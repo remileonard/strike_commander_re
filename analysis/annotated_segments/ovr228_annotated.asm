@@ -2071,20 +2071,23 @@ AircraftDamageModel_Helper_74B35	endp
 ; WorldObjectA_Method_ClearField2_738DA). Sequence complete : (1) hérite/initialise via la
 ; classe de base ; (2) copie arg_4 dans +0x2, pose +0x6=1, nettoie des bits de statut
 ; (+0x28D/+0x28B) ; (3) alloue un sous-objet (tag 0x5C44, taille 0x2B) et l'attache a
-; +0x7/+0x9 (avec fallback via sub_6AA34/sub_12931=HUD_ResetPanel si l'allocation echoue) ;
-; (4) copie ce pointeur vers +0x102/+0x104 (0) ; (5) etablit une reference faible sur +0x10F
-; (cible/objet lie initial) ; (6) POSITION PAR DEFAUT : +0x111/+0x115/+0x119 = (0, 0,
-; 0x3E800=256000) - le MEME decalage d'altitude (1000 en 24.8) que celui trouve dans
-; Goal_ActiveWingmanEngagement_878F ; (7) goal_state (+0x11D) = 0xFFFF (SENTINELLE 'aucun
-; objectif actif') ; (8) constantes +0x139=30000, +0x13D=512000, +0x141=64000 (role exact non
-; determine) ; (9) references faibles etablies sur +0x137/+0x145/+0x147 (les memes champs
-; cible que Goal_IsComplete/Goal_ActiveWingmanEngagement) ; (10) EFFACE LE PREMIER EMPLACEMENT
-; GOAL (+0x1B0, 8 octets a 0, via CRT_Fmemcpy_3FD depuis unk_6D1B8) ; (11) 5 champs
-; sentinelles a -100 (0xFFFFFF9C) : +0x166, +0x162, +0x109, +0x156, +0x15C (probables
-; timers/distances 'non initialise') ; (12) +0x10D=0, +0x15A/+0x15B=0xFF, +0x200(compteur
-; MVRS)=0, +0x202(premier pointeur MVRS)=0 - CONFIRME que MVRS demarre a zero AVANT le
-; chargement PROF ; (13) deballage/remballage individuel de bits sur +0x28B/+0x28C (meme motif
-; que le debut d'AIEntity_MasterTick_5ACC) ; (14) +0x16A=0. Anciennement mal nommee
+; +0x7/+0x9 (si l'allocation réussit : vtable 0xC6, VROOMM_StubThunk_6AA34, vtable 0x130, puis
+; AircraftStateBlock_Reset_12931 (anciennement HUD_ResetPanel) qui remet ce bloc à zéro ; ce
+; n'est PAS un repli d'échec d'allocation ; le bloc est un enregistrement d'états/commandes,
+; pas un panneau d'affichage) ; (4) copie ce pointeur vers +0x102/+0x104 (0) ; (5) etablit une
+; reference faible sur +0x10F (cible/objet lie initial) ; (6) POSITION PAR DEFAUT :
+; +0x111/+0x115/+0x119 = (0, 0, 0x3E800=256000) - le MEME decalage d'altitude (1000 en 24.8)
+; que celui trouve dans Goal_ActiveWingmanEngagement_878F ; (7) goal_state (+0x11D) = 0xFFFF
+; (SENTINELLE 'aucun objectif actif') ; (8) constantes +0x139=30000, +0x13D=512000,
+; +0x141=64000 (role exact non determine) ; (9) references faibles etablies sur
+; +0x137/+0x145/+0x147 (les memes champs cible que
+; Goal_IsComplete/Goal_ActiveWingmanEngagement) ; (10) EFFACE LE PREMIER EMPLACEMENT GOAL
+; (+0x1B0, 8 octets a 0, via CRT_Fmemcpy_3FD depuis unk_6D1B8) ; (11) 5 champs sentinelles a
+; -100 (0xFFFFFF9C) : +0x166, +0x162, +0x109, +0x156, +0x15C (probables timers/distances 'non
+; initialise') ; (12) +0x10D=0, +0x15A/+0x15B=0xFF, +0x200(compteur MVRS)=0, +0x202(premier
+; pointeur MVRS)=0 - CONFIRME que MVRS demarre a zero AVANT le chargement PROF ; (13)
+; deballage/remballage individuel de bits sur +0x28B/+0x28C (meme motif que le debut
+; d'AIEntity_MasterTick_5ACC) ; (14) +0x16A=0. Anciennement mal nommee
 ; AircraftDamageModel_ConstructAndBind (balayage rapide, aucun rapport avec un modele de
 ; dommages).
 ; ==============================================================================================
@@ -2134,7 +2137,7 @@ arg_4		= word ptr  0Ah
 		mov	word ptr es:[bx], 130h
 		push	word ptr [bp+var_4+2]
 		push	bx
-		call	HUD_ResetPanel
+		call	AircraftStateBlock_Reset_12931
 		add	sp, 4
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]

@@ -570,7 +570,7 @@ loc_4F25B:				; CODE XREF: seg108:04C5j
 
 loc_4F277:				; CODE XREF: seg108:0492j seg108:0498j ...
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 		pop	cx
 		pop	si
 		leave

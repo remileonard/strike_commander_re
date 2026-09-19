@@ -193,7 +193,7 @@ arg_0		= word ptr  6
 		mov	word_724AC, 0
 		push	si
 		push	59C3h
-		call	Container_FindAndTouch
+		call	WorldObjects_CallSlot4OnAllThenRecompute_2214F
 		add	sp, 4
 		push	53FAh
 		call	Widget_RefreshTextConditional
@@ -738,7 +738,7 @@ loc_7B370:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+493j
 		push	ax
 		call	AI_ComputeGeometryHelper_56E29
 		add	sp, 4
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		push	large 0
 		mov	al, [bp+var_10]
 		push	ax
@@ -1195,7 +1195,7 @@ loc_7B7BF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+8FBj
 		push	ax
 		call	Utility_Helper_55A37
 		pop	cx
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		push	large 0
 		mov	al, byte ptr [bp+var_2E]
 		push	ax
@@ -1818,7 +1818,7 @@ loc_7BF54:
 		push	ax
 		call	UI_ApplyLineOfSightAndTransform_57DAE
 		add	sp, 4
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		push	5130h
 		call	Resource_AccessUnified
 		pop	cx
@@ -2102,7 +2102,7 @@ loc_7C247:
 ; ���������������������������������������������������������������������������
 
 loc_7C24E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+11D7j
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 
 loc_7C253:
 		push	large 0
@@ -3204,7 +3204,7 @@ loc_7D10E:
 
 loc_7D142:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1E09j
 					; MissionRecord_LoadEntityDatabase_7B035+1E13j
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		cmp	byte ptr [bp+var_B4+1],	0
 		jz	short loc_7D161
 		push	0

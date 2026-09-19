@@ -476,10 +476,10 @@ loc_3CBB3:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,15L — wrapper vers sub_3800A (test d'état détruit/désactivé) : accesseur d'état de
-; destruction de l'objet composite.
+; far, enrobage de WorldObject_TestAliveAndUpdateChildren_3800A : renvoie non nul si l'objet
+; est vivant (le nom d'origine, IsDestroyed, était inversé).
 ; ==============================================================================================
-WorldObject_IsDestroyed	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+8P Camera_LookAtSecondaryTarget_3D9FB+BP ...
+WorldObject_IsAlive_3CBB7	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+8P WorldObject_UpdateWithAIEntity_3D9FB+BP ...
 
 arg_0		= word ptr  6
 
@@ -487,13 +487,13 @@ arg_0		= word ptr  6
 		mov	bp, sp
 		mov	ax, [bp+arg_0]
 		push	ax
-		call	Debris_TestDestroyedState
+		call	WorldObject_TestAliveAndUpdateChildren_3800A
 		pop	cx
 
 loc_3CBC4:
 		pop	bp
 		retf
-WorldObject_IsDestroyed	endp
+WorldObject_IsAlive_3CBB7	endp
 
 ; ���������������������������������������������������������������������������
 

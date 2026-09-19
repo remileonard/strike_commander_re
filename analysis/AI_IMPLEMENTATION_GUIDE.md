@@ -321,6 +321,8 @@ void SCMissionActors::onEvent(const EventMessage &event) {
 
 ### 2.5 `SCMissionActors::onAIRefresh`
 
+*Note (2026-09-19) : ce pseudocode ne reflète pas l'ordre réel d'`AI_TopLevelThink` (réactions prioritaires, objet en cours, contournement au sol) — voir §2.9 et `AI_SYSTEM.md` §4.2.*
+
 ```cpp
 void SCMissionActors::onAIRefresh(const AIRefreshEvent &event) {
     if (!this->is_active || this->is_destroyed) return;
@@ -444,6 +446,32 @@ exclusion mutuelle au niveau de la boucle `GOAL`, mais une délégation
 interne à certains native handlers. **À reconfirmer en ASM lors de la
 session dédiée au tournoi `MVRS`** (§3 ci-dessous) avant de considérer ce
 découpage comme définitif.
+
+### 2.9 Ce que l'ASM fait autour de la boucle `GOAL` (non encore reproduit)
+
+Source : `AI_SYSTEM.md` §4.2 corrigé, `AI_TICK_CALL_GRAPH.md` (citations). Ordre
+réel de la décision IA, à chaque tick de l'entité :
+
+1. **Réactions prioritaires** (menace, escorte, dégâts) : si l'une réagit, on
+   s'arrête là — c'est le « protect self » qui passe avant « obey order ».
+2. **Objet en cours** (`entité+0x0D`, nature inconnue) : s'il existe, il passe
+   avant le tournoi et avant les objectifs.
+3. **Avion au sol : `Goal_ExecuteAction` direct**, quel que soit le tableau
+   `GOAL`. Avion en vol : parcours des emplacements du fichier.
+
+Écarts actuels de libRealSpace par rapport à cet ordre :
+
+| Règle ASM | État dans `runGoalSelectors()` |
+|---|---|
+| Au sol, `Goal_ExecuteAction` tourne sans consulter `GOAL` | **absent** : avec `GOAL=1` seul (tableau vide), un acteur ne décolle pas, alors qu'en jeu il décolle |
+| La valeur `1` n'occupe aucun emplacement | traitée comme `GOAL_EMPTY` et ignorée à la lecture de la boucle : équivalent, mais l'acteur reste un acteur « à `GOAL` » |
+| Réactions prioritaires avant les objectifs | **absent** ; `protectSelf()` est un palliatif appelé dans `executeGoalAction()`, donc lié au sélecteur `2` |
+| Objet en cours (`entité+0x0D`) avant `GOAL` | **absent**, nature de l'objet non établie |
+| Gestionnaires appelés avec `(entité, 0)` | sans objet ici |
+
+Le contournement au sol est la règle prouvée la plus simple à reproduire :
+si `plane->on_ground`, appeler `executeGoalAction()` avant de parcourir
+`profile->ai.goal` (et ne pas exiger un tableau non vide dans `onAIRefresh`).
 
 ---
 

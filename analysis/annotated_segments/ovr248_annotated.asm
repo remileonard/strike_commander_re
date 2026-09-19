@@ -56,7 +56,7 @@ loc_8623E:				; CODE XREF: Camera_UpdateAndNotifyB_861E0+41j
 loc_86243:				; CODE XREF: Camera_UpdateAndNotifyB_861E0+5Cj
 		push	si
 		push	59C3h
-		call	Container_FindAndTouch
+		call	WorldObjects_CallSlot4OnAllThenRecompute_2214F
 		add	sp, 4
 		mov	byte_6EB46, 1
 		push	53FAh

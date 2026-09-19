@@ -894,7 +894,7 @@ loc_9E372:
 		push	ax
 		push	dx
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		lea	ax, [bp+var_5C]
@@ -975,7 +975,7 @@ loc_9E42A:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+E3j
 loc_9E431:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+1A3j
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	[bp+var_1E], si
 		push	[bp+var_1E]

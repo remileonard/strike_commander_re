@@ -648,7 +648,7 @@ arg_2		= word ptr  8
 		jnz	short loc_38006
 		push	di
 		push	word ptr [si+1Eh]
-		call	Container_FindByKeyAlt
+		call	WorldObjects_CallSlot4OnAll_22D6C
 		add	sp, 4
 
 loc_38006:				; CODE XREF: Debris_NotifyChildValidate+10j
@@ -665,10 +665,12 @@ Debris_NotifyChildValidate	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,38L — teste l'état d'un enfant (vtable[0x18]) ou d'un flag alternatif (+0x1E) : test
-; d'état 'détruit/désactivé' d'un corps physique.
+; far, si l'enfant à +0xA existe et que son slot +0x18 renvoie 0 → renvoie 0 (mort). Sinon, si
+; une liste de sous-objets existe à +0x1E, appelle WorldObjects_UpdateAllAndRemoveDead_221F2
+; dessus (mise à jour hiérarchique) et renvoie 1 (vivant). Anciennement
+; Debris_TestDestroyedState (le résultat non nul signifie vivant, pas détruit).
 ; ==============================================================================================
-Debris_TestDestroyedState	proc far		; CODE XREF: WorldObject_IsDestroyed+7P Camera_NotifyFollowTarget+8P ...
+WorldObject_TestAliveAndUpdateChildren_3800A	proc far		; CODE XREF: WorldObject_IsAlive_3CBB7+7P Camera_NotifyFollowTarget+8P ...
 
 arg_0		= word ptr  6
 
@@ -690,22 +692,22 @@ arg_0		= word ptr  6
 		jmp	short loc_38043
 ; ���������������������������������������������������������������������������
 
-loc_38032:				; CODE XREF: Debris_TestDestroyedState+Cj
-					; Debris_TestDestroyedState+22j
+loc_38032:				; CODE XREF: WorldObject_TestAliveAndUpdateChildren_3800A+Cj
+					; WorldObject_TestAliveAndUpdateChildren_3800A+22j
 		cmp	word ptr [si+1Eh], 0
 		jz	short loc_38041
 		push	word ptr [si+1Eh]
-		call	WorldObjects_PurgeExpired
+		call	WorldObjects_UpdateAllAndRemoveDead_221F2
 		pop	cx
 
-loc_38041:				; CODE XREF: Debris_TestDestroyedState+2Cj
+loc_38041:				; CODE XREF: WorldObject_TestAliveAndUpdateChildren_3800A+2Cj
 		mov	al, 1
 
-loc_38043:				; CODE XREF: Debris_TestDestroyedState+26j
+loc_38043:				; CODE XREF: WorldObject_TestAliveAndUpdateChildren_3800A+26j
 		pop	si
 		pop	bp
 		retf
-Debris_TestDestroyedState	endp
+WorldObject_TestAliveAndUpdateChildren_3800A	endp
 
 ; ���������������������������������������������������������������������������
 

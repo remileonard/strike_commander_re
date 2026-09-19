@@ -60,7 +60,7 @@ VROOMM_StubThunk_6AA2A	endp
 ; far, thunk fixe VROOMM (jmp sub_737E0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0, codesize=15Ah, nentries=10.
 ; ==============================================================================================
-VROOMM_StubThunk_6AA2F	proc far		; CODE XREF: HUD_EncodeInstruments:loc_1280DP
+VROOMM_StubThunk_6AA2F	proc far		; CODE XREF: AircraftStateBits_Clear_12806:loc_1280DP
 		jmp	WorldObjectA_Method_NoOp_737E0
 VROOMM_StubThunk_6AA2F	endp
 
@@ -73,7 +73,7 @@ VROOMM_StubThunk_6AA2F	endp
 ; far, thunk fixe VROOMM (jmp sub_737E5) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0, codesize=15Ah, nentries=10.
 ; ==============================================================================================
-VROOMM_StubThunk_6AA34	proc far		; CODE XREF: HUD_ResetPanel+AP seg010:01ACP ...
+VROOMM_StubThunk_6AA34	proc far		; CODE XREF: AircraftStateBlock_Reset_12931+AP seg010:01ACP ...
 		jmp	WorldObjectA_ResetPositionVector_737E5
 VROOMM_StubThunk_6AA34	endp
 

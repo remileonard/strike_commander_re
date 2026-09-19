@@ -415,7 +415,7 @@ loc_7D615:
 		push	ax
 		call	Matrix_BuildFullOrientation_575B2
 		add	sp, 8
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		push	large 0
 		mov	al, byte ptr [bp+var_24]
 		push	ax
@@ -645,7 +645,7 @@ loc_7D7C1:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+4A2j
 ; ���������������������������������������������������������������������������
 
 loc_7D8FD:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+640j
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		mov	eax, [bp+var_42]
 		mov	edx, dword_70458
 		imul	edx
@@ -946,7 +946,7 @@ loc_7DB67:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+82Ej
 		push	ax
 		call	UI_ApplyLineOfSightAndTransform_57DAE
 		add	sp, 4
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		push	5130h
 		call	Resource_AccessUnified
 		pop	cx
@@ -1068,7 +1068,7 @@ loc_7DDDE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0Aj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_7DE26
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		mov	eax, dword_70458
 		sub	[bp+var_24], eax
 		mov	al, byte_722D1

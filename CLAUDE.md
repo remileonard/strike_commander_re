@@ -5,6 +5,42 @@ une session ciblée de décodage sur une fonction ou un sous-système
 particulier. Il est volontairement concis — les détails complets sont dans
 les autres fichiers de `analysis/`, référencés au fil du texte.
 
+## ⚠️⚠️ Règles de travail avec Rémi (instructions FORTES, à appliquer à chaque réponse)
+
+**1. Parler avec les noms résolus, jamais avec les adresses.**
+Rémi ne lit pas l'assembleur et n'a pas en tête les adresses. Quand tu
+désignes une fonction, donne **son nom résolu de `known_functions.json`**
+(ex. `EntityTracker_ApplySelection`), pas `sub_23CCC`, `loc_5ACC` ou un offset
+hexadécimal. Lui-même te passe des noms de fonctions : réponds avec **les
+mêmes noms**, pour que vous parliez la même langue.
+- L'adresse, si elle est utile, vient **après** le nom et entre parenthèses,
+  une seule fois. Jamais seule.
+- Une fonction **sans nom résolu** : dis-le explicitement ("fonction pas
+  encore nommée") et décris ce qu'elle fait en une phrase, puis propose un
+  nom. Ne la balade pas sous son adresse nue dans une liste ou un résumé.
+- Écris pour quelqu'un qui doit comprendre sans ouvrir un autre fichier :
+  phrases courtes, rôle avant le détail technique, pas de suite d'offsets ou
+  d'instructions comme seule explication.
+
+**2. Ne jamais chercher dans `source/strike.asm` : utiliser
+`analysis/annotated_segments/`.**
+Toutes les recherches (grep d'un motif comme `call dword ptr [bx+0Ch]`, lecture
+d'une fonction, recherche d'appelants) se font dans les fichiers
+`analysis/annotated_segments/*_annotated.asm`, où les labels sont déjà
+renommés avec les noms de `known_functions.json`. C'est ce qui garantit que
+tes résultats sont directement lisibles par Rémi.
+- Pour chercher un motif partout : `grep` sur `annotated_segments/*.asm`
+  (les résultats portent déjà les noms résolus).
+- `source/strike.asm` uniquement si l'information n'existe réellement pas dans
+  le fichier annoté, et **dis-le à Rémi** en expliquant pourquoi. Ne pas y
+  basculer par commodité.
+- Si un segment annoté manque ou semble incomplet : régénérer avec
+  `tools/annotate_segments.py`, ne pas contourner.
+
+*(Rappel d'incident : une session a mené toute une investigation dans
+`strike.asm` et rendu des résultats en `sub_XXXXX`, obligeant Rémi à
+rechercher chaque nom dans `known_functions.json`. À ne pas reproduire.)*
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur

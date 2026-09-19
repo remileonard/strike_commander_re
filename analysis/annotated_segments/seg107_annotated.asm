@@ -889,7 +889,7 @@ loc_4DEE8:				; CODE XREF: seg107:0843j
 		push	1
 		push	large dword ptr	[bp-4]
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		or	si, si
@@ -942,7 +942,7 @@ loc_4DF0D:				; CODE XREF: seg107:0868j
 		add	sp, 4
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_4DF8E:				; CODE XREF: seg107:0845j seg107:086Aj
@@ -1628,7 +1628,7 @@ loc_4E5AC:				; DATA XREF: seg339:off_70266o
 		mov	si, [bp+6]
 		mov	byte ptr [bp-1], 0
 		push	si
-		call	Debris_TestDestroyedState
+		call	WorldObject_TestAliveAndUpdateChildren_3800A
 		pop	cx
 		or	al, al
 		jz	short loc_4E5FB

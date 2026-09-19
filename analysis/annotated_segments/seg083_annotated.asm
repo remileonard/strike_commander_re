@@ -17,7 +17,7 @@ seg083		segment	byte public 'CODE' use16
 ; de rendu. Priorité absolue pour une session d'analyse dédiée compte tenu de son rôle central
 ; et de son recoupement direct avec le format IFF déjà étudié.
 ; ==============================================================================================
-IFF_LoadModelMain	proc far		; CODE XREF: Debris_LoadAndInstantiate+2CP
+IFF_LoadModelMain	proc far		; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+2CP
 					; Debris_LoadAndInstantiateAlt+2CP ...
 
 var_16E		= word ptr -16Eh

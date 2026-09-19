@@ -598,7 +598,7 @@ loc_86F80:				; CODE XREF: Cockpit_LoadViewTable_86B53+3CFj
 		push	word ptr [bp+var_30+2]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	[si+173h], ax
 

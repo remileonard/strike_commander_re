@@ -331,7 +331,7 @@ loc_9AA9C:
 		lea	ax, [bp+var_59]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 
 loc_9AAB0:
@@ -348,7 +348,7 @@ loc_9AAB7:
 		lea	ax, [bp+var_66]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	[bp+var_E], ax
 
@@ -472,7 +472,7 @@ loc_9ABB0:
 		mov	[bp+var_20], ax
 		push	ax
 		push	word ptr [si+6]
-		call	Container_KeyCompare
+		call	List_AppendTail_22C23
 		add	sp, 4
 
 loc_9ABBF:				; CODE XREF: TerrainSector_LoadIndexedRecord_9A95A:loc_9AAD2j

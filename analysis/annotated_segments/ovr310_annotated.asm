@@ -338,10 +338,13 @@ Camera_Helper_9D286	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocation, WorldObject_BaseConstruct, Camera_ResetState,
-; Camera_InitWithSecondaryTarget.
+; far, construit un objet monde de 0x5A octets (WorldObject_BaseConstruct, vtable 0x2618 après
+; Camera_ResetState), puis écrit à +0x55 l'entité IA obtenue en appelant le slot 0 de l'objet
+; à +0x46 du prototype (AIEntity_CreateByType_12B4E, avec l'objet neuf en argument) et à +0x51
+; le résultat du slot +8 de l'objet à +0x36 du prototype. Anciennement
+; Camera_ConstructWithSecondaryTarget.
 ; ==============================================================================================
-Camera_ConstructWithSecondaryTarget_9D2CC	proc far		; CODE XREF: VROOMM_StubThunk_6C1D9J
+WorldObject_ConstructWithAIEntity_9D2CC	proc far		; CODE XREF: VROOMM_StubThunk_6C1D9J
 
 var_A		= word ptr -0Ah
 var_8		= dword	ptr -8
@@ -378,10 +381,10 @@ arg_0		= dword	ptr  6
 		jmp	short loc_9D31F
 ; ���������������������������������������������������������������������������
 
-loc_9D31D:				; CODE XREF: Camera_ConstructWithSecondaryTarget_9D2CC+1Bj
+loc_9D31D:				; CODE XREF: WorldObject_ConstructWithAIEntity_9D2CC+1Bj
 		mov	ax, si
 
-loc_9D31F:				; CODE XREF: Camera_ConstructWithSecondaryTarget_9D2CC+4Fj
+loc_9D31F:				; CODE XREF: WorldObject_ConstructWithAIEntity_9D2CC+4Fj
 		mov	si, ax
 		push	ax
 		push	large [bp+arg_0]
@@ -416,11 +419,11 @@ loc_9D366:
 		mov	[bp+var_A], ax
 		mov	[si+51h], ax
 
-loc_9D36F:				; CODE XREF: Camera_ConstructWithSecondaryTarget_9D2CC:loc_9D330j
+loc_9D36F:				; CODE XREF: WorldObject_ConstructWithAIEntity_9D2CC:loc_9D330j
 		mov	ax, si
 		pop	si
 		leave
 		retf
-Camera_ConstructWithSecondaryTarget_9D2CC	endp
+WorldObject_ConstructWithAIEntity_9D2CC	endp
 
 ovr310		ends

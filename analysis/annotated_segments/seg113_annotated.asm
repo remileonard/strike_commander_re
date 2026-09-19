@@ -475,7 +475,7 @@ arg_0		= word ptr  6
 		pop	cx
 		push	si
 		push	59C3h
-		call	Container_NotifyAllActive
+		call	WorldObjects_CallSlot1COnActive_2217D
 		add	sp, 4
 		pop	si
 		pop	bp

@@ -167,17 +167,16 @@ loc_2DF03:				; DATA XREF: seg339:0498o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far — méthode virtuelle 'rendre cette vue' partagée par de NOMBREUSES vtables (DATA XREF
-; seg339:0478/049C/...). Args : si = objet vue (ex. word_72A8F). Corps : lecture PIT
-; (PIT_ReadHighPrecision_27144) -> dword_72B7A (profilage) ; si [si+0x5C]==0 (pas de viewport)
-; -> bail ; Camera_CopyState_2DE6D(si,0x5146) (snapshot) ; sub_5D999([bp-4], [si+0x5C]+2) ;
-; si->vtable[+0x50][+0x20]() ; si->vtable[+0x50][+0x14]() (=
-; Camera_ExternalViewComputeMain_1519E pour une entrée CHAS — MAJ position/orientation caméra)
-; ; [si+0x5C]->vtable[+0x04]() (rendu via le rect viewport du chunk) ; jalons de profilage
-; dword_72B7E/82/86/8A/8E ; sub_5D9D3(2,[bp-4]). C'est le point d'entrée par frame côté rendu
-; qui tick la caméra de la vue active.
+; far, méthode virtuelle : slot +0x18 des sous-vtables posés à +0x50 (0x460 et 0x484 de
+; seg339), appelée par TrackedObjects_CallSlot18OnActive_22F10 pour chaque objet actif de la
+; liste 0x59CD. Séquence lue : PIT_ReadHighPrecision (jalons de profilage
+; dword_72B7A/7E/82/86/8A/8E), Camera_CopyState(objet,0x5146), Camera_UpdateViewportClip,
+; WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3, objet),
+; Widget_RefreshTextConditional(0x53FA), Collection_NotifyAllDestroy(0x53FA), slot +0x20 puis
+; slot +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement
+; View_RenderFrame ('rendre cette vue' : non prouvé, nom neutralisé).
 ; ==============================================================================================
-View_RenderFrame_2DF0D:				; DATA XREF: seg339:0478o seg339:049Co ...
+TrackedObject_FrameStep_2DF0D:				; DATA XREF: seg339:0478o seg339:049Co ...
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -231,7 +230,7 @@ loc_2DF5F:
 		mov	word_724AC, 0
 		push	si
 		push	59C3h
-		call	Container_FindAndTouch
+		call	WorldObjects_CallSlot4OnAllThenRecompute_2214F
 		add	sp, 4
 
 loc_2DF71:
@@ -298,7 +297,14 @@ loc_2DFE1:				; CODE XREF: seg065:012Aj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2DFE4:				; DATA XREF: seg339:off_6D530o
+; ==============================================================================================
+; far, méthode virtuelle : slot +0x20 des sous-vtables posés à +0x50 (0x460 et 0x484 de
+; seg339), appelée par TrackedObject_FrameStep_2DF0D. Appelle
+; UIScreen_RenderGraphVGA_Wrapper_50E44(objet), qui appelle UIScreen_RenderGraphVGA_509EE puis
+; WorldObjects_CallSlot1COnActive_2217D(0x59C3, objet). Pas de nom résolu auparavant (label
+; loc_2DFE4).
+; ==============================================================================================
+TrackedObject_NotifyWorldObjects_2DFE4:				; DATA XREF: seg339:off_6D530o
 					; seg339:04A4o	...
 		push	bp
 		mov	bp, sp

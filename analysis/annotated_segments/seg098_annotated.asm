@@ -112,7 +112,7 @@ loc_45B63:
 
 loc_45B6C:				; CODE XREF: seg098:0087j seg098:0090j ...
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 		pop	cx
 		pop	si
 		leave

@@ -306,7 +306,7 @@ loc_9B5F9:				; CODE XREF: Debris_ConstructWithTorque_9B5BD+Fj
 		mov	[bp+var_2], ax
 		push	ax
 		push	word ptr [si+1Eh]
-		call	Container_KeyCompare
+		call	List_AppendTail_22C23
 		add	sp, 4
 		push	si
 
@@ -432,7 +432,7 @@ loc_9B6A1:
 		push	word ptr [si+1Eh]
 
 loc_9B6A4:
-		call	Container_KeyCompare
+		call	List_AppendTail_22C23
 		add	sp, 4
 
 loc_9B6AC:				; CODE XREF: Debris_ConstructWithTorqueB_9B649+4Fj
@@ -485,7 +485,7 @@ arg_4		= word ptr  0Ah
 		pop	cx
 		push	di
 		push	[bp+arg_4]
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_9B6E3:

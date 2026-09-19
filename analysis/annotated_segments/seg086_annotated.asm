@@ -37,7 +37,7 @@ arg_0		= word ptr  6
 		push	si
 
 loc_3DDCF:
-		call	Camera_LookAtSecondaryTarget_3D9FB
+		call	WorldObject_UpdateWithAIEntity_3D9FB
 		pop	cx
 		or	al, al
 		jz	short loc_3DE17

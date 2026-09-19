@@ -73,7 +73,7 @@ loc_7A84E:				; CODE XREF: AIManeuver_BuildRotationAndLookupB_7A836+13j
 		pop	cx
 		push	word ptr [si+173h]
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	byte ptr [si+1BCh], 1
 		mov	word ptr [si+125h], 0FFFFh

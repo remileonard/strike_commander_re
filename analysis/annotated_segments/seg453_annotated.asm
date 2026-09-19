@@ -264,7 +264,7 @@ arg_2		= dword	ptr  8
 		push	1
 		push	large [bp+var_4]
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		or	si, si
@@ -429,7 +429,7 @@ loc_A6F7B:
 		add	sp, 8
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	bx, [di+51h]
 		mov	al, [bx+20h]

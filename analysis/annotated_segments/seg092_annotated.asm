@@ -438,7 +438,7 @@ loc_4375D:				; CODE XREF: seg092:0368j
 		push	word ptr es:[bx+4Bh]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -563,7 +563,7 @@ loc_43867:				; CODE XREF: seg092:046Ej
 		and	byte ptr [di+4], 0FDh
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		cmp	dword ptr [di+0Eh], 0
 		jz	short loc_438D7
@@ -595,7 +595,7 @@ loc_438F2:				; CODE XREF: seg092:00BFj
 
 loc_438FA:				; CODE XREF: seg092:02F2j seg092:02FCj ...
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 		pop	cx
 		mov	ah, 0
 		or	ax, ax
@@ -704,7 +704,7 @@ loc_4395C:				; CODE XREF: Effect_SpawnPeriodicAtAttach+21j
 		push	word ptr es:[bx+4Bh]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -935,7 +935,7 @@ loc_43B91:
 		add	sp, 8
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		dec	dword ptr [si+53h]
 		les	bx, [si+0Eh]

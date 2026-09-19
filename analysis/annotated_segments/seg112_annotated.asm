@@ -609,7 +609,7 @@ loc_5001C:				; CODE XREF: CombatTarget_WeaponActionSubsystem+3C2j
 		pop	eax
 		mov	dword_72B96, eax
 		push	59C3h
-		call	WorldObjects_PeriodicGC
+		call	WorldObjects_UpdateFrame_ResetCounters_221C2
 
 loc_50031:
 		pop	cx
@@ -714,11 +714,13 @@ UIScreen_ReadNumericFields_500A6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 360 lignes, NON DÉTAILLÉE — lit/valide de nombreux champs numériques (frame locale
-; ~0x74 octets, conversions via sub_27144), alimente des globales du même cluster (word_7045C
-; etc.), avec clamps min/max. Candidat pour session dédiée.
+; far, appelée directement par STRIKE_EXE_MAIN_LOOP. Appelle d'abord
+; TrackedObjects_CallSlot18OnActive_22F10 (liste 0x59CD), puis calcule le delta de temps de la
+; frame (dword_70458), le plafonne (0x1900) et met à jour la variable de vitesse de jeu
+; (dword_70468/70454/7045E). Anciennement UIScreen_ApplyFormFields (aucun formulaire dans ce
+; corps).
 ; ==============================================================================================
-UIScreen_ApplyFormFields_500F6	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP:loc_538BAP
+Frame_UpdateTimingAndNotifyTrackedObjects_500F6	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP:loc_538BAP
 					; UIScript_ParseAndEvaluate_7A054+467P ...
 
 var_74		= dword	ptr -74h
@@ -757,15 +759,15 @@ var_4		= dword	ptr -4
 		sub	sp, 74h
 		push	si
 		push	59CDh
-		call	WorldObjects_NotifyMissionTriggers
+		call	TrackedObjects_CallSlot18OnActive_22F10
 		pop	cx
 		cmp	byte_70447, 0
 		jnz	short loc_50110
 		jmp	loc_503DA
 ; ���������������������������������������������������������������������������
 
-loc_50110:				; CODE XREF: UIScreen_ApplyFormFields_500F6+15j
-					; UIScreen_ApplyFormFields_500F6+85j
+loc_50110:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+15j
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+85j
 		call	PIT_ReadHighPrecision
 		mov	bx, ax
 		cmp	bx, 1
@@ -776,10 +778,10 @@ loc_5011A:
 		jmp	short loc_50123
 ; ���������������������������������������������������������������������������
 
-loc_50121:				; CODE XREF: UIScreen_ApplyFormFields_500F6:loc_5011Aj
+loc_50121:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6:loc_5011Aj
 		mov	ax, bx
 
-loc_50123:				; CODE XREF: UIScreen_ApplyFormFields_500F6+29j
+loc_50123:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+29j
 		mov	word_7045C, ax
 		mov	[bp+var_8], 177000h
 		mov	[bp+var_A], ax
@@ -807,10 +809,10 @@ loc_50142:
 		jmp	short loc_50179
 ; ���������������������������������������������������������������������������
 
-loc_50177:				; CODE XREF: UIScreen_ApplyFormFields_500F6+7Aj
+loc_50177:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+7Aj
 		xor	ax, ax
 
-loc_50179:				; CODE XREF: UIScreen_ApplyFormFields_500F6+7Fj
+loc_50179:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+7Fj
 		or	al, al
 		jnz	short loc_50110
 		mov	eax, dword_72A69
@@ -846,17 +848,17 @@ loc_501A5:
 		sar	eax, 1Fh
 		inc	ax
 
-loc_501C6:				; CODE XREF: UIScreen_ApplyFormFields_500F6+92j
+loc_501C6:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+92j
 		cmp	dword_70468, 100h
 		jnz	short loc_501D6
 		mov	ax, 1
 		jmp	short loc_501D8
 ; ���������������������������������������������������������������������������
 
-loc_501D6:				; CODE XREF: UIScreen_ApplyFormFields_500F6+D9j
+loc_501D6:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+D9j
 		xor	ax, ax
 
-loc_501D8:				; CODE XREF: UIScreen_ApplyFormFields_500F6+DEj
+loc_501D8:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+DEj
 		or	al, al
 		jz	short loc_501EC
 		mov	al, byte_7046C
@@ -866,12 +868,12 @@ loc_501D8:				; CODE XREF: UIScreen_ApplyFormFields_500F6+DEj
 		cmp	word_7046E, 1
 		jz	short loc_501F3
 
-loc_501EC:				; CODE XREF: UIScreen_ApplyFormFields_500F6+E4j
-					; UIScreen_ApplyFormFields_500F6+EDj
+loc_501EC:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+E4j
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+EDj
 		cmp	byte_70497, 0
 		jz	short loc_50230
 
-loc_501F3:				; CODE XREF: UIScreen_ApplyFormFields_500F6+F4j
+loc_501F3:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+F4j
 		mov	[bp+var_2A], 400h
 		mov	eax, [bp+var_4]
 		mov	[bp+var_2E], eax
@@ -882,10 +884,10 @@ loc_501F3:				; CODE XREF: UIScreen_ApplyFormFields_500F6+F4j
 		jmp	short loc_50214
 ; ���������������������������������������������������������������������������
 
-loc_50212:				; CODE XREF: UIScreen_ApplyFormFields_500F6+115j
+loc_50212:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+115j
 		xor	ax, ax
 
-loc_50214:				; CODE XREF: UIScreen_ApplyFormFields_500F6+11Aj
+loc_50214:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+11Aj
 		or	al, al
 		jz	short loc_5021D
 
@@ -894,10 +896,10 @@ loc_50218:
 		jmp	short loc_50220
 ; ���������������������������������������������������������������������������
 
-loc_5021D:				; CODE XREF: UIScreen_ApplyFormFields_500F6+120j
+loc_5021D:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+120j
 		lea	ax, [bp+var_2E]
 
-loc_50220:				; CODE XREF: UIScreen_ApplyFormFields_500F6+125j
+loc_50220:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+125j
 		mov	si, ax
 
 loc_50222:
@@ -909,7 +911,7 @@ loc_50225:
 		jmp	loc_50399
 ; ���������������������������������������������������������������������������
 
-loc_50230:				; CODE XREF: UIScreen_ApplyFormFields_500F6+FBj
+loc_50230:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+FBj
 		cmp	byte_7046C, 0
 		jz	short loc_50256
 
@@ -927,8 +929,8 @@ loc_5023A:
 		jmp	short loc_50277
 ; ���������������������������������������������������������������������������
 
-loc_50256:				; CODE XREF: UIScreen_ApplyFormFields_500F6+13Fj
-					; UIScreen_ApplyFormFields_500F6+14Cj
+loc_50256:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+13Fj
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+14Cj
 		cmp	byte_7046C, 0
 		jz	short loc_50277
 		mov	byte_7046C, 0
@@ -938,8 +940,8 @@ loc_50256:				; CODE XREF: UIScreen_ApplyFormFields_500F6+13Fj
 		mov	dword_72B39, eax
 		mov	byte_72B41, 1
 
-loc_50277:				; CODE XREF: UIScreen_ApplyFormFields_500F6+15Ej
-					; UIScreen_ApplyFormFields_500F6+165j
+loc_50277:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+15Ej
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+165j
 		mov	[bp+var_3A], 100h
 		mov	eax, [bp+var_3A]
 		mov	edx, eax
@@ -965,7 +967,7 @@ loc_5029D:
 		mov	eax, [bp+var_46]
 		mov	dword_72A69, eax
 
-loc_502C7:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1BFj
+loc_502C7:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1BFj
 		cmp	word_7046E, 0
 		jz	short loc_5031C
 		mov	al, byte_7046C
@@ -977,7 +979,7 @@ loc_502C7:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1BFj
 		jle	short loc_502E8
 		mov	word_70495, 0
 
-loc_502E8:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1EAj
+loc_502E8:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1EAj
 		cmp	word_70495, 0Ah
 		jle	short loc_50301
 		mov	[bp+var_4A], 100h
@@ -986,7 +988,7 @@ loc_502E8:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1EAj
 		jmp	short loc_5031C
 ; ���������������������������������������������������������������������������
 
-loc_50301:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1F7j
+loc_50301:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1F7j
 		mov	ax, word_7046E
 		mov	[bp+var_4C], ax
 		movsx	eax, [bp+var_4C]
@@ -999,8 +1001,8 @@ loc_50314:
 		mov	eax, [bp+var_50]
 		mov	dword_70468, eax
 
-loc_5031C:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1D6j
-					; UIScreen_ApplyFormFields_500F6+1DFj ...
+loc_5031C:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1D6j
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1DFj ...
 		mov	eax, [bp+var_4]
 		mov	edx, eax
 		mov	ecx, dword_70468
@@ -1018,17 +1020,17 @@ loc_5031C:				; CODE XREF: UIScreen_ApplyFormFields_500F6+1D6j
 		jmp	short loc_50358
 ; ���������������������������������������������������������������������������
 
-loc_50356:				; CODE XREF: UIScreen_ApplyFormFields_500F6+259j
+loc_50356:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+259j
 		xor	ax, ax
 
-loc_50358:				; CODE XREF: UIScreen_ApplyFormFields_500F6+25Ej
+loc_50358:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+25Ej
 		or	al, al
 		jz	short loc_5036C
 		mov	[bp+var_60], 200h
 		mov	eax, [bp+var_60]
 		mov	dword_70454, eax
 
-loc_5036C:				; CODE XREF: UIScreen_ApplyFormFields_500F6+264j
+loc_5036C:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+264j
 		mov	[bp+var_64], 1900h
 		mov	eax, dword_70454
 		cmp	eax, [bp+var_64]
@@ -1037,10 +1039,10 @@ loc_5036C:				; CODE XREF: UIScreen_ApplyFormFields_500F6+264j
 		jmp	short loc_50385
 ; ���������������������������������������������������������������������������
 
-loc_50383:				; CODE XREF: UIScreen_ApplyFormFields_500F6+286j
+loc_50383:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+286j
 		xor	ax, ax
 
-loc_50385:				; CODE XREF: UIScreen_ApplyFormFields_500F6+28Bj
+loc_50385:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+28Bj
 		or	al, al
 		jz	short loc_50399
 		mov	[bp+var_68], 1900h
@@ -1049,8 +1051,8 @@ loc_50391:
 		mov	eax, [bp+var_68]
 		mov	dword_70454, eax
 
-loc_50399:				; CODE XREF: UIScreen_ApplyFormFields_500F6+137j
-					; UIScreen_ApplyFormFields_500F6+291j
+loc_50399:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+137j
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+291j
 		mov	[bp+var_6C], 100h
 		mov	eax, [bp+var_6C]
 		mov	edx, eax
@@ -1069,15 +1071,15 @@ loc_50399:				; CODE XREF: UIScreen_ApplyFormFields_500F6+137j
 		jmp	short loc_503DF
 ; ���������������������������������������������������������������������������
 
-loc_503DA:				; CODE XREF: UIScreen_ApplyFormFields_500F6+17j
+loc_503DA:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+17j
 		mov	byte_70447, 1
 
-loc_503DF:				; CODE XREF: UIScreen_ApplyFormFields_500F6+2E2j
+loc_503DF:				; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+2E2j
 		mov	dword_6E33D, 0
 		pop	si
 		leave
 		retf
-UIScreen_ApplyFormFields_500F6	endp
+Frame_UpdateTimingAndNotifyTrackedObjects_500F6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1089,7 +1091,7 @@ UIScreen_ApplyFormFields_500F6	endp
 ; UIScreen_StateMachineMain), gros calcul multi-champs (frame locale ~0x7A octets). Candidat
 ; pour session dédiée.
 ; ==============================================================================================
-UIScreen_ComputeDerivedFields_503EB	proc far		; CODE XREF: Container_FindAndTouch:loc_22163P
+UIScreen_ComputeDerivedFields_503EB	proc far		; CODE XREF: WorldObjects_CallSlot4OnAllThenRecompute_2214F:loc_22163P
 
 var_7A		= dword	ptr -7Ah
 var_76		= dword	ptr -76h

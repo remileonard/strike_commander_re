@@ -672,7 +672,7 @@ loc_45883:				; DATA XREF: seg339:off_6FC16o
 		push	si
 		mov	si, [bp+6]
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 		pop	cx
 		or	al, al
 		jz	short loc_458C3

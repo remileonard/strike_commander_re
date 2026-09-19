@@ -778,7 +778,7 @@ loc_7A48B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+429j
 		mov	dword_72B35, eax
 		mov	dword_72B39, eax
 		mov	byte_72B41, 1
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 
 loc_7A4C0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+420j
 		call	CombatTarget_WeaponActionSubsystem

@@ -219,7 +219,7 @@ loc_384BC:				; CODE XREF: Debris_SpawnAtAttachPoint+1E4j
 		push	571Ch
 		nop
 		push	cs
-		call	near ptr Debris_LoadAndInstantiate
+		call	near ptr ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		or	si, si
@@ -315,7 +315,7 @@ loc_38562:
 loc_3861C:				; CODE XREF: Debris_SpawnAtAttachPoint+1BFj
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_38628:				; CODE XREF: Debris_SpawnAtAttachPoint+B0j
@@ -477,7 +477,7 @@ loc_386E4:				; CODE XREF: Debris_SpawnOrchestrator+A5j
 		push	571Ch
 		nop
 		push	cs
-		call	near ptr Debris_LoadAndInstantiate
+		call	near ptr ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -595,7 +595,7 @@ loc_3879F:				; CODE XREF: Debris_SpawnOrchestrator+15Ej
 		add	sp, 8
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_38807:				; CODE XREF: Debris_SpawnOrchestrator+A7j
@@ -679,7 +679,7 @@ loc_3889D:				; CODE XREF: Debris_SpawnOrchestrator+32Bj
 		push	571Ch
 		nop
 		push	cs
-		call	near ptr Debris_LoadAndInstantiate
+		call	near ptr ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -738,7 +738,7 @@ loc_38941:				; CODE XREF: Debris_SpawnOrchestrator+2F9j
 		mov	word ptr [bp+var_12], di
 		push	word ptr [bp+var_12]
 		push	[bp+var_2]
-		call	Container_KeyCompare
+		call	List_AppendTail_22C23
 		add	sp, 4
 
 loc_38952:				; CODE XREF: Debris_SpawnOrchestrator+284j
@@ -981,7 +981,7 @@ Debris_ReleaseRefCounted	endp
 ; far,75L — recherche un modèle de débris par identifiant dans une table globale (offset
 ; +0x2B) : recherche d'un modèle de débris pré-chargé par identifiant.
 ; ==============================================================================================
-Debris_FindModelByID	proc far		; CODE XREF: Debris_LoadAndInstantiate+10p
+Debris_FindModelByID	proc far		; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+10p
 					; Debris_LoadAndInstantiateAlt+10p ...
 
 var_14		= dword	ptr -14h
@@ -1146,11 +1146,14 @@ loc_38B6C:				; CODE XREF: seg079:07E5j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,81L — recherche un modèle de débris (sub_38A79), le charge si absent (sub_3B876),
-; l'attache à un flag et invoque sa création (vtable[4]) : chargement et instanciation d'un
-; modèle de débris (avec cache).
+; far, cherche un prototype d'objet par clé (Debris_FindModelByID), le charge depuis
+; OBJECTS\<nom>.IFF via IFF_LoadModelMain s'il manque, écrit le rôle (arg 1/2/3 :
+; IA/PLAYER/NETWORK) à +0x34 du prototype, appelle son slot +4 (création d'une instance),
+; stocke à +0xA de l'instance l'objet enfant issu du slot +4 de l'objet à +0x15 du prototype,
+; incrémente le compteur de références du prototype (+4). Anciennement
+; Debris_LoadAndInstantiate (usage réel : tous les objets de modèle, dont les avions IA).
 ; ==============================================================================================
-Debris_LoadAndInstantiate	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+A4p
+ObjectPrototype_FindOrLoadAndInstantiate_38B70	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+A4p
 					; Debris_SpawnOrchestrator+C0p ...
 
 var_8		= dword	ptr -8
@@ -1183,7 +1186,7 @@ arg_8		= byte ptr  0Eh
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 
-loc_38BAA:				; CODE XREF: Debris_LoadAndInstantiate+21j
+loc_38BAA:				; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+21j
 		cmp	[bp+var_4], 0
 		jz	short loc_38C0D
 		les	bx, [bp+var_4]
@@ -1210,27 +1213,27 @@ loc_38BAA:				; CODE XREF: Debris_LoadAndInstantiate+21j
 		mov	word ptr [bp+var_8+2], dx
 		mov	word ptr [bp+var_8], ax
 
-loc_38BFA:				; CODE XREF: Debris_LoadAndInstantiate+6Fj
+loc_38BFA:				; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+6Fj
 		mov	eax, [bp+var_8]
 		mov	[si+0Ah], eax
 		les	bx, [bp+var_4]
 		inc	word ptr es:[bx+4]
 
-loc_38C09:				; CODE XREF: Debris_LoadAndInstantiate+5Cj
+loc_38C09:				; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+5Cj
 		mov	ax, si
 		jmp	short loc_38C0F
 ; ���������������������������������������������������������������������������
 
-loc_38C0D:				; CODE XREF: Debris_LoadAndInstantiate+3Fj
+loc_38C0D:				; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+3Fj
 		xor	ax, ax
 
-loc_38C0F:				; CODE XREF: Debris_LoadAndInstantiate+9Bj
+loc_38C0F:				; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+9Bj
 		pop	si
 		leave
 
 locret_38C11:
 		retf
-Debris_LoadAndInstantiate	endp
+ObjectPrototype_FindOrLoadAndInstantiate_38B70	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

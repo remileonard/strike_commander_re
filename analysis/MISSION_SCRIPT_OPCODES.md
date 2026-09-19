@@ -64,11 +64,23 @@ flowchart TD
     Alloc["PartEntry_AllocateArray<br/>(construction mission, UNE FOIS)"] --> Load["PartEntry_LoadAndResolveNames"]
     Load --> Reset["PartEntry_ResetState<br/>+0x52 = NUL au depart"]
 
-    MasterTick["AIEntity_MasterTick<br/>(arbre SEPARE, aussi par frame,<br/>voir AI_SYSTEM.md)"] --> TriggerBU["AI_TriggerBehaviorUpdate"]
+    MainGameTick --> WPeriodic["WorldObjects_UpdateFrame_ResetCounters<br/>(sub_221C2, appelee par CombatTarget_WeaponActionSubsystem)"]
+    WPeriodic --> WUpdAll["WorldObjects_UpdateAllAndRemoveDead<br/>(sub_221F2 : parcourt la liste 0x59C3,<br/>slot +0x10 de chaque noeud, retire les morts)"]
+    WUpdAll -->|"slot +0x10 de la classe<br/>de vtable 0x2618"| WUpdAI["WorldObject_UpdateWithAIEntity<br/>(sub_3D9FB)"]
+    WUpdAI -->|"byte_6D558 = 0<br/>entite lue a +0x55, slot +0xC"| MasterTick["AIEntity_MasterTick<br/>(tick par frame ; prepare l'etat puis aiguille ;<br/>voir AI_TICK_CALL_GRAPH.md)"]
+    Autopilot["byte_6D558 = 1<br/>(pilotage automatique,<br/>UIScript_ParseAndEvaluate)"] -.->|"suspend le tick IA"| WUpdAI
+    Spawn -->|"WorldObjects_AddToList<br/>(liste 0x59C3)"| WUpdAll
+    Spawn -.->|"objet monde +0x55 = entite IA<br/>(probable : WorldObject_ConstructWithAIEntity)"| WUpdAI
+    MasterTick --> TriggerBU["AI_TriggerBehaviorUpdate"]
     TriggerBU --> TopThink["AI_TopLevelThink"]
-    TopThink --> GoalExec["Goal_ExecuteAction"]
-    GoalExec --> Tournament["Tournoi MVRS"]
-    Tournament --> ActiveWingman["Goal_ActiveWingmanEngagement (GOAL=5)"]
+    TopThink --> React["réactions prioritaires<br/>(menace, escorte, dégâts)"]
+    React -->|"aucune réaction"| ActiveObj["objet à entité+0x0D<br/>(nature inconnue)"]
+    ActiveObj -->|"nul, avion au sol"| GoalExec["Goal_ExecuteAction"]
+    ActiveObj -->|"nul, avion en vol"| GoalSlots["emplacements GOAL du fichier<br/>(un gestionnaire par octet)"]
+    GoalSlots -->|"2"| GoalExec
+    GoalSlots -->|"3"| Wander["Goal_WanderRandom"]
+    GoalSlots -->|"4"| Tournament["Tournoi MVRS"]
+    GoalSlots -->|"5"| ActiveWingman["Goal_ActiveWingmanEngagement (GOAL=5)"]
 
     Profile -.->|"ecrit une fois,<br/>relu en boucle par l'autre arbre"| MasterTick
     Formation -.->|"entite+0x11D = 0xAA/0xA5<br/>(LIEN REEL, bidirectionnel)"| ActiveWingman
@@ -83,7 +95,8 @@ flowchart TD
     class Entry,InitVid,MainLoopTop,CockpitKey,RefreshField,UpdateProp,Alloc,Load,Reset construction
     class MainGameTick dispatch
     class Interp,Plumb,Relay,Native,Switch,OrderImpl,Formation,Trigger,Adapter,Ensure,TickGroup,SelChange,LeavingEvt,MissionUpdEvt,Recompute dispatch
-    class Controller,Spawn,Profile,MasterTick,TriggerBU,TopThink,GoalExec,Tournament,ActiveWingman resolved
+    class Controller,Spawn,Profile,MasterTick,TriggerBU,TopThink,React,GoalSlots,Wander,GoalExec,Tournament,ActiveWingman,WPeriodic,WUpdAll,WUpdAI resolved
+    class Autopilot dispatch
     class Fail failure
 ```
 
@@ -95,6 +108,33 @@ système séparé : elle est appelée par l'interprète, et le **rappelle**
 en interne (flèche pointillée) pour une sous-évaluation — un appel
 récursif contrôlé sur la même structure, pas deux systèmes distincts
 qui convergent par coïncidence.
+
+**MISE À JOUR (2026-09-19, session avec Rémi) — la case `AIEntity_MasterTick`
+n'est plus un « arbre séparé » sans parent.** Son appelant est maintenant
+tracé depuis `MAIN_GAME_TICK` (nouvelles flèches vertes du graphe) :
+`CombatTarget_WeaponActionSubsystem` → `WorldObjects_UpdateFrame_ResetCounters`
+→ `WorldObjects_UpdateAllAndRemoveDead` (parcourt la liste chaînée de tag
+0x59C3, slot +0x10 de chaque nœud) → `WorldObject_UpdateWithAIEntity` (l'objet
+monde lit l'entité IA à +0x55) → `AIEntity_MasterTick` (slot +0xC de la
+vtable de l'entité, uniquement si `byte_6D558`, le drapeau de pilotage
+automatique, vaut 0). Le détail, les noms modifiés et ce qui reste non
+résolu sont dans `AI_TICK_CALL_GRAPH.md`. Le lien avec la branche « spawn »
+est le même objet : `AIAircraft_SpawnAndConditionalLoadProfile` ajoute
+l'objet créé à la liste 0x59C3 (`WorldObjects_AddToList`, ancien nom
+`Expr_Node_RegisterListener`, qui n'enregistre aucun écouteur `Expr_VM`).
+Les liens `AI_TriggerBehaviorUpdate` → `AI_TopLevelThink` → `Goal_ExecuteAction`
+ci-dessous viennent des sessions précédentes et n'ont pas été relus lors de
+cette mise à jour : le corps de `AIEntity_MasterTick` lui-même n'exécute ni
+GOAL ni MVRS, il prépare l'état puis aiguille vers `Goal_FollowAllyExec` ou
+`AI_TriggerBehaviorUpdate`.
+
+**Mise à jour du même jour, après lecture de `AI_TopLevelThink`** : la
+chaîne `AI_TopLevelThink` → `Goal_ExecuteAction` → tournoi →
+`Goal_ActiveWingmanEngagement` dessinée ici auparavant était inexacte. Le
+graphe ci-dessus montre maintenant la structure lue : réactions
+prioritaires, puis l'objet à `entité+0x0D`, puis `Goal_ExecuteAction`
+direct si l'avion est au sol, sinon les gestionnaires du tableau `GOAL`
+(2, 3, 4, 5). Détail et citations dans `AI_TICK_CALL_GRAPH.md`.
 
 ## CORRIGÉ : cette chaîne tourne en fait À CHAQUE FRAME — `STRIKE_EXE_MAIN_LOOP`
 contient la boucle principale du jeu
@@ -320,6 +360,15 @@ qui communiquent par état partagé sur l'entité, pas par appel direct.
 elle-même** (pas l'initialisation), il faut repartir de
 `AIEntity_MasterTick` ou d'un point situé dans son propre arbre — pas
 de la chaîne de formation/spawn documentée ci-dessus.
+
+*Mise à jour 2026-09-19 : le point de départ est maintenant connu. Les deux
+« boucles per-frame distinctes » partent bien toutes deux de `MAIN_GAME_TICK` :
+l'une par `PartEntry_DispatchMissionUpdateTick` (script de mission, spawn),
+l'autre par `CombatTarget_WeaponActionSubsystem` →
+`WorldObjects_UpdateFrame_ResetCounters` → `WorldObjects_UpdateAllAndRemoveDead`
+→ `WorldObject_UpdateWithAIEntity` → `AIEntity_MasterTick`. Elles communiquent
+par l'objet monde et la liste 0x59C3, pas par un appel direct. Voir
+`AI_TICK_CALL_GRAPH.md`.*
 
 ## Découverte architecturale : ce n'est pas un système de mission, c'est
 un moteur générique d'évaluation de nœuds
@@ -714,19 +763,33 @@ void Goal_ActiveWingmanEngagement(Entity *self, Context *ctx)
    `PartEntry_ResolveSpawnPositionAndActivate` (côté script) que par cette
    fonction (côté `GOAL`).
 
-**Ça explique précisément l'observation empirique** : avec `GOAL=1`
-seul, le script pose bien `entité+0x11D=0xAA`, mais **aucune option du
-tournoi ne consulte ce champ** — rien ne réagit, l'avion garde son
-dernier état (monter, après le décollage). Avec `GOAL=5` présent, le
-tournoi peut sélectionner cette option, qui consulte le champ, le
-trouve à `0xAA`, et déclenche l'exécution réelle et continue.
+**CORRIGÉ (2026-09-19, lecture de `AI_TopLevelThink`, voir
+`AI_TICK_CALL_GRAPH.md`)** — l'explication initiale de ce paragraphe
+(« aucune option du tournoi ne consulte `entité+0x11D` ») était inexacte.
+Ce qui explique l'observation :
 
-**Donc la réponse complète à "comment sont reliés script et GOAL"** :
-ce n'est ni "flag posé puis lu passivement" ni "exécution 100% directe
-sans GOAL" — c'est une **collaboration bidirectionnelle sur un champ
-partagé**, où certaines options du tournoi (`GOAL=5` pour l'escorte,
-probablement d'autres pour d'autres ordres) sont les seules capables
-de traduire l'intention en comportement de vol continu et réactif.
+1. **Le décollage s'exécute parce que l'avion est au sol.**
+   `AI_TopLevelThink` appelle `Goal_ExecuteAction_A8AC` **directement**
+   quand l'octet `+0x20` du sous-objet de l'avion (le drapeau « au sol »
+   posé par `PhysicsTicks`) est non nul, sans consulter le tableau `GOAL`.
+   Le script pose l'ordre `0xA1` (décollage) et `Goal_ExecuteAction_A8AC`
+   l'exécute, même avec `GOAL=1` seul.
+2. **La valeur `1` du fichier `GOAL` est abandonnée au chargement**
+   (`cmp [bp+var_8], 1 / jz` dans `PilotProfile_LoadFromPROF`) : le
+   tableau est vide, aucun gestionnaire n'est associé.
+3. **Une fois en vol**, `AI_TopLevelThink` ne parcourt plus que les
+   emplacements du fichier. Avec un tableau vide rien ne s'exécute : le
+   suivi (`Follow Ally`, `0xAA`) n'est jamais traité, l'avion garde son
+   dernier état. Avec `5`, `Goal_ActiveWingmanEngagement_878F` est appelé
+   et lit `entité+0x11D`.
+
+Le canal `entité+0x11D` reste bidirectionnel (le script le pose,
+`Goal_ActiveWingmanEngagement_878F` le lit et peut l'écrire), mais le
+choix entre « exécuté » et « ignoré » dépend d'abord du drapeau au sol
+et du tableau `GOAL`, pas d'un test des options du tournoi.
+`Goal_ExecuteAction_A8AC`, `Goal_WanderRandom_AD13`, le tournoi et
+`Goal_ActiveWingmanEngagement_878F` sont des gestionnaires alternatifs
+choisis par l'octet du fichier, pas des étapes qui s'enchaînent.
 
 
 - Confirmer `0xA3`, `0xAB`, `0xB1`-`0xB5` par observation empirique.

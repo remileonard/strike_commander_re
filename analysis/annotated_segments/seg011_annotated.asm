@@ -59,7 +59,7 @@ loc_1301D:				; CODE XREF: SubObject_Attach+Ej
 loc_1305F:
 		push	word ptr [bp+var_4+2]
 		push	bx
-		call	HUD_ResetPanel
+		call	AircraftStateBlock_Reset_12931
 		add	sp, 4
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
@@ -189,7 +189,7 @@ arg_0		= dword	ptr  6
 		mov	[bp+var_1], 0
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+7]
-		call	HUD_EncodeInstruments
+		call	AircraftStateBits_Clear_12806
 		add	sp, 4
 		mov	[bp+var_2], 0
 		cmp	byte_72A8E, 4

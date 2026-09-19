@@ -367,7 +367,7 @@ off_69F26	dd loc_1689B
 		db  10h
 		db    1
 		db    0
-		dd WorldObjects_NotifyMissionTriggers
+		dd TrackedObjects_CallSlot18OnActive_22F10
 		db  0Fh
 		db    5
 		db    1

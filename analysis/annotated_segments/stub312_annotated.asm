@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C235	endp
 ; d'overlay actuellement charge en memoire. fileoff=2B890h, codesize=58h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C23A	proc far		; CODE XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+195P
-		jmp	Camera_Helper4_9D4D2
+		jmp	WorldObject_LoadAIProfileViaEntity_9D4D2
 VROOMM_StubThunk_6C23A	endp
 
 stub312		ends

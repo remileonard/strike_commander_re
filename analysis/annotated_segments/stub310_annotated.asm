@@ -87,7 +87,7 @@ VROOMM_StubThunk_6C1D4	endp
 ; d'overlay actuellement charge en memoire. fileoff=2B470h, codesize=2B4h, nentries=6.
 ; ==============================================================================================
 VROOMM_StubThunk_6C1D9	proc far		; DATA XREF: seg339:off_6F5A4o
-		jmp	Camera_ConstructWithSecondaryTarget_9D2CC
+		jmp	WorldObject_ConstructWithAIEntity_9D2CC
 VROOMM_StubThunk_6C1D9	endp
 
 stub310		ends

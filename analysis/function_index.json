@@ -2735,8 +2735,8 @@
 "calls": [
 "sub_6AA2F"
 ],
-"new_name": "HUD_EncodeInstruments",
-"summary": "far,102L — encode une série de booléens dans des champs bitfield du panneau HUD (+0x1B/0x1C/0x1D) : **encodeur d'état des instruments de bord (voyants/jauges).**"
+"new_name": "AircraftStateBits_Clear_12806",
+"summary": "far, 102 lignes, LUE EN ENTIER. Argument : pointeur far vers un bloc d'états de 0x2B octets (vtable 0x130, créé par loc_1297E ; l'entité IA le référence à +0x07/+0x09). Appelle WorldObjectA_Method_NoOp_737E0 (via VROOMM_StubThunk_6AA2F, non lue), puis met à zéro les 8 bits de l'octet +0x1B, les 8 bits de +0x1C et les bits 0-1 de +0x1D (la valeur écrite vient de `mov al,0`) : REMISE À ZÉRO d'un bloc de drapeaux, pas un encodage. Aucun affichage, aucune lecture d'un état d'avion. Appelée par HUD_ResetPanel, Player_MainUpdate et AIEntity_MasterTick_5ACC : le bloc est donc commun au joueur et aux entités IA. Anciennement HUD_EncodeInstruments ('encodeur d'état des instruments de bord') : nom trompeur, rien de HUD dans le corps."
 },
 "sub_12931": {
 "segment": "seg010",
@@ -2749,8 +2749,8 @@
 "sub_12806",
 "sub_12806"
 ],
-"new_name": "HUD_ResetPanel",
-"summary": "far,35L — appelle sub_6AA34 puis sub_12806 (encodage), remet à zéro le code HUD (+0x1E) et 3 champs de commande (+0x1F/0x23/0x27), ré-encode : **réinitialisation complète du panneau HUD/instruments.**"
+"new_name": "AircraftStateBlock_Reset_12931",
+"summary": "far, 35 lignes, LUE EN ENTIER. Réinitialise le bloc d'états de 0x2B octets : VROOMM_StubThunk_6AA34 (constructeur de base), AircraftStateBits_Clear_12806 (remise à zéro des drapeaux +0x1B..+0x1D), octet +0x1E = 0, dwords +0x1F, +0x23, +0x27 = 0, puis AircraftStateBits_Clear_12806 à nouveau. Appelée par le constructeur de ce bloc (loc_1297E, slot 0 de la vtable 0x130), par AIEntity_Construct_74B43, Player_MainUpdate et SubObject_Attach. Le bloc = 3 octets de drapeaux (+0x1B..0x1D), un octet de code (+0x1E) et 3 dwords (+0x1F/0x23/0x27) : probable enregistrement de commandes de pilotage (boutons + 3 axes) commun au joueur et à l'IA — HYPOTHÈSE, non prouvée. Aucun rapport avec un affichage. Anciennement HUD_ResetPanel (nom trompeur)."
 },
 "sub_12A22": {
 "segment": "seg010",
@@ -4308,8 +4308,8 @@
 "calls": [
 "sub_22C23"
 ],
-"new_name": "Container_KeyEquals",
-"summary": "far,45L — compare deux clés non nulles via sub_22C23 (comparaison de chaînes) : **prédicat d'égalité de clés du conteneur.**"
+"new_name": "List_AppendIfNonNull_21F8D",
+"summary": "far, args (liste, nœud) : appelle List_AppendTail_22C23 sur l'en-tête pointé par la liste si la liste et le nœud sont non nuls. Anciennement Container_KeyEquals (n'est pas un test d'égalité). Appelée avec le tag 0x59C3 (liste des entités du monde) au spawn et au chargement de mission."
 },
 "sub_21FC6": {
 "segment": "seg039",
@@ -4370,8 +4370,8 @@
 "sub_22D6C",
 "sub_503EB"
 ],
-"new_name": "Container_FindAndTouch",
-"summary": "far,33L — recherche une entrée (sub_22D6C) puis appelle sub_503EB : **accès à une entrée du conteneur avec traitement associé (probable incrément de référence).**"
+"new_name": "WorldObjects_CallSlot4OnAllThenRecompute_2214F",
+"summary": "far, appelle WorldObjects_CallSlot4OnAll_22D6C(liste[0], objet) puis UIScreen_ComputeDerivedFields_503EB (non lue). Appelée par TrackedObject_FrameStep_2DF0D avec le tag 0x59C3 avant le slot +0x20. Anciennement Container_FindAndTouch."
 },
 "sub_2217D": {
 "segment": "seg039",
@@ -4380,8 +4380,8 @@
 "lines": 46,
 "type": "far",
 "calls": [],
-"new_name": "Container_NotifyAllActive",
-"summary": "far,46L — parcourt la liste, notifie chaque nœud actif (flag+5==1) via vtable[0x1C] avec un paramètre, puis retourne un compteur global (via vtable[0xB]) : **notification en masse des entrées actives du conteneur.**"
+"new_name": "WorldObjects_CallSlot1COnActive_2217D",
+"summary": "far, args (liste en arg_0, objet en arg_2) : parcourt la liste (tête à +0xB de l'en-tête, suivant à +2 du nœud) et pour chaque nœud dont l'octet +5 vaut 1 appelle le slot +0x1C avec (nœud, objet). Appelée par UIScreen_RenderGraphVGA_Wrapper_50E44 avec la liste 0x59C3 (entités du monde), elle-même appelée par TrackedObject_NotifyWorldObjects_2DFE4. Anciennement Container_NotifyAllActive. Rôle du slot +0x1C non identifié ; aucun lien prouvé avec AIEntity_MasterTick_5ACC (le tick de l'entité IA passe par WorldObjects_UpdateAllAndRemoveDead_221F2, slot +0x10)."
 },
 "sub_221C2": {
 "segment": "seg039",
@@ -4392,8 +4392,8 @@
 "calls": [
 "sub_221F2"
 ],
-"new_name": "WorldObjects_PeriodicGC",
-"summary": "far,31L — remet à zéro 8 compteurs globaux (table 0x5B06) puis appelle sub_221F2 : **réinitialisation périodique + déclenchement du nettoyage du conteneur (garbage collection).**"
+"new_name": "WorldObjects_UpdateFrame_ResetCounters_221C2",
+"summary": "far, remet à zéro word_6E1BD et les 8 compteurs de profilage (table à 0x5B06), puis appelle WorldObjects_UpdateAllAndRemoveDead_221F2 sur la liste passée en argument. Appelée par CombatTarget_WeaponActionSubsystem (avec le tag 0x59C3), donc par MAIN_GAME_TICK. Anciennement WorldObjects_PeriodicGC (n'est qu'un enrobage de la boucle de mise à jour)."
 },
 "sub_221F2": {
 "segment": "seg039",
@@ -4406,8 +4406,8 @@
 "sub_22C56",
 "sub_27144"
 ],
-"new_name": "WorldObjects_PurgeExpired",
-"summary": "far,167L — parcourt la liste, teste chaque nœud (vtable[0x10]=expiré?), récupère un enfant (vtable[0]) et le valide (vtable[0xC]) avant de le retirer (sub_22C56) et de le libérer (vtable[0x18]) : **garbage collector du conteneur — purge des entrées expirées/invalides (probable nettoyage des objets détruits du monde de jeu, incrémente le compteur word_6E1BD).**"
+"new_name": "WorldObjects_UpdateAllAndRemoveDead_221F2",
+"summary": "far, parcourt une liste d'objets monde (tête à +0xB de l'en-tête, suivant à +2 du nœud) : pour chaque nœud appelle le slot +0x10 (mise à jour, renvoie 1 = vivant / 0 = mort) en chronométrant avec PIT_ReadHighPrecision, puis, si 0 est renvoyé, valide l'enfant (slot 0 puis slot +0xC de l'enfant) et retire le nœud (Container_RemoveNode) et le détruit (slot +0x18, argument 3). Le temps est cumulé par type d'objet (slot +0x34 : 6, 0xB, 0xC/0x12, autres). Appelée par WorldObjects_UpdateFrame_ResetCounters_221C2 (depuis CombatTarget_WeaponActionSubsystem, tick principal), Picking_ResolveSymbol et WorldObject_TestAliveAndUpdateChildren_3800A. Anciennement WorldObjects_PurgeExpired (nom trop restrictif : c'est la boucle de mise à jour du monde)."
 },
 "sub_22320": {
 "segment": "seg039",
@@ -4581,8 +4581,8 @@
 "lines": 36,
 "type": "far",
 "calls": [],
-"new_name": "Container_KeyCompare",
-"summary": "far,36L — comparaison de deux clés (chaînes courtes ≤8 car.) : **comparateur de clés du dictionnaire (utilisé par sub_21F8D).**"
+"new_name": "List_AppendTail_22C23",
+"summary": "far, ajoute un nœud en fin de liste chaînée : met le suivant du nœud (+2) à 0, met à jour la queue (+0xD) et la tête (+0xB) de l'en-tête, chaîne l'ancien dernier nœud. Même disposition que WorldObjects_CallSlot1COnActive_2217D / WorldObjects_UpdateAllAndRemoveDead_221F2. Anciennement Container_KeyCompare (ne compare rien)."
 },
 "sub_22C56": {
 "segment": "seg039",
@@ -4633,8 +4633,8 @@
 "lines": 47,
 "type": "far",
 "calls": [],
-"new_name": "Container_FindByKeyAlt",
-"summary": "far,47L — recherche une entrée par clé avec logique légèrement différente (utilisée par sub_2214F) : **variante de lookup par clé.**"
+"new_name": "WorldObjects_CallSlot4OnAll_22D6C",
+"summary": "far, parcourt toute la liste (tous les nœuds, pas seulement les actifs) et appelle le slot +4 de chaque nœud avec (nœud, objet arg_2). Appelée par WorldObjects_CallSlot4OnAllThenRecompute_2214F et Picking_ResolveSymbol. Anciennement Container_FindByKeyAlt (aucune recherche par clé dans ce corps). Rôle du slot +4 non identifié (pour la vtable de l'entité IA c'est un destructeur : les nœuds de la liste 0x59C3 ne sont donc pas des entités IA, mais des objets monde qui pointent vers elles à +0x55)."
 },
 "sub_22DAB": {
 "segment": "seg039",
@@ -4689,8 +4689,8 @@
 "calls": [
 "sub_5F6A9"
 ],
-"new_name": "WorldObjects_NotifyMissionTriggers",
-"summary": "far,44L — parcourt une liste (sub_5F6A9), notifie chaque élément actif (flag +0x52 bit0) via vtable[0x18] : **notification en masse d'éléments actifs d'une liste (probable liste de triggers de mission).**"
+"new_name": "TrackedObjects_CallSlot18OnActive_22F10",
+"summary": "far, parcourt la liste passée en argument (itérateur LinkedListB_Helper_5F6A9, objet à +0xE de chaque nœud) et, pour chaque objet dont le bit 0 de +0x52 est posé, appelle le slot +0x18 du sous-vtable pointé par +0x50 (TrackedObject_FrameStep_2DF0D pour les sous-vtables 0x460 et 0x484 de seg339). Appelée par Frame_UpdateTimingAndNotifyTrackedObjects_500F6 avec la liste 0x59CD (EntityTracker) ; référencée aussi dans la table d'overlay seg216. Anciennement WorldObjects_NotifyMissionTriggers (rien de spécifique aux triggers de mission dans ce corps). Rôle exact du slot +0x18 non prouvé au-delà de TrackedObject_FrameStep_2DF0D."
 },
 "sub_22F53": {
 "segment": "seg040",
@@ -7708,8 +7708,8 @@
 "calls": [
 "sub_221F2"
 ],
-"new_name": "Debris_TestDestroyedState",
-"summary": "far,38L — teste l'état d'un enfant (vtable[0x18]) ou d'un flag alternatif (+0x1E) : **test d'état 'détruit/désactivé' d'un corps physique.**"
+"new_name": "WorldObject_TestAliveAndUpdateChildren_3800A",
+"summary": "far, si l'enfant à +0xA existe et que son slot +0x18 renvoie 0 → renvoie 0 (mort). Sinon, si une liste de sous-objets existe à +0x1E, appelle WorldObjects_UpdateAllAndRemoveDead_221F2 dessus (mise à jour hiérarchique) et renvoie 1 (vivant). Anciennement Debris_TestDestroyedState (le résultat non nul signifie vivant, pas détruit)."
 },
 "sub_38068": {
 "segment": "seg078",
@@ -7864,8 +7864,8 @@
 "sub_38A79",
 "sub_3B876"
 ],
-"new_name": "Debris_LoadAndInstantiate",
-"summary": "far,81L — recherche un modèle de débris (sub_38A79), le charge si absent (sub_3B876), l'attache à un flag et invoque sa création (vtable[4]) : **chargement et instanciation d'un modèle de débris (avec cache).**"
+"new_name": "ObjectPrototype_FindOrLoadAndInstantiate_38B70",
+"summary": "far, cherche un prototype d'objet par clé (Debris_FindModelByID), le charge depuis OBJECTS\\<nom>.IFF via IFF_LoadModelMain s'il manque, écrit le rôle (arg 1/2/3 : IA/PLAYER/NETWORK) à +0x34 du prototype, appelle son slot +4 (création d'une instance), stocke à +0xA de l'instance l'objet enfant issu du slot +4 de l'objet à +0x15 du prototype, incrémente le compteur de références du prototype (+4). Anciennement Debris_LoadAndInstantiate (usage réel : tous les objets de modèle, dont les avions IA)."
 },
 "sub_38C12": {
 "segment": "seg079",
@@ -8380,8 +8380,8 @@
 "calls": [
 "sub_3800A"
 ],
-"new_name": "WorldObject_IsDestroyed",
-"summary": "far,15L — wrapper vers sub_3800A (test d'état détruit/désactivé) : **accesseur d'état de destruction de l'objet composite.**"
+"new_name": "WorldObject_IsAlive_3CBB7",
+"summary": "far, enrobage de WorldObject_TestAliveAndUpdateChildren_3800A : renvoie non nul si l'objet est vivant (le nom d'origine, IsDestroyed, était inversé)."
 },
 "sub_3CF1D": {
 "segment": "seg085",
@@ -8460,8 +8460,8 @@
 "sub_3CBB7",
 "sub_3D57E"
 ],
-"new_name": "Camera_LookAtSecondaryTarget_3D9FB",
-"summary": "far,138L — variante gérant une cible secondaire (+0x55) avec un mode global (byte_6D558) et transformation via point de montage (+0x51, vtable[0x40]) : **calcul de la caméra externe orientée vers une cible secondaire (mode 'regarder la cible').**"
+"new_name": "WorldObject_UpdateWithAIEntity_3D9FB",
+"summary": "far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 → renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0, appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1 (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps)."
 },
 "sub_3DAE2": {
 "segment": "seg085",
@@ -10833,8 +10833,8 @@
 "sub_27144",
 "sub_4F9E6"
 ],
-"new_name": "UIScreen_ApplyFormFields_500F6",
-"summary": "⚠️ far, 360 lignes, NON DÉTAILLÉE — lit/valide de nombreux champs numériques (frame locale ~0x74 octets, conversions via sub_27144), alimente des globales du même cluster (word_7045C etc.), avec clamps min/max. Candidat pour session dédiée."
+"new_name": "Frame_UpdateTimingAndNotifyTrackedObjects_500F6",
+"summary": "far, appelée directement par STRIKE_EXE_MAIN_LOOP. Appelle d'abord TrackedObjects_CallSlot18OnActive_22F10 (liste 0x59CD), puis calcule le delta de temps de la frame (dword_70458), le plafonne (0x1900) et met à jour la variable de vitesse de jeu (dword_70468/70454/7045E). Anciennement UIScreen_ApplyFormFields (aucun formulaire dans ce corps)."
 },
 "sub_503EB": {
 "segment": "seg112",
@@ -11461,8 +11461,8 @@
 "calls": [
 "sub_21F8D"
 ],
-"new_name": "Expr_Node_RegisterListener_5334D",
-"summary": "far, enregistre un nœud dans une liste (via sub_21F8D, motif d'ajout à conteneur déjà vu en seg109)."
+"new_name": "WorldObjects_AddToList_5334D",
+"summary": "far, ajoute l'objet passé en argument (arg_2) à la liste de tag 0x59C3 via List_AppendIfNonNull_21F8D. Appelée par AIAircraft_SpawnAndConditionalLoadProfile_53363 pour l'objet qu'elle vient de créer. Anciennement Expr_Node_RegisterListener (aucun rapport avec un écouteur Expr_VM dans ce corps)."
 },
 "sub_53363": {
 "segment": "seg114",
@@ -29356,7 +29356,7 @@
 "sub_3FD"
 ],
 "new_name": "AIEntity_Construct_74B43",
-"summary": "far, 196 lignes - ENTIEREMENT TRACEE. CONSTRUCTEUR REEL DE L'ENTITE IA ELLE-MEME (celle qui porte goal_state +0x11D, le tableau GOAL +0x1B0, le tableau MVRS +0x200/+0x202, et dont la vtable de classe contient AIEntity_MasterTick_5ACC en +0xC - CONFIRME par la position de unk_6D1B8 (8 octets zero utilises comme source memcpy) juste avant cette meme vtable en memoire). Herite d'une classe de base WorldObjectA (premier appel : WorldObjectA_Method_ClearField2_738DA). Sequence complete : (1) hérite/initialise via la classe de base ; (2) copie arg_4 dans +0x2, pose +0x6=1, nettoie des bits de statut (+0x28D/+0x28B) ; (3) alloue un sous-objet (tag 0x5C44, taille 0x2B) et l'attache a +0x7/+0x9 (avec fallback via sub_6AA34/sub_12931=HUD_ResetPanel si l'allocation echoue) ; (4) copie ce pointeur vers +0x102/+0x104 (0) ; (5) etablit une reference faible sur +0x10F (cible/objet lie initial) ; (6) POSITION PAR DEFAUT : +0x111/+0x115/+0x119 = (0, 0, 0x3E800=256000) - le MEME decalage d'altitude (1000 en 24.8) que celui trouve dans Goal_ActiveWingmanEngagement_878F ; (7) goal_state (+0x11D) = 0xFFFF (SENTINELLE 'aucun objectif actif') ; (8) constantes +0x139=30000, +0x13D=512000, +0x141=64000 (role exact non determine) ; (9) references faibles etablies sur +0x137/+0x145/+0x147 (les memes champs cible que Goal_IsComplete/Goal_ActiveWingmanEngagement) ; (10) EFFACE LE PREMIER EMPLACEMENT GOAL (+0x1B0, 8 octets a 0, via CRT_Fmemcpy_3FD depuis unk_6D1B8) ; (11) 5 champs sentinelles a -100 (0xFFFFFF9C) : +0x166, +0x162, +0x109, +0x156, +0x15C (probables timers/distances 'non initialise') ; (12) +0x10D=0, +0x15A/+0x15B=0xFF, +0x200(compteur MVRS)=0, +0x202(premier pointeur MVRS)=0 - CONFIRME que MVRS demarre a zero AVANT le chargement PROF ; (13) deballage/remballage individuel de bits sur +0x28B/+0x28C (meme motif que le debut d'AIEntity_MasterTick_5ACC) ; (14) +0x16A=0. Anciennement mal nommee AircraftDamageModel_ConstructAndBind (balayage rapide, aucun rapport avec un modele de dommages)."
+"summary": "far, 196 lignes - ENTIEREMENT TRACEE. CONSTRUCTEUR REEL DE L'ENTITE IA ELLE-MEME (celle qui porte goal_state +0x11D, le tableau GOAL +0x1B0, le tableau MVRS +0x200/+0x202, et dont la vtable de classe contient AIEntity_MasterTick_5ACC en +0xC - CONFIRME par la position de unk_6D1B8 (8 octets zero utilises comme source memcpy) juste avant cette meme vtable en memoire). Herite d'une classe de base WorldObjectA (premier appel : WorldObjectA_Method_ClearField2_738DA). Sequence complete : (1) hérite/initialise via la classe de base ; (2) copie arg_4 dans +0x2, pose +0x6=1, nettoie des bits de statut (+0x28D/+0x28B) ; (3) alloue un sous-objet (tag 0x5C44, taille 0x2B) et l'attache a +0x7/+0x9 (si l'allocation réussit : vtable 0xC6, VROOMM_StubThunk_6AA34, vtable 0x130, puis AircraftStateBlock_Reset_12931 (anciennement HUD_ResetPanel) qui remet ce bloc à zéro ; ce n'est PAS un repli d'échec d'allocation ; le bloc est un enregistrement d'états/commandes, pas un panneau d'affichage) ; (4) copie ce pointeur vers +0x102/+0x104 (0) ; (5) etablit une reference faible sur +0x10F (cible/objet lie initial) ; (6) POSITION PAR DEFAUT : +0x111/+0x115/+0x119 = (0, 0, 0x3E800=256000) - le MEME decalage d'altitude (1000 en 24.8) que celui trouve dans Goal_ActiveWingmanEngagement_878F ; (7) goal_state (+0x11D) = 0xFFFF (SENTINELLE 'aucun objectif actif') ; (8) constantes +0x139=30000, +0x13D=512000, +0x141=64000 (role exact non determine) ; (9) references faibles etablies sur +0x137/+0x145/+0x147 (les memes champs cible que Goal_IsComplete/Goal_ActiveWingmanEngagement) ; (10) EFFACE LE PREMIER EMPLACEMENT GOAL (+0x1B0, 8 octets a 0, via CRT_Fmemcpy_3FD depuis unk_6D1B8) ; (11) 5 champs sentinelles a -100 (0xFFFFFF9C) : +0x166, +0x162, +0x109, +0x156, +0x15C (probables timers/distances 'non initialise') ; (12) +0x10D=0, +0x15A/+0x15B=0xFF, +0x200(compteur MVRS)=0, +0x202(premier pointeur MVRS)=0 - CONFIRME que MVRS demarre a zero AVANT le chargement PROF ; (13) deballage/remballage individuel de bits sur +0x28B/+0x28C (meme motif que le debut d'AIEntity_MasterTick_5ACC) ; (14) +0x16A=0. Anciennement mal nommee AircraftDamageModel_ConstructAndBind (balayage rapide, aucun rapport avec un modele de dommages)."
 },
 "sub_74E1C": {
 "segment": "ovr228",
@@ -38758,8 +38758,8 @@
 "sub_3DD55",
 "sub_6C00E"
 ],
-"new_name": "Camera_ConstructWithSecondaryTarget_9D2CC",
-"summary": "far, combine allocation, `WorldObject_BaseConstruct`, `Camera_ResetState`, `Camera_InitWithSecondaryTarget`."
+"new_name": "WorldObject_ConstructWithAIEntity_9D2CC",
+"summary": "far, construit un objet monde de 0x5A octets (WorldObject_BaseConstruct, vtable 0x2618 après Camera_ResetState), puis écrit à +0x55 l'entité IA obtenue en appelant le slot 0 de l'objet à +0x46 du prototype (AIEntity_CreateByType_12B4E, avec l'objet neuf en argument) et à +0x51 le résultat du slot +8 de l'objet à +0x36 du prototype. Anciennement Camera_ConstructWithSecondaryTarget."
 },
 "sub_9D380": {
 "segment": "ovr311",
@@ -38824,8 +38824,8 @@
 "calls": [
 "sub_6AB07"
 ],
-"new_name": "Camera_Helper4_9D4D2",
-"summary": "far, thunk voisin uniquement (14 lignes)."
+"new_name": "WorldObject_LoadAIProfileViaEntity_9D4D2",
+"summary": "far, prend l'objet monde (arg near) et appelle AIAircraft_LoadProfileGuarded_73940 (via VROOMM_StubThunk_6AB07) avec l'entité IA stockée à +0x55 de cet objet. Appelée par AIAircraft_SpawnAndConditionalLoadProfile_53363 (via VROOMM_StubThunk_6C23A). Anciennement Camera_Helper4."
 },
 "sub_9D4F0": {
 "segment": "ovr313",
@@ -45395,7 +45395,7 @@
 "type": "label",
 "calls": [],
 "new_name": "AIEntity_MasterTick_5ACC",
-"summary": "far, ~306 lignes - JAMAIS DOCUMENTEE AVANT CETTE SESSION (methode de vtable, echappait a l'heuristique de detection malgre la couverture 100% des proc). CONFIRME etre le TICK IA MAITRE PAR ENTITE : slot [vtable+0xC] de la classe avion/pilote (table seg339, meme famille que Goal_TransferToWingman/Goal_SelectTransition). Sequence complete : (1) decompresse/recompresse un paquet de drapeaux d'etat individuels (+0x28C/+0x28D) ; (2) calcule deux SEUILS GLOBAUX partages dword_7203D (via test de portee sub_378CA + capteur AI_Sensor_SecondaryAngle_59A5) et dword_72039 (cosinus pondere, sub_54876) - ce sont les MEMES globales deja documentees comme consommees par AI_EvadeOrPursueSelector ; (3) met a jour le suivi de rotation/cap (+0x174-0x179) et un drapeau HUD d'aerofrein (flags_75 bit0) ; (4) calcule un SCORE DE MENACE global word_6D3BC, module par plusieurs bits de flags_75 (bit6: divise ou double selon le contexte, ajustements +/-2/+/-4) ; (5) AIGUILLAGE FINAL : si flags_75 bit5 ET un bit de statut (+0x28B bit3) sont poses, appelle DIRECTEMENT Goal_FollowAllyExec_DAA9 (court-circuite tout le reste - mode 'suivre la formation') ; sinon appelle AI_TriggerBehaviorUpdate_5E53 (chemin normal). Point d'entree racine de toute la logique de decision IA d'une entite pour ce tick. DECOUVERTE NON RESOLUE : le bit5 de flags_75 (non documente avant), qui gate a la fois ce court-circuit et la disponibilite generale de la reflexion IA dans AI_TriggerBehaviorUpdate."
+"summary": "far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique) est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_SecondaryAngle et Math_Cos (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458 (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4) AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC : +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue). CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit vers Goal_FollowAllyExec_DAA9."
 },
 "loc_5E189": {
 "segment": "seg141",
@@ -46384,8 +46384,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "View_RenderFrame_2DF0D",
-"summary": "far — méthode virtuelle 'rendre cette vue' partagée par de NOMBREUSES vtables (DATA XREF seg339:0478/049C/...). Args : si = objet vue (ex. word_72A8F). Corps : lecture PIT (PIT_ReadHighPrecision_27144) -> dword_72B7A (profilage) ; si [si+0x5C]==0 (pas de viewport) -> bail ; Camera_CopyState_2DE6D(si,0x5146) (snapshot) ; sub_5D999([bp-4], [si+0x5C]+2) ; si->vtable[+0x50][+0x20]() ; si->vtable[+0x50][+0x14]() (= Camera_ExternalViewComputeMain_1519E pour une entrée CHAS — MAJ position/orientation caméra) ; [si+0x5C]->vtable[+0x04]() (rendu via le rect viewport du chunk) ; jalons de profilage dword_72B7E/82/86/8A/8E ; sub_5D9D3(2,[bp-4]). C'est le point d'entrée par frame côté rendu qui tick la caméra de la vue active."
+"new_name": "TrackedObject_FrameStep_2DF0D",
+"summary": "far, méthode virtuelle : slot +0x18 des sous-vtables posés à +0x50 (0x460 et 0x484 de seg339), appelée par TrackedObjects_CallSlot18OnActive_22F10 pour chaque objet actif de la liste 0x59CD. Séquence lue : PIT_ReadHighPrecision (jalons de profilage dword_72B7A/7E/82/86/8A/8E), Camera_CopyState(objet,0x5146), Camera_UpdateViewportClip, WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3, objet), Widget_RefreshTextConditional(0x53FA), Collection_NotifyAllDestroy(0x53FA), slot +0x20 puis slot +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement View_RenderFrame ('rendre cette vue' : non prouvé, nom neutralisé)."
 },
 "loc_11809": {
 "segment": "seg008",
@@ -47336,5 +47336,25 @@
 "calls": [],
 "new_name": "GlyphObject_Method_CopyFlagField_606EE",
 "summary": "far, référencée via vtable (DATA XREF seg339) — copie un octet depuis un pointeur source dans le champ +0x16, retourne 0."
+},
+"loc_12B4E": {
+"segment": "seg010",
+"start_line": 37080,
+"end_line": 37080,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "AIEntity_CreateByType_12B4E",
+"summary": "far, méthode virtuelle en slot +0 de la vtable de classe de l'entité IA (seg339:0x110, celle qui contient AIEntity_MasterTick_5ACC en +0xC) ; même entrée partagée par d'autres vtables de seg339 (off_6D41C et suivantes). FABRIQUE PAR TYPE : appelle le slot +0 de l'objet source (arg [bp+0Ah]) pour obtenir une structure, lit l'octet de type à +0x34 ; type 1 → alloue 0x28E octets (tag 0x5C44), pose la vtable 0x110, initialise le sous-objet +0x1A (vtable 0x368) et appelle AIEntity_Construct_74B43 ; type 2 → alloue 0xBD octets (vtable 0xAA puis 0x36C) et appelle SubObject_Attach ; autre type → ne crée rien. Aucun appelant direct trouvé (appelée uniquement via vtable). Nom proposé, non prouvé côté appelant."
+},
+"loc_2DFE4": {
+"segment": "seg065",
+"start_line": 92900,
+"end_line": 92900,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TrackedObject_NotifyWorldObjects_2DFE4",
+"summary": "far, méthode virtuelle : slot +0x20 des sous-vtables posés à +0x50 (0x460 et 0x484 de seg339), appelée par TrackedObject_FrameStep_2DF0D. Appelle UIScreen_RenderGraphVGA_Wrapper_50E44(objet), qui appelle UIScreen_RenderGraphVGA_509EE puis WorldObjects_CallSlot1COnActive_2217D(0x59C3, objet). Pas de nom résolu auparavant (label loc_2DFE4)."
 }
 }

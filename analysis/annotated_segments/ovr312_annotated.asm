@@ -66,9 +66,12 @@ Camera_InitAndGetHandleWrapper_9D4B5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, thunk voisin uniquement (14 lignes).
+; far, prend l'objet monde (arg near) et appelle AIAircraft_LoadProfileGuarded_73940 (via
+; VROOMM_StubThunk_6AB07) avec l'entité IA stockée à +0x55 de cet objet. Appelée par
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 (via VROOMM_StubThunk_6C23A). Anciennement
+; Camera_Helper4.
 ; ==============================================================================================
-Camera_Helper4_9D4D2	proc far		; CODE XREF: VROOMM_StubThunk_6C23AJ
+WorldObject_LoadAIProfileViaEntity_9D4D2	proc far		; CODE XREF: VROOMM_StubThunk_6C23AJ
 
 arg_0		= word ptr  6
 
@@ -81,6 +84,6 @@ arg_0		= word ptr  6
 		add	sp, 4
 		pop	bp
 		retf
-Camera_Helper4_9D4D2	endp
+WorldObject_LoadAIProfileViaEntity_9D4D2	endp
 
 ovr312		ends

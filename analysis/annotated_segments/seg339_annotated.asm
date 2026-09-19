@@ -103,7 +103,7 @@ unk_6D1B8	db    0			; DATA XREF: AIEntity_Construct_74B43+1AFo
 		db    0
 		db    0
 		db    0
-		dd loc_12B4E
+		dd AIEntity_CreateByType_12B4E
 		dd VROOMM_StubThunk_6AB0C
 		dd loc_4F85
 		dd AIEntity_MasterTick_5ACC
@@ -248,7 +248,7 @@ aLandingGearDam	db 'Landing Gear Damaged',0 ; DATA XREF: AITargeting_RenderThrea
 aLanding	db 'LANDING',0          ; DATA XREF: AITargeting_UpdateAndRender_75C18+95o
 aTakeoff	db 'TAKEOFF',0          ; DATA XREF: seg009:01C1o
 		dd PilotProfile_LoadATRB_12E47
-off_6D41C	dd loc_12B4E
+off_6D41C	dd AIEntity_CreateByType_12B4E
 off_6D420	dd loc_130A3
 		dd loc_4F85
 		dd loc_141D3
@@ -257,7 +257,7 @@ off_6D420	dd loc_130A3
 		dd VROOMM_StubThunk_6AA20
 		dd loc_4F80
 		dd VROOMM_StubThunk_6B63F
-		dd loc_12B4E
+		dd AIEntity_CreateByType_12B4E
 		dd SubObject_NotifyEvent
 		dd loc_4F85
 		dd VROOMM_StubThunk_6AA4D
@@ -333,19 +333,19 @@ off_6D510	dd VROOMM_StubThunk_6AC48
 off_6D51C	dd VROOMM_StubThunk_6AC2A
 off_6D520	dd VROOMM_StubThunk_6AC52
 		dd VROOMM_StubThunk_6AC57
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd VROOMM_StubThunk_6AC25
-off_6D530	dd loc_2DFE4
+off_6D530	dd TrackedObject_NotifyWorldObjects_2DFE4
 off_6D534	dd VROOMM_StubThunk_6BC26
 		dd VROOMM_StubThunk_6BC2B
 		dd VROOMM_StubThunk_6BC30
 off_6D540	dd VROOMM_StubThunk_6BC35
 		dd loc_2DEF2
 		dd loc_2DF03
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd VROOMM_StubThunk_6AC20
-		dd loc_2DFE4
-byte_6D558	db 0			; DATA XREF: Camera_LookAtSecondaryTarget_3D9FB:loc_3DA13r
+		dd TrackedObject_NotifyWorldObjects_2DFE4
+byte_6D558	db 0			; DATA XREF: WorldObject_UpdateWithAIEntity_3D9FB:loc_3DA13r
 					; UIScript_ParseAndEvaluate_7A054:loc_7A456w	...
 byte_6D559	db 1			; DATA XREF: Expr_VM_Interpreter_51106+A2Aw
 					; UIScreen_RenderOrLayoutList_54503:loc_5451Br	...
@@ -392,7 +392,7 @@ a_pak_2		db '.PAK',0             ; DATA XREF: MissionRecord_LoadEntityDatabase_7
 		dd VROOMM_StubThunk_6ADB4
 		dd VROOMM_StubThunk_6ADB9
 		dd VROOMM_StubThunk_6AC20
-		dd loc_2DFE4
+		dd TrackedObject_NotifyWorldObjects_2DFE4
 		align 2
 aEject		db 'EJECT',0            ; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+A3o
 					; MissionRecord_LoadAndBuildWidgetTree_7D31A+92o
@@ -405,7 +405,7 @@ a_pak_3		db '.PAK',0             ; DATA XREF: MissionRecord_LoadAndBuildWidgetTr
 		dd VROOMM_StubThunk_6ADF5
 		dd VROOMM_StubThunk_6ADB9
 		dd VROOMM_StubThunk_6AC20
-		dd loc_2DFE4
+		dd TrackedObject_NotifyWorldObjects_2DFE4
 		align 2
 byte_6D5DE	db 0			; DATA XREF: GlyphObject_Helper8_7EC45:loc_7ED86r
 					; GlyphObject_Helper8_7EC45:loc_7EDB5w	...
@@ -464,7 +464,7 @@ off_6D712	dd VROOMM_StubThunk_6B107
 off_6D716	dd VROOMM_StubThunk_6AF3A
 off_6D71A	dd VROOMM_StubThunk_6AF7B
 		dd VROOMM_StubThunk_6AF80
-off_6D722	dd View_RenderFrame_2DF0D
+off_6D722	dd TrackedObject_FrameStep_2DF0D
 off_6D726	dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		dd VROOMM_StubThunk_6B102
@@ -473,7 +473,7 @@ off_6D732	dd VROOMM_StubThunk_6BC2B
 		dd VROOMM_StubThunk_6AF35
 		dd Camera_AttachedNoOffsetCompute_14867
 		dd Camera_Entry_GetState_1_14904
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		dd VROOMM_StubThunk_6B01E
@@ -482,7 +482,7 @@ off_6D732	dd VROOMM_StubThunk_6BC2B
 		dd VROOMM_StubThunk_6AF30
 		dd VROOMM_StubThunk_6B023
 		dd VROOMM_StubThunk_6B028
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 byte_6D776	db 0			; DATA XREF: HUDSymbol_Helper7_84337+2Er
@@ -497,7 +497,7 @@ off_6D787	dd VROOMM_StubThunk_6B107
 off_6D78B	dd VROOMM_StubThunk_6AFBA
 		dd VROOMM_StubThunk_6B04B
 off_6D793	dd VROOMM_StubThunk_6B050
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		dd VROOMM_StubThunk_6AFF6
@@ -506,7 +506,7 @@ off_6D793	dd VROOMM_StubThunk_6B050
 		dd VROOMM_StubThunk_6AFB5
 		dd VROOMM_StubThunk_6AFFB
 		dd VROOMM_StubThunk_6B000
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd VROOMM_StubThunk_6B005
 		dd VROOMM_StubThunk_6AFCE
@@ -515,7 +515,7 @@ off_6D7CF	dd VROOMM_StubThunk_6AFD3
 off_6D7D3	dd VROOMM_StubThunk_6AFB0
 		dd VROOMM_StubThunk_6AFD8
 		dd VROOMM_StubThunk_6AFE2
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		align 2
@@ -540,7 +540,7 @@ off_6D830	dd VROOMM_StubThunk_6B107
 		dd VROOMM_StubThunk_6B0D5
 		dd Camera_Entry_VtSlot_Finalize_14EBF
 		dd Camera_Entry_GetState_COCKPIT_14EF0
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		dd VROOMM_StubThunk_6B11B
@@ -549,7 +549,7 @@ off_6D830	dd VROOMM_StubThunk_6B107
 		dd VROOMM_StubThunk_6B0D0
 		dd Camera_OrbitTrackCompute_1493A
 		dd Camera_Entry_GetState_CHASE_14EB5
-		dd View_RenderFrame_2DF0D
+		dd TrackedObject_FrameStep_2DF0D
 		dd Camera_Entry_GetSubject_14859
 		dd loc_1490E
 		dd VROOMM_StubThunk_6B179
@@ -566,7 +566,7 @@ off_6D830	dd VROOMM_StubThunk_6B107
 		dd VROOMM_StubThunk_6B1BA
 		dd VROOMM_StubThunk_6B1B5
 		dd VROOMM_StubThunk_6AC20
-		dd loc_2DFE4
+		dd TrackedObject_NotifyWorldObjects_2DFE4
 byte_6D8AC	db 0			; DATA XREF: seg015:047Fw seg015:0569w ...
 byte_6D8AD	db 0			; DATA XREF: Cockpit_DetectPlayerMissile+5Ar
 					; Cockpit_DetectPlayerMissile:loc_16039w	...
@@ -1108,8 +1108,8 @@ aStrikeComman_0	db 'Strike Commander has encountered an Error that it cannot rec
 		dd Handle_Destructor
 		dd loc_21E88
 aDefault	db 'DEFAULT!',0
-word_6E1BD	dw 0			; DATA XREF: WorldObjects_PeriodicGC+7w
-					; WorldObjects_PurgeExpired:loc_22207w	...
+word_6E1BD	dw 0			; DATA XREF: WorldObjects_UpdateFrame_ResetCounters_221C2+7w
+					; WorldObjects_UpdateAllAndRemoveDead_221F2:loc_22207w	...
 		align 2
 byte_6E1C0	db 0			; DATA XREF: Mission_TriggerEvaluator+Bw
 					; Camera_ComputeViewMatrix+3E6r ...
@@ -1865,7 +1865,7 @@ aObjects	db 'OBJECTS',0          ; DATA XREF: seg009:0350o
 		dd Debris_NotifyChildValidate
 		dd loc_37D2E
 		dd loc_37DD1
-		dd Debris_TestDestroyedState
+		dd WorldObject_TestAliveAndUpdateChildren_3800A
 off_6EBA0	dd loc_38046
 off_6EBA4	dd VROOMM_StubThunk_6BFBA
 		dd VROOMM_StubThunk_6BFB5
@@ -2549,7 +2549,7 @@ off_6F63C	dd loc_37CF4
 off_6F640	dd Debris_NotifyChildValidate
 off_6F644	dd loc_37D2E
 		dd loc_37DD1
-off_6F64C	dd WorldObject_IsDestroyed
+off_6F64C	dd WorldObject_IsAlive_3CBB7
 off_6F650	dd loc_38046
 off_6F654	dd WorldObject_BaseDestruct
 		dd loc_3CC19
@@ -2584,7 +2584,7 @@ off_6F6C8	dd loc_37CF4
 off_6F6CC	dd Debris_NotifyChildValidate
 off_6F6D0	dd loc_37D2E
 off_6F6D4	dd loc_37DD1
-off_6F6D8	dd Camera_LookAtSecondaryTarget_3D9FB
+off_6F6D8	dd WorldObject_UpdateWithAIEntity_3D9FB
 off_6F6DC	dd Camera_ComputeMountedPosition_3D31D
 off_6F6E0	dd Camera_DestructSecondaryTarget
 off_6F6E4	dd loc_3D9E9
@@ -3525,7 +3525,7 @@ dword_70450	dd 0			; DATA XREF: seg030:0486r seg030:07B0r ...
 dword_70454	dd 0			; DATA XREF: Formation_GuidanceSolution+996r
 					; Formation_GuidanceSolution+9ADr ...
 dword_70458	dd 0			; DATA XREF: seg003:0D10r seg003:14BCr ...
-word_7045C	dw 1			; DATA XREF: UIScreen_ApplyFormFields_500F6:loc_50123w
+word_7045C	dw 1			; DATA XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6:loc_50123w
 					; UIScreen_RenderGraphVGA_509EE+48r
 dword_7045E	dd 0			; DATA XREF: seg085:004Cr seg085:0069r ...
 dword_70462	dd 0			; DATA XREF: seg085:01E4r seg085:0201r ...
@@ -3571,7 +3571,7 @@ dword_7048D	dd 0			; DATA XREF: Radar_Project3DToScreen+789r
 dword_70491	dd 0			; DATA XREF: Radar_Project3DToScreen+82Cr
 					; Radar_Project3DToScreen+86Dr ...
 word_70495	dw 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+11Aw
-					; UIScreen_ApplyFormFields_500F6+1E1w ...
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+1E1w ...
 byte_70497	db 0			; DATA XREF: Player_MainUpdate+7w
 					; Player_MainUpdate:loc_139DDw	...
 aTimeCompressio	db 'Time Compression %dx',0
@@ -10070,11 +10070,11 @@ word_72B30	dw 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+211r
 					; TextScroll_DrawTypewriterFrameB_8781A:loc_8782Fr
 		align 4
 byte_72B34	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+416w
-					; UIScreen_ApplyFormFields_500F6+16Cw ...
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+16Cw ...
 dword_72B35	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+41Ew
-					; UIScreen_ApplyFormFields_500F6+174w ...
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+174w ...
 dword_72B39	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_50013w
-					; UIScreen_ApplyFormFields_500F6+178w ...
+					; Frame_UpdateTimingAndNotifyTrackedObjects_500F6+178w ...
 		db    0
 		db    0
 		db    0
@@ -10146,13 +10146,13 @@ dword_72BAE	dd 0			; DATA XREF: UIScreen_ReadNumericFields_500A6+2Bw
 					; UIScreen_RenderGraphVGA_509EE+1ECr ...
 dword_72BB2	dd 0			; DATA XREF: UIScreen_ReadNumericFields_500A6+41w
 					; UIScreen_RenderGraphVGA_509EE+1E1r ...
-dword_72BB6	dd 0			; DATA XREF: WorldObjects_PurgeExpired+D2w
+dword_72BB6	dd 0			; DATA XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+D2w
 					; UIScreen_RenderGraphVGA_509EE+254r
-dword_72BBA	dd 0			; DATA XREF: WorldObjects_PurgeExpired+E9w
+dword_72BBA	dd 0			; DATA XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+E9w
 					; UIScreen_RenderGraphVGA_509EE+24Fr
-dword_72BBE	dd 0			; DATA XREF: WorldObjects_PurgeExpired+FAw
+dword_72BBE	dd 0			; DATA XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+FAw
 					; UIScreen_RenderGraphVGA_509EE+24Ar
-dword_72BC2	dd 0			; DATA XREF: WorldObjects_PurgeExpired+105w
+dword_72BC2	dd 0			; DATA XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+105w
 					; UIScreen_RenderGraphVGA_509EE+245r
 		db    0
 		db    0

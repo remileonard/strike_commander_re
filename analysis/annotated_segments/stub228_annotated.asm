@@ -369,7 +369,7 @@ VROOMM_StubThunk_6AB02	endp
 ; far, thunk fixe VROOMM (jmp sub_73940) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=160h, codesize=1C60h, nentries=30.
 ; ==============================================================================================
-VROOMM_StubThunk_6AB07	proc far		; CODE XREF: Camera_Helper4_9D4D2+CP
+VROOMM_StubThunk_6AB07	proc far		; CODE XREF: WorldObject_LoadAIProfileViaEntity_9D4D2+CP
 		jmp	AIAircraft_LoadProfileGuarded_73940
 VROOMM_StubThunk_6AB07	endp
 

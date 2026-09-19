@@ -145,11 +145,11 @@ arg_0		= word ptr  6
 		pop	cx
 		push	word_70483
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		push	word_70474
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		jmp	loc_A78A9
 ; ���������������������������������������������������������������������������
@@ -534,7 +534,7 @@ loc_A79FE:				; CODE XREF: MissionLoader_LoadFormation_A78F5+105j
 		mov	word_70474, ax
 		push	ax
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_A7A0D:				; CODE XREF: MissionLoader_LoadFormation_A78F5+1Fj
@@ -777,7 +777,7 @@ loc_A7B4E:				; CODE XREF: MissionLoader_SpawnEntity_A7B1E+169j
 		push	571Ch
 
 loc_A7B6F:
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		or	si, si
@@ -837,7 +837,7 @@ loc_A7B81:
 		mov	[si+1Ah], eax
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	eax, [bp+var_A]
 		cmp	eax, dword_704D5
@@ -1011,7 +1011,7 @@ loc_A7D30:
 		push	59C3h
 
 loc_A7D3B:
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 
 loc_A7D40:
 		add	sp, 4

@@ -389,7 +389,7 @@ arg_0		= word ptr  6
 		push	si
 		mov	si, [bp+arg_0]
 		push	si
-		call	Debris_TestDestroyedState
+		call	WorldObject_TestAliveAndUpdateChildren_3800A
 		pop	cx
 		or	al, al
 		jz	short loc_3CF47
@@ -1224,7 +1224,7 @@ Camera_EnableFollowIfActive	endp
 ; (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé.
 ; ==============================================================================================
 Emitter_UpdateFromEntitySMOKVec_3D57E	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+28p
-					; Camera_LookAtSecondaryTarget_3D9FB:loc_3DACEp	...
+					; WorldObject_UpdateWithAIEntity_3D9FB:loc_3DACEp	...
 
 var_F0		= dword	ptr -0F0h
 var_E8		= dword	ptr -0E8h
@@ -1681,7 +1681,7 @@ arg_0		= word ptr  6
 		push	si
 		mov	si, [bp+arg_0]
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 
 loc_3D9C1:
 		pop	cx
@@ -1741,11 +1741,18 @@ loc_3D9F1:				; DATA XREF: seg339:off_6F6FCo
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,138L — variante gérant une cible secondaire (+0x55) avec un mode global (byte_6D558) et
-; transformation via point de montage (+0x51, vtable[0x40]) : calcul de la caméra externe
-; orientée vers une cible secondaire (mode 'regarder la cible').
+; far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée
+; par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par
+; WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 →
+; renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle
+; AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0,
+; appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot
+; +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement
+; slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1
+; (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le
+; corps).
 ; ==============================================================================================
-Camera_LookAtSecondaryTarget_3D9FB	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4:loc_3DDCFP
+WorldObject_UpdateWithAIEntity_3D9FB	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4:loc_3DDCFP
 					; DATA XREF: seg339:off_6F6D8o
 
 var_8		= word ptr -8
@@ -1760,14 +1767,14 @@ arg_0		= word ptr  6
 		push	si
 		mov	si, [bp+arg_0]
 		push	si
-		call	WorldObject_IsDestroyed
+		call	WorldObject_IsAlive_3CBB7
 		pop	cx
 		or	al, al
 		jnz	short loc_3DA13
 		jmp	loc_3DAD6
 ; ���������������������������������������������������������������������������
 
-loc_3DA13:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+13j
+loc_3DA13:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+13j
 		cmp	byte_6D558, 0
 		jz	short loc_3DA57
 		cmp	dword ptr [si+55h], 0
@@ -1780,11 +1787,11 @@ loc_3DA13:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+13j
 		jmp	short loc_3DA37
 ; ���������������������������������������������������������������������������
 
-loc_3DA33:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+24j
+loc_3DA33:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+24j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_3DA37:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+36j
+loc_3DA37:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+36j
 		mov	[bp+var_2], dx
 		mov	[bp+var_4], ax
 		cmp	word ptr [si+51h], 0
@@ -1799,11 +1806,11 @@ loc_3DA37:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+36j
 		jmp	short loc_3DACC
 ; ���������������������������������������������������������������������������
 
-loc_3DA55:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+46j
+loc_3DA55:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+46j
 		jmp	short loc_3DACC
 ; ���������������������������������������������������������������������������
 
-loc_3DA57:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+1Dj
+loc_3DA57:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+1Dj
 		cmp	byte ptr [si+59h], 0
 		jz	short loc_3DA78
 		cmp	dword ptr [si+55h], 0
@@ -1816,11 +1823,11 @@ loc_3DA57:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+1Dj
 		jmp	short loc_3DACC
 ; ���������������������������������������������������������������������������
 
-loc_3DA76:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+67j
+loc_3DA76:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+67j
 		jmp	short loc_3DACC
 ; ���������������������������������������������������������������������������
 
-loc_3DA78:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+60j
+loc_3DA78:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+60j
 		cmp	dword ptr [si+55h], 0
 		jz	short loc_3DA91
 		push	large dword ptr	[si+55h]
@@ -1830,7 +1837,7 @@ loc_3DA78:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+60j
 		add	sp, 4
 		jmp	short $+2
 
-loc_3DA91:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+82j
+loc_3DA91:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+82j
 		cmp	dword ptr [si+55h], 0
 		jz	short loc_3DAAA
 		push	large dword ptr	[si+55h]
@@ -1841,11 +1848,11 @@ loc_3DA91:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+82j
 		jmp	short loc_3DAAE
 ; ���������������������������������������������������������������������������
 
-loc_3DAAA:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+9Bj
+loc_3DAAA:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+9Bj
 		xor	dx, dx
 		xor	ax, ax
 
-loc_3DAAE:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+ADj
+loc_3DAAE:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+ADj
 		mov	[bp+var_6], dx
 		mov	[bp+var_8], ax
 		cmp	word ptr [si+51h], 0
@@ -1861,8 +1868,8 @@ loc_3DAC2:
 		add	sp, 6
 		jmp	short $+2
 
-loc_3DACC:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+58j
-					; Camera_LookAtSecondaryTarget_3D9FB:loc_3DA55j	...
+loc_3DACC:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+58j
+					; WorldObject_UpdateWithAIEntity_3D9FB:loc_3DA55j	...
 		push	si
 		push	cs
 
@@ -1875,14 +1882,14 @@ loc_3DAD2:
 		jmp	short loc_3DAD8
 ; ���������������������������������������������������������������������������
 
-loc_3DAD6:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+15j
+loc_3DAD6:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+15j
 		mov	al, 0
 
-loc_3DAD8:				; CODE XREF: Camera_LookAtSecondaryTarget_3D9FB+D9j
+loc_3DAD8:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+D9j
 		pop	si
 		leave
 		retf
-Camera_LookAtSecondaryTarget_3D9FB	endp
+WorldObject_UpdateWithAIEntity_3D9FB	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -2143,7 +2150,7 @@ Camera_DestructTypeB	endp
 ; bit2) : reset de l'état de la caméra externe (invalidation complète).
 ; ==============================================================================================
 Camera_ResetState	proc far		; CODE XREF: Camera_InitAttachedWithTarget_3DC3D+3Fp
-					; Camera_ConstructWithSecondaryTarget_9D2CC+2EP ...
+					; WorldObject_ConstructWithAIEntity_9D2CC+2EP ...
 
 arg_0		= word ptr  6
 
@@ -2372,7 +2379,7 @@ Camera_ResetSecondaryFlag	endp
 ; avec cible secondaire.
 ; ==============================================================================================
 Camera_InitWithSecondaryTarget	proc far		; CODE XREF: Camera_InitAndGetHandle+CP
-					; Camera_ConstructWithSecondaryTarget_9D2CC+45P
+					; WorldObject_ConstructWithAIEntity_9D2CC+45P
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8

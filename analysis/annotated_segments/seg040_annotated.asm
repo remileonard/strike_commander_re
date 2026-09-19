@@ -7,11 +7,15 @@ seg040		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,44L — parcourt une liste (sub_5F6A9), notifie chaque élément actif (flag +0x52 bit0) via
-; vtable[0x18] : notification en masse d'éléments actifs d'une liste (probable liste de
-; triggers de mission).
+; far, parcourt la liste passée en argument (itérateur LinkedListB_Helper_5F6A9, objet à +0xE
+; de chaque nœud) et, pour chaque objet dont le bit 0 de +0x52 est posé, appelle le slot +0x18
+; du sous-vtable pointé par +0x50 (TrackedObject_FrameStep_2DF0D pour les sous-vtables 0x460
+; et 0x484 de seg339). Appelée par Frame_UpdateTimingAndNotifyTrackedObjects_500F6 avec la
+; liste 0x59CD (EntityTracker) ; référencée aussi dans la table d'overlay seg216. Anciennement
+; WorldObjects_NotifyMissionTriggers (rien de spécifique aux triggers de mission dans ce
+; corps). Rôle exact du slot +0x18 non prouvé au-delà de TrackedObject_FrameStep_2DF0D.
 ; ==============================================================================================
-WorldObjects_NotifyMissionTriggers	proc far		; CODE XREF: UIScreen_ApplyFormFields_500F6+AP
+TrackedObjects_CallSlot18OnActive_22F10	proc far		; CODE XREF: Frame_UpdateTimingAndNotifyTrackedObjects_500F6+AP
 					; DATA XREF: seg216:01FEo
 
 var_2		= word ptr -2
@@ -27,7 +31,7 @@ arg_0		= word ptr  6
 		jmp	short loc_22F3E
 ; ���������������������������������������������������������������������������
 
-loc_22F22:				; CODE XREF: WorldObjects_NotifyMissionTriggers+3Dj
+loc_22F22:				; CODE XREF: TrackedObjects_CallSlot18OnActive_22F10+3Dj
 		mov	bx, [bp+var_2]
 		mov	di, [bx+0Eh]
 		or	di, di
@@ -41,8 +45,8 @@ loc_22F22:				; CODE XREF: WorldObjects_NotifyMissionTriggers+3Dj
 		call	dword ptr [bx+18h]
 		pop	cx
 
-loc_22F3E:				; CODE XREF: WorldObjects_NotifyMissionTriggers+10j
-					; WorldObjects_NotifyMissionTriggers+1Aj ...
+loc_22F3E:				; CODE XREF: TrackedObjects_CallSlot18OnActive_22F10+10j
+					; TrackedObjects_CallSlot18OnActive_22F10+1Aj ...
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -54,7 +58,7 @@ loc_22F3E:				; CODE XREF: WorldObjects_NotifyMissionTriggers+10j
 		pop	si
 		leave
 		retf
-WorldObjects_NotifyMissionTriggers	endp
+TrackedObjects_CallSlot18OnActive_22F10	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

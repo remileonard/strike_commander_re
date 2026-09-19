@@ -199,7 +199,7 @@ loc_4F412:				; CODE XREF: seg109:015Dj
 		push	ax
 		push	dx
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -239,7 +239,7 @@ loc_4F43B:				; CODE XREF: seg109:0186j
 		add	sp, 4
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	[bp-1Eh], di
 		push	word ptr [bp-1Eh]

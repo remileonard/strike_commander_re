@@ -317,7 +317,7 @@ loc_9B9BC:
 		push	571Ch
 
 loc_9B9C3:
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		mov	dx, [bp+var_14]

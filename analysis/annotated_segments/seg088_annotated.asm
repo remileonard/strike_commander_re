@@ -349,7 +349,7 @@ loc_3E922:				; CODE XREF: HUD_RenderSymbologyMain+7C2j
 		push	ax
 		push	dx
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		lea	ax, [bp+var_E6]
@@ -646,7 +646,7 @@ loc_3EBCA:				; CODE XREF: HUD_RenderSymbologyMain+47Cj
 loc_3EC44:				; CODE XREF: HUD_RenderSymbologyMain+4FBj
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	[bp+var_94], di
 		push	[bp+var_94]
@@ -1004,7 +1004,7 @@ loc_3EFA8:				; CODE XREF: HUD_RenderSymbologyMain+832j
 		push	ax
 		push	dx
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		lea	ax, [bp+var_E6]
@@ -1085,7 +1085,7 @@ loc_3F087:
 		push	59C3h
 
 loc_3F08A:
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_3F092:
@@ -1690,7 +1690,7 @@ loc_3F5D9:				; CODE XREF: HUD_RenderSymbologyMain+E8Aj
 		push	word ptr [bp+arg_0+2]
 		push	ax
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -1739,7 +1739,7 @@ loc_3F605:				; CODE XREF: HUD_RenderSymbologyMain+EBBj
 		add	sp, 4
 		push	di
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		mov	[bp+var_50], di
 		push	[bp+var_50]
@@ -5211,7 +5211,7 @@ arg_4		= word ptr  0Ah
 
 loc_41173:
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		les	bx, [bp+arg_0]
@@ -5233,7 +5233,7 @@ loc_41191:
 		push	571Ch
 
 loc_41194:
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	si, ax
 		les	bx, [bp+arg_0]
@@ -5362,7 +5362,7 @@ loc_41286:
 		add	sp, 4
 		push	si
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
 loc_4130D:				; CODE XREF: Countermeasure_DeployChaffFlare+5Cj

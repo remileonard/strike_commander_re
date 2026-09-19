@@ -724,7 +724,7 @@ arg_2		= word ptr  8
 		jz	short loc_36FF4
 		push	[bp+arg_2]
 		push	word ptr [si+6]
-		call	Container_FindByKeyAlt
+		call	WorldObjects_CallSlot4OnAll_22D6C
 
 loc_36FF1:
 		add	sp, 4
@@ -749,7 +749,7 @@ loc_37002:
 
 loc_37004:
 		push	word ptr [si+6]
-		call	WorldObjects_PurgeExpired
+		call	WorldObjects_UpdateAllAndRemoveDead_221F2
 		pop	cx
 
 loc_3700D:				; CODE XREF: seg076:loc_37002j

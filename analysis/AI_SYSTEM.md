@@ -960,33 +960,71 @@ flowchart LR
     B5 --> H5["Goal_ActiveWingmanEngagement<br/>escorte/suivi du joueur<br/>(réservé coéquipiers actifs)"]
 ```
 
-### 4.2 `AI_TopLevelThink` — la boucle d'exécution
+### 4.2 `AI_TopLevelThink` — réactions, objet en cours, puis objectifs
 
-Jusqu'à **10 emplacements** (`GOAL` peut contenir jusqu'à 10 octets),
-essayés **dans l'ordre** jusqu'à ce que l'un des gestionnaires retourne
-« j'ai agi ce tick » :
+**CORRIGÉ (2026-09-19)** : la version précédente de cette section décrivait
+`AI_TopLevelThink` comme une simple boucle sur les emplacements `GOAL`. La
+lecture de la fonction (`seg004`, voir `AI_TICK_CALL_GRAPH.md` pour les
+citations) montre que les objectifs viennent **en dernier**, après des
+réactions prioritaires et un test d'objet en cours. Le cas spécial du
+« drapeau générique sur l'aéronef lié » de l'ancienne version est en fait le
+drapeau **« au sol »** (octet `+0x20` du sous-objet de l'avion, posé par
+`PhysicsTicks`). Le milieu de la fonction (traitement des menaces, chaîne de
+cibles `+0x287` / `+0x289`) n'est pas lu en détail.
 
 ```c
+// pseudocode de la structure lue (ordre réel)
 int AI_TopLevelThink(Entity* entity) {
-    // cas spécial : si un drapeau générique est pose sur l'aeronef lie,
-    // forcer le gestionnaire generique sur le slot 0
-    if (entity->linked_aircraft->override_flag) {
-        return Goal_ExecuteAction(entity, /*slot*/ 0);
+    // 1. début
+    if (byte_6E4D7 && entity->b0 >= 0xC) Targeting_AcquireBestThreat(entity, 0);
+    AI_MessageDispatcher(entity);
+    Radio_CombatChatterDispatch(entity);
+
+    // 2. traitement des menaces, SAUTÉ si décollage/atterrissage (+0x11D = 0xA1/0xA2),
+    //    avion au sol, ou word_70466 <= 3  (partie non lue en détail)
+
+    // 3. réactions prioritaires, avant tout objectif
+    int reacted = 0;
+    if (entity->f281) {
+        if (entity->obj0D == NULL && entity->f27F == 2)
+            reacted = AI_EscortPriorityReactionHandler(entity);
+        else
+            AI_QueryTargetField4B(entity);
+    }
+    if (!reacted && entity->f27F <= 1)
+        reacted = Formation_DamageReactionHandler(entity);
+    if (reacted) return;                      // "protect self" passe avant "obey order"
+
+    // 4. objet en cours : passe avant GOAL et tournoi (nature de l'objet non établie)
+    if (entity->obj0D != NULL && entity->f27F != 0) {
+        entity->obj0D->vtable[0xC](entity->obj0D);   // temps cumulé dans word_704E6+0x5B56
+        return;
     }
 
-    for (int i = 0; i < 10; i++) {
-        GoalSlot* slot = &entity->goal_slots[i];  // PilotProfile+0x1B0, pas 8 octets
-        if (slot->is_empty()) continue;
-
-        int handled = call_function_pointer(slot->handler, entity, i);
-        if (handled != 0) {
-            return handled;  // ce gestionnaire a agi ce tick, on s'arrête là
+    // 5. objectifs
+    if (aircraft_on_ground(entity)) {         // [[[entité+0xB]]+0x20] != 0
+        Goal_ExecuteAction(entity, 0);        // direct, tableau GOAL ignoré
+    } else {
+        for (int i = 0; entity->goal_slots[i].handler != NULL; i++) {   // entité+0x1B0, 8 octets
+            if (entity->goal_slots[i].handler(entity, 0))               // premier qui répond non nul
+                break;
         }
-        // sinon, essayer le slot suivant
     }
-    return 0;
+    // 6. épilogue (+0x280, +0x10D, +0x28B bit2) : non interprété
 }
 ```
+
+Points établis :
+- **Les gestionnaires sont alternatifs**, choisis par l'octet du fichier
+  (2 `Goal_ExecuteAction`, 3 `Goal_WanderRandom`, 4 tournoi, 5
+  `Goal_ActiveWingmanEngagement`) : ils ne s'enchaînent pas.
+- **La valeur `1` du fichier n'occupe aucun emplacement** (abandonnée dans
+  `PilotProfile_LoadFromPROF`) ; `GOAL=1` seul donne un tableau vide.
+- **Au sol, `Goal_ExecuteAction` tourne quel que soit le tableau `GOAL`**,
+  ce qui explique qu'un personnage avec `GOAL=1` seul décolle mais, une fois
+  en vol, n'exécute plus rien.
+- **Le gestionnaire est appelé avec `(entité, 0)`**, pas avec l'index de
+  l'emplacement.
 
 ### 4.3 `Goal_ExecuteAction` — la machine à états générique (sélecteur 2)
 

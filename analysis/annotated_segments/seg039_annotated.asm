@@ -206,7 +206,7 @@ loc_21F63:
 		push	dx
 		nop
 		push	cs
-		call	near ptr Container_KeyCompare
+		call	near ptr List_AppendTail_22C23
 		add	sp, 4
 		mov	cx, ax
 		jmp	short $+2
@@ -234,10 +234,12 @@ loc_21F8A:				; CODE XREF: seg039:00F6j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,45L — compare deux clés non nulles via sub_22C23 (comparaison de chaînes) : prédicat
-; d'égalité de clés du conteneur.
+; far, args (liste, nœud) : appelle List_AppendTail_22C23 sur l'en-tête pointé par la liste si
+; la liste et le nœud sont non nuls. Anciennement Container_KeyEquals (n'est pas un test
+; d'égalité). Appelée avec le tag 0x59C3 (liste des entités du monde) au spawn et au
+; chargement de mission.
 ; ==============================================================================================
-Container_KeyEquals	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+1D1P
+List_AppendIfNonNull_21F8D	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+1D1P
 					; Debris_SpawnOrchestrator+1C5P ...
 
 var_2		= word ptr -2
@@ -260,13 +262,13 @@ arg_2		= word ptr  8
 		push	dx
 		nop
 		push	cs
-		call	near ptr Container_KeyCompare
+		call	near ptr List_AppendTail_22C23
 		add	sp, 4
 		mov	cx, ax
 		jmp	short $+2
 
-loc_21FB4:				; CODE XREF: Container_KeyEquals+13j
-					; Container_KeyEquals+17j
+loc_21FB4:				; CODE XREF: List_AppendIfNonNull_21F8D+13j
+					; List_AppendIfNonNull_21F8D+17j
 		mov	[bp+var_2], cx
 		cmp	[bp+var_2], 0
 		jz	short loc_21FC1
@@ -274,14 +276,14 @@ loc_21FB4:				; CODE XREF: Container_KeyEquals+13j
 		jmp	short loc_21FC3
 ; ���������������������������������������������������������������������������
 
-loc_21FC1:				; CODE XREF: Container_KeyEquals+2Ej
+loc_21FC1:				; CODE XREF: List_AppendIfNonNull_21F8D+2Ej
 		mov	al, 0
 
-loc_21FC3:				; CODE XREF: Container_KeyEquals+32j
+loc_21FC3:				; CODE XREF: List_AppendIfNonNull_21F8D+32j
 		pop	si
 		leave
 		retf
-Container_KeyEquals	endp
+List_AppendIfNonNull_21F8D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -601,10 +603,11 @@ loc_22148:				; CODE XREF: seg039:02A5j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,33L — recherche une entrée (sub_22D6C) puis appelle sub_503EB : accès à une entrée du
-; conteneur avec traitement associé (probable incrément de référence).
+; far, appelle WorldObjects_CallSlot4OnAll_22D6C(liste[0], objet) puis
+; UIScreen_ComputeDerivedFields_503EB (non lue). Appelée par TrackedObject_FrameStep_2DF0D
+; avec le tag 0x59C3 avant le slot +0x20. Anciennement Container_FindAndTouch.
 ; ==============================================================================================
-Container_FindAndTouch	proc far		; CODE XREF: seg065:0169P
+WorldObjects_CallSlot4OnAllThenRecompute_2214F	proc far		; CODE XREF: seg065:0169P
 					; Camera_UpdateAndNotify_7AFCA+40P ...
 
 arg_0		= word ptr  6
@@ -628,7 +631,7 @@ loc_22159:
 		push	cs
 
 loc_2215D:
-		call	near ptr Container_FindByKeyAlt
+		call	near ptr WorldObjects_CallSlot4OnAll_22D6C
 		add	sp, 4
 
 loc_22163:
@@ -636,7 +639,7 @@ loc_22163:
 		pop	si
 		pop	bp
 		retf
-Container_FindAndTouch	endp
+WorldObjects_CallSlot4OnAllThenRecompute_2214F	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -657,11 +660,15 @@ Container_FindAndTouch	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — parcourt la liste, notifie chaque nœud actif (flag+5==1) via vtable[0x1C] avec un
-; paramètre, puis retourne un compteur global (via vtable[0xB]) : notification en masse des
-; entrées actives du conteneur.
+; far, args (liste en arg_0, objet en arg_2) : parcourt la liste (tête à +0xB de l'en-tête,
+; suivant à +2 du nœud) et pour chaque nœud dont l'octet +5 vaut 1 appelle le slot +0x1C avec
+; (nœud, objet). Appelée par UIScreen_RenderGraphVGA_Wrapper_50E44 avec la liste 0x59C3
+; (entités du monde), elle-même appelée par TrackedObject_NotifyWorldObjects_2DFE4.
+; Anciennement Container_NotifyAllActive. Rôle du slot +0x1C non identifié ; aucun lien prouvé
+; avec AIEntity_MasterTick_5ACC (le tick de l'entité IA passe par
+; WorldObjects_UpdateAllAndRemoveDead_221F2, slot +0x10).
 ; ==============================================================================================
-Container_NotifyAllActive	proc far		; CODE XREF: UIScreen_RenderGraphVGA_Wrapper_50E44+11P
+WorldObjects_CallSlot1COnActive_2217D	proc far		; CODE XREF: UIScreen_RenderGraphVGA_Wrapper_50E44+11P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -676,7 +683,7 @@ arg_2		= word ptr  8
 		jmp	short loc_221A3
 ; ���������������������������������������������������������������������������
 
-loc_2218E:				; CODE XREF: Container_NotifyAllActive+40j
+loc_2218E:				; CODE XREF: WorldObjects_CallSlot1COnActive_2217D+40j
 		mov	bx, [bp+var_2]
 		cmp	byte ptr [bx+5], 1
 		jnz	short loc_221A3
@@ -686,8 +693,8 @@ loc_2218E:				; CODE XREF: Container_NotifyAllActive+40j
 		call	dword ptr [bx+1Ch]
 		add	sp, 4
 
-loc_221A3:				; CODE XREF: Container_NotifyAllActive+Fj
-					; Container_NotifyAllActive+18j
+loc_221A3:				; CODE XREF: WorldObjects_CallSlot1COnActive_2217D+Fj
+					; WorldObjects_CallSlot1COnActive_2217D+18j
 		cmp	[bp+var_2], 0
 		jnz	short loc_221B0
 		mov	bx, [si]
@@ -695,18 +702,18 @@ loc_221A3:				; CODE XREF: Container_NotifyAllActive+Fj
 		jmp	short loc_221B6
 ; ���������������������������������������������������������������������������
 
-loc_221B0:				; CODE XREF: Container_NotifyAllActive+2Aj
+loc_221B0:				; CODE XREF: WorldObjects_CallSlot1COnActive_2217D+2Aj
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+2]
 
-loc_221B6:				; CODE XREF: Container_NotifyAllActive+31j
+loc_221B6:				; CODE XREF: WorldObjects_CallSlot1COnActive_2217D+31j
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0
 		jnz	short loc_2218E
 		pop	si
 		leave
 		retf
-Container_NotifyAllActive	endp
+WorldObjects_CallSlot1COnActive_2217D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -714,10 +721,12 @@ Container_NotifyAllActive	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,31L — remet à zéro 8 compteurs globaux (table 0x5B06) puis appelle sub_221F2 :
-; réinitialisation périodique + déclenchement du nettoyage du conteneur (garbage collection).
+; far, remet à zéro word_6E1BD et les 8 compteurs de profilage (table à 0x5B06), puis appelle
+; WorldObjects_UpdateAllAndRemoveDead_221F2 sur la liste passée en argument. Appelée par
+; CombatTarget_WeaponActionSubsystem (avec le tag 0x59C3), donc par MAIN_GAME_TICK.
+; Anciennement WorldObjects_PeriodicGC (n'est qu'un enrobage de la boucle de mise à jour).
 ; ==============================================================================================
-WorldObjects_PeriodicGC	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+43BP
+WorldObjects_UpdateFrame_ResetCounters_221C2	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+43BP
 
 arg_0		= word ptr  6
 
@@ -730,24 +739,24 @@ arg_0		= word ptr  6
 		jmp	short loc_221E2
 ; ���������������������������������������������������������������������������
 
-loc_221D3:				; CODE XREF: WorldObjects_PeriodicGC+23j
+loc_221D3:				; CODE XREF: WorldObjects_UpdateFrame_ResetCounters_221C2+23j
 		mov	bx, ax
 		shl	bx, 2
 		mov	dword ptr [bx+5B06h], 0
 		inc	ax
 
-loc_221E2:				; CODE XREF: WorldObjects_PeriodicGC+Fj
+loc_221E2:				; CODE XREF: WorldObjects_UpdateFrame_ResetCounters_221C2+Fj
 		cmp	ax, 8
 		jl	short loc_221D3
 		push	word ptr [si]
 		nop
 		push	cs
-		call	near ptr WorldObjects_PurgeExpired
+		call	near ptr WorldObjects_UpdateAllAndRemoveDead_221F2
 		pop	cx
 		pop	si
 		pop	bp
 		retf
-WorldObjects_PeriodicGC	endp
+WorldObjects_UpdateFrame_ResetCounters_221C2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -755,12 +764,17 @@ WorldObjects_PeriodicGC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,167L — parcourt la liste, teste chaque nœud (vtable[0x10]=expiré?), récupère un enfant
-; (vtable[0]) et le valide (vtable[0xC]) avant de le retirer (sub_22C56) et de le libérer
-; (vtable[0x18]) : garbage collector du conteneur — purge des entrées expirées/invalides
-; (probable nettoyage des objets détruits du monde de jeu, incrémente le compteur word_6E1BD).
+; far, parcourt une liste d'objets monde (tête à +0xB de l'en-tête, suivant à +2 du nœud) :
+; pour chaque nœud appelle le slot +0x10 (mise à jour, renvoie 1 = vivant / 0 = mort) en
+; chronométrant avec PIT_ReadHighPrecision, puis, si 0 est renvoyé, valide l'enfant (slot 0
+; puis slot +0xC de l'enfant) et retire le nœud (Container_RemoveNode) et le détruit (slot
+; +0x18, argument 3). Le temps est cumulé par type d'objet (slot +0x34 : 6, 0xB, 0xC/0x12,
+; autres). Appelée par WorldObjects_UpdateFrame_ResetCounters_221C2 (depuis
+; CombatTarget_WeaponActionSubsystem, tick principal), Picking_ResolveSymbol et
+; WorldObject_TestAliveAndUpdateChildren_3800A. Anciennement WorldObjects_PurgeExpired (nom
+; trop restrictif : c'est la boucle de mise à jour du monde).
 ; ==============================================================================================
-WorldObjects_PurgeExpired	proc far		; CODE XREF: WorldObjects_PeriodicGC+29p
+WorldObjects_UpdateAllAndRemoveDead_221F2	proc far		; CODE XREF: WorldObjects_UpdateFrame_ResetCounters_221C2+29p
 					; seg076:0567P	...
 
 var_14		= dword	ptr -14h
@@ -782,7 +796,7 @@ arg_0		= word ptr  6
 		jmp	loc_222FF
 ; ���������������������������������������������������������������������������
 
-loc_22207:				; CODE XREF: WorldObjects_PurgeExpired+127j
+loc_22207:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+127j
 		inc	word_6E1BD
 		call	PIT_ReadHighPrecision
 		push	dx
@@ -837,13 +851,13 @@ loc_2224F:
 		add	sp, 4
 		jmp	short $+2
 
-loc_2227E:				; CODE XREF: WorldObjects_PurgeExpired+78j
+loc_2227E:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+78j
 		mov	[bp+var_2], di
 		jmp	short loc_222FF
 ; ���������������������������������������������������������������������������
 
-loc_22283:				; CODE XREF: WorldObjects_PurgeExpired+36j
-					; WorldObjects_PurgeExpired+4Ej ...
+loc_22283:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+36j
+					; WorldObjects_UpdateAllAndRemoveDead_221F2+4Ej ...
 		call	PIT_ReadHighPrecision
 		push	dx
 		push	ax
@@ -866,7 +880,7 @@ loc_22283:				; CODE XREF: WorldObjects_PurgeExpired+36j
 		pop	cx
 		mov	[bp+var_C], al
 
-loc_222BA:				; CODE XREF: WorldObjects_PurgeExpired+B7j
+loc_222BA:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+B7j
 		cmp	[bp+var_C], 6
 		jnz	short loc_222CB
 		mov	eax, [bp+var_10]
@@ -874,19 +888,19 @@ loc_222BA:				; CODE XREF: WorldObjects_PurgeExpired+B7j
 		jmp	short loc_222FC
 ; ���������������������������������������������������������������������������
 
-loc_222CB:				; CODE XREF: WorldObjects_PurgeExpired+CCj
+loc_222CB:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+CCj
 		cmp	[bp+var_C], 0Ch
 		jz	short loc_222D7
 		cmp	[bp+var_C], 12h
 		jnz	short loc_222E2
 
-loc_222D7:				; CODE XREF: WorldObjects_PurgeExpired+DDj
+loc_222D7:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+DDj
 		mov	eax, [bp+var_10]
 		add	dword_72BBA, eax
 		jmp	short loc_222FC
 ; ���������������������������������������������������������������������������
 
-loc_222E2:				; CODE XREF: WorldObjects_PurgeExpired+E3j
+loc_222E2:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+E3j
 		cmp	[bp+var_C], 0Bh
 		jnz	short loc_222F3
 		mov	eax, [bp+var_10]
@@ -894,39 +908,39 @@ loc_222E2:				; CODE XREF: WorldObjects_PurgeExpired+E3j
 		jmp	short loc_222FC
 ; ���������������������������������������������������������������������������
 
-loc_222F3:				; CODE XREF: WorldObjects_PurgeExpired+F4j
+loc_222F3:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+F4j
 		mov	eax, [bp+var_10]
 		add	dword_72BC2, eax
 
-loc_222FC:				; CODE XREF: WorldObjects_PurgeExpired+D7j
-					; WorldObjects_PurgeExpired+EEj ...
+loc_222FC:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+D7j
+					; WorldObjects_UpdateAllAndRemoveDead_221F2+EEj ...
 		mov	di, [bp+var_2]
 
-loc_222FF:				; CODE XREF: WorldObjects_PurgeExpired+12j
-					; WorldObjects_PurgeExpired+8Fj
+loc_222FF:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+12j
+					; WorldObjects_UpdateAllAndRemoveDead_221F2+8Fj
 		cmp	[bp+var_2], 0
 		jnz	short loc_2230A
 		mov	ax, [si+0Bh]
 		jmp	short loc_22310
 ; ���������������������������������������������������������������������������
 
-loc_2230A:				; CODE XREF: WorldObjects_PurgeExpired+111j
+loc_2230A:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+111j
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+2]
 
-loc_22310:				; CODE XREF: WorldObjects_PurgeExpired+116j
+loc_22310:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+116j
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0
 		jz	short loc_2231C
 		jmp	loc_22207
 ; ���������������������������������������������������������������������������
 
-loc_2231C:				; CODE XREF: WorldObjects_PurgeExpired+125j
+loc_2231C:				; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+125j
 		pop	di
 		pop	si
 		leave
 		retf
-WorldObjects_PurgeExpired	endp
+WorldObjects_UpdateAllAndRemoveDead_221F2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2400,11 +2414,13 @@ Container_Op_22BFC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,36L — comparaison de deux clés (chaînes courtes ≤8 car.) : comparateur de clés du
-; dictionnaire (utilisé par sub_21F8D).
+; far, ajoute un nœud en fin de liste chaînée : met le suivant du nœud (+2) à 0, met à jour la
+; queue (+0xD) et la tête (+0xB) de l'en-tête, chaîne l'ancien dernier nœud. Même disposition
+; que WorldObjects_CallSlot1COnActive_2217D / WorldObjects_UpdateAllAndRemoveDead_221F2.
+; Anciennement Container_KeyCompare (ne compare rien).
 ; ==============================================================================================
-Container_KeyCompare	proc far		; CODE XREF: seg039:00E4p
-					; Container_KeyEquals+1Dp ...
+List_AppendTail_22C23	proc far		; CODE XREF: seg039:00E4p
+					; List_AppendIfNonNull_21F8D+1Dp ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2426,19 +2442,19 @@ arg_2		= word ptr  8
 		jmp	short loc_22C50
 ; ���������������������������������������������������������������������������
 
-loc_22C47:				; CODE XREF: Container_KeyCompare+18j
+loc_22C47:				; CODE XREF: List_AppendTail_22C23+18j
 		mov	bx, [si+0Dh]
 		mov	[bx+2],	di
 		mov	[si+0Dh], di
 
-loc_22C50:				; CODE XREF: Container_KeyCompare+Dj
-					; Container_KeyCompare+22j
+loc_22C50:				; CODE XREF: List_AppendTail_22C23+Dj
+					; List_AppendTail_22C23+22j
 		mov	ax, di
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Container_KeyCompare	endp
+List_AppendTail_22C23	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2449,7 +2465,7 @@ Container_KeyCompare	endp
 ; far,40L — retire un nœud spécifique par pointeur (unlink direct) : suppression directe d'un
 ; nœud connu du conteneur.
 ; ==============================================================================================
-Container_RemoveNode	proc far		; CODE XREF: WorldObjects_PurgeExpired+6Ep
+Container_RemoveNode	proc far		; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+6Ep
 					; Container_Op_22DE5+18p ...
 
 arg_0		= word ptr  6
@@ -2667,10 +2683,14 @@ Container_Op_22D32	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,47L — recherche une entrée par clé avec logique légèrement différente (utilisée par
-; sub_2214F) : variante de lookup par clé.
+; far, parcourt toute la liste (tous les nœuds, pas seulement les actifs) et appelle le slot
+; +4 de chaque nœud avec (nœud, objet arg_2). Appelée par
+; WorldObjects_CallSlot4OnAllThenRecompute_2214F et Picking_ResolveSymbol. Anciennement
+; Container_FindByKeyAlt (aucune recherche par clé dans ce corps). Rôle du slot +4 non
+; identifié (pour la vtable de l'entité IA c'est un destructeur : les nœuds de la liste 0x59C3
+; ne sont donc pas des entités IA, mais des objets monde qui pointent vers elles à +0x55).
 ; ==============================================================================================
-Container_FindByKeyAlt	proc far		; CODE XREF: Container_FindAndTouch:loc_2215Dp
+WorldObjects_CallSlot4OnAll_22D6C	proc far		; CODE XREF: WorldObjects_CallSlot4OnAllThenRecompute_2214F:loc_2215Dp
 					; Picking_ResolveSymbol+13P ...
 
 var_2		= word ptr -2
@@ -2690,7 +2710,7 @@ loc_22D7B:
 		jmp	short loc_22D8E
 ; ���������������������������������������������������������������������������
 
-loc_22D7D:				; CODE XREF: Container_FindByKeyAlt+3Aj
+loc_22D7D:				; CODE XREF: WorldObjects_CallSlot4OnAll_22D6C+3Aj
 		push	[bp+arg_2]
 		push	[bp+var_2]
 		mov	bx, [bp+var_2]
@@ -2698,25 +2718,25 @@ loc_22D7D:				; CODE XREF: Container_FindByKeyAlt+3Aj
 		call	dword ptr [bx+4]
 		add	sp, 4
 
-loc_22D8E:				; CODE XREF: Container_FindByKeyAlt:loc_22D7Bj
+loc_22D8E:				; CODE XREF: WorldObjects_CallSlot4OnAll_22D6C:loc_22D7Bj
 		cmp	[bp+var_2], 0
 		jnz	short loc_22D99
 		mov	ax, [si+0Bh]
 		jmp	short loc_22D9F
 ; ���������������������������������������������������������������������������
 
-loc_22D99:				; CODE XREF: Container_FindByKeyAlt+26j
+loc_22D99:				; CODE XREF: WorldObjects_CallSlot4OnAll_22D6C+26j
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+2]
 
-loc_22D9F:				; CODE XREF: Container_FindByKeyAlt+2Bj
+loc_22D9F:				; CODE XREF: WorldObjects_CallSlot4OnAll_22D6C+2Bj
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0
 		jnz	short loc_22D7D
 		pop	si
 		leave
 		retf
-Container_FindByKeyAlt	endp
+WorldObjects_CallSlot4OnAll_22D6C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

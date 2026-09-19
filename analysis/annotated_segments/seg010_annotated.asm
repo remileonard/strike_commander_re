@@ -8,11 +8,18 @@ seg010		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,102L — encode une série de booléens dans des champs bitfield du panneau HUD
-; (+0x1B/0x1C/0x1D) : encodeur d'état des instruments de bord (voyants/jauges).
+; far, 102 lignes, LUE EN ENTIER. Argument : pointeur far vers un bloc d'états de 0x2B octets
+; (vtable 0x130, créé par loc_1297E ; l'entité IA le référence à +0x07/+0x09). Appelle
+; WorldObjectA_Method_NoOp_737E0 (via VROOMM_StubThunk_6AA2F, non lue), puis met à zéro les 8
+; bits de l'octet +0x1B, les 8 bits de +0x1C et les bits 0-1 de +0x1D (la valeur écrite vient
+; de mov al,0) : REMISE À ZÉRO d'un bloc de drapeaux, pas un encodage. Aucun affichage, aucune
+; lecture d'un état d'avion. Appelée par HUD_ResetPanel, Player_MainUpdate et
+; AIEntity_MasterTick_5ACC : le bloc est donc commun au joueur et aux entités IA. Anciennement
+; HUD_EncodeInstruments ('encodeur d'état des instruments de bord') : nom trompeur, rien de
+; HUD dans le corps.
 ; ==============================================================================================
-HUD_EncodeInstruments	proc far		; CODE XREF: seg003:0DE2P
-					; HUD_ResetPanel+17p ...
+AircraftStateBits_Clear_12806	proc far		; CODE XREF: seg003:0DE2P
+					; AircraftStateBlock_Reset_12931+17p ...
 
 arg_0		= dword	ptr  6
 
@@ -112,7 +119,7 @@ loc_128EA:
 		or	es:[bx+1Bh], al
 		pop	bp
 		retf
-HUD_EncodeInstruments	endp
+AircraftStateBits_Clear_12806	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -120,11 +127,17 @@ HUD_EncodeInstruments	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,35L — appelle sub_6AA34 puis sub_12806 (encodage), remet à zéro le code HUD (+0x1E) et 3
-; champs de commande (+0x1F/0x23/0x27), ré-encode : réinitialisation complète du panneau
-; HUD/instruments.
+; far, 35 lignes, LUE EN ENTIER. Réinitialise le bloc d'états de 0x2B octets :
+; VROOMM_StubThunk_6AA34 (constructeur de base), AircraftStateBits_Clear_12806 (remise à zéro
+; des drapeaux +0x1B..+0x1D), octet +0x1E = 0, dwords +0x1F, +0x23, +0x27 = 0, puis
+; AircraftStateBits_Clear_12806 à nouveau. Appelée par le constructeur de ce bloc (loc_1297E,
+; slot 0 de la vtable 0x130), par AIEntity_Construct_74B43, Player_MainUpdate et
+; SubObject_Attach. Le bloc = 3 octets de drapeaux (+0x1B..0x1D), un octet de code (+0x1E) et
+; 3 dwords (+0x1F/0x23/0x27) : probable enregistrement de commandes de pilotage (boutons + 3
+; axes) commun au joueur et à l'IA — HYPOTHÈSE, non prouvée. Aucun rapport avec un affichage.
+; Anciennement HUD_ResetPanel (nom trompeur).
 ; ==============================================================================================
-HUD_ResetPanel	proc far		; CODE XREF: seg010:01C1p
+AircraftStateBlock_Reset_12931	proc far		; CODE XREF: seg010:01C1p
 					; SubObject_Attach+62P ...
 
 var_4		= dword	ptr -4
@@ -138,7 +151,7 @@ arg_0		= dword	ptr  6
 		add	sp, 4
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr HUD_EncodeInstruments
+		call	near ptr AircraftStateBits_Clear_12806
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+1Eh], 0
@@ -154,11 +167,11 @@ loc_12962:
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr HUD_EncodeInstruments
+		call	near ptr AircraftStateBits_Clear_12806
 		add	sp, 4
 		leave
 		retf
-HUD_ResetPanel	endp
+AircraftStateBlock_Reset_12931	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -188,7 +201,7 @@ loc_1297E:				; DATA XREF: seg339:0130o
 		push	word ptr [bp-2]
 		push	bx
 		push	cs
-		call	near ptr HUD_ResetPanel
+		call	near ptr AircraftStateBlock_Reset_12931
 		add	sp, 4
 		mov	dx, [bp-2]
 		mov	ax, [bp-4]
@@ -382,7 +395,17 @@ SubObject_NotifyEvent	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_12B4E:				; DATA XREF: seg339:0110o
+; ==============================================================================================
+; far, méthode virtuelle en slot +0 de la vtable de classe de l'entité IA (seg339:0x110, celle
+; qui contient AIEntity_MasterTick_5ACC en +0xC) ; même entrée partagée par d'autres vtables
+; de seg339 (off_6D41C et suivantes). FABRIQUE PAR TYPE : appelle le slot +0 de l'objet source
+; (arg [bp+0Ah]) pour obtenir une structure, lit l'octet de type à +0x34 ; type 1 → alloue
+; 0x28E octets (tag 0x5C44), pose la vtable 0x110, initialise le sous-objet +0x1A (vtable
+; 0x368) et appelle AIEntity_Construct_74B43 ; type 2 → alloue 0xBD octets (vtable 0xAA puis
+; 0x36C) et appelle SubObject_Attach ; autre type → ne crée rien. Aucun appelant direct trouvé
+; (appelée uniquement via vtable). Nom proposé, non prouvé côté appelant.
+; ==============================================================================================
+AIEntity_CreateByType_12B4E:				; DATA XREF: seg339:0110o
 					; seg339:off_6D41Co ...
 		push	bp
 		mov	bp, sp
@@ -634,7 +657,7 @@ loc_12DDF:				; CODE XREF: Goal_ResetNeutralState+Fj
 loc_12DE2:
 		push	large dword ptr	es:[bx+7]
 		push	cs
-		call	near ptr HUD_EncodeInstruments
+		call	near ptr AircraftStateBits_Clear_12806
 		add	sp, 4
 		les	bx, [bp+arg_0]
 

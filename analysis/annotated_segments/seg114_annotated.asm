@@ -5665,10 +5665,12 @@ Expr_Node_NotifyChange_53337	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, enregistre un nœud dans une liste (via sub_21F8D, motif d'ajout à conteneur déjà vu en
-; seg109).
+; far, ajoute l'objet passé en argument (arg_2) à la liste de tag 0x59C3 via
+; List_AppendIfNonNull_21F8D. Appelée par AIAircraft_SpawnAndConditionalLoadProfile_53363 pour
+; l'objet qu'elle vient de créer. Anciennement Expr_Node_RegisterListener (aucun rapport avec
+; un écouteur Expr_VM dans ce corps).
 ; ==============================================================================================
-Expr_Node_RegisterListener_5334D	proc far		; CODE XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+170p
+WorldObjects_AddToList_5334D	proc far		; CODE XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+170p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5678,11 +5680,11 @@ arg_2		= word ptr  8
 		mov	ax, [bp+arg_0]
 		push	[bp+arg_2]
 		push	59C3h
-		call	Container_KeyEquals
+		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 		pop	bp
 		retf
-Expr_Node_RegisterListener_5334D	endp
+WorldObjects_AddToList_5334D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5793,7 +5795,7 @@ loc_533D6:
 		push	ax
 		push	large [bp+var_E]
 		push	571Ch
-		call	Debris_LoadAndInstantiate
+		call	ObjectPrototype_FindOrLoadAndInstantiate_38B70
 		add	sp, 0Ah
 		mov	di, ax
 		or	di, di
@@ -5891,7 +5893,7 @@ loc_534D0:				; CODE XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+D4j
 loc_534D1:
 		push	si
 		push	cs
-		call	near ptr Expr_Node_RegisterListener_5334D
+		call	near ptr WorldObjects_AddToList_5334D
 		add	sp, 4
 
 loc_534D9:				; CODE XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+8Bj
@@ -6523,7 +6525,7 @@ loc_538A1:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+12Bj
 ; ���������������������������������������������������������������������������
 
 loc_538BA:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+112j
-		call	UIScreen_ApplyFormFields_500F6
+		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		cmp	byte_6E4B4, 0
 		jz	short loc_53901
 		mov	al, byte_6E4B5

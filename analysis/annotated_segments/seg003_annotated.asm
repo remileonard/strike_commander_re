@@ -1511,23 +1511,27 @@ loc_5ABA:				; CODE XREF: seg003:0ADEj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~306 lignes - JAMAIS DOCUMENTEE AVANT CETTE SESSION (methode de vtable, echappait a
-; l'heuristique de detection malgre la couverture 100% des proc). CONFIRME etre le TICK IA
-; MAITRE PAR ENTITE : slot [vtable+0xC] de la classe avion/pilote (table seg339, meme famille
-; que Goal_TransferToWingman/Goal_SelectTransition). Sequence complete : (1)
-; decompresse/recompresse un paquet de drapeaux d'etat individuels (+0x28C/+0x28D) ; (2)
-; calcule deux SEUILS GLOBAUX partages dword_7203D (via test de portee sub_378CA + capteur
-; AI_Sensor_SecondaryAngle_59A5) et dword_72039 (cosinus pondere, sub_54876) - ce sont les
-; MEMES globales deja documentees comme consommees par AI_EvadeOrPursueSelector ; (3) met a
-; jour le suivi de rotation/cap (+0x174-0x179) et un drapeau HUD d'aerofrein (flags_75 bit0) ;
-; (4) calcule un SCORE DE MENACE global word_6D3BC, module par plusieurs bits de flags_75
-; (bit6: divise ou double selon le contexte, ajustements +/-2/+/-4) ; (5) AIGUILLAGE FINAL :
-; si flags_75 bit5 ET un bit de statut (+0x28B bit3) sont poses, appelle DIRECTEMENT
-; Goal_FollowAllyExec_DAA9 (court-circuite tout le reste - mode 'suivre la formation') ; sinon
-; appelle AI_TriggerBehaviorUpdate_5E53 (chemin normal). Point d'entree racine de toute la
-; logique de decision IA d'une entite pour ce tick. DECOUVERTE NON RESOLUE : le bit5 de
-; flags_75 (non documente avant), qui gate a la fois ce court-circuit et la disponibilite
-; generale de la reflexion IA dans AI_TriggerBehaviorUpdate.
+; far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA
+; (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le
+; pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique)
+; est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et
+; +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain
+; (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de
+; l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_SecondaryAngle et Math_Cos
+; (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458
+; (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4)
+; AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ;
+; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de
+; l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC :
+; +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B
+; bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ;
+; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et
+; +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un
+; aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue).
+; CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique
+; de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est
+; confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit
+; vers Goal_FollowAllyExec_DAA9.
 ; ==============================================================================================
 AIEntity_MasterTick_5ACC:				; DATA XREF: seg339:011Co
 		push	bp
@@ -1737,7 +1741,7 @@ loc_5D31:				; CODE XREF: seg003:0DADj
 loc_5D5A:				; CODE XREF: seg003:0D8Cj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+7]
-		call	HUD_EncodeInstruments
+		call	AircraftStateBits_Clear_12806
 		add	sp, 4
 		les	bx, [bp+6]
 		mov	bx, es:[bx+0Bh]
