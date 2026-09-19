@@ -131,6 +131,11 @@ flowchart TD
         RELAY --> NATIVE
         NATIVE --> CTRL
         SPAWNFN --> CTRL
+        EFC["ExecuteFlightCommand, slot +0x88 de l'objet monde<br/>classe 0x27BC : loc_3E419, transmet à l'entité<br/>classes 0x26A4, 0x2618, 0x2730 : loc_38342, renvoie 0"]
+        SETOBJ["Goal_SetObjective_A307<br/>slot +0x10 de l'entité, lue à +0x55<br/>pose entité+0x11D, cibles et positions"]
+        CTRL --> EFC
+        EFC -->|"entité +0x55, slot +0x10"| SETOBJ
+        SETOBJ -->|"état entité+0x11D lu par"| HANDLERS
     end
 
     subgraph RENDER["Parcours de la liste des objets suivis - phase affichage"]
@@ -166,7 +171,7 @@ flowchart TD
     classDef unread fill:#e5e7eb,stroke:#6b7280,color:#1e293b
     classDef key fill:#dbeafe,stroke:#3b82f6,stroke-width:3px,color:#1e293b
     class LOOP,TICK,FRAME,COMBAT,RESET,UPDALL,UPD,ALIVE,TESTALIVE,MASTER,CLEAR,FOLLOW,SPAWNFN,PROTO,ECONSTR,RESETBLK,ADD,APPIF,APPTAIL,LOADW,LOADG,PROF,CAST,NOTIFY18,FSTEP,TOUCH,SLOT4,NOTIFYW,WRAP,SLOT1C,MLOAD,WRLD ok
-    class TOPTHINK,REACT,GROUND,SLOTS,HANDLERS ok
+    class TOPTHINK,REACT,GROUND,SLOTS,HANDLERS,EFC,SETOBJ ok
     class CONSTR,CREATE,BEHAV,CAM,CMD,FLAG,UISCRIPT,ACTIVEOBJ prob
     class SLOT8,MOUNT,EMIT,TRIGGER,PICK unread
     class MASTER key
@@ -202,6 +207,25 @@ Citations : `cmp byte ptr [bx+20h], 0 / jz loc_84E9 / call Goal_ExecuteAction_A8
 **Valeur `1` du fichier `GOAL`** : dans `PilotProfile_LoadFromPROF`, la boucle de lecture fait `cmp [bp+var_8], 1 / jz loc_73F62`, qui saute le rattachement du gestionnaire **et** l'incrément du compteur d'emplacements. La valeur `1` n'occupe donc aucun emplacement, et `GOAL=1` seul donne un tableau vide (terminé par le bloc `unk_6D188`).
 
 **Ce que `entité+0x0D` n'est pas** : ce n'est pas le nœud `MVRS` gagnant lui-même. `NotifiableRef_AttachTarget_75612` y copie `nœud+4/+6` (`mov es:[bx+0Fh], ax / mov es:[bx+0Dh], dx` sur l'objet pointé par `nœud+8`, qui est l'entité), et `NotifiableRef_DetachTarget_75661` le remet à zéro. La règle de comportement est établie (un objet en cours passe avant tout), sa nature ne l'est pas.
+
+## `ExecuteFlightCommand` : le script pose l'objectif, il ne pilote pas (lu le 2026-09-19)
+
+Chaîne lue : `MissionScript_CallNativeHandler_52513` empile `(contrôleur, opcode, compétence, pointeur de position, dword)` puis fait `les bx, es:[bx+52h] / mov bx, [bx] / call dword ptr [bx+88h]`. Le contrôleur (`PartEntry+0x52`) est l'objet renvoyé par `AIAircraft_SpawnAndConditionalLoadProfile_53363` (`mov ax, di ... retf`), c'est-à-dire l'objet monde créé par `ObjectPrototype_FindOrLoadAndInstantiate_38B70`.
+
+Les objets monde forment une hiérarchie de classes (tables de `seg339`, base `0x6D0B0` + décalage de classe) : `0x26A4` → `0x2618` (entité IA à `+0x55`) → `0x2730` → `0x27BC`. Contenu du slot `+0x88` :
+
+| Classe | `+0x88` | Effet |
+|---|---|---|
+| `0x26A4`, `0x2618`, `0x2730` | `loc_38342` (`xor ax, ax / retf`) | ne fait rien, renvoie 0 |
+| `0x27BC` | `loc_3E419` (`seg087`) | `call dword ptr [bx+10h]` sur l'entité lue à `[si+55h]` |
+
+Le slot `+0x10` de l'entité (table `0x110`) est **`Goal_SetObjective_A307`**. Elle reçoit `(entité, opcode, cible, pointeur de position, dword)`, écrit `entité+0x11D` (l'état d'objectif lu par `Goal_ExecuteAction_A8AC`) et les références de cible / positions, puis, dans sa queue commune (`loc_A641`) :
+1. si l'état vaut `0xAA` (suivi) ou si le bit 3 de `entité+0x28B` est posé, appelle `Goal_FollowAllyExec_DAA9` immédiatement ;
+2. sauf si le bit 5 de `entité+0x28B` est posé, appelle `Goal_IsComplete_A6D3` sur le nouvel état et **renvoie ce booléen**, qui remonte jusqu'à l'instruction de script (`taskState`).
+
+Si le bit 5 de `entité+0x28B` est déjà posé à l'entrée (`shr ax, 5 / and ax, 1 / jz` puis `jmp loc_A641`), le `switch` est sauté : le nouvel ordre n'est pas enregistré.
+
+**Conséquence** : la chaîne est script → `ExecuteFlightCommand` → `Goal_SetObjective_A307` (pose l'intention sur l'entité) ; l'exécution est ensuite faite par `AI_TopLevelThink` / `Goal_ExecuteAction_A8AC`. Rien dans ce chemin ne pilote l'avion. La complétion vue par le script est le résultat de `Goal_IsComplete_A6D3` évalué **au moment où l'ordre est (re)posé**, pas un booléen mémorisé par l'exécution.
 
 ## Faits établis
 
@@ -252,7 +276,7 @@ Citations : `cmp byte ptr [bx+20h], 0 / jz loc_84E9 / call Goal_ExecuteAction_A8
 
 - `AI_TriggerBehaviorUpdate_5E53` (ce qu'elle fait avant d'appeler `AI_TopLevelThink`, et la fonction de comportement gardée par `+0x28B` bit 7). Le corps de `AI_TopLevelThink` entre le test de menace et `loc_83F0` n'est pas lu.
 - La nature de l'objet à `entité+0x0D` et le contenu de `nœud+4` que `NotifiableRef_AttachTarget_75612` copie dedans.
-- Ce que fait `ExecuteFlightCommand` (slot `+0x88` du contrôleur) : c'est le seul chemin d'exécution des ordres de script qui ne passe pas par `Goal_ExecuteAction_A8AC`.
+- Quelle classe d'objet monde est réellement celle des avions IA : seule la classe `0x27BC` transmet l'ordre à l'entité, les trois autres ont un `+0x88` qui ne fait rien. Ce n'est pas vérifié pour les prototypes d'avions.
 - Le slot +8 de l'entité (`loc_4F85`, sans nom), l'objet à +0x51 et son slot +0x40, le rôle de l'octet +0x59 de l'objet monde.
 - Le rôle des slots +4, +0x18, +0x1C et +0x20 appelés par la phase d'affichage sur la liste 0x59C3.
 - Si `WorldObject_ConstructWithAIEntity_9D2CC` est bien le constructeur d'instance appelé par le slot +4 du prototype, et si l'objet à +0x46 du prototype appelle bien `AIEntity_CreateByType_12B4E`.

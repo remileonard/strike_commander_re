@@ -538,8 +538,13 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
 
 ### Ce qui reste incertain
 
-- **`ExecuteFlightCommand`** (`[vtable+0x88]`) — la méthode réellement
-  responsable de l'exécution tactique n'a pas été identifiée. Elle
+- **`ExecuteFlightCommand`** (`[vtable+0x88]`) — **RÉSOLU le 2026-09-19** : ce
+  n'est pas une exécution tactique. Sur la classe d'objet monde `0x27BC` elle
+  transmet l'ordre à l'entité IA (`[si+55h]`, slot `+0x10`), c'est-à-dire à
+  `Goal_SetObjective_A307`, qui pose l'objectif (`entité+0x11D`, cibles,
+  positions) ; sur les classes `0x26A4`, `0x2618`, `0x2730` c'est un no-op qui
+  renvoie 0. Détail dans `AI_TICK_CALL_GRAPH.md`. *Ancien texte :* la méthode
+  réellement responsable de l'exécution tactique n'avait pas été identifiée. Elle
   est générique (utilisée aussi par un système de rendu/géométrie
   sans rapport, avec un opcode différent), donc probablement un
   "bus de commande" d'entité plutôt qu'un contrôleur de vol dédié.
