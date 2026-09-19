@@ -1100,7 +1100,7 @@ locret_64A18:
 ; far, lit un groupe de champs via StreamReader_ReadTyped_63FA1 (×3).
 ; ==============================================================================================
 ResourceRecord_ReadFieldGroupA_64A19	proc far		; CODE XREF: seg010:06A1P
-					; Kneeboard_EntryConstructText+BCP ...
+					; EntityTracker_EntryConstructText+BCP ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6

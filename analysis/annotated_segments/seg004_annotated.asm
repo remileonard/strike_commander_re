@@ -703,35 +703,21 @@ AI_NavSolutionToPoint	endp
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 393 lignes - ENTIEREMENT TRACEE. Gestionnaire GOAL selecteur 5 (loc_878F, seg004) -
-; CONFIRME etre le comportement 'coequipier actif du joueur' pressenti depuis les toutes
-; premieres correlations empiriques sur les fichiers PROF (present chez Billy/Gwen, absent
-; chez Hammer/cargo). STRUCTURE COMPLETE : (1) auto-limitation de frequence (ne s'execute que
-; si un delai suffisant s'est ecoule depuis le dernier appel, via un delta temporel sur
-; l'objet lie +0x102) ; (2) appelle Radio_SelectContextMessage_CD4A pour classifier le
-; contexte radio courant (codes 4/5 = contextes lies a l'engagement/escorte) ; (3) TROIS
-; BRANCHES DE COMPORTEMENT : (a) ESCORTE/SUIVI DU JOUEUR - si contexte 4/5 et cible/reference
-; liee au joueur (word_722E6) et le timer vocal (Voice_ExpressionTimer_CA93) n'est pas occupe
-; : calcule une position de formation relative au joueur (AI_ResolveNodePosition_54274,
-; decalage altitude fixe +1000 unites, decalage lateral), fixe goal_state=0xAA
-; (OP_SET_OBJ_FOLLOW_ALLY), verrouille la reference cible directement sur le joueur
-; (SetReference), declenche un message radio (Radio_PlayMessage_CB45, code 0x20 ou 8 selon
-; variante), puis DELEGUE la decision finale a
-; AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (le meme mecanisme de selection ponderee
-; MVRS deja documente - confirme que MVRS intervient AUSSI dans le comportement d'escorte
-; active, pas uniquement via le selecteur GOAL 4) ; (b) VOL VERS POINT DE NAVIGATION (repli,
-; si le contexte 4/5 est present mais la condition de cible joueur n'est pas remplie) :
-; calcule une position DIFFERENTE (fusion de deux sources de position, probable
-; interception/rendez-vous), fixe goal_state=0xA5 (OP_SET_OBJ_FLY_TO_WP), message radio code 8
-; ; (c) TRANSFERT DE COEQUIPIER (si le contexte radio n'est PAS 4/5, mais la cible est deja le
-; joueur, goal_state deja FOLLOW_ALLY, et un verrou global byte_6E4CD est actif) : message
-; radio code 0x12, puis appelle Goal_TransferToWingman_C4FD (transmet l'etat
-; GOAL/cible/waypoint vers une autre entite - passation d'escorte). Toute condition non
-; remplie dans une branche => sortie sans action (retour 0, 'non gere ce tick'). CONFIRME
-; architecturalement : ce gestionnaire lie ensemble le systeme radio contextuel, le
-; verrouillage de cible sur le joueur, la machine a etats GOAL, et le mecanisme de selection
-; ponderee MVRS en aval. Anciennement non documentee (jamais ajoutee a known_functions.json
-; malgre plusieurs mentions dans l'analyse MVRS/GOAL).
+; far, 392 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi — resout la
+; connexion script/GOAL). Option de tournoi GOAL liee a GOAL=5. Referencee via vtable
+; (seg339:off_6D1A8, tag 0xF8).   DECOUVERTE CENTRALE : cette fonction LIT ET ECRIT
+; entite+0x11D (le meme champ que le script de mission utilise) : - Verifie si entite+0x11D ==
+; 0xAA (Follow Ally) pour decider d'executer le suivi actif - Peut ELLE-MEME poser
+; entite+0x11D = 0xAA ou 0xA5 (vol vers point) selon les conditions observees (correspondance
+; avec word_722E6, la cible/leader actuellement selectionnee) - Appelle DIRECTEMENT le noeud
+; MVRS ID=21 (entite+0xD1 -> vtable+8) pour l'execution reelle de la navigation — la MEME
+; mecanique que le script de mission utilise via MissionFormation_ComputeSlotAndSpawn.
+; CONCLUSION : entite+0x11D est un canal de communication BIDIRECTIONNEL entre le script et
+; GOAL=5, pas un simple drapeau a sens unique. Explique l'observation empirique de Remi : avec
+; GOAL=1 seul, le script pose bien entite+0x11D=0xAA (Follow Ally) mais AUCUNE option du
+; tournoi ne le consulte, donc rien ne se passe (l'avion garde son dernier etat, ex: monter
+; apres Take Off). Avec GOAL=5 present, cette fonction consulte le champ, le trouve a 0xAA, et
+; fournit le comportement de vol continu reel (suivi precis des commandes du joueur).
 ; ==============================================================================================
 Goal_ActiveWingmanEngagement_878F:				; DATA XREF: seg339:off_6D1A8o
 		push	bp

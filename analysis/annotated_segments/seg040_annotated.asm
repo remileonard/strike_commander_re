@@ -67,7 +67,7 @@ WorldObjects_NotifyMissionTriggers	endp
 ; (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : évaluateur
 ; de déclencheur d'événement scripté de mission (trigger de zone/proximité).
 ; ==============================================================================================
-Mission_TriggerEvaluator	proc far		; CODE XREF: UIScreen_StateMachineMain_4FBF1+490P
+Mission_TriggerEvaluator	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+490P
 
 var_10		= dword	ptr -10h
 var_7		= byte ptr -7
@@ -134,7 +134,7 @@ loc_22FBD:				; CODE XREF: Mission_TriggerEvaluator+66j
 loc_22FC8:				; CODE XREF: Mission_TriggerEvaluator+6Cj
 		push	4
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 
 loc_22FD3:				; CODE XREF: Mission_TriggerEvaluator+1Aj
@@ -168,7 +168,7 @@ loc_22FF5:				; CODE XREF: Mission_TriggerEvaluator+9Dj
 		or	ax, ax
 		jnz	short loc_2307A
 		push	[bp+var_6]
-		call	Kneeboard_EntryDestruct
+		call	EntityTracker_EntryDestruct
 		pop	cx
 		cmp	[si+12h], di
 		jnz	short loc_2307A
@@ -180,7 +180,7 @@ loc_22FF5:				; CODE XREF: Mission_TriggerEvaluator+9Dj
 		cmp	byte ptr [bx+4], 0Bh
 		jz	short loc_2305F
 		push	bx
-		call	Kneeboard_RenderEntry
+		call	EntityTracker_RenderEntry
 		pop	cx
 		mov	bx, [si+0Fh]
 		mov	di, [bx+0Eh]
@@ -210,7 +210,7 @@ loc_2305F:				; CODE XREF: Mission_TriggerEvaluator+C2j
 					; Mission_TriggerEvaluator+CBj ...
 		push	4
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		or	al, al
 		jz	short loc_23075
@@ -277,7 +277,7 @@ loc_230C0:				; CODE XREF: Mission_TriggerEvaluator+168j
 loc_230C7:				; DATA XREF: seg040:off_23233o
 		push	4		; case 0x0
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		jmp	loc_23172
 ; ���������������������������������������������������������������������������
@@ -286,7 +286,7 @@ loc_230D5:				; CODE XREF: Mission_TriggerEvaluator+16Fj
 					; DATA XREF: seg040:off_23233o
 		push	3		; case 0x1
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		or	al, al
 		jnz	short loc_230E7
@@ -309,7 +309,7 @@ loc_23104:				; CODE XREF: Mission_TriggerEvaluator+16Fj
 					; DATA XREF: seg040:off_23233o
 		push	8		; case 0x5
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		or	al, al
 		jz	short loc_23172
@@ -328,7 +328,7 @@ loc_23130:				; CODE XREF: Mission_TriggerEvaluator+16Fj
 					; DATA XREF: seg040:off_23233o
 		push	9		; case 0x6
 		push	si
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		or	al, al
 		jz	short loc_23172
@@ -541,7 +541,7 @@ loc_23285:				; CODE XREF: Radar_TargetTypeFilter+3Fj
 		mov	[bp+var_6], al
 		push	7
 		push	si
-		call	Kneeboard_RenderByCode
+		call	EntityTracker_RenderByCode
 		add	sp, 4
 		mov	[bp+var_8], ax
 		mov	al, [bp+var_6]
@@ -553,7 +553,7 @@ loc_23285:				; CODE XREF: Radar_TargetTypeFilter+3Fj
 		add	sp, 8
 		push	[bp+var_8]
 		push	si
-		call	Kneeboard_ApplySelection
+		call	EntityTracker_ApplySelection
 		add	sp, 4
 		or	al, al
 		jz	short loc_23307
@@ -674,7 +674,7 @@ loc_2337A:
 		jz	short loc_233EE
 		push	0Bh
 		push	si
-		call	Kneeboard_RenderByCode
+		call	EntityTracker_RenderByCode
 		add	sp, 4
 		mov	di, ax
 		lea	ax, [bp+var_36]
@@ -691,7 +691,7 @@ loc_2337A:
 		add	sp, 0Eh
 		push	di
 		push	si
-		call	Kneeboard_ApplySelection
+		call	EntityTracker_ApplySelection
 		add	sp, 4
 		or	al, al
 		jz	short loc_233EE

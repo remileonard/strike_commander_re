@@ -945,7 +945,7 @@ arg_0		= word ptr  6
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionText_Helper6_97CF5
+		call	near ptr EntityScreenLayout_PrepareAndCompute
 		add	sp, 6
 		or	byte ptr [si+52h], 1
 		mov	ax, si
@@ -1087,7 +1087,7 @@ MissionText_CopyBufferB_97C5C	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (19 lignes).
 ; ==============================================================================================
-MissionText_Helper4_97CB7	proc far		; CODE XREF: VROOMM_StubThunk_6BBF9J MissionText_Helper6_97CF5+Cp
+MissionText_Helper4_97CB7	proc far		; CODE XREF: VROOMM_StubThunk_6BBF9J EntityScreenLayout_PrepareAndCompute+Cp
 
 arg_0		= word ptr  6
 
@@ -1134,7 +1134,7 @@ arg_6		= dword	ptr  0Ch
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionText_Helper6_97CF5
+		call	near ptr EntityScreenLayout_PrepareAndCompute
 		add	sp, 6
 		pop	si
 		pop	bp
@@ -1147,9 +1147,13 @@ MissionText_Helper5_97CD0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (43 lignes).
+; far, 43L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_Helper6' — aucune preuve que ce
+; soit lie a du texte, garde generique en attendant confirmation). Appelle
+; EntityScreenLayout_Helper4 (non lue), clampe une valeur d'angle/distance a 0x100 si non
+; positive, la stocke sur l'entite (+0x60), puis appelle
+; EntityScreenLayout_ComputeAngularPosition.
 ; ==============================================================================================
-MissionText_Helper6_97CF5	proc far		; CODE XREF: VROOMM_StubThunk_6BC03J MissionText_CopyBuffer_97BD3+2Bp	...
+EntityScreenLayout_PrepareAndCompute	proc far		; CODE XREF: VROOMM_StubThunk_6BC03J MissionText_CopyBuffer_97BD3+2Bp	...
 
 var_C		= dword	ptr -0Ch
 arg_0		= word ptr  6
@@ -1170,28 +1174,28 @@ arg_2		= dword	ptr  8
 		jmp	short loc_97D13
 ; ���������������������������������������������������������������������������
 
-loc_97D11:				; CODE XREF: MissionText_Helper6_97CF5+15j
+loc_97D11:				; CODE XREF: EntityScreenLayout_PrepareAndCompute+15j
 		xor	ax, ax
 
-loc_97D13:				; CODE XREF: MissionText_Helper6_97CF5+1Aj
+loc_97D13:				; CODE XREF: EntityScreenLayout_PrepareAndCompute+1Aj
 		or	al, al
 		jz	short loc_97D27
 		mov	[bp+var_C], 100h
 		mov	eax, [bp+var_C]
 		mov	[bp+arg_2], eax
 
-loc_97D27:				; CODE XREF: MissionText_Helper6_97CF5+20j
+loc_97D27:				; CODE XREF: EntityScreenLayout_PrepareAndCompute+20j
 		mov	eax, [bp+arg_2]
 		mov	[si+60h], eax
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionText_ComputeTrigonometricLayout_97D39
+		call	near ptr EntityScreenLayout_ComputeAngularPosition
 		pop	cx
 		pop	si
 		leave
 		retf
-MissionText_Helper6_97CF5	endp
+EntityScreenLayout_PrepareAndCompute	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1199,11 +1203,16 @@ MissionText_Helper6_97CF5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 208 lignes, NON DÉTAILLÉE — combine Math_Sin_5483F, longueur vectorielle,
-; Math_Tan_548AD, Math_ArcTan_54ADE (seg115) — calcul de disposition trigonométrique (probable
-; positionnement d'éléments de texte en arc).
+; far, 207L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_ComputeTrigonometricLayout' — le
+; calcul trigonometrique est reel et verifie, mais RIEN ne confirme un rendu de texte : garde
+; 'EntityScreenLayout' generique, pas 'Text', en attendant de tracer qui consomme le resultat
+; +0xC/+0x10). Calcule une position ecran a partir d'un angle (+0x60) et des dimensions de
+; l'entite (+4/+6) : plusieurs Sin/Tan/ArcTan enchaines, division par les dimensions, mise a
+; l'echelle finale via dword_6E9AA. Ecrit le resultat en +0xC/+0x10 (coordonnees finales) et
+; +0x64/0x68/0x6C/0x70/0x74 (valeurs intermediaires). NE DESSINE RIEN elle-meme — calcule
+; seulement une position, stockee sur l'objet, consommee ailleurs (non trace).
 ; ==============================================================================================
-MissionText_ComputeTrigonometricLayout_97D39	proc far		; CODE XREF: VROOMM_StubThunk_6BBFEJ MissionText_Helper6_97CF5+3Dp
+EntityScreenLayout_ComputeAngularPosition	proc far		; CODE XREF: VROOMM_StubThunk_6BBFEJ EntityScreenLayout_PrepareAndCompute+3Dp
 
 var_7C		= dword	ptr -7Ch
 var_78		= dword	ptr -78h
@@ -1410,6 +1419,6 @@ loc_97EB3:
 		pop	si
 		leave
 		retf
-MissionText_ComputeTrigonometricLayout_97D39	endp
+EntityScreenLayout_ComputeAngularPosition	endp
 
 ovr287		ends

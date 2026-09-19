@@ -564,7 +564,7 @@ Parser_ConsumeRemaining	endp
 ; token. Corrèle directement avec la hiérarchie de parsing PROF→_AI_→ATRB/MVRS/GOAL déjà
 ; documentée.
 ; ==============================================================================================
-Compiler_EmitByTokenType	proc far		; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+F4P
+Compiler_EmitByTokenType	proc far		; CODE XREF: MAIN_GAME_TICK+F4P
 
 var_26		= dword	ptr -26h
 var_22		= dword	ptr -22h

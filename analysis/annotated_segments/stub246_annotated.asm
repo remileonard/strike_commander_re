@@ -136,7 +136,7 @@ VROOMM_StubThunk_6B0F8	endp
 ; far, thunk fixe VROOMM (jmp sub_8547C) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=123D0h, codesize=0AF1h, nentries=21.
 ; ==============================================================================================
-VROOMM_StubThunk_6B0FD	proc far		; CODE XREF: Kneeboard_RenderEntry+A2P
+VROOMM_StubThunk_6B0FD	proc far		; CODE XREF: EntityTracker_RenderEntry+A2P
 		jmp	HUDSymbol_ConstructVariantK_8547C
 VROOMM_StubThunk_6B0FD	endp
 
@@ -203,7 +203,7 @@ VROOMM_StubThunk_6B111	endp
 ; far, thunk fixe VROOMM (jmp sub_856F3) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=123D0h, codesize=0AF1h, nentries=21.
 ; ==============================================================================================
-VROOMM_StubThunk_6B116	proc far		; CODE XREF: Kneeboard_RenderEntry+C3P
+VROOMM_StubThunk_6B116	proc far		; CODE XREF: EntityTracker_RenderEntry+C3P
 		jmp	Cinematic_CamEntryConstruct_CHAS_856F3
 VROOMM_StubThunk_6B116	endp
 

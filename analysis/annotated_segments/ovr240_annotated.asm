@@ -378,7 +378,7 @@ loc_7D5DE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+2BFj
 ; ���������������������������������������������������������������������������
 
 loc_7D5E1:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+411j
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		mov	[bp+var_49], al
 		mov	di, [bp+arg_0]
 		add	di, 12h
@@ -671,7 +671,7 @@ loc_7D93E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+5E1j
 		inc	ax
 		or	ax, ax
 		jz	short loc_7D95C
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jnz	short loc_7D8FD
 
@@ -988,7 +988,7 @@ loc_7DD40:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A1Fj
 loc_7DD42:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A24j
 		or	al, al
 		jz	short loc_7DD58
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7DD52
 		jmp	loc_7DAE8
@@ -1005,7 +1005,7 @@ loc_7DD58:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+653j
 					; MissionRecord_LoadAndBuildWidgetTree_7D31A+65Dj ...
 		push	si
 		push	59CDh
-		call	Kneeboard_RemoveByTarget
+		call	EntityTracker_RemoveByTarget
 		add	sp, 4
 		mov	al, [bp+var_5]
 		mov	ah, 0
@@ -1023,7 +1023,7 @@ loc_7DD70:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A51j
 loc_7DD7A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A5Bj
 		push	8
 		push	59CDh
-		call	Kneeboard_RenderByCode
+		call	EntityTracker_RenderByCode
 		add	sp, 4
 		mov	di, ax
 		or	di, di
@@ -1048,7 +1048,7 @@ loc_7DD99:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A7Aj
 		add	sp, 4
 		push	di
 		push	59CDh
-		call	Kneeboard_ApplySelection
+		call	EntityTracker_ApplySelection
 		add	sp, 4
 		mov	ax, si
 		add	ax, 14h
@@ -1064,7 +1064,7 @@ loc_7DD99:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A7Aj
 ; ���������������������������������������������������������������������������
 
 loc_7DDDE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0Aj
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_7DE26

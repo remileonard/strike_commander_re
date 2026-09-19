@@ -18,7 +18,7 @@ stru_6AC60	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0806o
 ; far, thunk fixe VROOMM (jmp sub_7A79E) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=6890h, codesize=0A56h, nentries=3.
 ; ==============================================================================================
-VROOMM_StubThunk_6AC80	proc far		; CODE XREF: UIScreen_Construct_53896+E6P
+VROOMM_StubThunk_6AC80	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+E6P
 		jmp	UIScript_Helper_7A79E
 VROOMM_StubThunk_6AC80	endp
 

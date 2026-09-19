@@ -1636,7 +1636,7 @@ loc_13CA6:				; CODE XREF: Player_MainUpdate+B8Cj
 		or	byte ptr es:[bx+1Dh], 10h
 		push	4
 		push	59CDh
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		jmp	short loc_13CDD
 ; ���������������������������������������������������������������������������
@@ -1750,7 +1750,7 @@ loc_13DC7:				; CODE XREF: Player_MainUpdate+CC2j
 		or	byte ptr es:[bx+1Dh], 10h
 		push	4
 		push	59CDh
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		jmp	loc_14170
 ; ���������������������������������������������������������������������������

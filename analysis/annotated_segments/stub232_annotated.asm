@@ -96,7 +96,7 @@ VROOMM_StubThunk_6AC39	endp
 ; far, thunk fixe VROOMM (jmp sub_77FCA) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=4840h, codesize=1FC2h, nentries=12.
 ; ==============================================================================================
-VROOMM_StubThunk_6AC3E	proc far		; CODE XREF: Kneeboard_RenderEntry+189P
+VROOMM_StubThunk_6AC3E	proc far		; CODE XREF: EntityTracker_RenderEntry+189P
 		jmp	AIManeuver_LoadFormationDataB_77FCA
 VROOMM_StubThunk_6AC3E	endp
 

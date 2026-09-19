@@ -181,7 +181,7 @@ Weapon_HUDBox_TimerCaseJ_5A95E	endp
 ; ==============================================================================================
 ; far, appelle sub_5F700 — référencée directement par UIScreen_Construct (sub_53896, seg114).
 ; ==============================================================================================
-TextObject_AllocateVariantA_5A984	proc far		; CODE XREF: UIScreen_Construct_53896+1BP
+TextObject_AllocateVariantA_5A984	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+1BP
 					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CC1P	...
 
 arg_0		= word ptr  6
@@ -267,7 +267,7 @@ Widget_Helper_5A9D0	endp
 ; UIScreen_StateMachineMain_4FBF1).
 ; ==============================================================================================
 Widget_Helper_5A9E6	proc far		; CODE XREF: Config_ReadCalibration:loc_270D5P
-					; UIScreen_Construct_53896+1F1P ...
+					; STRIKE_EXE_MAIN_LOOP+1F1P ...
 
 arg_0		= byte ptr  6
 

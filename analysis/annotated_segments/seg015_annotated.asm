@@ -1403,7 +1403,7 @@ loc_15AD1:				; CODE XREF: Radar_SelectEntryByKey+4Aj
 		mov	[si+125h], dx
 		push	4
 		push	59CDh
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 		add	sp, 4
 		jmp	short loc_15B12
 ; ���������������������������������������������������������������������������
@@ -1432,7 +1432,7 @@ Radar_SelectEntryByKey	endp
 ; remplies, appelle sub_6ACB5 ou sub_6B085 selon l'état : handler ON/OFF du suivi de cible
 ; radar (UI cockpit).
 ; ==============================================================================================
-Radar_ToggleTracking	proc far		; CODE XREF: Kneeboard_SelectByStateCode+3EP
+Radar_ToggleTracking	proc far		; CODE XREF: EntityTracker_SelectByStateCode+3EP
 
 var_6		= dword	ptr -6
 arg_0		= word ptr  6

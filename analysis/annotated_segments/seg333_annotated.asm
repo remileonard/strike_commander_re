@@ -136,7 +136,7 @@ VROOMM_StubThunk_6CE38	endp
 ; far, thunk fixe VROOMM (jmp sub_A81E0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6CE3D	proc far		; CODE XREF: UIScreen_Construct_53896+125P
+VROOMM_StubThunk_6CE3D	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+125P
 		jmp	MissionScenario_ConstructAndBindUI_A81E0
 VROOMM_StubThunk_6CE3D	endp
 
@@ -214,7 +214,7 @@ VROOMM_StubThunk_6CE56	endp
 ; far, thunk fixe VROOMM (jmp sub_A9382) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6CE5B	proc far		; CODE XREF: UIScreen_Construct_53896+1E9P
+VROOMM_StubThunk_6CE5B	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+1E9P
 		jmp	MissionScenario_RecomputeFields_A9382
 VROOMM_StubThunk_6CE5B	endp
 

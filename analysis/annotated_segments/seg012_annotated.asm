@@ -8,11 +8,13 @@ seg012		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,289L — appelée directement depuis start (init programme). Charge la police 'SM-FONT.SHP'
-; (dossier FONTS), configure la palette/mode vidéo selon la mémoire disponible (word_6D140 vs
-; seuil 0x800h), puis parse les arguments de ligne de commande caractère par caractère (flags
-; '+G'/'-G', '+S'/'-S' détectés via sub_E4B) : initialisation programme (vidéo/police) +
-; parseur d'arguments de ligne de commande.
+; far, 289 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi, correction d'une
+; erreur de conclusion precedente). Charge la police 'SM-FONT.SHP', configure la palette/mode
+; video selon la memoire disponible, parse les arguments de ligne de commande (flags +G/-G,
+; +S/-S). Appelle UIScreen_Construct_53896 UNE SEULE FOIS puis retourne (retf) — AUCUNE boucle
+; dans cette fonction elle-meme. La boucle principale du jeu vit dans UIScreen_Construct, pas
+; ici — erreur initialement commise en confondant chaine d'appel statique et frequence
+; d'execution reelle.
 ; ==============================================================================================
 Program_InitVideoFontArgs	proc far		; CODE XREF: EntryPoint_RuntimeInit+158P
 
@@ -264,7 +266,7 @@ loc_1447F:				; CODE XREF: Program_InitVideoFontArgs+1F9j
 		pop	cx
 		lea	ax, [bp+var_E6]
 		push	ax
-		call	UIScreen_Construct_53896
+		call	STRIKE_EXE_MAIN_LOOP
 		pop	cx
 		push	2
 		lea	ax, [bp+var_E6]

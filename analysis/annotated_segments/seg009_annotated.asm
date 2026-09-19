@@ -160,7 +160,7 @@ loc_11D93:				; CODE XREF: seg009:01A5j
 		push	ds
 		push	offset aTakeoff	; "TAKEOFF"
 		push	59CDh
-		call	Kneeboard_SelectByID
+		call	EntityTracker_SelectByID
 		add	sp, 6
 
 loc_11DAF:				; CODE XREF: seg009:01BEj

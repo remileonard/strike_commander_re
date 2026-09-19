@@ -39,7 +39,7 @@ loc_5F57B:				; CODE XREF: seg159:0014j seg159:0023j
 ; sub_2387E.
 ; ==============================================================================================
 LinkedListB_InsertAtTail_5F57F	proc far		; CODE XREF: UIList_CreateMarker+55P
-					; Kneeboard_AddEntryObj+1BP ...
+					; EntityTracker_AddEntryObj+1BP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -80,8 +80,8 @@ LinkedListB_InsertAtTail_5F57F	endp
 ; ==============================================================================================
 ; far, recherche un nœud (sub_5F604) puis dispatch vtable [bx] si trouvé.
 ; ==============================================================================================
-LinkedListB_FindAndDispatch_5F5A4	proc far		; CODE XREF: Kneeboard_RemoveByTarget+29P
-					; Kneeboard_ClearAllFull+1AP ...
+LinkedListB_FindAndDispatch_5F5A4	proc far		; CODE XREF: EntityTracker_RemoveByTarget+29P
+					; EntityTracker_ClearAllFull+1AP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -253,7 +253,7 @@ LinkedListB_FindByKey_5F604	endp
 ; far, dispatch vtable [bx] (rôle exact non détaillé, voisin du cluster liste chaînée B).
 ; ==============================================================================================
 LinkedListB_Helper_5F66B	proc far		; CODE XREF: seg032:loc_1F5B1P
-					; Kneeboard_Destruct+1EP ...
+					; EntityTracker_Destruct+1EP ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6

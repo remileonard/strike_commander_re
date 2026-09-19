@@ -276,10 +276,10 @@ aFlapsOff	db 'Flaps OFF',0        ; DATA XREF: Player_MainUpdate+4E0o
 aBrakesOn	db 'Brakes ON',0        ; DATA XREF: Player_MainUpdate+529o
 aBrakesOff	db 'Brakes OFF',0       ; DATA XREF: Player_MainUpdate+547o
 		align 2
-word_6D48C	dw 1			; DATA XREF: UIScreen_ConstructWidgetBinding_536F7+B4r
-word_6D48E	dw 4			; DATA XREF: UIScreen_ConstructWidgetBinding_536F7+B0r
+word_6D48C	dw 1			; DATA XREF: MAIN_GAME_TICK+B4r
+word_6D48E	dw 4			; DATA XREF: MAIN_GAME_TICK+B0r
 		db    0
-unk_6D491	db    0			; DATA XREF: UIScreen_ConstructWidgetBinding_536F7+D2o
+unk_6D491	db    0			; DATA XREF: MAIN_GAME_TICK+D2o
 		db    0
 		db    0
 unk_6D494	db    0
@@ -1126,7 +1126,7 @@ aWeaponCameraOn	db 'Weapon Camera ON',0 ; DATA XREF: Mission_TriggerEvaluator+2A
 aWeaponCameraOf	db 'Weapon Camera OFF',0 ; DATA XREF: Mission_TriggerEvaluator+2CBo
 aVictimCamera	db 'Victim Camera',0    ; DATA XREF: Radar_TargetTypeFilter+B7o
 aWeaponCamera	db 'Weapon Camera',0    ; DATA XREF: Mission_PlayerEventHandler+D4o
-		dd Kneeboard_Destruct
+		dd EntityTracker_Destruct
 		dd loc_240A6
 		dd loc_24CAA
 		dd loc_2918F
@@ -1329,11 +1329,11 @@ word_6E4B2	dw 0			; DATA XREF: Player_MainUpdate+2Br
 byte_6E4B4	db 0			; DATA XREF: Mission_TriggerEvaluator+2Ar
 					; RadioFlags_ResetBank+3w	...
 byte_6E4B5	db 0			; DATA XREF: RadioFlags_ResetBank:loc_28EB9w
-					; UIScreen_Construct_53896+30r ...
+					; STRIKE_EXE_MAIN_LOOP+30r ...
 byte_6E4B6	db 0			; DATA XREF: RadioFlags_ResetBank+Dw
 					; Debris_SpawnOrchestrator+89r ...
 byte_6E4B7	db 2			; DATA XREF: RadioFlags_ResetBank+12w
-					; UIScreen_Construct_53896+34r ...
+					; STRIKE_EXE_MAIN_LOOP+34r ...
 byte_6E4B8	db 0			; DATA XREF: Player_MainUpdate+8Dw
 					; Player_MainUpdate+6F8w ...
 byte_6E4B9	db 0			; DATA XREF: Player_MainUpdate:loc_13800w
@@ -3517,7 +3517,7 @@ algn_70445:
 byte_70446	db 0			; DATA XREF: World_ParseWrldForm_A767F+Br
 					; World_ParseWrldForm_A767F+225w ...
 byte_70447	db 1			; DATA XREF: Player_MainUpdate:loc_1391Cw
-					; Kneeboard_ApplySelection:loc_23CE6w	...
+					; EntityTracker_ApplySelection:loc_23CE6w	...
 dword_70448	dd 0			; DATA XREF: seg014:05F2r seg014:062Ar ...
 dword_7044C	dd 0			; DATA XREF: seg112:0A9Dw
 					; Weapon_HUDBox_ComputeGeometry_58F42+77r ...
@@ -3531,21 +3531,21 @@ dword_7045E	dd 0			; DATA XREF: seg085:004Cr seg085:0069r ...
 dword_70462	dd 0			; DATA XREF: seg085:01E4r seg085:0201r ...
 word_70466	dw 0			; DATA XREF: AI_TopLevelThink:loc_81D4r
 					; Player_MainUpdate:loc_1367Dr	...
-dword_70468	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+100w
-					; UIScreen_StateMachineMain_4FBF1+104r ...
-byte_7046C	db 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_4FCA5w
-					; UIScreen_StateMachineMain_4FBF1+31Fw ...
-byte_7046D	db 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_4FC6Dw
-					; UIScreen_StateMachineMain_4FBF1+B9w ...
-word_7046E	dw 1			; DATA XREF: UIScreen_StateMachineMain_4FBF1+BEr
-					; UIScreen_StateMachineMain_4FBF1+C5w ...
+dword_70468	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+100w
+					; CombatTarget_WeaponActionSubsystem+104r ...
+byte_7046C	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FCA5w
+					; CombatTarget_WeaponActionSubsystem+31Fw ...
+byte_7046D	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FC6Dw
+					; CombatTarget_WeaponActionSubsystem+B9w ...
+word_7046E	dw 1			; DATA XREF: CombatTarget_WeaponActionSubsystem+BEr
+					; CombatTarget_WeaponActionSubsystem+C5w ...
 unk_70470	db    1
 byte_70471	db 0			; DATA XREF: Mission_TriggerEvaluator+3Cr
 					; Mission_TriggerEvaluator:loc_2308Er	...
 word_70472	dw 0			; DATA XREF: AI_EvalTargetAttribute+51r seg095:01A9r ...
 word_70474	dw 0			; DATA XREF: AI_Sensor_InterceptFeasibleCached+8Ar seg003:0C64r ...
-byte_70476	db 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_4FC62r
-					; UIScreen_StateMachineMain_4FBF1+76w ...
+byte_70476	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FC62r
+					; CombatTarget_WeaponActionSubsystem+76w ...
 byte_70477	db 0			; DATA XREF: Cockpit_ViewPanTransitionMain_15B67:loc_15E79r
 					; MissionLoader_SpawnEntity_A7B1E+134w
 byte_70478	db 1			; DATA XREF: seg020:loc_17931w
@@ -3570,13 +3570,13 @@ dword_7048D	dd 0			; DATA XREF: Radar_Project3DToScreen+789r
 					; seg019:02FDr	...
 dword_70491	dd 0			; DATA XREF: Radar_Project3DToScreen+82Cr
 					; Radar_Project3DToScreen+86Dr ...
-word_70495	dw 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+11Aw
+word_70495	dw 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+11Aw
 					; UIScreen_ApplyFormFields_500F6+1E1w ...
 byte_70497	db 0			; DATA XREF: Player_MainUpdate+7w
 					; Player_MainUpdate:loc_139DDw	...
 aTimeCompressio	db 'Time Compression %dx',0
-aGamePaused	db 'game paused',0      ; DATA XREF: UIScreen_StateMachineMain_4FBF1+20Eo
-aTimeBurst	db 'Time Burst',0       ; DATA XREF: UIScreen_StateMachineMain_4FBF1+3A9o
+aGamePaused	db 'game paused',0      ; DATA XREF: CombatTarget_WeaponActionSubsystem+20Eo
+aTimeBurst	db 'Time Burst',0       ; DATA XREF: CombatTarget_WeaponActionSubsystem+3A9o
 aMissions	db 'MISSIONS',0         ; DATA XREF: World_OpenAndParseFile_A75D0+4Bo
 dword_704CD	dd 454E4F4Eh		; DATA XREF: PlayerComponent_ReadFieldAndDispatch_9DF2A:loc_9DF30o
 					; PlayerComponent_LoadAndApply_9EDD4+14Do ...
@@ -3613,7 +3613,7 @@ algn_70697:
 		align 2
 aNetwork	db 'NETWORK',0          ; DATA XREF: AIAircraft_SpawnAndConditionalLoadProfile_53363+43o
 word_706A0	dw 0			; DATA XREF: seg004:0811r seg004:0939r ...
-byte_706A2	db 0FFh			; DATA XREF: UIScreen_Construct_53896+15r
+byte_706A2	db 0FFh			; DATA XREF: STRIKE_EXE_MAIN_LOOP+15r
 					; Weapon_HUDBox_InstantiateInstance_5AA02:loc_5AA3Cr	...
 word_706A3	dw 0			; DATA XREF: Goal_IsComplete:loc_A82Er
 					; Radio_SelectContextMessage:loc_CEC4r ...
@@ -3669,7 +3669,7 @@ off_7077D	dd ResourceRecord_Method_GetType_64E05
 off_70781	dd StreamReader_ReadDispatch_63D0E
 		align 2
 a20mm		db '20MM',0
-aBilly		db 'BILLY',0            ; DATA XREF: ExprSlot_ReleaseAndReloadDword_A9956+8Ao
+aBilly		db 'BILLY',0            ; DATA XREF: PLAY_LoadCASTTeamNames_A9956+8Ao
 off_70791	dd HitShape_ClassStub_ReturnConst43h_52F92
 off_70795	dd HitShape_Radial2D_ContainsPoint_52F99
 off_70799	dd HitShape_ClassStub_ReturnConst42h_52F8B
@@ -9873,10 +9873,10 @@ byte_72A5C	db 0			; DATA XREF: seg106:15EBw
 		align 4
 dword_72A60	dd 0			; DATA XREF: seg112:0C61w
 		db    0
-dword_72A65	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_4FD78w
-					; UIScreen_StateMachineMain_4FBF1+381w ...
-dword_72A69	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+190w
-					; UIScreen_StateMachineMain_4FBF1+300r ...
+dword_72A65	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FD78w
+					; CombatTarget_WeaponActionSubsystem+381w ...
+dword_72A69	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+190w
+					; CombatTarget_WeaponActionSubsystem+300r ...
 word_72A6D	dw 0			; DATA XREF: seg112:0C77w
 		db    0
 		db    0
@@ -10066,21 +10066,21 @@ dword_72AA0	dd 0			; DATA XREF: seg112:0DD9w
 		db    0
 		db    0
 		db    0
-word_72B30	dw 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+211r
+word_72B30	dw 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+211r
 					; TextScroll_DrawTypewriterFrameB_8781A:loc_8782Fr
 		align 4
-byte_72B34	db 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+416w
+byte_72B34	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+416w
 					; UIScreen_ApplyFormFields_500F6+16Cw ...
-dword_72B35	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+41Ew
+dword_72B35	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+41Ew
 					; UIScreen_ApplyFormFields_500F6+174w ...
-dword_72B39	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_50013w
+dword_72B39	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_50013w
 					; UIScreen_ApplyFormFields_500F6+178w ...
 		db    0
 		db    0
 		db    0
 		db    0
 byte_72B41	db 0			; DATA XREF: seg015:loc_15A9Cr
-					; UIScreen_StateMachineMain_4FBF1+426w ...
+					; CombatTarget_WeaponActionSubsystem+426w ...
 word_72B42	dw 0			; DATA XREF: Collision_NarrowPhaseTest+8Br
 word_72B44	dw 0			; DATA XREF: Collision_NarrowPhaseTest:loc_44A7Er
 					; Collision_NarrowPhaseTest:loc_44AF5r	...
@@ -10130,15 +10130,15 @@ dword_72B8E	dd 0			; DATA XREF: seg065:loc_2DFCFw
 		db    0
 		db    0
 		db    0
-dword_72B96	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+434w
+dword_72B96	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+434w
 					; UIScreen_RenderGraphVGA_509EE+19Ar ...
-dword_72B9A	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+44Aw
+dword_72B9A	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+44Aw
 					; UIScreen_RenderGraphVGA_509EE+18Fr ...
-dword_72B9E	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+463w
+dword_72B9E	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+463w
 					; UIScreen_RenderGraphVGA_509EE+184r ...
-dword_72BA2	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+479w
+dword_72BA2	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+479w
 					; UIScreen_RenderGraphVGA_509EE+179r ...
-dword_72BA6	dd 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1+4A3w
+dword_72BA6	dd 0			; DATA XREF: CombatTarget_WeaponActionSubsystem+4A3w
 					; UIScreen_RenderGraphVGA_509EE+175r ...
 dword_72BAA	dd 0			; DATA XREF: UIScreen_ReadNumericFields_500A6+15w
 					; UIScreen_RenderGraphVGA_509EE+1F7r ...
@@ -10171,9 +10171,9 @@ dword_72BC2	dd 0			; DATA XREF: WorldObjects_PurgeExpired+105w
 		db    0
 		db    0
 dword_72BD6	dd 0			; DATA XREF: UIScreen_RenderGraphVGA_509EE+2B0r
-					; UIScreen_ConstructWidgetBinding_536F7+EAw
+					; MAIN_GAME_TICK+EAw
 dword_72BDA	dd 0			; DATA XREF: UIScreen_RenderGraphVGA_509EE+2ADr
-					; UIScreen_ConstructWidgetBinding_536F7+17Cw
+					; MAIN_GAME_TICK+17Cw
 		db    0
 		db    0
 		db    0
@@ -10654,8 +10654,8 @@ byte_72DBB	db 0			; DATA XREF: seg201:011Bw seg201:015Bw
 		db    0
 		db    0
 		db    0
-byte_72DD7	db 0			; DATA XREF: UIScreen_StateMachineMain_4FBF1:loc_4FEAEr
-					; UIScreen_StateMachineMain_4FBF1:loc_4FF22r
+byte_72DD7	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FEAEr
+					; CombatTarget_WeaponActionSubsystem:loc_4FF22r
 		db    0
 		db    0
 		db    0

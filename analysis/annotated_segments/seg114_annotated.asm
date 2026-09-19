@@ -57,9 +57,19 @@ Str_SeekNthEntryByte_50E60	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante mot (scasw) de Str_SeekNthEntryByte — table à séparateurs 16 bits.
+; far, 43 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — REFERME la question
+; du decoupage du bloc PROG).   DECOUVERTE : le bloc PROG brut (charge par
+; ProgBuffer_LoadRawAndCountMarkers_AA31D) est une SEQUENCE DE MINI-PROGRAMMES CONSECUTIFS,
+; chacun termine par un MOT NUL (0x0000, 2 octets — pas juste un octet). Cette fonction,
+; donnee un index N, scanne le tampon (instruction x86 'repne scasw', qui cherche un mot egal
+; a 0) et saute par-dessus N separateurs consecutifs ; retourne le pointeur juste apres le
+; N-ieme separateur trouve = le debut du sous-programme #N.   CONCLUSION : les 4 progs_id
+; d'une PartEntry (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) sont
+; des INDEX DANS CETTE SEQUENCE ('le N-ieme mini-programme du bloc'), pas des offsets ni des
+; identifiants nommes independants. Le compteur de marqueurs (ProgBuffer+0x00) = nombre total
+; de mini-programmes empaquetes dans le bloc PROG d'une mission.
 ; ==============================================================================================
-Str_SeekNthEntryWord_50E94	proc far		; CODE XREF: Expr_LookupNamedValue_51E4A+1Fp
+ProgBuffer_FindSubProgramByIndex_50E94	proc far		; CODE XREF: Expr_LookupNamedValue_51E4A+1Fp
 
 var_4		= word ptr -4
 var_2		= dword	ptr -2
@@ -83,7 +93,7 @@ loc_50EA1:
 		or	bx, bx
 		jz	short loc_50EB8
 
-loc_50EA8:				; CODE XREF: Str_SeekNthEntryWord_50E94+1Aj
+loc_50EA8:				; CODE XREF: ProgBuffer_FindSubProgramByIndex_50E94+1Aj
 		mov	cx, 7FFFh
 		repne scasw
 		dec	bx
@@ -93,8 +103,8 @@ loc_50EA8:				; CODE XREF: Str_SeekNthEntryWord_50E94+1Aj
 		mov	es, cx
 		mov	di, cx
 
-loc_50EB8:				; CODE XREF: Str_SeekNthEntryWord_50E94+12j
-					; Str_SeekNthEntryWord_50E94+1Ej
+loc_50EB8:				; CODE XREF: ProgBuffer_FindSubProgramByIndex_50E94+12j
+					; ProgBuffer_FindSubProgramByIndex_50E94+1Ej
 		mov	[bp+var_4], di
 		mov	word ptr [bp+var_2], es
 		mov	edx, [bp+var_2]
@@ -102,7 +112,7 @@ loc_50EB8:				; CODE XREF: Str_SeekNthEntryWord_50E94+12j
 		pop	di
 		leave
 		retf
-Str_SeekNthEntryWord_50E94	endp
+ProgBuffer_FindSubProgramByIndex_50E94	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -155,7 +165,7 @@ Str_GetNthEntry_50EC8	endp
 ; largement dans tout le cluster seg109-117.
 ; ==============================================================================================
 GeomNode_SumOffsetsUpChain_50EEB	proc far		; CODE XREF: Lexer_ResolveConstantAlt+5BP
-					; GeomNode_BuildOrRefreshCluster_51EDC+325p ...
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+325p ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -534,7 +544,7 @@ Expr_VM_ReadVarOrOverride_510CC	endp
 ; valeurs calculées utilisé par le HUD (sub_3E744/sub_547B1), l'IA (seg004/seg054274) et l'UI
 ; (sub_4FBF1 et alentours). PRIORITÉ ABSOLUE pour une session dédiée.
 ; ==============================================================================================
-Expr_VM_Interpreter_51106	proc far		; CODE XREF: Expr_VM_Execute_51E7E+58p
+Expr_VM_Interpreter_51106	proc far		; CODE XREF: Expr_VM_ExecuteSingleInstruction_51E7E+58p
 
 var_2C		= dword	ptr -2Ch
 var_28		= dword	ptr -28h
@@ -1755,7 +1765,7 @@ loc_517FD:				; CODE XREF: Expr_VM_Interpreter_51106+6F2j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_BuildOrRefreshCluster_51EDC
+		call	near ptr PartEntry_ResolveSpawnPositionAndActivate_51EDC
 		jmp	loc_51B41
 ; ���������������������������������������������������������������������������
 
@@ -2346,7 +2356,7 @@ loc_51C09:				; CODE XREF: Expr_VM_Interpreter_51106:loc_51B51j
 loc_51C16:				; CODE XREF: Expr_VM_Interpreter_51106+AF4j
 		nop
 		push	cs
-		call	near ptr Expr_VM_CallNativeFunction_52513
+		call	near ptr MissionScript_CallNativeHandler_52513
 		add	sp, 0Ah
 		mov	[di+0Eh], ax
 		jmp	short loc_51C94	; default
@@ -2490,11 +2500,15 @@ off_51CA8	dw offset loc_51143, offset loc_51143, offset loc_51133
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, enveloppe bornée de Str_SeekNthEntryWord — résout un identifiant/index en pointeur vers
-; une valeur nommée.
+; far, 30 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Simple garde de
+; bornes : si rawId < buf->markerCount (le compteur pose par
+; ProgBuffer_LoadRawAndCountMarkers_AA31D), delegue a ProgBuffer_FindSubProgramByIndex_50E94
+; pour trouver le pointeur reel ; sinon retourne NULL. Utilisee pour resoudre les 4 progs_id
+; d'une PartEntry (PartEntry_LoadAndResolveNames_A9E3C) et par le mecanisme d'appel de sous-
+; routine du script (sub_51033).
 ; ==============================================================================================
 Expr_LookupNamedValue_51E4A	proc far		; CODE XREF: Expr_VM_PushValue_51033+1Dp
-					; ExprSlot_LoadAndResolveNames_A9E3C+120P ...
+					; PartEntry_LoadAndResolveNames_A9E3C+120P ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -2512,7 +2526,7 @@ arg_2		= word ptr  8
 		push	dx
 		push	large dword ptr	[si+2]
 		push	cs
-		call	near ptr Str_SeekNthEntryWord_50E94
+		call	near ptr ProgBuffer_FindSubProgramByIndex_50E94
 		add	sp, 6
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
@@ -2531,10 +2545,16 @@ Expr_LookupNamedValue_51E4A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, point d'entrée d'exécution de la VM d'expression : construit une frame locale (bytecode
-; ptr + contexte) et appelle Expr_VM_Interpreter_51106.
+; far, 48 lignes, LUE INTEGRALEMENT. Adaptateur generique : construit une fausse 'instruction'
+; temporaire sur sa PROPRE pile (pas dans un vrai buffer de script persistant) a partir de
+; trois parametres (objet de mission, position, donnees d'opcode empaquetees), puis appelle
+; directement MissionScript_ExecutePROG_51106 dessus. CONFIRME : l'interprete a 209 cas n'est
+; PAS reserve aux scripts de mission stockes — c'est un utilitaire generique 'executer une
+; instruction a la demande', appele aussi bien par le systeme de script que par
+; GeomNode_BuildOrRefreshCluster_51EDC (gestion de cluster geometrique, sans rapport avec les
+; missions).
 ; ==============================================================================================
-Expr_VM_Execute_51E7E	proc far		; CODE XREF: Expr_Node_ForceRecompute_5247D+2Fp
+Expr_VM_ExecuteSingleInstruction_51E7E	proc far		; CODE XREF: Shared_TriggerExprInstruction_5247D+2Fp
 					; Expr_Node_RecomputeIfDirty_524B4+2Fp ...
 
 var_7E		= word ptr -7Eh
@@ -2578,10 +2598,10 @@ arg_6		= dword	ptr  0Ch
 		call	near ptr Expr_VM_Interpreter_51106
 		pop	cx
 
-locret_51EDA:				; CODE XREF: Expr_VM_Execute_51E7E+Ej
+locret_51EDA:				; CODE XREF: Expr_VM_ExecuteSingleInstruction_51E7E+Ej
 		leave
 		retf
-Expr_VM_Execute_51E7E	endp
+Expr_VM_ExecuteSingleInstruction_51E7E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2589,11 +2609,20 @@ Expr_VM_Execute_51E7E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 547 lignes, NON DÉTAILLÉE — orchestrateur appelant de nombreuses fonctions du
-; cluster GeomNode/Expr (50EEB, 52C5F, 53363, 543BA...). Candidat pour session dédiée.
+; far, 547 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). CORRIGE : nommee a
+; tort 'GeomNode_BuildOrRefreshCluster' par une session anterieure (balayage rapide, jamais
+; verifie) — aucun contenu ne concerne un cluster geometrique. Appelee directement depuis
+; MissionScript_ExecutePROG_51106 (offset +0x6FB). Opere sur la MEME structure MissionObject a
+; 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de
+; formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a
+; l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et
+; AI_ComputeApproachAngles_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat
+; via SetReference — RESOUT LA QUESTION OUVERTE DU CONTROLEUR : c'est une entite avion/pilote
+; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md).
 ; ==============================================================================================
-GeomNode_BuildOrRefreshCluster_51EDC	proc far		; CODE XREF: Expr_VM_Interpreter_51106+6FBp
-					; Expr_Node_GetCachedValueA_530FF+6Bp
+PartEntry_ResolveSpawnPositionAndActivate_51EDC	proc far		; CODE XREF: Expr_VM_Interpreter_51106+6FBp
+					; Scene_EnsureUnitsSpawned_530FF+6Bp
 
 var_10C		= dword	ptr -10Ch
 var_108		= dword	ptr -108h
@@ -2694,32 +2723,32 @@ loc_51EF3:
 		jmp	short loc_51F42
 ; ���������������������������������������������������������������������������
 
-loc_51F3A:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+34j
+loc_51F3A:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+34j
 		mov	eax, [bp+arg_0]
 		mov	[bp+var_4], eax
 
-loc_51F42:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+1Fj
-					; GeomNode_BuildOrRefreshCluster_51EDC+26j ...
+loc_51F42:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+1Fj
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+26j ...
 		cmp	[bp+var_4], 0
 		jnz	short loc_51F4C
 		jmp	loc_52427
 ; ���������������������������������������������������������������������������
 
-loc_51F4C:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+6Bj
+loc_51F4C:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+6Bj
 		les	bx, [bp+var_4]
 		cmp	byte ptr es:[bx], 0
 		jnz	short loc_51F58
 		jmp	loc_52427
 ; ���������������������������������������������������������������������������
 
-loc_51F58:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+77j
+loc_51F58:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+77j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+1Ch], 0
 		jnz	short loc_51F65
 		jmp	loc_521F0
 ; ���������������������������������������������������������������������������
 
-loc_51F65:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+84j
+loc_51F65:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+84j
 		lea	ax, [bp+var_E8]
 		push	ax
 		call	Formation_ComputeGeometryHelper_56D43
@@ -2898,7 +2927,7 @@ loc_51FEC:
 		jmp	short loc_52244
 ; ���������������������������������������������������������������������������
 
-loc_521F0:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+86j
+loc_521F0:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+86j
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 1Dh
 		push	word ptr [bp+arg_0+2]
@@ -2924,7 +2953,7 @@ loc_521F0:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+86j
 		mov	eax, [bp+var_E]
 		mov	[bp+var_8], eax
 
-loc_52244:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+312j
+loc_52244:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+312j
 		lea	ax, [bp+var_C4]
 		push	ax
 		call	Formation_ComputeGeometryHelper_56D43
@@ -2981,7 +3010,7 @@ loc_52244:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+312j
 		jmp	loc_52427
 ; ���������������������������������������������������������������������������
 
-loc_522D7:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+3F6j
+loc_522D7:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3F6j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+52h]
 
@@ -3005,10 +3034,10 @@ loc_522E6:
 		jmp	short loc_52300
 ; ���������������������������������������������������������������������������
 
-loc_522FE:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+40Dj
+loc_522FE:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+40Dj
 		mov	al, 17h
 
-loc_52300:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+420j
+loc_52300:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+420j
 		cmp	al, 6
 		jnz	short loc_5233F
 		les	bx, [bp+arg_0]
@@ -3031,8 +3060,8 @@ loc_52300:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+420j
 		mov	bx, ax
 		or	byte ptr [bx+75h], 4
 
-loc_5233F:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+426j
-					; GeomNode_BuildOrRefreshCluster_51EDC+430j
+loc_5233F:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+426j
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+430j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+39h]
 		shl	ax, 0Eh
@@ -3042,7 +3071,7 @@ loc_5233F:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+426j
 		jmp	loc_5241B
 ; ���������������������������������������������������������������������������
 
-loc_52353:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+472j
+loc_52353:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+472j
 		lea	ax, [bp+var_24+2]
 		push	ax
 		call	String_ConstructEmpty
@@ -3071,7 +3100,7 @@ loc_52353:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+472j
 		call	VROOMM_StubThunk_6C3DA
 		add	sp, 6
 
-loc_5239F:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+4ADj
+loc_5239F:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+4ADj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+31h]
 		mov	byte ptr [bp+var_28], al
@@ -3111,7 +3140,7 @@ loc_523F6:
 		call	dword ptr [bx+88h]
 		add	sp, 0Ch
 
-loc_523FD:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+4FBj
+loc_523FD:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+4FBj
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+31h], 0FFh
 		jnz	short loc_5240D
@@ -3119,26 +3148,26 @@ loc_523FD:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+4FBj
 		jmp	short loc_5241B
 ; ���������������������������������������������������������������������������
 
-loc_5240D:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+529j
+loc_5240D:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+529j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+31h], 1
 		jnz	short loc_5241B
 		inc	word_706A3
 
-loc_5241B:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+474j
-					; GeomNode_BuildOrRefreshCluster_51EDC+52Fj ...
+loc_5241B:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+474j
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+52Fj ...
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr Expr_Node_ForceRecompute_5247D
+		call	near ptr Shared_TriggerExprInstruction_5247D
 		add	sp, 4
 
-loc_52427:				; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+6Dj
-					; GeomNode_BuildOrRefreshCluster_51EDC+79j ...
+loc_52427:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+6Dj
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+79j ...
 		pop	si
 		leave
 		retf
-GeomNode_BuildOrRefreshCluster_51EDC	endp
+PartEntry_ResolveSpawnPositionAndActivate_51EDC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3199,10 +3228,16 @@ Expr_Node_ClearDirtyAndNotify_5242A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, force le recalcul d'un champ de nœud (pose des flags, exécute le bytecode à +0x42 via
-; Expr_VM_Execute).
+; far, 23 lignes, LUE INTEGRALEMENT. Appelee par MissionFormation_ComputeSlotAndSpawn_51EDC EN
+; INTERNE (rappel controle vers l'interprete, pas un appelant externe sans rapport). Manipule
+; +0x39/+0x3A/+0x42, les MEMES champs de statut que
+; MissionObject_ResetState_A9DFD/MissionObject_LoadAndResolveNames_A9E3C utilisent sur les
+; objets de mission — la MEME structure generique a 85 octets, pour une sous-evaluation. Pose
+; bit0 de +0x39, efface bits2/3, efface +0x3A, puis appelle
+; Expr_VM_ExecuteSingleInstruction_51E7E avec +0x42 (donnees empaquetees) et une position
+; depuis word_706A0+0x40.
 ; ==============================================================================================
-Expr_Node_ForceRecompute_5247D	proc far		; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+545p
+Shared_TriggerExprInstruction_5247D	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+545p
 
 arg_0		= dword	ptr  6
 
@@ -3220,11 +3255,11 @@ arg_0		= dword	ptr  6
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		pop	bp
 		retf
-Expr_Node_ForceRecompute_5247D	endp
+Shared_TriggerExprInstruction_5247D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3257,7 +3292,7 @@ arg_0		= dword	ptr  6
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 
 loc_524E9:				; CODE XREF: Expr_Node_RecomputeIfDirty_524B4+12j
@@ -3307,12 +3342,31 @@ Expr_Node_DetachChildAndRecompute_524EB	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 685 lignes, NON DÉTAILLÉE — marshalling d'une liste d'arguments (~28 dwords, via
-; Expr_LookupNamedValue_52DDB/sub_5305A/sub_52C9C en boucle) puis appel indirect via table de
-; fonctions natives (dword ptr [bx+88h]). Implémente l'opcode "appel de fonction native" de la
-; VM. Candidat pour session dédiée.
+; far, 685 lignes, LUE EN PROFONDEUR (session dediee aux ordres de mission avec Remi). CORRIGE
+; : ce n'est pas une boucle generique de marshalling — c'est le vrai point d'aiguillage par
+; ordre, avec une GARDE D'ENTREE qui determine si un ordre execute reellement une commande de
+; vol, PUIS un switch a 31 cas reels (indice = opcode-0xA1, cmp bx,0x1E) qui distingue Take
+; off, Land, Destroy target, Defend target, Defend area, Follow ally, et 7 ordres non
+; identifies par la table externe (0xA3, 0xAB, 0xB1-0xB5) — detail complet dans
+; MISSION_SCRIPT_OPCODES.md.   GARDE D'ENTREE (determine si QUOI QUE CE SOIT s'execute, avant
+; meme de regarder quel ordre est demande) : verifie [arg_0+0x52] != 0 (l'objet de mission
+; reference par le script doit avoir un controleur associe) ET le bit 1 de [arg_0+0x39] doit
+; etre CLAIR (probable 'objet non occupe/disponible') — si l'une des deux conditions echoue,
+; retourne 0 IMMEDIATEMENT sans executer aucune commande de vol, quel que soit l'opcode
+; demande par le script. Si la garde passe : pose [arg_0+0x54]=0xFF (drapeau d'etat) avant le
+; switch.  SORTIE COMMUNE (tous les 31 cas convergent ici, loc_52A41) : delegue la VRAIE
+; execution tactique a une methode virtuelle UNIQUE et GENERIQUE, [arg_0+0x52 -> vtable+0x88],
+; en lui passant la position/reference resolue par le cas specifique, une valeur de
+; 'competence' (copiee depuis la cible resolue +0x52 si presente), l'opcode et une duree.
+; AUCUN calcul de poursuite, de tir ou de suivi vectoriel continu ne vit dans cette fonction
+; elle-meme ni dans aucun de ses 31 cas — c'est une couche de RESOLUTION D'INTENTION (ou
+; aller, quoi cibler), pas d'EXECUTION TACTIQUE. Cette derniere vit entierement dans la
+; methode virtuelle +0x88, non identifiee a ce stade.  PIEGE NOTE : le champ +0x52 utilise ici
+; comme POINTEUR de controleur appartient a un objet DIFFERENT du +0x52 scalaire (performance
+; JETP/TOFF, alimentant byte_720C3) trouve ailleurs dans le binaire — meme decalage, deux
+; structures distinctes.
 ; ==============================================================================================
-Expr_VM_CallNativeFunction_52513	proc far		; CODE XREF: Expr_VM_Interpreter_51106+B12p
+MissionScript_CallNativeHandler_52513	proc far		; CODE XREF: Expr_VM_Interpreter_51106+B12p
 
 var_E6		= dword	ptr -0E6h
 var_E2		= dword	ptr -0E2h
@@ -3393,13 +3447,13 @@ arg_8		= word ptr  0Eh
 		or	ax, ax
 		jz	short loc_52539
 
-loc_52534:				; CODE XREF: Expr_VM_CallNativeFunction_52513+11j
-					; Expr_VM_CallNativeFunction_52513+1F5j ...
+loc_52534:				; CODE XREF: MissionScript_CallNativeHandler_52513+11j
+					; MissionScript_CallNativeHandler_52513+1F5j ...
 		xor	ax, ax
 		jmp	loc_52A84
 ; ���������������������������������������������������������������������������
 
-loc_52539:				; CODE XREF: Expr_VM_CallNativeFunction_52513+1Fj
+loc_52539:				; CODE XREF: MissionScript_CallNativeHandler_52513+1Fj
 		mov	dx, [bp+arg_4]
 		mov	ax, [bp+arg_6]
 		mov	[bp+var_2], ax
@@ -3417,7 +3471,7 @@ loc_52539:				; CODE XREF: Expr_VM_CallNativeFunction_52513+1Fj
 		jmp	loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_52573:				; CODE XREF: Expr_VM_CallNativeFunction_52513+5Bj
+loc_52573:				; CODE XREF: MissionScript_CallNativeHandler_52513+5Bj
 		shl	bx, 1
 		jmp	cs:off_52A88[bx] ; switch jump
 
@@ -3439,18 +3493,18 @@ loc_5257A:				; DATA XREF: seg114:off_52A88o
 		mov	[bp+var_46], eax
 		mov	eax, [bp+var_4E]
 
-loc_525A4:				; CODE XREF: Expr_VM_CallNativeFunction_52513+144j
-					; Expr_VM_CallNativeFunction_52513+1B0j ...
+loc_525A4:				; CODE XREF: MissionScript_CallNativeHandler_52513+144j
+					; MissionScript_CallNativeHandler_52513+1B0j ...
 		mov	[bp+var_42], eax
 		les	bx, [bp+arg_0]
 		mov	al, byte ptr [bp+var_2]
 
-loc_525AE:				; CODE XREF: Expr_VM_CallNativeFunction_52513+395j
+loc_525AE:				; CODE XREF: MissionScript_CallNativeHandler_52513+395j
 		mov	es:[bx+54h], al
 		jmp	loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_525B5:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_525B5:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xA1
 		mov	ax, si
@@ -3480,7 +3534,7 @@ loc_525EB:				; default
 		jmp	loc_52A41
 ; ���������������������������������������������������������������������������
 
-loc_525EE:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_525EE:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+arg_8]	; case 0xA2
 		mov	ax, si
@@ -3523,7 +3577,7 @@ loc_525F3:
 		jmp	loc_525A4
 ; ���������������������������������������������������������������������������
 
-loc_5265A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_5265A:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+arg_8]	; case 0xA4
 		mov	ax, si
@@ -3564,7 +3618,7 @@ loc_5265A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		jmp	loc_525A4
 ; ���������������������������������������������������������������������������
 
-loc_526C6:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_526C6:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	large [bp+arg_0] ; case	0xA3
 		push	ss
@@ -3599,7 +3653,7 @@ loc_526F3:
 		jmp	loc_52534
 ; ���������������������������������������������������������������������������
 
-loc_5270B:				; CODE XREF: Expr_VM_CallNativeFunction_52513+1F3j
+loc_5270B:				; CODE XREF: MissionScript_CallNativeHandler_52513+1F3j
 		mov	ax, word ptr [bp+var_3A+2]
 		mov	dx, word ptr [bp+var_3A]
 		add	dx, 22h	; '"'
@@ -3636,7 +3690,7 @@ loc_5270B:				; CODE XREF: Expr_VM_CallNativeFunction_52513+1F3j
 		jmp	loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_5277C:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_5277C:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		cmp	[bp+var_2], 0FFh ; case	0xAA
 		jnz	short loc_5278F
@@ -3645,7 +3699,7 @@ loc_5277C:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		mov	ah, 0
 		mov	[bp+var_2], ax
 
-loc_5278F:				; CODE XREF: Expr_VM_CallNativeFunction_52513+26Ej
+loc_5278F:				; CODE XREF: MissionScript_CallNativeHandler_52513+26Ej
 		push	[bp+var_2]
 		mov	ax, si
 		add	ax, 34h	; '4'
@@ -3661,7 +3715,7 @@ loc_5278F:				; CODE XREF: Expr_VM_CallNativeFunction_52513+26Ej
 		jmp	loc_529B4
 ; ���������������������������������������������������������������������������
 
-loc_527B0:				; CODE XREF: Expr_VM_CallNativeFunction_52513+298j
+loc_527B0:				; CODE XREF: MissionScript_CallNativeHandler_52513+298j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+33h]
 		mov	[bp+var_E], ax
@@ -3688,7 +3742,7 @@ loc_527B0:				; CODE XREF: Expr_VM_CallNativeFunction_52513+298j
 		jmp	loc_529B4
 ; ���������������������������������������������������������������������������
 
-loc_52809:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_52809:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xA7
 		mov	ax, si
@@ -3705,7 +3759,7 @@ loc_52809:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		jmp	loc_529B4
 ; ���������������������������������������������������������������������������
 
-loc_5282A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+312j
+loc_5282A:				; CODE XREF: MissionScript_CallNativeHandler_52513+312j
 		push	dx
 		push	ax
 		push	ss
@@ -3725,7 +3779,7 @@ loc_5282A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+312j
 		jmp	loc_529B4
 ; ���������������������������������������������������������������������������
 
-loc_52855:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_52855:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xA8
 		mov	ax, si
@@ -3754,8 +3808,8 @@ loc_52855:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		mov	[bp+var_46], eax
 		mov	eax, [bp+var_8A]
 
-loc_5289A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+2F0j
-					; Expr_VM_CallNativeFunction_52513+33Dj
+loc_5289A:				; CODE XREF: MissionScript_CallNativeHandler_52513+2F0j
+					; MissionScript_CallNativeHandler_52513+33Dj
 		mov	[bp+var_42], eax
 		les	bx, [bp+var_C]
 		mov	al, es:[bx+54h]
@@ -3763,12 +3817,12 @@ loc_5289A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+2F0j
 		jmp	loc_525AE
 ; ���������������������������������������������������������������������������
 
-loc_528AB:				; CODE XREF: Expr_VM_CallNativeFunction_52513+35Ej
+loc_528AB:				; CODE XREF: MissionScript_CallNativeHandler_52513+35Ej
 		mov	di, 0FFFFh
 		jmp	loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_528B1:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_528B1:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xA9
 		mov	ax, si
@@ -3791,7 +3845,7 @@ loc_528DF:
 		jmp	loc_525A4
 ; ���������������������������������������������������������������������������
 
-loc_528E2:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_528E2:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		mov	[bp+var_22], 0	; case 0xB1
 		mov	eax, [bp+var_22]
@@ -3812,10 +3866,10 @@ loc_528F2:
 		jmp	short loc_52911
 ; ���������������������������������������������������������������������������
 
-loc_5290E:				; CODE XREF: Expr_VM_CallNativeFunction_52513+3E9j
+loc_5290E:				; CODE XREF: MissionScript_CallNativeHandler_52513+3E9j
 		xor	eax, eax
 
-loc_52911:				; CODE XREF: Expr_VM_CallNativeFunction_52513+3F9j
+loc_52911:				; CODE XREF: MissionScript_CallNativeHandler_52513+3F9j
 		mov	[bp+var_26], eax
 		shl	eax, 8
 		mov	[bp+var_2A], eax
@@ -3823,7 +3877,7 @@ loc_52911:				; CODE XREF: Expr_VM_CallNativeFunction_52513+3F9j
 		jmp	loc_529E8
 ; ���������������������������������������������������������������������������
 
-loc_52924:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_52924:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xB3
 		mov	ax, si
@@ -3856,7 +3910,7 @@ loc_52924:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		jmp	short loc_529B4
 ; ���������������������������������������������������������������������������
 
-loc_5296D:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_5296D:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xB5
 		mov	ax, si
@@ -3887,13 +3941,13 @@ loc_5296D:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		jmp	short loc_529E8
 ; ���������������������������������������������������������������������������
 
-loc_529B4:				; CODE XREF: Expr_VM_CallNativeFunction_52513+29Aj
-					; Expr_VM_CallNativeFunction_52513+2F3j ...
+loc_529B4:				; CODE XREF: MissionScript_CallNativeHandler_52513+29Aj
+					; MissionScript_CallNativeHandler_52513+2F3j ...
 		mov	di, 0FFFEh
 		jmp	loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_529BA:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_529BA:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		push	[bp+var_2]	; case 0xB4
 		mov	ax, si
@@ -3914,13 +3968,13 @@ loc_529DF:
 		mov	[bp+var_46], eax
 		mov	eax, [bp+var_BA]
 
-loc_529E8:				; CODE XREF: Expr_VM_CallNativeFunction_52513+40Ej
-					; Expr_VM_CallNativeFunction_52513+456j ...
+loc_529E8:				; CODE XREF: MissionScript_CallNativeHandler_52513+40Ej
+					; MissionScript_CallNativeHandler_52513+456j ...
 		mov	[bp+var_42], eax
 		jmp	short loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_529EE:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_529EE:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		mov	[bp+var_2E], 0	; case 0xB2
 		mov	eax, [bp+var_2E]
@@ -3937,10 +3991,10 @@ loc_529EE:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
 		jmp	short loc_52A1D
 ; ���������������������������������������������������������������������������
 
-loc_52A1A:				; CODE XREF: Expr_VM_CallNativeFunction_52513+4F5j
+loc_52A1A:				; CODE XREF: MissionScript_CallNativeHandler_52513+4F5j
 		xor	eax, eax
 
-loc_52A1D:				; CODE XREF: Expr_VM_CallNativeFunction_52513+505j
+loc_52A1D:				; CODE XREF: MissionScript_CallNativeHandler_52513+505j
 		mov	[bp+var_32], eax
 		shl	eax, 8
 		mov	[bp+var_36], eax
@@ -3949,35 +4003,35 @@ loc_52A1D:				; CODE XREF: Expr_VM_CallNativeFunction_52513+505j
 		jmp	short loc_52A41	; default
 ; ���������������������������������������������������������������������������
 
-loc_52A33:				; CODE XREF: Expr_VM_CallNativeFunction_52513+62j
+loc_52A33:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 					; DATA XREF: seg114:off_52A88o
 		mov	ax, [bp+var_2]	; case 0xAB
 		mov	word ptr [bp+var_8], ax
 		mov	eax, [si+54h]
 		mov	[bp+var_C], eax
 
-loc_52A41:				; CODE XREF: Expr_VM_CallNativeFunction_52513+5Dj
-					; Expr_VM_CallNativeFunction_52513+62j ...
+loc_52A41:				; CODE XREF: MissionScript_CallNativeHandler_52513+5Dj
+					; MissionScript_CallNativeHandler_52513+62j ...
 		cmp	di, 0FFFEh	; default
 		jnz	short loc_52A49
 		jmp	loc_52534
 ; ���������������������������������������������������������������������������
 
-loc_52A49:				; CODE XREF: Expr_VM_CallNativeFunction_52513+531j
+loc_52A49:				; CODE XREF: MissionScript_CallNativeHandler_52513+531j
 		cmp	di, 0FFFFh
 		jnz	short loc_52A53
 		mov	ax, 1
 		jmp	short loc_52A84
 ; ���������������������������������������������������������������������������
 
-loc_52A53:				; CODE XREF: Expr_VM_CallNativeFunction_52513+539j
+loc_52A53:				; CODE XREF: MissionScript_CallNativeHandler_52513+539j
 		cmp	[bp+var_C], 0
 		jz	short loc_52A64
 		les	bx, [bp+var_C]
 		mov	ax, es:[bx+52h]
 		mov	[bp+var_4], ax
 
-loc_52A64:				; CODE XREF: Expr_VM_CallNativeFunction_52513+545j
+loc_52A64:				; CODE XREF: MissionScript_CallNativeHandler_52513+545j
 		push	large [bp+var_8]
 		lea	ax, [bp+var_4A]
 		push	ax
@@ -3990,16 +4044,16 @@ loc_52A64:				; CODE XREF: Expr_VM_CallNativeFunction_52513+545j
 		call	dword ptr [bx+88h]
 		add	sp, 0Ch
 
-loc_52A84:				; CODE XREF: Expr_VM_CallNativeFunction_52513+23j
-					; Expr_VM_CallNativeFunction_52513+53Ej
+loc_52A84:				; CODE XREF: MissionScript_CallNativeHandler_52513+23j
+					; MissionScript_CallNativeHandler_52513+53Ej
 		pop	di
 		pop	si
 		leave
 		retf
-Expr_VM_CallNativeFunction_52513	endp
+MissionScript_CallNativeHandler_52513	endp
 
 ; ���������������������������������������������������������������������������
-off_52A88	dw offset loc_525B5	; DATA XREF: Expr_VM_CallNativeFunction_52513+62r
+off_52A88	dw offset loc_525B5	; DATA XREF: MissionScript_CallNativeHandler_52513+62r
 		dw offset loc_525EE	; jump table for switch	statement
 		dw offset loc_526C6
 		dw offset loc_5265A
@@ -4039,7 +4093,7 @@ off_52A88	dw offset loc_525B5	; DATA XREF: Expr_VM_CallNativeFunction_52513+62r
 ; far, cycle complet de réévaluation d'un nœud : réévalue (524B4), exécute la VM (51E7E),
 ; stocke le résultat (52C9C), efface le flag dirty (5242A).
 ; ==============================================================================================
-Expr_Node_UpdateAndPropagate_52AC6	proc far		; CODE XREF: Expr_Node_RefreshField_52E51+2Dp
+Expr_Node_UpdateAndPropagate_52AC6	proc far		; CODE XREF: PartEntry_DispatchMissionUpdateTick_52E51+2Dp
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -4115,7 +4169,7 @@ loc_52B22:				; CODE XREF: Expr_Node_UpdateAndPropagate_52AC6+57j
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		les	bx, [bp+arg_0]
 		mov	di, es:[bx+52h]
@@ -4206,7 +4260,7 @@ loc_52BFF:				; CODE XREF: Expr_Node_UpdateAndPropagate_52AC6+59j
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+52h]
@@ -4256,7 +4310,7 @@ Expr_Node_UpdateAndPropagate_52AC6	endp
 ; far, table lookup bornée par index (octet +0x1B) dans une table de descripteurs de fonctions
 ; natives (base word_706A0+0x30, stride 9 octets) — alimente Expr_VM_CallNativeFunction.
 ; ==============================================================================================
-Expr_LookupBuiltinFuncDesc_52C5F	proc far		; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+3C0p
+Expr_LookupBuiltinFuncDesc_52C5F	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3C0p
 					; Expr_Node_LookupAndConvert_52D69+1Cp ...
 
 var_4		= dword	ptr -4
@@ -4433,7 +4487,7 @@ Expr_Node_HasChildError_52D1D	endp
 ; far, accesseur de table bornée à stride 85 octets (0x55) — récupère un pointeur
 ; d'enregistrement par index.
 ; ==============================================================================================
-Expr_LookupTableEntry85B_52D45	proc far		; CODE XREF: Expr_Node_GetCachedValueA_530FF+26p
+Expr_LookupTableEntry85B_52D45	proc far		; CODE XREF: Scene_EnsureUnitsSpawned_530FF+26p
 					; Expr_Node_GetCachedValueB_5317A+22p ...
 
 arg_0		= word ptr  6
@@ -4658,10 +4712,19 @@ Expr_Node_Accessor_52E17	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, invoque Expr_Node_UpdateAndPropagate_52AC6 pour un champ donné — appelée par sub_536F7
-; (construction d'écran).
+; far, 37 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien
+; nom 'Expr_Node_RefreshField' n'avait plus de sens une fois le type d'objet identifie).
+; BOUCLE SUR LE TABLEAU DES PartEntry (participants du chunk PART) : pas de 0x55 (85 octets,
+; taille exacte confirmee de PartEntry_AllocateArray_AA23D). Pour chaque entree, teste le bit
+; 0 de +0x39 (le meme champ de statut que PartEntry_ResetState_A9DFD manipule) ; si actif,
+; appelle Expr_Node_UpdateAndPropagate_52AC6(entree).   ROLE CONFIRME : c'est le vrai
+; declencheur, a chaque frame (appelee par MAIN_GAME_TICK_536F7), de l'evenement
+; 'on_mission_update' pour chaque participant de mission dont le bit correspondant est actif —
+; point d'entree de la chaine Expr_Node_UpdateAndPropagate -> Expr_VM_ExecuteSingleInstruction
+; -> MissionScript_ExecutePROG qui execute finalement le script on_mission_update de ce
+; participant (PartEntry+0x46/0x48).
 ; ==============================================================================================
-Expr_Node_RefreshField_52E51	proc far		; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+16Fp
+PartEntry_DispatchMissionUpdateTick_52E51	proc far		; CODE XREF: MAIN_GAME_TICK+16Fp
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -4678,7 +4741,7 @@ arg_0		= word ptr  6
 		jmp	short loc_52E89
 ; ���������������������������������������������������������������������������
 
-loc_52E68:				; CODE XREF: Expr_Node_RefreshField_52E51+3Aj
+loc_52E68:				; CODE XREF: PartEntry_DispatchMissionUpdateTick_52E51+3Aj
 		les	bx, [bp+var_4]
 		mov	al, es:[bx+39h]
 		shl	ax, 0Fh
@@ -4691,18 +4754,18 @@ loc_52E68:				; CODE XREF: Expr_Node_RefreshField_52E51+3Aj
 		call	near ptr Expr_Node_UpdateAndPropagate_52AC6
 		add	sp, 4
 
-loc_52E84:				; CODE XREF: Expr_Node_RefreshField_52E51+26j
+loc_52E84:				; CODE XREF: PartEntry_DispatchMissionUpdateTick_52E51+26j
 		inc	di
 		add	word ptr [bp+var_4], 55h ; 'U'
 
-loc_52E89:				; CODE XREF: Expr_Node_RefreshField_52E51+15j
+loc_52E89:				; CODE XREF: PartEntry_DispatchMissionUpdateTick_52E51+15j
 		cmp	[si], di
 		jg	short loc_52E68
 		pop	di
 		pop	si
 		leave
 		retf
-Expr_Node_RefreshField_52E51	endp
+PartEntry_DispatchMissionUpdateTick_52E51	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -5084,10 +5147,16 @@ Player_ResolveAttachPointN_5305A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45), suivi d'un
-; recalcul conditionnel (GeomNode_BuildOrRefreshCluster_51EDC).
+; far, 73 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom
+; 'MissionFormation_EnsureAllSlotsFilled' errone). Le parametre 'si' est tres probablement la
+; SCENE elle-meme (pas un groupe/escadrille) : si[0x14]/si[0x16] correspondent
+; vraisemblablement a la LISTE D'UNITES en queue du chunk SCNE (documentee dans DATA_MODEL.md
+; : liste de u16, index dans PART). Pour chaque unite de cette liste : resout la PartEntry
+; correspondante (sub_52D45), et si son controleur (+0x52) est encore NUL, appelle
+; MissionFormation_ComputeSlotAndSpawn_51EDC pour la faire apparaitre — assure que toutes les
+; unites de la scene existent au moment de son activation.
 ; ==============================================================================================
-Expr_Node_GetCachedValueA_530FF	proc far		; CODE XREF: Expr_Node_RecomputeFieldA_531CD+9p
+Scene_EnsureUnitsSpawned_530FF	proc far		; CODE XREF: Scene_TriggerActivation_531CD+9p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -5103,7 +5172,7 @@ arg_0		= word ptr  6
 		jmp	short loc_53171
 ; ���������������������������������������������������������������������������
 
-loc_53112:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+75j
+loc_53112:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+75j
 		mov	ax, di
 		shl	ax, 1
 		mov	bx, [si+16h]
@@ -5126,10 +5195,10 @@ loc_53112:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+75j
 		jmp	short loc_53149
 ; ���������������������������������������������������������������������������
 
-loc_53147:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+41j
+loc_53147:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+41j
 		xor	ax, ax
 
-loc_53149:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+46j
+loc_53149:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+46j
 		or	ax, ax
 		jz	short loc_53165
 		les	bx, [bp+var_4]
@@ -5142,24 +5211,24 @@ loc_53149:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+46j
 		jmp	short loc_53170
 ; ���������������������������������������������������������������������������
 
-loc_53165:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+4Cj
+loc_53165:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+4Cj
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr GeomNode_BuildOrRefreshCluster_51EDC
+		call	near ptr PartEntry_ResolveSpawnPositionAndActivate_51EDC
 		add	sp, 4
 
-loc_53170:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+37j
-					; Expr_Node_GetCachedValueA_530FF+5Dj ...
+loc_53170:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+37j
+					; Scene_EnsureUnitsSpawned_530FF+5Dj ...
 		inc	di
 
-loc_53171:				; CODE XREF: Expr_Node_GetCachedValueA_530FF+11j
+loc_53171:				; CODE XREF: Scene_EnsureUnitsSpawned_530FF+11j
 		cmp	[si+14h], di
 		jg	short loc_53112
 		pop	di
 		pop	si
 		leave
 		retf
-Expr_Node_GetCachedValueA_530FF	endp
+Scene_EnsureUnitsSpawned_530FF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5169,7 +5238,7 @@ Expr_Node_GetCachedValueA_530FF	endp
 ; ==============================================================================================
 ; far, variante d'accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45).
 ; ==============================================================================================
-Expr_Node_GetCachedValueB_5317A	proc far		; CODE XREF: Expr_Node_RecomputeFieldC_53211+9p
+Expr_Node_GetCachedValueB_5317A	proc far		; CODE XREF: Scene_TriggerMissionUpdateEvent_53211+9p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -5225,9 +5294,14 @@ Expr_Node_GetCachedValueB_5317A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, recalcule un champ dérivé : Expr_Node_GetCachedValueA_530FF puis Expr_VM_Execute_51E7E.
+; far, 26 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_TickGroup'
+; errone). Quand une scene devient active : appelle Scene_EnsureUnitsSpawned_530FF (fait
+; apparaitre les unites associees non encore presentes), PUIS
+; Expr_VM_ExecuteSingleInstruction_51E7E — DECLENCHE L'EXECUTION DU SCRIPT on_is_activated DE
+; CETTE SCENE (parametres calcules depuis scene+2+0x40 = reference au champ progs_id resolu de
+; la scene, scene+8).
 ; ==============================================================================================
-Expr_Node_RecomputeFieldA_531CD	proc far		; CODE XREF: Expr_Node_RecomputeAllFields_532EA+2Cp
+Scene_TriggerActivation_531CD	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+2Cp
 					; MissionScenario_LoadMainRecord_A8331+5FEP
 
 arg_0		= word ptr  6
@@ -5238,7 +5312,7 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr Expr_Node_GetCachedValueA_530FF
+		call	near ptr Scene_EnsureUnitsSpawned_530FF
 		pop	cx
 
 loc_531DA:
@@ -5248,12 +5322,12 @@ loc_531DA:
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-Expr_Node_RecomputeFieldA_531CD	endp
+Scene_TriggerActivation_531CD	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5261,11 +5335,14 @@ Expr_Node_RecomputeFieldA_531CD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, recalcule un champ dérivé via Expr_VM_Execute_51E7E — utilisé par sub_536F7
-; (construction d'écran).
+; far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
+; +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via
+; Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas
+; depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de
+; ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide.
 ; ==============================================================================================
-Expr_Node_RecomputeFieldB_531F2	proc far		; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+104p
-					; UIScreen_ConstructWidgetBinding_536F7+164p
+Scene_TriggerLeavingEvent_531F2	proc far		; CODE XREF: MAIN_GAME_TICK+104p
+					; MAIN_GAME_TICK+164p
 
 arg_0		= word ptr  6
 
@@ -5279,12 +5356,12 @@ arg_0		= word ptr  6
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-Expr_Node_RecomputeFieldB_531F2	endp
+Scene_TriggerLeavingEvent_531F2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5292,9 +5369,18 @@ Expr_Node_RecomputeFieldB_531F2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, recalcule un champ dérivé : Expr_Node_GetCachedValueB_5317A puis Expr_VM_Execute_51E7E.
+; far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
+; +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via
+; Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois
+; depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change --
+; garantie supplementaire sur l'ancienne scene) ET depuis
+; MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste
+; non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par
+; frame tant que la scene reste active -- exactement comme celui de PART
+; (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement
+; suppose.
 ; ==============================================================================================
-Expr_Node_RecomputeFieldC_53211	proc far		; CODE XREF: Expr_Node_RecomputeAllFields_532EA+22p
+Scene_TriggerMissionUpdateEvent_53211	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+22p
 					; MissionScenario_RecomputeFields_A9382+10P ...
 
 arg_0		= word ptr  6
@@ -5313,12 +5399,12 @@ arg_0		= word ptr  6
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-Expr_Node_RecomputeFieldC_53211	endp
+Scene_TriggerMissionUpdateEvent_53211	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5326,9 +5412,14 @@ Expr_Node_RecomputeFieldC_53211	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, dispatch vtable (dword ptr [bx+4]) pour obtenir/recalculer une valeur de nœud.
+; far, 80 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Itere le tableau
+; des enregistrements SCNE (pas de 0x27=39 octets, confirmant la taille de DATA_MODEL.md),
+; pour chaque scene active (is_active!=0) dont la zone (area_id resolu, +4) est non nulle,
+; teste par appel virtuel ([areaHandle->vtable+4](param)) si le parametre (position/reference)
+; est contenu dans cette zone. Retourne la premiere scene active correspondante, ou NULL.
+; C'est le vrai SELECTEUR DE SCENE ACTIVE de la mission.
 ; ==============================================================================================
-Expr_Node_GetOrRecompute_53236	proc far		; CODE XREF: Expr_Node_RecomputeAllFields_532EA+10p
+Scene_FindMatchingByAreaContainment_53236	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+10p
 					; UIScreen_RenderOrLayoutList_54503+151p ...
 
 var_4		= word ptr -4
@@ -5346,7 +5437,7 @@ arg_2		= word ptr  8
 		jmp	short loc_532A0
 ; ���������������������������������������������������������������������������
 
-loc_53248:				; CODE XREF: Expr_Node_GetOrRecompute_53236+6Fj
+loc_53248:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+6Fj
 		mov	ax, [bp+var_2]
 		imul	ax, 27h
 		mov	di, [si+2]
@@ -5363,10 +5454,10 @@ loc_53248:				; CODE XREF: Expr_Node_GetOrRecompute_53236+6Fj
 		jmp	short loc_53273
 ; ���������������������������������������������������������������������������
 
-loc_53271:				; CODE XREF: Expr_Node_GetOrRecompute_53236+34j
+loc_53271:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+34j
 		xor	ax, ax
 
-loc_53273:				; CODE XREF: Expr_Node_GetOrRecompute_53236+39j
+loc_53273:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+39j
 		or	ax, ax
 		jnz	short loc_5328E
 		push	[bp+var_4]
@@ -5378,37 +5469,37 @@ loc_53273:				; CODE XREF: Expr_Node_GetOrRecompute_53236+39j
 		or	ax, ax
 		jz	short loc_53293
 
-loc_5328E:				; CODE XREF: Expr_Node_GetOrRecompute_53236+3Fj
+loc_5328E:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+3Fj
 		mov	ax, 1
 		jmp	short loc_53295
 ; ���������������������������������������������������������������������������
 
-loc_53293:				; CODE XREF: Expr_Node_GetOrRecompute_53236+56j
+loc_53293:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+56j
 		xor	ax, ax
 
-loc_53295:				; CODE XREF: Expr_Node_GetOrRecompute_53236+5Bj
+loc_53295:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+5Bj
 		or	ax, ax
 		jz	short loc_5329D
 		mov	ax, di
 		jmp	short loc_532A9
 ; ���������������������������������������������������������������������������
 
-loc_5329D:				; CODE XREF: Expr_Node_GetOrRecompute_53236+20j
-					; Expr_Node_GetOrRecompute_53236+27j ...
+loc_5329D:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+20j
+					; Scene_FindMatchingByAreaContainment_53236+27j ...
 		inc	[bp+var_2]
 
-loc_532A0:				; CODE XREF: Expr_Node_GetOrRecompute_53236+10j
+loc_532A0:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+10j
 		mov	ax, [si]
 		cmp	ax, [bp+var_2]
 		jg	short loc_53248
 		xor	ax, ax
 
-loc_532A9:				; CODE XREF: Expr_Node_GetOrRecompute_53236+65j
+loc_532A9:				; CODE XREF: Scene_FindMatchingByAreaContainment_53236+65j
 		pop	di
 		pop	si
 		leave
 		retf
-Expr_Node_GetOrRecompute_53236	endp
+Scene_FindMatchingByAreaContainment_53236	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5480,10 +5571,14 @@ Expr_Node_Accessor_532AD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, orchestrateur recalculant plusieurs champs d'un nœud (Expr_Node_GetOrRecompute_53236,
-; RecomputeFieldC_53211, RecomputeFieldA_531CD, puis sub_544DC).
+; far, 55 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom
+; 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une
+; formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active
+; courante ; si elle a change depuis le dernier appel (different du parametre previousScene),
+; desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en
+; mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52).
 ; ==============================================================================================
-Expr_Node_RecomputeAllFields_532EA	proc far		; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+151p
+Scene_DetectAndActivateChange_532EA	proc far		; CODE XREF: MAIN_GAME_TICK+151p
 					; MissionScenario_LoadMainRecord_A8331+69AP
 
 arg_0		= word ptr  6
@@ -5499,7 +5594,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_2]
 		push	ax
 		push	cs
-		call	near ptr Expr_Node_GetOrRecompute_53236
+		call	near ptr Scene_FindMatchingByAreaContainment_53236
 		add	sp, 4
 		mov	si, ax
 		cmp	si, di
@@ -5508,15 +5603,15 @@ arg_4		= word ptr  0Ah
 		jz	short loc_53310
 		push	di
 		push	cs
-		call	near ptr Expr_Node_RecomputeFieldC_53211
+		call	near ptr Scene_TriggerMissionUpdateEvent_53211
 		pop	cx
 
-loc_53310:				; CODE XREF: Expr_Node_RecomputeAllFields_532EA+1Ej
+loc_53310:				; CODE XREF: Scene_DetectAndActivateChange_532EA+1Ej
 		or	si, si
 		jz	short loc_5332F
 		push	si
 		push	cs
-		call	near ptr Expr_Node_RecomputeFieldA_531CD
+		call	near ptr Scene_TriggerActivation_531CD
 		pop	cx
 		mov	bx, word_706A0
 		cmp	[bx+52h], si
@@ -5525,20 +5620,20 @@ loc_53310:				; CODE XREF: Expr_Node_RecomputeAllFields_532EA+1Ej
 		push	cs
 		call	near ptr Expr_Node_UpdateSelectionCounters_544DC
 
-loc_53328:				; CODE XREF: Expr_Node_RecomputeAllFields_532EA+37j
+loc_53328:				; CODE XREF: Scene_DetectAndActivateChange_532EA+37j
 		mov	bx, word_706A0
 		mov	[bx+52h], si
 
-loc_5332F:				; CODE XREF: Expr_Node_RecomputeAllFields_532EA+28j
+loc_5332F:				; CODE XREF: Scene_DetectAndActivateChange_532EA+28j
 		mov	di, si
 
-loc_53331:				; CODE XREF: Expr_Node_RecomputeAllFields_532EA+1Aj
+loc_53331:				; CODE XREF: Scene_DetectAndActivateChange_532EA+1Aj
 		mov	ax, di
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Expr_Node_RecomputeAllFields_532EA	endp
+Scene_DetectAndActivateChange_532EA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5614,7 +5709,7 @@ Expr_Node_RegisterListener_5334D	endp
 ; Candidat prioritaire pour session dediee, lien direct avec Expr_VM_Interpreter_51106 (jamais
 ; lu en detail).
 ; ==============================================================================================
-AIAircraft_SpawnAndConditionalLoadProfile_53363	proc far		; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+3D2p
+AIAircraft_SpawnAndConditionalLoadProfile_53363	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3D2p
 
 var_26		= dword	ptr -26h
 var_22		= dword	ptr -22h
@@ -5888,7 +5983,7 @@ loc_53533:				; CODE XREF: Expr_VM_OpcodeHelperA_53504+18j
 		lea	ax, [bp+var_12]
 		push	ax
 		push	59CDh
-		call	Kneeboard_FindByID
+		call	EntityTracker_FindByID
 		add	sp, 6
 		mov	bx, ax
 		mov	dx, [bx+0Eh]
@@ -5896,7 +5991,7 @@ loc_53533:				; CODE XREF: Expr_VM_OpcodeHelperA_53504+18j
 		jz	short loc_53583
 		push	dx
 		push	59CDh
-		call	Kneeboard_ApplySelection
+		call	EntityTracker_ApplySelection
 		add	sp, 4
 
 loc_53583:				; CODE XREF: Expr_VM_OpcodeHelperA_53504+71j
@@ -5915,7 +6010,7 @@ Expr_VM_OpcodeHelperA_53504	endp
 ; exécution VM (Expr_VM_Execute_51E7E) et test de portée (sub_378CA, déjà vu en seg109 pour le
 ; trigger d'effet).
 ; ==============================================================================================
-Expr_Node_EvaluateVisibility_53586	proc far		; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+18Bp
+Expr_Node_EvaluateVisibility_53586	proc far		; CODE XREF: MAIN_GAME_TICK+18Bp
 
 var_3C		= word ptr -3Ch
 var_30		= dword	ptr -30h
@@ -5992,7 +6087,7 @@ loc_535F2:
 		push	cs
 
 loc_535FA:
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
@@ -6129,13 +6224,17 @@ Expr_Node_EvaluateVisibility_53586	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 242 lignes, NON DÉTAILLÉE — relie un widget à ses champs calculés
-; (Expr_Node_RecomputeFieldB_531F2, Expr_Node_RefreshField_52E51,
-; Expr_Node_StoreResultVector_52C9C) et appelle directement UIScreen_StateMachineMain_4FBF1
-; (seg112) et Expr_Node_EvaluateVisibility_53586. Pièce centrale du lien widget ↔ VM
-; d'expression.
+; far, 241 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE (echange
+; avec sub_4FBF1) : c'est ELLE le vrai point d'entree par frame — orchestre entree clavier
+; joueur (espace/slash), mise a jour de formation/groupe de mission (appelle
+; MissionFormation_HandleGroupSelectionChange_532EA directement), rafraichissement du graphe
+; d'expression (Expr_Node_RefreshField), ET delegue au sous-systeme combat/cible via l'appel a
+; sub_4FBF1 (desormais nommee separement, PAS 'MAIN_GAME_TICK'). Appelee une fois par
+; iteration de Simulator_MainLoop, sur un objet FIXE (si, jamais reassigne). C'est la fonction
+; qui merite le nom 'tick principal' car elle touche IA/joueur/rendu, meme via des appels
+; separes — une fonction qui ne gere pas l'IA ne peut pas etre le tick principal.
 ; ==============================================================================================
-UIScreen_ConstructWidgetBinding_536F7	proc far		; CODE XREF: UIScreen_Construct_53896+103p
+MAIN_GAME_TICK	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+103p
 
 var_12		= dword	ptr -12h
 var_C		= dword	ptr -0Ch
@@ -6159,10 +6258,10 @@ loc_536FA:
 		jmp	short loc_53715
 ; ���������������������������������������������������������������������������
 
-loc_53713:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+13j
+loc_53713:				; CODE XREF: MAIN_GAME_TICK+13j
 		xor	ax, ax
 
-loc_53715:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+1Aj
+loc_53715:				; CODE XREF: MAIN_GAME_TICK+1Aj
 		cmp	ax, 20h	; ' '
 		jz	short loc_53722
 		cmp	ax, 2Fh	; '/'
@@ -6170,7 +6269,7 @@ loc_53715:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+1Aj
 		jmp	loc_537D8
 ; ���������������������������������������������������������������������������
 
-loc_53722:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+21j
+loc_53722:				; CODE XREF: MAIN_GAME_TICK+21j
 		cmp	byte_722D0, 1
 		jnz	short loc_53739
 		test	byte_722D3, 30h
@@ -6179,35 +6278,35 @@ loc_53722:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+21j
 		jmp	short loc_53737
 ; ���������������������������������������������������������������������������
 
-loc_53735:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+37j
+loc_53735:				; CODE XREF: MAIN_GAME_TICK+37j
 		xor	ax, ax
 
-loc_53737:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+3Cj
+loc_53737:				; CODE XREF: MAIN_GAME_TICK+3Cj
 		jmp	short loc_5374E
 ; ���������������������������������������������������������������������������
 
-loc_53739:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+30j
+loc_53739:				; CODE XREF: MAIN_GAME_TICK+30j
 		cmp	byte_72DE5, 1
 		jz	short loc_53747
 		cmp	byte_72E1D, 1
 		jnz	short loc_5374C
 
-loc_53747:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+47j
+loc_53747:				; CODE XREF: MAIN_GAME_TICK+47j
 		mov	ax, 1
 		jmp	short loc_5374E
 ; ���������������������������������������������������������������������������
 
-loc_5374C:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+4Ej
+loc_5374C:				; CODE XREF: MAIN_GAME_TICK+4Ej
 		xor	ax, ax
 
-loc_5374E:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7:loc_53737j
-					; UIScreen_ConstructWidgetBinding_536F7+53j
+loc_5374E:				; CODE XREF: MAIN_GAME_TICK:loc_53737j
+					; MAIN_GAME_TICK+53j
 		or	al, al
 		jnz	short loc_53755
 		jmp	loc_537D8
 ; ���������������������������������������������������������������������������
 
-loc_53755:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+59j
+loc_53755:				; CODE XREF: MAIN_GAME_TICK+59j
 		cmp	byte_6E33C, 0
 		jz	short loc_537D8
 		cmp	word_722E6, 0
@@ -6219,7 +6318,7 @@ loc_53755:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+59j
 		jmp	short loc_537D8
 ; ���������������������������������������������������������������������������
 
-loc_53773:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+26j
+loc_53773:				; CODE XREF: MAIN_GAME_TICK+26j
 		cmp	byte_722D0, 1
 		jnz	short loc_5378A
 		test	byte_722D3, 0C0h
@@ -6228,29 +6327,29 @@ loc_53773:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+26j
 		jmp	short loc_53788
 ; ���������������������������������������������������������������������������
 
-loc_53786:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+88j
+loc_53786:				; CODE XREF: MAIN_GAME_TICK+88j
 		xor	ax, ax
 
-loc_53788:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+8Dj
+loc_53788:				; CODE XREF: MAIN_GAME_TICK+8Dj
 		jmp	short loc_5379F
 ; ���������������������������������������������������������������������������
 
-loc_5378A:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+81j
+loc_5378A:				; CODE XREF: MAIN_GAME_TICK+81j
 		cmp	byte_72E00, 1
 		jz	short loc_53798
 		cmp	byte_72E21, 1
 		jnz	short loc_5379D
 
-loc_53798:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+98j
+loc_53798:				; CODE XREF: MAIN_GAME_TICK+98j
 		mov	ax, 1
 		jmp	short loc_5379F
 ; ���������������������������������������������������������������������������
 
-loc_5379D:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+9Fj
+loc_5379D:				; CODE XREF: MAIN_GAME_TICK+9Fj
 		xor	ax, ax
 
-loc_5379F:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7:loc_53788j
-					; UIScreen_ConstructWidgetBinding_536F7+A4j
+loc_5379F:				; CODE XREF: MAIN_GAME_TICK:loc_53788j
+					; MAIN_GAME_TICK+A4j
 		or	al, al
 		jz	short loc_537D8
 		push	si
@@ -6270,8 +6369,8 @@ loc_5379F:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7:loc_53788j
 		call	VROOMM_StubThunk_6AEF3
 		add	sp, 0Ch
 
-loc_537D8:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+28j
-					; UIScreen_ConstructWidgetBinding_536F7+5Bj ...
+loc_537D8:				; CODE XREF: MAIN_GAME_TICK+28j
+					; MAIN_GAME_TICK+5Bj ...
 		call	PIT_ReadHighPrecision
 		push	dx
 		push	ax
@@ -6292,10 +6391,10 @@ loc_537F7:
 
 loc_537FA:
 		push	cs
-		call	near ptr Expr_Node_RecomputeFieldB_531F2
+		call	near ptr Scene_TriggerLeavingEvent_531F2
 		pop	cx
 
-loc_537FF:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+FEj
+loc_537FF:				; CODE XREF: MAIN_GAME_TICK+FEj
 		push	word ptr [si+50h]
 
 loc_53802:
@@ -6315,7 +6414,7 @@ loc_53807:
 		jmp	short loc_5383D
 ; ���������������������������������������������������������������������������
 
-loc_53820:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7:loc_53807j
+loc_53820:				; CODE XREF: MAIN_GAME_TICK:loc_53807j
 		mov	eax, dword_707F8
 		mov	[bp+var_C], eax
 		mov	eax, dword_707FC
@@ -6325,36 +6424,36 @@ loc_53820:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7:loc_53807j
 		mov	dx, ss
 		lea	ax, [bp+var_C]
 
-loc_5383D:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+127j
+loc_5383D:				; CODE XREF: MAIN_GAME_TICK+127j
 		lea	ax, [bp+var_C]
 		push	ax
 		mov	ax, si
 		add	ax, 3Ah	; ':'
 		push	ax
 		push	cs
-		call	near ptr Expr_Node_RecomputeAllFields_532EA
+		call	near ptr Scene_DetectAndActivateChange_532EA
 		add	sp, 6
 		mov	[si+50h], ax
 		cmp	word ptr [si+50h], 0
 		jz	short loc_5385F
 		push	word ptr [si+50h]
 		push	cs
-		call	near ptr Expr_Node_RecomputeFieldB_531F2
+		call	near ptr Scene_TriggerLeavingEvent_531F2
 		pop	cx
 
-loc_5385F:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+15Ej
+loc_5385F:				; CODE XREF: MAIN_GAME_TICK+15Ej
 		mov	ax, si
 		add	ax, 34h	; '4'
 		push	ax
 		push	cs
-		call	near ptr Expr_Node_RefreshField_52E51
+		call	near ptr PartEntry_DispatchMissionUpdateTick_52E51
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx
 		push	ax
 		pop	eax
 		mov	dword_72BDA, eax
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_53891
 		push	si
@@ -6368,15 +6467,15 @@ loc_5385F:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+15Ej
 		jmp	short loc_53893
 ; ���������������������������������������������������������������������������
 
-loc_53891:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+187j
-					; UIScreen_ConstructWidgetBinding_536F7+193j
+loc_53891:				; CODE XREF: MAIN_GAME_TICK+187j
+					; MAIN_GAME_TICK+193j
 		xor	ax, ax
 
-loc_53893:				; CODE XREF: UIScreen_ConstructWidgetBinding_536F7+198j
+loc_53893:				; CODE XREF: MAIN_GAME_TICK+198j
 		pop	si
 		leave
 		retf
-UIScreen_ConstructWidgetBinding_536F7	endp
+MAIN_GAME_TICK	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -6384,12 +6483,18 @@ UIScreen_ConstructWidgetBinding_536F7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 254 lignes, NON DÉTAILLÉE — construction complète d'un écran : alloue/configure des
-; ressources, appelle UIScreen_ApplyFormFields_500F6 (seg112) et
-; UIScreen_ConstructWidgetBinding_536F7. Référencée depuis seg014. Probable point d'entrée
-; "ouvrir cet écran".
+; far, 254 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE TROIS
+; FOIS : d'abord 'UIScreen_Construct' (faux), puis 'Simulator_MainLoop', puis
+; 'STRIKE_EXE_MAIN_LOOP' (nom final, propose par Remi) — c'est LA BOUCLE PRINCIPALE DE TOUT
+; L'EXECUTABLE, confirme par lecture directe : loc_538A1 (debut de boucle) est la cible d'un
+; jmp loc_538A1 explicite, avec sortie conditionnelle sur byte_706AF==6. A CHAQUE ITERATION,
+; EN SEQUENCE (pas en parallele) : appelle MAIN_GAME_TICK_536F7 (gestion clavier + formation +
+; scenes), PUIS MissionScenario_RecomputeFields_A9382 (declenche
+; Scene_TriggerMissionUpdateEvent sur +0x4E/+0x50, verifie une condition de fin de mission,
+; peut poser byte_706AF=5). Appelee une seule fois depuis Program_InitVideoFontArgs_14279, qui
+; lui-meme ne boucle jamais.
 ; ==============================================================================================
-UIScreen_Construct_53896	proc far		; CODE XREF: Program_InitVideoFontArgs+214P
+STRIKE_EXE_MAIN_LOOP	proc far		; CODE XREF: Program_InitVideoFontArgs+214P
 
 var_E		= word ptr -0Eh
 var_C		= dword	ptr -0Ch
@@ -6406,7 +6511,7 @@ arg_0		= word ptr  6
 		push	di
 		mov	si, [bp+arg_0]
 
-loc_538A1:				; CODE XREF: UIScreen_Construct_53896+12Bj
+loc_538A1:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+12Bj
 		mov	byte_706AF, 0
 		call	VROOMM_StubThunk_6CDD7
 		mov	al, byte_706A2
@@ -6417,7 +6522,7 @@ loc_538A1:				; CODE XREF: UIScreen_Construct_53896+12Bj
 		jmp	loc_53997
 ; ���������������������������������������������������������������������������
 
-loc_538BA:				; CODE XREF: UIScreen_Construct_53896+112j
+loc_538BA:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+112j
 		call	UIScreen_ApplyFormFields_500F6
 		cmp	byte_6E4B4, 0
 		jz	short loc_53901
@@ -6446,11 +6551,11 @@ loc_538F6:
 		jmp	loc_539AB
 ; ���������������������������������������������������������������������������
 
-loc_538FC:				; CODE XREF: UIScreen_Construct_53896+46j
+loc_538FC:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+46j
 		mov	byte_6E4B4, 0
 
-loc_53901:				; CODE XREF: UIScreen_Construct_53896+2Ej
-					; UIScreen_Construct_53896+4Fj
+loc_53901:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+2Ej
+					; STRIKE_EXE_MAIN_LOOP+4Fj
 		cmp	byte_6E4B8, 0
 		jz	short loc_53966
 		mov	byte_6E4B4, 1
@@ -6466,7 +6571,7 @@ loc_53901:				; CODE XREF: UIScreen_Construct_53896+2Ej
 		jmp	loc_539AB
 ; ���������������������������������������������������������������������������
 
-loc_53927:				; CODE XREF: UIScreen_Construct_53896+8Cj
+loc_53927:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+8Cj
 		cmp	byte_706AF, 0
 		jnz	short loc_539AB
 		mov	byte_706AF, 2
@@ -6477,7 +6582,7 @@ loc_53927:				; CODE XREF: UIScreen_Construct_53896+8Cj
 		jmp	short loc_539AB
 ; ���������������������������������������������������������������������������
 
-loc_53942:				; CODE XREF: UIScreen_Construct_53896+83j
+loc_53942:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+83j
 		mov	al, byte_6E345
 		mov	ah, 0
 		or	ax, ax
@@ -6492,7 +6597,7 @@ loc_53942:				; CODE XREF: UIScreen_Construct_53896+83j
 		jmp	short loc_539AB
 ; ���������������������������������������������������������������������������
 
-loc_53966:				; CODE XREF: UIScreen_Construct_53896+70j
+loc_53966:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+70j
 		cmp	byte_6E4B9, 0
 		jz	short loc_53997
 		push	1
@@ -6508,21 +6613,21 @@ loc_53966:				; CODE XREF: UIScreen_Construct_53896+70j
 		jmp	short loc_53988
 ; ���������������������������������������������������������������������������
 
-loc_53986:				; CODE XREF: UIScreen_Construct_53896+E3j
+loc_53986:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+E3j
 		mov	ax, di
 
-loc_53988:				; CODE XREF: UIScreen_Construct_53896+EEj
+loc_53988:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+EEj
 		mov	[bp+var_E], ax
 		push	ax
 		call	CRT_FreeNear_Wrap
 		pop	cx
 		mov	byte_6E4B9, 0
 
-loc_53997:				; CODE XREF: UIScreen_Construct_53896+21j
-					; UIScreen_Construct_53896+D5j
+loc_53997:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+21j
+					; STRIKE_EXE_MAIN_LOOP+D5j
 		push	si
 		push	cs
-		call	near ptr UIScreen_ConstructWidgetBinding_536F7
+		call	near ptr MAIN_GAME_TICK
 		pop	cx
 		or	al, al
 		jz	short loc_539AB
@@ -6531,8 +6636,8 @@ loc_53997:				; CODE XREF: UIScreen_Construct_53896+21j
 		jmp	loc_538BA
 ; ���������������������������������������������������������������������������
 
-loc_539AB:				; CODE XREF: UIScreen_Construct_53896+63j
-					; UIScreen_Construct_53896+8Ej ...
+loc_539AB:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+63j
+					; STRIKE_EXE_MAIN_LOOP+8Ej ...
 		push	0
 		call	Video_SetHorizontalShake
 		pop	cx
@@ -6544,7 +6649,7 @@ loc_539AB:				; CODE XREF: UIScreen_Construct_53896+63j
 		jmp	loc_538A1
 ; ���������������������������������������������������������������������������
 
-loc_539C4:				; CODE XREF: UIScreen_Construct_53896+122j
+loc_539C4:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+122j
 		cmp	word ptr [si+4Eh], 0
 		jz	short loc_539E4
 		push	large 0
@@ -6558,11 +6663,11 @@ loc_539D4:
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_539E4:				; CODE XREF: UIScreen_Construct_53896+132j
+loc_539E4:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+132j
 		mov	al, [si+0A1h]
 		mov	[bp+var_1], al
 		cmp	[bp+var_1], 0
@@ -6573,7 +6678,7 @@ loc_539F1:
 		mov	eax, [bp+var_6]
 		add	dword_706AB, eax
 
-loc_53A02:				; CODE XREF: UIScreen_Construct_53896+159j
+loc_53A02:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+159j
 		cmp	word ptr [si+4Eh], 0
 		jz	short loc_53A22
 		push	large 0
@@ -6583,11 +6688,11 @@ loc_53A02:				; CODE XREF: UIScreen_Construct_53896+159j
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_53A22:				; CODE XREF: UIScreen_Construct_53896+170j
+loc_53A22:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+170j
 		mov	al, [si+0AFh]
 		mov	[bp+var_7], al
 		cmp	[bp+var_7], 0
@@ -6601,36 +6706,36 @@ loc_53A22:				; CODE XREF: UIScreen_Construct_53896+170j
 		add	ax, 40h	; '@'
 		push	ax
 		push	cs
-		call	near ptr Expr_VM_Execute_51E7E
+		call	near ptr Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_53A4F:				; CODE XREF: UIScreen_Construct_53896+19Dj
+loc_53A4F:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+19Dj
 		cmp	word ptr [si+0A1h], 0
 		jnz	short loc_53A5D
 		cmp	word ptr [si+0AFh], 0
 		jz	short loc_53A62
 
-loc_53A5D:				; CODE XREF: UIScreen_Construct_53896+1BEj
+loc_53A5D:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1BEj
 		mov	ax, 1
 		jmp	short loc_53A64
 ; ���������������������������������������������������������������������������
 
-loc_53A62:				; CODE XREF: UIScreen_Construct_53896+1C5j
+loc_53A62:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1C5j
 		xor	ax, ax
 
-loc_53A64:				; CODE XREF: UIScreen_Construct_53896+1CAj
+loc_53A64:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1CAj
 		mov	[bp+var_8], al
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_53A7E
 
-loc_53A6D:				; CODE XREF: UIScreen_Construct_53896+197j
+loc_53A6D:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+197j
 		mov	[bp+var_C], 6400h
 		mov	eax, [bp+var_C]
 		sub	dword_706AB, eax
 
-loc_53A7E:				; CODE XREF: UIScreen_Construct_53896+1D5j
+loc_53A7E:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1D5j
 		push	si
 		call	VROOMM_StubThunk_6CE5B
 		pop	cx
@@ -6642,7 +6747,7 @@ loc_53A7E:				; CODE XREF: UIScreen_Construct_53896+1D5j
 		pop	si
 		leave
 		retf
-UIScreen_Construct_53896	endp
+STRIKE_EXE_MAIN_LOOP	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -8160,8 +8265,8 @@ AI_ResolveNodePosition_54274	endp
 ; far, accesseur du nœud actuellement sélectionné/en focus (chaîne globale
 ; word_706A0→+0x54→+0x52).
 ; ==============================================================================================
-Expr_Node_GetFocusedNode_543BA	proc far		; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+96p
-					; GeomNode_BuildOrRefreshCluster_51EDC+EEp
+Expr_Node_GetFocusedNode_543BA	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+96p
+					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+EEp
 		push	bp
 		mov	bp, sp
 		mov	bx, word_706A0
@@ -8358,7 +8463,7 @@ Expr_Node_AllocateTriple_543CA	endp
 ; far, orchestrateur appelant Expr_Node_CountSelectedInTable_54043 puis
 ; Expr_Node_TableOperationB_540B2 — appelée par Expr_Node_RecomputeAllFields_532EA.
 ; ==============================================================================================
-Expr_Node_UpdateSelectionCounters_544DC	proc far		; CODE XREF: Expr_Node_RecomputeAllFields_532EA+3Bp
+Expr_Node_UpdateSelectionCounters_544DC	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+3Bp
 		push	bp
 		mov	bp, sp
 		push	cs
@@ -8561,7 +8666,7 @@ loc_54648:				; CODE XREF: UIScreen_RenderOrLayoutList_54503+FDj
 		add	ax, 3Ah	; ':'
 		push	ax
 		push	cs
-		call	near ptr Expr_Node_GetOrRecompute_53236
+		call	near ptr Scene_FindMatchingByAreaContainment_53236
 		add	sp, 4
 		mov	[bp+var_20], ax
 		mov	word ptr [bp-22h], 1

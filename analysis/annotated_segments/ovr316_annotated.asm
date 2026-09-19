@@ -234,7 +234,7 @@ loc_9DA6D:
 		mov	ax, [bx+2]
 		add	ax, 40h	; '@'
 		push	ax
-		call	Expr_VM_Execute_51E7E
+		call	Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
@@ -407,7 +407,7 @@ loc_9DBEE:
 		push	59CDh
 
 loc_9DBF1:
-		call	Kneeboard_SelectByStateCode
+		call	EntityTracker_SelectByStateCode
 
 loc_9DBF6:
 		add	sp, 4

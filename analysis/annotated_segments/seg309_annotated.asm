@@ -254,7 +254,7 @@ VROOMM_StubThunk_6C3D5	endp
 ; far, thunk fixe VROOMM (jmp sub_9EFBE) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C3DA	proc far		; CODE XREF: GeomNode_BuildOrRefreshCluster_51EDC+4BBP
+VROOMM_StubThunk_6C3DA	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+4BBP
 		jmp	PlayerComponent_ConstructFromStream_9EFBE
 VROOMM_StubThunk_6C3DA	endp
 

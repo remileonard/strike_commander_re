@@ -83,7 +83,7 @@ VROOMM_StubThunk_6AFC4	endp
 ; far, thunk fixe VROOMM (jmp sub_82C2E) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34.
 ; ==============================================================================================
-VROOMM_StubThunk_6AFC9	proc far		; CODE XREF: Kneeboard_RenderEntry+104P
+VROOMM_StubThunk_6AFC9	proc far		; CODE XREF: EntityTracker_RenderEntry+104P
 		jmp	HUDSymbol_ConstructVariantC_82C2E
 VROOMM_StubThunk_6AFC9	endp
 
@@ -187,7 +187,7 @@ VROOMM_StubThunk_6AFEC	endp
 ; far, thunk fixe VROOMM (jmp sub_8383D) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34.
 ; ==============================================================================================
-VROOMM_StubThunk_6AFF1	proc far		; CODE XREF: Kneeboard_RenderEntry+E4P
+VROOMM_StubThunk_6AFF1	proc far		; CODE XREF: EntityTracker_RenderEntry+E4P
 		jmp	HUDSymbol_ConstructVariantE_8383D
 VROOMM_StubThunk_6AFF1	endp
 
@@ -291,7 +291,7 @@ VROOMM_StubThunk_6B014	endp
 ; far, thunk fixe VROOMM (jmp sub_83C4D) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34.
 ; ==============================================================================================
-VROOMM_StubThunk_6B019	proc far		; CODE XREF: Kneeboard_RenderEntry+124P
+VROOMM_StubThunk_6B019	proc far		; CODE XREF: EntityTracker_RenderEntry+124P
 		jmp	HUDSymbol_ConstructVariantG_83C4D
 VROOMM_StubThunk_6B019	endp
 
@@ -395,7 +395,7 @@ VROOMM_StubThunk_6B03C	endp
 ; far, thunk fixe VROOMM (jmp sub_847DB) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34.
 ; ==============================================================================================
-VROOMM_StubThunk_6B041	proc far		; CODE XREF: Kneeboard_RenderEntry+144P
+VROOMM_StubThunk_6B041	proc far		; CODE XREF: EntityTracker_RenderEntry+144P
 		jmp	HUDSymbol_ConstructVariantI_847DB
 VROOMM_StubThunk_6B041	endp
 

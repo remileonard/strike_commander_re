@@ -592,7 +592,7 @@ loc_75C94:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
 		push	ds
 		push	offset aLanding	; "LANDING"
 		push	59CDh
-		call	Kneeboard_SelectByID
+		call	EntityTracker_SelectByID
 		add	sp, 6
 		jmp	loc_75D42
 ; ���������������������������������������������������������������������������
@@ -2058,7 +2058,7 @@ loc_76B75:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+339j
 		mov	ax, [bx+2]
 		add	ax, 40h	; '@'
 		push	ax
-		call	Expr_VM_Execute_51E7E
+		call	Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 

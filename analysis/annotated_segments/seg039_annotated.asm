@@ -717,7 +717,7 @@ Container_NotifyAllActive	endp
 ; far,31L — remet à zéro 8 compteurs globaux (table 0x5B06) puis appelle sub_221F2 :
 ; réinitialisation périodique + déclenchement du nettoyage du conteneur (garbage collection).
 ; ==============================================================================================
-WorldObjects_PeriodicGC	proc far		; CODE XREF: UIScreen_StateMachineMain_4FBF1+43BP
+WorldObjects_PeriodicGC	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+43BP
 
 arg_0		= word ptr  6
 
@@ -937,7 +937,7 @@ WorldObjects_PurgeExpired	endp
 ; far,41L — (cluster conteneur, taille compatible avec un accesseur ou insertion) — même
 ; famille que sub_2204C, non détaillée.
 ; ==============================================================================================
-Container_Op_22320	proc far		; CODE XREF: UIScreen_StateMachineMain_4FBF1+46AP
+Container_Op_22320	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+46AP
 
 var_2		= word ptr -2
 arg_0		= word ptr  6

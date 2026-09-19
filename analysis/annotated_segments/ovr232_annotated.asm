@@ -2385,7 +2385,7 @@ loc_7964C:				; CODE XREF: CameraScript_ExecuteCOMP_781D0:loc_78923j
 		lea	ax, [bp+var_A2]
 		push	ax
 		push	59CDh
-		call	Kneeboard_FindByID
+		call	EntityTracker_FindByID
 		add	sp, 6
 		mov	bx, ax
 		or	bx, bx

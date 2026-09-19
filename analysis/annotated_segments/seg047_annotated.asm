@@ -83,8 +83,8 @@ loc_26F74:				; DATA XREF: TextRenderer_Main+976o
 ; (sub_286D2, byte_722D1) selon plusieurs flags de mode (byte_722D0/D3) : lecture de
 ; paramètres de configuration/calibration selon le mode d'affichage/contrôleur actif.
 ; ==============================================================================================
-Config_ReadCalibration	proc far		; CODE XREF: UIScreen_StateMachineMain_4FBF1+DP
-					; UIScreen_StateMachineMain_4FBF1:loc_4FE47P	...
+Config_ReadCalibration	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+DP
+					; CombatTarget_WeaponActionSubsystem:loc_4FE47P	...
 
 var_7		= byte ptr -7
 var_6		= word ptr -6

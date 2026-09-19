@@ -2895,7 +2895,7 @@
 "sub_5F508"
 ],
 "new_name": "Program_InitVideoFontArgs",
-"summary": "far,289L — **appelée directement depuis `start`** (init programme). Charge la police 'SM-FONT.SHP' (dossier FONTS), configure la palette/mode vidéo selon la mémoire disponible (word_6D140 vs seuil 0x800h), puis parse les arguments de ligne de commande caractère par caractère (flags '+G'/'-G', '+S'/'-S' détectés via sub_E4B) : **initialisation programme (vidéo/police) + parseur d'arguments de ligne de commande.**"
+"summary": "far, 289 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi, correction d'une erreur de conclusion precedente). Charge la police 'SM-FONT.SHP', configure la palette/mode video selon la memoire disponible, parse les arguments de ligne de commande (flags +G/-G, +S/-S). Appelle UIScreen_Construct_53896 UNE SEULE FOIS puis retourne (retf) — AUCUNE boucle dans cette fonction elle-meme. La boucle principale du jeu vit dans UIScreen_Construct, pas ici — erreur initialement commise en confondant chaine d'appel statique et frequence d'execution reelle."
 },
 "sub_144E5": {
 "segment": "seg013",
@@ -4762,8 +4762,8 @@
 "sub_658",
 "sub_2AFB5"
 ],
-"new_name": "Kneeboard_EntryConstructObj",
-"summary": "far,53L — constructeur d'une entrée de journal de mission (type 0x119C, priorité 2) référençant une cible (di) et son nom (vtable[0x14]) : **création d'une entrée de kneeboard/log de mission liée à un objet.**"
+"new_name": "EntityTracker_EntryConstructObj",
+"summary": "far, 52L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryConstructObj'). Construit une entree de 26 octets (tag final 0x119C, voisin du tag du gestionnaire 0x1198), stocke une reference directe a l'objet suivi (+0xE), appelle son vtable+0x14 (meme slot 'etat' qu'EntityTracker_ApplySelection), et copie 8 octets depuis objet+0x53 (position ou identifiant, a confirmer) dans les champs +5/+9 utilises comme cle de recherche par EntityTracker_FindByID."
 },
 "sub_23497": {
 "segment": "seg041",
@@ -4780,8 +4780,8 @@
 "sub_5C832",
 "sub_2E74"
 ],
-"new_name": "Kneeboard_EntryConstructText",
-"summary": "far,103L — variante de sub_2341F construisant une entrée de journal à partir d'un texte brut (via sub_5C6F3, constructeur String) plutôt que d'une référence d'objet : **création d'une entrée de kneeboard/log de mission avec message texte libre.**"
+"new_name": "EntityTracker_EntryConstructText",
+"summary": "far, 102L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryConstructText'). Meme tag final (0x119C) que EntryConstructObj. Lit du texte/donnees depuis un enregistrement ressource (ResourceRecord_ReadFieldGroupA), pose +0xE=0 (aucun objet lie, confirme le sens de ce champ comme discriminant texte/objet)."
 },
 "sub_23593": {
 "segment": "seg041",
@@ -4813,8 +4813,8 @@
 "sub_6AC3E",
 "sub_5C832"
 ],
-"new_name": "Kneeboard_RenderEntry",
-"summary": "far,265L — **switch à 20 cas** sur un code de message (+4), chaque cas formate un texte (sub_5C832 et alentours) dans un buffer de 0x80 octets : **moteur de rendu des messages du journal de mission/kneeboard, un cas par type d'événement.** || case 0x13 = objet caméra COMP (2026-08-30) : chaque case du switch (codes de type CAMR : CHAS=3/CKPT=4/VICT=7/ROTA=8/TARG=9/WEAP=0xB/COMP=0x13) mappe le payload brut ([entry+0x10], len [entry+0x16]) puis appelle un constructeur d'objet type-spécifique via stub (0x03->6B116, 0x07->6AFC9, 0x08->6B019, 0x09->6B041, 0x0B->6AF6C, 0x13->6AC3E=AIManeuver_LoadFormationDataB_77FCA). L'objet construit est mémorisé dans [entry+0x0E]. Pour COMP (0x13) : en plus, [obj+0x80]=payload+0x1C (début script keyframe), [obj+0x86]=payloadLen-0x1C. Voir DATA_MODEL.md §6.6b b-bis."
+"new_name": "EntityTracker_RenderEntry",
+"summary": "far, 264L, LUE INTEGRALEMENT — DECOUVERTE MAJEURE. RENOMMEE (ancien 'Kneeboard_RenderEntry'). VRAI SWITCH A 20 CAS (0x0-0x13) sur le code de type ([entree+4]). Pour chaque cas : alloue un objet de 0x80 (128) octets, appelle un stub VROOMM DIFFERENT par cas (construction d'un widget/objet de ce type precis), pose le resultat comme objet lie de l'entree (+0xE). CONFIRME : ce systeme construit dynamiquement 20 types differents d'objets a partir d'une ressource — pas un simple rendu de texte. CE QUE CES 20 TYPES REPRESENTENT REELEMENT N'EST PAS VERIFIE (aucun des 20 stubs VROOMM n'a ete lu) ; ne pas assumer 'widget UI' sans lecture. Appelee depuis Mission_TriggerEvaluator."
 },
 "sub_237AC": {
 "segment": "seg041",
@@ -4823,8 +4823,8 @@
 "lines": 55,
 "type": "far",
 "calls": [],
-"new_name": "Kneeboard_EntryDestruct",
-"summary": "far,55L — décrémente une référence sur la cible associée (+0xE, vtable[4]/[0]) puis notifie sa destruction (vtable[0xC], code 3) si nécessaire : **destructeur d'entrée de journal avec libération de référence à la cible.**"
+"new_name": "EntityTracker_EntryDestruct",
+"summary": "far, 54L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryDestruct'). Si un objet est lie (+0xE) et son bit +0x52.0 est actif, appelle [+0x50->vtable+4] (arret) puis [+0x50->vtable+0xC](param=3) (notification de detachement) ; detache la reference (+0xE=0) sans liberer la structure elle-meme. Appelee aussi depuis Mission_TriggerEvaluator."
 },
 "sub_23801": {
 "segment": "seg041",
@@ -4835,8 +4835,8 @@
 "calls": [
 "sub_5C7B6"
 ],
-"new_name": "Kneeboard_EntryDestructFull",
-"summary": "far,64L — variante de sub_237AC libérant en plus la chaîne de texte associée (+0x10 via sub_5C7B6) : **destructeur complet d'entrée de journal (référence cible + texte).**"
+"new_name": "EntityTracker_EntryDestructFull",
+"summary": "far, 63L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryDestructFull'). Meme detachement que EntryDestruct, PLUS libere la ressource associee (+0x10) si possedee (+0x15), via Memory_TypedFree_5C7B6."
 },
 "sub_2387E": {
 "segment": "seg041",
@@ -4848,8 +4848,8 @@
 "sub_2341F",
 "sub_5F57F"
 ],
-"new_name": "Kneeboard_AddEntryObj",
-"summary": "far,28L — construit une entrée liée à un objet (sub_2341F) et l'ajoute à la liste (sub_5F57F) : **ajout d'une entrée de journal référencée dans le journal de mission.**"
+"new_name": "EntityTracker_AddEntryObj",
+"summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_AddEntryObj', ancien nom d'appelant 'Cinematic_LoadCameraDef' egalement a reconsiderer). Construit une entree via EntityTracker_EntryConstructObj puis l'insere en queue de liste (LinkedListB_InsertAtTail_5F57F)."
 },
 "sub_238A4": {
 "segment": "seg041",
@@ -4861,8 +4861,8 @@
 "sub_23497",
 "sub_5F57F"
 ],
-"new_name": "Kneeboard_AddEntryText",
-"summary": "far,28L — construit une entrée texte libre (sub_23497) et l'ajoute à la liste (sub_5F57F) : **ajout d'une entrée de journal texte dans le journal de mission.**"
+"new_name": "EntityTracker_AddEntryText",
+"summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_AddEntryText'). Construit une entree texte via EntityTracker_EntryConstructText puis l'insere en queue de liste."
 },
 "sub_238CE": {
 "segment": "seg041",
@@ -4873,8 +4873,8 @@
 "calls": [
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_FindByID",
-"summary": "far,60L — recherche une entrée par une paire de champs 32-bit (comparaison à un identifiant composite) : **recherche d'entrée de journal par identifiant (probable ID de mission/objectif).**"
+"new_name": "EntityTracker_FindByID",
+"summary": "far, 60L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_FindByID'). Parcourt une liste chainee (LinkedListB_Helper_5F6A9), comparant un identifiant de 8 octets (deux dwords, +5/+9 de chaque noeud) a celui recherche. Retourne le noeud correspondant ou 0."
 },
 "sub_23994": {
 "segment": "seg041",
@@ -4886,8 +4886,8 @@
 "sub_23593",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_FindByIDContinue",
-"summary": "far,73L — variante de sub_238CE avec traitement supplémentaire si trouvé (référence +0xE) : **recherche d'entrée de journal par identifiant, avec suite de traitement.**"
+"new_name": "EntityTracker_FindByIDContinue",
+"summary": "far, 73L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_FindByIDContinue'). Identique a FindByID, mais si l'entree trouvee n'a pas d'objet lie (+0xE==0, entree texte), l'affiche immediatement (EntityTracker_RenderEntry) ; retourne l'objet lie ou 0."
 },
 "sub_239FE": {
 "segment": "seg041",
@@ -4899,8 +4899,8 @@
 "sub_23593",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_RenderByCode",
-"summary": "far,54L — parcourt les entrées, formate (sub_23593) celle dont le code (+4) correspond et n'a pas encore de rendu (+0xE==0) : **rendu à la demande d'une entrée de journal par code (lazy rendering).**"
+"new_name": "EntityTracker_RenderByCode",
+"summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RenderByCode'). Parcourt la liste, pour chaque entree dont [+4]==code demande ET sans objet lie (+0xE==0), l'affiche (RenderEntry). Appelee depuis Radar_TargetTypeFilter et Mission_PlayerEventHandler."
 },
 "sub_23AE5": {
 "segment": "seg041",
@@ -4911,8 +4911,8 @@
 "calls": [
 "sub_23B23"
 ],
-"new_name": "Kneeboard_ClearShortcut",
-"summary": "far,17L — wrapper trivial vers sub_23B23 : **vidage du journal de mission (raccourci).**"
+"new_name": "EntityTracker_ClearShortcut",
+"summary": "far, 17L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearShortcut'). Simple relais vers EntityTracker_ClearAll. Appelee depuis MissionLoader_AssignUnitRosterB_A7E3B (affectation d'unites de mission)."
 },
 "sub_23AF4": {
 "segment": "seg041",
@@ -4923,8 +4923,8 @@
 "calls": [
 "sub_23C4F"
 ],
-"new_name": "Kneeboard_Init",
-"summary": "far,28L — initialise les champs du journal (compteur, sélection, page=0x14) et appelle sub_23C4F : **initialisation/reset du journal de mission au démarrage.**"
+"new_name": "EntityTracker_Init",
+"summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_Init'). Initialise les champs de selection (+0xF/+0x11/+0x12/+0x14) puis appelle EntityTracker_SelectByID(self, self+6) — auto-selection par son propre nom embarque. Appelee depuis MissionLoader_QueryAndReleaseAttribute_A7F3A."
 },
 "sub_23B23": {
 "segment": "seg041",
@@ -4936,8 +4936,8 @@
 "sub_237AC",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_ClearAll",
-"summary": "far,33L — parcourt toutes les entrées et les détruit (sub_237AC), vide le compteur de sélection : **vidage complet du journal de mission.**"
+"new_name": "EntityTracker_ClearAll",
+"summary": "far, 32L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearAll'). Parcourt toute la liste, detruit chaque entree (EntryDestruct, sans liberer les ressources), remet +0x12 (selection courante) a 0."
 },
 "sub_23B55": {
 "segment": "seg041",
@@ -4950,8 +4950,8 @@
 "sub_5F5A4",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_RemoveByTarget",
-"summary": "far,60L — retire toutes les entrées référençant une cible spécifique (di) lors de sa destruction : **nettoyage du journal quand un objet référencé est détruit.**"
+"new_name": "EntityTracker_RemoveByTarget",
+"summary": "far, 60L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RemoveByTarget'). Trouve et detruit completement (EntryDestructFull) l'entree liee a un objet precis, la retire de la liste, met a jour +0x12/+0xF si c'etait la selection/tete courante. Appelee depuis MissionRecord_LoadEntityDatabase_7B035 ET MissionRecord_LoadAndBuildWidgetTree_7D31A."
 },
 "sub_23BB4": {
 "segment": "seg041",
@@ -4963,8 +4963,8 @@
 "sub_237AC",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_RemoveByTargetUpdateHead",
-"summary": "far,45L — variante de sub_23B55 mettant à jour un pointeur de tête de liste (+0xF) : **nettoyage ciblé avec mise à jour de la liste (variante).**"
+"new_name": "EntityTracker_RemoveByTargetUpdateHead",
+"summary": "far, 45L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RemoveByTargetUpdateHead'). Variante plus legere : destruction simple (EntryDestruct, pas Full), met a jour +0xF (tete). Appelee par EntityTracker_ApplySelection."
 },
 "sub_23BF3": {
 "segment": "seg041",
@@ -4977,8 +4977,8 @@
 "sub_5F5A4",
 "sub_5F6A9"
 ],
-"new_name": "Kneeboard_ClearAllFull",
-"summary": "far,39L — détruit toutes les entrées (sub_23801, destructeur complet) et réinitialise les pointeurs (+0xF/+0x12) : **vidage complet du journal avec libération des textes.**"
+"new_name": "EntityTracker_ClearAllFull",
+"summary": "far, 39L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearAllFull'). Comme ClearAll mais destruction complete (EntryDestructFull) et retrait de chaque entree de la liste ; remet aussi +0xF a 0. Appelee par EntityTracker_ResetAndRefresh."
 },
 "sub_23C38": {
 "segment": "seg041",
@@ -4990,8 +4990,8 @@
 "sub_23BF3",
 "sub_5E526"
 ],
-"new_name": "Kneeboard_ResetAndRefresh",
-"summary": "far,18L — vide le journal (sub_23BF3) puis notifie l'UI (sub_5E526, code 0x5196) : **réinitialisation du journal avec rafraîchissement de l'affichage.**"
+"new_name": "EntityTracker_ResetAndRefresh",
+"summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ResetAndRefresh'). Appelle EntityTracker_ClearAllFull. Appelee depuis EntityTracker_Destruct."
 },
 "sub_23C4F": {
 "segment": "seg041",
@@ -5003,8 +5003,8 @@
 "sub_23994",
 "sub_23CCC"
 ],
-"new_name": "Kneeboard_SelectByID",
-"summary": "far,45L — recherche une entrée par identifiant (sub_23994) puis la sélectionne (sub_23CCC) : **sélection d'une entrée de journal par identifiant (find+select).**"
+"new_name": "EntityTracker_SelectByID",
+"summary": "far, 30L, LUE INTEGRALEMENT. Relais : appelle EntityTracker_FindByIDContinue(self, id) ; si trouve, applique la selection (EntityTracker_ApplySelection). Appelee depuis EntityTracker_Init et seg009 (non identifie)."
 },
 "sub_23C82": {
 "segment": "seg041",
@@ -5017,8 +5017,8 @@
 "sub_23CCC",
 "sub_15B15"
 ],
-"new_name": "Kneeboard_SelectByStateCode",
-"summary": "far,50L — compare le champ +0x11 à un code cible ; si différent, cherche l'entrée correspondante (sub_239FE) et la sélectionne (sub_23CCC) ; cas spécial pour code 4 : **sélection d'une entrée de journal par code d'état (déclenché par les triggers de mission déjà documentés, ex. seg040/sub_22F53).**"
+"new_name": "EntityTracker_SelectByStateCode",
+"summary": "far, 40L, LUE INTEGRALEMENT. Si l'etat courant (+0x11) correspond deja au code demande : si ce code vaut 4 specifiquement, appelle une fonction nommee 'Radar_ToggleTracking' (nom herite NON VERIFIE, a prendre avec prudence) sur word_6E4B2 ; sinon rien. Sinon : cherche une entree via EntityTracker_RenderByCode(code), et si trouvee, l'applique comme selection. Appelee (au moins deux fois) depuis Player_MainUpdate."
 },
 "sub_23CCC": {
 "segment": "seg041",
@@ -5031,8 +5031,8 @@
 "sub_23BB4",
 "sub_23BB4"
 ],
-"new_name": "Kneeboard_ApplySelection",
-"summary": "far,108L — met à jour la sélection courante du journal (+0x12), positionne un flag global (byte_70447), gère le repositionnement d'affichage (fenêtre 0x100 octets) : **application de la sélection d'entrée de journal avec mise à jour de l'affichage.** || Contexte caméra (2026-08-30) : appelé Kneeboard_ApplySelection(manager=0x59CD, entrée) — pose manager[+0x12] = caméra/entrée active, lance Cockpit_PanAzimuthUpdate -> Camera_PanTransitionController (pan doux, seuil 0x100), puis pilote l'entrée via sa vtable [entrée+0x50] : [0x04] stop précédente, [0x10] start, [0x14] get-state. Utilisé pour activer les caméras scriptées du FORM CAMR (voir Cinematic_LoadCameraDef_23E7D, DATA_MODEL.md §6.6b b-bis)."
+"new_name": "EntityTracker_ApplySelection",
+"summary": "far, 108L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ApplySelection' — appelants reels : Radar_TargetTypeFilter, Mission_PlayerEventHandler, pas de lien kneeboard). Gere un changement de selection active entre deux objets candidats via un cycle de vie a methodes virtuelles (vtable+0=teste, +4=arrete, +0x10=demarre, +0x14=etat)."
 },
 "sub_23D8F": {
 "segment": "seg041",
@@ -5056,8 +5056,8 @@
 "sub_658",
 "sub_2AFB5"
 ],
-"new_name": "Kneeboard_Construct",
-"summary": "far,45L — constructeur de l'objet journal de mission complet (type 0x1198) : **constructeur du gestionnaire de journal/kneeboard de mission.**"
+"new_name": "EntityTracker_Construct",
+"summary": "far, 38L, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'Kneeboard_Construct' — il n'existe pas de carnet de vol dans le jeu). Construit le gestionnaire polymorphe (23 octets, tag final 0x1198 confirme via vtable), contenant une chaine embarquee de 8 caracteres a +6, et des champs de selection/etat (+0xF,+0x11,+0x12,+0x14-0x16)."
 },
 "sub_23E48": {
 "segment": "seg041",
@@ -5070,8 +5070,8 @@
 "sub_5F66B",
 "sub_338"
 ],
-"new_name": "Kneeboard_Destruct",
-"summary": "far,38L — destructeur : vide le journal (sub_23C38), libère la liste (sub_5F66B), libère la mémoire si demandé (sub_338) : **destructeur du gestionnaire de journal de mission.**"
+"new_name": "EntityTracker_Destruct",
+"summary": "far, 38L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_Destruct'). Referencee via vtable (seg339:1198, confirme). Vide la liste (EntityTracker_ResetAndRefresh), libere la liste chainee (LinkedListB_Helper_5F66B), libere la memoire si demande."
 },
 "sub_23E7D": {
 "segment": "seg041",
@@ -10801,8 +10801,8 @@
 "sub_27144",
 "sub_28F08"
 ],
-"new_name": "UIScreen_StateMachineMain_4FBF1",
-"summary": "⚠️ far, 645 lignes, NON DÉTAILLÉE — grosse machine à états dispatchant sur byte_722D1 (valeurs 0Fh/19h/20h/...), pilote un écran/dialogue (widgets autour de l'id 5A92h), pose des minuteurs (Timer_SetRelativeFrames). Référencée via vtable (DATA XREF seg216) et par sub_536F7/sub_7A054. Candidat prioritaire pour session dédiée."
+"new_name": "CombatTarget_WeaponActionSubsystem",
+"summary": "far, 645 lignes, PARTIELLEMENT LUE (session gestion de mission avec Remi). RENOMMEE (echange avec sub_536F7) : ce n'est PAS le tick principal du jeu — c'est un SOUS-SYSTEME appele DEPUIS MAIN_GAME_TICK_536F7 (et aussi UIScript_ParseAndEvaluate_7A054), dedie aux actions de combat liees a la cible verrouillee (word_722E6) : mode 'Time Burst' (post-combustion, message radio 'aTimeBurst'), calcul de portee/distance vers la cible (cible->+0x51, compare a 0x400), operation sur tag d'objet (0x59C3). Dispatch riche sur byte_722D1 (plusieurs valeurs). Lecture complete non terminee — les anciens noms de ses callees ('Config_ReadCalibration', 'WorldObjects_PeriodicGC', 'Physics_ApplyGroundHeightConstraint') sont eux-memes probablement faux, a revoir."
 },
 "sub_500A6": {
 "segment": "seg112",
@@ -10941,8 +10941,8 @@
 "lines": 44,
 "type": "far",
 "calls": [],
-"new_name": "Str_SeekNthEntryWord_50E94",
-"summary": "far, variante mot (scasw) de Str_SeekNthEntryByte — table à séparateurs 16 bits."
+"new_name": "ProgBuffer_FindSubProgramByIndex_50E94",
+"summary": "far, 43 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — REFERME la question du decoupage du bloc PROG). \n\nDECOUVERTE : le bloc PROG brut (charge par ProgBuffer_LoadRawAndCountMarkers_AA31D) est une SEQUENCE DE MINI-PROGRAMMES CONSECUTIFS, chacun termine par un MOT NUL (0x0000, 2 octets — pas juste un octet). Cette fonction, donnee un index N, scanne le tampon (instruction x86 'repne scasw', qui cherche un mot egal a 0) et saute par-dessus N separateurs consecutifs ; retourne le pointeur juste apres le N-ieme separateur trouve = le debut du sous-programme #N. \n\nCONCLUSION : les 4 progs_id d'une PartEntry (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) sont des INDEX DANS CETTE SEQUENCE ('le N-ieme mini-programme du bloc'), pas des offsets ni des identifiants nommes independants. Le compteur de marqueurs (ProgBuffer+0x00) = nombre total de mini-programmes empaquetes dans le bloc PROG d'une mission."
 },
 "sub_50EC8": {
 "segment": "seg114",
@@ -11079,7 +11079,7 @@
 "sub_50E94"
 ],
 "new_name": "Expr_LookupNamedValue_51E4A",
-"summary": "far, enveloppe bornée de Str_SeekNthEntryWord — résout un identifiant/index en pointeur vers une valeur nommée."
+"summary": "far, 30 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Simple garde de bornes : si rawId < buf->markerCount (le compteur pose par ProgBuffer_LoadRawAndCountMarkers_AA31D), delegue a ProgBuffer_FindSubProgramByIndex_50E94 pour trouver le pointeur reel ; sinon retourne NULL. Utilisee pour resoudre les 4 progs_id d'une PartEntry (PartEntry_LoadAndResolveNames_A9E3C) et par le mecanisme d'appel de sous-routine du script (sub_51033)."
 },
 "sub_51E7E": {
 "segment": "seg114",
@@ -11090,8 +11090,8 @@
 "calls": [
 "sub_51106"
 ],
-"new_name": "Expr_VM_Execute_51E7E",
-"summary": "far, point d'entrée d'exécution de la VM d'expression : construit une frame locale (bytecode ptr + contexte) et appelle Expr_VM_Interpreter_51106."
+"new_name": "Expr_VM_ExecuteSingleInstruction_51E7E",
+"summary": "far, 48 lignes, LUE INTEGRALEMENT. Adaptateur generique : construit une fausse 'instruction' temporaire sur sa PROPRE pile (pas dans un vrai buffer de script persistant) a partir de trois parametres (objet de mission, position, donnees d'opcode empaquetees), puis appelle directement MissionScript_ExecutePROG_51106 dessus. CONFIRME : l'interprete a 209 cas n'est PAS reserve aux scripts de mission stockes — c'est un utilitaire generique 'executer une instruction a la demande', appele aussi bien par le systeme de script que par GeomNode_BuildOrRefreshCluster_51EDC (gestion de cluster geometrique, sans rapport avec les missions)."
 },
 "sub_51EDC": {
 "segment": "seg114",
@@ -11119,8 +11119,8 @@
 "sub_52DDB",
 "sub_5247D"
 ],
-"new_name": "GeomNode_BuildOrRefreshCluster_51EDC",
-"summary": "⚠️ far, 547 lignes, NON DÉTAILLÉE — orchestrateur appelant de nombreuses fonctions du cluster GeomNode/Expr (50EEB, 52C5F, 53363, 543BA...). Candidat pour session dédiée."
+"new_name": "PartEntry_ResolveSpawnPositionAndActivate_51EDC",
+"summary": "far, 547 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). CORRIGE : nommee a tort 'GeomNode_BuildOrRefreshCluster' par une session anterieure (balayage rapide, jamais verifie) — aucun contenu ne concerne un cluster geometrique. Appelee directement depuis MissionScript_ExecutePROG_51106 (offset +0x6FB). Opere sur la MEME structure MissionObject a 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et AI_ComputeApproachAngles_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat via SetReference — **RESOUT LA QUESTION OUVERTE DU CONTROLEUR** : c'est une entite avion/pilote IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md)."
 },
 "sub_5242A": {
 "segment": "seg114",
@@ -11143,8 +11143,8 @@
 "calls": [
 "sub_51E7E"
 ],
-"new_name": "Expr_Node_ForceRecompute_5247D",
-"summary": "far, force le recalcul d'un champ de nœud (pose des flags, exécute le bytecode à +0x42 via Expr_VM_Execute)."
+"new_name": "Shared_TriggerExprInstruction_5247D",
+"summary": "far, 23 lignes, LUE INTEGRALEMENT. Appelee par MissionFormation_ComputeSlotAndSpawn_51EDC EN INTERNE (rappel controle vers l'interprete, pas un appelant externe sans rapport). Manipule +0x39/+0x3A/+0x42, les MEMES champs de statut que MissionObject_ResetState_A9DFD/MissionObject_LoadAndResolveNames_A9E3C utilisent sur les objets de mission — la MEME structure generique a 85 octets, pour une sous-evaluation. Pose bit0 de +0x39, efface bits2/3, efface +0x3A, puis appelle Expr_VM_ExecuteSingleInstruction_51E7E avec +0x42 (donnees empaquetees) et une position depuis word_706A0+0x40."
 },
 "sub_524B4": {
 "segment": "seg114",
@@ -11199,8 +11199,8 @@
 "sub_52C9C",
 "sub_5305A"
 ],
-"new_name": "Expr_VM_CallNativeFunction_52513",
-"summary": "⚠️ far, 685 lignes, NON DÉTAILLÉE — marshalling d'une liste d'arguments (~28 dwords, via Expr_LookupNamedValue_52DDB/sub_5305A/sub_52C9C en boucle) puis appel indirect via table de fonctions natives (dword ptr [bx+88h]). Implémente l'opcode \"appel de fonction native\" de la VM. Candidat pour session dédiée."
+"new_name": "MissionScript_CallNativeHandler_52513",
+"summary": "far, 685 lignes, LUE EN PROFONDEUR (session dediee aux ordres de mission avec Remi). CORRIGE : ce n'est pas une boucle generique de marshalling — c'est le vrai point d'aiguillage par ordre, avec une GARDE D'ENTREE qui determine si un ordre execute reellement une commande de vol, PUIS un switch a 31 cas reels (indice = opcode-0xA1, cmp bx,0x1E) qui distingue Take off, Land, Destroy target, Defend target, Defend area, Follow ally, et 7 ordres non identifies par la table externe (0xA3, 0xAB, 0xB1-0xB5) — detail complet dans MISSION_SCRIPT_OPCODES.md. \n\nGARDE D'ENTREE (determine si QUOI QUE CE SOIT s'execute, avant meme de regarder quel ordre est demande) : verifie [arg_0+0x52] != 0 (l'objet de mission reference par le script doit avoir un controleur associe) ET le bit 1 de [arg_0+0x39] doit etre CLAIR (probable 'objet non occupe/disponible') — si l'une des deux conditions echoue, retourne 0 IMMEDIATEMENT sans executer aucune commande de vol, quel que soit l'opcode demande par le script. Si la garde passe : pose [arg_0+0x54]=0xFF (drapeau d'etat) avant le switch.\n\nSORTIE COMMUNE (tous les 31 cas convergent ici, loc_52A41) : delegue la VRAIE execution tactique a une methode virtuelle UNIQUE et GENERIQUE, [arg_0+0x52 -> vtable+0x88], en lui passant la position/reference resolue par le cas specifique, une valeur de 'competence' (copiee depuis la cible resolue +0x52 si presente), l'opcode et une duree. AUCUN calcul de poursuite, de tir ou de suivi vectoriel continu ne vit dans cette fonction elle-meme ni dans aucun de ses 31 cas — c'est une couche de RESOLUTION D'INTENTION (ou aller, quoi cibler), pas d'EXECUTION TACTIQUE. Cette derniere vit entierement dans la methode virtuelle +0x88, non identifiee a ce stade.\n\nPIEGE NOTE : le champ +0x52 utilise ici comme POINTEUR de controleur appartient a un objet DIFFERENT du +0x52 scalaire (performance JETP/TOFF, alimentant byte_720C3) trouve ailleurs dans le binaire — meme decalage, deux structures distinctes."
 },
 "sub_52AC6": {
 "segment": "seg114",
@@ -11316,8 +11316,8 @@
 "calls": [
 "sub_52AC6"
 ],
-"new_name": "Expr_Node_RefreshField_52E51",
-"summary": "far, invoque Expr_Node_UpdateAndPropagate_52AC6 pour un champ donné — appelée par sub_536F7 (construction d'écran)."
+"new_name": "PartEntry_DispatchMissionUpdateTick_52E51",
+"summary": "far, 37 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien nom 'Expr_Node_RefreshField' n'avait plus de sens une fois le type d'objet identifie). \n\nBOUCLE SUR LE TABLEAU DES PartEntry (participants du chunk PART) : pas de 0x55 (85 octets, taille exacte confirmee de PartEntry_AllocateArray_AA23D). Pour chaque entree, teste le bit 0 de +0x39 (le meme champ de statut que PartEntry_ResetState_A9DFD manipule) ; si actif, appelle Expr_Node_UpdateAndPropagate_52AC6(entree). \n\nROLE CONFIRME : c'est le vrai declencheur, a chaque frame (appelee par MAIN_GAME_TICK_536F7), de l'evenement 'on_mission_update' pour chaque participant de mission dont le bit correspondant est actif — point d'entree de la chaine Expr_Node_UpdateAndPropagate -> Expr_VM_ExecuteSingleInstruction -> MissionScript_ExecutePROG qui execute finalement le script on_mission_update de ce participant (PartEntry+0x46/0x48)."
 },
 "sub_53034": {
 "segment": "seg114",
@@ -11352,8 +11352,8 @@
 "sub_52D45",
 "sub_51EDC"
 ],
-"new_name": "Expr_Node_GetCachedValueA_530FF",
-"summary": "far, accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45), suivi d'un recalcul conditionnel (GeomNode_BuildOrRefreshCluster_51EDC)."
+"new_name": "Scene_EnsureUnitsSpawned_530FF",
+"summary": "far, 73 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_EnsureAllSlotsFilled' errone). Le parametre 'si' est tres probablement la SCENE elle-meme (pas un groupe/escadrille) : si[0x14]/si[0x16] correspondent vraisemblablement a la LISTE D'UNITES en queue du chunk SCNE (documentee dans DATA_MODEL.md : liste de u16, index dans PART). Pour chaque unite de cette liste : resout la PartEntry correspondante (sub_52D45), et si son controleur (+0x52) est encore NUL, appelle MissionFormation_ComputeSlotAndSpawn_51EDC pour la faire apparaitre — assure que toutes les unites de la scene existent au moment de son activation."
 },
 "sub_5317A": {
 "segment": "seg114",
@@ -11377,8 +11377,8 @@
 "sub_530FF",
 "sub_51E7E"
 ],
-"new_name": "Expr_Node_RecomputeFieldA_531CD",
-"summary": "far, recalcule un champ dérivé : Expr_Node_GetCachedValueA_530FF puis Expr_VM_Execute_51E7E."
+"new_name": "Scene_TriggerActivation_531CD",
+"summary": "far, 26 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_TickGroup' errone). Quand une scene devient active : appelle Scene_EnsureUnitsSpawned_530FF (fait apparaitre les unites associees non encore presentes), PUIS Expr_VM_ExecuteSingleInstruction_51E7E — DECLENCHE L'EXECUTION DU SCRIPT on_is_activated DE CETTE SCENE (parametres calcules depuis scene+2+0x40 = reference au champ progs_id resolu de la scene, scene+8)."
 },
 "sub_531F2": {
 "segment": "seg114",
@@ -11389,8 +11389,8 @@
 "calls": [
 "sub_51E7E"
 ],
-"new_name": "Expr_Node_RecomputeFieldB_531F2",
-"summary": "far, recalcule un champ dérivé via Expr_VM_Execute_51E7E — utilisé par sub_536F7 (construction d'écran)."
+"new_name": "Scene_TriggerLeavingEvent_531F2",
+"summary": "far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide."
 },
 "sub_53211": {
 "segment": "seg114",
@@ -11402,8 +11402,8 @@
 "sub_5317A",
 "sub_51E7E"
 ],
-"new_name": "Expr_Node_RecomputeFieldC_53211",
-"summary": "far, recalcule un champ dérivé : Expr_Node_GetCachedValueB_5317A puis Expr_VM_Execute_51E7E."
+"new_name": "Scene_TriggerMissionUpdateEvent_53211",
+"summary": "far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change -- garantie supplementaire sur l'ancienne scene) ET depuis MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par frame tant que la scene reste active -- exactement comme celui de PART (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement suppose."
 },
 "sub_53236": {
 "segment": "seg114",
@@ -11412,8 +11412,8 @@
 "lines": 81,
 "type": "far",
 "calls": [],
-"new_name": "Expr_Node_GetOrRecompute_53236",
-"summary": "far, dispatch vtable (dword ptr [bx+4]) pour obtenir/recalculer une valeur de nœud."
+"new_name": "Scene_FindMatchingByAreaContainment_53236",
+"summary": "far, 80 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Itere le tableau des enregistrements SCNE (pas de 0x27=39 octets, confirmant la taille de DATA_MODEL.md), pour chaque scene active (is_active!=0) dont la zone (area_id resolu, +4) est non nulle, teste par appel virtuel ([areaHandle->vtable+4](param)) si le parametre (position/reference) est contenu dans cette zone. Retourne la premiere scene active correspondante, ou NULL. C'est le vrai SELECTEUR DE SCENE ACTIVE de la mission."
 },
 "sub_532AD": {
 "segment": "seg114",
@@ -11437,8 +11437,8 @@
 "sub_531CD",
 "sub_544DC"
 ],
-"new_name": "Expr_Node_RecomputeAllFields_532EA",
-"summary": "far, orchestrateur recalculant plusieurs champs d'un nœud (Expr_Node_GetOrRecompute_53236, RecomputeFieldC_53211, RecomputeFieldA_531CD, puis sub_544DC)."
+"new_name": "Scene_DetectAndActivateChange_532EA",
+"summary": "far, 55 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active courante ; si elle a change depuis le dernier appel (different du parametre previousScene), desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52)."
 },
 "sub_53337": {
 "segment": "seg114",
@@ -11530,8 +11530,8 @@
 "sub_4FBF1",
 "sub_53586"
 ],
-"new_name": "UIScreen_ConstructWidgetBinding_536F7",
-"summary": "⚠️ far, 242 lignes, NON DÉTAILLÉE — relie un widget à ses champs calculés (Expr_Node_RecomputeFieldB_531F2, Expr_Node_RefreshField_52E51, Expr_Node_StoreResultVector_52C9C) et appelle directement `UIScreen_StateMachineMain_4FBF1` (seg112) et Expr_Node_EvaluateVisibility_53586. Pièce centrale du lien widget ↔ VM d'expression."
+"new_name": "MAIN_GAME_TICK",
+"summary": "far, 241 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE (echange avec sub_4FBF1) : c'est ELLE le vrai point d'entree par frame — orchestre entree clavier joueur (espace/slash), mise a jour de formation/groupe de mission (appelle MissionFormation_HandleGroupSelectionChange_532EA directement), rafraichissement du graphe d'expression (Expr_Node_RefreshField), ET delegue au sous-systeme combat/cible via l'appel a sub_4FBF1 (desormais nommee separement, PAS 'MAIN_GAME_TICK'). Appelee une fois par iteration de Simulator_MainLoop, sur un objet FIXE (si, jamais reassigne). C'est la fonction qui merite le nom 'tick principal' car elle touche IA/joueur/rendu, meme via des appels separes — une fonction qui ne gere pas l'IA ne peut pas etre le tick principal."
 },
 "sub_53896": {
 "segment": "seg114",
@@ -11560,8 +11560,8 @@
 "sub_6CE5B",
 "sub_5A9E6"
 ],
-"new_name": "UIScreen_Construct_53896",
-"summary": "⚠️ far, 254 lignes, NON DÉTAILLÉE — construction complète d'un écran : alloue/configure des ressources, appelle `UIScreen_ApplyFormFields_500F6` (seg112) et `UIScreen_ConstructWidgetBinding_536F7`. Référencée depuis seg014. Probable point d'entrée \"ouvrir cet écran\"."
+"new_name": "STRIKE_EXE_MAIN_LOOP",
+"summary": "far, 254 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE TROIS FOIS : d'abord 'UIScreen_Construct' (faux), puis 'Simulator_MainLoop', puis 'STRIKE_EXE_MAIN_LOOP' (nom final, propose par Remi) — c'est LA BOUCLE PRINCIPALE DE TOUT L'EXECUTABLE, confirme par lecture directe : loc_538A1 (debut de boucle) est la cible d'un `jmp loc_538A1` explicite, avec sortie conditionnelle sur byte_706AF==6. A CHAQUE ITERATION, EN SEQUENCE (pas en parallele) : appelle MAIN_GAME_TICK_536F7 (gestion clavier + formation + scenes), PUIS MissionScenario_RecomputeFields_A9382 (declenche Scene_TriggerMissionUpdateEvent sur +0x4E/+0x50, verifie une condition de fin de mission, peut poser byte_706AF=5). Appelee une seule fois depuis Program_InitVideoFontArgs_14279, qui lui-meme ne boucle jamais."
 },
 "sub_53A94": {
 "segment": "seg114",
@@ -18684,7 +18684,7 @@
 "summary": "far, vide le tampon clavier BIOS standard (`int 16h`, fonctions 0/1 CHECK/READ) en boucle jusqu'à ce qu'il soit vide — probable purge du tampon BIOS natif avant activation du gestionnaire personnalisé. Référencée par sub_28670."
 },
 "sub_68254": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221387,
 "end_line": 221610,
 "lines": 224,
@@ -18703,7 +18703,7 @@
 "summary": "⚠️ far, 224 lignes, NON DÉTAILLÉE — recherche le fichier « strike.exe » (chaîne embarquée), teste la version DOS puis valide/ouvre le fichier via VROOMM_OpenWithDefaultPath_684A7 et VROOMM_CheckCopyright_683F9. Point d'entrée du loader VROOMM (Borland) pour ce segment."
 },
 "sub_68384": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221617,
 "end_line": 221673,
 "lines": 57,
@@ -18713,7 +18713,7 @@
 "summary": "far, rôle exact non détaillé (voisin du chargeur d'exécutable)."
 },
 "sub_683F9": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221708,
 "end_line": 221722,
 "lines": 15,
@@ -18725,7 +18725,7 @@
 "summary": "near, copie/vérifie une chaîne (proche d'un texte « Copyright 1991 » embarqué) avant d'appeler VROOMM_OpenFile_684A7."
 },
 "sub_68405": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221728,
 "end_line": 221783,
 "lines": 56,
@@ -18737,7 +18737,7 @@
 "summary": "far, vérifie la version DOS (`int 21h`) puis ouvre un fichier via VROOMM_OpenFile_684A7."
 },
 "sub_6844A": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221789,
 "end_line": 221876,
 "lines": 88,
@@ -18749,7 +18749,7 @@
 "summary": "⚠️ far, 88 lignes, NON DÉTAILLÉE — lit l'en-tête du fichier ouvert (`int 21h` READ) et appelle VROOMM_ComputeSizeFromHeader_689F1 — probable lecture de l'en-tête MZ."
 },
 "sub_684A7": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221882,
 "end_line": 221912,
 "lines": 31,
@@ -18759,7 +18759,7 @@
 "summary": "near, copie un chemin (12 caractères max, ou chemin par défaut) puis ouvre le fichier (`int 21h` AH=3Dh)."
 },
 "sub_684CF": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221918,
 "end_line": 221937,
 "lines": 20,
@@ -18769,7 +18769,7 @@
 "summary": "far, ferme un fichier (`int 21h` AH=3Eh)."
 },
 "sub_684DF": {
-"segment": null,
+"segment": "seg212",
 "start_line": 221943,
 "end_line": 222026,
 "lines": 84,
@@ -18781,7 +18781,7 @@
 "summary": "⚠️ far, 84 lignes, NON DÉTAILLÉE — combine VROOMM_ComputeSizeFromHeader_689F1 — lit et interprète l'en-tête MZ du fichier exécutable/overlay ciblé."
 },
 "sub_6855F": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222032,
 "end_line": 222148,
 "lines": 117,
@@ -18796,7 +18796,7 @@
 "summary": "⚠️ far, 117 lignes, NON DÉTAILLÉE — orchestre VROOMM_SkipRelocationsA_6862C, VROOMM_SkipRelocationsB_68665, VROOMM_PatchFarJumpTable_688D7 et un pointeur de fonction externe (off_69DF6) — probable allocation mémoire et relogement de l'image exécutable chargée."
 },
 "sub_6862C": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222165,
 "end_line": 222227,
 "lines": 63,
@@ -18806,7 +18806,7 @@
 "summary": "⚠️ far, 63 lignes, NON DÉTAILLÉE — parcourt la table de relogement MZ (`int 21h` LSEEK/READ)."
 },
 "sub_68665": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222233,
 "end_line": 222292,
 "lines": 60,
@@ -18818,7 +18818,7 @@
 "summary": "⚠️ far, 60 lignes, NON DÉTAILLÉE — variante de VROOMM_SkipRelocationsA_6862C (`int 21h` LSEEK/READ)."
 },
 "sub_686AA": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222298,
 "end_line": 222369,
 "lines": 72,
@@ -18828,7 +18828,7 @@
 "summary": "far, rôle exact non détaillé, référencée par VROOMM_AllocateAndFinalize_6879E."
 },
 "sub_6879E": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222468,
 "end_line": 222518,
 "lines": 51,
@@ -18846,7 +18846,7 @@
 "summary": "far, orchestre VROOMM_ComputeSizeFromHeader_689F1, VROOMM_PatchFarJumpTable_6887B, VROOMM_CheckImageHasTrailer_68863, VROOMM_ComputeParagraphs_689E5, VROOMM_MoveImageAndFixup_68928, VROOMM_AdvanceLoadPointer_68979, VROOMM_ComputeRemainingSpace_689C9."
 },
 "sub_687E8": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222524,
 "end_line": 222608,
 "lines": 85,
@@ -18863,7 +18863,7 @@
 "summary": "⚠️ far, 85 lignes, NON DÉTAILLÉE — applique la table de relogement MZ (comparable à VROOMM_AllocateAndFinalize_6879E, mêmes helpers PatchFarJumpTable/CheckImageHasTrailer/ComputeParagraphs/AdvanceLoadPointer/ComputeRemainingSpace)."
 },
 "sub_68863": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222614,
 "end_line": 222625,
 "lines": 12,
@@ -18876,7 +18876,7 @@
 "summary": "near, vérifie un motif d'en-tête à l'offset image+0x18 (constante 0x4CA) et appelle un pointeur externe (off_6D0C0) si présent."
 },
 "sub_6887B": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222631,
 "end_line": 222674,
 "lines": 44,
@@ -18889,7 +18889,7 @@
 "summary": "⚠️ far, 44 lignes, NON DÉTAILLÉE — écrit des instructions JMP FAR (opcode 0xEA) dans l'image chargée, motif de patch de table de sauts (probable installation de points d'entrée d'overlay)."
 },
 "sub_688B6": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222680,
 "end_line": 222698,
 "lines": 19,
@@ -18901,7 +18901,7 @@
 "summary": "near, patche un trampoline JMP FAR (0xEA) à l'offset image+0x20 si nécessaire (délègue à VROOMM_PatchFarJumpTable_688D7)."
 },
 "sub_688D7": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222704,
 "end_line": 222729,
 "lines": 26,
@@ -18911,7 +18911,7 @@
 "summary": "near, écrit une série d'instructions JMP FAR (opcode 0xEA) pour reconstruire une table de sauts après relogement."
 },
 "sub_688F5": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222735,
 "end_line": 222766,
 "lines": 32,
@@ -18923,7 +18923,7 @@
 "summary": "near, écrit une série d'instructions INT (opcode 0xCD) — motif de patch de trampoline d'interruption (probable installation de points d'entrée pour hooks matériels du type de ceux du seg154/seg161/seg211)."
 },
 "sub_68928": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222772,
 "end_line": 222823,
 "lines": 52,
@@ -18935,7 +18935,7 @@
 "summary": "⚠️ far, 52 lignes, NON DÉTAILLÉE — déplace l'image chargée en mémoire (rep movsw, direction ajustée selon chevauchement) et retouche l'en-tête (patch de trampolines via VROOMM_PatchIntTrampoline_688F5 ou table de relogement)."
 },
 "sub_68979": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222829,
 "end_line": 222853,
 "lines": 25,
@@ -18947,7 +18947,7 @@
 "summary": "near, avance un pointeur de chargement global (off_6D15E) et met à jour une chaîne de segments alloués."
 },
 "sub_68997": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222859,
 "end_line": 222868,
 "lines": 10,
@@ -18959,7 +18959,7 @@
 "summary": "near, patche une entrée de la table de relogement trouvée (échange avec VROOMM_FindRelocationSlot_689A3)."
 },
 "sub_689A3": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222874,
 "end_line": 222910,
 "lines": 37,
@@ -18969,7 +18969,7 @@
 "summary": "near, recherche binaire/linéaire dans une table de relogement (segment:offset). Appelée par VROOMM_MoveImageAndFixup_68928 et VROOMM_PatchRelocationEntry_68997."
 },
 "sub_689C9": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222916,
 "end_line": 222939,
 "lines": 24,
@@ -18979,7 +18979,7 @@
 "summary": "near, calcule l'espace mémoire restant disponible pour le chargement (comparaison de segments)."
 },
 "sub_689E5": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222945,
 "end_line": 222952,
 "lines": 8,
@@ -18989,7 +18989,7 @@
 "summary": "near, convertit une taille de fichier MZ (champ « pages ») en nombre de paragraphes (arrondi au paragraphe supérieur, classique du format MZ)."
 },
 "sub_689F1": {
-"segment": null,
+"segment": "seg212",
 "start_line": 222958,
 "end_line": 222977,
 "lines": 20,
@@ -30444,8 +30444,8 @@
 "sub_2387E",
 "sub_23CCC"
 ],
-"new_name": "Kneeboard_UpdateEntry_7AFA8",
-"summary": "far, combine `Kneeboard_AddEntryObj` et `Kneeboard_ApplySelection` — mise à jour d'une entrée du calepin de bord (kneeboard)."
+"new_name": "EntityTracker_RegisterAndSelect",
+"summary": "far, 20L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_UpdateEntry'). CONFIRME DIRECTEMENT 0x59CD comme adresse de la liste globale trackee : ajoute l'entite passee en parametre a cette liste (EntityTracker_AddEntryObj) PUIS l'applique comme selection active (EntityTracker_ApplySelection). Appelee depuis MissionRecord_LoadEntityDatabase_7B035 — candidat serieux pour la fonction qui peuple cette liste avec les entites de la mission, a lire."
 },
 "sub_7AFCA": {
 "segment": "ovr239",
@@ -37092,8 +37092,8 @@
 "sub_97CB7",
 "sub_97D39"
 ],
-"new_name": "MissionText_Helper6_97CF5",
-"summary": "far, aucun appel externe visible (43 lignes)."
+"new_name": "EntityScreenLayout_PrepareAndCompute",
+"summary": "far, 43L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_Helper6' — aucune preuve que ce soit lie a du texte, garde generique en attendant confirmation). Appelle EntityScreenLayout_Helper4 (non lue), clampe une valeur d'angle/distance a 0x100 si non positive, la stocke sur l'entite (+0x60), puis appelle EntityScreenLayout_ComputeAngularPosition."
 },
 "sub_97D39": {
 "segment": "ovr287",
@@ -37110,8 +37110,8 @@
 "sub_54ADE",
 "sub_5483F"
 ],
-"new_name": "MissionText_ComputeTrigonometricLayout_97D39",
-"summary": "⚠️ far, 208 lignes, NON DÉTAILLÉE — combine `Math_Sin_5483F`, longueur vectorielle, `Math_Tan_548AD`, `Math_ArcTan_54ADE` (seg115) — calcul de disposition trigonométrique (probable positionnement d'éléments de texte en arc)."
+"new_name": "EntityScreenLayout_ComputeAngularPosition",
+"summary": "far, 207L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_ComputeTrigonometricLayout' — le calcul trigonometrique est reel et verifie, mais RIEN ne confirme un rendu de texte : garde 'EntityScreenLayout' generique, pas 'Text', en attendant de tracer qui consomme le resultat +0xC/+0x10). Calcule une position ecran a partir d'un angle (+0x60) et des dimensions de l'entite (+4/+6) : plusieurs Sin/Tan/ArcTan enchaines, division par les dimensions, mise a l'echelle finale via dword_6E9AA. Ecrit le resultat en +0xC/+0x10 (coordonnees finales) et +0x64/0x68/0x6C/0x70/0x74 (valeurs intermediaires). NE DESSINE RIEN elle-meme — calcule seulement une position, stockee sur l'objet, consommee ailleurs (non trace)."
 },
 "sub_97F40": {
 "segment": "ovr288",
@@ -44171,7 +44171,7 @@
 "sub_6CDBE"
 ],
 "new_name": "MissionScenario_RecomputeFields_A9382",
-"summary": "far, combine Expr_Node_RecomputeFieldC_53211 (seg114, ×2), MissionScenario_ResolveAndBindExpressions_A8F22, MissionScenario_ConstructFieldChain_A8124, sub_6CDBE."
+"summary": "far, 58 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Appelee CHAQUE FRAME directement depuis Simulator_MainLoop_53896 (via VROOMM_StubThunk_6CE5B) — chemin SEPARE et PARALLELE a MAIN_GAME_TICK_536F7, pas decouvert avant. \n\nDeclenche Scene_TriggerMissionUpdateEvent_53211 sur DEUX pointeurs de SceneRecord stockes sur MissionScenario : +0x50 et +0x4E. CORRIGE DATA_MODEL.md : ces deux champs ne sont PAS 'handle de noeud Expr'/'flag HOME depuis noeud' comme documente precedemment — ce sont des pointeurs de SceneRecord (+0x50 correspond exactement au champ rempli par Scene_DetectAndActivateChange_532EA). \n\nVerifie ensuite une condition de fin de mission (position comparee a dword_70718/dword_7071C, une cible/checkpoint global) — si atteinte, POSE byte_706AF = 5 -- LE MEME OCTET QUI CONTROLE LA BOUCLE PRINCIPALE DE Simulator_MainLoop (condition de sortie == 6). Lien direct entre logique de scenario et controle du jeu a ce niveau. \n\nAppelle enfin MissionScenario_ResolveAndBindExpressions_A8F22 (ecrit MISN2OP.IFF, resultats de fin de mission) — a chaque frame, sans garde visible ici (garde probablement interne a A8F22, non verifiee). Appelle aussi sub_A8124 et sub_6CDBE, non identifiees."
 },
 "sub_A93E0": {
 "segment": "seg456",
@@ -44318,8 +44318,8 @@
 "sub_2E74",
 "sub_2E74"
 ],
-"new_name": "ExprSlot_ReleaseAndReloadDword_A9956",
-"summary": "⚠️ far, 125 lignes, NON DÉTAILLÉE — combine Memory_TypedFreeWrapperC_5C6F3, ResourceRecord_ReadDwordFieldB_64AFF (seg193), sub_2E74 (×2, externe)."
+"new_name": "PLAY_LoadCASTTeamNames_A9956",
+"summary": "far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4 octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers PilotProfile_LoadFromPROF."
 },
 "sub_A9A44": {
 "segment": "seg457",
@@ -44436,8 +44436,8 @@
 "lines": 20,
 "type": "far",
 "calls": [],
-"new_name": "ExprSlot_Helper_A9DFD",
-"summary": "far, aucun appel externe visible (20 lignes)."
+"new_name": "PartEntry_ResetState_A9DFD",
+"summary": "far, 19 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Reinitialise une entree PART (participant de mission) (85 octets, voir MissionObject_AllocateArray_AA23D) a son etat de repos : +0x32=0xFF, +0x3A(dword)=0, efface 6 bits de +0x39 (le meme champ de statut verifie par la garde d'entree de MissionScript_CallNativeHandler), +0x52(controleur)=0, +0x54(achevement)=0xFF. Ne construit PAS de vrai controleur — remet seulement a NUL."
 },
 "sub_A9E3C": {
 "segment": "seg457",
@@ -44457,8 +44457,8 @@
 "sub_51E4A",
 "sub_51E4A"
 ],
-"new_name": "ExprSlot_LoadAndResolveNames_A9E3C",
-"summary": "⚠️ far, 183 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper_A9DFD, ReadFieldGroupA_64A19, sub_2E74 (×3), GeomNode_SumAndCount_53034 (seg114), Expr_LookupNamedValue_51E4A (×2, seg114) — résolution de noms d'expression liés au scénario de mission."
+"new_name": "PartEntry_LoadAndResolveNames_A9E3C",
+"summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert)."
 },
 "sub_A9FD0": {
 "segment": "seg457",
@@ -44592,8 +44592,8 @@
 "sub_5C6F3",
 "sub_A9E3C"
 ],
-"new_name": "ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D",
-"summary": "⚠️ far, 77 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper4_AA227, gestion d'erreur (sub_6B70F), Memory_TypedFreeWrapperC_5C6F3, ExprSlot_LoadAndResolveNames_A9E3C."
+"new_name": "PartEntry_AllocateArray_AA23D",
+"summary": "far, 77 lignes, LUE INTEGRALEMENT. Le vrai constructeur du tableau d'entrees PART : calcule un nombre d'elements ([di+0x72]/0x3E), alloue un tableau de records de 85 octets chacun (meme allocateur Memory_TypedFreeWrapper_5C6F3, tag 0x5C44, que MVRS), puis appelle PartEntry_LoadAndResolveNames_A9E3C sur chaque element successivement (pas +0x55). CONFIRME : +0x52 (controleur) reste NUL a l'issue de la construction complete du tableau — son assignation reelle, si elle existe, se fait ailleurs, dynamiquement pendant le jeu — site non retrouve a ce stade."
 },
 "sub_AA2C4": {
 "segment": "seg457",
@@ -44614,8 +44614,8 @@
 "lines": 14,
 "type": "far",
 "calls": [],
-"new_name": "ExprSlot_Helper5_AA2F4",
-"summary": "far, aucun appel externe visible (14 lignes)."
+"new_name": "ProgBuffer_ResetState_AA2F4",
+"summary": "far, 13 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Initialise a zero les deux premiers champs du conteneur PROG : +0x00 (compteur d'instructions/marqueurs) et +0x06 (taille du chunk, ecrasee juste apres par ProgBuffer_ResetAndSetSize_AA307)."
 },
 "sub_AA307": {
 "segment": "seg457",
@@ -44626,8 +44626,8 @@
 "calls": [
 "sub_AA2F4"
 ],
-"new_name": "ExprSlot_Helper6_AA307",
-"summary": "far, appelle ExprSlot_Helper5_AA2F4."
+"new_name": "ProgBuffer_ResetAndSetSize_AA307",
+"summary": "far, 18 lignes, LUE INTEGRALEMENT. Appelle ProgBuffer_ResetState_AA2F4 puis pose +0x06 = taille du chunk PROG (parametre). Etape preliminaire de ProgBuffer_LoadRawAndCountMarkers_AA31D."
 },
 "sub_AA31D": {
 "segment": "seg457",
@@ -44640,8 +44640,8 @@
 "sub_5C6F3",
 "sub_64AFF"
 ],
-"new_name": "ExprSlot_ReleaseAndReloadDwordD_AA31D",
-"summary": "far, combine ExprSlot_Helper6_AA307, Memory_TypedFreeWrapperC_5C6F3, ResourceRecord_ReadDwordFieldB_64AFF."
+"new_name": "ProgBuffer_LoadRawAndCountMarkers_AA31D",
+"summary": "far, 62 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — lecteur reel du chunk PROG, confirme par DATA_MODEL.md 'sub_6CEB3->AA31D (PROG)'). \n\nDECOUVERTE : PROG N'EST PAS PARSE EN INSTRUCTIONS ICI — charge comme UN SEUL BLOC BRUT : alloue un tampon (meme allocateur generique tag 0x5C44 que partout ailleurs dans le binaire), copie tout le chunk tel quel (ResourceRecord_ReadFieldGroupA), puis SCANNE le tampon 2 octets par 2 octets et COMPTE les octets nuls a positions paires (+0x00 = compteur resultant). \n\nHYPOTHESE : ces zeros sont des SEPARATEURS entre plusieurs mini-programmes empaquetes dans le meme bloc PROG — ce qui expliquerait comment les 4 progs_id d'une entree PartEntry (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) peuvent chacun pointer vers un OFFSET DIFFERENT a l'interieur de ce meme bloc, plutot que vers des blocs separes. Le vrai decoupage en instructions (opcode, parametres, [instr+0xE] etat) n'a lieu qu'a l'execution, dans MissionScript_ExecutePROG. \n\nStructure du conteneur ProgBuffer (confirmee) : +0x00 compteur de marqueurs (word), +0x02/+0x04 pointeur lointain vers le tampon brut, +0x06 taille du chunk (word)."
 },
 "sub_AA37D": {
 "segment": "seg457",
@@ -45286,5 +45286,2055 @@
 ],
 "new_name": "EntryPoint_RuntimeInit",
 "summary": "Point d'entrée EXE : init runtime overlay manager Borland (calcul heap/pile, relocation bloc mémoire via INT21 4Ah, zero-init BSS), branche vers loc_2AD (init C runtime)."
+},
+"loc_5E216": {
+"segment": "seg141",
+"start_line": 190727,
+"end_line": 190727,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_PassThroughB_5E216",
+"summary": "far, méthode virtuelle stub identique à CachedObject_Method_PassThrough_5E20E."
+},
+"loc_5C416": {
+"segment": "seg129",
+"start_line": 185811,
+"end_line": 185811,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_ReturnType2B_5C416",
+"summary": "far, stub retournant AL=2 (variante byte du tag de type)."
+},
+"loc_64E05": {
+"segment": "seg193",
+"start_line": 211073,
+"end_line": 211073,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ResourceRecord_Method_GetType_64E05",
+"summary": "far, référencée via vtable (DATA XREF implicite, fin de segment) — accesseur simple de type/tag d'enregistrement."
+},
+"loc_1195A": {
+"segment": "seg008",
+"start_line": 35119,
+"end_line": 35180,
+"lines": 62,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID21_ApplyStoreNavCommand_1195A",
+"summary": "far, ~60 lignes - LUE INTEGRALEMENT. Fonction d'APPLICATION (vtable+8) du noeud MVRS_ID21 (le 'placeholder desactive' pour le tournoi de score, mais utilise DIRECTEMENT hors tournoi comme porteur de commande de navigation - voir AI_SYSTEM.md §4bis). Recopie le vecteur position+vitesse recu en parametre (calcule par AI_NavSolutionToPoint_8548) dans node+0x26/+0x2A/+0x2E, pose entite-avion+0x68=0xFF (timer rafraichi), appelle [vtable+0xC] (demarrage du suivi)."
+},
+"loc_F72B": {
+"segment": "seg008",
+"start_line": 31707,
+"end_line": 31707,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID4_TrackingStateMachine_F72B",
+"summary": "far, taille substantielle (>250 lignes), PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -= dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle, entierement non lue."
+},
+"loc_DCEE": {
+"segment": "seg006",
+"start_line": 28902,
+"end_line": 28902,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "AllocateIfNull_12Bytes_DCEE",
+"summary": "far, 26 lignes - JAMAIS DOCUMENTEE AVANT. Utilitaire generique 'allocate-if-null' : si le pointeur passe en argument est NULL, alloue 12 octets (sub_694) et retourne ce nouveau pointeur ; sinon retourne simplement le pointeur deja fourni tel quel. Referencee comme donnee depuis Formation_GuidanceSolution_D081 (+0x26C, probablement stockee dans une table de pointeurs de fonction plutot qu'appelee directement). Motif classique de type 'placement new' pour un petit objet de 12 octets."
+},
+"loc_5CDFE": {
+"segment": "seg134",
+"start_line": 187484,
+"end_line": 187484,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_ConstructThunkAdjustor_5CDFE",
+"summary": "far, thunk d'ajustement de pile redirigeant vers PagedResourceC_ConstructThunk_5CDD0 (motif d'héritage multiple C++ Borland)."
+},
+"loc_66AA4": {
+"segment": "seg201",
+"start_line": 216184,
+"end_line": 216184,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConfigOption_Method_ReturnTypeTag_66AA4",
+"summary": "far, stub retournant une constante de type (5CF6h)."
+},
+"loc_3FCB": {
+"segment": "seg002",
+"start_line": 10596,
+"end_line": 10770,
+"lines": 175,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID3_ScoreGeneric_3FCB",
+"summary": "far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3 (tag 0x278). Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9."
+},
+"loc_65B66": {
+"segment": "seg196",
+"start_line": 213310,
+"end_line": 213310,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "IndexedRecordReader_Method_ReturnZero_65B66",
+"summary": "far, stub retournant 0 (32 bits)."
+},
+"loc_5ACC": {
+"segment": "seg003",
+"start_line": 14023,
+"end_line": 14329,
+"lines": 307,
+"type": "label",
+"calls": [],
+"new_name": "AIEntity_MasterTick_5ACC",
+"summary": "far, ~306 lignes - JAMAIS DOCUMENTEE AVANT CETTE SESSION (methode de vtable, echappait a l'heuristique de detection malgre la couverture 100% des proc). CONFIRME etre le TICK IA MAITRE PAR ENTITE : slot [vtable+0xC] de la classe avion/pilote (table seg339, meme famille que Goal_TransferToWingman/Goal_SelectTransition). Sequence complete : (1) decompresse/recompresse un paquet de drapeaux d'etat individuels (+0x28C/+0x28D) ; (2) calcule deux SEUILS GLOBAUX partages dword_7203D (via test de portee sub_378CA + capteur AI_Sensor_SecondaryAngle_59A5) et dword_72039 (cosinus pondere, sub_54876) - ce sont les MEMES globales deja documentees comme consommees par AI_EvadeOrPursueSelector ; (3) met a jour le suivi de rotation/cap (+0x174-0x179) et un drapeau HUD d'aerofrein (flags_75 bit0) ; (4) calcule un SCORE DE MENACE global word_6D3BC, module par plusieurs bits de flags_75 (bit6: divise ou double selon le contexte, ajustements +/-2/+/-4) ; (5) AIGUILLAGE FINAL : si flags_75 bit5 ET un bit de statut (+0x28B bit3) sont poses, appelle DIRECTEMENT Goal_FollowAllyExec_DAA9 (court-circuite tout le reste - mode 'suivre la formation') ; sinon appelle AI_TriggerBehaviorUpdate_5E53 (chemin normal). Point d'entree racine de toute la logique de decision IA d'une entite pour ce tick. DECOUVERTE NON RESOLUE : le bit5 de flags_75 (non documente avant), qui gate a la fois ce court-circuit et la disponibilite generale de la reflexion IA dans AI_TriggerBehaviorUpdate."
+},
+"loc_5E189": {
+"segment": "seg141",
+"start_line": 190647,
+"end_line": 190647,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_SetPositionAndDispatch_5E189",
+"summary": "far, méthode virtuelle (DATA XREF seg339) : dispatch [bx+0x18], écrit une position (2 champs) dans l'objet, puis dispatch [bx+4] et [bx]."
+},
+"loc_4F351": {
+"segment": "seg109",
+"start_line": 158062,
+"end_line": 158062,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Trigger_TimedRangedSpawnOnce_4F351",
+"summary": "far, méthode virtuelle probable (\"Update\"/\"Tick\") d'un objet trigger : si non déjà déclenché (+0x5B), timer (+0x55, décrément par dword_70458) expiré et cible en portée (sub_378CA), instancie un objet enfant depuis un template (+0x0E) via sub_38B70, copie position/orientation, l'enregistre dans une liste membre (+0x59, dtor sub_3A3EC) et notifie un listener optionnel (+0x1E, résolu via sub_22E27). Hypothèse : trigger d'effet/évènement scripté à usage unique — non vérifié en détail."
+},
+"loc_A002": {
+"segment": "seg004",
+"start_line": 22150,
+"end_line": 22382,
+"lines": 233,
+"type": "label",
+"calls": [],
+"new_name": "AI_ProximityRadioCalloutTrigger_A002",
+"summary": "far, 232 lignes (methode de vtable, DATA XREF seg339:0128) - JAMAIS DOCUMENTEE AVANT, trouvee en parcourant seg004 a la recherche de labels loc_ references par vtable. RESOUT PLUSIEURS INCONNUES PRECEDENTES : (1) utilise entite+0x139 (une des 3 constantes du constructeur AIEntity_Construct_74B43, valeur 30000, jamais expliquee avant) comme SEUIL DE DISTANCE (echelle 24.8) compare a la distance reelle calculee entre le joueur (word_722E6+0x12) et l'objet lie (entite+0x102+0x12), via Math_VectorLength3D_Raw_5828E - CONFIRME que +0x139 est un seuil de proximite radio. (2) etablit une reference faible sur entite+0x289 (un des 5 nouveaux champs decouverts dans AIEntity_Destruct_74E1C, jamais expliques avant) via SetReference_3A44E. (3) declenche des CALLOUTS RADIO (Radio_PlayMessage_CB45, meme fonction que Goal_ActiveWingmanEngagement_878F) avec plusieurs codes distincts (0x13, 7, 6, 1) selon la condition qui a matche - un vrai systeme de 'reactions radio de proximite/etat'. Logique complexe : appelle deux methodes virtuelles sur un objet parametre (si=[bp+0xA]) - [vtable+0x38] puis [vtable+0]/[vtable+0x34] - comparant le resultat a des codes specifiques (8, 0xD=13) ; verifie aussi le champ +0x11 d'un objet resolu via une troisieme methode virtuelle (di->[vtable+0]) contre la valeur 2 avant le calcul de distance. Pose aussi deux nouveaux drapeaux globaux (byte_6E4BC, byte_6E4BD) et un troisieme (byte_6E4C3) selon les branches empruntees. Appelle egalement sub_43D0F et sub_CC7A (codes 7/6) - role de ces deux dernieres non trace en detail."
+},
+"loc_6450B": {
+"segment": "seg193",
+"start_line": 209297,
+"end_line": 209297,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ResourceRecord_Construct_6450B",
+"summary": "far, référencée via vtable (DATA XREF seg339) — constructeur : calcule un offset d'en-tête (StreamReader_ComputeHeaderOffset_64088), formate une chaîne (sub_2945, tag 3FCEh), initialise un sous-objet (CachedObject_DestructSubobjects_5E95A) et détruit un flux existant (StreamReader_Destruct_638FF)."
+},
+"loc_118C3": {
+"segment": "seg008",
+"start_line": 35057,
+"end_line": 35091,
+"lines": 35,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID19_ApplyReturnToBase_118C3",
+"summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE gerant vitesse et direction ensemble, pas seulement la trajectoire."
+},
+"loc_5C0B0": {
+"segment": "seg128",
+"start_line": 185296,
+"end_line": 185296,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_WriteDwordIfSet_5C0B0",
+"summary": "far, méthode virtuelle appelant Registry_MainOperationVariant_5B421 si le champ source est non nul, puis le remet à zéro."
+},
+"loc_4A02": {
+"segment": "seg002",
+"start_line": 11926,
+"end_line": 11950,
+"lines": 25,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID9_ScorePlaceholder_4A02",
+"summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+},
+"loc_5CDBC": {
+"segment": "seg134",
+"start_line": 187437,
+"end_line": 187437,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_ReturnZero_5CDBC",
+"summary": "far, stub retournant AX=0."
+},
+"loc_60783": {
+"segment": "seg162",
+"start_line": 197280,
+"end_line": 197280,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_ScalarDeletingDtorB_60783",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur scalar-deleting (tag 3E40h), même motif que GlyphObject_ScalarDeletingDtorA_6070E pour une classe sœur/apparentée."
+},
+"loc_680DA": {
+"segment": "seg209",
+"start_line": 221096,
+"end_line": 221096,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextScrollDisplayB_Method_DestructThunk_680DA",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant CachedObject_Destruct_5DC87 (seg141, tag 5DFEh, mode 2)."
+},
+"loc_4F5A4": {
+"segment": "seg109",
+"start_line": 158330,
+"end_line": 158330,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Ctor_CompositeObjectA_4F5A4",
+"summary": "far, alloue (sub_658, type 5Bh) et construit un objet composite à 2 sous-membres (init sub_6CACA/sub_6CB73) avec correctifs d'adresses vtable façon overlay fixup. Probable famille de constructeurs dupliqués (cf. pattern seg074/085-086) — identité NON vérifiée."
+},
+"loc_1138F": {
+"segment": "seg008",
+"start_line": 34542,
+"end_line": 34584,
+"lines": 43,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID14b_ApplySetTimer_1138F",
+"summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1)."
+},
+"loc_ED16": {
+"segment": "seg008",
+"start_line": 30692,
+"end_line": 30692,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_SharedDefaultTickNoOp_ED16",
+"summary": "far, 5 lignes - LUE INTEGRALEMENT. Slot [vtable+0x10] PAR DEFAUT, partage par de nombreux types MVRS (references depuis seg339 offsets 0x148, 0x15C, et d'autres - voir la table de tags/slots de AI_SYSTEM.md §3.7). VERITABLE NO-OP : 'mov ax,[bp+0xA] / pop bp / retf' - retourne simplement l'argument recu sans aucun effet de bord. CONFIRME que MVRS_ID7 (tag 0x228) n'a PAS de sequence de manoeuvre dediee (contrairement a l'hypothese initiale qui supposait une symetrie avec ID=6) - son minuteur, pose par MVRS_ID7_ApplySetTimer_1060A, n'est jamais consomme par un vrai tick, le rendant vestigial en pratique pour cet ID."
+},
+"loc_681BC": {
+"segment": "seg211",
+"start_line": 221251,
+"end_line": 221251,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Keyboard_BIOSInterceptHandler_681BC",
+"summary": "⭐ far, **installation matérielle réelle du gestionnaire clavier** — gestionnaire d'interception BIOS (`int 15h` fonction 4Fh, « keyboard intercept », appelée par la routine d'interruption INT 9 du BIOS pour chaque scan-code) : filtre le préfixe de touche étendue 0xE0, bascule sur DS/SS=seg339 et une pile privée, puis **appelle le pointeur `word_7160C`** — exactement le pointeur écrit par `Keyboard_SetHandlerPointer_66EE7` (seg203), qui installe `Keyboard_ProcessScanCode_66AC4` (seg202). Pose `word_7160A=1` (le flag « actif » testé par `Keyboard_ReportErrorIfActive_66EF4`). Referencée via vtable (DATA XREF seg216) et chaîne vers l'ancien gestionnaire (off_681B6) si non concerné. **Clôt la découverte du système clavier commencée en seg202-203** : c'est le point d'accroche matériel réel."
+},
+"loc_B90A": {
+"segment": "seg005",
+"start_line": 24805,
+"end_line": 24805,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GenericSmallObject_Destructor_B90A",
+"summary": "far, 31 lignes (methode de vtable, DATA XREF seg339) - JAMAIS DOCUMENTEE AVANT. Destructeur generique pour un petit objet avec reference faible embarquee a +0x13 : invalide cette reference (WeakRef_InvalidateFar_3A432) si le pointeur n'est pas nul, puis libere conditionnellement l'objet lui-meme (Memory_TypedFree_5C7B6, tag 0x5C44) si le bit0 de l'argument est pose - meme motif que le destructeur de la classe de reference notifiable (ovr229) mais sur une classe distincte (offset de reference different : +0x13 ici contre +0x08/+0x13 selon les champs pour l'autre classe). loc_B8C1 et loc_B90A sont structurellement identiques (code dupplique), rattaches a deux emplacements de vtable differents (seg339:0312 et seg339:0326) - probablement deux classes soeurs partageant un destructeur trivial generique."
+},
+"loc_6403C": {
+"segment": "seg190",
+"start_line": 208265,
+"end_line": 208265,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "StreamReader_Method_ReturnTrue_6403C",
+"summary": "far, référencée via vtable (DATA XREF seg339) — stub retournant toujours vrai (AL=1)."
+},
+"loc_64472": {
+"segment": "seg192",
+"start_line": 209191,
+"end_line": 209191,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_Close_64472",
+"summary": "far, référencée via vtable (DATA XREF seg339) — méthode « Close » de FileStream : File_CloseWithRetry_63463 (seg186), réinitialise le handle, retourne le statut."
+},
+"loc_5C2B3": {
+"segment": "seg128",
+"start_line": 185588,
+"end_line": 185588,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObjectB_DtorThunk_5C2B3",
+"summary": "far, thunk d'ajustement de pile redirigeant vers PagedTextObjectB_Construct_5C27E."
+},
+"loc_12E47": {
+"segment": "seg010",
+"start_line": 37359,
+"end_line": 37442,
+"lines": 84,
+"type": "label",
+"calls": [],
+"new_name": "PilotProfile_LoadATRB_12E47",
+"summary": "far, methode de vtable (referencee via DATA XREF seg339, jamais couverte par l'inventaire proc precedent) - chargeur du sous-chunk ATRB (attributs du profil pilote) : valide _AI_ (tag 0x5F49415F) puis ATRB (tag 0x42525441), verifie que la taille du chunk vaut EXACTEMENT 0x0A (10 octets, PAS 9 comme suppose dans RSProf.cpp) via ResourceRecord_ReadFieldGroupA_64A19. Les 10 octets sont dispatches vers des offsets NON sequentiels et NON dans l'ordre de lecture : octet-fichier 0->+0x97, 1->+0x99, 2->+0x98, 3->+0x9A, 4->+0x96, 5->+0x9B, 6->+0x9C, 7->+0x9D, 8->+0x9E, 9->+0x9F (ce dernier ecrete a un maximum de 3). Les octets 4,5,6 (valeurs a +0x96, +0x9B, +0x9C) sont ensuite dupliques a +0xA0, +0xA1, +0xA2 (stockage miroir, meme motif que le systeme de proprietes nommees courant/defaut). En l'absence du chunk ou taille incorrecte, des valeurs par defaut NON NULLES sont appliquees : 8 pour +0x97/+0x98/+0x99/+0x9A/+0x9D/+0x9E, 0xA (10) pour +0x96/+0x9B/+0x9C, 0 pour +0x9F - CONTREDIT l'hypothese de RSProf.cpp (tous a zero par defaut). Correction majeure pour le portage : format 10 octets avec reordonnancement et defauts non nuls, pas 9 octets sequentiels a zero par defaut."
+},
+"loc_4F2C1": {
+"segment": "seg109",
+"start_line": 157988,
+"end_line": 157988,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Dtor_ScalarDeleting_4F2C1",
+"summary": "far, destructeur scalar-deleting C++ : pose le tag vtable 23A4h, appelle le dtor de base sub_3DBC1, libère conditionnellement (bit0 du flag arg) via sub_5C7B6 (type 5C44h)."
+},
+"loc_5DFF4": {
+"segment": "seg141",
+"start_line": 190395,
+"end_line": 190395,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_InitFromFields_5DFF4",
+"summary": "far, méthode virtuelle (DATA XREF seg339) transmettant les champs +2/+4 de l'objet à CachedObject_AllocateAndInit_5DFBE."
+},
+"loc_14FD7": {
+"segment": "seg015",
+"start_line": 41377,
+"end_line": 41377,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_ExternalView_VtSlotC_14FD7",
+"summary": "far,~230L — slot [+0x0C] de la vtable +0x50 des entrees camera CAMR (tag 0x79C). PAS juste \"init/rendu overlay\" (ancien resume devine) : GESTIONNAIRE PAR-FRAME DE L HABILLAGE UI DE LA VUE EXTERNE -- legende de vue, widget liste/tooltip type kneeboard, et effet de secousse ecran lie aux degats joueur. si=objet vue (1 seul argument, [bp+6]). (1) garde : si si[+2]==0 -> sortie immediate. (2) deux branches selon si[+0x1BC] : branche B (!=0) rafraichit (si+0xF5)->vtable[0xC](), avance le typewriter de legende Text_TypewriterFrame(&word_72A94, si+2) -- CONFIRME le lien exact entre word_72A94 (buffer global des libelles \"Chase Plane\"/etc, ecrit par Mission_TriggerEvaluator) et si+2 (buffer lu par Cockpit_CaptionTextRenderStep_14EFA) -- puis Resource_AccessUnified(5130h). branche A (==0) : pose si[+0x21F] (\"vient d etre rafraichi\") selon byte_72340/byte_721F0==2, sauvegarde si[+0x1A], le remplace temporairement par word_70E62[+0xA], appelle Cockpit_CaptionTextRenderStep_14EFA si si[+0x21F] vient d etre pose, puis si si[+0x21E] : UI_ContainerCloseDispatch(si[+0x24] ou si[+0x22] selon si[+0x140]), UI_NotifyListEvent(&si+0x26), List_RefreshAllTooltips(&si+0x2C), rafraichit (si+0xF5)->vtable[0xC](), typewriter, Resource_AccessUnified(5130h), restaure si[+0x1A]/[+0xC]. (3) EFFET DE SECOUSSE (sans rapport avec le reste) : si word_722E6[+0x68] > 0 (word_722E6 = entite joueur courante) -> Video_SetHorizontalShake(si[+0x1F8 + idx*2]) -- ressemble a un shake de degats/impact. (4) si si[+0x21C]==0xFF (sequence de legende terminee) -> efface si[+0x21F]. RESTE OUVERT : semantique exacte de si[+0x1BC] (mode) et si[+0x21E] (widget liste actif ?), la table si[+0x1F8] (paliers de shake ?) et l origine de l index [bp-9] (non trace). Lu ligne a ligne le 2026-09-12."
+},
+"loc_683D7": {
+"segment": "seg212",
+"start_line": 221677,
+"end_line": 221703,
+"lines": 27,
+"type": "label",
+"calls": [],
+"new_name": "VROOMM_Helper2_683D7",
+"summary": "far, référencée via vtable (DATA XREF implicite) — rôle exact non détaillé."
+},
+"loc_6363A": {
+"segment": "seg189",
+"start_line": 206128,
+"end_line": 206128,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_ScalarDeletingDtor_6363A",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur scalar-deleting de FileStream : libère le buffer (+4, Memory_TypedFree_5C7B6 tag 5C44h) si présent, ferme le fichier (dispatch vtable [bx+0x14]), libère l'objet si demandé (sub_338)."
+},
+"loc_50920": {
+"segment": "seg112",
+"start_line": 160790,
+"end_line": 160790,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "UIScreen_Close_50920",
+"summary": "far, référencée via vtable (DATA XREF seg339), nettoie/ferme l'écran : libère un bloc alloué (dword_72B6F via sub_5C7B6), réinitialise les globales du cluster, cache/réinitialise les widgets 5A9Ah/5A92h."
+},
+"loc_5E1CA": {
+"segment": "seg141",
+"start_line": 190680,
+"end_line": 190680,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_ReleaseCache_5E1CA",
+"summary": "far, méthode virtuelle libérant un bloc mis en cache (Memory_TypedFree_5C7B6, tag 5C44h) si les indicateurs de validité (+0x14/+0x15/+0x10) le permettent, puis réinitialise les champs."
+},
+"loc_5C309": {
+"segment": "seg129",
+"start_line": 185651,
+"end_line": 185651,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_Call3Args_5C309",
+"summary": "far, méthode virtuelle transmettant 3 arguments à sub_2D24."
+},
+"loc_5C244": {
+"segment": "seg128",
+"start_line": 185516,
+"end_line": 185516,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_DtorThunkA_5C244",
+"summary": "far, thunk d'ajustement de pile (adjustor thunk, motif classique d'héritage multiple C++ Borland) redirigeant vers PagedTextObject_Construct_5C1C9."
+},
+"loc_4E2A": {
+"segment": "seg002",
+"start_line": 12425,
+"end_line": 12425,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID16_ScoreThreatSensor_4E2A",
+"summary": "far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_SecondaryAngle_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA."
+},
+"loc_878F": {
+"segment": "seg004",
+"start_line": 19270,
+"end_line": 19662,
+"lines": 393,
+"type": "label",
+"calls": [],
+"new_name": "Goal_ActiveWingmanEngagement_878F",
+"summary": "far, 392 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi — resout la connexion script/GOAL). Option de tournoi GOAL liee a GOAL=5. Referencee via vtable (seg339:off_6D1A8, tag 0xF8). \n\nDECOUVERTE CENTRALE : cette fonction LIT ET ECRIT entite+0x11D (le meme champ que le script de mission utilise) : - Verifie si entite+0x11D == 0xAA (Follow Ally) pour decider d'executer le suivi actif - Peut ELLE-MEME poser entite+0x11D = 0xAA ou 0xA5 (vol vers point) selon les conditions observees (correspondance avec word_722E6, la cible/leader actuellement selectionnee) - Appelle DIRECTEMENT le noeud MVRS ID=21 (entite+0xD1 -> vtable+8) pour l'execution reelle de la navigation — la MEME mecanique que le script de mission utilise via MissionFormation_ComputeSlotAndSpawn. \n\nCONCLUSION : entite+0x11D est un canal de communication BIDIRECTIONNEL entre le script et GOAL=5, pas un simple drapeau a sens unique. Explique l'observation empirique de Remi : avec GOAL=1 seul, le script pose bien entite+0x11D=0xAA (Follow Ally) mais AUCUNE option du tournoi ne le consulte, donc rien ne se passe (l'avion garde son dernier etat, ex: monter apres Take Off). Avec GOAL=5 present, cette fonction consulte le champ, le trouve a 0xAA, et fournit le comportement de vol continu reel (suivi precis des commandes du joueur)."
+},
+"loc_45BE": {
+"segment": "seg002",
+"start_line": 11405,
+"end_line": 11405,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID6_ScoreSensorGatedSubmode_45BE",
+"summary": "far, 280 lignes (11405-11684) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x23C confirme = ID=6 via ancrage sequentiel - CORRIGE : precedemment melangee avec ID=5/7). Base=3, pose node+0x26=3 au debut. GARDE SENSOR : dword_7203D+0xFA000 compare a entite+0x11->+0x1A (portee de detection etendue) - si echec ET byte_720DF/720E0 non tous deux actifs, sortie score=0. Sinon : tache en cours, byte_720DF, sub_564A. Calcul : fenetre temporelle sur dword_720D9 (bornes 0xFFF83000, meme famille que ID=5), seuils word_72095/720DD/72093 identiques a ID=5, dword_7201C/7209B. SOUS-MODE DISTINCT : compare dword_720CD/720C5, si declenche POSE node+0x26=2 (different du 1 pose par ID=5) et ajoute sub_564A comme penalite supplementaire (-6). Compare ensuite dword_720BB/720B7 sous 3 formes differentes (bearing) avec ajustements -6/-3/+2. Score borne [0,9]."
+},
+"loc_5E61C": {
+"segment": "seg144",
+"start_line": 191525,
+"end_line": 191525,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextRenderer_EncodeCharIfFlagged_5E61C",
+"summary": "far, référencée via vtable (DATA XREF seg339) et depuis seg047 — appelle TextRenderer_EncodeCharB_5E2A3 (seg142) si le champ +7 de l'objet est non nul."
+},
+"loc_52F0F": {
+"segment": "seg114",
+"start_line": 166006,
+"end_line": 166006,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_Box_ContainsPoint_52F0F",
+"summary": "far, référencée via vtable, test de collision boîte (AABB) : 6 comparaisons de bornes le long de X/Y/Z (centre +0x22/+0x26/+0x2A, demi-extents +0x2E/+0x32/+0x36/+0x3A/+0x3E)."
+},
+"loc_4ECD": {
+"segment": "seg002",
+"start_line": 12514,
+"end_line": 12514,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID19_ScoreFuelOrResource_4ECD",
+"summary": "far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif."
+},
+"loc_5C331": {
+"segment": "seg129",
+"start_line": 185673,
+"end_line": 185673,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_ReturnType2_5C331",
+"summary": "far, stub retournant AX=2 (tag de type)."
+},
+"loc_5E250": {
+"segment": "seg141",
+"start_line": 190780,
+"end_line": 190780,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_SetPositionAndDispatchB_5E250",
+"summary": "far, méthode virtuelle : écrit une position (2 champs) puis dispatch [bx]."
+},
+"loc_5C13C": {
+"segment": "seg128",
+"start_line": 185365,
+"end_line": 185365,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_Init_5C13C",
+"summary": "far, méthode virtuelle « constructeur/init » : réinitialise byte_70A62 puis appelle PagedMemory_CheckDriverPresent_5B944."
+},
+"loc_3CAD9": {
+"segment": "seg084",
+"start_line": 121393,
+"end_line": 121393,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "WorldObject_MethodReturnTrue_3CAD9",
+"summary": "far (methode vtable triviale, label seul). push bp / mov ax,[bp+6] / mov al,1 / retf => renvoie 1 (true). Slot voisin de WorldObject_ComposeOrientation* (seg339:off_6F670). Predicat par defaut d'une classe de base d'objet du monde."
+},
+"loc_A1DF": {
+"segment": "seg004",
+"start_line": 22385,
+"end_line": 22441,
+"lines": 57,
+"type": "label",
+"calls": [],
+"new_name": "AI_PropagateAircraftFlagsAndFollowGate_A1DF",
+"summary": "far, 57 lignes (methode de vtable, DATA XREF seg339:012C) - JAMAIS DOCUMENTEE AVANT, trouvee et transcrite par Remi en parcourant seg004. Efface le bit 2 de flags_75 sur l'avion lie (entite+0xB) - le bit 'aerofrein' deja documente en §7 de AI_SYSTEM.md. Propage deux AUTRES bits de flags_75 (bits 0 et 1, deja documentes comme 'volets' et 'aerofrein' - a reverifier lequel exactement compte tenu de l'ordre de lecture ici) vers les bits 4 et 5 d'un champ sur un troisieme objet (entite+7, dereference, champ +0x1C) - un miroir/synchronisation d'etat avion vers un objet lie distinct. Pose entite_avion+0x68=0xFF (probable sentinelle 'timer remis a neuf', a verifier). Si un argument (arg_2, [bp+0xA]) est non-nul, appelle Targeting_AcquireBestThreat(entite, 0). Si le bit 3 de entite+0x28B est pose ET entite+0x27F est non-nul, appelle Goal_FollowAllyExec(entite, arg_1) - CONFIRME un point d'entree supplementaire vers le comportement d'escorte, distinct de Goal_ActiveWingmanEngagement_878F. Termine en remettant a zero le champ +0x59 de l'objet lie (entite+0x102)."
+},
+"loc_5940B": {
+"segment": "seg121",
+"start_line": 179463,
+"end_line": 179463,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Interrupt_TimerISR_5940B",
+"summary": "⭐ far, référencée comme donnée (table d'ISR) depuis sub_AA810 — **gestionnaire d'interruption matérielle** : envoie l'EOI au contrôleur 8259A (`out 20h,al`) puis dispatche sur 4 cas (byte_70858) vers Interrupt_TimerDispatch_59436. Probable minuteur matériel pilotant l'animation/séquencement (musique ou effets de transition)."
+},
+"loc_5ADFC": {
+"segment": "seg125",
+"start_line": 183041,
+"end_line": 183041,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextObject_ScalarDeletingDtor_5ADFC",
+"summary": "far, référencée comme donnée par TextObjectCluster_DestructAll_5ABD1 — destructeur scalar-deleting d'un objet texte individuel : avance/désactive son créneau de séquenceur (Sequencer_AdvanceActiveSlot_59F1D), libère son buffer (sub_5C7B6, type 5C44h), réinitialise ses champs, libère l'objet lui-même si demandé (sub_338)."
+},
+"loc_4F54": {
+"segment": "seg002",
+"start_line": 12575,
+"end_line": 12575,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID21_ScorePlaceholder_4F54",
+"summary": "far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x15 (tag 0x138). TOUJOURS RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais selectionnable dans le tournoi de AI_BehaviorStateMachine quelle que soit la valeur brute du fichier PROF pour cet identifiant."
+},
+"loc_5F4D8": {
+"segment": "seg158",
+"start_line": 194469,
+"end_line": 194469,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_PassThrough_5F4D8",
+"summary": "far, référencée via vtable (DATA XREF seg216/seg339) — stub transmettant simplement son argument."
+},
+"loc_59817": {
+"segment": "seg121",
+"start_line": 180024,
+"end_line": 180024,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Interrupt_TimerCleanup_59817",
+"summary": "far, référencée via vtable (DATA XREF seg339), libère des ressources (sub_5C7B6, motif de \"free\" déjà vu) associées au sous-système minuteur."
+},
+"loc_681BB": {
+"segment": "seg211",
+"start_line": 221248,
+"end_line": 221248,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Keyboard_BIOSInterceptEntry_681BB",
+"summary": "far, point d'entrée du gestionnaire d'interception clavier BIOS (sauvegarde des flags avant traitement)."
+},
+"loc_606E4": {
+"segment": "seg162",
+"start_line": 197167,
+"end_line": 197167,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_ReturnZero_606E4",
+"summary": "far, référencée via vtable (DATA XREF seg339) — stub retournant 0."
+},
+"loc_5CDD0": {
+"segment": "seg134",
+"start_line": 187455,
+"end_line": 187455,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_ConstructThunk_5CDD0",
+"summary": "far, référencée via vtable et en interne (loc_5CDFE) — construit un sous-objet (sub_5EA03), libère si demandé (sub_338). Même motif que les autres classes du cluster mémoire paginée."
+},
+"loc_5EEDC": {
+"segment": "seg154",
+"start_line": 193256,
+"end_line": 193256,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_ExceptionHandler_ReturnPoint_5EEDC",
+"summary": "far, point de retour vers lequel le gestionnaire d'exception (loc_5EEDD) reprend l'exécution normale via un retf construit manuellement."
+},
+"loc_4CD1": {
+"segment": "seg002",
+"start_line": 12272,
+"end_line": 12272,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID15b_ScoreIntercept_4CD1",
+"summary": "far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9)."
+},
+"loc_3CB0B": {
+"segment": "seg084",
+"start_line": 121424,
+"end_line": 121424,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "WorldObject_ComposeOrientationAngleArray_3CB0B",
+"summary": "far (methode vtable, label seul - JAMAIS cataloguee avant 2026-09-05). Variante de WorldObject_ComposeOrientation3Angles_3CAE3 : recoit l'objet + UN pointeur vers un tableau de 3 dword angles ([bp+8]), appelle WorldObject_BuildOrientationMatrix_56E8A(objet+0x2C, anglesPtr) qui lit les angles en [anglesPtr+0/+4/+8] et compose les 3 rotations incrementales sur la matrice a objet+0x2C. Puis Debris_BodyDetach(objet). Presente dans 18+ vtables d'objets du monde (seg339 off_6F66C, off_6F784, off_6F810, ... off_703D6) => methode GENERIQUE POLYMORPHE partagee par toute la hierarchie d'objets du monde."
+},
+"loc_4A71": {
+"segment": "seg002",
+"start_line": 11990,
+"end_line": 12014,
+"lines": 25,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID12_ScorePlaceholder_4A71",
+"summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+},
+"loc_14EF0": {
+"segment": "seg014",
+"start_line": 41233,
+"end_line": 41233,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_Entry_GetState_COCKPIT_14EF0",
+"summary": "far — getter trivial (DATA XREF seg339:078C). `return AL = 4`. 4 = code d'état COCKPIT."
+},
+"loc_680CC": {
+"segment": "seg209",
+"start_line": 221086,
+"end_line": 221086,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextScrollDisplayB_Method_AllocateThunk_680CC",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant CachedObject_Allocate_5DA48 (seg141, tag 5DFEh)."
+},
+"loc_1493A": {
+"segment": "seg014",
+"start_line": 40672,
+"end_line": 40672,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_OrbitTrackCompute_1493A",
+"summary": "far, ~0xB0 L — CAMÉRA ORBITALE / SUIVI (ROTA, et probable base de CHASE/TARGET). Slot de vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par Math_ApplyRotationHelperA_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée. targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8). POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20] (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas -> Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_ApplyToVectorY_57660 accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir CAMERA_SYSTEM.md §4bis."
+},
+"loc_5CCBB": {
+"segment": "seg134",
+"start_line": 187291,
+"end_line": 187291,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_Allocate_5CCBB",
+"summary": "far, méthode virtuelle allouant via sub_658. Classe apparentée (tag 129Eh) au cluster de mémoire paginée (seg127-129), chaînée dans une liste globale d'instances (word_70EA8)."
+},
+"loc_112F7": {
+"segment": "seg008",
+"start_line": 34454,
+"end_line": 34454,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID9_ApplyTrivialDelegate_112F7",
+"summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+},
+"loc_5EAC8": {
+"segment": "seg152",
+"start_line": 192555,
+"end_line": 192555,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "DisplaySurfaceClass_Construct_5EAC8",
+"summary": "far, référencée via vtable (DATA XREF seg339) — constructeur de la classe DisplaySurface : réinitialise le mode vidéo global (word_70EA2=0) et alloue un buffer de 0x100 octets (tag 3DF2h) via Member_AllocateAndCopy_5EA23."
+},
+"loc_3E90": {
+"segment": "seg002",
+"start_line": 10440,
+"end_line": 10440,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID1_ScoreAngularGuarded_3E90",
+"summary": "far, 154 lignes (10440-10593) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x2B4 confirme = ID=1 via le constructeur sub_742FC, apres correction d'un decalage systematique dans la table precedente). Formule complete : appelle sub_EC22 (sync de contexte partage), base=5. GARDES SEQUENTIELS (chacun -> sortie score=0 si echoue) : entite+0x13!=0 (tache en cours), byte_720C3>byte_72038 (seuil de competence/personnalite), word_72093<=0x14 (20 - angle de poursuite), sub_564A(entite) retourne faux, sub_56E5(entite) retourne faux (capteur mis en cache, deja documente), byte_720DF!=0 OU byte_720E0!=0. CALCUL PRINCIPAL (si tous les gardes passent) : ajuste le score via un jeu complexe de seuils sur word_72093/word_72095 (angles) et dword_7209B vs dword_7201C (distance/seuil NUMS), avec des ajustements +2/-3/-4/-6/-10 selon les paliers d'angle - puis GARDE FINALE sur byte_720DF (si actif, soustrait entite->aircraft+0xB0 /2 - meme champ carburant que MVRS_ID13/19 connu). Score final borne [0,9]."
+},
+"loc_1131D": {
+"segment": "seg008",
+"start_line": 34476,
+"end_line": 34476,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID10_ApplyTrivialDelegate_1131D",
+"summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+},
+"loc_1011F": {
+"segment": "seg008",
+"start_line": 32683,
+"end_line": 33049,
+"lines": 367,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID6_TimerTickAndSubmodeSwitch_1011F",
+"summary": "far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_TurnToBearingCmd_7E18, AI_TurnToHeadingCmd_8104, AI_PitchRollController_Heading_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_TurnToHeadingCmd - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_PitchRollController_Heading, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_SecondaryAngle), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_TurnToBearingCmd. PHASE 7 : retour au cap de reference (0, taux 10) via AI_TurnToHeadingCmd - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi)."
+},
+"loc_66809": {
+"segment": "seg201",
+"start_line": 215656,
+"end_line": 215656,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConfigOption_ApplyAndDisplay_66809",
+"summary": "⚠️ far, 109 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), combine sub_67906, sub_67B3A et ConfigOption_FormatValue_668A2."
+},
+"loc_644F3": {
+"segment": "seg192",
+"start_line": 209264,
+"end_line": 209264,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_SeekToEnd_644F3",
+"summary": "far, référencée via vtable (DATA XREF seg339) — dispatch vtable [bx+0xC] avec position 0 depuis la fin (méthode Seek stylisée « aller à la fin »)."
+},
+"loc_60704": {
+"segment": "seg162",
+"start_line": 197195,
+"end_line": 197195,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_ReturnZeroB_60704",
+"summary": "far, référencée via vtable (DATA XREF seg339) — stub retournant 0 (identique à GlyphObject_Method_ReturnZero_606E4)."
+},
+"loc_100B6": {
+"segment": "seg008",
+"start_line": 32641,
+"end_line": 32680,
+"lines": 40,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID6_ApplySetTimer_100B6",
+"summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x6. Motif standard, initialise un MINUTEUR (node+0xD = 0x500 = 1280), incremente node+0x2, appelle [vtable+0xC]. Cette fonction EST COURTE - le vrai travail se passe dans le slot suivant (+0x10, voir loc_1011F ci-dessous)."
+},
+"loc_6672D": {
+"segment": "seg201",
+"start_line": 215497,
+"end_line": 215497,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConfigOption_Construct_6672D",
+"summary": "far, référencée via vtable (DATA XREF seg216) — constructeur : alloue (sub_658, 1 octet), initialise via sub_67DA4 puis délègue à ConfigOption_ConstructFull_66762."
+},
+"loc_14904": {
+"segment": "seg014",
+"start_line": 40638,
+"end_line": 40638,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_Entry_GetState_1_14904",
+"summary": "far — getter trivial (DATA XREF seg339:0692). `return AL = 1`."
+},
+"loc_5C221": {
+"segment": "seg128",
+"start_line": 185493,
+"end_line": 185493,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_Method_ReadDefault_5C221",
+"summary": "far, méthode virtuelle appelant PagedMemory_ReadFormattedString_5BE40 avec des arguments nuls — lecture par défaut."
+},
+"loc_5E20E": {
+"segment": "seg141",
+"start_line": 190717,
+"end_line": 190717,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_PassThrough_5E20E",
+"summary": "far, méthode virtuelle stub transmettant simplement son argument."
+},
+"loc_66721": {
+"segment": "seg200",
+"start_line": 215476,
+"end_line": 215476,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Runtime_StackAdjustAndJump_66721",
+"summary": "far, ajuste directement la pile de l'appelant (soustrait 6 octets à ss:[bx+4]) puis saute vers une adresse fixe (loc_6662F, à l'intérieur de JoystickManager_InitSingleton_6663D) — motif de thunk d'ajustement d'appel non standard."
+},
+"loc_6455E": {
+"segment": "seg193",
+"start_line": 209355,
+"end_line": 209355,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ResourceRecord_RefreshPosition_6455E",
+"summary": "far, référencée via vtable (DATA XREF seg339) — combine sub_64D25 et StreamReader_CloseHook_63D6E."
+},
+"loc_6669A": {
+"segment": "seg200",
+"start_line": 215364,
+"end_line": 215364,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "JoystickManager_Destruct_6669A",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur du gestionnaire : vide la chaîne de callbacks (LinkedList_RemoveAllAndDestroy_5F397), libère l'objet si demandé."
+},
+"loc_14859": {
+"segment": "seg014",
+"start_line": 40551,
+"end_line": 40551,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_Entry_GetSubject_14859",
+"summary": "far — slot de vtable d'entrée caméra (DATA XREF seg339:069A/0726...). Trivial : return si[+0x89] (pointeur entité sujet lié)."
+},
+"loc_66AAF": {
+"segment": "seg201",
+"start_line": 216193,
+"end_line": 216193,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConfigOption_InitGlobalState_66AAF",
+"summary": "far, référencée via vtable (DATA XREF seg339) — initialise les globales du module (word_72DA6, byte_72DA8/72DA9 à zéro)."
+},
+"loc_FCE1": {
+"segment": "seg008",
+"start_line": 32272,
+"end_line": 32360,
+"lines": 89,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID4_ApplyInterceptSolution_FCE1",
+"summary": "far, 125 lignes (32272-32396) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x264 confirme = ID=4 via ancrage sequentiel). Motif standard (reevalue, avion+0x68, compteur+0x2), PUIS calcul RICHE : resout une position via [entite+0x11->vtable+0x3C] (methode virtuelle), calcule un delta de position entre deux objets references (entite+0x13/+0x11, sous-champs +0x12), appelle Angle_DeltaNormalized_A_4F95 sur ce delta - SI RESULTAT > 0, pose bit0 de entite+0x32 (sinon l'efface). Resout ENSUITE une SECONDE position via sub_5593A et ECRIT LE RESULTAT dans node+0x26/0x2A/0x2E (position d'interception/anticipation). Demarre le suivi a la fin. Fonction d'application substantielle, pas un simple timer - calcule une VRAIE solution d'interception geometrique."
+},
+"loc_638BB": {
+"segment": "seg189",
+"start_line": 206590,
+"end_line": 206590,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_GetPosition_638BB",
+"summary": "far, référencée via vtable (DATA XREF seg339) — accesseur simple retournant la position courante (+0x18, 32 bits)."
+},
+"loc_11763": {
+"segment": "seg008",
+"start_line": 34912,
+"end_line": 34946,
+"lines": 35,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID15b_ApplyPersistence_11763",
+"summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616), reacquisition si echec."
+},
+"loc_6715C": {
+"segment": "seg204",
+"start_line": 217712,
+"end_line": 217712,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextScroll_TickHandler_6715C",
+"summary": "⚠️ far, 71 lignes, NON DÉTAILLÉE — référencée comme donnée (installée par TextScroll_RegisterHandler_671CA via sub_67517) — gestionnaire de tic périodique (teste des bits de flags 0x6/0x18) pour l'animation de défilement de texte, motif similaire au registre de modules temporisés (seg161)."
+},
+"loc_638CE": {
+"segment": "seg189",
+"start_line": 206602,
+"end_line": 206602,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_DestructPartial_638CE",
+"summary": "far, référencée via vtable (DATA XREF seg339) — variante de destructeur ne posant qu'un seul tag (3F42h), ferme le fichier (dispatch [bx+0x14]) et libère l'objet si demandé (sub_338)."
+},
+"loc_547E1": {
+"segment": "seg114",
+"start_line": 169834,
+"end_line": 169834,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GeomNode_ResetGlobalCounter_547E1",
+"summary": "far, référencée via vtable (DATA XREF seg339), remet à zéro dword_706AB — probable reset du sous-système au chargement/changement de contexte."
+},
+"loc_6725D": {
+"segment": "seg204",
+"start_line": 217930,
+"end_line": 217930,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextScroll_ResetFlag_6725D",
+"summary": "far, référencée via vtable (DATA XREF seg339) — réinitialise un indicateur global (byte_72E48)."
+},
+"loc_59436": {
+"segment": "seg121",
+"start_line": 179496,
+"end_line": 179496,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Interrupt_TimerDispatch_59436",
+"summary": "⚠️ far, 234 lignes, NON DÉTAILLÉE — table de saut à plusieurs cas (off_595BA) appelée depuis Interrupt_TimerISR_5940B ; appelle des fonctions non encore documentées (sub_59FF5/603CC/60402/603DE, probablement définies dans un segment suivant). Candidat pour session dédiée en lien avec le minuteur matériel."
+},
+"loc_6599C": {
+"segment": "seg195",
+"start_line": 212944,
+"end_line": 212944,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "StreamReader_ConstructMinimal_6599C",
+"summary": "far, référencée via vtable (DATA XREF seg339) — constructeur minimal (alloue 4 octets, sub_658) posant le même tag vtable que FileStream (3F42h, seg189) — probable classe sœur/dérivée."
+},
+"loc_5C208": {
+"segment": "seg128",
+"start_line": 185479,
+"end_line": 185479,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_Method_5C208",
+"summary": "far, méthode virtuelle appelant sub_5F4A9 avec un tag 1514h."
+},
+"loc_60690": {
+"segment": "seg162",
+"start_line": 197114,
+"end_line": 197114,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_MeasureCharParam_60690",
+"summary": "far, référencée via vtable (DATA XREF seg339) — variante paramétrée de mesure de caractère (le caractère à mesurer est un argument, pas 'A' fixe)."
+},
+"loc_5ADD9": {
+"segment": "seg125",
+"start_line": 183020,
+"end_line": 183020,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextObjectCluster_InitState_5ADD9",
+"summary": "far, référencée via vtable (DATA XREF seg339), initialise les globales d'état du cluster objets-texte (word_70997/70999, byte_70996)."
+},
+"loc_5CA80": {
+"segment": "seg131",
+"start_line": 186901,
+"end_line": 186901,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Memory_AllocatorTable_ConstructThunk_5CA80",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant Memory_AllocatorTableConstructor_5C9D3(tag=5C44h) — construction du gestionnaire de mémoire typée global."
+},
+"loc_66D91": {
+"segment": "seg202",
+"start_line": 216786,
+"end_line": 216786,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Keyboard_QueryHandlerTableWrapper_66D91",
+"summary": "far, combine sub_66EF4 et Keyboard_QueryHandlerTable_66D39."
+},
+"loc_5CD22": {
+"segment": "seg134",
+"start_line": 187348,
+"end_line": 187348,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_Init_5CD22",
+"summary": "far, méthode virtuelle « init » appelant sub_1BF4."
+},
+"loc_4F30C": {
+"segment": "seg109",
+"start_line": 158021,
+"end_line": 158021,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ClassStub_ReturnConst16h_4F30C",
+"summary": "far, stub identique à ClassStub_ReturnConst16h_4F2BA (AL=16h) pour une autre classe/vtable."
+},
+"loc_52F8B": {
+"segment": "seg114",
+"start_line": 166055,
+"end_line": 166055,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_ClassStub_ReturnConst42h_52F8B",
+"summary": "far, stub retournant AL='B' (42h) — tag de classe Box."
+},
+"loc_5EEBE": {
+"segment": "seg153",
+"start_line": 193218,
+"end_line": 193218,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FontStyle_ConstructThunk_5EEBE",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant FontStyle_Construct_5EB18(tag=5C60h)."
+},
+"loc_5CCCE": {
+"segment": "seg134",
+"start_line": 187303,
+"end_line": 187303,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_ReleaseIfSet_5CCCE",
+"summary": "far, méthode virtuelle : libère (sub_346) et remet à zéro un champ dword si non nul."
+},
+"loc_63616": {
+"segment": "seg189",
+"start_line": 206090,
+"end_line": 206090,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_OpenAndInit_63616",
+"summary": "far, méthode virtuelle (DATA XREF seg339) ouvrant le fichier (sub_64413, avec mode d'accès arg) et réinitialisant le champ +0x14, retourne succès (1)."
+},
+"PhysicsTicks": {
+"segment": "seg103",
+"start_line": 149559,
+"end_line": 149559,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PhysicsTicks",
+"summary": "far, ~0x4A85B, ~350L, seg103 — LE TICK DE LA DYNAMIQUE AVION (classe JDYN + 3 variantes ; slot 'Update' des vtables installees par JDYN_LoadChunk, tags seg339 0x228A/0x2312/0x2362 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]). Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) rate-limite (dword_72A2C*10), Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = base*dword_72A14*[si+0x33](SFC)*cran*dt(dword_70458), [si+0x6D] -= burn, flameout ([si+0x28]=0) si [si+0x6D]<=0 ; (5) etat volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 -> Guidance_HomingVelocityUpdate (AUTOPILOTE cinematique) SINON manuel : Aero_ComputeControlFlags75Bit5A -> [A+0x14/18/1C] (taux angulaires) ; Aero_ComputeControlFlags75Bit5A(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; drag sol sur [si+0x0C] si |A.vitesse|<0x2800 ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (faite par [si+2]->[bx+0x34] en tete de tick, sur l'objet monde, ordre integre-puis-calcule). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2."
+},
+"loc_4F4EE": {
+"segment": "seg109",
+"start_line": 158240,
+"end_line": 158240,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FlightPhysics_TickCandidate_4F4EE",
+"summary": "⚠️ far, référencé par jmp depuis seg082 — CANDIDAT FORT pour le tick physique de l'avion : réinitialise les accumulateurs (appel sub_4F56D), combine deux vecteurs (sub_47140+sub_46F5E), les applique à l'objet (sub_46392), puis appelle sub_4791E (Aero_ComputeForcesMain) sur si+4 et applique le résultat via sub_4696C. Lecture rapide seulement — À LIRE EN DÉTAIL EN PRIORITÉ avant toute affirmation ferme (cf. règle sub_3314/sub_49C2E)."
+},
+"loc_4A2A": {
+"segment": "seg002",
+"start_line": 11951,
+"end_line": 11964,
+"lines": 14,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID10_ScorePlaceholder_4A2A",
+"summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+},
+"loc_65EC5": {
+"segment": "seg196",
+"start_line": 213905,
+"end_line": 213905,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "IndexedRecordReader_Method_CloneState_65EC5",
+"summary": "far, référencée via vtable (DATA XREF seg339) — construit un nouvel objet copiant l'état d'index courant (tag 3FEAh via sub_5E9A9), transfère le flux sous-jacent (StreamReader_Destruct_638FF puis Member_ClearAndFree_5EA03) — probable méthode « clone » de l'itérateur d'index."
+},
+"loc_52F99": {
+"segment": "seg114",
+"start_line": 166071,
+"end_line": 166071,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_Radial2D_ContainsPoint_52F99",
+"summary": "far, référencée via vtable, test de collision radial 2D avec plage min/max en Z, distance calculée via sub_5828E, comparée au rayon (+0x32)."
+},
+"loc_2DF0D": {
+"segment": "seg065",
+"start_line": 92779,
+"end_line": 92779,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "View_RenderFrame_2DF0D",
+"summary": "far — méthode virtuelle 'rendre cette vue' partagée par de NOMBREUSES vtables (DATA XREF seg339:0478/049C/...). Args : si = objet vue (ex. word_72A8F). Corps : lecture PIT (PIT_ReadHighPrecision_27144) -> dword_72B7A (profilage) ; si [si+0x5C]==0 (pas de viewport) -> bail ; Camera_CopyState_2DE6D(si,0x5146) (snapshot) ; sub_5D999([bp-4], [si+0x5C]+2) ; si->vtable[+0x50][+0x20]() ; si->vtable[+0x50][+0x14]() (= Camera_ExternalViewComputeMain_1519E pour une entrée CHAS — MAJ position/orientation caméra) ; [si+0x5C]->vtable[+0x04]() (rendu via le rect viewport du chunk) ; jalons de profilage dword_72B7E/82/86/8A/8E ; sub_5D9D3(2,[bp-4]). C'est le point d'entrée par frame côté rendu qui tick la caméra de la vue active."
+},
+"loc_11809": {
+"segment": "seg008",
+"start_line": 34982,
+"end_line": 35021,
+"lines": 40,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID16_ApplyPersistence_11809",
+"summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases - verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une reaction reflexe plutot qu'une manoeuvre planifiee."
+},
+"loc_A307": {
+"segment": "seg005",
+"start_line": 22534,
+"end_line": 22938,
+"lines": 405,
+"type": "label",
+"calls": [],
+"new_name": "Goal_SetObjective_A307",
+"summary": "far, 405 lignes (methode de vtable, DEUX points d'entree : loc_A307 via seg339:off_6D1D0, ET loc_A30A/+3octets via seg216:00E6 - la table de dispatch de messages partagee). ENTIEREMENT TRACEE. C'est LE VERITABLE IMPLEMENTEUR de la famille d'opcodes OP_SET_OBJ_* (161-191/0xA1-0xBF), celui vers lequel MissionScript_CallNativeHandler_52513 delegue effectivement (confirme par la meme structure de switch 31 cas sur la meme plage). Parametres : entite (bp+6), operande principal 'si' (bp+0xA, le CODE OBJECTIF a fixer), cible (bp+0xC), pointeur vers donnees etendues 'di' (bp+0xE), buffer (bp+0x10). GATE INITIAL : si le bit 5 de entite+0x28B (mode formation/escorte) est pose, COURT-CIRCUITE tout le switch et saute directement a la queue commune (loc_A641) - un objectif ne peut pas etre change tant que l'entite est sous controle de formation. 13 GESTIONNAIRES DISTINCTS COUVRANT LES 31 CODES (jump table off_A695) : 0xA1 TAKE_OFF (loc_A3FA) : goal_state=code, rien d'autre. 0xA2 LAND (loc_A459) : ecrit +0x11F/+0x123/+0x127 PUIS +0x12B/+0x12F/+0x133 (deux vecteurs 3D consecutifs, source=operande di puis di). 0xA4/0xA5 (non nommes cote libRealSpace, loc_A405, partagent le meme gestionnaire) : ecrit +0x12B/+0x12F/+0x133 (source=buffer bp+0x10) PUIS +0x11F/+0x123/+0x127 (source=di) - ORDRE INVERSE de 0xA2. 0xA7 DESTROY_TARGET (loc_A4CA) : SetReference sur +0x137 (confirme le champ deja connu via Goal_IsComplete). 0xA8 DEFEND_TARGET (loc_A38D) : SetReference sur +0x10F PUIS +0x137 (continuation partagee loc_A5D5). 0xA9 DEFEND_AREA et 0xBF DEACTIVATE_OBJ (loc_A3BE, MEME gestionnaire) : efface la reference +0x10F (NULL), copie un vecteur 3D (source=di) dans +0x111/+0x115/+0x119 (champ 'centre de zone', DIFFERENT de +0x14A/+0x14E/+0x152 utilise par FOLLOW_ALLY). 0xAA FOLLOW_ALLY (loc_A341, deja documente separement) : SetReference sur +0x145, +0x149=0, copie position (source=di) dans +0x14A/+0x14E/+0x152 (continuation partagee loc_A368). 0xAB SET_MESSAGE (loc_A4AF) : appelle DIRECTEMENT Radio_PlayMessage_CB45 avec l'operande comme identifiant de message. 0xAC (non nomme, loc_A4EE) : ecrit +0x11F/+0x123/+0x127 ET +0x111/+0x115/+0x119 (deux vecteurs), efface +0x10F, PUIS ECRIT DYNAMIQUEMENT +0x139 ET +0x141 depuis l'operande buffer (bp+0x10, rescale >>8) - CONFIRME que +0x139 (seuil de proximite radio, AI_ProximityRadioCalloutTrigger_A002) et +0x141 (troisieme constante mysterieuse du constructeur d'entite) sont des PARAMETRES DE DETECTION CONFIGURABLES PAR OPCODE, pas de simples constantes fixes - probable 'SET DETECTION/AWARENESS RANGE'. 0xB1 (non nomme, loc_A588) : ecrit +0x13D (source=di+8) - MEME champ que 0xAC via une continuation partagee (loc_A598) - donc +0x13D peut AUSSI etre configure independamment par ce code. 0xB2 (non nomme, loc_A5E3) : ecrit +0x141 (source=di+4) - encore une voie d'ecriture pour ce champ. 0xB3 (non nomme, loc_A5A4) : SetReference sur +0x145 (MEME champ que FOLLOW_ALLY !), efface +0x149 - variante d'assignation de cible d'escorte sans changer goal_state. 0xB5 (non nomme, loc_A5C8) : SetReference sur +0x147 (le champ 'cible == joueur ?' de Goal_ActiveWingmanEngagement_878F), via la MEME continuation que 0xA8 (loc_A5D5). DEFAUT (loc_A5FE, pour tous les codes non geres explicitement - 0xA3,0xA6,0xAD-0xB0,0xB6-0xBE) : efface +0x10F, copie la position PROPRE de l'objet lie (entite+0x102+0x12) dans +0x111/+0x115/+0x119 (position de repli sur soi-meme), FORCE goal_state=0xBF (DEACTIVATE_OBJ) - un vrai comportement de secours/desactivation pour tout code non reconnu. QUEUE COMMUNE (loc_A641, apres N'IMPORTE QUEL cas) : (1) si goal_state==0xAA OU bit3 de +0x28B pose, appelle IMMEDIATEMENT Goal_FollowAllyExec_DAA9 (meme fonction que le court-circuit de AIEntity_MasterTick_5ACC !) - l'objectif FOLLOW_ALLY prend effet sans attendre le prochain tick. (2) SAUF SI bit5 de +0x28B est deja pose (deja verifie une fois en formation), appelle Goal_IsComplete_A6D3 IMMEDIATEMENT sur le nouvel etat pour verifier s'il est deja trivialement rempli, et retourne ce booleen comme resultat de la fonction entiere. Anciennement compris seulement partiellement (case 0xAA lue isolement lors de l'investigation des commandes radio) - desormais documente dans son integralite comme UNE SEULE fonction coherente plutot que des labels loc_ fragmentes et non catalogues."
+},
+"loc_5ADEF": {
+"segment": "seg125",
+"start_line": 183030,
+"end_line": 183030,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextObjectCluster_DtorThunk_5ADEF",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant TextObjectCluster_DestructAll_5ABD1(0x5C06)."
+},
+"loc_F2C8": {
+"segment": "seg008",
+"start_line": 31254,
+"end_line": 31356,
+"lines": 103,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID3_ApplyBreakDirection_F2C8",
+"summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle NotifiableRef_SwapTarget_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois)."
+},
+"loc_5C250": {
+"segment": "seg128",
+"start_line": 185524,
+"end_line": 185524,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_ConstructVariant_5C250",
+"summary": "far, référencée via vtable — variante de construction plus légère (sub_5EA03, libération conditionnelle via sub_338, sans les tags vtable)."
+},
+"loc_4F7D6": {
+"segment": "seg109",
+"start_line": 158554,
+"end_line": 158554,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Ctor_CompositeObjectC_4F7D6",
+"summary": "far, variante de Ctor_CompositeObjectB utilisant di au lieu de si, enchaîne sur Ctor_CompositeObjectC_RebindPointers_4F91A. Probable duplicat partiel — NON vérifié."
+},
+"loc_11343": {
+"segment": "seg008",
+"start_line": 34498,
+"end_line": 34498,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID11_ApplyTrivialDelegate_11343",
+"summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+},
+"loc_3CAE3": {
+"segment": "seg084",
+"start_line": 121402,
+"end_line": 121402,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "WorldObject_ComposeOrientation3Angles_3CAE3",
+"summary": "far (methode vtable, label seul - JAMAIS cataloguee avant 2026-09-05). Slot de la vtable des objets du monde (famille ~18 copies, ex. seg339:off_6F668/off_6F6F4). Recoit l'objet + 3 pointeurs d'angle ([bp+8]/[bp+0xA]/[bp+0xC]) et appelle Matrix_BuildFullOrientation_575B2(objet+0x2C, &angleX, &angleY, &angleZ) : compose 3 rotations d'axe INCREMENTALES (Matrix_BuildAxisX/Y/Z_56EC3, seuil 0.21875 deg) sur la matrice d'orientation PERSISTANTE stockee a objet+0x2C. Puis Debris_BodyDetach(objet) [fonction mal nommee : systeme generique d'objets du monde, PAS specifique aux debris - les debris sont des sous-objets du chunk DEBR d'un objet REAL]. C'est LE mecanisme de mise a jour d'orientation a partir des vitesses angulaires de la physique (angle_ptr = &(rate) ou &(rate*dt))."
+},
+"loc_1642C": {
+"segment": "seg016",
+"start_line": 43722,
+"end_line": 43953,
+"lines": 232,
+"type": "label",
+"calls": [],
+"new_name": "Radio_EvaluateOptionAvailability_1642C",
+"summary": "far (methode de vtable, loc_1642C, point d'entree du switch a loc_16433) - CONFIRME : recupere la lettre d'option a un index donne via Radio_GetOptionLetterByIndex_1F200, calcule 'lettre - 0x65' (soustrait 'e') pour indexer un switch a 9 cas (lettres 'e' a 'm', 0-8). Chaque cas evalue si cette QUESTION RADIO SPECIFIQUE est ACTUELLEMENT POSABLE dans le contexte de jeu courant (retourne un booleen) : case 0x1 ('f') calcule la distance 3D entre le joueur (word_722E6) et l'entite, compare a un seuil (0x1388=5000, portee radio/visuelle) ; cases 0x2/0x3 ('g'/'h') verifient des drapeaux globaux d'etat (byte_6E4D4/byte_6E4D5, probable mode combat/verrouillage) ; case 0x6 ('k') verifie aussi byte_6E4D4. CONFIRME ARCHITECTURALEMENT : OPTS liste les options POTENTIELLEMENT disponibles pour un personnage (statique, chargee depuis PROF), tandis que cette fonction determine, a chaque interrogation, LESQUELLES sont EFFECTIVEMENT disponibles maintenant (dynamique, selon distance/etat de combat/etc). Une lettre presente dans OPTS mais dont la condition n'est pas remplie serait donc grisee/indisponible dans le menu radio meme si le personnage la supporte en principe. Point notable : la lettre 'd' (observee dans BILLY.IFF/GWEN.IFF) tombe HORS de la plage geree par ce switch (e-m) - probablement geree par un mecanisme separe (option 'toujours disponible', ex. salutation/accuse de reception)."
+},
+"loc_5C0ED": {
+"segment": "seg128",
+"start_line": 185322,
+"end_line": 185322,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_WriteByte_5C0ED",
+"summary": "far, méthode virtuelle appelant PagedMemory_WriteByte_5BD14."
+},
+"loc_5C420": {
+"segment": "seg129",
+"start_line": 185820,
+"end_line": 185820,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_ConstructThunkAdjustor_5C420",
+"summary": "far, thunk d'ajustement de pile redirigeant vers PagedResourceB_ConstructThunk_5C3C9 (motif d'héritage multiple C++ Borland, identique à seg128)."
+},
+"loc_F6C2": {
+"segment": "seg008",
+"start_line": 31665,
+"end_line": 31665,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID3_ApplyGenericTimer_F6C2",
+"summary": "far, 40 lignes (31665-31704) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x278 confirme = ID=3 via ancrage sequentiel - CORRIGE : le nom precedent 'ID3_ApplyBreakDirection' appartenait en realite a F2C8/ID=2). Motif standard : reevalue si node+0xC==0, pose avion+0x68=0xFF (rafraichissement), timer=0x400, incremente compteur node+0x2, demarre le suivi (vtable+0xC). Aucune logique de rupture directionnelle ici - c'est un timer generique pur."
+},
+"loc_5C324": {
+"segment": "seg129",
+"start_line": 185664,
+"end_line": 185664,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_Init_5C324",
+"summary": "far, méthode virtuelle « init » appelant sub_5D95A."
+},
+"loc_5C3C9": {
+"segment": "seg129",
+"start_line": 185762,
+"end_line": 185762,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_ConstructThunk_5C3C9",
+"summary": "far, référencée via vtable et en interne (loc_5C420) — pose deux tags vtable (3A46h/3A6Eh), construit un sous-objet (sub_5EA03), libère si demandé (sub_338). Même motif que PagedTextObject_Construct_5C1C9 (seg128)."
+},
+"loc_666C5": {
+"segment": "seg200",
+"start_line": 215397,
+"end_line": 215397,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "JoystickCallback_DestructThunk_666C5",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur simple (tag 4072h) libérant l'objet si demandé."
+},
+"loc_66FA4": {
+"segment": "seg203",
+"start_line": 217321,
+"end_line": 217321,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "InputBinding_ConstructThunk_66FA4",
+"summary": "far, référencée via vtable (DATA XREF seg339) — thunk appelant `ConfigOption_Construct_6672D`... (sub_663D6, seg200, JoystickCallback_Construct, tag 5D84h)."
+},
+"loc_1519E": {
+"segment": "seg015",
+"start_line": 41616,
+"end_line": 41616,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_ExternalViewComputeMain_1519E",
+"summary": "far, ~460L — MISE À JOUR PAR FRAME DE LA VUE EXTERNE/CHASE (ex-inconnu). Slot [+0x14] de la vtable +0x50 des entrées caméra CAMR (tag 0x79C = CHAS, cf. HUDSymbol_ConstructVariantM_856F3) ; invoquée à chaque frame par View_RenderFrame_2DF0D (seg065) sur l'objet vue actif word_72A8F, et une fois à l'activation par Kneeboard_ApplySelection (son retour AL = code d'état stocké dans manager[+0x11]). Args : si = contrôleur de vue (>0x220 o, seg015), di = entrée caméra. Corps : (1) subject = di[+0x89] (l'avion, lié depuis le nom sujet du chunk CHAS 'PLAYER'/'AIRHEAD') ; subject->vtable[+0x3C]() -> scalaire (masse) ; (2) di[+0x14/+0x18/+0x1C] (POSITION CAMÉRA MONDE 24.8) := subject[+0x12/+0x16/+0x1A] (POSITION AVION) — copie directe, campos = pos_avion ; (3) si si[+0x1BB]==0 (pas de verrou cible) -> jmp loc_15485 (fin position) ; (4) branche verrou cible : direction de référence D = refpos - campos (refpos via subject[+0x5A]->[+0x0D..]), normalisée (sub_55B04/5593A), scalaire borné a +/-0x100 (+/-1.0) via sub_5505B/5493E, comparé a di[+0x60] (= dword de queue des params du chunk = seuil) et aux bornes si[+0x183/+0x185/+0x187], PUIS porté a 0x6400 = 100.0 unités (distance chase) ; (5) LISSAGE DU LAG : vecteur avant si[+0x14F] ramené vers la cible avec pas max 0x600 = 6.0 unités/frame (sub_55A9E = clamp de longueur) — c'est le 'lag', un simple rate-limit par frame, PAS une force physique ; (6) reconstruction matrice d'orientation si[+0x143] (3x3) via Matrix_BuildFromAngle_56D72 / Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / sub_57660, tangage/lacet si[+0x189]/si[+0x18B] ; (7) messages 'Eyes locked on target' / 'Target tracking OFF' (toggle si[+0x1BB] par scancode) ; (8) switch word_72352 (= TYPE DE PÉRIPHÉRIQUE D'ENTRÉE, pas la vue) -> Input_ProcessFrame_7A9E0 / Input_ReadMouseAndAxes_7AAF0 / Input_ReadJoystick* -> pan joueur via AIManeuver_BuildRotationAndLookup_7A800 ; (9) Cockpit_ViewPanTransitionMain_15B67. NB : remplace le modèle 'corps rigide debris' des passes 2026-09-06 (Camera_ComputeMountedPosition_3D31D seg085) qui concerne une AUTRE caméra (arme/cinématique), pas la chase F2. Détail : DATA_MODEL.md §6.6b-ter."
+},
+"loc_52F08": {
+"segment": "seg114",
+"start_line": 165998,
+"end_line": 165998,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_ClassStub_ReturnConst53h_52F08",
+"summary": "far, stub retournant AL='S' (53h) — tag de classe pour la forme Sphere de la hiérarchie HitShape."
+},
+"loc_68B2F": {
+"segment": "seg212",
+"start_line": 223151,
+"end_line": 223230,
+"lines": 80,
+"type": "label",
+"calls": [],
+"new_name": "VROOMM_MainEntry_68B2F",
+"summary": "⭐ far, 80 lignes, référencée via vtable (DATA XREF seg339) — point d'entrée principal du loader VROOMM : appelle VROOMM_ReadAndParseHeader_684DF puis enchaîne le chargement complet de l'image d'overlay (parsing MZ, relogement, patch de trampolines JMP/INT)."
+},
+"loc_5C23A": {
+"segment": "seg128",
+"start_line": 185507,
+"end_line": 185507,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_Method_ReturnType3_5C23A",
+"summary": "far, méthode virtuelle stub retournant AL=3 (tag de type)."
+},
+"loc_14EBF": {
+"segment": "seg014",
+"start_line": 41206,
+"end_line": 41206,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_Entry_VtSlot_Finalize_14EBF",
+"summary": "far — slot de vtable d'entrée caméra (DATA XREF seg339:0788). si=entrée. Si si[+0x89] (sujet) et si[+0x5C] (viewport) non nuls : `si[+0x5C]->vtable[+0x0C](si)`. Sinon `Camera_ComputeViewMatrix_2E2AC(si)`. return AL=1. (Finalisation / commit de la vue.)"
+},
+"loc_4F316": {
+"segment": "seg109",
+"start_line": 158030,
+"end_line": 158030,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Dtor_ScalarDeleting_4F316",
+"summary": "far, destructeur scalar-deleting : tag vtable 32F6h, dtor du membre à +0x59 (sub_3A3EC), dtor de base sub_3DC8D, libération conditionnelle via sub_338."
+},
+"loc_5E0E0": {
+"segment": "seg141",
+"start_line": 190535,
+"end_line": 190535,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_CopyAndDispatchB_5E0E0",
+"summary": "far, variante de CachedObject_Method_CopyAndDispatch_5E09F (même motif de 3 dispatchs vtable)."
+},
+"loc_5CDAE": {
+"segment": "seg134",
+"start_line": 187427,
+"end_line": 187427,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_PassThrough_5CDAE",
+"summary": "far, méthode virtuelle transmettant simplement son argument dword en retour."
+},
+"loc_4F2BA": {
+"segment": "seg109",
+"start_line": 157980,
+"end_line": 157980,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ClassStub_ReturnConst16h_4F2BA",
+"summary": "far, stub de méthode virtuelle : ignore son argument, retourne AL=16h (constante). Probable accesseur de type/classe minimal."
+},
+"loc_5CDC6": {
+"segment": "seg134",
+"start_line": 187446,
+"end_line": 187446,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_ReturnTrue_5CDC6",
+"summary": "far, stub retournant AL=1."
+},
+"loc_5C3FE": {
+"segment": "seg129",
+"start_line": 185792,
+"end_line": 185792,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_PassThrough_5C3FE",
+"summary": "far, méthode virtuelle transmettant simplement son argument dword en retour."
+},
+"loc_4A49": {
+"segment": "seg002",
+"start_line": 11965,
+"end_line": 11989,
+"lines": 25,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID11_ScorePlaceholder_4A49",
+"summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+},
+"loc_6380D": {
+"segment": "seg189",
+"start_line": 206476,
+"end_line": 206476,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_ReadLoop_6380D",
+"summary": "far, référencée via vtable (DATA XREF seg339) — boucle de lecture principale : lit par blocs (FileStream_ReadBuffered_6378F) jusqu'à la taille demandée, met à jour la position courante (+0x18) et des statistiques (compteurs de secteurs). Méthode « Read » de la classe FileStream."
+},
+"loc_5CE0B": {
+"segment": "seg135",
+"start_line": 187504,
+"end_line": 187504,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextFormat_BuildLabelString_5CE0B",
+"summary": "⚠️ far, 276 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), grande frame locale (0x20A octets, buffer texte). Combine massivement sub_2945/sub_2070/sub_22FC (trio de formatage déjà vu dans PagedMemory_ReadFormattedString_5BE40, seg127) avec un tag constant 3C76h et sub_2B1C/sub_5F700. Probable construction d'une chaîne de texte formatée (étiquette d'écran/HUD). Candidat pour session dédiée."
+},
+"loc_11369": {
+"segment": "seg008",
+"start_line": 34520,
+"end_line": 34529,
+"lines": 10,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID12_ApplyTrivialDelegate_11369",
+"summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+},
+"loc_5C347": {
+"segment": "seg129",
+"start_line": 185689,
+"end_line": 185689,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_NoOp_5C347",
+"summary": "far, méthode virtuelle vide (no-op)."
+},
+"loc_41DD": {
+"segment": "seg002",
+"start_line": 10881,
+"end_line": 11074,
+"lines": 194,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID4_ScoreAngularExtended_41DD",
+"summary": "far, 192 lignes (10881-11072) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x264 confirme = ID=4 via constructeur + XREF directe seg339:0268). Base=5, memes gardes sequentiels que ID=1 (tache en cours, byte_720C3/72038, word_72093<=0x14, sub_564A, sub_56E5, byte_720DF/720E0) MAIS calcul principal DISTINCT : introduit word_720DD (nouvelle variable, seuil 0x87), utilise des seuils differents (0x23,0x2D,0x1E,0x5A) avec des ajustements +4/+2/-2/-3/-0xA. Section finale UNIQUE a cet ID : compare dword_720CD a DEUX seuils differents (dword_720C9, dword_720C5) avec ajustements -8/-2 - probable double palier de proximite de menace, absent de la formule d'ID=1. Score borne [0,9]."
+},
+"loc_47D4": {
+"segment": "seg002",
+"start_line": 11687,
+"end_line": 11900,
+"lines": 214,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID7_ScoreManeuverFuelGated_47D4",
+"summary": "far, 212 lignes (11687-11898) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x228 confirme = ID=7 via constructeur + XREF directe seg339:022C - CORRIGE : precedemment attribuee a tort a ID=8). Base=5. Efface bits 0/1/3 de entite+0x32 au debut. GARDE flags_75 bit6 (modulateur de menace) OU tache en cours -> score=0. Sinon : si carburant/ressource (entite+0x22->+0xB0) <= 13, appelle sub_8C1E (AI_ManeuverSolution_91DF, deja documente) avec constante -7 (0xFFF9) - si echoue, branche differente (loc_498F, calcul distance/seuil simplifie avec clamp final [1,9]). CALCUL PRINCIPAL (si sub_8C1E reussit) : ajustements bases sur word_72093/72095/72097 puis appel Math_AngleBetweenVectors_552E1 avec la constante 0x4FA3 (deja croisee dans les sequences de manoeuvre) pour calculer un angle de correction complexe (division/multiplication). GARDE byte_720DF+byte_720E0 (ou byte_720E1) : ECRIT UNE POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur entite+0x32 (bit1 si byte_720E0, bit3 si byte_720E1) - CONFIRME que c'est CETTE fonction (pas ID=8) qui ecrit initialement ces bits consultes ailleurs. Score final borne [1,9] (PLANCHER A 1, PAS 0 - distinct des autres IDs)."
+},
+"loc_6058F": {
+"segment": "seg162",
+"start_line": 196929,
+"end_line": 196929,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_MeasureRefCharB_6058F",
+"summary": "far, référencée via vtable (DATA XREF seg339) — quasi identique à GlyphObject_Method_MeasureRefCharA_60550 (même séquence d'appels). Probable duplicat — non vérifié."
+},
+"loc_608CC": {
+"segment": "seg163",
+"start_line": 197527,
+"end_line": 197527,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Widget_Method_ReleaseAttrAndBounds_608CC",
+"summary": "far, référencée via vtable (DATA XREF seg339 implicite) — libère un attribut de style deux fois (TextFormat_ReleaseAttribute_5E5AC, seg143) puis recalcule les bornes (Widget_ComputeBoundsExtent_60AEB)."
+},
+"loc_434E": {
+"segment": "seg002",
+"start_line": 11075,
+"end_line": 11404,
+"lines": 330,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID5_ScoreSubmodeManeuver_434E",
+"summary": "far, 328 lignes (11075-11402) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x250 confirme = ID=5 via ancrage sequentiel - CORRIGE : precedemment attribuee a tort a ID=6, y compris le lien avec la sequence Immelmann/Split S). Base=3, pose node+0x26=3 des le debut. Gardes : tache en cours, sub_564A, byte_720E0. Calcul tres riche : compare dword_720CD/720C5, verifie une fenetre temporelle sur dword_720D9 (bornes 0xFFF63C00 et 0x4E200 - grandes valeurs suggerant une echelle temporelle en unites fines), ajuste selon word_72095/72093/720DD (seuils 0x23/0x91/0x2D/0x5A), compare dword_720BB/720B7 (bearing/orientation) sous plusieurs formes, lit entite->aircraft+0x8B (NOUVEAU champ, compteur/etat non documente ailleurs, formule *3/2 si >=2), appelle sub_56E5 (capteur cache). **DECLENCHEUR DE LA SEQUENCE ACROBATIQUE** : compare dword_72034 (constante NUMS, confirmee utilisee dans la sequence Immelmann/Split S) contre entite+0x11->+0x1A - si depasse, **POSE node+0x26=1** (le sous-mode qui demarre la sequence a 8 phases, AI_SYSTEM.md §3.9 - CORRIGE : cette sequence appartient a ID=5, pas ID=6). Score final borne [0,9]."
+},
+"loc_1115D": {
+"segment": "seg008",
+"start_line": 34304,
+"end_line": 34304,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID8_ApplyTrivialDelegate_1115D",
+"summary": "far, 36 lignes (34304-34339) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x214 = ID=8, score toujours 0 - coherent). Reevalue, pose avion+0x68=0xFF, demarre le suivi (vtable+0xC) immediatement. Aucun timer pose - delegation triviale."
+},
+"loc_54E83": {
+"segment": "seg115",
+"start_line": 170971,
+"end_line": 170971,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Math_InitConstants_54E83",
+"summary": "far, référencée via vtable (DATA XREF seg339), initialise les constantes globales du module trigonométrique (dword_707B2/B6/BA/BE, dont la sentinelle \"infini\" 0x7FFFFF00 utilisée par Math_Tan_548AD)."
+},
+"loc_64497": {
+"segment": "seg192",
+"start_line": 209217,
+"end_line": 209217,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_GetSize_64497",
+"summary": "far, référencée via vtable (DATA XREF seg339) — calcule la taille du fichier via 3 appels LSEEK (File_SeekWithRetry_63482 : position courante, fin, retour)."
+},
+"loc_60550": {
+"segment": "seg162",
+"start_line": 196884,
+"end_line": 196884,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_MeasureRefCharA_60550",
+"summary": "far, référencée via vtable (DATA XREF seg339) — récupère un bloc mémoire typé (Memory_TypedAllocDispatchB_5C832, tag 5C44h) puis mesure la largeur du caractère 'A' (Font_ComputeGlyphBoundingBox_5E74E) comme référence de mise à l'échelle. Probable duplicat partiel de GlyphObject_Method_MeasureRefCharB_6058F — non vérifié."
+},
+"loc_14867": {
+"segment": "seg014",
+"start_line": 40563,
+"end_line": 40563,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_AttachedNoOffsetCompute_14867",
+"summary": "far — slot de vtable d'entrée caméra (DATA XREF seg339:068E). si = entrée. subject = si[+0x89]. Camera_ComputeGeometryHelper_56E29(&buf, si+0x20) sème l'orientation caméra depuis subject->vtable[0x3C]() ; si[+0x14/18/1C] = subject[+0x12/16/1A] (POSITION CAMÉRA = POSITION SUJET, sans offset) ; Camera_ComputeViewMatrix_2E2AC(si) ; checks d'état sur subject->vtable[0]/[0x34] (al==6 -> sub_6C42A). Vue 'attachée rigide au sujet, orientation du sujet'. Retour bloqué si byte_722D1==1."
+},
+"loc_52E91": {
+"segment": "seg114",
+"start_line": 165940,
+"end_line": 165940,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_Sphere_ContainsPoint_52E91",
+"summary": "far, référencée via vtable (DATA XREF seg339), test de collision sphérique : distance 3D (sub_5828E) entre un point et le centre (+0x22/+0x26/+0x2A) comparée au rayon (+0x2E)."
+},
+"loc_4A99": {
+"segment": "seg002",
+"start_line": 12015,
+"end_line": 12015,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID13_ScoreScissorsRollaway_4A99",
+"summary": "far, 258 lignes (12015-12269) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x1B0 confirme = ID=13 via ancrage sequentiel - CORRIGE : precedemment attribuee a ID=0xE/14b). Base=1. Lit avion+0x86 (NOUVELLE capacite, probable taux de roulis max, mise a l'echelle x256) compare a entite+0x11->+0x1A. Gardes : tache en cours, sub_564A. Calcul RICHE : bearing dword_720BB/720B7, seuil dword_7205B, **UTILISE dword_72039 ET dword_7202C (les DEUX constantes NUMS deja identifiees dans la sequence de manoeuvre a 5 phases Scissors/Rollaway)** - CONFIRME QUE C'EST ID=13, PAS 0xE, QUI DECLENCHE CETTE SEQUENCE. Contient un calcul de type 'temps de virage' (imul x5, idiv par dword_720BB, decalages 0x18) similaire a celui documente dans la sequence elle-meme. Lit aussi avion+0x8B (MEME champ que ID=5) pour un ajustement final, et sub_56E5 (capteur cache). Score borne [0,9]."
+},
+"loc_597C2": {
+"segment": "seg121",
+"start_line": 180001,
+"end_line": 180001,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Interrupt_TimerInitState_597C2",
+"summary": "far, référencée via vtable (DATA XREF seg339), initialise ~10 globales d'état du sous-système minuteur (dword_72C97 et suivantes)."
+},
+"loc_649F0": {
+"segment": "seg193",
+"start_line": 210293,
+"end_line": 210293,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ResourceRecord_Method_ResolveOptionalField_649F0",
+"summary": "far, référencée via vtable (DATA XREF seg339) — si un indicateur (+0x4C) est posé, calcule les bornes de l'enregistrement (ResourceRecord_ComputeRecordBounds_646DB) et stocke la position de fin (+0x88)."
+},
+"loc_67824": {
+"segment": "seg207",
+"start_line": 219236,
+"end_line": 219236,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Stopwatch_StartOrStopThunk_67824",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant Stopwatch_StartOrStop_676F1(tag=5DC2h, mode=2)."
+},
+"loc_49DA": {
+"segment": "seg002",
+"start_line": 11901,
+"end_line": 11925,
+"lines": 25,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID9_ScorePlaceholder_49DA",
+"summary": "far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0 - type placeholder/desactive, comme 0x15."
+},
+"loc_5E63B": {
+"segment": "seg145",
+"start_line": 191563,
+"end_line": 191563,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "TextFormat_ValidateLinearTable_5E63B",
+"summary": "far, référencée via vtable (DATA XREF seg216) — vérifie qu'une table de mots correspond à une progression arithmétique (pas = arg+1)."
+},
+"loc_5F558": {
+"segment": "seg159",
+"start_line": 194573,
+"end_line": 194573,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "LinkedListB_InsertAtHead_5F558",
+"summary": "far, référencée via vtable (DATA XREF seg216) — insère un nœud en tête d'une liste simplement chaînée (structure de nœud distincte du cluster seg156)."
+},
+"loc_52F92": {
+"segment": "seg114",
+"start_line": 166063,
+"end_line": 166063,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "HitShape_ClassStub_ReturnConst43h_52F92",
+"summary": "far, stub retournant AL='C' (43h) — tag de classe (Cylindre/Cercle ?)."
+},
+"loc_5EEDD": {
+"segment": "seg154",
+"start_line": 193259,
+"end_line": 193259,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_ExceptionHandler_5EEDD",
+"summary": "⭐ far, 156 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216) et par sub_5EFB4 (installation via int 15h). **Gestionnaire d'exception matérielle** : vérifie un sélecteur sur la pile (0xFFFCh), examine le segment de code fautif (seg339) via `byte_70EA6`, puis décode l'instruction fautive (recherche du préfixe opérande 0x66 et des opcodes 0xF6/0xF7, groupe DIV/IDIV/TEST/NOT/NEG) — probable gestionnaire d'exception de division ou d'opcode invalide lié à l'accès à la mémoire paginée. Sinon reprend l'exécution via PagedMemory_ExceptionHandler_ReturnPoint_5EEDC. Candidat pour session dédiée si le mécanisme de mémoire paginée doit être élucidé complètement."
+},
+"loc_64393": {
+"segment": "seg192",
+"start_line": 209025,
+"end_line": 209025,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_Write_64393",
+"summary": "far, référencée via vtable (DATA XREF seg339) — méthode « Write » de FileStream : délègue à File_WriteOrDelegateToPaged_631E3 (seg185)."
+},
+"loc_5EAE0": {
+"segment": "seg152",
+"start_line": 192570,
+"end_line": 192570,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "DisplaySurfaceClass_Destruct_5EAE0",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur de la classe DisplaySurface : libère le buffer (tag 3DF2h) via Member_ClearAndFree_5EA03."
+},
+"loc_A2F9": {
+"segment": "seg004",
+"start_line": 22515,
+"end_line": 22522,
+"lines": 8,
+"type": "label",
+"calls": [],
+"new_name": "AI_ResetThreatScoreGlobal_A2F9",
+"summary": "far, 7 lignes (methode de vtable, DATA XREF seg339:4D98) - JAMAIS DOCUMENTEE AVANT. Triviale : remet a zero dword_6D3BE (le SCORE DE MENACE CALCULE PAR AIEntity_MasterTick_5ACC, deja documente en §6 - 'word_6D3BC' y est mentionne mais ce dword_6D3BE voisin est probablement un champ associe/etendu). Aucun autre effet."
+},
+"loc_5C2CF": {
+"segment": "seg129",
+"start_line": 185620,
+"end_line": 185620,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_Write_5C2CF",
+"summary": "far, méthode virtuelle appelant sub_5D555 (écriture, tag 1)."
+},
+"loc_5CA8D": {
+"segment": "seg131",
+"start_line": 186912,
+"end_line": 186912,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Memory_AllocatorTable_DestructThunk_5CA8D",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant Memory_AllocatorTable_ConstructSubobject_5CA4F(tag=5C44h, flag=2) — destruction du gestionnaire de mémoire typée global."
+},
+"loc_B8C1": {
+"segment": "seg005",
+"start_line": 24772,
+"end_line": 24772,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GenericSmallObject_Destructor_B8C1",
+"summary": "far, 31 lignes (methode de vtable, DATA XREF seg339) - JAMAIS DOCUMENTEE AVANT. Destructeur generique pour un petit objet avec reference faible embarquee a +0x13 : invalide cette reference (WeakRef_InvalidateFar_3A432) si le pointeur n'est pas nul, puis libere conditionnellement l'objet lui-meme (Memory_TypedFree_5C7B6, tag 0x5C44) si le bit0 de l'argument est pose - meme motif que le destructeur de la classe de reference notifiable (ovr229) mais sur une classe distincte (offset de reference different : +0x13 ici contre +0x08/+0x13 selon les champs pour l'autre classe). loc_B8C1 et loc_B90A sont structurellement identiques (code dupplique), rattaches a deux emplacements de vtable differents (seg339:0312 et seg339:0326) - probablement deux classes soeurs partageant un destructeur trivial generique."
+},
+"loc_606D2": {
+"segment": "seg162",
+"start_line": 197154,
+"end_line": 197154,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_SetFlagField_606D2",
+"summary": "far, référencée via vtable (DATA XREF seg339) — écrit un octet dans le champ +0x16 de l'objet, retourne 0."
+},
+"loc_54ECF": {
+"segment": "seg116",
+"start_line": 171006,
+"end_line": 171006,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Effect_RandomJitterVector_54ECF",
+"summary": "far, référencée via vtable (DATA XREF seg216), génère 3 composantes aléatoires (Math_RandomScale_54DF4 ×3) et alloue (sub_658) — vecteur de dispersion/jitter aléatoire, cohérent avec le système de particules (seg106/107)."
+},
+"loc_67817": {
+"segment": "seg207",
+"start_line": 219221,
+"end_line": 219221,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Stopwatch_ConstructThunk_67817",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant Stopwatch_Construct_675EF(tag=5DC2h)."
+},
+"loc_5E21E": {
+"segment": "seg141",
+"start_line": 190735,
+"end_line": 190735,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_AddPositionAndDispatch_5E21E",
+"summary": "far, méthode virtuelle : dispatch [bx+4], accumule une position (+2/+4 additionnés), puis dispatch [bx]."
+},
+"loc_65B26": {
+"segment": "seg196",
+"start_line": 213269,
+"end_line": 213269,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "IndexedRecordReader_Method_ComputeCount_65B26",
+"summary": "far, référencée via vtable (DATA XREF seg339) — lit un champ 32 bits (StreamReader_ReadTyped_63FA1), le divise par 4 pour obtenir un nombre d'entrées d'index, décrémenté de 1 (-1 = dernier index valide)."
+},
+"loc_5C27E": {
+"segment": "seg128",
+"start_line": 185556,
+"end_line": 185556,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObjectB_Construct_5C27E",
+"summary": "far, référencée via vtable et en interne (loc_5C2B3) — même motif que PagedTextObject_Construct_5C1C9 avec d'autres tags vtable (39EBh/3A13h) : probable classe sœur/dérivée."
+},
+"loc_5C089": {
+"segment": "seg128",
+"start_line": 185278,
+"end_line": 185278,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_ReadDword_5C089",
+"summary": "far, méthode virtuelle (DATA XREF seg339) appelant Registry_MainOperation_5B26B — lecture d'une valeur 32 bits paginée."
+},
+"loc_63C0B": {
+"segment": "seg190",
+"start_line": 207366,
+"end_line": 207366,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "StreamReader_AllocateInternal_63C0B",
+"summary": "far, alloue via sub_658 (fonction interne du cluster StreamReader, aucun label IDA distinct trouvé pour ses appelants)."
+},
+"loc_66672": {
+"segment": "seg200",
+"start_line": 215345,
+"end_line": 215345,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "JoystickManager_RegisterSingleton_66672",
+"summary": "far, référencée via vtable (DATA XREF seg339) — construit le singleton (JoystickManager_Construct_665FA, tag 5CECh) puis le détruit immédiatement dans un second temps (LinkedList_RemoveAllAndDestroy_5F397) — probable motif « test puis libération » ou séquence d'initialisation/nettoyage."
+},
+"loc_4F69E": {
+"segment": "seg109",
+"start_line": 158431,
+"end_line": 158431,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Ctor_CompositeObjectB_4F69E",
+"summary": "far, variante de Ctor_CompositeObjectA avec paramètre supplémentaire [bp+8] et champs étendus (+0x4B/+0x53 mis à zéro). Probable duplicat partiel — NON vérifié."
+},
+"loc_60A62": {
+"segment": "seg163",
+"start_line": 197814,
+"end_line": 197814,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Widget_Method_SetBoundsB_60A62",
+"summary": "far, référencée via vtable (DATA XREF seg339) — variante écrivant les champs +8/+0xC."
+},
+"loc_57F3B": {
+"segment": "seg116",
+"start_line": 176785,
+"end_line": 176785,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Formation_ApplyGeometryAndCalibration_57F3B",
+"summary": "far, référencée via vtable (DATA XREF, fin de segment), combine Formation_ComputeGeometryHelper_56D43 et Calibration_ComputeHelper_56CE5."
+},
+"loc_5E09F": {
+"segment": "seg141",
+"start_line": 190502,
+"end_line": 190502,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "CachedObject_Method_CopyAndDispatch_5E09F",
+"summary": "far, méthode virtuelle dispatchant successivement 3 appels vtable ([bx+0x18],[bx+4],[bx])."
+},
+"loc_10AF2": {
+"segment": "seg008",
+"start_line": 33700,
+"end_line": 33770,
+"lines": 71,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID7_ApplyFuelGatedTimer_10AF2",
+"summary": "far, 93 lignes (33700-33792) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x228 confirme = ID=7, coherent avec le score deja documente qui pose les memes bits). Motif standard, PUIS efface node+0x2E=0, LIT entite+0x32 bit0 (pose par le SCORE de ID=7) : si actif, timer=0x100, sinon timer=0x200. SI bits1 ET bit3 tous deux inactifs : appelle sub_56E5 (capteur cache) - si echoue AUSSI, timer=0x400 a la place (troisieme option). Efface bits2/4 de entite+0x32 a la fin. Chaine complete et coherente avec le score de ID=7."
+},
+"loc_6552E": {
+"segment": "seg195",
+"start_line": 212279,
+"end_line": 212279,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "StreamReader_Method_GrowBuffer_6552E",
+"summary": "far, référencée via vtable (DATA XREF seg339) — méthode de croissance dynamique du tampon interne : double la capacité (+0x61) en boucle jusqu'à couvrir la taille demandée (Memory_TypedAllocDispatchC_5C86D pour tester, Memory_TypedFreeWrapperC_5C6F3 pour réallouer, tag 5C44h), avec limite d'erreur (Runtime_FatalErrorHandlerWithTag, tag 1AE0h)."
+},
+"loc_1137E": {
+"segment": "seg008",
+"start_line": 34532,
+"end_line": 34539,
+"lines": 8,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID13_TickTrivialDelegate_1137E",
+"summary": "far, 8 lignes - probable slot [vtable+0x10] de MVRS ID=0x13. Tout aussi triviale : appelle uniquement NotifiableRef_AttachTarget_6AB45 (motif generique) et retourne. Aucune logique de tick/minuteur contrairement a ID=6/ID=7."
+},
+"loc_5CD0C": {
+"segment": "seg134",
+"start_line": 187337,
+"end_line": 187337,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_GetValue_5CD0C",
+"summary": "far, méthode virtuelle appelant sub_5D469, étend le résultat sur 32 bits."
+},
+"loc_113FD": {
+"segment": "seg008",
+"start_line": 34585,
+"end_line": 34911,
+"lines": 327,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID14b_TickManeuverSequence_113FD",
+"summary": "far, ~365 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] de MVRS ID=0xE. **DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE** (5 phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1 : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 : calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5), appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6). PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition."
+},
+"loc_11A04": {
+"segment": "seg008",
+"start_line": 35183,
+"end_line": 35245,
+"lines": 63,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID21_TickApplyGuidance_11A04",
+"summary": "far, ~55 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] (tick periodique) du noeud MVRS_ID21. Decompte le minuteur (node+0xD -= dword_70458), relit le vecteur stocke par MVRS_ID21_ApplyStoreNavCommand_1195A, ecrit une valeur fixe (0xA=10) dans entite+7+0x1E (statut sur le sous-objet partage). Si le minuteur est epuise : appelle NotifiableRef_AttachTarget (reacquisition). Sinon : appelle AI_GuidanceCmd_FromOwnPos_75A9 avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE GUIDAGE GEOMETRIQUE (voir §4bis)."
+},
+"loc_5066A": {
+"segment": "seg112",
+"start_line": 160612,
+"end_line": 160612,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "UIScreen_InitDefaultParams_5066A",
+"summary": "far, référencée via vtable (DATA XREF seg339), initialise une quinzaine de globales du cluster (dword_70448 et suivantes) avec des valeurs par défaut en virgule fixe 8.8 — probable constructeur/reset de l'écran."
+},
+"loc_5C119": {
+"segment": "seg128",
+"start_line": 185340,
+"end_line": 185340,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_Query_5C119",
+"summary": "far, méthode virtuelle appelant Registry_LookupVariant_5B68A."
+},
+"loc_5C2E6": {
+"segment": "seg129",
+"start_line": 185632,
+"end_line": 185632,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_ReleaseIfSet_5C2E6",
+"summary": "far, méthode virtuelle : si le champ source est non nul, appelle sub_5D62F (libération) puis le remet à zéro."
+},
+"loc_643D7": {
+"segment": "seg192",
+"start_line": 209061,
+"end_line": 209061,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FileStream_Method_Seek_643D7",
+"summary": "far, référencée via vtable (DATA XREF seg339) — méthode « Seek » de FileStream : délègue à File_SeekWithRetry_63482 (seg187)."
+},
+"loc_4128": {
+"segment": "seg002",
+"start_line": 10771,
+"end_line": 10771,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID3_ScoreAngularSimple_4128",
+"summary": "far, 108 lignes (10771-10878) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x278 confirme = ID=3 via methode d'ancrage sequentiel off_6D32C). Base=5, efface node+0x27 au debut. GARDES : tache en cours (entite+0x13), byte_720C3<=byte_72038, word_72093<=0x14 -> score=0 direct si echec (PAS de sub_564A/sub_56E5 ici, contrairement a ID=1/2/4/7 - formule plus simple). CALCUL : ajustements -3/-6 sur word_72095 (paliers 0x5A/0x2D), +3 ou -3 selon dword_7209B vs dword_7201C (deux comparaisons opposees successives). GARDE FINALE : si byte_720DF actif, soustrait entite->aircraft+0xB0 /4 (meme champ carburant, division differente des autres IDs qui font /2). Score borne [0,9]."
+},
+"loc_5CCF3": {
+"segment": "seg134",
+"start_line": 187322,
+"end_line": 187322,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceC_Method_Call2Args_5CCF3",
+"summary": "far, méthode virtuelle transmettant 2 arguments à sub_229C."
+},
+"loc_60A40": {
+"segment": "seg163",
+"start_line": 197790,
+"end_line": 197790,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Widget_Method_SetBoundsA_60A40",
+"summary": "far, référencée via vtable (DATA XREF seg339) — écrit deux champs (+6/+0xA) puis recalcule les bornes (Widget_ComputeBoundsExtent_60AEB)."
+},
+"loc_666E6": {
+"segment": "seg200",
+"start_line": 215420,
+"end_line": 215420,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "JoystickCallback_DestructFull_666E6",
+"summary": "far, référencée via vtable (DATA XREF seg339) — destructeur complet (tags 4076h/407Eh) : construit puis détruit un sous-état (JoystickManager_Construct_665FA, LinkedList_RemoveAllAndDestroy_5F397), libère l'objet si demandé."
+},
+"loc_5EECB": {
+"segment": "seg153",
+"start_line": 193233,
+"end_line": 193233,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FontStyle_DestructThunk_5EECB",
+"summary": "far, référencée via vtable (DATA XREF seg339), thunk appelant FontStyle_Destruct_5EB9E(tag=5C60h, flag=2)."
+},
+"loc_1060A": {
+"segment": "seg008",
+"start_line": 33193,
+"end_line": 33232,
+"lines": 40,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID6_ApplySetTimer_1060A",
+"summary": "far, 40 lignes (33193-33232) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x23C confirme = ID=6). Motif standard, timer=0x500 (different du 0x400 de ID=3/4/5/13). Aucune ecriture de sous-mode ici - le sous-mode a deja ete pose par le SCORE (ID=6 pose node+0x26=2 ou 3). La fonction de suivi loc_10673 (deja tabulee) lit ce sous-mode pour executer sa propre sequence de phases, DISTINCTE de celle de ID=5 (timer different, sous-mode different)."
+},
+"loc_5C126": {
+"segment": "seg128",
+"start_line": 185349,
+"end_line": 185349,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedMemory_Method_ReturnTrue_5C126",
+"summary": "far, méthode virtuelle stub retournant toujours 1 (probable \"IsValid\"/\"IsPaged\")."
+},
+"loc_5C1C9": {
+"segment": "seg128",
+"start_line": 185447,
+"end_line": 185447,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedTextObject_Construct_5C1C9",
+"summary": "far, référencée via vtable et en interne (loc_5C244) — constructeur d'objet texte paginé : pose deux tags vtable (39B3h/39DBh), initialise le pilote (PagedMemory_CheckDriverPresent_5B944), construit un sous-objet (sub_5EA03), libère l'objet si demandé (sub_338)."
+},
+"loc_6663D": {
+"segment": "seg200",
+"start_line": 215325,
+"end_line": 215325,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "JoystickManager_InitSingleton_6663D",
+"summary": "far, référencée via vtable (DATA XREF seg339) — initialise le singleton gestionnaire joystick : pose des tags vtable (406Eh/129Eh/4076h/407Eh), lie l'ancienne liste globale word_70EA8 (PagedResourceC, seg134) en la remplaçant par une nouvelle valeur (5CF2h) — probable ré-affectation d'une variable de liste partagée entre systèmes distincts."
+},
+"loc_5C40C": {
+"segment": "seg129",
+"start_line": 185802,
+"end_line": 185802,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PagedResourceB_Method_ReturnZero_5C40C",
+"summary": "far, stub retournant AX=0."
+},
+"loc_676E7": {
+"segment": "seg207",
+"start_line": 218965,
+"end_line": 218965,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Stopwatch_TickCallback_676E7",
+"summary": "far, callback de tic enregistré dans le registre de modules — incrémente le compteur global de tics (dword_711CD) à chaque appel."
+},
+"loc_66FB2": {
+"segment": "seg203",
+"start_line": 217331,
+"end_line": 217331,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "InputBinding_DestructThunk_66FB2",
+"summary": "far, référencée via vtable (DATA XREF seg339) — thunk appelant `JoystickCallback_Destruct_66420` (seg200, tag 5D84h, flag 2)."
+},
+"loc_14EB5": {
+"segment": "seg014",
+"start_line": 41197,
+"end_line": 41197,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Camera_Entry_GetState_CHASE_14EB5",
+"summary": "far — getter trivial de slot de vtable d'entrée caméra (DATA XREF seg339:07B0). `return AL = 3`. 3 = code d'état CHASE. **Adjacent à `loc_1493A` (seg339:07AC)** dans la MÊME vtable → confirme que la vue CHASE utilise le calcul orbital `Camera_OrbitTrackCompute_1493A`."
+},
+"loc_606EE": {
+"segment": "seg162",
+"start_line": 197176,
+"end_line": 197176,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GlyphObject_Method_CopyFlagField_606EE",
+"summary": "far, référencée via vtable (DATA XREF seg339) — copie un octet depuis un pointeur source dans le champ +0x16, retourne 0."
 }
 }

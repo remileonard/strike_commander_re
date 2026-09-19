@@ -101,7 +101,7 @@ VROOMM_StubThunk_6BBF9	endp
 ; d'overlay actuellement charge en memoire. fileoff=254D0h, codesize=9FEh, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6BBFE	proc far		; CODE XREF: HUDSymbol_Helper16_85F30+22P
-		jmp	MissionText_ComputeTrigonometricLayout_97D39
+		jmp	EntityScreenLayout_ComputeAngularPosition
 VROOMM_StubThunk_6BBFE	endp
 
 
@@ -114,7 +114,7 @@ VROOMM_StubThunk_6BBFE	endp
 ; d'overlay actuellement charge en memoire. fileoff=254D0h, codesize=9FEh, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6BC03	proc far		; CODE XREF: Kneeboard_ProcessSelected+57P
-		jmp	MissionText_Helper6_97CF5
+		jmp	EntityScreenLayout_PrepareAndCompute
 VROOMM_StubThunk_6BC03	endp
 
 
@@ -193,7 +193,7 @@ VROOMM_StubThunk_6BC1C	endp
 ; far, thunk fixe VROOMM (jmp sub_97A00) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=254D0h, codesize=9FEh, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6BC21	proc far		; CODE XREF: Kneeboard_RenderEntry+76P
+VROOMM_StubThunk_6BC21	proc far		; CODE XREF: EntityTracker_RenderEntry+76P
 		jmp	MissionText_Helper2_97A00
 VROOMM_StubThunk_6BC21	endp
 

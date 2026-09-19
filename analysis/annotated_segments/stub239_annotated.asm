@@ -99,7 +99,7 @@ VROOMM_StubThunk_6ADB9	endp
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
 VROOMM_StubThunk_6ADBE	proc far		; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+115P
-		jmp	Kneeboard_UpdateEntry_7AFA8
+		jmp	EntityTracker_RegisterAndSelect
 VROOMM_StubThunk_6ADBE	endp
 
 
@@ -111,7 +111,7 @@ VROOMM_StubThunk_6ADBE	endp
 ; far, thunk fixe VROOMM (jmp sub_7B035) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=7A50h, codesize=2422h, nentries=8.
 ; ==============================================================================================
-VROOMM_StubThunk_6ADC3	proc far		; CODE XREF: UIScreen_Construct_53896+3CP
+VROOMM_StubThunk_6ADC3	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+3CP
 		jmp	MissionRecord_LoadEntityDatabase_7B035
 VROOMM_StubThunk_6ADC3	endp
 

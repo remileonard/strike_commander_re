@@ -802,10 +802,18 @@ ExprSlot_ReleaseArray_A98EC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 125 lignes, NON DÉTAILLÉE — combine Memory_TypedFreeWrapperC_5C6F3,
-; ResourceRecord_ReadDwordFieldB_64AFF (seg193), sub_2E74 (×2, externe).
+; far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien
+; nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK
+; CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets
+; (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4
+; octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom
+; de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit
+; 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table
+; nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero
+; d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers
+; PilotProfile_LoadFromPROF.
 ; ==============================================================================================
-ExprSlot_ReleaseAndReloadDword_A9956	proc far		; CODE XREF: VROOMM_StubThunk_6CF0DJ
+PLAY_LoadCASTTeamNames_A9956	proc far		; CODE XREF: VROOMM_StubThunk_6CF0DJ
 
 var_18		= word ptr -18h
 var_16		= word ptr -16h
@@ -862,7 +870,7 @@ loc_A9973:
 		jmp	loc_A9A39
 ; ���������������������������������������������������������������������������
 
-loc_A99B1:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+E7j
+loc_A99B1:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+E7j
 		les	bx, [bp+var_4]
 		cmp	dword ptr es:[bx], 4D414554h
 		jnz	short loc_A9A34
@@ -889,7 +897,7 @@ loc_A99C3:
 		jmp	short loc_A9A2F
 ; ���������������������������������������������������������������������������
 
-loc_A99F4:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+79j
+loc_A99F4:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+79j
 		cmp	dx, 3
 		jnb	short loc_A9A34
 		mov	eax, [bp+var_4]
@@ -910,26 +918,26 @@ loc_A99F4:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+79j
 		add	sp, 0Ah
 		les	bx, [bp+var_14]
 
-loc_A9A2F:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+9Cj
+loc_A9A2F:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+9Cj
 		mov	byte ptr es:[bx+8], 0
 
-loc_A9A34:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+66j
-					; ExprSlot_ReleaseAndReloadDword_A9956+A1j
+loc_A9A34:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+66j
+					; PLAY_LoadCASTTeamNames_A9956+A1j
 		inc	di
 		add	word ptr [bp+var_4], 9
 
-loc_A9A39:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+58j
+loc_A9A39:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+58j
 		cmp	[si], di
 		jle	short loc_A9A40
 		jmp	loc_A99B1
 ; ���������������������������������������������������������������������������
 
-loc_A9A40:				; CODE XREF: ExprSlot_ReleaseAndReloadDword_A9956+E5j
+loc_A9A40:				; CODE XREF: PLAY_LoadCASTTeamNames_A9956+E5j
 		pop	di
 		pop	si
 		leave
 		retf
-ExprSlot_ReleaseAndReloadDword_A9956	endp
+PLAY_LoadCASTTeamNames_A9956	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1585,9 +1593,14 @@ ExprSlot_WriteFieldGroup_A9D66	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (20 lignes).
+; far, 19 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Reinitialise une
+; entree PART (participant de mission) (85 octets, voir MissionObject_AllocateArray_AA23D) a
+; son etat de repos : +0x32=0xFF, +0x3A(dword)=0, efface 6 bits de +0x39 (le meme champ de
+; statut verifie par la garde d'entree de MissionScript_CallNativeHandler),
+; +0x52(controleur)=0, +0x54(achevement)=0xFF. Ne construit PAS de vrai controleur — remet
+; seulement a NUL.
 ; ==============================================================================================
-ExprSlot_Helper_A9DFD	proc far		; CODE XREF: VROOMM_StubThunk_6CF17J ExprSlot_LoadAndResolveNames_A9E3C+10p
+PartEntry_ResetState_A9DFD	proc far		; CODE XREF: VROOMM_StubThunk_6CF17J PartEntry_LoadAndResolveNames_A9E3C+10p
 
 arg_0		= dword	ptr  6
 
@@ -1606,7 +1619,7 @@ arg_0		= dword	ptr  6
 		mov	byte ptr es:[bx+54h], 0FFh
 		pop	bp
 		retf
-ExprSlot_Helper_A9DFD	endp
+PartEntry_ResetState_A9DFD	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1614,11 +1627,28 @@ ExprSlot_Helper_A9DFD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 183 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper_A9DFD, ReadFieldGroupA_64A19,
-; sub_2E74 (×3), GeomNode_SumAndCount_53034 (seg114), Expr_LookupNamedValue_51E4A (×2, seg114)
-; — résolution de noms d'expression liés au scénario de mission.
+; far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec
+; DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette
+; structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par
+; DATA_MODEL.md ('sub_6CF35->AA23D (PART)').   DECOUVERTE MAJEURE : contient les 4
+; identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs
+; directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40,
+; id_brut) :   - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])   -
+; PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])   - PartEntry+0x4A/0x4C (far
+; ptr) = on_is_destroyed  (progs_id[2])   - PartEntry+0x4E/0x50 (far ptr) = on_missions_init
+; (progs_id[3]) Ordre et noms confirmes par l'implementation C de Remi. Chaque champ est un
+; pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au
+; chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) —
+; candidats pour l'etat d'execution courant, a confirmer.   Debut de fonction (avant les
+; progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk
+; (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8
+; caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides),
+; resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des
+; champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non
+; elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point
+; ouvert).
 ; ==============================================================================================
-ExprSlot_LoadAndResolveNames_A9E3C	proc far		; CODE XREF: VROOMM_StubThunk_6CF1CJ ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+6Fp
+PartEntry_LoadAndResolveNames_A9E3C	proc far		; CODE XREF: VROOMM_StubThunk_6CF1CJ PartEntry_AllocateArray_AA23D+6Fp
 
 var_4A		= word ptr -4Ah
 var_48		= word ptr -48h
@@ -1653,7 +1683,7 @@ arg_4		= word ptr  0Ah
 		mov	si, word_706A0
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr ExprSlot_Helper_A9DFD
+		call	near ptr PartEntry_ResetState_A9DFD
 
 loc_A9E4F:
 		add	sp, 4
@@ -1800,7 +1830,7 @@ loc_A9F72:
 		pop	si
 		leave
 		retf
-ExprSlot_LoadAndResolveNames_A9E3C	endp
+PartEntry_LoadAndResolveNames_A9E3C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2254,7 +2284,7 @@ ExprSlot_ReleaseObject_AA205	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (14 lignes).
 ; ==============================================================================================
-ExprSlot_Helper4_AA227	proc far		; CODE XREF: VROOMM_StubThunk_6CF30J ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+10p
+ExprSlot_Helper4_AA227	proc far		; CODE XREF: VROOMM_StubThunk_6CF30J PartEntry_AllocateArray_AA23D+10p
 
 arg_0		= word ptr  6
 
@@ -2275,10 +2305,15 @@ ExprSlot_Helper4_AA227	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 77 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper4_AA227, gestion d'erreur
-; (sub_6B70F), Memory_TypedFreeWrapperC_5C6F3, ExprSlot_LoadAndResolveNames_A9E3C.
+; far, 77 lignes, LUE INTEGRALEMENT. Le vrai constructeur du tableau d'entrees PART : calcule
+; un nombre d'elements ([di+0x72]/0x3E), alloue un tableau de records de 85 octets chacun
+; (meme allocateur Memory_TypedFreeWrapper_5C6F3, tag 0x5C44, que MVRS), puis appelle
+; PartEntry_LoadAndResolveNames_A9E3C sur chaque element successivement (pas +0x55). CONFIRME
+; : +0x52 (controleur) reste NUL a l'issue de la construction complete du tableau — son
+; assignation reelle, si elle existe, se fait ailleurs, dynamiquement pendant le jeu — site
+; non retrouve a ce stade.
 ; ==============================================================================================
-ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D	proc far		; CODE XREF: VROOMM_StubThunk_6CF35J
+PartEntry_AllocateArray_AA23D	proc far		; CODE XREF: VROOMM_StubThunk_6CF35J
 
 var_6		= word ptr -6
 var_4		= dword	ptr -4
@@ -2318,7 +2353,7 @@ loc_AA26C:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_AA275:				; CODE XREF: ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+2Dj
+loc_AA275:				; CODE XREF: PartEntry_AllocateArray_AA23D+2Dj
 		push	1
 		push	0
 		push	2
@@ -2337,16 +2372,16 @@ loc_AA275:				; CODE XREF: ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+2Dj
 		jmp	short loc_AA2B9
 ; ���������������������������������������������������������������������������
 
-loc_AA2A6:				; CODE XREF: ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+81j
+loc_AA2A6:				; CODE XREF: PartEntry_AllocateArray_AA23D+81j
 		push	di
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr ExprSlot_LoadAndResolveNames_A9E3C
+		call	near ptr PartEntry_LoadAndResolveNames_A9E3C
 		add	sp, 6
 		inc	[bp+var_6]
 		add	word ptr [bp+var_4], 55h ; 'U'
 
-loc_AA2B9:				; CODE XREF: ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+67j
+loc_AA2B9:				; CODE XREF: PartEntry_AllocateArray_AA23D+67j
 		mov	ax, [si]
 		cmp	ax, [bp+var_6]
 		jg	short loc_AA2A6
@@ -2354,7 +2389,7 @@ loc_AA2B9:				; CODE XREF: ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D+67j
 		pop	si
 		leave
 		retf
-ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D	endp
+PartEntry_AllocateArray_AA23D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2397,9 +2432,11 @@ ExprSlot_ReleaseSingleD_AA2C4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (14 lignes).
+; far, 13 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Initialise a zero
+; les deux premiers champs du conteneur PROG : +0x00 (compteur d'instructions/marqueurs) et
+; +0x06 (taille du chunk, ecrasee juste apres par ProgBuffer_ResetAndSetSize_AA307).
 ; ==============================================================================================
-ExprSlot_Helper5_AA2F4	proc far		; CODE XREF: VROOMM_StubThunk_6CEA9J ExprSlot_Helper6_AA307+9p
+ProgBuffer_ResetState_AA2F4	proc far		; CODE XREF: VROOMM_StubThunk_6CEA9J ProgBuffer_ResetAndSetSize_AA307+9p
 
 arg_0		= word ptr  6
 
@@ -2412,7 +2449,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-ExprSlot_Helper5_AA2F4	endp
+ProgBuffer_ResetState_AA2F4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2420,9 +2457,11 @@ ExprSlot_Helper5_AA2F4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle ExprSlot_Helper5_AA2F4.
+; far, 18 lignes, LUE INTEGRALEMENT. Appelle ProgBuffer_ResetState_AA2F4 puis pose +0x06 =
+; taille du chunk PROG (parametre). Etape preliminaire de
+; ProgBuffer_LoadRawAndCountMarkers_AA31D.
 ; ==============================================================================================
-ExprSlot_Helper6_AA307	proc far		; CODE XREF: VROOMM_StubThunk_6CEAEJ ExprSlot_ReleaseAndReloadDwordD_AA31D+10p
+ProgBuffer_ResetAndSetSize_AA307	proc far		; CODE XREF: VROOMM_StubThunk_6CEAEJ ProgBuffer_LoadRawAndCountMarkers_AA31D+10p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2433,14 +2472,14 @@ arg_2		= word ptr  8
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr ExprSlot_Helper5_AA2F4
+		call	near ptr ProgBuffer_ResetState_AA2F4
 		pop	cx
 		mov	ax, [bp+arg_2]
 		mov	[si+6],	ax
 		pop	si
 		pop	bp
 		retf
-ExprSlot_Helper6_AA307	endp
+ProgBuffer_ResetAndSetSize_AA307	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2448,10 +2487,22 @@ ExprSlot_Helper6_AA307	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ExprSlot_Helper6_AA307, Memory_TypedFreeWrapperC_5C6F3,
-; ResourceRecord_ReadDwordFieldB_64AFF.
+; far, 62 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — lecteur reel du
+; chunk PROG, confirme par DATA_MODEL.md 'sub_6CEB3->AA31D (PROG)').   DECOUVERTE : PROG N'EST
+; PAS PARSE EN INSTRUCTIONS ICI — charge comme UN SEUL BLOC BRUT : alloue un tampon (meme
+; allocateur generique tag 0x5C44 que partout ailleurs dans le binaire), copie tout le chunk
+; tel quel (ResourceRecord_ReadFieldGroupA), puis SCANNE le tampon 2 octets par 2 octets et
+; COMPTE les octets nuls a positions paires (+0x00 = compteur resultant).   HYPOTHESE : ces
+; zeros sont des SEPARATEURS entre plusieurs mini-programmes empaquetes dans le meme bloc PROG
+; — ce qui expliquerait comment les 4 progs_id d'une entree PartEntry
+; (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) peuvent chacun pointer
+; vers un OFFSET DIFFERENT a l'interieur de ce meme bloc, plutot que vers des blocs separes.
+; Le vrai decoupage en instructions (opcode, parametres, [instr+0xE] etat) n'a lieu qu'a
+; l'execution, dans MissionScript_ExecutePROG.   Structure du conteneur ProgBuffer (confirmee)
+; : +0x00 compteur de marqueurs (word), +0x02/+0x04 pointeur lointain vers le tampon brut,
+; +0x06 taille du chunk (word).
 ; ==============================================================================================
-ExprSlot_ReleaseAndReloadDwordD_AA31D	proc far		; CODE XREF: VROOMM_StubThunk_6CEB3J
+ProgBuffer_LoadRawAndCountMarkers_AA31D	proc far		; CODE XREF: VROOMM_StubThunk_6CEB3J
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2466,7 +2517,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr ExprSlot_Helper6_AA307
+		call	near ptr ProgBuffer_ResetAndSetSize_AA307
 		add	sp, 4
 		push	1
 		push	0
@@ -2487,7 +2538,7 @@ loc_AA353:
 		jmp	short loc_AA36F
 ; ���������������������������������������������������������������������������
 
-loc_AA35F:				; CODE XREF: ExprSlot_ReleaseAndReloadDwordD_AA31D:loc_AA377j
+loc_AA35F:				; CODE XREF: ProgBuffer_LoadRawAndCountMarkers_AA31D:loc_AA377j
 		les	bx, [si+2]
 		add	bx, dx
 
@@ -2498,10 +2549,10 @@ loc_AA364:
 loc_AA36A:
 		inc	word ptr [si]
 
-loc_AA36C:				; CODE XREF: ExprSlot_ReleaseAndReloadDwordD_AA31D+4Bj
+loc_AA36C:				; CODE XREF: ProgBuffer_LoadRawAndCountMarkers_AA31D+4Bj
 		add	dx, 2
 
-loc_AA36F:				; CODE XREF: ExprSlot_ReleaseAndReloadDwordD_AA31D+40j
+loc_AA36F:				; CODE XREF: ProgBuffer_LoadRawAndCountMarkers_AA31D+40j
 		movsx	eax, dx
 
 loc_AA373:
@@ -2513,7 +2564,7 @@ loc_AA377:
 		pop	si
 		pop	bp
 		retf
-ExprSlot_ReleaseAndReloadDwordD_AA31D	endp
+ProgBuffer_LoadRawAndCountMarkers_AA31D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -124,10 +124,14 @@ AIManeuver_Helper5_7AF9E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Kneeboard_AddEntryObj et Kneeboard_ApplySelection — mise à jour d'une entrée du
-; calepin de bord (kneeboard).
+; far, 20L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_UpdateEntry'). CONFIRME DIRECTEMENT
+; 0x59CD comme adresse de la liste globale trackee : ajoute l'entite passee en parametre a
+; cette liste (EntityTracker_AddEntryObj) PUIS l'applique comme selection active
+; (EntityTracker_ApplySelection). Appelee depuis MissionRecord_LoadEntityDatabase_7B035 —
+; candidat serieux pour la fonction qui peuple cette liste avec les entites de la mission, a
+; lire.
 ; ==============================================================================================
-Kneeboard_UpdateEntry_7AFA8	proc far		; CODE XREF: VROOMM_StubThunk_6ADBEJ
+EntityTracker_RegisterAndSelect	proc far		; CODE XREF: VROOMM_StubThunk_6ADBEJ
 					; MissionRecord_LoadEntityDatabase_7B035:loc_7B14Cp
 
 arg_0		= word ptr  6
@@ -138,16 +142,16 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	si
 		push	59CDh
-		call	Kneeboard_AddEntryObj
+		call	EntityTracker_AddEntryObj
 		add	sp, 4
 		push	si
 		push	59CDh
-		call	Kneeboard_ApplySelection
+		call	EntityTracker_ApplySelection
 		add	sp, 4
 		pop	si
 		pop	bp
 		retf
-Kneeboard_UpdateEntry_7AFA8	endp
+EntityTracker_RegisterAndSelect	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -510,7 +514,7 @@ loc_7B146:
 		push	cs
 
 loc_7B14C:
-		call	near ptr Kneeboard_UpdateEntry_7AFA8
+		call	near ptr EntityTracker_RegisterAndSelect
 		pop	cx
 
 loc_7B150:
@@ -712,7 +716,7 @@ loc_7B36D:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+333j
 ; ���������������������������������������������������������������������������
 
 loc_7B370:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+493j
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		mov	byte ptr [bp+var_54+3],	al
 		mov	ax, di
 		add	ax, 12h
@@ -1307,7 +1311,7 @@ loc_7B91A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+8DDj
 
 loc_7B927:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7B7BCj
 					; MissionRecord_LoadEntityDatabase_7B035+8EAj
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7B933
 		jmp	loc_7B7BF
@@ -1850,7 +1854,7 @@ loc_7C002:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FC5j
 
 loc_7C00F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+B0Ej
 					; MissionRecord_LoadEntityDatabase_7B035+FD2j
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 
 loc_7C016:
@@ -2227,7 +2231,7 @@ loc_7C356:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1319j
 
 loc_7C363:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7C1CDj
 					; MissionRecord_LoadEntityDatabase_7B035+1326j
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7C36F
 		jmp	loc_7C1D0
@@ -3251,7 +3255,7 @@ loc_7D1A8:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+216Cj
 loc_7D1AA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2171j
 		or	al, al
 		jz	short loc_7D1BA
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7D1BA
 		jmp	loc_7C9CA
@@ -3261,7 +3265,7 @@ loc_7D1BA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+135Ej
 					; MissionRecord_LoadEntityDatabase_7B035+1368j ...
 		push	si
 		push	59CDh
-		call	Kneeboard_RemoveByTarget
+		call	EntityTracker_RemoveByTarget
 		add	sp, 4
 		cmp	[bp+var_18], 0
 		jz	short loc_7D1DE

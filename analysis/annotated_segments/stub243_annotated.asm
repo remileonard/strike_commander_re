@@ -174,7 +174,7 @@ VROOMM_StubThunk_6AF67	endp
 ; far, thunk fixe VROOMM (jmp sub_805F8) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6AF6C	proc far		; CODE XREF: Kneeboard_RenderEntry:loc_236F7P
+VROOMM_StubThunk_6AF6C	proc far		; CODE XREF: EntityTracker_RenderEntry:loc_236F7P
 		jmp	HUDSymbol_ConstructVariantB_805F8
 VROOMM_StubThunk_6AF6C	endp
 

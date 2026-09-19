@@ -1055,7 +1055,7 @@ loc_A7D56:				; CODE XREF: MissionLoader_AssignUnitRoster_A7D46+Bj
 		call	Widget_DestructTwoLabels
 		pop	cx
 		push	59CDh
-		call	Kneeboard_ResetAndRefresh
+		call	EntityTracker_ResetAndRefresh
 		pop	cx
 		push	word_70474
 		push	59C3h
@@ -1151,7 +1151,7 @@ loc_A7E48:				; CODE XREF: MissionLoader_AssignUnitRosterB_A7E3B:loc_A7E43j
 		call	WeakRef_InvalidateAll
 		pop	cx
 		push	59CDh
-		call	Kneeboard_ClearShortcut
+		call	EntityTracker_ClearShortcut
 		pop	cx
 		push	word_70474
 		push	59C3h
@@ -1311,7 +1311,7 @@ loc_A7FA5:				; CODE XREF: MissionLoader_QueryAndReleaseAttribute_A7F3A+5Dj
 loc_A7FA7:				; CODE XREF: MissionLoader_QueryAndReleaseAttribute_A7F3A+2Fj
 					; MissionLoader_QueryAndReleaseAttribute_A7F3A+69j
 		push	59CDh
-		call	Kneeboard_Init
+		call	EntityTracker_Init
 		pop	cx
 		mov	[bp+var_4], ax
 		mov	dword_6E33D, 0

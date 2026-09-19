@@ -161,7 +161,7 @@ VROOMM_StubThunk_6CDD2	endp
 ; far, thunk fixe VROOMM (jmp sub_A7F3A) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36060h, codesize=0A17h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CDD7	proc far		; CODE XREF: UIScreen_Construct_53896+10P
+VROOMM_StubThunk_6CDD7	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+10P
 		jmp	MissionLoader_QueryAndReleaseAttribute_A7F3A
 VROOMM_StubThunk_6CDD7	endp
 

@@ -65,14 +65,14 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_8E2AF) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1B680h, codesize=58Fh, nentries=4."
  },
  "sub_23C38": {
-  "new_name": "Kneeboard_ResetAndRefresh",
+  "new_name": "EntityTracker_ResetAndRefresh",
   "segment": "seg041",
-  "summary": "far,18L — vide le journal (sub_23BF3) puis notifie l'UI (sub_5E526, code 0x5196) : **réinitialisation du journal avec rafraîchissement de l'affichage.**"
+  "summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ResetAndRefresh'). Appelle EntityTracker_ClearAllFull. Appelee depuis EntityTracker_Destruct."
  },
  "sub_23CCC": {
-  "new_name": "Kneeboard_ApplySelection",
+  "new_name": "EntityTracker_ApplySelection",
   "segment": "seg041",
-  "summary": "far,108L — met à jour la sélection courante du journal (+0x12), positionne un flag global (byte_70447), gère le repositionnement d'affichage (fenêtre 0x100 octets) : **application de la sélection d'entrée de journal avec mise à jour de l'affichage.** || Contexte caméra (2026-08-30) : appelé Kneeboard_ApplySelection(manager=0x59CD, entrée) — pose manager[+0x12] = caméra/entrée active, lance Cockpit_PanAzimuthUpdate -> Camera_PanTransitionController (pan doux, seuil 0x100), puis pilote l'entrée via sa vtable [entrée+0x50] : [0x04] stop précédente, [0x10] start, [0x14] get-state. Utilisé pour activer les caméras scriptées du FORM CAMR (voir Cinematic_LoadCameraDef_23E7D, DATA_MODEL.md §6.6b b-bis)."
+  "summary": "far, 108L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ApplySelection' — appelants reels : Radar_TargetTypeFilter, Mission_PlayerEventHandler, pas de lien kneeboard). Gere un changement de selection active entre deux objets candidats via un cycle de vie a methodes virtuelles (vtable+0=teste, +4=arrete, +0x10=demarre, +0x14=etat)."
  },
  "sub_6B670": {
   "new_name": "VROOMM_StubThunk_6B670",
@@ -155,9 +155,9 @@
   "summary": "far, méthode virtuelle stub identique à CachedObject_Method_PassThrough_5E20E."
  },
  "sub_23BF3": {
-  "new_name": "Kneeboard_ClearAllFull",
+  "new_name": "EntityTracker_ClearAllFull",
   "segment": "seg041",
-  "summary": "far,39L — détruit toutes les entrées (sub_23801, destructeur complet) et réinitialise les pointeurs (+0xF/+0x12) : **vidage complet du journal avec libération des textes.**"
+  "summary": "far, 39L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearAllFull'). Comme ClearAll mais destruction complete (EntryDestructFull) et retrait de chaque entree de la liste ; remet aussi +0xF a 0. Appelee par EntityTracker_ResetAndRefresh."
  },
  "sub_A7F16": {
   "new_name": "MissionLoader_ReleaseRosterAndDestruct_A7F16",
@@ -820,14 +820,14 @@
   "summary": "far,455L — grosse fonction géométrique (buffer local 0xA8, nombreux arguments) appelée par sub_36EA5/sub_36F47 : **candidat pour le calcul de sélection/surbrillance d'une pièce de modèle 3D (picking géométrique)**, à approfondir."
  },
  "sub_237AC": {
-  "new_name": "Kneeboard_EntryDestruct",
+  "new_name": "EntityTracker_EntryDestruct",
   "segment": "seg041",
-  "summary": "far,55L — décrémente une référence sur la cible associée (+0xE, vtable[4]/[0]) puis notifie sa destruction (vtable[0xC], code 3) si nécessaire : **destructeur d'entrée de journal avec libération de référence à la cible.**"
+  "summary": "far, 54L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryDestruct'). Si un objet est lie (+0xE) et son bit +0x52.0 est actif, appelle [+0x50->vtable+4] (arret) puis [+0x50->vtable+0xC](param=3) (notification de detachement) ; detache la reference (+0xE=0) sans liberer la structure elle-meme. Appelee aussi depuis Mission_TriggerEvaluator."
  },
  "sub_51E7E": {
-  "new_name": "Expr_VM_Execute_51E7E",
+  "new_name": "Expr_VM_ExecuteSingleInstruction_51E7E",
   "segment": "seg114",
-  "summary": "far, point d'entrée d'exécution de la VM d'expression : construit une frame locale (bytecode ptr + contexte) et appelle Expr_VM_Interpreter_51106."
+  "summary": "far, 48 lignes, LUE INTEGRALEMENT. Adaptateur generique : construit une fausse 'instruction' temporaire sur sa PROPRE pile (pas dans un vrai buffer de script persistant) a partir de trois parametres (objet de mission, position, donnees d'opcode empaquetees), puis appelle directement MissionScript_ExecutePROG_51106 dessus. CONFIRME : l'interprete a 209 cas n'est PAS reserve aux scripts de mission stockes — c'est un utilitaire generique 'executer une instruction a la demande', appele aussi bien par le systeme de script que par GeomNode_BuildOrRefreshCluster_51EDC (gestion de cluster geometrique, sans rapport avec les missions)."
  },
  "sub_9D2CC": {
   "new_name": "Camera_ConstructWithSecondaryTarget_9D2CC",
@@ -1002,7 +1002,7 @@
  "sub_14279": {
   "new_name": "Program_InitVideoFontArgs",
   "segment": "seg012",
-  "summary": "far,289L — **appelée directement depuis `start`** (init programme). Charge la police 'SM-FONT.SHP' (dossier FONTS), configure la palette/mode vidéo selon la mémoire disponible (word_6D140 vs seuil 0x800h), puis parse les arguments de ligne de commande caractère par caractère (flags '+G'/'-G', '+S'/'-S' détectés via sub_E4B) : **initialisation programme (vidéo/police) + parseur d'arguments de ligne de commande.**"
+  "summary": "far, 289 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi, correction d'une erreur de conclusion precedente). Charge la police 'SM-FONT.SHP', configure la palette/mode video selon la memoire disponible, parse les arguments de ligne de commande (flags +G/-G, +S/-S). Appelle UIScreen_Construct_53896 UNE SEULE FOIS puis retourne (retf) — AUCUNE boucle dans cette fonction elle-meme. La boucle principale du jeu vit dans UIScreen_Construct, pas ici — erreur initialement commise en confondant chaine d'appel statique et frequence d'execution reelle."
  },
  "sub_8AFA4": {
   "new_name": "MissionRecordField_ReleaseViaThunk_8AFA4",
@@ -1382,7 +1382,7 @@
  "sub_51E4A": {
   "new_name": "Expr_LookupNamedValue_51E4A",
   "segment": "seg114",
-  "summary": "far, enveloppe bornée de Str_SeekNthEntryWord — résout un identifiant/index en pointeur vers une valeur nommée."
+  "summary": "far, 30 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Simple garde de bornes : si rawId < buf->markerCount (le compteur pose par ProgBuffer_LoadRawAndCountMarkers_AA31D), delegue a ProgBuffer_FindSubProgramByIndex_50E94 pour trouver le pointeur reel ; sinon retourne NULL. Utilisee pour resoudre les 4 progs_id d'une PartEntry (PartEntry_LoadAndResolveNames_A9E3C) et par le mecanisme d'appel de sous-routine du script (sub_51033)."
  },
  "sub_2A82": {
   "new_name": "CRT_Strcpy",
@@ -1635,9 +1635,9 @@
   "summary": "far,228L — vérifie timer/portée ajustés par la compétence pilote (+0xB0), exclut certains types de cible (+0x10D), puis parcourt une liste chaînée d'objets (vtable calls) en cherchant un objet de type 8 différent de soi : **boucle de balayage/sélection de cible (scan radar).**"
  },
  "sub_50E94": {
-  "new_name": "Str_SeekNthEntryWord_50E94",
-  "segment": "seg114",
-  "summary": "far, variante mot (scasw) de Str_SeekNthEntryByte — table à séparateurs 16 bits."
+  "new_name": "ProgBuffer_FindSubProgramByIndex_50E94",
+  "segment": "seg002",
+  "summary": "far, 43 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — REFERME la question du decoupage du bloc PROG). \n\nDECOUVERTE : le bloc PROG brut (charge par ProgBuffer_LoadRawAndCountMarkers_AA31D) est une SEQUENCE DE MINI-PROGRAMMES CONSECUTIFS, chacun termine par un MOT NUL (0x0000, 2 octets — pas juste un octet). Cette fonction, donnee un index N, scanne le tampon (instruction x86 'repne scasw', qui cherche un mot egal a 0) et saute par-dessus N separateurs consecutifs ; retourne le pointeur juste apres le N-ieme separateur trouve = le debut du sous-programme #N. \n\nCONCLUSION : les 4 progs_id d'une PartEntry (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) sont des INDEX DANS CETTE SEQUENCE ('le N-ieme mini-programme du bloc'), pas des offsets ni des identifiants nommes independants. Le compteur de marqueurs (ProgBuffer+0x00) = nombre total de mini-programmes empaquetes dans le bloc PROG d'une mission."
  },
  "sub_63511": {
   "new_name": "Handle_ReadWordField_63511",
@@ -2540,9 +2540,9 @@
   "summary": "far, 5 lignes - LUE INTEGRALEMENT. Slot [vtable+0x10] PAR DEFAUT, partage par de nombreux types MVRS (references depuis seg339 offsets 0x148, 0x15C, et d'autres - voir la table de tags/slots de AI_SYSTEM.md §3.7). VERITABLE NO-OP : 'mov ax,[bp+0xA] / pop bp / retf' - retourne simplement l'argument recu sans aucun effet de bord. CONFIRME que MVRS_ID7 (tag 0x228) n'a PAS de sequence de manoeuvre dediee (contrairement a l'hypothese initiale qui supposait une symetrie avec ID=6) - son minuteur, pose par MVRS_ID7_ApplySetTimer_1060A, n'est jamais consomme par un vrai tick, le rendant vestigial en pratique pour cet ID."
  },
  "sub_5247D": {
-  "new_name": "Expr_Node_ForceRecompute_5247D",
+  "new_name": "Shared_TriggerExprInstruction_5247D",
   "segment": "seg114",
-  "summary": "far, force le recalcul d'un champ de nœud (pose des flags, exécute le bytecode à +0x42 via Expr_VM_Execute)."
+  "summary": "far, 23 lignes, LUE INTEGRALEMENT. Appelee par MissionFormation_ComputeSlotAndSpawn_51EDC EN INTERNE (rappel controle vers l'interprete, pas un appelant externe sans rapport). Manipule +0x39/+0x3A/+0x42, les MEMES champs de statut que MissionObject_ResetState_A9DFD/MissionObject_LoadAndResolveNames_A9E3C utilisent sur les objets de mission — la MEME structure generique a 85 octets, pour une sous-evaluation. Pose bit0 de +0x39, efface bits2/3, efface +0x3A, puis appelle Expr_VM_ExecuteSingleInstruction_51E7E avec +0x42 (donnees empaquetees) et une position depuis word_706A0+0x40."
  },
  "sub_6B01E": {
   "new_name": "VROOMM_StubThunk_6B01E",
@@ -2965,9 +2965,9 @@
   "summary": "⚠️ far, 476 lignes, NON DÉTAILLÉE — construit une arborescence de widgets/nœuds (dispatch vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B pour ajout à liste membre, appelle UIScreen_SetWidgetValue_50654 en fin). Candidat pour session dédiée. REMONTEE PARTIELLE (476 lignes, portion pertinente lue completement a la demande de Remi) : LE NOM PRECEDENT ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion lue ne construit aucun widget. Pose byte_6E4BF=1 (source du declencheur du message de destruction 0x0D via RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a +0x50 (meme champ deja vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A) qui sont l'OPPOSE EXACTE l'une de l'autre (var_4 == -var_6) - probable verification 'cible detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a pas ete relu en detail."
  },
  "sub_4FBF1": {
-  "new_name": "UIScreen_StateMachineMain_4FBF1",
+  "new_name": "CombatTarget_WeaponActionSubsystem",
   "segment": "seg112",
-  "summary": "⚠️ far, 645 lignes, NON DÉTAILLÉE — grosse machine à états dispatchant sur byte_722D1 (valeurs 0Fh/19h/20h/...), pilote un écran/dialogue (widgets autour de l'id 5A92h), pose des minuteurs (Timer_SetRelativeFrames). Référencée via vtable (DATA XREF seg216) et par sub_536F7/sub_7A054. Candidat prioritaire pour session dédiée."
+  "summary": "far, 645 lignes, PARTIELLEMENT LUE (session gestion de mission avec Remi). RENOMMEE (echange avec sub_536F7) : ce n'est PAS le tick principal du jeu — c'est un SOUS-SYSTEME appele DEPUIS MAIN_GAME_TICK_536F7 (et aussi UIScript_ParseAndEvaluate_7A054), dedie aux actions de combat liees a la cible verrouillee (word_722E6) : mode 'Time Burst' (post-combustion, message radio 'aTimeBurst'), calcul de portee/distance vers la cible (cible->+0x51, compare a 0x400), operation sur tag d'objet (0x59C3). Dispatch riche sur byte_722D1 (plusieurs valeurs). Lecture complete non terminee — les anciens noms de ses callees ('Config_ReadCalibration', 'WorldObjects_PeriodicGC', 'Physics_ApplyGroundHeightConstraint') sont eux-memes probablement faux, a revoir."
  },
  "sub_5C2BF": {
   "new_name": "PagedResourceB_Method_ReadDefault_5C2BF",
@@ -3205,9 +3205,9 @@
   "summary": "far, insère un nœud avant un nœud de référence donné (ou en queue via LinkedList_InsertAtTail_5F1CA si aucune référence)."
  },
  "sub_238A4": {
-  "new_name": "Kneeboard_AddEntryText",
+  "new_name": "EntityTracker_AddEntryText",
   "segment": "seg041",
-  "summary": "far,28L — construit une entrée texte libre (sub_23497) et l'ajoute à la liste (sub_5F57F) : **ajout d'une entrée de journal texte dans le journal de mission.**"
+  "summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_AddEntryText'). Construit une entree texte via EntityTracker_EntryConstructText puis l'insere en queue de liste."
  },
  "sub_477F0": {
   "new_name": "FlightControl_CacheTripleParam_477F0",
@@ -3617,7 +3617,7 @@
  "sub_A9382": {
   "new_name": "MissionScenario_RecomputeFields_A9382",
   "segment": "seg456",
-  "summary": "far, combine Expr_Node_RecomputeFieldC_53211 (seg114, ×2), MissionScenario_ResolveAndBindExpressions_A8F22, MissionScenario_ConstructFieldChain_A8124, sub_6CDBE."
+  "summary": "far, 58 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Appelee CHAQUE FRAME directement depuis Simulator_MainLoop_53896 (via VROOMM_StubThunk_6CE5B) — chemin SEPARE et PARALLELE a MAIN_GAME_TICK_536F7, pas decouvert avant. \n\nDeclenche Scene_TriggerMissionUpdateEvent_53211 sur DEUX pointeurs de SceneRecord stockes sur MissionScenario : +0x50 et +0x4E. CORRIGE DATA_MODEL.md : ces deux champs ne sont PAS 'handle de noeud Expr'/'flag HOME depuis noeud' comme documente precedemment — ce sont des pointeurs de SceneRecord (+0x50 correspond exactement au champ rempli par Scene_DetectAndActivateChange_532EA). \n\nVerifie ensuite une condition de fin de mission (position comparee a dword_70718/dword_7071C, une cible/checkpoint global) — si atteinte, POSE byte_706AF = 5 -- LE MEME OCTET QUI CONTROLE LA BOUCLE PRINCIPALE DE Simulator_MainLoop (condition de sortie == 6). Lien direct entre logique de scenario et controle du jeu a ce niveau. \n\nAppelle enfin MissionScenario_ResolveAndBindExpressions_A8F22 (ecrit MISN2OP.IFF, resultats de fin de mission) — a chaque frame, sans garde visible ici (garde probablement interne a A8F22, non verifiee). Appelle aussi sub_A8124 et sub_6CDBE, non identifiees."
  },
  "sub_6CDA0": {
   "new_name": "VROOMM_StubThunk_6CDA0",
@@ -4080,9 +4080,9 @@
   "summary": "far, appelle sub_6BF74 (externe). Appelée par PlayerComponent_Helper_9E651."
  },
  "sub_23B55": {
-  "new_name": "Kneeboard_RemoveByTarget",
+  "new_name": "EntityTracker_RemoveByTarget",
   "segment": "seg041",
-  "summary": "far,60L — retire toutes les entrées référençant une cible spécifique (di) lors de sa destruction : **nettoyage du journal quand un objet référencé est détruit.**"
+  "summary": "far, 60L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RemoveByTarget'). Trouve et detruit completement (EntryDestructFull) l'entree liee a un objet precis, la retire de la liste, met a jour +0x12/+0xF si c'etait la selection/tete courante. Appelee depuis MissionRecord_LoadEntityDatabase_7B035 ET MissionRecord_LoadAndBuildWidgetTree_7D31A."
  },
  "sub_DAA9": {
   "new_name": "Goal_FollowAllyExec",
@@ -4190,9 +4190,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_AA7D4) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
  },
  "sub_2341F": {
-  "new_name": "Kneeboard_EntryConstructObj",
+  "new_name": "EntityTracker_EntryConstructObj",
   "segment": "seg041",
-  "summary": "far,53L — constructeur d'une entrée de journal de mission (type 0x119C, priorité 2) référençant une cible (di) et son nom (vtable[0x14]) : **création d'une entrée de kneeboard/log de mission liée à un objet.**"
+  "summary": "far, 52L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryConstructObj'). Construit une entree de 26 octets (tag final 0x119C, voisin du tag du gestionnaire 0x1198), stocke une reference directe a l'objet suivi (+0xE), appelle son vtable+0x14 (meme slot 'etat' qu'EntityTracker_ApplySelection), et copie 8 octets depuis objet+0x53 (position ou identifiant, a confirmer) dans les champs +5/+9 utilises comme cle de recherche par EntityTracker_FindByID."
  },
  "sub_6CB5F": {
   "new_name": "VROOMM_StubThunk_6CB5F",
@@ -4467,7 +4467,7 @@
  "loc_878F": {
   "new_name": "Goal_ActiveWingmanEngagement_878F",
   "segment": "seg004",
-  "summary": "far, 393 lignes - ENTIEREMENT TRACEE. Gestionnaire GOAL selecteur 5 (loc_878F, seg004) - CONFIRME etre le comportement 'coequipier actif du joueur' pressenti depuis les toutes premieres correlations empiriques sur les fichiers PROF (present chez Billy/Gwen, absent chez Hammer/cargo). STRUCTURE COMPLETE : (1) auto-limitation de frequence (ne s'execute que si un delai suffisant s'est ecoule depuis le dernier appel, via un delta temporel sur l'objet lie +0x102) ; (2) appelle Radio_SelectContextMessage_CD4A pour classifier le contexte radio courant (codes 4/5 = contextes lies a l'engagement/escorte) ; (3) TROIS BRANCHES DE COMPORTEMENT : (a) ESCORTE/SUIVI DU JOUEUR - si contexte 4/5 et cible/reference liee au joueur (word_722E6) et le timer vocal (Voice_ExpressionTimer_CA93) n'est pas occupe : calcule une position de formation relative au joueur (AI_ResolveNodePosition_54274, decalage altitude fixe +1000 unites, decalage lateral), fixe goal_state=0xAA (OP_SET_OBJ_FOLLOW_ALLY), verrouille la reference cible directement sur le joueur (SetReference), declenche un message radio (Radio_PlayMessage_CB45, code 0x20 ou 8 selon variante), puis DELEGUE la decision finale a AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (le meme mecanisme de selection ponderee MVRS deja documente - confirme que MVRS intervient AUSSI dans le comportement d'escorte active, pas uniquement via le selecteur GOAL 4) ; (b) VOL VERS POINT DE NAVIGATION (repli, si le contexte 4/5 est present mais la condition de cible joueur n'est pas remplie) : calcule une position DIFFERENTE (fusion de deux sources de position, probable interception/rendez-vous), fixe goal_state=0xA5 (OP_SET_OBJ_FLY_TO_WP), message radio code 8 ; (c) TRANSFERT DE COEQUIPIER (si le contexte radio n'est PAS 4/5, mais la cible est deja le joueur, goal_state deja FOLLOW_ALLY, et un verrou global byte_6E4CD est actif) : message radio code 0x12, puis appelle Goal_TransferToWingman_C4FD (transmet l'etat GOAL/cible/waypoint vers une autre entite - passation d'escorte). Toute condition non remplie dans une branche => sortie sans action (retour 0, 'non gere ce tick'). CONFIRME architecturalement : ce gestionnaire lie ensemble le systeme radio contextuel, le verrouillage de cible sur le joueur, la machine a etats GOAL, et le mecanisme de selection ponderee MVRS en aval. Anciennement non documentee (jamais ajoutee a known_functions.json malgre plusieurs mentions dans l'analyse MVRS/GOAL)."
+  "summary": "far, 392 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi — resout la connexion script/GOAL). Option de tournoi GOAL liee a GOAL=5. Referencee via vtable (seg339:off_6D1A8, tag 0xF8). \n\nDECOUVERTE CENTRALE : cette fonction LIT ET ECRIT entite+0x11D (le meme champ que le script de mission utilise) : - Verifie si entite+0x11D == 0xAA (Follow Ally) pour decider d'executer le suivi actif - Peut ELLE-MEME poser entite+0x11D = 0xAA ou 0xA5 (vol vers point) selon les conditions observees (correspondance avec word_722E6, la cible/leader actuellement selectionnee) - Appelle DIRECTEMENT le noeud MVRS ID=21 (entite+0xD1 -> vtable+8) pour l'execution reelle de la navigation — la MEME mecanique que le script de mission utilise via MissionFormation_ComputeSlotAndSpawn. \n\nCONCLUSION : entite+0x11D est un canal de communication BIDIRECTIONNEL entre le script et GOAL=5, pas un simple drapeau a sens unique. Explique l'observation empirique de Remi : avec GOAL=1 seul, le script pose bien entite+0x11D=0xAA (Follow Ally) mais AUCUNE option du tournoi ne le consulte, donc rien ne se passe (l'avion garde son dernier etat, ex: monter apres Take Off). Avec GOAL=5 present, cette fonction consulte le champ, le trouve a 0xAA, et fournit le comportement de vol continu reel (suivi precis des commandes du joueur)."
  },
  "sub_6D095": {
   "new_name": "VROOMM_StubThunk_6D095",
@@ -5020,9 +5020,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_87718) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=13AF0h, codesize=0F6Fh, nentries=11."
  },
  "sub_52513": {
-  "new_name": "Expr_VM_CallNativeFunction_52513",
+  "new_name": "MissionScript_CallNativeHandler_52513",
   "segment": "seg114",
-  "summary": "⚠️ far, 685 lignes, NON DÉTAILLÉE — marshalling d'une liste d'arguments (~28 dwords, via Expr_LookupNamedValue_52DDB/sub_5305A/sub_52C9C en boucle) puis appel indirect via table de fonctions natives (dword ptr [bx+88h]). Implémente l'opcode \"appel de fonction native\" de la VM. Candidat pour session dédiée."
+  "summary": "far, 685 lignes, LUE EN PROFONDEUR (session dediee aux ordres de mission avec Remi). CORRIGE : ce n'est pas une boucle generique de marshalling — c'est le vrai point d'aiguillage par ordre, avec une GARDE D'ENTREE qui determine si un ordre execute reellement une commande de vol, PUIS un switch a 31 cas reels (indice = opcode-0xA1, cmp bx,0x1E) qui distingue Take off, Land, Destroy target, Defend target, Defend area, Follow ally, et 7 ordres non identifies par la table externe (0xA3, 0xAB, 0xB1-0xB5) — detail complet dans MISSION_SCRIPT_OPCODES.md. \n\nGARDE D'ENTREE (determine si QUOI QUE CE SOIT s'execute, avant meme de regarder quel ordre est demande) : verifie [arg_0+0x52] != 0 (l'objet de mission reference par le script doit avoir un controleur associe) ET le bit 1 de [arg_0+0x39] doit etre CLAIR (probable 'objet non occupe/disponible') — si l'une des deux conditions echoue, retourne 0 IMMEDIATEMENT sans executer aucune commande de vol, quel que soit l'opcode demande par le script. Si la garde passe : pose [arg_0+0x54]=0xFF (drapeau d'etat) avant le switch.\n\nSORTIE COMMUNE (tous les 31 cas convergent ici, loc_52A41) : delegue la VRAIE execution tactique a une methode virtuelle UNIQUE et GENERIQUE, [arg_0+0x52 -> vtable+0x88], en lui passant la position/reference resolue par le cas specifique, une valeur de 'competence' (copiee depuis la cible resolue +0x52 si presente), l'opcode et une duree. AUCUN calcul de poursuite, de tir ou de suivi vectoriel continu ne vit dans cette fonction elle-meme ni dans aucun de ses 31 cas — c'est une couche de RESOLUTION D'INTENTION (ou aller, quoi cibler), pas d'EXECUTION TACTIQUE. Cette derniere vit entierement dans la methode virtuelle +0x88, non identifiee a ce stade.\n\nPIEGE NOTE : le champ +0x52 utilise ici comme POINTEUR de controleur appartient a un objet DIFFERENT du +0x52 scalaire (performance JETP/TOFF, alimentant byte_720C3) trouve ailleurs dans le binaire — meme decalage, deux structures distinctes."
  },
  "sub_AA0F7": {
   "new_name": "ExprSlot_Helper2_AA0F7",
@@ -5810,9 +5810,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_8F5E0) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1C780h, codesize=87Dh, nentries=6."
  },
  "sub_97CF5": {
-  "new_name": "MissionText_Helper6_97CF5",
+  "new_name": "EntityScreenLayout_PrepareAndCompute",
   "segment": "ovr287",
-  "summary": "far, aucun appel externe visible (43 lignes)."
+  "summary": "far, 43L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_Helper6' — aucune preuve que ce soit lie a du texte, garde generique en attendant confirmation). Appelle EntityScreenLayout_Helper4 (non lue), clampe une valeur d'angle/distance a 0x100 si non positive, la stocke sur l'entite (+0x60), puis appelle EntityScreenLayout_ComputeAngularPosition."
  },
  "sub_638FF": {
   "new_name": "StreamReader_Destruct_638FF",
@@ -5895,9 +5895,9 @@
   "summary": "far, aucun appel externe visible (rôle exact non détaillé)."
  },
  "sub_23B23": {
-  "new_name": "Kneeboard_ClearAll",
+  "new_name": "EntityTracker_ClearAll",
   "segment": "seg041",
-  "summary": "far,33L — parcourt toutes les entrées et les détruit (sub_237AC), vide le compteur de sélection : **vidage complet du journal de mission.**"
+  "summary": "far, 32L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearAll'). Parcourt toute la liste, detruit chaque entree (EntryDestruct, sans liberer les ressources), remet +0x12 (selection courante) a 0."
  },
  "sub_6470F": {
   "new_name": "ResourceRecord_ComputeRecordBoundsB_6470F",
@@ -5950,9 +5950,9 @@
   "summary": "far,59L — intègre un vecteur (delta-temps dword_70458) dans une position secondaire (+4/8/0xC) : **intégrateur d'Euler pour un second point de référence (probable rotation/orientation).**"
  },
  "sub_23593": {
-  "new_name": "Kneeboard_RenderEntry",
+  "new_name": "EntityTracker_RenderEntry",
   "segment": "seg041",
-  "summary": "far,265L — **switch à 20 cas** sur un code de message (+4), chaque cas formate un texte (sub_5C832 et alentours) dans un buffer de 0x80 octets : **moteur de rendu des messages du journal de mission/kneeboard, un cas par type d'événement.** || case 0x13 = objet caméra COMP (2026-08-30) : chaque case du switch (codes de type CAMR : CHAS=3/CKPT=4/VICT=7/ROTA=8/TARG=9/WEAP=0xB/COMP=0x13) mappe le payload brut ([entry+0x10], len [entry+0x16]) puis appelle un constructeur d'objet type-spécifique via stub (0x03->6B116, 0x07->6AFC9, 0x08->6B019, 0x09->6B041, 0x0B->6AF6C, 0x13->6AC3E=AIManeuver_LoadFormationDataB_77FCA). L'objet construit est mémorisé dans [entry+0x0E]. Pour COMP (0x13) : en plus, [obj+0x80]=payload+0x1C (début script keyframe), [obj+0x86]=payloadLen-0x1C. Voir DATA_MODEL.md §6.6b b-bis."
+  "summary": "far, 264L, LUE INTEGRALEMENT — DECOUVERTE MAJEURE. RENOMMEE (ancien 'Kneeboard_RenderEntry'). VRAI SWITCH A 20 CAS (0x0-0x13) sur le code de type ([entree+4]). Pour chaque cas : alloue un objet de 0x80 (128) octets, appelle un stub VROOMM DIFFERENT par cas (construction d'un widget/objet de ce type precis), pose le resultat comme objet lie de l'entree (+0xE). CONFIRME : ce systeme construit dynamiquement 20 types differents d'objets a partir d'une ressource — pas un simple rendu de texte. CE QUE CES 20 TYPES REPRESENTENT REELEMENT N'EST PAS VERIFIE (aucun des 20 stubs VROOMM n'a ete lu) ; ne pas assumer 'widget UI' sans lecture. Appelee depuis Mission_TriggerEvaluator."
  },
  "sub_6C4E3": {
   "new_name": "VROOMM_StubThunk_6C4E3",
@@ -6165,9 +6165,9 @@
   "summary": "far, aucun appel externe visible (10 lignes)."
  },
  "sub_23994": {
-  "new_name": "Kneeboard_FindByIDContinue",
+  "new_name": "EntityTracker_FindByIDContinue",
   "segment": "seg041",
-  "summary": "far,73L — variante de sub_238CE avec traitement supplémentaire si trouvé (référence +0xE) : **recherche d'entrée de journal par identifiant, avec suite de traitement.**"
+  "summary": "far, 73L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_FindByIDContinue'). Identique a FindByID, mais si l'entree trouvee n'a pas d'objet lie (+0xE==0, entree texte), l'affiche immediatement (EntityTracker_RenderEntry) ; retourne l'objet lie ou 0."
  },
  "sub_2B1F3": {
   "new_name": "Collection_Destruct",
@@ -7965,9 +7965,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_A9450) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
  },
  "sub_239FE": {
-  "new_name": "Kneeboard_RenderByCode",
+  "new_name": "EntityTracker_RenderByCode",
   "segment": "seg041",
-  "summary": "far,54L — parcourt les entrées, formate (sub_23593) celle dont le code (+4) correspond et n'a pas encore de rendu (+0xE==0) : **rendu à la demande d'une entrée de journal par code (lazy rendering).**"
+  "summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RenderByCode'). Parcourt la liste, pour chaque entree dont [+4]==code demande ET sans objet lie (+0xE==0), l'affiche (RenderEntry). Appelee depuis Radar_TargetTypeFilter et Mission_PlayerEventHandler."
  },
  "sub_86965": {
   "new_name": "HUDSymbol_BlitOverlapRegion_86965",
@@ -8025,9 +8025,9 @@
   "summary": "far, appelle PlayerComponent_SubHelperF_A0090."
  },
  "sub_53211": {
-  "new_name": "Expr_Node_RecomputeFieldC_53211",
+  "new_name": "Scene_TriggerMissionUpdateEvent_53211",
   "segment": "seg114",
-  "summary": "far, recalcule un champ dérivé : Expr_Node_GetCachedValueB_5317A puis Expr_VM_Execute_51E7E."
+  "summary": "far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change -- garantie supplementaire sur l'ancienne scene) ET depuis MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par frame tant que la scene reste active -- exactement comme celui de PART (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement suppose."
  },
  "sub_99650": {
   "new_name": "Terrain_AllocateSectorBuffers_99650",
@@ -8265,9 +8265,9 @@
   "summary": "⚠️ far, 99 lignes, NON DÉTAILLÉE — alloue (sub_658), initialise un sous-objet composite (sub_6CACA, motif seg109), appelle PlayerComponent_SubHelperF_A0090."
  },
  "sub_531CD": {
-  "new_name": "Expr_Node_RecomputeFieldA_531CD",
+  "new_name": "Scene_TriggerActivation_531CD",
   "segment": "seg114",
-  "summary": "far, recalcule un champ dérivé : Expr_Node_GetCachedValueA_530FF puis Expr_VM_Execute_51E7E."
+  "summary": "far, 26 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_TickGroup' errone). Quand une scene devient active : appelle Scene_EnsureUnitsSpawned_530FF (fait apparaitre les unites associees non encore presentes), PUIS Expr_VM_ExecuteSingleInstruction_51E7E — DECLENCHE L'EXECUTION DU SCRIPT on_is_activated DE CETTE SCENE (parametres calcules depuis scene+2+0x40 = reference au champ progs_id resolu de la scene, scene+8)."
  },
  "sub_3C942": {
   "new_name": "IFF_LoadAngleParam",
@@ -8600,9 +8600,9 @@
   "summary": "far, combine `IFF_LoadAngleParam` et `JDYN_LoadChunk` — chargement combiné IFF/JDYN d'un paramètre d'angle."
  },
  "sub_53896": {
-  "new_name": "UIScreen_Construct_53896",
+  "new_name": "STRIKE_EXE_MAIN_LOOP",
   "segment": "seg114",
-  "summary": "⚠️ far, 254 lignes, NON DÉTAILLÉE — construction complète d'un écran : alloue/configure des ressources, appelle `UIScreen_ApplyFormFields_500F6` (seg112) et `UIScreen_ConstructWidgetBinding_536F7`. Référencée depuis seg014. Probable point d'entrée \"ouvrir cet écran\"."
+  "summary": "far, 254 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE TROIS FOIS : d'abord 'UIScreen_Construct' (faux), puis 'Simulator_MainLoop', puis 'STRIKE_EXE_MAIN_LOOP' (nom final, propose par Remi) — c'est LA BOUCLE PRINCIPALE DE TOUT L'EXECUTABLE, confirme par lecture directe : loc_538A1 (debut de boucle) est la cible d'un `jmp loc_538A1` explicite, avec sortie conditionnelle sur byte_706AF==6. A CHAQUE ITERATION, EN SEQUENCE (pas en parallele) : appelle MAIN_GAME_TICK_536F7 (gestion clavier + formation + scenes), PUIS MissionScenario_RecomputeFields_A9382 (declenche Scene_TriggerMissionUpdateEvent sur +0x4E/+0x50, verifie une condition de fin de mission, peut poser byte_706AF=5). Appelee une seule fois depuis Program_InitVideoFontArgs_14279, qui lui-meme ne boucle jamais."
  },
  "sub_28692": {
   "new_name": "Mouse_InitAndRead",
@@ -8635,9 +8635,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_84DDB) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34."
  },
  "sub_23E48": {
-  "new_name": "Kneeboard_Destruct",
+  "new_name": "EntityTracker_Destruct",
   "segment": "seg041",
-  "summary": "far,38L — destructeur : vide le journal (sub_23C38), libère la liste (sub_5F66B), libère la mémoire si demandé (sub_338) : **destructeur du gestionnaire de journal de mission.**"
+  "summary": "far, 38L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_Destruct'). Referencee via vtable (seg339:1198, confirme). Vide la liste (EntityTracker_ResetAndRefresh), libere la liste chainee (LinkedListB_Helper_5F66B), libere la memoire si demande."
  },
  "sub_A2DA6": {
   "new_name": "PaletteScreen_SwitchModeAndDispatch_A2DA6",
@@ -8890,9 +8890,9 @@
   "summary": "⚠️ far, 114 lignes, NON DÉTAILLÉE — lit une douzaine de champs depuis le format IFF (ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54 ×2, ReadFinalField_64B51 ×6, ReadFieldGroupC_64A7E ×3) et appelle directement `PlayerComponent_IndexToFlagMask_9DE60` (seg432) — confirme le lien direct avec le système d'index de composants de dommages."
  },
  "sub_536F7": {
-  "new_name": "UIScreen_ConstructWidgetBinding_536F7",
+  "new_name": "MAIN_GAME_TICK",
   "segment": "seg114",
-  "summary": "⚠️ far, 242 lignes, NON DÉTAILLÉE — relie un widget à ses champs calculés (Expr_Node_RecomputeFieldB_531F2, Expr_Node_RefreshField_52E51, Expr_Node_StoreResultVector_52C9C) et appelle directement `UIScreen_StateMachineMain_4FBF1` (seg112) et Expr_Node_EvaluateVisibility_53586. Pièce centrale du lien widget ↔ VM d'expression."
+  "summary": "far, 241 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi). RENOMMEE (echange avec sub_4FBF1) : c'est ELLE le vrai point d'entree par frame — orchestre entree clavier joueur (espace/slash), mise a jour de formation/groupe de mission (appelle MissionFormation_HandleGroupSelectionChange_532EA directement), rafraichissement du graphe d'expression (Expr_Node_RefreshField), ET delegue au sous-systeme combat/cible via l'appel a sub_4FBF1 (desormais nommee separement, PAS 'MAIN_GAME_TICK'). Appelee une fois par iteration de Simulator_MainLoop, sur un objet FIXE (si, jamais reassigne). C'est la fonction qui merite le nom 'tick principal' car elle touche IA/joueur/rendu, meme via des appels separes — une fonction qui ne gere pas l'IA ne peut pas etre le tick principal."
  },
  "loc_5ADD9": {
   "new_name": "TextObjectCluster_InitState_5ADD9",
@@ -9040,9 +9040,9 @@
   "summary": "far, prédicat booléen : vérifie un indicateur d'erreur (+0x20, signe) sur le petit-enfant d'un nœud (+0x52 → +0x51)."
  },
  "sub_53236": {
-  "new_name": "Expr_Node_GetOrRecompute_53236",
+  "new_name": "Scene_FindMatchingByAreaContainment_53236",
   "segment": "seg114",
-  "summary": "far, dispatch vtable (dword ptr [bx+4]) pour obtenir/recalculer une valeur de nœud."
+  "summary": "far, 80 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Itere le tableau des enregistrements SCNE (pas de 0x27=39 octets, confirmant la taille de DATA_MODEL.md), pour chaque scene active (is_active!=0) dont la zone (area_id resolu, +4) est non nulle, teste par appel virtuel ([areaHandle->vtable+4](param)) si le parametre (position/reference) est contenu dans cette zone. Retourne la premiere scene active correspondante, ou NULL. C'est le vrai SELECTEUR DE SCENE ACTIVE de la mission."
  },
  "sub_6CB69": {
   "new_name": "VROOMM_StubThunk_6CB69",
@@ -9350,9 +9350,9 @@
   "summary": "⭐⚠️ far, 666 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743/SeekAndReadB_647B2 répétés."
  },
  "sub_52E51": {
-  "new_name": "Expr_Node_RefreshField_52E51",
+  "new_name": "PartEntry_DispatchMissionUpdateTick_52E51",
   "segment": "seg114",
-  "summary": "far, invoque Expr_Node_UpdateAndPropagate_52AC6 pour un champ donné — appelée par sub_536F7 (construction d'écran)."
+  "summary": "far, 37 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien nom 'Expr_Node_RefreshField' n'avait plus de sens une fois le type d'objet identifie). \n\nBOUCLE SUR LE TABLEAU DES PartEntry (participants du chunk PART) : pas de 0x55 (85 octets, taille exacte confirmee de PartEntry_AllocateArray_AA23D). Pour chaque entree, teste le bit 0 de +0x39 (le meme champ de statut que PartEntry_ResetState_A9DFD manipule) ; si actif, appelle Expr_Node_UpdateAndPropagate_52AC6(entree). \n\nROLE CONFIRME : c'est le vrai declencheur, a chaque frame (appelee par MAIN_GAME_TICK_536F7), de l'evenement 'on_mission_update' pour chaque participant de mission dont le bit correspondant est actif — point d'entree de la chaine Expr_Node_UpdateAndPropagate -> Expr_VM_ExecuteSingleInstruction -> MissionScript_ExecutePROG qui execute finalement le script on_mission_update de ce participant (PartEntry+0x46/0x48)."
  },
  "sub_6AA48": {
   "new_name": "VROOMM_StubThunk_6AA48",
@@ -9920,9 +9920,9 @@
   "summary": "⚠️ far, référencé par jmp depuis seg082 — CANDIDAT FORT pour le tick physique de l'avion : réinitialise les accumulateurs (appel sub_4F56D), combine deux vecteurs (sub_47140+sub_46F5E), les applique à l'objet (sub_46392), puis appelle sub_4791E (Aero_ComputeForcesMain) sur si+4 et applique le résultat via sub_4696C. Lecture rapide seulement — À LIRE EN DÉTAIL EN PRIORITÉ avant toute affirmation ferme (cf. règle sub_3314/sub_49C2E)."
  },
  "sub_23C4F": {
-  "new_name": "Kneeboard_SelectByID",
+  "new_name": "EntityTracker_SelectByID",
   "segment": "seg041",
-  "summary": "far,45L — recherche une entrée par identifiant (sub_23994) puis la sélectionne (sub_23CCC) : **sélection d'une entrée de journal par identifiant (find+select).**"
+  "summary": "far, 30L, LUE INTEGRALEMENT. Relais : appelle EntityTracker_FindByIDContinue(self, id) ; si trouve, applique la selection (EntityTracker_ApplySelection). Appelee depuis EntityTracker_Init et seg009 (non identifie)."
  },
  "sub_32FBC": {
   "new_name": "Camera_DistanceLimitTest",
@@ -10165,9 +10165,9 @@
   "summary": "far, référencée via vtable (DATA XREF seg339) — construit un nouvel objet copiant l'état d'index courant (tag 3FEAh via sub_5E9A9), transfère le flux sous-jacent (StreamReader_Destruct_638FF puis Member_ClearAndFree_5EA03) — probable méthode « clone » de l'itérateur d'index."
  },
  "sub_532EA": {
-  "new_name": "Expr_Node_RecomputeAllFields_532EA",
+  "new_name": "Scene_DetectAndActivateChange_532EA",
   "segment": "seg114",
-  "summary": "far, orchestrateur recalculant plusieurs champs d'un nœud (Expr_Node_GetOrRecompute_53236, RecomputeFieldC_53211, RecomputeFieldA_531CD, puis sub_544DC)."
+  "summary": "far, 55 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active courante ; si elle a change depuis le dernier appel (different du parametre previousScene), desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52)."
  },
  "sub_6C55D": {
   "new_name": "VROOMM_StubThunk_6C55D",
@@ -10275,9 +10275,9 @@
   "summary": "far, identique en motif à AircraftDamageComponent_ScalarDeletingDtorA_74F92 (destructeur de classe sœur)."
  },
  "sub_97D39": {
-  "new_name": "MissionText_ComputeTrigonometricLayout_97D39",
+  "new_name": "EntityScreenLayout_ComputeAngularPosition",
   "segment": "ovr287",
-  "summary": "⚠️ far, 208 lignes, NON DÉTAILLÉE — combine `Math_Sin_5483F`, longueur vectorielle, `Math_Tan_548AD`, `Math_ArcTan_54ADE` (seg115) — calcul de disposition trigonométrique (probable positionnement d'éléments de texte en arc)."
+  "summary": "far, 207L, LUE INTEGRALEMENT. RENOMMEE (ancien 'MissionText_ComputeTrigonometricLayout' — le calcul trigonometrique est reel et verifie, mais RIEN ne confirme un rendu de texte : garde 'EntityScreenLayout' generique, pas 'Text', en attendant de tracer qui consomme le resultat +0xC/+0x10). Calcule une position ecran a partir d'un angle (+0x60) et des dimensions de l'entite (+4/+6) : plusieurs Sin/Tan/ArcTan enchaines, division par les dimensions, mise a l'echelle finale via dword_6E9AA. Ecrit le resultat en +0xC/+0x10 (coordonnees finales) et +0x64/0x68/0x6C/0x70/0x74 (valeurs intermediaires). NE DESSINE RIEN elle-meme — calcule seulement une position, stockee sur l'objet, consommee ailleurs (non trace)."
  },
  "sub_A1550": {
   "new_name": "Palette_GetOrLoadWorkingBuffer_A1550",
@@ -10420,9 +10420,9 @@
   "summary": "far, référencée par seg030 (zoom carte/radar) — longueur vectorielle (sub_5828E ×2) + Math_ArcSinOfRatio_54A0E : calcul de gisement vers un point de carte."
  },
  "sub_A9956": {
-  "new_name": "ExprSlot_ReleaseAndReloadDword_A9956",
+  "new_name": "PLAY_LoadCASTTeamNames_A9956",
   "segment": "seg457",
-  "summary": "⚠️ far, 125 lignes, NON DÉTAILLÉE — combine Memory_TypedFreeWrapperC_5C6F3, ResourceRecord_ReadDwordFieldB_64AFF (seg193), sub_2E74 (×2, externe)."
+  "summary": "far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4 octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers PilotProfile_LoadFromPROF."
  },
  "sub_9788C": {
   "new_name": "MissionText_ReleaseStyles_9788C",
@@ -11175,9 +11175,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_854F9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=123D0h, codesize=0AF1h, nentries=21."
  },
  "sub_7AFA8": {
-  "new_name": "Kneeboard_UpdateEntry_7AFA8",
+  "new_name": "EntityTracker_RegisterAndSelect",
   "segment": "ovr239",
-  "summary": "far, combine `Kneeboard_AddEntryObj` et `Kneeboard_ApplySelection` — mise à jour d'une entrée du calepin de bord (kneeboard)."
+  "summary": "far, 20L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_UpdateEntry'). CONFIRME DIRECTEMENT 0x59CD comme adresse de la liste globale trackee : ajoute l'entite passee en parametre a cette liste (EntityTracker_AddEntryObj) PUIS l'applique comme selection active (EntityTracker_ApplySelection). Appelee depuis MissionRecord_LoadEntityDatabase_7B035 — candidat serieux pour la fonction qui peuple cette liste avec les entites de la mission, a lire."
  },
  "unnamed_seg155_a": {
   "new_name": "Video_PrintFormattedValue_UNRESOLVED",
@@ -11335,9 +11335,9 @@
   "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — validation détaillée d'un bloc de tas (gestion d'erreur sub_6B70F ×3, formatage de message sub_22FC). Référencée par Heap_ValidateBlock_5D3AA (seg137) — fait partie du gestionnaire de tas bas niveau (Borland), pas du rendu de texte comme supposé initialement. CONFIRMÉ par le seg339 : messages « Far Heap Allocation error #%04X », « Free block #%02d at %04X:0000, size = %ld », « Invalid pointer free » — validation de tas standard du runtime Borland."
  },
  "sub_23DF4": {
-  "new_name": "Kneeboard_Construct",
+  "new_name": "EntityTracker_Construct",
   "segment": "seg041",
-  "summary": "far,45L — constructeur de l'objet journal de mission complet (type 0x1198) : **constructeur du gestionnaire de journal/kneeboard de mission.**"
+  "summary": "far, 38L, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'Kneeboard_Construct' — il n'existe pas de carnet de vol dans le jeu). Construit le gestionnaire polymorphe (23 octets, tag final 0x1198 confirme via vtable), contenant une chaine embarquee de 8 caracteres a +6, et des champs de selection/etat (+0xF,+0x11,+0x12,+0x14-0x16)."
  },
  "sub_6CB7D": {
   "new_name": "VROOMM_StubThunk_6CB7D",
@@ -11380,9 +11380,9 @@
   "summary": "far,41L — (cluster conteneur) — accesseur/test additionnel, non détaillé."
  },
  "sub_2387E": {
-  "new_name": "Kneeboard_AddEntryObj",
+  "new_name": "EntityTracker_AddEntryObj",
   "segment": "seg041",
-  "summary": "far,28L — construit une entrée liée à un objet (sub_2341F) et l'ajoute à la liste (sub_5F57F) : **ajout d'une entrée de journal référencée dans le journal de mission.**"
+  "summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_AddEntryObj', ancien nom d'appelant 'Cinematic_LoadCameraDef' egalement a reconsiderer). Construit une entree via EntityTracker_EntryConstructObj puis l'insere en queue de liste (LinkedListB_InsertAtTail_5F57F)."
  },
  "unnamed_seg134_status": {
   "new_name": "PagedResourceC_Method_GetStatus_UNRESOLVED",
@@ -12980,9 +12980,9 @@
   "summary": "far,52L — notifie un composant enfant (vtable[0]) et teste son état actif (vtable[8]) avant de vérifier un flag de type : **notification et validation d'état d'un corps physique enfant.**"
  },
  "sub_51EDC": {
-  "new_name": "GeomNode_BuildOrRefreshCluster_51EDC",
+  "new_name": "PartEntry_ResolveSpawnPositionAndActivate_51EDC",
   "segment": "seg114",
-  "summary": "⚠️ far, 547 lignes, NON DÉTAILLÉE — orchestrateur appelant de nombreuses fonctions du cluster GeomNode/Expr (50EEB, 52C5F, 53363, 543BA...). Candidat pour session dédiée."
+  "summary": "far, 547 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). CORRIGE : nommee a tort 'GeomNode_BuildOrRefreshCluster' par une session anterieure (balayage rapide, jamais verifie) — aucun contenu ne concerne un cluster geometrique. Appelee directement depuis MissionScript_ExecutePROG_51106 (offset +0x6FB). Opere sur la MEME structure MissionObject a 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et AI_ComputeApproachAngles_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat via SetReference — **RESOUT LA QUESTION OUVERTE DU CONTROLEUR** : c'est une entite avion/pilote IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md)."
  },
  "sub_A82B0": {
   "new_name": "MissionScenario_ReleaseAndStoreField_A82B0",
@@ -13045,9 +13045,9 @@
   "summary": "⚠️ far, 193 lignes, NON DÉTAILLÉE — combine Memory_TypedFreeWrapper_5C6F3 (×2), PlayerComponent_ApplyExternalCall_9DED3, PlayerComponent_ReleaseHelper_9E58E, PlayerComponent_ComputeDerived_9E77F, sub_3A44E (SetReference). Référencée via jmp depuis un stub VROOMM (sub_6C3F3)."
  },
  "sub_23801": {
-  "new_name": "Kneeboard_EntryDestructFull",
+  "new_name": "EntityTracker_EntryDestructFull",
   "segment": "seg041",
-  "summary": "far,64L — variante de sub_237AC libérant en plus la chaîne de texte associée (+0x10 via sub_5C7B6) : **destructeur complet d'entrée de journal (référence cible + texte).**"
+  "summary": "far, 63L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryDestructFull'). Meme detachement que EntryDestruct, PLUS libere la ressource associee (+0x10) si possedee (+0x15), via Memory_TypedFree_5C7B6."
  },
  "sub_3DE23": {
   "new_name": "Camera_DestructCompoundA",
@@ -13340,9 +13340,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_9416A) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4."
  },
  "sub_AA307": {
-  "new_name": "ExprSlot_Helper6_AA307",
+  "new_name": "ProgBuffer_ResetAndSetSize_AA307",
   "segment": "seg457",
-  "summary": "far, appelle ExprSlot_Helper5_AA2F4."
+  "summary": "far, 18 lignes, LUE INTEGRALEMENT. Appelle ProgBuffer_ResetState_AA2F4 puis pose +0x06 = taille du chunk PROG (parametre). Etape preliminaire de ProgBuffer_LoadRawAndCountMarkers_AA31D."
  },
  "sub_A4843": {
   "new_name": "InfoWidget_Method_DispatchField2A_A4843",
@@ -13500,9 +13500,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_A13FF) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
  },
  "sub_A9DFD": {
-  "new_name": "ExprSlot_Helper_A9DFD",
+  "new_name": "PartEntry_ResetState_A9DFD",
   "segment": "seg457",
-  "summary": "far, aucun appel externe visible (20 lignes)."
+  "summary": "far, 19 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Reinitialise une entree PART (participant de mission) (85 octets, voir MissionObject_AllocateArray_AA23D) a son etat de repos : +0x32=0xFF, +0x3A(dword)=0, efface 6 bits de +0x39 (le meme champ de statut verifie par la garde d'entree de MissionScript_CallNativeHandler), +0x52(controleur)=0, +0x54(achevement)=0xFF. Ne construit PAS de vrai controleur — remet seulement a NUL."
  },
  "sub_84DD1": {
   "new_name": "HUDSymbol_Helper9_84DD1",
@@ -14065,9 +14065,9 @@
   "summary": "⚠️ far, 275 lignes, NON DÉTAILLÉE — appelle `Pilot_LowLevelControlCommand` — émission de commande de pilotage bas niveau."
  },
  "sub_AA31D": {
-  "new_name": "ExprSlot_ReleaseAndReloadDwordD_AA31D",
+  "new_name": "ProgBuffer_LoadRawAndCountMarkers_AA31D",
   "segment": "seg457",
-  "summary": "far, combine ExprSlot_Helper6_AA307, Memory_TypedFreeWrapperC_5C6F3, ResourceRecord_ReadDwordFieldB_64AFF."
+  "summary": "far, 62 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — lecteur reel du chunk PROG, confirme par DATA_MODEL.md 'sub_6CEB3->AA31D (PROG)'). \n\nDECOUVERTE : PROG N'EST PAS PARSE EN INSTRUCTIONS ICI — charge comme UN SEUL BLOC BRUT : alloue un tampon (meme allocateur generique tag 0x5C44 que partout ailleurs dans le binaire), copie tout le chunk tel quel (ResourceRecord_ReadFieldGroupA), puis SCANNE le tampon 2 octets par 2 octets et COMPTE les octets nuls a positions paires (+0x00 = compteur resultant). \n\nHYPOTHESE : ces zeros sont des SEPARATEURS entre plusieurs mini-programmes empaquetes dans le meme bloc PROG — ce qui expliquerait comment les 4 progs_id d'une entree PartEntry (on_is_activated/on_mission_update/on_is_destroyed/on_missions_init) peuvent chacun pointer vers un OFFSET DIFFERENT a l'interieur de ce meme bloc, plutot que vers des blocs separes. Le vrai decoupage en instructions (opcode, parametres, [instr+0xE] etat) n'a lieu qu'a l'execution, dans MissionScript_ExecutePROG. \n\nStructure du conteneur ProgBuffer (confirmee) : +0x00 compteur de marqueurs (word), +0x02/+0x04 pointeur lointain vers le tampon brut, +0x06 taille du chunk (word)."
  },
  "sub_AB2BD": {
   "new_name": "AudioQueue_ReleaseAllSlots_AB2BD",
@@ -14425,9 +14425,9 @@
   "summary": "far, duplicat probable de MissionRecordField_ReleaseSingle_8953A (même motif)."
  },
  "sub_A9E3C": {
-  "new_name": "ExprSlot_LoadAndResolveNames_A9E3C",
+  "new_name": "PartEntry_LoadAndResolveNames_A9E3C",
   "segment": "seg457",
-  "summary": "⚠️ far, 183 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper_A9DFD, ReadFieldGroupA_64A19, sub_2E74 (×3), GeomNode_SumAndCount_53034 (seg114), Expr_LookupNamedValue_51E4A (×2, seg114) — résolution de noms d'expression liés au scénario de mission."
+  "summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert)."
  },
  "sub_83C4D": {
   "new_name": "HUDSymbol_ConstructVariantG_83C4D",
@@ -14520,9 +14520,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_897DE) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=15300h, codesize=17F6h, nentries=24."
  },
  "sub_531F2": {
-  "new_name": "Expr_Node_RecomputeFieldB_531F2",
+  "new_name": "Scene_TriggerLeavingEvent_531F2",
   "segment": "seg114",
-  "summary": "far, recalcule un champ dérivé via Expr_VM_Execute_51E7E — utilisé par sub_536F7 (construction d'écran)."
+  "summary": "far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide."
  },
  "unnamed_seg116_c": {
   "new_name": "AI_HelperD_UNRESOLVED",
@@ -14915,9 +14915,9 @@
   "summary": "far,327L — dispatch à 6 cas selon le type d'arme, appelle sub_43013 (filtre) puis priorise la cible (favorise le joueur, teste distance angulaire via sub_54DF4) : **sélecteur/verrouilleur de cible principal pour le tir, priorisé par type d'arme et proximité au réticule.**"
  },
  "sub_23AF4": {
-  "new_name": "Kneeboard_Init",
+  "new_name": "EntityTracker_Init",
   "segment": "seg041",
-  "summary": "far,28L — initialise les champs du journal (compteur, sélection, page=0x14) et appelle sub_23C4F : **initialisation/reset du journal de mission au démarrage.**"
+  "summary": "far, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_Init'). Initialise les champs de selection (+0xF/+0x11/+0x12/+0x14) puis appelle EntityTracker_SelectByID(self, self+6) — auto-selection par son propre nom embarque. Appelee depuis MissionLoader_QueryAndReleaseAttribute_A7F3A."
  },
  "sub_74292": {
   "new_name": "PilotProfile_GoalSlot_BindHandlerByType_74292",
@@ -15030,9 +15030,9 @@
   "summary": "far, duplicat probable de MissionRecordField_ReleaseViaThunk_8AF0E."
  },
  "sub_238CE": {
-  "new_name": "Kneeboard_FindByID",
+  "new_name": "EntityTracker_FindByID",
   "segment": "seg041",
-  "summary": "far,60L — recherche une entrée par une paire de champs 32-bit (comparaison à un identifiant composite) : **recherche d'entrée de journal par identifiant (probable ID de mission/objectif).**"
+  "summary": "far, 60L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_FindByID'). Parcourt une liste chainee (LinkedListB_Helper_5F6A9), comparant un identifiant de 8 octets (deux dwords, +5/+9 de chaque noeud) a celui recherche. Retourne le noeud correspondant ou 0."
  },
  "sub_7FA32": {
   "new_name": "GlyphObject_ReleaseMultiple_7FA32",
@@ -15055,9 +15055,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_A4B33) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=33380h, codesize=0B0Ch, nentries=28."
  },
  "sub_530FF": {
-  "new_name": "Expr_Node_GetCachedValueA_530FF",
+  "new_name": "Scene_EnsureUnitsSpawned_530FF",
   "segment": "seg114",
-  "summary": "far, accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45), suivi d'un recalcul conditionnel (GeomNode_BuildOrRefreshCluster_51EDC)."
+  "summary": "far, 73 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_EnsureAllSlotsFilled' errone). Le parametre 'si' est tres probablement la SCENE elle-meme (pas un groupe/escadrille) : si[0x14]/si[0x16] correspondent vraisemblablement a la LISTE D'UNITES en queue du chunk SCNE (documentee dans DATA_MODEL.md : liste de u16, index dans PART). Pour chaque unite de cette liste : resout la PartEntry correspondante (sub_52D45), et si son controleur (+0x52) est encore NUL, appelle MissionFormation_ComputeSlotAndSpawn_51EDC pour la faire apparaitre — assure que toutes les unites de la scene existent au moment de son activation."
  },
  "sub_6C7E9": {
   "new_name": "VROOMM_StubThunk_6C7E9",
@@ -15645,9 +15645,9 @@
   "summary": "far, référencée via vtable (DATA XREF seg216) — insère un nœud en tête d'une liste simplement chaînée (structure de nœud distincte du cluster seg156)."
  },
  "sub_AA2F4": {
-  "new_name": "ExprSlot_Helper5_AA2F4",
+  "new_name": "ProgBuffer_ResetState_AA2F4",
   "segment": "seg457",
-  "summary": "far, aucun appel externe visible (14 lignes)."
+  "summary": "far, 13 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Initialise a zero les deux premiers champs du conteneur PROG : +0x00 (compteur d'instructions/marqueurs) et +0x06 (taille du chunk, ecrasee juste apres par ProgBuffer_ResetAndSetSize_AA307)."
  },
  "sub_65E2C": {
   "new_name": "IndexedRecordReader_AdvanceIndex_65E2C",
@@ -15715,9 +15715,9 @@
   "summary": "far, thunk voisin uniquement (37 lignes)."
  },
  "sub_23C82": {
-  "new_name": "Kneeboard_SelectByStateCode",
+  "new_name": "EntityTracker_SelectByStateCode",
   "segment": "seg041",
-  "summary": "far,50L — compare le champ +0x11 à un code cible ; si différent, cherche l'entrée correspondante (sub_239FE) et la sélectionne (sub_23CCC) ; cas spécial pour code 4 : **sélection d'une entrée de journal par code d'état (déclenché par les triggers de mission déjà documentés, ex. seg040/sub_22F53).**"
+  "summary": "far, 40L, LUE INTEGRALEMENT. Si l'etat courant (+0x11) correspond deja au code demande : si ce code vaut 4 specifiquement, appelle une fonction nommee 'Radar_ToggleTracking' (nom herite NON VERIFIE, a prendre avec prudence) sur word_6E4B2 ; sinon rien. Sinon : cherche une entree via EntityTracker_RenderByCode(code), et si trouvee, l'applique comme selection. Appelee (au moins deux fois) depuis Player_MainUpdate."
  },
  "sub_A1ADF": {
   "new_name": "Widget_SetFlagBit4AndOffsets_A1ADF",
@@ -16345,9 +16345,9 @@
   "summary": "far,57L — interroge l'altitude du terrain (Terrain_QueryAltitudeAt, seg077) à la position d'un objet, applique une contrainte via sub_466BC : **contrainte de hauteur sol pour la physique de vol (terrain-following / évitement de collision avec le sol) — connecte le moteur physique JDYN au système de terrain.**"
  },
  "sub_23AE5": {
-  "new_name": "Kneeboard_ClearShortcut",
+  "new_name": "EntityTracker_ClearShortcut",
   "segment": "seg041",
-  "summary": "far,17L — wrapper trivial vers sub_23B23 : **vidage du journal de mission (raccourci).**"
+  "summary": "far, 17L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearShortcut'). Simple relais vers EntityTracker_ClearAll. Appelee depuis MissionLoader_AssignUnitRosterB_A7E3B (affectation d'unites de mission)."
  },
  "sub_76C09": {
   "new_name": "AITargeting_Helper2_76C09",
@@ -17070,9 +17070,9 @@
   "summary": "far, appelle `GlyphObject_ScalarDeletingDtorA_6070E` (seg162)."
  },
  "sub_23BB4": {
-  "new_name": "Kneeboard_RemoveByTargetUpdateHead",
+  "new_name": "EntityTracker_RemoveByTargetUpdateHead",
   "segment": "seg041",
-  "summary": "far,45L — variante de sub_23B55 mettant à jour un pointeur de tête de liste (+0xF) : **nettoyage ciblé avec mise à jour de la liste (variante).**"
+  "summary": "far, 45L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_RemoveByTargetUpdateHead'). Variante plus legere : destruction simple (EntryDestruct, pas Full), met a jour +0xF (tete). Appelee par EntityTracker_ApplySelection."
  },
  "sub_6B740": {
   "new_name": "VROOMM_StubThunk_6B740",
@@ -17250,9 +17250,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_9AD36) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=28DF0h, codesize=16Ch, nentries=3."
  },
  "sub_AA23D": {
-  "new_name": "ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D",
+  "new_name": "PartEntry_AllocateArray_AA23D",
   "segment": "seg457",
-  "summary": "⚠️ far, 77 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper4_AA227, gestion d'erreur (sub_6B70F), Memory_TypedFreeWrapperC_5C6F3, ExprSlot_LoadAndResolveNames_A9E3C."
+  "summary": "far, 77 lignes, LUE INTEGRALEMENT. Le vrai constructeur du tableau d'entrees PART : calcule un nombre d'elements ([di+0x72]/0x3E), alloue un tableau de records de 85 octets chacun (meme allocateur Memory_TypedFreeWrapper_5C6F3, tag 0x5C44, que MVRS), puis appelle PartEntry_LoadAndResolveNames_A9E3C sur chaque element successivement (pas +0x55). CONFIRME : +0x52 (controleur) reste NUL a l'issue de la construction complete du tableau — son assignation reelle, si elle existe, se fait ailleurs, dynamiquement pendant le jeu — site non retrouve a ce stade."
  },
  "sub_63C61": {
   "new_name": "StreamReader_ReadBlock_63C61",
@@ -18295,9 +18295,9 @@
   "summary": "far, en tête de segment — écrit un champ 16 bits typé (tag 2) via sub_6568F. ⚠️ Adresse exacte non résolue."
  },
  "sub_23497": {
-  "new_name": "Kneeboard_EntryConstructText",
+  "new_name": "EntityTracker_EntryConstructText",
   "segment": "seg041",
-  "summary": "far,103L — variante de sub_2341F construisant une entrée de journal à partir d'un texte brut (via sub_5C6F3, constructeur String) plutôt que d'une référence d'objet : **création d'une entrée de kneeboard/log de mission avec message texte libre.**"
+  "summary": "far, 102L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryConstructText'). Meme tag final (0x119C) que EntryConstructObj. Lit du texte/donnees depuis un enregistrement ressource (ResourceRecord_ReadFieldGroupA), pose +0xE=0 (aucun objet lie, confirme le sens de ce champ comme discriminant texte/objet)."
  },
  "sub_59F87": {
   "new_name": "Sequencer_ReleaseSlot_59F87",

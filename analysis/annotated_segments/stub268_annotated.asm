@@ -32,7 +32,7 @@ VROOMM_StubThunk_6B830	endp
 ; d'overlay actuellement charge en memoire. fileoff=1F6F0h, codesize=12EEh, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6B835	proc far		; CODE XREF: Expr_Node_EvaluateVisibility_53586+163P
-					; UIScreen_Construct_53896:loc_538F1P	...
+					; STRIKE_EXE_MAIN_LOOP:loc_538F1P	...
 		jmp	Cockpit_LoadAndApplyEncoding_926A5
 VROOMM_StubThunk_6B835	endp
 

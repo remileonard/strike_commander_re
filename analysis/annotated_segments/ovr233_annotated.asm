@@ -411,7 +411,7 @@ loc_7A0D0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+77j
 		mov	ax, word_706A0
 		add	ax, 3Ah	; ':'
 		push	ax
-		call	Expr_Node_GetOrRecompute_53236
+		call	Scene_FindMatchingByAreaContainment_53236
 		add	sp, 4
 		mov	[bp+var_E], ax
 		mov	al, [bp+arg_2]
@@ -455,7 +455,7 @@ loc_7A100:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+A7j
 		mov	ax, [bx+2]
 		add	ax, 40h	; '@'
 		push	ax
-		call	Expr_VM_Execute_51E7E
+		call	Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
@@ -475,7 +475,7 @@ loc_7A175:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+FDj
 		mov	ax, [bx+2]
 		add	ax, 40h	; '@'
 		push	ax
-		call	Expr_VM_Execute_51E7E
+		call	Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 
@@ -742,7 +742,7 @@ loc_7A456:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+3FDj
 		push	ds
 		push	offset aAutopilt ; "AUTOPILT"
 		push	59CDh
-		call	Kneeboard_SelectByID
+		call	EntityTracker_SelectByID
 		add	sp, 6
 		or	al, al
 		jz	short loc_7A4C9
@@ -781,7 +781,7 @@ loc_7A48B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+429j
 		call	UIScreen_ApplyFormFields_500F6
 
 loc_7A4C0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+420j
-		call	UIScreen_StateMachineMain_4FBF1
+		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jnz	short loc_7A476
 
@@ -929,7 +929,7 @@ loc_7A5F3:
 		mov	ax, word_706A0
 		add	ax, 3Ah	; ':'
 		push	ax
-		call	Expr_Node_GetOrRecompute_53236
+		call	Scene_FindMatchingByAreaContainment_53236
 		add	sp, 4
 		mov	di, ax
 

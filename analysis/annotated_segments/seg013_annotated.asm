@@ -47,7 +47,7 @@ UI_DrawRect	endp
 ; multi-paramètres : routine de rendu de texte formaté (UI/briefing).
 ; ==============================================================================================
 UI_RenderFormattedText	proc far		; CODE XREF: Audio_LoadSpeechClip+F6P
-					; UIScreen_StateMachineMain_4FBF1+21DP
+					; CombatTarget_WeaponActionSubsystem+21DP
 
 var_26		= word ptr -26h
 var_24		= word ptr -24h
@@ -252,7 +252,7 @@ UI_RenderFormattedText	endp
 ; dépasse une limite (+0xA1), réinitialise et positionne un flag 'terminé' (+0xAD) : minuteur
 ; d'effet d'animation de texte (type machine à écrire).
 ; ==============================================================================================
-Text_TypewriterTimer	proc far		; CODE XREF: UIScreen_StateMachineMain_4FBF1+485P
+Text_TypewriterTimer	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+485P
 
 arg_0		= dword	ptr  6
 

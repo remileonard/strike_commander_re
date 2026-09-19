@@ -85,7 +85,7 @@ VROOMM_StubThunk_6CEA4	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CEA9	proc far		; CODE XREF: Program_InitVideoFontArgs+193P
-		jmp	ExprSlot_Helper5_AA2F4
+		jmp	ProgBuffer_ResetState_AA2F4
 VROOMM_StubThunk_6CEA9	endp
 
 
@@ -98,7 +98,7 @@ VROOMM_StubThunk_6CEA9	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CEAE	proc far
-		jmp	ExprSlot_Helper6_AA307
+		jmp	ProgBuffer_ResetAndSetSize_AA307
 VROOMM_StubThunk_6CEAE	endp
 
 
@@ -111,7 +111,7 @@ VROOMM_StubThunk_6CEAE	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CEB3	proc far		; CODE XREF: MissionScenario_LoadMainRecord_A8331+405P
-		jmp	ExprSlot_ReleaseAndReloadDwordD_AA31D
+		jmp	ProgBuffer_LoadRawAndCountMarkers_AA31D
 VROOMM_StubThunk_6CEB3	endp
 
 
@@ -350,7 +350,7 @@ VROOMM_StubThunk_6CF08	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CF0D	proc far		; CODE XREF: MissionScenario_LoadMainRecord_A8331+28DP
-		jmp	ExprSlot_ReleaseAndReloadDword_A9956
+		jmp	PLAY_LoadCASTTeamNames_A9956
 VROOMM_StubThunk_6CF0D	endp
 
 
@@ -377,7 +377,7 @@ VROOMM_StubThunk_6CF12	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CF17	proc far
-		jmp	ExprSlot_Helper_A9DFD
+		jmp	PartEntry_ResetState_A9DFD
 VROOMM_StubThunk_6CF17	endp
 
 
@@ -390,7 +390,7 @@ VROOMM_StubThunk_6CF17	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CF1C	proc far
-		jmp	ExprSlot_LoadAndResolveNames_A9E3C
+		jmp	PartEntry_LoadAndResolveNames_A9E3C
 VROOMM_StubThunk_6CF1C	endp
 
 
@@ -455,7 +455,7 @@ VROOMM_StubThunk_6CF30	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CF35	proc far		; CODE XREF: MissionScenario_LoadMainRecord_A8331+440P
-		jmp	ExprSlot_LoadAndResolveNamesWithErrorCheck_AA23D
+		jmp	PartEntry_AllocateArray_AA23D
 VROOMM_StubThunk_6CF35	endp
 
 

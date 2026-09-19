@@ -317,6 +317,24 @@ loc_16421:
 		jmp	loc_165D0
 ; ���������������������������������������������������������������������������
 
+; ==============================================================================================
+; far (methode de vtable, loc_1642C, point d'entree du switch a loc_16433) - CONFIRME :
+; recupere la lettre d'option a un index donne via Radio_GetOptionLetterByIndex_1F200, calcule
+; 'lettre - 0x65' (soustrait 'e') pour indexer un switch a 9 cas (lettres 'e' a 'm', 0-8).
+; Chaque cas evalue si cette QUESTION RADIO SPECIFIQUE est ACTUELLEMENT POSABLE dans le
+; contexte de jeu courant (retourne un booleen) : case 0x1 ('f') calcule la distance 3D entre
+; le joueur (word_722E6) et l'entite, compare a un seuil (0x1388=5000, portee radio/visuelle)
+; ; cases 0x2/0x3 ('g'/'h') verifient des drapeaux globaux d'etat (byte_6E4D4/byte_6E4D5,
+; probable mode combat/verrouillage) ; case 0x6 ('k') verifie aussi byte_6E4D4. CONFIRME
+; ARCHITECTURALEMENT : OPTS liste les options POTENTIELLEMENT disponibles pour un personnage
+; (statique, chargee depuis PROF), tandis que cette fonction determine, a chaque
+; interrogation, LESQUELLES sont EFFECTIVEMENT disponibles maintenant (dynamique, selon
+; distance/etat de combat/etc). Une lettre presente dans OPTS mais dont la condition n'est pas
+; remplie serait donc grisee/indisponible dans le menu radio meme si le personnage la supporte
+; en principe. Point notable : la lettre 'd' (observee dans BILLY.IFF/GWEN.IFF) tombe HORS de
+; la plage geree par ce switch (e-m) - probablement geree par un mecanisme separe (option
+; 'toujours disponible', ex. salutation/accuse de reception).
+; ==============================================================================================
 Radio_EvaluateOptionAvailability_1642C:				; CODE XREF: seg016:045Dj
 		push	word ptr [bp-0Ah]
 		push	large dword ptr	[si+74h]

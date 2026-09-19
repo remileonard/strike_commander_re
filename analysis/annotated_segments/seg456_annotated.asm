@@ -1190,7 +1190,7 @@ loc_A8908:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+5CDj
 
 loc_A892C:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+5F0j
 		push	word ptr [si+4Eh]
-		call	Expr_Node_RecomputeFieldA_531CD
+		call	Scene_TriggerActivation_531CD
 		pop	cx
 		push	si
 		nop
@@ -1254,7 +1254,7 @@ loc_A89C0:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+66Cj
 		mov	ax, si
 		add	ax, 3Ah	; ':'
 		push	ax
-		call	Expr_Node_RecomputeAllFields_532EA
+		call	Scene_DetectAndActivateChange_532EA
 		add	sp, 6
 		cmp	word ptr [si+50h], 0
 		jz	short loc_A8A0D
@@ -2578,9 +2578,20 @@ MissionScenario_ResolveAndBindExpressions_A8F22	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Expr_Node_RecomputeFieldC_53211 (seg114, ×2),
-; MissionScenario_ResolveAndBindExpressions_A8F22, MissionScenario_ConstructFieldChain_A8124,
-; sub_6CDBE.
+; far, 58 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Appelee CHAQUE
+; FRAME directement depuis Simulator_MainLoop_53896 (via VROOMM_StubThunk_6CE5B) — chemin
+; SEPARE et PARALLELE a MAIN_GAME_TICK_536F7, pas decouvert avant.   Declenche
+; Scene_TriggerMissionUpdateEvent_53211 sur DEUX pointeurs de SceneRecord stockes sur
+; MissionScenario : +0x50 et +0x4E. CORRIGE DATA_MODEL.md : ces deux champs ne sont PAS
+; 'handle de noeud Expr'/'flag HOME depuis noeud' comme documente precedemment — ce sont des
+; pointeurs de SceneRecord (+0x50 correspond exactement au champ rempli par
+; Scene_DetectAndActivateChange_532EA).   Verifie ensuite une condition de fin de mission
+; (position comparee a dword_70718/dword_7071C, une cible/checkpoint global) — si atteinte,
+; POSE byte_706AF = 5 -- LE MEME OCTET QUI CONTROLE LA BOUCLE PRINCIPALE DE Simulator_MainLoop
+; (condition de sortie == 6). Lien direct entre logique de scenario et controle du jeu a ce
+; niveau.   Appelle enfin MissionScenario_ResolveAndBindExpressions_A8F22 (ecrit MISN2OP.IFF,
+; resultats de fin de mission) — a chaque frame, sans garde visible ici (garde probablement
+; interne a A8F22, non verifiee). Appelle aussi sub_A8124 et sub_6CDBE, non identifiees.
 ; ==============================================================================================
 MissionScenario_RecomputeFields_A9382	proc far		; CODE XREF: VROOMM_StubThunk_6CE5BJ
 
@@ -2593,14 +2604,14 @@ arg_0		= word ptr  6
 		cmp	word ptr [si+50h], 0
 		jz	short loc_A9398
 		push	word ptr [si+50h]
-		call	Expr_Node_RecomputeFieldC_53211
+		call	Scene_TriggerMissionUpdateEvent_53211
 		pop	cx
 
 loc_A9398:				; CODE XREF: MissionScenario_RecomputeFields_A9382+Bj
 		cmp	word ptr [si+4Eh], 0
 		jz	short loc_A93A7
 		push	word ptr [si+4Eh]
-		call	Expr_Node_RecomputeFieldC_53211
+		call	Scene_TriggerMissionUpdateEvent_53211
 		pop	cx
 
 loc_A93A7:				; CODE XREF: MissionScenario_RecomputeFields_A9382+1Aj

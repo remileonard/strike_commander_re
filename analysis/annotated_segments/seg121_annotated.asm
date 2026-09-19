@@ -598,7 +598,7 @@ loc_59292:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+40j
 		mov	ax, [bx+2]
 		add	ax, 40h	; '@'
 		push	ax
-		call	Expr_VM_Execute_51E7E
+		call	Expr_VM_ExecuteSingleInstruction_51E7E
 		add	sp, 0Ah
 		jmp	short $+2
 

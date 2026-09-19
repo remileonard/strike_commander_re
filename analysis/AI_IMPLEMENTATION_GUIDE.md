@@ -17,7 +17,7 @@ flowchart TD
         U["SCMission::update()"] -->|publie| MU["MissionUpdateEvent"]
         MU --> OMU["SCMissionActors::onMissionUpdate<br/>(override_progs, current_command,<br/>sequences de manoeuvre, pilot->FlyTo)"]
     end
-    subgraph Throttle["Toutes les ~150ms"]
+    subgraph Throttle["Toutes les 1/25s (cadence de decision d'origine)"]
         U -->|accumulateur| AIR["AIRefreshEvent"]
         AIR --> OAR["SCMissionActors::onAIRefresh<br/>GOAL 3/4/5 + tournoi MVRS"]
     end
@@ -27,8 +27,12 @@ flowchart TD
 
 `onMissionUpdate` reste la cascade de priorité pour `GOAL` sélecteur
 `2` (exécution de mission). `onAIRefresh` s'ajoute pour les
-sélecteurs `3`/`4`/`5`, sur un rythme réel plutôt que sur le
-framerate.
+sélecteurs `3`/`4`/`5`, à la cadence de décision d'origine (~25 Hz)
+plutôt que sur le framerate réel du port — sans ce throttle, un port
+tournant à un framerate supérieur à 25 fps ferait tourner le tournoi
+`MVRS` plus souvent que dans le binaire d'origine, donc plus de
+tirages aléatoires par seconde réelle et une IA statistiquement plus
+forte/réactive qu'à l'origine (défaut relevé dans `AI_SYSTEM.md` §6).
 
 ---
 
@@ -193,7 +197,16 @@ public:
 
 ```cpp
 float ai_refresh_accumulator{0.0f};
-static constexpr float AI_REFRESH_INTERVAL = 0.15f;
+// Le jeu d'origine tourne le tournoi MVRS sans aucun throttling (AI_SYSTEM.md
+// §6) : le rythme de décision de l'IA scale directement avec le framerate,
+// qui visait ~25 fps sur le binaire DOS d'origine (meme reference que la
+// caméra, cf. CAMERA_SYSTEM.md/DATA_MODEL.md). Ce n'est PAS un choix de
+// stabilite arbitraire pour le port : sur un port qui tourne a un framerate
+// different (souvent bien superieur a 25), laisser le tournoi tourner a
+// chaque frame rendrait l'IA statistiquement plus forte/plus reactive
+// qu'a l'origine (plus de tirages aleatoires par seconde reelle). Ce
+// throttle remet explicitement l'IA a la cadence de decision d'origine.
+static constexpr float AI_REFRESH_INTERVAL = 1.0f / 25.0f;
 
 float dt = this->tps > 0 ? 1.0f / (float)this->tps : 1.0f / 30.0f;
 this->ai_refresh_accumulator += dt;
@@ -366,6 +379,71 @@ bool SCMissionActors::tryWanderRandom() {
     return true;
 }
 ```
+
+*Note (implémentation réelle, libRealSpace, 2026-09-13) : la version
+effectivement livrée tire un `SPOT` existant de la mission au hasard
+(`std::rand() % spots.size()`) et le pose via le mécanisme
+`current_command`/`flyToWaypoint` déjà existant, plutôt qu'un point 3D
+calculé à la volée — voir §2.8 ci-dessous pour le contexte plus large sur
+comment `current_command` s'articule avec la boucle `GOAL`.*
+
+### 2.8 `SCMissionActors::executeGoalAction` (`GOAL_EXECUTE_ACTION`) —
+navigation vs combat, un point encore ouvert
+
+**Implémentation réelle, retenue après discussion avec Rémi (2026-09-13)** —
+diffère de l'esprit du pseudo-code `onAIRefresh` ci-dessus (§2.5), qui
+laissait `runMVRSTournament()` s'exécuter dès que le sélecteur `4` est
+atteint. En pratique, `executeGoalAction()` (le sélecteur `2`,
+`GOAL_EXECUTE_ACTION`) retraduit `current_command` en appel de méthode —
+mais son retour n'est **pas** un simple `current_command != OP_NOOP` :
+
+```cpp
+bool SCMissionActors::executeGoalAction() {
+    this->protectSelf();
+    switch (this->current_command) {
+        case OP_SET_WAIT_FOR_SECONDS:
+        case OP_SET_OBJ_TAKE_OFF:
+        case OP_SET_OBJ_LAND:
+        case OP_SET_OBJ_FLY_TO_WP:
+        case OP_SET_OBJ_FLY_TO_AREA:
+        case OP_SET_OBJ_FOLLOW_ALLY:
+            /* exécute la méthode correspondante, met à jour
+               current_command_executed */
+            return true;   // objectif de navigation pure : gagne le tick
+        case OP_SET_OBJ_DESTROY_TARGET:
+        case OP_SET_OBJ_DEFEND_TARGET:
+        case OP_SET_OBJ_DEFEND_AREA:
+            /* exécute quand même la méthode (l'avion continue de
+               s'approcher/tirer sur la cible) */
+            return false;  // objectif de combat : NE gagne PAS le tick
+        default:
+            return false;  // rien à faire
+    }
+}
+```
+
+**Pourquoi ce découpage** : `runGoalSelectors()` (§4bis de `AI_SYSTEM.md`
+pour l'équivalent ASM, `AI_TopLevelThink`) s'arrête au premier sélecteur
+qui « gagne » le tick. Dans **tous** les fichiers `PROF` échantillons
+(Billy `[5,2,1,4,3]`, Hammer `[2,1,4,3]`, Gwen, cargo), le sélecteur `2`
+précède toujours `4`. Si `2` gagnait le tick pour n'importe quel
+`current_command` non vide (y compris `DESTROY_TARGET`, qui peut rester
+actif très longtemps — tant que la cible n'est pas détruite), le tournoi
+`MVRS` (sélecteur `4`) ne tournerait **jamais** en combat, exactement le
+moment où il doit prendre la main pour la manœuvre tactique. En excluant
+les trois objectifs de combat du « gain de tick » (tout en continuant à
+les exécuter), `4` reste atteignable dans le même passage dès qu'il sera
+câblé.
+
+**Statut : hypothèse de travail, pas une certitude ASM.** `AI_SYSTEM.md`
+§4.4 (`Goal_ActiveWingmanEngagement`, sélecteur `5`) montre qu'au moins un
+sélecteur délègue lui-même à `AI_BehaviorStateMachine` en interne, en fin
+de son propre traitement — ce qui suggère que l'articulation réelle entre
+`Goal_ExecuteAction` et le tournoi `MVRS` n'est peut-être pas une simple
+exclusion mutuelle au niveau de la boucle `GOAL`, mais une délégation
+interne à certains native handlers. **À reconfirmer en ASM lors de la
+session dédiée au tournoi `MVRS`** (§3 ci-dessous) avant de considérer ce
+découpage comme définitif.
 
 ---
 
@@ -819,4 +897,7 @@ if (ai_actor->profile != nullptr && ai_actor->profile->ai.isAI) {
 5. **`tryActiveWingman`/`tryWanderRandom`** (§2.6-2.7).
 6. **Séquences de manœuvre** (§4), `PursuitSensorGated` en dernier.
 7. **`canPlayRadioMessage`/`checkMissileThreatWarning`** (§5).
-8. **Calibrer `AI_REFRESH_INTERVAL`** (§2.2).
+8. **Vérifier `AI_REFRESH_INTERVAL` en jeu** (§2.2, `1/25s`) — c'est une
+   remise à l'échelle sur la cadence de décision d'origine, pas une
+   valeur à ajuster pour le confort ; ne pas l'augmenter/diminuer sans
+   nouvelle donnée sur le framerate cible du binaire DOS.
