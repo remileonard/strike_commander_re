@@ -1892,7 +1892,7 @@ off_6EBB4	dd Debris_BodyDetach
 		dd loc_37E3F
 		dd loc_37F99
 		dd loc_38090
-		dd loc_381E5
+		dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
 		dd Debris_CombinePhysicsBodies
 		dd loc_38342
@@ -1960,7 +1960,7 @@ off_6ECFA	dd loc_37E34
 off_6ECFE	dd loc_37E3F
 off_6ED02	dd loc_37F99
 off_6ED06	dd loc_38090
-		dd loc_381E5
+		dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
 off_6ED12	dd Debris_CombinePhysicsBodies
 		dd loc_38342
@@ -1995,7 +1995,7 @@ off_6ED6E	dd loc_380E1
 		dd loc_37E3F
 		dd loc_37F99
 		dd loc_38090
-		dd loc_451F1
+		dd WorldObject_GetSignatureByte0_ModelDirect_451F1
 		dd VROOMM_StubThunk_6BFB0
 		dd Debris_CombinePhysicsBodies
 off_6EDA2	dd loc_38342
@@ -2576,7 +2576,7 @@ off_6F6A4	dd loc_3CC36
 		dd loc_3CB78
 		dd loc_3CBC6
 		dd loc_3CB3A
-off_6F6B8	dd loc_381E5
+off_6F6B8	dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
 off_6F6C0	dd Debris_CombinePhysicsBodies
 		dd loc_38342
@@ -2611,7 +2611,7 @@ off_6F734	dd loc_3CB5B
 off_6F738	dd loc_3CB78
 		dd loc_3CBC6
 off_6F740	dd loc_3CB3A
-		dd loc_381E5
+		dd WorldObject_GetSignatureByte0_381E5
 off_6F748	dd VROOMM_StubThunk_6BFB0
 off_6F74C	dd Debris_CombinePhysicsBodies
 off_6F750	dd loc_38342
@@ -2646,7 +2646,7 @@ off_6F7C0	dd loc_3CB5B
 off_6F7C4	dd loc_3CB78
 		dd loc_3CBC6
 off_6F7CC	dd loc_3CB3A
-off_6F7D0	dd loc_381E5
+off_6F7D0	dd WorldObject_GetSignatureByte0_381E5
 off_6F7D4	dd VROOMM_StubThunk_6BFB0
 off_6F7D8	dd Debris_CombinePhysicsBodies
 		dd loc_38342
@@ -2681,7 +2681,7 @@ off_6F84C	dd loc_3CB5B
 off_6F850	dd loc_3CB78
 off_6F854	dd loc_3CBC6
 off_6F858	dd loc_3CB3A
-off_6F85C	dd loc_381E5
+off_6F85C	dd WorldObject_GetSignatureByte0_381E5
 off_6F860	dd VROOMM_StubThunk_6BFB0
 off_6F864	dd Debris_CombinePhysicsBodies
 		dd loc_38342
@@ -2716,7 +2716,7 @@ off_6F8D8	dd loc_3CB5B
 off_6F8DC	dd loc_3CB78
 off_6F8E0	dd loc_3CBC6
 off_6F8E4	dd loc_3CB3A
-		dd loc_3E2F1
+		dd Aircraft_ComputeSeekerSignature_3E2F1
 		dd loc_3E201
 off_6F8F0	dd Debris_CombinePhysicsBodies
 off_6F8F4	dd loc_3E419
@@ -2761,7 +2761,7 @@ off_6F980	dd loc_3D21C
 off_6F990	dd loc_3CB78
 off_6F994	dd loc_3CBC6
 off_6F998	dd loc_3CB3A
-off_6F99C	dd loc_381E5
+off_6F99C	dd WorldObject_GetSignatureByte0_381E5
 off_6F9A0	dd VROOMM_StubThunk_6BFB0
 off_6F9A4	dd Debris_CombinePhysicsBodies
 off_6F9A8	dd loc_38342
@@ -2796,7 +2796,7 @@ off_6FA18	dd loc_3CB5B
 off_6FA1C	dd loc_3CB78
 off_6FA20	dd loc_3CBC6
 off_6FA24	dd loc_3CB3A
-off_6FA28	dd loc_381E5
+off_6FA28	dd WorldObject_GetSignatureByte0_381E5
 off_6FA2C	dd VROOMM_StubThunk_6BFB0
 off_6FA30	dd Debris_CombinePhysicsBodies
 off_6FA34	dd loc_38342
@@ -2831,7 +2831,7 @@ off_6FAA4	dd loc_3CB5B
 off_6FAA8	dd loc_3CB78
 off_6FAAC	dd loc_3CBC6
 off_6FAB0	dd loc_3CB3A
-off_6FAB4	dd loc_381E5
+off_6FAB4	dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
 		dd Debris_CombinePhysicsBodies
 off_6FAC0	dd loc_38342
@@ -2866,7 +2866,7 @@ off_6FB30	dd loc_3CB5B
 off_6FB34	dd loc_3CB78
 off_6FB38	dd loc_3CBC6
 off_6FB3C	dd loc_3CB3A
-off_6FB40	dd loc_381E5
+off_6FB40	dd WorldObject_GetSignatureByte0_381E5
 off_6FB44	dd loc_42618
 		dd loc_4256C
 off_6FB4C	dd loc_38342
@@ -2901,7 +2901,7 @@ off_6FBBC	dd loc_3CB5B
 off_6FBC0	dd loc_3CB78
 off_6FBC4	dd loc_3CBC6
 off_6FBC8	dd loc_3CB3A
-off_6FBCC	dd loc_381E5
+off_6FBCC	dd WorldObject_GetSignatureByte0_381E5
 off_6FBD0	dd VROOMM_StubThunk_6BFB0
 off_6FBD4	dd Debris_CombinePhysicsBodies
 		dd loc_43CBB
@@ -2960,7 +2960,7 @@ off_6FC72	dd loc_3CB5B
 off_6FC76	dd loc_3CB78
 off_6FC7A	dd loc_3CBC6
 off_6FC7E	dd loc_3CB3A
-off_6FC82	dd loc_381E5
+off_6FC82	dd WorldObject_GetSignatureByte0_381E5
 off_6FC86	dd VROOMM_StubThunk_6BFB0
 		dd Debris_CombinePhysicsBodies
 off_6FC8E	dd loc_453E3
@@ -3001,7 +3001,7 @@ off_6FD38	dd loc_3CB5B
 		dd loc_3CB78
 off_6FD40	dd loc_3CBC6
 off_6FD44	dd loc_3CB3A
-off_6FD48	dd loc_381E5
+off_6FD48	dd WorldObject_GetSignatureByte0_381E5
 off_6FD4C	dd VROOMM_StubThunk_6BFB0
 off_6FD50	dd Debris_CombinePhysicsBodies
 off_6FD54	dd loc_45B76
@@ -3036,7 +3036,7 @@ off_6FDC0	dd loc_38056
 off_6FDC8	dd loc_37E3F
 		dd loc_37F99
 off_6FDD0	dd loc_38090
-off_6FDD4	dd loc_381E5
+off_6FDD4	dd WorldObject_GetSignatureByte0_381E5
 off_6FDD8	dd VROOMM_StubThunk_6BFB0
 off_6FDDC	dd Debris_CombinePhysicsBodies
 off_6FDE0	dd loc_38342
@@ -3071,7 +3071,7 @@ off_6FE50	dd loc_3CB5B
 off_6FE54	dd loc_3CB78
 off_6FE58	dd loc_3CBC6
 off_6FE5C	dd loc_3CB3A
-off_6FE60	dd loc_381E5
+off_6FE60	dd WorldObject_GetSignatureByte0_381E5
 off_6FE64	dd VROOMM_StubThunk_6BFB0
 off_6FE68	dd Debris_CombinePhysicsBodies
 off_6FE6C	dd loc_38342
@@ -3288,7 +3288,7 @@ off_700BA	dd loc_37E34
 off_700BE	dd loc_37E3F
 off_700C2	dd loc_37F99
 off_700C6	dd loc_38090
-		dd loc_381E5
+		dd WorldObject_GetSignatureByte0_381E5
 off_700CE	dd VROOMM_StubThunk_6BFB0
 off_700D2	dd Debris_CombinePhysicsBodies
 off_700D6	dd loc_38342
@@ -3323,7 +3323,7 @@ off_70146	dd loc_3CB5B
 		dd loc_3CB78
 off_7014E	dd loc_3CBC6
 off_70152	dd loc_3CB3A
-off_70156	dd loc_381E5
+off_70156	dd WorldObject_GetSignatureByte0_381E5
 off_7015A	dd VROOMM_StubThunk_6BFB0
 off_7015E	dd loc_4BE51
 off_70162	dd loc_38342
@@ -3369,7 +3369,7 @@ off_7020A	dd loc_3CB5B
 off_7020E	dd loc_3CB78
 off_70212	dd loc_3CBC6
 off_70216	dd loc_3CB3A
-		dd loc_381E5
+		dd WorldObject_GetSignatureByte0_381E5
 off_7021E	dd VROOMM_StubThunk_6BFB0
 off_70222	dd Debris_CombinePhysicsBodies
 off_70226	dd loc_38342
@@ -3415,7 +3415,7 @@ off_702C2	dd loc_37E34
 off_702C6	dd loc_37E3F
 off_702CA	dd loc_37F99
 off_702CE	dd loc_38090
-off_702D2	dd loc_381E5
+off_702D2	dd WorldObject_GetSignatureByte0_381E5
 off_702D6	dd VROOMM_StubThunk_6BFB0
 off_702DA	dd loc_4E0E5
 off_702DE	dd loc_38342
@@ -3450,7 +3450,7 @@ off_7034E	dd loc_3CB5B
 off_70352	dd loc_3CB78
 off_70356	dd loc_3CBC6
 off_7035A	dd loc_3CB3A
-off_7035E	dd loc_381E5
+off_7035E	dd WorldObject_GetSignatureByte0_381E5
 off_70362	dd VROOMM_StubThunk_6BFB0
 off_70366	dd Debris_CombinePhysicsBodies
 off_7036A	dd loc_38342
@@ -3499,7 +3499,7 @@ off_70412	dd loc_3CB5B
 off_70416	dd loc_3CB78
 off_7041A	dd loc_3CBC6
 off_7041E	dd loc_3CB3A
-off_70422	dd loc_381E5
+off_70422	dd WorldObject_GetSignatureByte0_381E5
 off_70426	dd VROOMM_StubThunk_6BFB0
 off_7042A	dd Debris_CombinePhysicsBodies
 off_7042E	dd loc_38342

@@ -503,7 +503,20 @@ loc_3E2ED:				; CODE XREF: seg087:0409j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3E2F1:				; DATA XREF: seg339:2838o
+; ==============================================================================================
+; far, LUE (2026-09-20). Methode virtuelle +0x7C de la classe d'objet piloté (constructeur
+; seg087 loc_3E4AC, composant pilote en +0x55) : SIGNATURE vue par un chercheur, appelee par
+; Targeting_SelectAndPrioritize (weapon_aspec 1) et WeaponStation_TestTargetLock avec (cible,
+; objet suivi). Sans objet suivi (arg nul) : renvoie l'octet modele +0x12 (1er octet du chunk
+; SIGN). Avec objet suivi : v = |vecteur de vtable+0x4C de la cible| * 256 / 0x25A00 (=
+; vitesse / 602) ; A = produit Targeting_ComputeGeometryHelperA_5505B(vitesse du chercheur,
+; vitesse de la cible) > 0 (aspect arriere) ; sig = v*100 si A sinon v*50 ; sig += 0xA00 (10)
+; ; si l'octet +0x1E de l'enregistrement renvoye par [si+0x55]->vtable+8 est > 5 : sig +=
+; 0x6400 (100) si A sinon 0x3200 (50) ; renvoie sig>>8 (octet). Le 1er octet SIGN du modele
+; n'entre donc PAS dans ce cas. Sens de l'octet +0x1E (poussee > 5 ?) et unité de la vitesse
+; non prouvés.
+; ==============================================================================================
+Aircraft_ComputeSeekerSignature_3E2F1:				; DATA XREF: seg339:2838o
 		push	bp
 		mov	bp, sp
 		sub	sp, 36h

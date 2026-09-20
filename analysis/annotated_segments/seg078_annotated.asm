@@ -1030,7 +1030,13 @@ loc_381DB:				; DATA XREF: seg339:1B10o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_381E5:				; DATA XREF: seg339:1B58o seg339:1C5Ao ...
+; ==============================================================================================
+; far, methode virtuelle +0x7C par defaut de la plupart des classes objet : renvoie l'octet
+; instance+0x28 (copie du 1er octet du chunk SIGN faite par Debris_BodyAttachToSubpart).
+; Surchargee par Aircraft_ComputeSeekerSignature_3E2F1 (objet piloté) et loc_451F1 (renvoie
+; model+0x12).
+; ==============================================================================================
+WorldObject_GetSignatureByte0_381E5:				; DATA XREF: seg339:1B58o seg339:1C5Ao ...
 		push	bp
 		mov	bp, sp
 		push	si

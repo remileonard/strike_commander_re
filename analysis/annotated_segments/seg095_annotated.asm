@@ -63,7 +63,11 @@ loc_451EB:				; CODE XREF: seg095:0046j seg095:0051j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_451F1:				; DATA XREF: seg339:1CE6o
+; ==============================================================================================
+; far, surcharge du slot +0x7C : renvoie l'octet modele +0x12 (1er octet SIGN) ; calcule aussi
+; un quotient inutilisé (model+0x37 et instance+0x2E).
+; ==============================================================================================
+WorldObject_GetSignatureByte0_ModelDirect_451F1:				; DATA XREF: seg339:1CE6o
 		push	bp
 		mov	bp, sp
 		sub	sp, 24h

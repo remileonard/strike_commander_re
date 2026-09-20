@@ -307,7 +307,7 @@ Le nœud de mon avion est à `entité+0x102` (sa position, à `+0x12`, sert de p
 
 Chaque objet de la liste 0x59C3 est ignoré s'il est nul ou s'il s'agit de l'entité elle-même. Un objet est **candidat** si l'un de ces cas est vrai :
 
-- **Missile (catégorie 8)** dont `nœud+0x55` est mon avion et dont `+0x4E` (objet modèle) vaut 1 : un missile qui me vise.
+- **Missile (catégorie 8)** dont `nœud+0x55` est mon avion et dont `+0x4E` (objet modèle, `target_domain`) vaut 1 : un missile guidé anti-avion qui me vise.
 - **Avion (catégorie 6) hostile**, si le propriétaire du nœud (`nœud+0x51`, méthode `vtable+0x48`) n'a pas le bit 5 de `flags_75`, et si ma propre classe (`+0x52`) est ≥ 6.
 - **Objet hostile avec `+0x11` = 2**, seulement si `arg_4` est non nul **et** qu'une arme du masque `0x83C` est chargée.
 
@@ -366,7 +366,7 @@ Le canon n'entre dans aucun masque air-air : pour un candidat avion, il n'est ja
 
 `Debris_LoadFieldMix_9BA85` (`ovr302`, chargeur de la base de **tous** les objets modèle) lit le chunk **`TRGT`** (`push large 54475254h`) : son premier octet va dans `objet+0x11` (0 si le chunk est absent). C'est le champ `target_type` de `RSEntity` (que `parseREAL_OBJT_JETP_TRGT` remplit pour les `JETP`). Le même chargeur lit le chunk `SIGN` dans `objet+0x12`, `+0x13`, `+0x14` (3 octets : `RADAR_SIGN`).
 
-Rapprochement avec `WDAT.weapon_category` (fait vérifié côté données : **1 = air-air, 2 = air-sol**) : la valeur 2 de `target_type` est celle des cibles qu'on attaque avec des armes air-sol. Le test `+0x11 == 2` de `Targeting_AcquireBestThreat`, de `Goal_ExecuteAction` et de `MVRS_ID14_ScoreWeaponReadiness` signifie donc « cible sol ». Ces deux dernières exigent alors une arme du masque `0xFC`, et `Targeting_AcquireBestThreat` une arme du masque `0x83C`. Les masques d'armes (`WeaponStation_FindLoadedCompatible`) testent le mot `+0x0D` de chaque station d'armement (35 octets, quantité en `+0x13`) ; `WeaponStation_SelectForTarget` choisit la station dont `+0x0D` égale `objet+0x4B` de la cible.
+Rapprochement avec le champ `WDAT` `+0x4E` (`target_domain`, voir la section des deux octets de classe) : la valeur 2 de `target_type` est celle des cibles qu'on attaque avec des armes qui ne sont pas des missiles anti-avion (canon, bombes, AGM-65D, GBU-15). Le test `+0x11 == 2` de `Targeting_AcquireBestThreat`, de `Goal_ExecuteAction` et de `MVRS_ID14_ScoreWeaponReadiness` signifie donc « cible sol ». Ces deux dernières exigent alors une arme du masque `0xFC`, et `Targeting_AcquireBestThreat` une arme du masque `0x83C`. Les masques d'armes (`WeaponStation_FindLoadedCompatible`) testent le mot `+0x0D` de chaque station d'armement (35 octets, quantité en `+0x13`) ; `WeaponStation_SelectForTarget` choisit la station dont `+0x0D` égale `objet+0x4B` de la cible.
 
 ### Restes non lus
 
@@ -509,3 +509,43 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 - `Picking_ResolveSymbol`, troisième appelant de `WorldObjects_UpdateAllAndRemoveDead_221F2`.
 - Comment le nom du PROF de `CAST` arrive jusqu'à `AIAircraft_SpawnAndConditionalLoadProfile_53363`.
 - Ce qui remet l'IA en état d'être ticquée après le pilotage automatique, et l'état de GOAL à ce moment.
+
+## Le chunk `SIGN` (RADAR_SIGN) : chargement et usage (lu 2026-09-20)
+
+Chargement : `Debris_LoadFieldMix_9BA85` (ovr302) cherche `SIGN` (`4E474953h`) ; si présent, **3 lectures d'un octet** (`ResourceRecord_ReadFinalField_64B51`) vers modèle `+0x12`, `+0x13`, `+0x14` ; absent = 0, 0, 0. Nommons-les S0, S1, S2.
+
+Copie à l'instance : `Debris_BodyAttachToSubpart` recopie S0 dans `instance+0x28` et S2 dans `instance+0x29`. S1 reste lu dans le modèle (`Debris_GetSubpartAttrib`).
+
+Lecteurs (tous des octets 0-255, comparés à un seuil : plus grand = plus visible pour le chercheur) :
+- S0 (`instance+0x28`) : méthode virtuelle `+0x7C` (`loc_381E5`), utilisée par le chercheur `weapon_aspec` 1 (seuil > 210) ;
+- S1 (`modèle+0x13`) : `Debris_GetSubpartAttrib`, utilisé par `weapon_aspec` 3 (seuil >= 245) ; `WeaponStation_TestTargetLock` l'appelle pour l'aspec 4 ;
+- S2 (`instance+0x29`) : `Debris_GetStateFlag`, utilisé pour l'aspec 2 par `WeaponStation_TestTargetLock`/`Targeting_FilterByWeaponType`.
+
+## Les deux octets de classe du chunk `WDAT` (fichiers RAW décodés, 2026-09-20)
+
+`Weapon_LoadWDATChunk_A0700` lit, après `weapon_id`, un octet rangé à `+0x4D` puis un octet rangé à `+0x4E`, puis `weapon_aspec` (`+0x4F`). Les noms du parseur libRealSpace sont `weapon_category` (`+0x4D`) et `target_domain` (`+0x4E`, ex-`radar_type`). Valeurs lues dans les 11 fichiers `data/*.WDAT.DAT` :
+
+| Arme | `weapon_id` | `+0x4D` (`weapon_category`) | `+0x4E` (`target_domain`) | `weapon_aspec` | target_range | cone | effective_range | `+0x5A` |
+|---|---|---|---|---|---|---|---|---|
+| 20MM (`TRCR`) | 12 | 0 | 2 | 0 | 10000 | 45 | 1000 | 0 |
+| AIM-9M (`MISS`) | 1 | 1 | 1 | 2 | 17700 | 45 | 8000 | 256 |
+| AIM-9J (`MISS`) | 2 | 1 | 1 | 1 | 14500 | 40 | 5000 | 256 |
+| AIM-120 (`MISS`) | 9 | 2 | 1 | 4 | 74000 | 45 | 45000 | 256 |
+| SA-2 (`MISS`) | 10 | 2 | 1 | 4 | 25000 | 60 | 0 | 3840 |
+| SA-6 (`MISS`) | 11 | 2 | 1 | 4 | 30000 | 60 | 0 | 2560 |
+| AGM-65D (`MISS`) | 3 | 3 | 2 | 5 | 6000 | 25 | 15000 | 256 |
+| GBU-15 (`BOMB`) | 8 | 3 | 2 | 5 | 6000 | 25 | 0 | 256 |
+| MK-20 (`BOMB`) | 5 | 4 | 2 | 0 | 0 | 45 | 40 | 256 |
+| MK-82 (`BOMB`) | 6 | 4 | 2 | 0 | 0 | 0 | 40 | 256 |
+| LAU-3 (`PODR`) | 4 | 7 | 2 | 0 | 0 | 45 | 0 | 25 |
+
+- **`+0x4D` (`weapon_category`)** : famille du chercheur ou de l'arme : 0 canon, 1 IR (AIM-9), 2 radar (AIM-120, SA-2, SA-6), 3 guidée sol (AGM-65D, GBU-15), 4 bombe libre, 7 roquettes. Signification des valeurs 3, 4, 7 par déduction des armes concernées, non lue dans le code.
+- **`+0x4E` (`target_domain`)** : vaut 1 pour les cinq missiles guidés qui visent un avion (AIM-9J/9M, AIM-120, SA-2, SA-6 : donc pas « lancé depuis un avion »), 2 pour toutes les autres (canon, roquettes, bombes, AGM-65D, GBU-15). Nom `air_only` / `other` = **inférence** ; l'assembleur ne teste que `== 1` (`Targeting_AcquireBestThreat` pour « missile qui me vise », `HUD_RenderSymbologyMain`, `seg092`), la valeur 2 n'est lue nulle part ; `WeaponStation_ResolveStateA` prend 1 par défaut si le point d'emport est vide. `other` ne signifie pas « n'attaque pas les avions » (le canon en fait partie).
+- **Le missile et la bombe ne se distinguent pas par le `WDAT`** : AGM-65D (`MISS`) et GBU-15 (`BOMB`) ont exactement les mêmes octets de chercheur ; seule la classe IFF (catégorie d'objet 8 ou 9) diffère.
+- **`weapon_aspec` 0** (canon, bombes libres, roquettes) sort de la table de sauts de `WeaponStation_TestTargetLock` et `Targeting_SelectAndPrioritize` (cas `default`) : pas de test de verrouillage. Les aspecs des missiles guidés : 1 (AIM-9J), 2 (AIM-9M), 4 (AIM-120, SA-2, SA-6), 5 (AGM-65D, GBU-15, cas non lu).
+- Les ids des armes correspondent aux masques : `0x83C` = ids 3, 4, 5, 6, 12 ; `0x700` = ids 9, 10, 11 ; la GBU-15 (id 8) est dans `0xFC` mais pas dans `0x83C`.
+- Le dernier champ (`+0x5A`) suit la famille d'arme (256, 3840, 2560, 25, 0) ; sens inconnu.
+
+### La signature du 1er octet est calculée à l'exécution pour les avions (lu 2026-09-20)
+
+Le slot `+0x7C` vaut `WorldObject_GetSignatureByte0_381E5` (octet `instance+0x28`) dans presque toutes les tables de méthodes, sauf deux surcharges : `WorldObject_GetSignatureByte0_ModelDirect_451F1` (renvoie le 1er octet du modèle) et **`Aircraft_ComputeSeekerSignature_3E2F1`** (classe d'objet piloté, composant pilote en `+0x55`). Cette dernière, appelée avec l'objet suivi du chercheur, **ne lit pas le 1er octet `SIGN`** : `signature = 10 + v·100 (aspect arrière) ou v·50 (sinon) + 100 (arrière) ou 50 (sinon) si l'octet +0x1E du pilote > 5`, avec `v` = vitesse de la cible / 602, aspect arrière = produit `Targeting_ComputeGeometryHelperA_5505B(vitesse du chercheur, vitesse de la cible) > 0`. Plus de 210 (seuil de l'aspec 1) exige donc, en aspect arrière, une vitesse d'environ 602 avec l'octet pilote > 5 (post-combustion ?). Lecture par écrivains directs : aucun autre code n'écrit `instance+0x28/+0x29` de cette famille de classes (les autres écrivains trouvés sont des widgets d'interface, le terrain, `Flare_PhysicsTick` et des accumulateurs de force d'un autre objet).

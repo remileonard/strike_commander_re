@@ -12,7 +12,9 @@ seg435		segment	para public 'OVERLAY' use16
 ; avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage
 ; (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par
 ; WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category
-; (+0x4D), byte radar_type (+0x4E), byte weapon_aspec (+0x4F), valeur 'group C' target_range
+; (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte
+; target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte
+; weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range
 ; (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group
 ; C' (+0x5A). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et
 ; Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme,
