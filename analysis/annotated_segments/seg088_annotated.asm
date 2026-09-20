@@ -1910,11 +1910,17 @@ off_3F7BE	dw offset loc_3EF1E	; DATA XREF: HUD_RenderSymbologyMain+12Ar
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,83L — dispatch à 4 cas selon un type d'arme (+0x4F), appelle vtable[0x7C] avec des
-; paramètres du viseur (+0xD) pour le cas 0 : rendu du réticule de tir selon le mode d'arme
-; sélectionné (dispatché depuis le moteur HUD sub_3E744).
+; far, 83L, LUE (2026-09-20). Ancien nom 'HUD_RenderReticleByWeaponType' TROMPEUR : c'est le
+; TEST DE VERROUILLAGE d'un point d'emport sur une cible, utilise par l'IA
+; (AI_BehaviorSelector_8D30) avant de tirer un missile. Prend (point d'emport, cible). Vide le
+; drapeau de verrouillage du point d'emport (+0x0F). Si la cible existe, aiguille selon
+; weapon_aspec de l'arme (+0x4F, valeurs 1 a 4) : 1 = methode virtuelle +0x7C de la cible
+; appliquee a l'objet suivi (+0xD) ; 3 = Debris_GetStateFlag de la cible ; 4 =
+; Debris_GetSubpartAttrib de la cible ; resultat range dans +0x0F. Renvoie le resultat de
+; Targeting_SelectAndPrioritize(arme, objet suivi, cible, drapeau) : non nul si la cible est
+; retenue/verrouillee.
 ; ==============================================================================================
-HUD_RenderReticleByWeaponType	proc far		; CODE XREF: AI_BehaviorSelector+1F3P
+WeaponStation_TestTargetLock	proc far		; CODE XREF: AI_BehaviorSelector+1F3P
 					; HUD_RenderSymbologyAlt+1105p
 
 arg_0		= dword	ptr  6
@@ -1957,27 +1963,27 @@ loc_3F809:				; DATA XREF: seg088:off_3F851o
 		jmp	short loc_3F82A
 ; ���������������������������������������������������������������������������
 
-loc_3F81B:				; CODE XREF: HUD_RenderReticleByWeaponType+3Aj
+loc_3F81B:				; CODE XREF: WeaponStation_TestTargetLock+3Aj
 					; DATA XREF: seg088:off_3F851o
 		push	si		; case 0x2
 		call	Debris_GetStateFlag
 		jmp	short loc_3F829
 ; ���������������������������������������������������������������������������
 
-loc_3F823:				; CODE XREF: HUD_RenderReticleByWeaponType+3Aj
+loc_3F823:				; CODE XREF: WeaponStation_TestTargetLock+3Aj
 					; DATA XREF: seg088:off_3F851o
 		push	si		; case 0x3
 		call	Debris_GetSubpartAttrib
 
-loc_3F829:				; CODE XREF: HUD_RenderReticleByWeaponType+57j
+loc_3F829:				; CODE XREF: WeaponStation_TestTargetLock+57j
 		pop	cx
 
-loc_3F82A:				; CODE XREF: HUD_RenderReticleByWeaponType+4Fj
+loc_3F82A:				; CODE XREF: WeaponStation_TestTargetLock+4Fj
 		les	bx, [bp+arg_0]
 		mov	es:[bx+0Fh], al
 
-loc_3F831:				; CODE XREF: HUD_RenderReticleByWeaponType+18j
-					; HUD_RenderReticleByWeaponType+22j ...
+loc_3F831:				; CODE XREF: WeaponStation_TestTargetLock+18j
+					; WeaponStation_TestTargetLock+22j ...
 		les	bx, [bp+arg_0]	; default
 		mov	al, es:[bx+0Fh]
 		push	ax
@@ -1989,17 +1995,17 @@ loc_3F831:				; CODE XREF: HUD_RenderReticleByWeaponType+18j
 		jmp	short loc_3F84E
 ; ���������������������������������������������������������������������������
 
-loc_3F84C:				; CODE XREF: HUD_RenderReticleByWeaponType+Fj
+loc_3F84C:				; CODE XREF: WeaponStation_TestTargetLock+Fj
 		xor	ax, ax
 
-loc_3F84E:				; CODE XREF: HUD_RenderReticleByWeaponType+80j
+loc_3F84E:				; CODE XREF: WeaponStation_TestTargetLock+80j
 		pop	si
 		pop	bp
 		retf
-HUD_RenderReticleByWeaponType	endp
+WeaponStation_TestTargetLock	endp
 
 ; ���������������������������������������������������������������������������
-off_3F851	dw offset loc_3F809	; DATA XREF: HUD_RenderReticleByWeaponType+3Ar
+off_3F851	dw offset loc_3F809	; DATA XREF: WeaponStation_TestTargetLock+3Ar
 		dw offset loc_3F809	; jump table for switch	statement
 		dw offset loc_3F81B
 		dw offset loc_3F823
@@ -4060,7 +4066,7 @@ loc_409B8:				; CODE XREF: HUD_RenderSymbologyAlt+ED0j
 		push	word ptr es:[bx+0Dh]
 		push	large dword ptr	es:[bx+18h]
 		push	cs
-		call	near ptr HUD_RenderReticleByWeaponType
+		call	near ptr WeaponStation_TestTargetLock
 		add	sp, 6
 		mov	word ptr [bp+var_56+2],	ax
 		les	bx, [bp+arg_0]

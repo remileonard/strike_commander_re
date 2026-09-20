@@ -382,7 +382,7 @@
  "sub_8104": {
   "new_name": "AI_TurnToHeadingCmd",
   "segment": "seg003",
-  "summary": "far,38L — calcule l'écart entre un cap cible et le cap courant (sub_58F4), puis appelle sub_7E56(delta, taux) : **commande de roulis/tangage vers un cap à un taux donné**, variante de sub_7E18 basée sur le cap plutôt que le bearing."
+  "summary": "far, 38L, LUE INTEGRALEMENT (2026-09-20). Exécution d'un virage vers un cap : prend (entité, pointeur vers l'angle de cap voulu, taux), calcule ecart = cap voulu - AI_Sensor_HeadingNormalized(entité) (cap courant normalisé) puis appelle AI_PitchRollController_Heading(entité, &ecart, taux). Le 'taux' est la ZONE MORTE en degrés (5 depuis AI_CombatDecision_Major en correction normale, 2 en commande neutre)."
  },
  "sub_84863": {
   "new_name": "HUDSymbol_ConstructAndInitAngleE_84863",
@@ -1337,7 +1337,7 @@
  "sub_7E56": {
   "new_name": "AI_PitchRollController_Heading",
   "segment": "seg003",
-  "summary": "far,101L — normalise un angle (wraparound ±0xB400), stocke un compteur HUD (+0x23), compare la magnitude à un taux×256 : **contrôleur de roulis/tangage basé sur un delta d'angle et un taux (variante de sub_7B20 utilisant le cap sub_58F4).**"
+  "summary": "far, 101L, LUE INTEGRALEMENT (2026-09-20). Contrôleur de virage par ÉCART D'ANGLE : (entité, &ecart de cap, zone morte en degrés). Remet à 0 le champ de commande partagé avec le joueur (bloc d'état +0x23, l'entrée manche/souris), normalise l'écart à ±180 degrés (0xB400 = 180.0, 0x16800 = 360.0 en 24.8), puis, SEULEMENT si l'écart absolu dépasse la zone morte (taux*256), appelle JDYN_HighLevelPhysicsCalc(avion, sortie, écart) — le calcul physique de haut niveau du modèle de vol qui transforme l'écart en valeur de manche —, la NÉGATE et l'écrit dans +0x23. Renvoie 0 si elle a commandé, 1 sinon (dans la zone morte). L'IA ne fait donc PAS de boucle d'altitude : elle commande le manche à partir d'un écart d'angle, avec une zone morte."
  },
  "sub_4F9E6": {
   "new_name": "Timer_Tick_4F9E6",
@@ -1720,9 +1720,9 @@
   "summary": "far, 93 lignes - **RESOLUTION DU MUR CENTRAL**. C'est la vraie implementation de [vtable+8] (fonction d'APPLICATION) pour MVRS ID=0x14, appelee via VROOMM_StubThunk_6ABEE. LOGIQUE COMPLETE : si node+0xC==0, reevalue d'abord le score (rappel a MVRS_ID14_ScoreWeaponReadiness_77000, meme motif de garde que dans AI_BehaviorStateMachine et Entity_ProximityTest) ; appelle un helper generique (VROOMM_StubThunk_6AB4F) ; pose node+0x26=0 et node+0xD=0x200 (mode 'arme selectionnee') ; RE-RESOUT LA MEME CIBLE (entite+0x283/+0x137) et l'ETABLIT COMME REFERENCE SUR LE NOEUD LUI-MEME (node+0x27, via SetReference) - met en cache la cible localement sur cette entree MVRS ; SI aucune cible : appelle NotifiableRef_AttachTarget (VROOMM_StubThunk_6AB45, ovr229) - le motif generique deja connu ; SI une cible existe : efface une reference secondaire (node+0x29), remet a zero un compteur (node+0x34=0) et initialise un MINUTEUR DE VERROUILLAGE/COOLDOWN (node+0x30=0x186A0=100000), PUIS appelle **[vtable+0xC]** - le MEME cinquieme slot de vtable trouve independamment dans Escort_LeaderSuccession_C17A (cas 0x1) - confirme comme methode 'demarrer le suivi/verrouillage' quand une cible est effectivement acquise pour ce type de comportement."
  },
  "sub_91DF": {
-  "new_name": "AI_ManeuverSolution_91DF",
+  "new_name": "AI_ComputeFireSolutionQuality_91DF",
   "segment": "seg004",
-  "summary": "far,559L — vérifie l'existence d'une cible (+0x287), calcule les vecteurs relatifs position/vitesse : **grosse fonction de solution de manœuvre/guidage (même famille que sub_6977/sub_702A du seg003)**, à approfondir en détail. DECOUVERTE COMPLEMENTAIRE (Remi, en explorant seg004) : dans un bloc switch interne (cases 0x100 et 0x1, autour de loc_9586/loc_95DD), compare une distance/valeur (var_8) contre QUATRE SEUILS DERIVES DES CONSTANTES NUMS (dword_72020, dword_72024, dword_72028, dword_7202C - decodees empiriquement dans INTEL.IFF, voir §10.1 AI_SYSTEM.md), chacun multiplie par 256 (mise a l'echelle 24.8), pour produire une classification discrete (si, borne entre 0 et 10) - probable classification par PALIER DE DISTANCE utilisant les constantes partagees NUMS comme seuils de bande."
+  "summary": "far, 559L, LUE INTEGRALEMENT (2026-09-20). CALCULE LA QUALITE DE SOLUTION DE TIR 'si' (entier 0 a 10) contre la cible aerienne (entite+0x287) avec l'arme choisie (masque entite+0x1A2). Rangee par AI_BehaviorSelector_8D30 dans entite+0x1A0. Sans cible ou cible a 90 degres ou plus du nez : 0. Base : 10 - (ecart_nez*10)/35. Aspect croise (cap de la cible entre 50 et 130 degres de la direction vers elle) : -4. CANON (0x800) : 0 si d >= dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_AngleBetweenVectors_552E1, AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100, 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d < dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000) -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]."
  },
  "sub_A1C66": {
   "new_name": "PaletteScreen_DrawWidgetVariantB_A1C66",
@@ -9245,9 +9245,9 @@
   "summary": "far, thunk fixe VROOMM (jmp sub_87883) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=13AF0h, codesize=0F6Fh, nentries=11."
  },
  "sub_6469": {
-  "new_name": "AI_Sensor_TargetVelocityCache",
+  "new_name": "AI_Sensor_WeaponVelocityCache",
   "segment": "seg003",
-  "summary": "far,189L — capteur caché bit3 de +0x28D : récupère/cache la vitesse d'une cible (via pointeur +0x104 → vtable[0x18], fallback sur globals dword_707E0/4/8) dans dword_72041/45/49 (globals 'vitesse cible courante'), option vitesse propre. Copie le résultat dans un buffer de sortie (alloue via sub_658 si absent) : **cache global de la vitesse de la cible verrouillée**."
+  "summary": "far, 189L, LUE INTEGRALEMENT (2026-09-20). Ancien nom 'AI_Sensor_TargetVelocityCache' FAUX : ce n'est PAS la vitesse de la cible mais le VECTEUR VITESSE DE MA PROPRE ARME (direction de tir). Si le bit 3 de entite+0x28D n'est pas pose : remet a zero le cache global (dword_72041/45/49), lit le point d'emport courant de entite+0x104 (index a +0, stride 0x12), appelle vtable+0x18 de l'objet arme pour obtenir son vecteur vitesse initial (repli : globals dword_707E0/4/8), le range dans le cache, le fait tourner avec Math_ApplyRotationHelperB_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et si tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D (cache valide ; efface par AI_FireWeaponTrigger). Copie le resultat dans un tampon de sortie (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer l'erreur de visee du canon."
  },
  "sub_6AEEE": {
   "new_name": "VROOMM_StubThunk_6AEEE",
@@ -11760,9 +11760,9 @@
   "summary": "far, combine thunk voisin et copie de chaîne (42 lignes)."
  },
  "sub_3F7CA": {
-  "new_name": "HUD_RenderReticleByWeaponType",
+  "new_name": "WeaponStation_TestTargetLock",
   "segment": "seg088",
-  "summary": "far,83L — dispatch à 4 cas selon un type d'arme (+0x4F), appelle vtable[0x7C] avec des paramètres du viseur (+0xD) pour le cas 0 : **rendu du réticule de tir selon le mode d'arme sélectionné (dispatché depuis le moteur HUD sub_3E744).**"
+  "summary": "far, 83L, LUE (2026-09-20). Ancien nom 'HUD_RenderReticleByWeaponType' TROMPEUR : c'est le TEST DE VERROUILLAGE d'un point d'emport sur une cible, utilise par l'IA (AI_BehaviorSelector_8D30) avant de tirer un missile. Prend (point d'emport, cible). Vide le drapeau de verrouillage du point d'emport (+0x0F). Si la cible existe, aiguille selon weapon_aspec de l'arme (+0x4F, valeurs 1 a 4) : 1 = methode virtuelle +0x7C de la cible appliquee a l'objet suivi (+0xD) ; 3 = Debris_GetStateFlag de la cible ; 4 = Debris_GetSubpartAttrib de la cible ; resultat range dans +0x0F. Renvoie le resultat de Targeting_SelectAndPrioritize(arme, objet suivi, cible, drapeau) : non nul si la cible est retenue/verrouillee."
  },
  "loc_5C3C9": {
   "new_name": "PagedResourceB_ConstructThunk_5C3C9",
@@ -13005,9 +13005,9 @@
   "summary": "far,329L — vérifie flags avion (+0x28D bit5), heading (+0xB0), chaîne de pointeurs cible/allié (+0x287/+0x289 — mêmes offsets que sub_3314), calcule distance de fermeture via sub_5828E, compare à seuil dword_7201C, positionne flag d'alerte bit4 à +0x28D : **détection de menace/verrouillage entrant (missile threat warning)**."
  },
  "sub_9A77": {
-  "new_name": "AI_EscortPriorityReactionHandler_9A77",
+  "new_name": "AI_MissileEvasionReaction_9A77",
   "segment": "seg004",
-  "summary": "far,289L — (cluster IA, appelée par de nombreuses fonctions déjà vues comme sub_50AD/sub_75A9) — candidate pour une fonction de calcul géométrique/guidage partagée, à approfondir. LUE PARTIELLEMENT (debut, a la demande de Remi pour resoudre +0x281). CONFIRME : +0x281 est une reference liee au systeme D'ESCORTE - son objet cible a un champ +0x55 compare a entite+0x102 (le lien standard), et entite+0x27F==2 (etat 'escorte terminee', deja croise dans Goal_ActiveWingmanEngagement_878F) declenche l'EFFACEMENT de cette reference (SetReference vers null) et de entite+0x108. Role precis : probablement 'reference vers le leader/coequipier actuellement escorte', validee et nettoyee automatiquement a la fin de la relation d'escorte."
+  "summary": "far, 289L, LUE INTEGRALEMENT (2026-09-20). REACTION D'ESQUIVE D'UN MISSILE QUI ME VISE (ancien nom 'AI_EscortPriorityReactionHandler' FAUX : +0x281 n'est pas une reference d'escorte mais la menace missile posee par Targeting_AcquireBestThreat, et +0x27F==2 l'etat 'missile en approche'). Appelee en tete de AI_BehaviorStateMachine_WeightedOptionSelector_9D05, dans sa branche sans cible aerienne, et par AI_TopLevelThink. Renvoie 1 si elle a agi. (1) Si entite+0x281 est nul ou si le champ +0x55 du missile n'est plus mon noeud, ET +0x27F==2 : remet +0x27F et +0x108 a 0, vide +0x281 (SetReference) et renvoie 0. Sinon, elle n'agit que si +0x27F==2 et +0x281 non nul. (2) Vecteur vers le missile ; composante verticale remplacee selon mon altitude (+0x1A du noeud) comparee a dword_7203D : altitude <= seuil -> 2*seuil - altitude (monter), sinon seuil - altitude (descendre). (3) Bande de distance du missile par AI_ClassifyDistanceBand(entite, type d'arme du missile +0x4B) : 1 (proche) et 2 (moyen) : si le lanceur du missile (vtable+0x38) est le joueur et que mon camp (+0x50) vaut 1 (ami) : Radio_PlayMessage 0x0E vers le joueur (le missile vient du joueur) ; puis AI_EvalTargetAttribute. Bande 1 : composante verticale annulee puis manoeuvre perpendiculaire ; bande 2 : perpendiculaire en gardant l'altitude ; perpendiculaire = Vec_NegateSwapPair puis, si Angle_DeltaNormalized_A avec mon cap depasse 90 degres, inversion du signe (on tourne du cote qui demande le moins de virage). Bande 3 (loin) : pose +0x108=1 et inverse les 3 composantes = FUIR le missile. Bande 0 : renvoie 0. (4) AI_GuidanceCmd_FromOwnPos(entite, vecteur, 10) ; puis AI_ThrottleCmd_HUD avec la vitesse maximale (avion +0xB, +0x80) si le guidage renvoie non nul, sinon la vitesse de croisiere (+0x84) ; renvoie 1."
  },
  "sub_559BB": {
   "new_name": "Vector_Normalize3D_559BB",
@@ -14912,7 +14912,7 @@
  "sub_43107": {
   "new_name": "Targeting_SelectAndPrioritize",
   "segment": "seg091",
-  "summary": "far,327L — dispatch à 6 cas selon le type d'arme, appelle sub_43013 (filtre) puis priorise la cible (favorise le joueur, teste distance angulaire via sub_54DF4) : **sélecteur/verrouilleur de cible principal pour le tir, priorisé par type d'arme et proximité au réticule.**"
+  "summary": "far, 327L, LUE (2026-09-20). MODELE DE VERROUILLAGE (seeker) selon weapon_aspec de l'arme (+0x4F, 1 a 6). Filtre les candidats avec Targeting_FilterByWeaponType (cone/portee du chercheur), garde la cible deja suivie (arg objet suivi) si elle est encore candidate, sinon evalue la signature du candidat : aspec 1 : methode virtuelle +0x7C du candidat (signature) > 0xD2 (210), avec un tirage Math_RandomScale_54DF4(10) compare a un poids (3, ou 5 si le lanceur du candidat est le joueur) ; aspec 2 : Targeting_ReticleWindowTest (fenetre du reticule) ; aspec 3 : Debris_GetSubpartAttrib > 0xF5 (245) avec le meme tirage ; aspec 4 : Proximity_TestOriented ; renvoie la cible retenue ou 0. Les signatures sont les 3 octets du chunk SIGN de l'objet (+0x12 a +0x14)."
  },
  "sub_23AF4": {
   "new_name": "EntityTracker_Init",

@@ -1020,7 +1020,7 @@ Math_ApplyRotationHelperA_58768	endp
 ; far, référencée par sub_5392 — utilisée par WorldObject_ApplyOrientationVariantB_5779A.
 ; ==============================================================================================
 Math_ApplyRotationHelperB_58828	proc far		; CODE XREF: AI_IncomingThreatWarning+187P
-					; AI_Sensor_TargetVelocityCache+113P ...
+					; AI_Sensor_WeaponVelocityCache+113P ...
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8

@@ -1024,7 +1024,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Player_MainUpdate_13100` | 2015 | seg011 | Traitement principal avion du joueur |
 | `Radar_Project3DToScreen_16988` | 896 | seg018 | Projection 3D→écran radar/HUD |
 | `Formation_GuidanceSolution_D081` | 944 | seg006 | Guidage de formation (followAlly) |
-| `AI_ManeuverSolution_91DF` | 559 | seg004 | Solution de manœuvre/guidage |
+| `AI_ComputeFireSolutionQuality_91DF` | 559 | seg004 | Solution de manœuvre/guidage |
 | `AI_GuidanceSolution_Major_702A` | 651 | seg003 | Guidage complexe (lead pursuit) |
 | `AI_ManeuverSolution_Major_6977` | 616 | seg003 | Solution de manœuvre/tir |
 | `AI_CombatDecision_Major_75F8` | 603 | seg003 | Décision de combat IA |

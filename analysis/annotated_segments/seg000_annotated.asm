@@ -1281,7 +1281,7 @@ CRT_Lseek		endp
 ; malloc courte 16-bit.
 ; ==============================================================================================
 CRT_Malloc16_Retry		proc far		; CODE XREF: CRT_Doprnt_Dispatch+8Bp
-					; AI_Sensor_TargetVelocityCache+17BP ...
+					; AI_Sensor_WeaponVelocityCache+17BP ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6

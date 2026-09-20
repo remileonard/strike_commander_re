@@ -594,12 +594,17 @@ off_430FD	dw offset loc_43094	; DATA XREF: Targeting_FilterByWeaponType+7Cr
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,327L — dispatch à 6 cas selon le type d'arme, appelle sub_43013 (filtre) puis priorise
-; la cible (favorise le joueur, teste distance angulaire via sub_54DF4) :
-; sélecteur/verrouilleur de cible principal pour le tir, priorisé par type d'arme et proximité
-; au réticule.
+; far, 327L, LUE (2026-09-20). MODELE DE VERROUILLAGE (seeker) selon weapon_aspec de l'arme
+; (+0x4F, 1 a 6). Filtre les candidats avec Targeting_FilterByWeaponType (cone/portee du
+; chercheur), garde la cible deja suivie (arg objet suivi) si elle est encore candidate, sinon
+; evalue la signature du candidat : aspec 1 : methode virtuelle +0x7C du candidat (signature)
+; > 0xD2 (210), avec un tirage Math_RandomScale_54DF4(10) compare a un poids (3, ou 5 si le
+; lanceur du candidat est le joueur) ; aspec 2 : Targeting_ReticleWindowTest (fenetre du
+; reticule) ; aspec 3 : Debris_GetSubpartAttrib > 0xF5 (245) avec le meme tirage ; aspec 4 :
+; Proximity_TestOriented ; renvoie la cible retenue ou 0. Les signatures sont les 3 octets du
+; chunk SIGN de l'objet (+0x12 a +0x14).
 ; ==============================================================================================
-Targeting_SelectAndPrioritize	proc far		; CODE XREF: HUD_RenderReticleByWeaponType+78P
+Targeting_SelectAndPrioritize	proc far		; CODE XREF: WeaponStation_TestTargetLock+78P
 					; seg090:006AP
 
 var_24		= word ptr -24h

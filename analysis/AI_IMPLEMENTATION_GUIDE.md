@@ -524,7 +524,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 |---|---|---|---|---|
 | longueur de rafale restante (`+0x280`) | décrémentée à chaque tick de rafale | connu | à déclarer plus tard | — |
 | état de tir (`+0x10D`, valeur `0x800`) | mémorise qu'une rafale est en cours | partiel | non | — |
-| résultats de manœuvre (`+0x1A0`, `+0x1A2`) | sorties de `AI_ManeuverSolution_91DF` et de `AI_SelectWeaponMask_9665` | partiel | non | — |
+| résultats de manœuvre (`+0x1A0`, `+0x1A2`) | sorties de `AI_ComputeFireSolutionQuality_91DF` et de `AI_SelectWeaponMask_9665` | partiel | non | — |
 | drapeaux d'état (`+0x28B`, `+0x28D`) | bit 0x02 posé par le contrôle de tir ; bit 3 escorte ; bit 7 comportement déclenché ; `+0x28D` bit 0x08 effacé au début du ciblage | partiel | non | — |
 
 **Traits, listes et minuteurs**
@@ -550,6 +550,8 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | pointeur vers l'objet portant le chargement d'armes (`+0x22`) | déduit de `MVRS_ID14_ScoreWeaponReadiness` | partiel | non | — |
 
 **État d'avancement (2026-09-20)** : `SCAIBrain` (`SCAIBrain.h/.cpp`, dans `src/strike_commander/`) existe et est créé par `SCMission` pour tout acteur dont le profil est IA. La boucle `GOAL` (`runGoalSelectors`, `executeGoalAction`, `tryWanderRandom`, `tryActiveWingman`) y a été déplacée telle quelle ; `SCMissionActors::onAIRefresh` garde ses gardes puis appelle `brain->tick()`. Validé en jeu : compile, l'IA réagit comme avant. Les champs de ciblage sont déclarés mais pas encore utilisés ; l'état de l'objectif reste sur l'acteur.
+
+**État d'avancement, tir et poursuite (2026-09-20)** : le tir (`updateFireControl`) et la poursuite (`updatePursuit`) sont pilotés par `SCAIBrain` (drapeaux `fire_control_enabled` et `pursuit_enabled`, actifs). Tir : masque d'arme, qualité de solution, seuil `2 × qualité ≥ AA`, rafale de canon `((rand & 3) + 4) × qualité / 10` ; `SCPilot::Fire` → `SCPlane::ShootDirect` (sans la précision `rand % 16 <= AA` ni la visée prédictive de l'ancien code). Poursuite : point d'anticipation (position de la cible plus sa vitesse déduite du déplacement entre deux ticks, sur `distance / ma vitesse` plafonné à 3 s), inclinaison bornée à ±45°, consigne à `SCPilot` (cap, altitude, vitesse) ; hors de la portée du canon le MiG accélère, dedans il égale la vitesse de la cible. `aim_trim` : correctif intégral qui compense l'erreur permanente de la boucle d'altitude de `SCPilot` (jusqu'à environ 300 unités selon l'avion) ; il disparaîtra avec l'option B (le pilote reçoit des écarts d'angle, pas une altitude). Validé sur logs : `STERN` abat un MiG au canon à environ 1777 avec une visée à 0,3° de la cible. Unités : `vz` est la vitesse par tick avec 50 ticks par seconde ; `vz = -6` correspond à environ 300 unités par seconde. Le tir de missile n'a pas de contrôle de verrouillage (non lu). Prochaine étape : l'esquive missile (`AI_MissileEvasionReaction_9A77`).
 
 **Règle retenue** : le cerveau ne recopie pas ce que l'acteur, le profil ou le pilote portent déjà. Il lit ces données par `owner`. Il ne porte que l'état qui lui est propre (cibles, menace, et plus tard rafale et minuteurs). L'objectif courant migrera dans le cerveau quand la boucle `GOAL` y sera déplacée.
 
@@ -894,7 +896,7 @@ Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de l
 
 **Cibles sol : jamais acquises seules depuis `AI_TopLevelThink`.** Ce chemin appelle le ciblage avec « nouvelle cible » à 0, et un candidat sol n'est retenu que si cet argument est non nul (un avion hostile n'en a pas besoin). L'IA acquiert donc seule des avions et des missiles ; les cibles sol viennent du script. Le tournoi passe un argument non nul dans certains cas, à vérifier.
 
-**Pour l'implémentation** : la cible de mission reste ce que pose `setObjective` (`current_target`, `target` de l'acteur) ; elle entre dans `acquireBestThreat` comme bonus. `destroyTarget` garde la navigation vers la cible et son tir actuel tant que le contrôle de tir du cerveau n'existe pas. Non lu : ce qui fait attaquer une cible de mission aérienne qui n'est pas candidate.
+**Pour l'implémentation** : la cible de mission reste ce que pose `setObjective` (`current_target`, `target` de l'acteur) ; elle entre dans `acquireBestThreat` comme bonus. `destroyTarget` garde la navigation vers la cible et son tir actuel tant que le contrôle de tir du cerveau n'existe pas. Ce qui relie l'ordre au combat (lu) : `Goal_ExecuteAction`, cas « détruire la cible », route vers `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` (`arg_4` = 0) pour une cible aérienne et vers le nœud d'attaque au sol pour une cible sol ; voir `AI_TICK_CALL_GRAPH.md`. Pour l'air, rien d'autre que le bonus de score ne force le choix de la cible de mission.
 
 **À retenir pour l'implémentation** :
 - Un missile qui me vise **interrompt l'attaque** : plus de cible, pas de tir, pas de tournoi ce tick. La réaction défensive (leurres, virage) n'est pas dans cette fonction ; elle est à retrouver (lecteurs de `+0x281` et de `+0x27F == 2`).

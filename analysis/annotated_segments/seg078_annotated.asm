@@ -1049,7 +1049,7 @@ loc_381E5:				; DATA XREF: seg339:1B58o seg339:1C5Ao ...
 ; composant.
 ; ==============================================================================================
 Debris_GetSubpartAttrib	proc far		; CODE XREF: seg030:0239P
-					; HUD_RenderReticleByWeaponType+5AP ...
+					; WeaponStation_TestTargetLock+5AP ...
 
 arg_0		= word ptr  6
 
@@ -1072,7 +1072,7 @@ Debris_GetSubpartAttrib	endp
 ; far,14L — accesseur trivial d'un champ (+0x29) : getter d'un flag d'état de débris.
 ; ==============================================================================================
 Debris_GetStateFlag	proc far		; CODE XREF: seg032:014FP
-					; HUD_RenderReticleByWeaponType+52P ...
+					; WeaponStation_TestTargetLock+52P ...
 
 arg_0		= word ptr  6
 

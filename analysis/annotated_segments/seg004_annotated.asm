@@ -319,7 +319,7 @@ loc_83F0:				; CODE XREF: AI_TopLevelThink+67j AI_TopLevelThink+73j ...
 		push	bx
 		nop
 		push	cs
-		call	near ptr AI_EscortPriorityReactionHandler_9A77
+		call	near ptr AI_MissileEvasionReaction_9A77
 		add	sp, 4
 		mov	[bp+var_9], al
 		jmp	short loc_8431
@@ -1436,7 +1436,7 @@ loc_8DFE:				; CODE XREF: AI_BehaviorSelector+C9j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_ManeuverSolution_91DF
+		call	near ptr AI_ComputeFireSolutionQuality_91DF
 		add	sp, 4
 		mov	si, ax
 		les	bx, [bp+arg_0]
@@ -1539,7 +1539,7 @@ loc_8EE3:
 		pop	bx
 		push	word ptr es:[bx+16h]
 		push	ax
-		call	HUD_RenderReticleByWeaponType
+		call	WeaponStation_TestTargetLock
 		add	sp, 6
 		mov	[bp+var_C], ax
 		cmp	[bp+var_C], 0
@@ -1611,7 +1611,7 @@ loc_8FC7:				; CODE XREF: AI_BehaviorSelector+291j
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	AI_Sensor_TargetVelocityCache
+		call	AI_Sensor_WeaponVelocityCache
 		add	sp, 0Ah
 		lea	ax, [bp+var_24]
 		push	ax
@@ -1891,18 +1891,23 @@ AI_RadarScanTarget	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,559L — vérifie l'existence d'une cible (+0x287), calcule les vecteurs relatifs
-; position/vitesse : grosse fonction de solution de manœuvre/guidage (même famille que
-; sub_6977/sub_702A du seg003), à approfondir en détail. DECOUVERTE COMPLEMENTAIRE (Remi, en
-; explorant seg004) : dans un bloc switch interne (cases 0x100 et 0x1, autour de
-; loc_9586/loc_95DD), compare une distance/valeur (var_8) contre QUATRE SEUILS DERIVES DES
-; CONSTANTES NUMS (dword_72020, dword_72024, dword_72028, dword_7202C - decodees empiriquement
-; dans INTEL.IFF, voir §10.1 AI_SYSTEM.md), chacun multiplie par 256 (mise a l'echelle 24.8),
-; pour produire une classification discrete (si, borne entre 0 et 10) - probable
-; classification par PALIER DE DISTANCE utilisant les constantes partagees NUMS comme seuils
-; de bande.
+; far, 559L, LUE INTEGRALEMENT (2026-09-20). CALCULE LA QUALITE DE SOLUTION DE TIR 'si'
+; (entier 0 a 10) contre la cible aerienne (entite+0x287) avec l'arme choisie (masque
+; entite+0x1A2). Rangee par AI_BehaviorSelector_8D30 dans entite+0x1A0. Sans cible ou cible a
+; 90 degres ou plus du nez : 0. Base : 10 - (ecart_nez*10)/35. Aspect croise (cap de la cible
+; entre 50 et 130 degres de la direction vers elle) : -4. CANON (0x800) : 0 si d >=
+; dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur
+; de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le
+; vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_AngleBetweenVectors_552E1,
+; AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ;
+; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ;
+; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis
+; -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100,
+; 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d <
+; dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000)
+; -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10].
 ; ==============================================================================================
-AI_ManeuverSolution_91DF	proc far		; CODE XREF: AI_BehaviorSelector+FCp
+AI_ComputeFireSolutionQuality_91DF	proc far		; CODE XREF: AI_BehaviorSelector+FCp
 
 var_E8		= word ptr -0E8h
 var_DC		= dword	ptr -0DCh
@@ -1976,7 +1981,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_964B
 ; ���������������������������������������������������������������������������
 
-loc_91F8:				; CODE XREF: AI_ManeuverSolution_91DF+14j
+loc_91F8:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+14j
 		mov	di, es:[bx+287h]
 		add	di, 12h
 		mov	ax, es:[bx+102h]
@@ -2055,7 +2060,7 @@ loc_92CF:
 		jmp	loc_963B
 ; ���������������������������������������������������������������������������
 
-loc_92DA:				; CODE XREF: AI_ManeuverSolution_91DF+F6j
+loc_92DA:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+F6j
 		mov	ax, di
 		imul	ax, 0Ah
 		mov	bx, 23h	; '#'
@@ -2072,8 +2077,8 @@ loc_92E3:
 		jge	short loc_92FD
 		mov	[bp+var_D], 1
 
-loc_92FD:				; CODE XREF: AI_ManeuverSolution_91DF+111j
-					; AI_ManeuverSolution_91DF+118j
+loc_92FD:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+111j
+					; AI_ComputeFireSolutionQuality_91DF+118j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+1A2h], 800h
 		jz	short loc_9315
@@ -2082,8 +2087,8 @@ loc_92FD:				; CODE XREF: AI_ManeuverSolution_91DF+111j
 		jmp	loc_9558
 ; ���������������������������������������������������������������������������
 
-loc_9315:				; CODE XREF: AI_ManeuverSolution_91DF+128j
-					; AI_ManeuverSolution_91DF+131j
+loc_9315:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+128j
+					; AI_ComputeFireSolutionQuality_91DF+131j
 		mov	eax, [bp+var_8]
 		cmp	eax, dword_7201C
 		jl	short loc_9325
@@ -2091,16 +2096,16 @@ loc_9315:				; CODE XREF: AI_ManeuverSolution_91DF+128j
 		jmp	short loc_9327
 ; ���������������������������������������������������������������������������
 
-loc_9325:				; CODE XREF: AI_ManeuverSolution_91DF+13Fj
+loc_9325:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+13Fj
 		xor	ax, ax
 
-loc_9327:				; CODE XREF: AI_ManeuverSolution_91DF+144j
+loc_9327:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+144j
 		or	al, al
 		jz	short loc_932E
 		jmp	loc_9639	; default
 ; ���������������������������������������������������������������������������
 
-loc_932E:				; CODE XREF: AI_ManeuverSolution_91DF+14Aj
+loc_932E:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+14Aj
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+287h]
 		push	word ptr [bp+arg_0+2]
@@ -2108,7 +2113,7 @@ loc_932E:				; CODE XREF: AI_ManeuverSolution_91DF+14Aj
 		push	ss
 		lea	ax, [bp+var_E8]
 		push	ax
-		call	AI_Sensor_TargetVelocityCache
+		call	AI_Sensor_WeaponVelocityCache
 		add	sp, 0Ah
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2187,10 +2192,10 @@ loc_93E2:
 		jmp	short loc_9401
 ; ���������������������������������������������������������������������������
 
-loc_93FF:				; CODE XREF: AI_ManeuverSolution_91DF+219j
+loc_93FF:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+219j
 		xor	ax, ax
 
-loc_9401:				; CODE XREF: AI_ManeuverSolution_91DF+21Ej
+loc_9401:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+21Ej
 		or	al, al
 		jz	short loc_9446
 		les	bx, [bp+arg_0]
@@ -2215,11 +2220,11 @@ loc_9401:				; CODE XREF: AI_ManeuverSolution_91DF+21Ej
 		jmp	short loc_9452
 ; ���������������������������������������������������������������������������
 
-loc_9446:				; CODE XREF: AI_ManeuverSolution_91DF+224j
+loc_9446:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+224j
 		mov	[bp+var_80], 5A00h
 		mov	eax, [bp+var_80]
 
-loc_9452:				; CODE XREF: AI_ManeuverSolution_91DF+265j
+loc_9452:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+265j
 		mov	[bp+var_70], eax
 		mov	eax, [bp+var_5C]
 		sub	eax, [bp+var_70]
@@ -2231,10 +2236,10 @@ loc_9452:				; CODE XREF: AI_ManeuverSolution_91DF+265j
 		jmp	short loc_9477
 ; ���������������������������������������������������������������������������
 
-loc_9475:				; CODE XREF: AI_ManeuverSolution_91DF+28Fj
+loc_9475:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+28Fj
 		xor	ax, ax
 
-loc_9477:				; CODE XREF: AI_ManeuverSolution_91DF+294j
+loc_9477:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+294j
 		or	al, al
 		jz	short loc_94CE
 		mov	eax, [bp+var_84]
@@ -2262,7 +2267,7 @@ loc_94C8:
 		jmp	short loc_9549
 ; ���������������������������������������������������������������������������
 
-loc_94CE:				; CODE XREF: AI_ManeuverSolution_91DF+29Aj
+loc_94CE:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+29Aj
 		mov	eax, [bp+var_70]
 
 loc_94D2:
@@ -2294,30 +2299,30 @@ loc_94D5:
 		mov	[bp+var_C4], eax
 		mov	si, word ptr [bp+var_C4+1]
 
-loc_9549:				; CODE XREF: AI_ManeuverSolution_91DF+2EDj
+loc_9549:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+2EDj
 		cmp	[bp+var_D], 0
 		jnz	short loc_9552
 		jmp	loc_963B
 ; ���������������������������������������������������������������������������
 
-loc_9552:				; CODE XREF: AI_ManeuverSolution_91DF+36Ej
+loc_9552:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+36Ej
 		sub	si, 4
 		jmp	loc_963B
 ; ���������������������������������������������������������������������������
 
-loc_9558:				; CODE XREF: AI_ManeuverSolution_91DF+133j
+loc_9558:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+133j
 		cmp	[bp+var_D], 0
 		jz	short loc_9561
 		sub	si, 4
 
-loc_9561:				; CODE XREF: AI_ManeuverSolution_91DF+37Dj
+loc_9561:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+37Dj
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+1A2h]
 		mov	[bp+var_2], ax
 		mov	cx, 5		; switch 5 cases
 		mov	bx, offset word_9651
 
-loc_9572:				; CODE XREF: AI_ManeuverSolution_91DF+39Ej
+loc_9572:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+39Ej
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_2]
 		jz	short loc_9582
@@ -2326,7 +2331,7 @@ loc_9572:				; CODE XREF: AI_ManeuverSolution_91DF+39Ej
 		jmp	loc_9639	; default
 ; ���������������������������������������������������������������������������
 
-loc_9582:				; CODE XREF: AI_ManeuverSolution_91DF+399j
+loc_9582:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+399j
 		jmp	word ptr cs:[bx+0Ah] ; switch jump
 
 loc_9586:				; DATA XREF: seg004:151Bo
@@ -2341,16 +2346,16 @@ loc_9586:				; DATA XREF: seg004:151Bo
 		jmp	short loc_95A7
 ; ���������������������������������������������������������������������������
 
-loc_95A5:				; CODE XREF: AI_ManeuverSolution_91DF+3BFj
+loc_95A5:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3BFj
 		xor	ax, ax
 
-loc_95A7:				; CODE XREF: AI_ManeuverSolution_91DF+3C4j
+loc_95A7:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3C4j
 		or	al, al
 		jz	short loc_95AE
 		jmp	loc_962F
 ; ���������������������������������������������������������������������������
 
-loc_95AE:				; CODE XREF: AI_ManeuverSolution_91DF+3CAj
+loc_95AE:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3CAj
 		mov	eax, dword_72020
 		mov	[bp+var_24], eax
 		shl	eax, 8
@@ -2366,10 +2371,10 @@ loc_95C6:
 		jmp	short loc_95CF
 ; ���������������������������������������������������������������������������
 
-loc_95CD:				; CODE XREF: AI_ManeuverSolution_91DF:loc_95C6j
+loc_95CD:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF:loc_95C6j
 		xor	ax, ax
 
-loc_95CF:				; CODE XREF: AI_ManeuverSolution_91DF+3ECj
+loc_95CF:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3ECj
 		or	al, al
 		jz	short loc_963B
 		cmp	[bp+var_D], 0
@@ -2379,7 +2384,7 @@ loc_95CF:				; CODE XREF: AI_ManeuverSolution_91DF+3ECj
 		jmp	short loc_9634
 ; ���������������������������������������������������������������������������
 
-loc_95DD:				; CODE XREF: AI_ManeuverSolution_91DF:loc_9582j
+loc_95DD:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF:loc_9582j
 					; DATA XREF: seg004:151Bo
 		mov	eax, dword_7202C ; case	0x1
 
@@ -2394,16 +2399,16 @@ loc_95E1:
 		jmp	short loc_95FE
 ; ���������������������������������������������������������������������������
 
-loc_95FC:				; CODE XREF: AI_ManeuverSolution_91DF+416j
+loc_95FC:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+416j
 		xor	ax, ax
 
-loc_95FE:				; CODE XREF: AI_ManeuverSolution_91DF+41Bj
+loc_95FE:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+41Bj
 		or	al, al
 		jz	short loc_9604
 		jmp	short loc_962F
 ; ���������������������������������������������������������������������������
 
-loc_9604:				; CODE XREF: AI_ManeuverSolution_91DF+421j
+loc_9604:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+421j
 		mov	eax, dword_72028
 		mov	[bp+var_34], eax
 		shl	eax, 8
@@ -2415,55 +2420,55 @@ loc_9604:				; CODE XREF: AI_ManeuverSolution_91DF+421j
 		jmp	short loc_9625
 ; ���������������������������������������������������������������������������
 
-loc_9623:				; CODE XREF: AI_ManeuverSolution_91DF+43Dj
+loc_9623:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+43Dj
 		xor	ax, ax
 
-loc_9625:				; CODE XREF: AI_ManeuverSolution_91DF+442j
+loc_9625:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+442j
 		or	al, al
 		jz	short loc_963B
 		cmp	[bp+var_D], 0
 		jz	short loc_9634
 
-loc_962F:				; CODE XREF: AI_ManeuverSolution_91DF+3CCj
-					; AI_ManeuverSolution_91DF+3FAj ...
+loc_962F:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3CCj
+					; AI_ComputeFireSolutionQuality_91DF+3FAj ...
 		sub	si, 0Ah
 		jmp	short loc_963B
 ; ���������������������������������������������������������������������������
 
-loc_9634:				; CODE XREF: AI_ManeuverSolution_91DF+3F8j
-					; AI_ManeuverSolution_91DF+3FCj ...
+loc_9634:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+3F8j
+					; AI_ComputeFireSolutionQuality_91DF+3FCj ...
 		sub	si, 3
 		jmp	short loc_963B
 ; ���������������������������������������������������������������������������
 
-loc_9639:				; CODE XREF: AI_ManeuverSolution_91DF+14Cj
-					; AI_ManeuverSolution_91DF+3A0j
+loc_9639:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+14Cj
+					; AI_ComputeFireSolutionQuality_91DF+3A0j
 		xor	si, si		; default
 
-loc_963B:				; CODE XREF: AI_ManeuverSolution_91DF+F8j
-					; AI_ManeuverSolution_91DF+370j ...
+loc_963B:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+F8j
+					; AI_ComputeFireSolutionQuality_91DF+370j ...
 		cmp	si, 0Ah
 		jle	short loc_9645
 		mov	si, 0Ah
 		jmp	short loc_964B
 ; ���������������������������������������������������������������������������
 
-loc_9645:				; CODE XREF: AI_ManeuverSolution_91DF+45Fj
+loc_9645:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+45Fj
 		or	si, si
 		jge	short loc_964B
 		xor	si, si
 
-loc_964B:				; CODE XREF: AI_ManeuverSolution_91DF+16j
-					; AI_ManeuverSolution_91DF+464j ...
+loc_964B:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+16j
+					; AI_ComputeFireSolutionQuality_91DF+464j ...
 		mov	ax, si
 		pop	di
 		pop	si
 		leave
 		retf
-AI_ManeuverSolution_91DF	endp
+AI_ComputeFireSolutionQuality_91DF	endp
 
 ; ���������������������������������������������������������������������������
-word_9651	dw	1,     2,     3,  100h ; DATA XREF: AI_ManeuverSolution_91DF+390o
+word_9651	dw	1,     2,     3,  100h ; DATA XREF: AI_ComputeFireSolutionQuality_91DF+390o
 		dw   700h		; value	table for switch statement
 		dw offset loc_95DD	; jump table for switch	statement
 		dw offset loc_95DD
@@ -2786,7 +2791,7 @@ AI_SelectWeaponMask_9665	endp
 ; aeronef vs sol, ou ami vs ennemi - le sens precis des bits de arg_4 reste a determiner si
 ; necessaire).
 ; ==============================================================================================
-AI_ClassifyDistanceBand_98BD	proc far		; CODE XREF: AI_EscortPriorityReactionHandler_9A77+11Dp
+AI_ClassifyDistanceBand_98BD	proc far		; CODE XREF: AI_MissileEvasionReaction_9A77+11Dp
 
 var_24		= dword	ptr -24h
 var_20		= dword	ptr -20h
@@ -2910,7 +2915,7 @@ AI_ClassifyDistanceBand_98BD	endp
 ; d'un paramètre de cible (type ou distance).
 ; ==============================================================================================
 AI_EvalTargetAttribute	proc far		; CODE XREF: AI_QueryTargetField4B+29p
-					; AI_EscortPriorityReactionHandler_9A77+170p
+					; AI_MissileEvasionReaction_9A77+170p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -3029,17 +3034,30 @@ AI_QueryTargetField4B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,289L — (cluster IA, appelée par de nombreuses fonctions déjà vues comme
-; sub_50AD/sub_75A9) — candidate pour une fonction de calcul géométrique/guidage partagée, à
-; approfondir. LUE PARTIELLEMENT (debut, a la demande de Remi pour resoudre +0x281). CONFIRME
-; : +0x281 est une reference liee au systeme D'ESCORTE - son objet cible a un champ +0x55
-; compare a entite+0x102 (le lien standard), et entite+0x27F==2 (etat 'escorte terminee', deja
-; croise dans Goal_ActiveWingmanEngagement_878F) declenche l'EFFACEMENT de cette reference
-; (SetReference vers null) et de entite+0x108. Role precis : probablement 'reference vers le
-; leader/coequipier actuellement escorte', validee et nettoyee automatiquement a la fin de la
-; relation d'escorte.
+; far, 289L, LUE INTEGRALEMENT (2026-09-20). REACTION D'ESQUIVE D'UN MISSILE QUI ME VISE
+; (ancien nom 'AI_EscortPriorityReactionHandler' FAUX : +0x281 n'est pas une reference
+; d'escorte mais la menace missile posee par Targeting_AcquireBestThreat, et +0x27F==2 l'etat
+; 'missile en approche'). Appelee en tete de
+; AI_BehaviorStateMachine_WeightedOptionSelector_9D05, dans sa branche sans cible aerienne, et
+; par AI_TopLevelThink. Renvoie 1 si elle a agi. (1) Si entite+0x281 est nul ou si le champ
+; +0x55 du missile n'est plus mon noeud, ET +0x27F==2 : remet +0x27F et +0x108 a 0, vide
+; +0x281 (SetReference) et renvoie 0. Sinon, elle n'agit que si +0x27F==2 et +0x281 non nul.
+; (2) Vecteur vers le missile ; composante verticale remplacee selon mon altitude (+0x1A du
+; noeud) comparee a dword_7203D : altitude <= seuil -> 2*seuil - altitude (monter), sinon
+; seuil - altitude (descendre). (3) Bande de distance du missile par
+; AI_ClassifyDistanceBand(entite, type d'arme du missile +0x4B) : 1 (proche) et 2 (moyen) : si
+; le lanceur du missile (vtable+0x38) est le joueur et que mon camp (+0x50) vaut 1 (ami) :
+; Radio_PlayMessage 0x0E vers le joueur (le missile vient du joueur) ; puis
+; AI_EvalTargetAttribute. Bande 1 : composante verticale annulee puis manoeuvre
+; perpendiculaire ; bande 2 : perpendiculaire en gardant l'altitude ; perpendiculaire =
+; Vec_NegateSwapPair puis, si Angle_DeltaNormalized_A avec mon cap depasse 90 degres,
+; inversion du signe (on tourne du cote qui demande le moins de virage). Bande 3 (loin) : pose
+; +0x108=1 et inverse les 3 composantes = FUIR le missile. Bande 0 : renvoie 0. (4)
+; AI_GuidanceCmd_FromOwnPos(entite, vecteur, 10) ; puis AI_ThrottleCmd_HUD avec la vitesse
+; maximale (avion +0xB, +0x80) si le guidage renvoie non nul, sinon la vitesse de croisiere
+; (+0x84) ; renvoie 1.
 ; ==============================================================================================
-AI_EscortPriorityReactionHandler_9A77	proc far		; CODE XREF: AI_TopLevelThink+2CEp
+AI_MissileEvasionReaction_9A77	proc far		; CODE XREF: AI_TopLevelThink+2CEp
 					; AI_BehaviorStateMachine_WeightedOptionSelector_9D05+2Ap	...
 
 var_34		= dword	ptr -34h
@@ -3071,7 +3089,7 @@ arg_0		= dword	ptr  6
 		cmp	ax, es:[bx+102h]
 		jz	short loc_9ACC
 
-loc_9A9C:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+11j
+loc_9A9C:				; CODE XREF: AI_MissileEvasionReaction_9A77+11j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 2
 		jnz	short loc_9ACC
@@ -3085,12 +3103,12 @@ loc_9A9C:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+11j
 		call	SetReference
 		add	sp, 6
 
-loc_9AC7:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+5Ej AI_EscortPriorityReactionHandler_9A77+66j ...
+loc_9AC7:				; CODE XREF: AI_MissileEvasionReaction_9A77+5Ej AI_MissileEvasionReaction_9A77+66j ...
 		mov	al, 0
 		jmp	loc_9D01
 ; ���������������������������������������������������������������������������
 
-loc_9ACC:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+23j AI_EscortPriorityReactionHandler_9A77+2Ej
+loc_9ACC:				; CODE XREF: AI_MissileEvasionReaction_9A77+23j AI_MissileEvasionReaction_9A77+2Ej
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 2
 		jnz	short loc_9AC7
@@ -3118,10 +3136,10 @@ loc_9ACC:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+23j AI_EscortPr
 		jmp	short loc_9B2B
 ; ���������������������������������������������������������������������������
 
-loc_9B29:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+ABj
+loc_9B29:				; CODE XREF: AI_MissileEvasionReaction_9A77+ABj
 		xor	ax, ax
 
-loc_9B2B:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+B0j
+loc_9B2B:				; CODE XREF: AI_MissileEvasionReaction_9A77+B0j
 		or	al, al
 		jz	short loc_9B56
 		mov	eax, dword_7203D
@@ -3137,7 +3155,7 @@ loc_9B2B:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+B0j
 		jmp	short loc_9B70
 ; ���������������������������������������������������������������������������
 
-loc_9B56:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+B6j
+loc_9B56:				; CODE XREF: AI_MissileEvasionReaction_9A77+B6j
 		les	bx, [bp+arg_0]
 		mov	si, es:[bx+102h]
 		add	si, 1Ah
@@ -3146,7 +3164,7 @@ loc_9B56:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+B6j
 		mov	[bp+var_14], eax
 		mov	[bp+var_18], eax
 
-loc_9B70:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+DDj
+loc_9B70:				; CODE XREF: AI_MissileEvasionReaction_9A77+DDj
 		mov	[bp+var_2C], eax
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+281h]
@@ -3168,7 +3186,7 @@ loc_9B70:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+DDj
 		cmp	si, 2
 		jnz	short loc_9BED
 
-loc_9BA6:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+128j
+loc_9BA6:				; CODE XREF: AI_MissileEvasionReaction_9A77+128j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+281h]
 		mov	bx, es:[bx+281h]
@@ -3192,15 +3210,15 @@ loc_9BC2:
 		call	Radio_PlayMessage
 		add	sp, 0Ah
 
-loc_9BE1:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+146j
-					; AI_EscortPriorityReactionHandler_9A77+154j
+loc_9BE1:				; CODE XREF: AI_MissileEvasionReaction_9A77+146j
+					; AI_MissileEvasionReaction_9A77+154j
 		push	di
 		push	large [bp+arg_0]
 		push	cs
 		call	near ptr AI_EvalTargetAttribute
 		add	sp, 6
 
-loc_9BED:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+12Dj
+loc_9BED:				; CODE XREF: AI_MissileEvasionReaction_9A77+12Dj
 		mov	ax, si
 		cmp	ax, 1
 		jz	short loc_9C04
@@ -3211,16 +3229,16 @@ loc_9BED:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+12Dj
 		jmp	loc_9C8F
 ; ���������������������������������������������������������������������������
 
-loc_9C01:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+185j
+loc_9C01:				; CODE XREF: AI_MissileEvasionReaction_9A77+185j
 		jmp	loc_9AC7
 ; ���������������������������������������������������������������������������
 
-loc_9C04:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+17Bj
+loc_9C04:				; CODE XREF: AI_MissileEvasionReaction_9A77+17Bj
 		mov	[bp+var_1C], 0
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_2C], eax
 
-loc_9C14:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+180j
+loc_9C14:				; CODE XREF: AI_MissileEvasionReaction_9A77+180j
 		push	1
 		lea	ax, [bp+var_34]
 		push	ax
@@ -3246,7 +3264,7 @@ loc_9C14:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+180j
 		jge	short loc_9C56
 		neg	eax
 
-loc_9C56:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1DAj
+loc_9C56:				; CODE XREF: AI_MissileEvasionReaction_9A77+1DAj
 		mov	[bp+var_24], eax
 		mov	eax, [bp+var_24]
 		mov	[bp+var_28], eax
@@ -3256,10 +3274,10 @@ loc_9C56:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1DAj
 		jmp	short loc_9C73
 ; ���������������������������������������������������������������������������
 
-loc_9C71:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1F3j
+loc_9C71:				; CODE XREF: AI_MissileEvasionReaction_9A77+1F3j
 		xor	ax, ax
 
-loc_9C73:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1F8j
+loc_9C73:				; CODE XREF: AI_MissileEvasionReaction_9A77+1F8j
 		or	al, al
 		jz	short loc_9CBE
 		mov	eax, [bp+var_34]
@@ -3271,7 +3289,7 @@ loc_9C73:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1F8j
 		jmp	short loc_9CBE
 ; ���������������������������������������������������������������������������
 
-loc_9C8F:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+187j
+loc_9C8F:				; CODE XREF: AI_MissileEvasionReaction_9A77+187j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+108h], 1
 		mov	eax, [bp+var_34]
@@ -3288,8 +3306,8 @@ loc_9C8F:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+187j
 		jmp	loc_9AC7
 ; ���������������������������������������������������������������������������
 
-loc_9CBE:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1FEj
-					; AI_EscortPriorityReactionHandler_9A77+216j ...
+loc_9CBE:				; CODE XREF: AI_MissileEvasionReaction_9A77+1FEj
+					; AI_MissileEvasionReaction_9A77+216j ...
 		push	large 0Ah
 		lea	ax, [bp+var_34]
 		push	ax
@@ -3310,24 +3328,24 @@ loc_9CD8:
 		jmp	short loc_9CF1
 ; ���������������������������������������������������������������������������
 
-loc_9CE4:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77:loc_9CD3j
+loc_9CE4:				; CODE XREF: AI_MissileEvasionReaction_9A77:loc_9CD3j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		movsx	eax, word ptr [bx+84h]
 
-loc_9CF1:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+26Bj
+loc_9CF1:				; CODE XREF: AI_MissileEvasionReaction_9A77+26Bj
 		push	eax
 		push	large [bp+arg_0]
 		call	AI_ThrottleCmd_HUD
 		add	sp, 8
 		mov	al, 1
 
-loc_9D01:				; CODE XREF: AI_EscortPriorityReactionHandler_9A77+52j
+loc_9D01:				; CODE XREF: AI_MissileEvasionReaction_9A77+52j
 		pop	di
 		pop	si
 		leave
 		retf
-AI_EscortPriorityReactionHandler_9A77	endp
+AI_MissileEvasionReaction_9A77	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3411,7 +3429,7 @@ arg_4		= byte ptr  0Ah
 		mov	[bp+var_4], eax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_EscortPriorityReactionHandler_9A77
+		call	near ptr AI_MissileEvasionReaction_9A77
 		add	sp, 4
 		or	al, al
 		jz	short loc_9D3E
@@ -3507,7 +3525,7 @@ loc_9DDA:				; CODE XREF: AI_BehaviorStateMachine_WeightedOptionSelector_9D05+50
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr AI_EscortPriorityReactionHandler_9A77
+		call	near ptr AI_MissileEvasionReaction_9A77
 		add	sp, 4
 		jmp	loc_9FFE
 ; ���������������������������������������������������������������������������

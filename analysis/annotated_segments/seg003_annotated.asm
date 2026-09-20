@@ -33,7 +33,7 @@ loc_4F85:				; DATA XREF: seg339:0118o seg339:0374o ...
 ; calcul 'angle entre deux directions', pas juste un produit scalaire comme suppose
 ; initialement.
 ; ==============================================================================================
-Angle_DeltaNormalized_A	proc far		; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1CBP
+Angle_DeltaNormalized_A	proc far		; CODE XREF: AI_MissileEvasionReaction_9A77+1CBP
 					; Goal_FollowWaypoints+1CEP ...
 
 var_34		= dword	ptr -34h
@@ -178,7 +178,7 @@ Angle_DeltaNormalized_A	endp
 ; far,46L — échange/négate conditionnellement une paire de dwords (vecteur 2D ou nombre
 ; complexe) selon flag : inversion de direction.
 ; ==============================================================================================
-Vec_NegateSwapPair	proc far		; CODE XREF: AI_EscortPriorityReactionHandler_9A77+1A3P
+Vec_NegateSwapPair	proc far		; CODE XREF: AI_MissileEvasionReaction_9A77+1A3P
 					; Formation_GuidanceSolution+69CP
 
 var_6		= word ptr -6
@@ -2445,7 +2445,7 @@ AI_ThrottleController	endp
 ; (+0x75 bit0).
 ; ==============================================================================================
 AI_ThrottleCmd_HUD	proc far		; CODE XREF: AI_SpeedManeuverDecision+5Cp
-					; AI_EscortPriorityReactionHandler_9A77+280P ...
+					; AI_MissileEvasionReaction_9A77+280P ...
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -2607,13 +2607,19 @@ loc_6456:				; CODE XREF: seg003:14CCj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,189L — capteur caché bit3 de +0x28D : récupère/cache la vitesse d'une cible (via
-; pointeur +0x104 → vtable[0x18], fallback sur globals dword_707E0/4/8) dans dword_72041/45/49
-; (globals 'vitesse cible courante'), option vitesse propre. Copie le résultat dans un buffer
-; de sortie (alloue via sub_658 si absent) : cache global de la vitesse de la cible
-; verrouillée.
+; far, 189L, LUE INTEGRALEMENT (2026-09-20). Ancien nom 'AI_Sensor_TargetVelocityCache' FAUX :
+; ce n'est PAS la vitesse de la cible mais le VECTEUR VITESSE DE MA PROPRE ARME (direction de
+; tir). Si le bit 3 de entite+0x28D n'est pas pose : remet a zero le cache global
+; (dword_72041/45/49), lit le point d'emport courant de entite+0x104 (index a +0, stride
+; 0x12), appelle vtable+0x18 de l'objet arme pour obtenir son vecteur vitesse initial (repli :
+; globals dword_707E0/4/8), le range dans le cache, le fait tourner avec
+; Math_ApplyRotationHelperB_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et
+; si tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D
+; (cache valide ; efface par AI_FireWeaponTrigger). Copie le resultat dans un tampon de sortie
+; (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer
+; l'erreur de visee du canon.
 ; ==============================================================================================
-AI_Sensor_TargetVelocityCache	proc far		; CODE XREF: AI_ManeuverSolution_Major+23p AI_InterceptDispatcher+A5p ...
+AI_Sensor_WeaponVelocityCache	proc far		; CODE XREF: AI_ManeuverSolution_Major+23p AI_InterceptDispatcher+A5p ...
 
 var_22		= dword	ptr -22h
 var_1E		= dword	ptr -1Eh
@@ -2644,7 +2650,7 @@ arg_8		= word ptr  0Eh
 		jmp	loc_65D7
 ; ���������������������������������������������������������������������������
 
-loc_648A:				; CODE XREF: AI_Sensor_TargetVelocityCache+1Cj
+loc_648A:				; CODE XREF: AI_Sensor_WeaponVelocityCache+1Cj
 		mov	[bp+var_4], 0
 		mov	eax, [bp+var_4]
 		mov	dword_72041, eax
@@ -2659,13 +2665,13 @@ loc_648A:				; CODE XREF: AI_Sensor_TargetVelocityCache+1Cj
 		jmp	loc_6584
 ; ���������������������������������������������������������������������������
 
-loc_64C1:				; CODE XREF: AI_Sensor_TargetVelocityCache+53j
+loc_64C1:				; CODE XREF: AI_Sensor_WeaponVelocityCache+53j
 		cmp	dword ptr es:[bx+104h],	0
 		jnz	short loc_64CD
 		jmp	loc_6584
 ; ���������������������������������������������������������������������������
 
-loc_64CD:				; CODE XREF: AI_Sensor_TargetVelocityCache+5Fj
+loc_64CD:				; CODE XREF: AI_Sensor_WeaponVelocityCache+5Fj
 		les	bx, es:[bx+104h]
 		mov	ax, es:[bx+16h]
 		mov	dx, es:[bx+14h]
@@ -2679,7 +2685,7 @@ loc_64CD:				; CODE XREF: AI_Sensor_TargetVelocityCache+5Fj
 		jmp	loc_6584
 ; ���������������������������������������������������������������������������
 
-loc_64F2:				; CODE XREF: AI_Sensor_TargetVelocityCache+84j
+loc_64F2:				; CODE XREF: AI_Sensor_WeaponVelocityCache+84j
 		mov	[bp+var_12], cx
 		mov	[bp+var_16], 0
 		les	bx, [bp+var_10]
@@ -2703,7 +2709,7 @@ loc_64F2:				; CODE XREF: AI_Sensor_TargetVelocityCache+84j
 		jmp	short loc_654D
 ; ���������������������������������������������������������������������������
 
-loc_6530:				; CODE XREF: AI_Sensor_TargetVelocityCache+9Cj
+loc_6530:				; CODE XREF: AI_Sensor_WeaponVelocityCache+9Cj
 		mov	eax, dword_707E0
 		mov	[bp+var_22], eax
 		mov	eax, dword_707E4
@@ -2713,7 +2719,7 @@ loc_6530:				; CODE XREF: AI_Sensor_TargetVelocityCache+9Cj
 		mov	dx, ss
 		lea	ax, [bp+var_22]
 
-loc_654D:				; CODE XREF: AI_Sensor_TargetVelocityCache+C5j
+loc_654D:				; CODE XREF: AI_Sensor_WeaponVelocityCache+C5j
 		mov	eax, [bp+var_22]
 		mov	dword_72041, eax
 		mov	eax, [bp+var_1E]
@@ -2731,7 +2737,7 @@ loc_654D:				; CODE XREF: AI_Sensor_TargetVelocityCache+C5j
 		call	Math_ApplyRotationHelperB_58828
 		add	sp, 4
 
-loc_6584:				; CODE XREF: AI_Sensor_TargetVelocityCache+55j AI_Sensor_TargetVelocityCache+61j ...
+loc_6584:				; CODE XREF: AI_Sensor_WeaponVelocityCache+55j AI_Sensor_WeaponVelocityCache+61j ...
 		mov	eax, dword_72041
 		or	eax, dword_72045
 		or	eax, dword_72049
@@ -2740,10 +2746,10 @@ loc_6584:				; CODE XREF: AI_Sensor_TargetVelocityCache+55j AI_Sensor_TargetVel
 		jmp	short loc_659B
 ; ���������������������������������������������������������������������������
 
-loc_6599:				; CODE XREF: AI_Sensor_TargetVelocityCache+129j
+loc_6599:				; CODE XREF: AI_Sensor_WeaponVelocityCache+129j
 		xor	ax, ax
 
-loc_659B:				; CODE XREF: AI_Sensor_TargetVelocityCache+12Ej
+loc_659B:				; CODE XREF: AI_Sensor_WeaponVelocityCache+12Ej
 		or	al, al
 		jz	short loc_65CE
 		les	bx, [bp+arg_4]
@@ -2761,11 +2767,11 @@ loc_659B:				; CODE XREF: AI_Sensor_TargetVelocityCache+12Ej
 		mov	eax, [si+8]
 		mov	dword_72049, eax
 
-loc_65CE:				; CODE XREF: AI_Sensor_TargetVelocityCache+134j
+loc_65CE:				; CODE XREF: AI_Sensor_WeaponVelocityCache+134j
 		les	bx, [bp+arg_4]
 		or	byte ptr es:[bx+28Dh], 8
 
-loc_65D7:				; CODE XREF: AI_Sensor_TargetVelocityCache+1Ej
+loc_65D7:				; CODE XREF: AI_Sensor_WeaponVelocityCache+1Ej
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_65E2
@@ -2773,13 +2779,13 @@ loc_65D7:				; CODE XREF: AI_Sensor_TargetVelocityCache+1Ej
 		jmp	short loc_65EC
 ; ���������������������������������������������������������������������������
 
-loc_65E2:				; CODE XREF: AI_Sensor_TargetVelocityCache+173j
+loc_65E2:				; CODE XREF: AI_Sensor_WeaponVelocityCache+173j
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_65EC:				; CODE XREF: AI_Sensor_TargetVelocityCache+177j
+loc_65EC:				; CODE XREF: AI_Sensor_WeaponVelocityCache+177j
 		or	ax, ax
 		jz	short loc_660B
 		mov	eax, dword_72041
@@ -2792,16 +2798,16 @@ loc_65EC:				; CODE XREF: AI_Sensor_TargetVelocityCache+177j
 		jmp	short loc_660D
 ; ���������������������������������������������������������������������������
 
-loc_660B:				; CODE XREF: AI_Sensor_TargetVelocityCache+185j
+loc_660B:				; CODE XREF: AI_Sensor_WeaponVelocityCache+185j
 		mov	ax, si
 
-loc_660D:				; CODE XREF: AI_Sensor_TargetVelocityCache+1A0j
+loc_660D:				; CODE XREF: AI_Sensor_WeaponVelocityCache+1A0j
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	si
 		leave
 		retf
-AI_Sensor_TargetVelocityCache	endp
+AI_Sensor_WeaponVelocityCache	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3342,7 +3348,7 @@ loc_698E:				; CODE XREF: AI_ManeuverSolution_Major+12j
 		lea	ax, [bp+var_C0]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_TargetVelocityCache
+		call	near ptr AI_Sensor_WeaponVelocityCache
 		add	sp, 0Ah
 		mov	si, di
 		add	si, 12h
@@ -3988,7 +3994,7 @@ arg_4		= word ptr  0Ah
 		lea	ax, [bp+var_2E]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_TargetVelocityCache
+		call	near ptr AI_Sensor_WeaponVelocityCache
 		add	sp, 0Ah
 		lea	ax, [bp+var_2E]
 		push	ax
@@ -4710,7 +4716,7 @@ AI_GuidanceSolution_Major	endp
 ; far,40L — récupère la position propre (vtable+0x3C, +0xC), l'utilise comme référence pour
 ; appeler sub_702A(cap,rate) : wrapper de guidage utilisant position courante.
 ; ==============================================================================================
-AI_GuidanceCmd_FromOwnPos	proc far		; CODE XREF: AI_EscortPriorityReactionHandler_9A77+252P
+AI_GuidanceCmd_FromOwnPos	proc far		; CODE XREF: AI_MissileEvasionReaction_9A77+252P
 					; seg008:27E9P	...
 
 var_C		= dword	ptr -0Ch
@@ -5832,9 +5838,15 @@ AI_TurnToBearingCmd	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,101L — normalise un angle (wraparound ±0xB400), stocke un compteur HUD (+0x23), compare
-; la magnitude à un taux×256 : contrôleur de roulis/tangage basé sur un delta d'angle et un
-; taux (variante de sub_7B20 utilisant le cap sub_58F4).
+; far, 101L, LUE INTEGRALEMENT (2026-09-20). Contrôleur de virage par ÉCART D'ANGLE : (entité,
+; &ecart de cap, zone morte en degrés). Remet à 0 le champ de commande partagé avec le joueur
+; (bloc d'état +0x23, l'entrée manche/souris), normalise l'écart à ±180 degrés (0xB400 =
+; 180.0, 0x16800 = 360.0 en 24.8), puis, SEULEMENT si l'écart absolu dépasse la zone morte
+; (taux*256), appelle JDYN_HighLevelPhysicsCalc(avion, sortie, écart) — le calcul physique de
+; haut niveau du modèle de vol qui transforme l'écart en valeur de manche —, la NÉGATE et
+; l'écrit dans +0x23. Renvoie 0 si elle a commandé, 1 sinon (dans la zone morte). L'IA ne fait
+; donc PAS de boucle d'altitude : elle commande le manche à partir d'un écart d'angle, avec
+; une zone morte.
 ; ==============================================================================================
 AI_PitchRollController_Heading	proc far		; CODE XREF: AI_TurnToHeadingCmd+35p seg008:1E5DP ...
 
@@ -6199,9 +6211,11 @@ AI_FlightControl_Cluster	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,38L — calcule l'écart entre un cap cible et le cap courant (sub_58F4), puis appelle
-; sub_7E56(delta, taux) : commande de roulis/tangage vers un cap à un taux donné, variante de
-; sub_7E18 basée sur le cap plutôt que le bearing.
+; far, 38L, LUE INTEGRALEMENT (2026-09-20). Exécution d'un virage vers un cap : prend (entité,
+; pointeur vers l'angle de cap voulu, taux), calcule ecart = cap voulu -
+; AI_Sensor_HeadingNormalized(entité) (cap courant normalisé) puis appelle
+; AI_PitchRollController_Heading(entité, &ecart, taux). Le 'taux' est la ZONE MORTE en degrés
+; (5 depuis AI_CombatDecision_Major en correction normale, 2 en commande neutre).
 ; ==============================================================================================
 AI_TurnToHeadingCmd	proc far		; CODE XREF: AI_ManeuverSolution_Major+52Dp
 					; AI_CombatDecision_Major+319p ...
