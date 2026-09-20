@@ -1259,9 +1259,12 @@ Pilot_SkillCheck_B1	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,54L — calcul continu (division mise à l'échelle, arrondi) d'un seuil comparé à la stat
-; pilote +0xB6 : variante non-aléatoire de test de compétence (seuil de réaction), 4e attribut
-; pilote.
+; far, 54L, LUE (2026-09-20). Test DETERMINISTE (sans hasard) : renvoie 1 si 2*si >=
+; entite+0xB6 (trait AA, air-air), sinon 0 (calcul : round((si*16*256/8)/256)). Utilise par
+; AI_BehaviorSelector_8D30 pour autoriser une rafale de canon : la qualite de solution de tir
+; 'si' doit valoir au moins AA/2. Plus AA est eleve, plus le pilote attend une bonne solution
+; avant de tirer ; un pilote faible (AA bas) tire des qu'il a une solution mediocre (si >= 2
+; exige par ailleurs).
 ; ==============================================================================================
 Pilot_ReactionThreshold_B6	proc far		; CODE XREF: AI_BehaviorSelector+145p
 
@@ -1420,7 +1423,7 @@ loc_8DFE:				; CODE XREF: AI_BehaviorSelector+C9j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_Cluster_9665
+		call	near ptr AI_SelectWeaponMask_9665
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	es:[bx+1A2h], ax
@@ -2473,9 +2476,21 @@ word_9651	dw	1,     2,     3,  100h ; DATA XREF: AI_ManeuverSolution_91DF+390o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,277L — (même cluster IA, appelé en aval de sub_814C) — à approfondir.
+; far, 277L, LUE INTEGRALEMENT (2026-09-20). CHOIX DE L'ARME contre la cible aerienne
+; (entite+0x287) ; renvoie un MASQUE DE TYPE D'ARME (bit = weapon_id - 1), range par
+; AI_BehaviorSelector_8D30 dans entite+0x1A2. 0 = aucune arme. Sans cible : 0. Calcule le
+; vecteur vers la cible et la distance d ; si le bit 0 de entite+0x28B est pose (defaut NUMS),
+; teste par WeaponStation_FindLoadedCompatible les masques 1 (AIM-9J), 3 (AIM-9J/9M) et 0x700
+; (AIM-120/SA-2/SA-6). Deux angles via Targeting_ComputeBearingElevation : di = ecart entre
+; mon nez et la cible ; si = ecart entre le cap de la cible et la direction vers elle ;
+; drapeau 'aspect croise' = 40 < si < 140. Cible = joueur, di < 30, si < 30 et d < dword_7202C
+; (17700) : SetReference16(0x523A, mon noeud) (reference globale 'un IA est dans les six
+; heures du joueur', role exact non lu). Si di >= 90 : 0. Sinon, dans l'ordre : d < 1800
+; (dword_7201C) et canon (0x800) charge -> 0x800 ; d > dword_72020 (4000) et missile longue
+; portee (0x700) -> 0x700 ; sinon mask 3 charge et d < dword_7202C (17700) -> 1 si aspect
+; croise ET AIM-9J charge, sinon 3 ; sinon 0.
 ; ==============================================================================================
-AI_Cluster_9665	proc far		; CODE XREF: AI_BehaviorSelector+D4p
+AI_SelectWeaponMask_9665	proc far		; CODE XREF: AI_BehaviorSelector+D4p
 
 var_48		= dword	ptr -48h
 var_44		= dword	ptr -44h
@@ -2513,7 +2528,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_98B6
 ; ���������������������������������������������������������������������������
 
-loc_9680:				; CODE XREF: AI_Cluster_9665+16j
+loc_9680:				; CODE XREF: AI_SelectWeaponMask_9665+16j
 		mov	si, es:[bx+287h]
 		add	si, 12h
 		mov	di, es:[bx+102h]
@@ -2568,7 +2583,7 @@ loc_96D4:
 		add	sp, 6
 		mov	[bp+var_D], al
 
-loc_972F:				; CODE XREF: AI_Cluster_9665+88j
+loc_972F:				; CODE XREF: AI_SelectWeaponMask_9665+88j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+287h]
 		mov	bx, es:[bx+287h]
@@ -2632,10 +2647,10 @@ loc_97D3:
 		jmp	short loc_97DA
 ; ���������������������������������������������������������������������������
 
-loc_97D8:				; CODE XREF: AI_Cluster_9665+16Cj
+loc_97D8:				; CODE XREF: AI_SelectWeaponMask_9665+16Cj
 		xor	ax, ax
 
-loc_97DA:				; CODE XREF: AI_Cluster_9665+171j
+loc_97DA:				; CODE XREF: AI_SelectWeaponMask_9665+171j
 		or	al, al
 		jz	short loc_97F5
 		les	bx, [bp+arg_0]
@@ -2646,22 +2661,22 @@ loc_97DA:				; CODE XREF: AI_Cluster_9665+171j
 		call	SetReference16
 		add	sp, 4
 
-loc_97F5:				; CODE XREF: AI_Cluster_9665+148j
-					; AI_Cluster_9665+14Dj ...
+loc_97F5:				; CODE XREF: AI_SelectWeaponMask_9665+148j
+					; AI_SelectWeaponMask_9665+14Dj ...
 		cmp	di, 5Ah	; 'Z'
 		jl	short loc_97FD
 		jmp	loc_98B6
 ; ���������������������������������������������������������������������������
 
-loc_97FD:				; CODE XREF: AI_Cluster_9665+193j
+loc_97FD:				; CODE XREF: AI_SelectWeaponMask_9665+193j
 		cmp	si, 28h	; '('
 		jle	short loc_980C
 		cmp	si, 8Ch	; '�'
 		jge	short loc_980C
 		mov	[bp+var_E], 1
 
-loc_980C:				; CODE XREF: AI_Cluster_9665+19Bj
-					; AI_Cluster_9665+1A1j
+loc_980C:				; CODE XREF: AI_SelectWeaponMask_9665+19Bj
+					; AI_SelectWeaponMask_9665+1A1j
 		mov	eax, [bp+var_6]
 		cmp	eax, dword_7201C
 		jge	short loc_981C
@@ -2669,10 +2684,10 @@ loc_980C:				; CODE XREF: AI_Cluster_9665+19Bj
 		jmp	short loc_981E
 ; ���������������������������������������������������������������������������
 
-loc_981C:				; CODE XREF: AI_Cluster_9665+1B0j
+loc_981C:				; CODE XREF: AI_SelectWeaponMask_9665+1B0j
 		xor	ax, ax
 
-loc_981E:				; CODE XREF: AI_Cluster_9665+1B5j
+loc_981E:				; CODE XREF: AI_SelectWeaponMask_9665+1B5j
 		or	al, al
 		jz	short loc_9841
 		push	800h
@@ -2686,8 +2701,8 @@ loc_981E:				; CODE XREF: AI_Cluster_9665+1B5j
 		jmp	short loc_98B6
 ; ���������������������������������������������������������������������������
 
-loc_9841:				; CODE XREF: AI_Cluster_9665+1BBj
-					; AI_Cluster_9665+1D3j
+loc_9841:				; CODE XREF: AI_SelectWeaponMask_9665+1BBj
+					; AI_SelectWeaponMask_9665+1D3j
 		mov	eax, dword_72020
 		mov	[bp+var_24], eax
 		shl	eax, 8
@@ -2699,10 +2714,10 @@ loc_9841:				; CODE XREF: AI_Cluster_9665+1BBj
 		jmp	short loc_9862
 ; ���������������������������������������������������������������������������
 
-loc_9860:				; CODE XREF: AI_Cluster_9665+1F4j
+loc_9860:				; CODE XREF: AI_SelectWeaponMask_9665+1F4j
 		xor	ax, ax
 
-loc_9862:				; CODE XREF: AI_Cluster_9665+1F9j
+loc_9862:				; CODE XREF: AI_SelectWeaponMask_9665+1F9j
 		or	al, al
 		jz	short loc_9873
 		cmp	[bp+var_D], 0
@@ -2711,8 +2726,8 @@ loc_9862:				; CODE XREF: AI_Cluster_9665+1F9j
 		jmp	short loc_98B6
 ; ���������������������������������������������������������������������������
 
-loc_9873:				; CODE XREF: AI_Cluster_9665+1FFj
-					; AI_Cluster_9665+205j
+loc_9873:				; CODE XREF: AI_SelectWeaponMask_9665+1FFj
+					; AI_SelectWeaponMask_9665+205j
 		cmp	[bp+var_C], 0
 		jz	short loc_98B6
 		mov	eax, dword_7202C
@@ -2726,10 +2741,10 @@ loc_9873:				; CODE XREF: AI_Cluster_9665+1FFj
 		jmp	short loc_989A
 ; ���������������������������������������������������������������������������
 
-loc_9898:				; CODE XREF: AI_Cluster_9665+22Cj
+loc_9898:				; CODE XREF: AI_SelectWeaponMask_9665+22Cj
 		xor	ax, ax
 
-loc_989A:				; CODE XREF: AI_Cluster_9665+231j
+loc_989A:				; CODE XREF: AI_SelectWeaponMask_9665+231j
 		or	al, al
 		jz	short loc_98B6
 		cmp	[bp+var_E], 0
@@ -2740,18 +2755,18 @@ loc_989A:				; CODE XREF: AI_Cluster_9665+231j
 		jmp	short loc_98B6
 ; ���������������������������������������������������������������������������
 
-loc_98B1:				; CODE XREF: AI_Cluster_9665+23Dj
-					; AI_Cluster_9665+243j
+loc_98B1:				; CODE XREF: AI_SelectWeaponMask_9665+23Dj
+					; AI_SelectWeaponMask_9665+243j
 		mov	[bp+var_2], 3
 
-loc_98B6:				; CODE XREF: AI_Cluster_9665+18j
-					; AI_Cluster_9665+195j ...
+loc_98B6:				; CODE XREF: AI_SelectWeaponMask_9665+18j
+					; AI_SelectWeaponMask_9665+195j ...
 		mov	ax, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-AI_Cluster_9665	endp
+AI_SelectWeaponMask_9665	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

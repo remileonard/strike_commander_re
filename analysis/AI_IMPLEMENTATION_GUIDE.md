@@ -389,6 +389,18 @@ effectivement livrée tire un `SPOT` existant de la mission au hasard
 calculé à la volée — voir §2.8 ci-dessous pour le contexte plus large sur
 comment `current_command` s'articule avec la boucle `GOAL`.*
 
+**Lecture de `Goal_WanderRandom` (2026-09-20).**
+1. Si l'objet en cours de l'entité IA existe, elle lui délègue (`vtable+0xC`) et renvoie vrai. Sa garde n'est donc **pas** « une cible d'attaque est engagée » mais « un objet est en cours » (nature encore inconnue).
+2. Sinon elle tire deux valeurs `rand() % 20000 − 10000`, les prend comme direction horizontale, **normalise** ce vecteur et le multiplie par **30 000** : le point est à 30 000 unités dans une direction aléatoire (et non à ±10 000 comme dans l'exemple ci-dessus).
+3. Altitude : celle du terrain sous le point, plus l'altitude de croisière lue dans l'entité (constante issue de `NUMS`), moins l'altitude actuelle, bornée à ±1000, ajoutée à la position courante.
+4. Elle écrit le point (position visée) et la vitesse voulue (direction × vitesse de croisière `NUMS`) dans le bloc d'état commun au joueur et à l'IA, ainsi que dans les coordonnées de point de mission de l'entité, puis applique le nœud d'exécution du contrôleur (celui du chemin `ExecuteFlightCommand`) et renvoie vrai.
+5. Un test sur deux octets de l'état (`+0x1A` nul et code `0x15` en `+0x19`) peut sauter la génération du point : rôle non lu.
+6. Appelée par `Goal_ExecuteAction` (cas « aucun ordre ») et par `Formation_DamageReactionHandler`.
+
+**Écart avec libRealSpace** : la version livrée tire un `SPOT` de la mission et non un point à 30 000 unités. Sa garde est `current_target != NO_TARGET` (cible de mission engagée).
+
+**Correction du 2026-09-20 : `current_target` utilise `NO_TARGET = -1`.** Le joueur a l'identifiant 0. Avec 0 comme « pas de cible », un acteur ayant pour ordre de détruire le joueur gardait `current_target = 0` : la garde de `tryWanderRandom` ne le retenait pas, `tryWanderRandom` écrasait `current_command` et le waypoint posé par `destroyTarget`, et l'avion s'éloignait au lieu de combattre. Le sentinelle `-1` (constante `SCMissionActors::NO_TARGET`) corrige cela ; le combat contre le joueur est validé en jeu.
+
 ### 2.8 `SCMissionActors::executeGoalAction` (`GOAL_EXECUTE_ACTION`) —
 navigation vs combat, un point encore ouvert
 
@@ -463,21 +475,91 @@ réel de la décision IA, à chaque tick de l'entité :
 
 | Règle ASM | État dans `runGoalSelectors()` |
 |---|---|
-| Au sol, `Goal_ExecuteAction` tourne sans consulter `GOAL` | **absent** : avec `GOAL=1` seul (tableau vide), un acteur ne décolle pas, alors qu'en jeu il décolle |
+| Au sol, `Goal_ExecuteAction` tourne sans consulter `GOAL` | **implémenté** (2026-09-19) : `runGoalSelectors()` appelle `executeGoalAction()` en tête si `plane->on_ground`, ce qui fait décoller un acteur dont `GOAL` ne contient que 1 |
 | La valeur `1` n'occupe aucun emplacement | traitée comme `GOAL_EMPTY` et ignorée à la lecture de la boucle : équivalent, mais l'acteur reste un acteur « à `GOAL` » |
 | Réactions prioritaires avant les objectifs | **absent** ; `protectSelf()` est un palliatif appelé dans `executeGoalAction()`, donc lié au sélecteur `2` |
 | Objet en cours (`entité+0x0D`) avant `GOAL` | **absent**, nature de l'objet non établie |
 | Gestionnaires appelés avec `(entité, 0)` | sans objet ici |
 
-Le contournement au sol est la règle prouvée la plus simple à reproduire :
-si `plane->on_ground`, appeler `executeGoalAction()` avant de parcourir
-`profile->ai.goal` (et ne pas exiger un tableau non vide dans `onAIRefresh`).
+Le contournement au sol est reproduit : si `plane->on_ground`,
+`runGoalSelectors()` appelle `executeGoalAction()` avant de parcourir
+`profile->ai.goal`.
 
 ---
+
+### 2.10 L'état du cerveau (`SCAIBrain`) — carte des champs de l'entité IA
+
+L'acteur (`SCMissionActors`) joue le rôle du nœud du monde, le cerveau (`SCAIBrain`) celui de l'entité IA de l'original (le nœud du monde pointe vers elle). Ce tableau recense ce que l'entité IA porte, avec ce qui est établi. **Seuls les champs « connu » sont candidats à la déclaration dans `SCAIBrain.h`.** Les autres restent ici tant que leur rôle n'est pas lu.
+
+Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`** = déjà déclaré, à déclarer, ou non ; **équivalent** = ce que libRealSpace a déjà.
+
+**Cibles et menaces**
+
+| Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent libRealSpace |
+|---|---|---|---|---|
+| cible aérienne (`+0x287`) | cible de combat normale : tir, poursuite, tournoi | connu | `air_target` (déclaré) | `SCMissionActors::target` (mélangé) |
+| cible sol (`+0x283`) | cible traitée par le nœud permanent d'attaque au sol | connu | `ground_target` (déclaré) | — |
+| missile qui me vise (`+0x281`) | menace missile désignée par le ciblage | connu | `missile_threat` (déclaré) | `weapon_shooted_at_me` |
+| état de menace (`+0x27F`, 0 à 2) | 2 = un missile gagne le ciblage ce tick ; le rôle de 1 est inconnu | partiel | `threat_state` (déclaré) | — |
+| référence de bonus A (`+0x285`) | donne A +10, aptitude +5 au candidat désigné ; écrivain inconnu | inconnu | non | — |
+| référence de bonus B (`+0x289`) | donne aptitude +3, B +5 ; écrivain inconnu | inconnu | non | — |
+| cible de mission (`+0x137`) | cible des ordres détruire / défendre posée par le script | connu | non (reste à l'acteur) | `current_target`, `target` |
+| référence allié (`+0x145`) | allié suivi (`Goal_FollowAllyExec`) | connu | à déclarer plus tard | — |
+| références faibles (`+0x10F`, `+0x147`) | rôle non établi | inconnu | non | — |
+
+**Objectif et exécution**
+
+| Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
+|---|---|---|---|---|
+| objectif courant (`+0x11D`) | code d'état posé par `Goal_SetObjective_A307` | connu | à déclarer plus tard | `current_command` (acteur) |
+| coordonnées de point de mission (`+0x11F`, `+0x12B`) | point cible, partagé script / `GOAL` | connu | à déclarer plus tard | `current_command_arg` (partiel) |
+| objectif exécuté | inexistant identifié dans l'original | — | non | `current_command_executed` (propre à libRealSpace) |
+| objet en cours (`+0x0D`) | référence notifiable ; sa nature est inconnue | inconnu | non | — |
+| nœud permanent (`+0xD9`) | appliqué directement quand une cible sol est posée sans cible aérienne ; rôle non lu | partiel | non | — |
+| nœuds spéciaux (`+0xC1` ID 20, `+0xD1` ID 21) | nœuds `MVRS` réutilisés hors tournoi | connu | non | — |
+
+**Tir et poursuite** (lus dans `AI_BehaviorSelector_8D30`)
+
+| Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
+|---|---|---|---|---|
+| longueur de rafale restante (`+0x280`) | décrémentée à chaque tick de rafale | connu | à déclarer plus tard | — |
+| état de tir (`+0x10D`, valeur `0x800`) | mémorise qu'une rafale est en cours | partiel | non | — |
+| résultats de manœuvre (`+0x1A0`, `+0x1A2`) | sorties de `AI_ManeuverSolution_91DF` et de `AI_SelectWeaponMask_9665` | partiel | non | — |
+| drapeaux d'état (`+0x28B`, `+0x28D`) | bit 0x02 posé par le contrôle de tir ; bit 3 escorte ; bit 7 comportement déclenché ; `+0x28D` bit 0x08 effacé au début du ciblage | partiel | non | — |
+
+**Traits, listes et minuteurs**
+
+| Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
+|---|---|---|---|---|
+| traits `ATRB` (`+0xB0` à `+0xB8`, copie de consommation) | `TH`, `CN`, `VB`, `LY`, `FL`, `AG`, `AA`, `SM`, `AR` | connu | non (lus par `owner->profile`) | `profile->ai.atrb` |
+| tableau `GOAL` (`+0x1B0`, 8 octets par emplacement) | sélecteurs du profil | connu | non (lus par `owner->profile`) | `profile->ai.goal` |
+| nœuds `MVRS` (`+0x200` compteur, `+0x202` tableau, 5 octets chacun) | tournoi | connu | non (lus par `owner->profile`) | `profile->ai.mvrs` |
+| minuteur de rappel du ciblage (`+0x174`) | limite les rappels de `Targeting_AcquireBestThreat` du tournoi | connu | à déclarer plus tard | — |
+| chronomètre (`+0x175`) | préparé par `AIEntity_MasterTick_5ACC` | partiel | non | — |
+| rayon d'arrivée (`+0x139`), vitesse de croisière (`+0x141`), `+0x13D` | constantes issues de `NUMS` | connu | non | `NUMS` sur `SCMission` |
+| décalage de formation (`+0x14A`, `+0x14E`, `+0x152`) | (300, 0, 0) en 24.8 | connu | non | `formation_pos_offset` (acteur) |
+| vecteur (`+0x1A4`, `+0x1A8`, `+0x1AC`) | (0, −800, 0) ; sens inconnu | inconnu | non | — |
+
+**Liens vers les autres objets**
+
+| Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
+|---|---|---|---|---|
+| nœud du monde lié (`+0x102`) | position et objet de mon avion | connu | non (`owner->object`) | `owner->object` |
+| chargement d'armes (`+0x104`) | stations d'armement de 35 octets | connu | non | armes du `plane` / `RSEntity::weaps` |
+| avion (`+0xB`) et bloc d'état (`+0x7`) | drapeaux de l'avion ; commandes communes joueur et IA | connu | non (`owner->plane`, `owner->pilot`) | `PlaneControlEvent` |
+| pointeur vers l'objet portant le chargement d'armes (`+0x22`) | déduit de `MVRS_ID14_ScoreWeaponReadiness` | partiel | non | — |
+
+**État d'avancement (2026-09-20)** : `SCAIBrain` (`SCAIBrain.h/.cpp`, dans `src/strike_commander/`) existe et est créé par `SCMission` pour tout acteur dont le profil est IA. La boucle `GOAL` (`runGoalSelectors`, `executeGoalAction`, `tryWanderRandom`, `tryActiveWingman`) y a été déplacée telle quelle ; `SCMissionActors::onAIRefresh` garde ses gardes puis appelle `brain->tick()`. Validé en jeu : compile, l'IA réagit comme avant. Les champs de ciblage sont déclarés mais pas encore utilisés ; l'état de l'objectif reste sur l'acteur.
+
+**Règle retenue** : le cerveau ne recopie pas ce que l'acteur, le profil ou le pilote portent déjà. Il lit ces données par `owner`. Il ne porte que l'état qui lui est propre (cibles, menace, et plus tard rafale et minuteurs). L'objectif courant migrera dans le cerveau quand la boucle `GOAL` y sera déplacée.
+
+**Prochains champs candidats** (tous « connu ») : `+0x145` (allié), `+0x11D` avec ses coordonnées, `+0x280` (rafale), `+0x174` (minuteur). Ils se déclarent avec la couche qui les utilise, pas avant.
 
 ## 3. Le tournoi `MVRS`
 
 ### 3.1 `SCMissionActors::runMVRSTournament`
+
+*Correction (2026-09-19) : le bruit de l'ASM est ±1, jamais 0 (`test ax, 1`). Ce pseudocode ne montre que la boucle de score ; les conditions d'entrée (cible `entité+0x287`, `AI_BehaviorSelector_8D30` avant le score, objet en cours à `entité+0x0D`) sont dans `AI_TICK_CALL_GRAPH.md`.*
 
 ```cpp
 void SCMissionActors::runMVRSTournament() {
@@ -490,7 +572,7 @@ void SCMissionActors::runMVRSTournament() {
         MVRSInstinct id = (MVRSInstinct)e.node_id;
         int score = this->computeMVRSScore(id);
         score += e.value;
-        score += (std::rand() % 3) - 1;
+        score += (std::rand() & 1) ? 1 : -1;
         if (score > best) { best = score; winner = id; hasWinner = true; }
     }
     if (!hasWinner) return;
@@ -758,6 +840,68 @@ int SCMissionActors::weaponEffectiveRange(int hpt_id) {
 ```
 
 ---
+
+### 3.5 Choix de cible et menaces (`Targeting_AcquireBestThreat`) — spécification lue dans l'ASM
+
+Ce point conditionne le tournoi : il exige une cible, et c'est cette fonction qui la pose. Détail et citations : `AI_TICK_CALL_GRAPH.md`, section « Le choix de cible et le traitement des menaces ».
+
+**Catégorie d'un objet** = chunk présent dans son `OBJECTS\<nom>.IFF` (le premier trouvé dans l'ordre `BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY`) :
+
+| Chunk | Catégorie | Rôle |
+|---|---|---|
+| `JETP` | 6 | avion à réaction |
+| `MISS` | 8 | missile |
+| `SWPN` | 0x13 | défenses fixes (AA, batterie, SAM, navire) |
+| `WEAP` 7, `BOMB`/`DURD` 9, `PODR` 0x0A, `TRCR` 0x0D, `AFTB` 0x0E, `DECY` 0x10, `GRND` 0x14, `XMIT` 0x15, `MOBL` 2, `OMOB` 3, `GUID` 4, `ARMG` 5 | | non testées par la fonction |
+
+**Correspondance avec `EntityType` (`RSEntity.h`, champ `entity_type` ; les identifiants sont propres à libRealSpace, seule la classe compte)** :
+
+| Chunk IFF | Catégorie ASM | `EntityType` |
+|---|---|---|
+| `JETP` | 6 | `jet` |
+| `MISS` | 8 | `missiles` |
+| `SWPN` | 0x13 | `swpn` |
+| `BOMB` / `DURD` | 9 | `bomb` |
+| `TRCR` | 0x0D | `tracer` |
+| `AFTB` | 0x0E | `aftb` |
+| `PODR` | 0x0A | `podr` |
+| `GRND` | 0x14 | `ground` |
+| `ORNT` | 0 ? | `ornt` (objet de décor : immeuble, etc.) |
+| `RNWY` | non lue | `rnwy` (piste de décollage) |
+| `MOBL` / `OMOB` | 2 / 3 | `object_mobile` (non utilisés dans Strike Commander, laissés de côté) |
+
+Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de libRealSpace. La portée `objet+0x3E` d'une défense fixe correspond vraisemblablement à `swpn_data->detection_range` ou `effective_range` (à confirmer côté données).
+
+**Ordre de traitement** (à chaque appel, chaque acteur actif) :
+1. `+0x27F == 2` → 0. Chercher parmi tous les objets du monde, sauf soi.
+2. **Candidat** : missile dont la cible est moi ; avion hostile (camp de signe opposé) ; objet hostile « `+0x11 = 2` » seulement si l'appel autorise une nouvelle cible et qu'une arme air-air est chargée.
+3. **Scores A, B et aptitude `si`** : bandes de distance (`NUMS` 72020/24/28/2C/30), angles d'aspect (30°, 45°, 60°, 90°, 135°), armes chargées (masques `1` = AIM-9J, `3` = AIM-9J ou AIM-9M, `0x700` = AIM-120, SA-2 ou SA-6, `0x83C` = AGM-65D, LAU-3, MK-20, MK-82 ou canon 20 mm ; bit = `weapon_id` − 1), persistance de la cible courante (+3/+5), bonus si l'avion me vise déjà.
+4. **Porte** : `roll = (rand() & 15) + 1` ; le candidat est retenu si `roll <= TH + si` (`TH` = `ATRB[+0xB0]`, octet signé). Refait à chaque candidat, à chaque appel. Échec = candidat ignoré.
+5. **Score final** `= (AR − TH + 16)·A + (TH − AR + 16)·B` (`AR` = `+0xB8`, `TH` = `+0xB0`) ; le meilleur part de −5000.
+6. **Résultat** : avion → cible `+0x287` ; défense fixe → `+0x283` ; **missile qui me vise → `+0x281`, cibles vidées, `+0x27F = 2`**. Sans gagnant, rien n'est modifié.
+
+**Lecture des traits (hypothèse de travail de Rémi)** : les poids `AR − TH + 16` et `TH − AR + 16` valent toujours 32 au total. Un pilote agressif favorise A (cibles bien placées devant lui, à portée) et se rapproche de sa cible ; un pilote gâchette facile favorise B (cibles qui le menacent) et tire vite. Le choix de cible est lu dans l'ASM ; « se rapprocher » et « tirer vite » sont à vérifier dans `AI_GuidanceSolution_Major`, `AI_FireWeaponTrigger` et `Pilot_ReactionThreshold_B6` (non lues).
+
+**Cibles sol et missile qui me vise (implémentés le 2026-09-20 dans `SCAIBrain`)** :
+- **Candidat sol** : `target_type == 2`, camp hostile, un armement sol chargé (masque `0x83C`), et `allow_new_target`. Score : cible de mission A +6 / aptitude +3 ; pour une défense fixe avec munitions, `B = 10·(1 − d/R) + 5` si `d ≤ R`, avec `R = swpn_data->effective_range` (le `+0x3E` de l'assembleur, confirmé par `SwpnModel_LoadDataChunk_A0A00`) ; au-delà de `range_ground` aptitude −4, sinon angle `ahead` < 45° : aptitude +5 et A +6, entre 45° et 90° : aptitude +3 et A +3. Un gagnant sol range `ground_target` et vide `air_target`.
+- **Missile qui me vise** : seulement si sa cible est moi, son `entity_type` est `missiles` et son `radar_type` vaut 1 (l'assembleur teste `objet+0x4E == 1`, qui est le `radar_type` du chunk `WDAT`). Son angle d'approche `aims` (nez du missile contre la direction vers moi) doit être ≤ 90° et la distance inférieure à `range_far`. Missile longue portée (`weapon_id` AIM-120, SA-2, SA-6) : `B = 16·(1 − d/range_far) + 24` ; sinon il faut `d ≤ range_long` et `B = 16·(1 − d/range_long) + 24` ; aptitude += `TH²/16 − 8`, et −4 si `ahead` > 135° sans contrôle de tir. Un jet de dé réussi range le missile dans `missile_threat` même s'il ne gagne pas ; s'il gagne, `air_target` et `ground_target` sont vidés et `threat_state` passe à 2 (remis à 0 à l'appel suivant).
+- **Pas implémenté** : le `+4` si l'avion visé est le lanceur du missile (le sens exact de la méthode `vtable+0x38` du nœud est inconnu), le test du cône arrière et le terme de classe.
+
+**Articulation avec les ordres du script (lu le 2026-09-20)** : `Goal_SetObjective_A307` écrit, pour « détruire la cible » comme pour « défendre la cible », **uniquement la cible de mission** (`SetReference` sur son seul champ) ; elle n'écrit ni la cible aérienne ni la cible sol, qui sont remplies par le ciblage. Les deux mécanismes se croisent à trois endroits :
+1. **Bonus de score** dans `Targeting_AcquireBestThreat` : candidat = cible de mission → cible sol : A +6 et aptitude +3 ; avion : A +2 et aptitude +4. Préférence, pas obligation.
+2. **Tir** : `MVRS_ID14_ScoreWeaponReadiness` utilise la cible sol acquise, sinon la cible de mission.
+3. **Exécution** : `Goal_ExecuteAction`, pour une cible de mission de type sol, applique directement le nœud permanent d'attaque au sol, sans passer par le ciblage.
+
+**Cibles sol : jamais acquises seules depuis `AI_TopLevelThink`.** Ce chemin appelle le ciblage avec « nouvelle cible » à 0, et un candidat sol n'est retenu que si cet argument est non nul (un avion hostile n'en a pas besoin). L'IA acquiert donc seule des avions et des missiles ; les cibles sol viennent du script. Le tournoi passe un argument non nul dans certains cas, à vérifier.
+
+**Pour l'implémentation** : la cible de mission reste ce que pose `setObjective` (`current_target`, `target` de l'acteur) ; elle entre dans `acquireBestThreat` comme bonus. `destroyTarget` garde la navigation vers la cible et son tir actuel tant que le contrôle de tir du cerveau n'existe pas. Non lu : ce qui fait attaquer une cible de mission aérienne qui n'est pas candidate.
+
+**À retenir pour l'implémentation** :
+- Un missile qui me vise **interrompt l'attaque** : plus de cible, pas de tir, pas de tournoi ce tick. La réaction défensive (leurres, virage) n'est pas dans cette fonction ; elle est à retrouver (lecteurs de `+0x281` et de `+0x27F == 2`).
+- Les défenses fixes comptent quand l'avion est **dans leur portée** (`objet+0x3E`).
+- Le tir n'est pas ici : il est fait par `AI_BehaviorSelector_8D30`, avant le tournoi (voir §3.1).
+- `objet+0x11` est `RSEntity::target_type` (chunk `TRGT`, 1er octet) ; la valeur 2 = cible sol (armes `weapon_category` 2). Il faut que ce champ soit lu pour toutes les classes (aujourd'hui seul `parseREAL_OBJT_JETP_TRGT` le remplit).
+- Non lu : les lecteurs de `+0x281/+0x283/+0x285/+0x289`.
 
 ## 4. Séquences de manœuvre acrobatique
 

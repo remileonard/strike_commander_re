@@ -1444,7 +1444,7 @@
 "sub_27144"
 ],
 "new_name": "Targeting_AcquireBestThreat",
-"summary": "far,1347L — **CORRECTION D'ERREUR : ce n'est PAS un tick physique**, malgré le nom initial 'Flight_PhysicsTick_JDYN' donné par erreur dans une session précédente sur la seule base d'une hypothèse de structure, jamais vérifiée en détail. Lecture complète effectuée : la fonction lit le timer PIT à des fins de PROFILING uniquement (accumulation dans word_704E6[0x5B2E]), initialise un score à -5000, pondère par les attributs de compétence pilote (+0xB0/+0xB8), vérifie la disponibilité de 4 masques de type d'arme via WeaponStation_FindLoadedCompatible, puis **itère sur tous les objets du monde** (World_IterateObjects) en calculant pour chacun distance+angle d'aspect, un score pondéré par bonus de portée/catégorie/ligne de vue (catégorie 2=aéronef, 6=missile, 8=contre-mesure, 0x13=catégorie spéciale), avec lecture de flags_75 bit5 du propriétaire pour les candidats missile. À la fin, assigne via SetReference les 3 champs +0x281 (décoy/chaff), +0x283 (cible principale), +0x287 (menace/missile) du meilleur candidat trouvé, avec traitement spécial si c'est un leurre (catégorie 8 : verrouillage forcé + 0x27F=2). **C'est le sélecteur de cible/menace générique du jeu, utilisé par l'IA (appelée depuis AI_BehaviorStateMachine, sub_9D05) et probablement le joueur.**"
+"summary": "far, 1347L — SÉLECTEUR DE CIBLE ET DE MENACE de l'IA (lu intégralement le 2026-09-20). CE N'EST PAS un tick physique (ancien nom 'Flight_PhysicsTick_JDYN' faux). Parcourt tous les objets du monde (World_IterateObjects, liste 0x59C3), note chaque candidat (missile qui me vise, avion hostile, objet hostile '+0x11=2'), et range le gagnant dans entité+0x287 (avion), +0x283 (objet '+0x11=2') ou +0x281 (missile). CATÉGORIES (vtable+8 de la classe modèle, fixée par le chunk IFF présent dans OBJECTS\\\\<nom>.IFF, IFF_LoadModelMain) : 6=JETP avion, 8=MISS missile, 0x13=SWPN défenses fixes AA/batteries/SAM/navires (fait vérifié côté données). L'ancien commentaire '6=missile, 8=contre-mesure' était FAUX. Score = (ATRB+0xB8−ATRB+0xB0+16)·A + (ATRB+0xB0−ATRB+0xB8+16)·B, départ −5000 (0EC78h), porte de compétence Pilot_SkillCheck_B0, bandes de distance NUMS (72020/24/28/2C/30), persistance de la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir, pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur). Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail : analysis/AI_TICK_CALL_GRAPH.md."
 },
 "sub_4F95": {
 "segment": "seg003",
@@ -1778,7 +1778,7 @@
 "sub_40FD8"
 ],
 "new_name": "AI_FireWeaponTrigger",
-"summary": "far,16L — nettoie flag bit3 de +0x28D puis appelle sub_40FD8(cible +0x104, valeur +0x1A2) : **probable déclenchement de tir/largage d'arme sur la cible verrouillée.**"
+"summary": "far, 16L, LUE (2026-09-20). Efface le bit 0x08 de entite+0x28D puis appelle WeaponStation_ValidateReady(chargement d'armes entite+0x104, masque entite+0x1A2) : parcourt les points d'emport (stride 0x12), retient le premier dont l'arme a un masque de type compatible (test [arme+0x4B] & masque) et lance la routine d'engagement de ce point d'emport (stub VROOMM 6C434) ; renvoie 1 si un point d'emport a ete engage. Le masque vient de AI_SelectWeaponMask_9665."
 },
 "sub_6F5C": {
 "segment": "seg003",
@@ -2019,7 +2019,7 @@
 "type": "far",
 "calls": [],
 "new_name": "Pilot_ReactionThreshold_B6",
-"summary": "far,54L — calcul continu (division mise à l'échelle, arrondi) d'un seuil comparé à la stat pilote +0xB6 : **variante non-aléatoire de test de compétence (seuil de réaction), 4e attribut pilote.**"
+"summary": "far, 54L, LUE (2026-09-20). Test DETERMINISTE (sans hasard) : renvoie 1 si 2*si >= entite+0xB6 (trait AA, air-air), sinon 0 (calcul : round((si*16*256/8)/256)). Utilise par AI_BehaviorSelector_8D30 pour autoriser une rafale de canon : la qualite de solution de tir 'si' doit valoir au moins AA/2. Plus AA est eleve, plus le pilote attend une bonne solution avant de tirer ; un pilote faible (AA bas) tire des qu'il a une solution mediocre (si >= 2 exige par ailleurs)."
 },
 "sub_8D30": {
 "segment": "seg004",
@@ -2098,8 +2098,8 @@
 "sub_3A40B",
 "sub_40F92"
 ],
-"new_name": "AI_Cluster_9665",
-"summary": "far,277L — (même cluster IA, appelé en aval de sub_814C) — à approfondir."
+"new_name": "AI_SelectWeaponMask_9665",
+"summary": "far, 277L, LUE INTEGRALEMENT (2026-09-20). CHOIX DE L'ARME contre la cible aerienne (entite+0x287) ; renvoie un MASQUE DE TYPE D'ARME (bit = weapon_id - 1), range par AI_BehaviorSelector_8D30 dans entite+0x1A2. 0 = aucune arme. Sans cible : 0. Calcule le vecteur vers la cible et la distance d ; si le bit 0 de entite+0x28B est pose (defaut NUMS), teste par WeaponStation_FindLoadedCompatible les masques 1 (AIM-9J), 3 (AIM-9J/9M) et 0x700 (AIM-120/SA-2/SA-6). Deux angles via Targeting_ComputeBearingElevation : di = ecart entre mon nez et la cible ; si = ecart entre le cap de la cible et la direction vers elle ; drapeau 'aspect croise' = 40 < si < 140. Cible = joueur, di < 30, si < 30 et d < dword_7202C (17700) : SetReference16(0x523A, mon noeud) (reference globale 'un IA est dans les six heures du joueur', role exact non lu). Si di >= 90 : 0. Sinon, dans l'ordre : d < 1800 (dword_7201C) et canon (0x800) charge -> 0x800 ; d > dword_72020 (4000) et missile longue portee (0x700) -> 0x700 ; sinon mask 3 charge et d < dword_7202C (17700) -> 1 si aspect croise ET AIM-9J charge, sinon 3 ; sinon 0."
 },
 "sub_98BD": {
 "segment": "seg004",
@@ -2253,7 +2253,7 @@
 "sub_378CA"
 ],
 "new_name": "Goal_WanderRandom",
-"summary": "far,246L — handler d'un GOAL spécifique : si cible présente, délègue à vtable[0xC] ; sinon tire une position aléatoire (2x sub_70D, offset ±0x2710 échelle) : **probable handler de patrouille/vagabondage aléatoire (goal 'wander' ou zone de patrouille).**"
+"summary": "far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise (Targeting_LineOfSightCheck_5593A = normalisation) et la multiplie par 0x753000 (30000 en 24.8) : point a 30000 unites dans une direction aleatoire. Altitude : Terrain_QueryAltitudeAt + entite+0x13D (altitude de croisiere NUMS) - altitude actuelle (objet +0x102, +0x1A), bornee a +/-1000 puis ajoutee a la position courante. Ecrit le point dans le bloc d'etat commun ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction * entite+0x141) en +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface l'octet +0xC du noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1. Appelee par Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler."
 },
 "sub_AFFC": {
 "segment": "seg005",
@@ -8311,7 +8311,7 @@
 "sub_65643"
 ],
 "new_name": "IFF_LoadModelMain",
-"summary": "far,**1699 lignes — la 2e plus grosse fonction de la base**. **Chargeur principal de modèles IFF 3D** : détecte le VESA (INT15h), résout le chemin via `Path_ResolveDataFile` (`OBJECTS\\<nom>.IFF`), vérifie le magic chunk 'REAL', lit le chunk 'OBJT' (sub_647B2). Correspond directement au format IFF déjà documenté dans le projet — **c'est le point d'entrée principal du chargement de tout modèle 3D du jeu (avions, terrain, débris, armements)**, appelé par le système de débris (seg079) et vraisemblablement par tout le reste du pipeline de rendu. Priorité absolue pour une session d'analyse dédiée compte tenu de son rôle central et de son recoupement direct avec le format IFF déjà étudié."
+"summary": "far,**1699 lignes — la 2e plus grosse fonction de la base**. **Chargeur principal de modèles IFF 3D** : détecte le VESA (INT15h), résout le chemin via `Path_ResolveDataFile` (`OBJECTS\\<nom>.IFF`), vérifie le magic chunk 'REAL', lit le chunk 'OBJT' (sub_647B2). Correspond directement au format IFF déjà documenté dans le projet — **c'est le point d'entrée principal du chargement de tout modèle 3D du jeu (avions, terrain, débris, armements)**, appelé par le système de débris (seg079) et vraisemblablement par tout le reste du pipeline de rendu. Priorité absolue pour une session d'analyse dédiée compte tenu de son rôle central et de son recoupement direct avec le format IFF déjà étudié. || AJOUT 2026-09-20 : DÉTERMINE LA CLASSE (ET LA CATÉGORIE vtable+8) DE L'OBJET selon le PREMIER chunk présent, testé dans l'ordre BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY : chaque chunk alloue une taille de classe et écrit une suite de mots de vtable (constructeurs chaînés, la dernière gagne). Catégories : JETP=6, WEAP=7, MISS=8, BOMB/DURD=9, PODR=0xA, TRCR=0xD, AFTB=0xE, DECY=0x10, SWPN=0x13, GRND=0x14, XMIT=0x15. Voir analysis/AI_TICK_CALL_GRAPH.md."
 },
 "sub_3C942": {
 "segment": "seg084",
@@ -38975,8 +38975,8 @@
 "lines": 104,
 "type": "far",
 "calls": [],
-"new_name": "PlayerComponent_IndexToFlagMask_9DE60",
-"summary": "far, convertit un index de composant (0-12, switch à 13 cas) en un masque de bit (1,2,4,8,0x10...) — cohérent avec les composants de dommages/état de l'avion confirmés par les chaînes du seg339 (RUDDER/ELEVATOR/AILERON/LWING/RWING/ENGINE/LANDGEAR/FLAPS). Référencée via jmp depuis un stub VROOMM (sub_6C380)."
+"new_name": "WeaponId_ToTypeMask_9DE60",
+"summary": "far, LUE (2026-09-20). Convertit un identifiant d'arme (0 a 12, switch de 13 cas : 0->0, 1->0x1, 2->0x2, 3->0x4, ... bit = id-1) en masque de bit. Appelee par Weapon_LoadWDATChunk_A0700 sur le weapon_id du chunk WDAT (via le stub VROOMM 6C380). Ancien nom 'PlayerComponent_IndexToFlagMask' faux : les 13 cas sont les 13 weapon_ids (0=aucun, 1=AIM-9J, 2=AIM-9M, 3=AGM-65D, 4=LAU-3, 5=MK-20, 6=MK-82, 7=Durandal, 8=GBU-15, 9=AIM-120, 10=SA-2, 11=SA-6, 12=canon 20mm), pas des composants de dommages."
 },
 "sub_9DED3": {
 "segment": "seg432",
@@ -40115,8 +40115,8 @@
 "sub_64A7E",
 "sub_6B70F"
 ],
-"new_name": "PlayerComponent_LoadAllFields_A0700",
-"summary": "⚠️ far, 114 lignes, NON DÉTAILLÉE — lit une douzaine de champs depuis le format IFF (ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54 ×2, ReadFinalField_64B51 ×6, ReadFieldGroupC_64A7E ×3) et appelle directement `PlayerComponent_IndexToFlagMask_9DE60` (seg432) — confirme le lien direct avec le système d'index de composants de dommages."
+"new_name": "Weapon_LoadWDATChunk_A0700",
+"summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D), byte radar_type (+0x4E), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain)."
 },
 "sub_A07ED": {
 "segment": "seg435",
@@ -40128,8 +40128,8 @@
 "sub_6C1CA",
 "sub_A0700"
 ],
-"new_name": "PlayerComponent_ApplyFlagsAndLoad_A07ED",
-"summary": "far, combine sub_6C1CA et PlayerComponent_LoadAllFields_A0700."
+"new_name": "Weapon_LoadWDATWrapper_A07ED",
+"summary": "far, combine sub_6C1CA et Weapon_LoadWDATChunk_A0700."
 },
 "sub_A0810": {
 "segment": "seg435",
@@ -40182,8 +40182,8 @@
 "sub_64A7E",
 "sub_6B70F"
 ],
-"new_name": "PlayerComponent_LoadFieldsWithRetryC_A0A00",
-"summary": "⚠️ far, 128 lignes, NON DÉTAILLÉE — combine sub_3C942, ResourceRecord_SeekAndRead_64743, ReadFieldGroupC_64A7E (×4), ReadFieldGroupB_64A54, ReadFinalField_64B51 (seg193), sub_6C394 (stub voisin), gestion d'erreur. Référencée via jmp depuis un stub VROOMM (sub_6C5E0)."
+"new_name": "SwpnModel_LoadDataChunk_A0A00",
+"summary": "far, 128 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'DATA' D'UN OBJET SWPN (defense fixe AA/SAM/navire ; ancien nom 'PlayerComponent_LoadFieldsWithRetryC' faux). Appelle IFF_LoadAngleParam puis lit 'DATA' (push large 41544144h) : valeur group C -> objet+0x36 (weapons_round, munitions), group C -> +0x3A (detection_range), group C -> +0x3E (effective_range : LA PORTEE utilisee par Targeting_AcquireBestThreat pour noter une defense fixe), word -> +0x42, group C -> +0x44, byte -> +0x48 (max_simultaneous_shots), pointeur far vers l'objet arme charge (stub VROOMM 6C394, nom de l'arme sur 8 caracteres) -> +0x49/+0x4B, group C -> +0x4D. Correspond a RSEntity::parseREAL_OBJT_SWPN_DATA de libRealSpace."
 },
 "sub_A0ADC": {
 "segment": "seg436",

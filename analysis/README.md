@@ -768,10 +768,7 @@ cohérent d'environ 100 fonctions consacré à la **gestion des composants de
 l'avion du joueur** (dommages, état, configuration), chargés depuis le
 format IFF/ResourceRecord déjà documenté (seg193-194) :
 
-- **`PlayerComponent_IndexToFlagMask_9DE60`** (seg432) convertit un index
-  de composant (0-12) en masque de bit — cohérent avec les 8 composants de
-  dommages confirmés par les chaînes du seg339 (RUDDER, ELEVATOR, AILERON,
-  LWING, RWING, ENGINE, LANDGEAR, FLAPS).
+- **`WeaponId_ToTypeMask_9DE60`** (seg432, anciennement `PlayerComponent_IndexToFlagMask`) convertit un identifiant d'arme (0-12) en masque de bit ; correction du 2026-09-20 : ce ne sont pas des composants de dommages, les 13 cas sont les 13 `weapon_id` (voir `AI_TICK_CALL_GRAPH.md`, masques d'armes).
 - Une famille de **constructeurs de variantes** (`PlayerComponentVariantA`
   à `N`) suit un motif récurrent : allocation, initialisation de deux
   classes de base, initialisation de sous-objets composites (`sub_6CACA`

@@ -362,7 +362,7 @@ WeakRef_InvalidateIfSet	endp
 ; far,32L — invalide l'ancienne référence (sub_3A3EC) puis assigne et enregistre la nouvelle
 ; (sub_3A2A2) : variante de SetReference pour un champ 16-bit simple (near pointer).
 ; ==============================================================================================
-SetReference16	proc far		; CODE XREF: AI_Cluster_9665+188P
+SetReference16	proc far		; CODE XREF: AI_SelectWeaponMask_9665+188P
 					; Radar_Project3DToScreen+289P ...
 
 arg_0		= word ptr  6

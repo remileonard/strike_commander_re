@@ -3881,8 +3881,12 @@ AI_ManeuverSolution_Major	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,16L — nettoie flag bit3 de +0x28D puis appelle sub_40FD8(cible +0x104, valeur +0x1A2) :
-; probable déclenchement de tir/largage d'arme sur la cible verrouillée.
+; far, 16L, LUE (2026-09-20). Efface le bit 0x08 de entite+0x28D puis appelle
+; WeaponStation_ValidateReady(chargement d'armes entite+0x104, masque entite+0x1A2) : parcourt
+; les points d'emport (stride 0x12), retient le premier dont l'arme a un masque de type
+; compatible (test [arme+0x4B] & masque) et lance la routine d'engagement de ce point d'emport
+; (stub VROOMM 6C434) ; renvoie 1 si un point d'emport a ete engage. Le masque vient de
+; AI_SelectWeaponMask_9665.
 ; ==============================================================================================
 AI_FireWeaponTrigger	proc far		; CODE XREF: AI_BehaviorSelector+121P
 					; AI_BehaviorSelector+1AEP

@@ -18,8 +18,8 @@ stru_6C360	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A896o
 ; far, thunk fixe VROOMM (jmp sub_9DE60) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C380	proc far		; CODE XREF: PlayerComponent_LoadAllFields_A0700+61P
-		jmp	PlayerComponent_IndexToFlagMask_9DE60
+VROOMM_StubThunk_6C380	proc far		; CODE XREF: Weapon_LoadWDATChunk_A0700+61P
+		jmp	WeaponId_ToTypeMask_9DE60
 VROOMM_StubThunk_6C380	endp
 
 
@@ -70,7 +70,7 @@ VROOMM_StubThunk_6C38F	endp
 ; far, thunk fixe VROOMM (jmp sub_9DFC5) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C394	proc far		; CODE XREF: PlayerComponent_LoadFieldsWithRetryC_A0A00+A8P
+VROOMM_StubThunk_6C394	proc far		; CODE XREF: SwpnModel_LoadDataChunk_A0A00+A8P
 		jmp	PlayerComponent_ReleaseAndReload_9DFC5
 VROOMM_StubThunk_6C394	endp
 

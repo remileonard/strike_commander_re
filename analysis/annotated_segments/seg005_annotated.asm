@@ -1245,9 +1245,18 @@ word_ACE7	dw 0FFFFh,  0A1h,  0A2h,  0A4h ; DATA XREF: Goal_ExecuteAction_A8AC+61
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,246L — handler d'un GOAL spécifique : si cible présente, délègue à vtable[0xC] ; sinon
-; tire une position aléatoire (2x sub_70D, offset ±0x2710 échelle) : probable handler de
-; patrouille/vagabondage aléatoire (goal 'wander' ou zone de patrouille).
+; far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en
+; cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si
+; [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs
+; rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise
+; (Targeting_LineOfSightCheck_5593A = normalisation) et la multiplie par 0x753000 (30000 en
+; 24.8) : point a 30000 unites dans une direction aleatoire. Altitude :
+; Terrain_QueryAltitudeAt + entite+0x13D (altitude de croisiere NUMS) - altitude actuelle
+; (objet +0x102, +0x1A), bornee a +/-1000 puis ajoutee a la position courante. Ecrit le point
+; dans le bloc d'etat commun ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction *
+; entite+0x141) en +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface
+; l'octet +0xC du noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1.
+; Appelee par Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler.
 ; ==============================================================================================
 Goal_WanderRandom	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+42Fp
 					; Formation_DamageReactionHandler+34FP

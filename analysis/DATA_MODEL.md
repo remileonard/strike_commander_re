@@ -234,28 +234,33 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
    init les champs communs (`+0x2B` / `+0x2F` dword = 0, `+0x33` byte = 0), puis
    délègue à un chargeur d'overlay spécifique (stub VROOMM).
 
-| FourCC | Taille struct | Type d'objet |
-|---|---|---|
-| `BOBJ` | 0x35 | basic object |
-| `ORNT` | 0x36 | objet orienté (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
-| `TRCR` | 0x82 | tracer / traçante |
-| `AFTB` | 0x36 | afterburner (tuyère) |
-| `MOBL` | 0x37 | objet mobile |
-| `OMOB` | 0x46 | objet mobile orienté |
-| `GUID` | 0x4A | missile guidé |
-| `JETP` | 0x6A | jet / avion |
-| `XMIT` | 0x36 | émetteur |
-| `WEAP` | 0x5E | arme |
-| `MISS` | 0x65 | missile |
-| `PODR` | 0x6A | pod (nacelle) |
-| `DURD` | 0x67 | Durandal (anti-piste) |
-| `DECY` | 0x3B | leurre (decoy) |
-| `SWPN` | 0x51 | arme secondaire |
-| `GRND` | 0x46 | objet au sol |
-| `RNWY` | 0x36 | piste |
-| `EXPL` | 0x3E | explosion |
-| `DEBR` | 0x3B | débris |
-| + `BOMB`, `ARMG`, … | | (branches supplémentaires non détaillées) |
+| FourCC | Taille struct | Vtable finale | Catégorie (`vtable+8`) | Type d'objet |
+|---|---|---|---|---|
+| `BOBJ` | 0x35 | `1B6F` | 0 | basic object |
+| `ORNT` | 0x36 | `1B6F` (non retracé au-delà) | 0 ? | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
+| `TRCR` | 0x82 | `255C` | 0x0D | tracer / traçante |
+| `AFTB` | 0x36 | `2518` | 0x0E | afterburner (tuyère) |
+| `MOBL` | 0x37 | `2504` | 2 | objet mobile |
+| `OMOB` | 0x46 | `252C` | 3 | objet mobile orienté |
+| `GUID` | 0x4A | `24F0` | 4 | inconnu (seul `MISS` sert aux missiles dans le jeu, fait vérifié côté données) |
+| `ARMG` | 0x4E | `24DC` | 5 | — |
+| `JETP` | 0x6A | `24C8` | **6** | **jet / avion** |
+| `XMIT` | 0x36 | `24B4` | 0x15 | émetteur |
+| `WEAP` | 0x5E | `2540` | 7 | arme |
+| `MISS` | 0x65 | `2498` | **8** | **missile** |
+| `PODR` | 0x6A | `247C` | 0x0A | pod (nacelle) |
+| `BOMB` | 0x63 | `2460` | 9 | bombe |
+| `DURD` | 0x67 | `2444` | 9 | Durandal (anti-piste) |
+| `DECY` | 0x3B | `2430` | 0x10 | leurres (fait vérifié côté données) |
+| `SWPN` | 0x51 | `241C` | **0x13** | **défenses fixes : AA, batteries, SAM, navires** (fait vérifié côté données : objets chargés et codés dans libRealSpace) |
+| `GRND` | 0x46 | `2408` | 0x14 | objet au sol |
+| `RNWY` | 0x36 | non lue | non lue | piste de décollage (fait vérifié côté données) |
+| `EXPL` | 0x3E | non lue | non lue | explosion |
+| `DEBR` | 0x3B | non lue | non lue | débris |
+
+**Catégorie d'un objet (établi le 2026-09-20).** La classe d'un objet est fixée par le **premier chunk présent** dans l'ordre de probe de `IFF_LoadModelMain` (`BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY, …`). Chaque bloc alloue une taille (`Memory_TypedFreeWrapper_5C6F3`, tag `0x5C44`) et écrit une **suite de mots de vtable** (constructeurs chaînés, le dernier gagne). Le **troisième pointeur (`vtable+8`) est, dans chaque classe lue, un `mov al, <constante> ; retf`** : la constante est la catégorie. Elle est lue par `Targeting_AcquireBestThreat` (6 = avion, 8 = missile, 0x13 = défense fixe) pour choisir les cibles et menaces de l'IA (voir `AI_TICK_CALL_GRAPH.md`). Le mapping chunk → vtable est celui du dernier `mov word ptr es:[bx], …` de chaque bloc.
+
+**Base des vtables de `seg339`.** Les XREF d'IDA donnent **adresse linéaire = tag + `0x6D0B0`** (ex. `seg339:24D0` référence `loc_3E4A5`, la catégorie de `JETP`, à `0x6F580` = `0x6D0B0 + 0x24C8 + 8`). L'ancienne base `0x6D070` (§6.2) est décalée de `0x40`.
 
 Chunk transverse **`INFO`** (`IFF_LoadInfoChunk`, seg104) : `+0x37` (w) =
 **rayon de collision** (défaut `0x14` = 20), `+0x39` (b) flag, `+0x3A` (b) flag2.
@@ -362,6 +367,7 @@ Deux allocations distinctes reliées par pointeur, calquées sur l'IFF :
 
 - Base de segment `seg339` = linéaire **`0x6D070`** (vérifié : `0x228A` → vtable
   linéaire `0x6F2FA`).
+  **Correction 2026-09-20 :** cette base est probablement décalée de `0x40`. Les XREF d'IDA (`seg339:24D0` ↔ `loc_3E4A5`, `seg339:2534` ↔ `loc_3DBBA`) donnent **tag + `0x6D0B0`**. La conversion de `0x228A` en `0x6F2FA` est à refaire (`0x6F33A` avec la base corrigée).
 - `PhysicsTicks` / `Aero_SumLinearForces` opèrent sur l'objet **0xC5**
   (`si = [playerCtx+0x0B]`), via `[si+2]` = `0x228A`.
 - **Point ouvert** : le slot `+0x3C` de la vtable `0x228A` (diviseur de masse
@@ -378,6 +384,7 @@ Deux allocations distinctes reliées par pointeur, calquées sur l'IFF :
     est hors de la vtable `JETP` (trop courte) et pointe sur `loc_45BBB`,
     un stub trivial (`mov al,15h / retf`). La vtable `JETP` n'a donc **pas**
     de slot `+0x34`. Impasse.
+    **Correction 2026-09-20 :** avec la base corrigée, la vtable `JETP` est à `0x6F578` (5 slots : `loc_3E51D`, stub `6C290`, `loc_3E4A5`, stub `6C2C0`, stub `6C2F0`) ; son `+8` renvoie **6** (catégorie avion). Le stub `loc_45BBB` (`mov al,15h`) est le `+8` de la vtable voisine **`XMIT`** (`0x24B4`), lu par erreur à cause du décalage de `0x40`. La conclusion « pas de slot `+0x34` dans `JETP` » reste valable (vtable de 5 slots).
   - **Piste solide trouvée :** `loc_3CB0B` (seg084) est une méthode virtuelle
     présente dans **18+ vtables d'objets du monde** (`off_6F66C`, `off_6F784`,
     `off_6F810`, `off_6F89C`, … jusqu'à `off_703D6`) — donc une méthode

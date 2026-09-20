@@ -7,12 +7,18 @@ seg435		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 114 lignes, NON DÉTAILLÉE — lit une douzaine de champs depuis le format IFF
-; (ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54 ×2, ReadFinalField_64B51 ×6,
-; ReadFieldGroupC_64A7E ×3) et appelle directement PlayerComponent_IndexToFlagMask_9DE60
-; (seg432) — confirme le lien direct avec le système d'index de composants de dommages.
+; far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large
+; 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien
+; avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage
+; (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par
+; WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category
+; (+0x4D), byte radar_type (+0x4E), byte weapon_aspec (+0x4F), valeur 'group C' target_range
+; (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group
+; C' (+0x5A). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et
+; Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme,
+; bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain).
 ; ==============================================================================================
-PlayerComponent_LoadAllFields_A0700	proc far		; CODE XREF: VROOMM_StubThunk_6C5A0J PlayerComponent_ApplyFlagsAndLoad_A07ED+1Ap
+Weapon_LoadWDATChunk_A0700	proc far		; CODE XREF: VROOMM_StubThunk_6C5A0J Weapon_LoadWDATWrapper_A07ED+1Ap
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -41,7 +47,7 @@ loc_A072C:
 		jmp	loc_A07E1
 ; ���������������������������������������������������������������������������
 
-loc_A072F:				; CODE XREF: PlayerComponent_LoadAllFields_A0700+2Aj
+loc_A072F:				; CODE XREF: Weapon_LoadWDATChunk_A0700+2Aj
 		push	si
 
 loc_A0730:
@@ -116,16 +122,16 @@ loc_A0752:
 		jmp	short loc_A07EA
 ; ���������������������������������������������������������������������������
 
-loc_A07E1:				; CODE XREF: PlayerComponent_LoadAllFields_A0700:loc_A072Cj
+loc_A07E1:				; CODE XREF: Weapon_LoadWDATChunk_A0700:loc_A072Cj
 		push	0C01Fh
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A07EA:				; CODE XREF: PlayerComponent_LoadAllFields_A0700+DFj
+loc_A07EA:				; CODE XREF: Weapon_LoadWDATChunk_A0700+DFj
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadAllFields_A0700	endp
+Weapon_LoadWDATChunk_A0700	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -133,9 +139,9 @@ PlayerComponent_LoadAllFields_A0700	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6C1CA et PlayerComponent_LoadAllFields_A0700.
+; far, combine sub_6C1CA et Weapon_LoadWDATChunk_A0700.
 ; ==============================================================================================
-PlayerComponent_ApplyFlagsAndLoad_A07ED	proc far		; CODE XREF: VROOMM_StubThunk_6C5A5J
+Weapon_LoadWDATWrapper_A07ED	proc far		; CODE XREF: VROOMM_StubThunk_6C5A5J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -155,12 +161,12 @@ loc_A07F1:
 loc_A0802:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr PlayerComponent_LoadAllFields_A0700
+		call	near ptr Weapon_LoadWDATChunk_A0700
 		add	sp, 6
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_ApplyFlagsAndLoad_A07ED	endp
+Weapon_LoadWDATWrapper_A07ED	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

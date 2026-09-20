@@ -7,12 +7,14 @@ seg432		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, convertit un index de composant (0-12, switch à 13 cas) en un masque de bit
-; (1,2,4,8,0x10...) — cohérent avec les composants de dommages/état de l'avion confirmés par
-; les chaînes du seg339 (RUDDER/ELEVATOR/AILERON/LWING/RWING/ENGINE/LANDGEAR/FLAPS).
-; Référencée via jmp depuis un stub VROOMM (sub_6C380).
+; far, LUE (2026-09-20). Convertit un identifiant d'arme (0 a 12, switch de 13 cas : 0->0,
+; 1->0x1, 2->0x2, 3->0x4, ... bit = id-1) en masque de bit. Appelee par
+; Weapon_LoadWDATChunk_A0700 sur le weapon_id du chunk WDAT (via le stub VROOMM 6C380). Ancien
+; nom 'PlayerComponent_IndexToFlagMask' faux : les 13 cas sont les 13 weapon_ids (0=aucun,
+; 1=AIM-9J, 2=AIM-9M, 3=AGM-65D, 4=LAU-3, 5=MK-20, 6=MK-82, 7=Durandal, 8=GBU-15, 9=AIM-120,
+; 10=SA-2, 11=SA-6, 12=canon 20mm), pas des composants de dommages.
 ; ==============================================================================================
-PlayerComponent_IndexToFlagMask_9DE60	proc far		; CODE XREF: VROOMM_StubThunk_6C380J
+WeaponId_ToTypeMask_9DE60	proc far		; CODE XREF: VROOMM_StubThunk_6C380J
 
 arg_0		= byte ptr  6
 
@@ -36,31 +38,31 @@ loc_9DE77:				; DATA XREF: seg432:off_9DEB9o
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE7B:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE7B:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 1		; case 0x1
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE80:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE80:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 2		; case 0x2
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE85:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE85:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 4		; case 0x3
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE8A:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE8A:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 8		; case 0x4
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE8F:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE8F:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 10h		; case 0x5
 
@@ -68,19 +70,19 @@ loc_9DE92:				; default
 		jmp	short loc_9DEB5
 ; ���������������������������������������������������������������������������
 
-loc_9DE94:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE94:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 20h	; ' '   ; case 0x6
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE99:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE99:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 40h	; '@'   ; case 0x7
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DE9E:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DE9E:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 80h	; '�'   ; case 0x8
 
@@ -88,37 +90,37 @@ loc_9DEA1:				; default
 		jmp	short loc_9DEB5
 ; ���������������������������������������������������������������������������
 
-loc_9DEA3:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DEA3:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 100h	; case 0x9
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DEA8:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DEA8:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 200h	; case 0xA
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DEAD:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DEAD:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 400h	; case 0xB
 		jmp	short loc_9DEB5	; default
 ; ���������������������������������������������������������������������������
 
-loc_9DEB2:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72j
+loc_9DEB2:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72j
 					; DATA XREF: seg432:off_9DEB9o
 		mov	dx, 800h	; case 0xC
 
-loc_9DEB5:				; CODE XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE6Ej
-					; PlayerComponent_IndexToFlagMask_9DE60+19j ...
+loc_9DEB5:				; CODE XREF: WeaponId_ToTypeMask_9DE60:loc_9DE6Ej
+					; WeaponId_ToTypeMask_9DE60+19j ...
 		mov	ax, dx		; default
 		pop	bp
 		retf
-PlayerComponent_IndexToFlagMask_9DE60	endp
+WeaponId_ToTypeMask_9DE60	endp
 
 ; ���������������������������������������������������������������������������
-off_9DEB9	dw offset loc_9DE77	; DATA XREF: PlayerComponent_IndexToFlagMask_9DE60:loc_9DE72r
+off_9DEB9	dw offset loc_9DE77	; DATA XREF: WeaponId_ToTypeMask_9DE60:loc_9DE72r
 		dw offset loc_9DE7B	; jump table for switch	statement
 		dw offset loc_9DE80
 		dw offset loc_9DE85

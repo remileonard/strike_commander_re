@@ -196,21 +196,20 @@ AI_ProximityGeometricWarning_315B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,1347L — CORRECTION D'ERREUR : ce n'est PAS un tick physique, malgré le nom initial
-; 'Flight_PhysicsTick_JDYN' donné par erreur dans une session précédente sur la seule base
-; d'une hypothèse de structure, jamais vérifiée en détail. Lecture complète effectuée : la
-; fonction lit le timer PIT à des fins de PROFILING uniquement (accumulation dans
-; word_704E6[0x5B2E]), initialise un score à -5000, pondère par les attributs de compétence
-; pilote (+0xB0/+0xB8), vérifie la disponibilité de 4 masques de type d'arme via
-; WeaponStation_FindLoadedCompatible, puis itère sur tous les objets du monde
-; (World_IterateObjects) en calculant pour chacun distance+angle d'aspect, un score pondéré
-; par bonus de portée/catégorie/ligne de vue (catégorie 2=aéronef, 6=missile, 8=contre-mesure,
-; 0x13=catégorie spéciale), avec lecture de flags_75 bit5 du propriétaire pour les candidats
-; missile. À la fin, assigne via SetReference les 3 champs +0x281 (décoy/chaff), +0x283 (cible
-; principale), +0x287 (menace/missile) du meilleur candidat trouvé, avec traitement spécial si
-; c'est un leurre (catégorie 8 : verrouillage forcé + 0x27F=2). C'est le sélecteur de
-; cible/menace générique du jeu, utilisé par l'IA (appelée depuis AI_BehaviorStateMachine,
-; sub_9D05) et probablement le joueur.
+; far, 1347L — SÉLECTEUR DE CIBLE ET DE MENACE de l'IA (lu intégralement le 2026-09-20). CE
+; N'EST PAS un tick physique (ancien nom 'Flight_PhysicsTick_JDYN' faux). Parcourt tous les
+; objets du monde (World_IterateObjects, liste 0x59C3), note chaque candidat (missile qui me
+; vise, avion hostile, objet hostile '+0x11=2'), et range le gagnant dans entité+0x287
+; (avion), +0x283 (objet '+0x11=2') ou +0x281 (missile). CATÉGORIES (vtable+8 de la classe
+; modèle, fixée par le chunk IFF présent dans OBJECTS\\<nom>.IFF, IFF_LoadModelMain) : 6=JETP
+; avion, 8=MISS missile, 0x13=SWPN défenses fixes AA/batteries/SAM/navires (fait vérifié côté
+; données). L'ancien commentaire '6=missile, 8=contre-mesure' était FAUX. Score =
+; (ATRB+0xB8−ATRB+0xB0+16)·A + (ATRB+0xB0−ATRB+0xB8+16)·B, départ −5000 (0EC78h), porte de
+; compétence Pilot_SkillCheck_B0, bandes de distance NUMS (72020/24/28/2C/30), persistance de
+; la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir,
+; pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur).
+; Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail :
+; analysis/AI_TICK_CALL_GRAPH.md.
 ; ==============================================================================================
 Targeting_AcquireBestThreat	proc far		; CODE XREF: AI_TopLevelThink+23P AI_BehaviorStateMachine_WeightedOptionSelector_9D05+75P ...
 

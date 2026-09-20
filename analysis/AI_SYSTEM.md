@@ -443,6 +443,16 @@ int AI_BehaviorStateMachine(Entity* entity) {
 }
 ```
 
+**CORRIGÉ (2026-09-19)** : ce pseudocode ne montre que la boucle de score.
+La fonction commence par des réactions prioritaires, exige une **cible**
+(`entité+0x287`) ou applique directement le nœud `entité+0xD9`, puis appelle
+`AI_BehaviorSelector_8D30` (tir et guidage vers la cible) avant de scorer. Le
+score n'a lieu que si cette fonction renvoie 0 **et** que `entité+0x0D` est
+nul. Dans la boucle, le bruit est **±1** (`test ax, 1`, jamais 0), le plancher
+de départ est **−1000**, et le score renvoyé par `[vtable+4]` est un octet. Le
+détail, avec citations, est dans `AI_TICK_CALL_GRAPH.md` (section « Le tournoi
+`MVRS` : conditions d'entrée »).
+
 **Interprétation** : chaque entrée `MVRS` représente une **option de
 comportement/manœuvre candidate**. Son score de sélection combine :
 
@@ -1134,6 +1144,15 @@ coéquipier » (déterminé au chargement du fichier `PROF`, §8) et
 `AI_BehaviorStateMachine`).
 
 ---
+
+### 4.5 Choix de cible et traitement des menaces — `Targeting_AcquireBestThreat` (lu le 2026-09-20)
+
+Détail complet dans `AI_TICK_CALL_GRAPH.md` (section du même nom). Résumé :
+
+- **Catégories d'objet** : lues par `vtable+8` de la classe modèle, fixée par le chunk présent dans `OBJECTS\<nom>.IFF` (`IFF_LoadModelMain`). **6 = `JETP` (avion), 8 = `MISS` (missile), 0x13 = `SWPN` (défenses fixes : AA, batteries, SAM, navires ; fait vérifié côté données)**. L'ancien commentaire « 2 = aéronef, 6 = missile, 8 = contre-mesure » était faux.
+- **Candidats** : missile qui me vise (`nœud+0x55` = mon avion), avion hostile (camp `+0x50` de signe opposé), objet hostile à `+0x11 = 2` (si `arg_4` non nul et arme `0x83C` chargée).
+- **Score** : deux notes A et B pondérées par `(AR − TH) + 16` et `(TH − AR) + 16` (copie `ATRB`, `+0xB8` = `AR`, `+0xB0` = `TH`), bandes de distance (`NUMS`), angles d'aspect, persistance de la cible courante, porte de compétence `Pilot_SkillCheck_B0` (`tirage 1-16 ≤ TH + aptitude`).
+- **Résultat** : le gagnant est rangé dans `entité+0x287` (avion), `+0x283` (objet à `+0x11 = 2`) ou `+0x281` (missile). **Un missile gagnant vide `+0x287` et `+0x283` et pose `+0x27F = 2`** : plus de cible d'attaque, pas de tir (`AI_BehaviorSelector_8D30` exige `+0x27F` ≤ 1) et pas de tournoi pour ce tick. La réaction défensive n'est pas dans cette fonction.
 
 ## 4bis. Comment une décision se traduit en mouvement réel — chaîne
 complète vérifiée

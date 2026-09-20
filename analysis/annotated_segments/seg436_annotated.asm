@@ -7,11 +7,16 @@ seg436		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 128 lignes, NON DÉTAILLÉE — combine sub_3C942, ResourceRecord_SeekAndRead_64743,
-; ReadFieldGroupC_64A7E (×4), ReadFieldGroupB_64A54, ReadFinalField_64B51 (seg193), sub_6C394
-; (stub voisin), gestion d'erreur. Référencée via jmp depuis un stub VROOMM (sub_6C5E0).
+; far, 128 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'DATA' D'UN OBJET SWPN
+; (defense fixe AA/SAM/navire ; ancien nom 'PlayerComponent_LoadFieldsWithRetryC' faux).
+; Appelle IFF_LoadAngleParam puis lit 'DATA' (push large 41544144h) : valeur group C ->
+; objet+0x36 (weapons_round, munitions), group C -> +0x3A (detection_range), group C -> +0x3E
+; (effective_range : LA PORTEE utilisee par Targeting_AcquireBestThreat pour noter une defense
+; fixe), word -> +0x42, group C -> +0x44, byte -> +0x48 (max_simultaneous_shots), pointeur far
+; vers l'objet arme charge (stub VROOMM 6C394, nom de l'arme sur 8 caracteres) -> +0x49/+0x4B,
+; group C -> +0x4D. Correspond a RSEntity::parseREAL_OBJT_SWPN_DATA de libRealSpace.
 ; ==============================================================================================
-PlayerComponent_LoadFieldsWithRetryC_A0A00	proc far		; CODE XREF: VROOMM_StubThunk_6C5E0J
+SwpnModel_LoadDataChunk_A0A00	proc far		; CODE XREF: VROOMM_StubThunk_6C5E0J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -48,7 +53,7 @@ loc_A0A32:
 		jmp	loc_A0AD0
 ; ���������������������������������������������������������������������������
 
-loc_A0A3C:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryC_A0A00+37j
+loc_A0A3C:				; CODE XREF: SwpnModel_LoadDataChunk_A0A00+37j
 		push	si
 
 loc_A0A3D:
@@ -129,16 +134,16 @@ loc_A0A97:
 		jmp	short loc_A0AD9
 ; ���������������������������������������������������������������������������
 
-loc_A0AD0:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryC_A0A00+39j
+loc_A0AD0:				; CODE XREF: SwpnModel_LoadDataChunk_A0A00+39j
 		push	0C01Dh
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A0AD9:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryC_A0A00+CEj
+loc_A0AD9:				; CODE XREF: SwpnModel_LoadDataChunk_A0A00+CEj
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldsWithRetryC_A0A00	endp
+SwpnModel_LoadDataChunk_A0A00	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

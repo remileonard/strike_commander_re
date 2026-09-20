@@ -15,7 +15,13 @@ seg083		segment	byte public 'CODE' use16
 ; principal du chargement de tout modèle 3D du jeu (avions, terrain, débris, armements),
 ; appelé par le système de débris (seg079) et vraisemblablement par tout le reste du pipeline
 ; de rendu. Priorité absolue pour une session d'analyse dédiée compte tenu de son rôle central
-; et de son recoupement direct avec le format IFF déjà étudié.
+; et de son recoupement direct avec le format IFF déjà étudié. || AJOUT 2026-09-20 : DÉTERMINE
+; LA CLASSE (ET LA CATÉGORIE vtable+8) DE L'OBJET selon le PREMIER chunk présent, testé dans
+; l'ordre BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB,
+; DURD, DECY, SWPN, GRND, RNWY : chaque chunk alloue une taille de classe et écrit une suite
+; de mots de vtable (constructeurs chaînés, la dernière gagne). Catégories : JETP=6, WEAP=7,
+; MISS=8, BOMB/DURD=9, PODR=0xA, TRCR=0xD, AFTB=0xE, DECY=0x10, SWPN=0x13, GRND=0x14,
+; XMIT=0x15. Voir analysis/AI_TICK_CALL_GRAPH.md.
 ; ==============================================================================================
 IFF_LoadModelMain	proc far		; CODE XREF: ObjectPrototype_FindOrLoadAndInstantiate_38B70+2CP
 					; Debris_LoadAndInstantiateAlt+2CP ...

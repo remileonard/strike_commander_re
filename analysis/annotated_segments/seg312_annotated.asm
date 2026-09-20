@@ -20,7 +20,7 @@ stru_6C580	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0ACEo
 ; ==============================================================================================
 VROOMM_StubThunk_6C5A0	proc far		; CODE XREF: PlayerComponent_LoadFieldsWithRetryD_A0FB0+19P
 					; PlayerComponent_LoadFieldsWithRetryM_A66F0+2CP
-		jmp	PlayerComponent_LoadAllFields_A0700
+		jmp	Weapon_LoadWDATChunk_A0700
 VROOMM_StubThunk_6C5A0	endp
 
 
@@ -34,7 +34,7 @@ VROOMM_StubThunk_6C5A0	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6C5A5	proc far		; CODE XREF: IFF_LoadModelMain+79EP
 					; PlayerComponent_LoadFieldsWithRetry_9FAD0+CP	...
-		jmp	PlayerComponent_ApplyFlagsAndLoad_A07ED
+		jmp	Weapon_LoadWDATWrapper_A07ED
 VROOMM_StubThunk_6C5A5	endp
 
 
