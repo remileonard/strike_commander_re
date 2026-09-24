@@ -1040,14 +1040,14 @@ arg_2		= word ptr  8
 		mov	[bp+var_E], eax
 		mov	[bp+var_A], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp+var_A], eax
 		push	large [bp+var_E]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -1112,14 +1112,14 @@ loc_55626:
 		mov	[bp-0Eh], eax
 		mov	[bp-0Ah], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp-0Ah], eax
 		push	large dword ptr	[bp-0Eh]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -1196,14 +1196,14 @@ arg_2		= word ptr  8
 		mov	[bp+var_E], eax
 		mov	[bp+var_A], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp+var_A], eax
 		push	large [bp+var_E]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -4013,20 +4013,23 @@ WorldObject_BuildOrientationMatrix_56E8A	endp
 ; far, seg116 L3998-4178 (relu intégralement, session 2026-09-05). Composition INCRÉMENTALE
 ; d'une rotation d'angle *arg_2 sur la matrice PROPRE et PERSISTANTE de l'objet si (PAS un
 ; calcul générique sans état) : row1=[si+0Ch/10h/14h], row2=[si+18h/1Ch/20h].
-; sin=Math_Sin_5483F(angle), cos=Math_Cos_54876(angle). Formule exacte (row1_old sauvé dans
-; var_44/40/3C avant écrasement) : row1_new = row1_old*sin(A) + row2_old*cos(A) ; row2_new =
-; row2_old*sin(A) - row1_old*cos(A) (sin et cos inversés par rapport à une composition
-; "standard" row*cos+row*sin - vérifié bit à bit, ne pas supposer l'inverse). Seuil de sortie
-; anticipée (L4037-4045) : même motif scale-puis-unscale que Aero_ComputeForcesMain_4791E (mov
-; 38h/shl8/.../sar8/cmp/jle) -> comparaison réelle contre 56 BRUT face à |angle| en 24.8
-; (var_14/var_18=3800h, jamais relues ensuite - même sous-produit probable de macro FIXED que
-; dans Aero_ComputeForcesMain_4791E, pas du code mort) (unité degré*256) : si |angle| <
-; 56/256=0.21875°, retour immédiat sans toucher la matrice (pas de rotation appliquée -
-; optimisation anti-bruit, aucun rapport avec l'aérodynamique). Référencée depuis
-; seg014/seg015 (UI cockpit) et, via Matrix_BuildAxisX_ApplyToObject_574B3, par
-; WorldObject_BuildOrientationMatrix_56E8A (objets du monde) et Camera_ChaseComputeMain
+; sin=Math_CosDeg_5483F(angle), cos=Math_SinDeg_54876(angle). Formule exacte (row1_old sauvé
+; dans var_44/40/3C avant écrasement) : row1_new = row1_old*sin(A) + row2_old*cos(A) ;
+; row2_new = row2_old*sin(A) - row1_old*cos(A) (sin et cos inversés par rapport à une
+; composition "standard" row*cos+row*sin - vérifié bit à bit, ne pas supposer l'inverse).
+; Seuil de sortie anticipée (L4037-4045) : même motif scale-puis-unscale que
+; Aero_ComputeForcesMain_4791E (mov 38h/shl8/.../sar8/cmp/jle) -> comparaison réelle contre 56
+; BRUT face à |angle| en 24.8 (var_14/var_18=3800h, jamais relues ensuite - même sous-produit
+; probable de macro FIXED que dans Aero_ComputeForcesMain_4791E, pas du code mort) (unité
+; degré*256) : si |angle| < 56/256=0.21875°, retour immédiat sans toucher la matrice (pas de
+; rotation appliquée - optimisation anti-bruit, aucun rapport avec l'aérodynamique).
+; Référencée depuis seg014/seg015 (UI cockpit) et, via Matrix_BuildAxisX_ApplyToObject_574B3,
+; par WorldObject_BuildOrientationMatrix_56E8A (objets du monde) et Camera_ChaseComputeMain
 ; (seg085) - usage confirmé pour la caméra et les scripts de manœuvre IA (ovr232), PAS encore
-; trouvé pour la physique de l'avion joueur lui-même.
+; trouvé pour la physique de l'avion joueur lui-même. [2026-09-24 : l'inversion sin/cos notee
+; ci-dessus vient des NOMS : Math_CosDeg_5483F est un cosinus et Math_SinDeg_54876 un sinus.
+; Avec les vraies fonctions, c'est une rotation standard autour de la ligne 0 (lignes 1 et 2
+; modifiees).]
 ; ==============================================================================================
 Matrix_BuildAxisX_56EC3	proc far		; CODE XREF: seg014:05CDP seg015:07B3P ...
 
@@ -4083,7 +4086,7 @@ loc_56F05:				; CODE XREF: Matrix_BuildAxisX_56EC3+3Dj
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_4], eax
@@ -4091,7 +4094,7 @@ loc_56F05:				; CODE XREF: Matrix_BuildAxisX_56EC3+3Dj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_20]
 		mov	[bp+var_8], eax
@@ -4216,8 +4219,11 @@ Matrix_BuildAxisX_56EC3	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de construction de matrice de rotation (autre axe), référencée par
-; Audio3D_ComputeDistanceParams (sub_41BEF, Doppler).
+; far, LUE (2026-09-24). ROTATION d'angle theta (24.8 degres, *arg_2) de la matrice arg_0
+; AUTOUR DE SA LIGNE 1 : la ligne 1 n'est pas modifiee ; c = Math_CosDeg_5483F(theta), s =
+; Math_SinDeg_54876(theta) ; ligne0' = c*ligne0 - s*ligne2 ; ligne2' = c*ligne2 + s*ligne0. Ne
+; fait rien si |theta| < 0x38 (0,22 deg). Suivie de Matrix_OrthonormalizeKeepRow1_57660.
+; Utilisee pour le roulis du missile et de la bombe guidee.
 ; ==============================================================================================
 Matrix_BuildAxisY_570C5	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1EDP
 					; MissileBody_SteerToTarget_42738+1E7P ...
@@ -4275,7 +4281,7 @@ loc_57107:				; CODE XREF: Matrix_BuildAxisY_570C5+3Dj
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_4], eax
@@ -4283,7 +4289,7 @@ loc_57107:				; CODE XREF: Matrix_BuildAxisY_570C5+3Dj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_20]
 		mov	[bp+var_8], eax
@@ -4463,7 +4469,7 @@ loc_572FE:				; CODE XREF: Matrix_BuildAxisZ_572BC+3Dj
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_4], eax
@@ -4471,7 +4477,7 @@ loc_572FE:				; CODE XREF: Matrix_BuildAxisZ_572BC+3Dj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_20]
 		mov	[bp+var_8], eax
@@ -4636,7 +4642,7 @@ loc_574D5:				; CODE XREF: Matrix_BuildAxisX_ApplyToObject_574B3+1Dj
 		push	si
 		nop
 		push	cs
-		call	near ptr Matrix_ApplyToVectorX_575DF
+		call	near ptr Matrix_OrthonormalizeKeepRow0_575DF
 		pop	cx
 
 loc_57502:				; CODE XREF: Matrix_BuildAxisX_ApplyToObject_574B3+46j
@@ -4820,10 +4826,12 @@ Matrix_BuildFullOrientation_575B2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, applique une transformation à un vecteur (3× Vector_CrossProduct3D_550B7 + 3×
-; Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF).
+; far, LUE (2026-09-24). Ex-'Matrix_ApplyToVectorX'. Re-orthonormalise une matrice 3x3 en
+; GARDANT la ligne 0 (+0x00) : ligne 2 = Vector_CrossProduct3D_550B7(ligne 0, ligne 1), ligne
+; 1 = Vector_CrossProduct3D_550B7(ligne 2, ligne 0), puis Vector_Normalize3D_559BB sur les
+; trois lignes. Appelee apres Matrix_BuildAxisX_56EC3 (rotation autour de la ligne 0).
 ; ==============================================================================================
-Matrix_ApplyToVectorX_575DF	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2E5P
+Matrix_OrthonormalizeKeepRow0_575DF	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2E5P
 					; MissileBody_SteerToTarget_42738+2C9P ...
 
 var_18		= dword	ptr -18h
@@ -4891,7 +4899,7 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-Matrix_ApplyToVectorX_575DF	endp
+Matrix_OrthonormalizeKeepRow0_575DF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -616,7 +616,7 @@ loc_443A3:				; CODE XREF: Collision_ComputeConnectionVector+1C2j
 		push	ss
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_1E]
@@ -637,7 +637,7 @@ loc_443DD:				; CODE XREF: Collision_ComputeConnectionVector+1FCj
 		push	ss
 		lea	ax, [bp+var_2A]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_2A]

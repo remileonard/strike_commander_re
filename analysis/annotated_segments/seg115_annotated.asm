@@ -11,7 +11,7 @@ seg115		segment	byte public 'CODE' use16
 ; far, normalise un angle fixe (24.8, unité 0x16800=360°) dans l'intervalle [-180°,+180°]
 ; (0xB400) par additions/soustractions successives d'un tour complet.
 ; ==============================================================================================
-Math_NormalizeAngle180_547EF	proc far		; CODE XREF: Math_Sin_5483F+Fp Math_Cos_54876+Fp ...
+Math_NormalizeAngle180_547EF	proc far		; CODE XREF: Math_CosDeg_5483F+Fp Math_SinDeg_54876+Fp ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -73,10 +73,11 @@ Math_NormalizeAngle180_547EF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, normalise l'angle (Math_NormalizeAngle180) puis appelle sub_580A7 (sinus fixe).
-; Référencée par le cœur IA (seg002/seg003) et AI_ManeuverSolution.
+; far, LUE (2026-09-24). Ex-'Math_Sin' : NOM INVERSE, c'est un COSINUS.
+; Math_NormalizeAngle180_547EF(angle 24.8 en degres) puis Math_CosRaw_580A7 ; resultat 24.8
+; dans *arg_0.
 ; ==============================================================================================
-Math_Sin_5483F	proc far		; CODE XREF: AI_ManeuverSolution_Major+214P
+Math_CosDeg_5483F	proc far		; CODE XREF: AI_ManeuverSolution_Major+214P
 					; AI_VisibilityTest+1F5P ...
 
 var_8		= dword	ptr -8
@@ -96,7 +97,7 @@ arg_4		= word ptr  0Ah
 		call	near ptr Math_NormalizeAngle180_547EF
 		add	sp, 6
 		push	large [bp+var_8]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -108,7 +109,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-Math_Sin_5483F	endp
+Math_CosDeg_5483F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -116,10 +117,11 @@ Math_Sin_5483F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, normalise l'angle puis appelle sub_58063 (cosinus fixe). Référencée par le cœur IA
-; (seg002/seg003).
+; far, LUE (2026-09-24). Ex-'Math_Cos' : NOM INVERSE, c'est un SINUS.
+; Math_NormalizeAngle180_547EF(angle 24.8 en degres) puis Math_SinRaw_58063 ; resultat 24.8
+; dans *arg_0.
 ; ==============================================================================================
-Math_Cos_54876	proc far		; CODE XREF: seg002:0F18P seg003:0CD3P ...
+Math_SinDeg_54876	proc far		; CODE XREF: seg002:0F18P seg003:0CD3P ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -138,7 +140,7 @@ arg_4		= word ptr  0Ah
 		call	near ptr Math_NormalizeAngle180_547EF
 		add	sp, 6
 		push	large [bp+var_8]
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
@@ -150,7 +152,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-Math_Cos_54876	endp
+Math_SinDeg_54876	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

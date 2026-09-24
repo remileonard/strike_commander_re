@@ -1082,7 +1082,7 @@ loc_37263:
 		push	ax
 
 loc_37264:
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		mov	edx, [bp+var_4C]
@@ -1098,7 +1098,7 @@ loc_37264:
 		push	ss
 		lea	ax, [bp+var_58]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		mov	edx, [bp+var_58]

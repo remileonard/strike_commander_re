@@ -2047,7 +2047,7 @@ loc_4D58:
 		push	ss
 		lea	ax, [bp-1Eh]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-1Eh]
 		sar	eax, 1

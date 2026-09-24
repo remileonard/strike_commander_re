@@ -2594,8 +2594,11 @@ HUDSymbol_ComputeApproachDisplay_83FC9	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 217 lignes, NON DÉTAILLÉE — combine Math_Cos_54876, Camera_TransformPoint,
-; Math_ArcCosOfRatio_54A76 (seg115) — affichage HUD de gisement.
+; ⚠️ far, 217 lignes, NON DÉTAILLÉE — combine Math_SinDeg_54876, Camera_TransformPoint,
+; Math_ArcCosOfRatio_54A76 (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24)
+; Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir
+; Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a
+; relire.
 ; ==============================================================================================
 HUDSymbol_ComputeBearingDisplay_8417C	proc far		; CODE XREF: VROOMM_StubThunk_6B00AJ HUDSymbol_ProcessJoystickAndFilter_843B5+25Dp
 
@@ -2639,7 +2642,7 @@ arg_2		= word ptr  8
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	ax, si
 		add	ax, 8Ch	; '�'

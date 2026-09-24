@@ -1143,14 +1143,16 @@ Aero_SumLinearForces_48639	endp
 ; n'est PAS une valeur calculée à part - c'est littéralement l'octet à var_7A+0x20 de ce
 ; buffer, soit la composante Z (monde) du 3e vecteur (vecteur "haut" du repère avion).
 ; AI_ApplyAngleBetweenVectors_57C3A (L1364) -> Math_AngleBetweenVectors_552E1 calcule l'angle
-; entre le vecteur avant du buffer et l'axe Z monde ; Math_Sin_5483F (L1371) en prend le sinus
-; -> var_30. cmp [var_5A],0 / jge / neg var_30 (L1373-1377) : signe inversé si la composante Z
-; du vecteur "haut" est négative (avion sur le dos). var_30 = sin(angle(avant, Z_monde)), qui
-; par l'identité sin(90°-x)=cos(x) vaut ≈cos(tangage) quand l'avion est proche du vol
-; horizontal - PAS un terme de virage/inclinaison comme une interprétation précédente le
-; supposait. var_38 = var_16 + var_30 (L1380-1383, PAS juste var_16) : sans ce terme, var_38
-; s'effondre à 0 au neutre/palier (cf. bug 21G vs MAX_G=9 constaté en jeu, corrigé dans
-; SCJetpPlane::processInput session 2026-09-05).
+; entre le vecteur avant du buffer et l'axe Z monde ; Math_CosDeg_5483F (L1371) en prend le
+; sinus -> var_30. cmp [var_5A],0 / jge / neg var_30 (L1373-1377) : signe inversé si la
+; composante Z du vecteur "haut" est négative (avion sur le dos). var_30 = sin(angle(avant,
+; Z_monde)), qui par l'identité sin(90°-x)=cos(x) vaut ≈cos(tangage) quand l'avion est proche
+; du vol horizontal - PAS un terme de virage/inclinaison comme une interprétation précédente
+; le supposait. var_38 = var_16 + var_30 (L1380-1383, PAS juste var_16) : sans ce terme,
+; var_38 s'effondre à 0 au neutre/palier (cf. bug 21G vs MAX_G=9 constaté en jeu, corrigé dans
+; SCJetpPlane::processInput session 2026-09-05). ⚠️ (2026-09-24) Math_Sin_5483F /
+; Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
+; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 Aero_ComputeControlFlags75Bit5B	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+11p
 
@@ -1324,7 +1326,7 @@ loc_48967:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+100j
 		push	ss
 		lea	ax, [bp+var_4E]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4E]
 		or	eax, eax
@@ -1380,7 +1382,7 @@ loc_48A28:
 		push	ss
 		lea	ax, [bp+var_30]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		cmp	[bp+var_5A], 0
 		jge	short loc_48A64

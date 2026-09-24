@@ -1531,7 +1531,9 @@ loc_5ABA:				; CODE XREF: seg003:0ADEj
 ; CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique
 ; de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est
 ; confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit
-; vers Goal_FollowAllyExec_DAA9.
+; vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs
+; versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus
+; tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 AIEntity_MasterTick_5ACC:				; DATA XREF: seg339:011Co
 		push	bp
@@ -1650,7 +1652,7 @@ loc_5C2D:				; CODE XREF: seg003:0CA9j
 		push	ss
 		lea	ax, [bp-24h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-24h]
 		imul	eax, [bp-20h]
@@ -3513,7 +3515,7 @@ loc_6B7E:				; CODE XREF: AI_ManeuverSolution_Major+202j
 		push	ss
 		lea	ax, [bp+var_5A]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_46]
 		mov	edx, [bp+var_5A]
@@ -4044,7 +4046,7 @@ AI_InterceptDispatcher	endp
 ; agressives. PLUSIEURS PALIERS D'ANGLE LIMITE (lignes ~16800-16870) : clamps a ±166 deg (cas
 ; extreme) ou ±45 deg (cas modere, 0x2D00) selon la situation geometrique. REORIENTATION DU
 ; VECTEUR D'ENTREE (ligne ~16880, si var_1==1) : recalcule la 3e composante du vecteur si par
-; un facteur cosinus (Math_Cos_54876) proportionnel a la distance
+; un facteur cosinus (Math_SinDeg_54876) proportionnel a la distance
 ; (Math_VectorLength3D_Raw_5828E), puis re-transforme (Vector_TransformHelperB_559BB) - ajuste
 ; l'approche en fonction de la distance a la cible. SORTIE (fin de fonction, ligne
 ; ~17058-17075) : calcule un DERNIER delta d'angle final (var_A, wrappe ±180 deg), puis
@@ -4053,7 +4055,10 @@ AI_InterceptDispatcher	endp
 ; - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie
 ; complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de
 ; guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) ->
-; AI_CombatDecision_Major (decision) -> AI_TurnToHeadingCmd (execution).
+; AI_CombatDecision_Major (decision) -> AI_TurnToHeadingCmd (execution). ⚠️ (2026-09-24)
+; Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir
+; Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a
+; relire.
 ; ==============================================================================================
 AI_GuidanceSolution_Major	proc far		; CODE XREF: AI_InterceptDispatcher+B9p AI_GuidanceCmd_FromOwnPos+46p ...
 
@@ -4526,7 +4531,7 @@ loc_73D8:				; CODE XREF: AI_GuidanceSolution_Major+383j
 		push	ss
 		lea	ax, [bp+var_64]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_64]
 		mov	[si+8],	eax

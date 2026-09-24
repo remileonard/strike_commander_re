@@ -413,11 +413,12 @@ MissileBody_BoostPhase_42632	endp
 ; LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne
 ; max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote
 ; positif ; apres le roulis la cible est cote +c2, donc b >= 0).
-; Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0
-; (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de
-; poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a
-; vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par
-; unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg).
+; Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_OrthonormalizeKeepRow0_575DF : rotation autour
+; de c0 (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation.
+; Loi de poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis
+; cabrage a vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en
+; degres 24.8 par unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22
+; deg).
 ; ==============================================================================================
 MissileBody_SteerToTarget_42738	proc far		; CODE XREF: seg090:07DAp
 
@@ -759,7 +760,7 @@ loc_429F6:
 		call	Matrix_BuildAxisX_56EC3
 		add	sp, 4
 		push	57E2h
-		call	Matrix_ApplyToVectorX_575DF
+		call	Matrix_OrthonormalizeKeepRow0_575DF
 		pop	cx
 		push	57E2h
 		push	word ptr [si+2]

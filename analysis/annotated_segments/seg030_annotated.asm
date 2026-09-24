@@ -2600,7 +2600,7 @@ loc_1E804:
 		push	ss
 		lea	ax, [bp-8Ch]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-52h]
 		mov	edx, [bp-8Ch]
@@ -2616,7 +2616,7 @@ loc_1E804:
 		push	ss
 		lea	ax, [bp-98h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-52h]
 		mov	edx, [bp-98h]

@@ -1302,7 +1302,7 @@ loc_2E72F:
 		push	ax
 		push	ds
 		push	offset dword_6E9AE
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		leave
 		retf

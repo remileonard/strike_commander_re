@@ -303,14 +303,14 @@ loc_455A0:				; CODE XREF: Missile_ComputeImpactPlane+F5j
 		mov	[bp+var_2E], eax
 		mov	[bp+var_32], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp+var_32], eax
 		push	large [bp+var_2E]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax

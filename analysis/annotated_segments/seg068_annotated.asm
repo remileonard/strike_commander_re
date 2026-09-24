@@ -735,7 +735,7 @@ loc_2FDED:				; CODE XREF: Render_PolygonProjectVertices:loc_2FDE4j
 		push	ss
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_12]
 		mov	edx, [bp+var_2C]
@@ -757,7 +757,7 @@ loc_2FE32:
 loc_2FE37:
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 
 loc_2FE43:

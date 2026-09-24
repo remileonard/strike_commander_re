@@ -355,6 +355,14 @@ renommage. Exemples : `AI_ThrottleController_6250`,
   `loc_XXXXX`) référencés depuis un autre segment (méthodes de vtable,
   points d'entrée de stubs VROOMM) qui sont de vraies fonctions sans bloc
   `proc` formel. `extract_segment.py` détecte les deux cas.
+- **Sinus et cosinus : les noms historiques étaient INVERSÉS** (prouvé 2026-09-24 par la
+  table `seg213`, `table[i] = cos(i/4°)·256`). L'ex-`Math_Sin_5483F` est un **cosinus**
+  (`Math_CosDeg_5483F`), l'ex-`Math_Cos_54876` est un **sinus** (`Math_SinDeg_54876`) ; même
+  chose pour les versions brutes (`Math_CosRaw_580A7`, `Math_SinRaw_58063`). Tout résumé ou
+  document écrit avant cette date qui déduit un « sin » ou un « cos » de ces noms est à relire
+  (les résumés concernés portent un ⚠️) ; en particulier la loi de charge du modèle de vol
+  (`Aero_ComputeControlFlags75Bit5B` : `var_30` est le **cosinus** de l'angle nez / Z monde,
+  donc ≈ sin(tangage), et non ≈ cos(tangage)).
 - **Quand Rémi localise un bug ou exclut une piste**, c'est une contrainte
   dure, pas une hypothèse à confirmer parmi d'autres. « c'est dans le code
   que tu viens d'écrire », « ce n'est pas le dt », « c'est un signe dans

@@ -64,10 +64,11 @@ Math_FixedMulDiv_5804C	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, cosinus en virgule fixe (implémentation brute, sans normalisation d'angle — appelée par
-; Math_Cos_54876).
+; far, LUE (2026-09-24). Ex-'Math_Cos_Raw' : NOM INVERSE, c'est un SINUS. i = angle 24.8 >> 6
+; (+1440 si negatif) ; indexe la meme table cosinus seg213 a (90 deg - angle) avec signe :
+; sin(0) = table[360] = 0.
 ; ==============================================================================================
-Math_Cos_Raw_58063	proc far		; CODE XREF: seg020:0A10P
+Math_SinRaw_58063	proc far		; CODE XREF: seg020:0A10P
 					; Camera_ComputeMountedPosition_3D31D+192P ...
 
 arg_0		= dword	ptr  6
@@ -79,7 +80,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_58077
 		add	bx, 5A0h
 
-loc_58077:				; CODE XREF: Math_Cos_Raw_58063+Ej
+loc_58077:				; CODE XREF: Math_SinRaw_58063+Ej
 		mov	ax, 168h
 		sub	bx, ax
 		jl	short loc_5808B
@@ -89,16 +90,16 @@ loc_58077:				; CODE XREF: Math_Cos_Raw_58063+Ej
 		jmp	short loc_5808D
 ; ���������������������������������������������������������������������������
 
-loc_58086:				; CODE XREF: Math_Cos_Raw_58063+1Dj
+loc_58086:				; CODE XREF: Math_SinRaw_58063+1Dj
 		inc	cx
 		sub	bx, ax
 		jge	short loc_5808D
 
-loc_5808B:				; CODE XREF: Math_Cos_Raw_58063+19j
+loc_5808B:				; CODE XREF: Math_SinRaw_58063+19j
 		neg	bx
 
-loc_5808D:				; CODE XREF: Math_Cos_Raw_58063+21j
-					; Math_Cos_Raw_58063+26j
+loc_5808D:				; CODE XREF: Math_SinRaw_58063+21j
+					; Math_SinRaw_58063+26j
 		mov	ax, 100h
 		or	bx, bx
 		jz	short loc_5809E
@@ -108,16 +109,16 @@ loc_5808D:				; CODE XREF: Math_Cos_Raw_58063+21j
 		xor	ax, ax
 		mov	al, es:[bx]
 
-loc_5809E:				; CODE XREF: Math_Cos_Raw_58063+2Fj
+loc_5809E:				; CODE XREF: Math_SinRaw_58063+2Fj
 		or	cx, cx
 		jz	short loc_580A4
 		neg	ax
 
-loc_580A4:				; CODE XREF: Math_Cos_Raw_58063+3Dj
+loc_580A4:				; CODE XREF: Math_SinRaw_58063+3Dj
 		cwd
 		leave
 		retf
-Math_Cos_Raw_58063	endp
+Math_SinRaw_58063	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -125,9 +126,13 @@ Math_Cos_Raw_58063	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, sinus en virgule fixe (implémentation brute — appelée par Math_Sin_5483F).
+; far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8|
+; >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0,
+; sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) * 256 (verifie : 221 a 30
+; deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise |angle|) : cos(0) = 1,
+; cos(180) = -1.
 ; ==============================================================================================
-Math_Sin_Raw_580A7	proc far		; CODE XREF: seg020:0A24P
+Math_CosRaw_580A7	proc far		; CODE XREF: seg020:0A24P
 					; Camera_ComputeMountedPosition_3D31D+1A6P ...
 
 arg_0		= dword	ptr  6
@@ -139,7 +144,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_580B9
 		neg	bx
 
-loc_580B9:				; CODE XREF: Math_Sin_Raw_580A7+Ej
+loc_580B9:				; CODE XREF: Math_CosRaw_580A7+Ej
 		cmp	bx, 168h
 		jb	short loc_580D3
 		inc	cx
@@ -150,11 +155,11 @@ loc_580B9:				; CODE XREF: Math_Sin_Raw_580A7+Ej
 		dec	cx
 		sub	bx, 2D0h
 
-loc_580D1:				; CODE XREF: Math_Sin_Raw_580A7+1Dj
+loc_580D1:				; CODE XREF: Math_CosRaw_580A7+1Dj
 		neg	bx
 
-loc_580D3:				; CODE XREF: Math_Sin_Raw_580A7+16j
-					; Math_Sin_Raw_580A7+23j
+loc_580D3:				; CODE XREF: Math_CosRaw_580A7+16j
+					; Math_CosRaw_580A7+23j
 		mov	ax, 100h
 		or	bx, bx
 		jz	short loc_580E4
@@ -163,16 +168,16 @@ loc_580D3:				; CODE XREF: Math_Sin_Raw_580A7+16j
 		xor	ax, ax
 		mov	al, es:[bx]
 
-loc_580E4:				; CODE XREF: Math_Sin_Raw_580A7+31j
+loc_580E4:				; CODE XREF: Math_CosRaw_580A7+31j
 		or	cx, cx
 		jz	short loc_580EA
 		neg	ax
 
-loc_580EA:				; CODE XREF: Math_Sin_Raw_580A7+3Fj
+loc_580EA:				; CODE XREF: Math_CosRaw_580A7+3Fj
 		cwd
 		leave
 		retf
-Math_Sin_Raw_580A7	endp
+Math_CosRaw_580A7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -550,8 +555,10 @@ Math_Sqrt_Raw_582EE	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, calcule simultanément sinus et cosinus d'un même angle (Math_Cos_Raw_58063 +
-; Math_Sin_Raw_580A7). Référencée par sub_1B23F.
+; far, calcule simultanément sinus et cosinus d'un même angle (Math_SinRaw_58063 +
+; Math_CosRaw_580A7). Référencée par sub_1B23F. ⚠️ (2026-09-24) Math_Sin_5483F /
+; Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
+; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 Math_ComputeSinCosPair_58344	proc far		; CODE XREF: UI_ComputeScaledRect+65P
 					; UI_ComputeScaledRect+72P
@@ -573,10 +580,10 @@ arg_2		= word ptr  8
 		push	dx
 		push	ax
 		push	cs
-		call	near ptr Math_Cos_Raw_58063
+		call	near ptr Math_SinRaw_58063
 		mov	[bp+var_2], ax
 		push	cs
-		call	near ptr Math_Sin_Raw_580A7
+		call	near ptr Math_CosRaw_580A7
 		add	sp, 4
 		mov	[bp+var_4], ax
 		mov	ax, [si]

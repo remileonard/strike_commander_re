@@ -49,14 +49,14 @@ loc_17248:				; DATA XREF: seg216:0156o
 		push	ss
 		lea	ax, [bp+var_A]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		lea	ax, [bp+var_4]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_E]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	[bp+var_12], di
 		movsx	eax, [bp+var_12]
@@ -149,14 +149,14 @@ arg_4		= byte ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_A]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		lea	ax, [bp+var_4]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_E]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 
 loc_17333:
 		add	sp, 6

@@ -2772,8 +2772,10 @@ HUDSymbol_ComputeTransform_8203D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 474 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A, Math_Sin_5483F
-; (seg115), Camera_TransformPoint.
+; ⚠️ far, 474 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A, Math_CosDeg_5483F
+; (seg115), Camera_TransformPoint. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs
+; versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus
+; tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 HUDSymbol_RenderWithLOSCheckB_82181	proc far		; CODE XREF: VROOMM_StubThunk_6AF3FJ HUDSymbol_ConstructWithViewMatrix_82693+195p
 
@@ -3118,7 +3120,7 @@ loc_824D3:
 		push	ss
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_FA]
 		mov	edx, [bp+var_9A]

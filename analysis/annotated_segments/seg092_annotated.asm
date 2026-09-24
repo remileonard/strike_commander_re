@@ -338,7 +338,7 @@ loc_43692:
 		push	ss
 		lea	ax, [bp-26h]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-1Ah]
 		cmp	eax, [bp-26h]

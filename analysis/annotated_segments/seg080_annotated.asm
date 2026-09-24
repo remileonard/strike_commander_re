@@ -870,7 +870,7 @@ loc_39447:				; CODE XREF: seg080:06ADj
 		push	ss
 		lea	ax, [bp-24h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-1Ch]
 		mov	edx, [bp-24h]

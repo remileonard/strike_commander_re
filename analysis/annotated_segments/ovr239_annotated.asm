@@ -2917,7 +2917,7 @@ loc_7CC2E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BF4j
 		push	ss
 		lea	ax, [bp+var_142]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 
 loc_7CD0F:

@@ -935,13 +935,16 @@ loc_3D319:				; CODE XREF: seg085:06B5j
 ; &Vlin) => si[+0x12/+0x16/+0x1A] += Vlin — la position n'est PAS posée en absolu, elle
 ; INTEGRE la vitesse du mount * dt chaque frame (jamais de snap, jamais d'offset constant
 ; ici). (3) W = si[+0x51]->vtable[+0x2C]() (sinon 0) ; theta = W.y * dword_70458/256 ;
-; rotation 2D de (W.x, W.z) par theta (Math_Cos_58063 / Math_Sin_580A7 / FixedMul_58034) ;
-; si->vtable[+0x30](&{W.x*dt, W.y*dt, W.z*dt}) et si[+0x51]->vtable[+0x30](&W_tourné) —
+; rotation 2D de (W.x, W.z) par theta (Math_SinRaw_58063 / Math_CosRaw_580A7 / FixedMul_58034)
+; ; si->vtable[+0x30](&{W.x*dt, W.y*dt, W.z*dt}) et si[+0x51]->vtable[+0x30](&W_tourné) —
 ; RATTRAPAGE DE CAP rate-limité appliqué à l'orientation de la caméra ET du mount. => le 'lag
 ; chase' = (a) position qui intègre v_mount*dt + (b) cap qui rattrape à taux*dt. Reste ouvert
 ; : cam[+0x12] démarre à 0 et n'est jamais posé en absolu (=> offset relatif au mount, ou
 ; accumulateur de force ; Debris_BodyGetPosition_37D04 le lit pourtant brut) ; où l'offset de
 ; recul initial est posé ; identité du mount cam[+0x51] pour CHASE. Voir CAMERA_SYSTEM.md §4.
+; ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES
+; (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume
+; est a relire.
 ; ==============================================================================================
 Camera_ComputeMountedPosition_3D31D	proc far		; CODE XREF: seg087:0250P
 					; DATA XREF: seg339:off_6F6DCo	...
@@ -1108,7 +1111,7 @@ loc_3D483:
 		mov	[bp+var_40], eax
 		mov	[bp+var_44], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
@@ -1117,7 +1120,7 @@ loc_3D483:
 
 loc_3D4BF:
 		push	large [bp+var_40]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax

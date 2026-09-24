@@ -1858,7 +1858,7 @@ arg_E		= byte ptr  14h
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		push	di
 		mov	bx, [di]
@@ -2228,7 +2228,7 @@ arg_C		= byte ptr  12h
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		push	[bp+var_8]
 		mov	bx, [bp+var_8]

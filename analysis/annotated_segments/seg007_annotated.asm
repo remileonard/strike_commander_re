@@ -225,7 +225,7 @@ loc_DECB:				; CODE XREF: AI_VisibilityTest+1A5j
 		push	ss
 		lea	ax, [bp+var_1A]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_1A]
@@ -251,7 +251,7 @@ loc_DF09:				; CODE XREF: AI_VisibilityTest+1E4j
 		push	ss
 		lea	ax, [bp+var_26]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		mov	edx, [bp+var_26]

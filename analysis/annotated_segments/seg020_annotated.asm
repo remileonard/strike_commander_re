@@ -1090,14 +1090,14 @@ loc_17F53:
 		mov	[bp-5Eh], eax
 		mov	[bp-62h], eax
 		push	eax
-		call	Math_Cos_Raw_58063
+		call	Math_SinRaw_58063
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp-62h], eax
 		push	large dword ptr	[bp-5Eh]
-		call	Math_Sin_Raw_580A7
+		call	Math_CosRaw_580A7
 		push	dx
 		push	ax
 		pop	eax
@@ -1143,7 +1143,7 @@ loc_18045:
 		push	ss
 		lea	ax, [bp-66h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-66h]
 		add	[bp-4Ah], eax
@@ -1168,7 +1168,7 @@ loc_18045:
 		push	ss
 		lea	ax, [bp-7Eh]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-7Eh]
 		mov	[bp-7Ah], eax
@@ -1177,7 +1177,7 @@ loc_18045:
 		push	ss
 		lea	ax, [bp-82h]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-82h]
 		mov	[bp-76h], eax
@@ -1208,7 +1208,7 @@ loc_18045:
 		push	ss
 		lea	ax, [bp-86h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp-86h]
 		mov	[bp-7Ah], eax
@@ -1219,7 +1219,7 @@ loc_18144:
 		push	ss
 		lea	ax, [bp-8Ah]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-8Ah]
 		mov	[bp-76h], eax

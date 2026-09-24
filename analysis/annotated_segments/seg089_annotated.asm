@@ -522,7 +522,7 @@ loc_4180A:				; CODE XREF: seg089:04DEj
 		push	ss
 		lea	ax, [bp-24h]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp-24h]
 		mov	[bp-1Ah], eax
@@ -1132,11 +1132,11 @@ GuidedBombBody_InheritLaunchSpeed_41B84	endp
 ; Matrix_OrthonormalizeKeepRow1_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres idiv par
 ; c1 SANS garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18
 ; * dt (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 +
-; Matrix_ApplyToVectorX_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5)
-; DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la bombe
-; (Matrix_LocalToWorld_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise en
-; cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de
-; vitesse tant qu'elle est guidee.
+; Matrix_OrthonormalizeKeepRow0_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle
+; orientation. (5) DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la
+; bombe (Matrix_LocalToWorld_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise
+; en cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte
+; de vitesse tant qu'elle est guidee.
 ; ==============================================================================================
 GuidedBombBody_SteerToTarget_41BEF	proc far		; CODE XREF: seg089:0CE0p
 
@@ -1478,7 +1478,7 @@ loc_41EC2:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2A6j
 		call	Matrix_BuildAxisX_56EC3
 		add	sp, 4
 		push	57A6h
-		call	Matrix_ApplyToVectorX_575DF
+		call	Matrix_OrthonormalizeKeepRow0_575DF
 		pop	cx
 		push	57A6h
 		mov	bx, [si]

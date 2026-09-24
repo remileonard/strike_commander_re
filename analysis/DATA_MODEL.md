@@ -1530,7 +1530,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   1. `V = mount[+8] × (dword_7045E/256)` (ou `(0,0,0)` si pas de mount) ;
   2. `Debris_BodyIntegrateForces(cam, &V…)` → `cam.pos(+0x12) += V` puis `cam->vtable[8]` (no-op) ;
   3. `Ta = mount->vtable[0x2C](out)` ; rotation 2D horizontale de `(Ta.x, Ta.z)` par
-     l'angle `θ = Ta.y × (dword_70458/256)` (`Math_Cos/Sin_Raw`, `Math_FixedMultiply`,
+     l'angle `θ = Ta.y × (dword_70458/256)` (`Math_Cos/Sin_Raw` — ⚠️ noms inversés, voir `Math_CosRaw_580A7` / `Math_SinRaw_58063`, `Math_FixedMultiply`,
      seg085:1075-1120) ; `cam->vtable[0x30](&Ta×dt)` et `mount->vtable[0x30](&Ta_rot)`.
   → rattrapage **partiel par frame** du cap du mount = le « lag » angulaire.
 

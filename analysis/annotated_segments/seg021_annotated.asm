@@ -633,7 +633,7 @@ loc_18933:
 		push	ss
 		lea	ax, [bp-8Ch]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		movsx	eax, word ptr [bp-88h]
 		mov	edx, [bp-8Ch]
@@ -652,7 +652,7 @@ loc_18933:
 		push	ax
 
 loc_18990:
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 
 loc_18995:
 		add	sp, 6
@@ -889,7 +889,7 @@ loc_18BD6:				; CODE XREF: seg021:0834j
 		push	ax
 
 loc_18C21:
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		movsx	eax, word ptr [bp-9Eh]
 		mov	edx, [bp-0A2h]
@@ -906,7 +906,7 @@ loc_18C21:
 		push	ss
 		lea	ax, [bp-0B0h]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		movsx	eax, word ptr [bp-0ACh]
 		mov	edx, [bp-0B0h]

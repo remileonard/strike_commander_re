@@ -780,7 +780,7 @@ loc_4673C:				; CODE XREF: Physics_AllocGroundConstraintVector+73j
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Math_Cos_54876
+		call	Math_SinDeg_54876
 		add	sp, 6
 		mov	eax, [bp+var_4]
 
@@ -888,7 +888,7 @@ loc_4685C:
 loc_46861:
 		lea	ax, [bp+var_28]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_28]
 		add	[bp+var_C], eax

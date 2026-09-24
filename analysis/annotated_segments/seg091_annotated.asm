@@ -139,7 +139,7 @@ loc_42E34:
 		push	ss
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		cmp	eax, [bp+var_14]
@@ -605,10 +605,11 @@ off_430FD	dw offset loc_43094	; DATA XREF: Targeting_FilterByWeaponType+7Cr
 ; d'aspect ; sinon poids w = 3 (5 si c->vtable+0x38 == word_722E6), s =
 ; c->vtable+0x7C(reference) : s > 0xD2 (210) et Math_RandomScale_54DF4(10) < w -> bascule sur
 ; c ; s == 210 -> bascule ; sinon reste sur di. Si on reste sur di : ASPECT ARRIERE
-; OBLIGATOIRE, Math_DotProduct3D_5505B(vitesse reference, vitesse di) >= Math_Sin_5483F(0x5A00
-; = 90.0) sinon renvoie 0 (piste perdue). ASPEC 2 (AIM-9M) : meme candidat, bascule si s >=
-; 0xF5 (245) et tirage < w, sinon reste sur di ; PAS de test d'aspect (tous secteurs). ASPEC 3
-; (aucune arme des fichiers WDAT) : di nul -> FilterByWeaponType ; sinon
+; OBLIGATOIRE, Math_DotProduct3D_5505B(vitesse reference, vitesse di) >=
+; Math_CosDeg_5483F(0x5A00 = 90.0) = cos 90 = 0, sinon renvoie 0 (les deux vitesses doivent
+; former un angle d'au plus 90 deg) (piste perdue). ASPEC 2 (AIM-9M) : meme candidat, bascule
+; si s >= 0xF5 (245) et tirage < w, sinon reste sur di ; PAS de test d'aspect (tous secteurs).
+; ASPEC 3 (aucune arme des fichiers WDAT) : di nul -> FilterByWeaponType ; sinon
 ; Targeting_ReticleWindowTest(arme, di, reference, arg_8). ASPEC 4 (AIM-120, SA-2, SA-6) :
 ; bascule si Debris_GetSubpartAttrib(c) (2e octet SIGN du modele, non virtuel) >= 245 et
 ; tirage < w, sinon reste sur di. ASPEC 5/6 (AGM-65D, GBU-15) : Proximity_TestOriented(arme,
@@ -746,7 +747,7 @@ loc_4319B:				; CODE XREF: Targeting_SelectAndPrioritize+8Fj
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4]
 

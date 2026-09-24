@@ -1260,7 +1260,7 @@ arg_0		= word ptr  6
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		mov	[si+64h], eax
@@ -1358,7 +1358,7 @@ loc_97DB2:
 		push	ss
 		lea	ax, [bp+var_4C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	[bp+var_50], 100h
 		mov	eax, [bp+var_50]
@@ -1386,7 +1386,7 @@ loc_97EB3:
 		push	ss
 		lea	ax, [bp+var_60]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	[bp+var_64], 100h
 		mov	eax, [bp+var_64]

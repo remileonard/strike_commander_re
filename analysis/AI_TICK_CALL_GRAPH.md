@@ -580,7 +580,7 @@ renvoie (sig >> 8) & 0xFF                        // sar eax,8 ; mov [bp-1Dh], al
 1. `c = Targeting_FilterByWeaponType(arme, référence)` : le candidat dans le cône et la portée du chercheur.
 2. `c` nul → renvoie 0. `c` = cible actuelle → on la garde.
 3. Sinon, poids `w = 3` (5 si `c->vtable+0x38 == word_722E6`). La signature de `c` est comparée au seuil : **au-dessus, `c` vole la piste si `Math_RandomScale_54DF4(10) < w`** (3 chances sur 10) ; en dessous, on garde la cible actuelle.
-4. **Aspec 1 seulement (AIM-9J)** : quand on garde la cible, test d'aspect `Math_DotProduct3D_5505B(v_ref, v_cible) >= Math_Sin_5483F(0x5A00 = 90.0)`, sinon renvoie 0. **L'AIM-9J ne tient que de dos.**
+4. **Aspec 1 seulement (AIM-9J)** : quand on garde la cible, test d'aspect `Math_DotProduct3D_5505B(v_ref, v_cible) >= Math_CosDeg_5483F(0x5A00 = 90.0)` = cos 90° = 0 (les deux vitesses à 90° au plus), sinon renvoie 0. **L'AIM-9J ne tient que de dos.**
 
 | aspec | armes (`WDAT`) | test de `Targeting_SelectAndPrioritize` | octet rangé par `WeaponStation_TestTargetLock` dans `+0x0F` |
 |---|---|---|---|
@@ -712,3 +712,10 @@ Preuve que la ligne 1 est le nez : dans `MissileBody_BoostPhase_42632` et `Missi
 - La cible est `objet+0x55` (recopiée dans `+0x20`) et le lanceur est `objet->vtable+0x38` (recopié dans `+0x22`). Cela confirme le sens « lanceur » de `vtable+0x38` pour cet objet.
 
 **À vérifier côté données** : quels objets portent un chunk dynamique `GBMB` (vraisemblablement la GBU-15), et la valeur de son dword.
+
+### Sinus et cosinus inversés, et fin de la relecture des matrices (lu 2026-09-24)
+
+- `Matrix_OrthonormalizeKeepRow0_575DF` (ex-`Matrix_ApplyToVectorX`) : ligne 2 = ligne 0 × ligne 1, ligne 1 = ligne 2 × ligne 0, puis normalisation des trois lignes. Elle garde la ligne 0, c'est-à-dire l'axe de la rotation de `Matrix_BuildAxisX_56EC3`.
+- `Matrix_BuildAxisY_570C5` : la ligne 1 est inchangée ; `ligne0' = c·ligne0 − s·ligne2`, `ligne2' = c·ligne2 + s·ligne0`, avec `c = Math_CosDeg_5483F(θ)` et `s = Math_SinDeg_54876(θ)`. C'est bien une rotation autour du nez : **le roulis est confirmé**.
+- **Les noms étaient inversés.** `Math_Sin_Raw_580A7` travaille sur `|angle|` et renvoie 1,0 pour un angle nul ; `Math_Cos_Raw_58063` indexe la table à `90° − angle`. La table `seg213` vaut `cos(i/4°)·256` (221 à 30°, 181 à 45°, 127 à 60°, 0 à 90°). Renommées : `Math_CosDeg_5483F`, `Math_SinDeg_54876`, `Math_CosRaw_580A7`, `Math_SinRaw_58063`.
+- **Conséquence pour le chercheur** : le test d'aspect de l'AIM-9J compare le produit scalaire des vitesses à `cos 90° = 0`, et non à 1,0. L'AIM-9J garde sa cible tant que les deux vitesses font un angle d'au plus 90°.

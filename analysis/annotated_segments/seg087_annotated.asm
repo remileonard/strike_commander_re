@@ -472,7 +472,7 @@ loc_3E2C6:
 		push	ax
 
 loc_3E2CA:
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 
 loc_3E2D2:
@@ -970,7 +970,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_44]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_44]
 		mov	[bp+var_30], eax
@@ -990,7 +990,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_30]
 
@@ -1008,7 +1008,7 @@ loc_3E687:
 		push	ss
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 
 loc_3E6B5:
 		add	sp, 6
@@ -1030,7 +1030,7 @@ loc_3E6C3:
 		push	ss
 		lea	ax, [bp+var_68]
 		push	ax
-		call	Math_Sin_5483F
+		call	Math_CosDeg_5483F
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		mov	edx, [bp+var_68]
