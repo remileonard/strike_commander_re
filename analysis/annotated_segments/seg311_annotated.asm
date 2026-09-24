@@ -19,7 +19,7 @@ stru_6C510	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0AC6o
 ; d'overlay actuellement charge en memoire. fileoff=2E8E0h, codesize=3B1h, nentries=15.
 ; ==============================================================================================
 VROOMM_StubThunk_6C530	proc far		; CODE XREF: IFF_LoadModelMain+840P
-		jmp	PlayerComponent_LoadFieldsWithRetryB_A0340
+		jmp	MissileModel_LoadDATAChunk_A0340
 VROOMM_StubThunk_6C530	endp
 
 
@@ -136,7 +136,7 @@ VROOMM_StubThunk_6C558	endp
 ; d'overlay actuellement charge en memoire. fileoff=2E8E0h, codesize=3B1h, nentries=15.
 ; ==============================================================================================
 VROOMM_StubThunk_6C55D	proc far
-		jmp	PlayerComponent_LoadFieldGroupC_A04E3
+		jmp	DynMissile_LoadMISSChunk_A04E3
 VROOMM_StubThunk_6C55D	endp
 
 

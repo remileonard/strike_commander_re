@@ -2160,9 +2160,9 @@
     "summary": "far, aucun appel externe visible (32 lignes)."
   },
   "sub_A0340": {
-    "new_name": "PlayerComponent_LoadFieldsWithRetryB_A0340",
+    "new_name": "MissileModel_LoadDATAChunk_A0340",
     "segment": "seg434",
-    "summary": "far, combine sub_6C5A5, ResourceRecord_SeekAndRead_64743, ReadFieldGroupC_64A7E, ReadFinalField_64B51, ReadFieldGroupB_64A54 (seg193), gestion d'erreur."
+    "summary": "far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODELE missile (bloc MISS d'IFF_LoadModelMain, via VROOMM_StubThunk_6C530), apres le chargeur de base (VROOMM_StubThunk_6C5A5) : dword -> +0x5E, octet -> +0x62, word -> +0x63 = RAYON DE L'ALLUMEUR DE PROXIMITE (lu par Missile_UpdateSeekerAndFuse_42458, en unites entieres, << 8). Sens de +0x5E et +0x62 non trace."
   },
   "loc_680DA": {
     "new_name": "TextScrollDisplayB_Method_DestructThunk_680DA",
@@ -4815,9 +4815,9 @@
     "summary": "far, 30 lignes, entre sub_67C3F et sub_67CB8. ⚠️ Adresse exacte non résolue."
   },
   "sub_42632": {
-    "new_name": "Sound3D_TriggerWithRange",
+    "new_name": "MissileBody_BoostPhase_42632",
     "segment": "seg090",
-    "summary": "far,126L — résout la position d'une source sonore (via vtable[0x4C] d'un objet référencé +0x37, une fois — flag +0x3B), calcule la distance à l'auditeur (sub_5828E), compare à une portée d'écoute (+0x25) : **déclencheur de son 3D positionnel avec portée maximale (sub_58768) — mécanique commune aux effets sonores d'armement/leurres.**"
+    "summary": "far, 126L, LUE (2026-09-24). Ex-'Sound3D_TriggerWithRange' (FAUX). PHASE PROPULSEE du missile, appelee par MissileBody_GuidanceTick_42A4E tant que +0x3A == 0. Premier appel (+0x3B == 0) : vitesse du corps = vitesse du lanceur (+0x37, vtable+0x4C), efface le bit 1 de [missile]+4, pose +0x3B = 1. Ensuite : si |vitesse| < corps+0x25 (vitesse maximale) : vitesse ramenee dans le repere du missile (Math_ApplyRotationHelperA_58768 avec 0x57E2), composantes c0 et c2 mises a 0, c1 += corps+0x29 * dt (acceleration le long du nez), retour au repere monde (Math_ApplyRotationHelperB_58828). Sinon : MissileBody_SetCruiseVelocity_42A1B et +0x3A = 1 (fin de la propulsion : elle s'arrete quand la vitesse maximale est atteinte, pas sur une duree)."
   },
   "sub_6ADB9": {
     "new_name": "VROOMM_StubThunk_6ADB9",
@@ -6465,9 +6465,9 @@
     "summary": "far, 52 lignes, entre sub_66573 et sub_665FA — parcourt la chaîne (LinkedList_Helper_5F3D5) à la recherche d'une correspondance, appelle JoystickCallback_UpdateAndNotifyChain_66461 si trouvée. ⚠️ Adresse exacte non résolue."
   },
   "sub_42A1B": {
-    "new_name": "Sound3D_TriggerDirect",
+    "new_name": "MissileBody_SetCruiseVelocity_42A1B",
     "segment": "seg090",
-    "summary": "far,25L — copie 3 champs de position (+0x2D/+0x25/+0x31) vers le buffer standard (+8/0xC/0x10) puis joue un son (0x57E2, sub_58828) : **déclenchement direct d'un son positionnel depuis une position pré-calculée.**"
+    "summary": "far, 25L, LUE (2026-09-24). Ex-'Sound3D_TriggerDirect' (FAUX). Vitesse du corps = (corps+0x2D, corps+0x25, corps+0x31) exprimee dans le repere du missile (c0, c1 = nez, c2), ramenee au repere monde par Math_ApplyRotationHelperB_58828(0x57E2) : vol de croisiere a vitesse maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS (+0x2D, +0x31) sont les composantes laterale et normale de cette vitesse."
   },
   "sub_5BC94": {
     "new_name": "PagedMemory_Helper_5BC94",
@@ -6970,9 +6970,9 @@
     "summary": "far,36L — itère +0x17 (compteur +0x15) appelant vtable[8] : **notification (draw) d'une première liste d'enfants.**"
   },
   "sub_A04E3": {
-    "new_name": "PlayerComponent_LoadFieldGroupC_A04E3",
+    "new_name": "DynMissile_LoadMISSChunk_A04E3",
     "segment": "seg434",
-    "summary": "⚠️ far, 104 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 et ReadFieldGroupC_64A7E (×5, seg193), gestion d'erreur — charge un grand nombre de champs depuis le format IFF."
+    "summary": "far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldGroupC'. Chargeur du chunk dynamique 'MISS' (5353494Dh) du corps physique du missile (appele via PlayerComponent_SubHelperR_A04C0 depuis JDYN_LoadChunkAndConstruct_3A49C) : 5 dwords (ResourceRecord_ReadFieldGroupC_64A7E) -> +0x21 vitesse angulaire maximale de guidage (MissileBody_SteerToTarget_42738), +0x25 vitesse maximale / de croisiere, +0x29 acceleration de propulsion, +0x2D et +0x31 composantes laterale et normale de la vitesse de croisiere (MissileBody_SetCruiseVelocity_42A1B). Chunk absent : erreur 0xC00B."
   },
   "sub_73940": {
     "new_name": "AIAircraft_LoadProfileGuarded_73940",
@@ -12565,9 +12565,9 @@
     "summary": "far, thunk voisin uniquement (14 lignes)."
   },
   "sub_42738": {
-    "new_name": "Sound3D_ComputeSecondChannel",
+    "new_name": "MissileBody_SteerToTarget_42738",
     "segment": "seg090",
-    "summary": "far,352L — calcule la distance auditeur↔source sur un second canal de globals (dword_7287A/7E/82 vs dword_72886/8A/8E), variante étendue de sub_42632 : **calcul de paramètres audio 3D pour un second canal/voix simultanée (probable superposition de sons d'effets).**"
+    "summary": "far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'Sound3D_ComputeSecondChannel' (FAUX : aucun son). LOI DE GUIDAGE DU MISSILE, appelee par MissileBody_GuidanceTick_42A4E quand le corps a une cible (+0x35) et le guidage actif (+0x39). Entrees : point vise P = globals dword_7287A/7E/82 (position +0x12 de la cible), position propre = dword_72886/8A/8E, matrice d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2) ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L = Math_ApplyRotationHelperA_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) = atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_ApplyToVectorY_57660 : rotation autour de l'axe c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0). Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0 (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg)."
   },
   "sub_22A7D": {
     "new_name": "WorldObjects_Cluster_22A7D",
@@ -18773,5 +18773,20 @@
     "new_name": "Decoy_TickLifetime_451B5",
     "segment": "seg095",
     "summary": "far, LUE (2026-09-24). Slot +0x10 (mise a jour) de l'instance LEURRE (vtable 0x6ED1A) : inst+0x2E -= dt (dword_70458) ; tant que +0x2E >= 0 appelle Camera_NotifyFollowTarget ; renvoie 1 si l'objet vit encore. Le leurre meurt quand son temps restant passe sous 0."
+  },
+  "loc_42A4E": {
+    "new_name": "MissileBody_GuidanceTick_42A4E",
+    "segment": "seg090",
+    "summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present : 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A == 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente -> MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse += dword_6FFD7 * dt (gravite), UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_ApplyToVectorY_57660 + [missile]->vtable+0x40). Renvoie 1."
+  },
+  "loc_42458": {
+    "new_name": "Missile_UpdateSeekerAndFuse_42458",
+    "segment": "seg090",
+    "summary": "far, LUE (2026-09-24). Mise a jour de l'objet MISSILE (categorie 8). Si +0x59 : l'efface et renvoie 1 ; si +0x26 non nul : renvoie 1. Sinon, si le minuteur +0x5A echoit (Timer_TickWithBlinkPulses_4FB46) et que le chercheur est actif (+0x61) : +0x55 = Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible actuelle +0x55, le missile lui-meme, +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). Puis Camera_ExternalUpdate_3D9B4 (tick du corps -> MissileBody_GuidanceTick_42A4E). ALLUMEUR DE PROXIMITE : si cible presente et distance (positions +0x12) < modele+0x63 << 8 (word du chunk DATA du modele MISS), renvoie 0 (le missile explose/disparait) ; sinon renvoie l'etat du corps."
+  },
+  "loc_4244E": {
+    "new_name": "Missile_GetCategory_4244E",
+    "segment": "seg090",
+    "summary": "far, LUE (2026-09-24). `mov al, 8` : categorie d'objet 8 = missile (vtable de l'objet missile, seg339 off_6FAF8)."
   }
 }

@@ -3,7 +3,11 @@ seg090		segment	byte public 'CODE' use16
 		;org 0Eh
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_4244E:				; DATA XREF: seg339:off_6FAF8o
+; ==============================================================================================
+; far, LUE (2026-09-24). mov al, 8 : categorie d'objet 8 = missile (vtable de l'objet missile,
+; seg339 off_6FAF8).
+; ==============================================================================================
+Missile_GetCategory_4244E:				; DATA XREF: seg339:off_6FAF8o
 		push	bp
 		mov	bp, sp
 		mov	ax, [bp+6]
@@ -12,7 +16,18 @@ loc_4244E:				; DATA XREF: seg339:off_6FAF8o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_42458:				; DATA XREF: seg339:off_6FAD4o
+; ==============================================================================================
+; far, LUE (2026-09-24). Mise a jour de l'objet MISSILE (categorie 8). Si +0x59 : l'efface et
+; renvoie 1 ; si +0x26 non nul : renvoie 1. Sinon, si le minuteur +0x5A echoit
+; (Timer_TickWithBlinkPulses_4FB46) et que le chercheur est actif (+0x61) : +0x55 =
+; Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible actuelle +0x55, le missile lui-
+; meme, +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). Puis
+; Camera_ExternalUpdate_3D9B4 (tick du corps -> MissileBody_GuidanceTick_42A4E). ALLUMEUR DE
+; PROXIMITE : si cible presente et distance (positions +0x12) < modele+0x63 << 8 (word du
+; chunk DATA du modele MISS), renvoie 0 (le missile explose/disparait) ; sinon renvoie l'etat
+; du corps.
+; ==============================================================================================
+Missile_UpdateSeekerAndFuse_42458:				; DATA XREF: seg339:off_6FAD4o
 		push	bp
 		mov	bp, sp
 		sub	sp, 1Ah
@@ -238,12 +253,17 @@ loc_4261F:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,126L — résout la position d'une source sonore (via vtable[0x4C] d'un objet référencé
-; +0x37, une fois — flag +0x3B), calcule la distance à l'auditeur (sub_5828E), compare à une
-; portée d'écoute (+0x25) : déclencheur de son 3D positionnel avec portée maximale (sub_58768)
-; — mécanique commune aux effets sonores d'armement/leurres.
+; far, 126L, LUE (2026-09-24). Ex-'Sound3D_TriggerWithRange' (FAUX). PHASE PROPULSEE du
+; missile, appelee par MissileBody_GuidanceTick_42A4E tant que +0x3A == 0. Premier appel
+; (+0x3B == 0) : vitesse du corps = vitesse du lanceur (+0x37, vtable+0x4C), efface le bit 1
+; de [missile]+4, pose +0x3B = 1. Ensuite : si |vitesse| < corps+0x25 (vitesse maximale) :
+; vitesse ramenee dans le repere du missile (Math_ApplyRotationHelperA_58768 avec 0x57E2),
+; composantes c0 et c2 mises a 0, c1 += corps+0x29 * dt (acceleration le long du nez), retour
+; au repere monde (Math_ApplyRotationHelperB_58828). Sinon :
+; MissileBody_SetCruiseVelocity_42A1B et +0x3A = 1 (fin de la propulsion : elle s'arrete quand
+; la vitesse maximale est atteinte, pas sur une duree).
 ; ==============================================================================================
-Sound3D_TriggerWithRange	proc far		; CODE XREF: seg090:07E9p
+MissileBody_BoostPhase_42632	proc far		; CODE XREF: seg090:07E9p
 
 var_22		= dword	ptr -22h
 var_1E		= dword	ptr -1Eh
@@ -283,12 +303,12 @@ arg_0		= word ptr  6
 		mov	eax, [bp+var_1A]
 		mov	[si+10h], eax
 
-loc_42677:				; CODE XREF: Sound3D_TriggerWithRange+18j
+loc_42677:				; CODE XREF: MissileBody_BoostPhase_42632+18j
 		mov	bx, [si+2]
 		and	byte ptr [bx+4], 0FDh
 		mov	byte ptr [si+3Bh], 1
 
-loc_42682:				; CODE XREF: Sound3D_TriggerWithRange+12j
+loc_42682:				; CODE XREF: MissileBody_BoostPhase_42632+12j
 		push	large dword ptr	[si+10h]
 		push	large dword ptr	[si+0Ch]
 		push	large dword ptr	[si+8]
@@ -306,10 +326,10 @@ loc_42682:				; CODE XREF: Sound3D_TriggerWithRange+12j
 		jmp	short loc_426B3
 ; ���������������������������������������������������������������������������
 
-loc_426B1:				; CODE XREF: Sound3D_TriggerWithRange+78j
+loc_426B1:				; CODE XREF: MissileBody_BoostPhase_42632+78j
 		xor	ax, ax
 
-loc_426B3:				; CODE XREF: Sound3D_TriggerWithRange+7Dj
+loc_426B3:				; CODE XREF: MissileBody_BoostPhase_42632+7Dj
 		or	al, al
 		jz	short loc_42729
 		push	57E2h
@@ -355,20 +375,20 @@ loc_4271F:
 		jmp	short loc_42734
 ; ���������������������������������������������������������������������������
 
-loc_42729:				; CODE XREF: Sound3D_TriggerWithRange+83j
+loc_42729:				; CODE XREF: MissileBody_BoostPhase_42632+83j
 		push	si
 		nop
 		push	cs
-		call	near ptr Sound3D_TriggerDirect
+		call	near ptr MissileBody_SetCruiseVelocity_42A1B
 		pop	cx
 		mov	byte ptr [si+3Ah], 1
 
-loc_42734:				; CODE XREF: Sound3D_TriggerWithRange+F5j
+loc_42734:				; CODE XREF: MissileBody_BoostPhase_42632+F5j
 		pop	di
 		pop	si
 		leave
 		retf
-Sound3D_TriggerWithRange	endp
+MissileBody_BoostPhase_42632	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -376,12 +396,28 @@ Sound3D_TriggerWithRange	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,352L — calcule la distance auditeur↔source sur un second canal de globals
-; (dword_7287A/7E/82 vs dword_72886/8A/8E), variante étendue de sub_42632 : calcul de
-; paramètres audio 3D pour un second canal/voix simultanée (probable superposition de sons
-; d'effets).
+; far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'Sound3D_ComputeSecondChannel' (FAUX : aucun
+; son). LOI DE GUIDAGE DU MISSILE, appelee par MissileBody_GuidanceTick_42A4E quand le corps a
+; une cible (+0x35) et le guidage actif (+0x39). Entrees : point vise P = globals
+; dword_7287A/7E/82 (position +0x12 de la cible), position propre = dword_72886/8A/8E, matrice
+; d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse
+; = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2)
+; ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L =
+; Math_ApplyRotationHelperA_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice
+; (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) =
+; atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ;
+; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_ApplyToVectorY_57660 : rotation autour de l'axe
+; c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur
+; ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere)
+; b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code
+; ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0).
+; Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0
+; (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de
+; poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a
+; vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par
+; unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg).
 ; ==============================================================================================
-Sound3D_ComputeSecondChannel	proc far		; CODE XREF: seg090:07DAp
+MissileBody_SteerToTarget_42738	proc far		; CODE XREF: seg090:07DAp
 
 var_84		= dword	ptr -84h
 var_80		= dword	ptr -80h
@@ -458,10 +494,10 @@ arg_0		= word ptr  6
 		jmp	short loc_427B6
 ; ���������������������������������������������������������������������������
 
-loc_427B4:				; CODE XREF: Sound3D_ComputeSecondChannel+75j
+loc_427B4:				; CODE XREF: MissileBody_SteerToTarget_42738+75j
 		xor	ax, ax
 
-loc_427B6:				; CODE XREF: Sound3D_ComputeSecondChannel+7Aj
+loc_427B6:				; CODE XREF: MissileBody_SteerToTarget_42738+7Aj
 		or	al, al
 		jz	short loc_427D6
 		mov	eax, [bp+var_4]
@@ -474,29 +510,29 @@ loc_427B6:				; CODE XREF: Sound3D_ComputeSecondChannel+7Aj
 		jmp	short loc_427E6
 ; ���������������������������������������������������������������������������
 
-loc_427D6:				; CODE XREF: Sound3D_ComputeSecondChannel+80j
+loc_427D6:				; CODE XREF: MissileBody_SteerToTarget_42738+80j
 		mov	[bp+var_18], 100h
 		mov	eax, [bp+var_18]
 		mov	[bp+var_14], eax
 
-loc_427E6:				; CODE XREF: Sound3D_ComputeSecondChannel+9Cj
+loc_427E6:				; CODE XREF: MissileBody_SteerToTarget_42738+9Cj
 		cmp	[bp+var_14], 100h
 		jle	short loc_427F5
 		mov	ax, 1
 		jmp	short loc_427F7
 ; ���������������������������������������������������������������������������
 
-loc_427F5:				; CODE XREF: Sound3D_ComputeSecondChannel+B6j
+loc_427F5:				; CODE XREF: MissileBody_SteerToTarget_42738+B6j
 		xor	ax, ax
 
-loc_427F7:				; CODE XREF: Sound3D_ComputeSecondChannel+BBj
+loc_427F7:				; CODE XREF: MissileBody_SteerToTarget_42738+BBj
 		or	al, al
 		jz	short loc_4280B
 		mov	[bp+var_1C], 100h
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_14], eax
 
-loc_4280B:				; CODE XREF: Sound3D_ComputeSecondChannel+C1j
+loc_4280B:				; CODE XREF: MissileBody_SteerToTarget_42738+C1j
 		push	word ptr [si+35h]
 		push	ss
 		lea	ax, [bp+var_78]
@@ -573,27 +609,27 @@ loc_42897:
 		jmp	short loc_428D3
 ; ���������������������������������������������������������������������������
 
-loc_428D1:				; CODE XREF: Sound3D_ComputeSecondChannel+192j
+loc_428D1:				; CODE XREF: MissileBody_SteerToTarget_42738+192j
 		xor	ax, ax
 
-loc_428D3:				; CODE XREF: Sound3D_ComputeSecondChannel+197j
+loc_428D3:				; CODE XREF: MissileBody_SteerToTarget_42738+197j
 		or	al, al
 		jz	short loc_428DC
 		lea	ax, [bp+var_20]
 		jmp	short loc_4291B
 ; ���������������������������������������������������������������������������
 
-loc_428DC:				; CODE XREF: Sound3D_ComputeSecondChannel+19Dj
+loc_428DC:				; CODE XREF: MissileBody_SteerToTarget_42738+19Dj
 		cmp	[bp+var_84], 0
 		jle	short loc_428E9
 		mov	ax, 1
 		jmp	short loc_428EB
 ; ���������������������������������������������������������������������������
 
-loc_428E9:				; CODE XREF: Sound3D_ComputeSecondChannel+1AAj
+loc_428E9:				; CODE XREF: MissileBody_SteerToTarget_42738+1AAj
 		xor	ax, ax
 
-loc_428EB:				; CODE XREF: Sound3D_ComputeSecondChannel+1AFj
+loc_428EB:				; CODE XREF: MissileBody_SteerToTarget_42738+1AFj
 		or	al, al
 		jz	short loc_42906
 		mov	eax, [bp+var_20]
@@ -604,15 +640,15 @@ loc_428EB:				; CODE XREF: Sound3D_ComputeSecondChannel+1AFj
 		jmp	short loc_4291B
 ; ���������������������������������������������������������������������������
 
-loc_42906:				; CODE XREF: Sound3D_ComputeSecondChannel+1B5j
+loc_42906:				; CODE XREF: MissileBody_SteerToTarget_42738+1B5j
 		mov	eax, [bp+var_20]
 		add	eax, 0FFFF4C00h
 		mov	[bp+var_30], eax
 		mov	[bp+var_34], eax
 		lea	ax, [bp+var_34]
 
-loc_4291B:				; CODE XREF: Sound3D_ComputeSecondChannel+1A2j
-					; Sound3D_ComputeSecondChannel+1CCj
+loc_4291B:				; CODE XREF: MissileBody_SteerToTarget_42738+1A2j
+					; MissileBody_SteerToTarget_42738+1CCj
 		push	ax
 		push	57E2h
 		call	Matrix_BuildAxisY_570C5
@@ -647,10 +683,10 @@ loc_4291B:				; CODE XREF: Sound3D_ComputeSecondChannel+1A2j
 		jmp	short loc_4297F
 ; ���������������������������������������������������������������������������
 
-loc_4297D:				; CODE XREF: Sound3D_ComputeSecondChannel+23Ej
+loc_4297D:				; CODE XREF: MissileBody_SteerToTarget_42738+23Ej
 		xor	ax, ax
 
-loc_4297F:				; CODE XREF: Sound3D_ComputeSecondChannel+243j
+loc_4297F:				; CODE XREF: MissileBody_SteerToTarget_42738+243j
 		or	al, al
 		jz	short loc_429AF
 
@@ -663,7 +699,7 @@ loc_4298F:
 		jge	short loc_42997
 		neg	eax
 
-loc_42997:				; CODE XREF: Sound3D_ComputeSecondChannel+25Aj
+loc_42997:				; CODE XREF: MissileBody_SteerToTarget_42738+25Aj
 		mov	[bp+var_48], eax
 		mov	eax, [bp+var_48]
 		mov	[bp+var_4C], eax
@@ -671,7 +707,7 @@ loc_42997:				; CODE XREF: Sound3D_ComputeSecondChannel+25Aj
 		sub	eax, [bp+var_4C]
 		mov	[bp+var_38], eax
 
-loc_429AF:				; CODE XREF: Sound3D_ComputeSecondChannel+249j
+loc_429AF:				; CODE XREF: MissileBody_SteerToTarget_42738+249j
 		mov	eax, [bp+var_38]
 		cmp	eax, [bp+var_40]
 		jle	short loc_429BE
@@ -679,10 +715,10 @@ loc_429AF:				; CODE XREF: Sound3D_ComputeSecondChannel+249j
 		jmp	short loc_429C0
 ; ���������������������������������������������������������������������������
 
-loc_429BE:				; CODE XREF: Sound3D_ComputeSecondChannel+27Fj
+loc_429BE:				; CODE XREF: MissileBody_SteerToTarget_42738+27Fj
 		xor	ax, ax
 
-loc_429C0:				; CODE XREF: Sound3D_ComputeSecondChannel+284j
+loc_429C0:				; CODE XREF: MissileBody_SteerToTarget_42738+284j
 		or	al, al
 		jz	short loc_429EF
 		cmp	[bp+var_38], 0
@@ -691,10 +727,10 @@ loc_429C0:				; CODE XREF: Sound3D_ComputeSecondChannel+284j
 		jmp	short loc_429D2
 ; ���������������������������������������������������������������������������
 
-loc_429D0:				; CODE XREF: Sound3D_ComputeSecondChannel+291j
+loc_429D0:				; CODE XREF: MissileBody_SteerToTarget_42738+291j
 		xor	ax, ax
 
-loc_429D2:				; CODE XREF: Sound3D_ComputeSecondChannel+296j
+loc_429D2:				; CODE XREF: MissileBody_SteerToTarget_42738+296j
 		or	al, al
 		jz	short loc_429E7
 		mov	eax, [bp+var_40]
@@ -704,13 +740,13 @@ loc_429D2:				; CODE XREF: Sound3D_ComputeSecondChannel+296j
 		jmp	short loc_429EB
 ; ���������������������������������������������������������������������������
 
-loc_429E7:				; CODE XREF: Sound3D_ComputeSecondChannel+29Cj
+loc_429E7:				; CODE XREF: MissileBody_SteerToTarget_42738+29Cj
 		mov	eax, [bp+var_40]
 
-loc_429EB:				; CODE XREF: Sound3D_ComputeSecondChannel+2ADj
+loc_429EB:				; CODE XREF: MissileBody_SteerToTarget_42738+2ADj
 		mov	[bp+var_38], eax
 
-loc_429EF:				; CODE XREF: Sound3D_ComputeSecondChannel+28Aj
+loc_429EF:				; CODE XREF: MissileBody_SteerToTarget_42738+28Aj
 		lea	ax, [bp+var_38]
 		push	ax
 
@@ -732,7 +768,7 @@ loc_429F6:
 		pop	si
 		leave
 		retf
-Sound3D_ComputeSecondChannel	endp
+MissileBody_SteerToTarget_42738	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -740,11 +776,13 @@ Sound3D_ComputeSecondChannel	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,25L — copie 3 champs de position (+0x2D/+0x25/+0x31) vers le buffer standard
-; (+8/0xC/0x10) puis joue un son (0x57E2, sub_58828) : déclenchement direct d'un son
-; positionnel depuis une position pré-calculée.
+; far, 25L, LUE (2026-09-24). Ex-'Sound3D_TriggerDirect' (FAUX). Vitesse du corps =
+; (corps+0x2D, corps+0x25, corps+0x31) exprimee dans le repere du missile (c0, c1 = nez, c2),
+; ramenee au repere monde par Math_ApplyRotationHelperB_58828(0x57E2) : vol de croisiere a
+; vitesse maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS
+; (+0x2D, +0x31) sont les composantes laterale et normale de cette vitesse.
 ; ==============================================================================================
-Sound3D_TriggerDirect	proc far		; CODE XREF: Sound3D_TriggerWithRange+FAp
+MissileBody_SetCruiseVelocity_42A1B	proc far		; CODE XREF: MissileBody_BoostPhase_42632+FAp
 					; seg090:089Dp
 
 arg_0		= word ptr  6
@@ -768,11 +806,28 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Sound3D_TriggerDirect	endp
+MissileBody_SetCruiseVelocity_42A1B	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_42A4E:				; DATA XREF: seg339:off_6F052o
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe
+; construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present :
+; 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position
+; propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ;
+; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible
+; : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible
+; +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de
+; [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur
+; depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du
+; lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A ==
+; 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente ->
+; MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse +=
+; dword_6FFD7 * dt (gravite), UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A
+; sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_ApplyToVectorY_57660 +
+; [missile]->vtable+0x40). Renvoie 1.
+; ==============================================================================================
+MissileBody_GuidanceTick_42A4E:				; DATA XREF: seg339:off_6F052o
 		push	bp
 		mov	bp, sp
 		sub	sp, 5Ah
@@ -957,7 +1012,7 @@ loc_42C0C:				; CODE XREF: seg090:loc_42B26j
 		jz	short loc_42C1E
 		push	si
 		push	cs
-		call	near ptr Sound3D_ComputeSecondChannel
+		call	near ptr MissileBody_SteerToTarget_42738
 		pop	cx
 
 loc_42C1E:				; CODE XREF: seg090:07D0j seg090:07D6j
@@ -967,7 +1022,7 @@ loc_42C1E:				; CODE XREF: seg090:07D0j seg090:07D6j
 		jnz	short loc_42C2F
 		push	si
 		push	cs
-		call	near ptr Sound3D_TriggerWithRange
+		call	near ptr MissileBody_BoostPhase_42632
 		jmp	loc_42CE0
 ; ���������������������������������������������������������������������������
 
@@ -1048,7 +1103,7 @@ loc_42C95:
 loc_42CDB:				; CODE XREF: seg090:07F5j
 		push	si
 		push	cs
-		call	near ptr Sound3D_TriggerDirect
+		call	near ptr MissileBody_SetCruiseVelocity_42A1B
 
 loc_42CE0:				; CODE XREF: seg090:07ECj
 		pop	cx

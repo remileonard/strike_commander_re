@@ -63,6 +63,8 @@ Lu dans l'assembleur (détail dans `AI_TICK_CALL_GRAPH.md`, « Le tir de missile
 - Non lus : `Targeting_FilterByWeaponType` (cône et portée du chercheur), `Targeting_ReticleWindowTest`, `Proximity_TestOriented`.
 - Rémi veut que les valeurs de contrôle (aspec de chaque missile) soient affichées dans le débug, pas demandées.
 
+**Vol du missile décodé (2026-09-24)** : `AI_TICK_CALL_GRAPH.md`, « Le vol du missile guidé ». Le chercheur est réévalué en vol, et la loi de guidage `MissileBody_SteerToTarget_42738` (ex-`Sound3D_ComputeSecondChannel`) fait une poursuite avec anticipation plafonnée à 1, en « bank-to-turn » : roulis immédiat, cabrage borné par le 1er dword du chunk dynamique `MISS`. La propulsion dure jusqu'à la vitesse maximale, et sans cible le missile tombe en balistique.
+
 ## 6. Reste à faire (ordre suggéré)
 
 1. Missile : écrivains de `instance+0x28`/`+0x29` **trouvés** (aucun, voir §5). Reste : faire exposer `radar_sign[3]` par le parseur `SIGN`, coder `Aircraft_ComputeSeekerSignature` (cran de gaz > 5 = post-combustion) et le modèle de chercheur fidèle (garde ou vol de piste, aspect arrière de l'AIM-9J), puis les leurres `DECY` (chunk `DATA` = durée de vie ; valeurs `SIGN`/`DATA` des fichiers à relever).

@@ -7,10 +7,13 @@ seg434		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6C5A5, ResourceRecord_SeekAndRead_64743, ReadFieldGroupC_64A7E,
-; ReadFinalField_64B51, ReadFieldGroupB_64A54 (seg193), gestion d'erreur.
+; far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA'
+; du MODELE missile (bloc MISS d'IFF_LoadModelMain, via VROOMM_StubThunk_6C530), apres le
+; chargeur de base (VROOMM_StubThunk_6C5A5) : dword -> +0x5E, octet -> +0x62, word -> +0x63 =
+; RAYON DE L'ALLUMEUR DE PROXIMITE (lu par Missile_UpdateSeekerAndFuse_42458, en unites
+; entieres, << 8). Sens de +0x5E et +0x62 non trace.
 ; ==============================================================================================
-PlayerComponent_LoadFieldsWithRetryB_A0340	proc far		; CODE XREF: VROOMM_StubThunk_6C530J
+MissileModel_LoadDATAChunk_A0340	proc far		; CODE XREF: VROOMM_StubThunk_6C530J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -65,16 +68,16 @@ loc_A0361:
 		jmp	short loc_A03B3
 ; ���������������������������������������������������������������������������
 
-loc_A03AA:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryB_A0340+37j
+loc_A03AA:				; CODE XREF: MissileModel_LoadDATAChunk_A0340+37j
 		push	0C00Ah
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A03B3:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryB_A0340+68j
+loc_A03B3:				; CODE XREF: MissileModel_LoadDATAChunk_A0340+68j
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldsWithRetryB_A0340	endp
+MissileModel_LoadDATAChunk_A0340	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -301,7 +304,7 @@ loc_A04D2:
 		push	si
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldGroupC_A04E3
+		call	near ptr DynMissile_LoadMISSChunk_A04E3
 		add	sp, 4
 		pop	di
 		pop	si
@@ -315,11 +318,15 @@ PlayerComponent_SubHelperR_A04C0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 104 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 et
-; ReadFieldGroupC_64A7E (×5, seg193), gestion d'erreur — charge un grand nombre de champs
-; depuis le format IFF.
+; far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldGroupC'. Chargeur du chunk dynamique
+; 'MISS' (5353494Dh) du corps physique du missile (appele via PlayerComponent_SubHelperR_A04C0
+; depuis JDYN_LoadChunkAndConstruct_3A49C) : 5 dwords (ResourceRecord_ReadFieldGroupC_64A7E)
+; -> +0x21 vitesse angulaire maximale de guidage (MissileBody_SteerToTarget_42738), +0x25
+; vitesse maximale / de croisiere, +0x29 acceleration de propulsion, +0x2D et +0x31
+; composantes laterale et normale de la vitesse de croisiere
+; (MissileBody_SetCruiseVelocity_42A1B). Chunk absent : erreur 0xC00B.
 ; ==============================================================================================
-PlayerComponent_LoadFieldGroupC_A04E3	proc far		; CODE XREF: VROOMM_StubThunk_6C55DJ PlayerComponent_SubHelperR_A04C0+19p
+DynMissile_LoadMISSChunk_A04E3	proc far		; CODE XREF: VROOMM_StubThunk_6C55DJ PlayerComponent_SubHelperR_A04C0+19p
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h
@@ -412,17 +419,17 @@ loc_A0553:
 		jmp	short loc_A0570
 ; ���������������������������������������������������������������������������
 
-loc_A0567:				; CODE XREF: PlayerComponent_LoadFieldGroupC_A04E3+21j
+loc_A0567:				; CODE XREF: DynMissile_LoadMISSChunk_A04E3+21j
 		push	0C00Bh
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A0570:				; CODE XREF: PlayerComponent_LoadFieldGroupC_A04E3+82j
+loc_A0570:				; CODE XREF: DynMissile_LoadMISSChunk_A04E3+82j
 		pop	di
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadFieldGroupC_A04E3	endp
+DynMissile_LoadMISSChunk_A04E3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

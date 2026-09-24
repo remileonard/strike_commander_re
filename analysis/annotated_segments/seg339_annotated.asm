@@ -2170,7 +2170,7 @@ off_6F03E	dd loc_4629F
 off_6F046	dd loc_462ED
 off_6F04A	dd loc_462F5
 off_6F04E	dd loc_46912
-off_6F052	dd loc_42A4E
+off_6F052	dd MissileBody_GuidanceTick_42A4E
 off_6F056	dd loc_42CE7
 off_6F05A	dd loc_4691A
 off_6F05E	dd loc_46922
@@ -2839,7 +2839,7 @@ off_6FAC4	dd loc_37CF4
 off_6FAC8	dd Debris_NotifyChildValidate
 off_6FACC	dd loc_37D2E
 off_6FAD0	dd loc_37DD1
-off_6FAD4	dd loc_42458
+off_6FAD4	dd Missile_UpdateSeekerAndFuse_42458
 off_6FAD8	dd Camera_ComputeMountedPosition_3D31D
 off_6FADC	dd loc_42D4F
 off_6FAE0	dd loc_3CF4C
@@ -2848,7 +2848,7 @@ off_6FAE0	dd loc_3CF4C
 		dd Debris_BodyDetach
 off_6FAF0	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FAF4	dd WorldObject_ComposeOrientationAngleArray_3CB0B
-off_6FAF8	dd loc_4244E
+off_6FAF8	dd Missile_GetCategory_4244E
 off_6FAFC	dd loc_43325
 off_6FB00	dd loc_3CB2D
 off_6FB04	dd loc_3CB95
@@ -9469,15 +9469,15 @@ unk_72875	db    0
 		db    0
 		db    0
 		db    0
-dword_7287A	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+Br seg090:068Dw
-dword_7287E	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+18r
+dword_7287A	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+Br seg090:068Dw
+dword_7287E	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+18r
 					; seg090:0695w
-dword_72882	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+25r
+dword_72882	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+25r
 					; seg090:069Dw	...
-dword_72886	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+Fr seg090:0622w ...
-dword_7288A	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+1Cr
+dword_72886	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+Fr seg090:0622w ...
+dword_7288A	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+1Cr
 					; seg090:062Aw	...
-dword_7288E	dd 0			; DATA XREF: Sound3D_ComputeSecondChannel+29r
+dword_7288E	dd 0			; DATA XREF: MissileBody_SteerToTarget_42738+29r
 					; seg090:0632w	...
 		db    0
 		db    0

@@ -603,3 +603,80 @@ Le guidage du missile en vol (`seg090`, fonction pas encore nommée) appelle la 
 **À vérifier côté données** : les octets `SIGN` et le dword `DATA` des fichiers `DECY` (fusée éclairante et paillettes, pièces `FLARE` / `CHAFF`).
 
 **Non lus** : `Targeting_FilterByWeaponType` (quel candidat il rend quand plusieurs objets sont dans le cône), `vtable+0x38` et `word_722E6` (le « lanceur est le joueur » de la note précédente reste non prouvé), et l'identité de l'objet `+0x0D` du point d'emport (vraisemblablement le porteur, par analogie avec le missile en vol qui se passe lui-même).
+
+## Le vol du missile guidé : chercheur, guidage, propulsion (lu 2026-09-24)
+
+Les fonctions `Sound3D_*` de `seg090` étaient mal nommées : elles ne jouent aucun son, elles pilotent le missile. Renommées :
+
+| Ancien nom | Nouveau nom | Rôle |
+|---|---|---|
+| (sans nom, `loc_42458`) | `Missile_UpdateSeekerAndFuse_42458` | mise à jour de l'objet missile : chercheur + allumeur |
+| (sans nom, `loc_42A4E`) | `MissileBody_GuidanceTick_42A4E` | tick du corps physique : guidage puis vitesse |
+| `Sound3D_ComputeSecondChannel` | `MissileBody_SteerToTarget_42738` | **loi de guidage** |
+| `Sound3D_TriggerWithRange` | `MissileBody_BoostPhase_42632` | phase propulsée |
+| `Sound3D_TriggerDirect` | `MissileBody_SetCruiseVelocity_42A1B` | vitesse de croisière |
+| `PlayerComponent_LoadFieldGroupC_A04E3` | `DynMissile_LoadMISSChunk_A04E3` | chunk dynamique `MISS` du corps |
+| `PlayerComponent_LoadFieldsWithRetryB_A0340` | `MissileModel_LoadDATAChunk_A0340` | chunk `DATA` du modèle missile |
+
+### Chaîne d'appel
+
+```
+Missile_UpdateSeekerAndFuse_42458 (objet missile, catégorie 8)
+ ├─ si minuteur +0x5A échu et chercheur actif (+0x61) :
+ │     +0x55 = Targeting_SelectAndPrioritize(modèle +0x0E, +0x55, le missile, +0x63)
+ │     corps+0x39 = (+0x55 ≠ 0)                        guidage actif / coupé
+ ├─ Camera_ExternalUpdate_3D9B4 → corps->vtable+0x3C = MissileBody_GuidanceTick_42A4E
+ │     corps+0x35 = missile+0x55                        (SetReference16, à chaque tick)
+ │     si +0x35 et +0x39 : MissileBody_SteerToTarget_42738
+ │     si +0x3A == 0      : MissileBody_BoostPhase_42632
+ │     sinon, cible       : MissileBody_SetCruiseVelocity_42A1B
+ │     sinon              : vol balistique (gravité dword_6FFD7·dt, nez aligné sur la vitesse)
+ └─ allumeur : distance à la cible < modèle+0x63 << 8  → renvoie 0 (fin du missile)
+```
+
+Le corps (0x3C octets, vtable `0x1F66`) est construit par `JDYN_LoadChunkAndConstruct_3A49C` quand le chunk dynamique `MISS` est présent. Il est rempli par `DynMissile_LoadMISSChunk_A04E3`, qui lit 5 dwords :
+
+| Champ du corps | Rôle |
+|---|---|
+| `+0x21` | vitesse angulaire maximale de guidage (degrés 24.8 par unité de temps, multipliée par `dt`) |
+| `+0x25` | vitesse maximale = vitesse de croisière |
+| `+0x29` | accélération de propulsion |
+| `+0x2D`, `+0x31` | composantes latérale (c0) et normale (c2) de la vitesse de croisière |
+
+Autres champs du corps : `+0x35` cible, `+0x37` lanceur, `+0x39` guidage actif, `+0x3A` propulsion terminée, `+0x3B` vitesse initiale déjà héritée.
+
+### La loi de guidage (`MissileBody_SteerToTarget_42738`)
+
+Poursuite avec anticipation, pilotée en **« bank-to-turn »** : roulis immédiat vers la cible, puis cabrage à vitesse angulaire bornée. Le repère est celui des lignes de la matrice d'orientation (c0 envergure, c1 nez, c2 normale, comme le modèle de vol).
+
+```
+D    = point_visé − position_missile ; dist = |D|
+t    = min(dist / |v_missile|, 1.0)                      // 1.0 si v nulle
+D   += v_cible · t                                       // anticipation (cible->vtable+0x4C)
+L    = M · D                                             // Math_ApplyRotationHelperA_58768 : projection sur les 3 lignes
+roulis = atan(L.c0 / L.c2), ±180° si L.c2 ≤ 0            // Math_ArcTan2_54B0A + correction 0B400h
+M    = M ∘ Rot(c1, roulis)                               // Matrix_BuildAxisY_570C5 : SANS limite
+L    = M · D
+tangage = atan(L.c2 / L.c1), 180 − |tangage| si L.c1 < 0 // cible derrière
+tangage = min(tangage, corps+0x21 · dt)                  // seul le côté positif est borné (la cible est côté +c2 après le roulis)
+M    = M ∘ Rot(c0, tangage)                              // Matrix_BuildAxisX_56EC3
+missile->vtable+0x40(M)                                  // nouvelle orientation
+```
+
+- **Point visé** (`MissileBody_GuidanceTick_42A4E`) : position `+0x12` de la cible. Si le `target_type` de la cible (modèle `+0x11`) vaut plus de 1, l'altitude est relevée de `(champ +0x10 du sous-objet modèle+0x08) >> 3`, soit 1/8 d'une dimension du modèle (sens exact du champ non établi).
+- `Matrix_BuildAxisY_570C5` ne fait rien sous 0,22° (`0x38` en 24.8).
+- **La vitesse suit le nez** : après le guidage, `MissileBody_BoostPhase_42632` et `MissileBody_SetCruiseVelocity_42A1B` recalculent la vitesse dans l'axe du missile. Il n'y a ni inertie ni aérodynamique : le missile va où il pointe.
+- Unités : si les vitesses sont par seconde (l'accélération et la gravité sont multipliées par `dt`), l'anticipation est plafonnée à 1 seconde.
+
+### Propulsion et vol libre
+
+- **Départ** : au premier tick propulsé, la vitesse du missile = vitesse du lanceur.
+- **Propulsion** (`+0x3A == 0`) : tant que `|v| < +0x25`, la vitesse est remise dans l'axe du nez et augmente de `+0x29 · dt`. La propulsion s'arrête quand la vitesse maximale est atteinte, **pas au bout d'une durée**.
+- **Croisière** : vitesse = `(+0x2D, +0x25, +0x31)` dans le repère du missile, à chaque tick, tant qu'il a une cible.
+- **Sans cible** (chercheur revenu à 0, ou jamais de cible) : la gravité s'ajoute à l'altitude de la vitesse, et le nez est réaligné sur la vitesse. Le missile tombe en balistique.
+- **Dégagement du lanceur** : le bit 1 de `missile+4`, effacé au départ, est posé quand la distance au lanceur dépasse 4 × la somme des deux valeurs `+0x10` (celle du lanceur et celle du missile, lues dans leur sous-objet `modèle+0x08`).
+- **Allumeur de proximité** : `Missile_UpdateSeekerAndFuse_42458` renvoie 0 quand la distance à la cible passe sous `modèle+0x63` (word du chunk `DATA` du modèle `MISS`, lu par `MissileModel_LoadDATAChunk_A0340`).
+
+**À relever côté données** : les 5 dwords du chunk dynamique `MISS` et le chunk `DATA` des modèles `MISS` (AIM-9J/9M, AIM-120, SA-2, SA-6, AGM-65D).
+
+**Soupçon, non vérifié** : `Audio3D_ComputeDistanceParams_41BEF` (seg089) utilise les mêmes fonctions de matrice (`Matrix_BuildAxisY_570C5`, `Matrix_ApplyToVectorX_575DF`). Elle pourrait être mal nommée de la même façon (bombe guidée ? leurre ?).

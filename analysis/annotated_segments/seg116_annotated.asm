@@ -4213,7 +4213,7 @@ Matrix_BuildAxisX_56EC3	endp
 ; Audio3D_ComputeDistanceParams (sub_41BEF, Doppler).
 ; ==============================================================================================
 Matrix_BuildAxisY_570C5	proc far		; CODE XREF: Audio3D_ComputeDistanceParams+1EDP
-					; Sound3D_ComputeSecondChannel+1E7P ...
+					; MissileBody_SteerToTarget_42738+1E7P ...
 
 var_50		= dword	ptr -50h
 var_4C		= dword	ptr -4Ch
@@ -4817,7 +4817,7 @@ Matrix_BuildFullOrientation_575B2	endp
 ; Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF).
 ; ==============================================================================================
 Matrix_ApplyToVectorX_575DF	proc far		; CODE XREF: Audio3D_ComputeDistanceParams+2E5P
-					; Sound3D_ComputeSecondChannel+2C9P ...
+					; MissileBody_SteerToTarget_42738+2C9P ...
 
 var_18		= dword	ptr -18h
 var_14		= dword	ptr -14h
