@@ -2104,7 +2104,7 @@ arg_6		= dword	ptr  0Ch
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]

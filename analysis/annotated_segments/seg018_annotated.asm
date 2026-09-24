@@ -783,7 +783,7 @@ loc_17051:
 		push	ss
 		lea	ax, [bp+var_112]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		cmp	[bp+var_112], 0
 		jle	short loc_170F3

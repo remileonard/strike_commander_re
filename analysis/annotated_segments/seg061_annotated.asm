@@ -212,7 +212,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		lea	ax, [bp+var_50]
 		push	ax
@@ -221,7 +221,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_3C]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_38]
 		mov	[bp+var_34], eax

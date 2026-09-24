@@ -685,7 +685,7 @@ loc_2C08C:				; CODE XREF: Damage_SimulationTick+11Bj
 		push	ss
 		lea	ax, [bp+var_30]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_30]
 		mov	[bp+var_2C], eax

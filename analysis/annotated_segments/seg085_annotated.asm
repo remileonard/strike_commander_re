@@ -1967,7 +1967,7 @@ Camera_DestructSimple	endp
 ; far,14L — positionne un flag (+4 bit2) : marqueur 'caméra à recalculer'.
 ; ==============================================================================================
 Camera_MarkRecalc	proc far		; CODE XREF: Camera_AttachSubcomponent+16p
-					; Debris_ResetBodyAndMarkCamera_9C85A+4BP
+					; Decoy_ConstructInstance_9C85A+4BP
 
 arg_0		= word ptr  6
 
@@ -1990,7 +1990,7 @@ Camera_MarkRecalc	endp
 ; far,21L — attache un sous-composant (sub_37C89) puis marque le recalcul (sub_3DB48) :
 ; attachement d'un sous-composant caméra avec invalidation du cache.
 ; ==============================================================================================
-Camera_AttachSubcomponent	proc far		; CODE XREF: seg104:00D2P Camera_AttachSubcomponentWrapper_9C90B+FP ...
+Camera_AttachSubcomponent	proc far		; CODE XREF: seg104:00D2P Decoy_AttachAndStartLifetime_9C90B+FP ...
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8

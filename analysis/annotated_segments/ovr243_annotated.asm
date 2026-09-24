@@ -1348,7 +1348,7 @@ loc_8121F:				; CODE XREF: HUDSymbol_RenderWithClipTest_80B74+691j
 		push	ss
 		lea	ax, [bp+var_6A]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		cmp	[bp+var_6A], 0
 		jle	short loc_81255

@@ -127,7 +127,7 @@ loc_42E34:
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	ax, [bp+arg_A]
 		mov	[bp+var_16], ax
@@ -594,15 +594,26 @@ off_430FD	dw offset loc_43094	; DATA XREF: Targeting_FilterByWeaponType+7Cr
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 327L, LUE (2026-09-20). MODELE DE VERROUILLAGE (seeker) selon weapon_aspec de l'arme
-; (+0x4F, 1 a 6). Filtre les candidats avec Targeting_FilterByWeaponType (cone/portee du
-; chercheur), garde la cible deja suivie (arg objet suivi) si elle est encore candidate, sinon
-; evalue la signature du candidat : aspec 1 : methode virtuelle +0x7C du candidat (signature)
-; > 0xD2 (210), avec un tirage Math_RandomScale_54DF4(10) compare a un poids (3, ou 5 si le
-; lanceur du candidat est le joueur) ; aspec 2 : Targeting_ReticleWindowTest (fenetre du
-; reticule) ; aspec 3 : Debris_GetSubpartAttrib > 0xF5 (245) avec le meme tirage ; aspec 4 :
-; Proximity_TestOriented ; renvoie la cible retenue ou 0. Les signatures sont les 3 octets du
-; chunk SIGN de l'objet (+0x12 a +0x14).
+; far, 327L, LUE (2026-09-20, table de sauts corrigée 2026-09-24). MODELE DE CHERCHEUR :
+; decide si le chercheur GARDE sa cible (arg_4) ou la PERD au profit d'un autre candidat
+; (leurre, autre avion). Arguments : (arme [modele WDAT], cible actuelle di, objet de
+; reference du chercheur arg_6, octet arg_8). Appelants : WeaponStation_TestTargetLock avant
+; tir (cible voulue, objet +0x0D du point d'emport) et le guidage du missile en vol (seg090 :
+; cible = missile+0x55, reference = le missile lui-meme, resultat re-range dans missile+0x55).
+; Aiguillage dec ax sur weapon_aspec (+0x4F) : index = aspec-1 (off_43319). ASPEC 1 (AIM-9J) :
+; candidat c = Targeting_FilterByWeaponType(arme, reference) ; c nul -> 0 ; c = di -> test
+; d'aspect ; sinon poids w = 3 (5 si c->vtable+0x38 == word_722E6), s =
+; c->vtable+0x7C(reference) : s > 0xD2 (210) et Math_RandomScale_54DF4(10) < w -> bascule sur
+; c ; s == 210 -> bascule ; sinon reste sur di. Si on reste sur di : ASPECT ARRIERE
+; OBLIGATOIRE, Math_DotProduct3D_5505B(vitesse reference, vitesse di) >= Math_Sin_5483F(0x5A00
+; = 90.0) sinon renvoie 0 (piste perdue). ASPEC 2 (AIM-9M) : meme candidat, bascule si s >=
+; 0xF5 (245) et tirage < w, sinon reste sur di ; PAS de test d'aspect (tous secteurs). ASPEC 3
+; (aucune arme des fichiers WDAT) : di nul -> FilterByWeaponType ; sinon
+; Targeting_ReticleWindowTest(arme, di, reference, arg_8). ASPEC 4 (AIM-120, SA-2, SA-6) :
+; bascule si Debris_GetSubpartAttrib(c) (2e octet SIGN du modele, non virtuel) >= 245 et
+; tirage < w, sinon reste sur di. ASPEC 5/6 (AGM-65D, GBU-15) : Proximity_TestOriented(arme,
+; di, reference) non nul -> di, sinon 0. Aucun test du nombre de missiles en l'air. NB :
+; l'ancien resume decalait les aspecs 2 a 4 d'un cran.
 ; ==============================================================================================
 Targeting_SelectAndPrioritize	proc far		; CODE XREF: WeaponStation_TestTargetLock+78P
 					; seg090:006AP
@@ -727,7 +738,7 @@ loc_4319B:				; CODE XREF: Targeting_SelectAndPrioritize+8Fj
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_C], 5A00h
 		lea	ax, [bp+var_C]

@@ -1968,7 +1968,7 @@ off_6ED1A	dd loc_37CF4
 off_6ED1E	dd loc_451A1
 off_6ED22	dd loc_37D2E
 		dd loc_37DD1
-off_6ED2A	dd loc_451B5
+off_6ED2A	dd Decoy_TickLifetime_451B5
 off_6ED2E	dd loc_3CEED
 off_6ED32	dd loc_45326
 		dd loc_3CC4B
@@ -1995,11 +1995,11 @@ off_6ED6E	dd loc_380E1
 		dd loc_37E3F
 		dd loc_37F99
 		dd loc_38090
-		dd WorldObject_GetSignatureByte0_ModelDirect_451F1
+		dd Decoy_GetFadingSignature0_451F1
 		dd VROOMM_StubThunk_6BFB0
 		dd Debris_CombinePhysicsBodies
 off_6EDA2	dd loc_38342
-off_6EDA6	dd loc_45285
+off_6EDA6	dd Decoy_GetFadingSignature1_45285
 off_6EDAA	dd Ctor_CompositeObjectA_4F5A4
 off_6EDAE	dd Ctor_CompositeObjectB_4F69E
 off_6EDB2	dd Ctor_CompositeObjectC_4F7D6
@@ -2460,7 +2460,7 @@ off_6F4D8	dd Debris_SpawnOrchestrator
 off_6F4DC	dd loc_383DF
 off_6F4E0	dd loc_3C8B1
 off_6F4E4	dd VROOMM_StubThunk_6C085
-		dd loc_45190
+		dd DecoyModel_GetCategory_45190
 		dd Debris_SpawnOrchestrator
 off_6F4F0	dd loc_383DF
 off_6F4F4	dd loc_41905

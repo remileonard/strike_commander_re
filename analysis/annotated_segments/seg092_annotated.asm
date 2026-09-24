@@ -324,7 +324,7 @@ loc_43681:
 		push	ax
 
 loc_4368A:
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 
 loc_4368F:
 		add	sp, 8

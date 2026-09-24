@@ -8796,7 +8796,7 @@
 "sub_43107"
 ],
 "new_name": "WeaponStation_TestTargetLock",
-"summary": "far, 83L, LUE (2026-09-20). Ancien nom 'HUD_RenderReticleByWeaponType' TROMPEUR : c'est le TEST DE VERROUILLAGE d'un point d'emport sur une cible, utilise par l'IA (AI_BehaviorSelector_8D30) avant de tirer un missile. Prend (point d'emport, cible). Vide le drapeau de verrouillage du point d'emport (+0x0F). Si la cible existe, aiguille selon weapon_aspec de l'arme (+0x4F, valeurs 1 a 4) : 1 = methode virtuelle +0x7C de la cible appliquee a l'objet suivi (+0xD) ; 3 = Debris_GetStateFlag de la cible ; 4 = Debris_GetSubpartAttrib de la cible ; resultat range dans +0x0F. Renvoie le resultat de Targeting_SelectAndPrioritize(arme, objet suivi, cible, drapeau) : non nul si la cible est retenue/verrouillee."
+"summary": "far, 83L, LUE (2026-09-20, relu 2026-09-24). Ancien nom 'HUD_RenderReticleByWeaponType' TROMPEUR : TEST DE VERROUILLAGE d'un point d'emport (enregistrement de 0x12 octets : +0 arme, +0x0D objet de reference, +0x0F octet de signature) sur une cible. Appelants : AI_BehaviorSelector (point d'emport courant = tableau [systeme+0x14] + index*0x12, cible = +0x287) et HUD_RenderSymbologyAlt (point d'emport [systeme+0x18], cible [systeme+0x0D] ; resultat == cible -> systeme+0x0B = 1). Vide +0x0F ; si la cible existe, table off_3F851 indexee par weapon_aspec-1 : aspec 1 ET 2 -> cible->vtable+0x7C(objet +0x0D) (signature calculee), aspec 3 -> Debris_GetStateFlag (instance+0x29 = 3e octet SIGN), aspec 4 -> Debris_GetSubpartAttrib (modele+0x13 = 2e octet SIGN) ; resultat dans +0x0F. Renvoie Targeting_SelectAndPrioritize(arme, cible, objet +0x0D, octet +0x0F)."
 },
 "sub_3F87F": {
 "segment": "seg088",
@@ -9191,7 +9191,7 @@
 "sub_42EC3"
 ],
 "new_name": "Targeting_SelectAndPrioritize",
-"summary": "far, 327L, LUE (2026-09-20). MODELE DE VERROUILLAGE (seeker) selon weapon_aspec de l'arme (+0x4F, 1 a 6). Filtre les candidats avec Targeting_FilterByWeaponType (cone/portee du chercheur), garde la cible deja suivie (arg objet suivi) si elle est encore candidate, sinon evalue la signature du candidat : aspec 1 : methode virtuelle +0x7C du candidat (signature) > 0xD2 (210), avec un tirage Math_RandomScale_54DF4(10) compare a un poids (3, ou 5 si le lanceur du candidat est le joueur) ; aspec 2 : Targeting_ReticleWindowTest (fenetre du reticule) ; aspec 3 : Debris_GetSubpartAttrib > 0xF5 (245) avec le meme tirage ; aspec 4 : Proximity_TestOriented ; renvoie la cible retenue ou 0. Les signatures sont les 3 octets du chunk SIGN de l'objet (+0x12 a +0x14)."
+"summary": "far, 327L, LUE (2026-09-20, table de sauts corrigée 2026-09-24). MODELE DE CHERCHEUR : decide si le chercheur GARDE sa cible (arg_4) ou la PERD au profit d'un autre candidat (leurre, autre avion). Arguments : (arme [modele WDAT], cible actuelle di, objet de reference du chercheur arg_6, octet arg_8). Appelants : WeaponStation_TestTargetLock avant tir (cible voulue, objet +0x0D du point d'emport) et le guidage du missile en vol (seg090 : cible = missile+0x55, reference = le missile lui-meme, resultat re-range dans missile+0x55). Aiguillage `dec ax` sur weapon_aspec (+0x4F) : index = aspec-1 (off_43319). ASPEC 1 (AIM-9J) : candidat c = Targeting_FilterByWeaponType(arme, reference) ; c nul -> 0 ; c = di -> test d'aspect ; sinon poids w = 3 (5 si c->vtable+0x38 == word_722E6), s = c->vtable+0x7C(reference) : s > 0xD2 (210) et Math_RandomScale_54DF4(10) < w -> bascule sur c ; s == 210 -> bascule ; sinon reste sur di. Si on reste sur di : ASPECT ARRIERE OBLIGATOIRE, Math_DotProduct3D_5505B(vitesse reference, vitesse di) >= Math_Sin_5483F(0x5A00 = 90.0) sinon renvoie 0 (piste perdue). ASPEC 2 (AIM-9M) : meme candidat, bascule si s >= 0xF5 (245) et tirage < w, sinon reste sur di ; PAS de test d'aspect (tous secteurs). ASPEC 3 (aucune arme des fichiers WDAT) : di nul -> FilterByWeaponType ; sinon Targeting_ReticleWindowTest(arme, di, reference, arg_8). ASPEC 4 (AIM-120, SA-2, SA-6) : bascule si Debris_GetSubpartAttrib(c) (2e octet SIGN du modele, non virtuel) >= 245 et tirage < w, sinon reste sur di. ASPEC 5/6 (AGM-65D, GBU-15) : Proximity_TestOriented(arme, di, reference) non nul -> di, sinon 0. Aucun test du nombre de missiles en l'air. NB : l'ancien resume decalait les aspecs 2 a 4 d'un cran."
 },
 "sub_43343": {
 "segment": "seg091",
@@ -11941,8 +11941,8 @@
 "lines": 47,
 "type": "far",
 "calls": [],
-"new_name": "Targeting_ComputeGeometryHelperA_5505B",
-"summary": "far, référencée par `Targeting_AcquireBestThreat` (sub_3314) — helper géométrique (rôle exact non détaillé), également utilisé par de nombreuses fonctions du cluster matrice/rotation (57C67, 57DAE, 5789E)."
+"new_name": "Math_DotProduct3D_5505B",
+"summary": "far, 47L, LUE (2026-09-24). PRODUIT SCALAIRE de deux vecteurs 3x i32 24.8 : (a0*b0 + a1*b1 + a2*b2) en 64 bits (imul / add / adc), puis shrd 8 -> resultat 24.8 ecrit dans *arg_0. Ex-'Targeting_ComputeGeometryHelperA'. Utilise par Targeting_AcquireBestThreat, Aircraft_ComputeSeekerSignature_3E2F1 (aspect arriere), Targeting_SelectAndPrioritize et le cluster matrice/rotation."
 },
 "sub_550B7": {
 "segment": "seg116",
@@ -38451,8 +38451,8 @@
 "sub_64A7E",
 "sub_6B70F"
 ],
-"new_name": "Debris_LoadFieldGroupC_9C810",
-"summary": "far, combine ReadFieldGroupC_64A7E et gestion d'erreur (41 lignes)."
+"new_name": "DecoyModel_LoadDATALifetime_9C810",
+"summary": "far, LUE (2026-09-24). Chargeur du chunk propre a DECY (appele par IFF_LoadModelMain via VROOMM_StubThunk_6C080) : chaine le chargeur de base (VROOMM_StubThunk_6C1C0), cherche le chunk 'DATA' (41544144h), lit 4 octets (ResourceRecord_ReadFieldGroupC_64A7E) dans modele+0x37 = DUREE DE VIE du leurre (entier, en unites de dt). Chunk absent : erreur 0xC005."
 },
 "sub_9C85A": {
 "segment": "ovr304",
@@ -38466,8 +38466,8 @@
 "sub_3DB48",
 "sub_9C90B"
 ],
-"new_name": "Debris_ResetBodyAndMarkCamera_9C85A",
-"summary": "far, combine allocation, `Debris_BodyReset`, `Camera_MarkRecalc` — réinitialisation d'un corps de débris avec notification de recalcul caméra."
+"new_name": "Decoy_ConstructInstance_9C85A",
+"summary": "far, LUE (2026-09-24). Constructeur de l'INSTANCE LEURRE (slot +4 de la vtable modele DECY via VROOMM_StubThunk_6C085) : malloc 0x34, vtables chainees 0x10E4 -> 0x1ADC (Debris_BodyReset) -> 0x1BDE (Camera_MarkRecalc) -> 0x1C6A (leurre), +0x2E temps restant = 0, +0x32 = 0, incremente word_70472 (compteur de leurres actifs, decremente par le destructeur loc_45326)."
 },
 "sub_9C90B": {
 "segment": "ovr304",
@@ -38478,8 +38478,8 @@
 "calls": [
 "sub_3DB56"
 ],
-"new_name": "Camera_AttachSubcomponentWrapper_9C90B",
-"summary": "far, appelle `Camera_AttachSubcomponent`."
+"new_name": "Decoy_AttachAndStartLifetime_9C90B",
+"summary": "far, LUE (2026-09-24). Rattachement de l'instance LEURRE : Camera_AttachSubcomponent(instance, modele) puis instance+0x2E = (word modele+0x37) << 8 (temps restant = duree du chunk DATA, en 24.8) et pose le bit 0 de +0x04."
 },
 "sub_9C940": {
 "segment": "ovr305",
@@ -47365,7 +47365,7 @@
 "type": "label",
 "calls": [],
 "new_name": "Aircraft_ComputeSeekerSignature_3E2F1",
-"summary": "far, LUE (2026-09-20). Methode virtuelle +0x7C de la classe d'objet piloté (constructeur seg087 loc_3E4AC, composant pilote en +0x55) : SIGNATURE vue par un chercheur, appelee par Targeting_SelectAndPrioritize (weapon_aspec 1) et WeaponStation_TestTargetLock avec (cible, objet suivi). Sans objet suivi (arg nul) : renvoie l'octet modele +0x12 (1er octet du chunk SIGN). Avec objet suivi : v = |vecteur de vtable+0x4C de la cible| * 256 / 0x25A00 (= vitesse / 602) ; A = produit Targeting_ComputeGeometryHelperA_5505B(vitesse du chercheur, vitesse de la cible) > 0 (aspect arriere) ; sig = v*100 si A sinon v*50 ; sig += 0xA00 (10) ; si l'octet +0x1E de l'enregistrement renvoye par [si+0x55]->vtable+8 est > 5 : sig += 0x6400 (100) si A sinon 0x3200 (50) ; renvoie sig>>8 (octet). Le 1er octet SIGN du modele n'entre donc PAS dans ce cas. Sens de l'octet +0x1E (poussee > 5 ?) et unité de la vitesse non prouvés."
+"summary": "far, LUE (2026-09-20, completee 2026-09-24). Methode virtuelle +0x7C de la classe d'objet pilote (vtable seg339 0x6F86C, slot 0x6F8E8) : SIGNATURE IR vue par un chercheur, appelee (this = cible, arg = objet de reference du chercheur : missile en vol ou objet +0x0D du point d'emport). Sans reference : renvoie l'octet modele +0x12 (1er octet SIGN). Avec reference : v = |cible->vtable+0x4C| (vitesse, loc_3D246 = copie de [+0x51]+8) * 256 / 0x25A00 (= vitesse / 602) ; A = Math_DotProduct3D_5505B(vitesse reference, vitesse cible) > 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100 si A sinon v*50 ; sig += 0xA00 (10, constante, PAS l'octet SIGN) ; si l'octet +0x1E de l'enregistrement de commandes ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet octet est le CRAN DE MANETTE DES GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce meme enregistrement a [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit es:[bx+1Eh] comme cran et teste `cmp byte ptr [bp-2Ch],5 / jg` pour la consommation post-combustion (0x4C au lieu de 0x33) : > 5 = POST-COMBUSTION. Renvoie (sig >> 8) dans AL : tronque a l'octet, donc repasse par 0 au-dela de 255 (arriere + PC : v > ~812)."
 },
 "loc_381E5": {
 "segment": "seg078",
@@ -47384,7 +47384,37 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "WorldObject_GetSignatureByte0_ModelDirect_451F1",
-"summary": "far, surcharge du slot +0x7C : renvoie l'octet modele +0x12 (1er octet SIGN) ; calcule aussi un quotient inutilisé (model+0x37 et instance+0x2E)."
+"new_name": "Decoy_GetFadingSignature0_451F1",
+"summary": "far, LUE (2026-09-24). Methode virtuelle +0x7C de l'instance LEURRE (classe DECY, vtable seg339 0x6ED1A = tag 0x1C6A) : signature = octet modele +0x12 (1er octet SIGN) * (temps restant instance+0x2E / duree modele+0x37). Calcul : ratio = (inst+0x2E << 8) / (modele+0x37 << 8), sig = ratio * (S0 << 8) >> 8, renvoie sig >> 8 (octet). La chaleur du leurre DECROIT LINEAIREMENT jusqu'a 0 a la fin de sa vie. Ex-'WorldObject_GetSignatureByte0_ModelDirect' (l'ancien resume disait le quotient inutilise : faux, il multiplie S0)."
+},
+"loc_45285": {
+"segment": "seg095",
+"start_line": 138746,
+"end_line": 138746,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Decoy_GetFadingSignature1_45285",
+"summary": "far, LUE (2026-09-24). Methode virtuelle +0x8C de l'instance LEURRE (DECY, vtable 0x6ED1A) : meme calcul que Decoy_GetFadingSignature0_451F1 sur l'octet modele +0x13 (2e octet SIGN) : S1 * temps restant / duree. Consommateur du slot +0x8C non trace (Debris_GetSubpartAttrib, utilise par l'aspec 4, lit modele+0x13 directement, sans decroissance)."
+},
+"loc_45190": {
+"segment": "seg095",
+"start_line": 138638,
+"end_line": 138638,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "DecoyModel_GetCategory_45190",
+"summary": "far, LUE (2026-09-24). Slot +8 de la vtable modele DECY (seg339 tag 0x2430, XREF seg339:2438) : `mov al, 10h` -> categorie d'objet 0x10 = leurre."
+},
+"loc_451B5": {
+"segment": "seg095",
+"start_line": 138669,
+"end_line": 138669,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Decoy_TickLifetime_451B5",
+"summary": "far, LUE (2026-09-24). Slot +0x10 (mise a jour) de l'instance LEURRE (vtable 0x6ED1A) : inst+0x2E -= dt (dword_70458) ; tant que +0x2E >= 0 appelle Camera_NotifyFollowTarget ; renvoie 1 si l'objet vit encore. Le leurre meurt quand son temps restant passe sous 0."
 }
 }

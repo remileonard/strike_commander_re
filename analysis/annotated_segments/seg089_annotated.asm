@@ -561,7 +561,7 @@ loc_41883:
 loc_41884:
 		lea	ax, [bp-28h]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-28h]
 		cmp	eax, [bp-1Ah]

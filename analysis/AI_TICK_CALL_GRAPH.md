@@ -323,7 +323,7 @@ Le calcul produit un score **A** (`di`), un score **B** (`var_12`) et une **apti
 - puis, avec `dword_72030` : hors portée, `si −4` ; dans la portée et l'angle < 45° : `si +5`, `A +6` ; entre 45° et 90° : `si +3`, `A +3` ; au-delà : rien.
 
 **Autres objets** (missiles, avions) : un angle d'aspect > 90° du côté du candidat met B à 0.
-- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += TH²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Targeting_LineOfSightCheck` puis `Targeting_ComputeGeometryHelperA`) donne une valeur < −180 et que ce même bit est absent.
+- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += TH²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Targeting_LineOfSightCheck` puis `Math_DotProduct3D_5505B` (produit scalaire)) donne une valeur < −180 et que ce même bit est absent.
 - **Avion (6)** : bandes d'angle (> 135°, > 90°, > 30°, sinon) qui ajoutent à `si`, `A` et `B` (de −4 à +8), une seconde géométrie < −180 (`si −4`), des bandes sur le second angle (80–100° : `A −5` ; 60–120° : `A −3`), puis des bandes de distance selon les armes chargées : au-delà de `dword_72024` `si −3`, `A −5` ; au-delà de `dword_72020` avec masque `0x700` `si −1`, `A +3` ; avec masque `3` : au-delà de `dword_7202C` `A −2`, `si −1`, en deçà de `dword_72028` `A −1`, `B +4` ; sans masque `1`, l'angle > 150° donne `A −3`, > 60° `A −1`.
 - **Persistance (avions seulement)** : candidat = `entité+0x287` → `A +3`, `si +5` ; candidat = `+0x289` → `si +3`, `B +5` ; l'avion qui me vise déjà (`nœud+0x5A` → `+0x0D` = mon nœud) → `si +2`, `B +1` ; terme de classe comparant `objet+0x52` à `byte_72038` et à ma classe (B = 0 si `byte_72038` ≥ classe).
 - **Tous** : bit `0x02` de `entité+0x28B` posé → `si +4` ; candidat = `entité+0x285` → `A +10`, `si +5`.
@@ -446,7 +446,7 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 2. **Suivi** : le point d'emport engagé porte un objet suivi (`+0x0D`). S'il n'est **pas** la cible aérienne, l'IA pose le bit 6 (`0x40`) de l'octet de commande du bloc d'état commun : « demande de suivi ». Le tir n'a pas lieu ce tick.
 3. **Verrouillage** : s'il est déjà la cible, l'IA appelle **`WeaponStation_TestTargetLock`** (ancien nom `HUD_RenderReticleByWeaponType`) ; si elle renvoie non nul, le bit de tir est posé, sinon rien.
 
-`WeaponStation_TestTargetLock` aiguille selon `weapon_aspec` (`+0x4F`) et appelle **`Targeting_SelectAndPrioritize`**, le modèle de chercheur : filtre des candidats par cône et portée du chercheur, conservation de la cible déjà suivie, sinon évaluation de la **signature** de la cible (les trois octets du chunk `SIGN`, `+0x12` à `+0x14`) contre un seuil (`0xD2` = 210 pour l'aspec 1, `0xF5` = 245 pour l'aspec 3), avec un tirage `RandomScale(10)` comparé à un poids de 3 (5 si le lanceur du candidat est le joueur). Il n'y a **aucun test sur le nombre de missiles déjà en l'air** : rien de tel dans ces fonctions. Le rythme entre deux missiles vient donc du suivi (il faut que l'objet suivi redevienne la cible) et du délai d'engagement du point d'emport.
+`WeaponStation_TestTargetLock` aiguille selon `weapon_aspec` (`+0x4F`) et appelle **`Targeting_SelectAndPrioritize`**, le modèle de chercheur. **Corrigé le 2026-09-24** (voir « Qui écrit les octets de signature ») : ce n'est pas un seuil que la cible doit franchir pour être verrouillée, c'est la décision de **garder la cible ou de la perdre au profit d'un autre candidat** (leurre, autre avion) : un candidat du cône dont la signature dépasse le seuil (210 pour l'aspec 1, 245 pour l'aspec 2 ; 2e octet `SIGN` ≥ 245 pour l'aspec 4) vole la piste avec une probabilité de 3/10 (5/10 si `vtable+0x38` du candidat vaut `word_722E6`). Il n'y a **aucun test sur le nombre de missiles déjà en l'air** : rien de tel dans ces fonctions. Le rythme entre deux missiles vient donc du suivi (il faut que l'objet suivi redevienne la cible) et du délai d'engagement du point d'emport.
 
 ## Faits établis
 
@@ -516,10 +516,10 @@ Chargement : `Debris_LoadFieldMix_9BA85` (ovr302) cherche `SIGN` (`4E474953h`) ;
 
 Copie à l'instance : `Debris_BodyAttachToSubpart` recopie S0 dans `instance+0x28` et S2 dans `instance+0x29`. S1 reste lu dans le modèle (`Debris_GetSubpartAttrib`).
 
-Lecteurs (tous des octets 0-255, comparés à un seuil : plus grand = plus visible pour le chercheur) :
-- S0 (`instance+0x28`) : méthode virtuelle `+0x7C` (`loc_381E5`), utilisée par le chercheur `weapon_aspec` 1 (seuil > 210) ;
-- S1 (`modèle+0x13`) : `Debris_GetSubpartAttrib`, utilisé par `weapon_aspec` 3 (seuil >= 245) ; `WeaponStation_TestTargetLock` l'appelle pour l'aspec 4 ;
-- S2 (`instance+0x29`) : `Debris_GetStateFlag`, utilisé pour l'aspec 2 par `WeaponStation_TestTargetLock`/`Targeting_FilterByWeaponType`.
+Lecteurs (tous des octets 0-255 ; **table corrigée le 2026-09-24**, l'index des deux tables de sauts est `weapon_aspec − 1`) :
+- S0 (`instance+0x28`) : méthode virtuelle `+0x7C` (défaut `WorldObject_GetSignatureByte0_381E5`), utilisée par les aspecs **1 (AIM-9J, seuil > 210)** et **2 (AIM-9M, seuil ≥ 245)**. Surchargée pour les avions (signature calculée) et pour les leurres (signature qui décroît) ;
+- S1 (`modèle+0x13`) : `Debris_GetSubpartAttrib`, utilisé par l'aspec **4** (AIM-120, SA-2, SA-6 : seuil ≥ 245) dans les deux fonctions ;
+- S2 (`instance+0x29`) : `Debris_GetStateFlag`, utilisé seulement par `WeaponStation_TestTargetLock` pour l'aspec **3** (aucune arme des fichiers `WDAT` ; l'aspec 3 de `Targeting_SelectAndPrioritize` est `Targeting_ReticleWindowTest`).
 
 ## Les deux octets de classe du chunk `WDAT` (fichiers RAW décodés, 2026-09-20)
 
@@ -548,4 +548,58 @@ Lecteurs (tous des octets 0-255, comparés à un seuil : plus grand = plus visib
 
 ### La signature du 1er octet est calculée à l'exécution pour les avions (lu 2026-09-20)
 
-Le slot `+0x7C` vaut `WorldObject_GetSignatureByte0_381E5` (octet `instance+0x28`) dans presque toutes les tables de méthodes, sauf deux surcharges : `WorldObject_GetSignatureByte0_ModelDirect_451F1` (renvoie le 1er octet du modèle) et **`Aircraft_ComputeSeekerSignature_3E2F1`** (classe d'objet piloté, composant pilote en `+0x55`). Cette dernière, appelée avec l'objet suivi du chercheur, **ne lit pas le 1er octet `SIGN`** : `signature = 10 + v·100 (aspect arrière) ou v·50 (sinon) + 100 (arrière) ou 50 (sinon) si l'octet +0x1E du pilote > 5`, avec `v` = vitesse de la cible / 602, aspect arrière = produit `Targeting_ComputeGeometryHelperA_5505B(vitesse du chercheur, vitesse de la cible) > 0`. Plus de 210 (seuil de l'aspec 1) exige donc, en aspect arrière, une vitesse d'environ 602 avec l'octet pilote > 5 (post-combustion ?). Lecture par écrivains directs : aucun autre code n'écrit `instance+0x28/+0x29` de cette famille de classes (les autres écrivains trouvés sont des widgets d'interface, le terrain, `Flare_PhysicsTick` et des accumulateurs de force d'un autre objet).
+Voir la section suivante, « Qui écrit les octets de signature » (relue et corrigée le 2026-09-24).
+
+## Qui écrit les octets de signature (lu 2026-09-24)
+
+**Réponse courte : personne ne les réécrit.** Le seul écrivain de `instance+0x28` / `+0x29` d'un objet monde est la copie faite au rattachement par `Debris_BodyAttachToSubpart` (`mov [si+28h], al` / `mov [si+29h], al`). Les autres écritures trouvées dans les segments annotés visent d'autres structures : dwords d'accumulateurs de force, champ d'un enregistrement de rendu, et une structure de chute libre en `seg089` (fonction pas encore nommée, appelante de `Flare_PhysicsTick`, qui écrit un dword en `+0x29`). `Flare_PhysicsTick` lui-même n'écrit que des dwords en `+0x08`, `+0x0C` et `+0x10`. La mention « `Flare_PhysicsTick` écrit `+0x28` » de la note précédente était un faux positif.
+
+Le « 1er octet `SIGN` = 10 » ne bloque donc rien, pour deux raisons.
+
+### 1. Pour un avion, la signature des aspecs 1 et 2 est calculée, pas lue
+
+Le slot `+0x7C` de la classe d'objet piloté est `Aircraft_ComputeSeekerSignature_3E2F1`. Il est appelé avec (cible, objet de référence du chercheur : le missile en vol, ou l'objet `+0x0D` du point d'emport avant le tir). L'octet `SIGN` du modèle (`les bx,[si+0Eh] / mov al,es:[bx+12h]`) ne sert que **sans objet de référence**.
+
+```
+v   = |vitesse cible| · 256 / 0x25A00            // vitesse / 602, en 24.8
+A   = Math_DotProduct3D_5505B(v_ref, v_cible) > 0 // même sens : chercheur dans le secteur arrière
+sig = v · (A ? 100 : 50) + 10                    // imul eax,64h / imul eax,32h ; add 0A00h
+si cran_gaz > 5 : sig += (A ? 100 : 50)          // cmp byte ptr es:[bx+1Eh],5 / jle ; add 6400h / 3200h
+renvoie (sig >> 8) & 0xFF                        // sar eax,8 ; mov [bp-1Dh], al : repasse par 0 au-delà de 255
+```
+
+- **Le vecteur** vient de `vtable+0x4C` = `loc_3D246`, qui renvoie une copie de `[+0x51]+8` : la vitesse de l'objet (déjà établi dans `DATA_MODEL.md`, table « `entité->vtable[0x4C]` (vitesse entité) »).
+- **`Math_DotProduct3D_5505B`** (ex-`Targeting_ComputeGeometryHelperA`) est un produit scalaire 24.8 : `imul` des trois paires, somme sur 64 bits, `shrd eax, edx, 8`.
+- **L'octet `+0x1E` est le cran de manette des gaz (0 à 10), et `> 5` veut dire post-combustion.** Preuve : `WorldObject_UpdateWithAIEntity_3D9FB` prend le même enregistrement (`[si+55h] → vtable+8`) et le passe au corps `[si+51h] → vtable+0x40`. Dans la vtable `JDYN` de `seg339:0x2312` (adresse `0x6F3C2`), le slot `+0x40` (`0x6F402`) est le thunk `loc_3B669` (`add ax, 0FF72h`, soit `this − 0x8E`, puis `jmp far ptr PhysicsTicks`). `PhysicsTicks` lit `es:[bx+1Eh]` de son 2ᵉ argument comme cran, et bascule la consommation de carburant sur le facteur post-combustion avec **le même test** : `cmp byte ptr [bp-2Ch], 5 / jg` → `4Ch` au lieu de `33h`.
+- Ordres de grandeur, à 602 de vitesse : de dos avec post-combustion = 210 ; de dos sans post-combustion = 110 ; de face ou de côté avec post-combustion = 110.
+
+### 2. Le seuil n'est pas un seuil de verrouillage : c'est le vol de piste par un leurre
+
+`Targeting_SelectAndPrioritize(arme, cible actuelle, référence, octet)` (table de sauts `off_43319`, index `weapon_aspec − 1`, **l'ancien résumé décalait les aspecs 2 à 4 d'un cran**) :
+
+1. `c = Targeting_FilterByWeaponType(arme, référence)` : le candidat dans le cône et la portée du chercheur.
+2. `c` nul → renvoie 0. `c` = cible actuelle → on la garde.
+3. Sinon, poids `w = 3` (5 si `c->vtable+0x38 == word_722E6`). La signature de `c` est comparée au seuil : **au-dessus, `c` vole la piste si `Math_RandomScale_54DF4(10) < w`** (3 chances sur 10) ; en dessous, on garde la cible actuelle.
+4. **Aspec 1 seulement (AIM-9J)** : quand on garde la cible, test d'aspect `Math_DotProduct3D_5505B(v_ref, v_cible) >= Math_Sin_5483F(0x5A00 = 90.0)`, sinon renvoie 0. **L'AIM-9J ne tient que de dos.**
+
+| aspec | armes (`WDAT`) | test de `Targeting_SelectAndPrioritize` | octet rangé par `WeaponStation_TestTargetLock` dans `+0x0F` |
+|---|---|---|---|
+| 1 | AIM-9J | `c->vtable+0x7C` > 210, puis aspect arrière obligatoire | `vtable+0x7C` |
+| 2 | AIM-9M | `c->vtable+0x7C` ≥ 245, tous secteurs | `vtable+0x7C` |
+| 3 | (aucune) | `Targeting_ReticleWindowTest` | `Debris_GetStateFlag` (S2) |
+| 4 | AIM-120, SA-2, SA-6 | `Debris_GetSubpartAttrib(c)` (S1, lu dans le modèle) ≥ 245 | `Debris_GetSubpartAttrib` (S1) |
+| 5, 6 | AGM-65D, GBU-15 | `Proximity_TestOriented` : garde la cible ou 0 | — |
+
+Le guidage du missile en vol (`seg090`, fonction pas encore nommée) appelle la même fonction à chaque tick de son minuteur, avec (modèle d'arme `[si+0Eh]`, cible `[si+55h]`, **le missile lui-même**, `[si+63h]`), et range le résultat dans `missile+0x55`. **Un missile guidé peut donc être détourné en vol**, ou perdre sa cible (0).
+
+### 3. Les leurres (`DECY`, catégorie 0x10) : une signature qui s'éteint
+
+- Modèle : vtable `seg339` tag `0x2430`, slot `+8` = `DecoyModel_GetCategory_45190` (`mov al, 10h`). Chunk propre `DATA` (`41544144h`), lu par `DecoyModel_LoadDATALifetime_9C810` : 4 octets dans `modèle+0x37` = **durée de vie**. Chunk absent : erreur `0xC005`.
+- Instance : `Decoy_ConstructInstance_9C85A` (0x34 octets, vtable finale tag `0x1C6A` = `0x6ED1A`), puis `Decoy_AttachAndStartLifetime_9C90B` : `+0x2E = (word modèle+0x37) << 8`, soit le temps restant. `Decoy_TickLifetime_451B5` fait `+0x2E -= dt` à chaque tick, et le leurre meurt sous 0.
+- Signature : `Decoy_GetFadingSignature0_451F1` (slot `+0x7C`) = **S0 × temps restant / durée**, et `Decoy_GetFadingSignature1_45285` (slot `+0x8C`) fait de même avec S1. La chaleur décroît linéairement jusqu'à 0. Pour voler la piste d'un AIM-9J, un leurre doit donc être largué avec S0 > 210, et il cesse de pouvoir le faire quand `S0 × restant / durée` repasse sous 210.
+- **L'aspec 4 (radar) lit S1 sans décroissance** : `Debris_GetSubpartAttrib` lit `modèle+0x13` directement, sans passer par le slot virtuel `+0x8C`. Le consommateur du slot `+0x8C` n'est pas tracé.
+- `CAMERA_SYSTEM.md` voyait dans `Decoy_AttachAndStartLifetime_9C90B` une copie du rayon de collision vers la caméra. Pour un `DECY`, `modèle+0x37` est en réalité écrasé par le chunk `DATA`, et `+0x2E` est le temps restant du leurre.
+
+**À vérifier côté données** : les octets `SIGN` et le dword `DATA` des fichiers `DECY` (fusée éclairante et paillettes, pièces `FLARE` / `CHAFF`).
+
+**Non lus** : `Targeting_FilterByWeaponType` (quel candidat il rend quand plusieurs objets sont dans le cône), `vtable+0x38` et `word_722E6` (le « lanceur est le joueur » de la note précédente reste non prouvé), et l'identité de l'objet `+0x0D` du point d'emport (vraisemblablement le porteur, par analogie avec le missile en vol qui se passe lui-même).

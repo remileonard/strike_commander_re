@@ -257,11 +257,13 @@ Math_VectorLength3D_Scaled_54F57	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par Targeting_AcquireBestThreat (sub_3314) — helper géométrique (rôle exact
-; non détaillé), également utilisé par de nombreuses fonctions du cluster matrice/rotation
-; (57C67, 57DAE, 5789E).
+; far, 47L, LUE (2026-09-24). PRODUIT SCALAIRE de deux vecteurs 3x i32 24.8 : (a0*b0 + a1*b1 +
+; a2*b2) en 64 bits (imul / add / adc), puis shrd 8 -> resultat 24.8 ecrit dans *arg_0.
+; Ex-'Targeting_ComputeGeometryHelperA'. Utilise par Targeting_AcquireBestThreat,
+; Aircraft_ComputeSeekerSignature_3E2F1 (aspect arriere), Targeting_SelectAndPrioritize et le
+; cluster matrice/rotation.
 ; ==============================================================================================
-Targeting_ComputeGeometryHelperA_5505B	proc far		; CODE XREF: Targeting_AcquireBestThreat+74AP
+Math_DotProduct3D_5505B	proc far		; CODE XREF: Targeting_AcquireBestThreat+74AP
 					; Targeting_AcquireBestThreat+849P ...
 
 var_4		= dword	ptr -4
@@ -307,7 +309,7 @@ loc_550AD:
 		pop	si
 		leave
 		retf
-Targeting_ComputeGeometryHelperA_5505B	endp
+Math_DotProduct3D_5505B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -484,7 +486,7 @@ loc_551AA:
 		lea	ax, [bp+var_8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_2C]
 		mov	edx, [bp+var_8]
@@ -1926,7 +1928,7 @@ loc_55BE4:				; CODE XREF: Targeting_ComputeBearingElevation_55B1A+A0j
 		lea	ax, [bp+var_14]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		lea	ax, [bp+var_14]
 		push	ax
@@ -5300,7 +5302,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-8]
 		mov	[bp-20h], eax
@@ -5314,7 +5316,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-0Ch]
 		mov	[bp-1Ch], eax
@@ -5372,7 +5374,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-8]
 		mov	[bp-1Ch], eax
@@ -5386,7 +5388,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-0Ch]
 		mov	[bp-18h], eax
@@ -5438,7 +5440,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-8]
 		mov	[bp-20h], eax
@@ -5452,7 +5454,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-0Ch]
 		mov	[bp-1Ch], eax
@@ -5510,7 +5512,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-8]
 		mov	[bp-1Ch], eax
@@ -5524,7 +5526,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-0Ch]
 		mov	[bp-18h], eax
@@ -5574,7 +5576,7 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 		lea	ax, [bp-8]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-8]
 		mov	[bp-20h], eax
@@ -5584,7 +5586,7 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp-0Ch]
 		mov	[bp-1Ch], eax
@@ -5716,7 +5718,7 @@ loc_57C7B:				; CODE XREF: AI_ComputeGeometrySolution_57C67+Fj
 		lea	ax, [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr Targeting_ComputeGeometryHelperA_5505B
+		call	near ptr Math_DotProduct3D_5505B
 		add	sp, 8
 		lea	ax, [bp+var_30]
 		push	ax

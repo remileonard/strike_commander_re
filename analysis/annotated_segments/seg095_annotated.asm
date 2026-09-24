@@ -2,7 +2,11 @@ seg095		segment	byte public 'CODE' use16
 		assume cs:seg095
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_45190:				; DATA XREF: seg339:2438o
+; ==============================================================================================
+; far, LUE (2026-09-24). Slot +8 de la vtable modele DECY (seg339 tag 0x2430, XREF
+; seg339:2438) : mov al, 10h -> categorie d'objet 0x10 = leurre.
+; ==============================================================================================
+DecoyModel_GetCategory_45190:				; DATA XREF: seg339:2438o
 		push	bp
 		mov	bp, sp
 		mov	al, 10h
@@ -33,7 +37,12 @@ loc_451A1:				; DATA XREF: seg339:off_6ED1Eo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_451B5:				; DATA XREF: seg339:off_6ED2Ao
+; ==============================================================================================
+; far, LUE (2026-09-24). Slot +0x10 (mise a jour) de l'instance LEURRE (vtable 0x6ED1A) :
+; inst+0x2E -= dt (dword_70458) ; tant que +0x2E >= 0 appelle Camera_NotifyFollowTarget ;
+; renvoie 1 si l'objet vit encore. Le leurre meurt quand son temps restant passe sous 0.
+; ==============================================================================================
+Decoy_TickLifetime_451B5:				; DATA XREF: seg339:off_6ED2Ao
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -64,10 +73,14 @@ loc_451EB:				; CODE XREF: seg095:0046j seg095:0051j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, surcharge du slot +0x7C : renvoie l'octet modele +0x12 (1er octet SIGN) ; calcule aussi
-; un quotient inutilisé (model+0x37 et instance+0x2E).
+; far, LUE (2026-09-24). Methode virtuelle +0x7C de l'instance LEURRE (classe DECY, vtable
+; seg339 0x6ED1A = tag 0x1C6A) : signature = octet modele +0x12 (1er octet SIGN) * (temps
+; restant instance+0x2E / duree modele+0x37). Calcul : ratio = (inst+0x2E << 8) / (modele+0x37
+; << 8), sig = ratio * (S0 << 8) >> 8, renvoie sig >> 8 (octet). La chaleur du leurre DECROIT
+; LINEAIREMENT jusqu'a 0 a la fin de sa vie. Ex-'WorldObject_GetSignatureByte0_ModelDirect'
+; (l'ancien resume disait le quotient inutilise : faux, il multiplie S0).
 ; ==============================================================================================
-WorldObject_GetSignatureByte0_ModelDirect_451F1:				; DATA XREF: seg339:1CE6o
+Decoy_GetFadingSignature0_451F1:				; DATA XREF: seg339:1CE6o
 		push	bp
 		mov	bp, sp
 		sub	sp, 24h
@@ -114,7 +127,13 @@ WorldObject_GetSignatureByte0_ModelDirect_451F1:				; DATA XREF: seg339:1CE6o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_45285:				; DATA XREF: seg339:off_6EDA6o
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x8C de l'instance LEURRE (DECY, vtable 0x6ED1A) :
+; meme calcul que Decoy_GetFadingSignature0_451F1 sur l'octet modele +0x13 (2e octet SIGN) :
+; S1 * temps restant / duree. Consommateur du slot +0x8C non trace (Debris_GetSubpartAttrib,
+; utilise par l'aspec 4, lit modele+0x13 directement, sans decroissance).
+; ==============================================================================================
+Decoy_GetFadingSignature1_45285:				; DATA XREF: seg339:off_6EDA6o
 		push	bp
 		mov	bp, sp
 		sub	sp, 24h

@@ -7,9 +7,13 @@ ovr304		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ReadFieldGroupC_64A7E et gestion d'erreur (41 lignes).
+; far, LUE (2026-09-24). Chargeur du chunk propre a DECY (appele par IFF_LoadModelMain via
+; VROOMM_StubThunk_6C080) : chaine le chargeur de base (VROOMM_StubThunk_6C1C0), cherche le
+; chunk 'DATA' (41544144h), lit 4 octets (ResourceRecord_ReadFieldGroupC_64A7E) dans
+; modele+0x37 = DUREE DE VIE du leurre (entier, en unites de dt). Chunk absent : erreur
+; 0xC005.
 ; ==============================================================================================
-Debris_LoadFieldGroupC_9C810	proc far		; CODE XREF: VROOMM_StubThunk_6C080J
+DecoyModel_LoadDATALifetime_9C810	proc far		; CODE XREF: VROOMM_StubThunk_6C080J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -40,16 +44,16 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_9C857
 ; ���������������������������������������������������������������������������
 
-loc_9C84E:				; CODE XREF: Debris_LoadFieldGroupC_9C810+27j
+loc_9C84E:				; CODE XREF: DecoyModel_LoadDATALifetime_9C810+27j
 		push	0C005h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9C857:				; CODE XREF: Debris_LoadFieldGroupC_9C810+3Cj
+loc_9C857:				; CODE XREF: DecoyModel_LoadDATALifetime_9C810+3Cj
 		pop	si
 		pop	bp
 		retf
-Debris_LoadFieldGroupC_9C810	endp
+DecoyModel_LoadDATALifetime_9C810	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -57,10 +61,13 @@ Debris_LoadFieldGroupC_9C810	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocation, Debris_BodyReset, Camera_MarkRecalc — réinitialisation d'un corps
-; de débris avec notification de recalcul caméra.
+; far, LUE (2026-09-24). Constructeur de l'INSTANCE LEURRE (slot +4 de la vtable modele DECY
+; via VROOMM_StubThunk_6C085) : malloc 0x34, vtables chainees 0x10E4 -> 0x1ADC
+; (Debris_BodyReset) -> 0x1BDE (Camera_MarkRecalc) -> 0x1C6A (leurre), +0x2E temps restant =
+; 0, +0x32 = 0, incremente word_70472 (compteur de leurres actifs, decremente par le
+; destructeur loc_45326).
 ; ==============================================================================================
-Debris_ResetBodyAndMarkCamera_9C85A	proc far		; CODE XREF: VROOMM_StubThunk_6C085J
+Decoy_ConstructInstance_9C85A	proc far		; CODE XREF: VROOMM_StubThunk_6C085J
 
 var_A		= word ptr -0Ah
 var_8		= dword	ptr -8
@@ -116,17 +123,17 @@ loc_9C8BC:
 		push	cs
 
 loc_9C8C3:
-		call	near ptr Camera_AttachSubcomponentWrapper_9C90B
+		call	near ptr Decoy_AttachAndStartLifetime_9C90B
 		add	sp, 6
 		inc	word_70472
 		mov	ax, si
 		jmp	short loc_9C8D3
 ; ���������������������������������������������������������������������������
 
-loc_9C8D1:				; CODE XREF: Debris_ResetBodyAndMarkCamera_9C85A+1Bj
+loc_9C8D1:				; CODE XREF: Decoy_ConstructInstance_9C85A+1Bj
 		mov	ax, si
 
-loc_9C8D3:				; CODE XREF: Debris_ResetBodyAndMarkCamera_9C85A+75j
+loc_9C8D3:				; CODE XREF: Decoy_ConstructInstance_9C85A+75j
 		mov	si, ax
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
@@ -150,7 +157,7 @@ loc_9C8F0:
 		pop	si
 		leave
 		retf
-Debris_ResetBodyAndMarkCamera_9C85A	endp
+Decoy_ConstructInstance_9C85A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -158,10 +165,12 @@ Debris_ResetBodyAndMarkCamera_9C85A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Camera_AttachSubcomponent.
+; far, LUE (2026-09-24). Rattachement de l'instance LEURRE :
+; Camera_AttachSubcomponent(instance, modele) puis instance+0x2E = (word modele+0x37) << 8
+; (temps restant = duree du chunk DATA, en 24.8) et pose le bit 0 de +0x04.
 ; ==============================================================================================
-Camera_AttachSubcomponentWrapper_9C90B	proc far		; CODE XREF: VROOMM_StubThunk_6C08AJ
-					; Debris_ResetBodyAndMarkCamera_9C85A:loc_9C8C3p
+Decoy_AttachAndStartLifetime_9C90B	proc far		; CODE XREF: VROOMM_StubThunk_6C08AJ
+					; Decoy_ConstructInstance_9C85A:loc_9C8C3p
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -186,6 +195,6 @@ arg_2		= dword	ptr  8
 		pop	si
 		leave
 		retf
-Camera_AttachSubcomponentWrapper_9C90B	endp
+Decoy_AttachAndStartLifetime_9C90B	endp
 
 ovr304		ends

@@ -1910,15 +1910,16 @@ off_3F7BE	dw offset loc_3EF1E	; DATA XREF: HUD_RenderSymbologyMain+12Ar
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 83L, LUE (2026-09-20). Ancien nom 'HUD_RenderReticleByWeaponType' TROMPEUR : c'est le
-; TEST DE VERROUILLAGE d'un point d'emport sur une cible, utilise par l'IA
-; (AI_BehaviorSelector_8D30) avant de tirer un missile. Prend (point d'emport, cible). Vide le
-; drapeau de verrouillage du point d'emport (+0x0F). Si la cible existe, aiguille selon
-; weapon_aspec de l'arme (+0x4F, valeurs 1 a 4) : 1 = methode virtuelle +0x7C de la cible
-; appliquee a l'objet suivi (+0xD) ; 3 = Debris_GetStateFlag de la cible ; 4 =
-; Debris_GetSubpartAttrib de la cible ; resultat range dans +0x0F. Renvoie le resultat de
-; Targeting_SelectAndPrioritize(arme, objet suivi, cible, drapeau) : non nul si la cible est
-; retenue/verrouillee.
+; far, 83L, LUE (2026-09-20, relu 2026-09-24). Ancien nom 'HUD_RenderReticleByWeaponType'
+; TROMPEUR : TEST DE VERROUILLAGE d'un point d'emport (enregistrement de 0x12 octets : +0
+; arme, +0x0D objet de reference, +0x0F octet de signature) sur une cible. Appelants :
+; AI_BehaviorSelector (point d'emport courant = tableau [systeme+0x14] + index*0x12, cible =
+; +0x287) et HUD_RenderSymbologyAlt (point d'emport [systeme+0x18], cible [systeme+0x0D] ;
+; resultat == cible -> systeme+0x0B = 1). Vide +0x0F ; si la cible existe, table off_3F851
+; indexee par weapon_aspec-1 : aspec 1 ET 2 -> cible->vtable+0x7C(objet +0x0D) (signature
+; calculee), aspec 3 -> Debris_GetStateFlag (instance+0x29 = 3e octet SIGN), aspec 4 ->
+; Debris_GetSubpartAttrib (modele+0x13 = 2e octet SIGN) ; resultat dans +0x0F. Renvoie
+; Targeting_SelectAndPrioritize(arme, cible, objet +0x0D, octet +0x0F).
 ; ==============================================================================================
 WeaponStation_TestTargetLock	proc far		; CODE XREF: AI_BehaviorSelector+1F3P
 					; HUD_RenderSymbologyAlt+1105p

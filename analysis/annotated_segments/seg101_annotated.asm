@@ -824,7 +824,7 @@ loc_46793:				; CODE XREF: Physics_AllocGroundConstraintVector+CAj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_24], 9CCh
 		cmp	[bp+var_8], 100h

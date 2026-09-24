@@ -533,7 +533,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		mov	[bp+var_4], eax

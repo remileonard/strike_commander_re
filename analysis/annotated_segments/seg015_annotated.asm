@@ -549,7 +549,7 @@ loc_15234:				; CODE XREF: seg015:033Fj
 		push	ss
 		lea	ax, [bp-30h]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		cmp	dword ptr [bp-30h], 100h
 		jle	short loc_152D5

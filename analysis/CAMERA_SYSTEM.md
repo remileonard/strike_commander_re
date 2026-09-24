@@ -597,7 +597,8 @@ WorldObject `+0x20` « masse-ish » (sommé à une magnitude de force dans
 (`sub_4B90B`, seg104) ne lit que : `model[+0x37]` = **rayon de collision**
 (word, défaut `0x14` = 20), `model[+0x39]`/`+0x3A` = flags. Ce rayon EST
 recopié côté caméra (`model[+0x37] << 8` → `cam[+0x2E]`, via
-`Camera_AttachSubcomponentWrapper_9C90B`) mais à `+0x2E`, **pas `+0x20`**.
+`Decoy_AttachAndStartLifetime_9C90B`) mais à `+0x2E`, **pas `+0x20`**.
+*(Correction 2026-09-24 : `Decoy_AttachAndStartLifetime_9C90B` est le rattachement de l'instance **leurre** `DECY` ; pour cette classe `model[+0x37]` est la durée de vie lue dans le chunk `DATA` par `DecoyModel_LoadDATALifetime_9C810`, et `+0x2E` est le temps restant. Voir `AI_TICK_CALL_GRAPH.md`, « Qui écrit les octets de signature ».)*
 
 **Confirmé côté données (Rémi, 2026-09-12) : le chunk `INFO` de `REAL/OBJT`
 est systématiquement vide dans les fichiers livrés** (donc le rayon de

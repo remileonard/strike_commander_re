@@ -19,7 +19,7 @@ stru_6C060	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A3Eo
 ; d'overlay actuellement charge en memoire. fileoff=2AB40h, codesize=130h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C080	proc far		; CODE XREF: IFF_LoadModelMain+ACCP
-		jmp	Debris_LoadFieldGroupC_9C810
+		jmp	DecoyModel_LoadDATALifetime_9C810
 VROOMM_StubThunk_6C080	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6C080	endp
 ; d'overlay actuellement charge en memoire. fileoff=2AB40h, codesize=130h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C085	proc far		; DATA XREF: seg339:off_6F4E4o
-		jmp	Debris_ResetBodyAndMarkCamera_9C85A
+		jmp	Decoy_ConstructInstance_9C85A
 VROOMM_StubThunk_6C085	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C085	endp
 ; d'overlay actuellement charge en memoire. fileoff=2AB40h, codesize=130h, nentries=3.
 ; ==============================================================================================
 VROOMM_StubThunk_6C08A	proc far
-		jmp	Camera_AttachSubcomponentWrapper_9C90B
+		jmp	Decoy_AttachAndStartLifetime_9C90B
 VROOMM_StubThunk_6C08A	endp
 
 stub304		ends

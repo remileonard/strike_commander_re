@@ -1040,7 +1040,7 @@ loc_3A31:				; CODE XREF: Targeting_AcquireBestThreat+705j
 		push	ss
 		lea	ax, [bp+var_A8]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_AC], 0FFFFFF4Ch
 		mov	eax, [bp+var_A8]
@@ -1161,7 +1161,7 @@ loc_3B31:				; CODE XREF: Targeting_AcquireBestThreat+7BBj
 		push	ss
 		lea	ax, [bp+var_60]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	[bp+var_64], 0FFFFFF4Ch
 		mov	eax, [bp+var_60]

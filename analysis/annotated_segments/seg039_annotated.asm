@@ -2012,7 +2012,7 @@ loc_2294A:				; CODE XREF: WorldObjects_Cluster_22795+1B0j
 		push	ss
 		lea	ax, [bp+var_5C]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_5C]
 		cmp	eax, [bp+var_16]
@@ -2336,7 +2336,7 @@ loc_22BA1:				; CODE XREF: WorldObjects_Cluster_22A7D+10Dj
 		push	ss
 		lea	ax, [bp+var_2A]
 		push	ax
-		call	Targeting_ComputeGeometryHelperA_5505B
+		call	Math_DotProduct3D_5505B
 		add	sp, 8
 		mov	eax, [bp+var_2A]
 		cmp	eax, [bp+var_C]
