@@ -169,7 +169,7 @@ loc_3E7BB:
 		push	ss
 		lea	ax, [bp+var_26]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_26]
 		or	eax, eax
@@ -2189,7 +2189,7 @@ loc_3F8C3:
 		push	ss
 		lea	ax, [bp+var_26]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_26]
 		or	eax, eax

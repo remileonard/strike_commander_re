@@ -3279,7 +3279,7 @@ loc_104E8:				; CODE XREF: seg008:1BC1j
 		push	ss
 		lea	ax, [bp-62h]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp-62h]
 		sar	eax, 8
@@ -3798,7 +3798,7 @@ loc_109CF:				; CODE XREF: seg008:2115j
 		push	ss
 		lea	ax, [bp-6Ah]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		push	0Ah
 		lea	ax, [bp-6Ah]

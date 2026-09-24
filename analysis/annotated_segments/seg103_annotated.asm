@@ -1135,24 +1135,28 @@ Aero_SumLinearForces_48639	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,375L — Aero_ControlOrchestrator_48FC2+11p. Calcule var_38 = demande de charge en
-; tangage. var_16 (loadDemand) = elevator(via [arg_2+0x1F]))/3 si négatif sinon /16,
-; *(-si[0x4C]<<8)/16 (gain cellule). Puis (session 2026-09-05, relu 3x, L1191-1383) : appelle
-; vtable[0x3C] (orientation) -> AI_ComputeGeometryHelper_56E29 (L1201) qui remplit un buffer
-; de 36 octets var_7A (3 vecteurs de 3 dword) avec la base d'orientation de l'avion ; var_5A
-; n'est PAS une valeur calculée à part - c'est littéralement l'octet à var_7A+0x20 de ce
-; buffer, soit la composante Z (monde) du 3e vecteur (vecteur "haut" du repère avion).
-; AI_ApplyAngleBetweenVectors_57C3A (L1364) -> Math_AngleBetweenVectors_552E1 calcule l'angle
-; entre le vecteur avant du buffer et l'axe Z monde ; Math_CosDeg_5483F (L1371) en prend le
-; sinus -> var_30. cmp [var_5A],0 / jge / neg var_30 (L1373-1377) : signe inversé si la
-; composante Z du vecteur "haut" est négative (avion sur le dos). var_30 = sin(angle(avant,
-; Z_monde)), qui par l'identité sin(90°-x)=cos(x) vaut ≈cos(tangage) quand l'avion est proche
-; du vol horizontal - PAS un terme de virage/inclinaison comme une interprétation précédente
-; le supposait. var_38 = var_16 + var_30 (L1380-1383, PAS juste var_16) : sans ce terme,
-; var_38 s'effondre à 0 au neutre/palier (cf. bug 21G vs MAX_G=9 constaté en jeu, corrigé dans
-; SCJetpPlane::processInput session 2026-09-05). ⚠️ (2026-09-24) Math_Sin_5483F /
-; Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
-; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
+; far, 375L, RELUE INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques).
+; CONSIGNE D'INCIDENCE si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA =
+; si[0x16] - alpha). (1) si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ;
+; M = orientation de l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2)
+; flags_75.bit5 ou q < 1.0 -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS
+; utilise. (4) DEMANDE DU MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m
+; < 0 (manche pousse) ; d = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4
+; ET pas au sol ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE,
+; signe) ; si alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis
+; Math_CosDeg_5483F). (6) CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1
+; (volets). (7) TERME DE GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ;
+; g1 = cos(theta) (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas
+; (var_5A = M+0x20 < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g *
+; cos(theta) au neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) *
+; dword_6FFD7 ), X = valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car
+; portance = si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n !=
+; 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si
+; T est compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L =
+; (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien
+; resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait
+; juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un
+; cosinus). Ne lit PAS si[0x59].
 ; ==============================================================================================
 Aero_ComputeControlFlags75Bit5B	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+11p
 
@@ -1319,7 +1323,7 @@ loc_48967:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+100j
 		push	ss
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		lea	ax, [bp+var_4A]
 		push	ax
@@ -1375,7 +1379,7 @@ loc_48A28:
 		push	ss
 		lea	ax, [bp+var_34]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		lea	ax, [bp+var_34]
 		push	ax
@@ -1774,7 +1778,7 @@ loc_48D32:
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_24]
 		neg	eax
@@ -2241,7 +2245,7 @@ loc_49074:				; CODE XREF: seg103:10A0j seg103:10ABj
 		push	ss
 		lea	ax, [bp-6]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp-6]
 		or	eax, eax
@@ -2255,7 +2259,7 @@ loc_490AF:				; CODE XREF: seg103:10EAj
 		push	ss
 		lea	ax, [bp-0Ah]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	si, [di]
 		add	si, 8
@@ -3167,7 +3171,7 @@ loc_498D2:
 		push	ax
 
 loc_498D3:
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	ax, si
 		add	ax, 0Ch
@@ -3175,7 +3179,7 @@ loc_498D3:
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_8]
 		sub	eax, [bp+var_C]
@@ -3339,10 +3343,10 @@ JDYN_TickSubcalcA	endp
 ; ==============================================================================================
 ; far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN
 ; principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée
-; sub_49C2E, corrigée en session antérieure). Utilise AI_ComputeGeometrySolution_57C67
-; (sin/cos) avec constante 0xA00, puis
-; Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-calcul angulaire du
-; guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler.
+; sub_49C2E, corrigée en session antérieure). Utilise Matrix_RollAngle_57C67 (sin/cos) avec
+; constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-
+; calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact
+; toujours à détailler.
 ; ==============================================================================================
 JDYN_TickSubcalcB	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+8B1p
 
@@ -3384,7 +3388,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 
 loc_49A9F:
 		add	sp, 6
@@ -4458,7 +4462,7 @@ loc_4A2F3:
 		push	ss
 		lea	ax, [bp+var_162]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_162]
 		add	[bp+var_14E], eax
@@ -4507,7 +4511,7 @@ loc_4A335:
 		push	ss
 		lea	ax, [bp+var_162]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_162]
 		sub	[bp+var_14E], eax
@@ -5808,7 +5812,7 @@ loc_4AE67:				; CODE XREF: seg103:2E93j
 		push	ss
 		lea	ax, [bp-38h]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp-38h]
 		mov	edx, dword_70454

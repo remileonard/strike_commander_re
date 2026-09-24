@@ -592,7 +592,7 @@ loc_15312:				; CODE XREF: seg015:03FBj seg015:0410j
 		push	ss
 		lea	ax, [bp-3Ch]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [di+60h]
 		cmp	eax, [bp-3Ch]
@@ -628,7 +628,7 @@ loc_1533B:				; CODE XREF: seg015:0446j
 		push	ss
 		lea	ax, [bp-44h]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	byte_6D8AC, 0
 		cmp	dword ptr [bp-44h], 0

@@ -395,7 +395,7 @@ Les masques `0x1`, `0x3` et `0x700` ne sont testés que si le bit 0 de `entité+
 - **Canon** : 0 si `d` ≥ 1800 (`range_gun`). Sinon la valeur de base est **écrasée** par une qualité de visée : `erreur` est l'écart angulaire entre la direction vers la cible et le vecteur vitesse **de ma propre arme** (`AI_Sensor_WeaponVelocityCache`, ancien nom `AI_Sensor_TargetVelocityCache` faux ; c'est pratiquement l'écart entre mon nez et la cible) ; `tolérance = arctan(vitesse_cible / d)` ; `écart = erreur − tolérance` ; `si = 8 − 2·écart/tolérance` si l'écart est négatif (donc de 8 à 10), `si = 8 − 4·écart/tolérance` sinon ; puis −4 si l'aspect est croisé.
 - **Missiles** : courte portée (masques 1, 2, 3) : `d` ≥ 17 700 : −10 ; `d` < 1800 : −3 (−10 si aspect croisé). Longue portée (0x100, 0x700) : `d` ≥ 45 000 : −10 ; `d` < 4000 : −3 (−10 si croisé). Autre masque : 0.
 - Résultat borné à [0, 10]. C'est cette valeur qui est comparée à `2 × si ≥ AA` par `Pilot_ReactionThreshold_B6`.
-- Non lus : `Math_AngleBetweenVectors_552E1`, `AI_ComputeApproachAngles_553CF` (la différence d'azimut et d'élévation est reproduite dans libRealSpace par l'angle entre mon nez et la direction vers la cible). L'unité de la vitesse de la cible (`nœud+0x20`) n'est pas établie : libRealSpace utilise `airspeed` (nœuds).
+- Non lus : `Math_ElevationAngle_552E1`, `AI_ComputeApproachAngles_553CF` (la différence d'azimut et d'élévation est reproduite dans libRealSpace par l'angle entre mon nez et la direction vers la cible). L'unité de la vitesse de la cible (`nœud+0x20`) n'est pas établie : libRealSpace utilise `airspeed` (nœuds).
 
 **Encore à lire pour le tir** : `AI_ManeuverSolution_Major`, la routine d'engagement du point d'emport (stub `6C434`), le contrôle de verrouillage des missiles (`WeaponStation_TestTargetLock`, nom trompeur) et la poursuite (`AI_Sensor_WeaponVelocityCache`, `AI_GuidanceSolution_Major`, `AI_RadarScanTarget`).
 
@@ -717,5 +717,18 @@ Preuve que la ligne 1 est le nez : dans `MissileBody_BoostPhase_42632` et `Missi
 
 - `Matrix_OrthonormalizeKeepRow0_575DF` (ex-`Matrix_ApplyToVectorX`) : ligne 2 = ligne 0 × ligne 1, ligne 1 = ligne 2 × ligne 0, puis normalisation des trois lignes. Elle garde la ligne 0, c'est-à-dire l'axe de la rotation de `Matrix_BuildAxisX_56EC3`.
 - `Matrix_BuildAxisY_570C5` : la ligne 1 est inchangée ; `ligne0' = c·ligne0 − s·ligne2`, `ligne2' = c·ligne2 + s·ligne0`, avec `c = Math_CosDeg_5483F(θ)` et `s = Math_SinDeg_54876(θ)`. C'est bien une rotation autour du nez : **le roulis est confirmé**.
-- **Les noms étaient inversés.** `Math_Sin_Raw_580A7` travaille sur `|angle|` et renvoie 1,0 pour un angle nul ; `Math_Cos_Raw_58063` indexe la table à `90° − angle`. La table `seg213` vaut `cos(i/4°)·256` (221 à 30°, 181 à 45°, 127 à 60°, 0 à 90°). Renommées : `Math_CosDeg_5483F`, `Math_SinDeg_54876`, `Math_CosRaw_580A7`, `Math_SinRaw_58063`.
+- **Les noms étaient inversés.** `Math_Sin_Raw_580A7` travaille sur `|angle|` et renvoie 1,0 pour un angle nul ; `Math_Cos_Raw_58063` indexe la table à `90° − angle`. L'octet i de la table `seg213` est cos(i/4°) en 24.8, où 1,0 = 256 (221 à 30°, 181 à 45°, 127 à 60°, 0 à 90° ; l'angle nul, qui vaudrait 256, est traité à part). Renommées : `Math_CosDeg_5483F`, `Math_SinDeg_54876`, `Math_CosRaw_580A7`, `Math_SinRaw_58063`.
 - **Conséquence pour le chercheur** : le test d'aspect de l'AIM-9J compare le produit scalaire des vitesses à `cos 90° = 0`, et non à 1,0. L'AIM-9J garde sa cible tant que les deux vitesses font un angle d'au plus 90°.
+
+### Conversion des champs à la lecture des fichiers (précisé 2026-09-24)
+
+libRealSpace calcule en flottants : la colonne de droite dit comment obtenir la valeur réelle à partir de la valeur brute du fichier. Toutes les formules de cette section sont écrites en valeurs réelles (degrés, unités de distance, secondes).
+
+| Champ | Utilisation dans l'original | Valeur réelle à partir du fichier |
+|---|---|---|
+| chunk dynamique `MISS` (5 dwords : `+0x21` vitesse de rotation max en °/s, `+0x25` vitesse max, `+0x29` accélération, `+0x2D` et `+0x31` vitesses latérale et normale de croisière) | dword utilisé tel quel dans les calculs en virgule fixe | **dword ÷ 256** |
+| chunk dynamique `GBMB` (1 dword, `+0x18` vitesse de rotation max en °/s) | idem | **dword ÷ 256** |
+| chunk `DATA` du modèle `MISS`, word `+0x63` (rayon de l'allumeur) | word converti par `<< 8` | **word tel quel** (entier) |
+| chunk `DATA` du leurre `DECY`, `modèle+0x37` (durée de vie) | lu en dword, utilisé en word converti par `<< 8` | **mot de poids faible tel quel** (entier, dans l'unité de `dt`) |
+| chunk `SIGN` (3 octets) | octet comparé à 210 / 245 | **octet tel quel** (0 à 255) |
+| `Math_RandomScale_54DF4(n)` | `rand() × n / 0x8000` | entier uniforme de 0 à n−1 (`/0x8000` = échelle de `rand`, pas une conversion) |

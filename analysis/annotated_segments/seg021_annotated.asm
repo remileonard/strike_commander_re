@@ -623,7 +623,7 @@ loc_1892A:
 		push	ax
 
 loc_18933:
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		les	bx, [bp+6]
 		mov	ax, es:[bx+1Ah]
@@ -877,7 +877,7 @@ loc_18BD6:				; CODE XREF: seg021:0834j
 		push	ss
 		lea	ax, [bp-94h]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		les	bx, [bp+6]
 		mov	ax, es:[bx+1Ah]

@@ -705,7 +705,7 @@ loc_2FDCB:
 		push	ax
 
 loc_2FDCF:
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 
 loc_2FDD4:
 		add	sp, 8

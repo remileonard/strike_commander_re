@@ -2080,7 +2080,7 @@
 "sub_54ADE"
 ],
 "new_name": "AI_ComputeFireSolutionQuality_91DF",
-"summary": "far, 559L, LUE INTEGRALEMENT (2026-09-20). CALCULE LA QUALITE DE SOLUTION DE TIR 'si' (entier 0 a 10) contre la cible aerienne (entite+0x287) avec l'arme choisie (masque entite+0x1A2). Rangee par AI_BehaviorSelector_8D30 dans entite+0x1A0. Sans cible ou cible a 90 degres ou plus du nez : 0. Base : 10 - (ecart_nez*10)/35. Aspect croise (cap de la cible entre 50 et 130 degres de la direction vers elle) : -4. CANON (0x800) : 0 si d >= dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_AngleBetweenVectors_552E1, AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100, 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d < dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000) -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]."
+"summary": "far, 559L, LUE INTEGRALEMENT (2026-09-20). CALCULE LA QUALITE DE SOLUTION DE TIR 'si' (entier 0 a 10) contre la cible aerienne (entite+0x287) avec l'arme choisie (masque entite+0x1A2). Rangee par AI_BehaviorSelector_8D30 dans entite+0x1A0. Sans cible ou cible a 90 degres ou plus du nez : 0. Base : 10 - (ecart_nez*10)/35. Aspect croise (cap de la cible entre 50 et 130 degres de la direction vers elle) : -4. CANON (0x800) : 0 si d >= dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_ElevationAngle_552E1, AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100, 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d < dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000) -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]. ⚠️ (2026-09-24) Math_ElevationAngle_552E1 (ex-'Math_AngleBetweenVectors') ne calcule PAS un angle entre deux vecteurs : c'est l'angle d'ELEVATION d'un seul vecteur au-dessus de l'horizontale. La composante 'diff_elevation' de l'erreur de visee est donc une difference d'elevations (monde), a relire avec AI_ComputeApproachAngles_553CF avant de valider le portage SCAIBrain::computeFireSolutionQuality."
 },
 "sub_9665": {
 "segment": "seg004",
@@ -9806,7 +9806,7 @@
 "sub_46F20"
 ],
 "new_name": "Aero_DynamicPressure_46D13",
-"summary": "far, seg102 L500-570. Cache frame (byte_6FFBB -> dword_6FFB7). |v|^2 (Targeting_ComputeGeometryHelperA_5505B(A.vel,A.vel)) * rho(altitude) (Atmosphere_AirDensityAtAltitude via FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0. Renvoie q = 1/2*rho(h)*v^2 = pression dynamique, echelle de force aero maitresse (portance, trainee, forces de controle). Detail: DATA_MODEL.md 6.2."
+"summary": "far, seg102 L500-570. Cache frame (byte_6FFBB -> dword_6FFB7). |v|^2 (Math_DotProduct3D_5505B(A.vel,A.vel)) * rho(altitude) (Atmosphere_AirDensityAtAltitude via FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0. Renvoie q = 1/2*rho(h)*v^2 = pression dynamique, echelle de force aero maitresse (portance, trainee, forces de controle). Detail: DATA_MODEL.md 6.2."
 },
 "sub_46DA3": {
 "segment": "seg102",
@@ -10132,7 +10132,7 @@
 "sub_5483F"
 ],
 "new_name": "Aero_ComputeControlFlags75Bit5B",
-"summary": "far,375L — Aero_ControlOrchestrator_48FC2+11p. Calcule `var_38` = demande de charge en tangage. `var_16` (loadDemand) = elevator(via [arg_2+0x1F]))/3 si négatif sinon /16, *(-si[0x4C]<<8)/16 (gain cellule). Puis (session 2026-09-05, relu 3x, L1191-1383) : appelle vtable[0x3C] (orientation) -> `AI_ComputeGeometryHelper_56E29` (L1201) qui remplit un buffer de 36 octets `var_7A` (3 vecteurs de 3 dword) avec la base d'orientation de l'avion ; `var_5A` n'est PAS une valeur calculée à part - c'est littéralement l'octet à `var_7A+0x20` de ce buffer, soit la composante Z (monde) du 3e vecteur (vecteur \"haut\" du repère avion). `AI_ApplyAngleBetweenVectors_57C3A` (L1364) -> `Math_AngleBetweenVectors_552E1` calcule l'angle entre le vecteur avant du buffer et l'axe Z monde ; `Math_CosDeg_5483F` (L1371) en prend le sinus -> `var_30`. `cmp [var_5A],0 / jge / neg var_30` (L1373-1377) : signe inversé si la composante Z du vecteur \"haut\" est négative (avion sur le dos). `var_30 = sin(angle(avant, Z_monde))`, qui par l'identité sin(90°-x)=cos(x) vaut `≈cos(tangage)` quand l'avion est proche du vol horizontal - PAS un terme de virage/inclinaison comme une interprétation précédente le supposait. `var_38 = var_16 + var_30` (L1380-1383, PAS juste var_16) : sans ce terme, var_38 s'effondre à 0 au neutre/palier (cf. bug 21G vs MAX_G=9 constaté en jeu, corrigé dans SCJetpPlane::processInput session 2026-09-05). ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
+"summary": "far, 375L, RELUE INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques). CONSIGNE D'INCIDENCE si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA = si[0x16] - alpha). (1) si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ; M = orientation de l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2) flags_75.bit5 ou q < 1.0 -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS utilise. (4) DEMANDE DU MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m < 0 (manche pousse) ; d = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4 ET pas au sol ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE, signe) ; si alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis Math_CosDeg_5483F). (6) CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1 (volets). (7) TERME DE GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ; g1 = cos(theta) (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas (var_5A = M+0x20 < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g * cos(theta) au neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) * dword_6FFD7 ), X = valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car portance = si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n != 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si T est compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L = (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un cosinus). Ne lit PAS si[0x59]."
 },
 "sub_48BD4": {
 "segment": "seg103",
@@ -10248,7 +10248,7 @@
 "sub_57660"
 ],
 "new_name": "JDYN_TickSubcalcB",
-"summary": "far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure). Utilise AI_ComputeGeometrySolution_57C67 (sin/cos) avec constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler."
+"summary": "far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure). Utilise Matrix_RollAngle_57C67 (sin/cos) avec constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler."
 },
 "sub_49C2E": {
 "segment": "seg103",
@@ -11772,8 +11772,8 @@
 "calls": [
 "sub_581E3"
 ],
-"new_name": "Math_ArcSin_5493E",
-"summary": "far, arc sinus fixe (délègue à sub_581E3). Référencée par AI_GuidanceSolution_Major_702A."
+"new_name": "Math_AcosDeg_5493E",
+"summary": "far, LUE (2026-09-24). Ex-'Math_ArcSin' : NOM INVERSE, ARC COSINUS. Si |x| <= 1.0 : Math_AcosRaw_581E3(x), sinon 0. Resultat en degres 24.8 dans *arg_0."
 },
 "sub_549A6": {
 "segment": "seg115",
@@ -11784,8 +11784,8 @@
 "calls": [
 "sub_581A0"
 ],
-"new_name": "Math_ArcCos_549A6",
-"summary": "far, arc cosinus fixe (délègue à sub_581A0)."
+"new_name": "Math_AsinDeg_549A6",
+"summary": "far, LUE (2026-09-24). Ex-'Math_ArcCos' : NOM INVERSE, ARC SINUS. Si |x| <= 1.0 : Math_AsinRaw_581A0(x), sinon 0. Resultat en degres 24.8 dans *arg_0."
 },
 "sub_54A0E": {
 "segment": "seg115",
@@ -11796,8 +11796,8 @@
 "calls": [
 "sub_5493E"
 ],
-"new_name": "Math_ArcSinOfRatio_54A0E",
-"summary": "far, calcule un ratio (dividende/diviseur, garde contre diviseur nul) puis Math_ArcSin_5493E — arcsin(num/den). Référencée par seg030 (zoom carte/radar)."
+"new_name": "Math_AcosOfRatio_54A0E",
+"summary": "far, LUE (2026-09-24). Ex-'Math_ArcSinOfRatio' : NOM INVERSE. Si den != 0 : Math_AcosDeg_5493E(num/den) (arc COSINUS), sinon 0."
 },
 "sub_54A76": {
 "segment": "seg115",
@@ -11808,8 +11808,8 @@
 "calls": [
 "sub_549A6"
 ],
-"new_name": "Math_ArcCosOfRatio_54A76",
-"summary": "far, variante de Math_ArcSinOfRatio pour Math_ArcCos_549A6 — arccos(num/den). Référencée par Guidance_HomingVelocityUpdate (sub_49C2E)."
+"new_name": "Math_AsinOfRatio_54A76",
+"summary": "far, LUE (2026-09-24). Ex-'Math_ArcCosOfRatio' : NOM INVERSE. Si den != 0 : Math_AsinDeg_549A6(num/den) (arc SINUS), sinon 0."
 },
 "sub_54ADE": {
 "segment": "seg115",
@@ -11968,7 +11968,7 @@
 "sub_658"
 ],
 "new_name": "Targeting_ComputeGeometryHelperB_5517F",
-"summary": "far, combine Targeting_ComputeGeometryHelperA_5505B et sub_559BB, référencée par sub_5F9B."
+"summary": "far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B."
 },
 "sub_5525B": {
 "segment": "seg116",
@@ -11996,8 +11996,8 @@
 "sub_54A76",
 "sub_54A0E"
 ],
-"new_name": "Math_AngleBetweenVectors_552E1",
-"summary": "far, référencée massivement depuis le cœur IA (seg002/seg003) — combine longueur vectorielle (55920/55ED8/54F57) et arccos/arcsin (54A76/54A0E) : calcul d'angle entre deux vecteurs (aspect/bearing)."
+"new_name": "Math_ElevationAngle_552E1",
+"summary": "far, LUE (2026-09-24). Ex-'Math_AngleBetweenVectors' (FAUX : un seul vecteur). ANGLE D'ELEVATION SIGNE d'un vecteur v au-dessus du plan horizontal (composantes 0,1 = horizontal, 2 = altitude), en degres 24.8 : copie + Math_VectorLengthUnscaled_55920(v, 1000) (garde anti-debordement) ; h = |(v0, v1)| (Math_VectorLength3D_Scaled_Variant_55ED8), L = |v| ; L == 0 -> 0x2D000 (720 deg, valeur sentinelle) ; si h > |v2| : Math_AsinOfRatio_54A76(v2, L) = asin(v2/L) ; sinon Math_AcosOfRatio_54A0E(h, L) = acos(h/L), rendu negatif si v2 < 0. Les deux branches donnent le meme angle (asin pres de l'horizontale, acos pres de la verticale, pour la precision) - ce qui confirme l'inversion des noms des arcs."
 },
 "sub_553CF": {
 "segment": "seg116",
@@ -12016,7 +12016,7 @@
 "sub_54A0E"
 ],
 "new_name": "AI_ComputeApproachAngles_553CF",
-"summary": "⚠️ far, 209 lignes, NON DÉTAILLÉE — référencée par `AI_ManeuverSolution_Major_6977` ; multiples appels à Math_ArcCosOfRatio_54A76/Math_ArcSinOfRatio_54A0E — probable calcul d'angles d'approche/manœuvre. Candidat pour session dédiée."
+"summary": "⚠️ far, 209 lignes, NON DÉTAILLÉE — référencée par `AI_ManeuverSolution_Major_6977` ; multiples appels à Math_AsinOfRatio_54A76/Math_AcosOfRatio_54A0E — probable calcul d'angles d'approche/manœuvre. Candidat pour session dédiée."
 },
 "sub_5554E": {
 "segment": "seg116",
@@ -12161,7 +12161,7 @@
 "sub_54A0E"
 ],
 "new_name": "Targeting_ComputeBearingElevation_55B1A",
-"summary": "⚠️ far, 134 lignes, NON DÉTAILLÉE — référencée par `Targeting_AcquireBestThreat` (sub_3314) ; combine Math_VectorLengthUnscaled_55920 ×2, Math_VectorLength3D_Scaled_54F57 ×2, Targeting_ComputeGeometryHelperA_5505B, Math_ArcSinOfRatio_54A0E — probable calcul de gisement/élévation vers une cible."
+"summary": "⚠️ far, 134 lignes, NON DÉTAILLÉE — référencée par `Targeting_AcquireBestThreat` (sub_3314) ; combine Math_VectorLengthUnscaled_55920 ×2, Math_VectorLength3D_Scaled_54F57 ×2, Math_DotProduct3D_5505B, Math_AcosOfRatio_54A0E — probable calcul de gisement/élévation vers une cible."
 },
 "sub_55DB4": {
 "segment": "seg116",
@@ -12257,7 +12257,7 @@
 "sub_54A0E"
 ],
 "new_name": "Map_ComputeBearingToPoint_56304",
-"summary": "far, référencée par seg030 (zoom carte/radar) — longueur vectorielle (sub_5828E ×2) + Math_ArcSinOfRatio_54A0E : calcul de gisement vers un point de carte."
+"summary": "far, référencée par seg030 (zoom carte/radar) — longueur vectorielle (sub_5828E ×2) + Math_AcosOfRatio_54A0E : calcul de gisement vers un point de carte."
 },
 "sub_563C9": {
 "segment": "seg116",
@@ -12367,7 +12367,7 @@
 "type": "far",
 "calls": [],
 "new_name": "AI_ComputeGeometryHelper_56E29",
-"summary": "far, seg116 L3896-3936 (relu intégralement, session 2026-09-05). PAS un calcul - une simple COPIE de structure : recopie 36 octets (3 vecteurs de 3 dword, aux offsets +0/+0xC/+0x18, même layout que les lignes de matrice de Matrix_BuildAxisX_56EC3) depuis `arg_2` (source, typiquement la matrice d'orientation persistante de l'objet, obtenue via vtable[0x3C]) vers `arg_0` (buffer local du buffer). Référencée par `AI_ManeuverSolution_Major`, et par `PhysicsTicks` (seg103) pour extraire une copie de travail de l'orientation avant les helpers géométriques (`Targeting_ComputeGeometryHelperB_5517F`, `AI_ApplyAngleBetweenVectors_57C3A`)."
+"summary": "far, seg116 L3896-3936 (relu intégralement, session 2026-09-05). PAS un calcul - une simple COPIE de structure : recopie 36 octets (3 vecteurs de 3 dword, aux offsets +0/+0xC/+0x18, même layout que les lignes de matrice de Matrix_BuildAxisX_56EC3) depuis `arg_2` (source, typiquement la matrice d'orientation persistante de l'objet, obtenue via vtable[0x3C]) vers `arg_0` (buffer local du buffer). Référencée par `AI_ManeuverSolution_Major`, et par `PhysicsTicks` (seg103) pour extraire une copie de travail de l'orientation avant les helpers géométriques (`Targeting_ComputeGeometryHelperB_5517F`, `Matrix_NosePitchAngle_57C3A`)."
 },
 "sub_56E8A": {
 "segment": "seg116",
@@ -12570,8 +12570,8 @@
 "calls": [
 "sub_552E1"
 ],
-"new_name": "AI_ApplyAngleBetweenVectors_57C3A",
-"summary": "far, référencée par sub_125EC, appelle Math_AngleBetweenVectors_552E1."
+"new_name": "Matrix_NosePitchAngle_57C3A",
+"summary": "far, LUE (2026-09-24). Ex-'AI_ApplyAngleBetweenVectors'. TANGAGE du nez : Math_ElevationAngle_552E1(ligne 1 de la matrice d'orientation arg_4, +0x0C) -> *arg_0. Degres 24.8, signe (+ = nez au-dessus de l'horizontale)."
 },
 "sub_57C67": {
 "segment": "seg116",
@@ -12585,8 +12585,8 @@
 "sub_54A0E",
 "sub_658"
 ],
-"new_name": "AI_ComputeGeometrySolution_57C67",
-"summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — référencée depuis seg002 (cœur IA) et sub_58F4, combine Targeting_ComputeGeometryHelperA_5505B, Math_VectorLength3D_Scaled_54F57, Math_ArcSinOfRatio_54A0E."
+"new_name": "Matrix_RollAngle_57C67",
+"summary": "far, LUE (2026-09-24). Ex-'AI_ComputeGeometrySolution'. ANGLE DE ROULIS de la matrice d'orientation arg_4 (ligne 1 = nez, ligne 2 = normale), degres 24.8. Si normale.c2 ([+0x20]) == 0 -> 0. Sinon : h = (nez.c1, -nez.c0, 0) (horizontale perpendiculaire au nez) ; r = Math_DotProduct3D_5505B(h, normale) / |h| ; |h| == 0 (nez vertical) -> 90 deg ; sinon roulis = 90 - Math_AcosOfRatio_54A0E(r) = asin(r). Si la normale pointe vers le bas (c2 < 0, dos) : roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans ]-180, 180]."
 },
 "sub_57D81": {
 "segment": "seg116",
@@ -12677,7 +12677,7 @@
 "type": "far",
 "calls": [],
 "new_name": "Math_CosRaw_580A7",
-"summary": "far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8| >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0, sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) * 256 (verifie : 221 a 30 deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise |angle|) : cos(0) = 1, cos(180) = -1."
+"summary": "far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8| >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0, sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) en 24.8 (1.0 = 256) (verifie : 221 a 30 deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise |angle|) : cos(0) = 1, cos(180) = -1."
 },
 "sub_580ED": {
 "segment": "seg117",
@@ -12696,8 +12696,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "Math_ArcCos_Raw_581A0",
-"summary": "far, arc cosinus en virgule fixe (implémentation brute — appelée par Math_ArcCos_549A6)."
+"new_name": "Math_AsinRaw_581A0",
+"summary": "far, LUE (2026-09-24). Ex-'Math_AsinRaw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg - table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x))."
 },
 "sub_581E3": {
 "segment": "seg117",
@@ -12706,8 +12706,8 @@
 "lines": 30,
 "type": "far",
 "calls": [],
-"new_name": "Math_ArcSin_Raw_581E3",
-"summary": "far, arc sinus en virgule fixe (implémentation brute — appelée par Math_ArcSin_5493E)."
+"new_name": "Math_AcosRaw_581E3",
+"summary": "far, LUE (2026-09-24). Ex-'Math_AcosRaw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x 24.8, |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en degres 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180 deg - table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de branche)."
 },
 "sub_58223": {
 "segment": "seg117",
@@ -30331,7 +30331,7 @@
 "sub_7A836"
 ],
 "new_name": "AI_ApplyManeuverAngles_7A90A",
-"summary": "far, combine `AI_ApplyAngleBetweenVectors_57C3A` et `AI_ApplyApproachAngles_57D81` (seg116)."
+"summary": "far, combine `Matrix_NosePitchAngle_57C3A` et `AI_ApplyApproachAngles_57D81` (seg116)."
 },
 "sub_7A9E0": {
 "segment": "ovr235",
@@ -31972,7 +31972,7 @@
 "sub_553CF"
 ],
 "new_name": "HUDSymbol_ComputeApproachDisplay_83FC9",
-"summary": "⚠️ far, 207 lignes, NON DÉTAILLÉE — combine `SetReference16` (×2), `Math_VectorLength3D_Scaled_54F57`, `Math_AngleBetweenVectors_552E1`, `AI_ComputeApproachAngles_553CF` (seg116) — affichage HUD d'angle d'approche."
+"summary": "⚠️ far, 207 lignes, NON DÉTAILLÉE — combine `SetReference16` (×2), `Math_VectorLength3D_Scaled_54F57`, `Math_ElevationAngle_552E1`, `AI_ComputeApproachAngles_553CF` (seg116) — affichage HUD d'angle d'approche."
 },
 "sub_8417C": {
 "segment": "ovr244",
@@ -31986,7 +31986,7 @@
 "sub_54A76"
 ],
 "new_name": "HUDSymbol_ComputeBearingDisplay_8417C",
-"summary": "⚠️ far, 217 lignes, NON DÉTAILLÉE — combine `Math_SinDeg_54876`, `Camera_TransformPoint`, `Math_ArcCosOfRatio_54A76` (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
+"summary": "⚠️ far, 217 lignes, NON DÉTAILLÉE — combine `Math_SinDeg_54876`, `Camera_TransformPoint`, `Math_AsinOfRatio_54A76` (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
 },
 "sub_84337": {
 "segment": "ovr244",
@@ -46725,7 +46725,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MVRS_ID7_ScoreManeuverFuelGated_47D4",
-"summary": "far, 212 lignes (11687-11898) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x228 confirme = ID=7 via constructeur + XREF directe seg339:022C - CORRIGE : precedemment attribuee a tort a ID=8). Base=5. Efface bits 0/1/3 de entite+0x32 au debut. GARDE flags_75 bit6 (modulateur de menace) OU tache en cours -> score=0. Sinon : si carburant/ressource (entite+0x22->+0xB0) <= 13, appelle sub_8C1E (AI_ManeuverSolution_91DF, deja documente) avec constante -7 (0xFFF9) - si echoue, branche differente (loc_498F, calcul distance/seuil simplifie avec clamp final [1,9]). CALCUL PRINCIPAL (si sub_8C1E reussit) : ajustements bases sur word_72093/72095/72097 puis appel Math_AngleBetweenVectors_552E1 avec la constante 0x4FA3 (deja croisee dans les sequences de manoeuvre) pour calculer un angle de correction complexe (division/multiplication). GARDE byte_720DF+byte_720E0 (ou byte_720E1) : ECRIT UNE POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur entite+0x32 (bit1 si byte_720E0, bit3 si byte_720E1) - CONFIRME que c'est CETTE fonction (pas ID=8) qui ecrit initialement ces bits consultes ailleurs. Score final borne [1,9] (PLANCHER A 1, PAS 0 - distinct des autres IDs)."
+"summary": "far, 212 lignes (11687-11898) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x228 confirme = ID=7 via constructeur + XREF directe seg339:022C - CORRIGE : precedemment attribuee a tort a ID=8). Base=5. Efface bits 0/1/3 de entite+0x32 au debut. GARDE flags_75 bit6 (modulateur de menace) OU tache en cours -> score=0. Sinon : si carburant/ressource (entite+0x22->+0xB0) <= 13, appelle sub_8C1E (AI_ManeuverSolution_91DF, deja documente) avec constante -7 (0xFFF9) - si echoue, branche differente (loc_498F, calcul distance/seuil simplifie avec clamp final [1,9]). CALCUL PRINCIPAL (si sub_8C1E reussit) : ajustements bases sur word_72093/72095/72097 puis appel Math_ElevationAngle_552E1 avec la constante 0x4FA3 (deja croisee dans les sequences de manoeuvre) pour calculer un angle de correction complexe (division/multiplication). GARDE byte_720DF+byte_720E0 (ou byte_720E1) : ECRIT UNE POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur entite+0x32 (bit1 si byte_720E0, bit3 si byte_720E1) - CONFIRME que c'est CETTE fonction (pas ID=8) qui ecrit initialement ces bits consultes ailleurs. Score final borne [1,9] (PLANCHER A 1, PAS 0 - distinct des autres IDs)."
 },
 "loc_6058F": {
 "segment": "seg162",
@@ -47365,7 +47365,7 @@
 "type": "label",
 "calls": [],
 "new_name": "Aircraft_ComputeSeekerSignature_3E2F1",
-"summary": "far, LUE (2026-09-20, completee 2026-09-24). Methode virtuelle +0x7C de la classe d'objet pilote (vtable seg339 0x6F86C, slot 0x6F8E8) : SIGNATURE IR vue par un chercheur, appelee (this = cible, arg = objet de reference du chercheur : missile en vol ou objet +0x0D du point d'emport). Sans reference : renvoie l'octet modele +0x12 (1er octet SIGN). Avec reference : v = |cible->vtable+0x4C| (vitesse, loc_3D246 = copie de [+0x51]+8) * 256 / 0x25A00 (= vitesse / 602) ; A = Math_DotProduct3D_5505B(vitesse reference, vitesse cible) > 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100 si A sinon v*50 ; sig += 0xA00 (10, constante, PAS l'octet SIGN) ; si l'octet +0x1E de l'enregistrement de commandes ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet octet est le CRAN DE MANETTE DES GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce meme enregistrement a [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit es:[bx+1Eh] comme cran et teste `cmp byte ptr [bp-2Ch],5 / jg` pour la consommation post-combustion (0x4C au lieu de 0x33) : > 5 = POST-COMBUSTION. Renvoie (sig >> 8) dans AL : tronque a l'octet, donc repasse par 0 au-dela de 255 (arriere + PC : v > ~812)."
+"summary": "far, LUE (2026-09-20, completee 2026-09-24). Methode virtuelle +0x7C de la classe d'objet pilote (vtable seg339 0x6F86C, slot 0x6F8E8) : SIGNATURE IR vue par un chercheur, appelee (this = cible, arg = objet de reference du chercheur : missile en vol ou objet +0x0D du point d'emport). Sans reference : renvoie l'octet modele +0x12 (1er octet SIGN). Avec reference : v = |cible->vtable+0x4C| / 602 (vitesse, loc_3D246 = copie de [+0x51]+8 ; division en virgule fixe par 0x25A00 = 602,0) ; A = Math_DotProduct3D_5505B(vitesse reference, vitesse cible) > 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100 si A sinon v*50 ; sig += 10 (0xA00, constante, PAS l'octet SIGN) ; si l'octet +0x1E de l'enregistrement de commandes ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet octet est le CRAN DE MANETTE DES GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce meme enregistrement a [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit es:[bx+1Eh] comme cran et teste `cmp byte ptr [bp-2Ch],5 / jg` pour la consommation post-combustion (0x4C au lieu de 0x33) : > 5 = POST-COMBUSTION. Renvoie la partie entiere de sig, tronquee a l'octet, donc repasse par 0 au-dela de 255 (arriere + PC : v > ~812)."
 },
 "loc_381E5": {
 "segment": "seg078",
@@ -47385,7 +47385,7 @@
 "type": "label",
 "calls": [],
 "new_name": "Decoy_GetFadingSignature0_451F1",
-"summary": "far, LUE (2026-09-24). Methode virtuelle +0x7C de l'instance LEURRE (classe DECY, vtable seg339 0x6ED1A = tag 0x1C6A) : signature = octet modele +0x12 (1er octet SIGN) * (temps restant instance+0x2E / duree modele+0x37). Calcul : ratio = (inst+0x2E << 8) / (modele+0x37 << 8), sig = ratio * (S0 << 8) >> 8, renvoie sig >> 8 (octet). La chaleur du leurre DECROIT LINEAIREMENT jusqu'a 0 a la fin de sa vie. Ex-'WorldObject_GetSignatureByte0_ModelDirect' (l'ancien resume disait le quotient inutilise : faux, il multiplie S0)."
+"summary": "far, LUE (2026-09-24). Methode virtuelle +0x7C de l'instance LEURRE (classe DECY, vtable seg339 0x6ED1A = tag 0x1C6A) : signature = octet modele +0x12 (1er octet SIGN) * (temps restant instance+0x2E / duree modele+0x37). Calcul en virgule fixe : ratio = temps restant / duree (la duree entiere est convertie par << 8), sig = ratio * S0, renvoie la partie entiere (octet). La chaleur du leurre DECROIT LINEAIREMENT jusqu'a 0 a la fin de sa vie. Ex-'WorldObject_GetSignatureByte0_ModelDirect' (l'ancien resume disait le quotient inutilise : faux, il multiplie S0)."
 },
 "loc_45285": {
 "segment": "seg095",

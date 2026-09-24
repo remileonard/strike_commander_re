@@ -2377,8 +2377,8 @@ HUDSymbol_ConstructWithFullMatrix_83DD7	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 207 lignes, NON DÉTAILLÉE — combine SetReference16 (×2),
-; Math_VectorLength3D_Scaled_54F57, Math_AngleBetweenVectors_552E1,
-; AI_ComputeApproachAngles_553CF (seg116) — affichage HUD d'angle d'approche.
+; Math_VectorLength3D_Scaled_54F57, Math_ElevationAngle_552E1, AI_ComputeApproachAngles_553CF
+; (seg116) — affichage HUD d'angle d'approche.
 ; ==============================================================================================
 HUDSymbol_ComputeApproachDisplay_83FC9	proc far		; CODE XREF: VROOMM_StubThunk_6B032J
 
@@ -2564,7 +2564,7 @@ loc_84133:				; CODE XREF: HUDSymbol_ComputeApproachDisplay_83FC9+165j
 		push	ss
 		lea	ax, [bp+var_34]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 
 loc_8414F:
 		add	sp, 6
@@ -2595,10 +2595,9 @@ HUDSymbol_ComputeApproachDisplay_83FC9	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 217 lignes, NON DÉTAILLÉE — combine Math_SinDeg_54876, Camera_TransformPoint,
-; Math_ArcCosOfRatio_54A76 (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24)
-; Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir
-; Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a
-; relire.
+; Math_AsinOfRatio_54A76 (seg115) — affichage HUD de gisement. ⚠️ (2026-09-24) Math_Sin_5483F
+; / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute
+; mention de sinus/cosinus tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
 HUDSymbol_ComputeBearingDisplay_8417C	proc far		; CODE XREF: VROOMM_StubThunk_6B00AJ HUDSymbol_ProcessJoystickAndFilter_843B5+25Dp
 
@@ -2779,7 +2778,7 @@ loc_842C5:				; CODE XREF: HUDSymbol_ComputeBearingDisplay_8417C+135j
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_38]
 		neg	eax

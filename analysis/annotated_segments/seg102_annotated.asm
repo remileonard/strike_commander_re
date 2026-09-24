@@ -500,10 +500,10 @@ loc_46C9F:				; CODE XREF: seg082:072BJ seg082:0DD8J ...
 
 ; ==============================================================================================
 ; far, seg102 L500-570. Cache frame (byte_6FFBB -> dword_6FFB7). |v|^2
-; (Targeting_ComputeGeometryHelperA_5505B(A.vel,A.vel)) * rho(altitude)
-; (Atmosphere_AirDensityAtAltitude via FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0.
-; Renvoie q = 1/2*rho(h)*v^2 = pression dynamique, echelle de force aero maitresse (portance,
-; trainee, forces de controle). Detail: DATA_MODEL.md 6.2.
+; (Math_DotProduct3D_5505B(A.vel,A.vel)) * rho(altitude) (Atmosphere_AirDensityAtAltitude via
+; FlightControl_CacheNamedParam) >>8 ; /2 ; borne >=0. Renvoie q = 1/2*rho(h)*v^2 = pression
+; dynamique, echelle de force aero maitresse (portance, trainee, forces de controle). Detail:
+; DATA_MODEL.md 6.2.
 ; ==============================================================================================
 Aero_DynamicPressure_46D13	proc far		; CODE XREF: FlightControl_ComputeWindComponent+5Ap
 					; Aero_ComputeForcesMain_4791E+21p ...

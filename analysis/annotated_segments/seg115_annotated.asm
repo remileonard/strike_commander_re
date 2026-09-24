@@ -264,9 +264,10 @@ Math_Tan_548AD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc sinus fixe (délègue à sub_581E3). Référencée par AI_GuidanceSolution_Major_702A.
+; far, LUE (2026-09-24). Ex-'Math_ArcSin' : NOM INVERSE, ARC COSINUS. Si |x| <= 1.0 :
+; Math_AcosRaw_581E3(x), sinon 0. Resultat en degres 24.8 dans *arg_0.
 ; ==============================================================================================
-Math_ArcSin_5493E	proc far		; CODE XREF: AI_GuidanceSolution_Major+2EFP
+Math_AcosDeg_5493E	proc far		; CODE XREF: AI_GuidanceSolution_Major+2EFP
 					; seg015:042BP	...
 
 var_C		= dword	ptr -0Ch
@@ -295,7 +296,7 @@ loc_54946:
 		jge	short loc_5495E
 		neg	eax
 
-loc_5495E:				; CODE XREF: Math_ArcSin_5493E+1Bj
+loc_5495E:				; CODE XREF: Math_AcosDeg_5493E+1Bj
 		mov	[bp+var_8], eax
 		mov	eax, [bp+var_8]
 		mov	[bp+var_C], eax
@@ -305,21 +306,21 @@ loc_5495E:				; CODE XREF: Math_ArcSin_5493E+1Bj
 		jmp	short loc_5497B
 ; ���������������������������������������������������������������������������
 
-loc_54979:				; CODE XREF: Math_ArcSin_5493E+34j
+loc_54979:				; CODE XREF: Math_AcosDeg_5493E+34j
 		xor	ax, ax
 
-loc_5497B:				; CODE XREF: Math_ArcSin_5493E+39j
+loc_5497B:				; CODE XREF: Math_AcosDeg_5493E+39j
 		or	al, al
 		jz	short loc_54992
 		push	large dword ptr	[si]
-		call	Math_ArcSin_Raw_581E3
+		call	Math_AcosRaw_581E3
 		push	dx
 		push	ax
 		pop	eax
 		add	sp, 4
 		mov	[bp+var_4], eax
 
-loc_54992:				; CODE XREF: Math_ArcSin_5493E+3Fj
+loc_54992:				; CODE XREF: Math_AcosDeg_5493E+3Fj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -329,7 +330,7 @@ loc_54992:				; CODE XREF: Math_ArcSin_5493E+3Fj
 		pop	si
 		leave
 		retf
-Math_ArcSin_5493E	endp
+Math_AcosDeg_5493E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -337,10 +338,11 @@ Math_ArcSin_5493E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc cosinus fixe (délègue à sub_581A0).
+; far, LUE (2026-09-24). Ex-'Math_ArcCos' : NOM INVERSE, ARC SINUS. Si |x| <= 1.0 :
+; Math_AsinRaw_581A0(x), sinon 0. Resultat en degres 24.8 dans *arg_0.
 ; ==============================================================================================
-Math_ArcCos_549A6	proc far		; CODE XREF: AI_ComputeBearingToRef+64P
-					; Math_ArcCosOfRatio_54A76+46p
+Math_AsinDeg_549A6	proc far		; CODE XREF: AI_ComputeBearingToRef+64P
+					; Math_AsinOfRatio_54A76+46p
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -362,7 +364,7 @@ arg_4		= word ptr  0Ah
 		jge	short loc_549C6
 		neg	eax
 
-loc_549C6:				; CODE XREF: Math_ArcCos_549A6+1Bj
+loc_549C6:				; CODE XREF: Math_AsinDeg_549A6+1Bj
 		mov	[bp+var_8], eax
 
 loc_549CA:
@@ -376,14 +378,14 @@ loc_549D2:
 		jmp	short loc_549E3
 ; ���������������������������������������������������������������������������
 
-loc_549E1:				; CODE XREF: Math_ArcCos_549A6+34j
+loc_549E1:				; CODE XREF: Math_AsinDeg_549A6+34j
 		xor	ax, ax
 
-loc_549E3:				; CODE XREF: Math_ArcCos_549A6+39j
+loc_549E3:				; CODE XREF: Math_AsinDeg_549A6+39j
 		or	al, al
 		jz	short loc_549FA
 		push	large dword ptr	[si]
-		call	Math_ArcCos_Raw_581A0
+		call	Math_AsinRaw_581A0
 		push	dx
 		push	ax
 		pop	eax
@@ -392,7 +394,7 @@ loc_549F3:
 		add	sp, 4
 		mov	[bp+var_4], eax
 
-loc_549FA:				; CODE XREF: Math_ArcCos_549A6+3Fj
+loc_549FA:				; CODE XREF: Math_AsinDeg_549A6+3Fj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 
@@ -404,7 +406,7 @@ loc_54A01:
 		pop	si
 		leave
 		retf
-Math_ArcCos_549A6	endp
+Math_AsinDeg_549A6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -412,10 +414,10 @@ Math_ArcCos_549A6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, calcule un ratio (dividende/diviseur, garde contre diviseur nul) puis Math_ArcSin_5493E
-; — arcsin(num/den). Référencée par seg030 (zoom carte/radar).
+; far, LUE (2026-09-24). Ex-'Math_ArcSinOfRatio' : NOM INVERSE. Si den != 0 :
+; Math_AcosDeg_5493E(num/den) (arc COSINUS), sinon 0.
 ; ==============================================================================================
-Math_ArcSinOfRatio_54A0E	proc far		; CODE XREF: seg030:18C0P
+Math_AcosOfRatio_54A0E	proc far		; CODE XREF: seg030:18C0P
 					; Render_PolygonProjectVertices:loc_2FDCFP	...
 
 var_10		= dword	ptr -10h
@@ -458,12 +460,12 @@ loc_54A42:
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr Math_ArcSin_5493E
+		call	near ptr Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp+var_10]
 		mov	[bp+var_4], eax
 
-loc_54A62:				; CODE XREF: Math_ArcSinOfRatio_54A0E+1Aj
+loc_54A62:				; CODE XREF: Math_AcosOfRatio_54A0E+1Aj
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -473,7 +475,7 @@ loc_54A62:				; CODE XREF: Math_ArcSinOfRatio_54A0E+1Aj
 		pop	si
 		leave
 		retf
-Math_ArcSinOfRatio_54A0E	endp
+Math_AcosOfRatio_54A0E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -481,10 +483,10 @@ Math_ArcSinOfRatio_54A0E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Math_ArcSinOfRatio pour Math_ArcCos_549A6 — arccos(num/den). Référencée par
-; Guidance_HomingVelocityUpdate (sub_49C2E).
+; far, LUE (2026-09-24). Ex-'Math_ArcCosOfRatio' : NOM INVERSE. Si den != 0 :
+; Math_AsinDeg_549A6(num/den) (arc SINUS), sinon 0.
 ; ==============================================================================================
-Math_ArcCosOfRatio_54A76	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+6D9P
+Math_AsinOfRatio_54A76	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+6D9P
 					; Guidance_HomingVelocityUpdate+765P ...
 
 var_10		= dword	ptr -10h
@@ -521,14 +523,14 @@ arg_6		= word ptr  0Ch
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr Math_ArcCos_549A6
+		call	near ptr Math_AsinDeg_549A6
 		add	sp, 6
 
 loc_54AC2:
 		mov	eax, [bp+var_10]
 		mov	[bp+var_4], eax
 
-loc_54ACA:				; CODE XREF: Math_ArcCosOfRatio_54A76+1Aj
+loc_54ACA:				; CODE XREF: Math_AsinOfRatio_54A76+1Aj
 		mov	bx, [bp+arg_0]
 
 loc_54ACD:
@@ -542,7 +544,7 @@ loc_54AD4:
 		pop	si
 		leave
 		retf
-Math_ArcCosOfRatio_54A76	endp
+Math_AsinOfRatio_54A76	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -757,7 +757,7 @@ loc_466F7:				; CODE XREF: Physics_AllocGroundConstraintVector+10j
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		neg	eax

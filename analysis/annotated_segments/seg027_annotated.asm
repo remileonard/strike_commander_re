@@ -390,7 +390,7 @@ loc_1BCF1:
 		push	ss
 		lea	ax, [bp-96h]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp-96h]
 		mov	[bp-86h], eax

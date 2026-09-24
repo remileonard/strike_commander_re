@@ -772,7 +772,7 @@ loc_78274:				; CODE XREF: CameraScript_ExecuteCOMP_781D0+7Aj
 		push	ax
 
 loc_7827F:
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 
 loc_78287:
@@ -789,7 +789,7 @@ loc_7828C:
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [si+0E8h]
 		sub	eax, [bp+var_10]
@@ -1884,7 +1884,7 @@ loc_78FA8:				; CODE XREF: CameraScript_ExecuteCOMP_781D0:loc_78923j
 
 loc_79025:
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp+var_AE+2]
 		mov	[si+0FAh], eax

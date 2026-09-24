@@ -75,10 +75,11 @@ loc_451EB:				; CODE XREF: seg095:0046j seg095:0051j
 ; ==============================================================================================
 ; far, LUE (2026-09-24). Methode virtuelle +0x7C de l'instance LEURRE (classe DECY, vtable
 ; seg339 0x6ED1A = tag 0x1C6A) : signature = octet modele +0x12 (1er octet SIGN) * (temps
-; restant instance+0x2E / duree modele+0x37). Calcul : ratio = (inst+0x2E << 8) / (modele+0x37
-; << 8), sig = ratio * (S0 << 8) >> 8, renvoie sig >> 8 (octet). La chaleur du leurre DECROIT
-; LINEAIREMENT jusqu'a 0 a la fin de sa vie. Ex-'WorldObject_GetSignatureByte0_ModelDirect'
-; (l'ancien resume disait le quotient inutilise : faux, il multiplie S0).
+; restant instance+0x2E / duree modele+0x37). Calcul en virgule fixe : ratio = temps restant /
+; duree (la duree entiere est convertie par << 8), sig = ratio * S0, renvoie la partie entiere
+; (octet). La chaleur du leurre DECROIT LINEAIREMENT jusqu'a 0 a la fin de sa vie.
+; Ex-'WorldObject_GetSignatureByte0_ModelDirect' (l'ancien resume disait le quotient inutilise
+; : faux, il multiplie S0).
 ; ==============================================================================================
 Decoy_GetFadingSignature0_451F1:				; DATA XREF: seg339:1CE6o
 		push	bp

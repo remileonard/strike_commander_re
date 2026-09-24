@@ -494,7 +494,7 @@ Vec3_Negate	endp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
 		push	large dword ptr	[bp+6]
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	dx, [bp+8]
 		mov	ax, [bp+6]
@@ -1353,7 +1353,7 @@ arg_4		= dword	ptr  0Ah
 loc_5942:
 		lea	ax, [bp+var_C]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_C]
 		mov	[bp+var_4], eax
@@ -1434,7 +1434,7 @@ arg_4		= dword	ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_C]
 		mov	[bp+var_4], eax
@@ -1960,7 +1960,7 @@ arg_8		= word ptr  0Eh
 		push	ss
 		lea	ax, [bp+var_8]
 		push	ax
-		call	Math_ArcCos_549A6
+		call	Math_AsinDeg_549A6
 		add	sp, 6
 		cmp	[bp+var_1C], 0
 		jge	short loc_5F46
@@ -3394,14 +3394,14 @@ loc_698E:				; CODE XREF: AI_ManeuverSolution_Major+12j
 		push	ss
 		lea	ax, [bp+var_12]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		lea	ax, [bp+var_C0]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_12]
 		sub	eax, [bp+var_16]
@@ -4189,7 +4189,7 @@ loc_70E3:				; CODE XREF: AI_GuidanceSolution_Major+99j
 		push	ss
 		lea	ax, [bp+var_32]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_32]
 
@@ -4406,7 +4406,7 @@ loc_72F1:				; CODE XREF: AI_GuidanceSolution_Major+2B5j
 		push	ss
 		lea	ax, [bp+var_B6]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp+var_B6]
 		neg	eax
@@ -4549,13 +4549,13 @@ loc_743D:				; CODE XREF: AI_GuidanceSolution_Major+3B2j
 		push	ss
 		lea	ax, [bp+var_6C]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		push	di
 		push	ss
 		lea	ax, [bp+var_70]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_6C]
 		sub	eax, [bp+var_70]

@@ -508,16 +508,16 @@ loc_3E2ED:				; CODE XREF: seg087:0409j
 ; pilote (vtable seg339 0x6F86C, slot 0x6F8E8) : SIGNATURE IR vue par un chercheur, appelee
 ; (this = cible, arg = objet de reference du chercheur : missile en vol ou objet +0x0D du
 ; point d'emport). Sans reference : renvoie l'octet modele +0x12 (1er octet SIGN). Avec
-; reference : v = |cible->vtable+0x4C| (vitesse, loc_3D246 = copie de [+0x51]+8) * 256 /
-; 0x25A00 (= vitesse / 602) ; A = Math_DotProduct3D_5505B(vitesse reference, vitesse cible) >
-; 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100 si A sinon v*50 ; sig +=
-; 0xA00 (10, constante, PAS l'octet SIGN) ; si l'octet +0x1E de l'enregistrement de commandes
-; ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet octet est le CRAN DE MANETTE DES
-; GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce meme enregistrement a
-; [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit es:[bx+1Eh] comme cran et
-; teste cmp byte ptr [bp-2Ch],5 / jg pour la consommation post-combustion (0x4C au lieu de
-; 0x33) : > 5 = POST-COMBUSTION. Renvoie (sig >> 8) dans AL : tronque a l'octet, donc repasse
-; par 0 au-dela de 255 (arriere + PC : v > ~812).
+; reference : v = |cible->vtable+0x4C| / 602 (vitesse, loc_3D246 = copie de [+0x51]+8 ;
+; division en virgule fixe par 0x25A00 = 602,0) ; A = Math_DotProduct3D_5505B(vitesse
+; reference, vitesse cible) > 0 (meme sens = chercheur dans le secteur arriere) ; sig = v*100
+; si A sinon v*50 ; sig += 10 (0xA00, constante, PAS l'octet SIGN) ; si l'octet +0x1E de
+; l'enregistrement de commandes ([+0x55]->vtable+8) est > 5 : sig += 100 si A sinon 50. Cet
+; octet est le CRAN DE MANETTE DES GAZ (0-10) : WorldObject_UpdateWithAIEntity_3D9FB passe ce
+; meme enregistrement a [+0x51]->vtable+0x40 = thunk loc_3B669 -> PhysicsTicks, qui lit
+; es:[bx+1Eh] comme cran et teste cmp byte ptr [bp-2Ch],5 / jg pour la consommation post-
+; combustion (0x4C au lieu de 0x33) : > 5 = POST-COMBUSTION. Renvoie la partie entiere de sig,
+; tronquee a l'octet, donc repasse par 0 au-dela de 255 (arriere + PC : v > ~812).
 ; ==============================================================================================
 Aircraft_ComputeSeekerSignature_3E2F1:				; DATA XREF: seg339:2838o
 		push	bp
@@ -947,7 +947,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp+var_24]
 		neg	eax
@@ -959,7 +959,7 @@ loc_3E5C0:
 		push	ss
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	eax, [bp+var_1C]
 		add	eax, [bp+var_2C]

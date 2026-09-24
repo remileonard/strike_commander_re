@@ -166,7 +166,7 @@ loc_2CA33:
 		push	ss
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		lea	ax, [bp+var_14]
 		push	ax
@@ -236,7 +236,7 @@ loc_2CA8A:
 		push	ss
 		lea	ax, [bp+var_40]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	cx, [bp+var_40+1]
 		mov	[bp+var_44], 0

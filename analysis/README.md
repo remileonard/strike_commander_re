@@ -1099,7 +1099,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `AI_ComputeApproachAngles_553CF` | 209 | seg116 | Calcul d'angles d'approche/manœuvre (IA) |
 | `Damage_ComputeMainHelper_56559` | 288 | seg116 | Calcul principal de propagation de dommages |
 | `Targeting_ComputeBearingElevation_55B1A` | 134 | seg116 | Gisement/élévation vers une cible |
-| `AI_ComputeGeometrySolution_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |
+| `Matrix_RollAngle_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |
 | `GeomHelper_QuadrantComputeLoop_UNRESOLVED` | 348 | seg116 | Calcul répété sur 4 quadrants/coins (adresse non résolue) |
 | `Parser_BuildHashIndex_588E8` | 123 | seg118 | Construction de table de hachage/dispatch |
 | `Render_DitheredLineMain_58B97` | 298 | seg119 | Tracé de ligne pointillée/dégradée (rendu 3D) |

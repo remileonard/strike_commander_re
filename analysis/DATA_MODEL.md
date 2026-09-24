@@ -530,8 +530,8 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
       Aero_SumLinearForces_48639(si) → [A+0x14/+0x18/+0x1C] = ACCÉLÉRATION LINÉAIRE (net des forces)
       Aero_ControlOrchestrator(si, arg_2) → vecteur moment (tangage,roulis,lacet)
           — relu intégralement, session 2026-09-05 (seg103 L2099-2185), 5 sous-appels :
-          1. Aero_ComputeControlFlags75Bit5B(si) : calcule la CONSIGNE de tangage (loi de charge,
-             var_30=cos(tangage)) et l'écrit dans si[0x16] — PAS de retour capturé ici.
+          1. Aero_ComputeControlFlags75Bit5B(si) : calcule la CONSIGNE D'INCIDENCE (loi de charge,
+             var_30=cos(tangage), relue 2026-09-24) et l'écrit dans si[0x16] — PAS de retour capturé ici.
           2. Aero_ResetAccumulatorFlags75Bit5(si) : calcule la CONSIGNE de lacet (palonnier seul,
              confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A] — pas de retour capturé.
           3. Aero_ApplyGroundEffect(si) → slot TANGAGE : appelle Aero_ComputeForcesMain_4791E(si)
@@ -562,7 +562,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
           diff = A.vitesse − proj ; diff.z = max(diff.z, 0) (jamais négatif → pas d'enfoncement sol)
           si |diff| < 5 (24.8, seuil quasi nul) → diff = (0,0,0)
           A.vitesse [A+8/+C/+10] = diff        (vitesse projetée hors du plan défini par l'orientation)
-          limite = AI_ApplyAngleBetweenVectors_57C3A(buf) · dword_70454  (angle du vecteur
+          limite = Matrix_NosePitchAngle_57C3A(buf) · dword_70454  (angle du vecteur
                    d'orientation par rapport à l'axe Z monde, mis à l'échelle)
           [si+4] = max([si+4], −limite)   (plancher sur l'accumulateur de tangage — empêche
                    de piquer du nez plus vite que ne le permet l'assiette courante : anti
@@ -772,10 +772,11 @@ la vitesse. `jdyn[0x2C]` = poussée PC max (N), `jdyn[0x30]` = fraction MIL,
 
 Assemble le **vecteur de moment** passé à `Physics_IntegrateSecondaryPosition`
 (→ orientation `[si+4]`). Deux pré-appels à effet de bord :
-`Aero_ComputeControlFlags75Bit5B` (calcule la **consigne d'angle de tangage
+`Aero_ComputeControlFlags75Bit5B` (calcule la **consigne d'incidence
 `si[0x16]`** depuis le manche pilote `[ctrl+0x1F]`, le gain `si[0x61]`, le coeff
-`si[0x65]·dword_72A1C`, le plafond d'effet de sol `si[0x59]`, le calage d'aile
-`si[0x4C]` et les volets `si[0x4D]`) puis `Aero_ResetAccumulatorFlags75Bit5`.
+`si[0x65]·dword_72A1C`, le calage d'aile `si[0x4C]` et les volets `si[0x4D]` ;
+**ne lit pas** `si[0x59]` — loi complète relue le 2026-09-24, voir plus bas
+« Loi de charge ») puis `Aero_ResetAccumulatorFlags75Bit5`.
 
 | Composante sortie | Producteur | Contenu |
 |---|---|---|
@@ -2059,3 +2060,26 @@ Fichier .IFF
 8. **Cluster `PlayerComponent` (seg432-453)** — confirmé comme lecteur générique
    de paramètres de véhicule/dynamique (§6.2) ; les ~40 variantes de
    constructeurs/lecteurs de champs restent à cartographier une par une.
+
+
+#### Loi de charge — `Aero_ComputeControlFlags75Bit5B` (`sub_48862`, relue intégralement 2026-09-24)
+
+Produit `si[0x16]`, la **consigne d'incidence** que `Aero_ComputeForcesMain` compare à α (`errα = si[0x16] − α`). Tout est en 24.8 (256 = 1.0).
+
+```
+si FLAGS75.bit5 ou q < 1.0 :  si[0x16] = 0 ; fin               q = Aero_DynamicPressure(si[0x10])
+d  = (si[0x67] << 8) × manche / 16     (÷3 de plus si manche < 0)     manche = dword [ctrl+0x1F]
+A  = 0 ; si bit4 ET pas au sol ET !bit6 : A = α ; si α < 0 : A = α × |cos(roulis)|
+c  = −si[0x4C] (− si[0x4D] si bit1, volets)                          octets → << 8
+θ  = tangage du nez (Matrix_NosePitchAngle_57C3A) ; g1 = cos θ, négatif si l'avion est sur le dos
+n  = d + g1                                                          facteur de charge demandé (1 g·cos θ au neutre)
+k  = −( X / q / si[0x61] × 1.5 × dword_6FFD7 )                       incidence par g ; X = [si+2]->vtable+0x3C(si)
+si n ≠ 0 : T = n·k + c ; B = g1·k + c   sinon T = B = c
+si T est entre A et B (inclus) : garder A ; sinon A = T
+si[0x16] = clamp(A, ±(si[0x65] << 8)·dword_72A1C)
+```
+
+- `X` a la forme d'une **masse** (portance = `si[0x61]·α·q`, donc α pour 1 g = m·g/(si[0x61]·q)). **Non prouvé** : c'est la méthode `+0x3C` de la vtable `[si+2]`, question ouverte n°5 de `CLAUDE.md`.
+- `|α|` est calculé (`var_A`) puis **jamais utilisé**.
+- Le terme `g1 = cos θ` est exact. L'ancienne note (« ≈ cos(tangage) par identité ») donnait le bon résultat par deux erreurs qui s'annulaient : un angle pris pour « l'angle avec Z », et un sinus qui était en fait un cosinus.
+- Fonctions lues pour cette relecture : `Matrix_NosePitchAngle_57C3A`, `Math_ElevationAngle_552E1`, `Matrix_RollAngle_57C67`, les arcs et les tables `seg213` (cos, acos et tan, vérifiées valeur par valeur).

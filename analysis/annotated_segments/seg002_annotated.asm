@@ -1323,7 +1323,7 @@ loc_47CF:				; CODE XREF: seg002:0932j seg002:0938j
 ; (entite+0x22->+0xB0) <= 13, appelle sub_8C1E (AI_ManeuverSolution_91DF, deja documente) avec
 ; constante -7 (0xFFF9) - si echoue, branche differente (loc_498F, calcul distance/seuil
 ; simplifie avec clamp final [1,9]). CALCUL PRINCIPAL (si sub_8C1E reussit) : ajustements
-; bases sur word_72093/72095/72097 puis appel Math_AngleBetweenVectors_552E1 avec la constante
+; bases sur word_72093/72095/72097 puis appel Math_ElevationAngle_552E1 avec la constante
 ; 0x4FA3 (deja croisee dans les sequences de manoeuvre) pour calculer un angle de correction
 ; complexe (division/multiplication). GARDE byte_720DF+byte_720E0 (ou byte_720E1) : ECRIT UNE
 ; POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur
@@ -1409,7 +1409,7 @@ loc_4889:				; CODE XREF: seg002:09F3j
 		push	ss
 		lea	ax, [bp-0Ah]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp-0Ah]
 		sar	eax, 8
@@ -2034,7 +2034,7 @@ loc_4D58:
 		push	ss
 		lea	ax, [bp-12h]
 		push	ax
-		call	AI_ComputeGeometrySolution_57C67
+		call	Matrix_RollAngle_57C67
 		add	sp, 6
 		mov	eax, [bp-12h]
 		mov	ebx, 2

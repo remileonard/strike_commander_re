@@ -128,9 +128,9 @@ Math_SinRaw_58063	endp
 ; ==============================================================================================
 ; far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8|
 ; >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0,
-; sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) * 256 (verifie : 221 a 30
-; deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise |angle|) : cos(0) = 1,
-; cos(180) = -1.
+; sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) en 24.8 (1.0 = 256)
+; (verifie : 221 a 30 deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise
+; |angle|) : cos(0) = 1, cos(180) = -1.
 ; ==============================================================================================
 Math_CosRaw_580A7	proc far		; CODE XREF: seg020:0A24P
 					; Camera_ComputeMountedPosition_3D31D+1A6P ...
@@ -280,9 +280,10 @@ loc_58197:				; CODE XREF: seg117:0182j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc cosinus en virgule fixe (implémentation brute — appelée par Math_ArcCos_549A6).
+; far, LUE (2026-09-24). Ex-'Math_AsinRaw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg -
+; table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x)).
 ; ==============================================================================================
-Math_ArcCos_Raw_581A0	proc far		; CODE XREF: Math_ArcCos_549A6+44P
+Math_AsinRaw_581A0	proc far		; CODE XREF: Math_AsinDeg_549A6+44P
 
 arg_0		= dword	ptr  6
 
@@ -293,7 +294,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_581B3
 		neg	ebx
 
-loc_581B3:				; CODE XREF: Math_ArcCos_Raw_581A0+Ej
+loc_581B3:				; CODE XREF: Math_AsinRaw_581A0+Ej
 		cmp	ebx, 100h
 		ja	short loc_581DC
 		shl	bx, 1
@@ -307,12 +308,12 @@ loc_581B3:				; CODE XREF: Math_ArcCos_Raw_581A0+Ej
 		jz	short loc_581DC
 		neg	eax
 
-loc_581DC:				; CODE XREF: Math_ArcCos_Raw_581A0+1Aj
-					; Math_ArcCos_Raw_581A0+37j
+loc_581DC:				; CODE XREF: Math_AsinRaw_581A0+1Aj
+					; Math_AsinRaw_581A0+37j
 		shld	edx, eax, 10h
 		leave
 		retf
-Math_ArcCos_Raw_581A0	endp
+Math_AsinRaw_581A0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -320,9 +321,12 @@ Math_ArcCos_Raw_581A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, arc sinus en virgule fixe (implémentation brute — appelée par Math_ArcSin_5493E).
+; far, LUE (2026-09-24). Ex-'Math_AcosRaw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x 24.8,
+; |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en degres
+; 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180 deg -
+; table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de branche).
 ; ==============================================================================================
-Math_ArcSin_Raw_581E3	proc far		; CODE XREF: Math_ArcSin_5493E+44P
+Math_AcosRaw_581E3	proc far		; CODE XREF: Math_AcosDeg_5493E+44P
 
 arg_0		= dword	ptr  6
 
@@ -333,7 +337,7 @@ arg_0		= dword	ptr  6
 		jns	short loc_581F6
 		neg	ebx
 
-loc_581F6:				; CODE XREF: Math_ArcSin_Raw_581E3+Ej
+loc_581F6:				; CODE XREF: Math_AcosRaw_581E3+Ej
 		cmp	ebx, 100h
 		ja	short loc_5821C
 		shl	bx, 1
@@ -346,12 +350,12 @@ loc_581F6:				; CODE XREF: Math_ArcSin_Raw_581E3+Ej
 		neg	eax
 		add	eax, 0B400h
 
-loc_5821C:				; CODE XREF: Math_ArcSin_Raw_581E3+1Aj
-					; Math_ArcSin_Raw_581E3+2Ej
+loc_5821C:				; CODE XREF: Math_AcosRaw_581E3+1Aj
+					; Math_AcosRaw_581E3+2Ej
 		shld	edx, eax, 10h
 		leave
 		retf
-Math_ArcSin_Raw_581E3	endp
+Math_AcosRaw_581E3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

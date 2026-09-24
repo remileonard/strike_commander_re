@@ -549,7 +549,7 @@ loc_33796:
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	di, si
 		add	di, 3Fh	; '?'

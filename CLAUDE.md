@@ -356,13 +356,26 @@ renommage. Exemples : `AI_ThrottleController_6250`,
   points d'entrée de stubs VROOMM) qui sont de vraies fonctions sans bloc
   `proc` formel. `extract_segment.py` détecte les deux cas.
 - **Sinus et cosinus : les noms historiques étaient INVERSÉS** (prouvé 2026-09-24 par la
-  table `seg213`, `table[i] = cos(i/4°)·256`). L'ex-`Math_Sin_5483F` est un **cosinus**
+  table `seg213` : l'octet i est cos(i/4°) en 24.8, 1,0 = 256). L'ex-`Math_Sin_5483F` est un **cosinus**
   (`Math_CosDeg_5483F`), l'ex-`Math_Cos_54876` est un **sinus** (`Math_SinDeg_54876`) ; même
   chose pour les versions brutes (`Math_CosRaw_580A7`, `Math_SinRaw_58063`). Tout résumé ou
   document écrit avant cette date qui déduit un « sin » ou un « cos » de ces noms est à relire
-  (les résumés concernés portent un ⚠️) ; en particulier la loi de charge du modèle de vol
-  (`Aero_ComputeControlFlags75Bit5B` : `var_30` est le **cosinus** de l'angle nez / Z monde,
-  donc ≈ sin(tangage), et non ≈ cos(tangage)).
+  (les résumés concernés portent un ⚠️). **Les arcs sont inversés aussi** : l'ex-`Math_ArcSin*`
+  est un arc cosinus (`Math_AcosDeg_5493E`, `Math_AcosRaw_581E3`, `Math_AcosOfRatio_54A0E`),
+  l'ex-`Math_ArcCos*` un arc sinus (`Math_AsinDeg_549A6`, `Math_AsinRaw_581A0`,
+  `Math_AsinOfRatio_54A76`) ; l'arc tangente (`Math_ArcTan_Raw_58223`, table tan) est juste.
+  L'ex-`Math_AngleBetweenVectors_552E1` ne prend qu'UN vecteur : c'est son angle d'élévation
+  (`Math_ElevationAngle_552E1`). Relu : la loi de charge (`Aero_ComputeControlFlags75Bit5B`)
+  utilise bien cos(tangage) — l'ancien résultat était juste par deux erreurs qui s'annulaient.
+- **libRealSpace calcule en FLOTTANTS, pas en 24.8.** Le 24.8 n'est que le format interne de
+  l'original. Ce qu'on écrit pour Rémi (formules, constantes, champs de fichier) se donne en
+  **valeurs réelles** (degrés, distances, secondes, 1,0 et pas 0x100), avec pour chaque champ de
+  fichier la conversion à la lecture : un dword utilisé tel quel dans un calcul en virgule fixe
+  → **÷ 256** ; un word/octet converti par `<< 8` dans le code → **entier tel quel**. Côté
+  assembleur, ne pas confondre les échelles : `shl 8` / `sar 8` / `imul`+`shrd 8` / `0x100` =
+  virgule fixe ; `/ 0x8000` après `CRT_Rand` = échelle de `rand()`
+  (`Math_RandomScale_54DF4(n)` = entier 0..n−1). Ne jamais écrire « valeur·256 » dans une
+  formule destinée au portage.
 - **Quand Rémi localise un bug ou exclut une piste**, c'est une contrainte
   dure, pas une hypothèse à confirmer parmi d'autres. « c'est dans le code
   que tu viens d'écrire », « ce n'est pas le dt », « c'est un signe dans

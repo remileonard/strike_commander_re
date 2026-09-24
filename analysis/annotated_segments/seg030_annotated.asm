@@ -2380,7 +2380,7 @@ loc_1E5B1:
 loc_1E5B6:
 		lea	ax, [bp-2Eh]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-2Eh]
 		mov	[bp-2Ah], eax
@@ -2569,7 +2569,7 @@ loc_1E7B7:				; CODE XREF: seg030:189Cj
 		push	ss
 		lea	ax, [bp-0CCh]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp-0CCh]
 

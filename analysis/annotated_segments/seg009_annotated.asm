@@ -1125,7 +1125,7 @@ loc_12668:
 loc_1266B:
 		lea	ax, [bp+var_8]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		cmp	[bp+var_8], 1100h
 		jle	short loc_12686
@@ -1222,7 +1222,7 @@ loc_126F7:
 		push	ss
 		lea	ax, [bp+var_A]
 		push	ax
-		call	AI_ApplyAngleBetweenVectors_57C3A
+		call	Matrix_NosePitchAngle_57C3A
 		add	sp, 6
 		mov	cx, word ptr [bp+var_A+1]
 		sub	cx, si

@@ -1055,7 +1055,7 @@ loc_37211:				; CODE XREF: Picking_ComputeDetailed+193j
 		push	ss
 		lea	ax, [bp+var_94]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp+var_94]
 		mov	[bp+var_14], eax

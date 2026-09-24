@@ -1898,14 +1898,19 @@ AI_RadarScanTarget	endp
 ; entre 50 et 130 degres de la direction vers elle) : -4. CANON (0x800) : 0 si d >=
 ; dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur
 ; de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le
-; vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_AngleBetweenVectors_552E1,
+; vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_ElevationAngle_552E1,
 ; AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ;
 ; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ;
 ; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis
 ; -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100,
 ; 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d <
 ; dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000)
-; -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10].
+; -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]. ⚠️
+; (2026-09-24) Math_ElevationAngle_552E1 (ex-'Math_AngleBetweenVectors') ne calcule PAS un
+; angle entre deux vecteurs : c'est l'angle d'ELEVATION d'un seul vecteur au-dessus de
+; l'horizontale. La composante 'diff_elevation' de l'erreur de visee est donc une difference
+; d'elevations (monde), a relire avec AI_ComputeApproachAngles_553CF avant de valider le
+; portage SCAIBrain::computeFireSolutionQuality.
 ; ==============================================================================================
 AI_ComputeFireSolutionQuality_91DF	proc far		; CODE XREF: AI_BehaviorSelector+FCp
 
@@ -2120,14 +2125,14 @@ loc_932E:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+14Aj
 		push	ss
 		lea	ax, [bp+var_40]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		lea	ax, [bp+var_E8]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_44]
 		push	ax
-		call	Math_AngleBetweenVectors_552E1
+		call	Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	eax, [bp+var_40]
 		sub	eax, [bp+var_44]

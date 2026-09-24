@@ -435,7 +435,7 @@ Vector_CrossProduct3D_550B7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Targeting_ComputeGeometryHelperA_5505B et sub_559BB, référencée par sub_5F9B.
+; far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B.
 ; ==============================================================================================
 Targeting_ComputeGeometryHelperB_5517F	proc far		; CODE XREF: AI_InterceptSpeedControlLaw+EDP
 					; Missile_PhysicsTick+414P ...
@@ -639,11 +639,16 @@ ChaseCamera_ComputeGeometryHelper_5525B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée massivement depuis le cœur IA (seg002/seg003) — combine longueur vectorielle
-; (55920/55ED8/54F57) et arccos/arcsin (54A76/54A0E) : calcul d'angle entre deux vecteurs
-; (aspect/bearing).
+; far, LUE (2026-09-24). Ex-'Math_AngleBetweenVectors' (FAUX : un seul vecteur). ANGLE
+; D'ELEVATION SIGNE d'un vecteur v au-dessus du plan horizontal (composantes 0,1 = horizontal,
+; 2 = altitude), en degres 24.8 : copie + Math_VectorLengthUnscaled_55920(v, 1000) (garde
+; anti-debordement) ; h = |(v0, v1)| (Math_VectorLength3D_Scaled_Variant_55ED8), L = |v| ; L
+; == 0 -> 0x2D000 (720 deg, valeur sentinelle) ; si h > |v2| : Math_AsinOfRatio_54A76(v2, L) =
+; asin(v2/L) ; sinon Math_AcosOfRatio_54A0E(h, L) = acos(h/L), rendu negatif si v2 < 0. Les
+; deux branches donnent le meme angle (asin pres de l'horizontale, acos pres de la verticale,
+; pour la precision) - ce qui confirme l'inversion des noms des arcs.
 ; ==============================================================================================
-Math_AngleBetweenVectors_552E1	proc far		; CODE XREF: seg002:0A01P seg003:0375P ...
+Math_ElevationAngle_552E1	proc far		; CODE XREF: seg002:0A01P seg003:0375P ...
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -706,7 +711,7 @@ loc_5532B:
 		jge	short loc_55343
 		neg	eax
 
-loc_55343:				; CODE XREF: Math_AngleBetweenVectors_552E1+5Dj
+loc_55343:				; CODE XREF: Math_ElevationAngle_552E1+5Dj
 		mov	[bp+var_14], eax
 		lea	ax, [bp+var_30]
 		push	ax
@@ -723,7 +728,7 @@ loc_55343:				; CODE XREF: Math_AngleBetweenVectors_552E1+5Dj
 		jmp	short loc_553B8
 ; ���������������������������������������������������������������������������
 
-loc_5536C:				; CODE XREF: Math_AngleBetweenVectors_552E1+7Bj
+loc_5536C:				; CODE XREF: Math_ElevationAngle_552E1+7Bj
 		mov	eax, [bp+var_10]
 		cmp	eax, [bp+var_14]
 		jle	short loc_55391
@@ -734,13 +739,13 @@ loc_5536C:				; CODE XREF: Math_AngleBetweenVectors_552E1+7Bj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_20]
 		jmp	short loc_553B8
 ; ���������������������������������������������������������������������������
 
-loc_55391:				; CODE XREF: Math_AngleBetweenVectors_552E1+93j
+loc_55391:				; CODE XREF: Math_ElevationAngle_552E1+93j
 		lea	ax, [bp+var_18]
 		push	ax
 		lea	ax, [bp+var_10]
@@ -748,7 +753,7 @@ loc_55391:				; CODE XREF: Math_AngleBetweenVectors_552E1+93j
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 
 loc_553A3:
 		add	sp, 8
@@ -766,11 +771,11 @@ loc_553AE:
 loc_553B5:
 		neg	eax
 
-loc_553B8:				; CODE XREF: Math_AngleBetweenVectors_552E1+89j
-					; Math_AngleBetweenVectors_552E1+AEj
+loc_553B8:				; CODE XREF: Math_ElevationAngle_552E1+89j
+					; Math_ElevationAngle_552E1+AEj
 		mov	[bp+var_4], eax
 
-loc_553BC:				; CODE XREF: Math_AngleBetweenVectors_552E1+D2j
+loc_553BC:				; CODE XREF: Math_ElevationAngle_552E1+D2j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 
@@ -781,7 +786,7 @@ loc_553C3:
 		pop	si
 		leave
 		retf
-Math_AngleBetweenVectors_552E1	endp
+Math_ElevationAngle_552E1	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -790,8 +795,8 @@ Math_AngleBetweenVectors_552E1	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 209 lignes, NON DÉTAILLÉE — référencée par AI_ManeuverSolution_Major_6977 ;
-; multiples appels à Math_ArcCosOfRatio_54A76/Math_ArcSinOfRatio_54A0E — probable calcul
-; d'angles d'approche/manœuvre. Candidat pour session dédiée.
+; multiples appels à Math_AsinOfRatio_54A76/Math_AcosOfRatio_54A0E — probable calcul d'angles
+; d'approche/manœuvre. Candidat pour session dédiée.
 ; ==============================================================================================
 AI_ComputeApproachAngles_553CF	proc far		; CODE XREF: AI_ManeuverSolution_Major+F7P
 					; AI_ManeuverSolution_Major+109P ...
@@ -906,7 +911,7 @@ loc_5546C:				; CODE XREF: AI_ComputeApproachAngles_553CF+72j
 		push	ss
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp+var_14]
 		jmp	loc_55536
@@ -926,7 +931,7 @@ loc_554A7:
 		push	ss
 		lea	ax, [bp+var_18]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, 0B400h
 		sub	eax, [bp+var_18]
@@ -945,7 +950,7 @@ loc_554C8:				; CODE XREF: AI_ComputeApproachAngles_553CF+CEj
 		push	ss
 		lea	ax, [bp+var_24]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, 0FFFF4C00h
 		sub	eax, [bp+var_24]
@@ -964,7 +969,7 @@ loc_554F1:				; CODE XREF: AI_ComputeApproachAngles_553CF+A5j
 		push	ss
 		lea	ax, [bp+var_30]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp+var_30]
 		jmp	short loc_55536
@@ -978,7 +983,7 @@ loc_55512:				; CODE XREF: AI_ComputeApproachAngles_553CF+126j
 		push	ss
 		lea	ax, [bp+var_34]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp+var_34]
 		neg	eax
@@ -1486,7 +1491,7 @@ Vector_PrescaleDownByShift_55868	endp
 ; ==============================================================================================
 ; far, variante simplifiée de calcul de longueur vectorielle (référencée par sub_552E1).
 ; ==============================================================================================
-Math_VectorLengthUnscaled_55920	proc far		; CODE XREF: Math_AngleBetweenVectors_552E1+2Fp
+Math_VectorLengthUnscaled_55920	proc far		; CODE XREF: Math_ElevationAngle_552E1+2Fp
 					; AI_ComputeApproachAngles_553CF+30p ...
 
 arg_0		= word ptr  6
@@ -1813,8 +1818,8 @@ Vector_PrescaleBelow256_55B04	endp
 ; ==============================================================================================
 ; ⚠️ far, 134 lignes, NON DÉTAILLÉE — référencée par Targeting_AcquireBestThreat (sub_3314) ;
 ; combine Math_VectorLengthUnscaled_55920 ×2, Math_VectorLength3D_Scaled_54F57 ×2,
-; Targeting_ComputeGeometryHelperA_5505B, Math_ArcSinOfRatio_54A0E — probable calcul de
-; gisement/élévation vers une cible.
+; Math_DotProduct3D_5505B, Math_AcosOfRatio_54A0E — probable calcul de gisement/élévation vers
+; une cible.
 ; ==============================================================================================
 Targeting_ComputeBearingElevation_55B1A	proc far		; CODE XREF: Targeting_AcquireBestThreat+3ECP
 					; Targeting_AcquireBestThreat+571P ...
@@ -1940,7 +1945,7 @@ loc_55BE4:				; CODE XREF: Targeting_ComputeBearingElevation_55B1A+A0j
 		lea	ax, [bp+var_14]
 		push	ax
 		push	large [bp+arg_0]
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 
 loc_55C0C:				; CODE XREF: Targeting_ComputeBearingElevation_55B1A:loc_55BE2j
@@ -2107,7 +2112,7 @@ loc_55D24:				; CODE XREF: seg116:0E30j
 		push	ss
 		lea	ax, [bp-1Ch]
 		push	ax
-		call	Math_ArcCosOfRatio_54A76
+		call	Math_AsinOfRatio_54A76
 		add	sp, 8
 		mov	eax, [bp-1Ch]
 		mov	[bp-4],	eax
@@ -2847,7 +2852,7 @@ loc_562B4:
 
 ; ==============================================================================================
 ; far, référencée par seg030 (zoom carte/radar) — longueur vectorielle (sub_5828E ×2) +
-; Math_ArcSinOfRatio_54A0E : calcul de gisement vers un point de carte.
+; Math_AcosOfRatio_54A0E : calcul de gisement vers un point de carte.
 ; ==============================================================================================
 Map_ComputeBearingToPoint_56304	proc far		; CODE XREF: seg030:0431P
 
@@ -2933,7 +2938,7 @@ loc_563AB:
 
 loc_563B3:
 		push	large [bp+arg_0]
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 
 loc_563BF:				; CODE XREF: Map_ComputeBearingToPoint_56304+73j
@@ -3903,7 +3908,7 @@ Map_ApplyRotationTransform_56DC5	endp
 ; typiquement la matrice d'orientation persistante de l'objet, obtenue via vtable[0x3C]) vers
 ; arg_0 (buffer local du buffer). Référencée par AI_ManeuverSolution_Major, et par
 ; PhysicsTicks (seg103) pour extraire une copie de travail de l'orientation avant les helpers
-; géométriques (Targeting_ComputeGeometryHelperB_5517F, AI_ApplyAngleBetweenVectors_57C3A).
+; géométriques (Targeting_ComputeGeometryHelperB_5517F, Matrix_NosePitchAngle_57C3A).
 ; ==============================================================================================
 AI_ComputeGeometryHelper_56E29	proc far		; CODE XREF: AI_ManeuverSolution_Major+34AP
 					; seg014:003BP	...
@@ -5349,7 +5354,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-10h]
 		mov	[bp-4],	eax
@@ -5421,7 +5426,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-10h]
 		mov	[bp-4],	eax
@@ -5487,7 +5492,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-10h]
 		mov	[bp-4],	eax
@@ -5559,7 +5564,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-10h]
 		mov	[bp-4],	eax
@@ -5619,7 +5624,7 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ArcSin_5493E
+		call	Math_AcosDeg_5493E
 		add	sp, 6
 		mov	eax, [bp-10h]
 		mov	[bp-4],	eax
@@ -5650,9 +5655,11 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_125EC, appelle Math_AngleBetweenVectors_552E1.
+; far, LUE (2026-09-24). Ex-'AI_ApplyAngleBetweenVectors'. TANGAGE du nez :
+; Math_ElevationAngle_552E1(ligne 1 de la matrice d'orientation arg_4, +0x0C) -> *arg_0.
+; Degres 24.8, signe (+ = nez au-dessus de l'horizontale).
 ; ==============================================================================================
-AI_ApplyAngleBetweenVectors_57C3A	proc far		; CODE XREF: FlightState_EnterLevelFlight+83P
+Matrix_NosePitchAngle_57C3A	proc far		; CODE XREF: FlightState_EnterLevelFlight+83P
 					; Altitude_HoldController+31P ...
 
 var_4		= dword	ptr -4
@@ -5671,7 +5678,7 @@ arg_4		= word ptr  0Ah
 		lea	ax, [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr Math_AngleBetweenVectors_552E1
+		call	near ptr Math_ElevationAngle_552E1
 		add	sp, 6
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
@@ -5680,7 +5687,7 @@ arg_4		= word ptr  0Ah
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-AI_ApplyAngleBetweenVectors_57C3A	endp
+Matrix_NosePitchAngle_57C3A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5688,11 +5695,15 @@ AI_ApplyAngleBetweenVectors_57C3A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 143 lignes, NON DÉTAILLÉE — référencée depuis seg002 (cœur IA) et sub_58F4, combine
-; Targeting_ComputeGeometryHelperA_5505B, Math_VectorLength3D_Scaled_54F57,
-; Math_ArcSinOfRatio_54A0E.
+; far, LUE (2026-09-24). Ex-'AI_ComputeGeometrySolution'. ANGLE DE ROULIS de la matrice
+; d'orientation arg_4 (ligne 1 = nez, ligne 2 = normale), degres 24.8. Si normale.c2 ([+0x20])
+; == 0 -> 0. Sinon : h = (nez.c1, -nez.c0, 0) (horizontale perpendiculaire au nez) ; r =
+; Math_DotProduct3D_5505B(h, normale) / |h| ; |h| == 0 (nez vertical) -> 90 deg ; sinon roulis
+; = 90 - Math_AcosOfRatio_54A0E(r) = asin(r). Si la normale pointe vers le bas (c2 < 0, dos) :
+; roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans
+; ]-180, 180].
 ; ==============================================================================================
-AI_ComputeGeometrySolution_57C67	proc far		; CODE XREF: seg002:0EF0P AI_Sensor_HeadingNormalized+52P ...
+Matrix_RollAngle_57C67	proc far		; CODE XREF: seg002:0EF0P AI_Sensor_HeadingNormalized+52P ...
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -5720,7 +5731,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_57D52
 ; ���������������������������������������������������������������������������
 
-loc_57C7B:				; CODE XREF: AI_ComputeGeometrySolution_57C67+Fj
+loc_57C7B:				; CODE XREF: Matrix_RollAngle_57C67+Fj
 		mov	eax, [si+10h]
 		mov	[bp+var_30], eax
 		mov	eax, [si+0Ch]
@@ -5752,7 +5763,7 @@ loc_57C7B:				; CODE XREF: AI_ComputeGeometrySolution_57C67+Fj
 		jmp	short loc_57CF5
 ; ���������������������������������������������������������������������������
 
-loc_57CCD:				; CODE XREF: AI_ComputeGeometrySolution_57C67+5Aj
+loc_57CCD:				; CODE XREF: Matrix_RollAngle_57C67+5Aj
 		lea	ax, [bp+var_8]
 		push	ax
 		lea	ax, [bp+var_4]
@@ -5760,7 +5771,7 @@ loc_57CCD:				; CODE XREF: AI_ComputeGeometrySolution_57C67+5Aj
 		push	ss
 		lea	ax, [bp+var_C]
 		push	ax
-		call	Math_ArcSinOfRatio_54A0E
+		call	Math_AcosOfRatio_54A0E
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		neg	eax
@@ -5768,7 +5779,7 @@ loc_57CCD:				; CODE XREF: AI_ComputeGeometrySolution_57C67+5Aj
 		mov	[bp+var_14], eax
 		mov	[bp+var_4], eax
 
-loc_57CF5:				; CODE XREF: AI_ComputeGeometrySolution_57C67+64j
+loc_57CF5:				; CODE XREF: Matrix_RollAngle_57C67+64j
 		add	[bp+var_4], 5A00h
 		cmp	dword ptr [si+20h], 0
 		jge	short loc_57D40
@@ -5782,7 +5793,7 @@ loc_57CF5:				; CODE XREF: AI_ComputeGeometrySolution_57C67+64j
 		jmp	short loc_57D40
 ; ���������������������������������������������������������������������������
 
-loc_57D23:				; CODE XREF: AI_ComputeGeometrySolution_57C67+A2j
+loc_57D23:				; CODE XREF: Matrix_RollAngle_57C67+A2j
 		cmp	[bp+var_4], 0
 		jge	short loc_57D40
 		mov	eax, 0FFFF4C00h
@@ -5791,8 +5802,8 @@ loc_57D23:				; CODE XREF: AI_ComputeGeometrySolution_57C67+A2j
 		mov	[bp+var_24], eax
 		mov	[bp+var_4], eax
 
-loc_57D40:				; CODE XREF: AI_ComputeGeometrySolution_57C67+9Bj
-					; AI_ComputeGeometrySolution_57C67+BAj ...
+loc_57D40:				; CODE XREF: Matrix_RollAngle_57C67+9Bj
+					; Matrix_RollAngle_57C67+BAj ...
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -5801,7 +5812,7 @@ loc_57D40:				; CODE XREF: AI_ComputeGeometrySolution_57C67+9Bj
 		jmp	short loc_57D7E
 ; ���������������������������������������������������������������������������
 
-loc_57D52:				; CODE XREF: AI_ComputeGeometrySolution_57C67+11j
+loc_57D52:				; CODE XREF: Matrix_RollAngle_57C67+11j
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_57D5D
@@ -5809,13 +5820,13 @@ loc_57D52:				; CODE XREF: AI_ComputeGeometrySolution_57C67+11j
 		jmp	short loc_57D67
 ; ���������������������������������������������������������������������������
 
-loc_57D5D:				; CODE XREF: AI_ComputeGeometrySolution_57C67+F0j
+loc_57D5D:				; CODE XREF: Matrix_RollAngle_57C67+F0j
 		push	4
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_57D67:				; CODE XREF: AI_ComputeGeometrySolution_57C67+F4j
+loc_57D67:				; CODE XREF: Matrix_RollAngle_57C67+F4j
 		or	ax, ax
 		jz	short loc_57D76
 		mov	dword ptr [si],	0
@@ -5823,18 +5834,18 @@ loc_57D67:				; CODE XREF: AI_ComputeGeometrySolution_57C67+F4j
 		jmp	short loc_57D78
 ; ���������������������������������������������������������������������������
 
-loc_57D76:				; CODE XREF: AI_ComputeGeometrySolution_57C67+102j
+loc_57D76:				; CODE XREF: Matrix_RollAngle_57C67+102j
 		mov	ax, si
 
-loc_57D78:				; CODE XREF: AI_ComputeGeometrySolution_57C67+10Dj
+loc_57D78:				; CODE XREF: Matrix_RollAngle_57C67+10Dj
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 
-loc_57D7E:				; CODE XREF: AI_ComputeGeometrySolution_57C67+E9j
+loc_57D7E:				; CODE XREF: Matrix_RollAngle_57C67+E9j
 		pop	si
 		leave
 		retf
-AI_ComputeGeometrySolution_57C67	endp
+Matrix_RollAngle_57C67	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
