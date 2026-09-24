@@ -1065,7 +1065,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `HUD_RenderSymbologyMain_3E744` | 1882 | seg087 | **Moteur de rendu de symbologie HUD/viseur principal** |
 | `Collision_ComputeConnectionVector_441DC` | 427 | seg094 | Calcul de vecteur de connexion entre objets |
 | `Camera_ChaseComputeMain_3D57E` | 437 | seg085 | Calcul complet de la caméra de poursuite |
-| `Audio3D_ComputeDistanceParams_41BEF` | 380 | seg089 | Paramètres audio 3D (distance, Doppler) |
+| `GuidedBombBody_SteerToTarget_41BEF` | 380 | seg089 | Loi de guidage de la bombe guidée (chunk GBMB), ex-`Audio3D_ComputeDistanceParams` |
 | `Collision_MainLoop_44F08` | 309 | seg094 | Boucle principale de test de collision |
 | `Effect_SpawnPeriodicAtAttach_43936` | 312 | seg092 | Génération probabiliste d'effet visuel |
 | `WeaponStation_ResolveStateA_40A33` | 397 | seg088 | Résolution de l'état des stations d'armement |

@@ -2124,7 +2124,7 @@ off_6EF6E	dd loc_462ED
 		dd VROOMM_StubThunk_6C4BB
 		dd VROOMM_StubThunk_6C4C0
 off_6EF96	dd VROOMM_StubThunk_6C4C5
-		dd loc_41F2B
+		dd GuidedBombBody_GuidanceTick_41F2B
 off_6EF9E	dd loc_4200C
 off_6EFA2	dd loc_472C2
 off_6EFA6	dd loc_3ADFC
@@ -9423,15 +9423,15 @@ dword_72836	dd 0			; DATA XREF: seg080:0B25w
 					; Effect_GridProjectCorners+78w ...
 dword_7283A	dd 0			; DATA XREF: seg080:0B2Ew
 					; Effect_GridProjectCorners+80w ...
-dword_7283E	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+Br seg089:0CBEw
-dword_72842	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+18r
+dword_7283E	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+Br seg089:0CBEw
+dword_72842	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+18r
 					; seg089:0CC6w
-dword_72846	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+25r
+dword_72846	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+25r
 					; seg089:0CCEw
-dword_7284A	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+Fr seg089:0C31w
-dword_7284E	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+1Cr
+dword_7284A	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+Fr seg089:0C31w
+dword_7284E	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+1Cr
 					; seg089:0C39w
-dword_72852	dd 0			; DATA XREF: Audio3D_ComputeDistanceParams+29r
+dword_72852	dd 0			; DATA XREF: GuidedBombBody_SteerToTarget_41BEF+29r
 					; seg089:0C41w
 		db    0
 		db    0

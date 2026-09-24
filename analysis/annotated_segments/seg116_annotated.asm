@@ -4212,7 +4212,7 @@ Matrix_BuildAxisX_56EC3	endp
 ; far, variante de construction de matrice de rotation (autre axe), référencée par
 ; Audio3D_ComputeDistanceParams (sub_41BEF, Doppler).
 ; ==============================================================================================
-Matrix_BuildAxisY_570C5	proc far		; CODE XREF: Audio3D_ComputeDistanceParams+1EDP
+Matrix_BuildAxisY_570C5	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1EDP
 					; MissileBody_SteerToTarget_42738+1E7P ...
 
 var_50		= dword	ptr -50h
@@ -4816,7 +4816,7 @@ Matrix_BuildFullOrientation_575B2	endp
 ; far, applique une transformation à un vecteur (3× Vector_TransformHelperA_550B7 + 3×
 ; Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF).
 ; ==============================================================================================
-Matrix_ApplyToVectorX_575DF	proc far		; CODE XREF: Audio3D_ComputeDistanceParams+2E5P
+Matrix_ApplyToVectorX_575DF	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2E5P
 					; MissileBody_SteerToTarget_42738+2C9P ...
 
 var_18		= dword	ptr -18h

@@ -792,11 +792,15 @@ loc_419E0:				; CODE XREF: seg089:0698j seg089:06C7j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,62L — transforme position (vtable[0x4C]), normalise (sub_55B04/sub_5593A), résout
-; l'orientation (vtable[0x3C]), projette (sub_57660) et notifie (vtable[0x40]) : calcul de
-; position/orientation 3D pour le rendu d'un leurre déployé (chaff/flare).
+; far, 62L — ex-'Countermeasure_ComputeTransform'. Lit la vitesse (vtable+0x4C), la normalise
+; (UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A), reprend l'orientation
+; (vtable+0x3C), remplace l'axe du nez (Matrix_ApplyToVectorY_57660) et ecrit l'orientation
+; (vtable+0x40) : ALIGNE LE NEZ SUR LA VITESSE (meme sequence que la branche balistique de
+; MissileBody_GuidanceTick_42A4E). Utilise par la bombe guidee sans cible
+; (GuidedBombBody_GuidanceTick_41F2B) et par d'autres objets de seg089. (Renomme 2026-09-24
+; d'apres le resume existant et la sequence d'appels ; corps non relu ligne a ligne.)
 ; ==============================================================================================
-Countermeasure_ComputeTransform	proc far		; CODE XREF: seg089:0785p seg089:07FFp ...
+WorldObject_AlignNoseOnVelocity_419E4	proc far		; CODE XREF: seg089:0785p seg089:07FFp ...
 
 var_32		= word ptr -32h
 var_26		= dword	ptr -26h
@@ -857,7 +861,7 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-Countermeasure_ComputeTransform	endp
+WorldObject_AlignNoseOnVelocity_419E4	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -898,7 +902,7 @@ loc_41A91:
 		jz	short loc_41A99
 		push	si
 		push	cs
-		call	near ptr Countermeasure_ComputeTransform
+		call	near ptr WorldObject_AlignNoseOnVelocity_419E4
 		pop	cx
 
 loc_41A99:				; CODE XREF: seg089:loc_41A91j
@@ -967,7 +971,7 @@ loc_41AE2:				; CODE XREF: seg089:07CCj
 loc_41B0D:				; CODE XREF: seg089:07D9j seg089:07DFj
 		push	si
 		push	cs
-		call	near ptr Countermeasure_ComputeTransform
+		call	near ptr WorldObject_AlignNoseOnVelocity_419E4
 		pop	cx
 		push	1
 		lea	ax, [bp-10h]
@@ -1007,7 +1011,7 @@ loc_41B41:				; CODE XREF: seg089:082Dj
 		add	sp, 4
 		push	si
 		push	cs
-		call	near ptr Countermeasure_ComputeTransform
+		call	near ptr WorldObject_AlignNoseOnVelocity_419E4
 		pop	cx
 		jmp	short loc_41B7F
 ; ���������������������������������������������������������������������������
@@ -1046,12 +1050,12 @@ locret_41B83:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,57L — si un flag n'est pas déjà positionné (+0x24), résout la position d'un objet
-; référencé (+0x22, vtable[0x4C]), calcule sa magnitude (sub_5828E) et la met en cache (+0x1C)
-; : calcul et mise en cache de la distance à un objet de référence (probable calcul Doppler
-; pour un leurre).
+; far, 57L, LUE (2026-09-24). Ex-'Countermeasure_CacheDistance' (FAUX : ce n'est pas une
+; distance). Une seule fois (drapeau +0x24) : vitesse de l'objet ([si]+8/+C/+10) = vitesse du
+; lanceur (+0x22, vtable+0x4C), norme mise en cache dans +0x1C = vitesse de vol guide de la
+; bombe (utilisee par GuidedBombBody_SteerToTarget_41BEF).
 ; ==============================================================================================
-Countermeasure_CacheDistance	proc far		; CODE XREF: seg089:0CDAp
+GuidedBombBody_InheritLaunchSpeed_41B84	proc far		; CODE XREF: seg089:0CDAp
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h
@@ -1103,11 +1107,11 @@ loc_41B93:
 		mov	[si+1Ch], eax
 		mov	byte ptr [si+24h], 1
 
-loc_41BEC:				; CODE XREF: Countermeasure_CacheDistance+11j
+loc_41BEC:				; CODE XREF: GuidedBombBody_InheritLaunchSpeed_41B84+11j
 		pop	si
 		leave
 		retf
-Countermeasure_CacheDistance	endp
+GuidedBombBody_InheritLaunchSpeed_41B84	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1115,12 +1119,23 @@ Countermeasure_CacheDistance	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,380L — calcule la distance entre la position auditeur (globals dword_7283E-72852, cf.
-; moteur audio 3D seg022) et la position d'un objet (vtable via +8/0xC/0x10), puis un ratio de
-; variation de distance : calcul de paramètres audio 3D (distance, variation Doppler) pour un
-; objet sonore, extension du moteur audio du seg022.
+; far, 380L, LUE INTEGRALEMENT (2026-09-24). Ex-'Audio3D_ComputeDistanceParams' (FAUX : aucun
+; son, pas d'auditeur). LOI DE GUIDAGE DE LA BOMBE GUIDEE (corps du chunk dynamique GBMB),
+; deuxieme copie de MissileBody_SteerToTarget_42738 avec d'autres champs : cible +0x20,
+; matrice globale 0x57A6, point vise dword_7283E/42/46 (position +0x12 de la cible, SANS
+; relevement d'altitude), position propre dword_7284A/4E/52. (1) D = cible - moi ; t = dist /
+; |vitesse du corps [si]+8| borne a 1.0 ; D += vitesse_cible (vtable+0x4C) * t. (2) Roulis
+; immediat : atan(c0/c2) (Math_ArcTan2_54B0A), +/-180 si c2 <= 0, Matrix_BuildAxisY_570C5 +
+; Matrix_ApplyToVectorY_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres idiv par c1 SANS
+; garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18 * dt
+; (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 + Matrix_ApplyToVectorX_575DF.
+; (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5) DIFFERENCE AVEC LE MISSILE :
+; vitesse = (0, +0x1C, 0) dans le repere de la bombe (Math_ApplyRotationHelperB_58828) :
+; vitesse CONSTANTE = vitesse du lanceur au largage (mise en cache par
+; GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de vitesse
+; tant qu'elle est guidee.
 ; ==============================================================================================
-Audio3D_ComputeDistanceParams	proc far		; CODE XREF: seg089:0CE0p
+GuidedBombBody_SteerToTarget_41BEF	proc far		; CODE XREF: seg089:0CE0p
 
 var_8C		= dword	ptr -8Ch
 var_88		= dword	ptr -88h
@@ -1200,10 +1215,10 @@ arg_0		= word ptr  6
 		jmp	short loc_41C6F
 ; ���������������������������������������������������������������������������
 
-loc_41C6D:				; CODE XREF: Audio3D_ComputeDistanceParams+77j
+loc_41C6D:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+77j
 		xor	ax, ax
 
-loc_41C6F:				; CODE XREF: Audio3D_ComputeDistanceParams+7Cj
+loc_41C6F:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+7Cj
 		or	al, al
 
 loc_41C71:
@@ -1218,29 +1233,29 @@ loc_41C71:
 		jmp	short loc_41C9F
 ; ���������������������������������������������������������������������������
 
-loc_41C8F:				; CODE XREF: Audio3D_ComputeDistanceParams:loc_41C71j
+loc_41C8F:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF:loc_41C71j
 		mov	[bp+var_18], 100h
 		mov	eax, [bp+var_18]
 		mov	[bp+var_14], eax
 
-loc_41C9F:				; CODE XREF: Audio3D_ComputeDistanceParams+9Ej
+loc_41C9F:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+9Ej
 		cmp	[bp+var_14], 100h
 		jle	short loc_41CAE
 		mov	ax, 1
 		jmp	short loc_41CB0
 ; ���������������������������������������������������������������������������
 
-loc_41CAE:				; CODE XREF: Audio3D_ComputeDistanceParams+B8j
+loc_41CAE:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+B8j
 		xor	ax, ax
 
-loc_41CB0:				; CODE XREF: Audio3D_ComputeDistanceParams+BDj
+loc_41CB0:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+BDj
 		or	al, al
 		jz	short loc_41CC4
 		mov	[bp+var_1C], 100h
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_14], eax
 
-loc_41CC4:				; CODE XREF: Audio3D_ComputeDistanceParams+C3j
+loc_41CC4:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+C3j
 		push	word ptr [si+20h]
 		push	ss
 		lea	ax, [bp+var_80]
@@ -1305,27 +1320,27 @@ loc_41D81:
 		jmp	short loc_41D90
 ; ���������������������������������������������������������������������������
 
-loc_41D8E:				; CODE XREF: Audio3D_ComputeDistanceParams+198j
+loc_41D8E:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+198j
 		xor	ax, ax
 
-loc_41D90:				; CODE XREF: Audio3D_ComputeDistanceParams+19Dj
+loc_41D90:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+19Dj
 		or	al, al
 		jz	short loc_41D99
 		lea	ax, [bp+var_20]
 		jmp	short loc_41DD8
 ; ���������������������������������������������������������������������������
 
-loc_41D99:				; CODE XREF: Audio3D_ComputeDistanceParams+1A3j
+loc_41D99:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1A3j
 		cmp	[bp+var_8C], 0
 		jle	short loc_41DA6
 		mov	ax, 1
 		jmp	short loc_41DA8
 ; ���������������������������������������������������������������������������
 
-loc_41DA6:				; CODE XREF: Audio3D_ComputeDistanceParams+1B0j
+loc_41DA6:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1B0j
 		xor	ax, ax
 
-loc_41DA8:				; CODE XREF: Audio3D_ComputeDistanceParams+1B5j
+loc_41DA8:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1B5j
 		or	al, al
 		jz	short loc_41DC3
 		mov	eax, [bp+var_20]
@@ -1336,15 +1351,15 @@ loc_41DA8:				; CODE XREF: Audio3D_ComputeDistanceParams+1B5j
 		jmp	short loc_41DD8
 ; ���������������������������������������������������������������������������
 
-loc_41DC3:				; CODE XREF: Audio3D_ComputeDistanceParams+1BBj
+loc_41DC3:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1BBj
 		mov	eax, [bp+var_20]
 		add	eax, 0FFFF4C00h
 		mov	[bp+var_30], eax
 		mov	[bp+var_34], eax
 		lea	ax, [bp+var_34]
 
-loc_41DD8:				; CODE XREF: Audio3D_ComputeDistanceParams+1A8j
-					; Audio3D_ComputeDistanceParams+1D2j
+loc_41DD8:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1A8j
+					; GuidedBombBody_SteerToTarget_41BEF+1D2j
 		push	ax
 		push	57A6h
 		call	Matrix_BuildAxisY_570C5
@@ -1384,10 +1399,10 @@ loc_41DD8:				; CODE XREF: Audio3D_ComputeDistanceParams+1A8j
 		jmp	short loc_41E52
 ; ���������������������������������������������������������������������������
 
-loc_41E50:				; CODE XREF: Audio3D_ComputeDistanceParams+25Aj
+loc_41E50:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+25Aj
 		xor	ax, ax
 
-loc_41E52:				; CODE XREF: Audio3D_ComputeDistanceParams+25Fj
+loc_41E52:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+25Fj
 		or	al, al
 		jz	short loc_41E82
 		mov	[bp+var_44], 0B400h
@@ -1396,7 +1411,7 @@ loc_41E52:				; CODE XREF: Audio3D_ComputeDistanceParams+25Fj
 		jge	short loc_41E6A
 		neg	eax
 
-loc_41E6A:				; CODE XREF: Audio3D_ComputeDistanceParams+276j
+loc_41E6A:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+276j
 		mov	[bp+var_48], eax
 		mov	eax, [bp+var_48]
 
@@ -1410,7 +1425,7 @@ loc_41E76:
 loc_41E7E:
 		mov	[bp+var_38], eax
 
-loc_41E82:				; CODE XREF: Audio3D_ComputeDistanceParams+265j
+loc_41E82:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+265j
 		mov	eax, [bp+var_38]
 
 loc_41E86:
@@ -1422,10 +1437,10 @@ loc_41E8F:
 		jmp	short loc_41E93
 ; ���������������������������������������������������������������������������
 
-loc_41E91:				; CODE XREF: Audio3D_ComputeDistanceParams+29Bj
+loc_41E91:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+29Bj
 		xor	ax, ax
 
-loc_41E93:				; CODE XREF: Audio3D_ComputeDistanceParams:loc_41E8Fj
+loc_41E93:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF:loc_41E8Fj
 		or	al, al
 		jz	short loc_41EC2
 		cmp	[bp+var_38], 0
@@ -1434,10 +1449,10 @@ loc_41E93:				; CODE XREF: Audio3D_ComputeDistanceParams:loc_41E8Fj
 		jmp	short loc_41EA5
 ; ���������������������������������������������������������������������������
 
-loc_41EA3:				; CODE XREF: Audio3D_ComputeDistanceParams+2ADj
+loc_41EA3:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2ADj
 		xor	ax, ax
 
-loc_41EA5:				; CODE XREF: Audio3D_ComputeDistanceParams+2B2j
+loc_41EA5:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2B2j
 		or	al, al
 		jz	short loc_41EBA
 		mov	eax, [bp+var_40]
@@ -1447,13 +1462,13 @@ loc_41EA5:				; CODE XREF: Audio3D_ComputeDistanceParams+2B2j
 		jmp	short loc_41EBE
 ; ���������������������������������������������������������������������������
 
-loc_41EBA:				; CODE XREF: Audio3D_ComputeDistanceParams+2B8j
+loc_41EBA:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2B8j
 		mov	eax, [bp+var_40]
 
-loc_41EBE:				; CODE XREF: Audio3D_ComputeDistanceParams+2C9j
+loc_41EBE:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2C9j
 		mov	[bp+var_38], eax
 
-loc_41EC2:				; CODE XREF: Audio3D_ComputeDistanceParams+2A6j
+loc_41EC2:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2A6j
 		lea	ax, [bp+var_38]
 		push	ax
 		push	57A6h
@@ -1499,11 +1514,22 @@ loc_41F07:
 		pop	si
 		leave
 		retf
-Audio3D_ComputeDistanceParams	endp
+GuidedBombBody_SteerToTarget_41BEF	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_41F2B:				; CODE XREF: seg082:0A30J seg082:0ABCJ
+; ==============================================================================================
+; far, LUE (2026-09-24). Tick (slot +0x3C, vtable seg339 tag 0x1F16, via les thunks d'ajusteur
+; seg082 loc_3AE8E / loc_3AF25) du CORPS de la bombe guidee, construit par
+; JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique 'GBMB' est present (0x49 octets).
+; Position propre -> dword_7284A.. ; orientation de l'objet ([si]->+2, vtable+0x3C) copiee
+; dans 0x57A6 ; +0x20 = objet+0x55 (cible, SetReference16) ; +0x22 = objet->vtable+0x38
+; (lanceur) ; si cible : point vise = position +0x12 de la cible -> dword_7283E... Avec cible
+; : GuidedBombBody_InheritLaunchSpeed_41B84 puis GuidedBombBody_SteerToTarget_41BEF. Sans
+; cible : FlightControl_ComputeAngularAccel (somme des forces / masse : chute libre) puis
+; WorldObject_AlignNoseOnVelocity_419E4. Renvoie 1.
+; ==============================================================================================
+GuidedBombBody_GuidanceTick_41F2B:				; CODE XREF: seg082:0A30J seg082:0ABCJ
 					; DATA XREF: ...
 		push	bp
 		mov	bp, sp
@@ -1579,11 +1605,11 @@ loc_41FE2:				; CODE XREF: seg089:0C9Bj seg089:0CB3j
 		jz	short loc_41FF5
 		push	si
 		push	cs
-		call	near ptr Countermeasure_CacheDistance
+		call	near ptr GuidedBombBody_InheritLaunchSpeed_41B84
 		pop	cx
 		push	si
 		push	cs
-		call	near ptr Audio3D_ComputeDistanceParams
+		call	near ptr GuidedBombBody_SteerToTarget_41BEF
 		jmp	short loc_42005
 ; ���������������������������������������������������������������������������
 
@@ -1598,7 +1624,7 @@ loc_41FF6:
 loc_41FFE:
 		push	word ptr [bx+2]
 		push	cs
-		call	near ptr Countermeasure_ComputeTransform
+		call	near ptr WorldObject_AlignNoseOnVelocity_419E4
 
 loc_42005:				; CODE XREF: seg089:0CE3j
 		pop	cx

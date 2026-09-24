@@ -679,4 +679,25 @@ missile->vtable+0x40(M)                                  // nouvelle orientation
 
 **À relever côté données** : les 5 dwords du chunk dynamique `MISS` et le chunk `DATA` des modèles `MISS` (AIM-9J/9M, AIM-120, SA-2, SA-6, AGM-65D).
 
-**Soupçon, non vérifié** : `Audio3D_ComputeDistanceParams_41BEF` (seg089) utilise les mêmes fonctions de matrice (`Matrix_BuildAxisY_570C5`, `Matrix_ApplyToVectorX_575DF`). Elle pourrait être mal nommée de la même façon (bombe guidée ? leurre ?).
+### La bombe guidée (chunk dynamique `GBMB`) : même loi, vitesse constante (lu 2026-09-24)
+
+Le soupçon était fondé : `Audio3D_ComputeDistanceParams_41BEF` n'a rien d'audio. C'est **une deuxième copie de la loi de guidage**, pour le corps construit par `JDYN_LoadChunkAndConstruct_3A49C` quand le chunk dynamique `GBMB` est présent (0x49 octets, vtable `0x1F16`, tick au slot `+0x3C`, comme le missile).
+
+| Ancien nom | Nouveau nom | Rôle |
+|---|---|---|
+| (sans nom, `loc_41F2B`) | `GuidedBombBody_GuidanceTick_41F2B` | tick du corps : cible, lanceur, guidage ou chute |
+| `Audio3D_ComputeDistanceParams` | `GuidedBombBody_SteerToTarget_41BEF` | **loi de guidage** |
+| `Countermeasure_CacheDistance` | `GuidedBombBody_InheritLaunchSpeed_41B84` | vitesse héritée du lanceur, mise en cache |
+| `PlayerComponent_LoadFieldGroup_9FDDE` | `DynGuidedBomb_LoadGBMBChunk_9FDDE` | chunk `GBMB` : 1 dword = vitesse angulaire max (`+0x18`) |
+| `Countermeasure_ComputeTransform` | `WorldObject_AlignNoseOnVelocity_419E4` | aligne le nez sur la vitesse |
+
+**Identique au missile** : anticipation `t = min(dist / vitesse, 1)`, roulis immédiat `atan(c0/c2)` (±180° si c2 ≤ 0), cabrage `atan(c2/c1)` (180 − |b| si la cible est derrière) borné à `+0x18 · dt`, puis écriture de l'orientation.
+
+**Différences** :
+- **Vitesse constante** : à chaque tick guidé, vitesse = `(0, +0x1C, 0)` dans le repère de la bombe. `+0x1C` est la norme de la vitesse du lanceur, recopiée **une seule fois** au premier tick guidé (`GuidedBombBody_InheritLaunchSpeed_41B84`, drapeau `+0x24`). Tant qu'elle est guidée, la bombe ne subit ni propulsion, ni gravité, ni perte de vitesse.
+- **Point visé** : la position `+0x12` de la cible, sans le relèvement d'altitude du missile.
+- **Cabrage** : `Math_ArcTan_54ADE` après une division par c1 **sans garde**. Il y a une division par zéro si la cible est exactement à 90° du nez (c1 == 0) ; à reproduire avec une garde dans le portage.
+- **Sans cible** : `FlightControl_ComputeAngularAccel` (somme des forces / masse, donc chute libre avec forces) puis `WorldObject_AlignNoseOnVelocity_419E4`.
+- La cible est `objet+0x55` (recopiée dans `+0x20`) et le lanceur est `objet->vtable+0x38` (recopié dans `+0x22`). Cela confirme le sens « lanceur » de `vtable+0x38` pour cet objet.
+
+**À vérifier côté données** : quels objets portent un chunk dynamique `GBMB` (vraisemblablement la GBU-15), et la valeur de son dword.

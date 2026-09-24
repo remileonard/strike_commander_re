@@ -9010,8 +9010,8 @@
 "sub_56E29",
 "sub_57660"
 ],
-"new_name": "Countermeasure_ComputeTransform",
-"summary": "far,62L — transforme position (vtable[0x4C]), normalise (sub_55B04/sub_5593A), résout l'orientation (vtable[0x3C]), projette (sub_57660) et notifie (vtable[0x40]) : **calcul de position/orientation 3D pour le rendu d'un leurre déployé (chaff/flare).**"
+"new_name": "WorldObject_AlignNoseOnVelocity_419E4",
+"summary": "far, 62L — ex-'Countermeasure_ComputeTransform'. Lit la vitesse (vtable+0x4C), la normalise (UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A), reprend l'orientation (vtable+0x3C), remplace l'axe du nez (Matrix_ApplyToVectorY_57660) et ecrit l'orientation (vtable+0x40) : ALIGNE LE NEZ SUR LA VITESSE (meme sequence que la branche balistique de MissileBody_GuidanceTick_42A4E). Utilise par la bombe guidee sans cible (GuidedBombBody_GuidanceTick_41F2B) et par d'autres objets de seg089. (Renomme 2026-09-24 d'apres le resume existant et la sequence d'appels ; corps non relu ligne a ligne.)"
 },
 "sub_41B84": {
 "segment": "seg089",
@@ -9022,8 +9022,8 @@
 "calls": [
 "sub_5828E"
 ],
-"new_name": "Countermeasure_CacheDistance",
-"summary": "far,57L — si un flag n'est pas déjà positionné (+0x24), résout la position d'un objet référencé (+0x22, vtable[0x4C]), calcule sa magnitude (sub_5828E) et la met en cache (+0x1C) : **calcul et mise en cache de la distance à un objet de référence (probable calcul Doppler pour un leurre).**"
+"new_name": "GuidedBombBody_InheritLaunchSpeed_41B84",
+"summary": "far, 57L, LUE (2026-09-24). Ex-'Countermeasure_CacheDistance' (FAUX : ce n'est pas une distance). Une seule fois (drapeau +0x24) : vitesse de l'objet ([si]+8/+C/+10) = vitesse du lanceur (+0x22, vtable+0x4C), norme mise en cache dans +0x1C = vitesse de vol guide de la bombe (utilisee par GuidedBombBody_SteerToTarget_41BEF)."
 },
 "sub_41BEF": {
 "segment": "seg089",
@@ -9044,8 +9044,8 @@
 "sub_575DF",
 "sub_58828"
 ],
-"new_name": "Audio3D_ComputeDistanceParams",
-"summary": "far,380L — calcule la distance entre la position auditeur (globals dword_7283E-72852, cf. moteur audio 3D seg022) et la position d'un objet (vtable via +8/0xC/0x10), puis un ratio de variation de distance : **calcul de paramètres audio 3D (distance, variation Doppler) pour un objet sonore, extension du moteur audio du seg022.**"
+"new_name": "GuidedBombBody_SteerToTarget_41BEF",
+"summary": "far, 380L, LUE INTEGRALEMENT (2026-09-24). Ex-'Audio3D_ComputeDistanceParams' (FAUX : aucun son, pas d'auditeur). LOI DE GUIDAGE DE LA BOMBE GUIDEE (corps du chunk dynamique GBMB), deuxieme copie de MissileBody_SteerToTarget_42738 avec d'autres champs : cible +0x20, matrice globale 0x57A6, point vise dword_7283E/42/46 (position +0x12 de la cible, SANS relevement d'altitude), position propre dword_7284A/4E/52. (1) D = cible - moi ; t = dist / |vitesse du corps [si]+8| borne a 1.0 ; D += vitesse_cible (vtable+0x4C) * t. (2) Roulis immediat : atan(c0/c2) (Math_ArcTan2_54B0A), +/-180 si c2 <= 0, Matrix_BuildAxisY_570C5 + Matrix_ApplyToVectorY_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres `idiv` par c1 SANS garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18 * dt (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 + Matrix_ApplyToVectorX_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5) DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la bombe (Math_ApplyRotationHelperB_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise en cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de vitesse tant qu'elle est guidee."
 },
 "sub_42016": {
 "segment": "seg089",
@@ -39645,8 +39645,8 @@
 "sub_64A7E",
 "sub_6B70F"
 ],
-"new_name": "PlayerComponent_LoadFieldGroup_9FDDE",
-"summary": "far, combine ResourceRecord_SeekAndRead_64743 et ResourceRecord_ReadFieldGroupC_64A7E (seg193), gestion d'erreur."
+"new_name": "DynGuidedBomb_LoadGBMBChunk_9FDDE",
+"summary": "far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldGroup_9FDDE'. Chargeur du chunk dynamique 'GBMB' (424D4247h) du corps de bombe guidee (via PlayerComponent_SubHelperD_9FDAB, stub VROOMM_StubThunk_6C4A2 depuis JDYN_LoadChunkAndConstruct_3A49C) : 1 dword -> +0x18 = vitesse angulaire maximale de guidage (GuidedBombBody_SteerToTarget_41BEF). Chunk absent : erreur 0xC003."
 },
 "sub_9FE23": {
 "segment": "seg433",
@@ -47446,5 +47446,15 @@
 "calls": [],
 "new_name": "Missile_GetCategory_4244E",
 "summary": "far, LUE (2026-09-24). `mov al, 8` : categorie d'objet 8 = missile (vtable de l'objet missile, seg339 off_6FAF8)."
+},
+"loc_41F2B": {
+"segment": "seg089",
+"start_line": 132099,
+"end_line": 132099,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GuidedBombBody_GuidanceTick_41F2B",
+"summary": "far, LUE (2026-09-24). Tick (slot +0x3C, vtable seg339 tag 0x1F16, via les thunks d'ajusteur seg082 loc_3AE8E / loc_3AF25) du CORPS de la bombe guidee, construit par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique 'GBMB' est present (0x49 octets). Position propre -> dword_7284A.. ; orientation de l'objet ([si]->+2, vtable+0x3C) copiee dans 0x57A6 ; +0x20 = objet+0x55 (cible, SetReference16) ; +0x22 = objet->vtable+0x38 (lanceur) ; si cible : point vise = position +0x12 de la cible -> dword_7283E... Avec cible : GuidedBombBody_InheritLaunchSpeed_41B84 puis GuidedBombBody_SteerToTarget_41BEF. Sans cible : FlightControl_ComputeAngularAccel (somme des forces / masse : chute libre) puis WorldObject_AlignNoseOnVelocity_419E4. Renvoie 1."
 }
 }

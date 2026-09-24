@@ -1252,7 +1252,7 @@ loc_3AE8E:				; DATA XREF: seg339:off_6F002o
 		add	ax, 0FFD8h
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	far ptr	loc_41F2B
+		jmp	far ptr	GuidedBombBody_GuidanceTick_41F2B
 ; ���������������������������������������������������������������������������
 
 loc_3AEA5:				; DATA XREF: seg339:off_6EFD2o
@@ -1320,7 +1320,7 @@ loc_3AF19:				; DATA XREF: seg339:1F0Ao
 loc_3AF25:				; DATA XREF: seg339:off_6EFB6o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFFCh
-		jmp	far ptr	loc_41F2B
+		jmp	far ptr	GuidedBombBody_GuidanceTick_41F2B
 ; ���������������������������������������������������������������������������
 
 loc_3AF31:				; DATA XREF: seg339:off_6EFB2o

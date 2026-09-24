@@ -535,7 +535,7 @@ arg_2		= word ptr  8
 		push	si
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldGroup_9FDDE
+		call	near ptr DynGuidedBomb_LoadGBMBChunk_9FDDE
 		add	sp, 4
 		push	di
 		mov	ax, si
@@ -561,10 +561,13 @@ PlayerComponent_SubHelperD_9FDAB	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743 et ResourceRecord_ReadFieldGroupC_64A7E
-; (seg193), gestion d'erreur.
+; far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldGroup_9FDDE'. Chargeur du chunk
+; dynamique 'GBMB' (424D4247h) du corps de bombe guidee (via PlayerComponent_SubHelperD_9FDAB,
+; stub VROOMM_StubThunk_6C4A2 depuis JDYN_LoadChunkAndConstruct_3A49C) : 1 dword -> +0x18 =
+; vitesse angulaire maximale de guidage (GuidedBombBody_SteerToTarget_41BEF). Chunk absent :
+; erreur 0xC003.
 ; ==============================================================================================
-PlayerComponent_LoadFieldGroup_9FDDE	proc far		; CODE XREF: VROOMM_StubThunk_6C4ACJ PlayerComponent_SubHelperD_9FDAB+Fp
+DynGuidedBomb_LoadGBMBChunk_9FDDE	proc far		; CODE XREF: VROOMM_StubThunk_6C4ACJ PlayerComponent_SubHelperD_9FDAB+Fp
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -601,19 +604,19 @@ loc_9FDEC:
 		jmp	short loc_9FE1F
 ; ���������������������������������������������������������������������������
 
-loc_9FE16:				; CODE XREF: PlayerComponent_LoadFieldGroup_9FDDE+21j
+loc_9FE16:				; CODE XREF: DynGuidedBomb_LoadGBMBChunk_9FDDE+21j
 		push	0C003h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9FE1F:				; CODE XREF: PlayerComponent_LoadFieldGroup_9FDDE+36j
+loc_9FE1F:				; CODE XREF: DynGuidedBomb_LoadGBMBChunk_9FDDE+36j
 		pop	di
 		pop	si
 
 locret_9FE21:
 		leave
 		retf
-PlayerComponent_LoadFieldGroup_9FDDE	endp
+DynGuidedBomb_LoadGBMBChunk_9FDDE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

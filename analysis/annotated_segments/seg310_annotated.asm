@@ -175,7 +175,7 @@ VROOMM_StubThunk_6C4A7	endp
 ; d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29.
 ; ==============================================================================================
 VROOMM_StubThunk_6C4AC	proc far
-		jmp	PlayerComponent_LoadFieldGroup_9FDDE
+		jmp	DynGuidedBomb_LoadGBMBChunk_9FDDE
 VROOMM_StubThunk_6C4AC	endp
 
 
