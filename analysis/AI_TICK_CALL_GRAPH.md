@@ -323,7 +323,7 @@ Le calcul produit un score **A** (`di`), un score **B** (`var_12`) et une **apti
 - puis, avec `dword_72030` : hors portée, `si −4` ; dans la portée et l'angle < 45° : `si +5`, `A +6` ; entre 45° et 90° : `si +3`, `A +3` ; au-delà : rien.
 
 **Autres objets** (missiles, avions) : un angle d'aspect > 90° du côté du candidat met B à 0.
-- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += TH²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Targeting_LineOfSightCheck` puis `Math_DotProduct3D_5505B` (produit scalaire)) donne une valeur < −180 et que ce même bit est absent.
+- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += TH²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Vector_NormalizeInPlace_5593A` (normalisation) puis `Math_DotProduct3D_5505B` (produit scalaire)) donne une valeur < −180 et que ce même bit est absent.
 - **Avion (6)** : bandes d'angle (> 135°, > 90°, > 30°, sinon) qui ajoutent à `si`, `A` et `B` (de −4 à +8), une seconde géométrie < −180 (`si −4`), des bandes sur le second angle (80–100° : `A −5` ; 60–120° : `A −3`), puis des bandes de distance selon les armes chargées : au-delà de `dword_72024` `si −3`, `A −5` ; au-delà de `dword_72020` avec masque `0x700` `si −1`, `A +3` ; avec masque `3` : au-delà de `dword_7202C` `A −2`, `si −1`, en deçà de `dword_72028` `A −1`, `B +4` ; sans masque `1`, l'angle > 150° donne `A −3`, > 60° `A −1`.
 - **Persistance (avions seulement)** : candidat = `entité+0x287` → `A +3`, `si +5` ; candidat = `+0x289` → `si +3`, `B +5` ; l'avion qui me vise déjà (`nœud+0x5A` → `+0x0D` = mon nœud) → `si +2`, `B +1` ; terme de classe comparant `objet+0x52` à `byte_72038` et à ma classe (B = 0 si `byte_72038` ≥ classe).
 - **Tous** : bit `0x02` de `entité+0x28B` posé → `si +4` ; candidat = `entité+0x285` → `A +10`, `si +5`.
@@ -653,7 +653,7 @@ Poursuite avec anticipation, pilotée en **« bank-to-turn »** : roulis immédi
 D    = point_visé − position_missile ; dist = |D|
 t    = min(dist / |v_missile|, 1.0)                      // 1.0 si v nulle
 D   += v_cible · t                                       // anticipation (cible->vtable+0x4C)
-L    = M · D                                             // Math_ApplyRotationHelperA_58768 : projection sur les 3 lignes
+L    = M · D                                             // Matrix_WorldToLocal_58768 : projection sur les 3 lignes
 roulis = atan(L.c0 / L.c2), ±180° si L.c2 ≤ 0            // Math_ArcTan2_54B0A + correction 0B400h
 M    = M ∘ Rot(c1, roulis)                               // Matrix_BuildAxisY_570C5 : SANS limite
 L    = M · D
@@ -690,6 +690,17 @@ Le soupçon était fondé : `Audio3D_ComputeDistanceParams_41BEF` n'a rien d'aud
 | `Countermeasure_CacheDistance` | `GuidedBombBody_InheritLaunchSpeed_41B84` | vitesse héritée du lanceur, mise en cache |
 | `PlayerComponent_LoadFieldGroup_9FDDE` | `DynGuidedBomb_LoadGBMBChunk_9FDDE` | chunk `GBMB` : 1 dword = vitesse angulaire max (`+0x18`) |
 | `Countermeasure_ComputeTransform` | `WorldObject_AlignNoseOnVelocity_419E4` | aligne le nez sur la vitesse |
+
+**`WorldObject_AlignNoseOnVelocity_419E4`, relue ligne par ligne (2026-09-24)** :
+1. `v` = vitesse (`vtable+0x4C`) ;
+2. `Vector_PrescaleBelow256_55B04(v)` : divise par 8 tant qu'une composante dépasse 256 (garde anti-débordement) ;
+3. `Vector_NormalizeInPlace_5593A(v)` : `c = (c << 8) / |v|` (ex-`Targeting_LineOfSightCheck`, mal nommée) ;
+4. copie de l'orientation (`vtable+0x3C` = `objet+0x2C`, 36 octets) ;
+5. **ligne 1 (`+0x0C`) ← v** ;
+6. `Matrix_OrthonormalizeKeepRow1_57660` : ligne 2 = ligne 0 × ligne 1, ligne 0 = ligne 1 × ligne 2 (`Vector_CrossProduct3D_550B7`), puis normalisation des trois lignes ;
+7. `vtable+0x40` = recopie dans `objet+0x2C`.
+
+Preuve que la ligne 1 est le nez : dans `MissileBody_BoostPhase_42632` et `MissileBody_SetCruiseVelocity_42A1B`, toute la vitesse est portée par la composante 1 du repère local (`Matrix_WorldToLocal_58768` = `M·v` par lignes, `Matrix_LocalToWorld_58828` = `Mᵀ·v` par colonnes, toutes deux lues).
 
 **Identique au missile** : anticipation `t = min(dist / vitesse, 1)`, roulis immédiat `atan(c0/c2)` (±180° si c2 ≤ 0), cabrage `atan(c2/c1)` (180 − |b| si la cible est derrière) borné à `+0x18 · dt`, puis écriture de l'orientation.
 

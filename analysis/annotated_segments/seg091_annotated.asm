@@ -113,7 +113,7 @@ loc_42E21:
 loc_42E23:				; CODE XREF: Proximity_TestPoints+91j
 		lea	ax, [bp+var_26]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_42E2D:

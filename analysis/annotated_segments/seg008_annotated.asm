@@ -1982,7 +1982,7 @@ loc_F853:
 		add	sp, 4
 		lea	ax, [bp-88h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	dword ptr [bp-1Eh], 100h
 		les	bx, [bp+6]
@@ -2512,7 +2512,7 @@ loc_FDD8:				; CODE XREF: seg008:182Ej
 		mov	[bp-18h], eax
 		lea	ax, [bp-20h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-20h]
 		mov	[bp-0Ch], eax
@@ -4590,7 +4590,7 @@ loc_111DC:				; CODE XREF: seg008:2C37j
 		add	sp, 6
 		lea	ax, [bp-24h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	si, ax
 		mov	eax, [si]

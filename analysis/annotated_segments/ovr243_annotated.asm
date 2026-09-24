@@ -526,7 +526,7 @@ HUDSymbol_Helper2_8094F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 190 lignes, NON DÉTAILLÉE — combine Math_ApplyRotationHelperB_58828 (seg117),
+; ⚠️ far, 190 lignes, NON DÉTAILLÉE — combine Matrix_LocalToWorld_58828 (seg117),
 ; UI_ApplyLineOfSightAndTransform_57DAE (seg116), TextObject_AllocateVariantA_5A984 (×2,
 ; seg125).
 ; ==============================================================================================
@@ -582,7 +582,7 @@ arg_0		= word ptr  6
 		push	ax
 		lea	ax, [bp+var_30]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, [bp+var_30]
 		add	[si+14h], eax
@@ -903,7 +903,7 @@ arg_0		= word ptr  6
 		push	ax
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_B8]
 		push	ax
@@ -1915,7 +1915,7 @@ HUDSymbol_RenderWithClipTestB_81467	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 323 lignes, NON DÉTAILLÉE — combine Targeting_LineOfSightCheck_5593A (seg116, ×2),
+; ⚠️ far, 323 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A (seg116, ×2),
 ; Camera_TransformPoint.
 ; ==============================================================================================
 HUDSymbol_RenderWithLOSCheck_818A2	proc far		; CODE XREF: VROOMM_StubThunk_6AF58J HUDSymbol_ConstructWithViewMatrix_82693+C1p
@@ -1983,7 +1983,7 @@ arg_0		= word ptr  6
 		mov	[bp+var_70], eax
 		lea	ax, [bp+var_78]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [si+8Ch]
 		sar	eax, 1
@@ -2036,11 +2036,11 @@ loc_81954:
 		push	ax
 		lea	ax, [bp+var_78]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_78]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [si+8Ch]
 		sar	eax, 1
@@ -2379,7 +2379,7 @@ loc_81C5B:
 		push	ax
 		lea	ax, [bp+var_52]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_52]
 		push	ax
@@ -2772,7 +2772,7 @@ HUDSymbol_ComputeTransform_8203D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 474 lignes, NON DÉTAILLÉE — combine Targeting_LineOfSightCheck_5593A, Math_Sin_5483F
+; ⚠️ far, 474 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A, Math_Sin_5483F
 ; (seg115), Camera_TransformPoint.
 ; ==============================================================================================
 HUDSymbol_RenderWithLOSCheckB_82181	proc far		; CODE XREF: VROOMM_StubThunk_6AF3FJ HUDSymbol_ConstructWithViewMatrix_82693+195p
@@ -2885,7 +2885,7 @@ loc_821DB:
 		mov	ax, si
 		add	ax, 0E8h ; '�'
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		jmp	loc_82686
 ; ���������������������������������������������������������������������������
@@ -3543,7 +3543,7 @@ HUDSymbol_Helper3_82850	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 219 lignes, NON DÉTAILLÉE — combine SetReference16 (×3),
-; AI_ComputeGeometryHelper_56E29 (seg116), Math_ApplyRotationHelperB_58828.
+; AI_ComputeGeometryHelper_56E29 (seg116), Matrix_LocalToWorld_58828.
 ; ==============================================================================================
 HUDSymbol_ConstructWithGeometry_8285A	proc far		; CODE XREF: VROOMM_StubThunk_6AF85J
 
@@ -3711,7 +3711,7 @@ loc_829B6:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+13Aj
 		push	ax
 		lea	ax, [bp+var_2A]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, [bp+var_2A]
 		mov	[si+14h], eax

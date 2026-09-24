@@ -2001,7 +2001,7 @@ loc_22943:				; CODE XREF: WorldObjects_Cluster_22795+1AAj
 loc_2294A:				; CODE XREF: WorldObjects_Cluster_22795+1B0j
 		lea	ax, [bp+var_7C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		cmp	[bp+arg_A], 0B4h ; '�'
 		jz	short loc_22988
@@ -2327,7 +2327,7 @@ loc_22BA1:				; CODE XREF: WorldObjects_Cluster_22A7D+10Dj
 		jge	short loc_22BE2
 		lea	ax, [bp+var_42]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp+var_36]
 		push	ax

@@ -1942,13 +1942,13 @@ loc_34411:				; CODE XREF: Terrain_StreamingMain+31Dj
 					; Terrain_StreamingMain+336j
 		lea	ax, [bp+var_12A]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp+var_11E]
 		push	ax
 
 loc_34421:
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_34427:
@@ -1965,7 +1965,7 @@ loc_34436:
 		push	ax
 
 loc_34437:
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		cmp	[bp+var_1BE], 0
 		jge	short loc_3444C

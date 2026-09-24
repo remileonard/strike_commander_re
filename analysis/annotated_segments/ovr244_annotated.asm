@@ -531,7 +531,7 @@ loc_82EE1:
 		push	ax
 		lea	ax, [bp+var_DE]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_DE]
 		push	ax
@@ -1809,7 +1809,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		push	si
 		call	Camera_ComputeViewMatrix
@@ -2177,8 +2177,8 @@ HUDSymbol_ConstructAndInitAngleD_83CE9	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 189 lignes, NON DÉTAILLÉE — combine SetReference16, Matrix_BuildFromAngle_56D72,
-; Matrix_BuildAxisZ_572BC, Matrix_BuildAxisX_56EC3, Matrix_ApplyToVectorY_57660 (seg116) —
-; construction de matrice d'orientation complète pour un symbole HUD.
+; Matrix_BuildAxisZ_572BC, Matrix_BuildAxisX_56EC3, Matrix_OrthonormalizeKeepRow1_57660
+; (seg116) — construction de matrice d'orientation complète pour un symbole HUD.
 ; ==============================================================================================
 HUDSymbol_ConstructWithFullMatrix_83DD7	proc far		; CODE XREF: VROOMM_StubThunk_6B02DJ HUDSymbol_Helper7_84337+59p	...
 
@@ -2304,7 +2304,7 @@ loc_83E83:				; CODE XREF: HUDSymbol_ConstructWithFullMatrix_83DD7+8Bj
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [si+2Ch]
 		neg	eax
@@ -3259,7 +3259,7 @@ loc_84646:
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [si+2Ch]
 		neg	eax

@@ -450,7 +450,7 @@ loc_3EA49:				; CODE XREF: HUD_RenderSymbologyMain+301j
 		jz	short loc_3EA9B
 		lea	ax, [bp+var_F2]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_F2]
 		push	ax
@@ -478,7 +478,7 @@ loc_3EA80:
 
 loc_3EA94:
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_3EA9B:				; CODE XREF: HUD_RenderSymbologyMain+307j
@@ -609,7 +609,7 @@ loc_3EBCA:				; CODE XREF: HUD_RenderSymbologyMain+47Cj
 		mov	ax, di
 		add	ax, 12h
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	ax, di
 		add	ax, 12h
@@ -1032,7 +1032,7 @@ loc_3EFA8:				; CODE XREF: HUD_RenderSymbologyMain+832j
 		mov	ax, di
 		add	ax, 12h
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	ax, di
 		add	ax, 12h
@@ -1722,7 +1722,7 @@ loc_3F605:				; CODE XREF: HUD_RenderSymbologyMain+EBBj
 		push	ax
 		lea	ax, [bp+var_F2]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_F2]
 		push	ax

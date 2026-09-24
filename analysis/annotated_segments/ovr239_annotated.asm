@@ -1538,7 +1538,7 @@ loc_7BB46:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FFCj
 		push	ax
 		lea	ax, [bp+var_1C0]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_1C0]
 		push	ax
@@ -2411,7 +2411,7 @@ loc_7C550:
 		mov	[bp-194h], eax
 		lea	ax, [bp+var_19C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, di
 		add	ax, 12h

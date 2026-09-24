@@ -4,8 +4,10 @@ seg090		segment	byte public 'CODE' use16
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). mov al, 8 : categorie d'objet 8 = missile (vtable de l'objet missile,
-; seg339 off_6FAF8).
+; far, LUE (2026-09-24, precise). mov al, 8. Slot +0x34 de la vtable d'INSTANCE du missile
+; (seg339 base 0x6FAC4, entree off_6FAF8) : renvoie 8, la meme valeur que la categorie du
+; modele MISS (slot +8 de la vtable modele). Meme motif pour le leurre (loc_45197, slot +0x34,
+; 0x10). Le sens exact de ce slot d'instance (categorie ?) n'est pas prouve par un lecteur.
 ; ==============================================================================================
 Missile_GetCategory_4244E:				; DATA XREF: seg339:off_6FAF8o
 		push	bp
@@ -257,11 +259,11 @@ loc_4261F:
 ; missile, appelee par MissileBody_GuidanceTick_42A4E tant que +0x3A == 0. Premier appel
 ; (+0x3B == 0) : vitesse du corps = vitesse du lanceur (+0x37, vtable+0x4C), efface le bit 1
 ; de [missile]+4, pose +0x3B = 1. Ensuite : si |vitesse| < corps+0x25 (vitesse maximale) :
-; vitesse ramenee dans le repere du missile (Math_ApplyRotationHelperA_58768 avec 0x57E2),
+; vitesse ramenee dans le repere du missile (Matrix_WorldToLocal_58768 avec 0x57E2),
 ; composantes c0 et c2 mises a 0, c1 += corps+0x29 * dt (acceleration le long du nez), retour
-; au repere monde (Math_ApplyRotationHelperB_58828). Sinon :
-; MissileBody_SetCruiseVelocity_42A1B et +0x3A = 1 (fin de la propulsion : elle s'arrete quand
-; la vitesse maximale est atteinte, pas sur une duree).
+; au repere monde (Matrix_LocalToWorld_58828). Sinon : MissileBody_SetCruiseVelocity_42A1B et
+; +0x3A = 1 (fin de la propulsion : elle s'arrete quand la vitesse maximale est atteinte, pas
+; sur une duree).
 ; ==============================================================================================
 MissileBody_BoostPhase_42632	proc far		; CODE XREF: seg090:07E9p
 
@@ -336,7 +338,7 @@ loc_426B3:				; CODE XREF: MissileBody_BoostPhase_42632+7Dj
 		mov	ax, si
 		add	ax, 8
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	[bp+var_C], 0
 		mov	eax, [bp+var_C]
@@ -370,7 +372,7 @@ loc_426FC:
 		push	ax
 
 loc_4271F:
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		jmp	short loc_42734
 ; ���������������������������������������������������������������������������
@@ -403,14 +405,14 @@ MissileBody_BoostPhase_42632	endp
 ; d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse
 ; = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2)
 ; ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L =
-; Math_ApplyRotationHelperA_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice
-; (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) =
-; atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ;
-; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_ApplyToVectorY_57660 : rotation autour de l'axe
-; c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur
-; ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere)
-; b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code
-; ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0).
+; Matrix_WorldToLocal_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice (repere
+; missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) = atan(c0/c2),
+; corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ; Matrix_BuildAxisY_570C5(0x57E2, a) +
+; Matrix_OrthonormalizeKeepRow1_57660 : rotation autour de l'axe c1 (le nez) qui amene la
+; cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur ce roulis. (5) TANGAGE
+; LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne
+; max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote
+; positif ; apres le roulis la cible est cote +c2, donc b >= 0).
 ; Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0
 ; (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de
 ; poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a
@@ -590,7 +592,7 @@ loc_42897:
 		push	57E2h
 		lea	ax, [bp+var_84]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_7C]
 		push	ax
@@ -654,12 +656,12 @@ loc_4291B:				; CODE XREF: MissileBody_SteerToTarget_42738+1A2j
 		call	Matrix_BuildAxisY_570C5
 		add	sp, 4
 		push	57E2h
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		push	57E2h
 		lea	ax, [bp+var_60]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_5C]
 		push	ax
@@ -778,9 +780,9 @@ MissileBody_SteerToTarget_42738	endp
 ; ==============================================================================================
 ; far, 25L, LUE (2026-09-24). Ex-'Sound3D_TriggerDirect' (FAUX). Vitesse du corps =
 ; (corps+0x2D, corps+0x25, corps+0x31) exprimee dans le repere du missile (c0, c1 = nez, c2),
-; ramenee au repere monde par Math_ApplyRotationHelperB_58828(0x57E2) : vol de croisiere a
-; vitesse maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS
-; (+0x2D, +0x31) sont les composantes laterale et normale de cette vitesse.
+; ramenee au repere monde par Matrix_LocalToWorld_58828(0x57E2) : vol de croisiere a vitesse
+; maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS (+0x2D,
+; +0x31) sont les composantes laterale et normale de cette vitesse.
 ; ==============================================================================================
 MissileBody_SetCruiseVelocity_42A1B	proc far		; CODE XREF: MissileBody_BoostPhase_42632+FAp
 					; seg090:089Dp
@@ -801,7 +803,7 @@ arg_0		= word ptr  6
 		mov	ax, si
 		add	ax, 8
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		pop	si
 		pop	bp
@@ -823,9 +825,9 @@ MissileBody_SetCruiseVelocity_42A1B	endp
 ; lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A ==
 ; 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente ->
 ; MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse +=
-; dword_6FFD7 * dt (gravite), UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A
-; sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_ApplyToVectorY_57660 +
-; [missile]->vtable+0x40). Renvoie 1.
+; dword_6FFD7 * dt (gravite), Vector_PrescaleBelow256_55B04 / Vector_NormalizeInPlace_5593A
+; sur le vecteur vitesse, puis le nez est aligne sur la vitesse
+; (Matrix_OrthonormalizeKeepRow1_57660 + [missile]->vtable+0x40). Renvoie 1.
 ; ==============================================================================================
 MissileBody_GuidanceTick_42A4E:				; DATA XREF: seg339:off_6F052o
 		push	bp
@@ -1053,13 +1055,13 @@ loc_42C38:				; CODE XREF: seg090:loc_42C33j
 		mov	[bp-2Eh], eax
 		lea	ax, [bp-36h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp-36h]
 		push	ax
 
 loc_42C83:
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 
 loc_42C88:
 		pop	cx
@@ -1088,7 +1090,7 @@ loc_42C95:
 		mov	[bp-46h], eax
 		lea	ax, [bp-5Ah]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp-5Ah]
 		push	ax

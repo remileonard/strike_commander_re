@@ -688,7 +688,7 @@ off_75D45	dw offset loc_75C94	; DATA XREF: AITargeting_UpdateAndRender_75C18+68
 
 ; ==============================================================================================
 ; ⭐⚠️ far, 558 lignes, NON DÉTAILLÉE — combine longueur vectorielle (sub_5828E, seg117),
-; Targeting_LineOfSightCheck_5593A (seg116, ×3+), AI_ComputeGeometryHelper_56E29 — probable
+; Vector_NormalizeInPlace_5593A (seg116, ×3+), AI_ComputeGeometryHelper_56E29 — probable
 ; calcul complet de solution de ciblage (ligne de vue, distance, géométrie). Candidat
 ; prioritaire pour session dédiée.
 ; ==============================================================================================
@@ -920,7 +920,7 @@ loc_75ED6:				; CODE XREF: AITargeting_ComputeSolution_75D51+F4j
 		mov	[bp+var_A], eax
 		lea	ax, [bp+var_4E]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		mov	eax, [bp+var_4E]
@@ -1072,7 +1072,7 @@ loc_76088:				; DATA XREF: ovr230:0BEDo
 		mov	[bp+var_8E], eax
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_96]
 		push	ax
@@ -1125,7 +1125,7 @@ loc_76128:				; CODE XREF: AITargeting_ComputeSolution_75D51:loc_76084j
 		mov	[bp+var_8E], eax
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_96]
 		push	ax
@@ -1178,7 +1178,7 @@ loc_761CB:				; CODE XREF: AITargeting_ComputeSolution_75D51:loc_76084j
 		mov	[bp+var_8E], eax
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_96]
 		push	ax
@@ -1231,7 +1231,7 @@ loc_7626E:				; CODE XREF: AITargeting_ComputeSolution_75D51:loc_76084j
 		mov	[bp+var_8E], eax
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_96]
 		push	ax
@@ -1265,8 +1265,8 @@ word_76315	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_ComputeSolution_75
 
 ; ==============================================================================================
 ; ⚠️ far, 214 lignes, NON DÉTAILLÉE — combine AI_ComputeGeometryHelper_56E29,
-; Matrix_BuildAxisX_56EC3, Matrix_ApplyToVectorY_57660 (seg116) — calcul d'orientation pour la
-; solution de ciblage.
+; Matrix_BuildAxisX_56EC3, Matrix_OrthonormalizeKeepRow1_57660 (seg116) — calcul d'orientation
+; pour la solution de ciblage.
 ; ==============================================================================================
 AITargeting_ComputeOrientation_76325	proc far		; CODE XREF: VROOMM_StubThunk_6AB8AJ AITargeting_UpdateAndRender_75C18+EAp
 
@@ -1370,7 +1370,7 @@ loc_763EF:				; CODE XREF: AITargeting_ComputeOrientation_76325+A8j
 		add	sp, 4
 		lea	ax, [bp+var_84]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_84]
 		push	ax
@@ -1490,9 +1490,9 @@ AITargeting_ComputeOrientation_76325	endp
 
 ; ==============================================================================================
 ; ⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine
-; AI_ComputeGeometryHelper_56E29, Matrix_BuildAxisX_56EC3, Matrix_ApplyToVectorY_57660,
-; Targeting_LineOfSightCheck_5593A (×3+, seg116) — variante étendue de
-; AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée.
+; AI_ComputeGeometryHelper_56E29, Matrix_BuildAxisX_56EC3,
+; Matrix_OrthonormalizeKeepRow1_57660, Vector_NormalizeInPlace_5593A (×3+, seg116) — variante
+; étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée.
 ; ==============================================================================================
 AITargeting_ComputeOrientationExtended_765B2	proc far		; CODE XREF: VROOMM_StubThunk_6AB8FJ AITargeting_UpdateAndRender_75C18+F8p
 
@@ -1626,7 +1626,7 @@ loc_76673:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+ACj
 		add	sp, 4
 		lea	ax, [bp+var_96]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_96]
 		push	ax
@@ -1870,7 +1870,7 @@ loc_768F2:				; DATA XREF: ovr230:14C1o
 		mov	[bp+var_9A], eax
 		lea	ax, [bp+var_A2]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_A2]
 		push	ax
@@ -1923,7 +1923,7 @@ loc_76992:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		mov	[bp+var_9A], eax
 		lea	ax, [bp+var_A2]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_A2]
 		push	ax
@@ -1976,7 +1976,7 @@ loc_76A35:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		mov	[bp+var_9A], eax
 		lea	ax, [bp+var_A2]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_A2]
 		push	ax
@@ -2029,7 +2029,7 @@ loc_76AD8:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		mov	[bp+var_9A], eax
 		lea	ax, [bp+var_A2]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_A2]
 		push	ax
@@ -2330,7 +2330,7 @@ word_76E57	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_Helper2_76C09+E2o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 137 lignes, NON DÉTAILLÉE — combine Targeting_LineOfSightCheck_5593A (seg116),
+; ⚠️ far, 137 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A (seg116),
 ; Trigger_TimedRangedSpawnOnce-style test de portée (sub_378CA, seg109), sub_3E5A6 —
 ; vérification de portée pour le ciblage.
 ; ==============================================================================================

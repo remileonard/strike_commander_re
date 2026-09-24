@@ -141,7 +141,7 @@ loc_2FFB4:
 		push	ax
 		lea	ax, [bp+var_534]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		pop	bx
 		pop	cx

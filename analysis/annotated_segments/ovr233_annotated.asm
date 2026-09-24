@@ -645,11 +645,11 @@ loc_7A30F:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+2ABj
 		mov	[bp+var_9C], eax
 		lea	ax, [bp+var_A4]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_A4]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	si
 
@@ -908,7 +908,7 @@ loc_7A5DC:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4DCj
 		jnz	short loc_7A631
 		lea	ax, [bp+var_BC]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_8]
 

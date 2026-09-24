@@ -1358,7 +1358,7 @@ fait `shl …,8` pour sa maths interne 24.8 (noté « `<<8` »). `raw` = stocké
 | `0E` | 13 | `i32 x,y,z` | **position relative à l'entité liée** : `<<8`, tourné par l'orientation de `obj+92` + position de `obj+92` → `obj+14/18/1C` |
 | `0F` | 5 | `i16 h ; i16 k` | `obj+F0=h` (raw) ; `obj+F2=k` (`<<8`) ; angles d'approche → `obj+F6/FA` |
 | `10` | 1 | — | si `obj+92` : `AI_ComputeGeometryHelper(obj+20, entité)` |
-| `11` | 7 | `i16 a,b,c` | axes d'orientation (`Matrix_BuildAxisZ/X/Y`, `<<8`) + `Matrix_ApplyToVectorY` |
+| `11` | 7 | `i16 a,b,c` | axes d'orientation (`Matrix_BuildAxisZ/X/Y`, `<<8`) + `Matrix_OrthonormalizeKeepRow1_57660` |
 | `12` | 13 | `i32 x,y,z` | `obj+94/98/9C` (raw) |
 | `13` | 1 | — | `obj+FF=1 ; obj+100=0` |
 | `14` | 5 | `i32 s` | `obj+C0/C4/C8 = lignes_orientation(obj+2C) × s` (24.8) |
@@ -1417,8 +1417,8 @@ en file (posée par `FE`).
      mode `0xFF` ; sinon tourne de `erreur/A0 · dword_70458`.
    - **8** — pas de handler ; intégrateur générique seul.
    - **0xB — visée/poursuite d'un point** : `dir = obj+0xB0.. − pos` ;
-     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Targeting_LineOfSightCheck` ;
-     `Matrix_ApplyToVectorY`.
+     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Vector_NormalizeInPlace_5593A` (normalisation) ;
+     `Matrix_OrthonormalizeKeepRow1_57660`.
    - **0x1D — déplacement sur segment** vers `rotate(obj+0xE4.., orient_entité)` :
      `pas = ((cible − obj+0xB0..)<<8)/obj+0xA0 · dword_70458` ; `obj+0xB0.. += pas` ;
      `pos_monde = obj+0xB0.. + pos_entité`. Snap + mode `0xFF` si `obj+0xA0 ≤ 0` ou
@@ -1575,7 +1575,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   renvoie `[si+0x26]+0x24` ; sinon renvoie `si+0x12`.
 - `Debris_TransferForceToParent` (37F18) : `parent[+0x24/28/2C] = child[+0x12/16/1A]` ;
   `child[+0x24]->vtable[0x78](parent+0x24)` (transforme la force enfant→repère parent) ;
-  `Math_ApplyRotationHelperB_58828(parent+0x24)` ; récursion sur `[si+0x24]` ;
+  `Matrix_LocalToWorld_58828(parent+0x24)` ; récursion sur `[si+0x24]` ;
   `parent[+0x24] += force_sous-composant` ; `parent[+0x30] |= 1`.
 
 **Modèle résultant** : la caméra externe est un **corps rigide de faible masse
@@ -1590,7 +1590,7 @@ d'un ressort amorti** (masse `+0x20`, force de rappel, pas de temps `dword_7045E
    constante de rappel) — c'est ce qui fixe la « raideur » du lag ;
 2. les corps `mount->vtable[0x2C]` (renvoie `Ta`) et `mount->vtable[0x30]`, plus
    `sub[+0x24]->vtable[0x78]` ;
-3. `Math_VectorLength3D_Raw_5828E` / `Math_ApplyRotationHelperB_58828` (math exacte) ;
+3. `Math_VectorLength3D_Raw_5828E` / `Matrix_LocalToWorld_58828` (math exacte) ;
 4. quel objet est `parent` (avion JDYN ? rig ?) et le sens de la rotation 2D.
 
 **Complément (2026-09-06, 4ᵉ passe) — thunks vtable de base `WorldObject` (seg084) :**
@@ -1602,7 +1602,7 @@ d'un ressort amorti** (masse `+0x20`, force de rappel, pas de temps `dword_7045E
   confirmer par analyse de frame précise.
 - `vtable[0x1C]` = `loc_3CB0B` : `WorldObject_BuildOrientationMatrix_56E8A(this+0x2C)` +
   `Debris_BodyDetach`.
-- `loc_3CB78` : `r = this->vtable[0x3C]() ; Math_ApplyRotationHelperB_58828(r, arg)` —
+- `loc_3CB78` : `r = this->vtable[0x3C]() ; Matrix_LocalToWorld_58828(r, arg)` —
   « récupère un repère via `vtable[0x3C]`, y fait tourner `arg` ».
 - `loc_3CB3A` : si `this[+0x26]` (parent de force) → `this->vtable[0x74]()` puis renvoie
   `[+0x26]` ; sinon renvoie `this+0x2C`.
@@ -1614,7 +1614,7 @@ un détail : il faut (a) l'intégration force→position et ses constantes
 (masse `+0x20`, amortissement) — probablement dans le tick physique parent
 (`Damage_SimulationTick` seg060 / `PhysicsTicks` seg103) ; (b) la classe exacte du
 nœud de montage `+0x51` et le sens réel de ses thunks vtable (analyse de frame
-far-ptr) ; (c) `Math_VectorLength3D_Raw_5828E` / `Math_ApplyRotationHelperB_58828`.
+far-ptr) ; (c) `Math_VectorLength3D_Raw_5828E` / `Matrix_LocalToWorld_58828`.
 C'est un **décodage de sous-système soutenu** (plusieurs sessions, comme
 l'interpréteur COMP en a demandé), pas quelque chose qui converge en quelques
 tours. Cette section est le point d'appui ; le portage C++ vient après.

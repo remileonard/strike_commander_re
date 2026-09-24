@@ -234,7 +234,7 @@ loc_454F4:				; CODE XREF: Missile_ComputeImpactPlane+49j
 		mov	[bp+var_42], eax
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp+var_3A]
 		push	ax
@@ -824,7 +824,7 @@ loc_459D9:				; CODE XREF: seg097:0655j
 		mov	[bp-40h], eax
 		lea	ax, [bp-48h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-48h]
 		mov	[si+38h], eax

@@ -535,11 +535,11 @@ loc_15234:				; CODE XREF: seg015:033Fj
 		mov	[bp-9Ah], eax
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, [bp-12h]
 		add	ax, 0Ch
@@ -614,7 +614,7 @@ loc_1533B:				; CODE XREF: seg015:0446j
 		push	word ptr [bp-12h]
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp-0A2h]
 		push	ax
@@ -1004,7 +1004,7 @@ loc_15649:				; CODE XREF: seg015:0754j
 		mov	ax, si
 		add	ax, 143h
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		jmp	loc_158D0
 ; ���������������������������������������������������������������������������
@@ -1211,7 +1211,7 @@ loc_158D0:				; CODE XREF: seg015:0756j seg015:07C7j ...
 		push	word ptr [bp-12h]
 		lea	ax, [bp-7Eh]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	ax, [bp-10h]
 		add	ax, 12h
@@ -1318,7 +1318,7 @@ loc_15A1D:				; CODE XREF: seg015:0B28j
 		push	word ptr [bp-12h]
 		lea	ax, [bp-0A2h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, [bp-10h]
 		add	di, 12h
@@ -1496,16 +1496,15 @@ Radar_ToggleTracking	endp
 ; (6B099/6B08F/6B094) -- ressemble a une animation zoom/transition MFD en 2 etapes, PAS un
 ; calcul camera 3D. (5) bloc cle (garde byte_72365) : relit si[+0x14F] (LE MEME champ vecteur
 ; avant que Camera_ExternalViewComputeMain_1519E rate-limite a 6.0u/frame), le fait tourner
-; via Math_ApplyRotationHelperB_58828(forward, subject->vtable[0x3C]()), calcule
-; bearing/elevation via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si
-; si[+0x1EC] >= bearing_elev -> declenche un VRAI pan de camera
-; Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7]) (value = si[+0x1F0]*bearing_elev +
-; si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour neutre
-; Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE REGARD
-; quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera chase --
-; pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF) avec une
-; constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a une
-; position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](),
+; via Matrix_LocalToWorld_58828(forward, subject->vtable[0x3C]()), calcule bearing/elevation
+; via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si si[+0x1EC] >= bearing_elev
+; -> declenche un VRAI pan de camera Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7])
+; (value = si[+0x1F0]*bearing_elev + si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour
+; neutre Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE
+; REGARD quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera
+; chase -- pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF)
+; avec une constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a
+; une position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](),
 ; Targeting_ComputeBearingElevation_55B1A et Camera_PanTransitionExtended non tracees en
 ; detail, stubs VROOMM 6B099/6B08F/6B094/6B080/6B085 non resolus. Lu integralement ligne a
 ; ligne le 2026-09-12 (demande explicite de verification, ancien resume issu d une passe
@@ -1923,7 +1922,7 @@ loc_15EA7:				; CODE XREF: Cockpit_ViewPanTransitionMain_15B67+33Bj
 		push	ax
 		lea	ax, [bp+var_3C]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	5AA7h
 		lea	ax, [bp+var_3C]

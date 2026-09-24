@@ -2974,7 +2974,7 @@ loc_52244:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+312j
 		add	sp, 4
 		lea	ax, [bp+var_C4]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+2Fh]

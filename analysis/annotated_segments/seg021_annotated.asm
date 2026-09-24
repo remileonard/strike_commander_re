@@ -115,7 +115,7 @@ loc_1847A:				; CODE XREF: seg021:00E6j
 loc_18481:				; CODE XREF: seg021:00ECj
 		lea	ax, [bp-42h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [bp-3Eh]
 		cmp	eax, dword_6E9A6
@@ -422,7 +422,7 @@ loc_18743:
 		push	ax
 		lea	ax, [bp-104h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 
 loc_18766:				; CODE XREF: seg021:0365j
@@ -446,7 +446,7 @@ loc_1877E:				; CODE XREF: seg021:03EAj
 loc_18785:				; CODE XREF: seg021:03F0j
 		lea	ax, [bp-104h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [bp-100h]
 		cmp	eax, dword_6E9A6
@@ -1560,7 +1560,7 @@ loc_19278:				; CODE XREF: seg021:0EE4j
 loc_1927F:				; CODE XREF: seg021:0EEAj
 		lea	ax, [bp-36h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [bp-32h]
 		cmp	eax, dword_6E9A6

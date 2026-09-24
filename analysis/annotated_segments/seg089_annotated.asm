@@ -352,7 +352,7 @@ loc_416CA:				; CODE XREF: seg089:035Aj
 		push	ax
 		lea	ax, [bp-56h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	si, [bp+6]
 		or	si, si
@@ -528,7 +528,7 @@ loc_4180A:				; CODE XREF: seg089:04DEj
 		mov	[bp-1Ah], eax
 		lea	ax, [bp-40h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	si
 		mov	bx, [si]
@@ -792,13 +792,16 @@ loc_419E0:				; CODE XREF: seg089:0698j seg089:06C7j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 62L — ex-'Countermeasure_ComputeTransform'. Lit la vitesse (vtable+0x4C), la normalise
-; (UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A), reprend l'orientation
-; (vtable+0x3C), remplace l'axe du nez (Matrix_ApplyToVectorY_57660) et ecrit l'orientation
-; (vtable+0x40) : ALIGNE LE NEZ SUR LA VITESSE (meme sequence que la branche balistique de
-; MissileBody_GuidanceTick_42A4E). Utilise par la bombe guidee sans cible
-; (GuidedBombBody_GuidanceTick_41F2B) et par d'autres objets de seg089. (Renomme 2026-09-24
-; d'apres le resume existant et la sequence d'appels ; corps non relu ligne a ligne.)
+; far, 62L, LUE INTEGRALEMENT (2026-09-24). Ex-'Countermeasure_ComputeTransform'. ALIGNE LE
+; NEZ DE L'OBJET SUR SA VITESSE : v = objet->vtable+0x4C (vitesse) ;
+; Vector_PrescaleBelow256_55B04(v) (garde anti-debordement) ; Vector_NormalizeInPlace_5593A(v)
+; (vecteur unitaire) ; copie de l'orientation (vtable+0x3C, 36 octets) ; LIGNE 1 (+0x0C)
+; remplacee par v ; Matrix_OrthonormalizeKeepRow1_57660 (lignes 0 et 2 reconstruites par
+; produits vectoriels) ; objet->vtable+0x40 (ecrit l'orientation). La ligne 1 est l'axe du nez
+; : MissileBody_BoostPhase_42632 et MissileBody_SetCruiseVelocity_42A1B mettent toute la
+; vitesse sur la composante 1 du repere local (Matrix_WorldToLocal_58768 /
+; Matrix_LocalToWorld_58828). Appelants : GuidedBombBody_GuidanceTick_41F2B (sans cible) et
+; deux fois la mise a jour d'objet loc_41AAF (seg089, classe non identifiee).
 ; ==============================================================================================
 WorldObject_AlignNoseOnVelocity_419E4	proc far		; CODE XREF: seg089:0785p seg089:07FFp ...
 
@@ -826,11 +829,11 @@ arg_0		= word ptr  6
 		add	sp, 6
 		lea	ax, [bp+var_E]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_E]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	si
 		mov	bx, [si]
@@ -850,7 +853,7 @@ arg_0		= word ptr  6
 		mov	[bp+var_1E], eax
 		lea	ax, [bp+var_32]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_32]
 		push	ax
@@ -1126,14 +1129,14 @@ GuidedBombBody_InheritLaunchSpeed_41B84	endp
 ; relevement d'altitude), position propre dword_7284A/4E/52. (1) D = cible - moi ; t = dist /
 ; |vitesse du corps [si]+8| borne a 1.0 ; D += vitesse_cible (vtable+0x4C) * t. (2) Roulis
 ; immediat : atan(c0/c2) (Math_ArcTan2_54B0A), +/-180 si c2 <= 0, Matrix_BuildAxisY_570C5 +
-; Matrix_ApplyToVectorY_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres idiv par c1 SANS
-; garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18 * dt
-; (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 + Matrix_ApplyToVectorX_575DF.
-; (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5) DIFFERENCE AVEC LE MISSILE :
-; vitesse = (0, +0x1C, 0) dans le repere de la bombe (Math_ApplyRotationHelperB_58828) :
-; vitesse CONSTANTE = vitesse du lanceur au largage (mise en cache par
-; GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de vitesse
-; tant qu'elle est guidee.
+; Matrix_OrthonormalizeKeepRow1_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres idiv par
+; c1 SANS garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18
+; * dt (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 +
+; Matrix_ApplyToVectorX_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5)
+; DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la bombe
+; (Matrix_LocalToWorld_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise en
+; cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de
+; vitesse tant qu'elle est guidee.
 ; ==============================================================================================
 GuidedBombBody_SteerToTarget_41BEF	proc far		; CODE XREF: seg089:0CE0p
 
@@ -1297,7 +1300,7 @@ loc_41CC4:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+C3j
 		push	57A6h
 		lea	ax, [bp+var_8C]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_84]
 		push	ax
@@ -1365,12 +1368,12 @@ loc_41DD8:				; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+1A8j
 		call	Matrix_BuildAxisY_570C5
 		add	sp, 4
 		push	57A6h
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		push	57A6h
 		lea	ax, [bp+var_68]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp+var_60]
 		mov	edx, eax
@@ -1509,7 +1512,7 @@ loc_41F07:
 		mov	ax, [si]
 		add	ax, 8
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		pop	si
 		leave

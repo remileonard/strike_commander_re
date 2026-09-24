@@ -938,7 +938,7 @@ loc_78422:
 		push	ax
 		lea	ax, [bp+var_14C]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, si
 		add	di, 0B0h ; '�'
@@ -1225,12 +1225,12 @@ loc_78792:
 		mov	ax, si
 		add	ax, 2Ch	; ','
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		jmp	loc_796AA	; default
 ; ���������������������������������������������������������������������������
@@ -1275,7 +1275,7 @@ loc_7888D:
 		push	ax
 
 loc_78892:
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_14C]
 		mov	[si+2Ch], eax
@@ -1302,7 +1302,7 @@ loc_78892:
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	byte ptr [si+0FEh], 0FFh
 		jmp	loc_796AA	; default
@@ -1808,7 +1808,7 @@ loc_78F0C:				; CODE XREF: CameraScript_ExecuteCOMP_781D0+D37j
 		push	ax
 		lea	ax, [bp+var_14C]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, [si+92h]
 		add	di, 12h
@@ -1981,7 +1981,7 @@ loc_79124:
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [bp+var_9E]
 		mov	[si+8Ah], eax
@@ -2222,7 +2222,7 @@ loc_79466:				; CODE XREF: CameraScript_ExecuteCOMP_781D0:loc_78923j
 		mov	ax, si
 		add	ax, 0C0h ; '�'
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 
 loc_7948A:				; CODE XREF: CameraScript_ExecuteCOMP_781D0+129Bj
@@ -2243,7 +2243,7 @@ loc_79491:				; CODE XREF: CameraScript_ExecuteCOMP_781D0:loc_78923j
 		mov	ax, si
 		add	ax, 0CCh ; '�'
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 
 loc_794B5:				; CODE XREF: CameraScript_ExecuteCOMP_781D0+12C6j
@@ -2650,7 +2650,7 @@ loc_798EC:
 		push	ax
 		lea	ax, [bp+var_14C]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, [si+92h]
 		add	di, 12h
@@ -2796,7 +2796,7 @@ loc_79A7B:
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_79ABB:				; CODE XREF: CameraScript_ExecuteCOMP_781D0+1845j

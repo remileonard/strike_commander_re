@@ -810,7 +810,7 @@ arg_0		= word ptr  6
 		mov	[bp+var_78], eax
 		lea	ax, [bp+var_80]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_7C]
 		mov	[bp+var_8C], eax
@@ -909,7 +909,7 @@ loc_2E3E3:
 		push	ax
 
 loc_2E3F1:
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 
 loc_2E3F6:
 		add	sp, 4
@@ -926,7 +926,7 @@ loc_2E401:
 		push	ax
 		lea	ax, [bp+var_8C]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	[bp+var_28], 0E6h ; '�'
 

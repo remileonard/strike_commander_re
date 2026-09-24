@@ -2560,8 +2560,8 @@ off_6F668	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6F66C	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F670	dd WorldObject_MethodReturnTrue_3CAD9
 off_6F674	dd loc_3805E
-off_6F678	dd loc_3CB2D
-		dd loc_3CB95
+off_6F678	dd WorldObject_GetOrientationMatrix_3CB2D
+		dd WorldObject_SetOrientationMatrix_3CB95
 		dd loc_3809B
 off_6F684	dd loc_381BB
 off_6F688	dd loc_38127
@@ -2595,8 +2595,8 @@ off_6F6F4	dd WorldObject_ComposeOrientation3Angles_3CAE3
 		dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F6FC	dd loc_3D9F1
 		dd loc_3805E
-off_6F704	dd loc_3CB2D
-off_6F708	dd loc_3CB95
+off_6F704	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6F708	dd WorldObject_SetOrientationMatrix_3CB95
 		dd loc_3CFFF
 off_6F710	dd loc_3D0F9
 off_6F714	dd loc_3D246
@@ -2630,8 +2630,8 @@ off_6F780	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6F784	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 		dd loc_3CF54
 		dd loc_3805E
-off_6F790	dd loc_3CB2D
-off_6F794	dd loc_3CB95
+off_6F790	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6F794	dd WorldObject_SetOrientationMatrix_3CB95
 		dd loc_3CFFF
 off_6F79C	dd loc_3D0F9
 off_6F7A0	dd loc_3D246
@@ -2665,8 +2665,8 @@ off_6F808	dd Debris_BodyDetach
 off_6F810	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F814	dd loc_3DDBA
 		dd loc_3805E
-		dd loc_3CB2D
-off_6F820	dd loc_3CB95
+		dd WorldObject_GetOrientationMatrix_3CB2D
+off_6F820	dd WorldObject_SetOrientationMatrix_3CB95
 off_6F824	dd loc_3CFFF
 		dd loc_3D0F9
 off_6F82C	dd loc_3D246
@@ -2700,8 +2700,8 @@ off_6F894	dd Debris_BodyDetach
 off_6F89C	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F8A0	dd loc_3E1F7
 off_6F8A4	dd loc_3805E
-off_6F8A8	dd loc_3CB2D
-off_6F8AC	dd loc_3CB95
+off_6F8A8	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6F8AC	dd WorldObject_SetOrientationMatrix_3CB95
 off_6F8B0	dd loc_3CFFF
 off_6F8B4	dd loc_3D0F9
 off_6F8B8	dd loc_3D246
@@ -2745,8 +2745,8 @@ off_6F94C	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6F950	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F954	dd loc_418A9
 off_6F958	dd loc_43325
-off_6F95C	dd loc_3CB2D
-off_6F960	dd loc_3CB95
+off_6F95C	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6F960	dd WorldObject_SetOrientationMatrix_3CB95
 off_6F964	dd loc_3CFFF
 off_6F968	dd loc_3D0F9
 off_6F96C	dd loc_3D246
@@ -2780,8 +2780,8 @@ off_6F9D4	dd Debris_BodyDetach
 off_6F9DC	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6F9E0	dd loc_433AD
 off_6F9E4	dd loc_43325
-off_6F9E8	dd loc_3CB2D
-		dd loc_3CB95
+off_6F9E8	dd WorldObject_GetOrientationMatrix_3CB2D
+		dd WorldObject_SetOrientationMatrix_3CB95
 off_6F9F0	dd loc_3CFFF
 off_6F9F4	dd loc_3D0F9
 off_6F9F8	dd loc_3D246
@@ -2815,8 +2815,8 @@ off_6FA64	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FA68	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6FA6C	dd loc_418A9
 off_6FA70	dd loc_43325
-off_6FA74	dd loc_3CB2D
-off_6FA78	dd loc_3CB95
+off_6FA74	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FA78	dd WorldObject_SetOrientationMatrix_3CB95
 		dd loc_3CFFF
 off_6FA80	dd loc_3D0F9
 off_6FA84	dd loc_3D246
@@ -2850,8 +2850,8 @@ off_6FAF0	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FAF4	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6FAF8	dd Missile_GetCategory_4244E
 off_6FAFC	dd loc_43325
-off_6FB00	dd loc_3CB2D
-off_6FB04	dd loc_3CB95
+off_6FB00	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FB04	dd WorldObject_SetOrientationMatrix_3CB95
 off_6FB08	dd loc_3CFFF
 off_6FB0C	dd loc_3D0F9
 off_6FB10	dd loc_3D246
@@ -2885,8 +2885,8 @@ off_6FB7C	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FB80	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6FB84	dd loc_43487
 		dd loc_3805E
-off_6FB8C	dd loc_3CB2D
-off_6FB90	dd loc_3CB95
+off_6FB8C	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FB90	dd WorldObject_SetOrientationMatrix_3CB95
 off_6FB94	dd loc_3809B
 off_6FB98	dd loc_381BB
 off_6FB9C	dd loc_38127
@@ -2944,8 +2944,8 @@ off_6FC32	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FC36	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6FC3A	dd loc_453D9
 off_6FC3E	dd loc_3805E
-off_6FC42	dd loc_3CB2D
-off_6FC46	dd loc_3CB95
+off_6FC42	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FC46	dd WorldObject_SetOrientationMatrix_3CB95
 off_6FC4A	dd loc_3CFFF
 off_6FC4E	dd loc_3D0F9
 off_6FC52	dd loc_3D246
@@ -2985,8 +2985,8 @@ off_6FCF8	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FCFC	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_6FD00	dd loc_45AAF
 off_6FD04	dd loc_3805E
-off_6FD08	dd loc_3CB2D
-off_6FD0C	dd loc_3CB95
+off_6FD08	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FD0C	dd WorldObject_SetOrientationMatrix_3CB95
 off_6FD10	dd loc_3809B
 off_6FD14	dd loc_381BB
 off_6FD18	dd loc_38127
@@ -3055,8 +3055,8 @@ off_6FE10	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_6FE14	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 		dd loc_461A4
 off_6FE1C	dd loc_3805E
-off_6FE20	dd loc_3CB2D
-off_6FE24	dd loc_3CB95
+off_6FE20	dd WorldObject_GetOrientationMatrix_3CB2D
+off_6FE24	dd WorldObject_SetOrientationMatrix_3CB95
 off_6FE28	dd loc_3809B
 off_6FE2C	dd loc_381BB
 off_6FE30	dd loc_38127
@@ -3307,8 +3307,8 @@ off_70106	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_7010A	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_7010E	dd loc_4C00B
 off_70112	dd loc_4BFFE
-off_70116	dd loc_3CB2D
-off_7011A	dd loc_3CB95
+off_70116	dd WorldObject_GetOrientationMatrix_3CB2D
+off_7011A	dd WorldObject_SetOrientationMatrix_3CB95
 off_7011E	dd loc_3809B
 off_70122	dd loc_381BB
 off_70126	dd loc_38127
@@ -3353,8 +3353,8 @@ off_701CA	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_701CE	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_701D2	dd loc_4C15E
 off_701D6	dd loc_3805E
-off_701DA	dd loc_3CB2D
-off_701DE	dd loc_3CB95
+off_701DA	dd WorldObject_GetOrientationMatrix_3CB2D
+off_701DE	dd WorldObject_SetOrientationMatrix_3CB95
 off_701E2	dd loc_3809B
 off_701E6	dd loc_381BB
 off_701EA	dd loc_38127
@@ -3434,8 +3434,8 @@ off_7030E	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_70312	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_70316	dd loc_4F281
 off_7031A	dd loc_3805E
-off_7031E	dd loc_3CB2D
-off_70322	dd loc_3CB95
+off_7031E	dd WorldObject_GetOrientationMatrix_3CB2D
+off_70322	dd WorldObject_SetOrientationMatrix_3CB95
 off_70326	dd loc_3809B
 off_7032A	dd loc_381BB
 off_7032E	dd loc_38127
@@ -3483,8 +3483,8 @@ off_703D2	dd WorldObject_ComposeOrientation3Angles_3CAE3
 off_703D6	dd WorldObject_ComposeOrientationAngleArray_3CB0B
 off_703DA	dd ClassStub_ReturnConst16h_4F30C
 off_703DE	dd loc_3805E
-off_703E2	dd loc_3CB2D
-off_703E6	dd loc_3CB95
+off_703E2	dd WorldObject_GetOrientationMatrix_3CB2D
+off_703E6	dd WorldObject_SetOrientationMatrix_3CB95
 off_703EA	dd loc_3CFFF
 off_703EE	dd loc_3D0F9
 off_703F2	dd loc_3D246

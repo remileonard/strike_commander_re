@@ -79,7 +79,7 @@ loc_2B131:
 		mov	ax, si
 		inc	ax
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_2B141:				; CODE XREF: ListItem_ConstructThreeParams+43j
@@ -134,7 +134,7 @@ loc_2B16F:
 		mov	ax, si
 		inc	ax
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 
 loc_2B187:				; CODE XREF: ListItem_ConstructVector3D+31j

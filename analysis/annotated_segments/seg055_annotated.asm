@@ -263,7 +263,7 @@ loc_29351:
 		push	ss
 		lea	ax, [bp+var_30]
 		push	ax
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_30]
 		mov	[bp+var_24], eax

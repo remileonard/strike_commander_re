@@ -345,7 +345,7 @@ loc_1D156:				; CODE XREF: seg030:0241j
 		push	ax
 		lea	ax, [bp-0F6h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-0BAh]
 
@@ -376,7 +376,7 @@ loc_1D1E1:
 		push	ax
 		lea	ax, [bp-0DEh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	large dword ptr	[bp-0D6h]
 		push	large dword ptr	[bp-0DAh]

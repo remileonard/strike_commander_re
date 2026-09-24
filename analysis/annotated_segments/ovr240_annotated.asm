@@ -742,7 +742,7 @@ loc_7D9A8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+689j
 		push	ax
 		lea	ax, [bp+var_66]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, [bp+var_66]
 		add	[si+14h], eax
@@ -792,7 +792,7 @@ loc_7D9A8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+689j
 		push	ax
 		lea	ax, [bp+var_66]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	byte ptr [bp+var_48+1],	0
 		jmp	loc_7DD34

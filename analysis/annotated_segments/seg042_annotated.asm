@@ -411,7 +411,7 @@ loc_24300:				; CODE XREF: Cinematic_SplineCompute:loc_242FBj
 		push	5166h
 		lea	ax, [bp+var_110]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	ax, si
 		shl	ax, 2

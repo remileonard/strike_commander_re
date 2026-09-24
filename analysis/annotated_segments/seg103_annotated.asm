@@ -262,7 +262,7 @@ Aero_ComputeAoAWithTrim_480CA	endp
 ; · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord
 ; : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6
 ; (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB /
-; Targeting_LineOfSightCheck_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail :
+; Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail :
 ; analysis/DATA_MODEL.md 6.2.
 ; ==============================================================================================
 Aero_ComputeLiftAndSideForce_4812B	proc far		; CODE XREF: Aero_SumLinearForces_48639+69p
@@ -451,7 +451,7 @@ loc_48241:
 		mov	[bp+var_36], eax
 		lea	ax, [bp+var_3E]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_3E]
 		mov	edx, [bp+var_26]
@@ -526,7 +526,7 @@ loc_48342:
 		mov	[bp+var_42], 0
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_4A]
 		mov	edx, [bp+var_26]
@@ -2475,7 +2475,7 @@ arg_6		= dword	ptr  0Ch
 		mov	di, [bp+arg_4]
 		mov	dword ptr [di+8], 0
 		push	di
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, di
 		add	ax, 4
@@ -2525,7 +2525,7 @@ loc_492D6:
 		push	ax
 
 loc_492DB:
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 
 loc_492E0:
 		add	sp, 4
@@ -3109,7 +3109,7 @@ loc_498B0:
 ; principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée
 ; sub_49C2E, corrigée en session antérieure : c'est un moteur cinématique de poursuite/homing
 ; IA, appelé depuis PhysicsTicks UNIQUEMENT quand [si+0x68]!=0xFF, c.a.d. en mode
-; autopilote/IA, pas en vol manuel). Appelle Matrix_ApplyToVectorY_57660 /
+; autopilote/IA, pas en vol manuel). Appelle Matrix_OrthonormalizeKeepRow1_57660 /
 ; Matrix_BuildAxisY_570C5 (cluster de composition de rotation confirmé ailleurs) avec une
 ; constante de référence 0x500 : sous-calcul angulaire du guidage IA (probable calcul de
 ; portance/orientation cible), rôle exact toujours à détailler.
@@ -3269,7 +3269,7 @@ loc_499BF:
 loc_499C7:
 		lea	ax, [bp+var_44]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	di, si
 
@@ -3316,10 +3316,10 @@ loc_499E1:
 		mov	ax, si
 		add	ax, 0Ch
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	si
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_49A78:				; CODE XREF: JDYN_TickSubcalcA+50j
@@ -3338,9 +3338,9 @@ JDYN_TickSubcalcA	endp
 ; far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN
 ; principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée
 ; sub_49C2E, corrigée en session antérieure). Utilise AI_ComputeGeometrySolution_57C67
-; (sin/cos) avec constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_ApplyToVectorY_57660 :
-; sous-calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle
-; exact toujours à détailler.
+; (sin/cos) avec constante 0xA00, puis
+; Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-calcul angulaire du
+; guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler.
 ; ==============================================================================================
 JDYN_TickSubcalcB	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+8B1p
 
@@ -3592,7 +3592,7 @@ loc_49C12:				; CODE XREF: JDYN_TickSubcalcB+181j
 		call	Matrix_BuildAxisY_570C5
 		add	sp, 4
 		push	[bp+arg_2]
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_49C2A:				; CODE XREF: JDYN_TickSubcalcB+122j
@@ -4006,7 +4006,7 @@ loc_49E37:
 		mov	[bp+var_166], eax
 		lea	ax, [bp+var_16E]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_5C]
 
@@ -4660,7 +4660,7 @@ loc_4A4BD:				; CODE XREF: Guidance_HomingVelocityUpdate+876j
 		push	di
 
 loc_4A4D1:
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_A0]
 		push	ax
@@ -4909,7 +4909,7 @@ loc_4A6E0:
 		push	ax
 
 loc_4A6E5:
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_246]
 		mov	edx, [bp+var_2C]

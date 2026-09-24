@@ -144,7 +144,7 @@ loc_14937:				; CODE XREF: seg014:00D1j seg014:00DBj
 ; vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag
 ; 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice
 ; d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par
-; Math_ApplyRotationHelperA_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée.
+; Matrix_WorldToLocal_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée.
 ; targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8).
 ; POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité
 ; (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le
@@ -152,13 +152,13 @@ loc_14937:				; CODE XREF: seg014:00D1j seg014:00DBj
 ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20]
 ; (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick
 ; (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas ->
-; Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_ApplyToVectorY_57660 accumulés
-; dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 ->
-; si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448
-; (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos
-; lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice
-; d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir
-; CAMERA_SYSTEM.md §4bis.
+; Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_OrthonormalizeKeepRow1_57660
+; accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM :
+; byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF]
+; -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs :
+; +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B
+; matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist
+; min. Voir CAMERA_SYSTEM.md §4bis.
 ; ==============================================================================================
 Camera_OrbitTrackCompute_1493A:				; DATA XREF: seg339:07ACo
 		push	bp
@@ -191,7 +191,7 @@ loc_14950:				; CODE XREF: seg014:00FBj
 		push	ax
 		lea	ax, [bp-68h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [si+0AFh]
 		neg	eax
@@ -599,7 +599,7 @@ loc_14E25:				; CODE XREF: seg014:0556j seg014:0588j ...
 		mov	ax, si
 		add	ax, 8Bh	; '�'
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_14E31:				; CODE XREF: seg014:04BAj

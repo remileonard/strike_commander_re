@@ -303,7 +303,7 @@ loc_1F6D0:
 		mov	[bp-96h], eax
 		lea	ax, [bp-9Eh]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		push	large dword ptr	[bp-14h]
 		les	bx, [bp-14h]
@@ -415,7 +415,7 @@ loc_1F7D0:
 		push	ax
 		lea	ax, [bp-86h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	ax, [bp-2]
 		sub	ax, [bp-4]

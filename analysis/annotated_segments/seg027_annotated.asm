@@ -315,7 +315,7 @@ loc_1BBF1:
 		push	ax
 		lea	ax, [bp-21Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-21Ah]
 		mov	[bp-20h], eax

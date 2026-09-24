@@ -637,7 +637,7 @@ loc_86BF:				; CODE XREF: AI_NavSolutionToPoint+172j
 		mov	[bp+var_1], 1
 		lea	ax, [bp+var_58]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]

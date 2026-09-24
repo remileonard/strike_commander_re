@@ -97,7 +97,7 @@ Camera_UpdateAndNotifyB_861E0	endp
 
 ; ==============================================================================================
 ; ⭐⚠️ far, 628 lignes, NON DÉTAILLÉE — combine longueur vectorielle,
-; Math_ApplyRotationHelperB_58828, UI_ApplyVectorLength_55B04, Vector_TransformHelperB_559BB
+; Matrix_LocalToWorld_58828, Vector_PrescaleBelow256_55B04, Vector_TransformHelperB_559BB
 ; (seg116-117) — grande fonction de calcul de solution de ciblage IA. Candidat pour session
 ; dédiée.
 ; ==============================================================================================
@@ -301,11 +301,11 @@ loc_863C9:				; DATA XREF: ovr248:off_8692Eo
 		push	ax
 		lea	ax, [bp+var_BA]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		lea	ax, [bp+var_BA]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_BA]
 		push	ax
@@ -438,7 +438,7 @@ loc_8656D:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+2C4j
 loc_86574:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+2CAj
 		lea	ax, [bp+var_BA]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_BA]
 		push	ax
@@ -555,7 +555,7 @@ loc_866D5:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+11Fj
 		mov	[bp+var_B2], eax
 		lea	ax, [bp+var_BA]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp+var_BA]
 		push	ax
@@ -566,7 +566,7 @@ loc_866D5:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+11Fj
 		push	ax
 		lea	ax, [bp+var_BA]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	[bp+var_5E], 0F3h ; '�'
 		mov	eax, [di+40h]
@@ -685,7 +685,7 @@ loc_86852:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+182j
 		push	ss
 		lea	ax, [bp+var_132]
 		push	ax
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_132]
 		mov	[si+20h], eax
@@ -707,7 +707,7 @@ loc_86852:				; CODE XREF: AITargeting_ComputeFullSolution_862A5+182j
 		push	ss
 		lea	ax, [bp+var_13E]
 		push	ax
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_13E]
 		mov	[si+38h], eax

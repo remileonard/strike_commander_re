@@ -163,7 +163,7 @@ loc_38E5F:				; CODE XREF: Explosion_CreateFireball+6Cj
 		push	[bp+arg_4]
 		lea	ax, [bp+var_48]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		jmp	loc_3900C
 ; ���������������������������������������������������������������������������
@@ -230,7 +230,7 @@ loc_38F45:				; CODE XREF: Explosion_CreateFireball:loc_38F1Dj
 		push	5746h
 		lea	ax, [bp+var_54]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, dword_7281A
 		add	[bp+var_54], eax
@@ -1040,7 +1040,7 @@ loc_39581:				; CODE XREF: seg080:07FCj
 		push	5746h
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, [bp-10h]
 		add	dword_7281A, eax
@@ -1055,7 +1055,7 @@ loc_395E0:				; CODE XREF: seg080:0832j
 		push	5722h
 		lea	ax, [bp-10h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, [bp-10h]
 		sub	eax, dword_7281A
@@ -1157,7 +1157,7 @@ loc_396B0:				; CODE XREF: seg080:092Bj
 		push	5722h
 		lea	ax, [bp-28h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, dword_7281A
 		sub	[bp-28h], eax
@@ -1173,7 +1173,7 @@ loc_39701:				; CODE XREF: seg080:0953j
 		push	5746h
 		lea	ax, [bp-28h]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	eax, dword_7281A
 		add	[bp-28h], eax
@@ -1186,7 +1186,7 @@ loc_39701:				; CODE XREF: seg080:0953j
 loc_3972B:				; CODE XREF: seg080:097Fj
 		lea	ax, [bp-28h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		les	bx, [bp+6]
 		mov	eax, es:[bx+23h]
@@ -1793,7 +1793,7 @@ arg_0		= dword	ptr  6
 		sub	dword_7283A, eax
 		push	5746h
 		push	5776h
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	5746h
 		jmp	short loc_39BCF
@@ -1814,13 +1814,13 @@ loc_39B88:				; CODE XREF: Effect_RenderVolumetric+14j
 		add	dword_7283A, eax
 		push	5722h
 		push	5776h
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	5722h
 
 loc_39BCF:				; CODE XREF: Effect_RenderVolumetric+5Dj
 		push	5782h
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	eax, es:[bx+23h]
@@ -2274,7 +2274,7 @@ arg_4		= dword	ptr  0Ah
 		jz	short loc_3A1EA
 		push	5746h
 		push	5776h
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	5746h
 		jmp	short loc_3A1FB
@@ -2283,13 +2283,13 @@ arg_4		= dword	ptr  0Ah
 loc_3A1EA:				; CODE XREF: Debug_ToggleWireframeMode+Fj
 		push	5722h
 		push	5776h
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	5722h
 
 loc_3A1FB:				; CODE XREF: Debug_ToggleWireframeMode+22j
 		push	5782h
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	al, byte_6EC34
 		mov	ah, 0

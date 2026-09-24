@@ -179,7 +179,7 @@ loc_54FB6:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Math_VectorLength_ShiftUpIfSmall_55868
+		call	near ptr Vector_PrescaleDownByShift_55868
 
 loc_54FBF:
 		add	sp, 8
@@ -317,10 +317,11 @@ Math_DotProduct3D_5505B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, helper vectoriel générique (alloue via sub_658), utilisé massivement par le cluster de
-; construction de matrice de rotation (575DF/57660/576E5).
+; far, LUE (2026-09-24). Ex-'Vector_TransformHelperA'. PRODUIT VECTORIEL a x b en 24.8 (a =
+; arg_4, b = arg_6) : (a1*b2 - a2*b1, a2*b0 - a0*b2, a0*b1 - a1*b0), chaque produit imul /
+; shrd 8. Resultat ecrit dans arg_0 (alloue 12 octets si nul).
 ; ==============================================================================================
-Vector_TransformHelperA_550B7	proc far		; CODE XREF: AI_ProximityGeometricWarning_315B+A3P Goal_FollowAllyFormation+E7P ...
+Vector_CrossProduct3D_550B7	proc far		; CODE XREF: AI_ProximityGeometricWarning_315B+A3P Goal_FollowAllyFormation+E7P ...
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -397,13 +398,13 @@ loc_55142:
 		jmp	short loc_55154
 ; ���������������������������������������������������������������������������
 
-loc_5514A:				; CODE XREF: Vector_TransformHelperA_550B7+8Dj
+loc_5514A:				; CODE XREF: Vector_CrossProduct3D_550B7+8Dj
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_55154:				; CODE XREF: Vector_TransformHelperA_550B7+91j
+loc_55154:				; CODE XREF: Vector_CrossProduct3D_550B7+91j
 		or	ax, ax
 		jz	short loc_55173
 		mov	eax, [bp+var_C]
@@ -416,17 +417,17 @@ loc_55154:				; CODE XREF: Vector_TransformHelperA_550B7+91j
 		jmp	short loc_55175
 ; ���������������������������������������������������������������������������
 
-loc_55173:				; CODE XREF: Vector_TransformHelperA_550B7+9Fj
+loc_55173:				; CODE XREF: Vector_CrossProduct3D_550B7+9Fj
 		mov	ax, si
 
-loc_55175:				; CODE XREF: Vector_TransformHelperA_550B7+BAj
+loc_55175:				; CODE XREF: Vector_CrossProduct3D_550B7+BAj
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	di
 		pop	si
 		leave
 		retf
-Vector_TransformHelperA_550B7	endp
+Vector_CrossProduct3D_550B7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1385,10 +1386,12 @@ Math_VectorLength_ShiftDownIfLarge_55793	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante symétrique de Math_VectorLength_ShiftDownIfLarge — décalage vers le haut si
-; les valeurs sont trop petites (précision).
+; far, LUE (2026-09-24). Ex-'Math_VectorLength_ShiftUpIfSmall' (nom inverse du code). (v,
+; limite, pas) : tant que |composante| > limite << 8 pour l'une des trois, decale les valeurs
+; absolues de pas bits ; applique ensuite le decalage total aux composantes signees de v
+; (sar). Renvoie le decalage total. Direction conservee, norme reduite par 2^decalage.
 ; ==============================================================================================
-Math_VectorLength_ShiftUpIfSmall_55868	proc far		; CODE XREF: Math_VectorLength3D_Scaled_54F57+65p
+Vector_PrescaleDownByShift_55868	proc far		; CODE XREF: Math_VectorLength3D_Scaled_54F57+65p
 					; Math_VectorLengthUnscaled_55920:loc_5592Fp	...
 
 var_C		= dword	ptr -0Ch
@@ -1408,28 +1411,28 @@ arg_6		= byte ptr  0Ch
 		jge	short loc_5587D
 		neg	eax
 
-loc_5587D:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+10j
+loc_5587D:				; CODE XREF: Vector_PrescaleDownByShift_55868+10j
 		mov	[bp+var_4], eax
 		mov	eax, [si+4]
 		or	eax, eax
 		jge	short loc_5588D
 		neg	eax
 
-loc_5588D:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+20j
+loc_5588D:				; CODE XREF: Vector_PrescaleDownByShift_55868+20j
 		mov	[bp+var_8], eax
 		mov	eax, [si+8]
 		or	eax, eax
 		jge	short loc_5589D
 		neg	eax
 
-loc_5589D:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+30j
+loc_5589D:				; CODE XREF: Vector_PrescaleDownByShift_55868+30j
 		mov	[bp+var_C], eax
 		mov	dl, 0
 		jmp	short loc_558CC
 ; ���������������������������������������������������������������������������
 
-loc_558A5:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+70j
-					; Math_VectorLength_ShiftUpIfSmall_55868+7Ej ...
+loc_558A5:				; CODE XREF: Vector_PrescaleDownByShift_55868+70j
+					; Vector_PrescaleDownByShift_55868+7Ej ...
 		mov	cl, [bp+arg_6]
 		mov	eax, [bp+var_4]
 		sar	eax, cl
@@ -1442,7 +1445,7 @@ loc_558A5:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+70j
 		mov	[bp+var_C], eax
 		add	dl, [bp+arg_6]
 
-loc_558CC:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+3Bj
+loc_558CC:				; CODE XREF: Vector_PrescaleDownByShift_55868+3Bj
 		mov	eax, [bp+arg_2]
 		shl	eax, 8
 		cmp	eax, [bp+var_4]
@@ -1468,12 +1471,12 @@ loc_558CC:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+3Bj
 		sar	eax, cl
 		mov	[si+8],	eax
 
-loc_5591B:				; CODE XREF: Math_VectorLength_ShiftUpIfSmall_55868+90j
+loc_5591B:				; CODE XREF: Vector_PrescaleDownByShift_55868+90j
 		mov	al, dl
 		pop	si
 		leave
 		retf
-Math_VectorLength_ShiftUpIfSmall_55868	endp
+Vector_PrescaleDownByShift_55868	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1505,7 +1508,7 @@ loc_5592D:
 		push	cs
 
 loc_5592F:
-		call	near ptr Math_VectorLength_ShiftUpIfSmall_55868
+		call	near ptr Vector_PrescaleDownByShift_55868
 
 loc_55932:
 		add	sp, 8
@@ -1521,10 +1524,11 @@ Math_VectorLengthUnscaled_55920	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par Targeting_AcquireBestThreat (sub_3314) — utilise sub_5828E (longueur
-; vectorielle), probable test de ligne de vue/distance vers une cible.
+; far, LUE (2026-09-24). Ex-'Targeting_LineOfSightCheck' (FAUX). NORMALISATION en place d'un
+; vecteur 3x i32 24.8 : n = Math_VectorLength3D_Raw_5828E(v) ; si n != 0, chaque composante =
+; (c << 8) / n (shl eax,8 / idiv ecx) ; n nul : vecteur inchange. Renvoie le pointeur.
 ; ==============================================================================================
-Targeting_LineOfSightCheck_5593A	proc far		; CODE XREF: Targeting_AcquireBestThreat+722P
+Vector_NormalizeInPlace_5593A	proc far		; CODE XREF: Targeting_AcquireBestThreat+722P
 					; Targeting_AcquireBestThreat+822P ...
 
 var_8		= dword	ptr -8
@@ -1570,12 +1574,12 @@ arg_0		= word ptr  6
 		idiv	ecx
 		mov	[si+8],	eax
 
-loc_559B6:				; CODE XREF: Targeting_LineOfSightCheck_5593A+2Ej
+loc_559B6:				; CODE XREF: Vector_NormalizeInPlace_5593A+2Ej
 		mov	ax, si
 		pop	si
 		leave
 		retf
-Targeting_LineOfSightCheck_5593A	endp
+Vector_NormalizeInPlace_5593A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1719,7 +1723,7 @@ Utility_Helper_55A62	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée depuis seg014/seg015 (UI cockpit), appelle Targeting_LineOfSightCheck_5593A.
+; far, référencée depuis seg014/seg015 (UI cockpit), appelle Vector_NormalizeInPlace_5593A.
 ; ==============================================================================================
 UI_ApplyLineOfSightCheck_55A9E	proc far		; CODE XREF: seg014:0235P seg015:0978P ...
 
@@ -1741,7 +1745,7 @@ loc_55AA6:
 		mov	di, [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		cmp	dword ptr [di],	100h
 		jz	short loc_55AFE
@@ -1779,9 +1783,12 @@ UI_ApplyLineOfSightCheck_55A9E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée depuis seg015 (UI cockpit), appelle Math_VectorLengthUnscaled_55920.
+; far, LUE (2026-09-24). Ex-'UI_ApplyVectorLength'. Appelle
+; Vector_PrescaleDownByShift_55868(v, 0x100, 3) : divise le vecteur par 8 (sar 3) tant qu'une
+; composante depasse 256.0, pour eviter le debordement avant une normalisation. Direction
+; conservee.
 ; ==============================================================================================
-UI_ApplyVectorLength_55B04	proc far		; CODE XREF: seg015:03ACP
+Vector_PrescaleBelow256_55B04	proc far		; CODE XREF: seg015:03ACP
 					; Radar_Project3DToScreen:loc_16A4EP	...
 
 arg_0		= word ptr  6
@@ -1796,7 +1803,7 @@ arg_0		= word ptr  6
 		add	sp, 6
 		pop	bp
 		retf
-UI_ApplyVectorLength_55B04	endp
+Vector_PrescaleBelow256_55B04	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2368,7 +2375,7 @@ loc_55F2E:
 		push	cs
 
 loc_55F33:
-		call	near ptr Math_VectorLength_ShiftUpIfSmall_55868
+		call	near ptr Vector_PrescaleDownByShift_55868
 		add	sp, 8
 		mov	[bp+var_2], al
 
@@ -3873,7 +3880,7 @@ loc_56DDF:				; CODE XREF: Map_ApplyRotationTransform_56DC5+Aj
 		push	si
 		nop
 		push	cs
-		call	near ptr Matrix_ApplyToVectorY_57660
+		call	near ptr Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_56E23:				; CODE XREF: Map_ApplyRotationTransform_56DC5+18j
@@ -4689,7 +4696,7 @@ loc_5752A:				; CODE XREF: Matrix_BuildAxisY_ApplyToObject_57508+1Dj
 		push	si
 		nop
 		push	cs
-		call	near ptr Matrix_ApplyToVectorY_57660
+		call	near ptr Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
 loc_57557:				; CODE XREF: Matrix_BuildAxisY_ApplyToObject_57508+46j
@@ -4813,7 +4820,7 @@ Matrix_BuildFullOrientation_575B2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, applique une transformation à un vecteur (3× Vector_TransformHelperA_550B7 + 3×
+; far, applique une transformation à un vecteur (3× Vector_CrossProduct3D_550B7 + 3×
 ; Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF).
 ; ==============================================================================================
 Matrix_ApplyToVectorX_575DF	proc far		; CODE XREF: GuidedBombBody_SteerToTarget_41BEF+2E5P
@@ -4840,7 +4847,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_C]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		mov	[si+18h], eax
@@ -4856,7 +4863,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_18]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_18]
 		mov	[si+0Ch], eax
@@ -4892,10 +4899,12 @@ Matrix_ApplyToVectorX_575DF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Matrix_ApplyToVectorX pour un autre axe. Référencée par
-; AI_ManeuverSolution_Major_6977.
+; far, LUE (2026-09-24). Ex-'Matrix_ApplyToVectorY'. Re-orthonormalise une matrice 3x3 en
+; GARDANT la ligne 1 (+0x0C) : ligne 2 = Vector_CrossProduct3D_550B7(ligne 0, ligne 1), ligne
+; 0 = Vector_CrossProduct3D_550B7(ligne 1, ligne 2), puis Vector_Normalize3D_559BB sur les
+; trois lignes.
 ; ==============================================================================================
-Matrix_ApplyToVectorY_57660	proc far		; CODE XREF: AI_ManeuverSolution_Major+3EFP
+Matrix_OrthonormalizeKeepRow1_57660	proc far		; CODE XREF: AI_ManeuverSolution_Major+3EFP
 					; Formation_GuidanceSolution+8CDP ...
 
 var_18		= dword	ptr -18h
@@ -4919,7 +4928,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_C]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		mov	[si+18h], eax
@@ -4937,7 +4946,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_18]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_18]
 		mov	[si], eax
@@ -4965,7 +4974,7 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-Matrix_ApplyToVectorY_57660	endp
+Matrix_OrthonormalizeKeepRow1_57660	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5002,7 +5011,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_C]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		mov	[si], eax
@@ -5018,7 +5027,7 @@ arg_0		= word ptr  6
 		lea	ax, [bp+var_18]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_18]
 		mov	[si+0Ch], eax
@@ -5055,7 +5064,7 @@ Matrix_ApplyToVectorZ_576E5	endp
 
 ; ==============================================================================================
 ; far, référencée par seg084 (constructeurs objets du monde), appelle sub_58768 ×2 et
-; Matrix_ApplyToVectorY_57660.
+; Matrix_OrthonormalizeKeepRow1_57660.
 ; ==============================================================================================
 WorldObject_ApplyOrientationVariantA_5776A	proc far		; CODE XREF: seg084:02FCP
 					; WorldObject_ApplyOrientationAndFilter_9D020+44P
@@ -5071,17 +5080,17 @@ arg_2		= word ptr  8
 		mov	di, [bp+arg_2]
 		push	di
 		push	si
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	di
 		mov	ax, si
 		add	ax, 0Ch
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	si
 		push	cs
-		call	near ptr Matrix_ApplyToVectorY_57660
+		call	near ptr Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	ax, si
 		pop	di
@@ -5096,7 +5105,8 @@ WorldObject_ApplyOrientationVariantA_5776A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée depuis seg015/seg084, appelle sub_58828 ×2 et Matrix_ApplyToVectorY_57660.
+; far, référencée depuis seg015/seg084, appelle sub_58828 ×2 et
+; Matrix_OrthonormalizeKeepRow1_57660.
 ; ==============================================================================================
 WorldObject_ApplyOrientationVariantB_5779A	proc far		; CODE XREF: seg015:09FDP seg084:02D7P ...
 
@@ -5111,17 +5121,17 @@ arg_2		= word ptr  8
 		mov	di, [bp+arg_2]
 		push	di
 		push	si
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	di
 		mov	ax, si
 		add	ax, 0Ch
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	si
 		push	cs
-		call	near ptr Matrix_ApplyToVectorY_57660
+		call	near ptr Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	ax, si
 		pop	di
@@ -5324,7 +5334,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-20h]
 		push	ax
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp-1Ch]
 		push	ax
@@ -5396,7 +5406,7 @@ GeomHelper_QuadrantCompute_5789E	endp
 		lea	ax, [bp-1Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp-18h]
 		push	ax
@@ -5462,7 +5472,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-20h]
 		push	ax
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp-1Ch]
 		push	ax
@@ -5534,7 +5544,7 @@ loc_57A43:				; CODE XREF: seg116:2B7Aj
 		lea	ax, [bp-1Ch]
 		push	ax
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp-18h]
 		push	ax
@@ -5594,7 +5604,7 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 		lea	ax, [bp-20h]
 		push	ax
 		push	cs
-		call	near ptr Targeting_LineOfSightCheck_5593A
+		call	near ptr Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp-1Ch]
 		push	ax
@@ -5862,8 +5872,8 @@ AI_ApplyApproachAngles_57D81	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée depuis seg014/seg015 (UI cockpit) — combine UI_ApplyVectorLength_55B04,
-; Targeting_LineOfSightCheck_5593A ×2, Vector_TransformHelperA_550B7.
+; far, référencée depuis seg014/seg015 (UI cockpit) — combine Vector_PrescaleBelow256_55B04,
+; Vector_NormalizeInPlace_5593A ×2, Vector_CrossProduct3D_550B7.
 ; ==============================================================================================
 UI_ApplyLineOfSightAndTransform_57DAE	proc far		; CODE XREF: seg014:04A2P seg015:09D8P ...
 
@@ -5882,7 +5892,7 @@ arg_2		= word ptr  8
 		mov	di, [bp+arg_2]
 		push	di
 		push	cs
-		call	near ptr UI_ApplyVectorLength_55B04
+		call	near ptr Vector_PrescaleBelow256_55B04
 		pop	cx
 		push	di
 		push	cs
@@ -5922,7 +5932,7 @@ loc_57DD5:				; CODE XREF: UI_ApplyLineOfSightAndTransform_57DAE+1Ej
 		lea	ax, [bp+var_C]
 		push	ax
 		push	cs
-		call	near ptr Vector_TransformHelperA_550B7
+		call	near ptr Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		mov	[si+18h], eax

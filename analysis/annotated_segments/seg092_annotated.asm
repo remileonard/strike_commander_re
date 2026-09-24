@@ -471,7 +471,7 @@ loc_43793:
 		mov	[bp-42h], eax
 		lea	ax, [bp-4Ah]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	word ptr [si+51h]
 		mov	bx, [si+51h]
@@ -502,7 +502,7 @@ loc_43793:
 		call	dword ptr [bx+3Ch]
 		pop	cx
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		push	3748h
 		push	di
@@ -891,7 +891,7 @@ loc_43B91:
 		mov	[bp+var_4C], eax
 		lea	ax, [bp+var_54]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_54]
 		mov	[bp+var_84], eax

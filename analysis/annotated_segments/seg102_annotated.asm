@@ -838,7 +838,7 @@ loc_46F75:				; CODE XREF: FlightControl_ComputeWindComponent+12j
 		add	sp, 6
 		lea	ax, [bp+var_14]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [si+10h]
 		neg	eax

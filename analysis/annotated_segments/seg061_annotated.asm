@@ -203,7 +203,7 @@ loc_2CA8A:
 		push	ax
 		lea	ax, [bp+var_74]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_68]
 		push	ax
@@ -359,7 +359,7 @@ loc_2CC22:
 		push	5166h
 		lea	ax, [bp-15Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-156h]
 		cmp	eax, dword_6E9A6
@@ -1419,7 +1419,7 @@ loc_2D556:
 		push	ax
 
 loc_2D570:
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 
 loc_2D578:

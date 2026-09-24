@@ -367,7 +367,11 @@ WorldObject_ComposeOrientationAngleArray_3CB0B:				; DATA XREF: seg339:off_6F66C
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3CB2D:				; DATA XREF: seg339:off_6F678o
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x3C (notamment classe missile, vtable seg339
+; 0x6FAC4) : renvoie l'adresse objet+0x2C = matrice d'orientation 3x3 24.8 (36 octets).
+; ==============================================================================================
+WorldObject_GetOrientationMatrix_3CB2D:				; DATA XREF: seg339:off_6F678o
 					; seg339:off_6F704o ...
 		push	bp
 		mov	bp, sp
@@ -416,7 +420,7 @@ loc_3CB5B:				; DATA XREF: seg339:25F8o
 		pop	cx
 		push	ax
 		push	word ptr [bp+8]
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		pop	si
 		pop	bp
@@ -439,7 +443,7 @@ loc_3CB82:
 		push	word ptr [bp+8]
 
 loc_3CB8A:
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 
 loc_3CB8F:
 		add	sp, 4
@@ -450,7 +454,12 @@ locret_3CB94:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3CB95:				; DATA XREF: seg339:25CCo
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode virtuelle +0x40 (notamment classe missile, vtable seg339
+; 0x6FAC4) : recopie 36 octets (AI_ComputeGeometryHelper_56E29) de la matrice passee en
+; argument dans objet+0x2C (orientation), puis appelle Debris_BodyDetach(objet).
+; ==============================================================================================
+WorldObject_SetOrientationMatrix_3CB95:				; DATA XREF: seg339:25CCo
 					; seg339:off_6F708o ...
 		push	bp
 		mov	bp, sp

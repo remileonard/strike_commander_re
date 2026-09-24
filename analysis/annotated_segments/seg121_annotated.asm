@@ -85,10 +85,10 @@ Weapon_HUDBox_DrawElementA_58ED5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 143 lignes, NON DÉTAILLÉE — combine UI_ApplyVectorLength_55B04,
+; ⚠️ far, 143 lignes, NON DÉTAILLÉE — combine Vector_PrescaleBelow256_55B04,
 ; Targeting_ComputeBearingElevation_55B1A (seg116), dispatch vtable et
-; Math_ApplyRotationHelperA_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage
-; HUD. Référencée par sub_59061.
+; Matrix_WorldToLocal_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage HUD.
+; Référencée par sub_59061.
 ; ==============================================================================================
 Weapon_HUDBox_ComputeGeometry_58F42	proc far		; CODE XREF: Weapon_HUDBox_DrawElementB_59061+55p
 
@@ -159,7 +159,7 @@ arg_4		= word ptr  0Ah
 		jg	short loc_5905A
 		lea	ax, [bp+var_22]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		push	[bp+arg_2]
 		mov	bx, [bp+arg_2]
@@ -209,7 +209,7 @@ loc_59033:
 		push	ax
 		lea	ax, [bp+var_22]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		cmp	[bp+var_1E], 0
 		jge	short loc_59050

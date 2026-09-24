@@ -940,10 +940,12 @@ Math_VectorTransformByMatrix3x3_58476	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_5ECE et seg014 (UI cockpit) — utilisée par
-; WorldObject_ApplyOrientationVariantA_5776A.
+; far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperA'. v = M . v : chaque sortie est le
+; produit scalaire de v avec une LIGNE de la matrice 3x3 24.8 (M+0, M+0x0C, M+0x18). Pour une
+; matrice d'orientation (lignes = axes de l'objet), passage du repere monde au repere de
+; l'objet. Inverse de Matrix_LocalToWorld_58828.
 ; ==============================================================================================
-Math_ApplyRotationHelperA_58768	proc far		; CODE XREF: AI_ComputeBearingToRef+39P seg014:0134P ...
+Matrix_WorldToLocal_58768	proc far		; CODE XREF: AI_ComputeBearingToRef+39P seg014:0134P ...
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -1009,7 +1011,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-Math_ApplyRotationHelperA_58768	endp
+Matrix_WorldToLocal_58768	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1017,9 +1019,12 @@ Math_ApplyRotationHelperA_58768	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_5392 — utilisée par WorldObject_ApplyOrientationVariantB_5779A.
+; far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperB'. v = transposee(M) . v : chaque sortie
+; combine une COLONNE de la matrice ([di],[di+0Ch],[di+18h] pour la 1re, etc.). Pour une
+; matrice orthonormee, inverse de Matrix_WorldToLocal_58768 : passage du repere de l'objet au
+; repere monde.
 ; ==============================================================================================
-Math_ApplyRotationHelperB_58828	proc far		; CODE XREF: AI_IncomingThreatWarning+187P
+Matrix_LocalToWorld_58828	proc far		; CODE XREF: AI_IncomingThreatWarning+187P
 					; AI_Sensor_WeaponVelocityCache+113P ...
 
 var_C		= dword	ptr -0Ch
@@ -1088,6 +1093,6 @@ loc_588DE:
 		pop	si
 		leave
 		retf
-Math_ApplyRotationHelperB_58828	endp
+Matrix_LocalToWorld_58828	endp
 
 seg117		ends

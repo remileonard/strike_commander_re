@@ -154,7 +154,7 @@ loc_346D9:
 
 loc_346DC:
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 
 loc_346E2:
 		add	sp, 4

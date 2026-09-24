@@ -1560,7 +1560,7 @@ loc_3D826:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+285j
 		push	ax
 		lea	ax, [bp+var_64]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, si
 		add	di, 12h
@@ -1597,7 +1597,7 @@ loc_3D8C0:
 		push	ax
 		lea	ax, [bp+var_A0]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	di, si
 		add	di, 12h

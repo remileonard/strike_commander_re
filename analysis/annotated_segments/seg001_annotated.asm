@@ -96,7 +96,7 @@ arg_6		= word ptr  0Ch
 		push	ss
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	Vector_TransformHelperA_550B7
+		call	Vector_CrossProduct3D_550B7
 		add	sp, 8
 		mov	eax, [bp+var_4A]
 		mov	[bp+var_26], eax
@@ -1025,7 +1025,7 @@ loc_3A31:				; CODE XREF: Targeting_AcquireBestThreat+705j
 					; Targeting_AcquireBestThreat+718j
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
@@ -1146,7 +1146,7 @@ loc_3B31:				; CODE XREF: Targeting_AcquireBestThreat+7BBj
 					; Targeting_AcquireBestThreat+7C1j ...
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]

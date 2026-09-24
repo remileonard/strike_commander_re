@@ -160,7 +160,7 @@ loc_4D801:
 		mov	[bp-82h], eax
 		lea	ax, [bp-8Ah]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-8Ah]
 		mov	edx, [bp-14h]
@@ -219,7 +219,7 @@ loc_4D89F:				; CODE XREF: seg107:01FAj
 		push	ax
 		lea	ax, [bp-8Ah]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	dword ptr [bp-1Eh], 0
 		mov	dword ptr [bp-22h], 0
@@ -235,7 +235,7 @@ loc_4D900:
 		push	ax
 		lea	ax, [bp-0AEh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		add	di, 12h
 		add	si, 12h
@@ -252,7 +252,7 @@ loc_4D900:
 		push	ax
 		lea	ax, [bp-0BAh]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		cmp	dword ptr [bp-0AAh], 0
 		jnz	short loc_4D971
@@ -669,7 +669,7 @@ loc_4DC95:				; CODE XREF: seg107:05F0j
 		mov	[bp-5Eh], eax
 		lea	ax, [bp-66h]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp-66h]
 		mov	edx, [bp-14h]
@@ -784,7 +784,7 @@ loc_4DDCE:				; CODE XREF: seg107:0708j
 		push	ax
 		lea	ax, [bp-66h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	si, [bp+6]
 		or	si, si
@@ -1226,7 +1226,7 @@ arg_6		= word ptr  0Ch
 		mov	si, [bp+arg_0]
 		mov	di, [bp+arg_2]
 		push	[bp+arg_6]
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		push	di
 		push	ss

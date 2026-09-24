@@ -1239,7 +1239,7 @@ loc_C388:
 		mov	[bp+var_24], 0
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_28]
 		mov	[bp+var_44], eax
@@ -3641,7 +3641,7 @@ loc_D6FB:				; CODE XREF: Formation_GuidanceSolution+55Dj
 		mov	[bp+var_BC], 0
 		lea	ax, [bp+var_C4]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+16Ah]
@@ -3802,7 +3802,7 @@ loc_D8C3:				; CODE XREF: Formation_GuidanceSolution+83Dj
 		mov	[bp+var_A4], eax
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		mov	eax, [bp+var_94]
 		mov	edx, [bp+var_8]
@@ -3829,7 +3829,7 @@ loc_D985:
 		sub	[bp+var_74], eax
 		lea	ax, [bp+var_7C]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		mov	eax, [bp+var_7C]
 		mov	edx, [bp+var_40]

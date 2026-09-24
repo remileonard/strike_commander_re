@@ -52,7 +52,7 @@
   "sub_4812B": {
     "new_name": "Aero_ComputeLiftAndSideForce_4812B",
     "segment": "seg103",
-    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Targeting_LineOfSightCheck_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2."
+    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2."
   },
   "sub_642FF": {
     "new_name": "StreamReader_CloseAndUnregister_642FF",
@@ -567,7 +567,7 @@
   "sub_15B67": {
     "new_name": "Cockpit_ViewPanTransitionMain_15B67",
     "segment": "seg015",
-    "summary": "far,515L — appelée UNE FOIS PAR FRAME depuis Camera_ExternalViewComputeMain_1519E (loc_15485), memes args (si=controleur de vue, di=sujet avion) : PAS une mise a jour HUD generique (ancien resume faux/devine) mais une MACHINE A ETATS DE TRANSITION DE VUE/PAN. (1) garde de reentree byte_6E1C1, pan initial optionnel si byte_6E4CF && si[+0x1F4] -> Cockpit_PanAzimuthUpdate(541Ah,&1.0). (2) di->vtable[0x34]() code d etat compare a 6 ; si different, tout le reste est saute -- signification du code 6 NON CONFIRMEE (l ancien commentaire devinait \"detruit\", aucune preuve). (3)+(4) deux machines a etat quasi identiques (si[+0x1BF/1C3]->[+0x1D7] cible [+0x1D3], si[+0x1C7/1CB] meme motif) : rampe si[+0x1D7] vers si[+0x1D3] au rythme dword_70458, stubs VROOMM non resolus (6B099/6B08F/6B094) -- ressemble a une animation zoom/transition MFD en 2 etapes, PAS un calcul camera 3D. (5) bloc cle (garde byte_72365) : relit si[+0x14F] (LE MEME champ vecteur avant que Camera_ExternalViewComputeMain_1519E rate-limite a 6.0u/frame), le fait tourner via Math_ApplyRotationHelperB_58828(forward, subject->vtable[0x3C]()), calcule bearing/elevation via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si si[+0x1EC] >= bearing_elev -> declenche un VRAI pan de camera Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7]) (value = si[+0x1F0]*bearing_elev + si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour neutre Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE REGARD quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera chase -- pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF) avec une constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a une position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](), Targeting_ComputeBearingElevation_55B1A et Camera_PanTransitionExtended non tracees en detail, stubs VROOMM 6B099/6B08F/6B094/6B080/6B085 non resolus. Lu integralement ligne a ligne le 2026-09-12 (demande explicite de verification, ancien resume issu d une passe rapide/partielle)."
+    "summary": "far,515L — appelée UNE FOIS PAR FRAME depuis Camera_ExternalViewComputeMain_1519E (loc_15485), memes args (si=controleur de vue, di=sujet avion) : PAS une mise a jour HUD generique (ancien resume faux/devine) mais une MACHINE A ETATS DE TRANSITION DE VUE/PAN. (1) garde de reentree byte_6E1C1, pan initial optionnel si byte_6E4CF && si[+0x1F4] -> Cockpit_PanAzimuthUpdate(541Ah,&1.0). (2) di->vtable[0x34]() code d etat compare a 6 ; si different, tout le reste est saute -- signification du code 6 NON CONFIRMEE (l ancien commentaire devinait \"detruit\", aucune preuve). (3)+(4) deux machines a etat quasi identiques (si[+0x1BF/1C3]->[+0x1D7] cible [+0x1D3], si[+0x1C7/1CB] meme motif) : rampe si[+0x1D7] vers si[+0x1D3] au rythme dword_70458, stubs VROOMM non resolus (6B099/6B08F/6B094) -- ressemble a une animation zoom/transition MFD en 2 etapes, PAS un calcul camera 3D. (5) bloc cle (garde byte_72365) : relit si[+0x14F] (LE MEME champ vecteur avant que Camera_ExternalViewComputeMain_1519E rate-limite a 6.0u/frame), le fait tourner via Matrix_LocalToWorld_58828(forward, subject->vtable[0x3C]()), calcule bearing/elevation via Targeting_ComputeBearingElevation_55B1A(5AA7h,&forward) ; si si[+0x1EC] >= bearing_elev -> declenche un VRAI pan de camera Camera_PanTransitionExtended(541Ah,&value,si[+0x1E5..E7]) (value = si[+0x1F0]*bearing_elev + si[+0x1E8]), sinon si si[+0x1E4] etait actif -> retour neutre Cockpit_PanAzimuthUpdate(541Ah,&1.0). C EST DONC UN MECANISME DE RATTRAPAGE/SNAP DE REGARD quand la cible sort du cadre, reutilisant directement le vecteur avant de la camera chase -- pertinent pour le mecanisme padlock/TARGET. (6) bloc similaire (garde byte_6E4CF) avec une constante fixe 4Ch (76) au lieu du calcul bearing/elevation -- probable retour a une position fixe. RESTE OUVERT : semantique exacte de vtable[0x34]()/vtable[0x3C](), Targeting_ComputeBearingElevation_55B1A et Camera_PanTransitionExtended non tracees en detail, stubs VROOMM 6B099/6B08F/6B094/6B080/6B085 non resolus. Lu integralement ligne a ligne le 2026-09-12 (demande explicite de verification, ancien resume issu d une passe rapide/partielle)."
   },
   "sub_6B45C": {
     "new_name": "VROOMM_StubThunk_6B45C",
@@ -642,7 +642,7 @@
   "sub_75D51": {
     "new_name": "AITargeting_ComputeSolution_75D51",
     "segment": "ovr230",
-    "summary": "⭐⚠️ far, 558 lignes, NON DÉTAILLÉE — combine longueur vectorielle (sub_5828E, seg117), `Targeting_LineOfSightCheck_5593A` (seg116, ×3+), `AI_ComputeGeometryHelper_56E29` — probable calcul complet de solution de ciblage (ligne de vue, distance, géométrie). Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 558 lignes, NON DÉTAILLÉE — combine longueur vectorielle (sub_5828E, seg117), `Vector_NormalizeInPlace_5593A` (seg116, ×3+), `AI_ComputeGeometryHelper_56E29` — probable calcul complet de solution de ciblage (ligne de vue, distance, géométrie). Candidat prioritaire pour session dédiée."
   },
   "sub_6CF6C": {
     "new_name": "VROOMM_StubThunk_6CF6C",
@@ -2007,7 +2007,7 @@
   "sub_57DAE": {
     "new_name": "UI_ApplyLineOfSightAndTransform_57DAE",
     "segment": "seg116",
-    "summary": "far, référencée depuis seg014/seg015 (UI cockpit) — combine UI_ApplyVectorLength_55B04, Targeting_LineOfSightCheck_5593A ×2, Vector_TransformHelperA_550B7."
+    "summary": "far, référencée depuis seg014/seg015 (UI cockpit) — combine Vector_PrescaleBelow256_55B04, Vector_NormalizeInPlace_5593A ×2, Vector_CrossProduct3D_550B7."
   },
   "sub_A4A75": {
     "new_name": "PlayerComponent_LoadFieldsWithRetryEWrapper_A4A75",
@@ -2232,7 +2232,7 @@
   "sub_80971": {
     "new_name": "HUDSymbol_DrawWithLineOfSight_80971",
     "segment": "ovr243",
-    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — combine `Math_ApplyRotationHelperB_58828` (seg117), `UI_ApplyLineOfSightAndTransform_57DAE` (seg116), `TextObject_AllocateVariantA_5A984` (×2, seg125)."
+    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — combine `Matrix_LocalToWorld_58828` (seg117), `UI_ApplyLineOfSightAndTransform_57DAE` (seg116), `TextObject_AllocateVariantA_5A984` (×2, seg125)."
   },
   "sub_688D7": {
     "new_name": "VROOMM_PatchFarJumpTable_688D7",
@@ -2682,7 +2682,7 @@
   "sub_41BEF": {
     "new_name": "GuidedBombBody_SteerToTarget_41BEF",
     "segment": "seg089",
-    "summary": "far, 380L, LUE INTEGRALEMENT (2026-09-24). Ex-'Audio3D_ComputeDistanceParams' (FAUX : aucun son, pas d'auditeur). LOI DE GUIDAGE DE LA BOMBE GUIDEE (corps du chunk dynamique GBMB), deuxieme copie de MissileBody_SteerToTarget_42738 avec d'autres champs : cible +0x20, matrice globale 0x57A6, point vise dword_7283E/42/46 (position +0x12 de la cible, SANS relevement d'altitude), position propre dword_7284A/4E/52. (1) D = cible - moi ; t = dist / |vitesse du corps [si]+8| borne a 1.0 ; D += vitesse_cible (vtable+0x4C) * t. (2) Roulis immediat : atan(c0/c2) (Math_ArcTan2_54B0A), +/-180 si c2 <= 0, Matrix_BuildAxisY_570C5 + Matrix_ApplyToVectorY_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres `idiv` par c1 SANS garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18 * dt (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 + Matrix_ApplyToVectorX_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5) DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la bombe (Math_ApplyRotationHelperB_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise en cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de vitesse tant qu'elle est guidee."
+    "summary": "far, 380L, LUE INTEGRALEMENT (2026-09-24). Ex-'Audio3D_ComputeDistanceParams' (FAUX : aucun son, pas d'auditeur). LOI DE GUIDAGE DE LA BOMBE GUIDEE (corps du chunk dynamique GBMB), deuxieme copie de MissileBody_SteerToTarget_42738 avec d'autres champs : cible +0x20, matrice globale 0x57A6, point vise dword_7283E/42/46 (position +0x12 de la cible, SANS relevement d'altitude), position propre dword_7284A/4E/52. (1) D = cible - moi ; t = dist / |vitesse du corps [si]+8| borne a 1.0 ; D += vitesse_cible (vtable+0x4C) * t. (2) Roulis immediat : atan(c0/c2) (Math_ArcTan2_54B0A), +/-180 si c2 <= 0, Matrix_BuildAxisY_570C5 + Matrix_OrthonormalizeKeepRow1_57660. (3) Tangage : Math_ArcTan_54ADE(c2/c1) apres `idiv` par c1 SANS garde (division par zero si c1 == 0 exactement), 180 - |b| si c1 < 0, borne a +0x18 * dt (+0x18 = unique dword du chunk GBMB), Matrix_BuildAxisX_56EC3 + Matrix_ApplyToVectorX_575DF. (4) [objet]->vtable+0x40(0x57A6) : nouvelle orientation. (5) DIFFERENCE AVEC LE MISSILE : vitesse = (0, +0x1C, 0) dans le repere de la bombe (Matrix_LocalToWorld_58828) : vitesse CONSTANTE = vitesse du lanceur au largage (mise en cache par GuidedBombBody_InheritLaunchSpeed_41B84), ni propulsion, ni gravite, ni perte de vitesse tant qu'elle est guidee."
   },
   "sub_A3C85": {
     "new_name": "GaugeWidget_RebuildDisplay_A3C85",
@@ -3492,7 +3492,7 @@
   "sub_5779A": {
     "new_name": "WorldObject_ApplyOrientationVariantB_5779A",
     "segment": "seg116",
-    "summary": "far, référencée depuis seg015/seg084, appelle sub_58828 ×2 et Matrix_ApplyToVectorY_57660."
+    "summary": "far, référencée depuis seg015/seg084, appelle sub_58828 ×2 et Matrix_OrthonormalizeKeepRow1_57660."
   },
   "sub_7E690": {
     "new_name": "GlyphObject_StoreComputedPosition_7E690",
@@ -4012,7 +4012,7 @@
   "sub_818A2": {
     "new_name": "HUDSymbol_RenderWithLOSCheck_818A2",
     "segment": "ovr243",
-    "summary": "⚠️ far, 323 lignes, NON DÉTAILLÉE — combine `Targeting_LineOfSightCheck_5593A` (seg116, ×2), `Camera_TransformPoint`."
+    "summary": "⚠️ far, 323 lignes, NON DÉTAILLÉE — combine `Vector_NormalizeInPlace_5593A` (seg116, ×2), `Camera_TransformPoint`."
   },
   "sub_176": {
     "new_name": "Ovl_ChecksumStub",
@@ -4817,7 +4817,7 @@
   "sub_42632": {
     "new_name": "MissileBody_BoostPhase_42632",
     "segment": "seg090",
-    "summary": "far, 126L, LUE (2026-09-24). Ex-'Sound3D_TriggerWithRange' (FAUX). PHASE PROPULSEE du missile, appelee par MissileBody_GuidanceTick_42A4E tant que +0x3A == 0. Premier appel (+0x3B == 0) : vitesse du corps = vitesse du lanceur (+0x37, vtable+0x4C), efface le bit 1 de [missile]+4, pose +0x3B = 1. Ensuite : si |vitesse| < corps+0x25 (vitesse maximale) : vitesse ramenee dans le repere du missile (Math_ApplyRotationHelperA_58768 avec 0x57E2), composantes c0 et c2 mises a 0, c1 += corps+0x29 * dt (acceleration le long du nez), retour au repere monde (Math_ApplyRotationHelperB_58828). Sinon : MissileBody_SetCruiseVelocity_42A1B et +0x3A = 1 (fin de la propulsion : elle s'arrete quand la vitesse maximale est atteinte, pas sur une duree)."
+    "summary": "far, 126L, LUE (2026-09-24). Ex-'Sound3D_TriggerWithRange' (FAUX). PHASE PROPULSEE du missile, appelee par MissileBody_GuidanceTick_42A4E tant que +0x3A == 0. Premier appel (+0x3B == 0) : vitesse du corps = vitesse du lanceur (+0x37, vtable+0x4C), efface le bit 1 de [missile]+4, pose +0x3B = 1. Ensuite : si |vitesse| < corps+0x25 (vitesse maximale) : vitesse ramenee dans le repere du missile (Matrix_WorldToLocal_58768 avec 0x57E2), composantes c0 et c2 mises a 0, c1 += corps+0x29 * dt (acceleration le long du nez), retour au repere monde (Matrix_LocalToWorld_58828). Sinon : MissileBody_SetCruiseVelocity_42A1B et +0x3A = 1 (fin de la propulsion : elle s'arrete quand la vitesse maximale est atteinte, pas sur une duree)."
   },
   "sub_6ADB9": {
     "new_name": "VROOMM_StubThunk_6ADB9",
@@ -5672,7 +5672,7 @@
   "sub_498B5": {
     "new_name": "JDYN_TickSubcalcA",
     "segment": "seg103",
-    "summary": "far,214L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure : c'est un moteur cinématique de poursuite/homing IA, appelé depuis PhysicsTicks UNIQUEMENT quand [si+0x68]!=0xFF, c.a.d. en mode autopilote/IA, pas en vol manuel). Appelle Matrix_ApplyToVectorY_57660 / Matrix_BuildAxisY_570C5 (cluster de composition de rotation confirmé ailleurs) avec une constante de référence 0x500 : sous-calcul angulaire du guidage IA (probable calcul de portance/orientation cible), rôle exact toujours à détailler."
+    "summary": "far,214L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure : c'est un moteur cinématique de poursuite/homing IA, appelé depuis PhysicsTicks UNIQUEMENT quand [si+0x68]!=0xFF, c.a.d. en mode autopilote/IA, pas en vol manuel). Appelle Matrix_OrthonormalizeKeepRow1_57660 / Matrix_BuildAxisY_570C5 (cluster de composition de rotation confirmé ailleurs) avec une constante de référence 0x500 : sous-calcul angulaire du guidage IA (probable calcul de portance/orientation cible), rôle exact toujours à détailler."
   },
   "sub_88B02": {
     "new_name": "MissionRecord_LoadFieldSequence_88B02",
@@ -6407,7 +6407,7 @@
   "loc_1493A": {
     "new_name": "Camera_OrbitTrackCompute_1493A",
     "segment": "seg014",
-    "summary": "far, ~0xB0 L — CAMÉRA ORBITALE / SUIVI (ROTA, et probable base de CHASE/TARGET). Slot de vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par Math_ApplyRotationHelperA_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée. targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8). POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20] (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas -> Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_ApplyToVectorY_57660 accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir CAMERA_SYSTEM.md §4bis."
+    "summary": "far, ~0xB0 L — CAMÉRA ORBITALE / SUIVI (ROTA, et probable base de CHASE/TARGET). Slot de vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par Matrix_WorldToLocal_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée. targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8). POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20] (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas -> Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_OrthonormalizeKeepRow1_57660 accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir CAMERA_SYSTEM.md §4bis."
   },
   "sub_A50BF": {
     "new_name": "PlayerComponentVariantAB_ConstructAndInit_A50BF",
@@ -6455,9 +6455,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_85656) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=123D0h, codesize=0AF1h, nentries=21."
   },
   "sub_55868": {
-    "new_name": "Math_VectorLength_ShiftUpIfSmall_55868",
+    "new_name": "Vector_PrescaleDownByShift_55868",
     "segment": "seg116",
-    "summary": "far, variante symétrique de Math_VectorLength_ShiftDownIfLarge — décalage vers le haut si les valeurs sont trop petites (précision)."
+    "summary": "far, LUE (2026-09-24). Ex-'Math_VectorLength_ShiftUpIfSmall' (nom inverse du code). (v, limite, pas) : tant que |composante| > limite << 8 pour l'une des trois, decale les valeurs absolues de `pas` bits ; applique ensuite le decalage total aux composantes signees de v (sar). Renvoie le decalage total. Direction conservee, norme reduite par 2^decalage."
   },
   "unnamed_seg200_traverseremove": {
     "new_name": "JoystickCallback_TraverseAndRemove_UNRESOLVED",
@@ -6467,7 +6467,7 @@
   "sub_42A1B": {
     "new_name": "MissileBody_SetCruiseVelocity_42A1B",
     "segment": "seg090",
-    "summary": "far, 25L, LUE (2026-09-24). Ex-'Sound3D_TriggerDirect' (FAUX). Vitesse du corps = (corps+0x2D, corps+0x25, corps+0x31) exprimee dans le repere du missile (c0, c1 = nez, c2), ramenee au repere monde par Math_ApplyRotationHelperB_58828(0x57E2) : vol de croisiere a vitesse maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS (+0x2D, +0x31) sont les composantes laterale et normale de cette vitesse."
+    "summary": "far, 25L, LUE (2026-09-24). Ex-'Sound3D_TriggerDirect' (FAUX). Vitesse du corps = (corps+0x2D, corps+0x25, corps+0x31) exprimee dans le repere du missile (c0, c1 = nez, c2), ramenee au repere monde par Matrix_LocalToWorld_58828(0x57E2) : vol de croisiere a vitesse maximale (+0x25) dans l'axe du nez. Les 4e et 5e dwords du chunk dynamique MISS (+0x2D, +0x31) sont les composantes laterale et normale de cette vitesse."
   },
   "sub_5BC94": {
     "new_name": "PagedMemory_Helper_5BC94",
@@ -6780,9 +6780,9 @@
     "summary": "far,108L — vérifie la présence EMS (INT15 AH=12h/09h), alloue un handle EMS de 8 pages (INT67 AH=43h), le mappe en fenêtre (INT67 AH=44h) : **allocation d'un bloc de mémoire étendue EMS pour ressource streamée (audio/animation), erreurs 0xEEE1/0xEEE2 si échec.**"
   },
   "sub_58828": {
-    "new_name": "Math_ApplyRotationHelperB_58828",
+    "new_name": "Matrix_LocalToWorld_58828",
     "segment": "seg117",
-    "summary": "far, référencée par sub_5392 — utilisée par WorldObject_ApplyOrientationVariantB_5779A."
+    "summary": "far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperB'. v = transposee(M) . v : chaque sortie combine une COLONNE de la matrice ([di],[di+0Ch],[di+18h] pour la 1re, etc.). Pour une matrice orthonormee, inverse de Matrix_WorldToLocal_58768 : passage du repere de l'objet au repere monde."
   },
   "sub_A1375": {
     "new_name": "PaletteScreen_DrawCurveShape_A1375",
@@ -7157,7 +7157,7 @@
   "sub_862A5": {
     "new_name": "AITargeting_ComputeFullSolution_862A5",
     "segment": "ovr248",
-    "summary": "⭐⚠️ far, 628 lignes, NON DÉTAILLÉE — combine longueur vectorielle, `Math_ApplyRotationHelperB_58828`, `UI_ApplyVectorLength_55B04`, `Vector_TransformHelperB_559BB` (seg116-117) — grande fonction de calcul de solution de ciblage IA. Candidat pour session dédiée."
+    "summary": "⭐⚠️ far, 628 lignes, NON DÉTAILLÉE — combine longueur vectorielle, `Matrix_LocalToWorld_58828`, `Vector_PrescaleBelow256_55B04`, `Vector_TransformHelperB_559BB` (seg116-117) — grande fonction de calcul de solution de ciblage IA. Candidat pour session dédiée."
   },
   "sub_6C53A": {
     "new_name": "VROOMM_StubThunk_6C53A",
@@ -7292,7 +7292,7 @@
   "sub_AD13": {
     "new_name": "Goal_WanderRandom",
     "segment": "seg005",
-    "summary": "far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise (Targeting_LineOfSightCheck_5593A = normalisation) et la multiplie par 0x753000 (30000 en 24.8) : point a 30000 unites dans une direction aleatoire. Altitude : Terrain_QueryAltitudeAt + entite+0x13D (altitude de croisiere NUMS) - altitude actuelle (objet +0x102, +0x1A), bornee a +/-1000 puis ajoutee a la position courante. Ecrit le point dans le bloc d'etat commun ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction * entite+0x141) en +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface l'octet +0xC du noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1. Appelee par Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler."
+    "summary": "far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise (Vector_NormalizeInPlace_5593A = normalisation) et la multiplie par 0x753000 (30000 en 24.8) : point a 30000 unites dans une direction aleatoire. Altitude : Terrain_QueryAltitudeAt + entite+0x13D (altitude de croisiere NUMS) - altitude actuelle (objet +0x102, +0x1A), bornee a +/-1000 puis ajoutee a la position courante. Ecrit le point dans le bloc d'etat commun ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction * entite+0x141) en +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface l'octet +0xC du noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1. Appelee par Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler."
   },
   "sub_220": {
     "new_name": "CRT_RunAtexitTable_MinPrio",
@@ -7497,7 +7497,7 @@
   "sub_5776A": {
     "new_name": "WorldObject_ApplyOrientationVariantA_5776A",
     "segment": "seg116",
-    "summary": "far, référencée par seg084 (constructeurs objets du monde), appelle sub_58768 ×2 et Matrix_ApplyToVectorY_57660."
+    "summary": "far, référencée par seg084 (constructeurs objets du monde), appelle sub_58768 ×2 et Matrix_OrthonormalizeKeepRow1_57660."
   },
   "sub_1EC46": {
     "new_name": "RadioQueue_RegisterMessage",
@@ -7722,7 +7722,7 @@
   "sub_76E67": {
     "new_name": "AITargeting_ApplyRangeCheck_76E67",
     "segment": "ovr230",
-    "summary": "⚠️ far, 137 lignes, NON DÉTAILLÉE — combine `Targeting_LineOfSightCheck_5593A` (seg116), `Trigger_TimedRangedSpawnOnce`-style test de portée (sub_378CA, seg109), sub_3E5A6 — vérification de portée pour le ciblage."
+    "summary": "⚠️ far, 137 lignes, NON DÉTAILLÉE — combine `Vector_NormalizeInPlace_5593A` (seg116), `Trigger_TimedRangedSpawnOnce`-style test de portée (sub_378CA, seg109), sub_3E5A6 — vérification de portée pour le ciblage."
   },
   "sub_6C11F": {
     "new_name": "VROOMM_StubThunk_6C11F",
@@ -7852,7 +7852,7 @@
   "sub_8285A": {
     "new_name": "HUDSymbol_ConstructWithGeometry_8285A",
     "segment": "ovr243",
-    "summary": "⚠️ far, 219 lignes, NON DÉTAILLÉE — combine `SetReference16` (×3), `AI_ComputeGeometryHelper_56E29` (seg116), `Math_ApplyRotationHelperB_58828`."
+    "summary": "⚠️ far, 219 lignes, NON DÉTAILLÉE — combine `SetReference16` (×3), `AI_ComputeGeometryHelper_56E29` (seg116), `Matrix_LocalToWorld_58828`."
   },
   "sub_53504": {
     "new_name": "Expr_VM_OpcodeHelperA_53504",
@@ -8042,7 +8042,7 @@
   "sub_419E4": {
     "new_name": "WorldObject_AlignNoseOnVelocity_419E4",
     "segment": "seg089",
-    "summary": "far, 62L — ex-'Countermeasure_ComputeTransform'. Lit la vitesse (vtable+0x4C), la normalise (UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A), reprend l'orientation (vtable+0x3C), remplace l'axe du nez (Matrix_ApplyToVectorY_57660) et ecrit l'orientation (vtable+0x40) : ALIGNE LE NEZ SUR LA VITESSE (meme sequence que la branche balistique de MissileBody_GuidanceTick_42A4E). Utilise par la bombe guidee sans cible (GuidedBombBody_GuidanceTick_41F2B) et par d'autres objets de seg089. (Renomme 2026-09-24 d'apres le resume existant et la sequence d'appels ; corps non relu ligne a ligne.)"
+    "summary": "far, 62L, LUE INTEGRALEMENT (2026-09-24). Ex-'Countermeasure_ComputeTransform'. ALIGNE LE NEZ DE L'OBJET SUR SA VITESSE : v = objet->vtable+0x4C (vitesse) ; Vector_PrescaleBelow256_55B04(v) (garde anti-debordement) ; Vector_NormalizeInPlace_5593A(v) (vecteur unitaire) ; copie de l'orientation (vtable+0x3C, 36 octets) ; LIGNE 1 (+0x0C) remplacee par v ; Matrix_OrthonormalizeKeepRow1_57660 (lignes 0 et 2 reconstruites par produits vectoriels) ; objet->vtable+0x40 (ecrit l'orientation). La ligne 1 est l'axe du nez : MissileBody_BoostPhase_42632 et MissileBody_SetCruiseVelocity_42A1B mettent toute la vitesse sur la composante 1 du repere local (Matrix_WorldToLocal_58768 / Matrix_LocalToWorld_58828). Appelants : GuidedBombBody_GuidanceTick_41F2B (sans cible) et deux fois la mise a jour d'objet loc_41AAF (seg089, classe non identifiee)."
   },
   "sub_8547C": {
     "new_name": "HUDSymbol_ConstructVariantK_8547C",
@@ -9247,7 +9247,7 @@
   "sub_6469": {
     "new_name": "AI_Sensor_WeaponVelocityCache",
     "segment": "seg003",
-    "summary": "far, 189L, LUE INTEGRALEMENT (2026-09-20). Ancien nom 'AI_Sensor_TargetVelocityCache' FAUX : ce n'est PAS la vitesse de la cible mais le VECTEUR VITESSE DE MA PROPRE ARME (direction de tir). Si le bit 3 de entite+0x28D n'est pas pose : remet a zero le cache global (dword_72041/45/49), lit le point d'emport courant de entite+0x104 (index a +0, stride 0x12), appelle vtable+0x18 de l'objet arme pour obtenir son vecteur vitesse initial (repli : globals dword_707E0/4/8), le range dans le cache, le fait tourner avec Math_ApplyRotationHelperB_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et si tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D (cache valide ; efface par AI_FireWeaponTrigger). Copie le resultat dans un tampon de sortie (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer l'erreur de visee du canon."
+    "summary": "far, 189L, LUE INTEGRALEMENT (2026-09-20). Ancien nom 'AI_Sensor_TargetVelocityCache' FAUX : ce n'est PAS la vitesse de la cible mais le VECTEUR VITESSE DE MA PROPRE ARME (direction de tir). Si le bit 3 de entite+0x28D n'est pas pose : remet a zero le cache global (dword_72041/45/49), lit le point d'emport courant de entite+0x104 (index a +0, stride 0x12), appelle vtable+0x18 de l'objet arme pour obtenir son vecteur vitesse initial (repli : globals dword_707E0/4/8), le range dans le cache, le fait tourner avec Matrix_LocalToWorld_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et si tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D (cache valide ; efface par AI_FireWeaponTrigger). Copie le resultat dans un tampon de sortie (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer l'erreur de visee du canon."
   },
   "sub_6AEEE": {
     "new_name": "VROOMM_StubThunk_6AEEE",
@@ -9417,7 +9417,7 @@
   "sub_9B4DE": {
     "new_name": "Debris_ConstructWithRotation_9B4DE",
     "segment": "ovr300",
-    "summary": "far, combine `Formation_ComputeGeometryHelper_56D43`, `Math_ApplyRotationHelperA_58768` (seg117), opération de conteneur."
+    "summary": "far, combine `Formation_ComputeGeometryHelper_56D43`, `Matrix_WorldToLocal_58768` (seg117), opération de conteneur."
   },
   "sub_63DDB": {
     "new_name": "StreamReader_CheckBufferValid_63DDB",
@@ -9972,7 +9972,7 @@
   "sub_82181": {
     "new_name": "HUDSymbol_RenderWithLOSCheckB_82181",
     "segment": "ovr243",
-    "summary": "⚠️ far, 474 lignes, NON DÉTAILLÉE — combine `Targeting_LineOfSightCheck_5593A`, `Math_Sin_5483F` (seg115), `Camera_TransformPoint`."
+    "summary": "⚠️ far, 474 lignes, NON DÉTAILLÉE — combine `Vector_NormalizeInPlace_5593A`, `Math_Sin_5483F` (seg115), `Camera_TransformPoint`."
   },
   "sub_605CE": {
     "new_name": "GlyphObject_ResolveAndCache_605CE",
@@ -11000,9 +11000,9 @@
     "summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — combine `Render_DrawScaledSprite_621A2` (seg175) et `GlyphObject_MeasureChar_6064A`."
   },
   "sub_58768": {
-    "new_name": "Math_ApplyRotationHelperA_58768",
+    "new_name": "Matrix_WorldToLocal_58768",
     "segment": "seg117",
-    "summary": "far, référencée par sub_5ECE et seg014 (UI cockpit) — utilisée par WorldObject_ApplyOrientationVariantA_5776A."
+    "summary": "far, LUE (2026-09-24). Ex-'Math_ApplyRotationHelperA'. v = M . v : chaque sortie est le produit scalaire de v avec une LIGNE de la matrice 3x3 24.8 (M+0, M+0x0C, M+0x18). Pour une matrice d'orientation (lignes = axes de l'objet), passage du repere monde au repere de l'objet. Inverse de Matrix_LocalToWorld_58828."
   },
   "loc_5C0ED": {
     "new_name": "PagedMemory_Method_WriteByte_5C0ED",
@@ -11162,7 +11162,7 @@
   "unnamed_seg116_k": {
     "new_name": "GeomHelper_QuadrantComputeLoop_UNRESOLVED",
     "segment": "seg116",
-    "summary": "⚠️ far, 348 lignes, NON DÉTAILLÉE — entre sub_5789E et sub_57C3A. Boucle répétant 4 fois la même séquence d'appels (Targeting_ComputeGeometryHelperA_5505B ×2, Targeting_LineOfSightCheck_5593A, Math_ArcSin_5493E, GeomHelper_QuadrantCompute_5789E) — probable calcul sur 4 quadrants/coins/roues. Adresse exacte non résolue (aucun label IDA). Candidat pour session dédiée."
+    "summary": "⚠️ far, 348 lignes, NON DÉTAILLÉE — entre sub_5789E et sub_57C3A. Boucle répétant 4 fois la même séquence d'appels (Targeting_ComputeGeometryHelperA_5505B ×2, Vector_NormalizeInPlace_5593A, Math_ArcSin_5493E, GeomHelper_QuadrantCompute_5789E) — probable calcul sur 4 quadrants/coins/roues. Adresse exacte non résolue (aucun label IDA). Candidat pour session dédiée."
   },
   "sub_8D1C0": {
     "new_name": "MissionRecordField_ReleaseViaThunkB_8D1C0",
@@ -12300,9 +12300,9 @@
     "summary": "far,55L — vide une liste en notifiant chaque élément (vtable[4] code 3), libère les sous-ressources : **vidage d'une liste de tuiles avec notification de libération.**"
   },
   "sub_57660": {
-    "new_name": "Matrix_ApplyToVectorY_57660",
+    "new_name": "Matrix_OrthonormalizeKeepRow1_57660",
     "segment": "seg116",
-    "summary": "far, variante de Matrix_ApplyToVectorX pour un autre axe. Référencée par AI_ManeuverSolution_Major_6977."
+    "summary": "far, LUE (2026-09-24). Ex-'Matrix_ApplyToVectorY'. Re-orthonormalise une matrice 3x3 en GARDANT la ligne 1 (+0x0C) : ligne 2 = Vector_CrossProduct3D_550B7(ligne 0, ligne 1), ligne 0 = Vector_CrossProduct3D_550B7(ligne 1, ligne 2), puis Vector_Normalize3D_559BB sur les trois lignes."
   },
   "sub_4609C": {
     "new_name": "Camera_InitAttachedCopyFlag",
@@ -12567,7 +12567,7 @@
   "sub_42738": {
     "new_name": "MissileBody_SteerToTarget_42738",
     "segment": "seg090",
-    "summary": "far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'Sound3D_ComputeSecondChannel' (FAUX : aucun son). LOI DE GUIDAGE DU MISSILE, appelee par MissileBody_GuidanceTick_42A4E quand le corps a une cible (+0x35) et le guidage actif (+0x39). Entrees : point vise P = globals dword_7287A/7E/82 (position +0x12 de la cible), position propre = dword_72886/8A/8E, matrice d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2) ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L = Math_ApplyRotationHelperA_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) = atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_ApplyToVectorY_57660 : rotation autour de l'axe c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0). Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0 (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg)."
+    "summary": "far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'Sound3D_ComputeSecondChannel' (FAUX : aucun son). LOI DE GUIDAGE DU MISSILE, appelee par MissileBody_GuidanceTick_42A4E quand le corps a une cible (+0x35) et le guidage actif (+0x39). Entrees : point vise P = globals dword_7287A/7E/82 (position +0x12 de la cible), position propre = dword_72886/8A/8E, matrice d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2) ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L = Matrix_WorldToLocal_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) = atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_OrthonormalizeKeepRow1_57660 : rotation autour de l'axe c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0). Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_ApplyToVectorX_575DF : rotation autour de c0 (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg)."
   },
   "sub_22A7D": {
     "new_name": "WorldObjects_Cluster_22A7D",
@@ -14167,7 +14167,7 @@
   "sub_765B2": {
     "new_name": "AITargeting_ComputeOrientationExtended_765B2",
     "segment": "ovr230",
-    "summary": "⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_ApplyToVectorY_57660`, `Targeting_LineOfSightCheck_5593A` (×3+, seg116) — variante étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660`, `Vector_NormalizeInPlace_5593A` (×3+, seg116) — variante étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée."
   },
   "sub_294C0": {
     "new_name": "Mesh_FaceSetup",
@@ -14782,7 +14782,7 @@
   "sub_575DF": {
     "new_name": "Matrix_ApplyToVectorX_575DF",
     "segment": "seg116",
-    "summary": "far, applique une transformation à un vecteur (3× Vector_TransformHelperA_550B7 + 3× Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF)."
+    "summary": "far, applique une transformation à un vecteur (3× Vector_CrossProduct3D_550B7 + 3× Vector_TransformHelperB_559BB). Référencée par Audio3D_ComputeDistanceParams (sub_41BEF)."
   },
   "sub_5B987": {
     "new_name": "PagedMemory_ReadByte_5B987",
@@ -15420,9 +15420,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3405) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_550B7": {
-    "new_name": "Vector_TransformHelperA_550B7",
+    "new_name": "Vector_CrossProduct3D_550B7",
     "segment": "seg116",
-    "summary": "far, helper vectoriel générique (alloue via sub_658), utilisé massivement par le cluster de construction de matrice de rotation (575DF/57660/576E5)."
+    "summary": "far, LUE (2026-09-24). Ex-'Vector_TransformHelperA'. PRODUIT VECTORIEL a x b en 24.8 (a = arg_4, b = arg_6) : (a1*b2 - a2*b1, a2*b0 - a0*b2, a0*b1 - a1*b0), chaque produit `imul / shrd 8`. Resultat ecrit dans arg_0 (alloue 12 octets si nul)."
   },
   "sub_8C930": {
     "new_name": "UISublist_ResetAndCopy_8C930",
@@ -15800,9 +15800,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A1CE1) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_5593A": {
-    "new_name": "Targeting_LineOfSightCheck_5593A",
+    "new_name": "Vector_NormalizeInPlace_5593A",
     "segment": "seg116",
-    "summary": "far, référencée par `Targeting_AcquireBestThreat` (sub_3314) — utilise sub_5828E (longueur vectorielle), probable test de ligne de vue/distance vers une cible."
+    "summary": "far, LUE (2026-09-24). Ex-'Targeting_LineOfSightCheck' (FAUX). NORMALISATION en place d'un vecteur 3x i32 24.8 : n = Math_VectorLength3D_Raw_5828E(v) ; si n != 0, chaque composante = (c << 8) / n (`shl eax,8 / idiv ecx`) ; n nul : vecteur inchange. Renvoie le pointeur."
   },
   "sub_75746": {
     "new_name": "AITargeting_RenderThreatList_75746",
@@ -16322,7 +16322,7 @@
   "sub_76325": {
     "new_name": "AITargeting_ComputeOrientation_76325",
     "segment": "ovr230",
-    "summary": "⚠️ far, 214 lignes, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_ApplyToVectorY_57660` (seg116) — calcul d'orientation pour la solution de ciblage."
+    "summary": "⚠️ far, 214 lignes, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660` (seg116) — calcul d'orientation pour la solution de ciblage."
   },
   "sub_60303": {
     "new_name": "ModuleRegistry_CleanupModuleReference_60303",
@@ -17397,7 +17397,7 @@
   "sub_83DD7": {
     "new_name": "HUDSymbol_ConstructWithFullMatrix_83DD7",
     "segment": "ovr244",
-    "summary": "⚠️ far, 189 lignes, NON DÉTAILLÉE — combine `SetReference16`, `Matrix_BuildFromAngle_56D72`, `Matrix_BuildAxisZ_572BC`, `Matrix_BuildAxisX_56EC3`, `Matrix_ApplyToVectorY_57660` (seg116) — construction de matrice d'orientation complète pour un symbole HUD."
+    "summary": "⚠️ far, 189 lignes, NON DÉTAILLÉE — combine `SetReference16`, `Matrix_BuildFromAngle_56D72`, `Matrix_BuildAxisZ_572BC`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660` (seg116) — construction de matrice d'orientation complète pour un symbole HUD."
   },
   "sub_3800A": {
     "new_name": "WorldObject_TestAliveAndUpdateChildren_3800A",
@@ -17762,7 +17762,7 @@
   "sub_49A7C": {
     "new_name": "JDYN_TickSubcalcB",
     "segment": "seg103",
-    "summary": "far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure). Utilise AI_ComputeGeometrySolution_57C67 (sin/cos) avec constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_ApplyToVectorY_57660 : sous-calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler."
+    "summary": "far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée sub_49C2E, corrigée en session antérieure). Utilise AI_ComputeGeometrySolution_57C67 (sin/cos) avec constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact toujours à détailler."
   },
   "sub_6B70F": {
     "new_name": "VROOMM_StubThunk_6B70F",
@@ -17987,7 +17987,7 @@
   "sub_55A9E": {
     "new_name": "UI_ApplyLineOfSightCheck_55A9E",
     "segment": "seg116",
-    "summary": "far, référencée depuis seg014/seg015 (UI cockpit), appelle Targeting_LineOfSightCheck_5593A."
+    "summary": "far, référencée depuis seg014/seg015 (UI cockpit), appelle Vector_NormalizeInPlace_5593A."
   },
   "sub_5C14E": {
     "new_name": "PagedMemory_ReadTextResource_5C14E",
@@ -18157,7 +18157,7 @@
   "sub_58F42": {
     "new_name": "Weapon_HUDBox_ComputeGeometry_58F42",
     "segment": "seg121",
-    "summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — combine UI_ApplyVectorLength_55B04, Targeting_ComputeBearingElevation_55B1A (seg116), dispatch vtable et Math_ApplyRotationHelperA_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage HUD. Référencée par sub_59061."
+    "summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — combine Vector_PrescaleBelow256_55B04, Targeting_ComputeBearingElevation_55B1A (seg116), dispatch vtable et Matrix_WorldToLocal_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage HUD. Référencée par sub_59061."
   },
   "sub_75290": {
     "new_name": "AircraftDamageComponentFamily_ScalarDeletingDtor_75290",
@@ -18665,9 +18665,9 @@
     "summary": "far,14L — initialise une petite structure avec des valeurs par défaut 1:1 (+4/+6) : **constructeur avec échelle par défaut 1:1.**"
   },
   "sub_55B04": {
-    "new_name": "UI_ApplyVectorLength_55B04",
+    "new_name": "Vector_PrescaleBelow256_55B04",
     "segment": "seg116",
-    "summary": "far, référencée depuis seg015 (UI cockpit), appelle Math_VectorLengthUnscaled_55920."
+    "summary": "far, LUE (2026-09-24). Ex-'UI_ApplyVectorLength'. Appelle Vector_PrescaleDownByShift_55868(v, 0x100, 3) : divise le vecteur par 8 (sar 3) tant qu'une composante depasse 256.0, pour eviter le debordement avant une normalisation. Direction conservee."
   },
   "sub_85DB3": {
     "new_name": "UI_PositionListLabelsWrapper_85DB3",
@@ -18777,7 +18777,7 @@
   "loc_42A4E": {
     "new_name": "MissileBody_GuidanceTick_42A4E",
     "segment": "seg090",
-    "summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present : 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A == 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente -> MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse += dword_6FFD7 * dt (gravite), UI_ApplyVectorLength_55B04 / Targeting_LineOfSightCheck_5593A sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_ApplyToVectorY_57660 + [missile]->vtable+0x40). Renvoie 1."
+    "summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present : 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A == 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente -> MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse += dword_6FFD7 * dt (gravite), Vector_PrescaleBelow256_55B04 / Vector_NormalizeInPlace_5593A sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_OrthonormalizeKeepRow1_57660 + [missile]->vtable+0x40). Renvoie 1."
   },
   "loc_42458": {
     "new_name": "Missile_UpdateSeekerAndFuse_42458",
@@ -18787,11 +18787,21 @@
   "loc_4244E": {
     "new_name": "Missile_GetCategory_4244E",
     "segment": "seg090",
-    "summary": "far, LUE (2026-09-24). `mov al, 8` : categorie d'objet 8 = missile (vtable de l'objet missile, seg339 off_6FAF8)."
+    "summary": "far, LUE (2026-09-24, precise). `mov al, 8`. Slot +0x34 de la vtable d'INSTANCE du missile (seg339 base 0x6FAC4, entree off_6FAF8) : renvoie 8, la meme valeur que la categorie du modele MISS (slot +8 de la vtable modele). Meme motif pour le leurre (loc_45197, slot +0x34, 0x10). Le sens exact de ce slot d'instance (categorie ?) n'est pas prouve par un lecteur."
   },
   "loc_41F2B": {
     "new_name": "GuidedBombBody_GuidanceTick_41F2B",
     "summary": "far, LUE (2026-09-24). Tick (slot +0x3C, vtable seg339 tag 0x1F16, via les thunks d'ajusteur seg082 loc_3AE8E / loc_3AF25) du CORPS de la bombe guidee, construit par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique 'GBMB' est present (0x49 octets). Position propre -> dword_7284A.. ; orientation de l'objet ([si]->+2, vtable+0x3C) copiee dans 0x57A6 ; +0x20 = objet+0x55 (cible, SetReference16) ; +0x22 = objet->vtable+0x38 (lanceur) ; si cible : point vise = position +0x12 de la cible -> dword_7283E... Avec cible : GuidedBombBody_InheritLaunchSpeed_41B84 puis GuidedBombBody_SteerToTarget_41BEF. Sans cible : FlightControl_ComputeAngularAccel (somme des forces / masse : chute libre) puis WorldObject_AlignNoseOnVelocity_419E4. Renvoie 1.",
     "segment": "seg089"
+  },
+  "loc_3CB2D": {
+    "new_name": "WorldObject_GetOrientationMatrix_3CB2D",
+    "segment": "seg084",
+    "summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (notamment classe missile, vtable seg339 0x6FAC4) : renvoie l'adresse objet+0x2C = matrice d'orientation 3x3 24.8 (36 octets)."
+  },
+  "loc_3CB95": {
+    "new_name": "WorldObject_SetOrientationMatrix_3CB95",
+    "segment": "seg084",
+    "summary": "far, LUE (2026-09-24). Methode virtuelle +0x40 (notamment classe missile, vtable seg339 0x6FAC4) : recopie 36 octets (AI_ComputeGeometryHelper_56E29) de la matrice passee en argument dans objet+0x2C (orientation), puis appelle Debris_BodyDetach(objet)."
   }
 }

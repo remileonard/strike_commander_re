@@ -809,7 +809,7 @@ loc_54F5:				; CODE XREF: AI_IncomingThreatWarning+144j
 		push	ax
 		lea	ax, [bp+var_44]
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	di, es:[bx+102h]
@@ -1944,14 +1944,14 @@ arg_8		= word ptr  0Eh
 		push	ax
 		lea	ax, [bp+var_24]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	[bp+var_4], 0
 		mov	eax, [bp+var_4]
 		mov	[bp+var_20], eax
 		lea	ax, [bp+var_24]
 		push	ax
-		call	Targeting_LineOfSightCheck_5593A
+		call	Vector_NormalizeInPlace_5593A
 		pop	cx
 		lea	ax, [bp+var_24]
 		push	ax
@@ -2613,8 +2613,8 @@ loc_6456:				; CODE XREF: seg003:14CCj
 ; (dword_72041/45/49), lit le point d'emport courant de entite+0x104 (index a +0, stride
 ; 0x12), appelle vtable+0x18 de l'objet arme pour obtenir son vecteur vitesse initial (repli :
 ; globals dword_707E0/4/8), le range dans le cache, le fait tourner avec
-; Math_ApplyRotationHelperB_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et
-; si tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D
+; Matrix_LocalToWorld_58828 dans le repere de mon objet (entite+0x102, vtable+0x3C), et si
+; tout est nul retombe sur le vecteur +0xC de mon objet (mon cap). Pose le bit 3 de +0x28D
 ; (cache valide ; efface par AI_FireWeaponTrigger). Copie le resultat dans un tampon de sortie
 ; (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer
 ; l'erreur de visee du canon.
@@ -2734,7 +2734,7 @@ loc_654D:				; CODE XREF: AI_Sensor_WeaponVelocityCache+C5j
 		pop	cx
 		push	ax
 		push	4F91h
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 
 loc_6584:				; CODE XREF: AI_Sensor_WeaponVelocityCache+55j AI_Sensor_WeaponVelocityCache+61j ...
@@ -3682,7 +3682,7 @@ loc_6C46:				; CODE XREF: AI_ManeuverSolution_Major+2CAj
 		mov	[bp+var_E8], eax
 		lea	ax, [bp+var_FC]
 		push	ax
-		call	Matrix_ApplyToVectorY_57660
+		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 		lea	ax, [bp+var_FC]
 		push	ax

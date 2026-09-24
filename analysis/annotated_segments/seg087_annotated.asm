@@ -440,7 +440,7 @@ loc_3E225:				; CODE XREF: seg087:0340j
 		push	ax
 		lea	ax, [bp-22h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp-1Eh]
 		mov	[bp-0Ah], eax

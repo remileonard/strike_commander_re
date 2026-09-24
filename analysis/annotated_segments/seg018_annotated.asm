@@ -195,7 +195,7 @@ loc_16A31:
 		push	ax
 		lea	ax, [bp+var_13C]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 
 loc_16A46:
 		add	sp, 4
@@ -203,7 +203,7 @@ loc_16A46:
 		push	ax
 
 loc_16A4E:
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [bp+var_138]
 		cmp	eax, dword_6E9A6
@@ -438,7 +438,7 @@ loc_16C47:
 		mov	ax, si
 		add	ax, 6Dh	; 'm'
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, dword_6E9A6
 		mov	[bp+var_78], eax
@@ -455,7 +455,7 @@ loc_16C47:
 		mov	ax, si
 		add	ax, 79h	; 'y'
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [si+7Dh]
 		cmp	eax, [bp+var_78]

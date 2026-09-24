@@ -724,7 +724,7 @@ loc_2C132:
 		push	5166h
 		lea	ax, [bp+var_EC]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp+var_E8]
 
@@ -1352,7 +1352,7 @@ loc_2C796:
 		push	ax
 		lea	ax, [bp+var_E0]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		push	0
 		les	bx, [bp+arg_0]
@@ -1368,7 +1368,7 @@ loc_2C796:
 		push	ax
 		lea	ax, [bp+var_D4]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		lea	ax, [bp+var_D4]
 		push	ax

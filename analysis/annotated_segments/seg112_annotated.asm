@@ -1206,7 +1206,7 @@ loc_50499:
 		push	5166h
 		lea	ax, [bp+var_62]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	eax, [bp+var_5E]
 		cmp	eax, dword_721F6

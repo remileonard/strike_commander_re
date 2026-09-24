@@ -500,7 +500,7 @@ zoom/transition MFD en 2 étapes, non détaillés), le bloc clé (gardé par
 ```
 forward = si[+0x14F]                                   ; le vecteur avant de la vue (même champ que loc_1519E §4.2 pt.5)
 obj     = subject->vtable[0x3C]()                       ; même appel que loc_1519E pt.1
-forward = Math_ApplyRotationHelperB_58828(forward, obj)  ; rotation de forward par cet objet
+forward = Matrix_LocalToWorld_58828(forward, obj)  ; rotation de forward par cet objet
 bearing_elev = Targeting_ComputeBearingElevation_55B1A(0x5AA7, forward)
 si  si[+0x1EC] >= bearing_elev  :                        ; seuil dépassé -> hors cadre
     value = si[+0x1F0] * bearing_elev + si[+0x1E8]
@@ -734,7 +734,7 @@ Opcode inconnu → ignoré (avance de 1).
 | `0E` | 13     | `i32 x,y,z`           | **position relative à l'entité liée** : `<<8`, tourné par orient(`obj+92`) + pos(`obj+92`) → `obj+14/18/1C` |
 | `0F` | 5      | `i16 h ; i16 k`       | `obj+F0 = h` (raw) ; `obj+F2 = k` (`<<8`) ; angles d'approche → `obj+F6/FA` |
 | `10` | 1      | —                     | si `obj+92` : **`obj+20 (orient. caméra) ← orient. de l'entité liée`** (`AI_ComputeGeometryHelper_56E29`) |
-| `11` | 7      | `i16 a,b,c`           | **compose** des axes d'orientation sur `obj+20` (`Matrix_BuildAxisZ/X/Y_572BC/56EC3/570C5`, `<<8`) + `Matrix_ApplyToVectorY` |
+| `11` | 7      | `i16 a,b,c`           | **compose** des axes d'orientation sur `obj+20` (`Matrix_BuildAxisZ/X/Y_572BC/56EC3/570C5`, `<<8`) + `Matrix_OrthonormalizeKeepRow1_57660` |
 | `12` | 13     | `i32 x,y,z`           | offset d'ancrage dans le repère entité `obj+94/98/9C` (raw)        |
 | `13` | 1      | —                     | `obj+FF = 1 ; obj+100 = 0`                                          |
 | `14` | 5      | `i32 s`               | `obj+C0/C4/C8 = lignes_orient(obj+2C) × s` (24.8)                   |
@@ -797,8 +797,8 @@ chemin `0xF00` = 3840) :
      `erreur/A0 · dword_70458`.
    - **`8`** — pas de handler ; intégrateur générique seul.
    - **`0xB` — visée/poursuite d'un point** : `dir = obj+0xB0.. − pos` ;
-     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Targeting_LineOfSightCheck` ;
-     `Matrix_ApplyToVectorY`.
+     `ligne_orient(obj+0x2C) ← dir` (+ `dir/A0`/frame) ; `Vector_NormalizeInPlace_5593A` (normalisation) ;
+     `Matrix_OrthonormalizeKeepRow1_57660`.
    - **`0x1D` — déplacement sur segment** vers `rotate(obj+0xE4.., orient_entité)` :
      `pas = ((cible − obj+0xB0..)<<8)/obj+0xA0 · dword_70458` ; `obj+0xB0.. += pas` ;
      `pos_monde = obj+0xB0.. + pos_entité`. Snap + mode `0xFF` si `obj+0xA0 ≤ 0`

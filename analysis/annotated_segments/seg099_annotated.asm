@@ -44,7 +44,7 @@ loc_45CFC:				; CODE XREF: seg099:0017j
 		mov	[bp-3Ah], eax
 		lea	ax, [bp-42h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		lea	ax, [bp-42h]
 		push	ax
@@ -214,7 +214,7 @@ loc_45F33:				; CODE XREF: seg099:0203j
 		push	ax
 		lea	ax, [bp-42h]
 		push	ax
-		call	Math_ApplyRotationHelperA_58768
+		call	Matrix_WorldToLocal_58768
 		add	sp, 4
 		mov	si, [bp+6]
 		or	si, si

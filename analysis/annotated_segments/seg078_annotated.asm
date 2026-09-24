@@ -564,7 +564,7 @@ loc_37F61:
 
 loc_37F64:
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		push	word ptr [si+24h]
 		push	cs

@@ -933,7 +933,7 @@ loc_9E3B8:
 		mov	ax, si
 		add	ax, 12h
 		push	ax
-		call	Math_ApplyRotationHelperB_58828
+		call	Matrix_LocalToWorld_58828
 		add	sp, 4
 		mov	dx, si
 		add	dx, 12h

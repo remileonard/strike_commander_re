@@ -131,7 +131,7 @@ loc_176F1:				; CODE XREF: seg020:0122j
 		mov	[bp-50h], eax
 		lea	ax, [bp-58h]
 		push	ax
-		call	UI_ApplyVectorLength_55B04
+		call	Vector_PrescaleBelow256_55B04
 		pop	cx
 		mov	eax, [bp-54h]
 		cmp	eax, dword_6E9A6
