@@ -90,7 +90,7 @@ loc_19422:
 loc_19423:
 		lea	ax, [bp+var_4]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 
 loc_1942C:
 		add	sp, 6
@@ -151,7 +151,7 @@ loc_19492:
 		push	ax
 
 loc_19496:
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		cmp	[bp+var_8], 0
 		jge	short loc_194AA

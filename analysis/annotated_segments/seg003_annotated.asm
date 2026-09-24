@@ -3412,14 +3412,14 @@ loc_698E:				; CODE XREF: AI_ManeuverSolution_Major+12j
 		push	ss
 		lea	ax, [bp+var_22]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		lea	ax, [bp+var_C0]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_26]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_22]
 		sub	eax, [bp+var_26]
@@ -4030,9 +4030,9 @@ AI_InterceptDispatcher	endp
 ; far, 651 lignes - LUE INTEGRALEMENT (a la demande de Remi). VRAIE LOI DE GUIDAGE DE
 ; POURSUITE AVEC ANTICIPATION (proportional navigation / lead pursuit), le coeur geometrique
 ; de la chaine de combat aerien IA (AI_SYSTEM.md §4bis). Prend deux vecteurs d'approche
-; (si=arg_4, di=arg_6, chacun transforme/calcule via AI_ComputeApproachAngles_553CF), calcule
-; leur DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois
-; : cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE
+; (si=arg_4, di=arg_6, chacun transforme/calcule via Math_HeadingAngle_553CF), calcule leur
+; DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois :
+; cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE
 ; DIVERGENT (>90 deg, ligne ~16530) : bascule sur un calcul alternatif (angle=0, pas de
 ; correction fine) plutot que Math_AngleBetweenVectors, evitant les artefacts numeriques d'un
 ; calcul d'angle sur des vecteurs presque opposes. GARDE PORTEE CAPTEUR (ligne ~16571) :
@@ -4130,13 +4130,13 @@ arg_8		= dword	ptr  0Eh
 		push	ss
 		lea	ax, [bp+var_12]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		push	di
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_12]
 		sub	eax, [bp+var_16]

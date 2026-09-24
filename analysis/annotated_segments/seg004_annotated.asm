@@ -1899,18 +1899,22 @@ AI_RadarScanTarget	endp
 ; dword_7201C (1800) ; sinon la valeur de base est ECRASEE par une qualite de VISEE : erreur
 ; de VISEE = sqrt(diff_azimut^2 + diff_elevation^2) entre la direction vers la cible et le
 ; vecteur vitesse de MON ARME (AI_Sensor_WeaponVelocityCache, Math_ElevationAngle_552E1,
-; AI_ComputeApproachAngles_553CF), donc pratiquement l'ecart entre mon nez et la cible ;
-; tolerance = arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ;
-; si ecart < 0 : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis
-; -4 si aspect croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100,
-; 0x700 -> longue portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d <
-; dword_72028 (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000)
-; -> -10 ; d < dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]. ⚠️
-; (2026-09-24) Math_ElevationAngle_552E1 (ex-'Math_AngleBetweenVectors') ne calcule PAS un
-; angle entre deux vecteurs : c'est l'angle d'ELEVATION d'un seul vecteur au-dessus de
-; l'horizontale. La composante 'diff_elevation' de l'erreur de visee est donc une difference
-; d'elevations (monde), a relire avec AI_ComputeApproachAngles_553CF avant de valider le
-; portage SCAIBrain::computeFireSolutionQuality.
+; Math_HeadingAngle_553CF), donc pratiquement l'ecart entre mon nez et la cible ; tolerance =
+; arctan(vitesse_cible / d) (90 degres si d <= 0) ; ecart = erreur - tolerance ; si ecart < 0
+; : si = 8 - 2*ecart/tolerance (8 a 10) ; sinon si = 8 - 4*ecart/tolerance ; puis -4 si aspect
+; croise. MISSILES (switch sur le masque : 1, 2, 3 -> courte portee ; 0x100, 0x700 -> longue
+; portee ; autre -> 0) : courte portee : d >= dword_7202C (17700) -> -10 ; d < dword_72028
+; (1800) -> -3 (-10 si aspect croise) ; longue portee : d >= dword_72024 (45000) -> -10 ; d <
+; dword_72020 (4000) -> -3 (-10 si croise). Resultat borne a [0,10]. PRECISION (2026-09-24,
+; relu) : l'erreur de visee n'est PAS l'angle entre deux vecteurs. D = position cible (+0x12)
+; - ma position (entite+0x102, +0x12) ; W = vitesse de mon arme
+; (AI_Sensor_WeaponVelocityCache). d_elev = Math_ElevationAngle_552E1(D) -
+; Math_ElevationAngle_552E1(W) ; d_cap = Math_HeadingAngle_553CF(D) -
+; Math_HeadingAngle_553CF(W), SANS ramener la difference a +/-180 (sub eax,[bp+var_54] puis
+; Math_Square_54C39 directement) ; erreur = sqrt(d_cap^2 + d_elev^2) (Math_Square_54C39,
+; Math_Sqrt_54BF1), en degres, angles MONDE (cap et elevation), pas dans le repere de l'avion.
+; Consequences : pres de la verticale le cap devient instable ; si les deux caps sont de part
+; et d'autre de +/-180, d_cap vaut pres de 360 et la qualite tombe.
 ; ==============================================================================================
 AI_ComputeFireSolutionQuality_91DF	proc far		; CODE XREF: AI_BehaviorSelector+FCp
 
@@ -2143,14 +2147,14 @@ loc_932E:				; CODE XREF: AI_ComputeFireSolutionQuality_91DF+14Aj
 		push	ss
 		lea	ax, [bp+var_50]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		lea	ax, [bp+var_E8]
 		push	ax
 		push	ss
 		lea	ax, [bp+var_54]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_50]
 		sub	eax, [bp+var_54]

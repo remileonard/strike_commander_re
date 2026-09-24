@@ -154,5 +154,5 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 214 | `sub_76325` | `AITargeting_ComputeOrientation_76325` | ovr230 |
 | 213 | `sub_AAFA0` | `AudioQueue_ProcessAndAdvance_AAFA0` | seg458 |
 | 213 | `sub_9B2F4` | `Terrain_AllocateAndFormatMultiple_9B2F4` | ovr299 |
-| 209 | `sub_553CF` | `AI_ComputeApproachAngles_553CF` | seg116 |
+| 209 | `sub_553CF` | `Math_HeadingAngle_553CF` | seg116 |
 | 208 | `sub_97D39` | `MissionText_ComputeTrigonometricLayout_97D39` | ovr287 |

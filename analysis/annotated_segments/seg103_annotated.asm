@@ -3885,7 +3885,7 @@ loc_49CEF:
 		push	ss
 		lea	ax, [bp+var_1A]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_186]
 		sub	eax, [bp+var_17A]
@@ -4195,7 +4195,7 @@ loc_4A0E7:
 		push	ss
 		lea	ax, [bp+var_9C]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_1A]
 		sub	eax, [bp+var_9C]
@@ -4449,7 +4449,7 @@ loc_4A2D1:
 loc_4A2E1:
 		lea	ax, [bp+var_152]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_152]
 
@@ -4500,7 +4500,7 @@ loc_4A335:
 		push	ss
 		lea	ax, [bp+var_156]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_156]
 		mov	[bp+var_14E], eax

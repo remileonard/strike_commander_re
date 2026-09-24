@@ -2377,7 +2377,7 @@ HUDSymbol_ConstructWithFullMatrix_83DD7	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 207 lignes, NON DÉTAILLÉE — combine SetReference16 (×2),
-; Math_VectorLength3D_Scaled_54F57, Math_ElevationAngle_552E1, AI_ComputeApproachAngles_553CF
+; Math_VectorLength3D_Scaled_54F57, Math_ElevationAngle_552E1, Math_HeadingAngle_553CF
 ; (seg116) — affichage HUD d'angle d'approche.
 ; ==============================================================================================
 HUDSymbol_ComputeApproachDisplay_83FC9	proc far		; CODE XREF: VROOMM_StubThunk_6B032J
@@ -2577,7 +2577,7 @@ loc_84156:
 		push	ss
 		lea	ax, [bp+var_38]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_38]
 		mov	dword_6D77B, eax

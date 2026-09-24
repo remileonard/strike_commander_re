@@ -149,7 +149,7 @@ arg_4		= word ptr  0Ah
 		push	ss
 		lea	ax, [bp+var_4]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		neg	eax

@@ -2616,7 +2616,7 @@ Expr_VM_ExecuteSingleInstruction_51E7E	endp
 ; 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de
 ; formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a
 ; l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et
-; AI_ComputeApproachAngles_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
+; Math_HeadingAngle_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
 ; AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat
 ; via SetReference — RESOUT LA QUESTION OUVERTE DU CONTROLEUR : c'est une entite avion/pilote
 ; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md).
@@ -2771,7 +2771,7 @@ loc_51F65:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+84j
 		push	ss
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+2Dh]

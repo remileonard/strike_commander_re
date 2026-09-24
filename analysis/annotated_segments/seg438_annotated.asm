@@ -137,9 +137,9 @@ PlayerComponentVariantR_ConstructAndInit_A0DBA	endp
 ; ==============================================================================================
 ; ⚠️ far, 188 lignes, NON DÉTAILLÉE — combine TextFormat_ApplyStyleAttribute_5E2D0 (seg143),
 ; Widget_ComputeBoundsExtent_60AEB, Widget_RenderComplexLayoutWrapper_60DD1 (seg163), longueur
-; vectorielle (sub_5828E), et surtout AI_ComputeApproachAngles_553CF (seg116, ×2) — probable
-; widget HUD affichant un angle d'approche/aspect calculé, avec formatage de texte via
-; sub_2945. Candidat pour session dédiée.
+; vectorielle (sub_5828E), et surtout Math_HeadingAngle_553CF (seg116, ×2) — probable widget
+; HUD affichant un angle d'approche/aspect calculé, avec formatage de texte via sub_2945.
+; Candidat pour session dédiée.
 ; ==============================================================================================
 HUD_RenderApproachAngleWidget_A0E3F	proc far		; CODE XREF: VROOMM_StubThunk_6C67AJ
 
@@ -218,7 +218,7 @@ loc_A0E95:
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp+var_10+1]
 		mov	[bp+var_C], ax
@@ -261,7 +261,7 @@ loc_A0F04:
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp+var_16+1]
 		mov	[bp+var_12], ax

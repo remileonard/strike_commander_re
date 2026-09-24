@@ -621,7 +621,7 @@ loc_1533B:				; CODE XREF: seg015:0446j
 		push	ss
 		lea	ax, [bp-40h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		lea	ax, [bp-0A2h]
 		push	ax

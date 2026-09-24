@@ -794,11 +794,18 @@ Math_ElevationAngle_552E1	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 209 lignes, NON DÉTAILLÉE — référencée par AI_ManeuverSolution_Major_6977 ;
-; multiples appels à Math_AsinOfRatio_54A76/Math_AcosOfRatio_54A0E — probable calcul d'angles
-; d'approche/manœuvre. Candidat pour session dédiée.
+; far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_ComputeApproachAngles' (FAUX : un seul vecteur,
+; rien de specifique a l'IA). CAP HORIZONTAL d'un vecteur v, en degres dans ]-180, 180] :
+; angle mesure depuis l'axe +c1 vers l'axe +c0, soit atan2(v.c0, v.c1). Copie +
+; Math_VectorLengthUnscaled_55920(v, 1000) (garde anti-debordement), composante d'altitude
+; mise a 0, L = |(c0, c1)|. L == 0 -> 720 deg (valeur sentinelle). Si |c1| >= |c0| : c1 >= 0
+; -> asin(c0/L) ; c1 < 0 et c0 >= 0 -> 180 - asin(c0/L) ; c1 < 0 et c0 < 0 -> -180 -
+; asin(c0/L). Sinon : c0 >= 0 -> acos(c1/L) ; c0 < 0 -> -acos(c1/L) (Math_AsinOfRatio_54A76 /
+; Math_AcosOfRatio_54A0E). Les quatre branches ne sont coherentes (meme angle) qu'avec les
+; vrais noms des arcs, ce qui confirme leur inversion. En libRealSpace (Y-up, libRS.z =
+; asm.c1) : atan2(x, z).
 ; ==============================================================================================
-AI_ComputeApproachAngles_553CF	proc far		; CODE XREF: AI_ManeuverSolution_Major+F7P
+Math_HeadingAngle_553CF	proc far		; CODE XREF: AI_ManeuverSolution_Major+F7P
 					; AI_ManeuverSolution_Major+109P ...
 
 var_48		= dword	ptr -48h
@@ -857,7 +864,7 @@ arg_4		= word ptr  0Ah
 		jge	short loc_55428
 		neg	eax
 
-loc_55428:				; CODE XREF: AI_ComputeApproachAngles_553CF+54j
+loc_55428:				; CODE XREF: Math_HeadingAngle_553CF+54j
 		mov	[bp+var_C], eax
 		mov	eax, [si+4]
 		or	eax, eax
@@ -866,7 +873,7 @@ loc_55428:				; CODE XREF: AI_ComputeApproachAngles_553CF+54j
 loc_55435:
 		neg	eax
 
-loc_55438:				; CODE XREF: AI_ComputeApproachAngles_553CF+64j
+loc_55438:				; CODE XREF: Math_HeadingAngle_553CF+64j
 		mov	[bp+var_10], eax
 		cmp	[bp+var_8], 0
 		jnz	short loc_5546C
@@ -877,13 +884,13 @@ loc_55438:				; CODE XREF: AI_ComputeApproachAngles_553CF+64j
 		jmp	short loc_55458
 ; ���������������������������������������������������������������������������
 
-loc_5544E:				; CODE XREF: AI_ComputeApproachAngles_553CF+79j
+loc_5544E:				; CODE XREF: Math_HeadingAngle_553CF+79j
 		push	4
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_55458:				; CODE XREF: AI_ComputeApproachAngles_553CF+7Dj
+loc_55458:				; CODE XREF: Math_HeadingAngle_553CF+7Dj
 		or	ax, ax
 		jz	short loc_55467
 		mov	dword ptr [si],	2D000h
@@ -891,14 +898,14 @@ loc_55458:				; CODE XREF: AI_ComputeApproachAngles_553CF+7Dj
 		jmp	short loc_55469
 ; ���������������������������������������������������������������������������
 
-loc_55467:				; CODE XREF: AI_ComputeApproachAngles_553CF+8Bj
+loc_55467:				; CODE XREF: Math_HeadingAngle_553CF+8Bj
 		mov	ax, si
 
-loc_55469:				; CODE XREF: AI_ComputeApproachAngles_553CF+96j
+loc_55469:				; CODE XREF: Math_HeadingAngle_553CF+96j
 		jmp	loc_55544
 ; ���������������������������������������������������������������������������
 
-loc_5546C:				; CODE XREF: AI_ComputeApproachAngles_553CF+72j
+loc_5546C:				; CODE XREF: Math_HeadingAngle_553CF+72j
 		mov	eax, [bp+var_10]
 		cmp	eax, [bp+var_C]
 		jl	short loc_554F1
@@ -917,7 +924,7 @@ loc_5546C:				; CODE XREF: AI_ComputeApproachAngles_553CF+72j
 		jmp	loc_55536
 ; ���������������������������������������������������������������������������
 
-loc_55499:				; CODE XREF: AI_ComputeApproachAngles_553CF+ACj
+loc_55499:				; CODE XREF: Math_HeadingAngle_553CF+ACj
 		cmp	dword ptr [si],	0
 		jl	short loc_554C8
 
@@ -942,7 +949,7 @@ loc_554C2:
 		jmp	short loc_55536
 ; ���������������������������������������������������������������������������
 
-loc_554C8:				; CODE XREF: AI_ComputeApproachAngles_553CF+CEj
+loc_554C8:				; CODE XREF: Math_HeadingAngle_553CF+CEj
 		lea	ax, [bp+var_8]
 		push	ax
 		lea	ax, [bp+var_48]
@@ -959,7 +966,7 @@ loc_554C8:				; CODE XREF: AI_ComputeApproachAngles_553CF+CEj
 		jmp	short loc_55536
 ; ���������������������������������������������������������������������������
 
-loc_554F1:				; CODE XREF: AI_ComputeApproachAngles_553CF+A5j
+loc_554F1:				; CODE XREF: Math_HeadingAngle_553CF+A5j
 		cmp	dword ptr [si],	0
 		jl	short loc_55512
 		lea	ax, [bp+var_8]
@@ -975,7 +982,7 @@ loc_554F1:				; CODE XREF: AI_ComputeApproachAngles_553CF+A5j
 		jmp	short loc_55536
 ; ���������������������������������������������������������������������������
 
-loc_55512:				; CODE XREF: AI_ComputeApproachAngles_553CF+126j
+loc_55512:				; CODE XREF: Math_HeadingAngle_553CF+126j
 		lea	ax, [bp+var_8]
 		push	ax
 		lea	ax, [bp+var_44]
@@ -992,21 +999,21 @@ loc_55512:				; CODE XREF: AI_ComputeApproachAngles_553CF+126j
 loc_55532:
 		mov	[bp+var_3C], eax
 
-loc_55536:				; CODE XREF: AI_ComputeApproachAngles_553CF+C7j
-					; AI_ComputeApproachAngles_553CF+F7j ...
+loc_55536:				; CODE XREF: Math_HeadingAngle_553CF+C7j
+					; Math_HeadingAngle_553CF+F7j ...
 		mov	[bp+var_4], eax
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
 
-loc_55544:				; CODE XREF: AI_ComputeApproachAngles_553CF:loc_55469j
+loc_55544:				; CODE XREF: Math_HeadingAngle_553CF:loc_55469j
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	di
 		pop	si
 		leave
 		retf
-AI_ComputeApproachAngles_553CF	endp
+Math_HeadingAngle_553CF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1492,7 +1499,7 @@ Vector_PrescaleDownByShift_55868	endp
 ; far, variante simplifiée de calcul de longueur vectorielle (référencée par sub_552E1).
 ; ==============================================================================================
 Math_VectorLengthUnscaled_55920	proc far		; CODE XREF: Math_ElevationAngle_552E1+2Fp
-					; AI_ComputeApproachAngles_553CF+30p ...
+					; Math_HeadingAngle_553CF+30p ...
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
@@ -5853,7 +5860,7 @@ Matrix_RollAngle_57C67	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par sub_781D0, appelle AI_ComputeApproachAngles_553CF.
+; far, référencée par sub_781D0, appelle Math_HeadingAngle_553CF.
 ; ==============================================================================================
 AI_ApplyApproachAngles_57D81	proc far		; CODE XREF: CameraScript_ExecuteCOMP_781D0+101P
 					; CameraScript_ExecuteCOMP_781D0+E38P ...
@@ -5874,7 +5881,7 @@ arg_4		= word ptr  0Ah
 		lea	ax, [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr AI_ComputeApproachAngles_553CF
+		call	near ptr Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]

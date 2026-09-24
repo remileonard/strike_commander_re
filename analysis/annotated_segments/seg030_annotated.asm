@@ -555,7 +555,7 @@ loc_1D3DF:
 		push	ss
 		lea	ax, [bp-86h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-85h]
 		mov	[di+35h], ax
@@ -601,7 +601,7 @@ loc_1D422:				; CODE XREF: seg030:050Bj
 		push	ss
 		lea	ax, [bp-90h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-8Fh]
 		mov	[bp-8Ch], ax
@@ -610,7 +610,7 @@ loc_1D422:				; CODE XREF: seg030:050Bj
 		push	ss
 		lea	ax, [bp-96h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-95h]
 		mov	[bp-92h], ax
@@ -867,7 +867,7 @@ loc_1D6FC:
 		push	ss
 		lea	ax, [bp-34h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-33h]
 		mov	[di+35h], ax

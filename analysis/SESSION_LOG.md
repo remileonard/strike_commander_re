@@ -750,7 +750,7 @@ dédiée.
 variantes, chargement de champs IFF via ResourceRecord). Une exception
 notable : `HUD_RenderApproachAngleWidget_A0E3F` (seg438, 188L) combine le
 cluster de formatage de texte (seg143), le cluster widget (seg163) et
-`AI_ComputeApproachAngles_553CF` (seg116) — probable widget HUD affichant
+`Math_HeadingAngle_553CF` (seg116) — probable widget HUD affichant
 un angle d'approche/aspect calculé, hors sujet du cluster PlayerComponent
 environnant. Petite note en passant : `PlayerComponentVariantS_A1054`
 (seg440) appelle `sub_45C0D`, la fonction déjà signalée dans les notes

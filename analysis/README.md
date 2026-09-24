@@ -1096,7 +1096,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Expr_Node_ConstructAndAttach_53363` | 217 | seg114 | Construction/attachement de nœud |
 | `Expr_Node_EvaluateVisibility_53586` | 207 | seg114 | Évaluation de visibilité/portée d'un nœud |
 | `Expr_Node_AllocateTriple_543CA` | 166 | seg114 | Triple allocation (hors cluster identifié) |
-| `AI_ComputeApproachAngles_553CF` | 209 | seg116 | Calcul d'angles d'approche/manœuvre (IA) |
+| `Math_HeadingAngle_553CF` | 209 | seg116 | Calcul d'angles d'approche/manœuvre (IA) |
 | `Damage_ComputeMainHelper_56559` | 288 | seg116 | Calcul principal de propagation de dommages |
 | `Targeting_ComputeBearingElevation_55B1A` | 134 | seg116 | Gisement/élévation vers une cible |
 | `Matrix_RollAngle_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |

@@ -1025,7 +1025,7 @@ loc_17E5B:				; CODE XREF: seg020:08A6j
 		push	ss
 		lea	ax, [bp-24h]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-23h]
 		mov	[bp-20h], ax
@@ -1034,7 +1034,7 @@ loc_17E5B:				; CODE XREF: seg020:08A6j
 		push	ss
 		lea	ax, [bp-2Ah]
 		push	ax
-		call	AI_ComputeApproachAngles_553CF
+		call	Math_HeadingAngle_553CF
 		add	sp, 6
 		mov	ax, [bp-29h]
 		mov	[bp-26h], ax
