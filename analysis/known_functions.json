@@ -1997,7 +1997,7 @@
   "sub_75F8": {
     "new_name": "AI_CombatDecision_Major",
     "segment": "seg003",
-    "summary": "far, 603 lignes - LUE INTEGRALEMENT. Dernier maillon decisionnel de la chaine de guidage (AI_SYSTEM.md §4bis), recoit la geometrie complete calculee par AI_GuidanceSolution_Major (arg_6/arg_8 = deux deltas d'angle intermediaires). DEBUT : remet a zero entite+7+0x1F/+0x23/+0x27 (les 3 champs de commande partages avec l'entree souris du joueur, §4bis). GARDE CIBLE FINE (sub_564A) : si une condition de cible tient, pose entite+7+0x1E=10 et BORNE les deux deltas d'entree a ±10 deg (mode 'poursuite fine', corrections limitees). GARDE flags_75 BIT 6 (deja documente §7, non reinvestiguee ici) : si actif, BYPASS COMPLET - delegue directement a sub_676F et sort. ARBRE DE DECISION PRINCIPAL, base sur la magnitude de l'angle (di[0]) : (a) SI < 20 deg (0x1400) : aucune correction, sortie immediate sans toucher aux champs de commande. (b) SI l'ecart angulaire total (somme des deux deltas, wrappe ±180 deg) est <= 145 deg (0x9100) : calcule une position anticipee via sub_5305 (meme fonction utilisee dans les phases de manoeuvre MVRS_ID6/14b), scale par un facteur derive du carre de l'angle divise par -10 puis 10, appelle AI_RollToAngleCmd_8104(taux=5), ecrit le resultat dans entite+7+0x1F. (c) SI > 145 deg (cas extreme, quasi face-a-face) : calcul similaire mais en plus MULTIPLIE PAR LE TAUX DE ROULIS PROPRE DE L'AVION ([avion+0x71], meme champ que la formule de bonus de MVRS_ID14b_ScoreGeneric), divise par 0x10E (270), borne a un maximum (0x1000=16 deg) - encore une adaptation a la capacite de manoeuvre specifique de l'appareil. REPLI FINAL (aucune des conditions geometriques ne s'applique) : appelle AI_RollToAngleCmd_8104(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME le triptyque complet de la chaine de combat : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (choix entre correction fine/large/extreme/neutre, ecriture finale de la commande) -> AI_RollToAngleCmd_8104/AI_RollController_7E56 (execution)."
+    "summary": "far, 603L, RELUE INTEGRALEMENT 2026-09-25 (l'ancien resume etait faux : pas de 'rien sous 20 deg', pas de 'position anticipee'). DERNIER ETAGE DE LA LOI DE PILOTAGE : transforme les trois ecarts de AI_GuidanceSolution_Major (arg_4 = &cap h, arg_6 = &elevation v, arg_8 = &roulis r) en manche. (0) manche de tangage (bloc de commande +0x1F), de roulis (+0x23) et +0x27 remis a 0. (1) Si AI_Sensor_TooSlow_564A : cran de manette 10, et v et h bornes a +10 deg AU-DESSUS seulement ('cmp [si],0A00h / jle'). (2) Si decrochage (JDYN+0x75 bit6) : AI_NoseHighRecovery_676F, sortie. (3) h = v = 0 : ailes a plat (AI_RollToAngleCmd_8104(0, zone morte 2)), retourne 1 (aligne) - seul cas ou la fonction renvoie 1. (4) a = sqrt(h^2 + v^2) (Math_Square_54C39, Math_Sqrt_54BF1). (5) a > 20 deg et v > -10 deg : AI_BankErrorCmd_7F34(r, zone morte 2) ; si |r| < 20 deg : cran 10 et tangage = AI_ClampPitchStick_5305(16) = tirer a fond (dans la limite du pilote). (6) Sinon : w = roulis + r ramene a +/-180 (inclinaison qui alignerait). Si |w| > 145 deg (il faudrait etre presque sur le dos : cible juste sous le nez) : s = max(-16, -16 (v/10)^2), ailes a plat (zone morte 5) puis tangage = s (pousser). Sinon : s = 16 (a/20)^2 K/270 avec K = JDYN+0x71 ('imul [si+71h] / shrd 8 / idiv 10Eh') ; si s >= 16 : cran 10 et s = 16 ; t = r (a/20)^2 K/270, borne a |r| ; AI_BankErrorCmd_7F34(t, zone morte 5) ; une fois l'inclinaison atteinte : tangage = AI_ClampPitchStick_5305(s). Echelle du manche : 16 = butee."
   },
   "sub_6AED0": {
     "new_name": "VROOMM_StubThunk_6AED0",
@@ -11625,9 +11625,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A4815) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=32D90h, codesize=4A3h, nentries=20."
   },
   "sub_5305": {
-    "new_name": "Value_ClampSymmetric",
+    "new_name": "AI_ClampPitchStick_5305",
     "segment": "seg003",
-    "summary": "far,90L — clamp d'une valeur entre -limite et +limite (comparaisons signées successives) : borne une composante de position/angle."
+    "summary": "far, 90L, LUE 2026-09-25. Ex-'Value_ClampSymmetric'. Borne une valeur de manche de tangage a +/- entite+0xDD (autorite du pilote au manche) : out = clamp(valeur, -L, +L). entite+0xDD = 9 x max(competence entite+0xB0, 8) / G ('cmp 800h / jge' : plancher a 8, pas plafond) (G = facteur de charge max JDYN+0x67), echelle 16 = butee, pose par AIAircraft_LoadProfileGuarded_73940."
   },
   "sub_6BE3D": {
     "new_name": "VROOMM_StubThunk_6BE3D",
@@ -12715,9 +12715,9 @@
     "summary": "far, aucun appel externe visible (26 lignes)."
   },
   "sub_7F34": {
-    "new_name": "AI_FlightControl_Cluster",
+    "new_name": "AI_BankErrorCmd_7F34",
     "segment": "seg003",
-    "summary": "far,245L — fonction du même cluster (probable suite de sub_7B20/sub_7E56, logique de contrôle de vol IA) — à approfondir."
+    "summary": "far, 245L, LUE 2026-09-25. Ex-'AI_FlightControl_Cluster'. COMMANDE DE ROULIS PAR ECART, AVEC LIMITE D'INCLINAISON DU PILOTE : arg_4 = &ecart de roulis e (ramene a +/-180), arg_6 = zone morte (entier, degres). Manche de roulis (+0x23 du bloc de commande) remis a 0. Si la limite d'inclinaison du pilote entite+0xE9 < 90 : inclinaison visee = roulis + e bornee a +/-limite, e recalcule. Si |e| > zone morte : manche de roulis = -JDYN_HighLevelPhysicsCalc(avion, e), retourne 0 ; sinon retourne 1 (inclinaison atteinte). entite+0xE9 = 90 x G/6 si le facteur de charge max JDYN+0x67 < 6, sinon 90 (AIAircraft_LoadProfileGuarded_73940)."
   },
   "sub_1EAC5": {
     "new_name": "RadioQueue_AllocateSlot",

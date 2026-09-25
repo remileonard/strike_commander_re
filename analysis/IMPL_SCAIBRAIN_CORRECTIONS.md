@@ -193,8 +193,10 @@ tangage**, avec zone morte, en écrivant les axes du manche (les mêmes que le j
     (toujours au moins la pleine butée) ;
   - sinon : ailes à plat et, seulement une fois `|roulis| < 15°`, `s = e/15` pour `e < 15°`,
     `s = 1` au-delà (négatif = pousser, pour `−15° < e < 0`) ;
-  - `s` passe ensuite par `Value_ClampSymmetric` (limite propre à l'avion, **non lue**) : en
-    attendant, borner à `[−1, 1]`.
+  - `s` passe ensuite par `AI_ClampPitchStick_5305` (lue le 2026-09-25) : borné à ±`L`, avec
+    `L = 9 · max(compétence, 8) / G` (compétence = `entité+0xB0`, `G` = facteur de charge max
+    `JDYN+0x67`), sur l'échelle du manche de l'original où **16 = butée** ; sur un axe `[−1, 1]`,
+    borner à `±min(1, L/16)`. Exemple : compétence 8, G = 9 → L = 8 → la moitié de la butée.
   Les piqués de plus de 15° se font donc **sur le dos, en tirant**.
 - Tourner vers une direction : `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (loi
   ci-dessous, **relue le 2026-09-25**) → `AI_CombatDecision_Major` → commandes de roulis/tangage.
@@ -231,11 +233,45 @@ else { Vector3D L = toBodyFrame(D); r = atan2Deg(L.x, L.y); }   // roulis qui me
 r = wrap180(r);
 combatDecision(h, v, r);                                    // AI_CombatDecision_Major
 ```
-`AI_CombatDecision_Major` : son résumé (non relu depuis la correction sinus/cosinus) indique écart
-< 20° : rien ; ≤ 145° : correction proportionnelle ; > 145° : pondérée par le taux de roulis de
-l'avion, bornée à 16° ; **quand l'avion est trop lent** (`AI_Sensor_TooSlow_564A`) les écarts sont
-bornés à ±10° et la manette mise à 10 ; **quand le drapeau de décrochage est posé**, il délègue à la
-récupération nez haut (ID15). À relire avant de remplacer `SetAttitudeError`.
+### Du triplet d'écarts au manche (`AI_CombatDecision_Major`, relue le 2026-09-25)
+
+L'ancien résumé (« écart < 20° : rien ») était faux. Échelle du manche : 16 = butée (en `[−1, 1]` :
+diviser par 16). `pitchStick` positif = tirer.
+```cpp
+// h = écart de cap, v = écart d'élévation, r = écart de roulis (degrés), sortie des 3 axes remis à 0
+bool SCAIBrain::combatDecision(float h, float v, float r) {
+    pitchStick = rollStick = 0;
+    if (tooSlow()) { throttle = 10; v = std::min(v, 10.0f); h = std::min(h, 10.0f); } // borne haute seulement
+    if (stalled)   { noseHighRecovery(); return false; }                               // ID15
+    if (h == 0 && v == 0) { rollToAngle(0, 2); return true; }                          // aligné : seul « true »
+    float a = sqrtf(h*h + v*v);
+    if (a > 20.0f && v > -10.0f) {                    // gros écart : incliner, puis tirer à fond
+        bankError(r, 2);
+        if (fabsf(r) < 20.0f) { throttle = 10; pitchStick = clampPitch(16.0f); }
+        return false;
+    }
+    float w = wrap180(roll() + r);                    // inclinaison qui alignerait
+    if (fabsf(w) > 145.0f) {                          // cible juste sous le nez : ne pas passer sur le dos
+        float s = std::max(-16.0f, -16.0f * (v/10.0f) * (v/10.0f));
+        if (rollToAngle(0, 5)) pitchStick = clampPitch(s);                              // ailes à plat, pousser
+        return false;
+    }
+    float k = (a/20.0f) * (a/20.0f) * jdyn.turn_rate_max / 270.0f;                   // JDYN+0x71
+    float s = 16.0f * k;
+    if (s >= 16.0f) { throttle = 10; s = 16.0f; }
+    float t = r * k; if (fabsf(t) > fabsf(r)) t = r;
+    if (bankError(t, 5)) pitchStick = clampPitch(s);   // tirer seulement une fois incliné
+    return false;
+}
+// bankError(e, zm) = AI_BankErrorCmd_7F34 : inclinaison visée roll()+e bornée à ±maxBank
+//   (maxBank = 90° × G/6 si G < 6, sinon 90°) ; si |e| > zm : rollStick = -JDYN_HighLevelPhysicsCalc(e),
+//   retourne false ; sinon true.
+// clampPitch(x) = AI_ClampPitchStick_5305 : ±9·max(compétence, 8)/G.
+```
+Le pilote vise donc en **inclinant d'abord puis en tirant** (jamais de manche à pousser sauf cible
+juste sous le nez) ; la force de la ressource croît avec le carré de l'écart (`(a/20)²`), la pleine
+butée est atteinte au-delà de 20° d'écart. Les pilotes peu compétents et les avions à fort G tirent
+moins fort ; les avions sous 6 G s'inclinent moins (`90° × G/6`).
 
 **Encore bloquant** : `JDYN_HighLevelPhysicsCalc` (écart → valeur de manche) n'a jamais été lue.
 
@@ -508,7 +544,7 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
-1. `JDYN_HighLevelPhysicsCalc` (lecture) et `AI_CombatDecision_Major` (relecture) — §7. (`AI_GuidanceSolution_Major` relue le 2026-09-25.)
+1. `JDYN_HighLevelPhysicsCalc` (lecture) — §7. (`AI_GuidanceSolution_Major` et `AI_CombatDecision_Major` relues le 2026-09-25.)
 2. `Targeting_FilterByWeaponType` : cône et portée exacts du chercheur — §4.
 3. Test de verrouillage de l'AGM-65D (méthode `+0x14` du modèle `MISS`, fonction pas encore nommée).
 4. ~~Seuil `dword_7203D`~~ : c'est le plancher du pilote, altitude du terrain + `entité+0xE5` (§8quinquies).

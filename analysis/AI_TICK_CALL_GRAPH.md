@@ -448,10 +448,14 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 5. **Écart de roulis** : `h ≥ 90°` → `90° − roulis` (moins `v` si `v > 0`) ; `h ≤ −90°` →
    `−90° − roulis` (plus `v` si `v > 0`) ; sinon `AI_ComputeBearingToRef` = `atan2(L.x, L.haut)`
    de `D` dans le repère avion (le roulis qui met la cible dans le plan de portance).
-6. Les trois écarts partent dans `AI_CombatDecision_Major`. Son résumé (antérieur à la correction
-   des noms, **non relu**) montre qu'il borne les écarts à ±10° quand l'avion est **trop lent**
-   (`AI_Sensor_TooSlow_564A`, pas une « garde de cible fine ») et passe la main à
-   `AI_NoseHighRecovery_676F` quand le drapeau de décrochage est posé.
+6. Les trois écarts partent dans `AI_CombatDecision_Major` (**relue le 2026-09-25**) : trop lent →
+   plein gaz et écarts bornés à +10° (vers le haut seulement) ; décroché →
+   `AI_NoseHighRecovery_676F` ; aligné → ailes à plat ; écart total `a > 20°` (cible pas trop
+   basse) → s'incliner (`AI_BankErrorCmd_7F34`) puis tirer à fond ; cible juste sous le nez
+   (inclinaison requise > 145°) → ailes à plat et pousser `16·(v/10)²` ; sinon s'incliner de
+   `r·(a/20)²·K/270` et tirer `16·(a/20)²·K/270` (`K` = `JDYN+0x71`). Le manche de tangage est
+   borné par l'autorité du pilote `9·max(compétence, 8)/G` (`AI_ClampPitchStick_5305`),
+   l'inclinaison par `90° × G/6` quand `G < 6`. Pseudo-code : `IMPL_SCAIBRAIN_CORRECTIONS.md` §7.
 
 ### Ce que fait chaque identifiant
 
@@ -694,7 +698,7 @@ Elle n'utilise **ni leurres ni contre-mesures** : l'esquive est purement manœuv
 
 La poursuite (`AI_BehaviorSelector`, étape guidage) et l'esquive (`AI_MissileEvasionReaction_9A77`) passent toutes deux par `AI_GuidanceCmd_FromOwnPos` (ou directement `AI_GuidanceSolution_Major`) avec **un vecteur de direction désiré**. La chaîne, lue lors d'une session précédente (`AI_SYSTEM.md` §4bis, `known_functions.json`) :
 1. **`AI_GuidanceSolution_Major`** (géométrie et anticipation) : normalise le vecteur, calcule les deltas d'angle (cap et élévation) par rapport à mon avion avec gestion du repli à ±180°, limite l'inclinaison verticale (bornes de −90° et ±45°), prend en compte une garde d'altitude (`dword_7203D`), ma vitesse propre et la capacité de manœuvre de l'avion (`avion+0x67`), puis appelle la décision.
-2. **`AI_CombatDecision_Major`** : remet à zéro les commandes partagées, limite les deltas à ±10° en « poursuite fine », puis choisit : écart total < 20° : aucune correction ; ≤ 145° : correction proportionnelle (`AI_RollToAngleCmd_8104`, taux 5) ; > 145° : correction extrême pondérée par le taux de roulis de l'avion (`avion+0x71`, bornée à 16°) ; repli : commande neutre.
+2. **`AI_CombatDecision_Major`** : *(ancienne description fausse, corrigée le 2026-09-25)* incliner d'abord (`AI_BankErrorCmd_7F34`), puis tirer, avec une force en `(écart/20°)²` ; pleine butée au-delà de 20° d'écart ; pousser seulement quand la cible est juste sous le nez. Détail : « Les actions confirmées des manœuvres `MVRS` », point 6.
 3. **`AI_RollToAngleCmd_8104` / `AI_RollController_7E56`** : convertissent l'écart de cap en commande de roulis et de tangage et l'**écrivent dans le champ de commande que lit aussi le joueur** (entrée manche/souris). L'IA et le joueur alimentent donc le même point d'entrée de la physique `JDYN`. *(Corrigé 2026-09-24 : l'écart est un écart de roulis, pas de cap.)*
 
 C'est le pendant, côté libRealSpace, du couple `SCPilot` (qui produit le manche) et de la physique de l'avion.

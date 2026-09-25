@@ -1664,7 +1664,7 @@ loc_F545:
 		push	ax
 
 loc_F54F:
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 
 loc_F554:
 		add	sp, 0Ah
@@ -1691,7 +1691,7 @@ loc_F566:				; CODE XREF: seg008:0F87j seg008:0F97j
 		push	ss
 		lea	ax, [bp-18h]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-18h]
 		mov	[bp-1Ch], eax
@@ -1716,7 +1716,7 @@ loc_F5AC:				; CODE XREF: seg008:0FCEj seg008:0FDEj
 		push	ss
 		lea	ax, [bp-24h]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-24h]
 		mov	[bp-28h], eax
@@ -1733,7 +1733,7 @@ loc_F5F2:				; CODE XREF: seg008:1014j seg008:1024j
 		push	ss
 		lea	ax, [bp-30h]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-30h]
 		mov	[bp-34h], eax
@@ -2090,7 +2090,7 @@ loc_F963:				; CODE XREF: seg008:13BEj
 		push	ss
 		lea	ax, [bp-2Eh]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-2Eh]
 		mov	[bp-32h], eax
@@ -2256,7 +2256,7 @@ loc_FB06:				; CODE XREF: seg008:1561j
 		push	ss
 		lea	ax, [bp-4Eh]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-4Eh]
 		mov	[bp-52h], eax
@@ -2751,7 +2751,7 @@ loc_FFE3:				; CODE XREF: seg008:1A3Ej
 		push	ss
 		lea	ax, [bp-38h]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-38h]
 		mov	[bp-3Ch], eax
@@ -2794,7 +2794,7 @@ loc_10028:				; CODE XREF: seg008:1A27j
 		push	ax
 
 loc_1008F:
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-54h]
 		mov	[bp-58h], eax
@@ -3254,7 +3254,7 @@ loc_104A8:				; CODE XREF: seg008:1EEEj
 		push	ss
 		lea	ax, [bp-5Ah]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-5Ah]
 		mov	[bp-5Eh], eax
@@ -3780,7 +3780,7 @@ loc_109A3:
 		push	ss
 		lea	ax, [bp-52h]
 		push	ax
-		call	Value_ClampSymmetric
+		call	AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp-52h]
 		mov	[bp-56h], eax

@@ -6190,7 +6190,7 @@ loc_4B093:				; CODE XREF: seg082:11DDJ
 ; haut niveau intégrant le résultat du modèle de vol JDYN, à approfondir.
 ; ==============================================================================================
 JDYN_HighLevelPhysicsCalc	proc far		; CODE XREF: AI_RollController_7E56+ACP
-					; AI_FlightControl_Cluster+19BP
+					; AI_BankErrorCmd_7F34+19BP
 
 var_68		= dword	ptr -68h
 var_64		= dword	ptr -64h

@@ -1030,7 +1030,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `AI_CombatDecision_Major_75F8` | 603 | seg003 | Décision de combat IA |
 | `Flight_PhysicsTick_JDYN_3314` | 1347 | seg001 | Tick physique de vol (JDYN) |
 | `AI_PitchController_7B20_7B20` | 384 | seg003 | Contrôleur de roulis |
-| `AI_FlightControl_Cluster_7F34` | 245 | seg003 | Contrôle de vol IA |
+| `AI_BankErrorCmd_7F34` | 245 | seg003 | Commande de roulis par écart, limite d'inclinaison du pilote |
 | `AI_BehaviorSelector_8D30` | 313 | seg004 | Sélection de comportement IA |
 | `AI_BehaviorStateMachine_9D05` | 353 | seg004 | Machine à états de comportement |
 | `Widget_MainHandler_1C6C6` | 297 | seg028 | Gestionnaire de widget composite |

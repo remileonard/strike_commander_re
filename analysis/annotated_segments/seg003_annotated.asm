@@ -491,10 +491,13 @@ Vector2D_CrossSign_526F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,90L — clamp d'une valeur entre -limite et +limite (comparaisons signées successives) :
-; borne une composante de position/angle.
+; far, 90L, LUE 2026-09-25. Ex-'Value_ClampSymmetric'. Borne une valeur de manche de tangage a
+; +/- entite+0xDD (autorite du pilote au manche) : out = clamp(valeur, -L, +L). entite+0xDD =
+; 9 x max(competence entite+0xB0, 8) / G ('cmp 800h / jge' : plancher a 8, pas plafond) (G =
+; facteur de charge max JDYN+0x67), echelle 16 = butee, pose par
+; AIAircraft_LoadProfileGuarded_73940.
 ; ==============================================================================================
-Value_ClampSymmetric	proc far		; CODE XREF: AI_CombatDecision_Major+207p
+AI_ClampPitchStick_5305	proc far		; CODE XREF: AI_CombatDecision_Major+207p
 					; AI_CombatDecision_Major+335p ...
 
 var_10		= dword	ptr -10h
@@ -526,10 +529,10 @@ arg_8		= word ptr  0Eh
 		jmp	short loc_5337
 ; ���������������������������������������������������������������������������
 
-loc_5335:				; CODE XREF: Value_ClampSymmetric+29j
+loc_5335:				; CODE XREF: AI_ClampPitchStick_5305+29j
 		xor	ax, ax
 
-loc_5337:				; CODE XREF: Value_ClampSymmetric+2Ej
+loc_5337:				; CODE XREF: AI_ClampPitchStick_5305+2Ej
 		or	al, al
 		jz	short loc_5351
 		mov	eax, [si]
@@ -541,16 +544,16 @@ loc_533E:
 		jmp	short loc_534B
 ; ���������������������������������������������������������������������������
 
-loc_5349:				; CODE XREF: Value_ClampSymmetric+3Dj
+loc_5349:				; CODE XREF: AI_ClampPitchStick_5305+3Dj
 		xor	ax, ax
 
-loc_534B:				; CODE XREF: Value_ClampSymmetric+42j
+loc_534B:				; CODE XREF: AI_ClampPitchStick_5305+42j
 		or	al, al
 		jz	short loc_537F
 		jmp	short loc_5378
 ; ���������������������������������������������������������������������������
 
-loc_5351:				; CODE XREF: Value_ClampSymmetric+34j
+loc_5351:				; CODE XREF: AI_ClampPitchStick_5305+34j
 		mov	eax, [bp+var_4]
 		neg	eax
 		mov	[bp+var_C], eax
@@ -563,18 +566,18 @@ loc_5351:				; CODE XREF: Value_ClampSymmetric+34j
 		jmp	short loc_5374
 ; ���������������������������������������������������������������������������
 
-loc_5372:				; CODE XREF: Value_ClampSymmetric+66j
+loc_5372:				; CODE XREF: AI_ClampPitchStick_5305+66j
 		xor	ax, ax
 
-loc_5374:				; CODE XREF: Value_ClampSymmetric+6Bj
+loc_5374:				; CODE XREF: AI_ClampPitchStick_5305+6Bj
 		or	al, al
 		jz	short loc_537F
 
-loc_5378:				; CODE XREF: Value_ClampSymmetric+4Aj
+loc_5378:				; CODE XREF: AI_ClampPitchStick_5305+4Aj
 		mov	eax, [si]
 		mov	[bp+var_4], eax
 
-loc_537F:				; CODE XREF: Value_ClampSymmetric+48j Value_ClampSymmetric+71j
+loc_537F:				; CODE XREF: AI_ClampPitchStick_5305+48j AI_ClampPitchStick_5305+71j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -583,7 +586,7 @@ loc_537F:				; CODE XREF: Value_ClampSymmetric+48j Value_ClampSymmetric+71j
 		pop	si
 		leave
 		retf
-Value_ClampSymmetric	endp
+AI_ClampPitchStick_5305	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4734,29 +4737,23 @@ AI_GuidanceCmd_FromOwnPos	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 603 lignes - LUE INTEGRALEMENT. Dernier maillon decisionnel de la chaine de guidage
-; (AI_SYSTEM.md §4bis), recoit la geometrie complete calculee par AI_GuidanceSolution_Major
-; (arg_6/arg_8 = deux deltas d'angle intermediaires). DEBUT : remet a zero
-; entite+7+0x1F/+0x23/+0x27 (les 3 champs de commande partages avec l'entree souris du joueur,
-; §4bis). GARDE CIBLE FINE (sub_564A) : si une condition de cible tient, pose entite+7+0x1E=10
-; et BORNE les deux deltas d'entree a ±10 deg (mode 'poursuite fine', corrections limitees).
-; GARDE flags_75 BIT 6 (deja documente §7, non reinvestiguee ici) : si actif, BYPASS COMPLET -
-; delegue directement a sub_676F et sort. ARBRE DE DECISION PRINCIPAL, base sur la magnitude
-; de l'angle (di[0]) : (a) SI < 20 deg (0x1400) : aucune correction, sortie immediate sans
-; toucher aux champs de commande. (b) SI l'ecart angulaire total (somme des deux deltas,
-; wrappe ±180 deg) est <= 145 deg (0x9100) : calcule une position anticipee via sub_5305 (meme
-; fonction utilisee dans les phases de manoeuvre MVRS_ID6/14b), scale par un facteur derive du
-; carre de l'angle divise par -10 puis 10, appelle AI_RollToAngleCmd_8104(taux=5), ecrit le
-; resultat dans entite+7+0x1F. (c) SI > 145 deg (cas extreme, quasi face-a-face) : calcul
-; similaire mais en plus MULTIPLIE PAR LE TAUX DE ROULIS PROPRE DE L'AVION ([avion+0x71], meme
-; champ que la formule de bonus de MVRS_ID14b_ScoreGeneric), divise par 0x10E (270), borne a
-; un maximum (0x1000=16 deg) - encore une adaptation a la capacite de manoeuvre specifique de
-; l'appareil. REPLI FINAL (aucune des conditions geometriques ne s'applique) : appelle
-; AI_RollToAngleCmd_8104(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME
-; le triptyque complet de la chaine de combat : AI_GuidanceSolution_Major
-; (geometrie/anticipation) -> AI_CombatDecision_Major (choix entre correction
-; fine/large/extreme/neutre, ecriture finale de la commande) ->
-; AI_RollToAngleCmd_8104/AI_RollController_7E56 (execution).
+; far, 603L, RELUE INTEGRALEMENT 2026-09-25 (l'ancien resume etait faux : pas de 'rien sous 20
+; deg', pas de 'position anticipee'). DERNIER ETAGE DE LA LOI DE PILOTAGE : transforme les
+; trois ecarts de AI_GuidanceSolution_Major (arg_4 = &cap h, arg_6 = &elevation v, arg_8 =
+; &roulis r) en manche. (0) manche de tangage (bloc de commande +0x1F), de roulis (+0x23) et
+; +0x27 remis a 0. (1) Si AI_Sensor_TooSlow_564A : cran de manette 10, et v et h bornes a +10
+; deg AU-DESSUS seulement ('cmp [si],0A00h / jle'). (2) Si decrochage (JDYN+0x75 bit6) :
+; AI_NoseHighRecovery_676F, sortie. (3) h = v = 0 : ailes a plat (AI_RollToAngleCmd_8104(0,
+; zone morte 2)), retourne 1 (aligne) - seul cas ou la fonction renvoie 1. (4) a = sqrt(h^2 +
+; v^2) (Math_Square_54C39, Math_Sqrt_54BF1). (5) a > 20 deg et v > -10 deg :
+; AI_BankErrorCmd_7F34(r, zone morte 2) ; si |r| < 20 deg : cran 10 et tangage =
+; AI_ClampPitchStick_5305(16) = tirer a fond (dans la limite du pilote). (6) Sinon : w =
+; roulis + r ramene a +/-180 (inclinaison qui alignerait). Si |w| > 145 deg (il faudrait etre
+; presque sur le dos : cible juste sous le nez) : s = max(-16, -16 (v/10)^2), ailes a plat
+; (zone morte 5) puis tangage = s (pousser). Sinon : s = 16 (a/20)^2 K/270 avec K = JDYN+0x71
+; ('imul [si+71h] / shrd 8 / idiv 10Eh') ; si s >= 16 : cran 10 et s = 16 ; t = r (a/20)^2
+; K/270, borne a |r| ; AI_BankErrorCmd_7F34(t, zone morte 5) ; une fois l'inclinaison atteinte
+; : tangage = AI_ClampPitchStick_5305(s). Echelle du manche : 16 = butee.
 ; ==============================================================================================
 AI_CombatDecision_Major	proc far		; CODE XREF: AI_GuidanceSolution_Major+575p
 
@@ -5012,7 +5009,7 @@ loc_7799:				; CODE XREF: AI_CombatDecision_Major+19Dj
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_FlightControl_Cluster
+		call	near ptr AI_BankErrorCmd_7F34
 		add	sp, 8
 		mov	si, di
 		mov	eax, [si]
@@ -5051,7 +5048,7 @@ loc_77DD:				; CODE XREF: AI_CombatDecision_Major+1E0j
 		lea	ax, [bp+var_52]
 		push	ax
 		push	cs
-		call	near ptr Value_ClampSymmetric
+		call	near ptr AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp+var_52]
 		mov	[bp+var_56], eax
@@ -5174,7 +5171,7 @@ loc_791E:				; CODE XREF: AI_CombatDecision_Major+321j
 		lea	ax, [bp+var_8A]
 		push	ax
 		push	cs
-		call	near ptr Value_ClampSymmetric
+		call	near ptr AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp+var_8A]
 		mov	[bp+var_8E], eax
@@ -5316,7 +5313,7 @@ loc_7AB2:				; CODE XREF: AI_CombatDecision_Major+4B0j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_FlightControl_Cluster
+		call	near ptr AI_BankErrorCmd_7F34
 		add	sp, 8
 		or	al, al
 		jz	short loc_7B19
@@ -5327,7 +5324,7 @@ loc_7AB2:				; CODE XREF: AI_CombatDecision_Major+4B0j
 		lea	ax, [bp+var_BA]
 		push	ax
 		push	cs
-		call	near ptr Value_ClampSymmetric
+		call	near ptr AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp+var_BA]
 		mov	[bp+var_BE], eax
@@ -5616,7 +5613,7 @@ loc_7CB2:				; CODE XREF: AI_PitchController_7B20+184j
 		lea	ax, [bp+var_5E]
 		push	ax
 		push	cs
-		call	near ptr Value_ClampSymmetric
+		call	near ptr AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp+var_5E]
 		mov	[bp+var_62], eax
@@ -5726,7 +5723,7 @@ loc_7DA6:				; CODE XREF: AI_PitchController_7B20+238j
 		lea	ax, [bp+var_96]
 		push	ax
 		push	cs
-		call	near ptr Value_ClampSymmetric
+		call	near ptr AI_ClampPitchStick_5305
 		add	sp, 0Ah
 		mov	eax, [bp+var_96]
 		mov	[bp+var_9A], eax
@@ -5933,10 +5930,16 @@ AI_RollController_7E56	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,245L — fonction du même cluster (probable suite de sub_7B20/sub_7E56, logique de
-; contrôle de vol IA) — à approfondir.
+; far, 245L, LUE 2026-09-25. Ex-'AI_FlightControl_Cluster'. COMMANDE DE ROULIS PAR ECART, AVEC
+; LIMITE D'INCLINAISON DU PILOTE : arg_4 = &ecart de roulis e (ramene a +/-180), arg_6 = zone
+; morte (entier, degres). Manche de roulis (+0x23 du bloc de commande) remis a 0. Si la limite
+; d'inclinaison du pilote entite+0xE9 < 90 : inclinaison visee = roulis + e bornee a
+; +/-limite, e recalcule. Si |e| > zone morte : manche de roulis =
+; -JDYN_HighLevelPhysicsCalc(avion, e), retourne 0 ; sinon retourne 1 (inclinaison atteinte).
+; entite+0xE9 = 90 x G/6 si le facteur de charge max JDYN+0x67 < 6, sinon 90
+; (AIAircraft_LoadProfileGuarded_73940).
 ; ==============================================================================================
-AI_FlightControl_Cluster	proc far		; CODE XREF: AI_CombatDecision_Major+1AEp
+AI_BankErrorCmd_7F34	proc far		; CODE XREF: AI_CombatDecision_Major+1AEp
 					; AI_CombatDecision_Major+4C7p
 
 var_66		= dword	ptr -66h
@@ -5996,7 +5999,7 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_7FA4
 ; ���������������������������������������������������������������������������
 
-loc_7F90:				; CODE XREF: AI_FlightControl_Cluster+50j
+loc_7F90:				; CODE XREF: AI_BankErrorCmd_7F34+50j
 		cmp	[bp+var_4], 0FFFF4C00h
 
 loc_7F98:
@@ -6008,24 +6011,24 @@ loc_7F9A:
 loc_7FA2:
 		jmp	short $+2
 
-loc_7FA4:				; CODE XREF: AI_FlightControl_Cluster+5Aj
-					; AI_FlightControl_Cluster:loc_7F98j
+loc_7FA4:				; CODE XREF: AI_BankErrorCmd_7F34+5Aj
+					; AI_BankErrorCmd_7F34:loc_7F98j
 		cmp	[bp+var_E], 5A00h
 		jge	short loc_7FB3
 		mov	ax, 1
 		jmp	short loc_7FB5
 ; ���������������������������������������������������������������������������
 
-loc_7FB3:				; CODE XREF: AI_FlightControl_Cluster+78j
+loc_7FB3:				; CODE XREF: AI_BankErrorCmd_7F34+78j
 		xor	ax, ax
 
-loc_7FB5:				; CODE XREF: AI_FlightControl_Cluster+7Dj
+loc_7FB5:				; CODE XREF: AI_BankErrorCmd_7F34+7Dj
 		or	al, al
 		jnz	short loc_7FBC
 		jmp	loc_8076
 ; ���������������������������������������������������������������������������
 
-loc_7FBC:				; CODE XREF: AI_FlightControl_Cluster+83j
+loc_7FBC:				; CODE XREF: AI_BankErrorCmd_7F34+83j
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_34]
@@ -6053,10 +6056,10 @@ loc_7FE2:
 		jmp	short loc_7FE9
 ; ���������������������������������������������������������������������������
 
-loc_7FE7:				; CODE XREF: AI_FlightControl_Cluster:loc_7FE0j
+loc_7FE7:				; CODE XREF: AI_BankErrorCmd_7F34:loc_7FE0j
 		xor	ax, ax
 
-loc_7FE9:				; CODE XREF: AI_FlightControl_Cluster+B1j
+loc_7FE9:				; CODE XREF: AI_BankErrorCmd_7F34+B1j
 		or	al, al
 		jz	short loc_801B
 		mov	eax, [bp+var_E]
@@ -6076,7 +6079,7 @@ loc_7FE9:				; CODE XREF: AI_FlightControl_Cluster+B1j
 		jmp	short loc_8076
 ; ���������������������������������������������������������������������������
 
-loc_801B:				; CODE XREF: AI_FlightControl_Cluster+B7j
+loc_801B:				; CODE XREF: AI_BankErrorCmd_7F34+B7j
 		mov	eax, [bp+var_E]
 		neg	eax
 		mov	[bp+var_48], eax
@@ -6088,10 +6091,10 @@ loc_801B:				; CODE XREF: AI_FlightControl_Cluster+B7j
 		jmp	short loc_803B
 ; ���������������������������������������������������������������������������
 
-loc_8039:				; CODE XREF: AI_FlightControl_Cluster+FEj
+loc_8039:				; CODE XREF: AI_BankErrorCmd_7F34+FEj
 		xor	ax, ax
 
-loc_803B:				; CODE XREF: AI_FlightControl_Cluster+103j
+loc_803B:				; CODE XREF: AI_BankErrorCmd_7F34+103j
 		or	al, al
 		jz	short loc_8076
 		mov	eax, [bp+var_E]
@@ -6112,7 +6115,7 @@ loc_803B:				; CODE XREF: AI_FlightControl_Cluster+103j
 		mov	[bp+var_60], eax
 		mov	[bp+var_4], eax
 
-loc_8076:				; CODE XREF: AI_FlightControl_Cluster+85j AI_FlightControl_Cluster+E5j ...
+loc_8076:				; CODE XREF: AI_BankErrorCmd_7F34+85j AI_BankErrorCmd_7F34+E5j ...
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Bh], 0
 		jz	short loc_80FE
@@ -6121,7 +6124,7 @@ loc_8076:				; CODE XREF: AI_FlightControl_Cluster+85j AI_FlightControl_Cluster
 		jge	short loc_808C
 		neg	eax
 
-loc_808C:				; CODE XREF: AI_FlightControl_Cluster+153j
+loc_808C:				; CODE XREF: AI_BankErrorCmd_7F34+153j
 		mov	[bp+var_16], eax
 
 loc_8090:
@@ -6143,10 +6146,10 @@ loc_80A3:
 		jmp	short loc_80B4
 ; ���������������������������������������������������������������������������
 
-loc_80B2:				; CODE XREF: AI_FlightControl_Cluster+177j
+loc_80B2:				; CODE XREF: AI_BankErrorCmd_7F34+177j
 		xor	ax, ax
 
-loc_80B4:				; CODE XREF: AI_FlightControl_Cluster+17Cj
+loc_80B4:				; CODE XREF: AI_BankErrorCmd_7F34+17Cj
 		or	al, al
 		jz	short loc_80FE
 		sub	sp, 4
@@ -6174,13 +6177,13 @@ loc_80DE:
 		mov	es:[bx+23h], eax
 		mov	[bp+var_5], 0
 
-loc_80FE:				; CODE XREF: AI_FlightControl_Cluster+14Aj
-					; AI_FlightControl_Cluster+182j
+loc_80FE:				; CODE XREF: AI_BankErrorCmd_7F34+14Aj
+					; AI_BankErrorCmd_7F34+182j
 		mov	al, [bp+var_5]
 		pop	si
 		leave
 		retf
-AI_FlightControl_Cluster	endp
+AI_BankErrorCmd_7F34	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
