@@ -632,12 +632,24 @@ Escort_WaitTakeoffClearance	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,381L — déclenche le tick physique spécial (sub_3314) si dommage (+0x28D bit7) ou timer
-; expiré (sub_A2BD sur +0x174) ; gère sous-état d'escorte (+0x27F), calcule la vitesse
-; relative par rapport à l'objet suivi (+0x287) : handler de rejointe de formation / réaction
-; aux dommages, à approfondir.
+; Ex-'Formation_DamageReactionHandler' (pas une simple reaction aux degats). far, 381L, LUE
+; 2026-09-25. ENTREE EN COMBAT CONTRE UN ATTAQUANT, appelee par AI_TopLevelThink quand rien
+; n'a reagi et +0x27F <= 1. (1) Si je viens d'etre touche (bit 7 de +0x28D) ou minuteur +0x174
+; echu : Targeting_AcquireBestThreat(nouvelle cible sol 0). (2) Niveau +0x27F = 1 remis a 0.
+; (3) Avec une cible aerienne +0x287 et +0x27F == 0 : a = |angle entre mon nez et le sien|, b
+; = |angle entre mon nez et la direction vers lui| (Angle_DeltaNormalized_A), d = distance.
+; Declenchement si touche, OU si b > 150 (cmp 9600h) ET a < 30 (cmp 1E00h) ET d < dword_7201C
+; : IL EST DANS MES SIX HEURES, dans le meme sens que moi. Alors +0x27F = 1. (4a) Ailier en
+; suivi (objectif 0xAA, +0x149 == 0) : si mon leader n'est pas le joueur, il faut en plus que
+; la cible soit une IA qui me vise (son +0x287 = mon objet) ; puis +0x149 = 3, cible de
+; mission +0x137 = +0x285 = l'attaquant, +0x160 = 0, +0x162 = horloge ; si le leader est le
+; joueur : radio 0x12 ('This one's all mine.' chez Billy). (4b) Sinon, hors suivi et classe du
+; modele (+0x52) >= 9 : abandon d'une navigation ID 21 en cours, combat
+; (AI_BehaviorStateMachine_WeightedOptionSelector_9D05), renvoie 1. (4c) Sinon, rien en cours
+; et objectif aucun / 0xA5 / 0xA4 : bloc de commandes +0x1A = 1, bit 5 de +0x28B efface,
+; Goal_WanderRandom. Renvoie 1 seulement en 4b.
 ; ==============================================================================================
-Formation_DamageReactionHandler	proc far		; CODE XREF: AI_TopLevelThink+2FDP
+AI_EngageAttackerReaction_E246	proc far		; CODE XREF: AI_TopLevelThink+2FDP
 
 var_3E		= dword	ptr -3Eh
 var_3A		= dword	ptr -3Ah
@@ -679,32 +691,32 @@ arg_0		= dword	ptr  6
 		or	al, al
 		jz	short loc_E288
 
-loc_E27A:				; CODE XREF: Formation_DamageReactionHandler+1Cj
+loc_E27A:				; CODE XREF: AI_EngageAttackerReaction_E246+1Cj
 		push	0
 		push	large [bp+arg_0]
 		call	Targeting_AcquireBestThreat
 		add	sp, 6
 
-loc_E288:				; CODE XREF: Formation_DamageReactionHandler+32j
+loc_E288:				; CODE XREF: AI_EngageAttackerReaction_E246+32j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 1
 		jnz	short loc_E299
 		mov	byte ptr es:[bx+27Fh], 0
 
-loc_E299:				; CODE XREF: Formation_DamageReactionHandler+4Bj
+loc_E299:				; CODE XREF: AI_EngageAttackerReaction_E246+4Bj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+287h], 0
 		jnz	short loc_E2A7
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E2A7:				; CODE XREF: Formation_DamageReactionHandler+5Cj
+loc_E2A7:				; CODE XREF: AI_EngageAttackerReaction_E246+5Cj
 		cmp	byte ptr es:[bx+27Fh], 0
 		jz	short loc_E2B2
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E2B2:				; CODE XREF: Formation_DamageReactionHandler+67j
+loc_E2B2:				; CODE XREF: AI_EngageAttackerReaction_E246+67j
 		push	word ptr es:[bx+102h]
 		mov	bx, es:[bx+102h]
 		mov	bx, [bx]
@@ -751,7 +763,7 @@ loc_E2B2:				; CODE XREF: Formation_DamageReactionHandler+67j
 		jge	short loc_E344
 		neg	eax
 
-loc_E344:				; CODE XREF: Formation_DamageReactionHandler+F9j
+loc_E344:				; CODE XREF: AI_EngageAttackerReaction_E246+F9j
 		mov	[bp+var_12], eax
 		mov	eax, [bp+var_12]
 		mov	[bp+var_A], eax
@@ -769,7 +781,7 @@ loc_E344:				; CODE XREF: Formation_DamageReactionHandler+F9j
 		jge	short loc_E371
 		neg	eax
 
-loc_E371:				; CODE XREF: Formation_DamageReactionHandler+126j
+loc_E371:				; CODE XREF: AI_EngageAttackerReaction_E246+126j
 		mov	[bp+var_16], eax
 		mov	eax, [bp+var_16]
 		mov	[bp+var_6], eax
@@ -796,32 +808,32 @@ loc_E371:				; CODE XREF: Formation_DamageReactionHandler+126j
 		jmp	short loc_E3C4
 ; ���������������������������������������������������������������������������
 
-loc_E3C2:				; CODE XREF: Formation_DamageReactionHandler+175j
+loc_E3C2:				; CODE XREF: AI_EngageAttackerReaction_E246+175j
 		xor	ax, ax
 
-loc_E3C4:				; CODE XREF: Formation_DamageReactionHandler+17Aj
+loc_E3C4:				; CODE XREF: AI_EngageAttackerReaction_E246+17Aj
 		or	al, al
 		jnz	short loc_E3CB
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E3CB:				; CODE XREF: Formation_DamageReactionHandler+180j
+loc_E3CB:				; CODE XREF: AI_EngageAttackerReaction_E246+180j
 		cmp	[bp+var_A], 1E00h
 		jge	short loc_E3DA
 		mov	ax, 1
 		jmp	short loc_E3DC
 ; ���������������������������������������������������������������������������
 
-loc_E3DA:				; CODE XREF: Formation_DamageReactionHandler+18Dj
+loc_E3DA:				; CODE XREF: AI_EngageAttackerReaction_E246+18Dj
 		xor	ax, ax
 
-loc_E3DC:				; CODE XREF: Formation_DamageReactionHandler+192j
+loc_E3DC:				; CODE XREF: AI_EngageAttackerReaction_E246+192j
 		or	al, al
 		jnz	short loc_E3E3
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E3E3:				; CODE XREF: Formation_DamageReactionHandler+198j
+loc_E3E3:				; CODE XREF: AI_EngageAttackerReaction_E246+198j
 		mov	eax, [bp+var_E]
 		cmp	eax, dword_7201C
 		jge	short loc_E3F3
@@ -829,17 +841,17 @@ loc_E3E3:				; CODE XREF: Formation_DamageReactionHandler+198j
 		jmp	short loc_E3F5
 ; ���������������������������������������������������������������������������
 
-loc_E3F3:				; CODE XREF: Formation_DamageReactionHandler+1A6j
+loc_E3F3:				; CODE XREF: AI_EngageAttackerReaction_E246+1A6j
 		xor	ax, ax
 
-loc_E3F5:				; CODE XREF: Formation_DamageReactionHandler+1ABj
+loc_E3F5:				; CODE XREF: AI_EngageAttackerReaction_E246+1ABj
 		or	al, al
 		jnz	short loc_E3FC
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E3FC:				; CODE XREF: Formation_DamageReactionHandler+16Bj
-					; Formation_DamageReactionHandler+1B1j
+loc_E3FC:				; CODE XREF: AI_EngageAttackerReaction_E246+16Bj
+					; AI_EngageAttackerReaction_E246+1B1j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+27Fh], 1
 		cmp	word ptr es:[bx+11Dh], 0AAh ; '�'
@@ -847,13 +859,13 @@ loc_E3FC:				; CODE XREF: Formation_DamageReactionHandler+16Bj
 		jmp	loc_E4EC
 ; ���������������������������������������������������������������������������
 
-loc_E411:				; CODE XREF: Formation_DamageReactionHandler+1C6j
+loc_E411:				; CODE XREF: AI_EngageAttackerReaction_E246+1C6j
 		cmp	byte ptr es:[bx+149h], 0
 		jz	short loc_E41C
 		jmp	loc_E4EC
 ; ���������������������������������������������������������������������������
 
-loc_E41C:				; CODE XREF: Formation_DamageReactionHandler+1D1j
+loc_E41C:				; CODE XREF: AI_EngageAttackerReaction_E246+1D1j
 		mov	bx, es:[bx+287h]
 		mov	ax, [bx+57h]
 		mov	dx, [bx+55h]
@@ -866,7 +878,7 @@ loc_E41C:				; CODE XREF: Formation_DamageReactionHandler+1D1j
 		cmp	ax, word_722E6
 		jnz	short loc_E461
 
-loc_E442:				; CODE XREF: Formation_DamageReactionHandler+1ECj
+loc_E442:				; CODE XREF: AI_EngageAttackerReaction_E246+1ECj
 		les	bx, [bp+var_22]
 
 loc_E445:
@@ -877,7 +889,7 @@ loc_E44C:
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E44F:				; CODE XREF: Formation_DamageReactionHandler+204j
+loc_E44F:				; CODE XREF: AI_EngageAttackerReaction_E246+204j
 		mov	ax, es:[bx+287h]
 
 loc_E454:
@@ -889,8 +901,8 @@ loc_E457:
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E461:				; CODE XREF: Formation_DamageReactionHandler+1FAj
-					; Formation_DamageReactionHandler+216j
+loc_E461:				; CODE XREF: AI_EngageAttackerReaction_E246+1FAj
+					; AI_EngageAttackerReaction_E246+216j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+149h], 3
 		mov	ax, es:[bx+287h]
@@ -922,14 +934,14 @@ loc_E461:				; CODE XREF: Formation_DamageReactionHandler+1FAj
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E4C7:				; CODE XREF: Formation_DamageReactionHandler+27Cj
+loc_E4C7:				; CODE XREF: AI_EngageAttackerReaction_E246+27Cj
 		mov	ax, es:[bx+145h]
 		cmp	ax, word_722E6
 		jz	short loc_E4D5
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E4D5:				; CODE XREF: Formation_DamageReactionHandler+28Aj
+loc_E4D5:				; CODE XREF: AI_EngageAttackerReaction_E246+28Aj
 		push	0
 		push	12h
 		push	word_722E6
@@ -940,8 +952,8 @@ loc_E4D5:				; CODE XREF: Formation_DamageReactionHandler+28Aj
 		jmp	loc_E59D
 ; ���������������������������������������������������������������������������
 
-loc_E4EC:				; CODE XREF: Formation_DamageReactionHandler+1C8j
-					; Formation_DamageReactionHandler+1D3j
+loc_E4EC:				; CODE XREF: AI_EngageAttackerReaction_E246+1C8j
+					; AI_EngageAttackerReaction_E246+1D3j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+11Dh], 0AAh ; '�'
 		jz	short loc_E549
@@ -966,8 +978,8 @@ loc_E4EC:				; CODE XREF: Formation_DamageReactionHandler+1C8j
 		call	VROOMM_StubThunk_6AB54
 		add	sp, 4
 
-loc_E53C:				; CODE XREF: Formation_DamageReactionHandler+2D9j
-					; Formation_DamageReactionHandler+2E4j
+loc_E53C:				; CODE XREF: AI_EngageAttackerReaction_E246+2D9j
+					; AI_EngageAttackerReaction_E246+2E4j
 		push	0
 		push	large [bp+arg_0]
 		call	AI_BehaviorStateMachine_WeightedOptionSelector_9D05
@@ -976,8 +988,8 @@ loc_E547:
 		jmp	short loc_E59A
 ; ���������������������������������������������������������������������������
 
-loc_E549:				; CODE XREF: Formation_DamageReactionHandler+2B0j
-					; Formation_DamageReactionHandler+2CAj
+loc_E549:				; CODE XREF: AI_EngageAttackerReaction_E246+2B0j
+					; AI_EngageAttackerReaction_E246+2CAj
 		les	bx, [bp+arg_0]
 
 loc_E54C:
@@ -990,8 +1002,8 @@ loc_E54C:
 		cmp	word ptr es:[bx+11Dh], 0A4h ; '�'
 		jnz	short loc_E59D
 
-loc_E56E:				; CODE XREF: Formation_DamageReactionHandler+314j
-					; Formation_DamageReactionHandler+31Dj
+loc_E56E:				; CODE XREF: AI_EngageAttackerReaction_E246+314j
+					; AI_EngageAttackerReaction_E246+31Dj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+7]
 		mov	al, 1
@@ -1006,10 +1018,10 @@ loc_E56E:				; CODE XREF: Formation_DamageReactionHandler+314j
 		push	bx
 		call	Goal_WanderRandom
 
-loc_E59A:				; CODE XREF: Formation_DamageReactionHandler:loc_E547j
+loc_E59A:				; CODE XREF: AI_EngageAttackerReaction_E246:loc_E547j
 		add	sp, 6
 
-loc_E59D:				; CODE XREF: Formation_DamageReactionHandler+5Ej Formation_DamageReactionHandler+69j ...
+loc_E59D:				; CODE XREF: AI_EngageAttackerReaction_E246+5Ej AI_EngageAttackerReaction_E246+69j ...
 		mov	al, [bp+var_1]
 
 loc_E5A0:
@@ -1017,6 +1029,6 @@ loc_E5A0:
 		pop	si
 		leave
 		retf
-Formation_DamageReactionHandler	endp
+AI_EngageAttackerReaction_E246	endp
 
 seg007		ends

@@ -349,7 +349,7 @@ loc_8431:				; CODE XREF: AI_TopLevelThink+2ADj
 		ja	short loc_8454
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	Formation_DamageReactionHandler
+		call	AI_EngageAttackerReaction_E246
 		add	sp, 4
 		mov	[bp+var_9], al
 
@@ -726,16 +726,17 @@ AI_NavSolutionToPoint	endp
 ; sur le joueur) : L'AILIER SE RETOURNE CONTRE LE JOUEUR ; (B2) sinon, si +0x149 != 2 : radio
 ; 8, bit 5, objectif 0xAA, +0x149 = 2, leader = joueur, abandon du comportement en cours,
 ; navigation ID 21 vers le meme point + 1000 m (parametres 250, 0, 0) ; renvoie 1. (C) Sinon,
-; avec le leader = joueur : si +0x27F vaut 1 (degats) ou 2 (missile) : radio 6 au joueur,
-; renvoie 0. (D) m = 2 ou 3, camp 1, leader = joueur, AI_MoraleDisciplineCheck_CA93 faux,
-; +0x149 ni 1 ni 2, objectif 0xAA, byte_6E4CD != 0 : radio 0x12 puis Goal_TransferToWingman
-; (se rattache au joueur : cible de mission et reference de navigation = le joueur, +0x149 =
-; 1, bit 5) ; renvoie 1. Repliques (chunk MSGS de BILLY.IFF, data/BILLY.IFF) : 6 = 'This guy's
-; good. Could someone give me a hand here?' (appel a l'aide) ; 8 = 'That's all for me. I'm
-; outta here!' (abandon du combat, branches A et B2) ; 0x12 = 'This one's all mine.'
-; (initiative, branche D) ; 0x20 = 'Do you feel lucky? Well? Do you punk?' (provocation, aussi
-; jouee au tir par AI_BehaviorSelector). Point resolu depuis word_706A0 : non trace. Ne fait
-; PAS le suivi de formation (c'est Goal_ExecuteAction_A8AC, cas 0xAA).
+; avec le leader = joueur : si +0x27F vaut 1 (en combat contre un attaquant,
+; AI_EngageAttackerReaction_E246) ou 2 (missile) : radio 6 au joueur, renvoie 0. (D) m = 2 ou
+; 3, camp 1, leader = joueur, AI_MoraleDisciplineCheck_CA93 faux, +0x149 ni 1 ni 2, objectif
+; 0xAA, byte_6E4CD != 0 : radio 0x12 puis Goal_TransferToWingman (se rattache au joueur :
+; cible de mission et reference de navigation = le joueur, +0x149 = 1, bit 5) ; renvoie 1.
+; Repliques (chunk MSGS de BILLY.IFF, data/BILLY.IFF) : 6 = 'This guy's good. Could someone
+; give me a hand here?' (appel a l'aide) ; 8 = 'That's all for me. I'm outta here!' (abandon
+; du combat, branches A et B2) ; 0x12 = 'This one's all mine.' (initiative, branche D) ; 0x20
+; = 'Do you feel lucky? Well? Do you punk?' (provocation, aussi jouee au tir par
+; AI_BehaviorSelector). Point resolu depuis word_706A0 : non trace. Ne fait PAS le suivi de
+; formation (c'est Goal_ExecuteAction_A8AC, cas 0xAA).
 ; ==============================================================================================
 Goal_MoraleReaction_878F:				; DATA XREF: seg339:off_6D1A8o
 		push	bp
@@ -4126,7 +4127,7 @@ Timer_OneShotEvent_A288	endp
 ; far,32L — variante de sub_A288 sur bit3/bit4, avec division supplémentaire (sar dx,1) sur le
 ; masque : minuteur générique 'événement écoulé' (bit3), période différente.
 ; ==============================================================================================
-Timer_OneShotEvent_A2BD	proc far		; CODE XREF: Formation_DamageReactionHandler+28P
+Timer_OneShotEvent_A2BD	proc far		; CODE XREF: AI_EngageAttackerReaction_E246+28P
 
 arg_0		= dword	ptr  6
 

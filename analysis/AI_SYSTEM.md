@@ -984,7 +984,7 @@ int AI_TopLevelThink(Entity* entity) {
             AI_QueryTargetField4B(entity);
     }
     if (!reacted && entity->f27F <= 1)
-        reacted = Formation_DamageReactionHandler(entity);
+        reacted = AI_EngageAttackerReaction_E246(entity);
     if (reacted) return;                      // "protect self" passe avant "obey order"
 
     // 4. objet en cours : passe avant GOAL et tournoi (nature de l'objet non établie)
@@ -1083,7 +1083,7 @@ suivant prend la main) :
 | 4 ou 5 | pilote hors du camp du joueur | **fuite** : radio 8, ordre « vol vers un point » (`0xA5`) verrouillé contre le script, comportement en cours abandonné, navigation (nœud ID 21) vers un point résolu depuis l'objet global `word_706A0`, 1000 m plus haut |
 | 4 ou 5 | ailier du joueur, indiscipliné, en suivi : **la menace qui le vise est le joueur** et aucun adversaire actif | **se retourne contre le joueur** : cible aérienne = le joueur, combat, radio `0x20` |
 | 4 ou 5 | ailier du joueur, indiscipliné, en suivi, autre cas (une seule fois, `+0x149 = 2`) | radio 8, ordre « suivre » le joueur verrouillé, navigation vers le même point relevé de 1000 m |
-| 4 ou 5 | ailier du joueur, sinon, en réaction aux dégâts ou à un missile | radio 6 au joueur, ne prend pas la main |
+| 4 ou 5 | ailier du joueur, sinon, en combat contre un attaquant ou sous missile (niveau 1 ou 2) | radio 6 au joueur, ne prend pas la main |
 | 2 ou 3 | ailier du joueur, indiscipliné, en suivi, adversaires actifs | radio `0x12`, `Goal_TransferToWingman` (cible de mission et navigation = le joueur, ordre verrouillé) |
 
 « Camp du joueur » = octet `+0x50` de l'objet monde à 1 (0xFF = camp adverse, 0 = neutre) : déduit
@@ -1100,6 +1100,17 @@ Le point résolu depuis `word_706A0` n'est pas tracé. **Question ouverte** : da
 `0x12`, `Goal_TransferToWingman` met le joueur comme cible de mission et référence de navigation
 (l'ordre « suivre » est gardé) ; ce que fait ensuite l'ailier pour « s'occuper de celui-là » n'est
 pas tracé.
+
+**Usage des répliques observé en jeu (Rémi, 2026-09-25)** : `0x12` (« This one's all mine. »)
+arrive en début de combat, quand l'ailier sélectionne une cible, en alternance avec `0x0C`
+(« Here we go, folks. It's Primetime! ») ; `0x0D` (« Hasta la vista, baby. ») quand il a détruit un
+ennemi ; `0x0F` (« Radical shot! ») compliment quand le joueur abat un MiG au canon. Côté code,
+`0x12` est joué par ce gestionnaire (branche prise d'initiative) et surtout par
+`AI_EngageAttackerReaction_E246` (ex-`Formation_DamageReactionHandler`) : touché, ou un avion
+dans ses six heures (écart nez/cible > 150°, même sens à 30° près, distance < `dword_7201C`),
+l'ailier prend l'attaquant comme cible de mission, passe au niveau de réaction 1 et annonce
+`0x12`. Les appels qui jouent `0x0C`, `0x0D` et `0x0F` ne sont pas localisés (code du message
+probablement calculé, pas une constante).
 
 **`GOAL` de Billy** (fichier réel) : `5, 2, 1, 4, 3` → réaction au moral, puis ordre du script
 (dont le suivi `0xAA`), puis combat, puis errance ; le `1` est ignoré.

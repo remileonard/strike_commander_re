@@ -400,7 +400,7 @@ comment `current_command` s'articule avec la boucle `GOAL`.*
 3. Altitude : celle du terrain sous le point, plus l'altitude de croisière lue dans l'entité (constante issue de `NUMS`), moins l'altitude actuelle, bornée à ±1000, ajoutée à la position courante.
 4. Elle écrit le point (position visée) et la vitesse voulue (direction × vitesse de croisière `NUMS`) dans le bloc d'état commun au joueur et à l'IA, ainsi que dans les coordonnées de point de mission de l'entité, puis applique le nœud d'exécution du contrôleur (celui du chemin `ExecuteFlightCommand`) et renvoie vrai.
 5. Un test sur deux octets de l'état (`+0x1A` nul et code `0x15` en `+0x19`) peut sauter la génération du point : rôle non lu.
-6. Appelée par `Goal_ExecuteAction` (cas « aucun ordre ») et par `Formation_DamageReactionHandler`.
+6. Appelée par `Goal_ExecuteAction` (cas « aucun ordre ») et par `AI_EngageAttackerReaction_E246`.
 
 **Écart avec libRealSpace** : la version livrée tire un `SPOT` de la mission et non un point à 30 000 unités. Sa garde est `current_target != NO_TARGET` (cible de mission engagée).
 

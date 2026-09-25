@@ -1259,7 +1259,7 @@ word_ACE7	dw 0FFFFh,  0A1h,  0A2h,  0A4h ; DATA XREF: Goal_ExecuteAction_A8AC+61
 ; Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler.
 ; ==============================================================================================
 Goal_WanderRandom	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+42Fp
-					; Formation_DamageReactionHandler+34FP
+					; AI_EngageAttackerReaction_E246+34FP
 					; DATA XREF: ...
 
 var_6A		= dword	ptr -6Ah

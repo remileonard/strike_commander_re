@@ -48,7 +48,7 @@ flowchart TD
         MASTER -->|"sinon"| TRIGGER
         TRIGGER -.->|"si +0x28B bit7"| BEHAV
         TOPTHINK["AI_TopLevelThink<br/>appelée par AI_TriggerBehaviorUpdate<br/>lue : début et fin, pas le milieu"]
-        REACT["réactions prioritaires<br/>AI_MissileEvasionReaction_9A77<br/>Formation_DamageReactionHandler<br/>avant tout objectif"]
+        REACT["réactions prioritaires<br/>AI_MissileEvasionReaction_9A77<br/>AI_EngageAttackerReaction_E246<br/>avant tout objectif"]
         ACTIVEOBJ["objet à entité+0x0D<br/>si non nul : son slot +0xC<br/>GOAL et tournoi sautés<br/>nature de l'objet inconnue"]
         GROUND["avion au sol :<br/>Goal_ExecuteAction_A8AC direct<br/>tableau GOAL ignoré"]
         SLOTS["avion en vol : emplacements GOAL<br/>entité+0x1B0, 8 octets par emplacement<br/>jusqu'au premier qui renvoie non nul"]
@@ -201,7 +201,7 @@ flowchart TD
 
 1. **Début** : si `byte_6E4D7` est non nul et `entité+0xB0` ≥ 0xC (`TH` d'après `AI_SYSTEM.md` §1.5), appel de `Targeting_AcquireBestThreat`. Puis `AI_MessageDispatcher` et `Radio_CombatChatterDispatch`.
 2. **Le traitement des menaces est sauté** (`jmp loc_83F0`) dans trois cas : `entité+0x11D` vaut `0xA1` (décollage) ou `0xA2` (atterrissage) ; l'avion est au sol (l'octet `+0x20` du sous-objet pointé par le premier champ de l'objet à `entité+0xB` non nul) ; `word_70466` ≤ 3. Sinon, `AI_IncomingThreatWarning` et la mise à jour de la chaîne de cibles (`+0x287` / `+0x289`).
-3. **Réactions prioritaires, avant tout objectif** (`loc_83F0`) : si `entité+0x281` est non nul, alors `AI_MissileEvasionReaction_9A77` quand `entité+0x0D` est nul et `entité+0x27F` vaut 2, et `AI_QueryTargetField4B` dans les autres cas. Puis, si rien n'a réagi et `entité+0x27F` ≤ 1, `Formation_DamageReactionHandler`. Si l'un des deux gestionnaires de réaction a réagi, **la fonction se termine ici**.
+3. **Réactions prioritaires, avant tout objectif** (`loc_83F0`) : si `entité+0x281` est non nul, alors `AI_MissileEvasionReaction_9A77` quand `entité+0x0D` est nul et `entité+0x27F` vaut 2, et `AI_QueryTargetField4B` dans les autres cas. Puis, si rien n'a réagi et `entité+0x27F` ≤ 1, `AI_EngageAttackerReaction_E246`. Si l'un des deux gestionnaires de réaction a réagi, **la fonction se termine ici**.
 4. **Objet en cours** : si `entité+0x0D` (pointeur far) est non nul **et** `entité+0x27F` non nul, appel de `[vtable+0xC]` de cet objet, temps cumulé dans `word_704E6+0x5B56`, et **fin de la fonction** : ni `GOAL` ni tournoi. `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` contient le même bloc (si `entité+0x0D` est non nul, pas de nouveau score).
 5. **Objectifs** :
    - avion **au sol** (l'octet `+0x20` du sous-objet pointé par le premier champ de l'objet à `entité+0xB` non nul) : `Goal_ExecuteAction_A8AC(entité, 0)` **directement**, quel que soit le tableau `GOAL` ;
@@ -237,12 +237,12 @@ l'avion jusqu'à ce qu'il se termine ou soit abandonné.
 
 ### 2. `entité+0x27F` est le niveau de la réaction active
 
-Écrivains : `Formation_DamageReactionHandler` → 1 ; `Targeting_AcquireBestThreat` → 2 (missile
+Écrivains : `AI_EngageAttackerReaction_E246` → 1 (entrée en combat : touché, ou un avion dans mes six heures) ; `Targeting_AcquireBestThreat` → 2 (missile
 gagnant) ; `AI_VisibilityTest` → 3 ; `Escort_WaitLandingClearance` → 4 ;
 `Escort_WaitTakeoffClearance` → 5 ; remis à 0 par les mêmes et par `AI_ScanForNewTarget`,
 `AI_EvalTargetAttribute`, `AI_MissileEvasionReaction_9A77`. Chaque réaction ne tourne que si
 `+0x27F` ne dépasse pas son propre niveau : attente de décollage si ≤ 5, d'atterrissage si ≤ 4,
-recherche de cible si ≤ 3, esquive si == 2, réaction aux dégâts et **tir/poursuite** si ≤ 1.
+recherche de cible si ≤ 3, esquive si == 2, entrée en combat contre un attaquant et **tir/poursuite** si ≤ 1.
 
 ### 3. Ordre complet d'un tick (`AI_TopLevelThink`)
 
@@ -254,7 +254,7 @@ recherche de cible si ≤ 3, esquive si == 2, réaction aux dégâts et **tir/po
    `+0x28D` posé (effacé quand plus rien n'est en cours).
 3. Si rien n'est en cours : attente de décollage, d'atterrissage, recherche de nouvelle cible
    (selon `+0x27F`).
-4. Réactions prioritaires : esquive de missile (`+0x281`, `+0x27F == 2`), réaction aux dégâts.
+4. Réactions prioritaires : esquive de missile (`+0x281`, `+0x27F == 2`), entrée en combat contre un attaquant (`AI_EngageAttackerReaction_E246`).
    Si l'une agit : fin.
 5. **Comportement en cours** (`+0x0D`) et `+0x27F` non nul : sa méthode `+0xC`, fin.
 6. **`GOAL`** : au sol, `Goal_ExecuteAction_A8AC` directement ; en vol, les gestionnaires du
