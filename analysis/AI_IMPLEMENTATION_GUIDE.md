@@ -539,7 +539,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | traits `ATRB` (`+0xB0` à `+0xB8`, copie de consommation) | `FL`, `TH`, `VB`, `CN`, `LY`, `AG`, `AA`, `SM`, `AR` (ordre en mémoire, corrigé 2026-09-25 ; fichier : TH, CN, VB, LY, FL, …) | connu | non (lus par `owner->profile`) | `profile->ai.atrb` |
 | tableau `GOAL` (`+0x1B0`, 8 octets par emplacement) | sélecteurs du profil | connu | non (lus par `owner->profile`) | `profile->ai.goal` |
 | nœuds `MVRS` (`+0x200` compteur, `+0x202` tableau, 5 octets chacun) | tournoi | connu | non (lus par `owner->profile`) | `profile->ai.mvrs` |
-| minuteur de rappel du ciblage (`+0x174`) | limite les rappels de `Targeting_AcquireBestThreat` du tournoi | connu | à déclarer plus tard | — |
+| cadence du ciblage (`+0x174` bits, `+0x175` horloge, `+0x179` masque selon `FL`) | limite les rappels de `Targeting_AcquireBestThreat` : toutes les 16/8/4 s (tournoi) ou 8/4/2 s (attaquant) selon `FL` — `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis | connu | à déclarer plus tard | — |
 | chronomètre (`+0x175`) | préparé par `AIEntity_MasterTick_5ACC` | partiel | non | — |
 | rayon d'arrivée (`+0x139`), vitesse de croisière (`+0x141`), `+0x13D` | constantes issues de `NUMS` | connu | non | `NUMS` sur `SCMission` |
 | décalage de formation (`+0x14A`, `+0x14E`, `+0x152`) | (300, 0, 0) en 24.8 | connu | non | `formation_pos_offset` (acteur) |

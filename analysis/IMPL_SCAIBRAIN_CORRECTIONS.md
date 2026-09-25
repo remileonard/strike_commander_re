@@ -71,8 +71,30 @@ Tous les usages de `entité+0xB0` retrouvés :
 - **Alerte de menace** (`AI_IncomingThreatWarning`) : seuil `FL ≥ 13` puis jet de pilotage.
 - Scores des manœuvres ID1, ID2, ID3, ID7 (jet avec modificateur −7) ; `AI_EvalTargetAttribute` ;
   `AI_RadarScanTarget` (minuteur/portée).
-- `entité+0x179` = 15 si `FL < 4`, 7 si `FL < 11`, sinon 3 (`PilotProfile_LoadNUMSCompanionFile_73FB4`,
-  rôle non tracé).
+- **Cadence de recherche de cible** (`entité+0x179`, tracé le 2026-09-25) : masque `M` = 15 si
+  `FL < 4`, 7 si `FL < 11`, sinon 3 (`PilotProfile_LoadNUMSCompanionFile_73FB4`). Un pilote faible
+  re-cherche sa cible **moins souvent** :
+
+  | `FL` | Sans cible aérienne, sous menace missile ou avec cible sol (tournoi) | Entrée en combat contre un attaquant |
+  |---|---|---|
+  | 0–3 | toutes les 16 s | toutes les 8 s (et dès qu'il est touché) |
+  | 4–10 | toutes les 8 s | toutes les 4 s |
+  | 11–16 | toutes les 4 s | toutes les 2 s |
+
+  ```cpp
+  // entité : clock (s), mask M, deux fenêtres « une fois par période »
+  clock += dt;                                           // départ décalé de 0,098 s par entité créée
+  int t = (int)floorf(clock);
+  bool slowWindow() { if (!slowFired && (t & M) == 0) { slowFired = true; return true; } return false; }
+  bool fastWindow() { if (!fastFired && (t & (M >> 1)) == 0) { fastFired = true; return true; } return false; }
+  // chaque tick (AIEntity_MasterTick_5ACC) : si la fenêtre s'est refermée, réarmer
+  if (slowFired && (t & M) != 0) slowFired = false;
+  if (fastFired && (t & (M >> 1)) != 0) fastFired = false;
+  ```
+  `slowWindow` : `AI_RetargetWindowSlow_A288` (tournoi, `AI_BehaviorStateMachine_WeightedOptionSelector_9D05`) ;
+  `fastWindow` : `AI_RetargetWindowFast_A2BD` (`AI_EngageAttackerReaction_E246`). Avec une cible
+  aérienne vivante, le tournoi ne re-cherche pas ; il re-cherche aussitôt si son pilote s'est éjecté
+  (bit 5 de `flags_75`), et à chaque appel s'il n'a rien du tout.
 
 ## 1. [P1] Attaque au sol : condition inversée entre les phases 0 et 1
 
@@ -447,7 +469,7 @@ le fusionner avec `reaction_level`.
 `reaction_level ≤ 1` :
 ```cpp
 bool SCAIBrain::engageAttackerReaction() {
-    if (just_hit || retarget_timer_expired) this->acquireBestThreat(false);   // bit 7 de +0x28D / minuteur +0x174
+    if (just_hit || fastWindow()) this->acquireBestThreat(false);   // bit 7 de +0x28D / AI_RetargetWindowFast_A2BD (§0bis)
     if (reaction_level == REACT_ENGAGED) reaction_level = REACT_NONE;
     if (air_target == nullptr || reaction_level != REACT_NONE) return false;
 

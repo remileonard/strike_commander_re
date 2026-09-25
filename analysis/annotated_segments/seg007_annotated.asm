@@ -689,7 +689,7 @@ arg_0		= dword	ptr  6
 		add	ax, 174h
 		push	word ptr [bp+arg_0+2]
 		push	ax
-		call	Timer_OneShotEvent_A2BD
+		call	AI_RetargetWindowFast_A2BD
 		add	sp, 4
 		or	al, al
 		jz	short loc_E288

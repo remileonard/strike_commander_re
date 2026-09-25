@@ -775,7 +775,8 @@ PilotProfile_LoadFromPROF_73B4F	endp
 ; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
 ; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
 ; FL pour +0xB4 est a lire selon cette table. Pose aussi entite+0x179 = 15 si FL < 4, 7 si FL
-; < 11, sinon 3 ('cmp byte ptr es:[bx+0B0h], 4 / 0Bh') - role de +0x179 non trace.
+; < 11, sinon 3 ('cmp byte ptr es:[bx+0B0h], 4 / 0Bh') = masque de cadence du ciblage (voir
+; AI_RetargetWindowSlow_A288) : un pilote faible re-cherche sa cible moins souvent.
 ; ==============================================================================================
 PilotProfile_LoadNUMSCompanionFile_73FB4	proc far		; CODE XREF: VROOMM_StubThunk_6AAEEJ AIAircraft_LoadProfileGuarded_73940+6Bp
 

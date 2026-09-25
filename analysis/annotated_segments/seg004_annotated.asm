@@ -3545,7 +3545,7 @@ loc_9DAD:				; CODE XREF: AI_BehaviorStateMachine_WeightedOptionSelector_9D05+8D
 		push	ax
 		nop
 		push	cs
-		call	near ptr Timer_OneShotEvent_A288
+		call	near ptr AI_RetargetWindowSlow_A288
 		add	sp, 4
 		or	al, al
 		jz	short loc_9DDA
@@ -4136,11 +4136,22 @@ loc_A27A:				; CODE XREF: seg004:2124j seg004:212Cj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,27L — vérifie/positionne un bit d'événement one-shot sur un petit objet (offset 0,
-; bit0), calcule un compte à rebours (dword+1 >> 8 ET masque octet+5) : minuteur générique
-; 'événement écoulé' (bit1).
+; Ex-'Timer_OneShotEvent_A288'. far, LUE 2026-09-25. Renvoie 1 au plus une fois par fenetre
+; lente : si b1 de +0x174 = 0 et (t & M) == 0 ('sar eax, 8 / movzx edx, byte ptr es:[bx+5] /
+; test eax, edx'), pose b0 et renvoie 1. Appelee par
+; AI_BehaviorStateMachine_WeightedOptionSelector_9D05 quand l'IA n'a pas de cible aerienne
+; mais une menace missile (+0x281) ou une cible sol (+0x283) : relance
+; Targeting_AcquireBestThreat toutes les M+1 s au lieu de chaque tick. Bloc de cadence du
+; ciblage (entite+0x174..0x179) : +0x174 = 4 bits (b0/b1 fenetre lente, b2/b3 fenetre rapide),
+; +0x175 = horloge (secondes 24.8, += dt dans AIEntity_MasterTick_5ACC, depart decale de 0,098
+; s par entite : dword_6D3BE += 0x19 dans AIEntity_CreateByType_12B4E), +0x179 = masque M (3
+; par defaut ; PilotProfile_LoadNUMSCompanionFile_73FB4 : 15 si FL < 4, 7 si FL < 11, sinon
+; 3). Avec t = secondes entieres de l'horloge : la fenetre lente s'ouvre quand (t & M) == 0,
+; soit une fois toutes les M+1 s (16 / 8 / 4 s) ; la rapide quand (t & (M>>1)) == 0, toutes
+; les (M>>1)+1 s (8 / 4 / 2 s). Chaque fenetre ne declenche qu'une fois (bit 'deja tire' remis
+; a 0 par AIEntity_MasterTick_5ACC a la fermeture).
 ; ==============================================================================================
-Timer_OneShotEvent_A288	proc far		; CODE XREF: AI_BehaviorStateMachine_WeightedOptionSelector_9D05+B4p
+AI_RetargetWindowSlow_A288	proc far		; CODE XREF: AI_BehaviorStateMachine_WeightedOptionSelector_9D05+B4p
 
 arg_0		= dword	ptr  6
 
@@ -4162,11 +4173,11 @@ arg_0		= dword	ptr  6
 		or	byte ptr es:[bx], 1
 		mov	cx, 1
 
-loc_A2B9:				; CODE XREF: Timer_OneShotEvent_A288+14j Timer_OneShotEvent_A288+28j
+loc_A2B9:				; CODE XREF: AI_RetargetWindowSlow_A288+14j AI_RetargetWindowSlow_A288+28j
 		mov	al, cl
 		pop	bp
 		retf
-Timer_OneShotEvent_A288	endp
+AI_RetargetWindowSlow_A288	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4174,10 +4185,20 @@ Timer_OneShotEvent_A288	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,32L — variante de sub_A288 sur bit3/bit4, avec division supplémentaire (sar dx,1) sur le
-; masque : minuteur générique 'événement écoulé' (bit3), période différente.
+; Ex-'Timer_OneShotEvent_A2BD'. far, LUE 2026-09-25. Meme principe sur b2/b3 et le masque M>>1
+; ('sar dx, 1'). Appelee par AI_EngageAttackerReaction_E246 : Targeting_AcquireBestThreat est
+; relance si l'avion vient d'etre touche (bit 7 de +0x28D) ou a chaque fenetre rapide, toutes
+; les (M>>1)+1 s. Bloc de cadence du ciblage (entite+0x174..0x179) : +0x174 = 4 bits (b0/b1
+; fenetre lente, b2/b3 fenetre rapide), +0x175 = horloge (secondes 24.8, += dt dans
+; AIEntity_MasterTick_5ACC, depart decale de 0,098 s par entite : dword_6D3BE += 0x19 dans
+; AIEntity_CreateByType_12B4E), +0x179 = masque M (3 par defaut ;
+; PilotProfile_LoadNUMSCompanionFile_73FB4 : 15 si FL < 4, 7 si FL < 11, sinon 3). Avec t =
+; secondes entieres de l'horloge : la fenetre lente s'ouvre quand (t & M) == 0, soit une fois
+; toutes les M+1 s (16 / 8 / 4 s) ; la rapide quand (t & (M>>1)) == 0, toutes les (M>>1)+1 s
+; (8 / 4 / 2 s). Chaque fenetre ne declenche qu'une fois (bit 'deja tire' remis a 0 par
+; AIEntity_MasterTick_5ACC a la fermeture).
 ; ==============================================================================================
-Timer_OneShotEvent_A2BD	proc far		; CODE XREF: AI_EngageAttackerReaction_E246+28P
+AI_RetargetWindowFast_A2BD	proc far		; CODE XREF: AI_EngageAttackerReaction_E246+28P
 
 arg_0		= dword	ptr  6
 
@@ -4204,11 +4225,11 @@ loc_A2C0:
 		or	byte ptr es:[bx], 4
 		mov	cx, 1
 
-loc_A2F5:				; CODE XREF: Timer_OneShotEvent_A2BD+15j Timer_OneShotEvent_A2BD+2Fj
+loc_A2F5:				; CODE XREF: AI_RetargetWindowFast_A2BD+15j AI_RetargetWindowFast_A2BD+2Fj
 		mov	al, cl
 		pop	bp
 		retf
-Timer_OneShotEvent_A2BD	endp
+AI_RetargetWindowFast_A2BD	endp
 
 ; ���������������������������������������������������������������������������
 

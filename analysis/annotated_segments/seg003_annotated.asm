@@ -1529,7 +1529,10 @@ loc_5ABA:				; CODE XREF: seg003:0ADEj
 ; confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit
 ; vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs
 ; versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus
-; tiree de ces noms dans ce resume est a relire.
+; tiree de ces noms dans ce resume est a relire. Etape (3) precisee 2026-09-25 : horloge
+; +0x175 += dt ; si b0 de +0x174 : b0 = b1 = ((t & M) == 0) ; si b2 : b2 = b3 = ((t & (M>>1))
+; == 0), t = secondes entieres, M = +0x179 (fenetres de AI_RetargetWindowSlow_A288 /
+; AI_RetargetWindowFast_A2BD).
 ; ==============================================================================================
 AIEntity_MasterTick_5ACC:				; DATA XREF: seg339:011Co
 		push	bp
