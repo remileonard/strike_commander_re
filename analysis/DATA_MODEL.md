@@ -437,7 +437,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x3B` | **traînée train sorti** | id. L157 : `if flags_75 bit2: drag += [+0x3B]` |
 | `+0x3F` | coeff. de traînée **au sol** (roulage/réaction sol) | `Aero_ComputeDragWithFeedback` L724, gaté par `[A+0x20]` (flag « au sol ») |
 | `+0x43` | id. + extra si aérofrein sorti | id. L736 (`+ flags_75 bit0`) |
-| `+0x47` | **limite symétrique ±** d'un delta rate-limité | `Aero_ComputeControlFlags75Bit5C` L1855-1867 (clamp) |
+| `+0x47` | **limite symétrique ±** d'un delta rate-limité — côté IA (2026-09-25) : **accélération de roulis max** (deg/s²), `JDYN_RollStickFromError_4B09D` (`add di, 47h` puis `imul dword_70458`, × dt) | `Aero_ComputeControlFlags75Bit5C` L1855-1867 (clamp) |
 | `+0x4B` | **α de décrochage / Cl max** (u8) — (A) borne SYMÉTRIQUE `α_eff` ∈ `±(0x4B<<8)` **et** coupe la force latérale si `|β|` dépasse, toujours actif ; (B) départ franc (portance = 0 + `flags_75` bit6) seulement si `|α_eff|>seuil` ET `word_70466>10` ET `byte_72354≠0` ET objet = joueur (`word_722E6`) | `Aero_ComputeLiftAndSideForce` `loc_481C1`/`loc_48211`/`loc_482E7` |
 | `+0x4C` | **angle de calage d'aile / α de portance nulle** (u8, non signé, `×256`) — **toujours** ajouté à α. *Pas un trim pilote* (jeu en accès direct sur les axes) : constante de cellule | `Aero_ComputeAoAWithTrim` L219 |
 | `+0x4D` | **incrément de portance des volets** (u8) — ajouté si `flags_75` bit1 (volets sortis) | id. L230 |
@@ -449,7 +449,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeAoACommand_48862` L1457 |
 | `+0x66` | valeur de reset de l'accumulateur `[jdyn+0x1A]` × gain `dword_72A18` | `Aero_ResetAccumulatorFlags75Bit5` L1972 |
 | `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeAoACommand_48862` L1158 |
-| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) | `Autopilot_BankForTurn_49A7C` L3441 |
+| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) — **taux de roulis max** (deg/s) lu par `Aero_MaxRollRate_4AF35` (`add di, 71h`), réduit près du décrochage, à basse vitesse et à l'état 2 de `flags_75` bits 7-8 | `Autopilot_BankForTurn_49A7C` L3441 |
 | `+0x80` (u16, déf. 500) | **Vitesse de poursuite MAX de l'IA** — consigne haute quand la cible est loin ; l'IA interpole/plafonne sa vitesse de consigne vers `jdyn[0x80]<<8`, et la passe telle quelle à `AI_ThrottleCmd_HUD`. | `AI_InterceptSpeedControlLaw` `sub_5F9B` (seg003) `loc_60DF`/`loc_610A`/`loc_61AB` ; `AI_RegainSpeed_68D4` `sub_68D4` `loc_691C` |
 | `+0x82` (u16, déf. 100) | **Vitesse de poursuite MIN de l'IA** — plancher : `var_4 = max(var_4, jdyn[0x82]<<8)` sur la consigne de vitesse. | `AI_InterceptSpeedControlLaw` `sub_5F9B` L2044-2070 |
 | `+0x84` (i16, déf. 231) | **Vitesse de croisière / manœuvre de l'IA** — passée directement à `AI_ThrottleCmd_HUD` comme consigne de manette ; entre aussi dans un seuil de distance de manœuvre `(jdyn[0x84]+dword_72039)/2` (au-delà → maintien de vitesse, en-deçà → ajuste manette + vire). | `GroundAttack_Phase4_PullUp_77171` (ovr231) ; `AI_SpeedManeuverDecision` `sub_68D4` L3124-3134 |
