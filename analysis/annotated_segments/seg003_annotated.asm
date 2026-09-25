@@ -5904,7 +5904,7 @@ loc_7EE7:				; CODE XREF: AI_RollController_7E56+8Dj
 		push	ss
 		lea	ax, [bp+var_16]
 		push	ax
-		call	JDYN_HighLevelPhysicsCalc
+		call	JDYN_RollStickFromError_4B09D
 		add	sp, 0Ah
 		mov	eax, [bp+var_16]
 		neg	eax
@@ -6160,7 +6160,7 @@ loc_80B4:				; CODE XREF: AI_BankErrorCmd_7F34+17Cj
 		push	ss
 		lea	ax, [bp+var_20]
 		push	ax
-		call	JDYN_HighLevelPhysicsCalc
+		call	JDYN_RollStickFromError_4B09D
 		add	sp, 0Ah
 
 loc_80D7:

@@ -1184,7 +1184,7 @@ flowchart TD
     I -->|"écrit dans entité+7+0x23"| J(("MÊME champ que
 l'entrée souris
 du joueur !"))
-    I --> K["JDYN_HighLevelPhysicsCalc<br/>— LE MÊME calcul physique que le joueur"]
+    I --> K["JDYN_RollStickFromError_4B09D<br/>— écart de roulis → manche (IA)"]
 ```
 
 **Le point décisif** : `AI_RollController_7E56` écrit son
@@ -1192,11 +1192,12 @@ résultat dans `entité+7+0x23` — **exactement le champ que
 `Player_MainUpdate` lit aux côtés de la valeur dérivée de la
 souris du joueur**, dans la même comparaison. Ce n'est pas une
 coïncidence d'offset : l'IA et le joueur alimentent le **même point
-d'entrée**, avec des valeurs interchangeables, avant que le résultat
-ne soit consommé par `JDYN_HighLevelPhysicsCalc` (`sub_4B09D`) — la
-fonction de calcul physique de haut niveau du modèle de vol `JDYN`,
-**partagée sans distinction entre avions pilotés par le joueur et par
-l'IA**.
+d'entrée**, avec des valeurs interchangeables. *(Corrigé le 2026-09-25 :
+`JDYN_RollStickFromError_4B09D` n'est **pas** en aval de ce champ ; c'est
+l'IA qui l'appelle **avant** d'écrire `+0x23`, pour convertir son écart de
+roulis en manche — seuls `AI_RollController_7E56` et `AI_BankErrorCmd_7F34`
+l'appellent. Ce qui est partagé avec le joueur, c'est le modèle de vol qui lit
+ensuite le manche.)*
 
 **Ce que ça confirme et infirme** :
 - **Infirme** : pas de VM de mouvement séparée façon caméra scriptée,
@@ -1836,8 +1837,9 @@ maintenant en place :
   tournoi) → `AI_GuidanceSolution_Major` → **`AI_CombatDecision_Major`**
   (arbre à 4 branches selon la magnitude de l'angle, écrit la commande
   finale) → `AI_RollToAngleCmd_8104` → `AI_RollController_7E56` →
-  `JDYN_HighLevelPhysicsCalc` — le même calcul physique que le joueur,
-  confirmé par un champ de commande partagé (`entité+7+0x23`/`+0x1F`).
+  `JDYN_RollStickFromError_4B09D` (écart → manche, propre à l'IA), puis le
+  même modèle de vol que le joueur via le champ de commande partagé
+  (`entité+7+0x23`/`+0x1F`).
 - **Les constantes `NUMS` non rondes** (`dword_72020/24/28/2C`) :
   identifiées comme des seuils de classification de distance en 4
   paliers, avec deux jeux de seuils distincts selon le type de cible
@@ -1892,12 +1894,10 @@ Par ordre de valeur probable :
 
 *(Liste mise à jour le 2026-09-25.)*
 
-1. **`AI_GuidanceSolution_Major`** (651 lignes) — la loi qui transforme « aller vers cette
-   direction » en consignes de roulis. Lue avant la découverte de l'inversion des noms
-   sinus/cosinus : son résumé est à relire ligne à ligne. C'est le maillon qui manque pour
-   porter fidèlement la poursuite, l'esquive et l'approche de l'attaque au sol.
-2. **`JDYN_HighLevelPhysicsCalc`** (328 lignes) — convertit l'écart de roulis en valeur de manche
-   pour `AI_RollController_7E56` ; jamais lue.
+1. ~~`AI_GuidanceSolution_Major`, `AI_CombatDecision_Major`, `JDYN_RollStickFromError_4B09D`~~ —
+   **lues le 2026-09-25** : la loi de pilotage complète est dans `IMPL_SCAIBRAIN_CORRECTIONS.md` §7.
+2. Rôle des bits 7-8 de `flags_75` (état à 3 valeurs, taux de roulis × 0,6 à l'état 2) et nature de
+   `JDYN+0x59` (vitesse, pas altitude ? — `IMPL_SCAIBRAIN_CORRECTIONS.md` §7).
 3. **`Targeting_FilterByWeaponType`** — quel candidat le chercheur retient dans son cône
    (cône et portée exacts du verrouillage).
 4. Test de verrouillage de l'AGM-65D (fonction pas encore nommée, `loc_42F71`, méthode `+0x14`

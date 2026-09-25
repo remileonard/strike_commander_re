@@ -1074,7 +1074,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `PhysicsTicks` | ~350 | seg103 (~0x4A85B) | **★ LU — LE tick de la dynamique avion (classe `JDYN`). Détection sol, reset caches aéro, manette gaz→poussée→`[si+0x28]`, conso carburant + flameout, volets/aérofrein/train, autopilote si `[si+0x68]≠0xFF`, sinon `Aero_SumLinearForces` (forces linéaires, repère corps) + `Aero_ControlOrchestrator` (moments) + intégrations. Détail : DATA_MODEL.md §6.2.** |
 | `Aero_ComputeForcesMain_4791E` | 649 | seg102 | **LU — solveur d'asservissement d'attitude : `moment = ±2·√(q'·err)` rate-limité, nul si err ≥ 56° (décrochage de contrôle)** |
 | `Aero_ComputeLiftAndSideForce_4812B` | 333 | seg103 | **LU — ex-`DetectControlSaturation` (nom trompeur) : GÉNÉRATEUR DE PORTANCE + force latérale. `L = jdyn[0x61]·k·α_eff·q·n̂(0,−v.c2,v.c1)`. `flags_75` bit6 = effet de bord (alerte départ)** |
-| `JDYN_HighLevelPhysicsCalc_4B09D` | 328 | seg103 | Calcul physique de haut niveau intégrant JDYN |
+| `JDYN_RollStickFromError_4B09D` | 328 | seg103 | Calcul physique de haut niveau intégrant JDYN |
 | `Aero_ComputeDragWithFeedback_48400` | 248 | seg103 | **LU — ex-`ComputeMomentsWithFeedback` : VECTEUR DE TRAÎNÉE `−v̂_corps·[q·(0x5D·α² + (0x5D≫3)·β² + drag_flags75)]`** |
 | `Aero_ComputeCoeffSaturating_4730F` | 234 | seg102 | Coefficient aérodynamique non-linéaire avec saturation |
 | `ChaseCamera_RenderEffect_4D1C9` | 450 | seg106 | Effet visuel lié à la caméra de poursuite |

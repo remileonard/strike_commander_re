@@ -184,8 +184,8 @@ L'original ne commande **ni cap ni altitude** : il commande un **angle de roulis
 tangage**, avec zone morte, en écrivant les axes du manche (les mêmes que le joueur).
 
 - `AI_RollToAngleCmd_8104(roulis_voulu, zone_morte)` → `AI_RollController_7E56` : écart ramené à
-  ±180° ; si `|écart| > zone morte`, `JDYN_HighLevelPhysicsCalc` convertit l'écart en valeur de
-  manche latéral (**fonction non lue**). (0°, 5°) = ailes à plat ; (180°, 5°) = sur le dos.
+  ±180° ; si `|écart| > zone morte`, `JDYN_RollStickFromError_4B09D` convertit l'écart en valeur de
+  manche latéral (lue le 2026-09-25, voir ci-dessous). (0°, 5°) = ailes à plat ; (180°, 5°) = sur le dos.
 - `AI_PitchToAngleCmd_7E18(tangage_voulu, zone_morte)` → `AI_PitchController_7B20`, écart `e` :
   - `|e| ≤ zone morte` : manche 0, ailes à plat ;
   - `e < −15°`, ou sur le dos (`|roulis| > 90°`) et `e < 0` : **passer sur le dos** (roulis 180°)
@@ -264,7 +264,7 @@ bool SCAIBrain::combatDecision(float h, float v, float r) {
     return false;
 }
 // bankError(e, zm) = AI_BankErrorCmd_7F34 : inclinaison visée roll()+e bornée à ±maxBank
-//   (maxBank = 90° × G/6 si G < 6, sinon 90°) ; si |e| > zm : rollStick = -JDYN_HighLevelPhysicsCalc(e),
+//   (maxBank = 90° × G/6 si G < 6, sinon 90°) ; si |e| > zm : rollStick = rollStickFromError(e, dt),
 //   retourne false ; sinon true.
 // clampPitch(x) = AI_ClampPitchStick_5305 : ±9·max(compétence, 8)/G.
 ```
@@ -273,7 +273,42 @@ juste sous le nez) ; la force de la ressource croît avec le carré de l'écart 
 butée est atteinte au-delà de 20° d'écart. Les pilotes peu compétents et les avions à fort G tirent
 moins fort ; les avions sous 6 G s'inclinent moins (`90° × G/6`).
 
-**Encore bloquant** : `JDYN_HighLevelPhysicsCalc` (écart → valeur de manche) n'a jamais été lue.
+### De l'écart de roulis au manche latéral (`JDYN_RollStickFromError_4B09D`, lue le 2026-09-25)
+
+L'IA ne met pas un gain proportionnel : elle demande le **taux de roulis qui permet d'arriver pile
+sur l'angle en freinant à l'accélération maximale**, puis l'exprime en fraction du taux maximal.
+```cpp
+// e = écart de roulis (degrés), dt = durée du tick (s)
+float SCAIBrain::rollStickFromError(float e, float dt) {
+    float A    = jdyn.roll_accel;                 // JDYN+0x47, deg/s² (champ JDYN n°7)
+    float wmax = maxRollRate();                   // Aero_MaxRollRate_4AF35, deg/s
+    if (wmax == 0.0f) return 0.0f;
+    float w = sqrtf(A*dt*A*dt + 2.0f*A*fabsf(e)) - A*dt;   // taux voulu, >= 0
+    w = std::min(w, wmax);
+    return copysignf(16.0f * w / wmax, e);        // 16 = butée ; en [-1, 1] : w / wmax
+}
+float SCAIBrain::maxRollRate() {
+    float w = jdyn.roll_rate_max;                 // JDYN+0x71, deg/s
+    float flow  = sqrtf(alpha*alpha + beta*beta); // incidence et dérapage, degrés
+    float onset = jdyn.stall_angle - 5.0f;        // JDYN+0x4B - 5°
+    if (flow > onset) w /= (flow - onset + 1.0f); // chute du taux de roulis près du décrochage
+    if (flags75_tristate == 2) w *= 0.6f;         // bits 7-8 de flags_75 (rôle non identifié)
+    if (airspeed < jdyn.field_0x59) w *= airspeed / jdyn.field_0x59;   // JDYN+0x59, voir note
+    return w;
+}
+```
+Le taux de roulis **actuel n'entre pas** dans le calcul : l'original calcule bien
+`w − taux courant`, mais jette le résultat (`sub eax, [si]` puis `mov [bp+var_5C], eax`, jamais
+relu). À reproduire tel quel pour la fidélité. La commande de tangage (`AI_PitchController_7B20`)
+n'utilise **pas** cette fonction.
+
+**Note `JDYN+0x59`** : documenté ailleurs comme « plafond de l'effet de sol » (altitude). Ici il est
+comparé à la **vitesse** (`mov eax, [si+59h] / cmp eax, [bp+var_4]`, `var_4` = norme du vecteur
+vitesse) ; et dans `Aero_ApplyGroundEffect` il est comparé, au sol, à une composante de la vitesse
+air (`var_18`, sortie de `Physics_ResolveWindVectorCached_4643B`), pas à une altitude. Ce serait
+donc une **vitesse de référence d'efficacité des gouvernes** (sous elle, au sol, le nez reste
+plaqué : tangage −20). À confirmer avec la valeur du champ n°17 dans tes fichiers `JDYN`.
+
 
 ---
 
@@ -544,7 +579,7 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
-1. `JDYN_HighLevelPhysicsCalc` (lecture) — §7. (`AI_GuidanceSolution_Major` et `AI_CombatDecision_Major` relues le 2026-09-25.)
+1. ~~Loi de pilotage~~ : complète (§7, relue le 2026-09-25). Reste le rôle des bits 7-8 de `flags_75` (état à 3 valeurs qui réduit le taux de roulis à 60 %) et la nature exacte de `JDYN+0x59`.
 2. `Targeting_FilterByWeaponType` : cône et portée exacts du chercheur — §4.
 3. Test de verrouillage de l'AGM-65D (méthode `+0x14` du modèle `MISS`, fonction pas encore nommée).
 4. ~~Seuil `dword_7203D`~~ : c'est le plancher du pilote, altitude du terrain + `entité+0xE5` (§8quinquies).

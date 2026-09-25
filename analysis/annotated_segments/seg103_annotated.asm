@@ -1842,7 +1842,7 @@ loc_48DD3:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Aero_ComputeAdditionalForce
+		call	near ptr Aero_MaxRollRate_4AF35
 		add	sp, 6
 
 loc_48DDC:
@@ -5995,12 +5995,18 @@ locret_4AF34:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,169L — résout un vecteur de force (+0xC/0x10) puis effectue un calcul additionnel
-; (buffer local important) : sous-calcul de force additionnelle dans le pipeline de contrôle
-; de vol.
+; Ex-'Aero_ComputeAdditionalForce'. far, 169L, LUE INTEGRALEMENT 2026-09-25. TAUX DE ROULIS
+; MAXIMAL du moment (deg/s) : w = JDYN+0x71. Si l'angle d'ecoulement total sqrt(alpha^2 +
+; beta^2) (Aero_FlowAngle_AoA_469FE, Aero_FlowAngle_Sideslip_46AB5) depasse (JDYN+0x4B - 5
+; deg) [angle de decrochage - 5] : w = w / (angle - (JDYN+0x4B - 5) + 1). Si le champ a 3
+; etats de flags_75 (bits 7-8 du word JDYN+0x75, cycle 0->1->2->0 par le bit1 de la commande
+; +0x1D dans le tick physique, etat 1 a la creation) vaut 2 : w x 0x99/256 = 0,6. Si la
+; vitesse |v| (vecteur +0x08/+0x0C/+0x10 de l'objet [JDYN+0]) < JDYN+0x59 : w = w . |v| /
+; JDYN+0x59. Appelee aussi par Aero_ComputeControlFlags75Bit5C (limite du taux de roulis du
+; modele de vol).
 ; ==============================================================================================
-Aero_ComputeAdditionalForce	proc far		; CODE XREF: Aero_ComputeControlFlags75Bit5C+1A6p
-					; JDYN_HighLevelPhysicsCalc+148p
+Aero_MaxRollRate_4AF35	proc far		; CODE XREF: Aero_ComputeControlFlags75Bit5C+1A6p
+					; JDYN_RollStickFromError_4B09D+148p
 
 var_3E		= dword	ptr -3Eh
 var_3A		= dword	ptr -3Ah
@@ -6089,10 +6095,10 @@ loc_4AFA7:
 		jmp	short loc_4AFE0
 ; ���������������������������������������������������������������������������
 
-loc_4AFDE:				; CODE XREF: Aero_ComputeAdditionalForce+A2j
+loc_4AFDE:				; CODE XREF: Aero_MaxRollRate_4AF35+A2j
 		xor	ax, ax
 
-loc_4AFE0:				; CODE XREF: Aero_ComputeAdditionalForce+A7j
+loc_4AFE0:				; CODE XREF: Aero_MaxRollRate_4AF35+A7j
 		or	al, al
 		jz	short loc_4B01C
 
@@ -6118,7 +6124,7 @@ loc_4AFF0:
 		idiv	ecx
 		mov	[bp+var_24], eax
 
-loc_4B01C:				; CODE XREF: Aero_ComputeAdditionalForce+ADj
+loc_4B01C:				; CODE XREF: Aero_MaxRollRate_4AF35+ADj
 		mov	ax, [si+75h]
 
 loc_4B01F:
@@ -6139,7 +6145,7 @@ loc_4B031:
 		shrd	eax, edx, 8
 		mov	[bp+var_24], eax
 
-loc_4B045:				; CODE XREF: Aero_ComputeAdditionalForce+F2j
+loc_4B045:				; CODE XREF: Aero_MaxRollRate_4AF35+F2j
 		mov	eax, [si+59h]
 		cmp	eax, [bp+var_4]
 		jle	short loc_4B07F
@@ -6157,7 +6163,7 @@ loc_4B045:				; CODE XREF: Aero_ComputeAdditionalForce+F2j
 		idiv	ecx
 		mov	[bp+var_24], eax
 
-loc_4B07F:				; CODE XREF: Aero_ComputeAdditionalForce+118j
+loc_4B07F:				; CODE XREF: Aero_MaxRollRate_4AF35+118j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_24]
 		mov	[bx], eax
@@ -6167,7 +6173,7 @@ loc_4B07F:				; CODE XREF: Aero_ComputeAdditionalForce+118j
 		pop	si
 		leave
 		retf
-Aero_ComputeAdditionalForce	endp
+Aero_MaxRollRate_4AF35	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -6185,11 +6191,22 @@ loc_4B093:				; CODE XREF: seg082:11DDJ
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,328L — grosse fonction du même cluster physique (buffer local 0x68), appelée par des
-; fonctions de tick de haut niveau (sub_7E56/sub_7F34) : candidat pour un calcul physique de
-; haut niveau intégrant le résultat du modèle de vol JDYN, à approfondir.
+; Ex-'JDYN_HighLevelPhysicsCalc'. far, 328L, LUE INTEGRALEMENT 2026-09-25. CONVERTIT UN ECART
+; DE ROULIS EN MANCHE LATERAL (IA seulement : appelee par AI_RollController_7E56 et
+; AI_BankErrorCmd_7F34, qui negent le resultat). Arguments : out, JDYN (arg_4), ecart e
+; (arg_6, degres). A = JDYN+0x47 (acceleration de roulis max, deg/s^2) ; dt = dword_70458.
+; Taux voulu w = sqrt((A.dt)^2 + 2.A.|e|) - A.dt ('Math_Square_54C39 / Math_Sqrt_54BF1', puis
+; 'sub eax, [bp+var_8]' : A.dt - racine, signe negatif), borne a +/- wmax =
+; Aero_MaxRollRate_4AF35(JDYN), signe inverse si e < 0. C'est le taux qui permet d'arriver sur
+; l'angle en freinant a l'acceleration max (loi 'bang-bang' discretisee). Boucle de mise a
+; l'echelle (tant que A.dt ou A >= 2896 : A.dt/2, A/4, puis racine << n) = protection contre
+; le debordement 24.8, sans effet sur le resultat. Code sans effet : 'add si,8 / sub eax,[si]
+; / mov [bp+var_5C],eax' calcule (w - JDYN+8) puis jette le resultat (jamais relu) - le taux
+; courant n'intervient donc pas. Sortie = -signe(e) . 16 . min(w, wmax) / wmax (0 si wmax =
+; 0), bornee a +/-16 ; l'appelant la negue : manche lateral = signe(e) . 16 . min(w,
+; wmax)/wmax (16 = butee).
 ; ==============================================================================================
-JDYN_HighLevelPhysicsCalc	proc far		; CODE XREF: AI_RollController_7E56+ACP
+JDYN_RollStickFromError_4B09D	proc far		; CODE XREF: AI_RollController_7E56+ACP
 					; AI_BankErrorCmd_7F34+19BP
 
 var_68		= dword	ptr -68h
@@ -6250,8 +6267,8 @@ loc_4B0A0:
 		jmp	short loc_4B109
 ; ���������������������������������������������������������������������������
 
-loc_4B0E1:				; CODE XREF: JDYN_HighLevelPhysicsCalc+7Fj
-					; JDYN_HighLevelPhysicsCalc+94j
+loc_4B0E1:				; CODE XREF: JDYN_RollStickFromError_4B09D+7Fj
+					; JDYN_RollStickFromError_4B09D+94j
 		inc	di
 		add	[bp+var_8], 100h
 		mov	eax, [bp+var_8]
@@ -6262,17 +6279,17 @@ loc_4B0E1:				; CODE XREF: JDYN_HighLevelPhysicsCalc+7Fj
 		sar	eax, 2
 		mov	[bp+var_C], eax
 
-loc_4B109:				; CODE XREF: JDYN_HighLevelPhysicsCalc+42j
+loc_4B109:				; CODE XREF: JDYN_RollStickFromError_4B09D+42j
 		cmp	[bp+var_8], 0B5000h
 		jl	short loc_4B118
 		mov	ax, 1
 		jmp	short loc_4B11A
 ; ���������������������������������������������������������������������������
 
-loc_4B118:				; CODE XREF: JDYN_HighLevelPhysicsCalc+74j
+loc_4B118:				; CODE XREF: JDYN_RollStickFromError_4B09D+74j
 		xor	ax, ax
 
-loc_4B11A:				; CODE XREF: JDYN_HighLevelPhysicsCalc+79j
+loc_4B11A:				; CODE XREF: JDYN_RollStickFromError_4B09D+79j
 		or	al, al
 		jnz	short loc_4B0E1
 
@@ -6283,10 +6300,10 @@ loc_4B11E:
 		jmp	short loc_4B12F
 ; ���������������������������������������������������������������������������
 
-loc_4B12D:				; CODE XREF: JDYN_HighLevelPhysicsCalc+89j
+loc_4B12D:				; CODE XREF: JDYN_RollStickFromError_4B09D+89j
 		xor	ax, ax
 
-loc_4B12F:				; CODE XREF: JDYN_HighLevelPhysicsCalc+8Ej
+loc_4B12F:				; CODE XREF: JDYN_RollStickFromError_4B09D+8Ej
 		or	al, al
 		jnz	short loc_4B0E1
 
@@ -6303,7 +6320,7 @@ loc_4B133:
 		jge	short loc_4B15B
 		neg	eax
 
-loc_4B15B:				; CODE XREF: JDYN_HighLevelPhysicsCalc+B9j
+loc_4B15B:				; CODE XREF: JDYN_RollStickFromError_4B09D+B9j
 		mov	[bp+var_18], eax
 		mov	eax, [bp+var_18]
 		mov	[bp+var_1C], eax
@@ -6344,7 +6361,7 @@ loc_4B1B4:
 		shl	eax, cl
 		mov	[bp+var_8], eax
 
-loc_4B1CA:				; CODE XREF: JDYN_HighLevelPhysicsCalc+115j
+loc_4B1CA:				; CODE XREF: JDYN_RollStickFromError_4B09D+115j
 		mov	eax, [bp+var_4]
 		sub	eax, [bp+var_8]
 		mov	[bp+var_34], eax
@@ -6355,7 +6372,7 @@ loc_4B1CA:				; CODE XREF: JDYN_HighLevelPhysicsCalc+115j
 		lea	ax, [bp+var_3C]
 		push	ax
 		push	cs
-		call	near ptr Aero_ComputeAdditionalForce
+		call	near ptr Aero_MaxRollRate_4AF35
 		add	sp, 6
 		mov	eax, [bp+var_8]
 		cmp	eax, [bp+var_3C]
@@ -6366,17 +6383,17 @@ loc_4B1F3:
 		jmp	short loc_4B1FC
 ; ���������������������������������������������������������������������������
 
-loc_4B1FA:				; CODE XREF: JDYN_HighLevelPhysicsCalc:loc_4B1F3j
+loc_4B1FA:				; CODE XREF: JDYN_RollStickFromError_4B09D:loc_4B1F3j
 		xor	ax, ax
 
-loc_4B1FC:				; CODE XREF: JDYN_HighLevelPhysicsCalc+15Bj
+loc_4B1FC:				; CODE XREF: JDYN_RollStickFromError_4B09D+15Bj
 		or	al, al
 		jz	short loc_4B206
 		mov	eax, [bp+var_3C]
 		jmp	short loc_4B239
 ; ���������������������������������������������������������������������������
 
-loc_4B206:				; CODE XREF: JDYN_HighLevelPhysicsCalc+161j
+loc_4B206:				; CODE XREF: JDYN_RollStickFromError_4B09D+161j
 		mov	eax, [bp+var_3C]
 		neg	eax
 		mov	[bp+var_40], eax
@@ -6388,10 +6405,10 @@ loc_4B206:				; CODE XREF: JDYN_HighLevelPhysicsCalc+161j
 		jmp	short loc_4B226
 ; ���������������������������������������������������������������������������
 
-loc_4B224:				; CODE XREF: JDYN_HighLevelPhysicsCalc+180j
+loc_4B224:				; CODE XREF: JDYN_RollStickFromError_4B09D+180j
 		xor	ax, ax
 
-loc_4B226:				; CODE XREF: JDYN_HighLevelPhysicsCalc+185j
+loc_4B226:				; CODE XREF: JDYN_RollStickFromError_4B09D+185j
 		or	al, al
 
 loc_4B228:
@@ -6405,20 +6422,20 @@ loc_4B231:
 		mov	[bp+var_48], eax
 		mov	[bp+var_4C], eax
 
-loc_4B239:				; CODE XREF: JDYN_HighLevelPhysicsCalc+167j
+loc_4B239:				; CODE XREF: JDYN_RollStickFromError_4B09D+167j
 		mov	[bp+var_8], eax
 
-loc_4B23D:				; CODE XREF: JDYN_HighLevelPhysicsCalc:loc_4B228j
+loc_4B23D:				; CODE XREF: JDYN_RollStickFromError_4B09D:loc_4B228j
 		cmp	[bp+arg_6], 0
 		jge	short loc_4B249
 		mov	ax, 1
 		jmp	short loc_4B24B
 ; ���������������������������������������������������������������������������
 
-loc_4B249:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1A5j
+loc_4B249:				; CODE XREF: JDYN_RollStickFromError_4B09D+1A5j
 		xor	ax, ax
 
-loc_4B24B:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1AAj
+loc_4B24B:				; CODE XREF: JDYN_RollStickFromError_4B09D+1AAj
 		or	al, al
 		jz	short loc_4B262
 		mov	eax, [bp+var_8]
@@ -6427,7 +6444,7 @@ loc_4B24B:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1AAj
 		mov	[bp+var_54], eax
 		mov	[bp+var_8], eax
 
-loc_4B262:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1B0j
+loc_4B262:				; CODE XREF: JDYN_RollStickFromError_4B09D+1B0j
 		add	si, 8
 		mov	eax, [bp+var_8]
 		sub	eax, [si]
@@ -6439,10 +6456,10 @@ loc_4B262:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1B0j
 		jmp	short loc_4B282
 ; ���������������������������������������������������������������������������
 
-loc_4B280:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1DCj
+loc_4B280:				; CODE XREF: JDYN_RollStickFromError_4B09D+1DCj
 		xor	ax, ax
 
-loc_4B282:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1E1j
+loc_4B282:				; CODE XREF: JDYN_RollStickFromError_4B09D+1E1j
 		or	al, al
 		jz	short loc_4B2AE
 		mov	eax, [bp+var_8]
@@ -6464,22 +6481,22 @@ loc_4B2AC:
 		jmp	short loc_4B2BE
 ; ���������������������������������������������������������������������������
 
-loc_4B2AE:				; CODE XREF: JDYN_HighLevelPhysicsCalc+1E7j
+loc_4B2AE:				; CODE XREF: JDYN_RollStickFromError_4B09D+1E7j
 		mov	[bp+var_60], 0
 		mov	eax, [bp+var_60]
 		mov	[bp+var_8], eax
 
-loc_4B2BE:				; CODE XREF: JDYN_HighLevelPhysicsCalc:loc_4B2ACj
+loc_4B2BE:				; CODE XREF: JDYN_RollStickFromError_4B09D:loc_4B2ACj
 		cmp	[bp+var_8], 1000h
 		jle	short loc_4B2CD
 		mov	ax, 1
 		jmp	short loc_4B2CF
 ; ���������������������������������������������������������������������������
 
-loc_4B2CD:				; CODE XREF: JDYN_HighLevelPhysicsCalc+229j
+loc_4B2CD:				; CODE XREF: JDYN_RollStickFromError_4B09D+229j
 		xor	ax, ax
 
-loc_4B2CF:				; CODE XREF: JDYN_HighLevelPhysicsCalc+22Ej
+loc_4B2CF:				; CODE XREF: JDYN_RollStickFromError_4B09D+22Ej
 		or	al, al
 		jz	short loc_4B2E1
 		mov	[bp+var_64], 1000h
@@ -6487,26 +6504,26 @@ loc_4B2CF:				; CODE XREF: JDYN_HighLevelPhysicsCalc+22Ej
 		jmp	short loc_4B302
 ; ���������������������������������������������������������������������������
 
-loc_4B2E1:				; CODE XREF: JDYN_HighLevelPhysicsCalc+234j
+loc_4B2E1:				; CODE XREF: JDYN_RollStickFromError_4B09D+234j
 		cmp	[bp+var_8], 0FFFFF000h
 		jge	short loc_4B2F0
 		mov	ax, 1
 		jmp	short loc_4B2F2
 ; ���������������������������������������������������������������������������
 
-loc_4B2F0:				; CODE XREF: JDYN_HighLevelPhysicsCalc+24Cj
+loc_4B2F0:				; CODE XREF: JDYN_RollStickFromError_4B09D+24Cj
 		xor	ax, ax
 
-loc_4B2F2:				; CODE XREF: JDYN_HighLevelPhysicsCalc+251j
+loc_4B2F2:				; CODE XREF: JDYN_RollStickFromError_4B09D+251j
 		or	al, al
 		jz	short loc_4B306
 		mov	[bp+var_68], 0FFFFF000h
 		mov	eax, [bp+var_68]
 
-loc_4B302:				; CODE XREF: JDYN_HighLevelPhysicsCalc+242j
+loc_4B302:				; CODE XREF: JDYN_RollStickFromError_4B09D+242j
 		mov	[bp+var_8], eax
 
-loc_4B306:				; CODE XREF: JDYN_HighLevelPhysicsCalc+257j
+loc_4B306:				; CODE XREF: JDYN_RollStickFromError_4B09D+257j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_8]
 		mov	[bx], eax
@@ -6516,7 +6533,7 @@ loc_4B306:				; CODE XREF: JDYN_HighLevelPhysicsCalc+257j
 		pop	si
 		leave
 		retf
-JDYN_HighLevelPhysicsCalc	endp
+JDYN_RollStickFromError_4B09D	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

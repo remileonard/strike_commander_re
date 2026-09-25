@@ -510,9 +510,9 @@
     "summary": "far, 59 lignes, entre sub_5C916 et sub_5C9A6. ⚠️ Adresse exacte non résolue."
   },
   "sub_4B09D": {
-    "new_name": "JDYN_HighLevelPhysicsCalc",
+    "new_name": "JDYN_RollStickFromError_4B09D",
     "segment": "seg103",
-    "summary": "far,328L — grosse fonction du même cluster physique (buffer local 0x68), appelée par des fonctions de tick de haut niveau (sub_7E56/sub_7F34) : **candidat pour un calcul physique de haut niveau intégrant le résultat du modèle de vol JDYN**, à approfondir."
+    "summary": "Ex-'JDYN_HighLevelPhysicsCalc'. far, 328L, LUE INTEGRALEMENT 2026-09-25. CONVERTIT UN ECART DE ROULIS EN MANCHE LATERAL (IA seulement : appelee par AI_RollController_7E56 et AI_BankErrorCmd_7F34, qui negent le resultat). Arguments : out, JDYN (arg_4), ecart e (arg_6, degres). A = JDYN+0x47 (acceleration de roulis max, deg/s^2) ; dt = dword_70458. Taux voulu w = sqrt((A.dt)^2 + 2.A.|e|) - A.dt ('Math_Square_54C39 / Math_Sqrt_54BF1', puis 'sub eax, [bp+var_8]' : A.dt - racine, signe negatif), borne a +/- wmax = Aero_MaxRollRate_4AF35(JDYN), signe inverse si e < 0. C'est le taux qui permet d'arriver sur l'angle en freinant a l'acceleration max (loi 'bang-bang' discretisee). Boucle de mise a l'echelle (tant que A.dt ou A >= 2896 : A.dt/2, A/4, puis racine << n) = protection contre le debordement 24.8, sans effet sur le resultat. Code sans effet : 'add si,8 / sub eax,[si] / mov [bp+var_5C],eax' calcule (w - JDYN+8) puis jette le resultat (jamais relu) - le taux courant n'intervient donc pas. Sortie = -signe(e) . 16 . min(w, wmax) / wmax (0 si wmax = 0), bornee a +/-16 ; l'appelant la negue : manche lateral = signe(e) . 16 . min(w, wmax)/wmax (16 = butee)."
   },
   "sub_5E00C": {
     "new_name": "CachedObject_BuildComposite_5E00C",
@@ -1815,9 +1815,9 @@
     "summary": "far — malloc() : arrondit la taille (+5, pair, min 8), cherche un bloc libre assez grand (first-fit), sinon étend le heap ou split : allocateur mémoire principal du runtime custom."
   },
   "sub_4AF35": {
-    "new_name": "Aero_ComputeAdditionalForce",
+    "new_name": "Aero_MaxRollRate_4AF35",
     "segment": "seg103",
-    "summary": "far,169L — résout un vecteur de force (+0xC/0x10) puis effectue un calcul additionnel (buffer local important) : **sous-calcul de force additionnelle dans le pipeline de contrôle de vol.**"
+    "summary": "Ex-'Aero_ComputeAdditionalForce'. far, 169L, LUE INTEGRALEMENT 2026-09-25. TAUX DE ROULIS MAXIMAL du moment (deg/s) : w = JDYN+0x71. Si l'angle d'ecoulement total sqrt(alpha^2 + beta^2) (Aero_FlowAngle_AoA_469FE, Aero_FlowAngle_Sideslip_46AB5) depasse (JDYN+0x4B - 5 deg) [angle de decrochage - 5] : w = w / (angle - (JDYN+0x4B - 5) + 1). Si le champ a 3 etats de flags_75 (bits 7-8 du word JDYN+0x75, cycle 0->1->2->0 par le bit1 de la commande +0x1D dans le tick physique, etat 1 a la creation) vaut 2 : w x 0x99/256 = 0,6. Si la vitesse |v| (vecteur +0x08/+0x0C/+0x10 de l'objet [JDYN+0]) < JDYN+0x59 : w = w . |v| / JDYN+0x59. Appelee aussi par Aero_ComputeControlFlags75Bit5C (limite du taux de roulis du modele de vol)."
   },
   "sub_85DC2": {
     "new_name": "HUDSymbol_Helper15_85DC2",
