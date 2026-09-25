@@ -718,8 +718,9 @@ bidirectionnel, pas un drapeau à sens unique
 
 *Question empirique posée par Rémi : avec seulement `GOAL=1`, son
 coéquipier décolle (premier ordre du script) mais ignore ensuite
-l'ordre "Follow Leader" (monte simplement dans le ciel). Avec `GOAL=1`
-et `GOAL=5`, il suit immédiatement et précisément le vol du joueur.
+l'ordre "Follow Leader" (monte simplement dans le ciel). *(Précisé par Rémi le 2026-09-25 : avec `GOAL = 5, 1`, l'avion décolle puis
+ne fait plus rien — nez vers le ciel, plus de pilotage. La phrase qui se trouvait ici,
+« avec `GOAL=1` et `GOAL=5` il suit immédiatement le joueur », était fausse.)*
 Ça prouve qu'un vrai mécanisme relie script et `GOAL` — la conclusion
 précédente ("le script délègue directement, sans passer par `GOAL`")
 était incomplète.*
@@ -727,8 +728,9 @@ précédente ("le script délègue directement, sans passer par `GOAL`")
 > **⚠️ Correction 2026-09-25.** Le pseudo-code et les « deux découvertes » ci-dessous sont faux :
 > relue ligne à ligne, `Goal_MoraleReaction_878F` est une réaction au moral (fuite, abandon,
 > retournement contre le joueur, rattachement au joueur), pas l'exécution du suivi. Voir
-> `AI_SYSTEM.md` §4.4. L'observation de Rémi (`GOAL = 1, 5` suit, `GOAL = 1` seul ne suit pas)
-> reste vraie et reste à expliquer.
+> `AI_SYSTEM.md` §4.4. Avec `GOAL = 5, 1`, l'avion décolle (ordre exécuté au sol par
+> `Goal_ExecuteAction_A8AC`) puis ne fait plus rien en vol : le seul gestionnaire,
+> `Goal_MoraleReaction_878F`, n'agit que sur le moral. Le suivi (`0xAA`) demande la valeur `2`.
 
 En lisant intégralement `Goal_MoraleReaction_878F` (l'option
 de tournoi liée à `GOAL=5`) :

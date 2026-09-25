@@ -1107,10 +1107,11 @@ pas tracé.
 **Ce que ça ne fait pas : le suivi de formation.** Celui-ci passe par `Goal_FollowAllyExec`,
 appelé soit par `AIEntity_MasterTick_5ACC` (bit 3 de `entité+0x28B`, posé et entretenu par
 `Goal_FollowAllyExec` lui-même, et bit 5 de `flags_75` de l'avion), soit par
-`Goal_ExecuteAction_A8AC` (ordre `0xAA`), soit par `Goal_SetObjective_A307`. **Non résolu** :
-Rémi constate en jeu qu'un ailier suit le joueur avec `GOAL = 1, 5` et pas avec `GOAL = 1` seul ;
-la lecture de ce gestionnaire ne l'explique pas. À tracer : l'entrée dans le mode suivi (bit 3 de
-`+0x28B`, bit 5 de `flags_75`) et ce que change la présence d'un gestionnaire dans la liste.
+`Goal_ExecuteAction_A8AC` (ordre `0xAA`), soit par `Goal_SetObjective_A307`. **Vérifié en jeu (Rémi, 2026-09-25)** :
+avec `GOAL = 5, 1`, l'avion décolle puis ne fait plus rien (nez vers le ciel, plus de pilotage).
+C'est ce que prévoit le code : au sol, `AI_TopLevelThink` exécute l'ordre du script
+(`Goal_ExecuteAction_A8AC`) sans regarder le `GOAL` ; en vol, seul ce gestionnaire tourne, et il
+n'agit que sur le moral. **Le suivi d'un ordre « suivre » exige la valeur `2` dans le `GOAL`.**
 
 ---
 
