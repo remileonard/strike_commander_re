@@ -382,7 +382,7 @@
   "sub_8104": {
     "new_name": "AI_RollToAngleCmd_8104",
     "segment": "seg003",
-    "summary": "far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollToAngleCmd_8104' (FAUX : pas de cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis courant) puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) = remettre les ailes a plat ; (180, 5) = se mettre sur le dos."
+    "summary": "far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_TurnToHeadingCmd' (FAUX : pas de cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis courant) puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) = remettre les ailes a plat ; (180, 5) = se mettre sur le dos."
   },
   "sub_84863": {
     "new_name": "HUDSymbol_ConstructAndInitAngleE_84863",
@@ -1337,7 +1337,7 @@
   "sub_7E56": {
     "new_name": "AI_RollController_7E56",
     "segment": "seg003",
-    "summary": "far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollController_7E56'. CONTROLEUR DE ROULIS : remet a 0 l'axe de roulis du manche (bloc de commandes entite+7, +0x23 = roulis, cf. DATA_MODEL.md), ramene l'ecart a +/-180, et si |ecart| depasse la zone morte (degres) : JDYN_HighLevelPhysicsCalc(avion, sortie, ecart), valeur negee ecrite dans +0x23 (`mov es:[bx+23h], eax`). Renvoie 0 si elle a commande, 1 sinon."
+    "summary": "far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_PitchRollController_Heading'. CONTROLEUR DE ROULIS : remet a 0 l'axe de roulis du manche (bloc de commandes entite+7, +0x23 = roulis, cf. DATA_MODEL.md), ramene l'ecart a +/-180, et si |ecart| depasse la zone morte (degres) : JDYN_HighLevelPhysicsCalc(avion, sortie, ecart), valeur negee ecrite dans +0x23 (`mov es:[bx+23h], eax`). Renvoie 0 si elle a commande, 1 sinon."
   },
   "sub_4F9E6": {
     "new_name": "Timer_Tick_4F9E6",
@@ -5347,7 +5347,7 @@
   "sub_58F4": {
     "new_name": "AI_Sensor_RollAngle_58F4",
     "segment": "seg003",
-    "summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_RollAngle_58F4' (FAUX : ce n'est PAS un cap). ANGLE DE ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180, mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C)."
+    "summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_HeadingNormalized' (FAUX : ce n'est PAS un cap). ANGLE DE ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180, mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C)."
   },
   "sub_4FA80": {
     "new_name": "Timer_TickFarPtr_4FA80",
@@ -5672,7 +5672,7 @@
   "sub_498B5": {
     "new_name": "Autopilot_NosePitchRelax_498B5",
     "segment": "seg103",
-    "summary": "far, LUE (2026-09-25). Ex-'Autopilot_NosePitchRelax_498B5'. (JDYN, matrice, vitesse). e = Math_ElevationAngle_552E1(vitesse) - Math_ElevationAngle_552E1(nez) ; e == 0 -> rien. f = min(1, 5 deg/s * dt / |e|) (toujours positif) ; nez += (nez horizontal normalise - nez) * f ; normalisation, Matrix_OrthonormalizeKeepRow1_57660. Litteralement : ramene le nez VERS L'HORIZONTALE (pas vers la vitesse) d'une fraction f, d'un coup si |e| < le pas."
+    "summary": "far, LUE (2026-09-25). Ex-'JDYN_TickSubcalcA'. (JDYN, matrice, vitesse). e = Math_ElevationAngle_552E1(vitesse) - Math_ElevationAngle_552E1(nez) ; e == 0 -> rien. f = min(1, 5 deg/s * dt / |e|) (toujours positif) ; nez += (nez horizontal normalise - nez) * f ; normalisation, Matrix_OrthonormalizeKeepRow1_57660. Litteralement : ramene le nez VERS L'HORIZONTALE (pas vers la vitesse) d'une fraction f, d'un coup si |e| < le pas."
   },
   "sub_88B02": {
     "new_name": "MissionRecord_LoadFieldSequence_88B02",
@@ -7762,7 +7762,7 @@
   "sub_581A0": {
     "new_name": "Math_AsinRaw_581A0",
     "segment": "seg117",
-    "summary": "far, LUE (2026-09-24). Ex-'Math_AsinRaw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg - table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x))."
+    "summary": "far, LUE (2026-09-24). Ex-'Math_ArcCos_Raw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg - table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x))."
   },
   "sub_6ABDA": {
     "new_name": "VROOMM_StubThunk_6ABDA",
@@ -13597,7 +13597,7 @@
   "sub_581E3": {
     "new_name": "Math_AcosRaw_581E3",
     "segment": "seg117",
-    "summary": "far, LUE (2026-09-24). Ex-'Math_AcosRaw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x 24.8, |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en degres 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180 deg - table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de branche)."
+    "summary": "far, LUE (2026-09-24). Ex-'Math_ArcSin_Raw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x 24.8, |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en degres 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180 deg - table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de branche)."
   },
   "sub_87930": {
     "new_name": "TextScroll_Allocate_87930",
@@ -13857,7 +13857,7 @@
   "sub_37D54": {
     "new_name": "WorldObject_TranslateBy_37D54",
     "segment": "seg078",
-    "summary": "far, 44L, LUE (2026-09-25). Ex-'WorldObject_TranslateBy_37D54' (FAUX : pas des forces). (objet, &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis Debris_ComputeTorque si +0x24 et notification (vtable+8)."
+    "summary": "far, 44L, LUE (2026-09-25). Ex-'Debris_BodyIntegrateForces' (FAUX : pas des forces). (objet, &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis Debris_ComputeTorque si +0x24 et notification (vtable+8)."
   },
   "sub_20848": {
     "new_name": "Render_PolygonPrimitive_20848",
@@ -15487,7 +15487,7 @@
   "sub_7E18": {
     "new_name": "AI_PitchToAngleCmd_7E18",
     "segment": "seg003",
-    "summary": "far, 36L, LUE (2026-09-24). Ex-'AI_PitchToAngleCmd_7E18' (FAUX : pas de cap). Commande de TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis AI_PitchController_7B20(entite, &ecart, zone morte)."
+    "summary": "far, 36L, LUE (2026-09-24). Ex-'AI_TurnToBearingCmd' (FAUX : pas de cap). Commande de TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis AI_PitchController_7B20(entite, &ecart, zone morte)."
   },
   "sub_6BB8A": {
     "new_name": "VROOMM_StubThunk_6BB8A",
@@ -17762,7 +17762,7 @@
   "sub_49A7C": {
     "new_name": "Autopilot_BankForTurn_49A7C",
     "segment": "seg103",
-    "summary": "far, LUE (2026-09-25). Ex-'Autopilot_BankForTurn_49A7C'. (JDYN, matrice, &ecart de cap). Roulis vise T = 0 si |ecart| < 10 deg, sinon +/-10 deg du cote de l'ecart ; r = Matrix_RollAngle_57C67 ; delta = T - r borne a +/- JDYN[+0x71] * dt ; rotation autour du nez (Matrix_BuildAxisY_570C5) puis Matrix_OrthonormalizeKeepRow1_57660. Inclinaison essentiellement visuelle pendant le virage du pilote automatique."
+    "summary": "far, LUE (2026-09-25). Ex-'JDYN_TickSubcalcB'. (JDYN, matrice, &ecart de cap). Roulis vise T = 0 si |ecart| < 10 deg, sinon +/-10 deg du cote de l'ecart ; r = Matrix_RollAngle_57C67 ; delta = T - r borne a +/- JDYN[+0x71] * dt ; rotation autour du nez (Matrix_BuildAxisY_570C5) puis Matrix_OrthonormalizeKeepRow1_57660. Inclinaison essentiellement visuelle pendant le virage du pilote automatique."
   },
   "sub_6B70F": {
     "new_name": "VROOMM_StubThunk_6B70F",
@@ -18247,7 +18247,7 @@
   "sub_7B20": {
     "new_name": "AI_PitchController_7B20",
     "segment": "seg003",
-    "summary": "far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_PitchController_7B20'. CONTROLEUR DE TANGAGE, ecrit l'axe de tangage du manche (bloc entite+7, +0x1F). e = ecart ramene a +/-180. |e| <= zone morte : manche = 0, AI_RollToAngleCmd_8104(0, 5), renvoie 1. Sinon (renvoie 0) : dos = |roulis| > 90. Si e < -15 ou (dos et e < 0) : AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE DOS pour piquer) et, si |roulis| > 165 : manche = Value_ClampSymmetric(-e > 15 ? -e*16/15 : 16,0) (tirer). Sinon : AI_RollToAngleCmd_8104(0, 5) et, si |roulis| < 15 : manche = Value_ClampSymmetric(e < 0 ou e < 15 ? e*16/15 : 16,0). Les piques de plus de 15 deg se font donc dos, en tirant."
+    "summary": "far, LUE INTEGRALEMENT (2026-09-24, formule du manche relue 2026-09-25). Ex-'AI_RollRateController'. CONTROLEUR DE TANGAGE, ecrit l'axe de tangage du manche (bloc entite+7, +0x1F ; 16,0 = pleine butee, positif = tirer). e = ecart ramene a +/-180. |e| <= zone morte : manche = 0, AI_RollToAngleCmd_8104(0, 5), renvoie 1. Sinon (renvoie 0) : dos = |roulis| > 90 (cmp 5A00h). Si e < -15 (cmp 0FFFFF100h) ou (dos et e < 0) : AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE DOS pour piquer) puis, seulement si |roulis| > 165 (cmp 0A500h) : valeur = (-e > 15) ? -e*16/15 : 16,0 (toujours >= pleine butee, on TIRE). Sinon : AI_RollToAngleCmd_8104(0, 5) puis, seulement si |roulis| < 15 (cmp 0F00h) : valeur = e*16/15 si e < 0 ou e < 15, sinon 16,0. La valeur passe par Value_ClampSymmetric(entite, valeur) (limite non lue) avant l'ecriture en +0x1F (mov es:[bx+1Fh], eax). En manche normalise s = valeur/16 : s = e/15 pour |e| < 15, 1 au-dela ; sur le dos, s >= 1 avant bornage. Les piques de plus de 15 deg se font donc sur le dos, en tirant."
   },
   "sub_A2F1A": {
     "new_name": "GaugeWidget_Helper_A2F1A",
@@ -18342,7 +18342,7 @@
   "sub_59A5": {
     "new_name": "AI_Sensor_NosePitch_59A5",
     "segment": "seg003",
-    "summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_NosePitch_59A5'. TANGAGE DU NEZ : Math_ElevationAngle_552E1(ligne 1 de l'orientation de entite+0x102), mis en cache dans entite+0xF6 (drapeau bit 2 de entite+0x28C)."
+    "summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_SecondaryAngle'. TANGAGE DU NEZ : Math_ElevationAngle_552E1(ligne 1 de l'orientation de entite+0x102), mis en cache dans entite+0xF6 (drapeau bit 2 de entite+0x28C)."
   },
   "loc_5C1C9": {
     "new_name": "PagedTextObject_Construct_5C1C9",

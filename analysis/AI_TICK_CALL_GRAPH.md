@@ -26,8 +26,8 @@ flowchart TD
         MOUNT["objet à +0x51<br/>slot +0x40, pas identifié"]
         EMIT["Emitter_UpdateFromEntitySMOKVec_3D57E<br/>pas lu"]
         CLEAR["AircraftStateBits_Clear_12806<br/>remet à zéro 3 octets de drapeaux<br/>aucun affichage"]
-        FOLLOW["Goal_FollowAllyExec_DAA9"]
-        TRIGGER["AI_TriggerBehaviorUpdate_5E53<br/>c'est là que se trouve la décision<br/>pas lu"]
+        FOLLOW["Goal_FollowAllyExec"]
+        TRIGGER["AI_TriggerBehaviorUpdate<br/>c'est là que se trouve la décision<br/>pas lu"]
         BEHAV["fonction de comportement<br/>sans nom, pas lue"]
         PICK["Picking_ResolveSymbol<br/>autre appelant, pas lu"]
 
@@ -52,7 +52,7 @@ flowchart TD
         ACTIVEOBJ["objet à entité+0x0D<br/>si non nul : son slot +0xC<br/>GOAL et tournoi sautés<br/>nature de l'objet inconnue"]
         GROUND["avion au sol :<br/>Goal_ExecuteAction_A8AC direct<br/>tableau GOAL ignoré"]
         SLOTS["avion en vol : emplacements GOAL<br/>entité+0x1B0, 8 octets par emplacement<br/>jusqu'au premier qui renvoie non nul"]
-        HANDLERS["gestionnaires choisis par l'octet du fichier<br/>2 Goal_ExecuteAction_A8AC<br/>3 Goal_WanderRandom_AD13<br/>4 AI_BehaviorStateMachine_WeightedOptionSelector_9D05<br/>5 Goal_ActiveWingmanEngagement_878F<br/>1 : valeur abandonnée au chargement"]
+        HANDLERS["gestionnaires choisis par l'octet du fichier<br/>2 Goal_ExecuteAction_A8AC<br/>3 Goal_WanderRandom<br/>4 AI_BehaviorStateMachine_WeightedOptionSelector_9D05<br/>5 Goal_ActiveWingmanEngagement_878F<br/>1 : valeur abandonnée au chargement"]
         TRIGGER --> TOPTHINK
         TOPTHINK --> REACT
         REACT -->|"aucune réaction"| ACTIVEOBJ
@@ -60,7 +60,7 @@ flowchart TD
         ACTIVEOBJ -->|"nul, avion en vol"| SLOTS
         SLOTS --> HANDLERS
         BSM["AI_BehaviorStateMachine_WeightedOptionSelector_9D05<br/>tournoi MVRS, exige une cible entité+0x287"]
-        BSEL["AI_BehaviorSelector_8D30<br/>tir et guidage vers la cible<br/>renvoie 1 s'il a agi"]
+        BSEL["AI_BehaviorSelector<br/>tir et guidage vers la cible<br/>renvoie 1 s'il a agi"]
         BSCORE["nœuds MVRS<br/>score [vtable+4], application [vtable+8]"]
         HANDLERS -->|"4"| BSM
         BSM -->|"+0x27F au plus 1"| BSEL
@@ -197,7 +197,7 @@ flowchart TD
 
 ## `AI_TopLevelThink` : où se décident les objectifs (lu le 2026-09-19)
 
-`AI_TopLevelThink` (`seg004`) est appelée par `AI_TriggerBehaviorUpdate_5E53` (référence de code `AI_TriggerBehaviorUpdate+35`). Ce n'est **pas** une simple boucle sur les emplacements `GOAL` : les objectifs viennent en dernier. Ordre réel, tel que lu (le milieu de la fonction, entre le test de menace et le point `loc_83F0`, n'a **pas** été lu en détail) :
+`AI_TopLevelThink` (`seg004`) est appelée par `AI_TriggerBehaviorUpdate` (référence de code `AI_TriggerBehaviorUpdate+35`). Ce n'est **pas** une simple boucle sur les emplacements `GOAL` : les objectifs viennent en dernier. Ordre réel, tel que lu (le milieu de la fonction, entre le test de menace et le point `loc_83F0`, n'a **pas** été lu en détail) :
 
 1. **Début** : si `byte_6E4D7` est non nul et `entité+0xB0` ≥ 0xC (`TH` d'après `AI_SYSTEM.md` §1.5), appel de `Targeting_AcquireBestThreat`. Puis `AI_MessageDispatcher` et `Radio_CombatChatterDispatch`.
 2. **Le traitement des menaces est sauté** (`jmp loc_83F0`) dans trois cas : `entité+0x11D` vaut `0xA1` (décollage) ou `0xA2` (atterrissage) ; l'avion est au sol (l'octet `+0x20` du sous-objet pointé par le premier champ de l'objet à `entité+0xB` non nul) ; `word_70466` ≤ 3. Sinon, `AI_IncomingThreatWarning` et la mise à jour de la chaîne de cibles (`+0x287` / `+0x289`).
@@ -226,28 +226,28 @@ Les objets monde forment une hiérarchie de classes (tables de `seg339`, base `0
 | `0x27BC` | `loc_3E419` (`seg087`) | `call dword ptr [bx+10h]` sur l'entité lue à `[si+55h]` |
 
 Le slot `+0x10` de l'entité (table `0x110`) est **`Goal_SetObjective_A307`**. Elle reçoit `(entité, opcode, cible, pointeur de position, dword)`, écrit `entité+0x11D` (l'état d'objectif lu par `Goal_ExecuteAction_A8AC`) et les références de cible / positions, puis, dans sa queue commune (`loc_A641`) :
-1. si l'état vaut `0xAA` (suivi) ou si le bit 3 de `entité+0x28B` est posé, appelle `Goal_FollowAllyExec_DAA9` immédiatement ;
-2. sauf si le bit 5 de `entité+0x28B` est posé, appelle `Goal_IsComplete_A6D3` sur le nouvel état et **renvoie ce booléen**, qui remonte jusqu'à l'instruction de script (`taskState`).
+1. si l'état vaut `0xAA` (suivi) ou si le bit 3 de `entité+0x28B` est posé, appelle `Goal_FollowAllyExec` immédiatement ;
+2. sauf si le bit 5 de `entité+0x28B` est posé, appelle `Goal_IsComplete` sur le nouvel état et **renvoie ce booléen**, qui remonte jusqu'à l'instruction de script (`taskState`).
 
 Si le bit 5 de `entité+0x28B` est déjà posé à l'entrée (`shr ax, 5 / and ax, 1 / jz` puis `jmp loc_A641`), le `switch` est sauté : le nouvel ordre n'est pas enregistré.
 
 **Conséquence** : la chaîne est script → `ExecuteFlightCommand` → `Goal_SetObjective_A307` (pose l'intention sur l'entité) ; l'exécution est ensuite faite par `AI_TopLevelThink` / `Goal_ExecuteAction_A8AC`. Rien dans ce chemin ne pilote l'avion. La complétion vue par le script est le résultat de `Goal_IsComplete_A6D3` évalué **au moment où l'ordre est (re)posé**, pas un booléen mémorisé par l'exécution.
 
-## Le tournoi `MVRS` : conditions d'entrée, et `AI_BehaviorSelector_8D30` (lu le 2026-09-19)
+## Le tournoi `MVRS` : conditions d'entrée, et `AI_BehaviorSelector` (lu le 2026-09-19)
 
 Le scoring des nœuds `MVRS` n'est pas la première chose que fait `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` (`seg004`, argument : l'entité et un octet `arg_4` passé par l'appelant, non interprété). Ordre lu :
 
 1. **`AI_MissileEvasionReaction_9A77`** : si elle réagit, la fonction renvoie 1.
 2. **Obtenir une cible.**
-   - Avec `entité+0x287` non nul (l'objet cible courant : sa position est lue à `+0x12`, comme dans `AI_BehaviorSelector_8D30`) : si l'aéronef de cette cible a le bit 5 de `flags_75` posé, `Targeting_AcquireBestThreat` est rappelée et, sans résultat, la fonction renvoie 0.
+   - Avec `entité+0x287` non nul (l'objet cible courant : sa position est lue à `+0x12`, comme dans `AI_BehaviorSelector`) : si l'aéronef de cette cible a le bit 5 de `flags_75` posé, `Targeting_AcquireBestThreat` est rappelée et, sans résultat, la fonction renvoie 0.
    - Sans `+0x287` : si `+0x281` est non nul, ou si `+0x283` est non nul et `arg_4` non nul, un minuteur (`Timer_OneShotEvent_A288` sur `entité+0x174`) limite les rappels ; sinon `Targeting_AcquireBestThreat` est appelée directement. Sans résultat, renvoie 0.
 3. **Branche sans cible** (`+0x287` nul après l'étape 2) : si `+0x281` est non nul, renvoie le résultat de `AI_MissileEvasionReaction_9A77` ; si `+0x283` est nul, ou `arg_4` nul, renvoie 0 ; sinon applique **directement** le nœud permanent à `entité+0xD9` (`call [vtable+8]`, sans passer par le tournoi) et renvoie 1.
-4. **Branche avec cible** (`+0x287` non nul) : si `entité+0x27F` ≤ 1, appelle **`AI_BehaviorSelector_8D30`** ; s'il renvoie non nul, la fonction s'arrête (avec détachement de `entité+0x0D` si non nul, `NotifiableRef_DetachTarget_75661`) et renvoie 1.
+4. **Branche avec cible** (`+0x287` non nul) : si `entité+0x27F` ≤ 1, appelle **`AI_BehaviorSelector`** ; s'il renvoie non nul, la fonction s'arrête (avec détachement de `entité+0x0D` si non nul, `NotifiableRef_DetachTarget_75661`) et renvoie 1.
 5. Sinon : si `entité+0x0D` est non nul, appel de son `[vtable+0xC]` et fin ; **c'est seulement si `entité+0x0D` est nul que la boucle de score s'exécute**.
 
 Boucle de score (`entité+0x202`, 5 octets par entrée, `entité+0x200` entrées), citations : `call dword ptr [bx+4]` (score, un octet), `call CRT_Rand / test ax, 1 / mov cx, 1` ou `mov cx, 0FFFFh` (bruit **±1**, jamais 0), `add dx, ax` avec l'octet signé `es:[bx+4]` (valeur du fichier), `cmp cx, di / jle` avec `di` initialisé à `0FC18h` (**−1000**). Un score nul exclut l'entrée avant le bruit ; un perdant voit son mot `+2` remis à 0 ; le gagnant reçoit `call dword ptr [bx+8]` (application), et la fonction renvoie 1. Le deuxième argument des scores est un petit contexte construit sur la pile : la cible `entité+0x287` et un pointeur vers une copie du vecteur de `entité+0x1A4`.
 
-**`AI_BehaviorSelector_8D30` (313 lignes)** est le **tir et le guidage vers la cible courante**, pas un choix d'instinct. Sans `+0x287` elle renvoie 0. Sinon, dans l'ordre :
+**`AI_BehaviorSelector` (313 lignes)** est le **tir et le guidage vers la cible courante**, pas un choix d'instinct. Sans `+0x287` elle renvoie 0. Sinon, dans l'ordre :
 1. vecteur cible moins position propre (positions à `+0x12` de la cible et de l'objet lié `entité+0x102`) ; pose le bit 2 de `entité+0x28B` ;
 2. efface les bits 6 et 1 de l'octet `+0x1B` du bloc d'état (`[[entité+0x7]+0x1B]`, le bloc de `AircraftStateBlock_Reset_12931` commun au joueur et à l'IA) ; le bit 1 est le bit de tir posé plus bas ;
 3. `AI_RadarScanTarget` ; s'il renvoie non nul, fin ;
@@ -256,9 +256,9 @@ Boucle de score (`entité+0x202`, 5 octets par entrée, `entité+0x200` entrées
 6. si le bit de tir est posé : `+0x10D = +0x1A2`, message radio `0x20` (`Radio_PlayMessage`) si la cible est le joueur ;
 7. **guidage** : sauf si `AI_ManeuverSolution_Major` a répondu non nul, appelle `AI_Sensor_WeaponVelocityCache` puis `AI_GuidanceSolution_Major` (poursuite vers la cible) ; renvoie 1 s'il a tiré ou guidé, 0 sinon.
 
-Les temps sont cumulés dans `word_704E6+0x5B56` (objet en cours), `+0x5B60` (score) et `+0x5B6A` (`AI_BehaviorSelector_8D30`) : des compteurs de mesure de durée par composant, sans effet de jeu apparent.
+Les temps sont cumulés dans `word_704E6+0x5B56` (objet en cours), `+0x5B60` (score) et `+0x5B6A` (`AI_BehaviorSelector`) : des compteurs de mesure de durée par composant, sans effet de jeu apparent.
 
-**Conséquence** : tant qu'il y a une cible et que `entité+0x27F` ≤ 1, le tir et la poursuite sont faits par `AI_BehaviorSelector_8D30`, **avant** le tournoi. Le tournoi ne score que si cette fonction ne fait rien (renvoie 0) et qu'aucun objet n'est en cours à `entité+0x0D`. Le rôle de `entité+0x27F` (valeurs 0, 1, 2) n'est pas établi.
+**Conséquence** : tant qu'il y a une cible et que `entité+0x27F` ≤ 1, le tir et la poursuite sont faits par `AI_BehaviorSelector`, **avant** le tournoi. Le tournoi ne score que si cette fonction ne fait rien (renvoie 0) et qu'aucun objet n'est en cours à `entité+0x0D`. Le rôle de `entité+0x27F` (valeurs 0, 1, 2) n'est pas établi.
 
 ## Le choix de cible et le traitement des menaces : `Targeting_AcquireBestThreat` (lu le 2026-09-20)
 
@@ -344,7 +344,7 @@ Sans gagnant, **rien n'est modifié** : la cible précédente persiste. La fonct
 
 ### Ce que ça change pour le tick
 
-- **Un missile qui me vise peut retirer la cible d'attaque.** S'il gagne, `+0x287` et `+0x283` sont vidés et `+0x27F` passe à 2. Pour ce tick : `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` n'appelle pas `AI_BehaviorSelector_8D30` (il exige `+0x27F` ≤ 1) et, sans `+0x287`, ne score pas les instincts (renvoie 0, ou applique directement le nœud `+0xD9` si `+0x283` et `arg_4` sont non nuls). `+0x27F` est remis à 0 à l'appel suivant. **La fonction ne largue rien et ne détruit rien** : elle désigne la menace. La réaction défensive est ailleurs (non lue : lecteurs de `+0x281` et de `+0x27F == 2`).
+- **Un missile qui me vise peut retirer la cible d'attaque.** S'il gagne, `+0x287` et `+0x283` sont vidés et `+0x27F` passe à 2. Pour ce tick : `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` n'appelle pas `AI_BehaviorSelector` (il exige `+0x27F` ≤ 1) et, sans `+0x287`, ne score pas les instincts (renvoie 0, ou applique directement le nœud `+0xD9` si `+0x283` et `arg_4` sont non nuls). `+0x27F` est remis à 0 à l'appel suivant. **La fonction ne largue rien et ne détruit rien** : elle désigne la menace. La réaction défensive est ailleurs (non lue : lecteurs de `+0x281` et de `+0x27F == 2`).
 - **L'attaque est aussi sélectionnée ici** : les avions hostiles et les défenses fixes en concurrence, avec persistance de la cible courante, pondérés par les traits `ATRB` et filtrés par la compétence.
 - **La priorité des défenses fixes** dépend de leur portée `objet+0x3E` : elles comptent quand j'y entre.
 
@@ -386,7 +386,7 @@ Les masques `0x1`, `0x3` et `0x700` ne sont testés que si le bit 0 de `entité+
 
 **Seuil de réaction — `Pilot_ReactionThreshold_B6`** : test **sans hasard**. Il renvoie 1 si `2 × si` ≥ `AA` (trait air-air, `entité+0xB6`), avec `si` la qualité de solution de tir. Plus `AA` est élevé, plus le pilote attend une bonne solution avant de tirer ; un pilote faible tire dès qu'il a une solution médiocre.
 
-**Rafale de canon** (`AI_BehaviorSelector_8D30`) : si le masque vaut `0x800`, `si` est ramené à 10 quand la manœuvre principale répond non nul et que `si` > 5. Si `si` ≥ 2 et que le seuil de réaction réussit, la longueur de rafale vaut `((rand & 3) + 4) × si / 10` (en appels de contrôle de tir, donc en 25<sup>e</sup> de seconde) ; le bit de tir est posé si elle dépasse 1. Elle est ensuite décrémentée à chaque appel.
+**Rafale de canon** (`AI_BehaviorSelector`) : si le masque vaut `0x800`, `si` est ramené à 10 quand la manœuvre principale répond non nul et que `si` > 5. Si `si` ≥ 2 et que le seuil de réaction réussit, la longueur de rafale vaut `((rand & 3) + 4) × si / 10` (en appels de contrôle de tir, donc en 25<sup>e</sup> de seconde) ; le bit de tir est posé si elle dépasse 1. Elle est ensuite décrémentée à chaque appel.
 
 **Ce que ça dit des traits** : ni `TH` ni `AR` n'interviennent dans le choix de l'arme, le seuil de réaction ou la rafale. Le trait qui décide du tir est **`AA`**. `TH` et `AR` agissent sur le choix de cible (`Targeting_AcquireBestThreat`).
 
@@ -412,7 +412,7 @@ Les masques `0x1`, `0x3` et `0x700` ne sont testés que si le bit 0 de `entité+
 
 **Le gestionnaire de tir et de tournoi, relu dans son ordre exact d'appels (2026-09-20)** — `AI_BehaviorStateMachine_WeightedOptionSelector_9D05(entité, arg_4)` :
 - **`arg_4` est le drapeau « nouvelle cible autorisée »** : il est passé tel quel à `Targeting_AcquireBestThreat`. Valeurs vues : 0 depuis les cas « détruire la cible » et « défendre la cible » de `Goal_ExecuteAction` (donc pas de cible sol acquise seule), 1 depuis le cas `0xAC`.
-- Ordre : (1) `AI_MissileEvasionReaction_9A77` ; (2) obtention de la cible : avec une cible aérienne dont l'aéronef de l'acteur suivi a le bit 5 de `flags_75`, `Targeting_AcquireBestThreat` est rappelée (sans résultat, retour 0) ; sans cible aérienne, elle est appelée directement ou limitée par `Timer_OneShotEvent_A288` (`entité+0x174`) quand une cible aérienne, une référence missile ou (une cible sol et `arg_4`) existe déjà ; (3) **sans cible aérienne** : si une **référence missile** est posée, **c'est `AI_MissileEvasionReaction_9A77` qui répond** (la réaction à un missile n'est donc pas dans le ciblage, mais dans ce gestionnaire de réactions prioritaires, appelé ici et en tête) ; sinon, si une cible sol est posée et `arg_4` non nul, le nœud d'attaque au sol est appliqué ; sinon retour 0 ; (4) **avec cible aérienne** : `AI_BehaviorSelector_8D30` (tir et poursuite) si `entité+0x27F` ≤ 1 ; s'il agit, retour 1 ; (5) sinon objet en cours, ou tournoi `MVRS`.
+- Ordre : (1) `AI_MissileEvasionReaction_9A77` ; (2) obtention de la cible : avec une cible aérienne dont l'aéronef de l'acteur suivi a le bit 5 de `flags_75`, `Targeting_AcquireBestThreat` est rappelée (sans résultat, retour 0) ; sans cible aérienne, elle est appelée directement ou limitée par `Timer_OneShotEvent_A288` (`entité+0x174`) quand une cible aérienne, une référence missile ou (une cible sol et `arg_4`) existe déjà ; (3) **sans cible aérienne** : si une **référence missile** est posée, **c'est `AI_MissileEvasionReaction_9A77` qui répond** (la réaction à un missile n'est donc pas dans le ciblage, mais dans ce gestionnaire de réactions prioritaires, appelé ici et en tête) ; sinon, si une cible sol est posée et `arg_4` non nul, le nœud d'attaque au sol est appliqué ; sinon retour 0 ; (4) **avec cible aérienne** : `AI_BehaviorSelector` (tir et poursuite) si `entité+0x27F` ≤ 1 ; s'il agit, retour 1 ; (5) sinon objet en cours, ou tournoi `MVRS`.
 
 ## La réaction à un missile : `AI_MissileEvasionReaction_9A77` (lue le 2026-09-20)
 
@@ -430,7 +430,7 @@ Elle n'utilise **ni leurres ni contre-mesures** : l'esquive est purement manœuv
 
 ## La poursuite et l'esquive jusqu'au manche (chaîne déjà lue, rappel 2026-09-20)
 
-La poursuite (`AI_BehaviorSelector_8D30`, étape guidage) et l'esquive (`AI_MissileEvasionReaction_9A77`) passent toutes deux par `AI_GuidanceCmd_FromOwnPos` (ou directement `AI_GuidanceSolution_Major`) avec **un vecteur de direction désiré**. La chaîne, lue lors d'une session précédente (`AI_SYSTEM.md` §4bis, `known_functions.json`) :
+La poursuite (`AI_BehaviorSelector`, étape guidage) et l'esquive (`AI_MissileEvasionReaction_9A77`) passent toutes deux par `AI_GuidanceCmd_FromOwnPos` (ou directement `AI_GuidanceSolution_Major`) avec **un vecteur de direction désiré**. La chaîne, lue lors d'une session précédente (`AI_SYSTEM.md` §4bis, `known_functions.json`) :
 1. **`AI_GuidanceSolution_Major`** (géométrie et anticipation) : normalise le vecteur, calcule les deltas d'angle (cap et élévation) par rapport à mon avion avec gestion du repli à ±180°, limite l'inclinaison verticale (bornes de −90° et ±45°), prend en compte une garde d'altitude (`dword_7203D`), ma vitesse propre et la capacité de manœuvre de l'avion (`avion+0x67`), puis appelle la décision.
 2. **`AI_CombatDecision_Major`** : remet à zéro les commandes partagées, limite les deltas à ±10° en « poursuite fine », puis choisit : écart total < 20° : aucune correction ; ≤ 145° : correction proportionnelle (`AI_RollToAngleCmd_8104`, taux 5) ; > 145° : correction extrême pondérée par le taux de roulis de l'avion (`avion+0x71`, bornée à 16°) ; repli : commande neutre.
 3. **`AI_RollToAngleCmd_8104` / `AI_RollController_7E56`** : convertissent l'écart de cap en commande de roulis et de tangage et l'**écrivent dans le champ de commande que lit aussi le joueur** (entrée manche/souris). L'IA et le joueur alimentent donc le même point d'entrée de la physique `JDYN`. *(Corrigé 2026-09-24 : l'écart est un écart de roulis, pas de cap.)*
@@ -441,7 +441,7 @@ C'est le pendant, côté libRealSpace, du couple `SCPilot` (qui produit le manch
 
 ## Le tir de missile : engagement, suivi et verrouillage (lu le 2026-09-20)
 
-Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30` fait :
+Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector` fait :
 1. **`AI_FireWeaponTrigger`** : engage le premier point d'emport dont l'arme correspond au masque. Sans point d'emport engagé, rien.
 2. **Suivi** : le point d'emport engagé porte un objet suivi (`+0x0D`). S'il n'est **pas** la cible aérienne, l'IA pose le bit 6 (`0x40`) de l'octet de commande du bloc d'état commun : « demande de suivi ». Le tir n'a pas lieu ce tick.
 3. **Verrouillage** : s'il est déjà la cible, l'IA appelle **`WeaponStation_TestTargetLock`** (ancien nom `HUD_RenderReticleByWeaponType`) ; si elle renvoie non nul, le bit de tir est posé, sinon rien.
@@ -452,7 +452,7 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 
 - **Pourquoi un coéquipier avec `GOAL=1` seul décolle mais ignore ensuite « Follow »** : au sol, `AI_TopLevelThink` appelle `Goal_ExecuteAction_A8AC` sans consulter le tableau `GOAL` ; le décollage s'exécute donc. Une fois en vol, le tableau est vide et aucun gestionnaire ne tourne, d'où l'absence de suivi (il faut `5`, `Goal_ActiveWingmanEngagement_878F`).
 - **Liste 0x59C3** : liste chaînée d'objets monde (tête à +0xB de l'en-tête, suivant à +2 du nœud, drapeau actif à +5, pointeur de vtable à +0 de l'objet). Ses nœuds ne sont **pas** des entités IA : le slot +4 de la vtable IA (0x110) est un destructeur, alors que `WorldObjects_CallSlot4OnAll_22D6C` appelle le slot +4 de chaque nœud. L'objet du monde pointe vers son entité IA à +0x55.
-- **`AIEntity_MasterTick_5ACC`** n'exécute ni GOAL ni MVRS : il prépare l'état (drapeaux, seuils `dword_7203D` / `dword_72039`, chronomètre +0x175, score de menace `word_6D3BC`) puis aiguille vers `Goal_FollowAllyExec_DAA9` ou `AI_TriggerBehaviorUpdate_5E53`. La décision est dans cette dernière (non lue).
+- **`AIEntity_MasterTick_5ACC`** n'exécute ni GOAL ni MVRS : il prépare l'état (drapeaux, seuils `dword_7203D` / `dword_72039`, chronomètre +0x175, score de menace `word_6D3BC`) puis aiguille vers `Goal_FollowAllyExec` ou `AI_TriggerBehaviorUpdate`. La décision est dans cette dernière (non lue).
 - **`byte_6D558`** : drapeau « pilotage automatique ». Mis à 1 et remis à 0 par `UIScript_ParseAndEvaluate_7A054` autour d'une boucle imbriquée. À 1, `WorldObject_UpdateWithAIEntity_3D9FB` n'appelle pas `AIEntity_MasterTick_5ACC`. Selon Rémi (connaissance du jeu) : en pilotage automatique le jeu est mis en pause, le joueur est téléporté vers la destination, le jeu repart, et la caméra change pendant ce temps.
 - **Les nœuds de `WorldObjects_UpdateAllAndRemoveDead_221F2` sont mis à jour de façon hiérarchique** : `WorldObject_TestAliveAndUpdateChildren_3800A` met à jour la liste des sous-objets (+0x1E) avec la même fonction.
 - **Le nom du PROF vient de la mission** (chunk `CAST`, 9 octets par entrée : nom sur 8 octets et un identifiant), pas du modèle d'avion (indication de Rémi).
@@ -488,7 +488,7 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 ## Corrections de conclusions antérieures
 
 - `AIEntity_MasterTick_5ACC` n'est **pas** « le point d'entrée racine de toute la logique de décision IA » (ancien résumé) : c'est une préparation d'état suivie d'un aiguillage.
-- `Expr_Node_RegisterListener_5334D` n'enregistre pas un écouteur `Expr_VM` : elle ajoute l'objet à la liste 0x59C3.
+- `WorldObjects_AddToList_5334D` n'enregistre pas un écouteur `Expr_VM` : elle ajoute l'objet à la liste 0x59C3.
 - Le passage de `AIEntity_Construct_74B43` par `AircraftStateBlock_Reset_12931` n'est pas un repli quand l'allocation échoue : c'est l'initialisation du bloc quand l'allocation réussit.
 - `Debris_LoadAndInstantiate` ne sert pas qu'aux débris : c'est la fabrique de tous les objets de modèle, dont les avions IA.
 - **Le graphe de `MISSION_SCRIPT_OPCODES.md` et `AI_SYSTEM.md` §4.2** faisaient de `AI_TopLevelThink` une simple boucle sur dix emplacements `GOAL` (enchaînement `AI_TopLevelThink` → `Goal_ExecuteAction` → tournoi → `Goal_ActiveWingmanEngagement`). C'est inexact : `Goal_ExecuteAction_A8AC`, `Goal_WanderRandom_AD13`, `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` et `Goal_ActiveWingmanEngagement_878F` sont des **gestionnaires alternatifs**, choisis par l'octet du fichier, et `AI_TopLevelThink` les précède de réactions prioritaires et d'un contournement au sol. Le cas spécial « drapeau générique sur l'aéronef lié » de `AI_SYSTEM.md` §4.2 est en fait le drapeau « au sol ».
@@ -498,9 +498,9 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 
 ## Non résolu
 
-- `AI_TriggerBehaviorUpdate_5E53` (ce qu'elle fait avant d'appeler `AI_TopLevelThink`, et la fonction de comportement gardée par `+0x28B` bit 7). Le corps de `AI_TopLevelThink` entre le test de menace et `loc_83F0` n'est pas lu.
+- `AI_TriggerBehaviorUpdate` (ce qu'elle fait avant d'appeler `AI_TopLevelThink`, et la fonction de comportement gardée par `+0x28B` bit 7). Le corps de `AI_TopLevelThink` entre le test de menace et `loc_83F0` n'est pas lu.
 - La nature de l'objet à `entité+0x0D` et le contenu de `nœud+4` que `Behavior_PopFinished_75612` copie dedans.
-- `AI_EvalTargetAttribute`, `AI_RadarScanTarget`, `AI_ManeuverSolution_Major`, `AI_Sensor_WeaponVelocityCache` (appelées par `AI_BehaviorSelector_8D30`, non relues ici) ; le rôle de `entité+0x27F` ; l'octet `arg_4` du tournoi ; le rôle des champs `entité+0x281/0x283/0x285/0x287/0x289` côté lecteurs (`Targeting_AcquireBestThreat` les écrit, voir sa section) ; le sens de `objet+0x11 == 2` ; la réaction défensive à un missile qui me vise (lecteurs de `+0x281` et de `+0x27F == 2`).
+- `AI_EvalTargetAttribute`, `AI_RadarScanTarget`, `AI_ManeuverSolution_Major`, `AI_Sensor_WeaponVelocityCache` (appelées par `AI_BehaviorSelector`, non relues ici) ; le rôle de `entité+0x27F` ; l'octet `arg_4` du tournoi ; le rôle des champs `entité+0x281/0x283/0x285/0x287/0x289` côté lecteurs (`Targeting_AcquireBestThreat` les écrit, voir sa section) ; le sens de `objet+0x11 == 2` ; la réaction défensive à un missile qui me vise (lecteurs de `+0x281` et de `+0x27F == 2`).
 - Quelle classe d'objet monde est réellement celle des avions IA : seule la classe `0x27BC` transmet l'ordre à l'entité, les trois autres ont un `+0x88` qui ne fait rien. Ce n'est pas vérifié pour les prototypes d'avions.
 - Le slot +8 de l'entité (`loc_4F85`, sans nom), l'objet à +0x51 et son slot +0x40, le rôle de l'octet +0x59 de l'objet monde.
 - Le rôle des slots +4, +0x18, +0x1C et +0x20 appelés par la phase d'affichage sur la liste 0x59C3.
@@ -681,7 +681,7 @@ missile->vtable+0x40(M)                                  // nouvelle orientation
 
 ### La bombe guidée (chunk dynamique `GBMB`) : même loi, vitesse constante (lu 2026-09-24)
 
-Le soupçon était fondé : `Audio3D_ComputeDistanceParams_41BEF` n'a rien d'audio. C'est **une deuxième copie de la loi de guidage**, pour le corps construit par `JDYN_LoadChunkAndConstruct_3A49C` quand le chunk dynamique `GBMB` est présent (0x49 octets, vtable `0x1F16`, tick au slot `+0x3C`, comme le missile).
+Le soupçon était fondé : `GuidedBombBody_SteerToTarget_41BEF` n'a rien d'audio. C'est **une deuxième copie de la loi de guidage**, pour le corps construit par `JDYN_LoadChunkAndConstruct_3A49C` quand le chunk dynamique `GBMB` est présent (0x49 octets, vtable `0x1F16`, tick au slot `+0x3C`, comme le missile).
 
 | Ancien nom | Nouveau nom | Rôle |
 |---|---|---|

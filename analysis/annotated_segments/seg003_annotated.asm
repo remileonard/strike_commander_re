@@ -1309,8 +1309,8 @@ AI_Sensor_DistanceFromRef	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Ex-'AI_Sensor_RollAngle_58F4' (FAUX : ce n'est PAS un cap). ANGLE DE
-; ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180,
+; far, LUE (2026-09-24). Ex-'AI_Sensor_HeadingNormalized' (FAUX : ce n'est PAS un cap). ANGLE
+; DE ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180,
 ; mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C).
 ; ==============================================================================================
 AI_Sensor_RollAngle_58F4	proc far		; CODE XREF: AI_ThreatConeTest+8Ap
@@ -1393,7 +1393,7 @@ AI_Sensor_RollAngle_58F4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Ex-'AI_Sensor_NosePitch_59A5'. TANGAGE DU NEZ :
+; far, LUE (2026-09-24). Ex-'AI_Sensor_SecondaryAngle'. TANGAGE DU NEZ :
 ; Math_ElevationAngle_552E1(ligne 1 de l'orientation de entite+0x102), mis en cache dans
 ; entite+0xF6 (drapeau bit 2 de entite+0x28C).
 ; ==============================================================================================
@@ -5404,14 +5404,18 @@ AI_CombatDecision_Major	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_PitchController_7B20'. CONTROLEUR DE TANGAGE,
-; ecrit l'axe de tangage du manche (bloc entite+7, +0x1F). e = ecart ramene a +/-180. |e| <=
+; far, LUE INTEGRALEMENT (2026-09-24, formule du manche relue 2026-09-25).
+; Ex-'AI_RollRateController'. CONTROLEUR DE TANGAGE, ecrit l'axe de tangage du manche (bloc
+; entite+7, +0x1F ; 16,0 = pleine butee, positif = tirer). e = ecart ramene a +/-180. |e| <=
 ; zone morte : manche = 0, AI_RollToAngleCmd_8104(0, 5), renvoie 1. Sinon (renvoie 0) : dos =
-; |roulis| > 90. Si e < -15 ou (dos et e < 0) : AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE
-; DOS pour piquer) et, si |roulis| > 165 : manche = Value_ClampSymmetric(-e > 15 ? -e*16/15 :
-; 16,0) (tirer). Sinon : AI_RollToAngleCmd_8104(0, 5) et, si |roulis| < 15 : manche =
-; Value_ClampSymmetric(e < 0 ou e < 15 ? e*16/15 : 16,0). Les piques de plus de 15 deg se font
-; donc dos, en tirant.
+; |roulis| > 90 (cmp 5A00h). Si e < -15 (cmp 0FFFFF100h) ou (dos et e < 0) :
+; AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE DOS pour piquer) puis, seulement si |roulis| >
+; 165 (cmp 0A500h) : valeur = (-e > 15) ? -e*16/15 : 16,0 (toujours >= pleine butee, on TIRE).
+; Sinon : AI_RollToAngleCmd_8104(0, 5) puis, seulement si |roulis| < 15 (cmp 0F00h) : valeur =
+; e*16/15 si e < 0 ou e < 15, sinon 16,0. La valeur passe par Value_ClampSymmetric(entite,
+; valeur) (limite non lue) avant l'ecriture en +0x1F (mov es:[bx+1Fh], eax). En manche
+; normalise s = valeur/16 : s = e/15 pour |e| < 15, 1 au-dela ; sur le dos, s >= 1 avant
+; bornage. Les piques de plus de 15 deg se font donc sur le dos, en tirant.
 ; ==============================================================================================
 AI_PitchController_7B20	proc far		; CODE XREF: AI_PitchToAngleCmd_7E18+35p
 
@@ -5804,7 +5808,7 @@ AI_PitchController_7B20	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 36L, LUE (2026-09-24). Ex-'AI_PitchToAngleCmd_7E18' (FAUX : pas de cap). Commande de
+; far, 36L, LUE (2026-09-24). Ex-'AI_TurnToBearingCmd' (FAUX : pas de cap). Commande de
 ; TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis
 ; AI_PitchController_7B20(entite, &ecart, zone morte).
 ; ==============================================================================================
@@ -5851,7 +5855,7 @@ AI_PitchToAngleCmd_7E18	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollController_7E56'.
+; far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_PitchRollController_Heading'.
 ; CONTROLEUR DE ROULIS : remet a 0 l'axe de roulis du manche (bloc de commandes entite+7,
 ; +0x23 = roulis, cf. DATA_MODEL.md), ramene l'ecart a +/-180, et si |ecart| depasse la zone
 ; morte (degres) : JDYN_HighLevelPhysicsCalc(avion, sortie, ecart), valeur negee ecrite dans
@@ -6220,10 +6224,10 @@ AI_FlightControl_Cluster	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollToAngleCmd_8104' (FAUX : pas
-; de cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis
-; courant) puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) =
-; remettre les ailes a plat ; (180, 5) = se mettre sur le dos.
+; far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_TurnToHeadingCmd' (FAUX : pas de
+; cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis courant)
+; puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) = remettre
+; les ailes a plat ; (180, 5) = se mettre sur le dos.
 ; ==============================================================================================
 AI_RollToAngleCmd_8104	proc far		; CODE XREF: AI_ManeuverSolution_Major+52Dp
 					; AI_CombatDecision_Major+319p ...

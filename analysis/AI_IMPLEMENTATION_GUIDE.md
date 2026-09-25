@@ -9,6 +9,11 @@ ne documente que ce qu'il faut écrire, pas l'état antérieur du code.*
 
 ---
 
+> **Mise à jour 2026-09-25.** Les corrections à apporter au code actuel (`SCAIBrain`,
+> `SCMissionActors`, `SCPilot`) à partir des lectures de l'assembleur du 2026-09-24/25 (attaque au
+> sol, pilote automatique, commandes de roulis/tangage, verrouillage et esquive) sont regroupées
+> dans `analysis/IMPL_SCAIBRAIN_CORRECTIONS.md`. Côté physique : `IMPL_SCJETPPLANE_CORRECTIONS.md`.
+
 ## 0. Architecture — deux événements, deux fréquences
 
 ```mermaid
@@ -518,7 +523,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | nœud permanent (`+0xD9`) | appliqué directement quand une cible sol est posée sans cible aérienne ; rôle non lu | partiel | non | — |
 | nœuds spéciaux (`+0xC1` ID 20, `+0xD1` ID 21) | nœuds `MVRS` réutilisés hors tournoi | connu | non | — |
 
-**Tir et poursuite** (lus dans `AI_BehaviorSelector_8D30`)
+**Tir et poursuite** (lus dans `AI_BehaviorSelector`)
 
 | Champ (offset) | Rôle | Statut | `SCAIBrain` | Équivalent |
 |---|---|---|---|---|
@@ -547,7 +552,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 | nœud du monde lié (`+0x102`) | position et objet de mon avion | connu | non (`owner->object`) | `owner->object` |
 | chargement d'armes (`+0x104`) | stations d'armement de 35 octets | connu | non | armes du `plane` / `RSEntity::weaps` |
 | avion (`+0xB`) et bloc d'état (`+0x7`) | drapeaux de l'avion ; commandes communes joueur et IA | connu | non (`owner->plane`, `owner->pilot`) | `PlaneControlEvent` |
-| pointeur vers l'objet portant le chargement d'armes (`+0x22`) | déduit de `MVRS_ID14_ScoreWeaponReadiness` | partiel | non | — |
+| pointeur vers l'objet portant le chargement d'armes (`+0x22`) | lu par `GroundAttack_CanEngage_77000` (`nœud+0x22` du nœud d'attaque au sol) | partiel | non | — |
 
 **État d'avancement (2026-09-20)** : `SCAIBrain` (`SCAIBrain.h/.cpp`, dans `src/strike_commander/`) existe et est créé par `SCMission` pour tout acteur dont le profil est IA. La boucle `GOAL` (`runGoalSelectors`, `executeGoalAction`, `tryWanderRandom`, `tryActiveWingman`) y a été déplacée telle quelle ; `SCMissionActors::onAIRefresh` garde ses gardes puis appelle `brain->tick()`. Validé en jeu : compile, l'IA réagit comme avant. Les champs de ciblage sont déclarés mais pas encore utilisés ; l'état de l'objectif reste sur l'acteur.
 
@@ -561,7 +566,7 @@ Colonnes : **statut** = connu (lu dans l'ASM), partiel, inconnu ; **`SCAIBrain`*
 
 ### 3.1 `SCMissionActors::runMVRSTournament`
 
-*Correction (2026-09-19) : le bruit de l'ASM est ±1, jamais 0 (`test ax, 1`). Ce pseudocode ne montre que la boucle de score ; les conditions d'entrée (cible `entité+0x287`, `AI_BehaviorSelector_8D30` avant le score, objet en cours à `entité+0x0D`) sont dans `AI_TICK_CALL_GRAPH.md`.*
+*Correction (2026-09-19) : le bruit de l'ASM est ±1, jamais 0 (`test ax, 1`). Ce pseudocode ne montre que la boucle de score ; les conditions d'entrée (cible `entité+0x287`, `AI_BehaviorSelector` avant le score, objet en cours à `entité+0x0D`) sont dans `AI_TICK_CALL_GRAPH.md`.*
 
 ```cpp
 void SCMissionActors::runMVRSTournament() {
@@ -891,7 +896,7 @@ Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de l
 
 **Articulation avec les ordres du script (lu le 2026-09-20)** : `Goal_SetObjective_A307` écrit, pour « détruire la cible » comme pour « défendre la cible », **uniquement la cible de mission** (`SetReference` sur son seul champ) ; elle n'écrit ni la cible aérienne ni la cible sol, qui sont remplies par le ciblage. Les deux mécanismes se croisent à trois endroits :
 1. **Bonus de score** dans `Targeting_AcquireBestThreat` : candidat = cible de mission → cible sol : A +6 et aptitude +3 ; avion : A +2 et aptitude +4. Préférence, pas obligation.
-2. **Tir** : `MVRS_ID14_ScoreWeaponReadiness` utilise la cible sol acquise, sinon la cible de mission.
+2. **Attaque au sol** : `GroundAttack_CanEngage_77000` utilise la cible sol acquise, sinon la cible de mission (détail : `AI_TICK_CALL_GRAPH.md`, « L'attaque au sol »).
 3. **Exécution** : `Goal_ExecuteAction`, pour une cible de mission de type sol, applique directement le nœud permanent d'attaque au sol, sans passer par le ciblage.
 
 **Cibles sol : jamais acquises seules depuis `AI_TopLevelThink`.** Ce chemin appelle le ciblage avec « nouvelle cible » à 0, et un candidat sol n'est retenu que si cet argument est non nul (un avion hostile n'en a pas besoin). L'IA acquiert donc seule des avions et des missiles ; les cibles sol viennent du script. Le tournoi passe un argument non nul dans certains cas, à vérifier.
@@ -901,7 +906,7 @@ Le camp hostile de l'ASM (`+0x50` de signe opposé) correspond au `team_id` de l
 **À retenir pour l'implémentation** :
 - Un missile qui me vise **interrompt l'attaque** : plus de cible, pas de tir, pas de tournoi ce tick. La réaction défensive (leurres, virage) n'est pas dans cette fonction ; elle est à retrouver (lecteurs de `+0x281` et de `+0x27F == 2`).
 - Les défenses fixes comptent quand l'avion est **dans leur portée** (`objet+0x3E`).
-- Le tir n'est pas ici : il est fait par `AI_BehaviorSelector_8D30`, avant le tournoi (voir §3.1).
+- Le tir n'est pas ici : il est fait par `AI_BehaviorSelector`, avant le tournoi (voir §3.1).
 - `objet+0x11` est `RSEntity::target_type` (chunk `TRGT`, 1er octet) ; la valeur 2 = cible sol (cible qu'on attaque avec des armes non anti-avion). Il faut que ce champ soit lu pour toutes les classes (aujourd'hui seul `parseREAL_OBJT_JETP_TRGT` le remplit).
 - Non lu : les lecteurs de `+0x281/+0x283/+0x285/+0x289`.
 

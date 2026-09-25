@@ -158,6 +158,8 @@ strike_commander_re/
 │   ├── DATA_MODEL.md                modèle de données décodé (assets, missions,
 │   │                                  physique §6.2, caméras §6.6b) — cité en détail
 │   ├── PHYSICS.md                   modèle de vol / dynamique de l'avion
+│   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
+│   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
 │   ├── CAMERA_SYSTEM.md             ⭐ référence caméra : format COMP, parsing
 │   │                                  WRLD/CAMR, caméra de suivi (F2) — pour
 │   │                                  l'implémentation du système de caméra

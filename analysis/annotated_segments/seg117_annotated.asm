@@ -280,8 +280,8 @@ loc_58197:				; CODE XREF: seg117:0182j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Ex-'Math_AsinRaw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg -
-; table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x)).
+; far, LUE (2026-09-24). Ex-'Math_ArcCos_Raw_581A0' : NOM INVERSE, c'est un ARC SINUS. 90 deg
+; - table_acos(|x|), puis negation si x < 0 (asin(-x) = -asin(x)).
 ; ==============================================================================================
 Math_AsinRaw_581A0	proc far		; CODE XREF: Math_AsinDeg_549A6+44P
 
@@ -321,10 +321,11 @@ Math_AsinRaw_581A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Ex-'Math_AcosRaw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x 24.8,
-; |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en degres
-; 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180 deg -
-; table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de branche).
+; far, LUE (2026-09-24). Ex-'Math_ArcSin_Raw_581E3' : NOM INVERSE, c'est un ARC COSINUS. x
+; 24.8, |x| <= 1.0 : table de mots seg213+0x169 indexee par |x| (table[x] = acos(x/256) en
+; degres 24.8, verifie : 90 deg a 0, 60 deg a 0,5, 45 deg a 181/256, 0 deg a 1) ; x < 0 : 180
+; deg - table (symetrie acos(-x) = 180 - acos(x)). |x| > 1.0 : eax non defini (pas de
+; branche).
 ; ==============================================================================================
 Math_AcosRaw_581E3	proc far		; CODE XREF: Math_AcosDeg_5493E+44P
 

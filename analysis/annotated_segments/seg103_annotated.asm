@@ -3134,7 +3134,7 @@ loc_498B0:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-25). Ex-'Autopilot_NosePitchRelax_498B5'. (JDYN, matrice, vitesse). e =
+; far, LUE (2026-09-25). Ex-'JDYN_TickSubcalcA'. (JDYN, matrice, vitesse). e =
 ; Math_ElevationAngle_552E1(vitesse) - Math_ElevationAngle_552E1(nez) ; e == 0 -> rien. f =
 ; min(1, 5 deg/s * dt / |e|) (toujours positif) ; nez += (nez horizontal normalise - nez) * f
 ; ; normalisation, Matrix_OrthonormalizeKeepRow1_57660. Litteralement : ramene le nez VERS
@@ -3361,9 +3361,9 @@ Autopilot_NosePitchRelax_498B5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-25). Ex-'Autopilot_BankForTurn_49A7C'. (JDYN, matrice, &ecart de cap).
-; Roulis vise T = 0 si |ecart| < 10 deg, sinon +/-10 deg du cote de l'ecart ; r =
-; Matrix_RollAngle_57C67 ; delta = T - r borne a +/- JDYN[+0x71] * dt ; rotation autour du nez
+; far, LUE (2026-09-25). Ex-'JDYN_TickSubcalcB'. (JDYN, matrice, &ecart de cap). Roulis vise T
+; = 0 si |ecart| < 10 deg, sinon +/-10 deg du cote de l'ecart ; r = Matrix_RollAngle_57C67 ;
+; delta = T - r borne a +/- JDYN[+0x71] * dt ; rotation autour du nez
 ; (Matrix_BuildAxisY_570C5) puis Matrix_OrthonormalizeKeepRow1_57660. Inclinaison
 ; essentiellement visuelle pendant le virage du pilote automatique.
 ; ==============================================================================================

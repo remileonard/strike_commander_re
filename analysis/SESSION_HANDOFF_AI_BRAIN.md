@@ -2,6 +2,11 @@
 
 Document écrit avant compactage pour reprendre sans perdre le fil. À lire avec `CLAUDE.md` (règles de travail avec Rémi), `analysis/AI_TICK_CALL_GRAPH.md` (le détail de l'assembleur lu) et `analysis/AI_IMPLEMENTATION_GUIDE.md` (§2.10 et §3.5).
 
+> **Mise à jour 2026-09-25.** Cette fiche décrit l'état du 2026-09-20. Depuis : attaque au sol,
+> pilote automatique physique, commandes de roulis/tangage, signature du chercheur, leurres et vol
+> des missiles ont été lus. La liste des corrections à apporter au portage est dans
+> `IMPL_SCAIBRAIN_CORRECTIONS.md` (à lire en premier pour reprendre le chantier IA).
+
 ## 1. But et règles de travail
 
 - **But** : rendre le port libRealSpace fidèle à `STRIKE.EXE` sur l'IA. Le nouveau code suit l'assembleur ; l'ancien (`destroyTarget` et autres) est de la colle, décommissionnée progressivement.
@@ -69,7 +74,7 @@ Lu dans l'assembleur (détail dans `AI_TICK_CALL_GRAPH.md`, « Le tir de missile
 
 1. Missile : écrivains de `instance+0x28`/`+0x29` **trouvés** (aucun, voir §5). Reste : faire exposer `radar_sign[3]` par le parseur `SIGN`, coder `Aircraft_ComputeSeekerSignature` (cran de gaz > 5 = post-combustion) et le modèle de chercheur fidèle (garde ou vol de piste, aspect arrière de l'AIM-9J), puis les leurres `DECY` (chunk `DATA` = durée de vie ; valeurs `SIGN`/`DATA` des fichiers à relever).
 2. Esquive verticale : lire le seuil `dword_7203D` (calculé par `AIEntity_MasterTick_5ACC`) et `AI_EvalTargetAttribute` ; message radio de plainte de tir ami (`Radio_PlayMessage` `0x0E`).
-3. Attaque au sol : nœud permanent `+0xD9` (appliqué par `Goal_ExecuteAction` pour une cible de mission `+0x11 == 2`, et par le gestionnaire de tir si `arg_4` non nul), non lu.
+3. Attaque au sol : **lue intégralement le 2026-09-24/25** (`NOTE_ATTAQUE_SOL.md`, `AI_TICK_CALL_GRAPH.md` « L'attaque au sol »). `updateGroundAttack` existe dans le portage ; corrections à faire : `IMPL_SCAIBRAIN_CORRECTIONS.md` §1 (condition inversée) et §2 (pilote automatique physique des phases 2 et 3, qui dépend de `IMPL_SCJETPPLANE_CORRECTIONS.md` §1).
 4. `SCAIBrain::executeObjective()` (répartiteur d'après `Goal_ExecuteAction` : « détruire la cible » → gestionnaire de tir pour l'air, nœud sol pour le sol ; « défendre » → navigation puis gestionnaire puis errance) ; retrait progressif de l'ancien `destroyTarget` par responsabilité, après validation.
 5. Tournoi `MVRS` (sélecteur 4 = `AI_BehaviorStateMachine_WeightedOptionSelector_9D05`) : conditions d'entrée lues (cible aérienne, `+0x27F ≤ 1`, objet en cours nul, bruit ±1, plancher −1000) ; instincts à porter un par un.
 6. Retirer les `printf` de debug et l'`aim_trim` (ancien chemin) quand tout est validé ; calibrer la tolérance de tir avec des impacts réels.

@@ -174,9 +174,9 @@ locret_37D53:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 44L, LUE (2026-09-25). Ex-'WorldObject_TranslateBy_37D54' (FAUX : pas des forces).
-; (objet, &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis
-; Debris_ComputeTorque si +0x24 et notification (vtable+8).
+; far, 44L, LUE (2026-09-25). Ex-'Debris_BodyIntegrateForces' (FAUX : pas des forces). (objet,
+; &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis Debris_ComputeTorque
+; si +0x24 et notification (vtable+8).
 ; ==============================================================================================
 WorldObject_TranslateBy_37D54	proc far		; CODE XREF: seg085:02D2P
 					; WorldObject_IntegrateBodyMotion_3D31D+B6P ...
