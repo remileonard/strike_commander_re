@@ -1096,10 +1096,24 @@ des branches où le leader est le joueur. **Répliques** (chunk `MSGS` de `data/
 | `0x12` | « This one's all mine. » | prise d'initiative de l'ailier (`Goal_TransferToWingman`) |
 | `0x20` | « Do you feel lucky? Well? Do you punk? » | provocation : ailier retourné contre le joueur (aussi jouée au tir par `AI_BehaviorSelector`) |
 
-Le point résolu depuis `word_706A0` n'est pas tracé. **Question ouverte** : dans la branche
-`0x12`, `Goal_TransferToWingman` met le joueur comme cible de mission et référence de navigation
-(l'ordre « suivre » est gardé) ; ce que fait ensuite l'ailier pour « s'occuper de celui-là » n'est
-pas tracé.
+Le point résolu depuis `word_706A0` n'est pas tracé.
+
+**Comment ces réactions s'expriment ensuite : l'état de l'ailier `entité+0x149`** (lu dans
+`Goal_SelectTransition`, relue le 2026-09-25). La réaction au moral et l'entrée en combat
+n'exécutent presque rien elles-mêmes : elles écrivent l'objectif (`+0x11D`), le verrouillent contre
+le script (bit 5 de `+0x28B`) et changent l'état `+0x149`. C'est ensuite **`GOAL` 2**
+(`Goal_ExecuteAction_A8AC` → `Goal_SelectTransition` pour l'ordre « suivre ») qui l'applique à
+chaque tick, après `Goal_FollowAllyExec` (le vol en formation) :
+
+| `+0x149` | Posé par | Ce que fait `Goal_SelectTransition` |
+|---|---|---|
+| 0 | défaut | en formation ; ordre déverrouillé. Si l'ailier est discipliné et qu'un ennemi est dans les six heures du joueur (`word_722EE`, déduction) : il l'engage (état 3) et annonce `0x10` « You've got one on your tail, Commander! » |
+| 1 | `Goal_TransferToWingman` (réplique `0x12`) | **combat libre autour du leader** : ordre `0xAC` le temps d'un appel à `Goal_ExecuteAction_A8AC` (combat, cible sol autorisée), puis retour à « suivre » |
+| 2 | `Goal_MoraleReaction_878F` (réplique 8) | **a quitté le combat** : navigation vers le point posé par la réaction au moral |
+| 3 | `AI_EngageAttackerReaction_E246` (réplique `0x12`), défense du joueur (`0x10`) | **engage une cible précise** `+0x285` : cible au sol → attaque au sol ; avion → `Escort_LeaderSuccession` (non relue) |
+
+La réplique `0x12` (« This one's all mine. ») annonce donc bien un passage en combat (état 1 ou
+3), ce que Rémi observe en jeu.
 
 **Usage des répliques observé en jeu (Rémi, 2026-09-25)** : `0x12` (« This one's all mine. »)
 arrive en début de combat, quand l'ailier sélectionne une cible, en alternance avec `0x0C`

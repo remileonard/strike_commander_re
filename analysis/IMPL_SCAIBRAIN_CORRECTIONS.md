@@ -361,7 +361,7 @@ bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, s
     if (player_side && leader_is_player && !isDisciplined() && leader_state != 1 && leader_state != 2
         && following() && enemies_active) {
         owner->setMessage(0x12);                                                               // « This one's all mine. »
-        leader_state = 1; lockObjective(); owner->target = player; /* Goal_TransferToWingman */
+        leader_state = 1; objective_locked = true; owner->target = player; /* Goal_TransferToWingman → combat libre (état 1) */
         return true;
     }
     return false;
@@ -377,6 +377,37 @@ bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, s
   `FL + ajustement` vaut au moins 15 − 3 = 12 > 7 : il est **toujours discipliné**. **Billy ne fuit
   pas et ne prend pas d'initiative par le moral**. Ses 0x12 viennent de l'entrée en combat (B). Tester le moral avec un
   profil à `LY` et `FL` bas.
+
+**Comment ces réactions s'expriment : pas de faux `PROG`.** Dans l'original, la réaction écrit
+l'objectif de l'entité (comme le ferait le script), le **verrouille** contre le script (bit 5 de
+`+0x28B` : `Goal_SetObjective_A307` saute alors son `switch`) et change l'**état de l'ailier**
+(`+0x149`). C'est **`GOAL` 2** qui l'exécute ensuite (`Goal_ExecuteAction_A8AC` ; `0xA5` partage
+la branche de `0xA4`, `Goal_ReturnToBase` vers le point rangé en `+0x11F`). Transposé :
+```cpp
+uint8_t leader_state{0};        // +0x149 : 0 formation, 1 combat libre, 2 a quitté, 3 cible précise
+bool    objective_locked{false};// bit 5 de +0x28B — SCProg::setObjective doit l'ignorer quand vrai
+Vector3D brain_destination;     // +0x11F, pour l'ordre « aller à un point » posé par le cerveau
+```
+et dans `executeGoalAction()`, pour l'ordre « suivre » (d'après `Goal_SelectTransition`) :
+```cpp
+followAlly(...);                                        // Goal_FollowAllyExec : vol en formation
+switch (leader_state) {
+  case 0: objective_locked = false;
+          if (player_attacker_on_six && leader_is_player && isDisciplined()) {
+              leader_state = 3; engage_target = player_attacker; objective_locked = true;
+              owner->setMessage(0x10);                  // « You've got one on your tail, Commander! »
+          }
+          break;
+  case 1: combatStep(true); break;                      // combat libre autour du leader (ordre 0xAC)
+  case 2: objective_locked = true; flyTo(brain_destination); break;   // a quitté le combat
+  case 3: objective_locked = true;
+          if (engage_target est au sol) startGroundAttack(engage_target);
+          else combatStep(false);                       // Escort_LeaderSuccession non relue : approximation
+          break;
+}
+```
+`player_attacker_on_six` : ennemi dans les six heures du joueur (`word_722EE`, déduit de la
+réplique `0x10` ; mêmes critères que l'entrée en combat, vus depuis le joueur).
 
 **Ordre dans `tick()`** : ordres radio du joueur → esquive (niveau 2) → entrée en combat contre un
 attaquant (B) → comportement en cours → `GOAL` (dont 5 = moral, 2 = ordre, 4 = combat, 3 = errance).
