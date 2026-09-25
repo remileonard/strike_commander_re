@@ -373,9 +373,9 @@ bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, s
   la base de départ ou le point de sortie de la mission.
 - `enemies_active` : `byte_6E4CD`, « un avion du camp adverse a réfléchi au cycle radio précédent »
   (déduction) ; en attendant, « au moins un ennemi en vie à portée radar ».
-- Avec Billy (`LY = 13`, `FL = 15`) : moral plancher 25 (jamais 5), et `FL + ajustement` reste
-  au-dessus de 7 tant que le moral n'est pas 4 ou 5 : **Billy ne fuit pas et ne prend pas
-  d'initiative par le moral**. Ses 0x12 viennent de l'entrée en combat (B). Tester le moral avec un
+- Avec Billy (`LY = 13`, `FL = 15`) : score plancher 25, donc moral 4 au pire (jamais 5), et
+  `FL + ajustement` vaut au moins 15 − 3 = 12 > 7 : il est **toujours discipliné**. **Billy ne fuit
+  pas et ne prend pas d'initiative par le moral**. Ses 0x12 viennent de l'entrée en combat (B). Tester le moral avec un
   profil à `LY` et `FL` bas.
 
 **Ordre dans `tick()`** : ordres radio du joueur → esquive (niveau 2) → entrée en combat contre un
