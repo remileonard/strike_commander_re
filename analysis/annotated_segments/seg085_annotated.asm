@@ -939,9 +939,9 @@ loc_3D319:				; CODE XREF: seg085:06B5j
 ; increments) ; puis avec theta = Omega.c1 * dt : Omega.c2' = Omega.c2 cos + Omega.c0 sin,
 ; Omega.c0' = Omega.c0 cos - Omega.c2 sin (Math_CosRaw_580A7 / Math_SinRaw_58063 /
 ; Math_FixedMultiply_58034) ; corps->vtable+0x30(Omega') (JDYN : loc_3B6C5 -> loc_46BC0, ecrit
-; JDYN+4/+8/+0x0C). Sans corps : vecteur nul (dword_707F8..70800). Deux pas de temps
-; differents : dword_7045E pour la position, dword_70458 pour la rotation (relation non
-; tracee).
+; JDYN+4/+8/+0x0C). Sans corps : vecteur nul (dword_707F8..70800). dword_7045E (position) et
+; dword_70458 (rotation) sont IDENTIQUES : Frame_UpdateTimingAndNotifyTrackedObjects_500F6
+; fait toujours dword_7045E = dword_70458 en sortie (loc_50399).
 ; ==============================================================================================
 WorldObject_IntegrateBodyMotion_3D31D	proc far		; CODE XREF: seg087:0250P
 					; DATA XREF: seg339:off_6F6DCo	...

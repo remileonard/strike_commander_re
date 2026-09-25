@@ -718,7 +718,14 @@ UIScreen_ReadNumericFields_500A6	endp
 ; TrackedObjects_CallSlot18OnActive_22F10 (liste 0x59CD), puis calcule le delta de temps de la
 ; frame (dword_70458), le plafonne (0x1900) et met à jour la variable de vitesse de jeu
 ; (dword_70468/70454/7045E). Anciennement UIScreen_ApplyFormFields (aucun formulaire dans ce
-; corps).
+; corps). | PRECISE (2026-09-25) : fps = 1500 / ecart PIT (PIT_ReadHighPrecision) ; ATTENTE
+; ACTIVE tant que fps > 25 (limiteur a 25 images/s). Sauf mode particulier (dword_70468 == 1,0
+; et byte_7046C nul et word_7046E == 1, ou byte_70497) ou dword_70454 = max(fps, 4),
+; dword_70454 = fps / dword_70468 (facteur d'echelle du temps) borne a [2, 25]. En sortie
+; (loc_50399) : dword_70458 = 1 / dword_70454 (dt, donc entre 0,04 et 0,5 s), dword_70462 =
+; dword_70454, dword_7045E = dword_70458. Les ecritures intermediaires de dword_70458 (1 / fps
+; reel, decomptes dword_72A69 / dword_72A65) sont ecrasees avant le retour ; seul
+; Timer_Tick_4F9E6(0x59B0), appele entre-temps, les voit.
 ; ==============================================================================================
 Frame_UpdateTimingAndNotifyTrackedObjects_500F6	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP:loc_538BAP
 					; UIScript_ParseAndEvaluate_7A054+467P ...

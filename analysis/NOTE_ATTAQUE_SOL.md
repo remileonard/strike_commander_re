@@ -135,7 +135,7 @@ En pratique, pour l'attaque au sol, `W` pointe de l'avion vers `P` au moment de 
 
 **5. Drapeau « point atteint »** (bloc `+0x1A`) : il est posé quand `|cap(W) − cap du nez| < 5°` **et** que la distance à `P` est inférieure à `20 × |W| × dtc`, soit **400 m au moins** à 100 m/s. C'est lui qui renvoie la phase 3 en phase 0.
 
-**6. Position.** Ni `PhysicsTicks` ni le pilote automatique ne l'intègrent. C'est la méthode `+0x14` de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D`) qui fait `position += vitesse × dt`, avec le pas `dword_7045E`, et **dans les deux modes**.
+**6. Position.** Ni `PhysicsTicks` ni le pilote automatique ne l'intègrent. C'est la méthode `+0x14` de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D`) qui fait `position += vitesse × dt`, **dans les deux modes**. Son pas `dword_7045E` est toujours égal au `dt` habituel (`dword_70458`). Ce `dt` vaut `1 / fps de simulation`, borné entre 0,04 et 0,5 s ; le jeu est plafonné à 25 images/s par une attente active.
 
 **7. Vitesse angulaire.** À chaque tick, le pilote automatique **remet à zéro** la vitesse angulaire de l'avion (`JDYN+4/+8/+0x0C` ← vecteur nul constant `dword_707F8..70800`). La rotation que `WorldObject_IntegrateBodyMotion_3D31D` applique ensuite (`orientation += vitesse angulaire × dt`) est donc nulle : il ne reste aucune rotation résiduelle venant du vol normal. Dans le portage, il faut faire de même : **mettre la vitesse angulaire à zéro** en mode pilote automatique.
 
