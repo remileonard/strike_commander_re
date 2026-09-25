@@ -302,12 +302,12 @@ Le taux de roulis **actuel n'entre pas** dans le calcul : l'original calcule bie
 relu). À reproduire tel quel pour la fidélité. La commande de tangage (`AI_PitchController_7B20`)
 n'utilise **pas** cette fonction.
 
-**Note `JDYN+0x59`** : documenté ailleurs comme « plafond de l'effet de sol » (altitude). Ici il est
-comparé à la **vitesse** (`mov eax, [si+59h] / cmp eax, [bp+var_4]`, `var_4` = norme du vecteur
-vitesse) ; et dans `Aero_ApplyGroundEffect` il est comparé, au sol, à une composante de la vitesse
-air (`var_18`, sortie de `Physics_ResolveWindVectorCached_4643B`), pas à une altitude. Ce serait
-donc une **vitesse de référence d'efficacité des gouvernes** (sous elle, au sol, le nez reste
-plaqué : tangage −20). À confirmer avec la valeur du champ n°17 dans tes fichiers `JDYN`.
+**`JDYN+0x59` (champ n°17) = vitesse d'efficacité des gouvernes, confirmé** : 50 m/s pour le F-16
+(`F-16DES.IFF`). Il est comparé à la vitesse (`mov eax, [si+59h] / cmp eax, [bp+var_4]`) et, dans
+`Aero_ApplyGroundEffect`, à la vitesse air sur l'axe du nez ; ce n'est pas un plafond d'effet de
+sol. Valeurs F-16 utiles ici : accélération de roulis `JDYN+0x47` = 540 °/s², taux de roulis max
+`JDYN+0x71` = 270 °/s (le `K/270` de `combatDecision` vaut donc 1 pour le F-16), décrochage 30°,
+G max 9 (→ inclinaison max 90°, autorité au manche `max(compétence, 8)` sur 16).
 
 
 ---
@@ -574,7 +574,7 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 | 5 | Montée verticale + retournement | reprise de vitesse, +90°, roulis vers la cible, tirer jusqu'à 45° ; 5 s |
 | 6 | Split-S | monter jusqu'à plancher + 2000, dos, −90°, roulis vers la cible, tirer jusqu'à −45° ; 5 s |
 | 7 | Poursuite | interception, point d'anticipation (cible + vitesse × 4 s) quand proche |
-| 13 | Prise d'altitude à longue distance | seulement si la cible est à plus de 17 700 et sous le plafond `JDYN+0x86` ; cap sur la cible, chandelle `30° + 30° × (v − croisière)/v_min` (≤ 60°) |
+| 13 | Prise d'altitude à longue distance | seulement si la cible est à plus de 17 700 et sous le plafond `JDYN+0x86` (F-16 : 10 973 m = 36 000 ft, entier tel quel) ; cap sur la cible, chandelle `30° + 30° × (v − croisière)/v_min` (≤ 60°) |
 | 16 | Reprendre de la vitesse | vitesse max, assiette +5° jusqu'à (croisière + mini)/2 ; 1,5 s |
 
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)

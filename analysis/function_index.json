@@ -10145,7 +10145,7 @@
 "sub_4643B"
 ],
 "new_name": "Aero_ApplyGroundEffect",
-"summary": "far, seg103 L1542-1603 (relu intégralement, session 2026-09-05). Appelle `Aero_ComputeForcesMain_4791E(si, &buf12)`, extrait `buf12+0` = `m_alpha` (1er élément du triplet interne `(m_alpha,0,m_beta)`) = MOMENT DE TANGAGE. Applique ensuite l'effet de sol : si `[si+0x20]` (au sol) et `[si+0x59]` (ground_effect_ceiling, JDYN champ 17) <= une valeur d'altitude dérivée de `Physics_ResolveWindVectorCached_4643B`, alors `moment -= 0x1400` (20.0 en 24.8, biais de tangage en effet de sol). Appelée en 1er par `Aero_ControlOrchestrator_48FC2`, son résultat va dans le 1er slot (offset+0) du vecteur moment (TANGAGE,roulis,lacet)."
+"summary": "far, seg103 L1542-1603 (relu intégralement, session 2026-09-05). Appelle `Aero_ComputeForcesMain_4791E(si, &buf12)`, extrait `buf12+0` = `m_alpha` (1er élément du triplet interne `(m_alpha,0,m_beta)`) = MOMENT DE TANGAGE. Applique ensuite l'effet de sol : si `[si+0x20]` (au sol) et `[si+0x59]` (ground_effect_ceiling, JDYN champ 17) <= une valeur d'altitude dérivée de `Physics_ResolveWindVectorCached_4643B`, alors `moment -= 0x1400` (20.0 en 24.8, biais de tangage en effet de sol). Appelée en 1er par `Aero_ControlOrchestrator_48FC2`, son résultat va dans le 1er slot (offset+0) du vecteur moment (TANGAGE,roulis,lacet). CORRIGE 2026-09-25 : [si+0x59] (JDYN champ 17) n'est pas un plafond d'altitude mais une VITESSE (control_speed, F-16 = 50 m/s) ; var_18 = composante 'nez' de la vitesse air en repere corps (Physics_ResolveWindVectorCached_4643B). Donc : au sol et vitesse air < control_speed -> moment de tangage -20 (nez plaque avant la rotation)."
 },
 "sub_48C30": {
 "segment": "seg103",
@@ -10319,7 +10319,7 @@
 "sub_5828E"
 ],
 "new_name": "Aero_MaxRollRate_4AF35",
-"summary": "Ex-'Aero_ComputeAdditionalForce'. far, 169L, LUE INTEGRALEMENT 2026-09-25. TAUX DE ROULIS MAXIMAL du moment (deg/s) : w = JDYN+0x71. Si l'angle d'ecoulement total sqrt(alpha^2 + beta^2) (Aero_FlowAngle_AoA_469FE, Aero_FlowAngle_Sideslip_46AB5) depasse (JDYN+0x4B - 5 deg) [angle de decrochage - 5] : w = w / (angle - (JDYN+0x4B - 5) + 1). Si le champ a 3 etats de flags_75 (bits 7-8 du word JDYN+0x75, cycle 0->1->2->0 par le bit1 de la commande +0x1D dans le tick physique, etat 1 a la creation) vaut 2 : w x 0x99/256 = 0,6. Si la vitesse |v| (vecteur +0x08/+0x0C/+0x10 de l'objet [JDYN+0]) < JDYN+0x59 : w = w . |v| / JDYN+0x59. Appelee aussi par Aero_ComputeControlFlags75Bit5C (limite du taux de roulis du modele de vol)."
+"summary": "Ex-'Aero_ComputeAdditionalForce'. far, 169L, LUE INTEGRALEMENT 2026-09-25. TAUX DE ROULIS MAXIMAL du moment (deg/s) : w = JDYN+0x71. Si l'angle d'ecoulement total sqrt(alpha^2 + beta^2) (Aero_FlowAngle_AoA_469FE, Aero_FlowAngle_Sideslip_46AB5) depasse (JDYN+0x4B - 5 deg) [angle de decrochage - 5] : w = w / (angle - (JDYN+0x4B - 5) + 1). Si le champ a 3 etats de flags_75 (bits 7-8 du word JDYN+0x75, cycle 0->1->2->0 par le bit1 de la commande +0x1D dans le tick physique, etat 1 a la creation) vaut 2 : w x 0x99/256 = 0,6. Si la vitesse |v| (vecteur +0x08/+0x0C/+0x10 de l'objet [JDYN+0]) < JDYN+0x59 : w = w . |v| / JDYN+0x59. Appelee aussi par Aero_ComputeControlFlags75Bit5C (limite du taux de roulis du modele de vol). Valeurs F-16 (F-16DES.IFF) : JDYN+0x71 = 270 deg/s, JDYN+0x4B = 30 deg, JDYN+0x59 = 50 m/s."
 },
 "sub_4B09D": {
 "segment": "seg103",

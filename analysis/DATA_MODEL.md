@@ -444,7 +444,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x4E` | borne ± d'enveloppe **contact-sol** | bloc « au sol » L2213/2268 |
 | `+0x52` | distance/vitesse max pour état « au sol » | id. L2252 (`if [+0x52] ≤ dist → bail`) |
 | `+0x56`/`+0x57`/`+0x58` | bornes d'attitude 3 axes (i8, `<<8`) pour « au sol » | id. L2221/2231/2245 |
-| `+0x59` | ⚠️ **probablement une vitesse, pas une altitude** (2026-09-25) : comparé à `|v|` dans `Aero_MaxRollRate_4AF35` (taux de roulis × `|v|/[+0x59]` en dessous), et dans `Aero_ApplyGroundEffect` à une composante de la vitesse air (`var_18`), au sol → tangage `-0x1400`. Ancienne lecture : « altitude plafond de l'effet de sol ». À confirmer avec la valeur du fichier. | `Aero_ApplyGroundEffect` L1546, `Aero_MaxRollRate_4AF35` |
+| `+0x59` | ✅ **vitesse, pas une altitude** (confirmé 2026-09-25 ; F-16 = 50,0 m/s dans `F-16DES.IFF`) : comparé à `|v|` dans `Aero_MaxRollRate_4AF35` (taux de roulis × `|v|/[+0x59]` en dessous), et dans `Aero_ApplyGroundEffect` à une composante de la vitesse air (`var_18`), au sol → tangage `-0x1400`. Ancienne lecture : « altitude plafond de l'effet de sol ». Dans `Aero_ApplyGroundEffect`, `var_18` est la composante « nez » de la vitesse en repère corps (`Physics_ResolveWindVectorCached_4643B`). | `Aero_ApplyGroundEffect` L1546, `Aero_MaxRollRate_4AF35` |
 | `+0x61` | **gain de portance / d'agilité de la cellule** (aussi utilisé ÷4 pour la force latérale) | `Aero_ComputeLiftAndSideForce` L343 |
 | `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeAoACommand_48862` L1457 |
 | `+0x66` | valeur de reset de l'accumulateur `[jdyn+0x1A]` × gain `dword_72A18` | `Aero_ResetAccumulatorFlags75Bit5` L1972 |
@@ -537,7 +537,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
              confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A] — pas de retour capturé.
           3. Aero_ApplyGroundEffect(si) → slot TANGAGE : appelle Aero_ComputeForcesMain_4791E(si)
              qui lit si[0x16] comme consigne et calcule EN INTERNE un triplet (m_alpha,0,m_beta) ;
-             extrait m_alpha (+0), puis si au sol et sous ground_effect_ceiling (si[0x59],
+             extrait m_alpha (+0), puis si au sol et sous control_speed (si[0x59], vitesse — ex-« ground_effect_ceiling »,
              JDYN#17) : m_alpha -= 20.0 (24.8).
           4. Aero_ComputeControlFlags75Bit5C(si) → slot ROULIS : loi directe manche (confirmée
              correcte par Rémi, non retracée en détail cette session).

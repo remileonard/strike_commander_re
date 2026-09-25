@@ -110,7 +110,7 @@ Règle de conversion : un **dword** utilisé tel quel dans un calcul en virgule 
 | `JDYN #14` (u8, `+0x2B`→`+0x56`) | `envelope_bank_limit` | ° (à confirmer) | `raw` |
 | `JDYN #15` (u8, `+0x2C`→`+0x57`) | `envelope_pitch_limit` → **`pitch_rate_limit_dps`** | °/s ? | `raw` — champ réel, mais **aucun lecteur trouvé dans le tick physique** : le servo de tangage borne par `max_turn_rate` (#8) comme les deux autres axes (§5.7). Ne pas l'utiliser tant qu'un lecteur ASM n'est pas trouvé (§8) |
 | `JDYN #16` (u8, `+0x2D`→`+0x58`) | `envelope_pitch_margin` | ° (à confirmer) | `raw` |
-| `JDYN #17` (u32, `+0x2E`→`+0x59`) | `ground_effect_ceiling` | m | `raw / 256.0` |
+| `JDYN #17` (u32, `+0x2E`→`+0x59`) | **`control_speed`** (ex-`ground_effect_ceiling`, corrigé 2026-09-25) : **vitesse** d'efficacité des gouvernes — sous elle, taux de roulis max × `v/control_speed` (`Aero_MaxRollRate_4AF35`) et, au sol, nez plaqué (moment de tangage −20, `Aero_ApplyGroundEffect`, comparé à la vitesse air sur l'axe du nez). F-16 : **50** | m/s | `raw / 256.0` |
 | `JDYN #18` (u32, `+0x32`→`+0x5D`) | `induced_drag_k` | — (= `1/(π·e·AR)`) | `raw / 256.0` |
 | `JDYN #19` (u32, `+0x36`→`+0x61`) | `lift_gain` | — (rôle de `Clα·S`, sans unité S/b séparées) | `raw / 256.0` |
 | `JDYN #20` (u8, `+0x3A`→`+0x65`) | `pitch_stick_gain` : **borne de la consigne d'incidence** | ° | `raw` (entier : le code fait `si[0x65] << 8`) ; multipliée par le gain de dégâts ELEVATOR (§5.7) |
@@ -499,6 +499,12 @@ portage, même s'il tourne plus vite, reproduit le jeu à sa cadence nominale.
   roulis est bornée à `± max_turn_rate · g_aileron` (`mov edx,dword_72A20 / imul` sur `[si+71h]`),
   puis `(consigne − ω_roulis)·K` est comparée à `rate_limit` (`[si+47h]`, accélération de roulis
   maximale, °/s²). Aileron détruit → plus de roulis.
+  **Précisé le 2026-09-25** : la consigne ajoutée est `(manche/16) × Aero_MaxRollRate_4AF35`
+  (`idiv 10h` puis `call Aero_MaxRollRate_4AF35 / imul`), et ce taux max n'est pas `[si+71h]`
+  brut : il est divisé par `(angle − (α_décrochage − 5) + 1)` quand `√(α² + β²)` dépasse
+  `α_décrochage − 5°`, multiplié par `v / control_speed` sous `control_speed` (JDYN #17), et par
+  0,6 à l'état 2 des bits 7-8 de `flags_75`. F-16 (`F-16DES.IFF`) : `[si+71h]` = 270 °/s,
+  `[si+47h]` = 540 °/s², `control_speed` = 50 m/s, décrochage 30° → réduction au-delà de 25°.
 - **Lacet** (`Aero_ResetAccumulatorFlags75Bit5`) : consigne de dérapage =
   `yaw_authority · g_rudder · palonnier` (`si[0x66] << 8`, `imul dword_72A18`, × `[ctrl+0x27]/16`),
   puis même servo qu'en tangage avec `err = consigne − β`.

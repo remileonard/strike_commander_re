@@ -1551,6 +1551,10 @@ Aero_ComputeAoACommand_48862	endp
 ; d'altitude dérivée de Physics_ResolveWindVectorCached_4643B, alors moment -= 0x1400 (20.0 en
 ; 24.8, biais de tangage en effet de sol). Appelée en 1er par Aero_ControlOrchestrator_48FC2,
 ; son résultat va dans le 1er slot (offset+0) du vecteur moment (TANGAGE,roulis,lacet).
+; CORRIGE 2026-09-25 : [si+0x59] (JDYN champ 17) n'est pas un plafond d'altitude mais une
+; VITESSE (control_speed, F-16 = 50 m/s) ; var_18 = composante 'nez' de la vitesse air en
+; repere corps (Physics_ResolveWindVectorCached_4643B). Donc : au sol et vitesse air <
+; control_speed -> moment de tangage -20 (nez plaque avant la rotation).
 ; ==============================================================================================
 Aero_ApplyGroundEffect	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+2Dp
 
@@ -6003,7 +6007,8 @@ locret_4AF34:
 ; +0x1D dans le tick physique, etat 1 a la creation) vaut 2 : w x 0x99/256 = 0,6. Si la
 ; vitesse |v| (vecteur +0x08/+0x0C/+0x10 de l'objet [JDYN+0]) < JDYN+0x59 : w = w . |v| /
 ; JDYN+0x59. Appelee aussi par Aero_ComputeControlFlags75Bit5C (limite du taux de roulis du
-; modele de vol).
+; modele de vol). Valeurs F-16 (F-16DES.IFF) : JDYN+0x71 = 270 deg/s, JDYN+0x4B = 30 deg,
+; JDYN+0x59 = 50 m/s.
 ; ==============================================================================================
 Aero_MaxRollRate_4AF35	proc far		; CODE XREF: Aero_ComputeControlFlags75Bit5C+1A6p
 					; JDYN_RollStickFromError_4B09D+148p

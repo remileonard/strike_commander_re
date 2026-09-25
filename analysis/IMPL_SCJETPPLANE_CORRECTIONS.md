@@ -301,6 +301,26 @@ non-régression du vol stabilisé.
 
 ---
 
+## 8bis. [P2] Taux de roulis max : trois réductions, et le vrai rôle du champ JDYN n°17 [PHYSICS §5.8]
+
+Lu le 2026-09-25 (`Aero_MaxRollRate_4AF35`, appelé par `Aero_ComputeControlFlags75Bit5C`) : la
+consigne de roulis vaut `stick × maxRollRate()` (stick en [−1, 1]), avec
+```cpp
+float maxRollRate() {
+    float w = max_turn_rate_dps;                          // JDYN #8, F-16 : 270
+    float flow = sqrtf(alpha*alpha + beta*beta), onset = stall_alpha - 5.0f;   // #9 : 30 -> 25
+    if (flow > onset) w /= (flow - onset + 1.0f);
+    if (flags75_tristate == 2) w *= 0.6f;                 // bits 7-8 de flags_75, rôle à identifier
+    if (airspeed < control_speed) w *= airspeed / control_speed;   // #17, F-16 : 50 m/s
+    return w;                                             // puis × g_aileron (§3)
+}
+```
+**Champ n°17 = `control_speed` (m/s), pas `ground_effect_ceiling`** : il est comparé à une vitesse
+dans les deux fonctions qui le lisent. Dans `Aero_ApplyGroundEffect` : **au sol et vitesse air sur
+l'axe du nez < `control_speed` → moment de tangage −20** (le nez reste plaqué avant la vitesse de
+rotation), et non « sous une altitude ». Renommer le champ dans le parseur et corriger ce test si le
+portage compare une altitude.
+
 ## 9. Ce qui est conforme (ne pas toucher)
 
 Courbe de manette et lapse d'altitude ; densité `AIRDENS.TBL` ; α/β en degrés ; incidence
