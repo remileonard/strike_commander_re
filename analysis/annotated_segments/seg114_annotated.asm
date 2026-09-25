@@ -6769,7 +6769,7 @@ STRIKE_EXE_MAIN_LOOP	endp
 ; camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a
 ; pas ete relu en detail.
 ; ==============================================================================================
-Combat_TeamOpposedCheckAndDispatch_53A94	proc far		; CODE XREF: AI_MissileThreatTrigger_A+13CP
+Combat_TeamOpposedCheckAndDispatch_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
 					; Debris_SpawnOrchestrator+7BP ...
 
 var_16		= word ptr -16h

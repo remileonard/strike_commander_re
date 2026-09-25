@@ -1483,8 +1483,8 @@
 "sub_53A94",
 "sub_CB45"
 ],
-"new_name": "AI_MissileThreatTrigger_A",
-"summary": "far, 169 lignes - LUE INTEGRALEMENT (a la demande de Remi). **SYSTEME RWR (Radar Warning Receiver) A DEUX NIVEAUX, entierement decode.** Parametre arg_4 selectionne le mode (1 ou 2). GARDE INITIALE : si arg_4==1, verifie flags_75 bit6 (modulateur de menace, deja documente) - si absent, sortie immediate (retourne 0, aucune alerte). CALCUL DU RATIO DE MENACE : Roster_SumAttributeB(liste) * 100 / Roster_SumAttributeA(liste) - vraisemblablement un pourcentage de verrouillage/frames de poursuite actives sur le total possible. Si ratio > 80 (0x50) : declenche. Sinon, pour arg_4==2 : re-verifie flags_75 bit6 comme critere alternatif. Pour arg_4==1 supplementaire : compare entite+0x102+0x1A (portee/distance) a dword_7203D (seuil de portee capteur, deja connu) - si en dessous, declenche aussi. SI DECLENCHE : resout un objet via [entite+0x102->vtable+0]. **VERIFICATION CRITIQUE DE CORRESPONDANCE JOUEUR** : compare le champ +0x50 de cet objet a celui de word_722E6 (LE JOUEUR) - l'alerte radio NE SE DECLENCHE QUE SI LA MENACE CORRESPOND SPECIFIQUEMENT AU JOUEUR (var_B), pas generiquement pour n'importe quelle IA menacee. DEUX SOUS-TYPES D'ALERTE selon objet_resolu+0x63 : SI NON-ZERO (type A, probable 'missile tire/en approche') : appelle sub_6CCFF (mise a jour HUD/indicateur visuel avec un offset +0x5A sur l'objet resolu), PUIS SI var_B (correspond au joueur) : Radio_PlayMessage_CB45(joueur, code=9, categorie=1) - alerte sonore/vocale. Termine TOUJOURS par UIScreen_BuildWidgetTree_53A94 (code 0) et pose flags_75 bit5 sur l'avion lie (meme bit deja documente ailleurs comme lie a la formation - reutilisation multi-contexte probable, ou lien reel avec rupture de formation en reaction a la menace, a confirmer). SI ZERO (type B, probable 'verrouillage radar simple') : SI var_B : Radio_PlayMessage_CB45(joueur, code=0xA, categorie=1) uniquement, sans mise a jour HUD ni bit pose. CONCLUSION : ceci est LE vrai mecanisme 'avertir en cas de danger' cherche - mais SPECIFIQUEMENT pour des menaces missile/radar verrouillees sur le JOUEUR, pas un avertissement generique de danger pour n'importe quelle IA."
+"new_name": "AI_EjectDecision_50FF",
+"summary": "Ex-'AI_MissileThreatTrigger_A'. far, 169L. DECISION D'EJECTION (pas un detecteur de menace). Mode 1 exige le drapeau de decrochage. Ejecte si dommages = SommeB x 100 / SommeA > 80 %, ou (mode 2 et decroche), ou (mode 1 et altitude < plancher). Si le modele a un siege (+0x63) : ejection (stub 6CCFF), message radio 9 si ailier ami ('She's breaking up. Ejecting!'), Combat_TeamOpposedCheckAndDispatch, flags_75 |= bit5 (avion abandonne) ; sinon message radio 0x0A. Appelee par les ticks ID14 (mode 2) et ID15 (mode 1). A verifier : role A/B des sommes par rapport a JDYN_UpdateDamageGains_494DD."
 },
 "sub_526F": {
 "segment": "seg003",
@@ -1496,8 +1496,8 @@
 "sub_561AF",
 "sub_561AF"
 ],
-"new_name": "Vec3_Negate",
-"summary": "far,53L — négation d'un vecteur 3D (7 dwords, pattern similaire à sub_50AD) : inversion de direction vectorielle."
+"new_name": "Vector2D_CrossSign_526F",
+"summary": "Ex-'Vec3_Negate'. far, 53L. Signe du produit vectoriel 2D (plan horizontal) de deux directions : dit de quel cote (gauche/droite) se trouve la seconde par rapport a la premiere. Utilise par MVRS ID1 pour choisir le cote du premier virage. (Pas une negation de vecteur.)"
 },
 "sub_5305": {
 "segment": "seg003",
@@ -1534,8 +1534,8 @@
 "calls": [
 "sub_5861"
 ],
-"new_name": "AI_Sensor_TargetInRange",
-"summary": "far,63L — 1er du cluster 'cache capteur par frame' : teste bit0 de +0x28C, calcule via sub_5861 (distance) vs seuil dword_72039×256, cache résultat bit0 de +0x28D. **Capteur caché : cible en portée.**"
+"new_name": "AI_Sensor_TooSlow_564A",
+"summary": "Ex-'AI_Sensor_TargetInRange'. far, 63L. DRAPEAU 'TROP LENT' (pas 'cible a portee') : vrai si drapeau de decrochage (bit6) ou si AI_Sensor_IndicatedAirspeed_5861 <= dword_72039 (vitesse minimale de manoeuvre, calculee a partir de JDYN+0x82 corrigee vers +0x84 selon l'assiette). Cache bit0 de entite+0x28D."
 },
 "sub_56E5": {
 "segment": "seg003",
@@ -1546,8 +1546,8 @@
 "calls": [
 "sub_378CA"
 ],
-"new_name": "AI_Sensor_InterceptFeasibleCached",
-"summary": "far,99L — teste bit7 de +0x28C, accumule une distance de fermeture (dword_7204D) via sub_378CA en boucle, compare au carburant/munitions restant (+0x1A), cache bit1 de +0x28D. **Capteur caché : faisabilité d'interception.** LUE INTEGRALEMENT (a la demande de Remi). PRECISION IMPORTANTE : c'est un CAPTEUR MIS EN CACHE, pas un calcul refait a chaque appel. Si bit7 de entite+0x28C est pose, retourne IMMEDIATEMENT le resultat CACHE (bit1 de entite+0x28D) sans aucun calcul. Sinon : lit un champ a entite+0xE5 (probable carburant/munitions restant, mis a l'echelle x4), l'accumule avec le resultat de Terrain_QueryAltitudeAt_378CA (position de l'entite + reference globale word_70474) dans dword_7204D ('distance de fermeture'), compare ce total au seuil entite_liee+0x1A - si depasse, met en cache 'infaisable' (bit1 pose) ; sinon 'faisable' (bit1 efface). Explique pourquoi cette fonction sert de garde peu couteuse dans plusieurs fonctions de score (MVRS_ID7/8) et dans MVRS_ID8_ApplyFuelGatedManeuver - la plupart des appels retournent un resultat en cache, le vrai calcul (avec requete de terrain) n'ayant lieu que lorsque bit7 signale un rafraichissement necessaire."
+"new_name": "AI_Sensor_TooLow_56E5",
+"summary": "Ex-'AI_Sensor_InterceptFeasibleCached'. far, 99L. DRAPEAU 'TROP BAS' (pas 'interception faisable') : vrai si altitude < altitude du terrain + 4 x entite+0xE5 (plancher du pilote). Cache bit1 de entite+0x28D."
 },
 "sub_57CA": {
 "segment": "seg003",
@@ -1571,8 +1571,8 @@
 "sub_4B805",
 "sub_5828E"
 ],
-"new_name": "AI_Sensor_DistanceFromRef",
-"summary": "far,64L — cache à +0xF1 : appelle sub_4B805 sur position propre (+0xB) puis sub_5828E : **capteur caché : distance/altitude par rapport à un point de référence.**"
+"new_name": "AI_Sensor_IndicatedAirspeed_5861",
+"summary": "Ex-'AI_Sensor_DistanceFromRef'. far, 64L. VITESSE INDIQUEE (pas une distance) : |vitesse| x sqrt(rho(altitude)/rho0) via FlightControl_ResolveNormalizedParam, mise en cache a entite+0xF1 pour la frame. Utilisee par toutes les manoeuvres MVRS pour comparer aux vitesses JDYN+0x80 (max) / +0x82 (min) / +0x84 (croisiere)."
 },
 "sub_58F4": {
 "segment": "seg003",
@@ -1623,7 +1623,7 @@
 "sub_549A6"
 ],
 "new_name": "AI_ComputeBearingToRef",
-"summary": "far,103L — calcule un vecteur relatif via vtable[0x3C]+sub_58768+sub_5593A+sub_549A6, normalise l'angle résultant (wraparound ±0xB400) : **calcul de relèvement (bearing) vers un point de référence.**"
+"summary": "far, 103L, LUE 2026-09-25. ECART DE ROULIS VERS UNE DIRECTION : L = Matrix_WorldToLocal_58768(orientation de l'avion, D) (repere avion : c0 envergure, c1 nez, c2 haut) ; composante nez mise a 0 ; normalisation ; a = Math_AsinDeg_549A6(L.c0) ; si L.c2 < 0 (direction sous le plan des ailes) : a = 180 - a (a >= 0) ou -180 - a. Soit a = atan2(L.c0, L.c2) : le roulis qui amene D dans le plan 'nez-haut' de l'avion (portance vers la cible)."
 },
 "sub_5F9B": {
 "segment": "seg003",
@@ -1701,8 +1701,8 @@
 "sub_5861",
 "sub_7E18"
 ],
-"new_name": "AI_EvadeOrPursueSelector",
-"summary": "far,162L — vérifie vitesse verticale (chute) et timer de menace (dword_7203D) : si critique, déclenche manoeuvre d'urgence via sub_7E18 (virage vers cap 0x1E00, taux 0xA) + code HUD 0x0A ; sinon évalue bearing (sub_59A5)/distance (sub_5861) vs seuil pour choisir code HUD 1 ou 0xA. **Sélecteur de manoeuvre évasion/poursuite avec signalisation HUD**, retourne booléen (manoeuvre déclenchée)."
+"new_name": "AI_GroundAvoidPullUp_6616",
+"summary": "Ex-'AI_EvadeOrPursueSelector'. far, 162L. Corps du tick de l'evitement du sol (MVRS ID14). Si l'avion monte et est au-dessus du plancher (dword_7203D) : assiette +30 deg, cran de manette 10, retourne 1 (fin). Sinon : cran 1 si nez vers le bas et vitesse indiquee > minimale, sinon cran 10 ; commande d'assiette +30 deg (zone morte 10) via AI_PitchToAngleCmd_7E18."
 },
 "sub_676F": {
 "segment": "seg003",
@@ -1717,8 +1717,8 @@
 "sub_58F4",
 "sub_7E18"
 ],
-"new_name": "AI_ThreatConeTest",
-"summary": "far,169L — combine bearing (sub_59A5), détection ennemi (+0x75 bit6), distance (sub_5861 vs dword_72039) et cap (sub_58F4 vs 0x3C00) pour décider si la cible est dans le cône d'engagement ; déclenche éventuellement virage d'évitement via sub_7E18(rate=0xA, angle=-0x1E00). **Test 'cible dans le cône de tir/menace' + réaction évasive.**"
+"new_name": "AI_NoseHighRecovery_676F",
+"summary": "Ex-'AI_ThreatConeTest'. far, 169L. Corps du tick de la recuperation nez haut / decrochage (MVRS ID15). Termine (retourne 1) quand le nez est repasse sous l'horizon (et plus en decrochage lent). Si assiette > 60 deg et decroche : manette au ralenti (cran 0) ; sinon cran 10 et, hors decrochage, assiette -30 deg (zone morte 10)."
 },
 "sub_68D4": {
 "segment": "seg003",
@@ -1731,8 +1731,8 @@
 "sub_632E",
 "sub_7E18"
 ],
-"new_name": "AI_SpeedManeuverDecision",
-"summary": "far,74L — DECISION VITESSE/MANOEUVRE IA. JDYN = es:[arg_0+0x0B]. Seuil = (movsx jdyn[0x84] (i16, def 231) + dword_72039) / 2 ; si seuil<<8 > distance (AI_Sensor_DistanceFromRef) -> retourne 1 (maintien de vitesse). Sinon (loc_691C) : AI_ThrottleCmd_HUD(jdyn[0x80]) (consigne = vitesse IA max) + AI_PitchToAngleCmd_7E18(rate=5, angle=0x500) -> retourne 0. jdyn[0x84] = vitesse de croisiere/manoeuvre IA (sert aussi de consigne throttle directe dans GroundAttack_Phase4_PullUp_77171, ovr231)."
+"new_name": "AI_RegainSpeed_68D4",
+"summary": "Ex-'AI_SpeedManeuverDecision'. far, 74L. Corps du tick 'reprendre de la vitesse' (MVRS ID16). Termine quand vitesse indiquee > (croisiere JDYN+0x84 + dword_72039)/2 ; sinon manette a la vitesse max JDYN+0x80 et assiette +5 deg."
 },
 "sub_6977": {
 "segment": "seg003",
@@ -1821,7 +1821,7 @@
 "sub_75F8"
 ],
 "new_name": "AI_GuidanceSolution_Major",
-"summary": "far, 651 lignes - LUE INTEGRALEMENT (a la demande de Remi). **VRAIE LOI DE GUIDAGE DE POURSUITE AVEC ANTICIPATION** (proportional navigation / lead pursuit), le coeur geometrique de la chaine de combat aerien IA (AI_SYSTEM.md §4bis). Prend deux vecteurs d'approche (si=arg_4, di=arg_6, chacun transforme/calcule via Math_HeadingAngle_553CF), calcule leur DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois : cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE DIVERGENT (>90 deg, ligne ~16530) : bascule sur un calcul alternatif (angle=0, pas de correction fine) plutot que Math_AngleBetweenVectors, evitant les artefacts numeriques d'un calcul d'angle sur des vecteurs presque opposes. GARDE PORTEE CAPTEUR (ligne ~16571) : compare [avion+0x1A] a dword_7203D (le seuil de portee de capteur deja connu d'AIEntity_MasterTick) - si hors de portee de detection reelle, saute directement a un ANGLE FIXE MAXIMAL (±166 deg, constante 0xFFFFA600/-0x5A00) plutot que de calculer une correction fine. ESTIMATION DE TEMPS DE VIRAGE (ligne ~16604-16650) : calcule une estimation du temps necessaire pour completer un virage, BASEE SUR LA CAPACITE DE MANOEUVRE PROPRE DE L'AVION ([avion+0x67], meme champ que les sequences de manoeuvre MVRS_ID14b) - un avion plus manoeuvrant obtient une estimation de temps plus courte, permettant des corrections plus agressives. PLUSIEURS PALIERS D'ANGLE LIMITE (lignes ~16800-16870) : clamps a ±166 deg (cas extreme) ou ±45 deg (cas modere, 0x2D00) selon la situation geometrique. REORIENTATION DU VECTEUR D'ENTREE (ligne ~16880, si var_1==1) : recalcule la 3e composante du vecteur si par un facteur cosinus (Math_SinDeg_54876) proportionnel a la distance (Math_VectorLength3D_Raw_5828E), puis re-transforme (Vector_TransformHelperB_559BB) - ajuste l'approche en fonction de la distance a la cible. SORTIE (fin de fonction, ligne ~17058-17075) : calcule un DERNIER delta d'angle final (var_A, wrappe ±180 deg), puis **DELEGUE DIRECTEMENT (appel en queue) A AI_CombatDecision_Major_75F8** en lui passant CE cap final PLUS deux autres deltas intermediaires (var_68, var_E) et l'argument original (arg_8) - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (decision) -> AI_RollToAngleCmd_8104 (execution). ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
+"summary": "far, 651 lignes, RELUE INTEGRALEMENT 2026-09-25 (vrais noms trigonometriques ; l'ancien resume, errone : pas de '+/-166 deg' (0xFFFFA600 = -90), pas d'estimation de temps de virage). LOI DE PILOTAGE VERS UNE DIRECTION. Arguments : entite, D = direction voulue (normalisee sur place), R = direction de reference (vitesse de mon arme / de l'avion selon l'appelant), arg_8 transmis. (1) ecart de cap h = cap(D) - cap(R) (Math_HeadingAngle_553CF), ramene a +/-180. (2) elevation voulue e = 0 si |h| >= 90 (virage a plat quand la cible est derriere, [si+8] = 0), sinon Math_ElevationAngle_552E1(D) ; p = tangage du nez (AI_Sensor_NosePitch_59A5). (3) PROTECTIONS D'ALTITUDE (plancher dword_7203D, calcule par AIEntity_MasterTick_5ACC) : (a) si altitude ([obj+0x1A]) <= plancher et e < p : e = min(80, 80 * (plancher - altitude) / entite[+0xE5]) (remontee) ; (b) sinon angle de pique minimal m : 0 si le facteur de charge de l'avion [avion+0x67] < 2 ; sinon r = v^2 / (9,8 * n/2) (rayon de ressource, v = AI_Sensor_OwnSpeed, n = [avion+0x67]) ; m = -90 si la hauteur au-dessus du plancher h >= r, sinon m = -Math_AcosDeg_5493E((r - h) / r) ; si e < m : e = m ; sinon si p < -45 et e < p : e = -45 ; sinon si p >= 45 et e > p : e = 45. En cas de correction, D est recalcule avec une composante verticale sin(e) * |D horizontal| puis renormalise. (4) ecart d'elevation v = elevation(D) - elevation(R), +/-180. (5) ECART DE ROULIS r : h >= 90 -> r = 90 - roulis (AI_Sensor_RollAngle_58F4), moins v si v > 0 ; h <= -90 -> r = -90 - roulis, plus v si v > 0 ; sinon r = AI_ComputeBearingToRef (roulis qui place D dans le plan vertical de l'avion). r ramene a +/-180. (6) AI_CombatDecision_Major(entite, &h, &v, &r, arg_8)."
 },
 "sub_75A9": {
 "segment": "seg003",
@@ -2572,8 +2572,8 @@
 "calls": [
 "sub_6AB54"
 ],
-"new_name": "Escort_WaitLandingClearance",
-"summary": "far,96L — gère le sous-état d'escorte +0x27F==4 : vérifie le canal radio (+0xC5, vtable[4]) avant de notifier la cible (sub_6AB54) : **handler d'attente de clairance radio (probable 'attente autorisation atterrissage').**"
+"new_name": "AI_GroundAvoidReflex_E06C",
+"summary": "Ex-'Escort_WaitLandingClearance'. far, 96L. REFLEXE D'EVITEMENT DU SOL (niveau de reaction entite+0x27F = 4 ; pas une attente de clairance d'atterrissage). Lanceur generique : si le comportement en cours a deja ce niveau, le faire avancer ; si un autre comportement tourne, 0 ; sinon noter le noeud fixe ID14 (entite+0xC5) avec un contexte (sans cible, minuteur 2 s) ; s'il repond > 0 : abandon du comportement en cours, application d'ID14, niveau = 4."
 },
 "sub_E159": {
 "segment": "seg007",
@@ -2584,8 +2584,8 @@
 "calls": [
 "sub_6AB54"
 ],
-"new_name": "Escort_WaitTakeoffClearance",
-"summary": "far,96L — identique à sub_E06C mais sous-état +0x27F==5 et canal +0xC9 : **handler d'attente de clairance radio (probable 'attente autorisation décollage').**"
+"new_name": "AI_StallRecoveryReflex_E159",
+"summary": "Ex-'Escort_WaitTakeoffClearance'. far, 96L. REFLEXE DE RECUPERATION NEZ HAUT / DECROCHAGE (niveau entite+0x27F = 5 ; pas une attente de clairance de decollage). Meme lanceur que AI_GroundAvoidReflex_E06C avec le noeud fixe ID15 (entite+0xC9)."
 },
 "sub_E246": {
 "segment": "seg007",
@@ -2635,8 +2635,8 @@
 "sub_4F95",
 "sub_5828E"
 ],
-"new_name": "Missile_PhysicsTick",
-"summary": "far,638L — vérifie type d'objet cible (+0x8/+0x6==1), semble être un **tick de mise à jour d'un objet projectile/missile** (analogue à sub_3314 pour les avions mais structure de champs différente, avec suivi de position de cible +0x15/0x19/0x1E) : candidat fort pour la physique de guidage de missile, à approfondir."
+"new_name": "MVRS_BuildCombatContext_E5A4",
+"summary": "Ex-'Missile_PhysicsTick'. far, 638L, PARTIELLEMENT RELUE 2026-09-25 (pas un tick de missile). CONSTRUIT LE CONTEXTE PARTAGE lu par les scores et ticks MVRS : byte_720DF = je suis un avion (type 1) ; dword_720B7 = ma vitesse ; dword_720C5 = croisiere JDYN+0x84 ; dword_720C9 = minimale JDYN+0x82 ; dword_720CD = ma vitesse indiquee ; dword_72053/57/5B = cible - moi ; positions dans 3 s (Physics_ApplyForceAtPoint, 0x300) ; word_72095 = angle nez->cible ; dword_720AB.. = vitesse cible, dword_720BB = sa norme ; word_72097 = angle entre ligne de visee et vitesse cible, word_72093 = 180 - celui-ci ; dword_7209B = distance ; byte_720E0 = cible dans mon arriere (angle nez >= 100 et ...), byte_720E1 = je suis dans ses 6 heures proche (angle nez <= 60, word_72093 < 60, distance < 3 x portee)."
 },
 "sub_EC22": {
 "segment": "seg008",
@@ -2664,8 +2664,8 @@
 "sub_57CA",
 "sub_5828E"
 ],
-"new_name": "Missile_ProximityFuze",
-"summary": "far,167L — calcule la distance entre la position projetée du missile (+0x13) et sa cible (+0x11), compare au seuil de proximité dword_7201C (même seuil que les alertes de menace du seg003) : **détonateur de proximité (fuze) pour missile guidé.**"
+"new_name": "AI_ManeuverSpeedCmd_ED1E",
+"summary": "Ex-'Missile_ProximityFuze'. far, 167L. COMMANDE DE VITESSE DES MANOEUVRES (pas une fusee de proximite). Sans cible : vitesse de croisiere JDYN+0x84. Avec cible : vitesse demandee (argument), multipliee par (3600 - d)/1800 si la distance d < 1800, divisee par 2 si Pilot_SkillCheck_B0 reussit et que ma vitesse <= celle de la cible."
 },
 "sub_120E8": {
 "segment": "seg009",
@@ -45334,8 +45334,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID3_Tick_F72B",
-"summary": "Ex-'MVRS_ID4_TrackingStateMachine_F72B'. far, taille substantielle (>250 lignes), PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -= dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle, entierement non lue. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID3_TickEnergyManeuver_F72B",
+"summary": "Ex-'MVRS_ID3_Tick_F72B'. far, LUE 2026-09-25. Tick MVRS ID3 'manoeuvre d'energie' (phase node+0x27, minuteur 4 s -> phase 6). Phase 0 choix : trop lent et pas trop bas -> 2 (piqué), trop lent et trop bas -> 1 (jinks), pas trop lent et trop bas -> 4 (chandelle), sinon rand&3 : 1->2, 2->4, sinon 1. 1 : jambe ID20 de 1 s a +/-32/64 deg en alternant, retour 0. 2 : croisiere, roulis 180 puis tire a fond jusqu'a assiette >= -30 (avance immediatement en pratique). 3 : si trop bas ou vitesse >= croisiere -> assiette +5 puis 0 ; sinon assiette -(40 TH^2/256)-5. 4 : ailes a plat, tire jusqu'a assiette <= 30. 5 : si altitude > plancher + 3 x deck ou trop lent -> -5 puis 0 ; sinon +(40 TH^2/256)+5. 6 : croisiere, assiette 0, fin."
 },
 "loc_DCEE": {
 "segment": "seg006",
@@ -45444,8 +45444,8 @@
 "lines": 35,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID16_ApplyReturnToBase_118C3",
-"summary": "Ex-'MVRS_ID19_ApplyReturnToBase_118C3'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE gerant vitesse et direction ensemble, pas seulement la trajectoire. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID16_ApplyRegainSpeed_118C3",
+"summary": "Ex-'MVRS_ID16_ApplyReturnToBase_118C3'. far, LUE. Application MVRS ID16 : minuteur 1,5 s (0x180), premier tick. (Pas un retour a la base.)"
 },
 "loc_5C0B0": {
 "segment": "seg128",
@@ -45515,7 +45515,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MVRS_ID13_ApplySetTimer_1138F",
-"summary": "Ex-'MVRS_ID14b_ApplySetTimer_1138F'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"summary": "far, LUE. Application MVRS ID13 : minuteur 4 s (0x400), phase node+0x26 = 1, puis premier tick."
 },
 "loc_ED16": {
 "segment": "seg008",
@@ -45684,8 +45684,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID15_ScoreThreatSensor_4E2A",
-"summary": "Ex-'MVRS_ID16_ScoreThreatSensor_4E2A'. far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID15_ScoreStallRecovery_4E2A",
+"summary": "Ex-'MVRS_ID15_ScoreThreatSensor_4E2A'. far, 87L, RELUE 2026-09-25. Score MVRS ID15 'recuperation nez haut / decrochage' : 10 si pas de cible, pilote automatique coupe, et (drapeau de decrochage bit6, ou vitesse indiquee dword_720CD <= minimale dword_720C9 avec assiette > 30) ; sinon 0. Noeud fixe entite+0xC9, lance par AI_StallRecoveryReflex_E159."
 },
 "loc_878F": {
 "segment": "seg004",
@@ -45734,8 +45734,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID16_ScoreFuelOrResource_4ECD",
-"summary": "Ex-'MVRS_ID19_ScoreFuelOrResource_4ECD'. far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID16_ScoreLowSpeed_4ECD",
+"summary": "Ex-'MVRS_ID16_ScoreFuelOrResource_4ECD'. far, 59L, RELUE 2026-09-25. Score MVRS ID16 'reprendre de la vitesse' : 1 si la manette (TH) est sous 12, sinon 0 (pas de carburant ni de retour a la base)."
 },
 "loc_5C331": {
 "segment": "seg129",
@@ -45884,8 +45884,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID14_ScoreIntercept_4CD1",
-"summary": "Ex-'MVRS_ID15b_ScoreIntercept_4CD1'. far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID14_ScoreGroundAvoid_4CD1",
+"summary": "Ex-'MVRS_ID14_ScoreIntercept_4CD1'. far, 150L, RELUE 2026-09-25. Score MVRS ID14 'evitement du sol' : 10 si pas de cible, pilote automatique coupe, et hauteur-sol < entite+0xE1 x (1 + sin(roulis/2)/2) ou (altitude < plancher et vitesse verticale dword_720A7 < 0) ; sinon 0. Noeud fixe entite+0xC5, lance par AI_GroundAvoidReflex_E06C."
 },
 "loc_3CB0B": {
 "segment": "seg084",
@@ -45994,8 +45994,8 @@
 "lines": 367,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID5_TickSubmodeSwitch_1011F",
-"summary": "Ex-'MVRS_ID6_TimerTickAndSubmodeSwitch_1011F'. far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID5_TickVerticalReversal_1011F",
+"summary": "Ex-'MVRS_ID5_TickSubmodeSwitch_1011F'. far, LUE 2026-09-25. Tick MVRS ID5 'montee verticale + retournement' (type Immelmann ; minuteur 5 s ; phases node+0x26 fixees par le score). 1 : au-dessus de ~dword_72034 pique a -30 sinon ->2 ; 2 : reprise de vitesse (plein gaz, -30 ou +5 si bas) jusqu'a vitesse >= croisiere ; 3 : ailes et nez a plat ; 4 : assiette +90 ; 5 : roulis pour amener la cible dans le plan de portance (AI_ComputeBearingToRef) jusqu'a cible dessous ou trop lent ; 6 : tire jusqu'a assiette <= 45 ; 7 : assiette vers l'elevation de la cible ; 8 : ailes a plat, fin. Manette croisiere."
 },
 "loc_66809": {
 "segment": "seg201",
@@ -46154,8 +46154,8 @@
 "lines": 35,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID14_Apply_11763",
-"summary": "Ex-'MVRS_ID15b_ApplyPersistence_11763'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616), reacquisition si echec. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID14_ApplyGroundAvoid_11763",
+"summary": "Ex-'MVRS_ID14_Apply_11763'. far, LUE. Application MVRS ID14 (evitement du sol) : minuteur, premier tick."
 },
 "loc_6715C": {
 "segment": "seg204",
@@ -46394,8 +46394,8 @@
 "lines": 40,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID15_Apply_11809",
-"summary": "Ex-'MVRS_ID16_ApplyPersistence_11809'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases - verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une reaction reflexe plutot qu'une manoeuvre planifiee. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID15_ApplyStallRecovery_11809",
+"summary": "Ex-'MVRS_ID15_Apply_11809'. far, LUE. Application MVRS ID15 : minuteur 2 s, premier tick."
 },
 "loc_A307": {
 "segment": "seg005",
@@ -46824,8 +46824,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID13_ScoreScissorsRollaway_4A99",
-"summary": "far, 258 lignes (12015-12269) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x1B0 confirme = ID=13 via ancrage sequentiel - CORRIGE : precedemment attribuee a ID=0xE/14b). Base=1. Lit avion+0x86 (NOUVELLE capacite, probable taux de roulis max, mise a l'echelle x256) compare a entite+0x11->+0x1A. Gardes : tache en cours, sub_564A. Calcul RICHE : bearing dword_720BB/720B7, seuil dword_7205B, **UTILISE dword_72039 ET dword_7202C (les DEUX constantes NUMS deja identifiees dans la sequence de manoeuvre a 5 phases Scissors/Rollaway)** - CONFIRME QUE C'EST ID=13, PAS 0xE, QUI DECLENCHE CETTE SEQUENCE. Contient un calcul de type 'temps de virage' (imul x5, idiv par dword_720BB, decalages 0x18) similaire a celui documente dans la sequence elle-meme. Lit aussi avion+0x8B (MEME champ que ID=5) pour un ajustement final, et sub_56E5 (capteur cache). Score borne [0,9]."
+"new_name": "MVRS_ID13_ScoreZoomClimb_4A99",
+"summary": "Ex-'MVRS_ID13_ScoreScissorsRollaway_4A99'. far, 258L, RELUE 2026-09-25 (pas Scissors/Rollaway). Score MVRS ID13 'prise d'altitude' : base 1 ; 0 sans cible, si trop lent (AI_Sensor_TooSlow_564A), ou si mon altitude (entite+0x1A) >= plafond JDYN+0x86 (defaut 11005). -2 x nombre d'utilisations. Si la cible est plus lente que moi, pas plus de 400 sous moi, ma vitesse >= (croisiere + dword_72039)/2, je suis un avion et (cible dans mon arriere byte_720E0 ou moi dans ses 6h byte_720E1) : +5 x (ma vitesse - la sienne)/la sienne, ou +5 si sa vitesse <= la minimale. Distance > 17700 (dword_7202C) et word_72093 < 30 : +5 ; sinon distance < 1800 : -5 (et -5 encore si word_72093 < 20). + terme JDYN+0x8B. Trop bas (AI_Sensor_TooLow_56E5) : +4. Borne 0..9."
 },
 "loc_597C2": {
 "segment": "seg121",
@@ -47144,8 +47144,8 @@
 "lines": 327,
 "type": "label",
 "calls": [],
-"new_name": "MVRS_ID13_TickManeuverSequence_113FD",
-"summary": "Ex-'MVRS_ID14b_TickManeuverSequence_113FD'. far, ~365 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] de MVRS ID=0xE. **DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE** (5 phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1 : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 : calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5), appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6). PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
+"new_name": "MVRS_ID13_TickZoomClimb_113FD",
+"summary": "Ex-'MVRS_ID13_TickManeuverSequence_113FD'. far, ~335L, RELUE 2026-09-25 (pas Scissors/Rollaway). Tick MVRS ID13 'prise d'altitude a longue distance'. Minuteur -= dt (dword_70458) ; sans cible : fin. Phase 1 : si distance horizontale a la cible < 17700 (dword_7202C) -> fin ; sinon AI_GuidanceCmd_FromOwnPos vers la cible (composante verticale annulee, vitesse cran 10) et phase suivante une fois aligne. Phase 2 : si trop lent -> assiette 0 puis ailes a plat (zone morte 5) ; sinon phase suivante. Phase 3 : chandelle a 30 + 30 x (vitesse indiquee - croisiere JDYN+0x84)/min JDYN+0x82 deg (borne 60), ailes a plat, cran 10 ; phase suivante si minuteur < 0, trop lent ou cible a moins de 17700 (le minuteur est decremente 2 fois par tick dans cette phase). Phase 4 : assiette 0 (zone morte 5), manette croisiere, puis fin."
 },
 "loc_11A04": {
 "segment": "seg008",
@@ -47576,5 +47576,95 @@
 "calls": [],
 "new_name": "MVRS_ID21_TickAutopilotNav_11B16",
 "summary": "far (label, slot +0xC de l'ID 21), LU 2026-09-25. NAVIGATION AU PILOTE AUTOMATIQUE PHYSIQUE. Minuteur +0x0D -= dt. Si le pilote automatique est coupe (JDYN+0x68 == 0xFF) : si |tangage du nez| < 15 (AI_Sensor_NosePitch_59A5, cmp 0F00h) -> JDYN+0x68 = 0 (active Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5) (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis Behavior_PopFinished_75612."
+},
+"loc_EEA0": {
+"segment": "seg008",
+"start_line": 30873,
+"end_line": 30873,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID1_ApplyReacquireTurn_EEA0",
+"summary": "far, LUE 2026-09-25. Application MVRS ID1 : premiere jambe = noeud ID20 (entite+0xC1) vers le nez tourne de +/-30 deg du cote de la cible (Vector2D_CrossSign_526F), minuteur du noeud 4, jambes de 1 s."
+},
+"loc_F0C3": {
+"segment": "seg008",
+"start_line": 31067,
+"end_line": 31067,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID1_TickReacquireLegs_F0C3",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID1 'virage de reacquisition par jambes' : a chaque fin de jambe ID20, nouvelle jambe tournee de -60 deg (le test d'alternance 'test ax,0' est toujours faux : toujours du meme cote), minuteur -1 par jambe. Fin quand la cible est a moins de 60 deg du nez, sans cible, ou apres 4 jambes. Vitesse via AI_ManeuverSpeedCmd_ED1E."
+},
+"loc_F3B6": {
+"segment": "seg008",
+"start_line": 31359,
+"end_line": 31359,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID2_TickBreak_F3B6",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID2 'degagement (break)' : axe dominant de (vecteur memorise - mon nez) ; manche a fond tire (+16) si mon vecteur haut a le meme signe sur cet axe, sinon pousse a moitie (-8) ; manche lateral +/-16 selon le cote choisi a l'application (manche > 3/16 -> 1, < -3/16 -> 0, sinon aleatoire). Jusqu'au minuteur ; vitesse via AI_ManeuverSpeedCmd_ED1E."
+},
+"loc_FE39": {
+"segment": "seg008",
+"start_line": 32399,
+"end_line": 32399,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID4_TickDefensiveBreakTurn_FE39",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID4 'virage defensif' (declenche sur alerte de menace) : plein gaz (cran 10), inclinaison 90 deg (60 si trop bas) du cote memorise (signe de l'angle nez->cible), zone morte 30 puis 5 + tire a fond ; quand le cap a tourne de >= 90 deg ou minuteur ecoule : assiette +10 puis fin (fin forcee si minuteur < -2 s)."
+},
+"loc_10673": {
+"segment": "seg008",
+"start_line": 33235,
+"end_line": 33235,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID6_TickSplitS_10673",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID6 'Split-S' (minuteur 5 s) : 1 monte a +30 jusqu'a plancher + 2000 ; 2 monte a +20 a la vitesse minimale jusqu'a vitesse < croisiere ; 3 a plat puis roulis 180 ; 4 assiette -90 ; 5 roulis pour amener la cible dans le plan de portance ; 6 tire jusqu'a assiette >= -45 ; 7 assiette vers l'elevation de la cible (0 sans cible) ; 8 ailes a plat, fin."
+},
+"loc_10BD9": {
+"segment": "seg008",
+"start_line": 33795,
+"end_line": 33795,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID7_TickPursuit_10BD9",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID7 'poursuite' (bits de node+0x32). Sans cible : fin. Mode bit2 (ou bit1 et aspect >= 80) : guidage vers le point decale memorise (montee 45 deg si pas trop lent), vitesse dword_72039. Mode bit4 : vers le point d'anticipation memorise ; AI_InterceptDispatcher si cible a moins de 45 deg du nez. Sinon : si AI_VisibilityTest(cible) -> retour ; bit3 : si distance <= 2|Vt|^2/9 -> minuteur 4, bit4, point = position cible + vitesse x 4 s (Physics_ApplyForceAtPoint) ; sinon interception ; sinon si nez <= 60 et word_72093 < 60 -> bit3 ; AI_InterceptDispatcher, fin s'il renvoie non nul."
+},
+"loc_117B4": {
+"segment": "seg008",
+"start_line": 34948,
+"end_line": 34948,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID14_TickGroundAvoid_117B4",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID14 : AI_EjectDecision_50FF(mode 2) ; sinon fin si minuteur < 0 ; sinon AI_GroundAvoidPullUp_6616 (fin quand il renvoie 1)."
+},
+"loc_1186E": {
+"segment": "seg008",
+"start_line": 35023,
+"end_line": 35023,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID15_TickStallRecovery_1186E",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID15 : fin si minuteur < 0 ; AI_EjectDecision_50FF(mode 1) ; sinon AI_NoseHighRecovery_676F (fin quand il renvoie 1)."
+},
+"loc_1191D": {
+"segment": "seg008",
+"start_line": 35093,
+"end_line": 35093,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "MVRS_ID16_TickRegainSpeed_1191D",
+"summary": "far, LUE 2026-09-25. Tick MVRS ID16 : AI_RegainSpeed_68D4 jusqu'a la fin ou au minuteur."
 }
 }

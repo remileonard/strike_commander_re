@@ -8,12 +8,17 @@ seg008		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,638L — vérifie type d'objet cible (+0x8/+0x6==1), semble être un tick de mise à jour
-; d'un objet projectile/missile (analogue à sub_3314 pour les avions mais structure de champs
-; différente, avec suivi de position de cible +0x15/0x19/0x1E) : candidat fort pour la
-; physique de guidage de missile, à approfondir.
+; Ex-'Missile_PhysicsTick'. far, 638L, PARTIELLEMENT RELUE 2026-09-25 (pas un tick de
+; missile). CONSTRUIT LE CONTEXTE PARTAGE lu par les scores et ticks MVRS : byte_720DF = je
+; suis un avion (type 1) ; dword_720B7 = ma vitesse ; dword_720C5 = croisiere JDYN+0x84 ;
+; dword_720C9 = minimale JDYN+0x82 ; dword_720CD = ma vitesse indiquee ; dword_72053/57/5B =
+; cible - moi ; positions dans 3 s (Physics_ApplyForceAtPoint, 0x300) ; word_72095 = angle
+; nez->cible ; dword_720AB.. = vitesse cible, dword_720BB = sa norme ; word_72097 = angle
+; entre ligne de visee et vitesse cible, word_72093 = 180 - celui-ci ; dword_7209B = distance
+; ; byte_720E0 = cible dans mon arriere (angle nez >= 100 et ...), byte_720E1 = je suis dans
+; ses 6 heures proche (angle nez <= 60, word_72093 < 60, distance < 3 x portee).
 ; ==============================================================================================
-Missile_PhysicsTick	proc far		; CODE XREF: MVRS_SharedContextSyncAndID2Score_EC22+1Ep
+MVRS_BuildCombatContext_E5A4	proc far		; CODE XREF: MVRS_SharedContextSyncAndID2Score_EC22+1Ep
 
 var_EC		= dword	ptr -0ECh
 var_E8		= dword	ptr -0E8h
@@ -94,10 +99,10 @@ arg_0		= dword	ptr  6
 		jmp	short loc_E5DB
 ; ���������������������������������������������������������������������������
 
-loc_E5D6:				; CODE XREF: Missile_PhysicsTick+1Dj
+loc_E5D6:				; CODE XREF: MVRS_BuildCombatContext_E5A4+1Dj
 		mov	byte_720DF, 0
 
-loc_E5DB:				; CODE XREF: Missile_PhysicsTick+30j
+loc_E5DB:				; CODE XREF: MVRS_BuildCombatContext_E5A4+30j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+11h]
 		mov	bx, es:[bx+11h]
@@ -168,16 +173,16 @@ loc_E64B:
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		jmp	short loc_E6CC
 ; ���������������������������������������������������������������������������
 
-loc_E6C8:				; CODE XREF: Missile_PhysicsTick+10Bj
+loc_E6C8:				; CODE XREF: MVRS_BuildCombatContext_E5A4+10Bj
 		mov	eax, dword_720B7
 
-loc_E6CC:				; CODE XREF: Missile_PhysicsTick+122j
+loc_E6CC:				; CODE XREF: MVRS_BuildCombatContext_E5A4+122j
 		mov	dword_720CD, eax
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+13h], 0
@@ -185,7 +190,7 @@ loc_E6CC:				; CODE XREF: Missile_PhysicsTick+122j
 		jmp	loc_EAD7
 ; ���������������������������������������������������������������������������
 
-loc_E6DD:				; CODE XREF: Missile_PhysicsTick+134j
+loc_E6DD:				; CODE XREF: MVRS_BuildCombatContext_E5A4+134j
 		mov	si, es:[bx+13h]
 		add	si, 12h
 		mov	di, es:[bx+11h]
@@ -361,20 +366,20 @@ loc_E855:
 		jmp	short loc_E912
 ; ���������������������������������������������������������������������������
 
-loc_E910:				; CODE XREF: Missile_PhysicsTick+365j
+loc_E910:				; CODE XREF: MVRS_BuildCombatContext_E5A4+365j
 		xor	ax, ax
 
-loc_E912:				; CODE XREF: Missile_PhysicsTick+36Aj
+loc_E912:				; CODE XREF: MVRS_BuildCombatContext_E5A4+36Aj
 		or	al, al
 		jz	short loc_E91D
 		mov	byte_720C4, 1
 		jmp	short loc_E922
 ; ���������������������������������������������������������������������������
 
-loc_E91D:				; CODE XREF: Missile_PhysicsTick+370j
+loc_E91D:				; CODE XREF: MVRS_BuildCombatContext_E5A4+370j
 		mov	byte_720C4, 0
 
-loc_E922:				; CODE XREF: Missile_PhysicsTick+377j
+loc_E922:				; CODE XREF: MVRS_BuildCombatContext_E5A4+377j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+13h]
 		mov	bx, es:[bx+13h]
@@ -484,10 +489,10 @@ loc_EA3E:
 		jmp	short loc_EA7E
 ; ���������������������������������������������������������������������������
 
-loc_EA7C:				; CODE XREF: Missile_PhysicsTick+4D1j
+loc_EA7C:				; CODE XREF: MVRS_BuildCombatContext_E5A4+4D1j
 		xor	ax, ax
 
-loc_EA7E:				; CODE XREF: Missile_PhysicsTick+4D6j
+loc_EA7E:				; CODE XREF: MVRS_BuildCombatContext_E5A4+4D6j
 		or	al, al
 		jz	short loc_EA95
 		mov	eax, dword_720BF
@@ -496,7 +501,7 @@ loc_EA7E:				; CODE XREF: Missile_PhysicsTick+4D6j
 		mov	[bp+var_70], eax
 		mov	dword_720BF, eax
 
-loc_EA95:				; CODE XREF: Missile_PhysicsTick+4DCj
+loc_EA95:				; CODE XREF: MVRS_BuildCombatContext_E5A4+4DCj
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+13h]
 		mov	bx, es:[bx+13h]
@@ -510,7 +515,7 @@ loc_EA95:				; CODE XREF: Missile_PhysicsTick+4DCj
 		jmp	loc_EB70
 ; ���������������������������������������������������������������������������
 
-loc_EAB5:				; CODE XREF: Missile_PhysicsTick+50Cj
+loc_EAB5:				; CODE XREF: MVRS_BuildCombatContext_E5A4+50Cj
 		push	dx
 		push	ax
 		les	bx, [bp+var_74]
@@ -522,14 +527,14 @@ loc_EAB5:				; CODE XREF: Missile_PhysicsTick+50Cj
 		jmp	loc_EB70
 ; ���������������������������������������������������������������������������
 
-loc_EACA:				; CODE XREF: Missile_PhysicsTick+521j
+loc_EACA:				; CODE XREF: MVRS_BuildCombatContext_E5A4+521j
 		les	bx, [bp+var_74]
 		mov	al, es:[bx+52h]
 		mov	byte_720C3, al
 		jmp	loc_EB70
 ; ���������������������������������������������������������������������������
 
-loc_EAD7:				; CODE XREF: Missile_PhysicsTick+136j
+loc_EAD7:				; CODE XREF: MVRS_BuildCombatContext_E5A4+136j
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 15h
@@ -577,8 +582,8 @@ loc_EB52:
 		sub	eax, [si+8]
 		mov	dword_7205B, eax
 
-loc_EB70:				; CODE XREF: Missile_PhysicsTick+50Ej
-					; Missile_PhysicsTick+523j ...
+loc_EB70:				; CODE XREF: MVRS_BuildCombatContext_E5A4+50Ej
+					; MVRS_BuildCombatContext_E5A4+523j ...
 		push	4FA3h
 		push	4FAFh
 		push	ss
@@ -615,10 +620,10 @@ loc_EB70:				; CODE XREF: Missile_PhysicsTick+50Ej
 		jmp	short loc_EBE5
 ; ���������������������������������������������������������������������������
 
-loc_EBE3:				; CODE XREF: Missile_PhysicsTick+638j
+loc_EBE3:				; CODE XREF: MVRS_BuildCombatContext_E5A4+638j
 		xor	ax, ax
 
-loc_EBE5:				; CODE XREF: Missile_PhysicsTick+63Dj
+loc_EBE5:				; CODE XREF: MVRS_BuildCombatContext_E5A4+63Dj
 		mov	dl, al
 		cmp	word_72095, 64h	; 'd'
 		jl	short loc_EC07
@@ -629,13 +634,13 @@ loc_EBE5:				; CODE XREF: Missile_PhysicsTick+63Dj
 		or	dl, dl
 		jz	short loc_EC07
 
-loc_EC00:				; CODE XREF: Missile_PhysicsTick+64Fj
+loc_EC00:				; CODE XREF: MVRS_BuildCombatContext_E5A4+64Fj
 		mov	byte_720E0, 1
 		jmp	short loc_EC1E
 ; ���������������������������������������������������������������������������
 
-loc_EC07:				; CODE XREF: Missile_PhysicsTick+648j
-					; Missile_PhysicsTick+656j ...
+loc_EC07:				; CODE XREF: MVRS_BuildCombatContext_E5A4+648j
+					; MVRS_BuildCombatContext_E5A4+656j ...
 		cmp	word_72095, 3Ch	; '<'
 		jg	short loc_EC1E
 		cmp	word_72093, 3Ch	; '<'
@@ -644,13 +649,13 @@ loc_EC07:				; CODE XREF: Missile_PhysicsTick+648j
 		jz	short loc_EC1E
 		mov	byte_720E1, 1
 
-loc_EC1E:				; CODE XREF: Missile_PhysicsTick+61Ej
-					; Missile_PhysicsTick+661j ...
+loc_EC1E:				; CODE XREF: MVRS_BuildCombatContext_E5A4+61Ej
+					; MVRS_BuildCombatContext_E5A4+661j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Missile_PhysicsTick	endp
+MVRS_BuildCombatContext_E5A4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -700,7 +705,7 @@ arg_4		= word ptr  0Ah
 		mov	byte_72052, 1
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Missile_PhysicsTick
+		call	near ptr MVRS_BuildCombatContext_E5A4
 
 loc_EC43:
 		add	sp, 4
@@ -798,11 +803,12 @@ MVRS_SharedDefaultTickNoOp_ED16:				; DATA XREF: seg339:0148o seg339:015Co ...
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,167L — calcule la distance entre la position projetée du missile (+0x13) et sa cible
-; (+0x11), compare au seuil de proximité dword_7201C (même seuil que les alertes de menace du
-; seg003) : détonateur de proximité (fuze) pour missile guidé.
+; Ex-'Missile_ProximityFuze'. far, 167L. COMMANDE DE VITESSE DES MANOEUVRES (pas une fusee de
+; proximite). Sans cible : vitesse de croisiere JDYN+0x84. Avec cible : vitesse demandee
+; (argument), multipliee par (3600 - d)/1800 si la distance d < 1800, divisee par 2 si
+; Pilot_SkillCheck_B0 reussit et que ma vitesse <= celle de la cible.
 ; ==============================================================================================
-Missile_ProximityFuze	proc far		; CODE XREF: seg008:0AABp seg008:0CD9p ...
+AI_ManeuverSpeedCmd_ED1E	proc far		; CODE XREF: seg008:0AABp seg008:0CD9p ...
 
 var_3C		= dword	ptr -3Ch
 var_38		= dword	ptr -38h
@@ -834,7 +840,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_EE8B
 ; ���������������������������������������������������������������������������
 
-loc_ED36:				; CODE XREF: Missile_ProximityFuze+13j
+loc_ED36:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+13j
 		mov	di, es:[bx+13h]
 		add	di, 12h
 		mov	dx, es:[bx+11h]
@@ -889,7 +895,7 @@ loc_ED36:				; CODE XREF: Missile_ProximityFuze+13j
 		jmp	loc_EE9A
 ; ���������������������������������������������������������������������������
 
-loc_EDDD:				; CODE XREF: Missile_ProximityFuze+BAj
+loc_EDDD:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+BAj
 		movsx	eax, si
 		mov	edx, dword_7201C
 		sar	edx, 8
@@ -945,34 +951,39 @@ loc_EDDD:				; CODE XREF: Missile_ProximityFuze+BAj
 		jmp	short loc_EE83
 ; ���������������������������������������������������������������������������
 
-loc_EE81:				; CODE XREF: Missile_ProximityFuze+15Cj
+loc_EE81:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+15Cj
 		xor	ax, ax
 
-loc_EE83:				; CODE XREF: Missile_ProximityFuze+161j
+loc_EE83:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+161j
 		or	al, al
 		jz	short loc_EE9A
 		sar	si, 1
 		jmp	short loc_EE9A
 ; ���������������������������������������������������������������������������
 
-loc_EE8B:				; CODE XREF: Missile_ProximityFuze+15j
+loc_EE8B:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+15j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		mov	bx, es:[bx+0Bh]
 		mov	si, [bx+84h]
 
-loc_EE9A:				; CODE XREF: Missile_ProximityFuze+BCj
-					; Missile_ProximityFuze+105j ...
+loc_EE9A:				; CODE XREF: AI_ManeuverSpeedCmd_ED1E+BCj
+					; AI_ManeuverSpeedCmd_ED1E+105j ...
 		mov	ax, si
 		pop	di
 		pop	si
 		leave
 		retf
-Missile_ProximityFuze	endp
+AI_ManeuverSpeedCmd_ED1E	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_EEA0:				; DATA XREF: seg339:02BCo
+; ==============================================================================================
+; far, LUE 2026-09-25. Application MVRS ID1 : premiere jambe = noeud ID20 (entite+0xC1) vers
+; le nez tourne de +/-30 deg du cote de la cible (Vector2D_CrossSign_526F), minuteur du noeud
+; 4, jambes de 1 s.
+; ==============================================================================================
+MVRS_ID1_ApplyReacquireTurn_EEA0:				; DATA XREF: seg339:02BCo
 		push	bp
 		mov	bp, sp
 		sub	sp, 58h
@@ -1062,7 +1073,7 @@ loc_EF44:
 		pop	cx
 		add	ax, 0Ch
 		push	ax
-		call	Vec3_Negate
+		call	Vector2D_CrossSign_526F
 		add	sp, 4
 		or	al, al
 		jz	short loc_EFBD
@@ -1122,7 +1133,7 @@ loc_EFE5:				; CODE XREF: seg008:0A1Bj
 		push	word ptr [bp-2Dh]
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr Missile_ProximityFuze
+		call	near ptr AI_ManeuverSpeedCmd_ED1E
 
 loc_F04E:
 		add	sp, 6
@@ -1166,7 +1177,13 @@ loc_F0BF:				; CODE XREF: seg008:0958j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_F0C3:				; DATA XREF: seg339:02C0o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID1 'virage de reacquisition par jambes' : a chaque fin de
+; jambe ID20, nouvelle jambe tournee de -60 deg (le test d'alternance 'test ax,0' est toujours
+; faux : toujours du meme cote), minuteur -1 par jambe. Fin quand la cible est a moins de 60
+; deg du nez, sans cible, ou apres 4 jambes. Vitesse via AI_ManeuverSpeedCmd_ED1E.
+; ==============================================================================================
+MVRS_ID1_TickReacquireLegs_F0C3:				; DATA XREF: seg339:02C0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 58h
@@ -1325,7 +1342,7 @@ loc_F251:
 		push	word ptr [bp-2Fh]
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr Missile_ProximityFuze
+		call	near ptr AI_ManeuverSpeedCmd_ED1E
 		add	sp, 6
 		movsx	eax, ax
 		push	eax
@@ -1470,7 +1487,14 @@ loc_F390:				; CODE XREF: seg008:0D9Aj seg008:0DDCj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_F3B6:				; DATA XREF: seg339:0298o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID2 'degagement (break)' : axe dominant de (vecteur memorise
+; - mon nez) ; manche a fond tire (+16) si mon vecteur haut a le meme signe sur cet axe, sinon
+; pousse a moitie (-8) ; manche lateral +/-16 selon le cote choisi a l'application (manche >
+; 3/16 -> 1, < -3/16 -> 0, sinon aleatoire). Jusqu'au minuteur ; vitesse via
+; AI_ManeuverSpeedCmd_ED1E.
+; ==============================================================================================
+MVRS_ID2_TickBreak_F3B6:				; DATA XREF: seg339:0298o
 		push	bp
 		mov	bp, sp
 		sub	sp, 80h
@@ -1761,7 +1785,7 @@ loc_F653:				; CODE XREF: seg008:10A5j
 		push	word ptr [bp-43h]
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr Missile_ProximityFuze
+		call	near ptr AI_ManeuverSpeedCmd_ED1E
 		add	sp, 6
 		movsx	eax, ax
 		push	eax
@@ -1827,21 +1851,17 @@ loc_F6E7:				; CODE XREF: seg008:1137j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID4_TrackingStateMachine_F72B'. far, taille substantielle (>250 lignes),
-; PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une
-; premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit
-; l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de
-; vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de
-; MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -=
-; dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le
-; cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers
-; l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction
-; d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle,
-; entierement non lue. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a
-; 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC,
-; verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID3_Tick_F72B'. far, LUE 2026-09-25. Tick MVRS ID3 'manoeuvre d'energie' (phase
+; node+0x27, minuteur 4 s -> phase 6). Phase 0 choix : trop lent et pas trop bas -> 2 (piqué),
+; trop lent et trop bas -> 1 (jinks), pas trop lent et trop bas -> 4 (chandelle), sinon rand&3
+; : 1->2, 2->4, sinon 1. 1 : jambe ID20 de 1 s a +/-32/64 deg en alternant, retour 0. 2 :
+; croisiere, roulis 180 puis tire a fond jusqu'a assiette >= -30 (avance immediatement en
+; pratique). 3 : si trop bas ou vitesse >= croisiere -> assiette +5 puis 0 ; sinon assiette
+; -(40 TH^2/256)-5. 4 : ailes a plat, tire jusqu'a assiette <= 30. 5 : si altitude > plancher
+; + 3 x deck ou trop lent -> -5 puis 0 ; sinon +(40 TH^2/256)+5. 6 : croisiere, assiette 0,
+; fin.
 ; ==============================================================================================
-MVRS_ID3_Tick_F72B:				; DATA XREF: seg339:off_6D334o
+MVRS_ID3_TickEnergyManeuver_F72B:				; DATA XREF: seg339:off_6D334o
 		push	bp
 		mov	bp, sp
 		sub	sp, 88h
@@ -1874,12 +1894,12 @@ loc_F765:				; CODE XREF: seg008:11C0j
 loc_F76C:				; DATA XREF: seg008:off_FCD3o
 		les	bx, [bp+6]	; case 0x0
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		mov	[bp-1],	al
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		mov	dl, al
 		cmp	byte ptr [bp-1], 0
@@ -2085,7 +2105,7 @@ loc_F993:				; CODE XREF: seg008:11C7j
 		push	ss
 		lea	ax, [bp-38h]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		les	bx, [bp+6]
 		les	bx, es:[bx+22h]
@@ -2107,7 +2127,7 @@ loc_F9D0:				; CODE XREF: seg008:142Cj
 		mov	[bp-33h], al
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		mov	dl, al
 		or	dl, dl
@@ -2290,7 +2310,7 @@ loc_FB9A:				; CODE XREF: seg008:loc_FB96j
 loc_FB9D:
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		mov	[bp-1],	al
 		cmp	byte ptr [bp-53h], 0
@@ -2544,7 +2564,13 @@ loc_FDD8:				; CODE XREF: seg008:182Ej
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_FE39:				; DATA XREF: seg339:off_6D320o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID4 'virage defensif' (declenche sur alerte de menace) :
+; plein gaz (cran 10), inclinaison 90 deg (60 si trop bas) du cote memorise (signe de l'angle
+; nez->cible), zone morte 30 puis 5 + tire a fond ; quand le cap a tourne de >= 90 deg ou
+; minuteur ecoule : assiette +10 puis fin (fin forcee si minuteur < -2 s).
+; ==============================================================================================
+MVRS_ID4_TickDefensiveBreakTurn_FE39:				; DATA XREF: seg339:off_6D320o
 		push	bp
 		mov	bp, sp
 		sub	sp, 70h
@@ -2623,7 +2649,7 @@ loc_FEA6:
 		add	sp, 8
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_FF33
@@ -2838,44 +2864,15 @@ loc_100DB:				; CODE XREF: seg008:1B2Bj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID6_TimerTickAndSubmodeSwitch_1011F'. far, ~365 lignes - LUE INTEGRALEMENT (a la
-; demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme
-; l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode
-; [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si
-; epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8)
-; et bascule sur un SWITCH A 8 CAS - UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-
-; PHASES, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau
-; que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104,
-; AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une
-; condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de
-; dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 :
-; inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un
-; seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS
-; ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un
-; IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux
-; 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la
-; ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou
-; position propre decalee), tangage vers elle via AI_RollController_7E56, garde par
-; dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle
-; capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305)
-; et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree
-; souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de
-; controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors
-; contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via
-; AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via
-; AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres
-; CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement
-; l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8
-; phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel
-; (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine
-; QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une
-; manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a
-; confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi). |
-; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
-; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
-; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID5_TickSubmodeSwitch_1011F'. far, LUE 2026-09-25. Tick MVRS ID5 'montee verticale
+; + retournement' (type Immelmann ; minuteur 5 s ; phases node+0x26 fixees par le score). 1 :
+; au-dessus de ~dword_72034 pique a -30 sinon ->2 ; 2 : reprise de vitesse (plein gaz, -30 ou
+; +5 si bas) jusqu'a vitesse >= croisiere ; 3 : ailes et nez a plat ; 4 : assiette +90 ; 5 :
+; roulis pour amener la cible dans le plan de portance (AI_ComputeBearingToRef) jusqu'a cible
+; dessous ou trop lent ; 6 : tire jusqu'a assiette <= 45 ; 7 : assiette vers l'elevation de la
+; cible ; 8 : ailes a plat, fin. Manette croisiere.
 ; ==============================================================================================
-MVRS_ID5_TickSubmodeSwitch_1011F:				; DATA XREF: seg339:025Co
+MVRS_ID5_TickVerticalReversal_1011F:				; DATA XREF: seg339:025Co
 		push	bp
 		mov	bp, sp
 		sub	sp, 76h
@@ -2960,7 +2957,7 @@ loc_101CC:				; CODE XREF: seg008:1BC1j
 		push	ss
 		lea	ax, [bp-10h]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		les	bx, [bp+6]
 		les	bx, es:[bx+22h]
@@ -2989,7 +2986,7 @@ loc_10209:				; CODE XREF: seg008:1C65j
 loc_1021B:				; CODE XREF: seg008:1C6Bj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -3193,7 +3190,7 @@ loc_1041B:				; CODE XREF: seg008:1E77j
 		push	ss
 		lea	ax, [bp-42h]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, dword_72039
 		mov	[bp-46h], eax
@@ -3435,7 +3432,14 @@ loc_1062F:				; CODE XREF: seg008:207Fj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_10673:				; DATA XREF: seg339:0248o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID6 'Split-S' (minuteur 5 s) : 1 monte a +30 jusqu'a plancher
+; + 2000 ; 2 monte a +20 a la vitesse minimale jusqu'a vitesse < croisiere ; 3 a plat puis
+; roulis 180 ; 4 assiette -90 ; 5 roulis pour amener la cible dans le plan de portance ; 6
+; tire jusqu'a assiette >= -45 ; 7 assiette vers l'elevation de la cible (0 sans cible) ; 8
+; ailes a plat, fin.
+; ==============================================================================================
+MVRS_ID6_TickSplitS_10673:				; DATA XREF: seg339:0248o
 		push	bp
 		mov	bp, sp
 		sub	sp, 6Eh
@@ -3523,7 +3527,7 @@ loc_10724:				; CODE XREF: seg008:2115j
 		push	ss
 		lea	ax, [bp-14h]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		les	bx, [bp+6]
 		les	bx, es:[bx+22h]
@@ -3974,7 +3978,7 @@ loc_10B92:				; CODE XREF: seg008:25E2j
 
 loc_10B95:
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 
 loc_10B9F:
 		add	sp, 4
@@ -4003,7 +4007,17 @@ loc_10BBC:				; CODE XREF: seg008:loc_10B90j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_10BD9:				; DATA XREF: seg339:0234o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID7 'poursuite' (bits de node+0x32). Sans cible : fin. Mode
+; bit2 (ou bit1 et aspect >= 80) : guidage vers le point decale memorise (montee 45 deg si pas
+; trop lent), vitesse dword_72039. Mode bit4 : vers le point d'anticipation memorise ;
+; AI_InterceptDispatcher si cible a moins de 45 deg du nez. Sinon : si
+; AI_VisibilityTest(cible) -> retour ; bit3 : si distance <= 2|Vt|^2/9 -> minuteur 4, bit4,
+; point = position cible + vitesse x 4 s (Physics_ApplyForceAtPoint) ; sinon interception ;
+; sinon si nez <= 60 et word_72093 < 60 -> bit3 ; AI_InterceptDispatcher, fin s'il renvoie non
+; nul.
+; ==============================================================================================
+MVRS_ID7_TickPursuit_10BD9:				; DATA XREF: seg339:0234o
 		push	bp
 		mov	bp, sp
 		sub	sp, 74h
@@ -4138,7 +4152,7 @@ loc_10CEC:				; CODE XREF: seg008:273Bj seg008:2742j
 		mov	[bp-6Ch], eax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -4816,11 +4830,8 @@ MVRS_ID12_TickEndsAtOnce_1137E:				; DATA XREF: seg339:01D0o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID14b_ApplySetTimer_1138F'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour
-; MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1). |
-; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
-; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
-; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; far, LUE. Application MVRS ID13 : minuteur 4 s (0x400), phase node+0x26 = 1, puis premier
+; tick.
 ; ==============================================================================================
 MVRS_ID13_ApplySetTimer_1138F:				; DATA XREF: seg339:01B8o
 		push	bp
@@ -4866,25 +4877,18 @@ loc_113B4:				; CODE XREF: seg008:2E04j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID14b_TickManeuverSequence_113FD'. far, ~365 lignes - LUE INTEGRALEMENT. Methode
-; [vtable+0x10] de MVRS ID=0xE. DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE (5
-; phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a
-; dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME
-; fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1
-; : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 :
-; calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur
-; la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second
-; parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis
-; defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif
-; coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire
-; des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5),
-; appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6).
-; PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition. | IDENTIFIANT CORRIGE
-; 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID13_TickManeuverSequence_113FD'. far, ~335L, RELUE 2026-09-25 (pas
+; Scissors/Rollaway). Tick MVRS ID13 'prise d'altitude a longue distance'. Minuteur -= dt
+; (dword_70458) ; sans cible : fin. Phase 1 : si distance horizontale a la cible < 17700
+; (dword_7202C) -> fin ; sinon AI_GuidanceCmd_FromOwnPos vers la cible (composante verticale
+; annulee, vitesse cran 10) et phase suivante une fois aligne. Phase 2 : si trop lent ->
+; assiette 0 puis ailes a plat (zone morte 5) ; sinon phase suivante. Phase 3 : chandelle a 30
+; + 30 x (vitesse indiquee - croisiere JDYN+0x84)/min JDYN+0x82 deg (borne 60), ailes a plat,
+; cran 10 ; phase suivante si minuteur < 0, trop lent ou cible a moins de 17700 (le minuteur
+; est decremente 2 fois par tick dans cette phase). Phase 4 : assiette 0 (zone morte 5),
+; manette croisiere, puis fin.
 ; ==============================================================================================
-MVRS_ID13_TickManeuverSequence_113FD:				; DATA XREF: seg339:01BCo
+MVRS_ID13_TickZoomClimb_113FD:				; DATA XREF: seg339:01BCo
 		push	bp
 		mov	bp, sp
 		sub	sp, 5Ah
@@ -4980,7 +4984,7 @@ loc_114DC:				; CODE XREF: seg008:2E8Dj
 					; DATA XREF: seg008:off_11759o
 		les	bx, [bp+6]	; case 0x1
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -5020,7 +5024,7 @@ loc_11534:				; CODE XREF: seg008:2E8Dj
 		push	ss
 		lea	ax, [bp-1Ch]
 		push	ax
-		call	AI_Sensor_DistanceFromRef
+		call	AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, [bp-1Ch]
 		mov	dword_720B7, eax
@@ -5043,7 +5047,7 @@ loc_11534:				; CODE XREF: seg008:2E8Dj
 		or	al, al
 		jnz	short loc_115E2
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jnz	short loc_115E2
@@ -5212,16 +5216,10 @@ off_11759	dw offset loc_11432	; DATA XREF: seg008:2E8Dr
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID15b_ApplyPersistence_11763'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
-; (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases
-; (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie
-; simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616),
-; reacquisition si echec. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement
-; seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID14_Apply_11763'. far, LUE. Application MVRS ID14 (evitement du sol) : minuteur,
+; premier tick.
 ; ==============================================================================================
-MVRS_ID14_Apply_11763:				; DATA XREF: seg339:01A4o
+MVRS_ID14_ApplyGroundAvoid_11763:				; DATA XREF: seg339:01A4o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5257,7 +5255,11 @@ loc_11785:				; CODE XREF: seg008:31D5j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_117B4:				; DATA XREF: seg339:01A8o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID14 : AI_EjectDecision_50FF(mode 2) ; sinon fin si minuteur
+; < 0 ; sinon AI_GroundAvoidPullUp_6616 (fin quand il renvoie 1).
+; ==============================================================================================
+MVRS_ID14_TickGroundAvoid_117B4:				; DATA XREF: seg339:01A8o
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]
@@ -5265,7 +5267,7 @@ loc_117B4:				; DATA XREF: seg339:01A8o
 		sub	es:[bx+0Dh], eax
 		push	2
 		push	large dword ptr	es:[bx+22h]
-		call	AI_MissileThreatTrigger_A
+		call	AI_EjectDecision_50FF
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -5276,7 +5278,7 @@ loc_117B4:				; DATA XREF: seg339:01A8o
 		cmp	eax, 0
 		jl	short loc_117FB
 		push	large dword ptr	es:[bx+22h]
-		call	AI_EvadeOrPursueSelector
+		call	AI_GroundAvoidPullUp_6616
 		add	sp, 4
 		or	al, al
 		jz	short loc_11807
@@ -5292,16 +5294,9 @@ loc_11807:				; CODE XREF: seg008:3236j seg008:3259j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID16_ApplyPersistence_11809'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
-; (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases -
-; verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par
-; AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une
-; reaction reflexe plutot qu'une manoeuvre planifiee. | IDENTIFIANT CORRIGE 2026-09-25 :
-; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID15_Apply_11809'. far, LUE. Application MVRS ID15 : minuteur 2 s, premier tick.
 ; ==============================================================================================
-MVRS_ID15_Apply_11809:				; DATA XREF: seg339:off_6D240o
+MVRS_ID15_ApplyStallRecovery_11809:				; DATA XREF: seg339:off_6D240o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -5342,7 +5337,11 @@ loc_1182E:				; CODE XREF: seg008:327Ej
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_1186E:				; DATA XREF: seg339:off_6D244o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID15 : fin si minuteur < 0 ; AI_EjectDecision_50FF(mode 1) ;
+; sinon AI_NoseHighRecovery_676F (fin quand il renvoie 1).
+; ==============================================================================================
+MVRS_ID15_TickStallRecovery_1186E:				; DATA XREF: seg339:off_6D244o
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]
@@ -5354,14 +5353,14 @@ loc_1186E:				; DATA XREF: seg339:off_6D244o
 		jl	short loc_118B5
 		push	1
 		push	large dword ptr	es:[bx+22h]
-		call	AI_MissileThreatTrigger_A
+		call	AI_EjectDecision_50FF
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_118C1
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_ThreatConeTest
+		call	AI_NoseHighRecovery_676F
 		add	sp, 4
 		or	al, al
 		jz	short loc_118C1
@@ -5377,16 +5376,10 @@ loc_118C1:				; CODE XREF: seg008:32FFj seg008:3313j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID19_ApplyReturnToBase_118C3'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
-; (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle
-; AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE
-; REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE
-; gerant vitesse et direction ensemble, pas seulement la trajectoire. | IDENTIFIANT CORRIGE
-; 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID16_ApplyReturnToBase_118C3'. far, LUE. Application MVRS ID16 : minuteur 1,5 s
+; (0x180), premier tick. (Pas un retour a la base.)
 ; ==============================================================================================
-MVRS_ID16_ApplyReturnToBase_118C3:				; DATA XREF: seg339:017Co
+MVRS_ID16_ApplyRegainSpeed_118C3:				; DATA XREF: seg339:017Co
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5415,14 +5408,17 @@ loc_118E5:				; CODE XREF: seg008:3335j
 		les	bx, [bp+6]
 		mov	dword ptr es:[bx+0Dh], 180h
 		push	large dword ptr	es:[bx+22h]
-		call	AI_SpeedManeuverDecision
+		call	AI_RegainSpeed_68D4
 		add	sp, 4
 		pop	si
 		pop	bp
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_1191D:				; DATA XREF: seg339:off_6D230o
+; ==============================================================================================
+; far, LUE 2026-09-25. Tick MVRS ID16 : AI_RegainSpeed_68D4 jusqu'a la fin ou au minuteur.
+; ==============================================================================================
+MVRS_ID16_TickRegainSpeed_1191D:				; DATA XREF: seg339:off_6D230o
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]
@@ -5433,7 +5429,7 @@ loc_1191D:				; DATA XREF: seg339:off_6D230o
 		cmp	eax, 0
 		jl	short loc_1194C
 		push	large dword ptr	es:[bx+22h]
-		call	AI_SpeedManeuverDecision
+		call	AI_RegainSpeed_68D4
 		add	sp, 4
 		or	al, al
 		jz	short loc_11958

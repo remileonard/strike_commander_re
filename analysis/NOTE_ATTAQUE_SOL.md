@@ -103,7 +103,7 @@ Les commandes bas niveau de l'IA ne commandent **pas un cap** :
 - `AI_RollToAngleCmd_8104` (ex-`AI_TurnToHeadingCmd`) commande un **angle de roulis**. Son contrôleur `AI_RollController_7E56` écrit l'axe de roulis du manche (`+0x23`).
 - `AI_PitchToAngleCmd_7E18` (ex-`AI_TurnToBearingCmd`) commande un **angle de tangage**. Son contrôleur `AI_PitchController_7B20` écrit l'axe de tangage (`+0x1F`).
 
-Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major`. Cette dernière est **à relire** : sa lecture est antérieure à la découverte de l'inversion des noms sinus / cosinus.
+Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major`. Elle a été **relue le 2026-09-25** (loi complète : `AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des manœuvres `MVRS` », et `IMPL_SCAIBRAIN_CORRECTIONS.md` §7).
 
 ## 5. La loi du pilote automatique (`Autopilot_FlyToPointKinematic_49C2E`, relue intégralement)
 

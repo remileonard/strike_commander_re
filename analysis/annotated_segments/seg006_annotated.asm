@@ -2212,8 +2212,8 @@ off_CB3D	dw offset loc_CB05	; DATA XREF: AI_MoraleDisciplineCheck_CA93+55r
 ; correspondance de 8 lignes alternatives pour les codes 9/0xA. Appelée dans tout le cluster
 ; IA avec des dizaines de codes différents (9,0xA,0xB,0xC,0xE,0x10,0x11...).
 ; ==============================================================================================
-Radio_PlayMessage	proc far		; CODE XREF: AI_MissileThreatTrigger_A+12AP
-					; AI_MissileThreatTrigger_A+163P ...
+Radio_PlayMessage	proc far		; CODE XREF: AI_EjectDecision_50FF+12AP
+					; AI_EjectDecision_50FF+163P ...
 
 var_6		= byte ptr -6
 var_4		= word ptr -4

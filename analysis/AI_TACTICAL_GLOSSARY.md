@@ -62,6 +62,14 @@ temps chez un vrai pilote, et que le plus pressant l'emportait.
 
 ### Les instincts identifiés
 
+> ⚠️ **Tableau périmé (identifiants décalés et rôles devinés).** Relu le 2026-09-25 : ce que fait
+> réellement chaque identifiant est dans `AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des
+> manœuvres `MVRS` ». En bref : 1 virage de réacquisition, 2 dégagement, 3 manœuvre d'énergie,
+> 4 virage défensif sur alerte, 5 montée verticale + retournement, 6 Split-S, 7 poursuite,
+> 13 prise d'altitude à longue distance, 14 évitement du sol, 15 récupération nez haut /
+> décrochage, 16 reprendre de la vitesse, 19 attaque au sol. Aucun « carburant » ni « retour à la
+> base » dans les manœuvres.
+
 | Intention | Ce qui le déclenche | Ce qu'il fait s'il l'emporte | Réf. technique |
 |---|---|---|---|
 | **Manœuvre de poursuite** | Une cible est engagée ; l'urgence dépend de l'angle par rapport à elle (suis-je bien placé ?) et de la distance | Ajuste la position/l'orientation vers la cible ; peut choisir une **rupture défensive** (voir ci-dessous) si la position est ambiguë | `MVRS_ID3/4/5/6/7`, famille angulaire |

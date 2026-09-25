@@ -129,24 +129,24 @@ off_6D200	dd MVRS_ID20_ScoreAlwaysZero_4F54
 		dd VROOMM_StubThunk_6ABE4
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAD5
-		dd MVRS_ID16_ScoreFuelOrResource_4ECD
-		dd MVRS_ID16_ApplyReturnToBase_118C3
-off_6D230	dd loc_1191D
+		dd MVRS_ID16_ScoreLowSpeed_4ECD
+		dd MVRS_ID16_ApplyRegainSpeed_118C3
+off_6D230	dd MVRS_ID16_TickRegainSpeed_1191D
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAD0
-		dd MVRS_ID15_ScoreThreatSensor_4E2A
-off_6D240	dd MVRS_ID15_Apply_11809
-off_6D244	dd loc_1186E
+		dd MVRS_ID15_ScoreStallRecovery_4E2A
+off_6D240	dd MVRS_ID15_ApplyStallRecovery_11809
+off_6D244	dd MVRS_ID15_TickStallRecovery_1186E
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AACB
-		dd MVRS_ID14_ScoreIntercept_4CD1
-		dd MVRS_ID14_Apply_11763
-		dd loc_117B4
+		dd MVRS_ID14_ScoreGroundAvoid_4CD1
+		dd MVRS_ID14_ApplyGroundAvoid_11763
+		dd MVRS_ID14_TickGroundAvoid_117B4
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAC6
-		dd MVRS_ID13_ScoreScissorsRollaway_4A99
+		dd MVRS_ID13_ScoreZoomClimb_4A99
 		dd MVRS_ID13_ApplySetTimer_1138F
-		dd MVRS_ID13_TickManeuverSequence_113FD
+		dd MVRS_ID13_TickZoomClimb_113FD
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAC1
 		dd MVRS_ID12_ScoreAlwaysZero_4A71
@@ -176,32 +176,32 @@ off_6D2D0	dd MVRS_ID8_TickShadowTarget_111AE
 		dd VROOMM_StubThunk_6AAA8
 		dd MVRS_ID7_ScoreManeuverFuelGated_47D4
 		dd MVRS_ID7_ApplyFuelGatedTimer_10AF2
-		dd loc_10BD9
+		dd MVRS_ID7_TickPursuit_10BD9
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAA3
 		dd MVRS_ID6_ScoreSensorGatedSubmode_45BE
 		dd MVRS_ID6_ApplySetTimer_1060A
-		dd loc_10673
+		dd MVRS_ID6_TickSplitS_10673
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AA9E
 		dd MVRS_ID5_ScoreSubmodeManeuver_434E
 		dd MVRS_ID5_ApplySetTimer_100B6
-		dd MVRS_ID5_TickSubmodeSwitch_1011F
+		dd MVRS_ID5_TickVerticalReversal_1011F
 off_6D310	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D314	dd VROOMM_StubThunk_6AA99
 		dd MVRS_ID4_ScoreAngularExtended_41DD
 off_6D31C	dd MVRS_ID4_ApplyInterceptSolution_FCE1
-off_6D320	dd loc_FE39
+off_6D320	dd MVRS_ID4_TickDefensiveBreakTurn_FE39
 off_6D324	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D328	dd VROOMM_StubThunk_6AA94
 off_6D32C	dd MVRS_ID3_ScoreAngularSimple_4128
 		dd MVRS_ID3_ApplyGenericTimer_F6C2
-off_6D334	dd MVRS_ID3_Tick_F72B
+off_6D334	dd MVRS_ID3_TickEnergyManeuver_F72B
 off_6D338	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D33C	dd VROOMM_StubThunk_6AA8F
 off_6D340	dd MVRS_ID2_Score_3FCB
 		dd MVRS_ID2_ApplyBreakDirection_F2C8
-		dd loc_F3B6
+		dd MVRS_ID2_TickBreak_F3B6
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AA8A
 		dd MVRS_SharedContextSyncAndID2Score_EC22
@@ -210,8 +210,8 @@ off_6D340	dd MVRS_ID2_Score_3FCB
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AA85
 		dd MVRS_ID1_ScoreAngularGuarded_3E90
-		dd loc_EEA0
-		dd loc_F0C3
+		dd MVRS_ID1_ApplyReacquireTurn_EEA0
+		dd MVRS_ID1_TickReacquireLegs_F0C3
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd StreamReader_DestructWrapper_659C1
 		dd StreamReader_ReleaseBuffer_65643
@@ -3543,7 +3543,7 @@ unk_70470	db    1
 byte_70471	db 0			; DATA XREF: Mission_TriggerEvaluator+3Cr
 					; Mission_TriggerEvaluator:loc_2308Er	...
 word_70472	dw 0			; DATA XREF: AI_EvalTargetAttribute+51r seg095:01A9r ...
-word_70474	dw 0			; DATA XREF: AI_Sensor_InterceptFeasibleCached+8Ar seg003:0C64r ...
+word_70474	dw 0			; DATA XREF: AI_Sensor_TooLow_56E5+8Ar seg003:0C64r ...
 byte_70476	db 0			; DATA XREF: CombatTarget_WeaponActionSubsystem:loc_4FC62r
 					; CombatTarget_WeaponActionSubsystem+76w ...
 byte_70477	db 0			; DATA XREF: Cockpit_ViewPanTransitionMain_15B67:loc_15E79r
@@ -7655,74 +7655,74 @@ dword_72034	dd 0			; DATA XREF: seg002:loc_4571r
 byte_72038	db 0			; DATA XREF: Targeting_AcquireBestThreat+9C6r
 					; Targeting_AcquireBestThreat:loc_3CF6r ...
 dword_72039	dd 0			; DATA XREF: seg002:loc_4B54r
-					; AI_Sensor_TargetInRange+3Cr	...
+					; AI_Sensor_TooSlow_564A+3Cr	...
 dword_7203D	dd 0			; DATA XREF: seg002:0752r seg002:0F6Ar ...
 dword_72041	dd 0			; DATA XREF: AI_Sensor_WeaponVelocityCache+2Dw AI_Sensor_WeaponVelocityCache+E8w ...
 dword_72045	dd 0			; DATA XREF: AI_Sensor_WeaponVelocityCache+3Dw AI_Sensor_WeaponVelocityCache+F0w ...
 dword_72049	dd 0			; DATA XREF: AI_Sensor_WeaponVelocityCache+4Dw AI_Sensor_WeaponVelocityCache+F8w ...
-dword_7204D	dd 0			; DATA XREF: seg003:0756r AI_Sensor_InterceptFeasibleCached+44w ...
+dword_7204D	dd 0			; DATA XREF: seg003:0756r AI_Sensor_TooLow_56E5+44w ...
 algn_72051:
 		align 2
 byte_72052	db 0			; DATA XREF: AI_ProximityGeometricWarning_315B:loc_324Cw
 					; AI_TopLevelThink:loc_8177w ...
-dword_72053	dd 0			; DATA XREF: Missile_PhysicsTick+14Dw
-					; Missile_PhysicsTick+330r ...
-dword_72057	dd 0			; DATA XREF: Missile_PhysicsTick+159w
-					; Missile_PhysicsTick+339r ...
+dword_72053	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+14Dw
+					; MVRS_BuildCombatContext_E5A4+330r ...
+dword_72057	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+159w
+					; MVRS_BuildCombatContext_E5A4+339r ...
 dword_7205B	dd 0			; DATA XREF: seg002:loc_4B3Br
-					; Missile_PhysicsTick+165w ...
-dword_7205F	dd 0			; DATA XREF: Missile_PhysicsTick+50w
-					; Missile_PhysicsTick+315r ...
-dword_72063	dd 0			; DATA XREF: Missile_PhysicsTick+58w
-					; Missile_PhysicsTick+31Er ...
-dword_72067	dd 0			; DATA XREF: Missile_PhysicsTick+60w
-					; Missile_PhysicsTick+327r ...
-dword_7206B	dd 0			; DATA XREF: Missile_PhysicsTick+397w
-dword_7206F	dd 0			; DATA XREF: Missile_PhysicsTick+39Fw
-dword_72073	dd 0			; DATA XREF: Missile_PhysicsTick+3A7w
-dword_72077	dd 0			; DATA XREF: Missile_PhysicsTick+18Fw
-					; Missile_PhysicsTick+1E8r
-dword_7207B	dd 0			; DATA XREF: Missile_PhysicsTick+198w
-					; Missile_PhysicsTick+1F5r
-dword_7207F	dd 0			; DATA XREF: Missile_PhysicsTick+1A1w
-					; Missile_PhysicsTick+202r
-dword_72083	dd 0			; DATA XREF: Missile_PhysicsTick+1CEw
-					; Missile_PhysicsTick+1E4r
-dword_72087	dd 0			; DATA XREF: Missile_PhysicsTick+1D7w
-					; Missile_PhysicsTick+1F1r
-dword_7208B	dd 0			; DATA XREF: Missile_PhysicsTick+1E0w
-					; Missile_PhysicsTick+1FEr
-word_7208F	dw 0			; DATA XREF: Missile_PhysicsTick+5E2w
+					; MVRS_BuildCombatContext_E5A4+165w ...
+dword_7205F	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+50w
+					; MVRS_BuildCombatContext_E5A4+315r ...
+dword_72063	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+58w
+					; MVRS_BuildCombatContext_E5A4+31Er ...
+dword_72067	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+60w
+					; MVRS_BuildCombatContext_E5A4+327r ...
+dword_7206B	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+397w
+dword_7206F	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+39Fw
+dword_72073	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+3A7w
+dword_72077	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+18Fw
+					; MVRS_BuildCombatContext_E5A4+1E8r
+dword_7207B	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+198w
+					; MVRS_BuildCombatContext_E5A4+1F5r
+dword_7207F	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+1A1w
+					; MVRS_BuildCombatContext_E5A4+202r
+dword_72083	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+1CEw
+					; MVRS_BuildCombatContext_E5A4+1E4r
+dword_72087	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+1D7w
+					; MVRS_BuildCombatContext_E5A4+1F1r
+dword_7208B	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+1E0w
+					; MVRS_BuildCombatContext_E5A4+1FEr
+word_7208F	dw 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+5E2w
 					; seg009:00F4w
-word_72091	dw 0			; DATA XREF: Missile_PhysicsTick+3C1w
+word_72091	dw 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+3C1w
 word_72093	dw 0			; DATA XREF: seg002:loc_3EC3r
 					; seg002:0085r	...
 word_72095	dw 0			; DATA XREF: seg002:008Cr seg002:0097r ...
 word_72097	dw 0			; DATA XREF: seg002:loc_487Er
 					; seg002:0B06r	...
-word_72099	dw 0			; DATA XREF: Missile_PhysicsTick+312w
+word_72099	dw 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+312w
 dword_7209B	dd 0			; DATA XREF: seg002:009Fr
 					; seg002:loc_3F7Br ...
-dword_7209F	dd 0			; DATA XREF: Missile_PhysicsTick+80w
-					; Missile_PhysicsTick:loc_E63Fr ...
-dword_720A3	dd 0			; DATA XREF: Missile_PhysicsTick+88w Missile_PhysicsTick+96r ...
-dword_720A7	dd 0			; DATA XREF: seg002:0F7Cr Missile_PhysicsTick+90w ...
-dword_720AB	dd 0			; DATA XREF: Missile_PhysicsTick+27Fw
-					; Missile_PhysicsTick+3CEr ...
-dword_720AF	dd 0			; DATA XREF: Missile_PhysicsTick+288w
-					; Missile_PhysicsTick+3C9r ...
-dword_720B3	dd 0			; DATA XREF: Missile_PhysicsTick+291w
-					; Missile_PhysicsTick+3C4r ...
+dword_7209F	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+80w
+					; MVRS_BuildCombatContext_E5A4:loc_E63Fr ...
+dword_720A3	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+88w MVRS_BuildCombatContext_E5A4+96r ...
+dword_720A7	dd 0			; DATA XREF: seg002:0F7Cr MVRS_BuildCombatContext_E5A4+90w ...
+dword_720AB	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+27Fw
+					; MVRS_BuildCombatContext_E5A4+3CEr ...
+dword_720AF	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+288w
+					; MVRS_BuildCombatContext_E5A4+3C9r ...
+dword_720B3	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+291w
+					; MVRS_BuildCombatContext_E5A4+3C4r ...
 dword_720B7	dd 0			; DATA XREF: seg002:061Ar
 					; seg002:loc_44C5r ...
 dword_720BB	dd 0			; DATA XREF: seg002:loc_449Br
 					; seg002:0639r	...
-dword_720BF	dd 0			; DATA XREF: Missile_PhysicsTick+4B3w
-					; Missile_PhysicsTick+4DEr ...
+dword_720BF	dd 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+4B3w
+					; MVRS_BuildCombatContext_E5A4+4DEr ...
 byte_720C3	db 0			; DATA XREF: seg002:loc_3EB7r
 					; seg002:loc_3FF2r ...
-byte_720C4	db 0			; DATA XREF: Missile_PhysicsTick+372w
-					; Missile_PhysicsTick:loc_E91Dw
+byte_720C4	db 0			; DATA XREF: MVRS_BuildCombatContext_E5A4+372w
+					; MVRS_BuildCombatContext_E5A4:loc_E91Dw
 dword_720C5	dd 0			; DATA XREF: seg002:048Br seg002:050Cr ...
 dword_720C9	dd 0			; DATA XREF: seg002:0232r seg002:046Fr ...
 dword_720CD	dd 0			; DATA XREF: seg002:loc_40BEr

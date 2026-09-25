@@ -196,14 +196,48 @@ tangage**, avec zone morte, en écrivant les axes du manche (les mêmes que le j
   - `s` passe ensuite par `Value_ClampSymmetric` (limite propre à l'avion, **non lue**) : en
     attendant, borner à `[−1, 1]`.
   Les piqués de plus de 15° se font donc **sur le dos, en tirant**.
-- Tourner vers une direction : `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` →
-  `AI_CombatDecision_Major` (écart < 20° : rien ; ≤ 145° : correction proportionnelle ; > 145° :
-  correction pondérée par le taux de roulis de l'avion, bornée à 16° ; repli : ailes à plat) →
-  commande de roulis.
+- Tourner vers une direction : `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (loi
+  ci-dessous, **relue le 2026-09-25**) → `AI_CombatDecision_Major` → commandes de roulis/tangage.
 
-**Bloquant pour un portage fidèle** : `AI_GuidanceSolution_Major` a été lue avant la découverte de
-l'inversion des noms sinus/cosinus et doit être relue ; `JDYN_HighLevelPhysicsCalc` n'a jamais été
-lue. **Ne pas remplacer `SetAttitudeError` avant ces deux lectures** (côté rétro-ingénierie).
+### Loi de pilotage vers une direction (`AI_GuidanceSolution_Major`, relue)
+
+Repère libRealSpace (Y = haut). `D` = direction voulue, `R` = direction de référence (vitesse de
+l'avion). `floor` = altitude du terrain + `deck` (`entité+0xE5` du pilote). Angles en degrés.
+```cpp
+float h = wrap180(headingOf(D) - headingOf(R));             // cap = atan2(x, z) (asm : atan2(c0, c1))
+float p = nosePitch();
+float e = (fabsf(h) >= 90.0f) ? 0.0f : elevationOf(D);      // cible derrière : virage à plat
+bool corrected = false;
+if (altitude <= floor && e < p) {                           // sous le plancher : remonter
+    e = std::min(80.0f, 80.0f * (floor - altitude) / deck); corrected = true;
+} else {
+    float m = 0.0f;                                         // piqué maximal permis
+    float n = plane->max_g;                                 // avion+0x67
+    if (n >= 2.0f) {
+        float r = speed * speed / (9.8f * n / 2.0f);        // rayon de ressource
+        float above = altitude - floor;
+        m = (r <= 0.0f || above >= r) ? -90.0f : -acosDeg((r - above) / r);
+    }
+    if (e < m)                    { e = m;      corrected = true; }
+    else if (p < -45.0f && e < p) { e = -45.0f; corrected = true; }
+    else if (p >= 45.0f && e > p) { e = 45.0f;  corrected = true; }
+}
+if (corrected) { float lh = horizontalLength(D); D.y = sinDeg(e) * lh; D.normalize(); }
+float v = wrap180(elevationOf(D) - elevationOf(R));
+float r;
+if (h >= 90.0f)       r = 90.0f - roll()  - (v > 0 ? v : 0);
+else if (h <= -90.0f) r = -90.0f - roll() + (v > 0 ? v : 0);
+else { Vector3D L = toBodyFrame(D); r = atan2Deg(L.x, L.y); }   // roulis qui met D dans le plan de portance
+r = wrap180(r);
+combatDecision(h, v, r);                                    // AI_CombatDecision_Major
+```
+`AI_CombatDecision_Major` : son résumé (non relu depuis la correction sinus/cosinus) indique écart
+< 20° : rien ; ≤ 145° : correction proportionnelle ; > 145° : pondérée par le taux de roulis de
+l'avion, bornée à 16° ; **quand l'avion est trop lent** (`AI_Sensor_TooSlow_564A`) les écarts sont
+bornés à ±10° et la manette mise à 10 ; **quand le drapeau de décrochage est posé**, il délègue à la
+récupération nez haut (ID15). À relire avant de remplacer `SetAttitudeError`.
+
+**Encore bloquant** : `JDYN_HighLevelPhysicsCalc` (écart → valeur de manche) n'a jamais été lue.
 
 ---
 
@@ -259,7 +293,8 @@ Références : `AI_SYSTEM.md` §4.4 et `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tou
 
 ```cpp
 enum ReactionLevel : uint8_t { REACT_NONE = 0, REACT_ENGAGED = 1, REACT_MISSILE = 2,
-                               REACT_NEW_TARGET = 3, REACT_WAIT_LANDING = 4, REACT_WAIT_TAKEOFF = 5 };
+                               REACT_NEW_TARGET = 3, REACT_GROUND_AVOID = 4, REACT_STALL_RECOVERY = 5 };
+// 4/5 : réflexes de pilotage (§8quinquies), PAS des attentes d'atterrissage/décollage (corrigé 2026-09-25)
 uint8_t reaction_level{REACT_NONE};
 ```
 Chaque réaction ne s'exécute que si `reaction_level ≤ son niveau` (esquive : `== 2`). Le **tir et la
@@ -432,11 +467,50 @@ commandes de manche.
 exclut ; les ID 9 à 12 sont vides. L'ID 8 contient une manœuvre complète (« se caler derrière la
 cible ») qui n'est jamais choisie : à ne pas activer si le but est la fidélité.
 
+## 8quinquies. [P2] Les manœuvres `MVRS` : actions confirmées, et deux réflexes à ajouter
+
+Relu le 2026-09-25 (`AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des manœuvres `MVRS` »).
+« Trop lent » = décroché ou vitesse indiquée ≤ vitesse minimale de manœuvre ; « trop bas » =
+altitude < terrain + 4 × `deck`. Vitesse indiquée = `|v| · √(ρ(alt)/ρ0)`.
+
+### A. Deux réflexes qui passent avant le reste (niveaux 4 et 5)
+
+À appeler dans `tick()` quand aucun comportement n'est en cours (ordre : 5 puis 4), chacun seulement
+si `reaction_level ≤` son niveau, et **seulement sans cible et pilote automatique coupé** :
+```cpp
+// 5 : récupération nez haut / décrochage (ID15), minuteur 2 s
+bool needStall = stalled || (indicatedAirspeed <= jdyn.min_speed && nosePitch() > 30.0f);
+//     tick : si ejectDecision(1) -> fin ; si nez <= 0 et pas décroché lent -> fin ;
+//            si nosePitch() > 60 && stalled -> manette ralenti ; sinon plein gaz et, hors décrochage,
+//            pitchTo(-30, zone morte 10)
+// 4 : évitement du sol (ID14)
+bool needGround = heightAboveGround < ground_clear * (1 + sinDeg(roll()/2)/2)   // entité+0xE1
+               || (altitude < floor && verticalSpeed < 0);
+//     tick : si ejectDecision(2) -> fin ; si montée et altitude > floor -> pitchTo(+30), plein gaz, fin ;
+//            sinon manette cran 1 si nez bas et vitesse > mini, sinon plein gaz ; pitchTo(+30, zone morte 10)
+```
+Éjection (`AI_EjectDecision_50FF`) : dommages > 80 %, ou décroché (mode 2), ou décroché et sous le
+plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! ») pour un ailier ami.
+
+### B. Répertoire du tournoi (rôle réel de chaque identifiant)
+
+| ID | Manœuvre | À porter |
+|---|---|---|
+| 1 | Réacquisition par jambes de 1 s | 1re jambe à ±30° côté cible, puis −60° à chaque jambe, toujours du même côté (bug d'origine), max 4 jambes, fin si cible < 60° du nez |
+| 2 | Dégagement | manche latéral à fond du côté du manche actuel (au hasard si neutre), manche tiré à fond |
+| 3 | Manœuvre d'énergie | piqué si trop lent, chandelle si trop bas, sinon au hasard ; assiette 5° + 40° × (TH/16)² ; 4 s |
+| 4 | Virage défensif (sur alerte de menace) | plein gaz, inclinaison 90° (60° si trop bas) côté cible, tirer ; fin après 90° de cap |
+| 5 | Montée verticale + retournement | reprise de vitesse, +90°, roulis vers la cible, tirer jusqu'à 45° ; 5 s |
+| 6 | Split-S | monter jusqu'à plancher + 2000, dos, −90°, roulis vers la cible, tirer jusqu'à −45° ; 5 s |
+| 7 | Poursuite | interception, point d'anticipation (cible + vitesse × 4 s) quand proche |
+| 13 | Prise d'altitude à longue distance | seulement si la cible est à plus de 17 700 et sous le plafond `JDYN+0x86` ; cap sur la cible, chandelle `30° + 30° × (v − croisière)/v_min` (≤ 60°) |
+| 16 | Reprendre de la vitesse | vitesse max, assiette +5° jusqu'à (croisière + mini)/2 ; 1,5 s |
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
-1. `AI_GuidanceSolution_Major` (relecture) et `JDYN_HighLevelPhysicsCalc` (lecture) — §7.
+1. `JDYN_HighLevelPhysicsCalc` (lecture) et `AI_CombatDecision_Major` (relecture) — §7. (`AI_GuidanceSolution_Major` relue le 2026-09-25.)
 2. `Targeting_FilterByWeaponType` : cône et portée exacts du chercheur — §4.
 3. Test de verrouillage de l'AGM-65D (méthode `+0x14` du modèle `MISS`, fonction pas encore nommée).
-4. Seuil `dword_7203D` de l'esquive et de la poursuite — §5.
+4. ~~Seuil `dword_7203D`~~ : c'est le plancher du pilote, altitude du terrain + `entité+0xE5` (§8quinquies).
 5. `BombModel_PredictImpact_41311` : hauteur de chute passée par l'appelant — §2.
 6. Champ `+0x13` du nœud d'attaque au sol (bloque l'engagement s'il est non nul).

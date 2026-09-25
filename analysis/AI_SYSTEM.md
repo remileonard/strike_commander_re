@@ -760,10 +760,10 @@ chaque fonction de score **et** d'application a été lue intégralement.*
 | 10 | `0x1EC` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
 | 11 | `0x1D8` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
 | 12 | `0x1C4` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
-| 13 | `0x1B0` | Base 1, formule riche, utilise `dword_72039` ET `dword_7202C` — **déclenche la séquence Scissors/Rollaway à 5 phases** | Minuteur `0x400`, amorce phase 1 (`loc_1138F`) |
-| 14 | `0x19C` | **Interception** — calcul trigonométrique complet (angle/distance, `imul`/`shrd`), pas juste binaire dans le principe mais le résultat final reste `0` ou `10` | `loc_11763` |
-| 15 | `0x188` | **Détection de menace** — binaire, 0 ou 10 | — |
-| 16 | `0x174` | **CORRIGÉ, lu intégralement** : `var_4` est initialisé à `0` en dur, rendant la branche de plafonnement `0x900` inatteignable — le résultat final ne dépend que d'un seul test (`TH < 12`) et la valeur retournée est en réalité **`0` ou `1`** (lecture d'un octet décalé, `[bp-3]`, pas `[bp-4]`) — **pas l'échelle continue `0x100`-`0x900` documentée précédemment** | Retour à la base (`loc_118C3`) |
+| 13 | `0x1B0` | Base 1 : **prise d'altitude** (corrigé 2026-09-25, pas Scissors/Rollaway) — exige de ne pas être trop lent et d'être sous le plafond `JDYN+0x86` ; favorisé si plus rapide que la cible et loin (> 17 700 = `dword_7202C`) | Minuteur `0x400`, phase 1 ; tick `MVRS_ID13_TickZoomClimb_113FD` : cap sur la cible puis chandelle 30–60° |
+| 14 | `0x19C` | **Évitement du sol** (corrigé 2026-09-25) — `0` ou `10` : sans cible, pilote automatique coupé, trop près du sol | Nœud fixe `entité+0xC5`, lancé par le réflexe `AI_GroundAvoidReflex_E06C` (niveau 4) : assiette +30°, plein gaz |
+| 15 | `0x188` | **Récupération nez haut / décrochage** (corrigé 2026-09-25) — `0` ou `10` | Nœud fixe `entité+0xC9`, lancé par `AI_StallRecoveryReflex_E159` (niveau 5) : ralenti ou plein gaz, assiette −30° |
+| 16 | `0x174` | **CORRIGÉ, lu intégralement** : `var_4` est initialisé à `0` en dur, rendant la branche de plafonnement `0x900` inatteignable — le résultat final ne dépend que d'un seul test (`TH < 12`) et la valeur retournée est en réalité **`0` ou `1`** (lecture d'un octet décalé, `[bp-3]`, pas `[bp-4]`) — **pas l'échelle continue `0x100`-`0x900` documentée précédemment** | **Reprendre de la vitesse** (corrigé 2026-09-25, pas un retour à la base) : vitesse max, assiette +5° |
 | 19 | `0x160` | **Attaque au sol** (corrigé 2026-09-25) — `GroundAttack_CanEngage_77000` : cible `entité+0x283` sinon `+0x137`, `target_type == 2`, `nœud+0x13 == 0`, arme air-sol chargée (masque `0xFC`) → `5`, sinon `0` | `GroundAttack_Start_7709A` : empile le nœud comme comportement en cours et lance la machine à phases (`GroundAttack_PhaseDispatch_77215`) ; `nœud+0x30 = 100000` est une distance sentinelle, pas un minuteur |
 | 20 | `0x14C` | **Toujours 0** — mais utilisé comme **outil géométrique partagé hors tournoi**, référencé en dur via `entité+0xC1`, consommé par `AI_ProximityGeometricWarning_315B` pour une alerte de proximité/collision, **et directement par l'application d'`ID=1`** | `loc_1195A` |
 | 21 | `0x138` | **Toujours 0** (jamais dans le tournoi) | **Navigation au pilote automatique physique** (`MVRS_ID21_ApplyAutopilotNav_11AC4`), appelée directement via `entité+0xD1` (relu 2026-09-25) |
@@ -807,7 +807,7 @@ binaire). Le fichier de Billy utilise les identifiants `1` à `13` —
 voir la table complète et corrigée au §3.7bis pour le détail de
 chacun. Sur ces 13, **7 ont une vraie logique de score graduée**
 (`1,2,3,4,5,6,7`), `13` a une formule riche et distincte (déclencheur
-de la séquence Scissors/Rollaway), et les **5 suivants (`8` à `12`)
+de la prise d'altitude, relue 2026-09-25), et les **5 suivants (`8` à `12`)
 renvoient 0 dans le seul chemin de code lu jusqu'ici** — voir la note
 de correction ci-dessous, ce dernier point n'est pas une conclusion
 acquise.
@@ -915,7 +915,11 @@ cohérente avec le début d'un Split S. La phase 5 écrit directement
 dans `entité+7+0x1F` — le même champ consommé aux côtés de l'entrée
 souris du joueur dans `Player_MainUpdate` (§4bis).
 
-**Séquence Scissors/Rollaway à 5 phases — appartient à `ID=13`** (et
+> **Corrigé le 2026-09-25** : le tick d'`ID=13` a été relu ; ce n'est pas un Scissors/Rollaway mais
+> une **prise d'altitude à longue distance** (cap sur la cible, chandelle 30–60° selon l'excès de
+> vitesse). Détail : `AI_TICK_CALL_GRAPH.md`, « Les actions confirmées des manœuvres `MVRS` ».
+
+**Séquence à 5 phases — appartient à `ID=13`** (et
 non `ID=0xE` comme documenté précédemment). Le score d'`ID=13`
 (`loc_4A99`) utilise à la fois `dword_72039` ET `dword_7202C` (les
 deux constantes `NUMS` déjà associées à cette séquence) ; son
@@ -1415,7 +1419,7 @@ void AIEntity_MasterTick(Entity* entity) {
     unpack_status_flags(entity);  // +0x28C / +0x28D
 
     // seuils globaux de menace/proximite, partages avec d'autres
-    // fonctions de decision (ex. AI_EvadeOrPursueSelector)
+    // fonctions de decision (ex. AI_GroundAvoidPullUp_6616)
     dword_7203D = RangeTest(entity) + SecondaryAngleSensor(entity);
     dword_72039 = weighted_cosine(entity);
 
@@ -1560,7 +1564,7 @@ répond-elle à un message radio, se vante d'un exploit, avertit en cas
 de danger ? » Les deux fonctions suivantes ont été lues intégralement
 pour y répondre avec certitude plutôt que par extrapolation.*
 
-**`AI_MissileThreatTrigger_A` (`sub_50FF`, 169 lignes) — le vrai
+**`AI_EjectDecision_50FF` (`sub_50FF`, 169 lignes) — le vrai
 mécanisme d'alerte de danger, entièrement décodé :**
 
 - Calcule un **ratio de menace** via deux sommes sur une liste
@@ -1600,7 +1604,7 @@ fréquence générique, confirmé et précisé :**
 
 **Ce que ça répond à la question d'origine :**
 1. *Avertir en cas de danger* — oui, un vrai mécanisme existe
-   (`AI_MissileThreatTrigger_A`), mais spécifiquement pour des
+   (`AI_EjectDecision_50FF`), mais spécifiquement pour des
    menaces missile/radar verrouillées sur le joueur, passant par
    `Radio_CanPlayMessage` comme limiteur de fréquence commun à tout
    le système radio.
@@ -1822,9 +1826,9 @@ maintenant en place :
   `dword_72034` pour `ID=5`, `dword_72039`/`dword_7202C` pour `ID=13`).
 - **La séquence de manœuvre acrobatique** (§3.9) : les switch à
   phases de `MVRS_ID5` (8 phases) et `MVRS_ID13` (5 phases)
-  décodés intégralement (Immelmann/Split S pour l'un, probable
-  Scissors/Rollaway pour l'autre — confirmés au répertoire par le
-  manuel officiel) — chaque phase commande une attitude via les mêmes
+  décodés intégralement (montée verticale + retournement pour l'un,
+  prise d'altitude à longue distance pour l'autre — relu 2026-09-25,
+  l'hypothèse Scissors/Rollaway est abandonnée) — chaque phase commande une attitude via les mêmes
   contrôleurs bas niveau que la navigation, `ID=13` calculant même un
   délai de roulis basé sur la capacité propre de l'avion.
 - **La chaîne décision → mouvement réel** (§4bis) : `Goal_ExecuteAction`

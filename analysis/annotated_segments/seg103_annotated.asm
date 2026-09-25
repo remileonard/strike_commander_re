@@ -6975,7 +6975,7 @@ loc_4B7B2:
 ; (0x14A), applique une résolution supplémentaire (sub_54BF1) : résolution d'un paramètre de
 ; contrôle normalisé pour le modèle de vol.
 ; ==============================================================================================
-FlightControl_ResolveNormalizedParam	proc far		; CODE XREF: AI_Sensor_DistanceFromRef+44P
+FlightControl_ResolveNormalizedParam	proc far		; CODE XREF: AI_Sensor_IndicatedAirspeed_5861+44P
 
 var_18		= dword	ptr -18h
 var_14		= dword	ptr -14h

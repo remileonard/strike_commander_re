@@ -238,11 +238,18 @@ l'avion jusqu'à ce qu'il se termine ou soit abandonné.
 ### 2. `entité+0x27F` est le niveau de la réaction active
 
 Écrivains : `AI_EngageAttackerReaction_E246` → 1 (entrée en combat : touché, ou un avion dans mes six heures) ; `Targeting_AcquireBestThreat` → 2 (missile
-gagnant) ; `AI_VisibilityTest` → 3 ; `Escort_WaitLandingClearance` → 4 ;
-`Escort_WaitTakeoffClearance` → 5 ; remis à 0 par les mêmes et par `AI_ScanForNewTarget`,
+gagnant) ; `AI_VisibilityTest` → 3 ; `AI_GroundAvoidReflex_E06C` → 4 ;
+`AI_StallRecoveryReflex_E159` → 5 ; remis à 0 par les mêmes et par `AI_ScanForNewTarget`,
 `AI_EvalTargetAttribute`, `AI_MissileEvasionReaction_9A77`. Chaque réaction ne tourne que si
-`+0x27F` ne dépasse pas son propre niveau : attente de décollage si ≤ 5, d'atterrissage si ≤ 4,
-recherche de cible si ≤ 3, esquive si == 2, entrée en combat contre un attaquant et **tir/poursuite** si ≤ 1.
+`+0x27F` ne dépasse pas son propre niveau : récupération nez haut / décrochage si ≤ 5, évitement du
+sol si ≤ 4, recherche de cible si ≤ 3, esquive si == 2, entrée en combat contre un attaquant et
+**tir/poursuite** si ≤ 1.
+
+> **Corrigé le 2026-09-25** : les niveaux 4 et 5 ne sont **pas** des attentes de clairance
+> d'atterrissage/décollage (anciens noms `Escort_WaitLandingClearance` / `Escort_WaitTakeoffClearance`).
+> Ce sont deux **réflexes de pilotage** qui lancent les nœuds fixes ID14 (`entité+0xC5`, éviter le
+> sol) et ID15 (`entité+0xC9`, sortir d'un nez haut / décrochage). Détail : « Les actions confirmées
+> des manœuvres `MVRS` » plus bas.
 
 ### 3. Ordre complet d'un tick (`AI_TopLevelThink`)
 
@@ -252,7 +259,7 @@ recherche de cible si ≤ 3, esquive si == 2, entrée en combat contre un attaqu
    `+0x287` est reprise de `+0x289` si besoin, **le comportement en cours est abandonné**, et le
    nœud permanent **`ID=4`** (`entité+0xBD`) est appliqué directement, hors tournoi ; bit 6 de
    `+0x28D` posé (effacé quand plus rien n'est en cours).
-3. Si rien n'est en cours : attente de décollage, d'atterrissage, recherche de nouvelle cible
+3. Si rien n'est en cours : réflexe nez haut / décrochage (ID15), réflexe d'évitement du sol (ID14), recherche de nouvelle cible
    (selon `+0x27F`).
 4. Réactions prioritaires : esquive de missile (`+0x281`, `+0x27F == 2`), entrée en combat contre un attaquant (`AI_EngageAttackerReaction_E246`).
    Si l'une agit : fin.
@@ -321,22 +328,22 @@ portaient un **identifiant décalé d'un cran** ; ils sont corrigés dans `known
 
 | ID | Tag | Score | Application | Tick |
 |---|---|---|---|---|
-| 1 | `0x2B4` | `MVRS_ID1_ScoreAngularGuarded_3E90` | `loc_EEA0` | `loc_F0C3` |
-| 2 | `0x28C` | `MVRS_ID2_Score_3FCB` | `MVRS_ID2_ApplyBreakDirection_F2C8` | `loc_F3B6` |
-| 3 | `0x278` | `MVRS_ID3_ScoreAngularSimple_4128` | `MVRS_ID3_ApplyGenericTimer_F6C2` | `MVRS_ID3_Tick_F72B` |
-| 4 | `0x264` | `MVRS_ID4_ScoreAngularExtended_41DD` | `MVRS_ID4_ApplyInterceptSolution_FCE1` | `loc_FE39` |
-| 5 | `0x250` | `MVRS_ID5_ScoreSubmodeManeuver_434E` | `MVRS_ID5_ApplySetTimer_100B6` | `MVRS_ID5_TickSubmodeSwitch_1011F` |
-| 6 | `0x23C` | `MVRS_ID6_ScoreSensorGatedSubmode_45BE` | `MVRS_ID6_ApplySetTimer_1060A` | `loc_10673` |
-| 7 | `0x228` | `MVRS_ID7_ScoreManeuverFuelGated_47D4` | `MVRS_ID7_ApplyFuelGatedTimer_10AF2` | `loc_10BD9` |
+| 1 | `0x2B4` | `MVRS_ID1_ScoreAngularGuarded_3E90` | `MVRS_ID1_ApplyReacquireTurn_EEA0` | `MVRS_ID1_TickReacquireLegs_F0C3` |
+| 2 | `0x28C` | `MVRS_ID2_Score_3FCB` | `MVRS_ID2_ApplyBreakDirection_F2C8` | `MVRS_ID2_TickBreak_F3B6` |
+| 3 | `0x278` | `MVRS_ID3_ScoreAngularSimple_4128` | `MVRS_ID3_ApplyGenericTimer_F6C2` | `MVRS_ID3_TickEnergyManeuver_F72B` |
+| 4 | `0x264` | `MVRS_ID4_ScoreAngularExtended_41DD` | `MVRS_ID4_ApplyInterceptSolution_FCE1` | `MVRS_ID4_TickDefensiveBreakTurn_FE39` |
+| 5 | `0x250` | `MVRS_ID5_ScoreSubmodeManeuver_434E` | `MVRS_ID5_ApplySetTimer_100B6` | `MVRS_ID5_TickVerticalReversal_1011F` |
+| 6 | `0x23C` | `MVRS_ID6_ScoreSensorGatedSubmode_45BE` | `MVRS_ID6_ApplySetTimer_1060A` | `MVRS_ID6_TickSplitS_10673` |
+| 7 | `0x228` | `MVRS_ID7_ScoreManeuverFuelGated_47D4` | `MVRS_ID7_ApplyFuelGatedTimer_10AF2` | `MVRS_ID7_TickPursuit_10BD9` |
 | 8 | `0x214` | `MVRS_ID8_ScoreAlwaysZero_49DA` | `MVRS_ID8_ApplyTrivialDelegate_1115D` | `MVRS_ID8_TickShadowTarget_111AE` |
 | 9 | `0x200` | `MVRS_ID9_ScoreAlwaysZero_4A02` | `MVRS_ID9_ApplyEndsAtOnce_112F7` | `MVRS_ID9_TickEndsAtOnce_1130C` |
 | 10 | `0x1EC` | `MVRS_ID10_ScoreAlwaysZero_4A2A` | `MVRS_ID10_ApplyEndsAtOnce_1131D` | `MVRS_ID10_TickEndsAtOnce_11332` |
 | 11 | `0x1D8` | `MVRS_ID11_ScoreAlwaysZero_4A49` | `MVRS_ID11_ApplyEndsAtOnce_11343` | `MVRS_ID11_TickEndsAtOnce_11358` |
 | 12 | `0x1C4` | `MVRS_ID12_ScoreAlwaysZero_4A71` | `MVRS_ID12_ApplyEndsAtOnce_11369` | `MVRS_ID12_TickEndsAtOnce_1137E` |
-| 13 | `0x1B0` | `MVRS_ID13_ScoreScissorsRollaway_4A99` | `MVRS_ID13_ApplySetTimer_1138F` | `MVRS_ID13_TickManeuverSequence_113FD` |
-| 14 | `0x19C` | `MVRS_ID14_ScoreIntercept_4CD1` | `MVRS_ID14_Apply_11763` | `loc_117B4` |
-| 15 | `0x188` | `MVRS_ID15_ScoreThreatSensor_4E2A` | `MVRS_ID15_Apply_11809` | `loc_1186E` |
-| 16 | `0x174` | `MVRS_ID16_ScoreFuelOrResource_4ECD` | `MVRS_ID16_ApplyReturnToBase_118C3` | `loc_1191D` |
+| 13 | `0x1B0` | `MVRS_ID13_ScoreZoomClimb_4A99` | `MVRS_ID13_ApplySetTimer_1138F` | `MVRS_ID13_TickZoomClimb_113FD` |
+| 14 | `0x19C` | `MVRS_ID14_ScoreGroundAvoid_4CD1` | `MVRS_ID14_ApplyGroundAvoid_11763` | `MVRS_ID14_TickGroundAvoid_117B4` |
+| 15 | `0x188` | `MVRS_ID15_ScoreStallRecovery_4E2A` | `MVRS_ID15_ApplyStallRecovery_11809` | `MVRS_ID15_TickStallRecovery_1186E` |
+| 16 | `0x174` | `MVRS_ID16_ScoreLowSpeed_4ECD` | `MVRS_ID16_ApplyRegainSpeed_118C3` | `MVRS_ID16_TickRegainSpeed_1191D` |
 | 19 | `0x160` | `GroundAttack_CanEngage_77000` | `GroundAttack_Start_7709A` | `GroundAttack_PhaseDispatch_77215` |
 | 20 | `0x14C` | `MVRS_ID20_ScoreAlwaysZero_4F54` | `MVRS_ID20_ApplyStoreNavCommand_1195A` | `MVRS_ID20_TickApplyGuidance_11A04` |
 | 21 | `0x138` | `MVRS_ID21_ScoreAlwaysZero_4F6A` | `MVRS_ID21_ApplyAutopilotNav_11AC4` | `MVRS_ID21_TickAutopilotNav_11B16` |
@@ -400,6 +407,74 @@ atteint. Appelants : `AI_NavSolutionToPoint` (navigation de l'IA vers un point),
 `PartEntry_ResolveSpawnPositionAndActivate_51EDC`. **Conséquence : dans l'original, l'IA rejoint
 ses points de navigation au pilote automatique cinématique** (`PHYSICS.md` §9), pas par les
 commandes de manche.
+
+## Les actions confirmées des manœuvres `MVRS` (relu le 2026-09-25)
+
+Relecture de la loi de pilotage `AI_GuidanceSolution_Major` avec les vrais noms trigonométriques,
+puis lecture des méthodes d'application et de tick de chaque identifiant autre que 9 à 12. Les
+anciens noms qui décrivaient autre chose (interception, fusée de proximité, clairance
+d'atterrissage…) sont corrigés dans `known_functions.json` ; l'ancien nom reste dans chaque résumé.
+
+### Vocabulaire commun (capteurs renommés)
+
+| Nom corrigé | Ancien nom | Ce que c'est |
+|---|---|---|
+| `AI_Sensor_IndicatedAirspeed_5861` | `AI_Sensor_DistanceFromRef` | Vitesse indiquée : `|v| · √(ρ(altitude)/ρ0)`, en cache `entité+0xF1` |
+| `AI_Sensor_TooSlow_564A` | `AI_Sensor_TargetInRange` | « Trop lent » : décrochage (bit 6) ou vitesse indiquée ≤ `dword_72039` (vitesse minimale de manœuvre) |
+| `AI_Sensor_TooLow_56E5` | `AI_Sensor_InterceptFeasibleCached` | « Trop bas » : altitude < terrain + 4 × `entité+0xE5` |
+| `AI_ManeuverSpeedCmd_ED1E` | `Missile_ProximityFuze` | Vitesse des manœuvres : croisière `JDYN+0x84` sans cible ; sinon vitesse demandée × (3600 − d)/1800 si d < 1800, ÷ 2 si un jet de compétence réussit et que je vais moins vite que la cible |
+| `AI_EjectDecision_50FF` | `AI_MissileThreatTrigger_A` | Décision d'éjection (dommages > 80 %, ou décroché/trop bas selon le mode) ; radio 9 « She's breaking up. Ejecting! » |
+| `Vector2D_CrossSign_526F` | `Vec3_Negate` | Signe du produit vectoriel horizontal : de quel côté est la cible |
+| `MVRS_BuildCombatContext_E5A4` | `Missile_PhysicsTick` | Remplit les globales lues par les scores et ticks (ma vitesse, vitesse de la cible, distance, angles, cible dans mes 6 h / moi dans ses 6 h) |
+
+Les commandes d'attitude sont `AI_PitchToAngleCmd_7E18(assiette, zone morte)` et
+`AI_RollToAngleCmd_8104(inclinaison, zone morte)` ; elles renvoient « atteint ». « Cran » = cran de
+manette écrit dans la commande (`+0x1E`, 10 = plein gaz, 0 = ralenti).
+
+### La loi de pilotage `AI_GuidanceSolution_Major`
+
+Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'avion ou de l'arme).
+1. **Écart de cap** `h = cap(D) − cap(R)`, ramené à ±180°.
+2. **Élévation voulue** `e = 0` si `|h| ≥ 90°` (la cible est derrière : on tourne à plat), sinon
+   l'élévation de `D`. `p` = assiette du nez.
+3. **Protections d'altitude** (`plancher` = terrain + `entité+0xE5`, `deck` = `entité+0xE5`) :
+   - sous le plancher et `e < p` : `e = min(80°, 80° · (plancher − altitude)/deck)` ;
+   - sinon, piqué maximal permis `m` : 0 si le facteur de charge de l'avion (`avion+0x67`) est
+     < 2 ; sinon rayon de ressource `r = v² / (9,8 · n/2)` et `m = −90°` si la hauteur au-dessus
+     du plancher `≥ r`, sinon `m = −acos((r − hauteur)/r)`. Si `e < m` → `e = m` ; sinon si
+     `p < −45°` et `e < p` → `e = −45°` ; si `p ≥ 45°` et `e > p` → `e = 45°`.
+   - `D` est alors recalculé avec une composante verticale `sin(e) · |D horizontal|`.
+4. **Écart d'élévation** `v = élévation(D) − élévation(R)`.
+5. **Écart de roulis** : `h ≥ 90°` → `90° − roulis` (moins `v` si `v > 0`) ; `h ≤ −90°` →
+   `−90° − roulis` (plus `v` si `v > 0`) ; sinon `AI_ComputeBearingToRef` = `atan2(L.x, L.haut)`
+   de `D` dans le repère avion (le roulis qui met la cible dans le plan de portance).
+6. Les trois écarts partent dans `AI_CombatDecision_Major`. Son résumé (antérieur à la correction
+   des noms, **non relu**) montre qu'il borne les écarts à ±10° quand l'avion est **trop lent**
+   (`AI_Sensor_TooSlow_564A`, pas une « garde de cible fine ») et passe la main à
+   `AI_NoseHighRecovery_676F` quand le drapeau de décrochage est posé.
+
+### Ce que fait chaque identifiant
+
+| ID | Nom de la manœuvre | Déclenchement | Ce que fait le tick |
+|---|---|---|---|
+| 1 | Virage de réacquisition par jambes | tournoi | Jambes de 1 s (nœud ID20) : la 1re à ±30° du nez côté cible, puis −60° à chaque jambe ; fin quand la cible est à moins de 60° du nez, sans cible, ou après 4 jambes. **Bug d'origine** : le test d'alternance `test ax, 0` est toujours faux, les jambes tournent donc toujours du même côté. |
+| 2 | Dégagement (break) | tournoi (score 10 constant) | Côté choisi par le manche latéral du moment (> 3/16 → un côté, < −3/16 → l'autre, sinon au hasard) ; manche latéral à fond de ce côté, manche tiré à fond (ou poussé à moitié si l'avion est sur le dos par rapport à l'axe visé), jusqu'au minuteur. |
+| 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (jambes de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (TH/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
+| 4 | Virage défensif | **alerte de menace**, hors tournoi (`entité+0xBD`) | Plein gaz, inclinaison 90° (60° si trop bas) côté cible, tiré à fond ; quand le cap a tourné de 90° ou minuteur écoulé : assiette +10°, fin. |
+| 5 | Montée verticale et retournement (type Immelmann) | tournoi | Reprise de vitesse (piqué −30° si très haut), à plat, assiette +90°, roulis pour mettre la cible dans le plan de portance, tirer jusqu'à 45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
+| 6 | Split-S | tournoi | Monter à +30° jusqu'à plancher + 2000, puis +20° à vitesse minimale jusqu'à passer sous la croisière ; se mettre sur le dos, assiette −90°, roulis vers la cible, tirer jusqu'à −45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
+| 7 | Poursuite | tournoi | Interception (`AI_InterceptDispatcher` : vitesse d'interception + loi de pilotage) ; bascule sur un point d'anticipation (position cible + vitesse × 4 s) quand elle est proche, ou sur un point décalé en montée à 45° si l'aspect est ≥ 80°. Fin sans cible. |
+| 8 | Se caler derrière la cible | jamais (score 0) | Voir « Les identifiants 8 à 12 ». |
+| 13 | **Prise d'altitude à longue distance** (pas un Scissors/Rollaway) | tournoi | Si la cible est à moins de 17 700 : fin. Sinon cap sur la cible à plat, niveau si trop lent, puis chandelle à `30° + 30° × (vitesse − croisière)/vitesse mini` (max 60°), ailes à plat, plein gaz, jusqu'au minuteur (4 s, compté double dans cette phase), trop lent ou cible à moins de 17 700 ; enfin nez à plat, manette de croisière. Score : exige de ne pas être trop lent et d'être sous le plafond `JDYN+0x86` (11 005 par défaut) ; favorisé si je vais plus vite que la cible, loin (> 17 700) et bien placé. |
+| 14 | **Évitement du sol** | réflexe niveau 4 (`AI_GroundAvoidReflex_E06C`, nœud `entité+0xC5`) | Test d'éjection (mode 2), puis `AI_GroundAvoidPullUp_6616` : assiette +30°, plein gaz (ou cran 1 en piqué rapide) jusqu'à monter au-dessus du plancher. Score 10 si sans cible, pilote automatique coupé, et trop près du sol (`entité+0xE1` corrigé par l'inclinaison) ou sous le plancher en descente. |
+| 15 | **Récupération nez haut / décrochage** | réflexe niveau 5 (`AI_StallRecoveryReflex_E159`, nœud `entité+0xC9`) | Test d'éjection (mode 1), puis `AI_NoseHighRecovery_676F` : ralenti si décroché nez > 60°, sinon plein gaz et assiette −30° ; fin quand le nez est repassé sous l'horizon. Minuteur 2 s. Score 10 si sans cible, pilote automatique coupé et (décroché, ou vitesse ≤ minimale avec nez > 30°). |
+| 16 | **Reprendre de la vitesse** (pas un retour à la base) | tournoi (score 1 si TH < 12) | `AI_RegainSpeed_68D4` : manette à la vitesse max `JDYN+0x80`, assiette +5°, jusqu'à dépasser (croisière + mini)/2. Minuteur 1,5 s. |
+| 19 | Attaque au sol | tournoi | Voir « L'attaque au sol ». |
+| 20 | Voler dans une direction | outil (nœud `entité+0xC1`) | Suit une direction mémorisée à plein gaz pendant le minuteur (jambes d'ID1 et ID3, alerte de proximité). |
+| 21 | Navigation au pilote automatique | outil (nœud `entité+0xD1`) | Voir plus haut. |
+
+**Conséquences pour les niveaux de réaction** : les niveaux 4 et 5 de `entité+0x27F` sont ces deux
+réflexes (sol, décrochage), pas des états de décollage/atterrissage.
 
 ## `ExecuteFlightCommand` : le script pose l'objectif, il ne pilote pas (lu le 2026-09-19)
 
@@ -1016,4 +1091,4 @@ Toutes les distances et altitudes sont en mètres, et le point visé est toujour
 | `AI_TurnToBearingCmd` | `AI_PitchToAngleCmd_7E18` | écart de tangage, puis contrôleur de tangage |
 | `AI_RollRateController` | `AI_PitchController_7B20` | écrit l'axe de **tangage** (`+0x1F`) ; pour piquer de plus de 15°, passe **sur le dos** (roulis 180°) et tire |
 
-Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (lue par une session antérieure, avant la découverte de l'inversion des noms trigonométriques : **à relire**).
+Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (**relue le 2026-09-25** : voir « Les actions confirmées des manœuvres `MVRS` »).

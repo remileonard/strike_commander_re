@@ -218,7 +218,7 @@ loc_8308:				; CODE XREF: AI_TopLevelThink+1B7j
 		ja	short loc_8358
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	Escort_WaitTakeoffClearance
+		call	AI_StallRecoveryReflex_E159
 		add	sp, 4
 		mov	[bp+var_9], al
 		call	PIT_ReadHighPrecision
@@ -245,7 +245,7 @@ loc_8358:				; CODE XREF: AI_TopLevelThink+1D2j
 		ja	short loc_83A4
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	Escort_WaitLandingClearance
+		call	AI_GroundAvoidReflex_E06C
 		add	sp, 4
 		mov	[bp+var_9], al
 		call	PIT_ReadHighPrecision

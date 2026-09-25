@@ -48,7 +48,7 @@ loc_3EC3:				; CODE XREF: seg002:002Ej
 
 loc_3ECD:				; CODE XREF: seg002:0038j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_3EE1
@@ -58,7 +58,7 @@ loc_3ECD:				; CODE XREF: seg002:0038j
 loc_3EE1:				; CODE XREF: seg002:004Cj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_3EF8
@@ -210,7 +210,7 @@ loc_3FFE:				; CODE XREF: seg002:0169j
 
 loc_4008:				; CODE XREF: seg002:0173j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_401C
@@ -220,7 +220,7 @@ loc_4008:				; CODE XREF: seg002:0173j
 loc_401C:				; CODE XREF: seg002:0187j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4033
@@ -515,7 +515,7 @@ loc_4210:				; CODE XREF: seg002:037Bj
 
 loc_421A:				; CODE XREF: seg002:0385j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_422E
@@ -525,7 +525,7 @@ loc_421A:				; CODE XREF: seg002:0385j
 loc_422E:				; CODE XREF: seg002:0399j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4245
@@ -712,7 +712,7 @@ MVRS_ID5_ScoreSubmodeManeuver_434E:				; DATA XREF: seg339:0254o
 
 loc_437A:				; CODE XREF: seg002:04E5j
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_438E
@@ -974,7 +974,7 @@ loc_4554:
 loc_4557:				; CODE XREF: seg002:067Ej seg002:06ABj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4571
@@ -1236,7 +1236,7 @@ loc_472D:				; CODE XREF: seg002:0899j
 loc_473F:				; CODE XREF: seg002:089Fj
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_4757
@@ -1430,7 +1430,7 @@ loc_4889:				; CODE XREF: seg002:09F3j
 		mov	[bp-2],	dx
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_48E4
@@ -1702,18 +1702,17 @@ loc_4A95:				; CODE XREF: seg002:0BFDj seg002:0C01j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 258 lignes (12015-12269) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x1B0
-; confirme = ID=13 via ancrage sequentiel - CORRIGE : precedemment attribuee a ID=0xE/14b).
-; Base=1. Lit avion+0x86 (NOUVELLE capacite, probable taux de roulis max, mise a l'echelle
-; x256) compare a entite+0x11->+0x1A. Gardes : tache en cours, sub_564A. Calcul RICHE :
-; bearing dword_720BB/720B7, seuil dword_7205B, UTILISE dword_72039 ET dword_7202C (les DEUX
-; constantes NUMS deja identifiees dans la sequence de manoeuvre a 5 phases Scissors/Rollaway)
-; - CONFIRME QUE C'EST ID=13, PAS 0xE, QUI DECLENCHE CETTE SEQUENCE. Contient un calcul de
-; type 'temps de virage' (imul x5, idiv par dword_720BB, decalages 0x18) similaire a celui
-; documente dans la sequence elle-meme. Lit aussi avion+0x8B (MEME champ que ID=5) pour un
-; ajustement final, et sub_56E5 (capteur cache). Score borne [0,9].
+; Ex-'MVRS_ID13_ScoreScissorsRollaway_4A99'. far, 258L, RELUE 2026-09-25 (pas
+; Scissors/Rollaway). Score MVRS ID13 'prise d'altitude' : base 1 ; 0 sans cible, si trop lent
+; (AI_Sensor_TooSlow_564A), ou si mon altitude (entite+0x1A) >= plafond JDYN+0x86 (defaut
+; 11005). -2 x nombre d'utilisations. Si la cible est plus lente que moi, pas plus de 400 sous
+; moi, ma vitesse >= (croisiere + dword_72039)/2, je suis un avion et (cible dans mon arriere
+; byte_720E0 ou moi dans ses 6h byte_720E1) : +5 x (ma vitesse - la sienne)/la sienne, ou +5
+; si sa vitesse <= la minimale. Distance > 17700 (dword_7202C) et word_72093 < 30 : +5 ; sinon
+; distance < 1800 : -5 (et -5 encore si word_72093 < 20). + terme JDYN+0x8B. Trop bas
+; (AI_Sensor_TooLow_56E5) : +4. Borne 0..9.
 ; ==============================================================================================
-MVRS_ID13_ScoreScissorsRollaway_4A99:				; DATA XREF: seg339:01B4o
+MVRS_ID13_ScoreZoomClimb_4A99:				; DATA XREF: seg339:01B4o
 		push	bp
 		mov	bp, sp
 		sub	sp, 40h
@@ -1735,7 +1734,7 @@ MVRS_ID13_ScoreScissorsRollaway_4A99:				; DATA XREF: seg339:01B4o
 		cmp	word ptr es:[bx+13h], 0
 		jz	short loc_4B0E
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_TargetInRange
+		call	AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jnz	short loc_4B0E
@@ -1946,7 +1945,7 @@ loc_4C85:				; CODE XREF: seg002:0DE1j
 loc_4C9C:				; CODE XREF: seg002:0DF3j
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_Sensor_InterceptFeasibleCached
+		call	AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_4CB4
@@ -1971,16 +1970,12 @@ loc_4CCC:				; CODE XREF: seg002:0E2Fj seg002:0E35j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID15b_ScoreIntercept_4CD1'. far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE
-; pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul
-; d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C],
-; sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception),
-; gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9). |
-; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
-; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
-; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID14_ScoreIntercept_4CD1'. far, 150L, RELUE 2026-09-25. Score MVRS ID14 'evitement
+; du sol' : 10 si pas de cible, pilote automatique coupe, et hauteur-sol < entite+0xE1 x (1 +
+; sin(roulis/2)/2) ou (altitude < plancher et vitesse verticale dword_720A7 < 0) ; sinon 0.
+; Noeud fixe entite+0xC5, lance par AI_GroundAvoidReflex_E06C.
 ; ==============================================================================================
-MVRS_ID14_ScoreIntercept_4CD1:				; DATA XREF: seg339:01A0o
+MVRS_ID14_ScoreGroundAvoid_4CD1:				; DATA XREF: seg339:01A0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 3Ah
@@ -2134,18 +2129,12 @@ loc_4E27:				; CODE XREF: seg002:0E7Cj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID16_ScoreThreatSensor_4E2A'. far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE
-; pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi',
-; meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6
-; (modulateur de score de menace, deja documente en §7) OU un seuil de distance
-; (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via
-; AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le
-; systeme de detection de menace. Score BINAIRE 0/0xA. | IDENTIFIANT CORRIGE 2026-09-25 :
-; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID15_ScoreThreatSensor_4E2A'. far, 87L, RELUE 2026-09-25. Score MVRS ID15
+; 'recuperation nez haut / decrochage' : 10 si pas de cible, pilote automatique coupe, et
+; (drapeau de decrochage bit6, ou vitesse indiquee dword_720CD <= minimale dword_720C9 avec
+; assiette > 30) ; sinon 0. Noeud fixe entite+0xC9, lance par AI_StallRecoveryReflex_E159.
 ; ==============================================================================================
-MVRS_ID15_ScoreThreatSensor_4E2A:				; DATA XREF: seg339:018Co
+MVRS_ID15_ScoreStallRecovery_4E2A:				; DATA XREF: seg339:018Co
 		push	bp
 		mov	bp, sp
 		sub	sp, 6
@@ -2235,18 +2224,11 @@ locret_4ECB:				; CODE XREF: seg002:0FD4j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID19_ScoreFuelOrResource_4ECD'. far, 59 lignes - LU INTEGRALEMENT. Fonction de
-; SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la
-; construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS
-; 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur
-; entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire)
-; compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT
-; le tournoi de AI_BehaviorStateMachine des qu'actif. | IDENTIFIANT CORRIGE 2026-09-25 :
-; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
-; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
-; l'ancien nom portait un identifiant decale.
+; Ex-'MVRS_ID16_ScoreFuelOrResource_4ECD'. far, 59L, RELUE 2026-09-25. Score MVRS ID16
+; 'reprendre de la vitesse' : 1 si la manette (TH) est sous 12, sinon 0 (pas de carburant ni
+; de retour a la base).
 ; ==============================================================================================
-MVRS_ID16_ScoreFuelOrResource_4ECD:				; DATA XREF: seg339:0178o
+MVRS_ID16_ScoreLowSpeed_4ECD:				; DATA XREF: seg339:0178o
 		push	bp
 		mov	bp, sp
 		sub	sp, 10h

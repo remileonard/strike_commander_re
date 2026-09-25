@@ -231,32 +231,15 @@ Vec_NegateSwapPair	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 169 lignes - LUE INTEGRALEMENT (a la demande de Remi). SYSTEME RWR (Radar Warning
-; Receiver) A DEUX NIVEAUX, entierement decode. Parametre arg_4 selectionne le mode (1 ou 2).
-; GARDE INITIALE : si arg_4==1, verifie flags_75 bit6 (modulateur de menace, deja documente) -
-; si absent, sortie immediate (retourne 0, aucune alerte). CALCUL DU RATIO DE MENACE :
-; Roster_SumAttributeB(liste) * 100 / Roster_SumAttributeA(liste) - vraisemblablement un
-; pourcentage de verrouillage/frames de poursuite actives sur le total possible. Si ratio > 80
-; (0x50) : declenche. Sinon, pour arg_4==2 : re-verifie flags_75 bit6 comme critere
-; alternatif. Pour arg_4==1 supplementaire : compare entite+0x102+0x1A (portee/distance) a
-; dword_7203D (seuil de portee capteur, deja connu) - si en dessous, declenche aussi. SI
-; DECLENCHE : resout un objet via [entite+0x102->vtable+0]. VERIFICATION CRITIQUE DE
-; CORRESPONDANCE JOUEUR : compare le champ +0x50 de cet objet a celui de word_722E6 (LE
-; JOUEUR) - l'alerte radio NE SE DECLENCHE QUE SI LA MENACE CORRESPOND SPECIFIQUEMENT AU
-; JOUEUR (var_B), pas generiquement pour n'importe quelle IA menacee. DEUX SOUS-TYPES D'ALERTE
-; selon objet_resolu+0x63 : SI NON-ZERO (type A, probable 'missile tire/en approche') :
-; appelle sub_6CCFF (mise a jour HUD/indicateur visuel avec un offset +0x5A sur l'objet
-; resolu), PUIS SI var_B (correspond au joueur) : Radio_PlayMessage_CB45(joueur, code=9,
-; categorie=1) - alerte sonore/vocale. Termine TOUJOURS par UIScreen_BuildWidgetTree_53A94
-; (code 0) et pose flags_75 bit5 sur l'avion lie (meme bit deja documente ailleurs comme lie a
-; la formation - reutilisation multi-contexte probable, ou lien reel avec rupture de formation
-; en reaction a la menace, a confirmer). SI ZERO (type B, probable 'verrouillage radar
-; simple') : SI var_B : Radio_PlayMessage_CB45(joueur, code=0xA, categorie=1) uniquement, sans
-; mise a jour HUD ni bit pose. CONCLUSION : ceci est LE vrai mecanisme 'avertir en cas de
-; danger' cherche - mais SPECIFIQUEMENT pour des menaces missile/radar verrouillees sur le
-; JOUEUR, pas un avertissement generique de danger pour n'importe quelle IA.
+; Ex-'AI_MissileThreatTrigger_A'. far, 169L. DECISION D'EJECTION (pas un detecteur de menace).
+; Mode 1 exige le drapeau de decrochage. Ejecte si dommages = SommeB x 100 / SommeA > 80 %, ou
+; (mode 2 et decroche), ou (mode 1 et altitude < plancher). Si le modele a un siege (+0x63) :
+; ejection (stub 6CCFF), message radio 9 si ailier ami ('She's breaking up. Ejecting!'),
+; Combat_TeamOpposedCheckAndDispatch, flags_75 |= bit5 (avion abandonne) ; sinon message radio
+; 0x0A. Appelee par les ticks ID14 (mode 2) et ID15 (mode 1). A verifier : role A/B des sommes
+; par rapport a JDYN_UpdateDamageGains_494DD.
 ; ==============================================================================================
-AI_MissileThreatTrigger_A	proc far		; CODE XREF: seg008:322AP seg008:32F3P
+AI_EjectDecision_50FF	proc far		; CODE XREF: seg008:322AP seg008:32F3P
 
 var_B		= byte ptr -0Bh
 var_A		= dword	ptr -0Ah
@@ -281,7 +264,7 @@ arg_4		= byte ptr  0Ah
 		jmp	loc_526A
 ; ���������������������������������������������������������������������������
 
-loc_5126:				; CODE XREF: AI_MissileThreatTrigger_A+Ej AI_MissileThreatTrigger_A+22j
+loc_5126:				; CODE XREF: AI_EjectDecision_50FF+Ej AI_EjectDecision_50FF+22j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
 		mov	ax, [bx+60h]
@@ -314,7 +297,7 @@ loc_5126:				; CODE XREF: AI_MissileThreatTrigger_A+Ej AI_MissileThreatTrigger_
 		or	al, al
 		jnz	short loc_51A9
 
-loc_5185:				; CODE XREF: AI_MissileThreatTrigger_A+70j
+loc_5185:				; CODE XREF: AI_EjectDecision_50FF+70j
 		cmp	[bp+arg_4], 1
 		jnz	short loc_51AD
 		les	bx, [bp+arg_0]
@@ -326,23 +309,23 @@ loc_5185:				; CODE XREF: AI_MissileThreatTrigger_A+70j
 		jmp	short loc_51A5
 ; ���������������������������������������������������������������������������
 
-loc_51A3:				; CODE XREF: AI_MissileThreatTrigger_A+9Dj
+loc_51A3:				; CODE XREF: AI_EjectDecision_50FF+9Dj
 		xor	ax, ax
 
-loc_51A5:				; CODE XREF: AI_MissileThreatTrigger_A+A2j
+loc_51A5:				; CODE XREF: AI_EjectDecision_50FF+A2j
 		or	al, al
 		jz	short loc_51AD
 
-loc_51A9:				; CODE XREF: AI_MissileThreatTrigger_A+6Aj AI_MissileThreatTrigger_A+84j
+loc_51A9:				; CODE XREF: AI_EjectDecision_50FF+6Aj AI_EjectDecision_50FF+84j
 		mov	[bp+var_1], 1
 
-loc_51AD:				; CODE XREF: AI_MissileThreatTrigger_A+8Aj AI_MissileThreatTrigger_A+A8j
+loc_51AD:				; CODE XREF: AI_EjectDecision_50FF+8Aj AI_EjectDecision_50FF+A8j
 		cmp	[bp+var_1], 0
 		jnz	short loc_51B6
 		jmp	loc_526A
 ; ���������������������������������������������������������������������������
 
-loc_51B6:				; CODE XREF: AI_MissileThreatTrigger_A+B2j
+loc_51B6:				; CODE XREF: AI_EjectDecision_50FF+B2j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
 		mov	bx, es:[bx+102h]
@@ -363,10 +346,10 @@ loc_51B6:				; CODE XREF: AI_MissileThreatTrigger_A+B2j
 		jmp	short loc_51F0
 ; ���������������������������������������������������������������������������
 
-loc_51EE:				; CODE XREF: AI_MissileThreatTrigger_A+D4j AI_MissileThreatTrigger_A+E8j
+loc_51EE:				; CODE XREF: AI_EjectDecision_50FF+D4j AI_EjectDecision_50FF+E8j
 		xor	ax, ax
 
-loc_51F0:				; CODE XREF: AI_MissileThreatTrigger_A+EDj
+loc_51F0:				; CODE XREF: AI_EjectDecision_50FF+EDj
 		mov	[bp+var_B], al
 		les	bx, [bp+var_A]
 		cmp	byte ptr es:[bx+63h], 0
@@ -388,7 +371,7 @@ loc_51F0:				; CODE XREF: AI_MissileThreatTrigger_A+EDj
 		call	Radio_PlayMessage
 		add	sp, 0Ah
 
-loc_5231:				; CODE XREF: AI_MissileThreatTrigger_A+11Cj
+loc_5231:				; CODE XREF: AI_EjectDecision_50FF+11Cj
 		push	0
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
@@ -408,7 +391,7 @@ loc_524E:
 		jmp	short loc_526A
 ; ���������������������������������������������������������������������������
 
-loc_5250:				; CODE XREF: AI_MissileThreatTrigger_A+FCj
+loc_5250:				; CODE XREF: AI_EjectDecision_50FF+FCj
 		cmp	[bp+var_B], 0
 
 loc_5254:
@@ -420,11 +403,11 @@ loc_5254:
 		call	Radio_PlayMessage
 		add	sp, 0Ah
 
-loc_526A:				; CODE XREF: AI_MissileThreatTrigger_A+24j AI_MissileThreatTrigger_A+B4j ...
+loc_526A:				; CODE XREF: AI_EjectDecision_50FF+24j AI_EjectDecision_50FF+B4j ...
 		mov	al, [bp+var_1]
 		leave
 		retf
-AI_MissileThreatTrigger_A	endp
+AI_EjectDecision_50FF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -432,10 +415,12 @@ AI_MissileThreatTrigger_A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,53L — négation d'un vecteur 3D (7 dwords, pattern similaire à sub_50AD) : inversion de
-; direction vectorielle.
+; Ex-'Vec3_Negate'. far, 53L. Signe du produit vectoriel 2D (plan horizontal) de deux
+; directions : dit de quel cote (gauche/droite) se trouve la seconde par rapport a la
+; premiere. Utilise par MVRS ID1 pour choisir le cote du premier virage. (Pas une negation de
+; vecteur.)
 ; ==============================================================================================
-Vec3_Negate	proc far		; CODE XREF: seg008:09F6P
+Vector2D_CrossSign_526F	proc far		; CODE XREF: seg008:09F6P
 
 var_1C		= dword	ptr -1Ch
 var_18		= dword	ptr -18h
@@ -487,7 +472,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-Vec3_Negate	endp
+Vector2D_CrossSign_526F	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -947,11 +932,12 @@ AI_IncomingThreatWarning	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,63L — 1er du cluster 'cache capteur par frame' : teste bit0 de +0x28C, calcule via
-; sub_5861 (distance) vs seuil dword_72039×256, cache résultat bit0 de +0x28D. Capteur caché :
-; cible en portée.
+; Ex-'AI_Sensor_TargetInRange'. far, 63L. DRAPEAU 'TROP LENT' (pas 'cible a portee') : vrai si
+; drapeau de decrochage (bit6) ou si AI_Sensor_IndicatedAirspeed_5861 <= dword_72039 (vitesse
+; minimale de manoeuvre, calculee a partir de JDYN+0x82 corrigee vers +0x84 selon l'assiette).
+; Cache bit0 de entite+0x28D.
 ; ==============================================================================================
-AI_Sensor_TargetInRange	proc far		; CODE XREF: seg002:0042P seg002:017DP ...
+AI_Sensor_TooSlow_564A	proc far		; CODE XREF: seg002:0042P seg002:017DP ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -979,7 +965,7 @@ arg_0		= dword	ptr  6
 		push	ax
 		nop
 		push	cs
-		call	near ptr AI_Sensor_DistanceFromRef
+		call	near ptr AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, dword_72039
 		mov	[bp+var_8], eax
@@ -990,30 +976,30 @@ arg_0		= dword	ptr  6
 		jmp	short loc_569F
 ; ���������������������������������������������������������������������������
 
-loc_569D:				; CODE XREF: AI_Sensor_TargetInRange+4Cj
+loc_569D:				; CODE XREF: AI_Sensor_TooSlow_564A+4Cj
 		xor	ax, ax
 
-loc_569F:				; CODE XREF: AI_Sensor_TargetInRange+51j
+loc_569F:				; CODE XREF: AI_Sensor_TooSlow_564A+51j
 		or	al, al
 		jz	short loc_56AE
 
-loc_56A3:				; CODE XREF: AI_Sensor_TargetInRange+29j
+loc_56A3:				; CODE XREF: AI_Sensor_TooSlow_564A+29j
 		les	bx, [bp+arg_0]
 		or	byte ptr es:[bx+28Dh], 1
 		jmp	short loc_56B7
 ; ���������������������������������������������������������������������������
 
-loc_56AE:				; CODE XREF: AI_Sensor_TargetInRange+57j
+loc_56AE:				; CODE XREF: AI_Sensor_TooSlow_564A+57j
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+28Dh], 0FEh
 
-loc_56B7:				; CODE XREF: AI_Sensor_TargetInRange+18j AI_Sensor_TargetInRange+62j
+loc_56B7:				; CODE XREF: AI_Sensor_TooSlow_564A+18j AI_Sensor_TooSlow_564A+62j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+28Dh]
 		and	ax, 1
 		leave
 		retf
-AI_Sensor_TargetInRange	endp
+AI_Sensor_TooSlow_564A	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -1021,7 +1007,7 @@ AI_Sensor_TargetInRange	endp
 		push	large dword ptr	[bp+0Ah]
 		nop
 		push	cs
-		call	near ptr AI_Sensor_InterceptFeasibleCached
+		call	near ptr AI_Sensor_TooLow_56E5
 		add	sp, 4
 		mov	bx, [bp+6]
 		mov	eax, dword_7204D
@@ -1036,22 +1022,11 @@ AI_Sensor_TargetInRange	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,99L — teste bit7 de +0x28C, accumule une distance de fermeture (dword_7204D) via
-; sub_378CA en boucle, compare au carburant/munitions restant (+0x1A), cache bit1 de +0x28D.
-; Capteur caché : faisabilité d'interception. LUE INTEGRALEMENT (a la demande de Remi).
-; PRECISION IMPORTANTE : c'est un CAPTEUR MIS EN CACHE, pas un calcul refait a chaque appel.
-; Si bit7 de entite+0x28C est pose, retourne IMMEDIATEMENT le resultat CACHE (bit1 de
-; entite+0x28D) sans aucun calcul. Sinon : lit un champ a entite+0xE5 (probable
-; carburant/munitions restant, mis a l'echelle x4), l'accumule avec le resultat de
-; Terrain_QueryAltitudeAt_378CA (position de l'entite + reference globale word_70474) dans
-; dword_7204D ('distance de fermeture'), compare ce total au seuil entite_liee+0x1A - si
-; depasse, met en cache 'infaisable' (bit1 pose) ; sinon 'faisable' (bit1 efface). Explique
-; pourquoi cette fonction sert de garde peu couteuse dans plusieurs fonctions de score
-; (MVRS_ID7/8) et dans MVRS_ID8_ApplyFuelGatedManeuver - la plupart des appels retournent un
-; resultat en cache, le vrai calcul (avec requete de terrain) n'ayant lieu que lorsque bit7
-; signale un rafraichissement necessaire.
+; Ex-'AI_Sensor_InterceptFeasibleCached'. far, 99L. DRAPEAU 'TROP BAS' (pas 'interception
+; faisable') : vrai si altitude < altitude du terrain + 4 x entite+0xE5 (plancher du pilote).
+; Cache bit1 de entite+0x28D.
 ; ==============================================================================================
-AI_Sensor_InterceptFeasibleCached	proc far		; CODE XREF: seg002:0059P seg002:0194P ...
+AI_Sensor_TooLow_56E5	proc far		; CODE XREF: seg002:0059P seg002:0194P ...
 
 var_2C		= dword	ptr -2Ch
 var_28		= dword	ptr -28h
@@ -1079,7 +1054,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_57BB
 ; ���������������������������������������������������������������������������
 
-loc_5702:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+18j
+loc_5702:				; CODE XREF: AI_Sensor_TooLow_56E5+18j
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 0E5h ; '�'
@@ -1127,10 +1102,10 @@ loc_574F:
 		jmp	short loc_57A3
 ; ���������������������������������������������������������������������������
 
-loc_57A1:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+B5j
+loc_57A1:				; CODE XREF: AI_Sensor_TooLow_56E5+B5j
 		xor	ax, ax
 
-loc_57A3:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+BAj
+loc_57A3:				; CODE XREF: AI_Sensor_TooLow_56E5+BAj
 		or	al, al
 		jz	short loc_57B2
 		les	bx, [bp+arg_0]
@@ -1138,18 +1113,18 @@ loc_57A3:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+BAj
 		jmp	short loc_57BB
 ; ���������������������������������������������������������������������������
 
-loc_57B2:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+C0j
+loc_57B2:				; CODE XREF: AI_Sensor_TooLow_56E5+C0j
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+28Dh], 0FDh
 
-loc_57BB:				; CODE XREF: AI_Sensor_InterceptFeasibleCached+1Aj AI_Sensor_InterceptFeasibleCached+CBj
+loc_57BB:				; CODE XREF: AI_Sensor_TooLow_56E5+1Aj AI_Sensor_TooLow_56E5+CBj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+28Dh]
 		shr	ax, 1
 		and	ax, 1
 		leave
 		retf
-AI_Sensor_InterceptFeasibleCached	endp
+AI_Sensor_TooLow_56E5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1235,10 +1210,12 @@ AI_Sensor_OwnSpeed	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,64L — cache à +0xF1 : appelle sub_4B805 sur position propre (+0xB) puis sub_5828E :
-; capteur caché : distance/altitude par rapport à un point de référence.
+; Ex-'AI_Sensor_DistanceFromRef'. far, 64L. VITESSE INDIQUEE (pas une distance) : |vitesse| x
+; sqrt(rho(altitude)/rho0) via FlightControl_ResolveNormalizedParam, mise en cache a
+; entite+0xF1 pour la frame. Utilisee par toutes les manoeuvres MVRS pour comparer aux
+; vitesses JDYN+0x80 (max) / +0x82 (min) / +0x84 (croisiere).
 ; ==============================================================================================
-AI_Sensor_DistanceFromRef	proc far		; CODE XREF: AI_Sensor_TargetInRange+36p AI_EvadeOrPursueSelector+DAp ...
+AI_Sensor_IndicatedAirspeed_5861	proc far		; CODE XREF: AI_Sensor_TooSlow_564A+36p AI_GroundAvoidPullUp_6616+DAp ...
 
 var_20		= dword	ptr -20h
 var_1C		= dword	ptr -1Ch
@@ -1293,7 +1270,7 @@ arg_4		= dword	ptr  0Ah
 		les	bx, [bp+arg_4]
 		mov	es:[bx+0F1h], eax
 
-loc_58E2:				; CODE XREF: AI_Sensor_DistanceFromRef+30j
+loc_58E2:				; CODE XREF: AI_Sensor_IndicatedAirspeed_5861+30j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -1301,7 +1278,7 @@ loc_58E2:				; CODE XREF: AI_Sensor_DistanceFromRef+30j
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-AI_Sensor_DistanceFromRef	endp
+AI_Sensor_IndicatedAirspeed_5861	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1313,7 +1290,7 @@ AI_Sensor_DistanceFromRef	endp
 ; DE ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180,
 ; mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C).
 ; ==============================================================================================
-AI_Sensor_RollAngle_58F4	proc far		; CODE XREF: AI_ThreatConeTest+8Ap
+AI_Sensor_RollAngle_58F4	proc far		; CODE XREF: AI_NoseHighRecovery_676F+8Ap
 					; AI_ManeuverSolution_Major+45Ep ...
 
 var_10		= dword	ptr -10h
@@ -1759,7 +1736,7 @@ loc_5D5A:				; CODE XREF: seg003:0D8Cj
 		or	es:[bx+1Ch], al
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr AI_Sensor_InterceptFeasibleCached
+		call	near ptr AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_5DA1
@@ -1806,7 +1783,7 @@ loc_5DF7:				; CODE XREF: seg003:0E6Cj
 		add	sp, 4
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr AI_Sensor_InterceptFeasibleCached
+		call	near ptr AI_Sensor_TooLow_56E5
 		add	sp, 4
 		or	al, al
 		jz	short loc_5E0E
@@ -1907,9 +1884,12 @@ AI_TriggerBehaviorUpdate	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,103L — calcule un vecteur relatif via vtable[0x3C]+sub_58768+sub_5593A+sub_549A6,
-; normalise l'angle résultant (wraparound ±0xB400) : calcul de relèvement (bearing) vers un
-; point de référence.
+; far, 103L, LUE 2026-09-25. ECART DE ROULIS VERS UNE DIRECTION : L =
+; Matrix_WorldToLocal_58768(orientation de l'avion, D) (repere avion : c0 envergure, c1 nez,
+; c2 haut) ; composante nez mise a 0 ; normalisation ; a = Math_AsinDeg_549A6(L.c0) ; si L.c2
+; < 0 (direction sous le plan des ailes) : a = 180 - a (a >= 0) ou -180 - a. Soit a =
+; atan2(L.c0, L.c2) : le roulis qui amene D dans le plan 'nez-haut' de l'avion (portance vers
+; la cible).
 ; ==============================================================================================
 AI_ComputeBearingToRef	proc far		; CODE XREF: AI_ManeuverSolution_Major+1B5p
 					; AI_GuidanceSolution_Major+528p ...
@@ -2448,7 +2428,7 @@ AI_ThrottleController	endp
 ; (+0x1E via pointeur +7), positionne un bit audio/warning (+0x1C bit5) selon détection ennemi
 ; (+0x75 bit0).
 ; ==============================================================================================
-AI_ThrottleCmd_HUD	proc far		; CODE XREF: AI_SpeedManeuverDecision+5Cp
+AI_ThrottleCmd_HUD	proc far		; CODE XREF: AI_RegainSpeed_68D4+5Cp
 					; AI_MissileEvasionReaction_9A77+280P ...
 
 arg_0		= dword	ptr  6
@@ -2819,13 +2799,13 @@ AI_Sensor_WeaponVelocityCache	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,162L — vérifie vitesse verticale (chute) et timer de menace (dword_7203D) : si critique,
-; déclenche manoeuvre d'urgence via sub_7E18 (virage vers cap 0x1E00, taux 0xA) + code HUD
-; 0x0A ; sinon évalue bearing (sub_59A5)/distance (sub_5861) vs seuil pour choisir code HUD 1
-; ou 0xA. Sélecteur de manoeuvre évasion/poursuite avec signalisation HUD, retourne booléen
-; (manoeuvre déclenchée).
+; Ex-'AI_EvadeOrPursueSelector'. far, 162L. Corps du tick de l'evitement du sol (MVRS ID14).
+; Si l'avion monte et est au-dessus du plancher (dword_7203D) : assiette +30 deg, cran de
+; manette 10, retourne 1 (fin). Sinon : cran 1 si nez vers le bas et vitesse indiquee >
+; minimale, sinon cran 10 ; commande d'assiette +30 deg (zone morte 10) via
+; AI_PitchToAngleCmd_7E18.
 ; ==============================================================================================
-AI_EvadeOrPursueSelector	proc far		; CODE XREF: seg008:324FP
+AI_GroundAvoidPullUp_6616	proc far		; CODE XREF: seg008:324FP
 
 var_24		= dword	ptr -24h
 var_20		= dword	ptr -20h
@@ -2860,10 +2840,10 @@ arg_0		= dword	ptr  6
 		jmp	short loc_6653
 ; ���������������������������������������������������������������������������
 
-loc_6651:				; CODE XREF: AI_EvadeOrPursueSelector+34j
+loc_6651:				; CODE XREF: AI_GroundAvoidPullUp_6616+34j
 		xor	ax, ax
 
-loc_6653:				; CODE XREF: AI_EvadeOrPursueSelector+39j
+loc_6653:				; CODE XREF: AI_GroundAvoidPullUp_6616+39j
 		or	al, al
 		jz	short loc_66BC
 		les	bx, [bp+arg_0]
@@ -2875,10 +2855,10 @@ loc_6653:				; CODE XREF: AI_EvadeOrPursueSelector+39j
 		jmp	short loc_6671
 ; ���������������������������������������������������������������������������
 
-loc_666F:				; CODE XREF: AI_EvadeOrPursueSelector+52j
+loc_666F:				; CODE XREF: AI_GroundAvoidPullUp_6616+52j
 		xor	ax, ax
 
-loc_6671:				; CODE XREF: AI_EvadeOrPursueSelector+57j
+loc_6671:				; CODE XREF: AI_GroundAvoidPullUp_6616+57j
 		or	al, al
 		jz	short loc_66BC
 		push	0Ah
@@ -2905,7 +2885,7 @@ loc_6671:				; CODE XREF: AI_EvadeOrPursueSelector+57j
 		jmp	loc_676C
 ; ���������������������������������������������������������������������������
 
-loc_66BC:				; CODE XREF: AI_EvadeOrPursueSelector+3Fj AI_EvadeOrPursueSelector+5Dj
+loc_66BC:				; CODE XREF: AI_GroundAvoidPullUp_6616+3Fj AI_GroundAvoidPullUp_6616+5Dj
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_C]
@@ -2921,10 +2901,10 @@ loc_66BC:				; CODE XREF: AI_EvadeOrPursueSelector+3Fj AI_EvadeOrPursueSelector
 		jmp	short loc_66E2
 ; ���������������������������������������������������������������������������
 
-loc_66E0:				; CODE XREF: AI_EvadeOrPursueSelector+C3j
+loc_66E0:				; CODE XREF: AI_GroundAvoidPullUp_6616+C3j
 		xor	ax, ax
 
-loc_66E2:				; CODE XREF: AI_EvadeOrPursueSelector+C8j
+loc_66E2:				; CODE XREF: AI_GroundAvoidPullUp_6616+C8j
 		or	al, al
 		jz	short loc_6721
 		push	large [bp+arg_0]
@@ -2932,7 +2912,7 @@ loc_66E2:				; CODE XREF: AI_EvadeOrPursueSelector+C8j
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_DistanceFromRef
+		call	near ptr AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, dword_72039
 		mov	[bp+var_14], eax
@@ -2943,10 +2923,10 @@ loc_66E2:				; CODE XREF: AI_EvadeOrPursueSelector+C8j
 		jmp	short loc_670F
 ; ���������������������������������������������������������������������������
 
-loc_670D:				; CODE XREF: AI_EvadeOrPursueSelector+F0j
+loc_670D:				; CODE XREF: AI_GroundAvoidPullUp_6616+F0j
 		xor	ax, ax
 
-loc_670F:				; CODE XREF: AI_EvadeOrPursueSelector+F5j
+loc_670F:				; CODE XREF: AI_GroundAvoidPullUp_6616+F5j
 		or	al, al
 		jz	short loc_6721
 		les	bx, [bp+arg_0]
@@ -2955,12 +2935,12 @@ loc_670F:				; CODE XREF: AI_EvadeOrPursueSelector+F5j
 		jmp	short loc_672D
 ; ���������������������������������������������������������������������������
 
-loc_6721:				; CODE XREF: AI_EvadeOrPursueSelector+CEj AI_EvadeOrPursueSelector+FBj
+loc_6721:				; CODE XREF: AI_GroundAvoidPullUp_6616+CEj AI_GroundAvoidPullUp_6616+FBj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+7]
 		mov	byte ptr es:[bx+1Eh], 0Ah
 
-loc_672D:				; CODE XREF: AI_EvadeOrPursueSelector+109j
+loc_672D:				; CODE XREF: AI_GroundAvoidPullUp_6616+109j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		mov	al, [bx+75h]
@@ -2982,11 +2962,11 @@ loc_672D:				; CODE XREF: AI_EvadeOrPursueSelector+109j
 		add	sp, 8
 		mov	al, 0
 
-loc_676C:				; CODE XREF: AI_EvadeOrPursueSelector+A3j
+loc_676C:				; CODE XREF: AI_GroundAvoidPullUp_6616+A3j
 		pop	si
 		leave
 		retf
-AI_EvadeOrPursueSelector	endp
+AI_GroundAvoidPullUp_6616	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2994,12 +2974,12 @@ AI_EvadeOrPursueSelector	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,169L — combine bearing (sub_59A5), détection ennemi (+0x75 bit6), distance (sub_5861 vs
-; dword_72039) et cap (sub_58F4 vs 0x3C00) pour décider si la cible est dans le cône
-; d'engagement ; déclenche éventuellement virage d'évitement via sub_7E18(rate=0xA,
-; angle=-0x1E00). Test 'cible dans le cône de tir/menace' + réaction évasive.
+; Ex-'AI_ThreatConeTest'. far, 169L. Corps du tick de la recuperation nez haut / decrochage
+; (MVRS ID15). Termine (retourne 1) quand le nez est repasse sous l'horizon (et plus en
+; decrochage lent). Si assiette > 60 deg et decroche : manette au ralenti (cran 0) ; sinon
+; cran 10 et, hors decrochage, assiette -30 deg (zone morte 10).
 ; ==============================================================================================
-AI_ThreatConeTest	proc far		; CODE XREF: AI_CombatDecision_Major+CDp seg008:3309P
+AI_NoseHighRecovery_676F	proc far		; CODE XREF: AI_CombatDecision_Major+CDp seg008:3309P
 
 var_20		= dword	ptr -20h
 var_1C		= dword	ptr -1Ch
@@ -3034,7 +3014,7 @@ arg_0		= dword	ptr  6
 		lea	ax, [bp+var_8]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_DistanceFromRef
+		call	near ptr AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		mov	eax, dword_72039
 		mov	[bp+var_C], eax
@@ -3045,14 +3025,14 @@ arg_0		= dword	ptr  6
 		jmp	short loc_67C4
 ; ���������������������������������������������������������������������������
 
-loc_67C2:				; CODE XREF: AI_ThreatConeTest+4Cj
+loc_67C2:				; CODE XREF: AI_NoseHighRecovery_676F+4Cj
 		xor	ax, ax
 
-loc_67C4:				; CODE XREF: AI_ThreatConeTest+51j
+loc_67C4:				; CODE XREF: AI_NoseHighRecovery_676F+51j
 		or	al, al
 		jz	short loc_67EF
 
-loc_67C8:				; CODE XREF: AI_ThreatConeTest+2Aj
+loc_67C8:				; CODE XREF: AI_NoseHighRecovery_676F+2Aj
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_10]
@@ -3066,17 +3046,17 @@ loc_67C8:				; CODE XREF: AI_ThreatConeTest+2Aj
 		jmp	short loc_67E6
 ; ���������������������������������������������������������������������������
 
-loc_67E4:				; CODE XREF: AI_ThreatConeTest+6Ej
+loc_67E4:				; CODE XREF: AI_NoseHighRecovery_676F+6Ej
 		xor	ax, ax
 
-loc_67E6:				; CODE XREF: AI_ThreatConeTest+73j
+loc_67E6:				; CODE XREF: AI_NoseHighRecovery_676F+73j
 		or	al, al
 		jz	short loc_67EF
 		mov	al, 1
 		jmp	locret_68D2
 ; ���������������������������������������������������������������������������
 
-loc_67EF:				; CODE XREF: AI_ThreatConeTest+57j AI_ThreatConeTest+79j
+loc_67EF:				; CODE XREF: AI_NoseHighRecovery_676F+57j AI_NoseHighRecovery_676F+79j
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_18]
@@ -3089,7 +3069,7 @@ loc_67EF:				; CODE XREF: AI_ThreatConeTest+57j AI_ThreatConeTest+79j
 		jge	short loc_680B
 		neg	eax
 
-loc_680B:				; CODE XREF: AI_ThreatConeTest+97j
+loc_680B:				; CODE XREF: AI_NoseHighRecovery_676F+97j
 		mov	[bp+var_1C], eax
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_14], eax
@@ -3099,10 +3079,10 @@ loc_680B:				; CODE XREF: AI_ThreatConeTest+97j
 		jmp	short loc_6828
 ; ���������������������������������������������������������������������������
 
-loc_6826:				; CODE XREF: AI_ThreatConeTest+B0j
+loc_6826:				; CODE XREF: AI_NoseHighRecovery_676F+B0j
 		xor	ax, ax
 
-loc_6828:				; CODE XREF: AI_ThreatConeTest+B5j
+loc_6828:				; CODE XREF: AI_NoseHighRecovery_676F+B5j
 		or	al, al
 		jz	short loc_6871
 		les	bx, [bp+arg_0]
@@ -3128,7 +3108,7 @@ loc_6828:				; CODE XREF: AI_ThreatConeTest+B5j
 		jmp	short loc_68D0
 ; ���������������������������������������������������������������������������
 
-loc_6871:				; CODE XREF: AI_ThreatConeTest+BBj AI_ThreatConeTest+CFj
+loc_6871:				; CODE XREF: AI_NoseHighRecovery_676F+BBj AI_NoseHighRecovery_676F+CFj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+7]
 		mov	byte ptr es:[bx+1Eh], 0Ah
@@ -3160,14 +3140,14 @@ loc_6871:				; CODE XREF: AI_ThreatConeTest+BBj AI_ThreatConeTest+CFj
 		call	near ptr AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
-loc_68D0:				; CODE XREF: AI_ThreatConeTest+100j
-					; AI_ThreatConeTest+145j
+loc_68D0:				; CODE XREF: AI_NoseHighRecovery_676F+100j
+					; AI_NoseHighRecovery_676F+145j
 		mov	al, 0
 
-locret_68D2:				; CODE XREF: AI_ThreatConeTest+7Dj
+locret_68D2:				; CODE XREF: AI_NoseHighRecovery_676F+7Dj
 		leave
 		retf
-AI_ThreatConeTest	endp
+AI_NoseHighRecovery_676F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3175,14 +3155,11 @@ AI_ThreatConeTest	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,74L — DECISION VITESSE/MANOEUVRE IA. JDYN = es:[arg_0+0x0B]. Seuil = (movsx jdyn[0x84]
-; (i16, def 231) + dword_72039) / 2 ; si seuil<<8 > distance (AI_Sensor_DistanceFromRef) ->
-; retourne 1 (maintien de vitesse). Sinon (loc_691C) : AI_ThrottleCmd_HUD(jdyn[0x80])
-; (consigne = vitesse IA max) + AI_PitchToAngleCmd_7E18(rate=5, angle=0x500) -> retourne 0.
-; jdyn[0x84] = vitesse de croisiere/manoeuvre IA (sert aussi de consigne throttle directe dans
-; GroundAttack_Phase4_PullUp_77171, ovr231).
+; Ex-'AI_SpeedManeuverDecision'. far, 74L. Corps du tick 'reprendre de la vitesse' (MVRS
+; ID16). Termine quand vitesse indiquee > (croisiere JDYN+0x84 + dword_72039)/2 ; sinon
+; manette a la vitesse max JDYN+0x80 et assiette +5 deg.
 ; ==============================================================================================
-AI_SpeedManeuverDecision	proc far		; CODE XREF: seg008:3372P seg008:33A0P
+AI_RegainSpeed_68D4	proc far		; CODE XREF: seg008:3372P seg008:33A0P
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -3197,7 +3174,7 @@ arg_0		= dword	ptr  6
 		lea	ax, [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_DistanceFromRef
+		call	near ptr AI_Sensor_IndicatedAirspeed_5861
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
@@ -3212,17 +3189,17 @@ arg_0		= dword	ptr  6
 		jmp	short loc_6914
 ; ���������������������������������������������������������������������������
 
-loc_6912:				; CODE XREF: AI_SpeedManeuverDecision+37j
+loc_6912:				; CODE XREF: AI_RegainSpeed_68D4+37j
 		xor	ax, ax
 
-loc_6914:				; CODE XREF: AI_SpeedManeuverDecision+3Cj
+loc_6914:				; CODE XREF: AI_RegainSpeed_68D4+3Cj
 		or	al, al
 		jz	short loc_691C
 		mov	al, 1
 		jmp	short locret_6975
 ; ���������������������������������������������������������������������������
 
-loc_691C:				; CODE XREF: AI_SpeedManeuverDecision+42j
+loc_691C:				; CODE XREF: AI_RegainSpeed_68D4+42j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		movsx	eax, word ptr [bx+80h]
@@ -3252,10 +3229,10 @@ loc_691C:				; CODE XREF: AI_SpeedManeuverDecision+42j
 		add	sp, 8
 		mov	al, 0
 
-locret_6975:				; CODE XREF: AI_SpeedManeuverDecision+46j
+locret_6975:				; CODE XREF: AI_RegainSpeed_68D4+46j
 		leave
 		retf
-AI_SpeedManeuverDecision	endp
+AI_RegainSpeed_68D4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4029,38 +4006,25 @@ AI_InterceptDispatcher	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 651 lignes - LUE INTEGRALEMENT (a la demande de Remi). VRAIE LOI DE GUIDAGE DE
-; POURSUITE AVEC ANTICIPATION (proportional navigation / lead pursuit), le coeur geometrique
-; de la chaine de combat aerien IA (AI_SYSTEM.md §4bis). Prend deux vecteurs d'approche
-; (si=arg_4, di=arg_6, chacun transforme/calcule via Math_HeadingAngle_553CF), calcule leur
-; DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois :
-; cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE
-; DIVERGENT (>90 deg, ligne ~16530) : bascule sur un calcul alternatif (angle=0, pas de
-; correction fine) plutot que Math_AngleBetweenVectors, evitant les artefacts numeriques d'un
-; calcul d'angle sur des vecteurs presque opposes. GARDE PORTEE CAPTEUR (ligne ~16571) :
-; compare [avion+0x1A] a dword_7203D (le seuil de portee de capteur deja connu
-; d'AIEntity_MasterTick) - si hors de portee de detection reelle, saute directement a un ANGLE
-; FIXE MAXIMAL (±166 deg, constante 0xFFFFA600/-0x5A00) plutot que de calculer une correction
-; fine. ESTIMATION DE TEMPS DE VIRAGE (ligne ~16604-16650) : calcule une estimation du temps
-; necessaire pour completer un virage, BASEE SUR LA CAPACITE DE MANOEUVRE PROPRE DE L'AVION
-; ([avion+0x67], meme champ que les sequences de manoeuvre MVRS_ID14b) - un avion plus
-; manoeuvrant obtient une estimation de temps plus courte, permettant des corrections plus
-; agressives. PLUSIEURS PALIERS D'ANGLE LIMITE (lignes ~16800-16870) : clamps a ±166 deg (cas
-; extreme) ou ±45 deg (cas modere, 0x2D00) selon la situation geometrique. REORIENTATION DU
-; VECTEUR D'ENTREE (ligne ~16880, si var_1==1) : recalcule la 3e composante du vecteur si par
-; un facteur cosinus (Math_SinDeg_54876) proportionnel a la distance
-; (Math_VectorLength3D_Raw_5828E), puis re-transforme (Vector_TransformHelperB_559BB) - ajuste
-; l'approche en fonction de la distance a la cible. SORTIE (fin de fonction, ligne
-; ~17058-17075) : calcule un DERNIER delta d'angle final (var_A, wrappe ±180 deg), puis
-; DELEGUE DIRECTEMENT (appel en queue) A AI_CombatDecision_Major_75F8 en lui passant CE cap
-; final PLUS deux autres deltas intermediaires (var_68, var_E) et l'argument original (arg_8)
-; - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie
-; complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de
-; guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) ->
-; AI_CombatDecision_Major (decision) -> AI_RollToAngleCmd_8104 (execution). ⚠️ (2026-09-24)
-; Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir
-; Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a
-; relire.
+; far, 651 lignes, RELUE INTEGRALEMENT 2026-09-25 (vrais noms trigonometriques ; l'ancien
+; resume, errone : pas de '+/-166 deg' (0xFFFFA600 = -90), pas d'estimation de temps de
+; virage). LOI DE PILOTAGE VERS UNE DIRECTION. Arguments : entite, D = direction voulue
+; (normalisee sur place), R = direction de reference (vitesse de mon arme / de l'avion selon
+; l'appelant), arg_8 transmis. (1) ecart de cap h = cap(D) - cap(R) (Math_HeadingAngle_553CF),
+; ramene a +/-180. (2) elevation voulue e = 0 si |h| >= 90 (virage a plat quand la cible est
+; derriere, [si+8] = 0), sinon Math_ElevationAngle_552E1(D) ; p = tangage du nez
+; (AI_Sensor_NosePitch_59A5). (3) PROTECTIONS D'ALTITUDE (plancher dword_7203D, calcule par
+; AIEntity_MasterTick_5ACC) : (a) si altitude ([obj+0x1A]) <= plancher et e < p : e = min(80,
+; 80 * (plancher - altitude) / entite[+0xE5]) (remontee) ; (b) sinon angle de pique minimal m
+; : 0 si le facteur de charge de l'avion [avion+0x67] < 2 ; sinon r = v^2 / (9,8 * n/2) (rayon
+; de ressource, v = AI_Sensor_OwnSpeed, n = [avion+0x67]) ; m = -90 si la hauteur au-dessus du
+; plancher h >= r, sinon m = -Math_AcosDeg_5493E((r - h) / r) ; si e < m : e = m ; sinon si p
+; < -45 et e < p : e = -45 ; sinon si p >= 45 et e > p : e = 45. En cas de correction, D est
+; recalcule avec une composante verticale sin(e) * |D horizontal| puis renormalise. (4) ecart
+; d'elevation v = elevation(D) - elevation(R), +/-180. (5) ECART DE ROULIS r : h >= 90 -> r =
+; 90 - roulis (AI_Sensor_RollAngle_58F4), moins v si v > 0 ; h <= -90 -> r = -90 - roulis,
+; plus v si v > 0 ; sinon r = AI_ComputeBearingToRef (roulis qui place D dans le plan vertical
+; de l'avion). r ramene a +/-180. (6) AI_CombatDecision_Major(entite, &h, &v, &r, arg_8).
 ; ==============================================================================================
 AI_GuidanceSolution_Major	proc far		; CODE XREF: AI_InterceptDispatcher+B9p AI_GuidanceCmd_FromOwnPos+46p ...
 
@@ -4871,7 +4835,7 @@ arg_8		= word ptr  0Eh
 		mov	es:[bx+27h], eax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_Sensor_TargetInRange
+		call	near ptr AI_Sensor_TooSlow_564A
 		add	sp, 4
 		or	al, al
 		jz	short loc_76AC
@@ -4932,7 +4896,7 @@ loc_76AC:				; CODE XREF: AI_CombatDecision_Major+5Aj
 		jz	short loc_76CE
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_ThreatConeTest
+		call	near ptr AI_NoseHighRecovery_676F
 		add	sp, 4
 		jmp	loc_7B19
 ; ���������������������������������������������������������������������������
@@ -5812,8 +5776,8 @@ AI_PitchController_7B20	endp
 ; TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis
 ; AI_PitchController_7B20(entite, &ecart, zone morte).
 ; ==============================================================================================
-AI_PitchToAngleCmd_7E18	proc far		; CODE XREF: AI_EvadeOrPursueSelector+73p
-					; AI_EvadeOrPursueSelector+14Ep ...
+AI_PitchToAngleCmd_7E18	proc far		; CODE XREF: AI_GroundAvoidPullUp_6616+73p
+					; AI_GroundAvoidPullUp_6616+14Ep ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4

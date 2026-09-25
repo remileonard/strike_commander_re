@@ -439,7 +439,7 @@ Physics_ResolveWindVectorCached_4643B	endp
 ; point d'application (moment/couple).
 ; ==============================================================================================
 Physics_ApplyForceAtPoint	proc far		; CODE XREF: AI_VisibilityTest+6EP
-					; Missile_PhysicsTick+182P ...
+					; MVRS_BuildCombatContext_E5A4+182P ...
 
 var_18		= dword	ptr -18h
 var_14		= dword	ptr -14h

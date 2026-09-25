@@ -419,11 +419,13 @@ AI_ScanForNewTarget	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,96L — gère le sous-état d'escorte +0x27F==4 : vérifie le canal radio (+0xC5, vtable[4])
-; avant de notifier la cible (sub_6AB54) : handler d'attente de clairance radio (probable
-; 'attente autorisation atterrissage').
+; Ex-'Escort_WaitLandingClearance'. far, 96L. REFLEXE D'EVITEMENT DU SOL (niveau de reaction
+; entite+0x27F = 4 ; pas une attente de clairance d'atterrissage). Lanceur generique : si le
+; comportement en cours a deja ce niveau, le faire avancer ; si un autre comportement tourne,
+; 0 ; sinon noter le noeud fixe ID14 (entite+0xC5) avec un contexte (sans cible, minuteur 2 s)
+; ; s'il repond > 0 : abandon du comportement en cours, application d'ID14, niveau = 4.
 ; ==============================================================================================
-Escort_WaitLandingClearance	proc far		; CODE XREF: AI_TopLevelThink+224P
+AI_GroundAvoidReflex_E06C	proc far		; CODE XREF: AI_TopLevelThink+224P
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -457,7 +459,7 @@ arg_0		= dword	ptr  6
 		jmp	locret_E157
 ; ���������������������������������������������������������������������������
 
-loc_E0B9:				; CODE XREF: Escort_WaitLandingClearance+2Cj Escort_WaitLandingClearance+34j
+loc_E0B9:				; CODE XREF: AI_GroundAvoidReflex_E06C+2Cj AI_GroundAvoidReflex_E06C+34j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+0Dh], 0
 		jz	short loc_E0C9
@@ -465,13 +467,13 @@ loc_E0B9:				; CODE XREF: Escort_WaitLandingClearance+2Cj Escort_WaitLandingCle
 		jmp	locret_E157
 ; ���������������������������������������������������������������������������
 
-loc_E0C9:				; CODE XREF: Escort_WaitLandingClearance+56j
+loc_E0C9:				; CODE XREF: AI_GroundAvoidReflex_E06C+56j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 4
 		jnz	short loc_E0DA
 		mov	byte ptr es:[bx+27Fh], 0
 
-loc_E0DA:				; CODE XREF: Escort_WaitLandingClearance+66j
+loc_E0DA:				; CODE XREF: AI_GroundAvoidReflex_E06C+66j
 		mov	[bp+var_6], 3748h
 		mov	[bp+var_12], 200h
 		mov	eax, [bp+var_12]
@@ -494,7 +496,7 @@ loc_E0DA:				; CODE XREF: Escort_WaitLandingClearance+66j
 		call	VROOMM_StubThunk_6AB54
 		add	sp, 4
 
-loc_E12B:				; CODE XREF: Escort_WaitLandingClearance+B0j
+loc_E12B:				; CODE XREF: AI_GroundAvoidReflex_E06C+B0j
 		lea	ax, [bp+var_A]
 		push	ax
 		les	bx, [bp+arg_0]
@@ -509,16 +511,16 @@ loc_E12B:				; CODE XREF: Escort_WaitLandingClearance+B0j
 		jmp	short loc_E155
 ; ���������������������������������������������������������������������������
 
-loc_E153:				; CODE XREF: Escort_WaitLandingClearance+A5j
+loc_E153:				; CODE XREF: AI_GroundAvoidReflex_E06C+A5j
 		mov	dl, 0
 
-loc_E155:				; CODE XREF: Escort_WaitLandingClearance+E5j
+loc_E155:				; CODE XREF: AI_GroundAvoidReflex_E06C+E5j
 		mov	al, dl
 
-locret_E157:				; CODE XREF: Escort_WaitLandingClearance+4Aj Escort_WaitLandingClearance+5Aj
+locret_E157:				; CODE XREF: AI_GroundAvoidReflex_E06C+4Aj AI_GroundAvoidReflex_E06C+5Aj
 		leave
 		retf
-Escort_WaitLandingClearance	endp
+AI_GroundAvoidReflex_E06C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -526,10 +528,11 @@ Escort_WaitLandingClearance	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,96L — identique à sub_E06C mais sous-état +0x27F==5 et canal +0xC9 : handler d'attente
-; de clairance radio (probable 'attente autorisation décollage').
+; Ex-'Escort_WaitTakeoffClearance'. far, 96L. REFLEXE DE RECUPERATION NEZ HAUT / DECROCHAGE
+; (niveau entite+0x27F = 5 ; pas une attente de clairance de decollage). Meme lanceur que
+; AI_GroundAvoidReflex_E06C avec le noeud fixe ID15 (entite+0xC9).
 ; ==============================================================================================
-Escort_WaitTakeoffClearance	proc far		; CODE XREF: AI_TopLevelThink+1D8P
+AI_StallRecoveryReflex_E159	proc far		; CODE XREF: AI_TopLevelThink+1D8P
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -563,7 +566,7 @@ arg_0		= dword	ptr  6
 		jmp	locret_E244
 ; ���������������������������������������������������������������������������
 
-loc_E1A6:				; CODE XREF: Escort_WaitTakeoffClearance+2Cj Escort_WaitTakeoffClearance+34j
+loc_E1A6:				; CODE XREF: AI_StallRecoveryReflex_E159+2Cj AI_StallRecoveryReflex_E159+34j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+0Dh], 0
 		jz	short loc_E1B6
@@ -571,13 +574,13 @@ loc_E1A6:				; CODE XREF: Escort_WaitTakeoffClearance+2Cj Escort_WaitTakeoffCle
 		jmp	locret_E244
 ; ���������������������������������������������������������������������������
 
-loc_E1B6:				; CODE XREF: Escort_WaitTakeoffClearance+56j
+loc_E1B6:				; CODE XREF: AI_StallRecoveryReflex_E159+56j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 5
 		jnz	short loc_E1C7
 		mov	byte ptr es:[bx+27Fh], 0
 
-loc_E1C7:				; CODE XREF: Escort_WaitTakeoffClearance+66j
+loc_E1C7:				; CODE XREF: AI_StallRecoveryReflex_E159+66j
 		mov	[bp+var_6], 3748h
 		mov	[bp+var_12], 200h
 		mov	eax, [bp+var_12]
@@ -600,7 +603,7 @@ loc_E1C7:				; CODE XREF: Escort_WaitTakeoffClearance+66j
 		call	VROOMM_StubThunk_6AB54
 		add	sp, 4
 
-loc_E218:				; CODE XREF: Escort_WaitTakeoffClearance+B0j
+loc_E218:				; CODE XREF: AI_StallRecoveryReflex_E159+B0j
 		lea	ax, [bp+var_A]
 		push	ax
 		les	bx, [bp+arg_0]
@@ -615,16 +618,16 @@ loc_E218:				; CODE XREF: Escort_WaitTakeoffClearance+B0j
 		jmp	short loc_E242
 ; ���������������������������������������������������������������������������
 
-loc_E240:				; CODE XREF: Escort_WaitTakeoffClearance+A5j
+loc_E240:				; CODE XREF: AI_StallRecoveryReflex_E159+A5j
 		mov	dl, 0
 
-loc_E242:				; CODE XREF: Escort_WaitTakeoffClearance+E5j
+loc_E242:				; CODE XREF: AI_StallRecoveryReflex_E159+E5j
 		mov	al, dl
 
-locret_E244:				; CODE XREF: Escort_WaitTakeoffClearance+4Aj Escort_WaitTakeoffClearance+5Aj
+locret_E244:				; CODE XREF: AI_StallRecoveryReflex_E159+4Aj AI_StallRecoveryReflex_E159+5Aj
 		leave
 		retf
-Escort_WaitTakeoffClearance	endp
+AI_StallRecoveryReflex_E159	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

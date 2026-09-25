@@ -438,7 +438,7 @@ Vector_CrossProduct3D_550B7	endp
 ; far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B.
 ; ==============================================================================================
 Targeting_ComputeGeometryHelperB_5517F	proc far		; CODE XREF: AI_InterceptSpeedControlLaw+EDP
-					; Missile_PhysicsTick+414P ...
+					; MVRS_BuildCombatContext_E5A4+414P ...
 
 var_2C		= dword	ptr -2Ch
 var_28		= dword	ptr -28h
@@ -2688,7 +2688,7 @@ loc_561A6:				; CODE XREF: seg116:12D0j
 ; ==============================================================================================
 ; far, référencée deux fois par sub_526F, utilise sub_5828E (longueur vectorielle).
 ; ==============================================================================================
-Weapon_ComputeVectorLength_561AF	proc far		; CODE XREF: Vec3_Negate+2FP Vec3_Negate+39P ...
+Weapon_ComputeVectorLength_561AF	proc far		; CODE XREF: Vector2D_CrossSign_526F+2FP Vector2D_CrossSign_526F+39P ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4

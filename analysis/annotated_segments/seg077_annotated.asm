@@ -485,7 +485,7 @@ loc_378B1:				; CODE XREF: seg077:02F7j seg077:0326j
 ; utilisée à la fois par le rendu et par l'IA de vol (seg003) pour le suivi de
 ; terrain/évitement.
 ; ==============================================================================================
-Terrain_QueryAltitudeAt	proc far		; CODE XREF: AI_Sensor_InterceptFeasibleCached+93P seg003:0C6DP ...
+Terrain_QueryAltitudeAt	proc far		; CODE XREF: AI_Sensor_TooLow_56E5+93P seg003:0C6DP ...
 
 var_2A		= dword	ptr -2Ah
 var_26		= dword	ptr -26h
