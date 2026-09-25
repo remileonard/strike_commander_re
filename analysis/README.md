@@ -456,7 +456,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
     (`Physics_IntegratePosition`, transform corps→monde) ; asservissement
     d'attitude en `±2·√(q'·err)` (`Aero_ComputeForcesMain`) ; contrainte de
     hauteur sol (`Physics_ApplyGroundHeightConstraint`).
-    `Pilot_SteeringCommandToTarget` (`sub_49242`) = loi de guidage vers cible.
+    `JDYN_JumpToPoint_49242` (ex-`Pilot_SteeringCommandToTarget`) = saut instantané de l’avion vers un point, avec consommation du carburant du trajet (relu 2026-09-25 ; ce n’est pas une loi de guidage).
 30. **`flags_75` — bits confirmés par le porteur du projet** : bit0 = aérofrein
     sorti, bit2 = train d'atterrissage sorti (tous deux → traînée additionnelle
     `jdyn[0x37]`/`jdyn[0x3B]`) ; bit1 = volets sortis → ajoute `jdyn[0x4D]`
@@ -1078,7 +1078,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Aero_ComputeDragWithFeedback_48400` | 248 | seg103 | **LU — ex-`ComputeMomentsWithFeedback` : VECTEUR DE TRAÎNÉE `−v̂_corps·[q·(0x5D·α² + (0x5D≫3)·β² + drag_flags75)]`** |
 | `Aero_ComputeCoeffSaturating_4730F` | 234 | seg102 | Coefficient aérodynamique non-linéaire avec saturation |
 | `ChaseCamera_RenderEffect_4D1C9` | 450 | seg106 | Effet visuel lié à la caméra de poursuite |
-| `Aero_ComputeControlFlags75Bit5B_48862` | 375 | seg103 | Calcul contrôle dépendant de `flags_75` bit5 |
+| `Aero_ComputeAoACommand_48862_48862` | 375 | seg103 | Calcul contrôle dépendant de `flags_75` bit5 |
 | `ParticleEmitter_PeriodicUpdate_4C413` | 351 | seg106 | Mise à jour périodique d'émetteur de particules |
 | `FlightPhysics_TickCandidate_4F4EE` | 58 | seg109 | **RÉSOLU — tick des 3 classes `DYNM` simples (missile/bombe), PAS de l'avion (= `PhysicsTicks`). Divise par la masse via `vtable[0x10]`.** |
 | `UIScreen_StateMachineMain_4FBF1` | 645 | seg112 | Machine à états d'un écran/dialogue UI (formulaire numérique) |

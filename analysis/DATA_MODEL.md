@@ -424,7 +424,7 @@ offsets non contigus de la struct 0xC5. **Payload disque = 73 octets (`0x49`)**.
 
 Chunk absent → erreur `0xA005`. Avant lecture, `PlayerComponent_ResetVisualStateDefaults_A5620`
 pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
-`[si+0x75]` = bit4|bit7, et remet **7 gains globaux** (`dword_72A14/18/1C/20/24/28/2C`) à `0x100` (1.0 en 8.8).
+`[si+0x75]` = bit4|bit7, et remet **7 gains de dégâts** (`dword_72A14/18/1C/20/24/28/2C`) à 1,0. Ils sont ensuite recalculés à chaque tick par `JDYN_UpdateDamageGains_494DD` (voir `PHYSICS.md` §5.9).
 
 #### Sémantique des champs (tracée seg103, avec sites de lecture)
 
@@ -432,7 +432,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 |---|---|---|
 | `+0x69` | **capacité carburant** (24.8) — *fait vérifié côté données* | copié en `+0x6D`, jamais lu en calcul |
 | `+0x6D` | **carburant courant** (24.8, copie runtime de `+0x69`) | `sub_49242` L2560 `sub [si+6Dh],eax` ; clamp `≥0` L2554/L5118 ; `≤0` → `[si+0x28]=0` (**flameout**) L5121 |
-| `+0x33` | **coefficient de consommation carburant** | `sub_49242` L2543-2549 : `burn = (0xA00·throttle) × [+0x33] >> 8` puis `[+0x6D] -= burn` |
+| `+0x33` | **coefficient de consommation carburant** | `PhysicsTicks` : `burn = (10 − 9·g_fuel) · [+0x33] · facteur de cran · dt` ; `JDYN_JumpToPoint_49242` : même facteur × durée du trajet (relu 2026-09-25, `PHYSICS.md` §4.4) |
 | `+0x37` | **traînée aérofreins sortis** | `Aero_ComputeDragFromFlags75` L146 : `if flags_75 bit0: drag += [+0x37]` |
 | `+0x3B` | **traînée train sorti** | id. L157 : `if flags_75 bit2: drag += [+0x3B]` |
 | `+0x3F` | coeff. de traînée **au sol** (roulage/réaction sol) | `Aero_ComputeDragWithFeedback` L724, gaté par `[A+0x20]` (flag « au sol ») |
@@ -446,9 +446,9 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x56`/`+0x57`/`+0x58` | bornes d'attitude 3 axes (i8, `<<8`) pour « au sol » | id. L2221/2231/2245 |
 | `+0x59` | **altitude plafond de l'effet de sol** | `Aero_ApplyGroundEffect` L1546 (`if alt < [+0x59]` → `-0x1400`) |
 | `+0x61` | **gain de portance / d'agilité de la cellule** (aussi utilisé ÷4 pour la force latérale) | `Aero_ComputeLiftAndSideForce` L343 |
-| `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeControlFlags75Bit5B` L1457 |
+| `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeAoACommand_48862` L1457 |
 | `+0x66` | valeur de reset de l'accumulateur `[jdyn+0x1A]` × gain `dword_72A18` | `Aero_ResetAccumulatorFlags75Bit5` L1972 |
-| `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeControlFlags75Bit5B` L1158 |
+| `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeAoACommand_48862` L1158 |
 | `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) | `Autopilot_BankForTurn_49A7C` L3441 |
 | `+0x80` (u16, déf. 500) | **Vitesse de poursuite MAX de l'IA** — consigne haute quand la cible est loin ; l'IA interpole/plafonne sa vitesse de consigne vers `jdyn[0x80]<<8`, et la passe telle quelle à `AI_ThrottleCmd_HUD`. | `AI_InterceptSpeedControlLaw` `sub_5F9B` (seg003) `loc_60DF`/`loc_610A`/`loc_61AB` ; `AI_SpeedManeuverDecision` `sub_68D4` `loc_691C` |
 | `+0x82` (u16, déf. 100) | **Vitesse de poursuite MIN de l'IA** — plancher : `var_4 = max(var_4, jdyn[0x82]<<8)` sur la consigne de vitesse. | `AI_InterceptSpeedControlLaw` `sub_5F9B` L2044-2070 |
@@ -514,13 +514,14 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
    → [A+0x20] (flag « au sol ») posé/effacé selon difficulté word_70466
 2. FlightControl_InvalidateAllCachesGlobal(si)              reset des caches aéro
 3. MANETTE DES GAZ → POUSSÉE
-   cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), rate-limité (× dword_72A2C·10)
+   cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), PLAFONNÉ à arrondi(10·dword_72A2C) et réécrit
    → Aero_ComputeCoeffSaturating(si+0x22, cran) → [si+0x28] = poussée courante
      (× gain dword_72A2C)
 4. CONSOMMATION CARBURANT
    facteur 0x33 (51) si MIL (cran ≤ 5) sinon 0x4C (76) en AFT (post-comb. ≈ 1,5×)
-   burn = base · dword_72A14 · [si+0x33](SFC) · cran · dt
-   [si+0x6D] -= burn ;  flameout ([si+0x28] = 0) si [si+0x6D] ≤ 0
+   burn = (10 − 9·dword_72A14) · [si+0x33](SFC) · (cran·0,199 si cran ≤ 5, cran·0,297 sinon) · dt
+   (multiplication par le facteur de cran SAUTÉE s'il vaut 0 : au cran 0, burn = SFC·dt)
+   [si+0x6D] -= burn ;  si [si+0x6D] ≤ 0 avant le bloc : carburant = 0, poussée [si+0x28] = 0
 5. ÉTAT volets/aérofrein/train  ← bits du sous-objet contrôle es:[obj2+0x1C/0x1D]
    + Roster("FLAPS"/"LANDGEAR") ; agit sur flags_75 [si+0x75]
 6. vitesse = |A.velocity([A+8/+C/+10])|                     auto-comportements bas niveau
@@ -530,7 +531,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
       Aero_SumLinearForces_48639(si) → [A+0x14/+0x18/+0x1C] = ACCÉLÉRATION LINÉAIRE (net des forces)
       Aero_ControlOrchestrator(si, arg_2) → vecteur moment (tangage,roulis,lacet)
           — relu intégralement, session 2026-09-05 (seg103 L2099-2185), 5 sous-appels :
-          1. Aero_ComputeControlFlags75Bit5B(si) : calcule la CONSIGNE D'INCIDENCE (loi de charge,
+          1. Aero_ComputeAoACommand_48862(si) : calcule la CONSIGNE D'INCIDENCE (loi de charge,
              var_30=cos(tangage), relue 2026-09-24) et l'écrit dans si[0x16] — PAS de retour capturé ici.
           2. Aero_ResetAccumulatorFlags75Bit5(si) : calcule la CONSIGNE de lacet (palonnier seul,
              confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A] — pas de retour capturé.
@@ -765,14 +766,13 @@ fLapse(h) :   h ≤ href :  1 − (h/href) · (1 − jdyn[0x31])
 C'est un **lapse de poussée avec l'ALTITUDE** (moins d'air en altitude), pas avec
 la vitesse. `jdyn[0x2C]` = poussée PC max (N), `jdyn[0x30]` = fraction MIL,
 `jdyn[0x31]` = fraction de poussée à 11 000 m, `jdyn[0x32]` = altitude de coupure
-÷100. **Les gains globaux `dword_72A14..72A2C` valent tous `1.0`** (`0x100`,
-`sub_A5620`) — **corrigé 2026-09-25 : ils valent 1,0 seulement quand le composant est intact** ; `JDYN_UpdateDamageGains_494DD` (en tête de `PhysicsTicks`) les recalcule chaque tick comme rapports de santé des composants FUEL, RUDDER, ELEVATOR, AILERON, LWING/RWING et ENGINE.
+÷100. **Gains `dword_72A14..72A2C`** — **corrigé 2026-09-25 : ils valent 1,0 seulement quand le composant est intact** ; `JDYN_UpdateDamageGains_494DD` (en tête de `PhysicsTicks`) les recalcule chaque tick comme rapports de santé des composants FUEL, RUDDER, ELEVATOR, AILERON, LWING/RWING et ENGINE.
 
 ##### `Aero_ControlOrchestrator` (`sub_48FC2`, seg103 L2056-2142) : moments de contrôle
 
 Assemble le **vecteur de moment** passé à `Physics_IntegrateSecondaryPosition`
 (→ orientation `[si+4]`). Deux pré-appels à effet de bord :
-`Aero_ComputeControlFlags75Bit5B` (calcule la **consigne d'incidence
+`Aero_ComputeAoACommand_48862` (calcule la **consigne d'incidence
 `si[0x16]`** depuis le manche pilote `[ctrl+0x1F]`, le gain `si[0x61]`, le coeff
 `si[0x65]·dword_72A1C`, le calage d'aile `si[0x4C]` et les volets `si[0x4D]` ;
 **ne lit pas** `si[0x59]` — loi complète relue le 2026-09-24, voir plus bas
@@ -895,7 +895,7 @@ tick(struct JDYN) :
   vitesse_monde += transform_corps→monde(accel_corps) · dt  Physics_IntegratePosition([A], [A]+0x14)
   si au sol : projeter la vitesse hors du plan sol, v_alt ≥ 0, deadband, drag roulage
   orientation : Aero_ControlOrchestrator → moments (mα, ?, mβ) → Physics_IntegrateSecondaryPosition
-    consigne α  si[0x16] ← manche [ctrl+0x1F]  (Aero_ComputeControlFlags75Bit5B, PAS de trim)
+    consigne α  si[0x16] ← manche [ctrl+0x1F]  (Aero_ComputeAoACommand_48862, PAS de trim)
     mα = ±2·√(q'·|consigne − α|), rate-limité ±err·dt, nul si |err| ≥ 56°
 ```
 
@@ -2032,7 +2032,7 @@ Fichier .IFF
    **degrés**, `Cα = 180/π` ; `q = ½·ρ(h)·v²`) ; **courbe manette→poussée**
    `Aero_ThrottleThrustCurve` (piecewise MIL/AF + lapse vitesse) ; asservissement
    d'attitude `±2·√(q'·err)`, `q' = q·jdyn[0x12]/100` ; `g = −9.8 m/s²`
-   (`dword_6FFD7`) ; gains globaux `dword_72A14..2C = 1.0` ; carte des entrées
+   (`dword_6FFD7`) ; gains de dégâts `dword_72A14..2C` (1,0 si intact, `PHYSICS.md` §5.9) ; carte des entrées
    (accès direct sur les axes, pas de trim ; `flags_75` bits 0/1/2).
    **Restent** : ligne exacte des overrides `vtable[+0x3C]` (masse ≈ chunk `DYNM`)
    / `vtable[+0x34]` (intégration position) dans la vtable `JDYN` primaire ; les
@@ -2062,7 +2062,7 @@ Fichier .IFF
    constructeurs/lecteurs de champs restent à cartographier une par une.
 
 
-#### Loi de charge — `Aero_ComputeControlFlags75Bit5B` (`sub_48862`, relue intégralement 2026-09-24)
+#### Loi de charge — `Aero_ComputeAoACommand_48862` (`sub_48862`, relue intégralement 2026-09-24)
 
 Produit `si[0x16]`, la **consigne d'incidence** que `Aero_ComputeForcesMain` compare à α (`errα = si[0x16] − α`). Tout est en 24.8 (256 = 1.0).
 

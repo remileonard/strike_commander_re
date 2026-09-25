@@ -1414,7 +1414,7 @@ loc_472FD:				; CODE XREF: seg082:0BAFJ seg082:0C50J
 ; h=[[[jdyn+0x24]+2]+0x1A]=ALTITUDE). jdyn[0x2C]=poussee AF max ; jdyn[0x30/31/32] = les 3 u8
 ; du chunk THRS. Detail: DATA_MODEL.md 6.2.
 ; ==============================================================================================
-Aero_ThrottleThrustCurve_4730F	proc far		; CODE XREF: Pilot_SteeringCommandToTarget+259P
+Aero_ThrottleThrustCurve_4730F	proc far		; CODE XREF: JDYN_JumpToPoint_49242+259P
 					; seg103:loc_494C6P ...
 
 var_36		= dword	ptr -36h

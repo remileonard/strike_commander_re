@@ -116,8 +116,9 @@ Ex-`Guidance_HomingVelocityUpdate`. Elle est appelée par `PhysicsTicks` à la p
 - Deux centres de part et d'autre de `P`, perpendiculairement à `W` : `C1,2 = P ± perp(W) × (R − |W| × dt)`.
 - Au premier tick, le pilote automatique choisit un des deux cercles et le mémorise dans `JDYN+0x68` : 1 pour `C2`, 2 pour `C1`. Il prend `C2` si ce centre est le plus proche et que l'avion est hors de ce cercle, ou si l'avion est à l'intérieur du cercle `C1`.
 - **Dans le cercle** : écart 0, l'avion va tout droit pour en sortir.
-- **Sur le bord** (distance au centre < `R + |W| × dt`) : il vise le cap de `W`, en tournant dans le sens du cercle.
-- **Sinon** : il vise la **tangente au cercle**, `cap(centre − moi) ± asin(R / distance)`.
+- **Sur le bord** (distance au centre < `R + |W| × dt`) : il vise le cap de `W`, en tournant dans le sens du cercle : écart = cap(W) − cap du nez, puis −360° si cercle gauche et écart > 0, +360° si cercle droit et écart < 0.
+- **Sinon** : il vise la **tangente au cercle** : `cap(C_gauche − moi) + asin(R / d)` pour le cercle gauche, `cap(C_droit − moi) − asin(R / d)` pour le cercle droit.
+- *Précision (lu 2026-09-25)* : `perp(W) = (W.c1, −W.c0)` normalisé, donc `C1 = P + perp` est à **droite** de `W` et `C2 = P − perp` à **gauche** (cap compté de `c1` vers `c0`). Autour du cercle gauche l'avion vire à gauche, autour du droit à droite.
 - Écart = cap visé − cap du nez (ramené à ±180°), **borné à ±20°/s × dt**. Le nez tourne horizontalement de cet angle (`Vector_RotateHeading2D_556D4`).
 - **Roulis** (`Autopilot_BankForTurn_49A7C`) : ±10° du côté du virage si l'écart dépasse 10°, sinon 0°, atteint à la vitesse `JDYN[+0x71] × dt`. C'est essentiellement visuel.
 

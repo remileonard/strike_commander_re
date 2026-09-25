@@ -749,7 +749,7 @@ loc_3E487:
 		push	ax
 
 loc_3E48E:
-		call	Pilot_SteeringCommandToTarget
+		call	JDYN_JumpToPoint_49242
 		add	sp, 0Ah
 		push	large dword ptr	[si+55h]
 		call	Goal_ResetNeutralState

@@ -17,6 +17,30 @@ Ce document ne touche à aucun fichier de libRealSpace.
 Référence croisée : `/Users/remi/source/libRealSpace/src/strike_commander/SCPlane.h`
 et `SCJdynPlane.h` (lus le 2026-09-05).
 
+> **Mise à jour 2026-09-25 (relecture de l'assembleur, noms trigonométriques corrigés).**
+> Ce qui change par rapport aux versions précédentes :
+> - **Gains de dégâts** : `dword_72A14..72A2C` ne valent pas toujours 1,0. Ils sont recalculés à
+>   chaque tick par `JDYN_UpdateDamageGains_494DD` à partir de l'état des composants
+>   (moteur, gouvernes, ailes, réservoir). Ils modifient la poussée, le cran de manette maximum,
+>   la consommation, la portance et les bornes des trois commandes (§5.9).
+> - **Loi de charge** (`Aero_ComputeAoACommand_48862`, ex-`Aero_ComputeControlFlags75Bit5B`) :
+>   relue en entier. Le terme de gravité est **exactement** cos(tangage). La référence de départ
+>   vaut 0 au sol, en décrochage franc ou sans le bit 4 des drapeaux, et α·|cos(roulis)| quand α < 0
+>   (§5.7).
+> - **Ordre du tick** : la position n'est pas intégrée par `PhysicsTicks` mais par la méthode
+>   `+0x14` de l'objet monde (`WorldObject_IntegrateBodyMotion_3D31D`). `Physics_IntegratePosition_46300`
+>   intègre la **vitesse** (§3).
+> - **Mode pilote automatique** : quand `JDYN+0x68 ≠ 0xFF`, `PhysicsTicks` saute toute l'aérodynamique
+>   et appelle `Autopilot_FlyToPointKinematic_49C2E`, qui impose directement cap et vitesse (§9).
+>   L'IA l'utilise en phases 2 et 3 de l'attaque au sol.
+> - **Direction au sol** : au sol et sous 40 m/s, la vitesse de lacet est imposée par le manche
+>   latéral (§5.8).
+> - **Pas de temps** : `dt = 1 / fps de simulation`, borné à [0,04 s ; 0,5 s] ; le gain K du servo
+>   vaut `1/dt` (25 à 25 images/s), ce n'est pas une constante (§2).
+>
+> Le document de travail pour corriger `SCJetpPlane` dans libRealSpace est
+> `analysis/IMPL_SCJETPPLANE_CORRECTIONS.md`.
+
 ---
 
 ## 0. Constat sur `SCPlane` — un modèle générique, pas le modèle Origin
@@ -56,8 +80,9 @@ JETP  (FORM, struct 0x6A)
      └─ JDYN  (chunk)  28 champs (73o)→ enveloppe de vol                   [err A005]
 ```
 
-Toutes les valeurs disque sont des **entiers 24.8** (÷256 pour obtenir la
-valeur physique). Les booléens u8 le sont directement (pas de ÷256).
+Règle de conversion : un **dword** utilisé tel quel dans un calcul en virgule fixe est en 24.8
+→ **÷ 256**. Un **octet ou mot** que le code convertit par `<< 8` est un **entier tel quel**
+(degrés, g…). Exception : les octets de `THRS` utilisés comme fractions (voir tableau).
 
 ### 1.1 Table de conversion disque → SI
 
@@ -83,12 +108,14 @@ valeur physique). Les booléens u8 le sont directement (pas de ÷256).
 | `JDYN #12` (u32, `+0x23`→`+0x4E`) | `envelope_vs_limit` | m/s (à confirmer) | `raw / 256.0` |
 | `JDYN #13` (u32, `+0x27`→`+0x52`) | `envelope_speed_limit` | m/s | `raw / 256.0` |
 | `JDYN #14` (u8, `+0x2B`→`+0x56`) | `envelope_bank_limit` | ° (à confirmer) | `raw` |
-| `JDYN #15` (u8, `+0x2C`→`+0x57`) | `envelope_pitch_limit` → **`pitch_rate_limit_dps`** | °/s | `raw` — champ réel, chargé depuis la session du 2026-09-05, mais **actuellement inutilisé** dans le servo de tangage restauré (§5.7) qui réutilise `max_turn_rate` (#8) comme les deux autres axes ; à nettoyer ou retrouver un usage ASM confirmé (§8) |
+| `JDYN #15` (u8, `+0x2C`→`+0x57`) | `envelope_pitch_limit` → **`pitch_rate_limit_dps`** | °/s ? | `raw` — champ réel, mais **aucun lecteur trouvé dans le tick physique** : le servo de tangage borne par `max_turn_rate` (#8) comme les deux autres axes (§5.7). Ne pas l'utiliser tant qu'un lecteur ASM n'est pas trouvé (§8) |
 | `JDYN #16` (u8, `+0x2D`→`+0x58`) | `envelope_pitch_margin` | ° (à confirmer) | `raw` |
 | `JDYN #17` (u32, `+0x2E`→`+0x59`) | `ground_effect_ceiling` | m | `raw / 256.0` |
 | `JDYN #18` (u32, `+0x32`→`+0x5D`) | `induced_drag_k` | — (= `1/(π·e·AR)`) | `raw / 256.0` |
 | `JDYN #19` (u32, `+0x36`→`+0x61`) | `lift_gain` | — (rôle de `Clα·S`, sans unité S/b séparées) | `raw / 256.0` |
-| `JDYN #20-22` (u8×3, `+0x3A..3C`→`+0x65..67`) | coeffs × gains globaux (=1.0 par défaut) | — | `raw / 256.0` |
+| `JDYN #20` (u8, `+0x3A`→`+0x65`) | `pitch_stick_gain` : **borne de la consigne d'incidence** | ° | `raw` (entier : le code fait `si[0x65] << 8`) ; multipliée par le gain de dégâts ELEVATOR (§5.7) |
+| `JDYN #21` (u8, `+0x3B`→`+0x66`) | `yaw_authority` : **consigne de dérapage à pleine butée palonnier** | ° | `raw` (entier, `<< 8`) ; multipliée par le gain RUDDER (§5.8) |
+| `JDYN #22` (u8, `+0x3C`→`+0x67`) | `pitch_load_gain` : **facteur de charge demandé à pleine butée manche** | g | `raw` (entier, `<< 8`, recopié en `+0x78`) |
 | `JDYN #23-25` (u16×3, `+0x3D/3F/41`→`+0x80/82/84`) | **params IA** : vitesse poursuite max / min / croisière | — | 500 / 100 / 231 — DATA_MODEL §6.2 |
 | `JDYN #26` (u32, `+0x43`→`+0x86`) | **param IA** : seuil de portée | — | 11005 |
 | `JDYN #27-28` (u8×2, `+0x47/48`→`+0x8A/8B`) | **params IA** : décision de combat (`#28` = poids d'un score ; `#27` non localisé) | — | 3 / 2 |
@@ -129,9 +156,15 @@ paramètres** — voir §7.
   Y-up) : `local.x = c0`, `local.y = c2`, `local.z = -c1` (signe négatif
   car le nez ASM (`+c1`) correspond à l'avant local `-Z` de `SCPlane`).
 - **`AIRDENS.TBL`** fournit `ρ(altitude)` (§6) — remplace `ro[75]`.
-- **Gains globaux `dword_72A14..72A2C` = `1.0`** (posés par
-  `sub_A5620`) — tous les facteurs multiplicatifs génériques du jeu sont
-  neutres par défaut ; ignorables pour une repro fidèle standard.
+- **Gains de dégâts `dword_72A14..72A2C`** — ⚠️ **corrigé 2026-09-25** : ils ne sont PAS
+  toujours à 1,0 et ne sont pas ignorables. `JDYN_UpdateDamageGains_494DD` les remet à 1,0 puis
+  les recalcule **à chaque tick** d'après l'état des composants de l'avion. Voir §5.9.
+- **Pas de temps** (`Frame_UpdateTimingAndNotifyTrackedObjects_500F6`) : le jeu mesure ses images
+  par seconde et **attend activement tant qu'il dépasse 25 images/s**. La fréquence de simulation
+  `dword_70454` = fps / `dword_70468`, bornée à **[2 ; 25]** ; `dt = dword_70458 = 1 / dword_70454`,
+  donc **entre 0,04 s et 0,5 s**. `dword_7045E`, le pas utilisé pour intégrer la position (§3), est
+  toujours égal à `dword_70458`. Le « gain K = 25 » du servo (§5.7) est en réalité
+  `dword_70454` = `1/dt` : il vaut 25 seulement à 25 images/s.
 - **Pas de trim pilote.** Le jeu est en accès direct sur les axes
   (clavier/joystick) : `elevator`/`rollers`/`rudder` de `SCPlane`
   correspondent directement à la commande brute, rate-limitée par
@@ -139,31 +172,47 @@ paramètres** — voir §7.
 
 ---
 
-## 3. Séquence du tick (ordre exact, `PhysicsTicks`)
+## 3. Séquence du tick (ordre exact, `PhysicsTicks`) — réécrit 2026-09-25
 
-**Important** : l'ordre est **« intègre-puis-calcule »** — la position du
-tick `n` est intégrée avec la vitesse du tick `n−1`, **avant** que les
-nouvelles forces du tick `n` soient calculées. Ça correspond exactement à
-l'ordre de déclaration des méthodes virtuelles dans `SCPlane.h`
-(`updatePosition` déclarée **avant** `updateAcceleration`/`updateForces`) :
+`PhysicsTicks` (seg103, méthode Update de la classe JDYN) fait, dans cet ordre
+(citations : `analysis/annotated_segments/seg103_annotated.asm`, bloc `PhysicsTicks:`) :
 
 ```
-1. updatePosition()        position += velocity · dt            (avec la vitesse de la frame précédente)
-2. processInput()          lit les axes, flags volets/train/aérofrein, manette
-3. computeThrust()         → thrust_force, thrust_vector
-4. computeLift()           → Cl, lift_force, lift_vector, ae (α) ; clamp au décrochage + départ franc joueur (§5.2)
-5. computeDrag()           → Cd, drag_force, drag_vector
-6. computeGravity()        → gravity_force, gravity_vector
-7. updateForces()          F = thrust + lift(+latéral) + drag ; accel = F/mass + gravity_vector
-8. updateAcceleration()    stocke acceleration, ax/ay/az
-9. updateVelocity()        velocity += bodyToWorld(acceleration) · dt
-   [contrainte sol si on_ground : projette la vitesse hors du plan sol, v_alt≥0, deadband]
-10. checkStatus()          flameout si fuel≤0, crash si sous le sol
-11. updatePlaneStatus()    anims (train/volets), takeoff/landed
+ 0. JDYN_UpdateDamageGains_494DD            (mov bx,[si+2] / call dword ptr [bx+34h], 1re instruction utile)
+                                            → les 7 gains de dégâts du tick (§5.9)
+ 1. (bloc non relu en détail cette session ; il remet notamment à 0 le drapeau « au sol » objet+0x20)
+ 2. Carburant nul ?  cmp dword ptr [si+6Dh],0 / jg   → sinon carburant = 0, poussée [si+28h] = 0, fin du bloc moteur
+ 3. Manette :  cran ← min(cran, arrondi(10 · gain_moteur))   RÉÉCRIT dans le bloc de commandes (+0x1E)
+               poussée [si+28h] = Aero_ThrottleThrustCurve_4730F(cran) · gain_moteur
+               carburant [si+6Dh] -= consommation (§4.4)
+ 4. PILOTE AUTOMATIQUE ?  cmp byte ptr [si+68h],0FFh / jz  et  flags_75.bit5 = 0
+      → call Autopilot_FlyToPointKinematic_49C2E ; jmp loc_4AECA (= fin de PhysicsTicks)   (§9)
+      Les étapes 5 à 9 sont alors TOUTES sautées.
+ 5. Aero_SumLinearForces_48639              → accélération linéaire (repère corps), écrite en objet+0x14/18/1C
+ 6. Aero_ControlOrchestrator_48FC2          → consignes et accélérations angulaires (§5.7, §5.8)
+ 7. Physics_IntegrateSecondaryPosition      → vitesse angulaire Ω (JDYN+4/+8/+0x0C) += accél. angulaire · dt
+ 8. Au sol ET vitesse < 40 m/s : Ω_lacet (JDYN+0x0C) imposée par le manche latéral (§5.8)
+ 9. Physics_IntegratePosition_46300(objet, objet+0x14)
+                                            → VITESSE += corps→monde(accélération) · dt   (pas la position !)
+10. (suite : contrainte au sol, non relue en détail cette session — voir DATA_MODEL.md §6.2)
 ```
 
-Les moments de contrôle (asservissement d'attitude, §5) sont calculés en
-parallèle du bloc 3-7 et intégrés dans l'orientation séparément (voir §5.4).
+**La position et l'orientation ne sont pas intégrées par `PhysicsTicks`.** C'est la méthode
+`+0x14` de l'objet monde de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D`), appelée
+par la boucle des objets du monde, qui fait **dans les deux modes (normal et pilote automatique)** :
+
+```
+position    += vitesse · dt        (WorldObject_TranslateBy_37D54, pas dword_7045E = dt)
+orientation += Ω · dt              (WorldObject_ComposeOrientationAngleArray_3CB0B → rotations incrémentales
+                                    de la matrice persistante de l'objet, §8)
+```
+
+Correspondance avec les méthodes de `SCPlane` : `computeThrust` (étape 3), `computeLift/Drag/Gravity`
++ `updateForces` (étape 5), `processInput` pour les servos (étapes 6-8), `updateVelocity`
+(étape 9), `updatePosition` (position + orientation). Le moment exact où la boucle des objets
+appelle la méthode `+0x14` par rapport à `PhysicsTicks` n'a pas été épinglé : l'ancienne
+affirmation « intègre-puis-calcule » n'est pas prouvée. Dans le portage, l'ordre
+`updatePosition` puis forces (ou l'inverse) ne décale que d'un tick.
 
 ---
 
@@ -200,11 +249,39 @@ float fLapse(float alt_m) {
 
 ```cpp
 void SCJetpPlane::computeThrust() {
-    thrust_force = std::max(0.0f, thrust_max * fThrottle(throttle_setting) * fLapse(position.y /* altitude */));
-    if (fuel <= 0.0f) thrust_force = 0.0f;                    // flameout
-    thrust_vector = forward * thrust_force;                  // axe corps nez, PUR (pas de composante latérale/verticale)
+    if (fuel <= 0.0f) { fuel = 0.0f; thrust_force = 0.0f; return; }   // cmp [si+6Dh],0 / jg : ni poussée ni conso
+
+    // Cran plafonné par le moteur endommagé (seg103, bloc manette de PhysicsTicks) :
+    //   mov eax,dword_72A2C / imul eax,0Ah / add 80h / sar 8   → plafond = arrondi(10 · g_engine)
+    //   cmp al,plafond / jle … / mov es:[bx+1Eh],al            → le cran plafonné est RÉÉCRIT dans la commande
+    int cap = (int)std::lround(10.0f * g_engine);
+    if (throttle_notch > cap) throttle_notch = cap;            // visible sur l'instrument de manette
+
+    thrust_force = thrust_max * fThrottle(throttle_notch) * fLapse(altitude)   // Aero_ThrottleThrustCurve_4730F
+                 * g_engine;                                   // mov edx,dword_72A2C / imul / shrd 8 sur [si+28h]
+    thrust_vector = forward * thrust_force;                   // axe corps nez, PUR (pas de composante latérale/verticale)
 }
 ```
+Moteur intact : `g_engine = 1`, plafond 10, rien ne change. Moteur détruit : `g_engine = 0`,
+cran forcé à 0, poussée nulle.
+
+### 4.4 Consommation de carburant (bloc manette de `PhysicsTicks`, lu 2026-09-25)
+
+```cpp
+// facteur de cran : cran · 0,199 si cran ≤ 5 (mov dword ptr [bp-4Ch],33h), cran · 0,297 sinon ([bp-56h],4Ch)
+float f = (notch <= 5) ? notch * (51.0f / 256.0f) : notch * (76.0f / 256.0f);
+// fuite du réservoir : (10 − 9·g_fuel)   (mov [bp-5Ah],0FFFFF700h / imul dword_72A14 / add 0A00h)
+float burn = (10.0f - 9.0f * g_fuel) * sfc;                // × jdyn[0x33]
+if (f > 0.0f) burn *= f;                                   // cmp dword ptr [bp-42h],0 / jle : SAUTÉ si cran 0
+fuel -= burn * dt;                                         // imul dword_70458 ; sub [si+6Dh]
+```
+Deux points à reproduire tels quels :
+- **Au cran 0, la multiplication par le facteur de cran est sautée** : la consommation vaut
+  alors `sfc · dt` (comme au cran 5), pas zéro.
+- Réservoir intact (`g_fuel = 1`) : facteur 1. Réservoir détruit (`g_fuel = 0`) : ×10.
+
+Le saut instantané vers un point (`JDYN_JumpToPoint_49242`, §9.3) consomme le carburant du trajet
+avec le même facteur `(10 − 9·g_fuel)·sfc`, multiplié par la durée du trajet.
 
 `Mthrust` de `SCPlane` ↔ `thrust_max` (converti N). Le manette clavier
 (`+`/`-`, `1`…`0`, MIL 0-5/PC 6-10) est un dispatcher **hors** de la
@@ -268,12 +345,13 @@ pas de buffet/oscillation dans la physique.
 void SCJetpPlane::computeLift() {
     float q = 0.5f * airDensity(altitude) * V * V;              // §6
 
-    float k_lift = lift_gain * q;                               // jdyn[0x61] · q  (dword_72A24 = 0x100 = 1.0)
+    float k_lift = lift_gain * g_wing * q;                      // jdyn[0x61] · dword_72A24 · q (loc_48239 : mov edx,dword_72A24 / imul)
+                                                                // g_wing = gain de dégâts LWING+RWING (§5.9), 1 si ailes intactes
     lift_force   = hard_stall ? 0.0f : k_lift * ae;             // (B) §5.2 : portance nulle en départ franc
     Vector3D dirLift = normalize(Vector3D{0, v_body.nose /*c1*/, -v_body.z_up /*c2*/}); // ⟂ vitesse, plan vertical
     lift_vector  = dirLift * lift_force;
 
-    float k_side = (lift_gain * 0.25f) * q;                     // jdyn[0x61]>>2
+    float k_side = (lift_gain * 0.25f) * q;                     // jdyn[0x61]>>2 (mov eax,[si+61h] / sar eax,2) — SANS gain d'aile
     float side_force = side_stall ? 0.0f : k_side * beta;       // (A) §5.2 : coupée si |β| > stall_alpha
     Vector3D dirSide = normalize(Vector3D{v_body.nose, -v_body.span, 0});
     // side_vector ajouté séparément dans updateForces() — SCPlane n'a pas de champ dédié,
@@ -332,98 +410,132 @@ void SCJetpPlane::updateForces() {
 }
 ```
 
-### 5.7 Asservissement d'attitude ASM (`Aero_ControlOrchestrator` + `Aero_ComputeForcesMain`) — **NON câblé sur `pitch` dans le port (décision 2026-09-05)**
+### 5.7 Tangage : loi de charge + servo (`Aero_ComputeAoACommand_48862` + `Aero_ComputeForcesMain_4791E`) — réécrit 2026-09-25
 
-> **État au 2026-09-05, après plusieurs allers-retours :** le servo ASM
-> `Aero_ComputeForcesMain` (asservissement √ sur `alpha`) a été rebranché
-> sur `pitch` puis **re-débranché**. Motif définitif : `jdyn[+4]`
-> (= `pitch_speed` côté ASM) est un **état interne de la physique**.
-> `Aero_ComputeForcesMain` l'écrit et le relit pour son propre limiteur de
-> taux (vérifié : lecture de `[si+4]` dans le bloc de clamp, seg102
-> L2693/2720), mais **aucune trace ASM ne montre un tiers qui lit
-> `jdyn[+4]` pour construire l'orientation visible de l'avion**. Le
-> brancher directement sur l'angle `pitch` reproduit le bug de piqué du
-> nez (dès qu'une portance génère une accélération verticale, `pitch`
-> devient négatif → l'avion pique). Le raisonnement de l'ancienne analyse
-> (`alpha = pitch − γ`, `pitch` gagne la course contre `γ` faute
-> d'inertie) n'a jamais été invalidé par une preuve ASM.
->
-> **Hypothèse de travail (Rémi, 2026-09-05), à confirmer dans le binaire :**
-> dans le jeu d'origine, `pitch`/`roll`/`yaw` **ne sont pas portés par la
-> struct JDYN** mais par l'**objet monde (entity)** qui représente
-> l'avion — tourné par une **fonction générique polymorphe** partagée par
-> tous les objets (une seule liste d'objets ⇒ un seul intégrateur de
-> rotation). Candidate : `WorldObject_BuildOrientationMatrix_56E8A` /
-> `Matrix_BuildAxisX/Y/Z_56EC3` (composition incrémentale sur une matrice
-> persistante, déjà confirmée pour la caméra et l'IA). Indice côté
-> données : `REAL`/`OBJT` contient des types polymorphes `JETP` / `GRND` /
-> `RNWY`… La piste `vtable[+0x34]` de la vtable `JETP` a été tentée le
-> 2026-09-05 : le calcul (`seg339` base `0x6D070` + tag `0x24C8`) tombe sur
-> `loc_45BBB`, qui est un **stub trivial** (`mov al,15h / retf`, retourne
-> une constante) — donc soit le tag `0x24C8` de `JETP` (hérité, non
-> vérifié) est faux, soit `JETP` utilise une autre table. **Piste ouverte.**
->
-> **Implémentation courante du port :** loi directe manche→vitesse de
-> tangage (`pitch_speed += clamp(-elevator·pitch_rate_limit_dps −
-> pitch_speed, ±rate_limit_dps·dt)`, borné `±pitch_rate_limit_dps`),
-> placeholder qui vole sans piquer. Les acquis ASM ci-dessous
-> (`var_30 = cos(pitch)`, seuil `0.21875°`, forme de la loi de charge)
-> restent **documentés mais non câblés** tant que le vrai consommateur de
-> `jdyn[+4]` n'est pas localisé.
+> **Historique.** Les versions précédentes de cette section décrivaient un servo « non câblé »
+> dans le portage et un terme géométrique « ≈ cos(tangage) par identité ». Les deux sont périmés :
+> - le portage (`SCJetpPlane::processInput`) câble maintenant ce servo sur `pitch_speed`, et
+>   l'orientation visible vient de la matrice persistante tournée par `Ω·dt` (§3, §8) ;
+> - `Aero_ComputeAoACommand_48862` a été relue en entier le 2026-09-24 avec les vrais noms
+>   sinus/cosinus : le terme vaut **exactement** cos(tangage du nez).
 
----
+Le tangage est piloté en **incidence** : la loi de charge calcule une **consigne d'incidence**
+(`si[0x16]`), et le servo fait tourner le nez pour que α la rejoigne.
 
-Contenu ASM décodé (référence — **pas** le chemin actif du port pour `pitch`).
-Découplé de la translation dans l'ASM. Pour chaque axe (tangage montré ;
-lacet identique avec `beta`/`rudder`, cf. `Aero_ResetAccumulatorFlags75Bit5`
-côté lacet — confirmé indépendant du roulis et de alpha, session 2026-09-05) :
+**A. Consigne d'incidence — `Aero_ComputeAoACommand_48862`** (seg103, lue ligne à ligne ;
+valeurs réelles, degrés et g) :
 
 ```cpp
-// Aero_ComputeControlFlags75Bit5B (seg103 L1143-1517, relu octet-pres) :
-// var_38 = loadDemand + var_30, PAS juste loadDemand.
-float loadDemand = (elevator < 0) ? (pitch_load_gain * elevator / 3.0f / 16.0f)
-                                   : (pitch_load_gain * elevator / 16.0f);
-// var_30 = sin(angle(vecteur avant du repere avion, axe Z monde)), signe
-// inverse si la composante Z du vecteur "haut" est negative (avion sur le
-// dos). Par l'identite sin(90-x)=cos(x), vaut ~cos(pitch) pres du vol
-// horizontal - PAS un terme de virage/inclinaison comme suppose au premier
-// passage.
-float bankTerm = cosf(tenthOfDegreeToRad(pitch));
-if (ptw.v[1][1] < 0.0f) bankTerm = -bankTerm;
-float var_38 = loadDemand + bankTerm;
+float AoACommand() {
+    float q = dynamic_pressure;                                   // Aero_DynamicPressure_46D13
+    if (autopilot_bit5 || q < 1.0f) return 0.0f;                  // flags_75.bit5 ou q < 1 → si[0x16] = 0
 
-float incidencePerG = -(mass / (q * lift_gain)) * 1.5f * G_SI;
-float boundA = var_38 * incidencePerG + baseline;      // baseline = -wing_incidence (- flap_lift_increment si volets)
-float boundB = bankTerm * incidencePerG + baseline;
-float pitchCommandDeg = std::clamp(0.0f, std::min(boundA, boundB), std::max(boundA, boundB));
-pitchCommandDeg = std::clamp(pitchCommandDeg, -pitch_stick_gain, pitch_stick_gain);
+    // (1) demande du manche : m ∈ [−1, +1], positif = manche tiré
+    //     ASM : d = (si[0x67] << 8) · [ctrl+0x1F] / 16 ; ÷3 si [ctrl+0x1F] < 0 (manche poussé)
+    float d = pitch_load_gain * m;                                // jdyn[0x67], en g
+    if (m < 0) d /= 3.0f;
 
-float q_prime = q * stability_gain / 100.0f;              // STBL : jdyn[0x12]
-float err = pitchCommandDeg - alpha;                      // consigne (loi de charge ci-dessus) - incidence actuelle
-// SEUIL : 56 BRUT compare a err en 24.8 (degre*256) -> seuil reel 56/256 = 0.21875 deg.
-if (std::abs(err) < 56.0f / 256.0f) err = 0.0f;
-// CORRECTION 2026-09-05 (relecture octet-pres seg102 L2440-2652, seg112 L999-1045) :
-// K = dword_70454, valeur de config clampee [2.0, 25.0] (0x200..0x1900), defaut 25.0.
-// (K = 1/dt_asm (0x100 = 1.0, pas 256) ; ce N'EST PAS un delta-time. Une redaction anterieure de ce
-//  doc l'avait pris a tort pour 1/dt puis "dt".)
-constexpr float K = 25.0f;
-float target = std::copysign(std::min(2.0f * std::sqrt(q_prime * std::abs(err)),
-                                       K * std::abs(err)), err);   // loi sqrt bornee par K*|err|
-float accel  = std::clamp((target - pitch_speed) * K, -3.0f * q_prime, 3.0f * q_prime); // deg/s^2
-pitch_speed += accel * dt;                                   // ASM : accel*dword_70458 dans Physics_IntegrateSecondaryPosition
-pitch_speed = std::clamp(pitch_speed, -max_turn_rate_dps, max_turn_rate_dps);
+    // (2) référence de départ A (var_1A) — mov [bp+var_1A],0 puis 3 tests :
+    float A = 0.0f;
+    if (flags_75_bit4                                             // shr ax,4 / and 1 / jnz loc_48967
+        && !on_ground                                             // mov al,[bx+20h] / or / jnz → reste 0
+        && !hard_stall_bit6) {                                    // shr ax,6 / and 1 / jnz → reste 0
+        A = alpha;                                                // Aero_FlowAngle_AoA_469FE (signé)
+        if (A < 0) A *= fabsf(cosf(roll));                        // Matrix_RollAngle_57C67 → Math_CosDeg_5483F → |·|
+    }
+
+    // (3) calage : c = −calage_aile (− incrément volets si volets sortis, flags_75.bit1)
+    float c = -wing_incidence - (flaps ? flap_lift_increment : 0.0f);   // jdyn[0x4C], jdyn[0x4D]
+
+    // (4) terme de gravité : cosinus EXACT du tangage du nez, négatif sur le dos
+    float g1 = cosf(nose_pitch);                                  // Matrix_NosePitchAngle_57C3A → Math_CosDeg_5483F
+    if (up_vertical < 0) g1 = -g1;                                // M+0x20 < 0 : composante verticale de la normale
+
+    // (5) incidence par g :  k = −(X / q / lift_gain) · 1,5 · g     (0x180 = 1,5 ; dword_6FFD7 = −9,8)
+    //     X = [si+2]->vtable+0x3C : a la forme d'une masse (NON PROUVÉ, §8). Avec g = −9,8 le signe final est +.
+    float k = (mass / q / lift_gain) * 1.5f * 9.8f;
+
+    // (6) cibles
+    float n = d + g1;                                             // facteur de charge demandé (cos θ au neutre)
+    float T = c, B = c;
+    if (n != 0.0f) { T = n * k + c; B = g1 * k + c; }
+
+    // (7) sélection : on garde A s'il est entre T et B (bornes incluses), sinon A = T
+    if (!(A >= std::min(T, B) && A <= std::max(T, B))) A = T;
+
+    // (8) borne, avec le gain de dégâts ELEVATOR
+    float L = pitch_stick_gain * g_elevator;                      // (si[0x65] << 8) · dword_72A1C
+    return std::clamp(A, -L, L);                                  // → si[0x16]
+}
 ```
+Remarques :
+- `|α|` est calculé (`var_A`) mais **jamais relu** ; `si[0x59]` n'est pas lu.
+- Au neutre en vol (d = 0) : T = B = cos θ · k + c, soit l'incidence qui porte `cos θ` g. Si l'avion
+  vole déjà à cette incidence, `A = α` est gardé → erreur nulle → le manche neutre est stable.
+- **Au sol, en décrochage franc, ou sans le bit 4 : A = 0** (et non α). Le bit 4 est posé par défaut
+  à la création (`flags_75 = bit4|bit7`).
 
-Ce bloc décrit fidèlement ce que l'ASM calcule et stocke dans `jdyn[+4]`.
-Ce qui reste **non tracé**, c'est le consommateur de `jdyn[+4]` qui
-produirait l'assiette visible — voir l'encadré en tête de section. Tant
-que ce point n'est pas résolu, `SCJetpPlane` **ne câble pas** ce servo
-sur `pitch` (loi directe à la place).
+**B. Servo — `Aero_ComputeForcesMain_4791E`** (seg102) :
 
-`pitch_rate_limit_dps` (`jdyn[0x57]`, champ 15, `envelope_pitch_limit`)
-est **de nouveau utilisé** par la loi directe de tangage courante (borne
-de vitesse dédiée) ; `max_turn_rate_dps` (`jdyn[0x71]`, champ 8) reste
-utilisé pour roulis et lacet.
+```cpp
+float q2  = q * stability_gain / 100.0f;                          // q' = q · STBL / 100
+float err = AoACommand() - alpha;
+if (fabsf(err) < 0.21875f) err = 0.0f;                            // seuil brut 56 face à une erreur 24.8 → 56/256 °
+float K   = 1.0f / dt;                                            // dword_70454 (= 25 à 25 images/s)
+float target = copysign(std::min(2.0f * sqrtf(q2 * fabsf(err)), K * fabsf(err)), err);
+float accel  = std::clamp((target - pitch_speed) * K, -3.0f * q2, 3.0f * q2);   // °/s²
+pitch_speed += accel * dt;                                        // Physics_IntegrateSecondaryPosition (× dword_70458)
+pitch_speed  = std::clamp(pitch_speed, -max_turn_rate, max_turn_rate);          // jdyn[0x71]
+```
+Comme `K = 1/dt`, `(target − ω)·K·dt = target − ω` : sans la borne `±3q'`, la cible serait
+atteinte en un tick. Forme équivalente, indépendante du pas de temps :
+`pitch_speed += clamp(target − pitch_speed, ±3·q'·dt)`. Dans `min(2√(q'·|err|), K·|err|)`, K vaut
+25 dans le jeu d'origine dès qu'il tourne à 25 images/s (son maximum) : garder **25** dans le
+portage, même s'il tourne plus vite, reproduit le jeu à sa cadence nominale.
+
+### 5.8 Roulis et lacet — gains de dégâts et direction au sol (lu 2026-09-25)
+
+- **Roulis** (`Aero_ComputeControlFlags75Bit5C`, partiellement relue) : la consigne de vitesse de
+  roulis est bornée à `± max_turn_rate · g_aileron` (`mov edx,dword_72A20 / imul` sur `[si+71h]`),
+  puis `(consigne − ω_roulis)·K` est comparée à `rate_limit` (`[si+47h]`, accélération de roulis
+  maximale, °/s²). Aileron détruit → plus de roulis.
+- **Lacet** (`Aero_ResetAccumulatorFlags75Bit5`) : consigne de dérapage =
+  `yaw_authority · g_rudder · palonnier` (`si[0x66] << 8`, `imul dword_72A18`, × `[ctrl+0x27]/16`),
+  puis même servo qu'en tangage avec `err = consigne − β`.
+- **Direction au sol** (`PhysicsTicks`, juste après `Physics_IntegrateSecondaryPosition`) :
+  ```
+  cmp byte ptr [bx+20h],0 / jnz          → seulement au sol
+  cmp vitesse,2800h / jge                → seulement si vitesse < 40 m/s
+  Ω_lacet [si+0Ch] = −( [ctrl+0x23] / 16 · vitesse ) / 4
+  ```
+  soit **`yaw_speed = −manche_latéral · V / 4`** (°/s, V en m/s, manche ∈ [−1, 1]) : au roulage, c'est
+  le **manche latéral** (et non le palonnier) qui oriente la roue avant. Cette valeur remplace celle
+  du servo de lacet pour ce tick. Au-dessus de 40 m/s au sol, rien n'est imposé : le servo de lacet
+  s'applique.
+
+### 5.9 Gains de dégâts — `JDYN_UpdateDamageGains_494DD` (lu 2026-09-25)
+
+Méthode `+0x34` de la vtable secondaire de JDYN, appelée **en tête de chaque `PhysicsTicks`**
+(et par `JDYN_IsEngineDestroyed_47FCD`). Elle remet les 7 gains à 1,0, puis, pour chaque
+composant présent dans la liste de composants de l'avion :
+
+`gain = (B − A) / B`, avec `B` = somme de l'attribut B du composant (`Roster_SumFoundAttributeB`) et
+`A` = somme de l'attribut A (`Roster_SumFoundAttributeA`). Le gain vaut 1 pour un composant intact
+et descend vers 0 avec les dégâts. (Côté libRealSpace, ces attributs correspondent à ce que
+`SCPlane::system_health` stocke par composant : à vérifier côté données.)
+
+| Gain | Composant | Consommateur (ligne citée) | Effet |
+|---|---|---|---|
+| `g_fuel` (`dword_72A14`) | `FUEL` | bloc manette de `PhysicsTicks` ; `JDYN_JumpToPoint_49242` | consommation × `(10 − 9·g_fuel)` (§4.4) |
+| `g_rudder` (`dword_72A18`) | `RUDDER` | `Aero_ResetAccumulatorFlags75Bit5` (`mov edx,dword_72A18`) | consigne de lacet × g (§5.8) |
+| `g_elevator` (`dword_72A1C`) | `ELEVATOR` | `Aero_ComputeAoACommand_48862` (`mov edx,dword_72A1C`) | borne de la consigne d'incidence × g (§5.7) |
+| `g_aileron` (`dword_72A20`) | `AILERON` | `Aero_ComputeControlFlags75Bit5C` (`mov edx,dword_72A20`) | vitesse de roulis max × g (§5.8) |
+| `g_wing` (`dword_72A24`) | `LWING` + `RWING` | `Aero_ComputeLiftAndSideForce_4812B` (`loc_48239`) | portance × g (§5.3) — pas la force latérale |
+| `dword_72A28` | copie de `dword_72A24` | aucun lecteur trouvé | — |
+| `g_engine` (`dword_72A2C`) | `ENGINE` | bloc manette de `PhysicsTicks` ; `JDYN_IsEngineDestroyed_47FCD` | cran max = arrondi(10·g), poussée × g (§4.3) |
+
+Aucun autre lecteur de ces variables n'existe dans les segments annotés (recherche
+`grep dword_72A1[48C]\|dword_72A2[048C]` sur `annotated_segments/*.asm`).
 
 ---
 
@@ -513,13 +625,63 @@ table par défaut.
 | Bloc supplémentaire du chunk `ATMO` (quand `dword_72A0A≠0`) | Non décodé — la table de densité alternative éventuelle n'est pas dans `AIRDENS.TBL` |
 | `JDYN +0x80..+0x8B` (6 champs, défauts 500/100/231/11005/3/2) | **RÉSOLU (session 2026-09-06), sauf `+0x8A`.** Params de l'IA de vol/combat, lus via `[pilotCtx+0x0B]` depuis seg002/seg003/ovr231, jamais par la physique du joueur. `+0x80`=vitesse IA max poursuite, `+0x82`=vitesse IA min, `+0x84`=vitesse croisière/manœuvre, `+0x86`=seuil de portée, `+0x8B`=poids d'un score de décision. `+0x8A` (déf. 3) : consommateur non localisé. Détail DATA_MODEL §6.2. |
 | `jdyn[0x47]` (limite de taux) — unité exacte (°/s ? °/tick ?) | Pas confirmée numériquement |
-| `Aero_ComputeControlFlags75Bit5C` (composante latérale du moment, table `jdyn[0x77]`) | Non détaillée |
+| `Aero_ComputeControlFlags75Bit5C` (roulis, table `jdyn[0x77]`) | Partiellement lue (2026-09-25) : borne `± jdyn[0x71]·g_aileron`, limite d'accélération `jdyn[0x47]` (§5.8). Le reste (table `jdyn[0x77]`, gate à 40 m/s) n'est pas relu ligne à ligne. |
+| Valeur `X` de la loi de charge (`[si+2]->vtable+0x3C`) | A la forme d'une masse (la portance vaut `lift_gain·α·q`), **non prouvé** — même question que la première ligne de ce tableau. |
+| Attributs A et B des composants (gains de dégâts, §5.9) | Formule `(B − A)/B` lue ; la sémantique exacte (points de vie max / dégâts ?) et le lien avec `system_health` côté libRealSpace sont à confirmer côté données. |
+| Instant d'appel de la méthode `+0x14` (position/orientation) par rapport à `PhysicsTicks` | Non épinglé (§3). |
 | Dispatcher clavier de la manette des gaz (`+`/`-`, `1`…`0`) | Hors `Player_MainUpdate`, jamais localisé |
 | `mach`/`sos`/`updateSpeedOfSound` | Aucune correspondance ASM trouvée dans le tick tracé |
-| **Comment les vitesses angulaires physiques deviennent l'orientation VISIBLE** | **RÉSOLU, session 2026-09-05.** L'orientation n'est PAS un triplet d'angles d'Euler accumulés : c'est une **matrice persistante à `objet_monde+0x2C`**, tournée par petits incréments chaque frame. Fonction : `Matrix_BuildFullOrientation_575B2` (seg116) → `Matrix_BuildAxisX/Y/Z_56EC3` : chacun applique une rotation d'axe **incrémentale en place** sur les lignes de la matrice (`row1' = row1·sin + row2·cos`, `row2' = row2·sin − row1·cos`), no-op si `|angle| < 0.21875°`. Exposée en méthode vtable générique **`WorldObject_ComposeOrientation3Angles_3CAE3`** (`loc_3CAE3`, seg084) présente dans ~18 vtables d'objets du monde — l'objet monde qui **englobe** JDYN porte cette matrice. Les 3 angles passés = incréments = `vitesse_angulaire · dt`. `jdyn[+4/+8/+0xC]` sont donc bien les vitesses (état interne physique) ; le pont vers le visuel est ce compositeur matriciel, pas une lecture directe de `jdyn[+4]` comme angle. **Implémenté dans `SCJetpPlane::updatePosition()` le 2026-09-05** : `ptw` persistante, `ptw.rotateM(dPitch,X); .rotateM(dYaw,Y); .rotateM(dRoll,Z)` chaque tic ; `pitch/yaw/roll` re-dérivés de `ptw`. Reste non pin-pointé statiquement : le site d'appel per-frame exact (adressage seg339 ambigu, copies de vtables VROOMM) — mais le mécanisme est décodé sans ambiguïté. |
-| `Matrix_RollAngle_57C67` / `Matrix_NosePitchAngle_57C3A` / `Math_DotProduct3D_5505B` / `Math_AcosOfRatio_54A0E` / `Math_VectorLength3D_Scaled_54F57` — terme géométrique (`var_30`) de `Aero_ComputeControlFlags75Bit5B` | **Tranchée, session 2026-09-05** — `var_30 = sin(angle(vecteur avant, axe Z monde))`, signe inversé si `up.z<0` (avion sur le dos) ; ≈`cos(pitch)` près du vol horizontal (identité `sin(90-x)=cos(x)`). PAS une compensation de virage/roulis. Citation exacte : `known_functions.json["sub_48862"]`, `DATA_MODEL.md` §PhysicsTicks. |
+| **Comment les vitesses angulaires physiques deviennent l'orientation VISIBLE** | **RÉSOLU, session 2026-09-05.** L'orientation n'est PAS un triplet d'angles d'Euler accumulés : c'est une **matrice persistante à `objet_monde+0x2C`**, tournée par petits incréments chaque frame. Fonction : `Matrix_BuildFullOrientation_575B2` (seg116) → `Matrix_BuildAxisX/Y/Z_56EC3` : chacun applique une rotation d'axe **incrémentale en place** sur les lignes de la matrice, no-op si `|angle| < 0.21875°`. ⚠️ Corrigé 2026-09-24 : c'est une **rotation standard** (pour l'axe Y relu, `Matrix_BuildAxisY_570C5` : ligne 1 inchangée, `ligne0' = c·ligne0 − s·ligne2`, `ligne2' = c·ligne2 + s·ligne0` avec c = cos, s = sin) ; l'ancienne forme « `row1·sin + row2·cos` » venait des noms sinus/cosinus inversés. Exposée en méthode vtable générique **`WorldObject_ComposeOrientation3Angles_3CAE3`** (`loc_3CAE3`, seg084) présente dans ~18 vtables d'objets du monde — l'objet monde qui **englobe** JDYN porte cette matrice. Les 3 angles passés = incréments = `vitesse_angulaire · dt`. `jdyn[+4/+8/+0xC]` sont donc bien les vitesses (état interne physique) ; le pont vers le visuel est ce compositeur matriciel, pas une lecture directe de `jdyn[+4]` comme angle. **Implémenté dans `SCJetpPlane::updatePosition()` le 2026-09-05** : `ptw` persistante, `ptw.rotateM(dPitch,X); .rotateM(dYaw,Y); .rotateM(dRoll,Z)` chaque tic ; `pitch/yaw/roll` re-dérivés de `ptw`. **Site d'appel épinglé le 2026-09-25** : méthode `+0x14` de l'objet monde de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D` → `WorldObject_ComposeOrientationAngleArray_3CB0B`), qui fait aussi `position += vitesse·dt` (§3). |
+| Terme de gravité (`var_30`) de `Aero_ComputeAoACommand_48862` | **Tranché, 2026-09-24** — `var_30 = cos(tangage du nez)` **exactement** (`Matrix_NosePitchAngle_57C3A` puis `Math_CosDeg_5483F`, vrai cosinus), signe inversé sur le dos. L'ancienne rédaction (« sin(angle avec Z) ≈ cos par identité ») était juste par deux erreurs qui s'annulaient. Détail §5.7. |
 | `checkStatus()` de `SCJetpPlane` (portage, pas décodage ASM direct) : zone morte entre `groundlevel+0.5` et `groundlevel+1.0` où `on_ground` ne change jamais de valeur — observée en jeu (l'avion spawn avec ~0.9 m de marge, tombe dans cette zone) | **Constatée, pas corrigée** — reste un défaut réel de `checkStatus()`/`updateVelocity()` à traiter séparément |
 | **Couplage roulis→lacet / mélange tangage-lacet à fort roulis** observé empiriquement en jeu | **Émerge naturellement du modèle, session 2026-09-05.** Deux sources, aucune n'est une « fonction de couplage » dédiée : (1) la **composition matricielle incrémentale** (ligne ci-dessus) : tourner en roulis puis appliquer un incrément de tangage produit, dans le monde, une rotation qui mélange cap et assiette — c'est le comportement gimbal correct d'une matrice tournée par petits pas en repère avion ; (2) la **portance** (alignée sur le "haut" corps) devient horizontale en repère monde à fort roulis → tirer le manche courbe la trajectoire latéralement. Les servos tangage/lacet/roulis eux-mêmes restent **découplés** (lois directes manche, `Aero_ResetAccumulatorFlags75Bit5` confirme : lacet = palonnier seul, pas de `beta`). ⚠️ Le servo de lacet du port était asservi sur `beta_deg` (= `−Cα·vx/V`) → l'avion tournait sur lui-même en continu : **corrigé le 2026-09-05**, lacet repassé en loi directe palonnier comme le roulis. |
+
+---
+
+## 9. Mode pilote automatique (`JDYN+0x68`) et saut vers un point — ajouté 2026-09-25
+
+### 9.1 Bascule
+
+Dans `PhysicsTicks`, juste après le bloc moteur :
+```
+cmp byte ptr [si+68h],0FFh / jz loc_4AC96          ; 0xFF = pas de pilote automatique → vol normal
+test flags_75.bit5 / jnz loc_4AC96                  ; bit5 posé → vol normal
+call Autopilot_FlyToPointKinematic_49C2E ; jmp loc_4AECA   ; → fin du tick
+```
+En mode pilote automatique, **aucune force et aucun moment** ne sont calculés : ni portance, ni
+traînée, ni servo, ni intégration de la vitesse. Le moteur (poussée, carburant, gains) tourne
+quand même (étapes 0-3 du §3). La position et l'orientation continuent d'être intégrées par la
+méthode `+0x14` de l'objet monde.
+
+`JDYN+0x68` sert à la fois d'interrupteur (0xFF = inactif) et de mémoire du cercle de virage
+choisi (0 = à choisir, 1 = cercle C2, 2 = cercle C1).
+
+### 9.2 Loi (`Autopilot_FlyToPointKinematic_49C2E`)
+
+Relue intégralement ; description complète en valeurs réelles, avec pseudo-code libRealSpace, dans
+`analysis/NOTE_ATTAQUE_SOL.md` §5. Résumé :
+- entrées dans le bloc de commandes : `P = ctrl+0x02` (point visé), `W = ctrl+0x0E` (vitesse voulue) ;
+- cap : virage à **20°/s** maximum, par cercles de rayon `R = |W|·180/(20π)` tangents à `P` ;
+  roulis visuel ±10° (`Autopilot_BankForTurn_49A7C`) ;
+- altitude : `vz = clamp(dz, ±50 m/s)`, plancher **terrain + 250 m** ;
+- vitesse horizontale : rejoint `|W|` à **25 m/s²** ; **la vitesse est écrite directement** ;
+- nez : ramené vers l'horizontale à 5°/s (`Autopilot_NosePitchRelax_498B5`) ;
+- **vitesse angulaire Ω remise à zéro à chaque tick** (vecteur nul constant `dword_707F8..70800`) :
+  la rotation vient uniquement de ce que la fonction écrit dans l'orientation ;
+- drapeau « point atteint » `ctrl+0x1A = 1` quand l'écart de cap est < 5° et la distance < `20·|W|·max(dt, 0,2 s)`.
+
+Utilisateur connu : l'IA en attaque au sol, phases 2 et 3 (`GroundAttack_Phase2_EngageAutopilot_775B1`).
+
+### 9.3 Saut instantané vers un point (`JDYN_JumpToPoint_49242`, ex-`Pilot_SteeringCommandToTarget`)
+
+Fonction distincte du mode ci-dessus (appelée par `FlightState_ResetHud` et
+`Pilot_LowLevelControlCommand`) : elle **téléporte** l'avion.
+- orientation reconstruite **à plat** sur le cap demandé ; vitesse = vitesse demandée le long du nez ;
+- carburant consommé pour le trajet : `durée = distance / vitesse`, `burn = durée · (10 − 9·g_fuel) · sfc`,
+  borné à 0 ;
+- position = point visé ; vitesse angulaire = 0 ; volets rentrés si l'avion n'a pas de composant
+  `FLAPS` ; aérofrein (`flags_75.bit0`) rentré ; drapeau « au sol » effacé ;
+  poussée recalculée au **cran 4**.
 
 ---
 

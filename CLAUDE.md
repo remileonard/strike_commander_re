@@ -365,7 +365,7 @@ renommage. Exemples : `AI_ThrottleController_6250`,
   l'ex-`Math_ArcCos*` un arc sinus (`Math_AsinDeg_549A6`, `Math_AsinRaw_581A0`,
   `Math_AsinOfRatio_54A76`) ; l'arc tangente (`Math_ArcTan_Raw_58223`, table tan) est juste.
   L'ex-`Math_AngleBetweenVectors_552E1` ne prend qu'UN vecteur : c'est son angle d'élévation
-  (`Math_ElevationAngle_552E1`). Relu : la loi de charge (`Aero_ComputeControlFlags75Bit5B`)
+  (`Math_ElevationAngle_552E1`). Relu : la loi de charge (`Aero_ComputeAoACommand_48862`)
   utilise bien cos(tangage) — l'ancien résultat était juste par deux erreurs qui s'annulaient.
 - **libRealSpace calcule en FLOTTANTS, pas en 24.8.** Le 24.8 n'est que le format interne de
   l'original. Ce qu'on écrit pour Rémi (formules, constantes, champs de fichier) se donne en
@@ -435,7 +435,7 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
    `jdyn[0x4C]` (+ volets `jdyn[0x4D]`), borné `jdyn[0x4B]` = décrochage ;
    `q = ½·v²·coeff(vitesse-air)` via table 1-D lerp `Aero_ResolveAeroCoeffTable`
    (`sub_46DA3`) ; traînée `Aero_ComputeDragWithFeedback` (`sub_48400`) ;
-   moments = asservissement `±2·√(q'·err)` rate-limité, nul si err ≥ 56°
+   moments = asservissement `±2·√(q'·err)` rate-limité, zone morte |err| < 0,21875° ; gains de dégâts et mode pilote automatique : `PHYSICS.md` §5.9 et §9 ; corrections du portage : `analysis/IMPL_SCJETPPLANE_CORRECTIONS.md`
    (`Aero_ComputeForcesMain`). **Pas de trim pilote** (accès direct axes).
    `jdyn[0x4C]/0x4D` = constantes de cellule (calage/volets), pas des trims.
    `FlightControl_ComputeMomentA/B/C` renommés `Aero_FlowAngle_AoA/Sideslip` /

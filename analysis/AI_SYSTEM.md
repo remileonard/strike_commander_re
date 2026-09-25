@@ -1247,7 +1247,7 @@ consigne (`target_climb`/`target_speed`) consommés par une physique
 simplifiée pour les appareils IA, le jeu original calcule un delta de
 cap via une vraie géométrie de guidage puis l'injecte dans le modèle
 de vol complet, au même titre qu'une entrée manette. Le bit `flags_75`
-bit 4 (`Aero_ComputeControlFlags75Bit5B`) reste un mécanisme réel mais
+bit 4 (`Aero_ComputeAoACommand_48862`) reste un mécanisme réel mais
 séparé — probablement un ajustement aérodynamique fin, pas le
 mécanisme de navigation lui-même.
 

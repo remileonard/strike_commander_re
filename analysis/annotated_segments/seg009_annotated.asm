@@ -871,7 +871,7 @@ loc_12397:				; CODE XREF: FlightState_ResetHud+2AAj
 		call	dword ptr [bx+48h]
 		pop	cx
 		push	ax
-		call	Pilot_SteeringCommandToTarget
+		call	JDYN_JumpToPoint_49242
 		add	sp, 0Ah
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+11h]

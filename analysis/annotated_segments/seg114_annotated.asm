@@ -8744,7 +8744,7 @@ loc_546F1:
 		push	ax
 
 loc_546F2:
-		call	Physics_TestGlobalWindActive
+		call	JDYN_IsEngineDestroyed_47FCD
 		pop	cx
 
 loc_546F8:

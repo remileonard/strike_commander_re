@@ -8,10 +8,13 @@ seg103		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,52L — résout l'orientation (vtable[0x34]) et compare un compteur global (dword_72A2C) :
-; test d'état lié au vecteur d'accélération globale (probable vent global actif/inactif).
+; Ex-'Physics_TestGlobalWindActive' (nom errone : aucun vent). far, 52L, LUE 2026-09-25.
+; Appelle la methode +0x34 de la vtable secondaire (= JDYN_UpdateDamageGains_494DD, recalcule
+; les gains de degats), puis renvoie 1 si dword_72A2C (gain moteur) == 0 (cmp dword_72A2C,0 /
+; jnz / mov ax,1), sinon 0. Test 'moteur detruit', appele depuis
+; UIScreen_RenderOrLayoutList_54503.
 ; ==============================================================================================
-Physics_TestGlobalWindActive	proc far		; CODE XREF: UIScreen_RenderOrLayoutList_54503:loc_546F2P
+JDYN_IsEngineDestroyed_47FCD	proc far		; CODE XREF: UIScreen_RenderOrLayoutList_54503:loc_546F2P
 
 arg_0		= word ptr  6
 
@@ -45,24 +48,24 @@ loc_47FE7:
 		jmp	short loc_47FEB
 ; ���������������������������������������������������������������������������
 
-loc_47FE9:				; CODE XREF: Physics_TestGlobalWindActive:loc_47FE2j
+loc_47FE9:				; CODE XREF: JDYN_IsEngineDestroyed_47FCD:loc_47FE2j
 		xor	ax, ax
 
-loc_47FEB:				; CODE XREF: Physics_TestGlobalWindActive:loc_47FE7j
+loc_47FEB:				; CODE XREF: JDYN_IsEngineDestroyed_47FCD:loc_47FE7j
 		or	al, al
 		jz	short loc_47FF3
 		mov	al, 1
 		jmp	short loc_47FF5
 ; ���������������������������������������������������������������������������
 
-loc_47FF3:				; CODE XREF: Physics_TestGlobalWindActive+20j
+loc_47FF3:				; CODE XREF: JDYN_IsEngineDestroyed_47FCD+20j
 		mov	al, 0
 
-loc_47FF5:				; CODE XREF: Physics_TestGlobalWindActive+24j
+loc_47FF5:				; CODE XREF: JDYN_IsEngineDestroyed_47FCD+24j
 		pop	si
 		pop	bp
 		retf
-Physics_TestGlobalWindActive	endp
+JDYN_IsEngineDestroyed_47FCD	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -1135,30 +1138,31 @@ Aero_SumLinearForces_48639	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 375L, RELUE INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques).
-; CONSIGNE D'INCIDENCE si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA =
-; si[0x16] - alpha). (1) si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ;
-; M = orientation de l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2)
-; flags_75.bit5 ou q < 1.0 -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS
-; utilise. (4) DEMANDE DU MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m
-; < 0 (manche pousse) ; d = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4
-; ET pas au sol ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE,
-; signe) ; si alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis
-; Math_CosDeg_5483F). (6) CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1
-; (volets). (7) TERME DE GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ;
-; g1 = cos(theta) (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas
-; (var_5A = M+0x20 < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g *
-; cos(theta) au neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) *
-; dword_6FFD7 ), X = valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car
-; portance = si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n !=
-; 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si
-; T est compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L =
-; (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien
-; resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait
-; juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un
-; cosinus). Ne lit PAS si[0x59].
+; Ex-'Aero_ComputeControlFlags75Bit5B' (nom sans rapport avec le role). far, 375L, RELUE
+; INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques). CONSIGNE D'INCIDENCE
+; si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA = si[0x16] - alpha). (1)
+; si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ; M = orientation de
+; l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2) flags_75.bit5 ou q < 1.0
+; -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS utilise. (4) DEMANDE DU
+; MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m < 0 (manche pousse) ; d
+; = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4 ET pas au sol
+; ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE, signe) ; si
+; alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis Math_CosDeg_5483F). (6)
+; CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1 (volets). (7) TERME DE
+; GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ; g1 = cos(theta)
+; (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas (var_5A = M+0x20
+; < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g * cos(theta) au
+; neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) * dword_6FFD7 ), X =
+; valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car portance =
+; si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n != 0 : T =
+; n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si T est
+; compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L = (si[0x65]
+; << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien resume :
+; var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait juste par
+; deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un cosinus).
+; Ne lit PAS si[0x59].
 ; ==============================================================================================
-Aero_ComputeControlFlags75Bit5B	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+11p
+Aero_ComputeAoACommand_48862	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+11p
 
 var_7A		= word ptr -7Ah
 var_5A		= dword	ptr -5Ah
@@ -1226,12 +1230,12 @@ arg_4		= word ptr  0Ah
 		cmp	[bp+var_4], 100h
 		jge	short loc_488CE
 
-loc_488C3:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+55j
+loc_488C3:				; CODE XREF: Aero_ComputeAoACommand_48862+55j
 		mov	dword ptr [si+16h], 0
 		jmp	loc_48BD0
 ; ���������������������������������������������������������������������������
 
-loc_488CE:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+5Fj
+loc_488CE:				; CODE XREF: Aero_ComputeAoACommand_48862+5Fj
 		push	si
 		push	ss
 		lea	ax, [bp+var_A]
@@ -1243,7 +1247,7 @@ loc_488CE:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+5Fj
 		jge	short loc_488E8
 		neg	eax
 
-loc_488E8:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+81j
+loc_488E8:				; CODE XREF: Aero_ComputeAoACommand_48862+81j
 		mov	[bp+var_A], eax
 		mov	ax, [bp+arg_4]
 		mov	dx, [bp+arg_2]
@@ -1268,7 +1272,7 @@ loc_48912:
 		idiv	ebx
 		mov	[bp+var_16], eax
 
-loc_48928:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+B5j
+loc_48928:				; CODE XREF: Aero_ComputeAoACommand_48862+B5j
 		mov	eax, [bp+var_16]
 		mov	edx, [bp+var_E]
 		imul	edx
@@ -1296,7 +1300,7 @@ loc_48942:
 		jmp	loc_489EC
 ; ���������������������������������������������������������������������������
 
-loc_48967:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+100j
+loc_48967:				; CODE XREF: Aero_ComputeAoACommand_48862+100j
 		mov	bx, [si]
 		mov	al, [bx+20h]
 		mov	ah, 0
@@ -1337,7 +1341,7 @@ loc_48967:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+100j
 		jge	short loc_489CC
 		neg	eax
 
-loc_489CC:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+165j
+loc_489CC:				; CODE XREF: Aero_ComputeAoACommand_48862+165j
 		mov	[bp+var_52], eax
 		mov	eax, [bp+var_52]
 		mov	[bp+var_56], eax
@@ -1347,8 +1351,8 @@ loc_489CC:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+165j
 		shrd	eax, edx, 8
 		mov	[bp+var_1A], eax
 
-loc_489EC:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+102j
-					; Aero_ComputeControlFlags75Bit5B+10Ej ...
+loc_489EC:				; CODE XREF: Aero_ComputeAoACommand_48862+102j
+					; Aero_ComputeAoACommand_48862+10Ej ...
 		mov	al, [si+4Ch]
 		mov	ah, 0
 		neg	ax
@@ -1369,7 +1373,7 @@ loc_489EC:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+102j
 loc_48A1C:
 		sub	[bp+var_22], eax
 
-loc_48A20:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+1A7j
+loc_48A20:				; CODE XREF: Aero_ComputeAoACommand_48862+1A7j
 		mov	[bp+var_28], 0
 
 loc_48A28:
@@ -1394,7 +1398,7 @@ loc_48A28:
 		neg	eax
 		mov	[bp+var_30], eax
 
-loc_48A64:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+1F5j
+loc_48A64:				; CODE XREF: Aero_ComputeAoACommand_48862+1F5j
 		mov	eax, [bp+var_16]
 		mov	[bp+var_38], eax
 		mov	eax, [bp+var_30]
@@ -1463,7 +1467,7 @@ loc_48B22:
 		shrd	eax, edx, 8
 		mov	[bp+var_28], eax
 
-loc_48B36:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+29Aj
+loc_48B36:				; CODE XREF: Aero_ComputeAoACommand_48862+29Aj
 		mov	eax, [bp+var_22]
 		add	[bp+var_2C], eax
 		add	[bp+var_28], eax
@@ -1480,20 +1484,20 @@ loc_48B42:
 		jmp	short loc_48B6E
 ; ���������������������������������������������������������������������������
 
-loc_48B5E:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+2E8j
+loc_48B5E:				; CODE XREF: Aero_ComputeAoACommand_48862+2E8j
 		mov	eax, [bp+var_2C]
 		cmp	eax, [bp+var_1A]
 		jl	short loc_48B6E
 		cmp	eax, [bp+var_28]
 		jle	short loc_48B76
 
-loc_48B6E:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+2F2j
-					; Aero_ComputeControlFlags75Bit5B+2FAj ...
+loc_48B6E:				; CODE XREF: Aero_ComputeAoACommand_48862+2F2j
+					; Aero_ComputeAoACommand_48862+2FAj ...
 		mov	eax, [bp+var_2C]
 		mov	[bp+var_1A], eax
 
-loc_48B76:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+2F8j
-					; Aero_ComputeControlFlags75Bit5B+30Aj
+loc_48B76:				; CODE XREF: Aero_ComputeAoACommand_48862+2F8j
+					; Aero_ComputeAoACommand_48862+30Aj
 		mov	al, [si+65h]
 		mov	ah, 0
 		mov	[bp+var_46], ax
@@ -1512,7 +1516,7 @@ loc_48B76:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+2F8j
 		jmp	short loc_48BC4
 ; ���������������������������������������������������������������������������
 
-loc_48BB0:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+346j
+loc_48BB0:				; CODE XREF: Aero_ComputeAoACommand_48862+346j
 		mov	eax, [bp+var_44]
 		neg	eax
 		cmp	eax, [bp+var_1A]
@@ -1520,19 +1524,19 @@ loc_48BB0:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+346j
 		mov	eax, [bp+var_44]
 		neg	eax
 
-loc_48BC4:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+34Cj
+loc_48BC4:				; CODE XREF: Aero_ComputeAoACommand_48862+34Cj
 		mov	[bp+var_1A], eax
 
-loc_48BC8:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+359j
+loc_48BC8:				; CODE XREF: Aero_ComputeAoACommand_48862+359j
 		mov	eax, [bp+var_1A]
 		mov	[si+16h], eax
 
-loc_48BD0:				; CODE XREF: Aero_ComputeControlFlags75Bit5B+69j
+loc_48BD0:				; CODE XREF: Aero_ComputeAoACommand_48862+69j
 		pop	di
 		pop	si
 		leave
 		retf
-Aero_ComputeControlFlags75Bit5B	endp
+Aero_ComputeAoACommand_48862	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1619,6 +1623,10 @@ Aero_ApplyGroundEffect	endp
 ; ==============================================================================================
 ; far,303L — testé aussi sur flags_75 bit5, résout un paramètre indexé (+0x77) : variante de
 ; calcul de contrôle de vol conditionnée par flags_75 bit5, avec table de paramètres indexée.
+; | Complement 2026-09-25 (lu L1856-1880 du segment annote) : la consigne de vitesse de roulis
+; var_8 est bornee a +/- jdyn[0x71] * dword_72A20 (gain de degats AILERON : mov
+; edx,dword_72A20 / imul / shrd 8), puis (consigne - [si+8]) * dword_70454 est comparee a
+; [si+47h] (limite d'acceleration de roulis).
 ; ==============================================================================================
 Aero_ComputeControlFlags75Bit5C	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+3Ep
 
@@ -2104,11 +2112,11 @@ Aero_ExtractRollMoment	endp
 ; ==============================================================================================
 ; far, seg103 L2099-2185 (relu intégralement, session 2026-09-05). ORCHESTRATEUR complet du
 ; vecteur moment (tangage,roulis,lacet) retourné à PhysicsTicks, assemblé dans un buffer
-; malloc'é de 12 octets. Séquence exacte : (1) Aero_ComputeControlFlags75Bit5B(si) - calcule
-; la CONSIGNE de tangage (loi de charge/var_30) et l'écrit dans si[0x16], PAS de valeur de
-; retour capturée ici ; (2) Aero_ResetAccumulatorFlags75Bit5(si) - calcule la consigne de
-; lacet (palonnier seul, confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A], pas
-; de retour capturé ; (3) Aero_ApplyGroundEffect(si) -> slot 0 (tangage) = extrait m_alpha de
+; malloc'é de 12 octets. Séquence exacte : (1) Aero_ComputeAoACommand_48862(si) - calcule la
+; CONSIGNE de tangage (loi de charge/var_30) et l'écrit dans si[0x16], PAS de valeur de retour
+; capturée ici ; (2) Aero_ResetAccumulatorFlags75Bit5(si) - calcule la consigne de lacet
+; (palonnier seul, confirmé indépendant du roulis/alpha) et l'écrit dans si[0x1A], pas de
+; retour capturé ; (3) Aero_ApplyGroundEffect(si) -> slot 0 (tangage) = extrait m_alpha de
 ; Aero_ComputeForcesMain_4791E (qui lit si[0x16] en interne comme consigne), + effet de sol ;
 ; (4) Aero_ComputeControlFlags75Bit5C(si) -> slot 1 (roulis) = loi directe manche (confirmée
 ; correcte par Rémi) ; (5) Aero_ExtractRollMoment(si) [mal nommée, cf. son entrée] -> slot 2
@@ -2138,7 +2146,7 @@ arg_6		= dword	ptr  0Ch
 		push	large [bp+arg_6]
 		push	si
 		push	cs
-		call	near ptr Aero_ComputeControlFlags75Bit5B
+		call	near ptr Aero_ComputeAoACommand_48862
 		add	sp, 6
 		push	large [bp+arg_6]
 		push	si
@@ -2441,13 +2449,20 @@ loc_49221:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,258L — fonction pivot déjà en investigation dans le projet (référencée depuis
-; Pilot_LowLevelControlCommand/seg087). Transforme un vecteur d'aim par rotation (sub_56DC5),
-; déclenche un son positionnel (sub_58828), calcule l'écart angulaire vers une cible avec un
-; gain de contrôle (dword_72A14) : calcul de commande de pilotage vers une cible (loi de
-; guidage/steering), avec retour sonore — connecte orientation de vue et tick physique JDYN.
+; Ex-'Pilot_SteeringCommandToTarget' (nom sans rapport). far, 258L, LUE 2026-09-25. Saut
+; instantane de l'avion vers un point (arg_2 = point monde, arg_4 = direction, arg_6 =
+; vitesse) : met la composante verticale de la direction a 0 et la normalise, construit
+; l'orientation a plat sur ce cap (Map_ApplyRotationTransform_56DC5 puis vtable objet +0x40),
+; vitesse = (0, arg_6, 0) en repere corps passee au monde par Matrix_LocalToWorld_58828 et
+; ecrite en [obj+8/+C/+10]. Carburant consomme pendant le saut : duree = distance(point -
+; position) / |vitesse| ; burn = duree * (10 - 9*dword_72A14) * jdyn[0x33] (mov
+; [bp+var_26],0FFFFF700h / imul dword_72A14 / add 0A00h / imul [si+33h]) ; [si+6Dh] -= burn,
+; borne a 0. Puis position objet = point ([bx+12h/16h/1Ah]), vtable objet +0x08, vitesse
+; angulaire [si+4/+8/+0Ch] = 0, volets rentres si le roster n'a pas de composant 'FLAPS',
+; flags_75 bit0 efface, [obj+0x20]=0 (en vol), poussee [si+28h] = courbe manette au cran 4.
+; Appelants : FlightState_ResetHud, Pilot_LowLevelControlCommand.
 ; ==============================================================================================
-Pilot_SteeringCommandToTarget	proc far		; CODE XREF: FlightState_ResetHud+34DP
+JDYN_JumpToPoint_49242	proc far		; CODE XREF: FlightState_ResetHud+34DP
 					; Pilot_LowLevelControlCommand:loc_3E48EP
 
 var_5E		= word ptr -5Eh
@@ -2630,11 +2645,11 @@ loc_493E0:
 		jmp	short loc_4940F
 ; ���������������������������������������������������������������������������
 
-loc_49407:				; CODE XREF: Pilot_SteeringCommandToTarget+1B9j
+loc_49407:				; CODE XREF: JDYN_JumpToPoint_49242+1B9j
 		mov	eax, [bp+var_26]
 		sub	[si+6Dh], eax
 
-loc_4940F:				; CODE XREF: Pilot_SteeringCommandToTarget+1C3j
+loc_4940F:				; CODE XREF: JDYN_JumpToPoint_49242+1C3j
 		mov	di, [bp+arg_2]
 		mov	eax, [di]
 		mov	bx, [si]
@@ -2679,7 +2694,7 @@ loc_49422:
 		jnz	short loc_49484
 		and	byte ptr [si+75h], 0FDh
 
-loc_49484:				; CODE XREF: Pilot_SteeringCommandToTarget+23Cj
+loc_49484:				; CODE XREF: JDYN_JumpToPoint_49242+23Cj
 		and	byte ptr [si+75h], 0FEh
 		mov	bx, [si]
 		mov	byte ptr [bx+20h], 0
@@ -2704,7 +2719,7 @@ loc_494AC:
 locret_494AD:
 		leave
 		retf
-Pilot_SteeringCommandToTarget	endp
+JDYN_JumpToPoint_49242	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -3618,8 +3633,8 @@ Autopilot_BankForTurn_49A7C	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 1422L, RELUE INTEGRALEMENT (2026-09-25). Ex-'Autopilot_FlyToPointKinematic_49C2E'.
-; PILOTE AUTOMATIQUE CINEMATIQUE de l'avion, appele par PhysicsTicks a la place de toute
+; far, 1422L, RELUE INTEGRALEMENT (2026-09-25). Ex-'Guidance_HomingVelocityUpdate'. PILOTE
+; AUTOMATIQUE CINEMATIQUE de l'avion, appele par PhysicsTicks a la place de toute
 ; l'aerodynamique quand JDYN+0x68 != 0xFF et !flags_75.bit5 (PhysicsTicks sort ensuite
 ; directement : jmp loc_4AECA -> retf). Arguments : si = JDYN, arg_2 = BLOC DE COMMANDES (pas
 ; une cible). Entrees : P = bloc+0x02 (point vise), W = bloc+0x0E (vitesse voulue ; norme 100
@@ -3643,7 +3658,15 @@ Autopilot_BankForTurn_49A7C	endp
 ; DRAPEAU 'point atteint' bloc+0x1A = 1 si |cap(W) - cap du nez| < 5 deg (modulo 360) ET
 ; distance(P) < 20 * |W| * dtc (>= 400 m a 100 m/s). La position n'est pas integree ici :
 ; WorldObject_IntegrateBodyMotion_3D31D (methode +0x14 de l'objet) le fait avec la vitesse
-; ecrite.
+; ecrite. | Precision des cercles (lu 2026-09-25, L4038-4640 du segment annote) : perp = (w1,
+; -w0, 0) avec w = W horizontal normalise, longueur r = R - |W|dt ; centre 'droit' Cd = P +
+; perp (var_1CE), centre 'gauche' Cg = P - perp (var_1C2) (droite/gauche au sens du cap
+; atan2(c0,c1), croissant vers c0). Etat 1 = Cg, etat 2 = Cd. Choix (etat 0) : si d(Cg) <
+; d(Cd) et d(Cg) > r -> 1 ; sinon si d(Cd) < r -> 1 ; sinon 2. Dans le cercle (d < R) : ecart
+; 0. Sur le bord (d < R + |W|dt) : ecart = cap(W) - cap(nez), et si etat 1 et ecart > 0 :
+; ecart -= 360 ; si etat 2 et ecart < 0 : ecart += 360 (virage force a gauche autour de Cg, a
+; droite autour de Cd). Sinon : cap vise = cap(Cg - moi) + asin(R/d(Cg)) (etat 1) ou cap(Cd -
+; moi) - asin(R/d(Cd)) (etat 2), ramene a +/-180, ecart = cap vise - cap(nez) ramene a +/-180.
 ; ==============================================================================================
 Autopilot_FlyToPointKinematic_49C2E	proc far		; CODE XREF: seg103:2CCDp
 
@@ -5104,25 +5127,33 @@ loc_4A826:
 ; (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]).
 ; Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la
 ; difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ;
-; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) rate-limite
-; (dword_72A2C*10), Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante
-; (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT
-; ~1.5x), burn = base*dword_72A14*[si+0x33](SFC)*cran*dt(dword_70458), [si+0x6D] -= burn,
-; flameout ([si+0x28]=0) si [si+0x6D]<=0 ; (5) etat volets/aerofrein/train depuis les bits du
-; sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse =
-; |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 ->
-; Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel :
-; Aero_ComputeControlFlags75Bit5A -> [A+0x14/18/1C] (taux angulaires) ;
-; Aero_ComputeControlFlags75Bit5A(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee
+; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a
+; arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22,
+; cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur
+; 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) *
+; (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0,
+; donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si
+; [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat
+; volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] +
+; Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] !=
+; 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON
+; manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee
 ; [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ;
 ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4)
-; ; drag sol sur [si+0x0C] si |A.vitesse|<0x2800 ; Physics_IntegratePosition([si]=A,
-; [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde
-; [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband
-; |v|<5. La POSITION monde n'est PAS integree ici (faite par [si+2]->[bx+0x34] en tete de
-; tick, sur l'objet monde, ordre integre-puis-calcule). Sous-objet A ([si]->jdyn+0x8E) : +0x02
-; ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail :
-; analysis/DATA_MODEL.md §6.2.
+; ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche
+; lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse
+; [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol :
+; projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est
+; PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est
+; JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet
+; monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse,
+; +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. |
+; Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 =
+; JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol
+; ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) =
+; -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral).
+; Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree
+; par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D).
 ; ==============================================================================================
 PhysicsTicks:				; CODE XREF: seg082:1153J
 					; seg082:loc_3B67BJ ...
