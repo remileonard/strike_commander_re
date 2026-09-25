@@ -14,7 +14,14 @@ seg002		segment	byte public 'CODE' use16
 ; (angles) et dword_7209B vs dword_7201C (distance/seuil NUMS), avec des ajustements
 ; +2/-3/-4/-6/-10 selon les paliers d'angle - puis GARDE FINALE sur byte_720DF (si actif,
 ; soustrait entite->aircraft+0xB0 /2 - meme champ carburant que MVRS_ID13/19 connu). Score
-; final borne [0,9].
+; final borne [0,9]. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47
+; range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97,
+; +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
 MVRS_ID1_ScoreAngularGuarded_3E90:				; DATA XREF: seg339:02B8o
 		push	bp
@@ -178,7 +185,14 @@ loc_3FC6:				; CODE XREF: seg002:0129j seg002:012Fj
 ; word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9. |
 ; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
 ; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
-; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID2_Score_3FCB:				; DATA XREF: seg339:off_6D340o
 		push	bp
@@ -363,7 +377,14 @@ loc_4123:				; CODE XREF: seg002:0286j seg002:028Cj
 ; plus simple). CALCUL : ajustements -3/-6 sur word_72095 (paliers 0x5A/0x2D), +3 ou -3 selon
 ; dword_7209B vs dword_7201C (deux comparaisons opposees successives). GARDE FINALE : si
 ; byte_720DF actif, soustrait entite->aircraft+0xB0 /4 (meme champ carburant, division
-; differente des autres IDs qui font /2). Score borne [0,9].
+; differente des autres IDs qui font /2). Score borne [0,9]. TRAITS ATRB CORRIGES 2026-09-25 :
+; le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID3_ScoreAngularSimple_4128:				; DATA XREF: seg339:off_6D32Co
 		push	bp
@@ -1332,7 +1353,14 @@ loc_47CF:				; CODE XREF: seg002:0932j seg002:0938j
 ; POSITION D'INTERCEPTION (dword_720D1/D5/D9) dans node+0x26/0x2A/0x2E ET POSE UN BIT sur
 ; entite+0x32 (bit1 si byte_720E0, bit3 si byte_720E1) - CONFIRME que c'est CETTE fonction
 ; (pas ID=8) qui ecrit initialement ces bits consultes ailleurs. Score final borne [1,9]
-; (PLANCHER A 1, PAS 0 - distinct des autres IDs).
+; (PLANCHER A 1, PAS 0 - distinct des autres IDs). TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID7_ScoreManeuverFuelGated_47D4:				; DATA XREF: seg339:022Co
 		push	bp
@@ -2225,8 +2253,15 @@ locret_4ECB:				; CODE XREF: seg002:0FD4j
 
 ; ==============================================================================================
 ; Ex-'MVRS_ID16_ScoreFuelOrResource_4ECD'. far, 59L, RELUE 2026-09-25. Score MVRS ID16
-; 'reprendre de la vitesse' : 1 si la manette (TH) est sous 12, sinon 0 (pas de carburant ni
-; de retour a la base).
+; 'reprendre de la vitesse' : 1 si le pilotage FL (entite+0xB0, 'cmp byte ptr es:[bx+0B0h],
+; 0Ch') est sous 12, sinon 0 (pas de carburant ni de retour a la base). TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 MVRS_ID16_ScoreLowSpeed_4ECD:				; DATA XREF: seg339:0178o
 		push	bp

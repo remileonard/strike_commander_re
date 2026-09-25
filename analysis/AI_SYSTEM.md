@@ -107,6 +107,14 @@ cet ordre exact, sans réarrangement, ce qui correspond à la lecture
 directe confirmée dans `libRealSpace` (`ReadByte()` × 9, dans cet
 ordre précis).
 
+> ⚠️ **Corrigé le 2026-09-25 : ordre en mémoire ≠ ordre du fichier.** Le fichier est bien lu dans
+> cet ordre, mais `PilotProfile_LoadATRB_12E47` range les octets à profil `+0x97, +0x99, +0x98,
+> +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F`, et le profil vit à `entité+0x1A`. Sur l'entité :
+> `+0xB0` = **FL**, `+0xB1` = TH, `+0xB2` = VB, `+0xB3` = **CN**, `+0xB4` = **LY**, `+0xB5` = AG,
+> `+0xB6` = AA, `+0xB7` = SM, `+0xB8` = AR. Le tableau du §6ter (lecture séquentielle supposée) est
+> faux pour `+0xB0`, `+0xB1`, `+0xB3`, `+0xB4`. Détail et consommateurs :
+> `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis.
+
 **Le 10ᵉ octet** (valeur `1` chez Billy) **n'a pas de nom dans cet
 extrait du manuel** — soit une statistique non documentée dans la
 page fournie, soit un octet réservé/de remplissage. Reste ouvert.
@@ -1076,13 +1084,13 @@ int Goal_ExecuteAction(Entity* entity, int slot) {
 - tant que des adversaires sont en vie : −8 par adversaire vivant, −32 par perte de son camp, et
   plafond à 79 ;
 - −50 si une réaction est active (`+0x27F ≠ 0`) ;
-- loyauté `LY` : +0, +15, +30, +50 ou +75 (paliers 3, 6, 12, 15) ; plancher 25 si `LY > 9` ; 0 si
-  `LY ≤ 0`.
+- confiance `CN` (`+0xB3` ; « loyauté `LY` » avant la correction du 2026-09-25) : +0, +15, +30, +50 ou +75
+  (paliers 3, 6, 12, 15) ; plancher 25 si `CN > 9` ; 0 si `CN ≤ 0`.
 
 Résultat : **2** (≥ 80, bon), **3** (≥ 50), **4** (≥ 25, ébranlé), **5** (< 25, panique).
 
-**Discipline** (`AI_MoraleDisciplineCheck_CA93`, toutes les 3 s) : `FL + (+7, +4, −3, −5 selon le
-moral 2 à 5) > 7`. Un pilote discipliné tient son rôle.
+**Discipline** (`AI_MoraleDisciplineCheck_CA93`, toutes les 3 s) : `LY + (+7, +4, −3, −5 selon le
+moral 2 à 5) > 7` (`LY` = loyauté, `+0xB4` ; « `FL` » avant la correction du 2026-09-25). Un pilote discipliné tient son rôle.
 
 **Le gestionnaire** (au plus toutes les 5 s ; renvoie 1 s'il a agi, sinon le gestionnaire `GOAL`
 suivant prend la main) :
@@ -1479,13 +1487,16 @@ dans le binaire une autre valeur suivant cette échelle précise.
 Recherche exhaustive de cette famille de fonctions (même motif,
 offset variable) :
 
+> ⚠️ **Tableau faux pour `+0xB0/+0xB1/+0xB3/+0xB4`** (supposait l'ordre du fichier) : lire `+0xB0` = FL,
+> `+0xB1` = TH, `+0xB3` = CN, `+0xB4` = LY — voir §2.3 et `IMPL_SCAIBRAIN_CORRECTIONS.md` §0bis.
+
 | Offset | Trait `ATRB` (ordre du fichier) | Confirmé par |
 |---|---|---|
-| `entité+0xB0` | `TH` (Trigger Happy) | `sub_8C1E`, jet de compétence appelé par `MVRS_ID7` (modificateur `-7`) |
-| `entité+0xB1` | `CN` (Confidence) | `sub_8CA2`, jet de compétence, appelée depuis `sub_9027` |
+| `entité+0xB0` | ~~`TH`~~ **`FL` (Flying)** | `sub_8C1E`, jet de compétence appelé par `MVRS_ID7` (modificateur `-7`) |
+| `entité+0xB1` | ~~`CN`~~ **`TH` (Trigger Happy)** | `sub_8CA2`, jet de compétence, appelée depuis `sub_9027` |
 | `entité+0xB2` | `VB` (Verbosity) | **`Radio_CanPlayMessage`** — lue intégralement plus tôt dans cette session, le lien avec `ATRB` était resté non démontré à l'époque ; confirmé maintenant |
-| `entité+0xB3` | `LY` (Loyalty) | `AI_ComputeMorale_CD4A` — bonus de moral par paliers de `LY` (`3`, `6`, `0xC`, `0xF`), plancher si `LY > 9`, moral nul si `LY ≤ 0` (§4.4) |
-| `entité+0xB4` | `FL` (Flying) | `AI_MessageDispatcher` — compare `FL > 14` comme condition de branche |
+| `entité+0xB3` | ~~`LY`~~ **`CN` (Confidence)** | `AI_ComputeMorale_CD4A` — bonus de moral par paliers de `CN` (`3`, `6`, `0xC`, `0xF`), plancher si `LY > 9`, moral nul si `LY ≤ 0` (§4.4) |
+| `entité+0xB4` | ~~`FL`~~ **`LY` (Loyalty)** | `AI_MessageDispatcher` — compare `LY > 14` comme condition de branche |
 | `entité+0xB5` | `AG` (Air-to-Ground) | jet de compétence (motif identique, `sub_776FB`, voisine de la zone `MVRS_ID19`) |
 | `entité+0xB6` | `AA` (Air-to-Air) | `sub_8CCE`, **appelée depuis `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` elle-même** (le tournoi) — comparaison par division, pas un simple jet |
 | `entité+0xB7` | `SM` (Showmanship) | `sub_8C4A`, jet de compétence, appelée par `loc_3FCB` (la fonction jumelle hors-tournoi qui a lancé cette investigation) |

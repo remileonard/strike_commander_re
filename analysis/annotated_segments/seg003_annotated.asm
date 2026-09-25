@@ -493,9 +493,16 @@ Vector2D_CrossSign_526F	endp
 ; ==============================================================================================
 ; far, 90L, LUE 2026-09-25. Ex-'Value_ClampSymmetric'. Borne une valeur de manche de tangage a
 ; +/- entite+0xDD (autorite du pilote au manche) : out = clamp(valeur, -L, +L). entite+0xDD =
-; 9 x max(competence entite+0xB0, 8) / G ('cmp 800h / jge' : plancher a 8, pas plafond) (G =
+; 9 x max(pilotage FL entite+0xB0, 8) / G ('cmp 800h / jge' : plancher a 8, pas plafond) (G =
 ; facteur de charge max JDYN+0x67), echelle 16 = butee, pose par
-; AIAircraft_LoadProfileGuarded_73940.
+; AIAircraft_LoadProfileGuarded_73940. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_ClampPitchStick_5305	proc far		; CODE XREF: AI_CombatDecision_Major+207p
 					; AI_CombatDecision_Major+335p ...
@@ -597,7 +604,14 @@ AI_ClampPitchStick_5305	endp
 ; far,329L — vérifie flags avion (+0x28D bit5), heading (+0xB0), chaîne de pointeurs
 ; cible/allié (+0x287/+0x289 — mêmes offsets que sub_3314), calcule distance de fermeture via
 ; sub_5828E, compare à seuil dword_7201C, positionne flag d'alerte bit4 à +0x28D : détection
-; de menace/verrouillage entrant (missile threat warning).
+; de menace/verrouillage entrant (missile threat warning). TRAITS ATRB CORRIGES 2026-09-25 :
+; le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_IncomingThreatWarning	proc far		; CODE XREF: AI_TopLevelThink+B8P
 

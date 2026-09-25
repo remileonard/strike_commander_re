@@ -806,7 +806,14 @@ MVRS_SharedDefaultTickNoOp_ED16:				; DATA XREF: seg339:0148o seg339:015Co ...
 ; Ex-'Missile_ProximityFuze'. far, 167L. COMMANDE DE VITESSE DES MANOEUVRES (pas une fusee de
 ; proximite). Sans cible : vitesse de croisiere JDYN+0x84. Avec cible : vitesse demandee
 ; (argument), multipliee par (3600 - d)/1800 si la distance d < 1800, divisee par 2 si
-; Pilot_SkillCheck_B0 reussit et que ma vitesse <= celle de la cible.
+; Pilot_SkillCheck_B0 reussit et que ma vitesse <= celle de la cible. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_ManeuverSpeedCmd_ED1E	proc far		; CODE XREF: seg008:0AABp seg008:0CD9p ...
 
@@ -1857,9 +1864,16 @@ loc_F6E7:				; CODE XREF: seg008:1137j
 ; : 1->2, 2->4, sinon 1. 1 : jambe ID20 de 1 s a +/-32/64 deg en alternant, retour 0. 2 :
 ; croisiere, roulis 180 puis tire a fond jusqu'a assiette >= -30 (avance immediatement en
 ; pratique). 3 : si trop bas ou vitesse >= croisiere -> assiette +5 puis 0 ; sinon assiette
-; -(40 TH^2/256)-5. 4 : ailes a plat, tire jusqu'a assiette <= 30. 5 : si altitude > plancher
-; + 3 x deck ou trop lent -> -5 puis 0 ; sinon +(40 TH^2/256)+5. 6 : croisiere, assiette 0,
-; fin.
+; -(40 FL^2/256)-5. 4 : ailes a plat, tire jusqu'a assiette <= 30. 5 : si altitude > plancher
+; + 3 x deck ou trop lent -> -5 puis 0 ; sinon +(40 FL^2/256)+5. 6 : croisiere, assiette 0,
+; fin. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les
+; octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99,
+; +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
 MVRS_ID3_TickEnergyManeuver_F72B:				; DATA XREF: seg339:off_6D334o
 		push	bp

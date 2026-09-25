@@ -25,6 +25,55 @@ Ordre conseillé : §1 et §2 (le bombardement ne marche pas sans eux), puis §3
 
 ---
 
+## 0bis. [P1] Les traits `ATRB` sur l'entité : l'ordre du fichier n'est pas l'ordre en mémoire (corrigé le 2026-09-25)
+
+`PilotProfile_LoadATRB_12E47` range les 10 octets du fichier (ordre `TH, CN, VB, LY, FL, AG, AA,
+SM, AR, 10e`) **dans le désordre** : profil `+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
++0x9E, +0x9F` (10e borné à 3). Le profil est le sous-objet à `entité+0x1A` (constructeur de
+l'entité IA : `mov word ptr es:[bx+1Ah], 368h`, vtable dont le 1er slot est ce chargeur), donc
+`entité+0xB0 + i` = profil `+0x96 + i` :
+
+| Entité | Trait | Ancienne lecture (fausse) | Qui le lit (noms actuels) |
+|---|---|---|---|
+| `+0xB0` | **`FL` (Flying)** | `TH` | voir la liste ci-dessous — c'est le trait qui **pilote l'avion** |
+| `+0xB1` | `TH` (Trigger Happy) | `CN` | `Pilot_SkillCheck_B1` (depuis `AI_RadarScanTarget`) |
+| `+0xB2` | `VB` (Verbosity) | `VB` | `Radio_CanPlayMessage` |
+| `+0xB3` | **`CN` (Confidence)** | `LY` | `AI_ComputeMorale_CD4A` (paliers 3/6/12/15) |
+| `+0xB4` | **`LY` (Loyalty)** | `FL` | `AI_MoraleDisciplineCheck_CA93` (tient son rôle si `LY` + moral > 7), `AI_MessageDispatcher` (> 14) |
+| `+0xB5` | `AG` | `AG` | attaque au sol |
+| `+0xB6` | `AA` | `AA` | `Pilot_ReactionThreshold_B6` (tir) |
+| `+0xB7` | `SM` | `SM` | `Pilot_SkillCheck_B7` |
+| `+0xB8` | `AR` | `AR` | poids du choix de cible |
+| `+0xB9` | 10e octet (≤ 3) | — | — |
+
+Même valeurs par défaut sans chunk : 10 pour `FL`, `AG`, `AA` ; 8 pour les autres ; 0 pour le 10e.
+`FL`, `AG` et `AA` sont en plus décalés selon la difficulté (`PilotProfile_RescaleSkillByDifficulty_12FC9`).
+Billy : `FL` = 15, `TH` = 10, `CN` = 14, `LY` = 13.
+
+**À faire dans le portage** : garder la lecture du fichier dans l'ordre, mais faire lire à chaque
+consommateur le **bon** trait. Tout code écrit d'après les anciens documents avec
+`atrb.TH` là où l'original lit `+0xB0` doit lire `atrb.FL`, `CN` → `TH`, `LY` → `CN`, `FL` → `LY`.
+
+### Le pilotage `FL` conduit l'avion
+
+Tous les usages de `entité+0xB0` retrouvés :
+- **Autorité au manche de tangage** : `±9·max(FL, 8)/G` (`AI_ClampPitchStick_5305`, posé par
+  `AIAircraft_LoadProfileGuarded_73940`) — un `FL` faible tire moins fort (§7).
+- **Garde au sol** `entité+0xE1 = min(9·max(FL, 8)/32, 5)` (même fonction), lue par l'évitement du
+  sol (ID14).
+- **Assiette des manœuvres d'énergie** (ID3) : `5° + 40° × (FL/16)²`.
+- **Reprendre de la vitesse** (ID16) : score 1 seulement si `FL < 12` — seuls les pilotes moyens le font.
+- **Vitesse de manœuvre** : `AI_ManeuverSpeedCmd_ED1E` divise la vitesse par 2 si
+  `Pilot_SkillCheck_B0` réussit et que je suis plus lent que la cible.
+- **Choix de cible** : `AI_TopLevelThink` n'appelle `Targeting_AcquireBestThreat` que si `FL ≥ 12`
+  (hors déclencheur `byte_6E4D7`) ; porte `(rand & 15) + 1 ≤ FL + si` par candidat ; poids
+  `(AR − FL) + 16` et `(FL − AR) + 16` ; bonus `FL²/16 − 8` pour les missiles.
+- **Alerte de menace** (`AI_IncomingThreatWarning`) : seuil `FL ≥ 13` puis jet de pilotage.
+- Scores des manœuvres ID1, ID2, ID3, ID7 (jet avec modificateur −7) ; `AI_EvalTargetAttribute` ;
+  `AI_RadarScanTarget` (minuteur/portée).
+- `entité+0x179` = 15 si `FL < 4`, 7 si `FL < 11`, sinon 3 (`PilotProfile_LoadNUMSCompanionFile_73FB4`,
+  rôle non tracé).
+
 ## 1. [P1] Attaque au sol : condition inversée entre les phases 0 et 1
 
 **Où.** `SCAIBrain::updateGroundAttack`, ligne 771 :
@@ -194,9 +243,9 @@ tangage**, avec zone morte, en écrivant les axes du manche (les mêmes que le j
   - sinon : ailes à plat et, seulement une fois `|roulis| < 15°`, `s = e/15` pour `e < 15°`,
     `s = 1` au-delà (négatif = pousser, pour `−15° < e < 0`) ;
   - `s` passe ensuite par `AI_ClampPitchStick_5305` (lue le 2026-09-25) : borné à ±`L`, avec
-    `L = 9 · max(compétence, 8) / G` (compétence = `entité+0xB0`, `G` = facteur de charge max
+    `L = 9 · max(FL, 8) / G` (`FL` = trait Flying, `entité+0xB0`, `G` = facteur de charge max
     `JDYN+0x67`), sur l'échelle du manche de l'original où **16 = butée** ; sur un axe `[−1, 1]`,
-    borner à `±min(1, L/16)`. Exemple : compétence 8, G = 9 → L = 8 → la moitié de la butée.
+    borner à `±min(1, L/16)`. Exemple : `FL` = 8, G = 9 → L = 8 → la moitié de la butée.
   Les piqués de plus de 15° se font donc **sur le dos, en tirant**.
 - Tourner vers une direction : `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (loi
   ci-dessous, **relue le 2026-09-25**) → `AI_CombatDecision_Major` → commandes de roulis/tangage.
@@ -266,7 +315,7 @@ bool SCAIBrain::combatDecision(float h, float v, float r) {
 // bankError(e, zm) = AI_BankErrorCmd_7F34 : inclinaison visée roll()+e bornée à ±maxBank
 //   (maxBank = 90° × G/6 si G < 6, sinon 90°) ; si |e| > zm : rollStick = rollStickFromError(e, dt),
 //   retourne false ; sinon true.
-// clampPitch(x) = AI_ClampPitchStick_5305 : ±9·max(compétence, 8)/G.
+// clampPitch(x) = AI_ClampPitchStick_5305 : ±9·max(FL, 8)/G.
 ```
 Le pilote vise donc en **inclinant d'abord puis en tirant** (jamais de manche à pousser sauf cible
 juste sous le nez) ; la force de la ressource croît avec le carré de l'écart (`(a/20)²`), la pleine
@@ -314,10 +363,10 @@ n'utilise **pas** cette fonction.
 - Sous 50 m/s ou au-delà de 25° d'angle d'écoulement, le roulis est réduit : comme
   `combatDecision` ne tire qu'une fois l'inclinaison atteinte, l'IA **attend plus longtemps avant
   de tirer** — autolimitation naturelle près du décrochage.
-- Autorité au manche `9·max(compétence, 8)/G` sur 16 : en fraction de la butée,
-  `0,5625·max(compétence, 8)/G`. Si la loi de charge est proportionnelle au manche (butée =
+- Autorité au manche `9·max(FL, 8)/G` sur 16 : en fraction de la butée,
+  `0,5625·max(FL, 8)/G`. Si la loi de charge est proportionnelle au manche (butée =
   `JDYN` n°22 = G max, `PHYSICS.md` §5.7), le **facteur de charge maximal de l'IA vaut
-  `0,5625 × max(compétence, 8)` G quel que soit l'avion** (4,5 G à 8, 9 G à 16), borné par le G max.
+  `0,5625 × max(FL, 8)` G quel que soit l'avion** (4,5 G à 8, 9 G à 16), borné par le G max.
 - `K/270` (`JDYN+0x71`/270) vaut 1 pour le F-16 : un avion qui roule moins vite tire aussi moins
   fort pour le même écart.
 
@@ -326,7 +375,7 @@ n'utilise **pas** cette fonction.
 `Aero_ApplyGroundEffect`, à la vitesse air sur l'axe du nez ; ce n'est pas un plafond d'effet de
 sol. Valeurs F-16 utiles ici : accélération de roulis `JDYN+0x47` = 540 °/s², taux de roulis max
 `JDYN+0x71` = 270 °/s (le `K/270` de `combatDecision` vaut donc 1 pour le F-16), décrochage 30°,
-G max 9 (→ inclinaison max 90°, autorité au manche `max(compétence, 8)` sur 16).
+G max 9 (→ inclinaison max 90°, autorité au manche `max(FL, 8)` sur 16).
 
 
 ---
@@ -456,16 +505,16 @@ int SCAIBrain::computeMorale() {                    // AI_ComputeMorale_CD4A, un
     int enemies_alive = count_alive(other_team), own_losses = count_destroyed(my_team);
     if (enemies_alive > 0 && my_team != NEUTRAL) s += -8 * enemies_alive - 32 * own_losses;
     if (reaction_level != REACT_NONE) s -= 50;
-    int LY = atrb.LY;
-    s += LY < 3 ? 0 : LY < 6 ? 15 : LY < 12 ? 30 : LY < 15 ? 50 : 75;
+    int CN = atrb.CN;                               // +0xB3 = Confidence (corrigé 2026-09-25, §0bis)
+    s += CN < 3 ? 0 : CN < 6 ? 15 : CN < 12 ? 30 : CN < 15 ? 50 : 75;
     if (enemies_alive > 0 && s >= 80) s = 79;
-    if (LY > 9 && s < 25) s = 25;
-    if (LY <= 0) s = 0;
+    if (CN > 9 && s < 25) s = 25;
+    if (CN <= 0) s = 0;
     return s < 25 ? 5 : s < 50 ? 4 : s < 80 ? 3 : 2;   // 5 panique … 2 bon
 }
 bool SCAIBrain::isDisciplined() {                   // AI_MoraleDisciplineCheck_CA93, réévalué toutes les 3 s
     static const int adj[4] = {+7, +4, -3, -5};      // moral 2, 3, 4, 5
-    return atrb.FL + adj[morale - 2] > 7;
+    return atrb.LY + adj[morale - 2] > 7;           // +0xB4 = Loyalty (corrigé 2026-09-25)
 }
 bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, sinon false
     bool player_side = owner->team_id == player_team;
@@ -498,10 +547,10 @@ bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, s
   la base de départ ou le point de sortie de la mission.
 - `enemies_active` : `byte_6E4CD`, « un avion du camp adverse a réfléchi au cycle radio précédent »
   (déduction) ; en attendant, « au moins un ennemi en vie à portée radar ».
-- Avec Billy (`LY = 13`, `FL = 15`) : score plancher 25, donc moral 4 au pire (jamais 5), et
-  `FL + ajustement` vaut au moins 15 − 3 = 12 > 7 : il est **toujours discipliné**. **Billy ne fuit
+- Avec Billy (`CN = 14`, `LY = 13`) : score plancher 25, donc moral 4 au pire (jamais 5), et
+  `LY + ajustement` vaut au moins 13 − 3 = 10 > 7 : il est **toujours discipliné**. **Billy ne fuit
   pas et ne prend pas d'initiative par le moral**. Ses 0x12 viennent de l'entrée en combat (B). Tester le moral avec un
-  profil à `LY` et `FL` bas.
+  profil à `CN` et `LY` bas.
 
 **Comment ces réactions s'expriment : pas de faux `PROG`.** Dans l'original, la réaction écrit
 l'objectif de l'entité (comme le ferait le script), le **verrouille** contre le script (bit 5 de
@@ -537,8 +586,8 @@ réplique `0x10` ; mêmes critères que l'entrée en combat, vus depuis le joueu
 **Ordre dans `tick()`** : ordres radio du joueur → esquive (niveau 2) → entrée en combat contre un
 attaquant (B) → comportement en cours → `GOAL` (dont 5 = moral, 2 = ordre, 4 = combat, 3 = errance).
 
-**Test.** Profil à faible `LY` et `FL`, camp adverse, après plusieurs pertes : le MiG annonce 8 et
-part. Ailier du joueur à faible `LY`/`FL` sur qui le joueur tire, sans autre ennemi : il annonce
+**Test.** Profil à faible `CN` et `LY`, camp adverse, après plusieurs pertes : le MiG annonce 8 et
+part. Ailier du joueur à faible `CN`/`LY` sur qui le joueur tire, sans autre ennemi : il annonce
 0x20 et attaque le joueur.
 
 ## 8quater. [P2] Navigation vers un point : l'original utilise le pilote automatique physique
@@ -588,7 +637,7 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 |---|---|---|
 | 1 | Réacquisition par jambes de 1 s | 1re jambe à ±30° côté cible, puis −60° à chaque jambe, toujours du même côté (bug d'origine), max 4 jambes, fin si cible < 60° du nez |
 | 2 | Dégagement | manche latéral à fond du côté du manche actuel (au hasard si neutre), manche tiré à fond |
-| 3 | Manœuvre d'énergie | piqué si trop lent, chandelle si trop bas, sinon au hasard ; assiette 5° + 40° × (TH/16)² ; 4 s |
+| 3 | Manœuvre d'énergie | piqué si trop lent, chandelle si trop bas, sinon au hasard ; assiette 5° + 40° × (FL/16)² ; 4 s |
 | 4 | Virage défensif (sur alerte de menace) | plein gaz, inclinaison 90° (60° si trop bas) côté cible, tirer ; fin après 90° de cap |
 | 5 | Montée verticale + retournement | reprise de vitesse, +90°, roulis vers la cible, tirer jusqu'à 45° ; 5 s |
 | 6 | Split-S | monter jusqu'à plancher + 2000, dos, −90°, roulis vers la cible, tirer jusqu'à −45° ; 5 s |

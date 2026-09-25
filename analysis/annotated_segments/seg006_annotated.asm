@@ -1500,7 +1500,14 @@ Goal_TransferToWingman	endp
 ; ==============================================================================================
 ; far,578L — appelé par sub_814C : gère une file de messages (+0x1A/+0x26 via sub_1EC46) et un
 ; verrou de cible (+0x9C) : dispatcher de traitement des messages/événements IA de haut
-; niveau, en amont de la sélection de GOAL — à approfondir.
+; niveau, en amont de la sélection de GOAL — à approfondir. TRAITS ATRB CORRIGES 2026-09-25 :
+; le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_MessageDispatcher	proc far		; CODE XREF: AI_TopLevelThink+34P
 
@@ -2099,11 +2106,18 @@ off_CA7F	dw offset loc_C6B6	; DATA XREF: AI_MessageDispatcher+E4r
 
 ; ==============================================================================================
 ; Ex-'Voice_ExpressionTimer' (ni voix ni expression). far, 90L, LUE 2026-09-25. Toutes les 3 s
-; au plus (horloge +0x175 contre +0x15C), v = FL (+0xB4) + ajustement selon le moral
+; au plus (horloge +0x175 contre +0x15C), v = LY (Loyalty, +0xB4) + ajustement selon le moral
 ; (AI_ComputeMorale_CD4A : 2 -> +7, 3 -> +4, 4 -> -3, 5 -> -5) ; bit 6 de +0x28B = (v > 7).
 ; Renvoie ce bit (valeur memorisee entre deux evaluations). Utilisee par
 ; Goal_MoraleReaction_878F : un pilote qui passe ce test tient son role (ne fuit pas, ne prend
-; pas d'initiative).
+; pas d'initiative). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47
+; range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97,
+; +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
 AI_MoraleDisciplineCheck_CA93	proc far		; CODE XREF: seg004:06DBP seg004:0A83P ...
 
@@ -2401,7 +2415,14 @@ off_CC6A	dw offset loc_CBB9	; DATA XREF: Radio_PlayMessage+6Fr
 ; tombe a 0, OU si entite+0x149==2 (etat special). SINON : verifie le temps ecoule contre un
 ; seuil PAR PALIER (80/60/40/20 unites) determine par la valeur effective (proche de l'echelle
 ; 0-16 de bavardage) - plus bavard = seuil de temps plus bas = peut reparler plus souvent.
-; Retourne 1 (bloque, ne peut pas jouer) ou 0 (autorise).
+; Retourne 1 (bloque, ne peut pas jouer) ou 0 (autorise). TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Radio_CanPlayMessage	proc far		; CODE XREF: seg004:2035P seg004:204DP ...
 
@@ -2537,7 +2558,14 @@ word_CD32	dw	6,     7,     8,   10h ; DATA XREF: Radio_CanPlayMessage+30o
 ; : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire
 ; vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus
 ; de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79
-; tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0.
+; tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0. TRAITS ATRB CORRIGES
+; 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH,
+; CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B,
+; +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr
+; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
+; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
+; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_ComputeMorale_CD4A	proc far		; CODE XREF: seg004:068AP AI_MessageDispatcher+EFp ...
 

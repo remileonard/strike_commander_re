@@ -17,7 +17,14 @@ ovr228		segment	para public 'OVERLAY' use16
 ; Anciennement mal nommee AircraftDamageModel_ComputeStatus. Appelee par
 ; AIAircraft_LoadProfileWrapper_9D4D2 via VROOMM_StubThunk_6AB07, elle-meme appelee depuis
 ; AIAircraft_SpawnAndConditionalLoadProfile_53363 (seg114, systeme Expr_VM) - uniquement pour
-; les entites non-PLAYER.
+; les entites non-PLAYER. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AIAircraft_LoadProfileGuarded_73940	proc far		; CODE XREF: VROOMM_StubThunk_6AB07J
 
@@ -760,7 +767,15 @@ PilotProfile_LoadFromPROF_73B4F	endp
 ; fixe 24.8 - un decalage PUREMENT HORIZONTAL, sans changement d'altitude, CONFIRME comme
 ; decalage de FORMATION (pas une position absolue - des coordonnees monde reelles n'auraient
 ; pas des valeurs aussi rondes). Voir tools/decode_nums.py pour le decodeur complet et
-; analysis/AI_SYSTEM.md pour le detail de toutes les valeurs.
+; analysis/AI_SYSTEM.md pour le detail de toutes les valeurs. TRAITS ATRB CORRIGES 2026-09-25
+; : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY,
+; FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D,
+; +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h',
+; vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 =
+; TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR,
+; +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou
+; FL pour +0xB4 est a lire selon cette table. Pose aussi entite+0x179 = 15 si FL < 4, 7 si FL
+; < 11, sinon 3 ('cmp byte ptr es:[bx+0B0h], 4 / 0Bh') - role de +0x179 non trace.
 ; ==============================================================================================
 PilotProfile_LoadNUMSCompanionFile_73FB4	proc far		; CODE XREF: VROOMM_StubThunk_6AAEEJ AIAircraft_LoadProfileGuarded_73940+6Bp
 

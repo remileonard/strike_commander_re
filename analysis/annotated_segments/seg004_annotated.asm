@@ -19,7 +19,14 @@ seg004		segment	byte public 'CODE' use16
 ; decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du
 ; comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis
 ; attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <=
-; 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'.
+; 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'. TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_TopLevelThink	proc far		; CODE XREF: AI_TriggerBehaviorUpdate+35P
 
@@ -1132,9 +1139,17 @@ loc_8C18:				; CODE XREF: seg004:0673j seg004:077Cj ...
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,31L — jet de dé pilote : lit stat pilote à +0xB0, ajoute modificateur (arg_4), tire
-; sub_70D (rand)%16+1, réussite si tirage ≤ seuil. Test de compétence/chance basé sur une
-; statistique pilote (offset 0xB0).
+; far, 31L. JET DE COMPETENCE EN PILOTAGE (FL, Flying = entite+0xB0) : reussite si (rand & 15)
+; + 1 <= FL + modificateur (arg_4). Appelants : Targeting_AcquireBestThreat,
+; MVRS_ID7_ScoreManeuverFuelGated_47D4 (modificateur -7), AI_IncomingThreatWarning,
+; AI_EvalTargetAttribute, AI_ManeuverSpeedCmd_ED1E. TRAITS ATRB CORRIGES 2026-09-25 : le
+; chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL,
+; AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E,
+; +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable
+; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
+; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
+; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Pilot_SkillCheck_B0	proc far		; CODE XREF: Targeting_AcquireBestThreat+A20P
 					; seg002:loc_4840P ...
@@ -1175,7 +1190,14 @@ Pilot_SkillCheck_B0	endp
 
 ; ==============================================================================================
 ; far,30L — identique à sub_8C1E mais sur la stat pilote à +0xB7 : test de compétence sur un
-; attribut pilote différent.
+; attribut pilote différent. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Pilot_SkillCheck_B7	proc far		; CODE XREF: seg002:026BP
 
@@ -1238,8 +1260,15 @@ locret_8CA0:				; CODE XREF: seg004:0B5Cj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,30L — identique à sub_8C1E/8C4A mais sur la stat pilote à +0xB1 : test de compétence sur
-; un 3e attribut pilote (probable trio gunnery/evasion/awareness).
+; far, 30L. Jet sur entite+0xB1 = TH (Trigger Happy), meme motif que Pilot_SkillCheck_B0 ;
+; appele depuis AI_RadarScanTarget. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Pilot_SkillCheck_B1	proc far		; CODE XREF: AI_RadarScanTarget+90p
 
@@ -1283,7 +1312,14 @@ Pilot_SkillCheck_B1	endp
 ; AI_BehaviorSelector_8D30 pour autoriser une rafale de canon : la qualite de solution de tir
 ; 'si' doit valoir au moins AA/2. Plus AA est eleve, plus le pilote attend une bonne solution
 ; avant de tirer ; un pilote faible (AA bas) tire des qu'il a une solution mediocre (si >= 2
-; exige par ailleurs).
+; exige par ailleurs). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Pilot_ReactionThreshold_B6	proc far		; CODE XREF: AI_BehaviorSelector+145p
 
@@ -1673,7 +1709,14 @@ AI_BehaviorSelector	endp
 ; far,228L — vérifie timer/portée ajustés par la compétence pilote (+0xB0), exclut certains
 ; types de cible (+0x10D), puis parcourt une liste chaînée d'objets (vtable calls) en
 ; cherchant un objet de type 8 différent de soi : boucle de balayage/sélection de cible (scan
-; radar).
+; radar). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les
+; octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99,
+; +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
+; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
+; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
+; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
+; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
+; selon cette table.
 ; ==============================================================================================
 AI_RadarScanTarget	proc far		; CODE XREF: AI_BehaviorSelector+81p AI_EvalTargetAttribute+6Ep
 
@@ -2940,7 +2983,14 @@ AI_ClassifyDistanceBand_98BD	endp
 
 ; ==============================================================================================
 ; far,77L — appelée par sub_9A46 avec une valeur extraite via vtable — probable évaluation
-; d'un paramètre de cible (type ou distance).
+; d'un paramètre de cible (type ou distance). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 AI_EvalTargetAttribute	proc far		; CODE XREF: AI_QueryTargetField4B+29p
 					; AI_MissileEvasionReaction_9A77+170p

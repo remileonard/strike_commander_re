@@ -199,7 +199,7 @@ flowchart TD
 
 `AI_TopLevelThink` (`seg004`) est appelée par `AI_TriggerBehaviorUpdate` (référence de code `AI_TriggerBehaviorUpdate+35`). Ce n'est **pas** une simple boucle sur les emplacements `GOAL` : les objectifs viennent en dernier. Ordre réel, tel que lu (le milieu de la fonction, entre le test de menace et le point `loc_83F0`, n'a **pas** été lu en détail) :
 
-1. **Début** : si `byte_6E4D7` est non nul et `entité+0xB0` ≥ 0xC (`TH` d'après `AI_SYSTEM.md` §1.5), appel de `Targeting_AcquireBestThreat`. Puis `AI_MessageDispatcher` et `Radio_CombatChatterDispatch`.
+1. **Début** : si `byte_6E4D7` est non nul et `entité+0xB0` ≥ 0xC (`FL`, pilotage — corrigé le 2026-09-25, voir `AI_SYSTEM.md` §2.3), appel de `Targeting_AcquireBestThreat`. Puis `AI_MessageDispatcher` et `Radio_CombatChatterDispatch`.
 2. **Le traitement des menaces est sauté** (`jmp loc_83F0`) dans trois cas : `entité+0x11D` vaut `0xA1` (décollage) ou `0xA2` (atterrissage) ; l'avion est au sol (l'octet `+0x20` du sous-objet pointé par le premier champ de l'objet à `entité+0xB` non nul) ; `word_70466` ≤ 3. Sinon, `AI_IncomingThreatWarning` et la mise à jour de la chaîne de cibles (`+0x287` / `+0x289`).
 3. **Réactions prioritaires, avant tout objectif** (`loc_83F0`) : si `entité+0x281` est non nul, alors `AI_MissileEvasionReaction_9A77` quand `entité+0x0D` est nul et `entité+0x27F` vaut 2, et `AI_QueryTargetField4B` dans les autres cas. Puis, si rien n'a réagi et `entité+0x27F` ≤ 1, `AI_EngageAttackerReaction_E246`. Si l'un des deux gestionnaires de réaction a réagi, **la fonction se termine ici**.
 4. **Objet en cours** : si `entité+0x0D` (pointeur far) est non nul **et** `entité+0x27F` non nul, appel de `[vtable+0xC]` de cet objet, temps cumulé dans `word_704E6+0x5B56`, et **fin de la fonction** : ni `GOAL` ni tournoi. `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` contient le même bloc (si `entité+0x0D` est non nul, pas de nouveau score).
@@ -253,7 +253,7 @@ sol si ≤ 4, recherche de cible si ≤ 3, esquive si == 2, entrée en combat co
 
 ### 3. Ordre complet d'un tick (`AI_TopLevelThink`)
 
-1. Ciblage éventuel (`byte_6E4D7` et `TH ≥ 12`), messages radio.
+1. Ciblage éventuel (`byte_6E4D7` et `FL ≥ 12`), messages radio.
 2. **Alerte de menace** (sauté en décollage/atterrissage, au sol, difficulté ≤ 3, bit 6 de
    `entité+0x28D` déjà posé, ou `+0x27F > 1`) : si `AI_IncomingThreatWarning` répond, la cible
    `+0x287` est reprise de `+0x289` si besoin, **le comportement en cours est abandonné**, et le
@@ -454,7 +454,7 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
    basse) → s'incliner (`AI_BankErrorCmd_7F34`) puis tirer à fond ; cible juste sous le nez
    (inclinaison requise > 145°) → ailes à plat et pousser `16·(v/10)²` ; sinon s'incliner de
    `r·(a/20)²·K/270` et tirer `16·(a/20)²·K/270` (`K` = `JDYN+0x71`). Le manche de tangage est
-   borné par l'autorité du pilote `9·max(compétence, 8)/G` (`AI_ClampPitchStick_5305`),
+   borné par l'autorité du pilote `9·max(FL, 8)/G` (`AI_ClampPitchStick_5305`),
    l'inclinaison par `90° × G/6` quand `G < 6`. Pseudo-code : `IMPL_SCAIBRAIN_CORRECTIONS.md` §7.
 
 ### Ce que fait chaque identifiant
@@ -463,7 +463,7 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 |---|---|---|---|
 | 1 | Virage de réacquisition par jambes | tournoi | Jambes de 1 s (nœud ID20) : la 1re à ±30° du nez côté cible, puis −60° à chaque jambe ; fin quand la cible est à moins de 60° du nez, sans cible, ou après 4 jambes. **Bug d'origine** : le test d'alternance `test ax, 0` est toujours faux, les jambes tournent donc toujours du même côté. |
 | 2 | Dégagement (break) | tournoi (score 10 constant) | Côté choisi par le manche latéral du moment (> 3/16 → un côté, < −3/16 → l'autre, sinon au hasard) ; manche latéral à fond de ce côté, manche tiré à fond (ou poussé à moitié si l'avion est sur le dos par rapport à l'axe visé), jusqu'au minuteur. |
-| 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (jambes de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (TH/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
+| 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (jambes de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (FL/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
 | 4 | Virage défensif | **alerte de menace**, hors tournoi (`entité+0xBD`) | Plein gaz, inclinaison 90° (60° si trop bas) côté cible, tiré à fond ; quand le cap a tourné de 90° ou minuteur écoulé : assiette +10°, fin. |
 | 5 | Montée verticale et retournement (type Immelmann) | tournoi | Reprise de vitesse (piqué −30° si très haut), à plat, assiette +90°, roulis pour mettre la cible dans le plan de portance, tirer jusqu'à 45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
 | 6 | Split-S | tournoi | Monter à +30° jusqu'à plancher + 2000, puis +20° à vitesse minimale jusqu'à passer sous la croisière ; se mettre sur le dos, assiette −90°, roulis vers la cible, tirer jusqu'à −45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
@@ -472,7 +472,7 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 | 13 | **Prise d'altitude à longue distance** (pas un Scissors/Rollaway) | tournoi | Si la cible est à moins de 17 700 : fin. Sinon cap sur la cible à plat, niveau si trop lent, puis chandelle à `30° + 30° × (vitesse − croisière)/vitesse mini` (max 60°), ailes à plat, plein gaz, jusqu'au minuteur (4 s, compté double dans cette phase), trop lent ou cible à moins de 17 700 ; enfin nez à plat, manette de croisière. Score : exige de ne pas être trop lent et d'être sous le plafond `JDYN+0x86` (11 005 par défaut) ; favorisé si je vais plus vite que la cible, loin (> 17 700) et bien placé. |
 | 14 | **Évitement du sol** | réflexe niveau 4 (`AI_GroundAvoidReflex_E06C`, nœud `entité+0xC5`) | Test d'éjection (mode 2), puis `AI_GroundAvoidPullUp_6616` : assiette +30°, plein gaz (ou cran 1 en piqué rapide) jusqu'à monter au-dessus du plancher. Score 10 si sans cible, pilote automatique coupé, et trop près du sol (`entité+0xE1` corrigé par l'inclinaison) ou sous le plancher en descente. |
 | 15 | **Récupération nez haut / décrochage** | réflexe niveau 5 (`AI_StallRecoveryReflex_E159`, nœud `entité+0xC9`) | Test d'éjection (mode 1), puis `AI_NoseHighRecovery_676F` : ralenti si décroché nez > 60°, sinon plein gaz et assiette −30° ; fin quand le nez est repassé sous l'horizon. Minuteur 2 s. Score 10 si sans cible, pilote automatique coupé et (décroché, ou vitesse ≤ minimale avec nez > 30°). |
-| 16 | **Reprendre de la vitesse** (pas un retour à la base) | tournoi (score 1 si TH < 12) | `AI_RegainSpeed_68D4` : manette à la vitesse max `JDYN+0x80`, assiette +5°, jusqu'à dépasser (croisière + mini)/2. Minuteur 1,5 s. |
+| 16 | **Reprendre de la vitesse** (pas un retour à la base) | tournoi (score 1 si `FL` < 12) | `AI_RegainSpeed_68D4` : manette à la vitesse max `JDYN+0x80`, assiette +5°, jusqu'à dépasser (croisière + mini)/2. Minuteur 1,5 s. |
 | 19 | Attaque au sol | tournoi | Voir « L'attaque au sol ». |
 | 20 | Voler dans une direction | outil (nœud `entité+0xC1`) | Suit une direction mémorisée à plein gaz pendant le minuteur (jambes d'ID1 et ID3, alerte de proximité). |
 | 21 | Navigation au pilote automatique | outil (nœud `entité+0xD1`) | Voir plus haut. |
@@ -567,7 +567,7 @@ Le nœud de mon avion est à `entité+0x102` (sa position, à `+0x12`, sert de p
 
 1. Efface le bit `0x08` de `entité+0x28D` ; si `entité+0x27F` vaut 2, le remet à 0.
 2. **Court-circuit** : si `byte_6E33B` est non nul (mis à 1 par `IFF_LoadModelMain`), `entité+0x287` reçoit `word_722E6` (le joueur), `+0x281` et `+0x283` sont vidés, et la fonction renvoie `word_722E6`.
-3. Prépare : score initial **−5000** (`0EC78h`), deux poids issus de la copie `ATRB` (`+0xB0` = `TH`, `+0xB8` = `AR`) : `var_16 = (AR − TH) + 16` (multiplie le score A) et `var_18 = (TH − AR) + 16` (multiplie le score B), et **quatre tests d'arme chargée** par `WeaponStation_FindLoadedCompatible` sur `entité+0x104` : masques `1`, `3`, `0x700`, `0x83C`. Efface `entité+0x17A`.
+3. Prépare : score initial **−5000** (`0EC78h`), deux poids issus de la copie `ATRB` (`+0xB0` = `FL`, `+0xB8` = `AR`) : `var_16 = (AR − FL) + 16` (multiplie le score A) et `var_18 = (FL − AR) + 16` (multiplie le score B), et **quatre tests d'arme chargée** par `WeaponStation_FindLoadedCompatible` sur `entité+0x104` : masques `1`, `3`, `0x700`, `0x83C`. Efface `entité+0x17A`.
 
 ### Qui est candidat
 
@@ -589,14 +589,14 @@ Le calcul produit un score **A** (`di`), un score **B** (`var_12`) et une **apti
 - puis, avec `dword_72030` : hors portée, `si −4` ; dans la portée et l'angle < 45° : `si +5`, `A +6` ; entre 45° et 90° : `si +3`, `A +3` ; au-delà : rien.
 
 **Autres objets** (missiles, avions) : un angle d'aspect > 90° du côté du candidat met B à 0.
-- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += TH²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Vector_NormalizeInPlace_5593A` (normalisation) puis `Math_DotProduct3D_5505B` (produit scalaire)) donne une valeur < −180 et que ce même bit est absent.
+- **Missile (8)**, seulement s'il est dans `dword_72024` (et dans `dword_7202C` quand le masque `+0x4B & 0x700` est nul) : `B += 16·(1 − d/R) + 24` ; `si += FL²/16 − 8` ; `si +4` si `entité+0x287` ou `+0x283` désigne l'objet renvoyé par `vtable+0x38` du nœud ; `si −4` si l'angle > 135° et le bit `0x02` de `entité+0x28B` est absent ; encore `si −4` si la géométrie (`Vector_NormalizeInPlace_5593A` (normalisation) puis `Math_DotProduct3D_5505B` (produit scalaire)) donne une valeur < −180 et que ce même bit est absent.
 - **Avion (6)** : bandes d'angle (> 135°, > 90°, > 30°, sinon) qui ajoutent à `si`, `A` et `B` (de −4 à +8), une seconde géométrie < −180 (`si −4`), des bandes sur le second angle (80–100° : `A −5` ; 60–120° : `A −3`), puis des bandes de distance selon les armes chargées : au-delà de `dword_72024` `si −3`, `A −5` ; au-delà de `dword_72020` avec masque `0x700` `si −1`, `A +3` ; avec masque `3` : au-delà de `dword_7202C` `A −2`, `si −1`, en deçà de `dword_72028` `A −1`, `B +4` ; sans masque `1`, l'angle > 150° donne `A −3`, > 60° `A −1`.
 - **Persistance (avions seulement)** : candidat = `entité+0x287` → `A +3`, `si +5` ; candidat = `+0x289` → `si +3`, `B +5` ; l'avion qui me vise déjà (`nœud+0x5A` → `+0x0D` = mon nœud) → `si +2`, `B +1` ; terme de classe comparant `objet+0x52` à `byte_72038` et à ma classe (B = 0 si `byte_72038` ≥ classe).
 - **Tous** : bit `0x02` de `entité+0x28B` posé → `si +4` ; candidat = `entité+0x285` → `A +10`, `si +5`.
 
 ### Filtre de compétence et sélection
 
-`Pilot_SkillCheck_B0(entité, si)` est **une porte** : un candidat qui échoue est ignoré. Lue le 2026-09-20 (31 lignes) : `seuil = (octet signé entité+0xB0, c'est-à-dire TH) + si` ; `tirage = (CRT_Rand & 0x0F) + 1` (1 à 16) ; **réussite si `tirage ≤ seuil`**. Un `seuil` ≤ 0 échoue toujours, un `seuil` ≥ 16 réussit toujours. Le tirage est refait à chaque candidat et à chaque appel. `Pilot_SkillCheck_B1`, `_B7` et l'homologue de `+0xB8` sont identiques sur `CN`, `SM` et `AR`. Pour un **missile** qui réussit, `entité+0x281` reçoit le candidat **tout de suite**, même s'il ne gagne pas. Le candidat dont le score final dépasse le meilleur (départ −5000) devient le meilleur.
+`Pilot_SkillCheck_B0(entité, si)` est **une porte** : un candidat qui échoue est ignoré. Lue le 2026-09-20 (31 lignes) : `seuil = (octet signé entité+0xB0, c'est-à-dire `FL`, pilotage) + si` ; `tirage = (CRT_Rand & 0x0F) + 1` (1 à 16) ; **réussite si `tirage ≤ seuil`**. Un `seuil` ≤ 0 échoue toujours, un `seuil` ≥ 16 réussit toujours. Le tirage est refait à chaque candidat et à chaque appel. `Pilot_SkillCheck_B1`, `_B7` et l'homologue de `+0xB8` sont identiques sur `TH` (`+0xB1`), `SM` et `AR`. Pour un **missile** qui réussit, `entité+0x281` reçoit le candidat **tout de suite**, même s'il ne gagne pas. Le candidat dont le score final dépasse le meilleur (départ −5000) devient le meilleur.
 
 ### Résultat : trois champs, selon la catégorie du gagnant
 
@@ -654,7 +654,7 @@ Les masques `0x1`, `0x3` et `0x700` ne sont testés que si le bit 0 de `entité+
 
 **Rafale de canon** (`AI_BehaviorSelector`) : si le masque vaut `0x800`, `si` est ramené à 10 quand la manœuvre principale répond non nul et que `si` > 5. Si `si` ≥ 2 et que le seuil de réaction réussit, la longueur de rafale vaut `((rand & 3) + 4) × si / 10` (en appels de contrôle de tir, donc en 25<sup>e</sup> de seconde) ; le bit de tir est posé si elle dépasse 1. Elle est ensuite décrémentée à chaque appel.
 
-**Ce que ça dit des traits** : ni `TH` ni `AR` n'interviennent dans le choix de l'arme, le seuil de réaction ou la rafale. Le trait qui décide du tir est **`AA`**. `TH` et `AR` agissent sur le choix de cible (`Targeting_AcquireBestThreat`).
+**Ce que ça dit des traits** : ni `FL` ni `AR` n'interviennent dans le choix de l'arme, le seuil de réaction ou la rafale. Le trait qui décide du tir est **`AA`**. `FL` et `AR` agissent sur le choix de cible (`Targeting_AcquireBestThreat`).
 
 **Qualité de solution de tir — `AI_ComputeFireSolutionQuality_91DF`** (ancien nom `AI_ManeuverSolution_91DF`). Elle renvoie un entier `si` de 0 à 10 pour la cible aérienne et l'arme choisie.
 - Cible à 90° ou plus du nez : 0. Base : `10 − (écart_nez × 10) / 35`. Aspect croisé (cap de la cible entre 50° et 130° de la direction vers elle) : −4.

@@ -209,7 +209,14 @@ AI_ProximityGeometricWarning_315B	endp
 ; la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir,
 ; pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur).
 ; Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail :
-; analysis/AI_TICK_CALL_GRAPH.md.
+; analysis/AI_TICK_CALL_GRAPH.md. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur
+; PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA,
+; SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ;
+; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368
+; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
+; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
+; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
+; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
 Targeting_AcquireBestThreat	proc far		; CODE XREF: AI_TopLevelThink+23P AI_BehaviorStateMachine_WeightedOptionSelector_9D05+75P ...
 
