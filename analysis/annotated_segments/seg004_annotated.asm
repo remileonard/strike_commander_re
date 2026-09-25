@@ -14,7 +14,12 @@ seg004		segment	byte public 'CODE' use16
 ; (word_70466), gère alerte menace (sub_5392), met à jour la chaîne de cibles (+0x287/+0x289)
 ; et notifie l'affichage radar (vtable[8]). Candidat très fort pour le point d'entrée
 ; principal du 'think' IA par avion (proche de SelectAIBehaviorPriorityAndTrackStats déjà
-; documenté) — 435 lignes, à disséquer en détail dans une session dédiée.
+; documenté) — 435 lignes, à disséquer en détail dans une session dédiée. | Relue en entier le
+; 2026-09-25 (y compris le milieu) : sur alerte de menace (AI_IncomingThreatWarning, sauf
+; decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du
+; comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis
+; attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <=
+; 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'.
 ; ==============================================================================================
 AI_TopLevelThink	proc far		; CODE XREF: AI_TriggerBehaviorUpdate+35P
 
@@ -3362,48 +3367,21 @@ AI_MissileEvasionReaction_9A77	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, gestionnaire GOAL selecteur 4 - CONFIRME etre le CONSOMMATEUR REEL de la table MVRS
-; complete (tableau contigu PilotProfile+0x202, pas de 5 octets, compteur a +0x200 - voir
-; correction sur PilotProfile_LoadFromPROF_73B4F). MECANISME DE SELECTION PONDEREE ALEATOIRE
-; ENTIEREMENT DECODE : pour chaque entree MVRS (si son pointeur de noeud est non-nul) : (1)
-; reinitialise noeud[+0xC]=0 ; (2) appelle la methode virtuelle [vtable+4](noeud) - MEME
-; methode que celle consultee par Entity_ProximityTest_ThreatGate_315B ; (3) si le resultat
-; est non-nul, tire un bit aleatoire (CRT_Rand_70D) donnant +1 ou -1 ; (4) SOMME : score =
-; resultat_vtable + valeur_brute_signee_du_fichier + bruit aleatoire(+/-1) ; (5) MECANISME DE
-; TOURNOI CONFIRME (verification precise du code) : le seuil de comparaison demarre a
-; 0xFC18=-996 (plancher tres bas) puis EST REMPLACE par le score du candidat gagnant a chaque
-; fois qu'un nouveau candidat le depasse - c'est une VRAIE recherche du meilleur score
-; (argmax), pas un simple seuil fixe. L'ancien meilleur candidat voit son drapeau 'choisi'
-; efface a chaque changement de champion. Un seul candidat final survit a la fin de la boucle
-; (var_16). Apres la boucle, si une candidate a ete retenue, mesure un delai ecoule
-; (sub_27144, horloge/timer, delta accumule dans une table globale word_704E6+0x5B56/+0x5B60 -
-; probable cooldown/statistique par pilote) puis execute l'action associee a cette candidate.
-; INTERPRETATION : chaque entree MVRS represente une OPTION DE COMPORTEMENT/MANOEUVRE
-; CANDIDATE, ponderee par un poids de base calcule dynamiquement par son noeud (type-
-; dependant, via vtable) PLUS un modificateur propre au pilote (la valeur signee du fichier
-; PROF) PLUS du bruit aleatoire - la boucle fait une selection ponderee aleatoire parmi toutes
-; les options configurees. Explique l'observation empirique de Remi : une valeur negative
-; (cargo, ID=3 -> -2) penalise systematiquement une option specifique, la rendant moins
-; susceptible d'etre choisie ; une liste MVRS totalement vide fait echouer la boucle
-; entierement (aucune candidate trouvee), forcant probablement un chemin de repli plus direct
-; - explication plausible du comportement plus decisif observe apres suppression de MVRS.
-; Reste a tracer : le chemin de repli exact (loc_9E2E et environs) et la signification precise
-; de chaque type de noeud/option. CASCADE DE PRIORITE AU-DESSUS DU TOURNOI (verifiee
-; precisement, resolution de +0x281/+0x283/+0x287) : au tout debut de la fonction, AVANT le
-; tournoi MVRS lui-meme, verifie dans l'ordre +0x287 (deja documente via
-; Goal_SelectTransition), +0x281 (reference d'escorte, voir
-; AI_EscortPriorityReactionHandler_9A77), puis +0x283. +0x283 EST CONFIRME COMME UN NOEUD
-; DEDIE PERMANENT DE TAG MVRS 0x13 (19) - LE MEME TAG QUE 'URGENCE CARBURANT' (construit une
-; fois par pilote au chargement, push 0x13 avant sub_742FC dans
-; PilotProfile_LoadFromPROF_73B4F, ligne 254914 - verifie precisement via calcul d'offset dans
-; seg339, [+8]=loc_118C3, exactement MVRS_ID19_ApplyReturnToBase_118C3 deja documentee en
-; detail). Quand +0x283 est actif, la cascade appelle DIRECTEMENT [entite+0xD9->vtable+8] - CE
-; QUI EST LITTERALEMENT LA MEME FONCTION D'APPLICATION que le type 'urgence carburant' du
-; tournoi, mais invoquee HORS TOURNOI, en court-circuit prioritaire. CONCLUSION : +0x283 est
-; un DRAPEAU/REFERENCE 'URGENCE CARBURANT CONFIRMEE' distinct de l'entree MVRS dynamique du
-; meme nom - probablement pose par un capteur de niveau de carburant ailleurs dans le code,
-; permettant a la reaction de retour a la base de s'executer immediatement sans attendre que
-; le tournoi la selectionne naturellement par le score.
+; far, RELUE INTEGRALEMENT (2026-09-25). GESTIONNAIRE DE COMBAT, appele par le gestionnaire
+; GOAL 4 (arg_4 = 0) et par Goal_ExecuteAction_A8AC (ordres detruire/defendre : arg_4 = 0 ;
+; 0xAC : arg_4 = 1). arg_4 = nouvelle cible sol autorisee. (1) AI_MissileEvasionReaction_9A77
+; ; (2) ciblage (Targeting_AcquireBestThreat, limite par Timer_OneShotEvent_A288 sur +0x174
+; quand une menace existe deja) ; (3) sans cible aerienne +0x287 : esquive si menace missile
+; +0x281, sinon noeud d'attaque au sol +0xD9 (methode +8) si cible sol +0x283 et arg_4, sinon
+; renvoie 0 (le gestionnaire GOAL suivant prend la main) ; (4) avec cible aerienne et +0x27F
+; <= 1 : AI_BehaviorSelector (tir et poursuite) ; s'il agit (bit de tir ou qualite de solution
+; > 0), le comportement en cours +0x0D est ABANDONNE (NotifiableRef_DetachTarget_75661) et
+; renvoie 1 ; (5) sinon comportement en cours : sa methode +0xC ; (6) sinon TOURNOI : entrees
+; +0x202 (5 octets : noeud, poids signe), +0x200 entrees ; score = methode +4 (0 = exclue) +
+; poids + bruit +/-1 (rand & 1), meilleur au-dessus de -1000 (0FC18h), perdants : noeud+2 = 0
+; ; gagnant : methode +8 (qui s'empile en general comme comportement en cours). Contexte passe
+; aux methodes : cible +0x287 et copie du vecteur +0x1A4. L'ancien resume (urgence carburant,
+; +0x281 = escorte) etait faux. Detail : AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'.
 ; ==============================================================================================
 AI_BehaviorStateMachine_WeightedOptionSelector_9D05	proc far		; CODE XREF: seg004:0756p Goal_ExecuteAction_A8AC+AAP ...
 

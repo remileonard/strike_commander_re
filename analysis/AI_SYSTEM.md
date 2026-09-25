@@ -240,6 +240,13 @@ entrée de tournoi — elle est interceptée par une chaîne de cas
 spéciaux et stockée comme **biais de configuration** dans un champ
 dédié sur le nœud déjà construit :
 
+> **Précision 2026-09-25** : ce « champ de biais » est en réalité **l'octet de poids de l'entrée du
+> nœud dans la table du tournoi** (entrées 0 à 7, 5 octets à partir de `entité+0x202`). Les 8 nœuds
+> fixes concourent donc toujours au tournoi, avec un poids 0 si le fichier ne les cite pas, et les
+> fichiers d'exemple les citent bien (Billy/Stern/Hammer listent 1 à 13, dont 4 et 7). Voir
+> `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tournoi `MVRS` ».
+
+
 | ID (déc) | Tag du nœud | Champ de biais (si présent dans le fichier) |
 |---|---|---|
 | 4 | `0x264` | `+0x229` |

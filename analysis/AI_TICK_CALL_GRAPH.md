@@ -214,6 +214,99 @@ Citations : `cmp byte ptr [bx+20h], 0 / jz loc_84E9 / call Goal_ExecuteAction_A8
 
 **Ce que `entité+0x0D` n'est pas** : ce n'est pas le nœud `MVRS` gagnant lui-même. `Behavior_PopFinished_75612` y copie `nœud+4/+6` (`mov es:[bx+0Fh], ax / mov es:[bx+0Dh], dx` sur l'objet pointé par `nœud+8`, qui est l'entité), et `NotifiableRef_DetachTarget_75661` le remet à zéro. La règle de comportement est établie (un objet en cours passe avant tout), sa nature ne l'est pas.
 
+## `GOAL` et tournoi `MVRS` : l'arbitrage complet (relu le 2026-09-25)
+
+Relecture intégrale de `AI_TopLevelThink` (y compris son milieu, jamais lu),
+`AI_BehaviorStateMachine_WeightedOptionSelector_9D05`, `AI_BehaviorSelector`, des trois
+fonctions de pile de comportements (`ovr229`) et de la construction de la table du tournoi
+(`PilotProfile_LoadFromPROF_73B4F`, `ovr228`).
+
+### 1. Le comportement en cours est une pile (`entité+0x0D`)
+
+| Fonction | Effet |
+|---|---|
+| `Behavior_PushRunning_756A4` | `nœud+4 = entité+0x0D` (garde le précédent), `entité+0x0D = nœud` |
+| `Behavior_PopFinished_75612` | `entité+0x0D = nœud+4` (restaure le précédent), `entité+0x19 = identifiant du nœud` |
+| `NotifiableRef_DetachTarget_75661` | **abandon** : `entité+0x0D = 0` (pas de restauration), `entité+0x19 = identifiant` |
+
+**Presque toutes les méthodes d'application des nœuds `MVRS` s'empilent** (appels de
+`Behavior_PushRunning_756A4` dans `MVRS_ID3_*`, `ID4`, `ID6`, `ID7`, `ID8`, `ID14b`, `ID15b`,
+`ID16`, `ID19` (attaque au sol), `ID21`…), puis se dépilent elles-mêmes à la fin de leur manœuvre.
+Le gagnant du tournoi n'agit donc pas un tick : il devient le comportement en cours et garde
+l'avion jusqu'à ce qu'il se termine ou soit abandonné.
+
+### 2. `entité+0x27F` est le niveau de la réaction active
+
+Écrivains : `Formation_DamageReactionHandler` → 1 ; `Targeting_AcquireBestThreat` → 2 (missile
+gagnant) ; `AI_VisibilityTest` → 3 ; `Escort_WaitLandingClearance` → 4 ;
+`Escort_WaitTakeoffClearance` → 5 ; remis à 0 par les mêmes et par `AI_ScanForNewTarget`,
+`AI_EvalTargetAttribute`, `AI_MissileEvasionReaction_9A77`. Chaque réaction ne tourne que si
+`+0x27F` ne dépasse pas son propre niveau : attente de décollage si ≤ 5, d'atterrissage si ≤ 4,
+recherche de cible si ≤ 3, esquive si == 2, réaction aux dégâts et **tir/poursuite** si ≤ 1.
+
+### 3. Ordre complet d'un tick (`AI_TopLevelThink`)
+
+1. Ciblage éventuel (`byte_6E4D7` et `TH ≥ 12`), messages radio.
+2. **Alerte de menace** (sauté en décollage/atterrissage, au sol, difficulté ≤ 3, bit 6 de
+   `entité+0x28D` déjà posé, ou `+0x27F > 1`) : si `AI_IncomingThreatWarning` répond, la cible
+   `+0x287` est reprise de `+0x289` si besoin, **le comportement en cours est abandonné**, et le
+   nœud permanent **`ID=4`** (`entité+0xBD`) est appliqué directement, hors tournoi ; bit 6 de
+   `+0x28D` posé (effacé quand plus rien n'est en cours).
+3. Si rien n'est en cours : attente de décollage, d'atterrissage, recherche de nouvelle cible
+   (selon `+0x27F`).
+4. Réactions prioritaires : esquive de missile (`+0x281`, `+0x27F == 2`), réaction aux dégâts.
+   Si l'une agit : fin.
+5. **Comportement en cours** (`+0x0D`) et `+0x27F` non nul : sa méthode `+0xC`, fin.
+6. **`GOAL`** : au sol, `Goal_ExecuteAction_A8AC` directement ; en vol, les gestionnaires du
+   fichier dans l'ordre, arrêt au premier qui agit.
+7. Poursuite d'une rafale de canon si `AI_BehaviorSelector` n'a pas tourné ce tick (bit 2 de
+   `+0x28B`).
+
+### 4. Où se trouve le tournoi : à l'intérieur de `GOAL`
+
+`AI_BehaviorStateMachine_WeightedOptionSelector_9D05(entité, nouvelle_cible_sol_autorisée)` n'est
+appelée que par des gestionnaires `GOAL` : directement par la valeur **4** (argument 0), et par
+`Goal_ExecuteAction_A8AC` (valeur **2**) pour les ordres « détruire » et « défendre »
+(argument 0) et `0xAC` (argument 1). Ordre :
+1. esquive de missile ;
+2. ciblage ;
+3. **sans cible aérienne** : esquive si menace missile, sinon attaque au sol si une cible sol est
+   acquise et l'argument non nul, **sinon renvoie 0 : le gestionnaire `GOAL` suivant prend la
+   main** (errance, navigation…) ;
+4. **avec cible aérienne**, si `+0x27F ≤ 1` : `AI_BehaviorSelector` (tir et poursuite). **S'il
+   agit, le comportement en cours est abandonné** (`NotifiableRef_DetachTarget_75661`) et la
+   fonction renvoie 1 ;
+5. sinon, comportement en cours : sa méthode `+0xC` ;
+6. sinon, **tournoi** : le gagnant est appliqué (et s'empile).
+
+**Quand `AI_BehaviorSelector` agit-il ?** Il renvoie 1 si le bit de tir est posé **ou** si la
+qualité de solution de tir `si` est positive (`loc_8FAF` : `test bit 1 de +0x1B / or si, si / jle`),
+et 0 sinon. `si > 0` demande une arme utilisable (masque non nul), une cible à moins de 90° du nez
+et une qualité positive (base `10 − écart_nez × 10/35`, pénalités de distance et d'aspect croisé).
+Cas non résolu : quand `AI_RadarScanTarget` répond, le saut direct à `loc_8FAF` teste `si` sans
+qu'il ait été calculé dans la fonction.
+
+**Conséquence** : le tournoi `MVRS` choisit **comment manœuvrer quand il y a une cible aérienne mais
+pas de solution de tir** (cible derrière, hors portée, aspect défavorable, pas d'arme adaptée) ou
+quand une réaction de niveau supérieur à 1 est active. Dès qu'une solution de tir apparaît, la
+poursuite reprend la main et la manœuvre est abandonnée.
+
+### 5. La table du tournoi contient toujours les 8 nœuds fixes
+
+À la création (`ovr228`) : `mov word ptr es:[bx+200h], 8`. Les entrées 0 à 7 (5 octets : pointeur
+du nœud + octet de poids signé, à partir de `+0x202`) sont les identifiants 20, 14, 15, 16, 21, 7,
+19 et 4, **poids 0 par défaut**. Chacun est aussi rangé dans un champ dédié pour les appels directs
+(`+0xC1` ID 20, `+0xC5` 14, `+0xC9` 15, `+0xCD` 16, `+0xD1` 21, `+0xD5` 7, `+0xD9` 19, `+0xBD` 4).
+Dans la boucle de lecture du chunk `MVRS` (paires identifiant, poids), un identifiant fixe **écrit
+seulement le poids de son entrée** (`+0x206`, `+0x20B`, `+0x210`, `+0x215`, `+0x21A`, `+0x21F`,
+`+0x224`, `+0x229`) ; les autres créent une entrée de plus (`inc word ptr es:[bx+200h]`, 25
+entrées au maximum). Les 8 nœuds fixes concourent donc toujours ; ceux dont le score vaut 0 (ID 20,
+21) ne gagnent jamais. L'attaque au sol (ID 19, score 5) peut gagner le tournoi quand il y a à la
+fois une cible aérienne sans solution de tir et une cible sol avec une arme air-sol.
+
+Score d'une entrée : `score_du_nœud (≥ 1, sinon exclue) + poids_du_fichier ± 1`, meilleur au-dessus
+de −1000 ; égalité : le premier garde la place (`jle`).
+
 ## `ExecuteFlightCommand` : le script pose l'objectif, il ne pilote pas (lu le 2026-09-19)
 
 Chaîne lue : `MissionScript_CallNativeHandler_52513` empile `(contrôleur, opcode, compétence, pointeur de position, dword)` puis fait `les bx, es:[bx+52h] / mov bx, [bx] / call dword ptr [bx+88h]`. Le contrôleur (`PartEntry+0x52`) est l'objet renvoyé par `AIAircraft_SpawnAndConditionalLoadProfile_53363` (`mov ax, di ... retf`), c'est-à-dire l'objet monde créé par `ObjectPrototype_FindOrLoadAndInstantiate_38B70`.
@@ -258,7 +351,7 @@ Boucle de score (`entité+0x202`, 5 octets par entrée, `entité+0x200` entrées
 
 Les temps sont cumulés dans `word_704E6+0x5B56` (objet en cours), `+0x5B60` (score) et `+0x5B6A` (`AI_BehaviorSelector`) : des compteurs de mesure de durée par composant, sans effet de jeu apparent.
 
-**Conséquence** : tant qu'il y a une cible et que `entité+0x27F` ≤ 1, le tir et la poursuite sont faits par `AI_BehaviorSelector`, **avant** le tournoi. Le tournoi ne score que si cette fonction ne fait rien (renvoie 0) et qu'aucun objet n'est en cours à `entité+0x0D`. Le rôle de `entité+0x27F` (valeurs 0, 1, 2) n'est pas établi.
+**Conséquence** : tant qu'il y a une cible et que `entité+0x27F` ≤ 1, le tir et la poursuite sont faits par `AI_BehaviorSelector`, **avant** le tournoi. Le tournoi ne score que si cette fonction ne fait rien (renvoie 0) et qu'aucun objet n'est en cours à `entité+0x0D`. Le rôle de `entité+0x27F` est établi plus haut (« `GOAL` et tournoi `MVRS` », §2).
 
 ## Le choix de cible et le traitement des menaces : `Targeting_AcquireBestThreat` (lu le 2026-09-20)
 

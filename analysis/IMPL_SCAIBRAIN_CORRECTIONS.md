@@ -215,6 +215,41 @@ jamais incrémenté dans la boucle des sous-systèmes, et soustraction sur un `u
 
 ---
 
+## 8bis. [P2, structurant] Placer le combat et le tournoi sous `GOAL`, comme l'original
+
+Référence : `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tournoi `MVRS` » (relu le 2026-09-25).
+
+**Écart actuel.** `SCAIBrain::tick()` fait le ciblage, le tir, puis `runGoalSelectors()`, puis
+l'esquive et la poursuite **en dehors** de `GOAL` ; la valeur `GOAL` 4 ne fait rien (`continue`).
+Conséquences : un pilote dont le fichier dit « 4 » ne combat pas sans ordre de script (la poursuite
+exige un ordre détruire/défendre), et l'ordre des gestionnaires du fichier n'arbitre pas entre
+navigation et combat.
+
+**Structure de l'original, à reproduire :**
+```
+tick :
+  réactions (niveau entité+0x27F) ; alerte de menace → abandon + nœud ID 4
+  si comportement en cours : le faire tourner, fin
+  GOAL (ordre du fichier, premier qui agit) :
+     2 → executeGoalAction : détruire/défendre → combatStep(false) ; cible sol de mission → attaque au sol
+     3 → errance
+     4 → combatStep(false)
+     5 → ailier
+combatStep(sol_autorisé) :                     // AI_BehaviorStateMachine_WeightedOptionSelector_9D05
+  esquive ; ciblage
+  pas de cible aérienne : esquive, ou attaque au sol (si cible sol et sol_autorisé), sinon return false
+  tir + poursuite (si niveau ≤ 1) : s'il y a tir ou qualité de solution > 0 → abandonner la manœuvre en cours, return true
+  manœuvre en cours → la faire tourner, return true
+  tournoi MVRS → appliquer le gagnant (il devient la manœuvre en cours), return true
+```
+Il faut pour cela une **pile de comportements** (en cours / précédent) avec trois opérations :
+empiler, terminer (restaure le précédent), abandonner (vide). L'attaque au sol actuelle en est un
+cas particulier.
+
+**Tant que les manœuvres `MVRS` ne sont pas portées**, le tournoi peut rester vide : `combatStep`
+se réduit alors au tir et à la poursuite actuels. Le gain immédiat est la place du combat dans la
+liste `GOAL`. Déplacement à faire en plusieurs commits, validés en jeu un par un.
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
 1. `AI_GuidanceSolution_Major` (relecture) et `JDYN_HighLevelPhysicsCalc` (lecture) — §7.
