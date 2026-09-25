@@ -250,6 +250,141 @@ cas particulier.
 se réduit alors au tir et à la poursuite actuels. Le gain immédiat est la place du combat dans la
 liste `GOAL`. Déplacement à faire en plusieurs commits, validés en jeu un par un.
 
+## 8ter. [P2] Réactions : niveau de réaction, entrée en combat contre un attaquant, moral (`GOAL` 5)
+
+Références : `AI_SYSTEM.md` §4.4 et `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tournoi `MVRS` » §2-3
+(relus le 2026-09-25). Répliques de Billy (`data/BILLY.IFF`) citées pour les tests.
+
+### A. Niveau de réaction (`entité+0x27F`) — sur `SCAIBrain`
+
+```cpp
+enum ReactionLevel : uint8_t { REACT_NONE = 0, REACT_ENGAGED = 1, REACT_MISSILE = 2,
+                               REACT_NEW_TARGET = 3, REACT_WAIT_LANDING = 4, REACT_WAIT_TAKEOFF = 5 };
+uint8_t reaction_level{REACT_NONE};
+```
+Chaque réaction ne s'exécute que si `reaction_level ≤ son niveau` (esquive : `== 2`). Le **tir et la
+poursuite** n'ont lieu que si `reaction_level ≤ 1` (à ajouter comme garde dans `updateFireControl`
+et `updatePursuit`, ou dans `combatStep` du §8bis). L'actuel `threat_state == 2` est ce niveau 2 :
+le fusionner avec `reaction_level`.
+
+### B. Entrée en combat contre un attaquant (`AI_EngageAttackerReaction_E246`)
+
+**À appeler** dans `tick()`, après l'esquive et avant `runGoalSelectors()`, si rien n'a réagi et
+`reaction_level ≤ 1` :
+```cpp
+bool SCAIBrain::engageAttackerReaction() {
+    if (just_hit || retarget_timer_expired) this->acquireBestThreat(false);   // bit 7 de +0x28D / minuteur +0x174
+    if (reaction_level == REACT_ENGAGED) reaction_level = REACT_NONE;
+    if (air_target == nullptr || reaction_level != REACT_NONE) return false;
+
+    Vector3D to_target = air_target->plane->position - owner->plane->position;
+    float nose_vs_target_nose = owner->plane->forward.AngleBetween(air_target->plane->forward);  // a
+    float nose_vs_direction   = owner->plane->forward.AngleBetween(to_target);                   // b
+    bool on_my_six = nose_vs_direction > 150.0f && nose_vs_target_nose < 30.0f
+                  && to_target.Length() < intel.distanceThreshold1800;          // NUMS dword_7201C = 1800
+    if (!just_hit && !on_my_six) return false;
+    reaction_level = REACT_ENGAGED;
+
+    if (owner->current_command == OP_SET_OBJ_FOLLOW_ALLY && leader_state == 0) {   // +0x149
+        bool leader_is_player = owner->leader == player;                          // +0x145
+        if (!leader_is_player && air_target->brain_target() != owner) return false; // l'attaquant doit me viser
+        leader_state = 3;
+        owner->target = air_target;                                               // cible de mission +0x137
+        if (leader_is_player) owner->setMessage(0x12);                            // « This one's all mine. »
+        return false;                                                             // l'original ne prend pas la main ici
+    }
+    if (owner->current_command != OP_SET_OBJ_FOLLOW_ALLY && model_class >= 9) {   // modèle +0x52
+        abortRunningNavigation();                                                 // nœud ID 21
+        return this->combatStep(false);                                           // §8bis
+    }
+    if (no_running_behavior && (no_command || command == FLY_TO_POINT || command == RETURN_TO_BASE)) {
+        this->tryWanderRandom();                                                  // + drapeau « point atteint »
+    }
+    return false;
+}
+```
+- Les angles de l'original sont des écarts d'angle (`Angle_DeltaNormalized_A`) ; `AngleBetween`
+  (angle 3D) est l'approximation raisonnable.
+- « Touché » : poser `just_hit` dans `SCMissionActors::hasBeenHit` (le portage a déjà `attacker`) et
+  l'effacer après le tick.
+- `model_class` (octet `+0x52` du modèle, seuil 9) : correspondance avec les données non établie ;
+  en attendant, considérer tous les avions de combat comme éligibles.
+- Cela remplace le réflexe actuel `followAlly()` → `destroyTarget(attacker)` (ligne ~610 de
+  `SCMissionActors.cpp`), qui engage l'attaquant immédiatement et sans condition.
+
+**Test.** Ailier en formation, un MiG se place dans ses six heures à moins de 1800 : l'ailier annonce
+« This one's all mine. » et le prend pour cible. Même chose s'il est touché.
+
+### C. Réaction au moral (`GOAL` 5, `Goal_MoraleReaction_878F`)
+
+**Écart actuel.** `tryActiveWingman()` exécute les ordres radio du joueur (`override_progs`) sous la
+valeur 5. Dans l'original, la valeur 5 est la **réaction au moral** ; les ordres radio passent
+ailleurs (`AI_MessageDispatcher`, non détaillée). **Garder l'exécution des ordres radio**, mais la
+sortir de `runGoalSelectors()` (en tête de `tick()`), et implémenter la valeur 5 ainsi :
+
+```cpp
+int SCAIBrain::computeMorale() {                    // AI_ComputeMorale_CD4A, une fois par tick
+    int s = 100;
+    if (has_damaged_component) s -= 100;             // Roster_SumAttributeB non nul : sens à confirmer côté données
+    s += (int)(51.0f * fuel / fuel_capacity) - 50;
+    if (!canHoldOrder()) s -= 50;                    // détruire : pas d'arme adaptée ; défendre : pas de cible ou pas d'arme air-air
+    int enemies_alive = count_alive(other_team), own_losses = count_destroyed(my_team);
+    if (enemies_alive > 0 && my_team != NEUTRAL) s += -8 * enemies_alive - 32 * own_losses;
+    if (reaction_level != REACT_NONE) s -= 50;
+    int LY = atrb.LY;
+    s += LY < 3 ? 0 : LY < 6 ? 15 : LY < 12 ? 30 : LY < 15 ? 50 : 75;
+    if (enemies_alive > 0 && s >= 80) s = 79;
+    if (LY > 9 && s < 25) s = 25;
+    if (LY <= 0) s = 0;
+    return s < 25 ? 5 : s < 50 ? 4 : s < 80 ? 3 : 2;   // 5 panique … 2 bon
+}
+bool SCAIBrain::isDisciplined() {                   // AI_MoraleDisciplineCheck_CA93, réévalué toutes les 3 s
+    static const int adj[4] = {+7, +4, -3, -5};      // moral 2, 3, 4, 5
+    return atrb.FL + adj[morale - 2] > 7;
+}
+bool SCAIBrain::moraleReaction() {                  // toutes les 5 s au plus, sinon false
+    bool player_side = owner->team_id == player_team;
+    bool leader_is_player = owner->leader == player;
+    if (morale >= 4) {
+        if (!player_side) { owner->setMessage(8); fleeToExit(); return true; }             // « I'm outta here! »
+        if (leader_is_player && !isDisciplined() && following()) {
+            if (threat == player && !enemies_active) {                                        // le joueur lui tire dessus
+                air_target = player; leader_state = 1; combatStep(false);
+                owner->setMessage(0x20); return true;                                         // « Do you feel lucky? … »
+            }
+            if (leader_state != 2) { owner->setMessage(8); leader_state = 2; leaveFight(); return true; }
+            return false;
+        }
+        if (leader_is_player && (reaction_level == 1 || reaction_level == 2)) owner->setMessage(6); // « … give me a hand here? »
+        return false;
+    }
+    if (player_side && leader_is_player && !isDisciplined() && leader_state != 1 && leader_state != 2
+        && following() && enemies_active) {
+        owner->setMessage(0x12);                                                               // « This one's all mine. »
+        leader_state = 1; lockObjective(); owner->target = player; /* Goal_TransferToWingman */
+        return true;
+    }
+    return false;
+}
+```
+- `fleeToExit()` / `leaveFight()` : ordre « aller à un point » (fuite) ou « suivre » gardé (ailier),
+  ordre verrouillé contre le script, comportement en cours abandonné, navigation vers un point
+  1000 m plus haut. **Le point exact n'est pas tracé** (objet global `word_706A0`) : en attendant,
+  la base de départ ou le point de sortie de la mission.
+- `enemies_active` : `byte_6E4CD`, « un avion du camp adverse a réfléchi au cycle radio précédent »
+  (déduction) ; en attendant, « au moins un ennemi en vie à portée radar ».
+- Avec Billy (`LY = 13`, `FL = 15`) : moral plancher 25 (jamais 5), et `FL + ajustement` reste
+  au-dessus de 7 tant que le moral n'est pas 4 ou 5 : **Billy ne fuit pas et ne prend pas
+  d'initiative par le moral**. Ses 0x12 viennent de l'entrée en combat (B). Tester le moral avec un
+  profil à `LY` et `FL` bas.
+
+**Ordre dans `tick()`** : ordres radio du joueur → esquive (niveau 2) → entrée en combat contre un
+attaquant (B) → comportement en cours → `GOAL` (dont 5 = moral, 2 = ordre, 4 = combat, 3 = errance).
+
+**Test.** Profil à faible `LY` et `FL`, camp adverse, après plusieurs pertes : le MiG annonce 8 et
+part. Ailier du joueur à faible `LY`/`FL` sur qui le joueur tire, sans autre ennemi : il annonce
+0x20 et attaque le joueur.
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
 1. `AI_GuidanceSolution_Major` (relecture) et `JDYN_HighLevelPhysicsCalc` (lecture) — §7.
