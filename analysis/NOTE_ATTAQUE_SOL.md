@@ -137,6 +137,8 @@ En pratique, pour l'attaque au sol, `W` pointe de l'avion vers `P` au moment de 
 
 **6. Position.** Ni `PhysicsTicks` ni le pilote automatique ne l'intègrent. C'est la méthode `+0x14` de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D`) qui fait `position += vitesse × dt`, avec le pas `dword_7045E`, et **dans les deux modes**.
 
+**7. Vitesse angulaire.** À chaque tick, le pilote automatique **remet à zéro** la vitesse angulaire de l'avion (`JDYN+4/+8/+0x0C` ← vecteur nul constant `dword_707F8..70800`). La rotation que `WorldObject_IntegrateBodyMotion_3D31D` applique ensuite (`orientation += vitesse angulaire × dt`) est donc nulle : il ne reste aucune rotation résiduelle venant du vol normal. Dans le portage, il faut faire de même : **mettre la vitesse angulaire à zéro** en mode pilote automatique.
+
 **Transposé à libRealSpace** (Y-up : cap = `atan2(x, z)`, altitude = `y`), en phases 2 et 3 :
 ```
 cible_cap = cap de W (ou tangente au cercle si l'avion n'est pas aligné)

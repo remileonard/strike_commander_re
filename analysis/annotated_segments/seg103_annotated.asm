@@ -3637,7 +3637,9 @@ Autopilot_BankForTurn_49A7C	endp
 ; dessous, sinon son altitude actuelle ; dz = P.z - z ; vz = dz si |dz| < 50, sinon +/-50 m/s.
 ; VITESSE HORIZONTALE : rejoint |W| a 25 m/s^2 (egale si l'ecart est inferieur au pas).
 ; VITESSE = direction horizontale du nez * vitesse horizontale + vz, ECRITE DIRECTEMENT dans
-; corps+8/0C/10 ; Autopilot_NosePitchRelax_498B5 ; vent global recopie dans JDYN+4/8/0C.
+; corps+8/0C/10 ; Autopilot_NosePitchRelax_498B5 ; VITESSE ANGULAIRE JDYN+4/+8/+0x0C REMISE A
+; ZERO (dword_707F8..70800 = vecteur nul constant, initialise a 0 dans seg116) : en pilote
+; automatique, WorldObject_IntegrateBodyMotion_3D31D ne fait donc tourner l'avion de rien.
 ; DRAPEAU 'point atteint' bloc+0x1A = 1 si |cap(W) - cap du nez| < 5 deg (modulo 360) ET
 ; distance(P) < 20 * |W| * dtc (>= 400 m a 100 m/s). La position n'est pas integree ici :
 ; WorldObject_IntegrateBodyMotion_3D31D (methode +0x14 de l'objet) le fait avec la vitesse

@@ -929,13 +929,19 @@ loc_3D319:				; CODE XREF: seg085:06B5j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE en partie (2026-09-25). Ex-'Camera_ComputeMountedPosition' (FAUX). INTEGRATION DE
-; LA POSITION de l'objet monde : WorldObject_TranslateBy_37D54(objet, vitesse du corps (+0x51
-; -> +8) * dword_7045E) (vecteur par defaut sans corps), puis rotation a partir d'une vitesse
-; angulaire du corps (+0x51 -> vtable+0x2C, * dword_70458, Math_SinRaw_58063 /
-; Math_CosRaw_580A7) : suite non detaillee. Appelee par la methode +0x14 de l'avion
-; (loc_3E115, vtable seg339 off_6F880) : s'applique aussi en pilote automatique, avec la
-; vitesse ecrite par Autopilot_FlyToPointKinematic_49C2E.
+; far, LUE INTEGRALEMENT (2026-09-25). Ex-'Camera_ComputeMountedPosition' (FAUX). INTEGRATION
+; DU MOUVEMENT de l'objet monde, methode +0x14 (pour l'avion : loc_3E115, vtable seg339
+; off_6F880). (1) POSITION : WorldObject_TranslateBy_37D54(objet, vitesse du corps (+0x51 ->
+; +8) * dword_7045E). (2) ORIENTATION : Omega = corps->vtable+0x2C (pour JDYN : thunk
+; loc_3B6DC -> loc_46B74 = copie de JDYN+4/+8/+0x0C, la vitesse angulaire) ;
+; objet->vtable+0x30(Omega * dword_70458) (avion :
+; WorldObject_ComposeOrientationAngleArray_3CB0B, rotation de l'orientation par ces
+; increments) ; puis avec theta = Omega.c1 * dt : Omega.c2' = Omega.c2 cos + Omega.c0 sin,
+; Omega.c0' = Omega.c0 cos - Omega.c2 sin (Math_CosRaw_580A7 / Math_SinRaw_58063 /
+; Math_FixedMultiply_58034) ; corps->vtable+0x30(Omega') (JDYN : loc_3B6C5 -> loc_46BC0, ecrit
+; JDYN+4/+8/+0x0C). Sans corps : vecteur nul (dword_707F8..70800). Deux pas de temps
+; differents : dword_7045E pour la position, dword_70458 pour la rotation (relation non
+; tracee).
 ; ==============================================================================================
 WorldObject_IntegrateBodyMotion_3D31D	proc far		; CODE XREF: seg087:0250P
 					; DATA XREF: seg339:off_6F6DCo	...
