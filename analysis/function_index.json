@@ -1583,8 +1583,8 @@
 "calls": [
 "sub_57C67"
 ],
-"new_name": "AI_Sensor_HeadingNormalized",
-"summary": "far,73L — cache à +0xFA : vtable[0x3C] (cap?) + sub_57C67, normalise l'angle (wraparound ±0xB400) : **capteur caché : cap/bearing normalisé.**"
+"new_name": "AI_Sensor_RollAngle_58F4",
+"summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_RollAngle_58F4' (FAUX : ce n'est PAS un cap). ANGLE DE ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180, mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C)."
 },
 "sub_59A5": {
 "segment": "seg003",
@@ -1595,8 +1595,8 @@
 "calls": [
 "sub_552E1"
 ],
-"new_name": "AI_Sensor_SecondaryAngle",
-"summary": "far,57L — cache à +0xF6 : vtable[0x3C]+0xC + sub_552E1 : **capteur caché : angle secondaire (tangage/roulis?).**"
+"new_name": "AI_Sensor_NosePitch_59A5",
+"summary": "far, LUE (2026-09-24). Ex-'AI_Sensor_NosePitch_59A5'. TANGAGE DU NEZ : Math_ElevationAngle_552E1(ligne 1 de l'orientation de entite+0x102), mis en cache dans entite+0xF6 (drapeau bit 2 de entite+0x28C)."
 },
 "sub_5E53": {
 "segment": "seg003",
@@ -1732,7 +1732,7 @@
 "sub_7E18"
 ],
 "new_name": "AI_SpeedManeuverDecision",
-"summary": "far,74L — DECISION VITESSE/MANOEUVRE IA. JDYN = es:[arg_0+0x0B]. Seuil = (movsx jdyn[0x84] (i16, def 231) + dword_72039) / 2 ; si seuil<<8 > distance (AI_Sensor_DistanceFromRef) -> retourne 1 (maintien de vitesse). Sinon (loc_691C) : AI_ThrottleCmd_HUD(jdyn[0x80]) (consigne = vitesse IA max) + AI_TurnToBearingCmd(rate=5, angle=0x500) -> retourne 0. jdyn[0x84] = vitesse de croisiere/manoeuvre IA (sert aussi de consigne throttle directe dans AI_IssueTurnAndThrottle_77171, ovr231)."
+"summary": "far,74L — DECISION VITESSE/MANOEUVRE IA. JDYN = es:[arg_0+0x0B]. Seuil = (movsx jdyn[0x84] (i16, def 231) + dword_72039) / 2 ; si seuil<<8 > distance (AI_Sensor_DistanceFromRef) -> retourne 1 (maintien de vitesse). Sinon (loc_691C) : AI_ThrottleCmd_HUD(jdyn[0x80]) (consigne = vitesse IA max) + AI_PitchToAngleCmd_7E18(rate=5, angle=0x500) -> retourne 0. jdyn[0x84] = vitesse de croisiere/manoeuvre IA (sert aussi de consigne throttle directe dans GroundAttack_Phase4_PullUp_77171, ovr231)."
 },
 "sub_6977": {
 "segment": "seg003",
@@ -1821,7 +1821,7 @@
 "sub_75F8"
 ],
 "new_name": "AI_GuidanceSolution_Major",
-"summary": "far, 651 lignes - LUE INTEGRALEMENT (a la demande de Remi). **VRAIE LOI DE GUIDAGE DE POURSUITE AVEC ANTICIPATION** (proportional navigation / lead pursuit), le coeur geometrique de la chaine de combat aerien IA (AI_SYSTEM.md §4bis). Prend deux vecteurs d'approche (si=arg_4, di=arg_6, chacun transforme/calcule via Math_HeadingAngle_553CF), calcule leur DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois : cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE DIVERGENT (>90 deg, ligne ~16530) : bascule sur un calcul alternatif (angle=0, pas de correction fine) plutot que Math_AngleBetweenVectors, evitant les artefacts numeriques d'un calcul d'angle sur des vecteurs presque opposes. GARDE PORTEE CAPTEUR (ligne ~16571) : compare [avion+0x1A] a dword_7203D (le seuil de portee de capteur deja connu d'AIEntity_MasterTick) - si hors de portee de detection reelle, saute directement a un ANGLE FIXE MAXIMAL (±166 deg, constante 0xFFFFA600/-0x5A00) plutot que de calculer une correction fine. ESTIMATION DE TEMPS DE VIRAGE (ligne ~16604-16650) : calcule une estimation du temps necessaire pour completer un virage, BASEE SUR LA CAPACITE DE MANOEUVRE PROPRE DE L'AVION ([avion+0x67], meme champ que les sequences de manoeuvre MVRS_ID14b) - un avion plus manoeuvrant obtient une estimation de temps plus courte, permettant des corrections plus agressives. PLUSIEURS PALIERS D'ANGLE LIMITE (lignes ~16800-16870) : clamps a ±166 deg (cas extreme) ou ±45 deg (cas modere, 0x2D00) selon la situation geometrique. REORIENTATION DU VECTEUR D'ENTREE (ligne ~16880, si var_1==1) : recalcule la 3e composante du vecteur si par un facteur cosinus (Math_SinDeg_54876) proportionnel a la distance (Math_VectorLength3D_Raw_5828E), puis re-transforme (Vector_TransformHelperB_559BB) - ajuste l'approche en fonction de la distance a la cible. SORTIE (fin de fonction, ligne ~17058-17075) : calcule un DERNIER delta d'angle final (var_A, wrappe ±180 deg), puis **DELEGUE DIRECTEMENT (appel en queue) A AI_CombatDecision_Major_75F8** en lui passant CE cap final PLUS deux autres deltas intermediaires (var_68, var_E) et l'argument original (arg_8) - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (decision) -> AI_TurnToHeadingCmd (execution). ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
+"summary": "far, 651 lignes - LUE INTEGRALEMENT (a la demande de Remi). **VRAIE LOI DE GUIDAGE DE POURSUITE AVEC ANTICIPATION** (proportional navigation / lead pursuit), le coeur geometrique de la chaine de combat aerien IA (AI_SYSTEM.md §4bis). Prend deux vecteurs d'approche (si=arg_4, di=arg_6, chacun transforme/calcule via Math_HeadingAngle_553CF), calcule leur DELTA D'ANGLE avec gestion complete du wraparound ±180 deg (motif repete plusieurs fois : cmp 0xB400/sub 0x16800 si > 180, cmp -180/add 0x16800 si < -180). CAS SPECIAL ANGLE DIVERGENT (>90 deg, ligne ~16530) : bascule sur un calcul alternatif (angle=0, pas de correction fine) plutot que Math_AngleBetweenVectors, evitant les artefacts numeriques d'un calcul d'angle sur des vecteurs presque opposes. GARDE PORTEE CAPTEUR (ligne ~16571) : compare [avion+0x1A] a dword_7203D (le seuil de portee de capteur deja connu d'AIEntity_MasterTick) - si hors de portee de detection reelle, saute directement a un ANGLE FIXE MAXIMAL (±166 deg, constante 0xFFFFA600/-0x5A00) plutot que de calculer une correction fine. ESTIMATION DE TEMPS DE VIRAGE (ligne ~16604-16650) : calcule une estimation du temps necessaire pour completer un virage, BASEE SUR LA CAPACITE DE MANOEUVRE PROPRE DE L'AVION ([avion+0x67], meme champ que les sequences de manoeuvre MVRS_ID14b) - un avion plus manoeuvrant obtient une estimation de temps plus courte, permettant des corrections plus agressives. PLUSIEURS PALIERS D'ANGLE LIMITE (lignes ~16800-16870) : clamps a ±166 deg (cas extreme) ou ±45 deg (cas modere, 0x2D00) selon la situation geometrique. REORIENTATION DU VECTEUR D'ENTREE (ligne ~16880, si var_1==1) : recalcule la 3e composante du vecteur si par un facteur cosinus (Math_SinDeg_54876) proportionnel a la distance (Math_VectorLength3D_Raw_5828E), puis re-transforme (Vector_TransformHelperB_559BB) - ajuste l'approche en fonction de la distance a la cible. SORTIE (fin de fonction, ligne ~17058-17075) : calcule un DERNIER delta d'angle final (var_A, wrappe ±180 deg), puis **DELEGUE DIRECTEMENT (appel en queue) A AI_CombatDecision_Major_75F8** en lui passant CE cap final PLUS deux autres deltas intermediaires (var_68, var_E) et l'argument original (arg_8) - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (decision) -> AI_RollToAngleCmd_8104 (execution). ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
 },
 "sub_75A9": {
 "segment": "seg003",
@@ -1859,7 +1859,7 @@
 "sub_8104"
 ],
 "new_name": "AI_CombatDecision_Major",
-"summary": "far, 603 lignes - LUE INTEGRALEMENT. Dernier maillon decisionnel de la chaine de guidage (AI_SYSTEM.md §4bis), recoit la geometrie complete calculee par AI_GuidanceSolution_Major (arg_6/arg_8 = deux deltas d'angle intermediaires). DEBUT : remet a zero entite+7+0x1F/+0x23/+0x27 (les 3 champs de commande partages avec l'entree souris du joueur, §4bis). GARDE CIBLE FINE (sub_564A) : si une condition de cible tient, pose entite+7+0x1E=10 et BORNE les deux deltas d'entree a ±10 deg (mode 'poursuite fine', corrections limitees). GARDE flags_75 BIT 6 (deja documente §7, non reinvestiguee ici) : si actif, BYPASS COMPLET - delegue directement a sub_676F et sort. ARBRE DE DECISION PRINCIPAL, base sur la magnitude de l'angle (di[0]) : (a) SI < 20 deg (0x1400) : aucune correction, sortie immediate sans toucher aux champs de commande. (b) SI l'ecart angulaire total (somme des deux deltas, wrappe ±180 deg) est <= 145 deg (0x9100) : calcule une position anticipee via sub_5305 (meme fonction utilisee dans les phases de manoeuvre MVRS_ID6/14b), scale par un facteur derive du carre de l'angle divise par -10 puis 10, appelle AI_TurnToHeadingCmd(taux=5), ecrit le resultat dans entite+7+0x1F. (c) SI > 145 deg (cas extreme, quasi face-a-face) : calcul similaire mais en plus MULTIPLIE PAR LE TAUX DE ROULIS PROPRE DE L'AVION ([avion+0x71], meme champ que la formule de bonus de MVRS_ID14b_ScoreGeneric), divise par 0x10E (270), borne a un maximum (0x1000=16 deg) - encore une adaptation a la capacite de manoeuvre specifique de l'appareil. REPLI FINAL (aucune des conditions geometriques ne s'applique) : appelle AI_TurnToHeadingCmd(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME le triptyque complet de la chaine de combat : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (choix entre correction fine/large/extreme/neutre, ecriture finale de la commande) -> AI_TurnToHeadingCmd/AI_PitchRollController_Heading (execution)."
+"summary": "far, 603 lignes - LUE INTEGRALEMENT. Dernier maillon decisionnel de la chaine de guidage (AI_SYSTEM.md §4bis), recoit la geometrie complete calculee par AI_GuidanceSolution_Major (arg_6/arg_8 = deux deltas d'angle intermediaires). DEBUT : remet a zero entite+7+0x1F/+0x23/+0x27 (les 3 champs de commande partages avec l'entree souris du joueur, §4bis). GARDE CIBLE FINE (sub_564A) : si une condition de cible tient, pose entite+7+0x1E=10 et BORNE les deux deltas d'entree a ±10 deg (mode 'poursuite fine', corrections limitees). GARDE flags_75 BIT 6 (deja documente §7, non reinvestiguee ici) : si actif, BYPASS COMPLET - delegue directement a sub_676F et sort. ARBRE DE DECISION PRINCIPAL, base sur la magnitude de l'angle (di[0]) : (a) SI < 20 deg (0x1400) : aucune correction, sortie immediate sans toucher aux champs de commande. (b) SI l'ecart angulaire total (somme des deux deltas, wrappe ±180 deg) est <= 145 deg (0x9100) : calcule une position anticipee via sub_5305 (meme fonction utilisee dans les phases de manoeuvre MVRS_ID6/14b), scale par un facteur derive du carre de l'angle divise par -10 puis 10, appelle AI_RollToAngleCmd_8104(taux=5), ecrit le resultat dans entite+7+0x1F. (c) SI > 145 deg (cas extreme, quasi face-a-face) : calcul similaire mais en plus MULTIPLIE PAR LE TAUX DE ROULIS PROPRE DE L'AVION ([avion+0x71], meme champ que la formule de bonus de MVRS_ID14b_ScoreGeneric), divise par 0x10E (270), borne a un maximum (0x1000=16 deg) - encore une adaptation a la capacite de manoeuvre specifique de l'appareil. REPLI FINAL (aucune des conditions geometriques ne s'applique) : appelle AI_RollToAngleCmd_8104(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME le triptyque complet de la chaine de combat : AI_GuidanceSolution_Major (geometrie/anticipation) -> AI_CombatDecision_Major (choix entre correction fine/large/extreme/neutre, ecriture finale de la commande) -> AI_RollToAngleCmd_8104/AI_RollController_7E56 (execution)."
 },
 "sub_7B20": {
 "segment": "seg003",
@@ -1875,8 +1875,8 @@
 "sub_5305",
 "sub_8104"
 ],
-"new_name": "AI_RollRateController",
-"summary": "far,384L — appelée par sub_7E18 (commande de virage vers un angle à un taux donné) : **candidat fort pour le contrôleur de roulis/virage (aileron command law)** — à approfondir."
+"new_name": "AI_PitchController_7B20",
+"summary": "far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_PitchController_7B20'. CONTROLEUR DE TANGAGE, ecrit l'axe de tangage du manche (bloc entite+7, +0x1F). e = ecart ramene a +/-180. |e| <= zone morte : manche = 0, AI_RollToAngleCmd_8104(0, 5), renvoie 1. Sinon (renvoie 0) : dos = |roulis| > 90. Si e < -15 ou (dos et e < 0) : AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE DOS pour piquer) et, si |roulis| > 165 : manche = Value_ClampSymmetric(-e > 15 ? -e*16/15 : 16,0) (tirer). Sinon : AI_RollToAngleCmd_8104(0, 5) et, si |roulis| < 15 : manche = Value_ClampSymmetric(e < 0 ou e < 15 ? e*16/15 : 16,0). Les piques de plus de 15 deg se font donc dos, en tirant."
 },
 "sub_7E18": {
 "segment": "seg003",
@@ -1888,8 +1888,8 @@
 "sub_59A5",
 "sub_7B20"
 ],
-"new_name": "AI_TurnToBearingCmd",
-"summary": "far,36L — calcule l'écart entre un angle cible et le bearing courant (sub_59A5), puis appelle sub_7B20(delta, taux) : **commande de virage vers un cap à un taux donné (fonction de pilotage IA).**"
+"new_name": "AI_PitchToAngleCmd_7E18",
+"summary": "far, 36L, LUE (2026-09-24). Ex-'AI_PitchToAngleCmd_7E18' (FAUX : pas de cap). Commande de TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis AI_PitchController_7B20(entite, &ecart, zone morte)."
 },
 "sub_7E56": {
 "segment": "seg003",
@@ -1900,8 +1900,8 @@
 "calls": [
 "sub_4B09D"
 ],
-"new_name": "AI_PitchRollController_Heading",
-"summary": "far, 101L, LUE INTEGRALEMENT (2026-09-20). Contrôleur de virage par ÉCART D'ANGLE : (entité, &ecart de cap, zone morte en degrés). Remet à 0 le champ de commande partagé avec le joueur (bloc d'état +0x23, l'entrée manche/souris), normalise l'écart à ±180 degrés (0xB400 = 180.0, 0x16800 = 360.0 en 24.8), puis, SEULEMENT si l'écart absolu dépasse la zone morte (taux*256), appelle JDYN_HighLevelPhysicsCalc(avion, sortie, écart) — le calcul physique de haut niveau du modèle de vol qui transforme l'écart en valeur de manche —, la NÉGATE et l'écrit dans +0x23. Renvoie 0 si elle a commandé, 1 sinon (dans la zone morte). L'IA ne fait donc PAS de boucle d'altitude : elle commande le manche à partir d'un écart d'angle, avec une zone morte."
+"new_name": "AI_RollController_7E56",
+"summary": "far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollController_7E56'. CONTROLEUR DE ROULIS : remet a 0 l'axe de roulis du manche (bloc de commandes entite+7, +0x23 = roulis, cf. DATA_MODEL.md), ramene l'ecart a +/-180, et si |ecart| depasse la zone morte (degres) : JDYN_HighLevelPhysicsCalc(avion, sortie, ecart), valeur negee ecrite dans +0x23 (`mov es:[bx+23h], eax`). Renvoie 0 si elle a commande, 1 sinon."
 },
 "sub_7F34": {
 "segment": "seg003",
@@ -1928,8 +1928,8 @@
 "sub_58F4",
 "sub_7E56"
 ],
-"new_name": "AI_TurnToHeadingCmd",
-"summary": "far, 38L, LUE INTEGRALEMENT (2026-09-20). Exécution d'un virage vers un cap : prend (entité, pointeur vers l'angle de cap voulu, taux), calcule ecart = cap voulu - AI_Sensor_HeadingNormalized(entité) (cap courant normalisé) puis appelle AI_PitchRollController_Heading(entité, &ecart, taux). Le 'taux' est la ZONE MORTE en degrés (5 depuis AI_CombatDecision_Major en correction normale, 2 en commande neutre)."
+"new_name": "AI_RollToAngleCmd_8104",
+"summary": "far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollToAngleCmd_8104' (FAUX : pas de cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis courant) puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) = remettre les ailes a plat ; (180, 5) = se mettre sur le dos."
 },
 "sub_814C": {
 "segment": "seg004",
@@ -29678,7 +29678,7 @@
 "sub_5C6F3"
 ],
 "new_name": "PilotProfile_NamedPropertyNode_Construct_755A0",
-"summary": "far, 45 lignes - constructeur generique du noeud de propriete nommee (tag de classe 0x2F8), appele via le thunk VROOMM_StubThunk_6AB4A. Prend deux pointeurs far : le noeud deja alloue (0x28 octets, tag memoire 0x5C44) et une SOURCE (dans le cas du chargement PROF/MVRS, le pointeur PilotProfile lui-meme). Stocke : node[+8] = pointeur source brut (reference arriere vers l'objet proprietaire), node[+0x11] = copie du champ a l'offset +2 de la source (contexte/type). Les champs [+0xC],[+0x13],[+0x21],[+2] sont initialises a zero. L'appelant reecrit ensuite node[0] avec un tag specifique a la propriete (valeurs observees : 0x2A0 par defaut, 0x2B4/0x28C/0x278/0x250/0x214/0x188/0x174/0x26/0x36 selon le cas, 0x326 pour un usage par Goal_ExecuteAction_A8AC) - la semantique exacte de ces tags n'est PAS resolue. Anciennement mal nommee TargetTrackObject_Construct (aucun rapport avec le suivi de cible, erreur du balayage rapide initial). CLASSE COMPLETE IDENTIFIEE (ovr229, 5 fonctions, 161 lignes au total - confirme l'hypothese 'un overlay = une classe C++') : voir NotifiableRef_AttachTarget_75612, NotifiableRef_DetachTarget_75661, NotifiableRef_SwapTarget_756A4, NotifiableRef_Destructor_756D5."
+"summary": "far, 45 lignes - constructeur generique du noeud de propriete nommee (tag de classe 0x2F8), appele via le thunk VROOMM_StubThunk_6AB4A. Prend deux pointeurs far : le noeud deja alloue (0x28 octets, tag memoire 0x5C44) et une SOURCE (dans le cas du chargement PROF/MVRS, le pointeur PilotProfile lui-meme). Stocke : node[+8] = pointeur source brut (reference arriere vers l'objet proprietaire), node[+0x11] = copie du champ a l'offset +2 de la source (contexte/type). Les champs [+0xC],[+0x13],[+0x21],[+2] sont initialises a zero. L'appelant reecrit ensuite node[0] avec un tag specifique a la propriete (valeurs observees : 0x2A0 par defaut, 0x2B4/0x28C/0x278/0x250/0x214/0x188/0x174/0x26/0x36 selon le cas, 0x326 pour un usage par Goal_ExecuteAction_A8AC) - la semantique exacte de ces tags n'est PAS resolue. Anciennement mal nommee TargetTrackObject_Construct (aucun rapport avec le suivi de cible, erreur du balayage rapide initial). CLASSE COMPLETE IDENTIFIEE (ovr229, 5 fonctions, 161 lignes au total - confirme l'hypothese 'un overlay = une classe C++') : voir Behavior_PopFinished_75612, NotifiableRef_DetachTarget_75661, Behavior_PushRunning_756A4, NotifiableRef_Destructor_756D5."
 },
 "sub_75612": {
 "segment": "ovr229",
@@ -29687,8 +29687,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "NotifiableRef_AttachTarget_75612",
-"summary": "far, 31 lignes - CONFIRME methode de la classe 'reference notifiable' (ovr229, meme classe que PilotProfile_NamedPropertyNode_Construct_755A0). Appelee via VROOMM_StubThunk_6AB45. Copie this+4/+6 (dword) vers l'objet cible dereference (this+8 -> +0xF/+0xD), copie this+0x21 (byte) vers cible+0x19, reinitialise this+0xC=0. SI this+4 (dword) == 0 : appelle la methode virtuelle [vtable+0x1Ch] du POINTEUR CIBLE avec argument 1 - probable notification 'attache-toi a moi' quand la cible n'a pas encore de valeur de retour en cache. Anciennement mal nommee TargetTrackObject_Helper (balayage rapide, jamais revalidee)."
+"new_name": "Behavior_PopFinished_75612",
+"summary": "far, LUE (2026-09-24). Ex-'NotifiableRef_AttachTarget'. Termine un comportement : [noeud+8]+0x0D = noeud+4 (restaure le precedent), [noeud+8]+0x19 = noeud+0x21 (identifiant du comportement termine), noeud+0x0C = 0 ; s'il n'y avait pas de precedent : [noeud+8]->vtable+0x1C(1)."
 },
 "sub_75661": {
 "segment": "ovr229",
@@ -29698,7 +29698,7 @@
 "type": "far",
 "calls": [],
 "new_name": "NotifiableRef_DetachTarget_75661",
-"summary": "far, 25 lignes - CONFIRME methode SOEUR de NotifiableRef_AttachTarget_75612 (meme classe, ovr229). Appelee via VROOMM_StubThunk_6AB54 - **CONNEXION MAJEURE** : ce thunk est le meme que celui appele partout dans le code IA pour 'notifier la cible' (AIEntity_MasterTick_5ACC, Entity_ProximityTest_ThreatGate_315B, et d'autres) - confirme que le mecanisme de notification de cible dissemine dans tout le systeme IA appartient a CETTE CLASSE, qui n'est donc PAS reservee aux noeuds de propriete MVRS mais sert de wrapper de reference notifiable generique. Remet a zero this+8->+0xF/+0xD (au lieu de copier depuis this+4/+6 comme la variante Attach), copie this+0x21 vers cible+0x19, reinitialise this+0xC=0, puis appelle INCONDITIONNELLEMENT [vtable+0x1Ch] de la cible avec argument 0 - probable 'detache-toi de moi'. Anciennement mal nommee TargetTrackObject_Helper2."
+"summary": "far, 25 lignes - CONFIRME methode SOEUR de Behavior_PopFinished_75612 (meme classe, ovr229). Appelee via VROOMM_StubThunk_6AB54 - **CONNEXION MAJEURE** : ce thunk est le meme que celui appele partout dans le code IA pour 'notifier la cible' (AIEntity_MasterTick_5ACC, Entity_ProximityTest_ThreatGate_315B, et d'autres) - confirme que le mecanisme de notification de cible dissemine dans tout le systeme IA appartient a CETTE CLASSE, qui n'est donc PAS reservee aux noeuds de propriete MVRS mais sert de wrapper de reference notifiable generique. Remet a zero this+8->+0xF/+0xD (au lieu de copier depuis this+4/+6 comme la variante Attach), copie this+0x21 vers cible+0x19, reinitialise this+0xC=0, puis appelle INCONDITIONNELLEMENT [vtable+0x1Ch] de la cible avec argument 0 - probable 'detache-toi de moi'. Anciennement mal nommee TargetTrackObject_Helper2."
 },
 "sub_756A4": {
 "segment": "ovr229",
@@ -29707,8 +29707,8 @@
 "lines": 21,
 "type": "far",
 "calls": [],
-"new_name": "NotifiableRef_SwapTarget_756A4",
-"summary": "far, 21 lignes - CONFIRME methode de la meme classe (ovr229) : operation 'echange' entre this et sa cible dereferencee (this+8) - lit cible+0xF/+0xD et les copie vers this+6/+4, PUIS ecrit une nouvelle valeur (argument passe en this+2/this) dans cible+0xF/+0xD. Get-then-set sur le meme champ. Anciennement mal nommee TargetTrackObject_Helper3."
+"new_name": "Behavior_PushRunning_756A4",
+"summary": "far, LUE (2026-09-24). Ex-'NotifiableRef_SwapTarget'. Empile un comportement : noeud+4 = [noeud+8]+0x0D (comportement en cours precedent), [noeud+8]+0x0D = noeud. [noeud+8] = l'entite."
 },
 "sub_756D5": {
 "segment": "ovr229",
@@ -29914,8 +29914,8 @@
 "sub_EC22",
 "sub_40F92"
 ],
-"new_name": "MVRS_ID14_ScoreWeaponReadiness_77000",
-"summary": "far, 80 lignes - **RESOLUTION DU MUR CENTRAL DE L'INVESTIGATION MVRS**. C'est la vraie implementation de [vtable+4] (fonction de SCORE) pour le type de propriete MVRS ID=0x14 (tag 0x14C dans la table statique de seg339, voir ci-dessous). Appelee via le thunk VROOMM_StubThunk_6ABE9. LOGIQUE COMPLETE : recupere l'entite via la reference arriere du noeud (node+0x22), cherche une cible (entite+0x283 sinon entite+0x137 - les memes champs deja identifies via Escort_LeaderSuccession et Goal_IsComplete), appelle [cible->vtable+0]() pour obtenir un pointeur de resultat, verifie que ce resultat a un champ +0x11==2 (type de cible valide, meme test que dans AI_ProximityRadioCalloutTrigger_A002 et sub_77000 lui-meme) ET que entite+0x13==0 (aucune tache en cours), PUIS verifie la disponibilite d'un poste d'arme compatible via sub_40F92 (entite+0x104, code 0xFC). RETOURNE 5 si toutes les conditions sont remplies, SINON 0. Score BINAIRE : ce type de comportement MVRS represente donc 'preparer/selectionner une arme contre la cible courante', actif seulement si un poste d'arme est libre et qu'aucune autre tache n'occupe l'entite."
+"new_name": "GroundAttack_CanEngage_77000",
+"summary": "far, LUE (2026-09-24). Methode +4 du NOEUD PERMANENT D'ATTAQUE AU SOL (entite+0xD9, 0x36 octets, vtable seg339 tag 0x160, construit par PilotProfile_ResolveNamedPropertyNode_742FC case 0x13, noeud+0x21 = 0x13, noeud+0x22 = entite). Ex-'MVRS_ID14_ScoreWeaponReadiness'. MVRS_SharedContextSyncAndID2Score_EC22 puis : cible = entite+0x283 (cible sol acquise) sinon entite+0x137 (cible de mission) ; renvoie 5 si noeud+0x13 == 0 ET target_type de la cible (modele +0x11) == 2 ET WeaponStation_FindLoadedCompatible(chargement entite+0x104, 0xFC) (armes id 3 a 8 : AGM-65D, LAU-3, MK-20, MK-82, id 7, GBU-15 ; pas le canon) ; sinon 0. Sens de noeud+0x13 non trace."
 },
 "sub_7709A": {
 "segment": "ovr231",
@@ -29929,8 +29929,8 @@
 "sub_6AB45",
 "sub_3A44E"
 ],
-"new_name": "MVRS_ID14_ApplyWeaponTracking_7709A",
-"summary": "far, 93 lignes - **RESOLUTION DU MUR CENTRAL**. C'est la vraie implementation de [vtable+8] (fonction d'APPLICATION) pour MVRS ID=0x14, appelee via VROOMM_StubThunk_6ABEE. LOGIQUE COMPLETE : si node+0xC==0, reevalue d'abord le score (rappel a MVRS_ID14_ScoreWeaponReadiness_77000, meme motif de garde que dans AI_BehaviorStateMachine et Entity_ProximityTest) ; appelle un helper generique (VROOMM_StubThunk_6AB4F) ; pose node+0x26=0 et node+0xD=0x200 (mode 'arme selectionnee') ; RE-RESOUT LA MEME CIBLE (entite+0x283/+0x137) et l'ETABLIT COMME REFERENCE SUR LE NOEUD LUI-MEME (node+0x27, via SetReference) - met en cache la cible localement sur cette entree MVRS ; SI aucune cible : appelle NotifiableRef_AttachTarget (VROOMM_StubThunk_6AB45, ovr229) - le motif generique deja connu ; SI une cible existe : efface une reference secondaire (node+0x29), remet a zero un compteur (node+0x34=0) et initialise un MINUTEUR DE VERROUILLAGE/COOLDOWN (node+0x30=0x186A0=100000), PUIS appelle **[vtable+0xC]** - le MEME cinquieme slot de vtable trouve independamment dans Escort_LeaderSuccession_C17A (cas 0x1) - confirme comme methode 'demarrer le suivi/verrouillage' quand une cible est effectivement acquise pour ce type de comportement."
+"new_name": "GroundAttack_Start_7709A",
+"summary": "far, LUE (2026-09-24). Ex-'MVRS_ID14_ApplyWeaponTracking'. Methode +8 du noeud d'attaque au sol : DEMARRE l'attaque. Si noeud+0x0C == 0 : appelle sa methode +4. Behavior_PushRunning_756A4 (le noeud devient le comportement en cours de l'entite, entite+0x0D). Phase noeud+0x26 = 0 ; minuteur noeud+0x0D = 2,0 (0x200) ; noeud+0x27 = cible (entite+0x283 sinon +0x137) ; sans cible : Behavior_PopFinished_75612 ; sinon noeud+0x29 = 0 (arme larguee), noeud+0x34 = 0 (arme choisie), noeud+0x30 = 100000 (entier, distance sentinelle), puis methode +0xC (GroundAttack_PhaseDispatch_77215). Appelee par Goal_ExecuteAction_A8AC (ordre 'detruire la cible' sur cible de mission au sol, apres la methode +4) et par AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (cible sol acquise et arg_4)."
 },
 "sub_77171": {
 "segment": "ovr231",
@@ -29944,8 +29944,8 @@
 "sub_632E",
 "sub_6AB45"
 ],
-"new_name": "AI_IssueTurnAndThrottle_77171",
-"summary": "far — emission d'ordre IA virage+manette. JDYN = es:[[arg_0+0x22]+0x0B] ; passe movsx jdyn[0x84] (i16, def 231, vitesse de croisiere/manoeuvre IA) a AI_ThrottleCmd_HUD comme consigne, apres AI_TurnToBearingCmd. Combine SetReference, AI_TurnToBearingCmd, AI_ThrottleCmd_HUD."
+"new_name": "GroundAttack_Phase4_PullUp_77171",
+"summary": "far, LUE (2026-09-24). Ex-'AI_IssueTurnAndThrottle'. PHASE 4 (apres le tir). Si noeud+0x34 : noeud+0x29 = chargement+0x11 (l'arme larguee), noeud+0x34 = 0. Pilote automatique physique coupe (JDYN+0x68 = 0xFF) ; AI_PitchToAngleCmd_7E18(+5, zone morte 5) ; AI_ThrottleCmd_HUD(vitesse de croisiere JDYN+0x84) ; quand noeud+0x29 redevient nul (l'arme n'existe plus) : fin (Behavior_PopFinished_75612)."
 },
 "sub_77215": {
 "segment": "ovr231",
@@ -29960,8 +29960,8 @@
 "sub_77171",
 "sub_6AB45"
 ],
-"new_name": "AI_TargetTrackHelper_77215",
-"summary": "far, thunk widget HUD box uniquement (70 lignes, rôle exact non détaillé)."
+"new_name": "GroundAttack_PhaseDispatch_77215",
+"summary": "far, LUE (2026-09-24). Ex-'AI_TargetTrackHelper'. Methode +0xC du noeud d'attaque au sol, appelee a chaque tick par Goal_ExecuteAction_A8AC tant que le noeud est le comportement en cours (entite+0x0D). Sans cible (noeud+0x27) : fin. Machine a etats sur noeud+0x26 (table off_77274) : 0 et 1 -> GroundAttack_Phase01_Approach_77282 ; 2 -> GroundAttack_Phase2_EngageAutopilot_775B1 ; 3 -> GroundAttack_Phase3_WeaponRelease_776FB ; 4 -> GroundAttack_Phase4_PullUp_77171 ; 5 et 6 -> Behavior_PopFinished_75612 (fin)."
 },
 "sub_77282": {
 "segment": "ovr231",
@@ -29979,8 +29979,8 @@
 "sub_632E",
 "sub_7E18"
 ],
-"new_name": "AI_ComputeGuidanceSolution_77282",
-"summary": "⚠️ far, 352 lignes, NON DÉTAILLÉE — combine longueur vectorielle, `Angle_DeltaNormalized_A`, `AI_TurnToHeadingCmd`, `AI_Sensor_HeadingNormalized`, `AI_GuidanceCmd_FromOwnPos` — calcul de solution de guidage IA (cap, angle, position)."
+"new_name": "GroundAttack_Phase01_Approach_77282",
+"summary": "far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_ComputeGuidanceSolution'. PHASES 0 (eloignement) ET 1 (approche). Minuteur noeud+0x0D -= dt ; < 0 -> fin (Behavior_PopFinished_75612 ; l'attaque redemarre au tick suivant par GroundAttack_Start_7709A). Pilote automatique physique coupe (JDYN+0x68 = 0xFF) ; cran de gaz = 5. P = position cible +0x12 avec altitude + 1000 ; D = ma position - P ; hd = distance horizontale (noeud+0x30 = partie entiere) ; a = |Angle_DeltaNormalized_A(nez, D)| (a ~ 180 = nez vers la cible). TRANSITIONS : a < 170 et hd < 5000 -> phase 0 ; a > 170 et hd < 5000 -> AI_RollToAngleCmd_8104(0, zone morte 5) (ailes a plat) et si |roulis| (AI_Sensor_RollAngle_58F4) < 5 : cran de gaz 3, phase 2 ; sinon hd > 8000 ou a > 170 -> phase 1. PILOTAGE : direction V = D en phase 0 (s'eloigner), -D sinon (vers P) ; AI_GuidanceCmd_FromOwnPos(entite, V, 10) (-> AI_GuidanceSolution_Major) ; AI_ThrottleCmd_HUD(vitesse de croisiere JDYN+0x84). Puis : si a > 169 et hd > 9000 : AI_PitchToAngleCmd_7E18(0, 5) (palier) ; sinon si phase 1, a > 169 et P.alt - ma alt < -2000 (plus de 2000 au-dessus du point vise) : AI_PitchToAngleCmd_7E18(-40, 5) (pique a -40 deg)."
 },
 "sub_775B1": {
 "segment": "ovr231",
@@ -29991,8 +29991,8 @@
 "calls": [
 "sub_559BB"
 ],
-"new_name": "AI_TransformTargetVector_775B1",
-"summary": "far, appelle `Vector_TransformHelperB_559BB` (seg116, ×plusieurs) — transformation vectorielle liée au ciblage IA."
+"new_name": "GroundAttack_Phase2_EngageAutopilot_775B1",
+"summary": "far, LUE (2026-09-24). Ex-'AI_TransformTargetVector'. PHASE 2 (un tick) : P = cible + 1000 d'altitude ; dir = normalise(P - ma position) * 100 ; bloc de commandes (entite+7) : +0x02/06/0A = P, +0x0E/12/16 = dir, +0x1A = 0 ; JDYN+0x68 = 0 (ACTIVE le pilote automatique physique Guidance_HomingVelocityUpdate vers ce point) ; phase 3."
 },
 "sub_776FB": {
 "segment": "ovr231",
@@ -30016,8 +30016,8 @@
 "sub_70D",
 "sub_5828E"
 ],
-"new_name": "AI_WeaponEngagementCycle_776FB",
-"summary": "⭐⚠️ far, 706 lignes, NON DÉTAILLÉE — combine transformation vectorielle et `WeaponStation_ValidateReady` (répété plusieurs fois), `SetReference` — cycle complet d'engagement d'arme par l'IA (vérification de disponibilité sur plusieurs stations). Candidat prioritaire pour session dédiée."
+"new_name": "GroundAttack_Phase3_WeaponRelease_776FB",
+"summary": "far, 706L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_WeaponEngagementCycle'. PHASE 3. (1) Cible mobile (bit 2 de cible+4) : recalcule P = cible + 1000 et dir*100 dans le bloc de commandes a chaque tick. (2) CHOIX DE L'ARME une fois (noeud+0x34 == 0), WeaponStation_ValidateReady dans l'ordre : 0x04 AGM-65D et 0x80 GBU-15 (chargement+0x0D = cible) ; 0x10 MK-20 et 0x20 MK-82 (octet +0x4D du modele d'arme courant := 4) ; 0x40 id 7 (+0x4D := 5) ; 0x08 LAU-3 (minuteur noeud+0x2B = 3,0 s, chargement+0x0D = cible). Aucune -> phase 6 (fin). (3) Chaque tick : WeaponStation_FindLoadedCompatible(chargement, noeud+0x34) sinon phase 6. AGM-65D / GBU-15 : tir si modele->vtable+0x14(modele, cible, moi) (BOMB : BombModel_TestGuidedLockCone_41735 ; MISS : loc_42F71 non lu). LAU-3 : tir quand le minuteur de 3 s echoit. BOMBES : hauteur = ma alt - alt cible ; I = modele->vtable+0x18(I, modele, 0, point d'emport+0x0D, &hauteur, 3 pour MK-20/MK-82, 5 pour id 7) (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0 sans point d'emport ; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR = bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si bloc+0x1A != 0 (pose par Guidance_HomingVelocityUpdate) -> phase 0 (nouvelle passe)."
 },
 "sub_77DD0": {
 "segment": "ovr232",
@@ -45395,7 +45395,7 @@
 "type": "label",
 "calls": [],
 "new_name": "AIEntity_MasterTick_5ACC",
-"summary": "far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique) est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_SecondaryAngle et Math_Cos (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458 (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4) AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC : +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue). CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
+"summary": "far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique) est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_NosePitch_59A5 et Math_Cos (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458 (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4) AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC : +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue). CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire."
 },
 "loc_5E189": {
 "segment": "seg141",
@@ -45685,7 +45685,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MVRS_ID16_ScoreThreatSensor_4E2A",
-"summary": "far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_SecondaryAngle_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA."
+"summary": "far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA."
 },
 "loc_878F": {
 "segment": "seg004",
@@ -45995,7 +45995,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MVRS_ID6_TimerTickAndSubmodeSwitch_1011F",
-"summary": "far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_TurnToBearingCmd_7E18, AI_TurnToHeadingCmd_8104, AI_PitchRollController_Heading_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_TurnToHeadingCmd - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_PitchRollController_Heading, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_SecondaryAngle), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_TurnToBearingCmd. PHASE 7 : retour au cap de reference (0, taux 10) via AI_TurnToHeadingCmd - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi)."
+"summary": "far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi)."
 },
 "loc_66809": {
 "segment": "seg201",
@@ -46425,7 +46425,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MVRS_ID3_ApplyBreakDirection_F2C8",
-"summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle NotifiableRef_SwapTarget_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois)."
+"summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois)."
 },
 "loc_5C250": {
 "segment": "seg128",
@@ -47476,5 +47476,25 @@
 "calls": [],
 "new_name": "WorldObject_SetOrientationMatrix_3CB95",
 "summary": "far, LUE (2026-09-24). Methode virtuelle +0x40 (notamment classe missile, vtable seg339 0x6FAC4) : recopie 36 octets (AI_ComputeGeometryHelper_56E29) de la matrice passee en argument dans objet+0x2C (orientation), puis appelle Debris_BodyDetach(objet)."
+},
+"loc_41735": {
+"segment": "seg089",
+"start_line": 131033,
+"end_line": 131033,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "BombModel_TestGuidedLockCone_41735",
+"summary": "far, LUE (2026-09-24). Methode +0x14 des modeles BOMB (vtable seg339 0x6F510) et DURD (0x6F4F4), appelee par GroundAttack_Phase3_WeaponRelease_776FB pour la GBU-15 : (modele, cible, lanceur). Faux si modele+0x5E == 0 (octet du chunk DATA du modele : bombe guidee ?) ou sans cible/lanceur. t = distance(cible, lanceur) / |vitesse du lanceur| ; VRAI si Math_DotProduct3D_5505B(direction normalisee vers la cible, nez du lanceur) > Math_CosDeg_5483F(modele+0x61 * t) (+0x61 = word du chunk DATA, PlayerComponent_LoadFieldsWithRetry_9FAD0). Le cone d'acceptation s'elargit avec le temps de vol."
+},
+"loc_41311": {
+"segment": "seg089",
+"start_line": 130624,
+"end_line": 130624,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "BombModel_PredictImpact_41311",
+"summary": "far, LUE (2026-09-24), formule balistique NON RESOLUE. Methode +0x18 des modeles BOMB/DURD : (sortie, modele, 0, porteur = point d'emport+0x0D, &hauteur, n). Porteur nul -> vecteur par defaut. n >= 4 (id 7) : impact = position du porteur + direction horizontale de sa vitesse * 2500 (si masque modele+0x4B == 0x40) ou * 3000, altitude = terrain. n = 3 (MK-20/MK-82) : Z = alt porteur - hauteur (= altitude de la cible d'apres l'appelant) ; t = (-vz - sqrt(vz^2 - 2 g Z)) / g avec g = dword_6FFD7 = -9,8 ; t -= Z / (3 * (2000 - alt porteur) + 290) ; impact = position porteur + vitesse horizontale * t, altitude = terrain (Terrain_QueryAltitudeAt). A CLARIFIER : Z vaut l'altitude de la cible et non la hauteur de chute ; soit l'objet +0x0D ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original."
 }
 }

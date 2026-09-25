@@ -5710,7 +5710,7 @@ Matrix_NosePitchAngle_57C3A	endp
 ; roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans
 ; ]-180, 180].
 ; ==============================================================================================
-Matrix_RollAngle_57C67	proc far		; CODE XREF: seg002:0EF0P AI_Sensor_HeadingNormalized+52P ...
+Matrix_RollAngle_57C67	proc far		; CODE XREF: seg002:0EF0P AI_Sensor_RollAngle_58F4+52P ...
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch

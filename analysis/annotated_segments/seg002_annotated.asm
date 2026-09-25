@@ -2117,7 +2117,7 @@ loc_4E27:				; CODE XREF: seg002:0E7Cj
 ; par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle
 ; initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace,
 ; deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a
-; AI_Sensor_SecondaryAngle_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en
+; AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en
 ; 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score
 ; BINAIRE 0/0xA.
 ; ==============================================================================================
@@ -2184,7 +2184,7 @@ loc_4E95:				; CODE XREF: seg002:1001j
 		push	ss
 		lea	ax, [bp-6]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-6], 1E00h
 		jle	short loc_4EBD

@@ -6150,7 +6150,7 @@ loc_4B093:				; CODE XREF: seg082:11DDJ
 ; fonctions de tick de haut niveau (sub_7E56/sub_7F34) : candidat pour un calcul physique de
 ; haut niveau intégrant le résultat du modèle de vol JDYN, à approfondir.
 ; ==============================================================================================
-JDYN_HighLevelPhysicsCalc	proc far		; CODE XREF: AI_PitchRollController_Heading+ACP
+JDYN_HighLevelPhysicsCalc	proc far		; CODE XREF: AI_RollController_7E56+ACP
 					; AI_FlightControl_Cluster+19BP
 
 var_68		= dword	ptr -68h

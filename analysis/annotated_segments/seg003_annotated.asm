@@ -1309,10 +1309,11 @@ AI_Sensor_DistanceFromRef	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,73L — cache à +0xFA : vtable[0x3C] (cap?) + sub_57C67, normalise l'angle (wraparound
-; ±0xB400) : capteur caché : cap/bearing normalisé.
+; far, LUE (2026-09-24). Ex-'AI_Sensor_RollAngle_58F4' (FAUX : ce n'est PAS un cap). ANGLE DE
+; ROULIS de l'avion : Matrix_RollAngle_57C67(orientation de entite+0x102), ramene a +/-180,
+; mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C).
 ; ==============================================================================================
-AI_Sensor_HeadingNormalized	proc far		; CODE XREF: AI_ThreatConeTest+8Ap
+AI_Sensor_RollAngle_58F4	proc far		; CODE XREF: AI_ThreatConeTest+8Ap
 					; AI_ManeuverSolution_Major+45Ep ...
 
 var_10		= dword	ptr -10h
@@ -1363,20 +1364,20 @@ loc_5942:
 		jmp	short loc_597E
 ; ���������������������������������������������������������������������������
 
-loc_596A:				; CODE XREF: AI_Sensor_HeadingNormalized+6Aj
+loc_596A:				; CODE XREF: AI_Sensor_RollAngle_58F4+6Aj
 		cmp	[bp+var_4], 0FFFF4C00h
 		jge	short loc_597E
 		add	[bp+var_4], 16800h
 		jmp	short $+2
 
-loc_597E:				; CODE XREF: AI_Sensor_HeadingNormalized+74j AI_Sensor_HeadingNormalized+7Ej
+loc_597E:				; CODE XREF: AI_Sensor_RollAngle_58F4+74j AI_Sensor_RollAngle_58F4+7Ej
 		mov	eax, [bp+var_4]
 		mov	[bp+var_10], eax
 		mov	eax, [bp+var_10]
 		les	bx, [bp+arg_4]
 		mov	es:[bx+0FAh], eax
 
-loc_5993:				; CODE XREF: AI_Sensor_HeadingNormalized+31j
+loc_5993:				; CODE XREF: AI_Sensor_RollAngle_58F4+31j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -1384,7 +1385,7 @@ loc_5993:				; CODE XREF: AI_Sensor_HeadingNormalized+31j
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-AI_Sensor_HeadingNormalized	endp
+AI_Sensor_RollAngle_58F4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1392,10 +1393,11 @@ AI_Sensor_HeadingNormalized	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,57L — cache à +0xF6 : vtable[0x3C]+0xC + sub_552E1 : capteur caché : angle secondaire
-; (tangage/roulis?).
+; far, LUE (2026-09-24). Ex-'AI_Sensor_NosePitch_59A5'. TANGAGE DU NEZ :
+; Math_ElevationAngle_552E1(ligne 1 de l'orientation de entite+0x102), mis en cache dans
+; entite+0xF6 (drapeau bit 2 de entite+0x28C).
 ; ==============================================================================================
-AI_Sensor_SecondaryAngle	proc far		; CODE XREF: seg002:1016P seg003:0C99p ...
+AI_Sensor_NosePitch_59A5	proc far		; CODE XREF: seg002:1016P seg003:0C99p ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -1443,7 +1445,7 @@ arg_4		= dword	ptr  0Ah
 		les	bx, [bp+arg_4]
 		mov	es:[bx+0F6h], eax
 
-loc_5A1B:				; CODE XREF: AI_Sensor_SecondaryAngle+31j
+loc_5A1B:				; CODE XREF: AI_Sensor_NosePitch_59A5+31j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_4]
 		mov	[bx], eax
@@ -1451,7 +1453,7 @@ loc_5A1B:				; CODE XREF: AI_Sensor_SecondaryAngle+31j
 		mov	ax, [bp+arg_0]
 		leave
 		retf
-AI_Sensor_SecondaryAngle	endp
+AI_Sensor_NosePitch_59A5	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -1517,7 +1519,7 @@ loc_5ABA:				; CODE XREF: seg003:0ADEj
 ; est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et
 ; +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain
 ; (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de
-; l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_SecondaryAngle et Math_Cos
+; l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_NosePitch_59A5 et Math_Cos
 ; (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458
 ; (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4)
 ; AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ;
@@ -1627,7 +1629,7 @@ AIEntity_MasterTick_5ACC:				; DATA XREF: seg339:011Co
 		lea	ax, [bp-1Ch]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-1Ch], 0
 		jle	short loc_5C2B
@@ -2886,7 +2888,7 @@ loc_6671:				; CODE XREF: AI_EvadeOrPursueSelector+57j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToBearingCmd
+		call	near ptr AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
@@ -2909,7 +2911,7 @@ loc_66BC:				; CODE XREF: AI_EvadeOrPursueSelector+3Fj AI_EvadeOrPursueSelector
 		lea	ax, [bp+var_C]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		mov	eax, [bp+var_C]
 		mov	[bp+var_8], eax
@@ -2976,7 +2978,7 @@ loc_672D:				; CODE XREF: AI_EvadeOrPursueSelector+109j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToBearingCmd
+		call	near ptr AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		mov	al, 0
 
@@ -3017,7 +3019,7 @@ arg_0		= dword	ptr  6
 		lea	ax, [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
@@ -3056,7 +3058,7 @@ loc_67C8:				; CODE XREF: AI_ThreatConeTest+2Aj
 		lea	ax, [bp+var_10]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	[bp+var_10], 0
 		jg	short loc_67E4
@@ -3080,7 +3082,7 @@ loc_67EF:				; CODE XREF: AI_ThreatConeTest+57j AI_ThreatConeTest+79j
 		lea	ax, [bp+var_18]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_18]
 		or	eax, eax
@@ -3155,7 +3157,7 @@ loc_6871:				; CODE XREF: AI_ThreatConeTest+BBj AI_ThreatConeTest+CFj
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToBearingCmd
+		call	near ptr AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
 loc_68D0:				; CODE XREF: AI_ThreatConeTest+100j
@@ -3176,9 +3178,9 @@ AI_ThreatConeTest	endp
 ; far,74L — DECISION VITESSE/MANOEUVRE IA. JDYN = es:[arg_0+0x0B]. Seuil = (movsx jdyn[0x84]
 ; (i16, def 231) + dword_72039) / 2 ; si seuil<<8 > distance (AI_Sensor_DistanceFromRef) ->
 ; retourne 1 (maintien de vitesse). Sinon (loc_691C) : AI_ThrottleCmd_HUD(jdyn[0x80])
-; (consigne = vitesse IA max) + AI_TurnToBearingCmd(rate=5, angle=0x500) -> retourne 0.
+; (consigne = vitesse IA max) + AI_PitchToAngleCmd_7E18(rate=5, angle=0x500) -> retourne 0.
 ; jdyn[0x84] = vitesse de croisiere/manoeuvre IA (sert aussi de consigne throttle directe dans
-; AI_IssueTurnAndThrottle_77171, ovr231).
+; GroundAttack_Phase4_PullUp_77171, ovr231).
 ; ==============================================================================================
 AI_SpeedManeuverDecision	proc far		; CODE XREF: seg008:3372P seg008:33A0P
 
@@ -3246,7 +3248,7 @@ loc_691C:				; CODE XREF: AI_SpeedManeuverDecision+42j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToBearingCmd
+		call	near ptr AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		mov	al, 0
 
@@ -3730,7 +3732,7 @@ loc_6DCA:				; CODE XREF: AI_ManeuverSolution_Major+44Bj
 		lea	ax, [bp+var_88]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_88]
 		neg	eax
@@ -3813,7 +3815,7 @@ loc_6E9D:				; CODE XREF: AI_ManeuverSolution_Major+4DEj
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	[bp+var_B0], 0
 		mov	eax, [bp+var_B0]
@@ -4055,7 +4057,7 @@ AI_InterceptDispatcher	endp
 ; - cette fonction ne prend PAS elle-meme la decision finale, elle prepare la geometrie
 ; complete pour que AI_CombatDecision_Major decide de l'action. CONFIRME que le triplet de
 ; guidage complet est : AI_GuidanceSolution_Major (geometrie/anticipation) ->
-; AI_CombatDecision_Major (decision) -> AI_TurnToHeadingCmd (execution). ⚠️ (2026-09-24)
+; AI_CombatDecision_Major (decision) -> AI_RollToAngleCmd_8104 (execution). ⚠️ (2026-09-24)
 ; Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir
 ; Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a
 ; relire.
@@ -4200,7 +4202,7 @@ loc_70F5:				; CODE XREF: AI_GuidanceSolution_Major+B7j
 		lea	ax, [bp+var_36]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
@@ -4594,7 +4596,7 @@ loc_74A2:				; CODE XREF: AI_GuidanceSolution_Major+474j
 		lea	ax, [bp+var_78]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, 5A00h
 		sub	eax, [bp+var_78]
@@ -4640,7 +4642,7 @@ loc_74FC:				; CODE XREF: AI_GuidanceSolution_Major+4CEj
 		lea	ax, [bp+var_84]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, 0FFFFA600h
 		sub	eax, [bp+var_84]
@@ -4780,17 +4782,17 @@ AI_GuidanceCmd_FromOwnPos	endp
 ; toucher aux champs de commande. (b) SI l'ecart angulaire total (somme des deux deltas,
 ; wrappe ±180 deg) est <= 145 deg (0x9100) : calcule une position anticipee via sub_5305 (meme
 ; fonction utilisee dans les phases de manoeuvre MVRS_ID6/14b), scale par un facteur derive du
-; carre de l'angle divise par -10 puis 10, appelle AI_TurnToHeadingCmd(taux=5), ecrit le
+; carre de l'angle divise par -10 puis 10, appelle AI_RollToAngleCmd_8104(taux=5), ecrit le
 ; resultat dans entite+7+0x1F. (c) SI > 145 deg (cas extreme, quasi face-a-face) : calcul
 ; similaire mais en plus MULTIPLIE PAR LE TAUX DE ROULIS PROPRE DE L'AVION ([avion+0x71], meme
 ; champ que la formule de bonus de MVRS_ID14b_ScoreGeneric), divise par 0x10E (270), borne a
 ; un maximum (0x1000=16 deg) - encore une adaptation a la capacite de manoeuvre specifique de
 ; l'appareil. REPLI FINAL (aucune des conditions geometriques ne s'applique) : appelle
-; AI_TurnToHeadingCmd(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME le
-; triptyque complet de la chaine de combat : AI_GuidanceSolution_Major
+; AI_RollToAngleCmd_8104(cible=0, taux=2) - une commande neutre de retour au niveau. CONFIRME
+; le triptyque complet de la chaine de combat : AI_GuidanceSolution_Major
 ; (geometrie/anticipation) -> AI_CombatDecision_Major (choix entre correction
 ; fine/large/extreme/neutre, ecriture finale de la commande) ->
-; AI_TurnToHeadingCmd/AI_PitchRollController_Heading (execution).
+; AI_RollToAngleCmd_8104/AI_RollController_7E56 (execution).
 ; ==============================================================================================
 AI_CombatDecision_Major	proc far		; CODE XREF: AI_GuidanceSolution_Major+575p
 
@@ -5100,7 +5102,7 @@ loc_7814:				; CODE XREF: AI_CombatDecision_Major+18Ej
 		lea	ax, [bp+var_5E]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	si, di
 		mov	eax, [bp+var_5E]
@@ -5193,7 +5195,7 @@ loc_78FB:				; CODE XREF: AI_CombatDecision_Major+2EFj
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jnz	short loc_791E
@@ -5383,7 +5385,7 @@ loc_7AFB:				; CODE XREF: AI_CombatDecision_Major+137j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	[bp+var_1], 1
 
@@ -5402,10 +5404,16 @@ AI_CombatDecision_Major	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,384L — appelée par sub_7E18 (commande de virage vers un angle à un taux donné) :
-; candidat fort pour le contrôleur de roulis/virage (aileron command law) — à approfondir.
+; far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_PitchController_7B20'. CONTROLEUR DE TANGAGE,
+; ecrit l'axe de tangage du manche (bloc entite+7, +0x1F). e = ecart ramene a +/-180. |e| <=
+; zone morte : manche = 0, AI_RollToAngleCmd_8104(0, 5), renvoie 1. Sinon (renvoie 0) : dos =
+; |roulis| > 90. Si e < -15 ou (dos et e < 0) : AI_RollToAngleCmd_8104(180, 5) (PASSER SUR LE
+; DOS pour piquer) et, si |roulis| > 165 : manche = Value_ClampSymmetric(-e > 15 ? -e*16/15 :
+; 16,0) (tirer). Sinon : AI_RollToAngleCmd_8104(0, 5) et, si |roulis| < 15 : manche =
+; Value_ClampSymmetric(e < 0 ou e < 15 ? e*16/15 : 16,0). Les piques de plus de 15 deg se font
+; donc dos, en tirant.
 ; ==============================================================================================
-AI_RollRateController	proc far		; CODE XREF: AI_TurnToBearingCmd+35p
+AI_PitchController_7B20	proc far		; CODE XREF: AI_PitchToAngleCmd_7E18+35p
 
 var_9A		= dword	ptr -9Ah
 var_96		= dword	ptr -96h
@@ -5464,20 +5472,20 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_7B5A
 ; ���������������������������������������������������������������������������
 
-loc_7B46:				; CODE XREF: AI_RollRateController+1Aj
+loc_7B46:				; CODE XREF: AI_PitchController_7B20+1Aj
 		cmp	[bp+var_4], 0FFFF4C00h
 		jge	short loc_7B5A
 		add	[bp+var_4], 16800h
 		jmp	short $+2
 
-loc_7B5A:				; CODE XREF: AI_RollRateController+24j AI_RollRateController+2Ej
+loc_7B5A:				; CODE XREF: AI_PitchController_7B20+24j AI_PitchController_7B20+2Ej
 		mov	[bp+var_5], 1
 		mov	eax, [bp+var_4]
 		or	eax, eax
 		jge	short loc_7B6A
 		neg	eax
 
-loc_7B6A:				; CODE XREF: AI_RollRateController+45j
+loc_7B6A:				; CODE XREF: AI_PitchController_7B20+45j
 		mov	[bp+var_A], eax
 		mov	eax, [bp+var_A]
 		mov	[bp+var_E], eax
@@ -5491,29 +5499,29 @@ loc_7B6A:				; CODE XREF: AI_RollRateController+45j
 		jmp	short loc_7B92
 ; ���������������������������������������������������������������������������
 
-loc_7B90:				; CODE XREF: AI_RollRateController+69j
+loc_7B90:				; CODE XREF: AI_PitchController_7B20+69j
 		xor	ax, ax
 
-loc_7B92:				; CODE XREF: AI_RollRateController+6Ej
+loc_7B92:				; CODE XREF: AI_PitchController_7B20+6Ej
 		or	al, al
 		jnz	short loc_7B99
 		jmp	loc_7DE0
 ; ���������������������������������������������������������������������������
 
-loc_7B99:				; CODE XREF: AI_RollRateController+74j
+loc_7B99:				; CODE XREF: AI_PitchController_7B20+74j
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		or	eax, eax
 		jge	short loc_7BB5
 		neg	eax
 
-loc_7BB5:				; CODE XREF: AI_RollRateController+90j
+loc_7BB5:				; CODE XREF: AI_PitchController_7B20+90j
 		mov	[bp+var_22], eax
 		mov	eax, [bp+var_22]
 		mov	[bp+var_26], eax
@@ -5523,10 +5531,10 @@ loc_7BB5:				; CODE XREF: AI_RollRateController+90j
 		jmp	short loc_7BD2
 ; ���������������������������������������������������������������������������
 
-loc_7BD0:				; CODE XREF: AI_RollRateController+A9j
+loc_7BD0:				; CODE XREF: AI_PitchController_7B20+A9j
 		xor	ax, ax
 
-loc_7BD2:				; CODE XREF: AI_RollRateController+AEj
+loc_7BD2:				; CODE XREF: AI_PitchController_7B20+AEj
 		mov	[bp+var_1D], al
 		cmp	[bp+var_4], 0FFFFF100h
 		jge	short loc_7BE4
@@ -5534,10 +5542,10 @@ loc_7BD2:				; CODE XREF: AI_RollRateController+AEj
 		jmp	short loc_7BE6
 ; ���������������������������������������������������������������������������
 
-loc_7BE4:				; CODE XREF: AI_RollRateController+BDj
+loc_7BE4:				; CODE XREF: AI_PitchController_7B20+BDj
 		xor	ax, ax
 
-loc_7BE6:				; CODE XREF: AI_RollRateController+C2j
+loc_7BE6:				; CODE XREF: AI_PitchController_7B20+C2j
 		or	al, al
 		jnz	short loc_7C08
 		cmp	[bp+var_1D], 0
@@ -5545,23 +5553,23 @@ loc_7BE6:				; CODE XREF: AI_RollRateController+C2j
 		jmp	loc_7CD9
 ; ���������������������������������������������������������������������������
 
-loc_7BF3:				; CODE XREF: AI_RollRateController+CEj
+loc_7BF3:				; CODE XREF: AI_PitchController_7B20+CEj
 		cmp	[bp+var_4], 0
 		jge	short loc_7BFF
 		mov	ax, 1
 		jmp	short loc_7C01
 ; ���������������������������������������������������������������������������
 
-loc_7BFF:				; CODE XREF: AI_RollRateController+D8j
+loc_7BFF:				; CODE XREF: AI_PitchController_7B20+D8j
 		xor	ax, ax
 
-loc_7C01:				; CODE XREF: AI_RollRateController+DDj
+loc_7C01:				; CODE XREF: AI_PitchController_7B20+DDj
 		or	al, al
 		jnz	short loc_7C08
 		jmp	loc_7CD9
 ; ���������������������������������������������������������������������������
 
-loc_7C08:				; CODE XREF: AI_RollRateController+C8j AI_RollRateController+E3j
+loc_7C08:				; CODE XREF: AI_PitchController_7B20+C8j AI_PitchController_7B20+E3j
 		push	5
 		mov	[bp+var_2E], 0B400h
 		lea	ax, [bp+var_2E]
@@ -5569,14 +5577,14 @@ loc_7C08:				; CODE XREF: AI_RollRateController+C8j AI_RollRateController+E3j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		or	eax, eax
 		jge	short loc_7C2E
 		neg	eax
 
-loc_7C2E:				; CODE XREF: AI_RollRateController+109j
+loc_7C2E:				; CODE XREF: AI_PitchController_7B20+109j
 		mov	[bp+var_32], eax
 		mov	eax, [bp+var_32]
 		mov	[bp+var_36], eax
@@ -5586,16 +5594,16 @@ loc_7C2E:				; CODE XREF: AI_RollRateController+109j
 		jmp	short loc_7C4B
 ; ���������������������������������������������������������������������������
 
-loc_7C49:				; CODE XREF: AI_RollRateController+122j
+loc_7C49:				; CODE XREF: AI_PitchController_7B20+122j
 		xor	ax, ax
 
-loc_7C4B:				; CODE XREF: AI_RollRateController+127j
+loc_7C4B:				; CODE XREF: AI_PitchController_7B20+127j
 		or	al, al
 		jnz	short loc_7C52
 		jmp	loc_7DDA
 ; ���������������������������������������������������������������������������
 
-loc_7C52:				; CODE XREF: AI_RollRateController+12Dj
+loc_7C52:				; CODE XREF: AI_PitchController_7B20+12Dj
 		mov	eax, [bp+var_4]
 		neg	eax
 		mov	[bp+var_3A], eax
@@ -5606,10 +5614,10 @@ loc_7C52:				; CODE XREF: AI_RollRateController+12Dj
 		jmp	short loc_7C72
 ; ���������������������������������������������������������������������������
 
-loc_7C70:				; CODE XREF: AI_RollRateController+149j
+loc_7C70:				; CODE XREF: AI_PitchController_7B20+149j
 		xor	ax, ax
 
-loc_7C72:				; CODE XREF: AI_RollRateController+14Ej
+loc_7C72:				; CODE XREF: AI_PitchController_7B20+14Ej
 		or	al, al
 		jz	short loc_7CA6
 		mov	eax, [bp+var_4]
@@ -5627,11 +5635,11 @@ loc_7C72:				; CODE XREF: AI_RollRateController+14Ej
 		jmp	short loc_7CB2
 ; ���������������������������������������������������������������������������
 
-loc_7CA6:				; CODE XREF: AI_RollRateController+154j
+loc_7CA6:				; CODE XREF: AI_PitchController_7B20+154j
 		mov	[bp+var_5A], 1000h
 		mov	eax, [bp+var_5A]
 
-loc_7CB2:				; CODE XREF: AI_RollRateController+184j
+loc_7CB2:				; CODE XREF: AI_PitchController_7B20+184j
 		mov	[bp+var_2A], eax
 		lea	ax, [bp+var_2A]
 		push	ax
@@ -5648,7 +5656,7 @@ loc_7CB2:				; CODE XREF: AI_RollRateController+184j
 		jmp	loc_7DCE
 ; ���������������������������������������������������������������������������
 
-loc_7CD9:				; CODE XREF: AI_RollRateController+D0j AI_RollRateController+E5j
+loc_7CD9:				; CODE XREF: AI_PitchController_7B20+D0j AI_PitchController_7B20+E5j
 		push	5
 		mov	[bp+var_66], 0
 		lea	ax, [bp+var_66]
@@ -5656,14 +5664,14 @@ loc_7CD9:				; CODE XREF: AI_RollRateController+D0j AI_RollRateController+E5j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		or	eax, eax
 		jge	short loc_7CFF
 		neg	eax
 
-loc_7CFF:				; CODE XREF: AI_RollRateController+1DAj
+loc_7CFF:				; CODE XREF: AI_PitchController_7B20+1DAj
 		mov	[bp+var_6A], eax
 		mov	eax, [bp+var_6A]
 		mov	[bp+var_6E], eax
@@ -5673,26 +5681,26 @@ loc_7CFF:				; CODE XREF: AI_RollRateController+1DAj
 		jmp	short loc_7D1C
 ; ���������������������������������������������������������������������������
 
-loc_7D1A:				; CODE XREF: AI_RollRateController+1F3j
+loc_7D1A:				; CODE XREF: AI_PitchController_7B20+1F3j
 		xor	ax, ax
 
-loc_7D1C:				; CODE XREF: AI_RollRateController+1F8j
+loc_7D1C:				; CODE XREF: AI_PitchController_7B20+1F8j
 		or	al, al
 		jnz	short loc_7D23
 		jmp	loc_7DDA
 ; ���������������������������������������������������������������������������
 
-loc_7D23:				; CODE XREF: AI_RollRateController+1FEj
+loc_7D23:				; CODE XREF: AI_PitchController_7B20+1FEj
 		cmp	[bp+var_4], 0
 		jge	short loc_7D2F
 		mov	ax, 1
 		jmp	short loc_7D31
 ; ���������������������������������������������������������������������������
 
-loc_7D2F:				; CODE XREF: AI_RollRateController+208j
+loc_7D2F:				; CODE XREF: AI_PitchController_7B20+208j
 		xor	ax, ax
 
-loc_7D31:				; CODE XREF: AI_RollRateController+20Dj
+loc_7D31:				; CODE XREF: AI_PitchController_7B20+20Dj
 		or	al, al
 		jz	short loc_7D5A
 		mov	eax, [bp+var_4]
@@ -5707,17 +5715,17 @@ loc_7D31:				; CODE XREF: AI_RollRateController+20Dj
 		jmp	short loc_7DA6
 ; ���������������������������������������������������������������������������
 
-loc_7D5A:				; CODE XREF: AI_RollRateController+213j
+loc_7D5A:				; CODE XREF: AI_PitchController_7B20+213j
 		cmp	[bp+var_4], 0F00h
 		jge	short loc_7D69
 		mov	ax, 1
 		jmp	short loc_7D6B
 ; ���������������������������������������������������������������������������
 
-loc_7D69:				; CODE XREF: AI_RollRateController+242j
+loc_7D69:				; CODE XREF: AI_PitchController_7B20+242j
 		xor	ax, ax
 
-loc_7D6B:				; CODE XREF: AI_RollRateController+247j
+loc_7D6B:				; CODE XREF: AI_PitchController_7B20+247j
 		or	al, al
 		jz	short loc_7D98
 		mov	eax, [bp+var_4]
@@ -5736,12 +5744,12 @@ loc_7D96:
 		jmp	short loc_7DA6
 ; ���������������������������������������������������������������������������
 
-loc_7D98:				; CODE XREF: AI_RollRateController+24Dj
+loc_7D98:				; CODE XREF: AI_PitchController_7B20+24Dj
 		mov	[bp+var_92], 1000h
 		mov	eax, [bp+var_92]
 
-loc_7DA6:				; CODE XREF: AI_RollRateController+238j
-					; AI_RollRateController:loc_7D96j
+loc_7DA6:				; CODE XREF: AI_PitchController_7B20+238j
+					; AI_PitchController_7B20:loc_7D96j
 		mov	[bp+var_2A], eax
 		lea	ax, [bp+var_2A]
 		push	ax
@@ -5756,18 +5764,18 @@ loc_7DA6:				; CODE XREF: AI_RollRateController+238j
 		mov	[bp+var_9A], eax
 		mov	eax, [bp+var_9A]
 
-loc_7DCE:				; CODE XREF: AI_RollRateController+1B6j
+loc_7DCE:				; CODE XREF: AI_PitchController_7B20+1B6j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+7]
 		mov	es:[bx+1Fh], eax
 
-loc_7DDA:				; CODE XREF: AI_RollRateController+12Fj
-					; AI_RollRateController+200j
+loc_7DDA:				; CODE XREF: AI_PitchController_7B20+12Fj
+					; AI_PitchController_7B20+200j
 		mov	[bp+var_5], 0
 		jmp	short loc_7E12
 ; ���������������������������������������������������������������������������
 
-loc_7DE0:				; CODE XREF: AI_RollRateController+76j
+loc_7DE0:				; CODE XREF: AI_PitchController_7B20+76j
 		mov	[bp+var_14], 0
 		mov	eax, [bp+var_14]
 		les	bx, [bp+arg_0]
@@ -5780,15 +5788,15 @@ loc_7DE0:				; CODE XREF: AI_RollRateController+76j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_TurnToHeadingCmd
+		call	near ptr AI_RollToAngleCmd_8104
 		add	sp, 8
 
-loc_7E12:				; CODE XREF: AI_RollRateController+2BEj
+loc_7E12:				; CODE XREF: AI_PitchController_7B20+2BEj
 		mov	al, [bp+var_5]
 		pop	si
 		leave
 		retf
-AI_RollRateController	endp
+AI_PitchController_7B20	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5796,11 +5804,11 @@ AI_RollRateController	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,36L — calcule l'écart entre un angle cible et le bearing courant (sub_59A5), puis
-; appelle sub_7B20(delta, taux) : commande de virage vers un cap à un taux donné (fonction de
-; pilotage IA).
+; far, 36L, LUE (2026-09-24). Ex-'AI_PitchToAngleCmd_7E18' (FAUX : pas de cap). Commande de
+; TANGAGE : ecart = tangage voulu - AI_Sensor_NosePitch_59A5 puis
+; AI_PitchController_7B20(entite, &ecart, zone morte).
 ; ==============================================================================================
-AI_TurnToBearingCmd	proc far		; CODE XREF: AI_EvadeOrPursueSelector+73p
+AI_PitchToAngleCmd_7E18	proc far		; CODE XREF: AI_EvadeOrPursueSelector+73p
 					; AI_EvadeOrPursueSelector+14Ep ...
 
 var_8		= dword	ptr -8
@@ -5821,7 +5829,7 @@ arg_6		= word ptr  0Ch
 		lea	ax, [bp+var_8]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_SecondaryAngle
+		call	near ptr AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		sub	[bp+var_4], eax
@@ -5830,12 +5838,12 @@ arg_6		= word ptr  0Ch
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_RollRateController
+		call	near ptr AI_PitchController_7B20
 		add	sp, 8
 		pop	si
 		leave
 		retf
-AI_TurnToBearingCmd	endp
+AI_PitchToAngleCmd_7E18	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5843,17 +5851,13 @@ AI_TurnToBearingCmd	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 101L, LUE INTEGRALEMENT (2026-09-20). Contrôleur de virage par ÉCART D'ANGLE : (entité,
-; &ecart de cap, zone morte en degrés). Remet à 0 le champ de commande partagé avec le joueur
-; (bloc d'état +0x23, l'entrée manche/souris), normalise l'écart à ±180 degrés (0xB400 =
-; 180.0, 0x16800 = 360.0 en 24.8), puis, SEULEMENT si l'écart absolu dépasse la zone morte
-; (taux*256), appelle JDYN_HighLevelPhysicsCalc(avion, sortie, écart) — le calcul physique de
-; haut niveau du modèle de vol qui transforme l'écart en valeur de manche —, la NÉGATE et
-; l'écrit dans +0x23. Renvoie 0 si elle a commandé, 1 sinon (dans la zone morte). L'IA ne fait
-; donc PAS de boucle d'altitude : elle commande le manche à partir d'un écart d'angle, avec
-; une zone morte.
+; far, 101L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollController_7E56'.
+; CONTROLEUR DE ROULIS : remet a 0 l'axe de roulis du manche (bloc de commandes entite+7,
+; +0x23 = roulis, cf. DATA_MODEL.md), ramene l'ecart a +/-180, et si |ecart| depasse la zone
+; morte (degres) : JDYN_HighLevelPhysicsCalc(avion, sortie, ecart), valeur negee ecrite dans
+; +0x23 (mov es:[bx+23h], eax). Renvoie 0 si elle a commande, 1 sinon.
 ; ==============================================================================================
-AI_PitchRollController_Heading	proc far		; CODE XREF: AI_TurnToHeadingCmd+35p seg008:1E5DP ...
+AI_RollController_7E56	proc far		; CODE XREF: AI_RollToAngleCmd_8104+35p seg008:1E5DP ...
 
 var_28		= dword	ptr -28h
 var_22		= dword	ptr -22h
@@ -5888,7 +5892,7 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_7EA9
 ; ���������������������������������������������������������������������������
 
-loc_7E95:				; CODE XREF: AI_PitchRollController_Heading+33j
+loc_7E95:				; CODE XREF: AI_RollController_7E56+33j
 		cmp	[bp+var_4], 0FFFF4C00h
 		jge	short loc_7EA9
 
@@ -5898,7 +5902,7 @@ loc_7E9F:
 loc_7EA7:
 		jmp	short $+2
 
-loc_7EA9:				; CODE XREF: AI_PitchRollController_Heading+3Dj AI_PitchRollController_Heading+47j
+loc_7EA9:				; CODE XREF: AI_RollController_7E56+3Dj AI_RollController_7E56+47j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Bh], 0
 		jz	short loc_7F2F
@@ -5907,7 +5911,7 @@ loc_7EA9:				; CODE XREF: AI_PitchRollController_Heading+3Dj AI_PitchRollContro
 		jge	short loc_7EBF
 		neg	eax
 
-loc_7EBF:				; CODE XREF: AI_PitchRollController_Heading+64j
+loc_7EBF:				; CODE XREF: AI_RollController_7E56+64j
 		mov	[bp+var_C], eax
 		mov	eax, [bp+var_C]
 		mov	[bp+var_10], eax
@@ -5921,10 +5925,10 @@ loc_7EBF:				; CODE XREF: AI_PitchRollController_Heading+64j
 		jmp	short loc_7EE7
 ; ���������������������������������������������������������������������������
 
-loc_7EE5:				; CODE XREF: AI_PitchRollController_Heading+88j
+loc_7EE5:				; CODE XREF: AI_RollController_7E56+88j
 		xor	ax, ax
 
-loc_7EE7:				; CODE XREF: AI_PitchRollController_Heading+8Dj
+loc_7EE7:				; CODE XREF: AI_RollController_7E56+8Dj
 		or	al, al
 		jz	short loc_7F2F
 		sub	sp, 4
@@ -5948,12 +5952,12 @@ loc_7EE7:				; CODE XREF: AI_PitchRollController_Heading+8Dj
 		mov	es:[bx+23h], eax
 		mov	dl, 0
 
-loc_7F2F:				; CODE XREF: AI_PitchRollController_Heading+5Bj AI_PitchRollController_Heading+93j
+loc_7F2F:				; CODE XREF: AI_RollController_7E56+5Bj AI_RollController_7E56+93j
 		mov	al, dl
 		pop	si
 		leave
 		retf
-AI_PitchRollController_Heading	endp
+AI_RollController_7E56	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -6059,7 +6063,7 @@ loc_7FBC:				; CODE XREF: AI_FlightControl_Cluster+83j
 		lea	ax, [bp+var_34]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_34]
 
@@ -6094,7 +6098,7 @@ loc_7FE9:				; CODE XREF: AI_FlightControl_Cluster+B1j
 		lea	ax, [bp+var_3C]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_30]
 		sub	eax, [bp+var_3C]
@@ -6132,7 +6136,7 @@ loc_803B:				; CODE XREF: AI_FlightControl_Cluster+103j
 		lea	ax, [bp+var_58]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_30]
 		sub	eax, [bp+var_58]
@@ -6216,13 +6220,12 @@ AI_FlightControl_Cluster	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 38L, LUE INTEGRALEMENT (2026-09-20). Exécution d'un virage vers un cap : prend (entité,
-; pointeur vers l'angle de cap voulu, taux), calcule ecart = cap voulu -
-; AI_Sensor_HeadingNormalized(entité) (cap courant normalisé) puis appelle
-; AI_PitchRollController_Heading(entité, &ecart, taux). Le 'taux' est la ZONE MORTE en degrés
-; (5 depuis AI_CombatDecision_Major en correction normale, 2 en commande neutre).
+; far, 38L, LUE (2026-09-20, sens corrige 2026-09-24). Ex-'AI_RollToAngleCmd_8104' (FAUX : pas
+; de cap). Commande de ROULIS : ecart = roulis voulu - AI_Sensor_RollAngle_58F4 (roulis
+; courant) puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) =
+; remettre les ailes a plat ; (180, 5) = se mettre sur le dos.
 ; ==============================================================================================
-AI_TurnToHeadingCmd	proc far		; CODE XREF: AI_ManeuverSolution_Major+52Dp
+AI_RollToAngleCmd_8104	proc far		; CODE XREF: AI_ManeuverSolution_Major+52Dp
 					; AI_CombatDecision_Major+319p ...
 
 var_8		= dword	ptr -8
@@ -6243,7 +6246,7 @@ arg_6		= word ptr  0Ch
 		lea	ax, [bp+var_8]
 		push	ax
 		push	cs
-		call	near ptr AI_Sensor_HeadingNormalized
+		call	near ptr AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		sub	[bp+var_4], eax
@@ -6252,14 +6255,14 @@ arg_6		= word ptr  0Ch
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_PitchRollController_Heading
+		call	near ptr AI_RollController_7E56
 		add	sp, 8
 		pop	si
 
 locret_8140:
 		leave
 		retf
-AI_TurnToHeadingCmd	endp
+AI_RollToAngleCmd_8104	endp
 
 ; ���������������������������������������������������������������������������
 

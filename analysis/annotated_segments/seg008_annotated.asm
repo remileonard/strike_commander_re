@@ -1355,7 +1355,7 @@ loc_F2C5:				; CODE XREF: seg008:0C37j
 
 ; ==============================================================================================
 ; far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue
-; le score si besoin, appelle NotifiableRef_SwapTarget_756A4, pose entite-lie+0x68=0xFF,
+; le score si besoin, appelle Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF,
 ; incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset
 ; lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0
 ; (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D
@@ -2024,7 +2024,7 @@ loc_F8EA:				; CODE XREF: seg008:11C7j
 		push	ss
 		lea	ax, [bp-22h]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-22h], 0FFFFE200h
 		jl	short loc_F931
@@ -2048,7 +2048,7 @@ loc_F93E:				; CODE XREF: seg008:1395j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jnz	short loc_F963
@@ -2116,7 +2116,7 @@ loc_F9EF:				; CODE XREF: seg008:1447j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jnz	short loc_FA14
@@ -2190,7 +2190,7 @@ loc_FAA3:
 		push	ss
 		lea	ax, [bp-42h]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-42h], 1E00h
 		jg	short loc_FAD4
@@ -2214,7 +2214,7 @@ loc_FAE1:				; CODE XREF: seg008:1538j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jnz	short loc_FB06
@@ -2299,7 +2299,7 @@ loc_FBBC:				; CODE XREF: seg008:1614j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_FC5A
@@ -2341,7 +2341,7 @@ loc_FC49:				; CODE XREF: seg008:14E7j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
 loc_FC5A:				; CODE XREF: seg008:1471j seg008:147Cj ...
@@ -2378,7 +2378,7 @@ loc_FC9A:
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_FCD0	; default
@@ -2657,7 +2657,7 @@ loc_FF6A:				; CODE XREF: seg008:19B3j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_FF9B
@@ -2696,7 +2696,7 @@ loc_FFBF:				; CODE XREF: seg008:19C8j
 		lea	ax, [bp-24h]
 		push	ax
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jnz	short loc_FFE3
@@ -2709,7 +2709,7 @@ loc_FFE3:				; CODE XREF: seg008:1A3Ej
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	dword ptr [bp-34h], 1000h
 		lea	ax, [bp-34h]
@@ -2737,7 +2737,7 @@ loc_10028:				; CODE XREF: seg008:1A27j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jz	short loc_100B3
@@ -2750,7 +2750,7 @@ loc_10028:				; CODE XREF: seg008:1A27j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		mov	dword ptr [bp-50h], 1000h
 		lea	ax, [bp-50h]
@@ -2835,33 +2835,32 @@ loc_100DB:				; CODE XREF: seg008:1B2Bj
 ; (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit
 ; node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - UNE VERITABLE SEQUENCE DE
 ; MANOEUVRE ACROBATIQUE MULTI-PHASES, chaque phase commandant une attitude precise via les
-; MEMES controleurs bas niveau que la navigation normale (AI_TurnToBearingCmd_7E18,
-; AI_TurnToHeadingCmd_8104, AI_PitchRollController_Heading_7E56), et avancant a la phase
-; suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0
-; : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de
-; ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce
-; vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 :
-; retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_TurnToHeadingCmd - motif
-; coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle).
-; PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le
-; DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position
-; relative a une reference (cible ou position propre decalee), tangage vers elle via
-; AI_PitchRollController_Heading, garde par dword_72039 (cosinus pondere, deja connu de
-; AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_SecondaryAngle),
-; puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F -
-; LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate
-; (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul
-; d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans
-; node+0x27, puis virage vers cet angle via AI_TurnToBearingCmd. PHASE 7 : retour au cap de
-; reference (0, taux 10) via AI_TurnToHeadingCmd - sortie/stabilisation finale de la
-; manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite
-; [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion.
-; CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution
-; des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) -
-; le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch
-; en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <->
-; manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le
-; suggerait Remi).
+; MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18,
+; AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante
+; (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage
+; vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a
+; cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau
+; (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat
+; (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la
+; 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison
+; a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S
+; (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference
+; (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par
+; dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle
+; capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305)
+; et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree
+; souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de
+; controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors
+; contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via
+; AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via
+; AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres
+; CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement
+; l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8
+; phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel
+; (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine
+; QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une
+; manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a
+; confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi).
 ; ==============================================================================================
 MVRS_ID6_TimerTickAndSubmodeSwitch_1011F:				; DATA XREF: seg339:025Co
 		push	bp
@@ -2936,7 +2935,7 @@ loc_101AB:				; CODE XREF: seg008:1BEEj
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		jmp	loc_105C5
 ; ���������������������������������������������������������������������������
@@ -2997,7 +2996,7 @@ loc_1024D:				; CODE XREF: seg008:1C9Ej
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
 loc_1025E:				; CODE XREF: seg008:loc_10292j
@@ -3017,7 +3016,7 @@ loc_10272:				; CODE XREF: seg008:1BC1j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 
@@ -3031,7 +3030,7 @@ loc_10296:
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jz	short loc_1025E
@@ -3050,7 +3049,7 @@ loc_102C6:				; CODE XREF: seg008:1BC1j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jnz	short loc_102EB
@@ -3156,7 +3155,7 @@ loc_103D7:				; CODE XREF: seg008:1DF8j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_PitchRollController_Heading
+		call	AI_RollController_7E56
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1040C
@@ -3216,7 +3215,7 @@ loc_10466:				; CODE XREF: seg008:1BC1j
 		push	ss
 		lea	ax, [bp-4Eh]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-4Eh], 2D00h
 		jg	short loc_1048A
@@ -3302,7 +3301,7 @@ loc_10550:				; CODE XREF: seg008:1FA2j
 		lea	ax, [bp-6Ah]
 		push	ax
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_105C5
@@ -3325,7 +3324,7 @@ loc_10595:
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jz	short loc_105C5
@@ -3499,7 +3498,7 @@ loc_10703:				; CODE XREF: seg008:2146j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		jmp	loc_10AAD
 ; ���������������������������������������������������������������������������
@@ -3544,7 +3543,7 @@ loc_10773:				; CODE XREF: seg008:21C3j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		les	bx, [bp+6]
 		les	bx, es:[bx+22h]
@@ -3567,7 +3566,7 @@ loc_107A5:				; CODE XREF: seg008:2115j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jnz	short loc_107CA
@@ -3581,7 +3580,7 @@ loc_107CA:				; CODE XREF: seg008:2225j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jnz	short loc_107EF
@@ -3604,7 +3603,7 @@ loc_10801:				; CODE XREF: seg008:2115j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jnz	short loc_10826
@@ -3711,7 +3710,7 @@ loc_10906:				; CODE XREF: seg008:2327j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_PitchRollController_Heading
+		call	AI_RollController_7E56
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1093B
@@ -3733,7 +3732,7 @@ loc_1094D:				; CODE XREF: seg008:2115j
 		push	ss
 		lea	ax, [bp-46h]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		cmp	dword ptr [bp-46h], 0FFFFD300h
 		jl	short loc_10971
@@ -3805,7 +3804,7 @@ loc_109CF:				; CODE XREF: seg008:2115j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_10AAD
@@ -3821,7 +3820,7 @@ loc_10A41:				; CODE XREF: seg008:2437j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_10AAD
@@ -3840,7 +3839,7 @@ loc_10A73:				; CODE XREF: seg008:2115j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		or	al, al
 		jz	short loc_10AAD
@@ -4944,7 +4943,7 @@ loc_114FC:				; CODE XREF: seg008:2F50j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jnz	short loc_11521
@@ -5089,7 +5088,7 @@ loc_116A1:				; CODE XREF: seg008:3085j seg008:30F7j
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_116E9
@@ -5101,7 +5100,7 @@ loc_116D8:				; CODE XREF: seg008:2F8Ej
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 
 loc_116E9:				; CODE XREF: seg008:2F59j seg008:2F7Ej ...
@@ -5120,7 +5119,7 @@ loc_116FB:				; CODE XREF: seg008:2E8Dj
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		or	al, al
 		jz	short loc_11724
@@ -5593,7 +5592,7 @@ loc_11B3D:				; CODE XREF: seg008:3599j
 		push	ss
 		lea	ax, [bp-4]
 		push	ax
-		call	AI_Sensor_SecondaryAngle
+		call	AI_Sensor_NosePitch_59A5
 		add	sp, 8
 		mov	eax, [bp-4]
 		or	eax, eax
@@ -5628,7 +5627,7 @@ loc_11B8E:				; CODE XREF: seg008:35DBj
 		push	ax
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
 loc_11BAC:				; CODE XREF: seg008:35A1j seg008:35ECj

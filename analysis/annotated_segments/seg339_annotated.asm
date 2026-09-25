@@ -2468,15 +2468,15 @@ off_6F4F8	dd VROOMM_StubThunk_6C489
 off_6F4FC	dd loc_418B3
 off_6F500	dd Debris_SpawnOrchestrator
 off_6F504	dd VROOMM_StubThunk_6C5AF
-		dd loc_41735
-off_6F50C	dd loc_41311
+		dd BombModel_TestGuidedLockCone_41735
+off_6F50C	dd BombModel_PredictImpact_41311
 off_6F510	dd Countermeasure_DestructA
 off_6F514	dd VROOMM_StubThunk_6C475
 		dd loc_418B3
 off_6F51C	dd Debris_SpawnOrchestrator
 off_6F520	dd VROOMM_StubThunk_6C5AF
-		dd loc_41735
-		dd loc_41311
+		dd BombModel_TestGuidedLockCone_41735
+		dd BombModel_PredictImpact_41311
 		dd loc_46036
 off_6F530	dd loc_45FCA
 off_6F534	dd loc_45FC3

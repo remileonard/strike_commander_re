@@ -25,7 +25,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 736 | `sub_62800` | `Render_DrawRotatedScaledSprite_62800` | seg179 |
 | 729 | `sub_96917` | `AircraftComponent_ConstructAndCalibrate_96917` | ovr284 |
 | 729 | `sub_88CAD` | `MissionRecord_LoadWithStringConstruct_88CAD` | ovr253 |
-| 706 | `sub_776FB` | `AI_WeaponEngagementCycle_776FB` | ovr231 |
+| 706 | `sub_776FB` | `GroundAttack_Phase3_WeaponRelease_776FB` | ovr231 |
 | 697 | `sub_88206` | `MissionRecord_LoadAndDecodeMain_88206` | ovr253 |
 | 685 | `sub_52513` | `Expr_VM_CallNativeFunction_52513` | seg114 |
 | 675 | `sub_621A2` | `Render_DrawScaledSprite_621A2` | seg175 |
@@ -80,7 +80,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 356 | `sub_A8C44` | `MissionScenario_LoadFromIFF_A8C44` | seg456 |
 | 353 | `sub_8DF49` | `AITargeting_LoadCalibrationRecord_8DF49` | ovr260 |
 | 352 | `sub_94710` | `MissionText_LoadSubtitleRecordB_94710` | ovr270 |
-| 352 | `sub_77282` | `AI_ComputeGuidanceSolution_77282` | ovr231 |
+| 352 | `sub_77282` | `GroundAttack_Phase01_Approach_77282` | ovr231 |
 | 342 | `sub_61960` | `Render_FillClippedRect_61960` | seg170 |
 | 334 | `sub_75746` | `AITargeting_RenderThreatList_75746` | ovr230 |
 | 331 | `sub_7FF90` | `Font_LoadGlyphTable_7FF90` | ovr242 |

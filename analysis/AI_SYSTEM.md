@@ -27,7 +27,7 @@ flowchart TD
     G -->|sélecteur 3| I[Goal_WanderRandom]
     G -->|sélecteur 4| J[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
     G -->|sélecteur 5| K[Goal_ActiveWingmanEngagement<br/>escorte active du joueur]
-    H --> L[Commandes bas niveau<br/>AI_TurnToBearingCmd, etc.]
+    H --> L[Commandes bas niveau<br/>AI_PitchToAngleCmd_7E18, etc.]
     J --> L
     K --> L
     I --> L
@@ -528,9 +528,9 @@ total** — confirmant qu'un overlay VROOMM correspond ici précisément à
 | Fonction | Rôle |
 |---|---|
 | `PilotProfile_NamedPropertyNode_Construct_755A0` | Constructeur (déjà documenté, §3.3) |
-| `NotifiableRef_AttachTarget_75612` | Copie des champs, appelle `[vtable+0x1C]` de la cible **si une condition est vraie** (argument `1`) |
+| `Behavior_PopFinished_75612` | Copie des champs, appelle `[vtable+0x1C]` de la cible **si une condition est vraie** (argument `1`) |
 | `NotifiableRef_DetachTarget_75661` | Variante inconditionnelle de la précédente (argument `0`), remet les champs à zéro |
-| `NotifiableRef_SwapTarget_756A4` | Opération d'échange (lit puis écrit un champ de la cible) |
+| `Behavior_PushRunning_756A4` | Opération d'échange (lit puis écrit un champ de la cible) |
 | `NotifiableRef_Destructor_756D5` | Vrai destructeur (convention Borland *ScalarDeletingDtor*) |
 
 **Le vrai destructeur révèle le cycle de vie complet** : pose
@@ -920,8 +920,8 @@ un minuteur `0x400` et la phase 1 ; le tick périodique
 (`loc_1011F`, lu intégralement) exécute les 8 phases — chaque phase
 (`node+0x26`, 1 à 8) commande une attitude précise (tangage,
 inclinaison, cap) via les mêmes contrôleurs bas niveau que la
-navigation normale (`AI_TurnToBearingCmd`, `AI_TurnToHeadingCmd`,
-`AI_PitchRollController_Heading`). Motifs reconnaissables : phases 0-2
+navigation normale (`AI_PitchToAngleCmd_7E18`, `AI_RollToAngleCmd_8104`,
+`AI_RollController_7E56`). Motifs reconnaissables : phases 0-2
 correspondent à un Immelmann (tirer à cabrer, ajuster l'inclinaison,
 rouler à plat puis ajuster le cap) ; phase 3 (inclinaison à 90°) est
 cohérente avec le début d'un Split S. La phase 5 écrit directement
@@ -1175,15 +1175,15 @@ flowchart TD
     D -->|"tick périodique (vtable+0x10)"| E["décompte le minuteur<br/>AI_GuidanceCmd_FromOwnPos"]
     E --> F["AI_GuidanceSolution_Major (651L)<br/>géométrie de poursuite/anticipation"]
     F --> G["AI_CombatDecision_Major"]
-    G --> H["AI_TurnToHeadingCmd<br/>delta de cap → taux de virage"]
-    H --> I["AI_PitchRollController_Heading"]
+    G --> H["AI_RollToAngleCmd_8104<br/>écart de ROULIS (corrigé 2026-09-24)"]
+    H --> I["AI_RollController_7E56"]
     I -->|"écrit dans entité+7+0x23"| J(("MÊME champ que
 l'entrée souris
 du joueur !"))
     I --> K["JDYN_HighLevelPhysicsCalc<br/>— LE MÊME calcul physique que le joueur"]
 ```
 
-**Le point décisif** : `AI_PitchRollController_Heading` écrit son
+**Le point décisif** : `AI_RollController_7E56` écrit son
 résultat dans `entité+7+0x23` — **exactement le champ que
 `Player_MainUpdate_13100` lit aux côtés de la valeur dérivée de la
 souris du joueur**, dans la même comparaison. Ce n'est pas une
@@ -1831,7 +1831,7 @@ maintenant en place :
   → `AI_NavSolutionToPoint` → nœud `MVRS_ID21` (réutilisé hors
   tournoi) → `AI_GuidanceSolution_Major` → **`AI_CombatDecision_Major`**
   (arbre à 4 branches selon la magnitude de l'angle, écrit la commande
-  finale) → `AI_TurnToHeadingCmd` → `AI_PitchRollController_Heading` →
+  finale) → `AI_RollToAngleCmd_8104` → `AI_RollController_7E56` →
   `JDYN_HighLevelPhysicsCalc` — le même calcul physique que le joueur,
   confirmé par un champ de commande partagé (`entité+7+0x23`/`+0x1F`).
 - **Les constantes `NUMS` non rondes** (`dword_72020/24/28/2C`) :

@@ -3,7 +3,18 @@ seg089		segment	byte public 'CODE' use16
 		;org 1
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_41311:				; DATA XREF: seg339:off_6F50Co
+; ==============================================================================================
+; far, LUE (2026-09-24), formule balistique NON RESOLUE. Methode +0x18 des modeles BOMB/DURD :
+; (sortie, modele, 0, porteur = point d'emport+0x0D, &hauteur, n). Porteur nul -> vecteur par
+; defaut. n >= 4 (id 7) : impact = position du porteur + direction horizontale de sa vitesse *
+; 2500 (si masque modele+0x4B == 0x40) ou * 3000, altitude = terrain. n = 3 (MK-20/MK-82) : Z
+; = alt porteur - hauteur (= altitude de la cible d'apres l'appelant) ; t = (-vz - sqrt(vz^2 -
+; 2 g Z)) / g avec g = dword_6FFD7 = -9,8 ; t -= Z / (3 * (2000 - alt porteur) + 290) ; impact
+; = position porteur + vitesse horizontale * t, altitude = terrain (Terrain_QueryAltitudeAt).
+; A CLARIFIER : Z vaut l'altitude de la cible et non la hauteur de chute ; soit l'objet +0x0D
+; ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original.
+; ==============================================================================================
+BombModel_PredictImpact_41311:				; DATA XREF: seg339:off_6F50Co
 					; seg339:2478o
 		push	bp
 		mov	bp, sp
@@ -412,7 +423,17 @@ loc_4172B:				; CODE XREF: seg089:03B6j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_41735:				; DATA XREF: seg339:2458o seg339:2474o
+; ==============================================================================================
+; far, LUE (2026-09-24). Methode +0x14 des modeles BOMB (vtable seg339 0x6F510) et DURD
+; (0x6F4F4), appelee par GroundAttack_Phase3_WeaponRelease_776FB pour la GBU-15 : (modele,
+; cible, lanceur). Faux si modele+0x5E == 0 (octet du chunk DATA du modele : bombe guidee ?)
+; ou sans cible/lanceur. t = distance(cible, lanceur) / |vitesse du lanceur| ; VRAI si
+; Math_DotProduct3D_5505B(direction normalisee vers la cible, nez du lanceur) >
+; Math_CosDeg_5483F(modele+0x61 * t) (+0x61 = word du chunk DATA,
+; PlayerComponent_LoadFieldsWithRetry_9FAD0). Le cone d'acceptation s'elargit avec le temps de
+; vol.
+; ==============================================================================================
+BombModel_TestGuidedLockCone_41735:				; DATA XREF: seg339:2458o seg339:2474o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4Ch

@@ -212,7 +212,7 @@ Citations : `cmp byte ptr [bx+20h], 0 / jz loc_84E9 / call Goal_ExecuteAction_A8
 
 **Valeur `1` du fichier `GOAL`** : dans `PilotProfile_LoadFromPROF`, la boucle de lecture fait `cmp [bp+var_8], 1 / jz loc_73F62`, qui saute le rattachement du gestionnaire **et** l'incrément du compteur d'emplacements. La valeur `1` n'occupe donc aucun emplacement, et `GOAL=1` seul donne un tableau vide (terminé par le bloc `unk_6D188`).
 
-**Ce que `entité+0x0D` n'est pas** : ce n'est pas le nœud `MVRS` gagnant lui-même. `NotifiableRef_AttachTarget_75612` y copie `nœud+4/+6` (`mov es:[bx+0Fh], ax / mov es:[bx+0Dh], dx` sur l'objet pointé par `nœud+8`, qui est l'entité), et `NotifiableRef_DetachTarget_75661` le remet à zéro. La règle de comportement est établie (un objet en cours passe avant tout), sa nature ne l'est pas.
+**Ce que `entité+0x0D` n'est pas** : ce n'est pas le nœud `MVRS` gagnant lui-même. `Behavior_PopFinished_75612` y copie `nœud+4/+6` (`mov es:[bx+0Fh], ax / mov es:[bx+0Dh], dx` sur l'objet pointé par `nœud+8`, qui est l'entité), et `NotifiableRef_DetachTarget_75661` le remet à zéro. La règle de comportement est établie (un objet en cours passe avant tout), sa nature ne l'est pas.
 
 ## `ExecuteFlightCommand` : le script pose l'objectif, il ne pilote pas (lu le 2026-09-19)
 
@@ -432,12 +432,12 @@ Elle n'utilise **ni leurres ni contre-mesures** : l'esquive est purement manœuv
 
 La poursuite (`AI_BehaviorSelector_8D30`, étape guidage) et l'esquive (`AI_MissileEvasionReaction_9A77`) passent toutes deux par `AI_GuidanceCmd_FromOwnPos` (ou directement `AI_GuidanceSolution_Major`) avec **un vecteur de direction désiré**. La chaîne, lue lors d'une session précédente (`AI_SYSTEM.md` §4bis, `known_functions.json`) :
 1. **`AI_GuidanceSolution_Major`** (géométrie et anticipation) : normalise le vecteur, calcule les deltas d'angle (cap et élévation) par rapport à mon avion avec gestion du repli à ±180°, limite l'inclinaison verticale (bornes de −90° et ±45°), prend en compte une garde d'altitude (`dword_7203D`), ma vitesse propre et la capacité de manœuvre de l'avion (`avion+0x67`), puis appelle la décision.
-2. **`AI_CombatDecision_Major`** : remet à zéro les commandes partagées, limite les deltas à ±10° en « poursuite fine », puis choisit : écart total < 20° : aucune correction ; ≤ 145° : correction proportionnelle (`AI_TurnToHeadingCmd`, taux 5) ; > 145° : correction extrême pondérée par le taux de roulis de l'avion (`avion+0x71`, bornée à 16°) ; repli : commande neutre.
-3. **`AI_TurnToHeadingCmd` / `AI_PitchRollController_Heading`** : convertissent l'écart de cap en commande de roulis et de tangage et l'**écrivent dans le champ de commande que lit aussi le joueur** (entrée manche/souris). L'IA et le joueur alimentent donc le même point d'entrée de la physique `JDYN`.
+2. **`AI_CombatDecision_Major`** : remet à zéro les commandes partagées, limite les deltas à ±10° en « poursuite fine », puis choisit : écart total < 20° : aucune correction ; ≤ 145° : correction proportionnelle (`AI_RollToAngleCmd_8104`, taux 5) ; > 145° : correction extrême pondérée par le taux de roulis de l'avion (`avion+0x71`, bornée à 16°) ; repli : commande neutre.
+3. **`AI_RollToAngleCmd_8104` / `AI_RollController_7E56`** : convertissent l'écart de cap en commande de roulis et de tangage et l'**écrivent dans le champ de commande que lit aussi le joueur** (entrée manche/souris). L'IA et le joueur alimentent donc le même point d'entrée de la physique `JDYN`. *(Corrigé 2026-09-24 : l'écart est un écart de roulis, pas de cap.)*
 
 C'est le pendant, côté libRealSpace, du couple `SCPilot` (qui produit le manche) et de la physique de l'avion.
 
-**Exécution finale, lue le 2026-09-20** : `AI_TurnToHeadingCmd(entité, cap voulu, zone morte)` calcule `écart = cap voulu − cap courant` (`AI_Sensor_HeadingNormalized`) et appelle `AI_PitchRollController_Heading(entité, &écart, zone morte)`. Celle-ci remet à 0 la commande partagée avec le joueur, ramène l'écart à ±180°, et **seulement si l'écart dépasse la zone morte** (5° en correction normale, 2° en commande neutre) elle appelle `JDYN_HighLevelPhysicsCalc(avion, sortie, écart)` (le modèle de vol convertit l'écart en valeur de manche), négate la valeur et l'écrit comme entrée de manche. **L'IA de l'original ne tient donc aucune altitude** : elle commande le manche à partir d'écarts d'angle, avec une zone morte. C'est ce que fera l'option B dans `SCPilot`.
+**Exécution finale, lue le 2026-09-20** : `AI_RollToAngleCmd_8104(entité, cap voulu, zone morte)` calcule `écart = cap voulu − cap courant` (`AI_Sensor_RollAngle_58F4`) et appelle `AI_RollController_7E56(entité, &écart, zone morte)`. Celle-ci remet à 0 la commande partagée avec le joueur, ramène l'écart à ±180°, et **seulement si l'écart dépasse la zone morte** (5° en correction normale, 2° en commande neutre) elle appelle `JDYN_HighLevelPhysicsCalc(avion, sortie, écart)` (le modèle de vol convertit l'écart en valeur de manche), négate la valeur et l'écrit comme entrée de manche. **L'IA de l'original ne tient donc aucune altitude** : elle commande le manche à partir d'écarts d'angle, avec une zone morte. C'est ce que fera l'option B dans `SCPilot`. **⚠️ Corrigé le 2026-09-24 : ce n'est pas un cap mais le ROULIS** (`AI_Sensor_RollAngle_58F4` appelle `Matrix_RollAngle_57C67`, et `AI_RollController_7E56` écrit l'axe de roulis du manche `+0x23`). Voir la section « L'attaque au sol ». La conclusion « aucune altitude tenue, commande par écarts d'angle avec zone morte » reste vraie, mais les angles commandés sont le roulis et le tangage, pas le cap.
 
 ## Le tir de missile : engagement, suivi et verrouillage (lu le 2026-09-20)
 
@@ -499,7 +499,7 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector_8D30
 ## Non résolu
 
 - `AI_TriggerBehaviorUpdate_5E53` (ce qu'elle fait avant d'appeler `AI_TopLevelThink`, et la fonction de comportement gardée par `+0x28B` bit 7). Le corps de `AI_TopLevelThink` entre le test de menace et `loc_83F0` n'est pas lu.
-- La nature de l'objet à `entité+0x0D` et le contenu de `nœud+4` que `NotifiableRef_AttachTarget_75612` copie dedans.
+- La nature de l'objet à `entité+0x0D` et le contenu de `nœud+4` que `Behavior_PopFinished_75612` copie dedans.
 - `AI_EvalTargetAttribute`, `AI_RadarScanTarget`, `AI_ManeuverSolution_Major`, `AI_Sensor_WeaponVelocityCache` (appelées par `AI_BehaviorSelector_8D30`, non relues ici) ; le rôle de `entité+0x27F` ; l'octet `arg_4` du tournoi ; le rôle des champs `entité+0x281/0x283/0x285/0x287/0x289` côté lecteurs (`Targeting_AcquireBestThreat` les écrit, voir sa section) ; le sens de `objet+0x11 == 2` ; la réaction défensive à un missile qui me vise (lecteurs de `+0x281` et de `+0x27F == 2`).
 - Quelle classe d'objet monde est réellement celle des avions IA : seule la classe `0x27BC` transmet l'ordre à l'entité, les trois autres ont un `+0x88` qui ne fait rien. Ce n'est pas vérifié pour les prototypes d'avions.
 - Le slot +8 de l'entité (`loc_4F85`, sans nom), l'objet à +0x51 et son slot +0x40, le rôle de l'octet +0x59 de l'objet monde.
@@ -732,3 +732,101 @@ libRealSpace calcule en flottants : la colonne de droite dit comment obtenir la 
 | chunk `DATA` du leurre `DECY`, `modèle+0x37` (durée de vie) | lu en dword, utilisé en word converti par `<< 8` | **mot de poids faible tel quel** (entier, dans l'unité de `dt`) |
 | chunk `SIGN` (3 octets) | octet comparé à 210 / 245 | **octet tel quel** (0 à 255) |
 | `Math_RandomScale_54DF4(n)` | `rand() × n / 0x8000` | entier uniforme de 0 à n−1 (`/0x8000` = échelle de `rand`, pas une conversion) |
+
+## L'attaque au sol (lue intégralement le 2026-09-24)
+
+### Qui la déclenche et comment elle tourne
+
+L'attaque au sol est un **nœud de comportement permanent** de l'entité (`entité+0xD9`). Il est construit une fois au chargement du pilote par `PilotProfile_ResolveNamedPropertyNode_742FC`, case `0x13` : 0x36 octets, vtable tag `0x160`, `nœud+0x22` = l'entité.
+
+| Slot | Fonction | Rôle |
+|---|---|---|
+| `+4` | `GroundAttack_CanEngage_77000` | renvoie 5 si la cible est au sol et qu'une arme air-sol est chargée |
+| `+8` | `GroundAttack_Start_7709A` | démarre l'attaque et empile le nœud comme comportement en cours |
+| `+0xC` | `GroundAttack_PhaseDispatch_77215` | machine à états, appelée à chaque tick |
+| `+0x10` | `MVRS_SharedDefaultTickNoOp_ED16` | vide |
+
+1. **Déclenchement.**
+   - `Goal_ExecuteAction_A8AC`, ordre « détruire la cible » (`0xA7`), si la cible de mission (`+0x137`) a `target_type == 2` : `+4`, puis `+8` si `+4` a réussi. Sinon, le répartiteur renvoie 0.
+   - Même chose dans `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` pour une cible sol acquise (`+0x283`) quand `arg_4` est non nul.
+2. **Exécution.** `GroundAttack_Start_7709A` appelle `Behavior_PushRunning_756A4`, qui pose `entité+0x0D = nœud` (l'ancien comportement est gardé dans `nœud+4`). Tant que `entité+0x0D` est non nul, `Goal_ExecuteAction_A8AC` n'appelle **que** sa méthode `+0xC` (`loc_A938`).
+3. **Fin.** `Behavior_PopFinished_75612` restaure le comportement précédent et note l'identifiant 0x13 dans `entité+0x19`.
+
+**Conditions de `GroundAttack_CanEngage_77000`** : la cible est `+0x283`, sinon `+0x137`. Il faut `nœud+0x13 == 0` (sens non tracé), `target_type == 2` et `WeaponStation_FindLoadedCompatible(chargement, 0xFC)`. Le masque couvre les armes d'identifiant 3 à 8 (AGM-65D, LAU-3, MK-20, MK-82, l'identifiant 7, GBU-15), **pas le canon**.
+
+### La machine à états (`nœud+0x26`)
+
+Toutes les distances et altitudes sont en mètres, et le point visé est toujours **la cible relevée de 1000 m**.
+
+**Phases 0 et 1, approche** (`GroundAttack_Phase01_Approach_77282`) :
+- **Chaque tick** :
+  - le minuteur `nœud+0x0D` (2 s, posé au démarrage) décroît de `dt` ; à 0, l'attaque se termine, puis redémarre au tick suivant avec les mêmes règles ;
+  - pilote automatique physique coupé ; cran de gaz 5.
+- **Mesures** :
+  - `D = ma position − point visé`, `hd` = distance horizontale ;
+  - `a = |angle horizontal entre le nez et D|` : `a` proche de 180° signifie que le nez pointe vers la cible.
+- **Transitions** :
+  - `a < 170°` et `hd < 5000` : phase 0 (trop près et mal aligné : on s'éloigne) ;
+  - `a > 170°` et `hd < 5000` : **ailes à plat** (`AI_RollToAngleCmd_8104(0°, zone morte 5°)`) ; quand `|roulis| < 5°` : cran de gaz 3 et **phase 2** ;
+  - sinon, `hd > 8000` ou `a > 170°` : phase 1.
+- **Pilotage** :
+  - direction `D` en phase 0 (s'éloigner), `−D` sinon (aller vers le point visé) : `AI_GuidanceCmd_FromOwnPos(entité, direction, 10)` ;
+  - vitesse de croisière `JDYN+0x84` (`AI_ThrottleCmd_HUD`) ;
+  - si `a > 169°` et `hd > 9000` : **palier** (`AI_PitchToAngleCmd_7E18(0°, 5°)`) ;
+  - sinon, en phase 1, si `a > 169°` et que je suis **plus de 2000 m au-dessus du point visé** : **piqué à −40°**.
+
+**Phase 2, passage au pilote automatique** (`GroundAttack_Phase2_EngageAutopilot_775B1`, un seul tick) :
+- écrit le point visé (bloc de commandes `+0x02..+0x0A`) et `direction normalisée × 100` (`+0x0E..+0x16`) ;
+- remet `+0x1A` à 0 ;
+- `JDYN+0x68 = 0` : c'est désormais `Guidance_HomingVelocityUpdate` qui pilote l'avion vers ce point, en cinématique (direction et vitesse imposées) ;
+- passe en phase 3.
+
+**Phase 3, choix de l'arme et largage** (`GroundAttack_Phase3_WeaponRelease_776FB`) :
+- **Cible mobile** (bit 2 de `cible+4`) : point visé et direction recalculés à chaque tick.
+- **Choix de l'arme**, une seule fois, par ordre de priorité :
+
+| Ordre | Masque | Arme | Préparation |
+|---|---|---|---|
+| 1 | `0x04` | AGM-65D | le système d'armes suit la cible (`chargement+0x0D = cible`) |
+| 2 | `0x80` | GBU-15 | idem |
+| 3 | `0x10` | MK-20 | l'octet `+0x4D` du modèle d'arme vaut 4 |
+| 4 | `0x20` | MK-82 | idem |
+| 5 | `0x40` | identifiant 7 | l'octet `+0x4D` vaut 5 |
+| 6 | `0x08` | LAU-3 | minuteur de 3 s ; le système d'armes suit la cible |
+
+  Aucune arme : phase 6, fin.
+- **Tir** : bit 1 de l'octet de commande (`bloc+0x1B |= 2`), le même que pour le tir air-air, puis phase 4.
+  - **AGM-65D / GBU-15** : tir quand la méthode `+0x14` du modèle d'arme réussit. Pour la GBU-15, c'est `BombModel_TestGuidedLockCone_41735`. Pour l'AGM-65D (`MISS`, fonction pas encore nommée `loc_42F71`), la méthode **n'est pas lue**.
+  - **LAU-3** : tir quand le minuteur de 3 s est écoulé.
+  - **Bombes** : `I` = impact prédit (`BombModel_PredictImpact_41311`), `raté` = distance **horizontale** entre `I` et la cible. On tire si `raté ≤ 20 + |ma vitesse| × dt + (150 si (rand & 15) > AG)`.
+- **Nouvelle passe** : sans tir, si `Guidance_HomingVelocityUpdate` a posé `bloc+0x1A`, retour en **phase 0**. Ce drapeau est posé quand un écart d'angle (non identifié précisément) est inférieur à 5° et que la distance au point est inférieure à environ 20 pas de déplacement.
+
+**Phase 4, dégagement** (`GroundAttack_Phase4_PullUp_77171`) :
+- mémorise l'arme larguée ;
+- pilote automatique coupé, **cabré à +5°** (zone morte 5°), vitesse de croisière ;
+- fin quand l'arme larguée n'existe plus.
+
+### Les deux méthodes des modèles d'arme
+
+- **`BombModel_TestGuidedLockCone_41735`** (méthode `+0x14` de `BOMB` / `DURD`, utilisée pour la GBU-15). Elle réussit si :
+  - l'octet `modèle+0x5E` est non nul ;
+  - `nez · direction(cible) > cos(modèle[+0x61] × t)`, avec `t = distance / vitesse du lanceur`.
+
+  Le cône autorisé grandit avec le temps de vol. `+0x5E` et `+0x61` viennent du chunk `DATA` du modèle (`PlayerComponent_LoadFieldsWithRetry_9FAD0` : octets `+0x5E`, `+0x5F`, `+0x60`, word `+0x61`).
+- **`BombModel_PredictImpact_41311`** (méthode `+0x18`). L'objet `+0x0D` du point d'emport lui est passé comme porteur : sa vitesse et sa position sont utilisées.
+  - **Identifiant 7** : impact à **2500 m** (masque `0x40`) ou **3000 m** devant le porteur, dans la direction horizontale de sa vitesse, au niveau du terrain.
+  - **MK-20 / MK-82** : `Z = altitude porteur − hauteur passée`, puis `t = (−vz − √(vz² − 2gZ)) / g`, avec `g = −9,8`, et une correction `t −= Z / (3 × (2000 − altitude porteur) + 290)`. L'impact est `position porteur + vitesse horizontale × t`, au niveau du terrain.
+  - **Non résolu** : d'après l'appelant, `Z` vaut l'altitude de la cible et non la hauteur de chute. Soit le sens de l'objet `+0x0D` ou de la hauteur n'est pas celui que je crois, soit c'est un défaut de l'original. À vérifier en jeu avant de le porter.
+
+### Correction importante : les commandes bas niveau de l'IA commandent le roulis et le tangage, pas le cap
+
+| Ancien nom | Nouveau nom | Ce que fait le code |
+|---|---|---|
+| `AI_Sensor_HeadingNormalized` | `AI_Sensor_RollAngle_58F4` | roulis (`Matrix_RollAngle_57C67`), cache `+0xFA` |
+| `AI_Sensor_SecondaryAngle` | `AI_Sensor_NosePitch_59A5` | tangage du nez (`Math_ElevationAngle_552E1`), cache `+0xF6` |
+| `AI_TurnToHeadingCmd` | `AI_RollToAngleCmd_8104` | écart de roulis, puis contrôleur de roulis |
+| `AI_PitchRollController_Heading` | `AI_RollController_7E56` | écrit l'axe de **roulis** du manche (`+0x23`) |
+| `AI_TurnToBearingCmd` | `AI_PitchToAngleCmd_7E18` | écart de tangage, puis contrôleur de tangage |
+| `AI_RollRateController` | `AI_PitchController_7B20` | écrit l'axe de **tangage** (`+0x1F`) ; pour piquer de plus de 15°, passe **sur le dos** (roulis 180°) et tire |
+
+Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major` (lue par une session antérieure, avant la découverte de l'inversion des noms trigonométriques : **à relire**).

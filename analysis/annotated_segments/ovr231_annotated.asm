@@ -7,21 +7,16 @@ ovr231		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 80 lignes - RESOLUTION DU MUR CENTRAL DE L'INVESTIGATION MVRS. C'est la vraie
-; implementation de [vtable+4] (fonction de SCORE) pour le type de propriete MVRS ID=0x14 (tag
-; 0x14C dans la table statique de seg339, voir ci-dessous). Appelee via le thunk
-; VROOMM_StubThunk_6ABE9. LOGIQUE COMPLETE : recupere l'entite via la reference arriere du
-; noeud (node+0x22), cherche une cible (entite+0x283 sinon entite+0x137 - les memes champs
-; deja identifies via Escort_LeaderSuccession et Goal_IsComplete), appelle [cible->vtable+0]()
-; pour obtenir un pointeur de resultat, verifie que ce resultat a un champ +0x11==2 (type de
-; cible valide, meme test que dans AI_ProximityRadioCalloutTrigger_A002 et sub_77000 lui-meme)
-; ET que entite+0x13==0 (aucune tache en cours), PUIS verifie la disponibilite d'un poste
-; d'arme compatible via sub_40F92 (entite+0x104, code 0xFC). RETOURNE 5 si toutes les
-; conditions sont remplies, SINON 0. Score BINAIRE : ce type de comportement MVRS represente
-; donc 'preparer/selectionner une arme contre la cible courante', actif seulement si un poste
-; d'arme est libre et qu'aucune autre tache n'occupe l'entite.
+; far, LUE (2026-09-24). Methode +4 du NOEUD PERMANENT D'ATTAQUE AU SOL (entite+0xD9, 0x36
+; octets, vtable seg339 tag 0x160, construit par PilotProfile_ResolveNamedPropertyNode_742FC
+; case 0x13, noeud+0x21 = 0x13, noeud+0x22 = entite). Ex-'MVRS_ID14_ScoreWeaponReadiness'.
+; MVRS_SharedContextSyncAndID2Score_EC22 puis : cible = entite+0x283 (cible sol acquise) sinon
+; entite+0x137 (cible de mission) ; renvoie 5 si noeud+0x13 == 0 ET target_type de la cible
+; (modele +0x11) == 2 ET WeaponStation_FindLoadedCompatible(chargement entite+0x104, 0xFC)
+; (armes id 3 a 8 : AGM-65D, LAU-3, MK-20, MK-82, id 7, GBU-15 ; pas le canon) ; sinon 0. Sens
+; de noeud+0x13 non trace.
 ; ==============================================================================================
-MVRS_ID14_ScoreWeaponReadiness_77000	proc far		; CODE XREF: VROOMM_StubThunk_6ABE9J
+GroundAttack_CanEngage_77000	proc far		; CODE XREF: VROOMM_StubThunk_6ABE9J
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -44,15 +39,15 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_77042
 ; ���������������������������������������������������������������������������
 
-loc_7702E:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+25j
+loc_7702E:				; CODE XREF: GroundAttack_CanEngage_77000+25j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		cmp	word ptr es:[bx+137h], 0
 		jz	short loc_77042
 		mov	si, es:[bx+137h]
 
-loc_77042:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+2Cj
-					; MVRS_ID14_ScoreWeaponReadiness_77000+3Bj
+loc_77042:				; CODE XREF: GroundAttack_CanEngage_77000+2Cj
+					; GroundAttack_CanEngage_77000+3Bj
 		or	si, si
 		jz	short loc_7704E
 		push	si
@@ -62,11 +57,11 @@ loc_77042:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+2Cj
 		jmp	short loc_77052
 ; ���������������������������������������������������������������������������
 
-loc_7704E:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+44j
+loc_7704E:				; CODE XREF: GroundAttack_CanEngage_77000+44j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_77052:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+4Cj
+loc_77052:				; CODE XREF: GroundAttack_CanEngage_77000+4Cj
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 		les	bx, [bp+arg_0]
@@ -87,20 +82,20 @@ loc_77052:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+4Cj
 		or	ax, ax
 		jnz	short loc_77095
 
-loc_77091:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+60j
-					; MVRS_ID14_ScoreWeaponReadiness_77000+67j ...
+loc_77091:				; CODE XREF: GroundAttack_CanEngage_77000+60j
+					; GroundAttack_CanEngage_77000+67j ...
 		mov	al, 0
 		jmp	short loc_77097
 ; ���������������������������������������������������������������������������
 
-loc_77095:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+8Fj
+loc_77095:				; CODE XREF: GroundAttack_CanEngage_77000+8Fj
 		mov	al, 5
 
-loc_77097:				; CODE XREF: MVRS_ID14_ScoreWeaponReadiness_77000+93j
+loc_77097:				; CODE XREF: GroundAttack_CanEngage_77000+93j
 		pop	si
 		leave
 		retf
-MVRS_ID14_ScoreWeaponReadiness_77000	endp
+GroundAttack_CanEngage_77000	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -108,23 +103,18 @@ MVRS_ID14_ScoreWeaponReadiness_77000	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 93 lignes - RESOLUTION DU MUR CENTRAL. C'est la vraie implementation de [vtable+8]
-; (fonction d'APPLICATION) pour MVRS ID=0x14, appelee via VROOMM_StubThunk_6ABEE. LOGIQUE
-; COMPLETE : si node+0xC==0, reevalue d'abord le score (rappel a
-; MVRS_ID14_ScoreWeaponReadiness_77000, meme motif de garde que dans AI_BehaviorStateMachine
-; et Entity_ProximityTest) ; appelle un helper generique (VROOMM_StubThunk_6AB4F) ; pose
-; node+0x26=0 et node+0xD=0x200 (mode 'arme selectionnee') ; RE-RESOUT LA MEME CIBLE
-; (entite+0x283/+0x137) et l'ETABLIT COMME REFERENCE SUR LE NOEUD LUI-MEME (node+0x27, via
-; SetReference) - met en cache la cible localement sur cette entree MVRS ; SI aucune cible :
-; appelle NotifiableRef_AttachTarget (VROOMM_StubThunk_6AB45, ovr229) - le motif generique
-; deja connu ; SI une cible existe : efface une reference secondaire (node+0x29), remet a zero
-; un compteur (node+0x34=0) et initialise un MINUTEUR DE VERROUILLAGE/COOLDOWN
-; (node+0x30=0x186A0=100000), PUIS appelle [vtable+0xC] - le MEME cinquieme slot de vtable
-; trouve independamment dans Escort_LeaderSuccession_C17A (cas 0x1) - confirme comme methode
-; 'demarrer le suivi/verrouillage' quand une cible est effectivement acquise pour ce type de
-; comportement.
+; far, LUE (2026-09-24). Ex-'MVRS_ID14_ApplyWeaponTracking'. Methode +8 du noeud d'attaque au
+; sol : DEMARRE l'attaque. Si noeud+0x0C == 0 : appelle sa methode +4.
+; Behavior_PushRunning_756A4 (le noeud devient le comportement en cours de l'entite,
+; entite+0x0D). Phase noeud+0x26 = 0 ; minuteur noeud+0x0D = 2,0 (0x200) ; noeud+0x27 = cible
+; (entite+0x283 sinon +0x137) ; sans cible : Behavior_PopFinished_75612 ; sinon noeud+0x29 = 0
+; (arme larguee), noeud+0x34 = 0 (arme choisie), noeud+0x30 = 100000 (entier, distance
+; sentinelle), puis methode +0xC (GroundAttack_PhaseDispatch_77215). Appelee par
+; Goal_ExecuteAction_A8AC (ordre 'detruire la cible' sur cible de mission au sol, apres la
+; methode +4) et par AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (cible sol acquise et
+; arg_4).
 ; ==============================================================================================
-MVRS_ID14_ApplyWeaponTracking_7709A	proc far		; CODE XREF: VROOMM_StubThunk_6ABEEJ
+GroundAttack_Start_7709A	proc far		; CODE XREF: VROOMM_StubThunk_6ABEEJ
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -149,7 +139,7 @@ arg_4		= word ptr  0Ah
 		call	dword ptr [bx+4]
 		add	sp, 6
 
-loc_770BF:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+15j
+loc_770BF:				; CODE XREF: GroundAttack_Start_7709A+15j
 		push	si
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6AB4F
@@ -168,7 +158,7 @@ loc_770BF:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+15j
 		jmp	short loc_77114
 ; ���������������������������������������������������������������������������
 
-loc_770FC:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+55j
+loc_770FC:				; CODE XREF: GroundAttack_Start_7709A+55j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		cmp	word ptr es:[bx+137h], 0
@@ -177,7 +167,7 @@ loc_770FC:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+55j
 		mov	[bp+var_8], ax
 		push	ax
 
-loc_77114:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+60j
+loc_77114:				; CODE XREF: GroundAttack_Start_7709A+60j
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 27h	; '''
 		push	word ptr [bp+arg_0+2]
@@ -185,7 +175,7 @@ loc_77114:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+60j
 		call	SetReference
 		add	sp, 6
 
-loc_77126:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+6Fj
+loc_77126:				; CODE XREF: GroundAttack_Start_7709A+6Fj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+27h], 0
 		jnz	short loc_7713B
@@ -195,7 +185,7 @@ loc_77126:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+6Fj
 		jmp	short loc_7716B
 ; ���������������������������������������������������������������������������
 
-loc_7713B:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+94j
+loc_7713B:				; CODE XREF: GroundAttack_Start_7709A+94j
 		push	0
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 29h	; ')'
@@ -211,12 +201,12 @@ loc_7713B:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+94j
 		mov	bx, es:[bx]
 		call	dword ptr [bx+0Ch]
 
-loc_7716B:				; CODE XREF: MVRS_ID14_ApplyWeaponTracking_7709A+9Fj
+loc_7716B:				; CODE XREF: GroundAttack_Start_7709A+9Fj
 		add	sp, 4
 		pop	si
 		leave
 		retf
-MVRS_ID14_ApplyWeaponTracking_7709A	endp
+GroundAttack_Start_7709A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -224,12 +214,13 @@ MVRS_ID14_ApplyWeaponTracking_7709A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far — emission d'ordre IA virage+manette. JDYN = es:[[arg_0+0x22]+0x0B] ; passe movsx
-; jdyn[0x84] (i16, def 231, vitesse de croisiere/manoeuvre IA) a AI_ThrottleCmd_HUD comme
-; consigne, apres AI_TurnToBearingCmd. Combine SetReference, AI_TurnToBearingCmd,
-; AI_ThrottleCmd_HUD.
+; far, LUE (2026-09-24). Ex-'AI_IssueTurnAndThrottle'. PHASE 4 (apres le tir). Si noeud+0x34 :
+; noeud+0x29 = chargement+0x11 (l'arme larguee), noeud+0x34 = 0. Pilote automatique physique
+; coupe (JDYN+0x68 = 0xFF) ; AI_PitchToAngleCmd_7E18(+5, zone morte 5) ;
+; AI_ThrottleCmd_HUD(vitesse de croisiere JDYN+0x84) ; quand noeud+0x29 redevient nul (l'arme
+; n'existe plus) : fin (Behavior_PopFinished_75612).
 ; ==============================================================================================
-AI_IssueTurnAndThrottle_77171	proc far		; CODE XREF: VROOMM_StubThunk_6ABDAJ AI_TargetTrackHelper_77215+4Cp
+GroundAttack_Phase4_PullUp_77171	proc far		; CODE XREF: VROOMM_StubThunk_6ABDAJ GroundAttack_PhaseDispatch_77215+4Cp
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -255,7 +246,7 @@ arg_0		= dword	ptr  6
 		les	bx, [bp+arg_0]
 		mov	word ptr es:[bx+34h], 0
 
-loc_771AD:				; CODE XREF: AI_IssueTurnAndThrottle_77171+Ej
+loc_771AD:				; CODE XREF: GroundAttack_Phase4_PullUp_77171+Ej
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		mov	bx, es:[bx+0Bh]
@@ -266,7 +257,7 @@ loc_771AD:				; CODE XREF: AI_IssueTurnAndThrottle_77171+Ej
 		push	ax
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -285,10 +276,10 @@ loc_771AD:				; CODE XREF: AI_IssueTurnAndThrottle_77171+Ej
 		call	VROOMM_StubThunk_6AB45
 		add	sp, 4
 
-locret_77213:				; CODE XREF: AI_IssueTurnAndThrottle_77171+94j
+locret_77213:				; CODE XREF: GroundAttack_Phase4_PullUp_77171+94j
 		leave
 		retf
-AI_IssueTurnAndThrottle_77171	endp
+GroundAttack_Phase4_PullUp_77171	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -296,9 +287,14 @@ AI_IssueTurnAndThrottle_77171	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, thunk widget HUD box uniquement (70 lignes, rôle exact non détaillé).
+; far, LUE (2026-09-24). Ex-'AI_TargetTrackHelper'. Methode +0xC du noeud d'attaque au sol,
+; appelee a chaque tick par Goal_ExecuteAction_A8AC tant que le noeud est le comportement en
+; cours (entite+0x0D). Sans cible (noeud+0x27) : fin. Machine a etats sur noeud+0x26 (table
+; off_77274) : 0 et 1 -> GroundAttack_Phase01_Approach_77282 ; 2 ->
+; GroundAttack_Phase2_EngageAutopilot_775B1 ; 3 -> GroundAttack_Phase3_WeaponRelease_776FB ; 4
+; -> GroundAttack_Phase4_PullUp_77171 ; 5 et 6 -> Behavior_PopFinished_75612 (fin).
 ; ==============================================================================================
-AI_TargetTrackHelper_77215	proc far		; CODE XREF: VROOMM_StubThunk_6ABE4J
+GroundAttack_PhaseDispatch_77215	proc far		; CODE XREF: VROOMM_StubThunk_6ABE4J
 
 arg_0		= dword	ptr  6
 
@@ -310,7 +306,7 @@ arg_0		= dword	ptr  6
 		jmp	short loc_77266	; case 0x5
 ; ���������������������������������������������������������������������������
 
-loc_77224:				; CODE XREF: AI_TargetTrackHelper_77215+Bj
+loc_77224:				; CODE XREF: GroundAttack_PhaseDispatch_77215+Bj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+26h]
 		mov	ah, 0
@@ -324,53 +320,53 @@ loc_7723B:				; DATA XREF: ovr231:off_77274o
 		push	large [bp+arg_0] ; case	0x0
 		nop
 		push	cs
-		call	near ptr AI_ComputeGuidanceSolution_77282
+		call	near ptr GroundAttack_Phase01_Approach_77282
 		jmp	short loc_7726F
 ; ���������������������������������������������������������������������������
 
-loc_77246:				; CODE XREF: AI_TargetTrackHelper_77215+21j
+loc_77246:				; CODE XREF: GroundAttack_PhaseDispatch_77215+21j
 					; DATA XREF: ovr231:off_77274o
 		push	large [bp+arg_0] ; case	0x2
 		nop
 		push	cs
-		call	near ptr AI_TransformTargetVector_775B1
+		call	near ptr GroundAttack_Phase2_EngageAutopilot_775B1
 		jmp	short loc_7726F
 ; ���������������������������������������������������������������������������
 
-loc_77251:				; CODE XREF: AI_TargetTrackHelper_77215+21j
+loc_77251:				; CODE XREF: GroundAttack_PhaseDispatch_77215+21j
 					; DATA XREF: ovr231:off_77274o
 		push	large [bp+arg_0] ; case	0x3
 		nop
 		push	cs
-		call	near ptr AI_WeaponEngagementCycle_776FB
+		call	near ptr GroundAttack_Phase3_WeaponRelease_776FB
 		jmp	short loc_7726F
 ; ���������������������������������������������������������������������������
 
-loc_7725C:				; CODE XREF: AI_TargetTrackHelper_77215+21j
+loc_7725C:				; CODE XREF: GroundAttack_PhaseDispatch_77215+21j
 					; DATA XREF: ovr231:off_77274o
 		push	large [bp+arg_0] ; case	0x4
 		push	cs
-		call	near ptr AI_IssueTurnAndThrottle_77171
+		call	near ptr GroundAttack_Phase4_PullUp_77171
 		jmp	short loc_7726F
 ; ���������������������������������������������������������������������������
 
-loc_77266:				; CODE XREF: AI_TargetTrackHelper_77215+Dj
-					; AI_TargetTrackHelper_77215+21j
+loc_77266:				; CODE XREF: GroundAttack_PhaseDispatch_77215+Dj
+					; GroundAttack_PhaseDispatch_77215+21j
 					; DATA XREF: ...
 		push	large [bp+arg_0] ; case	0x5
 		call	VROOMM_StubThunk_6AB45
 
-loc_7726F:				; CODE XREF: AI_TargetTrackHelper_77215+2Fj
-					; AI_TargetTrackHelper_77215+3Aj ...
+loc_7726F:				; CODE XREF: GroundAttack_PhaseDispatch_77215+2Fj
+					; GroundAttack_PhaseDispatch_77215+3Aj ...
 		add	sp, 4
 
-loc_77272:				; CODE XREF: AI_TargetTrackHelper_77215+1Dj
+loc_77272:				; CODE XREF: GroundAttack_PhaseDispatch_77215+1Dj
 		pop	bp		; default
 		retf
-AI_TargetTrackHelper_77215	endp
+GroundAttack_PhaseDispatch_77215	endp
 
 ; ���������������������������������������������������������������������������
-off_77274	dw offset loc_7723B	; DATA XREF: AI_TargetTrackHelper_77215+21r
+off_77274	dw offset loc_7723B	; DATA XREF: GroundAttack_PhaseDispatch_77215+21r
 		dw offset loc_7723B	; jump table for switch	statement
 		dw offset loc_77246
 		dw offset loc_77251
@@ -383,11 +379,22 @@ off_77274	dw offset loc_7723B	; DATA XREF: AI_TargetTrackHelper_77215+21r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 352 lignes, NON DÉTAILLÉE — combine longueur vectorielle, Angle_DeltaNormalized_A,
-; AI_TurnToHeadingCmd, AI_Sensor_HeadingNormalized, AI_GuidanceCmd_FromOwnPos — calcul de
-; solution de guidage IA (cap, angle, position).
+; far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_ComputeGuidanceSolution'. PHASES 0
+; (eloignement) ET 1 (approche). Minuteur noeud+0x0D -= dt ; < 0 -> fin
+; (Behavior_PopFinished_75612 ; l'attaque redemarre au tick suivant par
+; GroundAttack_Start_7709A). Pilote automatique physique coupe (JDYN+0x68 = 0xFF) ; cran de
+; gaz = 5. P = position cible +0x12 avec altitude + 1000 ; D = ma position - P ; hd = distance
+; horizontale (noeud+0x30 = partie entiere) ; a = |Angle_DeltaNormalized_A(nez, D)| (a ~ 180 =
+; nez vers la cible). TRANSITIONS : a < 170 et hd < 5000 -> phase 0 ; a > 170 et hd < 5000 ->
+; AI_RollToAngleCmd_8104(0, zone morte 5) (ailes a plat) et si |roulis|
+; (AI_Sensor_RollAngle_58F4) < 5 : cran de gaz 3, phase 2 ; sinon hd > 8000 ou a > 170 ->
+; phase 1. PILOTAGE : direction V = D en phase 0 (s'eloigner), -D sinon (vers P) ;
+; AI_GuidanceCmd_FromOwnPos(entite, V, 10) (-> AI_GuidanceSolution_Major) ;
+; AI_ThrottleCmd_HUD(vitesse de croisiere JDYN+0x84). Puis : si a > 169 et hd > 9000 :
+; AI_PitchToAngleCmd_7E18(0, 5) (palier) ; sinon si phase 1, a > 169 et P.alt - ma alt < -2000
+; (plus de 2000 au-dessus du point vise) : AI_PitchToAngleCmd_7E18(-40, 5) (pique a -40 deg).
 ; ==============================================================================================
-AI_ComputeGuidanceSolution_77282	proc far		; CODE XREF: VROOMM_StubThunk_6ABDFJ AI_TargetTrackHelper_77215+2Cp
+GroundAttack_Phase01_Approach_77282	proc far		; CODE XREF: VROOMM_StubThunk_6ABDFJ GroundAttack_PhaseDispatch_77215+2Cp
 
 var_4E		= dword	ptr -4Eh
 var_4A		= dword	ptr -4Ah
@@ -435,7 +442,7 @@ arg_0		= dword	ptr  6
 		call	VROOMM_StubThunk_6AB45
 		add	sp, 4
 
-loc_772CB:				; CODE XREF: AI_ComputeGuidanceSolution_77282+3Bj
+loc_772CB:				; CODE XREF: GroundAttack_Phase01_Approach_77282+3Bj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		mov	bx, es:[bx+0Bh]
@@ -502,7 +509,7 @@ loc_772CB:				; CODE XREF: AI_ComputeGuidanceSolution_77282+3Bj
 		jge	short loc_773AF
 		neg	eax
 
-loc_773AF:				; CODE XREF: AI_ComputeGuidanceSolution_77282+128j
+loc_773AF:				; CODE XREF: GroundAttack_Phase01_Approach_77282+128j
 		mov	[bp+var_16], eax
 		mov	eax, [bp+var_4]
 		sar	eax, 8
@@ -514,10 +521,10 @@ loc_773AF:				; CODE XREF: AI_ComputeGuidanceSolution_77282+128j
 		jmp	short loc_773D4
 ; ���������������������������������������������������������������������������
 
-loc_773D2:				; CODE XREF: AI_ComputeGuidanceSolution_77282+149j
+loc_773D2:				; CODE XREF: GroundAttack_Phase01_Approach_77282+149j
 		xor	ax, ax
 
-loc_773D4:				; CODE XREF: AI_ComputeGuidanceSolution_77282+14Ej
+loc_773D4:				; CODE XREF: GroundAttack_Phase01_Approach_77282+14Ej
 		or	al, al
 		jz	short loc_773F8
 		cmp	[bp+var_4], 138800h
@@ -526,10 +533,10 @@ loc_773D4:				; CODE XREF: AI_ComputeGuidanceSolution_77282+14Ej
 		jmp	short loc_773E9
 ; ���������������������������������������������������������������������������
 
-loc_773E7:				; CODE XREF: AI_ComputeGuidanceSolution_77282+15Ej
+loc_773E7:				; CODE XREF: GroundAttack_Phase01_Approach_77282+15Ej
 		xor	ax, ax
 
-loc_773E9:				; CODE XREF: AI_ComputeGuidanceSolution_77282+163j
+loc_773E9:				; CODE XREF: GroundAttack_Phase01_Approach_77282+163j
 		or	al, al
 		jz	short loc_773F8
 		les	bx, [bp+arg_0]
@@ -537,34 +544,34 @@ loc_773E9:				; CODE XREF: AI_ComputeGuidanceSolution_77282+163j
 		jmp	loc_774C9
 ; ���������������������������������������������������������������������������
 
-loc_773F8:				; CODE XREF: AI_ComputeGuidanceSolution_77282+154j
-					; AI_ComputeGuidanceSolution_77282+169j
+loc_773F8:				; CODE XREF: GroundAttack_Phase01_Approach_77282+154j
+					; GroundAttack_Phase01_Approach_77282+169j
 		cmp	[bp+var_16], 0AA00h
 		jle	short loc_77407
 		mov	ax, 1
 		jmp	short loc_77409
 ; ���������������������������������������������������������������������������
 
-loc_77407:				; CODE XREF: AI_ComputeGuidanceSolution_77282+17Ej
+loc_77407:				; CODE XREF: GroundAttack_Phase01_Approach_77282+17Ej
 		xor	ax, ax
 
-loc_77409:				; CODE XREF: AI_ComputeGuidanceSolution_77282+183j
+loc_77409:				; CODE XREF: GroundAttack_Phase01_Approach_77282+183j
 		or	al, al
 		jnz	short loc_77410
 		jmp	loc_77497
 ; ���������������������������������������������������������������������������
 
-loc_77410:				; CODE XREF: AI_ComputeGuidanceSolution_77282+189j
+loc_77410:				; CODE XREF: GroundAttack_Phase01_Approach_77282+189j
 		cmp	[bp+var_4], 138800h
 		jge	short loc_7741F
 		mov	ax, 1
 		jmp	short loc_77421
 ; ���������������������������������������������������������������������������
 
-loc_7741F:				; CODE XREF: AI_ComputeGuidanceSolution_77282+196j
+loc_7741F:				; CODE XREF: GroundAttack_Phase01_Approach_77282+196j
 		xor	ax, ax
 
-loc_77421:				; CODE XREF: AI_ComputeGuidanceSolution_77282+19Bj
+loc_77421:				; CODE XREF: GroundAttack_Phase01_Approach_77282+19Bj
 		or	al, al
 		jz	short loc_77497
 		push	5
@@ -573,21 +580,21 @@ loc_77421:				; CODE XREF: AI_ComputeGuidanceSolution_77282+19Bj
 		push	ax
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToHeadingCmd
+		call	AI_RollToAngleCmd_8104
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+22h]
 		push	ss
 		lea	ax, [bp+var_2E]
 		push	ax
-		call	AI_Sensor_HeadingNormalized
+		call	AI_Sensor_RollAngle_58F4
 		add	sp, 8
 		mov	eax, [bp+var_2E]
 		or	eax, eax
 		jge	short loc_77464
 		neg	eax
 
-loc_77464:				; CODE XREF: AI_ComputeGuidanceSolution_77282+1DDj
+loc_77464:				; CODE XREF: GroundAttack_Phase01_Approach_77282+1DDj
 		mov	[bp+var_2E], eax
 		cmp	[bp+var_2E], 500h
 		jge	short loc_77477
@@ -595,10 +602,10 @@ loc_77464:				; CODE XREF: AI_ComputeGuidanceSolution_77282+1DDj
 		jmp	short loc_77479
 ; ���������������������������������������������������������������������������
 
-loc_77477:				; CODE XREF: AI_ComputeGuidanceSolution_77282+1EEj
+loc_77477:				; CODE XREF: GroundAttack_Phase01_Approach_77282+1EEj
 		xor	ax, ax
 
-loc_77479:				; CODE XREF: AI_ComputeGuidanceSolution_77282+1F3j
+loc_77479:				; CODE XREF: GroundAttack_Phase01_Approach_77282+1F3j
 		or	al, al
 		jz	short loc_774C9
 		les	bx, [bp+arg_0]
@@ -610,18 +617,18 @@ loc_77479:				; CODE XREF: AI_ComputeGuidanceSolution_77282+1F3j
 		jmp	short loc_774C9
 ; ���������������������������������������������������������������������������
 
-loc_77497:				; CODE XREF: AI_ComputeGuidanceSolution_77282+18Bj
-					; AI_ComputeGuidanceSolution_77282+1A1j
+loc_77497:				; CODE XREF: GroundAttack_Phase01_Approach_77282+18Bj
+					; GroundAttack_Phase01_Approach_77282+1A1j
 		cmp	[bp+var_4], 1F4000h
 		jle	short loc_774A6
 		mov	ax, 1
 		jmp	short loc_774A8
 ; ���������������������������������������������������������������������������
 
-loc_774A6:				; CODE XREF: AI_ComputeGuidanceSolution_77282+21Dj
+loc_774A6:				; CODE XREF: GroundAttack_Phase01_Approach_77282+21Dj
 		xor	ax, ax
 
-loc_774A8:				; CODE XREF: AI_ComputeGuidanceSolution_77282+222j
+loc_774A8:				; CODE XREF: GroundAttack_Phase01_Approach_77282+222j
 		or	al, al
 		jnz	short loc_774C1
 		cmp	[bp+var_16], 0AA00h
@@ -630,19 +637,19 @@ loc_774A8:				; CODE XREF: AI_ComputeGuidanceSolution_77282+222j
 		jmp	short loc_774BD
 ; ���������������������������������������������������������������������������
 
-loc_774BB:				; CODE XREF: AI_ComputeGuidanceSolution_77282+232j
+loc_774BB:				; CODE XREF: GroundAttack_Phase01_Approach_77282+232j
 		xor	ax, ax
 
-loc_774BD:				; CODE XREF: AI_ComputeGuidanceSolution_77282+237j
+loc_774BD:				; CODE XREF: GroundAttack_Phase01_Approach_77282+237j
 		or	al, al
 		jz	short loc_774C9
 
-loc_774C1:				; CODE XREF: AI_ComputeGuidanceSolution_77282+228j
+loc_774C1:				; CODE XREF: GroundAttack_Phase01_Approach_77282+228j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+26h], 1
 
-loc_774C9:				; CODE XREF: AI_ComputeGuidanceSolution_77282+173j
-					; AI_ComputeGuidanceSolution_77282+1F9j ...
+loc_774C9:				; CODE XREF: GroundAttack_Phase01_Approach_77282+173j
+					; GroundAttack_Phase01_Approach_77282+1F9j ...
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+26h], 0
 		jz	short loc_774F4
@@ -656,7 +663,7 @@ loc_774C9:				; CODE XREF: AI_ComputeGuidanceSolution_77282+173j
 		neg	eax
 		mov	[bp+var_3A], eax
 
-loc_774F4:				; CODE XREF: AI_ComputeGuidanceSolution_77282+24Fj
+loc_774F4:				; CODE XREF: GroundAttack_Phase01_Approach_77282+24Fj
 		push	large 0Ah
 		lea	ax, [bp+var_42]
 		push	ax
@@ -679,10 +686,10 @@ loc_774F4:				; CODE XREF: AI_ComputeGuidanceSolution_77282+24Fj
 		jmp	short loc_7753F
 ; ���������������������������������������������������������������������������
 
-loc_7753D:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2B4j
+loc_7753D:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2B4j
 		xor	ax, ax
 
-loc_7753F:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2B9j
+loc_7753F:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2B9j
 		or	al, al
 		jz	short loc_77567
 		cmp	[bp+var_4], 232800h
@@ -691,10 +698,10 @@ loc_7753F:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2B9j
 		jmp	short loc_77554
 ; ���������������������������������������������������������������������������
 
-loc_77552:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2C9j
+loc_77552:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2C9j
 		xor	ax, ax
 
-loc_77554:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2CEj
+loc_77554:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2CEj
 		or	al, al
 		jz	short loc_77567
 		push	5
@@ -703,8 +710,8 @@ loc_77554:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2CEj
 		jmp	short loc_7759D
 ; ���������������������������������������������������������������������������
 
-loc_77567:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2BFj
-					; AI_ComputeGuidanceSolution_77282+2D4j
+loc_77567:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2BFj
+					; GroundAttack_Phase01_Approach_77282+2D4j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+26h], 1
 		jnz	short loc_775AE
@@ -714,10 +721,10 @@ loc_77567:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2BFj
 		jmp	short loc_77582
 ; ���������������������������������������������������������������������������
 
-loc_77580:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2F7j
+loc_77580:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2F7j
 		xor	ax, ax
 
-loc_77582:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2FCj
+loc_77582:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2FCj
 		or	al, al
 		jz	short loc_775AE
 		cmp	[bp+var_3A], 0FFF83000h
@@ -726,19 +733,19 @@ loc_77582:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2FCj
 		mov	[bp+var_36], 0FFFFD800h
 		lea	ax, [bp+var_36]
 
-loc_7759D:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2E3j
+loc_7759D:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2E3j
 		push	ax
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_TurnToBearingCmd
+		call	AI_PitchToAngleCmd_7E18
 		add	sp, 8
 
-loc_775AE:				; CODE XREF: AI_ComputeGuidanceSolution_77282+2EDj
-					; AI_ComputeGuidanceSolution_77282+302j ...
+loc_775AE:				; CODE XREF: GroundAttack_Phase01_Approach_77282+2EDj
+					; GroundAttack_Phase01_Approach_77282+302j ...
 		pop	si
 		leave
 		retf
-AI_ComputeGuidanceSolution_77282	endp
+GroundAttack_Phase01_Approach_77282	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -746,10 +753,12 @@ AI_ComputeGuidanceSolution_77282	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Vector_TransformHelperB_559BB (seg116, ×plusieurs) — transformation vectorielle
-; liée au ciblage IA.
+; far, LUE (2026-09-24). Ex-'AI_TransformTargetVector'. PHASE 2 (un tick) : P = cible + 1000
+; d'altitude ; dir = normalise(P - ma position) * 100 ; bloc de commandes (entite+7) :
+; +0x02/06/0A = P, +0x0E/12/16 = dir, +0x1A = 0 ; JDYN+0x68 = 0 (ACTIVE le pilote automatique
+; physique Guidance_HomingVelocityUpdate vers ce point) ; phase 3.
 ; ==============================================================================================
-AI_TransformTargetVector_775B1	proc far		; CODE XREF: VROOMM_StubThunk_6ABD0J AI_TargetTrackHelper_77215+37p
+GroundAttack_Phase2_EngageAutopilot_775B1	proc far		; CODE XREF: VROOMM_StubThunk_6ABD0J GroundAttack_PhaseDispatch_77215+37p
 
 var_1C		= dword	ptr -1Ch
 var_18		= dword	ptr -18h
@@ -848,7 +857,7 @@ arg_0		= dword	ptr  6
 		pop	si
 		leave
 		retf
-AI_TransformTargetVector_775B1	endp
+GroundAttack_Phase2_EngageAutopilot_775B1	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -856,12 +865,24 @@ AI_TransformTargetVector_775B1	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 706 lignes, NON DÉTAILLÉE — combine transformation vectorielle et
-; WeaponStation_ValidateReady (répété plusieurs fois), SetReference — cycle complet
-; d'engagement d'arme par l'IA (vérification de disponibilité sur plusieurs stations).
-; Candidat prioritaire pour session dédiée.
+; far, 706L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_WeaponEngagementCycle'. PHASE 3. (1) Cible
+; mobile (bit 2 de cible+4) : recalcule P = cible + 1000 et dir*100 dans le bloc de commandes
+; a chaque tick. (2) CHOIX DE L'ARME une fois (noeud+0x34 == 0), WeaponStation_ValidateReady
+; dans l'ordre : 0x04 AGM-65D et 0x80 GBU-15 (chargement+0x0D = cible) ; 0x10 MK-20 et 0x20
+; MK-82 (octet +0x4D du modele d'arme courant := 4) ; 0x40 id 7 (+0x4D := 5) ; 0x08 LAU-3
+; (minuteur noeud+0x2B = 3,0 s, chargement+0x0D = cible). Aucune -> phase 6 (fin). (3) Chaque
+; tick : WeaponStation_FindLoadedCompatible(chargement, noeud+0x34) sinon phase 6. AGM-65D /
+; GBU-15 : tir si modele->vtable+0x14(modele, cible, moi) (BOMB :
+; BombModel_TestGuidedLockCone_41735 ; MISS : loc_42F71 non lu). LAU-3 : tir quand le minuteur
+; de 3 s echoit. BOMBES : hauteur = ma alt - alt cible ; I = modele->vtable+0x18(I, modele, 0,
+; point d'emport+0x0D, &hauteur, 3 pour MK-20/MK-82, 5 pour id 7)
+; (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0 sans point d'emport ;
+; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma
+; vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR =
+; bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si
+; bloc+0x1A != 0 (pose par Guidance_HomingVelocityUpdate) -> phase 0 (nouvelle passe).
 ; ==============================================================================================
-AI_WeaponEngagementCycle_776FB	proc far		; CODE XREF: VROOMM_StubThunk_6ABD5J AI_TargetTrackHelper_77215+42p
+GroundAttack_Phase3_WeaponRelease_776FB	proc far		; CODE XREF: VROOMM_StubThunk_6ABD5J GroundAttack_PhaseDispatch_77215+42p
 
 var_78		= dword	ptr -78h
 var_74		= dword	ptr -74h
@@ -911,7 +932,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_7782D
 ; ���������������������������������������������������������������������������
 
-loc_77717:				; CODE XREF: AI_WeaponEngagementCycle_776FB+17j
+loc_77717:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+17j
 		mov	si, es:[bx+27h]
 		add	si, 12h
 		mov	eax, [si]
@@ -983,14 +1004,14 @@ loc_77717:				; CODE XREF: AI_WeaponEngagementCycle_776FB+17j
 		mov	eax, [bp+var_4C]
 		mov	es:[bx+16h], eax
 
-loc_7782D:				; CODE XREF: AI_WeaponEngagementCycle_776FB+19j
+loc_7782D:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+19j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+34h], 0
 		jz	short loc_7783A
 		jmp	loc_779E5
 ; ���������������������������������������������������������������������������
 
-loc_7783A:				; CODE XREF: AI_WeaponEngagementCycle_776FB+13Aj
+loc_7783A:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+13Aj
 		push	4
 		les	bx, es:[bx+22h]
 		push	large dword ptr	es:[bx+104h]
@@ -1003,8 +1024,8 @@ loc_7783A:				; CODE XREF: AI_WeaponEngagementCycle_776FB+13Aj
 		mov	[bp+var_4], di
 		push	[bp+var_4]
 
-loc_77861:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1B1j
-					; AI_WeaponEngagementCycle_776FB+2E4j
+loc_77861:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+1B1j
+					; GroundAttack_Phase3_WeaponRelease_776FB+2E4j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		mov	ax, es:[bx+104h]
@@ -1016,7 +1037,7 @@ loc_77861:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1B1j
 		jmp	loc_779E5
 ; ���������������������������������������������������������������������������
 
-loc_77881:				; CODE XREF: AI_WeaponEngagementCycle_776FB+155j
+loc_77881:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+155j
 		push	80h ; '�'
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -1032,7 +1053,7 @@ loc_77881:				; CODE XREF: AI_WeaponEngagementCycle_776FB+155j
 		jmp	short loc_77861
 ; ���������������������������������������������������������������������������
 
-loc_778AE:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1A0j
+loc_778AE:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+1A0j
 		push	10h
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -1051,13 +1072,13 @@ loc_778AE:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1A0j
 		jmp	loc_77992
 ; ���������������������������������������������������������������������������
 
-loc_778E8:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1E8j
+loc_778E8:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+1E8j
 		jmp	short loc_77924
 ; ���������������������������������������������������������������������������
 		jmp	loc_77992
 ; ���������������������������������������������������������������������������
 
-loc_778ED:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1CCj
+loc_778ED:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+1CCj
 		push	20h ; ' '
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -1076,7 +1097,7 @@ loc_778ED:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1CCj
 loc_77922:
 		jz	short loc_77992
 
-loc_77924:				; CODE XREF: AI_WeaponEngagementCycle_776FB:loc_778E8j
+loc_77924:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB:loc_778E8j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 
@@ -1096,7 +1117,7 @@ loc_77937:
 		jmp	short loc_77992
 ; ���������������������������������������������������������������������������
 
-loc_77941:				; CODE XREF: AI_WeaponEngagementCycle_776FB+20Bj
+loc_77941:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+20Bj
 		push	40h ; '@'
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -1121,12 +1142,12 @@ loc_77941:				; CODE XREF: AI_WeaponEngagementCycle_776FB+20Bj
 		jmp	short loc_779E5
 ; ���������������������������������������������������������������������������
 
-loc_77992:				; CODE XREF: AI_WeaponEngagementCycle_776FB+1EAj
-					; AI_WeaponEngagementCycle_776FB+1EFj ...
+loc_77992:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+1EAj
+					; GroundAttack_Phase3_WeaponRelease_776FB+1EFj ...
 		jmp	short loc_779E5
 ; ���������������������������������������������������������������������������
 
-loc_77994:				; CODE XREF: AI_WeaponEngagementCycle_776FB+25Fj
+loc_77994:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+25Fj
 		push	8
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
@@ -1138,7 +1159,7 @@ loc_77994:				; CODE XREF: AI_WeaponEngagementCycle_776FB+25Fj
 		jmp	loc_77DBA
 ; ���������������������������������������������������������������������������
 
-loc_779B2:				; CODE XREF: AI_WeaponEngagementCycle_776FB+2B2j
+loc_779B2:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+2B2j
 		les	bx, [bp+arg_0]
 		mov	word ptr es:[bx+34h], 8
 		mov	[bp+var_A], 300h
@@ -1157,8 +1178,8 @@ loc_779B2:				; CODE XREF: AI_WeaponEngagementCycle_776FB+2B2j
 		jmp	loc_77DBA
 ; ���������������������������������������������������������������������������
 
-loc_779E5:				; CODE XREF: AI_WeaponEngagementCycle_776FB+13Cj
-					; AI_WeaponEngagementCycle_776FB+183j ...
+loc_779E5:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+13Cj
+					; GroundAttack_Phase3_WeaponRelease_776FB+183j ...
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+34h]
 		les	bx, es:[bx+22h]
@@ -1170,7 +1191,7 @@ loc_779E5:				; CODE XREF: AI_WeaponEngagementCycle_776FB+13Cj
 		jmp	loc_77DBA
 ; ���������������������������������������������������������������������������
 
-loc_77A05:				; CODE XREF: AI_WeaponEngagementCycle_776FB+305j
+loc_77A05:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+305j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+34h], 4
 		jz	short loc_77A1A
@@ -1179,8 +1200,8 @@ loc_77A05:				; CODE XREF: AI_WeaponEngagementCycle_776FB+305j
 		jmp	loc_77AA1
 ; ���������������������������������������������������������������������������
 
-loc_77A1A:				; CODE XREF: AI_WeaponEngagementCycle_776FB+312j
-					; AI_WeaponEngagementCycle_776FB+31Aj
+loc_77A1A:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+312j
+					; GroundAttack_Phase3_WeaponRelease_776FB+31Aj
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+27h]
 		mov	[bp+var_E], ax
@@ -1214,17 +1235,17 @@ loc_77A2F:
 		jmp	short loc_77A7B
 ; ���������������������������������������������������������������������������
 
-loc_77A79:				; CODE XREF: AI_WeaponEngagementCycle_776FB+344j
+loc_77A79:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+344j
 		mov	al, 0
 
-loc_77A7B:				; CODE XREF: AI_WeaponEngagementCycle_776FB+37Cj
+loc_77A7B:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+37Cj
 		or	al, al
 		jnz	short loc_77A82
 		jmp	loc_77D8E
 ; ���������������������������������������������������������������������������
 
-loc_77A82:				; CODE XREF: AI_WeaponEngagementCycle_776FB+382j
-					; AI_WeaponEngagementCycle_776FB:loc_77AC6j
+loc_77A82:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+382j
+					; GroundAttack_Phase3_WeaponRelease_776FB:loc_77AC6j
 		les	bx, [bp+arg_0]
 
 loc_77A85:
@@ -1245,7 +1266,7 @@ loc_77A95:
 		jmp	loc_77D8E
 ; ���������������������������������������������������������������������������
 
-loc_77AA1:				; CODE XREF: AI_WeaponEngagementCycle_776FB+31Cj
+loc_77AA1:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+31Cj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+34h], 8
 		jnz	short loc_77AC8
@@ -1261,11 +1282,11 @@ loc_77AA1:				; CODE XREF: AI_WeaponEngagementCycle_776FB+31Cj
 		jmp	loc_77D8E
 ; ���������������������������������������������������������������������������
 
-loc_77AC6:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3C6j
+loc_77AC6:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+3C6j
 		jmp	short loc_77A82
 ; ���������������������������������������������������������������������������
 
-loc_77AC8:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3AEj
+loc_77AC8:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+3AEj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+11h]
 		mov	eax, [bx+1Ah]
@@ -1280,7 +1301,7 @@ loc_77AC8:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3AEj
 		jmp	loc_77B94
 ; ���������������������������������������������������������������������������
 
-loc_77AF2:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3F2j
+loc_77AF2:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+3F2j
 		les	bx, es:[bx+22h]
 		les	bx, es:[bx+104h]
 		les	bx, es:[bx+18h]
@@ -1321,7 +1342,7 @@ loc_77B2B:
 		jmp	short loc_77B7D
 ; ���������������������������������������������������������������������������
 
-loc_77B60:				; CODE XREF: AI_WeaponEngagementCycle_776FB+40Bj
+loc_77B60:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+40Bj
 		mov	eax, dword_707E0
 		mov	[bp+var_60], eax
 		mov	eax, dword_707E4
@@ -1331,7 +1352,7 @@ loc_77B60:				; CODE XREF: AI_WeaponEngagementCycle_776FB+40Bj
 		mov	dx, ss
 		lea	ax, [bp+var_60]
 
-loc_77B7D:				; CODE XREF: AI_WeaponEngagementCycle_776FB+463j
+loc_77B7D:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+463j
 		mov	eax, [bp+var_60]
 		mov	[bp+var_54], eax
 
@@ -1344,7 +1365,7 @@ loc_77B8D:
 		jmp	loc_77C36
 ; ���������������������������������������������������������������������������
 
-loc_77B94:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3F4j
+loc_77B94:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+3F4j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+22h]
 		les	bx, es:[bx+104h]
@@ -1382,7 +1403,7 @@ loc_77B94:				; CODE XREF: AI_WeaponEngagementCycle_776FB+3F4j
 		jmp	short loc_77C22
 ; ���������������������������������������������������������������������������
 
-loc_77C05:				; CODE XREF: AI_WeaponEngagementCycle_776FB+4B0j
+loc_77C05:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+4B0j
 		mov	eax, dword_707E0
 		mov	[bp+var_6C], eax
 		mov	eax, dword_707E4
@@ -1392,7 +1413,7 @@ loc_77C05:				; CODE XREF: AI_WeaponEngagementCycle_776FB+4B0j
 		mov	dx, ss
 		lea	ax, [bp+var_6C]
 
-loc_77C22:				; CODE XREF: AI_WeaponEngagementCycle_776FB+508j
+loc_77C22:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+508j
 		mov	eax, [bp+var_6C]
 		mov	[bp+var_54], eax
 
@@ -1401,7 +1422,7 @@ loc_77C2A:
 		mov	[bp+var_50], eax
 		mov	eax, [bp+var_64]
 
-loc_77C36:				; CODE XREF: AI_WeaponEngagementCycle_776FB+496j
+loc_77C36:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+496j
 		mov	[bp+var_4C], eax
 		les	bx, [bp+arg_0]
 		mov	si, es:[bx+27h]
@@ -1449,10 +1470,10 @@ loc_77C8B:
 		jmp	short loc_77CC9
 ; ���������������������������������������������������������������������������
 
-loc_77CC1:				; CODE XREF: AI_WeaponEngagementCycle_776FB+5BAj
+loc_77CC1:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+5BAj
 		mov	[bp+var_3C], 0
 
-loc_77CC9:				; CODE XREF: AI_WeaponEngagementCycle_776FB+5C4j
+loc_77CC9:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+5C4j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+11h]
 		push	ss
@@ -1502,10 +1523,10 @@ loc_77D35:
 		jmp	short loc_77D4B
 ; ���������������������������������������������������������������������������
 
-loc_77D49:				; CODE XREF: AI_WeaponEngagementCycle_776FB+647j
+loc_77D49:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+647j
 		xor	ax, ax
 
-loc_77D4B:				; CODE XREF: AI_WeaponEngagementCycle_776FB+64Cj
+loc_77D4B:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+64Cj
 		or	al, al
 		jz	short loc_77D6B
 		les	bx, [bp+arg_0]
@@ -1516,7 +1537,7 @@ loc_77D4B:				; CODE XREF: AI_WeaponEngagementCycle_776FB+64Cj
 		mov	byte ptr es:[bx+26h], 4
 		mov	[bp+var_1], 1
 
-loc_77D6B:				; CODE XREF: AI_WeaponEngagementCycle_776FB+652j
+loc_77D6B:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+652j
 		cmp	[bp+var_1], 0
 		jz	short loc_77D8E
 		mov	eax, [bp+var_30]
@@ -1526,10 +1547,10 @@ loc_77D6B:				; CODE XREF: AI_WeaponEngagementCycle_776FB+652j
 		jmp	short loc_77D82
 ; ���������������������������������������������������������������������������
 
-loc_77D80:				; CODE XREF: AI_WeaponEngagementCycle_776FB+67Ej
+loc_77D80:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+67Ej
 		xor	ax, ax
 
-loc_77D82:				; CODE XREF: AI_WeaponEngagementCycle_776FB+683j
+loc_77D82:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+683j
 		or	al, al
 		jz	short loc_77D8E
 		les	bx, [bp+arg_0]
@@ -1537,8 +1558,8 @@ loc_77D82:				; CODE XREF: AI_WeaponEngagementCycle_776FB+683j
 loc_77D89:
 		mov	byte ptr es:[bx+26h], 4
 
-loc_77D8E:				; CODE XREF: AI_WeaponEngagementCycle_776FB+384j
-					; AI_WeaponEngagementCycle_776FB+3A3j ...
+loc_77D8E:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+384j
+					; GroundAttack_Phase3_WeaponRelease_776FB+3A3j ...
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -1555,17 +1576,17 @@ loc_77D8E:				; CODE XREF: AI_WeaponEngagementCycle_776FB+384j
 		jmp	short loc_77DC2
 ; ���������������������������������������������������������������������������
 
-loc_77DBA:				; CODE XREF: AI_WeaponEngagementCycle_776FB+2B4j
-					; AI_WeaponEngagementCycle_776FB+2E7j ...
+loc_77DBA:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+2B4j
+					; GroundAttack_Phase3_WeaponRelease_776FB+2E7j ...
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+26h], 6
 
-loc_77DC2:				; CODE XREF: AI_WeaponEngagementCycle_776FB+69Aj
-					; AI_WeaponEngagementCycle_776FB+6A4j ...
+loc_77DC2:				; CODE XREF: GroundAttack_Phase3_WeaponRelease_776FB+69Aj
+					; GroundAttack_Phase3_WeaponRelease_776FB+6A4j ...
 		pop	di
 		pop	si
 		leave
 		retf
-AI_WeaponEngagementCycle_776FB	endp
+GroundAttack_Phase3_WeaponRelease_776FB	endp
 
 ovr231		ends
