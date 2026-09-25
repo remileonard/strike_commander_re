@@ -1087,8 +1087,22 @@ suivant prend la main) :
 | 2 ou 3 | ailier du joueur, indiscipliné, en suivi, adversaires actifs | radio `0x12`, `Goal_TransferToWingman` (cible de mission et navigation = le joueur, ordre verrouillé) |
 
 « Camp du joueur » = octet `+0x50` de l'objet monde à 1 (0xFF = camp adverse, 0 = neutre) : déduit
-des branches où le leader est le joueur. Le sens des messages radio 6, 8, `0x12` et du point
-résolu depuis `word_706A0` n'est pas tracé.
+des branches où le leader est le joueur. **Répliques** (chunk `MSGS` de `data/BILLY.IFF`, vocabulaire commun à tous les personnages) :
+
+| Index | Réplique de Billy | Branche |
+|---|---|---|
+| 6 | « This guy's good. Could someone give me a hand here? » | appel à l'aide (dégâts ou missile) |
+| 8 | « That's all for me. I'm outta here! » | **abandon du combat** : fuite d'un adversaire, départ d'un ailier |
+| `0x12` | « This one's all mine. » | prise d'initiative de l'ailier (`Goal_TransferToWingman`) |
+| `0x20` | « Do you feel lucky? Well? Do you punk? » | provocation : ailier retourné contre le joueur (aussi jouée au tir par `AI_BehaviorSelector`) |
+
+Le point résolu depuis `word_706A0` n'est pas tracé. **Question ouverte** : dans la branche
+`0x12`, `Goal_TransferToWingman` met le joueur comme cible de mission et référence de navigation
+(l'ordre « suivre » est gardé) ; ce que fait ensuite l'ailier pour « s'occuper de celui-là » n'est
+pas tracé.
+
+**`GOAL` de Billy** (fichier réel) : `5, 2, 1, 4, 3` → réaction au moral, puis ordre du script
+(dont le suivi `0xAA`), puis combat, puis errance ; le `1` est ignoré.
 
 **Ce que ça ne fait pas : le suivi de formation.** Celui-ci passe par `Goal_FollowAllyExec`,
 appelé soit par `AIEntity_MasterTick_5ACC` (bit 3 de `entité+0x28B`, posé et entretenu par

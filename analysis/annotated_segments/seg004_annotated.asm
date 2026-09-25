@@ -730,9 +730,12 @@ AI_NavSolutionToPoint	endp
 ; renvoie 0. (D) m = 2 ou 3, camp 1, leader = joueur, AI_MoraleDisciplineCheck_CA93 faux,
 ; +0x149 ni 1 ni 2, objectif 0xAA, byte_6E4CD != 0 : radio 0x12 puis Goal_TransferToWingman
 ; (se rattache au joueur : cible de mission et reference de navigation = le joueur, +0x149 =
-; 1, bit 5) ; renvoie 1. Sens exact des messages radio 6, 8, 0x12 et du point resolu depuis
-; word_706A0 : non traces. Ne fait PAS le suivi de formation (c'est Goal_ExecuteAction_A8AC,
-; cas 0xAA).
+; 1, bit 5) ; renvoie 1. Repliques (chunk MSGS de BILLY.IFF, data/BILLY.IFF) : 6 = 'This guy's
+; good. Could someone give me a hand here?' (appel a l'aide) ; 8 = 'That's all for me. I'm
+; outta here!' (abandon du combat, branches A et B2) ; 0x12 = 'This one's all mine.'
+; (initiative, branche D) ; 0x20 = 'Do you feel lucky? Well? Do you punk?' (provocation, aussi
+; jouee au tir par AI_BehaviorSelector). Point resolu depuis word_706A0 : non trace. Ne fait
+; PAS le suivi de formation (c'est Goal_ExecuteAction_A8AC, cas 0xAA).
 ; ==============================================================================================
 Goal_MoraleReaction_878F:				; DATA XREF: seg339:off_6D1A8o
 		push	bp
