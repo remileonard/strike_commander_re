@@ -307,6 +307,100 @@ fois une cible aérienne sans solution de tir et une cible sol avec une arme air
 Score d'une entrée : `score_du_nœud (≥ 1, sinon exclue) + poids_du_fichier ± 1`, meilleur au-dessus
 de −1000 ; égalité : le premier garde la place (`jle`).
 
+## Les identifiants `MVRS` 8 à 12, et la table des méthodes vérifiée (relu le 2026-09-25)
+
+### Table des méthodes : adresse vérifiée, noms corrigés
+
+Le nœud porte un tag (`nœud+0`) posé par `PilotProfile_ResolveNamedPropertyNode_742FC`
+(`switch` indexé par identifiant − 1, `mov word ptr es:[bx], tag`). Ses méthodes sont à
+**`0x6D0B0 + tag`** dans `seg339` : `+0` destructeur, `+4` score, `+8` application, `+0xC` tick.
+Vérification : le tag `0x160` (ID 19) donne `GroundAttack_CanEngage_77000`,
+`GroundAttack_Start_7709A`, `GroundAttack_PhaseDispatch_77215`. Plusieurs noms de fonctions
+portaient un **identifiant décalé d'un cran** ; ils sont corrigés dans `known_functions.json`
+(ancien nom rappelé dans chaque résumé) :
+
+| ID | Tag | Score | Application | Tick |
+|---|---|---|---|---|
+| 1 | `0x2B4` | `MVRS_ID1_ScoreAngularGuarded_3E90` | `loc_EEA0` | `loc_F0C3` |
+| 2 | `0x28C` | `MVRS_ID2_Score_3FCB` | `MVRS_ID2_ApplyBreakDirection_F2C8` | `loc_F3B6` |
+| 3 | `0x278` | `MVRS_ID3_ScoreAngularSimple_4128` | `MVRS_ID3_ApplyGenericTimer_F6C2` | `MVRS_ID3_Tick_F72B` |
+| 4 | `0x264` | `MVRS_ID4_ScoreAngularExtended_41DD` | `MVRS_ID4_ApplyInterceptSolution_FCE1` | `loc_FE39` |
+| 5 | `0x250` | `MVRS_ID5_ScoreSubmodeManeuver_434E` | `MVRS_ID5_ApplySetTimer_100B6` | `MVRS_ID5_TickSubmodeSwitch_1011F` |
+| 6 | `0x23C` | `MVRS_ID6_ScoreSensorGatedSubmode_45BE` | `MVRS_ID6_ApplySetTimer_1060A` | `loc_10673` |
+| 7 | `0x228` | `MVRS_ID7_ScoreManeuverFuelGated_47D4` | `MVRS_ID7_ApplyFuelGatedTimer_10AF2` | `loc_10BD9` |
+| 8 | `0x214` | `MVRS_ID8_ScoreAlwaysZero_49DA` | `MVRS_ID8_ApplyTrivialDelegate_1115D` | `MVRS_ID8_TickShadowTarget_111AE` |
+| 9 | `0x200` | `MVRS_ID9_ScoreAlwaysZero_4A02` | `MVRS_ID9_ApplyEndsAtOnce_112F7` | `MVRS_ID9_TickEndsAtOnce_1130C` |
+| 10 | `0x1EC` | `MVRS_ID10_ScoreAlwaysZero_4A2A` | `MVRS_ID10_ApplyEndsAtOnce_1131D` | `MVRS_ID10_TickEndsAtOnce_11332` |
+| 11 | `0x1D8` | `MVRS_ID11_ScoreAlwaysZero_4A49` | `MVRS_ID11_ApplyEndsAtOnce_11343` | `MVRS_ID11_TickEndsAtOnce_11358` |
+| 12 | `0x1C4` | `MVRS_ID12_ScoreAlwaysZero_4A71` | `MVRS_ID12_ApplyEndsAtOnce_11369` | `MVRS_ID12_TickEndsAtOnce_1137E` |
+| 13 | `0x1B0` | `MVRS_ID13_ScoreScissorsRollaway_4A99` | `MVRS_ID13_ApplySetTimer_1138F` | `MVRS_ID13_TickManeuverSequence_113FD` |
+| 14 | `0x19C` | `MVRS_ID14_ScoreIntercept_4CD1` | `MVRS_ID14_Apply_11763` | `loc_117B4` |
+| 15 | `0x188` | `MVRS_ID15_ScoreThreatSensor_4E2A` | `MVRS_ID15_Apply_11809` | `loc_1186E` |
+| 16 | `0x174` | `MVRS_ID16_ScoreFuelOrResource_4ECD` | `MVRS_ID16_ApplyReturnToBase_118C3` | `loc_1191D` |
+| 19 | `0x160` | `GroundAttack_CanEngage_77000` | `GroundAttack_Start_7709A` | `GroundAttack_PhaseDispatch_77215` |
+| 20 | `0x14C` | `MVRS_ID20_ScoreAlwaysZero_4F54` | `MVRS_ID20_ApplyStoreNavCommand_1195A` | `MVRS_ID20_TickApplyGuidance_11A04` |
+| 21 | `0x138` | `MVRS_ID21_ScoreAlwaysZero_4F6A` | `MVRS_ID21_ApplyAutopilotNav_11AC4` | `MVRS_ID21_TickAutopilotNav_11B16` |
+
+(Tag `0x2A0` = classe de base : score `MVRS_SharedContextSyncAndID2Score_EC22`.) Les tableaux
+récapitulatifs de `AI_SYSTEM.md` §3.7 associaient déjà les bonnes adresses aux identifiants ; ce
+sont les noms de fonctions qui étaient restés décalés.
+
+### Ce que font les identifiants 8 à 12
+
+- **Le score commun** `MVRS_SharedContextSyncAndID2Score_EC22`, appelé en tête de chaque score :
+  marque le nœud évalué (`nœud+0x0C = 1`), lui donne la cible aérienne (`nœud+0x13`), une copie du
+  vecteur de contexte (`nœud+0x15..0x1D`) et règle son **minuteur à 2 s** (`nœud+0x0D`, valeur
+  posée par le tournoi dans le contexte).
+- **Scores des ID 8 à 12 : toujours 0.** Chacun appelle le score commun, puis `xor dx, dx`, borne
+  `dx` entre 0 et 9 (`cmp dx, 9 / jle … or dx, dx / jg … xor dx, dx`) et le renvoie ; l'ID 10 écrit
+  directement `mov word ptr [bp-2], 0`. C'est la forme exacte des vrais scores (borne [0, 9]) **sans
+  aucun terme** entre l'initialisation et la borne. Or le tournoi exclut une entrée de score nul
+  avant d'ajouter le poids du fichier (`jz loc_9FBF`) : **ces nœuds ne peuvent pas gagner**, quel
+  que soit leur poids.
+- **ID 9 à 12 : coquilles vides.** Application = appel de son tick ; tick =
+  `Behavior_PopFinished_75612` seul. Même s'ils gagnaient, ils se termineraient dans l'instant.
+- **ID 8 : manœuvre complète, mais inaccessible.** Application : s'empile comme comportement en
+  cours, coupe le pilote automatique, appelle son tick. Tick (`MVRS_ID8_TickShadowTarget_111AE`) :
+  tant que la cible existe et que le minuteur (2 s) n'est pas écoulé, vise **la position de la
+  cible + 100 dans l'axe de sa vitesse**, commande la vitesse d'interception avec une distance de
+  `dword_7201C / 2 = 900`, et guide vers ce point (`AI_GuidanceCmd_FromOwnPos`, taux 10). C'est
+  une manœuvre « se caler derrière la cible, dans son axe » : codée, mais son score ne rend jamais
+  autre chose que 0.
+
+### Aucun autre chemin ne les atteint (vérifié)
+
+- Les étiquettes de ces fonctions n'ont qu'une référence : leur entrée dans la table `seg339`
+  (`DATA XREF`), aucun appel direct.
+- Aucun code ne parcourt la table du tournoi (`entité+0x200/+0x202`) en dehors du chargeur, du
+  destructeur (`AIEntity_Destruct_74E1C`) et du tournoi.
+- Aucune comparaison de l'identifiant d'un nœud (`nœud+0x21`) à 8, 9, 10, 11 ou 12 ; les seuls
+  nœuds appelés directement sont les 8 nœuds fixes (champs `+0xBD` à `+0xD9`).
+- Le poids du fichier n'est lu que par le tournoi.
+
+### Pourquoi les profils les contiennent : ce qu'on peut dire
+
+Dans **ce** binaire, les identifiants 8 à 12 n'ont aucun effet de jeu ; leur place dans les
+fichiers `PROF` (Billy, Stern et Hammer listent 1 à 13, avec 0 pour 8 à 12 ; Gwen omet 8, 9, 10)
+s'accorde avec un catalogue de manœuvres **prévu plus large que ce qui a été programmé** :
+emplacements réservés dans la classe (constructeur, vtable, score borné), une manœuvre écrite
+(ID 8) dont le score n'a jamais été rempli, et des données éditées pour le catalogue complet.
+Deux points restent à vérifier par Rémi côté données : la version exacte de l'exécutable
+(disquette, CD, *Tactical Operations*) par rapport à celle des fichiers `PROF`, et si un profil du
+jeu donne une valeur non nulle à l'un de ces identifiants.
+
+### Le vrai nœud ID 21 : navigation au pilote automatique physique
+
+`MVRS_ID21_ApplyAutopilotNav_11AC4` / `MVRS_ID21_TickAutopilotNav_11B16` (score toujours 0,
+appelé directement via `entité+0xD1`) : s'empile, remet à 0 le drapeau « point atteint » ; puis à
+chaque tick, si le pilote automatique est coupé, **remet d'abord le nez à l'horizontale**
+(`AI_PitchToAngleCmd_7E18(0°, 5°)`) et **active le pilote automatique** (`JDYN+0x68 = 0`) dès que
+le tangage est sous 15° ; fin (pilote automatique coupé) au bout du minuteur ou quand le point est
+atteint. Appelants : `AI_NavSolutionToPoint` (navigation de l'IA vers un point),
+`Goal_MoraleReaction_878F` (fuite), `Goal_SelectTransition` (ailier qui a quitté le combat),
+`PartEntry_ResolveSpawnPositionAndActivate_51EDC`. **Conséquence : dans l'original, l'IA rejoint
+ses points de navigation au pilote automatique cinématique** (`PHYSICS.md` §9), pas par les
+commandes de manche.
+
 ## `ExecuteFlightCommand` : le script pose l'objectif, il ne pilote pas (lu le 2026-09-19)
 
 Chaîne lue : `MissionScript_CallNativeHandler_52513` empile `(contrôleur, opcode, compétence, pointeur de position, dword)` puis fait `les bx, es:[bx+52h] / mov bx, [bx] / call dword ptr [bx+88h]`. Le contrôleur (`PartEntry+0x52`) est l'objet renvoyé par `AIAircraft_SpawnAndConditionalLoadProfile_53363` (`mov ax, di ... retf`), c'est-à-dire l'objet monde créé par `ObjectPrototype_FindOrLoadAndInstantiate_38B70`.

@@ -173,11 +173,14 @@ loc_3FC6:				; CODE XREF: seg002:0129j seg002:012Fj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3 (tag 0x278). Meme famille
-; angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via word_72093/72095, seuils
-; NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9.
+; Ex-'MVRS_ID3_ScoreGeneric_3FCB'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3
+; (tag 0x278). Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via
+; word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9. |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID3_ScoreGeneric_3FCB:				; DATA XREF: seg339:off_6D340o
+MVRS_ID2_Score_3FCB:				; DATA XREF: seg339:off_6D340o
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -1546,10 +1549,13 @@ loc_49D5:				; CODE XREF: seg002:0B38j seg002:0B3Ej
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0
-; - type placeholder/desactive, comme 0x15.
+; Ex-'MVRS_ID9_ScorePlaceholder_49DA'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS
+; ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0 - type placeholder/desactive, comme 0x15. |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID9_ScorePlaceholder_49DA:				; DATA XREF: seg339:0218o
+MVRS_ID8_ScoreAlwaysZero_49DA:				; DATA XREF: seg339:0218o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1575,11 +1581,14 @@ loc_49FE:				; CODE XREF: seg002:0B66j seg002:0B6Aj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID9_ScorePlaceholder_4A02'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=9 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID9_ScorePlaceholder_4A02:				; DATA XREF: seg339:0204o
+MVRS_ID9_ScoreAlwaysZero_4A02:				; DATA XREF: seg339:0204o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1605,11 +1614,14 @@ loc_4A26:				; CODE XREF: seg002:0B8Ej seg002:0B92j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID10_ScorePlaceholder_4A2A'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=10 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID10_ScorePlaceholder_4A2A:				; DATA XREF: seg339:01F0o
+MVRS_ID10_ScoreAlwaysZero_4A2A:				; DATA XREF: seg339:01F0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -1624,11 +1636,14 @@ MVRS_ID10_ScorePlaceholder_4A2A:				; DATA XREF: seg339:01F0o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID11_ScorePlaceholder_4A49'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=11 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID11_ScorePlaceholder_4A49:				; DATA XREF: seg339:01DCo
+MVRS_ID11_ScoreAlwaysZero_4A49:				; DATA XREF: seg339:01DCo
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1654,11 +1669,14 @@ loc_4A6D:				; CODE XREF: seg002:0BD5j seg002:0BD9j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme via ancrage
-; sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le
-; resultat) - authentique emplacement vestige jamais implemente.
+; Ex-'MVRS_ID12_ScorePlaceholder_4A71'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=12 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le
+; debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais
+; implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0
+; + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par
+; le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID12_ScorePlaceholder_4A71:				; DATA XREF: seg339:01C8o
+MVRS_ID12_ScoreAlwaysZero_4A71:				; DATA XREF: seg339:01C8o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1953,13 +1971,16 @@ loc_4CCC:				; CODE XREF: seg002:0E2Fj seg002:0E35j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188).
-; STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE
-; TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus
-; pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur
-; dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9).
+; Ex-'MVRS_ID15b_ScoreIntercept_4CD1'. far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE
+; pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul
+; d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C],
+; sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception),
+; gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9). |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID15b_ScoreIntercept_4CD1:				; DATA XREF: seg339:01A0o
+MVRS_ID14_ScoreIntercept_4CD1:				; DATA XREF: seg339:01A0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 3Ah
@@ -2113,15 +2134,18 @@ loc_4E27:				; CODE XREF: seg002:0E7Cj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee
-; par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle
-; initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace,
-; deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a
-; AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en
-; 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score
-; BINAIRE 0/0xA.
+; Ex-'MVRS_ID16_ScoreThreatSensor_4E2A'. far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE
+; pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi',
+; meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6
+; (modulateur de score de menace, deja documente en §7) OU un seuil de distance
+; (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via
+; AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le
+; systeme de detection de menace. Score BINAIRE 0/0xA. | IDENTIFIANT CORRIGE 2026-09-25 :
+; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID16_ScoreThreatSensor_4E2A:				; DATA XREF: seg339:018Co
+MVRS_ID15_ScoreThreatSensor_4E2A:				; DATA XREF: seg339:018Co
 		push	bp
 		mov	bp, sp
 		sub	sp, 6
@@ -2211,14 +2235,18 @@ locret_4ECB:				; CODE XREF: seg002:0FD4j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160,
-; l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT
-; DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE,
-; pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable
-; carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle
-; bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif.
+; Ex-'MVRS_ID19_ScoreFuelOrResource_4ECD'. far, 59 lignes - LU INTEGRALEMENT. Fonction de
+; SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la
+; construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS
+; 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur
+; entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire)
+; compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT
+; le tournoi de AI_BehaviorStateMachine des qu'actif. | IDENTIFIANT CORRIGE 2026-09-25 :
+; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID19_ScoreFuelOrResource_4ECD:				; DATA XREF: seg339:0178o
+MVRS_ID16_ScoreFuelOrResource_4ECD:				; DATA XREF: seg339:0178o
 		push	bp
 		mov	bp, sp
 		sub	sp, 10h
@@ -2280,12 +2308,15 @@ loc_4F4F:				; CODE XREF: seg002:1090j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x15 (tag 0x138). TOUJOURS
-; RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais selectionnable dans le tournoi de
-; AI_BehaviorStateMachine quelle que soit la valeur brute du fichier PROF pour cet
-; identifiant.
+; Ex-'MVRS_ID21_ScorePlaceholder_4F54'. far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE
+; pour MVRS ID=0x15 (tag 0x138). TOUJOURS RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais
+; selectionnable dans le tournoi de AI_BehaviorStateMachine quelle que soit la valeur brute du
+; fichier PROF pour cet identifiant. | IDENTIFIANT CORRIGE 2026-09-25 : methode de
+; l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID21_ScorePlaceholder_4F54:				; DATA XREF: seg339:off_6D200o
+MVRS_ID20_ScoreAlwaysZero_4F54:				; DATA XREF: seg339:off_6D200o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -2297,7 +2328,12 @@ MVRS_ID21_ScorePlaceholder_4F54:				; DATA XREF: seg339:off_6D200o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4F6A:				; DATA XREF: seg339:013Co
+; ==============================================================================================
+; far (label, slot +4 de l'ID 21, tag 0x138), LU 2026-09-25.
+; MVRS_SharedContextSyncAndID2Score_EC22 puis renvoie 0 : jamais choisi par le tournoi ; le
+; noeud est appele directement via entite+0xD1.
+; ==============================================================================================
+MVRS_ID21_ScoreAlwaysZero_4F6A:				; DATA XREF: seg339:013Co
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]

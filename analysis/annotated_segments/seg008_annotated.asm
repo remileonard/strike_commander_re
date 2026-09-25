@@ -1354,15 +1354,18 @@ loc_F2C5:				; CODE XREF: seg008:0C37j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue
-; le score si besoin, appelle Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF,
-; incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset
-; lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0
-; (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D
-; (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot,
-; 'demarrer le suivi', confirme une nouvelle fois).
+; Ex-'MVRS_ID3_ApplyBreakDirection_F2C8'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour
+; MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle
+; Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION
+; TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 :
+; node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone
+; centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un
+; appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois). |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID3_ApplyBreakDirection_F2C8:				; DATA XREF: seg339:0294o
+MVRS_ID2_ApplyBreakDirection_F2C8:				; DATA XREF: seg339:0294o
 		push	bp
 		mov	bp, sp
 		sub	sp, 10h
@@ -1824,18 +1827,21 @@ loc_F6E7:				; CODE XREF: seg008:1137j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, taille substantielle (>250 lignes), PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par
-; erreur a 'ID=0x7 application' lors d'une premiere lecture trop rapide (assomption fausse que
-; l'ordre physique dans le fichier suit l'ordre des identifiants) ; verification precise par
-; calcul d'offset dans la table de vtables de seg339 confirme que c'est en realite le slot
-; [+0xC] ('suivi/verrouillage') de MVRS ID=0x4 (tag 0x264), pas une fonction d'application.
-; Decompte un minuteur (node+0xD -= dword_70458) et implemente une machine a etats interne a 7
-; cas (switch sur node+0x27). Le cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A,
-; sub_56E5) et transitionne vers l'etat 2 ou reste en 0. Role exact des 7 etats non trace en
-; detail - la VRAIE fonction d'application de ID=0x7 (offset 0x230 dans seg339, adresse
-; loc_1060A) reste, elle, entierement non lue.
+; Ex-'MVRS_ID4_TrackingStateMachine_F72B'. far, taille substantielle (>250 lignes),
+; PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une
+; premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit
+; l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de
+; vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de
+; MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -=
+; dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le
+; cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers
+; l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction
+; d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle,
+; entierement non lue. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a
+; 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC,
+; verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID4_TrackingStateMachine_F72B:				; DATA XREF: seg339:off_6D334o
+MVRS_ID3_Tick_F72B:				; DATA XREF: seg339:off_6D334o
 		push	bp
 		mov	bp, sp
 		sub	sp, 88h
@@ -2781,12 +2787,15 @@ loc_100B3:				; CODE XREF: seg008:19F8j seg008:1A0Dj ...
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x6. Motif standard, initialise
-; un MINUTEUR (node+0xD = 0x500 = 1280), incremente node+0x2, appelle [vtable+0xC]. Cette
-; fonction EST COURTE - le vrai travail se passe dans le slot suivant (+0x10, voir loc_1011F
-; ci-dessous).
+; Ex-'MVRS_ID6_ApplySetTimer_100B6'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS
+; ID=0x6. Motif standard, initialise un MINUTEUR (node+0xD = 0x500 = 1280), incremente
+; node+0x2, appelle [vtable+0xC]. Cette fonction EST COURTE - le vrai travail se passe dans le
+; slot suivant (+0x10, voir loc_1011F ci-dessous). | IDENTIFIANT CORRIGE 2026-09-25 : methode
+; de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID6_ApplySetTimer_100B6:				; DATA XREF: seg339:0258o
+MVRS_ID5_ApplySetTimer_100B6:				; DATA XREF: seg339:0258o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -2829,23 +2838,24 @@ loc_100DB:				; CODE XREF: seg008:1B2Bj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA
-; execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu
-; section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur
-; (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit
-; node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - UNE VERITABLE SEQUENCE DE
-; MANOEUVRE ACROBATIQUE MULTI-PHASES, chaque phase commandant une attitude precise via les
-; MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18,
-; AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante
-; (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage
-; vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a
-; cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau
-; (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat
-; (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la
-; 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison
-; a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S
-; (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference
-; (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par
+; Ex-'MVRS_ID6_TimerTickAndSubmodeSwitch_1011F'. far, ~365 lignes - LUE INTEGRALEMENT (a la
+; demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme
+; l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode
+; [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si
+; epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8)
+; et bascule sur un SWITCH A 8 CAS - UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-
+; PHASES, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau
+; que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104,
+; AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une
+; condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de
+; dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 :
+; inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un
+; seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS
+; ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un
+; IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux
+; 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la
+; ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou
+; position propre decalee), tangage vers elle via AI_RollController_7E56, garde par
 ; dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle
 ; capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305)
 ; et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree
@@ -2860,9 +2870,12 @@ loc_100DB:				; CODE XREF: seg008:1B2Bj
 ; (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine
 ; QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une
 ; manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a
-; confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi).
+; confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi). |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID6_TimerTickAndSubmodeSwitch_1011F:				; DATA XREF: seg339:025Co
+MVRS_ID5_TickSubmodeSwitch_1011F:				; DATA XREF: seg339:025Co
 		push	bp
 		mov	bp, sp
 		sub	sp, 76h
@@ -4542,7 +4555,17 @@ loc_11193:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_111AE:				; DATA XREF: seg339:off_6D2D0o
+; ==============================================================================================
+; far (label, slot +0xC de l'ID 8, tag 0x214), LU 2026-09-25. Si le noeud n'a pas de cible
+; (+0x13) ou que son minuteur +0x0D (-= dt, 2 s poses par
+; MVRS_SharedContextSyncAndID2Score_EC22) est ecoule : Behavior_PopFinished_75612. Sinon :
+; point vise = position de la cible + 100 * direction normalisee de sa vitesse
+; (dword_72053..5B) ; AI_InterceptSpeedCmd_HUD(entite, cible, dword_7201C / 2 = 900) ;
+; AI_GuidanceCmd_FromOwnPos(entite, &point, 10). Manoeuvre complete 'se placer derriere la
+; cible, 100 devant elle dans son axe, a 900 de distance' - jamais choisie car le score de
+; l'ID 8 vaut toujours 0.
+; ==============================================================================================
+MVRS_ID8_TickShadowTarget_111AE:				; DATA XREF: seg339:off_6D2D0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 24h
@@ -4655,92 +4678,14 @@ loc_112F3:				; CODE XREF: seg008:2D45j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme, score toujours 0
-; - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation
-; triviale pure, authentique emplacement vestige.
+; Ex-'MVRS_ID9_ApplyTrivialDelegate_112F7'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=9 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC]
+; (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige.
+; | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID9_ApplyTrivialDelegate_112F7:				; DATA XREF: seg339:0208o
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		les	bx, [bp+6]
-		mov	bx, es:[bx]
-		call	dword ptr [bx+0Ch]
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-loc_1130C:				; DATA XREF: seg339:020Co
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		call	VROOMM_StubThunk_6AB45
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-; ==============================================================================================
-; far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme, score toujours
-; 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation
-; triviale pure, authentique emplacement vestige.
-; ==============================================================================================
-MVRS_ID10_ApplyTrivialDelegate_1131D:				; DATA XREF: seg339:01F4o
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		les	bx, [bp+6]
-		mov	bx, es:[bx]
-		call	dword ptr [bx+0Ch]
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-loc_11332:				; DATA XREF: seg339:01F8o
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		call	VROOMM_StubThunk_6AB45
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-; ==============================================================================================
-; far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme, score toujours
-; 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation
-; triviale pure, authentique emplacement vestige.
-; ==============================================================================================
-MVRS_ID11_ApplyTrivialDelegate_11343:				; DATA XREF: seg339:off_6D290o
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		les	bx, [bp+6]
-		mov	bx, es:[bx]
-		call	dword ptr [bx+0Ch]
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-loc_11358:				; DATA XREF: seg339:01E4o
-		push	bp
-		mov	bp, sp
-		push	large dword ptr	[bp+6]
-		call	VROOMM_StubThunk_6AB45
-		add	sp, 4
-		pop	bp
-		retf
-; ���������������������������������������������������������������������������
-
-; ==============================================================================================
-; far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme, score toujours
-; 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation
-; triviale pure, authentique emplacement vestige.
-; ==============================================================================================
-MVRS_ID12_ApplyTrivialDelegate_11369:				; DATA XREF: seg339:01CCo
+MVRS_ID9_ApplyEndsAtOnce_112F7:				; DATA XREF: seg339:0208o
 		push	bp
 		mov	bp, sp
 		push	large dword ptr	[bp+6]
@@ -4753,11 +4698,10 @@ MVRS_ID12_ApplyTrivialDelegate_11369:				; DATA XREF: seg339:01CCo
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 8 lignes - probable slot [vtable+0x10] de MVRS ID=0x13. Tout aussi triviale : appelle
-; uniquement NotifiableRef_AttachTarget_6AB45 (motif generique) et retourne. Aucune logique de
-; tick/minuteur contrairement a ID=6/ID=7.
+; far (label, slot +0xC de l'ID 9). Behavior_PopFinished_75612 seulement : le comportement se
+; termine immediatement.
 ; ==============================================================================================
-MVRS_ID13_TickTrivialDelegate_1137E:				; DATA XREF: seg339:01D0o
+MVRS_ID9_TickEndsAtOnce_1130C:				; DATA XREF: seg339:020Co
 		push	bp
 		mov	bp, sp
 		push	large dword ptr	[bp+6]
@@ -4768,10 +4712,117 @@ MVRS_ID13_TickTrivialDelegate_1137E:				; DATA XREF: seg339:01D0o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0xE. Motif standard,
-; timer=0x400, pose la phase initiale (node+0x26=1).
+; Ex-'MVRS_ID10_ApplyTrivialDelegate_1131D'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=10 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC]
+; (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige.
+; | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID14b_ApplySetTimer_1138F:				; DATA XREF: seg339:01B8o
+MVRS_ID10_ApplyEndsAtOnce_1131D:				; DATA XREF: seg339:01F4o
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		les	bx, [bp+6]
+		mov	bx, es:[bx]
+		call	dword ptr [bx+0Ch]
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; far (label, slot +0xC de l'ID 10). Behavior_PopFinished_75612 seulement.
+; ==============================================================================================
+MVRS_ID10_TickEndsAtOnce_11332:				; DATA XREF: seg339:01F8o
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		call	VROOMM_StubThunk_6AB45
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; Ex-'MVRS_ID11_ApplyTrivialDelegate_11343'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=11 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC]
+; (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige.
+; | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; ==============================================================================================
+MVRS_ID11_ApplyEndsAtOnce_11343:				; DATA XREF: seg339:off_6D290o
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		les	bx, [bp+6]
+		mov	bx, es:[bx]
+		call	dword ptr [bx+0Ch]
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; far (label, slot +0xC de l'ID 11). Behavior_PopFinished_75612 seulement.
+; ==============================================================================================
+MVRS_ID11_TickEndsAtOnce_11358:				; DATA XREF: seg339:01E4o
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		call	VROOMM_StubThunk_6AB45
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; Ex-'MVRS_ID12_ApplyTrivialDelegate_11369'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT
+; ATTRIBUEE (ID=12 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC]
+; (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige.
+; | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; ==============================================================================================
+MVRS_ID12_ApplyEndsAtOnce_11369:				; DATA XREF: seg339:01CCo
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		les	bx, [bp+6]
+		mov	bx, es:[bx]
+		call	dword ptr [bx+0Ch]
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; Ex-'MVRS_ID13_TickTrivialDelegate_1137E'. far, 8 lignes - probable slot [vtable+0x10] de
+; MVRS ID=0x13. Tout aussi triviale : appelle uniquement NotifiableRef_AttachTarget_6AB45
+; (motif generique) et retourne. Aucune logique de tick/minuteur contrairement a ID=6/ID=7. |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; ==============================================================================================
+MVRS_ID12_TickEndsAtOnce_1137E:				; DATA XREF: seg339:01D0o
+		push	bp
+		mov	bp, sp
+		push	large dword ptr	[bp+6]
+		call	VROOMM_StubThunk_6AB45
+		add	sp, 4
+		pop	bp
+		retf
+; ���������������������������������������������������������������������������
+
+; ==============================================================================================
+; Ex-'MVRS_ID14b_ApplySetTimer_1138F'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour
+; MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1). |
+; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
+; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID
+; 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale.
+; ==============================================================================================
+MVRS_ID13_ApplySetTimer_1138F:				; DATA XREF: seg339:01B8o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -4815,22 +4866,25 @@ loc_113B4:				; CODE XREF: seg008:2E04j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~365 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] de MVRS ID=0xE. DEUXIEME
-; SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE (5 phases, distincte de celle de ID=0x6/0x7).
-; PHASE 0 : distance a la cible comparee a dword_7202C (constante NUMS), si proche appelle
-; AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME fonction que la chaine de navigation principale,
-; §4bis) pour pointer vers la cible. PHASE 1 : verifie une condition cible (sub_564A), sinon
-; roule a plat (0 deg, taux 5). PHASE 2 : calcule le relevement vers la cible (dword_720B7),
-; PUIS CALCULE UN DELAI DYNAMIQUE base sur la CAPACITE DE ROULIS PROPRE DE L'AVION
-; ([avion+0x84]=taux de roulis, [avion+0x82]=un second parametre), borne a 60 - combien de
-; temps CET avion specifique mettra a completer un roulis defensif - puis commande un virage
-; (sub_7E18) suivi d'un retour a plat (sub_8104). Motif coherent avec une manoeuvre defensive
-; de type SCISSORS ou ROLLAWAY (confirmees au repertoire des pilotes par le manuel officiel,
-; section WILDCATS). PHASE 3 : retour a plat (rate 5), appelle systematiquement sub_632E avec
-; [avion+0x84] (meme queue que la sequence de ID=0x6). PHASE 4 (defaut/sortie) :
-; NotifiableRef_AttachTarget - reacquisition.
+; Ex-'MVRS_ID14b_TickManeuverSequence_113FD'. far, ~365 lignes - LUE INTEGRALEMENT. Methode
+; [vtable+0x10] de MVRS ID=0xE. DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE (5
+; phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a
+; dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME
+; fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1
+; : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 :
+; calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur
+; la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second
+; parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis
+; defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif
+; coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire
+; des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5),
+; appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6).
+; PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition. | IDENTIFIANT CORRIGE
+; 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID14b_TickManeuverSequence_113FD:				; DATA XREF: seg339:01BCo
+MVRS_ID13_TickManeuverSequence_113FD:				; DATA XREF: seg339:01BCo
 		push	bp
 		mov	bp, sp
 		sub	sp, 5Ah
@@ -5158,12 +5212,16 @@ off_11759	dw offset loc_11432	; DATA XREF: seg008:2E8Dr
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (loc_11763) et de TICK (loc_117B4) pour
-; MVRS ID=0xF (interception). PAS de sequence a phases (coherent avec sa nature de calcul
-; continu, pas une manoeuvre choregraphiee) : verifie simplement la persistance de la solution
-; d'interception (sub_50FF code 2, sub_6616), reacquisition si echec.
+; Ex-'MVRS_ID15b_ApplyPersistence_11763'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
+; (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases
+; (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie
+; simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616),
+; reacquisition si echec. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement
+; seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID15b_ApplyPersistence_11763:				; DATA XREF: seg339:01A4o
+MVRS_ID14_Apply_11763:				; DATA XREF: seg339:01A4o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5234,13 +5292,16 @@ loc_11807:				; CODE XREF: seg008:3236j seg008:3259j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x200) et de TICK pour MVRS ID=0x10
-; (detection de menace). PAS de sequence a phases - verification de persistance simple
-; (sub_50FF code 1, sub_676F - meme fonction appelee par AI_CombatDecision_Major, confirme le
-; lien), reacquisition si echec. Coherent avec une reaction reflexe plutot qu'une manoeuvre
-; planifiee.
+; Ex-'MVRS_ID16_ApplyPersistence_11809'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
+; (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases -
+; verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par
+; AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une
+; reaction reflexe plutot qu'une manoeuvre planifiee. | IDENTIFIANT CORRIGE 2026-09-25 :
+; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID16_ApplyPersistence_11809:				; DATA XREF: seg339:off_6D240o
+MVRS_ID15_Apply_11809:				; DATA XREF: seg339:off_6D240o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -5316,13 +5377,16 @@ loc_118C1:				; CODE XREF: seg008:32FFj seg008:3313j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x180) et de TICK pour MVRS ID=0x13
-; (urgence carburant). Appelle AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement
-; pilote aussi bien le CAP QUE LE REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai
-; comportement de RETOUR A LA BASE gerant vitesse et direction ensemble, pas seulement la
-; trajectoire.
+; Ex-'MVRS_ID19_ApplyReturnToBase_118C3'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION
+; (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle
+; AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE
+; REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE
+; gerant vitesse et direction ensemble, pas seulement la trajectoire. | IDENTIFIANT CORRIGE
+; 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID19_ApplyReturnToBase_118C3:				; DATA XREF: seg339:017Co
+MVRS_ID16_ApplyReturnToBase_118C3:				; DATA XREF: seg339:017Co
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5385,14 +5449,18 @@ loc_11958:				; CODE XREF: seg008:33AAj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~60 lignes - LUE INTEGRALEMENT. Fonction d'APPLICATION (vtable+8) du noeud MVRS_ID21
-; (le 'placeholder desactive' pour le tournoi de score, mais utilise DIRECTEMENT hors tournoi
-; comme porteur de commande de navigation - voir AI_SYSTEM.md §4bis). Recopie le vecteur
-; position+vitesse recu en parametre (calcule par AI_NavSolutionToPoint_8548) dans
-; node+0x26/+0x2A/+0x2E, pose entite-avion+0x68=0xFF (timer rafraichi), appelle [vtable+0xC]
-; (demarrage du suivi).
+; Ex-'MVRS_ID21_ApplyStoreNavCommand_1195A'. far, ~60 lignes - LUE INTEGRALEMENT. Fonction
+; d'APPLICATION (vtable+8) du noeud MVRS ID 20 (tag 0x14C, noeud permanent entite+0xC1 ; les
+; anciens resumes le disaient ID 21 a tort) (le 'placeholder desactive' pour le tournoi de
+; score, mais utilise DIRECTEMENT hors tournoi comme porteur de commande de navigation - voir
+; AI_SYSTEM.md §4bis). Recopie le vecteur position+vitesse recu en parametre (calcule par
+; AI_NavSolutionToPoint_8548) dans node+0x26/+0x2A/+0x2E, pose entite-avion+0x68=0xFF (timer
+; rafraichi), appelle [vtable+0xC] (demarrage du suivi). | IDENTIFIANT CORRIGE 2026-09-25 :
+; methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID21_ApplyStoreNavCommand_1195A:				; DATA XREF: seg339:0154o
+MVRS_ID20_ApplyStoreNavCommand_1195A:				; DATA XREF: seg339:0154o
 		push	bp
 		mov	bp, sp
 		sub	sp, 18h
@@ -5457,14 +5525,18 @@ loc_11A01:				; CODE XREF: seg008:33CAj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, ~55 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] (tick periodique) du noeud
-; MVRS_ID21. Decompte le minuteur (node+0xD -= dword_70458), relit le vecteur stocke par
-; MVRS_ID21_ApplyStoreNavCommand_1195A, ecrit une valeur fixe (0xA=10) dans entite+7+0x1E
-; (statut sur le sous-objet partage). Si le minuteur est epuise : appelle
-; NotifiableRef_AttachTarget (reacquisition). Sinon : appelle AI_GuidanceCmd_FromOwnPos_75A9
-; avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE GUIDAGE GEOMETRIQUE (voir §4bis).
+; Ex-'MVRS_ID21_TickApplyGuidance_11A04'. far, ~55 lignes - LUE INTEGRALEMENT. Methode
+; [vtable+0x10] (tick periodique) du noeud MVRS_ID21. Decompte le minuteur (node+0xD -=
+; dword_70458), relit le vecteur stocke par MVRS_ID20_ApplyStoreNavCommand_1195A, ecrit une
+; valeur fixe (0xA=10) dans entite+7+0x1E (statut sur le sous-objet partage). Si le minuteur
+; est epuise : appelle NotifiableRef_AttachTarget (reacquisition). Sinon : appelle
+; AI_GuidanceCmd_FromOwnPos_75A9 avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE
+; GUIDAGE GEOMETRIQUE (voir §4bis). | IDENTIFIANT CORRIGE 2026-09-25 : methode de
+; l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de
+; PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ;
+; l'ancien nom portait un identifiant decale.
 ; ==============================================================================================
-MVRS_ID21_TickApplyGuidance_11A04:				; DATA XREF: seg339:0158o
+MVRS_ID20_TickApplyGuidance_11A04:				; DATA XREF: seg339:0158o
 		push	bp
 		mov	bp, sp
 		sub	sp, 24h
@@ -5529,7 +5601,15 @@ locret_11AC2:				; CODE XREF: seg008:3514j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_11AC4:				; DATA XREF: seg339:0140o
+; ==============================================================================================
+; far (label, slot +8 de l'ID 21), LU 2026-09-25. Reevalue le score si besoin, s'empile comme
+; comportement en cours (Behavior_PushRunning_756A4), remet a 0 le drapeau 'point atteint' du
+; bloc de commandes (+0x1A), puis appelle son tick. Appele via entite+0xD1 par
+; AI_NavSolutionToPoint, Goal_MoraleReaction_878F, Goal_SelectTransition,
+; PartEntry_ResolveSpawnPositionAndActivate : le point et la vitesse voulue sont deja dans le
+; bloc de commandes (+0x02, +0x0E).
+; ==============================================================================================
+MVRS_ID21_ApplyAutopilotNav_11AC4:				; DATA XREF: seg339:0140o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5565,7 +5645,16 @@ loc_11AE6:				; CODE XREF: seg008:3536j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_11B16:				; DATA XREF: seg339:0144o
+; ==============================================================================================
+; far (label, slot +0xC de l'ID 21), LU 2026-09-25. NAVIGATION AU PILOTE AUTOMATIQUE PHYSIQUE.
+; Minuteur +0x0D -= dt. Si le pilote automatique est coupe (JDYN+0x68 == 0xFF) : si |tangage
+; du nez| < 15 (AI_Sensor_NosePitch_59A5, cmp 0F00h) -> JDYN+0x68 = 0 (active
+; Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5)
+; (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote
+; automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis
+; Behavior_PopFinished_75612.
+; ==============================================================================================
+MVRS_ID21_TickAutopilotNav_11B16:				; DATA XREF: seg339:0144o
 		push	bp
 		mov	bp, sp
 		sub	sp, 8

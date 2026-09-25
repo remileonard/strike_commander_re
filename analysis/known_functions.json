@@ -310,9 +310,9 @@
     "summary": "far, applique deux styles de texte (TextFormat_ApplyStyleAttribute_5E2D0 ×2, seg143)."
   },
   "loc_1195A": {
-    "new_name": "MVRS_ID21_ApplyStoreNavCommand_1195A",
+    "new_name": "MVRS_ID20_ApplyStoreNavCommand_1195A",
     "segment": "seg008",
-    "summary": "far, ~60 lignes - LUE INTEGRALEMENT. Fonction d'APPLICATION (vtable+8) du noeud MVRS_ID21 (le 'placeholder desactive' pour le tournoi de score, mais utilise DIRECTEMENT hors tournoi comme porteur de commande de navigation - voir AI_SYSTEM.md §4bis). Recopie le vecteur position+vitesse recu en parametre (calcule par AI_NavSolutionToPoint_8548) dans node+0x26/+0x2A/+0x2E, pose entite-avion+0x68=0xFF (timer rafraichi), appelle [vtable+0xC] (demarrage du suivi)."
+    "summary": "Ex-'MVRS_ID21_ApplyStoreNavCommand_1195A'. far, ~60 lignes - LUE INTEGRALEMENT. Fonction d'APPLICATION (vtable+8) du noeud MVRS ID 20 (tag 0x14C, noeud permanent entite+0xC1 ; les anciens resumes le disaient ID 21 a tort) (le 'placeholder desactive' pour le tournoi de score, mais utilise DIRECTEMENT hors tournoi comme porteur de commande de navigation - voir AI_SYSTEM.md §4bis). Recopie le vecteur position+vitesse recu en parametre (calcule par AI_NavSolutionToPoint_8548) dans node+0x26/+0x2A/+0x2E, pose entite-avion+0x68=0xFF (timer rafraichi), appelle [vtable+0xC] (demarrage du suivi). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6CF58": {
     "new_name": "VROOMM_StubThunk_6CF58",
@@ -400,9 +400,9 @@
     "summary": "far, combine `TextFormat_ReleaseStyleList_5E526`/`ApplyStyleAttribute_5E2D0` (×2, seg143), `Font_GetGlyphMetrics_58DFE` (seg120)."
   },
   "loc_F72B": {
-    "new_name": "MVRS_ID4_TrackingStateMachine_F72B",
+    "new_name": "MVRS_ID3_Tick_F72B",
     "segment": "seg008",
-    "summary": "far, taille substantielle (>250 lignes), PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -= dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle, entierement non lue."
+    "summary": "Ex-'MVRS_ID4_TrackingStateMachine_F72B'. far, taille substantielle (>250 lignes), PARTIELLEMENT EXPLOREE - CORRECTION : attribuee par erreur a 'ID=0x7 application' lors d'une premiere lecture trop rapide (assomption fausse que l'ordre physique dans le fichier suit l'ordre des identifiants) ; verification precise par calcul d'offset dans la table de vtables de seg339 confirme que c'est en realite le slot [+0xC] ('suivi/verrouillage') de MVRS ID=0x4 (tag 0x264), pas une fonction d'application. Decompte un minuteur (node+0xD -= dword_70458) et implemente une machine a etats interne a 7 cas (switch sur node+0x27). Le cas 0 (loc_F76C) verifie deux conditions cibles (sub_564A, sub_56E5) et transitionne vers l'etat 2 ou reste en 0. Role exact des 7 etats non trace en detail - la VRAIE fonction d'application de ID=0x7 (offset 0x230 dans seg339, adresse loc_1060A) reste, elle, entierement non lue. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "loc_DCEE": {
     "new_name": "AllocateIfNull_12Bytes_DCEE",
@@ -660,9 +660,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8AD50) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=16CA0h, codesize=1915h, nentries=16."
   },
   "loc_3FCB": {
-    "new_name": "MVRS_ID3_ScoreGeneric_3FCB",
+    "new_name": "MVRS_ID2_Score_3FCB",
     "segment": "seg002",
-    "summary": "far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3 (tag 0x278). Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9."
+    "summary": "Ex-'MVRS_ID3_ScoreGeneric_3FCB'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3 (tag 0x278). Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6B0D0": {
     "new_name": "VROOMM_StubThunk_6B0D0",
@@ -1425,9 +1425,9 @@
     "summary": "far, 61 lignes, entre sub_668FF et sub_6698F — même motif que ConfigOption_Construct_6672D (alloue 1 octet, sub_658). ⚠️ Adresse exacte non résolue."
   },
   "loc_118C3": {
-    "new_name": "MVRS_ID19_ApplyReturnToBase_118C3",
+    "new_name": "MVRS_ID16_ApplyReturnToBase_118C3",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE gerant vitesse et direction ensemble, pas seulement la trajectoire."
+    "summary": "Ex-'MVRS_ID19_ApplyReturnToBase_118C3'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x180) et de TICK pour MVRS ID=0x13 (urgence carburant). Appelle AI_SpeedManeuverDecision_68D4 - CONFIRME que ce comportement pilote aussi bien le CAP QUE LE REGIME MOTEUR (AI_ThrottleCmd_HUD), coherent avec un vrai comportement de RETOUR A LA BASE gerant vitesse et direction ensemble, pas seulement la trajectoire. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_641B2": {
     "new_name": "StreamReader_ParseFormattedValueB_641B2",
@@ -1785,9 +1785,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A449F) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=32A70h, codesize=2FEh, nentries=4."
   },
   "loc_4A02": {
-    "new_name": "MVRS_ID9_ScorePlaceholder_4A02",
+    "new_name": "MVRS_ID9_ScoreAlwaysZero_4A02",
     "segment": "seg002",
-    "summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+    "summary": "Ex-'MVRS_ID9_ScorePlaceholder_4A02'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6BB50": {
     "new_name": "VROOMM_StubThunk_6BB50",
@@ -2225,9 +2225,9 @@
     "summary": "⚠️ far, 105 lignes, NON DÉTAILLÉE — alloue (sub_658), initialise sous-objet composite (sub_6CACF), appelle PlayerComponent_LoadFieldsWithRetryG_A4F01."
   },
   "loc_1138F": {
-    "new_name": "MVRS_ID14b_ApplySetTimer_1138F",
+    "new_name": "MVRS_ID13_ApplySetTimer_1138F",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1)."
+    "summary": "Ex-'MVRS_ID14b_ApplySetTimer_1138F'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0xE. Motif standard, timer=0x400, pose la phase initiale (node+0x26=1). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_80971": {
     "new_name": "HUDSymbol_DrawWithLineOfSight_80971",
@@ -4445,9 +4445,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7AAF0) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=7640h, codesize=17Ch, nentries=1."
   },
   "loc_4E2A": {
-    "new_name": "MVRS_ID16_ScoreThreatSensor_4E2A",
+    "new_name": "MVRS_ID15_ScoreThreatSensor_4E2A",
     "segment": "seg002",
-    "summary": "far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA."
+    "summary": "Ex-'MVRS_ID16_ScoreThreatSensor_4E2A'. far, 87 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x10 (tag 0x174). Gardee par entite+0x22->0xB->0x68==0xFF ('timer rafraichi', meme champ que la sentinelle initialisee dans les applications). Verifie flags_75 bit6 (modulateur de score de menace, deja documente en §7) OU un seuil de distance (dword_720CD/720C9) OU un appel direct a AI_Sensor_NosePitch_59A5_59A5 (deja connue via AIEntity_MasterTick) compare a 0x1E00 (30 en 24.8) - CONFIRME un lien direct et fort avec le systeme de detection de menace. Score BINAIRE 0/0xA. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6B3D8": {
     "new_name": "VROOMM_StubThunk_6B3D8",
@@ -4905,9 +4905,9 @@
     "summary": "⚠️ far, 94 lignes, NON DÉTAILLÉE — combine ResourceRecord_ReadFieldGroupA_64A19 et ReadFieldGroupC_64A7E (×3, seg193) — chargement d'un groupe de champs IFF pour le système de résolution d'expressions (Expr/GeomNode, seg114)."
   },
   "loc_4ECD": {
-    "new_name": "MVRS_ID19_ScoreFuelOrResource_4ECD",
+    "new_name": "MVRS_ID16_ScoreFuelOrResource_4ECD",
     "segment": "seg002",
-    "summary": "far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif."
+    "summary": "Ex-'MVRS_ID19_ScoreFuelOrResource_4ECD'. far, 59 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x13 (tag 0x160, l'identifiant SPECIAL avec deux references faibles a la construction). ECHELLE COMPLETEMENT DIFFERENTE des autres types (0x100 a 0x900, PAS 0-9/0-10) - retourne une VALEUR CONTINUE, pas un petit score discret, basee sur entite+0x22->0xB0 (pourcentage/etat continu, probable carburant ou ressource similaire) compare a un seuil fixe (0xC=12). Etant donne l'echelle bien plus grande, ce type DOMINERAIT le tournoi de AI_BehaviorStateMachine des qu'actif. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6C43E": {
     "new_name": "VROOMM_StubThunk_6C43E",
@@ -5300,9 +5300,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8CBB0) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=19FE0h, codesize=763h, nentries=14."
   },
   "loc_4F54": {
-    "new_name": "MVRS_ID21_ScorePlaceholder_4F54",
+    "new_name": "MVRS_ID20_ScoreAlwaysZero_4F54",
     "segment": "seg002",
-    "summary": "far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x15 (tag 0x138). TOUJOURS RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais selectionnable dans le tournoi de AI_BehaviorStateMachine quelle que soit la valeur brute du fichier PROF pour cet identifiant."
+    "summary": "Ex-'MVRS_ID21_ScorePlaceholder_4F54'. far, 10 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x15 (tag 0x138). TOUJOURS RETOURNE 0 - un type PLACEHOLDER/DESACTIVE, jamais selectionnable dans le tournoi de AI_BehaviorStateMachine quelle que soit la valeur brute du fichier PROF pour cet identifiant. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_5EAED": {
     "new_name": "FontStyle_ClearFlag_5EAED",
@@ -5910,9 +5910,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7385B) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0, codesize=15Ah, nentries=10."
   },
   "loc_4CD1": {
-    "new_name": "MVRS_ID15b_ScoreIntercept_4CD1",
+    "new_name": "MVRS_ID14_ScoreIntercept_4CD1",
     "segment": "seg002",
-    "summary": "far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9)."
+    "summary": "Ex-'MVRS_ID15b_ScoreIntercept_4CD1'. far, 150 lignes - LU INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0xF (tag 0x188). STRUCTURELLEMENT DIFFERENTE des precedentes : calcul d'INTERCEPTION/ANTICIPATION DE TRAJECTOIRE (position via [entite+0x11->vtable+0x3C], sub_57C67 et sub_54876='cosinus pondere' pour un calcul de temps/angle d'interception), gardee par le seuil capteur dword_7203D et dword_720A7. Score BINAIRE 0/0xA (10, pas 0-9). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6C48E": {
     "new_name": "VROOMM_StubThunk_6C48E",
@@ -6075,9 +6075,9 @@
     "summary": "⚠️ far, 176 lignes, NON DÉTAILLÉE — combine allocation et ReadFinalField_64B51 répété."
   },
   "loc_4A71": {
-    "new_name": "MVRS_ID12_ScorePlaceholder_4A71",
+    "new_name": "MVRS_ID12_ScoreAlwaysZero_4A71",
     "segment": "seg002",
-    "summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+    "summary": "Ex-'MVRS_ID12_ScorePlaceholder_4A71'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_66F34": {
     "new_name": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
@@ -6620,9 +6620,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9D2CC) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2B470h, codesize=2B4h, nentries=6."
   },
   "loc_112F7": {
-    "new_name": "MVRS_ID9_ApplyTrivialDelegate_112F7",
+    "new_name": "MVRS_ID9_ApplyEndsAtOnce_112F7",
     "segment": "seg008",
-    "summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+    "summary": "Ex-'MVRS_ID9_ApplyTrivialDelegate_112F7'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=9 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6AC25": {
     "new_name": "VROOMM_StubThunk_6AC25",
@@ -6675,9 +6675,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9E027) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39."
   },
   "loc_1131D": {
-    "new_name": "MVRS_ID10_ApplyTrivialDelegate_1131D",
+    "new_name": "MVRS_ID10_ApplyEndsAtOnce_1131D",
     "segment": "seg008",
-    "summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+    "summary": "Ex-'MVRS_ID10_ApplyTrivialDelegate_1131D'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_68D4": {
     "new_name": "AI_SpeedManeuverDecision",
@@ -6705,9 +6705,9 @@
     "summary": "far,167L — calcule la distance entre la position projetée du missile (+0x13) et sa cible (+0x11), compare au seuil de proximité dword_7201C (même seuil que les alertes de menace du seg003) : **détonateur de proximité (fuze) pour missile guidé.**"
   },
   "loc_1011F": {
-    "new_name": "MVRS_ID6_TimerTickAndSubmodeSwitch_1011F",
+    "new_name": "MVRS_ID5_TickSubmodeSwitch_1011F",
     "segment": "seg008",
-    "summary": "far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi)."
+    "summary": "Ex-'MVRS_ID6_TimerTickAndSubmodeSwitch_1011F'. far, ~365 lignes - LUE INTEGRALEMENT (a la demande de Remi, pour comprendre comment l'IA execute des manoeuvres nommees comme l'Immelmann/Split S, confirmees par le manuel du jeu section WILDCATS). Methode [vtable+0x10] SPECIFIQUE a MVRS ID=0x6. Decompte le minuteur (node+0xD -= dword_70458) ; si epuise, appelle NotifiableRef_AttachTarget_6AB45. Sinon, lit node+0x26 (phase courante, 1-8) et bascule sur un SWITCH A 8 CAS - **UNE VERITABLE SEQUENCE DE MANOEUVRE ACROBATIQUE MULTI-PHASES**, chaque phase commandant une attitude precise via les MEMES controleurs bas niveau que la navigation normale (AI_PitchToAngleCmd_7E18_7E18, AI_RollToAngleCmd_8104_8104, AI_RollController_7E56_7E56), et avancant a la phase suivante (inc node+0x26) quand une condition geometrique de tolerance est remplie : PHASE 0 : tangage vers un angle derive de dword_72034 (constante NUMS), taux 10 - debut de ressource/tire a cabrer. PHASE 1 : inclinaison forte -30 deg (taux 5) OU correction douce vers le niveau (taux 2), selon un seuil de capacite de l'avion lu a [avion+0x84]. PHASE 2 : retour a plat (0 deg, taux 5) PUIS ajustement de cap via AI_RollToAngleCmd_8104 - motif coherent avec la 2e moitie d'un IMMELMANN (roulis a plat apres la ressource en boucle). PHASE 3 : inclinaison a 90 deg (taux 10) - roulis sur la tranche, motif coherent avec le DEBUT d'un SPLIT S (roulis avant la ressource inversee). PHASE 4 : calcul de position relative a une reference (cible ou position propre decalee), tangage vers elle via AI_RollController_7E56, garde par dword_72039 (cosinus pondere, deja connu de AIEntity_MasterTick). PHASE 5 : test d'angle capteur < 45 deg (AI_Sensor_NosePitch_59A5), puis calcule une position anticipee (sub_5305) et l'ECRIT DIRECTEMENT dans entite+7+0x1F - LE MEME CHAMP consomme aux cotes de l'entree souris du joueur dans Player_MainUpdate (confirme le lien direct avec le pipeline de controle partage, §4bis). PHASE 6 : calcul d'angle vers une cible (Math_AngleBetweenVectors contre constante 0x4FA3), stocke dans node+0x27, puis virage vers cet angle via AI_PitchToAngleCmd_7E18. PHASE 7 : retour au cap de reference (0, taux 10) via AI_RollToAngleCmd_8104 - sortie/stabilisation finale de la manoeuvre. QUEUE COMMUNE (apres CHAQUE phase) : appelle sub_632E avec la limite de capacite [avion+0x84] - probablement l'angle de roulis maximal autorise pour ce type d'avion. CONCLUSION : cette sequence a 8 phases est le mecanisme le plus probable pour l'execution des manoeuvres nommees du manuel (Immelmann, Split S, Scissors, Rollaway, Jink, Pursuit) - le sous-mode (node+0x26) determine QUELLE manoeuvre est en cours, et chaque 'case' du switch en est UNE PHASE, pas une manoeuvre complete a elle seule. Le mapping exact phase-numero <-> manoeuvre nommee reste a confirmer (candidat pour verification empirique en jeu, comme le suggerait Remi). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_564A": {
     "new_name": "AI_Sensor_TargetInRange",
@@ -6955,9 +6955,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9F98D) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39."
   },
   "loc_100B6": {
-    "new_name": "MVRS_ID6_ApplySetTimer_100B6",
+    "new_name": "MVRS_ID5_ApplySetTimer_100B6",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x6. Motif standard, initialise un MINUTEUR (node+0xD = 0x500 = 1280), incremente node+0x2, appelle [vtable+0xC]. Cette fonction EST COURTE - le vrai travail se passe dans le slot suivant (+0x10, voir loc_1011F ci-dessous)."
+    "summary": "Ex-'MVRS_ID6_ApplySetTimer_100B6'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x6. Motif standard, initialise un MINUTEUR (node+0xD = 0x500 = 1280), incremente node+0x2, appelle [vtable+0xC]. Cette fonction EST COURTE - le vrai travail se passe dans le slot suivant (+0x10, voir loc_1011F ci-dessous). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_5CB63": {
     "new_name": "Memory_AllocatorSlotArray_Construct_5CB63",
@@ -7900,9 +7900,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A4BE1) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=33380h, codesize=0B0Ch, nentries=28."
   },
   "loc_11763": {
-    "new_name": "MVRS_ID15b_ApplyPersistence_11763",
+    "new_name": "MVRS_ID14_Apply_11763",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616), reacquisition si echec."
+    "summary": "Ex-'MVRS_ID15b_ApplyPersistence_11763'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (loc_11763) et de TICK (loc_117B4) pour MVRS ID=0xF (interception). PAS de sequence a phases (coherent avec sa nature de calcul continu, pas une manoeuvre choregraphiee) : verifie simplement la persistance de la solution d'interception (sub_50FF code 2, sub_6616), reacquisition si echec. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_582EE": {
     "new_name": "Math_Sqrt_Raw_582EE",
@@ -10140,9 +10140,9 @@
     "summary": "far, aucun appel externe visible (34 lignes)."
   },
   "loc_4A2A": {
-    "new_name": "MVRS_ID10_ScorePlaceholder_4A2A",
+    "new_name": "MVRS_ID10_ScoreAlwaysZero_4A2A",
     "segment": "seg002",
-    "summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+    "summary": "Ex-'MVRS_ID10_ScorePlaceholder_4A2A'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=10 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_1839": {
     "new_name": "CRT_Int86",
@@ -10410,9 +10410,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3A86) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "loc_11809": {
-    "new_name": "MVRS_ID16_ApplyPersistence_11809",
+    "new_name": "MVRS_ID15_Apply_11809",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases - verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une reaction reflexe plutot qu'une manoeuvre planifiee."
+    "summary": "Ex-'MVRS_ID16_ApplyPersistence_11809'. far - LUE INTEGRALEMENT. Fonctions d'APPLICATION (timer=0x200) et de TICK pour MVRS ID=0x10 (detection de menace). PAS de sequence a phases - verification de persistance simple (sub_50FF code 1, sub_676F - meme fonction appelee par AI_CombatDecision_Major, confirme le lien), reacquisition si echec. Coherent avec une reaction reflexe plutot qu'une manoeuvre planifiee. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_56304": {
     "new_name": "Map_ComputeBearingToPoint_56304",
@@ -10630,9 +10630,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_82693) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18."
   },
   "loc_F2C8": {
-    "new_name": "MVRS_ID3_ApplyBreakDirection_F2C8",
+    "new_name": "MVRS_ID2_ApplyBreakDirection_F2C8",
     "segment": "seg008",
-    "summary": "far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois)."
+    "summary": "Ex-'MVRS_ID3_ApplyBreakDirection_F2C8'. far - LUE INTEGRALEMENT. Fonction d'APPLICATION pour MVRS ID=0x3. Motif standard (reevalue le score si besoin, appelle Behavior_PushRunning_756A4, pose entite-lie+0x68=0xFF, incremente node+0x2), PUIS DECISION TACTIQUE REELLE : lit une valeur geometrique (offset lateral, echelle ±768) - si > 768 : node+0x2E=1 (vire a droite) ; si < -768 : node+0x2E=0 (vire a gauche) ; SINON (dans la zone centrale ±768) : PILE OU FACE via CRT_Rand_70D (rand()%2) pour departager ! Termine par un appel a [vtable+0xC] (le cinquieme slot, 'demarrer le suivi', confirme une nouvelle fois). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_2330B": {
     "new_name": "Mission_PlayerEventHandler",
@@ -10840,9 +10840,9 @@
     "summary": "far, appelle PlayerComponent_SubHelperE_9FE23."
   },
   "loc_11343": {
-    "new_name": "MVRS_ID11_ApplyTrivialDelegate_11343",
+    "new_name": "MVRS_ID11_ApplyEndsAtOnce_11343",
     "segment": "seg008",
-    "summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+    "summary": "Ex-'MVRS_ID11_ApplyTrivialDelegate_11343'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_8B0D5": {
     "new_name": "MissionRecordField_ReleaseViaThunk_8B0D5",
@@ -13290,9 +13290,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_87A60) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=14CB0h, codesize=4A0h, nentries=8."
   },
   "loc_4A49": {
-    "new_name": "MVRS_ID11_ScorePlaceholder_4A49",
+    "new_name": "MVRS_ID11_ScoreAlwaysZero_4A49",
     "segment": "seg002",
-    "summary": "far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente."
+    "summary": "Ex-'MVRS_ID11_ScorePlaceholder_4A49'. far, ~25 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=11 confirme via ancrage sequentiel). Retourne TOUJOURS 0 (dx force a 0 des le debut, aucune condition n'influence le resultat) - authentique emplacement vestige jamais implemente. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_526F": {
     "new_name": "Vec3_Negate",
@@ -13550,9 +13550,9 @@
     "summary": "far,152L — **lecteur de message radio** : vérifie le flag de suppression (+0x28B bit4), la probabilité via sub_CC7A, gère un cas spécial porte-avions (+0x6B==0xC) avec table de correspondance de 8 lignes alternatives pour les codes 9/0xA. Appelée dans tout le cluster IA avec des dizaines de codes différents (9,0xA,0xB,0xC,0xE,0x10,0x11...)."
   },
   "loc_11369": {
-    "new_name": "MVRS_ID12_ApplyTrivialDelegate_11369",
+    "new_name": "MVRS_ID12_ApplyEndsAtOnce_11369",
     "segment": "seg008",
-    "summary": "far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige."
+    "summary": "Ex-'MVRS_ID12_ApplyTrivialDelegate_11369'. far, 8 lignes - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (ID=12 confirme, score toujours 0 - coherent). Appelle directement [vtable+0xC] (demarre le suivi), rien d'autre. Delegation triviale pure, authentique emplacement vestige. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_1ED97": {
     "new_name": "AV_SyncInit",
@@ -15405,9 +15405,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_99120) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=27200h, codesize=526h, nentries=1."
   },
   "loc_49DA": {
-    "new_name": "MVRS_ID9_ScorePlaceholder_49DA",
+    "new_name": "MVRS_ID8_ScoreAlwaysZero_49DA",
     "segment": "seg002",
-    "summary": "far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0 - type placeholder/desactive, comme 0x15."
+    "summary": "Ex-'MVRS_ID9_ScorePlaceholder_49DA'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x9 (tag 0x200). TOUJOURS RETOURNE 0 - type placeholder/desactive, comme 0x15. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_6AE7A": {
     "new_name": "VROOMM_StubThunk_6AE7A",
@@ -17325,9 +17325,9 @@
     "summary": "far, référencée via vtable (DATA XREF seg339) — méthode de croissance dynamique du tampon interne : double la capacité (+0x61) en boucle jusqu'à couvrir la taille demandée (Memory_TypedAllocDispatchC_5C86D pour tester, Memory_TypedFreeWrapperC_5C6F3 pour réallouer, tag 5C44h), avec limite d'erreur (Runtime_FatalErrorHandlerWithTag, tag 1AE0h)."
   },
   "loc_1137E": {
-    "new_name": "MVRS_ID13_TickTrivialDelegate_1137E",
+    "new_name": "MVRS_ID12_TickEndsAtOnce_1137E",
     "segment": "seg008",
-    "summary": "far, 8 lignes - probable slot [vtable+0x10] de MVRS ID=0x13. Tout aussi triviale : appelle uniquement NotifiableRef_AttachTarget_6AB45 (motif generique) et retourne. Aucune logique de tick/minuteur contrairement a ID=6/ID=7."
+    "summary": "Ex-'MVRS_ID13_TickTrivialDelegate_1137E'. far, 8 lignes - probable slot [vtable+0x10] de MVRS ID=0x13. Tout aussi triviale : appelle uniquement NotifiableRef_AttachTarget_6AB45 (motif generique) et retourne. Aucune logique de tick/minuteur contrairement a ID=6/ID=7. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_79D88": {
     "new_name": "AI_ManeuverHelper3_79D88",
@@ -17440,9 +17440,9 @@
     "summary": "far, méthode virtuelle appelant sub_5D469, étend le résultat sur 32 bits."
   },
   "loc_113FD": {
-    "new_name": "MVRS_ID14b_TickManeuverSequence_113FD",
+    "new_name": "MVRS_ID13_TickManeuverSequence_113FD",
     "segment": "seg008",
-    "summary": "far, ~365 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] de MVRS ID=0xE. **DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE** (5 phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1 : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 : calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5), appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6). PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition."
+    "summary": "Ex-'MVRS_ID14b_TickManeuverSequence_113FD'. far, ~365 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] de MVRS ID=0xE. **DEUXIEME SEQUENCE DE MANOEUVRE MULTI-PHASES DECOUVERTE** (5 phases, distincte de celle de ID=0x6/0x7). PHASE 0 : distance a la cible comparee a dword_7202C (constante NUMS), si proche appelle AI_GuidanceCmd_FromOwnPos_75A9 (LA MEME fonction que la chaine de navigation principale, §4bis) pour pointer vers la cible. PHASE 1 : verifie une condition cible (sub_564A), sinon roule a plat (0 deg, taux 5). PHASE 2 : calcule le relevement vers la cible (dword_720B7), PUIS CALCULE UN DELAI DYNAMIQUE base sur la CAPACITE DE ROULIS PROPRE DE L'AVION ([avion+0x84]=taux de roulis, [avion+0x82]=un second parametre), borne a 60 - combien de temps CET avion specifique mettra a completer un roulis defensif - puis commande un virage (sub_7E18) suivi d'un retour a plat (sub_8104). Motif coherent avec une manoeuvre defensive de type SCISSORS ou ROLLAWAY (confirmees au repertoire des pilotes par le manuel officiel, section WILDCATS). PHASE 3 : retour a plat (rate 5), appelle systematiquement sub_632E avec [avion+0x84] (meme queue que la sequence de ID=0x6). PHASE 4 (defaut/sortie) : NotifiableRef_AttachTarget - reacquisition. | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_75446": {
     "new_name": "AircraftDamageComponentFamily_ScalarDeletingDtor_75446",
@@ -17475,9 +17475,9 @@
     "summary": "far, trace un pixel unique (arg_2=x, arg_4=y, arg_6=couleur) dans une structure de contexte graphique (bx), avec clipping contre les bornes +4/+6/+8/+0xA. Référencée depuis seg016 et seg027 — primitive de rendu 2D de base (même famille que Render_FillClippedRect_61960, seg170)."
   },
   "loc_11A04": {
-    "new_name": "MVRS_ID21_TickApplyGuidance_11A04",
+    "new_name": "MVRS_ID20_TickApplyGuidance_11A04",
     "segment": "seg008",
-    "summary": "far, ~55 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] (tick periodique) du noeud MVRS_ID21. Decompte le minuteur (node+0xD -= dword_70458), relit le vecteur stocke par MVRS_ID21_ApplyStoreNavCommand_1195A, ecrit une valeur fixe (0xA=10) dans entite+7+0x1E (statut sur le sous-objet partage). Si le minuteur est epuise : appelle NotifiableRef_AttachTarget (reacquisition). Sinon : appelle AI_GuidanceCmd_FromOwnPos_75A9 avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE GUIDAGE GEOMETRIQUE (voir §4bis)."
+    "summary": "Ex-'MVRS_ID21_TickApplyGuidance_11A04'. far, ~55 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] (tick periodique) du noeud MVRS_ID21. Decompte le minuteur (node+0xD -= dword_70458), relit le vecteur stocke par MVRS_ID20_ApplyStoreNavCommand_1195A, ecrit une valeur fixe (0xA=10) dans entite+7+0x1E (statut sur le sous-objet partage). Si le minuteur est epuise : appelle NotifiableRef_AttachTarget (reacquisition). Sinon : appelle AI_GuidanceCmd_FromOwnPos_75A9 avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE GUIDAGE GEOMETRIQUE (voir §4bis). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_5A9D0": {
     "new_name": "Widget_Helper_5A9D0",
@@ -18818,5 +18818,40 @@
     "new_name": "JDYN_UpdateDamageGains_494DD",
     "segment": "seg103",
     "summary": "far, LUE (2026-09-25). Methode +0x34 de la vtable secondaire JDYN (tag 0x228A), appelee en tete de PhysicsTicks. Remet les gains dword_72A14..72A2C a 1,0, puis pour chaque composant present dans le roster (FUEL -> 72A14, RUDDER -> 72A18, ELEVATOR -> 72A1C, AILERON -> 72A20, LWING+RWING -> 72A24 et 72A28, ENGINE -> 72A2C) : gain = (attribut B - attribut A) / attribut B (Roster_SumFoundAttributeB / A). Les gains valent 1,0 quand le composant est intact et baissent avec les dommages (DATA_MODEL.md les disait toujours a 1,0)."
+  },
+  "loc_111AE": {
+    "new_name": "MVRS_ID8_TickShadowTarget_111AE",
+    "segment": "seg008",
+    "summary": "far (label, slot +0xC de l'ID 8, tag 0x214), LU 2026-09-25. Si le noeud n'a pas de cible (+0x13) ou que son minuteur +0x0D (-= dt, 2 s poses par MVRS_SharedContextSyncAndID2Score_EC22) est ecoule : Behavior_PopFinished_75612. Sinon : point vise = position de la cible + 100 * direction normalisee de sa vitesse (dword_72053..5B) ; AI_InterceptSpeedCmd_HUD(entite, cible, dword_7201C / 2 = 900) ; AI_GuidanceCmd_FromOwnPos(entite, &point, 10). Manoeuvre complete 'se placer derriere la cible, 100 devant elle dans son axe, a 900 de distance' - jamais choisie car le score de l'ID 8 vaut toujours 0."
+  },
+  "loc_1130C": {
+    "new_name": "MVRS_ID9_TickEndsAtOnce_1130C",
+    "segment": "seg008",
+    "summary": "far (label, slot +0xC de l'ID 9). Behavior_PopFinished_75612 seulement : le comportement se termine immediatement."
+  },
+  "loc_11332": {
+    "new_name": "MVRS_ID10_TickEndsAtOnce_11332",
+    "segment": "seg008",
+    "summary": "far (label, slot +0xC de l'ID 10). Behavior_PopFinished_75612 seulement."
+  },
+  "loc_11358": {
+    "new_name": "MVRS_ID11_TickEndsAtOnce_11358",
+    "segment": "seg008",
+    "summary": "far (label, slot +0xC de l'ID 11). Behavior_PopFinished_75612 seulement."
+  },
+  "loc_4F6A": {
+    "new_name": "MVRS_ID21_ScoreAlwaysZero_4F6A",
+    "segment": "seg002",
+    "summary": "far (label, slot +4 de l'ID 21, tag 0x138), LU 2026-09-25. MVRS_SharedContextSyncAndID2Score_EC22 puis renvoie 0 : jamais choisi par le tournoi ; le noeud est appele directement via entite+0xD1."
+  },
+  "loc_11AC4": {
+    "new_name": "MVRS_ID21_ApplyAutopilotNav_11AC4",
+    "segment": "seg008",
+    "summary": "far (label, slot +8 de l'ID 21), LU 2026-09-25. Reevalue le score si besoin, s'empile comme comportement en cours (Behavior_PushRunning_756A4), remet a 0 le drapeau 'point atteint' du bloc de commandes (+0x1A), puis appelle son tick. Appele via entite+0xD1 par AI_NavSolutionToPoint, Goal_MoraleReaction_878F, Goal_SelectTransition, PartEntry_ResolveSpawnPositionAndActivate : le point et la vitesse voulue sont deja dans le bloc de commandes (+0x02, +0x0E)."
+  },
+  "loc_11B16": {
+    "new_name": "MVRS_ID21_TickAutopilotNav_11B16",
+    "segment": "seg008",
+    "summary": "far (label, slot +0xC de l'ID 21), LU 2026-09-25. NAVIGATION AU PILOTE AUTOMATIQUE PHYSIQUE. Minuteur +0x0D -= dt. Si le pilote automatique est coupe (JDYN+0x68 == 0xFF) : si |tangage du nez| < 15 (AI_Sensor_NosePitch_59A5, cmp 0F00h) -> JDYN+0x68 = 0 (active Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5) (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis Behavior_PopFinished_75612."
   }
 }

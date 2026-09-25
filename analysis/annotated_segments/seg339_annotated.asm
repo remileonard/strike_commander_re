@@ -114,14 +114,14 @@ off_6D1D4	dd loc_8142
 		dd loc_1297E
 		dd loc_129D7
 		dd VROOMM_StubThunk_6AAE4
-		dd loc_4F6A
-		dd loc_11AC4
-		dd loc_11B16
+		dd MVRS_ID21_ScoreAlwaysZero_4F6A
+		dd MVRS_ID21_ApplyAutopilotNav_11AC4
+		dd MVRS_ID21_TickAutopilotNav_11B16
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AADF
-off_6D200	dd MVRS_ID21_ScorePlaceholder_4F54
-		dd MVRS_ID21_ApplyStoreNavCommand_1195A
-		dd MVRS_ID21_TickApplyGuidance_11A04
+off_6D200	dd MVRS_ID20_ScoreAlwaysZero_4F54
+		dd MVRS_ID20_ApplyStoreNavCommand_1195A
+		dd MVRS_ID20_TickApplyGuidance_11A04
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AADA
 		dd VROOMM_StubThunk_6ABE9
@@ -129,49 +129,49 @@ off_6D200	dd MVRS_ID21_ScorePlaceholder_4F54
 		dd VROOMM_StubThunk_6ABE4
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAD5
-		dd MVRS_ID19_ScoreFuelOrResource_4ECD
-		dd MVRS_ID19_ApplyReturnToBase_118C3
+		dd MVRS_ID16_ScoreFuelOrResource_4ECD
+		dd MVRS_ID16_ApplyReturnToBase_118C3
 off_6D230	dd loc_1191D
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAD0
-		dd MVRS_ID16_ScoreThreatSensor_4E2A
-off_6D240	dd MVRS_ID16_ApplyPersistence_11809
+		dd MVRS_ID15_ScoreThreatSensor_4E2A
+off_6D240	dd MVRS_ID15_Apply_11809
 off_6D244	dd loc_1186E
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AACB
-		dd MVRS_ID15b_ScoreIntercept_4CD1
-		dd MVRS_ID15b_ApplyPersistence_11763
+		dd MVRS_ID14_ScoreIntercept_4CD1
+		dd MVRS_ID14_Apply_11763
 		dd loc_117B4
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAC6
 		dd MVRS_ID13_ScoreScissorsRollaway_4A99
-		dd MVRS_ID14b_ApplySetTimer_1138F
-		dd MVRS_ID14b_TickManeuverSequence_113FD
+		dd MVRS_ID13_ApplySetTimer_1138F
+		dd MVRS_ID13_TickManeuverSequence_113FD
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAC1
-		dd MVRS_ID12_ScorePlaceholder_4A71
-		dd MVRS_ID12_ApplyTrivialDelegate_11369
-		dd MVRS_ID13_TickTrivialDelegate_1137E
+		dd MVRS_ID12_ScoreAlwaysZero_4A71
+		dd MVRS_ID12_ApplyEndsAtOnce_11369
+		dd MVRS_ID12_TickEndsAtOnce_1137E
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AABC
-		dd MVRS_ID11_ScorePlaceholder_4A49
-off_6D290	dd MVRS_ID11_ApplyTrivialDelegate_11343
-		dd loc_11358
+		dd MVRS_ID11_ScoreAlwaysZero_4A49
+off_6D290	dd MVRS_ID11_ApplyEndsAtOnce_11343
+		dd MVRS_ID11_TickEndsAtOnce_11358
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAB7
-		dd MVRS_ID10_ScorePlaceholder_4A2A
-		dd MVRS_ID10_ApplyTrivialDelegate_1131D
-		dd loc_11332
+		dd MVRS_ID10_ScoreAlwaysZero_4A2A
+		dd MVRS_ID10_ApplyEndsAtOnce_1131D
+		dd MVRS_ID10_TickEndsAtOnce_11332
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAB2
-		dd MVRS_ID9_ScorePlaceholder_4A02
-		dd MVRS_ID9_ApplyTrivialDelegate_112F7
-		dd loc_1130C
+		dd MVRS_ID9_ScoreAlwaysZero_4A02
+		dd MVRS_ID9_ApplyEndsAtOnce_112F7
+		dd MVRS_ID9_TickEndsAtOnce_1130C
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAAD
-		dd MVRS_ID9_ScorePlaceholder_49DA
+		dd MVRS_ID8_ScoreAlwaysZero_49DA
 		dd MVRS_ID8_ApplyTrivialDelegate_1115D
-off_6D2D0	dd loc_111AE
+off_6D2D0	dd MVRS_ID8_TickShadowTarget_111AE
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AAA8
 		dd MVRS_ID7_ScoreManeuverFuelGated_47D4
@@ -185,8 +185,8 @@ off_6D2D0	dd loc_111AE
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AA9E
 		dd MVRS_ID5_ScoreSubmodeManeuver_434E
-		dd MVRS_ID6_ApplySetTimer_100B6
-		dd MVRS_ID6_TimerTickAndSubmodeSwitch_1011F
+		dd MVRS_ID5_ApplySetTimer_100B6
+		dd MVRS_ID5_TickSubmodeSwitch_1011F
 off_6D310	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D314	dd VROOMM_StubThunk_6AA99
 		dd MVRS_ID4_ScoreAngularExtended_41DD
@@ -196,11 +196,11 @@ off_6D324	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D328	dd VROOMM_StubThunk_6AA94
 off_6D32C	dd MVRS_ID3_ScoreAngularSimple_4128
 		dd MVRS_ID3_ApplyGenericTimer_F6C2
-off_6D334	dd MVRS_ID4_TrackingStateMachine_F72B
+off_6D334	dd MVRS_ID3_Tick_F72B
 off_6D338	dd MVRS_SharedDefaultTickNoOp_ED16
 off_6D33C	dd VROOMM_StubThunk_6AA8F
-off_6D340	dd MVRS_ID3_ScoreGeneric_3FCB
-		dd MVRS_ID3_ApplyBreakDirection_F2C8
+off_6D340	dd MVRS_ID2_Score_3FCB
+		dd MVRS_ID2_ApplyBreakDirection_F2C8
 		dd loc_F3B6
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd VROOMM_StubThunk_6AA8A

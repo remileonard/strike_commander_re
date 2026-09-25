@@ -82,7 +82,7 @@ et s'il n'y a vraiment aucun indice géométrique pour trancher, **il
 tire à pile ou face**. C'est un choix défensif : casser la ligne de
 mire de l'adversaire plutôt que de rester prévisible.
 
-*Réf. technique : `MVRS_ID3_ApplyBreakDirection_F2C8`.*
+*Réf. technique : `MVRS_ID2_ApplyBreakDirection_F2C8`.*
 
 ### Les instincts se parlent entre eux
 

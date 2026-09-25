@@ -416,6 +416,22 @@ attaquant (B) → comportement en cours → `GOAL` (dont 5 = moral, 2 = ordre, 4
 part. Ailier du joueur à faible `LY`/`FL` sur qui le joueur tire, sans autre ennemi : il annonce
 0x20 et attaque le joueur.
 
+## 8quater. [P2] Navigation vers un point : l'original utilise le pilote automatique physique
+
+Relu le 2026-09-25 (`AI_TICK_CALL_GRAPH.md`, « Le vrai nœud ID 21 »). `AI_NavSolutionToPoint`
+écrit le point et la vitesse voulue (direction × vitesse de croisière) dans le bloc de commandes,
+puis applique le nœud ID 21 : **nez remis à l'horizontale** (commande de tangage 0°, zone morte 5°),
+puis, dès que le tangage est sous 15°, **pilote automatique physique** jusqu'au point
+(`IMPL_SCJETPPLANE_CORRECTIONS.md` §1 : virages à 20°/s, montée/descente à 50 m/s au plus,
+plancher terrain + 250 m). Même chemin pour la fuite au moral et pour l'ailier qui a quitté le
+combat. Dans le portage, les ordres de navigation passent par `SCPilot` (manche) : une fois le mode
+pilote automatique de `SCJetpPlane` disponible, ils peuvent l'utiliser. Le combat, lui, reste aux
+commandes de manche.
+
+**Manœuvres `MVRS` 8 à 12** : rien à porter. Leurs scores valent toujours 0 et le tournoi les
+exclut ; les ID 9 à 12 sont vides. L'ID 8 contient une manœuvre complète (« se caler derrière la
+cible ») qui n'est jamais choisie : à ne pas activer si le but est la fidélité.
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
 1. `AI_GuidanceSolution_Major` (relecture) et `JDYN_HighLevelPhysicsCalc` (lecture) — §7.

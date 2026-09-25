@@ -755,21 +755,26 @@ chaque fonction de score **et** d'application a été lue intégralement.*
 | 5 | `0x250` | Sous-mode riche, fenêtre temporelle `dword_720D9`, lit `avion+0x8B` — **déclenche la séquence Immelmann/Split S à 8 phases** (`node+0x26=1` si `dword_72034` dépassé) | Minuteur `0x400`, amorce phase 1 (`loc_100B6`) |
 | 6 | `0x23C` | Garde de portée capteur (`dword_7203D+0xFA000`), sous-mode différent (`node+0x26=2`) | Minuteur `0x500` seul — les phases vivent dans le suivi `loc_10673` |
 | 7 | `0x228` | Base 1 (plancher), garde `flags_75` bit6/`TH`, pose bits `entité+0x32`, écrit position d'interception | Lit ces mêmes bits pour choisir le minuteur (`0x100`/`0x200`/`0x400` selon capteur) (`loc_10AF2`) |
-| 8 | `0x214` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale, aucun minuteur (`loc_1115D`) |
-| 9 | `0x200` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_112F7`) |
-| 10 | `0x1EC` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_1131D`) |
-| 11 | `0x1D8` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_11343`) |
-| 12 | `0x1C4` | Renvoie 0 dans le chemin de score lu — **investigation incomplète, voir note ci-dessous** | Délégation triviale pure (`loc_11369`) |
+| 8 | `0x214` | **Toujours 0** (relu 2026-09-25 : score vide, jamais choisi) | Manœuvre complète « se caler derrière la cible, 100 dans son axe, à 900 » (`MVRS_ID8_TickShadowTarget_111AE`), inaccessible |
+| 9 | `0x200` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 10 | `0x1EC` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 11 | `0x1D8` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
+| 12 | `0x1C4` | **Toujours 0** (relu 2026-09-25) | Vide : se termine aussitôt |
 | 13 | `0x1B0` | Base 1, formule riche, utilise `dword_72039` ET `dword_7202C` — **déclenche la séquence Scissors/Rollaway à 5 phases** | Minuteur `0x400`, amorce phase 1 (`loc_1138F`) |
 | 14 | `0x19C` | **Interception** — calcul trigonométrique complet (angle/distance, `imul`/`shrd`), pas juste binaire dans le principe mais le résultat final reste `0` ou `10` | `loc_11763` |
 | 15 | `0x188` | **Détection de menace** — binaire, 0 ou 10 | — |
 | 16 | `0x174` | **CORRIGÉ, lu intégralement** : `var_4` est initialisé à `0` en dur, rendant la branche de plafonnement `0x900` inatteignable — le résultat final ne dépend que d'un seul test (`TH < 12`) et la valeur retournée est en réalité **`0` ou `1`** (lecture d'un octet décalé, `[bp-3]`, pas `[bp-4]`) — **pas l'échelle continue `0x100`-`0x900` documentée précédemment** | Retour à la base (`loc_118C3`) |
 | 19 | `0x160` | **Attaque au sol** (corrigé 2026-09-25) — `GroundAttack_CanEngage_77000` : cible `entité+0x283` sinon `+0x137`, `target_type == 2`, `nœud+0x13 == 0`, arme air-sol chargée (masque `0xFC`) → `5`, sinon `0` | `GroundAttack_Start_7709A` : empile le nœud comme comportement en cours et lance la machine à phases (`GroundAttack_PhaseDispatch_77215`) ; `nœud+0x30 = 100000` est une distance sentinelle, pas un minuteur |
 | 20 | `0x14C` | **Toujours 0** — mais utilisé comme **outil géométrique partagé hors tournoi**, référencé en dur via `entité+0xC1`, consommé par `AI_ProximityGeometricWarning_315B` pour une alerte de proximité/collision, **et directement par l'application d'`ID=1`** | `loc_1195A` |
-| 21 | `0x138` | Renvoie 0 dans le chemin de score lu (juste `sub_EC22` puis retour direct) — **investigation incomplète, voir note ci-dessous ; ce nœud a par ailleurs un rôle réel et confirmé hors tournoi, voir §4bis** | `loc_11AC4` (non détaillée cette session) |
+| 21 | `0x138` | **Toujours 0** (jamais dans le tournoi) | **Navigation au pilote automatique physique** (`MVRS_ID21_ApplyAutopilotNav_11AC4`), appelée directement via `entité+0xD1` (relu 2026-09-25) |
 
 `ID=17`/`18` : invalides, la table de saut du constructeur pointe les
 deux vers le cas par défaut (aucun nœud construit).
+
+> **Relu le 2026-09-25** : les identifiants 8 à 12 ont été retracés en entier (scores, applications,
+> ticks, tous les chemins d'accès). Résultat et table des méthodes vérifiée : `AI_TICK_CALL_GRAPH.md`,
+> « Les identifiants `MVRS` 8 à 12 ». En bref : scores toujours nuls (le tournoi les exclut),
+> ID 9 à 12 vides, ID 8 = manœuvre « se caler derrière la cible » complète mais inaccessible.
 
 **Sur les identifiants `8,9,10,11,12` (correction — voir note
 méthodologique ci-dessous)** : dans le seul chemin lu jusqu'ici, chacun
