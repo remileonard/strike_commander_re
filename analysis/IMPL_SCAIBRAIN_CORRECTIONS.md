@@ -302,6 +302,25 @@ Le taux de roulis **actuel n'entre pas** dans le calcul : l'original calcule bie
 relu). À reproduire tel quel pour la fidélité. La commande de tangage (`AI_PitchController_7B20`)
 n'utilise **pas** cette fonction.
 
+**Conséquences pour l'IA (2026-09-25)** :
+- La conversion de l'IA est l'**inverse exact** de la loi de roulis de l'avion : l'IA calcule un
+  taux voulu `w`, envoie `w / maxRollRate()` au manche, et l'avion rend `manche × maxRollRate()`.
+  `rollStickFromError` doit donc appeler **la même** `maxRollRate()` que `SCJetpPlane`
+  (`IMPL_SCJETPPLANE_CORRECTIONS.md` §8bis), sinon l'IA dépasse ou n'atteint pas ses angles.
+  Le gain de dégâts aileron n'entre que côté avion : avec un aileron touché, l'IA roule moins vite
+  qu'elle ne le demande (effet voulu de l'original).
+- F-16 à 25 images/s (dt = 0,04 s, `A·dt` = 21,6 °/s) : écart 2° → 30 °/s (manche 0,11) ; 10° →
+  85 °/s (0,31) ; manche à fond au-delà de ~78°. Utiliser le vrai `dt` du tick.
+- Sous 50 m/s ou au-delà de 25° d'angle d'écoulement, le roulis est réduit : comme
+  `combatDecision` ne tire qu'une fois l'inclinaison atteinte, l'IA **attend plus longtemps avant
+  de tirer** — autolimitation naturelle près du décrochage.
+- Autorité au manche `9·max(compétence, 8)/G` sur 16 : en fraction de la butée,
+  `0,5625·max(compétence, 8)/G`. Si la loi de charge est proportionnelle au manche (butée =
+  `JDYN` n°22 = G max, `PHYSICS.md` §5.7), le **facteur de charge maximal de l'IA vaut
+  `0,5625 × max(compétence, 8)` G quel que soit l'avion** (4,5 G à 8, 9 G à 16), borné par le G max.
+- `K/270` (`JDYN+0x71`/270) vaut 1 pour le F-16 : un avion qui roule moins vite tire aussi moins
+  fort pour le même écart.
+
 **`JDYN+0x59` (champ n°17) = vitesse d'efficacité des gouvernes, confirmé** : 50 m/s pour le F-16
 (`F-16DES.IFF`). Il est comparé à la vitesse (`mov eax, [si+59h] / cmp eax, [bp+var_4]`) et, dans
 `Aero_ApplyGroundEffect`, à la vitesse air sur l'axe du nez ; ce n'est pas un plafond d'effet de
