@@ -44,7 +44,7 @@ On note `hd` la distance horizontale au point visé, et `a` l'angle horizontal e
 - sinon, en phase 1, si `a > 169°` et que l'avion est **plus de 2000 m au-dessus du point visé** → piqué à **−40°**. Les piqués de plus de 15° se font sur le dos, en tirant (`AI_PitchController_7B20`).
 
 **Phases 2 et 3, le pilote automatique physique :**
-- `PhysicsTicks` appelle `Guidance_HomingVelocityUpdate` et **saute toute l'aérodynamique** : pas de forces, pas de moments, pas d'intégration.
+- `PhysicsTicks` appelle `Autopilot_FlyToPointKinematic_49C2E` et **saute toute l'aérodynamique** : pas de forces, pas de moments, pas d'intégration.
 - L'orientation du nez et la vitesse sont **écrites directement** : l'avion devient un objet cinématique qui file vers le point visé, **sans zone morte**.
 - Si la cible est mobile, le point visé est recalculé à chaque tick.
 - Si l'avion passe le point sans tirer, le pilote automatique pose un drapeau, et la phase 3 repart en phase 0 pour une nouvelle passe.
@@ -105,9 +105,52 @@ Les commandes bas niveau de l'IA ne commandent **pas un cap** :
 
 Le virage vers une direction passe par `AI_GuidanceCmd_FromOwnPos` → `AI_GuidanceSolution_Major`. Cette dernière est **à relire** : sa lecture est antérieure à la découverte de l'inversion des noms sinus / cosinus.
 
-## 5. Questions ouvertes
+## 5. La loi du pilote automatique (`Autopilot_FlyToPointKinematic_49C2E`, relue intégralement)
+
+Ex-`Guidance_HomingVelocityUpdate`. Elle est appelée par `PhysicsTicks` à la place de toute l'aérodynamique : pas de forces, pas de moments. Elle reçoit le bloc de commandes : `P` est le point visé, et `W` la **vitesse voulue**, de norme **100 m/s** telle que la phase 2 l'écrit.
+
+**Constantes** : virage à **20°/s**, accélération **25 m/s²**, vitesse verticale max **50 m/s**, plancher **terrain + 250 m**, pas `dtc = max(dt, 0,2 s)`.
+
+**1. Cap : arrivée sur `P` avec le cap de `W`, par cercles de virage.**
+- `R = |W| × 180 / (20 × π)` : le rayon de virage à 20°/s (≈ 286 m à 100 m/s).
+- Deux centres de part et d'autre de `P`, perpendiculairement à `W` : `C1,2 = P ± perp(W) × (R − |W| × dt)`.
+- Au premier tick, le pilote automatique choisit un des deux cercles et le mémorise dans `JDYN+0x68` : 1 pour `C2`, 2 pour `C1`. Il prend `C2` si ce centre est le plus proche et que l'avion est hors de ce cercle, ou si l'avion est à l'intérieur du cercle `C1`.
+- **Dans le cercle** : écart 0, l'avion va tout droit pour en sortir.
+- **Sur le bord** (distance au centre < `R + |W| × dt`) : il vise le cap de `W`, en tournant dans le sens du cercle.
+- **Sinon** : il vise la **tangente au cercle**, `cap(centre − moi) ± asin(R / distance)`.
+- Écart = cap visé − cap du nez (ramené à ±180°), **borné à ±20°/s × dt**. Le nez tourne horizontalement de cet angle (`Vector_RotateHeading2D_556D4`).
+- **Roulis** (`Autopilot_BankForTurn_49A7C`) : ±10° du côté du virage si l'écart dépasse 10°, sinon 0°, atteint à la vitesse `JDYN[+0x71] × dt`. C'est essentiellement visuel.
+
+En pratique, pour l'attaque au sol, `W` pointe de l'avion vers `P` au moment de la phase 2, et l'avion est déjà aligné : il va quasiment en ligne droite.
+
+**2. Altitude.**
+- Si `P` est sous le plancher (terrain sous l'avion + 250 m) : on vise le plancher si l'avion est lui-même dessous, sinon on garde son altitude actuelle.
+- `vz = dz` si `|dz| < 50`, sinon `±50 m/s`, avec `dz = altitude visée − altitude de l'avion`.
+
+**3. Vitesse.**
+- La vitesse horizontale rejoint `|W|` (100 m/s) à 25 m/s².
+- **La vitesse est écrite directement** : direction horizontale du nez × vitesse horizontale, plus `vz`.
+
+**4. Tangage du nez** (`Autopilot_NosePitchRelax_498B5`). Soit `e = élévation(vitesse) − élévation(nez)`. Le nez est ramené **vers l'horizontale** d'une fraction `min(1, 5°/s × dt / |e|)`. Littéralement, il n'est pas aligné sur la vitesse.
+
+**5. Drapeau « point atteint »** (bloc `+0x1A`) : il est posé quand `|cap(W) − cap du nez| < 5°` **et** que la distance à `P` est inférieure à `20 × |W| × dtc`, soit **400 m au moins** à 100 m/s. C'est lui qui renvoie la phase 3 en phase 0.
+
+**6. Position.** Ni `PhysicsTicks` ni le pilote automatique ne l'intègrent. C'est la méthode `+0x14` de l'avion (`loc_3E115` → `WorldObject_IntegrateBodyMotion_3D31D`) qui fait `position += vitesse × dt`, avec le pas `dword_7045E`, et **dans les deux modes**.
+
+**Transposé à libRealSpace** (Y-up : cap = `atan2(x, z)`, altitude = `y`), en phases 2 et 3 :
+```
+cible_cap = cap de W (ou tangente au cercle si l'avion n'est pas aligné)
+cap      += clamp(cible_cap − cap, ±20°·dt)
+vh        = approche(vh, 100, 25·dt)
+vy        = clamp(alt_visée − y, ±50)       (alt_visée ≥ terrain + 250)
+vitesse   = (sin(cap)·vh, vy, cos(cap)·vh)
+position += vitesse · dt
+nez       : cap imposé, tangage ramené vers 0 à 5°/s, roulis ±10° en virage
+```
+À 100 m/s depuis 1000 m au-dessus de la cible, une bombe tombe en environ 14 s et parcourt environ 1400 m : le largage a lieu bien avant le drapeau « point atteint » (400 m).
+
+## 6. Questions ouvertes
 
 - **`BombModel_PredictImpact_41311`** (point d'impact des bombes) : la formule balistique est lue, mais la hauteur utilisée vaut, d'après l'appelant, l'altitude de la cible et non la hauteur de chute. Non tranché : ne pas porter cette formule tant que ce n'est pas clarifié. Le portage peut garder sa propre simulation de trajectoire.
-- Loi exacte du pilote automatique (`Guidance_HomingVelocityUpdate`) : taux de virage maximum, rampe de vitesse, suivi du relief. On ne sait pas non plus où la position est intégrée dans ce mode.
 - Test de verrouillage de l'AGM-65D (fonction pas encore nommée, `loc_42F71`).
 - Champ `+0x13` du nœud d'attaque, qui peut bloquer l'engagement.

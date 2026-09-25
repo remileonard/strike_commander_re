@@ -788,7 +788,7 @@ loc_45971:				; CODE XREF: seg097:05D2j
 		lea	ax, [bp-3Ch]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		push	1
 		lea	ax, [bp-30h]

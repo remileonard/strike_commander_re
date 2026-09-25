@@ -69,7 +69,7 @@ Math_FixedMulDiv_5804C	endp
 ; sin(0) = table[360] = 0.
 ; ==============================================================================================
 Math_SinRaw_58063	proc far		; CODE XREF: seg020:0A10P
-					; Camera_ComputeMountedPosition_3D31D+192P ...
+					; WorldObject_IntegrateBodyMotion_3D31D+192P ...
 
 arg_0		= dword	ptr  6
 
@@ -133,7 +133,7 @@ Math_SinRaw_58063	endp
 ; |angle|) : cos(0) = 1, cos(180) = -1.
 ; ==============================================================================================
 Math_CosRaw_580A7	proc far		; CODE XREF: seg020:0A24P
-					; Camera_ComputeMountedPosition_3D31D+1A6P ...
+					; WorldObject_IntegrateBodyMotion_3D31D+1A6P ...
 
 arg_0		= dword	ptr  6
 

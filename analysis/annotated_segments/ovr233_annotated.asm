@@ -985,7 +985,7 @@ loc_7A682:
 		push	ax
 		lea	ax, [bp+var_A4]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 
 loc_7A6B1:				; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A673j

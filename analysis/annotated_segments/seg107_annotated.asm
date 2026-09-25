@@ -1841,7 +1841,7 @@ loc_4E758:				; DATA XREF: seg339:off_7026Ao
 		lea	ax, [bp-14h]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		mov	di, si
 		add	di, 38h	; '8'

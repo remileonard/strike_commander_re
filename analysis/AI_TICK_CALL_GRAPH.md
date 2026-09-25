@@ -778,7 +778,7 @@ Toutes les distances et altitudes sont en mètres, et le point visé est toujour
 **Phase 2, passage au pilote automatique** (`GroundAttack_Phase2_EngageAutopilot_775B1`, un seul tick) :
 - écrit le point visé (bloc de commandes `+0x02..+0x0A`) et `direction normalisée × 100` (`+0x0E..+0x16`) ;
 - remet `+0x1A` à 0 ;
-- `JDYN+0x68 = 0` : c'est désormais `Guidance_HomingVelocityUpdate` qui pilote l'avion vers ce point, en cinématique (direction et vitesse imposées) ;
+- `JDYN+0x68 = 0` : c'est désormais `Autopilot_FlyToPointKinematic_49C2E` qui pilote l'avion vers ce point, en cinématique (direction et vitesse imposées) ;
 - passe en phase 3.
 
 **Phase 3, choix de l'arme et largage** (`GroundAttack_Phase3_WeaponRelease_776FB`) :
@@ -799,7 +799,7 @@ Toutes les distances et altitudes sont en mètres, et le point visé est toujour
   - **AGM-65D / GBU-15** : tir quand la méthode `+0x14` du modèle d'arme réussit. Pour la GBU-15, c'est `BombModel_TestGuidedLockCone_41735`. Pour l'AGM-65D (`MISS`, fonction pas encore nommée `loc_42F71`), la méthode **n'est pas lue**.
   - **LAU-3** : tir quand le minuteur de 3 s est écoulé.
   - **Bombes** : `I` = impact prédit (`BombModel_PredictImpact_41311`), `raté` = distance **horizontale** entre `I` et la cible. On tire si `raté ≤ 20 + |ma vitesse| × dt + (150 si (rand & 15) > AG)`.
-- **Nouvelle passe** : sans tir, si `Guidance_HomingVelocityUpdate` a posé `bloc+0x1A`, retour en **phase 0**. Ce drapeau est posé quand un écart d'angle (non identifié précisément) est inférieur à 5° et que la distance au point est inférieure à environ 20 pas de déplacement.
+- **Nouvelle passe** : sans tir, si `Autopilot_FlyToPointKinematic_49C2E` a posé `bloc+0x1A`, retour en **phase 0**. Ce drapeau est posé quand l'écart entre le cap de `W` (vitesse voulue) et le cap du nez est inférieur à 5°, et que la distance au point est inférieure à `20 × |W| × max(dt, 0,2)`, soit au moins 400 m à 100 m/s. La loi complète du pilote automatique est dans `NOTE_ATTAQUE_SOL.md`, §5.
 
 **Phase 4, dégagement** (`GroundAttack_Phase4_PullUp_77171`) :
 - mémorise l'arme larguée ;

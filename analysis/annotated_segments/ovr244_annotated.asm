@@ -1679,8 +1679,8 @@ HUDSymbol_ConstructWithMatrix_839CA	endp
 ; ==============================================================================================
 ; ⚠️ far, 140 lignes, NON DÉTAILLÉE — combine longueur vectorielle,
 ; UI_ApplyLineOfSightAndTransform_57DAE, Camera_ComputeViewMatrix,
-; Missile_ComputeDirectionVector2D_556D4 (×2, seg116) — probable affichage d'un vecteur de
-; direction de missile sur le HUD.
+; Vector_RotateHeading2D_556D4 (×2, seg116) — probable affichage d'un vecteur de direction de
+; missile sur le HUD.
 ; ==============================================================================================
 HUDSymbol_RenderMissileDirection_83A42	proc far		; CODE XREF: VROOMM_StubThunk_6AFFBJ
 
@@ -1780,7 +1780,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 20h	; ' '
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, [si+8Bh]
 		mov	[bp+var_8], ax
@@ -1792,7 +1792,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 2Ch	; ','
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, [si+8Bh]
 		mov	[bp+var_E], ax
@@ -1804,7 +1804,7 @@ loc_83AF0:				; CODE XREF: HUDSymbol_RenderMissileDirection_83A42+12j
 		mov	ax, si
 		add	ax, 38h	; '8'
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	ax, si
 		add	ax, 20h	; ' '

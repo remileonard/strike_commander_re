@@ -32,7 +32,7 @@ Deux fonctions ont été mal caractérisées dans une session précédente sur l
 lecture ligne à ligne, corrigée depuis :
 - **`sub_3314`** : `Flight_PhysicsTick_JDYN` → **`Targeting_AcquireBestThreat`**
   (sélecteur de cible/menace générique, pas un tick physique)
-- **`sub_49C2E`** : `JDYN_PhysicsTickMain` → **`Guidance_HomingVelocityUpdate`**
+- **`sub_49C2E`** : `JDYN_PhysicsTickMain` → **`Autopilot_FlyToPointKinematic_49C2E`**
   (moteur de pilotage automatique/homing cinématique — écrit directement cap et vitesse
   sur l'objet, pas un intégrateur physique par force/masse)
 
@@ -448,7 +448,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
 29. **Cœur complet du moteur physique de vol JDYN** (seg101-103) — *voir la
     section « Physique de l'avion — RÉSOLUE » en tête de fichier et
     `DATA_MODEL.md` §6.2 pour l'analyse à jour.* Tick = **`PhysicsTicks`**
-    (seg103, ~0x4A85B), PAS `Guidance_HomingVelocityUpdate_49C2E` (ex-mal-nommé
+    (seg103, ~0x4A85B), PAS `Autopilot_FlyToPointKinematic_49C2E_49C2E` (ex-mal-nommé
     `JDYN_PhysicsTickMain`, qui est le pilote automatique/homing). Bilan de
     forces en repère corps : poussée sur l'axe nez, **portance explicite**
     (`Aero_ComputeLiftAndSideForce`, `L = k·α_eff·q`), traînée
@@ -1070,7 +1070,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Effect_SpawnPeriodicAtAttach_43936` | 312 | seg092 | Génération probabiliste d'effet visuel |
 | `WeaponStation_ResolveStateA_40A33` | 397 | seg088 | Résolution de l'état des stations d'armement |
 | `Targeting_SelectAndPrioritize_43107` | 327 | seg091 | Sélecteur/verrouilleur de cible principal |
-| `JDYN_PhysicsTickMain_49C2E` | 1422 | seg103 | **⚠️ RENOMMÉE `Guidance_HomingVelocityUpdate` — voir CLAUDE.md, ce n'est pas un tick physique, lecture complète effectuée** |
+| `JDYN_PhysicsTickMain_49C2E` | 1422 | seg103 | **⚠️ RENOMMÉE `Autopilot_FlyToPointKinematic_49C2E` — voir CLAUDE.md, ce n'est pas un tick physique, lecture complète effectuée** |
 | `PhysicsTicks` | ~350 | seg103 (~0x4A85B) | **★ LU — LE tick de la dynamique avion (classe `JDYN`). Détection sol, reset caches aéro, manette gaz→poussée→`[si+0x28]`, conso carburant + flameout, volets/aérofrein/train, autopilote si `[si+0x68]≠0xFF`, sinon `Aero_SumLinearForces` (forces linéaires, repère corps) + `Aero_ControlOrchestrator` (moments) + intégrations. Détail : DATA_MODEL.md §6.2.** |
 | `Aero_ComputeForcesMain_4791E` | 649 | seg102 | **LU — solveur d'asservissement d'attitude : `moment = ±2·√(q'·err)` rate-limité, nul si err ≥ 56° (décrochage de contrôle)** |
 | `Aero_ComputeLiftAndSideForce_4812B` | 333 | seg103 | **LU — ex-`DetectControlSaturation` (nom trompeur) : GÉNÉRATEUR DE PORTANCE + force latérale. `L = jdyn[0x61]·k·α_eff·q·n̂(0,−v.c2,v.c1)`. `flags_75` bit6 = effet de bord (alerte départ)** |

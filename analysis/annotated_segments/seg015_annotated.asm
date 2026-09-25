@@ -453,7 +453,7 @@ Cockpit_LoadBettyPack	endp
 ; Input_ReadMouseAndAxes_7AAF0 / Input_ReadJoystick* -> pan joueur via
 ; AIManeuver_BuildRotationAndLookup_7A800 ; (9) Cockpit_ViewPanTransitionMain_15B67. NB :
 ; remplace le modèle 'corps rigide debris' des passes 2026-09-06
-; (Camera_ComputeMountedPosition_3D31D seg085) qui concerne une AUTRE caméra
+; (WorldObject_IntegrateBodyMotion_3D31D seg085) qui concerne une AUTRE caméra
 ; (arme/cinématique), pas la chase F2. Détail : DATA_MODEL.md §6.6b-ter.
 ; ==============================================================================================
 Camera_ExternalViewComputeMain_1519E:				; DATA XREF: seg339:0770o

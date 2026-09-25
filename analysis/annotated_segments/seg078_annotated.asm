@@ -174,12 +174,12 @@ locret_37D53:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,44L — accumule 3 vecteurs de force (+0x12/0x16/0x1A), applique un couple additionnel si
-; sous-composant présent (sub_37E4A), notifie l'objet (vtable[8]) : intégration des forces
-; appliquées sur un débris (physique de corps rigide détaché).
+; far, 44L, LUE (2026-09-25). Ex-'WorldObject_TranslateBy_37D54' (FAUX : pas des forces).
+; (objet, &dx, &dy, &dz) : position objet+0x12/+0x16/+0x1A += (dx, dy, dz) ; puis
+; Debris_ComputeTorque si +0x24 et notification (vtable+8).
 ; ==============================================================================================
-Debris_BodyIntegrateForces	proc far		; CODE XREF: seg085:02D2P
-					; Camera_ComputeMountedPosition_3D31D+B6P ...
+WorldObject_TranslateBy_37D54	proc far		; CODE XREF: seg085:02D2P
+					; WorldObject_IntegrateBodyMotion_3D31D+B6P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -212,7 +212,7 @@ loc_37D73:
 		call	near ptr Debris_ComputeTorque
 		pop	cx
 
-loc_37D89:				; CODE XREF: Debris_BodyIntegrateForces+2Aj
+loc_37D89:				; CODE XREF: WorldObject_TranslateBy_37D54+2Aj
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+8]
@@ -221,7 +221,7 @@ loc_37D89:				; CODE XREF: Debris_BodyIntegrateForces+2Aj
 		pop	si
 		pop	bp
 		retf
-Debris_BodyIntegrateForces	endp
+WorldObject_TranslateBy_37D54	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -363,7 +363,7 @@ loc_37E48:
 ; (sub_22CC6, produit vectoriel position×force) : calcul de couple (moment de force) pour la
 ; rotation d'un débris.
 ; ==============================================================================================
-Debris_ComputeTorque	proc far		; CODE XREF: Debris_BodyIntegrateForces+31p
+Debris_ComputeTorque	proc far		; CODE XREF: WorldObject_TranslateBy_37D54+31p
 					; Debris_ComputeTorque+55p ...
 
 var_C		= dword	ptr -0Ch

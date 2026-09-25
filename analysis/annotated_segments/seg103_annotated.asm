@@ -2749,7 +2749,15 @@ locret_494DC:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_494DD:				; DATA XREF: seg339:22BEo
+; ==============================================================================================
+; far, LUE (2026-09-25). Methode +0x34 de la vtable secondaire JDYN (tag 0x228A), appelee en
+; tete de PhysicsTicks. Remet les gains dword_72A14..72A2C a 1,0, puis pour chaque composant
+; present dans le roster (FUEL -> 72A14, RUDDER -> 72A18, ELEVATOR -> 72A1C, AILERON -> 72A20,
+; LWING+RWING -> 72A24 et 72A28, ENGINE -> 72A2C) : gain = (attribut B - attribut A) /
+; attribut B (Roster_SumFoundAttributeB / A). Les gains valent 1,0 quand le composant est
+; intact et baissent avec les dommages (DATA_MODEL.md les disait toujours a 1,0).
+; ==============================================================================================
+JDYN_UpdateDamageGains_494DD:				; DATA XREF: seg339:22BEo
 		push	bp
 		mov	bp, sp
 		sub	sp, 14h
@@ -3111,16 +3119,13 @@ loc_498B0:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,214L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN
-; principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée
-; sub_49C2E, corrigée en session antérieure : c'est un moteur cinématique de poursuite/homing
-; IA, appelé depuis PhysicsTicks UNIQUEMENT quand [si+0x68]!=0xFF, c.a.d. en mode
-; autopilote/IA, pas en vol manuel). Appelle Matrix_OrthonormalizeKeepRow1_57660 /
-; Matrix_BuildAxisY_570C5 (cluster de composition de rotation confirmé ailleurs) avec une
-; constante de référence 0x500 : sous-calcul angulaire du guidage IA (probable calcul de
-; portance/orientation cible), rôle exact toujours à détailler.
+; far, LUE (2026-09-25). Ex-'Autopilot_NosePitchRelax_498B5'. (JDYN, matrice, vitesse). e =
+; Math_ElevationAngle_552E1(vitesse) - Math_ElevationAngle_552E1(nez) ; e == 0 -> rien. f =
+; min(1, 5 deg/s * dt / |e|) (toujours positif) ; nez += (nez horizontal normalise - nez) * f
+; ; normalisation, Matrix_OrthonormalizeKeepRow1_57660. Litteralement : ramene le nez VERS
+; L'HORIZONTALE (pas vers la vitesse) d'une fraction f, d'un coup si |e| < le pas.
 ; ==============================================================================================
-JDYN_TickSubcalcA	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+B2Fp
+Autopilot_NosePitchRelax_498B5	proc far		; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+B2Fp
 
 var_5C		= dword	ptr -5Ch
 var_58		= dword	ptr -58h
@@ -3190,7 +3195,7 @@ loc_498D3:
 		jmp	loc_49A78
 ; ���������������������������������������������������������������������������
 
-loc_49908:				; CODE XREF: JDYN_TickSubcalcA+4Ej
+loc_49908:				; CODE XREF: Autopilot_NosePitchRelax_498B5+4Ej
 		mov	eax, [bp+var_4]
 		mov	edx, dword_70458
 		imul	edx
@@ -3203,7 +3208,7 @@ loc_49908:				; CODE XREF: JDYN_TickSubcalcA+4Ej
 		jge	short loc_49931
 		neg	eax
 
-loc_49931:				; CODE XREF: JDYN_TickSubcalcA+77j
+loc_49931:				; CODE XREF: Autopilot_NosePitchRelax_498B5+77j
 		mov	[bp+var_20], eax
 		mov	eax, [bp+var_20]
 		mov	[bp+var_24], eax
@@ -3213,27 +3218,27 @@ loc_49931:				; CODE XREF: JDYN_TickSubcalcA+77j
 		jmp	short loc_4994A
 ; ���������������������������������������������������������������������������
 
-loc_49948:				; CODE XREF: JDYN_TickSubcalcA+8Cj
+loc_49948:				; CODE XREF: Autopilot_NosePitchRelax_498B5+8Cj
 		xor	ax, ax
 
-loc_4994A:				; CODE XREF: JDYN_TickSubcalcA+91j
+loc_4994A:				; CODE XREF: Autopilot_NosePitchRelax_498B5+91j
 		or	al, al
 		jz	short loc_49954
 		mov	eax, [bp+var_10]
 		jmp	short loc_49975
 ; ���������������������������������������������������������������������������
 
-loc_49954:				; CODE XREF: JDYN_TickSubcalcA+97j
+loc_49954:				; CODE XREF: Autopilot_NosePitchRelax_498B5+97j
 		cmp	[bp+var_10], 0
 		jge	short loc_49960
 		mov	ax, 1
 		jmp	short loc_49962
 ; ���������������������������������������������������������������������������
 
-loc_49960:				; CODE XREF: JDYN_TickSubcalcA+A4j
+loc_49960:				; CODE XREF: Autopilot_NosePitchRelax_498B5+A4j
 		xor	ax, ax
 
-loc_49962:				; CODE XREF: JDYN_TickSubcalcA+A9j
+loc_49962:				; CODE XREF: Autopilot_NosePitchRelax_498B5+A9j
 		or	al, al
 		jz	short loc_49979
 		mov	eax, [bp+var_18]
@@ -3241,10 +3246,10 @@ loc_49962:				; CODE XREF: JDYN_TickSubcalcA+A9j
 		mov	[bp+var_28], eax
 		mov	[bp+var_2C], eax
 
-loc_49975:				; CODE XREF: JDYN_TickSubcalcA+9Dj
+loc_49975:				; CODE XREF: Autopilot_NosePitchRelax_498B5+9Dj
 		mov	[bp+var_18], eax
 
-loc_49979:				; CODE XREF: JDYN_TickSubcalcA+AFj
+loc_49979:				; CODE XREF: Autopilot_NosePitchRelax_498B5+AFj
 		mov	eax, [bp+var_18]
 		mov	edx, eax
 		mov	ecx, [bp+var_10]
@@ -3328,12 +3333,12 @@ loc_499E1:
 		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
-loc_49A78:				; CODE XREF: JDYN_TickSubcalcA+50j
+loc_49A78:				; CODE XREF: Autopilot_NosePitchRelax_498B5+50j
 		pop	di
 		pop	si
 		leave
 		retf
-JDYN_TickSubcalcA	endp
+Autopilot_NosePitchRelax_498B5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3341,14 +3346,13 @@ JDYN_TickSubcalcA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,259L — appelée depuis Guidance_HomingVelocityUpdate (sub_49C2E, PAS le tick JDYN
-; principal malgré ce que ce résumé affirmait avant correction du 2026-09-05 - cf. l'entrée
-; sub_49C2E, corrigée en session antérieure). Utilise Matrix_RollAngle_57C67 (sin/cos) avec
-; constante 0xA00, puis Matrix_BuildAxisY_570C5/Matrix_OrthonormalizeKeepRow1_57660 : sous-
-; calcul angulaire du guidage IA (probable orientation de référence/cap cible), rôle exact
-; toujours à détailler.
+; far, LUE (2026-09-25). Ex-'Autopilot_BankForTurn_49A7C'. (JDYN, matrice, &ecart de cap).
+; Roulis vise T = 0 si |ecart| < 10 deg, sinon +/-10 deg du cote de l'ecart ; r =
+; Matrix_RollAngle_57C67 ; delta = T - r borne a +/- JDYN[+0x71] * dt ; rotation autour du nez
+; (Matrix_BuildAxisY_570C5) puis Matrix_OrthonormalizeKeepRow1_57660. Inclinaison
+; essentiellement visuelle pendant le virage du pilote automatique.
 ; ==============================================================================================
-JDYN_TickSubcalcB	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+8B1p
+Autopilot_BankForTurn_49A7C	proc far		; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+8B1p
 
 var_54		= dword	ptr -54h
 var_50		= dword	ptr -50h
@@ -3403,7 +3407,7 @@ loc_49A9F:
 		jge	short loc_49AC0
 		neg	eax
 
-loc_49AC0:				; CODE XREF: JDYN_TickSubcalcB+3Fj
+loc_49AC0:				; CODE XREF: Autopilot_BankForTurn_49A7C+3Fj
 		mov	[bp+var_14], eax
 		mov	eax, [bp+var_14]
 		mov	[bp+var_18], eax
@@ -3417,10 +3421,10 @@ loc_49AD6:
 		jmp	short loc_49ADD
 ; ���������������������������������������������������������������������������
 
-loc_49ADB:				; CODE XREF: JDYN_TickSubcalcB+58j
+loc_49ADB:				; CODE XREF: Autopilot_BankForTurn_49A7C+58j
 		xor	ax, ax
 
-loc_49ADD:				; CODE XREF: JDYN_TickSubcalcB+5Dj
+loc_49ADD:				; CODE XREF: Autopilot_BankForTurn_49A7C+5Dj
 		or	al, al
 		jz	short loc_49AF0
 		mov	[bp+var_1C], 0
@@ -3428,7 +3432,7 @@ loc_49ADD:				; CODE XREF: JDYN_TickSubcalcB+5Dj
 		jmp	loc_49B83
 ; ���������������������������������������������������������������������������
 
-loc_49AF0:				; CODE XREF: JDYN_TickSubcalcB+63j
+loc_49AF0:				; CODE XREF: Autopilot_BankForTurn_49A7C+63j
 		mov	eax, [di]
 		cmp	eax, [bp+var_4]
 		jle	short loc_49AFE
@@ -3436,17 +3440,17 @@ loc_49AF0:				; CODE XREF: JDYN_TickSubcalcB+63j
 		jmp	short loc_49B00
 ; ���������������������������������������������������������������������������
 
-loc_49AFE:				; CODE XREF: JDYN_TickSubcalcB+7Bj
+loc_49AFE:				; CODE XREF: Autopilot_BankForTurn_49A7C+7Bj
 		xor	ax, ax
 
-loc_49B00:				; CODE XREF: JDYN_TickSubcalcB+80j
+loc_49B00:				; CODE XREF: Autopilot_BankForTurn_49A7C+80j
 		or	al, al
 		jz	short loc_49B0A
 		mov	eax, [bp+var_4]
 		jmp	short loc_49B83
 ; ���������������������������������������������������������������������������
 
-loc_49B0A:				; CODE XREF: JDYN_TickSubcalcB+86j
+loc_49B0A:				; CODE XREF: Autopilot_BankForTurn_49A7C+86j
 		mov	eax, [bp+var_4]
 		neg	eax
 		mov	[bp+var_20], eax
@@ -3458,10 +3462,10 @@ loc_49B0A:				; CODE XREF: JDYN_TickSubcalcB+86j
 		jmp	short loc_49B29
 ; ���������������������������������������������������������������������������
 
-loc_49B27:				; CODE XREF: JDYN_TickSubcalcB+A4j
+loc_49B27:				; CODE XREF: Autopilot_BankForTurn_49A7C+A4j
 		xor	ax, ax
 
-loc_49B29:				; CODE XREF: JDYN_TickSubcalcB+A9j
+loc_49B29:				; CODE XREF: Autopilot_BankForTurn_49A7C+A9j
 		or	al, al
 		jz	short loc_49B3E
 		mov	eax, [bp+var_4]
@@ -3471,17 +3475,17 @@ loc_49B29:				; CODE XREF: JDYN_TickSubcalcB+A9j
 		jmp	short loc_49B83
 ; ���������������������������������������������������������������������������
 
-loc_49B3E:				; CODE XREF: JDYN_TickSubcalcB+AFj
+loc_49B3E:				; CODE XREF: Autopilot_BankForTurn_49A7C+AFj
 		cmp	dword ptr [di],	0A00h
 		jle	short loc_49B4C
 		mov	ax, 1
 		jmp	short loc_49B4E
 ; ���������������������������������������������������������������������������
 
-loc_49B4C:				; CODE XREF: JDYN_TickSubcalcB+C9j
+loc_49B4C:				; CODE XREF: Autopilot_BankForTurn_49A7C+C9j
 		xor	ax, ax
 
-loc_49B4E:				; CODE XREF: JDYN_TickSubcalcB+CEj
+loc_49B4E:				; CODE XREF: Autopilot_BankForTurn_49A7C+CEj
 		or	al, al
 		jz	short loc_49B65
 		mov	eax, [di]
@@ -3491,27 +3495,27 @@ loc_49B4E:				; CODE XREF: JDYN_TickSubcalcB+CEj
 		jmp	short loc_49B83
 ; ���������������������������������������������������������������������������
 
-loc_49B65:				; CODE XREF: JDYN_TickSubcalcB+D4j
+loc_49B65:				; CODE XREF: Autopilot_BankForTurn_49A7C+D4j
 		cmp	dword ptr [di],	0FFFFF600h
 		jge	short loc_49B73
 		mov	ax, 1
 		jmp	short loc_49B75
 ; ���������������������������������������������������������������������������
 
-loc_49B73:				; CODE XREF: JDYN_TickSubcalcB+F0j
+loc_49B73:				; CODE XREF: Autopilot_BankForTurn_49A7C+F0j
 		xor	ax, ax
 
-loc_49B75:				; CODE XREF: JDYN_TickSubcalcB+F5j
+loc_49B75:				; CODE XREF: Autopilot_BankForTurn_49A7C+F5j
 		or	al, al
 		jz	short loc_49B87
 		add	dword ptr [di],	0A00h
 		mov	eax, [di]
 
-loc_49B83:				; CODE XREF: JDYN_TickSubcalcB+71j
-					; JDYN_TickSubcalcB+8Cj ...
+loc_49B83:				; CODE XREF: Autopilot_BankForTurn_49A7C+71j
+					; Autopilot_BankForTurn_49A7C+8Cj ...
 		mov	[bp+var_C], eax
 
-loc_49B87:				; CODE XREF: JDYN_TickSubcalcB+FBj
+loc_49B87:				; CODE XREF: Autopilot_BankForTurn_49A7C+FBj
 		mov	eax, [bp+var_C]
 		sub	eax, [bp+var_8]
 		mov	[bp+var_3C], eax
@@ -3521,7 +3525,7 @@ loc_49B87:				; CODE XREF: JDYN_TickSubcalcB+FBj
 		jmp	loc_49C2A
 ; ���������������������������������������������������������������������������
 
-loc_49BA1:				; CODE XREF: JDYN_TickSubcalcB+120j
+loc_49BA1:				; CODE XREF: Autopilot_BankForTurn_49A7C+120j
 		mov	eax, [si+71h]
 		mov	edx, dword_70458
 		imul	edx
@@ -3538,7 +3542,7 @@ loc_49BC2:
 		jge	short loc_49BCA
 		neg	eax
 
-loc_49BCA:				; CODE XREF: JDYN_TickSubcalcB+149j
+loc_49BCA:				; CODE XREF: Autopilot_BankForTurn_49A7C+149j
 		mov	[bp+var_48], eax
 		mov	eax, [bp+var_48]
 
@@ -3550,10 +3554,10 @@ loc_49BD2:
 		jmp	short loc_49BE3
 ; ���������������������������������������������������������������������������
 
-loc_49BE1:				; CODE XREF: JDYN_TickSubcalcB+15Ej
+loc_49BE1:				; CODE XREF: Autopilot_BankForTurn_49A7C+15Ej
 		xor	ax, ax
 
-loc_49BE3:				; CODE XREF: JDYN_TickSubcalcB+163j
+loc_49BE3:				; CODE XREF: Autopilot_BankForTurn_49A7C+163j
 		or	al, al
 
 loc_49BE5:
@@ -3564,7 +3568,7 @@ loc_49BEB:
 		jmp	short loc_49C0E
 ; ���������������������������������������������������������������������������
 
-loc_49BED:				; CODE XREF: JDYN_TickSubcalcB:loc_49BE5j
+loc_49BED:				; CODE XREF: Autopilot_BankForTurn_49A7C:loc_49BE5j
 		cmp	[bp+var_38], 0
 
 loc_49BF2:
@@ -3577,10 +3581,10 @@ loc_49BF7:
 		jmp	short loc_49BFB
 ; ���������������������������������������������������������������������������
 
-loc_49BF9:				; CODE XREF: JDYN_TickSubcalcB:loc_49BF2j
+loc_49BF9:				; CODE XREF: Autopilot_BankForTurn_49A7C:loc_49BF2j
 		xor	ax, ax
 
-loc_49BFB:				; CODE XREF: JDYN_TickSubcalcB:loc_49BF7j
+loc_49BFB:				; CODE XREF: Autopilot_BankForTurn_49A7C:loc_49BF7j
 		or	al, al
 		jz	short loc_49C12
 		mov	eax, [bp+var_40]
@@ -3588,10 +3592,10 @@ loc_49BFB:				; CODE XREF: JDYN_TickSubcalcB:loc_49BF7j
 		mov	[bp+var_50], eax
 		mov	[bp+var_54], eax
 
-loc_49C0E:				; CODE XREF: JDYN_TickSubcalcB:loc_49BEBj
+loc_49C0E:				; CODE XREF: Autopilot_BankForTurn_49A7C:loc_49BEBj
 		mov	[bp+var_40], eax
 
-loc_49C12:				; CODE XREF: JDYN_TickSubcalcB+181j
+loc_49C12:				; CODE XREF: Autopilot_BankForTurn_49A7C+181j
 		lea	ax, [bp+var_40]
 		push	ax
 		push	[bp+arg_2]
@@ -3601,12 +3605,12 @@ loc_49C12:				; CODE XREF: JDYN_TickSubcalcB+181j
 		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
-loc_49C2A:				; CODE XREF: JDYN_TickSubcalcB+122j
+loc_49C2A:				; CODE XREF: Autopilot_BankForTurn_49A7C+122j
 		pop	di
 		pop	si
 		leave
 		retf
-JDYN_TickSubcalcB	endp
+Autopilot_BankForTurn_49A7C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3614,30 +3618,32 @@ JDYN_TickSubcalcB	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,1422L — CORRECTION D'ERREUR : ce n'est PAS le tick physique JDYN, contrairement au nom
-; initial 'JDYN_PhysicsTickMain' donné par erreur (hypothèse de structure jamais vérifiée).
-; Lecture complète ligne à ligne effectuée. Prend en paramètres arg_0 (objet 'this', near) et
-; arg_2 (objet cible/référence, far). Fonction : (1) calcule un point visé direct ou anticipé
-; (extrapolation de la position de arg_2 selon sa vitesse × delta-temps) avec état hystérésis
-; ([si+0x68], 0/1/2) pour éviter l'oscillation entre les deux modes ; (2) calcule un écart de
-; cap (angle en virgule fixe degrés×256, normalisé ±180°) vers le point visé choisi, pondéré
-; par interpolation entre les deux candidats (sub_54A76) selon leur distance respective ; (3)
-; borne l'écart de cap à un taux de rotation maximum par frame ; (4) ÉCRIT directement le
-; nouveau cap sur l'objet via sub_556D4 (pas de calcul de moment/inertie) ; (5) appelle
-; JDYN_TickSubcalcB (sub_49A7C) avec cet écart de cap ; (6) applique une contrainte de suivi
-; de terrain (Terrain_QueryAltitudeAt) sur l'altitude de la position visée ; (7) rampe la
-; vitesse propre vers la vitesse de la cible, bornée en accélération par frame ; (8) combine
-; direction × vitesse rampée en une nouvelle vitesse, ÉCRITE DIRECTEMENT dans
-; [si+8/+0xC/+0x10] (mêmes offsets lus en tant que vitesse en début de fonction — confirmé :
-; la fonction modifie sa propre vitesse) ; (9) appelle JDYN_TickSubcalcA (sub_498B5) sur cette
-; nouvelle vitesse ; (10) recache le vecteur vent global sur l'objet ; (11) si l'alignement de
-; cap est bon et la cible à portée, POSITIONNE UN FLAG D'ALERTE sur l'objet cible
-; (arg_2+0x1A=1). C'est un moteur de pilotage automatique/homing cinématique générique
-; (direction+vitesse imposées directement, pas de simulation de force), très probablement
-; utilisé pour le guidage de missile (le flag final ressemble à un signal de verrouillage
-; transmis à la cible) et/ou la poursuite IA — PAS le calcul de physique de vol du joueur.
+; far, 1422L, RELUE INTEGRALEMENT (2026-09-25). Ex-'Autopilot_FlyToPointKinematic_49C2E'.
+; PILOTE AUTOMATIQUE CINEMATIQUE de l'avion, appele par PhysicsTicks a la place de toute
+; l'aerodynamique quand JDYN+0x68 != 0xFF et !flags_75.bit5 (PhysicsTicks sort ensuite
+; directement : jmp loc_4AECA -> retf). Arguments : si = JDYN, arg_2 = BLOC DE COMMANDES (pas
+; une cible). Entrees : P = bloc+0x02 (point vise), W = bloc+0x0E (vitesse voulue ; norme 100
+; m/s quand GroundAttack_Phase2_EngageAutopilot_775B1 l'ecrit), ma position (objet+0x12), ma
+; vitesse (corps+8). Constantes : taux de virage 20 deg/s, acceleration 25 m/s^2, vitesse
+; verticale max 50 m/s, pas dtc = max(dt, 0,2 s). CAP : R = |W|*180/(20*pi) (rayon de virage a
+; 20 deg/s) ; centres C1,2 = P +/- perp(W)*(R - |W| dt) ; etat JDYN+0x68 (0 = a choisir, 1 =
+; cercle C2, 2 = cercle C1) choisi au premier passage (C2 si plus proche et hors de lui, ou si
+; dans C1) ; dans le cercle : ecart 0 (tout droit) ; sur le bord (< R + |W| dt) : vise le cap
+; de W en tournant dans le sens du cercle ; sinon cap vise = cap(C - moi) +/- asin(R / d)
+; (tangente au cercle) ; ecart = cap vise - cap du nez ramene a +/-180, borne a +/-20 deg/s *
+; dt ; nez tourne de cet angle (Vector_RotateHeading2D_556D4 sur la ligne 1) puis
+; Matrix_OrthonormalizeKeepRow1_57660 ; Autopilot_BankForTurn_49A7C(ecart). ALTITUDE :
+; plancher = terrain sous l'avion + 250 m ; si P.z < plancher : P.z = plancher si l'avion est
+; dessous, sinon son altitude actuelle ; dz = P.z - z ; vz = dz si |dz| < 50, sinon +/-50 m/s.
+; VITESSE HORIZONTALE : rejoint |W| a 25 m/s^2 (egale si l'ecart est inferieur au pas).
+; VITESSE = direction horizontale du nez * vitesse horizontale + vz, ECRITE DIRECTEMENT dans
+; corps+8/0C/10 ; Autopilot_NosePitchRelax_498B5 ; vent global recopie dans JDYN+4/8/0C.
+; DRAPEAU 'point atteint' bloc+0x1A = 1 si |cap(W) - cap du nez| < 5 deg (modulo 360) ET
+; distance(P) < 20 * |W| * dtc (>= 400 m a 100 m/s). La position n'est pas integree ici :
+; WorldObject_IntegrateBodyMotion_3D31D (methode +0x14 de l'objet) le fait avec la vitesse
+; ecrite.
 ; ==============================================================================================
-Guidance_HomingVelocityUpdate	proc far		; CODE XREF: seg103:2CCDp
+Autopilot_FlyToPointKinematic_49C2E	proc far		; CODE XREF: seg103:2CCDp
 
 var_276		= dword	ptr -276h
 var_272		= dword	ptr -272h
@@ -3951,7 +3957,7 @@ loc_49DE7:
 		jge	short loc_49E06
 		mov	[bp+var_44], 33h ; '3'
 
-loc_49E06:				; CODE XREF: Guidance_HomingVelocityUpdate+1CEj
+loc_49E06:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+1CEj
 		mov	eax, [bp+var_12]
 		mov	edx, [bp+var_44]
 		imul	edx
@@ -4212,10 +4218,10 @@ loc_4A126:
 		jmp	short loc_4A149
 ; ���������������������������������������������������������������������������
 
-loc_4A147:				; CODE XREF: Guidance_HomingVelocityUpdate+512j
+loc_4A147:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+512j
 		xor	ax, ax
 
-loc_4A149:				; CODE XREF: Guidance_HomingVelocityUpdate+517j
+loc_4A149:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+517j
 		or	al, al
 		jz	short loc_4A176
 		mov	eax, [bp+var_5C]
@@ -4229,14 +4235,14 @@ loc_4A149:				; CODE XREF: Guidance_HomingVelocityUpdate+517j
 		jmp	short loc_4A172
 ; ���������������������������������������������������������������������������
 
-loc_4A170:				; CODE XREF: Guidance_HomingVelocityUpdate+53Bj
+loc_4A170:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+53Bj
 		xor	ax, ax
 
-loc_4A172:				; CODE XREF: Guidance_HomingVelocityUpdate+540j
+loc_4A172:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+540j
 		or	al, al
 		jnz	short loc_4A19F
 
-loc_4A176:				; CODE XREF: Guidance_HomingVelocityUpdate+51Dj
+loc_4A176:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+51Dj
 		mov	eax, [bp+var_5C]
 		sub	eax, [bp+var_50]
 		mov	[bp+var_B0], eax
@@ -4248,23 +4254,23 @@ loc_4A176:				; CODE XREF: Guidance_HomingVelocityUpdate+51Dj
 		jmp	short loc_4A19B
 ; ���������������������������������������������������������������������������
 
-loc_4A199:				; CODE XREF: Guidance_HomingVelocityUpdate+564j
+loc_4A199:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+564j
 		xor	ax, ax
 
-loc_4A19B:				; CODE XREF: Guidance_HomingVelocityUpdate+569j
+loc_4A19B:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+569j
 		or	al, al
 		jz	short loc_4A1A5
 
-loc_4A19F:				; CODE XREF: Guidance_HomingVelocityUpdate+546j
+loc_4A19F:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+546j
 		mov	byte ptr [si+68h], 1
 		jmp	short loc_4A1A9
 ; ���������������������������������������������������������������������������
 
-loc_4A1A5:				; CODE XREF: Guidance_HomingVelocityUpdate+56Fj
+loc_4A1A5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+56Fj
 		mov	byte ptr [si+68h], 2
 
-loc_4A1A9:				; CODE XREF: Guidance_HomingVelocityUpdate+506j
-					; Guidance_HomingVelocityUpdate+575j
+loc_4A1A9:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+506j
+					; Autopilot_FlyToPointKinematic_49C2E+575j
 		mov	eax, [bp+var_8C]
 		cmp	eax, [bp+var_5C]
 
@@ -4274,16 +4280,16 @@ loc_4A1B2:
 		jmp	short loc_4A1BB
 ; ���������������������������������������������������������������������������
 
-loc_4A1B9:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A1B2j
+loc_4A1B9:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A1B2j
 		xor	ax, ax
 
-loc_4A1BB:				; CODE XREF: Guidance_HomingVelocityUpdate+589j
+loc_4A1BB:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+589j
 		or	al, al
 		jz	short loc_4A1C5
 		cmp	byte ptr [si+68h], 1
 		jz	short loc_4A1E1
 
-loc_4A1C5:				; CODE XREF: Guidance_HomingVelocityUpdate+58Fj
+loc_4A1C5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+58Fj
 		mov	eax, [bp+var_94]
 
 loc_4A1CA:
@@ -4295,24 +4301,24 @@ loc_4A1D0:
 		jmp	short loc_4A1D7
 ; ���������������������������������������������������������������������������
 
-loc_4A1D5:				; CODE XREF: Guidance_HomingVelocityUpdate+5A0j
+loc_4A1D5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5A0j
 		xor	ax, ax
 
-loc_4A1D7:				; CODE XREF: Guidance_HomingVelocityUpdate+5A5j
+loc_4A1D7:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5A5j
 		or	al, al
 		jz	short loc_4A1F7
 		cmp	byte ptr [si+68h], 2
 		jnz	short loc_4A1F7
 
-loc_4A1E1:				; CODE XREF: Guidance_HomingVelocityUpdate+595j
+loc_4A1E1:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+595j
 		mov	[bp+var_B8], 0
 		mov	eax, [bp+var_B8]
 		mov	[bp+var_A0], eax
 		jmp	loc_4A43E
 ; ���������������������������������������������������������������������������
 
-loc_4A1F7:				; CODE XREF: Guidance_HomingVelocityUpdate+5ABj
-					; Guidance_HomingVelocityUpdate+5B1j
+loc_4A1F7:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5ABj
+					; Autopilot_FlyToPointKinematic_49C2E+5B1j
 		mov	eax, [bp+var_5C]
 		add	eax, [bp+var_50]
 		mov	[bp+var_BC], eax
@@ -4324,10 +4330,10 @@ loc_4A1F7:				; CODE XREF: Guidance_HomingVelocityUpdate+5ABj
 		jmp	short loc_4A21C
 ; ���������������������������������������������������������������������������
 
-loc_4A21A:				; CODE XREF: Guidance_HomingVelocityUpdate+5E5j
+loc_4A21A:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5E5j
 		xor	ax, ax
 
-loc_4A21C:				; CODE XREF: Guidance_HomingVelocityUpdate+5EAj
+loc_4A21C:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5EAj
 		or	al, al
 		jz	short loc_4A23F
 
@@ -4350,10 +4356,10 @@ loc_4A231:
 		jmp	short loc_4A235
 ; ���������������������������������������������������������������������������
 
-loc_4A233:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A22Cj
+loc_4A233:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A22Cj
 		xor	ax, ax
 
-loc_4A235:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A231j
+loc_4A235:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A231j
 		or	al, al
 
 loc_4A237:
@@ -4361,12 +4367,12 @@ loc_4A237:
 		jmp	loc_4A43E
 ; ���������������������������������������������������������������������������
 
-loc_4A23C:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A237j
+loc_4A23C:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A237j
 		jmp	loc_4A414
 ; ���������������������������������������������������������������������������
 
-loc_4A23F:				; CODE XREF: Guidance_HomingVelocityUpdate+5F0j
-					; Guidance_HomingVelocityUpdate:loc_4A224j
+loc_4A23F:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5F0j
+					; Autopilot_FlyToPointKinematic_49C2E:loc_4A224j
 		mov	eax, [bp+var_5C]
 		add	eax, [bp+var_50]
 		mov	[bp+var_C4], eax
@@ -4378,10 +4384,10 @@ loc_4A23F:				; CODE XREF: Guidance_HomingVelocityUpdate+5F0j
 		jmp	short loc_4A264
 ; ���������������������������������������������������������������������������
 
-loc_4A262:				; CODE XREF: Guidance_HomingVelocityUpdate+62Dj
+loc_4A262:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+62Dj
 		xor	ax, ax
 
-loc_4A264:				; CODE XREF: Guidance_HomingVelocityUpdate+632j
+loc_4A264:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+632j
 		or	al, al
 		jz	short loc_4A287
 		cmp	byte ptr [si+68h], 2
@@ -4392,27 +4398,27 @@ loc_4A264:				; CODE XREF: Guidance_HomingVelocityUpdate+632j
 		jmp	short loc_4A27D
 ; ���������������������������������������������������������������������������
 
-loc_4A27B:				; CODE XREF: Guidance_HomingVelocityUpdate+646j
+loc_4A27B:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+646j
 		xor	ax, ax
 
-loc_4A27D:				; CODE XREF: Guidance_HomingVelocityUpdate+64Bj
+loc_4A27D:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+64Bj
 		or	al, al
 		jnz	short loc_4A284
 		jmp	loc_4A43E
 ; ���������������������������������������������������������������������������
 
-loc_4A284:				; CODE XREF: Guidance_HomingVelocityUpdate+651j
+loc_4A284:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+651j
 		jmp	loc_4A435
 ; ���������������������������������������������������������������������������
 
-loc_4A287:				; CODE XREF: Guidance_HomingVelocityUpdate+638j
-					; Guidance_HomingVelocityUpdate+63Ej
+loc_4A287:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+638j
+					; Autopilot_FlyToPointKinematic_49C2E+63Ej
 		cmp	byte ptr [si+68h], 1
 		jz	short loc_4A290
 		jmp	loc_4A31C
 ; ���������������������������������������������������������������������������
 
-loc_4A290:				; CODE XREF: Guidance_HomingVelocityUpdate+65Dj
+loc_4A290:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+65Dj
 		mov	eax, [bp+var_1C2]
 		sub	eax, [bp+var_17A]
 		mov	[bp+var_252], eax
@@ -4469,7 +4475,7 @@ loc_4A2F3:
 		jmp	loc_4A3A5
 ; ���������������������������������������������������������������������������
 
-loc_4A31C:				; CODE XREF: Guidance_HomingVelocityUpdate+65Fj
+loc_4A31C:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+65Fj
 		mov	eax, [bp+var_1CE]
 
 loc_4A321:
@@ -4516,7 +4522,7 @@ loc_4A335:
 		mov	eax, [bp+var_162]
 		sub	[bp+var_14E], eax
 
-loc_4A3A5:				; CODE XREF: Guidance_HomingVelocityUpdate+6EBj
+loc_4A3A5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+6EBj
 		cmp	[bp+var_14E], 0FFFF4C00h
 		jge	short loc_4A3B5
 		mov	ax, 1
@@ -4525,17 +4531,17 @@ loc_4A3B3:
 		jmp	short loc_4A3B7
 ; ���������������������������������������������������������������������������
 
-loc_4A3B5:				; CODE XREF: Guidance_HomingVelocityUpdate+780j
+loc_4A3B5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+780j
 		xor	ax, ax
 
-loc_4A3B7:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A3B3j
+loc_4A3B7:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A3B3j
 		or	al, al
 		jz	short loc_4A3C6
 		add	[bp+var_14E], 16800h
 		jmp	short loc_4A3E5
 ; ���������������������������������������������������������������������������
 
-loc_4A3C6:				; CODE XREF: Guidance_HomingVelocityUpdate+78Bj
+loc_4A3C6:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+78Bj
 		cmp	[bp+var_14E], 0B400h
 		jle	short loc_4A3D6
 
@@ -4544,18 +4550,18 @@ loc_4A3D1:
 		jmp	short loc_4A3D8
 ; ���������������������������������������������������������������������������
 
-loc_4A3D6:				; CODE XREF: Guidance_HomingVelocityUpdate+7A1j
+loc_4A3D6:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7A1j
 		xor	ax, ax
 
-loc_4A3D8:				; CODE XREF: Guidance_HomingVelocityUpdate+7A6j
+loc_4A3D8:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7A6j
 		or	al, al
 		jz	short loc_4A3E5
 
 loc_4A3DC:
 		sub	[bp+var_14E], 16800h
 
-loc_4A3E5:				; CODE XREF: Guidance_HomingVelocityUpdate+796j
-					; Guidance_HomingVelocityUpdate+7ACj
+loc_4A3E5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+796j
+					; Autopilot_FlyToPointKinematic_49C2E+7ACj
 		mov	eax, [bp+var_14E]
 
 loc_4A3EA:
@@ -4569,19 +4575,19 @@ loc_4A3EA:
 		jmp	short loc_4A410
 ; ���������������������������������������������������������������������������
 
-loc_4A40E:				; CODE XREF: Guidance_HomingVelocityUpdate+7D9j
+loc_4A40E:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7D9j
 		xor	ax, ax
 
-loc_4A410:				; CODE XREF: Guidance_HomingVelocityUpdate+7DEj
+loc_4A410:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7DEj
 		or	al, al
 		jz	short loc_4A41F
 
-loc_4A414:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A23Cj
+loc_4A414:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A23Cj
 		sub	[bp+var_A0], 16800h
 		jmp	short loc_4A43E
 ; ���������������������������������������������������������������������������
 
-loc_4A41F:				; CODE XREF: Guidance_HomingVelocityUpdate+7E4j
+loc_4A41F:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7E4j
 		cmp	[bp+var_A0], 0FFFF4C00h
 		jge	short loc_4A42F
 
@@ -4590,18 +4596,18 @@ loc_4A42A:
 		jmp	short loc_4A431
 ; ���������������������������������������������������������������������������
 
-loc_4A42F:				; CODE XREF: Guidance_HomingVelocityUpdate+7FAj
+loc_4A42F:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7FAj
 		xor	ax, ax
 
-loc_4A431:				; CODE XREF: Guidance_HomingVelocityUpdate+7FFj
+loc_4A431:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+7FFj
 		or	al, al
 		jz	short loc_4A43E
 
-loc_4A435:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A284j
+loc_4A435:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A284j
 		add	[bp+var_A0], 16800h
 
-loc_4A43E:				; CODE XREF: Guidance_HomingVelocityUpdate+5C6j
-					; Guidance_HomingVelocityUpdate+60Bj ...
+loc_4A43E:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+5C6j
+					; Autopilot_FlyToPointKinematic_49C2E+60Bj ...
 		mov	eax, [bp+var_38]
 		mov	edx, dword_70458
 		imul	edx
@@ -4614,7 +4620,7 @@ loc_4A43E:				; CODE XREF: Guidance_HomingVelocityUpdate+5C6j
 		jge	short loc_4A46B
 		neg	eax
 
-loc_4A46B:				; CODE XREF: Guidance_HomingVelocityUpdate+838j
+loc_4A46B:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+838j
 		mov	[bp+var_D4], eax
 		mov	eax, [bp+var_D4]
 		mov	[bp+var_D8], eax
@@ -4624,27 +4630,27 @@ loc_4A46B:				; CODE XREF: Guidance_HomingVelocityUpdate+838j
 		jmp	short loc_4A488
 ; ���������������������������������������������������������������������������
 
-loc_4A486:				; CODE XREF: Guidance_HomingVelocityUpdate+851j
+loc_4A486:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+851j
 		xor	ax, ax
 
-loc_4A488:				; CODE XREF: Guidance_HomingVelocityUpdate+856j
+loc_4A488:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+856j
 		or	al, al
 		jz	short loc_4A493
 		mov	eax, [bp+var_A0]
 		jmp	short loc_4A4B8
 ; ���������������������������������������������������������������������������
 
-loc_4A493:				; CODE XREF: Guidance_HomingVelocityUpdate+85Cj
+loc_4A493:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+85Cj
 		cmp	[bp+var_A0], 0
 		jge	short loc_4A4A0
 		mov	ax, 1
 		jmp	short loc_4A4A2
 ; ���������������������������������������������������������������������������
 
-loc_4A4A0:				; CODE XREF: Guidance_HomingVelocityUpdate+86Bj
+loc_4A4A0:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+86Bj
 		xor	ax, ax
 
-loc_4A4A2:				; CODE XREF: Guidance_HomingVelocityUpdate+870j
+loc_4A4A2:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+870j
 		or	al, al
 		jz	short loc_4A4BD
 		mov	eax, [bp+var_CC]
@@ -4652,16 +4658,16 @@ loc_4A4A2:				; CODE XREF: Guidance_HomingVelocityUpdate+870j
 		mov	[bp+var_DC], eax
 		mov	[bp+var_E0], eax
 
-loc_4A4B8:				; CODE XREF: Guidance_HomingVelocityUpdate+863j
+loc_4A4B8:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+863j
 		mov	[bp+var_CC], eax
 
-loc_4A4BD:				; CODE XREF: Guidance_HomingVelocityUpdate+876j
+loc_4A4BD:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+876j
 		lea	ax, [bp+var_CC]
 		push	ax
 		mov	ax, di
 		add	ax, 0Ch
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		push	di
 
@@ -4673,7 +4679,7 @@ loc_4A4D1:
 		push	di
 		push	si
 		push	cs
-		call	near ptr JDYN_TickSubcalcB
+		call	near ptr Autopilot_BankForTurn_49A7C
 		add	sp, 6
 		mov	eax, [bp+var_40]
 		mov	[bp+var_E4], eax
@@ -4711,10 +4717,10 @@ loc_4A533:
 		jmp	short loc_4A561
 ; ���������������������������������������������������������������������������
 
-loc_4A55F:				; CODE XREF: Guidance_HomingVelocityUpdate+92Aj
+loc_4A55F:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+92Aj
 		xor	ax, ax
 
-loc_4A561:				; CODE XREF: Guidance_HomingVelocityUpdate+92Fj
+loc_4A561:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+92Fj
 		or	al, al
 		jz	short loc_4A58D
 		mov	eax, [bp+var_172]
@@ -4724,23 +4730,23 @@ loc_4A561:				; CODE XREF: Guidance_HomingVelocityUpdate+92Fj
 		jmp	short loc_4A578
 ; ���������������������������������������������������������������������������
 
-loc_4A576:				; CODE XREF: Guidance_HomingVelocityUpdate+941j
+loc_4A576:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+941j
 		xor	ax, ax
 
-loc_4A578:				; CODE XREF: Guidance_HomingVelocityUpdate+946j
+loc_4A578:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+946j
 		or	al, al
 		jz	short loc_4A583
 		mov	eax, [bp+var_E8]
 		jmp	short loc_4A588
 ; ���������������������������������������������������������������������������
 
-loc_4A583:				; CODE XREF: Guidance_HomingVelocityUpdate+94Cj
+loc_4A583:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+94Cj
 		mov	eax, [bp+var_172]
 
-loc_4A588:				; CODE XREF: Guidance_HomingVelocityUpdate+953j
+loc_4A588:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+953j
 		mov	[bp+var_17E], eax
 
-loc_4A58D:				; CODE XREF: Guidance_HomingVelocityUpdate+935j
+loc_4A58D:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+935j
 		mov	eax, [bp+var_17E]
 		sub	eax, [bp+var_172]
 		mov	[bp+var_F8], eax
@@ -4756,7 +4762,7 @@ loc_4A5A9:
 		jge	short loc_4A5AE
 		neg	eax
 
-loc_4A5AE:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A5A9j
+loc_4A5AE:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A5A9j
 		mov	[bp+var_100], eax
 
 loc_4A5B3:
@@ -4774,10 +4780,10 @@ loc_4A5C7:
 		jmp	short loc_4A5CB
 ; ���������������������������������������������������������������������������
 
-loc_4A5C9:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A5C2j
+loc_4A5C9:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A5C2j
 		xor	ax, ax
 
-loc_4A5CB:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A5C7j
+loc_4A5CB:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A5C7j
 		or	al, al
 		jz	short loc_4A5E5
 
@@ -4793,7 +4799,7 @@ loc_4A5E3:
 		jmp	short loc_4A60E
 ; ���������������������������������������������������������������������������
 
-loc_4A5E5:				; CODE XREF: Guidance_HomingVelocityUpdate+99Fj
+loc_4A5E5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+99Fj
 		mov	eax, [bp+var_172]
 		cmp	eax, [bp+var_17E]
 		jle	short loc_4A5F6
@@ -4801,10 +4807,10 @@ loc_4A5E5:				; CODE XREF: Guidance_HomingVelocityUpdate+99Fj
 		jmp	short loc_4A5F8
 ; ���������������������������������������������������������������������������
 
-loc_4A5F6:				; CODE XREF: Guidance_HomingVelocityUpdate+9C1j
+loc_4A5F6:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+9C1j
 		xor	ax, ax
 
-loc_4A5F8:				; CODE XREF: Guidance_HomingVelocityUpdate+9C6j
+loc_4A5F8:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+9C6j
 		or	al, al
 		jz	short loc_4A613
 		mov	eax, [bp+var_E4]
@@ -4812,10 +4818,10 @@ loc_4A5F8:				; CODE XREF: Guidance_HomingVelocityUpdate+9C6j
 		mov	[bp+var_110], eax
 		mov	[bp+var_114], eax
 
-loc_4A60E:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A5E3j
+loc_4A60E:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A5E3j
 		mov	[bp+var_E4], eax
 
-loc_4A613:				; CODE XREF: Guidance_HomingVelocityUpdate+9CCj
+loc_4A613:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+9CCj
 		mov	ax, di
 		add	ax, 0Ch
 		mov	[bp+var_116], ax
@@ -4852,7 +4858,7 @@ loc_4A635:
 		jge	short loc_4A679
 		neg	eax
 
-loc_4A679:				; CODE XREF: Guidance_HomingVelocityUpdate+A46j
+loc_4A679:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A46j
 		mov	[bp+var_12A], eax
 		mov	eax, [bp+var_12A]
 		mov	[bp+var_12E], eax
@@ -4862,10 +4868,10 @@ loc_4A679:				; CODE XREF: Guidance_HomingVelocityUpdate+A46j
 		jmp	short loc_4A696
 ; ���������������������������������������������������������������������������
 
-loc_4A694:				; CODE XREF: Guidance_HomingVelocityUpdate+A5Fj
+loc_4A694:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A5Fj
 		xor	ax, ax
 
-loc_4A696:				; CODE XREF: Guidance_HomingVelocityUpdate+A64j
+loc_4A696:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A64j
 		or	al, al
 		jz	short loc_4A6A4
 		mov	eax, [bp+var_12]
@@ -4875,7 +4881,7 @@ loc_4A69E:
 		jmp	short loc_4A6CD
 ; ���������������������������������������������������������������������������
 
-loc_4A6A4:				; CODE XREF: Guidance_HomingVelocityUpdate+A6Aj
+loc_4A6A4:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A6Aj
 		mov	eax, [bp+var_2C]
 		cmp	eax, [bp+var_12]
 		jle	short loc_4A6B3
@@ -4883,10 +4889,10 @@ loc_4A6A4:				; CODE XREF: Guidance_HomingVelocityUpdate+A6Aj
 		jmp	short loc_4A6B5
 ; ���������������������������������������������������������������������������
 
-loc_4A6B3:				; CODE XREF: Guidance_HomingVelocityUpdate+A7Ej
+loc_4A6B3:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A7Ej
 		xor	ax, ax
 
-loc_4A6B5:				; CODE XREF: Guidance_HomingVelocityUpdate+A83j
+loc_4A6B5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A83j
 		or	al, al
 		jz	short loc_4A6C4
 		mov	eax, [bp+var_11A]
@@ -4896,12 +4902,12 @@ loc_4A6BE:
 		jmp	short loc_4A6CD
 ; ���������������������������������������������������������������������������
 
-loc_4A6C4:				; CODE XREF: Guidance_HomingVelocityUpdate+A89j
+loc_4A6C4:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A89j
 		mov	eax, [bp+var_11A]
 		add	[bp+var_2C], eax
 
-loc_4A6CD:				; CODE XREF: Guidance_HomingVelocityUpdate+A74j
-					; Guidance_HomingVelocityUpdate+A94j
+loc_4A6CD:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+A74j
+					; Autopilot_FlyToPointKinematic_49C2E+A94j
 		mov	[bp+var_132], 0
 
 loc_4A6D6:
@@ -4957,7 +4963,7 @@ loc_4A737:
 		push	di
 		push	si
 		push	cs
-		call	near ptr JDYN_TickSubcalcA
+		call	near ptr Autopilot_NosePitchRelax_498B5
 		add	sp, 6
 		mov	eax, dword_707F8
 		mov	[si+4],	eax
@@ -4978,10 +4984,10 @@ loc_4A7A1:
 		jmp	short loc_4A7A5
 ; ���������������������������������������������������������������������������
 
-loc_4A7A3:				; CODE XREF: Guidance_HomingVelocityUpdate+B6Ej
+loc_4A7A3:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+B6Ej
 		xor	ax, ax
 
-loc_4A7A5:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A7A1j
+loc_4A7A5:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A7A1j
 		or	al, al
 		jnz	short loc_4A7F1
 		cmp	[bp+var_A0], 16300h
@@ -4994,10 +5000,10 @@ loc_4A7B4:
 		jmp	short loc_4A7BB
 ; ���������������������������������������������������������������������������
 
-loc_4A7B9:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A7B2j
+loc_4A7B9:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A7B2j
 		xor	ax, ax
 
-loc_4A7BB:				; CODE XREF: Guidance_HomingVelocityUpdate+B89j
+loc_4A7BB:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+B89j
 		or	al, al
 		jnz	short loc_4A7F1
 
@@ -5007,7 +5013,7 @@ loc_4A7BF:
 		jge	short loc_4A7CC
 		neg	eax
 
-loc_4A7CC:				; CODE XREF: Guidance_HomingVelocityUpdate+B99j
+loc_4A7CC:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+B99j
 		mov	[bp+var_13E], eax
 
 loc_4A7D1:
@@ -5019,17 +5025,17 @@ loc_4A7D1:
 		jmp	short loc_4A7ED
 ; ���������������������������������������������������������������������������
 
-loc_4A7EB:				; CODE XREF: Guidance_HomingVelocityUpdate+BB6j
+loc_4A7EB:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+BB6j
 		xor	ax, ax
 
-loc_4A7ED:				; CODE XREF: Guidance_HomingVelocityUpdate+BBBj
+loc_4A7ED:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+BBBj
 		or	al, al
 
 loc_4A7EF:
 		jz	short loc_4A821
 
-loc_4A7F1:				; CODE XREF: Guidance_HomingVelocityUpdate+B79j
-					; Guidance_HomingVelocityUpdate+B8Fj
+loc_4A7F1:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+B79j
+					; Autopilot_FlyToPointKinematic_49C2E+B8Fj
 		mov	eax, [bp+var_48]
 
 loc_4A7F5:
@@ -5043,22 +5049,22 @@ loc_4A7F5:
 		jmp	short loc_4A815
 ; ���������������������������������������������������������������������������
 
-loc_4A813:				; CODE XREF: Guidance_HomingVelocityUpdate+BDEj
+loc_4A813:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+BDEj
 		xor	ax, ax
 
-loc_4A815:				; CODE XREF: Guidance_HomingVelocityUpdate+BE3j
+loc_4A815:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+BE3j
 		or	al, al
 		jz	short loc_4A821
 		les	bx, [bp+arg_2]
 		mov	byte ptr es:[bx+1Ah], 1
 
-loc_4A821:				; CODE XREF: Guidance_HomingVelocityUpdate:loc_4A7EFj
-					; Guidance_HomingVelocityUpdate+BE9j
+loc_4A821:				; CODE XREF: Autopilot_FlyToPointKinematic_49C2E:loc_4A7EFj
+					; Autopilot_FlyToPointKinematic_49C2E+BE9j
 		pop	di
 		pop	si
 		leave
 		retf
-Guidance_HomingVelocityUpdate	endp
+Autopilot_FlyToPointKinematic_49C2E	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -5103,7 +5109,7 @@ loc_4A826:
 ; flameout ([si+0x28]=0) si [si+0x6D]<=0 ; (5) etat volets/aerofrein/train depuis les bits du
 ; sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse =
 ; |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 ->
-; Guidance_HomingVelocityUpdate (AUTOPILOTE cinematique) SINON manuel :
+; Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel :
 ; Aero_ComputeControlFlags75Bit5A -> [A+0x14/18/1C] (taux angulaires) ;
 ; Aero_ComputeControlFlags75Bit5A(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee
 ; [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ;
@@ -5607,7 +5613,7 @@ loc_4AC72:				; CODE XREF: seg103:2C7Fj seg103:2CA8j
 		push	large dword ptr	[bp+8]
 		push	si
 		push	cs
-		call	near ptr Guidance_HomingVelocityUpdate
+		call	near ptr Autopilot_FlyToPointKinematic_49C2E
 		add	sp, 6
 		jmp	loc_4AECA
 ; ���������������������������������������������������������������������������

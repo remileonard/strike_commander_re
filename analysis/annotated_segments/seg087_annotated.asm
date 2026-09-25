@@ -296,7 +296,7 @@ loc_3E115:				; DATA XREF: seg339:off_6F880o
 
 loc_3E12F:				; CODE XREF: seg087:024Aj
 		push	si
-		call	Camera_ComputeMountedPosition_3D31D
+		call	WorldObject_IntegrateBodyMotion_3D31D
 		pop	cx
 		cmp	word_722E6, si
 		jnz	short loc_3E15D

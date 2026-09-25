@@ -294,7 +294,7 @@ loc_1BBD3:
 		push	ax
 		lea	ax, [bp-21Ah]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 
 loc_1BBF1:
@@ -303,7 +303,7 @@ loc_1BBF1:
 		push	ax
 		lea	ax, [bp-226h]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	eax, [bp-226h]
 		sub	[bp-21Ah], eax

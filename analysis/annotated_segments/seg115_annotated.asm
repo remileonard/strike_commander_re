@@ -486,8 +486,8 @@ Math_AcosOfRatio_54A0E	endp
 ; far, LUE (2026-09-24). Ex-'Math_ArcCosOfRatio' : NOM INVERSE. Si den != 0 :
 ; Math_AsinDeg_549A6(num/den) (arc SINUS), sinon 0.
 ; ==============================================================================================
-Math_AsinOfRatio_54A76	proc far		; CODE XREF: Guidance_HomingVelocityUpdate+6D9P
-					; Guidance_HomingVelocityUpdate+765P ...
+Math_AsinOfRatio_54A76	proc far		; CODE XREF: Autopilot_FlyToPointKinematic_49C2E+6D9P
+					; Autopilot_FlyToPointKinematic_49C2E+765P ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch

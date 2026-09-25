@@ -449,7 +449,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x65` | coeff./borne × gain global `dword_72A1C` | `Aero_ComputeControlFlags75Bit5B` L1457 |
 | `+0x66` | valeur de reset de l'accumulateur `[jdyn+0x1A]` × gain `dword_72A18` | `Aero_ResetAccumulatorFlags75Bit5` L1972 |
 | `+0x67` | → `[jdyn+0x78]` (échelle 8-bit) | `Aero_ComputeControlFlags75Bit5B` L1158 |
-| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) | `JDYN_TickSubcalcB` L3441 |
+| `+0x71` | **taux de rotation/cap max** (intégré par `dt` `dword_70458`) | `Autopilot_BankForTurn_49A7C` L3441 |
 | `+0x80` (u16, déf. 500) | **Vitesse de poursuite MAX de l'IA** — consigne haute quand la cible est loin ; l'IA interpole/plafonne sa vitesse de consigne vers `jdyn[0x80]<<8`, et la passe telle quelle à `AI_ThrottleCmd_HUD`. | `AI_InterceptSpeedControlLaw` `sub_5F9B` (seg003) `loc_60DF`/`loc_610A`/`loc_61AB` ; `AI_SpeedManeuverDecision` `sub_68D4` `loc_691C` |
 | `+0x82` (u16, déf. 100) | **Vitesse de poursuite MIN de l'IA** — plancher : `var_4 = max(var_4, jdyn[0x82]<<8)` sur la consigne de vitesse. | `AI_InterceptSpeedControlLaw` `sub_5F9B` L2044-2070 |
 | `+0x84` (i16, déf. 231) | **Vitesse de croisière / manœuvre de l'IA** — passée directement à `AI_ThrottleCmd_HUD` comme consigne de manette ; entre aussi dans un seuil de distance de manœuvre `(jdyn[0x84]+dword_72039)/2` (au-delà → maintien de vitesse, en-deçà → ajuste manette + vire). | `GroundAttack_Phase4_PullUp_77171` (ovr231) ; `AI_SpeedManeuverDecision` `sub_68D4` L3124-3134 |
@@ -525,7 +525,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
    + Roster("FLAPS"/"LANDGEAR") ; agit sur flags_75 [si+0x75]
 6. vitesse = |A.velocity([A+8/+C/+10])|                     auto-comportements bas niveau
 7. SI [si+0x68] ≠ 0xFF ET !flags_75.bit5 :
-      Guidance_HomingVelocityUpdate(si, arg_2)     ← AUTOPILOTE / homing (cinématique)
+      Autopilot_FlyToPointKinematic_49C2E(si, arg_2)     ← AUTOPILOTE / homing (cinématique)
    SINON (vol manuel) :
       Aero_SumLinearForces_48639(si) → [A+0x14/+0x18/+0x1C] = ACCÉLÉRATION LINÉAIRE (net des forces)
       Aero_ControlOrchestrator(si, arg_2) → vecteur moment (tangage,roulis,lacet)
@@ -766,7 +766,7 @@ C'est un **lapse de poussée avec l'ALTITUDE** (moins d'air en altitude), pas av
 la vitesse. `jdyn[0x2C]` = poussée PC max (N), `jdyn[0x30]` = fraction MIL,
 `jdyn[0x31]` = fraction de poussée à 11 000 m, `jdyn[0x32]` = altitude de coupure
 ÷100. **Les gains globaux `dword_72A14..72A2C` valent tous `1.0`** (`0x100`,
-`sub_A5620`) — ignorables.
+`sub_A5620`) — **corrigé 2026-09-25 : ils valent 1,0 seulement quand le composant est intact** ; `JDYN_UpdateDamageGains_494DD` (en tête de `PhysicsTicks`) les recalcule chaque tick comme rapports de santé des composants FUEL, RUDDER, ELEVATOR, AILERON, LWING/RWING et ENGINE.
 
 ##### `Aero_ControlOrchestrator` (`sub_48FC2`, seg103 L2056-2142) : moments de contrôle
 
@@ -1499,9 +1499,9 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   | `+0x04` | bitfield d'état (bit1 = flag parent, bit2 = recalc, bit4 = attaché, bit6 = mode cible sec.) | `Debris_BodyAttachToSubpart` (37C89), `Camera_MarkRecalc` (or `[si+4],4`) |
   | `+0x0A` | weak ref A (dd far) | `Debris_BodyReset` (37C4C) |
   | `+0x0E` | **corps rigide parent** (dd far ; l'avion) | `Debris_BodyAttachToSubpart` : `[si+0Eh]=arg_2` ; `loc_37CF4` renvoie `[si+0E:10]` |
-  | `+0x12/16/1A` | **position monde** (i32×3, 24.8) — **sortie** | `Debris_BodyGetPosition` (37D04) : `out = [si+12h..]` ; `Debris_BodyIntegrateForces` (37D54) : `[si+12h] += *arg` |
+  | `+0x12/16/1A` | **position monde** (i32×3, 24.8) — **sortie** | `Debris_BodyGetPosition` (37D04) : `out = [si+12h..]` ; `WorldObject_TranslateBy_37D54` (37D54) : `[si+12h] += *arg` |
   | `+0x20` | copie d'un champ du parent (`parent[+8][+0x10]`) | `Debris_BodyAttachToSubpart` |
-  | `+0x24` | sous-composant (couple) | `Debris_BodyIntegrateForces` → `Debris_ComputeTorque` si `≠0` |
+  | `+0x24` | sous-composant (couple) | `WorldObject_TranslateBy_37D54` → `Debris_ComputeTorque` si `≠0` |
   | `+0x28/29` | 2 octets copiés du parent (`[+0x12]`, `[+0x14]`) | `Debris_BodyAttachToSubpart` |
   | `+0x2C` | **matrice d'orientation 3×3** (lignes `+0x2C`/`+0x38`/`+0x44`) | `Matrix_BuildFromAngle_56D72(cam+0x2C)` ; `AI_ComputeGeometryHelper_56E29(&buf, si+0x2C)` |
   | `+0x50` | octet copié de la cible (`cible[+0x35]`) | `Camera_InitAttachedWithTarget` |
@@ -1529,7 +1529,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   → `Camera_ChaseComputeMain` (traînée).
 - **`Camera_ComputeMountedPosition` (`sub_3D31D`, seg085, appelée depuis `seg087:0250`)** :
   1. `V = mount[+8] × (dword_7045E/256)` (ou `(0,0,0)` si pas de mount) ;
-  2. `Debris_BodyIntegrateForces(cam, &V…)` → `cam.pos(+0x12) += V` puis `cam->vtable[8]` (no-op) ;
+  2. `WorldObject_TranslateBy_37D54(cam, &V…)` → `cam.pos(+0x12) += V` puis `cam->vtable[8]` (no-op) ;
   3. `Ta = mount->vtable[0x2C](out)` ; rotation 2D horizontale de `(Ta.x, Ta.z)` par
      l'angle `θ = Ta.y × (dword_70458/256)` (`Math_Cos/Sin_Raw` — ⚠️ noms inversés, voir `Math_CosRaw_580A7` / `Math_SinRaw_58063`, `Math_FixedMultiply`,
      seg085:1075-1120) ; `cam->vtable[0x30](&Ta×dt)` et `mount->vtable[0x30](&Ta_rot)`.
@@ -1552,7 +1552,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   de temps 24.8 (`/256` → ~0.04–0.07 s).
 - **Paradoxe de dérive** : `Camera_ComputeMountedPosition` fait
   `cam[+0x12] += mount[+8..0x10] × (dword_7045E/256)` **par frame** via
-  `Debris_BodyIntegrateForces`. Si `+0x12` était la position monde absolue, elle
+  `WorldObject_TranslateBy_37D54`. Si `+0x12` était la position monde absolue, elle
   dériverait sans borne (mount.pos ~1e5 × 0.05 = +5000/frame). Résolution probable :
   **`cam[+0x12/16/1A]` est un accumulateur de FORCE**, pas la position — consommé et
   remis à zéro chaque frame par le parent (`Debris_TransferForceToParent` `sub_37F18`,
@@ -1627,7 +1627,7 @@ tours. Cette section est le point d'appui ; le portage C++ vient après.
 **Complément (2026-09-06, 5ᵉ passe) — chemin F2 RÉSOLU : la vue chase n'est PAS
 le « corps rigide debris ».**
 
-Les 4 passes ci-dessus traçaient `Camera_ComputeMountedPosition_3D31D` (seg085) :
+Les 4 passes ci-dessus traçaient `WorldObject_IntegrateBodyMotion_3D31D` (seg085) :
 c'est une **autre caméra** (arme/cinématique). La caméra **chase F2** passe par un
 tout autre code, dans **seg015** (segment cockpit/vue), beaucoup plus simple —
 pas de solveur de force.

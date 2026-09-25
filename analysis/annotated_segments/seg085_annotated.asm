@@ -364,7 +364,7 @@ loc_3CEED:				; DATA XREF: seg339:off_6ECA2o
 		lea	ax, [bp-0Ch]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		pop	si
 		leave
@@ -929,24 +929,15 @@ loc_3D319:				; CODE XREF: seg085:06B5j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,233L — TICK PAR FRAME DE LA POSITION D'UNE CAMÉRA EXTERNE ATTACHÉE (seg087:0250 ; vtable
-; seg339:off_6F6DC). si = objet caméra. (1) Vlin = si[+0x51] ? mount[+8/+0xC/+0x10] *
-; dword_7045E/256 : (0,0,0) (dword_707F8/FC/800). (2) Debris_BodyIntegrateForces_37D54(si,
-; &Vlin) => si[+0x12/+0x16/+0x1A] += Vlin — la position n'est PAS posée en absolu, elle
-; INTEGRE la vitesse du mount * dt chaque frame (jamais de snap, jamais d'offset constant
-; ici). (3) W = si[+0x51]->vtable[+0x2C]() (sinon 0) ; theta = W.y * dword_70458/256 ;
-; rotation 2D de (W.x, W.z) par theta (Math_SinRaw_58063 / Math_CosRaw_580A7 / FixedMul_58034)
-; ; si->vtable[+0x30](&{W.x*dt, W.y*dt, W.z*dt}) et si[+0x51]->vtable[+0x30](&W_tourné) —
-; RATTRAPAGE DE CAP rate-limité appliqué à l'orientation de la caméra ET du mount. => le 'lag
-; chase' = (a) position qui intègre v_mount*dt + (b) cap qui rattrape à taux*dt. Reste ouvert
-; : cam[+0x12] démarre à 0 et n'est jamais posé en absolu (=> offset relatif au mount, ou
-; accumulateur de force ; Debris_BodyGetPosition_37D04 le lit pourtant brut) ; où l'offset de
-; recul initial est posé ; identité du mount cam[+0x51] pour CHASE. Voir CAMERA_SYSTEM.md §4.
-; ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES
-; (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume
-; est a relire.
+; far, LUE en partie (2026-09-25). Ex-'Camera_ComputeMountedPosition' (FAUX). INTEGRATION DE
+; LA POSITION de l'objet monde : WorldObject_TranslateBy_37D54(objet, vitesse du corps (+0x51
+; -> +8) * dword_7045E) (vecteur par defaut sans corps), puis rotation a partir d'une vitesse
+; angulaire du corps (+0x51 -> vtable+0x2C, * dword_70458, Math_SinRaw_58063 /
+; Math_CosRaw_580A7) : suite non detaillee. Appelee par la methode +0x14 de l'avion
+; (loc_3E115, vtable seg339 off_6F880) : s'applique aussi en pilote automatique, avec la
+; vitesse ecrite par Autopilot_FlyToPointKinematic_49C2E.
 ; ==============================================================================================
-Camera_ComputeMountedPosition_3D31D	proc far		; CODE XREF: seg087:0250P
+WorldObject_IntegrateBodyMotion_3D31D	proc far		; CODE XREF: seg087:0250P
 					; DATA XREF: seg339:off_6F6DCo	...
 
 var_68		= dword	ptr -68h
@@ -1021,7 +1012,7 @@ loc_3D392:
 		jmp	short loc_3D3C6
 ; ���������������������������������������������������������������������������
 
-loc_3D3A9:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+Fj
+loc_3D3A9:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+Fj
 		mov	eax, dword_707F8
 		mov	[bp+var_50], eax
 		mov	eax, dword_707FC
@@ -1035,7 +1026,7 @@ loc_3D3C1:
 loc_3D3C3:
 		lea	ax, [bp+var_50]
 
-loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
+loc_3D3C6:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+8Aj
 		lea	ax, [bp+var_48]
 		push	ax
 		lea	ax, [bp+var_4C]
@@ -1043,7 +1034,7 @@ loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
 		lea	ax, [bp+var_50]
 		push	ax
 		push	si
-		call	Debris_BodyIntegrateForces
+		call	WorldObject_TranslateBy_37D54
 		add	sp, 8
 		cmp	word ptr [si+51h], 0
 		jz	short loc_3D3FB
@@ -1060,7 +1051,7 @@ loc_3D3C6:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+8Aj
 		jmp	short loc_3D418
 ; ���������������������������������������������������������������������������
 
-loc_3D3FB:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+C2j
+loc_3D3FB:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+C2j
 		mov	eax, dword_707F8
 		mov	[bp+var_5C], eax
 		mov	eax, dword_707FC
@@ -1070,7 +1061,7 @@ loc_3D3FB:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+C2j
 		mov	dx, ss
 		lea	ax, [bp+var_5C]
 
-loc_3D418:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+DCj
+loc_3D418:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+DCj
 		mov	eax, [bp+var_54]
 		mov	[bp+var_20], eax
 		mov	eax, [bp+var_5C]
@@ -1173,12 +1164,12 @@ loc_3D4BF:
 		add	sp, 4
 		jmp	short $+2
 
-loc_3D562:				; CODE XREF: Camera_ComputeMountedPosition_3D31D+22Fj
+loc_3D562:				; CODE XREF: WorldObject_IntegrateBodyMotion_3D31D+22Fj
 		pop	di
 		pop	si
 		leave
 		retf
-Camera_ComputeMountedPosition_3D31D	endp
+WorldObject_IntegrateBodyMotion_3D31D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

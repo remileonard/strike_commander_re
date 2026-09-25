@@ -456,7 +456,7 @@ ovr310) : `entité[+0x39]` u8 (F-16 : 3) + vec3 `entité[+0x3A/+0x3E/+0x42]`
   (le compte SMOK sert de param), mais le **vecteur** SMOK sert à la fumée,
   pas au placement.
 
-### 4.5 Cluster caméra externe seg085/086/087 — `Camera_ComputeMountedPosition_3D31D`
+### 4.5 Cluster caméra externe seg085/086/087 — `WorldObject_IntegrateBodyMotion_3D31D`
 
 Tick par frame (`seg087:0250`). `Vlin = cam[+0x51] ? mount[+8..+0x10] ×
 dword_7045E/256 : 0` ; `cam[+0x12..] += Vlin` (**intègre** la vitesse du
@@ -1078,7 +1078,7 @@ Base seg339 pour résoudre un tag : `vtable = 0x6D070 + tag` (vérifié `0x228A�
 3. `loc_1493A` : `sub_58768` (transforme l'axe par `si+0x8B`) et
    `sub_2E08B` — sémantique exacte ; ordre des rangées de la matrice
    d'orientation du sujet (`R[+0x0C/+0x10/+0x14]` = quelle rangée ?).
-4. Le cluster **seg085/086/087** (`Camera_ComputeMountedPosition_3D31D`,
+4. Le cluster **seg085/086/087** (`WorldObject_IntegrateBodyMotion_3D31D`,
    intégrateur `cam.pos += v_mount·dt`) : caméra distincte (arme / missile /
    replay ?) ou chemin alternatif ? `cam[+0x12]` n'est jamais posé en
    absolu (offset relatif au mount ? accumulateur de force ?).

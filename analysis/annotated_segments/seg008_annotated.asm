@@ -1070,7 +1070,7 @@ loc_EF44:
 		push	ax
 		lea	ax, [bp-4Ch]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		les	bx, [bp+6]
 		mov	word ptr es:[bx+26h], 0
@@ -1086,7 +1086,7 @@ loc_EFBD:				; CODE XREF: seg008:0A00j
 		push	ax
 		lea	ax, [bp-4Ch]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		les	bx, [bp+6]
 		mov	word ptr es:[bx+26h], 1
@@ -1284,7 +1284,7 @@ loc_F201:				; CODE XREF: seg008:0C4Dj
 		push	ax
 		lea	ax, [bp-40h]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		mov	dword ptr [bp-24h], 0
 		mov	eax, [bp-24h]
@@ -1978,7 +1978,7 @@ loc_F853:
 		push	ax
 		lea	ax, [bp-88h]
 		push	ax
-		call	Missile_ComputeDirectionVector2D_556D4
+		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 		lea	ax, [bp-88h]
 		push	ax

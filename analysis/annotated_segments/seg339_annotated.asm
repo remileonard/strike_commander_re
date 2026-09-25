@@ -2369,7 +2369,7 @@ off_6F35E	dd PhysicsTicks
 off_6F362	dd loc_498AD
 off_6F366	dd loc_3B4FB
 		dd VROOMM_StubThunk_6CBE2
-		dd loc_494DD
+		dd JDYN_UpdateDamageGains_494DD
 off_6F372	dd loc_49050
 off_6F376	dd loc_47FF8
 off_6F37A	dd loc_491B7
@@ -2585,7 +2585,7 @@ off_6F6CC	dd Debris_NotifyChildValidate
 off_6F6D0	dd loc_37D2E
 off_6F6D4	dd loc_37DD1
 off_6F6D8	dd WorldObject_UpdateWithAIEntity_3D9FB
-off_6F6DC	dd Camera_ComputeMountedPosition_3D31D
+off_6F6DC	dd WorldObject_IntegrateBodyMotion_3D31D
 off_6F6E0	dd Camera_DestructSecondaryTarget
 off_6F6E4	dd loc_3D9E9
 		dd VROOMM_StubThunk_6C190
@@ -2620,7 +2620,7 @@ off_6F758	dd Debris_NotifyChildValidate
 off_6F75C	dd loc_37D2E
 off_6F760	dd loc_37DD1
 off_6F764	dd Camera_ExternalUpdate_3D9B4
-		dd Camera_ComputeMountedPosition_3D31D
+		dd WorldObject_IntegrateBodyMotion_3D31D
 off_6F76C	dd Camera_DestructWithMount
 		dd loc_3CF4C
 off_6F774	dd VROOMM_StubThunk_6C190
@@ -2655,7 +2655,7 @@ off_6F7E4	dd Debris_NotifyChildValidate
 		dd loc_37D2E
 		dd loc_37DD1
 off_6F7F0	dd Camera_ResolvePositionVelocity_3DDC4
-off_6F7F4	dd Camera_ComputeMountedPosition_3D31D
+off_6F7F4	dd WorldObject_IntegrateBodyMotion_3D31D
 off_6F7F8	dd Camera_DestructCompoundB
 off_6F7FC	dd loc_3DEDF
 off_6F800	dd VROOMM_StubThunk_6C190
@@ -2735,7 +2735,7 @@ off_6F924	dd Debris_NotifyChildValidate
 		dd loc_37D2E
 off_6F92C	dd loc_37DD1
 off_6F930	dd loc_41AAF
-off_6F934	dd Camera_ComputeMountedPosition_3D31D
+off_6F934	dd WorldObject_IntegrateBodyMotion_3D31D
 		dd loc_4199B
 		dd loc_3CF4C
 off_6F940	dd VROOMM_StubThunk_6C190
@@ -2770,7 +2770,7 @@ off_6F9B0	dd Debris_NotifyChildValidate
 off_6F9B4	dd loc_37D2E
 off_6F9B8	dd loc_37DD1
 		dd loc_43332
-off_6F9C0	dd Camera_ComputeMountedPosition_3D31D
+off_6F9C0	dd WorldObject_IntegrateBodyMotion_3D31D
 off_6F9C4	dd Targeting_DestructWithWeakRefs
 		dd loc_3CF4C
 off_6F9CC	dd VROOMM_StubThunk_6C190
@@ -2805,7 +2805,7 @@ off_6FA3C	dd Debris_NotifyChildValidate
 off_6FA40	dd loc_37D2E
 off_6FA44	dd loc_37DD1
 off_6FA48	dd loc_41A59
-off_6FA4C	dd Camera_ComputeMountedPosition_3D31D
+off_6FA4C	dd WorldObject_IntegrateBodyMotion_3D31D
 off_6FA50	dd Countermeasure_DestructB
 off_6FA54	dd loc_3CF4C
 off_6FA58	dd VROOMM_StubThunk_6C190
@@ -2840,7 +2840,7 @@ off_6FAC8	dd Debris_NotifyChildValidate
 off_6FACC	dd loc_37D2E
 off_6FAD0	dd loc_37DD1
 off_6FAD4	dd Missile_UpdateSeekerAndFuse_42458
-off_6FAD8	dd Camera_ComputeMountedPosition_3D31D
+off_6FAD8	dd WorldObject_IntegrateBodyMotion_3D31D
 off_6FADC	dd loc_42D4F
 off_6FAE0	dd loc_3CF4C
 		dd VROOMM_StubThunk_6C190
@@ -3473,7 +3473,7 @@ off_703AA	dd Debris_NotifyChildValidate
 off_703AE	dd loc_37D2E
 off_703B2	dd loc_37DD1
 off_703B6	dd Trigger_TimedRangedSpawnOnce_4F351
-off_703BA	dd Camera_ComputeMountedPosition_3D31D
+off_703BA	dd WorldObject_IntegrateBodyMotion_3D31D
 off_703BE	dd Dtor_ScalarDeleting_4F316
 off_703C2	dd loc_3CF4C
 off_703C6	dd VROOMM_StubThunk_6C190

@@ -140,7 +140,7 @@ Deux erreurs de nommage/caractérisation ont été commises dans les sessions pr
 
 - **`sub_49C2E`** : anciennement nommée `JDYN_PhysicsTickMain`. Lecture complète (100%,
   1422 lignes) effectuée : ce n'est PAS un intégrateur physique newtonien (pas de calcul
-  force/masse/accélération). C'est **`Guidance_HomingVelocityUpdate`** — un moteur de
+  force/masse/accélération). C'est **`Autopilot_FlyToPointKinematic_49C2E`** — un moteur de
   pilotage automatique/homing cinématique générique, prenant un objet cible en paramètre :
   calcule un point visé (direct ou anticipé), un écart de cap borné, **écrit directement**
   le nouveau cap et la nouvelle vitesse sur l'objet (pas de simulation de force), applique

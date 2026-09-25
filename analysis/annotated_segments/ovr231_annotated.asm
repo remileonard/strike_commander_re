@@ -756,7 +756,7 @@ GroundAttack_Phase01_Approach_77282	endp
 ; far, LUE (2026-09-24). Ex-'AI_TransformTargetVector'. PHASE 2 (un tick) : P = cible + 1000
 ; d'altitude ; dir = normalise(P - ma position) * 100 ; bloc de commandes (entite+7) :
 ; +0x02/06/0A = P, +0x0E/12/16 = dir, +0x1A = 0 ; JDYN+0x68 = 0 (ACTIVE le pilote automatique
-; physique Guidance_HomingVelocityUpdate vers ce point) ; phase 3.
+; physique Autopilot_FlyToPointKinematic_49C2E vers ce point) ; phase 3.
 ; ==============================================================================================
 GroundAttack_Phase2_EngageAutopilot_775B1	proc far		; CODE XREF: VROOMM_StubThunk_6ABD0J GroundAttack_PhaseDispatch_77215+37p
 
@@ -880,7 +880,7 @@ GroundAttack_Phase2_EngageAutopilot_775B1	endp
 ; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma
 ; vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR =
 ; bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si
-; bloc+0x1A != 0 (pose par Guidance_HomingVelocityUpdate) -> phase 0 (nouvelle passe).
+; bloc+0x1A != 0 (pose par Autopilot_FlyToPointKinematic_49C2E) -> phase 0 (nouvelle passe).
 ; ==============================================================================================
 GroundAttack_Phase3_WeaponRelease_776FB	proc far		; CODE XREF: VROOMM_StubThunk_6ABD5J GroundAttack_PhaseDispatch_77215+42p
 

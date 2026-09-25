@@ -1180,10 +1180,12 @@ loc_556B2:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Missile_ComputeDirectionVector2D_5554E, référencée par seg008
-; (physique/guidage de missile).
+; far, LUE (2026-09-25). Ex-'Missile_ComputeDirectionVector2D'. Tourne en place la partie
+; horizontale d'un vecteur de theta (degres 24.8) : c0' = c0 cos + c1 sin, c1' = c1 cos - c0
+; sin (Math_CosRaw_580A7 / Math_SinRaw_58063), c2 inchange. Le cap atan2(c0, c1) augmente de
+; theta.
 ; ==============================================================================================
-Missile_ComputeDirectionVector2D_556D4	proc far		; CODE XREF: seg008:0A0AP seg008:0A34P ...
+Vector_RotateHeading2D_556D4	proc far		; CODE XREF: seg008:0A0AP seg008:0A34P ...
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -1260,7 +1262,7 @@ loc_55736:
 		pop	si
 		leave
 		retf
-Missile_ComputeDirectionVector2D_556D4	endp
+Vector_RotateHeading2D_556D4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
