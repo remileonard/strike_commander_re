@@ -825,7 +825,7 @@ off_1CDC0	dw offset loc_1CC40	; DATA XREF: Compiler_EmitByTokenType+3Cr
 ; noms (sub_52DDB, word_706A0+0x34) et retourne un champ associé (+0x52) : résolution de
 ; symbole nommé (table de symboles) du parseur script IA.
 ; ==============================================================================================
-Lexer_ResolveSymbol	proc far		; CODE XREF: Radio_SelectContextMessage+16DP
+Lexer_ResolveSymbol	proc far		; CODE XREF: AI_ComputeMorale_CD4A+16DP
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2

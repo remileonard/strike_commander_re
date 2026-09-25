@@ -11,7 +11,7 @@ seg093		segment	byte public 'CODE' use16
 ; far,34L — parcourt une table d'entrées de 20 octets et somme un champ (offset+0) : somme
 ; d'un attribut sur une liste de pilotes/entrées de roster.
 ; ==============================================================================================
-Roster_SumAttributeA	proc far		; CODE XREF: AI_MissileThreatTrigger_A+53P Radio_SelectContextMessage+3FP ...
+Roster_SumAttributeA	proc far		; CODE XREF: AI_MissileThreatTrigger_A+53P AI_ComputeMorale_CD4A+3FP ...
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6

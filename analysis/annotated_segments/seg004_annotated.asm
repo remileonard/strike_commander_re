@@ -708,23 +708,33 @@ AI_NavSolutionToPoint	endp
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 392 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi — resout la
-; connexion script/GOAL). Option de tournoi GOAL liee a GOAL=5. Referencee via vtable
-; (seg339:off_6D1A8, tag 0xF8).   DECOUVERTE CENTRALE : cette fonction LIT ET ECRIT
-; entite+0x11D (le meme champ que le script de mission utilise) : - Verifie si entite+0x11D ==
-; 0xAA (Follow Ally) pour decider d'executer le suivi actif - Peut ELLE-MEME poser
-; entite+0x11D = 0xAA ou 0xA5 (vol vers point) selon les conditions observees (correspondance
-; avec word_722E6, la cible/leader actuellement selectionnee) - Appelle DIRECTEMENT le noeud
-; MVRS ID=21 (entite+0xD1 -> vtable+8) pour l'execution reelle de la navigation — la MEME
-; mecanique que le script de mission utilise via MissionFormation_ComputeSlotAndSpawn.
-; CONCLUSION : entite+0x11D est un canal de communication BIDIRECTIONNEL entre le script et
-; GOAL=5, pas un simple drapeau a sens unique. Explique l'observation empirique de Remi : avec
-; GOAL=1 seul, le script pose bien entite+0x11D=0xAA (Follow Ally) mais AUCUNE option du
-; tournoi ne le consulte, donc rien ne se passe (l'avion garde son dernier etat, ex: monter
-; apres Take Off). Avec GOAL=5 present, cette fonction consulte le champ, le trouve a 0xAA, et
-; fournit le comportement de vol continu reel (suivi precis des commandes du joueur).
+; Ex-'Goal_ActiveWingmanEngagement_878F' (interpretation 'escorte active du joueur' fausse).
+; far, ~390L, RELUE INTEGRALEMENT 2026-09-25. Gestionnaire GOAL de valeur 5
+; (seg339:off_6D1A8). REACTION AU MORAL, evaluee au plus toutes les 5 s (horloge +0x175
+; comparee a +0x166, sinon renvoie 0). m = AI_ComputeMorale_CD4A (2 bon, 3 correct, 4 ebranle,
+; 5 panique) ; camp = [objet+0x102]+0x50 (1 = camp du joueur, 0xFF = camp adverse, 0 = neutre
+; ; deduit des branches ou le leader est le joueur). (A) m = 4 ou 5 et camp != 1 : FUITE -
+; radio 8, bit 5 de +0x28B (ordre verrouille contre le script), objectif +0x11D = 0xA5 (vol
+; vers un point), comportement en cours abandonne, point = AI_ResolveNodePosition_54274(objet,
+; word_706A0) + 1000 m d'altitude (add 3E800h), parametres (250, 100, 0) dans le bloc de
+; commandes +0x0E, recopies dans +0x11F/+0x12B, applique le noeud ID 21 (+0xD1, navigation) ;
+; renvoie 1. (B) m = 4 ou 5, camp 1, leader (+0x145) ou +0x147 = le joueur (word_722E6),
+; AI_MoraleDisciplineCheck_CA93 faux, et objectif = 0xAA (suivre) ou bit 5 de +0x28B : (B1) si
+; la menace +0x289 est le leader lui-meme et byte_6E4CD == 0 (pas d'adversaire actif au cycle
+; radio precedent) : cible aerienne +0x287 = le leader, +0x149 = 1,
+; AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (combat), radio 0x20 (le message de tir
+; sur le joueur) : L'AILIER SE RETOURNE CONTRE LE JOUEUR ; (B2) sinon, si +0x149 != 2 : radio
+; 8, bit 5, objectif 0xAA, +0x149 = 2, leader = joueur, abandon du comportement en cours,
+; navigation ID 21 vers le meme point + 1000 m (parametres 250, 0, 0) ; renvoie 1. (C) Sinon,
+; avec le leader = joueur : si +0x27F vaut 1 (degats) ou 2 (missile) : radio 6 au joueur,
+; renvoie 0. (D) m = 2 ou 3, camp 1, leader = joueur, AI_MoraleDisciplineCheck_CA93 faux,
+; +0x149 ni 1 ni 2, objectif 0xAA, byte_6E4CD != 0 : radio 0x12 puis Goal_TransferToWingman
+; (se rattache au joueur : cible de mission et reference de navigation = le joueur, +0x149 =
+; 1, bit 5) ; renvoie 1. Sens exact des messages radio 6, 8, 0x12 et du point resolu depuis
+; word_706A0 : non traces. Ne fait PAS le suivi de formation (c'est Goal_ExecuteAction_A8AC,
+; cas 0xAA).
 ; ==============================================================================================
-Goal_ActiveWingmanEngagement_878F:				; DATA XREF: seg339:off_6D1A8o
+Goal_MoraleReaction_878F:				; DATA XREF: seg339:off_6D1A8o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4Eh
@@ -745,7 +755,7 @@ loc_87B6:				; CODE XREF: seg004:0671j
 		mov	es:[bx+166h], eax
 		push	word ptr [bp+8]
 		push	bx
-		call	Radio_SelectContextMessage
+		call	AI_ComputeMorale_CD4A
 		add	sp, 4
 
 loc_87D2:
@@ -784,7 +794,7 @@ loc_87FB:				; CODE XREF: seg004:06B6j
 
 loc_8817:				; CODE XREF: seg004:06C7j seg004:06D2j
 		push	large dword ptr	[bp+6]
-		call	Voice_ExpressionTimer
+		call	AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -1075,7 +1085,7 @@ loc_8BA3:				; CODE XREF: seg004:06AFj
 		jnz	short loc_8C18
 		push	word ptr [bp+8]
 		push	bx
-		call	Voice_ExpressionTimer
+		call	AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax

@@ -26,7 +26,7 @@ flowchart TD
     G -->|sélecteur 2| H[Goal_ExecuteAction]
     G -->|sélecteur 3| I[Goal_WanderRandom]
     G -->|sélecteur 4| J[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    G -->|sélecteur 5| K[Goal_ActiveWingmanEngagement<br/>escorte active du joueur]
+    G -->|sélecteur 5| K[Goal_MoraleReaction_878F<br/>escorte active du joueur]
     H --> L[Commandes bas niveau<br/>AI_PitchToAngleCmd_7E18, etc.]
     J --> L
     K --> L
@@ -594,14 +594,14 @@ base `WorldObjectA` (confirmé : premier appel à
   tout chargement `PROF`.
 - Position par défaut (`+0x111/+0x115/+0x119`) = **(0, 0, 0x3E800)** —
   le même décalage d'altitude (1000 en virgule fixe 24.8) que celui
-  trouvé dans `Goal_ActiveWingmanEngagement_878F` pour le
+  trouvé dans `Goal_MoraleReaction_878F` pour le
   positionnement de formation.
 - `+0x200` (compteur `MVRS`) = 0, `+0x202` (premier pointeur `MVRS`) =
   0 — confirme que la table `MVRS` démarre **strictement vide**, avant
   que `PilotProfile_LoadFromPROF_73B4F` ne la peuple.
 - Références faibles établies sur `+0x10F/+0x137/+0x145/+0x147` — les
   mêmes champs cible déjà rencontrés dans `Goal_IsComplete` et
-  `Goal_ActiveWingmanEngagement_878F`.
+  `Goal_MoraleReaction_878F`.
 - Trois nouvelles constantes non décodées : `+0x139=30000`,
   `+0x13D=512000`, `+0x141=64000`.
 - Efface le premier emplacement `GOAL` (`+0x1B0`, 8 octets), et
@@ -949,7 +949,7 @@ flowchart LR
     B2 --> H2[Goal_ExecuteAction<br/>machine à états générique 0xA1-0xAC]
     B3 --> H3[Goal_WanderRandom<br/>patrouille/vagabondage]
     B4 --> H4[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    B5 --> H5["Goal_ActiveWingmanEngagement<br/>escorte/suivi du joueur<br/>(réservé coéquipiers actifs)"]
+    B5 --> H5["Goal_MoraleReaction_878F<br/>escorte/suivi du joueur<br/>(réservé coéquipiers actifs)"]
 ```
 
 ### 4.2 `AI_TopLevelThink` — réactions, objet en cours, puis objectifs
@@ -1009,7 +1009,7 @@ int AI_TopLevelThink(Entity* entity) {
 Points établis :
 - **Les gestionnaires sont alternatifs**, choisis par l'octet du fichier
   (2 `Goal_ExecuteAction`, 3 `Goal_WanderRandom`, 4 tournoi, 5
-  `Goal_ActiveWingmanEngagement`) : ils ne s'enchaînent pas.
+  `Goal_MoraleReaction_878F`) : ils ne s'enchaînent pas.
 - **La valeur `1` du fichier n'occupe aucun emplacement** (abandonnée dans
   `PilotProfile_LoadFromPROF`) ; `GOAL=1` seul donne un tableau vide.
 - **Au sol, `Goal_ExecuteAction` tourne quel que soit le tableau `GOAL`**,
@@ -1051,79 +1051,52 @@ int Goal_ExecuteAction(Entity* entity, int slot) {
 }
 ```
 
-### 4.4 `Goal_ActiveWingmanEngagement` — le gestionnaire du sélecteur `5`
-(escorte active du joueur)
+### 4.4 `Goal_MoraleReaction_878F` — le gestionnaire du sélecteur `5` : réaction au moral (relu le 2026-09-25)
 
-Entièrement tracé (393 lignes). Confirme précisément l'hypothèse
-pressentie dès les premières corrélations empiriques sur les fichiers
-`PROF` (§8) : ce gestionnaire est spécifiquement le comportement
-« devenir/rester coéquipier actif du joueur ».
+> **Correction 2026-09-25.** Ce gestionnaire était décrit comme « escorte active du joueur ».
+> Relu ligne à ligne, c'est une **réaction au moral** : fuite, abandon, retournement contre le
+> joueur ou rattachement au joueur, selon le moral et la discipline du pilote. Il ne fait **pas**
+> le suivi de formation. Les deux fonctions qu'il appelle étaient aussi mal nommées :
+> `AI_ComputeMorale_CD4A` (ex-`Radio_SelectContextMessage`) et `AI_MoraleDisciplineCheck_CA93`
+> (ex-`Voice_ExpressionTimer`).
 
-```mermaid
-flowchart TD
-    Start([Appel du gestionnaire]) --> RateLimit{Délai suffisant<br/>écoulé ?}
-    RateLimit -->|non| Exit0([Sortie, non géré])
-    RateLimit -->|oui| Context[Radio_SelectContextMessage<br/>classifie le contexte radio]
-    Context --> IsEscortCtx{Contexte == 4 ou 5 ?}
+**Moral** (`AI_ComputeMorale_CD4A`, rangé dans `entité+0xF5`) : score de départ 100, puis
+- carburant : `+ 51 × restant / capacité − 50` ;
+- −100 si `Roster_SumAttributeB` de l'avion est non nul (sens de l'attribut non établi) ;
+- −50 si l'ordre en cours ne peut pas être tenu (pas d'arme adaptée à la cible, pas de cible) ;
+- tant que des adversaires sont en vie : −8 par adversaire vivant, −32 par perte de son camp, et
+  plafond à 79 ;
+- −50 si une réaction est active (`+0x27F ≠ 0`) ;
+- loyauté `LY` : +0, +15, +30, +50 ou +75 (paliers 3, 6, 12, 15) ; plancher 25 si `LY > 9` ; 0 si
+  `LY ≤ 0`.
 
-    IsEscortCtx -->|oui| TargetPlayer{Cible/référence liée<br/>au joueur ?}
-    TargetPlayer -->|non, ni cible ni timer libre| FlyToWP[Branche B : FLY_TO_WP]
-    TargetPlayer -->|oui, timer vocal libre| Escort[Branche A : FOLLOW_ALLY]
+Résultat : **2** (≥ 80, bon), **3** (≥ 50), **4** (≥ 25, ébranlé), **5** (< 25, panique).
 
-    IsEscortCtx -->|non| TransferCheck{Cible déjà joueur,<br/>goal=FOLLOW_ALLY,<br/>verrou global actif ?}
-    TransferCheck -->|oui| Transfer[Branche C : transfert coéquipier]
-    TransferCheck -->|non| Exit0
+**Discipline** (`AI_MoraleDisciplineCheck_CA93`, toutes les 3 s) : `FL + (+7, +4, −3, −5 selon le
+moral 2 à 5) > 7`. Un pilote discipliné tient son rôle.
 
-    Escort --> EscortPos[Position de formation relative<br/>au joueur + altitude fixe]
-    EscortPos --> EscortState[goal_state = 0xAA<br/>verrouille cible sur le joueur]
-    EscortState --> EscortRadio[Radio_PlayMessage]
-    EscortRadio --> Delegate[AI_BehaviorStateMachine<br/>sélection pondérée MVRS]
-    Delegate --> Handled1([Sortie, géré])
+**Le gestionnaire** (au plus toutes les 5 s ; renvoie 1 s'il a agi, sinon le gestionnaire `GOAL`
+suivant prend la main) :
 
-    FlyToWP --> WPPos[Position fusionnée<br/>de deux sources]
-    WPPos --> WPState[goal_state = 0xA5]
-    WPState --> WPRadio[Radio_PlayMessage]
-    WPRadio --> Handled2([Sortie, géré])
+| Moral | Cas | Action |
+|---|---|---|
+| 4 ou 5 | pilote hors du camp du joueur | **fuite** : radio 8, ordre « vol vers un point » (`0xA5`) verrouillé contre le script, comportement en cours abandonné, navigation (nœud ID 21) vers un point résolu depuis l'objet global `word_706A0`, 1000 m plus haut |
+| 4 ou 5 | ailier du joueur, indiscipliné, en suivi : **la menace qui le vise est le joueur** et aucun adversaire actif | **se retourne contre le joueur** : cible aérienne = le joueur, combat, radio `0x20` |
+| 4 ou 5 | ailier du joueur, indiscipliné, en suivi, autre cas (une seule fois, `+0x149 = 2`) | radio 8, ordre « suivre » le joueur verrouillé, navigation vers le même point relevé de 1000 m |
+| 4 ou 5 | ailier du joueur, sinon, en réaction aux dégâts ou à un missile | radio 6 au joueur, ne prend pas la main |
+| 2 ou 3 | ailier du joueur, indiscipliné, en suivi, adversaires actifs | radio `0x12`, `Goal_TransferToWingman` (cible de mission et navigation = le joueur, ordre verrouillé) |
 
-    Transfer --> TransferRadio[Radio_PlayMessage]
-    TransferRadio --> TransferCall[Goal_TransferToWingman]
-    TransferCall --> Handled3([Sortie, géré])
-```
+« Camp du joueur » = octet `+0x50` de l'objet monde à 1 (0xFF = camp adverse, 0 = neutre) : déduit
+des branches où le leader est le joueur. Le sens des messages radio 6, 8, `0x12` et du point
+résolu depuis `word_706A0` n'est pas tracé.
 
-**Trois branches de comportement** :
-
-- **(A) Escorte/suivi du joueur** — si le contexte radio est `4`/`5`,
-  que la cible ou référence de l'entité pointe vers le joueur
-  (`word_722E6`), et que le timer d'expression vocale n'est pas occupé :
-  calcule une position de formation relative au joueur
-  (`AI_ResolveNodePosition_54274`, décalage d'altitude fixe et décalage
-  latéral), fixe `goal_state = 0xAA` (`OP_SET_OBJ_FOLLOW_ALLY`),
-  **verrouille la référence cible directement sur le joueur**,
-  déclenche un message radio, puis **délègue la décision finale à
-  `AI_BehaviorStateMachine`** — confirme que le mécanisme de sélection
-  pondérée `MVRS` (§3.5) intervient aussi dans le comportement
-  d'escorte active, pas uniquement via le sélecteur `GOAL` `4`
-  isolément.
-- **(B) Repli vers un point de navigation** — si le contexte `4`/`5` est
-  présent mais la condition de cible joueur n'est pas remplie : calcule
-  une position différente (fusion de deux sources — probable
-  interception/rendez-vous), fixe `goal_state = 0xA5`
-  (`OP_SET_OBJ_FLY_TO_WP`), message radio.
-- **(C) Transfert de coéquipier** — si le contexte radio n'est *pas*
-  `4`/`5`, mais que la cible est déjà le joueur, l'état est déjà
-  `FOLLOW_ALLY`, et qu'un verrou global (`byte_6E4CD`) est actif :
-  déclenche un message radio distinct puis appelle
-  **`Goal_TransferToWingman`** (transmet l'état `GOAL`/cible/point
-  de navigation vers une autre entité — passation d'escorte, par
-  exemple si le coéquipier courant doit être remplacé).
-
-**Ce que ça confirme architecturalement** : ce gestionnaire relie
-ensemble le système radio contextuel, le verrouillage de cible sur le
-joueur, la machine à états `GOAL`, et le mécanisme de sélection pondérée
-`MVRS` en aval — c'est le point de jonction entre « qui peut être
-coéquipier » (déterminé au chargement du fichier `PROF`, §8) et
-« comment ce coéquipier se comporte concrètement » (délégué à
-`AI_BehaviorStateMachine`).
+**Ce que ça ne fait pas : le suivi de formation.** Celui-ci passe par `Goal_FollowAllyExec`,
+appelé soit par `AIEntity_MasterTick_5ACC` (bit 3 de `entité+0x28B`, posé et entretenu par
+`Goal_FollowAllyExec` lui-même, et bit 5 de `flags_75` de l'avion), soit par
+`Goal_ExecuteAction_A8AC` (ordre `0xAA`), soit par `Goal_SetObjective_A307`. **Non résolu** :
+Rémi constate en jeu qu'un ailier suit le joueur avec `GOAL = 1, 5` et pas avec `GOAL = 1` seul ;
+la lecture de ce gestionnaire ne l'explique pas. À tracer : l'entrée dans le mode suivi (bit 3 de
+`+0x28B`, bit 5 de `flags_75`) et ce que change la présence d'un gestionnaire dans la liste.
 
 ---
 
@@ -1461,7 +1434,7 @@ offset variable) :
 | `entité+0xB0` | `TH` (Trigger Happy) | `sub_8C1E`, jet de compétence appelé par `MVRS_ID7` (modificateur `-7`) |
 | `entité+0xB1` | `CN` (Confidence) | `sub_8CA2`, jet de compétence, appelée depuis `sub_9027` |
 | `entité+0xB2` | `VB` (Verbosity) | **`Radio_CanPlayMessage`** — lue intégralement plus tôt dans cette session, le lien avec `ATRB` était resté non démontré à l'époque ; confirmé maintenant |
-| `entité+0xB3` | `LY` (Loyalty) | `Radio_SelectContextMessage` — compare `LY` à des paliers (`3`, `6`, `0xC`...) pour choisir un registre de message contextuel |
+| `entité+0xB3` | `LY` (Loyalty) | `AI_ComputeMorale_CD4A` — bonus de moral par paliers de `LY` (`3`, `6`, `0xC`, `0xF`), plancher si `LY > 9`, moral nul si `LY ≤ 0` (§4.4) |
 | `entité+0xB4` | `FL` (Flying) | `AI_MessageDispatcher` — compare `FL > 14` comme condition de branche |
 | `entité+0xB5` | `AG` (Air-to-Ground) | jet de compétence (motif identique, `sub_776FB`, voisine de la zone `MVRS_ID19`) |
 | `entité+0xB6` | `AA` (Air-to-Air) | `sub_8CCE`, **appelée depuis `AI_BehaviorStateMachine_WeightedOptionSelector_9D05` elle-même** (le tournoi) — comparaison par division, pas un simple jet |
@@ -1829,7 +1802,7 @@ maintenant en place :
 - **`AI_ResolveNodePosition_54274` vs `CameraScript_ExecuteCOMP_781D0`**
   : confirmé comme DEUX mécanismes distincts, pas la même famille — le
   premier résout une position nommée (système d'expressions +
-  hiérarchie géométrique) et est bien utilisé par l'IA (`Goal_ActiveWingmanEngagement`).
+  hiérarchie géométrique) et est bien utilisé par l'IA (`Goal_MoraleReaction_878F`).
   Le second (renommé — l'hypothèse « partagé avec l'IA » d'une analyse
   externe non revérifiée s'est révélée fausse à la lecture directe :
   il opère sur des offsets et une globale d'abandon spécifiques au

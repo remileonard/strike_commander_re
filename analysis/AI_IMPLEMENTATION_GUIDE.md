@@ -455,7 +455,7 @@ les exécuter), `4` reste atteignable dans le même passage dès qu'il sera
 câblé.
 
 **Statut : hypothèse de travail, pas une certitude ASM.** `AI_SYSTEM.md`
-§4.4 (`Goal_ActiveWingmanEngagement`, sélecteur `5`) montre qu'au moins un
+§4.4 (`Goal_MoraleReaction_878F`, sélecteur `5`) montre qu'au moins un
 sélecteur délègue lui-même à `AI_BehaviorStateMachine` en interne, en fin
 de son propre traitement — ce qui suggère que l'articulation réelle entre
 `Goal_ExecuteAction` et le tournoi `MVRS` n'est peut-être pas une simple

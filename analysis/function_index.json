@@ -2397,7 +2397,7 @@
 "sub_3A44E"
 ],
 "new_name": "Goal_TransferToWingman",
-"summary": "far,88L — transfert de GOAL entre deux entités (copie +0x11D, +0x137 cible, +0x10F waypoint depuis un objet référencé) : **transmission d'ordre/mission du leader vers un ailier.**"
+"summary": "far, 88L, LUE 2026-09-25. +0x149 = 1, bit 5 de +0x28B (ordre verrouille). Si le leader +0x145 existe et n'est pas le joueur, et que son entite IA (+0x55) a l'octet +6 == 1 : recopie son objectif +0x11D, sa cible de mission +0x137 et sa reference de navigation +0x10F. Si le leader est le joueur : byte_6E4D4 = 0, reference de navigation +0x10F et cible de mission +0x137 = le joueur (l'objectif, en general 0xAA suivre, est garde). Appelee par Goal_MoraleReaction_878F et AI_MessageDispatcher."
 },
 "sub_C5CD": {
 "segment": "seg006",
@@ -2435,8 +2435,8 @@
 "calls": [
 "sub_CD4A"
 ],
-"new_name": "Voice_ExpressionTimer",
-"summary": "far,90L — timer d'expression faciale/voix (+0x175/+0x15C), déclenche sub_CD4A (sélection de ligne) puis ajuste un index de voix (+0xB4) via un switch à 4 cas : **sélecteur d'expression/réplique du pilote selon le contexte.**"
+"new_name": "AI_MoraleDisciplineCheck_CA93",
+"summary": "Ex-'Voice_ExpressionTimer' (ni voix ni expression). far, 90L, LUE 2026-09-25. Toutes les 3 s au plus (horloge +0x175 contre +0x15C), v = FL (+0xB4) + ajustement selon le moral (AI_ComputeMorale_CD4A : 2 -> +7, 3 -> +4, 4 -> -3, 5 -> -5) ; bit 6 de +0x28B = (v > 7). Renvoie ce bit (valeur memorisee entre deux evaluations). Utilisee par Goal_MoraleReaction_878F : un pilote qui passe ce test tient son role (ne fuit pas, ne prend pas d'initiative)."
 },
 "sub_CB45": {
 "segment": "seg006",
@@ -2476,8 +2476,8 @@
 "sub_40F92",
 "sub_1CDD4"
 ],
-"new_name": "Radio_SelectContextMessage",
-"summary": "far,337L — capteur caché bit5 de +0x28C : calcule la vitesse (sub_43CDC), vérifie les munitions (+0x69 via +0xB), sélectionne un code de message par défaut (2) selon le contexte : **sélecteur de message radio contextuel (état de combat/armement).**"
+"new_name": "AI_ComputeMorale_CD4A",
+"summary": "Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25. CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye : 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100 ; pas de recalcul si Roster_SumAttributeA du roster de l'objet est nul ou si la capacite carburant [avion+0x69] est nulle ; -100 si Roster_SumAttributeB non nul (sens de l'attribut non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] - 0x32) ; -50 si l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol 0xFC ou cible air sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-air ; 0xAA suivre : condition sur l'objet global word_706A0 non tracee) ; equilibre des camps (compteurs word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94) : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79 tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0."
 },
 "sub_CFDF": {
 "segment": "seg006",
@@ -45694,8 +45694,8 @@
 "lines": 393,
 "type": "label",
 "calls": [],
-"new_name": "Goal_ActiveWingmanEngagement_878F",
-"summary": "far, 392 lignes, LUE INTEGRALEMENT (session gestion de mission avec Remi — resout la connexion script/GOAL). Option de tournoi GOAL liee a GOAL=5. Referencee via vtable (seg339:off_6D1A8, tag 0xF8). \n\nDECOUVERTE CENTRALE : cette fonction LIT ET ECRIT entite+0x11D (le meme champ que le script de mission utilise) : - Verifie si entite+0x11D == 0xAA (Follow Ally) pour decider d'executer le suivi actif - Peut ELLE-MEME poser entite+0x11D = 0xAA ou 0xA5 (vol vers point) selon les conditions observees (correspondance avec word_722E6, la cible/leader actuellement selectionnee) - Appelle DIRECTEMENT le noeud MVRS ID=21 (entite+0xD1 -> vtable+8) pour l'execution reelle de la navigation — la MEME mecanique que le script de mission utilise via MissionFormation_ComputeSlotAndSpawn. \n\nCONCLUSION : entite+0x11D est un canal de communication BIDIRECTIONNEL entre le script et GOAL=5, pas un simple drapeau a sens unique. Explique l'observation empirique de Remi : avec GOAL=1 seul, le script pose bien entite+0x11D=0xAA (Follow Ally) mais AUCUNE option du tournoi ne le consulte, donc rien ne se passe (l'avion garde son dernier etat, ex: monter apres Take Off). Avec GOAL=5 present, cette fonction consulte le champ, le trouve a 0xAA, et fournit le comportement de vol continu reel (suivi precis des commandes du joueur)."
+"new_name": "Goal_MoraleReaction_878F",
+"summary": "Ex-'Goal_ActiveWingmanEngagement_878F' (interpretation 'escorte active du joueur' fausse). far, ~390L, RELUE INTEGRALEMENT 2026-09-25. Gestionnaire GOAL de valeur 5 (seg339:off_6D1A8). REACTION AU MORAL, evaluee au plus toutes les 5 s (horloge +0x175 comparee a +0x166, sinon renvoie 0). m = AI_ComputeMorale_CD4A (2 bon, 3 correct, 4 ebranle, 5 panique) ; camp = [objet+0x102]+0x50 (1 = camp du joueur, 0xFF = camp adverse, 0 = neutre ; deduit des branches ou le leader est le joueur). (A) m = 4 ou 5 et camp != 1 : FUITE - radio 8, bit 5 de +0x28B (ordre verrouille contre le script), objectif +0x11D = 0xA5 (vol vers un point), comportement en cours abandonne, point = AI_ResolveNodePosition_54274(objet, word_706A0) + 1000 m d'altitude (add 3E800h), parametres (250, 100, 0) dans le bloc de commandes +0x0E, recopies dans +0x11F/+0x12B, applique le noeud ID 21 (+0xD1, navigation) ; renvoie 1. (B) m = 4 ou 5, camp 1, leader (+0x145) ou +0x147 = le joueur (word_722E6), AI_MoraleDisciplineCheck_CA93 faux, et objectif = 0xAA (suivre) ou bit 5 de +0x28B : (B1) si la menace +0x289 est le leader lui-meme et byte_6E4CD == 0 (pas d'adversaire actif au cycle radio precedent) : cible aerienne +0x287 = le leader, +0x149 = 1, AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (combat), radio 0x20 (le message de tir sur le joueur) : L'AILIER SE RETOURNE CONTRE LE JOUEUR ; (B2) sinon, si +0x149 != 2 : radio 8, bit 5, objectif 0xAA, +0x149 = 2, leader = joueur, abandon du comportement en cours, navigation ID 21 vers le meme point + 1000 m (parametres 250, 0, 0) ; renvoie 1. (C) Sinon, avec le leader = joueur : si +0x27F vaut 1 (degats) ou 2 (missile) : radio 6 au joueur, renvoie 0. (D) m = 2 ou 3, camp 1, leader = joueur, AI_MoraleDisciplineCheck_CA93 faux, +0x149 ni 1 ni 2, objectif 0xAA, byte_6E4CD != 0 : radio 0x12 puis Goal_TransferToWingman (se rattache au joueur : cible de mission et reference de navigation = le joueur, +0x149 = 1, bit 5) ; renvoie 1. Sens exact des messages radio 6, 8, 0x12 et du point resolu depuis word_706A0 : non traces. Ne fait PAS le suivi de formation (c'est Goal_ExecuteAction_A8AC, cas 0xAA)."
 },
 "loc_45BE": {
 "segment": "seg002",

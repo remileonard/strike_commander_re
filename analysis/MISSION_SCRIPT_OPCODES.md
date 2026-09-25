@@ -80,7 +80,7 @@ flowchart TD
     GoalSlots -->|"2"| GoalExec
     GoalSlots -->|"3"| Wander["Goal_WanderRandom"]
     GoalSlots -->|"4"| Tournament["Tournoi MVRS"]
-    GoalSlots -->|"5"| ActiveWingman["Goal_ActiveWingmanEngagement (GOAL=5)"]
+    GoalSlots -->|"5"| ActiveWingman["Goal_MoraleReaction_878F (GOAL=5)"]
 
     Profile -.->|"ecrit une fois,<br/>relu en boucle par l'autre arbre"| MasterTick
     Formation -.->|"entite+0x11D = 0xAA/0xA5<br/>(LIEN REEL, bidirectionnel)"| ActiveWingman
@@ -130,7 +130,7 @@ GOAL ni MVRS, il prépare l'état puis aiguille vers `Goal_FollowAllyExec` ou
 
 **Mise à jour du même jour, après lecture de `AI_TopLevelThink`** : la
 chaîne `AI_TopLevelThink` → `Goal_ExecuteAction` → tournoi →
-`Goal_ActiveWingmanEngagement` dessinée ici auparavant était inexacte. Le
+`Goal_MoraleReaction_878F` dessinée ici auparavant était inexacte. Le
 graphe ci-dessus montre maintenant la structure lue : réactions
 prioritaires, puis l'objet à `entité+0x0D`, puis `Goal_ExecuteAction`
 direct si l'avion est au sol, sinon les gestionnaires du tableau `GOAL`
@@ -724,12 +724,18 @@ et `GOAL=5`, il suit immédiatement et précisément le vol du joueur.
 précédente ("le script délègue directement, sans passer par `GOAL`")
 était incomplète.*
 
-En lisant intégralement `Goal_ActiveWingmanEngagement_878F` (l'option
+> **⚠️ Correction 2026-09-25.** Le pseudo-code et les « deux découvertes » ci-dessous sont faux :
+> relue ligne à ligne, `Goal_MoraleReaction_878F` est une réaction au moral (fuite, abandon,
+> retournement contre le joueur, rattachement au joueur), pas l'exécution du suivi. Voir
+> `AI_SYSTEM.md` §4.4. L'observation de Rémi (`GOAL = 1, 5` suit, `GOAL = 1` seul ne suit pas)
+> reste vraie et reste à expliquer.
+
+En lisant intégralement `Goal_MoraleReaction_878F` (l'option
 de tournoi liée à `GOAL=5`) :
 
 ```c
-// Extrait central de Goal_ActiveWingmanEngagement (GOAL=5)
-void Goal_ActiveWingmanEngagement(Entity *self, Context *ctx)
+// Extrait central de Goal_MoraleReaction_878F (GOAL=5)
+void Goal_MoraleReaction_878F(Entity *self, Context *ctx)
 {
     // ... conditions de garde (portee, delai anti-spam byte_6E4CD) ...
 
@@ -755,7 +761,7 @@ void Goal_ActiveWingmanEngagement(Entity *self, Context *ctx)
 **Deux découvertes en une** :
 
 1. **`entité+0x11D` est un canal à double sens** : le script peut le
-   poser (via `Goal_SetObjective`), et `Goal_ActiveWingmanEngagement`
+   poser (via `Goal_SetObjective`), et `Goal_MoraleReaction_878F`
    (`GOAL=5`) le **lit** pour décider d'agir — mais elle peut **aussi
    l'écrire elle-même**, avec le même vocabulaire de codes (`0xAA`,
    `0xA5`), selon ses propres observations (correspondance avec
@@ -785,15 +791,15 @@ Ce qui explique l'observation :
 3. **Une fois en vol**, `AI_TopLevelThink` ne parcourt plus que les
    emplacements du fichier. Avec un tableau vide rien ne s'exécute : le
    suivi (`Follow Ally`, `0xAA`) n'est jamais traité, l'avion garde son
-   dernier état. Avec `5`, `Goal_ActiveWingmanEngagement_878F` est appelé
+   dernier état. Avec `5`, `Goal_MoraleReaction_878F` est appelé
    et lit `entité+0x11D`.
 
 Le canal `entité+0x11D` reste bidirectionnel (le script le pose,
-`Goal_ActiveWingmanEngagement_878F` le lit et peut l'écrire), mais le
+`Goal_MoraleReaction_878F` le lit et peut l'écrire), mais le
 choix entre « exécuté » et « ignoré » dépend d'abord du drapeau au sol
 et du tableau `GOAL`, pas d'un test des options du tournoi.
 `Goal_ExecuteAction_A8AC`, `Goal_WanderRandom_AD13`, le tournoi et
-`Goal_ActiveWingmanEngagement_878F` sont des gestionnaires alternatifs
+`Goal_MoraleReaction_878F` sont des gestionnaires alternatifs
 choisis par l'octet du fichier, pas des étapes qui s'enchaînent.
 
 

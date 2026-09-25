@@ -37,7 +37,7 @@ flowchart TD
 
 | Intention | Description | Réf. technique |
 |---|---|---|
-| **Coéquipier** | Suit et protège le joueur activement — position de formation, réagit aux ordres radio du joueur (attaquer ma cible, rentrer à la base...). Réservé aux personnages « actifs » (Billy, Gwen, Stern). | `Goal_ActiveWingmanEngagement_878F`, sélecteur `5` |
+| **Coéquipier** | Suit et protège le joueur activement — position de formation, réagit aux ordres radio du joueur (attaquer ma cible, rentrer à la base...). Réservé aux personnages « actifs » (Billy, Gwen, Stern). | suivi : `Goal_FollowAllyExec` ; le sélecteur `5` (`Goal_MoraleReaction_878F`) est la **réaction au moral** de l'ailier (fuite, abandon, retournement contre le joueur), corrigé 2026-09-25 |
 | **En mission** | Exécute un ordre de mission précis assigné par le scénario ou la radio — décoller, atterrir, détruire une cible, défendre une zone. | `Goal_ExecuteAction`, `Goal_SetObjective_A307`, sélecteur `2` |
 | **Solo / en attente** | Aucun ordre précis en cours — patrouille ou vagabonde sans intention forte. Comportement de repli. | `Goal_WanderRandom`, sélecteur `3` |
 | **Instinct de combat** | La vraie prise de décision moment par moment une fois engagé — voir §3. | `AI_BehaviorStateMachine`, sélecteur `4` |

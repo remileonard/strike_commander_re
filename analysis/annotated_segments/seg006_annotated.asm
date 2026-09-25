@@ -202,7 +202,7 @@ loc_BAB7:				; CODE XREF: Goal_SelectTransition+15Fj
 		push	bx
 		nop
 		push	cs
-		call	near ptr Voice_ExpressionTimer
+		call	near ptr AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		or	al, al
 		jnz	short loc_BACA
@@ -1385,8 +1385,12 @@ off_C4F5	dw offset loc_C324	; DATA XREF: Escort_LeaderSuccession+6Er
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,88L — transfert de GOAL entre deux entités (copie +0x11D, +0x137 cible, +0x10F waypoint
-; depuis un objet référencé) : transmission d'ordre/mission du leader vers un ailier.
+; far, 88L, LUE 2026-09-25. +0x149 = 1, bit 5 de +0x28B (ordre verrouille). Si le leader
+; +0x145 existe et n'est pas le joueur, et que son entite IA (+0x55) a l'octet +6 == 1 :
+; recopie son objectif +0x11D, sa cible de mission +0x137 et sa reference de navigation
+; +0x10F. Si le leader est le joueur : byte_6E4D4 = 0, reference de navigation +0x10F et cible
+; de mission +0x137 = le joueur (l'objectif, en general 0xAA suivre, est garde). Appelee par
+; Goal_MoraleReaction_878F et AI_MessageDispatcher.
 ; ==============================================================================================
 Goal_TransferToWingman	proc far		; CODE XREF: seg004:0ACCP
 					; AI_MessageDispatcher+168p ...
@@ -1599,7 +1603,7 @@ loc_C682:				; CODE XREF: AI_MessageDispatcher+B0j
 		push	cs
 
 loc_C688:
-		call	near ptr Voice_ExpressionTimer
+		call	near ptr AI_MoraleDisciplineCheck_CA93
 		add	sp, 4
 		mov	dl, al
 
@@ -1632,7 +1636,7 @@ loc_C6B6:				; DATA XREF: seg006:off_CA7Fo
 		push	large [bp+arg_0] ; case	0x0
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		mov	[bp+var_6], al
 		jmp	loc_CA19
@@ -1910,14 +1914,14 @@ loc_C8E3:				; CODE XREF: AI_MessageDispatcher+309j
 		push	bx
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cmp	al, 5
 		jz	short loc_C911
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cmp	al, 4
 		jz	short loc_C911
@@ -2083,11 +2087,14 @@ off_CA7F	dw offset loc_C6B6	; DATA XREF: AI_MessageDispatcher+E4r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,90L — timer d'expression faciale/voix (+0x175/+0x15C), déclenche sub_CD4A (sélection de
-; ligne) puis ajuste un index de voix (+0xB4) via un switch à 4 cas : sélecteur
-; d'expression/réplique du pilote selon le contexte.
+; Ex-'Voice_ExpressionTimer' (ni voix ni expression). far, 90L, LUE 2026-09-25. Toutes les 3 s
+; au plus (horloge +0x175 contre +0x15C), v = FL (+0xB4) + ajustement selon le moral
+; (AI_ComputeMorale_CD4A : 2 -> +7, 3 -> +4, 4 -> -3, 5 -> -5) ; bit 6 de +0x28B = (v > 7).
+; Renvoie ce bit (valeur memorisee entre deux evaluations). Utilisee par
+; Goal_MoraleReaction_878F : un pilote qui passe ce test tient son role (ne fuit pas, ne prend
+; pas d'initiative).
 ; ==============================================================================================
-Voice_ExpressionTimer	proc far		; CODE XREF: seg004:06DBP seg004:0A83P ...
+AI_MoraleDisciplineCheck_CA93	proc far		; CODE XREF: seg004:06DBP seg004:0A83P ...
 
 var_5		= byte ptr -5
 var_4		= dword	ptr -4
@@ -2112,7 +2119,7 @@ arg_0		= dword	ptr  6
 		push	bx
 		nop
 		push	cs
-		call	near ptr Radio_SelectContextMessage
+		call	near ptr AI_ComputeMorale_CD4A
 		add	sp, 4
 		cbw
 		sub	ax, 2
@@ -2126,60 +2133,60 @@ loc_CAED:				; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x3
 		add	al, 0FBh ; '�'
 
-loc_CAF2:				; CODE XREF: Voice_ExpressionTimer+69j Voice_ExpressionTimer+70j ...
+loc_CAF2:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+69j AI_MoraleDisciplineCheck_CA93+70j ...
 		mov	[bp+var_5], al
 		jmp	short loc_CB0C	; default
 ; ���������������������������������������������������������������������������
 
-loc_CAF7:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CAF7:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x2
 		add	al, 0FDh ; '�'
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CAFE:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CAFE:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x1
 		add	al, 4
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CB05:				; CODE XREF: Voice_ExpressionTimer+55j
+loc_CB05:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+55j
 					; DATA XREF: seg006:off_CB3Do
 		mov	al, [bp+var_5]	; case 0x0
 		add	al, 7
 		jmp	short loc_CAF2
 ; ���������������������������������������������������������������������������
 
-loc_CB0C:				; CODE XREF: Voice_ExpressionTimer+51j Voice_ExpressionTimer+62j
+loc_CB0C:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+51j AI_MoraleDisciplineCheck_CA93+62j
 		cmp	[bp+var_5], 7	; default
 		jle	short loc_CB17
 		mov	ax, 1
 		jmp	short loc_CB19
 ; ���������������������������������������������������������������������������
 
-loc_CB17:				; CODE XREF: Voice_ExpressionTimer+7Dj
+loc_CB17:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+7Dj
 		xor	ax, ax
 
-loc_CB19:				; CODE XREF: Voice_ExpressionTimer+82j
+loc_CB19:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+82j
 		and	ax, 1
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+28Bh], 0BFh
 		shl	al, 6
 		or	es:[bx+28Bh], al
 
-loc_CB2D:				; CODE XREF: Voice_ExpressionTimer+22j
+loc_CB2D:				; CODE XREF: AI_MoraleDisciplineCheck_CA93+22j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+28Bh]
 		shr	ax, 6
 		and	ax, 1
 		leave
 		retf
-Voice_ExpressionTimer	endp
+AI_MoraleDisciplineCheck_CA93	endp
 
 ; ���������������������������������������������������������������������������
-off_CB3D	dw offset loc_CB05	; DATA XREF: Voice_ExpressionTimer+55r
+off_CB3D	dw offset loc_CB05	; DATA XREF: AI_MoraleDisciplineCheck_CA93+55r
 		dw offset loc_CAFE	; jump table for switch	statement
 		dw offset loc_CAF7
 		dw offset loc_CAED
@@ -2505,11 +2512,23 @@ word_CD32	dw	6,     7,     8,   10h ; DATA XREF: Radio_CanPlayMessage+30o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,337L — capteur caché bit5 de +0x28C : calcule la vitesse (sub_43CDC), vérifie les
-; munitions (+0x69 via +0xB), sélectionne un code de message par défaut (2) selon le contexte
-; : sélecteur de message radio contextuel (état de combat/armement).
+; Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25.
+; CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye :
+; 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100
+; ; pas de recalcul si Roster_SumAttributeA du roster de l'objet est nul ou si la capacite
+; carburant [avion+0x69] est nulle ; -100 si Roster_SumAttributeB non nul (sens de l'attribut
+; non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] - 0x32) ; -50 si
+; l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol 0xFC ou cible air
+; sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-air ; 0xAA suivre :
+; condition sur l'objet global word_706A0 non tracee) ; equilibre des camps (compteurs
+; word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94)
+; : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire
+; vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus
+; de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79
+; tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0.
 ; ==============================================================================================
-Radio_SelectContextMessage	proc far		; CODE XREF: seg004:068AP AI_MessageDispatcher+EFp ...
+AI_ComputeMorale_CD4A	proc far		; CODE XREF: seg004:068AP AI_MessageDispatcher+EFp ...
 
 var_C		= word ptr -0Ch
 var_A		= dword	ptr -0Ah
@@ -2533,7 +2552,7 @@ arg_0		= dword	ptr  6
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CD6D:				; CODE XREF: Radio_SelectContextMessage+1Ej
+loc_CD6D:				; CODE XREF: AI_ComputeMorale_CD4A+1Ej
 		or	byte ptr es:[bx+28Ch], 20h
 		mov	si, 64h	; 'd'
 		mov	bx, es:[bx+102h]
@@ -2554,7 +2573,7 @@ loc_CD84:
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CD98:				; CODE XREF: Radio_SelectContextMessage+49j
+loc_CD98:				; CODE XREF: AI_ComputeMorale_CD4A+49j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		cmp	dword ptr [bx+69h], 0
@@ -2563,16 +2582,16 @@ loc_CD98:				; CODE XREF: Radio_SelectContextMessage+49j
 		jmp	short loc_CDAD
 ; ���������������������������������������������������������������������������
 
-loc_CDAB:				; CODE XREF: Radio_SelectContextMessage+5Aj
+loc_CDAB:				; CODE XREF: AI_ComputeMorale_CD4A+5Aj
 		xor	ax, ax
 
-loc_CDAD:				; CODE XREF: Radio_SelectContextMessage+5Fj
+loc_CDAD:				; CODE XREF: AI_ComputeMorale_CD4A+5Fj
 		or	al, al
 		jnz	short loc_CDB4
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CDB4:				; CODE XREF: Radio_SelectContextMessage+65j
+loc_CDB4:				; CODE XREF: AI_ComputeMorale_CD4A+65j
 		push	large [bp+var_6]
 		call	Roster_SumAttributeB
 		add	sp, 4
@@ -2580,7 +2599,7 @@ loc_CDB4:				; CODE XREF: Radio_SelectContextMessage+65j
 		jz	short loc_CDC7
 		sub	si, 64h	; 'd'
 
-loc_CDC7:				; CODE XREF: Radio_SelectContextMessage+78j
+loc_CDC7:				; CODE XREF: AI_ComputeMorale_CD4A+78j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Bh]
 		mov	eax, [bx+6Dh]
@@ -2605,7 +2624,7 @@ loc_CDC7:				; CODE XREF: Radio_SelectContextMessage+78j
 		jmp	loc_CEC4
 ; ���������������������������������������������������������������������������
 
-loc_CE10:				; CODE XREF: Radio_SelectContextMessage+C1j
+loc_CE10:				; CODE XREF: AI_ComputeMorale_CD4A+C1j
 		push	word ptr es:[bx+137h]
 		mov	bx, es:[bx+137h]
 		mov	bx, [bx]
@@ -2627,7 +2646,7 @@ loc_CE10:				; CODE XREF: Radio_SelectContextMessage+C1j
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE4B:				; CODE XREF: Radio_SelectContextMessage+E3j
+loc_CE4B:				; CODE XREF: AI_ComputeMorale_CD4A+E3j
 		push	0F03h
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+104h]
@@ -2639,7 +2658,7 @@ loc_CE4B:				; CODE XREF: Radio_SelectContextMessage+E3j
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE67:				; CODE XREF: Radio_SelectContextMessage+B9j
+loc_CE67:				; CODE XREF: AI_ComputeMorale_CD4A+B9j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+11Dh], 0A8h ; '�'
 		jnz	short loc_CE96
@@ -2661,7 +2680,7 @@ loc_CE92:
 		jmp	short loc_CEC1
 ; ���������������������������������������������������������������������������
 
-loc_CE96:				; CODE XREF: Radio_SelectContextMessage+127j
+loc_CE96:				; CODE XREF: AI_ComputeMorale_CD4A+127j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+11Dh], 0AAh ; '�'
 		jnz	short loc_CEC4
@@ -2678,31 +2697,31 @@ loc_CE96:				; CODE XREF: Radio_SelectContextMessage+127j
 		or	ax, ax
 		jnz	short loc_CEC4
 
-loc_CEC1:				; CODE XREF: Radio_SelectContextMessage+FFj
-					; Radio_SelectContextMessage+11Bj ...
+loc_CEC1:				; CODE XREF: AI_ComputeMorale_CD4A+FFj
+					; AI_ComputeMorale_CD4A+11Bj ...
 		sub	si, 32h	; '2'
 
-loc_CEC4:				; CODE XREF: Radio_SelectContextMessage+C3j Radio_SelectContextMessage+FDj ...
+loc_CEC4:				; CODE XREF: AI_ComputeMorale_CD4A+C3j AI_ComputeMorale_CD4A+FDj ...
 		cmp	word_706A3, 0
 		jnz	short loc_CECE
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CECE:				; CODE XREF: Radio_SelectContextMessage+17Fj
+loc_CECE:				; CODE XREF: AI_ComputeMorale_CD4A+17Fj
 		mov	ax, word_706A3
 		cmp	ax, word_706A5
 		jge	short loc_CEDA
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CEDA:				; CODE XREF: Radio_SelectContextMessage+18Bj
+loc_CEDA:				; CODE XREF: AI_ComputeMorale_CD4A+18Bj
 		mov	ax, word_706A7
 		cmp	ax, word_706A9
 		jge	short loc_CEE6
 		jmp	loc_CFD3
 ; ���������������������������������������������������������������������������
 
-loc_CEE6:				; CODE XREF: Radio_SelectContextMessage+197j
+loc_CEE6:				; CODE XREF: AI_ComputeMorale_CD4A+197j
 		xor	dx, dx
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
@@ -2714,7 +2733,7 @@ loc_CEE6:				; CODE XREF: Radio_SelectContextMessage+197j
 		jmp	short loc_CF1C
 ; ���������������������������������������������������������������������������
 
-loc_CF03:				; CODE XREF: Radio_SelectContextMessage+1AAj
+loc_CF03:				; CODE XREF: AI_ComputeMorale_CD4A+1AAj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+102h]
 		cmp	byte ptr [bx+50h], 1
@@ -2723,10 +2742,10 @@ loc_CF03:				; CODE XREF: Radio_SelectContextMessage+1AAj
 		sub	di, word_706A9
 		mov	ax, word_706A5
 
-loc_CF1C:				; CODE XREF: Radio_SelectContextMessage+1B7j
+loc_CF1C:				; CODE XREF: AI_ComputeMorale_CD4A+1B7j
 		mov	[bp+var_C], ax
 
-loc_CF1F:				; CODE XREF: Radio_SelectContextMessage+1C5j
+loc_CF1F:				; CODE XREF: AI_ComputeMorale_CD4A+1C5j
 		or	di, di
 		jle	short loc_CF40
 		les	bx, [bp+arg_0]
@@ -2740,15 +2759,15 @@ loc_CF1F:				; CODE XREF: Radio_SelectContextMessage+1C5j
 		shl	ax, 5
 		sub	dx, ax
 
-loc_CF40:				; CODE XREF: Radio_SelectContextMessage+1D7j
-					; Radio_SelectContextMessage+1E5j
+loc_CF40:				; CODE XREF: AI_ComputeMorale_CD4A+1D7j
+					; AI_ComputeMorale_CD4A+1E5j
 		add	si, dx
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+27Fh], 0
 		jz	short loc_CF50
 		sub	si, 32h	; '2'
 
-loc_CF50:				; CODE XREF: Radio_SelectContextMessage+201j
+loc_CF50:				; CODE XREF: AI_ComputeMorale_CD4A+201j
 		les	bx, [bp+arg_0]
 		mov	dl, es:[bx+0B3h]
 		cmp	dl, 3
@@ -2757,32 +2776,32 @@ loc_CF50:				; CODE XREF: Radio_SelectContextMessage+201j
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF61:				; CODE XREF: Radio_SelectContextMessage+211j
+loc_CF61:				; CODE XREF: AI_ComputeMorale_CD4A+211j
 		cmp	dl, 6
 		jge	short loc_CF6B
 		mov	bx, 0Fh
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF6B:				; CODE XREF: Radio_SelectContextMessage+21Aj
+loc_CF6B:				; CODE XREF: AI_ComputeMorale_CD4A+21Aj
 		cmp	dl, 0Ch
 		jge	short loc_CF75
 		mov	bx, 1Eh
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF75:				; CODE XREF: Radio_SelectContextMessage+224j
+loc_CF75:				; CODE XREF: AI_ComputeMorale_CD4A+224j
 		cmp	dl, 0Fh
 		jge	short loc_CF7F
 		mov	bx, 32h	; '2'
 		jmp	short loc_CF82
 ; ���������������������������������������������������������������������������
 
-loc_CF7F:				; CODE XREF: Radio_SelectContextMessage+22Ej
+loc_CF7F:				; CODE XREF: AI_ComputeMorale_CD4A+22Ej
 		mov	bx, 4Bh	; 'K'
 
-loc_CF82:				; CODE XREF: Radio_SelectContextMessage+215j
-					; Radio_SelectContextMessage+21Fj ...
+loc_CF82:				; CODE XREF: AI_ComputeMorale_CD4A+215j
+					; AI_ComputeMorale_CD4A+21Fj ...
 		add	si, bx
 		or	di, di
 		jle	short loc_CF90
@@ -2794,58 +2813,58 @@ loc_CF8B:
 		jl	short loc_CF90
 		mov	si, 4Fh	; 'O'
 
-loc_CF90:				; CODE XREF: Radio_SelectContextMessage+23Cj
-					; Radio_SelectContextMessage:loc_CF8Bj
+loc_CF90:				; CODE XREF: AI_ComputeMorale_CD4A+23Cj
+					; AI_ComputeMorale_CD4A:loc_CF8Bj
 		cmp	dl, 9
 		jle	short loc_CF9D
 		cmp	si, 19h
 		jge	short loc_CF9D
 		mov	si, 19h
 
-loc_CF9D:				; CODE XREF: Radio_SelectContextMessage+249j
-					; Radio_SelectContextMessage+24Ej
+loc_CF9D:				; CODE XREF: AI_ComputeMorale_CD4A+249j
+					; AI_ComputeMorale_CD4A+24Ej
 		or	dl, dl
 		jg	short loc_CFA3
 		xor	si, si
 
-loc_CFA3:				; CODE XREF: Radio_SelectContextMessage+255j
+loc_CFA3:				; CODE XREF: AI_ComputeMorale_CD4A+255j
 		cmp	si, 19h
 		jge	short loc_CFAE
 		mov	[bp+var_2], 5
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFAE:				; CODE XREF: Radio_SelectContextMessage+25Cj
+loc_CFAE:				; CODE XREF: AI_ComputeMorale_CD4A+25Cj
 		cmp	si, 32h	; '2'
 		jge	short loc_CFB9
 		mov	[bp+var_2], 4
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFB9:				; CODE XREF: Radio_SelectContextMessage+267j
+loc_CFB9:				; CODE XREF: AI_ComputeMorale_CD4A+267j
 		cmp	si, 50h	; 'P'
 		jge	short loc_CFC4
 		mov	[bp+var_2], 3
 		jmp	short loc_CFC8
 ; ���������������������������������������������������������������������������
 
-loc_CFC4:				; CODE XREF: Radio_SelectContextMessage+272j
+loc_CFC4:				; CODE XREF: AI_ComputeMorale_CD4A+272j
 		mov	[bp+var_2], 2
 
-loc_CFC8:				; CODE XREF: Radio_SelectContextMessage+262j
-					; Radio_SelectContextMessage+26Dj ...
+loc_CFC8:				; CODE XREF: AI_ComputeMorale_CD4A+262j
+					; AI_ComputeMorale_CD4A+26Dj ...
 		les	bx, [bp+arg_0]
 		mov	al, [bp+var_2]
 		mov	es:[bx+0F5h], al
 
-loc_CFD3:				; CODE XREF: Radio_SelectContextMessage+20j Radio_SelectContextMessage+4Bj ...
+loc_CFD3:				; CODE XREF: AI_ComputeMorale_CD4A+20j AI_ComputeMorale_CD4A+4Bj ...
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+0F5h]
 		pop	di
 		pop	si
 		leave
 		retf
-Radio_SelectContextMessage	endp
+AI_ComputeMorale_CD4A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
