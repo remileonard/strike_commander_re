@@ -3,7 +3,13 @@ seg084		segment	byte public 'CODE' use16
 		;org 0Bh
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_3C93B:				; DATA XREF: seg339:off_6F630o
+; ==============================================================================================
+; far, LUE 2026-10-06. 'mov al, 1 / retf' : categorie 1, slot +8 de la vtable 0x6F628 (tag
+; 2578h) que IFF_LoadModelMain pose sur les objets ORNT (decor oriente : immeubles...) juste
+; apres la base 1B6Fh, avant IFF_LoadAngleParam. 2578h sert aussi de tag intermediaire aux
+; classes derivees (TRCR, AFTB, MOBL...).
+; ==============================================================================================
+OrntModel_GetCategory_3C93B:				; DATA XREF: seg339:off_6F630o
 		push	bp
 		mov	bp, sp
 		mov	al, 1

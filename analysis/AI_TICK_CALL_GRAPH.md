@@ -536,7 +536,8 @@ La fonction lit une **catégorie** par `call [vtable+8]` sur l'objet modèle du 
 
 | Chunk présent | Vtable finale (`seg339`) | Catégorie (`vtable+8`) | Rôle |
 |---|---|---|---|
-| `BOBJ` / `ORNT` (base) | `1B6F` | 0 | objet de base |
+| `BOBJ` (base) | `1B6F` | 0 | objet de base |
+| `ORNT` | `2578` | **1** | objet de décor orienté : immeubles… (corrigé 2026-10-06 : `IFF_LoadModelMain` pose `2578h`, dont le slot +8 fait `mov al, 1`) |
 | `MOBL` | `2504` | 2 | non testée par la fonction |
 | `OMOB` | `252C` | 3 | — |
 | `GUID` | `24F0` | 4 | inconnu (seul `MISS` sert aux missiles dans le jeu, fait vérifié côté données) |

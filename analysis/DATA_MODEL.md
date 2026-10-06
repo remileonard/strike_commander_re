@@ -237,7 +237,7 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | FourCC | Taille struct | Vtable finale | Catégorie (`vtable+8`) | Type d'objet |
 |---|---|---|---|---|
 | `BOBJ` | 0x35 | `1B6F` | 0 | basic object |
-| `ORNT` | 0x36 | `1B6F` (non retracé au-delà) | 0 ? | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
+| `ORNT` | 0x36 | **`2578`** (`IFF_LoadModelMain` : `mov word ptr es:[bx], 2578h` après la base `1B6F`) | **1** (vtable `0x6F628`, slot +8 = `mov al, 1`, corrigé 2026-10-06) | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
 | `TRCR` | 0x82 | `255C` | 0x0D | tracer / traçante |
 | `AFTB` | 0x36 | `2518` | 0x0E | afterburner (tuyère) |
 | `MOBL` | 0x37 | `2504` | 2 | objet mobile |

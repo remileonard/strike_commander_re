@@ -243,12 +243,13 @@ est `0x14`, ou si un changement est déjà en attente.
 
 Gestionnaire appelé par les générateurs de débris (`Debris_SpawnOrchestrator`,
 `Debris_SpawnOrchestratorVariant_9D770`), par l'éjection (`AI_EjectDecision_50FF`) et par
-`MissionRecord_LoadAndBuildWidgetTree_7D31A`. La musique n'est concernée que pour les catégories 1,
-6, 0x13, 0x14 et 0x15 (table `word_53D7E`), et rien ne se passe si le joueur est mort, si l'objet
+`MissionRecord_LoadAndBuildWidgetTree_7D31A`. La musique n'est concernée que pour les catégories 1
+(`ORNT`, décor orienté : immeubles…), 6 (avion), 0x13 (défense fixe), 0x14 (objet au sol) et 0x15
+(`XMIT`) (table `word_53D7E`), et rien ne se passe si le joueur est mort, si l'objet
 détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
 - **Objet ennemi** (camp `0xFF`) : `Music_OnObjectDestroyed_5AA49` (§5.2) ; s'il ne change rien et
   que **le joueur** est l'auteur → **ponctuation** `0x10` (avion), `0x11` (défense fixe ou objet au
-  sol), `0x12` (autre).
+  sol), `0x12` (autre : décor `ORNT` ou `XMIT`).
 - **Objet allié** (camp `1`) : **0x0E** s'il s'agit de l'objet désigné par la mission (stub
   `VROOMM_StubThunk_6CE2E(word_706A0)`, non lu), sinon **0x0F**.
 
@@ -275,7 +276,7 @@ détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
 | 0x0C | fin de combat, condition de mission remplie |
 | 0x0D | fin de combat (une fois) |
 | 0x0E / 0x0F | objet allié détruit (désigné par la mission / autre) |
-| 0x10 / 0x11 / 0x12 | ponctuation de victoire du joueur : avion / défense au sol / autre |
+| 0x10 / 0x11 / 0x12 | ponctuation de victoire du joueur : avion / défense fixe ou objet au sol / décor (`ORNT`) ou `XMIT` |
 | 0x13 | menaces au sol seules, ou dernier avion ennemi abattu |
 | 0x14, 0x15, 0x08 | demandées par des fonctions non relues (§5.4) |
 
@@ -329,7 +330,6 @@ sur 16. `Sound_StopAll_5A88F` : arrête musique (avec fondu), effets et voix.
 ## 8. Questions ouvertes
 
 - Pistes 0x0A, 0x0B, 0x14, 0x15, 0x08 : relire les fonctions qui les demandent (§5.4).
-- Catégorie d'objet 1 (§5.3), absente de la table des catégories connues.
 - `byte_72A8E == 0x0B` (verrou du §5.1) et l'objet désigné par la mission (`VROOMM_StubThunk_6CE2E`,
   §5.3).
 - Facteur `dword_7044C` du test « dans les six heures ».

@@ -2542,7 +2542,7 @@ off_6F618	dd loc_4DEB2
 off_6F624	dd loc_4D770
 		dd loc_3C8F6
 		dd loc_3C996
-off_6F630	dd loc_3C93B
+off_6F630	dd OrntModel_GetCategory_3C93B
 		dd Debris_SpawnOrchestrator
 off_6F638	dd loc_383DF
 off_6F63C	dd loc_37CF4

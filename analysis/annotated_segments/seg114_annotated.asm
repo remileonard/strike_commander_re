@@ -6775,8 +6775,9 @@ STRIKE_EXE_MAIN_LOOP	endp
 ; ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non ejecte) :
 ; objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit rien et que
 ; l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense fixe ou objet
-; au sol, 0x13/0x14), 0x12 (autre). Objet du camp du joueur (1) : 0x0E s'il s'agit de l'objet
-; designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
+; au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 = XMIT ; table
+; word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il s'agit de
+; l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
 ; ==============================================================================================
 World_OnObjectDestroyed_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
 					; Debris_SpawnOrchestrator+7BP ...
