@@ -356,7 +356,7 @@ VROOMM_StubThunk_6B02D	endp
 ; far, thunk fixe VROOMM (jmp sub_83FC9) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34.
 ; ==============================================================================================
-VROOMM_StubThunk_6B032	proc far		; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+AAAP
+VROOMM_StubThunk_6B032	proc far		; CODE XREF: Player_EjectSequence_7D31A+AAAP
 		jmp	HUDSymbol_ComputeApproachDisplay_83FC9
 VROOMM_StubThunk_6B032	endp
 

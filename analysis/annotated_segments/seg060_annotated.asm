@@ -113,10 +113,10 @@ Damage_SelectWeightedComponent	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,51L — reset du timer de vérification de panne si la difficulté a changé (+0x98 vs
-; word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à
-; expiration : minuteur de vérification périodique de panne de composant, sensible à la
-; difficulté.
+; far,51L — reset du timer de vérification de panne une fois par image (+0x98 mémorise le
+; compteur d'images word_70466) ; sinon décrémente le timer (dword_70458) et déclenche
+; sub_4FBC3 (+0x86) à expiration : minuteur de vérification périodique de panne de composant,
+; sensible à la difficulté.
 ; ==============================================================================================
 Damage_CheckTimer	proc far		; CODE XREF: seg060:0C64p
 

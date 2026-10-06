@@ -380,7 +380,7 @@ AITargeting_RenderThreatList_75746	endp
 ; ⚠️ far, 125 lignes, NON DÉTAILLÉE — combine Vector_TransformHelperB_559BB (seg116) et
 ; AITargeting_ComputeSolution_75D51.
 ; ==============================================================================================
-AITargeting_ComputeGeometry_75AA6	proc far		; CODE XREF: VROOMM_StubThunk_6AB85J AITargeting_UpdateAndRender_75C18+8Ep
+AITargeting_ComputeGeometry_75AA6	proc far		; CODE XREF: VROOMM_StubThunk_6AB85J Landing_SequenceTick_75C18+8Ep
 
 var_38		= dword	ptr -38h
 var_34		= dword	ptr -34h
@@ -512,10 +512,13 @@ AITargeting_ComputeGeometry_75AA6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 158 lignes, NON DÉTAILLÉE — combine AITargeting_ApplyRangeCheck_76E67, sub_6AB45
-; (×2), AITargeting_ComputeGeometry_75AA6, sub_23C4F, AITargeting_ComputeSolution_75D51.
+; ⚠️ far, 158 lignes (ex-AITargeting_UpdateAndRender_75C18, nom faux). Tick de la séquence
+; d'atterrissage : switch à 6 cas sur la phase +0x22 ; en phase 1, si l'avion tenu (+0x11) est
+; le joueur, sélectionne la caméra « LANDING » (push offset aLanding / call
+; EntityTracker_SelectByID). Le joueur sous contrôle manuel (byte_722D1 == 1) court-circuite
+; la séquence. Phase de roulage : Landing_TaxiPhase_765B2.
 ; ==============================================================================================
-AITargeting_UpdateAndRender_75C18	proc far		; CODE XREF: VROOMM_StubThunk_6AB9EJ
+Landing_SequenceTick_75C18	proc far		; CODE XREF: VROOMM_StubThunk_6AB9EJ
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -538,7 +541,7 @@ arg_0		= dword	ptr  6
 		jmp	short loc_75C55
 ; ���������������������������������������������������������������������������
 
-loc_75C38:				; CODE XREF: AITargeting_UpdateAndRender_75C18+1Cj
+loc_75C38:				; CODE XREF: Landing_SequenceTick_75C18+1Cj
 		push	1
 		push	large [bp+arg_0]
 		nop
@@ -551,8 +554,8 @@ loc_75C38:				; CODE XREF: AITargeting_UpdateAndRender_75C18+1Cj
 		jmp	loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75C55:				; CODE XREF: AITargeting_UpdateAndRender_75C18+12j
-					; AITargeting_UpdateAndRender_75C18+1Ej
+loc_75C55:				; CODE XREF: Landing_SequenceTick_75C18+12j
+					; Landing_SequenceTick_75C18+1Ej
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+8]
 		push	word ptr es:[bx+0Bh]
@@ -571,14 +574,14 @@ loc_75C55:				; CODE XREF: AITargeting_UpdateAndRender_75C18+12j
 		jmp	cs:off_75D45[bx] ; switch jump
 ; ���������������������������������������������������������������������������
 
-loc_75C85:				; CODE XREF: AITargeting_UpdateAndRender_75C18+64j
+loc_75C85:				; CODE XREF: Landing_SequenceTick_75C18+64j
 		push	large [bp+arg_0] ; default
 		call	VROOMM_StubThunk_6AB45
 		add	sp, 4
 		jmp	loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75C94:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75C94:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		les	bx, [bp+arg_0]	; case 0x0
 		mov	ax, es:[bx+11h]
@@ -597,7 +600,7 @@ loc_75C94:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
 		jmp	loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75CBE:				; CODE XREF: AITargeting_UpdateAndRender_75C18+87j
+loc_75CBE:				; CODE XREF: Landing_SequenceTick_75C18+87j
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 15h
@@ -620,7 +623,7 @@ loc_75CBE:				; CODE XREF: AITargeting_UpdateAndRender_75C18+87j
 		jmp	short loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75CFC:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75CFC:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		push	large [bp+arg_0] ; case	0x1
 		nop
@@ -630,17 +633,17 @@ loc_75CFC:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
 		jmp	short loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75D0A:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75D0A:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		push	large [bp+arg_0] ; case	0x2
 		nop
 		push	cs
-		call	near ptr AITargeting_ComputeOrientationExtended_765B2
+		call	near ptr Landing_TaxiPhase_765B2
 		add	sp, 4
 		jmp	short loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75D18:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75D18:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		push	large [bp+arg_0] ; case	0x3
 		nop
@@ -650,7 +653,7 @@ loc_75D18:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
 		jmp	short loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75D26:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75D26:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		push	0		; case 0x4
 		push	large [bp+arg_0]
@@ -661,21 +664,21 @@ loc_75D26:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
 		jmp	short loc_75D42
 ; ���������������������������������������������������������������������������
 
-loc_75D36:				; CODE XREF: AITargeting_UpdateAndRender_75C18+68j
+loc_75D36:				; CODE XREF: Landing_SequenceTick_75C18+68j
 					; DATA XREF: ovr230:off_75D45o
 		push	large [bp+arg_0] ; case	0x5
 		call	VROOMM_StubThunk_6AB45
 		add	sp, 4
 
-loc_75D42:				; CODE XREF: AITargeting_UpdateAndRender_75C18+3Aj
-					; AITargeting_UpdateAndRender_75C18+79j ...
+loc_75D42:				; CODE XREF: Landing_SequenceTick_75C18+3Aj
+					; Landing_SequenceTick_75C18+79j ...
 		pop	si
 		leave
 		retf
-AITargeting_UpdateAndRender_75C18	endp
+Landing_SequenceTick_75C18	endp
 
 ; ���������������������������������������������������������������������������
-off_75D45	dw offset loc_75C94	; DATA XREF: AITargeting_UpdateAndRender_75C18+68r
+off_75D45	dw offset loc_75C94	; DATA XREF: Landing_SequenceTick_75C18+68r
 		dw offset loc_75CFC	; jump table for switch	statement
 		dw offset loc_75D0A
 		dw offset loc_75D18
@@ -1268,7 +1271,7 @@ word_76315	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_ComputeSolution_75
 ; Matrix_BuildAxisX_56EC3, Matrix_OrthonormalizeKeepRow1_57660 (seg116) — calcul d'orientation
 ; pour la solution de ciblage.
 ; ==============================================================================================
-AITargeting_ComputeOrientation_76325	proc far		; CODE XREF: VROOMM_StubThunk_6AB8AJ AITargeting_UpdateAndRender_75C18+EAp
+AITargeting_ComputeOrientation_76325	proc far		; CODE XREF: VROOMM_StubThunk_6AB8AJ Landing_SequenceTick_75C18+EAp
 
 var_84		= word ptr -84h
 var_60		= dword	ptr -60h
@@ -1489,12 +1492,16 @@ AITargeting_ComputeOrientation_76325	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine
-; AI_ComputeGeometryHelper_56E29, Matrix_BuildAxisX_56EC3,
-; Matrix_OrthonormalizeKeepRow1_57660, Vector_NormalizeInPlace_5593A (×3+, seg116) — variante
-; étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée.
+; ⭐⚠️ far, 594 lignes, en partie lue (ex-AITargeting_ComputeOrientationExtended_765B2, nom
+; faux). Phase sol de la séquence d'atterrissage : déplace l'avion tenu (+0x11) en fixant sa
+; position (+0x70 copié dans [+0x11]+0x12/+0x16/+0x1A) et son orientation (vtable +0x40) ;
+; switch sur un cap +0x9F ∈ {0, 90, 180, 270}° ; +0x5C += dword_70458 (temps). À la fin (mov
+; byte ptr es:[bx+94h],1), si l'avion est le joueur : exécute le gestionnaire du script de
+; mission (word_706A0+0x4E, entrée +0x40 → Expr_VM_ExecuteSingleInstruction_51E7E) puis, si le
+; script n'a pas pris la main ([word_706A0+0xA1] == 0), demande la piste musicale 0x14 (push
+; 14h / call Music_RequestTune_5A984).
 ; ==============================================================================================
-AITargeting_ComputeOrientationExtended_765B2	proc far		; CODE XREF: VROOMM_StubThunk_6AB8FJ AITargeting_UpdateAndRender_75C18+F8p
+Landing_TaxiPhase_765B2	proc far		; CODE XREF: VROOMM_StubThunk_6AB8FJ Landing_SequenceTick_75C18+F8p
 
 var_A2		= dword	ptr -0A2h
 var_9E		= dword	ptr -9Eh
@@ -1557,10 +1564,10 @@ arg_0		= dword	ptr  6
 		jmp	short loc_765E3
 ; ���������������������������������������������������������������������������
 
-loc_765E1:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+28j
+loc_765E1:				; CODE XREF: Landing_TaxiPhase_765B2+28j
 		xor	ax, ax
 
-loc_765E3:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+2Dj
+loc_765E3:				; CODE XREF: Landing_TaxiPhase_765B2+2Dj
 		or	al, al
 		jz	short loc_76628
 		mov	ax, word ptr [bp+arg_0+2]
@@ -1582,7 +1589,7 @@ loc_765E3:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+2Dj
 		mov	bx, es:[bx+11h]
 		mov	[bx+1Ah], eax
 
-loc_76628:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+33j
+loc_76628:				; CODE XREF: Landing_TaxiPhase_765B2+33j
 		mov	[bp+var_10], 100h
 		les	bx, [bp+arg_0]
 		mov	eax, [bp+var_10]
@@ -1604,7 +1611,7 @@ loc_76628:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+33j
 		jmp	short loc_766D1
 ; ���������������������������������������������������������������������������
 
-loc_76673:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+ACj
+loc_76673:				; CODE XREF: Landing_TaxiPhase_765B2+ACj
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+11h]
 		mov	bx, es:[bx+11h]
@@ -1637,7 +1644,7 @@ loc_76673:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+ACj
 		call	dword ptr [bx+40h]
 		add	sp, 4
 
-loc_766D1:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+BFj
+loc_766D1:				; CODE XREF: Landing_TaxiPhase_765B2+BFj
 		les	bx, [bp+arg_0]
 		mov	eax, dword_70458
 		add	es:[bx+5Ch], eax
@@ -1646,7 +1653,7 @@ loc_766D1:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+BFj
 		mov	cx, 4		; switch 4 cases
 		mov	bx, offset word_76BF9
 
-loc_766EB:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+144j
+loc_766EB:				; CODE XREF: Landing_TaxiPhase_765B2+144j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_50]
 		jz	short loc_766FB
@@ -1655,7 +1662,7 @@ loc_766EB:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+144j
 		jmp	loc_76854	; default
 ; ���������������������������������������������������������������������������
 
-loc_766FB:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+13Fj
+loc_766FB:				; CODE XREF: Landing_TaxiPhase_765B2+13Fj
 		jmp	word ptr cs:[bx+8] ; switch jump
 
 loc_766FF:				; DATA XREF: ovr230:14D1o
@@ -1684,7 +1691,7 @@ loc_766FF:				; DATA XREF: ovr230:14D1o
 		jmp	loc_76854	; default
 ; ���������������������������������������������������������������������������
 
-loc_7674D:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766FBj
+loc_7674D:				; CODE XREF: Landing_TaxiPhase_765B2:loc_766FBj
 					; DATA XREF: ovr230:14D1o
 		push	large 0		; case 0x5A
 		push	0FFFFh
@@ -1715,7 +1722,7 @@ loc_7674D:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766F
 		jmp	loc_76854	; default
 ; ���������������������������������������������������������������������������
 
-loc_767AA:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766FBj
+loc_767AA:				; CODE XREF: Landing_TaxiPhase_765B2:loc_766FBj
 					; DATA XREF: ovr230:14D1o
 		push	large 0FFFFh	; case 0xB4
 		push	0
@@ -1746,7 +1753,7 @@ loc_767AA:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766F
 		jmp	short loc_76854	; default
 ; ���������������������������������������������������������������������������
 
-loc_76809:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766FBj
+loc_76809:				; CODE XREF: Landing_TaxiPhase_765B2:loc_766FBj
 					; DATA XREF: ovr230:14D1o
 		push	large 0		; case 0x10E
 		push	1
@@ -1771,8 +1778,8 @@ loc_76809:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_766F
 		shrd	eax, edx, 8
 		mov	[bp+var_66], eax
 
-loc_76854:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+146j
-					; AITargeting_ComputeOrientationExtended_765B2+198j ...
+loc_76854:				; CODE XREF: Landing_TaxiPhase_765B2+146j
+					; Landing_TaxiPhase_765B2+198j ...
 		les	bx, [bp+arg_0]	; default
 		mov	si, es:[bx+11h]
 		add	si, 12h
@@ -1805,7 +1812,7 @@ loc_76854:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+146j
 		jmp	loc_76BE5
 ; ���������������������������������������������������������������������������
 
-loc_768C2:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+30Bj
+loc_768C2:				; CODE XREF: Landing_TaxiPhase_765B2+30Bj
 		mov	al, es:[bx+94h]
 		mov	ah, 0
 		or	ax, ax
@@ -1813,13 +1820,13 @@ loc_768C2:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+30Bj
 		jmp	loc_76BE5
 ; ���������������������������������������������������������������������������
 
-loc_768D0:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+319j
+loc_768D0:				; CODE XREF: Landing_TaxiPhase_765B2+319j
 		mov	ax, es:[bx+9Fh]
 		mov	[bp+var_52], ax
 		mov	cx, 4		; switch 4 cases
 		mov	bx, offset word_76BE9
 
-loc_768DE:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+337j
+loc_768DE:				; CODE XREF: Landing_TaxiPhase_765B2+337j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_52]
 		jz	short loc_768EE
@@ -1828,7 +1835,7 @@ loc_768DE:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+337j
 		jmp	loc_76B75	; default
 ; ���������������������������������������������������������������������������
 
-loc_768EE:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+332j
+loc_768EE:				; CODE XREF: Landing_TaxiPhase_765B2+332j
 		jmp	word ptr cs:[bx+8] ; switch jump
 
 loc_768F2:				; DATA XREF: ovr230:14C1o
@@ -1883,7 +1890,7 @@ loc_768F2:				; DATA XREF: ovr230:14C1o
 		jmp	loc_76B75	; default
 ; ���������������������������������������������������������������������������
 
-loc_76992:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768EEj
+loc_76992:				; CODE XREF: Landing_TaxiPhase_765B2:loc_768EEj
 					; DATA XREF: ovr230:14C1o
 		push	large 0		; case 0x10E
 		push	1
@@ -1936,7 +1943,7 @@ loc_76992:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		jmp	loc_76B75	; default
 ; ���������������������������������������������������������������������������
 
-loc_76A35:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768EEj
+loc_76A35:				; CODE XREF: Landing_TaxiPhase_765B2:loc_768EEj
 					; DATA XREF: ovr230:14C1o
 		push	large 0FFFFh	; case 0xB4
 		push	0
@@ -1989,7 +1996,7 @@ loc_76A35:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		jmp	loc_76B75	; default
 ; ���������������������������������������������������������������������������
 
-loc_76AD8:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768EEj
+loc_76AD8:				; CODE XREF: Landing_TaxiPhase_765B2:loc_768EEj
 					; DATA XREF: ovr230:14C1o
 		push	large 0		; case 0x5A
 		push	0FFFFh
@@ -2040,8 +2047,8 @@ loc_76AD8:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2:loc_768E
 		call	dword ptr [bx+40h]
 		add	sp, 4
 
-loc_76B75:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+339j
-					; AITargeting_ComputeOrientationExtended_765B2+3DDj ...
+loc_76B75:				; CODE XREF: Landing_TaxiPhase_765B2+339j
+					; Landing_TaxiPhase_765B2+3DDj ...
 		les	bx, [bp+arg_0]	; default
 		mov	byte ptr es:[bx+94h], 1
 		mov	ax, es:[bx+11h]
@@ -2062,7 +2069,7 @@ loc_76B75:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+339j
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_76BB4:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+5DEj
+loc_76BB4:				; CODE XREF: Landing_TaxiPhase_765B2+5DEj
 		mov	bx, word_706A0
 		mov	al, [bx+0A1h]
 		mov	byte ptr [bp+var_54+1],	al
@@ -2073,30 +2080,30 @@ loc_76BB4:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+5DEj
 		call	Music_RequestTune_5A984
 		pop	cx
 
-loc_76BCD:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+5D4j
-					; AITargeting_ComputeOrientationExtended_765B2+611j
+loc_76BCD:				; CODE XREF: Landing_TaxiPhase_765B2+5D4j
+					; Landing_TaxiPhase_765B2+611j
 		mov	[bp+var_58], 0
 		mov	eax, [bp+var_58]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+5Ch], eax
 		inc	word ptr es:[bx+22h]
 
-loc_76BE5:				; CODE XREF: AITargeting_ComputeOrientationExtended_765B2+30Dj
-					; AITargeting_ComputeOrientationExtended_765B2+31Bj
+loc_76BE5:				; CODE XREF: Landing_TaxiPhase_765B2+30Dj
+					; Landing_TaxiPhase_765B2+31Bj
 		pop	di
 		pop	si
 		leave
 		retf
-AITargeting_ComputeOrientationExtended_765B2	endp
+Landing_TaxiPhase_765B2	endp
 
 ; ���������������������������������������������������������������������������
-word_76BE9	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_ComputeOrientationExtended_765B2+329o
+word_76BE9	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: Landing_TaxiPhase_765B2+329o
 					; value	table for switch statement
 		dw offset loc_768F2	; jump table for switch	statement
 		dw offset loc_76AD8
 		dw offset loc_76A35
 		dw offset loc_76992
-word_76BF9	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_ComputeOrientationExtended_765B2+136o
+word_76BF9	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: Landing_TaxiPhase_765B2+136o
 					; value	table for switch statement
 		dw offset loc_766FF	; jump table for switch	statement
 		dw offset loc_7674D
@@ -2110,7 +2117,7 @@ word_76BF9	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_ComputeOrientation
 ; ==============================================================================================
 ; ⚠️ far, 206 lignes, NON DÉTAILLÉE — aucun appel externe visible (calcul entièrement inline).
 ; ==============================================================================================
-AITargeting_Helper2_76C09	proc far		; CODE XREF: VROOMM_StubThunk_6AB94J AITargeting_UpdateAndRender_75C18+106p
+AITargeting_Helper2_76C09	proc far		; CODE XREF: VROOMM_StubThunk_6AB94J Landing_SequenceTick_75C18+106p
 
 var_32		= word ptr -32h
 var_30		= dword	ptr -30h
@@ -2334,7 +2341,7 @@ word_76E57	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: AITargeting_Helper2_76C09+E2o
 ; Trigger_TimedRangedSpawnOnce-style test de portée (sub_378CA, seg109), sub_3E5A6 —
 ; vérification de portée pour le ciblage.
 ; ==============================================================================================
-AITargeting_ApplyRangeCheck_76E67	proc far		; CODE XREF: VROOMM_StubThunk_6AB99J AITargeting_UpdateAndRender_75C18+28p	...
+AITargeting_ApplyRangeCheck_76E67	proc far		; CODE XREF: VROOMM_StubThunk_6AB99J Landing_SequenceTick_75C18+28p	...
 
 var_38		= dword	ptr -38h
 var_34		= dword	ptr -34h

@@ -66,10 +66,10 @@ TrackedObjects_CallSlot18OnActive_22F10	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags
-; byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence
-; (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : évaluateur
-; de déclencheur d'événement scripté de mission (trigger de zone/proximité).
+; far,381L — vérifie de nombreux flags globaux d'état de mission (compteur d'images
+; word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de
+; référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies :
+; évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).
 ; ==============================================================================================
 Mission_TriggerEvaluator	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+490P
 
@@ -584,9 +584,13 @@ Radar_TargetTypeFilter	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,127L — ne s'active que si arg_2 est le joueur (word_722E6), exclut les états spéciaux
-; (+0x11 == 0xB ou 7, probable détruit/hors-jeu) : handler d'événement de mission conditionné
-; à une action du joueur (probable comptage de kill/objectif).
+; far,127L — appelé à chaque lancement d'arme (3 appels dans HUD_RenderSymbologyMain seg088,
+; juste après SoundFX_Play_5A8DC et la décrémentation du compteur de munitions [+0x13] ; 1
+; appel dans TimedTrigger_SpawnAndBindGeometry_9E289 seg432). Ne s'active que si le tireur
+; (arg_2) est le joueur (word_722E6), si la catégorie de l'arme (arg_4, vtable +0x34) vaut 9
+; (bombe) ou 8 (missile), et si [+0x11] ne vaut ni 0x0B ni 7. Lance alors la caméra arme
+; (EntityTracker_RenderByCode(0x0B), VROOMM_StubThunk_6AF85 → WeaponCam_Start_8285A,
+; EntityTracker_ApplySelection) et affiche « Weapon Camera ».
 ; ==============================================================================================
 Mission_PlayerEventHandler	proc far		; CODE XREF: HUD_RenderSymbologyMain+780P
 					; HUD_RenderSymbologyMain+B29P ...

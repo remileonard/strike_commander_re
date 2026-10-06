@@ -180,8 +180,8 @@ IndexedRecordReader_ConstructVariantB_65A4A	endp
 ; far, alloue (sub_658), construit via StreamReader_ConstructAndBind_63B23 (seg190) et
 ; initialise les champs d'index (sub_65B03), dispatch vtable [bx+0xC].
 ; ==============================================================================================
-IndexedRecordReader_ConstructVariantC_65A8A	proc far		; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+71P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+64P ...
+IndexedRecordReader_ConstructVariantC_65A8A	proc far		; CODE XREF: Player_ShotDownSequence_7B035+71P
+					; Player_EjectSequence_7D31A+64P ...
 
 var_A		= dword	ptr -0Ah
 var_6		= dword	ptr -6

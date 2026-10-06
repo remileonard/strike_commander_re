@@ -663,7 +663,7 @@ propre switch interne :
 
 - **Cas « leader mort/hors-jeu »** : calcule la distance à la cible
   d'escorte (via `[vtable+0x3C]` sur celle-ci, comme dans
-  `MissionRecord_LoadEntityDatabase_7B035`), compare contre
+  `Player_ShotDownSequence_7B035`, ex-`MissionRecord_LoadEntityDatabase_7B035`), compare contre
   un seuil, puis appelle **`[vtable+8]` directement sur le nœud
   `ID=20`** (`+0xC1`) — même idiome de finalisation que
   `Entity_ProximityTest_ThreatGate` et `AI_BehaviorStateMachine`, dans
@@ -990,7 +990,7 @@ int AI_TopLevelThink(Entity* entity) {
     Radio_CombatChatterDispatch(entity);
 
     // 2. traitement des menaces, SAUTÉ si décollage/atterrissage (+0x11D = 0xA1/0xA2),
-    //    avion au sol, ou word_70466 <= 3  (partie non lue en détail)
+    //    avion au sol, ou word_70466 <= 3 (3 premières images de la mission ; partie non lue en détail)
 
     // 3. réactions prioritaires, avant tout objectif
     int reacted = 0;

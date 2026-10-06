@@ -986,8 +986,9 @@ future.
 identifiés, avec quelques ajouts :
 
 - **IA de combat** : `AI_ManeuverSolutionMain_781D0` (2373 lignes),
-  `MissionRecord_LoadEntityDatabase_7B035` (3103 lignes — la plus grosse
-  fonction de tout le fichier), calculs de solution de ciblage/guidage.
+  `Player_ShotDownSequence_7B035` (3103 lignes — la plus grosse
+  fonction de tout le fichier ; c'est en fait la séquence « avion du joueur
+  détruit », voir `MUSIC_SYSTEM.md` §5.4), calculs de solution de ciblage/guidage.
 - **Symboles HUD** : grande famille de constructeurs et de fonctions de
   rendu avec test de clipping caméra (`HUDSymbol_*`), incluant plusieurs
   familles de duplicats confirmés byte-pour-byte (motif VROOMM classique).
@@ -1005,7 +1006,7 @@ identifiés, avec quelques ajouts :
 - **Chargeurs de ressources génériques** : famille de 7 grosses fonctions
   quasi identiques (`ResourceFile_LoadTypeA` à `G`, 470-1400 lignes
   chacune) pour différents types de fichiers.
-- **`Gauge_ComputeAndRenderNeedle_9D910`** (577 lignes), dernière fonction
+- **`Collision_OnTerrainContact_9D910`** (577 lignes), dernière fonction
   du fichier avant les tables de stubs suivantes, relie explicitement le
   terrain, une jauge d'instrument et la VM d'expression (`Expr_VM_Execute_51E7E`).
 

@@ -996,7 +996,7 @@ loc_37BC6:				; CODE XREF: seg077:0653j
 ; far,60L — parcourt les patches adjacents, appelle sub_32FBC (test de distance limite) pour
 ; chacun : vérification de la limite de distance sur les patches voisins de terrain.
 ; ==============================================================================================
-Terrain_CheckAdjacentDistance	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2A8P
+Terrain_CheckAdjacentDistance	proc far		; CODE XREF: Collision_OnTerrainContact_9D910+2A8P
 					; PlayerComponent_ComputeImpactResponse_A089D+84P
 
 var_E		= dword	ptr -0Eh

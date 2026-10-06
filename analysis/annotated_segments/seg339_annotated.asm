@@ -245,7 +245,7 @@ off_6D3E2	dd VROOMM_StubThunk_6AB9E
 		dd MVRS_SharedDefaultTickNoOp_ED16
 aLandgear_0	db 'LANDGEAR',0         ; DATA XREF: AITargeting_RenderThreatList_75746+10Fo
 aLandingGearDam	db 'Landing Gear Damaged',0 ; DATA XREF: AITargeting_RenderThreatList_75746+14Bo
-aLanding	db 'LANDING',0          ; DATA XREF: AITargeting_UpdateAndRender_75C18+95o
+aLanding	db 'LANDING',0          ; DATA XREF: Landing_SequenceTick_75C18+95o
 aTakeoff	db 'TAKEOFF',0          ; DATA XREF: seg009:01C1o
 		dd PilotProfile_LoadATRB_12E47
 off_6D41C	dd AIEntity_CreateByType_12B4E
@@ -351,7 +351,7 @@ byte_6D559	db 1			; DATA XREF: Expr_VM_Interpreter_51106+A2Aw
 					; UIScreen_RenderOrLayoutList_54503:loc_5451Br	...
 aAutopilt	db 'AUTOPILT',0         ; DATA XREF: UIScript_ParseAndEvaluate_7A054+408o
 		align 2
-unk_6D564	db    0			; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+2DCo
+unk_6D564	db    0			; DATA XREF: Player_ShotDownSequence_7B035+2DCo
 		db    0
 		db    1
 		db    0
@@ -367,7 +367,7 @@ unk_6D564	db    0			; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+2DCo
 		db    0
 		db    7
 		db    0
-unk_6D574	db 0FFh			; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+2EEo
+unk_6D574	db 0FFh			; DATA XREF: Player_ShotDownSequence_7B035+2EEo
 		db 0FFh
 		db    1
 		db    0
@@ -383,7 +383,7 @@ unk_6D574	db 0FFh			; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+2EEo
 unk_6D581	db    0
 		db    6
 		db    0
-a_pak_2		db '.PAK',0             ; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+9Fo
+a_pak_2		db '.PAK',0             ; DATA XREF: Player_ShotDownSequence_7B035+9Fo
 		dd VROOMM_StubThunk_6BC26
 		dd VROOMM_StubThunk_6BC2B
 		dd VROOMM_StubThunk_6BC30
@@ -394,9 +394,9 @@ a_pak_2		db '.PAK',0             ; DATA XREF: MissionRecord_LoadEntityDatabase_7
 		dd VROOMM_StubThunk_6AC20
 		dd TrackedObject_NotifyWorldObjects_2DFE4
 		align 2
-aEject		db 'EJECT',0            ; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+A3o
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+92o
-a_pak_3		db '.PAK',0             ; DATA XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+8Eo
+aEject		db 'EJECT',0            ; DATA XREF: Player_ShotDownSequence_7B035+A3o
+					; Player_EjectSequence_7D31A+92o
+a_pak_3		db '.PAK',0             ; DATA XREF: Player_EjectSequence_7D31A+8Eo
 		dd VROOMM_StubThunk_6BC26
 		dd VROOMM_StubThunk_6BC2B
 		dd VROOMM_StubThunk_6BC30
@@ -2906,7 +2906,7 @@ off_6FBD0	dd VROOMM_StubThunk_6BFB0
 off_6FBD4	dd Debris_CombinePhysicsBodies
 		dd loc_43CBB
 aTerrain	db 'TERRAIN',0          ; DATA XREF: seg079:0080o
-					; Gauge_ComputeAndRenderNeedle_9D910+49o ...
+					; Collision_OnTerrainContact_9D910+49o ...
 unk_6FBE4	db    0
 dword_6FBE5	dd 0			; DATA XREF: Collision_PrepareObjectPair+C2r
 					; Collision_PrepareObjectPair+ECr ...

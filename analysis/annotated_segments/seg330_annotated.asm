@@ -58,7 +58,7 @@ VROOMM_StubThunk_6CCFA	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCFF	proc far		; CODE XREF: AI_EjectDecision_50FF+110P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+66DP ...
+					; Player_EjectSequence_7D31A+66DP ...
 		jmp	TriggerObject_SpawnAndBindFull_A6DF2
 VROOMM_StubThunk_6CCFF	endp
 

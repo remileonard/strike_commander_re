@@ -52,7 +52,7 @@
   "sub_4812B": {
     "new_name": "Aero_ComputeLiftAndSideForce_4812B",
     "segment": "seg103",
-    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2."
+    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET plus de 10 images écoulées depuis le début de la mission (word_70466 = compteur d'images, `cmp word_70466,0Ah / jbe`) ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2."
   },
   "sub_642FF": {
     "new_name": "StreamReader_CloseAndUnregister_642FF",
@@ -170,9 +170,9 @@
     "summary": "far, duplicat confirmé de AircraftDamageComponentFamily_ScalarDeletingDtor_75091."
   },
   "sub_7B035": {
-    "new_name": "MissionRecord_LoadEntityDatabase_7B035",
+    "new_name": "Player_ShotDownSequence_7B035",
     "segment": "ovr239",
-    "summary": "⭐⚠️ far, **3103 lignes — la plus grosse fonction de tout le fichier**, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743, `IndexedRecordReader_ConstructVariantC_65A8A`/`VariantA_65A1A` (seg196), `Path_ResolveDataFile` (seg057) — chargement massif d'une base d'entités depuis un fichier de données résolu par chemin. Candidat prioritaire absolu pour session dédiée."
+    "summary": "⭐⚠️ far, **3103 lignes — la plus grosse fonction de tout le fichier**, corps NON DÉTAILLÉ (ex-`MissionRecord_LoadEntityDatabase_7B035`, nom faux). **Séquence jouée quand l'avion du joueur est détruit** : appelée par `STRIKE_EXE_MAIN_LOOP` via `VROOMM_StubThunk_6ADC3` quand `byte_6E4B4 != 0` (`cmp byte_6E4B4,0` ; ce drapeau est posé par `Debris_SpawnOrchestratorVariant_9D770` quand l'objet détruit est le joueur : `cmp word_722E6,di / mov byte_6E4B4,1`), avec les arguments (joueur, `byte_6E4B7`, `byte_6E4B5`). Elle charge `OBJECTS\\EJECT.PAK` (`push offset aEject` / `aObjects` / `a_pak_2` → `Path_ResolveDataFile`), crée l'objet éjecté, l'enregistre (`EntityTracker_RegisterAndSelect`), puis **demande la piste musicale 0x0B** (`push 0Bh / call Music_RequestTune_5A984`). Retour non nul → `byte_706AF = 3` (fin de mission) ; nul → `byte_6E4B4 = 0`. Le détail des 3100 lignes (caméra, parachute, conditions de survie) reste à lire."
   },
   "sub_6AFBA": {
     "new_name": "VROOMM_StubThunk_6AFBA",
@@ -365,9 +365,9 @@
     "summary": "far, aucun appel externe visible (34 lignes)."
   },
   "sub_7D31A": {
-    "new_name": "MissionRecord_LoadAndBuildWidgetTree_7D31A",
+    "new_name": "Player_EjectSequence_7D31A",
     "segment": "ovr240",
-    "summary": "⭐⚠️ far, 1081 lignes, NON DÉTAILLÉE — même motif que MissionRecord_LoadEntityDatabase_7B035, mais combine aussi `UIScreen_BuildWidgetTree_53A94` (seg114) — lie le chargement de base de données d'entités à la construction d'arborescence de widgets. Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 1081 lignes, corps NON DÉTAILLÉ (ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`, nom faux). **Séquence d'éjection volontaire du joueur** : appelée par `STRIKE_EXE_MAIN_LOOP` via `VROOMM_StubThunk_6ADFA` quand `byte_6E4B8 != 0` (la boucle pose d'abord `byte_6E4B4 = 1`). `byte_6E4B8` est posé par `Player_MainUpdate` sur la touche de code 0x12 (E) avec Ctrl (tables d'état clavier `byte_72DE5` / `byte_72E1D`, indice 0x1D = Ctrl), ou quand `byte_6E33B != 0`. Charge aussi `OBJECTS\\EJECT.PAK` (`push offset aEject`) et **demande la piste musicale 0x0A** (`push 0Ah / call Music_RequestTune_5A984`). Retour non nul → `byte_706AF = 2` ; nul → `byte_706AF = 3`."
   },
   "sub_91B70": {
     "new_name": "Cockpit_ApplyFormatAndDraw_91B70",
@@ -2230,9 +2230,9 @@
     "summary": "far, LUE. Application MVRS ID13 : minuteur 4 s (0x400), phase node+0x26 = 1, puis premier tick."
   },
   "sub_80971": {
-    "new_name": "HUDSymbol_DrawWithLineOfSight_80971",
+    "new_name": "WeaponCam_LaunchPhase_80971",
     "segment": "ovr243",
-    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — combine `Matrix_LocalToWorld_58828` (seg117), `UI_ApplyLineOfSightAndTransform_57DAE` (seg116), `Music_RequestTune_5A984` (×2, seg125)."
+    "summary": "⚠️ far, 190 lignes (ex-`HUDSymbol_DrawWithLineOfSight_80971`, nom faux). **Phase 0 de la caméra arme (WEAP, code caméra 0x0B)**, appelée par `WeaponCam_Tick_82693` quand `+0xA3 == 0`. Place la caméra au lanceur (`+0x9F`) plus un décalage et vise l'arme (`+0x89`). Quand le minuteur `+0xC0` est écoulé : si l'arme est de catégorie 9 (bombe, `+0x9E`), passe en phase 2 (`mov byte ptr [si+0A3h],2`) et **demande la piste 0x15 seulement si la piste courante est 0x13** (`cmp word_70859,13h / jz` → `push 15h`) ; sinon (missile), passe en phase 1 et **demande la piste 0x08** (`mov byte ptr [si+0A3h],1 / push 8`)."
   },
   "sub_688D7": {
     "new_name": "VROOMM_PatchFarCallStub_688D7",
@@ -7850,9 +7850,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3BE6) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_8285A": {
-    "new_name": "HUDSymbol_ConstructWithGeometry_8285A",
+    "new_name": "WeaponCam_Start_8285A",
     "segment": "ovr243",
-    "summary": "⚠️ far, 219 lignes, NON DÉTAILLÉE — combine `SetReference16` (×3), `AI_ComputeGeometryHelper_56E29` (seg116), `Matrix_LocalToWorld_58828`."
+    "summary": "⚠️ far, 219 lignes (ex-`HUDSymbol_ConstructWithGeometry_8285A`, nom faux). **Démarrage de la caméra arme**, appelé par `Mission_PlayerEventHandler` via `VROOMM_StubThunk_6AF85` : `+0x89` = arme suivie, `+0x9F` = lanceur, `+0x9E` = catégorie de l'arme (`call [bx+34h]` puis `mov [si+9Eh],al`)."
   },
   "sub_53504": {
     "new_name": "Expr_VM_OpcodeHelperA_53504",
@@ -9797,7 +9797,7 @@
   "PhysicsTicks": {
     "new_name": "PhysicsTicks",
     "segment": "seg103",
-    "summary": "far, ~0x4A85B, ~350L, seg103 — LE TICK DE LA DYNAMIQUE AVION (classe JDYN + 3 variantes ; slot 'Update' des vtables installees par JDYN_LoadChunk, tags seg339 0x228A/0x2312/0x2362 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]). Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) * (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0, donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. | Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 = JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) = -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral). Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D)."
+    "summary": "far, ~0x4A85B, ~350L, seg103 — LE TICK DE LA DYNAMIQUE AVION (classe JDYN + 3 variantes ; slot 'Update' des vtables installees par JDYN_LoadChunk, tags seg339 0x228A/0x2312/0x2362 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]). Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par le compteur d'images word_70466 (image 0 : `[+0x20] = 1` d'office ; test terrain seulement après 3 images, `cmp word_70466,3 / jbe`) ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) * (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0, donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. | Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 = JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) = -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral). Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D)."
   },
   "sub_CA93": {
     "new_name": "AI_MoraleDisciplineCheck_CA93",
@@ -10432,7 +10432,7 @@
   "sub_2BD51": {
     "new_name": "Damage_CheckTimer",
     "segment": "seg060",
-    "summary": "far,51L — reset du timer de vérification de panne si la difficulté a changé (+0x98 vs word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à expiration : **minuteur de vérification périodique de panne de composant, sensible à la difficulté.**"
+    "summary": "far,51L — reset du timer de vérification de panne une fois par image (+0x98 mémorise le compteur d'images word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à expiration : **minuteur de vérification périodique de panne de composant, sensible à la difficulté.**"
   },
   "sub_64743": {
     "new_name": "ResourceRecord_SeekAndRead_64743",
@@ -10637,7 +10637,7 @@
   "sub_2330B": {
     "new_name": "Mission_PlayerEventHandler",
     "segment": "seg040",
-    "summary": "far,127L — ne s'active que si arg_2 est le joueur (word_722E6), exclut les états spéciaux (+0x11 == 0xB ou 7, probable détruit/hors-jeu) : **handler d'événement de mission conditionné à une action du joueur (probable comptage de kill/objectif).**"
+    "summary": "far,127L — **appelé à chaque lancement d'arme** (3 appels dans `HUD_RenderSymbologyMain` seg088, juste après `SoundFX_Play_5A8DC` et la décrémentation du compteur de munitions `[+0x13]` ; 1 appel dans `TimedTrigger_SpawnAndBindGeometry_9E289` seg432). Ne s'active que si le tireur (`arg_2`) est le joueur (`word_722E6`), si la catégorie de l'arme (`arg_4`, vtable `+0x34`) vaut 9 (bombe) ou 8 (missile), et si `[+0x11]` ne vaut ni 0x0B ni 7. Lance alors la **caméra arme** (`EntityTracker_RenderByCode(0x0B)`, `VROOMM_StubThunk_6AF85` → `WeaponCam_Start_8285A`, `EntityTracker_ApplySelection`) et affiche « Weapon Camera »."
   },
   "sub_A2E39": {
     "new_name": "GaugeWidget_Destruct_A2E39",
@@ -11072,7 +11072,7 @@
   "sub_22F53": {
     "new_name": "Mission_TriggerEvaluator",
     "segment": "seg040",
-    "summary": "far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : **évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).**"
+    "summary": "far,381L — vérifie de nombreux flags globaux d'état de mission (compteur d'images word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : **évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).**"
   },
   "sub_2EA80": {
     "new_name": "Texture_SelectMipLevel",
@@ -12405,9 +12405,9 @@
     "summary": "⚠️ far, 392 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74, ajoute `UI_ApplyLineOfSightCheck_55A9E` (seg116)."
   },
   "sub_82693": {
-    "new_name": "HUDSymbol_ConstructWithViewMatrix_82693",
+    "new_name": "WeaponCam_Tick_82693",
     "segment": "ovr243",
-    "summary": "⚠️ far, 245 lignes, NON DÉTAILLÉE — combine `SetReference16` et `Camera_ComputeViewMatrix`."
+    "summary": "⚠️ far, 245 lignes (ex-`HUDSymbol_ConstructWithViewMatrix_82693`, nom faux). **Tick par image de la caméra arme** : machine à phases `+0xA3` (0 à 4) ; phase 0 = `WeaponCam_LaunchPhase_80971` ; calcule la matrice de vue (`Camera_ComputeViewMatrix`)."
   },
   "sub_A6048": {
     "new_name": "TextLabel_InitRandomTimer_A6048",
@@ -14165,9 +14165,9 @@
     "summary": "far, aucun appel externe visible (103 lignes)."
   },
   "sub_765B2": {
-    "new_name": "AITargeting_ComputeOrientationExtended_765B2",
+    "new_name": "Landing_TaxiPhase_765B2",
     "segment": "ovr230",
-    "summary": "⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660`, `Vector_NormalizeInPlace_5593A` (×3+, seg116) — variante étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 594 lignes, en partie lue (ex-`AITargeting_ComputeOrientationExtended_765B2`, nom faux). **Phase sol de la séquence d'atterrissage** : déplace l'avion tenu (`+0x11`) en fixant sa position (`+0x70` copié dans `[+0x11]+0x12/+0x16/+0x1A`) et son orientation (vtable `+0x40`) ; switch sur un cap `+0x9F` ∈ {0, 90, 180, 270}° ; `+0x5C += dword_70458` (temps). À la fin (`mov byte ptr es:[bx+94h],1`), si l'avion est le joueur : exécute le gestionnaire du script de mission (`word_706A0+0x4E`, entrée `+0x40` → `Expr_VM_ExecuteSingleInstruction_51E7E`) puis, si le script n'a pas pris la main (`[word_706A0+0xA1] == 0`), **demande la piste musicale 0x14** (`push 14h / call Music_RequestTune_5A984`)."
   },
   "sub_294C0": {
     "new_name": "Mesh_FaceSetup",
@@ -16142,7 +16142,7 @@
   "sub_814C": {
     "new_name": "AI_TopLevelThink",
     "segment": "seg004",
-    "summary": "far,435L — dispatcher IA de haut niveau (appelé depuis sub_5E53) : vérifie difficulté pilote (+0xB0≥0xC → tick physique spécial sub_3314), exclut états spéciaux (+0x11D=0xA1/0xA2, probable décollage/atterrissage), vérifie pilote vivant, teste seuil de difficulté globale (word_70466), gère alerte menace (sub_5392), met à jour la chaîne de cibles (+0x287/+0x289) et notifie l'affichage radar (vtable[8]). **Candidat très fort pour le point d'entrée principal du 'think' IA par avion** (proche de SelectAIBehaviorPriorityAndTrackStats déjà documenté) — 435 lignes, à disséquer en détail dans une session dédiée. | Relue en entier le 2026-09-25 (y compris le milieu) : sur alerte de menace (AI_IncomingThreatWarning, sauf decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <= 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "far,435L — dispatcher IA de haut niveau (appelé depuis sub_5E53) : vérifie difficulté pilote (+0xB0≥0xC → tick physique spécial sub_3314), exclut états spéciaux (+0x11D=0xA1/0xA2, probable décollage/atterrissage), vérifie pilote vivant, teste le compteur d'images (word_70466 ≤ 3 : début de mission), gère alerte menace (sub_5392), met à jour la chaîne de cibles (+0x287/+0x289) et notifie l'affichage radar (vtable[8]). **Candidat très fort pour le point d'entrée principal du 'think' IA par avion** (proche de SelectAIBehaviorPriorityAndTrackStats déjà documenté) — 435 lignes, à disséquer en détail dans une session dédiée. | Relue en entier le 2026-09-25 (y compris le milieu) : sur alerte de menace (AI_IncomingThreatWarning, sauf decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <= 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
   },
   "sub_74B43": {
     "new_name": "AIEntity_Construct_74B43",
@@ -16570,9 +16570,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_ABDAF) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=3A990h, codesize=38Fh, nentries=4."
   },
   "sub_9D910": {
-    "new_name": "Gauge_ComputeAndRenderNeedle_9D910",
+    "new_name": "Collision_OnTerrainContact_9D910",
     "segment": "ovr316",
-    "summary": "⭐⚠️ far, 577 lignes, NON DÉTAILLÉE — **dernière fonction du fichier** (avant les tables de stubs suivantes) : combine `Terrain_QueryAltitudeAt`, `Gauge_ComputeNeedlePosition`, `Expr_VM_Execute_51E7E` (seg114), `Music_RequestTune_5A984` (seg125) — calcul et rendu d'une aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour session dédiée."
+    "summary": "⭐⚠️ far, 577 lignes, début lu (ex-`Gauge_ComputeAndRenderNeedle_9D910`, nom faux : pas une jauge). **Réaction au contact d'un objet avec le terrain** : compare le nom de l'objet heurté à « TERRAIN » (`push offset aTerrain / call CRT_MemFamily_Extra7`). Si l'objet a le drapeau `[+0x51]+0x20` (après appel vtable `+0x14` ; probablement train sorti — non prouvé) et, pour le joueur, si `byte_6E4D0 != 0` : contact accepté, l'altitude est recalée sur le sol (`Terrain_QueryAltitudeAt` + `Gauge_ComputeNeedlePosition` → `[obj+0x1A]`). Si c'est le joueur : exécute le gestionnaire du script de mission (`word_706A0+0x4E`, entrée `+0x40`) puis, si le script n'a pas pris la main (`[word_706A0+0xA1] == 0`) **et** que plus de 100 images se sont écoulées depuis le début de la mission (`cmp word_70466,64h / jbe`), **demande la piste musicale 0x14** (posé sans encombre). Le reste (contact refusé = crash) n'est pas lu."
   },
   "sub_500F6": {
     "new_name": "Frame_UpdateTimingAndNotifyTrackedObjects_500F6",
@@ -18240,9 +18240,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_83CE9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34."
   },
   "sub_75C18": {
-    "new_name": "AITargeting_UpdateAndRender_75C18",
+    "new_name": "Landing_SequenceTick_75C18",
     "segment": "ovr230",
-    "summary": "⚠️ far, 158 lignes, NON DÉTAILLÉE — combine AITargeting_ApplyRangeCheck_76E67, sub_6AB45 (×2), AITargeting_ComputeGeometry_75AA6, sub_23C4F, AITargeting_ComputeSolution_75D51."
+    "summary": "⚠️ far, 158 lignes (ex-`AITargeting_UpdateAndRender_75C18`, nom faux). **Tick de la séquence d'atterrissage** : switch à 6 cas sur la phase `+0x22` ; en phase 1, si l'avion tenu (`+0x11`) est le joueur, sélectionne la caméra « LANDING » (`push offset aLanding / call EntityTracker_SelectByID`). Le joueur sous contrôle manuel (`byte_722D1 == 1`) court-circuite la séquence. Phase de roulage : `Landing_TaxiPhase_765B2`."
   },
   "sub_7B20": {
     "new_name": "AI_PitchController_7B20",

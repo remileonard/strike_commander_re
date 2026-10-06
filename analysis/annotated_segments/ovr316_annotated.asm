@@ -7,13 +7,18 @@ ovr316		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 577 lignes, NON DÉTAILLÉE — dernière fonction du fichier (avant les tables de stubs
-; suivantes) : combine Terrain_QueryAltitudeAt, Gauge_ComputeNeedlePosition,
-; Expr_VM_Execute_51E7E (seg114), Music_RequestTune_5A984 (seg125) — calcul et rendu d'une
-; aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour session
-; dédiée.
+; ⭐⚠️ far, 577 lignes, début lu (ex-Gauge_ComputeAndRenderNeedle_9D910, nom faux : pas une
+; jauge). Réaction au contact d'un objet avec le terrain : compare le nom de l'objet heurté à
+; « TERRAIN » (push offset aTerrain / call CRT_MemFamily_Extra7). Si l'objet a le drapeau
+; [+0x51]+0x20 (après appel vtable +0x14 ; probablement train sorti — non prouvé) et, pour le
+; joueur, si byte_6E4D0 != 0 : contact accepté, l'altitude est recalée sur le sol
+; (Terrain_QueryAltitudeAt + Gauge_ComputeNeedlePosition → [obj+0x1A]). Si c'est le joueur :
+; exécute le gestionnaire du script de mission (word_706A0+0x4E, entrée +0x40) puis, si le
+; script n'a pas pris la main ([word_706A0+0xA1] == 0) et que plus de 100 images se sont
+; écoulées depuis le début de la mission (cmp word_70466,64h / jbe), demande la piste musicale
+; 0x14 (posé sans encombre). Le reste (contact refusé = crash) n'est pas lu.
 ; ==============================================================================================
-Gauge_ComputeAndRenderNeedle_9D910	proc far		; CODE XREF: VROOMM_StubThunk_6C2F0J
+Collision_OnTerrainContact_9D910	proc far		; CODE XREF: VROOMM_StubThunk_6C2F0J
 
 var_62		= dword	ptr -62h
 var_58		= dword	ptr -58h
@@ -80,7 +85,7 @@ loc_9D934:
 		call	dword ptr [bx+34h]
 		pop	cx
 
-loc_9D956:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+3Dj
+loc_9D956:				; CODE XREF: Collision_OnTerrainContact_9D910+3Dj
 		push	8
 		push	ds
 		push	offset aTerrain	; "TERRAIN"
@@ -95,16 +100,16 @@ loc_9D960:
 		jmp	short loc_9D973
 ; ���������������������������������������������������������������������������
 
-loc_9D971:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+5Aj
+loc_9D971:				; CODE XREF: Collision_OnTerrainContact_9D910+5Aj
 		xor	ax, ax
 
-loc_9D973:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+5Fj
+loc_9D973:				; CODE XREF: Collision_OnTerrainContact_9D910+5Fj
 		or	al, al
 		jnz	short loc_9D97A
 		jmp	loc_9DBCA
 ; ���������������������������������������������������������������������������
 
-loc_9D97A:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+65j
+loc_9D97A:				; CODE XREF: Collision_OnTerrainContact_9D910+65j
 		mov	bx, [di+51h]
 		mov	al, [bx+20h]
 		mov	[bp+var_7], al
@@ -123,14 +128,14 @@ loc_9D99B:
 		jmp	short loc_9D99F
 ; ���������������������������������������������������������������������������
 
-loc_9D99D:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+7Fj
-					; Gauge_ComputeAndRenderNeedle_9D910+86j
+loc_9D99D:				; CODE XREF: Collision_OnTerrainContact_9D910+7Fj
+					; Collision_OnTerrainContact_9D910+86j
 		xor	ax, ax
 
-loc_9D99F:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9D99Bj
+loc_9D99F:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9D99Bj
 		mov	[bp+var_7], al
 
-loc_9D9A2:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+79j
+loc_9D9A2:				; CODE XREF: Collision_OnTerrainContact_9D910+79j
 		mov	al, [bp+var_7]
 		mov	ah, 0
 		or	ax, ax
@@ -140,7 +145,7 @@ loc_9D9AB:
 		jmp	loc_9DAC5
 ; ���������������������������������������������������������������������������
 
-loc_9D9AE:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+99j
+loc_9D9AE:				; CODE XREF: Collision_OnTerrainContact_9D910+99j
 		push	word ptr [di+51h]
 		mov	bx, [di+51h]
 
@@ -162,20 +167,20 @@ loc_9D9B4:
 		jmp	short loc_9D9DF
 ; ���������������������������������������������������������������������������
 
-loc_9D9DD:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+BFj
-					; Gauge_ComputeAndRenderNeedle_9D910+C6j
+loc_9D9DD:				; CODE XREF: Collision_OnTerrainContact_9D910+BFj
+					; Collision_OnTerrainContact_9D910+C6j
 		xor	ax, ax
 
-loc_9D9DF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+CBj
+loc_9D9DF:				; CODE XREF: Collision_OnTerrainContact_9D910+CBj
 		mov	[bp+var_7], al
 
-loc_9D9E2:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+B9j
+loc_9D9E2:				; CODE XREF: Collision_OnTerrainContact_9D910+B9j
 		cmp	[bp+var_7], 0
 		jnz	short loc_9D9EB
 		jmp	loc_9DAC5
 ; ���������������������������������������������������������������������������
 
-loc_9D9EB:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+D6j
+loc_9D9EB:				; CODE XREF: Collision_OnTerrainContact_9D910+D6j
 		mov	si, [bp+arg_4]
 		add	si, 1Ah
 		push	0
@@ -238,7 +243,7 @@ loc_9DA6D:
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_9DA8F:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+15Bj
+loc_9DA8F:				; CODE XREF: Collision_OnTerrainContact_9D910+15Bj
 		mov	bx, word_706A0
 		mov	al, [bx+0A1h]
 		mov	[bp+var_1D], al
@@ -253,8 +258,8 @@ loc_9DA9A:
 		call	Music_RequestTune_5A984
 		pop	cx
 
-loc_9DAAF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+18Ej
-					; Gauge_ComputeAndRenderNeedle_9D910+195j
+loc_9DAAF:				; CODE XREF: Collision_OnTerrainContact_9D910+18Ej
+					; Collision_OnTerrainContact_9D910+195j
 		cmp	byte_72A8E, 4
 		jnz	short loc_9DAC5
 		push	0
@@ -263,8 +268,8 @@ loc_9DAAF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+18Ej
 		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
-loc_9DAC5:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9D9ABj
-					; Gauge_ComputeAndRenderNeedle_9D910+D8j ...
+loc_9DAC5:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9D9ABj
+					; Collision_OnTerrainContact_9D910+D8j ...
 		mov	al, [bp+var_7]
 		mov	ah, 0
 		or	ax, ax
@@ -274,8 +279,8 @@ loc_9DAC5:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9D9ABj
 		jmp	loc_9DBC5
 ; ���������������������������������������������������������������������������
 
-loc_9DAD7:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+1BCj
-					; Gauge_ComputeAndRenderNeedle_9D910+1C2j
+loc_9DAD7:				; CODE XREF: Collision_OnTerrainContact_9D910+1BCj
+					; Collision_OnTerrainContact_9D910+1C2j
 		or	byte ptr [di+73h], 1
 		push	0
 		mov	[bp+var_26], 0
@@ -325,23 +330,23 @@ loc_9DB47:
 		jmp	short loc_9DB50
 ; ���������������������������������������������������������������������������
 
-loc_9DB4E:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9DB47j
+loc_9DB4E:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9DB47j
 		xor	ax, ax
 
-loc_9DB50:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+23Cj
+loc_9DB50:				; CODE XREF: Collision_OnTerrainContact_9D910+23Cj
 		or	al, al
 		jz	short loc_9DB5F
 		mov	bx, [bp+arg_4]
 		mov	eax, [bp+var_22]
 		mov	[bx+1Ah], eax
 
-loc_9DB5F:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+242j
+loc_9DB5F:				; CODE XREF: Collision_OnTerrainContact_9D910+242j
 		mov	ax, [bp+arg_4]
 		cmp	ax, word_722E6
 		jnz	short loc_9DB6D
 		mov	byte_6E4B7, 0
 
-loc_9DB6D:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+256j
+loc_9DB6D:				; CODE XREF: Collision_OnTerrainContact_9D910+256j
 		mov	[bp+var_3A], 1400h
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+19h], 0
@@ -359,7 +364,7 @@ loc_9DB98:
 		mov	eax, [bp+var_40]
 		mov	[bp+var_3A], eax
 
-loc_9DBA0:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+26Ej
+loc_9DBA0:				; CODE XREF: Collision_OnTerrainContact_9D910+26Ej
 		push	20h ; ' '
 
 loc_9DBA2:
@@ -378,12 +383,12 @@ loc_9DBA5:
 		jmp	loc_9DD1A
 ; ���������������������������������������������������������������������������
 
-loc_9DBC5:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+1C4j
+loc_9DBC5:				; CODE XREF: Collision_OnTerrainContact_9D910+1C4j
 		mov	al, 0
 		jmp	loc_9DD1A
 ; ���������������������������������������������������������������������������
 
-loc_9DBCA:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+67j
+loc_9DBCA:				; CODE XREF: Collision_OnTerrainContact_9D910+67j
 		mov	[bp+var_7], 0
 		mov	ax, [bp+arg_4]
 		cmp	ax, word_722E6
@@ -412,7 +417,7 @@ loc_9DBF1:
 loc_9DBF6:
 		add	sp, 4
 
-loc_9DBF9:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2DAj
+loc_9DBF9:				; CODE XREF: Collision_OnTerrainContact_9D910+2DAj
 		mov	al, [si+4]
 		and	al, 4
 		mov	ah, 0
@@ -420,8 +425,8 @@ loc_9DBF9:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2DAj
 		jnz	short loc_9DC08
 		mov	[bp+var_7], 1
 
-loc_9DC08:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2C5j
-					; Gauge_ComputeAndRenderNeedle_9D910+2CEj ...
+loc_9DC08:				; CODE XREF: Collision_OnTerrainContact_9D910+2C5j
+					; Collision_OnTerrainContact_9D910+2CEj ...
 		push	si
 		push	large dword ptr	[di+55h]
 		les	bx, [di+55h]
@@ -451,7 +456,7 @@ loc_9DC3D:
 		jmp	loc_9DCF4
 ; ���������������������������������������������������������������������������
 
-loc_9DC40:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+32Bj
+loc_9DC40:				; CODE XREF: Collision_OnTerrainContact_9D910+32Bj
 		push	si
 		mov	bx, [si]
 
@@ -467,16 +472,16 @@ loc_9DC43:
 		jmp	short loc_9DC55
 ; ���������������������������������������������������������������������������
 
-loc_9DC53:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+338j
+loc_9DC53:				; CODE XREF: Collision_OnTerrainContact_9D910+338j
 		mov	al, 17h
 
-loc_9DC55:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+341j
+loc_9DC55:				; CODE XREF: Collision_OnTerrainContact_9D910+341j
 		cmp	al, 8
 		jnz	short loc_9DC61
 		mov	word ptr [bp+arg_8+2], ds
 		mov	word ptr [bp+arg_8], 2B43h
 
-loc_9DC61:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+347j
+loc_9DC61:				; CODE XREF: Collision_OnTerrainContact_9D910+347j
 		push	large [bp+arg_8]
 		push	si
 		push	large dword ptr	[di+5Eh]
@@ -514,7 +519,7 @@ loc_9DCA8:
 		cmp	[bp+var_7], 0
 		jz	short loc_9DCE8
 
-loc_9DCAE:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9DCA6j
+loc_9DCAE:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9DCA6j
 		mov	ax, [bp+arg_4]
 
 loc_9DCB1:
@@ -537,26 +542,26 @@ loc_9DCD1:				; DATA XREF: ovr316:off_9DD1Eo
 		jmp	short loc_9DCE4
 ; ���������������������������������������������������������������������������
 
-loc_9DCD8:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+3BCj
+loc_9DCD8:				; CODE XREF: Collision_OnTerrainContact_9D910+3BCj
 					; DATA XREF: ovr316:off_9DD1Eo
 		mov	byte_6E4B7, 3	; case 0x5
 		jmp	short loc_9DCE4
 ; ���������������������������������������������������������������������������
 
-loc_9DCDF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+3B8j
-					; Gauge_ComputeAndRenderNeedle_9D910+3BCj
+loc_9DCDF:				; CODE XREF: Collision_OnTerrainContact_9D910+3B8j
+					; Collision_OnTerrainContact_9D910+3BCj
 					; DATA XREF: ...
 		mov	byte_6E4B7, 1	; default
 
-loc_9DCE4:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+3A5j
-					; Gauge_ComputeAndRenderNeedle_9D910+3C6j ...
+loc_9DCE4:				; CODE XREF: Collision_OnTerrainContact_9D910+3A5j
+					; Collision_OnTerrainContact_9D910+3C6j ...
 		mov	al, 1
 
 loc_9DCE6:
 		jmp	short loc_9DD1A
 ; ���������������������������������������������������������������������������
 
-loc_9DCE8:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+39Cj
+loc_9DCE8:				; CODE XREF: Collision_OnTerrainContact_9D910+39Cj
 		cmp	cx, word ptr [bp+var_C]
 		jl	short loc_9DCF4
 		push	di
@@ -565,8 +570,8 @@ loc_9DCEE:
 		call	Camera_EnableFollowIfActive
 		pop	cx
 
-loc_9DCF4:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9DC3Dj
-					; Gauge_ComputeAndRenderNeedle_9D910+3DBj
+loc_9DCF4:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9DC3Dj
+					; Collision_OnTerrainContact_9D910+3DBj
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+1Dh]
 		sar	ax, 1
@@ -580,19 +585,19 @@ loc_9DCF4:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9DC3Dj
 		call	Debris_SpawnAtAttachPoint
 		add	sp, 8
 
-loc_9DD18:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+3F6j
+loc_9DD18:				; CODE XREF: Collision_OnTerrainContact_9D910+3F6j
 		mov	al, 0
 
-loc_9DD1A:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+2B2j
-					; Gauge_ComputeAndRenderNeedle_9D910+2B7j ...
+loc_9DD1A:				; CODE XREF: Collision_OnTerrainContact_9D910+2B2j
+					; Collision_OnTerrainContact_9D910+2B7j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Gauge_ComputeAndRenderNeedle_9D910	endp
+Collision_OnTerrainContact_9D910	endp
 
 ; ���������������������������������������������������������������������������
-off_9DD1E	dw offset loc_9DCD1	; DATA XREF: Gauge_ComputeAndRenderNeedle_9D910+3BCr
+off_9DD1E	dw offset loc_9DCD1	; DATA XREF: Collision_OnTerrainContact_9D910+3BCr
 		dw offset loc_9DCD1	; jump table for switch	statement
 		dw offset loc_9DCDF
 		dw offset loc_9DCDF

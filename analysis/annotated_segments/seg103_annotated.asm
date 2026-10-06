@@ -263,10 +263,11 @@ Aero_ComputeAoAWithTrim_480CA	endp
 ; Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0,
 ; -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q)
 ; · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord
-; : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6
-; (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB /
-; Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail :
-; analysis/DATA_MODEL.md 6.2.
+; : si |alpha_eff| > seuil si[0x4B] ET plus de 10 images écoulées depuis le début de la
+; mission (word_70466 = compteur d'images, cmp word_70466,0Ah / jbe) ET joueur ->
+; flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize =
+; Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas
+; des rotations). Detail : analysis/DATA_MODEL.md 6.2.
 ; ==============================================================================================
 Aero_ComputeLiftAndSideForce_4812B	proc far		; CODE XREF: Aero_SumLinearForces_48639+69p
 
@@ -5129,35 +5130,37 @@ loc_4A826:
 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec
 ; FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples
 ; (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]).
-; Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la
-; difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ;
-; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a
-; arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22,
-; cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur
-; 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) *
-; (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0,
-; donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si
-; [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat
-; volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] +
-; Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] !=
-; 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON
-; manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee
-; [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ;
-; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4)
-; ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche
-; lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse
-; [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol :
-; projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est
-; PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est
-; JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet
-; monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse,
-; +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. |
-; Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 =
-; JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol
-; ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) =
-; -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral).
-; Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree
-; par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D).
+; Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par le
+; compteur d'images word_70466 (image 0 : [+0x20] = 1 d'office ; test terrain seulement après
+; 3 images, cmp word_70466,3 / jbe) ; (2) FlightControl_InvalidateAllCachesGlobal (reset
+; caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT
+; 1-5) PLAFONNE a arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E],
+; Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain
+; dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x),
+; burn = (10 - 9*dword_72A14) * [si+0x33](SFC) * (cran*0x33/256 si cran<=5, cran*0x4C/256
+; sinon ; multiplication SAUTEE si ce facteur <= 0, donc cran 0 -> SFC seul) *
+; dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si [si+0x6D]<=0 avant le bloc :
+; carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat volets/aerofrein/train depuis les
+; bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse =
+; |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 ->
+; Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel :
+; Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] +
+; portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator ->
+; moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; au sol et |A.vitesse| < 40
+; m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche lateral (voir complement) ;
+; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt
+; (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du
+; plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (corrige
+; 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est JDYN_UpdateDamageGains_494DD ; la
+; position est integree par la methode +0x14 de l'objet monde, voir complement). Sous-objet A
+; ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag
+; 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. | Complement 2026-09-25 : tout debut = appel
+; vtable secondaire +0x34 = JDYN_UpdateDamageGains_494DD ; apres
+; Physics_IntegrateSecondaryPosition : si au sol ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp
+; 2800h) -> [si+0Ch] (vitesse de lacet) = -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par
+; le manche lateral). Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la
+; position est integree par la methode +0x14 de l'objet monde
+; (WorldObject_IntegrateBodyMotion_3D31D).
 ; ==============================================================================================
 PhysicsTicks:				; CODE XREF: seg082:1153J
 					; seg082:loc_3B67BJ ...

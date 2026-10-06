@@ -58,7 +58,7 @@ VROOMM_StubThunk_6AB8A	endp
 ; d'overlay actuellement charge en memoire. fileoff=20C0h, codesize=18C9h, nentries=9.
 ; ==============================================================================================
 VROOMM_StubThunk_6AB8F	proc far
-		jmp	AITargeting_ComputeOrientationExtended_765B2
+		jmp	Landing_TaxiPhase_765B2
 VROOMM_StubThunk_6AB8F	endp
 
 
@@ -97,7 +97,7 @@ VROOMM_StubThunk_6AB99	endp
 ; d'overlay actuellement charge en memoire. fileoff=20C0h, codesize=18C9h, nentries=9.
 ; ==============================================================================================
 VROOMM_StubThunk_6AB9E	proc far		; DATA XREF: seg339:off_6D3E2o
-		jmp	AITargeting_UpdateAndRender_75C18
+		jmp	Landing_SequenceTick_75C18
 VROOMM_StubThunk_6AB9E	endp
 
 

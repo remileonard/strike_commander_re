@@ -511,7 +511,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
 
 ```
 1. Terrain_QueryAltitudeAt([[si]+2]+0x12, word_70474)      détection sol
-   → [A+0x20] (flag « au sol ») posé/effacé selon difficulté word_70466
+   → [A+0x20] (flag « au sol ») posé d'office à l'image 0, puis testé après 3 images (word_70466 = compteur d'images de la mission, pas une difficulté)
 2. FlightControl_InvalidateAllCachesGlobal(si)              reset des caches aéro
 3. MANETTE DES GAZ → POUSSÉE
    cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), PLAFONNÉ à arrondi(10·dword_72A2C) et réécrit
@@ -658,7 +658,7 @@ seuil  = si[0x4B] << 8                                = α de décrochage (u8, e
 (B) DÉPART FRANC → vecteur portance = (0,0,0) (loc_481C1..loc_48211, sortie loc_482E7), SEULEMENT si
     les 4 conditions, évaluées dans cet ordre (chaîne de `jbe/jz/jnz short loc_48211` = sinon on retombe sur (A)) :
       |α_eff| > seuil                                 test sur α_eff NON borné (loc_481C1)
-      && word_70466 > 10                              niveau de difficulté / réalisme global (loc_481CF)
+      && word_70466 > 10                              plus de 10 images écoulées (word_70466 = compteur d'images) (loc_481CF)
       && byte_72354 != 0                              option de jeu, = 1 par défaut (init ovr266) (loc_481DB)
       && handle_objet == word_722E6                   UNIQUEMENT l'avion du joueur — jamais les IA
     →  flags_75.bit6 = (obj[+0x20] == 0)   (drapeau d'alerte HUD/son) ; la force latérale reste calculée normalement
@@ -1714,15 +1714,17 @@ hook de vue externe. Le slot `[0x14]` est la partie caméra.)
 
 #### c) Base d'entités — `MissionRecord_*` (ovr239-257)
 
-`MissionRecord_LoadEntityDatabase_7B035` (**3103 L, plus grosse fonction du
-binaire**) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
-charge en masse une base d'entités depuis un fichier indexé (potentiellement LZW).
+`Player_ShotDownSequence_7B035` (**3103 L, plus grosse fonction du
+binaire**, ex-`MissionRecord_LoadEntityDatabase_7B035`) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
+**ce n'est pas un chargeur de base d'entités** : c'est la séquence jouée quand l'avion du
+joueur est détruit (lancée par `STRIKE_EXE_MAIN_LOOP` sur `byte_6E4B4`), qui charge
+`OBJECTS\EJECT.PAK` (voir `MUSIC_SYSTEM.md` §5.4).
 Tags ASCII vus : `EJECT`, chunk générique **`DATA`** (`0x41544144`, cf.
 `PlayerComponent_LoadDataChunk_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
 (816 L, ovr249) = variante `Path_ResolveDataFile` + `InitAndValidate` + lecture
-massive de champs. `MissionRecord_LoadAndBuildWidgetTree_7D31A` (1081 L, ovr240) =
-même motif + construction de l'arbre de widgets (`UIScreen_BuildWidgetTree_53A94`,
-seg114). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
+massive de champs. `Player_EjectSequence_7D31A` (1081 L, ovr240, ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`) =
+séquence d'éjection volontaire (lancée sur `byte_6E4B8`, Ctrl+E), même chargement de `EJECT.PAK`,
+puis destruction de l'avion abandonné via `World_OnObjectDestroyed_53A94` (ex-`UIScreen_BuildWidgetTree_53A94`). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
 des lecteurs de sous-enregistrements selon la disposition de champs.
 
 ### 6.7 Composants d'avion & dégâts
@@ -2050,7 +2052,7 @@ Fichier .IFF
    interne de `AREA`/`SPOT`/`PART`/`CAST`/`NUMS`/`MSGS`/`FLAG`/`PLYR` (fonctions
    `A9956`/`A974A`/`AA6C9`/… seg457), le contenu du chunk `PROG` (bytecode Expr VM),
    le rôle exact de `SCNE.heading` (`+0x0A`, candidat cap), et
-   `MissionRecord_LoadEntityDatabase_7B035` (3103 L, base d'entités indexée).
+   `Player_ShotDownSequence_7B035` (3103 L, séquence « avion du joueur détruit », corps à lire).
 4. **`ResourceFile_LoadTypeA…G`** (ovr266-269, 7 fonctions 470–1400 L quasi
    identiques) — identifier les 7 types de fichiers correspondants.
 5. **LZW** — la table de dictionnaire n'a pas été tracée (seul le paramétrage

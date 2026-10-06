@@ -212,8 +212,8 @@ principale. `Music_StopAndResetCombat_AA831` fait de même et oublie l'état de 
 ### 5.1 Pendant le vol : `Music_CombatIntensitySelector_59302`
 
 Appelé **une frame sur 16** par `Sound_FrameUpdate_5AB79` (`test word_70466, 0Fh`). Ne fait rien si le
-joueur est mort ou éjecté (`byte_6E4B8`, `byte_6E4B4`), si `byte_72A8E == 0x0B`, si la piste courante
-est `0x14`, ou si un changement est déjà en attente.
+joueur s'éjecte (`byte_6E4B8`) ou a été abattu (`byte_6E4B4`), si `byte_72A8E == 0x0B`, si la piste
+courante est `0x14` (musique d'atterrissage, §5.4), ou si un changement est déjà en attente.
 
 1. `Music_ScanNearbyEnemies_590E0` : objets du **camp adverse** (`+0x50 == 0xFF`) à moins de **18 520**
    du joueur — bit 0 = avion (catégorie 6, pilote non éjecté), bit 1 = défense fixe, objet au sol ou
@@ -243,7 +243,7 @@ est `0x14`, ou si un changement est déjà en attente.
 
 Gestionnaire appelé par les générateurs de débris (`Debris_SpawnOrchestrator`,
 `Debris_SpawnOrchestratorVariant_9D770`), par l'éjection (`AI_EjectDecision_50FF`) et par
-`MissionRecord_LoadAndBuildWidgetTree_7D31A`. La musique n'est concernée que pour les catégories 1
+`Player_EjectSequence_7D31A`. La musique n'est concernée que pour les catégories 1
 (`ORNT`, décor orienté : immeubles…), 6 (avion), 0x13 (défense fixe), 0x14 (objet au sol) et 0x15
 (`XMIT`) (table `word_53D7E`), et rien ne se passe si le joueur est mort, si l'objet
 détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
@@ -259,10 +259,24 @@ détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
 |---|---|---|
 | `TUNE` de la mission (`byte_706A2`) | `STRIKE_EXE_MAIN_LOOP` | au démarrage de la mission (fait vérifié par Rémi en jeu) |
 | 4 / 0x13 / `TUNE` | `Music_SelectStartTune_5AA02` (depuis `Cockpit_LoadAndDrawCalibration_8FDC0`) | si §5.1 ne choisit rien : ennemis proches → 4 si un combat a déjà eu lieu, sinon 0x13 ; aucun ennemi → `TUNE` |
-| 0x0B | `MissionRecord_LoadEntityDatabase_7B035` | sans condition, au début de la séquence d'ouverture de mission (rôle exact non tracé) |
-| 0x0A | `MissionRecord_LoadAndBuildWidgetTree_7D31A` | sans condition (rôle exact non tracé) |
-| 0x14 | `AITargeting_ComputeOrientationExtended_765B2`, `Gauge_ComputeAndRenderNeedle_9D910` | si `[word_706A0+0xA1] == 0` ; dans la seconde, après 100 frames (`word_70466 > 64h`). Fonctions non relues |
-| 0x15 / 0x08 | `HUDSymbol_DrawWithLineOfSight_80971` | 0x15 si `[si+9Eh] == 9`, sinon 0x08 ; seulement si la piste courante n'est pas 0x13. Fonction non relue |
+| 0x0B | `Player_ShotDownSequence_7B035` | **avion du joueur détruit** : `STRIKE_EXE_MAIN_LOOP` lance la séquence quand `byte_6E4B4 != 0`, drapeau posé par `Debris_SpawnOrchestratorVariant_9D770` quand l'objet détruit est le joueur (`cmp word_722E6,di` / `mov byte_6E4B4,1`). La séquence charge `OBJECTS\EJECT.PAK` puis demande 0x0B (`push 0Bh`), sans condition |
+| 0x0A | `Player_EjectSequence_7D31A` | **éjection volontaire du joueur** : `STRIKE_EXE_MAIN_LOOP` lance la séquence quand `byte_6E4B8 != 0`, drapeau posé par `Player_MainUpdate` sur Ctrl+E (touche de code 0x12 avec Ctrl, tables d'état clavier indice 0x1D) ou quand `byte_6E33B != 0`. Charge aussi `EJECT.PAK`, puis demande 0x0A (`push 0Ah`), sans condition |
+| 0x14 | `Landing_TaxiPhase_765B2` | **atterrissage terminé** : fin de la phase sol de la séquence d'atterrissage (caméra « LANDING », `Landing_SequenceTick_75C18`), quand l'avion est le joueur (`mov byte ptr es:[bx+94h],1`, puis `cmp ax,word_722E6`) |
+| 0x14 | `Collision_OnTerrainContact_9D910` | **le joueur touche le sol sans casse** (objet heurté = « TERRAIN », contact accepté), après plus de 100 images de mission (`cmp word_70466,64h / jbe` : `word_70466` est le compteur d'images, incrémenté dans `CombatTarget_WeaponActionSubsystem`), ce qui écarte le contact au départ sur la piste |
+| 0x08 | `WeaponCam_LaunchPhase_80971` | **caméra arme sur un missile du joueur** : fin de la phase de lancement (`mov byte ptr [si+0A3h],1 / push 8`) |
+| 0x15 | `WeaponCam_LaunchPhase_80971` | **caméra arme sur une bombe du joueur** (catégorie 9), **seulement si la piste courante est 0x13** (`cmp word_70859,13h / jz` → `push 15h`) ; sinon pas de changement |
+
+Pour 0x14, les deux sites exécutent d'abord le gestionnaire du script de mission (`word_706A0+0x4E`,
+entrée `+0x40`, via `Expr_VM_ExecuteSingleInstruction_51E7E`) ; la piste n'est demandée que si le script
+n'a pas pris la main (`[word_706A0+0xA1] == 0`). Une mission peut donc remplacer la musique
+d'atterrissage.
+
+**Caméra arme.** Elle est lancée par `Mission_PlayerEventHandler`, appelé à chaque lancement d'arme
+(3 appels dans `HUD_RenderSymbologyMain` juste après le bruit de tir `SoundFX_Play_5A8DC` et la
+décrémentation du compteur de munitions, et 1 dans `TimedTrigger_SpawnAndBindGeometry_9E289`). Elle ne
+démarre que si le tireur est le joueur et que l'arme est de catégorie 8 (missile) ou 9 (bombe). Elle
+passe par `WeaponCam_Start_8285A` (arme suivie, lanceur, catégorie), puis `WeaponCam_Tick_82693` à chaque
+image, dont la phase 0 est `WeaponCam_LaunchPhase_80971`.
 
 ### 5.5 Récapitulatif par numéro
 
@@ -272,13 +286,16 @@ détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
 | 5 | ennemi dans les six heures du joueur |
 | 6 / 7 | combat, joueur endommagé à 35 % / 75 % |
 | 9 | missile sur le joueur, ou avion qui l'attaque |
-| 0x0A, 0x0B | séquences de mission (rôle non tracé) |
+| 0x0A | éjection volontaire du joueur (Ctrl+E) |
+| 0x0B | avion du joueur détruit |
 | 0x0C | fin de combat, condition de mission remplie |
 | 0x0D | fin de combat (une fois) |
 | 0x0E / 0x0F | objet allié détruit (désigné par la mission / autre) |
 | 0x10 / 0x11 / 0x12 | ponctuation de victoire du joueur : avion / défense fixe ou objet au sol / décor (`ORNT`) ou `XMIT` |
 | 0x13 | menaces au sol seules, ou dernier avion ennemi abattu |
-| 0x14, 0x15, 0x08 | demandées par des fonctions non relues (§5.4) |
+| 0x14 | atterrissage du joueur (fin du roulage, ou contact au sol accepté), sauf si le script de mission prend la main |
+| 0x15 | caméra arme sur une bombe du joueur, seulement pendant la piste 0x13 |
+| 0x08 | caméra arme sur un missile du joueur |
 
 ---
 
@@ -329,7 +346,10 @@ sur 16. `Sound_StopAll_5A88F` : arrête musique (avec fondu), effets et voix.
 
 ## 8. Questions ouvertes
 
-- Pistes 0x0A, 0x0B, 0x14, 0x15, 0x08 : relire les fonctions qui les demandent (§5.4).
+- Événements du §5.4 tracés ; restent : la condition `[+0x11]` ≠ 0x0B et ≠ 7 de
+  `Mission_PlayerEventHandler` (qui peut bloquer la caméra arme, donc 0x08 et 0x15) ; `byte_6E33B`
+  (deuxième source de l'éjection) ; le drapeau `[+0x51]+0x20` et `byte_6E4D0` qui font accepter le
+  contact au sol dans `Collision_OnTerrainContact_9D910`.
 - `byte_72A8E == 0x0B` (verrou du §5.1) et l'objet désigné par la mission (`VROOMM_StubThunk_6CE2E`,
   §5.3).
 - Facteur `dword_7044C` du test « dans les six heures ».
@@ -350,6 +370,11 @@ Points de la session musique corrigés à l'intégration, pour qui relirait un a
   `AI_EjectDecision_50FF` ; la musique réagit à la destruction d'objets (§5.3).
 - Les pistes 0x10-0x12 sont des ponctuations de victoire, pas « l'ID d'un widget ».
 - Le ratio d'intensité porte sur les dégâts du joueur (`word_722E6` = le joueur), pas sur une cible.
+- `word_70466` est le **compteur d'images** de la mission (remis à 0 au chargement, `inc word_70466` dans
+  `CombatTarget_WeaponActionSubsystem`), pas une « difficulté » comme le disent d'anciens résumés.
+- Les fonctions qui demandent 0x0A, 0x0B, 0x14, 0x15 et 0x08 étaient mal nommées (`MissionRecord_*`,
+  `AITargeting_*`, `Gauge_*`, `HUDSymbol_*`) : ce sont l'éjection, l'avion abattu, l'atterrissage, le
+  contact au sol et la caméra arme (§5.4).
 - Les `Weapon_HUDBox_*` étaient les tests de combat de la musique, les effets sonores et les façades.
 - Les deux octets par piste de `combat.dat` sont la longueur de phrase et la position de dernière
   mesure ; les 61 entrées sont des numéros de liaison par position, pas des enveloppes ; l'en-tête

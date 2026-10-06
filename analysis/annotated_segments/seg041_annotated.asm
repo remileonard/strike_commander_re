@@ -1218,8 +1218,8 @@ EntityTracker_ClearAll	endp
 ; a jour +0x12/+0xF si c'etait la selection/tete courante. Appelee depuis
 ; MissionRecord_LoadEntityDatabase_7B035 ET MissionRecord_LoadAndBuildWidgetTree_7D31A.
 ; ==============================================================================================
-EntityTracker_RemoveByTarget	proc far		; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2189P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+A42P
+EntityTracker_RemoveByTarget	proc far		; CODE XREF: Player_ShotDownSequence_7B035+2189P
+					; Player_EjectSequence_7D31A+A42P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6

@@ -1187,7 +1187,7 @@ WorldObject_IntegrateBodyMotion_3D31D	endp
 ; (+0x38) : activation conditionnelle du mode caméra suiveuse selon l'état de la cible.
 ; ==============================================================================================
 Camera_EnableFollowIfActive	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+173P
-					; Gauge_ComputeAndRenderNeedle_9D910:loc_9DCEEP	...
+					; Collision_OnTerrainContact_9D910:loc_9DCEEP	...
 
 arg_0		= word ptr  6
 

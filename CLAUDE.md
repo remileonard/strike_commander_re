@@ -347,7 +347,7 @@ Règles :
 `Categorie_RoleCourtEtDescriptif_ADRESSE` — l'adresse (ex. `_51106`) est
 **toujours conservée en suffixe** pour la traçabilité, même après
 renommage. Exemples : `AI_ThrottleController_6250`,
-`Expr_VM_Interpreter_51106`, `MissionRecord_LoadEntityDatabase_7B035`.
+`Expr_VM_Interpreter_51106`, `Player_ShotDownSequence_7B035`.
 
 ## Pièges méthodologiques déjà rencontrés (à ne pas répéter)
 
@@ -425,7 +425,7 @@ renommage. Exemples : `AI_ThrottleController_6250`,
 | Chargeur de mission | seg455 | `MissionLoader_LoadEntitiesMain_A767F` |
 | Cluster AudioQueue (file audio/messages indexée) | seg458-461 | `AudioQueue_ProcessMain_AA84E` |
 | IA de manœuvre/ciblage | ovr230-232 | `AI_ManeuverSolutionMain_781D0` (**jamais lu en détail**) |
-| Base de données d'entités de mission | ovr239-240 | `MissionRecord_LoadEntityDatabase_7B035` (**la plus grosse fonction du fichier, jamais lue en détail**) |
+| Séquences avion abattu / éjection (ex-« base d'entités de mission ») | ovr239-240 | `Player_ShotDownSequence_7B035` (**la plus grosse fonction du fichier**, rôle tracé, corps jamais lu en détail), `Player_EjectSequence_7D31A` |
 
 Pour le récit complet de chaque découverte (avec justification), voir les
 sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 1
@@ -435,8 +435,9 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
 
 1. `Expr_VM_Interpreter_51106` — jamais lu en détail malgré son rôle
    transversal central (HUD, IA, UI, mission passent tous par cette VM).
-2. `MissionRecord_LoadEntityDatabase_7B035` (3103 lignes, ovr239) — la
-   plus grosse fonction du fichier.
+2. `Player_ShotDownSequence_7B035` (3103 lignes, ovr239) — la
+   plus grosse fonction du fichier : séquence jouée quand l'avion du joueur est
+   détruit (charge `EJECT.PAK`, piste 0x0B ; voir `MUSIC_SYSTEM.md` §5.4). Corps à lire.
 3. `AI_ManeuverSolutionMain_781D0` (2373 lignes, ovr232) — cœur probable
    du calcul de manœuvre de combat aérien.
 4. ~~Contenu du cluster AudioQueue~~ : catalogue musical **et** son numérisé VOC ; système son entièrement décrit dans `MUSIC_SYSTEM.md` (questions restantes : §8).

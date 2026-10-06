@@ -323,7 +323,7 @@ bool side_stall = std::abs(beta) > stall_alpha;   // → coupe la force latéral
 //     (loc_481C1 → chaîne de sauts vers loc_48211 = "sinon on retombe sur (A)") :
 bool hard_stall =
        std::abs(ae_raw) > stall_alpha       // test sur l'AoA NON borné      (loc_481C1)
-    && difficulty       > 10                // word_70466 (réalisme global)   (loc_481CF)
+    && frame_count      > 10                // word_70466 = compteur d'images de la mission (loc_481CF)
     && realism_option                       // byte_72354 != 0 (option de jeu, = 1 par défaut, init ovr266)
     && is_player;                           // handle == word_722E6 — JAMAIS les IA
 wing_stall = hard_stall;   // flags_75 bit6 = (obj[+0x20] == 0) : drapeau d'alerte HUD/son, PAS un couple
@@ -595,7 +595,7 @@ table par défaut.
   force latérale si `|β| > stall_alpha` sont **toujours** actives et
   suffisent au comportement de décrochage. Le « départ franc » (portance
   nulle) demande en plus trois entrées à câbler côté port :
-  `difficulty` (word_70466 > 10), une option de réalisme (byte_72354) et
+  le compteur d'images de la mission (word_70466 > 10, c.-à-d. pas pendant les 10 premières images ; ce n'est **pas** une difficulté), une option de réalisme (byte_72354) et
   `is_player` — les IA n'y sont **jamais** soumises.
 - **`Fmax`/`Smax`** (déflexion max volets/spoiler) ← rôle proche de
   `flap_lift_increment` (`jdyn[0x4D]`) mais **en incidence**, pas en angle
