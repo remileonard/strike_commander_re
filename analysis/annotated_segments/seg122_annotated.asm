@@ -8,10 +8,12 @@ seg122		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_603DE (sous-fonction du sous-système minuteur, seg121) — référencée par
-; sub_59902.
+; Ex-'Weapon_HUDBox_TimerCaseC_598A6'. far. LUE 2026-10-06. Systeme d'effets sonores : 5
+; canaux de sequence XMIDI a +0x92 (pas 0x11 : struct canal, +0xE = numero d'effet, 0x0F =
+; libre, +0xF = emetteur). Renvoie le premier canal dont la sequence ne joue pas
+; (AIL_sequence_status_603DE != 1), ou -1.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseC_598A6	proc far		; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+Dp
+SoundFX_FindFreeChannel_598A6	proc far		; CODE XREF: SoundFX_Play3D_59902+Dp
 
 arg_0		= word ptr  6
 
@@ -24,7 +26,7 @@ arg_0		= word ptr  6
 		jmp	short loc_598F6
 ; ���������������������������������������������������������������������������
 
-loc_598B2:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+53j
+loc_598B2:				; CODE XREF: SoundFX_FindFreeChannel_598A6+53j
 		mov	bx, di
 		imul	bx, 11h
 		cmp	word ptr [bx+si+92h], 0
@@ -44,17 +46,17 @@ loc_598B2:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+53j
 		jmp	short loc_598E7
 ; ���������������������������������������������������������������������������
 
-loc_598E5:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+38j
+loc_598E5:				; CODE XREF: SoundFX_FindFreeChannel_598A6+38j
 		xor	ax, ax
 
-loc_598E7:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+3Dj
+loc_598E7:				; CODE XREF: SoundFX_FindFreeChannel_598A6+3Dj
 		jmp	short loc_598EB
 ; ���������������������������������������������������������������������������
 
-loc_598E9:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+16j
+loc_598E9:				; CODE XREF: SoundFX_FindFreeChannel_598A6+16j
 		mov	al, 0
 
-loc_598EB:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6:loc_598E7j
+loc_598EB:				; CODE XREF: SoundFX_FindFreeChannel_598A6:loc_598E7j
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_598F5
@@ -62,20 +64,20 @@ loc_598EB:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6:loc_598E7j
 		jmp	short loc_598FE
 ; ���������������������������������������������������������������������������
 
-loc_598F5:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+49j
+loc_598F5:				; CODE XREF: SoundFX_FindFreeChannel_598A6+49j
 		inc	di
 
-loc_598F6:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+Aj
+loc_598F6:				; CODE XREF: SoundFX_FindFreeChannel_598A6+Aj
 		cmp	di, 5
 		jl	short loc_598B2
 		mov	ax, 0FFFFh
 
-loc_598FE:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+4Dj
+loc_598FE:				; CODE XREF: SoundFX_FindFreeChannel_598A6+4Dj
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Weapon_HUDBox_TimerCaseC_598A6	endp
+SoundFX_FindFreeChannel_598A6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -83,11 +85,13 @@ Weapon_HUDBox_TimerCaseC_598A6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 113 lignes, NON DÉTAILLÉE — combine Weapon_HUDBox_TimerCaseC_598A6 et les fonctions
-; du sous-système minuteur (59FF5/603F0/603CC). Référencée par sub_59B10 et sub_59CFA.
+; Ex-'Weapon_HUDBox_TimerCaseD_59902'. far. LUE 2026-10-06. (systeme, effet, distance,
+; emetteur) : volume = 100 - d/10 si d < 1000, 5 si d < 5000, sinon rien ; sur un canal libre
+; : Music_ChannelRegisterSequence_59FF5 (sequence de l'effet en systeme+6+effet x 10),
+; AIL_set_relative_volume_603F0, AIL_start_sequence_603CC ; memorise effet et emetteur.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseD_59902	proc far		; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+1CAp
-					; Weapon_HUDBox_MasterUpdate_59CFA+1AFp ...
+SoundFX_Play3D_59902	proc far		; CODE XREF: SoundFX_CheckFlyBy_59B10+1CAp
+					; SoundFX_Tick_59CFA+1AFp ...
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -105,7 +109,7 @@ arg_8		= word ptr  0Eh
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseC_598A6
+		call	near ptr SoundFX_FindFreeChannel_598A6
 		pop	cx
 		mov	dx, ax
 		cmp	dx, 0FFFFh
@@ -113,7 +117,7 @@ arg_8		= word ptr  0Eh
 		jmp	loc_599CF
 ; ���������������������������������������������������������������������������
 
-loc_5991D:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+16j
+loc_5991D:				; CODE XREF: SoundFX_Play3D_59902+16j
 		imul	ax, 11h
 		mov	dx, si
 		add	dx, ax
@@ -130,23 +134,23 @@ loc_5991D:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+16j
 		jmp	short loc_59958
 ; ���������������������������������������������������������������������������
 
-loc_5994B:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+31j
+loc_5994B:				; CODE XREF: SoundFX_Play3D_59902+31j
 		cmp	[bp+arg_4], 1388h
 		jge	short loc_59958
 		mov	di, 5
 
-loc_59958:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+47j
-					; Weapon_HUDBox_TimerCaseD_59902+51j
+loc_59958:				; CODE XREF: SoundFX_Play3D_59902+47j
+					; SoundFX_Play3D_59902+51j
 		or	di, di
 		jge	short loc_59960
 		xor	ax, ax
 		jmp	short loc_59962
 ; ���������������������������������������������������������������������������
 
-loc_59960:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+58j
+loc_59960:				; CODE XREF: SoundFX_Play3D_59902+58j
 		mov	ax, di
 
-loc_59962:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+5Cj
+loc_59962:				; CODE XREF: SoundFX_Play3D_59902+5Cj
 		mov	[bp+var_4], ax
 		cmp	[bp+var_4], 0
 		jz	short loc_599CF
@@ -175,7 +179,7 @@ loc_59962:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+5Cj
 		add	sp, 8
 		jmp	short $+2
 
-loc_599A9:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+90j
+loc_599A9:				; CODE XREF: SoundFX_Play3D_59902+90j
 		cmp	word ptr [di], 0
 		jz	short loc_599C0
 		push	word ptr [di+2]
@@ -185,20 +189,20 @@ loc_599A9:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+90j
 		add	sp, 4
 		jmp	short $+2
 
-loc_599C0:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+AAj
+loc_599C0:				; CODE XREF: SoundFX_Play3D_59902+AAj
 		mov	bx, [bp+var_2]
 		mov	al, [bp+arg_2]
 		mov	[bx+0Eh], al
 		mov	ax, [bp+arg_8]
 		mov	[bx+0Fh], ax
 
-loc_599CF:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+18j
-					; Weapon_HUDBox_TimerCaseD_59902+67j
+loc_599CF:				; CODE XREF: SoundFX_Play3D_59902+18j
+					; SoundFX_Play3D_59902+67j
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_TimerCaseD_59902	endp
+SoundFX_Play3D_59902	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -206,10 +210,12 @@ Weapon_HUDBox_TimerCaseD_59902	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 113 lignes, NON DÉTAILLÉE — utilise sub_603F0/sub_59F1D. Référencée par sub_59CFA.
+; Ex-'Weapon_HUDBox_TimerCaseE_599D3'. far. LUE 2026-10-06. Meme loi de volume que
+; SoundFX_Play3D_59902 pour l'effet (effet, emetteur) en cours ; volume nul ->
+; Music_ChannelStopSequence_59F1D et canal libere.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseE_599D3	proc far		; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+1A0p
-					; Weapon_HUDBox_TimerCaseI_5A906+4DP
+SoundFX_UpdateVolume3D_599D3	proc far		; CODE XREF: SoundFX_Tick_59CFA+1A0p
+					; SoundFX_PlayOrUpdate_5A906+4DP
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -229,7 +235,7 @@ arg_8		= word ptr  0Eh
 		jmp	loc_59A7D
 ; ���������������������������������������������������������������������������
 
-loc_599E6:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+B0j
+loc_599E6:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+B0j
 		mov	ax, [bp+var_2]
 		imul	ax, 11h
 		mov	di, si
@@ -257,7 +263,7 @@ loc_59A22:
 		jmp	short loc_59A36
 ; ���������������������������������������������������������������������������
 
-loc_59A27:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+39j
+loc_59A27:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+39j
 		cmp	[bp+arg_4], 1388h
 
 loc_59A2F:
@@ -266,18 +272,18 @@ loc_59A2F:
 loc_59A31:
 		mov	[bp+var_4], 5
 
-loc_59A36:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+52j
-					; Weapon_HUDBox_TimerCaseE_599D3:loc_59A2Fj
+loc_59A36:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+52j
+					; SoundFX_UpdateVolume3D_599D3:loc_59A2Fj
 		cmp	[bp+var_4], 0
 		jge	short loc_59A40
 		xor	ax, ax
 		jmp	short loc_59A43
 ; ���������������������������������������������������������������������������
 
-loc_59A40:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+67j
+loc_59A40:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+67j
 		mov	ax, [bp+var_4]
 
-loc_59A43:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+6Bj
+loc_59A43:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+6Bj
 		mov	dx, ax
 		or	dx, dx
 		jz	short loc_59A6A
@@ -294,33 +300,33 @@ loc_59A43:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+6Bj
 		jmp	short loc_59A7A
 ; ���������������������������������������������������������������������������
 
-loc_59A68:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+7Cj
+loc_59A68:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+7Cj
 		jmp	short loc_59A7A
 ; ���������������������������������������������������������������������������
 
-loc_59A6A:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+74j
+loc_59A6A:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+74j
 		push	di
 		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	byte ptr [di+0Eh], 0Fh
 		mov	word ptr [di+0Fh], 0
 
-loc_59A7A:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+27j
-					; Weapon_HUDBox_TimerCaseE_599D3+2Fj ...
+loc_59A7A:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+27j
+					; SoundFX_UpdateVolume3D_599D3+2Fj ...
 		inc	[bp+var_2]
 
-loc_59A7D:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+10j
+loc_59A7D:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+10j
 		cmp	[bp+var_2], 5
 		jge	short loc_59A86
 		jmp	loc_599E6
 ; ���������������������������������������������������������������������������
 
-loc_59A86:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+AEj
+loc_59A86:				; CODE XREF: SoundFX_UpdateVolume3D_599D3+AEj
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_TimerCaseE_599D3	endp
+SoundFX_UpdateVolume3D_599D3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -328,10 +334,11 @@ Weapon_HUDBox_TimerCaseE_599D3	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, utilise sub_59F1D. Référencée par sub_59CFA.
+; Ex-'Weapon_HUDBox_TimerCaseF_59A8A'. far. LUE 2026-10-06. Arrete l'effet (effet, emetteur)
+; et libere son canal.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseF_59A8A	proc far		; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA:loc_59F13p
-					; Weapon_HUDBox_TimerCaseJ_5A95E+1CP
+SoundFX_StopEffect_59A8A	proc far		; CODE XREF: SoundFX_Tick_59CFA:loc_59F13p
+					; SoundFX_Stop_5A95E+1CP
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -348,7 +355,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_59ACD
 ; ���������������������������������������������������������������������������
 
-loc_59A9C:				; CODE XREF: Weapon_HUDBox_TimerCaseF_59A8A+47j
+loc_59A9C:				; CODE XREF: SoundFX_StopEffect_59A8A+47j
 		mov	ax, [bp+var_2]
 		imul	ax, 11h
 		mov	di, si
@@ -366,18 +373,18 @@ loc_59A9C:				; CODE XREF: Weapon_HUDBox_TimerCaseF_59A8A+47j
 		mov	byte ptr [di+0Eh], 0Fh
 		mov	word ptr [di+0Fh], 0
 
-loc_59ACA:				; CODE XREF: Weapon_HUDBox_TimerCaseF_59A8A+26j
-					; Weapon_HUDBox_TimerCaseF_59A8A+2Ej
+loc_59ACA:				; CODE XREF: SoundFX_StopEffect_59A8A+26j
+					; SoundFX_StopEffect_59A8A+2Ej
 		inc	[bp+var_2]
 
-loc_59ACD:				; CODE XREF: Weapon_HUDBox_TimerCaseF_59A8A+10j
+loc_59ACD:				; CODE XREF: SoundFX_StopEffect_59A8A+10j
 		cmp	[bp+var_2], 5
 		jl	short loc_59A9C
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_TimerCaseF_59A8A	endp
+SoundFX_StopEffect_59A8A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -385,10 +392,11 @@ Weapon_HUDBox_TimerCaseF_59A8A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (calcul autonome). Référencée par sub_59B10 et sub_59CFA.
+; Ex-'Weapon_HUDBox_TimerCaseG_59AD7'. far. LUE 2026-10-06. Vrai si l'effet (effet, emetteur)
+; occupe un canal.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseG_59AD7	proc far		; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+1B4p
-					; Weapon_HUDBox_MasterUpdate_59CFA+18Cp ...
+SoundFX_IsPlaying_59AD7	proc far		; CODE XREF: SoundFX_CheckFlyBy_59B10+1B4p
+					; SoundFX_Tick_59CFA+18Cp ...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -403,7 +411,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_59B05
 ; ���������������������������������������������������������������������������
 
-loc_59AE3:				; CODE XREF: Weapon_HUDBox_TimerCaseG_59AD7+31j
+loc_59AE3:				; CODE XREF: SoundFX_IsPlaying_59AD7+31j
 		mov	ax, di
 		imul	ax, 11h
 		mov	si, cx
@@ -423,21 +431,21 @@ loc_59B02:
 		jmp	short loc_59B0C
 ; ���������������������������������������������������������������������������
 
-loc_59B04:				; CODE XREF: Weapon_HUDBox_TimerCaseG_59AD7+1Fj
-					; Weapon_HUDBox_TimerCaseG_59AD7+27j
+loc_59B04:				; CODE XREF: SoundFX_IsPlaying_59AD7+1Fj
+					; SoundFX_IsPlaying_59AD7+27j
 		inc	di
 
-loc_59B05:				; CODE XREF: Weapon_HUDBox_TimerCaseG_59AD7+Aj
+loc_59B05:				; CODE XREF: SoundFX_IsPlaying_59AD7+Aj
 		cmp	di, 5
 		jl	short loc_59AE3
 		mov	al, 0
 
-loc_59B0C:				; CODE XREF: Weapon_HUDBox_TimerCaseG_59AD7:loc_59B02j
+loc_59B0C:				; CODE XREF: SoundFX_IsPlaying_59AD7:loc_59B02j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Weapon_HUDBox_TimerCaseG_59AD7	endp
+SoundFX_IsPlaying_59AD7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -445,12 +453,12 @@ Weapon_HUDBox_TimerCaseG_59AD7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 239 lignes, NON DÉTAILLÉE — combine dispatch vtable,
-; Targeting_ComputeBearingElevation_55B1A (seg116), Weapon_HUDBox_TimerCaseG_59AD7 et
-; Weapon_HUDBox_TimerCaseD_59902. Référencée par sub_59CFA. Candidat pour session dédiée
-; (probable indicateur clignotant de contre-mesure/alerte sur le HUD).
+; Ex-'Weapon_HUDBox_UpdateGeometryAndTimer_59B10'. far. LUE 2026-10-06. Bruit de passage :
+; pour chaque avion (categorie 6) autre que l'objet vu (word_72A8F) a moins de 200 du point de
+; vue, si l'angle entre sa trajectoire et la ligne de vue depasse 30 deg et que l'effet 0x0B
+; ne joue pas : SoundFX_Play3D_59902(0x0B, distance). Ignore la frame ou l'objet vu change.
 ; ==============================================================================================
-Weapon_HUDBox_UpdateGeometryAndTimer_59B10	proc far		; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+7Ap
+SoundFX_CheckFlyBy_59B10	proc far		; CODE XREF: SoundFX_Tick_59CFA+7Ap
 
 var_62		= dword	ptr -62h
 var_5E		= dword	ptr -5Eh
@@ -496,18 +504,18 @@ loc_59B21:
 		jmp	loc_59CF6
 ; ���������������������������������������������������������������������������
 
-loc_59B2D:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+15j
+loc_59B2D:				; CODE XREF: SoundFX_CheckFlyBy_59B10+15j
 		cmp	[bp+var_2], 0
 		jnz	short loc_59B36
 		jmp	loc_59CF6
 ; ���������������������������������������������������������������������������
 
-loc_59B36:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+21j
+loc_59B36:				; CODE XREF: SoundFX_CheckFlyBy_59B10+21j
 		mov	[bp+var_4], 0
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59B3E:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+1E3j
+loc_59B3E:				; CODE XREF: SoundFX_CheckFlyBy_59B10+1E3j
 		mov	di, [bp+var_4]
 		push	di
 		mov	bx, [di]
@@ -520,7 +528,7 @@ loc_59B3E:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+1E3j
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59B57:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+42j
+loc_59B57:				; CODE XREF: SoundFX_CheckFlyBy_59B10+42j
 		push	dx
 		push	ax
 		les	bx, [bp+var_8]
@@ -532,7 +540,7 @@ loc_59B57:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+42j
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59B6C:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+57j
+loc_59B6C:				; CODE XREF: SoundFX_CheckFlyBy_59B10+57j
 		push	[bp+var_2]
 		mov	bx, [bp+var_2]
 		mov	bx, [bx+50h]
@@ -543,14 +551,14 @@ loc_59B6C:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+57j
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59B80:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+6Bj
+loc_59B80:				; CODE XREF: SoundFX_CheckFlyBy_59B10+6Bj
 		les	bx, [di+0Ah]
 		cmp	byte ptr es:[bx+8], 0
 		jnz	short loc_59B8D
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59B8D:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+78j
+loc_59B8D:				; CODE XREF: SoundFX_CheckFlyBy_59B10+78j
 		mov	dx, di
 		add	dx, 12h
 		mov	bx, dx
@@ -606,7 +614,7 @@ loc_59C1E:
 		jmp	loc_59CE0
 ; ���������������������������������������������������������������������������
 
-loc_59C2F:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+11Aj
+loc_59C2F:				; CODE XREF: SoundFX_CheckFlyBy_59B10+11Aj
 		mov	eax, [bp+var_26]
 
 loc_59C33:
@@ -657,7 +665,7 @@ loc_59C33:
 		push	0Bh
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseG_59AD7
+		call	near ptr SoundFX_IsPlaying_59AD7
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -667,11 +675,11 @@ loc_59C33:
 		push	0Bh
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseD_59902
+		call	near ptr SoundFX_Play3D_59902
 		add	sp, 0Ah
 
-loc_59CE0:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+2Bj
-					; Weapon_HUDBox_UpdateGeometryAndTimer_59B10+44j ...
+loc_59CE0:				; CODE XREF: SoundFX_CheckFlyBy_59B10+2Bj
+					; SoundFX_CheckFlyBy_59B10+44j ...
 		lea	ax, [bp+var_4]
 		push	ax
 		push	59C3h
@@ -682,13 +690,13 @@ loc_59CE0:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+2Bj
 		jmp	loc_59B3E
 ; ���������������������������������������������������������������������������
 
-loc_59CF6:				; CODE XREF: Weapon_HUDBox_UpdateGeometryAndTimer_59B10+1Aj
-					; Weapon_HUDBox_UpdateGeometryAndTimer_59B10+23j ...
+loc_59CF6:				; CODE XREF: SoundFX_CheckFlyBy_59B10+1Aj
+					; SoundFX_CheckFlyBy_59B10+23j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_UpdateGeometryAndTimer_59B10	endp
+SoundFX_CheckFlyBy_59B10	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -696,12 +704,13 @@ Weapon_HUDBox_UpdateGeometryAndTimer_59B10	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 311 lignes, NON DÉTAILLÉE — la plus grosse fonction du cluster
-; Weapon_HUDBox/minuteur : orchestre sub_59B10, sub_599D3, sub_59902, sub_59A8A, sub_59AD7.
-; Candidat prioritaire pour session dédiée (probable pilote principal de l'indicateur HUD à
-; clignotement synchronisé au minuteur matériel).
+; Ex-'Weapon_HUDBox_MasterUpdate_59CFA'. far. LUE 2026-10-06. Tick des effets : libere les
+; canaux termines (statut 2) ; SoundFX_CheckFlyBy_59B10 ; SON MOTEUR : si l'objet vu est un
+; avion dont le moteur ([+0x55]) a une manette +0x1E >= 1 : effet 0x0D joue ou mis a jour
+; selon la distance, et pitch-bend MIDI 0xE1 = 0x4000 + (cran - 5) x 0x600 envoye par
+; AIL_send_channel_voice_message_60420 quand il change ; sinon effet 0x0D arrete.
 ; ==============================================================================================
-Weapon_HUDBox_MasterUpdate_59CFA	proc far		; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+18P
+SoundFX_Tick_59CFA	proc far		; CODE XREF: Sound_FrameUpdate_5AB79+18P
 
 var_32		= dword	ptr -32h
 var_2E		= dword	ptr -2Eh
@@ -735,7 +744,7 @@ loc_59D05:
 		jmp	short loc_59D65
 ; ���������������������������������������������������������������������������
 
-loc_59D0C:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+6Fj
+loc_59D0C:				; CODE XREF: SoundFX_Tick_59CFA+6Fj
 		mov	ax, [bp+var_4]
 		imul	ax, 11h
 
@@ -769,17 +778,17 @@ loc_59D33:
 		jmp	short loc_59D4A
 ; ���������������������������������������������������������������������������
 
-loc_59D48:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+47j
+loc_59D48:				; CODE XREF: SoundFX_Tick_59CFA+47j
 		xor	ax, ax
 
-loc_59D4A:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+4Cj
+loc_59D4A:				; CODE XREF: SoundFX_Tick_59CFA+4Cj
 		jmp	short loc_59D4E
 ; ���������������������������������������������������������������������������
 
-loc_59D4C:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+32j
+loc_59D4C:				; CODE XREF: SoundFX_Tick_59CFA+32j
 		mov	al, 1
 
-loc_59D4E:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA:loc_59D4Aj
+loc_59D4E:				; CODE XREF: SoundFX_Tick_59CFA:loc_59D4Aj
 		or	al, al
 		jz	short loc_59D62
 		push	[bp+var_2]
@@ -788,21 +797,21 @@ loc_59D4E:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA:loc_59D4Aj
 		mov	bx, [bp+var_2]
 		mov	byte ptr [bx+0Eh], 0Fh
 
-loc_59D62:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA:loc_59D24j
-					; Weapon_HUDBox_MasterUpdate_59CFA+56j
+loc_59D62:				; CODE XREF: SoundFX_Tick_59CFA:loc_59D24j
+					; SoundFX_Tick_59CFA+56j
 		inc	[bp+var_4]
 
-loc_59D65:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+10j
+loc_59D65:				; CODE XREF: SoundFX_Tick_59CFA+10j
 		cmp	[bp+var_4], 5
 		jl	short loc_59D0C
 		cmp	byte_7236C, 0
 		jz	short loc_59D78
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_UpdateGeometryAndTimer_59B10
+		call	near ptr SoundFX_CheckFlyBy_59B10
 		pop	cx
 
-loc_59D78:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+76j
+loc_59D78:				; CODE XREF: SoundFX_Tick_59CFA+76j
 		mov	[bp+var_5], 0
 		mov	al, byte_7236B
 		mov	ah, 0
@@ -811,13 +820,13 @@ loc_59D78:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+76j
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59D88:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+89j
+loc_59D88:				; CODE XREF: SoundFX_Tick_59CFA+89j
 		cmp	byte_7236C, 0
 		jnz	short loc_59D92
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59D92:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+93j
+loc_59D92:				; CODE XREF: SoundFX_Tick_59CFA+93j
 		mov	ax, word_72A8F
 		mov	[bp+var_8], ax
 		cmp	[bp+var_8], 0
@@ -825,7 +834,7 @@ loc_59D92:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+93j
 		jmp	loc_59F07
 ; ���������������������������������������������������������������������������
 
-loc_59DA1:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+A2j
+loc_59DA1:				; CODE XREF: SoundFX_Tick_59CFA+A2j
 		push	ax
 		mov	bx, [bp+var_8]
 		mov	bx, [bx+50h]
@@ -837,7 +846,7 @@ loc_59DA1:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+A2j
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59DB5:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+B6j
+loc_59DB5:				; CODE XREF: SoundFX_Tick_59CFA+B6j
 		push	ax
 		mov	bx, [di]
 		call	dword ptr [bx]
@@ -847,7 +856,7 @@ loc_59DB5:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+B6j
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59DC2:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+C3j
+loc_59DC2:				; CODE XREF: SoundFX_Tick_59CFA+C3j
 		push	di
 		mov	bx, [di]
 		call	dword ptr [bx]
@@ -865,7 +874,7 @@ loc_59DC2:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+C3j
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59DE3:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+E4j
+loc_59DE3:				; CODE XREF: SoundFX_Tick_59CFA+E4j
 		mov	[bp+var_E], di
 		mov	bx, [bp+var_E]
 		cmp	dword ptr [bx+55h], 0
@@ -878,11 +887,11 @@ loc_59DE3:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+E4j
 		jmp	short loc_59E06
 ; ���������������������������������������������������������������������������
 
-loc_59E02:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+F4j
+loc_59E02:				; CODE XREF: SoundFX_Tick_59CFA+F4j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_59E06:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+106j
+loc_59E06:				; CODE XREF: SoundFX_Tick_59CFA+106j
 		mov	word ptr [bp+var_14+2],	dx
 		mov	word ptr [bp+var_14], ax
 
@@ -899,7 +908,7 @@ loc_59E13:
 		jmp	loc_59F03
 ; ���������������������������������������������������������������������������
 
-loc_59E1F:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+120j
+loc_59E1F:				; CODE XREF: SoundFX_Tick_59CFA+120j
 		mov	dx, [bp+var_8]
 		add	dx, 14h
 		mov	bx, dx
@@ -932,7 +941,7 @@ loc_59E1F:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+120j
 		push	0Dh
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseG_59AD7
+		call	near ptr SoundFX_IsPlaying_59AD7
 		add	sp, 6
 		or	al, al
 		jz	short loc_59E9F
@@ -941,19 +950,19 @@ loc_59E1F:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+120j
 		push	0Dh
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseE_599D3
+		call	near ptr SoundFX_UpdateVolume3D_599D3
 		jmp	short loc_59EAC
 ; ���������������������������������������������������������������������������
 
-loc_59E9F:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+194j
+loc_59E9F:				; CODE XREF: SoundFX_Tick_59CFA+194j
 		push	0
 		push	large [bp+var_18]
 		push	0Dh
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_TimerCaseD_59902
+		call	near ptr SoundFX_Play3D_59902
 
-loc_59EAC:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+1A3j
+loc_59EAC:				; CODE XREF: SoundFX_Tick_59CFA+1A3j
 		add	sp, 0Ah
 		mov	[bp+var_22], 4000h
 		mov	al, [bp+var_10]
@@ -987,12 +996,12 @@ loc_59EAC:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+1A3j
 ; ���������������������������������������������������������������������������
 		jmp	short $+2
 
-loc_59F03:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+8Bj
-					; Weapon_HUDBox_MasterUpdate_59CFA+95j ...
+loc_59F03:				; CODE XREF: SoundFX_Tick_59CFA+8Bj
+					; SoundFX_Tick_59CFA+95j ...
 		mov	[bp+var_5], 1
 
-loc_59F07:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+A4j
-					; Weapon_HUDBox_MasterUpdate_59CFA+1D2j ...
+loc_59F07:				; CODE XREF: SoundFX_Tick_59CFA+A4j
+					; SoundFX_Tick_59CFA+1D2j ...
 		cmp	[bp+var_5], 0
 		jz	short loc_59F19
 		push	0
@@ -1003,14 +1012,14 @@ loc_59F0F:
 		push	cs
 
 loc_59F13:
-		call	near ptr Weapon_HUDBox_TimerCaseF_59A8A
+		call	near ptr SoundFX_StopEffect_59A8A
 		add	sp, 6
 
-loc_59F19:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+211j
+loc_59F19:				; CODE XREF: SoundFX_Tick_59CFA+211j
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_MasterUpdate_59CFA	endp
+SoundFX_Tick_59CFA	endp
 
 seg122		ends

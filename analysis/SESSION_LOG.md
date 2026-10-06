@@ -872,10 +872,10 @@ typée (tag 5C44h) associées à la lecture de champs IFF.
 consomme le registre de modules à créneaux temporisés du seg161 en dehors
 du séquenceur de contre-mesures ? Réponse : `AudioQueue_RegisterTickModule_AA810`
 référence explicitement `Music_SequencerTickISR_5940B` (seg121) via le
-mécanisme Stopwatch (seg207). `AudioQueue_ActivateSlotOpcode_AB16F`/
+mécanisme Stopwatch (seg207). `Music_PauseChannels_AB16F`/
 `DeactivateSlotOpcode_AB1AF` appellent directement les thunks d'opcode du
 registre (`AIL_stop_sequence_603D2`/`_AD_603D8`, seg161).
-`AudioQueue_ProcessSequencerSlots_AB1EF` appelle
+`Music_StopWithFade_AB1EF` appelle
 `Music_ChannelStopSequence_59F1D` (seg123). Le cluster combine
 massivement `IndexedRecordReader` (seg196) et `StreamReader` (seg190),
 avec un signal (callback + constante mémoire 0xC0000 dans un appel à

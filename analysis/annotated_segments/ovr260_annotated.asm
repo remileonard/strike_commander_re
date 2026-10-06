@@ -203,7 +203,7 @@ loc_8E03A:				; CODE XREF: PilotProfile_LoadRADI_8DF49+44j
 		push	ax
 		lea	ax, [bp+var_7A]
 		push	ax
-		call	Widget_Helper_5AAB2
+		call	Speech_LoadBank_5AAB2
 
 loc_8E093:
 		add	sp, 4

@@ -1603,7 +1603,7 @@ AIL_start_digital_playback_60360	endp
 ; AIL_set_digital_playback_panpot (0x83), AIL_digital_playback_panpot (0x84).
 ; ==============================================================================================
 AIL_stop_digital_playback_60366	proc far		; CODE XREF: seg125:02EFP
-					; AudioQueue_OpcodeWrapper_AB883+13P ...
+					; Speech_StopPlayback_AB883+13P ...
 		mov	ax, 7Eh	; '~'
 		jmp	near ptr AIL_call_driver_5FBA6
 AIL_stop_digital_playback_60366	endp
@@ -1800,7 +1800,7 @@ AIL_start_sequence_603CC	endp
 ; de ce numero (171 = AIL_STOP_SEQ dans AIL.INC) et y saute.
 ; ==============================================================================================
 AIL_stop_sequence_603D2	proc far		; CODE XREF: Music_ChannelStopSequence_59F1D+42P
-					; AudioQueue_ActivateSlotOpcode_AB16F+18P ...
+					; Music_PauseChannels_AB16F+18P ...
 		mov	ax, 0ABh ; '�'
 		jmp	near ptr AIL_call_driver_5FBA6
 AIL_stop_sequence_603D2	endp
@@ -1816,8 +1816,8 @@ AIL_stop_sequence_603D2	endp
 ; call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction
 ; de ce numero (173 = AIL_RESUME_SEQ dans AIL.INC) et y saute.
 ; ==============================================================================================
-AIL_resume_sequence_603D8	proc far		; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+18P
-					; AudioQueue_DeactivateSlotOpcode_AB1AF:loc_AB1E3P
+AIL_resume_sequence_603D8	proc far		; CODE XREF: Music_ResumeChannels_AB1AF+18P
+					; Music_ResumeChannels_AB1AF:loc_AB1E3P
 		mov	ax, 0ADh ; '�'
 		jmp	near ptr AIL_call_driver_5FBA6
 AIL_resume_sequence_603D8	endp
@@ -1850,7 +1850,7 @@ AIL_sequence_status_603DE	endp
 ; call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction
 ; de ce numero (175 = AIL_REL_VOL dans AIL.INC) et y saute.
 ; ==============================================================================================
-AIL_relative_volume_603E4	proc far		; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+B3P
+AIL_relative_volume_603E4	proc far		; CODE XREF: Music_StopWithFade_AB1EF+B3P
 		mov	ax, 0AFh ; '�'
 		jmp	near ptr AIL_call_driver_5FBA6
 AIL_relative_volume_603E4	endp
@@ -1871,8 +1871,8 @@ AIL_relative_volume_603E4	endp
 ; (0-100 %) avec duree de rampe en ms : c'est le FONDU. Suivent sans entree propre :
 ; AIL_set_relative_tempo (0xB2, loc_603F6), AIL_beat_count (0xB3, loc_603FC).
 ; ==============================================================================================
-AIL_set_relative_volume_603F0	proc far		; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+9DP
-					; Weapon_HUDBox_TimerCaseE_599D3+8BP ...
+AIL_set_relative_volume_603F0	proc far		; CODE XREF: SoundFX_Play3D_59902+9DP
+					; SoundFX_UpdateVolume3D_599D3+8BP ...
 		mov	ax, 0B1h ; '�'
 
 loc_603F3:
@@ -1936,7 +1936,7 @@ AIL_measure_count_60402	endp
 ; fonction de ce numero (186 = AIL_SEND_CV_MSG dans AIL.INC) et y saute. Envoie un message
 ; MIDI de canal directement au pilote.
 ; ==============================================================================================
-AIL_send_channel_voice_message_60420	proc far		; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+1F7P
+AIL_send_channel_voice_message_60420	proc far		; CODE XREF: SoundFX_Tick_59CFA+1F7P
 		mov	ax, 0BAh ; '�'
 		jmp	near ptr AIL_call_driver_5FBA6
 AIL_send_channel_voice_message_60420	endp

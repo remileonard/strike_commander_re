@@ -6742,7 +6742,7 @@ loc_53A7E:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+1D5j
 		call	VROOMM_StubThunk_6CE5B
 		pop	cx
 		push	1
-		call	Widget_Helper_5A9E6
+		call	Music_Stop_5A9E6
 		pop	cx
 		mov	al, byte_706AF
 		pop	di
@@ -7072,7 +7072,7 @@ loc_53C7F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1E6j
 		cmp	[bp+var_6], 0FFh
 		jnz	short loc_53CC9
 		push	si
-		call	Weapon_HUDBox_UpdateAndRenderVariant_5AA49
+		call	Music_OnObjectDestroyed_5AA49
 		pop	cx
 		mov	ah, 0
 		or	ax, ax

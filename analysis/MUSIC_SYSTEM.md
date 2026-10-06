@@ -50,14 +50,13 @@ Ce document vient d'une session menée sur une copie plus ancienne du dépôt ; 
    quand **le joueur** a détruit l'objet (`cmp di, word_722E6`), selon la **catégorie** de l'objet
    détruit (`6` = avion → `0x10` ; `0x13`/`0x14` → `0x11` ; autre → `0x12`), pas l'« ID d'un
    widget ». Cohérent avec §8.4 : ces trois pistes sont temporaires, la piste précédente reprend.
-7. **§8.1, ratio d'intensité** : `word_722E6` est **le joueur** ; `SommeB × 100 / SommeA` sur son
-   `+0x5E` est la même formule que le pourcentage de dégâts d'`AI_EjectDecision_50FF`. L'intensité
-   de la musique de combat (seuils 35 % et 75 %) suit donc **probablement les dégâts du joueur** —
-   à confirmer en relisant `Music_CombatIntensitySelector_59302` avec les noms actuels.
-8. Les fonctions `Weapon_HUDBox_*` du seg121-122 portent probablement de faux noms : au moins
-   `Weapon_HUDBox_TimerCaseD_59902` règle le volume musical (`AIL_set_relative_volume_603F0`) et
-   `Weapon_HUDBox_MasterUpdate_59CFA` envoie des messages MIDI (`AIL_send_channel_voice_message_60420`).
-   Renommage à faire après lecture.
+7. **§8.1 relu le 2026-10-06** : l'intensité de la musique de combat dépend bien des **dégâts du
+   joueur** (7 au-delà de 75 %, 6 au-delà de 35 %), mais seulement après deux priorités : missile
+   qui vise le joueur ou avion qui l'attaque (9), ennemi dans ses six heures (5). Voir §8.1.
+8. **Les `Weapon_HUDBox_*` n'avaient rien à voir avec le HUD** : ce sont les tests de combat de la
+   musique (seg121), le **système d'effets sonores 3D joués en XMIDI** (seg122 : passage d'avion,
+   son moteur avec pitch-bend selon la manette) et les façades musique / effets / voix (seg125).
+   Tous renommés ; voir §8.1 et §10.
 
 ---
 
@@ -219,9 +218,9 @@ partie significative de seg121 l'est désormais, avec des preuves solides
 `Sound_LoadDriverAndTimbreCache_5A0F3` appelle en interne les fonctions du
 cluster `Sequencer_*` (seg123, `Music_ChannelInit_59F87`/
 `Music_ChannelRegisterSequence_59FF5`/`Music_ChannelStopSequence_59F1D`) — ce
-triptyque reste nommé génériquement car `Weapon_HUDBox_TimerCaseF_59A8A` (« TimerCaseF », seg122),
-par exemple, est appelée à la fois par le lecteur son (`Weapon_HUDBox_TimerCaseJ_5A95E`) et par
-`Weapon_HUDBox_MasterUpdate_59CFA` — la même table à 5 emplacements (stride
+triptyque reste nommé génériquement car `SoundFX_StopEffect_59A8A` (« TimerCaseF », seg122),
+par exemple, est appelée à la fois par le lecteur son (`SoundFX_Stop_5A95E`) et par
+`SoundFX_Tick_59CFA` — la même table à 5 emplacements (stride
 `0x11` octets, base `+0x92` de l'objet) est réutilisée par au moins deux
 consommateurs distincts (audio + boîte HUD armement). **`Sequencer_*` reste
 donc nommé comme infrastructure générique**, ce serait une sur-affirmation
@@ -237,7 +236,7 @@ après lecture ligne à ligne intégrale (§8) : ces fonctions manipulent
 `word_70859`/`byte_72C90`/les canaux fixes `5BE3h`/`5BF5h` de façon
 exclusivement musicale, sans aucun appel ou usage partagé avec le rendu HUD
 armement identifié ailleurs dans le même segment (`Weapon_HUDBox_DrawElementA/
-B/C_58ED5/59061/590E0`, `Weapon_HUDBox_ComputeGeometry_58F42`, qui elles
+B/C_58ED5/59061/590E0`, `Music_IsEnemyOnPlayerSix_58F42`, qui elles
 restent des fonctions de rendu HUD — simplement *consommées* comme signaux
 d'entrée booléens par le sélecteur de musique de combat, §8.1).
 
@@ -564,6 +563,35 @@ secondaire, qu'avec un saut interne au flux cible.
 
 ### 8.1 Sélection — `Music_CombatIntensitySelector_59302`
 
+> **Relu intégralement le 2026-10-06 — cette version remplace le texte d'origine qui suit.**
+>
+> Appelé une frame sur 16 par `Sound_FrameUpdate_5AB79` (`test word_70466, 0Fh`). Ne change rien
+> si le joueur est mort ou éjecté (`byte_6E4B8`, `byte_6E4B4`), si `byte_72A8E == 0x0B`, si la piste
+> courante est `0x14`, ou si un changement de piste est déjà en attente.
+>
+> 1. `Music_ScanNearbyEnemies_590E0` : objets du **camp adverse** (`+0x50 == 0xFF`) à moins de
+>    **18 520** du joueur — bit 0 = avion (catégorie 6, pilote non éjecté), bit 1 = défense fixe,
+>    objet au sol ou `XMIT` (catégories 0x13, 0x14, 0x15). Aucun → repli (ci-dessous).
+> 2. Sinon (« un combat a eu lieu », `byte_70869 = 1`), première règle vraie :
+>
+> | Piste | Condition |
+> |---|---|
+> | **9** | un missile vise le joueur (`Music_IsMissileTargetingPlayer_58ED5`), ou un avion IA l'attaque de près (`word_722EE`, posé par `AI_SelectWeaponMask_9665`, même signal que la réplique 0x10 « You've got one on your tail ») |
+> | **5** | un avion ennemi est dans ses six heures : à moins de 3 500 (× `dword_7044C`), son nez à moins de 45° du joueur, et derrière lui (`Music_AnyEnemyOnPlayerSix_59061`) |
+> | **7** | dégâts du joueur ≥ 75 % (`SommeB × 100 / SommeA` sur `word_722E6+0x5E`, même formule que `AI_EjectDecision_50FF`) |
+> | **6** | dégâts du joueur ≥ 35 % |
+> | **4** | un avion ennemi est proche |
+> | **0x13** | seulement des défenses fixes / objets au sol ennemis proches |
+>
+> **Repli** (`Music_SelectTuneCandidate_5923A`) : condition de mission (`[word_706A0+0xA1]`, motif
+> `+0x68`) → **0x0C** ; sinon, si un combat a eu lieu → **0x0D**, une seule fois. À la destruction
+> d'un objet (`Music_OnObjectDestroyed_5AA49`), le même repli est rejoué sans l'objet détruit : s'il
+> n'y a plus d'avion ennemi proche alors qu'il y en avait → **0x13**. Au démarrage, la piste vient
+> de `Music_SelectStartTune_5AA02` (combat en cours → 4 ou 0x13, sinon la piste `TUNE` de la mission).
+>
+> *Texte d'origine (session musique), conservé pour mémoire :*
+
+
 Point d'entrée périodique (probable appel par tick). Plusieurs verrous de
 sortie précoce désactivent toute l'évaluation dans certains contextes
 (`byte_6E4B8`, `byte_6E4B4`, états `byte_72A8E==0x0B`/`byte_72C90==0x14`)
@@ -601,8 +629,8 @@ lui-même reste à déterminer.
 
 Choisit une piste parmi `{4, 5, 6, 7, 9, 0x13}` selon des seuils
 (`≥0x4B`=75%, `≥0x23`=35%) et des booléens intermédiaires renvoyés par
-des fonctions de rendu HUD armement (`Weapon_HUDBox_DrawElementA_58ED5`,
-`Weapon_HUDBox_DrawElementB_59061` — ces deux-là restent des fonctions
+des fonctions de rendu HUD armement (`Music_IsMissileTargetingPlayer_58ED5`,
+`Music_AnyEnemyOnPlayerSix_59061` — ces deux-là restent des fonctions
 HUD, simplement consommées ici comme signaux). Si aucune branche ne
 matche, délègue à `Music_SelectTuneCandidate_5923A` (cascade de repli :
 combat 0x13, objectif de mission `[+0xA1]` → 0x0C, ou flag `byte_70869`
@@ -626,10 +654,10 @@ paire suivante.
 les appelants de `Music_SelectTuneCandidate_5923A` dans toute la base :
 seulement deux existent — `Music_CombatIntensitySelector_59302` (§8.1,
 `arg_2=0`, ne déclenche jamais cette branche) et
-`Weapon_HUDBox_UpdateAndRenderVariant_5AA49` (`arg_2=1`, littéral,
+`Music_OnObjectDestroyed_5AA49` (`arg_2=1`, littéral,
 systématique — déclenche donc `0x13` à chaque appel réussi).
 
-`Weapon_HUDBox_UpdateAndRenderVariant_5AA49` n'a qu'un seul appelant :
+`Music_OnObjectDestroyed_5AA49` n'a qu'un seul appelant :
 `Combat_TeamOpposedCheckAndDispatch_53A94`, elle-même appelée par
 **`AI_EjectDecision_50FF`** (déjà nommée ainsi dans une session
 antérieure, confirmée pertinente après lecture complète des 169 lignes) :
@@ -858,3 +886,40 @@ sauvegarde/reprise pour les interruptions transitoires (menus).
   `combat.adl` de ce document, et le format de courbe d'enveloppe du
   pilote (`ADLIB_DRIVER.md`) reste à établir. Voir README.md pour le
   détail complet de cette découverte.
+
+---
+
+## 10. Effets sonores et voix (lu le 2026-10-06)
+
+Les anciennes `Weapon_HUDBox_*` du seg122 sont un **système d'effets sonores joués comme des
+séquences XMIDI** par le même pilote que la musique (objet `word_7099B`, actif si `byte_7236C`).
+
+- **5 canaux** à `+0x92` (pas `0x11`) : struct de canal musical + numéro d'effet (`+0xE`, `0x0F` =
+  libre) + émetteur (`+0xF`). `SoundFX_FindFreeChannel_598A6`, `SoundFX_IsPlaying_59AD7`,
+  `SoundFX_StopEffect_59A8A`.
+- **Volume selon la distance** (`SoundFX_Play3D_59902`, `SoundFX_UpdateVolume3D_599D3`) :
+  `100 − d/10` sous 1 000, `5` entre 1 000 et 5 000, rien au-delà (`AIL_set_relative_volume_603F0`).
+- **Passage d'avion** (`SoundFX_CheckFlyBy_59B10`) : effet **0x0B** quand un avion passe à moins de
+  200 du point de vue avec un angle de croisement supérieur à 30°.
+- **Son moteur** (`SoundFX_Tick_59CFA`) : effet **0x0D** pour l'avion vu, volume selon la distance et
+  **pitch-bend MIDI** (`0xE1`, canal 2) `0x4000 + (cran de manette − 5) × 0x600`, envoyé à chaque
+  changement par `AIL_send_channel_voice_message_60420`.
+- Façades publiques : `SoundFX_Play_5A8DC`, `SoundFX_PlayOrUpdate_5A906`, `SoundFX_Stop_5A95E`,
+  `SoundFX_StopAll_5AA95`, `SoundFX_Disable_5AA73`.
+
+**Voix** (objet `word_7099F`, actif si `byte_7236D`, sons VOC) : `Speech_LoadBank_5AAB2` (appelée au
+chargement du `RADI` du profil), `Speech_PlayClip_5AAD7`, `Speech_QueryStatus_5AB2C` (file radio),
+`Speech_StopPlayback_AB883`.
+
+**Ensemble** : `Sound_FrameUpdate_5AB79` (chaque frame : effets, voix, musique une frame sur 16),
+`Sound_StopAll_5A88F` ; musique : `Music_Pause_5A9BA`, `Music_Resume_5A9D0`, `Music_Stop_5A9E6`
+(fondu de 1 s par `Music_StopWithFade_AB1EF`).
+
+### Pour le portage
+
+- Musique : lecteur XMIDI + OPL2 ; changer de piste via la matrice de transitions de `combat.dat`
+  (§8.2) ; règle de choix du §8.1 évaluée toutes les 16 frames.
+- Effets moteur et passage : séquences XMIDI à part, volume `100 − d/10` (5 entre 1 000 et 5 000),
+  pitch-bend moteur : l'original envoie l'octet bas puis l'octet haut de `0x4000 + (cran − 5) × 0x600`,
+  soit en MIDI standard **MSB = 0x40 + 6 × (cran − 5)**, LSB = 0, c'est-à-dire une valeur 14 bits
+  `0x2000 + (cran − 5) × 0x300` (centre au cran 5).

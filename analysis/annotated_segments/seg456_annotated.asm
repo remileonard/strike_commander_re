@@ -299,10 +299,9 @@ MissionScenario_ConstructFieldChain_A8124	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124,
-; Widget_ApplyLayoutHelper_5A88F (seg125), MissionScenario_LoadFromIFF_A8C44,
-; PagedResourceB_Helper_5D859 (seg138) — construction et liaison à l'interface d'un scénario
-; de mission chargé.
+; far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124, Sound_StopAll_5A88F
+; (seg125), MissionScenario_LoadFromIFF_A8C44, PagedResourceB_Helper_5D859 (seg138) —
+; construction et liaison à l'interface d'un scénario de mission chargé.
 ; ==============================================================================================
 MissionScenario_ConstructAndBindUI_A81E0	proc far		; CODE XREF: VROOMM_StubThunk_6CE3DJ
 
@@ -317,7 +316,7 @@ arg_0		= word ptr  6
 		push	cs
 		call	near ptr MissionScenario_ConstructFieldChain_A8124
 		pop	cx
-		call	Widget_ApplyLayoutHelper_5A88F
+		call	Sound_StopAll_5A88F
 		cmp	byte_7070E, 0
 		jz	short loc_A8207
 		push	si

@@ -8,10 +8,11 @@ seg121		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, dispatch vtable (2 appels), référencée par sub_59302 — élément de dessin pour un
-; réticule/boîte de ciblage HUD.
+; Ex-'Weapon_HUDBox_DrawElementA_58ED5'. far. LUE 2026-10-06. Parcourt les objets du monde
+; (World_IterateObjects) : vrai si un objet de categorie 8 (missile, vtable+8) a pour cible
+; [obj+0x55] le joueur (word_722E6).
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementA_58ED5	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+68p
+Music_IsMissileTargetingPlayer_58ED5	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+68p
 
 var_C		= word ptr -0Ch
 var_A		= dword	ptr -0Ah
@@ -34,7 +35,7 @@ loc_58EDC:				; DATA XREF: seg216:off_6A26Eo
 		jmp	short loc_58F29
 ; ���������������������������������������������������������������������������
 
-loc_58EF0:				; CODE XREF: Weapon_HUDBox_DrawElementA_58ED5+65j
+loc_58EF0:				; CODE XREF: Music_IsMissileTargetingPlayer_58ED5+65j
 		mov	si, [bp+var_6]
 		push	si
 		mov	bx, [si]
@@ -62,8 +63,8 @@ loc_58F21:
 		jmp	short loc_58F3C
 ; ���������������������������������������������������������������������������
 
-loc_58F29:				; CODE XREF: Weapon_HUDBox_DrawElementA_58ED5+19j
-					; Weapon_HUDBox_DrawElementA_58ED5+2Fj ...
+loc_58F29:				; CODE XREF: Music_IsMissileTargetingPlayer_58ED5+19j
+					; Music_IsMissileTargetingPlayer_58ED5+2Fj ...
 		lea	ax, [bp+var_6]
 		push	ax
 		push	59C3h
@@ -72,12 +73,12 @@ loc_58F29:				; CODE XREF: Weapon_HUDBox_DrawElementA_58ED5+19j
 		or	ax, ax
 		jnz	short loc_58EF0
 
-loc_58F3C:				; CODE XREF: Weapon_HUDBox_DrawElementA_58ED5+52j
+loc_58F3C:				; CODE XREF: Music_IsMissileTargetingPlayer_58ED5+52j
 		mov	al, [bp+var_1]
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_DrawElementA_58ED5	endp
+Music_IsMissileTargetingPlayer_58ED5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -85,12 +86,13 @@ Weapon_HUDBox_DrawElementA_58ED5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 143 lignes, NON DÉTAILLÉE — combine Vector_PrescaleBelow256_55B04,
-; Targeting_ComputeBearingElevation_55B1A (seg116), dispatch vtable et
-; Matrix_WorldToLocal_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage HUD.
-; Référencée par sub_59061.
+; Ex-'Weapon_HUDBox_ComputeGeometry_58F42'. far. LUE 2026-10-06. (ctx, joueur, ennemi) : d =
+; ennemi - joueur ; vrai si |d| x dword_7044C <= 3500 ('cmp eax, 0DACh'), si le joueur est a
+; moins de 45 deg de l'axe de vitesse de l'ennemi (Targeting_ComputeBearingElevation_55B1A,
+; 'cmp ..., 2Dh') et si l'ennemi est derriere le joueur (composante nez < 0 apres
+; Matrix_WorldToLocal_58768).
 ; ==============================================================================================
-Weapon_HUDBox_ComputeGeometry_58F42	proc far		; CODE XREF: Weapon_HUDBox_DrawElementB_59061+55p
+Music_IsEnemyOnPlayerSix_58F42	proc far		; CODE XREF: Music_AnyEnemyOnPlayerSix_59061+55p
 
 var_3A		= dword	ptr -3Ah
 var_36		= dword	ptr -36h
@@ -217,22 +219,22 @@ loc_59033:
 		jmp	short loc_59052
 ; ���������������������������������������������������������������������������
 
-loc_59050:				; CODE XREF: Weapon_HUDBox_ComputeGeometry_58F42+107j
+loc_59050:				; CODE XREF: Music_IsEnemyOnPlayerSix_58F42+107j
 		xor	ax, ax
 
-loc_59052:				; CODE XREF: Weapon_HUDBox_ComputeGeometry_58F42+10Cj
+loc_59052:				; CODE XREF: Music_IsEnemyOnPlayerSix_58F42+10Cj
 		or	al, al
 		jz	short loc_5905A
 		mov	[bp+var_1], 1
 
-loc_5905A:				; CODE XREF: Weapon_HUDBox_ComputeGeometry_58F42+9Aj
-					; Weapon_HUDBox_ComputeGeometry_58F42+E7j ...
+loc_5905A:				; CODE XREF: Music_IsEnemyOnPlayerSix_58F42+9Aj
+					; Music_IsEnemyOnPlayerSix_58F42+E7j ...
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_ComputeGeometry_58F42	endp
+Music_IsEnemyOnPlayerSix_58F42	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -240,10 +242,11 @@ Weapon_HUDBox_ComputeGeometry_58F42	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, dispatch vtable + appel à Weapon_HUDBox_ComputeGeometry_58F42. Référencée par
-; sub_59302.
+; Ex-'Weapon_HUDBox_DrawElementB_59061'. far. LUE 2026-10-06. Vrai si un avion (categorie 6)
+; du camp adverse ([obj+0x50] == 0xFF), autre que le joueur, verifie
+; Music_IsEnemyOnPlayerSix_58F42.
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementB_59061	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+89p
+Music_AnyEnemyOnPlayerSix_59061	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+89p
 
 var_A		= dword	ptr -0Ah
 var_6		= word ptr -6
@@ -264,7 +267,7 @@ arg_0		= word ptr  6
 		jmp	short loc_590C6
 ; ���������������������������������������������������������������������������
 
-loc_5907D:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+76j
+loc_5907D:				; CODE XREF: Music_AnyEnemyOnPlayerSix_59061+76j
 		mov	di, [bp+var_6]
 		push	di
 		mov	bx, [di]
@@ -290,7 +293,7 @@ loc_5907D:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+76j
 		push	[bp+var_4]
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_ComputeGeometry_58F42
+		call	near ptr Music_IsEnemyOnPlayerSix_58F42
 		add	sp, 6
 		or	al, al
 		jz	short loc_590C6
@@ -298,8 +301,8 @@ loc_5907D:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+76j
 		jmp	short loc_590D9
 ; ���������������������������������������������������������������������������
 
-loc_590C6:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+1Aj
-					; Weapon_HUDBox_DrawElementB_59061+30j ...
+loc_590C6:				; CODE XREF: Music_AnyEnemyOnPlayerSix_59061+1Aj
+					; Music_AnyEnemyOnPlayerSix_59061+30j ...
 		lea	ax, [bp+var_6]
 		push	ax
 		push	59C3h
@@ -308,13 +311,13 @@ loc_590C6:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+1Aj
 		or	ax, ax
 		jnz	short loc_5907D
 
-loc_590D9:				; CODE XREF: Weapon_HUDBox_DrawElementB_59061+63j
+loc_590D9:				; CODE XREF: Music_AnyEnemyOnPlayerSix_59061+63j
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_DrawElementB_59061	endp
+Music_AnyEnemyOnPlayerSix_59061	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -322,10 +325,14 @@ Weapon_HUDBox_DrawElementB_59061	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 190 lignes, NON DÉTAILLÉE — dispatch vtable multiple, longueur vectorielle
-; (sub_5828E). Référencée par sub_5923A.
+; Ex-'Weapon_HUDBox_DrawElementC_590E0'. far. LUE 2026-10-06. (ctx, objet a ignorer) :
+; parcourt les objets du monde, categories 6 (avion), 0x13 (defense fixe), 0x14 (objet au
+; sol), 0x15 (XMIT) via vtable+0x34 ; ignore un avion dont le pilote s'est ejecte (bit 5 de
+; flags_75) ; pour un objet du camp adverse ([+0x50] == 0xFF) a moins de 18 520 du joueur
+; ('cmp ..., 4858h') : bit 0 = avion, bit 1 = autre. Renvoie ces bits (s'arrete quand les deux
+; sont poses).
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementC_590E0	proc far		; CODE XREF: Music_SelectTuneCandidate_5923A+21p
+Music_ScanNearbyEnemies_590E0	proc far		; CODE XREF: Music_SelectTuneCandidate_5923A+21p
 					; Music_CombatIntensitySelector_59302+4Ep ...
 
 var_24		= dword	ptr -24h
@@ -355,14 +362,14 @@ arg_2		= word ptr  8
 		jmp	loc_59204
 ; ���������������������������������������������������������������������������
 
-loc_590FB:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+140j
+loc_590FB:				; CODE XREF: Music_ScanNearbyEnemies_590E0+140j
 		mov	si, [bp+var_4]
 		cmp	si, [bp+arg_2]
 		jnz	short loc_59106
 		jmp	loc_59204
 ; ���������������������������������������������������������������������������
 
-loc_59106:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+21j
+loc_59106:				; CODE XREF: Music_ScanNearbyEnemies_590E0+21j
 		push	si
 
 loc_59107:
@@ -378,7 +385,7 @@ loc_5910F:
 		jmp	loc_591FB	; default
 ; ���������������������������������������������������������������������������
 
-loc_5911C:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+37j
+loc_5911C:				; CODE XREF: Music_ScanNearbyEnemies_590E0+37j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx]
@@ -398,17 +405,17 @@ loc_5912D:
 		jmp	short loc_59131
 ; ���������������������������������������������������������������������������
 
-loc_5912F:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+44j
+loc_5912F:				; CODE XREF: Music_ScanNearbyEnemies_590E0+44j
 		mov	al, 17h
 
-loc_59131:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0:loc_5912Dj
+loc_59131:				; CODE XREF: Music_ScanNearbyEnemies_590E0:loc_5912Dj
 		mov	[bp+var_C], al
 		mov	ah, 0
 		mov	[bp+var_6], ax
 		mov	cx, 4		; switch 4 cases
 		mov	bx, offset word_5922A
 
-loc_5913F:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+6Aj
+loc_5913F:				; CODE XREF: Music_ScanNearbyEnemies_590E0+6Aj
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_6]
 		jz	short loc_5914F
@@ -417,7 +424,7 @@ loc_5913F:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+6Aj
 		jmp	loc_591FB	; default
 ; ���������������������������������������������������������������������������
 
-loc_5914F:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+65j
+loc_5914F:				; CODE XREF: Music_ScanNearbyEnemies_590E0+65j
 		jmp	word ptr cs:[bx+8] ; switch jump
 
 loc_59153:				; DATA XREF: seg121:0362o
@@ -437,8 +444,8 @@ loc_59153:				; DATA XREF: seg121:0362o
 		jmp	loc_591FB	; default
 ; ���������������������������������������������������������������������������
 
-loc_59177:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+77j
-					; Weapon_HUDBox_DrawElementC_590E0+92j
+loc_59177:				; CODE XREF: Music_ScanNearbyEnemies_590E0+77j
+					; Music_ScanNearbyEnemies_590E0+92j
 		mov	di, si
 		cmp	byte ptr [di+50h], 0FFh
 		jnz	short loc_591FB	; default
@@ -478,19 +485,19 @@ loc_59177:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+77j
 		jmp	short loc_591FB	; default
 ; ���������������������������������������������������������������������������
 
-loc_591F7:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+10Fj
+loc_591F7:				; CODE XREF: Music_ScanNearbyEnemies_590E0+10Fj
 		or	[bp+var_1], 2
 
-loc_591FB:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+39j
-					; Weapon_HUDBox_DrawElementC_590E0+6Cj ...
+loc_591FB:				; CODE XREF: Music_ScanNearbyEnemies_590E0+39j
+					; Music_ScanNearbyEnemies_590E0+6Cj ...
 		cmp	[bp+var_1], 3	; default
 		jnz	short loc_59204
 
 loc_59201:
 		inc	[bp+var_2]
 
-loc_59204:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+18j
-					; Weapon_HUDBox_DrawElementC_590E0+23j ...
+loc_59204:				; CODE XREF: Music_ScanNearbyEnemies_590E0+18j
+					; Music_ScanNearbyEnemies_590E0+23j ...
 		lea	ax, [bp+var_4]
 		push	ax
 		push	59C3h
@@ -507,17 +514,17 @@ loc_5920B:
 		jmp	loc_590FB
 ; ���������������������������������������������������������������������������
 
-loc_59223:				; CODE XREF: Weapon_HUDBox_DrawElementC_590E0+135j
-					; Weapon_HUDBox_DrawElementC_590E0+13Ej
+loc_59223:				; CODE XREF: Music_ScanNearbyEnemies_590E0+135j
+					; Music_ScanNearbyEnemies_590E0+13Ej
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_DrawElementC_590E0	endp
+Music_ScanNearbyEnemies_590E0	endp
 
 ; ���������������������������������������������������������������������������
-word_5922A	dw	6,   13h,   14h,   15h ; DATA XREF: Weapon_HUDBox_DrawElementC_590E0+5Co
+word_5922A	dw	6,   13h,   14h,   15h ; DATA XREF: Music_ScanNearbyEnemies_590E0+5Co
 					; value	table for switch statement
 		dw offset loc_59153	; jump table for switch	statement
 		dw offset loc_59153
@@ -533,16 +540,23 @@ word_5922A	dw	6,   13h,   14h,   15h ; DATA XREF: Weapon_HUDBox_DrawElementC_590
 ; musique (archive handoff 2026-10-06). ★ far — DÉCISION DE PISTE (cascade de priorité), lue
 ; ligne à ligne intégralement. Anciennement Music_SelectTuneCandidate_5923A. Calcule un
 ; candidat di=0xFFFF par défaut, puis l'affine selon une cascade : (1) si arg_2!=0, appelle
-; Weapon_HUDBox_DrawElementC_590E0 et compare des bits de byte_7086A/résultat → di=0x13
-; (combat) ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET
+; Music_ScanNearbyEnemies_590E0 et compare des bits de byte_7086A/résultat → di=0x13 (combat)
+; ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET
 ; Parser_LookaheadPattern_1CB83([+0x68]) renvoie vrai → di=0x0C ; (3) sinon, si byte_70869 est
 ; positionné → di=0x0D (et le flag est consommé). Si un candidat a été choisi (di!=0xFFFF) :
 ; ÉCRASE IMMÉDIATEMENT word_70859. Retourne un booléen 'changement effectué'. Appelée par
 ; Music_CombatIntensitySelector_59302 (en dernier recours) et par sub_5AA49 (seg125, non
-; détaillée).
+; détaillée). RELUE 2026-10-06 : (musique, mode, objet detruit). Mode 1
+; (Music_OnObjectDestroyed_5AA49) : nouveau scan sans l'objet detruit ; s'il y avait un avion
+; ennemi proche (bit 0 de byte_7086A) et qu'il n'y en a plus -> 0x13 ; si plus aucun ennemi et
+; qu'il y en avait -> etape suivante. Mode 0 (aucun ennemi, depuis
+; Music_CombatIntensitySelector_59302) -> etape suivante. Etape : execute l'expression de la
+; mission ([word_706A0+0x4E], Expr_VM_ExecuteSingleInstruction_51E7E) ; si [+0xA1] et
+; Parser_LookaheadPattern([+0x68]) -> 0x0C ; sinon si byte_70869 (un combat a eu lieu) ->
+; 0x0D, une seule fois (byte_70869 = 0).
 ; ==============================================================================================
 Music_SelectTuneCandidate_5923A	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+FDp
-					; Weapon_HUDBox_UpdateAndRenderVariant_5AA49+1CP
+					; Music_OnObjectDestroyed_5AA49+1CP
 
 var_4		= byte ptr -4
 var_3		= byte ptr -3
@@ -566,7 +580,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	ax
 		push	cs
-		call	near ptr Weapon_HUDBox_DrawElementC_590E0
+		call	near ptr Music_ScanNearbyEnemies_590E0
 		add	sp, 4
 		mov	dl, al
 		or	dl, dl
@@ -654,25 +668,24 @@ Music_SelectTuneCandidate_5923A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Ex-'Weapon_HUDBox_Main_59302' (nom de notre base) ; renommee par la session musique (archive
-; handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE DE COMBAT PAR INTENSITÉ, lue ligne à ligne
-; intégralement. Anciennement Music_CombatIntensitySelector_59302. Plusieurs verrous de sortie
-; précoce (byte_6E4B8, byte_6E4B4, byte_72A8E==0x0B, byte_72C90==0x14) désactivent toute
-; l'évaluation — la piste en cours n'est alors pas modifiée. byte_6E4B8 est positionné dans
-; Player_MainUpdate_13100 selon byte_72DE5/byte_72E1D (probable mort/éjection du joueur) ;
-; byte_6E4B4 est une réaction dérivée, positionnée dans sub_53896 quand byte_6E4B8 est actif
-; (avec appel à sub_6ADFA, probable séquence de mort/éjection, candidat pour la piste
-; victoire/défaite). Si byte_72C90 (catégorie courante) == word_70859 (piste jouée) : calcule
-; un ratio via Roster_SumAttributeB_43D0F × 100 / Roster_SumAttributeA_43CDC (probable
-; pertes/effectif de l'escadrille ou score) et choisit di parmi {4,5,6,7,9,0x13} selon des
-; seuils (≥0x4B=75%, ≥0x23=35%) et des booléens intermédiaires
-; (Weapon_HUDBox_DrawElementA_58ED5, Weapon_HUDBox_DrawElementB_59061, word_722EE, byte_7086A
-; bit0). Si aucune branche ne matche : délègue à Music_SelectTuneCandidate_5923A(si,0,0). Si
-; di choisi : ÉCRASE word_70859 immédiatement. Point d'entrée périodique principal du système
-; de musique de combat dynamique — voir MUSIC_SYSTEM.md §8.1.
+; RELUE INTEGRALEMENT 2026-10-06 (remplace le resume de la session musique). far, 169L. CHOIX
+; DE LA MUSIQUE DE COMBAT, une frame sur 16 (Sound_FrameUpdate_5AB79). Ne fait rien si
+; byte_6E4B8 ou byte_6E4B4 (joueur mort / ejecte), si byte_72A8E == 0x0B, si la piste courante
+; byte_72C90 vaut 0x14, ou si un changement est deja en attente (byte_72C90 != word_70859). c
+; = Music_ScanNearbyEnemies_590E0 (ennemis a moins de 18 520 : bit 0 avion, bit 1 defense fixe
+; / objet au sol) -> byte_7086A. Aucun ennemi proche : repli
+; Music_SelectTuneCandidate_5923A(musique, 0, 0). Sinon byte_70869 = 1 (un combat a eu lieu)
+; et, dans l'ordre : piste 9 si un missile vise le joueur
+; (Music_IsMissileTargetingPlayer_58ED5) ou si un avion IA attaque le joueur (word_722EE, pose
+; via word_722EA par AI_SelectWeaponMask_9665) ; 5 si un avion ennemi est dans ses six heures
+; (Music_AnyEnemyOnPlayerSix_59061) ; sinon d = dommages du joueur = SommeB x 100 / SommeA sur
+; word_722E6+0x5E (meme formule que AI_EjectDecision_50FF) : 7 si d >= 75 %, 6 si d >= 35 % ;
+; sinon 4 si un avion ennemi est proche (bit 0), 0x13 si seules des defenses fixes / objets au
+; sol le sont. word_70859 = piste choisie (la transition est faite par
+; Music_TuneTransitionResolve_595C2). Renvoie la piste ou -1.
 ; ==============================================================================================
-Music_CombatIntensitySelector_59302	proc far		; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+EP
-					; Weapon_HUDBox_FullUpdateCycle_5AB79+50P
+Music_CombatIntensitySelector_59302	proc far		; CODE XREF: Music_SelectStartTune_5AA02+EP
+					; Sound_FrameUpdate_5AB79+50P
 
 var_A		= word ptr -0Ah
 var_8		= word ptr -8
@@ -726,7 +739,7 @@ loc_5934C:				; CODE XREF: Music_CombatIntensitySelector_59302+45j
 		push	0
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_DrawElementC_590E0
+		call	near ptr Music_ScanNearbyEnemies_590E0
 		add	sp, 4
 		mov	byte_7086A, al
 		cmp	byte_7086A, 0
@@ -738,7 +751,7 @@ loc_59363:				; CODE XREF: Music_CombatIntensitySelector_59302+5Cj
 		mov	byte_70869, 1
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_DrawElementA_58ED5
+		call	near ptr Music_IsMissileTargetingPlayer_58ED5
 		pop	cx
 		or	al, al
 		jz	short loc_59377
@@ -763,7 +776,7 @@ loc_59385:				; CODE XREF: Music_CombatIntensitySelector_59302+7Fj
 		jnz	short loc_59372
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_DrawElementB_59061
+		call	near ptr Music_AnyEnemyOnPlayerSix_59061
 		pop	cx
 		or	al, al
 		jz	short loc_59398

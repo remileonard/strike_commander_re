@@ -591,7 +591,7 @@ loc_3879F:				; CODE XREF: Debris_SpawnOrchestrator+15Ej
 		push	0
 		push	eax
 		push	3
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		push	di
 		push	59C3h

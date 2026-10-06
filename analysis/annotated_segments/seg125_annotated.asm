@@ -8,10 +8,11 @@ seg125		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6CFBE/sub_6D01A/sub_6D05F (fonctions non encore documentées). Référencée
-; par sub_A81E0.
+; Ex-'Widget_ApplyLayoutHelper_5A88F'. far. LUE 2026-10-06. Arrete tout : musique avec fondu
+; (Music_StopAndResetCombat_AA831), tous les effets (SoundFX_StopAllEntry_AB583), la voix
+; (Speech_StopPlayback_AB883), chacun s'il est actif (byte_7236B / 7236C / 7236D).
 ; ==============================================================================================
-Widget_ApplyLayoutHelper_5A88F	proc far		; CODE XREF: MissionScenario_ConstructAndBindUI_A81E0+12P
+Sound_StopAll_5A88F	proc far		; CODE XREF: MissionScenario_ConstructAndBindUI_A81E0+12P
 		push	bp
 		mov	bp, sp
 		cmp	byte_7236B, 0
@@ -22,7 +23,7 @@ Widget_ApplyLayoutHelper_5A88F	proc far		; CODE XREF: MissionScenario_ConstructA
 		call	VROOMM_StubThunk_6CFBE
 		pop	cx
 
-loc_5A8AA:				; CODE XREF: Widget_ApplyLayoutHelper_5A88F+8j Widget_ApplyLayoutHelper_5A88F+Fj
+loc_5A8AA:				; CODE XREF: Sound_StopAll_5A88F+8j Sound_StopAll_5A88F+Fj
 		cmp	byte_7236C, 0
 		jz	short loc_5A8C2
 		cmp	word_7099B, 0
@@ -31,8 +32,8 @@ loc_5A8AA:				; CODE XREF: Widget_ApplyLayoutHelper_5A88F+8j Widget_ApplyLayout
 		call	VROOMM_StubThunk_6D01A
 		pop	cx
 
-loc_5A8C2:				; CODE XREF: Widget_ApplyLayoutHelper_5A88F+20j
-					; Widget_ApplyLayoutHelper_5A88F+27j
+loc_5A8C2:				; CODE XREF: Sound_StopAll_5A88F+20j
+					; Sound_StopAll_5A88F+27j
 		cmp	byte_7236D, 0
 		jz	short loc_5A8DA
 		cmp	word_7099F, 0
@@ -41,11 +42,11 @@ loc_5A8C2:				; CODE XREF: Widget_ApplyLayoutHelper_5A88F+20j
 		call	VROOMM_StubThunk_6D05F
 		pop	cx
 
-loc_5A8DA:				; CODE XREF: Widget_ApplyLayoutHelper_5A88F+38j
-					; Widget_ApplyLayoutHelper_5A88F+3Fj
+loc_5A8DA:				; CODE XREF: Sound_StopAll_5A88F+38j
+					; Sound_StopAll_5A88F+3Fj
 		pop	bp
 		retf
-Widget_ApplyLayoutHelper_5A88F	endp
+Sound_StopAll_5A88F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -53,9 +54,10 @@ Widget_ApplyLayoutHelper_5A88F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Weapon_HUDBox_TimerCaseD_59902 (seg122). Référencée par sub_3863A.
+; Ex-'Weapon_HUDBox_TimerCaseH_5A8DC'. far. LUE 2026-10-06. Facade publique (si effets actifs,
+; byte_7236C, objet word_7099B) : SoundFX_Play3D_59902(effet, distance, emetteur).
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseH_5A8DC	proc far		; CODE XREF: Debris_SpawnOrchestrator+1B9P
+SoundFX_Play_5A8DC	proc far		; CODE XREF: Debris_SpawnOrchestrator+1B9P
 					; seg087:00B9P	...
 
 arg_0		= byte ptr  6
@@ -73,13 +75,13 @@ arg_6		= word ptr  0Ch
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_7099B
-		call	Weapon_HUDBox_TimerCaseD_59902
+		call	SoundFX_Play3D_59902
 		add	sp, 0Ah
 
-loc_5A904:				; CODE XREF: Weapon_HUDBox_TimerCaseH_5A8DC+8j Weapon_HUDBox_TimerCaseH_5A8DC+Fj
+loc_5A904:				; CODE XREF: SoundFX_Play_5A8DC+8j SoundFX_Play_5A8DC+Fj
 		pop	bp
 		retf
-Weapon_HUDBox_TimerCaseH_5A8DC	endp
+SoundFX_Play_5A8DC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -87,10 +89,10 @@ Weapon_HUDBox_TimerCaseH_5A8DC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Weapon_HUDBox_TimerCaseG_59AD7, TimerCaseD_59902 et TimerCaseE_599D3 (seg122).
-; Référencée par sub_15FD3.
+; Ex-'Weapon_HUDBox_TimerCaseI_5A906'. far. LUE 2026-10-06. Facade : demarre l'effet s'il ne
+; joue pas, sinon met a jour son volume selon la distance.
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseI_5A906	proc far		; CODE XREF: Cockpit_DetectPlayerMissile+192P
+SoundFX_PlayOrUpdate_5A906	proc far		; CODE XREF: Cockpit_DetectPlayerMissile+192P
 					; HUD_RenderSymbologyAlt:loc_400C2P
 
 arg_0		= byte ptr  6
@@ -109,7 +111,7 @@ arg_6		= word ptr  0Ch
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_7099B
-		call	Weapon_HUDBox_TimerCaseG_59AD7
+		call	SoundFX_IsPlaying_59AD7
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -119,27 +121,27 @@ arg_6		= word ptr  0Ch
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_7099B
-		call	Weapon_HUDBox_TimerCaseD_59902
+		call	SoundFX_Play3D_59902
 		jmp	short loc_5A958
 ; ���������������������������������������������������������������������������
 
-loc_5A946:				; CODE XREF: Weapon_HUDBox_TimerCaseI_5A906+2Aj
+loc_5A946:				; CODE XREF: SoundFX_PlayOrUpdate_5A906+2Aj
 		push	si
 		push	large [bp+arg_2]
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_7099B
-		call	Weapon_HUDBox_TimerCaseE_599D3
+		call	SoundFX_UpdateVolume3D_599D3
 
-loc_5A958:				; CODE XREF: Weapon_HUDBox_TimerCaseI_5A906+3Ej
+loc_5A958:				; CODE XREF: SoundFX_PlayOrUpdate_5A906+3Ej
 		add	sp, 0Ah
 
-loc_5A95B:				; CODE XREF: Weapon_HUDBox_TimerCaseI_5A906+Cj
-					; Weapon_HUDBox_TimerCaseI_5A906+13j
+loc_5A95B:				; CODE XREF: SoundFX_PlayOrUpdate_5A906+Cj
+					; SoundFX_PlayOrUpdate_5A906+13j
 		pop	si
 		pop	bp
 		retf
-Weapon_HUDBox_TimerCaseI_5A906	endp
+SoundFX_PlayOrUpdate_5A906	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -147,9 +149,10 @@ Weapon_HUDBox_TimerCaseI_5A906	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Weapon_HUDBox_TimerCaseF_59A8A (seg122). Référencée par sub_15138.
+; Ex-'Weapon_HUDBox_TimerCaseJ_5A95E'. far. LUE 2026-10-06. Facade :
+; SoundFX_StopEffect_59A8A(effet, emetteur).
 ; ==============================================================================================
-Weapon_HUDBox_TimerCaseJ_5A95E	proc far		; CODE XREF: Resource_InitTwoChannels+7P
+SoundFX_Stop_5A95E	proc far		; CODE XREF: Resource_InitTwoChannels+7P
 					; Resource_InitTwoChannels+13P ...
 
 arg_0		= byte ptr  6
@@ -165,13 +168,13 @@ arg_2		= word ptr  8
 		mov	al, [bp+arg_0]
 		push	ax
 		push	word_7099B
-		call	Weapon_HUDBox_TimerCaseF_59A8A
+		call	SoundFX_StopEffect_59A8A
 		add	sp, 6
 
-loc_5A982:				; CODE XREF: Weapon_HUDBox_TimerCaseJ_5A95E+8j Weapon_HUDBox_TimerCaseJ_5A95E+Fj
+loc_5A982:				; CODE XREF: SoundFX_Stop_5A95E+8j SoundFX_Stop_5A95E+Fj
 		pop	bp
 		retf
-Weapon_HUDBox_TimerCaseJ_5A95E	endp
+SoundFX_Stop_5A95E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -229,9 +232,9 @@ Music_RequestTune_5A984	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6CFD2. Référencée par sub_8EEBC.
+; Ex-'Widget_Helper_5A9BA'. far. LUE 2026-10-06. Facade : Music_PauseChannels_AB16F.
 ; ==============================================================================================
-Widget_Helper_5A9BA	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8EF4BP
+Music_Pause_5A9BA	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8EF4BP
 		push	bp
 		mov	bp, sp
 		cmp	word_7099D, 0
@@ -240,10 +243,10 @@ Widget_Helper_5A9BA	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc
 		call	VROOMM_StubThunk_6CFD2
 		pop	cx
 
-loc_5A9CE:				; CODE XREF: Widget_Helper_5A9BA+8j
+loc_5A9CE:				; CODE XREF: Music_Pause_5A9BA+8j
 		pop	bp
 		retf
-Widget_Helper_5A9BA	endp
+Music_Pause_5A9BA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -251,9 +254,9 @@ Widget_Helper_5A9BA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6CFD7. Référencée par sub_8EEBC.
+; Ex-'Widget_Helper_5A9D0'. far. LUE 2026-10-06. Facade : Music_ResumeChannels_AB1AF.
 ; ==============================================================================================
-Widget_Helper_5A9D0	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8F42CP
+Music_Resume_5A9D0	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8F42CP
 		push	bp
 		mov	bp, sp
 		cmp	word_7099D, 0
@@ -262,10 +265,10 @@ Widget_Helper_5A9D0	proc far		; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc
 		call	VROOMM_StubThunk_6CFD7
 		pop	cx
 
-loc_5A9E4:				; CODE XREF: Widget_Helper_5A9D0+8j
+loc_5A9E4:				; CODE XREF: Music_Resume_5A9D0+8j
 		pop	bp
 		retf
-Widget_Helper_5A9D0	endp
+Music_Resume_5A9D0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -273,10 +276,10 @@ Widget_Helper_5A9D0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6CFDC. Référencée par sub_26F7E (proche de
-; UIScreen_StateMachineMain_4FBF1).
+; Ex-'Widget_Helper_5A9E6'. far. LUE 2026-10-06. Facade (appelee par STRIKE_EXE_MAIN_LOOP) :
+; Music_StopWithFade_AB1EF(fondu = argument).
 ; ==============================================================================================
-Widget_Helper_5A9E6	proc far		; CODE XREF: Config_ReadCalibration:loc_270D5P
+Music_Stop_5A9E6	proc far		; CODE XREF: Config_ReadCalibration:loc_270D5P
 					; STRIKE_EXE_MAIN_LOOP+1F1P ...
 
 arg_0		= byte ptr  6
@@ -291,10 +294,10 @@ arg_0		= byte ptr  6
 		call	VROOMM_StubThunk_6CFDC
 		add	sp, 4
 
-loc_5AA00:				; CODE XREF: Widget_Helper_5A9E6+8j
+loc_5AA00:				; CODE XREF: Music_Stop_5A9E6+8j
 		pop	bp
 		retf
-Widget_Helper_5A9E6	endp
+Music_Stop_5A9E6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -302,10 +305,12 @@ Widget_Helper_5A9E6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, instancie le cluster HUD armement : appelle Music_CombatIntensitySelector_59302,
-; Weapon_HUDBox_DrawElementC_590E0 et Music_RequestTune_5A984. Référencée par sub_26F7E.
+; Ex-'Weapon_HUDBox_InstantiateInstance_5AA02'. far. LUE 2026-10-06. Piste de depart (appelee
+; par Cockpit_LoadAndDrawCalibration_8FDC0) : si Music_CombatIntensitySelector_59302 ne
+; choisit rien : ennemis proches (Music_ScanNearbyEnemies_590E0) -> 4 si byte_70869 sinon 0x13
+; ; sinon piste de la mission byte_706A2 (chunk TUNE) ; Music_RequestTune_5A984.
 ; ==============================================================================================
-Weapon_HUDBox_InstantiateInstance_5AA02	proc far		; CODE XREF: Config_ReadCalibration:loc_27100P
+Music_SelectStartTune_5AA02	proc far		; CODE XREF: Config_ReadCalibration:loc_27100P
 					; Cockpit_LoadAndDrawCalibration_8FDC0+2C2P
 		push	bp
 		mov	bp, sp
@@ -318,7 +323,7 @@ Weapon_HUDBox_InstantiateInstance_5AA02	proc far		; CODE XREF: Config_ReadCalibr
 		jnz	short loc_5AA47
 		push	0
 		push	word_7099D
-		call	Weapon_HUDBox_DrawElementC_590E0
+		call	Music_ScanNearbyEnemies_590E0
 		add	sp, 4
 		or	al, al
 		jz	short loc_5AA3C
@@ -328,27 +333,27 @@ Weapon_HUDBox_InstantiateInstance_5AA02	proc far		; CODE XREF: Config_ReadCalibr
 		jmp	short loc_5AA42
 ; ���������������������������������������������������������������������������
 
-loc_5AA38:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+30j
+loc_5AA38:				; CODE XREF: Music_SelectStartTune_5AA02+30j
 		push	13h
 		jmp	short loc_5AA42
 ; ���������������������������������������������������������������������������
 
-loc_5AA3C:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+29j
+loc_5AA3C:				; CODE XREF: Music_SelectStartTune_5AA02+29j
 		mov	al, byte_706A2
 		mov	ah, 0
 		push	ax
 
-loc_5AA42:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+34j
-					; Weapon_HUDBox_InstantiateInstance_5AA02+38j
+loc_5AA42:				; CODE XREF: Music_SelectStartTune_5AA02+34j
+					; Music_SelectStartTune_5AA02+38j
 		push	cs
 		call	near ptr Music_RequestTune_5A984
 		pop	cx
 
-loc_5AA47:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+8j
-					; Weapon_HUDBox_InstantiateInstance_5AA02+17j
+loc_5AA47:				; CODE XREF: Music_SelectStartTune_5AA02+8j
+					; Music_SelectStartTune_5AA02+17j
 		pop	bp
 		retf
-Weapon_HUDBox_InstantiateInstance_5AA02	endp
+Music_SelectStartTune_5AA02	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -356,10 +361,11 @@ Weapon_HUDBox_InstantiateInstance_5AA02	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Music_SelectTuneCandidate_5923A (seg114). Référencée par
-; UIScreen_BuildWidgetTree (sub_53A94, seg114).
+; Ex-'Weapon_HUDBox_UpdateAndRenderVariant_5AA49'. far. LUE 2026-10-06. Appelee par
+; Combat_TeamOpposedCheckAndDispatch_53A94 a la destruction d'un objet :
+; Music_SelectTuneCandidate_5923A(musique, 1, objet detruit).
 ; ==============================================================================================
-Weapon_HUDBox_UpdateAndRenderVariant_5AA49	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1F2P
+Music_OnObjectDestroyed_5AA49	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1F2P
 
 arg_0		= word ptr  6
 
@@ -377,12 +383,12 @@ arg_0		= word ptr  6
 		add	sp, 6
 		mov	dl, al
 
-loc_5AA6F:				; CODE XREF: Weapon_HUDBox_UpdateAndRenderVariant_5AA49+Aj
-					; Weapon_HUDBox_UpdateAndRenderVariant_5AA49+11j
+loc_5AA6F:				; CODE XREF: Music_OnObjectDestroyed_5AA49+Aj
+					; Music_OnObjectDestroyed_5AA49+11j
 		mov	al, dl
 		pop	bp
 		retf
-Weapon_HUDBox_UpdateAndRenderVariant_5AA49	endp
+Music_OnObjectDestroyed_5AA49	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -390,9 +396,10 @@ Weapon_HUDBox_UpdateAndRenderVariant_5AA49	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6D029. Référencée par sub_26F7E.
+; Ex-'Widget_Helper_5AA73'. far. LUE 2026-10-06. Desactive les effets (byte_7236C = 0) apres
+; avoir arrete tous les canaux.
 ; ==============================================================================================
-Widget_Helper_5AA73	proc far		; CODE XREF: Config_ReadCalibration+19FP
+SoundFX_Disable_5AA73	proc far		; CODE XREF: Config_ReadCalibration+19FP
 		push	bp
 		mov	bp, sp
 		cmp	byte_7236C, 0
@@ -404,10 +411,10 @@ Widget_Helper_5AA73	proc far		; CODE XREF: Config_ReadCalibration+19FP
 		call	VROOMM_StubThunk_6D029
 		pop	cx
 
-loc_5AA93:				; CODE XREF: Widget_Helper_5AA73+8j Widget_Helper_5AA73+Fj
+loc_5AA93:				; CODE XREF: SoundFX_Disable_5AA73+8j SoundFX_Disable_5AA73+Fj
 		pop	bp
 		retf
-Widget_Helper_5AA73	endp
+SoundFX_Disable_5AA73	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -415,9 +422,10 @@ Widget_Helper_5AA73	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6D029 (variante). Référencée par sub_26F7E.
+; Ex-'Widget_Helper_5AA95'. far. LUE 2026-10-06. Arrete tous les canaux d'effets
+; (SoundFX_StopAllChannels_AB770).
 ; ==============================================================================================
-Widget_Helper_5AA95	proc far		; CODE XREF: Config_ReadCalibration+138P
+SoundFX_StopAll_5AA95	proc far		; CODE XREF: Config_ReadCalibration+138P
 		push	bp
 		mov	bp, sp
 		cmp	byte_7236C, 0
@@ -428,10 +436,10 @@ Widget_Helper_5AA95	proc far		; CODE XREF: Config_ReadCalibration+138P
 		call	VROOMM_StubThunk_6D029
 		pop	cx
 
-loc_5AAB0:				; CODE XREF: Widget_Helper_5AA95+8j Widget_Helper_5AA95+Fj
+loc_5AAB0:				; CODE XREF: SoundFX_StopAll_5AA95+8j SoundFX_StopAll_5AA95+Fj
 		pop	bp
 		retf
-Widget_Helper_5AA95	endp
+SoundFX_StopAll_5AA95	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -439,9 +447,10 @@ Widget_Helper_5AA95	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6D064. Référencée par sub_869C0.
+; Ex-'Widget_Helper_5AAB2'. far. LUE 2026-10-06. Facade voix (byte_7236D, objet word_7099F)
+; appelee par PilotProfile_LoadRADI_8DF49 : AudioQueue_LoadFromMultipleReaders_AB9D7.
 ; ==============================================================================================
-Widget_Helper_5AAB2	proc far		; CODE XREF: UIScreen_ClearAndLoadResource_869C0+187P
+Speech_LoadBank_5AAB2	proc far		; CODE XREF: UIScreen_ClearAndLoadResource_869C0+187P
 					; PilotProfile_LoadRADI_8DF49+145P
 
 arg_0		= word ptr  6
@@ -459,10 +468,10 @@ arg_2		= word ptr  8
 		call	VROOMM_StubThunk_6D064
 		add	sp, 6
 
-loc_5AAD5:				; CODE XREF: Widget_Helper_5AAB2+8j Widget_Helper_5AAB2+Fj
+loc_5AAD5:				; CODE XREF: Speech_LoadBank_5AAB2+8j Speech_LoadBank_5AAB2+Fj
 		pop	bp
 		retf
-Widget_Helper_5AAB2	endp
+Speech_LoadBank_5AAB2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -470,9 +479,10 @@ Widget_Helper_5AAB2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6D095. Référencée par sub_15155.
+; Ex-'Widget_Helper_5AAD7'. far. LUE 2026-10-06. Facade voix appelee par Audio_LoadSpeechClip
+; : AudioQueue_MainProcessEntry_ABBEF (lecture VOC via AIL_play_VOC_file_6034E).
 ; ==============================================================================================
-Widget_Helper_5AAD7	proc far		; CODE XREF: Cockpit_LoadBettyPack+33P
+Speech_PlayClip_5AAD7	proc far		; CODE XREF: Cockpit_LoadBettyPack+33P
 					; Audio_LoadSpeechClip+3CP
 
 arg_0		= word ptr  6
@@ -497,12 +507,12 @@ arg_6		= byte ptr  0Ch
 		add	sp, 0Ah
 		mov	dl, al
 
-loc_5AB05:				; CODE XREF: Widget_Helper_5AAD7+Aj
-					; Widget_Helper_5AAD7+11j
+loc_5AB05:				; CODE XREF: Speech_PlayClip_5AAD7+Aj
+					; Speech_PlayClip_5AAD7+11j
 		mov	al, dl
 		pop	bp
 		retf
-Widget_Helper_5AAD7	endp
+Speech_PlayClip_5AAD7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -510,9 +520,10 @@ Widget_Helper_5AAD7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible. Référencée par sub_15155.
+; Ex-'Widget_Helper_5AB09'. far. LUE 2026-10-06. Ecrit l'argument dans le champ +0x49 de
+; l'objet voix (role non trace).
 ; ==============================================================================================
-Widget_Helper_5AB09	proc far		; CODE XREF: Cockpit_LoadBettyPack+41P
+Speech_SetField49_5AB09	proc far		; CODE XREF: Cockpit_LoadBettyPack+41P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -529,11 +540,11 @@ arg_0		= word ptr  6
 		mov	bx, word_7099F
 		mov	[bx+49h], ax
 
-locret_5AB2A:				; CODE XREF: Widget_Helper_5AB09+Bj
-					; Widget_Helper_5AB09+12j
+locret_5AB2A:				; CODE XREF: Speech_SetField49_5AB09+Bj
+					; Speech_SetField49_5AB09+12j
 		leave
 		retf
-Widget_Helper_5AB09	endp
+Speech_SetField49_5AB09	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -541,9 +552,10 @@ Widget_Helper_5AB09	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6D09A. Référencée par sub_BD3F.
+; Ex-'Widget_Helper_5AB2C'. far. LUE 2026-10-06. Facade voix appelee par
+; RadioQueue_RegisterMessage : AudioQueue_OpcodeHelper_ABDAF (statut de lecture VOC).
 ; ==============================================================================================
-Widget_Helper_5AB2C	proc far		; CODE XREF: Radio_PlayerSpottedCallout+104P
+Speech_QueryStatus_5AB2C	proc far		; CODE XREF: Radio_PlayerSpottedCallout+104P
 					; RadioQueue_RegisterMessage+6FP
 
 arg_0		= byte ptr  6
@@ -562,12 +574,12 @@ arg_0		= byte ptr  6
 		add	sp, 4
 		mov	dl, al
 
-loc_5AB51:				; CODE XREF: Widget_Helper_5AB2C+Aj
-					; Widget_Helper_5AB2C+11j
+loc_5AB51:				; CODE XREF: Speech_QueryStatus_5AB2C+Aj
+					; Speech_QueryStatus_5AB2C+11j
 		mov	al, dl
 		pop	bp
 		retf
-Widget_Helper_5AB2C	endp
+Speech_QueryStatus_5AB2C	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -592,10 +604,11 @@ loc_5AB77:				; CODE XREF: seg125:02DDj seg125:02E7j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, orchestre le cycle complet du cluster HUD armement : Weapon_HUDBox_MasterUpdate_59CFA
-; (seg122) puis Music_CombatIntensitySelector_59302 (seg121). Référencée par sub_26F7E.
+; Ex-'Weapon_HUDBox_FullUpdateCycle_5AB79'. far. LUE 2026-10-06. Mise a jour son de chaque
+; frame : SoundFX_Tick_59CFA, tick de la voix (AudioQueue_FinalizeAndRelease_ABDEC), et
+; Music_CombatIntensitySelector_59302 une frame sur 16 ('test word_70466, 0Fh').
 ; ==============================================================================================
-Weapon_HUDBox_FullUpdateCycle_5AB79	proc far		; CODE XREF: Config_ReadCalibration+1A7P
+Sound_FrameUpdate_5AB79	proc far		; CODE XREF: Config_ReadCalibration+1A7P
 
 arg_0		= word ptr  6
 
@@ -607,11 +620,11 @@ arg_0		= word ptr  6
 		cmp	word_7099B, 0
 		jz	short loc_5AB97
 		push	word_7099B
-		call	Weapon_HUDBox_MasterUpdate_59CFA
+		call	SoundFX_Tick_59CFA
 		pop	cx
 
-loc_5AB97:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+Bj
-					; Weapon_HUDBox_FullUpdateCycle_5AB79+12j
+loc_5AB97:				; CODE XREF: Sound_FrameUpdate_5AB79+Bj
+					; Sound_FrameUpdate_5AB79+12j
 		cmp	byte_7236D, 0
 		jz	short loc_5ABAF
 		cmp	word_7099F, 0
@@ -620,8 +633,8 @@ loc_5AB97:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+Bj
 		call	VROOMM_StubThunk_6D09F
 		pop	cx
 
-loc_5ABAF:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+23j
-					; Weapon_HUDBox_FullUpdateCycle_5AB79+2Aj
+loc_5ABAF:				; CODE XREF: Sound_FrameUpdate_5AB79+23j
+					; Sound_FrameUpdate_5AB79+2Aj
 		cmp	byte_7236B, 0
 		jz	short loc_5ABCF
 		cmp	word_7099D, 0
@@ -632,11 +645,11 @@ loc_5ABAF:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+23j
 		call	Music_CombatIntensitySelector_59302
 		pop	cx
 
-loc_5ABCF:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+3Bj
-					; Weapon_HUDBox_FullUpdateCycle_5AB79+42j ...
+loc_5ABCF:				; CODE XREF: Sound_FrameUpdate_5AB79+3Bj
+					; Sound_FrameUpdate_5AB79+42j ...
 		pop	bp
 		retf
-Weapon_HUDBox_FullUpdateCycle_5AB79	endp
+Sound_FrameUpdate_5AB79	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

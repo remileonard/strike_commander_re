@@ -44,8 +44,8 @@ VROOMM_StubThunk_6D015	endp
 ; far, thunk fixe VROOMM (jmp sub_AB583) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=3A370h, codesize=316h, nentries=6.
 ; ==============================================================================================
-VROOMM_StubThunk_6D01A	proc far		; CODE XREF: Widget_ApplyLayoutHelper_5A88F+2DP
-		jmp	AudioQueue_AdvanceWrapper_AB583
+VROOMM_StubThunk_6D01A	proc far		; CODE XREF: Sound_StopAll_5A88F+2DP
+		jmp	SoundFX_StopAllEntry_AB583
 VROOMM_StubThunk_6D01A	endp
 
 
@@ -84,9 +84,9 @@ VROOMM_StubThunk_6D024	endp
 ; far, thunk fixe VROOMM (jmp sub_AB770) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=3A370h, codesize=316h, nentries=6.
 ; ==============================================================================================
-VROOMM_StubThunk_6D029	proc far		; CODE XREF: Widget_Helper_5AA73+1AP
-					; Widget_Helper_5AA95+15P
-		jmp	AudioQueue_AdvanceSlotEntry_AB770
+VROOMM_StubThunk_6D029	proc far		; CODE XREF: SoundFX_Disable_5AA73+1AP
+					; SoundFX_StopAll_5AA95+15P
+		jmp	SoundFX_StopAllChannels_AB770
 VROOMM_StubThunk_6D029	endp
 
 seg336		ends

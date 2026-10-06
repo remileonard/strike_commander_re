@@ -926,7 +926,7 @@ Config_ReadSettingsFieldWithMessage_8FD2A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 322 lignes, NON DÉTAILLÉE — combine Widget_Helper_5A9E6 (seg125), StreamReader,
+; ⚠️ far, 322 lignes, NON DÉTAILLÉE — combine Music_Stop_5A9E6 (seg125), StreamReader,
 ; Joystick_GetButtonRawByte_67B82/InitCalibrationDefaults_67B92 (seg208),
 ; Render_MeasureOrDrawTextString_61F52.
 ; ==============================================================================================
@@ -943,7 +943,7 @@ arg_0		= dword	ptr  6
 		mov	bp, sp
 		sub	sp, 6Ah
 		push	0
-		call	Widget_Helper_5A9E6
+		call	Music_Stop_5A9E6
 		pop	cx
 		lea	ax, [bp+var_6A]
 		push	ax
@@ -1243,7 +1243,7 @@ loc_9007A:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+2B5j
 		push	0
 		call	Joystick_UpdateCalibration_67B0D
 		pop	cx
-		call	Weapon_HUDBox_InstantiateInstance_5AA02
+		call	Music_SelectStartTune_5AA02
 		push	0
 		lea	ax, [bp+var_6A]
 		push	ax

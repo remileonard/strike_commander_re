@@ -38,9 +38,10 @@ AudioQueue_RegisterTickModule_AA810	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle AudioQueue_ProcessMain_AB1EF.
+; Ex-'AudioQueue_AdvanceSlot_AA831'. far. LUE 2026-10-06. Music_StopWithFade_AB1EF(fondu) puis
+; remet a zero byte_70869 (un combat a eu lieu) et byte_7086A (ennemis proches).
 ; ==============================================================================================
-AudioQueue_AdvanceSlot_AA831	proc far		; CODE XREF: VROOMM_StubThunk_6CFBEJ
+Music_StopAndResetCombat_AA831	proc far		; CODE XREF: VROOMM_StubThunk_6CFBEJ
 
 arg_0		= word ptr  6
 
@@ -57,7 +58,7 @@ loc_AA834:
 		push	cs
 
 loc_AA83C:
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AA83F:
 		add	sp, 4
@@ -69,7 +70,7 @@ loc_AA847:
 		mov	byte_7086A, 0
 		pop	bp
 		retf
-AudioQueue_AdvanceSlot_AA831	endp
+Music_StopAndResetCombat_AA831	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -129,7 +130,7 @@ loc_AA861:
 		push	cs
 
 loc_AA862:
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AA865:
 		add	sp, 4
@@ -1289,11 +1290,11 @@ AudioQueue_LoadTransitionTable_AAFA0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle deux fois AIL_stop_sequence_603D2 (seg161, thunk d'activation d'emplacement
-; du registre de modules) — confirme que ce cluster utilise directement les thunks d'opcode du
-; registre de modules découverts en seg161.
+; Ex-'AudioQueue_ActivateSlotOpcode_AB16F'. far. LUE 2026-10-06. AIL_stop_sequence_603D2 sur
+; les deux canaux musicaux (principal 5BE3h et transition 5BF5h) : pause (la position est
+; gardee).
 ; ==============================================================================================
-AudioQueue_ActivateSlotOpcode_AB16F	proc far		; CODE XREF: VROOMM_StubThunk_6CFD2J
+Music_PauseChannels_AB16F	proc far		; CODE XREF: VROOMM_StubThunk_6CFD2J
 
 arg_0		= word ptr  6
 
@@ -1311,7 +1312,7 @@ loc_AB172:
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB191:				; CODE XREF: AudioQueue_ActivateSlotOpcode_AB16F+Bj
+loc_AB191:				; CODE XREF: Music_PauseChannels_AB16F+Bj
 		cmp	word_72CA5, 0
 		jz	short loc_AB1AD
 		push	word_72CA7
@@ -1325,10 +1326,10 @@ loc_AB1A3:
 loc_AB1AB:
 		jmp	short $+2
 
-loc_AB1AD:				; CODE XREF: AudioQueue_ActivateSlotOpcode_AB16F+27j
+loc_AB1AD:				; CODE XREF: Music_PauseChannels_AB16F+27j
 		pop	bp
 		retf
-AudioQueue_ActivateSlotOpcode_AB16F	endp
+Music_PauseChannels_AB16F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1336,10 +1337,10 @@ AudioQueue_ActivateSlotOpcode_AB16F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle deux fois AIL_resume_sequence_603D8 (seg161, thunk de désactivation
-; d'emplacement).
+; Ex-'AudioQueue_DeactivateSlotOpcode_AB1AF'. far. LUE 2026-10-06. AIL_resume_sequence_603D8
+; sur les deux canaux musicaux.
 ; ==============================================================================================
-AudioQueue_DeactivateSlotOpcode_AB1AF	proc far		; CODE XREF: VROOMM_StubThunk_6CFD7J
+Music_ResumeChannels_AB1AF	proc far		; CODE XREF: VROOMM_StubThunk_6CFD7J
 
 arg_0		= word ptr  6
 
@@ -1361,7 +1362,7 @@ loc_AB1B5:
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB1D1:				; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+Bj
+loc_AB1D1:				; CODE XREF: Music_ResumeChannels_AB1AF+Bj
 		cmp	word_72CA5, 0
 		jz	short loc_AB1ED
 		push	word_72CA7
@@ -1375,10 +1376,10 @@ loc_AB1E8:
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB1ED:				; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+27j
+loc_AB1ED:				; CODE XREF: Music_ResumeChannels_AB1AF+27j
 		pop	bp
 		retf
-AudioQueue_DeactivateSlotOpcode_AB1AF	endp
+Music_ResumeChannels_AB1AF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1386,13 +1387,13 @@ AudioQueue_DeactivateSlotOpcode_AB1AF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 123 lignes, NON DÉTAILLÉE — appelle directement Music_ChannelStopSequence_59F1D
-; (seg123, ×2) et les thunks d'opcode du registre de modules (AIL_sequence_status_603DE probe,
-; _B1_603F0, _AF_603E4) — cœur du traitement des emplacements actifs de la file
-; audio/séquenceur.
+; Ex-'AudioQueue_ProcessSequencerSlots_AB1EF'. far. LUE 2026-10-06. (musique, fondu) : piste
+; demandee = 0xFFFF, canal de transition arrete ; si fondu et piste principale en cours :
+; AIL_set_relative_volume_603F0(0, 1000 ms) puis attente active jusqu'a volume nul
+; (AIL_relative_volume_603E4) ; arrete le canal principal.
 ; ==============================================================================================
-AudioQueue_ProcessSequencerSlots_AB1EF	proc far		; CODE XREF: VROOMM_StubThunk_6CFDCJ
-					; AudioQueue_AdvanceSlot_AA831:loc_AA83Cp	...
+Music_StopWithFade_AB1EF	proc far		; CODE XREF: VROOMM_StubThunk_6CFDCJ
+					; Music_StopAndResetCombat_AA831:loc_AA83Cp	...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -1414,7 +1415,7 @@ loc_AB1F5:
 		jmp	loc_AB2B2
 ; ���������������������������������������������������������������������������
 
-loc_AB212:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+1Ej
+loc_AB212:				; CODE XREF: Music_StopWithFade_AB1EF+1Ej
 		cmp	word_72C93, 0
 		jz	short loc_AB23A
 		push	word_72C95
@@ -1428,17 +1429,17 @@ loc_AB212:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+1Ej
 		jmp	short loc_AB238
 ; ���������������������������������������������������������������������������
 
-loc_AB236:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+40j
+loc_AB236:				; CODE XREF: Music_StopWithFade_AB1EF+40j
 		xor	ax, ax
 
-loc_AB238:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+45j
+loc_AB238:				; CODE XREF: Music_StopWithFade_AB1EF+45j
 		jmp	short loc_AB23C
 ; ���������������������������������������������������������������������������
 
-loc_AB23A:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+28j
+loc_AB23A:				; CODE XREF: Music_StopWithFade_AB1EF+28j
 		mov	al, 0
 
-loc_AB23C:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF:loc_AB238j
+loc_AB23C:				; CODE XREF: Music_StopWithFade_AB1EF:loc_AB238j
 		or	al, al
 		jz	short loc_AB2B2
 
@@ -1459,8 +1460,8 @@ loc_AB24D:
 loc_AB260:
 		jmp	short $+2
 
-loc_AB262:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+56j
-					; AudioQueue_ProcessSequencerSlots_AB1EF+C1j
+loc_AB262:				; CODE XREF: Music_StopWithFade_AB1EF+56j
+					; Music_StopWithFade_AB1EF+C1j
 		cmp	word_72C93, 0
 		jz	short loc_AB28A
 		push	word_72C95
@@ -1474,17 +1475,17 @@ loc_AB262:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+56j
 		jmp	short loc_AB288
 ; ���������������������������������������������������������������������������
 
-loc_AB286:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+90j
+loc_AB286:				; CODE XREF: Music_StopWithFade_AB1EF+90j
 		xor	ax, ax
 
-loc_AB288:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+95j
+loc_AB288:				; CODE XREF: Music_StopWithFade_AB1EF+95j
 		jmp	short loc_AB28C
 ; ���������������������������������������������������������������������������
 
-loc_AB28A:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+78j
+loc_AB28A:				; CODE XREF: Music_StopWithFade_AB1EF+78j
 		mov	al, 0
 
-loc_AB28C:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF:loc_AB288j
+loc_AB28C:				; CODE XREF: Music_StopWithFade_AB1EF:loc_AB288j
 		or	al, al
 		jz	short loc_AB2B2
 		cmp	word_72C93, 0
@@ -1499,21 +1500,21 @@ loc_AB2A7:
 		jmp	short loc_AB2AE
 ; ���������������������������������������������������������������������������
 
-loc_AB2AC:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+A6j
+loc_AB2AC:				; CODE XREF: Music_StopWithFade_AB1EF+A6j
 		xor	ax, ax
 
-loc_AB2AE:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+BBj
+loc_AB2AE:				; CODE XREF: Music_StopWithFade_AB1EF+BBj
 		or	ax, ax
 		jnz	short loc_AB262
 
-loc_AB2B2:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+20j
-					; AudioQueue_ProcessSequencerSlots_AB1EF+4Fj ...
+loc_AB2B2:				; CODE XREF: Music_StopWithFade_AB1EF+20j
+					; Music_StopWithFade_AB1EF+4Fj ...
 		push	5BE3h
 		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		pop	bp
 		retf
-AudioQueue_ProcessSequencerSlots_AB1EF	endp
+Music_StopWithFade_AB1EF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1719,8 +1720,8 @@ AudioQueue_ReleaseAllSlots_AB2BD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine AudioQueue_ProcessSequencerSlots_AB1EF, Stopwatch_UnregisterTickModule_6769F
-; (seg207), AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2).
+; far, combine Music_StopWithFade_AB1EF, Stopwatch_UnregisterTickModule_6769F (seg207),
+; AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2).
 ; ==============================================================================================
 AudioQueue_UnregisterAndCleanup_AB44A	proc far		; CODE XREF: VROOMM_StubThunk_6CFCDJ
 
@@ -1736,7 +1737,7 @@ arg_0		= word ptr  6
 		push	1
 		push	si
 		push	cs
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AB464:
 		add	sp, 4

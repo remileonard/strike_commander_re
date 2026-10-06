@@ -703,9 +703,9 @@ PlayerComponent_ComputeGeometryComplex_9E027	endp
 ; (sub_38B70, motif de Trigger_TimedRangedSpawnOnce_4F351, seg109), l'enregistrement de
 ; conteneur (sub_21F8D), la référence faible SetReference (sub_3A44E, mentionnée dans les
 ; notes du projet), l'ajout à liste membre (sub_3A40B ×2, dtor sub_3A3EC associé en seg109) et
-; Weapon_HUDBox_TimerCaseH_5A8DC (seg125). Correspond très fortement au système de
-; trigger/spawn temporisé du seg109, probablement son implémentation d'overlay réelle.
-; Candidat prioritaire pour session dédiée.
+; SoundFX_Play_5A8DC (seg125). Correspond très fortement au système de trigger/spawn temporisé
+; du seg109, probablement son implémentation d'overlay réelle. Candidat prioritaire pour
+; session dédiée.
 ; ==============================================================================================
 TimedTrigger_SpawnAndBindGeometry_9E289	proc far		; CODE XREF: VROOMM_StubThunk_6C399J
 
@@ -1104,7 +1104,7 @@ loc_9E535:
 		push	8
 
 loc_9E55E:
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_9E566:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+48j
@@ -3964,8 +3964,8 @@ PlayerComponent_HelperVariantF_9F760	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 87 lignes, NON DÉTAILLÉE — combine sub_3FD (formatage), sub_43D43,
-; PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, Weapon_HUDBox_TimerCaseJ_5A95E
-; (seg125). Référencée via jmp depuis un stub VROOMM (sub_6C41B).
+; PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, SoundFX_Stop_5A95E (seg125).
+; Référencée via jmp depuis un stub VROOMM (sub_6C41B).
 ; ==============================================================================================
 PlayerComponent_FormatAndDisplay_9F784	proc far		; CODE XREF: VROOMM_StubThunk_6C41BJ
 
@@ -4045,7 +4045,7 @@ loc_9F7EB:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+37j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	2
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
 loc_9F829:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+12j

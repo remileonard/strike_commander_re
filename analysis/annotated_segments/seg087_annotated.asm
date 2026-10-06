@@ -96,7 +96,7 @@ loc_3DF6E:				; CODE XREF: seg087:0089j
 		push	0
 		push	large 0
 		push	4
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_3DFA1:				; CODE XREF: seg087:009Cj seg087:00A3j ...
@@ -144,7 +144,7 @@ loc_3DFD3:
 		push	0
 		push	large 0
 		push	5
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_3DFFC:				; CODE XREF: seg087:00F7j seg087:00FEj ...

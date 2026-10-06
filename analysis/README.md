@@ -938,10 +938,10 @@ créneaux temporisés du seg161 en dehors du séquenceur de contre-mesures
   `Music_SequencerTickISR_5940B` (seg121) via le mécanisme Stopwatch (seg207,
   tag 5DC2h) — confirmant l'enregistrement direct dans le minuteur
   matériel.
-- **`AudioQueue_ActivateSlotOpcode_AB16F`** et
-  **`AudioQueue_DeactivateSlotOpcode_AB1AF`** appellent directement les
+- **`Music_PauseChannels_AB16F`** et
+  **`Music_ResumeChannels_AB1AF`** appellent directement les
   thunks d'opcode `AIL_stop_sequence_603D2`/`_AD_603D8` (seg161).
-- **`AudioQueue_ProcessSequencerSlots_AB1EF`** appelle
+- **`Music_StopWithFade_AB1EF`** appelle
   `Music_ChannelStopSequence_59F1D` (seg123) — le séquenceur générique
   découvert dès le début de la traversée des segments de fin de fichier.
 - Le cluster combine massivement `IndexedRecordReader` (seg196) et
@@ -1105,10 +1105,10 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Render_DitheredLineMain_58B97` | 298 | seg119 | Tracé de ligne pointillée/dégradée (rendu 3D) |
 | `Music_SequencerTickDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
 | `Music_TuneTransitionResolve_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |
-| `Weapon_HUDBox_ComputeGeometry_58F42` | 143 | seg121 | Géométrie de boîte de ciblage HUD |
-| `Weapon_HUDBox_DrawElementC_590E0` | 190 | seg121 | Élément de dessin de boîte de ciblage HUD |
-| `Weapon_HUDBox_UpdateGeometryAndTimer_59B10` | 239 | seg122 | Mise à jour géométrie+minuterie de la boîte HUD |
-| `Weapon_HUDBox_MasterUpdate_59CFA` | 311 | seg122 | **Pilote principal du cluster HUD armement/séquenceur** |
+| `Music_IsEnemyOnPlayerSix_58F42` | 143 | seg121 | Géométrie de boîte de ciblage HUD |
+| `Music_ScanNearbyEnemies_590E0` | 190 | seg121 | Élément de dessin de boîte de ciblage HUD |
+| `SoundFX_CheckFlyBy_59B10` | 239 | seg122 | Mise à jour géométrie+minuterie de la boîte HUD |
+| `SoundFX_Tick_59CFA` | 311 | seg122 | **Pilote principal du cluster HUD armement/séquenceur** |
 | `Music_ChannelRegisterSequence_59FF5` | 135 | seg123 | Traitement de la file du séquenceur à créneaux |
 | `Sound_LoadDriverAndTimbreCache_5A0F3` | 493 | seg124 | Gestionnaire de champ de saisie/édition de texte |
 | `Music_InstallXMITimbres_UNRESOLVED` | 189 | seg124 | Constructeur de widget de saisie (adresse non résolue) |

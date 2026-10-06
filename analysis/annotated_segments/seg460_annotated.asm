@@ -37,10 +37,10 @@ AudioQueue_Helper2_AB860	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle AIL_stop_digital_playback_60366 (seg161) — confirme un lien supplémentaire
-; entre ce cluster et le registre de modules.
+; Ex-'AudioQueue_OpcodeWrapper_AB883'. far. LUE 2026-10-06. AIL_stop_digital_playback_60366
+; sur le pilote voix.
 ; ==============================================================================================
-AudioQueue_OpcodeWrapper_AB883	proc far		; CODE XREF: VROOMM_StubThunk_6D05FJ
+Speech_StopPlayback_AB883	proc far		; CODE XREF: VROOMM_StubThunk_6D05FJ
 
 arg_0		= word ptr  6
 
@@ -56,11 +56,11 @@ arg_0		= word ptr  6
 		pop	cx
 		jmp	short $+2
 
-loc_AB89E:				; CODE XREF: AudioQueue_OpcodeWrapper_AB883+Bj
+loc_AB89E:				; CODE XREF: Speech_StopPlayback_AB883+Bj
 		pop	si
 		pop	bp
 		retf
-AudioQueue_OpcodeWrapper_AB883	endp
+Speech_StopPlayback_AB883	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -376,7 +376,7 @@ AudioQueue_LoadFromMultipleReaders_AB9D7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine AudioQueue_OpcodeWrapper_AB883, sub_E77, Heap_FreeAndCoalesce_5D30E (seg137).
+; far, combine Speech_StopPlayback_AB883, sub_E77, Heap_FreeAndCoalesce_5D30E (seg137).
 ; ==============================================================================================
 AudioQueue_ReleaseAndCoalesce_ABAAD	proc far		; CODE XREF: VROOMM_StubThunk_6D05AJ
 

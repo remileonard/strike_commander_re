@@ -96,8 +96,8 @@ VROOMM_StubThunk_6CFB9	endp
 ; far, thunk fixe VROOMM (jmp sub_AA831) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CFBE	proc far		; CODE XREF: Widget_ApplyLayoutHelper_5A88F+15P
-		jmp	AudioQueue_AdvanceSlot_AA831
+VROOMM_StubThunk_6CFBE	proc far		; CODE XREF: Sound_StopAll_5A88F+15P
+		jmp	Music_StopAndResetCombat_AA831
 VROOMM_StubThunk_6CFBE	endp
 
 
@@ -149,8 +149,8 @@ VROOMM_StubThunk_6CFCD	endp
 ; far, thunk fixe VROOMM (jmp sub_AB16F) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CFD2	proc far		; CODE XREF: Widget_Helper_5A9BA+EP
-		jmp	AudioQueue_ActivateSlotOpcode_AB16F
+VROOMM_StubThunk_6CFD2	proc far		; CODE XREF: Music_Pause_5A9BA+EP
+		jmp	Music_PauseChannels_AB16F
 VROOMM_StubThunk_6CFD2	endp
 
 
@@ -162,8 +162,8 @@ VROOMM_StubThunk_6CFD2	endp
 ; far, thunk fixe VROOMM (jmp sub_AB1AF) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CFD7	proc far		; CODE XREF: Widget_Helper_5A9D0+EP
-		jmp	AudioQueue_DeactivateSlotOpcode_AB1AF
+VROOMM_StubThunk_6CFD7	proc far		; CODE XREF: Music_Resume_5A9D0+EP
+		jmp	Music_ResumeChannels_AB1AF
 VROOMM_StubThunk_6CFD7	endp
 
 
@@ -175,8 +175,8 @@ VROOMM_StubThunk_6CFD7	endp
 ; far, thunk fixe VROOMM (jmp sub_AB1EF) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CFDC	proc far		; CODE XREF: Widget_Helper_5A9E6+12P
-		jmp	AudioQueue_ProcessSequencerSlots_AB1EF
+VROOMM_StubThunk_6CFDC	proc far		; CODE XREF: Music_Stop_5A9E6+12P
+		jmp	Music_StopWithFade_AB1EF
 VROOMM_StubThunk_6CFDC	endp
 
 seg335		ends

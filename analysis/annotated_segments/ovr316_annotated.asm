@@ -260,7 +260,7 @@ loc_9DAAF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+18Ej
 		push	0
 		push	large 0
 		push	0Ch
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_9DAC5:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910:loc_9D9ABj

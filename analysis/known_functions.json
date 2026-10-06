@@ -500,9 +500,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A6900) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=352F0h, codesize=391h, nentries=7."
   },
   "sub_AB770": {
-    "new_name": "AudioQueue_AdvanceSlotEntry_AB770",
+    "new_name": "SoundFX_StopAllChannels_AB770",
     "segment": "seg459",
-    "summary": "far, appelle Music_ChannelStopSequence_59F1D (seg123)."
+    "summary": "Ex-'AudioQueue_AdvanceSlotEntry_AB770'. far. LUE 2026-10-06. Arrete et libere les 5 canaux d'effets."
   },
   "unnamed_seg131_d": {
     "new_name": "Memory_TypedAllocDispatchF_UNRESOLVED",
@@ -1880,9 +1880,9 @@
     "summary": "far,427L — calcule le vecteur direction entre deux points d'attache de deux objets référencés (dword_6FBE5/E9, réutilise les globals de cache du seg080/effets), normalise (sub_54F57) : **candidat pour le calcul de connexion visuelle entre deux objets (câble de ravitaillement en vol, ou rayon de liaison), ou traitement de collision entre paires d'objets**, à approfondir."
   },
   "sub_AB1EF": {
-    "new_name": "AudioQueue_ProcessSequencerSlots_AB1EF",
+    "new_name": "Music_StopWithFade_AB1EF",
     "segment": "seg458",
-    "summary": "⭐⚠️ far, 123 lignes, NON DÉTAILLÉE — appelle directement `Music_ChannelStopSequence_59F1D` (seg123, ×2) et les thunks d'opcode du registre de modules (`AIL_sequence_status_603DE` probe, `_B1_603F0`, `_AF_603E4`) — cœur du traitement des emplacements actifs de la file audio/séquenceur."
+    "summary": "Ex-'AudioQueue_ProcessSequencerSlots_AB1EF'. far. LUE 2026-10-06. (musique, fondu) : piste demandee = 0xFFFF, canal de transition arrete ; si fondu et piste principale en cours : AIL_set_relative_volume_603F0(0, 1000 ms) puis attente active jusqu'a volume nul (AIL_relative_volume_603E4) ; arrete le canal principal."
   },
   "sub_6C4ED": {
     "new_name": "VROOMM_StubThunk_6C4ED",
@@ -2615,9 +2615,9 @@
     "summary": "⚠️ far, 105 lignes, NON DÉTAILLÉE — combine allocateurs typés, ReadFieldGroupA_64A19, `GlyphObject_ComputeMetrics_60456` (seg162) — chargement de métriques de glyphe depuis IFF."
   },
   "sub_598A6": {
-    "new_name": "Weapon_HUDBox_TimerCaseC_598A6",
+    "new_name": "SoundFX_FindFreeChannel_598A6",
     "segment": "seg122",
-    "summary": "far, appelle sub_603DE (sous-fonction du sous-système minuteur, seg121) — référencée par sub_59902."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseC_598A6'. far. LUE 2026-10-06. Systeme d'effets sonores : 5 canaux de sequence XMIDI a +0x92 (pas 0x11 : struct canal, +0xE = numero d'effet, 0x0F = libre, +0xF = emetteur). Renvoie le premier canal dont la sequence ne joue pas (AIL_sequence_status_603DE != 1), ou -1."
   },
   "sub_6BC6F": {
     "new_name": "VROOMM_StubThunk_6BC6F",
@@ -2905,9 +2905,9 @@
     "summary": "far, appelle CRT_MemFamily_Extra1."
   },
   "sub_AB583": {
-    "new_name": "AudioQueue_AdvanceWrapper_AB583",
+    "new_name": "SoundFX_StopAllEntry_AB583",
     "segment": "seg459",
-    "summary": "far, appelle AudioQueue_AdvanceSlotEntry_AB770."
+    "summary": "Ex-'AudioQueue_AdvanceWrapper_AB583'. far. LUE 2026-10-06. Facade de SoundFX_StopAllChannels_AB770."
   },
   "sub_9416A": {
     "new_name": "ResourceFile_LoadTypeG_9416A",
@@ -2930,9 +2930,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9BDE9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=29A70h, codesize=7CCh, nentries=9."
   },
   "sub_59AD7": {
-    "new_name": "Weapon_HUDBox_TimerCaseG_59AD7",
+    "new_name": "SoundFX_IsPlaying_59AD7",
     "segment": "seg122",
-    "summary": "far, aucun appel externe visible (calcul autonome). Référencée par sub_59B10 et sub_59CFA."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseG_59AD7'. far. LUE 2026-10-06. Vrai si l'effet (effet, emetteur) occupe un canal."
   },
   "sub_29036": {
     "new_name": "Object_DestructGeneric_29036",
@@ -3035,9 +3035,9 @@
     "summary": "far, appelle `GlyphObject_ScalarDeletingDtorA_6070E`."
   },
   "sub_5A9BA": {
-    "new_name": "Widget_Helper_5A9BA",
+    "new_name": "Music_Pause_5A9BA",
     "segment": "seg125",
-    "summary": "far, appelle sub_6CFD2. Référencée par sub_8EEBC."
+    "summary": "Ex-'Widget_Helper_5A9BA'. far. LUE 2026-10-06. Facade : Music_PauseChannels_AB16F."
   },
   "sub_6B507": {
     "new_name": "VROOMM_StubThunk_6B507",
@@ -3370,9 +3370,9 @@
     "summary": "far, itère sur les lignes d'un texte (compte via sub_625CC), calcule la largeur de chaque ligne (sub_5E74E) et retourne le maximum — probable calcul de largeur de boîte de texte multi-lignes. Référencée par sub_97215 et sub_A60AC."
   },
   "sub_59A8A": {
-    "new_name": "Weapon_HUDBox_TimerCaseF_59A8A",
+    "new_name": "SoundFX_StopEffect_59A8A",
     "segment": "seg122",
-    "summary": "far, utilise sub_59F1D. Référencée par sub_59CFA."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseF_59A8A'. far. LUE 2026-10-06. Arrete l'effet (effet, emetteur) et libere son canal."
   },
   "sub_56DC5": {
     "new_name": "Map_ApplyRotationTransform_56DC5",
@@ -3737,7 +3737,7 @@
   "sub_8FDC0": {
     "new_name": "Cockpit_LoadAndDrawCalibration_8FDC0",
     "segment": "ovr266",
-    "summary": "⚠️ far, 322 lignes, NON DÉTAILLÉE — combine `Widget_Helper_5A9E6` (seg125), StreamReader, `Joystick_GetButtonRawByte_67B82`/`InitCalibrationDefaults_67B92` (seg208), `Render_MeasureOrDrawTextString_61F52`."
+    "summary": "⚠️ far, 322 lignes, NON DÉTAILLÉE — combine `Music_Stop_5A9E6` (seg125), StreamReader, `Joystick_GetButtonRawByte_67B82`/`InitCalibrationDefaults_67B92` (seg208), `Render_MeasureOrDrawTextString_61F52`."
   },
   "sub_6887B": {
     "new_name": "VROOMM_EvictOldestBlock_6887B",
@@ -3995,9 +3995,9 @@
     "summary": "far, aucun appel externe visible (92 lignes)."
   },
   "sub_5AA95": {
-    "new_name": "Widget_Helper_5AA95",
+    "new_name": "SoundFX_StopAll_5AA95",
     "segment": "seg125",
-    "summary": "far, appelle sub_6D029 (variante). Référencée par sub_26F7E."
+    "summary": "Ex-'Widget_Helper_5AA95'. far. LUE 2026-10-06. Arrete tous les canaux d'effets (SoundFX_StopAllChannels_AB770)."
   },
   "sub_6CE2E": {
     "new_name": "VROOMM_StubThunk_6CE2E",
@@ -4990,9 +4990,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A31C9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_58ED5": {
-    "new_name": "Weapon_HUDBox_DrawElementA_58ED5",
+    "new_name": "Music_IsMissileTargetingPlayer_58ED5",
     "segment": "seg121",
-    "summary": "far, dispatch vtable (2 appels), référencée par sub_59302 — élément de dessin pour un réticule/boîte de ciblage HUD."
+    "summary": "Ex-'Weapon_HUDBox_DrawElementA_58ED5'. far. LUE 2026-10-06. Parcourt les objets du monde (World_IterateObjects) : vrai si un objet de categorie 8 (missile, vtable+8) a pour cible [obj+0x55] le joueur (word_722E6)."
   },
   "sub_6CC1A": {
     "new_name": "VROOMM_StubThunk_6CC1A",
@@ -5975,9 +5975,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A2CB7) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31380h, codesize=1B3h, nentries=6."
   },
   "sub_AB16F": {
-    "new_name": "AudioQueue_ActivateSlotOpcode_AB16F",
+    "new_name": "Music_PauseChannels_AB16F",
     "segment": "seg458",
-    "summary": "⭐ far, appelle deux fois `AIL_stop_sequence_603D2` (seg161, thunk d'activation d'emplacement du registre de modules) — confirme que ce cluster utilise directement les thunks d'opcode du registre de modules découverts en seg161."
+    "summary": "Ex-'AudioQueue_ActivateSlotOpcode_AB16F'. far. LUE 2026-10-06. AIL_stop_sequence_603D2 sur les deux canaux musicaux (principal 5BE3h et transition 5BF5h) : pause (la position est gardee)."
   },
   "sub_67F8A": {
     "new_name": "TextScrollDisplayB_UpdateObjectState_67F8A",
@@ -6027,7 +6027,7 @@
   "sub_9E289": {
     "new_name": "TimedTrigger_SpawnAndBindGeometry_9E289",
     "segment": "seg432",
-    "summary": "⭐⚠️ far, 419 lignes, NON DÉTAILLÉE — combine AI_ComputeGeometryHelper_56E29 (seg116), HUD_ResolveNodePosition_547B1 (seg114), l'instanciation d'objet Effect_SpawnObject (sub_38B70, motif de `Trigger_TimedRangedSpawnOnce_4F351`, seg109), l'enregistrement de conteneur (sub_21F8D), la référence faible SetReference (sub_3A44E, mentionnée dans les notes du projet), l'ajout à liste membre (sub_3A40B ×2, dtor sub_3A3EC associé en seg109) et `Weapon_HUDBox_TimerCaseH_5A8DC` (seg125). Correspond très fortement au système de trigger/spawn temporisé du seg109, probablement son implémentation d'overlay réelle. Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 419 lignes, NON DÉTAILLÉE — combine AI_ComputeGeometryHelper_56E29 (seg116), HUD_ResolveNodePosition_547B1 (seg114), l'instanciation d'objet Effect_SpawnObject (sub_38B70, motif de `Trigger_TimedRangedSpawnOnce_4F351`, seg109), l'enregistrement de conteneur (sub_21F8D), la référence faible SetReference (sub_3A44E, mentionnée dans les notes du projet), l'ajout à liste membre (sub_3A40B ×2, dtor sub_3A3EC associé en seg109) et `SoundFX_Play_5A8DC` (seg125). Correspond très fortement au système de trigger/spawn temporisé du seg109, probablement son implémentation d'overlay réelle. Candidat prioritaire pour session dédiée."
   },
   "sub_67DEA": {
     "new_name": "OptionCounter_Set_67DEA",
@@ -6430,9 +6430,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_738E8) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0, codesize=15Ah, nentries=10."
   },
   "sub_5AA73": {
-    "new_name": "Widget_Helper_5AA73",
+    "new_name": "SoundFX_Disable_5AA73",
     "segment": "seg125",
-    "summary": "far, appelle sub_6D029. Référencée par sub_26F7E."
+    "summary": "Ex-'Widget_Helper_5AA73'. far. LUE 2026-10-06. Desactive les effets (byte_7236C = 0) apres avoir arrete tous les canaux."
   },
   "sub_97C5C": {
     "new_name": "MissionText_CopyBufferB_97C5C",
@@ -6445,9 +6445,9 @@
     "summary": "⚠️ far, 156 lignes, NON DÉTAILLÉE — libère 5 blocs typés (Memory_TypedFree_5C7B6 ×5)."
   },
   "sub_5A906": {
-    "new_name": "Weapon_HUDBox_TimerCaseI_5A906",
+    "new_name": "SoundFX_PlayOrUpdate_5A906",
     "segment": "seg125",
-    "summary": "far, combine Weapon_HUDBox_TimerCaseG_59AD7, TimerCaseD_59902 et TimerCaseE_599D3 (seg122). Référencée par sub_15FD3."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseI_5A906'. far. LUE 2026-10-06. Facade : demarre l'effet s'il ne joue pas, sinon met a jour son volume selon la distance."
   },
   "sub_6B10C": {
     "new_name": "VROOMM_StubThunk_6B10C",
@@ -6515,9 +6515,9 @@
     "summary": "Ex-'VROOMM_AllocateAndFinalize_6879E' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - COEUR DE LA LOGIQUE DE CHARGEMENT A LA DEMANDE : incremente un compteur de chargement (word_6D16A), calcule si le segment demande est deja en memoire (VROOMM_ComputeAvailableOffset_689C9) ou doit etre charge/remplace (LRU - libere le segment le moins recemment utilise via VROOMM_EvictOldestBlock_6887B si necessaire)."
   },
   "sub_59CFA": {
-    "new_name": "Weapon_HUDBox_MasterUpdate_59CFA",
+    "new_name": "SoundFX_Tick_59CFA",
     "segment": "seg122",
-    "summary": "⚠️ far, 311 lignes, NON DÉTAILLÉE — la plus grosse fonction du cluster Weapon_HUDBox/minuteur : orchestre sub_59B10, sub_599D3, sub_59902, sub_59A8A, sub_59AD7. Candidat prioritaire pour session dédiée (probable pilote principal de l'indicateur HUD à clignotement synchronisé au minuteur matériel)."
+    "summary": "Ex-'Weapon_HUDBox_MasterUpdate_59CFA'. far. LUE 2026-10-06. Tick des effets : libere les canaux termines (statut 2) ; SoundFX_CheckFlyBy_59B10 ; SON MOTEUR : si l'objet vu est un avion dont le moteur ([+0x55]) a une manette +0x1E >= 1 : effet 0x0D joue ou mis a jour selon la distance, et pitch-bend MIDI 0xE1 = 0x4000 + (cran - 5) x 0x600 envoye par AIL_send_channel_voice_message_60420 quand il change ; sinon effet 0x0D arrete."
   },
   "sub_6AAD0": {
     "new_name": "VROOMM_StubThunk_6AAD0",
@@ -6915,9 +6915,9 @@
     "summary": "far, aucun appel externe visible (rôle exact non détaillé)."
   },
   "sub_5AA02": {
-    "new_name": "Weapon_HUDBox_InstantiateInstance_5AA02",
+    "new_name": "Music_SelectStartTune_5AA02",
     "segment": "seg125",
-    "summary": "far, instancie le cluster HUD armement : appelle Music_CombatIntensitySelector_59302, Weapon_HUDBox_DrawElementC_590E0 et Music_RequestTune_5A984. Référencée par sub_26F7E."
+    "summary": "Ex-'Weapon_HUDBox_InstantiateInstance_5AA02'. far. LUE 2026-10-06. Piste de depart (appelee par Cockpit_LoadAndDrawCalibration_8FDC0) : si Music_CombatIntensitySelector_59302 ne choisit rien : ennemis proches (Music_ScanNearbyEnemies_590E0) -> 4 si byte_70869 sinon 0x13 ; sinon piste de la mission byte_706A2 (chunk TUNE) ; Music_RequestTune_5A984."
   },
   "unnamed_seg160_a": {
     "new_name": "Runtime_FatalErrorHandlerWithTag_UNRESOLVED",
@@ -7300,9 +7300,9 @@
     "summary": "near — dispatcher table 6 octets/entrée : cherche l'entrée de priorité minimale non traitée et l'exécute ; boucle jusqu'à épuisement (exit-handlers ordonnés, type atexit)."
   },
   "sub_59B10": {
-    "new_name": "Weapon_HUDBox_UpdateGeometryAndTimer_59B10",
+    "new_name": "SoundFX_CheckFlyBy_59B10",
     "segment": "seg122",
-    "summary": "⚠️ far, 239 lignes, NON DÉTAILLÉE — combine dispatch vtable, Targeting_ComputeBearingElevation_55B1A (seg116), Weapon_HUDBox_TimerCaseG_59AD7 et Weapon_HUDBox_TimerCaseD_59902. Référencée par sub_59CFA. Candidat pour session dédiée (probable indicateur clignotant de contre-mesure/alerte sur le HUD)."
+    "summary": "Ex-'Weapon_HUDBox_UpdateGeometryAndTimer_59B10'. far. LUE 2026-10-06. Bruit de passage : pour chaque avion (categorie 6) autre que l'objet vu (word_72A8F) a moins de 200 du point de vue, si l'angle entre sa trajectoire et la ligne de vue depasse 30 deg et que l'effet 0x0B ne joue pas : SoundFX_Play3D_59902(0x0B, distance). Ignore la frame ou l'objet vu change."
   },
   "unnamed_seg155_b": {
     "new_name": "Video_PrintFormattedMessage_UNRESOLVED",
@@ -7875,9 +7875,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_AA7A4) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
   },
   "sub_5A8DC": {
-    "new_name": "Weapon_HUDBox_TimerCaseH_5A8DC",
+    "new_name": "SoundFX_Play_5A8DC",
     "segment": "seg125",
-    "summary": "far, appelle Weapon_HUDBox_TimerCaseD_59902 (seg122). Référencée par sub_3863A."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseH_5A8DC'. far. LUE 2026-10-06. Facade publique (si effets actifs, byte_7236C, objet word_7099B) : SoundFX_Play3D_59902(effet, distance, emetteur)."
   },
   "unnamed_seg153_a": {
     "new_name": "FontStyle_ApplyVariantA_UNRESOLVED",
@@ -7890,9 +7890,9 @@
     "summary": "far, même motif que MissionScenario_ReleaseStreamA_A93E0."
   },
   "sub_5AB2C": {
-    "new_name": "Widget_Helper_5AB2C",
+    "new_name": "Speech_QueryStatus_5AB2C",
     "segment": "seg125",
-    "summary": "far, appelle sub_6D09A. Référencée par sub_BD3F."
+    "summary": "Ex-'Widget_Helper_5AB2C'. far. LUE 2026-10-06. Facade voix appelee par RadioQueue_RegisterMessage : AudioQueue_OpcodeHelper_ABDAF (statut de lecture VOC)."
   },
   "sub_6CB19": {
     "new_name": "VROOMM_StubThunk_6CB19",
@@ -8067,7 +8067,7 @@
   "sub_869C0": {
     "new_name": "UIScreen_ClearAndLoadResource_869C0",
     "segment": "ovr249",
-    "summary": "far, combine `Video_ClearTextPage`, `Path_ResolveDataFile`, `Widget_Helper_5AAB2` (seg125)."
+    "summary": "far, combine `Video_ClearTextPage`, `Path_ResolveDataFile`, `Speech_LoadBank_5AAB2` (seg125)."
   },
   "sub_68254": {
     "new_name": "VROOMM_OpenAndParseOverlayFile_68254",
@@ -8320,9 +8320,9 @@
     "summary": "far, écrit le pointeur de fonction gestionnaire (word_7160C). Appelée par Keyboard_InstallHandlerMask_66F50."
   },
   "sub_5AB79": {
-    "new_name": "Weapon_HUDBox_FullUpdateCycle_5AB79",
+    "new_name": "Sound_FrameUpdate_5AB79",
     "segment": "seg125",
-    "summary": "far, orchestre le cycle complet du cluster HUD armement : Weapon_HUDBox_MasterUpdate_59CFA (seg122) puis Music_CombatIntensitySelector_59302 (seg121). Référencée par sub_26F7E."
+    "summary": "Ex-'Weapon_HUDBox_FullUpdateCycle_5AB79'. far. LUE 2026-10-06. Mise a jour son de chaque frame : SoundFX_Tick_59CFA, tick de la voix (AudioQueue_FinalizeAndRelease_ABDEC), et Music_CombatIntensitySelector_59302 une frame sur 16 ('test word_70466, 0Fh')."
   },
   "sub_60883": {
     "new_name": "Widget_ComputeAndStoreBounds_60883",
@@ -9660,9 +9660,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_99650) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=27750h, codesize=39Ch, nentries=3."
   },
   "sub_599D3": {
-    "new_name": "Weapon_HUDBox_TimerCaseE_599D3",
+    "new_name": "SoundFX_UpdateVolume3D_599D3",
     "segment": "seg122",
-    "summary": "⚠️ far, 113 lignes, NON DÉTAILLÉE — utilise sub_603F0/sub_59F1D. Référencée par sub_59CFA."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseE_599D3'. far. LUE 2026-10-06. Meme loi de volume que SoundFX_Play3D_59902 pour l'effet (effet, emetteur) en cours ; volume nul -> Music_ChannelStopSequence_59F1D et canal libere."
   },
   "sub_6C93C": {
     "new_name": "VROOMM_StubThunk_6C93C",
@@ -9765,9 +9765,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7ADFC) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=7830h, codesize=20Bh, nentries=2."
   },
   "sub_5AB09": {
-    "new_name": "Widget_Helper_5AB09",
+    "new_name": "Speech_SetField49_5AB09",
     "segment": "seg125",
-    "summary": "far, aucun appel externe visible. Référencée par sub_15155."
+    "summary": "Ex-'Widget_Helper_5AB09'. far. LUE 2026-10-06. Ecrit l'argument dans le champ +0x49 de l'objet voix (role non trace)."
   },
   "sub_6B1C4": {
     "new_name": "VROOMM_StubThunk_6B1C4",
@@ -10045,9 +10045,9 @@
     "summary": "far,125L — parcourt les 10 patches adjacents (+0xB5), calcule des données géométriques (buffer local) : **traitement des patches de terrain adjacents pour la continuité du maillage (raccord de LOD entre patches).**"
   },
   "sub_5A88F": {
-    "new_name": "Widget_ApplyLayoutHelper_5A88F",
+    "new_name": "Sound_StopAll_5A88F",
     "segment": "seg125",
-    "summary": "far, appelle sub_6CFBE/sub_6D01A/sub_6D05F (fonctions non encore documentées). Référencée par sub_A81E0."
+    "summary": "Ex-'Widget_ApplyLayoutHelper_5A88F'. far. LUE 2026-10-06. Arrete tout : musique avec fondu (Music_StopAndResetCombat_AA831), tous les effets (SoundFX_StopAllEntry_AB583), la voix (Speech_StopPlayback_AB883), chacun s'il est actif (byte_7236B / 7236C / 7236D)."
   },
   "sub_9ADC9": {
     "new_name": "Terrain_ReleaseFreeB_9ADC9",
@@ -10180,9 +10180,9 @@
     "summary": "⚠️ far, 138 lignes, NON DÉTAILLÉE — combine `Matrix_BuildFullOrientation_575B2` (seg116), `Utility_Helper_55E11`, allocation, copie de chaîne."
   },
   "sub_5AAB2": {
-    "new_name": "Widget_Helper_5AAB2",
+    "new_name": "Speech_LoadBank_5AAB2",
     "segment": "seg125",
-    "summary": "far, appelle sub_6D064. Référencée par sub_869C0."
+    "summary": "Ex-'Widget_Helper_5AAB2'. far. LUE 2026-10-06. Facade voix (byte_7236D, objet word_7099F) appelee par PilotProfile_LoadRADI_8DF49 : AudioQueue_LoadFromMultipleReaders_AB9D7."
   },
   "sub_9D610": {
     "new_name": "Camera_ConstructWithHandle_9D610",
@@ -10265,9 +10265,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A0ADC) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F010h, codesize=1DDh, nentries=4."
   },
   "sub_5AA49": {
-    "new_name": "Weapon_HUDBox_UpdateAndRenderVariant_5AA49",
+    "new_name": "Music_OnObjectDestroyed_5AA49",
     "segment": "seg125",
-    "summary": "far, appelle Music_SelectTuneCandidate_5923A (seg114). Référencée par `UIScreen_BuildWidgetTree` (sub_53A94, seg114)."
+    "summary": "Ex-'Weapon_HUDBox_UpdateAndRenderVariant_5AA49'. far. LUE 2026-10-06. Appelee par Combat_TeamOpposedCheckAndDispatch_53A94 a la destruction d'un objet : Music_SelectTuneCandidate_5923A(musique, 1, objet detruit)."
   },
   "sub_74FDB": {
     "new_name": "AircraftDamageComponent_ScalarDeletingDtorB_74FDB",
@@ -10457,7 +10457,7 @@
   "sub_59302": {
     "new_name": "Music_CombatIntensitySelector_59302",
     "segment": "seg121",
-    "summary": "Ex-'Weapon_HUDBox_Main_59302' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE DE COMBAT PAR INTENSITÉ, lue ligne à ligne intégralement. Anciennement Music_CombatIntensitySelector_59302. Plusieurs verrous de sortie précoce (byte_6E4B8, byte_6E4B4, byte_72A8E==0x0B, byte_72C90==0x14) désactivent toute l'évaluation — la piste en cours n'est alors pas modifiée. byte_6E4B8 est positionné dans Player_MainUpdate_13100 selon byte_72DE5/byte_72E1D (probable mort/éjection du joueur) ; byte_6E4B4 est une réaction dérivée, positionnée dans sub_53896 quand byte_6E4B8 est actif (avec appel à sub_6ADFA, probable séquence de mort/éjection, candidat pour la piste victoire/défaite). Si byte_72C90 (catégorie courante) == word_70859 (piste jouée) : calcule un ratio via Roster_SumAttributeB_43D0F × 100 / Roster_SumAttributeA_43CDC (probable pertes/effectif de l'escadrille ou score) et choisit di parmi {4,5,6,7,9,0x13} selon des seuils (≥0x4B=75%, ≥0x23=35%) et des booléens intermédiaires (Weapon_HUDBox_DrawElementA_58ED5, Weapon_HUDBox_DrawElementB_59061, word_722EE, byte_7086A bit0). Si aucune branche ne matche : délègue à Music_SelectTuneCandidate_5923A(si,0,0). Si di choisi : ÉCRASE word_70859 immédiatement. Point d'entrée périodique principal du système de musique de combat dynamique — voir MUSIC_SYSTEM.md §8.1."
+    "summary": "RELUE INTEGRALEMENT 2026-10-06 (remplace le resume de la session musique). far, 169L. CHOIX DE LA MUSIQUE DE COMBAT, une frame sur 16 (Sound_FrameUpdate_5AB79). Ne fait rien si byte_6E4B8 ou byte_6E4B4 (joueur mort / ejecte), si byte_72A8E == 0x0B, si la piste courante byte_72C90 vaut 0x14, ou si un changement est deja en attente (byte_72C90 != word_70859). c = Music_ScanNearbyEnemies_590E0 (ennemis a moins de 18 520 : bit 0 avion, bit 1 defense fixe / objet au sol) -> byte_7086A. Aucun ennemi proche : repli Music_SelectTuneCandidate_5923A(musique, 0, 0). Sinon byte_70869 = 1 (un combat a eu lieu) et, dans l'ordre : piste 9 si un missile vise le joueur (Music_IsMissileTargetingPlayer_58ED5) ou si un avion IA attaque le joueur (word_722EE, pose via word_722EA par AI_SelectWeaponMask_9665) ; 5 si un avion ennemi est dans ses six heures (Music_AnyEnemyOnPlayerSix_59061) ; sinon d = dommages du joueur = SommeB x 100 / SommeA sur word_722E6+0x5E (meme formule que AI_EjectDecision_50FF) : 7 si d >= 75 %, 6 si d >= 35 % ; sinon 4 si un avion ennemi est proche (bit 0), 0x13 si seules des defenses fixes / objets au sol le sont. word_70859 = piste choisie (la transition est faite par Music_TuneTransitionResolve_595C2). Renvoie la piste ou -1."
   },
   "sub_5F3D5": {
     "new_name": "LinkedList_Helper_5F3D5",
@@ -11212,7 +11212,7 @@
   "sub_AB7A4": {
     "new_name": "AudioQueue_AdvanceAndRelease_AB7A4",
     "segment": "seg459",
-    "summary": "far, combine AudioQueue_AdvanceSlotEntry_AB770 et Memory_TypedFree_5C7B6."
+    "summary": "far, combine SoundFX_StopAllChannels_AB770 et Memory_TypedFree_5C7B6."
   },
   "sub_6C5AA": {
     "new_name": "VROOMM_StubThunk_6C5AA",
@@ -11977,7 +11977,7 @@
   "sub_5923A": {
     "new_name": "Music_SelectTuneCandidate_5923A",
     "segment": "seg121",
-    "summary": "Ex-'Weapon_HUDBox_UpdateAndRender_5923A' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — DÉCISION DE PISTE (cascade de priorité), lue ligne à ligne intégralement. Anciennement Music_SelectTuneCandidate_5923A. Calcule un candidat di=0xFFFF par défaut, puis l'affine selon une cascade : (1) si arg_2!=0, appelle Weapon_HUDBox_DrawElementC_590E0 et compare des bits de byte_7086A/résultat → di=0x13 (combat) ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET Parser_LookaheadPattern_1CB83([+0x68]) renvoie vrai → di=0x0C ; (3) sinon, si byte_70869 est positionné → di=0x0D (et le flag est consommé). Si un candidat a été choisi (di!=0xFFFF) : ÉCRASE IMMÉDIATEMENT word_70859. Retourne un booléen 'changement effectué'. Appelée par Music_CombatIntensitySelector_59302 (en dernier recours) et par sub_5AA49 (seg125, non détaillée)."
+    "summary": "Ex-'Weapon_HUDBox_UpdateAndRender_5923A' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — DÉCISION DE PISTE (cascade de priorité), lue ligne à ligne intégralement. Anciennement Music_SelectTuneCandidate_5923A. Calcule un candidat di=0xFFFF par défaut, puis l'affine selon une cascade : (1) si arg_2!=0, appelle Music_ScanNearbyEnemies_590E0 et compare des bits de byte_7086A/résultat → di=0x13 (combat) ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET Parser_LookaheadPattern_1CB83([+0x68]) renvoie vrai → di=0x0C ; (3) sinon, si byte_70869 est positionné → di=0x0D (et le flag est consommé). Si un candidat a été choisi (di!=0xFFFF) : ÉCRASE IMMÉDIATEMENT word_70859. Retourne un booléen 'changement effectué'. Appelée par Music_CombatIntensitySelector_59302 (en dernier recours) et par sub_5AA49 (seg125, non détaillée). RELUE 2026-10-06 : (musique, mode, objet detruit). Mode 1 (Music_OnObjectDestroyed_5AA49) : nouveau scan sans l'objet detruit ; s'il y avait un avion ennemi proche (bit 0 de byte_7086A) et qu'il n'y en a plus -> 0x13 ; si plus aucun ennemi et qu'il y en avait -> etape suivante. Mode 0 (aucun ennemi, depuis Music_CombatIntensitySelector_59302) -> etape suivante. Etape : execute l'expression de la mission ([word_706A0+0x4E], Expr_VM_ExecuteSingleInstruction_51E7E) ; si [+0xA1] et Parser_LookaheadPattern([+0x68]) -> 0x0C ; sinon si byte_70869 (un combat a eu lieu) -> 0x0D, une seule fois (byte_70869 = 0)."
   },
   "sub_6B8BA": {
     "new_name": "VROOMM_StubThunk_6B8BA",
@@ -12005,9 +12005,9 @@
     "summary": "far, combine MissionScenario_ResolveFieldEntryB_A8BA9 et Expr_LookupTableEntry85B_52D45."
   },
   "sub_590E0": {
-    "new_name": "Weapon_HUDBox_DrawElementC_590E0",
+    "new_name": "Music_ScanNearbyEnemies_590E0",
     "segment": "seg121",
-    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — dispatch vtable multiple, longueur vectorielle (sub_5828E). Référencée par sub_5923A."
+    "summary": "Ex-'Weapon_HUDBox_DrawElementC_590E0'. far. LUE 2026-10-06. (ctx, objet a ignorer) : parcourt les objets du monde, categories 6 (avion), 0x13 (defense fixe), 0x14 (objet au sol), 0x15 (XMIT) via vtable+0x34 ; ignore un avion dont le pilote s'est ejecte (bit 5 de flags_75) ; pour un objet du camp adverse ([+0x50] == 0xFF) a moins de 18 520 du joueur ('cmp ..., 4858h') : bit 0 = avion, bit 1 = autre. Renvoie ces bits (s'arrete quand les deux sont poses)."
   },
   "sub_6BE1F": {
     "new_name": "VROOMM_StubThunk_6BE1F",
@@ -14255,9 +14255,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_AB583) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=3A370h, codesize=316h, nentries=6."
   },
   "sub_AB1AF": {
-    "new_name": "AudioQueue_DeactivateSlotOpcode_AB1AF",
+    "new_name": "Music_ResumeChannels_AB1AF",
     "segment": "seg458",
-    "summary": "⭐ far, appelle deux fois `AIL_resume_sequence_603D8` (seg161, thunk de désactivation d'emplacement)."
+    "summary": "Ex-'AudioQueue_DeactivateSlotOpcode_AB1AF'. far. LUE 2026-10-06. AIL_resume_sequence_603D8 sur les deux canaux musicaux."
   },
   "sub_6CE56": {
     "new_name": "VROOMM_StubThunk_6CE56",
@@ -14667,7 +14667,7 @@
   "sub_9F784": {
     "new_name": "PlayerComponent_FormatAndDisplay_9F784",
     "segment": "seg432",
-    "summary": "⚠️ far, 87 lignes, NON DÉTAILLÉE — combine sub_3FD (formatage), sub_43D43, PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, `Weapon_HUDBox_TimerCaseJ_5A95E` (seg125). Référencée via jmp depuis un stub VROOMM (sub_6C41B)."
+    "summary": "⚠️ far, 87 lignes, NON DÉTAILLÉE — combine sub_3FD (formatage), sub_43D43, PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, `SoundFX_Stop_5A95E` (seg125). Référencée via jmp depuis un stub VROOMM (sub_6C41B)."
   },
   "sub_661AF": {
     "new_name": "TextRenderer_LoadResourceFile_661AF",
@@ -14955,9 +14955,9 @@
     "summary": "far, référencée par sub_29A7D (rôle exact non détaillé, hors cluster identifié)."
   },
   "sub_AB883": {
-    "new_name": "AudioQueue_OpcodeWrapper_AB883",
+    "new_name": "Speech_StopPlayback_AB883",
     "segment": "seg460",
-    "summary": "⭐ far, appelle `AIL_stop_digital_playback_60366` (seg161) — confirme un lien supplémentaire entre ce cluster et le registre de modules."
+    "summary": "Ex-'AudioQueue_OpcodeWrapper_AB883'. far. LUE 2026-10-06. AIL_stop_digital_playback_60366 sur le pilote voix."
   },
   "sub_6B489": {
     "new_name": "VROOMM_StubThunk_6B489",
@@ -14967,7 +14967,7 @@
   "sub_A81E0": {
     "new_name": "MissionScenario_ConstructAndBindUI_A81E0",
     "segment": "seg456",
-    "summary": "far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124, `Widget_ApplyLayoutHelper_5A88F` (seg125), MissionScenario_LoadFromIFF_A8C44, `PagedResourceB_Helper_5D859` (seg138) — construction et liaison à l'interface d'un scénario de mission chargé."
+    "summary": "far, combine sub_6CDC3, MissionScenario_ConstructFieldChain_A8124, `Sound_StopAll_5A88F` (seg125), MissionScenario_LoadFromIFF_A8C44, `PagedResourceB_Helper_5D859` (seg138) — construction et liaison à l'interface d'un scénario de mission chargé."
   },
   "sub_6C77B": {
     "new_name": "VROOMM_StubThunk_6C77B",
@@ -15230,9 +15230,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9D610) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2BA30h, codesize=15Dh, nentries=1."
   },
   "sub_5A95E": {
-    "new_name": "Weapon_HUDBox_TimerCaseJ_5A95E",
+    "new_name": "SoundFX_Stop_5A95E",
     "segment": "seg125",
-    "summary": "far, appelle Weapon_HUDBox_TimerCaseF_59A8A (seg122). Référencée par sub_15138."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseJ_5A95E'. far. LUE 2026-10-06. Facade : SoundFX_StopEffect_59A8A(effet, emetteur)."
   },
   "sub_66CF5": {
     "new_name": "Keyboard_PeekOrPopEvent_66CF5",
@@ -15362,12 +15362,12 @@
   "sub_ABAAD": {
     "new_name": "AudioQueue_ReleaseAndCoalesce_ABAAD",
     "segment": "seg460",
-    "summary": "far, combine AudioQueue_OpcodeWrapper_AB883, sub_E77, Heap_FreeAndCoalesce_5D30E (seg137)."
+    "summary": "far, combine Speech_StopPlayback_AB883, sub_E77, Heap_FreeAndCoalesce_5D30E (seg137)."
   },
   "sub_59061": {
-    "new_name": "Weapon_HUDBox_DrawElementB_59061",
+    "new_name": "Music_AnyEnemyOnPlayerSix_59061",
     "segment": "seg121",
-    "summary": "far, dispatch vtable + appel à Weapon_HUDBox_ComputeGeometry_58F42. Référencée par sub_59302."
+    "summary": "Ex-'Weapon_HUDBox_DrawElementB_59061'. far. LUE 2026-10-06. Vrai si un avion (categorie 6) du camp adverse ([obj+0x50] == 0xFF), autre que le joueur, verifie Music_IsEnemyOnPlayerSix_58F42."
   },
   "sub_1F21D": {
     "new_name": "Text_ComputeCumulativeWidth",
@@ -15755,9 +15755,9 @@
     "summary": "far,46L — appelle sub_2B5F9 puis résout une couleur via texte/texture si index négatif (même table 0x72528 que sub_298F5, seg055) : **setup d'arête avec résolution de texture/couleur spéciale.**"
   },
   "sub_59902": {
-    "new_name": "Weapon_HUDBox_TimerCaseD_59902",
+    "new_name": "SoundFX_Play3D_59902",
     "segment": "seg122",
-    "summary": "⚠️ far, 113 lignes, NON DÉTAILLÉE — combine Weapon_HUDBox_TimerCaseC_598A6 et les fonctions du sous-système minuteur (59FF5/603F0/603CC). Référencée par sub_59B10 et sub_59CFA."
+    "summary": "Ex-'Weapon_HUDBox_TimerCaseD_59902'. far. LUE 2026-10-06. (systeme, effet, distance, emetteur) : volume = 100 - d/10 si d < 1000, 5 si d < 5000, sinon rien ; sur un canal libre : Music_ChannelRegisterSequence_59FF5 (sequence de l'effet en systeme+6+effet x 10), AIL_set_relative_volume_603F0, AIL_start_sequence_603CC ; memorise effet et emetteur."
   },
   "sub_60A84": {
     "new_name": "Widget_Method_DispatchChain_60A84",
@@ -15895,9 +15895,9 @@
     "summary": "far, lit une entrée via StreamReader_ReadTyped_63FA1, gestion d'erreur (Runtime_FatalErrorHandlerWithTag). Appelée deux fois par sub_65E2C."
   },
   "sub_AA831": {
-    "new_name": "AudioQueue_AdvanceSlot_AA831",
+    "new_name": "Music_StopAndResetCombat_AA831",
     "segment": "seg458",
-    "summary": "far, appelle AudioQueue_ProcessMain_AB1EF."
+    "summary": "Ex-'AudioQueue_AdvanceSlot_AA831'. far. LUE 2026-10-06. Music_StopWithFade_AB1EF(fondu) puis remet a zero byte_70869 (un combat a eu lieu) et byte_7086A (ennemis proches)."
   },
   "sub_6C3DF": {
     "new_name": "VROOMM_StubThunk_6C3DF",
@@ -16775,9 +16775,9 @@
     "summary": "far,38L — attache un sous-composant (sub_37C89), copie un identifiant de cible (+0x35), reset (sub_3DC27), copie un flag depuis la cible référencée (+0xE→+0x54) : **initialisation de la caméra externe attachée avec copie de paramètres cible.**"
   },
   "sub_5A9E6": {
-    "new_name": "Widget_Helper_5A9E6",
+    "new_name": "Music_Stop_5A9E6",
     "segment": "seg125",
-    "summary": "far, appelle sub_6CFDC. Référencée par sub_26F7E (proche de UIScreen_StateMachineMain_4FBF1)."
+    "summary": "Ex-'Widget_Helper_5A9E6'. far. LUE 2026-10-06. Facade (appelee par STRIKE_EXE_MAIN_LOOP) : Music_StopWithFade_AB1EF(fondu = argument)."
   },
   "sub_A39B7": {
     "new_name": "GaugeWidget_QueryRenderState_A39B7",
@@ -16800,9 +16800,9 @@
     "summary": "near — trampoline indirect vers off_71E36 : vecteur d'erreur mémoire configurable #3."
   },
   "sub_5AAD7": {
-    "new_name": "Widget_Helper_5AAD7",
+    "new_name": "Speech_PlayClip_5AAD7",
     "segment": "seg125",
-    "summary": "far, appelle sub_6D095. Référencée par sub_15155."
+    "summary": "Ex-'Widget_Helper_5AAD7'. far. LUE 2026-10-06. Facade voix appelee par Audio_LoadSpeechClip : AudioQueue_MainProcessEntry_ABBEF (lecture VOC via AIL_play_VOC_file_6034E)."
   },
   "sub_2B06C": {
     "new_name": "Path_ResolveDataFile",
@@ -17480,9 +17480,9 @@
     "summary": "Ex-'MVRS_ID21_TickApplyGuidance_11A04'. far, ~55 lignes - LUE INTEGRALEMENT. Methode [vtable+0x10] (tick periodique) du noeud MVRS_ID21. Decompte le minuteur (node+0xD -= dword_70458), relit le vecteur stocke par MVRS_ID20_ApplyStoreNavCommand_1195A, ecrit une valeur fixe (0xA=10) dans entite+7+0x1E (statut sur le sous-objet partage). Si le minuteur est epuise : appelle NotifiableRef_AttachTarget (reacquisition). Sinon : appelle AI_GuidanceCmd_FromOwnPos_75A9 avec le vecteur stocke - POINT D'ENTREE DE LA CHAINE DE GUIDAGE GEOMETRIQUE (voir §4bis). | IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID 19 = GroundAttack_*) ; l'ancien nom portait un identifiant decale."
   },
   "sub_5A9D0": {
-    "new_name": "Widget_Helper_5A9D0",
+    "new_name": "Music_Resume_5A9D0",
     "segment": "seg125",
-    "summary": "far, appelle sub_6CFD7. Référencée par sub_8EEBC."
+    "summary": "Ex-'Widget_Helper_5A9D0'. far. LUE 2026-10-06. Facade : Music_ResumeChannels_AB1AF."
   },
   "sub_52AC6": {
     "new_name": "Expr_Node_UpdateAndPropagate_52AC6",
@@ -18155,9 +18155,9 @@
     "summary": "⚠️ far, 394 lignes, NON DÉTAILLÉE — lit une douzaine de champs IFF (ReadFinalField_64B51 répété) — chargement de définition de widget."
   },
   "sub_58F42": {
-    "new_name": "Weapon_HUDBox_ComputeGeometry_58F42",
+    "new_name": "Music_IsEnemyOnPlayerSix_58F42",
     "segment": "seg121",
-    "summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — combine Vector_PrescaleBelow256_55B04, Targeting_ComputeBearingElevation_55B1A (seg116), dispatch vtable et Matrix_WorldToLocal_58768 — calcul géométrique pour l'affichage d'une boîte de ciblage HUD. Référencée par sub_59061."
+    "summary": "Ex-'Weapon_HUDBox_ComputeGeometry_58F42'. far. LUE 2026-10-06. (ctx, joueur, ennemi) : d = ennemi - joueur ; vrai si |d| x dword_7044C <= 3500 ('cmp eax, 0DACh'), si le joueur est a moins de 45 deg de l'axe de vitesse de l'ennemi (Targeting_ComputeBearingElevation_55B1A, 'cmp ..., 2Dh') et si l'ennemi est derriere le joueur (composante nez < 0 apres Matrix_WorldToLocal_58768)."
   },
   "sub_75290": {
     "new_name": "AircraftDamageComponentFamily_ScalarDeletingDtor_75290",
@@ -18392,7 +18392,7 @@
   "sub_AB44A": {
     "new_name": "AudioQueue_UnregisterAndCleanup_AB44A",
     "segment": "seg458",
-    "summary": "far, combine AudioQueue_ProcessSequencerSlots_AB1EF, Stopwatch_UnregisterTickModule_6769F (seg207), AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2)."
+    "summary": "far, combine Music_StopWithFade_AB1EF, Stopwatch_UnregisterTickModule_6769F (seg207), AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2)."
   },
   "sub_8DB1A": {
     "new_name": "UIWidget_Helper8_8DB1A",

@@ -92,7 +92,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 319 | `sub_8BAE8` | `MissionRecord_LoadFieldGroupMixB_8BAE8` | ovr255 |
 | 317 | `sub_9E027` | `PlayerComponent_ComputeGeometryComplex_9E027` | seg432 |
 | 314 | `sub_8C088` | `MissionRecord_LoadFieldGroupMixC_8C088` | ovr255 |
-| 311 | `sub_59CFA` | `Weapon_HUDBox_MasterUpdate_59CFA` | seg122 |
+| 311 | `sub_59CFA` | `SoundFX_Tick_59CFA` | seg122 |
 | 310 | `sub_8E450` | `AITargeting_LoadCalibrationRecordB_8E450` | ovr261 |
 | 301 | `sub_87A60` | `MissionText_LoadSubtitleRecord_87A60` | ovr251 |
 | 301 | `sub_7F6EE` | `Cockpit_ProcessInputFrame_7F6EE` | ovr241 |
@@ -134,7 +134,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 239 | `sub_A5D18` | `PlayerComponent_LoadFieldsMassive_A5D18` | seg449 |
 | 239 | `sub_A1AF9` | `PaletteScreen_DrawWidgetBackground_A1AF9` | seg442 |
 | 239 | `sub_9EDD4` | `PlayerComponent_LoadAndApply_9EDD4` | seg432 |
-| 239 | `sub_59B10` | `Weapon_HUDBox_UpdateGeometryAndTimer_59B10` | seg122 |
+| 239 | `sub_59B10` | `SoundFX_CheckFlyBy_59B10` | seg122 |
 | 232 | `sub_A6DF2` | `TriggerObject_SpawnAndBindFull_A6DF2` | seg453 |
 | 232 | `sub_8F720` | `Cockpit_ReadControlsFrame_8F720` | ovr266 |
 | 230 | `sub_9F286` | `PlayerComponent_OrchestrateComplex_9F286` | seg432 |
