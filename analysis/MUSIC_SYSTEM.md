@@ -372,8 +372,7 @@ combat.adl (niveau 1 — le fichier matériel, IndexedRecordReader)
 4. Boucle sur les entrées **1 à `word_70867`** du niveau 1 (l'entrée 0
    est sautée — déjà extraite séparément comme niveau 2) :
    - Lit 2 octets supplémentaires depuis `combat.dat` (séquentiel) →
-     champs `+0xA`/`+0xB` du descripteur (rôle non déterminé — priorité ?
-     bouclage ? volume ?)
+     champs `+0xA`/`+0xB` du descripteur (**résolu le 2026-10-06** : longueur de phrase en mesures et position sur la dernière mesure, §8.2bis)
    - `IndexedRecordReader_AdvanceIndex_65E2C(niveau1, i)` → taille de
      l'entrée
    - Alloue un buffer de cette taille (tag `0x5C44`, même pool que le
@@ -739,6 +738,28 @@ imbriquée — pas un saut à un marqueur à l'intérieur du flux cible.
 (structure `TransitionDescriptor`, 10 octets, §7.3), et `word_7084E` (la
 borne testée juste après) est exactement le nombre d'entrées de ce
 niveau 3.
+
+### 8.2bis Les transitions sont calées sur les mesures (lu le 2026-10-06)
+
+Le seul lien entre le code et le contenu des pistes est le **numéro de mesure** que renvoie le pilote
+(`AIL_measure_count_60402`). Les notes ne sont jamais examinées ; seules les indications de tempo et
+de mesure du fichier XMIDI comptent.
+
+1. Une piste est demandée → `Music_SequencerTickDispatch_59436` note la mesure courante
+   (`word_72C91 = AIL_measure_count`) et passe en attente.
+2. Il attend que ce numéro **change** — la prochaine barre de mesure — et seulement alors appelle
+   `Music_TuneTransitionResolve_595C2`.
+3. Celle-ci calcule la **position dans la phrase** : `(mesure mod longueur) + 1`, ou la valeur `+0xB`
+   si le reste est nul, avec `longueur = TrackDescriptor+0xA` de la piste courante. **Les deux octets
+   par piste de `combat.dat` (§7.3, « rôle inconnu ») sont donc la longueur de phrase en mesures et la
+   position à utiliser sur la dernière mesure.**
+4. La piste de transition jouée est `dword_7085D[dl][position]` : le morceau de liaison dépend de
+   l'endroit où l'on se trouve dans la phrase.
+
+**Pour le portage** : le lecteur XMIDI doit fournir le **numéro de mesure courant** (calculé depuis
+les méta-événements de tempo et de signature rythmique, comme `advance_count` de `XMIDI.ASM`) ; le
+changement de piste se fait à la barre suivante, avec la position dans la phrase pour choisir la
+liaison.
 
 ### 8.3 Deux canaux fixes, pas une file — `5BE3h` / `5BF5h`
 

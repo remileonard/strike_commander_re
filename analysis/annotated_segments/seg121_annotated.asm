@@ -903,7 +903,12 @@ loc_5942F:				; CODE XREF: seg121:055Aj
 ; anciennement Music_SequencerTickDispatch_59436. Aiguille vers
 ; Music_TuneTransitionResolve_595C2, Music_TuneTransitionCommit_5974D,
 ; Music_SequencerTickInit_597C2 et Music_SequencerTickCleanup_59817 selon l'état courant du
-; séquenceur musical.
+; séquenceur musical. PRECISE 2026-10-06 : LES CHANGEMENTS DE PISTE SONT CALES SUR LES
+; MESURES. Etat 1 (byte_70858) : si une piste est demandee (word_70859 != byte_72C90),
+; word_72C91 = AIL_measure_count_60402 (mesure courante du canal principal), etat 2. Etat 2 :
+; attend que le numero de mesure change ('cmp ax, word_72C91 / jnz'), c'est-a-dire la
+; prochaine barre de mesure, puis resout la transition (Music_TuneTransitionResolve_595C2). Si
+; la piste demandee redevient la piste courante entre-temps : retour a l'etat 1.
 ; ==============================================================================================
 Music_SequencerTickDispatch_59436:				; DATA XREF: seg121:off_595BAo
 		mov	ax, 4700h	; case 0x0
@@ -1153,7 +1158,12 @@ off_595BA	dw offset Music_SequencerTickDispatch_59436	; DATA XREF: seg121:0561r
 ; word_70856+(var_1-1)*10 ; > word_7084E → abandon, word_70859 réinitialisé à byte_72C90.
 ; CONFIRMÉ sur fichier réel (combat.dat, MUSIC_SYSTEM.md §7.5) : var_1 est l'index d'une piste
 ; de transition autonome dans l'archive imbriquée à 3 niveaux (§7.3) — PAS un saut de marqueur
-; façon RBRN. Voir MUSIC_SYSTEM.md §8.2.
+; façon RBRN. Voir MUSIC_SYSTEM.md §8.2. PRECISE 2026-10-06 : word_72C91 = position dans la
+; phrase : (mesure courante mod TrackDescriptor+0xA de la piste courante) + 1, ou
+; TrackDescriptor+0xB si le reste est nul ('idiv bx / mov word_72C91, dx / inc' sinon
+; '[si+0Bh]'). Donc +0xA = longueur de la phrase en mesures et +0xB = position a utiliser sur
+; la derniere mesure (valeurs lues dans combat.dat). La piste de transition choisie depend de
+; cette position : dword_7085D[dl][position].
 ; ==============================================================================================
 Music_TuneTransitionResolve_595C2	proc far		; CODE XREF: seg121:069Dp
 
