@@ -274,7 +274,11 @@ d'atterrissage.
 **Caméra arme.** Elle est lancée par `Mission_PlayerEventHandler`, appelé à chaque lancement d'arme
 (3 appels dans `HUD_RenderSymbologyMain` juste après le bruit de tir `SoundFX_Play_5A8DC` et la
 décrémentation du compteur de munitions, et 1 dans `TimedTrigger_SpawnAndBindGeometry_9E289`). Elle ne
-démarre que si le tireur est le joueur et que l'arme est de catégorie 8 (missile) ou 9 (bombe). Elle
+démarre que si le tireur est le joueur, que l'arme est de catégorie 8 (missile) ou 9 (bombe), **et
+que l'option « caméra automatique » est active** : c'est le champ `+0x11` testé par
+`Mission_PlayerEventHandler` (fait donné par Rémi) ; les valeurs 0x0B et 7 bloquent la caméra
+(`cmp byte ptr [si+11h],0Bh` / `cmp byte ptr [si+11h],7` → sortie). **Option désactivée = ni caméra
+arme, ni pistes 0x08 / 0x15.** Elle
 passe par `WeaponCam_Start_8285A` (arme suivie, lanceur, catégorie), puis `WeaponCam_Tick_82693` à chaque
 image, dont la phase 0 est `WeaponCam_LaunchPhase_80971`.
 
@@ -346,8 +350,8 @@ sur 16. `Sound_StopAll_5A88F` : arrête musique (avec fondu), effets et voix.
 
 ## 8. Questions ouvertes
 
-- Événements du §5.4 tracés ; restent : la condition `[+0x11]` ≠ 0x0B et ≠ 7 de
-  `Mission_PlayerEventHandler` (qui peut bloquer la caméra arme, donc 0x08 et 0x15) ; `byte_6E33B`
+- Événements du §5.4 tracés (le champ `+0x11` de `Mission_PlayerEventHandler` est l'option
+  « caméra automatique », fait donné par Rémi) ; restent : `byte_6E33B`
   (deuxième source de l'éjection) ; le drapeau `[+0x51]+0x20` et `byte_6E4D0` qui font accepter le
   contact au sol dans `Collision_OnTerrainContact_9D910`.
 - `byte_72A8E == 0x0B` (verrou du §5.1) et l'objet désigné par la mission (`VROOMM_StubThunk_6CE2E`,

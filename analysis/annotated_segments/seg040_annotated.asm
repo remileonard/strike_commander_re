@@ -588,9 +588,12 @@ Radar_TargetTypeFilter	endp
 ; juste après SoundFX_Play_5A8DC et la décrémentation du compteur de munitions [+0x13] ; 1
 ; appel dans TimedTrigger_SpawnAndBindGeometry_9E289 seg432). Ne s'active que si le tireur
 ; (arg_2) est le joueur (word_722E6), si la catégorie de l'arme (arg_4, vtable +0x34) vaut 9
-; (bombe) ou 8 (missile), et si [+0x11] ne vaut ni 0x0B ni 7. Lance alors la caméra arme
-; (EntityTracker_RenderByCode(0x0B), VROOMM_StubThunk_6AF85 → WeaponCam_Start_8285A,
-; EntityTracker_ApplySelection) et affiche « Weapon Camera ».
+; (bombe) ou 8 (missile), et si l'option de caméra automatique le permet : le champ +0x11 de
+; l'objet passé en premier argument (push 59CDh) est l'option « caméra automatique » (fait
+; donné par Rémi) ; la caméra arme n'est pas lancée si ce champ vaut 0x0B ou 7 (cmp byte ptr
+; [si+11h],0Bh / jnz puis cmp byte ptr [si+11h],7 / jnz, sinon jmp loc_233EE = sortie). Lance
+; alors la caméra arme (EntityTracker_RenderByCode(0x0B), VROOMM_StubThunk_6AF85 →
+; WeaponCam_Start_8285A, EntityTracker_ApplySelection) et affiche « Weapon Camera ».
 ; ==============================================================================================
 Mission_PlayerEventHandler	proc far		; CODE XREF: HUD_RenderSymbologyMain+780P
 					; HUD_RenderSymbologyMain+B29P ...
