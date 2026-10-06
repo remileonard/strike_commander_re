@@ -615,25 +615,25 @@ callbacks temporisés matériels**, jusqu'ici invisible derrière les
 « fonctions `sub_603xx` non documentées » signalées dans les sessions
 précédentes (cluster séquenceur seg121-123) :
 
-- **`ModuleRegistry_HookTimerIRQ_5FCCA`** détourne le vecteur d'interruption
+- **`AIL_hook_timer_process_5FCCA`** détourne le vecteur d'interruption
   matérielle **IRQ0 (INT 8, minuteur)** : sauvegarde l'ancien vecteur, en
-  installe un nouveau pointant vers `ModuleRegistry_TimerISR_5FBBE`.
-- **`ModuleRegistry_ProgramPITFrequency_5FD3A`** reprogramme directement la
+  installe un nouveau pointant vers `AIL_API_timer_ISR_5FBBE`.
+- **`AIL_set_PIT_divisor_5FD3A`** reprogramme directement la
   puce **8253/8254 (PIT)** (ports 0x43/0x40) pour changer la cadence du
-  tic matériel — `ModuleRegistry_SetTickRateHz_5FD5D` convertit une
+  tic matériel — `AIL_set_PIT_period_5FD5D` convertit une
   fréquence en Hz vers le diviseur approprié.
-- **`ModuleRegistry_RegisterModule_5FF08`** / **`UnregisterModule_5FFBD`**
+- **`AIL_register_timer_5FF08`** / **`UnregisterModule_5FFBD`**
   gèrent une **table de 16 emplacements** ; chaque module enregistré fournit
   un pointeur de gestionnaire (far ptr) et une cadence. Au premier
   enregistrement, le système s'initialise et détourne IRQ0 ; au dernier
   désenregistrement, il restaure tout.
-- **`ModuleRegistry_TimerISR_5FBBE`** (le corps de l'ISR installée) : à
+- **`AIL_API_timer_ISR_5FBBE`** (le corps de l'ISR installée) : à
   chaque tic matériel, parcourt les 16 emplacements actifs, accumule le
   temps écoulé, et **appelle le gestionnaire enregistré** dès que le seuil
   configuré est atteint — avec garde de réentrance, pile privée, et un
   auto-test d'intégrité (chaîne magique "Test") qui déclenche un `int 3`
   (trap debugger) en cas de corruption détectée.
-- **`ModuleRegistry_DispatchTrampoline_5FBA6`** est le point d'entrée commun
+- **`AIL_call_driver_5FBA6`** est le point d'entrée commun
   d'une **vingtaine de « thunks d'opcode »** dispersés dans des dizaines de
   segments (dont les `sub_603xx` du cluster séquenceur, mais aussi des
   fonctions du `TextRenderer_InputFieldHandler`, seg124, et du cluster
@@ -643,15 +643,15 @@ précédentes (cluster séquenceur seg121-123) :
   enregistré — un **mécanisme de hook/plugin transparent**.
 
 **Ceci résout une question ouverte de longue date** : les fonctions
-`sub_603xx` appelées massivement par `Sequencer_AdvanceActiveSlot_59F1D`,
-`Sequencer_ProcessQueue_59FF5` et `Sequencer_ValidatePlacement_5A62A`
+`sub_603xx` appelées massivement par `Music_ChannelStopSequence_59F1D`,
+`Music_ChannelRegisterSequence_59FF5` et `Music_InstallTimbre_5A62A`
 (seg121-124) sont maintenant identifiées comme des **thunks d'opcode** vers
 ce même registre de modules — le séquenceur de contre-mesures/messages
 n'est donc probablement pas un système autonome mais un **module de plus
 enregistré dans ce framework temporisé générique**, aux côtés du
 `TextRenderer_InputFieldHandler` et d'autres consommateurs.
 
-**Non vérifié en détail** : `ModuleRegistry_TimerISR_5FBBE` (89 lignes) n'a
+**Non vérifié en détail** : `AIL_API_timer_ISR_5FBBE` (89 lignes) n'a
 été lue qu'une fois, sans trace exhaustive de chaque branche ; le cluster
 `sub_ABxxx` qui utilise aussi ce système reste à couvrir.
 
@@ -750,12 +750,12 @@ en bout (seule la consommation côté boucle de jeu reste à tracer).
 (Borland, cf. `github.com/NancySadkov/devroomm` déjà référencé pour
 seg000) : recherche et ouverture du fichier "strike.exe" (chaîne
 embarquée), lecture et interprétation d'en-tête MZ
-(`VROOMM_ComputeSizeFromHeader_689F1`, arithmétique standard
+(`VROOMM_ComputeSegmentSpan_689F1`, arithmétique standard
 pages/paragraphes), parcours de la table de relogement, déplacement de
 l'image en mémoire, et **patch direct de trampolines** — écriture
 d'instructions machine `JMP FAR` (0xEA) et `INT` (0xCD) à des offsets
-calculés dans l'image chargée (`VROOMM_PatchFarJumpTable_6887B`/`688D7`,
-`VROOMM_PatchIntTrampoline_688F5`) : c'est exactement le mécanisme par
+calculés dans l'image chargée (`VROOMM_EvictOldestBlock_6887B`/`688D7`,
+`VROOMM_PatchIntCallStub_688F5`) : c'est exactement le mécanisme par
 lequel VROOMM réécrit les points d'entrée des segments d'overlay pour les
 rediriger vers le gestionnaire d'overlay au lieu du code original. Toutes les fonctions du segment sont nommées `VROOMM_*` dans
 known_functions.json.
@@ -872,7 +872,7 @@ terrain (`Render_TerrainPipelineMain`, seg074).
 - Pilotes audio : roland, adlib, pas (Pro Audio Spectrum), fichiers
   `.adl`/`.rol`, « No mem for XMIDI state table. ».
 - Confirmation du tag de debug déjà noté : **« SCSCSCFY! »** retrouvé tel
-  quel (cf. `TextObject_CloseAndLog_5A856`, seg124).
+  quel (cf. `Music_ShutdownDriver_5A856`, seg124).
 - Chemins de données : `..\..\data\cockpits\`, `..\..\DATA\`,
   `..\..\data\airdens.tbl`, fichier de config `sc.cfg`.
 
@@ -935,14 +935,14 @@ créneaux temporisés du seg161 en dehors du séquenceur de contre-mesures
 (seg121-123) ?
 
 - **`AudioQueue_RegisterTickModule_AA810`** référence explicitement
-  `Interrupt_TimerISR_5940B` (seg121) via le mécanisme Stopwatch (seg207,
+  `Music_SequencerTickISR_5940B` (seg121) via le mécanisme Stopwatch (seg207,
   tag 5DC2h) — confirmant l'enregistrement direct dans le minuteur
   matériel.
 - **`AudioQueue_ActivateSlotOpcode_AB16F`** et
   **`AudioQueue_DeactivateSlotOpcode_AB1AF`** appellent directement les
-  thunks d'opcode `ModuleRegistry_Opcode_AB_603D2`/`_AD_603D8` (seg161).
+  thunks d'opcode `AIL_stop_sequence_603D2`/`_AD_603D8` (seg161).
 - **`AudioQueue_ProcessSequencerSlots_AB1EF`** appelle
-  `Sequencer_AdvanceActiveSlot_59F1D` (seg123) — le séquenceur générique
+  `Music_ChannelStopSequence_59F1D` (seg123) — le séquenceur générique
   découvert dès le début de la traversée des segments de fin de fichier.
 - Le cluster combine massivement `IndexedRecordReader` (seg196) et
   `StreamReader` (seg190) pour lire des plages d'octets variables dans
@@ -1103,15 +1103,15 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `GeomHelper_QuadrantComputeLoop_UNRESOLVED` | 348 | seg116 | Calcul répété sur 4 quadrants/coins (adresse non résolue) |
 | `Parser_BuildHashIndex_588E8` | 123 | seg118 | Construction de table de hachage/dispatch |
 | `Render_DitheredLineMain_58B97` | 298 | seg119 | Tracé de ligne pointillée/dégradée (rendu 3D) |
-| `Interrupt_TimerDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
-| `Interrupt_TimerCase_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |
+| `Music_SequencerTickDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
+| `Music_TuneTransitionResolve_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |
 | `Weapon_HUDBox_ComputeGeometry_58F42` | 143 | seg121 | Géométrie de boîte de ciblage HUD |
 | `Weapon_HUDBox_DrawElementC_590E0` | 190 | seg121 | Élément de dessin de boîte de ciblage HUD |
 | `Weapon_HUDBox_UpdateGeometryAndTimer_59B10` | 239 | seg122 | Mise à jour géométrie+minuterie de la boîte HUD |
 | `Weapon_HUDBox_MasterUpdate_59CFA` | 311 | seg122 | **Pilote principal du cluster HUD armement/séquenceur** |
-| `Sequencer_ProcessQueue_59FF5` | 135 | seg123 | Traitement de la file du séquenceur à créneaux |
-| `TextRenderer_InputFieldHandler_5A0F3` | 493 | seg124 | Gestionnaire de champ de saisie/édition de texte |
-| `TextRenderer_BuildInputWidget_UNRESOLVED` | 189 | seg124 | Constructeur de widget de saisie (adresse non résolue) |
+| `Music_ChannelRegisterSequence_59FF5` | 135 | seg123 | Traitement de la file du séquenceur à créneaux |
+| `Sound_LoadDriverAndTimbreCache_5A0F3` | 493 | seg124 | Gestionnaire de champ de saisie/édition de texte |
+| `Music_InstallXMITimbres_UNRESOLVED` | 189 | seg124 | Constructeur de widget de saisie (adresse non résolue) |
 | `TextObjectCluster_DestructAll_5ABD1` | 190 | seg125 | Destructeur global du cluster objets-texte |
 | `Registry_BuildOrUpdateEntry_5B036` | 219 | seg126 | Construction/mise à jour d'entrée de registre |
 | `Registry_MainOperation_5B26B` | 175 | seg126 | Opération principale de registre |
@@ -1129,11 +1129,11 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `DisplaySurface_CloneOrResize_5E89E` | 111 | seg151 | Clonage/redimensionnement de surface d'affichage |
 | `FontStyle_ApplyVariantA_UNRESOLVED` | 166 | seg153 | Application de style de police (adresse non résolue) |
 | `Runtime_FatalErrorHandler_5F700` | 75 | seg160 | **Gestionnaire d'erreur fatale/assertion, appelé depuis le pipeline terrain** |
-| `ModuleRegistry_TimerISR_5FBBE` | 89 | seg161 | **ISR du minuteur matériel — cœur du registre de modules** |
+| `AIL_API_timer_ISR_5FBBE` | 89 | seg161 | **ISR du minuteur matériel — cœur du registre de modules** |
 | `Widget_RenderComplexLayout_60BA6` | 331 | seg163 | Rendu de layout complexe de widget |
 | `GlyphObject_LayoutAndRenderAll_60E60` | 131 | seg163 | Layout/rendu de tous les glyphes d'un widget |
 | `Widget_UpdateLayoutAndBounds_60B1D` | 103 | seg163 | Mise à jour layout/bornes de widget |
-| `ModuleRegistry_ConfigureModuleExtended_60254` | 100 | seg161 | Configuration étendue d'un module enregistré |
+| `AIL_init_driver_60254` | 100 | seg161 | Configuration étendue d'un module enregistré |
 | `Render_DrawFilledEllipse_6106E` | 481 | seg167 | Tracé d'ellipse/cercle rempli |
 | `Render_DrawEllipseOutline_61612` | 454 | seg169 | Tracé de contour d'ellipse |
 | `Render_ClipAndDrawLine_613B0` | 428 | seg168 | Clipping et tracé de ligne |
@@ -1158,10 +1158,10 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Keyboard_ProcessScanCode_66AC4` | ~180 | seg202 | **Traitement bas niveau des scan-codes clavier** |
 | `InputBinding_InitAndRegister_66E02` | 155 | seg203 | Enregistrement de liaison entrée-action |
 | `Mouse_EventCallback_68109` | 122 | seg210 | **Gestionnaire d'événement souris (callback int 33h)** |
-| `VROOMM_LocateAndValidate_68254` | 224 | seg212 | Localisation/validation du fichier exécutable |
-| `VROOMM_ReadHeader_6844A` | 88 | seg212 | Lecture d'en-tête MZ |
+| `VROOMM_OpenAndParseOverlayFile_68254` | 224 | seg212 | Localisation/validation du fichier exécutable |
+| `VROOMM_MatchPathPrefix_6844A` | 88 | seg212 | Lecture d'en-tête MZ |
 | `VROOMM_MainEntry_68B2F` | 80 | seg212 | Point d'entrée principal du chargeur |
-| `VROOMM_ApplyRelocationsMain_687E8` | 85 | seg212 | Application de la table de relogement |
+| `VROOMM_DemandLoadDispatch_687E8` | 85 | seg212 | Application de la table de relogement |
 | `VROOMM_FinalizeAndJump_UNRESOLVED` | 173 | seg212 | Finalisation du chargement (adresse non résolue) |
 | `Joystick_InterpolateCalibrationPercent_67CB8` | 138 | seg208 | Interpolation de calibration en pourcentage |
 | `Joystick_ApplyDeadzoneAndScaleB_679E2` | 136 | seg208 | Application de zone morte/échelle (axe B) |
@@ -1214,3 +1214,38 @@ mathématique (seg115-117), les sous-systèmes mémoire paginée/typée
 (seg127-138), le runtime bas niveau (dépassement de pile, tas, exception
 matérielle, erreur fatale — seg137/154/160), et désormais le registre de
 modules à créneaux temporisés (seg161).
+
+## ⭐⭐⭐ Découverte majeure : le système musical — un programme AIL 2.0 (intégré le 2026-10-06)
+
+Travail d'une session dédiée (menée sur une copie plus ancienne du dépôt), intégré et corrigé le
+2026-10-06. Référence complète : **`analysis/MUSIC_SYSTEM.md`** (§0 = corrections) et
+**`analysis/ADLIB_DRIVER.md`** ; sources publiques de la bibliothèque dans `analysis/ail_sources/`
+(`AIL.ASM`, `AIL.INC`, `XMIDI.ASM`, Miles Design 1991-1992), pilote réel dans
+`analysis/adlib_driver_source/`, `COMBAT.DAT` décodé dans `analysis/sample_dat_files/`.
+
+**Preuve d'identification** : le seg161 est `AIL.ASM` compilé, procédure par procédure dans l'ordre
+du source (`find_proc`, `call_driver`, `API_timer`, `init_DDA_arrays`, `hook_timer_process`…
+`AIL_register_timer`, `AIL_set_timer_frequency` — qui appelle `ul_divide(0xF4240, Hz)` comme le
+source —, `AIL_register_driver`, `AIL_init_driver`, `AIL_shutdown_driver`), puis un thunk par
+fonction pilote, `mov ax, N / jmp call_driver`, dont les `N` successifs (`0x78, 0x79, 0x86, 0x7A,
+0x7B, 0x85, 0x7C…0x84, 0x96…0x9F, 0xAA…0xC2`) suivent exactement l'ordre et les valeurs de `AIL.INC`.
+Tous renommés d'après les noms officiels (`AIL_register_sequence_60396`, `AIL_start_sequence_603CC`,
+`AIL_set_relative_volume_603F0`, `AIL_timbre_request_603AE`, `AIL_play_VOC_file_6034E`…).
+
+**Architecture** :
+- **Pilote** (`ADLIB.ADV`, `.ROL` pour Roland) : contient l'**interpréteur XMIDI** (shell `XMIDI.ASM`,
+  recherche de séquence `cmp word ptr [si], 4F46h` / `cmp word ptr [si+8], 4D58h`, 120 Hz) et la
+  partie voix OPL2 propre à cette version.
+- **Jeu, couche AIL** (seg123-124) : `Music_ChannelInit_59F87`, `Music_ChannelRegisterSequence_59FF5`,
+  `Music_ChannelStopSequence_59F1D`, `Music_InstallTimbre_5A62A`, `Music_LoadTimbreFromLibrary_5A577`,
+  `Music_InstallXMITimbres_UNRESOLVED`, `Sound_LoadDriverAndTimbreCache_5A0F3`, `Music_ShutdownDriver_5A856`.
+- **Jeu, logique musicale** (seg121, seg125, seg458) : `Music_RequestTune_5A984` (unique point de
+  changement de piste), `Music_CombatIntensitySelector_59302`, `Music_SelectTuneCandidate_5923A`,
+  tick `Music_SequencerTickISR_5940B` → `Music_TuneTransitionResolve_595C2` /
+  `Music_TuneTransitionCommit_5974D` (matrice de transitions de `combat.dat`, piste de transition sur un
+  second canal, reprise à un niveau), catalogue `AudioQueue_LoadTrackTable_AACA6` /
+  `AudioQueue_LoadTransitionTable_AAFA0`. Le cluster `AudioQueue_*` joue aussi le son numérisé (VOC).
+- **Déclencheurs corrigés** : piste `0x13` depuis l'éjection (`AI_EjectDecision_50FF`, pas une alerte
+  missile) ; ponctuations `0x10/0x11/0x12` quand le joueur détruit un objet, selon sa catégorie ;
+  intensité de combat probablement liée aux dégâts du joueur (`word_722E6`).
+

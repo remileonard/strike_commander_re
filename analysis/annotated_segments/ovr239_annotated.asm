@@ -543,7 +543,7 @@ loc_7B156:
 		mov	eax, [bx+6]
 		mov	[bp+var_E], eax
 		push	0Bh
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		cmp	[bp+arg_2], 3
 		jnb	short loc_7B1AA

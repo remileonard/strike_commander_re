@@ -358,7 +358,7 @@ loc_7D5A9:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+280j
 		mov	eax, [bp+var_46]
 		mov	[bp+var_4], eax
 		push	0Ah
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		mov	[bp+var_48], 0
 		mov	[bp+var_49], 1

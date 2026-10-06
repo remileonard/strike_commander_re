@@ -527,8 +527,7 @@ HUDSymbol_Helper2_8094F	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 190 lignes, NON DÉTAILLÉE — combine Matrix_LocalToWorld_58828 (seg117),
-; UI_ApplyLineOfSightAndTransform_57DAE (seg116), TextObject_AllocateVariantA_5A984 (×2,
-; seg125).
+; UI_ApplyLineOfSightAndTransform_57DAE (seg116), Music_RequestTune_5A984 (×2, seg125).
 ; ==============================================================================================
 HUDSymbol_DrawWithLineOfSight_80971	proc far		; CODE XREF: VROOMM_StubThunk_6AF44J HUDSymbol_ConstructWithViewMatrix_82693+A6p
 
@@ -673,7 +672,7 @@ loc_80A7B:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+EAj
 
 loc_80AE9:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+173j
 		push	15h
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		jmp	short loc_80B70
 ; ���������������������������������������������������������������������������
@@ -710,7 +709,7 @@ loc_80AF3:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+113j
 		mov	[si+90h], eax
 		mov	byte ptr [si+0A3h], 1
 		push	8
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
 loc_80B70:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+107j

@@ -142,7 +142,7 @@ AudioQueue_ProcessAndDecodeB_ABB10	endp
 ; IndexedRecordReader_ConstructVariantA_65A1A (×2, seg196),
 ; IndexedRecordReader_AdvanceIndex_65E2C, StreamReader_ConstructAndBind_63B23 (seg190),
 ; AudioQueue_ProcessAndDecodeB_ABB10, IndexedRecordReader_Destruct_659D0 (×2),
-; Memory_TypedAllocDispatchB_5C832, ModuleRegistry_Opcode_7B_6034E/_7D_60360 (seg161) — point
+; Memory_TypedAllocDispatchB_5C832, AIL_play_VOC_file_6034E/_7D_60360 (seg161) — point
 ; d'entrée principal de traitement d'une entrée de la file audio/message. Candidat pour
 ; session dédiée.
 ; ==============================================================================================
@@ -382,10 +382,10 @@ loc_ABD53:
 		push	dx
 		push	ax
 		push	di
-		call	ModuleRegistry_Opcode_7B_6034E
+		call	AIL_play_VOC_file_6034E
 		add	sp, 8
 		push	di
-		call	ModuleRegistry_Opcode_7D_60360
+		call	AIL_start_digital_playback_60360
 		pop	cx
 		mov	[bp+var_1], 1
 		mov	al, [bp+arg_8]
@@ -407,7 +407,7 @@ AudioQueue_MainProcessEntry_ABBEF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle ModuleRegistry_Opcode_7C_6035A (seg161).
+; far, appelle AIL_VOC_playback_status_6035A (seg161).
 ; ==============================================================================================
 AudioQueue_OpcodeHelper_ABDAF	proc far		; CODE XREF: VROOMM_StubThunk_6D09AJ
 					; AudioQueue_MainProcessEntry_ABBEF:loc_ABC0Fp
@@ -430,7 +430,7 @@ loc_ABDB6:
 		jz	short loc_ABDE7
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_7C_6035A
+		call	AIL_VOC_playback_status_6035A
 		pop	cx
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 2
@@ -462,10 +462,10 @@ AudioQueue_OpcodeHelper_ABDAF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, dernière fonction du fichier — combine ModuleRegistry_Opcode_7C_6035A,
-; Memory_TypedAllocDispatchB_5C832, ModuleRegistry_Opcode_7B_6034E,
-; ModuleRegistry_Opcode_7D_60360 (seg161), Memory_TypedFree_5C7B6 — finalisation/nettoyage
-; d'une entrée de la file audio/message.
+; far, dernière fonction du fichier — combine AIL_VOC_playback_status_6035A,
+; Memory_TypedAllocDispatchB_5C832, AIL_play_VOC_file_6034E, AIL_start_digital_playback_60360
+; (seg161), Memory_TypedFree_5C7B6 — finalisation/nettoyage d'une entrée de la file
+; audio/message.
 ; ==============================================================================================
 AudioQueue_FinalizeAndRelease_ABDEC	proc far		; CODE XREF: VROOMM_StubThunk_6D09FJ
 
@@ -486,7 +486,7 @@ arg_0		= word ptr  6
 loc_ABE00:				; CODE XREF: AudioQueue_FinalizeAndRelease_ABDEC+Fj
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_7C_6035A
+		call	AIL_VOC_playback_status_6035A
 		pop	cx
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 2
@@ -519,12 +519,12 @@ loc_ABE43:
 		push	di
 
 loc_ABE44:
-		call	ModuleRegistry_Opcode_7B_6034E
+		call	AIL_play_VOC_file_6034E
 		add	sp, 8
 		push	di
 
 loc_ABE4D:
-		call	ModuleRegistry_Opcode_7D_60360
+		call	AIL_start_digital_playback_60360
 		pop	cx
 
 loc_ABE53:

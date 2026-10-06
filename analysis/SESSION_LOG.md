@@ -206,9 +206,9 @@ point d'entrée consommant à la fois joystick ET clavier.
 **Session en cours : seg109→seg123 traités.** Après la bibliothèque
 mathématique (seg115-117, voir ci-dessus), seg119-123 ont révélé un nouveau
 sous-système : un **gestionnaire d'interruption matérielle 8259A**
-(`Interrupt_TimerISR_5940B`, seg121 — envoie l'EOI via `out 20h,al`) pilotant
+(`Music_SequencerTickISR_5940B`, seg121 — envoie l'EOI via `out 20h,al`) pilotant
 un **séquenceur à créneaux en exclusion mutuelle**
-(`Sequencer_AdvanceActiveSlot_59F1D`, seg123), lui-même piloté par un
+(`Music_ChannelStopSequence_59F1D`, seg123), lui-même piloté par un
 cluster de « boîte de ciblage HUD » (`Weapon_HUDBox_*`, seg121-122) qui
 réutilise le cluster géométrie/ciblage de seg116
 (`Targeting_ComputeBearingElevation_55B1A`) et la VM d'expression de seg114
@@ -243,7 +243,7 @@ au-delà des 640 Ko conventionnels. `PagedMemory_ReadFormattedString_5BE40`
 (279L, seg127) est la meilleure candidate pour vérifier cette hypothèse par
 lecture approfondie. seg124-126 documentent également le cluster
 « objets-texte »/« registre » qui s'appuie sur ce système paginé, et
-confirment (via TextRenderer_InputFieldHandler_5A0F3, seg124) que ce cluster
+confirment (via Sound_LoadDriverAndTimbreCache_5A0F3, seg124) que ce cluster
 alimente aussi le champ de saisie/édition de texte de `TextRenderer_Main`.
 
 **Nouvelle découverte (seg129-133) : gestionnaire de mémoire typée
@@ -363,15 +363,15 @@ Puis continuer l'analyse en ordre fichier à partir de **seg161**.
 **seg161 (⭐ DÉCOUVERTE MAJEURE) : registre de modules à créneaux
 temporisés.** Résout la question ouverte de longue date sur les fonctions
 `sub_603xx` du cluster séquenceur (seg121-124). Le système :
-détourne IRQ0 (`ModuleRegistry_HookTimerIRQ_5FCCA`), reprogramme le PIT
-8253/8254 (`ModuleRegistry_ProgramPITFrequency_5FD3A`), gère une table de
-16 modules enregistrés (`ModuleRegistry_RegisterModule_5FF08`), et son ISR
-(`ModuleRegistry_TimerISR_5FBBE`, 89L, lue une seule fois — à approfondir)
+détourne IRQ0 (`AIL_hook_timer_process_5FCCA`), reprogramme le PIT
+8253/8254 (`AIL_set_PIT_divisor_5FD3A`), gère une table de
+16 modules enregistrés (`AIL_register_timer_5FF08`), et son ISR
+(`AIL_API_timer_ISR_5FBBE`, 89L, lue une seule fois — à approfondir)
 appelle le gestionnaire de chaque module dès que son seuil de temps est
 atteint. Une vingtaine de « thunks d'opcode » dispersés dans des dizaines
 de segments (dont les `sub_603xx`, mais aussi seg124 et le cluster
 `sub_ABxxx` pas encore couvert) sautent vers
-`ModuleRegistry_DispatchTrampoline_5FBA6`, qui réécrit l'adresse de retour
+`AIL_call_driver_5FBA6`, qui réécrit l'adresse de retour
 de l'appelant pour rediriger vers le gestionnaire enregistré — mécanisme de
 hook/plugin transparent. **Le séquenceur de contre-mesures/messages n'est
 donc probablement qu'un module de plus dans ce framework générique**, pas
@@ -651,7 +651,7 @@ d'opcodes machine JMP FAR 0xEA et INT 0xCD dans l'image chargée) — c'est
 exactement le mécanisme par lequel VROOMM réécrit les points d'entrée des
 segments d'overlay. Toutes les fonctions du segment ont été renommées
 `VROOMM_*` dans known_functions.json (`VROOMM_MainEntry_68B2F`,
-`VROOMM_LocateAndValidate_68254`, etc.).
+`VROOMM_OpenAndParseOverlayFile_68254`, etc.).
 
 **seg213-215 : segments de données uniquement**, pas de fonctions (tables
 de remplissage 0xFF/0x00, probablement des tables de correspondance ou
@@ -871,12 +871,12 @@ typée (tag 5C44h) associées à la lecture de champs IFF.
 (AudioQueue).** Question ouverte depuis plusieurs sessions : quel module
 consomme le registre de modules à créneaux temporisés du seg161 en dehors
 du séquenceur de contre-mesures ? Réponse : `AudioQueue_RegisterTickModule_AA810`
-référence explicitement `Interrupt_TimerISR_5940B` (seg121) via le
+référence explicitement `Music_SequencerTickISR_5940B` (seg121) via le
 mécanisme Stopwatch (seg207). `AudioQueue_ActivateSlotOpcode_AB16F`/
 `DeactivateSlotOpcode_AB1AF` appellent directement les thunks d'opcode du
-registre (`ModuleRegistry_Opcode_AB_603D2`/`_AD_603D8`, seg161).
+registre (`AIL_stop_sequence_603D2`/`_AD_603D8`, seg161).
 `AudioQueue_ProcessSequencerSlots_AB1EF` appelle
-`Sequencer_AdvanceActiveSlot_59F1D` (seg123). Le cluster combine
+`Music_ChannelStopSequence_59F1D` (seg123). Le cluster combine
 massivement `IndexedRecordReader` (seg196) et `StreamReader` (seg190),
 avec un signal (callback + constante mémoire 0xC0000 dans un appel à
 sub_1069) évoquant une installation de callback DMA/audio. **Hypothèse de

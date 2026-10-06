@@ -1532,10 +1532,10 @@ StreamReader_RefillBuffer_63EE5	endp
 
 ; ==============================================================================================
 ; far, prépare le flux avant lecture (dispatch vtable [bx+0xC],
-; StreamReader_ValidateState_63DB5, sub_6404E). Référencée par TextObject_Allocate_5A577
-; (seg124).
+; StreamReader_ValidateState_63DB5, sub_6404E). Référencée par
+; Music_LoadTimbreFromLibrary_5A577 (seg124).
 ; ==============================================================================================
-StreamReader_PrepareForRead_63F46	proc far		; CODE XREF: TextObject_Allocate_5A577+10P
+StreamReader_PrepareForRead_63F46	proc far		; CODE XREF: Music_LoadTimbreFromLibrary_5A577+10P
 					; seg196:0161P
 
 var_4		= dword	ptr -4

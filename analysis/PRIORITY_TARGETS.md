@@ -47,7 +47,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 538 | `sub_A1626` | `PaletteScreen_BuildCustomGradient_A1626` | seg442 |
 | 516 | `sub_94D40` | `AircraftComponent_LoadWithDwordFields_94D40` | ovr272 |
 | 496 | `sub_61CD2` | `Render_DrawTextString_61CD2` | seg173 |
-| 493 | `sub_5A0F3` | `TextRenderer_InputFieldHandler_5A0F3` | seg124 |
+| 493 | `sub_5A0F3` | `Sound_LoadDriverAndTimbreCache_5A0F3` | seg124 |
 | 492 | `sub_A8F22` | `MissionScenario_ResolveAndBindExpressions_A8F22` | seg456 |
 | 482 | `sub_7E1B4` | `Font_LoadDefinitionFromIFF_7E1B4` | ovr241 |
 | 481 | `sub_6106E` | `Render_DrawFilledEllipse_6106E` | seg167 |
@@ -143,7 +143,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 227 | `sub_91B70` | `Cockpit_ApplyFormatAndDraw_91B70` | ovr268 |
 | 226 | `sub_A61D0` | `TextLabel_LoadFieldsExtended_A61D0` | seg450 |
 | 225 | `sub_8C32C` | `MissionRecord_LoadFieldGroupMixD_8C32C` | ovr255 |
-| 224 | `sub_68254` | `VROOMM_LocateAndValidate_68254` | None |
+| 224 | `sub_68254` | `VROOMM_OpenAndParseOverlayFile_68254` | None |
 | 220 | `sub_73940` | `AircraftDamageModel_ComputeStatus_73940` | ovr228 |
 | 219 | `sub_8285A` | `HUDSymbol_ConstructWithGeometry_8285A` | ovr243 |
 | 219 | `sub_5B036` | `Registry_BuildOrUpdateEntry_5B036` | seg126 |
@@ -152,7 +152,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 217 | `sub_53363` | `Expr_Node_ConstructAndAttach_53363` | seg114 |
 | 215 | `sub_625E2` | `Render_DrawOrMeasureTextVariant_625E2` | seg177 |
 | 214 | `sub_76325` | `AITargeting_ComputeOrientation_76325` | ovr230 |
-| 213 | `sub_AAFA0` | `AudioQueue_ProcessAndAdvance_AAFA0` | seg458 |
+| 213 | `sub_AAFA0` | `AudioQueue_LoadTransitionTable_AAFA0` | seg458 |
 | 213 | `sub_9B2F4` | `Terrain_AllocateAndFormatMultiple_9B2F4` | ovr299 |
 | 209 | `sub_553CF` | `Math_HeadingAngle_553CF` | seg116 |
 | 208 | `sub_97D39` | `MissionText_ComputeTrigonometricLayout_97D39` | ovr287 |

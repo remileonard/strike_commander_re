@@ -19,7 +19,7 @@ seg160		segment	byte public 'CODE' use16
 ; texte utilisateur final retrouvé tel quel.
 ; ==============================================================================================
 Runtime_FatalErrorHandler_5F700	proc far		; CODE XREF: Render_TerrainPipelineMain+215BP
-					; TextObject_AllocateVariantA_5A984+2AP ...
+					; Music_RequestTune_5A984+2AP ...
 
 var_202		= word ptr -202h
 var_102		= word ptr -102h

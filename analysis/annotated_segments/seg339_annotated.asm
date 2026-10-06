@@ -3,20 +3,20 @@ seg339		segment	para public '' use16
 unk_6D0B0	db    0			; DATA XREF: Program_InitVideoFontArgs+60o
 					; Render_MeshPrimitive_216F6+727o ...
 		db    0
-word_6D0B2	dw 0			; DATA XREF: VROOMM_Helper_68384+23w
-word_6D0B4	dw 6F42h		; DATA XREF: VROOMM_Helper_68384+27w
-byte_6D0B6	db 72h			; DATA XREF: VROOMM_Helper_68384:loc_683CCr
-					; VROOMM_CheckDOSVersionAndOpen_68405:loc_6840Dw
+word_6D0B2	dw 0			; DATA XREF: VROOMM_InstallIntHandler_68384+23w
+word_6D0B4	dw 6F42h		; DATA XREF: VROOMM_InstallIntHandler_68384+27w
+byte_6D0B6	db 72h			; DATA XREF: VROOMM_InstallIntHandler_68384:loc_683CCr
+					; VROOMM_SearchPathEnvAndOpen_68405:loc_6840Dw
 		db  6Ch	; l
 		db  61h	; a
 		db  6Eh	; n
 off_6D0BA	dw offset loc_2063+1	; DATA XREF: CRT_FlushSprintfBuf+13r
-off_6D0BC	dw offset CRT_Memcmp_Bounded	; DATA XREF: VROOMM_Helper3_686AA:loc_686EEr
-off_6D0BE	dw offset Stdio_LoadFileTable	; DATA XREF: VROOMM_AllocateAndRelocate_6855F:loc_68600w
-					; VROOMM_ApplyRelocationsMain_687E8+28w ...
-off_6D0C0	dw offset Stdio_LoadFileTable+2	; DATA XREF: VROOMM_CheckImageHasTrailer_68863:loc_6886Fr
-aCopyright1991B	db 'Copyright 1991 Borland Intl.',0 ; DATA XREF: VROOMM_Helper_68384:loc_683C6o
-					; VROOMM_CheckCopyright_683F9:loc_683FAo	...
+off_6D0BC	dw offset CRT_Memcmp_Bounded	; DATA XREF: VROOMM_PatchFarJumpOpcode_686AA:loc_686EEr
+off_6D0BE	dw offset Stdio_LoadFileTable	; DATA XREF: VROOMM_ScanMemoryArena_6855F:loc_68600w
+					; VROOMM_DemandLoadDispatch_687E8+28w ...
+off_6D0C0	dw offset Stdio_LoadFileTable+2	; DATA XREF: VROOMM_FinalizeLoadedSegment_68863:loc_6886Fr
+aCopyright1991B	db 'Copyright 1991 Borland Intl.',0 ; DATA XREF: VROOMM_InstallIntHandler_68384:loc_683C6o
+					; VROOMM_SearchPathAndOpen_683F9:loc_683FAo	...
 aNullPointerAss	db 'Null pointer assignment',0Dh,0Ah
 		db 'Divide error',0Dh,0Ah
 		db 'Abnormal program termination',0Dh,0Ah,0
@@ -42,27 +42,27 @@ word_6D148	dw 0			; DATA XREF: EntryPoint_RuntimeInit+128w
 		db  5Eh	; ^
 word_6D14C	dw 5EAAh		; DATA XREF: CRT_AllocaGuard+10w CRT_AllocaGrow+9r	...
 		align 4
-word_6D150	dw 0			; DATA XREF: EntryPoint_RuntimeInit+A3w	VROOMM_PatchIntTrampoline_688F5+26r
+word_6D150	dw 0			; DATA XREF: EntryPoint_RuntimeInit+A3w	VROOMM_PatchIntCallStub_688F5+26r
 		align 4
 word_6D154	dw 0			; DATA XREF: EntryPoint_RuntimeInit+A7w
-					; VROOMM_ReadAndParseHeader_684DF:loc_68530r
-word_6D156	dw 0			; DATA XREF: VROOMM_ReadAndParseHeader_684DF:loc_68533r
+					; VROOMM_ScanFreeMemoryBlocks_684DF:loc_68530r
+word_6D156	dw 0			; DATA XREF: VROOMM_ScanFreeMemoryBlocks_684DF:loc_68533r
 word_6D158	dw 0			; DATA XREF: EntryPoint_RuntimeInit:loc_21w EntryPoint_RuntimeInit+107w	...
-word_6D15A	dw 4Fh			; DATA XREF: VROOMM_ReadAndParseHeader_684DF+7Bw
-seg_6D15C	dw seg seg047		; DATA XREF: VROOMM_ApplyRelocationsMain_687E8w
-off_6D15E	dd VROOMM_StubThunk_6AA48		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+52w
-					; VROOMM_AllocateAndFinalize_6879E:loc_687E0r	...
-word_6D162	dw 4Fh			; DATA XREF: VROOMM_AllocateAndRelocate_6855Fr
-seg_6D164	dw seg seg047		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+Ar
-					; VROOMM_AllocateAndRelocate_6855F+56r ...
-word_6D166	dw 4Dh			; DATA XREF: VROOMM_AllocateAndRelocate_6855F+Er
-					; VROOMM_PatchFarJumpTable_6887B+14r ...
-seg_6D168	dw seg stub227		; DATA XREF: VROOMM_Helper_68384+2Br
-					; VROOMM_Helper_68384+32r ...
-word_6D16A	dw 2Ah			; DATA XREF: VROOMM_AllocateAndFinalize_6879E+1w
-seg_6D16C	dw seg stub227		; DATA XREF: VROOMM_AllocateAndRelocate_6855F:loc_68563w
-					; VROOMM_AllocateAndRelocate_6855F+6Cr ...
-off_6D16E	dd VROOMM_StubThunk_6AA25		; DATA XREF: VROOMM_ReadAndParseHeader_684DF:loc_684F8o
+word_6D15A	dw 4Fh			; DATA XREF: VROOMM_ScanFreeMemoryBlocks_684DF+7Bw
+seg_6D15C	dw seg seg047		; DATA XREF: VROOMM_DemandLoadDispatch_687E8w
+off_6D15E	dd VROOMM_StubThunk_6AA48		; DATA XREF: VROOMM_ScanMemoryArena_6855F+52w
+					; VROOMM_LoadOnDemandCore_6879E:loc_687E0r	...
+word_6D162	dw 4Fh			; DATA XREF: VROOMM_ScanMemoryArena_6855Fr
+seg_6D164	dw seg seg047		; DATA XREF: VROOMM_ScanMemoryArena_6855F+Ar
+					; VROOMM_ScanMemoryArena_6855F+56r ...
+word_6D166	dw 4Dh			; DATA XREF: VROOMM_ScanMemoryArena_6855F+Er
+					; VROOMM_EvictOldestBlock_6887B+14r ...
+seg_6D168	dw seg stub227		; DATA XREF: VROOMM_InstallIntHandler_68384+2Br
+					; VROOMM_InstallIntHandler_68384+32r ...
+word_6D16A	dw 2Ah			; DATA XREF: VROOMM_LoadOnDemandCore_6879E+1w
+seg_6D16C	dw seg stub227		; DATA XREF: VROOMM_ScanMemoryArena_6855F:loc_68563w
+					; VROOMM_ScanMemoryArena_6855F+6Cr ...
+off_6D16E	dd VROOMM_StubThunk_6AA25		; DATA XREF: VROOMM_ScanFreeMemoryBlocks_684DF:loc_684F8o
 off_6D172	dd VROOMM_StubThunk_6AA20
 		dd VROOMM_StubThunk_6AA39
 		dd VROOMM_StubThunk_6AA3E
@@ -3746,39 +3746,39 @@ algn_70847:
 byte_70848	db 0FFh			; DATA XREF: Render_DitheredLineMain_58B97:loc_58C7Br
 		align 2
 byte_7084A	db 0			; DATA XREF: seg121:loc_595B2w
-					; Interrupt_TimerCase_595C2+13Aw ...
+					; Music_TuneTransitionResolve_595C2+13Aw ...
 byte_7084B	db 0			; DATA XREF: TextRenderer_Main+829w
 					; AudioQueue_UnregisterAndCleanup_AB44A+7r	...
 word_7084C	dw 0			; DATA XREF: TextRenderer_Main+833w
-					; TextObject_AllocateVariantA_5A984+14r ...
-word_7084E	dw 0			; DATA XREF: Interrupt_TimerCase_595C2+134r
-					; AudioQueue_ProcessAndAdvance_AAFA0+59w ...
+					; Music_RequestTune_5A984+14r ...
+word_7084E	dw 0			; DATA XREF: Music_TuneTransitionResolve_595C2+134r
+					; AudioQueue_LoadTransitionTable_AAFA0+59w ...
 word_70850	dw 0			; DATA XREF: AudioQueue_ProcessMain_AA84E+366w
 					; AudioQueue_ProcessMain_AA84E:loc_AAC66r	...
 word_70852	dw 0			; DATA XREF: TextRenderer_Main+83Cw
 					; TextRenderer_Main+84Br ...
 word_70854	dw 0			; DATA XREF: seg121:0582r
-					; Interrupt_TimerCase_595C2+54r ...
-word_70856	dw 0			; DATA XREF: Interrupt_TimerCase_595C2+15Cr
-					; AudioQueue_ProcessAndAdvance_AAFA0+73w ...
+					; Music_TuneTransitionResolve_595C2+54r ...
+word_70856	dw 0			; DATA XREF: Music_TuneTransitionResolve_595C2+15Cr
+					; AudioQueue_LoadTransitionTable_AAFA0+73w ...
 byte_70858	db 0			; DATA XREF: seg121:loc_59420r
 					; seg121:loc_5947Ew ...
-word_70859	dw 0FFFFh		; DATA XREF: Weapon_HUDBox_UpdateAndRender_5923A+B9w
-					; Weapon_HUDBox_Main_59302+41r ...
+word_70859	dw 0FFFFh		; DATA XREF: Music_SelectTuneCandidate_5923A+B9w
+					; Music_CombatIntensitySelector_59302+41r ...
 word_7085B	dw 0FFFFh		; DATA XREF: seg121:loc_594F4r
-					; Interrupt_TimerCase_595C2:loc_595EDw	...
-dword_7085D	dd 0			; DATA XREF: Interrupt_TimerCase_595C2+AAr
+					; Music_TuneTransitionResolve_595C2:loc_595EDw	...
+dword_7085D	dd 0			; DATA XREF: Music_TuneTransitionResolve_595C2+AAr
 					; AudioQueue_ProcessMain_AA84E+38Bw ...
-dword_70861	dd 0			; DATA XREF: Interrupt_TimerCase_595C2+88r
+dword_70861	dd 0			; DATA XREF: Music_TuneTransitionResolve_595C2+88r
 					; AudioQueue_ProcessMain_AA84E+2D9w ...
 word_70865	dw 0FFFFh		; DATA XREF: AudioQueue_ProcessMain_AA84E:loc_AA86Br
 					; AudioQueue_ProcessMain_AA84E+133r ...
 word_70867	dw 0			; DATA XREF: AudioQueue_ProcessMain_AA84E:loc_AAA61r
 					; AudioQueue_ProcessMain_AA84E:loc_AAA67r	...
 byte_70869	db 0			; DATA XREF: TextRenderer_Main+82Ew
-					; Weapon_HUDBox_UpdateAndRender_5923A:loc_592DFr	...
-byte_7086A	db 0			; DATA XREF: Weapon_HUDBox_UpdateAndRender_5923A+2Dr
-					; Weapon_HUDBox_UpdateAndRender_5923A:loc_59287r	...
+					; Music_SelectTuneCandidate_5923A:loc_592DFr	...
+byte_7086A	db 0			; DATA XREF: Music_SelectTuneCandidate_5923A+2Dr
+					; Music_SelectTuneCandidate_5923A:loc_59287r	...
 		align 2
 a_dat		db '.dat',0             ; DATA XREF: AudioQueue_ProcessMain_AA84E+34o
 a_adl		db '.adl',0
@@ -3795,8 +3795,8 @@ a_adl_0		db '.adl',0
 a_rol_0		db '.rol',0
 aSoundfx	db 'soundfx',0          ; DATA XREF: AudioQueue_LoadAndPlayEntry_AB592+35o
 aNoMemForXmidiS	db 'No mem for XMIDI state table.',0
-aSound		db 'SOUND',0            ; DATA XREF: TextRenderer_InputFieldHandler_5A0F3+44o
-					; TextRenderer_InputFieldHandler_5A0F3+27Do ...
+aSound		db 'SOUND',0            ; DATA XREF: Sound_LoadDriverAndTimbreCache_5A0F3+44o
+					; Sound_LoadDriverAndTimbreCache_5A0F3+27Do ...
 aStrikeCommande	db 'Strike Commander cannot locate the sound card(s) you have selecte'
 		db 'd.',0Ah
 		db 'Please run INSTALL and make sure your sound card settings are cor'
@@ -3805,7 +3805,7 @@ a_drv		db '.drv',0
 aNoMemoryForSou	db 'No memory for sound driver.',0Ah,0
 aNoMemoryForTim	db 'No memory for timbre cache.',0Ah,0
 aStrike		db 'strike',0
-aScscscfy	db 'SCSCSCFY!',0        ; DATA XREF: TextObject_CloseAndLog_5A856+15o
+aScscscfy	db 'SCSCSCFY!',0        ; DATA XREF: Music_ShutdownDriver_5A856+15o
 byte_70994	db 0			; DATA XREF: AudioQueue_ReleaseAndCoalesce_ABAAD+8r
 					; AudioQueue_ReleaseAndCoalesce_ABAAD:loc_ABB04w
 		align 2
@@ -3834,7 +3834,7 @@ dword_709C4	dd 0			; DATA XREF: Registry_LookupForTextRenderer_5B5D9+36w
 					; Registry_LookupForTextRenderer_5B5D9+6Fw ...
 dword_709C8	dd 0			; DATA XREF: Registry_LookupForTextRenderer_5B5D9+32w
 					; Registry_LookupForTextRenderer_5B5D9+5Dr ...
-dword_709CC	dd 0			; DATA XREF: Sequencer_ValidatePlacement_5A62A:loc_5A698r
+dword_709CC	dd 0			; DATA XREF: Music_InstallTimbre_5A62A:loc_5A698r
 					; PagedMemory_LoadPage_5B813+3r	...
 word_709D0	dw 0FFFFh		; DATA XREF: seg121:0569r seg121:05B6r ...
 word_709D2	dw 0			; DATA XREF: PagedMemory_InitDriver_5B89D:loc_5B8C9w
@@ -6417,8 +6417,8 @@ unk_71A14	db    0
 		db    0
 		db 0FFh
 		db 0FFh
-word_71A18	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68320w
-word_71A1A	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68327w
+word_71A18	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68320w
+word_71A1A	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68327w
 word_71A1C	dw 0			; DATA XREF: seg212:0908r seg212:090Fr
 word_71A1E	dw 0			; DATA XREF: seg000:030Er
 					; seg000:loc_31Ar ...
@@ -7509,7 +7509,7 @@ unk_71F19	db  20h
 		dd Formation_ApplyGeometryAndCalibration_57F3B
 unk_71F1E	db    1
 unk_71F1F	db  20h
-off_71F20	dd Interrupt_TimerInitState_597C2
+off_71F20	dd Music_SequencerTickInit_597C2
 unk_71F24	db    1
 unk_71F25	db  20h
 		dd TextObjectCluster_InitState_5ADD9
@@ -7608,7 +7608,7 @@ unk_71FD3	db  20h
 off_71FD4	dd UIScreen_Close_50920
 		db    1
 		db  20h
-		dd Interrupt_TimerCleanup_59817
+		dd Music_SequencerTickCleanup_59817
 		db    1
 		db  20h
 off_71FE0	dd TextObjectCluster_DtorThunk_5ADEF
@@ -7635,7 +7635,7 @@ off_72004	dd Stopwatch_StartOrStopThunk_67824
 		dd TextScrollDisplayB_Method_DestructThunk_680DA
 		db    1
 		db    1
-off_72010	dd VROOMM_Helper2_683D7
+off_72010	dd VROOMM_RestoreIntAndDispatch_683D7
 word_72014	dw 0			; DATA XREF: PilotProfile_LoadNUMSCompanionFile_73FB4+10Ew
 dword_72016	dd 0			; DATA XREF: PilotProfile_LoadNUMSCompanionFile_73FB4+FFw
 word_7201A	dw 0			; DATA XREF: PilotProfile_LoadNUMSCompanionFile_73FB4+11Cw
@@ -10340,8 +10340,8 @@ unk_72C60	db    0			; DATA XREF: seg116:314Ao
 		db    0
 		db    0
 		db    0
-byte_72C90	db 0			; DATA XREF: Weapon_HUDBox_Main_59302:loc_5932Er
-					; Weapon_HUDBox_Main_59302+3Cr ...
+byte_72C90	db 0			; DATA XREF: Music_CombatIntensitySelector_59302:loc_5932Er
+					; Music_CombatIntensitySelector_59302+3Cr ...
 word_72C91	dw 0			; DATA XREF: seg121:loc_594B8w
 					; seg121:loc_5952Er ...
 word_72C93	dw 0			; DATA XREF: seg121:05CAr seg121:05D5r ...
@@ -10352,7 +10352,7 @@ byte_72C9C	db 0			; DATA XREF: seg121:0903w seg121:0998r ...
 dword_72C9D	dd 0			; DATA XREF: seg121:0908w
 					; seg121:loc_5989Bw
 byte_72CA1	db 0			; DATA XREF: seg121:loc_59479w
-					; Interrupt_TimerCase_595C2:loc_596CBw	...
+					; Music_TuneTransitionResolve_595C2:loc_596CBw	...
 		db    0
 		db    0
 		db    0
@@ -10364,9 +10364,9 @@ byte_72CAD	db 0			; DATA XREF: seg121:0926w seg121:0964r
 byte_72CAE	db 0			; DATA XREF: seg121:092Bw seg121:0953r ...
 dword_72CAF	dd 0			; DATA XREF: seg121:loc_59800w
 					; seg121:0986w
-byte_72CB3	db 0			; DATA XREF: Interrupt_TimerCaseB_5974D+Ew
-word_72CB4	dw 0			; DATA XREF: TextObject_Allocate_5A577+5Dw
-					; TextObject_Allocate_5A577+66r ...
+byte_72CB3	db 0			; DATA XREF: Music_TuneTransitionCommit_5974D+Ew
+word_72CB4	dw 0			; DATA XREF: Music_LoadTimbreFromLibrary_5A577+5Dw
+					; Music_LoadTimbreFromLibrary_5A577+66r ...
 		db    0
 		db    0
 		db    0

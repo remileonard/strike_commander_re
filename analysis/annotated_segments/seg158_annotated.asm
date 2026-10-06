@@ -25,7 +25,7 @@ PagedResourceC_Method_PassThrough_5F4D8:				; DATA XREF: seg216:05B6o seg339:12
 ; sur chacune. Référencée par sub_14279 et TextRenderer_InputFieldHandler (sub_5A0F3, seg124).
 ; ==============================================================================================
 PagedResourceC_RefreshAllInstances_5F4E0	proc far		; CODE XREF: Program_InitVideoFontArgs+23EP
-					; TextRenderer_InputFieldHandler_5A0F3+186P ...
+					; Sound_LoadDriverAndTimbreCache_5A0F3+186P ...
 		push	bp
 		mov	bp, sp
 		push	si

@@ -11,7 +11,7 @@ seg121		segment	byte public 'CODE' use16
 ; far, dispatch vtable (2 appels), référencée par sub_59302 — élément de dessin pour un
 ; réticule/boîte de ciblage HUD.
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementA_58ED5	proc far		; CODE XREF: Weapon_HUDBox_Main_59302+68p
+Weapon_HUDBox_DrawElementA_58ED5	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+68p
 
 var_C		= word ptr -0Ch
 var_A		= dword	ptr -0Ah
@@ -243,7 +243,7 @@ Weapon_HUDBox_ComputeGeometry_58F42	endp
 ; far, dispatch vtable + appel à Weapon_HUDBox_ComputeGeometry_58F42. Référencée par
 ; sub_59302.
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementB_59061	proc far		; CODE XREF: Weapon_HUDBox_Main_59302+89p
+Weapon_HUDBox_DrawElementB_59061	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+89p
 
 var_A		= dword	ptr -0Ah
 var_6		= word ptr -6
@@ -325,8 +325,8 @@ Weapon_HUDBox_DrawElementB_59061	endp
 ; ⚠️ far, 190 lignes, NON DÉTAILLÉE — dispatch vtable multiple, longueur vectorielle
 ; (sub_5828E). Référencée par sub_5923A.
 ; ==============================================================================================
-Weapon_HUDBox_DrawElementC_590E0	proc far		; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+21p
-					; Weapon_HUDBox_Main_59302+4Ep ...
+Weapon_HUDBox_DrawElementC_590E0	proc far		; CODE XREF: Music_SelectTuneCandidate_5923A+21p
+					; Music_CombatIntensitySelector_59302+4Ep ...
 
 var_24		= dword	ptr -24h
 var_20		= dword	ptr -20h
@@ -529,11 +529,19 @@ word_5922A	dw	6,   13h,   14h,   15h ; DATA XREF: Weapon_HUDBox_DrawElementC_590
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, orchestre Weapon_HUDBox_DrawElementC_590E0, exécute une expression via
-; Expr_VM_Execute_51E7E (seg114) — confirme le lien entre le cluster HUD armement et la VM
-; d'expression. Référencée par sub_59302.
+; Ex-'Weapon_HUDBox_UpdateAndRender_5923A' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). ★ far — DÉCISION DE PISTE (cascade de priorité), lue
+; ligne à ligne intégralement. Anciennement Music_SelectTuneCandidate_5923A. Calcule un
+; candidat di=0xFFFF par défaut, puis l'affine selon une cascade : (1) si arg_2!=0, appelle
+; Weapon_HUDBox_DrawElementC_590E0 et compare des bits de byte_7086A/résultat → di=0x13
+; (combat) ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET
+; Parser_LookaheadPattern_1CB83([+0x68]) renvoie vrai → di=0x0C ; (3) sinon, si byte_70869 est
+; positionné → di=0x0D (et le flag est consommé). Si un candidat a été choisi (di!=0xFFFF) :
+; ÉCRASE IMMÉDIATEMENT word_70859. Retourne un booléen 'changement effectué'. Appelée par
+; Music_CombatIntensitySelector_59302 (en dernier recours) et par sub_5AA49 (seg125, non
+; détaillée).
 ; ==============================================================================================
-Weapon_HUDBox_UpdateAndRender_5923A	proc far		; CODE XREF: Weapon_HUDBox_Main_59302+FDp
+Music_SelectTuneCandidate_5923A	proc far		; CODE XREF: Music_CombatIntensitySelector_59302+FDp
 					; Weapon_HUDBox_UpdateAndRenderVariant_5AA49+1CP
 
 var_4		= byte ptr -4
@@ -578,15 +586,15 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_59292
 ; ���������������������������������������������������������������������������
 
-loc_59287:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+2Bj
+loc_59287:				; CODE XREF: Music_SelectTuneCandidate_5923A+2Bj
 		cmp	byte_7086A, 0
 		jz	short loc_59292
 
-loc_5928E:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+1Aj
+loc_5928E:				; CODE XREF: Music_SelectTuneCandidate_5923A+1Aj
 		mov	[bp+var_2], 1
 
-loc_59292:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+40j
-					; Weapon_HUDBox_UpdateAndRender_5923A+46j ...
+loc_59292:				; CODE XREF: Music_SelectTuneCandidate_5923A+40j
+					; Music_SelectTuneCandidate_5923A+46j ...
 		cmp	[bp+var_2], 0
 		jz	short loc_592EE
 		mov	si, word_706A0
@@ -602,7 +610,7 @@ loc_59292:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+40j
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_592BD:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+66j
+loc_592BD:				; CODE XREF: Music_SelectTuneCandidate_5923A+66j
 		mov	al, [si+0A1h]
 		mov	[bp+var_3], al
 		cmp	[bp+var_3], 0
@@ -618,27 +626,27 @@ loc_592BD:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+66j
 		jmp	short loc_592EE
 ; ���������������������������������������������������������������������������
 
-loc_592DF:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+8Ej
-					; Weapon_HUDBox_UpdateAndRender_5923A+9Ej
+loc_592DF:				; CODE XREF: Music_SelectTuneCandidate_5923A+8Ej
+					; Music_SelectTuneCandidate_5923A+9Ej
 		cmp	byte_70869, 0
 		jz	short loc_592EE
 		mov	di, 0Dh
 		mov	byte_70869, 0
 
-loc_592EE:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+5Cj
-					; Weapon_HUDBox_UpdateAndRender_5923A+A3j ...
+loc_592EE:				; CODE XREF: Music_SelectTuneCandidate_5923A+5Cj
+					; Music_SelectTuneCandidate_5923A+A3j ...
 		cmp	di, 0FFFFh
 		jz	short loc_592FB
 		mov	word_70859, di
 		mov	[bp+var_1], 1
 
-loc_592FB:				; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+B7j
+loc_592FB:				; CODE XREF: Music_SelectTuneCandidate_5923A+B7j
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-Weapon_HUDBox_UpdateAndRender_5923A	endp
+Music_SelectTuneCandidate_5923A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -646,11 +654,24 @@ Weapon_HUDBox_UpdateAndRender_5923A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, point d'entrée orchestrant tout le cluster Weapon_HUDBox (58ED5/590E0/59061/5923A) +
-; sub_43CDC/sub_43D0F (zone armement/ciblage, proche de WeaponStation_ResolveStateA_40A33 et
-; Targeting_SelectAndPrioritize_43107). Référencée par sub_5AA02.
+; Ex-'Weapon_HUDBox_Main_59302' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE DE COMBAT PAR INTENSITÉ, lue ligne à ligne
+; intégralement. Anciennement Music_CombatIntensitySelector_59302. Plusieurs verrous de sortie
+; précoce (byte_6E4B8, byte_6E4B4, byte_72A8E==0x0B, byte_72C90==0x14) désactivent toute
+; l'évaluation — la piste en cours n'est alors pas modifiée. byte_6E4B8 est positionné dans
+; Player_MainUpdate_13100 selon byte_72DE5/byte_72E1D (probable mort/éjection du joueur) ;
+; byte_6E4B4 est une réaction dérivée, positionnée dans sub_53896 quand byte_6E4B8 est actif
+; (avec appel à sub_6ADFA, probable séquence de mort/éjection, candidat pour la piste
+; victoire/défaite). Si byte_72C90 (catégorie courante) == word_70859 (piste jouée) : calcule
+; un ratio via Roster_SumAttributeB_43D0F × 100 / Roster_SumAttributeA_43CDC (probable
+; pertes/effectif de l'escadrille ou score) et choisit di parmi {4,5,6,7,9,0x13} selon des
+; seuils (≥0x4B=75%, ≥0x23=35%) et des booléens intermédiaires
+; (Weapon_HUDBox_DrawElementA_58ED5, Weapon_HUDBox_DrawElementB_59061, word_722EE, byte_7086A
+; bit0). Si aucune branche ne matche : délègue à Music_SelectTuneCandidate_5923A(si,0,0). Si
+; di choisi : ÉCRASE word_70859 immédiatement. Point d'entrée périodique principal du système
+; de musique de combat dynamique — voir MUSIC_SYSTEM.md §8.1.
 ; ==============================================================================================
-Weapon_HUDBox_Main_59302	proc far		; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+EP
+Music_CombatIntensitySelector_59302	proc far		; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+EP
 					; Weapon_HUDBox_FullUpdateCycle_5AB79+50P
 
 var_A		= word ptr -0Ah
@@ -673,25 +694,25 @@ loc_5930A:
 		jmp	loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_5931A:				; CODE XREF: Weapon_HUDBox_Main_59302+13j
+loc_5931A:				; CODE XREF: Music_CombatIntensitySelector_59302+13j
 		cmp	byte_6E4B4, 0
 		jz	short loc_59324
 		jmp	loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_59324:				; CODE XREF: Weapon_HUDBox_Main_59302+1Dj
+loc_59324:				; CODE XREF: Music_CombatIntensitySelector_59302+1Dj
 		cmp	byte_72A8E, 0Bh
 		jnz	short loc_5932E
 		jmp	loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_5932E:				; CODE XREF: Weapon_HUDBox_Main_59302+27j
+loc_5932E:				; CODE XREF: Music_CombatIntensitySelector_59302+27j
 		cmp	byte_72C90, 14h
 		jnz	short loc_59338
 		jmp	loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_59338:				; CODE XREF: Weapon_HUDBox_Main_59302+31j
+loc_59338:				; CODE XREF: Music_CombatIntensitySelector_59302+31j
 		mov	ax, word_722E6
 		mov	[bp+var_2], ax
 		mov	al, byte_72C90
@@ -701,7 +722,7 @@ loc_59338:				; CODE XREF: Weapon_HUDBox_Main_59302+31j
 		jmp	loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_5934C:				; CODE XREF: Weapon_HUDBox_Main_59302+45j
+loc_5934C:				; CODE XREF: Music_CombatIntensitySelector_59302+45j
 		push	0
 		push	si
 		push	cs
@@ -713,7 +734,7 @@ loc_5934C:				; CODE XREF: Weapon_HUDBox_Main_59302+45j
 		jmp	loc_593F9
 ; ���������������������������������������������������������������������������
 
-loc_59363:				; CODE XREF: Weapon_HUDBox_Main_59302+5Cj
+loc_59363:				; CODE XREF: Music_CombatIntensitySelector_59302+5Cj
 		mov	byte_70869, 1
 		push	si
 		push	cs
@@ -722,22 +743,22 @@ loc_59363:				; CODE XREF: Weapon_HUDBox_Main_59302+5Cj
 		or	al, al
 		jz	short loc_59377
 
-loc_59372:				; CODE XREF: Weapon_HUDBox_Main_59302+85j
+loc_59372:				; CODE XREF: Music_CombatIntensitySelector_59302+85j
 		mov	di, 9
 		jmp	short loc_593EE
 ; ���������������������������������������������������������������������������
 
-loc_59377:				; CODE XREF: Weapon_HUDBox_Main_59302+6Ej
+loc_59377:				; CODE XREF: Music_CombatIntensitySelector_59302+6Ej
 		cmp	word_722EE, 0
 		jz	short loc_59383
 		mov	ax, 1
 		jmp	short loc_59385
 ; ���������������������������������������������������������������������������
 
-loc_59383:				; CODE XREF: Weapon_HUDBox_Main_59302+7Aj
+loc_59383:				; CODE XREF: Music_CombatIntensitySelector_59302+7Aj
 		xor	ax, ax
 
-loc_59385:				; CODE XREF: Weapon_HUDBox_Main_59302+7Fj
+loc_59385:				; CODE XREF: Music_CombatIntensitySelector_59302+7Fj
 		or	al, al
 		jnz	short loc_59372
 		push	si
@@ -750,7 +771,7 @@ loc_59385:				; CODE XREF: Weapon_HUDBox_Main_59302+7Fj
 		jmp	short loc_593EE
 ; ���������������������������������������������������������������������������
 
-loc_59398:				; CODE XREF: Weapon_HUDBox_Main_59302+8Fj
+loc_59398:				; CODE XREF: Music_CombatIntensitySelector_59302+8Fj
 		mov	bx, [bp+var_2]
 		mov	eax, [bx+5Eh]
 		mov	[bp+var_6], eax
@@ -772,43 +793,43 @@ loc_59398:				; CODE XREF: Weapon_HUDBox_Main_59302+8Fj
 		jmp	short loc_593EE
 ; ���������������������������������������������������������������������������
 
-loc_593D5:				; CODE XREF: Weapon_HUDBox_Main_59302+CCj
+loc_593D5:				; CODE XREF: Music_CombatIntensitySelector_59302+CCj
 		cmp	dx, 23h	; '#'
 		jb	short loc_593DF
 		mov	di, 6
 		jmp	short loc_593EE
 ; ���������������������������������������������������������������������������
 
-loc_593DF:				; CODE XREF: Weapon_HUDBox_Main_59302+D6j
+loc_593DF:				; CODE XREF: Music_CombatIntensitySelector_59302+D6j
 		test	byte_7086A, 1
 		jz	short loc_593EB
 		mov	di, 4
 		jmp	short loc_593EE
 ; ���������������������������������������������������������������������������
 
-loc_593EB:				; CODE XREF: Weapon_HUDBox_Main_59302+E2j
+loc_593EB:				; CODE XREF: Music_CombatIntensitySelector_59302+E2j
 		mov	di, 13h
 
-loc_593EE:				; CODE XREF: Weapon_HUDBox_Main_59302+73j
-					; Weapon_HUDBox_Main_59302+94j ...
+loc_593EE:				; CODE XREF: Music_CombatIntensitySelector_59302+73j
+					; Music_CombatIntensitySelector_59302+94j ...
 		cmp	di, 0FFFFh
 		jz	short loc_59405
 		mov	word_70859, di
 		jmp	short loc_59405
 ; ���������������������������������������������������������������������������
 
-loc_593F9:				; CODE XREF: Weapon_HUDBox_Main_59302+5Ej
+loc_593F9:				; CODE XREF: Music_CombatIntensitySelector_59302+5Ej
 		push	0
 		push	0
 		push	si
 		push	cs
-		call	near ptr Weapon_HUDBox_UpdateAndRender_5923A
+		call	near ptr Music_SelectTuneCandidate_5923A
 
 loc_59402:
 		add	sp, 6
 
-loc_59405:				; CODE XREF: Weapon_HUDBox_Main_59302+15j
-					; Weapon_HUDBox_Main_59302+1Fj ...
+loc_59405:				; CODE XREF: Music_CombatIntensitySelector_59302+15j
+					; Music_CombatIntensitySelector_59302+1Fj ...
 		mov	ax, di
 		pop	di
 
@@ -818,17 +839,19 @@ loc_59408:
 
 locret_5940A:
 		retf
-Weapon_HUDBox_Main_59302	endp
+Music_CombatIntensitySelector_59302	endp
 
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; ⭐ far, référencée comme donnée (table d'ISR) depuis sub_AA810 — gestionnaire d'interruption
-; matérielle : envoie l'EOI au contrôleur 8259A (out 20h,al) puis dispatche sur 4 cas
-; (byte_70858) vers Interrupt_TimerDispatch_59436. Probable minuteur matériel pilotant
-; l'animation/séquencement (musique ou effets de transition).
+; Ex-'Interrupt_TimerISR_5940B' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). ★ ISR de tick, référencée explicitement par
+; AudioQueue_RegisterTickModule_AA810 (seg458) via le mécanisme Stopwatch (seg207).
+; Anciennement Music_SequencerTickISR_5940B. Corps de l'ISR enregistrée comme module dans le
+; registre de modules à créneaux temporisés générique (seg161) — dédiée spécifiquement au
+; séquenceur musical.
 ; ==============================================================================================
-Interrupt_TimerISR_5940B:				; DATA XREF: AudioQueue_RegisterTickModule_AA810+Do
+Music_SequencerTickISR_5940B:				; DATA XREF: AudioQueue_RegisterTickModule_AA810+Do
 		push	bp
 		mov	bp, sp
 		sub	sp, 2
@@ -862,12 +885,14 @@ loc_5942F:				; CODE XREF: seg121:055Aj
 		jmp	cs:off_595BA[bx] ; switch jump
 
 ; ==============================================================================================
-; ⚠️ far, 234 lignes, NON DÉTAILLÉE — table de saut à plusieurs cas (off_595BA) appelée depuis
-; Interrupt_TimerISR_5940B ; appelle des fonctions non encore documentées
-; (sub_59FF5/603CC/60402/603DE, probablement définies dans un segment suivant). Candidat pour
-; session dédiée en lien avec le minuteur matériel.
+; Ex-'Interrupt_TimerDispatch_59436' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). ★ 234 lignes — dispatch de l'ISR musicale (4 cas),
+; anciennement Music_SequencerTickDispatch_59436. Aiguille vers
+; Music_TuneTransitionResolve_595C2, Music_TuneTransitionCommit_5974D,
+; Music_SequencerTickInit_597C2 et Music_SequencerTickCleanup_59817 selon l'état courant du
+; séquenceur musical.
 ; ==============================================================================================
-Interrupt_TimerDispatch_59436:				; DATA XREF: seg121:off_595BAo
+Music_SequencerTickDispatch_59436:				; DATA XREF: seg121:off_595BAo
 		mov	ax, 4700h	; case 0x0
 		mov	dx, word_709D0
 		int	67h		;  - LIM EMS - SAVE MAPPING CONTEXT
@@ -884,14 +909,14 @@ Interrupt_TimerDispatch_59436:				; DATA XREF: seg121:off_595BAo
 		add	dx, ax
 		push	dx
 		push	si
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		cmp	word ptr [si], 0
 		jz	short loc_59479
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
@@ -921,7 +946,7 @@ loc_5948F:				; CODE XREF: seg121:0561j
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_UNKNOWN_60402
+		call	AIL_measure_count_60402
 		add	sp, 4
 		jmp	short loc_594B8
 ; ���������������������������������������������������������������������������
@@ -941,7 +966,7 @@ loc_594C3:				; CODE XREF: seg121:05C8j
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 2
 		jnz	short loc_594E7
@@ -991,7 +1016,7 @@ loc_59510:				; CODE XREF: seg121:loc_59506j
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_UNKNOWN_60402
+		call	AIL_measure_count_60402
 		add	sp, 4
 		jmp	short loc_5952E
 ; ���������������������������������������������������������������������������
@@ -1011,7 +1036,7 @@ loc_59534:
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 2
 		jnz	short loc_59558
@@ -1041,7 +1066,7 @@ loc_59562:				; CODE XREF: seg121:loc_59532j
 					; Return: AH = status
 		nop
 		push	cs
-		call	near ptr Interrupt_TimerCase_595C2
+		call	near ptr Music_TuneTransitionResolve_595C2
 		jmp	loc_59483
 ; ���������������������������������������������������������������������������
 
@@ -1052,7 +1077,7 @@ loc_59573:				; CODE XREF: seg121:0561j
 		push	word_72CA7
 		mov	bx, word_72CA5
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 2
 		jnz	short loc_59597
@@ -1080,7 +1105,7 @@ loc_5959D:				; CODE XREF: seg121:loc_59599j
 					; Return: AH = status
 		nop
 		push	cs
-		call	near ptr Interrupt_TimerCaseB_5974D
+		call	near ptr Music_TuneTransitionCommit_5974D
 		jmp	loc_5947E
 ; ���������������������������������������������������������������������������
 
@@ -1092,7 +1117,7 @@ loc_595B7:				; CODE XREF: seg121:054Dj seg121:05BCj ...
 		leave
 		retf
 ; ���������������������������������������������������������������������������
-off_595BA	dw offset Interrupt_TimerDispatch_59436	; DATA XREF: seg121:0561r
+off_595BA	dw offset Music_SequencerTickDispatch_59436	; DATA XREF: seg121:0561r
 		dw offset loc_5948F	; jump table for switch	statement
 		dw offset loc_594FD
 		dw offset loc_59573
@@ -1102,10 +1127,22 @@ off_595BA	dw offset Interrupt_TimerDispatch_59436	; DATA XREF: seg121:0561r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 208 lignes, NON DÉTAILLÉE — un des cas de Interrupt_TimerDispatch_59436
-; (sub_59F1D/59FF5/603CC répétés deux fois).
+; Ex-'Interrupt_TimerCase_595C2' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). ★ far, 208 lignes — RÉSOLUTION DE TRANSITION PAR DOUBLE
+; INDIRECTION, lue ligne à ligne intégralement. Anciennement
+; Music_TuneTransitionResolve_595C2. Un des 4 cas de Music_SequencerTickDispatch_59436. Deux
+; tables chaînées : (1) dl = dword_70861[byte_72C90 (piste actuelle)][word_70859 (piste
+; cible)] — si dl==0xFF, aucune transition, ne fait rien ; (2) sinon var_1 =
+; dword_7085D[dl][word_72C91 (ratio par piste)]. Décision finale sur var_1 : ==0 → bascule
+; directe sur le canal principal 5BE3h (Music_ChannelStopSequence_59F1D +
+; Music_ChannelRegisterSequence_59FF5 + sub_603CC), pas de piste de transition ; !=0 et <=
+; word_7084E → charge une PISTE DE TRANSITION sur le canal secondaire 5BF5h via
+; word_70856+(var_1-1)*10 ; > word_7084E → abandon, word_70859 réinitialisé à byte_72C90.
+; CONFIRMÉ sur fichier réel (combat.dat, MUSIC_SYSTEM.md §7.5) : var_1 est l'index d'une piste
+; de transition autonome dans l'archive imbriquée à 3 niveaux (§7.3) — PAS un saut de marqueur
+; façon RBRN. Voir MUSIC_SYSTEM.md §8.2.
 ; ==============================================================================================
-Interrupt_TimerCase_595C2	proc far		; CODE XREF: seg121:069Dp
+Music_TuneTransitionResolve_595C2	proc far		; CODE XREF: seg121:069Dp
 
 var_4		= word ptr -4
 var_1		= byte ptr -1
@@ -1129,31 +1166,31 @@ var_1		= byte ptr -1
 		jmp	short loc_59606
 ; ���������������������������������������������������������������������������
 
-loc_595ED:				; CODE XREF: Interrupt_TimerCase_595C2+1Dj
-					; Interrupt_TimerCase_595C2+3Aj
+loc_595ED:				; CODE XREF: Music_TuneTransitionResolve_595C2+1Dj
+					; Music_TuneTransitionResolve_595C2+3Aj
 		mov	word_7085B, 4
 		jmp	short loc_5960E
 ; ���������������������������������������������������������������������������
 
-loc_595F5:				; CODE XREF: Interrupt_TimerCase_595C2+22j
+loc_595F5:				; CODE XREF: Music_TuneTransitionResolve_595C2+22j
 		test	byte_7086A, 1
 		jz	short loc_595FE
 		jmp	short loc_595ED
 ; ���������������������������������������������������������������������������
 
-loc_595FE:				; CODE XREF: Interrupt_TimerCase_595C2+27j
-					; Interrupt_TimerCase_595C2+38j
+loc_595FE:				; CODE XREF: Music_TuneTransitionResolve_595C2+27j
+					; Music_TuneTransitionResolve_595C2+38j
 		mov	word_7085B, 13h
 		jmp	short loc_5960E
 ; ���������������������������������������������������������������������������
 
-loc_59606:				; CODE XREF: Interrupt_TimerCase_595C2+29j
+loc_59606:				; CODE XREF: Music_TuneTransitionResolve_595C2+29j
 		mov	al, byte_72C90
 		mov	ah, 0
 		mov	word_7085B, ax
 
-loc_5960E:				; CODE XREF: Interrupt_TimerCase_595C2+Cj
-					; Interrupt_TimerCase_595C2+13j ...
+loc_5960E:				; CODE XREF: Music_TuneTransitionResolve_595C2+Cj
+					; Music_TuneTransitionResolve_595C2+13j ...
 		mov	al, byte_72C90
 		mov	ah, 0
 		imul	ax, 0Ch
@@ -1177,12 +1214,12 @@ loc_59632:
 		jmp	short loc_59642
 ; ���������������������������������������������������������������������������
 
-loc_5963A:				; CODE XREF: Interrupt_TimerCase_595C2:loc_59632j
+loc_5963A:				; CODE XREF: Music_TuneTransitionResolve_595C2:loc_59632j
 		mov	al, [si+0Bh]
 		mov	ah, 0
 		mov	word_72C91, ax
 
-loc_59642:				; CODE XREF: Interrupt_TimerCase_595C2+76j
+loc_59642:				; CODE XREF: Music_TuneTransitionResolve_595C2+76j
 		mov	al, byte_72C90
 		mov	ah, 0
 		shl	ax, 2
@@ -1197,7 +1234,7 @@ loc_59642:				; CODE XREF: Interrupt_TimerCase_595C2+76j
 		jmp	short loc_5967F
 ; ���������������������������������������������������������������������������
 
-loc_59665:				; CODE XREF: Interrupt_TimerCase_595C2+9Bj
+loc_59665:				; CODE XREF: Music_TuneTransitionResolve_595C2+9Bj
 		mov	al, dl
 		mov	ah, 0
 		shl	ax, 2
@@ -1208,13 +1245,13 @@ loc_59665:				; CODE XREF: Interrupt_TimerCase_595C2+9Bj
 		mov	al, es:[bx]
 		mov	[bp+var_1], al
 
-loc_5967F:				; CODE XREF: Interrupt_TimerCase_595C2+A1j
+loc_5967F:				; CODE XREF: Music_TuneTransitionResolve_595C2+A1j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_596D7
 		push	5BE3h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	al, byte ptr word_70859
 		mov	byte_72C90, al
@@ -1227,37 +1264,37 @@ loc_5967F:				; CODE XREF: Interrupt_TimerCase_595C2+A1j
 		add	dx, ax
 		push	dx
 		push	si
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		cmp	word ptr [si], 0
 		jz	short loc_596CB
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
-loc_596CB:				; CODE XREF: Interrupt_TimerCase_595C2+F5j
+loc_596CB:				; CODE XREF: Music_TuneTransitionResolve_595C2+F5j
 		mov	byte_72CA1, 1
 		mov	byte_70858, 1
 		jmp	short loc_5974A
 ; ���������������������������������������������������������������������������
 
-loc_596D7:				; CODE XREF: Interrupt_TimerCase_595C2+C4j
+loc_596D7:				; CODE XREF: Music_TuneTransitionResolve_595C2+C4j
 		test	[bp+var_1], 80h
 		jz	short loc_596E3
 		and	[bp+var_1], 7Fh
 		jmp	short loc_596F1
 ; ���������������������������������������������������������������������������
 
-loc_596E3:				; CODE XREF: Interrupt_TimerCase_595C2+119j
+loc_596E3:				; CODE XREF: Music_TuneTransitionResolve_595C2+119j
 		push	5BE3h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	byte_72CA1, 0
 
-loc_596F1:				; CODE XREF: Interrupt_TimerCase_595C2+11Fj
+loc_596F1:				; CODE XREF: Music_TuneTransitionResolve_595C2+11Fj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		cmp	ax, word_7084E
@@ -1272,7 +1309,7 @@ loc_59701:
 		jmp	short loc_5974A
 ; ���������������������������������������������������������������������������
 
-loc_59710:				; CODE XREF: Interrupt_TimerCase_595C2+138j
+loc_59710:				; CODE XREF: Music_TuneTransitionResolve_595C2+138j
 		mov	si, 5BF5h
 
 loc_59713:
@@ -1287,7 +1324,7 @@ loc_59722:
 		add	dx, ax
 		push	dx
 		push	si
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 
 loc_5972B:
 		add	sp, 6
@@ -1300,19 +1337,19 @@ loc_59733:
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
-loc_59745:				; CODE XREF: Interrupt_TimerCase_595C2+16Fj
+loc_59745:				; CODE XREF: Music_TuneTransitionResolve_595C2+16Fj
 		mov	byte_70858, 3
 
-loc_5974A:				; CODE XREF: Interrupt_TimerCase_595C2+113j
-					; Interrupt_TimerCase_595C2+14Cj
+loc_5974A:				; CODE XREF: Music_TuneTransitionResolve_595C2+113j
+					; Music_TuneTransitionResolve_595C2+14Cj
 		pop	si
 		leave
 		retf
-Interrupt_TimerCase_595C2	endp
+Music_TuneTransitionResolve_595C2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1320,24 +1357,33 @@ Interrupt_TimerCase_595C2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, autre cas de Interrupt_TimerDispatch_59436 (sub_59F1D/59FF5/603CC).
+; Ex-'Interrupt_TimerCaseB_5974D' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). ★ far — COMMIT DE LECTURE + REPRISE APRÈS PISTE TRANSITOIRE,
+; lue ligne à ligne intégralement. Anciennement Music_TuneTransitionCommit_5974D. Un des 4 cas
+; de Music_SequencerTickDispatch_59436. Libère le canal transition (5BF5h) et
+; conditionnellement le canal principal (5BE3h, si byte_72CA1==1), commit
+; byte_72C90=word_70859, recharge et démarre la lecture (Music_ChannelRegisterSequence_59FF5 +
+; sub_603CC) sur le canal 5BE3h. Registre de reprise à un seul niveau : si la piste qui vient
+; de démarrer (di) est une piste transitoire de menu (0x10 ≤ di ≤ 0x12), REMPLACE
+; immédiatement word_70859 par word_7085B (piste sauvegardée avant la transition, positionnée
+; dans Music_TuneTransitionResolve_595C2). Voir MUSIC_SYSTEM.md §8.4.
 ; ==============================================================================================
-Interrupt_TimerCaseB_5974D	proc far		; CODE XREF: seg121:06DCp
+Music_TuneTransitionCommit_5974D	proc far		; CODE XREF: seg121:06DCp
 		push	bp
 		mov	bp, sp
 		push	si
 		push	di
 		push	5BF5h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	byte_72CB3, 0
 		cmp	byte_72CA1, 1
 		jnz	short loc_59770
 		push	5BE3h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 
-loc_59770:				; CODE XREF: Interrupt_TimerCaseB_5974D+18j
+loc_59770:				; CODE XREF: Music_TuneTransitionCommit_5974D+18j
 		mov	al, byte ptr word_70859
 		mov	byte_72C90, al
 		mov	ah, 0
@@ -1349,18 +1395,18 @@ loc_59770:				; CODE XREF: Interrupt_TimerCaseB_5974D+18j
 		add	dx, ax
 		push	dx
 		push	si
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		cmp	word ptr [si], 0
 		jz	short loc_597A9
 		push	word ptr [si+2]
 		mov	bx, [si]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
-loc_597A9:				; CODE XREF: Interrupt_TimerCaseB_5974D+48j
+loc_597A9:				; CODE XREF: Music_TuneTransitionCommit_5974D+48j
 		mov	byte_72CA1, 1
 		cmp	di, 10h
 		jl	short loc_597BE
@@ -1369,21 +1415,22 @@ loc_597A9:				; CODE XREF: Interrupt_TimerCaseB_5974D+48j
 		mov	ax, word_7085B
 		mov	word_70859, ax
 
-loc_597BE:				; CODE XREF: Interrupt_TimerCaseB_5974D+64j
-					; Interrupt_TimerCaseB_5974D+69j
+loc_597BE:				; CODE XREF: Music_TuneTransitionCommit_5974D+64j
+					; Music_TuneTransitionCommit_5974D+69j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Interrupt_TimerCaseB_5974D	endp
+Music_TuneTransitionCommit_5974D	endp
 
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, référencée via vtable (DATA XREF seg339), initialise ~10 globales d'état du sous-
-; système minuteur (dword_72C97 et suivantes).
+; Ex-'Interrupt_TimerInitState_597C2' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). Anciennement Music_SequencerTickInit_597C2. Un des 4 cas de
+; Music_SequencerTickDispatch_59436 — initialisation d'état du séquenceur musical.
 ; ==============================================================================================
-Interrupt_TimerInitState_597C2:				; DATA XREF: seg339:off_71F20o
+Music_SequencerTickInit_597C2:				; DATA XREF: seg339:off_71F20o
 		push	bp
 		mov	bp, sp
 		mov	dword_72C97, 0
@@ -1407,14 +1454,15 @@ loc_59809:
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, référencée via vtable (DATA XREF seg339), libère des ressources (sub_5C7B6, motif de
-; "free" déjà vu) associées au sous-système minuteur.
+; Ex-'Interrupt_TimerCleanup_59817' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). Anciennement Music_SequencerTickCleanup_59817. Un des 4 cas de
+; Music_SequencerTickDispatch_59436 — nettoyage d'état du séquenceur musical.
 ; ==============================================================================================
-Interrupt_TimerCleanup_59817:				; DATA XREF: seg339:4F2Ao
+Music_SequencerTickCleanup_59817:				; DATA XREF: seg339:4F2Ao
 		push	bp
 		mov	bp, sp
 		push	5BF5h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	byte_72CAE, 0
 		jz	short loc_59848
@@ -1436,7 +1484,7 @@ loc_59848:				; CODE XREF: seg121:0958j seg121:0960j
 		mov	byte_72CAE, 0
 		mov	dword_72CAF, 0
 		push	5BE3h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	byte_72C9C, 0
 		jz	short loc_5988D

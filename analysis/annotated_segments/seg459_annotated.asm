@@ -8,7 +8,7 @@ seg459		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; far, combine AudioQueue_Helper_AB82E, AudioQueue_LoadAndPlayEntry_AB592,
-; Sequencer_ReleaseSlot_59F87 (seg123).
+; Music_ChannelInit_59F87 (seg123).
 ; ==============================================================================================
 AudioQueue_InitAndProcess_AB540	proc far		; CODE XREF: VROOMM_StubThunk_6D015J
 
@@ -50,7 +50,7 @@ loc_AB560:				; CODE XREF: AudioQueue_InitAndProcess_AB540+3Dj
 		add	dx, ax
 		add	dx, 92h	; '�'
 		push	dx
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		inc	di
 
@@ -94,13 +94,13 @@ AudioQueue_AdvanceWrapper_AB583	endp
 
 ; ==============================================================================================
 ; ⭐⚠️ far, 247 lignes, NON DÉTAILLÉE — orchestrateur majeur du cluster : combine
-; IndexedRecordReader_ConstructVariantA_65A1A (seg196), Sequencer_ReleaseSlot_59F87,
+; IndexedRecordReader_ConstructVariantA_65A1A (seg196), Music_ChannelInit_59F87,
 ; IndexedRecordReader_AdvanceIndex_65E2C, allocateurs typés
 ; (Memory_TypedFreeWrapperC_5C6F3/Memory_TypedAllocDispatchB_5C832),
-; IndexedRecordReader_SeekToIndex_65C6D, Sequencer_ProcessQueue_59FF5,
-; Sequencer_AdvanceActiveSlot_59F1D (×2, seg123), IndexedRecordReader_Destruct_659D0 (seg196)
-; — cycle complet de chargement et lecture d'une entrée audio/message indexée via le
-; séquenceur. Candidat prioritaire pour session dédiée.
+; IndexedRecordReader_SeekToIndex_65C6D, Music_ChannelRegisterSequence_59FF5,
+; Music_ChannelStopSequence_59F1D (×2, seg123), IndexedRecordReader_Destruct_659D0 (seg196) —
+; cycle complet de chargement et lecture d'une entrée audio/message indexée via le séquenceur.
+; Candidat prioritaire pour session dédiée.
 ; ==============================================================================================
 AudioQueue_LoadAndPlayEntry_AB592	proc far		; CODE XREF: VROOMM_StubThunk_6D01FJ AudioQueue_InitAndProcess_AB540+18p
 
@@ -189,7 +189,7 @@ loc_AB5EB:
 		push	word ptr [si+4]
 		lea	ax, [bp+var_E4]
 		push	ax
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 
 loc_AB632:
@@ -285,11 +285,11 @@ loc_AB6A7:
 		push	dx
 		lea	ax, [bp+var_E4]
 		push	ax
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		lea	ax, [bp+var_E4]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		inc	di
 
@@ -304,7 +304,7 @@ loc_AB713:				; CODE XREF: AudioQueue_LoadAndPlayEntry_AB592+17Cj
 		push	ax
 
 loc_AB718:
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 
 loc_AB71D:
 		pop	cx
@@ -356,7 +356,7 @@ AudioQueue_LoadAndPlayEntry_AB592	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Sequencer_AdvanceActiveSlot_59F1D (seg123).
+; far, appelle Music_ChannelStopSequence_59F1D (seg123).
 ; ==============================================================================================
 AudioQueue_AdvanceSlotEntry_AB770	proc far		; CODE XREF: VROOMM_StubThunk_6D029J AudioQueue_AdvanceWrapper_AB583+9p ...
 
@@ -378,7 +378,7 @@ loc_AB77C:				; CODE XREF: AudioQueue_AdvanceSlotEntry_AB770+2Ej
 		add	dx, ax
 		add	dx, 92h	; '�'
 		push	dx
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	bx, di
 		imul	bx, 11h

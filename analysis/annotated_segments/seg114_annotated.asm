@@ -6519,7 +6519,7 @@ loc_538A1:				; CODE XREF: STRIKE_EXE_MAIN_LOOP+12Bj
 		mov	al, byte_706A2
 		mov	ah, 0
 		push	ax
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		jmp	loc_53997
 ; ���������������������������������������������������������������������������
@@ -7111,7 +7111,7 @@ loc_53CBB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+21Dj
 		push	ax
 
 loc_53CC1:
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 
 loc_53CC6:
 		pop	cx
@@ -7152,7 +7152,7 @@ loc_53CEB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+252j
 		push	ax
 
 loc_53CEC:
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
 loc_53CF2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1FCj

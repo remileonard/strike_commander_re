@@ -460,7 +460,7 @@ Lexer_Rewind	endp
 ; suivi lui-même d'un token 0xA2 : prédicat de lookahead du parseur (reconnaissance de motif
 ; de token).
 ; ==============================================================================================
-Parser_LookaheadPattern	proc far		; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+96P
+Parser_LookaheadPattern	proc far		; CODE XREF: Music_SelectTuneCandidate_5923A+96P
 					; UIScript_ParseAndEvaluate_7A054+EBP
 
 arg_0		= word ptr  6

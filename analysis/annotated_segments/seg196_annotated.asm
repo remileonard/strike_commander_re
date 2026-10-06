@@ -496,8 +496,8 @@ IndexedRecordReader_ReadIndexTable_65B73	endp
 ; IndexedRecordReader_AdvanceIndex_65E2C, StreamReader_ReadTyped_63FA1 et
 ; IndexedRecordReader_ReadIndexTable_65B73 — positionnement sur une entrée d'index donnée.
 ; ==============================================================================================
-IndexedRecordReader_SeekToIndex_65C6D	proc far		; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+107P
-					; TextRenderer_InputFieldHandler_5A0F3+352P ...
+IndexedRecordReader_SeekToIndex_65C6D	proc far		; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+107P
+					; Sound_LoadDriverAndTimbreCache_5A0F3+352P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

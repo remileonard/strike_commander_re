@@ -1178,8 +1178,8 @@ loc_8B932:
 		call	Memory_TypedAllocDispatchB_5C832
 		add	sp, 0Ah
 ; ���������������������������������������������������������������������������
-word_8B984	dw 5689h		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+1Dr
-word_8B986	dw 89E0h		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+21r
+word_8B984	dw 5689h		; DATA XREF: VROOMM_ScanMemoryArena_6855F+1Dr
+word_8B986	dw 89E0h		; DATA XREF: VROOMM_ScanMemoryArena_6855F+21r
 aFFg		db 'F�f�~�',0
 ; ���������������������������������������������������������������������������
 		jnz	short loc_8B994

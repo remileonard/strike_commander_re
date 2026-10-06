@@ -31,7 +31,7 @@ VROOMM_StubThunk_6CFA0	endp
 ; far, thunk fixe VROOMM (jmp sub_AB4BE) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
-VROOMM_StubThunk_6CFA5	proc far		; DATA XREF: AudioQueue_ReleaseAndAdvance_AACA6+24o
+VROOMM_StubThunk_6CFA5	proc far		; DATA XREF: AudioQueue_LoadTrackTable_AACA6+24o
 		jmp	AudioQueue_Helper_AB4BE
 VROOMM_StubThunk_6CFA5	endp
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6CFA5	endp
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
 VROOMM_StubThunk_6CFAA	proc far
-		jmp	AudioQueue_ReleaseAndAdvance_AACA6
+		jmp	AudioQueue_LoadTrackTable_AACA6
 VROOMM_StubThunk_6CFAA	endp
 
 
@@ -71,7 +71,7 @@ VROOMM_StubThunk_6CFAF	endp
 ; d'overlay actuellement charge en memoire. fileoff=39580h, codesize=0D26h, nentries=13.
 ; ==============================================================================================
 VROOMM_StubThunk_6CFB4	proc far
-		jmp	AudioQueue_ProcessAndAdvance_AAFA0
+		jmp	AudioQueue_LoadTransitionTable_AAFA0
 VROOMM_StubThunk_6CFB4	endp
 
 

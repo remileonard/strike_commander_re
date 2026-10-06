@@ -36,7 +36,7 @@ loc_598B2:				; CODE XREF: Weapon_HUDBox_TimerCaseC_598A6+53j
 		imul	bx, 11h
 		mov	bx, [bx+si+92h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 1
 		jnz	short loc_598E5
@@ -160,7 +160,7 @@ loc_59962:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+5Cj
 		add	dx, 6
 		push	dx
 		push	di
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		mov	ax, [bp+var_4]
 		mov	[bp+var_6], ax
@@ -171,7 +171,7 @@ loc_59962:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+5Cj
 		push	word ptr [di+2]
 		mov	bx, [di]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_B1_603F0
+		call	AIL_set_relative_volume_603F0
 		add	sp, 8
 		jmp	short $+2
 
@@ -181,7 +181,7 @@ loc_599A9:				; CODE XREF: Weapon_HUDBox_TimerCaseD_59902+90j
 		push	word ptr [di+2]
 		mov	bx, [di]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
@@ -289,7 +289,7 @@ loc_59A43:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+6Bj
 		push	word ptr [di+2]
 		mov	bx, [di]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_B1_603F0
+		call	AIL_set_relative_volume_603F0
 		add	sp, 8
 		jmp	short loc_59A7A
 ; ���������������������������������������������������������������������������
@@ -300,7 +300,7 @@ loc_59A68:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+7Cj
 
 loc_59A6A:				; CODE XREF: Weapon_HUDBox_TimerCaseE_599D3+74j
 		push	di
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	byte ptr [di+0Eh], 0Fh
 		mov	word ptr [di+0Fh], 0
@@ -361,7 +361,7 @@ loc_59A9C:				; CODE XREF: Weapon_HUDBox_TimerCaseF_59A8A+47j
 		cmp	ax, [bp+arg_4]
 		jnz	short loc_59ACA
 		push	di
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	byte ptr [di+0Eh], 0Fh
 		mov	word ptr [di+0Fh], 0
@@ -761,7 +761,7 @@ loc_59D2E:
 
 loc_59D33:
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 2
 		jnz	short loc_59D48
@@ -783,7 +783,7 @@ loc_59D4E:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA:loc_59D4Aj
 		or	al, al
 		jz	short loc_59D62
 		push	[bp+var_2]
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		mov	bx, [bp+var_2]
 		mov	byte ptr [bx+0Eh], 0Fh
@@ -979,7 +979,7 @@ loc_59EAC:				; CODE XREF: Weapon_HUDBox_MasterUpdate_59CFA+1A3j
 		push	0E1h ; '�'
 		mov	bx, [si+4]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_UNKNOWN_60420
+		call	AIL_send_channel_voice_message_60420
 		add	sp, 8
 		mov	ax, [bp+var_22]
 		mov	word_7087F, ax

@@ -9,9 +9,9 @@ ovr316		segment	para public 'OVERLAY' use16
 ; ==============================================================================================
 ; ⭐⚠️ far, 577 lignes, NON DÉTAILLÉE — dernière fonction du fichier (avant les tables de stubs
 ; suivantes) : combine Terrain_QueryAltitudeAt, Gauge_ComputeNeedlePosition,
-; Expr_VM_Execute_51E7E (seg114), TextObject_AllocateVariantA_5A984 (seg125) — calcul et rendu
-; d'une aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour
-; session dédiée.
+; Expr_VM_Execute_51E7E (seg114), Music_RequestTune_5A984 (seg125) — calcul et rendu d'une
+; aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour session
+; dédiée.
 ; ==============================================================================================
 Gauge_ComputeAndRenderNeedle_9D910	proc far		; CODE XREF: VROOMM_StubThunk_6C2F0J
 
@@ -250,7 +250,7 @@ loc_9DA9A:
 		cmp	word_70466, 64h	; 'd'
 		jbe	short loc_9DAAF
 		push	14h
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
 loc_9DAAF:				; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+18Ej

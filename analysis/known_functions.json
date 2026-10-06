@@ -490,9 +490,9 @@
     "summary": "far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B."
   },
   "sub_689F1": {
-    "new_name": "VROOMM_ComputeSizeFromHeader_689F1",
+    "new_name": "VROOMM_ComputeSegmentSpan_689F1",
     "segment": "seg212",
-    "summary": "near, calcule la taille totale de l'image (pages + paragraphes supplémentaires demandés) à partir de l'en-tête MZ — arithmétique standard de calcul de taille d'exécutable DOS."
+    "summary": "Ex-'VROOMM_ComputeSizeFromHeader_689F1' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - calcule l'etendue totale en paragraphes d'un segment de donnees + code (es:8 = taille code, es:0xA = taille donnees), arrondis independamment puis sommes."
   },
   "sub_6CCA5": {
     "new_name": "VROOMM_StubThunk_6CCA5",
@@ -502,7 +502,7 @@
   "sub_AB770": {
     "new_name": "AudioQueue_AdvanceSlotEntry_AB770",
     "segment": "seg459",
-    "summary": "far, appelle Sequencer_AdvanceActiveSlot_59F1D (seg123)."
+    "summary": "far, appelle Music_ChannelStopSequence_59F1D (seg123)."
   },
   "unnamed_seg131_d": {
     "new_name": "Memory_TypedAllocDispatchF_UNRESOLVED",
@@ -525,9 +525,9 @@
     "summary": "⭐ far, référencée via vtable (DATA XREF seg216) et par des dizaines de fonctions dans toute la base, notamment `Render_TerrainPipelineMain` (sub_345D6, seg074) — **gestionnaire d'erreur fatale/assertion** : garde de réentrance (byte_70EEE), formate un message (sub_2962), résout le nom de la classe fautive via Memory_AllocatorTable_PopulateSlots_5CB99 (tag 5C44h, le gestionnaire de mémoire typée), imprime le diagnostic à l'écran (Video_PrintString_5EFD3, plusieurs fois, avec un tag fixe 3DFAh), puis appelle sub_3C2(1) — probable terminaison/abandon du programme. CONFIRMÉ par le seg339 : le dialogue d'erreur fatale affiché est exactement « Strike Commander has encountered an Error that it cannot recover from... » avec un code « Error Code: %X-%X » et une invite à contacter le support Origin — texte utilisateur final retrouvé tel quel."
   },
   "sub_689A3": {
-    "new_name": "VROOMM_FindRelocationSlot_689A3",
+    "new_name": "VROOMM_FindOffsetInTable_689A3",
     "segment": "seg212",
-    "summary": "near, recherche binaire/linéaire dans une table de relogement (segment:offset). Appelée par VROOMM_MoveImageAndFixup_68928 et VROOMM_PatchRelocationEntry_68997."
+    "summary": "Ex-'VROOMM_FindRelocationSlot_689A3' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - recherche binaire/lineaire dans une table de correspondances (offset->segment) utilisee par le mecanisme de patch de relocation."
   },
   "sub_1CE1D": {
     "new_name": "Lexer_ResolveConstantAlt",
@@ -620,9 +620,9 @@
     "summary": "far, transformation d'un vecteur 3D par une matrice 3×3 (9 multiplications-accumulations en virgule fixe) — implémentation du produit matrice×vecteur utilisé par le cluster de rotation (seg116). Référencée par Damage_ComputeHelperB_564CE."
   },
   "unnamed_seg124_widgetbuilder": {
-    "new_name": "TextRenderer_BuildInputWidget_UNRESOLVED",
+    "new_name": "Music_InstallXMITimbres_UNRESOLVED",
     "segment": "seg124",
-    "summary": "⚠️ far, 189 lignes, NON DÉTAILLÉE — construit un widget complexe (buffer local 0xAC octets initialisé via sub_63A39, dispatch vtable, ~10 appels sub_64xxx typiques de setters d'attribut widget : position/taille/couleur/police), appelle aussi Sequencer_ValidatePlacement_5A62A. ⚠️ Aucun label IDA — adresse exacte non résolue. Candidat pour session dédiée (probable constructeur de champ de saisie de texte pour l'UI)."
+    "summary": "Ex-'XMI_ParseMultiTrackFile_UNRESOLVED'. Ex-'TextRenderer_BuildInputWidget_UNRESOLVED' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★★★ far, ~185 lignes, lue ligne à ligne intégralement — PARSEUR DE FICHIER XMI MULTI-PISTES AU FORMAT IFF STANDARD. Anciennement et INCORRECTEMENT étiquetée XMI_ParseMultiTrackFile_UNRESOLVED (hypothèse posée sans lecture du contenu, sur la seule base d'un buffer 0xAC octets + dispatch vtable — motif générique partagé par de nombreuses fonctions I/O du moteur, pas spécifique à l'UI texte). ⚠️ Aucun label IDA — bloc anonyme, adresse exacte non résolue, situé immédiatement après Music_InstallTimbre_5A62A (fin ligne 182021) et avant Music_ShutdownDriver_5A856 (début ligne 182211), seg124. Appelée par Music_ChannelRegisterSequence_59FF5 (seg123, +0xF0). \n\nSéquence confirmée : (1) FORM 'XDIR' (52494458h) → INFO (4F464E49h) lu via sub_64A54 → di = nombre de pistes XMID du fichier ; (2) CAT ' ' 'XMID' (44494D58h) recherché ; (3) boucle : sub_646DB (chunk suivant) → si type==XMID (44494D58h) → sub_64C21 (entre dans le FORM) → recherche TIMB (424D4954h) via sub_64743 → si présent, lit le compte de timbres via sub_64A19 puis boucle Music_InstallTimbre_5A62A(si, timbre_id) pour chaque entrée (2 octets par timbre, format patch/bank standard AIL) → sub_64D25 (sort du FORM) → di-- ; répète tant que di>0 et sub_64DB3 (chunk suivant au niveau CAT) réussit. \n\n⚠️ AUCUNE lecture du chunk EVNT observée dans cette fonction — elle n'extrait que l'en-tête (nombre de pistes) et la liste des timbres requis par piste, PAS les événements de note eux-mêmes. Hypothèse : cette fonction sert à un pré-scan/enregistrement des timbres nécessaires (peut-être appelée au chargement d'un fichier multi-XMID pour préparer le cache de timbres, cf. Sound_LoadDriverAndTimbreCache_5A0F3), tandis que la lecture effective des EVNT/notes se fait ailleurs (au moment de la lecture réelle, via le mécanisme AudioQueue_*/Music_TuneTransitionResolve_595C2 déjà documenté dans MUSIC_SYSTEM.md — lien exact entre les deux systèmes non établi cette session). Voir ADLIB_DRIVER.md pour le format bas niveau consommé côté pilote (courbes d'enveloppe pas/durée, sub_552) — la relation entre EVNT (s'il existe ailleurs) et ce format reste à tracer. PRECISE 2026-10-06 : ce n'est pas un lecteur de notes ; c'est le pre-chargement des timbres d'un fichier XMI (FORM XDIR/INFO, CAT XMID, chunk TIMB de chaque sequence -> Music_InstallTimbre_5A62A pour chaque paire patch/banque). Les evenements (EVNT) sont lus par le pilote lui-meme (shell XMIDI.ASM d'AIL dans ADLIB.ADV)."
   },
   "sub_6AF3F": {
     "new_name": "VROOMM_StubThunk_6AF3F",
@@ -877,7 +877,7 @@
   "sub_5CB99": {
     "new_name": "Memory_AllocatorTable_PopulateSlots_5CB99",
     "segment": "seg133",
-    "summary": "far, 152 lignes — construit le tableau de 6 emplacements (Memory_AllocatorSlotArray_Construct_5CB63), libère un glyphe en cache (TextRenderer_ReleaseCachedGlyph_5CA9E), puis peuple/configure chaque emplacement (Memory_AllocatorSlot_Helper_5CB30, appelée 12 fois), termine par la construction de deux sous-objets (sub_5E9A9/sub_5EA03). Référencée par sub_5F700 (seg125, via TextObject_AllocateVariantA_5A984)."
+    "summary": "far, 152 lignes — construit le tableau de 6 emplacements (Memory_AllocatorSlotArray_Construct_5CB63), libère un glyphe en cache (TextRenderer_ReleaseCachedGlyph_5CA9E), puis peuple/configure chaque emplacement (Memory_AllocatorSlot_Helper_5CB30, appelée 12 fois), termine par la construction de deux sous-objets (sub_5E9A9/sub_5EA03). Référencée par sub_5F700 (seg125, via Music_RequestTune_5A984)."
   },
   "sub_6C420": {
     "new_name": "VROOMM_StubThunk_6C420",
@@ -955,9 +955,9 @@
     "summary": "far, 125L (ex-'HUDSymbol_ComputeAndClipTest', NON DÉTAILLÉE). RESET/INIT DE LA CAMÉRA ORBITALE (CHASE/ROTA/TARGET). Slot [0x1C] de la vtable d'entrée caméra (CODE XREF sub_6B11B). si = objet entrée. (1) sub_855E1(si) ; bail si si[+0x89] (sujet) == 0. (2) Matrix_BuildFromAngle_56D72(si+0x8B) -> RÉINITIALISE LA MATRICE D'ORBITE à l'identité. (3) R = si[+0x89]->vtable[0x3C]() ; AI_ComputeGeometryHelper_56E29(&R, si+0x20) -> sème la matrice de visée si[+0x20] depuis l'orientation du sujet. (4) **DISTANCES D'ORBITE dérivées de la taille du sujet** : e = subject[+0x20] (dword) ; si[+0xB7] (min) = e ; si[+0xAF] (recul courant) = e*2 ; si[+0xB3] (max) = e*4. (5) lit si[+0x2C]... (suite non détaillée). subject[+0x20] = champ dword du WorldObject sujet (= parent[+8][+0x10] via Debris_BodyAttachToSubpart_37C89 ; probable rayon englobant / taille caractéristique de l'avion, 24.8). => recul chase = taille_avion * 2 ; zoom entre *1 et *4. Consommé par Camera_OrbitTrackCompute_1493A (§4bis). Voir CAMERA_SYSTEM.md §4bis."
   },
   "sub_684DF": {
-    "new_name": "VROOMM_ReadAndParseHeader_684DF",
+    "new_name": "VROOMM_ScanFreeMemoryBlocks_684DF",
     "segment": "seg212",
-    "summary": "⚠️ far, 84 lignes, NON DÉTAILLÉE — combine VROOMM_ComputeSizeFromHeader_689F1 — lit et interprète l'en-tête MZ du fichier exécutable/overlay ciblé."
+    "summary": "Ex-'VROOMM_ReadAndParseHeader_684DF' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - parcourt une table de descripteurs memoire (base seg339+0x6D16E, stride 8 octets, jusqu'a 0xC08/8=385 entrees) cherchant des blocs reutilisables/libres pour l'allocation d'overlay, calcule la meilleure correspondance de taille (bx = meilleur candidat)."
   },
   "sub_8CCE": {
     "new_name": "Pilot_ReactionThreshold_B6",
@@ -1185,9 +1185,9 @@
     "summary": "⭐⚠️ far, 516 lignes, NON DÉTAILLÉE — combine allocateurs typés et ReadDwordFieldB_64AFF répété — même motif que MissionRecord_LoadWithDwordFields_89850 (seg254). Candidat pour session dédiée."
   },
   "sub_683F9": {
-    "new_name": "VROOMM_CheckCopyright_683F9",
+    "new_name": "VROOMM_SearchPathAndOpen_683F9",
     "segment": "seg212",
-    "summary": "near, copie/vérifie une chaîne (proche d'un texte « Copyright 1991 » embarqué) avant d'appeler VROOMM_OpenFile_684A7."
+    "summary": "Ex-'VROOMM_CheckCopyright_683F9' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - essaie d'ouvrir le fichier directement (chemin fourni tel quel), sinon delegue a VROOMM_SearchPathEnvAndOpen_68405 pour chercher dans PATH."
   },
   "sub_6C38F": {
     "new_name": "VROOMM_StubThunk_6C38F",
@@ -1550,9 +1550,9 @@
     "summary": "far — alloue (sub_5D22B) et copie une chaîne (strlen+1 puis sub_229C) : strdup()."
   },
   "sub_5FFBD": {
-    "new_name": "ModuleRegistry_UnregisterModule_5FFBD",
+    "new_name": "AIL_release_timer_handle_5FFBD",
     "segment": "seg161",
-    "summary": "far, désenregistre un emplacement de module ; au tout dernier désenregistrement, restaure la fréquence PIT par défaut et désinstalle le hook IRQ0 (ModuleRegistry_UnhookTimerIRQ_5FD10)."
+    "summary": "Ex-'ModuleRegistry_UnregisterModule_5FFBD'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_release_timer_handle(timer)."
   },
   "sub_9A46": {
     "new_name": "AI_QueryTargetField4B",
@@ -1642,7 +1642,7 @@
   "sub_63511": {
     "new_name": "Handle_ReadWordField_63511",
     "segment": "seg188",
-    "summary": "far, lit un champ 16 bits typé (tag 2) via sub_63FA1. Référencée par `TextObject_Allocate_5A577` (seg124)."
+    "summary": "far, lit un champ 16 bits typé (tag 2) via sub_63FA1. Référencée par `Music_LoadTimbreFromLibrary_5A577` (seg124)."
   },
   "loc_5C0B0": {
     "new_name": "PagedMemory_Method_WriteDwordIfSet_5C0B0",
@@ -1842,7 +1842,7 @@
   "unnamed_seg207_query2": {
     "new_name": "Stopwatch_QueryHelperB_UNRESOLVED",
     "segment": "seg207",
-    "summary": "far, appelle ModuleRegistry_Helper_60018 si actif (variante de Stopwatch_QueryHelperA). ⚠️ Adresse exacte non résolue."
+    "summary": "far, appelle AIL_start_timer_60018 si actif (variante de Stopwatch_QueryHelperA). ⚠️ Adresse exacte non résolue."
   },
   "sub_52C5F": {
     "new_name": "Expr_LookupBuiltinFuncDesc_52C5F",
@@ -1882,7 +1882,7 @@
   "sub_AB1EF": {
     "new_name": "AudioQueue_ProcessSequencerSlots_AB1EF",
     "segment": "seg458",
-    "summary": "⭐⚠️ far, 123 lignes, NON DÉTAILLÉE — appelle directement `Sequencer_AdvanceActiveSlot_59F1D` (seg123, ×2) et les thunks d'opcode du registre de modules (`ModuleRegistry_Opcode_AE_603DE` probe, `_B1_603F0`, `_AF_603E4`) — cœur du traitement des emplacements actifs de la file audio/séquenceur."
+    "summary": "⭐⚠️ far, 123 lignes, NON DÉTAILLÉE — appelle directement `Music_ChannelStopSequence_59F1D` (seg123, ×2) et les thunks d'opcode du registre de modules (`AIL_sequence_status_603DE` probe, `_B1_603F0`, `_AF_603E4`) — cœur du traitement des emplacements actifs de la file audio/séquenceur."
   },
   "sub_6C4ED": {
     "new_name": "VROOMM_StubThunk_6C4ED",
@@ -2125,9 +2125,9 @@
     "summary": "⚠️ far, 182 lignes, NON DÉTAILLÉE — alloue (sub_658), initialise 3 sous-objets composites, appelle PlayerComponent_ResetVisualStateDefaults_A5620."
   },
   "sub_59FF5": {
-    "new_name": "Sequencer_ProcessQueue_59FF5",
+    "new_name": "Music_ChannelRegisterSequence_59FF5",
     "segment": "seg123",
-    "summary": "⚠️ far, 135 lignes, NON DÉTAILLÉE — orchestrateur du séquenceur (sub_5BD80/60396/603AE/5A62A, fonctions non encore documentées). Référencée massivement depuis le cluster Weapon_HUDBox (seg121-122). Candidat pour session dédiée en lien avec Weapon_HUDBox_MasterUpdate_59CFA."
+    "summary": "Ex-'Sequencer_ProcessQueue_59FF5'. far, 135L, LUE 2026-10-06. Charge une piste dans un canal : si le descripteur est de type 3 (donnees en memoire paginee), la projette d'abord (PagedMemory_ReleaseRange_5BD80, echec -> byte_7084A = 6) ; AIL_register_sequence_60396(pilote, donnees XMIDI, numero de sequence arg_4, table d'etat, 0) -> handle (-1 -> byte_7084A = 3, -2 -> 5) ; puis boucle AIL_timbre_request_603AE -> Music_InstallTimbre_5A62A(banque, patch) jusqu'a 0xFFFF (tous les timbres necessaires installes). Le demarrage se fait ensuite par AIL_start_sequence_603CC."
   },
   "sub_3B876": {
     "new_name": "IFF_LoadModelMain",
@@ -2140,9 +2140,9 @@
     "summary": "far, teste si une composante dépasse un seuil et retourne le nombre de bits à décaler pour éviter un débordement — utilisé uniquement par Math_VectorLength3D_Scaled_54F57 et apparentés."
   },
   "sub_688B6": {
-    "new_name": "VROOMM_ConditionalPatchTrampoline_688B6",
+    "new_name": "VROOMM_MaybePatchCallSite_688B6",
     "segment": "seg212",
-    "summary": "near, patche un trampoline JMP FAR (0xEA) à l'offset image+0x20 si nécessaire (délègue à VROOMM_PatchFarJumpTable_688D7)."
+    "summary": "Ex-'VROOMM_ConditionalPatchTrampoline_688B6' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - verifie le type d'instruction au site d'appel (0xEA=JMP FAR direct) et delegue soit a VROOMM_PatchFarCallStub_688D7 (creation de stubs de saut far) soit a VROOMM_LookupOrRegisterOffset_68997."
   },
   "sub_A10C0": {
     "new_name": "SaveGame_WriteFile_A10C0",
@@ -2232,12 +2232,12 @@
   "sub_80971": {
     "new_name": "HUDSymbol_DrawWithLineOfSight_80971",
     "segment": "ovr243",
-    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — combine `Matrix_LocalToWorld_58828` (seg117), `UI_ApplyLineOfSightAndTransform_57DAE` (seg116), `TextObject_AllocateVariantA_5A984` (×2, seg125)."
+    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — combine `Matrix_LocalToWorld_58828` (seg117), `UI_ApplyLineOfSightAndTransform_57DAE` (seg116), `Music_RequestTune_5A984` (×2, seg125)."
   },
   "sub_688D7": {
-    "new_name": "VROOMM_PatchFarJumpTable_688D7",
+    "new_name": "VROOMM_PatchFarCallStub_688D7",
     "segment": "seg212",
-    "summary": "near, écrit une série d'instructions JMP FAR (opcode 0xEA) pour reconstruire une table de sauts après relogement."
+    "summary": "Ex-'VROOMM_PatchFarJumpTable_688D7' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - genere dynamiquement du CODE MACHINE X86 BRUT (ecrit l'opcode 0xEA = JMP FAR direct suivi de l'offset/segment cible) dans la table de stubs - c'est le mecanisme qui cree les thunks VROOMM_StubThunk_XXXX rencontres partout ailleurs dans le desassemblage."
   },
   "sub_4338E": {
     "new_name": "Targeting_InitWithFlags",
@@ -2415,9 +2415,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_78184) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=4840h, codesize=1FC2h, nentries=12."
   },
   "sub_5FBA6": {
-    "new_name": "ModuleRegistry_DispatchTrampoline_5FBA6",
+    "new_name": "AIL_call_driver_5FBA6",
     "segment": "seg161",
-    "summary": "⭐ far, **trampoline de dispatch central** : lit l'adresse de retour de son appelant sur la pile, appelle ModuleRegistry_LookupHandler_5FB6E, et si un gestionnaire est trouvé, **réécrit l'adresse de retour de l'appelant** pour rediriger l'exécution vers ce gestionnaire au lieu du code d'origine. C'est le point d'entrée commun de dizaines de « thunks d'opcode » (sub_603xx et apparentés) répartis dans toute la base — chacun pose un identifiant d'opcode dans AX puis saute ici. Mécanisme de type hook/plugin transparent."
+    "summary": "Ex-'ModuleRegistry_DispatchTrampoline_5FBA6'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). call_driver : point commun de tous les thunks d'API (numero de fonction dans AX) ; appelle AIL_find_proc_5FB6E et saute dans le pilote charge (ADLIB.ADV etc.)."
   },
   "sub_122B": {
     "new_name": "CRT_EmitHexDigit",
@@ -2490,9 +2490,9 @@
     "summary": "far, aucun appel externe visible (13 lignes)."
   },
   "sub_5A984": {
-    "new_name": "TextObject_AllocateVariantA_5A984",
+    "new_name": "Music_RequestTune_5A984",
     "segment": "seg125",
-    "summary": "far, appelle sub_5F700 — référencée directement par `UIScreen_Construct` (sub_53896, seg114)."
+    "summary": "Ex-'TextObject_AllocateVariantA_5A984' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE MUSICALE (moteur XMIDI/AIL). Anciennement mal étiquetée Music_RequestTune_5A984. Signature (tune_id: word) : borne tune_id contre word_7084C (nb de pistes max) ; si valide, écrit dans word_70859 (piste couramment jouée, init 0xFFFF) ; si invalide (sauf sentinelle 0xFF, probablement 'aucune piste'/stop) → log \"Invalid tune requested: %d\" (aInvalidTuneReq, seg339) via sub_5F700. Appelée depuis au moins 10 sites dans des segments très divers (seg114 UI, ovr230/239/240/243/316 logique mission) avec des tune_id différents selon le contexte (0x08 à 0x15 identifiés) — voir MUSIC_SYSTEM.md pour la table complète des déclencheurs. Piste de mission de base : lue depuis le chunk IFF TUNE (MissionScenario_LoadMainRecord_A8331) dans byte_706A2, jouée à l'ouverture d'écran par sub_53896 (UIScreen_Construct)."
   },
   "sub_54C77": {
     "new_name": "Math_VectorLength_Wrapper_54C77",
@@ -2732,7 +2732,7 @@
   "sub_5ABD1": {
     "new_name": "TextObjectCluster_DestructAll_5ABD1",
     "segment": "seg125",
-    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — destructeur global du cluster objets-texte : ferme deux objets texte (TextObject_CloseAndLog_5A856 ×2) et libère plusieurs buffers (sub_5C7B6/sub_338). Référencée en interne (thunk vtable loc_5ADEF)."
+    "summary": "⚠️ far, 190 lignes, NON DÉTAILLÉE — destructeur global du cluster objets-texte : ferme deux objets texte (Music_ShutdownDriver_5A856 ×2) et libère plusieurs buffers (sub_5C7B6/sub_338). Référencée en interne (thunk vtable loc_5ADEF)."
   },
   "sub_99B7F": {
     "new_name": "IndexedRecordReader_ScanAndReadTypedB_99B7F",
@@ -2777,7 +2777,7 @@
   "sub_ABDAF": {
     "new_name": "AudioQueue_OpcodeHelper_ABDAF",
     "segment": "seg461",
-    "summary": "far, appelle `ModuleRegistry_Opcode_7C_6035A` (seg161)."
+    "summary": "far, appelle `AIL_VOC_playback_status_6035A` (seg161)."
   },
   "sub_2071E": {
     "new_name": "EMS_FreeBlock",
@@ -2845,9 +2845,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A8B8F) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18."
   },
   "sub_5FB6E": {
-    "new_name": "ModuleRegistry_LookupHandler_5FB6E",
+    "new_name": "AIL_find_proc_5FB6E",
     "segment": "seg161",
-    "summary": "⭐ far, recherche un gestionnaire enregistré : cherche dans la table du module `bx` (0-15) une entrée dont le tag (mot) correspond à `ax`, en parcourant un tableau jusqu'au sentinelle 0xFFFF ; retourne l'adresse du gestionnaire (es:bx+2) si trouvé, sinon 0. Cœur du système de recherche du registre de modules."
+    "summary": "Ex-'ModuleRegistry_LookupHandler_5FB6E'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). find_proc : cherche, dans la table de fonctions du pilote (paires numero/offset), le gestionnaire du numero demande."
   },
   "unnamed_seg205_a": {
     "new_name": "TextScrollDisplay_Helper_UNRESOLVED",
@@ -2860,9 +2860,9 @@
     "summary": "far,36L — destructeur : vide la liste (sub_3317E), la libère, libère l'objet si demandé : **destructeur de conteneur de tuiles.**"
   },
   "sub_6039C": {
-    "new_name": "ModuleRegistry_Opcode_98_6039C",
+    "new_name": "AIL_release_sequence_handle_6039C",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x98 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_AdvanceActiveSlot` (sub_59F1D, seg123) — c'est l'appel « désactiver l'ancien emplacement »."
+    "summary": "Ex-'ModuleRegistry_Opcode_98_6039C'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 98h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (152 = AIL_REL_SEQ_HND dans AIL.INC) et y saute. "
   },
   "sub_6501E": {
     "new_name": "ResourceRecord_WriteFieldGroupC_6501E",
@@ -3055,9 +3055,9 @@
     "summary": "far, seg103 L606-853. Ex-'ComputeMomentsWithFeedback'. Produit le VECTEUR DE FORCE DE TRAÎNÉE (repère corps), terme 'aero' de Aero_SumLinearForces. q = Aero_DynamicPressure(&si[0x10]). mag = q·[ si[0x5D]·alpha_eff² + (si[0x5D]>>3)·c_beta² + drag75 ] ; alpha_eff = Aero_ComputeAoAWithTrim ; c_beta = Aero_FlowAngle_Sideslip ; drag75 = Aero_ComputeDragFromFlags75 = (0x100 + si[0x37]·bit0 aérofrein + si[0x3B]·bit2 train)·[[si+0x10]+0x10]. Si au sol (A[0x20]) : mag += (si[0x3F]·256 + si[0x43]·256·bit0) mis à l'échelle par flux latéral. Direction = Vector_Normalize3D_559BB(-v_corps) = unitaire opposé au flux, en repère CORPS. Sortie = dir·mag écrit dans [si+0x10]+4..+0xC. C'est la TRAÎNÉE le long de la trajectoire ; sa composante c2 (quand incidence != 0) apporte une portance secondaire, mais la portance principale vient de Aero_ComputeLiftAndSideForce. Detail : analysis/DATA_MODEL.md 6.2 item 1."
   },
   "sub_603D8": {
-    "new_name": "ModuleRegistry_Opcode_AD_603D8",
+    "new_name": "AIL_resume_sequence_603D8",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xAD → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par sub_AB1AF."
+    "summary": "Ex-'ModuleRegistry_Opcode_AD_603D8'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0ADh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (173 = AIL_RESUME_SEQ dans AIL.INC) et y saute. "
   },
   "sub_7FC55": {
     "new_name": "GlyphObject_MeasureWrapperB_7FC55",
@@ -3195,9 +3195,9 @@
     "summary": "far, réévalue un champ de nœud (bytecode à +0x4A) uniquement si son bit dirty (+0x39) est posé."
   },
   "sub_688F5": {
-    "new_name": "VROOMM_PatchIntTrampoline_688F5",
+    "new_name": "VROOMM_PatchIntCallStub_688F5",
     "segment": "seg212",
-    "summary": "near, écrit une série d'instructions INT (opcode 0xCD) — motif de patch de trampoline d'interruption (probable installation de points d'entrée pour hooks matériels du type de ceux du seg154/seg161/seg211)."
+    "summary": "Ex-'VROOMM_PatchIntTrampoline_688F5' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - variante generant des STUBS BASES SUR INT (ecrit l'opcode 0xCD = INT n) plutot que des sauts far directs, pour les points d'entree necessitant le mecanisme d'interruption plutot qu'un jmp far."
   },
   "sub_5F245": {
     "new_name": "LinkedList_InsertBefore_5F245",
@@ -3225,9 +3225,9 @@
     "summary": "⚠️ far, 174 lignes, NON DÉTAILLÉE — appelle un thunk VROOMM voisin — probable traitement d'une frame d'entrée (clavier/joystick/souris)."
   },
   "sub_603B4": {
-    "new_name": "ModuleRegistry_Opcode_9C_603B4",
+    "new_name": "AIL_install_timbre_603B4",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x9C → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_ValidatePlacement` (sub_5A62A, seg124)."
+    "summary": "Ex-'ModuleRegistry_Opcode_9C_603B4'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 9Ch / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (156 = AIL_INSTALL_T dans AIL.INC) et y saute. "
   },
   "sub_4F9A2": {
     "new_name": "Timer_SetAbsolute_4F9A2",
@@ -3280,9 +3280,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8D3C3) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1A910h, codesize=97Eh, nentries=20."
   },
   "sub_689C9": {
-    "new_name": "VROOMM_ComputeRemainingSpace_689C9",
+    "new_name": "VROOMM_ComputeAvailableOffset_689C9",
     "segment": "seg212",
-    "summary": "near, calcule l'espace mémoire restant disponible pour le chargement (comparaison de segments)."
+    "summary": "Ex-'VROOMM_ComputeRemainingSpace_689C9' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - calcule l'espace disponible avant la prochaine limite de segment charge, utilise pour decider si un nouveau segment peut etre place sans collision avec un segment deja resident."
   },
   "loc_5C2B3": {
     "new_name": "PagedTextObjectB_DtorThunk_5C2B3",
@@ -3350,9 +3350,9 @@
     "summary": "far, appelle `LinkedListB_Helper_5F66B` (seg159)."
   },
   "sub_5FCCA": {
-    "new_name": "ModuleRegistry_HookTimerIRQ_5FCCA",
+    "new_name": "AIL_hook_timer_process_5FCCA",
     "segment": "seg161",
-    "summary": "⭐ far, **détourne le vecteur d'interruption matérielle IRQ0 (INT 8, minuteur PIT)** : sauvegarde l'ancien vecteur (table des vecteurs d'interruption à 0000:0020) dans cs:dword_5F8CC, puis installe un nouveau gestionnaire à (cs):0x40E. Appelée par ModuleRegistry_RegisterModule_5FF08 lors du tout premier enregistrement."
+    "summary": "Ex-'ModuleRegistry_HookTimerIRQ_5FCCA'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). hook_timer_process : installe AIL_API_timer_ISR_5FBBE sur le vecteur INT 8."
   },
   "sub_6C794": {
     "new_name": "VROOMM_StubThunk_6C794",
@@ -3595,9 +3595,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9C810) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2AB40h, codesize=130h, nentries=3."
   },
   "loc_683D7": {
-    "new_name": "VROOMM_Helper2_683D7",
+    "new_name": "VROOMM_RestoreIntAndDispatch_683D7",
     "segment": "seg212",
-    "summary": "far, référencée via vtable (DATA XREF implicite) — rôle exact non détaillé."
+    "summary": "Ex-'VROOMM_Helper2_683D7' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). far, 27 lignes - point d'entree via vtable (seg339:off_72010). Si word_69E98 (indicateur de fichier ouvert par sub_68254) est non-nul, restaure l'ancien gestionnaire d'interruption (rappel a VROOMM_InstallIntHandler_68384, effet de bascule). Enchaine systematiquement deux appels indirects via des pointeurs de fonction stockes en donnees (off_69DF4 puis off_69DF2, tous deux initialement 'nullsub_7' - des points d'extension/hook laisses vides par defaut, potentiellement rebranches ailleurs au chargement)."
   },
   "sub_6CBCE": {
     "new_name": "VROOMM_StubThunk_6CBCE",
@@ -3645,9 +3645,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A04AC) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2E8E0h, codesize=3B1h, nentries=15."
   },
   "sub_AAFA0": {
-    "new_name": "AudioQueue_ProcessAndAdvance_AAFA0",
+    "new_name": "AudioQueue_LoadTransitionTable_AAFA0",
     "segment": "seg458",
-    "summary": "⚠️ far, 213 lignes, NON DÉTAILLÉE — combine IndexedRecordReader_AdvanceIndex_65E2C, IndexedRecordReader_ConstructVariantC_65A8A (seg196), sub_1069, Sequencer_ReleaseSlot_59F87, IndexedRecordReader_SeekToIndex_65C6D — cycle complet de traitement d'un élément de la file audio/message."
+    "summary": "Ex-'AudioQueue_ProcessAndAdvance_AAFA0' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far, 213 lignes — CHARGE LA TABLE DES PISTES DE TRANSITION, lue ligne à ligne intégralement (anciennement AudioQueue_LoadTransitionTable_AAFA0). arg_2=lecteur IndexedRecordReader du niveau 2. Séquence : (1) relit SA PROPRE entrée 0 et construit un NIVEAU 3 (IndexedRecordReader_ConstructVariantC_65A8A) ; (2) word_7084E = [niveau3+0x5D] — la borne testée dans Music_TuneTransitionResolve_595C2 ; (3) alloue word_70856 = table de word_7084E TransitionDescriptor (10 octets chacun), callback overlay stub239 (différent de seg335) ; (4) boucle sur les word_7084E entrées du niveau 3, même mécanique de chargement. Voir MUSIC_SYSTEM.md §7.3."
   },
   "sub_6C8EC": {
     "new_name": "VROOMM_StubThunk_6C8EC",
@@ -3740,9 +3740,9 @@
     "summary": "⚠️ far, 322 lignes, NON DÉTAILLÉE — combine `Widget_Helper_5A9E6` (seg125), StreamReader, `Joystick_GetButtonRawByte_67B82`/`InitCalibrationDefaults_67B92` (seg208), `Render_MeasureOrDrawTextString_61F52`."
   },
   "sub_6887B": {
-    "new_name": "VROOMM_PatchFarJumpTable_6887B",
+    "new_name": "VROOMM_EvictOldestBlock_6887B",
     "segment": "seg212",
-    "summary": "⚠️ far, 44 lignes, NON DÉTAILLÉE — écrit des instructions JMP FAR (opcode 0xEA) dans l'image chargée, motif de patch de table de sauts (probable installation de points d'entrée d'overlay)."
+    "summary": "Ex-'VROOMM_PatchFarJumpTable_6887B' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - implemente une politique D'EVICTION LRU (least-recently-used) : parcourt tous les blocs actuellement charges, en libere autant que necessaire pour faire de la place au nouveau chargement demande."
   },
   "sub_3A44E": {
     "new_name": "SetReference",
@@ -3755,9 +3755,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8F47A) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1C780h, codesize=87Dh, nentries=6."
   },
   "sub_60228": {
-    "new_name": "ModuleRegistry_QueryModuleField_60228",
+    "new_name": "AIL_describe_driver_60228",
     "segment": "seg161",
-    "summary": "far, retourne un champ (segment:offset) de l'emplacement de module `bx`, avec vérification de borne (0-15). Appelée par ModuleRegistry_QueryOrDispatch_6015A et sub_60254."
+    "summary": "Ex-'ModuleRegistry_QueryModuleField_60228'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_describe_driver(H) : fonction pilote 100 (0x64, AIL_DESC_DRVR), renvoie le descripteur du pilote (type, ports par defaut...)."
   },
   "sub_6B17E": {
     "new_name": "VROOMM_StubThunk_6B17E",
@@ -3780,9 +3780,9 @@
     "summary": "far, appelle PagedResourceC_RefreshAllInstances_5F4E0 puis sub_3C2. Référencée par sub_14279 et sub_67517."
   },
   "sub_600DB": {
-    "new_name": "ModuleRegistry_ConfigureAndActivate_600DB",
+    "new_name": "AIL_set_timer_frequency_600DB",
     "segment": "seg161",
-    "summary": "far, configure la cadence d'un module (ModuleRegistry_ConfigureModuleTiming_5FD87) puis l'active (sub_6008C). Référencée par sub_60254 et sub_67611."
+    "summary": "Ex-'ModuleRegistry_ConfigureAndActivate_600DB'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_set_timer_frequency(timer, Hz) : periode = 1 000 000 / Hz (AIL_ul_divide_5FD87(0xF4240, Hz)) puis AIL_set_timer_period_6008C."
   },
   "sub_A1C36": {
     "new_name": "PaletteScreen_DrawWidgetVariantA_A1C36",
@@ -3865,9 +3865,9 @@
     "summary": "far,70L — met à jour la position d'affichage du texte (+0x9C/+0x94), recherche le glyphe via sub_5C832 (police), le dessine (sub_5E74E), avance le curseur : **rendu caractère par caractère (moteur de texte 'machine à écrire').**"
   },
   "sub_6844A": {
-    "new_name": "VROOMM_ReadHeader_6844A",
+    "new_name": "VROOMM_MatchPathPrefix_6844A",
     "segment": "seg212",
-    "summary": "⚠️ far, 88 lignes, NON DÉTAILLÉE — lit l'en-tête du fichier ouvert (`int 21h` READ) et appelle VROOMM_ComputeSizeFromHeader_689F1 — probable lecture de l'en-tête MZ."
+    "summary": "Ex-'VROOMM_ReadHeader_6844A' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - compare les 5 premiers octets de l'entree d'environnement courante contre la chaine litterale 'PATH=' (donnee brute byte_6824D). Si correspondance, construit le chemin complet avec le repertoire trouve + nom de fichier, essaie l'ouverture. Sinon avance a l'entree d'environnement suivante."
   },
   "sub_A381A": {
     "new_name": "GaugeWidget_HelperH_A381A",
@@ -4220,9 +4220,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A9A7B) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
   },
   "sub_6035A": {
-    "new_name": "ModuleRegistry_Opcode_7C_6035A",
+    "new_name": "AIL_VOC_playback_status_6035A",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x7C → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par sub_ABDAF et sub_ABDEC."
+    "summary": "Ex-'ModuleRegistry_Opcode_7C_6035A'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 7Ch / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (124 = AIL_VOC_PB_STAT dans AIL.INC) et y saute. "
   },
   "sub_97CB7": {
     "new_name": "MissionText_Helper4_97CB7",
@@ -4437,7 +4437,7 @@
   "unnamed_seg207_query1": {
     "new_name": "Stopwatch_QueryHelperA_UNRESOLVED",
     "segment": "seg207",
-    "summary": "far, entre sub_6769F et loc_676E7 — appelle ModuleRegistry_Helper3_60052 si actif. ⚠️ Adresse exacte non résolue."
+    "summary": "far, entre sub_6769F et loc_676E7 — appelle AIL_stop_timer_60052 si actif. ⚠️ Adresse exacte non résolue."
   },
   "sub_6AD10": {
     "new_name": "VROOMM_StubThunk_6AD10",
@@ -4590,9 +4590,9 @@
     "summary": "far, référencée via jmp depuis un stub VROOMM (sub_6C620) et par PlayerComponent_SubHelperZ_A0CE2/PlayerComponentVariantP_A0D23."
   },
   "sub_60390": {
-    "new_name": "ModuleRegistry_Opcode_96_60390",
+    "new_name": "AIL_state_table_size_60390",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x96 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_ReleaseSlot` (sub_59F87, seg123)."
+    "summary": "Ex-'ModuleRegistry_Opcode_96_60390'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 96h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (150 = AIL_STATE_TAB_SIZE dans AIL.INC) et y saute. Taille de la table d'etat a allouer par sequence XMIDI ('No mem for XMIDI state table.')."
   },
   "sub_6C79E": {
     "new_name": "VROOMM_StubThunk_6C79E",
@@ -4845,9 +4845,9 @@
     "summary": "far, même motif que HUDSymbol_ConstructVariantA_804F0."
   },
   "sub_5A62A": {
-    "new_name": "Sequencer_ValidatePlacement_5A62A",
+    "new_name": "Music_InstallTimbre_5A62A",
     "segment": "seg124",
-    "summary": "far, vérifie si une coordonnée (x,y) est libre (sub_603C6), sinon tente d'y placer un objet (TextObject_Allocate_5A577) ; en cas d'échec, affiche un message d'erreur (sub_6B70F, ressource 0xD003) si un buffer de texte est actif, ou pose byte_7084A=4. Référencée par Sequencer_ProcessQueue_59FF5 (seg123) et en interne du segment."
+    "summary": "Ex-'Sequencer_ValidatePlacement_5A62A'. far, 74L, LUE 2026-10-06. Si AIL_timbre_status_603C6(banque, patch) == 0 : charge le timbre depuis la bibliotheque (Music_LoadTimbreFromLibrary_5A577), AIL_install_timbre_603B4 puis libere le buffer ; timbre introuvable -> erreur 0xD003 si dword_709CC l'exige, sinon byte_7084A = 4."
   },
   "sub_56215": {
     "new_name": "UI_ComputeScaledVectorHelper_56215",
@@ -5010,9 +5010,9 @@
     "summary": "far, alloue (sub_658) et initialise (StreamReader_Helper_63A12). Référencée directement depuis **seg009** (cœur du jeu/boucle principale)."
   },
   "sub_6862C": {
-    "new_name": "VROOMM_SkipRelocationsA_6862C",
+    "new_name": "VROOMM_ReadRawSegment_6862C",
     "segment": "seg212",
-    "summary": "⚠️ far, 63 lignes, NON DÉTAILLÉE — parcourt la table de relogement MZ (`int 21h` LSEEK/READ)."
+    "summary": "Ex-'VROOMM_SkipRelocationsA_6862C' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - positionne le pointeur de fichier (DOS INT 21h AH=42h LSEEK) puis lit des blocs de donnees brutes (DOS INT 21h AH=3Fh) directement dans la memoire allouee pour un segment d'overlay, par blocs de 0xFFF0 octets max (limite de segment 64Ko), en avancant le pointeur de segment de destination entre chaque bloc."
   },
   "sub_6B1FF": {
     "new_name": "VROOMM_StubThunk_6B1FF",
@@ -5245,9 +5245,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_92E60) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=20AE0h, codesize=18ADh, nentries=4."
   },
   "loc_5940B": {
-    "new_name": "Interrupt_TimerISR_5940B",
+    "new_name": "Music_SequencerTickISR_5940B",
     "segment": "seg121",
-    "summary": "⭐ far, référencée comme donnée (table d'ISR) depuis sub_AA810 — **gestionnaire d'interruption matérielle** : envoie l'EOI au contrôleur 8259A (`out 20h,al`) puis dispatche sur 4 cas (byte_70858) vers Interrupt_TimerDispatch_59436. Probable minuteur matériel pilotant l'animation/séquencement (musique ou effets de transition)."
+    "summary": "Ex-'Interrupt_TimerISR_5940B' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ ISR de tick, référencée explicitement par AudioQueue_RegisterTickModule_AA810 (seg458) via le mécanisme Stopwatch (seg207). Anciennement Music_SequencerTickISR_5940B. Corps de l'ISR enregistrée comme module dans le registre de modules à créneaux temporisés générique (seg161) — dédiée spécifiquement au séquenceur musical."
   },
   "sub_8D27C": {
     "new_name": "UIWidget_Helper2_8D27C",
@@ -5287,7 +5287,7 @@
   "loc_5ADFC": {
     "new_name": "TextObject_ScalarDeletingDtor_5ADFC",
     "segment": "seg125",
-    "summary": "far, référencée comme donnée par TextObjectCluster_DestructAll_5ABD1 — destructeur scalar-deleting d'un objet texte individuel : avance/désactive son créneau de séquenceur (Sequencer_AdvanceActiveSlot_59F1D), libère son buffer (sub_5C7B6, type 5C44h), réinitialise ses champs, libère l'objet lui-même si demandé (sub_338)."
+    "summary": "far, référencée comme donnée par TextObjectCluster_DestructAll_5ABD1 — destructeur scalar-deleting d'un objet texte individuel : avance/désactive son créneau de séquenceur (Music_ChannelStopSequence_59F1D), libère son buffer (sub_5C7B6, type 5C44h), réinitialise ses champs, libère l'objet lui-même si demandé (sub_338)."
   },
   "sub_6C2C0": {
     "new_name": "VROOMM_StubThunk_6C2C0",
@@ -5330,9 +5330,9 @@
     "summary": "far, aucun appel externe visible (13 lignes)."
   },
   "sub_603AE": {
-    "new_name": "ModuleRegistry_Opcode_9B_603AE",
+    "new_name": "AIL_timbre_request_603AE",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x9B → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_ProcessQueue_59FF5` (seg123)."
+    "summary": "Ex-'ModuleRegistry_Opcode_9B_603AE'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 9Bh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (155 = AIL_T_REQ dans AIL.INC) et y saute. Renvoie le prochain timbre (banque, patch) dont la sequence a besoin et qui n'est pas encore installe ; le jeu le charge puis appelle AIL_install_timbre_603B4."
   },
   "sub_85ACB": {
     "new_name": "TextScrollDisplay_FormatAndCache_85ACB",
@@ -5490,9 +5490,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3C14) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_5A856": {
-    "new_name": "TextObject_CloseAndLog_5A856",
+    "new_name": "Music_ShutdownDriver_5A856",
     "segment": "seg124",
-    "summary": "far, ferme un objet texte (+0x83 flag) : émet un tag de debug (\"SCSCSCFY!\") via sub_60303, appelle sub_60200 (fermeture), réinitialise le handle. Référencée par `TextRenderer_Main` (seg048) et sub_5ABD1."
+    "summary": "Ex-'TextObject_CloseAndLog_5A856'. far, 32L, LUE 2026-10-06. Si le pilote est actif (+0x83) : AIL_shutdown_driver_60303(handle, message de sortie 'SCSCSCFY!') puis AIL_release_driver_handle_60200, handle = -1."
   },
   "sub_855E1": {
     "new_name": "HUDSymbol_ConstructWithContainerOpB_855E1",
@@ -5515,9 +5515,9 @@
     "summary": "far, appelle Timer_SetAbsolute_4F9A2 (seg110) — initialise un champ minuteur du composant."
   },
   "unnamed_seg161_d": {
-    "new_name": "ModuleRegistry_Opcode_66_UNRESOLVED",
+    "new_name": "AIL_sound_buffer_thunks_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 17 lignes, entre sub_60303 et sub_6034E. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Opcode_66_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Quatre thunks d'API son numerise : AIL_index_VOC_block (0x78), AIL_register_sound_buffer (0x79), AIL_format_sound_buffer (0x86), AIL_sound_buffer_status (0x7A). (Ancien nom 'Opcode_66' faux.)"
   },
   "sub_6CC3D": {
     "new_name": "VROOMM_StubThunk_6CC3D",
@@ -5555,9 +5555,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_75612) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1F30h, codesize=184h, nentries=5."
   },
   "loc_59817": {
-    "new_name": "Interrupt_TimerCleanup_59817",
+    "new_name": "Music_SequencerTickCleanup_59817",
     "segment": "seg121",
-    "summary": "far, référencée via vtable (DATA XREF seg339), libère des ressources (sub_5C7B6, motif de \"free\" déjà vu) associées au sous-système minuteur."
+    "summary": "Ex-'Interrupt_TimerCleanup_59817' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). Anciennement Music_SequencerTickCleanup_59817. Un des 4 cas de Music_SequencerTickDispatch_59436 — nettoyage d'état du séquenceur musical."
   },
   "sub_5334D": {
     "new_name": "WorldObjects_AddToList_5334D",
@@ -5977,7 +5977,7 @@
   "sub_AB16F": {
     "new_name": "AudioQueue_ActivateSlotOpcode_AB16F",
     "segment": "seg458",
-    "summary": "⭐ far, appelle deux fois `ModuleRegistry_Opcode_AB_603D2` (seg161, thunk d'activation d'emplacement du registre de modules) — confirme que ce cluster utilise directement les thunks d'opcode du registre de modules découverts en seg161."
+    "summary": "⭐ far, appelle deux fois `AIL_stop_sequence_603D2` (seg161, thunk d'activation d'emplacement du registre de modules) — confirme que ce cluster utilise directement les thunks d'opcode du registre de modules découverts en seg161."
   },
   "sub_67F8A": {
     "new_name": "TextScrollDisplayB_UpdateObjectState_67F8A",
@@ -6110,9 +6110,9 @@
     "summary": "far, arc tangente en virgule fixe (implémentation brute — appelée par Math_ArcTan_54ADE et Math_ArcTan2_54B0A)."
   },
   "sub_5A0F3": {
-    "new_name": "TextRenderer_InputFieldHandler_5A0F3",
+    "new_name": "Sound_LoadDriverAndTimbreCache_5A0F3",
     "segment": "seg124",
-    "summary": "⚠️ far, 493 lignes, NON DÉTAILLÉE — référencée deux fois par `TextRenderer_Main` (sub_27477, seg048). Combine des appels au sous-système séquenceur/minuteur (Sequencer_AdvanceActiveSlot_59F1D, Sequencer_ProcessQueue_59FF5, Sequencer_ReleaseSlot_59F87) et au sous-système d'allocation (sub_5Cxxx). Probable gestionnaire de champ de saisie/édition de texte dynamique. Candidat prioritaire pour session dédiée."
+    "summary": "Ex-'TextRenderer_InputFieldHandler_5A0F3' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far, 493 lignes — CHARGEUR DU PILOTE SON AIL/XMIDI. Anciennement mal étiquetée Sound_LoadDriverAndTimbreCache_5A0F3 (classée par erreur car référencée deux fois par TextRenderer_Main, sub_27477 — coïncidence d'appelant, pas de lien fonctionnel). Séquence confirmée ligne à ligne : (1) lit le chunk IFF 'SOUND' via ResourceRecord (sub_2B06C) pour obtenir le nom du pilote ; (2) concatène '.drv' (offset 3894h) pour former le nom de fichier pilote ; (3) ouvre/charge le pilote (sub_603A2/603A8) ; (4) alloue le CACHE DE TIMBRES via Memory_TypedFreeWrapperB_5C774 avec le message d'erreur 'No memory for timbre cache.' (offset 38B6h) en cas d'échec ; (5) construit en interne un enregistrement dans le système de slots temporisés générique en appelant directement Music_ChannelInit_59F87/Music_ChannelRegisterSequence_59FF5/Music_ChannelStopSequence_59F1D (seg123). Appelée par Program_InitVideoFontArgs (sub_14279, init programme)."
   },
   "sub_A3BC2": {
     "new_name": "GaugeWidget_HelperJ_A3BC2",
@@ -6290,9 +6290,9 @@
     "summary": "far, appelée par sub_544DC en complément de Expr_Node_CountSelectedInTable_54043 (rôle exact non détaillé)."
   },
   "sub_603CC": {
-    "new_name": "ModuleRegistry_Opcode_AA_603CC",
+    "new_name": "AIL_start_sequence_603CC",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xAA → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée depuis seg121 et `Interrupt_TimerCase_595C2` (seg121)."
+    "summary": "Ex-'ModuleRegistry_Opcode_AA_603CC'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0AAh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (170 = AIL_START_SEQ dans AIL.INC) et y saute. "
   },
   "sub_9F873": {
     "new_name": "PlayerComponent_ReleaseFull_9F873",
@@ -6510,9 +6510,9 @@
     "summary": "far, appelle sub_6C875 (stub voisin), encadré par le verrou d'ownership."
   },
   "sub_6879E": {
-    "new_name": "VROOMM_AllocateAndFinalize_6879E",
+    "new_name": "VROOMM_LoadOnDemandCore_6879E",
     "segment": "seg212",
-    "summary": "far, orchestre VROOMM_ComputeSizeFromHeader_689F1, VROOMM_PatchFarJumpTable_6887B, VROOMM_CheckImageHasTrailer_68863, VROOMM_ComputeParagraphs_689E5, VROOMM_MoveImageAndFixup_68928, VROOMM_AdvanceLoadPointer_68979, VROOMM_ComputeRemainingSpace_689C9."
+    "summary": "Ex-'VROOMM_AllocateAndFinalize_6879E' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - COEUR DE LA LOGIQUE DE CHARGEMENT A LA DEMANDE : incremente un compteur de chargement (word_6D16A), calcule si le segment demande est deja en memoire (VROOMM_ComputeAvailableOffset_689C9) ou doit etre charge/remplace (LRU - libere le segment le moins recemment utilise via VROOMM_EvictOldestBlock_6887B si necessaire)."
   },
   "sub_59CFA": {
     "new_name": "Weapon_HUDBox_MasterUpdate_59CFA",
@@ -6900,9 +6900,9 @@
     "summary": "far, alloue (sub_658), construit un StreamReader (StreamReader_ConstructVariantA_63A39, seg190) et initialise les champs d'index (sub_65B03)."
   },
   "sub_68979": {
-    "new_name": "VROOMM_AdvanceLoadPointer_68979",
+    "new_name": "VROOMM_UpdateFreeListOffset_68979",
     "segment": "seg212",
-    "summary": "near, avance un pointeur de chargement global (off_6D15E) et met à jour une chaîne de segments alloués."
+    "summary": "Ex-'VROOMM_AdvanceLoadPointer_68979' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - met a jour le pointeur courant dans la table de blocs libres (off_6D15E) apres une operation d'allocation/liberation, cherchant le prochain emplacement disponible dans la table."
   },
   "sub_6AABC": {
     "new_name": "VROOMM_StubThunk_6AABC",
@@ -6917,7 +6917,7 @@
   "sub_5AA02": {
     "new_name": "Weapon_HUDBox_InstantiateInstance_5AA02",
     "segment": "seg125",
-    "summary": "far, instancie le cluster HUD armement : appelle Weapon_HUDBox_Main_59302, Weapon_HUDBox_DrawElementC_590E0 et TextObject_AllocateVariantA_5A984. Référencée par sub_26F7E."
+    "summary": "far, instancie le cluster HUD armement : appelle Music_CombatIntensitySelector_59302, Weapon_HUDBox_DrawElementC_590E0 et Music_RequestTune_5A984. Référencée par sub_26F7E."
   },
   "unnamed_seg160_a": {
     "new_name": "Runtime_FatalErrorHandlerWithTag_UNRESOLVED",
@@ -7165,9 +7165,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A0455) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2E8E0h, codesize=3B1h, nentries=15."
   },
   "sub_689E5": {
-    "new_name": "VROOMM_ComputeParagraphs_689E5",
+    "new_name": "VROOMM_ComputeParagraphCount_689E5",
     "segment": "seg212",
-    "summary": "near, convertit une taille de fichier MZ (champ « pages ») en nombre de paragraphes (arrondi au paragraphe supérieur, classique du format MZ)."
+    "summary": "Ex-'VROOMM_ComputeParagraphs_689E5' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - convertit une taille en octets (es:8) en nombre de PARAGRAPHES DOS (unite d'allocation memoire = 16 octets), arrondi."
   },
   "sub_8FC61": {
     "new_name": "CRT_DisplayCalibrationMessage_8FC61",
@@ -7175,9 +7175,9 @@
     "summary": "far, combine `CRT_Write_TextMode` et `CPU_SpeedCalibration` — affichage lié à la calibration de vitesse CPU (cf. joystick, seg199)."
   },
   "sub_5FD5D": {
-    "new_name": "ModuleRegistry_SetTickRateHz_5FD5D",
+    "new_name": "AIL_set_PIT_period_5FD5D",
     "segment": "seg161",
-    "summary": "far, convertit une fréquence en Hz en diviseur PIT (formule standard base ~1.193 MHz) et l'applique via ModuleRegistry_ProgramPITFrequency_5FD3A."
+    "summary": "Ex-'ModuleRegistry_SetTickRateHz_5FD5D'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). set_PIT_period : convertit une periode en microsecondes en diviseur PIT (54925 us max)."
   },
   "sub_A4AA6": {
     "new_name": "PlayerComponent_LoadFieldsWithRetryEVariant_A4AA6",
@@ -7445,9 +7445,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7EB1C) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28."
   },
   "sub_5FDD2": {
-    "new_name": "ModuleRegistry_RecomputeGlobalTickRate_5FDD2",
+    "new_name": "AIL_program_timers_5FDD2",
     "segment": "seg161",
-    "summary": "far, parcourt tous les modules actifs pour recalculer et appliquer la fréquence de tic globale (ModuleRegistry_SetTickRateHz_5FD5D). Appelée par sub_6008C."
+    "summary": "Ex-'ModuleRegistry_RecomputeGlobalTickRate_5FDD2'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). program_timers : choisit la periode commune la plus courte des minuteries actives et reprogramme le PIT."
   },
   "sub_9D020": {
     "new_name": "WorldObject_ApplyOrientationAndFilter_9D020",
@@ -7465,9 +7465,9 @@
     "summary": "far, aucun appel externe visible (20 lignes)."
   },
   "unnamed_seg161_c": {
-    "new_name": "ModuleRegistry_Helper5_UNRESOLVED",
+    "new_name": "AIL_set_timer_divisor_interrupt_divisor_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 59 lignes, entre sub_600DB et sub_6015A. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Helper5_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_set_timer_divisor (diviseur PIT -> periode : 0 -> 54925 us, sinon diviseur x 10000 / 11932) puis AIL_interrupt_divisor (renvoie le diviseur PIT courant), deux procedures du source dans ce bloc."
   },
   "sub_38DE6": {
     "new_name": "Explosion_CreateFireball",
@@ -7685,9 +7685,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A93E0) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18."
   },
   "unnamed_seg161_f": {
-    "new_name": "ModuleRegistry_OpcodeGroup_9599_UNRESOLVED",
+    "new_name": "AIL_protect_unprotect_timbre_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 23 lignes — plusieurs thunks d'opcode consécutifs (0x9D/0x9E) → ModuleRegistry_DispatchTrampoline_5FBA6. ⚠️ Adresses exactes non résolues."
+    "summary": "Ex-'ModuleRegistry_OpcodeGroup_9599_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunks AIL_protect_timbre (0x9D) et AIL_unprotect_timbre (0x9E)."
   },
   "sub_2258E": {
     "new_name": "Container_Op_2258E",
@@ -7985,9 +7985,9 @@
     "summary": "far, calcule les bornes d'un widget (dispatch vtable [bx]/[bx+4] pour la position de base, additionne des décalages, stocke dans les champs +0x10/+0x12). Référencée massivement depuis seg016 et par de nombreuses fonctions de ce segment."
   },
   "sub_60200": {
-    "new_name": "ModuleRegistry_ReleaseSlotIfSet_60200",
+    "new_name": "AIL_release_driver_handle_60200",
     "segment": "seg161",
-    "summary": "far, libère un emplacement de module s'il est actif. Référencée directement par `TextRenderer_Main` (via Heap_ValidateBlockDetailed context, cf. seg124-160)."
+    "summary": "Ex-'ModuleRegistry_ReleaseSlotIfSet_60200'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_release_driver_handle(H)."
   },
   "sub_6C394": {
     "new_name": "VROOMM_StubThunk_6C394",
@@ -8070,9 +8070,9 @@
     "summary": "far, combine `Video_ClearTextPage`, `Path_ResolveDataFile`, `Widget_Helper_5AAB2` (seg125)."
   },
   "sub_68254": {
-    "new_name": "VROOMM_LocateAndValidate_68254",
+    "new_name": "VROOMM_OpenAndParseOverlayFile_68254",
     "segment": "seg212",
-    "summary": "⚠️ far, 224 lignes, NON DÉTAILLÉE — recherche le fichier « strike.exe » (chaîne embarquée), teste la version DOS puis valide/ouvre le fichier via VROOMM_OpenWithDefaultPath_684A7 et VROOMM_CheckCopyright_683F9. Point d'entrée du loader VROOMM (Borland) pour ce segment."
+    "summary": "Ex-'VROOMM_LocateAndValidate_68254' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). far, ~230 lignes - POINT D'ENTREE PRINCIPAL du moteur bas niveau VROOMM. Ouvre le fichier .EXE du jeu (par defaut 'strike.exe', ou un nom fourni en argument) en cherchant dans les repertoires de la variable d'environnement PATH (via VROOMM_SearchPathAndOpen_68405/6844A). Lit et VALIDE L'EN-TETE DOS MZ (signature 0x5A4D='MZ'), calcule la position du bloc d'overlay dans le fichier, VALIDE UNE SIGNATURE D'OVERLAY 'BF'/'OV' (0x4246/0x564F) - confirmant le format d'en-tete d'overlay proprietaire Borland/VROOMM. Extrait la position/taille des donnees d'overlay et les stocke dans seg339 (word_71A18/word_71A1A). Appelle VROOMM_InstallIntHandler_68384 pour installer le gestionnaire d'interruption, puis VROOMM_ScanMemoryArena_6855F pour detecter la memoire disponible."
   },
   "sub_6B023": {
     "new_name": "VROOMM_StubThunk_6B023",
@@ -8195,9 +8195,9 @@
     "summary": "far, initialise le pilote de mémoire paginée : combine PagedMemory_DetectDriverSignatureA_5B7F1 et B_5B802 avec gestion d'erreur (sub_6B70F ×2)."
   },
   "sub_5FD87": {
-    "new_name": "ModuleRegistry_ConfigureModuleTiming_5FD87",
+    "new_name": "AIL_ul_divide_5FD87",
     "segment": "seg161",
-    "summary": "far, configure les paramètres de cadence d'un module enregistré (4 arguments). Appelée par ModuleRegistry_ConfigureAndActivate_600DB."
+    "summary": "Ex-'ModuleRegistry_ConfigureModuleTiming_5FD87'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). ul_divide : division non signee 32 bits / 32 bits."
   },
   "sub_6CE47": {
     "new_name": "VROOMM_StubThunk_6CE47",
@@ -8227,7 +8227,7 @@
   "sub_676F1": {
     "new_name": "Stopwatch_StartOrStop_676F1",
     "segment": "seg207",
-    "summary": "⚠️ far, 138 lignes, NON DÉTAILLÉE — combine ModuleRegistry_CleanupModuleSlot_5FE9F et sub_338 — démarre ou arrête le chronomètre (enregistrement/désenregistrement complet)."
+    "summary": "⚠️ far, 138 lignes, NON DÉTAILLÉE — combine AIL_shutdown_5FE9F et sub_338 — démarre ou arrête le chronomètre (enregistrement/désenregistrement complet)."
   },
   "sub_3A343": {
     "new_name": "WeakRef_Invalidate",
@@ -8322,7 +8322,7 @@
   "sub_5AB79": {
     "new_name": "Weapon_HUDBox_FullUpdateCycle_5AB79",
     "segment": "seg125",
-    "summary": "far, orchestre le cycle complet du cluster HUD armement : Weapon_HUDBox_MasterUpdate_59CFA (seg122) puis Weapon_HUDBox_Main_59302 (seg121). Référencée par sub_26F7E."
+    "summary": "far, orchestre le cycle complet du cluster HUD armement : Weapon_HUDBox_MasterUpdate_59CFA (seg122) puis Music_CombatIntensitySelector_59302 (seg121). Référencée par sub_26F7E."
   },
   "sub_60883": {
     "new_name": "Widget_ComputeAndStoreBounds_60883",
@@ -8330,9 +8330,9 @@
     "summary": "far, appelle Widget_ComputeBoundsExtent_60AEB."
   },
   "sub_68997": {
-    "new_name": "VROOMM_PatchRelocationEntry_68997",
+    "new_name": "VROOMM_LookupOrRegisterOffset_68997",
     "segment": "seg212",
-    "summary": "near, patche une entrée de la table de relogement trouvée (échange avec VROOMM_FindRelocationSlot_689A3)."
+    "summary": "Ex-'VROOMM_PatchRelocationEntry_68997' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - recherche (ou enregistre) un offset dans la table via VROOMM_FindOffsetInTable_689A3, echange une valeur en place si trouve."
   },
   "unnamed_seg117_anglelut": {
     "new_name": "Math_AngleTableIndex360_UNRESOLVED",
@@ -8405,9 +8405,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3224) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_68665": {
-    "new_name": "VROOMM_SkipRelocationsB_68665",
+    "new_name": "VROOMM_ApplyRelocationsToBlock_68665",
     "segment": "seg212",
-    "summary": "⚠️ far, 60 lignes, NON DÉTAILLÉE — variante de VROOMM_SkipRelocationsA_6862C (`int 21h` LSEEK/READ)."
+    "summary": "Ex-'VROOMM_SkipRelocationsB_68665' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - applique une TABLE DE RELOCATION (format standard EXE DOS : paires offset/segment) sur du code fraichement charge, patchant les adresses absolues embarquees selon le segment reel de chargement. Delegue a VROOMM_PatchFarJumpOpcode_686AA pour la reconnaissance/patch d'instructions specifiques."
   },
   "sub_A4AED": {
     "new_name": "PlayerComponent_ReleaseVariant_A4AED",
@@ -8475,9 +8475,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A499D) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=32D90h, codesize=4A3h, nentries=20."
   },
   "sub_AACA6": {
-    "new_name": "AudioQueue_ReleaseAndAdvance_AACA6",
+    "new_name": "AudioQueue_LoadTrackTable_AACA6",
     "segment": "seg458",
-    "summary": "⚠️ far, 196 lignes, NON DÉTAILLÉE — combine Handle_ReadByteField_63534 (×3, seg188), sub_1069, Sequencer_ReleaseSlot_59F87 (seg123), IndexedRecordReader_AdvanceIndex_65E2C, allocateurs typés (seg131)."
+    "summary": "Ex-'AudioQueue_ReleaseAndAdvance_AACA6' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far, 196 lignes — CHARGE LA TABLE DES PISTES PRINCIPALES, lue ligne à ligne intégralement (anciennement AudioQueue_LoadTrackTable_AACA6). arg_2=lecteur flux combat.dat, arg_4=lecteur IndexedRecordReader du niveau 2 (archive de transitions brute). Séquence : (1) word_7084C = Handle_ReadByteField_63534(combat.dat, -1) — nombre de pistes lu directement depuis le .dat ; (2) alloue word_70854 = table de word_7084C TrackDescriptor (12 octets chacun, via sub_1069) ; (3) word_70867 = [niveau2+0x5D]-1 ; (4) boucle sur les entrées 1..word_70867 du niveau 1 : lit 2 octets depuis combat.dat, lit la taille via IndexedRecordReader_AdvanceIndex_65E2C, alloue un buffer (tag 0x5C44), charge les données réelles via IndexedRecordReader_SeekToIndex_65C6D, enregistre dans le séquenceur. Voir MUSIC_SYSTEM.md §7.3."
   },
   "sub_45675": {
     "new_name": "Missile_TestSearchRange",
@@ -8500,9 +8500,9 @@
     "summary": "far,29L — initialise un objet (type 0x10E4, marqueur 0xFFFF), libère la mémoire near associée si demandé (flag bit0 → sub_338/free) : **destructeur de handle/ressource générique (pattern C++ destructeur avec libération conditionnelle).**"
   },
   "loc_59436": {
-    "new_name": "Interrupt_TimerDispatch_59436",
+    "new_name": "Music_SequencerTickDispatch_59436",
     "segment": "seg121",
-    "summary": "⚠️ far, 234 lignes, NON DÉTAILLÉE — table de saut à plusieurs cas (off_595BA) appelée depuis Interrupt_TimerISR_5940B ; appelle des fonctions non encore documentées (sub_59FF5/603CC/60402/603DE, probablement définies dans un segment suivant). Candidat pour session dédiée en lien avec le minuteur matériel."
+    "summary": "Ex-'Interrupt_TimerDispatch_59436' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ 234 lignes — dispatch de l'ISR musicale (4 cas), anciennement Music_SequencerTickDispatch_59436. Aiguille vers Music_TuneTransitionResolve_595C2, Music_TuneTransitionCommit_5974D, Music_SequencerTickInit_597C2 et Music_SequencerTickCleanup_59817 selon l'état courant du séquenceur musical."
   },
   "loc_6599C": {
     "new_name": "StreamReader_ConstructMinimal_6599C",
@@ -8865,9 +8865,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_73FB4) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=160h, codesize=1C60h, nentries=30."
   },
   "sub_6034E": {
-    "new_name": "ModuleRegistry_Opcode_7B_6034E",
+    "new_name": "AIL_play_VOC_file_6034E",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x7B → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par sub_ABBEF et sub_ABDEC (cluster non encore couvert, seg171+ probable)."
+    "summary": "Ex-'ModuleRegistry_Opcode_7B_6034E'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 7Bh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (123 = AIL_P_VOC_FILE dans AIL.INC) et y saute. Lance un fichier VOC (son numerise) ; appele par le cluster AudioQueue_* (AudioQueue_MainProcessEntry_ABBEF)."
   },
   "sub_5DFBE": {
     "new_name": "CachedObject_AllocateAndInit_5DFBE",
@@ -8902,7 +8902,7 @@
   "sub_AA810": {
     "new_name": "AudioQueue_RegisterTickModule_AA810",
     "segment": "seg458",
-    "summary": "⭐ far, enregistre le module auprès du minuteur matériel : référence explicitement `Interrupt_TimerISR_5940B` (seg121) via `Stopwatch_RegisterTickModuleVariant_67662` (seg207, tag 5DC2h, cadence 0x14). Confirme le lien direct entre ce cluster et le registre de modules à créneaux temporisés (seg161) découvert plusieurs lots auparavant."
+    "summary": "⭐ far, enregistre le module auprès du minuteur matériel : référence explicitement `Music_SequencerTickISR_5940B` (seg121) via `Stopwatch_RegisterTickModuleVariant_67662` (seg207, tag 5DC2h, cadence 0x14). Confirme le lien direct entre ce cluster et le registre de modules à créneaux temporisés (seg161) découvert plusieurs lots auparavant."
   },
   "sub_98670": {
     "new_name": "TextureLoader_OpenAndLoadSubrecord_98670",
@@ -9097,7 +9097,7 @@
   "sub_AAE3B": {
     "new_name": "AudioQueue_ReleaseAndAdvanceB_AAE3B",
     "segment": "seg458",
-    "summary": "⚠️ far, 186 lignes, NON DÉTAILLÉE — variante de AudioQueue_ReleaseAndAdvance_AACA6, combine aussi IndexedRecordReader_SeekToIndex_65C6D (seg196) et Sequencer_ProcessQueue_59FF5 (seg123)."
+    "summary": "⚠️ far, 186 lignes, NON DÉTAILLÉE — variante de AudioQueue_LoadTrackTable_AACA6, combine aussi IndexedRecordReader_SeekToIndex_65C6D (seg196) et Music_ChannelRegisterSequence_59FF5 (seg123)."
   },
   "loc_5EEBE": {
     "new_name": "FontStyle_ConstructThunk_5EEBE",
@@ -9367,7 +9367,7 @@
   "sub_5BD80": {
     "new_name": "PagedMemory_ReleaseRange_5BD80",
     "segment": "seg127",
-    "summary": "far, libère/réinitialise une plage d'adresses paginées (PagedMemory_ResolveAddress_5BBCC ×3). Référencée par Sequencer_ReleaseSlot_59F87 (seg123)."
+    "summary": "far, libère/réinitialise une plage d'adresses paginées (PagedMemory_ResolveAddress_5BBCC ×3). Référencée par Music_ChannelInit_59F87 (seg123)."
   },
   "sub_9AECE": {
     "new_name": "Terrain_BuildAndLoadTilePath_9AECE",
@@ -9555,9 +9555,9 @@
     "summary": "far,118L — teste si un point (di) sort des limites d'une zone de défilement (+0x1E-0x24), ajuste les indicateurs de bord atteint (+0x1B/0x1C) et recalcule l'offset de scroll pour garder le point visible avec une marge (+0x10) : **gestionnaire de défilement/cadrage de vue (carte de mission ou radar défilant).**"
   },
   "sub_60254": {
-    "new_name": "ModuleRegistry_ConfigureModuleExtended_60254",
+    "new_name": "AIL_init_driver_60254",
     "segment": "seg161",
-    "summary": "⚠️ far, 100 lignes, NON DÉTAILLÉE — combine ModuleRegistry_QueryModuleField_60228, ModuleRegistry_LookupHandler_5FB6E, ModuleRegistry_RegisterModule_5FF08, ModuleRegistry_ConfigureAndActivate_600DB. Référencée directement par `TextRenderer_InputFieldHandler` (sub_5A0F3, seg124)."
+    "summary": "Ex-'ModuleRegistry_ConfigureModuleExtended_60254'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_init_driver(H, IO, IRQ, DMA, DRQ) : fonction pilote 102 (AIL_INIT_DRVR), puis enregistre une minuterie pour le service periodique du pilote (103, AIL_SERVE_DRVR) a la frequence qu'il demande."
   },
   "sub_31DA0": {
     "new_name": "Model_SubmitPolygonGroupB",
@@ -9780,9 +9780,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_84FE2) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=11ED0h, codesize=4E2h, nentries=8."
   },
   "unnamed_seg161_isr": {
-    "new_name": "ModuleRegistry_TimerISR_5FBBE",
+    "new_name": "AIL_API_timer_ISR_5FBBE",
     "segment": "seg161",
-    "summary": "⭐ far, 89 lignes, NON DÉTAILLÉE EN PROFONDEUR — corps du **gestionnaire d'interruption matérielle IRQ0 installé par ModuleRegistry_HookTimerIRQ_5FCCA** : garde de réentrance, bascule sur une pile privée, sauvegarde tous les registres (pushad), puis pour chacun des 16 emplacements actifs (état==2) accumule les tics écoulés et, une fois le seuil configuré atteint, **appelle le gestionnaire enregistré** (dword ptr cs:[si+8], le pointeur far fourni lors de l'enregistrement). Envoie l'EOI au 8259A, avec un auto-test d'intégrité (chaîne magique \"Test\") qui déclenche un  (trap debugger) en cas de corruption détectée. Adresse cible de ModuleRegistry_HookTimerIRQ_5FCCA (cs:0x40E). ⚠️ Adresse exacte non résolue par IDA (pas de label). PRIORITÉ pour une lecture complète si le mécanisme de timing doit être entièrement confirmé."
+    "summary": "Ex-'ModuleRegistry_TimerISR_5FBBE'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). API_timer : routine d'interruption du timer PC (INT 8) de AIL ; appelle les callbacks des minuteries enregistrees (AIL_register_timer_5FF08) a leur periode, dont le service du pilote musical (serve_driver, 120 Hz) et les modules du jeu."
   },
   "sub_5F397": {
     "new_name": "LinkedList_RemoveAllAndDestroy_5F397",
@@ -9870,9 +9870,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8C531) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=18750h, codesize=17B5h, nentries=27."
   },
   "sub_60052": {
-    "new_name": "ModuleRegistry_Helper3_60052",
+    "new_name": "AIL_stop_timer_60052",
     "segment": "seg161",
-    "summary": "far, aucun appel externe visible (rôle exact non détaillé)."
+    "summary": "Ex-'ModuleRegistry_Helper3_60052'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_stop_timer(timer) : etat 2 -> 1."
   },
   "sub_A2ED3": {
     "new_name": "GaugeWidget_ReleaseListNode_A2ED3",
@@ -9937,7 +9937,7 @@
   "sub_67662": {
     "new_name": "Stopwatch_RegisterTickModuleVariant_67662",
     "segment": "seg207",
-    "summary": "far, variante de Stopwatch_RegisterTickModule_67611 (ModuleRegistry_RegisterModule_5FF08, ConfigureAndActivate_600DB, ModuleRegistry_Helper_60018)."
+    "summary": "far, variante de Stopwatch_RegisterTickModule_67611 (AIL_register_timer_5FF08, ConfigureAndActivate_600DB, AIL_start_timer_60018)."
   },
   "sub_6C9FA": {
     "new_name": "VROOMM_StubThunk_6C9FA",
@@ -10227,7 +10227,7 @@
   "sub_6769F": {
     "new_name": "Stopwatch_UnregisterTickModule_6769F",
     "segment": "seg207",
-    "summary": "far, désenregistre le module de tic (ModuleRegistry_UnregisterModule_5FFBD, seg161) si actif. Référencée par sub_27F0E et le destructeur ConfigOption (seg201)."
+    "summary": "far, désenregistre le module de tic (AIL_release_timer_handle_5FFBD, seg161) si actif. Référencée par sub_27F0E et le destructeur ConfigOption (seg201)."
   },
   "loc_52F99": {
     "new_name": "HitShape_Radial2D_ContainsPoint_52F99",
@@ -10255,9 +10255,9 @@
     "summary": "far, combine sub_229C et TextScroll_Helper_6707C."
   },
   "sub_6015A": {
-    "new_name": "ModuleRegistry_QueryOrDispatch_6015A",
+    "new_name": "AIL_register_driver_6015A",
     "segment": "seg161",
-    "summary": "⚠️ far, 90 lignes, NON DÉTAILLÉE — combine ModuleRegistry_QueryModuleField_60228 et ModuleRegistry_DispatchTrampoline_5FBA6."
+    "summary": "Ex-'ModuleRegistry_QueryOrDispatch_6015A'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_register_driver(pilote) : enregistre l'image d'un pilote .ADV charge en memoire dans une des 16 entrees (table cs:+0x128) ; renvoie le handle ou -1."
   },
   "sub_6C5E5": {
     "new_name": "VROOMM_StubThunk_6C5E5",
@@ -10267,7 +10267,7 @@
   "sub_5AA49": {
     "new_name": "Weapon_HUDBox_UpdateAndRenderVariant_5AA49",
     "segment": "seg125",
-    "summary": "far, appelle Weapon_HUDBox_UpdateAndRender_5923A (seg114). Référencée par `UIScreen_BuildWidgetTree` (sub_53A94, seg114)."
+    "summary": "far, appelle Music_SelectTuneCandidate_5923A (seg114). Référencée par `UIScreen_BuildWidgetTree` (sub_53A94, seg114)."
   },
   "sub_74FDB": {
     "new_name": "AircraftDamageComponent_ScalarDeletingDtorB_74FDB",
@@ -10380,9 +10380,9 @@
     "summary": "far — wrapper itoa base variable, signé uniquement si base=10."
   },
   "sub_68405": {
-    "new_name": "VROOMM_CheckDOSVersionAndOpen_68405",
+    "new_name": "VROOMM_SearchPathEnvAndOpen_68405",
     "segment": "seg212",
-    "summary": "far, vérifie la version DOS (`int 21h`) puis ouvre un fichier via VROOMM_OpenFile_684A7."
+    "summary": "Ex-'VROOMM_CheckDOSVersionAndOpen_68405' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - implemente l'algorithme classique DOS de RECHERCHE DE FICHIER VIA LA VARIABLE D'ENVIRONNEMENT PATH : parcourt le bloc d'environnement (deux chaines ASCIIZ ignorees en tete, probable COMSPEC), cherche l'entree commencant par 'PATH=' (verifiee par VROOMM_MatchPathPrefix_6844A), construit un chemin complet (repertoire+'\\'+nom de fichier) pour chaque repertoire liste, tente l'ouverture (VROOMM_TryOpenFile_684A7) jusqu'a succes."
   },
   "sub_77FCA": {
     "new_name": "AIManeuver_LoadFormationDataB_77FCA",
@@ -10455,9 +10455,9 @@
     "summary": "far, combine sub_6CAC5 (sous-objet composite) et PlayerComponent_SubHelperO_A0313."
   },
   "sub_59302": {
-    "new_name": "Weapon_HUDBox_Main_59302",
+    "new_name": "Music_CombatIntensitySelector_59302",
     "segment": "seg121",
-    "summary": "far, point d'entrée orchestrant tout le cluster Weapon_HUDBox (58ED5/590E0/59061/5923A) + sub_43CDC/sub_43D0F (zone armement/ciblage, proche de WeaponStation_ResolveStateA_40A33 et Targeting_SelectAndPrioritize_43107). Référencée par sub_5AA02."
+    "summary": "Ex-'Weapon_HUDBox_Main_59302' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE DE COMBAT PAR INTENSITÉ, lue ligne à ligne intégralement. Anciennement Music_CombatIntensitySelector_59302. Plusieurs verrous de sortie précoce (byte_6E4B8, byte_6E4B4, byte_72A8E==0x0B, byte_72C90==0x14) désactivent toute l'évaluation — la piste en cours n'est alors pas modifiée. byte_6E4B8 est positionné dans Player_MainUpdate_13100 selon byte_72DE5/byte_72E1D (probable mort/éjection du joueur) ; byte_6E4B4 est une réaction dérivée, positionnée dans sub_53896 quand byte_6E4B8 est actif (avec appel à sub_6ADFA, probable séquence de mort/éjection, candidat pour la piste victoire/défaite). Si byte_72C90 (catégorie courante) == word_70859 (piste jouée) : calcule un ratio via Roster_SumAttributeB_43D0F × 100 / Roster_SumAttributeA_43CDC (probable pertes/effectif de l'escadrille ou score) et choisit di parmi {4,5,6,7,9,0x13} selon des seuils (≥0x4B=75%, ≥0x23=35%) et des booléens intermédiaires (Weapon_HUDBox_DrawElementA_58ED5, Weapon_HUDBox_DrawElementB_59061, word_722EE, byte_7086A bit0). Si aucune branche ne matche : délègue à Music_SelectTuneCandidate_5923A(si,0,0). Si di choisi : ÉCRASE word_70859 immédiatement. Point d'entrée périodique principal du système de musique de combat dynamique — voir MUSIC_SYSTEM.md §8.1."
   },
   "sub_5F3D5": {
     "new_name": "LinkedList_Helper_5F3D5",
@@ -11225,9 +11225,9 @@
     "summary": "far, thunk d'ajustement de pile redirigeant vers PagedResourceB_ConstructThunk_5C3C9 (motif d'héritage multiple C++ Borland, identique à seg128)."
   },
   "sub_5FC8D": {
-    "new_name": "ModuleRegistry_ResetTables_5FC8D",
+    "new_name": "AIL_init_DDA_arrays_5FC8D",
     "segment": "seg161",
-    "summary": "far, désactive les interruptions, met à zéro les 3 tables internes du registre (17+34+34 mots, offsets 0x6E/0x90/0xD4 du segment) — initialisation complète du système au premier enregistrement. Appelée par ModuleRegistry_RegisterModule_5FF08."
+    "summary": "Ex-'ModuleRegistry_ResetTables_5FC8D'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). init_DDA_arrays : remise a zero des tables de periodes des 16 minuteries."
   },
   "sub_25DFA": {
     "new_name": "Render_SampleTexture",
@@ -11865,14 +11865,14 @@
     "summary": "far, référencée via vtable (DATA XREF seg339) — thunk appelant `ConfigOption_Construct_6672D`... (sub_663D6, seg200, JoystickCallback_Construct, tag 5D84h)."
   },
   "unnamed_seg161_h": {
-    "new_name": "ModuleRegistry_OpcodeGroup_final_UNRESOLVED",
+    "new_name": "AIL_misc_thunks_BB_C2_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 34 lignes en toute fin de segment — plusieurs thunks d'opcode consécutifs (0xBB-0xC2) → ModuleRegistry_DispatchTrampoline_5FBA6. ⚠️ Adresses exactes non résolues."
+    "summary": "Ex-'ModuleRegistry_OpcodeGroup_final_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunks AIL_send_sysex_message (0xBB), AIL_write_display (0xBC), AIL_install_callback (0xBD), AIL_cancel_callback (0xBE), AIL_lock_channel (0xBF), AIL_map_sequence_channel (0xC0), AIL_release_channel (0xC1), AIL_true_sequence_channel (0xC2)."
   },
   "sub_684A7": {
-    "new_name": "VROOMM_OpenFile_684A7",
+    "new_name": "VROOMM_TryOpenFile_684A7",
     "segment": "seg212",
-    "summary": "near, copie un chemin (12 caractères max, ou chemin par défaut) puis ouvre le fichier (`int 21h` AH=3Dh)."
+    "summary": "Ex-'VROOMM_OpenFile_684A7' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - copie un nom de fichier optionnel (argument far) dans un buffer, puis appelle DOS INT 21h AH=3Dh (OPEN DISK FILE WITH HANDLE) avec le mode d'acces configure (byte_69DE6)."
   },
   "sub_6CF67": {
     "new_name": "VROOMM_StubThunk_6CF67",
@@ -11940,9 +11940,9 @@
     "summary": "far,102L — compte les tokens d'un flux (boucle sur sub_1C8ED), utilise le moteur printf (sub_1069) avec format 0x50000 pour produire une chaîne, message d'erreur 0x700D si échec d'allocation : **comptage de tokens + génération de message d'erreur formaté (parseur script IA).**"
   },
   "sub_687E8": {
-    "new_name": "VROOMM_ApplyRelocationsMain_687E8",
+    "new_name": "VROOMM_DemandLoadDispatch_687E8",
     "segment": "seg212",
-    "summary": "⚠️ far, 85 lignes, NON DÉTAILLÉE — applique la table de relogement MZ (comparable à VROOMM_AllocateAndFinalize_6879E, mêmes helpers PatchFarJumpTable/CheckImageHasTrailer/ComputeParagraphs/AdvanceLoadPointer/ComputeRemainingSpace)."
+    "summary": "Ex-'VROOMM_ApplyRelocationsMain_687E8' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - dispatche entre chargement immediat et differe selon l'etat du segment demande (drapeaux es:0x1A/es:0x1B), gere le compteur de recharge (seg_6D15C), et la boucle de recherche parmi les segments actuellement charges pour trouver ou placer le nouveau."
   },
   "sub_8DF49": {
     "new_name": "PilotProfile_LoadRADI_8DF49",
@@ -11975,9 +11975,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_86B53) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=13AF0h, codesize=0F6Fh, nentries=11."
   },
   "sub_5923A": {
-    "new_name": "Weapon_HUDBox_UpdateAndRender_5923A",
+    "new_name": "Music_SelectTuneCandidate_5923A",
     "segment": "seg121",
-    "summary": "far, orchestre Weapon_HUDBox_DrawElementC_590E0, exécute une expression via Expr_VM_Execute_51E7E (seg114) — confirme le lien entre le cluster HUD armement et la VM d'expression. Référencée par sub_59302."
+    "summary": "Ex-'Weapon_HUDBox_UpdateAndRender_5923A' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — DÉCISION DE PISTE (cascade de priorité), lue ligne à ligne intégralement. Anciennement Music_SelectTuneCandidate_5923A. Calcule un candidat di=0xFFFF par défaut, puis l'affine selon une cascade : (1) si arg_2!=0, appelle Weapon_HUDBox_DrawElementC_590E0 et compare des bits de byte_7086A/résultat → di=0x13 (combat) ; (2) sinon, si le champ [word_706A0+0xA1] (objectif mission) est non nul ET Parser_LookaheadPattern_1CB83([+0x68]) renvoie vrai → di=0x0C ; (3) sinon, si byte_70869 est positionné → di=0x0D (et le flag est consommé). Si un candidat a été choisi (di!=0xFFFF) : ÉCRASE IMMÉDIATEMENT word_70859. Retourne un booléen 'changement effectué'. Appelée par Music_CombatIntensitySelector_59302 (en dernier recours) et par sub_5AA49 (seg125, non détaillée)."
   },
   "sub_6B8BA": {
     "new_name": "VROOMM_StubThunk_6B8BA",
@@ -12055,9 +12055,9 @@
     "summary": "far — allocation avec retry sur errno global (dword_72F54), appelle sub_5D22B : variante malloc courte 16-bit."
   },
   "sub_60018": {
-    "new_name": "ModuleRegistry_Helper_60018",
+    "new_name": "AIL_start_timer_60018",
     "segment": "seg161",
-    "summary": "far, aucun appel externe visible (rôle exact non détaillé)."
+    "summary": "Ex-'ModuleRegistry_Helper_60018'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_start_timer(timer) : etat 1 -> 2 (active)."
   },
   "sub_AA205": {
     "new_name": "ExprSlot_ReleaseObject_AA205",
@@ -12242,7 +12242,7 @@
   "loc_68B2F": {
     "new_name": "VROOMM_MainEntry_68B2F",
     "segment": "seg212",
-    "summary": "⭐ far, 80 lignes, référencée via vtable (DATA XREF seg339) — point d'entrée principal du loader VROOMM : appelle VROOMM_ReadAndParseHeader_684DF puis enchaîne le chargement complet de l'image d'overlay (parsing MZ, relogement, patch de trampolines JMP/INT)."
+    "summary": "far, 80 lignes, referencee via vtable (seg339:off_71F62) - CONFIRME point d'entree principal de (re)chargement VROOMM : appelle VROOMM_ScanFreeMemoryBlocks_684DF puis calcule une taille de bloc requise a partir de word_69E8A et de la table de segments deja chargee (seg339:word_71A1C). Tente une allocation (sub_5D90E) ; SI L'ALLOCATION ECHOUE (taille insuffisante), retente en relancant l'ouverture complete du fichier depuis zero via VROOMM_OpenAndParseOverlayFile_68254 - mecanisme de RECUPERATION PAR AGRANDISSEMENT DYNAMIQUE DE LA ZONE D'OVERLAY."
   },
   "sub_A8225": {
     "new_name": "MissionScenario_LoadFieldGroup_A8225",
@@ -12290,9 +12290,9 @@
     "summary": "far, stub retournant 0."
   },
   "sub_60366": {
-    "new_name": "ModuleRegistry_Opcode_7E_60366",
+    "new_name": "AIL_stop_digital_playback_60366",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x7E → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée depuis seg125 et sub_AB883."
+    "summary": "Ex-'ModuleRegistry_Opcode_7E_60366'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 7Eh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (126 = AIL_STOP_D_PB dans AIL.INC) et y saute. Suivent sans entree propre : AIL_pause_digital_playback (0x7F), AIL_resume_digital_playback (0x80), AIL_set_digital_playback_volume (0x81), AIL_digital_playback_volume (0x82), AIL_set_digital_playback_panpot (0x83), AIL_digital_playback_panpot (0x84)."
   },
   "sub_3317E": {
     "new_name": "TerrainTile_ListClear",
@@ -12315,9 +12315,9 @@
     "summary": "far, combine `Matrix_NosePitchAngle_57C3A` et `AI_ApplyApproachAngles_57D81` (seg116)."
   },
   "sub_6008C": {
-    "new_name": "ModuleRegistry_ConfigureAndActivate_6008C",
+    "new_name": "AIL_set_timer_period_6008C",
     "segment": "seg161",
-    "summary": "far, applique une configuration de cadence puis recalcule la fréquence globale (ModuleRegistry_RecomputeGlobalTickRate_5FDD2). Appelée par ModuleRegistry_RegisterModule_5FF08 et ModuleRegistry_ConfigureAndActivate_600DB."
+    "summary": "Ex-'ModuleRegistry_ConfigureAndActivate_6008C'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_set_timer_period(timer, microsecondes)."
   },
   "sub_6CF71": {
     "new_name": "VROOMM_StubThunk_6CF71",
@@ -12342,7 +12342,7 @@
   "sub_AB592": {
     "new_name": "AudioQueue_LoadAndPlayEntry_AB592",
     "segment": "seg459",
-    "summary": "⭐⚠️ far, 247 lignes, NON DÉTAILLÉE — orchestrateur majeur du cluster : combine IndexedRecordReader_ConstructVariantA_65A1A (seg196), Sequencer_ReleaseSlot_59F87, IndexedRecordReader_AdvanceIndex_65E2C, allocateurs typés (Memory_TypedFreeWrapperC_5C6F3/Memory_TypedAllocDispatchB_5C832), IndexedRecordReader_SeekToIndex_65C6D, Sequencer_ProcessQueue_59FF5, Sequencer_AdvanceActiveSlot_59F1D (×2, seg123), `IndexedRecordReader_Destruct_659D0` (seg196) — cycle complet de chargement et lecture d'une entrée audio/message indexée via le séquenceur. Candidat prioritaire pour session dédiée."
+    "summary": "⭐⚠️ far, 247 lignes, NON DÉTAILLÉE — orchestrateur majeur du cluster : combine IndexedRecordReader_ConstructVariantA_65A1A (seg196), Music_ChannelInit_59F87, IndexedRecordReader_AdvanceIndex_65E2C, allocateurs typés (Memory_TypedFreeWrapperC_5C6F3/Memory_TypedAllocDispatchB_5C832), IndexedRecordReader_SeekToIndex_65C6D, Music_ChannelRegisterSequence_59FF5, Music_ChannelStopSequence_59F1D (×2, seg123), `IndexedRecordReader_Destruct_659D0` (seg196) — cycle complet de chargement et lecture d'une entrée audio/message indexée via le séquenceur. Candidat prioritaire pour session dédiée."
   },
   "sub_6B099": {
     "new_name": "VROOMM_StubThunk_6B099",
@@ -12395,9 +12395,9 @@
     "summary": "⚠️ far, 139 lignes, NON DÉTAILLÉE — variante de MissionScenario_DecodeFieldA_A9B14 avec sub_2E74 additionnel."
   },
   "sub_603DE": {
-    "new_name": "ModuleRegistry_Opcode_AE_603DE",
+    "new_name": "AIL_sequence_status_603DE",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xAE → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_AdvanceActiveSlot` (sub_59F1D, seg123) — c'est l'appel « vérifier/sonder »."
+    "summary": "Ex-'ModuleRegistry_Opcode_AE_603DE'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0AEh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (174 = AIL_SEQ_STAT dans AIL.INC) et y saute. 0 arretee, 1 en cours, 2 terminee (AIL.INC : SEQ_STOPPED/PLAYING/DONE)."
   },
   "sub_81467": {
     "new_name": "HUDSymbol_RenderWithClipTestB_81467",
@@ -12445,9 +12445,9 @@
     "summary": "near, variante de Render_DitheredLineSpan_58A7A pour une autre paire de bornes (word_70842/word_7083E) — probable axe/bord de clipping différent."
   },
   "sub_68384": {
-    "new_name": "VROOMM_Helper_68384",
+    "new_name": "VROOMM_InstallIntHandler_68384",
     "segment": "seg212",
-    "summary": "far, rôle exact non détaillé (voisin du chargeur d'exécutable)."
+    "summary": "Ex-'VROOMM_Helper_68384' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). far - installe le VECTEUR D'INTERRUPTION DOS propre a VROOMM (INT 21h fonction 25h SET INTERRUPT VECTOR, sauvegarde l'ancien via fonction 35h GET INTERRUPT VECTOR) - c'est le point d'ancrage qui permet au moteur d'intercepter des appels pour charger les overlays a la demande. Ouvre aussi (ou ferme) le fichier d'overlay lui-meme (DOS INT 21h AH=3Dh)."
   },
   "sub_8C088": {
     "new_name": "MissionRecord_LoadFieldGroupMixC_8C088",
@@ -12530,9 +12530,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8CA28) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=19FE0h, codesize=763h, nentries=14."
   },
   "unnamed_seg161_a": {
-    "new_name": "ModuleRegistry_Helper2_UNRESOLVED",
+    "new_name": "AIL_start_all_timers_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 28 lignes, entre sub_60018 et sub_60052. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Helper2_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_start_all_timers (suit AIL_start_timer_60018)."
   },
   "sub_665FA": {
     "new_name": "JoystickManager_Construct_665FA",
@@ -12580,9 +12580,9 @@
     "summary": "far, initialise sous-objet composite (sub_6CAC0), combine PlayerComponent_ResetFieldsB_A4B98, PlayerComponent_LoadFieldsWithRetryF_A4BE1, PlayerComponent_LoadFieldsWithRetryJ_A52B8."
   },
   "sub_60402": {
-    "new_name": "ModuleRegistry_Opcode_UNKNOWN_60402",
+    "new_name": "AIL_measure_count_60402",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée depuis Interrupt_TimerDispatch_59436 (seg121)."
+    "summary": "Ex-'ModuleRegistry_Opcode_UNKNOWN_60402'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0B4h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (180 = AIL_BAR_CNT dans AIL.INC) et y saute. Numero de mesure courant de la sequence ; appele par le tick musical (Music_SequencerTickDispatch_59436). Suivent sans entree propre : AIL_branch_index (0xB5), AIL_controller_value (0xB6), AIL_set_controller_value (0xB7), AIL_channel_notes (0xB9)."
   },
   "sub_8CA28": {
     "new_name": "UISublist_Helper_8CA28",
@@ -12610,9 +12610,9 @@
     "summary": "far, copie conditionnellement un champ (+0x20) vers un pointeur cible (+0x1E) si un flag (arg_8) est posé."
   },
   "sub_60396": {
-    "new_name": "ModuleRegistry_Opcode_97_60396",
+    "new_name": "AIL_register_sequence_60396",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x97 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_ProcessQueue` (sub_59FF5, seg123)."
+    "summary": "Ex-'ModuleRegistry_Opcode_97_60396'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 97h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (151 = AIL_REG_SEQ dans AIL.INC) et y saute. Enregistre une sequence XMIDI (pointeur sur le FORM XMID / CAT, numero de sequence, table d'etat) ; le pilote la jouera lui-meme (interpreteur XMIDI dans ADLIB.ADV, find_seq de XMIDI.ASM)."
   },
   "sub_5D22B": {
     "new_name": "Runtime_StackOverflowCheck_5D22B",
@@ -12835,9 +12835,9 @@
     "summary": "far,61L — copie 9 coordonnées (3 sommets) dans un buffer partagé (word_72778...), teste si le triangle est plat sur un axe (Z constant) → appelle Render_PolygonPrimitive_20848 (seg037, cas simplifié 2D) ; sinon appelle Render_MeshPrimitive_21085 (cas général 3D) : **dispatcher de rastérisation choisissant entre le rasterizer plat et le rasterizer perspective, confirmant le rôle des 4 grosses fonctions du seg037.**"
   },
   "sub_60420": {
-    "new_name": "ModuleRegistry_Opcode_UNKNOWN_60420",
+    "new_name": "AIL_send_channel_voice_message_60420",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode → ModuleRegistry_DispatchTrampoline_5FBA6 (adresse en fin de segment, valeur exacte non lue)."
+    "summary": "Ex-'ModuleRegistry_Opcode_UNKNOWN_60420'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0BAh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (186 = AIL_SEND_CV_MSG dans AIL.INC) et y saute. Envoie un message MIDI de canal directement au pilote."
   },
   "sub_663D6": {
     "new_name": "JoystickCallback_Construct_663D6",
@@ -13245,9 +13245,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A303D) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_603A8": {
-    "new_name": "ModuleRegistry_Opcode_9A_603A8",
+    "new_name": "AIL_define_timbre_cache_603A8",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x9A → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `TextRenderer_InputFieldHandler` (sub_5A0F3, seg124)."
+    "summary": "Ex-'ModuleRegistry_Opcode_9A_603A8'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 9Ah / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (154 = AIL_DEFINE_T_CACHE dans AIL.INC) et y saute. Fournit au pilote le cache de timbres alloue ('No memory for timbre cache.')."
   },
   "sub_A06BA": {
     "new_name": "PlayerComponent_SubHelperW_A06BA",
@@ -13665,9 +13665,9 @@
     "summary": "far,236L — pour chaque sommet référencé, calcule une position relative à un point de référence (di) divisée par un facteur d'échelle (arg_A) : **projection/mise à l'échelle des sommets d'un polygone pour le rendu.**"
   },
   "sub_5FD3A": {
-    "new_name": "ModuleRegistry_ProgramPITFrequency_5FD3A",
+    "new_name": "AIL_set_PIT_divisor_5FD3A",
     "segment": "seg161",
-    "summary": "⭐ far, **reprogramme la puce minuterie 8253/8254 (PIT)** : envoie l'octet de commande 0x36 (port 0x43, mode 3 binaire) puis le diviseur de fréquence 16 bits (port 0x40) — change la cadence de tic du minuteur matériel. Appelée par ModuleRegistry_SetTickRateHz_5FD5D et ModuleRegistry_UnregisterModule_5FFBD (restauration à la fréquence par défaut)."
+    "summary": "Ex-'ModuleRegistry_ProgramPITFrequency_5FD3A'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). set_PIT_divisor : programme le diviseur du PIT 8253 (out 43h, 36h)."
   },
   "sub_2D3D4": {
     "new_name": "Widget_DestructComposite",
@@ -13825,9 +13825,9 @@
     "summary": "far, LUE (2026-09-24). Ex-'Math_Sin_Raw' : NOM INVERSE, c'est un COSINUS. i = |angle 24.8| >> 6 (quarts de degre) ; ramene dans [0, 90 deg] avec signe (cx) ; 1.0 (0x100) si i == 0, sinon table d'octets seg213 (unk_68B90) : table[i] = cos(i/4 deg) en 24.8 (1.0 = 256) (verifie : 221 a 30 deg, 181 a 45 deg, 127 a 60 deg, 0 a 90 deg). Fonction paire (utilise |angle|) : cos(0) = 1, cos(180) = -1."
   },
   "sub_603F0": {
-    "new_name": "ModuleRegistry_Opcode_B1_603F0",
+    "new_name": "AIL_set_relative_volume_603F0",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xB1 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Weapon_HUDBox_TimerCaseD_59902` et `TimerCaseE_599D3` (seg122)."
+    "summary": "Ex-'ModuleRegistry_Opcode_B1_603F0'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0B1h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (177 = AIL_SET_REL_VOL dans AIL.INC) et y saute. Volume relatif de la sequence (0-100 %) avec duree de rampe en ms : c'est le FONDU. Suivent sans entree propre : AIL_set_relative_tempo (0xB2, loc_603F6), AIL_beat_count (0xB3, loc_603FC)."
   },
   "sub_1CBCB": {
     "new_name": "Parser_ConsumeRemaining",
@@ -14200,9 +14200,9 @@
     "summary": "far,65L — compare une position à la limite du terrain courant (+0x92 d'un objet référencé +0x45) : **test de limite de la tuile de terrain courante (déclenche un rechargement si dépassée).**"
   },
   "sub_6024E": {
-    "new_name": "ModuleRegistry_Opcode_65_6024E",
+    "new_name": "AIL_detect_device_6024E",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x65 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `TextRenderer_InputFieldHandler` (sub_5A0F3, seg124)."
+    "summary": "Ex-'ModuleRegistry_Opcode_65_6024E'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 65h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (101 = AIL_DET_DEV dans AIL.INC) et y saute. Detection de la carte (pour l'AdLib : test des timers OPL, ADLIB_DRIVER.md §7)."
   },
   "sub_6C807": {
     "new_name": "VROOMM_StubThunk_6C807",
@@ -14257,7 +14257,7 @@
   "sub_AB1AF": {
     "new_name": "AudioQueue_DeactivateSlotOpcode_AB1AF",
     "segment": "seg458",
-    "summary": "⭐ far, appelle deux fois `ModuleRegistry_Opcode_AD_603D8` (seg161, thunk de désactivation d'emplacement)."
+    "summary": "⭐ far, appelle deux fois `AIL_resume_sequence_603D8` (seg161, thunk de désactivation d'emplacement)."
   },
   "sub_6CE56": {
     "new_name": "VROOMM_StubThunk_6CE56",
@@ -14390,9 +14390,9 @@
     "summary": "far, duplicat probable de MissionRecordField_ReleaseSingle_8953A."
   },
   "unnamed_seg161_g": {
-    "new_name": "ModuleRegistry_Opcode_B0_UNRESOLVED",
+    "new_name": "AIL_relative_tempo_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xB0 → ModuleRegistry_DispatchTrampoline_5FBA6. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Opcode_B0_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0B0h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (176 = AIL_REL_TEMPO dans AIL.INC) et y saute. "
   },
   "loc_608CC": {
     "new_name": "Widget_Method_ReleaseAttrAndBounds_608CC",
@@ -14535,9 +14535,9 @@
     "summary": "far, combine sub_67DEA, sub_67662 et Runtime_FatalErrorHandlerWithTag (sub_5F700, seg160) — finalise la construction d'une option de configuration."
   },
   "sub_684CF": {
-    "new_name": "VROOMM_CloseFile_684CF",
+    "new_name": "VROOMM_ReadFileExact_684CF",
     "segment": "seg212",
-    "summary": "far, ferme un fichier (`int 21h` AH=3Eh)."
+    "summary": "Ex-'VROOMM_CloseFile_684CF' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - DOS INT 21h AH=3Fh (READ FROM FILE), verifie que le nombre d'octets lus correspond exactement a la demande (detecte une lecture partielle/EOF premature comme une erreur)."
   },
   "sub_19E8C": {
     "new_name": "UI_ContainerLifecycle",
@@ -14795,9 +14795,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A0700) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2ECE0h, codesize=2F5h, nentries=4."
   },
   "sub_603E4": {
-    "new_name": "ModuleRegistry_Opcode_AF_603E4",
+    "new_name": "AIL_relative_volume_603E4",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xAF → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par sub_AB1EF."
+    "summary": "Ex-'ModuleRegistry_Opcode_AF_603E4'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0AFh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (175 = AIL_REL_VOL dans AIL.INC) et y saute. "
   },
   "loc_54E83": {
     "new_name": "Math_InitConstants_54E83",
@@ -14832,7 +14832,7 @@
   "sub_ABDEC": {
     "new_name": "AudioQueue_FinalizeAndRelease_ABDEC",
     "segment": "seg461",
-    "summary": "far, dernière fonction du fichier — combine `ModuleRegistry_Opcode_7C_6035A`, Memory_TypedAllocDispatchB_5C832, `ModuleRegistry_Opcode_7B_6034E`, `ModuleRegistry_Opcode_7D_60360` (seg161), Memory_TypedFree_5C7B6 — finalisation/nettoyage d'une entrée de la file audio/message."
+    "summary": "far, dernière fonction du fichier — combine `AIL_VOC_playback_status_6035A`, Memory_TypedAllocDispatchB_5C832, `AIL_play_VOC_file_6034E`, `AIL_start_digital_playback_60360` (seg161), Memory_TypedFree_5C7B6 — finalisation/nettoyage d'une entrée de la file audio/message."
   },
   "sub_97CD0": {
     "new_name": "MissionText_Helper5_97CD0",
@@ -14957,7 +14957,7 @@
   "sub_AB883": {
     "new_name": "AudioQueue_OpcodeWrapper_AB883",
     "segment": "seg460",
-    "summary": "⭐ far, appelle `ModuleRegistry_Opcode_7E_60366` (seg161) — confirme un lien supplémentaire entre ce cluster et le registre de modules."
+    "summary": "⭐ far, appelle `AIL_stop_digital_playback_60366` (seg161) — confirme un lien supplémentaire entre ce cluster et le registre de modules."
   },
   "sub_6B489": {
     "new_name": "VROOMM_StubThunk_6B489",
@@ -15100,9 +15100,9 @@
     "summary": "far, appelle `Text_TypewriterDrawChar` et des thunks voisins."
   },
   "sub_5FE9F": {
-    "new_name": "ModuleRegistry_CleanupModuleSlot_5FE9F",
+    "new_name": "AIL_shutdown_5FE9F",
     "segment": "seg161",
-    "summary": "far, combine ModuleRegistry_UnregisterModule_5FFBD, sub_60303 et ModuleRegistry_UnregisterAll_60000 — nettoyage complet d'un emplacement de module."
+    "summary": "Ex-'ModuleRegistry_CleanupModuleSlot_5FE9F'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_shutdown(SignOff) : arrete tous les pilotes et minuteries."
   },
   "sub_A4850": {
     "new_name": "InfoWidget_Helper4_A4850",
@@ -15190,9 +15190,9 @@
     "summary": "far,285L — machine de transition/interpolation animée (compare à seuil 0x100) : **contrôleur de transition douce (pan) pour une valeur d'orientation caméra/HUD.**"
   },
   "loc_597C2": {
-    "new_name": "Interrupt_TimerInitState_597C2",
+    "new_name": "Music_SequencerTickInit_597C2",
     "segment": "seg121",
-    "summary": "far, référencée via vtable (DATA XREF seg339), initialise ~10 globales d'état du sous-système minuteur (dword_72C97 et suivantes)."
+    "summary": "Ex-'Interrupt_TimerInitState_597C2' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). Anciennement Music_SequencerTickInit_597C2. Un des 4 cas de Music_SequencerTickDispatch_59436 — initialisation d'état du séquenceur musical."
   },
   "sub_A7CA1": {
     "new_name": "MissionLoader_LoadChunkB_A7CA1",
@@ -15220,9 +15220,9 @@
     "summary": "far, combine ResourceRecord_SeekAndReadB_647B2/ReleaseAndClear_64D25 (38 lignes)."
   },
   "sub_60360": {
-    "new_name": "ModuleRegistry_Opcode_7D_60360",
+    "new_name": "AIL_start_digital_playback_60360",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x7D → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par sub_ABBEF et sub_ABDEC."
+    "summary": "Ex-'ModuleRegistry_Opcode_7D_60360'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 7Dh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (125 = AIL_START_D_PB dans AIL.INC) et y saute. "
   },
   "sub_6C290": {
     "new_name": "VROOMM_StubThunk_6C290",
@@ -15290,9 +15290,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A12BD) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_5974D": {
-    "new_name": "Interrupt_TimerCaseB_5974D",
+    "new_name": "Music_TuneTransitionCommit_5974D",
     "segment": "seg121",
-    "summary": "far, autre cas de Interrupt_TimerDispatch_59436 (sub_59F1D/59FF5/603CC)."
+    "summary": "Ex-'Interrupt_TimerCaseB_5974D' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — COMMIT DE LECTURE + REPRISE APRÈS PISTE TRANSITOIRE, lue ligne à ligne intégralement. Anciennement Music_TuneTransitionCommit_5974D. Un des 4 cas de Music_SequencerTickDispatch_59436. Libère le canal transition (5BF5h) et conditionnellement le canal principal (5BE3h, si byte_72CA1==1), commit byte_72C90=word_70859, recharge et démarre la lecture (Music_ChannelRegisterSequence_59FF5 + sub_603CC) sur le canal 5BE3h. Registre de reprise à un seul niveau : si la piste qui vient de démarrer (di) est une piste transitoire de menu (0x10 ≤ di ≤ 0x12), REMPLACE immédiatement word_70859 par word_7085B (piste sauvegardée avant la transition, positionnée dans Music_TuneTransitionResolve_595C2). Voir MUSIC_SYSTEM.md §8.4."
   },
   "sub_3844F": {
     "new_name": "Debris_SpawnAtAttachPoint",
@@ -15592,7 +15592,7 @@
   "unnamed_seg212_a": {
     "new_name": "VROOMM_HelperLarge_UNRESOLVED",
     "segment": "seg212",
-    "summary": "far, 98 lignes, entre sub_686AA et sub_6879E — combine VROOMM_SkipRelocationsA_6862C, VROOMM_SkipRelocationsB_68665, VROOMM_ApplyRelocationsMain_687E8 (×2) et un pointeur externe (off_69DF6). ⚠️ Adresse exacte non résolue."
+    "summary": "far, 98 lignes, entre sub_686AA et sub_6879E — combine VROOMM_ReadRawSegment_6862C, VROOMM_ApplyRelocationsToBlock_68665, VROOMM_DemandLoadDispatch_687E8 (×2) et un pointeur externe (off_69DF6). ⚠️ Adresse exacte non résolue."
   },
   "sub_9B497": {
     "new_name": "TerrainTile_Helper3_9B497",
@@ -15607,7 +15607,7 @@
   "sub_ABBEF": {
     "new_name": "AudioQueue_MainProcessEntry_ABBEF",
     "segment": "seg461",
-    "summary": "⭐⚠️ far, 254 lignes, NON DÉTAILLÉE — dernière grosse fonction du fichier : combine AudioQueue_OpcodeHelper_ABDAF, sub_2ADC, sub_26F2B, IndexedRecordReader_ConstructVariantA_65A1A (×2, seg196), IndexedRecordReader_AdvanceIndex_65E2C, StreamReader_ConstructAndBind_63B23 (seg190), AudioQueue_ProcessAndDecodeB_ABB10, IndexedRecordReader_Destruct_659D0 (×2), Memory_TypedAllocDispatchB_5C832, `ModuleRegistry_Opcode_7B_6034E`/`_7D_60360` (seg161) — point d'entrée principal de traitement d'une entrée de la file audio/message. Candidat pour session dédiée."
+    "summary": "⭐⚠️ far, 254 lignes, NON DÉTAILLÉE — dernière grosse fonction du fichier : combine AudioQueue_OpcodeHelper_ABDAF, sub_2ADC, sub_26F2B, IndexedRecordReader_ConstructVariantA_65A1A (×2, seg196), IndexedRecordReader_AdvanceIndex_65E2C, StreamReader_ConstructAndBind_63B23 (seg190), AudioQueue_ProcessAndDecodeB_ABB10, IndexedRecordReader_Destruct_659D0 (×2), Memory_TypedAllocDispatchB_5C832, `AIL_play_VOC_file_6034E`/`_7D_60360` (seg161) — point d'entrée principal de traitement d'une entrée de la file audio/message. Candidat pour session dédiée."
   },
   "sub_5C916": {
     "new_name": "Memory_TypedAllocDispatchE_5C916",
@@ -15630,9 +15630,9 @@
     "summary": "far,25L — invalide plusieurs caches (sub_469EC, sub_47095, sub_478C5) : **invalidation globale de tous les caches de moments/forces avant un nouveau tick physique.**"
   },
   "sub_5FE61": {
-    "new_name": "ModuleRegistry_Helper_5FE61",
+    "new_name": "AIL_startup_5FE61",
     "segment": "seg161",
-    "summary": "far, aucun appel externe visible (rôle exact non détaillé, voisin du cluster registre de modules)."
+    "summary": "Ex-'ModuleRegistry_Helper_5FE61'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_startup : initialisation de l'API (aucune minuterie active)."
   },
   "sub_6B870": {
     "new_name": "VROOMM_StubThunk_6B870",
@@ -15745,9 +15745,9 @@
     "summary": "far, aucun appel externe visible (22 lignes)."
   },
   "sub_603D2": {
-    "new_name": "ModuleRegistry_Opcode_AB_603D2",
+    "new_name": "AIL_stop_sequence_603D2",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0xAB → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_AdvanceActiveSlot` (sub_59F1D, seg123) — c'est l'appel « activer l'emplacement »."
+    "summary": "Ex-'ModuleRegistry_Opcode_AB_603D2'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 0ABh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (171 = AIL_STOP_SEQ dans AIL.INC) et y saute. "
   },
   "sub_2BB6A": {
     "new_name": "Render_EdgeSetupTexturedColor",
@@ -15847,7 +15847,7 @@
   "sub_63F46": {
     "new_name": "StreamReader_PrepareForRead_63F46",
     "segment": "seg190",
-    "summary": "far, prépare le flux avant lecture (dispatch vtable [bx+0xC], StreamReader_ValidateState_63DB5, sub_6404E). Référencée par `TextObject_Allocate_5A577` (seg124)."
+    "summary": "far, prépare le flux avant lecture (dispatch vtable [bx+0xC], StreamReader_ValidateState_63DB5, sub_6404E). Référencée par `Music_LoadTimbreFromLibrary_5A577` (seg124)."
   },
   "sub_43E47": {
     "new_name": "Roster_SumFoundAttributeB",
@@ -16055,9 +16055,9 @@
     "summary": "⚠️ far, 331 lignes, NON DÉTAILLÉE — combine plusieurs lectures IFF (ResourceRecord_SeekAndRead_64743) et `GlyphObject_AllocateBuffer_604C9` (seg162) — chargement de la table de glyphes d'une police."
   },
   "unnamed_seg161_e": {
-    "new_name": "ModuleRegistry_Opcode_85_UNRESOLVED",
+    "new_name": "AIL_format_VOC_file_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 8 lignes — thunk d'opcode 0x85. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Opcode_85_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 85h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (133 = AIL_F_VOC_FILE dans AIL.INC) et y saute. "
   },
   "sub_6ADA0": {
     "new_name": "VROOMM_StubThunk_6ADA0",
@@ -16250,9 +16250,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A8C44) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18."
   },
   "sub_68863": {
-    "new_name": "VROOMM_CheckImageHasTrailer_68863",
+    "new_name": "VROOMM_FinalizeLoadedSegment_68863",
     "segment": "seg212",
-    "summary": "near, vérifie un motif d'en-tête à l'offset image+0x18 (constante 0x4CA) et appelle un pointeur externe (off_6D0C0) si présent."
+    "summary": "Ex-'VROOMM_CheckImageHasTrailer_68863' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - appelle VROOMM_PatchFarCallStub_688F5 puis, si un marqueur particulier (0x4CA) est present, un gestionnaire externe additionnel (off_6D0C0) - finalise l'etat d'un segment nouvellement charge."
   },
   "sub_878A6": {
     "new_name": "Video_ShakeEffectWrapperB_878A6",
@@ -16325,9 +16325,9 @@
     "summary": "⚠️ far, 214 lignes, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660` (seg116) — calcul d'orientation pour la solution de ciblage."
   },
   "sub_60303": {
-    "new_name": "ModuleRegistry_CleanupModuleReference_60303",
+    "new_name": "AIL_shutdown_driver_60303",
     "segment": "seg161",
-    "summary": "far, nettoie une référence de module en attente (désenregistre via ModuleRegistry_UnregisterModule_5FFBD si nécessaire) puis dispatche l'opcode 0x68. Référencée directement par `TextObject_CloseAndLog` (sub_5A856, seg124)."
+    "summary": "Ex-'ModuleRegistry_CleanupModuleReference_60303'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_shutdown_driver(H, SignOff) : fonction pilote 104 (0x68), libere sa minuterie."
   },
   "sub_64B51": {
     "new_name": "ResourceRecord_ReadFinalField_64B51",
@@ -16400,9 +16400,9 @@
     "summary": "far,49L — parcourt les stations d'armement, teste le masque de type et la quantité restante (+0x13 > 0) : **recherche d'une station d'armement chargée et compatible — appelée directement par Flight_PhysicsTick_JDYN (sub_3314).**"
   },
   "sub_59F1D": {
-    "new_name": "Sequencer_AdvanceActiveSlot_59F1D",
+    "new_name": "Music_ChannelStopSequence_59F1D",
     "segment": "seg123",
-    "summary": "far, cœur du sous-système « minuteur » (seg121-123) : vérifie une condition sur l'emplacement actif (sub_603DE), l'active si prêt (sub_603D2), désactive l'ancien emplacement (sub_6039C) et marque le nouveau comme actif (sentinelle 0xFFFF). Motif « avancer vers le prochain créneau actif en exclusion mutuelle » — hypothèse : séquenceur de contre-mesures (leurres/paillettes) ou de créneaux de message radio. Référencée par de nombreuses fonctions du cluster Weapon_HUDBox (seg121-122)."
+    "summary": "Ex-'Sequencer_AdvanceActiveSlot_59F1D'. far, 65L, LUE 2026-10-06. Arrete et libere la sequence d'un canal musical (struct canal : +0 pilote (+4 = handle AIL), +2 handle de sequence, -1 si aucune, +4 table d'etat) : si AIL_sequence_status_603DE == 1 (en cours) -> AIL_stop_sequence_603D2 ; puis AIL_release_sequence_handle_6039C et handle = -1. Canaux du jeu : 5BE3h (principal) et 5BF5h (transition)."
   },
   "sub_6698F": {
     "new_name": "ConfigOption_ApplyAndDisplayB_6698F",
@@ -16572,7 +16572,7 @@
   "sub_9D910": {
     "new_name": "Gauge_ComputeAndRenderNeedle_9D910",
     "segment": "ovr316",
-    "summary": "⭐⚠️ far, 577 lignes, NON DÉTAILLÉE — **dernière fonction du fichier** (avant les tables de stubs suivantes) : combine `Terrain_QueryAltitudeAt`, `Gauge_ComputeNeedlePosition`, `Expr_VM_Execute_51E7E` (seg114), `TextObject_AllocateVariantA_5A984` (seg125) — calcul et rendu d'une aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour session dédiée."
+    "summary": "⭐⚠️ far, 577 lignes, NON DÉTAILLÉE — **dernière fonction du fichier** (avant les tables de stubs suivantes) : combine `Terrain_QueryAltitudeAt`, `Gauge_ComputeNeedlePosition`, `Expr_VM_Execute_51E7E` (seg114), `Music_RequestTune_5A984` (seg125) — calcul et rendu d'une aiguille de jauge liée à l'altitude terrain via la VM d'expression. Candidat pour session dédiée."
   },
   "sub_500F6": {
     "new_name": "Frame_UpdateTimingAndNotifyTrackedObjects_500F6",
@@ -16987,7 +16987,7 @@
   "sub_AB540": {
     "new_name": "AudioQueue_InitAndProcess_AB540",
     "segment": "seg459",
-    "summary": "far, combine AudioQueue_Helper_AB82E, AudioQueue_LoadAndPlayEntry_AB592, Sequencer_ReleaseSlot_59F87 (seg123)."
+    "summary": "far, combine AudioQueue_Helper_AB82E, AudioQueue_LoadAndPlayEntry_AB592, Music_ChannelInit_59F87 (seg123)."
   },
   "sub_9CCE5": {
     "new_name": "Debris_LoadSubrecordWithRelease_9CCE5",
@@ -17187,7 +17187,7 @@
   "sub_67611": {
     "new_name": "Stopwatch_RegisterTickModule_67611",
     "segment": "seg207",
-    "summary": "⭐ far, enregistre un module de comptage de tics (loc_676E7) dans le registre de modules à créneaux temporisés (ModuleRegistry_RegisterModule_5FF08, seg161) avec une cadence de 60 tics (ModuleRegistry_ConfigureAndActivate_600DB), avec avertissement d'échec (Runtime_FatalErrorHandler, tag 4121h). Référencée par sub_8F47A — confirme que le registre de modules du seg161 est utilisé au-delà du seul séquenceur de contre-mesures."
+    "summary": "⭐ far, enregistre un module de comptage de tics (loc_676E7) dans le registre de modules à créneaux temporisés (AIL_register_timer_5FF08, seg161) avec une cadence de 60 tics (AIL_set_timer_frequency_600DB), avec avertissement d'échec (Runtime_FatalErrorHandler, tag 4121h). Référencée par sub_8F47A — confirme que le registre de modules du seg161 est utilisé au-delà du seul séquenceur de contre-mesures."
   },
   "sub_6CA4E": {
     "new_name": "VROOMM_StubThunk_6CA4E",
@@ -17195,9 +17195,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A4677) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=32D90h, codesize=4A3h, nentries=20."
   },
   "sub_5A577": {
-    "new_name": "TextObject_Allocate_5A577",
+    "new_name": "Music_LoadTimbreFromLibrary_5A577",
     "segment": "seg124",
-    "summary": "far, appelle sub_63F46/sub_63FA1/sub_63511/sub_5C6F3 — probable allocation/placement d'un objet texte à une coordonnée donnée. Appelée par Sequencer_ValidatePlacement_5A62A."
+    "summary": "Ex-'TextObject_Allocate_5A577'. far, 89L, LUE 2026-10-06. Cherche un timbre dans la bibliotheque de timbres (format Global Timbre Library d'AIL) : index d'entrees de 6 octets (patch, banque, offset u32), fin sur banque 0xFF ; a l'offset trouve, un mot de longueur puis les donnees du timbre ; renvoie un buffer (pool 5C44h) commencant par cette longueur, ou NULL."
   },
   "sub_58DFE": {
     "new_name": "Font_GetGlyphMetrics_58DFE",
@@ -17385,9 +17385,9 @@
     "summary": "near — retire un bloc de la liste chaînée libre (unlink) : heap free-list management."
   },
   "sub_686AA": {
-    "new_name": "VROOMM_Helper3_686AA",
+    "new_name": "VROOMM_PatchFarJumpOpcode_686AA",
     "segment": "seg212",
-    "summary": "far, rôle exact non détaillé, référencée par VROOMM_AllocateAndFinalize_6879E."
+    "summary": "Ex-'VROOMM_Helper3_686AA' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - reconnait des sequences d'opcodes x86 specifiques (0xB8=MOV AX,imm16 et 0x50='PUSH AX', motif d'appel indirect via registre) dans le code fraichement charge et les associe a une entree de table de stubs (off_6D0BC) - mecanisme de PATCH D'ADRESSAGE POUR LES APPELS INTER-OVERLAY."
   },
   "sub_6B785": {
     "new_name": "VROOMM_StubThunk_6B785",
@@ -17525,9 +17525,9 @@
     "summary": "far — 44 lignes, gestion d'erreur de stream avec messages fixes (4D7Ch/5EA8h) : probable handler d'erreur matherr/ferror."
   },
   "sub_68928": {
-    "new_name": "VROOMM_MoveImageAndFixup_68928",
+    "new_name": "VROOMM_CopyAndRelocateBlock_68928",
     "segment": "seg212",
-    "summary": "⚠️ far, 52 lignes, NON DÉTAILLÉE — déplace l'image chargée en mémoire (rep movsw, direction ajustée selon chevauchement) et retouche l'en-tête (patch de trampolines via VROOMM_PatchIntTrampoline_688F5 ou table de relogement)."
+    "summary": "Ex-'VROOMM_MoveImageAndFixup_68928' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - copie un bloc de memoire (rep movsw, avec support de copie en sens inverse via std/cld pour les chevauchements) entre deux zones, utilise pendant la compaction/reorganisation des segments d'overlay charges."
   },
   "sub_65B73": {
     "new_name": "IndexedRecordReader_ReadIndexTable_65B73",
@@ -17580,9 +17580,9 @@
     "summary": "far,34L — parcourt une table d'entrées de 20 octets et somme un champ (offset+0) : **somme d'un attribut sur une liste de pilotes/entrées de roster.**"
   },
   "sub_603C6": {
-    "new_name": "ModuleRegistry_Opcode_9F_603C6",
+    "new_name": "AIL_timbre_status_603C6",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x9F → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `Sequencer_ValidatePlacement` (sub_5A62A, seg124) — c'est cette même fonction qui vérifie « la coordonnée est-elle libre »."
+    "summary": "Ex-'ModuleRegistry_Opcode_9F_603C6'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 9Fh / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (159 = AIL_T_STATUS dans AIL.INC) et y saute. Le timbre (banque, patch) est-il deja dans le cache ?"
   },
   "sub_6CBB0": {
     "new_name": "VROOMM_StubThunk_6CBB0",
@@ -17655,9 +17655,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_82A91) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18."
   },
   "sub_60000": {
-    "new_name": "ModuleRegistry_UnregisterAll_60000",
+    "new_name": "AIL_release_all_timers_60000",
     "segment": "seg161",
-    "summary": "far, désenregistre les 16 emplacements du registre en boucle (ModuleRegistry_UnregisterModule_5FFBD)."
+    "summary": "Ex-'ModuleRegistry_UnregisterAll_60000'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_release_all_timers : libere les 16 minuteries."
   },
   "sub_6C6D5": {
     "new_name": "VROOMM_StubThunk_6C6D5",
@@ -18300,9 +18300,9 @@
     "summary": "far, 102L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_EntryConstructText'). Meme tag final (0x119C) que EntryConstructObj. Lit du texte/donnees depuis un enregistrement ressource (ResourceRecord_ReadFieldGroupA), pose +0xE=0 (aucun objet lie, confirme le sens de ce champ comme discriminant texte/objet)."
   },
   "sub_59F87": {
-    "new_name": "Sequencer_ReleaseSlot_59F87",
+    "new_name": "Music_ChannelInit_59F87",
     "segment": "seg123",
-    "summary": "far, appelle sub_60390 et sub_5C774 (motif de libération de ressource) — probable libération d'un emplacement du séquenceur."
+    "summary": "Ex-'Sequencer_ReleaseSlot_59F87'. far, 49L, LUE 2026-10-06. Initialise un canal musical pour un pilote : canal+0 = pilote, handle = -1, alloue la table d'etat XMIDI de AIL_state_table_size_60390 octets (pool 5C44h) en canal+4, taille en +0xA."
   },
   "unnamed_seg156_a": {
     "new_name": "LinkedList_Sort_UNRESOLVED",
@@ -18310,9 +18310,9 @@
     "summary": "far, 100 lignes, entre sub_5F245 et sub_5F324 — appelle LinkedList_Remove_5F324 et LinkedList_InsertAfter_5F1F8/InsertBefore_5F245 en boucle (motif de tri par insertion sur liste chaînée). ⚠️ Adresse exacte non résolue."
   },
   "sub_603A2": {
-    "new_name": "ModuleRegistry_Opcode_99_603A2",
+    "new_name": "AIL_default_timbre_cache_size_603A2",
     "segment": "seg161",
-    "summary": "far, thunk d'opcode 0x99 → ModuleRegistry_DispatchTrampoline_5FBA6. Référencée par `TextRenderer_InputFieldHandler` (sub_5A0F3, seg124)."
+    "summary": "Ex-'ModuleRegistry_Opcode_99_603A2'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). Thunk d'API AIL : 'mov ax, 99h / jmp call_driver' -> AIL_call_driver_5FBA6 cherche dans la table du pilote enregistre la fonction de ce numero (153 = AIL_T_CACHE_SIZE dans AIL.INC) et y saute. "
   },
   "loc_5EECB": {
     "new_name": "FontStyle_DestructThunk_5EECB",
@@ -18485,14 +18485,14 @@
     "summary": "far, appelle Joystick_ReadAxesRaw_6634C et range les 4 valeurs d'axes brutes (+0/+2/+4, +6/+8/+0xA) plus les boutons dans la structure de sortie. Référencée par sub_67835 et sub_67910."
   },
   "sub_6855F": {
-    "new_name": "VROOMM_AllocateAndRelocate_6855F",
+    "new_name": "VROOMM_ScanMemoryArena_6855F",
     "segment": "seg212",
-    "summary": "⚠️ far, 117 lignes, NON DÉTAILLÉE — orchestre VROOMM_SkipRelocationsA_6862C, VROOMM_SkipRelocationsB_68665, VROOMM_PatchFarJumpTable_688D7 et un pointeur de fonction externe (off_69DF6) — probable allocation mémoire et relogement de l'image exécutable chargée."
+    "summary": "Ex-'VROOMM_AllocateAndRelocate_6855F' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). near - PARCOURT LA CHAINE MCB DOS (Memory Control Block, la structure standard DOS de gestion memoire par blocs de paragraphes) pour determiner la memoire totale disponible pour les overlays. Pour chaque bloc libre assez grand, appelle des sous-routines de decoupage/preparation (VROOMM_ReadRawSegment_6862C, VROOMM_ApplyRelocationsToBlock_68665, VROOMM_PatchFarCallStub_688D7)."
   },
   "sub_5FF08": {
-    "new_name": "ModuleRegistry_RegisterModule_5FF08",
+    "new_name": "AIL_register_timer_5FF08",
     "segment": "seg161",
-    "summary": "⭐ far, **enregistre un nouveau module** dans la table de 16 emplacements : trouve le premier emplacement libre, y stocke l'adresse du gestionnaire (far ptr fourni en argument), incrémente le compteur global. Au tout premier enregistrement, initialise tout le système (ModuleRegistry_ResetTables_5FC8D, ModuleRegistry_HookTimerIRQ_5FCCA) et configure le minuteur (ModuleRegistry_ConfigureAndActivate_600DB). Référencée par sub_60254 et sub_67611."
+    "summary": "Ex-'ModuleRegistry_RegisterModule_5FF08'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_register_timer(callback) : reserve une des 16 minuteries pour une fonction appelee par l'interruption timer. Utilisee aussi par le jeu (Stopwatch_*, AudioQueue_RegisterTickModule_AA810)."
   },
   "sub_7DE55": {
     "new_name": "MissionRecord_ReleaseEntryC_7DE55",
@@ -18547,7 +18547,7 @@
   "unnamed_seg212_b": {
     "new_name": "VROOMM_FinalizeAndJump_UNRESOLVED",
     "segment": "seg212",
-    "summary": "⚠️ far, 173 lignes, NON DÉTAILLÉE — combine VROOMM_ApplyRelocationsMain_687E8 et un pointeur externe (off_69DF6). ⚠️ Adresse exacte non résolue. Candidat pour session dédiée si le chargeur d'exécutable/overlay doit être entièrement élucidé."
+    "summary": "⚠️ far, 173 lignes, NON DÉTAILLÉE — combine VROOMM_DemandLoadDispatch_687E8 et un pointeur externe (off_69DF6). ⚠️ Adresse exacte non résolue. Candidat pour session dédiée si le chargeur d'exécutable/overlay doit être entièrement élucidé."
   },
   "sub_6F5C": {
     "new_name": "AI_InterceptDispatcher",
@@ -18590,9 +18590,9 @@
     "summary": "far,14L — setter simple du champ +0x32 : accesseur trivial de classe UI."
   },
   "unnamed_seg161_b": {
-    "new_name": "ModuleRegistry_Helper4_UNRESOLVED",
+    "new_name": "AIL_stop_all_timers_UNRESOLVED",
     "segment": "seg161",
-    "summary": "far, 26 lignes, entre sub_60052 et sub_6008C. ⚠️ Adresse exacte non résolue."
+    "summary": "Ex-'ModuleRegistry_Helper4_UNRESOLVED'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). AIL_stop_all_timers (suit AIL_stop_timer_60052)."
   },
   "sub_9DED3": {
     "new_name": "PlayerComponent_ApplyExternalCall_9DED3",
@@ -18610,9 +18610,9 @@
     "summary": "far, référencée via vtable (DATA XREF seg339) — thunk appelant `JoystickCallback_Destruct_66420` (seg200, tag 5D84h, flag 2)."
   },
   "sub_5FD10": {
-    "new_name": "ModuleRegistry_UnhookTimerIRQ_5FD10",
+    "new_name": "AIL_unhook_timer_process_5FD10",
     "segment": "seg161",
-    "summary": "far, restaure le vecteur d'interruption IRQ0 original sauvegardé par ModuleRegistry_HookTimerIRQ_5FCCA. Appelée par ModuleRegistry_UnregisterModule_5FFBD lors du dernier désenregistrement."
+    "summary": "Ex-'ModuleRegistry_UnhookTimerIRQ_5FD10'. far. Identifie 2026-10-06 par alignement avec le source public AIL 2.0 (Miles Design, analysis/ail_sources/AIL.ASM, meme ordre de procedures que seg161 ; numeros de fonctions pilote dans AIL.INC). unhook_timer_process : restaure le vecteur INT 8 d'origine."
   },
   "sub_2BEF7": {
     "new_name": "Damage_ResolveComponentPositions",
@@ -18690,9 +18690,9 @@
     "summary": "far, calcule l'intersection/le clamp de deux rectangles (tri min/max sur X et Y). Référencée depuis seg028 (framework UI) et sub_1EFFE — probable calcul de zone de rafraîchissement (clip) pour l'UI."
   },
   "sub_595C2": {
-    "new_name": "Interrupt_TimerCase_595C2",
+    "new_name": "Music_TuneTransitionResolve_595C2",
     "segment": "seg121",
-    "summary": "⚠️ far, 208 lignes, NON DÉTAILLÉE — un des cas de Interrupt_TimerDispatch_59436 (sub_59F1D/59FF5/603CC répétés deux fois)."
+    "summary": "Ex-'Interrupt_TimerCase_595C2' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far, 208 lignes — RÉSOLUTION DE TRANSITION PAR DOUBLE INDIRECTION, lue ligne à ligne intégralement. Anciennement Music_TuneTransitionResolve_595C2. Un des 4 cas de Music_SequencerTickDispatch_59436. Deux tables chaînées : (1) dl = dword_70861[byte_72C90 (piste actuelle)][word_70859 (piste cible)] — si dl==0xFF, aucune transition, ne fait rien ; (2) sinon var_1 = dword_7085D[dl][word_72C91 (ratio par piste)]. Décision finale sur var_1 : ==0 → bascule directe sur le canal principal 5BE3h (Music_ChannelStopSequence_59F1D + Music_ChannelRegisterSequence_59FF5 + sub_603CC), pas de piste de transition ; !=0 et <= word_7084E → charge une PISTE DE TRANSITION sur le canal secondaire 5BF5h via word_70856+(var_1-1)*10 ; > word_7084E → abandon, word_70859 réinitialisé à byte_72C90. CONFIRMÉ sur fichier réel (combat.dat, MUSIC_SYSTEM.md §7.5) : var_1 est l'index d'une piste de transition autonome dans l'archive imbriquée à 3 niveaux (§7.3) — PAS un saut de marqueur façon RBRN. Voir MUSIC_SYSTEM.md §8.2."
   },
   "sub_8528C": {
     "new_name": "HUDSymbol_AllocateDualBuffer_8528C",

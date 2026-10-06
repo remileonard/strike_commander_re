@@ -25,12 +25,12 @@ loc_C:					; CODE XREF: seg154:0038J
 		mov	word_6D142, ax
 		mov	word_6D140, es
 
-loc_1D:					; DATA XREF: ModuleRegistry_HookTimerIRQ_5FCCA:loc_5FCD4r
-					; ModuleRegistry_HookTimerIRQ_5FCCA+37w ...
+loc_1D:					; DATA XREF: AIL_hook_timer_process_5FCCA:loc_5FCD4r
+					; AIL_hook_timer_process_5FCCA+37w ...
 		mov	word_6D13C, bx
 
-loc_21:					; DATA XREF: ModuleRegistry_HookTimerIRQ_5FCCA+Fr
-					; ModuleRegistry_HookTimerIRQ_5FCCA+3Cw ...
+loc_21:					; DATA XREF: AIL_hook_timer_process_5FCCA+Fr
+					; AIL_hook_timer_process_5FCCA+3Cw ...
 		mov	word_6D158, bp
 		call	CRT_SaveIntVectors
 		mov	ax, word_6D13C
@@ -491,10 +491,10 @@ word_2C4	dw 0			; DATA XREF: EntryPoint_RuntimeInit+3w EntryPoint_RuntimeInit+C
 		db 76h,	65h, 72h, 6Ch, 61h, 79h, 20h, 65h, 2 dup(72h)
 		db 6Fh,	72h, 0Dh, 0Ah
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR VROOMM_ApplyRelocationsMain_687E8
+; START	OF FUNCTION CHUNK FOR VROOMM_DemandLoadDispatch_687E8
 
 loc_2DF:				; CODE XREF: seg212:loc_68741J
-					; VROOMM_ApplyRelocationsMain_687E8:loc_6885EJ
+					; VROOMM_DemandLoadDispatch_687E8:loc_6885EJ
 		mov	cx, 17h
 		mov	dx, 2C8h
 		push	cs
@@ -512,7 +512,7 @@ loc_2DF:				; CODE XREF: seg212:loc_68741J
 		nop
 		push	cs
 		call	near ptr CRT_Abort
-; END OF FUNCTION CHUNK	FOR VROOMM_ApplyRelocationsMain_687E8
+; END OF FUNCTION CHUNK	FOR VROOMM_DemandLoadDispatch_687E8
 ; [00000001 BYTES: COLLAPSED FUNCTION nullsub_1. PRESS KEYPAD "+" TO EXPAND]
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -711,7 +711,7 @@ CRT_Exit		endp
 ; far — wrapper _exit/abort(code) flag=1 → sub_36B(1,0,code).
 ; ==============================================================================================
 CRT_Abort		proc far		; CODE XREF: seg000:02C1p
-					; VROOMM_ApplyRelocationsMain_687E8-684EFp
+					; VROOMM_DemandLoadDispatch_687E8-684EFp
 
 arg_0		= word ptr  6
 
@@ -982,17 +982,17 @@ arg_0		= word ptr  4
 		mov	si, [bp+arg_0]
 		or	si, si
 		jl	short loc_507
-		cmp	si, 58h	; 'X'   ; DATA XREF: VROOMM_AllocateAndRelocate_6855F+26r
-		jle	short loc_4FA	; DATA XREF: VROOMM_AllocateAndRelocate_6855F+2Ar
+		cmp	si, 58h	; 'X'   ; DATA XREF: VROOMM_ScanMemoryArena_6855F+26r
+		jle	short loc_4FA	; DATA XREF: VROOMM_ScanMemoryArena_6855F+2Ar
 
 loc_4F7:				; CODE XREF: CRT_ClampMathIndex:loc_50Cj
 		mov	si, 57h	; 'W'
 
 loc_4FA:				; CODE XREF: CRT_ClampMathIndex+Ej
 		mov	word_71C9A, si
-		mov	al, [si+4BECh]	; DATA XREF: VROOMM_AllocateAndRelocate_6855F+39w
+		mov	al, [si+4BECh]	; DATA XREF: VROOMM_ScanMemoryArena_6855F+39w
 
-loc_502:				; DATA XREF: VROOMM_AllocateAndRelocate_6855F:loc_68574r
+loc_502:				; DATA XREF: VROOMM_ScanMemoryArena_6855F:loc_68574r
 		cbw
 		mov	si, ax
 		jmp	short loc_514
@@ -1002,8 +1002,8 @@ loc_507:				; CODE XREF: CRT_ClampMathIndex+9j
 		neg	si
 		cmp	si, 30h	; '0'
 
-loc_50C:				; DATA XREF: VROOMM_AllocateAndRelocate_6855F+41w
-					; VROOMM_AllocateAndRelocate_6855F+4Bw
+loc_50C:				; DATA XREF: VROOMM_ScanMemoryArena_6855F+41w
+					; VROOMM_ScanMemoryArena_6855F+4Bw
 		jg	short loc_4F7
 		mov	word_71C9A, 0FFFFh
 
@@ -7759,7 +7759,7 @@ CRT_Msg_Sprintf3	endp
 ; strcat().
 ; ==============================================================================================
 CRT_Strcat	proc far		; CODE XREF: Radio_LoadAndTriggerVoice+140P
-					; TextRenderer_InputFieldHandler_5A0F3+32P ...
+					; Sound_LoadDriverAndTimbreCache_5A0F3+32P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

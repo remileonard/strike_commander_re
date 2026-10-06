@@ -37,7 +37,7 @@ AudioQueue_Helper2_AB860	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle ModuleRegistry_Opcode_7E_60366 (seg161) — confirme un lien supplémentaire
+; ⭐ far, appelle AIL_stop_digital_playback_60366 (seg161) — confirme un lien supplémentaire
 ; entre ce cluster et le registre de modules.
 ; ==============================================================================================
 AudioQueue_OpcodeWrapper_AB883	proc far		; CODE XREF: VROOMM_StubThunk_6D05FJ
@@ -52,7 +52,7 @@ arg_0		= word ptr  6
 		jz	short loc_AB89E
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_7E_60366
+		call	AIL_stop_digital_playback_60366
 		pop	cx
 		jmp	short $+2
 
@@ -393,7 +393,7 @@ arg_0		= word ptr  6
 		jz	short loc_ABB04
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_7E_60366
+		call	AIL_stop_digital_playback_60366
 		pop	cx
 		xor	di, di
 		jmp	short loc_ABAFF

@@ -179,9 +179,19 @@ Weapon_HUDBox_TimerCaseJ_5A95E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_5F700 — référencée directement par UIScreen_Construct (sub_53896, seg114).
+; Ex-'TextObject_AllocateVariantA_5A984' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). ★ far — SÉLECTEUR DE PISTE MUSICALE (moteur XMIDI/AIL).
+; Anciennement mal étiquetée Music_RequestTune_5A984. Signature (tune_id: word) : borne
+; tune_id contre word_7084C (nb de pistes max) ; si valide, écrit dans word_70859 (piste
+; couramment jouée, init 0xFFFF) ; si invalide (sauf sentinelle 0xFF, probablement 'aucune
+; piste'/stop) → log "Invalid tune requested: %d" (aInvalidTuneReq, seg339) via sub_5F700.
+; Appelée depuis au moins 10 sites dans des segments très divers (seg114 UI,
+; ovr230/239/240/243/316 logique mission) avec des tune_id différents selon le contexte (0x08
+; à 0x15 identifiés) — voir MUSIC_SYSTEM.md pour la table complète des déclencheurs. Piste de
+; mission de base : lue depuis le chunk IFF TUNE (MissionScenario_LoadMainRecord_A8331) dans
+; byte_706A2, jouée à l'ouverture d'écran par sub_53896 (UIScreen_Construct).
 ; ==============================================================================================
-TextObject_AllocateVariantA_5A984	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+1BP
+Music_RequestTune_5A984	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+1BP
 					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CC1P	...
 
 arg_0		= word ptr  6
@@ -199,7 +209,7 @@ arg_0		= word ptr  6
 		jmp	short loc_5A9B8
 ; ���������������������������������������������������������������������������
 
-loc_5A9A4:				; CODE XREF: TextObject_AllocateVariantA_5A984+18j
+loc_5A9A4:				; CODE XREF: Music_RequestTune_5A984+18j
 		cmp	dx, 0FFh
 		jz	short loc_5A9B8
 		push	dx
@@ -208,10 +218,10 @@ loc_5A9A4:				; CODE XREF: TextObject_AllocateVariantA_5A984+18j
 		add	sp, 4
 		jmp	short $+2
 
-loc_5A9B8:				; CODE XREF: TextObject_AllocateVariantA_5A984+8j TextObject_AllocateVariantA_5A984+Fj ...
+loc_5A9B8:				; CODE XREF: Music_RequestTune_5A984+8j Music_RequestTune_5A984+Fj ...
 		pop	bp
 		retf
-TextObject_AllocateVariantA_5A984	endp
+Music_RequestTune_5A984	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -292,9 +302,8 @@ Widget_Helper_5A9E6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, instancie le cluster HUD armement : appelle Weapon_HUDBox_Main_59302,
-; Weapon_HUDBox_DrawElementC_590E0 et TextObject_AllocateVariantA_5A984. Référencée par
-; sub_26F7E.
+; far, instancie le cluster HUD armement : appelle Music_CombatIntensitySelector_59302,
+; Weapon_HUDBox_DrawElementC_590E0 et Music_RequestTune_5A984. Référencée par sub_26F7E.
 ; ==============================================================================================
 Weapon_HUDBox_InstantiateInstance_5AA02	proc far		; CODE XREF: Config_ReadCalibration:loc_27100P
 					; Cockpit_LoadAndDrawCalibration_8FDC0+2C2P
@@ -303,7 +312,7 @@ Weapon_HUDBox_InstantiateInstance_5AA02	proc far		; CODE XREF: Config_ReadCalibr
 		cmp	word_7099D, 0
 		jz	short loc_5AA47
 		push	word_7099D
-		call	Weapon_HUDBox_Main_59302
+		call	Music_CombatIntensitySelector_59302
 		pop	cx
 		cmp	ax, 0FFFFh
 		jnz	short loc_5AA47
@@ -332,7 +341,7 @@ loc_5AA3C:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+29j
 loc_5AA42:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+34j
 					; Weapon_HUDBox_InstantiateInstance_5AA02+38j
 		push	cs
-		call	near ptr TextObject_AllocateVariantA_5A984
+		call	near ptr Music_RequestTune_5A984
 		pop	cx
 
 loc_5AA47:				; CODE XREF: Weapon_HUDBox_InstantiateInstance_5AA02+8j
@@ -347,7 +356,7 @@ Weapon_HUDBox_InstantiateInstance_5AA02	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Weapon_HUDBox_UpdateAndRender_5923A (seg114). Référencée par
+; far, appelle Music_SelectTuneCandidate_5923A (seg114). Référencée par
 ; UIScreen_BuildWidgetTree (sub_53A94, seg114).
 ; ==============================================================================================
 Weapon_HUDBox_UpdateAndRenderVariant_5AA49	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1F2P
@@ -364,7 +373,7 @@ arg_0		= word ptr  6
 		push	[bp+arg_0]
 		push	1
 		push	word_7099D
-		call	Weapon_HUDBox_UpdateAndRender_5923A
+		call	Music_SelectTuneCandidate_5923A
 		add	sp, 6
 		mov	dl, al
 
@@ -570,7 +579,7 @@ Widget_Helper_5AB2C	endp
 		jz	short loc_5AB77
 		mov	bx, [bx+34h]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_7E_60366
+		call	AIL_stop_digital_playback_60366
 		pop	cx
 		jmp	short $+2
 
@@ -584,7 +593,7 @@ loc_5AB77:				; CODE XREF: seg125:02DDj seg125:02E7j
 
 ; ==============================================================================================
 ; far, orchestre le cycle complet du cluster HUD armement : Weapon_HUDBox_MasterUpdate_59CFA
-; (seg122) puis Weapon_HUDBox_Main_59302 (seg121). Référencée par sub_26F7E.
+; (seg122) puis Music_CombatIntensitySelector_59302 (seg121). Référencée par sub_26F7E.
 ; ==============================================================================================
 Weapon_HUDBox_FullUpdateCycle_5AB79	proc far		; CODE XREF: Config_ReadCalibration+1A7P
 
@@ -620,7 +629,7 @@ loc_5ABAF:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+23j
 		test	word_70466, 0Fh
 		jnz	short loc_5ABCF
 		push	word_7099D
-		call	Weapon_HUDBox_Main_59302
+		call	Music_CombatIntensitySelector_59302
 		pop	cx
 
 loc_5ABCF:				; CODE XREF: Weapon_HUDBox_FullUpdateCycle_5AB79+3Bj
@@ -636,7 +645,7 @@ Weapon_HUDBox_FullUpdateCycle_5AB79	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 190 lignes, NON DÉTAILLÉE — destructeur global du cluster objets-texte : ferme deux
-; objets texte (TextObject_CloseAndLog_5A856 ×2) et libère plusieurs buffers
+; objets texte (Music_ShutdownDriver_5A856 ×2) et libère plusieurs buffers
 ; (sub_5C7B6/sub_338). Référencée en interne (thunk vtable loc_5ADEF).
 ; ==============================================================================================
 TextObjectCluster_DestructAll_5ABD1	proc far		; CODE XREF: seg125:0576p
@@ -701,7 +710,7 @@ loc_5AC6B:				; CODE XREF: TextObjectCluster_DestructAll_5ABD1+95j
 		mov	bx, word_70997
 		mov	word ptr [bx], 13A2h
 		push	bx
-		call	TextObject_CloseAndLog_5A856
+		call	Music_ShutdownDriver_5A856
 		pop	cx
 		push	0
 		mov	ax, word_70997
@@ -768,7 +777,7 @@ loc_5AD26:				; CODE XREF: TextObjectCluster_DestructAll_5ABD1+150j
 		mov	bx, word_70999
 		mov	word ptr [bx], 13A2h
 		push	bx
-		call	TextObject_CloseAndLog_5A856
+		call	Music_ShutdownDriver_5A856
 		pop	cx
 		push	0
 		mov	ax, word_70999
@@ -864,7 +873,7 @@ TextObjectCluster_DtorThunk_5ADEF:				; DATA XREF: seg339:off_71FE0o
 ; ==============================================================================================
 ; far, référencée comme donnée par TextObjectCluster_DestructAll_5ABD1 — destructeur scalar-
 ; deleting d'un objet texte individuel : avance/désactive son créneau de séquenceur
-; (Sequencer_AdvanceActiveSlot_59F1D), libère son buffer (sub_5C7B6, type 5C44h), réinitialise
+; (Music_ChannelStopSequence_59F1D), libère son buffer (sub_5C7B6, type 5C44h), réinitialise
 ; ses champs, libère l'objet lui-même si demandé (sub_338).
 ; ==============================================================================================
 TextObject_ScalarDeletingDtor_5ADFC:				; DATA XREF: TextObjectCluster_DestructAll_5ABD1+1Fo
@@ -877,7 +886,7 @@ TextObject_ScalarDeletingDtor_5ADFC:				; DATA XREF: TextObjectCluster_DestructA
 		or	si, si
 		jz	short loc_5AE5B
 		push	si
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	byte ptr [si+9], 0
 		jz	short loc_5AE38
