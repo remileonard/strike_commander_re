@@ -4662,8 +4662,8 @@ Expr_LookupNamedValue_52DDB	endp
 ; far, accesseur/mutateur de champ de nœud, utilisé par plusieurs constructeurs d'écran UI
 ; (sub_53A94/sub_53D92/sub_54274).
 ; ==============================================================================================
-Expr_Node_Accessor_52E17	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+98p
-					; Combat_TeamOpposedCheckAndDispatch_53A94+F4p ...
+Expr_Node_Accessor_52E17	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+98p
+					; World_OnObjectDestroyed_53A94+F4p ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -6757,19 +6757,28 @@ STRIKE_EXE_MAIN_LOOP	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit une arborescence de widgets/nœuds (dispatch
-; vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B pour ajout à liste membre, appelle
-; UIScreen_SetWidgetValue_50654 en fin). Candidat pour session dédiée. REMONTEE PARTIELLE (476
-; lignes, portion pertinente lue completement a la demande de Remi) : LE NOM PRECEDENT
-; ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion lue ne construit aucun widget. Pose
-; byte_6E4BF=1 (source du declencheur du message de destruction 0x0D via
-; RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a +0x50 (meme champ deja
-; vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A) qui sont l'OPPOSE EXACTE
-; l'une de l'autre (var_4 == -var_6) - probable verification 'cible detruite appartient au
-; camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a
-; pas ete relu en detail.
+; Ex-'Combat_TeamOpposedCheckAndDispatch_53A94'. ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit
+; une arborescence de widgets/nœuds (dispatch vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B
+; pour ajout à liste membre, appelle UIScreen_SetWidgetValue_50654 en fin). Candidat pour
+; session dédiée. REMONTEE PARTIELLE (476 lignes, portion pertinente lue completement a la
+; demande de Remi) : LE NOM PRECEDENT ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion
+; lue ne construit aucun widget. Pose byte_6E4BF=1 (source du declencheur du message de
+; destruction 0x0D via RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a
+; +0x50 (meme champ deja vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A)
+; qui sont l'OPPOSE EXACTE l'une de l'autre (var_4 == -var_6) - probable verification 'cible
+; detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350
+; lignes precedentes) n'a pas ete relu en detail. RELU 2026-10-06 (partie son et camps) :
+; GESTIONNAIRE DE DESTRUCTION D'UN OBJET (objet detruit, auteur), appele par
+; Debris_SpawnOrchestrator, Debris_SpawnOrchestratorVariant_9D770, AI_EjectDecision_50FF et
+; MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de l'objet detruit
+; (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur, var_7 = pilote
+; ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non ejecte) :
+; objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit rien et que
+; l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense fixe ou objet
+; au sol, 0x13/0x14), 0x12 (autre). Objet du camp du joueur (1) : 0x0E s'il s'agit de l'objet
+; designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
 ; ==============================================================================================
-Combat_TeamOpposedCheckAndDispatch_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
+World_OnObjectDestroyed_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
 					; Debris_SpawnOrchestrator+7BP ...
 
 var_16		= word ptr -16h
@@ -6806,7 +6815,7 @@ arg_2		= word ptr  8
 		pop	cx
 		mov	di, ax
 
-loc_53ABF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20j
+loc_53ABF:				; CODE XREF: World_OnObjectDestroyed_53A94+20j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx]
@@ -6820,10 +6829,10 @@ loc_53ABF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20j
 		jmp	short loc_53AD4
 ; ���������������������������������������������������������������������������
 
-loc_53AD2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+33j
+loc_53AD2:				; CODE XREF: World_OnObjectDestroyed_53A94+33j
 		mov	al, 17h
 
-loc_53AD4:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+3Cj
+loc_53AD4:				; CODE XREF: World_OnObjectDestroyed_53A94+3Cj
 		mov	[bp+var_2], al
 		mov	[bp+var_4], 0
 		or	di, di
@@ -6841,8 +6850,8 @@ loc_53AE5:
 loc_53AE8:
 		mov	[bp+var_4], al
 
-loc_53AEB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+49j
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AE3j
+loc_53AEB:				; CODE XREF: World_OnObjectDestroyed_53A94+49j
+					; World_OnObjectDestroyed_53A94:loc_53AE3j
 		mov	[bp+var_6], 0
 
 loc_53AEF:
@@ -6859,8 +6868,8 @@ loc_53AF7:
 		mov	al, [si+50h]
 		mov	[bp+var_6], al
 
-loc_53AFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AF1j
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53AF7j
+loc_53AFF:				; CODE XREF: World_OnObjectDestroyed_53A94:loc_53AF1j
+					; World_OnObjectDestroyed_53A94:loc_53AF7j
 		mov	[bp+var_7], 0
 
 loc_53B03:
@@ -6877,7 +6886,7 @@ loc_53B03:
 		and	ax, 1
 		mov	[bp+var_7], al
 
-loc_53B23:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+73j
+loc_53B23:				; CODE XREF: World_OnObjectDestroyed_53A94+73j
 		push	si
 		mov	ax, word_706A0
 		add	ax, 34h	; '4'
@@ -6900,18 +6909,18 @@ loc_53B23:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+73j
 		jnz	short loc_53B5D
 		inc	word_706A9
 
-loc_53B5D:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+C3j
+loc_53B5D:				; CODE XREF: World_OnObjectDestroyed_53A94+C3j
 		les	bx, [bp+var_C]
 		cmp	byte ptr es:[bx+31h], 1
 		jnz	short loc_53B6B
 		inc	word_706A5
 
-loc_53B6B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+BCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+D1j
+loc_53B6B:				; CODE XREF: World_OnObjectDestroyed_53A94+BCj
+					; World_OnObjectDestroyed_53A94+D1j
 		les	bx, [bp+var_C]
 		or	byte ptr es:[bx+39h], 2
 
-loc_53B73:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+A9j
+loc_53B73:				; CODE XREF: World_OnObjectDestroyed_53A94+A9j
 		mov	[bp+var_10], 0
 		or	di, di
 		jz	short loc_53B94
@@ -6925,7 +6934,7 @@ loc_53B73:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+A9j
 		mov	word ptr [bp+var_10+2],	dx
 		mov	word ptr [bp+var_10], ax
 
-loc_53B94:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+E9j
+loc_53B94:				; CODE XREF: World_OnObjectDestroyed_53A94+E9j
 		cmp	[bp+var_10], 0
 		jnz	short loc_53BC2
 		cmp	[bp+var_2], 6
@@ -6937,7 +6946,7 @@ loc_53B94:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+E9j
 		jmp	short loc_53BC2
 ; ���������������������������������������������������������������������������
 
-loc_53BAD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+112j
+loc_53BAD:				; CODE XREF: World_OnObjectDestroyed_53A94+112j
 		push	di
 		mov	ax, word_706A0
 		add	ax, 34h	; '4'
@@ -6948,8 +6957,8 @@ loc_53BAD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+112j
 		mov	word ptr [bp+var_10+2],	dx
 		mov	word ptr [bp+var_10], ax
 
-loc_53BC2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+105j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+10Bj ...
+loc_53BC2:				; CODE XREF: World_OnObjectDestroyed_53A94+105j
+					; World_OnObjectDestroyed_53A94+10Bj ...
 		cmp	[bp+var_10], 0
 		jz	short loc_53C2B
 		mov	al, [bp+var_7]
@@ -6970,7 +6979,7 @@ loc_53BE0:
 		les	bx, [bp+var_10]
 		inc	word ptr es:[bx+3Eh]
 
-loc_53BE7:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+14Aj
+loc_53BE7:				; CODE XREF: World_OnObjectDestroyed_53A94+14Aj
 		test	byte ptr [si+4], 40h
 		jz	short loc_53BFD
 
@@ -6988,11 +6997,11 @@ loc_53BF8:
 		jmp	short loc_53BFF
 ; ���������������������������������������������������������������������������
 
-loc_53BFD:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+157j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+162j
+loc_53BFD:				; CODE XREF: World_OnObjectDestroyed_53A94+157j
+					; World_OnObjectDestroyed_53A94+162j
 		xor	ax, ax
 
-loc_53BFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+167j
+loc_53BFF:				; CODE XREF: World_OnObjectDestroyed_53A94+167j
 		or	al, al
 		jnz	short loc_53C24
 		mov	al, [si+4]
@@ -7009,20 +7018,20 @@ loc_53BFF:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+167j
 		jmp	short loc_53C20
 ; ���������������������������������������������������������������������������
 
-loc_53C1E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+178j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+183j
+loc_53C1E:				; CODE XREF: World_OnObjectDestroyed_53A94+178j
+					; World_OnObjectDestroyed_53A94+183j
 		xor	ax, ax
 
-loc_53C20:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+188j
+loc_53C20:				; CODE XREF: World_OnObjectDestroyed_53A94+188j
 		or	al, al
 		jz	short loc_53C2B
 
-loc_53C24:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+16Dj
+loc_53C24:				; CODE XREF: World_OnObjectDestroyed_53A94+16Dj
 		les	bx, [bp+var_10]
 		inc	word ptr es:[bx+40h]
 
-loc_53C2B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+133j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+13Cj ...
+loc_53C2B:				; CODE XREF: World_OnObjectDestroyed_53A94+133j
+					; World_OnObjectDestroyed_53A94+13Cj ...
 		cmp	si, word_722E6
 		jnz	short loc_53C45
 		mov	[bp+var_12], di
@@ -7033,7 +7042,7 @@ loc_53C2B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+133j
 		jmp	loc_53D7A
 ; ���������������������������������������������������������������������������
 
-loc_53C45:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+19Bj
+loc_53C45:				; CODE XREF: World_OnObjectDestroyed_53A94+19Bj
 		mov	al, byte_6E4B4
 		mov	ah, 0
 		or	ax, ax
@@ -7041,14 +7050,14 @@ loc_53C45:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+19Bj
 		jmp	loc_53D7A
 ; ���������������������������������������������������������������������������
 
-loc_53C51:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1B8j
+loc_53C51:				; CODE XREF: World_OnObjectDestroyed_53A94+1B8j
 		mov	al, [bp+var_2]
 		mov	ah, 0
 		mov	[bp+var_16], ax
 		mov	cx, 5		; switch 5 cases
 		mov	bx, offset word_53D7E
 
-loc_53C5F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D6j
+loc_53C5F:				; CODE XREF: World_OnObjectDestroyed_53A94+1D6j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_16]
 		jz	short loc_53C6F
@@ -7057,7 +7066,7 @@ loc_53C5F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D6j
 		jmp	loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53C6F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D1j
+loc_53C6F:				; CODE XREF: World_OnObjectDestroyed_53A94+1D1j
 		jmp	word ptr cs:[bx+0Ah] ; switch jump
 
 loc_53C73:				; DATA XREF: seg114:2F28o
@@ -7068,7 +7077,7 @@ loc_53C73:				; DATA XREF: seg114:2F28o
 		jmp	loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53C7F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1E6j
+loc_53C7F:				; CODE XREF: World_OnObjectDestroyed_53A94+1E6j
 		cmp	[bp+var_6], 0FFh
 		jnz	short loc_53CC9
 		push	si
@@ -7090,22 +7099,22 @@ loc_53C7F:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1E6j
 		jmp	short loc_53CB8
 ; ���������������������������������������������������������������������������
 
-loc_53CAE:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+20Cj
+loc_53CAE:				; CODE XREF: World_OnObjectDestroyed_53A94+20Cj
 		mov	ax, 10h
 		jmp	short loc_53CBB
 ; ���������������������������������������������������������������������������
 
-loc_53CB3:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+211j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+216j
+loc_53CB3:				; CODE XREF: World_OnObjectDestroyed_53A94+211j
+					; World_OnObjectDestroyed_53A94+216j
 		mov	ax, 11h
 		jmp	short loc_53CBB
 ; ���������������������������������������������������������������������������
 
-loc_53CB8:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+218j
+loc_53CB8:				; CODE XREF: World_OnObjectDestroyed_53A94+218j
 		mov	ax, 12h
 
-loc_53CBB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+21Dj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+222j
+loc_53CBB:				; CODE XREF: World_OnObjectDestroyed_53A94+21Dj
+					; World_OnObjectDestroyed_53A94+222j
 		cmp	ax, 0FFFFh
 		jz	short loc_53CF2
 		push	ax
@@ -7118,7 +7127,7 @@ loc_53CC6:
 		jmp	short loc_53CF2
 ; ���������������������������������������������������������������������������
 
-loc_53CC9:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1EFj
+loc_53CC9:				; CODE XREF: World_OnObjectDestroyed_53A94+1EFj
 		cmp	[bp+var_6], 1
 
 loc_53CCD:
@@ -7144,19 +7153,19 @@ loc_53CE3:
 		jmp	short loc_53CEB
 ; ���������������������������������������������������������������������������
 
-loc_53CE8:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CDCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+24Dj
+loc_53CE8:				; CODE XREF: World_OnObjectDestroyed_53A94:loc_53CDCj
+					; World_OnObjectDestroyed_53A94+24Dj
 		mov	ax, 0Fh
 
-loc_53CEB:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+252j
+loc_53CEB:				; CODE XREF: World_OnObjectDestroyed_53A94+252j
 		push	ax
 
 loc_53CEC:
 		call	Music_RequestTune_5A984
 		pop	cx
 
-loc_53CF2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1FCj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+202j ...
+loc_53CF2:				; CODE XREF: World_OnObjectDestroyed_53A94+1FCj
+					; World_OnObjectDestroyed_53A94+202j ...
 		or	di, di
 		jz	short loc_53D6E	; default
 		mov	byte_6E4BB, 0
@@ -7166,8 +7175,8 @@ loc_53CF2:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1FCj
 		jnz	short loc_53D0B
 		mov	byte_6E4C3, 1
 
-loc_53D0B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+26Bj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+270j
+loc_53D0B:				; CODE XREF: World_OnObjectDestroyed_53A94+26Bj
+					; World_OnObjectDestroyed_53A94+270j
 		cmp	[bp+arg_2], 0
 		jz	short loc_53D39
 		push	[bp+arg_2]
@@ -7185,10 +7194,10 @@ loc_53D0B:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+26Bj
 		jmp	short loc_53D30
 ; ���������������������������������������������������������������������������
 
-loc_53D2E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+28Aj
+loc_53D2E:				; CODE XREF: World_OnObjectDestroyed_53A94+28Aj
 		mov	al, 17h
 
-loc_53D30:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+298j
+loc_53D30:				; CODE XREF: World_OnObjectDestroyed_53A94+298j
 		cmp	al, 0Dh
 
 loc_53D32:
@@ -7197,8 +7206,8 @@ loc_53D32:
 loc_53D34:
 		mov	byte_6E4C4, 1
 
-loc_53D39:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+27Bj
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53D32j
+loc_53D39:				; CODE XREF: World_OnObjectDestroyed_53A94+27Bj
+					; World_OnObjectDestroyed_53A94:loc_53D32j
 		mov	[bp+var_14], di
 
 loc_53D3C:
@@ -7219,7 +7228,7 @@ loc_53D47:
 		jmp	short loc_53D6E	; default
 ; ���������������������������������������������������������������������������
 
-loc_53D59:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2BCj
+loc_53D59:				; CODE XREF: World_OnObjectDestroyed_53A94+2BCj
 		mov	al, [bp+var_4]
 		cbw
 		push	ax
@@ -7231,23 +7240,23 @@ loc_53D59:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2BCj
 		jnz	short loc_53D6E	; default
 		mov	byte_6E4BF, 1
 
-loc_53D6E:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1D8j
-					; Combat_TeamOpposedCheckAndDispatch_53A94+1E8j ...
+loc_53D6E:				; CODE XREF: World_OnObjectDestroyed_53A94+1D8j
+					; World_OnObjectDestroyed_53A94+1E8j ...
 		push	[bp+arg_2]	; default
 		push	si
 		call	UIScreen_SetWidgetValue_50654
 		add	sp, 4
 
-loc_53D7A:				; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1AEj
-					; Combat_TeamOpposedCheckAndDispatch_53A94+1BAj
+loc_53D7A:				; CODE XREF: World_OnObjectDestroyed_53A94+1AEj
+					; World_OnObjectDestroyed_53A94+1BAj
 		pop	di
 		pop	si
 		leave
 		retf
-Combat_TeamOpposedCheckAndDispatch_53A94	endp
+World_OnObjectDestroyed_53A94	endp
 
 ; ���������������������������������������������������������������������������
-word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1C8o
+word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: World_OnObjectDestroyed_53A94+1C8o
 		dw    15h		; value	table for switch statement
 		dw offset loc_53C73	; jump table for switch	statement
 		dw offset loc_53C73
@@ -7263,7 +7272,7 @@ word_53D7E	dw	1,     6,   13h,   14h ; DATA XREF: Combat_TeamOpposedCheckAndDisp
 ; ⚠️ far, 395 lignes, NON DÉTAILLÉE — sous-routine récursive de UIScreen_BuildWidgetTree_53A94
 ; (mêmes dispatchs vtable et Expr_Node_Accessor_52E17). Candidat pour session dédiée.
 ; ==============================================================================================
-UIScreen_BuildWidgetTree_Recurse_53D92	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+15p
+UIScreen_BuildWidgetTree_Recurse_53D92	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+15p
 
 var_1E		= dword	ptr -1Eh
 var_1A		= dword	ptr -1Ah

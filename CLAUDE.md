@@ -77,7 +77,7 @@ Conséquences directes :
 - **Le son passe par la bibliothèque AIL 2.0 de Miles Design** : seg161 = `AIL.ASM` compilé
   (fonctions renommées d'après les noms officiels, ex. `AIL_start_sequence_603CC`), sources
   publiques dans `analysis/ail_sources/`. La musique est du XMIDI joué **par le pilote**
-  (`ADLIB.ADV` contient l'interpréteur `XMIDI.ASM`). Voir `analysis/MUSIC_SYSTEM.md` §0.
+  (`ADLIB.ADV` contient l'interpréteur `XMIDI.ASM`). Voir `analysis/MUSIC_SYSTEM.md` §1.
 - Le jeu est écrit en **Borland C++**, compilé pour DOS 16 bits (segments
   `far`/`near`, conventions d'appel Borland classiques).
 - Il utilise le gestionnaire d'overlay propriétaire de Borland,
@@ -170,7 +170,7 @@ strike_commander_re/
 │   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
 │   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
-│   │                                  transitions, déclencheurs) — §0 = corrections
+│   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
 │   ├── ail_sources/                 sources publiques AIL 2.0 (AIL.ASM, AIL.INC, XMIDI.ASM)
 │   ├── adlib_driver_source/         ADLIB.ADV + son désassemblage
@@ -439,7 +439,7 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
    plus grosse fonction du fichier.
 3. `AI_ManeuverSolutionMain_781D0` (2373 lignes, ovr232) — cœur probable
    du calcul de manœuvre de combat aérien.
-4. ~~Contenu du cluster AudioQueue~~ : catalogue musical **et** son numérisé VOC (voir `MUSIC_SYSTEM.md` §0). Reste : relire `Music_CombatIntensitySelector_59302` (intensité liée aux dégâts du joueur ?) et les `Weapon_HUDBox_*` du seg122 (faux noms probables).
+4. ~~Contenu du cluster AudioQueue~~ : catalogue musical **et** son numérisé VOC ; système son entièrement décrit dans `MUSIC_SYSTEM.md` (questions restantes : §8).
 5. **Tick physique de l'avion : tranché** — c'est **`PhysicsTicks`**
    (seg103, ~0x4A85B ; slot Update des vtables de la classe `JDYN`, appelé par
    4 thunks seg082). `FlightPhysics_TickCandidate_4F4EE` (seg109) est le tick

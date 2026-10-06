@@ -1218,7 +1218,7 @@ modules à créneaux temporisés (seg161).
 ## ⭐⭐⭐ Découverte majeure : le système musical — un programme AIL 2.0 (intégré le 2026-10-06)
 
 Travail d'une session dédiée (menée sur une copie plus ancienne du dépôt), intégré et corrigé le
-2026-10-06. Référence complète : **`analysis/MUSIC_SYSTEM.md`** (§0 = corrections) et
+2026-10-06. Référence complète : **`analysis/MUSIC_SYSTEM.md`** (§9 = historique des corrections) et
 **`analysis/ADLIB_DRIVER.md`** ; sources publiques de la bibliothèque dans `analysis/ail_sources/`
 (`AIL.ASM`, `AIL.INC`, `XMIDI.ASM`, Miles Design 1991-1992), pilote réel dans
 `analysis/adlib_driver_source/`, `COMBAT.DAT` décodé dans `analysis/sample_dat_files/`.

@@ -201,7 +201,7 @@ d'implémentation maison.
 *Confirmé, lu intégralement.* C'est le point d'entrée périodique du
 pilote (appelé par le hook installé via `word_2BE2`/`word_2BE4`/
 `word_2BE6`, probablement câblé sur le timer/tick du jeu, cf.
-`MUSIC_SYSTEM.md` §8 pour le mécanisme d'enregistrement côté jeu).
+`MUSIC_SYSTEM.md` §4 pour le séquenceur côté jeu).
 
 Itère sur **16 emplacements de voix** (`si` = 0 à 15), ignore les
 inactifs (`cs:[si+0x16D4]`/`cs:[si+0x16E4]` == 0), puis pour chaque voix
@@ -269,7 +269,7 @@ sinon :
 > de séquence `cmp word ptr [si], 4F46h` / `cmp word ptr [si+8], 4D58h` (adlib.asm l. 8564), en-tête
 > `EVNT` présent dans `ADLIB.ADV`, service périodique à 120 Hz. `sub_552` / `sub_618` sont la
 > partie « voix OPL » (équivalent de `YAMAHA.INC`, absent des sources), appelée par cet
-> interpréteur. Voir `MUSIC_SYSTEM.md` §0.
+> interpréteur. Voir `MUSIC_SYSTEM.md` §1.
 
 **Implication architecturale majeure** : le vrai parseur XMIDI (temps
 delta, octets de statut MIDI, meta-événements, tempo) **n'est pas dans
@@ -278,28 +278,17 @@ ce pilote**. Son rôle se limite à : recevoir un déclenchement de note
 pointer les 8 flux de courbes d'enveloppe de la voix vers les données de
 l'instrument, puis jouer ces courbes de façon autonome tick après tick.
 
-**Mise à jour (Découverte 20 du README, `MUSIC_SYSTEM.md`)** : un vrai
-parseur XMI au format IFF standard (`XDIR`/`INFO`/`XMID`/`TIMB`) a été
-localisé côté `STRIKE.EXE` (seg124, fonction anonyme
-`Music_InstallXMITimbres_UNRESOLVED`, appelée par
-`Music_ChannelRegisterSequence_59FF5`) — confirmant que le séquenceur XMIDI vit
-bien côté jeu. Cette fonction lit l'en-tête et la liste des timbres, mais
-ne lit PAS le chunk `EVNT` — le lien exact entre ce parseur, le format
-`combat.dat`/`combat.adl` (`MUSIC_SYSTEM.md` §7), et ce lecteur de courbe
-reste à établir : hypothèse prioritaire, les événements `EVNT` (ou leur
-équivalent) sont traduits en paires pas/durée au format `sub_552` quelque
-part entre les deux.
+**Mise à jour (2026-10-06)** : `Music_InstallXMITimbres_UNRESOLVED` (côté jeu) ne fait que
+précharger les timbres d'un fichier XMI ; les événements `EVNT` sont lus par l'interpréteur XMIDI de
+ce pilote, qui appelle ensuite la partie voix OPL décrite ici. Voir `MUSIC_SYSTEM.md` §1 et §3.
 
 ---
 
 ## 10. Ce qui reste à tracer
 
-- **Priorité** : établir le lien concret entre `Music_InstallXMITimbres_UNRESOLVED`
-  (parseur d'en-tête XDIR/INFO/XMID/TIMB, côté jeu) et ce lecteur de
-  courbe d'enveloppe (`sub_552`, côté pilote) — qui traduit les
-  événements réels (notes, durées) de l'un vers l'autre ? Chercher un
-  chunk `EVNT` non encore trouvé, ou une conversion effectuée ailleurs
-  dans le cluster `Sequencer_*`.
+- Repérer dans `adlib.asm` la frontière entre le shell `XMIDI.ASM` (comparable au source public) et
+  la partie voix OPL propre à cette version (équivalent de `YAMAHA.INC`, absent des sources), pour ne
+  documenter que cette dernière.
 - Table `@0xF2E` (offset canal, variante liée à `0xF0A`) — trouvée à
   zéro sur les 16 premiers octets testés ; rôle exact et contenu complet
   non vérifiés.
@@ -321,9 +310,5 @@ part entre les deux.
   cette session.
 - Table `@0x1884` (bits percussion, indexée par `[si+0x1704]&0xF`) —
   contenu non extrait.
-- Lien concret entre ce pilote et le format `TrackDescriptor`/
-  `TransitionDescriptor` de `combat.dat`/`combat.adl` documenté dans
-  `MUSIC_SYSTEM.md` (§7.3, §7.5) : hypothèse à tester en premier — que
-  les séquences préfixées par `0x01` dans les entrées de transition
-  décodées SONT directement des données de courbe d'enveloppe au format
-  `sub_552` (paires pas/durée) plutôt que des événements MIDI classiques.
+- ~~Lien avec les entrées de `combat.dat`~~ : réglé, ce sont des numéros de pistes de liaison
+  indexés par la position dans la phrase, pas des courbes d'enveloppe (`MUSIC_SYSTEM.md` §2.3).

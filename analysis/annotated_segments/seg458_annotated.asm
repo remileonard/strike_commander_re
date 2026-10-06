@@ -657,7 +657,7 @@ AudioQueue_ProcessMain_AA84E	endp
 ; boucle sur les entrées 1..word_70867 du niveau 1 : lit 2 octets depuis combat.dat, lit la
 ; taille via IndexedRecordReader_AdvanceIndex_65E2C, alloue un buffer (tag 0x5C44), charge les
 ; données réelles via IndexedRecordReader_SeekToIndex_65C6D, enregistre dans le séquenceur.
-; Voir MUSIC_SYSTEM.md §7.3.
+; Voir MUSIC_SYSTEM.md §2.4.
 ; ==============================================================================================
 AudioQueue_LoadTrackTable_AACA6	proc far		; CODE XREF: VROOMM_StubThunk_6CFAAJ AudioQueue_ProcessMain_AA84E+1B9p
 
@@ -1068,7 +1068,7 @@ AudioQueue_ReleaseAndAdvanceB_AAE3B	endp
 ; testée dans Music_TuneTransitionResolve_595C2 ; (3) alloue word_70856 = table de word_7084E
 ; TransitionDescriptor (10 octets chacun), callback overlay stub239 (différent de seg335) ;
 ; (4) boucle sur les word_7084E entrées du niveau 3, même mécanique de chargement. Voir
-; MUSIC_SYSTEM.md §7.3.
+; MUSIC_SYSTEM.md §2.4.
 ; ==============================================================================================
 AudioQueue_LoadTransitionTable_AAFA0	proc far		; CODE XREF: VROOMM_StubThunk_6CFB4J AudioQueue_ProcessMain_AA84E+1C7p
 

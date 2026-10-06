@@ -1156,9 +1156,9 @@ off_595BA	dw offset Music_SequencerTickDispatch_59436	; DATA XREF: seg121:0561r
 ; Music_ChannelRegisterSequence_59FF5 + sub_603CC), pas de piste de transition ; !=0 et <=
 ; word_7084E → charge une PISTE DE TRANSITION sur le canal secondaire 5BF5h via
 ; word_70856+(var_1-1)*10 ; > word_7084E → abandon, word_70859 réinitialisé à byte_72C90.
-; CONFIRMÉ sur fichier réel (combat.dat, MUSIC_SYSTEM.md §7.5) : var_1 est l'index d'une piste
+; CONFIRMÉ sur fichier réel (combat.dat, MUSIC_SYSTEM.md §2.3) : var_1 est l'index d'une piste
 ; de transition autonome dans l'archive imbriquée à 3 niveaux (§7.3) — PAS un saut de marqueur
-; façon RBRN. Voir MUSIC_SYSTEM.md §8.2. PRECISE 2026-10-06 : word_72C91 = position dans la
+; façon RBRN. Voir MUSIC_SYSTEM.md §4.3. PRECISE 2026-10-06 : word_72C91 = position dans la
 ; phrase : (mesure courante mod TrackDescriptor+0xA de la piste courante) + 1, ou
 ; TrackDescriptor+0xB si le reste est nul ('idiv bx / mov word_72C91, dx / inc' sinon
 ; '[si+0Bh]'). Donc +0xA = longueur de la phrase en mesures et +0xB = position a utiliser sur
@@ -1389,7 +1389,7 @@ Music_TuneTransitionResolve_595C2	endp
 ; sub_603CC) sur le canal 5BE3h. Registre de reprise à un seul niveau : si la piste qui vient
 ; de démarrer (di) est une piste transitoire de menu (0x10 ≤ di ≤ 0x12), REMPLACE
 ; immédiatement word_70859 par word_7085B (piste sauvegardée avant la transition, positionnée
-; dans Music_TuneTransitionResolve_595C2). Voir MUSIC_SYSTEM.md §8.4.
+; dans Music_TuneTransitionResolve_595C2). Voir MUSIC_SYSTEM.md §4.4.
 ; ==============================================================================================
 Music_TuneTransitionCommit_5974D	proc far		; CODE XREF: seg121:06DCp
 		push	bp

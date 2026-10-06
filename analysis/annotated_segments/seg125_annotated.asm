@@ -195,7 +195,7 @@ SoundFX_Stop_5A95E	endp
 ; byte_706A2, jouée à l'ouverture d'écran par sub_53896 (UIScreen_Construct).
 ; ==============================================================================================
 Music_RequestTune_5A984	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP+1BP
-					; Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CC1P	...
+					; World_OnObjectDestroyed_53A94:loc_53CC1P	...
 
 arg_0		= word ptr  6
 
@@ -365,7 +365,7 @@ Music_SelectStartTune_5AA02	endp
 ; Combat_TeamOpposedCheckAndDispatch_53A94 a la destruction d'un objet :
 ; Music_SelectTuneCandidate_5923A(musique, 1, objet detruit).
 ; ==============================================================================================
-Music_OnObjectDestroyed_5AA49	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+1F2P
+Music_OnObjectDestroyed_5AA49	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+1F2P
 
 arg_0		= word ptr  6
 

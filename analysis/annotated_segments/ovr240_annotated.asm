@@ -129,7 +129,7 @@ loc_7D323:
 loc_7D360:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3Bj
 		push	0
 		push	[bp+arg_0]
-		call	Combat_TeamOpposedCheckAndDispatch_53A94
+		call	World_OnObjectDestroyed_53A94
 		add	sp, 4
 		push	large dword ptr	[si+76h]
 		push	large dword ptr	[si+65h]

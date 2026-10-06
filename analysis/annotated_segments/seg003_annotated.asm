@@ -375,7 +375,7 @@ loc_5231:				; CODE XREF: AI_EjectDecision_50FF+11Cj
 		push	0
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+102h]
-		call	Combat_TeamOpposedCheckAndDispatch_53A94
+		call	World_OnObjectDestroyed_53A94
 
 loc_5240:
 		add	sp, 4
