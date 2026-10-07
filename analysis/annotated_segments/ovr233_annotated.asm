@@ -10,7 +10,7 @@ ovr233		segment	para public 'OVERLAY' use16
 ; ⚠️ far, 275 lignes, NON DÉTAILLÉE — appelle Pilot_LowLevelControlCommand — émission de
 ; commande de pilotage bas niveau.
 ; ==============================================================================================
-Pilot_IssueControlCommand_79DA0	proc far		; CODE XREF: VROOMM_StubThunk_6AC8AJ UIScript_ParseAndEvaluate_7A054+3F0p ...
+Pilot_IssueControlCommand_79DA0	proc far		; CODE XREF: VROOMM_StubThunk_6AC8AJ Autopilot_JumpSequence_7A054+3F0p ...
 
 var_A8		= dword	ptr -0A8h
 var_A0		= dword	ptr -0A0h
@@ -292,12 +292,17 @@ Pilot_IssueControlCommand_79DA0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 796 lignes, NON DÉTAILLÉE — combine Lexer_ResolveConstantAlt,
-; Expr_Node_GetOrRecompute_53236 (seg114), UIScreen_RenderOrLayoutList_54503 (seg114),
-; Parser_LookaheadPattern — probable interpréteur/évaluateur de script pour un écran UI
-; dynamique, lié au système Expr_VM. Candidat prioritaire pour session dédiée.
+; far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE
+; PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination
+; differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour
+; chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde
+; +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A :
+; l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste
+; (Container_Op_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par
+; l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du
+; joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu.
 ; ==============================================================================================
-UIScript_ParseAndEvaluate_7A054	proc far		; CODE XREF: VROOMM_StubThunk_6AC85J UIScript_Helper_7A79E+32p	...
+Autopilot_JumpSequence_7A054	proc far		; CODE XREF: VROOMM_StubThunk_6AC85J UIScript_Helper_7A79E+32p	...
 
 var_C4		= dword	ptr -0C4h
 var_BC		= dword	ptr -0BCh
@@ -405,7 +410,7 @@ loc_7A07D:
 		jmp	loc_7A79A
 ; ���������������������������������������������������������������������������
 
-loc_7A0D0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+77j
+loc_7A0D0:				; CODE XREF: Autopilot_JumpSequence_7A054+77j
 		lea	ax, [bp+var_8C]
 		push	ax
 		mov	ax, word_706A0
@@ -425,7 +430,7 @@ loc_7A0D0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+77j
 		jmp	loc_7A79A
 ; ���������������������������������������������������������������������������
 
-loc_7A100:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+A7j
+loc_7A100:				; CODE XREF: Autopilot_JumpSequence_7A054+A7j
 		mov	word_7046E, 1
 		mov	[bp+var_12], 100h
 		mov	eax, [bp+var_12]
@@ -459,7 +464,7 @@ loc_7A100:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+A7j
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_7A175:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+FDj
+loc_7A175:				; CODE XREF: Autopilot_JumpSequence_7A054+FDj
 		mov	bx, word_706A0
 		mov	al, [bx+0A1h]
 		mov	[bp+var_13], al
@@ -479,18 +484,18 @@ loc_7A175:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+FDj
 		add	sp, 0Ah
 		jmp	short $+2
 
-loc_7A1B0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+138j
+loc_7A1B0:				; CODE XREF: Autopilot_JumpSequence_7A054+138j
 		mov	bx, word_706A0
 		mov	al, [bx+0AFh]
 		mov	[bp+var_14], al
 		cmp	[bp+var_14], 0
 
-loc_7A1BF:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+F3j
+loc_7A1BF:				; CODE XREF: Autopilot_JumpSequence_7A054+F3j
 		mov	[bp+var_16], 1
 		jmp	short loc_7A1F4
 ; ���������������������������������������������������������������������������
 
-loc_7A1C6:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1A6j
+loc_7A1C6:				; CODE XREF: Autopilot_JumpSequence_7A054+1A6j
 		mov	bx, [bp+var_16]
 		shl	bx, 1
 		lea	ax, [bp+var_74]
@@ -516,7 +521,7 @@ loc_7A1E6:
 		mov	byte ptr [bx+68h], 0FFh
 		inc	[bp+var_16]
 
-loc_7A1F4:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+170j
+loc_7A1F4:				; CODE XREF: Autopilot_JumpSequence_7A054+170j
 		mov	ax, [bp+var_16]
 		cmp	ax, [bp+var_C]
 		jl	short loc_7A1C6
@@ -525,13 +530,13 @@ loc_7A1F4:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+170j
 		jmp	loc_7A294
 ; ���������������������������������������������������������������������������
 
-loc_7A204:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1ABj
+loc_7A204:				; CODE XREF: Autopilot_JumpSequence_7A054+1ABj
 		mov	[bp+var_5C], 0
 		mov	word ptr [bp+var_60+2],	0
 		jmp	short loc_7A27E
 ; ���������������������������������������������������������������������������
 
-loc_7A210:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+23Dj
+loc_7A210:				; CODE XREF: Autopilot_JumpSequence_7A054+23Dj
 		mov	ax, word ptr [bp+var_60+2]
 		mov	word ptr [bp+var_60], ax
 		push	ax
@@ -551,21 +556,21 @@ loc_7A210:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+23Dj
 		or	al, al
 		jz	short loc_7A278
 		push	large [bp+var_64]
-		call	Expr_Node_ClearDirtyAndNotify_5242A
+		call	PartEntry_Deactivate_5242A
 		add	sp, 4
 		mov	ax, [bp+var_5C]
 		mov	word ptr [bp+var_60+2],	ax
 		jmp	short loc_7A278
 ; ���������������������������������������������������������������������������
 
-loc_7A255:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1DDj
+loc_7A255:				; CODE XREF: Autopilot_JumpSequence_7A054+1DDj
 		mov	bx, word ptr [bp+var_60]
 		test	byte ptr [bx+4], 1
 		jnz	short loc_7A264
 		test	byte ptr [bx+4], 20h
 		jz	short loc_7A278
 
-loc_7A264:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+208j
+loc_7A264:				; CODE XREF: Autopilot_JumpSequence_7A054+208j
 		push	word ptr [bp+var_60]
 		push	59C3h
 		call	Container_Op_223C5
@@ -573,12 +578,12 @@ loc_7A264:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+208j
 		mov	ax, [bp+var_5C]
 		mov	word ptr [bp+var_60+2],	ax
 
-loc_7A278:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1EBj
-					; UIScript_ParseAndEvaluate_7A054+1FFj ...
+loc_7A278:				; CODE XREF: Autopilot_JumpSequence_7A054+1EBj
+					; Autopilot_JumpSequence_7A054+1FFj ...
 		mov	ax, word ptr [bp+var_60+2]
 		mov	[bp+var_5C], ax
 
-loc_7A27E:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1BAj
+loc_7A27E:				; CODE XREF: Autopilot_JumpSequence_7A054+1BAj
 		lea	ax, [bp+var_60+2]
 		push	ax
 		push	59C3h
@@ -589,8 +594,8 @@ loc_7A27E:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1BAj
 		jmp	loc_7A210
 ; ���������������������������������������������������������������������������
 
-loc_7A294:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+1ADj
-					; UIScript_ParseAndEvaluate_7A054+23Bj
+loc_7A294:				; CODE XREF: Autopilot_JumpSequence_7A054+1ADj
+					; Autopilot_JumpSequence_7A054+23Bj
 		mov	[bp+var_1C], 15E00h
 		push	0
 		mov	[bp+var_24], 0
@@ -627,7 +632,7 @@ loc_7A2F7:
 		add	eax, 7D000h
 		mov	[bp+var_78], eax
 
-loc_7A30F:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+2ABj
+loc_7A30F:				; CODE XREF: Autopilot_JumpSequence_7A054+2ABj
 		mov	eax, [bp+var_8C]
 		mov	[bp+var_A4], eax
 		mov	eax, [bp+var_88]
@@ -737,7 +742,7 @@ loc_7A3F2:
 		jmp	loc_7A4D7
 ; ���������������������������������������������������������������������������
 
-loc_7A456:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+3FDj
+loc_7A456:				; CODE XREF: Autopilot_JumpSequence_7A054+3FDj
 		mov	byte_6D558, 1
 		push	ds
 		push	offset aAutopilt ; "AUTOPILT"
@@ -751,7 +756,7 @@ loc_7A456:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+3FDj
 		jmp	short loc_7A4C0
 ; ���������������������������������������������������������������������������
 
-loc_7A476:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+473j
+loc_7A476:				; CODE XREF: Autopilot_JumpSequence_7A054+473j
 		mov	ax, [bp+var_5C]
 		cmp	ax, word_72A8F
 		jz	short loc_7A48B
@@ -767,7 +772,7 @@ loc_7A488:
 		jmp	short loc_7A4C9
 ; ���������������������������������������������������������������������������
 
-loc_7A48B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+429j
+loc_7A48B:				; CODE XREF: Autopilot_JumpSequence_7A054+429j
 		mov	word_7046E, 1
 		mov	[bp+var_60], 100h
 		mov	eax, [bp+var_60]
@@ -780,25 +785,25 @@ loc_7A48B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+429j
 		mov	byte_72B41, 1
 		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 
-loc_7A4C0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+420j
+loc_7A4C0:				; CODE XREF: Autopilot_JumpSequence_7A054+420j
 		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jnz	short loc_7A476
 
-loc_7A4C9:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+418j
-					; UIScript_ParseAndEvaluate_7A054+435j
+loc_7A4C9:				; CODE XREF: Autopilot_JumpSequence_7A054+418j
+					; Autopilot_JumpSequence_7A054+435j
 		push	51E2h
 		call	Config_ReadCalibration
 		pop	cx
 		mov	byte_6D558, 0
 
-loc_7A4D7:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+3FFj
+loc_7A4D7:				; CODE XREF: Autopilot_JumpSequence_7A054+3FFj
 		cmp	[bp+var_E], 0
 		jnz	short loc_7A4E0
 		jmp	loc_7A79A
 ; ���������������������������������������������������������������������������
 
-loc_7A4E0:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+487j
+loc_7A4E0:				; CODE XREF: Autopilot_JumpSequence_7A054+487j
 		mov	[bp+var_45], 0
 		mov	[bp+var_48], di
 		mov	[bp+var_4A], 0FFFFh
@@ -810,7 +815,7 @@ loc_7A4F0:
 		jmp	loc_7A631
 ; ���������������������������������������������������������������������������
 
-loc_7A4F3:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+5E6j
+loc_7A4F3:				; CODE XREF: Autopilot_JumpSequence_7A054+5E6j
 		mov	eax, [bp+var_8C]
 		mov	[bp+var_BC], eax
 		mov	eax, [bp+var_88]
@@ -828,20 +833,20 @@ loc_7A4F3:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+5E6j
 		jmp	loc_7A5DC
 ; ���������������������������������������������������������������������������
 
-loc_7A533:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4DAj
+loc_7A533:				; CODE XREF: Autopilot_JumpSequence_7A054+4DAj
 		cmp	di, [bp+var_E]
 		jz	short loc_7A53B
 		jmp	loc_7A5BE
 ; ���������������������������������������������������������������������������
 
-loc_7A53B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4E2j
+loc_7A53B:				; CODE XREF: Autopilot_JumpSequence_7A054+4E2j
 		mov	[bp+var_4B], 1
 		cmp	[bp+arg_2], 0
 		jnz	short loc_7A54B
 		cmp	word ptr [di+14h], 0
 		jnz	short loc_7A569
 
-loc_7A54B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4EFj
+loc_7A54B:				; CODE XREF: Autopilot_JumpSequence_7A054+4EFj
 		mov	eax, [bp+var_8C]
 		mov	[bp+var_80], eax
 		mov	eax, [bp+var_88]
@@ -851,7 +856,7 @@ loc_7A54B:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4EFj
 		jmp	loc_7A63D
 ; ���������������������������������������������������������������������������
 
-loc_7A569:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4F5j
+loc_7A569:				; CODE XREF: Autopilot_JumpSequence_7A054+4F5j
 		push	large [bp+var_B4]
 		push	large [bp+var_B8]
 		push	large [bp+var_BC]
@@ -870,13 +875,13 @@ loc_7A581:
 		jge	short loc_7A596
 		mov	[bp+var_8], eax
 
-loc_7A596:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+53Cj
+loc_7A596:				; CODE XREF: Autopilot_JumpSequence_7A054+53Cj
 		mov	eax, [bp+var_60+2]
 		cmp	eax, [bp+var_4]
 		jge	short loc_7A5A4
 		mov	[bp+var_45], 1
 
-loc_7A5A4:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+54Aj
+loc_7A5A4:				; CODE XREF: Autopilot_JumpSequence_7A054+54Aj
 		push	0FFh
 		push	di
 		call	VROOMM_StubThunk_6CF49
@@ -888,7 +893,7 @@ loc_7A5A4:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+54Aj
 		jmp	short loc_7A5DC
 ; ���������������������������������������������������������������������������
 
-loc_7A5BE:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4E4j
+loc_7A5BE:				; CODE XREF: Autopilot_JumpSequence_7A054+4E4j
 		cmp	di, [bp+var_48]
 		jz	short loc_7A5DC
 		push	0FFh
@@ -900,8 +905,8 @@ loc_7A5BE:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4E4j
 		jle	short loc_7A5DC
 		mov	[bp+var_45], 1
 
-loc_7A5DC:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+4DCj
-					; UIScript_ParseAndEvaluate_7A054+55Ej ...
+loc_7A5DC:				; CODE XREF: Autopilot_JumpSequence_7A054+4DCj
+					; Autopilot_JumpSequence_7A054+55Ej ...
 		mov	al, [bp+var_45]
 		mov	ah, 0
 		or	ax, ax
@@ -933,8 +938,8 @@ loc_7A5F3:
 		add	sp, 4
 		mov	di, ax
 
-loc_7A631:				; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A4F0j
-					; UIScript_ParseAndEvaluate_7A054+58Fj
+loc_7A631:				; CODE XREF: Autopilot_JumpSequence_7A054:loc_7A4F0j
+					; Autopilot_JumpSequence_7A054+58Fj
 		mov	al, [bp+var_45]
 		mov	ah, 0
 		or	ax, ax
@@ -942,8 +947,8 @@ loc_7A631:				; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A4F0j
 		jmp	loc_7A4F3
 ; ���������������������������������������������������������������������������
 
-loc_7A63D:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+512j
-					; UIScript_ParseAndEvaluate_7A054+5E4j
+loc_7A63D:				; CODE XREF: Autopilot_JumpSequence_7A054+512j
+					; Autopilot_JumpSequence_7A054+5E4j
 		or	di, di
 		jz	short loc_7A66F
 		cmp	byte ptr [di+18h], 0
@@ -961,8 +966,8 @@ loc_7A63D:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+512j
 		mov	ax, [di+19h]
 		mov	[bp+var_4A], ax
 
-loc_7A66F:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+5EBj
-					; UIScript_ParseAndEvaluate_7A054+5F1j
+loc_7A66F:				; CODE XREF: Autopilot_JumpSequence_7A054+5EBj
+					; Autopilot_JumpSequence_7A054+5F1j
 		cmp	[bp+var_4A], 0FFFFh
 
 loc_7A673:
@@ -988,7 +993,7 @@ loc_7A682:
 		call	Vector_RotateHeading2D_556D4
 		add	sp, 4
 
-loc_7A6B1:				; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A673j
+loc_7A6B1:				; CODE XREF: Autopilot_JumpSequence_7A054:loc_7A673j
 		mov	[bp+var_58], 0C800h
 		mov	eax, [bp+var_58]
 		mov	[bp+var_1C], eax
@@ -1026,7 +1031,7 @@ loc_7A6B1:				; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A673j
 		call	Picking_ClearSelectableList
 		pop	cx
 
-loc_7A716:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+6B6j
+loc_7A716:				; CODE XREF: Autopilot_JumpSequence_7A054+6B6j
 		push	word_6E4B2
 		call	VROOMM_StubThunk_6B21D
 		pop	cx
@@ -1038,7 +1043,7 @@ loc_7A716:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+6B6j
 		add	sp, 4
 		jmp	short $+2
 
-loc_7A736:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+6D1j
+loc_7A736:				; CODE XREF: Autopilot_JumpSequence_7A054+6D1j
 		push	0
 		push	word_70E62
 		call	TextFormat_ReleaseAttribute_5E5AC
@@ -1073,11 +1078,11 @@ loc_7A783:
 		jmp	short loc_7A787
 ; ���������������������������������������������������������������������������
 
-loc_7A785:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+723j
+loc_7A785:				; CODE XREF: Autopilot_JumpSequence_7A054+723j
 		jmp	short $+2
 
-loc_7A787:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+6F5j
-					; UIScript_ParseAndEvaluate_7A054:loc_7A783j
+loc_7A787:				; CODE XREF: Autopilot_JumpSequence_7A054+6F5j
+					; Autopilot_JumpSequence_7A054:loc_7A783j
 		cmp	[bp+var_4B], 0
 		jz	short loc_7A79A
 		mov	ax, word_706A0
@@ -1086,13 +1091,13 @@ loc_7A787:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+6F5j
 		call	Parser_ConsumeRemaining
 		pop	cx
 
-loc_7A79A:				; CODE XREF: UIScript_ParseAndEvaluate_7A054+79j
-					; UIScript_ParseAndEvaluate_7A054+A9j ...
+loc_7A79A:				; CODE XREF: Autopilot_JumpSequence_7A054+79j
+					; Autopilot_JumpSequence_7A054+A9j ...
 		pop	di
 		pop	si
 		leave
 		retf
-UIScript_ParseAndEvaluate_7A054	endp
+Autopilot_JumpSequence_7A054	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1129,7 +1134,7 @@ loc_7A7C6:				; DATA XREF: ovr233:off_7A7ECo
 		push	ax
 		push	dx
 		push	cs
-		call	near ptr UIScript_ParseAndEvaluate_7A054
+		call	near ptr Autopilot_JumpSequence_7A054
 		add	sp, 4
 		jmp	short locret_7A7EA ; default
 ; ���������������������������������������������������������������������������
@@ -1147,7 +1152,7 @@ loc_7A7E0:
 
 loc_7A7E3:
 		push	cs
-		call	near ptr UIScript_ParseAndEvaluate_7A054
+		call	near ptr Autopilot_JumpSequence_7A054
 
 loc_7A7E7:
 		add	sp, 4

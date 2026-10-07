@@ -19,7 +19,7 @@ seg112		segment	byte public 'CODE' use16
 ; sont eux-memes probablement faux, a revoir.
 ; ==============================================================================================
 CombatTarget_WeaponActionSubsystem	proc far		; CODE XREF: MAIN_GAME_TICK+180P
-					; UIScript_ParseAndEvaluate_7A054:loc_7A4C0P	...
+					; Autopilot_JumpSequence_7A054:loc_7A4C0P	...
 
 var_38		= dword	ptr -38h
 var_34		= word ptr -34h
@@ -728,7 +728,7 @@ UIScreen_ReadNumericFields_500A6	endp
 ; Timer_Tick_4F9E6(0x59B0), appele entre-temps, les voit.
 ; ==============================================================================================
 Frame_UpdateTimingAndNotifyTrackedObjects_500F6	proc far		; CODE XREF: STRIKE_EXE_MAIN_LOOP:loc_538BAP
-					; UIScript_ParseAndEvaluate_7A054+467P ...
+					; Autopilot_JumpSequence_7A054+467P ...
 
 var_74		= dword	ptr -74h
 var_70		= dword	ptr -70h

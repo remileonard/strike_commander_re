@@ -722,7 +722,7 @@ Camera_FrustumClipTest	endp
 ; far,20L — détache la référence de caméra parente (+0x5E), invalide le lien retour :
 ; détachement d'une caméra de son parent.
 ; ==============================================================================================
-Camera_DetachParent	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054:loc_7A483P
+Camera_DetachParent	proc far		; CODE XREF: Autopilot_JumpSequence_7A054:loc_7A483P
 					; HUDSymbol_ConstructWithFullMatrix_83DD7+1E3P ...
 
 arg_0		= word ptr  6

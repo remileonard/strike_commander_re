@@ -873,14 +873,15 @@ GroundAttack_Phase2_EngageAutopilot_775B1	endp
 ; (minuteur noeud+0x2B = 3,0 s, chargement+0x0D = cible). Aucune -> phase 6 (fin). (3) Chaque
 ; tick : WeaponStation_FindLoadedCompatible(chargement, noeud+0x34) sinon phase 6. AGM-65D /
 ; GBU-15 : tir si modele->vtable+0x14(modele, cible, moi) (BOMB :
-; BombModel_TestGuidedLockCone_41735 ; MISS : loc_42F71 non lu). LAU-3 : tir quand le minuteur
-; de 3 s echoit. BOMBES : hauteur = ma alt - alt cible ; I = modele->vtable+0x18(I, modele, 0,
-; point d'emport+0x0D, &hauteur, 3 pour MK-20/MK-82, 5 pour id 7)
-; (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0 sans point d'emport ;
-; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma
-; vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR =
-; bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si
-; bloc+0x1A != 0 (pose par Autopilot_FlyToPointKinematic_49C2E) -> phase 0 (nouvelle passe).
+; BombModel_TestGuidedLockCone_41735 ; MISS : MissileModel_TestInRange_42F71, distance <
+; effective_range). LAU-3 : tir quand le minuteur de 3 s echoit. BOMBES : hauteur = ma alt -
+; alt cible ; I = modele->vtable+0x18(I, modele, 0, point d'emport+0x0D, &hauteur, 3 pour
+; MK-20/MK-82, 5 pour id 7) (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0
+; sans point d'emport ; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ;
+; tolerance = 20 + |ma vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <=
+; tolerance -> tir. TIR = bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans
+; tir, en phase 3, si bloc+0x1A != 0 (pose par Autopilot_FlyToPointKinematic_49C2E) -> phase 0
+; (nouvelle passe).
 ; ==============================================================================================
 GroundAttack_Phase3_WeaponRelease_776FB	proc far		; CODE XREF: VROOMM_StubThunk_6ABD5J GroundAttack_PhaseDispatch_77215+42p
 

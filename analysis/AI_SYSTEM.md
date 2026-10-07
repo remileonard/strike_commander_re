@@ -489,8 +489,8 @@ pendant le balayage de nouvelle cible :
 ```mermaid
 sequenceDiagram
     participant Tick as AI_TopLevelThink
-    participant Scan as AI_ScanForNewTarget
-    participant Vis as AI_VisibilityTest
+    participant Scan as AI_ScanCollisionThreats_DF99
+    participant Vis as AI_CollisionCourseTest_DD21
     participant Prox as Entity_ProximityTest_ThreatGate
     participant Node as Nœud MVRS ID=20
 
@@ -510,7 +510,7 @@ sequenceDiagram
     end
 ```
 
-Cette même infrastructure (`AI_VisibilityTest`) est également invoquée
+Cette même infrastructure (`AI_CollisionCourseTest_DD21`) est également invoquée
 depuis du code d'évaluation de menace dans `seg008`, suggérant qu'elle
 est **partagée** entre le balayage de cible de l'IA et la réaction aux
 menaces entrantes (missiles).
@@ -990,7 +990,7 @@ int AI_TopLevelThink(Entity* entity) {
     Radio_CombatChatterDispatch(entity);
 
     // 2. traitement des menaces, SAUTÉ si décollage/atterrissage (+0x11D = 0xA1/0xA2),
-    //    avion au sol, ou word_70466 <= 3  (partie non lue en détail)
+    //    avion au sol, ou word_70466 <= 3 (compteur de frames : 3 premières frames de la mission)
 
     // 3. réactions prioritaires, avant tout objectif
     int reacted = 0;
@@ -1415,7 +1415,7 @@ boucle principale de `AI_BehaviorStateMachine`) — aucun accumulateur
 de `dt`, aucun cooldown. Comme le tick est cadencé sur le framerate,
 **la fréquence de décision de l'IA (et donc le nombre de jets
 aléatoires par seconde réelle — bruit du tournoi via `CRT_Rand`, test
-de compétence « 3d6 » dans `AI_ManeuverSolution_Major`) scale
+de compétence « 3d6 » dans `AI_GunSnapAim_6977`) scale
 directement avec le framerate**, contrairement à la physique qui est
 correctement synchronisée sur le temps réel. Un pilote de faible
 compétence sur une machine rapide obtiendrait statistiquement plus de

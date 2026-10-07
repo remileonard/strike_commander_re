@@ -45,15 +45,19 @@ seg005		segment	byte public 'CODE' use16
 ; PROPRE de l'objet lie (entite+0x102+0x12) dans +0x111/+0x115/+0x119 (position de repli sur
 ; soi-meme), FORCE goal_state=0xBF (DEACTIVATE_OBJ) - un vrai comportement de
 ; secours/desactivation pour tout code non reconnu. QUEUE COMMUNE (loc_A641, apres N'IMPORTE
-; QUEL cas) : (1) si goal_state==0xAA OU bit3 de +0x28B pose, appelle IMMEDIATEMENT
-; Goal_FollowAllyExec_DAA9 (meme fonction que le court-circuit de AIEntity_MasterTick_5ACC !)
-; - l'objectif FOLLOW_ALLY prend effet sans attendre le prochain tick. (2) SAUF SI bit5 de
-; +0x28B est deja pose (deja verifie une fois en formation), appelle Goal_IsComplete_A6D3
-; IMMEDIATEMENT sur le nouvel etat pour verifier s'il est deja trivialement rempli, et
-; retourne ce booleen comme resultat de la fonction entiere. Anciennement compris seulement
-; partiellement (case 0xAA lue isolement lors de l'investigation des commandes radio) -
-; desormais documente dans son integralite comme UNE SEULE fonction coherente plutot que des
-; labels loc_ fragmentes et non catalogues.
+; QUEL cas) : (1) CORRIGE 2026-10-03 : si goal_state != 0xAA ET bit3 de +0x28B (formation)
+; pose, appelle Goal_FollowAllyExec_DAA9 ('cmp word ptr es:[bx+11Dh], 0AAh / jz loc_A668'
+; saute l'appel pour 0xAA) : avec un autre ordre, il echoue et SORT DE LA FORMATION
+; (historique libere, objet+0x59 = 0). L'ancien texte ('0xAA OU bit3') etait faux. (2) bit5 de
+; +0x28B (ORDRE VERROUILLE, pose par Goal_SelectTransition etats 2/3, Goal_TransferToWingman,
+; AI_MessageDispatcher, Goal_MoraleReaction_878F ; efface par Goal_ExecuteAction_A8AC quand
+; l'ordre est fini) : renvoie 1 (en cours) sans rien changer ; sinon renvoie
+; Goal_IsComplete_A6D3 du nouvel etat (1 = en cours). Cette valeur devient l'etat 'ordre en
+; cours' [instr+0xE] lu par les opcodes 0x46/0x47 du script. PAS DE PILE D'ORDRES : un seul
+; champ +0x11D, chaque appel l'ecrase ; le script est relu depuis le debut a chaque frame.
+; Anciennement compris seulement partiellement (case 0xAA lue isolement lors de
+; l'investigation des commandes radio) - desormais documente dans son integralite comme UNE
+; SEULE fonction coherente plutot que des labels loc_ fragmentes et non catalogues.
 ; ==============================================================================================
 Goal_SetObjective_A307:				; DATA XREF: seg339:off_6D1D0o
 		push	bp
@@ -461,11 +465,15 @@ off_A695	dw offset loc_A3FA	; DATA XREF: seg005:003Cr
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,235L — switch sur 11 cas du code d'état/but IA (offset +0x11D, valeurs 0xA1-0xAC) : pour
-; chaque type de GOAL, vérifie si la condition de complétion est remplie (ex: 0xA1=cible
-; valide de type 0x11, 0xA9=distance parcourue vs seuil, 0xA4=distance à un point <0x1F400).
-; 'Is-Goal-Complete' checker — correspond directement aux GOAL types déjà documentés
-; (takeOff/land/flyToWaypoint/destroyTarget/defendTarget/followAlly).
+; far, 235L, RELUE 2026-09-27. Dit si Goal_ExecuteAction_A8AC doit executer l'ordre +0x11D (1
+; = en cours / a executer, 0 = termine ou inactif -> Goal_ExecuteAction renvoie 0, efface le
+; verrou bit 5 de +0x28B et laisse la main au GOAL suivant). 0xA1 : decollage en cours
+; (comportement tag 0x11) ou au sol ou pas de noeud +0x15. 0xA2 : dernier comportement termine
+; (+0x19) != 0x12 (atterrissage). 0xA4/0xA5 : distance HORIZONTALE a +0x11F > 500 m (1F400h).
+; 0xA7/0xA8 : reference +0x137 non nulle. 0xA9 : camp adverse sans unite vivante (camp 1 :
+; word_706A7 - word_706A9 == 0 ; sinon word_706A3 - word_706A5 == 0 ; A3/A7 = PART activees
+; camp 1/0xFF, A5/A9 = detruites). 0xAA : leader +0x145 non nul. 0xAC/0xBF : toujours. 0xFFFF
+; et defaut : [[+0x0B]]+0x20 == 0.
 ; ==============================================================================================
 Goal_IsComplete	proc far		; CODE XREF: seg005:0380p Goal_ExecuteAction_A8AC+Cp
 
@@ -735,7 +743,11 @@ word_A880	dw 0FFFFh,  0A1h,  0A2h,  0A4h ; DATA XREF: Goal_IsComplete+19o
 ; chargee depuis le fichier - confirme que ce systeme de noeud generique (tag 0x5C44) sert a
 ; la fois au chargement de configuration statique ET au transport de valeurs calculees
 ; dynamiquement, mais n'etablit PAS de lien direct avec les valeurs MVRS specifiquement
-; chargees en memoire.
+; chargees en memoire. | 2026-10-03 : table word_ACE7 = 0xFFFF, A1, A2, A4, A5, A7, A8, A9,
+; AA, AC, BF. 0xBF (et 0xFFFF) -> loc_A9B7 : AI_NavSolutionToPoint, sinon Goal_WanderRandom.
+; Avec le centre +0x111 recopie sur ma position a chaque Goal_SetObjective (cas par defaut,
+; ordre de script 0xBE), l'avion erre au hasard (patrouille libre) ; Goal_IsComplete 0xBF =
+; toujours en cours.
 ; ==============================================================================================
 Goal_ExecuteAction_A8AC	proc far		; CODE XREF: AI_TopLevelThink+376P
 					; Goal_SelectTransition+2ADP
@@ -1245,18 +1257,14 @@ word_ACE7	dw 0FFFFh,  0A1h,  0A2h,  0A4h ; DATA XREF: Goal_ExecuteAction_A8AC+61
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en
-; cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si
-; [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs
-; rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise
-; (Vector_NormalizeInPlace_5593A = normalisation) et la multiplie par 0x753000 (30000 en 24.8)
-; : point a 30000 unites dans une direction aleatoire. Altitude : Terrain_QueryAltitudeAt +
-; entite+0x13D (altitude de croisiere NUMS) - altitude actuelle (objet +0x102, +0x1A), bornee
-; a +/-1000 puis ajoutee a la position courante. Ecrit le point dans le bloc d'etat commun
-; ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction * entite+0x141) en
-; +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface l'octet +0xC du
-; noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1. Appelee par
-; Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler.
+; far, 246L, RELUE 2026-09-27. Gestionnaire GOAL 3 (off_6D198), aussi appele par
+; Goal_ExecuteAction_A8AC et AI_EngageAttackerReaction_E246. Renvoie toujours 1. (1)
+; Comportement en cours (+0x0D) -> sa methode +0xC. (2) Si le dernier comportement termine
+; (+0x19) est l'ID21 (0x15) et que le point n'a pas ete atteint (bloc +0x1A == 0) : reapplique
+; l'ID21 avec le meme bloc. Sinon : dir = normalise(rand()%20000-10000, rand()%20000-10000, 0)
+; ; P = moi + dir*30000 m, altitude = moi + borne(terrain sous moi + +0x13D - mon altitude,
+; +/-1000 m) ; W = dir * +0x141 ; +0x11F = P. (3) Noeud ID21 (+0xD1), minuteur de contexte 30
+; s (0x1E00, ecrase le 0x200 initial).
 ; ==============================================================================================
 Goal_WanderRandom	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+42Fp
 					; AI_EngageAttackerReaction_E246+34FP
@@ -1511,8 +1519,12 @@ Goal_WanderRandom	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,305L — handler GOAL utilisant un champ route/waypoint (+0x145→+0x51), teste un flag
-; pilote (+0x75 bit5) : probable handler flyToWaypoint suivant une liste de points de passage.
+; far, 305L, LUE 2026-09-27. REJOINTE DU LEADER. Comportement en cours -> son tick. Leader
+; ejecte -> oublie. Leader a plus de 333 m du sol : noeud fixe entite+0xD5 (ID7, poursuite)
+; applique avec contexte (leader, &poste, 2,0) - l'ID7 poursuit le leader lui-meme
+; (AI_InterceptDispatcher), le poste n'est pas relu. Sinon : bloc de commandes +2 = leader +
+; 1000 m, +0x0E = nez du leader * 200 + vitesse du leader, noeud entite+0xD1 (ID21, pilote
+; automatique).
 ; ==============================================================================================
 Goal_FollowWaypoints	proc far		; CODE XREF: Goal_SelectTransition+24EP
 					; Goal_FollowAllyExec+1D0P
@@ -1826,8 +1838,15 @@ Goal_FollowWaypoints	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,229L — handler GOAL utilisant la position/vitesse propre (+0x11F) en absence de cible :
-; probable handler 'return to base'/'orbit point' (variante sans cible).
+; far, 229L, LUE 2026-09-27. EXECUTION DES ORDRES 0xA5 (vol vers un point, FLY_TO_WP) et 0xA4,
+; appelee par Goal_ExecuteAction_A8AC. Comportement en cours (+0x0D) -> sa methode +0xC. Sinon
+; : bloc de commandes P = +0x11F (spot[param1]), drapeau 'point atteint' +0x1A = 0 ; W (+0x0E)
+; = +0x12B (spot[param2], 2e operande = opcode 9 suivant ; absent -> (0,0,0)) pour 0xA4/0xA5,
+; sinon direction vers P * +0x141 ; noeud ID21 (+0xD1) avec minuteur de contexte 2 s (0x200).
+; Donnees : le 2e spot des 80 FLY_TO_WP de l'IA est un vecteur vitesse (zone 0xFFFF), ex.
+; (0,100,0) m/s = vitesse et cap voulus a l'arrivee ; les 121 FLY_TO_WP sans opcode 9 sont
+; tous dans des scripts du joueur. Fin (Goal_IsComplete) : distance horizontale <= 500 m. Nom
+; historique trompeur (pas de retour a la base).
 ; ==============================================================================================
 Goal_ReturnToBase	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+129p
 
@@ -2065,9 +2084,12 @@ Goal_ReturnToBase	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,269L — handler GOAL utilisant la vitesse d'un objet référence (vtable+0x3C+0xC), teste
-; un type d'objet (+0x6B==9, probable porte-avions) et une position de formation (+0x14A) :
-; probable handler followAlly/formation flying.
+; far, 269L, LUE 2026-09-27. POSTE EN FORMATION (monde) : (a, b, c) = entite+0x14A (cote,
+; avant, haut) si voix +0x6B == 9 (octet SPCH du RADI du profil), ou camp != joueur
+; (objet+0x50 != 1), ou byte_6E4CD (adversaire actif) ; sinon (300, -200, 50) m. S =
+; normalise(N.c1, -N.c0, 0), U = S x N, a de signe tel que le poste reste du cote ou se trouve
+; deja l'ailier (Angle_DeltaNormalized_A(N, ailier - leader) < 0 -> -|a|). Poste = S*a + N*b +
+; U*c ; si hauteur-sol du leader + composante verticale < 500 m, composante verticale = 500 m.
 ; ==============================================================================================
 Goal_FollowAllyFormation	proc far		; CODE XREF: Formation_GuidanceSolution+F8P
 

@@ -110,7 +110,7 @@ unk_6D1B8	db    0			; DATA XREF: AIEntity_Construct_74B43+1AFo
 off_6D1D0	dd Goal_SetObjective_A307
 off_6D1D4	dd loc_8142
 		dd AI_ProximityRadioCalloutTrigger_A002
-		dd AI_PropagateAircraftFlagsAndFollowGate_A1DF
+		dd AIEntity_OnBehaviorEnded_A1DF
 		dd loc_1297E
 		dd loc_129D7
 		dd VROOMM_StubThunk_6AAE4
@@ -234,18 +234,18 @@ word_6D3BC	dw 0			; DATA XREF: seg003:0E1Cw seg003:0E38r ...
 dword_6D3BE	dd 0			; DATA XREF: seg004:loc_A2FCw
 					; seg010:04F9w	...
 		dd GenericSmallObject_Destructor_B8C1
-		dd loc_11BED
-		dd loc_11D03
-		dd loc_1208C
+		dd TakeoffBehavior_Init_11BED
+		dd TakeoffBehavior_Start_11D03
+		dd TakeoffBehavior_Tick_1208C
 off_6D3D2	dd MVRS_SharedDefaultTickNoOp_ED16
 		dd GenericSmallObject_Destructor_B90A
 		dd VROOMM_StubThunk_6ABA3
 		dd VROOMM_StubThunk_6ABA8
 off_6D3E2	dd VROOMM_StubThunk_6AB9E
 		dd MVRS_SharedDefaultTickNoOp_ED16
-aLandgear_0	db 'LANDGEAR',0         ; DATA XREF: AITargeting_RenderThreatList_75746+10Fo
-aLandingGearDam	db 'Landing Gear Damaged',0 ; DATA XREF: AITargeting_RenderThreatList_75746+14Bo
-aLanding	db 'LANDING',0          ; DATA XREF: AITargeting_UpdateAndRender_75C18+95o
+aLandgear_0	db 'LANDGEAR',0         ; DATA XREF: LandingBehavior_Start_75746+10Fo
+aLandingGearDam	db 'Landing Gear Damaged',0 ; DATA XREF: LandingBehavior_Start_75746+14Bo
+aLanding	db 'LANDING',0          ; DATA XREF: LandingBehavior_Tick_75C18+95o
 aTakeoff	db 'TAKEOFF',0          ; DATA XREF: seg009:01C1o
 		dd PilotProfile_LoadATRB_12E47
 off_6D41C	dd AIEntity_CreateByType_12B4E
@@ -346,10 +346,10 @@ off_6D540	dd VROOMM_StubThunk_6BC35
 		dd VROOMM_StubThunk_6AC20
 		dd TrackedObject_NotifyWorldObjects_2DFE4
 byte_6D558	db 0			; DATA XREF: WorldObject_UpdateWithAIEntity_3D9FB:loc_3DA13r
-					; UIScript_ParseAndEvaluate_7A054:loc_7A456w	...
+					; Autopilot_JumpSequence_7A054:loc_7A456w	...
 byte_6D559	db 1			; DATA XREF: Expr_VM_Interpreter_51106+A2Aw
 					; UIScreen_RenderOrLayoutList_54503:loc_5451Br	...
-aAutopilt	db 'AUTOPILT',0         ; DATA XREF: UIScript_ParseAndEvaluate_7A054+408o
+aAutopilt	db 'AUTOPILT',0         ; DATA XREF: Autopilot_JumpSequence_7A054+408o
 		align 2
 unk_6D564	db    0			; DATA XREF: MissionRecord_LoadEntityDatabase_7B035+2DCo
 		db    0
@@ -2371,7 +2371,7 @@ off_6F366	dd loc_3B4FB
 		dd VROOMM_StubThunk_6CBE2
 		dd JDYN_UpdateDamageGains_494DD
 off_6F372	dd loc_49050
-off_6F376	dd loc_47FF8
+off_6F376	dd JDYN_TotalMass_47FF8
 off_6F37A	dd loc_491B7
 off_6F37E	dd loc_4AF1C
 off_6F382	dd loc_4B093
@@ -2482,15 +2482,15 @@ off_6F530	dd loc_45FCA
 off_6F534	dd loc_45FC3
 		dd Debris_SpawnOrchestrator
 off_6F53C	dd VROOMM_StubThunk_6C5AF
-off_6F540	dd loc_42F71
+off_6F540	dd MissileModel_TestInRange_42F71
 off_6F544	dd loc_45CEA
 off_6F548	dd loc_42D04
 off_6F54C	dd VROOMM_StubThunk_6C535
 off_6F550	dd loc_42CFD
 off_6F554	dd Debris_SpawnOrchestrator
 		dd VROOMM_StubThunk_6C5AF
-		dd loc_42F71
-off_6F560	dd loc_42E80
+		dd MissileModel_TestInRange_42F71
+off_6F560	dd WeaponModel_InitialVelocityZero_42E80
 		dd loc_45BC2
 		dd VROOMM_StubThunk_6C6D5
 		dd loc_45BBB
@@ -2531,14 +2531,14 @@ off_6F5F4	dd VROOMM_StubThunk_6C5AA
 off_6F5F8	dd loc_4333C
 off_6F5FC	dd Debris_SpawnOrchestrator
 off_6F600	dd VROOMM_StubThunk_6C5AF
-off_6F604	dd loc_42F71
-off_6F608	dd loc_42E80
+off_6F604	dd MissileModel_TestInRange_42F71
+off_6F608	dd WeaponModel_InitialVelocityZero_42E80
 off_6F60C	dd loc_4D6A5
 off_6F610	dd loc_4D6F0
 off_6F614	dd loc_4D769
 off_6F618	dd loc_4DEB2
 		dd loc_4DECF
-		dd loc_42F71
+		dd MissileModel_TestInRange_42F71
 off_6F624	dd loc_4D770
 		dd loc_3C8F6
 		dd loc_3C996
@@ -3551,15 +3551,15 @@ byte_70477	db 0			; DATA XREF: Cockpit_ViewPanTransitionMain_15B67:loc_15E79r
 byte_70478	db 1			; DATA XREF: seg020:loc_17931w
 					; UIScreen_ComputeDerivedFields_503EB:loc_503FEr	...
 word_70479	dw 0			; DATA XREF: Debris_SpawnOrchestrator:loc_3868Bw
-					; HUD_RenderSymbologyMain:loc_3E8D1r	...
+					; WeaponSystem_LaunchFromStation_3E744:loc_3E8D1r	...
 word_7047B	dw 0			; DATA XREF: Debris_SpawnOrchestrator+64w
-					; HUD_RenderSymbologyMain+E84r ...
+					; WeaponSystem_LaunchFromStation_3E744+E84r ...
 word_7047D	dw 0			; DATA XREF: Debris_SpawnOrchestrator+4Bw
-					; HUD_RenderSymbologyMain+187r ...
+					; WeaponSystem_LaunchFromStation_3E744+187r ...
 word_7047F	dw 0			; DATA XREF: Debris_SpawnOrchestrator+32w
-					; HUD_RenderSymbologyMain+BDDr ...
+					; WeaponSystem_LaunchFromStation_3E744+BDDr ...
 word_70481	dw 0			; DATA XREF: Debris_SpawnOrchestrator:loc_38672w
-					; HUD_RenderSymbologyMain:loc_3F327r	...
+					; WeaponSystem_LaunchFromStation_3E744:loc_3F327r	...
 word_70483	dw 0			; DATA XREF: Emitter_UpdateFromEntitySMOKVec_3D57E:loc_3D5A0r
 					; Emitter_UpdateFromEntitySMOKVec_3D57E+426r ...
 dword_70485	dd 0			; DATA XREF: seg019:021Cr
@@ -8277,12 +8277,12 @@ byte_72356	db 0			; DATA XREF: Collision_NarrowPhaseTest:loc_44AB0r
 					; UIScreen_BuildWidgetTree_Recurse_53D92:loc_53F3Fr	...
 byte_72357	db 0			; DATA XREF: Player_MainUpdate+2F4w
 					; ResourceFile_Helper_90923+13Dw ...
-byte_72358	db 0			; DATA XREF: HUD_RenderSymbologyMain+14Er
-					; HUD_RenderSymbologyMain+681r ...
-byte_72359	db 0			; DATA XREF: HUD_RenderSymbologyAlt:loc_4086Er
+byte_72358	db 0			; DATA XREF: WeaponSystem_LaunchFromStation_3E744+14Er
+					; WeaponSystem_LaunchFromStation_3E744+681r ...
+byte_72359	db 0			; DATA XREF: WeaponSystem_FrameUpdate_3F8C0:loc_4086Er
 					; UIScreen_BuildWidgetTree_Recurse_53D92:loc_53F57r	...
-byte_7235A	db 0			; DATA XREF: HUD_RenderSymbologyAlt+A50r
-					; HUD_RenderSymbologyAlt+B62r ...
+byte_7235A	db 0			; DATA XREF: WeaponSystem_FrameUpdate_3F8C0+A50r
+					; WeaponSystem_FrameUpdate_3F8C0+B62r ...
 byte_7235B	db 0			; DATA XREF: seg030:loc_1D2EEr
 					; seg030:0B54r	...
 byte_7235C	db 0			; DATA XREF: seg030:loc_1DFF2r
@@ -8296,7 +8296,7 @@ word_7235F	dw 0			; DATA XREF: PilotProfile_RescaleSkillByDifficulty_12FC9+Cr
 byte_72361	db 0			; DATA XREF: seg027:0130r
 					; ResourceFile_Helper_90923+16Bw
 byte_72362	db 0			; DATA XREF: seg022:032Er seg022:045Ar ...
-byte_72363	db 0			; DATA XREF: HUD_RenderSymbologyAlt:loc_401F8r
+byte_72363	db 0			; DATA XREF: WeaponSystem_FrameUpdate_3F8C0:loc_401F8r
 					; UIScreen_BuildWidgetTree_Recurse_53D92:loc_53FBAr	...
 byte_72364	db 0			; DATA XREF: Cockpit_ViewPanTransitionMain_15B67:loc_15BD0r
 					; UIScreen_BuildWidgetTree_Recurse_53D92:loc_53FC5r	...

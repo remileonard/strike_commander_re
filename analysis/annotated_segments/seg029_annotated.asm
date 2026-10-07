@@ -461,7 +461,7 @@ Lexer_Rewind	endp
 ; de token).
 ; ==============================================================================================
 Parser_LookaheadPattern	proc far		; CODE XREF: Weapon_HUDBox_UpdateAndRender_5923A+96P
-					; UIScript_ParseAndEvaluate_7A054+EBP
+					; Autopilot_JumpSequence_7A054+EBP
 
 arg_0		= word ptr  6
 
@@ -519,7 +519,7 @@ Parser_LookaheadPattern	endp
 ; parseur).
 ; ==============================================================================================
 Parser_ConsumeRemaining	proc far		; CODE XREF: Compiler_EmitByTokenType+1C6p
-					; UIScript_ParseAndEvaluate_7A054+740P
+					; Autopilot_JumpSequence_7A054+740P
 
 arg_0		= word ptr  6
 
@@ -964,7 +964,7 @@ Lexer_ResolveConstantAlt	endp
 ; correspondant à arg_2 : recherche de doublon/valeur existante dans une liste de symboles
 ; (détection de redéfinition).
 ; ==============================================================================================
-Parser_FindDuplicateSymbol	proc far		; CODE XREF: Render_DrawComplexShape_7EDCA+68DP
+Parser_FindDuplicateSymbol	proc far		; CODE XREF: NavMap_DrawMissionObjects_7EDCA+68DP
 
 var_4		= word ptr -4
 var_1		= byte ptr -1

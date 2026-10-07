@@ -1721,7 +1721,7 @@ loc_44C7E:				; CODE XREF: Collision_SelectCandidates+A5j
 		push	ss
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	Gauge_ComputeNeedlePosition
+		call	Aircraft_GroundClearance_3E5A6
 		add	sp, 6
 		mov	eax, [bp+var_A]
 		add	eax, [bp+var_1C]

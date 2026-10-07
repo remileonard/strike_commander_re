@@ -1646,7 +1646,10 @@ PartEntry_ResetState_A9DFD	endp
 ; resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des
 ; champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non
 ; elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point
-; ouvert).
+; ouvert). | 2026-09-27 : enregistrement PART de 62 octets : +0x1C octet 28, +0x21/+0x25/+0x29
+; dwords 29/33/37, +0x2D/+0x2F mots 41/43, +0x31 octet 45, +0x32 octet 46 = ALLIE PAR DEFAUT
+; de l'ordre 'suivre', +0x33/+0x35/+0x37 mots 48/50/52 = POSTE (cote, avant, haut, m) de
+; l'ordre 'suivre', 4 programmes mots 54..60.
 ; ==============================================================================================
 PartEntry_LoadAndResolveNames_A9E3C	proc far		; CODE XREF: VROOMM_StubThunk_6CF1CJ PartEntry_AllocateArray_AA23D+6Fp
 

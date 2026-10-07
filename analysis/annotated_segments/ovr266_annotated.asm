@@ -8,7 +8,10 @@ ovr266		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; ⚠️ far, 232 lignes, NON DÉTAILLÉE — combine Joystick_GetButtonRawByte_67B82 (×2, seg208),
-; allocateur typé, Mouse_InitAndRead — lecture combinée des contrôles cockpit.
+; allocateur typé, Mouse_InitAndRead — lecture combinée des contrôles cockpit. | LU 2026-10-03
+; (fin) : parcourt la liste 0x59C3 et applique PilotProfile_RescaleSkillByDifficulty_12FC9 au
+; profil (entite +0x55, +0x1A) de chaque avion (categorie 6) du camp 0xFF : application de
+; l'option de difficulte.
 ; ==============================================================================================
 Cockpit_ReadControlsFrame_8F720	proc far		; CODE XREF: VROOMM_StubThunk_6B7ADJ Config_ReadSettingsField_8FBE7+65p	...
 

@@ -131,7 +131,10 @@ PagedResourceB_TreeSearchRecursive_5D482	endp
 
 ; ==============================================================================================
 ; far, implémentation de l'écriture pour la classe PagedResourceB (seg129) — gestion d'erreur
-; via sub_6B70F. Référencée par PagedResourceB_Method_Write_5C2CF.
+; via sub_6B70F. Référencée par PagedResourceB_Method_Write_5C2CF. | 2026-09-26 : c'est
+; l'ALLOCATION du tas de blocs (paragraphes, liste libre word_70E28) utilisee par
+; Memory_TypedFreeWrapper_5C6F3 pour l'allocateur d'index 2 (PagedResourceB) ; la memoire
+; rendue N'EST PAS mise a zero.
 ; ==============================================================================================
 PagedResourceB_Write_5D555	proc far		; CODE XREF: seg129:002CP
 					; PagedResourceB_Read_5D90E+1Bp

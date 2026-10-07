@@ -113,7 +113,7 @@ loc_54F4D:				; CODE XREF: seg116:0089j
 ; sommer les carrés et appeler Math_Sqrt_54BF1, puis rétablit l'échelle du résultat.
 ; Référencée par Formation_GuidanceSolution (sub_D081) et sub_DD21.
 ; ==============================================================================================
-Math_VectorLength3D_Scaled_54F57	proc far		; CODE XREF: Formation_GuidanceSolution+E8P AI_VisibilityTest+BBP ...
+Math_VectorLength3D_Scaled_54F57	proc far		; CODE XREF: Formation_GuidanceSolution+E8P AI_CollisionCourseTest_DD21+BBP ...
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -435,7 +435,8 @@ Vector_CrossProduct3D_550B7	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B.
+; far, LUE 2026-10-02. (sortie, v, axe) : projection de v sur l'axe normalise : axe_n x dot(v,
+; axe_n).
 ; ==============================================================================================
 Targeting_ComputeGeometryHelperB_5517F	proc far		; CODE XREF: AI_InterceptSpeedControlLaw+EDP
 					; MVRS_BuildCombatContext_E5A4+414P ...
@@ -805,8 +806,8 @@ Math_ElevationAngle_552E1	endp
 ; vrais noms des arcs, ce qui confirme leur inversion. En libRealSpace (Y-up, libRS.z =
 ; asm.c1) : atan2(x, z).
 ; ==============================================================================================
-Math_HeadingAngle_553CF	proc far		; CODE XREF: AI_ManeuverSolution_Major+F7P
-					; AI_ManeuverSolution_Major+109P ...
+Math_HeadingAngle_553CF	proc far		; CODE XREF: AI_GunSnapAim_6977+F7P
+					; AI_GunSnapAim_6977+109P ...
 
 var_48		= dword	ptr -48h
 var_44		= dword	ptr -44h
@@ -1608,8 +1609,8 @@ Vector_NormalizeInPlace_5593A	endp
 ; (Matrix_ApplyToVectorX/Y/Z, 3x chacun = orthonormalisation) et par
 ; Aero_ComputeDragWithFeedback (direction de traînée).
 ; ==============================================================================================
-Vector_Normalize3D_559BB	proc far		; CODE XREF: AI_ManeuverSolution_Major+B3P
-					; AI_ManeuverSolution_Major+2D4P ...
+Vector_Normalize3D_559BB	proc far		; CODE XREF: AI_GunSnapAim_6977+B3P
+					; AI_GunSnapAim_6977+2D4P ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -3919,7 +3920,7 @@ Map_ApplyRotationTransform_56DC5	endp
 ; PhysicsTicks (seg103) pour extraire une copie de travail de l'orientation avant les helpers
 ; géométriques (Targeting_ComputeGeometryHelperB_5517F, Matrix_NosePitchAngle_57C3A).
 ; ==============================================================================================
-AI_ComputeGeometryHelper_56E29	proc far		; CODE XREF: AI_ManeuverSolution_Major+34AP
+AI_ComputeGeometryHelper_56E29	proc far		; CODE XREF: AI_GunSnapAim_6977+34AP
 					; seg014:003BP	...
 
 arg_0		= word ptr  6
@@ -4926,7 +4927,7 @@ Matrix_OrthonormalizeKeepRow0_575DF	endp
 ; 0 = Vector_CrossProduct3D_550B7(ligne 1, ligne 2), puis Vector_Normalize3D_559BB sur les
 ; trois lignes.
 ; ==============================================================================================
-Matrix_OrthonormalizeKeepRow1_57660	proc far		; CODE XREF: AI_ManeuverSolution_Major+3EFP
+Matrix_OrthonormalizeKeepRow1_57660	proc far		; CODE XREF: AI_GunSnapAim_6977+3EFP
 					; Formation_GuidanceSolution+8CDP ...
 
 var_18		= dword	ptr -18h
@@ -5668,8 +5669,8 @@ loc_57B8A:				; CODE XREF: seg116:2CC1j
 ; Math_ElevationAngle_552E1(ligne 1 de la matrice d'orientation arg_4, +0x0C) -> *arg_0.
 ; Degres 24.8, signe (+ = nez au-dessus de l'horizontale).
 ; ==============================================================================================
-Matrix_NosePitchAngle_57C3A	proc far		; CODE XREF: FlightState_EnterLevelFlight+83P
-					; Altitude_HoldController+31P ...
+Matrix_NosePitchAngle_57C3A	proc far		; CODE XREF: Takeoff_Phase3_LevelOff_125EC+83P
+					; AI_PitchAttitudeHold_126CC+31P ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -5710,7 +5711,11 @@ Matrix_NosePitchAngle_57C3A	endp
 ; Math_DotProduct3D_5505B(h, normale) / |h| ; |h| == 0 (nez vertical) -> 90 deg ; sinon roulis
 ; = 90 - Math_AcosOfRatio_54A0E(r) = asin(r). Si la normale pointe vers le bas (c2 < 0, dos) :
 ; roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans
-; ]-180, 180].
+; ]-180, 180]. | MESURE DOSBox 2026-09-26 (F-16 joueur, seul avion) : a 90 deg de roulis pile,
+; la fonction renvoie 0 (cas normale.c2 == 0 en 24.8, c.-a-d. |c2| < 1/256) -> dans
+; Aero_ComputeAoACommand_48862 |cos| = 1,0, la consigne garde alpha (-2,98 deg), servo
+; inactif, 0,0 G au HUD ; a ~60 deg elle renvoie le vrai angle (|cos| = 0x79 = 0,47). Ce cas
+; particulier est ce qui fait que l'avion sur la tranche ne tourne pas.
 ; ==============================================================================================
 Matrix_RollAngle_57C67	proc far		; CODE XREF: seg002:0EF0P AI_Sensor_RollAngle_58F4+52P ...
 

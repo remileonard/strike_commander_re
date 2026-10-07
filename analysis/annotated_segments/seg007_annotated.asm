@@ -8,11 +8,17 @@ seg007		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,291L — calcule position/vitesse relatives entre deux objets, utilise sub_464BE (probable
-; test d'angle/cône de vision) : test 'objet visible/dans le champ de vision' pour
-; l'acquisition de cible.
+; far, 291L, LUE 2026-10-02. Ex-'AI_VisibilityTest' (faux : ce n'est pas un test de
+; visibilite). TEST DE COLLISION entre l'entite (son objet +0x02) et un autre avion (arg_4). D
+; = ma position - la sienne, dist = |D| (Math_VectorLength3D_Scaled_54F57) ; Vrel = sa vitesse
+; - la mienne (methode +0x4C des objets) ; E = angle entre Vrel et D
+; (Targeting_ComputeBearingElevation_55B1A). VRAI si dist < 80 m (cmp 5000h), ou si |Vrel| >
+; 0, E < 90 deg (5A00h), dist*sin(E) < 80 m (distance de passage) et dist*cos(E) <= 4,0 s
+; (0x400) * |Vrel| (rapprochement en moins de 4 s). Si vrai :
+; AI_ProximityGeometricWarning_315B (manoeuvre d'evitement par le noeud ID20 +0xC1) et niveau
+; de reaction +0x27F = 3. Appelee par AI_ScanCollisionThreats_DF99 et seg008.
 ; ==============================================================================================
-AI_VisibilityTest	proc far		; CODE XREF: AI_ScanForNewTarget+A8p seg008:2930P
+AI_CollisionCourseTest_DD21	proc far		; CODE XREF: AI_ScanCollisionThreats_DF99+A8p seg008:2930P
 
 var_9E		= dword	ptr -9Eh
 var_9A		= dword	ptr -9Ah
@@ -164,15 +170,15 @@ loc_DD22:				; DATA XREF: seg216:00F6o
 		jmp	short loc_DE79
 ; ���������������������������������������������������������������������������
 
-loc_DE77:				; CODE XREF: AI_VisibilityTest+14Fj
+loc_DE77:				; CODE XREF: AI_CollisionCourseTest_DD21+14Fj
 		xor	ax, ax
 
-loc_DE79:				; CODE XREF: AI_VisibilityTest+154j
+loc_DE79:				; CODE XREF: AI_CollisionCourseTest_DD21+154j
 		or	al, al
 		jz	short loc_DE81
 		mov	[bp+var_1], 1
 
-loc_DE81:				; CODE XREF: AI_VisibilityTest+15Aj
+loc_DE81:				; CODE XREF: AI_CollisionCourseTest_DD21+15Aj
 		lea	ax, [bp+var_7A]
 		push	ax
 		push	ss
@@ -186,16 +192,16 @@ loc_DE81:				; CODE XREF: AI_VisibilityTest+15Aj
 		jmp	short loc_DEA0
 ; ���������������������������������������������������������������������������
 
-loc_DE9E:				; CODE XREF: AI_VisibilityTest+176j
+loc_DE9E:				; CODE XREF: AI_CollisionCourseTest_DD21+176j
 		xor	ax, ax
 
-loc_DEA0:				; CODE XREF: AI_VisibilityTest+17Bj
+loc_DEA0:				; CODE XREF: AI_CollisionCourseTest_DD21+17Bj
 		or	al, al
 		jnz	short loc_DEA7
 		jmp	loc_DF6F
 ; ���������������������������������������������������������������������������
 
-loc_DEA7:				; CODE XREF: AI_VisibilityTest+181j
+loc_DEA7:				; CODE XREF: AI_CollisionCourseTest_DD21+181j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -203,23 +209,23 @@ loc_DEA7:				; CODE XREF: AI_VisibilityTest+181j
 		jmp	loc_DF6F
 ; ���������������������������������������������������������������������������
 
-loc_DEB3:				; CODE XREF: AI_VisibilityTest+18Dj
+loc_DEB3:				; CODE XREF: AI_CollisionCourseTest_DD21+18Dj
 		cmp	[bp+var_E], 5A00h
 		jge	short loc_DEC2
 		mov	ax, 1
 		jmp	short loc_DEC4
 ; ���������������������������������������������������������������������������
 
-loc_DEC2:				; CODE XREF: AI_VisibilityTest+19Aj
+loc_DEC2:				; CODE XREF: AI_CollisionCourseTest_DD21+19Aj
 		xor	ax, ax
 
-loc_DEC4:				; CODE XREF: AI_VisibilityTest+19Fj
+loc_DEC4:				; CODE XREF: AI_CollisionCourseTest_DD21+19Fj
 		or	al, al
 		jnz	short loc_DECB
 		jmp	loc_DF6F
 ; ���������������������������������������������������������������������������
 
-loc_DECB:				; CODE XREF: AI_VisibilityTest+1A5j
+loc_DECB:				; CODE XREF: AI_CollisionCourseTest_DD21+1A5j
 		lea	ax, [bp+var_E]
 		push	ax
 		push	ss
@@ -240,10 +246,10 @@ loc_DECB:				; CODE XREF: AI_VisibilityTest+1A5j
 		jmp	short loc_DF09
 ; ���������������������������������������������������������������������������
 
-loc_DF07:				; CODE XREF: AI_VisibilityTest+1DFj
+loc_DF07:				; CODE XREF: AI_CollisionCourseTest_DD21+1DFj
 		xor	ax, ax
 
-loc_DF09:				; CODE XREF: AI_VisibilityTest+1E4j
+loc_DF09:				; CODE XREF: AI_CollisionCourseTest_DD21+1E4j
 		or	al, al
 		jz	short loc_DF6F
 		lea	ax, [bp+var_E]
@@ -274,16 +280,16 @@ loc_DF09:				; CODE XREF: AI_VisibilityTest+1E4j
 		jmp	short loc_DF67
 ; ���������������������������������������������������������������������������
 
-loc_DF65:				; CODE XREF: AI_VisibilityTest+23Dj
+loc_DF65:				; CODE XREF: AI_CollisionCourseTest_DD21+23Dj
 		xor	ax, ax
 
-loc_DF67:				; CODE XREF: AI_VisibilityTest+242j
+loc_DF67:				; CODE XREF: AI_CollisionCourseTest_DD21+242j
 		or	al, al
 		jz	short loc_DF6F
 		mov	[bp+var_1], 1
 
-loc_DF6F:				; CODE XREF: AI_VisibilityTest+183j
-					; AI_VisibilityTest+18Fj ...
+loc_DF6F:				; CODE XREF: AI_CollisionCourseTest_DD21+183j
+					; AI_CollisionCourseTest_DD21+18Fj ...
 		cmp	[bp+var_1], 0
 		jz	short loc_DF92
 		lea	ax, [bp+var_4A]
@@ -296,13 +302,13 @@ loc_DF6F:				; CODE XREF: AI_VisibilityTest+183j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+27Fh], 3
 
-loc_DF92:				; CODE XREF: AI_VisibilityTest+252j
+loc_DF92:				; CODE XREF: AI_CollisionCourseTest_DD21+252j
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-AI_VisibilityTest	endp
+AI_CollisionCourseTest_DD21	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -310,12 +316,15 @@ AI_VisibilityTest	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,97L — appelé par sub_814C : itère sur la liste des objets du monde (sub_224DA, filtre
-; type 0x59C3), ignore soi-même, vérifie état 'détruit' (vtable[8]==6), teste chaque candidat
-; via sub_DD21 : boucle de balayage/acquisition de nouvelle cible parmi tous les objets du
-; monde.
+; far, 97L, LUE 2026-10-02. Ex-'AI_ScanForNewTarget' (faux : ne cherche pas de cible). Etape 3
+; de AI_TopLevelThink. Comportement en cours et +0x27F == 3 (evitement en cours) : sa methode
+; +0xC, renvoie 1. Autre comportement en cours : renvoie 0. Sinon +0x27F == 3 remis a 0, puis
+; parcours de TOUS les objets du monde (liste 59C3h) : avion (modele +0x11 == 1, categorie 6
+; JETP), sauf moi, amis compris : AI_CollisionCourseTest_DD21 ; arret au premier vrai,
+; renvoye. C'est l'EVITEMENT DE COLLISION entre avions (niveau 3), pas une recherche de cible
+; ; non porte dans libRealSpace (REACT_NEW_TARGET est un nom faux).
 ; ==============================================================================================
-AI_ScanForNewTarget	proc far		; CODE XREF: AI_TopLevelThink+270P
+AI_ScanCollisionThreats_DF99	proc far		; CODE XREF: AI_TopLevelThink+270P
 
 var_E		= word ptr -0Eh
 var_C		= dword	ptr -0Ch
@@ -344,24 +353,24 @@ arg_0		= dword	ptr  6
 		jmp	loc_E066
 ; ���������������������������������������������������������������������������
 
-loc_DFD8:				; CODE XREF: AI_ScanForNewTarget+1Cj AI_ScanForNewTarget+24j
+loc_DFD8:				; CODE XREF: AI_ScanCollisionThreats_DF99+1Cj AI_ScanCollisionThreats_DF99+24j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+0Dh], 0
 		jz	short loc_DFE6
 		jmp	loc_E066
 ; ���������������������������������������������������������������������������
 
-loc_DFE6:				; CODE XREF: AI_ScanForNewTarget+48j
+loc_DFE6:				; CODE XREF: AI_ScanCollisionThreats_DF99+48j
 		cmp	byte ptr es:[bx+27Fh], 3
 		jnz	short loc_DFF4
 		mov	byte ptr es:[bx+27Fh], 0
 
-loc_DFF4:				; CODE XREF: AI_ScanForNewTarget+53j
+loc_DFF4:				; CODE XREF: AI_ScanCollisionThreats_DF99+53j
 		mov	[bp+var_8], 0
 		jmp	short loc_E04A
 ; ���������������������������������������������������������������������������
 
-loc_DFFB:				; CODE XREF: AI_ScanForNewTarget+CBj
+loc_DFFB:				; CODE XREF: AI_ScanCollisionThreats_DF99+CBj
 		mov	si, [bp+var_8]
 		push	si
 		mov	bx, [si]
@@ -389,11 +398,11 @@ loc_DFFB:				; CODE XREF: AI_ScanForNewTarget+CBj
 		push	[bp+var_E]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_VisibilityTest
+		call	near ptr AI_CollisionCourseTest_DD21
 		add	sp, 6
 		mov	[bp+var_1], al
 
-loc_E04A:				; CODE XREF: AI_ScanForNewTarget+60j AI_ScanForNewTarget+76j ...
+loc_E04A:				; CODE XREF: AI_ScanCollisionThreats_DF99+60j AI_ScanCollisionThreats_DF99+76j ...
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -406,12 +415,12 @@ loc_E04A:				; CODE XREF: AI_ScanForNewTarget+60j AI_ScanForNewTarget+76j ...
 		or	ax, ax
 		jnz	short loc_DFFB
 
-loc_E066:				; CODE XREF: AI_ScanForNewTarget+3Cj AI_ScanForNewTarget+4Aj ...
+loc_E066:				; CODE XREF: AI_ScanCollisionThreats_DF99+3Cj AI_ScanCollisionThreats_DF99+4Aj ...
 		mov	al, [bp+var_1]
 		pop	si
 		leave
 		retf
-AI_ScanForNewTarget	endp
+AI_ScanCollisionThreats_DF99	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -650,7 +659,14 @@ AI_StallRecoveryReflex_E159	endp
 ; modele (+0x52) >= 9 : abandon d'une navigation ID 21 en cours, combat
 ; (AI_BehaviorStateMachine_WeightedOptionSelector_9D05), renvoie 1. (4c) Sinon, rien en cours
 ; et objectif aucun / 0xA5 / 0xA4 : bloc de commandes +0x1A = 1, bit 5 de +0x28B efface,
-; Goal_WanderRandom. Renvoie 1 seulement en 4b.
+; Goal_WanderRandom. Renvoie 1 seulement en 4b. | RELU 2026-10-02 (fin) : (4b) hors suivi
+; (+0x11D != 0xAA) ET octet +0x52 du modele de MON avion >= 9 (chunk JINF, 'classe de combat'
+; : F-15/F-16/F-18/MiG-29/Su-27/Tornado 11, F-22/YF-23 12, Mirage 10, MiG-21 9 ; A-10 8,
+; 747/AWACS 5, Tu-20 4, C-130 2, Learjet 1) : si le comportement en cours est l'ID21 (tag
+; 0x15) il est abandonne, puis AI_BehaviorStateMachine_WeightedOptionSelector_9D05(entite, 0),
+; renvoie 1. (4c) sinon, rien en cours et objectif 0xFFFF / 0xA5 / 0xA4 : bloc +0x1A = 1 et
+; bit 5 de +0x28B POSE (and 0DFh puis or 20h ; l'ancien resume disait efface),
+; Goal_WanderRandom ; renvoie 0.
 ; ==============================================================================================
 AI_EngageAttackerReaction_E246	proc far		; CODE XREF: AI_TopLevelThink+2FDP
 

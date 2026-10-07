@@ -442,9 +442,11 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
    `jdyn[0x4C]/0x4D` = constantes de cellule (calage/volets), pas des trims.
    `FlightControl_ComputeMomentA/B/C` renommés `Aero_FlowAngle_AoA/Sideslip` /
    `Aero_DynamicPressure` ; `Vector_TransformHelperB_559BB` = **normalisation**,
-   pas une rotation. **Reste** : ligne exacte des overrides vtable `+0x3C`
-   (masse ≈ chunk `DYNM`) et `+0x34` (position) dans la vtable JDYN primaire ;
-   3 u8 du chunk `THRS` (`+0x0E/0F/10`) ; `JDYN +0x80..0x8B`.
+   pas une rotation. **Tranché (2026-09-26)** : vtable JDYN (`0x228A`, base `seg339`
+   corrigée `0x6D0B0` → `0x6F33A`) : `+0x34` = `JDYN_UpdateDamageGains_494DD`,
+   `+0x3C` = `JDYN_TotalMass_47FF8` = **masse à vide `DYNM` + carburant + emport**
+   (diviseur des forces et `X` de la loi de charge) ; 3 u8 du chunk `THRS` = fractions
+   MIL / lapse / coupure ; `JDYN +0x80..0x8B` = paramètres IA, `+0x8A` jamais lu.
 6. ~~Rôle de la souris~~ **tranché** : contrôle de la vue 3D du cockpit
    (pas le pilotage), mutuellement exclusif avec les axes de vol via
    `word_71200`. Voir `DATA_MODEL.md §6.2`.

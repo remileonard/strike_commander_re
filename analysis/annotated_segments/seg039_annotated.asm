@@ -1349,7 +1349,7 @@ loc_224D6:				; CODE XREF: seg039:063Dj
 ; monde.
 ; ==============================================================================================
 World_IterateObjects	proc far		; CODE XREF: Targeting_AcquireBestThreat+A7AP
-					; AI_RadarScanTarget+FEP	...
+					; AI_WeaponRecoveryBusy_9027+FEP	...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1788,8 +1788,8 @@ Container_IterateFiltered	endp
 ; far,380L — grosse fonction du cluster conteneur/monde de jeu (buffer local 0x7C) — à
 ; approfondir en session dédiée.
 ; ==============================================================================================
-WorldObjects_Cluster_22795	proc far		; CODE XREF: HUD_RenderSymbologyAlt+9E7P
-					; HUD_RenderSymbologyAlt+A28P ...
+WorldObjects_Cluster_22795	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9E7P
+					; WeaponSystem_FrameUpdate_3F8C0+A28P ...
 
 var_7C		= dword	ptr -7Ch
 var_78		= dword	ptr -78h

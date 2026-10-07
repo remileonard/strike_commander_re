@@ -1339,8 +1339,8 @@ Debris_LoadAndInstantiateAlt	endp
 ; far,107L — invoque la création (vtable[4]) d'un débris déjà chargé référencé par un objet
 ; parent (+0xE) : instanciation d'un débris depuis un modèle pré-résolu attaché au parent.
 ; ==============================================================================================
-Debris_InstantiateFromParent	proc far		; CODE XREF: HUD_RenderSymbologyMain+857P
-					; TimedTrigger_SpawnAndBindGeometry_9E289:loc_9E362P
+Debris_InstantiateFromParent	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+857P
+					; WeaponSystem_ReleaseBomb_9E289:loc_9E362P
 
 var_6		= word ptr -6
 var_4		= dword	ptr -4

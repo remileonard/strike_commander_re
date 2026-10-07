@@ -507,8 +507,8 @@ VROOMM_StubThunk_6CF44	endp
 ; far, thunk fixe VROOMM (jmp sub_AA4BD) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF49	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+554P
-					; UIScript_ParseAndEvaluate_7A054+573P
+VROOMM_StubThunk_6CF49	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+554P
+					; Autopilot_JumpSequence_7A054+573P
 		jmp	MissionScenario_ResolveMultipleFields_AA4BD
 VROOMM_StubThunk_6CF49	endp
 

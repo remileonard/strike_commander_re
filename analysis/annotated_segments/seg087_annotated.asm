@@ -684,7 +684,7 @@ loc_3E419:				; DATA XREF: seg339:off_6F8F4o
 ; vtable[4]) et efface un flag (+0x67) : nettoyage/notification de destruction d'un sous-
 ; composant lié au pilotage.
 ; ==============================================================================================
-Pilot_NotifySubcomponentDestroy	proc far		; CODE XREF: HUD_RenderSymbologyMain+FD4P
+Pilot_NotifySubcomponentDestroy	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FD4P
 
 arg_0		= word ptr  6
 
@@ -722,7 +722,7 @@ Pilot_NotifySubcomponentDestroy	endp
 ; la chaîne sub_49242 déjà en cours d'investigation.
 ; ==============================================================================================
 Pilot_LowLevelControlCommand	proc far		; CODE XREF: Pilot_IssueControlCommand_79DA0+16BP
-					; UIScript_ParseAndEvaluate_7A054+3C6P ...
+					; Autopilot_JumpSequence_7A054+3C6P ...
 
 var_6		= dword	ptr -6
 arg_0		= word ptr  6
@@ -882,12 +882,17 @@ loc_3E5A3:				; CODE XREF: seg087:064Cj seg087:06A6j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,178L — calcule un angle via sin/cos (sub_57C67/sub_57C3A) avec des constantes fixes
-; (0x6D9/0x62C, probable dimensions d'écran), produit une série de projections
-; trigonométriques successives : calcul de position d'une aiguille/élément graphique
-; d'instrument de bord (cadran complexe), même famille que le seg019.
+; far, LUE 2026-09-26 (ex-'Gauge_ComputeNeedlePosition' : rien a voir avec une jauge). GARDE
+; AU SOL de l'avion : hauteur de l'origine de l'objet (arg_4, matrice +0x2C) au-dessus du
+; terrain selon son attitude, sur trois points de contact a constantes fixes communes a tous
+; les avions. r = -Matrix_RollAngle_57C67, p = Matrix_NosePitchAngle_57C3A ; A = 6,17 (62Ch) *
+; cos(p + 34,27 deg (2245h)) ; h1 = A * cos(r - 39,43 deg (D892h)) ; h2 = A * cos(r + 39,43
+; deg (276Eh)) ; h3 = 6,85 (6D9h) * cos(p - 45,37 deg (D2A1h)) ; renvoie max(h1, h2, h3) (4,81
+; m a plat). Utilisee par PhysicsTicks (drapeau 'au sol' efface si altitude > terrain + garde
+; + 10 m), Collision_SelectCandidates et Landing_Phase5_Stop_76E67 (altitude de l'avion
+; arrete).
 ; ==============================================================================================
-Gauge_ComputeNeedlePosition	proc far		; CODE XREF: Collision_SelectCandidates+B9P
+Aircraft_GroundClearance_3E5A6	proc far		; CODE XREF: Collision_SelectCandidates+B9P
 					; seg103:loc_4A8C2P ...
 
 var_74		= dword	ptr -74h
@@ -1047,13 +1052,13 @@ loc_3E6C3:
 		jle	short loc_3E723
 		mov	[bp+var_74], eax
 
-loc_3E723:				; CODE XREF: Gauge_ComputeNeedlePosition+177j
+loc_3E723:				; CODE XREF: Aircraft_GroundClearance_3E5A6+177j
 		mov	eax, [bp+var_38]
 		cmp	eax, [bp+var_74]
 		jle	short loc_3E731
 		mov	[bp+var_74], eax
 
-loc_3E731:				; CODE XREF: Gauge_ComputeNeedlePosition+185j
+loc_3E731:				; CODE XREF: Aircraft_GroundClearance_3E5A6+185j
 		mov	bx, [bp+arg_0]
 		mov	eax, [bp+var_74]
 		mov	[bx], eax
@@ -1064,6 +1069,6 @@ loc_3E73E:
 		pop	si
 		leave
 		retf
-Gauge_ComputeNeedlePosition	endp
+Aircraft_GroundClearance_3E5A6	endp
 
 seg087		ends

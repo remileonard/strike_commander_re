@@ -19,7 +19,7 @@ stru_6C240	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A866o
 ; d'overlay actuellement charge en memoire. fileoff=2B8F0h, codesize=11Fh, nentries=1.
 ; ==============================================================================================
 VROOMM_StubThunk_6C260	proc far		; CODE XREF: IFF_LoadModelMain+677P
-		jmp	MissionRecord_LoadStringFields_9D4F0
+		jmp	Aircraft_LoadEJECAndJINF_9D4F0
 VROOMM_StubThunk_6C260	endp
 
 stub313		ends

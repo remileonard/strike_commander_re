@@ -370,11 +370,10 @@ Deux allocations distinctes reliées par pointeur, calquées sur l'IFF :
   **Correction 2026-09-20 :** cette base est probablement décalée de `0x40`. Les XREF d'IDA (`seg339:24D0` ↔ `loc_3E4A5`, `seg339:2534` ↔ `loc_3DBBA`) donnent **tag + `0x6D0B0`**. La conversion de `0x228A` en `0x6F2FA` est à refaire (`0x6F33A` avec la base corrigée).
 - `PhysicsTicks` / `Aero_SumLinearForces` opèrent sur l'objet **0xC5**
   (`si = [playerCtx+0x0B]`), via `[si+2]` = `0x228A`.
-- **Point ouvert** : le slot `+0x3C` de la vtable `0x228A` (diviseur de masse
-  appelé par `Aero_SumLinearForces`) et le slot `+0x34` (tête de `PhysicsTicks`)
-  pointent tous deux, en lecture statique, vers des **stubs no-op partagés**
-  (`loc_4692C` / `loc_4691A`, 8 o, `mov ax,[bp+6] / retf`). Voir « Le diviseur de
-  masse `m` » plus bas.
+- **Résolu (2026-09-26)** : avec la base `seg339` corrigée (`0x6D0B0`), la vtable `0x228A`
+  est à `0x6F33A`. Slots vérifiés : `+0x24` = `PhysicsTicks`, `+0x34` = `JDYN_UpdateDamageGains_494DD`,
+  `+0x3C` = **`JDYN_TotalMass_47FF8`** (masse totale). Les « stubs no-op » `loc_4692C`/`loc_4691A`
+  venaient de l'ancienne base décalée de `0x40`. Voir « Le diviseur de masse `m` » plus bas.
 - **Investigation 2026-09-05 :**
   - `IFF_LoadModelMain` (`seg083`, `loc_3BE4D`) construit bien l'objet `JETP`
     de `0x6A` octets, chaîne de constructeurs `1B6F→2578→252C→24F0→24DC→24C8`
@@ -454,7 +453,7 @@ pose les défauts (colonne ci-dessus) + `[si+0x68]=0xFF`, `[si+0x7C]=0`, `flags`
 | `+0x82` (u16, déf. 100) | **Vitesse de poursuite MIN de l'IA** — plancher : `var_4 = max(var_4, jdyn[0x82]<<8)` sur la consigne de vitesse. | `AI_InterceptSpeedControlLaw` `sub_5F9B` L2044-2070 |
 | `+0x84` (i16, déf. 231) | **Vitesse de croisière / manœuvre de l'IA** — passée directement à `AI_ThrottleCmd_HUD` comme consigne de manette ; entre aussi dans un seuil de distance de manœuvre `(jdyn[0x84]+dword_72039)/2` (au-delà → maintien de vitesse, en-deçà → ajuste manette + vire). | `GroundAttack_Phase4_PullUp_77171` (ovr231) ; `AI_SpeedManeuverDecision` `sub_68D4` L3124-3134 |
 | `+0x86` (u32, déf. 11005) | **Seuil de distance/portée IA** — comparé `<<8` à `[cible+0x1A]` dans un évaluateur de critère de combat (slot de vtable IA). | seg002 `loc_4A99` (réf. `seg339:01B4o`) L1585-1605 |
-| `+0x8A` (u8, déf. 3) | Paramètre de décision IA — **consommateur exact non localisé** (voisin de `+0x8B`, probablement même bloc d'évaluation seg002 ; pas d'accès `[ptr+0x8A]` trouvé via `[ctx+0x0B]`). | — |
+| `+0x8A` (u8, déf. 3) | **Jamais lu** (vérifié 2026-09-26 sur les 462 segments annotés : les seuls accès à l'octet `+0x8A` d'une JDYN sont la valeur par défaut `mov byte ptr [si+8Ah],3` (seg449), la lecture du chunk et la copie `PlayerComponent_Helper_A5B8F` ; aucune lecture mot/double mot ne le recouvre). Champ chargé mais sans effet. | — |
 | `+0x8B` (u8, déf. 2) | Pondère une contribution à un **score de décision IA** : `contrib = ((jdyn[0x8B]-2)·3)/2 + 3` (branche `< 2` → `contrib = 2`). | seg002 `loc_434E` L875-895 (gaté par `byte_720DF`) |
 
 Accès **toujours** via `[pilotCtx + 0x0B]` = pointeur JDYN (même chemin que `PhysicsTicks`), depuis le **code IA** (seg002 = évaluateurs de décision / slots de vtable, seg003 = lois vitesse/manœuvre, ovr231 = émission ordre virage+manette). **Jamais** lus par la physique du joueur (seg102/103) ni par `PhysicsTicks` — d'où l'échec des recherches précédentes limitées à seg101-103/seg109. Ces 6 valeurs sont quasi constantes entre avions car elles règlent le comportement générique de l'IA, pas la cellule.
@@ -511,7 +510,7 @@ vtable** (seg339 ~`0x1CFE`), utilisée par **3 classes `DYNM` plus simples**
 
 ```
 1. Terrain_QueryAltitudeAt([[si]+2]+0x12, word_70474)      détection sol
-   → [A+0x20] (flag « au sol ») posé/effacé selon difficulté word_70466
+   → [A+0x20] (flag « au sol ») posé/effacé selon word_70466 (compteur de frames depuis le début de mission, PAS la difficulté — corrigé 2026-10-03)
 2. FlightControl_InvalidateAllCachesGlobal(si)              reset des caches aéro
 3. MANETTE DES GAZ → POUSSÉE
    cran es:[obj2+0x1E] (0-10 : MIL 0-5 / AFT 1-5), PLAFONNÉ à arrondi(10·dword_72A2C) et réécrit
@@ -658,7 +657,7 @@ seuil  = si[0x4B] << 8                                = α de décrochage (u8, e
 (B) DÉPART FRANC → vecteur portance = (0,0,0) (loc_481C1..loc_48211, sortie loc_482E7), SEULEMENT si
     les 4 conditions, évaluées dans cet ordre (chaîne de `jbe/jz/jnz short loc_48211` = sinon on retombe sur (A)) :
       |α_eff| > seuil                                 test sur α_eff NON borné (loc_481C1)
-      && word_70466 > 10                              niveau de difficulté / réalisme global (loc_481CF)
+      && word_70466 > 10                              compteur de frames depuis le début de mission (corrigé 2026-10-03 : pas la difficulté) (loc_481CF)
       && byte_72354 != 0                              option de jeu, = 1 par défaut (init ovr266) (loc_481DB)
       && handle_objet == word_722E6                   UNIQUEMENT l'avion du joueur — jamais les IA
     →  flags_75.bit6 = (obj[+0x20] == 0)   (drapeau d'alerte HUD/son) ; la force latérale reste calculée normalement
@@ -825,36 +824,26 @@ en **m/s**, `dt` en **s**, le tout ×256 (24.8). Corollaires :
 - `jdyn[0x7C] = −accel_corps.c2 / dword_6FFD7` = **facteur de charge en G**
   (division par g) — confirme l'interprétation « G-mètre ».
 
-##### Le diviseur de masse `m` — trace bloquée en statique
+##### Le diviseur de masse `m` — `JDYN_TotalMass_47FF8` (résolu 2026-09-26)
 
-`m` vient d'un **appel virtuel `[[si+2] + 0x3C]`** (this = `si` = objet 0xC5),
-scalaire 24.8 lu ensuite dans le paramètre de sortie (`>>8`).
+`m` vient de l'appel virtuel `[[si+2] + 0x3C]` (this = `si` = objet 0xC5). Avec la base
+`seg339` corrigée, ce slot est `off_6F376 → loc_47FF8` = **`JDYN_TotalMass_47FF8`** (seg103) :
 
-- Le constructeur `JDYN_LoadChunkAndConstruct_3A49C` (`enter_form('DYNM')`,
-  `malloc(0xC5)`) écrit les vptr finaux : **`[si+2] = 0x228A`** (objet
-  principal), `[[si]] = 0x2312` (sous-objet A / dynamique), `[[si+0x10]]+2 =
-  0x2362`. (strike.asm ~116908.)
-- Base seg339 = `0x6D070` (vérifié). `seg339:0x228A` = vtable linéaire
-  `0x6F2FA` ; slot `+0x3C` = `off_6F336 → loc_4692C` = **stub partagé de 8
-  octets** (`mov ax,[bp+6] / retf`, strike.asm:141797) qui **n'écrit rien**
-  dans le paramètre de sortie. Le slot `+0x34` (appelé en tête de
-  `PhysicsTicks`) = `loc_4691A`, même stub.
-- Or `Aero_SumLinearForces` lit ce paramètre de sortie (`var_4`, `[bp-4]`,
-  **non initialisé** avant l'appel dans la lecture statique) et s'en sert
-  comme diviseur pour les 3 composantes. **Contradiction** : soit l'avion
-  reçoit à l'exécution un `[si+2]` différent de `0x228A` (probable — Rémi
-  confirme qu'il existe une **classe wrapper `DYNM`** au niveau de la
-  structure IFF `JETP → FORM DYNM → {DYNM, THRS, JDYN}` ; le wrapper `JETP`
-  lui-même fait 0x6A o, vtable `0x24C8`, alloué par `IFF_LoadModelMain` via
-  `sub_5C6F3(0x5C44, 0x6A, …)`), soit la sémantique de retour par buffer
-  échappe à l'analyse statique.
-- **À confirmer par trace d'exécution** (DOSBox : point d'arrêt dans
-  `sub_48639` sur le `call [bx+3Ch]`, lire `bx` et la valeur écrite dans
-  `var_4`).
-- Conceptuellement, la masse divisée reste **le chunk `DYNM`** :
-  `AircraftDynamics_ReadMassChunk_A4A20` (seg447) — FourCC `'DYNM'` →
-  `ResourceRecord_ReadFieldGroupC_64A7E` (u32) → `[massSubobj+0x04]` (24.8,
-  kg) ; erreur `0xA001` si absent.
+```
+mov bx,[si] / mov bx,[bx+2] / mov ax,[bx+5Ch] / mov dx,[bx+5Ah] / add dx,20h   ; &emport+0x20
+les bx,[bp-8] / mov eax,es:[bx] / mov [bp-4],eax                               ; masse d'emport
+mov bx,[si] / mov eax,[bx+4] / add eax,[si+6Dh] / add eax,[bp-4]               ; + à vide + carburant
+```
+
+**masse = masse à vide (chunk `DYNM`, `[[si]]+4`) + carburant restant (`si[0x6D]`) + masse d'emport**, en kg.
+
+- **Masse d'emport** : l'objet monde de l'avion (`[[si]]+2`) porte en `+0x5A` un pointeur far vers la
+  structure d'emport. Son `+0x20` = somme sur les stations (tableau `+0x34`, pas `0x23`, nombre `+0x38`)
+  de *nombre d'armes* (`station+0x13`) × *masse d'une arme* (objet `DYNM` de l'arme, méthode `+0x10`)
+  — `PlayerComponent_OrchestrateComplex_9F286`. Chaque tir retire la masse d'une arme
+  (`WeaponStation_DecrementCounter` : `sub es:[bx+20h], eax`).
+- La masse varie donc en vol : elle baisse avec le carburant brûlé et à chaque arme tirée ou larguée.
+- La même valeur est le `X` de l'incidence par g dans `Aero_ComputeAoACommand_48862`.
 
 ##### Chunk `THRS` et champs restants
 
@@ -2034,11 +2023,11 @@ Fichier .IFF
    d'attitude `±2·√(q'·err)`, `q' = q·jdyn[0x12]/100` ; `g = −9.8 m/s²`
    (`dword_6FFD7`) ; gains de dégâts `dword_72A14..2C` (1,0 si intact, `PHYSICS.md` §5.9) ; carte des entrées
    (accès direct sur les axes, pas de trim ; `flags_75` bits 0/1/2).
-   **Restent** : ligne exacte des overrides `vtable[+0x3C]` (masse ≈ chunk `DYNM`)
-   / `vtable[+0x34]` (intégration position) dans la vtable `JDYN` primaire ; les
+   Masse (`vtable[+0x3C]`) = `JDYN_TotalMass_47FF8` (à vide + carburant + emport) ;
+   `vtable[+0x34]` = `JDYN_UpdateDamageGains_494DD` (tranché 2026-09-26). **Restent** : les
    **valeurs de la table `Cd/Cl vs vitesse-air`** (ressource indexée par
    atmosphère `dword_72A0A`, hors binaire) ; le bloc supplémentaire du chunk
-   `ATMO` quand `dword_72A0A≠0` ; `JDYN +0x80..+0x8B` ;
+   `ATMO` quand `dword_72A0A≠0` ;
    `Aero_ComputeControlFlags75Bit5C` (composante `c1` du moment) ; le dispatcher
    clavier de la manette des gaz ; layout complet des sous-objets A/B.
 2. **Sous-chunks de `OBJT`** — la géométrie 3D elle-même (sommets / faces / LOD /

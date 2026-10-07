@@ -7,12 +7,17 @@ seg433		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_6C5A5 (probable stub voisin) puis lit plusieurs champs via
-; ResourceRecord_SeekAndRead_64743/ReadFinalField_64B51 (×3)/ReadFieldGroupB_64A54 (seg193),
-; gestion d'erreur (sub_6B70F). Référencée via jmp depuis un stub VROOMM (sub_6C470) et par
-; PlayerComponentVariantB_ConstructAndInit_9FBDE.
+; far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA'
+; (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet ->
+; +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60,
+; mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par
+; BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51,
+; ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position
+; absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03
+; 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete
+; suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001.
 ; ==============================================================================================
-PlayerComponent_LoadFieldsWithRetry_9FAD0	proc far		; CODE XREF: VROOMM_StubThunk_6C470J PlayerComponentVariantB_ConstructAndInit_9FBDE+26p
+BombModel_LoadDATAChunk_9FAD0	proc far		; CODE XREF: VROOMM_StubThunk_6C470J PlayerComponentVariantB_ConstructAndInit_9FBDE+26p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -69,18 +74,18 @@ loc_9FB31:
 		jmp	short loc_9FB3C
 ; ���������������������������������������������������������������������������
 
-loc_9FB33:				; CODE XREF: PlayerComponent_LoadFieldsWithRetry_9FAD0+27j
+loc_9FB33:				; CODE XREF: BombModel_LoadDATAChunk_9FAD0+27j
 		push	0C001h
 
 loc_9FB36:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9FB3C:				; CODE XREF: PlayerComponent_LoadFieldsWithRetry_9FAD0:loc_9FB31j
+loc_9FB3C:				; CODE XREF: BombModel_LoadDATAChunk_9FAD0:loc_9FB31j
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldsWithRetry_9FAD0	endp
+BombModel_LoadDATAChunk_9FAD0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -211,7 +216,7 @@ loc_9FBE1:
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldsWithRetry_9FAD0
+		call	near ptr BombModel_LoadDATAChunk_9FAD0
 		add	sp, 6
 		push	0
 		push	large 52504144h

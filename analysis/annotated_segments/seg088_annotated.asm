@@ -8,13 +8,36 @@ seg088		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,1882 lignes. Vérifie l'angle d'inclinaison (bank) contre un seuil de 90° (0x5A00),
-; compare l'objet à l'objet joueur (word_722E6), calcule des positions d'affichage HUD
-; (sub_56E29) via un gros switch interne (commentaire IDA 'default') : candidat très fort pour
-; le moteur de rendu de la symbologie du HUD/viseur (gunsight) — cadrans, réticule,
-; indicateurs de tangage/roulis. Bien trop volumineuse pour une passe rapide.
+; far, 1882L, LUE PARTIELLEMENT 2026-10-03 (missiles et canon). Ex-'HUD_RenderSymbologyMain'
+; (FAUX : aucun affichage). LANCEMENT D'UNE ARME depuis un point d'emport. Args : point
+; d'emport (arg_0), tireur (si), cible (arg_6, nulle si pas d'accrochage), pylone (arg_8),
+; systeme d'armes (arg_C). Aiguillage sur la categorie du modele d'arme (+0x4A, octet WDAT) -
+; 8 : 0 = missile (minuteur +0x24), 1 = bombe (+0x28), 2 = panier (+0x30), 5 = canon (+0x2C).
+; Chaque cas exige son minuteur a 0. MISSILE : plafond de missiles en vol par camp (word_7047D
+; joueur / word_70479 IA, incremente au lancement) compare a
+; DisplayCache_ComputeChecksum_5D43F / 1000 (somme d'une liste de 4 blocs, probable memoire
+; libre : garde technique) ; objet missile instancie
+; (ObjectPrototype_FindOrLoadAndInstantiate_38B70) au point du pylone, ajoute a la liste
+; 0x59C3, byte_6E4C6 = 1 si target_domain 1 ; cible missile+0x55 = arg_6, lanceur +0x57 ; avec
+; cible : signature via cible vtable+0x7C -> systeme +0x0F, sinon +0x0F = 0x14 ; pylone +0x13
+; decremente. Puis MINUTEUR = dword +0x5A du modele (dernier champ du chunk WDAT, 24.8
+; secondes : 1,0 s pour AIM-9J/9M/AIM-120, 15 s SA-2, 10 s SA-6, 0 pour les canons). CANON :
+; meme gate (+0x2C), minuteur = WDAT +0x5A (0 : un coup par frame). PANIER (classe 10,
+; minuteur +0x30) : exige le compteur de roquettes du systeme +0x1E > 0 ; pour CHAQUE pylone
+; dont le type d'arme (+0x0D) vaut 8 (LAU-3), et pour chaque panier de ce pylone (+0x13),
+; lance UNE roquette (modele nomme a +0x5F du modele du point d'emport = M261), sans cible, et
+; decremente +0x1E ; minuteur = WDAT +0x5A du panier (0x19 = 0,1 s). BOMBE (classe 9, minuteur
+; +0x28) : exige systeme +0x44 (lacher arme) ou masque 0x80 (GBU-15) ou famille +0x4D == 4
+; (bombe libre), et pas sur le dos (joueur, roulis > 90) ; plafond par camp word_7047F/70481
+; (+2 par lacher) ; WeaponSystem_ReleaseBomb_9E289 sur le pylone, puis, sauf GBU-15, sur le
+; pylone symetrique (PlayerComponent_MainOrchestrator_9F98D) avec lacher force : les bombes
+; partent PAR PAIRES ; minuteur = celui renvoye (WDAT +0x5A, 1 s) ; +0x44 = 0. Famille 5
+; (Durandal) sans +0x44 : premier appui = armement (+0x44 = 1, +0x51 = 0, minuteur 1 s, point
+; d'impact predit au sol range a +0x45/+0x49/+0x4D via le slot +0x18 du modele et
+; Terrain_QueryAltitudeAt), le lacher a lieu a l'appui suivant. Renvoie 1 si une arme est
+; partie (ou armement Durandal).
 ; ==============================================================================================
-HUD_RenderSymbologyMain	proc far		; CODE XREF: HUD_RenderSymbologyAlt+83Cp
+WeaponSystem_LaunchFromStation_3E744	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+83Cp
 
 var_13A		= dword	ptr -13Ah
 var_136		= dword	ptr -136h
@@ -176,7 +199,7 @@ loc_3E7BB:
 		jge	short loc_3E7FE
 		neg	eax
 
-loc_3E7FE:				; CODE XREF: HUD_RenderSymbologyMain+B5j
+loc_3E7FE:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B5j
 		mov	[bp+var_2A], eax
 		mov	eax, [bp+var_2A]
 		mov	[bp+var_2E], eax
@@ -186,23 +209,23 @@ loc_3E7FE:				; CODE XREF: HUD_RenderSymbologyMain+B5j
 		jmp	short loc_3E81B
 ; ���������������������������������������������������������������������������
 
-loc_3E819:				; CODE XREF: HUD_RenderSymbologyMain+CEj
+loc_3E819:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+CEj
 		xor	ax, ax
 
-loc_3E81B:				; CODE XREF: HUD_RenderSymbologyMain+D3j
+loc_3E81B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+D3j
 		or	al, al
 		jz	short loc_3E823
 		mov	[bp+var_22], 1
 
-loc_3E823:				; CODE XREF: HUD_RenderSymbologyMain+90j
-					; HUD_RenderSymbologyMain+D9j
+loc_3E823:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+90j
+					; WeaponSystem_LaunchFromStation_3E744+D9j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx], 0
 		jnz	short loc_3E830
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E830:				; CODE XREF: HUD_RenderSymbologyMain+E7j
+loc_3E830:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E7j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+3Ch]
@@ -221,10 +244,10 @@ loc_3E830:				; CODE XREF: HUD_RenderSymbologyMain+E7j
 		jmp	short loc_3E85D
 ; ���������������������������������������������������������������������������
 
-loc_3E85B:				; CODE XREF: HUD_RenderSymbologyMain+10Cj
+loc_3E85B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+10Cj
 		mov	al, 17h
 
-loc_3E85D:				; CODE XREF: HUD_RenderSymbologyMain+115j
+loc_3E85D:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+115j
 		mov	ah, 0
 		sub	ax, 8
 		mov	bx, ax
@@ -233,7 +256,7 @@ loc_3E85D:				; CODE XREF: HUD_RenderSymbologyMain+115j
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E86C:				; CODE XREF: HUD_RenderSymbologyMain+123j
+loc_3E86C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+123j
 		shl	bx, 1
 		jmp	cs:off_3F7BE[bx] ; switch jump
 
@@ -244,10 +267,10 @@ loc_3E873:				; DATA XREF: seg088:off_3F7BEo
 		jmp	short loc_3E881
 ; ���������������������������������������������������������������������������
 
-loc_3E87F:				; CODE XREF: HUD_RenderSymbologyMain+134j
+loc_3E87F:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+134j
 		xor	ax, ax
 
-loc_3E881:				; CODE XREF: HUD_RenderSymbologyMain+139j
+loc_3E881:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+139j
 		or	al, al
 		jnz	short loc_3E888
 
@@ -255,7 +278,7 @@ loc_3E885:				; default
 		jmp	loc_3F71E
 ; ���������������������������������������������������������������������������
 
-loc_3E888:				; CODE XREF: HUD_RenderSymbologyMain+13Fj
+loc_3E888:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+13Fj
 		les	bx, [bp+arg_C]
 		cmp	word ptr es:[bx+1Eh], 0
 		jg	short loc_3E8B6
@@ -264,13 +287,13 @@ loc_3E888:				; CODE XREF: HUD_RenderSymbologyMain+13Fj
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E89C:				; CODE XREF: HUD_RenderSymbologyMain+153j
+loc_3E89C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+153j
 		cmp	si, word_722E6
 		jz	short loc_3E8A5
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E8A5:				; CODE XREF: HUD_RenderSymbologyMain+15Cj
+loc_3E8A5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+15Cj
 		push	word_706A0
 		call	HUD_ResolveNodePosition_547B1
 		pop	cx
@@ -279,8 +302,8 @@ loc_3E8A5:				; CODE XREF: HUD_RenderSymbologyMain+15Cj
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E8B6:				; CODE XREF: HUD_RenderSymbologyMain+14Cj
-					; HUD_RenderSymbologyMain+16Dj
+loc_3E8B6:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+14Cj
+					; WeaponSystem_LaunchFromStation_3E744+16Dj
 		call	DisplayCache_ComputeChecksum_5D43F
 		mov	bx, 3E8h
 		xor	dx, dx
@@ -292,21 +315,21 @@ loc_3E8B6:				; CODE XREF: HUD_RenderSymbologyMain+14Cj
 		jmp	short loc_3E8D5
 ; ���������������������������������������������������������������������������
 
-loc_3E8D1:				; CODE XREF: HUD_RenderSymbologyMain+185j
+loc_3E8D1:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+185j
 		mov	di, word_70479
 
-loc_3E8D5:				; CODE XREF: HUD_RenderSymbologyMain+18Bj
+loc_3E8D5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+18Bj
 		cmp	di, [bp-46h]
 		jl	short loc_3E8DD
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E8DD:				; CODE XREF: HUD_RenderSymbologyMain+194j
+loc_3E8DD:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+194j
 		mov	word ptr [bp+var_4A+2],	1
 		jmp	loc_3EF0C
 ; ���������������������������������������������������������������������������
 
-loc_3E8E5:				; CODE XREF: HUD_RenderSymbologyMain+7D4j
+loc_3E8E5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7D4j
 		les	bx, [bp+arg_C]
 		mov	ax, es:[bx+38h]
 		cmp	ax, word ptr [bp+var_4A+2]
@@ -319,11 +342,11 @@ loc_3E8E5:				; CODE XREF: HUD_RenderSymbologyMain+7D4j
 		jmp	short loc_3E907
 ; ���������������������������������������������������������������������������
 
-loc_3E903:				; CODE XREF: HUD_RenderSymbologyMain+1ABj
+loc_3E903:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1ABj
 		xor	dx, dx
 		xor	ax, ax
 
-loc_3E907:				; CODE XREF: HUD_RenderSymbologyMain+1BDj
+loc_3E907:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1BDj
 		mov	word ptr [bp+var_4A], dx
 		mov	word ptr [bp+var_4E+2],	ax
 		les	bx, [bp+var_4E+2]
@@ -332,12 +355,12 @@ loc_3E907:				; CODE XREF: HUD_RenderSymbologyMain+1BDj
 		jmp	loc_3EF09
 ; ���������������������������������������������������������������������������
 
-loc_3E91A:				; CODE XREF: HUD_RenderSymbologyMain+1D1j
+loc_3E91A:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1D1j
 		mov	word ptr [bp+var_4E], 0
 		jmp	loc_3EEFA
 ; ���������������������������������������������������������������������������
 
-loc_3E922:				; CODE XREF: HUD_RenderSymbologyMain+7C2j
+loc_3E922:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7C2j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+2]
 		mov	dx, es:[bx]
@@ -409,7 +432,7 @@ loc_3E9C4:
 		jmp	short loc_3EA0C
 ; ���������������������������������������������������������������������������
 
-loc_3E9E4:				; CODE XREF: HUD_RenderSymbologyMain+220j
+loc_3E9E4:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+220j
 		push	si
 		push	ss
 		lea	ax, [bp+var_116]
@@ -423,7 +446,7 @@ loc_3E9E4:				; CODE XREF: HUD_RenderSymbologyMain+220j
 		mov	[bp+var_EE], eax
 		mov	eax, [bp+var_10E]
 
-loc_3EA0C:				; CODE XREF: HUD_RenderSymbologyMain+29Ej
+loc_3EA0C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+29Ej
 		mov	[bp+var_EA], eax
 		push	large [bp+var_EA]
 		push	large [bp+var_EE]
@@ -442,10 +465,10 @@ loc_3EA0C:				; CODE XREF: HUD_RenderSymbologyMain+29Ej
 		jmp	short loc_3EA49
 ; ���������������������������������������������������������������������������
 
-loc_3EA47:				; CODE XREF: HUD_RenderSymbologyMain+2FCj
+loc_3EA47:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+2FCj
 		xor	ax, ax
 
-loc_3EA49:				; CODE XREF: HUD_RenderSymbologyMain+301j
+loc_3EA49:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+301j
 		or	al, al
 		jz	short loc_3EA9B
 		lea	ax, [bp+var_F2]
@@ -481,7 +504,7 @@ loc_3EA94:
 		call	Matrix_OrthonormalizeKeepRow1_57660
 		pop	cx
 
-loc_3EA9B:				; CODE XREF: HUD_RenderSymbologyMain+307j
+loc_3EA9B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+307j
 		mov	ax, word ptr [bp+var_4A]
 		mov	dx, word ptr [bp+var_4E+2]
 		inc	dx
@@ -532,12 +555,12 @@ loc_3EAB5:
 		jmp	short loc_3EB40
 ; ���������������������������������������������������������������������������
 
-loc_3EB37:				; CODE XREF: HUD_RenderSymbologyMain+3B6j
+loc_3EB37:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+3B6j
 		push	0C01Ah
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_3EB40:				; CODE XREF: HUD_RenderSymbologyMain+3F1j
+loc_3EB40:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+3F1j
 		mov	eax, [bp+var_70]
 		mov	[bp+var_84], eax
 		cmp	word ptr [bp+var_4E], 0
@@ -546,21 +569,21 @@ loc_3EB40:				; CODE XREF: HUD_RenderSymbologyMain+3F1j
 		cmp	word ptr es:[bx+13h], 1
 		jz	short loc_3EB7B
 
-loc_3EB59:				; CODE XREF: HUD_RenderSymbologyMain+409j
+loc_3EB59:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+409j
 		cmp	word ptr [bp+var_4E], 2
 		jz	short loc_3EB65
 		cmp	word ptr [bp+var_4E], 5
 		jnz	short loc_3EB7B
 
-loc_3EB65:				; CODE XREF: HUD_RenderSymbologyMain+419j
+loc_3EB65:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+419j
 		mov	eax, [bp+var_70]
 		shl	eax, 1
 		mov	[bp+var_88], eax
 		mov	[bp+var_8C], eax
 		add	[bp+var_84], eax
 
-loc_3EB7B:				; CODE XREF: HUD_RenderSymbologyMain+413j
-					; HUD_RenderSymbologyMain+41Fj
+loc_3EB7B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+413j
+					; WeaponSystem_LaunchFromStation_3E744+41Fj
 		mov	eax, [bp+var_84]
 
 loc_3EB80:
@@ -584,7 +607,7 @@ loc_3EB8C:
 		jmp	short loc_3EBBC
 ; ���������������������������������������������������������������������������
 
-loc_3EBAA:				; CODE XREF: HUD_RenderSymbologyMain+45Dj
+loc_3EBAA:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+45Dj
 		mov	eax, [bp+var_74]
 
 loc_3EBAE:
@@ -592,18 +615,18 @@ loc_3EBAE:
 		jmp	short loc_3EBBC
 ; ���������������������������������������������������������������������������
 
-loc_3EBB4:				; CODE XREF: HUD_RenderSymbologyMain+462j
+loc_3EBB4:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+462j
 		mov	eax, [bp+var_74]
 		add	[di+12h], eax
 
-loc_3EBBC:				; CODE XREF: HUD_RenderSymbologyMain:loc_3EB8Cj
-					; HUD_RenderSymbologyMain+464j ...
+loc_3EBBC:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744:loc_3EB8Cj
+					; WeaponSystem_LaunchFromStation_3E744+464j ...
 		cmp	word ptr [bp+var_4A+2],	3
 		jl	short loc_3EBCA
 		mov	eax, [bp+var_78]
 		add	[di+16h], eax
 
-loc_3EBCA:				; CODE XREF: HUD_RenderSymbologyMain+47Cj
+loc_3EBCA:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+47Cj
 		lea	ax, [bp+var_E6]
 		push	ax
 		mov	ax, di
@@ -643,7 +666,7 @@ loc_3EBCA:				; CODE XREF: HUD_RenderSymbologyMain+47Cj
 		jmp	loc_3EEF7
 ; ���������������������������������������������������������������������������
 
-loc_3EC44:				; CODE XREF: HUD_RenderSymbologyMain+4FBj
+loc_3EC44:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+4FBj
 		push	di
 		push	59C3h
 		call	List_AppendIfNonNull_21F8D
@@ -664,7 +687,7 @@ loc_3EC44:				; CODE XREF: HUD_RenderSymbologyMain+4FBj
 		jmp	loc_3ED46
 ; ���������������������������������������������������������������������������
 
-loc_3EC7D:				; CODE XREF: HUD_RenderSymbologyMain+534j
+loc_3EC7D:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+534j
 		push	si
 		push	ss
 		lea	ax, [bp+var_12E]
@@ -724,7 +747,7 @@ loc_3ECC3:
 		jmp	short loc_3ED59
 ; ���������������������������������������������������������������������������
 
-loc_3ED46:				; CODE XREF: HUD_RenderSymbologyMain+536j
+loc_3ED46:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+536j
 		push	si
 		push	ss
 		lea	ax, [bp+var_122]
@@ -734,7 +757,7 @@ loc_3ED46:				; CODE XREF: HUD_RenderSymbologyMain+536j
 		add	sp, 6
 		lea	ax, [bp+var_122]
 
-loc_3ED59:				; CODE XREF: HUD_RenderSymbologyMain+600j
+loc_3ED59:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+600j
 		push	ax
 		push	di
 		mov	bx, [di]
@@ -774,10 +797,10 @@ loc_3EDB5:
 		jmp	short loc_3EDBF
 ; ���������������������������������������������������������������������������
 
-loc_3EDBB:				; CODE XREF: HUD_RenderSymbologyMain:loc_3EDB3j
+loc_3EDBB:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744:loc_3EDB3j
 		inc	word_70479
 
-loc_3EDBF:				; CODE XREF: HUD_RenderSymbologyMain+675j
+loc_3EDBF:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+675j
 		cmp	si, word_722E6
 		jnz	short loc_3EDDA
 		cmp	byte_72358, 0
@@ -788,12 +811,12 @@ loc_3EDBF:				; CODE XREF: HUD_RenderSymbologyMain+675j
 		or	al, al
 		jnz	short loc_3EDE1
 
-loc_3EDDA:				; CODE XREF: HUD_RenderSymbologyMain+67Fj
-					; HUD_RenderSymbologyMain+686j
+loc_3EDDA:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+67Fj
+					; WeaponSystem_LaunchFromStation_3E744+686j
 		les	bx, [bp+arg_C]
 		dec	word ptr es:[bx+1Eh]
 
-loc_3EDE1:				; CODE XREF: HUD_RenderSymbologyMain+694j
+loc_3EDE1:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+694j
 		mov	[bp+var_21], 1
 		cmp	byte_72A8E, 4
 		jnz	short loc_3EE16
@@ -809,15 +832,15 @@ loc_3EDE1:				; CODE XREF: HUD_RenderSymbologyMain+694j
 		jmp	loc_3EEB3
 ; ���������������������������������������������������������������������������
 
-loc_3EE0C:				; CODE XREF: HUD_RenderSymbologyMain+6BEj
+loc_3EE0C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6BEj
 		push	0
 		push	large 0
 		push	0
 		jmp	loc_3EEB5
 ; ���������������������������������������������������������������������������
 
-loc_3EE16:				; CODE XREF: HUD_RenderSymbologyMain+6A6j
-					; HUD_RenderSymbologyMain+6ACj
+loc_3EE16:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6A6j
+					; WeaponSystem_LaunchFromStation_3E744+6ACj
 		mov	ax, si
 		add	ax, 12h
 		mov	word ptr [bp+var_A4+2],	ax
@@ -864,10 +887,10 @@ loc_3EE86:
 		push	0
 		push	eax
 
-loc_3EEB3:				; CODE XREF: HUD_RenderSymbologyMain+6C5j
+loc_3EEB3:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6C5j
 		push	1
 
-loc_3EEB5:				; CODE XREF: HUD_RenderSymbologyMain+6CFj
+loc_3EEB5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6CFj
 		call	Weapon_HUDBox_TimerCaseH_5A8DC
 		add	sp, 8
 		push	0
@@ -888,10 +911,10 @@ loc_3EEB5:				; CODE XREF: HUD_RenderSymbologyMain+6CFj
 		mov	eax, [bp+var_A0]
 		mov	[bp+var_1C], eax
 
-loc_3EEF7:				; CODE XREF: HUD_RenderSymbologyMain+4FDj
+loc_3EEF7:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+4FDj
 		inc	word ptr [bp+var_4E]
 
-loc_3EEFA:				; CODE XREF: HUD_RenderSymbologyMain+1DBj
+loc_3EEFA:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1DBj
 		les	bx, [bp+var_4E+2]
 		mov	ax, es:[bx+13h]
 		cmp	ax, word ptr [bp+var_4E]
@@ -899,11 +922,11 @@ loc_3EEFA:				; CODE XREF: HUD_RenderSymbologyMain+1DBj
 		jmp	loc_3E922
 ; ���������������������������������������������������������������������������
 
-loc_3EF09:				; CODE XREF: HUD_RenderSymbologyMain+1D3j
-					; HUD_RenderSymbologyMain+7C0j
+loc_3EF09:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1D3j
+					; WeaponSystem_LaunchFromStation_3E744+7C0j
 		inc	word ptr [bp+var_4A+2]
 
-loc_3EF0C:				; CODE XREF: HUD_RenderSymbologyMain+19Ej
+loc_3EF0C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+19Ej
 		les	bx, [bp+arg_C]
 		mov	ax, es:[bx+38h]
 		cmp	ax, word ptr [bp+var_4A+2]
@@ -911,11 +934,11 @@ loc_3EF0C:				; CODE XREF: HUD_RenderSymbologyMain+19Ej
 		jmp	loc_3E8E5
 ; ���������������������������������������������������������������������������
 
-loc_3EF1B:				; CODE XREF: HUD_RenderSymbologyMain+7D2j
+loc_3EF1B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7D2j
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3EF1E:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
+loc_3EF1E:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+12Aj
 					; DATA XREF: seg088:off_3F7BEo
 		cmp	[bp+var_4], 0	; case 0x0
 		jnz	short loc_3EF2A
@@ -923,16 +946,16 @@ loc_3EF1E:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
 		jmp	short loc_3EF2C
 ; ���������������������������������������������������������������������������
 
-loc_3EF2A:				; CODE XREF: HUD_RenderSymbologyMain+7DFj
+loc_3EF2A:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7DFj
 		xor	ax, ax
 
-loc_3EF2C:				; CODE XREF: HUD_RenderSymbologyMain+7E4j
+loc_3EF2C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7E4j
 		or	al, al
 		jnz	short loc_3EF33
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3EF33:				; CODE XREF: HUD_RenderSymbologyMain+7EAj
+loc_3EF33:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+7EAj
 		les	bx, [bp+arg_8]
 		mov	ax, es:[bx+13h]
 		dec	ax
@@ -952,10 +975,10 @@ loc_3EF33:				; CODE XREF: HUD_RenderSymbologyMain+7EAj
 		jmp	short loc_3EF66
 ; ���������������������������������������������������������������������������
 
-loc_3EF63:				; CODE XREF: HUD_RenderSymbologyMain+818j
+loc_3EF63:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+818j
 		mov	ax, word_70479
 
-loc_3EF66:				; CODE XREF: HUD_RenderSymbologyMain+81Dj
+loc_3EF66:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+81Dj
 		mov	word ptr [bp+var_4A], ax
 		mov	ax, word ptr [bp+var_4A]
 		cmp	ax, word ptr [bp+var_4A+2]
@@ -963,7 +986,7 @@ loc_3EF66:				; CODE XREF: HUD_RenderSymbologyMain+81Dj
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3EF74:				; CODE XREF: HUD_RenderSymbologyMain+82Bj
+loc_3EF74:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+82Bj
 		or	di, di
 		jz	short loc_3EFA8
 		cmp	si, word_722E6
@@ -978,8 +1001,8 @@ loc_3EF8F:
 		or	al, al
 		jnz	short loc_3EFA8
 
-loc_3EF93:				; CODE XREF: HUD_RenderSymbologyMain+838j
-					; HUD_RenderSymbologyMain+83Fj
+loc_3EF93:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+838j
+					; WeaponSystem_LaunchFromStation_3E744+83Fj
 		push	1
 		push	1
 		push	di
@@ -992,8 +1015,8 @@ loc_3EF98:
 		jmp	loc_3F06F
 ; ���������������������������������������������������������������������������
 
-loc_3EFA8:				; CODE XREF: HUD_RenderSymbologyMain+832j
-					; HUD_RenderSymbologyMain+84Dj
+loc_3EFA8:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+832j
+					; WeaponSystem_LaunchFromStation_3E744+84Dj
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 4
@@ -1062,23 +1085,23 @@ loc_3EFA8:				; CODE XREF: HUD_RenderSymbologyMain+832j
 		mov	bx, word ptr [bp+var_58+2]
 		mov	[bx+8],	eax
 
-loc_3F06F:				; CODE XREF: HUD_RenderSymbologyMain+861j
+loc_3F06F:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+861j
 		or	di, di
 		jnz	short loc_3F076
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F076:				; CODE XREF: HUD_RenderSymbologyMain+92Dj
+loc_3F076:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+92Dj
 		cmp	word_722E6, si
 		jnz	short loc_3F082
 		inc	word_7047D
 		jmp	short loc_3F086
 ; ���������������������������������������������������������������������������
 
-loc_3F082:				; CODE XREF: HUD_RenderSymbologyMain+936j
+loc_3F082:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+936j
 		inc	word_70479
 
-loc_3F086:				; CODE XREF: HUD_RenderSymbologyMain+93Cj
+loc_3F086:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+93Cj
 		push	di
 
 loc_3F087:
@@ -1096,8 +1119,8 @@ loc_3F092:
 		jnz	short loc_3F0A8
 		mov	byte_6E4C6, 1
 
-loc_3F0A8:				; CODE XREF: HUD_RenderSymbologyMain+953j
-					; HUD_RenderSymbologyMain+95Dj
+loc_3F0A8:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+953j
+					; WeaponSystem_LaunchFromStation_3E744+95Dj
 		mov	word ptr [bp+var_5C], di
 		push	word ptr [bp+var_5C]
 		mov	ax, word ptr [bp+arg_C]
@@ -1156,13 +1179,13 @@ loc_3F0B4:
 		jmp	short loc_3F144
 ; ���������������������������������������������������������������������������
 
-loc_3F135:				; CODE XREF: HUD_RenderSymbologyMain+9D0j
+loc_3F135:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+9D0j
 		mov	bx, [di+51h]
 		mov	byte ptr [bx+39h], 0
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+0Fh], 14h
 
-loc_3F144:				; CODE XREF: HUD_RenderSymbologyMain+9EFj
+loc_3F144:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+9EFj
 		mov	word ptr [bp+var_64+2],	si
 		push	word ptr [bp+var_64+2]
 		mov	ax, [di+51h]
@@ -1180,8 +1203,8 @@ loc_3F144:				; CODE XREF: HUD_RenderSymbologyMain+9EFj
 		or	al, al
 		jnz	short loc_3F183
 
-loc_3F174:				; CODE XREF: HUD_RenderSymbologyMain+A19j
-					; HUD_RenderSymbologyMain+A20j
+loc_3F174:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A19j
+					; WeaponSystem_LaunchFromStation_3E744+A20j
 		les	bx, [bp+arg_8]
 		mov	ax, es:[bx+13h]
 		dec	ax
@@ -1190,7 +1213,7 @@ loc_3F174:				; CODE XREF: HUD_RenderSymbologyMain+A19j
 loc_3F17F:
 		mov	es:[bx+13h], ax
 
-loc_3F183:				; CODE XREF: HUD_RenderSymbologyMain+A2Ej
+loc_3F183:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A2Ej
 		mov	[bp+var_21], 1
 		cmp	byte_72A8E, 4
 
@@ -1212,15 +1235,15 @@ loc_3F194:
 		jmp	loc_3F24A
 ; ���������������������������������������������������������������������������
 
-loc_3F1AE:				; CODE XREF: HUD_RenderSymbologyMain+A60j
+loc_3F1AE:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A60j
 		push	0
 		push	large 0
 		push	0
 		jmp	loc_3F24C
 ; ���������������������������������������������������������������������������
 
-loc_3F1B8:				; CODE XREF: HUD_RenderSymbologyMain:loc_3F18Cj
-					; HUD_RenderSymbologyMain+A4Ej
+loc_3F1B8:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744:loc_3F18Cj
+					; WeaponSystem_LaunchFromStation_3E744+A4Ej
 		mov	ax, si
 		add	ax, 12h
 
@@ -1269,10 +1292,10 @@ loc_3F1C6:
 		push	0
 		push	eax
 
-loc_3F24A:				; CODE XREF: HUD_RenderSymbologyMain+A67j
+loc_3F24A:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A67j
 		push	1
 
-loc_3F24C:				; CODE XREF: HUD_RenderSymbologyMain+A71j
+loc_3F24C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A71j
 		call	Weapon_HUDBox_TimerCaseH_5A8DC
 		add	sp, 8
 		les	bx, [bp+arg_0]
@@ -1283,10 +1306,10 @@ loc_3F24C:				; CODE XREF: HUD_RenderSymbologyMain+A71j
 		jmp	short loc_3F268
 ; ���������������������������������������������������������������������������
 
-loc_3F265:				; CODE XREF: HUD_RenderSymbologyMain+B1Bj
+loc_3F265:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B1Bj
 		push	[bp+arg_6]
 
-loc_3F268:				; CODE XREF: HUD_RenderSymbologyMain+B1Fj
+loc_3F268:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B1Fj
 		push	di
 		push	si
 		push	59CDh
@@ -1302,8 +1325,8 @@ loc_3F268:				; CODE XREF: HUD_RenderSymbologyMain+B1Fj
 		or	al, al
 		jnz	short loc_3F2A4
 
-loc_3F290:				; CODE XREF: HUD_RenderSymbologyMain+B35j
-					; HUD_RenderSymbologyMain+B3Cj
+loc_3F290:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B35j
+					; WeaponSystem_LaunchFromStation_3E744+B3Cj
 		les	bx, [bp+arg_C]
 
 loc_3F293:
@@ -1315,7 +1338,7 @@ loc_3F293:
 		call	near ptr WeaponStation_DecrementCounter
 		add	sp, 8
 
-loc_3F2A4:				; CODE XREF: HUD_RenderSymbologyMain+B4Aj
+loc_3F2A4:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B4Aj
 		mov	ax, [di+10h]
 		mov	dx, [di+0Eh]
 		add	dx, 5Ah	; 'Z'
@@ -1335,7 +1358,7 @@ loc_3F2C2:
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F2C9:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
+loc_3F2C9:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+12Aj
 					; DATA XREF: seg088:off_3F7BEo
 		les	bx, [bp+arg_C]	; case 0x1
 		cmp	byte ptr es:[bx+44h], 0
@@ -1349,8 +1372,8 @@ loc_3F2C9:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
 		jmp	loc_3F492
 ; ���������������������������������������������������������������������������
 
-loc_3F2EB:				; CODE XREF: HUD_RenderSymbologyMain+B8Dj
-					; HUD_RenderSymbologyMain+B9Bj ...
+loc_3F2EB:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B8Dj
+					; WeaponSystem_LaunchFromStation_3E744+B9Bj ...
 		mov	al, [bp+var_22]
 		mov	ah, 0
 		or	ax, ax
@@ -1358,23 +1381,23 @@ loc_3F2EB:				; CODE XREF: HUD_RenderSymbologyMain+B8Dj
 		jmp	loc_3F492
 ; ���������������������������������������������������������������������������
 
-loc_3F2F7:				; CODE XREF: HUD_RenderSymbologyMain+BAEj
+loc_3F2F7:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BAEj
 		cmp	[bp+var_C], 0
 		jnz	short loc_3F303
 		mov	ax, 1
 		jmp	short loc_3F305
 ; ���������������������������������������������������������������������������
 
-loc_3F303:				; CODE XREF: HUD_RenderSymbologyMain+BB8j
+loc_3F303:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BB8j
 		xor	ax, ax
 
-loc_3F305:				; CODE XREF: HUD_RenderSymbologyMain+BBDj
+loc_3F305:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BBDj
 		or	al, al
 		jnz	short loc_3F30C
 		jmp	loc_3F492
 ; ���������������������������������������������������������������������������
 
-loc_3F30C:				; CODE XREF: HUD_RenderSymbologyMain+BC3j
+loc_3F30C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BC3j
 		call	DisplayCache_ComputeChecksum_5D43F
 		mov	bx, 3E8h
 		xor	dx, dx
@@ -1386,26 +1409,26 @@ loc_3F30C:				; CODE XREF: HUD_RenderSymbologyMain+BC3j
 		jmp	short loc_3F32B
 ; ���������������������������������������������������������������������������
 
-loc_3F327:				; CODE XREF: HUD_RenderSymbologyMain+BDBj
+loc_3F327:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BDBj
 		mov	di, word_70481
 
-loc_3F32B:				; CODE XREF: HUD_RenderSymbologyMain+BE1j
+loc_3F32B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BE1j
 		cmp	di, [bp-46h]
 		jl	short loc_3F333
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F333:				; CODE XREF: HUD_RenderSymbologyMain+BEAj
+loc_3F333:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BEAj
 		cmp	word_722E6, si
 		jnz	short loc_3F340
 		add	word_7047F, 2
 		jmp	short loc_3F345
 ; ���������������������������������������������������������������������������
 
-loc_3F340:				; CODE XREF: HUD_RenderSymbologyMain+BF3j
+loc_3F340:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BF3j
 		add	word_70481, 2
 
-loc_3F345:				; CODE XREF: HUD_RenderSymbologyMain+BFAj
+loc_3F345:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BFAj
 		cmp	si, word_722E6
 		jnz	short loc_3F360
 		cmp	byte_72358, 0
@@ -1416,8 +1439,8 @@ loc_3F345:				; CODE XREF: HUD_RenderSymbologyMain+BFAj
 		or	al, al
 		jnz	short loc_3F374
 
-loc_3F360:				; CODE XREF: HUD_RenderSymbologyMain+C05j
-					; HUD_RenderSymbologyMain+C0Cj
+loc_3F360:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C05j
+					; WeaponSystem_LaunchFromStation_3E744+C0Cj
 		les	bx, [bp+arg_C]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_C+2]
@@ -1427,7 +1450,7 @@ loc_3F360:				; CODE XREF: HUD_RenderSymbologyMain+C05j
 		call	near ptr WeaponStation_DecrementCounter
 		add	sp, 8
 
-loc_3F374:				; CODE XREF: HUD_RenderSymbologyMain+C1Aj
+loc_3F374:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C1Aj
 		push	0
 		push	large [bp+arg_C]
 		push	large [bp+arg_8]
@@ -1452,7 +1475,7 @@ loc_3F3B1:
 		jmp	loc_3F435
 ; ���������������������������������������������������������������������������
 
-loc_3F3B4:				; CODE XREF: HUD_RenderSymbologyMain+C6Bj
+loc_3F3B4:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C6Bj
 		les	bx, [bp+arg_C]
 		les	bx, es:[bx+18h]
 
@@ -1468,10 +1491,10 @@ loc_3F3C2:
 		jmp	short loc_3F3CD
 ; ���������������������������������������������������������������������������
 
-loc_3F3CB:				; CODE XREF: HUD_RenderSymbologyMain:loc_3F3C0j
+loc_3F3CB:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744:loc_3F3C0j
 		xor	ax, ax
 
-loc_3F3CD:				; CODE XREF: HUD_RenderSymbologyMain+C85j
+loc_3F3CD:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+C85j
 		push	ax
 		push	large [bp+arg_C]
 		call	VROOMM_StubThunk_6C434
@@ -1490,8 +1513,8 @@ loc_3F3CD:				; CODE XREF: HUD_RenderSymbologyMain+C85j
 		or	al, al
 		jnz	short loc_3F416
 
-loc_3F402:				; CODE XREF: HUD_RenderSymbologyMain+CA7j
-					; HUD_RenderSymbologyMain+CAEj
+loc_3F402:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+CA7j
+					; WeaponSystem_LaunchFromStation_3E744+CAEj
 		les	bx, [bp+arg_C]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_C+2]
@@ -1501,7 +1524,7 @@ loc_3F402:				; CODE XREF: HUD_RenderSymbologyMain+CA7j
 		call	near ptr WeaponStation_DecrementCounter
 		add	sp, 8
 
-loc_3F416:				; CODE XREF: HUD_RenderSymbologyMain+CBCj
+loc_3F416:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+CBCj
 		push	1
 		push	large [bp+arg_C]
 		push	large [bp+arg_8]
@@ -1514,8 +1537,8 @@ loc_3F416:				; CODE XREF: HUD_RenderSymbologyMain+CBCj
 		call	VROOMM_StubThunk_6C399
 		add	sp, 16h
 
-loc_3F435:				; CODE XREF: HUD_RenderSymbologyMain:loc_3F3B1j
-					; HUD_RenderSymbologyMain+CA1j
+loc_3F435:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744:loc_3F3B1j
+					; WeaponSystem_LaunchFromStation_3E744+CA1j
 		les	bx, [bp+arg_C]
 		mov	ax, es:[bx+9]
 		cmp	ax, word_722E6
@@ -1537,7 +1560,7 @@ loc_3F435:				; CODE XREF: HUD_RenderSymbologyMain:loc_3F3B1j
 		mov	word ptr [bp+var_54], ax
 		mov	es:[bx+13h], ax
 
-loc_3F474:				; CODE XREF: HUD_RenderSymbologyMain+D1Fj
+loc_3F474:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+D1Fj
 		les	bx, [bp+var_4E]
 		mov	ax, es:[bx+13h]
 		inc	ax
@@ -1546,8 +1569,8 @@ loc_3F474:				; CODE XREF: HUD_RenderSymbologyMain+D1Fj
 loc_3F47F:
 		mov	es:[bx+13h], ax
 
-loc_3F483:				; CODE XREF: HUD_RenderSymbologyMain+CFCj
-					; HUD_RenderSymbologyMain+D03j ...
+loc_3F483:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+CFCj
+					; WeaponSystem_LaunchFromStation_3E744+D03j ...
 		les	bx, [bp+arg_C]
 
 loc_3F486:
@@ -1558,8 +1581,8 @@ loc_3F48F:				; default
 		jmp	loc_3F71E
 ; ���������������������������������������������������������������������������
 
-loc_3F492:				; CODE XREF: HUD_RenderSymbologyMain+BA4j
-					; HUD_RenderSymbologyMain+BB0j ...
+loc_3F492:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+BA4j
+					; WeaponSystem_LaunchFromStation_3E744+BB0j ...
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx]
 		cmp	byte ptr es:[bx+4Dh], 5
@@ -1567,7 +1590,7 @@ loc_3F492:				; CODE XREF: HUD_RenderSymbologyMain+BA4j
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F4A2:				; CODE XREF: HUD_RenderSymbologyMain+D59j
+loc_3F4A2:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+D59j
 		les	bx, [bp+arg_C]
 		mov	byte ptr es:[bx+44h], 1
 		mov	[bp+var_44], 0
@@ -1598,7 +1621,7 @@ loc_3F4C3:
 		jmp	short loc_3F51C
 ; ���������������������������������������������������������������������������
 
-loc_3F4FB:				; CODE XREF: HUD_RenderSymbologyMain+D8Bj
+loc_3F4FB:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+D8Bj
 		mov	eax, dword_707E0
 		mov	[bp+var_FE], eax
 		mov	eax, dword_707E4
@@ -1608,7 +1631,7 @@ loc_3F4FB:				; CODE XREF: HUD_RenderSymbologyMain+D8Bj
 		mov	dx, ss
 		lea	ax, [bp+var_FE]
 
-loc_3F51C:				; CODE XREF: HUD_RenderSymbologyMain+DB5j
+loc_3F51C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+DB5j
 		les	bx, [bp+arg_C]
 		mov	eax, [bp+var_FE]
 		mov	es:[bx+45h], eax
@@ -1650,7 +1673,7 @@ loc_3F581:
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F5A4:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
+loc_3F5A4:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+12Aj
 					; DATA XREF: seg088:off_3F7BEo
 		cmp	[bp+var_14], 0	; case 0x5
 		jnz	short loc_3F5B0
@@ -1658,16 +1681,16 @@ loc_3F5A4:				; CODE XREF: HUD_RenderSymbologyMain+12Aj
 		jmp	short loc_3F5B2
 ; ���������������������������������������������������������������������������
 
-loc_3F5B0:				; CODE XREF: HUD_RenderSymbologyMain+E65j
+loc_3F5B0:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E65j
 		xor	ax, ax
 
-loc_3F5B2:				; CODE XREF: HUD_RenderSymbologyMain+E6Aj
+loc_3F5B2:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E6Aj
 		or	al, al
 		jnz	short loc_3F5B9
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F5B9:				; CODE XREF: HUD_RenderSymbologyMain+E70j
+loc_3F5B9:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E70j
 		call	DisplayCache_ComputeChecksum_5D43F
 		mov	bx, 3E8h
 		xor	dx, dx
@@ -1681,8 +1704,8 @@ loc_3F5B9:				; CODE XREF: HUD_RenderSymbologyMain+E70j
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F5D9:				; CODE XREF: HUD_RenderSymbologyMain+E8Aj
-					; HUD_RenderSymbologyMain+E90j
+loc_3F5D9:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E8Aj
+					; WeaponSystem_LaunchFromStation_3E744+E90j
 		push	0
 		push	1
 		mov	ax, word ptr [bp+arg_0]
@@ -1698,12 +1721,12 @@ loc_3F5D9:				; CODE XREF: HUD_RenderSymbologyMain+E8Aj
 		jmp	loc_3F71E	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F5FB:				; CODE XREF: HUD_RenderSymbologyMain+EB2j
+loc_3F5FB:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+EB2j
 		cmp	word_722E6, si
 		jz	short loc_3F605
 		inc	word_7047B
 
-loc_3F605:				; CODE XREF: HUD_RenderSymbologyMain+EBBj
+loc_3F605:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+EBBj
 		mov	ax, word ptr [bp+arg_8+2]
 		mov	dx, word ptr [bp+arg_8]
 		inc	dx
@@ -1758,7 +1781,7 @@ loc_3F691:
 		cmp	byte_72358, 0
 		jnz	short loc_3F6BA
 
-loc_3F69E:				; CODE XREF: HUD_RenderSymbologyMain+F51j
+loc_3F69E:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+F51j
 		les	bx, [di+0Eh]
 		mov	ax, es:[bx+80h]
 		mov	word ptr [bp+var_5C+2],	ax
@@ -1774,7 +1797,7 @@ loc_3F6B3:
 loc_3F6B6:
 		mov	es:[bx+13h], ax
 
-loc_3F6BA:				; CODE XREF: HUD_RenderSymbologyMain+F58j
+loc_3F6BA:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+F58j
 		mov	[bp+var_21], 1
 
 loc_3F6BE:
@@ -1805,8 +1828,8 @@ loc_3F6C2:
 		mov	byte ptr [bx+21Ch], 0
 		jmp	short $+2
 
-loc_3F70C:				; CODE XREF: HUD_RenderSymbologyMain+FAFj
-					; HUD_RenderSymbologyMain+FBFj
+loc_3F70C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FAFj
+					; WeaponSystem_LaunchFromStation_3E744+FBFj
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+34h]
@@ -1817,8 +1840,8 @@ loc_3F70C:				; CODE XREF: HUD_RenderSymbologyMain+FAFj
 		call	Pilot_NotifySubcomponentDestroy
 		pop	cx
 
-loc_3F71E:				; CODE XREF: HUD_RenderSymbologyMain+E9j
-					; HUD_RenderSymbologyMain+125j ...
+loc_3F71E:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+E9j
+					; WeaponSystem_LaunchFromStation_3E744+125j ...
 		les	bx, [bp+arg_C]	; default
 		cmp	word ptr es:[bx+1Eh], 0
 		jnz	short loc_3F770
@@ -1826,7 +1849,7 @@ loc_3F71E:				; CODE XREF: HUD_RenderSymbologyMain+E9j
 		jmp	short loc_3F767
 ; ���������������������������������������������������������������������������
 
-loc_3F72D:				; CODE XREF: HUD_RenderSymbologyMain+102Aj
+loc_3F72D:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+102Aj
 		les	bx, [bp+arg_C]
 		cmp	es:[bx+38h], di
 		jle	short loc_3F747
@@ -1838,11 +1861,11 @@ loc_3F72D:				; CODE XREF: HUD_RenderSymbologyMain+102Aj
 		jmp	short loc_3F74B
 ; ���������������������������������������������������������������������������
 
-loc_3F747:				; CODE XREF: HUD_RenderSymbologyMain+FF0j
+loc_3F747:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FF0j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_3F74B:				; CODE XREF: HUD_RenderSymbologyMain+1001j
+loc_3F74B:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1001j
 		mov	[bp+var_40], dx
 		mov	word ptr [bp+var_44+2],	ax
 		les	bx, [bp+var_44+2]
@@ -1854,15 +1877,15 @@ loc_3F74B:				; CODE XREF: HUD_RenderSymbologyMain+1001j
 		call	VROOMM_StubThunk_6C39E
 		add	sp, 6
 
-loc_3F766:				; CODE XREF: HUD_RenderSymbologyMain+1015j
+loc_3F766:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+1015j
 		inc	di
 
-loc_3F767:				; CODE XREF: HUD_RenderSymbologyMain+FE7j
+loc_3F767:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FE7j
 		les	bx, [bp+arg_C]
 		cmp	es:[bx+38h], di
 		jg	short loc_3F72D
 
-loc_3F770:				; CODE XREF: HUD_RenderSymbologyMain+FE2j
+loc_3F770:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+FE2j
 		mov	eax, [bp+var_4]
 		mov	[bp+var_32], eax
 		mov	eax, [bp+var_32]
@@ -1895,10 +1918,10 @@ loc_3F7AE:
 		pop	si
 		leave
 		retf
-HUD_RenderSymbologyMain	endp
+WeaponSystem_LaunchFromStation_3E744	endp
 
 ; ���������������������������������������������������������������������������
-off_3F7BE	dw offset loc_3EF1E	; DATA XREF: HUD_RenderSymbologyMain+12Ar
+off_3F7BE	dw offset loc_3EF1E	; DATA XREF: WeaponSystem_LaunchFromStation_3E744+12Ar
 		dw offset loc_3F2C9	; jump table for switch	statement
 		dw offset loc_3E873
 		dw offset loc_3F71E
@@ -1922,7 +1945,7 @@ off_3F7BE	dw offset loc_3EF1E	; DATA XREF: HUD_RenderSymbologyMain+12Ar
 ; Targeting_SelectAndPrioritize(arme, cible, objet +0x0D, octet +0x0F).
 ; ==============================================================================================
 WeaponStation_TestTargetLock	proc far		; CODE XREF: AI_BehaviorSelector+1F3P
-					; HUD_RenderSymbologyAlt+1105p
+					; WeaponSystem_FrameUpdate_3F8C0+1105p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -2036,12 +2059,14 @@ loc_3F87D:				; CODE XREF: seg088:1139j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — récupère une valeur via vtable[0x10] d'un sous-composant (+0x36) et la soustrait
-; d'un accumulateur (+0x20) : décrément d'un compteur (probable munitions/carburant) selon un
-; sous-système.
+; far, 40L, LUE (2026-09-26). Au tir d'une arme : lit la masse d'UNE arme par la methode
+; vtable+0x10 de son objet dynamique DYNM (station->+0x36 ; +0x10 = masse, comme dans le tick
+; des DYNM simples) et la retire de la masse d'emport es:[arg_0+0x20]. arg_0 = structure
+; d'emport de l'avion (objet monde +0x5A). Cette masse d'emport entre dans la masse totale de
+; l'avion (JDYN_TotalMass_47FF8).
 ; ==============================================================================================
-WeaponStation_DecrementCounter	proc far		; CODE XREF: HUD_RenderSymbologyMain+B5Ap
-					; HUD_RenderSymbologyMain+C2Ap ...
+WeaponStation_DecrementCounter	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+B5Ap
+					; WeaponSystem_LaunchFromStation_3E744+C2Ap ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -2087,13 +2112,24 @@ WeaponStation_DecrementCounter	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,2016 lignes. Structure quasi identique à sub_3E744 (mêmes offsets +0x24/28/2C/30, même
-; seuil de bank 0x5A00, même test 'objet == joueur') : second moteur de rendu de symbologie
-; HUD, variante probable pour le mode air-air/air-sol ou pour les cibles secondaires. Appelle
-; sub_4114D (largage chaff/flare) et sub_40A33/sub_40D3B (résolution de stations d'armement).
-; Bien trop volumineuse pour une passe rapide.
+; far, 2016L, LUE PARTIELLEMENT 2026-10-03 (chemins gachette, minuteurs, objet suivi).
+; Ex-'HUD_RenderSymbologyAlt' (FAUX : aucun affichage). MISE A JOUR PAR FRAME DU SYSTEME
+; D'ARMES d'un avion (joueur et IA ; arg_0 = systeme +0x104, arg_4 = bloc de commande +7). (1)
+; Quatre MINUTEURS DE CADENCE +0x24 (missiles, categorie 8), +0x28 (categorie 9 : bombes),
+; +0x2C (categorie 13 : canons), +0x30 (categorie 10 : paniers) decrementes de dword_70458
+; (dt) et bornes a 0, recopies a la fin. (2) Point d'emport courant = tableau +0x14 + index
+; (+0) * 0x12 -> +0x18. (3) Octet de commande +0x1B : bit 1 = GACHETTE ->
+; WeaponStation_FindByTypeMask puis pylone le plus charge du type
+; (PlayerComponent_MainOrchestrator_9F98D) puis WeaponSystem_LaunchFromStation_3E744(point
+; d'emport, tireur +9, cible = +0x0D seulement si +0x0B (accroche) est pose, pylone, systeme)
+; ; si le lancement a lieu, les minuteurs sont relus (la fonction de lancement les rearme) ;
+; plus de pylone du type -> retour au point d'emport par defaut (+0x06). Bit 2 : cycle de
+; cible (WeaponStation_ResolveStateA/B), cible d'une autre famille que l'arme -> +0x0D efface.
+; Bit 4 / bit 5 : largage (pylones vides par WeaponStation_DecrementCounter). +0x1C bit 3 :
+; bascule air-air / air-sol (+0x56, canon ou masque 0xF03). +0x1C bit 0 : objet suivi +0x0D
+; efface. Reste (bit 6 de +0x1B = demande de suivi, a partir de loc_40483) non relu en detail.
 ; ==============================================================================================
-HUD_RenderSymbologyAlt	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4+45P
+WeaponSystem_FrameUpdate_3F8C0	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4+45P
 
 var_96		= dword	ptr -96h
 var_92		= dword	ptr -92h
@@ -2196,7 +2232,7 @@ loc_3F8C3:
 		jge	short loc_3F96A
 		neg	eax
 
-loc_3F96A:				; CODE XREF: HUD_RenderSymbologyAlt+A5j
+loc_3F96A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+A5j
 		mov	[bp+var_2A], eax
 		mov	eax, [bp+var_2A]
 		mov	[bp+var_2E], eax
@@ -2206,16 +2242,16 @@ loc_3F96A:				; CODE XREF: HUD_RenderSymbologyAlt+A5j
 		jmp	short loc_3F987
 ; ���������������������������������������������������������������������������
 
-loc_3F985:				; CODE XREF: HUD_RenderSymbologyAlt+BEj
+loc_3F985:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BEj
 		xor	ax, ax
 
-loc_3F987:				; CODE XREF: HUD_RenderSymbologyAlt+C3j
+loc_3F987:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C3j
 		or	al, al
 		jz	short loc_3F98F
 		mov	[bp+var_1], 1
 
-loc_3F98F:				; CODE XREF: HUD_RenderSymbologyAlt+80j
-					; HUD_RenderSymbologyAlt+C9j
+loc_3F98F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+80j
+					; WeaponSystem_FrameUpdate_3F8C0+C9j
 		les	bx, [bp+arg_0]
 
 loc_3F992:
@@ -2224,13 +2260,13 @@ loc_3F992:
 		jmp	loc_409E8
 ; ���������������������������������������������������������������������������
 
-loc_3F99D:				; CODE XREF: HUD_RenderSymbologyAlt+D8j
+loc_3F99D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+D8j
 		cmp	dword ptr es:[bx+14h], 0
 		jnz	short loc_3F9A8
 		jmp	loc_409E8
 ; ���������������������������������������������������������������������������
 
-loc_3F9A8:				; CODE XREF: HUD_RenderSymbologyAlt+E3j
+loc_3F9A8:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+E3j
 		mov	ax, es:[bx+16h]
 		mov	dx, es:[bx+14h]
 		mov	bx, es:[bx]
@@ -2261,7 +2297,7 @@ loc_3F9C7:
 		mov	eax, [bp+var_32]
 		mov	[bp+var_16], eax
 
-loc_3F9E2:				; CODE XREF: HUD_RenderSymbologyAlt+110j
+loc_3F9E2:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+110j
 		mov	eax, dword_70458
 		sub	[bp+var_E], eax
 		cmp	[bp+var_E], 0
@@ -2270,7 +2306,7 @@ loc_3F9E2:				; CODE XREF: HUD_RenderSymbologyAlt+110j
 		mov	eax, [bp+var_36]
 		mov	[bp+var_E], eax
 
-loc_3FA01:				; CODE XREF: HUD_RenderSymbologyAlt+12Fj
+loc_3FA01:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+12Fj
 		mov	eax, dword_70458
 		sub	[bp+var_6], eax
 		cmp	[bp+var_6], 0
@@ -2279,7 +2315,7 @@ loc_3FA01:				; CODE XREF: HUD_RenderSymbologyAlt+12Fj
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_6], eax
 
-loc_3FA20:				; CODE XREF: HUD_RenderSymbologyAlt+14Ej
+loc_3FA20:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+14Ej
 		mov	eax, dword_70458
 		sub	[bp+var_1E], eax
 		cmp	[bp+var_1E], 0
@@ -2288,7 +2324,7 @@ loc_3FA20:				; CODE XREF: HUD_RenderSymbologyAlt+14Ej
 		mov	eax, [bp+var_3E]
 		mov	[bp+var_1E], eax
 
-loc_3FA3F:				; CODE XREF: HUD_RenderSymbologyAlt+16Dj
+loc_3FA3F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+16Dj
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_52], eax
 		les	bx, [bp+arg_0]
@@ -2297,7 +2333,7 @@ loc_3FA3F:				; CODE XREF: HUD_RenderSymbologyAlt+16Dj
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FA54:				; CODE XREF: HUD_RenderSymbologyAlt+18Fj
+loc_3FA54:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+18Fj
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
 		push	bx
@@ -2308,7 +2344,7 @@ loc_3FA54:				; CODE XREF: HUD_RenderSymbologyAlt+18Fj
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FA6C:				; CODE XREF: HUD_RenderSymbologyAlt+1A7j
+loc_3FA6C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1A7j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -2316,7 +2352,7 @@ loc_3FA6C:				; CODE XREF: HUD_RenderSymbologyAlt+1A7j
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FA78:				; CODE XREF: HUD_RenderSymbologyAlt+1B3j
+loc_3FA78:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1B3j
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
@@ -2334,7 +2370,7 @@ loc_3FA85:
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FA9A:				; CODE XREF: HUD_RenderSymbologyAlt+1D5j
+loc_3FA9A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1D5j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+9]
 		cmp	ax, word_722E6
@@ -2342,7 +2378,7 @@ loc_3FA9A:				; CODE XREF: HUD_RenderSymbologyAlt+1D5j
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FAAA:				; CODE XREF: HUD_RenderSymbologyAlt+1E5j
+loc_3FAAA:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1E5j
 		push	word_706A0
 		call	HUD_ResolveNodePosition_547B1
 		pop	cx
@@ -2353,8 +2389,8 @@ loc_3FAB6:
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FABB:				; CODE XREF: HUD_RenderSymbologyAlt+1CEj
-					; HUD_RenderSymbologyAlt:loc_3FAB6j
+loc_3FABB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1CEj
+					; WeaponSystem_FrameUpdate_3F8C0:loc_3FAB6j
 		les	bx, [bp+arg_0]
 
 loc_3FABE:
@@ -2366,10 +2402,10 @@ loc_3FABE:
 		jmp	short loc_3FAD4
 ; ���������������������������������������������������������������������������
 
-loc_3FAD2:				; CODE XREF: HUD_RenderSymbologyAlt+207j
+loc_3FAD2:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+207j
 		xor	ax, ax
 
-loc_3FAD4:				; CODE XREF: HUD_RenderSymbologyAlt+210j
+loc_3FAD4:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+210j
 		push	ax
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6C434
@@ -2382,7 +2418,7 @@ loc_3FAD4:				; CODE XREF: HUD_RenderSymbologyAlt+210j
 		jmp	loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FAF3:				; CODE XREF: HUD_RenderSymbologyAlt+22Ej
+loc_3FAF3:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+22Ej
 		push	1
 		push	large [bp+arg_0]
 		push	dx
@@ -2410,8 +2446,8 @@ loc_3FAF3:				; CODE XREF: HUD_RenderSymbologyAlt+22Ej
 		or	al, al
 		jnz	short loc_3FB54
 
-loc_3FB3F:				; CODE XREF: HUD_RenderSymbologyAlt+268j
-					; HUD_RenderSymbologyAlt+26Fj
+loc_3FB3F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+268j
+					; WeaponSystem_FrameUpdate_3F8C0+26Fj
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
@@ -2422,14 +2458,14 @@ loc_3FB3F:				; CODE XREF: HUD_RenderSymbologyAlt+268j
 		jmp	short loc_3FB63
 ; ���������������������������������������������������������������������������
 
-loc_3FB54:				; CODE XREF: HUD_RenderSymbologyAlt+27Dj
+loc_3FB54:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+27Dj
 		les	bx, [bp+var_56]
 		mov	ax, es:[bx+13h]
 		inc	ax
 		mov	word ptr [bp+var_5C], ax
 		mov	es:[bx+13h], ax
 
-loc_3FB63:				; CODE XREF: HUD_RenderSymbologyAlt+292j
+loc_3FB63:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+292j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		cmp	dword ptr es:[bx], 0
@@ -2439,10 +2475,10 @@ loc_3FB63:				; CODE XREF: HUD_RenderSymbologyAlt+292j
 		jmp	short loc_3FB7C
 ; ���������������������������������������������������������������������������
 
-loc_3FB7A:				; CODE XREF: HUD_RenderSymbologyAlt+2AFj
+loc_3FB7A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+2AFj
 		xor	ax, ax
 
-loc_3FB7C:				; CODE XREF: HUD_RenderSymbologyAlt+2B8j
+loc_3FB7C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+2B8j
 		push	ax
 		push	large [bp+arg_0]
 
@@ -2491,8 +2527,8 @@ loc_3FBC3:
 		jmp	short loc_3FBFE
 ; ���������������������������������������������������������������������������
 
-loc_3FBEB:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FBC3j
-					; HUD_RenderSymbologyAlt+30Aj ...
+loc_3FBEB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_3FBC3j
+					; WeaponSystem_FrameUpdate_3F8C0+30Aj ...
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
@@ -2501,14 +2537,14 @@ loc_3FBEB:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FBC3j
 		call	near ptr WeaponStation_DecrementCounter
 		add	sp, 8
 
-loc_3FBFE:				; CODE XREF: HUD_RenderSymbologyAlt+191j
-					; HUD_RenderSymbologyAlt+1A9j ...
+loc_3FBFE:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+191j
+					; WeaponSystem_FrameUpdate_3F8C0+1A9j ...
 		cmp	[bp+var_52], 0
 		jnz	short loc_3FC08
 		jmp	loc_409E8
 ; ���������������������������������������������������������������������������
 
-loc_3FC08:				; CODE XREF: HUD_RenderSymbologyAlt+343j
+loc_3FC08:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+343j
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Bh]
 		shr	ax, 2
@@ -2518,7 +2554,7 @@ loc_3FC08:				; CODE XREF: HUD_RenderSymbologyAlt+343j
 		jmp	loc_3FCC9
 ; ���������������������������������������������������������������������������
 
-loc_3FC1C:				; CODE XREF: HUD_RenderSymbologyAlt+357j
+loc_3FC1C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+357j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+56h], 0
 		jz	short loc_3FC31
@@ -2530,13 +2566,13 @@ loc_3FC1C:				; CODE XREF: HUD_RenderSymbologyAlt+357j
 		jmp	short loc_3FC3A
 ; ���������������������������������������������������������������������������
 
-loc_3FC31:				; CODE XREF: HUD_RenderSymbologyAlt+364j
+loc_3FC31:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+364j
 		push	large [bp+arg_0]
 		nop
 		push	cs
 		call	near ptr WeaponStation_ResolveStateA
 
-loc_3FC3A:				; CODE XREF: HUD_RenderSymbologyAlt+36Fj
+loc_3FC3A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+36Fj
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
@@ -2544,7 +2580,7 @@ loc_3FC3A:				; CODE XREF: HUD_RenderSymbologyAlt+36Fj
 		jmp	loc_3FCC9
 ; ���������������������������������������������������������������������������
 
-loc_3FC4A:				; CODE XREF: HUD_RenderSymbologyAlt+385j
+loc_3FC4A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+385j
 		push	word ptr es:[bx+0Dh]
 		mov	bx, es:[bx+0Dh]
 		mov	bx, [bx]
@@ -2568,10 +2604,10 @@ loc_3FC4A:				; CODE XREF: HUD_RenderSymbologyAlt+385j
 		jmp	short loc_3FC8F
 ; ���������������������������������������������������������������������������
 
-loc_3FC8D:				; CODE XREF: HUD_RenderSymbologyAlt+3C2j
+loc_3FC8D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+3C2j
 		xor	ax, ax
 
-loc_3FC8F:				; CODE XREF: HUD_RenderSymbologyAlt+3CBj
+loc_3FC8F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+3CBj
 		cmp	ax, 800h
 		jz	short loc_3FCC9
 		les	bx, [bp+arg_0]
@@ -2583,10 +2619,10 @@ loc_3FC8F:				; CODE XREF: HUD_RenderSymbologyAlt+3CBj
 		jmp	short loc_3FCAD
 ; ���������������������������������������������������������������������������
 
-loc_3FCAB:				; CODE XREF: HUD_RenderSymbologyAlt+3E0j
+loc_3FCAB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+3E0j
 		mov	al, 1
 
-loc_3FCAD:				; CODE XREF: HUD_RenderSymbologyAlt+3E9j
+loc_3FCAD:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+3E9j
 		mov	byte ptr [bp+var_5C+2],	al
 		cmp	al, byte ptr [bp+var_58]
 		jz	short loc_3FCC9
@@ -2602,8 +2638,8 @@ loc_3FCBA:
 		call	SetReference
 		add	sp, 6
 
-loc_3FCC9:				; CODE XREF: HUD_RenderSymbologyAlt+359j
-					; HUD_RenderSymbologyAlt+387j ...
+loc_3FCC9:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+359j
+					; WeaponSystem_FrameUpdate_3F8C0+387j ...
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Ch]
 		shr	ax, 3
@@ -2613,7 +2649,7 @@ loc_3FCC9:				; CODE XREF: HUD_RenderSymbologyAlt+359j
 		jmp	loc_3FDA5
 ; ���������������������������������������������������������������������������
 
-loc_3FCDD:				; CODE XREF: HUD_RenderSymbologyAlt+418j
+loc_3FCDD:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+418j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+56h]
 		mov	ah, 0
@@ -2629,10 +2665,10 @@ loc_3FCDD:				; CODE XREF: HUD_RenderSymbologyAlt+418j
 		jmp	short loc_3FD05
 ; ���������������������������������������������������������������������������
 
-loc_3FD03:				; CODE XREF: HUD_RenderSymbologyAlt+438j
+loc_3FD03:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+438j
 		xor	ax, ax
 
-loc_3FD05:				; CODE XREF: HUD_RenderSymbologyAlt+441j
+loc_3FD05:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+441j
 		push	ax
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6C434
@@ -2650,8 +2686,8 @@ loc_3FD05:				; CODE XREF: HUD_RenderSymbologyAlt+441j
 		cmp	[bp+var_56], 0
 		jnz	short loc_3FD9D
 
-loc_3FD39:				; CODE XREF: HUD_RenderSymbologyAlt+467j
-					; HUD_RenderSymbologyAlt+470j
+loc_3FD39:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+467j
+					; WeaponSystem_FrameUpdate_3F8C0+470j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+55h], 1
 		push	800h
@@ -2689,12 +2725,12 @@ loc_3FD39:				; CODE XREF: HUD_RenderSymbologyAlt+467j
 		mov	es:[bx+18h], dx
 		mov	byte ptr es:[bx+13h], 1
 
-loc_3FD9D:				; CODE XREF: HUD_RenderSymbologyAlt+460j
-					; HUD_RenderSymbologyAlt+477j ...
+loc_3FD9D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+460j
+					; WeaponSystem_FrameUpdate_3F8C0+477j ...
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+13h], 1
 
-loc_3FDA5:				; CODE XREF: HUD_RenderSymbologyAlt+41Aj
+loc_3FDA5:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+41Aj
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Bh]
 		shr	ax, 4
@@ -2708,7 +2744,7 @@ loc_3FDB6:
 		jmp	loc_3FE89
 ; ���������������������������������������������������������������������������
 
-loc_3FDB9:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FDB4j
+loc_3FDB9:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_3FDB4j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 
@@ -2724,21 +2760,21 @@ loc_3FDC7:
 		jmp	short loc_3FDD2
 ; ���������������������������������������������������������������������������
 
-loc_3FDD0:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FDC5j
+loc_3FDD0:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_3FDC5j
 		xor	ax, ax
 
-loc_3FDD2:				; CODE XREF: HUD_RenderSymbologyAlt+50Ej
+loc_3FDD2:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+50Ej
 		cmp	ax, 800h
 		jnz	short loc_3FDDA
 		jmp	loc_3FE89
 ; ���������������������������������������������������������������������������
 
-loc_3FDDA:				; CODE XREF: HUD_RenderSymbologyAlt+515j
+loc_3FDDA:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+515j
 		mov	si, 1
 		jmp	short loc_3FE5A
 ; ���������������������������������������������������������������������������
 
-loc_3FDDF:				; CODE XREF: HUD_RenderSymbologyAlt+5A3j
+loc_3FDDF:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+5A3j
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+38h], si
 		jle	short loc_3FDF9
@@ -2750,11 +2786,11 @@ loc_3FDDF:				; CODE XREF: HUD_RenderSymbologyAlt+5A3j
 		jmp	short loc_3FDFD
 ; ���������������������������������������������������������������������������
 
-loc_3FDF9:				; CODE XREF: HUD_RenderSymbologyAlt+526j
+loc_3FDF9:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+526j
 		xor	dx, dx
 		xor	ax, ax
 
-loc_3FDFD:				; CODE XREF: HUD_RenderSymbologyAlt+537j
+loc_3FDFD:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+537j
 		mov	word ptr [bp+var_56+2],	dx
 		mov	word ptr [bp+var_56], ax
 		les	bx, [bp+arg_0]
@@ -2766,10 +2802,10 @@ loc_3FDFD:				; CODE XREF: HUD_RenderSymbologyAlt+537j
 		jmp	short loc_3FE1C
 ; ���������������������������������������������������������������������������
 
-loc_3FE1A:				; CODE XREF: HUD_RenderSymbologyAlt+54Fj
+loc_3FE1A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+54Fj
 		xor	ax, ax
 
-loc_3FE1C:				; CODE XREF: HUD_RenderSymbologyAlt+558j
+loc_3FE1C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+558j
 		les	bx, [bp+var_56]
 		cmp	ax, es:[bx+0Dh]
 		jnz	short loc_3FE59
@@ -2777,7 +2813,7 @@ loc_3FE1C:				; CODE XREF: HUD_RenderSymbologyAlt+558j
 		jmp	short loc_3FE3D
 ; ���������������������������������������������������������������������������
 
-loc_3FE29:				; CODE XREF: HUD_RenderSymbologyAlt+584j
+loc_3FE29:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+584j
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
@@ -2787,7 +2823,7 @@ loc_3FE29:				; CODE XREF: HUD_RenderSymbologyAlt+584j
 		add	sp, 8
 		inc	di
 
-loc_3FE3D:				; CODE XREF: HUD_RenderSymbologyAlt+567j
+loc_3FE3D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+567j
 		les	bx, [bp+var_56]
 		cmp	es:[bx+13h], di
 		jg	short loc_3FE29
@@ -2797,17 +2833,17 @@ loc_3FE3D:				; CODE XREF: HUD_RenderSymbologyAlt+567j
 		call	VROOMM_StubThunk_6C39E
 		add	sp, 6
 
-loc_3FE59:				; CODE XREF: HUD_RenderSymbologyAlt+563j
+loc_3FE59:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+563j
 		inc	si
 
-loc_3FE5A:				; CODE XREF: HUD_RenderSymbologyAlt+51Dj
+loc_3FE5A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+51Dj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+38h], si
 		jle	short loc_3FE66
 		jmp	loc_3FDDF
 ; ���������������������������������������������������������������������������
 
-loc_3FE66:				; CODE XREF: HUD_RenderSymbologyAlt+5A1j
+loc_3FE66:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+5A1j
 		mov	ax, es:[bx+16h]
 		mov	dx, es:[bx+14h]
 		mov	bx, es:[bx+6]
@@ -2819,8 +2855,8 @@ loc_3FE66:				; CODE XREF: HUD_RenderSymbologyAlt+5A1j
 		mov	ax, es:[bx+6]
 		mov	es:[bx], ax
 
-loc_3FE89:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FDB6j
-					; HUD_RenderSymbologyAlt+517j
+loc_3FE89:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_3FDB6j
+					; WeaponSystem_FrameUpdate_3F8C0+517j
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Bh]
 		shr	ax, 5
@@ -2830,12 +2866,12 @@ loc_3FE89:				; CODE XREF: HUD_RenderSymbologyAlt:loc_3FDB6j
 		jmp	loc_3FF5B
 ; ���������������������������������������������������������������������������
 
-loc_3FE9D:				; CODE XREF: HUD_RenderSymbologyAlt+5D8j
+loc_3FE9D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+5D8j
 		xor	si, si
 		jmp	loc_3FF2C
 ; ���������������������������������������������������������������������������
 
-loc_3FEA2:				; CODE XREF: HUD_RenderSymbologyAlt+675j
+loc_3FEA2:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+675j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+16h]
 		mov	dx, es:[bx+14h]
@@ -2856,22 +2892,22 @@ loc_3FEB7:
 		jmp	short loc_3FECF
 ; ���������������������������������������������������������������������������
 
-loc_3FECD:				; CODE XREF: HUD_RenderSymbologyAlt+602j
+loc_3FECD:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+602j
 		xor	ax, ax
 
-loc_3FECF:				; CODE XREF: HUD_RenderSymbologyAlt+60Bj
+loc_3FECF:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+60Bj
 		mov	di, ax
 		test	di, 0F03h
 		jnz	short loc_3FF2B
 		jmp	short loc_3FF11
 ; ���������������������������������������������������������������������������
 
-loc_3FED9:				; CODE XREF: HUD_RenderSymbologyAlt+669j
+loc_3FED9:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+669j
 		mov	word ptr [bp+var_5C], 0
 		jmp	short loc_3FEF2
 ; ���������������������������������������������������������������������������
 
-loc_3FEE0:				; CODE XREF: HUD_RenderSymbologyAlt+63Cj
+loc_3FEE0:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+63Cj
 		push	large [bp+var_56]
 		push	large [bp+arg_0]
 		push	cs
@@ -2879,7 +2915,7 @@ loc_3FEE0:				; CODE XREF: HUD_RenderSymbologyAlt+63Cj
 		add	sp, 8
 		inc	word ptr [bp+var_5C]
 
-loc_3FEF2:				; CODE XREF: HUD_RenderSymbologyAlt+61Ej
+loc_3FEF2:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+61Ej
 		les	bx, [bp+var_5C+2]
 		mov	ax, es:[bx+13h]
 		cmp	ax, word ptr [bp+var_5C]
@@ -2890,7 +2926,7 @@ loc_3FEF2:				; CODE XREF: HUD_RenderSymbologyAlt+61Ej
 		call	VROOMM_StubThunk_6C39E
 		add	sp, 6
 
-loc_3FF11:				; CODE XREF: HUD_RenderSymbologyAlt+617j
+loc_3FF11:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+617j
 		push	di
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6C434
@@ -2900,17 +2936,17 @@ loc_3FF11:				; CODE XREF: HUD_RenderSymbologyAlt+617j
 		cmp	[bp+var_5C+2], 0
 		jnz	short loc_3FED9
 
-loc_3FF2B:				; CODE XREF: HUD_RenderSymbologyAlt+615j
+loc_3FF2B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+615j
 		inc	si
 
-loc_3FF2C:				; CODE XREF: HUD_RenderSymbologyAlt+5DFj
+loc_3FF2C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+5DFj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+1Ch], si
 		jle	short loc_3FF38
 		jmp	loc_3FEA2
 ; ���������������������������������������������������������������������������
 
-loc_3FF38:				; CODE XREF: HUD_RenderSymbologyAlt+673j
+loc_3FF38:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+673j
 		mov	ax, es:[bx+16h]
 		mov	dx, es:[bx+14h]
 		mov	bx, es:[bx+6]
@@ -2922,7 +2958,7 @@ loc_3FF38:				; CODE XREF: HUD_RenderSymbologyAlt+673j
 		mov	ax, es:[bx+6]
 		mov	es:[bx], ax
 
-loc_3FF5B:				; CODE XREF: HUD_RenderSymbologyAlt+5DAj
+loc_3FF5B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+5DAj
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Ch]
 		shr	ax, 1
@@ -2940,8 +2976,8 @@ loc_3FF5B:				; CODE XREF: HUD_RenderSymbologyAlt+5DAj
 		call	near ptr Countermeasure_DeployChaffFlare
 		add	sp, 6
 
-loc_3FF83:				; CODE XREF: HUD_RenderSymbologyAlt+6A9j
-					; HUD_RenderSymbologyAlt+6B3j
+loc_3FF83:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6A9j
+					; WeaponSystem_FrameUpdate_3F8C0+6B3j
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Ch]
 		shr	ax, 2
@@ -2959,8 +2995,8 @@ loc_3FF83:				; CODE XREF: HUD_RenderSymbologyAlt+6A9j
 		call	near ptr Countermeasure_DeployChaffFlare
 		add	sp, 6
 
-loc_3FFAC:				; CODE XREF: HUD_RenderSymbologyAlt+6D2j
-					; HUD_RenderSymbologyAlt+6DCj
+loc_3FFAC:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6D2j
+					; WeaponSystem_FrameUpdate_3F8C0+6DCj
 		les	bx, [bp+var_52]
 
 loc_3FFAF:
@@ -2972,7 +3008,7 @@ loc_3FFAF:
 		jmp	loc_401C5
 ; ���������������������������������������������������������������������������
 
-loc_3FFBF:				; CODE XREF: HUD_RenderSymbologyAlt+6FAj
+loc_3FFBF:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6FAj
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+18h]
 		push	word ptr [bp+arg_0+2]
@@ -2988,7 +3024,7 @@ loc_3FFBF:				; CODE XREF: HUD_RenderSymbologyAlt+6FAj
 		jmp	loc_401C5
 ; ���������������������������������������������������������������������������
 
-loc_3FFE1:				; CODE XREF: HUD_RenderSymbologyAlt+71Cj
+loc_3FFE1:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+71Cj
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+9]
 		cmp	ax, word_722E6
@@ -2996,7 +3032,7 @@ loc_3FFE1:				; CODE XREF: HUD_RenderSymbologyAlt+71Cj
 		jmp	loc_401C5
 ; ���������������������������������������������������������������������������
 
-loc_3FFF1:				; CODE XREF: HUD_RenderSymbologyAlt+72Cj
+loc_3FFF1:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+72Cj
 		push	word_706A0
 		call	HUD_ResolveNodePosition_547B1
 		pop	cx
@@ -3005,8 +3041,8 @@ loc_3FFF1:				; CODE XREF: HUD_RenderSymbologyAlt+72Cj
 		jmp	loc_401C5
 ; ���������������������������������������������������������������������������
 
-loc_40002:				; CODE XREF: HUD_RenderSymbologyAlt+715j
-					; HUD_RenderSymbologyAlt+73Dj
+loc_40002:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+715j
+					; WeaponSystem_FrameUpdate_3F8C0+73Dj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		cmp	dword ptr es:[bx], 0
@@ -3016,10 +3052,10 @@ loc_40002:				; CODE XREF: HUD_RenderSymbologyAlt+715j
 		jmp	short loc_4001B
 ; ���������������������������������������������������������������������������
 
-loc_40019:				; CODE XREF: HUD_RenderSymbologyAlt+74Ej
+loc_40019:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+74Ej
 		xor	ax, ax
 
-loc_4001B:				; CODE XREF: HUD_RenderSymbologyAlt+757j
+loc_4001B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+757j
 		mov	word ptr [bp+var_56+2],	ax
 		push	ax
 		push	large [bp+arg_0]
@@ -3032,7 +3068,7 @@ loc_4001B:				; CODE XREF: HUD_RenderSymbologyAlt+757j
 		jmp	loc_400CA
 ; ���������������������������������������������������������������������������
 
-loc_4003B:				; CODE XREF: HUD_RenderSymbologyAlt+776j
+loc_4003B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+776j
 		les	bx, [bp+arg_0]
 		mov	si, es:[bx+9]
 		add	si, 12h
@@ -3076,13 +3112,13 @@ loc_400C2:
 		call	Weapon_HUDBox_TimerCaseI_5A906
 		add	sp, 8
 
-loc_400CA:				; CODE XREF: HUD_RenderSymbologyAlt+778j
+loc_400CA:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+778j
 		cmp	dword ptr [bp-58h], 0
 		jnz	short loc_400D4
 		jmp	loc_40191
 ; ���������������������������������������������������������������������������
 
-loc_400D4:				; CODE XREF: HUD_RenderSymbologyAlt+80Fj
+loc_400D4:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+80Fj
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+0Bh], 0
 		jz	short loc_400E4
@@ -3090,10 +3126,10 @@ loc_400D4:				; CODE XREF: HUD_RenderSymbologyAlt+80Fj
 		jmp	short loc_400E6
 ; ���������������������������������������������������������������������������
 
-loc_400E4:				; CODE XREF: HUD_RenderSymbologyAlt+81Cj
+loc_400E4:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+81Cj
 		xor	bx, bx
 
-loc_400E6:				; CODE XREF: HUD_RenderSymbologyAlt+822j
+loc_400E6:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+822j
 		push	large [bp+arg_0]
 		push	large dword ptr	[bp-58h]
 		push	bx
@@ -3101,14 +3137,14 @@ loc_400E6:				; CODE XREF: HUD_RenderSymbologyAlt+822j
 		push	word ptr es:[bx+9]
 		push	large dword ptr	es:[bx+18h]
 		push	cs
-		call	near ptr HUD_RenderSymbologyMain
+		call	near ptr WeaponSystem_LaunchFromStation_3E744
 		add	sp, 10h
 		or	al, al
 		jnz	short loc_40109
 		jmp	loc_40191
 ; ���������������������������������������������������������������������������
 
-loc_40109:				; CODE XREF: HUD_RenderSymbologyAlt+844j
+loc_40109:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+844j
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 24h	; '$'
@@ -3150,8 +3186,8 @@ loc_40109:				; CODE XREF: HUD_RenderSymbologyAlt+844j
 		mov	eax, [bp+var_7A+2]
 		mov	[bp+var_1E], eax
 
-loc_40191:				; CODE XREF: HUD_RenderSymbologyAlt+811j
-					; HUD_RenderSymbologyAlt+846j
+loc_40191:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+811j
+					; WeaponSystem_FrameUpdate_3F8C0+846j
 		push	word ptr [bp+var_56+2]
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6C434
@@ -3176,16 +3212,16 @@ loc_401BB:
 		jmp	short loc_401D6
 ; ���������������������������������������������������������������������������
 
-loc_401C5:				; CODE XREF: HUD_RenderSymbologyAlt+6FCj
-					; HUD_RenderSymbologyAlt+71Ej ...
+loc_401C5:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6FCj
+					; WeaponSystem_FrameUpdate_3F8C0+71Ej ...
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	2
 		call	Weapon_HUDBox_TimerCaseJ_5A95E
 		add	sp, 4
 
-loc_401D6:				; CODE XREF: HUD_RenderSymbologyAlt+8E2j
-					; HUD_RenderSymbologyAlt+903j
+loc_401D6:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+8E2j
+					; WeaponSystem_FrameUpdate_3F8C0+903j
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Ch]
 		and	ax, 1
@@ -3199,20 +3235,20 @@ loc_401D6:				; CODE XREF: HUD_RenderSymbologyAlt+8E2j
 		call	SetReference
 		add	sp, 6
 
-loc_401F8:				; CODE XREF: HUD_RenderSymbologyAlt+922j
+loc_401F8:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+922j
 		cmp	byte_72363, 0
 		jnz	short loc_40202
 		jmp	loc_40483
 ; ���������������������������������������������������������������������������
 
-loc_40202:				; CODE XREF: HUD_RenderSymbologyAlt+93Dj
+loc_40202:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+93Dj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_4020F
 		jmp	loc_40483
 ; ���������������������������������������������������������������������������
 
-loc_4020F:				; CODE XREF: HUD_RenderSymbologyAlt+94Aj
+loc_4020F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+94Aj
 		les	bx, es:[bx+18h]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_40223
@@ -3221,10 +3257,10 @@ loc_4020F:				; CODE XREF: HUD_RenderSymbologyAlt+94Aj
 		jmp	short loc_40225
 ; ���������������������������������������������������������������������������
 
-loc_40223:				; CODE XREF: HUD_RenderSymbologyAlt+958j
+loc_40223:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+958j
 		mov	al, 0
 
-loc_40225:				; CODE XREF: HUD_RenderSymbologyAlt+961j
+loc_40225:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+961j
 		or	al, al
 		jnz	short loc_4024A
 		les	bx, [bp+arg_0]
@@ -3236,21 +3272,21 @@ loc_40225:				; CODE XREF: HUD_RenderSymbologyAlt+961j
 		jmp	short loc_40242
 ; ���������������������������������������������������������������������������
 
-loc_40240:				; CODE XREF: HUD_RenderSymbologyAlt+975j
+loc_40240:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+975j
 		xor	ax, ax
 
-loc_40242:				; CODE XREF: HUD_RenderSymbologyAlt+97Ej
+loc_40242:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+97Ej
 		cmp	ax, 800h
 		jz	short loc_4024A
 		jmp	loc_40483
 ; ���������������������������������������������������������������������������
 
-loc_4024A:				; CODE XREF: HUD_RenderSymbologyAlt+967j
-					; HUD_RenderSymbologyAlt+985j
+loc_4024A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+967j
+					; WeaponSystem_FrameUpdate_3F8C0+985j
 		mov	byte ptr [bp+var_56+3],	0
 		xor	si, si
 
-loc_40250:				; CODE XREF: HUD_RenderSymbologyAlt+BA3j
+loc_40250:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BA3j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+13h]
 		mov	ah, 0
@@ -3263,11 +3299,11 @@ loc_40250:				; CODE XREF: HUD_RenderSymbologyAlt+BA3j
 		jmp	loc_40383
 ; ���������������������������������������������������������������������������
 
-loc_4026A:				; CODE XREF: HUD_RenderSymbologyAlt+9A5j
+loc_4026A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9A5j
 		jmp	loc_40451
 ; ���������������������������������������������������������������������������
 
-loc_4026D:				; CODE XREF: HUD_RenderSymbologyAlt+99Bj
+loc_4026D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+99Bj
 		push	0
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 0Dh
@@ -3279,7 +3315,7 @@ loc_4026D:				; CODE XREF: HUD_RenderSymbologyAlt+99Bj
 		jmp	loc_40451
 ; ���������������������������������������������������������������������������
 
-loc_40288:				; CODE XREF: HUD_RenderSymbologyAlt+9A0j
+loc_40288:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9A0j
 		or	si, si
 		jz	short loc_402C5
 		push	1
@@ -3301,7 +3337,7 @@ loc_40288:				; CODE XREF: HUD_RenderSymbologyAlt+9A0j
 		call	SetReference
 		add	sp, 6
 
-loc_402C5:				; CODE XREF: HUD_RenderSymbologyAlt+9CAj
+loc_402C5:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9CAj
 		or	si, si
 		jnz	short loc_40306
 		les	bx, [bp+arg_0]
@@ -3324,7 +3360,7 @@ loc_402C5:				; CODE XREF: HUD_RenderSymbologyAlt+9CAj
 		call	SetReference
 		add	sp, 6
 
-loc_40306:				; CODE XREF: HUD_RenderSymbologyAlt+A07j
+loc_40306:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+A07j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_4036F
@@ -3338,7 +3374,7 @@ loc_40306:				; CODE XREF: HUD_RenderSymbologyAlt+A07j
 		cmp	byte ptr [bp+var_5C+2],	0
 		jnz	short loc_40373
 
-loc_4032D:				; CODE XREF: HUD_RenderSymbologyAlt+A65j
+loc_4032D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+A65j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+0Dh]
 		mov	bx, es:[bx+0Dh]
@@ -3365,23 +3401,23 @@ loc_4032D:				; CODE XREF: HUD_RenderSymbologyAlt+A65j
 		jnz	short loc_40373
 		jmp	short $+2
 
-loc_4036F:				; CODE XREF: HUD_RenderSymbologyAlt+A4Ej
-					; HUD_RenderSymbologyAlt+A55j ...
+loc_4036F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+A4Ej
+					; WeaponSystem_FrameUpdate_3F8C0+A55j ...
 		mov	byte ptr [bp+var_56+3],	1
 
-loc_40373:				; CODE XREF: HUD_RenderSymbologyAlt+A6Bj
-					; HUD_RenderSymbologyAlt+AABj
+loc_40373:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+A6Bj
+					; WeaponSystem_FrameUpdate_3F8C0+AABj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_40380
 		jmp	loc_40451
 ; ���������������������������������������������������������������������������
 
-loc_40380:				; CODE XREF: HUD_RenderSymbologyAlt+ABBj
+loc_40380:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+ABBj
 		jmp	loc_4044D
 ; ���������������������������������������������������������������������������
 
-loc_40383:				; CODE XREF: HUD_RenderSymbologyAlt+9A7j
+loc_40383:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9A7j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		les	bx, es:[bx]
@@ -3412,7 +3448,7 @@ loc_40383:				; CODE XREF: HUD_RenderSymbologyAlt+9A7j
 		call	SetReference
 		add	sp, 6
 
-loc_403DB:				; CODE XREF: HUD_RenderSymbologyAlt+AE6j
+loc_403DB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+AE6j
 		or	si, si
 		jnz	short loc_40418
 		les	bx, [bp+arg_0]
@@ -3435,7 +3471,7 @@ loc_403DB:				; CODE XREF: HUD_RenderSymbologyAlt+AE6j
 		call	SetReference
 		add	sp, 6
 
-loc_40418:				; CODE XREF: HUD_RenderSymbologyAlt+B1Dj
+loc_40418:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+B1Dj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_4043F
@@ -3449,20 +3485,20 @@ loc_40418:				; CODE XREF: HUD_RenderSymbologyAlt+B1Dj
 		cmp	byte ptr [bp+var_64+2],	0
 		jnz	short loc_40443
 
-loc_4043F:				; CODE XREF: HUD_RenderSymbologyAlt+B60j
-					; HUD_RenderSymbologyAlt+B67j ...
+loc_4043F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+B60j
+					; WeaponSystem_FrameUpdate_3F8C0+B67j ...
 		mov	byte ptr [bp+var_56+3],	1
 
-loc_40443:				; CODE XREF: HUD_RenderSymbologyAlt+B7Dj
+loc_40443:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+B7Dj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jnz	short loc_40451
 
-loc_4044D:				; CODE XREF: HUD_RenderSymbologyAlt:loc_40380j
+loc_4044D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_40380j
 		mov	byte ptr [bp+var_56+3],	0
 
-loc_40451:				; CODE XREF: HUD_RenderSymbologyAlt:loc_4026Aj
-					; HUD_RenderSymbologyAlt+9C5j ...
+loc_40451:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_4026Aj
+					; WeaponSystem_FrameUpdate_3F8C0+9C5j ...
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+0Dh], si
 		jz	short loc_40466
@@ -3473,8 +3509,8 @@ loc_40451:				; CODE XREF: HUD_RenderSymbologyAlt:loc_4026Aj
 		jmp	loc_40250
 ; ���������������������������������������������������������������������������
 
-loc_40466:				; CODE XREF: HUD_RenderSymbologyAlt+B98j
-					; HUD_RenderSymbologyAlt+BA1j
+loc_40466:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+B98j
+					; WeaponSystem_FrameUpdate_3F8C0+BA1j
 		mov	al, byte ptr [bp+var_56+3]
 		mov	ah, 0
 		or	ax, ax
@@ -3487,8 +3523,8 @@ loc_40466:				; CODE XREF: HUD_RenderSymbologyAlt+B98j
 		call	SetReference
 		add	sp, 6
 
-loc_40483:				; CODE XREF: HUD_RenderSymbologyAlt+93Fj
-					; HUD_RenderSymbologyAlt+94Cj ...
+loc_40483:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+93Fj
+					; WeaponSystem_FrameUpdate_3F8C0+94Cj ...
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		cmp	dword ptr es:[bx], 0
@@ -3498,10 +3534,10 @@ loc_40483:				; CODE XREF: HUD_RenderSymbologyAlt+93Fj
 		jmp	short loc_4049C
 ; ���������������������������������������������������������������������������
 
-loc_4049A:				; CODE XREF: HUD_RenderSymbologyAlt+BCFj
+loc_4049A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BCFj
 		mov	al, 0
 
-loc_4049C:				; CODE XREF: HUD_RenderSymbologyAlt+BD8j
+loc_4049C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BD8j
 		or	al, al
 		jnz	short loc_404C1
 		les	bx, [bp+arg_0]
@@ -3517,17 +3553,17 @@ loc_404B5:
 		jmp	short loc_404B9
 ; ���������������������������������������������������������������������������
 
-loc_404B7:				; CODE XREF: HUD_RenderSymbologyAlt+BECj
+loc_404B7:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BECj
 		xor	ax, ax
 
-loc_404B9:				; CODE XREF: HUD_RenderSymbologyAlt:loc_404B5j
+loc_404B9:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_404B5j
 		cmp	ax, 800h
 		jz	short loc_404C1
 		jmp	loc_407AE
 ; ���������������������������������������������������������������������������
 
-loc_404C1:				; CODE XREF: HUD_RenderSymbologyAlt+BDEj
-					; HUD_RenderSymbologyAlt+BFCj
+loc_404C1:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BDEj
+					; WeaponSystem_FrameUpdate_3F8C0+BFCj
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Bh]
 		shr	ax, 6
@@ -3542,8 +3578,8 @@ loc_404C1:				; CODE XREF: HUD_RenderSymbologyAlt+BDEj
 		jmp	loc_407AE
 ; ���������������������������������������������������������������������������
 
-loc_404E3:				; CODE XREF: HUD_RenderSymbologyAlt+C10j
-					; HUD_RenderSymbologyAlt+C1Ej
+loc_404E3:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C10j
+					; WeaponSystem_FrameUpdate_3F8C0+C1Ej
 		les	bx, [bp+var_52]
 		mov	al, es:[bx+1Bh]
 		shr	ax, 6
@@ -3561,7 +3597,7 @@ loc_404E3:				; CODE XREF: HUD_RenderSymbologyAlt+C10j
 		call	SetReference
 		add	sp, 6
 
-loc_40514:				; CODE XREF: HUD_RenderSymbologyAlt+EC4j
+loc_40514:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+EC4j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+13h]
 		mov	ah, 0
@@ -3574,11 +3610,11 @@ loc_40514:				; CODE XREF: HUD_RenderSymbologyAlt+EC4j
 		jmp	loc_40672
 ; ���������������������������������������������������������������������������
 
-loc_4052E:				; CODE XREF: HUD_RenderSymbologyAlt+C69j
+loc_4052E:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C69j
 		jmp	loc_40772
 ; ���������������������������������������������������������������������������
 
-loc_40531:				; CODE XREF: HUD_RenderSymbologyAlt+C5Fj
+loc_40531:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C5Fj
 		push	0
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 0Dh
@@ -3590,7 +3626,7 @@ loc_40531:				; CODE XREF: HUD_RenderSymbologyAlt+C5Fj
 		jmp	loc_40772
 ; ���������������������������������������������������������������������������
 
-loc_4054C:				; CODE XREF: HUD_RenderSymbologyAlt+C64j
+loc_4054C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C64j
 		or	si, si
 		jz	short loc_4057B
 		mov	al, byte ptr [bp+var_56+3]
@@ -3609,7 +3645,7 @@ loc_4054C:				; CODE XREF: HUD_RenderSymbologyAlt+C64j
 		jmp	short loc_405A1
 ; ���������������������������������������������������������������������������
 
-loc_4057B:				; CODE XREF: HUD_RenderSymbologyAlt+C8Ej
+loc_4057B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C8Ej
 		mov	al, byte ptr [bp+var_56+3]
 		push	ax
 		push	1
@@ -3624,7 +3660,7 @@ loc_4057B:				; CODE XREF: HUD_RenderSymbologyAlt+C8Ej
 		mov	[bp+var_58], ax
 		push	ax
 
-loc_405A1:				; CODE XREF: HUD_RenderSymbologyAlt+CB9j
+loc_405A1:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+CB9j
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 0Dh
 		push	word ptr [bp+arg_0+2]
@@ -3660,7 +3696,7 @@ loc_405C8:
 		call	SetReference
 		add	sp, 6
 
-loc_405F6:				; CODE XREF: HUD_RenderSymbologyAlt+CF5j
+loc_405F6:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+CF5j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_4065F
@@ -3674,7 +3710,7 @@ loc_405F6:				; CODE XREF: HUD_RenderSymbologyAlt+CF5j
 		cmp	byte ptr [bp+var_60+2],	0
 		jnz	short loc_40663
 
-loc_4061D:				; CODE XREF: HUD_RenderSymbologyAlt+D55j
+loc_4061D:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+D55j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+0Dh]
 		mov	bx, es:[bx+0Dh]
@@ -3701,23 +3737,23 @@ loc_4061D:				; CODE XREF: HUD_RenderSymbologyAlt+D55j
 		jnz	short loc_40663
 		jmp	short $+2
 
-loc_4065F:				; CODE XREF: HUD_RenderSymbologyAlt+D3Ej
-					; HUD_RenderSymbologyAlt+D45j ...
+loc_4065F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+D3Ej
+					; WeaponSystem_FrameUpdate_3F8C0+D45j ...
 		mov	byte ptr [bp+var_56+2],	1
 
-loc_40663:				; CODE XREF: HUD_RenderSymbologyAlt+D5Bj
-					; HUD_RenderSymbologyAlt+D9Bj
+loc_40663:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+D5Bj
+					; WeaponSystem_FrameUpdate_3F8C0+D9Bj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+0Dh], di
 		jz	short loc_4066F
 		jmp	loc_40772
 ; ���������������������������������������������������������������������������
 
-loc_4066F:				; CODE XREF: HUD_RenderSymbologyAlt+DAAj
+loc_4066F:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+DAAj
 		jmp	loc_4076E
 ; ���������������������������������������������������������������������������
 
-loc_40672:				; CODE XREF: HUD_RenderSymbologyAlt+C6Bj
+loc_40672:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C6Bj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		les	bx, es:[bx]
@@ -3752,7 +3788,7 @@ loc_406C1:
 		jmp	short loc_406E7
 ; ���������������������������������������������������������������������������
 
-loc_406C3:				; CODE XREF: HUD_RenderSymbologyAlt+DD8j
+loc_406C3:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+DD8j
 		mov	al, byte ptr [bp+var_56+3]
 		push	ax
 		push	2
@@ -3767,7 +3803,7 @@ loc_406C3:				; CODE XREF: HUD_RenderSymbologyAlt+DD8j
 		mov	word ptr [bp+var_68+2],	ax
 		push	ax
 
-loc_406E7:				; CODE XREF: HUD_RenderSymbologyAlt:loc_406C1j
+loc_406E7:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_406C1j
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 0Dh
 		push	word ptr [bp+arg_0+2]
@@ -3797,7 +3833,7 @@ loc_406E7:				; CODE XREF: HUD_RenderSymbologyAlt:loc_406C1j
 		call	SetReference
 		add	sp, 6
 
-loc_4073A:				; CODE XREF: HUD_RenderSymbologyAlt+E3Bj
+loc_4073A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+E3Bj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jz	short loc_40761
@@ -3811,20 +3847,20 @@ loc_4073A:				; CODE XREF: HUD_RenderSymbologyAlt+E3Bj
 		cmp	byte ptr [bp+var_6C+2],	0
 		jnz	short loc_40765
 
-loc_40761:				; CODE XREF: HUD_RenderSymbologyAlt+E82j
-					; HUD_RenderSymbologyAlt+E89j ...
+loc_40761:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+E82j
+					; WeaponSystem_FrameUpdate_3F8C0+E89j ...
 		mov	byte ptr [bp+var_56+2],	1
 
-loc_40765:				; CODE XREF: HUD_RenderSymbologyAlt+E9Fj
+loc_40765:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+E9Fj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+0Dh], di
 		jnz	short loc_40772
 
-loc_4076E:				; CODE XREF: HUD_RenderSymbologyAlt:loc_4066Fj
+loc_4076E:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_4066Fj
 		mov	byte ptr [bp+var_56+2],	0
 
-loc_40772:				; CODE XREF: HUD_RenderSymbologyAlt:loc_4052Ej
-					; HUD_RenderSymbologyAlt+C89j ...
+loc_40772:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_4052Ej
+					; WeaponSystem_FrameUpdate_3F8C0+C89j ...
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+0Dh], si
 		jz	short loc_40787
@@ -3835,8 +3871,8 @@ loc_40772:				; CODE XREF: HUD_RenderSymbologyAlt:loc_4052Ej
 		jmp	loc_40514
 ; ���������������������������������������������������������������������������
 
-loc_40787:				; CODE XREF: HUD_RenderSymbologyAlt+EB9j
-					; HUD_RenderSymbologyAlt+EC2j
+loc_40787:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+EB9j
+					; WeaponSystem_FrameUpdate_3F8C0+EC2j
 		mov	al, byte ptr [bp+var_56+2]
 		mov	ah, 0
 		or	ax, ax
@@ -3844,7 +3880,7 @@ loc_40787:				; CODE XREF: HUD_RenderSymbologyAlt+EB9j
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_40793:				; CODE XREF: HUD_RenderSymbologyAlt+ECEj
+loc_40793:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+ECEj
 		mov	word ptr [bp+var_5C], di
 		push	word ptr [bp+var_5C]
 		mov	ax, word ptr [bp+arg_0]
@@ -3856,8 +3892,8 @@ loc_40793:				; CODE XREF: HUD_RenderSymbologyAlt+ECEj
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_407AE:				; CODE XREF: HUD_RenderSymbologyAlt+BFEj
-					; HUD_RenderSymbologyAlt+C20j
+loc_407AE:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+BFEj
+					; WeaponSystem_FrameUpdate_3F8C0+C20j
 		les	bx, [bp+arg_0]
 
 loc_407B1:
@@ -3866,7 +3902,7 @@ loc_407B1:
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_407BB:				; CODE XREF: HUD_RenderSymbologyAlt+EF6j
+loc_407BB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+EF6j
 		push	word ptr es:[bx+42h]
 
 loc_407BF:
@@ -3897,7 +3933,7 @@ loc_407C4:
 		cmp	byte_6D8AC, 0
 		jnz	short loc_4081B
 
-loc_40807:				; CODE XREF: HUD_RenderSymbologyAlt+F3Ej
+loc_40807:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F3Ej
 		push	0
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 0Dh
@@ -3906,8 +3942,8 @@ loc_40807:				; CODE XREF: HUD_RenderSymbologyAlt+F3Ej
 		call	SetReference
 		add	sp, 6
 
-loc_4081B:				; CODE XREF: HUD_RenderSymbologyAlt+F31j
-					; HUD_RenderSymbologyAlt+F45j
+loc_4081B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F31j
+					; WeaponSystem_FrameUpdate_3F8C0+F45j
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+18h]
 		cmp	dword ptr es:[bx], 0
@@ -3917,23 +3953,23 @@ loc_4081B:				; CODE XREF: HUD_RenderSymbologyAlt+F31j
 		jmp	short loc_40834
 ; ���������������������������������������������������������������������������
 
-loc_40832:				; CODE XREF: HUD_RenderSymbologyAlt+F67j
+loc_40832:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F67j
 		xor	ax, ax
 
-loc_40834:				; CODE XREF: HUD_RenderSymbologyAlt+F70j
+loc_40834:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F70j
 		cmp	ax, 800h
 		jz	short loc_4083C
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_4083C:				; CODE XREF: HUD_RenderSymbologyAlt+F77j
+loc_4083C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F77j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+0Dh], 0
 		jnz	short loc_40849
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_40849:				; CODE XREF: HUD_RenderSymbologyAlt+F84j
+loc_40849:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F84j
 		push	word ptr es:[bx+0Dh]
 		mov	bx, es:[bx+0Dh]
 		mov	bx, [bx]
@@ -3944,7 +3980,7 @@ loc_40849:				; CODE XREF: HUD_RenderSymbologyAlt+F84j
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_4085E:				; CODE XREF: HUD_RenderSymbologyAlt+F99j
+loc_4085E:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F99j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+9]
 		cmp	ax, word_722E6
@@ -3952,13 +3988,13 @@ loc_4085E:				; CODE XREF: HUD_RenderSymbologyAlt+F99j
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_4086E:				; CODE XREF: HUD_RenderSymbologyAlt+FA9j
+loc_4086E:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+FA9j
 		cmp	byte_72359, 0
 		jnz	short loc_40878
 		jmp	loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_40878:				; CODE XREF: HUD_RenderSymbologyAlt+FB3j
+loc_40878:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+FB3j
 		mov	[bp+var_60+2], 1000h
 		mov	eax, [bp+var_60+2]
 		mov	[bp+var_5C+2], eax
@@ -4030,10 +4066,10 @@ loc_408C2:
 		jmp	short loc_40976
 ; ���������������������������������������������������������������������������
 
-loc_40974:				; CODE XREF: HUD_RenderSymbologyAlt+10ADj
+loc_40974:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+10ADj
 		xor	ax, ax
 
-loc_40976:				; CODE XREF: HUD_RenderSymbologyAlt+10B2j
+loc_40976:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+10B2j
 		or	al, al
 		jz	short loc_4099A
 		les	bx, [bp+arg_0]
@@ -4049,7 +4085,7 @@ loc_40976:				; CODE XREF: HUD_RenderSymbologyAlt+10B2j
 		jmp	short loc_409B8
 ; ���������������������������������������������������������������������������
 
-loc_4099A:				; CODE XREF: HUD_RenderSymbologyAlt+10B8j
+loc_4099A:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+10B8j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+0Dh]
 		mov	bx, es:[bx+0Dh]
@@ -4061,8 +4097,8 @@ loc_4099A:				; CODE XREF: HUD_RenderSymbologyAlt+10B8j
 		les	bx, [bp+var_7E]
 		mov	byte ptr es:[bx+0Ch], 0
 
-loc_409B8:				; CODE XREF: HUD_RenderSymbologyAlt+ED0j
-					; HUD_RenderSymbologyAlt+EEBj ...
+loc_409B8:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+ED0j
+					; WeaponSystem_FrameUpdate_3F8C0+EEBj ...
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+0Dh]
 		push	large dword ptr	es:[bx+18h]
@@ -4078,15 +4114,15 @@ loc_409B8:				; CODE XREF: HUD_RenderSymbologyAlt+ED0j
 		jmp	short loc_409E1
 ; ���������������������������������������������������������������������������
 
-loc_409DF:				; CODE XREF: HUD_RenderSymbologyAlt+1118j
+loc_409DF:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+1118j
 		xor	ax, ax
 
-loc_409E1:				; CODE XREF: HUD_RenderSymbologyAlt+111Dj
+loc_409E1:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+111Dj
 		les	bx, [bp+arg_0]
 		mov	es:[bx+0Bh], al
 
-loc_409E8:				; CODE XREF: HUD_RenderSymbologyAlt+DAj
-					; HUD_RenderSymbologyAlt+E5j ...
+loc_409E8:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+DAj
+					; WeaponSystem_FrameUpdate_3F8C0+E5j ...
 		mov	eax, [bp+var_6]
 		mov	[bp+var_42], eax
 		mov	eax, [bp+var_42]
@@ -4108,7 +4144,7 @@ loc_409E8:				; CODE XREF: HUD_RenderSymbologyAlt+DAj
 		pop	si
 		leave
 		retf
-HUD_RenderSymbologyAlt	endp
+WeaponSystem_FrameUpdate_3F8C0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4120,7 +4156,7 @@ HUD_RenderSymbologyAlt	endp
 ; munition (+0x4E) et son statut (+0x4B) : résolution de l'état des stations d'armement
 ; (hardpoints) pour l'affichage HUD/sélection d'arme.
 ; ==============================================================================================
-WeaponStation_ResolveStateA	proc far		; CODE XREF: HUD_RenderSymbologyAlt+377p
+WeaponStation_ResolveStateA	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+377p
 
 var_1E		= word ptr -1Eh
 var_1C		= word ptr -1Ch
@@ -4527,7 +4563,7 @@ WeaponStation_ResolveStateA	endp
 ; far,278L — variante de sub_40A33 avec logique de résolution similaire : résolution de
 ; stations d'armement, second contexte d'affichage.
 ; ==============================================================================================
-WeaponStation_ResolveStateB	proc far		; CODE XREF: HUD_RenderSymbologyAlt+36Cp
+WeaponStation_ResolveStateB	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+36Cp
 
 var_16		= word ptr -16h
 var_14		= word ptr -14h
@@ -4817,7 +4853,7 @@ WeaponStation_ResolveStateB	endp
 ; type de cible.
 ; ==============================================================================================
 WeaponStation_FindByTypeMask	proc far		; CODE XREF: Radar_Project3DToScreen+7F9P
-					; HUD_RenderSymbologyAlt+1C6p ...
+					; WeaponSystem_FrameUpdate_3F8C0+1C6p ...
 
 var_6		= word ptr -6
 var_4		= dword	ptr -4
@@ -4949,7 +4985,7 @@ WeaponStation_FindLoadedCompatible	endp
 ; avant tir.
 ; ==============================================================================================
 WeaponStation_ValidateReady	proc far		; CODE XREF: AI_FireWeaponTrigger+17P
-					; HUD_RenderSymbologyAlt+48Ap ...
+					; WeaponSystem_FrameUpdate_3F8C0+48Ap ...
 
 var_6		= dword	ptr -6
 var_2		= byte ptr -2
@@ -5186,8 +5222,8 @@ WeaponStation_SelectForTarget	endp
 ; cf. système de débris seg079) selon le paramètre, décrémente le compteur associé
 ; (+0x3C/+0x3A) : fonction de largage de leurres chaff/flare (contre-mesures anti-missile).
 ; ==============================================================================================
-Countermeasure_DeployChaffFlare	proc far		; CODE XREF: HUD_RenderSymbologyAlt+6BDp
-					; HUD_RenderSymbologyAlt+6E6p
+Countermeasure_DeployChaffFlare	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6BDp
+					; WeaponSystem_FrameUpdate_3F8C0+6E6p
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h

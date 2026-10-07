@@ -8,11 +8,13 @@ seg091		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,153L — calcule la distance entre un point de proximité (arg_0+0x12) et un point de
-; référence (arg_2), la compare à un seuil : test de proximité (rayon de fuze) entre deux
-; points, utilisé pour la détection de leurre/verrouillage.
+; far, 153L, LUE 2026-09-25. (objet, point, direction, portee, cone) : d = |objet+0x12 -
+; point| ; faux si d <= 0 (exclut la reference elle-meme) ou si portee (entier, shl 8) < d ;
+; vrai si byte_7235D (seulement remis a 0 dans le code lu) ; sinon vrai si dot(normalise(objet
+; - point), direction) >= Math_CosDeg_5483F(cone). Le cone est donc tracking_cone en DEGRES,
+; demi-angle (AIM-9J 40, AIM-9M 45).
 ; ==============================================================================================
-Proximity_TestPoints	proc far		; CODE XREF: HUD_RenderSymbologyAlt+F25P
+Proximity_TestPoints	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+F25P
 					; Proximity_TestOriented+2Cp
 
 var_26		= dword	ptr -26h
@@ -168,7 +170,12 @@ Proximity_TestPoints	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_42E80:				; DATA XREF: seg339:off_6F560o
+; ==============================================================================================
+; far (label, methode +0x18 des modeles MISS et de la famille seg339:off_6F608), LU
+; 2026-10-02. Renvoie dword_707F8/707FC/70800 (vecteur nul constant) :
+; AI_Sensor_WeaponVelocityCache retombe alors sur le nez de l'avion.
+; ==============================================================================================
+WeaponModel_InitialVelocityZero_42E80:				; DATA XREF: seg339:off_6F560o
 					; seg339:off_6F608o
 		push	bp
 
@@ -216,8 +223,10 @@ loc_42EBA:				; CODE XREF: seg091:0136j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,39L — appelle vtable[0x3C] pour résoudre l'orientation puis sub_42D8C avec un rayon
-; décalé (+0xC) : test de proximité orientée pour la détection de cible potentielle.
+; far, 39L, LUE 2026-09-25. (arme, candidat, reference) : 0 sans reference ; sinon
+; Proximity_TestPoints(candidat, position de la reference (+0x12), direction de la reference
+; ([vtable+0x3C]+0xC), portee = arme+0x50 (target_range WDAT), cone = arme+0x54 (tracking_cone
+; WDAT)).
 ; ==============================================================================================
 Proximity_TestOriented	proc far		; CODE XREF: seg088:1131P seg090:01E8P ...
 
@@ -341,7 +350,13 @@ Targeting_ReticleWindowTest	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_42F71:				; DATA XREF: seg339:off_6F540o
+; ==============================================================================================
+; far (label, methode +0x14 des modeles MISS, vtable seg339 0x6F540), LU 2026-09-28. (modele,
+; cible, lanceur) : faux sans cible ou lanceur ; VRAI si distance 3D(cible, lanceur) <
+; modele+0x56 << 8 (+0x56 = effective_range du chunk WDAT, metres entiers ; 15000 m pour
+; l'AGM-65D). Test de tir de l'AGM-65D dans GroundAttack_Phase3_WeaponRelease_776FB.
+; ==============================================================================================
+MissileModel_TestInRange_42F71:				; DATA XREF: seg339:off_6F540o
 					; seg339:24ACo	...
 		push	bp
 		mov	bp, sp
@@ -436,9 +451,14 @@ loc_4300F:				; CODE XREF: seg091:028Bj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,141L — filtre par type d'arme (+0x4F ∈ {1..5}), parcourt la liste des objets candidats,
-; teste la compatibilité de type (+0x11) : filtrage des cibles compatibles avec le type d'arme
-; sélectionné pour l'acquisition.
+; far, 141L, LUE 2026-09-25. CANDIDAT DU CHERCHEUR : (arme, reference). Si weapon_aspec
+; (+0x4F) est dans 1..5, parcourt TOUS les objets du monde (World_IterateObjects liste 59C3h)
+; ; pour chacun dont la methode [0] rend un objet non nul, lit target_type (+0x11) et ne garde
+; que 1 (avion) ou 4 (leurre DECY) ; signature selon aspec : 1, 2, 5 -> methode
+; +0x7C(reference) (Aircraft_ComputeSeekerSignature_3E2F1 pour un avion), 3 ->
+; Debris_GetStateFlag (3e octet SIGN), 4 -> Debris_GetSubpartAttrib (2e octet SIGN). Retient
+; l'objet de PLUS FORTE signature (strictement superieure, depart 0) qui passe
+; Proximity_TestOriented(arme, objet, reference). Renvoie cet objet ou 0.
 ; ==============================================================================================
 Targeting_FilterByWeaponType	proc far		; CODE XREF: Targeting_SelectAndPrioritize+30p
 					; Targeting_SelectAndPrioritize+108p ...

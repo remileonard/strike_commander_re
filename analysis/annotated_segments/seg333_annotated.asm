@@ -44,7 +44,7 @@ VROOMM_StubThunk_6CE15	endp
 ; far, thunk fixe VROOMM (jmp sub_A7FF0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6CE1A	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+1E1P
+VROOMM_StubThunk_6CE1A	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+1E1P
 		jmp	MissionScenario_QueryFieldWrapper_A7FF0
 VROOMM_StubThunk_6CE1A	endp
 
@@ -227,7 +227,7 @@ VROOMM_StubThunk_6CE5B	endp
 ; far, thunk fixe VROOMM (jmp sub_A8A87) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6CE60	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+2EP
+VROOMM_StubThunk_6CE60	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+2EP
 		jmp	MissionScenario_QueryAndResolve_A8A87
 VROOMM_StubThunk_6CE60	endp
 

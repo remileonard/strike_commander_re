@@ -12,7 +12,8 @@ seg089		segment	byte public 'CODE' use16
 ; 2 g Z)) / g avec g = dword_6FFD7 = -9,8 ; t -= Z / (3 * (2000 - alt porteur) + 290) ; impact
 ; = position porteur + vitesse horizontale * t, altitude = terrain (Terrain_QueryAltitudeAt).
 ; A CLARIFIER : Z vaut l'altitude de la cible et non la hauteur de chute ; soit l'objet +0x0D
-; ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original.
+; ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original. |
+; L'arme id 7 est la DURANDAL (masque 0x40) : impact = 2500 m devant.
 ; ==============================================================================================
 BombModel_PredictImpact_41311:				; DATA XREF: seg339:off_6F50Co
 					; seg339:2478o
@@ -431,7 +432,10 @@ loc_4172B:				; CODE XREF: seg089:03B6j
 ; Math_DotProduct3D_5505B(direction normalisee vers la cible, nez du lanceur) >
 ; Math_CosDeg_5483F(modele+0x61 * t) (+0x61 = word du chunk DATA,
 ; PlayerComponent_LoadFieldsWithRetry_9FAD0). Le cone d'acceptation s'elargit avec le temps de
-; vol.
+; vol. | RELU 2026-09-28 : angle = movsx(+0x61) * t (t = distance / |vitesse du lanceur|, 0 si
+; vitesse nulle), ramene sur +/-180 par Math_CosDeg_5483F. Pour la GBU-15, +0x61 = 17920 (voir
+; BombModel_LoadDATAChunk_9FAD0) : le cone oscille tres vite avec t. Lanceur = [bp+0Ch], cible
+; = [bp+0Ah].
 ; ==============================================================================================
 BombModel_TestGuidedLockCone_41735:				; DATA XREF: seg339:2458o seg339:2474o
 		push	bp

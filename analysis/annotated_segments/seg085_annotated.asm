@@ -1750,7 +1750,9 @@ loc_3D9F1:				; DATA XREF: seg339:off_6F6FCo
 ; +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement
 ; slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1
 ; (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le
-; corps).
+; corps). | 2026-09-27 : l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne
+; (pas de lecture des commandes ni de tick de dynamique). Pose par le decollage/atterrissage
+; (roulage, approche) et par Goal_FollowAllyExec pendant la formation.
 ; ==============================================================================================
 WorldObject_UpdateWithAIEntity_3D9FB	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4:loc_3DDCFP
 					; DATA XREF: seg339:off_6F6D8o

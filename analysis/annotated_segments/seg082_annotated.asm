@@ -2373,7 +2373,7 @@ loc_3B74F:				; DATA XREF: seg339:2322o
 		add	ax, 0FF72h
 		mov	bx, sp
 		add	ss:[bx+8], ax
-		jmp	far ptr	loc_47FF8
+		jmp	far ptr	JDYN_TotalMass_47FF8
 ; ���������������������������������������������������������������������������
 
 loc_3B766:				; DATA XREF: seg339:off_6F3CEo

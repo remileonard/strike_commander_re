@@ -201,7 +201,7 @@ VROOMM_StubThunk_6AE61	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE66	proc far
-		jmp	Render_DrawComplexShape_7EDCA
+		jmp	NavMap_DrawMissionObjects_7EDCA
 VROOMM_StubThunk_6AE66	endp
 
 

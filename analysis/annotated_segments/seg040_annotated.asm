@@ -69,7 +69,12 @@ TrackedObjects_CallSlot18OnActive_22F10	endp
 ; far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags
 ; byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence
 ; (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : évaluateur
-; de déclencheur d'événement scripté de mission (trigger de zone/proximité).
+; de déclencheur d'événement scripté de mission (trigger de zone/proximité). | CORRIGE
+; 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut
+; de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem,
+; remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de
+; demarrage en frames. La difficulte est word_7235F
+; (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 Mission_TriggerEvaluator	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+490P
 
@@ -588,8 +593,8 @@ Radar_TargetTypeFilter	endp
 ; (+0x11 == 0xB ou 7, probable détruit/hors-jeu) : handler d'événement de mission conditionné
 ; à une action du joueur (probable comptage de kill/objectif).
 ; ==============================================================================================
-Mission_PlayerEventHandler	proc far		; CODE XREF: HUD_RenderSymbologyMain+780P
-					; HUD_RenderSymbologyMain+B29P ...
+Mission_PlayerEventHandler	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+780P
+					; WeaponSystem_LaunchFromStation_3E744+B29P ...
 
 var_3E		= dword	ptr -3Eh
 var_36		= word ptr -36h

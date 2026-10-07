@@ -69,7 +69,21 @@ JDYN_IsEngineDestroyed_47FCD	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_47FF8:				; CODE XREF: seg082:12F1J
+; ==============================================================================================
+; far, LUE (2026-09-26). Methode +0x3C de la vtable secondaire JDYN (tag 0x228A, lineaire
+; 0x6F33A avec la base seg339 corrigee 0x6D0B0 : off_6F376 -> loc_47FF8 ; alignement verifie :
+; +0x24 = PhysicsTicks, +0x34 = JDYN_UpdateDamageGains_494DD). MASSE TOTALE DE L'AVION, ecrite
+; dans *arg_0 (24.8, kg) : m = [[si]+4] (masse a vide, chunk DYNM, sous-objet A) + si[0x6D]
+; (carburant restant, kg, decremente par PhysicsTicks) + es:[ [[[si]+2]+0x5A] + 0x20 ] (masse
+; de l'emport : objet monde de l'avion +0x5A = far ptr vers la structure d'emport, +0x20 =
+; somme des masses des armes, cf. PlayerComponent_OrchestrateComplex_9F286 et
+; WeaponStation_DecrementCounter). Code : mov bx,[si] / mov bx,[bx+2] / mov ax,[bx+5Ch] / mov
+; dx,[bx+5Ah] / add dx,20h / les ... / mov eax,es:[bx] ; mov bx,[si] / mov eax,[bx+4] / add
+; eax,[si+6Dh] / add eax,[bp-4]. Diviseur des forces dans Aero_SumLinearForces_48639 et X de
+; l'incidence par g dans Aero_ComputeAoACommand_48862. Leve la question ouverte 5 (l'ancien
+; 'stub no-op loc_4692C' venait de la base seg339 decalee de 0x40).
+; ==============================================================================================
+JDYN_TotalMass_47FF8:				; CODE XREF: seg082:12F1J
 					; DATA XREF: seg339:off_6F376o
 		push	bp
 		mov	bp, sp
@@ -266,7 +280,11 @@ Aero_ComputeAoAWithTrim_480CA	endp
 ; : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6
 ; (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB /
 ; Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail :
-; analysis/DATA_MODEL.md 6.2.
+; analysis/DATA_MODEL.md 6.2. | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais
+; le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame
+; dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils
+; (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F
+; (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 Aero_ComputeLiftAndSideForce_4812B	proc far		; CODE XREF: Aero_SumLinearForces_48639+69p
 
@@ -881,8 +899,8 @@ Aero_ComputeDragWithFeedback_48400	endp
 ; gravité seule. SINON : thrust = FlightControl_CacheTripleParam(&si[0x22]) = (0, si[0x28], 0)
 ; (poussée pure axe corps c1/nez) ; satur  = Aero_ComputeLiftAndSideForce(si) = PORTANCE +
 ; force latérale (repère corps) ; aero   = Aero_ComputeDragWithFeedback(si) = traînée le long
-; de la trajectoire ; m = call [[si+2]+0x3C](this=si) >>8 (scalaire 24.8 ~ masse, virtuel JDYN
-; ; override non épinglé) ; grav = FlightControl_ResolveParamCached(&si[0x1E]) via
+; de la trajectoire ; m = call [[si+2]+0x3C](this=si) = JDYN_TotalMass_47FF8 = masse a vide
+; DYNM + carburant + emport (kg) ; grav = FlightControl_ResolveParamCached(&si[0x1E]) via
 ; vtable[0x6C] magic 0x2F1A (gravité résolue en repère corps). F = thrust>>8 + satur + aero ;
 ; accel = (F<<8)/m ; [si+0x7C] = -accel.c2 / dword_6FFD7 = FACTEUR DE CHARGE (G-mètre, axe
 ; normal corps) ; accel += grav (APRÈS division par m). Detail : DATA_MODEL.md 6.2.
@@ -1153,14 +1171,13 @@ Aero_SumLinearForces_48639	endp
 ; (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas (var_5A = M+0x20
 ; < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g * cos(theta) au
 ; neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) * dword_6FFD7 ), X =
-; valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car portance =
-; si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n != 0 : T =
-; n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si T est
-; compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L = (si[0x65]
-; << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien resume :
-; var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait juste par
-; deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un cosinus).
-; Ne lit PAS si[0x59].
+; [si+2]->vtable+0x3C(si) = JDYN_TotalMass_47FF8 = masse totale (a vide + carburant + emport,
+; kg). (10) si n != 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c.
+; (11) SELECTION : si T est compris entre A et B (bornes incluses), on garde A ; sinon A = T.
+; (12) BORNE : L = (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A.
+; Correction de l'ancien resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ;
+; l'ancien resultat etait juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec
+; Z' + sinus pris pour un cosinus). Ne lit PAS si[0x59].
 ; ==============================================================================================
 Aero_ComputeAoACommand_48862	proc far		; CODE XREF: Aero_ControlOrchestrator_48FC2+11p
 
@@ -2466,7 +2483,7 @@ loc_49221:
 ; flags_75 bit0 efface, [obj+0x20]=0 (en vol), poussee [si+28h] = courbe manette au cran 4.
 ; Appelants : FlightState_ResetHud, Pilot_LowLevelControlCommand.
 ; ==============================================================================================
-JDYN_JumpToPoint_49242	proc far		; CODE XREF: FlightState_ResetHud+34DP
+JDYN_JumpToPoint_49242	proc far		; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+34DP
 					; Pilot_LowLevelControlCommand:loc_3E48EP
 
 var_5E		= word ptr -5Eh
@@ -5157,7 +5174,12 @@ loc_4A826:
 ; ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) =
 ; -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral).
 ; Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree
-; par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D).
+; par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D). | CORRIGE
+; 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut
+; de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem,
+; remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de
+; demarrage en frames. La difficulte est word_7235F
+; (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 PhysicsTicks:				; CODE XREF: seg082:1153J
 					; seg082:loc_3B67BJ ...
@@ -5219,7 +5241,7 @@ loc_4A8B1:
 		push	ax
 
 loc_4A8C2:
-		call	Gauge_ComputeNeedlePosition
+		call	Aircraft_GroundClearance_3E5A6
 
 loc_4A8C7:
 		add	sp, 6

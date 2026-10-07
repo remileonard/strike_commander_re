@@ -137,7 +137,7 @@ VROOMM_StubThunk_6B218	endp
 ; far, thunk fixe VROOMM (jmp sub_87883) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=13AF0h, codesize=0F6Fh, nentries=11.
 ; ==============================================================================================
-VROOMM_StubThunk_6B21D	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+6C6P
+VROOMM_StubThunk_6B21D	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+6C6P
 					; HUDSymbol_ConstructWithContainerOpC_85D22+56P
 		jmp	Video_ShakeEffectWrapper_87883
 VROOMM_StubThunk_6B21D	endp

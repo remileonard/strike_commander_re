@@ -1788,7 +1788,7 @@ loc_51822:				; CODE XREF: Expr_VM_Interpreter_51106+717j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_ClearDirtyAndNotify_5242A
+		call	near ptr PartEntry_Deactivate_5242A
 		jmp	loc_51B41
 ; ���������������������������������������������������������������������������
 
@@ -3175,10 +3175,16 @@ PartEntry_ResolveSpawnPositionAndActivate_51EDC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, efface le bit dirty d'un nœud (+0x39), décrémente des compteurs globaux
-; (word_706A3/706A7) selon son état antérieur, notifie via Expr_Node_NotifyChange_53337.
+; far. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN OBJET DE MISSION :
+; opcode de script 0x91 (Expr_VM_Interpreter_51106, cas 0x91), inverse de 0x90
+; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Efface le bit actif de l'objet (+0x39),
+; decremente les compteurs d'objets actifs par camp (word_706A3 / word_706A7, lus par
+; Goal_IsComplete pour l'ordre 0xA9) selon l'etat anterieur, notifie via
+; Expr_Node_NotifyChange_53337. Exemple MISN-1A : le C-130 se desactive (0x91 8) apres son
+; atterrissage. NB : l'opcode 0xBE n'est PAS une desactivation : c'est un ordre transmis a
+; Goal_SetObjective_A307 (cas par defaut, objectif 0xBF).
 ; ==============================================================================================
-Expr_Node_ClearDirtyAndNotify_5242A	proc far		; CODE XREF: Expr_VM_Interpreter_51106+720p
+PartEntry_Deactivate_5242A	proc far		; CODE XREF: Expr_VM_Interpreter_51106+720p
 					; Expr_Node_UpdateAndPropagate_52AC6+133p ...
 
 arg_0		= dword	ptr  6
@@ -3199,14 +3205,14 @@ arg_0		= dword	ptr  6
 		jmp	short loc_52460
 ; ���������������������������������������������������������������������������
 
-loc_52452:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+20j
+loc_52452:				; CODE XREF: PartEntry_Deactivate_5242A+20j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+31h], 1
 		jnz	short loc_52460
 		dec	word_706A3
 
-loc_52460:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+19j
-					; Expr_Node_ClearDirtyAndNotify_5242A+26j ...
+loc_52460:				; CODE XREF: PartEntry_Deactivate_5242A+19j
+					; PartEntry_Deactivate_5242A+26j ...
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+52h]
 		push	word_706A0
@@ -3215,12 +3221,12 @@ loc_52460:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+19j
 		call	near ptr Expr_Node_NotifyChange_53337
 		add	sp, 4
 
-loc_52473:				; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+Bj
+loc_52473:				; CODE XREF: PartEntry_Deactivate_5242A+Bj
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+39h], 0FEh
 		pop	bp
 		retf
-Expr_Node_ClearDirtyAndNotify_5242A	endp
+PartEntry_Deactivate_5242A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4248,7 +4254,7 @@ loc_52BF2:
 		jz	short loc_52C5B
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Expr_Node_ClearDirtyAndNotify_5242A
+		call	near ptr PartEntry_Deactivate_5242A
 		jmp	loc_52AF5
 ; ���������������������������������������������������������������������������
 
@@ -5034,11 +5040,11 @@ GeomNode_SumAndCount_53034	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, référencée DIRECTEMENT par Player_MainUpdate (sub_13100, deux sites d'appel) —
-; récupère la N-ième entrée d'une table (stride 16 octets) puis résout sa position via
-; GeomNode_SumOffsetsUpChain_50EEB. Hypothèse : résolution de position d'un point
-; d'attache/hardpoint de l'avion du joueur. À approfondir en lien avec la question ouverte de
-; la physique du joueur.
+; far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre
+; d'entrees, +2 far ptr, pas 16 octets) via GeomNode_SumOffsetsUpChain_50EEB ; si n >= nombre
+; d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la
+; resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1,
+; 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde.
 ; ==============================================================================================
 Player_ResolveAttachPointN_5305A	proc far		; CODE XREF: Player_MainUpdate+5FEP
 					; Player_MainUpdate+620P ...
@@ -5643,7 +5649,7 @@ Scene_DetectAndActivateChange_532EA	endp
 ; ==============================================================================================
 ; far, notifie un changement de valeur de nœud (appel externe sub_223C5).
 ; ==============================================================================================
-Expr_Node_NotifyChange_53337	proc far		; CODE XREF: Expr_Node_ClearDirtyAndNotify_5242A+43p
+Expr_Node_NotifyChange_53337	proc far		; CODE XREF: PartEntry_Deactivate_5242A+43p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -8503,8 +8509,8 @@ Expr_Node_UpdateSelectionCounters_544DC	endp
 ; Expr_Node_GetOrRecompute_53236, Expr_Node_ComputeAggregateField_54121, distance (sub_5828E).
 ; Référencée depuis sub_75746. Candidat pour session dédiée.
 ; ==============================================================================================
-UIScreen_RenderOrLayoutList_54503	proc far		; CODE XREF: AITargeting_RenderThreatList_75746+12EP
-					; UIScript_ParseAndEvaluate_7A054+9BP
+UIScreen_RenderOrLayoutList_54503	proc far		; CODE XREF: LandingBehavior_Start_75746+12EP
+					; Autopilot_JumpSequence_7A054+9BP
 
 var_60		= dword	ptr -60h
 var_58		= dword	ptr -58h
@@ -8834,8 +8840,8 @@ UIScreen_RenderOrLayoutList_54503	endp
 ; far, référencée DIRECTEMENT par HUD_RenderSymbologyMain (sub_3E744) — confirme l'usage du
 ; système GeomNode/Expr par le rendu HUD pour positionner des éléments de symbologie.
 ; ==============================================================================================
-HUD_ResolveNodePosition_547B1	proc far		; CODE XREF: HUD_RenderSymbologyMain+165P
-					; HUD_RenderSymbologyMain+68CP ...
+HUD_ResolveNodePosition_547B1	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+165P
+					; WeaponSystem_LaunchFromStation_3E744+68CP ...
 
 arg_0		= word ptr  6
 

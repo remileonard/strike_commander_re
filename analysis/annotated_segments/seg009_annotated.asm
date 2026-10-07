@@ -3,7 +3,14 @@ seg009		segment	byte public 'CODE' use16
 		;org 0Dh
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_11BED:				; DATA XREF: seg339:0316o
+; ==============================================================================================
+; far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +4 de la vtable du comportement de
+; decollage (0x312, objet 0x5A cree par Goal_ExecuteAction_A8AC cas 0xA1, type +0x21 = 0x11).
+; Meme gabarit qu'un noeud MVRS : MVRS_SharedContextSyncAndID2Score_EC22, recopie de la
+; reference (+0x22..+0x2A, SetReference +0x13), position/vecteurs globaux du contexte de
+; combat (dword_7205F.., distance dword_7209B). Renvoie 0.
+; ==============================================================================================
+TakeoffBehavior_Init_11BED:				; DATA XREF: seg339:0316o
 		push	bp
 		mov	bp, sp
 		sub	sp, 1Ch
@@ -92,7 +99,19 @@ loc_11BED:				; DATA XREF: seg339:0316o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_11D03:				; DATA XREF: seg339:031Ao
+; ==============================================================================================
+; far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +8 (appelee par
+; Goal_ExecuteAction_A8AC). Init +4 si besoin, Behavior_PushRunning_756A4 (devient le
+; comportement en cours de l'entite). Si |vitesse| > 10 m/s : Behavior_PopFinished_75612 (deja
+; en vol, fin). Joueur : camera 'TAKEOFF'. Phase +0x46 = 0, temps +0x4C = 0. Cap de piste
+; +0x58 d'apres le nez de l'avion, seulement si axial : nez +c1 -> 0, -c1 -> 180, +c0 -> 270,
+; -c0 -> 90. LIT LE CHUNK REAL/OBJT/JETP/TOFF de OBJECTS\<avion>.IFF : 4 words -> +0x52
+; (acceleration au roulage, m/s2, defaut 20), +0x50 (vitesse de rotation, m/s, defaut 150),
+; +0x54 (assiette de montee, deg, defaut 30), +0x56 (gain de tenue d'assiette, defaut 8).
+; Train sorti (flags_75 |= 4). Joueur : dword_706AB -= 15,0 (global non identifie). Puis
+; appelle le tick +0xC.
+; ==============================================================================================
+TakeoffBehavior_Start_11D03:				; DATA XREF: seg339:031Ao
 		push	bp
 		mov	bp, sp
 		sub	sp, 136h
@@ -489,7 +508,13 @@ loc_12086:				; CODE XREF: seg009:01B0j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_1208C:				; DATA XREF: seg339:031Eo
+; ==============================================================================================
+; far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +0xC (tick du comportement en
+; cours). Switch sur la phase +0x46 : 0 Takeoff_Phase0_GroundRoll_120E8, 1
+; Takeoff_Phase1_ClimbOut_12472, 2 Takeoff_Phase2_GearFlapsUp_125C2, 3
+; Takeoff_Phase3_LevelOff_125EC, 4 et au-dela Behavior_PopFinished_75612 (fin).
+; ==============================================================================================
+TakeoffBehavior_Tick_1208C:				; DATA XREF: seg339:031Eo
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]
@@ -503,7 +528,7 @@ loc_120A2:				; DATA XREF: seg009:off_120DEo
 		push	large dword ptr	[bp+6] ; case 0x0
 		nop
 		push	cs
-		call	near ptr FlightState_ResetHud
+		call	near ptr Takeoff_Phase0_GroundRoll_120E8
 		jmp	short loc_120D9
 ; ���������������������������������������������������������������������������
 
@@ -512,7 +537,7 @@ loc_120AD:				; CODE XREF: seg009:04BDj
 		push	large dword ptr	[bp+6] ; case 0x1
 		nop
 		push	cs
-		call	near ptr FlightState_EnterEmergency
+		call	near ptr Takeoff_Phase1_ClimbOut_12472
 		jmp	short loc_120D9
 ; ���������������������������������������������������������������������������
 
@@ -521,7 +546,7 @@ loc_120B8:				; CODE XREF: seg009:04BDj
 		push	large dword ptr	[bp+6] ; case 0x2
 		nop
 		push	cs
-		call	near ptr FlightState_FinalizeCounter
+		call	near ptr Takeoff_Phase2_GearFlapsUp_125C2
 		jmp	short loc_120D9
 ; ���������������������������������������������������������������������������
 
@@ -530,7 +555,7 @@ loc_120C3:				; CODE XREF: seg009:04BDj
 		push	large dword ptr	[bp+6] ; case 0x3
 		nop
 		push	cs
-		call	near ptr FlightState_EnterLevelFlight
+		call	near ptr Takeoff_Phase3_LevelOff_125EC
 		jmp	short loc_120D9
 ; ���������������������������������������������������������������������������
 
@@ -558,11 +583,15 @@ off_120DE	dw offset loc_120A2	; DATA XREF: seg009:04BDr
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,329L — réinitialise plusieurs champs HUD/commande d'un objet (via chaîne +8→+7, offsets
-; +0x1F/0x23/0x27) et vérifie une altitude (+0x4C) : handler de fin/init de manoeuvre
-; (probable transition d'état de vol, ex: fin de décollage).
+; far, LUE 2026-09-26 (ex-'FlightState_ResetHud', faux). DECOLLAGE IA (ordre 0xA1). Phase 0,
+; ROULAGE CINEMATIQUE. Manche (+0x1F/+0x23/+0x27) a 0, gaz cran 10 (plein PC, ctrl+0x1E). Au
+; 1er tick, memorise la position de depart (+0x3A). Objet monde +0x59 = 1 (mode cinematique).
+; temps +0x4C += dt ; vitesse +0x48 = TOFF[+0x52] * temps ; la position avance de vitesse*dt
+; le long du cap de piste +0x58 (0 : +c1, 90 : -c0, 180 : -c1, 270 : +c0) et est ecrite dans
+; l'objet. Quand vitesse > TOFF[+0x50] : phase 1, JDYN_JumpToPoint_49242(position, direction,
+; vitesse) rend l'avion a la physique a cette vitesse, objet +0x59 = 0, drapeau 'au sol' = 1.
 ; ==============================================================================================
-FlightState_ResetHud	proc far		; CODE XREF: seg009:04C8p
+Takeoff_Phase0_GroundRoll_120E8	proc far		; CODE XREF: seg009:04C8p
 
 var_70		= dword	ptr -70h
 var_6A		= dword	ptr -6Ah
@@ -633,7 +662,7 @@ loc_12168:
 		mov	eax, [si+8]
 		mov	es:[bx+42h], eax
 
-loc_12176:				; CODE XREF: FlightState_ResetHud+6Bj
+loc_12176:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+6Bj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+11h]
 		mov	byte ptr [bx+59h], 1
@@ -682,7 +711,7 @@ loc_12176:				; CODE XREF: FlightState_ResetHud+6Bj
 		mov	cx, 4		; switch 4 cases
 		mov	bx, offset word_12462
 
-loc_1222D:				; CODE XREF: FlightState_ResetHud+150j
+loc_1222D:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+150j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_44]
 		jz	short loc_1223D
@@ -691,7 +720,7 @@ loc_1222D:				; CODE XREF: FlightState_ResetHud+150j
 		jmp	loc_1237D	; default
 ; ���������������������������������������������������������������������������
 
-loc_1223D:				; CODE XREF: FlightState_ResetHud+14Bj
+loc_1223D:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+14Bj
 		jmp	word ptr cs:[bx+8] ; switch jump
 
 loc_12241:				; DATA XREF: seg009:088Ao
@@ -729,7 +758,7 @@ loc_12276:
 		jmp	loc_1237D	; default
 ; ���������������������������������������������������������������������������
 
-loc_12291:				; CODE XREF: FlightState_ResetHud:loc_1223Dj
+loc_12291:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8:loc_1223Dj
 					; DATA XREF: seg009:088Ao
 		les	bx, [bp+arg_0]	; case 0x5A
 		mov	eax, [bp+var_2E]
@@ -755,7 +784,7 @@ loc_12291:				; CODE XREF: FlightState_ResetHud:loc_1223Dj
 		jmp	loc_1237D	; default
 ; ���������������������������������������������������������������������������
 
-loc_122E1:				; CODE XREF: FlightState_ResetHud:loc_1223Dj
+loc_122E1:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8:loc_1223Dj
 					; DATA XREF: seg009:088Ao
 		les	bx, [bp+arg_0]	; case 0xB4
 		mov	eax, [bp+var_2E]
@@ -781,7 +810,7 @@ loc_122E1:				; CODE XREF: FlightState_ResetHud:loc_1223Dj
 		jmp	short loc_1237D	; default
 ; ���������������������������������������������������������������������������
 
-loc_12330:				; CODE XREF: FlightState_ResetHud:loc_1223Dj
+loc_12330:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8:loc_1223Dj
 					; DATA XREF: seg009:088Ao
 		les	bx, [bp+arg_0]	; case 0x10E
 		mov	eax, [bp+var_2E]
@@ -809,8 +838,8 @@ loc_12365:
 		mov	bx, es:[bx+11h]
 		mov	[bx+1Ah], eax
 
-loc_1237D:				; CODE XREF: FlightState_ResetHud+152j
-					; FlightState_ResetHud+1A6j ...
+loc_1237D:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+152j
+					; Takeoff_Phase0_GroundRoll_120E8+1A6j ...
 		les	bx, [bp+arg_0]	; default
 		mov	eax, es:[bx+48h]
 		sar	eax, 8
@@ -820,7 +849,7 @@ loc_1237D:				; CODE XREF: FlightState_ResetHud+152j
 		jmp	loc_1245F
 ; ���������������������������������������������������������������������������
 
-loc_12397:				; CODE XREF: FlightState_ResetHud+2AAj
+loc_12397:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+2AAj
 		inc	word ptr es:[bx+46h]
 		push	word ptr es:[bx+11h]
 		mov	bx, es:[bx+11h]
@@ -884,16 +913,16 @@ loc_12397:				; CODE XREF: FlightState_ResetHud+2AAj
 		mov	al, [bp+var_51]
 		mov	[bx+20h], al
 
-loc_1245F:				; CODE XREF: FlightState_ResetHud+2ACj
+loc_1245F:				; CODE XREF: Takeoff_Phase0_GroundRoll_120E8+2ACj
 		pop	si
 		leave
 
 locret_12461:
 		retf
-FlightState_ResetHud	endp
+Takeoff_Phase0_GroundRoll_120E8	endp
 
 ; ���������������������������������������������������������������������������
-word_12462	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: FlightState_ResetHud+142o
+word_12462	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: Takeoff_Phase0_GroundRoll_120E8+142o
 					; value	table for switch statement
 		dw offset loc_12241	; jump table for switch	statement
 		dw offset loc_12291
@@ -905,11 +934,13 @@ word_12462	dw	0,   5Ah,  0B4h,  10Eh ; DATA XREF: FlightState_ResetHud+142o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,124L — même pattern de reset HUD (+0x23/+0x1F/+0x27=0, code HUD +0x1E=0xA) + positionne
-; un flag pilote (+0x75 bit1) : handler d'entrée dans un état de vol (probable début de
-; manoeuvre d'évitement/urgence).
+; far, LUE 2026-09-26 (ex-'FlightState_EnterEmergency', faux). DECOLLAGE IA (ordre 0xA1).
+; Phase 1, MONTEE INITIALE. Aerofrein rentre s'il est sorti (bit 5 de ctrl+0x1C), manche a 0,
+; gaz cran 10, volets sortis (flags_75 |= 2). Hauteur = altitude - Terrain_QueryAltitudeAt. Si
+; hauteur > 300 m (cmp 12C00h) : gaz cran 5 (MIL), phase 2. Sinon
+; AI_PitchAttitudeHold_126CC(assiette TOFF[+0x54]).
 ; ==============================================================================================
-FlightState_EnterEmergency	proc far		; CODE XREF: seg009:04D3p
+Takeoff_Phase1_ClimbOut_12472	proc far		; CODE XREF: seg009:04D3p
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -1004,10 +1035,10 @@ loc_12573:
 		jmp	short loc_12590
 ; ���������������������������������������������������������������������������
 
-loc_1258E:				; CODE XREF: FlightState_EnterEmergency+115j
+loc_1258E:				; CODE XREF: Takeoff_Phase1_ClimbOut_12472+115j
 		xor	ax, ax
 
-loc_12590:				; CODE XREF: FlightState_EnterEmergency+11Aj
+loc_12590:				; CODE XREF: Takeoff_Phase1_ClimbOut_12472+11Aj
 		or	al, al
 		jz	short loc_125AD
 		les	bx, [bp+arg_0]
@@ -1019,20 +1050,20 @@ loc_12590:				; CODE XREF: FlightState_EnterEmergency+11Aj
 		jmp	short locret_125C0
 ; ���������������������������������������������������������������������������
 
-loc_125AD:				; CODE XREF: FlightState_EnterEmergency+120j
+loc_125AD:				; CODE XREF: Takeoff_Phase1_ClimbOut_12472+120j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+54h]
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		nop
 		push	cs
-		call	near ptr Altitude_HoldController
+		call	near ptr AI_PitchAttitudeHold_126CC
 		add	sp, 6
 
-locret_125C0:				; CODE XREF: FlightState_EnterEmergency+139j
+locret_125C0:				; CODE XREF: Takeoff_Phase1_ClimbOut_12472+139j
 		leave
 		retf
-FlightState_EnterEmergency	endp
+Takeoff_Phase1_ClimbOut_12472	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1040,10 +1071,10 @@ FlightState_EnterEmergency	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,19L — nettoie 2 bits de flag pilote (+0x75 bits 2 et 1) et incrémente un compteur
-; (+0x46) : finalisation d'état avec comptage d'occurrences.
+; far, LUE 2026-09-26 (ex-'FlightState_FinalizeCounter'). DECOLLAGE IA (ordre 0xA1). Phase 2 :
+; train rentre (flags_75 &= ~4), volets rentres (flags_75 &= ~2), phase 3.
 ; ==============================================================================================
-FlightState_FinalizeCounter	proc far		; CODE XREF: seg009:04DEp
+Takeoff_Phase2_GearFlapsUp_125C2	proc far		; CODE XREF: seg009:04DEp
 
 arg_0		= dword	ptr  6
 
@@ -1061,7 +1092,7 @@ arg_0		= dword	ptr  6
 		inc	word ptr es:[bx+46h]
 		pop	bp
 		retf
-FlightState_FinalizeCounter	endp
+Takeoff_Phase2_GearFlapsUp_125C2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1069,10 +1100,13 @@ FlightState_FinalizeCounter	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,89L — reset HUD (code +0x1E=5), nettoie flag pilote (+0x75 bit1), compare l'altitude
-; courante (sub_57C3A) à un seuil (0x1100) : handler d'entrée en palier/maintien d'altitude.
+; far, LUE 2026-09-26 (ex-'FlightState_EnterLevelFlight'). DECOLLAGE IA (ordre 0xA1). Phase 3,
+; MISE EN PALIER. Aerofrein rentre s'il est sorti, ctrl+0x27 = 0, gaz cran 5 (MIL), volets
+; rentres. Si assiette du nez (Matrix_NosePitchAngle_57C3A) > 17 deg (cmp 1100h) : manche
+; +0x1F = -16 (plein pique). Sinon : phase 4 (fin au tick suivant) et manche +0x1F = +8 (mi-
+; course tire).
 ; ==============================================================================================
-FlightState_EnterLevelFlight	proc far		; CODE XREF: seg009:04E9p
+Takeoff_Phase3_LevelOff_125EC	proc far		; CODE XREF: seg009:04E9p
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -1133,10 +1167,10 @@ loc_1266B:
 		jmp	short loc_12688
 ; ���������������������������������������������������������������������������
 
-loc_12686:				; CODE XREF: FlightState_EnterLevelFlight+93j
+loc_12686:				; CODE XREF: Takeoff_Phase3_LevelOff_125EC+93j
 		xor	ax, ax
 
-loc_12688:				; CODE XREF: FlightState_EnterLevelFlight+98j
+loc_12688:				; CODE XREF: Takeoff_Phase3_LevelOff_125EC+98j
 		or	al, al
 		jz	short loc_126AA
 		mov	[bp+var_C], 0FFFFF000h
@@ -1148,7 +1182,7 @@ loc_12688:				; CODE XREF: FlightState_EnterLevelFlight+98j
 		jmp	short locret_126CA
 ; ���������������������������������������������������������������������������
 
-loc_126AA:				; CODE XREF: FlightState_EnterLevelFlight+9Ej
+loc_126AA:				; CODE XREF: Takeoff_Phase3_LevelOff_125EC+9Ej
 		les	bx, [bp+arg_0]
 		inc	word ptr es:[bx+46h]
 		mov	[bp+var_10], 800h
@@ -1157,10 +1191,10 @@ loc_126AA:				; CODE XREF: FlightState_EnterLevelFlight+9Ej
 		les	bx, es:[bx+7]
 		mov	es:[bx+1Fh], eax
 
-locret_126CA:				; CODE XREF: FlightState_EnterLevelFlight+BCj
+locret_126CA:				; CODE XREF: Takeoff_Phase3_LevelOff_125EC+BCj
 		leave
 		retf
-FlightState_EnterLevelFlight	endp
+Takeoff_Phase3_LevelOff_125EC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1168,11 +1202,13 @@ FlightState_EnterLevelFlight	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,166L — contrôleur de maintien d'altitude : calcule l'écart entre l'altitude courante
-; (sub_57C3A) et une consigne (arg_4), applique un coefficient (+0x56) façon correction
-; proportionnelle : loi de contrôle du tangage pour tenir une altitude cible.
+; far, LUE 2026-09-26 (ex-'Altitude_HoldController' : ce n'est PAS une tenue d'altitude).
+; TENUE D'ASSIETTE : erreur = consigne (arg_4, deg) - assiette du nez
+; (Matrix_NosePitchAngle_57C3A) ; manche ctrl+0x1F = borne(erreur * gain / 8, +/- gain), gain
+; = +0x56 (TOFF, defaut 8), tronque a l'entier (manche pleine butee = 16). Renvoie |erreur| <
+; 5 deg.
 ; ==============================================================================================
-Altitude_HoldController	proc far		; CODE XREF: FlightState_EnterEmergency+148p
+AI_PitchAttitudeHold_126CC	proc far		; CODE XREF: Takeoff_Phase1_ClimbOut_12472+148p
 
 var_22		= dword	ptr -22h
 var_1E		= word ptr -1Eh
@@ -1233,10 +1269,10 @@ loc_126F7:
 		jmp	short loc_12716
 ; ���������������������������������������������������������������������������
 
-loc_12714:				; CODE XREF: Altitude_HoldController+40j
+loc_12714:				; CODE XREF: AI_PitchAttitudeHold_126CC+40j
 		mov	ax, cx
 
-loc_12716:				; CODE XREF: Altitude_HoldController+46j
+loc_12716:				; CODE XREF: AI_PitchAttitudeHold_126CC+46j
 		mov	cx, ax
 		mov	eax, [bp+var_A]
 		sub	[bp+var_4], eax
@@ -1260,10 +1296,10 @@ loc_12716:				; CODE XREF: Altitude_HoldController+46j
 		jmp	short loc_12764
 ; ���������������������������������������������������������������������������
 
-loc_12762:				; CODE XREF: Altitude_HoldController+8Fj
+loc_12762:				; CODE XREF: AI_PitchAttitudeHold_126CC+8Fj
 		xor	ax, ax
 
-loc_12764:				; CODE XREF: Altitude_HoldController+94j
+loc_12764:				; CODE XREF: AI_PitchAttitudeHold_126CC+94j
 		or	al, al
 		jz	short loc_12789
 		les	bx, [bp+arg_0]
@@ -1277,7 +1313,7 @@ loc_12764:				; CODE XREF: Altitude_HoldController+94j
 		jmp	short loc_127D0
 ; ���������������������������������������������������������������������������
 
-loc_12789:				; CODE XREF: Altitude_HoldController+9Aj
+loc_12789:				; CODE XREF: AI_PitchAttitudeHold_126CC+9Aj
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+56h]
 		neg	ax
@@ -1290,10 +1326,10 @@ loc_12789:				; CODE XREF: Altitude_HoldController+9Aj
 		jmp	short loc_127AB
 ; ���������������������������������������������������������������������������
 
-loc_127A9:				; CODE XREF: Altitude_HoldController+D6j
+loc_127A9:				; CODE XREF: AI_PitchAttitudeHold_126CC+D6j
 		xor	ax, ax
 
-loc_127AB:				; CODE XREF: Altitude_HoldController+DBj
+loc_127AB:				; CODE XREF: AI_PitchAttitudeHold_126CC+DBj
 		or	al, al
 		jz	short loc_127D0
 		les	bx, [bp+arg_0]
@@ -1306,8 +1342,8 @@ loc_127AB:				; CODE XREF: Altitude_HoldController+DBj
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_4], eax
 
-loc_127D0:				; CODE XREF: Altitude_HoldController+BBj
-					; Altitude_HoldController+E1j
+loc_127D0:				; CODE XREF: AI_PitchAttitudeHold_126CC+BBj
+					; AI_PitchAttitudeHold_126CC+E1j
 		mov	ax, word ptr [bp+var_4+1]
 		mov	[bp+var_1E], ax
 		movsx	eax, [bp+var_1E]
@@ -1330,13 +1366,13 @@ loc_127FF:
 		jmp	short loc_12803
 ; ���������������������������������������������������������������������������
 
-loc_12801:				; CODE XREF: Altitude_HoldController+12Ej
+loc_12801:				; CODE XREF: AI_PitchAttitudeHold_126CC+12Ej
 		xor	ax, ax
 
-loc_12803:				; CODE XREF: Altitude_HoldController:loc_127FFj
+loc_12803:				; CODE XREF: AI_PitchAttitudeHold_126CC:loc_127FFj
 		pop	si
 		leave
 		retf
-Altitude_HoldController	endp
+AI_PitchAttitudeHold_126CC	endp
 
 seg009		ends

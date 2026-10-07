@@ -20,7 +20,7 @@ seg001		segment	byte public 'CODE' use16
 ; CONFIRME que ID=20 sert de solveur geometrique partage, pas un instinct classique du tournoi
 ; consomme via le tableau MVRS du fichier.
 ; ==============================================================================================
-AI_ProximityGeometricWarning_315B	proc far		; CODE XREF: AI_VisibilityTest+260P
+AI_ProximityGeometricWarning_315B	proc far		; CODE XREF: AI_CollisionCourseTest_DD21+260P
 
 var_4A		= dword	ptr -4Ah
 var_46		= dword	ptr -46h
@@ -216,7 +216,15 @@ AI_ProximityGeometricWarning_315B	endp
 ; slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 =
 ; VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e
 ; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
-; +0xB4 est a lire selon cette table.
+; +0xB4 est a lire selon cette table. | CLASSE ET ADMISSIBILITE (relu 2026-10-02) : var_E = ma
+; classe (octet +0x52 du modele de mon avion, chunk JINF), var_7 = (>= 9), var_8 = (>= 6).
+; Candidat admis (loc_3623) si : missile (categorie 8) qui me vise avec target_domain 1 ; OU
+; camp du candidat (+0x50) == -mon camp (1 contre 0xFF ; 0 contre 0) et (cible sol +0x11 == 2
+; avec arg_4 et arme sol, OU avion categorie 6 dont le pilote n'est pas ejecte (flags_75 bit
+; 5) et ma classe >= 6). Score des avions (loc_3CCF), c = classe du candidat, m = la mienne, K
+; = byte_72038 = 6 : c <= K -> B (var_12) = 0 ; sinon A et aptitude += (c - 2 <= m ? c - K : m
+; - c). Puis bit 1 de +0x28B (aptitude +4) et +0x285 (A +10, aptitude +5) pour tous les
+; candidats.
 ; ==============================================================================================
 Targeting_AcquireBestThreat	proc far		; CODE XREF: AI_TopLevelThink+23P AI_BehaviorStateMachine_WeightedOptionSelector_9D05+75P ...
 

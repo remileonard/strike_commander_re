@@ -116,7 +116,11 @@ Damage_SelectWeightedComponent	endp
 ; far,51L — reset du timer de vérification de panne si la difficulté a changé (+0x98 vs
 ; word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à
 ; expiration : minuteur de vérification périodique de panne de composant, sensible à la
-; difficulté.
+; difficulté. | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE
+; FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans
+; CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3,
+; > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F
+; (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 Damage_CheckTimer	proc far		; CODE XREF: seg060:0C64p
 

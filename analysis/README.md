@@ -1026,7 +1026,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Formation_GuidanceSolution_D081` | 944 | seg006 | Guidage de formation (followAlly) |
 | `AI_ComputeFireSolutionQuality_91DF` | 559 | seg004 | Solution de manœuvre/guidage |
 | `AI_GuidanceSolution_Major_702A` | 651 | seg003 | Guidage complexe (lead pursuit) |
-| `AI_ManeuverSolution_Major_6977` | 616 | seg003 | Solution de manœuvre/tir |
+| `AI_GunSnapAim_6977_6977` | 616 | seg003 | Solution de manœuvre/tir |
 | `AI_CombatDecision_Major_75F8` | 603 | seg003 | Décision de combat IA |
 | `Flight_PhysicsTick_JDYN_3314` | 1347 | seg001 | Tick physique de vol (JDYN) |
 | `AI_PitchController_7B20_7B20` | 384 | seg003 | Contrôleur de roulis |

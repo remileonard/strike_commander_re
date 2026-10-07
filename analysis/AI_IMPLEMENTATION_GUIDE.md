@@ -161,7 +161,7 @@ bool SCMissionActors::skillCheck(uint8_t statValue, int modifier) {
 | Offset | Trait `ATRB` | Confirmé par |
 |---|---|---|
 | `+0xB0` | `FL` (corrigé 2026-09-25 : pas `TH`) | jet de pilotage, consulté par le tournoi |
-| `+0xB1` | `TH` (corrigé 2026-09-25 : pas `CN`) | jet (`Pilot_SkillCheck_B1`, depuis `AI_RadarScanTarget`) |
+| `+0xB1` | `TH` (corrigé 2026-09-25 : pas `CN`) | jet (`Pilot_SkillCheck_B1`, depuis `AI_WeaponRecoveryBusy_9027`) |
 | `+0xB2` | `VB` | `canPlayRadioMessage` (§5.2) |
 | `+0xB3` | `CN` (corrigé 2026-09-25 : pas `LY`) | calcul du moral (`AI_ComputeMorale_CD4A`) |
 | `+0xB4` | `LY` (corrigé 2026-09-25 : pas `FL`) | discipline (`AI_MoraleDisciplineCheck_CA93`), condition `> 14` dans le dispatcheur de message |
@@ -171,6 +171,11 @@ bool SCMissionActors::skillCheck(uint8_t statValue, int modifier) {
 | `+0xB8` | `AR` | jet de compétence |
 
 ### 1.6 Remise à l'échelle de `FL`/`AG`/`AA` par la difficulté
+
+> 2026-10-03 : ne s'applique qu'aux **avions du camp ennemi** (`Cockpit_ReadControlsFrame_8F720` : catégorie 6 et camp
+> +0x50 == 0xFF), toujours à partir des valeurs du fichier (+0xA0..+0xA2). `word_7235F` : 0 = intact, 1 = moitié,
+> 2 = quart. Porté dans `SCMission::applyDifficulty` (`RSProf::ai.atrb_file`). `word_70466` n'est pas la
+> difficulté mais le compteur de frames de la mission.
 
 Concerne uniquement la copie de réglage, distincte de la copie de
 consommation directe ci-dessus :

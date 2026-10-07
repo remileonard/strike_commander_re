@@ -69,7 +69,9 @@ UIWidget_ReleaseWrapper_8DEC0	endp
 ; alloue dynamiquement un tampon type tag 0x5C44 pour stocker des messages indexes).
 ; Anciennement mal nommee AITargeting_LoadCalibrationRecord (aucun rapport avec le ciblage
 ; IA). Candidat pour session dediee si la structure exacte de ASKS/MSGS (chaines/cles) doit
-; etre tracee completement.
+; etre tracee completement. | 2026-09-27 : octet du chunk SPCH -> +0x51 du profil (profil a
+; entite+0x1A) = entite+0x6B = voix du personnage, testee par Goal_FollowAllyFormation (== 9)
+; et Radio_PlayMessage (== 0x0C).
 ; ==============================================================================================
 PilotProfile_LoadRADI_8DF49	proc far		; CODE XREF: VROOMM_StubThunk_6B63FJ
 

@@ -96,7 +96,7 @@ VROOMM_StubThunk_6C129	endp
 ; far, thunk fixe VROOMM (jmp sub_9CCB3) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2AF50h, codesize=2A2h, nentries=7.
 ; ==============================================================================================
-VROOMM_StubThunk_6C12E	proc far		; CODE XREF: MissionRecord_LoadStringFields_9D4F0+1FP
+VROOMM_StubThunk_6C12E	proc far		; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+1FP
 		jmp	Debris_ReleaseWrapper_9CCB3
 VROOMM_StubThunk_6C12E	endp
 

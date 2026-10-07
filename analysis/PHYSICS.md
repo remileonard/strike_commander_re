@@ -323,7 +323,7 @@ bool side_stall = std::abs(beta) > stall_alpha;   // → coupe la force latéral
 //     (loc_481C1 → chaîne de sauts vers loc_48211 = "sinon on retombe sur (A)") :
 bool hard_stall =
        std::abs(ae_raw) > stall_alpha       // test sur l'AoA NON borné      (loc_481C1)
-    && difficulty       > 10                // word_70466 (réalisme global)   (loc_481CF)
+    && difficulty       > 10                // word_70466 = compteur de frames depuis le début de mission (corrigé 2026-10-03)   (loc_481CF)
     && realism_option                       // byte_72354 != 0 (option de jeu, = 1 par défaut, init ovr266)
     && is_player;                           // handle == word_722E6 — JAMAIS les IA
 wing_stall = hard_stall;   // flags_75 bit6 = (obj[+0x20] == 0) : drapeau d'alerte HUD/son, PAS un couple
@@ -452,8 +452,9 @@ float AoACommand() {
     if (up_vertical < 0) g1 = -g1;                                // M+0x20 < 0 : composante verticale de la normale
 
     // (5) incidence par g :  k = −(X / q / lift_gain) · 1,5 · g     (0x180 = 1,5 ; dword_6FFD7 = −9,8)
-    //     X = [si+2]->vtable+0x3C : a la forme d'une masse (NON PROUVÉ, §8). Avec g = −9,8 le signe final est +.
-    float k = (mass / q / lift_gain) * 1.5f * 9.8f;
+    //     X = [si+2]->vtable+0x3C = JDYN_TotalMass_47FF8 = masse à vide + carburant + emport (kg).
+    //     Avec g = −9,8 le signe final est +.
+    float k = (total_mass / q / lift_gain) * 1.5f * 9.8f;
 
     // (6) cibles
     float n = d + g1;                                             // facteur de charge demandé (cos θ au neutre)
@@ -474,6 +475,20 @@ Remarques :
   vole déjà à cette incidence, `A = α` est gardé → erreur nulle → le manche neutre est stable.
 - **Au sol, en décrochage franc, ou sans le bit 4 : A = 0** (et non α). Le bit 4 est posé par défaut
   à la création (`flags_75 = bit4|bit7`).
+  Tracé 2026-09-26 : `PhysicsTicks` bascule le bit 4 quand le bit 7 de l'octet de commandes `+0x1C`
+  est posé, mais rien ne pose ce bit 7. `Player_MainUpdate` ne pose que les bits 0 à 6, les lois de
+  l'IA seulement les bits 4 et 5, et `AircraftStateBits_Clear_12806` le remet à 0. La seule écriture
+  qui efface le bit 4 est une fonction anonyme à `0x494AF`, juste après `JDYN_JumpToPoint_49242`,
+  qui ne reçoit aucune référence (ni dans les segments annotés ni dans `strike.asm`). En pratique
+  **le bit 4 reste posé en permanence**. La matrice `M` est la vraie orientation de l'avion
+  (méthode `+0x3C` de l'objet monde = `WorldObject_GetOrientationMatrix_3CB2D`, objet `+0x2C`).
+- **Sur la tranche exacte (mesuré dans DOSBox le 2026-09-26)** : `Matrix_RollAngle_57C67` renvoie **0°**
+  quand la composante verticale de la normale vaut 0 en 24.8 (`cmp dword ptr [si+20h],0 / jnz`), donc à
+  moins de 1/256 près. Mesures sur le F-16 à 90° de roulis, manche au neutre : `|cos| = 1,0`, consigne
+  `si[0x16]` = −2,98° (= α), vitesse de tangage `si[4]` = 0,08°/s, `si[0x7C]` = 0,03 g. À environ 60° :
+  `|cos| = 0,47`, la fonction calcule normalement. C'est ce cas particulier qui empêche l'avion sur la
+  tranche de tourner : α descend librement jusqu'à −calage, la portance s'annule, et seul le lacet fait
+  piquer le nez.
 
 **B. Servo — `Aero_ComputeForcesMain_4791E`** (seg102) :
 
@@ -595,7 +610,7 @@ table par défaut.
   force latérale si `|β| > stall_alpha` sont **toujours** actives et
   suffisent au comportement de décrochage. Le « départ franc » (portance
   nulle) demande en plus trois entrées à câbler côté port :
-  `difficulty` (word_70466 > 10), une option de réalisme (byte_72354) et
+  `word_70466` > 10 (compteur de frames depuis le début de mission, pas la difficulté — corrigé 2026-10-03), une option de réalisme (byte_72354) et
   `is_player` — les IA n'y sont **jamais** soumises.
 - **`Fmax`/`Smax`** (déflexion max volets/spoiler) ← rôle proche de
   `flap_lift_increment` (`jdyn[0x4D]`) mais **en incidence**, pas en angle
@@ -627,12 +642,12 @@ table par défaut.
 
 | Point | État |
 |---|---|
-| Diviseur de masse — ligne exacte de l'override `vtable[+0x3C]` sur l'objet JDYN | Bloqué en statique (stub no-op `loc_4692C` trouvé sur la vtable secondaire `0x228A`) ; **hypothèse retenue : `m` = chunk `DYNM`** (confirmée par Rémi comme cohérente avec la structure IFF) — à vérifier par trace DOSBox si besoin de certitude absolue |
+| Diviseur de masse — override `vtable[+0x3C]` sur l'objet JDYN | **RÉSOLU (2026-09-26)** : `JDYN_TotalMass_47FF8` = masse à vide (`DYNM`) + carburant restant (`si[0x6D]`) + masse d'emport (objet monde `+0x5A` → `+0x20`). L'ancien « stub no-op » venait de la base `seg339` décalée de `0x40`. Voir DATA_MODEL §6.2. |
 | Bloc supplémentaire du chunk `ATMO` (quand `dword_72A0A≠0`) | Non décodé — la table de densité alternative éventuelle n'est pas dans `AIRDENS.TBL` |
-| `JDYN +0x80..+0x8B` (6 champs, défauts 500/100/231/11005/3/2) | **RÉSOLU (session 2026-09-06), sauf `+0x8A`.** Params de l'IA de vol/combat, lus via `[pilotCtx+0x0B]` depuis seg002/seg003/ovr231, jamais par la physique du joueur. `+0x80`=vitesse IA max poursuite, `+0x82`=vitesse IA min, `+0x84`=vitesse croisière/manœuvre, `+0x86`=seuil de portée, `+0x8B`=poids d'un score de décision. `+0x8A` (déf. 3) : consommateur non localisé. Détail DATA_MODEL §6.2. |
+| `JDYN +0x80..+0x8B` (6 champs, défauts 500/100/231/11005/3/2) | **RÉSOLU (session 2026-09-06 ; `+0x8A` 2026-09-26).** Params de l'IA de vol/combat, lus via `[pilotCtx+0x0B]` depuis seg002/seg003/ovr231, jamais par la physique du joueur. `+0x80`=vitesse IA max poursuite, `+0x82`=vitesse IA min, `+0x84`=vitesse croisière/manœuvre, `+0x86`=seuil de portée, `+0x8B`=poids d'un score de décision. `+0x8A` (déf. 3) : jamais lu dans le binaire (vérifié 2026-09-26). Détail DATA_MODEL §6.2. |
 | `jdyn[0x47]` (limite de taux) — unité exacte (°/s ? °/tick ?) | Pas confirmée numériquement |
 | `Aero_ComputeControlFlags75Bit5C` (roulis, table `jdyn[0x77]`) | Partiellement lue (2026-09-25) : borne `± jdyn[0x71]·g_aileron`, limite d'accélération `jdyn[0x47]` (§5.8). Le reste (table `jdyn[0x77]`, gate à 40 m/s) n'est pas relu ligne à ligne. |
-| Valeur `X` de la loi de charge (`[si+2]->vtable+0x3C`) | A la forme d'une masse (la portance vaut `lift_gain·α·q`), **non prouvé** — même question que la première ligne de ce tableau. |
+| Valeur `X` de la loi de charge (`[si+2]->vtable+0x3C`) | **RÉSOLU (2026-09-26)** : même méthode, masse totale `JDYN_TotalMass_47FF8`. |
 | Attributs A et B des composants (gains de dégâts, §5.9) | Formule `(B − A)/B` lue ; la sémantique exacte (points de vie max / dégâts ?) et le lien avec `system_health` côté libRealSpace sont à confirmer côté données. |
 | Instant d'appel de la méthode `+0x14` (position/orientation) par rapport à `PhysicsTicks` | Non épinglé (§3). |
 | Dispatcher clavier de la manette des gaz (`+`/`-`, `1`…`0`) | Hors `Player_MainUpdate`, jamais localisé |

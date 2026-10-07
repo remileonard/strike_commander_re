@@ -19,7 +19,7 @@ stru_6C1E0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A76o
 ; d'overlay actuellement charge en memoire. fileoff=2B760h, codesize=110h, nentries=2.
 ; ==============================================================================================
 VROOMM_StubThunk_6C200	proc far		; CODE XREF: IFF_LoadModelMain+5A1P
-					; MissionRecord_LoadStringFields_9D4F0+CP
+					; Aircraft_LoadEJECAndJINF_9D4F0+CP
 		jmp	Camera_Helper2_9D380
 VROOMM_StubThunk_6C200	endp
 

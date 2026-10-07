@@ -33,7 +33,7 @@ VROOMM_StubThunk_6C5A0	endp
 ; d'overlay actuellement charge en memoire. fileoff=2ECE0h, codesize=2F5h, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6C5A5	proc far		; CODE XREF: IFF_LoadModelMain+79EP
-					; PlayerComponent_LoadFieldsWithRetry_9FAD0+CP	...
+					; BombModel_LoadDATAChunk_9FAD0+CP	...
 		jmp	Weapon_LoadWDATWrapper_A07ED
 VROOMM_StubThunk_6C5A5	endp
 

@@ -4029,7 +4029,18 @@ loc_10BBC:				; CODE XREF: seg008:loc_10B90j
 ; AI_VisibilityTest(cible) -> retour ; bit3 : si distance <= 2|Vt|^2/9 -> minuteur 4, bit4,
 ; point = position cible + vitesse x 4 s (Physics_ApplyForceAtPoint) ; sinon interception ;
 ; sinon si nez <= 60 et word_72093 < 60 -> bit3 ; AI_InterceptDispatcher, fin s'il renvoie non
-; nul.
+; nul. | RELU EN DETAIL 2026-10-02 : minuteur < 0 -> Behavior_PopFinished mais le tick
+; continue. Bit1 : word_72097 = angle(D, vitesse de la cible). Bit2 (ou bit1 et word_72097 >=
+; 80) : bit1 -> bit2, ou bit2 efface si word_72097 < 80 ; direction = (node+0x26, +0x2A, 0)
+; avec composante verticale = sa longueur si pas trop lent ; AI_GuidanceCmd_FromOwnPos ;
+; AI_ThrottleCmd_HUD(dword_72039). Bit4 : si angle(D, nez) <= 45 : AI_InterceptDispatcher puis
+; bit4 efface ; sinon AI_GuidanceCmd_FromOwnPos(node+0x26.. = POSITION ABSOLUE cible + vitesse
+; x 4 s passee comme direction : bug de l'original), bit4 efface s'il renvoie 1. Sinon :
+; AI_CollisionCourseTest_DD21 -> fin du tick ; bit3 : si d <= 2|Vt|^2/9 : minuteur 4 s, bit4,
+; bit3 efface, node+0x26 = Physics_ApplyForceAtPoint(cible, 4 s) ; sinon
+; AI_InterceptDispatcher. Sans bit : nez <= 60 et (180 - angle(D, Vt)) < 60 -> bit3 et
+; AI_InterceptDispatcher ; sinon AI_InterceptDispatcher, FIN DE LA MANOEUVRE s'il renvoie 1
+; (recalage de visee fait).
 ; ==============================================================================================
 MVRS_ID7_TickPursuit_10BD9:				; DATA XREF: seg339:0234o
 		push	bp
@@ -4314,7 +4325,7 @@ loc_10EC4:				; CODE XREF: seg008:281Aj
 		les	bx, [bp+6]
 		push	word ptr es:[bx+13h]
 		push	large dword ptr	es:[bx+22h]
-		call	AI_VisibilityTest
+		call	AI_CollisionCourseTest_DD21
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -5662,7 +5673,10 @@ loc_11AE6:				; CODE XREF: seg008:3536j
 ; Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5)
 ; (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote
 ; automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis
-; Behavior_PopFinished_75612.
+; Behavior_PopFinished_75612. | Minuteur +0x0D = scalaire du contexte passe a l'application
+; (MVRS_SharedContextSyncAndID2Score_EC22) : 2 s pour AI_NavSolutionToPoint /
+; Goal_ReturnToBase / Goal_FollowWaypoints, 30 s pour Goal_WanderRandom. Fin si minuteur < 0
+; (sar 1Fh).
 ; ==============================================================================================
 MVRS_ID21_TickAutopilotNav_11B16:				; DATA XREF: seg339:0144o
 		push	bp

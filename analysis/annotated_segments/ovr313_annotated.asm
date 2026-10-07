@@ -7,9 +7,15 @@ ovr313		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743 et String_ConstructFromFarPtrLen (123 lignes).
+; far, 123L, LUE 2026-10-02. Ex-'MissionRecord_LoadStringFields_9D4F0'. Chargeur de deux
+; chunks du modele d'avion apres le chargeur de base. 'EJEC' (43454A45h) : chaine -> +0x5A
+; (longueur +0x59), mot -> +0x66, octet -> +0x58, mot -> +0x68. 'JINF' (464E494Ah) : octet ->
+; +0x53, mot -> +0x54, mot -> +0x56, octet -> +0x52 (CLASSE DE COMBAT : >= 9 pour les
+; chasseurs, lue par AI_EngageAttackerReaction_E246 et comparee a byte_72038 = 6 par
+; Targeting_AcquireBestThreat), mot -> +0x64, octet... Sans JINF : +0x53 = 0, +0x52 = 2, +0x64
+; = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30.
 ; ==============================================================================================
-MissionRecord_LoadStringFields_9D4F0	proc far		; CODE XREF: VROOMM_StubThunk_6C260J
+Aircraft_LoadEJECAndJINF_9D4F0	proc far		; CODE XREF: VROOMM_StubThunk_6C260J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -52,11 +58,11 @@ loc_9D542:
 		jmp	short loc_9D551
 ; ���������������������������������������������������������������������������
 
-loc_9D549:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+3Aj
+loc_9D549:				; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+3Aj
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+63h], 0
 
-loc_9D551:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+57j
+loc_9D551:				; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+57j
 		push	0
 		push	large 464E494Ah
 		push	si
@@ -67,7 +73,7 @@ loc_9D551:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+57j
 		jmp	loc_9D5E9
 ; ���������������������������������������������������������������������������
 
-loc_9D569:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+74j
+loc_9D569:				; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+74j
 		push	si
 
 loc_9D56A:
@@ -118,7 +124,7 @@ loc_9D56A:
 		jmp	short loc_9D60C
 ; ���������������������������������������������������������������������������
 
-loc_9D5E9:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+76j
+loc_9D5E9:				; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+76j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+53h], 0
 		mov	byte ptr es:[bx+52h], 2
@@ -127,10 +133,10 @@ loc_9D5E9:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+76j
 		mov	byte ptr es:[bx+58h], 6
 		mov	word ptr es:[bx+68h], 1Eh
 
-loc_9D60C:				; CODE XREF: MissionRecord_LoadStringFields_9D4F0+F7j
+loc_9D60C:				; CODE XREF: Aircraft_LoadEJECAndJINF_9D4F0+F7j
 		pop	si
 		pop	bp
 		retf
-MissionRecord_LoadStringFields_9D4F0	endp
+Aircraft_LoadEJECAndJINF_9D4F0	endp
 
 ovr313		ends

@@ -26,7 +26,15 @@ seg004		segment	byte public 'CODE' use16
 ; 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH,
 ; +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 =
 ; 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
-; +0xB4 est a lire selon cette table.
+; +0xB4 est a lire selon cette table. | PRECISION 2026-09-28 : l'appel d'entree a
+; Targeting_AcquireBestThreat(entite, 0) exige byte_6E4D7 != 0 ET FL (+0xB0) >= 12 (deux sauts
+; jz / jl). byte_6E4D7 = byte_6E4C6 du cycle precedent (RadioFlags_ShiftHistory), pose quand
+; un objet dont le modele d'arme a target_domain (+0x4E) = 1 (missile air-air) est ajoute a la
+; liste des objets du monde 59C3h (seg088, seg092). | CORRIGE 2026-10-03 : word_70466 n'est
+; PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466'
+; une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de
+; mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte
+; est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 AI_TopLevelThink	proc far		; CODE XREF: AI_TriggerBehaviorUpdate+35P
 
@@ -290,7 +298,7 @@ loc_83A4:				; CODE XREF: AI_TopLevelThink+213j
 		ja	short loc_83F0
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	AI_ScanForNewTarget
+		call	AI_ScanCollisionThreats_DF99
 		add	sp, 4
 		mov	[bp+var_9], al
 		call	PIT_ReadHighPrecision
@@ -470,15 +478,14 @@ AI_TopLevelThink	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 231 lignes - LUE INTEGRALEMENT. Fonction cle de la chaine decision->mouvement (voir
-; AI_SYSTEM.md §4bis). Calcule la position cible (via entite+0x10F si une reference existe,
-; sinon entite+0x111 'centre de zone'), appelle Terrain_QueryAltitudeAt_378CA pour tenir
-; compte du relief. Verifie l'arrivee via entite+0x139 (rayon d'arrivee, echelle 24.8) - si
-; trop loin, calcule la direction normalisee vers la cible, la met a l'echelle par
-; entite+0x141 (vitesse de croisiere), et ECRIT POSITION+VITESSE dans entite+7 (dereference,
-; +0x2/+0x6/+0xA=position, +0xE/+0x12/+0x16=vitesse) - LE MEME sous-objet partage que
-; Goal_ActiveWingmanEngagement. Termine en appelant [entite+0xD1->vtable+8] - le noeud
-; MVRS_ID21 utilise directement comme porteur de commande de navigation.
+; far, 231L, RELUE 2026-09-27. Navigation vers une zone (ordres 0xA8/0xA9, cas par defaut et
+; 0xFFFF de Goal_ExecuteAction_A8AC). Comportement en cours (+0x0D) -> renvoie 0 SANS le faire
+; tourner. Point = position de l'objet +0x10F si non nul, sinon +0x111 ; son altitude est
+; REMPLACEE par terrain sous MON avion (Terrain_QueryAltitudeAt sur objet+0x12) + +0x13D. d =
+; distance 3D. Si +0x139 * 256 < d (+0x139 = rayon en metres entiers) : W = direction 3D
+; normalisee * +0x141, bloc +0x02/+0x0E, noeud ID21 (+0xD1) avec minuteur 2 s (0x200), renvoie
+; 1 ; sinon renvoie 0. Valeurs initiales (ovr228) : +0x111 = (0,0,1000 m), +0x139 = 30000,
+; +0x13D = 2000 m, +0x141 = 250 m/s.
 ; ==============================================================================================
 AI_NavSolutionToPoint	proc far		; CODE XREF: Goal_ExecuteAction_A8AC+BCP
 					; Goal_ExecuteAction_A8AC+10FP ...
@@ -1270,7 +1277,7 @@ locret_8CA0:				; CODE XREF: seg004:0B5Cj
 ; octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour
 ; +0xB4 est a lire selon cette table.
 ; ==============================================================================================
-Pilot_SkillCheck_B1	proc far		; CODE XREF: AI_RadarScanTarget+90p
+Pilot_SkillCheck_B1	proc far		; CODE XREF: AI_WeaponRecoveryBusy_9027+90p
 
 var_2		= word ptr -2
 arg_0		= dword	ptr  6
@@ -1382,9 +1389,26 @@ Pilot_ReactionThreshold_B6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,313L — orchestre plusieurs des fonctions ci-dessus (sub_9027, sub_8CCE, sub_91DF
-; référencées) : candidat pour une routine de sélection de comportement combinant tests de
-; compétence pilote et solutions de manœuvre, à approfondir.
+; far, 313L, LUE INTEGRALEMENT 2026-10-03. TIR ET POURSUITE de la cible aerienne +0x287, etape
+; 4 de AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (si +0x27F <= 1) ; renvoie 1 =
+; 'agit' -> l'appelant ABANDONNE le comportement en cours. Sans cible : 0. (1) D = position
+; cible - ma position ; +0x28B |= 4 (selecteur passe ce tick ; sinon AI_TopLevelThink continue
+; lui-meme la rafale) ; bloc de commande (+7) +0x1B : bit 6 (demande de suivi) efface, busy =
+; AI_WeaponRecoveryBusy_9027, bit 1 (gachette) efface. (2) Rafale en cours (+0x280 != 0 et
+; derniere arme +0x10D == 0x800) : +0x280--, gachette, -> (6). (3) busy : -> (7) SANS calculer
+; q (le registre si garde la valeur de l'appelant = pointeur vers l'avion de la cible : bug de
+; l'original, q 'positif' en pratique -> poursuite). (4) masque = AI_SelectWeaponMask_9665
+; (+0x1A2) ; snap = AI_GunSnapAim_6977(cible) ; q = AI_ComputeFireSolutionQuality_91DF
+; (+0x1A0). CANON : AI_FireWeaponTrigger (engage le point d'emport canon) ; snap et q > 5 -> q
+; = 10 ; q >= 2 et Pilot_ReactionThreshold_B6 (2q >= AA) : +0x280 = ((rand&3)+4)*q (octet) /
+; 10 ; > 1 -> gachette, sinon +0x280 = 0. (5) MISSILE si q > 0 : AI_FireWeaponTrigger ; point
+; d'emport engage : si son objet suivi (+0x104 -> +0x0D) == cible ->
+; WeaponStation_TestTargetLock(point d'emport courant, cible) non nul -> gachette ; sinon bit
+; 6 (demande de suivi). (6) Gachette posee : +0x10D = masque, +0x109 = horloge +0x175 >> 8 ;
+; missile tire sur le joueur -> byte_6E4C0 = 1 ; si byte_6E33B et joueur :
+; Radio_PlayMessage(0x20). (7) Si gachette ou q > 0 : sans snap, AI_GuidanceSolution_Major(D,
+; W = AI_Sensor_WeaponVelocityCache(cible, 10) = le nez) : POURSUITE PURE vers la position de
+; la cible, sans anticipation ; renvoie 1. Sinon 0.
 ; ==============================================================================================
 AI_BehaviorSelector	proc far		; CODE XREF: AI_BehaviorStateMachine_WeightedOptionSelector_9D05+148p
 
@@ -1442,7 +1466,7 @@ loc_8D4A:				; CODE XREF: AI_BehaviorSelector+15j
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr AI_RadarScanTarget
+		call	near ptr AI_WeaponRecoveryBusy_9027
 		add	sp, 4
 		mov	[bp+var_7], al
 		les	bx, [bp+arg_0]
@@ -1485,7 +1509,7 @@ loc_8DFE:				; CODE XREF: AI_BehaviorSelector+C9j
 		push	word ptr es:[bx+287h]
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	AI_ManeuverSolution_Major
+		call	AI_GunSnapAim_6977
 		add	sp, 6
 		mov	[bp+var_2], al
 		push	large [bp+arg_0]
@@ -1706,19 +1730,19 @@ AI_BehaviorSelector	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,228L — vérifie timer/portée ajustés par la compétence pilote (+0xB0), exclut certains
-; types de cible (+0x10D), puis parcourt une liste chaînée d'objets (vtable calls) en
-; cherchant un objet de type 8 différent de soi : boucle de balayage/sélection de cible (scan
-; radar). TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les
-; octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99,
-; +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A
-; (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 =
-; PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3
-; = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute
-; mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire
-; selon cette table.
+; far, 228L, LUE 2026-10-03. Ex-'AI_RadarScanTarget' (FAUX : aucun balayage radar). DELAI DE
+; RECUPERATION APRES UN TIR : renvoie 1 tant que l'IA ne doit pas engager de nouvelle arme. t
+; = horloge +0x175 - (+0x109 << 8) = secondes depuis le dernier tir (+0x109 = secondes
+; entieres au tir, +0x10D = masque de l'arme tiree, poses par AI_BehaviorSelector). (1) Si t <
+; FL - 13 (FL = +0xB0 ; jamais vrai pour FL <= 13) et derniere arme = missile (+0x10D ni 0x800
+; ni 0) : parcourt la liste 0x59C3 (World_IterateObjects) a la recherche d'objets de categorie
+; 8 (missile) dont vtable+0x38 (lanceur) == mon objet +0x102 ; Pilot_SkillCheck_B1(entite, 0)
+; (1 + rand%16 <= TH +0xB1) tire une fois : si reussi, UN missile en vol est tolere, le second
+; rend 1 ; sinon le premier rend 1 ; aucun missile en vol : 0. (2) Sinon, derniere arme canon
+; (0x800) : 1 si t < (16 - TH)/8 s ; aucune arme tiree (0) : 1 si t < (16 - FL)/8 + 0,5 s ;
+; missile : 0. Appelee par AI_BehaviorSelector et AI_EvalTargetAttribute.
 ; ==============================================================================================
-AI_RadarScanTarget	proc far		; CODE XREF: AI_BehaviorSelector+81p AI_EvalTargetAttribute+6Ep
+AI_WeaponRecoveryBusy_9027	proc far		; CODE XREF: AI_BehaviorSelector+81p AI_EvalTargetAttribute+6Ep
 
 var_24		= dword	ptr -24h
 var_20		= word ptr -20h
@@ -1765,29 +1789,29 @@ arg_0		= dword	ptr  6
 		jmp	short loc_908D
 ; ���������������������������������������������������������������������������
 
-loc_908B:				; CODE XREF: AI_RadarScanTarget+5Dj
+loc_908B:				; CODE XREF: AI_WeaponRecoveryBusy_9027+5Dj
 		xor	ax, ax
 
-loc_908D:				; CODE XREF: AI_RadarScanTarget+62j
+loc_908D:				; CODE XREF: AI_WeaponRecoveryBusy_9027+62j
 		or	al, al
 		jnz	short loc_9094
 		jmp	loc_9134
 ; ���������������������������������������������������������������������������
 
-loc_9094:				; CODE XREF: AI_RadarScanTarget+68j
+loc_9094:				; CODE XREF: AI_WeaponRecoveryBusy_9027+68j
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+10Dh], 800h
 		jnz	short loc_90A3
 		jmp	loc_9134
 ; ���������������������������������������������������������������������������
 
-loc_90A3:				; CODE XREF: AI_RadarScanTarget+77j
+loc_90A3:				; CODE XREF: AI_WeaponRecoveryBusy_9027+77j
 		cmp	word ptr es:[bx+10Dh], 0
 		jnz	short loc_90AE
 		jmp	loc_9134
 ; ���������������������������������������������������������������������������
 
-loc_90AE:				; CODE XREF: AI_RadarScanTarget+82j
+loc_90AE:				; CODE XREF: AI_WeaponRecoveryBusy_9027+82j
 		xor	di, di
 		push	0
 		push	word ptr [bp+arg_0+2]
@@ -1804,7 +1828,7 @@ loc_90C5:
 		jmp	short loc_911E
 ; ���������������������������������������������������������������������������
 
-loc_90C7:				; CODE XREF: AI_RadarScanTarget+108j
+loc_90C7:				; CODE XREF: AI_WeaponRecoveryBusy_9027+108j
 		mov	si, word ptr [bp+var_18]
 		push	si
 
@@ -1854,13 +1878,13 @@ loc_90E4:
 		jmp	short loc_911E
 ; ���������������������������������������������������������������������������
 
-loc_9117:				; CODE XREF: AI_RadarScanTarget+E4j AI_RadarScanTarget+EAj
+loc_9117:				; CODE XREF: AI_WeaponRecoveryBusy_9027+E4j AI_WeaponRecoveryBusy_9027+EAj
 		mov	[bp+var_D], 1
 		jmp	loc_91D8
 ; ���������������������������������������������������������������������������
 
-loc_911E:				; CODE XREF: AI_RadarScanTarget:loc_90C5j
-					; AI_RadarScanTarget+B4j	...
+loc_911E:				; CODE XREF: AI_WeaponRecoveryBusy_9027:loc_90C5j
+					; AI_WeaponRecoveryBusy_9027+B4j	...
 		lea	ax, [bp+var_18]
 		push	ax
 		push	59C3h
@@ -1871,7 +1895,7 @@ loc_911E:				; CODE XREF: AI_RadarScanTarget:loc_90C5j
 		jmp	loc_91D8
 ; ���������������������������������������������������������������������������
 
-loc_9134:				; CODE XREF: AI_RadarScanTarget+6Aj AI_RadarScanTarget+79j ...
+loc_9134:				; CODE XREF: AI_WeaponRecoveryBusy_9027+6Aj AI_WeaponRecoveryBusy_9027+79j ...
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+10Dh], 800h
 		jz	short loc_914B
@@ -1880,8 +1904,8 @@ loc_9134:				; CODE XREF: AI_RadarScanTarget+6Aj AI_RadarScanTarget+79j ...
 		jmp	loc_91D8
 ; ���������������������������������������������������������������������������
 
-loc_914B:				; CODE XREF: AI_RadarScanTarget+117j
-					; AI_RadarScanTarget+11Fj
+loc_914B:				; CODE XREF: AI_WeaponRecoveryBusy_9027+117j
+					; AI_WeaponRecoveryBusy_9027+11Fj
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+10Dh], 800h
 		jnz	short loc_9186
@@ -1901,7 +1925,7 @@ loc_914B:				; CODE XREF: AI_RadarScanTarget+117j
 		jmp	short loc_91C4
 ; ���������������������������������������������������������������������������
 
-loc_9186:				; CODE XREF: AI_RadarScanTarget+12Ej
+loc_9186:				; CODE XREF: AI_WeaponRecoveryBusy_9027+12Ej
 		les	bx, [bp+arg_0]
 		cmp	word ptr es:[bx+10Dh], 0
 		jnz	short loc_91C4
@@ -1919,8 +1943,8 @@ loc_9186:				; CODE XREF: AI_RadarScanTarget+12Ej
 		mov	[bp+var_18], eax
 		add	[bp+var_18], 80h ; '�'
 
-loc_91C4:				; CODE XREF: AI_RadarScanTarget+15Dj
-					; AI_RadarScanTarget+168j
+loc_91C4:				; CODE XREF: AI_WeaponRecoveryBusy_9027+15Dj
+					; AI_WeaponRecoveryBusy_9027+168j
 		mov	eax, [bp+var_4]
 		cmp	eax, [bp+var_18]
 		jge	short loc_91D3
@@ -1932,20 +1956,20 @@ loc_91D1:
 		jmp	short loc_91D5
 ; ���������������������������������������������������������������������������
 
-loc_91D3:				; CODE XREF: AI_RadarScanTarget+1A5j
+loc_91D3:				; CODE XREF: AI_WeaponRecoveryBusy_9027+1A5j
 		xor	ax, ax
 
-loc_91D5:				; CODE XREF: AI_RadarScanTarget:loc_91D1j
+loc_91D5:				; CODE XREF: AI_WeaponRecoveryBusy_9027:loc_91D1j
 		mov	[bp+var_D], al
 
-loc_91D8:				; CODE XREF: AI_RadarScanTarget+F4j
-					; AI_RadarScanTarget+10Aj ...
+loc_91D8:				; CODE XREF: AI_WeaponRecoveryBusy_9027+F4j
+					; AI_WeaponRecoveryBusy_9027+10Aj ...
 		mov	al, [bp+var_D]
 		pop	di
 		pop	si
 		leave
 		retf
-AI_RadarScanTarget	endp
+AI_WeaponRecoveryBusy_9027	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2564,7 +2588,10 @@ word_9651	dw	1,     2,     3,  100h ; DATA XREF: AI_ComputeFireSolutionQuality_9
 ; heures du joueur', role exact non lu). Si di >= 90 : 0. Sinon, dans l'ordre : d < 1800
 ; (dword_7201C) et canon (0x800) charge -> 0x800 ; d > dword_72020 (4000) et missile longue
 ; portee (0x700) -> 0x700 ; sinon mask 3 charge et d < dword_7202C (17700) -> 1 si aspect
-; croise ET AIM-9J charge, sinon 3 ; sinon 0.
+; croise ET AIM-9J charge, sinon 3 ; sinon 0. | 2026-09-27 : si la cible +0x287 est le joueur,
+; qu'il est a moins de 30 deg du nez, que le nez du joueur est a moins de 30 deg de l'axe
+; (ennemi dans son dos) et que la distance < dword_7202C (NUMS range_long) : word_722EA = moi
+; (SetReference16 0x523A).
 ; ==============================================================================================
 AI_SelectWeaponMask_9665	proc far		; CODE XREF: AI_BehaviorSelector+D4p
 
@@ -3041,7 +3068,7 @@ loc_99DD:				; CODE XREF: AI_EvalTargetAttribute+1Ej
 		jz	short loc_9A31
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr AI_RadarScanTarget
+		call	near ptr AI_WeaponRecoveryBusy_9027
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -4059,21 +4086,20 @@ loc_A1DB:				; CODE XREF: seg004:1EEBj seg004:1F48j ...
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, 57 lignes (methode de vtable, DATA XREF seg339:012C) - JAMAIS DOCUMENTEE AVANT, trouvee
-; et transcrite par Remi en parcourant seg004. Efface le bit 2 de flags_75 sur l'avion lie
-; (entite+0xB) - le bit 'aerofrein' deja documente en §7 de AI_SYSTEM.md. Propage deux AUTRES
-; bits de flags_75 (bits 0 et 1, deja documentes comme 'volets' et 'aerofrein' - a reverifier
-; lequel exactement compte tenu de l'ordre de lecture ici) vers les bits 4 et 5 d'un champ sur
-; un troisieme objet (entite+7, dereference, champ +0x1C) - un miroir/synchronisation d'etat
-; avion vers un objet lie distinct. Pose entite_avion+0x68=0xFF (probable sentinelle 'timer
-; remis a neuf', a verifier). Si un argument (arg_2, [bp+0xA]) est non-nul, appelle
-; Targeting_AcquireBestThreat(entite, 0). Si le bit 3 de entite+0x28B est pose ET entite+0x27F
-; est non-nul, appelle Goal_FollowAllyExec(entite, arg_1) - CONFIRME un point d'entree
-; supplementaire vers le comportement d'escorte, distinct de
-; Goal_ActiveWingmanEngagement_878F. Termine en remettant a zero le champ +0x59 de l'objet lie
-; (entite+0x102).
+; far (label), RELU 2026-09-28. Ex-'AI_PropagateAircraftFlagsAndFollowGate_A1DF'. METHODE
+; +0x1C DE L'ENTITE IA (vtable 0x110 = seg339:6D1C0 ; +0x10 = Goal_SetObjective_A307) : RAPPEL
+; DE FIN DE COMPORTEMENT. Appelee UNIQUEMENT par Behavior_PopFinished_75612 (fin normale,
+; argument 1, seulement s'il n'y a pas de comportement precedent a restaurer) et
+; NotifiableRef_DetachTarget_75661 (comportement abandonne, argument 0) ; les autres 'call
+; [bx+1Ch]' du binaire visent d'autres classes. Arguments : entite (bp+6), drapeau (bp+0Ah).
+; (1) Avion (+0x0B) : flags_75 bit2 efface (train rentre). (2) Bloc de commandes (+7) +0x1C :
+; bit4 = flags_75 bit1 (volets), bit5 = flags_75 bit0 (aerofrein) - la commande reprend l'etat
+; courant. (3) JDYN+0x68 = 0xFF : PILOTE AUTOMATIQUE COUPE. (4) Drapeau non nul :
+; Targeting_AcquireBestThreat(entite, 0). (5) Bit 3 de +0x28B (formation) et +0x27F (niveau de
+; reaction) non nul : Goal_FollowAllyExec(entite). (6) Objet monde (+0x102) +0x59 = 0 : la
+; physique reprend (fin du mode suspendu pose par decollage/atterrissage/formation).
 ; ==============================================================================================
-AI_PropagateAircraftFlagsAndFollowGate_A1DF:				; DATA XREF: seg339:012Co
+AIEntity_OnBehaviorEnded_A1DF:				; DATA XREF: seg339:012Co
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]

@@ -791,7 +791,7 @@ Terrain_TestAdjacentVisibility	endp
 ; far,13L — wrapper vers sub_3317E (vidage de liste, table 0x5510) : vidage de la liste
 ; d'objets sélectionnables (picking).
 ; ==============================================================================================
-Picking_ClearSelectableList	proc far		; CODE XREF: UIScript_ParseAndEvaluate_7A054+6BCP
+Picking_ClearSelectableList	proc far		; CODE XREF: Autopilot_JumpSequence_7A054+6BCP
 
 arg_0		= word ptr  6
 

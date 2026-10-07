@@ -7,7 +7,9 @@ seg456		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle MissionScenario_ResolveFieldChain_A8BD1.
+; far. Renvoie 1 si l'objet de mission doit etre DESACTIVE au saut de pilote automatique
+; (Autopilot_JumpSequence_7A054) : objet monde +0x1D et controleur +0x52 presents et bit 5 de
+; +0x39 efface (0xB9) ; ou (byte_6E4D5 et objet = celui resolu depuis word_706A0).
 ; ==============================================================================================
 MissionScenario_QueryFieldWrapper_A7FF0	proc far		; CODE XREF: VROOMM_StubThunk_6CE1AJ
 

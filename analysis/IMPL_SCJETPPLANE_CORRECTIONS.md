@@ -120,6 +120,16 @@ et convertir : calculer `h(nez)` à partir de `forward` plutôt qu'à partir de 
 La direction horizontale du nez utilisée pour `velocity` doit être celle **après** l'incrément de
 cap du tick.
 
+**Fait le 2026-09-25, dans `SCPilot` et non dans `SCJetpPlane`** : la loi est calculée par le
+pilote, qui envoie à l'avion un `PlaneKinematicEvent` ; `SCPlane` applique l'état imposé (mode
+cinématique commun à toutes les classes filles). L'orientation imposée est reconstruite
+directement dans `ptw` (cap, tangage et roulis en dixièmes de degré, même convention que
+`SCJdynPlane` et `SCJetpPlane` : `forward = (−sin cap, sin tangage, −cos cap)`). Le cap du jeu
+`atan2(x, z)` vaut `yaw/10 + 180°`. Le roulis visuel est positif quand le cap `atan2(x, z)` croît
+(virage à gauche à l'écran de libRealSpace, les axes y/z échangés inversant la chiralité).
+`SCJetpPlane::updatePosition` retrouve l'état écrit par ses détecteurs d'écriture externe
+(`m_seed_*`) à la sortie du mode.
+
 **Test d'acceptation.**
 1. Avion à 3000 m, cible à 8 km devant, `W` vers la cible : l'avion va en ligne droite, `|vy| ≤ 50`,
    altitude jamais sous terrain + 250 m, `ap_reached` passe à vrai vers 400 m de `P`.
@@ -321,6 +331,48 @@ l'axe du nez < `control_speed` → moment de tangage −20** (le nez reste plaqu
 rotation), et non « sous une altitude ». Renommer le champ dans le parseur et corriger ce test si le
 portage compare une altitude.
 
+## 8ter. État au 2026-09-25
+
+Faits (syntaxe vérifiée, à valider en jeu) : §2 (référence A), §3 (gains de dégâts, noms réels du
+chunk `SYSM` du F-16 : sous-systèmes `ENGINE`, `FUEL`, `LWING`+`RWING`, `ELEVATOR`, `RUDDER`,
+`AILERON` ; gain = santé courante / santé du `SYSM`, entrée absente de `system_health` = intacte),
+§4 (carburant), §5 (direction au sol, signe `yaw_speed = rollers·V/4` déduit des conventions :
+manche à droite → `rollers < 0` → lacet négatif → nez à droite ; à confirmer au roulage), §6 (les
+deux blocs de `hasBeenHit`), §8 (commentaires), §8bis (`maxRollRate()` virtuelle dans `SCPlane`,
+redéfinie par `SCJetpPlane` avec la chute près du décrochage et la vitesse d'efficacité des
+gouvernes ; `SCPilot` l'utilise ; champ JDYN n°17 renommé `control_speed_ms`). Non faits : §7
+(ordre servo/forces, sur demande de Rémi) ; cas `flags_75` (rôle inconnu) ; le portage n'a pas
+d'effet de sol qui lise le champ n°17 (rien à corriger).
+
+## 8quater. [P1] Masse totale : à vide + carburant + emport (fait 2026-09-26)
+
+La méthode `+0x3C` de la JDYN est `JDYN_TotalMass_47FF8` (question ouverte levée, DATA_MODEL §6.2) :
+`masse = masse à vide (DYNM) + carburant restant + masse des armes emportées`, en kg. Elle divise
+les forces (`Aero_SumLinearForces_48639`) et sert de `X` dans l'incidence par g
+(`Aero_ComputeAoACommand_48862`). Le portage divisait par la seule masse à vide.
+
+Fait dans `SCJetpPlane` : `empty_mass_kg` (chunk `DYNM`) et `updateMass()`, appelée à chaque
+`Simulate` : `mass_kg = empty_mass_kg + fuel_kg + Σ(nb_weap × objct->weight_in_kg)` sur
+`weaps_load`, puis `W` et `inverse_mass`. La masse baisse avec le carburant brûlé et à chaque arme
+tirée (comme `WeaponStation_DecrementCounter`).
+
+## 8quinquies. Avion sur la tranche : roulis vu comme 0° (fait 2026-09-26)
+
+Mesuré dans DOSBox (PHYSICS §5.7) : à 90° de roulis pile, `Matrix_RollAngle_57C67` renvoie 0°, donc la
+consigne garde α et le servo ne fait rien (0 g, pas de virage). `SCJetpPlane::processInput` saute le
+facteur `|cos(roulis)|` quand la verticale de la normale est proche de 0. **Écart volontaire** (demande
+de Rémi) : l'original n'a que ±0,22° de marge (1/256 en 24.8) ; le portage prend
+`KNIFE_EDGE_MARGIN_DEG = 3°` pour qu'on puisse tenir la tranche sans être pile à 90°.
+
+## 8sexies. Servo : K = fréquence d'images de l'original (fait 2026-09-26)
+
+`K` (`dword_70454`) n'est pas un gain : c'est le nombre d'images/s de l'original, bridé à 25
+(`Frame_UpdateTimingAndNotifyTrackedObjects_500F6`), et `dt = 1/K`. Le portage le nomme
+`ORIGINAL_FPS = 25`. La mise à jour de la vitesse de rotation suit l'original :
+`rate += clamp((cible − rate) · 25 · dt, ±3·q'·dt)`, avec `25·dt` plafonné à 1. À 60 images/s la
+vitesse rattrape donc 42 % de l'écart par frame, soit la même réactivité en temps réel qu'à 25
+images/s. L'ancienne version rattrapait tout l'écart en une frame, donc 2,4 fois plus vite à 60 images/s.
+
 ## 9. Ce qui est conforme (ne pas toucher)
 
 Courbe de manette et lapse d'altitude ; densité `AIRDENS.TBL` ; α/β en degrés ; incidence
@@ -332,8 +384,6 @@ sur les incréments de rotation (justifiée à haute fréquence d'image).
 
 ## 10. Questions ouvertes (ne pas deviner)
 
-- La valeur `X` de la loi de charge (méthode `+0x3C` de l'objet) a la forme d'une masse : le
-  portage utilise `mass_kg`, cohérent mais non prouvé.
 - Sémantique exacte des attributs A et B des composants (§3) : à confirmer côté données.
 - Roulis : la coupure sous 40 m/s et au sol de `rollLive` n'a pas été relue ligne à ligne dans
   l'original (`Aero_ComputeControlFlags75Bit5C`, partiellement lue).

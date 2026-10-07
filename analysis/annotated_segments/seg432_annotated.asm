@@ -698,16 +698,17 @@ PlayerComponent_ComputeGeometryComplex_9E027	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 419 lignes, NON DÉTAILLÉE — combine AI_ComputeGeometryHelper_56E29 (seg116),
-; HUD_ResolveNodePosition_547B1 (seg114), l'instanciation d'objet Effect_SpawnObject
-; (sub_38B70, motif de Trigger_TimedRangedSpawnOnce_4F351, seg109), l'enregistrement de
-; conteneur (sub_21F8D), la référence faible SetReference (sub_3A44E, mentionnée dans les
-; notes du projet), l'ajout à liste membre (sub_3A40B ×2, dtor sub_3A3EC associé en seg109) et
-; Weapon_HUDBox_TimerCaseH_5A8DC (seg125). Correspond très fortement au système de
-; trigger/spawn temporisé du seg109, probablement son implémentation d'overlay réelle.
-; Candidat prioritaire pour session dédiée.
+; far, 419L, LUE PARTIELLEMENT 2026-10-03 (garde et minuteur).
+; Ex-'TimedTrigger_SpawnAndBindGeometry' (FAUX). LACHER D'UNE BOMBE depuis un pylone, appele
+; par WeaponSystem_LaunchFromStation_3E744 (cas bombe) via le stub 6C399. Args : sortie
+; (minuteur), point d'emport (arg_4), tireur (arg_8), cible (arg_A), pylone (arg_C), systeme
+; d'armes (arg_10), arg_14 = lacher force. Systeme +0x44 (lacher arme) remis a 0. Classe de
+; l'arme (+0x4A) != 9 -> rien. Exige le minuteur bombes +0x28 a 0 OU arg_14 (la seconde bombe
+; d'une paire part dans le meme appel). Instancie la bombe au pylone (pylone +0x13 - 1),
+; evenement 59CDh, puis MINUTEUR = dword +0x5A du modele (dernier champ WDAT : 1,0 s pour
+; MK-20, MK-82, Durandal, GBU-15), ecrit dans +0x28 et dans la sortie.
 ; ==============================================================================================
-TimedTrigger_SpawnAndBindGeometry_9E289	proc far		; CODE XREF: VROOMM_StubThunk_6C399J
+WeaponSystem_ReleaseBomb_9E289	proc far		; CODE XREF: VROOMM_StubThunk_6C399J
 
 var_80		= dword	ptr -80h
 var_7C		= dword	ptr -7Ch
@@ -785,7 +786,7 @@ loc_9E2BB:
 		jmp	loc_9E566
 ; ���������������������������������������������������������������������������
 
-loc_9E2D4:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+46j
+loc_9E2D4:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+46j
 		push	di
 		mov	bx, [di]
 		call	dword ptr [bx+3Ch]
@@ -808,27 +809,27 @@ loc_9E2F3:
 		jmp	short loc_9E300
 ; ���������������������������������������������������������������������������
 
-loc_9E2FE:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289:loc_9E2F3j
+loc_9E2FE:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289:loc_9E2F3j
 		mov	al, 17h
 
-loc_9E300:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+73j
+loc_9E300:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+73j
 		mov	ah, 0
 		cmp	ax, 9
 		jz	short loc_9E30A
 		jmp	loc_9E566
 ; ���������������������������������������������������������������������������
 
-loc_9E30A:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+7Cj
+loc_9E30A:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+7Cj
 		cmp	[bp+var_4], 0
 		jnz	short loc_9E316
 		mov	ax, 1
 		jmp	short loc_9E318
 ; ���������������������������������������������������������������������������
 
-loc_9E316:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+86j
+loc_9E316:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+86j
 		xor	ax, ax
 
-loc_9E318:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+8Bj
+loc_9E318:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+8Bj
 		or	al, al
 		jnz	short loc_9E325
 		cmp	[bp+arg_14], 0
@@ -836,8 +837,8 @@ loc_9E318:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+8Bj
 		jmp	loc_9E566
 ; ���������������������������������������������������������������������������
 
-loc_9E325:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+91j
-					; TimedTrigger_SpawnAndBindGeometry_9E289+97j
+loc_9E325:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+91j
+					; WeaponSystem_ReleaseBomb_9E289+97j
 		les	bx, [bp+arg_C]
 		mov	ax, es:[bx+13h]
 		dec	ax
@@ -864,8 +865,8 @@ loc_9E33D:
 		or	al, al
 		jnz	short loc_9E36F
 
-loc_9E35A:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+BAj
-					; TimedTrigger_SpawnAndBindGeometry_9E289+C1j
+loc_9E35A:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+BAj
+					; WeaponSystem_ReleaseBomb_9E289+C1j
 		push	1
 		push	1
 		push	si
@@ -882,8 +883,8 @@ loc_9E367:
 		jmp	loc_9E42A
 ; ���������������������������������������������������������������������������
 
-loc_9E36F:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289:loc_9E33Dj
-					; TimedTrigger_SpawnAndBindGeometry_9E289+CFj
+loc_9E36F:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289:loc_9E33Dj
+					; WeaponSystem_ReleaseBomb_9E289+CFj
 		mov	ax, word ptr [bp+arg_4+2]
 
 loc_9E372:
@@ -968,13 +969,13 @@ loc_9E3EB:
 		mov	bx, dx
 		mov	[bx+8],	eax
 
-loc_9E42A:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+E3j
+loc_9E42A:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+E3j
 		or	si, si
 		jnz	short loc_9E431
 		jmp	loc_9E566
 ; ���������������������������������������������������������������������������
 
-loc_9E431:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+1A3j
+loc_9E431:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+1A3j
 		push	si
 		push	59C3h
 		call	List_AppendIfNonNull_21F8D
@@ -1042,10 +1043,10 @@ loc_9E4B7:
 		jmp	short loc_9E4BC
 ; ���������������������������������������������������������������������������
 
-loc_9E4B9:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289:loc_9E4B3j
+loc_9E4B9:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289:loc_9E4B3j
 		push	[bp+arg_A]
 
-loc_9E4BC:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289:loc_9E4B7j
+loc_9E4BC:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289:loc_9E4B7j
 		push	si
 		push	di
 		push	59CDh
@@ -1107,8 +1108,8 @@ loc_9E55E:
 		call	Weapon_HUDBox_TimerCaseH_5A8DC
 		add	sp, 8
 
-loc_9E566:				; CODE XREF: TimedTrigger_SpawnAndBindGeometry_9E289+48j
-					; TimedTrigger_SpawnAndBindGeometry_9E289+7Ej ...
+loc_9E566:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+48j
+					; WeaponSystem_ReleaseBomb_9E289+7Ej ...
 		mov	eax, [bp+var_4]
 		mov	[bp+var_C], eax
 		mov	eax, [bp+var_C]
@@ -1125,7 +1126,7 @@ loc_9E572:
 		pop	si
 		leave
 		retf
-TimedTrigger_SpawnAndBindGeometry_9E289	endp
+WeaponSystem_ReleaseBomb_9E289	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3214,7 +3215,10 @@ PlayerComponent_HelperVariantC_9F24C	endp
 ; ⚠️ far, 230 lignes, NON DÉTAILLÉE — combine PlayerComponent_HelperVariantA_9F1D0,
 ; PlayerComponent_ComputeComplexB_9EA2E (×3), dispatch vtable [bx+0x10]. Référencée via jmp
 ; depuis un stub VROOMM (sub_6C3E9) et par PlayerComponent_LoadAndApply_9EDD4. Candidat pour
-; session dédiée.
+; session dédiée. | Complement 2026-09-26 (fin de fonction lue) : calcule la MASSE D'EMPORT
+; es:[arg_0+0x20] = somme sur les stations (tableau far es:[arg_0+0x34], pas 0x23, nombre
+; es:[arg_0+0x38]) de (nombre d'armes word station+0x13) x (masse d'une arme = objet DYNM
+; (station+0x0F)->+0x36, methode vtable+0x10). Lue par JDYN_TotalMass_47FF8.
 ; ==============================================================================================
 PlayerComponent_OrchestrateComplex_9F286	proc far		; CODE XREF: VROOMM_StubThunk_6C3E9J PlayerComponent_LoadAndApply_9EDD4+196p
 

@@ -1419,7 +1419,7 @@ Particle_ComputeSpawnJitter	endp
 ; HUD_RenderSymbologyMain (probable effet de fumée/étincelle du réticule ou d'un composant
 ; endommagé affiché au HUD).
 ; ==============================================================================================
-Particle_ComputeSpawnAtAttachPoint	proc far		; CODE XREF: HUD_RenderSymbologyMain+F0DP
+Particle_ComputeSpawnAtAttachPoint	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+F0DP
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8

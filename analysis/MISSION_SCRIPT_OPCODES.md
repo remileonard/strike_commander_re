@@ -1070,3 +1070,32 @@ mission.
   plus haut, à la lumière de la découverte du canal `entité+0x11D`.
 - Les ~130 cas de plomberie générique du premier switch — hors
   périmètre "ordres de mission" sauf indication contraire.
+
+## Opcodes 0x90 / 0x91 / 0xBE (2026-10-03)
+
+- `0x90` (144) : activation d'un objet de mission (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`).
+- `0x91` (145) : **désactivation** (`PartEntry_Deactivate_5242A` : bit actif +0x39 effacé, compteurs
+  d'objets actifs par camp décrémentés). Utilisé 56 fois dans MISSIONS.TRE ; ex. MISN-1A, le C-130
+  (PROG 5) se désactive après son atterrissage (`SET_LABEL(52)` puis `0x91(8)`).
+- `0xBE` (190) : **ordre**, pas une désactivation. `Expr_VM_Interpreter_51106` vérifie que l'objet est
+  actif puis passe par `MissionScript_CallNativeHandler_52513` (entrée 0x1D de la table : sortie commune)
+  jusqu'à `Goal_SetObjective_A307`, cas par défaut : objectif 0xBF, position de repli = la sienne.
+  Utilisé 37 fois. libRealSpace l'appelait à tort `OP_DEACTIVATE_OBJ` (corrigé : `OP_SET_OBJ_BE`).
+
+## Opcodes 0xB6 à 0xB9 : bits 4 et 5 de l'objet de mission (+0x39) (2026-10-03)
+
+- `0xB6` (182) pose le bit 4, `0xB7` (183) l'efface. Bit 4 = **visible sur la carte de navigation** :
+  seul lecteur `NavMap_DrawMissionObjects_7EDCA` (ex-`Render_DrawComplexShape`), qui ne trace que les objets
+  ayant ce bit (couleur 0xE6 camp ennemi, 0xC7 joueur, 0x1F sinon). Le chargeur de mission le pose sur le
+  joueur. MISN-1A : Stern `0xB6(255)`, C-130 `0xB6(255)` ; les MiG n'apparaissent pas. libRealSpace :
+  `on_nav_map` (`OP_SHOW_ON_NAV_MAP` / `OP_HIDE_FROM_NAV_MAP`), lu par `SCNavMap`.
+- `0xB8` (184) pose le bit 5, `0xB9` (185) l'efface. Argument 255 = l'objet qui exécute le script.
+  Bit 5 = **accompagne le joueur au pilote automatique** : `Autopilot_JumpSequence_7A054` (ex-
+  `UIScript_ParseAndEvaluate`) désactive, quand la zone change, tout objet de mission sans ce bit
+  (`MissionScenario_QueryFieldWrapper_A7FF0` puis `PartEntry_Deactivate_5242A`). Le chargeur de mission
+  le pose sur l'objet du joueur. MISN-1A : Stern `0xB8(255)` et C-130 `0xB8(8)` à l'activation, puis
+  C-130 `0xB9(255)` (PROG 5).
+- Le chunk `TEAM` correspond presque toujours au joueur + les objets marqués `0xB8`. libRealSpace :
+  `friendlies` (initialisé depuis `TEAM`) ; `0xB8` ajoute, `0xB9` retire (`OP_JOIN_PLAYER_TEAM`,
+  `OP_LEAVE_PLAYER_TEAM`). Les affichages (radar, carte, radio) bouclent aussi sur `friendlies` ; la
+  façon dont le radar de l'original choisit ses contacts n'a pas été lue.

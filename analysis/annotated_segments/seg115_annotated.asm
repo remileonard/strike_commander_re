@@ -77,8 +77,8 @@ Math_NormalizeAngle180_547EF	endp
 ; Math_NormalizeAngle180_547EF(angle 24.8 en degres) puis Math_CosRaw_580A7 ; resultat 24.8
 ; dans *arg_0.
 ; ==============================================================================================
-Math_CosDeg_5483F	proc far		; CODE XREF: AI_ManeuverSolution_Major+214P
-					; AI_VisibilityTest+1F5P ...
+Math_CosDeg_5483F	proc far		; CODE XREF: AI_GunSnapAim_6977+214P
+					; AI_CollisionCourseTest_DD21+1F5P ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -555,7 +555,7 @@ Math_AsinOfRatio_54A76	endp
 ; far, arc tangente fixe (délègue à sub_58223).
 ; ==============================================================================================
 Math_ArcTan_54ADE	proc far		; CODE XREF: AI_IncomingThreatWarning+25AP
-					; AI_ManeuverSolution_Major+59FP ...
+					; AI_GunSnapAim_6977+59FP ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -750,7 +750,7 @@ Math_ArcTan2_54B0A	endp
 ; mise à l'échelle) si l'entrée est négative. Référencée par AI_ManeuverSolution_Major_6977 et
 ; AI_CombatDecision_Major_75F8.
 ; ==============================================================================================
-Math_Sqrt_54BF1	proc far		; CODE XREF: AI_ManeuverSolution_Major+15CP
+Math_Sqrt_54BF1	proc far		; CODE XREF: AI_GunSnapAim_6977+15CP
 					; AI_CombatDecision_Major+171P ...
 
 var_4		= dword	ptr -4
@@ -803,8 +803,8 @@ Math_Sqrt_54BF1	endp
 ; far, carré fixe (24.8) : x*x avec décalage 8 bits (imul+shrd). Référencée deux fois par
 ; AI_ManeuverSolution_Major_6977.
 ; ==============================================================================================
-Math_Square_54C39	proc far		; CODE XREF: AI_ManeuverSolution_Major+12AP
-					; AI_ManeuverSolution_Major+13BP ...
+Math_Square_54C39	proc far		; CODE XREF: AI_GunSnapAim_6977+12AP
+					; AI_GunSnapAim_6977+13BP ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -1086,8 +1086,8 @@ UIScreen_BuildFormattedText_54CC9	endp
 ; far, multiplie une valeur par un nombre pseudo-aléatoire (sub_70D) mis à l'échelle (÷0x8000)
 ; — magnitude aléatoire. Référencée deux fois par AI_ManeuverSolution_Major_6977.
 ; ==============================================================================================
-Math_RandomScale_54DF4	proc far		; CODE XREF: AI_ManeuverSolution_Major+16BP
-					; AI_ManeuverSolution_Major+174P ...
+Math_RandomScale_54DF4	proc far		; CODE XREF: AI_GunSnapAim_6977+16BP
+					; AI_GunSnapAim_6977+174P ...
 
 var_2		= word ptr -2
 

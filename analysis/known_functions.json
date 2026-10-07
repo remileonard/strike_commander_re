@@ -22,7 +22,7 @@
   "sub_8F720": {
     "new_name": "Cockpit_ReadControlsFrame_8F720",
     "segment": "ovr266",
-    "summary": "⚠️ far, 232 lignes, NON DÉTAILLÉE — combine `Joystick_GetButtonRawByte_67B82` (×2, seg208), allocateur typé, `Mouse_InitAndRead` — lecture combinée des contrôles cockpit."
+    "summary": "⚠️ far, 232 lignes, NON DÉTAILLÉE — combine `Joystick_GetButtonRawByte_67B82` (×2, seg208), allocateur typé, `Mouse_InitAndRead` — lecture combinée des contrôles cockpit. | LU 2026-10-03 (fin) : parcourt la liste 0x59C3 et applique PilotProfile_RescaleSkillByDifficulty_12FC9 au profil (entite +0x55, +0x1A) de chaque avion (categorie 6) du camp 0xFF : application de l'option de difficulte."
   },
   "sub_9CF55": {
     "new_name": "Debris_ReleaseWithErrorCheckB_9CF55",
@@ -47,12 +47,12 @@
   "sub_8D30": {
     "new_name": "AI_BehaviorSelector",
     "segment": "seg004",
-    "summary": "far,313L — orchestre plusieurs des fonctions ci-dessus (sub_9027, sub_8CCE, sub_91DF référencées) : **candidat pour une routine de sélection de comportement combinant tests de compétence pilote et solutions de manœuvre**, à approfondir."
+    "summary": "far, 313L, LUE INTEGRALEMENT 2026-10-03. TIR ET POURSUITE de la cible aerienne +0x287, etape 4 de AI_BehaviorStateMachine_WeightedOptionSelector_9D05 (si +0x27F <= 1) ; renvoie 1 = 'agit' -> l'appelant ABANDONNE le comportement en cours. Sans cible : 0. (1) D = position cible - ma position ; +0x28B |= 4 (selecteur passe ce tick ; sinon AI_TopLevelThink continue lui-meme la rafale) ; bloc de commande (+7) +0x1B : bit 6 (demande de suivi) efface, busy = AI_WeaponRecoveryBusy_9027, bit 1 (gachette) efface. (2) Rafale en cours (+0x280 != 0 et derniere arme +0x10D == 0x800) : +0x280--, gachette, -> (6). (3) busy : -> (7) SANS calculer q (le registre si garde la valeur de l'appelant = pointeur vers l'avion de la cible : bug de l'original, q 'positif' en pratique -> poursuite). (4) masque = AI_SelectWeaponMask_9665 (+0x1A2) ; snap = AI_GunSnapAim_6977(cible) ; q = AI_ComputeFireSolutionQuality_91DF (+0x1A0). CANON : AI_FireWeaponTrigger (engage le point d'emport canon) ; snap et q > 5 -> q = 10 ; q >= 2 et Pilot_ReactionThreshold_B6 (2q >= AA) : +0x280 = ((rand&3)+4)*q (octet) / 10 ; > 1 -> gachette, sinon +0x280 = 0. (5) MISSILE si q > 0 : AI_FireWeaponTrigger ; point d'emport engage : si son objet suivi (+0x104 -> +0x0D) == cible -> WeaponStation_TestTargetLock(point d'emport courant, cible) non nul -> gachette ; sinon bit 6 (demande de suivi). (6) Gachette posee : +0x10D = masque, +0x109 = horloge +0x175 >> 8 ; missile tire sur le joueur -> byte_6E4C0 = 1 ; si byte_6E33B et joueur : Radio_PlayMessage(0x20). (7) Si gachette ou q > 0 : sans snap, AI_GuidanceSolution_Major(D, W = AI_Sensor_WeaponVelocityCache(cible, 10) = le nez) : POURSUITE PURE vers la position de la cible, sans anticipation ; renvoie 1. Sinon 0."
   },
   "sub_4812B": {
     "new_name": "Aero_ComputeLiftAndSideForce_4812B",
     "segment": "seg103",
-    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2."
+    "summary": "far, seg103 L261-593. Nom hérité 'DetectControlSaturation' trompeur : c'est le GÉNÉRATEUR DE PORTANCE + FORCE LATÉRALE (repère corps), terme 'satur' de Aero_SumLinearForces. v_corps = Physics_ResolveWindVectorCached([A]) ; alpha_eff = Aero_ComputeAoAWithTrim(si) (borné ±(si[0x4B]<<8) = alpha de décrochage / Cl max) ; beta = Aero_FlowAngle_Sideslip(si) ; q = Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0, -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q) · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail : analysis/DATA_MODEL.md 6.2. | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_642FF": {
     "new_name": "StreamReader_CloseAndUnregister_642FF",
@@ -210,9 +210,9 @@
     "summary": "far — 299 lignes, moteur vprintf/_doprnt (gestion varargs 2/4 octets selon flag), cœur du formatteur d'impression bas niveau."
   },
   "sub_9FAD0": {
-    "new_name": "PlayerComponent_LoadFieldsWithRetry_9FAD0",
+    "new_name": "BombModel_LoadDATAChunk_9FAD0",
     "segment": "seg433",
-    "summary": "far, appelle sub_6C5A5 (probable stub voisin) puis lit plusieurs champs via ResourceRecord_SeekAndRead_64743/ReadFinalField_64B51 (×3)/ReadFieldGroupB_64A54 (seg193), gestion d'erreur (sub_6B70F). Référencée via jmp depuis un stub VROOMM (sub_6C470) et par PlayerComponentVariantB_ConstructAndInit_9FBDE."
+    "summary": "far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA' (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet -> +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60, mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001."
   },
   "sub_6B31F": {
     "new_name": "VROOMM_StubThunk_6B31F",
@@ -487,7 +487,7 @@
   "sub_5517F": {
     "new_name": "Targeting_ComputeGeometryHelperB_5517F",
     "segment": "seg116",
-    "summary": "far, combine Math_DotProduct3D_5505B et sub_559BB, référencée par sub_5F9B."
+    "summary": "far, LUE 2026-10-02. (sortie, v, axe) : projection de v sur l'axe normalise : axe_n x dot(v, axe_n)."
   },
   "sub_689F1": {
     "new_name": "VROOMM_ComputeSizeFromHeader_689F1",
@@ -640,9 +640,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9FDAB) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2DFF0h, codesize=864h, nentries=29."
   },
   "sub_75D51": {
-    "new_name": "AITargeting_ComputeSolution_75D51",
+    "new_name": "Landing_Phase1_SetupApproach_75D51",
     "segment": "ovr230",
-    "summary": "⭐⚠️ far, 558 lignes, NON DÉTAILLÉE — combine longueur vectorielle (sub_5828E, seg117), `Vector_NormalizeInPlace_5593A` (seg116, ×3+), `AI_ComputeGeometryHelper_56E29` — probable calcul complet de solution de ciblage (ligne de vue, distance, géométrie). Candidat prioritaire pour session dédiée."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_ComputeSolution_75D51'). ATTERRISSAGE (ordre 0xA2). Phase 1, MISE EN PLACE CINEMATIQUE. Depart +0x64 = position actuelle ; cible +0x70 = toucher + (0, 0, LAND[+0x9B]) ; cap de piste +0x9F d'apres le signe de l'axe (cible - depart) quand il est axial (0/90/180/270) ; direction unitaire +0x88 ; vitesses +0x48 = +0x4C = LAND[+0x95] ; vitesse physique de l'avion = 0 ; compteurs +0x54, +0x5C, +0x94 = 0 ; duree +0x58 = distance / vitesse ; objet monde +0x59 = 1 (cinematique) ; train sorti ; orientation a plat, nez sur l'axe de piste (Matrix_OrthonormalizeKeepRow1_57660, vtable +0x40). Phase 2."
   },
   "sub_6CF6C": {
     "new_name": "VROOMM_StubThunk_6CF6C",
@@ -737,7 +737,7 @@
   "sub_9665": {
     "new_name": "AI_SelectWeaponMask_9665",
     "segment": "seg004",
-    "summary": "far, 277L, LUE INTEGRALEMENT (2026-09-20). CHOIX DE L'ARME contre la cible aerienne (entite+0x287) ; renvoie un MASQUE DE TYPE D'ARME (bit = weapon_id - 1), range par AI_BehaviorSelector_8D30 dans entite+0x1A2. 0 = aucune arme. Sans cible : 0. Calcule le vecteur vers la cible et la distance d ; si le bit 0 de entite+0x28B est pose (defaut NUMS), teste par WeaponStation_FindLoadedCompatible les masques 1 (AIM-9J), 3 (AIM-9J/9M) et 0x700 (AIM-120/SA-2/SA-6). Deux angles via Targeting_ComputeBearingElevation : di = ecart entre mon nez et la cible ; si = ecart entre le cap de la cible et la direction vers elle ; drapeau 'aspect croise' = 40 < si < 140. Cible = joueur, di < 30, si < 30 et d < dword_7202C (17700) : SetReference16(0x523A, mon noeud) (reference globale 'un IA est dans les six heures du joueur', role exact non lu). Si di >= 90 : 0. Sinon, dans l'ordre : d < 1800 (dword_7201C) et canon (0x800) charge -> 0x800 ; d > dword_72020 (4000) et missile longue portee (0x700) -> 0x700 ; sinon mask 3 charge et d < dword_7202C (17700) -> 1 si aspect croise ET AIM-9J charge, sinon 3 ; sinon 0."
+    "summary": "far, 277L, LUE INTEGRALEMENT (2026-09-20). CHOIX DE L'ARME contre la cible aerienne (entite+0x287) ; renvoie un MASQUE DE TYPE D'ARME (bit = weapon_id - 1), range par AI_BehaviorSelector_8D30 dans entite+0x1A2. 0 = aucune arme. Sans cible : 0. Calcule le vecteur vers la cible et la distance d ; si le bit 0 de entite+0x28B est pose (defaut NUMS), teste par WeaponStation_FindLoadedCompatible les masques 1 (AIM-9J), 3 (AIM-9J/9M) et 0x700 (AIM-120/SA-2/SA-6). Deux angles via Targeting_ComputeBearingElevation : di = ecart entre mon nez et la cible ; si = ecart entre le cap de la cible et la direction vers elle ; drapeau 'aspect croise' = 40 < si < 140. Cible = joueur, di < 30, si < 30 et d < dword_7202C (17700) : SetReference16(0x523A, mon noeud) (reference globale 'un IA est dans les six heures du joueur', role exact non lu). Si di >= 90 : 0. Sinon, dans l'ordre : d < 1800 (dword_7201C) et canon (0x800) charge -> 0x800 ; d > dword_72020 (4000) et missile longue portee (0x700) -> 0x700 ; sinon mask 3 charge et d < dword_7202C (17700) -> 1 si aspect croise ET AIM-9J charge, sinon 3 ; sinon 0. | 2026-09-27 : si la cible +0x287 est le joueur, qu'il est a moins de 30 deg du nez, que le nez du joueur est a moins de 30 deg de l'axe (ennemi dans son dos) et que la distance < dword_7202C (NUMS range_long) : word_722EA = moi (SetReference16 0x523A)."
   },
   "sub_87D74": {
     "new_name": "TextScroll_AllocateAndInsert_87D74",
@@ -927,7 +927,7 @@
   "sub_AFFC": {
     "new_name": "Goal_FollowWaypoints",
     "segment": "seg005",
-    "summary": "far,305L — handler GOAL utilisant un champ route/waypoint (+0x145→+0x51), teste un flag pilote (+0x75 bit5) : **probable handler flyToWaypoint suivant une liste de points de passage.**"
+    "summary": "far, 305L, LUE 2026-09-27. REJOINTE DU LEADER. Comportement en cours -> son tick. Leader ejecte -> oublie. Leader a plus de 333 m du sol : noeud fixe entite+0xD5 (ID7, poursuite) applique avec contexte (leader, &poste, 2,0) - l'ID7 poursuit le leader lui-meme (AI_InterceptDispatcher), le poste n'est pas relu. Sinon : bloc de commandes +2 = leader + 1000 m, +0x0E = nez du leader * 200 + vitesse du leader, noeud entite+0xD1 (ID21, pilote automatique)."
   },
   "sub_975CC": {
     "new_name": "MissionText_DrawTypewriterSynced_975CC",
@@ -945,9 +945,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8E351) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1B680h, codesize=58Fh, nentries=4."
   },
   "sub_75730": {
-    "new_name": "AITargeting_Helper_75730",
+    "new_name": "LandingBehavior_Init_75730",
     "segment": "ovr230",
-    "summary": "far, appelle sub_EC22 (externe, 15 lignes)."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_Helper_75730'). ATTERRISSAGE (ordre 0xA2). Methode +4 de la vtable du comportement d'atterrissage (0x326, objet 0xA1 cree par Goal_ExecuteAction_A8AC cas 0xA2, type +0x21 = 0x12) : MVRS_SharedContextSyncAndID2Score_EC22, renvoie 0."
   },
   "sub_85878": {
     "new_name": "Camera_OrbitReset_85878",
@@ -982,7 +982,7 @@
   "loc_5ACC": {
     "new_name": "AIEntity_MasterTick_5ACC",
     "segment": "seg003",
-    "summary": "far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique) est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_NosePitch_59A5 et Math_Cos (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458 (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4) AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC : +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue). CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire. Etape (3) precisee 2026-09-25 : horloge +0x175 += dt ; si b0 de +0x174 : b0 = b1 = ((t & M) == 0) ; si b2 : b2 = b3 = ((t & (M>>1)) == 0), t = secondes entieres, M = +0x179 (fenetres de AI_RetargetWindowSlow_A288 / AI_RetargetWindowFast_A2BD)."
+    "summary": "far, 306 lignes, LUE EN ENTIER. Méthode virtuelle, slot +0xC de la vtable de l'entité IA (seg339:0x110). Appelée une fois par frame par WorldObject_UpdateWithAIEntity_3D9FB (via le pointeur d'entité à +0x55 de l'objet monde), sauf quand byte_6D558 (pilotage automatique) est non nul. Séquence : (1) met à zéro tous les bits de statut à +0x28D (bits 3 et 5) et +0x28C (bits 0 à 7) ; (2) dword_7203D = [+0xE5] + altitude du terrain (Terrain_QueryAltitudeAt) à la position de l'objet lié (+0x102) ; dword_72039 = mot +0x82 de l'avion lié (+0x0B), corrigé vers le mot +0x84 par AI_Sensor_NosePitch_59A5 et Math_Cos (mêmes globales que AI_EvadeOrPursueSelector) ; (3) chronomètre [+0x175] += dword_70458 (delta de la frame), bascule des bits de +0x174 selon le masque +0x179 ; (4) AircraftStateBits_Clear_12806 (remise à zéro du bloc d'états de l'objet à +0x07 ; anciennement HUD_EncodeInstruments, aucun affichage), puis recopie du bit 0 de flags_75 de l'avion vers le bit 5 de l'octet +0x1C de ce bloc ; (5) score de menace global word_6D3BC : +2 si AI_Sensor_InterceptFeasibleCached, ×2 si flags_75 bit6 ; (6) AIGUILLAGE : si (+0x28B bit3) ET (flags_75 bit5) → Goal_FollowAllyExec_DAA9, sinon AI_TriggerBehaviorUpdate_5E53 ; (7) score −4 si InterceptFeasible, /4 si flags_75 bit6, puis ×2 ; efface +0x28B bit1 et +0x28D bit7 ; renvoie 1. Ce corps n'exécute ni GOAL ni MVRS : préparation d'état + un aiguillage. La décision réelle est dans AI_TriggerBehaviorUpdate_5E53 (non relue). CORRECTION : l'ancien résumé le présentait comme 'point d'entrée racine de toute la logique de décision IA' et mentionnait un 'drapeau HUD d'aérofrein' ; ni l'un ni l'autre n'est confirmé par le corps. Reste non résolu : le bit5 de flags_75, qui gate le court-circuit vers Goal_FollowAllyExec_DAA9. ⚠️ (2026-09-24) Math_Sin_5483F / Math_Cos_54876 et leurs versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus tiree de ces noms dans ce resume est a relire. Etape (3) precisee 2026-09-25 : horloge +0x175 += dt ; si b0 de +0x174 : b0 = b1 = ((t & M) == 0) ; si b2 : b2 = b3 = ((t & (M>>1)) == 0), t = secondes entieres, M = +0x179 (fenetres de AI_RetargetWindowSlow_A288 / AI_RetargetWindowFast_A2BD). | PRECISION 2026-09-28 (etape 6) : le court-circuit vers Goal_FollowAllyExec exige le bit 3 de +0x28B (mode formation) ET flags_75 bit 5 de l'avion (+0x0B) = PILOTE EJECTE ; sinon AI_TriggerBehaviorUpdate, qui lance AI_TopLevelThink si bit 7 de +0x28B et pilote non ejecte, et sinon abandonne le comportement en cours (VROOMM_StubThunk_6AB54 = NotifiableRef_DetachTarget_75661)."
   },
   "sub_9B700": {
     "new_name": "Debris_FindAndUnregister_9B700",
@@ -1102,7 +1102,7 @@
   "sub_5305A": {
     "new_name": "Player_ResolveAttachPointN_5305A",
     "segment": "seg114",
-    "summary": "⚠️ far, référencée DIRECTEMENT par `Player_MainUpdate` (sub_13100, deux sites d'appel) — récupère la N-ième entrée d'une table (stride 16 octets) puis résout sa position via GeomNode_SumOffsetsUpChain_50EEB. Hypothèse : résolution de position d'un point d'attache/hardpoint de l'avion du joueur. À approfondir en lien avec la question ouverte de la physique du joueur."
+    "summary": "far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre d'entrees, +2 far ptr, pas 16 octets) via GeomNode_SumOffsetsUpChain_50EEB ; si n >= nombre d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1, 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde."
   },
   "sub_6CA49": {
     "new_name": "VROOMM_StubThunk_6CA49",
@@ -1630,9 +1630,9 @@
     "summary": "far, parcourt la liste passée en argument (itérateur LinkedListB_Helper_5F6A9, objet à +0xE de chaque nœud) et, pour chaque objet dont le bit 0 de +0x52 est posé, appelle le slot +0x18 du sous-vtable pointé par +0x50 (TrackedObject_FrameStep_2DF0D pour les sous-vtables 0x460 et 0x484 de seg339). Appelée par Frame_UpdateTimingAndNotifyTrackedObjects_500F6 avec la liste 0x59CD (EntityTracker) ; référencée aussi dans la table d'overlay seg216. Anciennement WorldObjects_NotifyMissionTriggers (rien de spécifique aux triggers de mission dans ce corps). Rôle exact du slot +0x18 non prouvé au-delà de TrackedObject_FrameStep_2DF0D."
   },
   "sub_9027": {
-    "new_name": "AI_RadarScanTarget",
+    "new_name": "AI_WeaponRecoveryBusy_9027",
     "segment": "seg004",
-    "summary": "far,228L — vérifie timer/portée ajustés par la compétence pilote (+0xB0), exclut certains types de cible (+0x10D), puis parcourt une liste chaînée d'objets (vtable calls) en cherchant un objet de type 8 différent de soi : **boucle de balayage/sélection de cible (scan radar).** TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "far, 228L, LUE 2026-10-03. Ex-'AI_RadarScanTarget' (FAUX : aucun balayage radar). DELAI DE RECUPERATION APRES UN TIR : renvoie 1 tant que l'IA ne doit pas engager de nouvelle arme. t = horloge +0x175 - (+0x109 << 8) = secondes depuis le dernier tir (+0x109 = secondes entieres au tir, +0x10D = masque de l'arme tiree, poses par AI_BehaviorSelector). (1) Si t < FL - 13 (FL = +0xB0 ; jamais vrai pour FL <= 13) et derniere arme = missile (+0x10D ni 0x800 ni 0) : parcourt la liste 0x59C3 (World_IterateObjects) a la recherche d'objets de categorie 8 (missile) dont vtable+0x38 (lanceur) == mon objet +0x102 ; Pilot_SkillCheck_B1(entite, 0) (1 + rand%16 <= TH +0xB1) tire une fois : si reussi, UN missile en vol est tolere, le second rend 1 ; sinon le premier rend 1 ; aucun missile en vol : 0. (2) Sinon, derniere arme canon (0x800) : 1 si t < (16 - TH)/8 s ; aucune arme tiree (0) : 1 si t < (16 - FL)/8 + 0,5 s ; missile : 0. Appelee par AI_BehaviorSelector et AI_EvalTargetAttribute."
   },
   "sub_50E94": {
     "new_name": "ProgBuffer_FindSubProgramByIndex_50E94",
@@ -1912,7 +1912,7 @@
   "sub_42D8C": {
     "new_name": "Proximity_TestPoints",
     "segment": "seg091",
-    "summary": "far,153L — calcule la distance entre un point de proximité (arg_0+0x12) et un point de référence (arg_2), la compare à un seuil : **test de proximité (rayon de fuze) entre deux points, utilisé pour la détection de leurre/verrouillage.**"
+    "summary": "far, 153L, LUE 2026-09-25. (objet, point, direction, portee, cone) : d = |objet+0x12 - point| ; faux si d <= 0 (exclut la reference elle-meme) ou si portee (entier, shl 8) < d ; vrai si byte_7235D (seulement remis a 0 dans le code lu) ; sinon vrai si dot(normalise(objet - point), direction) >= Math_CosDeg_5483F(cone). Le cone est donc tracking_cone en DEGRES, demi-angle (AIM-9J 40, AIM-9M 45)."
   },
   "sub_75091": {
     "new_name": "AircraftDamageComponentFamily_ScalarDeletingDtor_75091",
@@ -1970,9 +1970,9 @@
     "summary": "far, aucun appel externe visible (41 lignes)."
   },
   "sub_3E744": {
-    "new_name": "HUD_RenderSymbologyMain",
+    "new_name": "WeaponSystem_LaunchFromStation_3E744",
     "segment": "seg088",
-    "summary": "far,**1882 lignes**. Vérifie l'angle d'inclinaison (bank) contre un seuil de 90° (0x5A00), compare l'objet à l'objet joueur (word_722E6), calcule des positions d'affichage HUD (sub_56E29) via un gros switch interne (commentaire IDA 'default') : **candidat très fort pour le moteur de rendu de la symbologie du HUD/viseur (gunsight)** — cadrans, réticule, indicateurs de tangage/roulis. Bien trop volumineuse pour une passe rapide."
+    "summary": "far, 1882L, LUE PARTIELLEMENT 2026-10-03 (missiles et canon). Ex-'HUD_RenderSymbologyMain' (FAUX : aucun affichage). LANCEMENT D'UNE ARME depuis un point d'emport. Args : point d'emport (arg_0), tireur (si), cible (arg_6, nulle si pas d'accrochage), pylone (arg_8), systeme d'armes (arg_C). Aiguillage sur la categorie du modele d'arme (+0x4A, octet WDAT) - 8 : 0 = missile (minuteur +0x24), 1 = bombe (+0x28), 2 = panier (+0x30), 5 = canon (+0x2C). Chaque cas exige son minuteur a 0. MISSILE : plafond de missiles en vol par camp (word_7047D joueur / word_70479 IA, incremente au lancement) compare a DisplayCache_ComputeChecksum_5D43F / 1000 (somme d'une liste de 4 blocs, probable memoire libre : garde technique) ; objet missile instancie (ObjectPrototype_FindOrLoadAndInstantiate_38B70) au point du pylone, ajoute a la liste 0x59C3, byte_6E4C6 = 1 si target_domain 1 ; cible missile+0x55 = arg_6, lanceur +0x57 ; avec cible : signature via cible vtable+0x7C -> systeme +0x0F, sinon +0x0F = 0x14 ; pylone +0x13 decremente. Puis MINUTEUR = dword +0x5A du modele (dernier champ du chunk WDAT, 24.8 secondes : 1,0 s pour AIM-9J/9M/AIM-120, 15 s SA-2, 10 s SA-6, 0 pour les canons). CANON : meme gate (+0x2C), minuteur = WDAT +0x5A (0 : un coup par frame). PANIER (classe 10, minuteur +0x30) : exige le compteur de roquettes du systeme +0x1E > 0 ; pour CHAQUE pylone dont le type d'arme (+0x0D) vaut 8 (LAU-3), et pour chaque panier de ce pylone (+0x13), lance UNE roquette (modele nomme a +0x5F du modele du point d'emport = M261), sans cible, et decremente +0x1E ; minuteur = WDAT +0x5A du panier (0x19 = 0,1 s). BOMBE (classe 9, minuteur +0x28) : exige systeme +0x44 (lacher arme) ou masque 0x80 (GBU-15) ou famille +0x4D == 4 (bombe libre), et pas sur le dos (joueur, roulis > 90) ; plafond par camp word_7047F/70481 (+2 par lacher) ; WeaponSystem_ReleaseBomb_9E289 sur le pylone, puis, sauf GBU-15, sur le pylone symetrique (PlayerComponent_MainOrchestrator_9F98D) avec lacher force : les bombes partent PAR PAIRES ; minuteur = celui renvoye (WDAT +0x5A, 1 s) ; +0x44 = 0. Famille 5 (Durandal) sans +0x44 : premier appui = armement (+0x44 = 1, +0x51 = 0, minuteur 1 s, point d'impact predit au sol range a +0x45/+0x49/+0x4D via le slot +0x18 du modele et Terrain_QueryAltitudeAt), le lacher a lieu a l'appui suivant. Renvoie 1 si une arme est partie (ou armement Durandal)."
   },
   "sub_63B97": {
     "new_name": "StreamReader_CloseUnderlying_63B97",
@@ -2040,9 +2040,9 @@
     "summary": "far,46L — teste l'état détruit puis délègue soit à un point de montage caméra (+0x51, vtable[0x3C]) soit au calcul complet (sub_3D57E) : **mise à jour de la caméra externe (avec ou sans point de montage fixe).**"
   },
   "sub_125C2": {
-    "new_name": "FlightState_FinalizeCounter",
+    "new_name": "Takeoff_Phase2_GearFlapsUp_125C2",
     "segment": "seg009",
-    "summary": "far,19L — nettoie 2 bits de flag pilote (+0x75 bits 2 et 1) et incrémente un compteur (+0x46) : **finalisation d'état avec comptage d'occurrences.**"
+    "summary": "far, LUE 2026-09-26 (ex-'FlightState_FinalizeCounter'). DECOLLAGE IA (ordre 0xA1). Phase 2 : train rentre (flags_75 &= ~4), volets rentres (flags_75 &= ~2), phase 3."
   },
   "sub_2914F": {
     "new_name": "Descriptor_Reset",
@@ -2252,7 +2252,7 @@
   "sub_3314": {
     "new_name": "Targeting_AcquireBestThreat",
     "segment": "seg001",
-    "summary": "far, 1347L — SÉLECTEUR DE CIBLE ET DE MENACE de l'IA (lu intégralement le 2026-09-20). CE N'EST PAS un tick physique (ancien nom 'Flight_PhysicsTick_JDYN' faux). Parcourt tous les objets du monde (World_IterateObjects, liste 0x59C3), note chaque candidat (missile qui me vise, avion hostile, objet hostile '+0x11=2'), et range le gagnant dans entité+0x287 (avion), +0x283 (objet '+0x11=2') ou +0x281 (missile). CATÉGORIES (vtable+8 de la classe modèle, fixée par le chunk IFF présent dans OBJECTS\\\\<nom>.IFF, IFF_LoadModelMain) : 6=JETP avion, 8=MISS missile, 0x13=SWPN défenses fixes AA/batteries/SAM/navires (fait vérifié côté données). L'ancien commentaire '6=missile, 8=contre-mesure' était FAUX. Score = (ATRB+0xB8−ATRB+0xB0+16)·A + (ATRB+0xB0−ATRB+0xB8+16)·B, départ −5000 (0EC78h), porte de compétence Pilot_SkillCheck_B0, bandes de distance NUMS (72020/24/28/2C/30), persistance de la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir, pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur). Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail : analysis/AI_TICK_CALL_GRAPH.md. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "far, 1347L — SÉLECTEUR DE CIBLE ET DE MENACE de l'IA (lu intégralement le 2026-09-20). CE N'EST PAS un tick physique (ancien nom 'Flight_PhysicsTick_JDYN' faux). Parcourt tous les objets du monde (World_IterateObjects, liste 0x59C3), note chaque candidat (missile qui me vise, avion hostile, objet hostile '+0x11=2'), et range le gagnant dans entité+0x287 (avion), +0x283 (objet '+0x11=2') ou +0x281 (missile). CATÉGORIES (vtable+8 de la classe modèle, fixée par le chunk IFF présent dans OBJECTS\\\\<nom>.IFF, IFF_LoadModelMain) : 6=JETP avion, 8=MISS missile, 0x13=SWPN défenses fixes AA/batteries/SAM/navires (fait vérifié côté données). L'ancien commentaire '6=missile, 8=contre-mesure' était FAUX. Score = (ATRB+0xB8−ATRB+0xB0+16)·A + (ATRB+0xB0−ATRB+0xB8+16)·B, départ −5000 (0EC78h), porte de compétence Pilot_SkillCheck_B0, bandes de distance NUMS (72020/24/28/2C/30), persistance de la cible courante. Un missile gagnant vide +0x287 et +0x283 et pose +0x27F=2 (pas de tir, pas de tournoi ce tick). Court-circuit : si byte_6E33B non nul, cible = word_722E6 (joueur). Non lu : Pilot_SkillCheck_B0, sens de objet+0x11==2. Détail : analysis/AI_TICK_CALL_GRAPH.md. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | CLASSE ET ADMISSIBILITE (relu 2026-10-02) : var_E = ma classe (octet +0x52 du modele de mon avion, chunk JINF), var_7 = (>= 9), var_8 = (>= 6). Candidat admis (loc_3623) si : missile (categorie 8) qui me vise avec target_domain 1 ; OU camp du candidat (+0x50) == -mon camp (1 contre 0xFF ; 0 contre 0) et (cible sol +0x11 == 2 avec arg_4 et arme sol, OU avion categorie 6 dont le pilote n'est pas ejecte (flags_75 bit 5) et ma classe >= 6). Score des avions (loc_3CCF), c = classe du candidat, m = la mienne, K = byte_72038 = 6 : c <= K -> B (var_12) = 0 ; sinon A et aptitude += (c - 2 <= m ? c - K : m - c). Puis bit 1 de +0x28B (aptitude +4) et +0x285 (A +10, aptitude +5) pour tous les candidats."
   },
   "sub_8B4B8": {
     "new_name": "MissionRecordField_ThunkOnly4_8B4B8",
@@ -2642,7 +2642,7 @@
   "sub_75A9": {
     "new_name": "AI_GuidanceCmd_FromOwnPos",
     "segment": "seg003",
-    "summary": "far,40L — récupère la position propre (vtable+0x3C, +0xC), l'utilise comme référence pour appeler sub_702A(cap,rate) : wrapper de guidage utilisant position courante."
+    "summary": "far, 40L, LUE 2026-10-02. AI_GuidanceSolution_Major(entite, D = argument, R = MON NEZ (methode +0x3C de l'objet, ligne +0x0C), argument transmis). Le D recu est utilise tel quel comme direction."
   },
   "sub_6B0E4": {
     "new_name": "VROOMM_StubThunk_6B0E4",
@@ -2792,7 +2792,7 @@
   "sub_12FC9": {
     "new_name": "PilotProfile_RescaleSkillByDifficulty_12FC9",
     "segment": "seg010",
-    "summary": "far, 25 lignes - LUE INTEGRALEMENT (recherche d'usage des traits ATRB non retraces, a la demande de Remi - verification rigoureuse par lecture complete, pas par heuristique). RELIT le cache duplique de FL/AG/AA (+0xA0/+0xA1/+0xA2, deja documente comme pose par PilotProfile_LoadATRB_12E47), applique un DECALAGE A DROITE (sar) par word_7235F (compare a 1 et 2 ailleurs dans le code - tres probablement un NIVEAU DE DIFFICULTE 0/1/2), et ECRIT LE RESULTAT DANS LES CHAMPS ORIGINAUX (+0x96=FL, +0x9B=AG, +0x9C=AA). CONFIRME un mecanisme de remise a l'echelle de la competence de pilotage PAR LA DIFFICULTE DU JEU - plus la difficulte est elevee (word_7235F petit), moins le decalage reduit la competence effective. Appelee depuis Cockpit_ReadControlsFrame_8F720 (contexte de lecture des commandes cockpit - le profil concerne par cet appel precis n'est pas confirme avec certitude, role exact a eclaircir si necessaire). PREMIERE CONFIRMATION D'USAGE REEL POUR AG ET AA, distincte du role de FL deja connu (bonus quadratique dans MVRS_ID14b) - ce mecanisme de difficulte s'applique en amont, sur la valeur de base, avant toute consommation par le tournoi. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "far, 25 lignes - LUE INTEGRALEMENT (recherche d'usage des traits ATRB non retraces, a la demande de Remi - verification rigoureuse par lecture complete, pas par heuristique). RELIT le cache duplique de FL/AG/AA (+0xA0/+0xA1/+0xA2, deja documente comme pose par PilotProfile_LoadATRB_12E47), applique un DECALAGE A DROITE (sar) par word_7235F (compare a 1 et 2 ailleurs dans le code - tres probablement un NIVEAU DE DIFFICULTE 0/1/2), et ECRIT LE RESULTAT DANS LES CHAMPS ORIGINAUX (+0x96=FL, +0x9B=AG, +0x9C=AA). CONFIRME un mecanisme de remise a l'echelle de la competence de pilotage PAR LA DIFFICULTE DU JEU - plus la difficulte est elevee (word_7235F petit), moins le decalage reduit la competence effective. Appelee depuis Cockpit_ReadControlsFrame_8F720 (contexte de lecture des commandes cockpit - le profil concerne par cet appel precis n'est pas confirme avec certitude, role exact a eclaircir si necessaire). PREMIERE CONFIRMATION D'USAGE REEL POUR AG ET AA, distincte du role de FL deja connu (bonus quadratique dans MVRS_ID14b) - ce mecanisme de difficulte s'applique en amont, sur la valeur de base, avant toute consommation par le tournoi. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | PRECISE 2026-10-03 : appelee par Cockpit_ReadControlsFrame_8F720 pour CHAQUE objet de la liste 0x59C3 de categorie 6 (avion) et de camp +0x50 == 0xFF (ennemi) : seuls les pilotes ennemis sont affaiblis. word_7235F fait partie du bloc d'options byte_72358..byte_72367 (remis a 0 par ResourceFile_Helper_90923) ; 0 = competences intactes, 1 = moitie, 2 = quart ; le calcul de note de mission (UIScreen_BuildWidgetTree_Recurse_53D92) retire 12 (niveau 1) ou 25 (niveau 2)."
   },
   "sub_A3405": {
     "new_name": "GaugeWidget_UpdateWithLock_A3405",
@@ -2995,14 +2995,14 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A5B8F) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=33F00h, codesize=8FEh, nentries=11."
   },
   "sub_7A054": {
-    "new_name": "UIScript_ParseAndEvaluate_7A054",
+    "new_name": "Autopilot_JumpSequence_7A054",
     "segment": "ovr233",
-    "summary": "⭐⚠️ far, 796 lignes, NON DÉTAILLÉE — combine `Lexer_ResolveConstantAlt`, `Expr_Node_GetOrRecompute_53236` (seg114), `UIScreen_RenderOrLayoutList_54503` (seg114), `Parser_LookaheadPattern` — probable interpréteur/évaluateur de script pour un écran UI dynamique, lié au système Expr_VM. Candidat prioritaire pour session dédiée."
+    "summary": "far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A : l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste (Container_Op_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu."
   },
   "sub_A5B8F": {
     "new_name": "PlayerComponent_Helper_A5B8F",
     "segment": "seg449",
-    "summary": "⚠️ far, 102 lignes, NON DÉTAILLÉE — aucun appel externe visible (manipulation de champs internes)."
+    "summary": "far, 102L. Copie champ a champ d'une structure JDYN (di) vers une autre (si), dont +0x80..+0x8B. Seul lecteur de JDYN+0x8A dans tout le binaire (avec l'init par defaut a 3 en seg449 et la lecture du chunk) : JDYN+0x8A n'est jamais consomme."
   },
   "sub_A324D": {
     "new_name": "GaugeWidget_Method_ToggleField_A324D",
@@ -3072,7 +3072,7 @@
   "sub_9F286": {
     "new_name": "PlayerComponent_OrchestrateComplex_9F286",
     "segment": "seg432",
-    "summary": "⚠️ far, 230 lignes, NON DÉTAILLÉE — combine PlayerComponent_HelperVariantA_9F1D0, PlayerComponent_ComputeComplexB_9EA2E (×3), dispatch vtable [bx+0x10]. Référencée via jmp depuis un stub VROOMM (sub_6C3E9) et par PlayerComponent_LoadAndApply_9EDD4. Candidat pour session dédiée."
+    "summary": "⚠️ far, 230 lignes, NON DÉTAILLÉE — combine PlayerComponent_HelperVariantA_9F1D0, PlayerComponent_ComputeComplexB_9EA2E (×3), dispatch vtable [bx+0x10]. Référencée via jmp depuis un stub VROOMM (sub_6C3E9) et par PlayerComponent_LoadAndApply_9EDD4. Candidat pour session dédiée. | Complement 2026-09-26 (fin de fonction lue) : calcule la MASSE D'EMPORT es:[arg_0+0x20] = somme sur les stations (tableau far es:[arg_0+0x34], pas 0x23, nombre es:[arg_0+0x38]) de (nombre d'armes word station+0x13) x (masse d'une arme = objet DYNM (station+0x0F)->+0x36, methode vtable+0x10). Lue par JDYN_TotalMass_47FF8."
   },
   "sub_2B191": {
     "new_name": "ProgressBar_InitFull",
@@ -3165,9 +3165,9 @@
     "summary": "far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldGroup_9FDDE'. Chargeur du chunk dynamique 'GBMB' (424D4247h) du corps de bombe guidee (via PlayerComponent_SubHelperD_9FDAB, stub VROOMM_StubThunk_6C4A2 depuis JDYN_LoadChunkAndConstruct_3A49C) : 1 dword -> +0x18 = vitesse angulaire maximale de guidage (GuidedBombBody_SteerToTarget_41BEF). Chunk absent : erreur 0xC003."
   },
   "sub_9D4F0": {
-    "new_name": "MissionRecord_LoadStringFields_9D4F0",
+    "new_name": "Aircraft_LoadEJECAndJINF_9D4F0",
     "segment": "ovr313",
-    "summary": "far, combine ResourceRecord_SeekAndRead_64743 et `String_ConstructFromFarPtrLen` (123 lignes)."
+    "summary": "far, 123L, LUE 2026-10-02. Ex-'MissionRecord_LoadStringFields_9D4F0'. Chargeur de deux chunks du modele d'avion apres le chargeur de base. 'EJEC' (43454A45h) : chaine -> +0x5A (longueur +0x59), mot -> +0x66, octet -> +0x58, mot -> +0x68. 'JINF' (464E494Ah) : octet -> +0x53, mot -> +0x54, mot -> +0x56, octet -> +0x52 (CLASSE DE COMBAT : >= 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246 et comparee a byte_72038 = 6 par Targeting_AcquireBestThreat), mot -> +0x64, octet... Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30."
   },
   "sub_6B360": {
     "new_name": "VROOMM_StubThunk_6B360",
@@ -4057,7 +4057,7 @@
   "sub_776FB": {
     "new_name": "GroundAttack_Phase3_WeaponRelease_776FB",
     "segment": "ovr231",
-    "summary": "far, 706L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_WeaponEngagementCycle'. PHASE 3. (1) Cible mobile (bit 2 de cible+4) : recalcule P = cible + 1000 et dir*100 dans le bloc de commandes a chaque tick. (2) CHOIX DE L'ARME une fois (noeud+0x34 == 0), WeaponStation_ValidateReady dans l'ordre : 0x04 AGM-65D et 0x80 GBU-15 (chargement+0x0D = cible) ; 0x10 MK-20 et 0x20 MK-82 (octet +0x4D du modele d'arme courant := 4) ; 0x40 id 7 (+0x4D := 5) ; 0x08 LAU-3 (minuteur noeud+0x2B = 3,0 s, chargement+0x0D = cible). Aucune -> phase 6 (fin). (3) Chaque tick : WeaponStation_FindLoadedCompatible(chargement, noeud+0x34) sinon phase 6. AGM-65D / GBU-15 : tir si modele->vtable+0x14(modele, cible, moi) (BOMB : BombModel_TestGuidedLockCone_41735 ; MISS : loc_42F71 non lu). LAU-3 : tir quand le minuteur de 3 s echoit. BOMBES : hauteur = ma alt - alt cible ; I = modele->vtable+0x18(I, modele, 0, point d'emport+0x0D, &hauteur, 3 pour MK-20/MK-82, 5 pour id 7) (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0 sans point d'emport ; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR = bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si bloc+0x1A != 0 (pose par Autopilot_FlyToPointKinematic_49C2E) -> phase 0 (nouvelle passe)."
+    "summary": "far, 706L, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_WeaponEngagementCycle'. PHASE 3. (1) Cible mobile (bit 2 de cible+4) : recalcule P = cible + 1000 et dir*100 dans le bloc de commandes a chaque tick. (2) CHOIX DE L'ARME une fois (noeud+0x34 == 0), WeaponStation_ValidateReady dans l'ordre : 0x04 AGM-65D et 0x80 GBU-15 (chargement+0x0D = cible) ; 0x10 MK-20 et 0x20 MK-82 (octet +0x4D du modele d'arme courant := 4) ; 0x40 id 7 (+0x4D := 5) ; 0x08 LAU-3 (minuteur noeud+0x2B = 3,0 s, chargement+0x0D = cible). Aucune -> phase 6 (fin). (3) Chaque tick : WeaponStation_FindLoadedCompatible(chargement, noeud+0x34) sinon phase 6. AGM-65D / GBU-15 : tir si modele->vtable+0x14(modele, cible, moi) (BOMB : BombModel_TestGuidedLockCone_41735 ; MISS : MissileModel_TestInRange_42F71, distance < effective_range). LAU-3 : tir quand le minuteur de 3 s echoit. BOMBES : hauteur = ma alt - alt cible ; I = modele->vtable+0x18(I, modele, 0, point d'emport+0x0D, &hauteur, 3 pour MK-20/MK-82, 5 pour id 7) (BombModel_PredictImpact_41311), ou vecteur par defaut dword_707E0 sans point d'emport ; rate = distance HORIZONTALE (I, cible) (noeud+0x30 = partie entiere) ; tolerance = 20 + |ma vitesse| * dt + (150 si (rand & 15) > AG (entite+0xB5)) ; rate <= tolerance -> tir. TIR = bit 1 de l'octet de commande (bloc+0x1B |= 2) puis phase 4. (4) Sans tir, en phase 3, si bloc+0x1A != 0 (pose par Autopilot_FlyToPointKinematic_49C2E) -> phase 0 (nouvelle passe)."
   },
   "sub_AA56C": {
     "new_name": "ExprSlot_Helper7_AA56C",
@@ -4087,7 +4087,7 @@
   "sub_DAA9": {
     "new_name": "Goal_FollowAllyExec",
     "segment": "seg006",
-    "summary": "far,260L — orchestrateur GOAL followAlly : valide le leader (vtable/+0x59 statut), met à jour l'escorte (+0x145 via sub_3A44E), vérifie l'état GOAL 0xAA, appelle sub_CFDF (validité leader) et sub_D081 (guidage) : **exécuteur complet du GOAL 'suivre/former avec un allié'.**"
+    "summary": "far, 260L, LUE 2026-09-27. EXECUTEUR DU VOL EN FORMATION (appele par Goal_SelectTransition a chaque tick de l'ordre 0xAA). var_2 = bit3 de +0x28B (deja en formation) OU objet monde (+0x102)+0x59 == 0 (physique non suspendue par ailleurs). Leader +0x145 : si son avion a flags_75.bit5 (pilote ejecte, pose par AI_EjectDecision_50FF) -> leader oublie. Conditions : ordre 0xAA, var_2, etat d'ailier +0x149 == 0, ailier non ejecte, leader pas au sol, +0x27F == 0. Si le leader est une entite IA (octet +6 == 1, pose par AIEntity_Construct_74B43) : +0x149 = Escort_QueryLeaderValid ; 1 -> Goal_TransferToWingman ; 3 -> cibles +0x137/+0x285/+0x287 = celle renvoyee, +0x160 = 0, +0x162 = horloge +0x175 (secondes) ; sinon Formation_GuidanceSolution. Leader non IA (joueur) : Formation_GuidanceSolution si +0x149 == 0. Si formation tenue et aucun comportement en cours : Goal_FollowWaypoints (sans effet visible, physique suspendue). Hors formation : libere l'historique +0x16A. bit3 de +0x28B = resultat ; si var_2 : objet+0x59 = resultat (physique suspendue pendant la formation)."
   },
   "sub_8B255": {
     "new_name": "MissionRecordField_Helper2_8B255",
@@ -4655,9 +4655,9 @@
     "summary": "⚠️ far, 183 lignes, NON DÉTAILLÉE — libère plusieurs blocs typés (Memory_TypedFree_5C7B6 répété)."
   },
   "sub_3E5A6": {
-    "new_name": "Gauge_ComputeNeedlePosition",
+    "new_name": "Aircraft_GroundClearance_3E5A6",
     "segment": "seg087",
-    "summary": "far,178L — calcule un angle via sin/cos (sub_57C67/sub_57C3A) avec des constantes fixes (0x6D9/0x62C, probable dimensions d'écran), produit une série de projections trigonométriques successives : **calcul de position d'une aiguille/élément graphique d'instrument de bord (cadran complexe), même famille que le seg019.**"
+    "summary": "far, LUE 2026-09-26 (ex-'Gauge_ComputeNeedlePosition' : rien a voir avec une jauge). GARDE AU SOL de l'avion : hauteur de l'origine de l'objet (arg_4, matrice +0x2C) au-dessus du terrain selon son attitude, sur trois points de contact a constantes fixes communes a tous les avions. r = -Matrix_RollAngle_57C67, p = Matrix_NosePitchAngle_57C3A ; A = 6,17 (62Ch) * cos(p + 34,27 deg (2245h)) ; h1 = A * cos(r - 39,43 deg (D892h)) ; h2 = A * cos(r + 39,43 deg (276Eh)) ; h3 = 6,85 (6D9h) * cos(p - 45,37 deg (D2A1h)) ; renvoie max(h1, h2, h3) (4,81 m a plat). Utilisee par PhysicsTicks (drapeau 'au sol' efface si altitude > terrain + garde + 10 m), Collision_SelectCandidates et Landing_Phase5_Stop_76E67 (altitude de l'avion arrete)."
   },
   "sub_A4602": {
     "new_name": "InfoWidget_Helper2_A4602",
@@ -4892,7 +4892,7 @@
   "sub_3D9FB": {
     "new_name": "WorldObject_UpdateWithAIEntity_3D9FB",
     "segment": "seg085",
-    "summary": "far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 → renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0, appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1 (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps)."
+    "summary": "far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 → renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0, appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1 (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps). | 2026-09-27 : l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne (pas de lecture des commandes ni de tick de dynamique). Pose par le decollage/atterrissage (roulage, approche) et par Goal_FollowAllyExec pendant la formation."
   },
   "sub_21E90": {
     "new_name": "Container_Construct",
@@ -5220,9 +5220,9 @@
     "summary": "⚠️ far, 65 lignes, NON DÉTAILLÉE — calcule le layout d'affichage du défilement de texte."
   },
   "loc_A1DF": {
-    "new_name": "AI_PropagateAircraftFlagsAndFollowGate_A1DF",
+    "new_name": "AIEntity_OnBehaviorEnded_A1DF",
     "segment": "seg004",
-    "summary": "far, 57 lignes (methode de vtable, DATA XREF seg339:012C) - JAMAIS DOCUMENTEE AVANT, trouvee et transcrite par Remi en parcourant seg004. Efface le bit 2 de flags_75 sur l'avion lie (entite+0xB) - le bit 'aerofrein' deja documente en §7 de AI_SYSTEM.md. Propage deux AUTRES bits de flags_75 (bits 0 et 1, deja documentes comme 'volets' et 'aerofrein' - a reverifier lequel exactement compte tenu de l'ordre de lecture ici) vers les bits 4 et 5 d'un champ sur un troisieme objet (entite+7, dereference, champ +0x1C) - un miroir/synchronisation d'etat avion vers un objet lie distinct. Pose entite_avion+0x68=0xFF (probable sentinelle 'timer remis a neuf', a verifier). Si un argument (arg_2, [bp+0xA]) est non-nul, appelle Targeting_AcquireBestThreat(entite, 0). Si le bit 3 de entite+0x28B est pose ET entite+0x27F est non-nul, appelle Goal_FollowAllyExec(entite, arg_1) - CONFIRME un point d'entree supplementaire vers le comportement d'escorte, distinct de Goal_ActiveWingmanEngagement_878F. Termine en remettant a zero le champ +0x59 de l'objet lie (entite+0x102)."
+    "summary": "far (label), RELU 2026-09-28. Ex-'AI_PropagateAircraftFlagsAndFollowGate_A1DF'. METHODE +0x1C DE L'ENTITE IA (vtable 0x110 = seg339:6D1C0 ; +0x10 = Goal_SetObjective_A307) : RAPPEL DE FIN DE COMPORTEMENT. Appelee UNIQUEMENT par Behavior_PopFinished_75612 (fin normale, argument 1, seulement s'il n'y a pas de comportement precedent a restaurer) et NotifiableRef_DetachTarget_75661 (comportement abandonne, argument 0) ; les autres 'call [bx+1Ch]' du binaire visent d'autres classes. Arguments : entite (bp+6), drapeau (bp+0Ah). (1) Avion (+0x0B) : flags_75 bit2 efface (train rentre). (2) Bloc de commandes (+7) +0x1C : bit4 = flags_75 bit1 (volets), bit5 = flags_75 bit0 (aerofrein) - la commande reprend l'etat courant. (3) JDYN+0x68 = 0xFF : PILOTE AUTOMATIQUE COUPE. (4) Drapeau non nul : Targeting_AcquireBestThreat(entite, 0). (5) Bit 3 de +0x28B (formation) et +0x27F (niveau de reaction) non nul : Goal_FollowAllyExec(entite). (6) Objet monde (+0x102) +0x59 = 0 : la physique reprend (fin du mode suspendu pose par decollage/atterrissage/formation)."
   },
   "sub_978D4": {
     "new_name": "MissionText_CopyStringField_978D4",
@@ -5340,9 +5340,9 @@
     "summary": "⚠️ far, 197 lignes, NON DÉTAILLÉE — combine copie de chaîne, `CachedObject_Allocate_5DA48`/`ConstructVariantB_5DB0D` (seg141), `CRT_Doprnt_Dispatch` — formatage et mise en cache de texte défilant."
   },
   "sub_6977": {
-    "new_name": "AI_ManeuverSolution_Major",
+    "new_name": "AI_GunSnapAim_6977",
     "segment": "seg003",
-    "summary": "far,616L — fonction majeure : calcule le vecteur relatif cible-soi, sa magnitude (sub_5828E), angles via sub_559BB/sub_552E1, et évalue une solution de manoeuvre complexe. Vu la taille, **candidat fort pour le calcul de solution de tir/interception ou d'évitement complet** — mérite une passe dédiée."
+    "summary": "far, 616L, LUE INTEGRALEMENT 2026-10-02. Ex-'AI_ManeuverSolution_Major'. RECALAGE DE VISEE (aide a la visee de l'IA). Appelee par AI_InterceptDispatcher et AI_BehaviorSelector. W = AI_Sensor_WeaponVelocityCache (pour canon et missiles : le nez, loc_42E80 renvoyant un vecteur nul) ; D = cible - moi, d = |D| ; e = elevation(D) - elevation(W), h = cap(D) - cap(W) ; erreur = sqrt(e^2 + h^2). Jet : AA (+0xB6) >= 1 + 3 x Math_RandomScale(6). r = AI_ComputeBearingToRef(D) ramene a +/-180 ; fenetre = 7 deg x cos(|r|/4), au moins 1 deg. Si |h| et |e| < fenetre, d < dword_7201C (1800 m) et jet reussi : nez <- nez + D - W (= D), Matrix_OrthonormalizeKeepRow1_57660, methode +0x40 de mon objet (L'AVION EST REORIENTE DIRECTEMENT SUR LA CIBLE) ; roulis voulu = r si |h| > fenetre/2, sinon -roulis courant, rapproche de JDYN+0x71/4 x dt (AI_RollToAngleCmd_8104, zone morte 5) ; manche de tangage et +0x27 a 0 ; renvoie 1. Sinon renvoie 1 seulement si l'erreur est nulle (Math_ArcTan d'un champ +0x20 de la cible calcule puis inutilise)."
   },
   "sub_58F4": {
     "new_name": "AI_Sensor_RollAngle_58F4",
@@ -5937,7 +5937,7 @@
   "sub_5D555": {
     "new_name": "PagedResourceB_Write_5D555",
     "segment": "seg138",
-    "summary": "far, implémentation de l'écriture pour la classe PagedResourceB (seg129) — gestion d'erreur via sub_6B70F. Référencée par PagedResourceB_Method_Write_5C2CF."
+    "summary": "far, implémentation de l'écriture pour la classe PagedResourceB (seg129) — gestion d'erreur via sub_6B70F. Référencée par PagedResourceB_Method_Write_5C2CF. | 2026-09-26 : c'est l'ALLOCATION du tas de blocs (paragraphes, liste libre word_70E28) utilisee par Memory_TypedFreeWrapper_5C6F3 pour l'allocateur d'index 2 (PagedResourceB) ; la memoire rendue N'EST PAS mise a zero."
   },
   "sub_6B0FD": {
     "new_name": "VROOMM_StubThunk_6B0FD",
@@ -5997,7 +5997,7 @@
   "sub_42EC3": {
     "new_name": "Proximity_TestOriented",
     "segment": "seg091",
-    "summary": "far,39L — appelle vtable[0x3C] pour résoudre l'orientation puis sub_42D8C avec un rayon décalé (+0xC) : **test de proximité orientée pour la détection de cible potentielle.**"
+    "summary": "far, 39L, LUE 2026-09-25. (arme, candidat, reference) : 0 sans reference ; sinon Proximity_TestPoints(candidat, position de la reference (+0x12), direction de la reference ([vtable+0x3C]+0xC), portee = arme+0x50 (target_range WDAT), cone = arme+0x54 (tracking_cone WDAT))."
   },
   "sub_6CC38": {
     "new_name": "VROOMM_StubThunk_6CC38",
@@ -6025,9 +6025,9 @@
     "summary": "far, combine sub_1069 (×2)."
   },
   "sub_9E289": {
-    "new_name": "TimedTrigger_SpawnAndBindGeometry_9E289",
+    "new_name": "WeaponSystem_ReleaseBomb_9E289",
     "segment": "seg432",
-    "summary": "⭐⚠️ far, 419 lignes, NON DÉTAILLÉE — combine AI_ComputeGeometryHelper_56E29 (seg116), HUD_ResolveNodePosition_547B1 (seg114), l'instanciation d'objet Effect_SpawnObject (sub_38B70, motif de `Trigger_TimedRangedSpawnOnce_4F351`, seg109), l'enregistrement de conteneur (sub_21F8D), la référence faible SetReference (sub_3A44E, mentionnée dans les notes du projet), l'ajout à liste membre (sub_3A40B ×2, dtor sub_3A3EC associé en seg109) et `Weapon_HUDBox_TimerCaseH_5A8DC` (seg125). Correspond très fortement au système de trigger/spawn temporisé du seg109, probablement son implémentation d'overlay réelle. Candidat prioritaire pour session dédiée."
+    "summary": "far, 419L, LUE PARTIELLEMENT 2026-10-03 (garde et minuteur). Ex-'TimedTrigger_SpawnAndBindGeometry' (FAUX). LACHER D'UNE BOMBE depuis un pylone, appele par WeaponSystem_LaunchFromStation_3E744 (cas bombe) via le stub 6C399. Args : sortie (minuteur), point d'emport (arg_4), tireur (arg_8), cible (arg_A), pylone (arg_C), systeme d'armes (arg_10), arg_14 = lacher force. Systeme +0x44 (lacher arme) remis a 0. Classe de l'arme (+0x4A) != 9 -> rien. Exige le minuteur bombes +0x28 a 0 OU arg_14 (la seconde bombe d'une paire part dans le meme appel). Instancie la bombe au pylone (pylone +0x13 - 1), evenement 59CDh, puis MINUTEUR = dword +0x5A du modele (dernier champ WDAT : 1,0 s pour MK-20, MK-82, Durandal, GBU-15), ecrit dans +0x28 et dans la sortie."
   },
   "sub_67DEA": {
     "new_name": "OptionCounter_Set_67DEA",
@@ -6307,7 +6307,7 @@
   "sub_57C67": {
     "new_name": "Matrix_RollAngle_57C67",
     "segment": "seg116",
-    "summary": "far, LUE (2026-09-24). Ex-'AI_ComputeGeometrySolution'. ANGLE DE ROULIS de la matrice d'orientation arg_4 (ligne 1 = nez, ligne 2 = normale), degres 24.8. Si normale.c2 ([+0x20]) == 0 -> 0. Sinon : h = (nez.c1, -nez.c0, 0) (horizontale perpendiculaire au nez) ; r = Math_DotProduct3D_5505B(h, normale) / |h| ; |h| == 0 (nez vertical) -> 90 deg ; sinon roulis = 90 - Math_AcosOfRatio_54A0E(r) = asin(r). Si la normale pointe vers le bas (c2 < 0, dos) : roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans ]-180, 180]."
+    "summary": "far, LUE (2026-09-24). Ex-'AI_ComputeGeometrySolution'. ANGLE DE ROULIS de la matrice d'orientation arg_4 (ligne 1 = nez, ligne 2 = normale), degres 24.8. Si normale.c2 ([+0x20]) == 0 -> 0. Sinon : h = (nez.c1, -nez.c0, 0) (horizontale perpendiculaire au nez) ; r = Math_DotProduct3D_5505B(h, normale) / |h| ; |h| == 0 (nez vertical) -> 90 deg ; sinon roulis = 90 - Math_AcosOfRatio_54A0E(r) = asin(r). Si la normale pointe vers le bas (c2 < 0, dos) : roulis = 180 - roulis (s'il est > 0) ou -180 - roulis (s'il est < 0) : roulis complet dans ]-180, 180]. | MESURE DOSBox 2026-09-26 (F-16 joueur, seul avion) : a 90 deg de roulis pile, la fonction renvoie 0 (cas normale.c2 == 0 en 24.8, c.-a-d. |c2| < 1/256) -> dans Aero_ComputeAoACommand_48862 |cos| = 1,0, la consigne garde alpha (-2,98 deg), servo inactif, 0,0 G au HUD ; a ~60 deg elle renvoie le vrai angle (|cos| = 0x79 = 0,47). Ce cas particulier est ce qui fait que l'avion sur la tranche ne tourne pas."
   },
   "sub_5D469": {
     "new_name": "DisplayCache_GetHeadValue_5D469",
@@ -6550,9 +6550,9 @@
     "summary": "far — opération fichier bas niveau INT21 AH=43h (get/set attributs) avec gestion erreur via sub_4E7."
   },
   "sub_5242A": {
-    "new_name": "Expr_Node_ClearDirtyAndNotify_5242A",
+    "new_name": "PartEntry_Deactivate_5242A",
     "segment": "seg114",
-    "summary": "far, efface le bit dirty d'un nœud (+0x39), décrémente des compteurs globaux (word_706A3/706A7) selon son état antérieur, notifie via Expr_Node_NotifyChange_53337."
+    "summary": "far. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN OBJET DE MISSION : opcode de script 0x91 (Expr_VM_Interpreter_51106, cas 0x91), inverse de 0x90 (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Efface le bit actif de l'objet (+0x39), decremente les compteurs d'objets actifs par camp (word_706A3 / word_706A7, lus par Goal_IsComplete pour l'ordre 0xA9) selon l'etat anterieur, notifie via Expr_Node_NotifyChange_53337. Exemple MISN-1A : le C-130 se desactive (0x91 8) apres son atterrissage. NB : l'opcode 0xBE n'est PAS une desactivation : c'est un ordre transmis a Goal_SetObjective_A307 (cas par defaut, objectif 0xBF)."
   },
   "sub_6CDD7": {
     "new_name": "VROOMM_StubThunk_6CDD7",
@@ -6600,9 +6600,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A2462) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_120E8": {
-    "new_name": "FlightState_ResetHud",
+    "new_name": "Takeoff_Phase0_GroundRoll_120E8",
     "segment": "seg009",
-    "summary": "far,329L — réinitialise plusieurs champs HUD/commande d'un objet (via chaîne +8→+7, offsets +0x1F/0x23/0x27) et vérifie une altitude (+0x4C) : **handler de fin/init de manoeuvre (probable transition d'état de vol, ex: fin de décollage).**"
+    "summary": "far, LUE 2026-09-26 (ex-'FlightState_ResetHud', faux). DECOLLAGE IA (ordre 0xA1). Phase 0, ROULAGE CINEMATIQUE. Manche (+0x1F/+0x23/+0x27) a 0, gaz cran 10 (plein PC, ctrl+0x1E). Au 1er tick, memorise la position de depart (+0x3A). Objet monde +0x59 = 1 (mode cinematique). temps +0x4C += dt ; vitesse +0x48 = TOFF[+0x52] * temps ; la position avance de vitesse*dt le long du cap de piste +0x58 (0 : +c1, 90 : -c0, 180 : -c1, 270 : +c0) et est ecrite dans l'objet. Quand vitesse > TOFF[+0x50] : phase 1, JDYN_JumpToPoint_49242(position, direction, vitesse) rend l'avion a la physique a cette vitesse, objet +0x59 = 0, drapeau 'au sol' = 1."
   },
   "sub_67E9C": {
     "new_name": "TextScrollDisplayB_ApplyHelperA_67E9C",
@@ -6717,7 +6717,7 @@
   "sub_E246": {
     "new_name": "AI_EngageAttackerReaction_E246",
     "segment": "seg007",
-    "summary": "Ex-'Formation_DamageReactionHandler' (pas une simple reaction aux degats). far, 381L, LUE 2026-09-25. ENTREE EN COMBAT CONTRE UN ATTAQUANT, appelee par AI_TopLevelThink quand rien n'a reagi et +0x27F <= 1. (1) Si je viens d'etre touche (bit 7 de +0x28D) ou minuteur +0x174 echu : Targeting_AcquireBestThreat(nouvelle cible sol 0). (2) Niveau +0x27F = 1 remis a 0. (3) Avec une cible aerienne +0x287 et +0x27F == 0 : a = |angle entre mon nez et le sien|, b = |angle entre mon nez et la direction vers lui| (Angle_DeltaNormalized_A), d = distance. Declenchement si touche, OU si b > 150 (cmp 9600h) ET a < 30 (cmp 1E00h) ET d < dword_7201C : IL EST DANS MES SIX HEURES, dans le meme sens que moi. Alors +0x27F = 1. (4a) Ailier en suivi (objectif 0xAA, +0x149 == 0) : si mon leader n'est pas le joueur, il faut en plus que la cible soit une IA qui me vise (son +0x287 = mon objet) ; puis +0x149 = 3, cible de mission +0x137 = +0x285 = l'attaquant, +0x160 = 0, +0x162 = horloge ; si le leader est le joueur : radio 0x12 ('This one's all mine.' chez Billy). (4b) Sinon, hors suivi et classe du modele (+0x52) >= 9 : abandon d'une navigation ID 21 en cours, combat (AI_BehaviorStateMachine_WeightedOptionSelector_9D05), renvoie 1. (4c) Sinon, rien en cours et objectif aucun / 0xA5 / 0xA4 : bloc de commandes +0x1A = 1, bit 5 de +0x28B efface, Goal_WanderRandom. Renvoie 1 seulement en 4b."
+    "summary": "Ex-'Formation_DamageReactionHandler' (pas une simple reaction aux degats). far, 381L, LUE 2026-09-25. ENTREE EN COMBAT CONTRE UN ATTAQUANT, appelee par AI_TopLevelThink quand rien n'a reagi et +0x27F <= 1. (1) Si je viens d'etre touche (bit 7 de +0x28D) ou minuteur +0x174 echu : Targeting_AcquireBestThreat(nouvelle cible sol 0). (2) Niveau +0x27F = 1 remis a 0. (3) Avec une cible aerienne +0x287 et +0x27F == 0 : a = |angle entre mon nez et le sien|, b = |angle entre mon nez et la direction vers lui| (Angle_DeltaNormalized_A), d = distance. Declenchement si touche, OU si b > 150 (cmp 9600h) ET a < 30 (cmp 1E00h) ET d < dword_7201C : IL EST DANS MES SIX HEURES, dans le meme sens que moi. Alors +0x27F = 1. (4a) Ailier en suivi (objectif 0xAA, +0x149 == 0) : si mon leader n'est pas le joueur, il faut en plus que la cible soit une IA qui me vise (son +0x287 = mon objet) ; puis +0x149 = 3, cible de mission +0x137 = +0x285 = l'attaquant, +0x160 = 0, +0x162 = horloge ; si le leader est le joueur : radio 0x12 ('This one's all mine.' chez Billy). (4b) Sinon, hors suivi et classe du modele (+0x52) >= 9 : abandon d'une navigation ID 21 en cours, combat (AI_BehaviorStateMachine_WeightedOptionSelector_9D05), renvoie 1. (4c) Sinon, rien en cours et objectif aucun / 0xA5 / 0xA4 : bloc de commandes +0x1A = 1, bit 5 de +0x28B efface, Goal_WanderRandom. Renvoie 1 seulement en 4b. | RELU 2026-10-02 (fin) : (4b) hors suivi (+0x11D != 0xAA) ET octet +0x52 du modele de MON avion >= 9 (chunk JINF, 'classe de combat' : F-15/F-16/F-18/MiG-29/Su-27/Tornado 11, F-22/YF-23 12, Mirage 10, MiG-21 9 ; A-10 8, 747/AWACS 5, Tu-20 4, C-130 2, Learjet 1) : si le comportement en cours est l'ID21 (tag 0x15) il est abandonne, puis AI_BehaviorStateMachine_WeightedOptionSelector_9D05(entite, 0), renvoie 1. (4c) sinon, rien en cours et objectif 0xFFFF / 0xA5 / 0xA4 : bloc +0x1A = 1 et bit 5 de +0x28B POSE (and 0DFh puis or 20h ; l'ancien resume disait efface), Goal_WanderRandom ; renvoie 0."
   },
   "loc_66809": {
     "new_name": "ConfigOption_ApplyAndDisplay_66809",
@@ -7292,7 +7292,7 @@
   "sub_AD13": {
     "new_name": "Goal_WanderRandom",
     "segment": "seg005",
-    "summary": "far, 246L, LUE INTEGRALEMENT (2026-09-20). Handler du GOAL 'errance'. (1) Si l'objet en cours de l'entite (+0x0D) existe : delegue a son vtable+0xC et renvoie 1. (2) Sinon, sauf si [[entite+7]+0x1A]==0 et entite+0x19==0x15 (role non lu), tire deux valeurs rand()%20000-10000 (0x4E20 / 0xD8F0), les prend comme direction horizontale, la normalise (Vector_NormalizeInPlace_5593A = normalisation) et la multiplie par 0x753000 (30000 en 24.8) : point a 30000 unites dans une direction aleatoire. Altitude : Terrain_QueryAltitudeAt + entite+0x13D (altitude de croisiere NUMS) - altitude actuelle (objet +0x102, +0x1A), bornee a +/-1000 puis ajoutee a la position courante. Ecrit le point dans le bloc d'etat commun ([[entite+7]] +0x2/+0x6/+0xA), la vitesse voulue (direction * entite+0x141) en +0xE/+0x12/+0x16, et le point dans entite+0x11F/+0x123/+0x127. (3) Efface l'octet +0xC du noeud entite+0xD1 (MVRS ID 21) et appelle son vtable+8. Renvoie toujours 1. Appelee par Goal_ExecuteAction_A8AC (cas par defaut) et Formation_DamageReactionHandler."
+    "summary": "far, 246L, RELUE 2026-09-27. Gestionnaire GOAL 3 (off_6D198), aussi appele par Goal_ExecuteAction_A8AC et AI_EngageAttackerReaction_E246. Renvoie toujours 1. (1) Comportement en cours (+0x0D) -> sa methode +0xC. (2) Si le dernier comportement termine (+0x19) est l'ID21 (0x15) et que le point n'a pas ete atteint (bloc +0x1A == 0) : reapplique l'ID21 avec le meme bloc. Sinon : dir = normalise(rand()%20000-10000, rand()%20000-10000, 0) ; P = moi + dir*30000 m, altitude = moi + borne(terrain sous moi + +0x13D - mon altitude, +/-1000 m) ; W = dir * +0x141 ; +0x11F = P. (3) Noeud ID21 (+0xD1), minuteur de contexte 30 s (0x1E00, ecrase le 0x200 initial)."
   },
   "sub_220": {
     "new_name": "CRT_RunAtexitTable_MinPrio",
@@ -7352,7 +7352,7 @@
   "sub_3F87F": {
     "new_name": "WeaponStation_DecrementCounter",
     "segment": "seg088",
-    "summary": "far,40L — récupère une valeur via vtable[0x10] d'un sous-composant (+0x36) et la soustrait d'un accumulateur (+0x20) : **décrément d'un compteur (probable munitions/carburant) selon un sous-système.**"
+    "summary": "far, 40L, LUE (2026-09-26). Au tir d'une arme : lit la masse d'UNE arme par la methode vtable+0x10 de son objet dynamique DYNM (station->+0x36 ; +0x10 = masse, comme dans le tick des DYNM simples) et la retire de la masse d'emport es:[arg_0+0x20]. arg_0 = structure d'emport de l'avion (objet monde +0x5A). Cette masse d'emport entre dans la masse totale de l'avion (JDYN_TotalMass_47FF8)."
   },
   "loc_6669A": {
     "new_name": "JoystickManager_Destruct_6669A",
@@ -7720,9 +7720,9 @@
     "summary": "far, stub transmettant simplement son argument."
   },
   "sub_76E67": {
-    "new_name": "AITargeting_ApplyRangeCheck_76E67",
+    "new_name": "Landing_Phase5_Stop_76E67",
     "segment": "ovr230",
-    "summary": "⚠️ far, 137 lignes, NON DÉTAILLÉE — combine `Vector_NormalizeInPlace_5593A` (seg116), `Trigger_TimedRangedSpawnOnce`-style test de portée (sub_378CA, seg109), sub_3E5A6 — vérification de portée pour le ciblage."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_ApplyRangeCheck_76E67'). ATTERRISSAGE (ordre 0xA2). Phase 5, ARRET. Vitesse physique = 0 ; altitude = Terrain_QueryAltitudeAt + Gauge_ComputeNeedlePosition(objet) (hauteur de l'avion au sol, nom a revoir) ; manche a 0 ; volets rentres s'ils sont sortis ; gaz ctrl+0x1E = 0xFF. Joueur : byte_706AF = 1 (pose). IA : phase 6 (fin au tick suivant)."
   },
   "sub_6C11F": {
     "new_name": "VROOMM_StubThunk_6C11F",
@@ -8112,7 +8112,7 @@
   "sub_464BE": {
     "new_name": "Physics_ApplyForceAtPoint",
     "segment": "seg101",
-    "summary": "far,117L — met à l'échelle un vecteur de force (+8/0xC/0x10) par un scalaire (arg_6), l'ajoute à une position de référence (+0x2, +0x12) : **application pondérée d'une force à un point d'application (moment/couple).**"
+    "summary": "far, LUE 2026-10-02. (sortie, corps, &echelle) : position monde de l'objet du corps (corps+2 -> +0x12) + vitesse du corps (+8/+0x0C/+0x10) x echelle. Position predite absolue (ex. a 4 s)."
   },
   "sub_6AE9D": {
     "new_name": "VROOMM_StubThunk_6AE9D",
@@ -8355,9 +8355,9 @@
     "summary": "far,50L — bascule un mode de rendu global (byte_6EC34) entre deux réglages sonores/visuels ('WF'/'XX', bip 'Wv'), appelle sub_39B29 : **bascule debug entre deux modes de rendu (wireframe/solide) avec retour sonore.**"
   },
   "sub_12472": {
-    "new_name": "FlightState_EnterEmergency",
+    "new_name": "Takeoff_Phase1_ClimbOut_12472",
     "segment": "seg009",
-    "summary": "far,124L — même pattern de reset HUD (+0x23/+0x1F/+0x27=0, code HUD +0x1E=0xA) + positionne un flag pilote (+0x75 bit1) : **handler d'entrée dans un état de vol (probable début de manoeuvre d'évitement/urgence).**"
+    "summary": "far, LUE 2026-09-26 (ex-'FlightState_EnterEmergency', faux). DECOLLAGE IA (ordre 0xA1). Phase 1, MONTEE INITIALE. Aerofrein rentre s'il est sorti (bit 5 de ctrl+0x1C), manche a 0, gaz cran 10, volets sortis (flags_75 |= 2). Hauteur = altitude - Terrain_QueryAltitudeAt. Si hauteur > 300 m (cmp 12C00h) : gaz cran 5 (MIL), phase 2. Sinon AI_PitchAttitudeHold_126CC(assiette TOFF[+0x54])."
   },
   "sub_A0574": {
     "new_name": "PlayerComponent_SubHelperS_A0574",
@@ -8887,7 +8887,7 @@
   "sub_A0700": {
     "new_name": "Weapon_LoadWDATChunk_A0700",
     "segment": "seg435",
-    "summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain)."
+    "summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain)."
   },
   "sub_536F7": {
     "new_name": "MAIN_GAME_TICK",
@@ -9692,7 +9692,7 @@
   "sub_B331": {
     "new_name": "Goal_ReturnToBase",
     "segment": "seg005",
-    "summary": "far,229L — handler GOAL utilisant la position/vitesse propre (+0x11F) en absence de cible : **probable handler 'return to base'/'orbit point' (variante sans cible).**"
+    "summary": "far, 229L, LUE 2026-09-27. EXECUTION DES ORDRES 0xA5 (vol vers un point, FLY_TO_WP) et 0xA4, appelee par Goal_ExecuteAction_A8AC. Comportement en cours (+0x0D) -> sa methode +0xC. Sinon : bloc de commandes P = +0x11F (spot[param1]), drapeau 'point atteint' +0x1A = 0 ; W (+0x0E) = +0x12B (spot[param2], 2e operande = opcode 9 suivant ; absent -> (0,0,0)) pour 0xA4/0xA5, sinon direction vers P * +0x141 ; noeud ID21 (+0xD1) avec minuteur de contexte 2 s (0x200). Donnees : le 2e spot des 80 FLY_TO_WP de l'IA est un vecteur vitesse (zone 0xFFFF), ex. (0,100,0) m/s = vitesse et cap voulus a l'arrivee ; les 121 FLY_TO_WP sans opcode 9 sont tous dans des scripts du joueur. Fin (Goal_IsComplete) : distance horizontale <= 500 m. Nom historique trompeur (pas de retour a la base)."
   },
   "sub_5B802": {
     "new_name": "PagedMemory_DetectDriverSignatureB_5B802",
@@ -9797,7 +9797,7 @@
   "PhysicsTicks": {
     "new_name": "PhysicsTicks",
     "segment": "seg103",
-    "summary": "far, ~0x4A85B, ~350L, seg103 — LE TICK DE LA DYNAMIQUE AVION (classe JDYN + 3 variantes ; slot 'Update' des vtables installees par JDYN_LoadChunk, tags seg339 0x228A/0x2312/0x2362 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]). Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) * (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0, donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. | Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 = JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) = -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral). Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D)."
+    "summary": "far, ~0x4A85B, ~350L, seg103 — LE TICK DE LA DYNAMIQUE AVION (classe JDYN + 3 variantes ; slot 'Update' des vtables installees par JDYN_LoadChunk, tags seg339 0x228A/0x2312/0x2362 ; appele par 4 thunks d'ajusteur this dans seg082). A NE PAS confondre avec FlightPhysics_TickCandidate_4F4EE (seg109) qui est le tick de 3 classes DYNM plus simples (missile/bombe, vtables seg339 ~0x1CFE). si = la struct JDYN 0xC5 (= [playerCtx+0x0B]). Deroule : (1) Terrain_QueryAltitudeAt + detection 'au sol' [A+0x20] conditionnee par la difficulte word_70466 ; (2) FlightControl_InvalidateAllCachesGlobal (reset caches aero) ; (3) MANETTE DES GAZ -> POUSSEE : cran es:[obj2+0x1E] (0-10, MIL 0-5 / AFT 1-5) PLAFONNE a arrondi(10*dword_72A2C) et reecrit dans es:[obj2+0x1E], Aero_ComputeCoeffSaturating(si+0x22, cran) -> [si+0x28] = poussee courante (x gain dword_72A2C) ; (4) CONSO CARBURANT : facteur 0x33 si MIL (cran<=5) sinon 0x4C (AFT ~1.5x), burn = (10 - 9*dword_72A14) * [si+0x33](SFC) * (cran*0x33/256 si cran<=5, cran*0x4C/256 sinon ; multiplication SAUTEE si ce facteur <= 0, donc cran 0 -> SFC seul) * dt(dword_70458), [si+0x6D] -= burn (relu 2026-09-25) ; si [si+0x6D]<=0 avant le bloc : carburant=0, poussee [si+0x28]=0, pas de conso ; (5) etat volets/aerofrein/train depuis les bits du sous-objet controle es:[obj2+0x1C/0x1D] + Roster('FLAPS'/'LANDGEAR') ; (6) vitesse = |A.velocity([A+8/C/10])| ; (7) si [si+0x68] != 0xFF et !flags_75.bit5 -> Autopilot_FlyToPointKinematic_49C2E (AUTOPILOTE cinematique) SINON manuel : Aero_SumLinearForces_48639(si) -> [A+0x14/18/1C] = SOMMATION DES FORCES (poussee [si+0x28] + portance/trainee + gravite + drag flags_75, en acceleration) ; Aero_ControlOrchestrator -> moment -> Physics_IntegrateSecondaryPosition (orientation si+4) ; au sol et |A.vitesse| < 40 m/s (0x2800) : vitesse de lacet [si+0x0C] imposee par le manche lateral (voir complement) ; Physics_IntegratePosition([si]=A, [si]+0x14) : A.vitesse [A+8/C/10] += accel[A+0x14..]*dt (transform corps->monde [[A+2]+0x70]) ; contrainte sol : projection de la vitesse hors du plan sol, vy>=0, deadband |v|<5. La POSITION monde n'est PAS integree ici (corrige 2026-09-25 : l'appel [si+2]->[bx+0x34] de tete est JDYN_UpdateDamageGains_494DD ; la position est integree par la methode +0x14 de l'objet monde, voir complement). Sous-objet A ([si]->jdyn+0x8E) : +0x02 ptr membre, +8/C/10 vitesse, +0x14/18/1C acceleration, +0x20 flag 'au sol'. Detail : analysis/DATA_MODEL.md §6.2. | Complement 2026-09-25 : tout debut = appel vtable secondaire +0x34 = JDYN_UpdateDamageGains_494DD ; apres Physics_IntegrateSecondaryPosition : si au sol ([obj+0x20]!=0) et |vitesse| < 40 m/s (cmp 2800h) -> [si+0Ch] (vitesse de lacet) = -([ctrl+0x23]/16 * vitesse)/4 (direction au sol par le manche lateral). Physics_IntegratePosition_46300(obj, obj+0x14) integre la VITESSE ; la position est integree par la methode +0x14 de l'objet monde (WorldObject_IntegrateBodyMotion_3D31D). | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_CA93": {
     "new_name": "AI_MoraleDisciplineCheck_CA93",
@@ -9890,9 +9890,9 @@
     "summary": "far, référencée par `Formation_GuidanceSolution` (sub_D081), alloue (sub_658) et appelle Matrix_BuildFromAngle_56D72."
   },
   "sub_3F8C0": {
-    "new_name": "HUD_RenderSymbologyAlt",
+    "new_name": "WeaponSystem_FrameUpdate_3F8C0",
     "segment": "seg088",
-    "summary": "far,**2016 lignes**. Structure quasi identique à sub_3E744 (mêmes offsets +0x24/28/2C/30, même seuil de bank 0x5A00, même test 'objet == joueur') : **second moteur de rendu de symbologie HUD, variante probable pour le mode air-air/air-sol ou pour les cibles secondaires.** Appelle sub_4114D (largage chaff/flare) et sub_40A33/sub_40D3B (résolution de stations d'armement). Bien trop volumineuse pour une passe rapide."
+    "summary": "far, 2016L, LUE PARTIELLEMENT 2026-10-03 (chemins gachette, minuteurs, objet suivi). Ex-'HUD_RenderSymbologyAlt' (FAUX : aucun affichage). MISE A JOUR PAR FRAME DU SYSTEME D'ARMES d'un avion (joueur et IA ; arg_0 = systeme +0x104, arg_4 = bloc de commande +7). (1) Quatre MINUTEURS DE CADENCE +0x24 (missiles, categorie 8), +0x28 (categorie 9 : bombes), +0x2C (categorie 13 : canons), +0x30 (categorie 10 : paniers) decrementes de dword_70458 (dt) et bornes a 0, recopies a la fin. (2) Point d'emport courant = tableau +0x14 + index (+0) * 0x12 -> +0x18. (3) Octet de commande +0x1B : bit 1 = GACHETTE -> WeaponStation_FindByTypeMask puis pylone le plus charge du type (PlayerComponent_MainOrchestrator_9F98D) puis WeaponSystem_LaunchFromStation_3E744(point d'emport, tireur +9, cible = +0x0D seulement si +0x0B (accroche) est pose, pylone, systeme) ; si le lancement a lieu, les minuteurs sont relus (la fonction de lancement les rearme) ; plus de pylone du type -> retour au point d'emport par defaut (+0x06). Bit 2 : cycle de cible (WeaponStation_ResolveStateA/B), cible d'une autre famille que l'arme -> +0x0D efface. Bit 4 / bit 5 : largage (pylones vides par WeaponStation_DecrementCounter). +0x1C bit 3 : bascule air-air / air-sol (+0x56, canon ou masque 0xF03). +0x1C bit 0 : objet suivi +0x0D efface. Reste (bit 6 de +0x1B = demande de suivi, a partir de loc_40483) non relu en detail."
   },
   "sub_6AFB5": {
     "new_name": "VROOMM_StubThunk_6AFB5",
@@ -10432,7 +10432,7 @@
   "sub_2BD51": {
     "new_name": "Damage_CheckTimer",
     "segment": "seg060",
-    "summary": "far,51L — reset du timer de vérification de panne si la difficulté a changé (+0x98 vs word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à expiration : **minuteur de vérification périodique de panne de composant, sensible à la difficulté.**"
+    "summary": "far,51L — reset du timer de vérification de panne si la difficulté a changé (+0x98 vs word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à expiration : **minuteur de vérification périodique de panne de composant, sensible à la difficulté.** | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_64743": {
     "new_name": "ResourceRecord_SeekAndRead_64743",
@@ -10612,7 +10612,7 @@
   "loc_A307": {
     "new_name": "Goal_SetObjective_A307",
     "segment": "seg005",
-    "summary": "far, 405 lignes (methode de vtable, DEUX points d'entree : loc_A307 via seg339:off_6D1D0, ET loc_A30A/+3octets via seg216:00E6 - la table de dispatch de messages partagee). ENTIEREMENT TRACEE. C'est LE VERITABLE IMPLEMENTEUR de la famille d'opcodes OP_SET_OBJ_* (161-191/0xA1-0xBF), celui vers lequel MissionScript_CallNativeHandler_52513 delegue effectivement (confirme par la meme structure de switch 31 cas sur la meme plage). Parametres : entite (bp+6), operande principal 'si' (bp+0xA, le CODE OBJECTIF a fixer), cible (bp+0xC), pointeur vers donnees etendues 'di' (bp+0xE), buffer (bp+0x10). GATE INITIAL : si le bit 5 de entite+0x28B (mode formation/escorte) est pose, COURT-CIRCUITE tout le switch et saute directement a la queue commune (loc_A641) - un objectif ne peut pas etre change tant que l'entite est sous controle de formation. 13 GESTIONNAIRES DISTINCTS COUVRANT LES 31 CODES (jump table off_A695) : 0xA1 TAKE_OFF (loc_A3FA) : goal_state=code, rien d'autre. 0xA2 LAND (loc_A459) : ecrit +0x11F/+0x123/+0x127 PUIS +0x12B/+0x12F/+0x133 (deux vecteurs 3D consecutifs, source=operande di puis di). 0xA4/0xA5 (non nommes cote libRealSpace, loc_A405, partagent le meme gestionnaire) : ecrit +0x12B/+0x12F/+0x133 (source=buffer bp+0x10) PUIS +0x11F/+0x123/+0x127 (source=di) - ORDRE INVERSE de 0xA2. 0xA7 DESTROY_TARGET (loc_A4CA) : SetReference sur +0x137 (confirme le champ deja connu via Goal_IsComplete). 0xA8 DEFEND_TARGET (loc_A38D) : SetReference sur +0x10F PUIS +0x137 (continuation partagee loc_A5D5). 0xA9 DEFEND_AREA et 0xBF DEACTIVATE_OBJ (loc_A3BE, MEME gestionnaire) : efface la reference +0x10F (NULL), copie un vecteur 3D (source=di) dans +0x111/+0x115/+0x119 (champ 'centre de zone', DIFFERENT de +0x14A/+0x14E/+0x152 utilise par FOLLOW_ALLY). 0xAA FOLLOW_ALLY (loc_A341, deja documente separement) : SetReference sur +0x145, +0x149=0, copie position (source=di) dans +0x14A/+0x14E/+0x152 (continuation partagee loc_A368). 0xAB SET_MESSAGE (loc_A4AF) : appelle DIRECTEMENT Radio_PlayMessage_CB45 avec l'operande comme identifiant de message. 0xAC (non nomme, loc_A4EE) : ecrit +0x11F/+0x123/+0x127 ET +0x111/+0x115/+0x119 (deux vecteurs), efface +0x10F, PUIS ECRIT DYNAMIQUEMENT +0x139 ET +0x141 depuis l'operande buffer (bp+0x10, rescale >>8) - CONFIRME que +0x139 (seuil de proximite radio, AI_ProximityRadioCalloutTrigger_A002) et +0x141 (troisieme constante mysterieuse du constructeur d'entite) sont des PARAMETRES DE DETECTION CONFIGURABLES PAR OPCODE, pas de simples constantes fixes - probable 'SET DETECTION/AWARENESS RANGE'. 0xB1 (non nomme, loc_A588) : ecrit +0x13D (source=di+8) - MEME champ que 0xAC via une continuation partagee (loc_A598) - donc +0x13D peut AUSSI etre configure independamment par ce code. 0xB2 (non nomme, loc_A5E3) : ecrit +0x141 (source=di+4) - encore une voie d'ecriture pour ce champ. 0xB3 (non nomme, loc_A5A4) : SetReference sur +0x145 (MEME champ que FOLLOW_ALLY !), efface +0x149 - variante d'assignation de cible d'escorte sans changer goal_state. 0xB5 (non nomme, loc_A5C8) : SetReference sur +0x147 (le champ 'cible == joueur ?' de Goal_ActiveWingmanEngagement_878F), via la MEME continuation que 0xA8 (loc_A5D5). DEFAUT (loc_A5FE, pour tous les codes non geres explicitement - 0xA3,0xA6,0xAD-0xB0,0xB6-0xBE) : efface +0x10F, copie la position PROPRE de l'objet lie (entite+0x102+0x12) dans +0x111/+0x115/+0x119 (position de repli sur soi-meme), FORCE goal_state=0xBF (DEACTIVATE_OBJ) - un vrai comportement de secours/desactivation pour tout code non reconnu. QUEUE COMMUNE (loc_A641, apres N'IMPORTE QUEL cas) : (1) si goal_state==0xAA OU bit3 de +0x28B pose, appelle IMMEDIATEMENT Goal_FollowAllyExec_DAA9 (meme fonction que le court-circuit de AIEntity_MasterTick_5ACC !) - l'objectif FOLLOW_ALLY prend effet sans attendre le prochain tick. (2) SAUF SI bit5 de +0x28B est deja pose (deja verifie une fois en formation), appelle Goal_IsComplete_A6D3 IMMEDIATEMENT sur le nouvel etat pour verifier s'il est deja trivialement rempli, et retourne ce booleen comme resultat de la fonction entiere. Anciennement compris seulement partiellement (case 0xAA lue isolement lors de l'investigation des commandes radio) - desormais documente dans son integralite comme UNE SEULE fonction coherente plutot que des labels loc_ fragmentes et non catalogues."
+    "summary": "far, 405 lignes (methode de vtable, DEUX points d'entree : loc_A307 via seg339:off_6D1D0, ET loc_A30A/+3octets via seg216:00E6 - la table de dispatch de messages partagee). ENTIEREMENT TRACEE. C'est LE VERITABLE IMPLEMENTEUR de la famille d'opcodes OP_SET_OBJ_* (161-191/0xA1-0xBF), celui vers lequel MissionScript_CallNativeHandler_52513 delegue effectivement (confirme par la meme structure de switch 31 cas sur la meme plage). Parametres : entite (bp+6), operande principal 'si' (bp+0xA, le CODE OBJECTIF a fixer), cible (bp+0xC), pointeur vers donnees etendues 'di' (bp+0xE), buffer (bp+0x10). GATE INITIAL : si le bit 5 de entite+0x28B (mode formation/escorte) est pose, COURT-CIRCUITE tout le switch et saute directement a la queue commune (loc_A641) - un objectif ne peut pas etre change tant que l'entite est sous controle de formation. 13 GESTIONNAIRES DISTINCTS COUVRANT LES 31 CODES (jump table off_A695) : 0xA1 TAKE_OFF (loc_A3FA) : goal_state=code, rien d'autre. 0xA2 LAND (loc_A459) : ecrit +0x11F/+0x123/+0x127 PUIS +0x12B/+0x12F/+0x133 (deux vecteurs 3D consecutifs, source=operande di puis di). 0xA4/0xA5 (non nommes cote libRealSpace, loc_A405, partagent le meme gestionnaire) : ecrit +0x12B/+0x12F/+0x133 (source=buffer bp+0x10) PUIS +0x11F/+0x123/+0x127 (source=di) - ORDRE INVERSE de 0xA2. 0xA7 DESTROY_TARGET (loc_A4CA) : SetReference sur +0x137 (confirme le champ deja connu via Goal_IsComplete). 0xA8 DEFEND_TARGET (loc_A38D) : SetReference sur +0x10F PUIS +0x137 (continuation partagee loc_A5D5). 0xA9 DEFEND_AREA et 0xBF DEACTIVATE_OBJ (loc_A3BE, MEME gestionnaire) : efface la reference +0x10F (NULL), copie un vecteur 3D (source=di) dans +0x111/+0x115/+0x119 (champ 'centre de zone', DIFFERENT de +0x14A/+0x14E/+0x152 utilise par FOLLOW_ALLY). 0xAA FOLLOW_ALLY (loc_A341, deja documente separement) : SetReference sur +0x145, +0x149=0, copie position (source=di) dans +0x14A/+0x14E/+0x152 (continuation partagee loc_A368). 0xAB SET_MESSAGE (loc_A4AF) : appelle DIRECTEMENT Radio_PlayMessage_CB45 avec l'operande comme identifiant de message. 0xAC (non nomme, loc_A4EE) : ecrit +0x11F/+0x123/+0x127 ET +0x111/+0x115/+0x119 (deux vecteurs), efface +0x10F, PUIS ECRIT DYNAMIQUEMENT +0x139 ET +0x141 depuis l'operande buffer (bp+0x10, rescale >>8) - CONFIRME que +0x139 (seuil de proximite radio, AI_ProximityRadioCalloutTrigger_A002) et +0x141 (troisieme constante mysterieuse du constructeur d'entite) sont des PARAMETRES DE DETECTION CONFIGURABLES PAR OPCODE, pas de simples constantes fixes - probable 'SET DETECTION/AWARENESS RANGE'. 0xB1 (non nomme, loc_A588) : ecrit +0x13D (source=di+8) - MEME champ que 0xAC via une continuation partagee (loc_A598) - donc +0x13D peut AUSSI etre configure independamment par ce code. 0xB2 (non nomme, loc_A5E3) : ecrit +0x141 (source=di+4) - encore une voie d'ecriture pour ce champ. 0xB3 (non nomme, loc_A5A4) : SetReference sur +0x145 (MEME champ que FOLLOW_ALLY !), efface +0x149 - variante d'assignation de cible d'escorte sans changer goal_state. 0xB5 (non nomme, loc_A5C8) : SetReference sur +0x147 (le champ 'cible == joueur ?' de Goal_ActiveWingmanEngagement_878F), via la MEME continuation que 0xA8 (loc_A5D5). DEFAUT (loc_A5FE, pour tous les codes non geres explicitement - 0xA3,0xA6,0xAD-0xB0,0xB6-0xBE) : efface +0x10F, copie la position PROPRE de l'objet lie (entite+0x102+0x12) dans +0x111/+0x115/+0x119 (position de repli sur soi-meme), FORCE goal_state=0xBF (DEACTIVATE_OBJ) - un vrai comportement de secours/desactivation pour tout code non reconnu. QUEUE COMMUNE (loc_A641, apres N'IMPORTE QUEL cas) : (1) CORRIGE 2026-10-03 : si goal_state != 0xAA ET bit3 de +0x28B (formation) pose, appelle Goal_FollowAllyExec_DAA9 ('cmp word ptr es:[bx+11Dh], 0AAh / jz loc_A668' saute l'appel pour 0xAA) : avec un autre ordre, il echoue et SORT DE LA FORMATION (historique libere, objet+0x59 = 0). L'ancien texte ('0xAA OU bit3') etait faux. (2) bit5 de +0x28B (ORDRE VERROUILLE, pose par Goal_SelectTransition etats 2/3, Goal_TransferToWingman, AI_MessageDispatcher, Goal_MoraleReaction_878F ; efface par Goal_ExecuteAction_A8AC quand l'ordre est fini) : renvoie 1 (en cours) sans rien changer ; sinon renvoie Goal_IsComplete_A6D3 du nouvel etat (1 = en cours). Cette valeur devient l'etat 'ordre en cours' [instr+0xE] lu par les opcodes 0x46/0x47 du script. PAS DE PILE D'ORDRES : un seul champ +0x11D, chaque appel l'ecrase ; le script est relu depuis le debut a chaque frame. Anciennement compris seulement partiellement (case 0xAA lue isolement lors de l'investigation des commandes radio) - desormais documente dans son integralite comme UNE SEULE fonction coherente plutot que des labels loc_ fragmentes et non catalogues."
   },
   "sub_5828E": {
     "new_name": "Math_VectorLength3D_Raw_5828E",
@@ -11072,7 +11072,7 @@
   "sub_22F53": {
     "new_name": "Mission_TriggerEvaluator",
     "segment": "seg040",
-    "summary": "far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : **évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).**"
+    "summary": "far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : **évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).** | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_2EA80": {
     "new_name": "Texture_SelectMipLevel",
@@ -11320,9 +11320,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7DF7F) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28."
   },
   "sub_126CC": {
-    "new_name": "Altitude_HoldController",
+    "new_name": "AI_PitchAttitudeHold_126CC",
     "segment": "seg009",
-    "summary": "far,166L — **contrôleur de maintien d'altitude** : calcule l'écart entre l'altitude courante (sub_57C3A) et une consigne (arg_4), applique un coefficient (+0x56) façon correction proportionnelle : loi de contrôle du tangage pour tenir une altitude cible."
+    "summary": "far, LUE 2026-09-26 (ex-'Altitude_HoldController' : ce n'est PAS une tenue d'altitude). TENUE D'ASSIETTE : erreur = consigne (arg_4, deg) - assiette du nez (Matrix_NosePitchAngle_57C3A) ; manche ctrl+0x1F = borne(erreur * gain / 8, +/- gain), gain = +0x56 (TOFF, defaut 8), tronque a l'entier (manche pleine butee = 16). Renvoie |erreur| < 5 deg."
   },
   "sub_1B022": {
     "new_name": "UI_SetField36",
@@ -11662,7 +11662,7 @@
   "sub_48862": {
     "new_name": "Aero_ComputeAoACommand_48862",
     "segment": "seg103",
-    "summary": "Ex-'Aero_ComputeControlFlags75Bit5B' (nom sans rapport avec le role). far, 375L, RELUE INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques). CONSIGNE D'INCIDENCE si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA = si[0x16] - alpha). (1) si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ; M = orientation de l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2) flags_75.bit5 ou q < 1.0 -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS utilise. (4) DEMANDE DU MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m < 0 (manche pousse) ; d = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4 ET pas au sol ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE, signe) ; si alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis Math_CosDeg_5483F). (6) CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1 (volets). (7) TERME DE GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ; g1 = cos(theta) (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas (var_5A = M+0x20 < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g * cos(theta) au neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) * dword_6FFD7 ), X = valeur de [si+2]->vtable+0x3C(si) (forme de la formule : masse, car portance = si[0x61]*alpha*q ; NON PROUVE, cf. question ouverte 5 de CLAUDE.md). (10) si n != 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si T est compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L = (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un cosinus). Ne lit PAS si[0x59]."
+    "summary": "Ex-'Aero_ComputeControlFlags75Bit5B' (nom sans rapport avec le role). far, 375L, RELUE INTEGRALEMENT (2026-09-24, avec les vraies fonctions trigonometriques). CONSIGNE D'INCIDENCE si[0x16] (comparee a alpha par Aero_ComputeForcesMain_4791E : errA = si[0x16] - alpha). (1) si[0x78] = si[0x67] << 8 ; q = Aero_DynamicPressure_46D13(si[0x10]) ; M = orientation de l'objet ([si]->+2, vtable+0x3C, copie 36 octets dans var_7A). (2) flags_75.bit5 ou q < 1.0 -> si[0x16] = 0, fin. (3) |alpha| calcule dans var_A mais JAMAIS utilise. (4) DEMANDE DU MANCHE : m = dword [ctrl+0x1F] (arg_2:arg_4) ; d = si[0x78], /3 si m < 0 (manche pousse) ; d = d * m >> 8 / 16. (5) REFERENCE A (var_1A) = 0 ; si flags_75.bit4 ET pas au sol ([[si]+0x20] == 0) ET !flags_75.bit6 : A = alpha (Aero_FlowAngle_AoA_469FE, signe) ; si alpha < 0 : A = alpha * |cos(roulis)| (Matrix_RollAngle_57C67 puis Math_CosDeg_5483F). (6) CALAGE : c = -(si[0x4C] << 8), et -= si[0x4D] << 8 si flags_75.bit1 (volets). (7) TERME DE GRAVITE : theta = Matrix_NosePitchAngle_57C3A(M) = tangage du nez ; g1 = cos(theta) (Math_CosDeg_5483F, vrai cosinus), negatif si la normale pointe vers le bas (var_5A = M+0x20 < 0, avion sur le dos). (8) FACTEUR DE CHARGE DEMANDE n = d + g1 (1 g * cos(theta) au neutre). (9) INCIDENCE PAR g : k = -( X / q / si[0x61] * 1.5 (0x180) * dword_6FFD7 ), X = [si+2]->vtable+0x3C(si) = JDYN_TotalMass_47FF8 = masse totale (a vide + carburant + emport, kg). (10) si n != 0 : T = n*k (cible), B = g1*k (base) ; sinon T = B = 0. T += c ; B += c. (11) SELECTION : si T est compris entre A et B (bornes incluses), on garde A ; sinon A = T. (12) BORNE : L = (si[0x65] << 8) * dword_72A1C ; A borne a [-L, L] ; si[0x16] = A. Correction de l'ancien resume : var_30 = cos(tangage) EXACTEMENT (et non ~ par identite) ; l'ancien resultat etait juste par deux erreurs qui s'annulaient (angle pris pour 'angle avec Z' + sinus pris pour un cosinus). Ne lit PAS si[0x59]."
   },
   "sub_A4BA6": {
     "new_name": "PlayerComponent_HelperB_A4BA6",
@@ -11832,7 +11832,7 @@
   "sub_43013": {
     "new_name": "Targeting_FilterByWeaponType",
     "segment": "seg091",
-    "summary": "far,141L — filtre par type d'arme (+0x4F ∈ {1..5}), parcourt la liste des objets candidats, teste la compatibilité de type (+0x11) : **filtrage des cibles compatibles avec le type d'arme sélectionné pour l'acquisition.**"
+    "summary": "far, 141L, LUE 2026-09-25. CANDIDAT DU CHERCHEUR : (arme, reference). Si weapon_aspec (+0x4F) est dans 1..5, parcourt TOUS les objets du monde (World_IterateObjects liste 59C3h) ; pour chacun dont la methode [0] rend un objet non nul, lit target_type (+0x11) et ne garde que 1 (avion) ou 4 (leurre DECY) ; signature selon aspec : 1, 2, 5 -> methode +0x7C(reference) (Aircraft_ComputeSeekerSignature_3E2F1 pour un avion), 3 -> Debris_GetStateFlag (3e octet SIGN), 4 -> Debris_GetSubpartAttrib (2e octet SIGN). Retient l'objet de PLUS FORTE signature (strictement superieure, depart 0) qui passe Proximity_TestOriented(arme, objet, reference). Renvoie cet objet ou 0."
   },
   "sub_3D31D": {
     "new_name": "WorldObject_IntegrateBodyMotion_3D31D",
@@ -11922,7 +11922,7 @@
   "sub_8548": {
     "new_name": "AI_NavSolutionToPoint",
     "segment": "seg004",
-    "summary": "far, 231 lignes - LUE INTEGRALEMENT. **Fonction cle de la chaine decision->mouvement** (voir AI_SYSTEM.md §4bis). Calcule la position cible (via entite+0x10F si une reference existe, sinon entite+0x111 'centre de zone'), appelle Terrain_QueryAltitudeAt_378CA pour tenir compte du relief. Verifie l'arrivee via entite+0x139 (rayon d'arrivee, echelle 24.8) - si trop loin, calcule la direction normalisee vers la cible, la met a l'echelle par entite+0x141 (vitesse de croisiere), et ECRIT POSITION+VITESSE dans entite+7 (dereference, +0x2/+0x6/+0xA=position, +0xE/+0x12/+0x16=vitesse) - LE MEME sous-objet partage que Goal_ActiveWingmanEngagement. Termine en appelant [entite+0xD1->vtable+8] - le noeud MVRS_ID21 utilise directement comme porteur de commande de navigation."
+    "summary": "far, 231L, RELUE 2026-09-27. Navigation vers une zone (ordres 0xA8/0xA9, cas par defaut et 0xFFFF de Goal_ExecuteAction_A8AC). Comportement en cours (+0x0D) -> renvoie 0 SANS le faire tourner. Point = position de l'objet +0x10F si non nul, sinon +0x111 ; son altitude est REMPLACEE par terrain sous MON avion (Terrain_QueryAltitudeAt sur objet+0x12) + +0x13D. d = distance 3D. Si +0x139 * 256 < d (+0x139 = rayon en metres entiers) : W = direction 3D normalisee * +0x141, bloc +0x02/+0x0E, noeud ID21 (+0xD1) avec minuteur 2 s (0x200), renvoie 1 ; sinon renvoie 0. Valeurs initiales (ovr228) : +0x111 = (0,0,1000 m), +0x139 = 30000, +0x13D = 2000 m, +0x141 = 250 m/s."
   },
   "sub_79CFF": {
     "new_name": "AI_ManeuverCleanup_79CFF",
@@ -11947,7 +11947,7 @@
   "sub_8DF49": {
     "new_name": "PilotProfile_LoadRADI_8DF49",
     "segment": "ovr260",
-    "summary": "far, 353 lignes - chargeur complet du sous-chunk RADI (radio/communications) du profil pilote PROF, structure confirmee par recoupement avec RSProf.cpp : valide RADI (tag 0x49444152, ResourceRecord_SeekAndReadB_647B2, pose un flag has-RADI a +0xC), puis ASKS (tag 0x534B5341), SPCH (tag 0x48435053, lit un octet unique a +0x51 - avec chargement conditionnel d'un fichier audio INTEL/SPEECH/.PAK si une condition memoire globale est remplie), INFO (tag 0x4F464E49, lit un id puis deux chaines via PilotProfile_ResolveNamedPropertyNode-adjacent ResourceRecord_ReadDwordFieldB_64AFF aux offsets +0x52 et +0x72 - correspond a {id, name, callsign}), OPTS (tag 0x5354504F, lit un nombre d'entrees plafonne a 8 puis un tableau d'octets a +0x88), et MSGS (tag 0x5347534D, alloue dynamiquement un tampon type tag 0x5C44 pour stocker des messages indexes). Anciennement mal nommee AITargeting_LoadCalibrationRecord (aucun rapport avec le ciblage IA). Candidat pour session dediee si la structure exacte de ASKS/MSGS (chaines/cles) doit etre tracee completement."
+    "summary": "far, 353 lignes - chargeur complet du sous-chunk RADI (radio/communications) du profil pilote PROF, structure confirmee par recoupement avec RSProf.cpp : valide RADI (tag 0x49444152, ResourceRecord_SeekAndReadB_647B2, pose un flag has-RADI a +0xC), puis ASKS (tag 0x534B5341), SPCH (tag 0x48435053, lit un octet unique a +0x51 - avec chargement conditionnel d'un fichier audio INTEL/SPEECH/.PAK si une condition memoire globale est remplie), INFO (tag 0x4F464E49, lit un id puis deux chaines via PilotProfile_ResolveNamedPropertyNode-adjacent ResourceRecord_ReadDwordFieldB_64AFF aux offsets +0x52 et +0x72 - correspond a {id, name, callsign}), OPTS (tag 0x5354504F, lit un nombre d'entrees plafonne a 8 puis un tableau d'octets a +0x88), et MSGS (tag 0x5347534D, alloue dynamiquement un tampon type tag 0x5C44 pour stocker des messages indexes). Anciennement mal nommee AITargeting_LoadCalibrationRecord (aucun rapport avec le ciblage IA). Candidat pour session dediee si la structure exacte de ASKS/MSGS (chaines/cles) doit etre tracee completement. | 2026-09-27 : octet du chunk SPCH -> +0x51 du profil (profil a entite+0x1A) = entite+0x6B = voix du personnage, testee par Goal_FollowAllyFormation (== 9) et Radio_PlayMessage (== 0x0C)."
   },
   "sub_2B14A": {
     "new_name": "ListItem_ConstructVector3D",
@@ -12182,7 +12182,7 @@
   "sub_5F9B": {
     "new_name": "AI_InterceptSpeedControlLaw",
     "segment": "seg003",
-    "summary": "far,285L — LOI DE CONTROLE IA DE LA VITESSE (poursuite de cible). Objet pilote = arg_0 far ptr ; JDYN = es:[arg_0+0x0B] (meme chemin que PhysicsTicks). Lit : jdyn[0x82] (u16, def 100) = PLANCHER de la vitesse de consigne (var_4 = max(var_4, jdyn[0x82]<<8), L2044-2070) ; jdyn[0x80] (u16, def 500) = PLAFOND / cible haute : quand la distance a la cible > arg_6, interpole var_4 vers jdyn[0x80]<<8 (poids = dist_residuelle/3000, clamp 1.0, loc_610A) ou plafonne a jdyn[0x80]<<8 (loc_61AB). Branche cible-proche (loc_61D0) : deceleration via dword_72039. Resultat -> sub_6250 (AI_ThrottleController). CONFIRME : jdyn[0x80]/[0x82] = vitesses IA max/min de poursuite, PAS des params de cellule."
+    "summary": "far, 285L, LUE INTEGRALEMENT 2026-10-02. (entite, cible, seuil P en metres). vc = vitesse de la cible (methode +0x4C) . mon nez, au moins JDYN+0x82 (min) ; L = |projection de (cible - moi) sur mon nez| (Targeting_ComputeGeometryHelperB_5517F). L > P : si JDYN+0x80 (max) > vc, vitesse = vc + min((L - P)/3000, 1) x (max - vc), sinon max ; L <= P : vitesse = (vc - dword_72039) x L / P + dword_72039. Puis AI_ThrottleController (cran)."
   },
   "sub_6CDB4": {
     "new_name": "VROOMM_StubThunk_6CDB4",
@@ -12780,9 +12780,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9BF6A) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=29A70h, codesize=7CCh, nentries=9."
   },
   "sub_7EDCA": {
-    "new_name": "Render_DrawComplexShape_7EDCA",
+    "new_name": "NavMap_DrawMissionObjects_7EDCA",
     "segment": "ovr241",
-    "summary": "⭐⚠️ far, 1080 lignes, NON DÉTAILLÉE — combine `Render_SetPixelClipped_61B58` (seg171), `Render_DrawEllipseOutline_61612` (seg169), `Render_FillClippedRect_61960` (seg170, répété) — grosse fonction de dessin combinant plusieurs primitives 2D. Candidat prioritaire pour session dédiée."
+    "summary": "far, 1080L, LUE PARTIELLEMENT 2026-10-03 (trace des objets). Ex-'Render_DrawComplexShape' (nom generique). CARTE DE NAVIGATION : trace des objets de mission. Pour chaque objet de la table de mission (Expr_LookupTableEntry85B_52D45, enregistrements de 85 octets) ayant un controleur (+0x52) ET le BIT 4 de +0x39 (shl ax, 0Bh / sar ax, 0Fh ; pose par l'opcode de script 0xB6, efface par 0xB7, pose sur le joueur par le chargeur) : point (Render_SetPixelClipped_61B58) + glyphe 3x3 (GlyphObject_Helper5_7EB1C) a sa position (GlyphObject_Helper3_7E72B) ; couleur 0xE6 si camp +0x31 == 0xFF, 0xC7 si c'est le joueur (word_722E6), 0x1F sinon ; pour un avion (bit 2 de +4), decalage du trait selon le signe de la vitesse (seuil 0x40 en 24.8). Le reste (primitives d'ellipse et de rectangle) non relu."
   },
   "sub_A4388": {
     "new_name": "GaugeWidget_DrawWithLabel_A4388",
@@ -14082,7 +14082,7 @@
   "sub_A8AC": {
     "new_name": "Goal_ExecuteAction_A8AC",
     "segment": "seg005",
-    "summary": "far,486L — appelle d'abord sub_A6D3 (test complétion), puis **re-dispatch sur le MÊME switch 11 cas +0x11D** pour exécuter l'action associée à chaque GOAL (délègue souvent à vtable[0xC] de la cible si présente). **'Execute-Goal-Action' dispatcher — cœur du système d'exécution de GOAL IA.** DECOUVERTE : dans son traitement du code 0xA1, construit un noeud de propriete nommee via le MEME mecanisme generique que le chargement PROF/MVRS/ATRB (Memory_TypedFreeWrapper_5C6F3 + VROOMM_StubThunk_6AB4A -> PilotProfile_NamedPropertyNode_Construct_755A0), en enveloppant une valeur CALCULEE au runtime (derivee de deux positions 3D de l'entite, +0x11F et +0x12B) plutot qu'une valeur chargee depuis le fichier - confirme que ce systeme de noeud generique (tag 0x5C44) sert a la fois au chargement de configuration statique ET au transport de valeurs calculees dynamiquement, mais n'etablit PAS de lien direct avec les valeurs MVRS specifiquement chargees en memoire."
+    "summary": "far,486L — appelle d'abord sub_A6D3 (test complétion), puis **re-dispatch sur le MÊME switch 11 cas +0x11D** pour exécuter l'action associée à chaque GOAL (délègue souvent à vtable[0xC] de la cible si présente). **'Execute-Goal-Action' dispatcher — cœur du système d'exécution de GOAL IA.** DECOUVERTE : dans son traitement du code 0xA1, construit un noeud de propriete nommee via le MEME mecanisme generique que le chargement PROF/MVRS/ATRB (Memory_TypedFreeWrapper_5C6F3 + VROOMM_StubThunk_6AB4A -> PilotProfile_NamedPropertyNode_Construct_755A0), en enveloppant une valeur CALCULEE au runtime (derivee de deux positions 3D de l'entite, +0x11F et +0x12B) plutot qu'une valeur chargee depuis le fichier - confirme que ce systeme de noeud generique (tag 0x5C44) sert a la fois au chargement de configuration statique ET au transport de valeurs calculees dynamiquement, mais n'etablit PAS de lien direct avec les valeurs MVRS specifiquement chargees en memoire. | 2026-10-03 : table word_ACE7 = 0xFFFF, A1, A2, A4, A5, A7, A8, A9, AA, AC, BF. 0xBF (et 0xFFFF) -> loc_A9B7 : AI_NavSolutionToPoint, sinon Goal_WanderRandom. Avec le centre +0x111 recopie sur ma position a chaque Goal_SetObjective (cas par defaut, ordre de script 0xBE), l'avion erre au hasard (patrouille libre) ; Goal_IsComplete 0xBF = toujours en cours."
   },
   "sub_40A33": {
     "new_name": "WeaponStation_ResolveStateA",
@@ -14165,9 +14165,9 @@
     "summary": "far, aucun appel externe visible (103 lignes)."
   },
   "sub_765B2": {
-    "new_name": "AITargeting_ComputeOrientationExtended_765B2",
+    "new_name": "Landing_Phase3_TouchdownRoll_765B2",
     "segment": "ovr230",
-    "summary": "⭐⚠️ far, 594 lignes — plus grosse fonction du segment, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660`, `Vector_NormalizeInPlace_5593A` (×3+, seg116) — variante étendue de AITargeting_ComputeOrientation_76325. Candidat prioritaire pour session dédiée."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_ComputeOrientationExtended_765B2'). ATTERRISSAGE (ordre 0xA2). Phase 3, TOUCHER ET DEBUT DE ROULAGE. Au 1er tick, position = cible (+0x70). Compteur +0x54 += 1 par tick ; tant qu'il est sous LAND[+0x9D]/6 le nez tourne de -1 deg, sinon compteur = 0. temps += dt ; position = cible + axe de piste * vitesse * temps (altitude inchangee). Quand le compteur est a 0 : orientation remise a plat sur l'axe, +0x94 = 1 ; joueur : evenement de script word_706A0+0x4E, et TextObject_AllocateVariantA_5A984(0x14) si word_706A0+0xA1 == 0 ; temps = 0, phase 4."
   },
   "sub_294C0": {
     "new_name": "Mesh_FaceSetup",
@@ -14212,7 +14212,7 @@
   "sub_5E53": {
     "new_name": "AI_TriggerBehaviorUpdate",
     "segment": "seg003",
-    "summary": "far,51L — nettoie flag bit2 de +0x28B ; si bit7 de +0x28B et pas bit5 de +0x75, invoque sub_814C (comportement IA) ; sinon si cible (+0xD) existe, appelle sub_6AB54 et notifie via vtable[0] : **déclencheur de mise à jour comportementale IA / notification d'état.**"
+    "summary": "far, 51L, RELU 2026-09-28. Efface le bit 2 de +0x28B. Si bit 7 de +0x28B et pilote non ejecte (flags_75 bit 5 de l'avion +0x0B nul) : AI_TopLevelThink. Sinon, si bit 7 et un comportement en cours (+0x0D) : abandon (VROOMM_StubThunk_6AB54 -> NotifiableRef_DetachTarget_75661) et octet +0x20 du sous-objet de l'avion remis a 0. Appelee par AIEntity_MasterTick_5ACC hors cas 'formation et pilote ejecte'."
   },
   "sub_2B1C": {
     "new_name": "CRT_Strlen",
@@ -14402,7 +14402,7 @@
   "sub_28F08": {
     "new_name": "RadioFlags_ShiftHistory",
     "segment": "seg006",
-    "summary": "far, 96 lignes - LUE INTEGRALEMENT (remontee de la chaine de declenchement du bavardage de combat, a la demande de Remi). Simple decalage d'historique : copie les drapeaux 'de cette frame' (byte_6E4BC a byte_6E4C7) vers des emplacements 'historique' (byte_6E4C8 a byte_6E4D8), PUIS remet les drapeaux source a zero. Ne decide rien elle-meme - juste un registre a decalage. Mapping confirme : byte_6E4BF (source) -> byte_6E4CB (consomme par Radio_CombatChatterDispatch pour le message de destruction 0x0D)."
+    "summary": "far, 96 lignes - LUE INTEGRALEMENT (remontee de la chaine de declenchement du bavardage de combat, a la demande de Remi). Simple decalage d'historique : copie les drapeaux 'de cette frame' (byte_6E4BC a byte_6E4C7) vers des emplacements 'historique' (byte_6E4C8 a byte_6E4D8), PUIS remet les drapeaux source a zero. Ne decide rien elle-meme - juste un registre a decalage. Mapping confirme : byte_6E4BF (source) -> byte_6E4CB (consomme par Radio_CombatChatterDispatch pour le message de destruction 0x0D). | 2026-09-27 : decale aussi les references word_722EA -> word_722EE (SetReference16 0x523A/0x523E) : word_722EE = l'ennemi dans les six heures du joueur detecte au cycle precedent par AI_SelectWeaponMask_9665. Appelee une fois par frame par CombatTarget_WeaponActionSubsystem."
   },
   "sub_6BF65": {
     "new_name": "VROOMM_StubThunk_6BF65",
@@ -14427,7 +14427,7 @@
   "sub_A9E3C": {
     "new_name": "PartEntry_LoadAndResolveNames_A9E3C",
     "segment": "seg457",
-    "summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert)."
+    "summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert). | 2026-09-27 : enregistrement PART de 62 octets : +0x1C octet 28, +0x21/+0x25/+0x29 dwords 29/33/37, +0x2D/+0x2F mots 41/43, +0x31 octet 45, +0x32 octet 46 = ALLIE PAR DEFAUT de l'ordre 'suivre', +0x33/+0x35/+0x37 mots 48/50/52 = POSTE (cote, avant, haut, m) de l'ordre 'suivre', 4 programmes mots 54..60."
   },
   "sub_83C4D": {
     "new_name": "HUDSymbol_ConstructVariantG_83C4D",
@@ -14630,9 +14630,9 @@
     "summary": "far,27L — remet à zéro une grille 8×8 de cellules (2 mots par cellule) : **réinitialisation d'une grille spatiale de collision à 64 cellules.**"
   },
   "sub_75AA6": {
-    "new_name": "AITargeting_ComputeGeometry_75AA6",
+    "new_name": "Landing_PlacePlayerOnFinal_75AA6",
     "segment": "ovr230",
-    "summary": "⚠️ far, 125 lignes, NON DÉTAILLÉE — combine Vector_TransformHelperB_559BB (seg116) et AITargeting_ComputeSolution_75D51."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_ComputeGeometry_75AA6'). ATTERRISSAGE (ordre 0xA2). Joueur seulement : place l'avion a 500 m (1F400h) avant le point de toucher, sur la droite approche -> toucher, puis Landing_Phase1_SetupApproach_75D51(toucher)."
   },
   "sub_224DA": {
     "new_name": "World_IterateObjects",
@@ -15477,7 +15477,7 @@
   "sub_A7FF0": {
     "new_name": "MissionScenario_QueryFieldWrapper_A7FF0",
     "segment": "seg456",
-    "summary": "far, appelle MissionScenario_ResolveFieldChain_A8BD1."
+    "summary": "far. Renvoie 1 si l'objet de mission doit etre DESACTIVE au saut de pilote automatique (Autopilot_JumpSequence_7A054) : objet monde +0x1D et controleur +0x52 presents et bit 5 de +0x39 efface (0xB9) ; ou (byte_6E4D5 et objet = celui resolu depuis word_706A0)."
   },
   "sub_6B005": {
     "new_name": "VROOMM_StubThunk_6B005",
@@ -15505,9 +15505,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_73929) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0, codesize=15Ah, nentries=10."
   },
   "sub_DD21": {
-    "new_name": "AI_VisibilityTest",
+    "new_name": "AI_CollisionCourseTest_DD21",
     "segment": "seg007",
-    "summary": "far,291L — calcule position/vitesse relatives entre deux objets, utilise sub_464BE (probable test d'angle/cône de vision) : **test 'objet visible/dans le champ de vision' pour l'acquisition de cible.**"
+    "summary": "far, 291L, LUE 2026-10-02. Ex-'AI_VisibilityTest' (faux : ce n'est pas un test de visibilite). TEST DE COLLISION entre l'entite (son objet +0x02) et un autre avion (arg_4). D = ma position - la sienne, dist = |D| (Math_VectorLength3D_Scaled_54F57) ; Vrel = sa vitesse - la mienne (methode +0x4C des objets) ; E = angle entre Vrel et D (Targeting_ComputeBearingElevation_55B1A). VRAI si dist < 80 m (cmp 5000h), ou si |Vrel| > 0, E < 90 deg (5A00h), dist*sin(E) < 80 m (distance de passage) et dist*cos(E) <= 4,0 s (0x400) * |Vrel| (rapprochement en moins de 4 s). Si vrai : AI_ProximityGeometricWarning_315B (manoeuvre d'evitement par le noeud ID20 +0xC1) et niveau de reaction +0x27F = 3. Appelee par AI_ScanCollisionThreats_DF99 et seg008."
   },
   "sub_6AAA3": {
     "new_name": "VROOMM_StubThunk_6AAA3",
@@ -15805,9 +15805,9 @@
     "summary": "far, LUE (2026-09-24). Ex-'Targeting_LineOfSightCheck' (FAUX). NORMALISATION en place d'un vecteur 3x i32 24.8 : n = Math_VectorLength3D_Raw_5828E(v) ; si n != 0, chaque composante = (c << 8) / n (`shl eax,8 / idiv ecx`) ; n nul : vecteur inchange. Renvoie le pointeur."
   },
   "sub_75746": {
-    "new_name": "AITargeting_RenderThreatList_75746",
+    "new_name": "LandingBehavior_Start_75746",
     "segment": "ovr230",
-    "summary": "⚠️ far, 334 lignes, NON DÉTAILLÉE — grande frame locale (0x11C octets), dispatch vtable [bx+4], combine sub_6AB4F, sub_43D9B, `UIScreen_RenderOrLayoutList_54503` (seg114), sub_6AEF3, sub_6AB45 (×2) — probable affichage d'une liste de menaces/cibles suivies sur un élément d'interface (HUD ou radar)."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_RenderThreatList_75746', faux). ATTERRISSAGE (ordre 0xA2). Methode +8. Init si besoin, Behavior_PushRunning_756A4. Point de toucher +0x15 = entite+0x11F, point d'approche +0x7C = entite+0x12B (poses par Goal_SetObjective_A307 depuis les deux spots de l'ordre : param2 -> toucher, param1 -> approche). Phase +0x22 = 1. IA : l'avion est TELEPORTE au point d'approche. Joueur : si composant 'LANDGEAR' endommage -> message 'Landing Gear Damaged' et fin ; si UIScreen_RenderOrLayoutList_54503(word_706A0, 1) renvoie 0 -> fin ; dword_706AB -= 35,0. LIT LE CHUNK REAL/OBJT/JETP/LAND : word +0x95 (vitesse d'approche, m/s, defaut 200), dword +0x97 (defaut 0x64, JAMAIS RELU), word +0x9B (hauteur du point vise au-dessus du toucher, m, defaut 6), word +0x9D (borne du compteur d'assiette, defaut 20). Puis appelle le tick +0xC."
   },
   "sub_5647A": {
     "new_name": "Damage_ComputeHelperA_5647A",
@@ -15972,7 +15972,7 @@
   "sub_48639": {
     "new_name": "Aero_SumLinearForces_48639",
     "segment": "seg103",
-    "summary": "far, seg103 L874-1117. si = struct JDYN ; sortie = vecteur ACCÉLÉRATION 3x i32 (24.8) écrit par PhysicsTicks dans [A+0x14/18/1C], en repère CORPS (transformé corps->monde ensuite par Physics_IntegratePosition via [[A+2]+0x70]). SI flags_75.bit5 : thrust=satur=0 -> accel = gravité seule. SINON : thrust = FlightControl_CacheTripleParam(&si[0x22]) = (0, si[0x28], 0) (poussée pure axe corps c1/nez) ; satur  = Aero_ComputeLiftAndSideForce(si) = PORTANCE + force latérale (repère corps) ; aero   = Aero_ComputeDragWithFeedback(si) = traînée le long de la trajectoire ; m = call [[si+2]+0x3C](this=si) >>8 (scalaire 24.8 ~ masse, virtuel JDYN ; override non épinglé) ; grav = FlightControl_ResolveParamCached(&si[0x1E]) via vtable[0x6C] magic 0x2F1A (gravité résolue en repère corps). F = thrust>>8 + satur + aero ; accel = (F<<8)/m ; [si+0x7C] = -accel.c2 / dword_6FFD7 = FACTEUR DE CHARGE (G-mètre, axe normal corps) ; accel += grav (APRÈS division par m). Detail : DATA_MODEL.md 6.2."
+    "summary": "far, seg103 L874-1117. si = struct JDYN ; sortie = vecteur ACCÉLÉRATION 3x i32 (24.8) écrit par PhysicsTicks dans [A+0x14/18/1C], en repère CORPS (transformé corps->monde ensuite par Physics_IntegratePosition via [[A+2]+0x70]). SI flags_75.bit5 : thrust=satur=0 -> accel = gravité seule. SINON : thrust = FlightControl_CacheTripleParam(&si[0x22]) = (0, si[0x28], 0) (poussée pure axe corps c1/nez) ; satur  = Aero_ComputeLiftAndSideForce(si) = PORTANCE + force latérale (repère corps) ; aero   = Aero_ComputeDragWithFeedback(si) = traînée le long de la trajectoire ; m = call [[si+2]+0x3C](this=si) = JDYN_TotalMass_47FF8 = masse a vide DYNM + carburant + emport (kg) ; grav = FlightControl_ResolveParamCached(&si[0x1E]) via vtable[0x6C] magic 0x2F1A (gravité résolue en repère corps). F = thrust>>8 + satur + aero ; accel = (F<<8)/m ; [si+0x7C] = -accel.c2 / dword_6FFD7 = FACTEUR DE CHARGE (G-mètre, axe normal corps) ; accel += grav (APRÈS division par m). Detail : DATA_MODEL.md 6.2."
   },
   "sub_73935": {
     "new_name": "WorldObjectA_Method_NoOpC_73935",
@@ -16142,7 +16142,7 @@
   "sub_814C": {
     "new_name": "AI_TopLevelThink",
     "segment": "seg004",
-    "summary": "far,435L — dispatcher IA de haut niveau (appelé depuis sub_5E53) : vérifie difficulté pilote (+0xB0≥0xC → tick physique spécial sub_3314), exclut états spéciaux (+0x11D=0xA1/0xA2, probable décollage/atterrissage), vérifie pilote vivant, teste seuil de difficulté globale (word_70466), gère alerte menace (sub_5392), met à jour la chaîne de cibles (+0x287/+0x289) et notifie l'affichage radar (vtable[8]). **Candidat très fort pour le point d'entrée principal du 'think' IA par avion** (proche de SelectAIBehaviorPriorityAndTrackStats déjà documenté) — 435 lignes, à disséquer en détail dans une session dédiée. | Relue en entier le 2026-09-25 (y compris le milieu) : sur alerte de menace (AI_IncomingThreatWarning, sauf decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <= 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "far,435L — dispatcher IA de haut niveau (appelé depuis sub_5E53) : vérifie difficulté pilote (+0xB0≥0xC → tick physique spécial sub_3314), exclut états spéciaux (+0x11D=0xA1/0xA2, probable décollage/atterrissage), vérifie pilote vivant, teste seuil de difficulté globale (word_70466), gère alerte menace (sub_5392), met à jour la chaîne de cibles (+0x287/+0x289) et notifie l'affichage radar (vtable[8]). **Candidat très fort pour le point d'entrée principal du 'think' IA par avion** (proche de SelectAIBehaviorPriorityAndTrackStats déjà documenté) — 435 lignes, à disséquer en détail dans une session dédiée. | Relue en entier le 2026-09-25 (y compris le milieu) : sur alerte de menace (AI_IncomingThreatWarning, sauf decollage/atterrissage, au sol, difficulte <= 3, bit 6 de +0x28D, ou +0x27F > 1), abandon du comportement en cours puis application directe du noeud permanent ID=4 (entite+0xBD) ; puis attentes decollage/atterrissage et recherche de cible selon le niveau +0x27F (<= 5, <= 4, <= 3). Voir AI_TICK_CALL_GRAPH.md, 'GOAL et tournoi MVRS'. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | PRECISION 2026-09-28 : l'appel d'entree a Targeting_AcquireBestThreat(entite, 0) exige byte_6E4D7 != 0 ET FL (+0xB0) >= 12 (deux sauts jz / jl). byte_6E4D7 = byte_6E4C6 du cycle precedent (RadioFlags_ShiftHistory), pose quand un objet dont le modele d'arme a target_domain (+0x4E) = 1 (missile air-air) est ajoute a la liste des objets du monde 59C3h (seg088, seg092). | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_74B43": {
     "new_name": "AIEntity_Construct_74B43",
@@ -16197,7 +16197,7 @@
   "sub_B5C1": {
     "new_name": "Goal_FollowAllyFormation",
     "segment": "seg005",
-    "summary": "far,269L — handler GOAL utilisant la vitesse d'un objet référence (vtable+0x3C+0xC), teste un type d'objet (+0x6B==9, probable porte-avions) et une position de formation (+0x14A) : **probable handler followAlly/formation flying.**"
+    "summary": "far, 269L, LUE 2026-09-27. POSTE EN FORMATION (monde) : (a, b, c) = entite+0x14A (cote, avant, haut) si voix +0x6B == 9 (octet SPCH du RADI du profil), ou camp != joueur (objet+0x50 != 1), ou byte_6E4CD (adversaire actif) ; sinon (300, -200, 50) m. S = normalise(N.c1, -N.c0, 0), U = S x N, a de signe tel que le poste reste du cote ou se trouve deja l'ailier (Angle_DeltaNormalized_A(N, ailier - leader) < 0 -> -|a|). Poste = S*a + N*b + U*c ; si hauteur-sol du leader + composante verticale < 500 m, composante verticale = 500 m."
   },
   "sub_43D0F": {
     "new_name": "Roster_SumAttributeB",
@@ -16320,9 +16320,9 @@
     "summary": "far, lit 3 champs numériques d'un widget (id 5A92h) via sub_27144 et les stocke dans dword_72BAA/72BAE/72BB2. Appelée uniquement par UIScreen_StateMachineMain. Hypothèse : formulaire de saisie de coordonnées — non vérifié."
   },
   "sub_76325": {
-    "new_name": "AITargeting_ComputeOrientation_76325",
+    "new_name": "Landing_Phase2_Approach_76325",
     "segment": "ovr230",
-    "summary": "⚠️ far, 214 lignes, NON DÉTAILLÉE — combine `AI_ComputeGeometryHelper_56E29`, `Matrix_BuildAxisX_56EC3`, `Matrix_OrthonormalizeKeepRow1_57660` (seg116) — calcul d'orientation pour la solution de ciblage."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_ComputeOrientation_76325'). ATTERRISSAGE (ordre 0xA2). Phase 2, APPROCHE. Manche a 0, JDYN+0x7C = 1,0 g. temps +0x5C += dt ; compteur +0x54 -= 1 par TICK ; s'il passe sous LAND[+0x9D] il y est borne, sinon le nez tourne de +1 deg (Matrix_BuildAxisX_56EC3). Position = depart + direction * vitesse * temps. Quand temps >= duree : temps = 0, phase 3."
   },
   "sub_60303": {
     "new_name": "ModuleRegistry_CleanupModuleReference_60303",
@@ -16350,9 +16350,9 @@
     "summary": "far, 17L, LUE INTEGRALEMENT. RENOMMEE (ancien 'Kneeboard_ClearShortcut'). Simple relais vers EntityTracker_ClearAll. Appelee depuis MissionLoader_AssignUnitRosterB_A7E3B (affectation d'unites de mission)."
   },
   "sub_76C09": {
-    "new_name": "AITargeting_Helper2_76C09",
+    "new_name": "Landing_Phase4_Braking_76C09",
     "segment": "ovr230",
-    "summary": "⚠️ far, 206 lignes, NON DÉTAILLÉE — aucun appel externe visible (calcul entièrement inline)."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_Helper2_76C09'). ATTERRISSAGE (ordre 0xA2). Phase 4, FREINAGE. Au 1er tick : deceleration +0x60 = 2,0 m/s2, position de reference = position actuelle. temps += dt ; vitesse +0x4C = ent(+0x48) - ent(2) * ent(temps) (secondes entieres, paliers) ; la position avance de vitesse*dt le long du cap de piste. Vitesse <= 0 : phase 5."
   },
   "sub_83CE9": {
     "new_name": "HUDSymbol_ConstructAndInitAngleD_83CE9",
@@ -17092,7 +17092,7 @@
   "sub_D081": {
     "new_name": "Formation_GuidanceSolution",
     "segment": "seg006",
-    "summary": "far,944L — **la plus grosse fonction documentée jusqu'ici**. Vérifie flag combat (+0x28B bit3), récupère vitesse de la cible/leader (+0x145, vtable+0x3C+0xC) et vitesse propre : **candidat très fort pour la solution de guidage de formation/rejointe (followAlly)**, appelée par sub_DAA9 — à disséquer en détail dans une session dédiée."
+    "summary": "far, 944L, LUE 2026-09-27. TENUE DE FORMATION CINEMATIQUE. N = nez du leader, n = nez propre, pas s = |vitesse leader| * dt. Poste = Goal_FollowAllyFormation ; d = |leader + poste - moi|. Hors formation si d > 4 |poste| ; entree si |ecart de cap nez leader / nez propre| < 15 deg. 'Derriere' = |ecart de cap nez propre / direction du poste| > 160 deg. A l'entree : historique +0x16A (32 nez + 32 envergures) rempli avec l'orientation propre, index +0x172 = 0, horloge +0x16E = 0. Si s < d : s += min(d - s, (d > 3000 et derriere ? 50 : 20) m/s * dt), sinon s = d. Recopie le cran de gaz du leader (ctrl+0x1E). c = s * (derriere ? 76/256 : 25/256), s -= c. Tant que horloge >= 0,125 s : nez[i] = N ; envergure[i] = |manche leader| > 2/16 ? (envergure[i] + envergure leader)/2 : envergure a plat du nez propre (Vec_NegateSwapPair) ; i = (i+1)&31 ; horloge -= 0,125. horloge += dt. Moyennes des 32 nez et envergures. Orientation = nez du leader actuel + envergure moyenne (Matrix_OrthonormalizeKeepRow1_57660, vtable +0x40). Deplacement = nez_moyen*s + unitaire(vers le poste - nez_moyen*s)*c ; vitesse = deplacement * dword_70454 (vtable +0x50). Renvoie 1 en formation."
   },
   "sub_85E66": {
     "new_name": "HUDSymbol_ReleaseSingleRefD_85E66",
@@ -18065,9 +18065,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A9B14) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
   },
   "sub_125EC": {
-    "new_name": "FlightState_EnterLevelFlight",
+    "new_name": "Takeoff_Phase3_LevelOff_125EC",
     "segment": "seg009",
-    "summary": "far,89L — reset HUD (code +0x1E=5), nettoie flag pilote (+0x75 bit1), compare l'altitude courante (sub_57C3A) à un seuil (0x1100) : **handler d'entrée en palier/maintien d'altitude.**"
+    "summary": "far, LUE 2026-09-26 (ex-'FlightState_EnterLevelFlight'). DECOLLAGE IA (ordre 0xA1). Phase 3, MISE EN PALIER. Aerofrein rentre s'il est sorti, ctrl+0x27 = 0, gaz cran 5 (MIL), volets rentres. Si assiette du nez (Matrix_NosePitchAngle_57C3A) > 17 deg (cmp 1100h) : manche +0x1F = -16 (plein pique). Sinon : phase 4 (fin au tick suivant) et manche +0x1F = +8 (mi-course tire)."
   },
   "sub_856F3": {
     "new_name": "Cinematic_CamEntryConstruct_CHAS_856F3",
@@ -18142,7 +18142,7 @@
   "sub_A6D3": {
     "new_name": "Goal_IsComplete",
     "segment": "seg005",
-    "summary": "far,235L — **switch sur 11 cas du code d'état/but IA (offset +0x11D, valeurs 0xA1-0xAC)** : pour chaque type de GOAL, vérifie si la condition de complétion est remplie (ex: 0xA1=cible valide de type 0x11, 0xA9=distance parcourue vs seuil, 0xA4=distance à un point <0x1F400). **'Is-Goal-Complete' checker — correspond directement aux GOAL types déjà documentés (takeOff/land/flyToWaypoint/destroyTarget/defendTarget/followAlly).**"
+    "summary": "far, 235L, RELUE 2026-09-27. Dit si Goal_ExecuteAction_A8AC doit executer l'ordre +0x11D (1 = en cours / a executer, 0 = termine ou inactif -> Goal_ExecuteAction renvoie 0, efface le verrou bit 5 de +0x28B et laisse la main au GOAL suivant). 0xA1 : decollage en cours (comportement tag 0x11) ou au sol ou pas de noeud +0x15. 0xA2 : dernier comportement termine (+0x19) != 0x12 (atterrissage). 0xA4/0xA5 : distance HORIZONTALE a +0x11F > 500 m (1F400h). 0xA7/0xA8 : reference +0x137 non nulle. 0xA9 : camp adverse sans unite vivante (camp 1 : word_706A7 - word_706A9 == 0 ; sinon word_706A3 - word_706A5 == 0 ; A3/A7 = PART activees camp 1/0xFF, A5/A9 = detruites). 0xAA : leader +0x145 non nul. 0xAC/0xBF : toujours. 0xFFFF et defaut : [[+0x0B]]+0x20 == 0."
   },
   "sub_1C63A": {
     "new_name": "Widget_SetLabelFormatted",
@@ -18240,9 +18240,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_83CE9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0FA60h, codesize=233Bh, nentries=34."
   },
   "sub_75C18": {
-    "new_name": "AITargeting_UpdateAndRender_75C18",
+    "new_name": "LandingBehavior_Tick_75C18",
     "segment": "ovr230",
-    "summary": "⚠️ far, 158 lignes, NON DÉTAILLÉE — combine AITargeting_ApplyRangeCheck_76E67, sub_6AB45 (×2), AITargeting_ComputeGeometry_75AA6, sub_23C4F, AITargeting_ComputeSolution_75D51."
+    "summary": "far, LUE 2026-09-26 (ex-'AITargeting_UpdateAndRender_75C18'). ATTERRISSAGE (ordre 0xA2). Methode +0xC. Joueur avec byte_722D1 == 1 : Landing_Phase5_Stop_76E67(1) puis fin (atterrissage saute). Efface flags_75.bit5. Switch sur +0x22 : 1 joueur -> Landing_PlacePlayerOnFinal_75AA6 + camera 'LANDING', IA -> Landing_Phase1_SetupApproach_75D51(toucher) ; 2 Landing_Phase2_Approach_76325 ; 3 Landing_Phase3_TouchdownRoll_765B2 ; 4 Landing_Phase4_Braking_76C09 ; 5 Landing_Phase5_Stop_76E67(0) ; 6 et autres Behavior_PopFinished_75612."
   },
   "sub_7B20": {
     "new_name": "AI_PitchController_7B20",
@@ -18462,7 +18462,7 @@
   "sub_CFDF": {
     "new_name": "Escort_QueryLeaderValid",
     "segment": "seg006",
-    "summary": "far,86L — selon l'état d'escorte (+0x27F ==1 ou 2), soit propage la cible du leader (+0x287) soit interroge le leader (+0x281, vtable[0x38]/[0]/[0x34]) pour valider sa disponibilité : **requête de validité du leader pour la logique d'ailier/formation.**"
+    "summary": "far, 86L, LUE 2026-09-27. D'apres la reaction du LEADER (+0x27F) : 1 et cible +0x287 -> 3 (engager cette cible) ; 2 et objet menacant +0x281 dont le lanceur (vtable+0x38) est un avion (categorie 6) -> 3 (engager le lanceur) ; sinon 0. Pose le bit 1 de +0x28B du leader = (resultat == 0). N'emet jamais 1."
   },
   "sub_38D89": {
     "new_name": "Particle_Init",
@@ -18552,7 +18552,7 @@
   "sub_6F5C": {
     "new_name": "AI_InterceptDispatcher",
     "segment": "seg003",
-    "summary": "far,96L — calcule un seuil de fermeture (dword_7201C/4), commande la vitesse via sub_6388, calcule le vecteur relatif cible, appelle sub_6977 (évaluation manoeuvre) ; si échec, récupère la vitesse cible via sub_6469 et bascule sur sub_702A (guidage alternatif). **Dispatcher de manoeuvre d'interception : poursuite directe vs guidage complexe.**"
+    "summary": "far, 96L, LUE 2026-10-02. (entite, cible) : AI_InterceptSpeedCmd_HUD(entite, cible, dword_7201C/4 = 450 m) ; si AI_GunSnapAim_6977 -> 1 ; sinon AI_GuidanceSolution_Major(entite, D = cible - moi, R = AI_Sensor_WeaponVelocityCache (= nez pour canon/missiles), 10 inutilise) et renvoie son resultat (1 seulement si aligne). Appelee trois fois par MVRS_ID7_TickPursuit_10BD9."
   },
   "sub_A4570": {
     "new_name": "InfoWidget_CopyFieldA_A4570",
@@ -18675,9 +18675,9 @@
     "summary": "far, appelle `UI_PositionListLabels` (13 lignes)."
   },
   "sub_DF99": {
-    "new_name": "AI_ScanForNewTarget",
+    "new_name": "AI_ScanCollisionThreats_DF99",
     "segment": "seg007",
-    "summary": "far,97L — appelé par sub_814C : itère sur la liste des objets du monde (sub_224DA, filtre type 0x59C3), ignore soi-même, vérifie état 'détruit' (vtable[8]==6), teste chaque candidat via sub_DD21 : **boucle de balayage/acquisition de nouvelle cible parmi tous les objets du monde.**"
+    "summary": "far, 97L, LUE 2026-10-02. Ex-'AI_ScanForNewTarget' (faux : ne cherche pas de cible). Etape 3 de AI_TopLevelThink. Comportement en cours et +0x27F == 3 (evitement en cours) : sa methode +0xC, renvoie 1. Autre comportement en cours : renvoie 0. Sinon +0x27F == 3 remis a 0, puis parcours de TOUS les objets du monde (liste 59C3h) : avion (modele +0x11 == 1, categorie 6 JETP), sauf moi, amis compris : AI_CollisionCourseTest_DD21 ; arret au premier vrai, renvoye. C'est l'EVITEMENT DE COLLISION entre avions (niveau 3), pas une recherche de cible ; non porte dans libRealSpace (REACT_NEW_TARGET est un nom faux)."
   },
   "sub_2BE0A": {
     "new_name": "Damage_UpdateHudIcon",
@@ -18807,12 +18807,12 @@
   "loc_41735": {
     "new_name": "BombModel_TestGuidedLockCone_41735",
     "segment": "seg089",
-    "summary": "far, LUE (2026-09-24). Methode +0x14 des modeles BOMB (vtable seg339 0x6F510) et DURD (0x6F4F4), appelee par GroundAttack_Phase3_WeaponRelease_776FB pour la GBU-15 : (modele, cible, lanceur). Faux si modele+0x5E == 0 (octet du chunk DATA du modele : bombe guidee ?) ou sans cible/lanceur. t = distance(cible, lanceur) / |vitesse du lanceur| ; VRAI si Math_DotProduct3D_5505B(direction normalisee vers la cible, nez du lanceur) > Math_CosDeg_5483F(modele+0x61 * t) (+0x61 = word du chunk DATA, PlayerComponent_LoadFieldsWithRetry_9FAD0). Le cone d'acceptation s'elargit avec le temps de vol."
+    "summary": "far, LUE (2026-09-24). Methode +0x14 des modeles BOMB (vtable seg339 0x6F510) et DURD (0x6F4F4), appelee par GroundAttack_Phase3_WeaponRelease_776FB pour la GBU-15 : (modele, cible, lanceur). Faux si modele+0x5E == 0 (octet du chunk DATA du modele : bombe guidee ?) ou sans cible/lanceur. t = distance(cible, lanceur) / |vitesse du lanceur| ; VRAI si Math_DotProduct3D_5505B(direction normalisee vers la cible, nez du lanceur) > Math_CosDeg_5483F(modele+0x61 * t) (+0x61 = word du chunk DATA, PlayerComponent_LoadFieldsWithRetry_9FAD0). Le cone d'acceptation s'elargit avec le temps de vol. | RELU 2026-09-28 : angle = movsx(+0x61) * t (t = distance / |vitesse du lanceur|, 0 si vitesse nulle), ramene sur +/-180 par Math_CosDeg_5483F. Pour la GBU-15, +0x61 = 17920 (voir BombModel_LoadDATAChunk_9FAD0) : le cone oscille tres vite avec t. Lanceur = [bp+0Ch], cible = [bp+0Ah]."
   },
   "loc_41311": {
     "new_name": "BombModel_PredictImpact_41311",
     "segment": "seg089",
-    "summary": "far, LUE (2026-09-24), formule balistique NON RESOLUE. Methode +0x18 des modeles BOMB/DURD : (sortie, modele, 0, porteur = point d'emport+0x0D, &hauteur, n). Porteur nul -> vecteur par defaut. n >= 4 (id 7) : impact = position du porteur + direction horizontale de sa vitesse * 2500 (si masque modele+0x4B == 0x40) ou * 3000, altitude = terrain. n = 3 (MK-20/MK-82) : Z = alt porteur - hauteur (= altitude de la cible d'apres l'appelant) ; t = (-vz - sqrt(vz^2 - 2 g Z)) / g avec g = dword_6FFD7 = -9,8 ; t -= Z / (3 * (2000 - alt porteur) + 290) ; impact = position porteur + vitesse horizontale * t, altitude = terrain (Terrain_QueryAltitudeAt). A CLARIFIER : Z vaut l'altitude de la cible et non la hauteur de chute ; soit l'objet +0x0D ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original."
+    "summary": "far, LUE (2026-09-24), formule balistique NON RESOLUE. Methode +0x18 des modeles BOMB/DURD : (sortie, modele, 0, porteur = point d'emport+0x0D, &hauteur, n). Porteur nul -> vecteur par defaut. n >= 4 (id 7) : impact = position du porteur + direction horizontale de sa vitesse * 2500 (si masque modele+0x4B == 0x40) ou * 3000, altitude = terrain. n = 3 (MK-20/MK-82) : Z = alt porteur - hauteur (= altitude de la cible d'apres l'appelant) ; t = (-vz - sqrt(vz^2 - 2 g Z)) / g avec g = dword_6FFD7 = -9,8 ; t -= Z / (3 * (2000 - alt porteur) + 290) ; impact = position porteur + vitesse horizontale * t, altitude = terrain (Terrain_QueryAltitudeAt). A CLARIFIER : Z vaut l'altitude de la cible et non la hauteur de chute ; soit l'objet +0x0D ou la hauteur passee ne sont pas ce que l'on croit, soit c'est un defaut de l'original. | L'arme id 7 est la DURANDAL (masque 0x40) : impact = 2500 m devant."
   },
   "loc_494DD": {
     "new_name": "JDYN_UpdateDamageGains_494DD",
@@ -18852,7 +18852,7 @@
   "loc_11B16": {
     "new_name": "MVRS_ID21_TickAutopilotNav_11B16",
     "segment": "seg008",
-    "summary": "far (label, slot +0xC de l'ID 21), LU 2026-09-25. NAVIGATION AU PILOTE AUTOMATIQUE PHYSIQUE. Minuteur +0x0D -= dt. Si le pilote automatique est coupe (JDYN+0x68 == 0xFF) : si |tangage du nez| < 15 (AI_Sensor_NosePitch_59A5, cmp 0F00h) -> JDYN+0x68 = 0 (active Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5) (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis Behavior_PopFinished_75612."
+    "summary": "far (label, slot +0xC de l'ID 21), LU 2026-09-25. NAVIGATION AU PILOTE AUTOMATIQUE PHYSIQUE. Minuteur +0x0D -= dt. Si le pilote automatique est coupe (JDYN+0x68 == 0xFF) : si |tangage du nez| < 15 (AI_Sensor_NosePitch_59A5, cmp 0F00h) -> JDYN+0x68 = 0 (active Autopilot_FlyToPointKinematic_49C2E) ; sinon AI_PitchToAngleCmd_7E18(0, zone morte 5) (remettre le nez a l'horizontale d'abord). Fin quand le minuteur est ecoule ou que le pilote automatique a pose 'point atteint' (bloc +0x1A) : JDYN+0x68 = 0xFF puis Behavior_PopFinished_75612. | Minuteur +0x0D = scalaire du contexte passe a l'application (MVRS_SharedContextSyncAndID2Score_EC22) : 2 s pour AI_NavSolutionToPoint / Goal_ReturnToBase / Goal_FollowWaypoints, 30 s pour Goal_WanderRandom. Fin si minuteur < 0 (sar 1Fh)."
   },
   "loc_EEA0": {
     "new_name": "MVRS_ID1_ApplyReacquireTurn_EEA0",
@@ -18882,7 +18882,7 @@
   "loc_10BD9": {
     "new_name": "MVRS_ID7_TickPursuit_10BD9",
     "segment": "seg008",
-    "summary": "far, LUE 2026-09-25. Tick MVRS ID7 'poursuite' (bits de node+0x32). Sans cible : fin. Mode bit2 (ou bit1 et aspect >= 80) : guidage vers le point decale memorise (montee 45 deg si pas trop lent), vitesse dword_72039. Mode bit4 : vers le point d'anticipation memorise ; AI_InterceptDispatcher si cible a moins de 45 deg du nez. Sinon : si AI_VisibilityTest(cible) -> retour ; bit3 : si distance <= 2|Vt|^2/9 -> minuteur 4, bit4, point = position cible + vitesse x 4 s (Physics_ApplyForceAtPoint) ; sinon interception ; sinon si nez <= 60 et word_72093 < 60 -> bit3 ; AI_InterceptDispatcher, fin s'il renvoie non nul."
+    "summary": "far, LUE 2026-09-25. Tick MVRS ID7 'poursuite' (bits de node+0x32). Sans cible : fin. Mode bit2 (ou bit1 et aspect >= 80) : guidage vers le point decale memorise (montee 45 deg si pas trop lent), vitesse dword_72039. Mode bit4 : vers le point d'anticipation memorise ; AI_InterceptDispatcher si cible a moins de 45 deg du nez. Sinon : si AI_VisibilityTest(cible) -> retour ; bit3 : si distance <= 2|Vt|^2/9 -> minuteur 4, bit4, point = position cible + vitesse x 4 s (Physics_ApplyForceAtPoint) ; sinon interception ; sinon si nez <= 60 et word_72093 < 60 -> bit3 ; AI_InterceptDispatcher, fin s'il renvoie non nul. | RELU EN DETAIL 2026-10-02 : minuteur < 0 -> Behavior_PopFinished mais le tick continue. Bit1 : word_72097 = angle(D, vitesse de la cible). Bit2 (ou bit1 et word_72097 >= 80) : bit1 -> bit2, ou bit2 efface si word_72097 < 80 ; direction = (node+0x26, +0x2A, 0) avec composante verticale = sa longueur si pas trop lent ; AI_GuidanceCmd_FromOwnPos ; AI_ThrottleCmd_HUD(dword_72039). Bit4 : si angle(D, nez) <= 45 : AI_InterceptDispatcher puis bit4 efface ; sinon AI_GuidanceCmd_FromOwnPos(node+0x26.. = POSITION ABSOLUE cible + vitesse x 4 s passee comme direction : bug de l'original), bit4 efface s'il renvoie 1. Sinon : AI_CollisionCourseTest_DD21 -> fin du tick ; bit3 : si d <= 2|Vt|^2/9 : minuteur 4 s, bit4, bit3 efface, node+0x26 = Physics_ApplyForceAtPoint(cible, 4 s) ; sinon AI_InterceptDispatcher. Sans bit : nez <= 60 et (180 - angle(D, Vt)) < 60 -> bit3 et AI_InterceptDispatcher ; sinon AI_InterceptDispatcher, FIN DE LA MANOEUVRE s'il renvoie 1 (recalage de visee fait)."
   },
   "loc_117B4": {
     "new_name": "MVRS_ID14_TickGroundAvoid_117B4",
@@ -18898,5 +18898,35 @@
     "new_name": "MVRS_ID16_TickRegainSpeed_1191D",
     "segment": "seg008",
     "summary": "far, LUE 2026-09-25. Tick MVRS ID16 : AI_RegainSpeed_68D4 jusqu'a la fin ou au minuteur."
+  },
+  "loc_47FF8": {
+    "new_name": "JDYN_TotalMass_47FF8",
+    "segment": "seg103",
+    "summary": "far, LUE (2026-09-26). Methode +0x3C de la vtable secondaire JDYN (tag 0x228A, lineaire 0x6F33A avec la base seg339 corrigee 0x6D0B0 : off_6F376 -> loc_47FF8 ; alignement verifie : +0x24 = PhysicsTicks, +0x34 = JDYN_UpdateDamageGains_494DD). MASSE TOTALE DE L'AVION, ecrite dans *arg_0 (24.8, kg) : m = [[si]+4] (masse a vide, chunk DYNM, sous-objet A) + si[0x6D] (carburant restant, kg, decremente par PhysicsTicks) + es:[ [[[si]+2]+0x5A] + 0x20 ] (masse de l'emport : objet monde de l'avion +0x5A = far ptr vers la structure d'emport, +0x20 = somme des masses des armes, cf. PlayerComponent_OrchestrateComplex_9F286 et WeaponStation_DecrementCounter). Code : mov bx,[si] / mov bx,[bx+2] / mov ax,[bx+5Ch] / mov dx,[bx+5Ah] / add dx,20h / les ... / mov eax,es:[bx] ; mov bx,[si] / mov eax,[bx+4] / add eax,[si+6Dh] / add eax,[bp-4]. Diviseur des forces dans Aero_SumLinearForces_48639 et X de l'incidence par g dans Aero_ComputeAoACommand_48862. Leve la question ouverte 5 (l'ancien 'stub no-op loc_4692C' venait de la base seg339 decalee de 0x40)."
+  },
+  "loc_11BED": {
+    "new_name": "TakeoffBehavior_Init_11BED",
+    "segment": "seg009",
+    "summary": "far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +4 de la vtable du comportement de decollage (0x312, objet 0x5A cree par Goal_ExecuteAction_A8AC cas 0xA1, type +0x21 = 0x11). Meme gabarit qu'un noeud MVRS : MVRS_SharedContextSyncAndID2Score_EC22, recopie de la reference (+0x22..+0x2A, SetReference +0x13), position/vecteurs globaux du contexte de combat (dword_7205F.., distance dword_7209B). Renvoie 0."
+  },
+  "loc_11D03": {
+    "new_name": "TakeoffBehavior_Start_11D03",
+    "segment": "seg009",
+    "summary": "far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +8 (appelee par Goal_ExecuteAction_A8AC). Init +4 si besoin, Behavior_PushRunning_756A4 (devient le comportement en cours de l'entite). Si |vitesse| > 10 m/s : Behavior_PopFinished_75612 (deja en vol, fin). Joueur : camera 'TAKEOFF'. Phase +0x46 = 0, temps +0x4C = 0. Cap de piste +0x58 d'apres le nez de l'avion, seulement si axial : nez +c1 -> 0, -c1 -> 180, +c0 -> 270, -c0 -> 90. LIT LE CHUNK REAL/OBJT/JETP/TOFF de OBJECTS\\<avion>.IFF : 4 words -> +0x52 (acceleration au roulage, m/s2, defaut 20), +0x50 (vitesse de rotation, m/s, defaut 150), +0x54 (assiette de montee, deg, defaut 30), +0x56 (gain de tenue d'assiette, defaut 8). Train sorti (flags_75 |= 4). Joueur : dword_706AB -= 15,0 (global non identifie). Puis appelle le tick +0xC."
+  },
+  "loc_1208C": {
+    "new_name": "TakeoffBehavior_Tick_1208C",
+    "segment": "seg009",
+    "summary": "far, LUE 2026-09-26. DECOLLAGE IA (ordre 0xA1). Methode +0xC (tick du comportement en cours). Switch sur la phase +0x46 : 0 Takeoff_Phase0_GroundRoll_120E8, 1 Takeoff_Phase1_ClimbOut_12472, 2 Takeoff_Phase2_GearFlapsUp_125C2, 3 Takeoff_Phase3_LevelOff_125EC, 4 et au-dela Behavior_PopFinished_75612 (fin)."
+  },
+  "loc_42F71": {
+    "new_name": "MissileModel_TestInRange_42F71",
+    "segment": "seg091",
+    "summary": "far (label, methode +0x14 des modeles MISS, vtable seg339 0x6F540), LU 2026-09-28. (modele, cible, lanceur) : faux sans cible ou lanceur ; VRAI si distance 3D(cible, lanceur) < modele+0x56 << 8 (+0x56 = effective_range du chunk WDAT, metres entiers ; 15000 m pour l'AGM-65D). Test de tir de l'AGM-65D dans GroundAttack_Phase3_WeaponRelease_776FB."
+  },
+  "loc_42E80": {
+    "new_name": "WeaponModel_InitialVelocityZero_42E80",
+    "segment": "seg091",
+    "summary": "far (label, methode +0x18 des modeles MISS et de la famille seg339:off_6F608), LU 2026-10-02. Renvoie dword_707F8/707FC/70800 (vecteur nul constant) : AI_Sensor_WeaponVelocityCache retombe alors sur le nez de l'avion."
   }
 }

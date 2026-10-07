@@ -209,7 +209,7 @@ loc_9DA43:
 		push	ax
 
 loc_9DA47:
-		call	Gauge_ComputeNeedlePosition
+		call	Aircraft_GroundClearance_3E5A6
 		add	sp, 6
 		mov	eax, [bp+var_18]
 		add	eax, [bp+var_1C]

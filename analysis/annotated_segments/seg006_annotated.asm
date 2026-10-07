@@ -2911,9 +2911,10 @@ AI_ComputeMorale_CD4A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,86L — selon l'état d'escorte (+0x27F ==1 ou 2), soit propage la cible du leader (+0x287)
-; soit interroge le leader (+0x281, vtable[0x38]/[0]/[0x34]) pour valider sa disponibilité :
-; requête de validité du leader pour la logique d'ailier/formation.
+; far, 86L, LUE 2026-09-27. D'apres la reaction du LEADER (+0x27F) : 1 et cible +0x287 -> 3
+; (engager cette cible) ; 2 et objet menacant +0x281 dont le lanceur (vtable+0x38) est un
+; avion (categorie 6) -> 3 (engager le lanceur) ; sinon 0. Pose le bit 1 de +0x28B du leader =
+; (resultat == 0). N'emet jamais 1.
 ; ==============================================================================================
 Escort_QueryLeaderValid	proc far		; CODE XREF: Goal_FollowAllyExec+10Bp
 
@@ -3008,10 +3009,20 @@ Escort_QueryLeaderValid	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,944L — la plus grosse fonction documentée jusqu'ici. Vérifie flag combat (+0x28B bit3),
-; récupère vitesse de la cible/leader (+0x145, vtable+0x3C+0xC) et vitesse propre : candidat
-; très fort pour la solution de guidage de formation/rejointe (followAlly), appelée par
-; sub_DAA9 — à disséquer en détail dans une session dédiée.
+; far, 944L, LUE 2026-09-27. TENUE DE FORMATION CINEMATIQUE. N = nez du leader, n = nez
+; propre, pas s = |vitesse leader| * dt. Poste = Goal_FollowAllyFormation ; d = |leader +
+; poste - moi|. Hors formation si d > 4 |poste| ; entree si |ecart de cap nez leader / nez
+; propre| < 15 deg. 'Derriere' = |ecart de cap nez propre / direction du poste| > 160 deg. A
+; l'entree : historique +0x16A (32 nez + 32 envergures) rempli avec l'orientation propre,
+; index +0x172 = 0, horloge +0x16E = 0. Si s < d : s += min(d - s, (d > 3000 et derriere ? 50
+; : 20) m/s * dt), sinon s = d. Recopie le cran de gaz du leader (ctrl+0x1E). c = s *
+; (derriere ? 76/256 : 25/256), s -= c. Tant que horloge >= 0,125 s : nez[i] = N ;
+; envergure[i] = |manche leader| > 2/16 ? (envergure[i] + envergure leader)/2 : envergure a
+; plat du nez propre (Vec_NegateSwapPair) ; i = (i+1)&31 ; horloge -= 0,125. horloge += dt.
+; Moyennes des 32 nez et envergures. Orientation = nez du leader actuel + envergure moyenne
+; (Matrix_OrthonormalizeKeepRow1_57660, vtable +0x40). Deplacement = nez_moyen*s +
+; unitaire(vers le poste - nez_moyen*s)*c ; vitesse = deplacement * dword_70454 (vtable
+; +0x50). Renvoie 1 en formation.
 ; ==============================================================================================
 Formation_GuidanceSolution	proc far		; CODE XREF: Goal_FollowAllyExec+1B2p
 
@@ -3964,9 +3975,19 @@ Formation_GuidanceSolution	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,260L — orchestrateur GOAL followAlly : valide le leader (vtable/+0x59 statut), met à
-; jour l'escorte (+0x145 via sub_3A44E), vérifie l'état GOAL 0xAA, appelle sub_CFDF (validité
-; leader) et sub_D081 (guidage) : exécuteur complet du GOAL 'suivre/former avec un allié'.
+; far, 260L, LUE 2026-09-27. EXECUTEUR DU VOL EN FORMATION (appele par Goal_SelectTransition a
+; chaque tick de l'ordre 0xAA). var_2 = bit3 de +0x28B (deja en formation) OU objet monde
+; (+0x102)+0x59 == 0 (physique non suspendue par ailleurs). Leader +0x145 : si son avion a
+; flags_75.bit5 (pilote ejecte, pose par AI_EjectDecision_50FF) -> leader oublie. Conditions :
+; ordre 0xAA, var_2, etat d'ailier +0x149 == 0, ailier non ejecte, leader pas au sol, +0x27F
+; == 0. Si le leader est une entite IA (octet +6 == 1, pose par AIEntity_Construct_74B43) :
+; +0x149 = Escort_QueryLeaderValid ; 1 -> Goal_TransferToWingman ; 3 -> cibles
+; +0x137/+0x285/+0x287 = celle renvoyee, +0x160 = 0, +0x162 = horloge +0x175 (secondes) ;
+; sinon Formation_GuidanceSolution. Leader non IA (joueur) : Formation_GuidanceSolution si
+; +0x149 == 0. Si formation tenue et aucun comportement en cours : Goal_FollowWaypoints (sans
+; effet visible, physique suspendue). Hors formation : libere l'historique +0x16A. bit3 de
+; +0x28B = resultat ; si var_2 : objet+0x59 = resultat (physique suspendue pendant la
+; formation).
 ; ==============================================================================================
 Goal_FollowAllyExec	proc far		; CODE XREF: seg003:0E67P seg004:2132P ...
 

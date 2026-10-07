@@ -36,7 +36,7 @@ l'entité IA : `mov word ptr es:[bx+1Ah], 368h`, vtable dont le 1er slot est ce 
 | Entité | Trait | Ancienne lecture (fausse) | Qui le lit (noms actuels) |
 |---|---|---|---|
 | `+0xB0` | **`FL` (Flying)** | `TH` | voir la liste ci-dessous — c'est le trait qui **pilote l'avion** |
-| `+0xB1` | `TH` (Trigger Happy) | `CN` | `Pilot_SkillCheck_B1` (depuis `AI_RadarScanTarget`) |
+| `+0xB1` | `TH` (Trigger Happy) | `CN` | `Pilot_SkillCheck_B1` (depuis `AI_WeaponRecoveryBusy_9027`) |
 | `+0xB2` | `VB` (Verbosity) | `VB` | `Radio_CanPlayMessage` |
 | `+0xB3` | **`CN` (Confidence)** | `LY` | `AI_ComputeMorale_CD4A` (paliers 3/6/12/15) |
 | `+0xB4` | **`LY` (Loyalty)** | `FL` | `AI_MoraleDisciplineCheck_CA93` (tient son rôle si `LY` + moral > 7), `AI_MessageDispatcher` (> 14) |
@@ -65,12 +65,13 @@ Tous les usages de `entité+0xB0` retrouvés :
 - **Reprendre de la vitesse** (ID16) : score 1 seulement si `FL < 12` — seuls les pilotes moyens le font.
 - **Vitesse de manœuvre** : `AI_ManeuverSpeedCmd_ED1E` divise la vitesse par 2 si
   `Pilot_SkillCheck_B0` réussit et que je suis plus lent que la cible.
-- **Choix de cible** : `AI_TopLevelThink` n'appelle `Targeting_AcquireBestThreat` que si `FL ≥ 12`
-  (hors déclencheur `byte_6E4D7`) ; porte `(rand & 15) + 1 ≤ FL + si` par candidat ; poids
+- **Choix de cible** : `AI_TopLevelThink` n'appelle `Targeting_AcquireBestThreat(…, 0)` que si `FL ≥ 12`
+  **et** `byte_6E4D7` (un missile air-air — WDAT `target_domain` = 1 — a été ajouté à la liste des objets du
+  monde au cycle précédent : `byte_6E4C6` posé en seg088/seg092, décalé par `RadioFlags_ShiftHistory`) ; porte `(rand & 15) + 1 ≤ FL + si` par candidat ; poids
   `(AR − FL) + 16` et `(FL − AR) + 16` ; bonus `FL²/16 − 8` pour les missiles.
 - **Alerte de menace** (`AI_IncomingThreatWarning`) : seuil `FL ≥ 13` puis jet de pilotage.
 - Scores des manœuvres ID1, ID2, ID3, ID7 (jet avec modificateur −7) ; `AI_EvalTargetAttribute` ;
-  `AI_RadarScanTarget` (minuteur/portée).
+  `AI_WeaponRecoveryBusy_9027` (minuteur/portée).
 - **Cadence de recherche de cible** (`entité+0x179`, tracé le 2026-09-25) : masque `M` = 15 si
   `FL < 4`, 7 si `FL < 11`, sinon 3 (`PilotProfile_LoadNUMSCompanionFile_73FB4`). Un pilote faible
   re-cherche sa cible **moins souvent** :
@@ -96,6 +97,13 @@ Tous les usages de `entité+0xB0` retrouvés :
   aérienne vivante, le tournoi ne re-cherche pas ; il re-cherche aussitôt si son pilote s'est éjecté
   (bit 5 de `flags_75`), et à chaque appel s'il n'a rien du tout.
 
+  **Porté le 2026-09-28** (`SCAIBrain`) : `retargetSlowWindow` / `retargetFastWindow`, horloge décalée de
+  0x19/256 s par cerveau créé (`SCMission::ai_clock_stagger`), masque fixé au constructeur ; trois appels
+  distincts : début du tick (`aa_missile_launched_last` et FL ≥ 12, argument 0), début de `combatStep`
+  (logique du tournoi, argument `ground_allowed`, arrêt si rien n'est trouvé), début de
+  `engageAttackerReaction` (touché ou fenêtre rapide, argument 0). `acquireBestThreat` renvoie « un gagnant,
+  missile compris ». 4e appel : `AIEntity_OnBehaviorEnded_A1DF`, fin normale d'un comportement sans comportement précédent (voir §14).
+
 ## 1. [P1] Attaque au sol : condition inversée entre les phases 0 et 1
 
 **Où.** `SCAIBrain::updateGroundAttack`, ligne 771 :
@@ -107,6 +115,9 @@ Tous les usages de `entité+0xB0` retrouvés :
 **Correction** : `|| aligned`.
 
 **Effet attendu** : l'avion ne tourne plus en rond à ~5000 m entre les phases 0 et 1.
+
+**Fait le 2026-09-25** (à valider en jeu). Entre 5000 et 8000 m, un avion non aligné garde sa phase
+(hystérésis de l'original).
 
 ---
 
@@ -140,6 +151,34 @@ if (!fired && owner->plane->autopilotReached()) ground_phase = 0;
 ```
 Le test de repli actuel « `angle < 90°` → phase 0 » (ligne 820) devient inutile : le garder en
 secours seulement si Rémi le souhaite.
+
+**Fait le 2026-09-25** (à valider en jeu). Le pilote automatique est dans **`SCPilot`** (tout le
+pilotage au même endroit) : `engageAutopilot`, `setAutopilotTarget`, `disengageAutopilot`,
+`autopilotActive`, `autopilotReached`. La loi tourne dans `SCPilot::FlyTo` (à chaque image, juste
+après `plane->Simulate`) et envoie un `PlaneKinematicEvent` (vitesse monde en m/s, cap, tangage,
+roulis en dixièmes de degré ; `engaged = false` rend la main). L'avion (`SCPlane`) n'a plus qu'un
+mode cinématique sans décision : `SCJdynPlane` et `SCJetpPlane` sautent leur physique, appliquent
+l'état reçu, avancent la position et convertissent la vitesse dans leur unité interne
+(`syncKinematicVelocity`). Côté cerveau : la
+phase 2 engage (un tick), la phase 3 ne donne plus d'écarts d'attitude, le repli `angle < 90°` est
+remplacé par « point atteint » → phase 0 ; le pilote automatique est coupé au largage, en phases
+0/1/4, sur arme non gérée, à toute interruption (`resetGroundAttack`, y compris pendant une
+esquive). Le choix de l'arme reste fait en phase 3. Les missions créent toujours des `SCJdynPlane`.
+
+**Essai du 2026-09-25 (STERN, MK-82)** : approche alignée, phase 1 → 3 à 5094 m ; en phase 3 l'écart
+prévu décroît (785, 581, 367, 165 m) ; largage à `miss = 26 ≤ tolerance = 28`, une cible au sol
+détruite ensuite. Vitesse de 436 à 201 m/s en phase 3 (vitesse voulue de 100 m/s, conforme). Reste à
+observer : la sortie du pilote automatique et la phase 4.
+
+**Essai 2 du 2026-09-25** : 2ᵉ largage réussi (`miss = 23 ≤ 32`) ; sortie du pilote automatique sans
+saut (vitesse ~300 m/s, phase 4 cabrée sans à-coup). Cible au sol détruite désormais libérée par
+`SCMissionActors::destroyTarget` (test `target->is_destroyed` ajouté ; avant, seules les cibles
+avions l'étaient) ; le script enchaîne sur la cible suivante. **Nouveau défaut** sur la 2ᵉ cible,
+arrivée de dos : en phase 1, l'écart de cap plafonne à ~22° sur 3 km (angle 157°) avec une consigne
+de piqué de ~9° ; `SCPilot` en mode attitude incline (~55°) mais la consigne de piqué annule la
+traction, l'avion ne tourne presque plus ; à 5000 m non aligné → phase 0, nouvelle boucle.
+L'original, au-delà de 20° d'écart (et piqué voulu < 10°), incline puis tire à fond
+(`AI_CombatDecision_Major`, §7).
 
 **Tir des bombes** (inchangé, conforme) : `raté ≤ 20 + |vitesse| × dt + (150 si (rand() & 15) > AG)`,
 `raté` = distance **horizontale** impact prédit ↔ cible. Garder la simulation de trajectoire du
@@ -208,7 +247,15 @@ L'octet `SIGN` du modèle ne sert que sans objet de référence.
 **Leurres (`DECY`)** : signature = `S0 × temps restant / durée de vie` (décroît jusqu'à 0) ; l'aspec 4
 lit S1 sans décroissance.
 
-**Correction minimale** : ajouter le test d'aspect arrière de l'AIM-9J dans `testMissileLock`.
+**Fait le 2026-09-25 (modèle complet)** : `Targeting_FilterByWeaponType` et `Proximity_TestPoints` lus.
+Candidat = l'objet de type 1 (avion) ou 4 (leurre) de **plus forte signature** parmi ceux à distance
+`0 < d ≤ target_range` du porteur et à moins de **`tracking_cone` degrés** de son nez
+(`dot ≥ cos(cone)` ; le portage testait à tort `90 − cone`). `SCAIBrain::seekerSelect` reproduit
+`Targeting_SelectAndPrioritize` (garde ou vol de piste selon l'aspec, poids 5 si le candidat est le
+joueur — lien `vtable+0x38 == word_722E6` non prouvé —, aspect arrière de l'AIM-9J sur la cible
+gardée) ; tir si le chercheur garde la cible voulue. Non porté : leurres (aucun objet `DECY` dans le
+monde du portage) et réévaluation du chercheur par le missile en vol (code du missile).
+Ancienne note :
 Le vol de piste par les leurres vient ensuite, avec les leurres eux-mêmes.
 
 ---
@@ -250,6 +297,26 @@ pas relu.
 ---
 
 ## 7. [P3] Commandes bas niveau de l'original — pour l'« option B » de `SCPilot`
+
+**Porté le 2026-09-25 dans `SCPilot`** (à valider en jeu, avions encore en `SCJdynPlane`) :
+`SetGuidanceDirection` (`guidanceSolution` + `combatDecision`), `SetPitchCommand` (`pitchToAngle`),
+`rollToAngle`, `bankError`, `rollStickFromError`, `clampPitch`. Sortie : manche normalisé [−1, 1]
+dans `PlaneControlEvent` (`normalized_stick`), converti par l'avion (×160 pour `SCJdynPlane`,
+direct pour `SCJetpPlane`). Conventions libRealSpace : cap « boussole » `−atan2(x, z)` (écart > 0 =
+à droite), inclinaison > 0 = vers l'aile droite (`−signedRoll/10`), manche x > 0 = roulis à droite,
+y > 0 = tirer. `deck` = 200 m (`entité+0xE5 = 0C800h`, `AIAircraft_LoadProfileGuarded_73940`).
+Simplifications : vitesse indiquée = vitesse vraie ; `maxRollRate` sans la réduction près du
+décrochage ni le cas `flags_75` ; décrochage = ancien anti-décrochage de `SCPilot`. Utilisé par la
+poursuite (direction vers le point d'anticipation), l'attaque au sol (phases 0/1 : direction ;
+palier > 9000 m et piqué −40° de l'original ; phase 4 : +5°), l'esquive (direction horizontale).
+Le cerveau efface la commande au début de chaque tick (`ClearGuidance`).
+
+**Écart assumé (décision de Rémi, 2026-09-25)** : en phase 0 de l'attaque au sol, la direction
+d'éloignement est horizontale (composante verticale annulée). Avec le vecteur complet de l'original
+(`moi − point visé`), l'IA montait à 45° jusqu'à ~15 km, puis ne parvenait plus à se réaligner en
+piqué (bascule entre « ailes à plat, pousser » et « incliner puis tirer » autour du seuil de 145°).
+Le 3ᵉ argument de `AI_GuidanceCmd_FromOwnPos` (10) n'est pas lu par `AI_CombatDecision_Major` :
+il ne borne rien.
 
 L'original ne commande **ni cap ni altitude** : il commande un **angle de roulis** et un **angle de
 tangage**, avec zone morte, en écrivant les axes du manche (les mêmes que le joueur).
@@ -445,6 +512,29 @@ cas particulier.
 se réduit alors au tir et à la poursuite actuels. Le gain immédiat est la place du combat dans la
 liste `GOAL`. Déplacement à faire en plusieurs commits, validés en jeu un par un.
 
+**Étape 1 faite le 2026-09-25** (à valider en jeu) : `SCAIBrain::combatStep(sol_autorisé)` (tir +
+poursuite si cible aérienne ; attaque au sol si autorisé et cible sol acquise ; sinon `false`) ;
+`destroyTargetOrder` (ordre « détruire » du cerveau, d'après `Goal_ExecuteAction_A8AC` : cible sol de
+mission → attaque au sol ; sinon `combatStep(false)` ; renvoie « a agi », et pose
+`current_command_executed` quand la cible est détruite — booléen gardé par décision de Rémi) ;
+`GOAL` 4 → `combatStep(false)`. `tick()` : ciblage (comme `AI_TopLevelThink`), réaction à un missile,
+puis `GOAL`. Aiguillage unique `brain_orders_enabled` dans `executeGoalAction` ; tests `brain->…`
+retirés de l'ancien `destroyTarget` (encore utilisé par « défendre » et, pour les armes sol non
+portées, par l'ordre du cerveau). Écart : sans cible aérienne acquise, l'ordre « détruire » air ne
+dirige plus l'avion vers la cible (l'original passe au `GOAL` suivant).
+
+**Étape 2 faite le 2026-09-25** (à valider en jeu) : ordre « défendre la cible » dans le cerveau
+(`defendTargetOrder`), d'après `Goal_SetObjective_A307` case 0xA8 (référence de navigation `+0x10F`
+et cible de mission `+0x137` = l'objet défendu), `Goal_ExecuteAction_A8AC` case 0xA8
+(`AI_NavSolutionToPoint`, sinon `combatStep(false)`, sinon errance) et `Goal_IsComplete` case 0xA8
+(terminé quand l'objet défendu disparaît). Navigation : au-delà du rayon d'arrivée par défaut
+(`entité+0x139 = 0x7530` = 30 000 m, écrit par le constructeur), nez remis à l'horizontale puis
+pilote automatique de `SCPilot` vers l'objet à 250 m/s (`entité+0x141 = 0FA00h`). Errance : point à
+30 000 m dans une direction aléatoire (`Goal_WanderRandom`), renouvelé à 2 km (seuil du portage),
+suivi par la loi de pilotage. Le pilote automatique de navigation est coupé dès que la navigation
+n'est plus demandée (autre ordre, esquive). Écart : l'objet défendu n'est pas copié dans
+`owner->target` (bonus de ciblage de la cible de mission non reproduit pour cet ordre).
+
 ## 8ter. [P2] Réactions : niveau de réaction, entrée en combat contre un attaquant, moral (`GOAL` 5)
 
 Références : `AI_SYSTEM.md` §4.4 et `AI_TICK_CALL_GRAPH.md`, « `GOAL` et tournoi `MVRS` » §2-3
@@ -510,6 +600,17 @@ bool SCAIBrain::engageAttackerReaction() {
 
 **Test.** Ailier en formation, un MiG se place dans ses six heures à moins de 1800 : l'ailier annonce
 « This one's all mine. » et le prend pour cible. Même chose s'il est touché.
+
+**A et B faits le 2026-09-25** (à valider en jeu) : `reaction_level` sur `SCAIBrain` (niveau 2 =
+esquive en cours) ; tir et poursuite de `combatStep` seulement si niveau ≤ 1 ;
+`engageAttackerReaction` appelée après l'esquive et avant `GOAL` (si elle agit, `GOAL` est sauté) ;
+`just_hit` posé par `SCMissionActors::hasBeenHit`, effacé en fin de tick ; ordre « suivre » dans le
+cerveau (`followAllyOrder` : vol en formation par `followAllyFormation`, l'ancien réflexe
+`destroyTarget(attacker)` n'étant plus utilisé ; `leader_state` 3 → `combatStep(false)` jusqu'à la
+destruction de l'avion engagé). Écarts : pas de fenêtre de re-ciblage rapide (le ciblage tourne à
+chaque tick) ; tous les avions éligibles (classe de modèle ≥ 9 non établie) ; branche « errance »
+réduite à la demande d'un nouveau point d'errance ; `leader_state` 0 → 3 sur attaquant dans les six
+heures du joueur (réplique 0x10) non fait.
 
 ### C. Réaction au moral (`GOAL` 5, `Goal_MoraleReaction_878F`)
 
@@ -612,6 +713,18 @@ attaquant (B) → comportement en cours → `GOAL` (dont 5 = moral, 2 = ordre, 4
 part. Ailier du joueur à faible `CN`/`LY` sur qui le joueur tire, sans autre ennemi : il annonce
 0x20 et attaque le joueur.
 
+**C fait le 2026-09-25** (à valider en jeu) : `computeMorale` à chaque tick ; discipline réévaluée
+toutes les 3 s ; `moraleReaction` sous `GOAL` 5, au plus toutes les 5 s ; ordres radio du joueur
+(`tryActiveWingman`) sortis en tête de `tick()` ; `objective_locked` respecté par
+`SCMissionActors::setObjective` ; états d'ailier 0 (formation, déverrouille), 1 (combat libre :
+`combatStep(true)`, ou le joueur comme cible en cas de mutinerie), 2 (a quitté : navigation),
+3 (cible précise). Choix du portage (points non tracés) : « composant endommagé » = une santé de
+`system_health` sous sa valeur `SYSM` ; ennemis et pertes comptés sur les acteurs avec avion ;
+`enemies_active` = un ennemi vivant à moins de `range_far` (45 km) ; « le joueur me tire dessus » =
+dernier attaquant (`hasBeenHit`) = joueur ; destination de fuite et de retraite = point de départ
++ 1000 m (objet `word_706A0` non lu), rayon d'arrivée 2 km puis errance. Logs : `flees`,
+`leaves the fight`, `turns on the player`, `engages on its own`.
+
 ## 8quater. [P2] Navigation vers un point : l'original utilise le pilote automatique physique
 
 Relu le 2026-09-25 (`AI_TICK_CALL_GRAPH.md`, « Le vrai nœud ID 21 »). `AI_NavSolutionToPoint`
@@ -667,6 +780,41 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 | 13 | Prise d'altitude à longue distance | seulement si la cible est à plus de 17 700 et sous le plafond `JDYN+0x86` (F-16 : 10 973 m = 36 000 ft, entier tel quel) ; cap sur la cible, chandelle `30° + 30° × (v − croisière)/v_min` (≤ 60°) |
 | 16 | Reprendre de la vitesse | vitesse max, assiette +5° jusqu'à (croisière + mini)/2 ; 1,5 s |
 
+## 8sexies. État d'implémentation complet (2026-09-25, à valider en jeu)
+
+Tout ce document est porté, sauf le §6 (qualité de solution au canon avec le vecteur de l'arme :
+le calcul de `AI_Sensor_WeaponVelocityCache` n'est pas lu) et le GBU-15 / AGM-65D (données `DATA`
++0x61 non chargées ; l'ancien code prend la main).
+
+- **Tournoi et manœuvres** (`SCAIManeuvers.cpp`, même classe `SCAIBrain`) : contexte de combat
+  d'après `MVRS_BuildCombatContext_E5A4` (angles 3D = `Targeting_ComputeBearingElevation_55B1A`,
+  projection = `Targeting_ComputeGeometryHelperB_5517F`) ; scores 1 à 7 transcrits ligne à ligne
+  (branches mortes de l'original conservées dans le résultat), 13 à 16 et 19 d'après leurs résumés
+  relus ; tournoi à 8 nœuds fixes + entrées du fichier (25 au plus), bruit ±1, plancher −1000 ;
+  application et tick de 1 à 7, 13 à 16, 19 ; jambes ID20 ; éjection (`AI_EjectDecision_50FF`).
+  `combatStep` : tir/poursuite seulement si le tir part ou si la qualité de solution est > 0 (sinon
+  manœuvre en cours, sinon tournoi), comme `AI_BehaviorSelector`.
+- **Réflexes** 14 (sol) et 15 (décrochage) en tête de tick, niveaux 4 et 5 ; **alerte de menace**
+  → ID4 hors tournoi.
+- **§0bis** : lecteurs de `+0xB0` corrigés (`FL` au lieu de `TH`) ; cadence de re-ciblage :
+  `FL` ≥ 12 → chaque tick, sinon fenêtre lente `entité+0x179`, sans cible ou touché.
+- **§3** : ailes à plat avant la phase 2, vitesse de croisière du profil, identifiant 7 dans l'ordre
+  des armes, LAU-3 tiré 3 s après l'entrée en phase 3.
+- **§4** : aspect arrière de l'AIM-9J (`dot(v_porteur, v_cible) ≥ 0`).
+- **§5** : composante verticale de l'esquive sur le plancher, vitesse max du profil, plainte 0x0E.
+- **§8quater** : les ordres « aller au point / à la zone » et l'errance volent au pilote
+  automatique (le calcul d'arrivée reste l'ancien).
+- Le tir n'a plus lieu hors du gestionnaire de combat (appel global retiré de `tick()`).
+
+**Approximations du portage (points non tracés)** : classe de modèle (`+0x52`) des cibles
+considérée > 6 pour tous les chasseurs ; vitesse indiquée par l'atmosphère standard ; loi de
+manette de `AI_ThrottleController_6250` remplacée par un réglage à trois crans autour de la vitesse
+voulue ; « avion » (`byte_720DF`) toujours vrai pour l'IA ; `AI_InterceptDispatcher` réduit au
+guidage vers la cible ; alerte de menace (`AI_IncomingThreatWarning`, non détaillée) : ennemi qui
+me vise à moins de 1800 m en rapprochement, `FL` ≥ 13 et jet de pilotage ; vecteur mémorisé du
+dégagement (ID2) = `unknown_vector` du `NUMS` ; garde au sol `entité+0xE1` prise telle quelle
+(≤ 5 m, déclenchement surtout par « sous le plancher en descente »).
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
 1. ~~Loi de pilotage~~ : complète (§7, relue le 2026-09-25). Reste le rôle des bits 7-8 de `flags_75` (état à 3 valeurs qui réduit le taux de roulis à 60 %) et la nature exacte de `JDYN+0x59`.
@@ -675,3 +823,338 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 4. ~~Seuil `dword_7203D`~~ : c'est le plancher du pilote, altitude du terrain + `entité+0xE5` (§8quinquies).
 5. `BombModel_PredictImpact_41311` : hauteur de chute passée par l'appelant — §2.
 6. Champ `+0x13` du nœud d'attaque au sol (bloque l'engagement s'il est non nul).
+
+## 11. [P1] Décollage (`0xA1`) et atterrissage (`0xA2`) : chunks `TOFF` et `LAND` (relu le 2026-09-26)
+
+Les deux ordres ne sont **pas** des manœuvres pilotées : ce sont deux **comportements** (objets à
+vtable, comme les nœuds `MVRS`) créés par `Goal_ExecuteAction_A8AC`, poussés comme comportement en
+cours (`Behavior_PushRunning_756A4`, tick par `AI_TopLevelThink` étape 4), et dont l'essentiel est
+**cinématique** : l'avion est déplacé directement, la physique est rendue ou coupée à des moments précis.
+Au sol, `AI_TopLevelThink` appelle `Goal_ExecuteAction_A8AC` sans regarder le `GOAL` : le décollage
+s'exécute toujours.
+
+### A. Chunk `TOFF` (`REAL/OBJT/JETP/TOFF`, 4 words, lu par `TakeoffBehavior_Start_11D03`)
+
+| # | Champ | Défaut | Rôle |
+|---|---|---|---|
+| 0 | `roll_accel` | 20 | accélération au roulage, m/s² |
+| 1 | `rotate_speed` | 150 | vitesse de fin de roulage, m/s |
+| 2 | `climb_pitch` | 30 | assiette de montée, degrés |
+| 3 | `pitch_gain` | 8 | gain de la tenue d'assiette (manche pleine butée = 16) |
+
+### B. Décollage (`seg009`)
+
+Au démarrage : fin immédiate si l'avion va déjà à plus de 10 m/s ; caméra `TAKEOFF` pour le joueur ;
+cap de piste pris sur le nez de l'avion, **seulement s'il est axial** (0°, 90°, 180°, 270°) ; train sorti.
+1. **Roulage cinématique** (`Takeoff_Phase0_GroundRoll_120E8`) : manche au neutre, plein PC (cran 10),
+   avion en mode cinématique ; `vitesse = roll_accel × t`, la position avance de `vitesse × dt` sur l'axe
+   de piste. Quand `vitesse > rotate_speed` : `JDYN_JumpToPoint_49242` rend l'avion à la physique à cette
+   vitesse, nez à plat sur l'axe.
+2. **Montée** (`Takeoff_Phase1_ClimbOut_12472`) : aérofrein rentré, plein PC, volets sortis ; tenue
+   d'assiette `climb_pitch` (`AI_PitchAttitudeHold_126CC` : `manche = borne((consigne − assiette) ×
+   pitch_gain / 8, ± pitch_gain)`, tronqué à l'entier) jusqu'à **300 m au-dessus du sol**, puis cran 5 (MIL).
+3. **Train et volets rentrés** (`Takeoff_Phase2_GearFlapsUp_125C2`).
+4. **Mise en palier** (`Takeoff_Phase3_LevelOff_125EC`) : MIL ; si l'assiette dépasse 17° : manche plein
+   piqué (−16) ; sinon manche +8 et fin au tick suivant.
+
+Complétion (`Goal_IsComplete`) : l'objet de type `0x11` reste en `entité+0x15`, donc l'ordre n'est pas
+relancé.
+
+### C. Chunk `LAND` (`REAL/OBJT/JETP/LAND`, lu par `LandingBehavior_Start_75746`)
+
+| # | Type | Champ | Défaut | Rôle |
+|---|---|---|---|---|
+| 0 | word | `approach_speed` | 200 | vitesse d'approche et de toucher, m/s |
+| 1 | dword | — | `0x64` brut | **jamais relu** |
+| 2 | word | `aim_height` | 6 | hauteur du point visé au-dessus du point de toucher, m |
+| 3 | word | `pitch_steps` | 20 | borne du compteur d'assiette (1°/tick) |
+
+### D. Atterrissage (`ovr230`)
+
+L'ordre résout **deux spots** (`MissionScript_CallNativeHandler_52513`) : le 2ᵉ opérande de
+l'instruction donne le **point de toucher** (`entité+0x11F`), le 1ᵉʳ le **point d'approche**
+(`entité+0x12B`) (`Goal_SetObjective_A307`). Au démarrage : **l'IA est téléportée au point
+d'approche** ; le joueur est refusé si le composant `LANDGEAR` est endommagé (« Landing Gear Damaged »)
+ou si `UIScreen_RenderOrLayoutList_54503` refuse (condition non tracée).
+1. **Mise en place** (`Landing_Phase1_SetupApproach_75D51`) : cible = toucher + `aim_height` ; vitesse
+   physique 0, mode cinématique, train sorti ; ailes et nez à plat sur l'axe de piste (axial) ;
+   durée = distance / `approach_speed`. Joueur : d'abord replacé à 500 m avant le toucher
+   (`Landing_PlacePlayerOnFinal_75AA6`), caméra `LANDING`.
+2. **Approche** (`Landing_Phase2_Approach_76325`) : ligne droite départ → cible à `approach_speed` ;
+   facteur de charge affiché 1,0 ; le nez tourne de +1° par tick tant que le compteur (−1 par tick) ne
+   passe pas sous `pitch_steps`.
+3. **Toucher et roulage** (`Landing_Phase3_TouchdownRoll_765B2`) : posé sur la cible, roule sur l'axe à
+   `approach_speed` ; le nez revient de 1° par tick jusqu'à `pitch_steps / 6` ; puis orientation à plat
+   (joueur : événement de script d'atterrissage).
+4. **Freinage** (`Landing_Phase4_Braking_76C09`) : `vitesse = ent(approach_speed) − 2 × ent(t)`
+   (secondes entières, par paliers), jusqu'à 0.
+5. **Arrêt** (`Landing_Phase5_Stop_76E67`) : vitesse 0, posé sur le terrain, volets rentrés, moteur
+   coupé (cran `0xFF`) ; joueur : drapeau « posé » (`byte_706AF`) ; IA : fin.
+
+### E. Ce que fait le portage aujourd'hui
+
+`SCMissionActors::takeOff` : montée pilotée de 1000 m (`target_climb`), terminée à 10 m près.
+`SCMissionActors::land` : vol vers le spot, terminé à 2 km. `RSEntity::parseREAL_OBJT_JETP_TOFF` et
+`..._LAND` sont vides. `SCProg` ne transmet qu'un argument à `OP_SET_OBJ_LAND` (l'original en utilise
+deux). À porter avec le mode cinématique de `SCPlane` (`kinematic_mode`, déjà utilisé par le pilote
+automatique) et `SCPilot` pour la tenue d'assiette.
+
+### F. Fait le 2026-09-26 (syntaxe vérifiée, à valider en jeu)
+
+- `RSEntity` lit `TOFF` (`takeoff_roll_accel`, `takeoff_rotate_speed`, `takeoff_climb_pitch`,
+  `takeoff_pitch_gain`) et `LAND` (`landing_speed`, `landing_unused`, `landing_aim_height`,
+  `landing_pitch_steps`), avec les valeurs par défaut de l'original.
+- `SCProg` : l'ordre `OP_SET_OBJ_LAND` prend son 2ᵉ spot dans l'instruction `OP_SPOT_DATA` (opcode 9)
+  qui le suit, comme `Expr_VM_ReadNextToken_50F85` → `SCMissionActors::current_command_arg2`
+  (`0xFF` si absent : repli sur l'ancien `SCMissionActors::land`).
+- `PlaneKinematicEvent` peut placer l'avion (`set_position`) ; `SCPilot` a un mode « opérations au
+  sol » (`BeginGroundOps`, `CmdGroundControls`, `CmdKinematic`, `CmdPlaceAt`) qui court-circuite les
+  automatismes de `FlyTo` (gaz coupés au sol, train rentré en vol, anti-décrochage).
+- `SCAIBrain::takeoffOrder` et `SCAIBrain::landingOrder` (dans `SCAIBrain.cpp`) reproduisent les phases
+  B et D. Comme dans `AI_TopLevelThink`, le comportement n'avance que par `executeGoalAction()` : au sol
+  toujours, en vol seulement si le `GOAL` contient 2 (sinon l'avion garde son dernier manche, nez vers le
+  ciel, observé par Rémi avec `GOAL = 5, 1`). Menaces sautées en `0xA1`/`0xA2` ; réflexes et esquive sautés
+  tant qu'un comportement est en cours ; l'entrée en combat contre un attaquant reste active. Le cerveau
+  tourne à 25 Hz : « 1° par tick » est repris tel quel.
+- Tracé le 2026-09-26 (plus d'approximation) : spot absent → (0, 0, 0) (`Player_ResolveAttachPointN_5305A`) ;
+  après décollage ou atterrissage, un nouvel ordre du même type est aussitôt accompli (l'objet reste en
+  `entité+0x15` / `+0x11`) ; l'avion atterri reste en mode cinématique (`+0x59` jamais remis à 0).
+- **Indéfini dans l'original** : sur une piste non axiale, le cap (`+0x58` / `+0x9F`) n'est jamais écrit et
+  l'allocateur (`PagedResourceB_Write_5D555`) ne met pas la mémoire à zéro → valeur résiduelle du tas. Le
+  portage suit l'axe du nez et l'écrit dans le log : **décision de Rémi à prendre**.
+- **Convention de sol à trancher** : l'original pose l'avion arrêté à `terrain + Aircraft_GroundClearance_3E5A6`
+  (4,81 m à plat, 3 points de contact), la même garde que `PhysicsTicks` utilise pour le drapeau « au sol ».
+  `SCJetpPlane` met l'origine au niveau du terrain (contact à +0,5 m) ; l'atterrissage suit pour l'instant
+  cette convention du portage. Porter la garde au sol concerne toute la physique au sol.
+
+## 12. [P1] Vol en formation (ordre `0xAA`) — relu et porté le 2026-09-27
+
+Chaîne : `Goal_ExecuteAction_A8AC` (`0xAA`) → `Goal_SelectTransition` → `Goal_FollowAllyExec` →
+`Formation_GuidanceSolution` (+ `Goal_FollowAllyFormation` pour le poste). Hors formation :
+`Goal_FollowWaypoints` (rejointe). Détail des formules dans les résumés de `known_functions.json`.
+
+- **La formation est cinématique** : pendant qu'elle est tenue, l'objet monde de l'ailier a `+0x59 = 1`, que
+  `WorldObject_UpdateWithAIEntity_3D9FB` traite comme « physique suspendue ». L'ailier reçoit sa vitesse et son
+  orientation (nez du leader, roulis lissé sur 4 s) ; il reprend le cran de gaz du leader.
+- **Entrée** : à moins de 4 × |poste| du poste, nez à moins de 15° de celui du leader. **Sortie** : au-delà.
+- **Rejointe** : poursuite du leader (ID 7, le poste n'est pas relu) si le leader est à plus de 333 m du sol,
+  sinon pilote automatique (ID 21) vers un point 1000 m au-dessus du leader.
+- **Poste** : (côté, avant, haut) de l'entrée `PART` de l'ailier (mots 48/50/52, posés par l'ordre), ou `NUMS`
+  par défaut ; poste fixe (300, −200, 50) m pour un ailier du camp du joueur sans adversaire actif, sauf voix 9.
+- **Leader IA** : l'ailier engage la cible du leader en combat, ou le tireur d'un missile qui le vise.
+- **Ennemi dans les six heures du joueur** (`word_722EE`) : détecté par l'ennemi lui-même (`AI_SelectWeaponMask_9665`),
+  décalé d'un cycle (`RadioFlags_ShiftHistory`) ; un ailier discipliné en formation l'engage (radio `0x10`).
+
+**Fait dans le portage** (syntaxe vérifiée, à valider en jeu) : `SCAIBrain::followAllyOrder` (réécrit),
+`followAllyExec`, `formationGuidance`, `formationSlot`, `followWaypoints`, `escortQueryLeader`, `followLeader`,
+`navigateWithVelocity` ; `SCProg` résout l'allié par défaut et le poste depuis `PART` ; `SCMission` décale la
+détection « six heures » à chaque cycle IA ; `selectWeaponMask` la pose. Corrigé au passage : le minuteur de
+l'ID 7 (`applyManeuver`) testait l'inverse de l'original.
+
+**Choix délibéré** : pendant la formation, l'original appelle aussi `Goal_FollowWaypoints` ; ses commandes sont
+sans effet puisque la physique est suspendue, mais elles laissent un comportement en cours (ID 7 ou ID 21), qui
+bloque les réflexes et l'esquive. Le portage ne l'appelle pas pendant la formation (ses commandes passeraient par
+le pilote automatique cinématique et écraseraient la formation) et compte la formation comme un comportement en
+cours dans `tick()` ; la rejointe reprend dès la sortie.
+
+**Non tracé / non porté** :
+- `+0x15B = 0x12` (branche « six heures ») et `+0x160`/`+0x162` (horloge d'engagement de l'état 3) : rôle inconnu.
+- `byte_6E33B` (étape 2 de `Goal_SelectTransition`) et `Escort_LeaderSuccession` (état 3 contre un avion).
+- Carburant : l'original ne consomme pas pendant la physique suspendue ; `SCJetpPlane` consomme en mode cinématique.
+- `Goal_SetObjective_A307` remet l'état d'ailier `+0x149` à 0 à chaque ordre `0xAA` ; le portage ne le fait pas
+  tant que la réexécution des ordres par le script n'est pas tracée.
+
+## §13 Ordres WAIT (0xA0), FLY_TO_WP (0xA5), FLY_TO_AREA (0xA6), DEFEND_AREA (0xA9) — tracés et portés (2026-09-27)
+
+**Contexte de la VM** (`Expr_VM_ExecuteSingleInstruction_51E7E`) : contexte local sur la pile, recréé à chaque exécution
+du script ; `taskState` (`[ctx+0x0E]`) démarre à 0. `0x46` saute si `taskState != 0`, `0x47` si `== 0`. L'opcode 2
+empile dans le MÊME contexte (un sous-programme partage donc le `taskState`). Objet de mission `[ctx+0x12]` : la PART,
+ou 0 pour les scripts de scène (`Scene_*`, appel avec `push large 0`).
+
+**WAIT 0xA0** (`Expr_VM_Interpreter_51106`, loc_51C25) : `taskState = 1` ; minuteur = objet+0x3A (PART), ou le
+global `dword_706B0` pour une scène (remis à 0 au tout premier WAIT, `byte_706B4`). Minuteur nul → chargé à
+param1 secondes (`movsx`, `shl 8`), reste en cours ; sinon `-= dt` (`dword_70458`) ; `<= 0` → minuteur 0,
+`taskState = 0`. Ne touche PAS l'ordre de l'entité (pas d'appel natif). `Shared_TriggerExprInstruction_5247D`
+remet objet+0x3A à 0 à l'activation de la PART. Données : 19 WAIT dans des scripts IA/NULL, 6 dans des scripts de
+scène (ex. `A0:60 46:65 94:19 08:65`), STRIBASE en enchaîne plusieurs. → à porter dans `SCProg` (pas dans le brain),
+avec un minuteur par acteur et un minuteur de mission pour les scènes.
+
+**FLY_TO_AREA 0xA6** : dans la table de la VM, 0xA6 → cas par défaut (loc_51C94) : **aucun effet**, `taskState`
+inchangé. Données : les 48 usages sont dans les scripts du **joueur** uniquement.
+
+**FLY_TO_WP 0xA5** : VM → `MissionScript_CallNativeHandler_52513` (même cas que 0xA4) → `Goal_SetObjective_A307` :
++0x11F = spot[param1] (position monde), +0x12B = spot[param2] (opcode 9 suivant ; absent → index 0xFFFF →
+(0,0,0) par `Player_ResolveAttachPointN_5305A`). Données : les 121 usages sans opcode 9 sont tous du **joueur** ;
+les 80 usages IA ont tous un opcode 9, dont le spot est un **vecteur vitesse** (zone 0xFFFF) : (0,100,0), (0,150,0),
+(0,120,0), (100,0,0) m/s = vitesse ET cap d'arrivée voulus au point. Exécution `Goal_ReturnToBase` (sub_B331) :
+comportement en cours → son tick ; sinon bloc de commandes P = +0x11F, drapeau atteint +0x1A = 0, W = +0x12B (0xA4/0xA5 ;
+autres codes : direction vers P × +0x141), puis nœud ID21 (+0xD1). Fin (`Goal_IsComplete`) : distance
+**horizontale** ≤ 500 m (`cmp 1F400h`, composante altitude mise à 0).
+
+**Nœud ID21** (navigation au pilote automatique) : durée = scalaire du contexte : **2 s** (`0x200`) pour
+`AI_NavSolutionToPoint` et `Goal_ReturnToBase`, **30 s** (`0x1E00`) pour `Goal_WanderRandom`. Fin quand minuteur < 0
+ou 'point atteint'. S'empile comme comportement en cours ; tant qu'il tourne, `AI_NavSolutionToPoint` renvoie 0 sans
+rien faire. L'abandon (`NotifiableRef_DetachTarget_75661`) appelle `AIEntity_OnBehaviorEnded_A1DF`, qui coupe le pilote
+automatique (JDYN+0x68 = 0xFF) : couper la nav quand elle n'est plus demandée est donc conforme (corrigé 2026-09-28).
+
+**DEFEND_AREA 0xA9** : Goal_SetObjective : +0x10F = nul, +0x111 = spot[param1]. `Goal_IsComplete` : « actif »
+seulement si le camp adverse n'a plus d'unité vivante (camp 1 : `word_706A7 − word_706A9` ; sinon
+`word_706A3 − word_706A5` ; A3/A7 = PART activées camp 1/0xFF, A5/A9 = détruites). Sinon `Goal_ExecuteAction`
+renvoie 0 (GOAL suivant) et efface le verrou bit 5 de +0x28B. Actif (même code que DEFEND_TARGET 0xA8, loc_A9DB) :
+camp 0xFF → `byte_6E4C5 = 1` (non tracé) ; `AI_NavSolutionToPoint` ; s'il ne navigue pas :
+`AI_BehaviorStateMachine_WeightedOptionSelector_9D05(entité, 0)` ; s'il renvoie 0 : `Goal_WanderRandom`.
+Données : 20 usages (PUNK*, camp 0xFF) → en pratique inactif tant que le joueur vit.
+
+**`AI_NavSolutionToPoint`** (relu) : comportement en cours → renvoie 0. Point = position de +0x10F si non nul,
+sinon +0x111 ; altitude du point = **terrain sous MON avion + +0x13D** ; d = distance 3D ; si `+0x139·256 < d` :
+W = direction 3D normalisée × +0x141, bloc P/W, ID21 (2 s), renvoie 1 ; sinon 0. Valeurs initiales (ovr228) :
++0x111 = (0,0,1000 m), +0x139 = 30000 m (entier), +0x13D = 2000 m, +0x141 = 250 m/s ; modifiées par 0xAC/0xB1/0xB2
+(1–2 usages chacun dans les données).
+
+**`Goal_WanderRandom`** (relu ; = gestionnaire GOAL 3, `off_6D198`) : comportement en cours → son tick. Sinon, si
+le dernier comportement terminé (+0x19) est l'ID21 (0x15) et que le point n'a pas été atteint (+0x1A == 0) : réapplique
+l'ID21 avec le même bloc. Sinon : dir = normalise(rand()%20000 − 10000, rand()%20000 − 10000, 0) ; P = moi +
+dir·30000 m, altitude = moi + borne(terrain sous moi + +0x13D − mon altitude, ±1000 m) ; W = dir × +0x141 ;
++0x11F = P ; ID21 **30 s**. Renvoie toujours 1. Le `tryWanderRandom` actuel du port (spot au hasard, force
+FLY_TO_WP) et `wander()` (direction simple) ne correspondent pas à l'original.
+
+**Portage (libRealSpace)** :
+- `SCProg` : `task_state` par exécution (partagé avec un sous-programme), lu par 0x46 ; WAIT avec
+  `SCMissionActors::wait_timer` (remis à 0 à l'activation) ou `SCMission::scene_wait_timer` (scripts de scène,
+  `scene_script`) ; FLY_TO_WP lit l'opcode 9 suivant dans `current_command_arg2` ; 0xA6 ignoré pour l'IA
+  (`SCMissionActors::setObjective`), le joueur garde son chemin.
+- `SCAIBrain` : nœud ID21 = `applyNavigation` / `tickNavigation` (minuteur 2 s ou 30 s, fin sur 'point atteint'),
+  écrit `pilot->target_waypoint` (affiché par DebugStrike) ; `behaviorRunning` / `tickBehavior` = entité+0x0D ;
+  `navSolutionToPoint` ; `flyToWaypointOrder` (0xA5) ; `defendAreaOrder` (0xA9) et `defendTargetOrder` (0xA8)
+  via `defendExec` ; `wander()` = `Goal_WanderRandom`, aussi gestionnaire GOAL 3 (`tryWanderRandom`) ;
+  `Goal_FollowWaypoints` utilise le même nœud ID21.
+- Non porté : `byte_6E4C5` (drapeau radio décalé par `RadioFlags_ShiftHistory` vers `byte_6E4D3`, posé par
+  0xA7/0xA8/0xA9/0xAC en camp 0xFF) ; opcodes 0xAC/0xB1/0xB2 (rayon/altitude/vitesse de navigation).
+
+## §14 Fin de comportement : `AIEntity_OnBehaviorEnded_A1DF` (lu et porté 2026-09-28)
+
+Méthode +0x1C de l'entité IA, appelée par `Behavior_PopFinished_75612` (fin normale, argument 1, seulement si
+aucun comportement précédent n'est à restaurer) et `NotifiableRef_DetachTarget_75661` (abandon, argument 0).
+Effets, dans l'ordre : train rentré (flags_75 bit2 = 0) ; commandes volets/aérofrein recopiées de l'état
+courant ; pilote automatique coupé (JDYN+0x68 = 0xFF) ; si argument : `Targeting_AcquireBestThreat(entité, 0)` ;
+si mode formation (bit 3 de +0x28B) et niveau de réaction +0x27F non nul : `Goal_FollowAllyExec` ; physique
+reprise (objet +0x59 = 0).
+
+**Portage** : `SCAIBrain::onBehaviorEnded(bool finished)` (train rentré `CmdGearUp`, pilote automatique coupé,
+recherche de cible si fin normale, `followAllyExec` en formation avec réaction, `CmdKinematic(false)` = physique
+reprise). Le port n'a pas de pile de comportements : une fin normale est toujours « pile vide » (argument 1).
+Appels : fin normale = navigation ID21 terminée (point atteint ou minuteur), fin naturelle d'une manœuvre
+(`endManeuver(true)`), décollage/atterrissage terminé (`endGroundOp`), attaque au sol finie (arme larguée
+disparue, plus d'arme : `resetGroundAttack(true)`) ; abandon = tous les autres `endManeuver(false)`,
+`resetGroundAttack(false)` (si une attaque était en cours) et `stopNavigation` d'une navigation ID21. L'attaque
+au sol lancée comme manœuvre 19 ne notifie qu'une fois, par `endManeuver`.
+
+## §15 Structure de `SCAIBrain` (refonte du 2026-09-28)
+
+- `tick()` = `AIEntity_MasterTick_5ACC` : `updateTimers()` puis, pilote non éjecté, `topLevelThink()` ; pilote
+  éjecté : `followAllyExec` en mode formation, sinon abandon du comportement en cours (`AI_TriggerBehaviorUpdate`).
+- `topLevelThink()` = `AI_TopLevelThink`, étapes du §3 d'AI_TICK_CALL_GRAPH.md : ciblage sur tir de missile,
+  alerte de menace, réflexes (sans comportement en cours), réactions prioritaires (esquive, entrée en combat),
+  comportement en cours pendant une réaction, puis GOAL (`runGoalSelectors` : 2 `executeGoalAction`,
+  3 `wander`, 4 `combatStep`, 5 `moraleReaction`).
+- Comportement en cours = pile `behaviors` (`entité+0x0D`) : `pushBehavior` (`Behavior_PushRunning_756A4`),
+  `endBehavior(kind, true)` (`Behavior_PopFinished_75612`), `endBehavior(kind, false)` / `abandonBehavior`
+  (`NotifiableRef_DetachTarget_75661`, pile vidée), `tickBehavior` (méthode +0xC du sommet). Types : manœuvre
+  MVRS, navigation ID21, attaque au sol ID19, décollage, atterrissage. Plus aucun arrêt « non touché ce tick ».
+- État regroupé : `RetargetClock retarget` (+0x174..0x179), `ManeuverState maneuver`, `NavigationState nav`
+  (+0x10F..0x141, bloc ID21), `GroundAttackState ground` (ID19), `GroundOpsState ground_ops`,
+  `FormationState formation`, `MoodState mood`.
+- Fuites (`Goal_MoraleReaction_878F`) : navigation ID21 de 2 s, W = (250, 100, 0) (ennemi, puis `returnToBase`)
+  ou (250, 0, 0) (ailier qui quitte le combat) ; plus de navigation continue.
+- Ordres radio acceptés : exécutés dans `SCMissionActors::onAIRefresh`, avant le tick du cerveau.
+
+## §16 DEFEND_TARGET et l'étape 3 de `AI_TopLevelThink` (2026-10-02)
+
+- L'étape 3 n'est pas une recherche de cible : `AI_ScanCollisionThreats_DF99` parcourt tous les avions (amis compris)
+  et `AI_CollisionCourseTest_DD21` détecte une collision (distance < 80 m, ou passage à moins de 80 m dans les 4 s) ;
+  si oui, `AI_ProximityGeometricWarning_315B` (nœud ID20) et niveau de réaction 3. **Non porté** ; `REACT_NEW_TARGET`
+  (= 3) est un nom faux (évitement de collision).
+- DEFEND_TARGET (`Goal_ExecuteAction_A8AC`, 0xA8) n'a donc pas d'autre mécanisme que : navigation vers l'allié au-delà
+  de 30 km, sinon combat (meilleure menace parmi tous les ennemis), sinon errance de 30 s. Aucune priorité pour
+  l'attaquant de l'allié.
+- Corrigé dans le port : `missile_threat` (+0x281) se vide quand le missile est retiré du monde
+  (`SCMission::onWeaponRemoved`, appelé par SCPlane, SCJdynPlane, SCJetpPlane et les SWPN), comme une référence
+  `SetReference` de l'original. Avant, il restait posé (pointeur invalide pour les missiles SAM détruits) et
+  bridait la recherche de cible du combat à la fenêtre lente.
+
+## §17 Ordres DESTROY/DEFEND, entrée en combat, ciblage, évitement de collision (porté 2026-10-02)
+
+- `destroyTargetOrder` : cible aérienne → combat, puis **renvoie true** (Goal_ExecuteAction 0xA7 renvoie le
+  résultat de `Goal_IsComplete`, pas celui du combat). Avant, un combat sans cible retenue laissait la main au GOAL
+  suivant (errance de 30 s) : l'IA « perdait » sa cible de mission.
+- `engageAttackerReaction` : 4b seulement pour un chasseur (`RSEntity::combat_class`, JINF +0x52 >= 9), abandon de
+  la navigation ID21 au sommet de la pile, combat, renvoie true ; 4c (non chasseur, rien en cours, sans ordre ou
+  FLY_TO_WP) : point « atteint », ordre verrouillé, errance.
+- Ciblage : bonus dernier attaquant `last_attacker` (+0x289 : aptitude +3, B +5), cible désignée `engage_target`
+  (+0x285 : A +10, aptitude +5 ; posée en 4a, état 3 du suivi), bit 1 de +0x28B `escort_leader_free` (posé sur le
+  leader par `escortQueryLeader`, effacé en fin de tick ; remplace `fire_control_active`, jamais écrit).
+- Évitement de collision (étape 3, niveau `REACT_COLLISION` = 3, ex-`REACT_NEW_TARGET`) : `scanCollisionThreats`
+  / `collisionCourse` ; manœuvre 20 = jambe ID20 de 2 s, plein gaz, direction `-(a × b)` (a = moi − lui,
+  b = sa vitesse × 4 s), repli (5, 5, 1000) asm. Les réflexes de l'étape 3 terminent le tick s'ils réagissent.
+- Classe (porté) : un avion ne prend de cible aérienne que si sa classe est >= 6, et jamais un avion dont le pilote
+  s'est éjecté ; score d'un avion candidat de classe c (la mienne m, référence 6) : c <= 6 → B = 0, sinon A et
+  aptitude += (c − 2 <= m ? c − 6 : m − c).
+- Non porté : règle de camp de l'original (candidat ennemi si son camp == −le mien : 1 contre 0xFF, et neutre (0)
+  contre neutre) ; le port prend tout camp différent du sien.
+
+## §18 Validation sur log MiG-21 / STERN / C-130 (2026-10-02)
+
+- **Cible de mission posée trop tard** : `owner->target` (+0x137) n'était posé que par `destroyTargetOrder` (GOAL 2),
+  après les recherches de cible des étapes 1 à 4 du tick ; la première cible aérienne était choisie sans le bonus
+  de cible de mission, puis gardée. Corrigé : posé par `SCMissionActors::setObjective` dès l'ordre 0xA7/0xA8
+  (`Goal_SetObjective_A307`) ; cible nulle = ordre terminé (Goal_IsComplete 0xA7).
+- **Comportement en cours avant le combat dans l'ordre 0xA7 : conforme** (`cmp dword ptr es:[bx+0Dh], 0 / jmp
+  loc_A938` avant `AI_BehaviorStateMachine_WeightedOptionSelector_9D05`) ; ID7 s'empile bien
+  (`MVRS_ID7_ApplyFuelGatedTimer_10AF2` → `VROOMM_StubThunk_6AB4F` → `Behavior_PushRunning_756A4`). Le tir
+  (`AI_BehaviorSelector`, un seul appelant : le combat) n'est donc testé qu'entre deux manœuvres.
+- **Loi de manette** : `AI_ThrottleController_6250` portée (cran proportionnel à l'écart de vitesse) à la place des
+  trois crans 10/2/5. Le cran −1 est borné à 0 par `SCPilot::CmdThrottle` (sens de −1 non tracé).
+- **Porté** : `AI_InterceptDispatcher` (`interceptDispatcher`) avec `AI_InterceptSpeedControlLaw`
+  (`interceptSpeed`, `referenceSpeed` = dword_72039) et `AI_GunSnapAim_6977` (`gunSnap` : l'avion est réorienté
+  sur la cible quand l'erreur de visée est sous la fenêtre, à moins de 1800 m, si le jet AA réussit ; publié par
+  `PlaneAttitudeEvent`) ; tick ID7 réécrit d'après `MVRS_ID7_TickPursuit_10BD9` (la manœuvre se termine quand le
+  recalage a eu lieu → le combat tire ; angle du mode 2 = angle(D, vitesse cible), pas l'aspect).
+- **Guidage** : `SCPilot::guidanceSolution` prend le **nez** comme référence (AI_GuidanceCmd_FromOwnPos, et
+  AI_Sensor_WeaponVelocityCache = nez pour canon et missiles), plus la vitesse ; renvoie vrai si aligné.
+- **Bug d'origine porté tel quel** : en mode bit 4 d'ID7, la position absolue mémorisée (cible + vitesse × 4 s) est
+  passée comme direction de guidage.
+- Ciblage : test « cible nettement sous moi » (avions et missiles) et bonus « le tireur du missile est ma cible »
+  (aptitude +4) portés.
+
+## §19 Ordres du script : pas de pile, un verrou (2026-10-03)
+
+- `Expr_VM_Interpreter_51106` relit le script depuis le début à chaque frame (curseur remis à 0 par
+  `Expr_VM_ExecuteSingleInstruction_51E7E`). Chaque `SET_OBJ_*` appelle `Goal_SetObjective_A307`, qui
+  écrase l'ordre unique +0x11D. Exemple MISN-1A, Stern (PROG 3) : `FOLLOW_ALLY(joueur)` puis, selon les
+  zones du joueur, `DEFEND_TARGET(C-130)` à chaque passe — voulu par la mission.
+- Verrou = bit 5 de +0x28B : `Goal_SetObjective_A307` ne pose rien et renvoie 1 (en cours). Posé par
+  `Goal_SelectTransition` (états d'ailier 2 et 3), `Goal_TransferToWingman`, `AI_MessageDispatcher`,
+  `Goal_MoraleReaction_878F` ; effacé par `Goal_ExecuteAction_A8AC` en fin d'ordre.
+- Retour = 1 si verrouillé, sinon `Goal_IsComplete_A6D3` du nouvel état ; c'est l'état lu par
+  `GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` (0x46). Port : `setObjective` renvoie ce booléen, `SCProg` l'utilise.
+- 0xAA remet l'état d'ailier +0x149 à 0 ; queue commune : ordre ≠ 0xAA et formation tenue →
+  `Goal_FollowAllyExec` (sortie de formation). Port : `SCAIBrain::onObjectiveSet`.
+- +0x137 (cible de mission) n'est jamais réécrit par le combat (cible aérienne = +0x287). Supprimé du port :
+  `owner->target = air_target` dans `combatStep`, la remise `actors[arg]` dans `destroyTargetOrder`,
+  l'effacement de cible du cas DEFEND de `SCProg`.
+- MISN-1A : MiG#5 → `DESTROY(C-130)` (puis joueur une fois le C-130 détruit), MiG#6 → `DESTROY(STERN)`,
+  MiG#7 → `DESTROY(joueur)`.
+
+## §20 `AI_BehaviorSelector` porté (2026-10-03)
+
+- `SCAIBrain::behaviorSelector()` traduit `AI_BehaviorSelector` (détail dans `known_functions.json`) ;
+  `SCAIBrain::weaponRecoveryBusy()` traduit `AI_WeaponRecoveryBusy_9027` (ex-`AI_RadarScanTarget`).
+- `combatStep` (étape 4) abandonne le comportement en cours si le sélecteur agit (gâchette ou q > 0).
+- Fin de `topLevelThink` : continuation de rafale de canon quand le sélecteur n'est pas passé ce tick
+  (`loc_850B`, bit 2 de +0x28B effacé en tête de `AI_TriggerBehaviorUpdate`).
+- Supprimés : `updateFireControl`, `updatePursuit` (poursuite anticipée inventée), le calcul d'arme et de
+  qualité dans `updateTimers`. La poursuite est pure : `CmdGuidance(cible − moi)`, référence le nez.
+- Bug de l'original porté : pendant le délai d'après tir, la qualité n'est pas calculée et le registre
+  garde une valeur positive de l'appelant → l'IA continue la poursuite (q = 1 dans le port).
+- Non porté : `byte_6E4C0` (missile tiré sur le joueur) et le message radio 0x20 sous `byte_6E33B`
+  (globaux non tracés).

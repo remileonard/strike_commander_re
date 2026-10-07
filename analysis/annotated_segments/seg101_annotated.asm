@@ -434,11 +434,11 @@ Physics_ResolveWindVectorCached_4643B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,117L — met à l'échelle un vecteur de force (+8/0xC/0x10) par un scalaire (arg_6),
-; l'ajoute à une position de référence (+0x2, +0x12) : application pondérée d'une force à un
-; point d'application (moment/couple).
+; far, LUE 2026-10-02. (sortie, corps, &echelle) : position monde de l'objet du corps (corps+2
+; -> +0x12) + vitesse du corps (+8/+0x0C/+0x10) x echelle. Position predite absolue (ex. a 4
+; s).
 ; ==============================================================================================
-Physics_ApplyForceAtPoint	proc far		; CODE XREF: AI_VisibilityTest+6EP
+Physics_ApplyForceAtPoint	proc far		; CODE XREF: AI_CollisionCourseTest_DD21+6EP
 					; MVRS_BuildCombatContext_E5A4+182P ...
 
 var_18		= dword	ptr -18h

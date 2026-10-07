@@ -1308,7 +1308,7 @@ AI_Sensor_IndicatedAirspeed_5861	endp
 ; mis en cache dans entite+0xFA (drapeau bit 4 de entite+0x28C).
 ; ==============================================================================================
 AI_Sensor_RollAngle_58F4	proc far		; CODE XREF: AI_NoseHighRecovery_676F+8Ap
-					; AI_ManeuverSolution_Major+45Ep ...
+					; AI_GunSnapAim_6977+45Ep ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -1532,7 +1532,11 @@ loc_5ABA:				; CODE XREF: seg003:0ADEj
 ; tiree de ces noms dans ce resume est a relire. Etape (3) precisee 2026-09-25 : horloge
 ; +0x175 += dt ; si b0 de +0x174 : b0 = b1 = ((t & M) == 0) ; si b2 : b2 = b3 = ((t & (M>>1))
 ; == 0), t = secondes entieres, M = +0x179 (fenetres de AI_RetargetWindowSlow_A288 /
-; AI_RetargetWindowFast_A2BD).
+; AI_RetargetWindowFast_A2BD). | PRECISION 2026-09-28 (etape 6) : le court-circuit vers
+; Goal_FollowAllyExec exige le bit 3 de +0x28B (mode formation) ET flags_75 bit 5 de l'avion
+; (+0x0B) = PILOTE EJECTE ; sinon AI_TriggerBehaviorUpdate, qui lance AI_TopLevelThink si bit
+; 7 de +0x28B et pilote non ejecte, et sinon abandonne le comportement en cours
+; (VROOMM_StubThunk_6AB54 = NotifiableRef_DetachTarget_75661).
 ; ==============================================================================================
 AIEntity_MasterTick_5ACC:				; DATA XREF: seg339:011Co
 		push	bp
@@ -1842,9 +1846,11 @@ loc_5E2E:				; CODE XREF: seg003:0EA0j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,51L — nettoie flag bit2 de +0x28B ; si bit7 de +0x28B et pas bit5 de +0x75, invoque
-; sub_814C (comportement IA) ; sinon si cible (+0xD) existe, appelle sub_6AB54 et notifie via
-; vtable[0] : déclencheur de mise à jour comportementale IA / notification d'état.
+; far, 51L, RELU 2026-09-28. Efface le bit 2 de +0x28B. Si bit 7 de +0x28B et pilote non
+; ejecte (flags_75 bit 5 de l'avion +0x0B nul) : AI_TopLevelThink. Sinon, si bit 7 et un
+; comportement en cours (+0x0D) : abandon (VROOMM_StubThunk_6AB54 ->
+; NotifiableRef_DetachTarget_75661) et octet +0x20 du sous-objet de l'avion remis a 0. Appelee
+; par AIEntity_MasterTick_5ACC hors cas 'formation et pilote ejecte'.
 ; ==============================================================================================
 AI_TriggerBehaviorUpdate	proc far		; CODE XREF: seg003:0E74p
 
@@ -1911,7 +1917,7 @@ AI_TriggerBehaviorUpdate	endp
 ; atan2(L.c0, L.c2) : le roulis qui amene D dans le plan 'nez-haut' de l'avion (portance vers
 ; la cible).
 ; ==============================================================================================
-AI_ComputeBearingToRef	proc far		; CODE XREF: AI_ManeuverSolution_Major+1B5p
+AI_ComputeBearingToRef	proc far		; CODE XREF: AI_GunSnapAim_6977+1B5p
 					; AI_GuidanceSolution_Major+528p ...
 
 var_24		= dword	ptr -24h
@@ -2021,14 +2027,11 @@ AI_ComputeBearingToRef	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,285L — LOI DE CONTROLE IA DE LA VITESSE (poursuite de cible). Objet pilote = arg_0 far
-; ptr ; JDYN = es:[arg_0+0x0B] (meme chemin que PhysicsTicks). Lit : jdyn[0x82] (u16, def 100)
-; = PLANCHER de la vitesse de consigne (var_4 = max(var_4, jdyn[0x82]<<8), L2044-2070) ;
-; jdyn[0x80] (u16, def 500) = PLAFOND / cible haute : quand la distance a la cible > arg_6,
-; interpole var_4 vers jdyn[0x80]<<8 (poids = dist_residuelle/3000, clamp 1.0, loc_610A) ou
-; plafonne a jdyn[0x80]<<8 (loc_61AB). Branche cible-proche (loc_61D0) : deceleration via
-; dword_72039. Resultat -> sub_6250 (AI_ThrottleController). CONFIRME : jdyn[0x80]/[0x82] =
-; vitesses IA max/min de poursuite, PAS des params de cellule.
+; far, 285L, LUE INTEGRALEMENT 2026-10-02. (entite, cible, seuil P en metres). vc = vitesse de
+; la cible (methode +0x4C) . mon nez, au moins JDYN+0x82 (min) ; L = |projection de (cible -
+; moi) sur mon nez| (Targeting_ComputeGeometryHelperB_5517F). L > P : si JDYN+0x80 (max) > vc,
+; vitesse = vc + min((L - P)/3000, 1) x (max - vc), sinon max ; L <= P : vitesse = (vc -
+; dword_72039) x L / P + dword_72039. Puis AI_ThrottleController (cran).
 ; ==============================================================================================
 AI_InterceptSpeedControlLaw	proc far		; CODE XREF: AI_InterceptSpeedCmd_HUD+Fp
 
@@ -2623,7 +2626,7 @@ loc_6456:				; CODE XREF: seg003:14CCj
 ; (alloue 12 octets si absent). Sert a AI_ComputeFireSolutionQuality_91DF pour mesurer
 ; l'erreur de visee du canon.
 ; ==============================================================================================
-AI_Sensor_WeaponVelocityCache	proc far		; CODE XREF: AI_ManeuverSolution_Major+23p AI_InterceptDispatcher+A5p ...
+AI_Sensor_WeaponVelocityCache	proc far		; CODE XREF: AI_GunSnapAim_6977+23p AI_InterceptDispatcher+A5p ...
 
 var_22		= dword	ptr -22h
 var_1E		= dword	ptr -1Eh
@@ -3260,12 +3263,20 @@ AI_RegainSpeed_68D4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,616L — fonction majeure : calcule le vecteur relatif cible-soi, sa magnitude
-; (sub_5828E), angles via sub_559BB/sub_552E1, et évalue une solution de manoeuvre complexe.
-; Vu la taille, candidat fort pour le calcul de solution de tir/interception ou d'évitement
-; complet — mérite une passe dédiée.
+; far, 616L, LUE INTEGRALEMENT 2026-10-02. Ex-'AI_ManeuverSolution_Major'. RECALAGE DE VISEE
+; (aide a la visee de l'IA). Appelee par AI_InterceptDispatcher et AI_BehaviorSelector. W =
+; AI_Sensor_WeaponVelocityCache (pour canon et missiles : le nez, loc_42E80 renvoyant un
+; vecteur nul) ; D = cible - moi, d = |D| ; e = elevation(D) - elevation(W), h = cap(D) -
+; cap(W) ; erreur = sqrt(e^2 + h^2). Jet : AA (+0xB6) >= 1 + 3 x Math_RandomScale(6). r =
+; AI_ComputeBearingToRef(D) ramene a +/-180 ; fenetre = 7 deg x cos(|r|/4), au moins 1 deg. Si
+; |h| et |e| < fenetre, d < dword_7201C (1800 m) et jet reussi : nez <- nez + D - W (= D),
+; Matrix_OrthonormalizeKeepRow1_57660, methode +0x40 de mon objet (L'AVION EST REORIENTE
+; DIRECTEMENT SUR LA CIBLE) ; roulis voulu = r si |h| > fenetre/2, sinon -roulis courant,
+; rapproche de JDYN+0x71/4 x dt (AI_RollToAngleCmd_8104, zone morte 5) ; manche de tangage et
+; +0x27 a 0 ; renvoie 1. Sinon renvoie 1 seulement si l'erreur est nulle (Math_ArcTan d'un
+; champ +0x20 de la cible calcule puis inutilise).
 ; ==============================================================================================
-AI_ManeuverSolution_Major	proc far		; CODE XREF: AI_InterceptDispatcher+8Dp AI_BehaviorSelector+EBP
+AI_GunSnapAim_6977	proc far		; CODE XREF: AI_InterceptDispatcher+8Dp AI_BehaviorSelector+EBP
 
 var_FC		= word ptr -0FCh
 var_F0		= dword	ptr -0F0h
@@ -3342,7 +3353,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_6F34
 ; ���������������������������������������������������������������������������
 
-loc_698E:				; CODE XREF: AI_ManeuverSolution_Major+12j
+loc_698E:				; CODE XREF: AI_GunSnapAim_6977+12j
 		push	di
 		push	large [bp+arg_0]
 		push	ss
@@ -3471,7 +3482,7 @@ loc_698E:				; CODE XREF: AI_ManeuverSolution_Major+12j
 		jl	short loc_6B15
 		mov	[bp+var_3F], 1
 
-loc_6B15:				; CODE XREF: AI_ManeuverSolution_Major+198j
+loc_6B15:				; CODE XREF: AI_GunSnapAim_6977+198j
 		mov	[bp+var_46], 700h
 		lea	ax, [bp+var_CC]
 		push	ax
@@ -3488,14 +3499,14 @@ loc_6B15:				; CODE XREF: AI_ManeuverSolution_Major+198j
 		jmp	short loc_6B5A
 ; ���������������������������������������������������������������������������
 
-loc_6B46:				; CODE XREF: AI_ManeuverSolution_Major+1C3j
+loc_6B46:				; CODE XREF: AI_GunSnapAim_6977+1C3j
 		cmp	[bp+var_4A], 0FFFF4C00h
 		jge	short loc_6B5A
 		add	[bp+var_4A], 16800h
 		jmp	short $+2
 
-loc_6B5A:				; CODE XREF: AI_ManeuverSolution_Major+1CDj
-					; AI_ManeuverSolution_Major+1D7j
+loc_6B5A:				; CODE XREF: AI_GunSnapAim_6977+1CDj
+					; AI_GunSnapAim_6977+1D7j
 		mov	eax, [bp+var_4A]
 		mov	[bp+var_4E], eax
 		sar	eax, 2
@@ -3507,7 +3518,7 @@ loc_6B5A:				; CODE XREF: AI_ManeuverSolution_Major+1CDj
 		jge	short loc_6B7E
 		neg	eax
 
-loc_6B7E:				; CODE XREF: AI_ManeuverSolution_Major+202j
+loc_6B7E:				; CODE XREF: AI_GunSnapAim_6977+202j
 		mov	[bp+var_4A], eax
 		lea	ax, [bp+var_4A]
 		push	ax
@@ -3527,23 +3538,23 @@ loc_6B7E:				; CODE XREF: AI_ManeuverSolution_Major+202j
 		jmp	short loc_6BB8
 ; ���������������������������������������������������������������������������
 
-loc_6BB6:				; CODE XREF: AI_ManeuverSolution_Major+238j
+loc_6BB6:				; CODE XREF: AI_GunSnapAim_6977+238j
 		xor	ax, ax
 
-loc_6BB8:				; CODE XREF: AI_ManeuverSolution_Major+23Dj
+loc_6BB8:				; CODE XREF: AI_GunSnapAim_6977+23Dj
 		or	al, al
 		jz	short loc_6BCC
 		mov	[bp+var_5E], 100h
 		mov	eax, [bp+var_5E]
 		mov	[bp+var_46], eax
 
-loc_6BCC:				; CODE XREF: AI_ManeuverSolution_Major+243j
+loc_6BCC:				; CODE XREF: AI_GunSnapAim_6977+243j
 		mov	eax, [bp+var_1E]
 		or	eax, eax
 		jge	short loc_6BD8
 		neg	eax
 
-loc_6BD8:				; CODE XREF: AI_ManeuverSolution_Major+25Cj
+loc_6BD8:				; CODE XREF: AI_GunSnapAim_6977+25Cj
 		mov	[bp+var_62], eax
 		mov	eax, [bp+var_62]
 		mov	[bp+var_66], eax
@@ -3553,22 +3564,22 @@ loc_6BD8:				; CODE XREF: AI_ManeuverSolution_Major+25Cj
 		jmp	short loc_6BF1
 ; ���������������������������������������������������������������������������
 
-loc_6BEF:				; CODE XREF: AI_ManeuverSolution_Major+271j
+loc_6BEF:				; CODE XREF: AI_GunSnapAim_6977+271j
 		xor	ax, ax
 
-loc_6BF1:				; CODE XREF: AI_ManeuverSolution_Major+276j
+loc_6BF1:				; CODE XREF: AI_GunSnapAim_6977+276j
 		or	al, al
 		jnz	short loc_6BF8
 		jmp	loc_6ED9
 ; ���������������������������������������������������������������������������
 
-loc_6BF8:				; CODE XREF: AI_ManeuverSolution_Major+27Cj
+loc_6BF8:				; CODE XREF: AI_GunSnapAim_6977+27Cj
 		mov	eax, [bp+var_E]
 		or	eax, eax
 		jge	short loc_6C04
 		neg	eax
 
-loc_6C04:				; CODE XREF: AI_ManeuverSolution_Major+288j
+loc_6C04:				; CODE XREF: AI_GunSnapAim_6977+288j
 		mov	[bp+var_6A], eax
 		mov	eax, [bp+var_6A]
 		mov	[bp+var_6E], eax
@@ -3578,16 +3589,16 @@ loc_6C04:				; CODE XREF: AI_ManeuverSolution_Major+288j
 		jmp	short loc_6C1D
 ; ���������������������������������������������������������������������������
 
-loc_6C1B:				; CODE XREF: AI_ManeuverSolution_Major+29Dj
+loc_6C1B:				; CODE XREF: AI_GunSnapAim_6977+29Dj
 		xor	ax, ax
 
-loc_6C1D:				; CODE XREF: AI_ManeuverSolution_Major+2A2j
+loc_6C1D:				; CODE XREF: AI_GunSnapAim_6977+2A2j
 		or	al, al
 		jnz	short loc_6C24
 		jmp	loc_6ED9
 ; ���������������������������������������������������������������������������
 
-loc_6C24:				; CODE XREF: AI_ManeuverSolution_Major+2A8j
+loc_6C24:				; CODE XREF: AI_GunSnapAim_6977+2A8j
 		mov	eax, [bp+var_6]
 		cmp	eax, dword_7201C
 		jge	short loc_6C34
@@ -3595,22 +3606,22 @@ loc_6C24:				; CODE XREF: AI_ManeuverSolution_Major+2A8j
 		jmp	short loc_6C36
 ; ���������������������������������������������������������������������������
 
-loc_6C34:				; CODE XREF: AI_ManeuverSolution_Major+2B6j
+loc_6C34:				; CODE XREF: AI_GunSnapAim_6977+2B6j
 		xor	ax, ax
 
-loc_6C36:				; CODE XREF: AI_ManeuverSolution_Major+2BBj
+loc_6C36:				; CODE XREF: AI_GunSnapAim_6977+2BBj
 		or	al, al
 		jnz	short loc_6C3D
 		jmp	loc_6ED9
 ; ���������������������������������������������������������������������������
 
-loc_6C3D:				; CODE XREF: AI_ManeuverSolution_Major+2C1j
+loc_6C3D:				; CODE XREF: AI_GunSnapAim_6977+2C1j
 		cmp	[bp+var_3F], 0
 		jnz	short loc_6C46
 		jmp	loc_6ED9
 ; ���������������������������������������������������������������������������
 
-loc_6C46:				; CODE XREF: AI_ManeuverSolution_Major+2CAj
+loc_6C46:				; CODE XREF: AI_GunSnapAim_6977+2CAj
 		lea	ax, [bp+var_C0]
 		push	ax
 		call	Vector_Normalize3D_559BB
@@ -3698,7 +3709,7 @@ loc_6C46:				; CODE XREF: AI_ManeuverSolution_Major+2CAj
 		jge	short loc_6D92
 		neg	eax
 
-loc_6D92:				; CODE XREF: AI_ManeuverSolution_Major+416j
+loc_6D92:				; CODE XREF: AI_GunSnapAim_6977+416j
 		mov	[bp+var_78], eax
 		mov	eax, [bp+var_78]
 		mov	[bp+var_7C], eax
@@ -3713,17 +3724,17 @@ loc_6D92:				; CODE XREF: AI_ManeuverSolution_Major+416j
 		jmp	short loc_6DC0
 ; ���������������������������������������������������������������������������
 
-loc_6DBE:				; CODE XREF: AI_ManeuverSolution_Major+440j
+loc_6DBE:				; CODE XREF: AI_GunSnapAim_6977+440j
 		xor	ax, ax
 
-loc_6DC0:				; CODE XREF: AI_ManeuverSolution_Major+445j
+loc_6DC0:				; CODE XREF: AI_GunSnapAim_6977+445j
 		or	al, al
 		jz	short loc_6DCA
 		mov	eax, [bp+var_4E]
 		jmp	short loc_6DED
 ; ���������������������������������������������������������������������������
 
-loc_6DCA:				; CODE XREF: AI_ManeuverSolution_Major+44Bj
+loc_6DCA:				; CODE XREF: AI_GunSnapAim_6977+44Bj
 		push	large [bp+arg_0]
 		push	ss
 		lea	ax, [bp+var_88]
@@ -3736,7 +3747,7 @@ loc_6DCA:				; CODE XREF: AI_ManeuverSolution_Major+44Bj
 		mov	[bp+var_8C], eax
 		mov	[bp+var_90], eax
 
-loc_6DED:				; CODE XREF: AI_ManeuverSolution_Major+451j
+loc_6DED:				; CODE XREF: AI_GunSnapAim_6977+451j
 		mov	[bp+var_74], eax
 		les	bx, [bp+arg_0]
 		mov	si, es:[bx+0Bh]
@@ -3755,7 +3766,7 @@ loc_6DED:				; CODE XREF: AI_ManeuverSolution_Major+451j
 		jge	short loc_6E2F
 		neg	eax
 
-loc_6E2F:				; CODE XREF: AI_ManeuverSolution_Major+4B3j
+loc_6E2F:				; CODE XREF: AI_GunSnapAim_6977+4B3j
 		mov	[bp+var_98], eax
 		mov	eax, [bp+var_98]
 		mov	[bp+var_9C], eax
@@ -3765,10 +3776,10 @@ loc_6E2F:				; CODE XREF: AI_ManeuverSolution_Major+4B3j
 		jmp	short loc_6E4C
 ; ���������������������������������������������������������������������������
 
-loc_6E4A:				; CODE XREF: AI_ManeuverSolution_Major+4CCj
+loc_6E4A:				; CODE XREF: AI_GunSnapAim_6977+4CCj
 		xor	ax, ax
 
-loc_6E4C:				; CODE XREF: AI_ManeuverSolution_Major+4D1j
+loc_6E4C:				; CODE XREF: AI_GunSnapAim_6977+4D1j
 		or	al, al
 		jz	short loc_6E57
 		push	5
@@ -3776,17 +3787,17 @@ loc_6E4C:				; CODE XREF: AI_ManeuverSolution_Major+4D1j
 		jmp	short loc_6E9D
 ; ���������������������������������������������������������������������������
 
-loc_6E57:				; CODE XREF: AI_ManeuverSolution_Major+4D7j
+loc_6E57:				; CODE XREF: AI_GunSnapAim_6977+4D7j
 		cmp	[bp+var_74], 0
 		jle	short loc_6E63
 		mov	ax, 1
 		jmp	short loc_6E65
 ; ���������������������������������������������������������������������������
 
-loc_6E63:				; CODE XREF: AI_ManeuverSolution_Major+4E5j
+loc_6E63:				; CODE XREF: AI_GunSnapAim_6977+4E5j
 		xor	ax, ax
 
-loc_6E65:				; CODE XREF: AI_ManeuverSolution_Major+4EAj
+loc_6E65:				; CODE XREF: AI_GunSnapAim_6977+4EAj
 		or	al, al
 		jz	short loc_6E84
 		push	5
@@ -3798,7 +3809,7 @@ loc_6E65:				; CODE XREF: AI_ManeuverSolution_Major+4EAj
 		jmp	short loc_6E9D
 ; ���������������������������������������������������������������������������
 
-loc_6E84:				; CODE XREF: AI_ManeuverSolution_Major+4F0j
+loc_6E84:				; CODE XREF: AI_GunSnapAim_6977+4F0j
 		push	5
 		mov	eax, [bp+var_74]
 		add	eax, [bp+var_94]
@@ -3806,8 +3817,8 @@ loc_6E84:				; CODE XREF: AI_ManeuverSolution_Major+4F0j
 		mov	[bp+var_AC], eax
 		lea	ax, [bp+var_AC]
 
-loc_6E9D:				; CODE XREF: AI_ManeuverSolution_Major+4DEj
-					; AI_ManeuverSolution_Major+50Bj
+loc_6E9D:				; CODE XREF: AI_GunSnapAim_6977+4DEj
+					; AI_GunSnapAim_6977+50Bj
 		push	ax
 		push	large [bp+arg_0]
 		nop
@@ -3825,18 +3836,18 @@ loc_6E9D:				; CODE XREF: AI_ManeuverSolution_Major+4DEj
 		jmp	short loc_6F30
 ; ���������������������������������������������������������������������������
 
-loc_6ED9:				; CODE XREF: AI_ManeuverSolution_Major+27Ej
-					; AI_ManeuverSolution_Major+2AAj ...
+loc_6ED9:				; CODE XREF: AI_GunSnapAim_6977+27Ej
+					; AI_GunSnapAim_6977+2AAj ...
 		cmp	[bp+var_6], 0
 		jle	short loc_6EE5
 		mov	ax, 1
 		jmp	short loc_6EE7
 ; ���������������������������������������������������������������������������
 
-loc_6EE5:				; CODE XREF: AI_ManeuverSolution_Major+567j
+loc_6EE5:				; CODE XREF: AI_GunSnapAim_6977+567j
 		xor	ax, ax
 
-loc_6EE7:				; CODE XREF: AI_ManeuverSolution_Major+56Cj
+loc_6EE7:				; CODE XREF: AI_GunSnapAim_6977+56Cj
 		or	al, al
 		jz	short loc_6F1E
 		mov	eax, [di+20h]
@@ -3856,31 +3867,31 @@ loc_6EE7:				; CODE XREF: AI_ManeuverSolution_Major+56Cj
 		call	Math_ArcTan_54ADE
 		add	sp, 6
 
-loc_6F1E:				; CODE XREF: AI_ManeuverSolution_Major+572j
+loc_6F1E:				; CODE XREF: AI_GunSnapAim_6977+572j
 		cmp	[bp+var_2E], 0
 		jnz	short loc_6F2A
 		mov	ax, 1
 		jmp	short loc_6F2C
 ; ���������������������������������������������������������������������������
 
-loc_6F2A:				; CODE XREF: AI_ManeuverSolution_Major+5ACj
+loc_6F2A:				; CODE XREF: AI_GunSnapAim_6977+5ACj
 		xor	ax, ax
 
-loc_6F2C:				; CODE XREF: AI_ManeuverSolution_Major+5B1j
+loc_6F2C:				; CODE XREF: AI_GunSnapAim_6977+5B1j
 		or	al, al
 		jz	short loc_6F34
 
-loc_6F30:				; CODE XREF: AI_ManeuverSolution_Major+560j
+loc_6F30:				; CODE XREF: AI_GunSnapAim_6977+560j
 		mov	[bp+var_1], 1
 
-loc_6F34:				; CODE XREF: AI_ManeuverSolution_Major+14j
-					; AI_ManeuverSolution_Major+5B7j
+loc_6F34:				; CODE XREF: AI_GunSnapAim_6977+14j
+					; AI_GunSnapAim_6977+5B7j
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-AI_ManeuverSolution_Major	endp
+AI_GunSnapAim_6977	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3918,10 +3929,11 @@ AI_FireWeaponTrigger	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,96L — calcule un seuil de fermeture (dword_7201C/4), commande la vitesse via sub_6388,
-; calcule le vecteur relatif cible, appelle sub_6977 (évaluation manoeuvre) ; si échec,
-; récupère la vitesse cible via sub_6469 et bascule sur sub_702A (guidage alternatif).
-; Dispatcher de manoeuvre d'interception : poursuite directe vs guidage complexe.
+; far, 96L, LUE 2026-10-02. (entite, cible) : AI_InterceptSpeedCmd_HUD(entite, cible,
+; dword_7201C/4 = 450 m) ; si AI_GunSnapAim_6977 -> 1 ; sinon
+; AI_GuidanceSolution_Major(entite, D = cible - moi, R = AI_Sensor_WeaponVelocityCache (= nez
+; pour canon/missiles), 10 inutilise) et renvoie son resultat (1 seulement si aligne). Appelee
+; trois fois par MVRS_ID7_TickPursuit_10BD9.
 ; ==============================================================================================
 AI_InterceptDispatcher	proc far		; CODE XREF: seg008:loc_10E91P
 					; seg008:2B8BP	...
@@ -3984,7 +3996,7 @@ arg_4		= word ptr  0Ah
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr AI_ManeuverSolution_Major
+		call	near ptr AI_GunSnapAim_6977
 		add	sp, 6
 		or	al, al
 		jnz	short loc_701F
@@ -4704,8 +4716,9 @@ AI_GuidanceSolution_Major	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — récupère la position propre (vtable+0x3C, +0xC), l'utilise comme référence pour
-; appeler sub_702A(cap,rate) : wrapper de guidage utilisant position courante.
+; far, 40L, LUE 2026-10-02. AI_GuidanceSolution_Major(entite, D = argument, R = MON NEZ
+; (methode +0x3C de l'objet, ligne +0x0C), argument transmis). Le D recu est utilise tel quel
+; comme direction.
 ; ==============================================================================================
 AI_GuidanceCmd_FromOwnPos	proc far		; CODE XREF: AI_MissileEvasionReaction_9A77+252P
 					; seg008:27E9P	...
@@ -6213,7 +6226,7 @@ AI_BankErrorCmd_7F34	endp
 ; puis AI_RollController_7E56(entite, &ecart, zone morte). AI_RollToAngleCmd(0, 5) = remettre
 ; les ailes a plat ; (180, 5) = se mettre sur le dos.
 ; ==============================================================================================
-AI_RollToAngleCmd_8104	proc far		; CODE XREF: AI_ManeuverSolution_Major+52Dp
+AI_RollToAngleCmd_8104	proc far		; CODE XREF: AI_GunSnapAim_6977+52Dp
 					; AI_CombatDecision_Major+319p ...
 
 var_8		= dword	ptr -8
