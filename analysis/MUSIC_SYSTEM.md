@@ -305,14 +305,30 @@ image, dont la phase 0 est `WeaponCam_LaunchPhase_80971`.
 
 ## 6. Ce qu'il faut pour le portage
 
-- **Lecteur XMIDI + émulateur OPL2.** Le jeu n'examine aucune note ; le lecteur doit seulement fournir
-  le **numéro de mesure courant** (calculé depuis les méta-événements de tempo et de signature
-  rythmique, comme `advance_count` de `XMIDI.ASM`), le statut de fin et le volume relatif.
-- **Deux canaux** : principal et liaison ; machine à quatre états (§4.2) ; changement à la barre
-  suivante ; liaison choisie par `combat.dat` selon la position dans la phrase (§4.3) ; mémoire d'une
-  piste pour les ponctuations (§4.4).
+**Implémentation de référence : `tools/sc_player/`** (C, sans dépendance pour le cœur). Elle porte
+le séquenceur du jeu (§4), l'interpréteur XMIDI du pilote, la partie voix OPL du pilote
+(`ADLIB_DRIVER.md` §11) et l'archive avec LZW. Le mode `--wav` écrit chaque transition (mesure,
+position, entrée de liaison) pour comparer avec libRealSpace.
+
+- **Lecteur XMIDI + émulateur OPL2.** Le jeu n'examine aucune note. Le lecteur doit fournir :
+  - le **numéro de mesure courant**, tel que le compte le pilote : il **part de 0** au démarrage
+    de la piste, il est avancé avant les évènements de chaque intervalle, et la signature rythmique
+    ne le modifie pas (`ADLIB_DRIVER.md` §11) ;
+  - le statut de fin de piste ;
+  - le volume relatif.
+- **Deux canaux** : principal et liaison.
+  - Machine à quatre états (§4.2), changement à la barre suivante.
+  - Liaison choisie par `combat.dat` selon la position dans la phrase (§4.3).
+  - Mémoire d'une piste pour les ponctuations (§4.4).
 - **Règle de choix** du §5.1 toutes les 16 frames ; destruction d'objets (§5.3).
 - **Fondu d'arrêt** : volume à 0 en 1 000 ms.
+- **Timbres** : bibliothèque `SOUND/STRIKE.AD`, installée piste par piste d'après le chunk `TIMB`
+  (`Music_ChannelRegisterSequence_59FF5`).
+- **Archive** : nombre d'enregistrements = offset de l'entrée 0 / 4 − 1. Un enregistrement dont les
+  drapeaux ont `0xC0` à zéro commence par sa taille décompressée (u32), suivie d'un flux LZW
+  (`LZW_Decompress_66068` : codes de 9 à 12 bits lus du poids faible au poids fort, 256 = remise à
+  zéro, 257 = fin). Le lecteur de l'archive handoff lisait le mauvais champ pour le nombre
+  d'enregistrements et ignorait le LZW.
 
 ---
 
@@ -359,6 +375,8 @@ sur 16. `Sound_StopAll_5A88F` : arrête musique (avec fondu), effets et voix.
 - Facteur `dword_7044C` du test « dans les six heures ».
 - Séquence jouée à la fin de `Sound_LoadDriverAndTimbreCache_5A0F3`.
 - Autres numéros d'effets sonores (seuls 0x0B et 0x0D sont identifiés).
+- Lecteur `tools/sc_player` : à valider sur les vrais `COMBAT.ADL` et `STRIKE.AD` (testé ici sur
+  des données synthétiques uniquement).
 - Renommer `CRT_Doprnt_Dispatch` après lecture.
 - Côté pilote : voir `ADLIB_DRIVER.md` §10.
 

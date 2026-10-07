@@ -198,6 +198,9 @@ strike_commander_re/
     ├── build_function_index.py      reconstruit function_index.json à
     │                                  partir de strike.asm +
     │                                  known_functions.json
+    ├── sc_player/                   ⭐ lecteur de la musique du jeu (C + SDL2/ImGui) :
+    │                                  séquenceur du jeu, XMIDI et pilote AdLib portés
+    │                                  depuis le code ; voir tools/sc_player/README.md
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer

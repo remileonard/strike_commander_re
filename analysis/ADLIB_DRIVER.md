@@ -152,6 +152,8 @@ traité — évite de réécrire tous les registres à chaque tick.
 
 ## 6. Structure d'instrument déduite
 
+> **Confirmé et complété au §11** : le format réel suit l'ordre BNK des pilotes AIL (le tableau ci-dessous regroupe les champs par registre, pas dans l'ordre du fichier).
+
 *Hypothèse forte — déduite des variables locales consommées par le
 dispatch de §5 ; format cohérent avec le format **OP2** standard utilisé
 par plusieurs pilotes AIL de cette génération (non comparé octet à octet
@@ -312,3 +314,93 @@ ce pilote, qui appelle ensuite la partie voix OPL décrite ici. Voir `MUSIC_SYST
   contenu non extrait.
 - ~~Lien avec les entrées de `combat.dat`~~ : réglé, ce sont des numéros de pistes de liaison
   indexés par la position dans la phrase, pas des courbes d'enveloppe (`MUSIC_SYSTEM.md` §2.3).
+
+---
+
+## 11. Partie voix lue intégralement (2026-10-07) — portée dans `tools/sc_player/src/ail_adlib.c`
+
+Toute la partie « voix OPL » (`sub_501` à `sub_28BE`) a été lue et portée. C'est le **système TVFX
+d'AIL 2.0** (équivalent de `YAMAHA.INC`). Les §6, §8 et §9 ci-dessus sont confirmés et complétés
+comme suit.
+
+**Table des fonctions du pilote** (en-tête du binaire : paires numéro AIL / offset). Les plus utiles :
+`0x9C` install_timbre = `0x1E6C`, `0x9B` timbre_request = `0x1CC7`, `0xBA` send_cv_msg = `0x2A79`,
+`0x67` serve = `0x35B1`, `0xB4` get_bar_count = `0x3D81`. Le descripteur suit la table : type 3
+(XMIDI), suffixe `"AD"`, port 0x388, **service à 120 Hz** (`78 00`).
+
+**Messages MIDI** (`sub_28BE`) :
+- **Note On** : acceptée seulement sur les canaux MIDI 1 à 9 (0-based, `cmp di,1 / jb`,
+  `cmp di,9 / ja`), donc les canaux 2 à 10. Le canal 9 (MIDI 10) est le canal des percussions :
+  le timbre est cherché en banque `0x7F`, patch = numéro de note, et la note jouée est celle du
+  timbre (octet +2).
+- **Contrôleurs** :
+  - 1 modulation (≥ 64 → bit vibrato), 7 volume, 11 expression, 10 panoramique (sans effet) ;
+  - 64 sustain ; 114 banque ; 112 protection de voix ; 113 protection de timbre ;
+  - 121 remise à zéro ; 123 toutes notes coupées.
+- **Pitch-bend : ±12 demi-tons.** Calcul : `((MSB<<7|LSB) − 0x2000) >> 5`, puis `mov cl,0Ch / imul cx`.
+
+**Volume d'un opérateur** (registre 0x40) : niveau = valeur du paramètre >> 10 (0..63).
+- Mise à l'échelle par `vol·expr/128`, puis `·vélocité/128`, chacun arrondi à +1 s'il n'est pas nul.
+- La vélocité passe par la table `0xED6` : `vel>>3` → 82..127.
+- L'échelle ne s'applique qu'aux opérateurs dont le bit est posé dans le masque `0x1824`.
+  **Seul le timbre OPL simple pose ce masque** (porteur toujours, modulateur si connexion additive).
+  Les timbres TVFX ne sont donc pas affectés par le volume.
+
+**Fréquence** :
+1. Partir de note + transposition − 24, ramenée dans 0..95.
+2. Ajouter le pitch-bend, en 1/256 de demi-ton (`add ah, bl`), puis `(x+8)>>4` (1/16 de demi-ton),
+   ramené dans 0..0x5FF.
+3. F-Number = table `0xAAC` [demi-ton·16 + pas] ; bloc = table `0xC2C`[n] − 1.
+4. Une entrée négative de la table vaut « bloc + 1 ».
+
+**Timbre OPL simple** (longueur 0x0E, `sub_2617`). Après la longueur (u16) :
+
+| Octet | Contenu |
+|---|---|
+| +2 | transposition |
+| +3 / +9 | AVEKM mod / porteur |
+| +4 / +0A | KSL·TL mod / porteur |
+| +5 / +0B | AD |
+| +6 / +0C | SR |
+| +7 / +0D | forme d'onde |
+| +8 | FB·C |
+
+C'est le format BNK habituel des pilotes AIL. Priorité de la voix : 0x7FFF.
+
+**Timbre TVFX** (toute autre longueur sauf 0x19, que le pilote ignore ; `sub_89F`).
+
+| Octet | Contenu |
+|---|---|
+| +3 | type : 1 = hauteur donnée par la note, 2 = fréquence absolue |
+| +4 | durée en ticks à 60 Hz (+1) ; 0xFFFF pour le type 1, relâché par le Note Off |
+| +6 … +34 | pour chacun des 8 paramètres : valeur initiale, offset de la courbe d'attaque, offset de la courbe de relâchement |
+| +36 / +3A | AD·SR de l'attaque / du relâchement, si la courbe de fréquence ne commence pas à +0x36 |
+
+- Ordre des 8 paramètres : fréquence, niveau mod, niveau porteur, priorité, feedback,
+  multiplicateur mod, multiplicateur porteur, forme d'onde.
+- Une courbe est une suite de paires (u16, u16) :
+  - `(0, d)` : saut relatif ;
+  - `(0xFFFF, v)` : valeur absolue ;
+  - `(0xFFFE, o)` : octet d'état (KSL, AVEKM, bits de key-on ou de connexion, selon le paramètre) ;
+  - `(n, pas)` : n ticks à `valeur += pas`.
+- Une voix en relâchement est libérée quand ses deux niveaux passent sous 0x400.
+
+**Allocation** :
+- 16 voix logiques pour 9 canaux OPL.
+- Un nouveau canal est pris en tourniquet (`sub_1FEB`).
+- À 5 Hz, `sub_2514` donne les canaux aux voix de plus haute priorité. Priorité = paramètre de
+  priorité, ou 0xFFFF si la protection de voix est active, moins le nombre de voix du canal MIDI.
+
+**Interpréteur XMIDI compilé dans le pilote : écarts avec `XMIDI.ASM` 1.08** (importants pour les
+transitions, qui lisent le compteur de mesures) :
+- Au rembobinage (`sub_2DFA`), le **compteur de mesures part de 0** (et non de −1). La fraction de
+  temps vaut `QUANT_TIME_16`, pour un 4/4 par défaut.
+- La signature rythmique (`sub_3418`) ne remet pas le temps à zéro et n'incrémente pas la mesure.
+- `get_bar_count` renvoie le compteur brut, sans anticipation.
+- Le service avance le temps *avant* les évènements de l'intervalle.
+
+**Cache de timbres** :
+- 192 entrées (banque `0x1422`, patch `0x14E2`, drapeaux `0x15A2` : 0x80 = utilisé,
+  0x40 = protégé), avec une éviction de l'entrée la plus ancienne (`sub_1D21`).
+- Les registres initiaux (`0xCEB`, registres 1..0xF5) activent la sélection de forme d'onde
+  (registre 1 = 0x20) et fixent 0xBD = 0xC0.
