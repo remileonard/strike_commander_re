@@ -16,56 +16,87 @@
 #include <cstddef>
 #include "AILAdlibDriver.h"
 
-enum { SEQ_STOPPED = 0, SEQ_PLAYING = 1, SEQ_DONE = 2 };
+enum {
+    SEQ_STOPPED = 0,
+    SEQ_PLAYING = 1,
+    SEQ_DONE = 2
+};
 
 struct XmidiSequence {
-    static const int MAX_NOTES = 32, FOR_NEST = 4;
+    static const int MAX_NOTES = 32;
+    static const int FOR_NEST = 4;
     int used;
-    const uint8_t *base; size_t len;          // donnees XMIDI (FORM XDIR + CAT XMID, ou FORM XMID)
-    size_t timb, evnt;                        // offsets des chunks TIMB / EVNT (0 si absent)
+    const uint8_t *base; // donnees XMIDI (FORM XDIR + CAT XMID, ou FORM XMID)
+    size_t len;
+    size_t timb; // offsets des chunks TIMB / EVNT (0 si absent)
+    size_t evnt;
     size_t evnt_ptr;
-    int    seq_started, status, post_release;
-    int    interval_cnt, note_count;
-    int    vol_percent, vol_target; uint32_t vol_accum, vol_period;
-    int    tempo_error, tempo_percent, tempo_target; uint32_t tempo_accum, tempo_period;
-    int    beat_count, measure_count, time_numerator;
-    int32_t time_fraction, beat_fraction, time_per_beat;
-    size_t for_ptrs[FOR_NEST]; int for_cnt[FOR_NEST];
-    uint8_t chan_map[16], chan_program[16], chan_pitch_l[16], chan_pitch_h[16], chan_indirect[16];
-    uint8_t chan_controls[9 * 16];            // ctrl_log : [controle*16 + canal]
-    uint8_t note_chan[MAX_NOTES], note_num[MAX_NOTES];
+    int seq_started;
+    int status;
+    int post_release;
+    int interval_cnt;
+    int note_count;
+    int vol_percent;
+    int vol_target;
+    uint32_t vol_accum;
+    uint32_t vol_period;
+    int tempo_error;
+    int tempo_percent;
+    int tempo_target;
+    uint32_t tempo_accum;
+    uint32_t tempo_period;
+    int beat_count;
+    int measure_count;
+    int time_numerator;
+    int32_t time_fraction;
+    int32_t beat_fraction;
+    int32_t time_per_beat;
+    size_t for_ptrs[FOR_NEST];
+    int for_cnt[FOR_NEST];
+    uint8_t chan_map[16];
+    uint8_t chan_program[16];
+    uint8_t chan_pitch_l[16];
+    uint8_t chan_pitch_h[16];
+    uint8_t chan_indirect[16];
+    uint8_t chan_controls[9 * 16]; // ctrl_log : [controle*16 + canal]
+    uint8_t note_chan[MAX_NOTES];
+    uint8_t note_num[MAX_NOTES];
     int32_t note_time[MAX_NOTES];
 };
 
 class AILXmidiDriver {
 public:
     static const int NSEQS = 8;
-    void init(AILAdlibDriver *driver);                                  // init_driver
-    int  registerSequence(const uint8_t *data, size_t len, int num);   // register_seq, -1 si echec
+    void init(AILAdlibDriver *driver);                              // init_driver
+    int registerSequence(const uint8_t *data, size_t len, int num); // register_seq, -1 si echec
     void release(int h);
     void start(int h);
     void stop(int h);
     void resume(int h);
-    int  status(int h);
-    int  barCount(int h);
-    int  beatCount(int h);
+    int status(int h);
+    int barCount(int h);
+    int beatCount(int h);
     void setRelVolume(int h, int vol, int ms);
-    int  relVolume(int h);
-    int  timbreRequest(int h);    // (banque << 8) | patch du premier timbre absent, ou 0xFFFF
-    void serve();                 // a appeler a 120 Hz ; appelle aussi AILAdlibDriver::serve()
+    int relVolume(int h);
+    int timbreRequest(int h); // (banque << 8) | patch du premier timbre absent, ou 0xFFFF
+    void serve();             // a appeler a 120 Hz ; appelle aussi AILAdlibDriver::serve()
 
     AILAdlibDriver *adl = nullptr;
     XmidiSequence seq[NSEQS];
     int current = 0;
     uint8_t ctrl_hash[256];
-    uint8_t global_controls[9 * 16], global_program[16], global_pitch_l[16], global_pitch_h[16];
-    uint8_t active_notes[16], lock_status[16];
+    uint8_t global_controls[9 * 16];
+    uint8_t global_program[16];
+    uint8_t global_pitch_l[16];
+    uint8_t global_pitch_h[16];
+    uint8_t active_notes[16];
+    uint8_t lock_status[16];
 
 private:
     void send(int st, int d1, int d2);
     void flushChannelNotes(int chan);
     void flushNoteQueue(XmidiSequence *s);
-    int  lockChannel();
+    int lockChannel();
     void releaseChannel(int chan1);
     void resetSequence(XmidiSequence *s);
     void xmidiVolume(XmidiSequence *s);

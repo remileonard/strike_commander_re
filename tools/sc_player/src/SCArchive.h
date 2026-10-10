@@ -21,7 +21,9 @@
 class SCArchive {
 public:
     bool open(const uint8_t *buf, size_t len);
-    uint32_t count() const { return n; }
+    uint32_t count() const {
+        return n;
+    }
     // Enregistrement decompresse ; false si erreur.
     bool record(uint32_t index, std::vector<uint8_t> &out) const;
 

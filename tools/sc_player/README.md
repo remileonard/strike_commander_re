@@ -131,6 +131,21 @@ Ce qu'on observe sur le vrai `STRIKE.AD` :
 - Le bouton « Silence total » coupe toutes les voix. **Il n'existe pas dans le pilote** :
   c'est un outil de test (`adl_kill_all`).
 
+## Style du code
+
+- Accolades obligatoires sur `if` / `for` / `while` / `do`, ouvrante sur la même ligne.
+- Une instruction par ligne, y compris les déclarations de variables.
+- Une valeur par ligne dans une liste d'initialisation de plus d'une valeur.
+
+```sh
+FILES=$(git ls-files '*.cpp' '*.h' | grep -v third_party)
+python3 tools/style_check.py --fix $FILES      # declarations multiples, listes
+clang-format --style=file:.clang-format -i $FILES
+python3 tools/style_check.py $FILES            # verification : ne doit rien afficher
+```
+
+`AILAdlibTables.h` est produit directement dans ce format par `tools/gen_adlib_tables.py`.
+
 ## Tests (sans les fichiers du jeu)
 
 ```sh

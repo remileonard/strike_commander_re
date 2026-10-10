@@ -19,12 +19,13 @@
 #include <vector>
 
 struct SCMusicSet {
-    int trackCount = 0;                               // word_7084C
-    std::vector<uint8_t> phraseLen, phraseLast;       // TrackDescriptor +0xA (A) / +0xB (B)
-    std::vector<uint8_t> matrix;                      // [courante * N + demandee]
-    std::vector<std::vector<uint8_t>> linkEntries;    // L+1 octets, indexes par la position
-    std::vector<std::vector<uint8_t>> tracks;         // pistes principales (XMIDI)
-    std::vector<std::vector<uint8_t>> linkTracks;     // pistes de liaison (XMIDI), word_7084E
+    int trackCount = 0;             // word_7084C
+    std::vector<uint8_t> phraseLen; // TrackDescriptor +0xA (A) / +0xB (B)
+    std::vector<uint8_t> phraseLast;
+    std::vector<uint8_t> matrix;                   // [courante * N + demandee]
+    std::vector<std::vector<uint8_t>> linkEntries; // L+1 octets, indexes par la position
+    std::vector<std::vector<uint8_t>> tracks;      // pistes principales (XMIDI)
+    std::vector<std::vector<uint8_t>> linkTracks;  // pistes de liaison (XMIDI), word_7084E
 
     // Analyse l'enregistrement 0 du .DAT. Renvoie false si le format est inattendu.
     bool parseDat(const uint8_t *rec, size_t n);
@@ -32,12 +33,22 @@ struct SCMusicSet {
 
 class SCTimbreLibrary {
 public:
-    void set(const uint8_t *data, size_t size) { lib = data; libSize = size; }
-    bool loaded() const { return lib != nullptr; }
+    void set(const uint8_t *data, size_t size) {
+        lib = data;
+        libSize = size;
+    }
+    bool loaded() const {
+        return lib != nullptr;
+    }
     // Pointeur sur le timbre (commencant par sa longueur u16), ou nullptr.
     const uint8_t *find(int bank, int patch) const;
-    const uint8_t *data() const { return lib; }
-    size_t size() const { return libSize; }
+    const uint8_t *data() const {
+        return lib;
+    }
+    size_t size() const {
+        return libSize;
+    }
+
 private:
     const uint8_t *lib = nullptr;
     size_t libSize = 0;

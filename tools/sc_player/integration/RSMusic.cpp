@@ -96,29 +96,35 @@ void RSMusic::loadCombat() {
     for (size_t i = 0; i < pak->GetNumEntries(); i++) {
         SCMusicSet set;
         PakEntry *rec = datpak->GetNumEntries() > 0
-                            ? datpak->GetEntry(i < datpak->GetNumEntries() ? i : 0) : NULL;
+                            ? datpak->GetEntry(i < datpak->GetNumEntries() ? i : 0)
+                            : NULL;
         if (rec == NULL || !set.parseDat(rec->data, rec->size)) {
             printf("RSMusic::init: COMBAT.DAT: unexpected format\n");
         }
         PakEntry *e = pak->GetEntry(i);
         PakArchive *setpak = new PakArchive();
         setpak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.ADL", e->data, e->size);
-        for (size_t j = 1; j < setpak->GetNumEntries(); j++) {          // pistes principales
+        for (size_t j = 1; j < setpak->GetNumEntries(); j++) { // pistes principales
             PakEntry *t = setpak->GetEntry(j);
-            if (t == NULL) continue;
+            if (t == NULL) {
+                continue;
+            }
             set.tracks.emplace_back(t->data, t->data + t->size);
             MemMusic *music = copyMusic(t->data, t->size);
             musics[2].push_back(music);
             combat_musics[i].push_back(music);
         }
-        if (setpak->GetNumEntries() > 0) {                              // pistes de liaison
+        if (setpak->GetNumEntries() > 0) { // pistes de liaison
             PakEntry *l = setpak->GetEntry(0);
             PakArchive *linkpak = new PakArchive();
             linkpak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.ADL", l->data, l->size);
             for (size_t k = 0; k < linkpak->GetNumEntries(); k++) {
                 PakEntry *lt = linkpak->GetEntry(k);
-                if (lt == NULL) set.linkTracks.emplace_back();
-                else set.linkTracks.emplace_back(lt->data, lt->data + lt->size);
+                if (lt == NULL) {
+                    set.linkTracks.emplace_back();
+                } else {
+                    set.linkTracks.emplace_back(lt->data, lt->data + lt->size);
+                }
             }
         }
         if ((int)set.tracks.size() < set.trackCount) {
@@ -134,7 +140,9 @@ void RSMusic::loadCombat() {
 void RSMusic::collectTracks(PakArchive *pak, const char *name, std::vector<MemMusic *> &out, int depth) {
     for (size_t j = 0; j < pak->GetNumEntries(); j++) {
         PakEntry *sub = pak->GetEntry(j);
-        if (sub == NULL || sub->size == 0) continue;
+        if (sub == NULL || sub->size == 0) {
+            continue;
+        }
         if (isForm(sub)) {
             out.push_back(copyMusic(sub->data, sub->size));
         } else if (depth < 4) {
@@ -155,7 +163,9 @@ void RSMusic::loadSoundFx() {
     pak->InitFromRAM("..\\..\\DATA\\SOUND\\SOUNDFX.ADL", soundfx->data, soundfx->size);
     for (size_t i = 0; i < pak->GetNumEntries(); i++) {
         PakEntry *e = pak->GetEntry(i);
-        if (e == NULL || e->size == 0) continue;
+        if (e == NULL || e->size == 0) {
+            continue;
+        }
         if (isForm(e)) {
             soundfx_musics[i].push_back(copyMusic(e->data, e->size));
             continue;
@@ -172,12 +182,12 @@ void RSMusic::SwitchBank(uint8_t bank) {
     }
     this->bank = bank;
 }
-MemMusic *RSMusic::GetMusic(uint32_t index) { 
+MemMusic *RSMusic::GetMusic(uint32_t index) {
     if (musics.find(bank) == musics.end()) {
         return NULL;
     }
     if (index >= musics[bank].size()) {
         return NULL;
     }
-    return musics[bank][index]; 
+    return musics[bank][index];
 }

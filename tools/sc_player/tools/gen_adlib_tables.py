@@ -28,8 +28,8 @@ for name, off, n, t, doc in tables:
     ctype = 'uint16_t' if t == 'H' else 'uint8_t'
     out.append("/* @0x%X : %s */" % (off, doc))
     out.append("static const %s %s[%d] = {" % (ctype, name, n))
-    for i in range(0, n, 16):
-        out.append("    " + ", ".join(str(v) for v in vals[i:i + 16]) + ",")
+    for i, v in enumerate(vals):                      # une valeur par ligne (style du projet)
+        out.append("    %d%s" % (v, "," if i + 1 < n else ""))
     out.append("};")
 out.append("#endif")
 open(sys.argv[2], 'w').write("\n".join(out) + "\n")

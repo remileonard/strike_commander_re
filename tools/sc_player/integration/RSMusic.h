@@ -26,12 +26,13 @@ class RSMusic {
 private:
     std::vector<MemMusic *> gameflow_music;
     AssetManager &assetManager = AssetManager::instance();
-    std::vector<uint8_t> timbre_data;   // copie de STRIKE.AD (SCTimbreLibrary ne fait que pointer dessus)
+    std::vector<uint8_t> timbre_data; // copie de STRIKE.AD (SCTimbreLibrary ne fait que pointer dessus)
     void loadCombat();
     void loadSoundFx();
     void collectTracks(PakArchive *pak, const char *name, std::vector<MemMusic *> &out, int depth);
+
 public:
-    uint8_t bank{0};
+    uint8_t bank{ 0 };
     std::unordered_map<uint8_t, std::vector<MemMusic *>> midgames_musics;
     std::unordered_map<uint8_t, std::vector<MemMusic *>> combat_musics;
     std::unordered_map<uint8_t, std::vector<MemMusic *>> gameflow_musics;

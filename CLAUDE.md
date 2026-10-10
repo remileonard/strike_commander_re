@@ -41,6 +41,16 @@ tes résultats sont directement lisibles par Rémi.
 `strike.asm` et rendu des résultats en `sub_XXXXX`, obligeant Rémi à
 rechercher chaque nom dans `known_functions.json`. À ne pas reproduire.)*
 
+**3. Style du code C++ écrit pour Rémi** (`tools/sc_player`, code destiné à libRealSpace) :
+- `if`, `for`, `while`, `do` **toujours avec des accolades**, accolade ouvrante sur la ligne de
+  l'instruction (`if (valeur == 1) {` … `}`) ;
+- **une seule instruction par ligne**, y compris les déclarations (`int a;` puis `int b;`, jamais `int a, b;`) ;
+- une liste d'initialisation de plus d'une valeur (tableau, enum…) : **une valeur par ligne**.
+
+Après chaque modification : `clang-format --style=file:tools/sc_player/.clang-format -i <fichiers>`
+puis `python3 tools/sc_player/tools/style_check.py <fichiers>` (doit ne rien signaler ;
+`--fix` découpe les déclarations multiples et les listes).
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur
