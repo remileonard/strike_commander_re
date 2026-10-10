@@ -45,6 +45,10 @@ int main(int, char **argv) {
         }
         int n = total - pos < 1024 ? total - pos : 1024;
         g_hook(g_hookArg, (Uint8 *)buf, n * 4);
+        SCMusicEvent ev;
+        while (m.pollMusicEvent(ev)) {
+            printf("evenement %d piste %d depuis %d liaison %d\n", (int)ev.type, ev.track, ev.fromTrack, ev.link);
+        }
         fwrite(buf, 4, n, f);
         pos += n;
         if (pos % (RATE * 10) < 1024) {
@@ -80,5 +84,9 @@ int main(int, char **argv) {
     printf("piste isolee : getMusicID %u, effet canal %d actif %d\n", m.getMusicID(), fx, (int)m.isSoundFxPlaying(fx));
     m.stopMusic();
     m.stopSoundFx(fx);
+    SCMusicEvent ev;
+    while (m.pollMusicEvent(ev)) {
+        printf("evenement %d piste %d depuis %d liaison %d\n", (int)ev.type, ev.track, ev.fromTrack, ev.link);
+    }
     return 0;
 }

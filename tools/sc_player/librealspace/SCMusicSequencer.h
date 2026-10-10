@@ -17,6 +17,23 @@
 #pragma once
 #include "AILXmidiDriver.h"
 #include "SCMusicSet.h"
+#include <deque>
+
+// Evenement du sequenceur, pour que le jeu (la mission) reagisse : reconnaitre une ponctuation,
+// redemander une piste, etc. Le sequenceur ne sait pas ce que represente une piste.
+struct SCMusicEvent {
+    enum Type {
+        TRANSITION_STARTED, // la barre est atteinte, la piste de liaison du .dat demarre
+        TRACK_STARTED,      // la piste demandee demarre (apres la liaison, ou bascule directe)
+        TRACK_FINISHED,     // une piste qui ne boucle pas s'est terminee
+        MUSIC_STOPPED       // arret effectif (fondu termine compris)
+    };
+    Type type = TRACK_STARTED;
+    int track = -1;     // piste concernee (TRANSITION_STARTED : piste demandee)
+    int fromTrack = -1; // piste quittee (TRANSITION_STARTED, TRACK_STARTED), -1 sinon
+    int link = -1;      // TRANSITION_STARTED : numero de la piste de liaison (0 = premiere)
+    int measure = 0;    // mesure de la piste principale au moment de l'evenement
+};
 
 class SCMusicSequencer {
 public:
@@ -34,6 +51,10 @@ public:
     int measure();                           // AIL_measure_count du canal principal
     // La piste demandee est jouee jusqu'au bout et ne boucle pas (aucune autre demande en attente)
     bool finished();
+    // Evenement suivant (le plus ancien), false si la file est vide. Appeler sous le meme verrou
+    // que tick() : la file est remplie depuis le fil audio.
+    bool pollEvent(SCMusicEvent &e);
+    static const size_t MAX_EVENTS = 64; // au-dela, les plus anciens sont perdus
     bool active() const {
         return requested != 0xFFFF || fading;
     }
@@ -63,6 +84,11 @@ private:
     AILXmidiDriver *xmi = nullptr;
     const SCTimbreLibrary *lib = nullptr;
     const SCMusicSet *set = nullptr;
+    std::deque<SCMusicEvent> events;
+    bool finishReported = false;
+    bool hasPlayed() const;
+    void emit(SCMusicEvent::Type type, int track, int fromTrack, int link, int measure);
+    void startMain(int fromTrack); // demarre la piste 'current' sur le canal principal + evenement
     void chanStop(Channel &c);
     void chanPlay(Channel &c, const std::vector<uint8_t> *b, int isLink, int index);
     const std::vector<uint8_t> *track(int i);

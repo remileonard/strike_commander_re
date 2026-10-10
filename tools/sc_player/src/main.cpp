@@ -23,6 +23,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <deque>
 #include <cctype>
 #include <sys/stat.h>
 #include "imgui.h"
@@ -265,6 +266,31 @@ static const char *tune_label(int t) {
     }
 }
 
+/* Texte d'un evenement du sequenceur (journal WAV et interface). */
+static std::string event_text(const SCMusicEvent &e) {
+    char b[160];
+    switch (e.type) {
+    case SCMusicEvent::TRANSITION_STARTED:
+        snprintf(b, sizeof b, "TRANSITION_STARTED piste 0x%02X depuis 0x%02X, liaison %d, mesure %d",
+                 e.track, e.fromTrack, e.link, e.measure);
+        break;
+    case SCMusicEvent::TRACK_STARTED:
+        if (e.fromTrack < 0) {
+            snprintf(b, sizeof b, "TRACK_STARTED piste 0x%02X", e.track);
+        } else {
+            snprintf(b, sizeof b, "TRACK_STARTED piste 0x%02X depuis 0x%02X", e.track, e.fromTrack);
+        }
+        break;
+    case SCMusicEvent::TRACK_FINISHED:
+        snprintf(b, sizeof b, "TRACK_FINISHED piste 0x%02X, mesure %d", e.track, e.measure);
+        break;
+    default:
+        snprintf(b, sizeof b, "MUSIC_STOPPED piste 0x%02X", e.track);
+        break;
+    }
+    return b;
+}
+
 static const char *state_label(int s) {
     static const char *n[] = {
         "0 demarrage",
@@ -337,6 +363,10 @@ static int wav_mode(const char *path, double seconds, int tune, const std::vecto
         render(buf.data(), n);
         fwrite(buf.data(), 4, (size_t)n, f);
         pos += (uint32_t)n;
+        SCMusicEvent ev;
+        while (g.music.pollEvent(ev)) {
+            fprintf(stderr, "t=%6.2f s : evenement %s\n", t, event_text(ev).c_str());
+        }
         if (g.music.state != last_state || g.music.current != last_cur) {
             fprintf(stderr, "t=%6.2f s : etat %s, piste 0x%02X, mesure %d, voix %d",
                     t, state_label(g.music.state), g.music.current, g.music.measure(), g.adl.activeVoices());
@@ -485,6 +515,7 @@ int main(int argc, char **argv) {
         return wav_mode(wav.c_str(), seconds, tune, at);
     }
     std::vector<SCTimbreInfo> timbres = timbre_list();
+    static std::deque<std::string> event_log;
     static bool tvfx_only = true;
     static int filt_bank = -1;
     static int test_note = TEST_NOTE;
@@ -547,6 +578,15 @@ int main(int argc, char **argv) {
                 int beat = g.music.mainCh.handle >= 0 ? g.xmi.beatCount(g.music.mainCh.handle) : 0;
                 int voices = g.adl.activeVoices();
                 bool finished = g.music.finished();
+                SCMusicEvent ev;
+                while (g.music.pollEvent(ev)) {
+                    char t[24];
+                    snprintf(t, sizeof t, "%7.2f s  ", SDL_GetTicks() / 1000.0);
+                    event_log.push_back(t + event_text(ev));
+                    if (event_log.size() > 12) {
+                        event_log.pop_front();
+                    }
+                }
                 SDL_UnlockAudioDevice(dev);
 
                 char req[16];
@@ -565,6 +605,11 @@ int main(int argc, char **argv) {
                 }
                 if (snap.state == 3) {
                     ImGui::TextColored(ImVec4(1, 0.8f, 0.3f, 1), "Liaison %d en cours", snap.linkCh.index);
+                }
+                ImGui::Separator();
+                ImGui::Text("Evenements du sequenceur (ce que lit le jeu avec RSMixer::pollMusicEvent) :");
+                for (const std::string &l : event_log) {
+                    ImGui::TextUnformatted(l.c_str());
                 }
                 ImGui::Separator();
                 ImGui::Text("Demander une piste (Music_RequestTune) : le changement attend la barre de mesure suivante.");

@@ -20,6 +20,20 @@ check "etat 1 lecture, piste 0x10"                                            "p
 if [ "$(grep -c 'etat 1 lecture, piste 0x04' "$TMP/log")" = 1 ]; then echo "OK   pas de retour automatique a la piste 4"; else echo "ECHEC pas de retour automatique a la piste 4"; fail=1; fi
 check "etat 2 attente de la barre, piste 0x10"                                "la piste 0x10 reste courante jusqu'a la demande suivante"
 check "etat 1 lecture, piste 0x09, .*entree 255"                              "bascule directe 0x10 -> 9"
+# Evenements du sequenceur, dans l'ordre (ce que le jeu lit avec RSMixer::pollMusicEvent)
+python3 - "$TMP/log" <<'PY' || fail=1
+import re, sys
+got = [l.split('evenement ', 1)[1].strip() for l in open(sys.argv[1]) if 'evenement ' in l]
+want = [r'TRACK_STARTED piste 0x04$',
+        r'TRANSITION_STARTED piste 0x10 depuis 0x04, liaison 18, mesure 3$',
+        r'TRACK_STARTED piste 0x10 depuis 0x04$',
+        r'TRACK_FINISHED piste 0x10, mesure \d+$',
+        r'TRACK_STARTED piste 0x09 depuis 0x10$',
+        r'MUSIC_STOPPED piste 0x09$']
+ok = len(got) == len(want) and all(re.match(w, g) for w, g in zip(want, got))
+print(("OK  " if ok else "ECHEC") + " evenements : " + " / ".join(got))
+sys.exit(0 if ok else 1)
+PY
 python3 - "$TMP/out.wav" <<'PY' || fail=1
 import array, sys
 a = array.array('h', open(sys.argv[1], 'rb').read()[44:])

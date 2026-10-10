@@ -58,6 +58,37 @@ Ce sont les versions de `RSMusic` et `RSMixer` de libRealSpace qui utilisent le 
   Choisir la piste selon la situation (ennemi proche, dégâts, éjection, reprise après une
   ponctuation…) reste le travail de la mission dans libRealSpace (`analysis/MUSIC_SYSTEM.md` §4.4 et §5).
 - Une seule musique joue à la fois.
+- **Évènements**, pour que le jeu réagisse (reconnaître une ponctuation, demander la piste
+  suivante). `RSMixer` ne sait pas ce que représente une piste : il signale, la mission décide.
+  - `bool pollMusicEvent(SCMusicEvent &e)` : à appeler dans la boucle de jeu, jusqu'à `false`.
+    Le séquenceur tourne dans le fil audio, d'où la file plutôt qu'un rappel. Elle garde au plus
+    64 évènements.
+  - `TRANSITION_STARTED` : la barre est atteinte, la piste de liaison du `.dat` démarre
+    (`track` = piste demandée, `fromTrack` = piste quittée, `link` = liaison, `measure` = mesure).
+  - `TRACK_STARTED` : la piste demandée démarre (`fromTrack` = précédente, -1 au départ).
+  - `TRACK_FINISHED` : une piste qui ne boucle pas vient de se terminer.
+  - `MUSIC_STOPPED` : arrêt effectif (`stopMusic`, fin du fondu, ou autre musique lancée).
+  - Une piste isolée (banque sans `.dat`) donne aussi `TRACK_STARTED`, `TRACK_FINISHED` et
+    `MUSIC_STOPPED` (`track` = index dans la banque, -1 si inconnu).
+  - État courant : `getMusicID()`, `getRequestedMusicID()`, `isInTransition()`, `getMeasure()`.
+
+  Exemple : reprise après une ponctuation, comme le jeu (`analysis/MUSIC_SYSTEM.md` §4.4). Le jeu
+  redemande la piste mémorisée **dès que la ponctuation démarre** : elle joue donc jusqu'à la barre
+  suivante, ou jusqu'à sa fin si elle est plus courte.
+
+  ```cpp
+  // au moment de demander une ponctuation (0x10 a 0x12) :
+  resumeTune = mixer.getMusicID();   // + cas 5 -> 4, 8 -> 4 ou 0x13, 0x15 -> 0x13 (mission)
+  mixer.playMusic(0x10);
+
+  // a chaque frame :
+  SCMusicEvent e;
+  while (mixer.pollMusicEvent(e)) {
+      if (e.type == SCMusicEvent::TRACK_STARTED && e.track >= 0x10 && e.track <= 0x12) {
+          mixer.playMusic(resumeTune);
+      }
+  }
+  ```
 - Effets XMIDI : `playSoundFx(mus, volume)`, `setSoundFxVolume`, `stopSoundFx`, `isSoundFxPlaying` :
   - 5 canaux, comme le jeu (`SoundFX_FindFreeChannel_598A6`) ;
   - volume en pourcentage : le jeu donne `100 − distance/10` (`SoundFX_Play3D_59902`) ;

@@ -72,6 +72,10 @@ Il **ne contient pas** la logique de reprise du jeu (`Music_TuneTransitionResolv
 C'est à la mission de demander la piste suivante. Une piste qui ne boucle pas joue jusqu'au bout,
 puis le séquenceur attend la demande suivante (`finished()` le signale).
 
+Il signale ce qui se passe par une file d'évènements (`pollEvent`) : `TRANSITION_STARTED`,
+`TRACK_STARTED`, `TRACK_FINISHED`, `MUSIC_STOPPED`. `RSMixer::pollMusicEvent` les transmet au jeu.
+Le lecteur les écrit dans le journal du mode WAV et les affiche dans l'onglet « Musique ».
+
 ## Fichiers du jeu nécessaires
 
 Dans le répertoire `SOUND` du jeu (le nom est cherché sans tenir compte de la casse) :
@@ -170,13 +174,14 @@ tests/run_tests.sh build
 - un `COMBAT.ADL` à 3 niveaux, dont certains enregistrements sont compressés en LZW ;
 - une bibliothèque de timbres contenant des timbres OPL simples et un timbre TVFX.
 
-Le test vérifie quatre points :
+Le test vérifie :
 - l'attente de la barre de mesure ;
 - la position dans la phrase et la piste de liaison choisie (4 → 0x10 à la position 3 → liaison 0x13,
   d'après le vrai `COMBAT.DAT`) ;
 - l'absence de retour automatique après une ponctuation : la piste reste courante jusqu'à la
   demande suivante (voir « Ce que fait le séquenceur ») ;
-- le fondu d'arrêt.
+- le fondu d'arrêt ;
+- la suite exacte des évènements du séquenceur.
 
 Ces musiques de test ne sont pas celles du jeu.
 

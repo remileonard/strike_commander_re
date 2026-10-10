@@ -18,6 +18,8 @@ void SCMusicSequencer::init(AILXmidiDriver *x, const SCTimbreLibrary *l) {
     error = 0;
     fading = false;
     lastMatrix = lastPos = lastValue = lastLink = -1;
+    events.clear();
+    finishReported = false;
 }
 
 void SCMusicSequencer::setMusicSet(const SCMusicSet *s) {
@@ -101,6 +103,39 @@ int SCMusicSequencer::measure() {
     return mainCh.handle >= 0 ? xmi->barCount(mainCh.handle) : 0;
 }
 
+void SCMusicSequencer::emit(SCMusicEvent::Type type, int track, int fromTrack, int link, int measure) {
+    SCMusicEvent e;
+    e.type = type;
+    e.track = track;
+    e.fromTrack = fromTrack;
+    e.link = link;
+    e.measure = measure;
+    if (events.size() >= MAX_EVENTS) {
+        events.pop_front();
+    }
+    events.push_back(e);
+}
+
+bool SCMusicSequencer::pollEvent(SCMusicEvent &e) {
+    if (events.empty()) {
+        return false;
+    }
+    e = events.front();
+    events.pop_front();
+    return true;
+}
+
+bool SCMusicSequencer::hasPlayed() const {
+    return requested != 0xFFFF || mainCh.handle >= 0 || linkCh.handle >= 0;
+}
+
+void SCMusicSequencer::startMain(int fromTrack) {
+    chanPlay(mainCh, track(current), 0, current);
+    mainPlaying = 1;
+    finishReported = false;
+    emit(SCMusicEvent::TRACK_STARTED, current, fromTrack, -1, 0);
+}
+
 bool SCMusicSequencer::finished() {
     return requested != 0xFFFF && state == 1 && seqDone(mainCh);
 }
@@ -111,6 +146,7 @@ bool SCMusicSequencer::seqDone(Channel &c) {
 
 void SCMusicSequencer::resolve() // Music_TuneTransitionResolve_595C2
 {
+    int bar = measure(); // mesure de la piste quittee, avant son arret
     int A = set->phraseLen[(size_t)current];
     int r = A ? (int)((int16_t)measureAtReq % A) : 0; // 'cwd / idiv bx'
     measureAtReq = r ? r + 1 : set->phraseLast[(size_t)current];
@@ -125,10 +161,10 @@ void SCMusicSequencer::resolve() // Music_TuneTransitionResolve_595C2
     lastLink = -1;
 
     if (v == 0) { // bascule directe
+        int from = current;
         chanStop(mainCh);
         current = requested;
-        chanPlay(mainCh, track(current), 0, current);
-        mainPlaying = 1;
+        startMain(from);
         state = 1;
         return;
     }
@@ -145,6 +181,7 @@ void SCMusicSequencer::resolve() // Music_TuneTransitionResolve_595C2
         return;
     }
     lastLink = v - 1;
+    emit(SCMusicEvent::TRANSITION_STARTED, requested, current, v - 1, bar);
     chanPlay(linkCh, &set->linkTracks[(size_t)(v - 1)], 1, v - 1);
     state = 3;
 }
@@ -155,9 +192,9 @@ void SCMusicSequencer::commit() // Music_TuneTransitionCommit_5974D
     if (mainPlaying == 1) {
         chanStop(mainCh);
     }
+    int from = current;
     current = requested & 0xFF;
-    chanPlay(mainCh, track(current), 0, current);
-    mainPlaying = 1;
+    startMain(from);
 }
 
 void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
@@ -166,6 +203,7 @@ void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
         if (mainCh.handle < 0 || xmi->relVolume(mainCh.handle) == 0) {
             chanStop(mainCh);
             fading = false;
+            emit(SCMusicEvent::MUSIC_STOPPED, current, -1, -1, 0);
         }
         return;
     }
@@ -175,14 +213,16 @@ void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
     switch (state) {
     case 0:
         current = requested & 0xFF;
-        chanPlay(mainCh, track(current), 0, current);
-        mainPlaying = 1;
+        startMain(-1);
         state = 1;
         break;
     case 1:
         if (current != requested) {
             measureAtReq = measure();
             state = 2;
+        } else if (!finishReported && seqDone(mainCh)) {
+            finishReported = true;
+            emit(SCMusicEvent::TRACK_FINISHED, current, -1, -1, measure());
         }
         break;
     case 2:
@@ -208,6 +248,7 @@ void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
 
 void SCMusicSequencer::stop(bool fade) // Music_StopWithFade_AB1EF
 {
+    bool wasPlaying = hasPlayed() && !fading;
     requested = 0xFFFF;
     state = 0;
     if (!xmi) {
@@ -220,5 +261,8 @@ void SCMusicSequencer::stop(bool fade) // Music_StopWithFade_AB1EF
     } else {
         chanStop(mainCh);
         fading = false;
+        if (wasPlaying) {
+            emit(SCMusicEvent::MUSIC_STOPPED, current, -1, -1, 0);
+        }
     }
 }

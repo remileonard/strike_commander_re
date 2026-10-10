@@ -13,6 +13,7 @@
 #include "../realspace/AssetManager.h"
 #include "../realspace/RSMusic.h"
 #include <SDL2/SDL_mixer_ext.h>
+#include <deque>
 #include <mutex>
 #include <vector>
 #include "opl3.h"
@@ -55,8 +56,13 @@ class RSMixer {
     static void musicHook(void *udata, Uint8 *stream, int len);
     void render(int16_t *out, int frames); // appele sous engineMutex
     bool sequenced{ false };               // la musique courante passe par le sequenceur (banque avec .dat)
+    int isolatedTrack{ -1 };               // piste isolee : index dans la banque (-1 si inconnu), pour les evenements
+    std::deque<SCMusicEvent> events;
+    void pushEvent(SCMusicEvent::Type type, int track, int fromTrack, int link, int measure);
+    void drainSequencer(); // recopie les evenements du sequenceur dans 'events'
     void stopMusicLocked();
     void playSequenced(const SCMusicSet *set, uint32_t index);
+    void playIsolated(MemMusic *mus, int loop, int index);
     void serveDriver();
 
 public:
@@ -84,6 +90,22 @@ public:
     void stopMusic(bool fade = false);
     // Piste en train de jouer (apres une transition), UINT32_MAX si aucune
     uint32_t getMusicID();
+    // Piste demandee (celle vers laquelle une transition est en cours), UINT32_MAX si arret
+    uint32_t getRequestedMusicID();
+    // Une piste de liaison du .dat est en train de jouer
+    bool isInTransition();
+    // Mesure courante de la piste principale (compteur du pilote XMIDI)
+    int getMeasure();
+
+    // Evenements musicaux, a lire depuis la boucle de jeu (une fois par frame, jusqu'a false).
+    // RSMixer ne sait pas ce que represente une piste : c'est au consommateur de reconnaitre
+    // une ponctuation (0x10 a 0x12 dans COMBAT) et de demander la piste suivante.
+    //   TRANSITION_STARTED : track = piste demandee, fromTrack = piste quittee, link = liaison
+    //   TRACK_STARTED      : track = piste qui demarre, fromTrack = precedente (-1 au depart)
+    //   TRACK_FINISHED     : track = piste qui ne boucle pas et vient de se terminer
+    //   MUSIC_STOPPED      : arret effectif (stopMusic, fondu termine, ou autre musique lancee)
+    // File limitee a SCMusicSequencer::MAX_EVENTS : au-dela, les plus anciens sont perdus.
+    bool pollMusicEvent(SCMusicEvent &e);
 
     // Effets XMIDI (SOUNDFX.ADL) : 5 canaux comme le jeu. volume en pourcentage (0..100,
     // SoundFX_Play3D_59902 : 100 - distance/10). Renvoie le canal, -1 si aucun libre.
