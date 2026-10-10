@@ -389,39 +389,51 @@ int main(int argc, char **argv)
             SDL_UnlockAudioDevice(dev);
             ImGui::TextWrapped("Voix actives : %d  %s", nv, vinfo.c_str());
             ImGui::Separator();
-            if (ImGui::BeginTable("timbres", 6, ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders)) {
-                ImGui::TableSetupColumn("Banque"); ImGui::TableSetupColumn("Patch"); ImGui::TableSetupColumn("Type");
-                ImGui::TableSetupColumn("Longueur"); ImGui::TableSetupColumn("Duree"); ImGui::TableSetupColumn("");
-                ImGui::TableHeadersRow();
-                for (size_t i = 0; i < timbres.size(); i++) {
-                    const ScTimbreInfo &t = timbres[i];
-                    bool tv = t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS;
-                    if (tvfx_only && !tv) continue;
-                    if (filt_bank >= 0 && t.bank != filt_bank) continue;
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn(); ImGui::Text("%d", t.bank);
-                    ImGui::TableNextColumn(); ImGui::Text("%d", t.patch);
-                    ImGui::TableNextColumn(); ImGui::Text("%s", sc_timbre_kind_label(t.kind));
-                    ImGui::TableNextColumn(); ImGui::Text("%d", t.length);
-                    ImGui::TableNextColumn();
-                    if (tv) { if (t.duration == 0xFFFF) ImGui::Text("Note Off"); else ImGui::Text("%.2f s", (t.duration + 1) / 60.0); }
-                    ImGui::TableNextColumn();
-                    char b1[32], b2[32];
-                    snprintf(b1, sizeof b1, "Jouer##p%zu", i); snprintf(b2, sizeof b2, "Stop##s%zu", i);
-                    if (ImGui::SmallButton(b1)) {
-                        SDL_LockAudioDevice(dev);
-                        if (playing >= 0) sc_timbre_stop(&g.adl, TEST_CHAN, playing);
-                        sc_timbre_play(&g.adl, &t, TEST_CHAN, test_note, test_vel);
-                        playing = test_note;
-                        SDL_UnlockAudioDevice(dev);
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::SmallButton(b2) && playing >= 0) {
-                        SDL_LockAudioDevice(dev); sc_timbre_stop(&g.adl, TEST_CHAN, playing); playing = -1; SDL_UnlockAudioDevice(dev);
-                    }
-                }
-                ImGui::EndTable();
+            /* liste deroulante des timbres retenus par les filtres */
+            std::vector<int> shown;
+            for (size_t i = 0; i < timbres.size(); i++) {
+                const ScTimbreInfo &t = timbres[i];
+                bool tv = t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS;
+                if ((tvfx_only && !tv) || (filt_bank >= 0 && t.bank != filt_bank)) continue;
+                shown.push_back((int)i);
             }
+            auto label = [&](int i) {
+                const ScTimbreInfo &t = timbres[(size_t)i];
+                char b[96];
+                if (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS) {
+                    if (t.duration == 0xFFFF) snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, jusqu'au Note Off", t.bank, t.patch, sc_timbre_kind_label(t.kind));
+                    else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, %.2f s", t.bank, t.patch, sc_timbre_kind_label(t.kind), (t.duration + 1) / 60.0);
+                } else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s", t.bank, t.patch, sc_timbre_kind_label(t.kind));
+                return std::string(b);
+            };
+            static int sel = 0;
+            if (sel >= (int)shown.size()) sel = shown.empty() ? 0 : (int)shown.size() - 1;
+            auto play = [&](int k) {
+                if (k < 0 || k >= (int)shown.size()) return;
+                SDL_LockAudioDevice(dev);
+                if (playing >= 0) sc_timbre_stop(&g.adl, TEST_CHAN, playing);
+                sc_timbre_play(&g.adl, &timbres[(size_t)shown[(size_t)k]], TEST_CHAN, test_note, test_vel);
+                playing = test_note;
+                SDL_UnlockAudioDevice(dev);
+            };
+            ImGui::Text("%d timbre(s)", (int)shown.size());
+            ImGui::SetNextItemWidth(520);
+            if (ImGui::BeginCombo("##timbre", shown.empty() ? "(aucun)" : label(shown[(size_t)sel]).c_str())) {
+                for (int k = 0; k < (int)shown.size(); k++) {
+                    bool is = (k == sel);
+                    if (ImGui::Selectable(label(shown[(size_t)k]).c_str(), is)) sel = k;
+                    if (is) ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+            ImGui::SameLine(); if (ImGui::Button("<")) { if (sel > 0) sel--; play(sel); }
+            ImGui::SameLine(); if (ImGui::Button(">")) { if (sel + 1 < (int)shown.size()) sel++; play(sel); }
+            if (ImGui::Button("Jouer", ImVec2(160, 32))) play(sel);
+            ImGui::SameLine();
+            if (ImGui::Button("Stop (Note Off)", ImVec2(160, 32)) && playing >= 0) {
+                SDL_LockAudioDevice(dev); sc_timbre_stop(&g.adl, TEST_CHAN, playing); playing = -1; SDL_UnlockAudioDevice(dev);
+            }
+            ImGui::TextDisabled("< et > passent au timbre precedent / suivant et le jouent.");
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

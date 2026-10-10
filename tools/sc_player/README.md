@@ -51,10 +51,15 @@ et la dernière résolution de liaison.
 
 ## Test des timbres (TVFX)
 
-L'onglet « Test des timbres (TVFX) » liste les timbres de `STRIKE.AD`, avec un filtre par banque et
-une case « TVFX seulement ». Le bouton « Jouer » envoie au pilote ce qu'enverrait une séquence XMIDI,
-sur le canal MIDI 9 : contrôleur 114 (banque), programme (patch), puis Note On. « Stop » envoie le
-Note Off. `--timbre-tab` ouvre directement cet onglet.
+L'onglet « Test des timbres (TVFX) » propose une **liste déroulante** des timbres de `STRIKE.AD`.
+Elle se filtre par banque, avec une case « TVFX seulement », cochée par défaut. On choisit un
+timbre, puis :
+- **Jouer** fait jouer le timbre par le pilote comme une séquence XMIDI, sur le canal MIDI 9 :
+  contrôleur 114 (banque), programme (patch), puis Note On ;
+- **Stop** envoie le Note Off ;
+- **<** et **>** passent au timbre précédent ou suivant, et le jouent.
+
+`--timbre-tab` ouvre directement cet onglet.
 
 Mode sans fenêtre :
 
