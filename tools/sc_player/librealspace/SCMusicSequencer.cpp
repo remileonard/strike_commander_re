@@ -13,10 +13,8 @@ void SCMusicSequencer::init(AILXmidiDriver *x, const SCTimbreLibrary *l) {
     requested = 0xFFFF;
     current = 0;
     state = 0;
-    resumeTune = 0;
     measureAtReq = 0;
     mainPlaying = 0;
-    enemyNear = 0;
     error = 0;
     fading = false;
     lastMatrix = lastPos = lastValue = lastLink = -1;
@@ -103,23 +101,16 @@ int SCMusicSequencer::measure() {
     return mainCh.handle >= 0 ? xmi->barCount(mainCh.handle) : 0;
 }
 
+bool SCMusicSequencer::finished() {
+    return requested != 0xFFFF && state == 1 && seqDone(mainCh);
+}
+
 bool SCMusicSequencer::seqDone(Channel &c) {
     return c.handle < 0 ? true : xmi->status(c.handle) == SEQ_DONE;
 }
 
 void SCMusicSequencer::resolve() // Music_TuneTransitionResolve_595C2
 {
-    if (requested >= 0x10 && requested <= 0x12) { // ponctuation : piste de reprise
-        if (current == 5) {
-            resumeTune = 4;
-        } else if (current == 8) {
-            resumeTune = (enemyNear & 1) ? 4 : 0x13;
-        } else if (current == 0x15) {
-            resumeTune = 0x13;
-        } else {
-            resumeTune = current;
-        }
-    }
     int A = set->phraseLen[(size_t)current];
     int r = A ? (int)((int16_t)measureAtReq % A) : 0; // 'cwd / idiv bx'
     measureAtReq = r ? r + 1 : set->phraseLast[(size_t)current];
@@ -165,12 +156,8 @@ void SCMusicSequencer::commit() // Music_TuneTransitionCommit_5974D
         chanStop(mainCh);
     }
     current = requested & 0xFF;
-    int di = current;
     chanPlay(mainCh, track(current), 0, current);
     mainPlaying = 1;
-    if (di >= 0x10 && di <= 0x12) {
-        requested = resumeTune;
-    }
 }
 
 void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
@@ -196,8 +183,6 @@ void SCMusicSequencer::tick() // Music_SequencerTickISR_5940B
         if (current != requested) {
             measureAtReq = measure();
             state = 2;
-        } else if (seqDone(mainCh)) {
-            requested = resumeTune;
         }
         break;
     case 2:

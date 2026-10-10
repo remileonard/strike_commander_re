@@ -9,6 +9,11 @@
 //    Music_InstallTimbre_5A62A, Music_StopWithFade_AB1EF.
 //  Voir strike_commander_re/analysis/MUSIC_SYSTEM.md section 4.
 //
+//  Ne garde que ce que donne le .dat : attente de la barre de mesure, position dans la
+//  phrase, matrice et pistes de liaison. Le retour automatique apres une ponctuation
+//  (pistes 0x10 a 0x12, piste de reprise word_7085B, cas 5 / 8 / 0x15 et "ennemi proche")
+//  n'est PAS ici : c'est la mission qui choisit la piste suivante (MUSIC_SYSTEM.md 4.4).
+//
 #pragma once
 #include "AILXmidiDriver.h"
 #include "SCMusicSet.h"
@@ -27,6 +32,8 @@ public:
     void tick();                             // a appeler a 20 Hz
     void stop(bool fade);                    // Music_StopWithFade_AB1EF
     int measure();                           // AIL_measure_count du canal principal
+    // La piste demandee est jouee jusqu'au bout et ne boucle pas (aucune autre demande en attente)
+    bool finished();
     bool active() const {
         return requested != 0xFFFF || fading;
     }
@@ -43,10 +50,8 @@ public:
     int requested = 0xFFFF; // word_70859 (0xFFFF = arret)
     int current = 0;        // byte_72C90
     int state = 0;          // byte_70858
-    int resumeTune = 0;     // word_7085B
     int measureAtReq = 0;   // word_72C91 (mesure, puis position dans la phrase)
     int mainPlaying = 0;    // byte_72CA1
-    int enemyNear = 0;      // byte_7086A bit 0 (choix de reprise apres la piste 8)
     int error = 0;          // byte_7084A
     bool fading = false;
     int lastMatrix = -1;

@@ -218,6 +218,15 @@ canal principal. **Si c'est une ponctuation (`0x10` à `0x12`)**, la piste mémo
 aussitôt redemandée : la ponctuation joue jusqu'à la barre suivante (ou sa fin), puis la musique
 repart vers la piste mémorisée. Un seul niveau de mémoire : une seconde ponctuation écrase la première.
 
+La piste mémorisée est choisie par `Music_TuneTransitionResolve_595C2` quand une ponctuation est demandée :
+en général la piste courante, sauf trois cas. Pendant la piste 5, c'est la 4. Pendant la piste 8, c'est la 4
+si un avion ennemi est proche (`byte_7086A` bit 0), sinon la 0x13. Pendant la 0x15, c'est la 0x13. Une piste
+principale qui se termine fait aussi redemander la piste mémorisée.
+
+**Portage (décision de Rémi, 2026-10-10)** : `SCMusicSequencer` et `RSMixer` ne gardent que ce que donne le
+`.dat` (barre de mesure, position dans la phrase, matrice, liaisons). La mémoire de reprise et ses cas
+particuliers sont de la logique de mission, à porter plus tard dans la partie mission de libRealSpace.
+
 ### 4.5 Arrêt, pause, reprise
 
 `Music_Stop_5A9E6` → `Music_StopWithFade_AB1EF(fondu)` : demande `0xFFFF`, arrête la liaison ; si

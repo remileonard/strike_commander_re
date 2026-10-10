@@ -50,10 +50,13 @@ Ce sont les versions de `RSMusic` et `RSMixer` de libRealSpace qui utilisent le 
   - `playMusic(index, loop)` dans une autre banque : la piste joue seule. -1 = sans fin, n = n fois ;
   - `playMusic(MemMusic*, loop)` : même règle, selon que la piste appartient ou non à une banque avec `.dat` ;
   - `stopMusic(fade = false)` : `fade` = fondu d'une seconde (`Music_StopWithFade_AB1EF`) ;
-  - `getMusicID()` : la piste qui joue réellement, par exemple la piste de reprise après une ponctuation.
+  - `getMusicID()` : la piste qui joue réellement, ou `UINT32_MAX` si elle s'est terminée (une
+    ponctuation, par exemple) ou si la musique est arrêtée ;
+  - rien d'autre que le `.dat` : pas de retour automatique après une ponctuation, pas d'« ennemi
+    proche ». La mission demande elle-même la piste suivante.
   
-  Choisir la piste selon la situation (ennemi proche, dégâts, éjection…) reste le travail du code de jeu
-  de libRealSpace (`analysis/MUSIC_SYSTEM.md` §5).
+  Choisir la piste selon la situation (ennemi proche, dégâts, éjection, reprise après une
+  ponctuation…) reste le travail de la mission dans libRealSpace (`analysis/MUSIC_SYSTEM.md` §4.4 et §5).
 - Une seule musique joue à la fois.
 - Effets XMIDI : `playSoundFx(mus, volume)`, `setSoundFxVolume`, `stopSoundFx`, `isSoundFxPlaying` :
   - 5 canaux, comme le jeu (`SoundFX_FindFreeChannel_598A6`) ;

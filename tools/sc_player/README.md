@@ -59,6 +59,19 @@ seq.request(4);          // Music_RequestTune_5A984 ; seq.stop(true) = arret ave
 
 Versions de `RSMusic` et `RSMixer` prêtes à intégrer : voir `integration/README.md`.
 
+## Ce que fait le séquenceur
+
+`SCMusicSequencer` ne garde **que ce que donne le `.dat`** : il attend la barre de mesure, calcule la
+position dans la phrase, puis lit la matrice et les entrées de liaison pour choisir la piste de liaison.
+
+Il **ne contient pas** la logique de reprise du jeu (`Music_TuneTransitionResolve_595C2`,
+`Music_TuneTransitionCommit_5974D`, `analysis/MUSIC_SYSTEM.md` §4.4) :
+- le retour automatique vers une piste mémorisée après une ponctuation (0x10 à 0x12) ;
+- les cas particuliers (5 → 4, 8 → 4 ou 0x13 selon « ennemi proche », 0x15 → 0x13).
+
+C'est à la mission de demander la piste suivante. Une piste qui ne boucle pas joue jusqu'au bout,
+puis le séquenceur attend la demande suivante (`finished()` le signale).
+
 ## Fichiers du jeu nécessaires
 
 Dans le répertoire `SOUND` du jeu (le nom est cherché sans tenir compte de la casse) :
@@ -90,8 +103,8 @@ Il faut SDL2 (paquet `libsdl2-dev`). ImGui et Nuked-OPL3 sont fournis dans `thir
 - `--screenshot f.bmp` enregistre la fenêtre au bout de 2 s, puis quitte.
 
 L'interface propose un bouton par piste, libellé avec l'événement du jeu qui la déclenche
-(`analysis/MUSIC_SYSTEM.md` §5.5). Elle affiche l'état du séquenceur, la mesure, la piste de reprise
-et la dernière résolution de liaison.
+(`analysis/MUSIC_SYSTEM.md` §5.5). Elle affiche l'état du séquenceur, la mesure, la dernière résolution de liaison, et signale
+une piste terminée.
 
 ## Test des timbres (TVFX)
 
@@ -161,7 +174,8 @@ Le test vérifie quatre points :
 - l'attente de la barre de mesure ;
 - la position dans la phrase et la piste de liaison choisie (4 → 0x10 à la position 3 → liaison 0x13,
   d'après le vrai `COMBAT.DAT`) ;
-- le retour à la piste de reprise après une ponctuation ;
+- l'absence de retour automatique après une ponctuation : la piste reste courante jusqu'à la
+  demande suivante (voir « Ce que fait le séquenceur ») ;
 - le fondu d'arrêt.
 
 Ces musiques de test ne sont pas celles du jeu.
@@ -179,7 +193,7 @@ Ces musiques de test ne sont pas celles du jeu.
   - 87 timbres TVFX, tous de type 2 (fréquence absolue).
   - Aucun timbre de longueur 0x19, que le pilote ignorerait.
 - Transitions sur données réelles : 4 → 0x10 à la position 5, entrée 24, valeur 0x14,
-  donc la liaison n° 19 est jouée, puis le retour à 4.
+  donc la liaison n° 19 est jouée (le retour à 4 qui suivait dans le jeu relève de la mission).
 
 ## Reste à comparer
 

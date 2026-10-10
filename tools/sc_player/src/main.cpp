@@ -546,6 +546,7 @@ int main(int argc, char **argv) {
                 int measure = g.music.measure();
                 int beat = g.music.mainCh.handle >= 0 ? g.xmi.beatCount(g.music.mainCh.handle) : 0;
                 int voices = g.adl.activeVoices();
+                bool finished = g.music.finished();
                 SDL_UnlockAudioDevice(dev);
 
                 char req[16];
@@ -555,8 +556,8 @@ int main(int argc, char **argv) {
                     snprintf(req, sizeof req, "0x%02X", snap.requested);
                 }
                 ImGui::Text("Piste courante 0x%02X   demandee %s   etat %s", snap.current, req, state_label(snap.state));
-                ImGui::Text("Mesure %d, temps %d   voix actives %d / 16   piste de reprise 0x%02X   erreur %d",
-                            measure, beat, voices, snap.resumeTune, snap.error);
+                ImGui::Text("Mesure %d, temps %d   voix actives %d / 16   erreur %d%s",
+                            measure, beat, voices, snap.error, finished ? "   (piste terminee)" : "");
                 if (snap.lastMatrix >= 0) {
                     ImGui::Text("Derniere resolution : entree de liaison %d, position %d, valeur 0x%02X -> %s",
                                 snap.lastMatrix == 0xFF ? -1 : snap.lastMatrix, snap.lastPos, snap.lastValue,
@@ -564,12 +565,6 @@ int main(int argc, char **argv) {
                 }
                 if (snap.state == 3) {
                     ImGui::TextColored(ImVec4(1, 0.8f, 0.3f, 1), "Liaison %d en cours", snap.linkCh.index);
-                }
-                bool near = snap.enemyNear & 1;
-                if (ImGui::Checkbox("Avion ennemi proche (choix de reprise apres la piste 8)", &near)) {
-                    SDL_LockAudioDevice(dev);
-                    g.music.enemyNear = near ? 1 : 0;
-                    SDL_UnlockAudioDevice(dev);
                 }
                 ImGui::Separator();
                 ImGui::Text("Demander une piste (Music_RequestTune) : le changement attend la barre de mesure suivante.");

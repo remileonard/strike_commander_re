@@ -15,8 +15,11 @@ check() { if grep -q "$1" "$TMP/log"; then echo "OK   $2"; else echo "ECHEC $2";
 check "etat 2 attente de la barre, piste 0x04, mesure 2"                     "demande mise en attente de la barre"
 check "t=  6.0[0-9] s : etat 3 liaison en cours.*entree 24, position 3, valeur 0x13" "liaison 4 -> 0x10 a la position 3"
 check "etat 1 lecture, piste 0x10"                                            "ponctuation 0x10 jouee apres la liaison"
-check "etat 1 lecture, piste 0x04, .*entree 255"                              "retour a la piste de reprise 4"
-check "etat 1 lecture, piste 0x09"                                            "bascule directe 4 -> 9"
+# Pas de retour automatique apres une ponctuation (logique de mission, pas du .dat) :
+# 0x10 joue jusqu'au bout puis la demande suivante part de 0x10.
+if [ "$(grep -c 'etat 1 lecture, piste 0x04' "$TMP/log")" = 1 ]; then echo "OK   pas de retour automatique a la piste 4"; else echo "ECHEC pas de retour automatique a la piste 4"; fail=1; fi
+check "etat 2 attente de la barre, piste 0x10"                                "la piste 0x10 reste courante jusqu'a la demande suivante"
+check "etat 1 lecture, piste 0x09, .*entree 255"                              "bascule directe 0x10 -> 9"
 python3 - "$TMP/out.wav" <<'PY' || fail=1
 import array, sys
 a = array.array('h', open(sys.argv[1], 'rb').read()[44:])

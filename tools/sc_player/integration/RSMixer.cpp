@@ -326,7 +326,10 @@ void RSMixer::stopMusic(bool fade) {
 uint32_t RSMixer::getMusicID() {
     std::lock_guard<std::recursive_mutex> lock(engineMutex);
     if (this->sequenced) {
-        return sequencer.active() ? (uint32_t)sequencer.current : UINT32_MAX;
+        if (!sequencer.active() || sequencer.finished()) {
+            return UINT32_MAX;
+        }
+        return (uint32_t)sequencer.current;
     }
     return this->isplaying ? this->current_music : UINT32_MAX;
 }
