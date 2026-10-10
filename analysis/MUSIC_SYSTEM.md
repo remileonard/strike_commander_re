@@ -326,7 +326,8 @@ image, dont la phase 0 est `WeaponCam_LaunchPhase_80971`.
 
 ## 6. Ce qu'il faut pour le portage
 
-**Implémentation de référence : `tools/sc_player/`** (C, sans dépendance pour le cœur). Elle porte
+**Implémentation de référence : `tools/sc_player/`**, **validée à l'oreille par Rémi le 2026-10-10**
+(musiques de `STRIKE.EXE` et d'un jeu de musique d'`OPTEST.EXE`, banque TVFX), (C, sans dépendance pour le cœur). Elle porte
 le séquenceur du jeu (§4), l'interpréteur XMIDI du pilote, la partie voix OPL du pilote
 (`ADLIB_DRIVER.md` §11) et l'archive avec LZW. Le mode `--wav` écrit chaque transition (mesure,
 position, entrée de liaison) pour comparer avec libRealSpace.

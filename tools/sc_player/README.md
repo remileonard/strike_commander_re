@@ -124,7 +124,7 @@ Ces musiques de test ne sont pas celles du jeu.
 
 ## Reste à comparer
 
-- L'écoute, comparée au jeu original, n'a pas encore été faite.
+- **Validé à l'oreille par Rémi (2026-10-10)** : rendu des musiques correct, y compris avec un autre jeu de musique chargé par `OPTEST.EXE`, et chargement de la banque TVFX correct.
 - Le pilote n'applique pas le volume aux voix TVFX : seul le timbre OPL simple fixe le masque
   `0x1824` (`sub_2617`). Le fondu d'arrêt ne baisse donc pas une voix TVFX. Le portage fait de même.
 - Le jeu boucle sans fin si un timbre manque dans la bibliothèque. Le lecteur s'arrête et le signale.
