@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Genere src/adlib_tables.h a partir du binaire reel ADLIB.ADV (pilote AIL du jeu).
-Usage : python3 gen_adlib_tables.py ADLIB.ADV src/adlib_tables.h
+"""Genere librealspace/AILAdlibTables.h a partir du binaire reel ADLIB.ADV (pilote AIL du jeu).
+Usage : python3 gen_adlib_tables.py ADLIB.ADV librealspace/AILAdlibTables.h
 Chaque table est copiee a son offset exact dans le binaire (offsets cites dans
 analysis/ADLIB_DRIVER.md et dans le code du pilote, ex. 'mov ax, cs:[di+0AACh]')."""
 import struct, sys
@@ -21,7 +21,7 @@ tables = [
     ("ADL_PRG_DEFAULT", 0x2AB9,  9, 'B', "programmes initiaux des canaux MIDI 1..9 (0xFF = aucun)"),
 ]
 out = ["/* Genere par tools/gen_adlib_tables.py depuis ADLIB.ADV (pilote AdLib AIL de Strike Commander). Ne pas editer. */",
-       "#ifndef ADLIB_TABLES_H", "#define ADLIB_TABLES_H", "#include <stdint.h>"]
+       "#ifndef AIL_ADLIB_TABLES_H", "#define AIL_ADLIB_TABLES_H", "#include <stdint.h>"]
 for name, off, n, t, doc in tables:
     sz = struct.calcsize(t)
     vals = struct.unpack('<%d%s' % (n, t), b[off:off + n * sz])

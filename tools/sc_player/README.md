@@ -4,16 +4,57 @@ Reproduit la chaîne musicale du jeu, chaque étage étant porté depuis le code
 
 | Étage | Fréquence | Source portée | Fichier |
 |---|---|---|---|
-| Séquenceur du jeu : 4 états, transitions calées sur la barre de mesure, pistes de liaison, ponctuations | 20 Hz | `Music_SequencerTickISR_5940B`, `Music_TuneTransitionResolve_595C2`, `Music_TuneTransitionCommit_5974D`, `Music_ChannelRegisterSequence_59FF5`, `Music_InstallTimbre_5A62A`, `Music_StopWithFade_AB1EF` (seg121-125) | `src/sc_music.c` |
-| Interpréteur XMIDI (file de notes, tempo, mesures, boucles FOR/NEXT, volume relatif) | 120 Hz | `XMIDI.ASM` d'AIL 2.0, avec les écarts de la version compilée dans `ADLIB.ADV` | `src/ail_xmidi.c` |
-| Partie voix du pilote AdLib (16 voix → 9 canaux OPL2, priorités, timbres OPL simples et TVFX) | 120 Hz (TVFX à 60 Hz) | `ADLIB.ADV` lu dans `analysis/adlib_driver_source/adlib.asm` | `src/ail_adlib.c` |
-| Tables du pilote (F-Number, octaves, vélocité, registres initiaux, contrôleurs par défaut) | — | extraites du binaire `ADLIB.ADV` | `src/adlib_tables.h` (généré) |
-| Archive indexée + LZW | — | `IndexedRecordReader_*` (seg196), `LZW_Decompress_66068` (seg197) | `src/sc_archive.c` |
-| Chargement de `COMBAT.DAT`, `COMBAT.ADL`, `STRIKE.AD` | — | `AudioQueue_LoadTrackTable_AACA6`, `AudioQueue_LoadTransitionTable_AAFA0`, `Music_LoadTimbreFromLibrary_5A577` | `src/sc_data.c` |
+| Séquenceur du jeu : 4 états, transitions calées sur la barre de mesure, pistes de liaison, ponctuations | 20 Hz | `Music_SequencerTickISR_5940B`, `Music_TuneTransitionResolve_595C2`, `Music_TuneTransitionCommit_5974D`, `Music_ChannelRegisterSequence_59FF5`, `Music_InstallTimbre_5A62A`, `Music_StopWithFade_AB1EF` (seg121-125) | `librealspace/SCMusicSequencer.cpp` |
+| Interpréteur XMIDI (file de notes, tempo, mesures, boucles FOR/NEXT, volume relatif) | 120 Hz | `XMIDI.ASM` d'AIL 2.0, avec les écarts de la version compilée dans `ADLIB.ADV` | `librealspace/AILXmidiDriver.cpp` |
+| Partie voix du pilote AdLib (16 voix → 9 canaux OPL2, priorités, timbres OPL simples et TVFX) | 120 Hz (TVFX à 60 Hz) | `ADLIB.ADV` lu dans `analysis/adlib_driver_source/adlib.asm` | `librealspace/AILAdlibDriver.cpp` |
+| Tables du pilote (F-Number, octaves, vélocité, registres initiaux, contrôleurs par défaut) | — | extraites du binaire `ADLIB.ADV` | `librealspace/AILAdlibTables.h` (généré par `tools/gen_adlib_tables.py`) |
+| Données d'un jeu de musique (`COMBAT.DAT` + pistes de `COMBAT.ADL`) et bibliothèque de timbres `STRIKE.AD` | — | `AudioQueue_LoadTrackTable_AACA6`, `AudioQueue_LoadTransitionTable_AAFA0`, `Music_LoadTimbreFromLibrary_5A577` | `librealspace/SCMusicSet.cpp` |
+| Test des timbres (liste, jouer, Note Off) | — | `Music_InstallTimbre_5A62A` | `librealspace/SCTimbreTest.cpp` |
+| Archive indexée + LZW (lecteur autonome seulement) | — | `IndexedRecordReader_*` (seg196), `LZW_Decompress_66068` (seg197) | `src/SCArchive.cpp` |
 
-Le cœur (`sc_music_core` : tout `src/` sauf `main.cpp`) est en C, sans SDL ni ImGui.
-C'est la partie à reprendre dans libRealSpace. Il suffit de lui fournir une fonction
-d'écriture de registre OPL, puis d'appeler `xmi_serve()` à 120 Hz et `sc_music_tick()` à 20 Hz.
+Tout est en **C++17**. Seul l'émulateur Nuked-OPL3 (`third_party/`) reste en C.
+
+- `librealspace/` (bibliothèque `sc_music_core`) ne dépend ni de SDL, ni d'ImGui, ni du format
+  d'archive : **ce répertoire se copie tel quel dans libRealSpace**. On lui fournit une fonction
+  d'écriture de registre OPL, puis on appelle `AILXmidiDriver::serve()` à 120 Hz et
+  `SCMusicSequencer::tick()` à 20 Hz.
+- `src/` est propre au lecteur autonome : `main.cpp` (interface, rendu WAV) et `SCArchive`
+  (lecture des fichiers du jeu, rôle que tient `PakArchive` dans libRealSpace).
+
+Le passage du C au C++ (2026-10-10) ne change pas le rendu. Sur les vrais fichiers, l'ancien et le
+nouveau lecteur produisent des WAV **identiques octet pour octet** :
+- 60 s de musique de combat, avec des demandes 4 → 0x10 → 9 → 0x13 puis un arrêt avec fondu ;
+- les 87 TVFX joués l'un après l'autre (`--timbre-wav`).
+
+## Utilisation dans libRealSpace
+
+```cpp
+#include "AILAdlibDriver.h"
+#include "AILXmidiDriver.h"
+#include "SCMusicSequencer.h"
+
+opl3_chip chip;  AILAdlibDriver adl;  AILXmidiDriver xmi;  SCMusicSequencer seq;
+SCMusicSet combat;  SCTimbreLibrary lib;
+
+// chargement (avec PakArchive) :
+//   COMBAT.DAT : enregistrement 0          -> combat.parseDat(data, size)
+//   COMBAT.ADL : entree 0 du fichier = le jeu ; dans le jeu :
+//                [0] archive des pistes de liaison -> combat.linkTracks
+//                [1..N] pistes principales          -> combat.tracks
+//   STRIKE.AD  : fichier entier (le buffer doit rester vivant) -> lib.set(data, size)
+
+OPL3_Reset(&chip, rate);
+adl.init([&](uint16_t reg, uint8_t val) { OPL3_WriteReg(&chip, reg, val); });
+xmi.init(&adl);
+seq.init(&xmi, &lib);
+seq.setMusicSet(&combat);
+seq.request(4);          // Music_RequestTune_5A984 ; seq.stop(true) = arret avec fondu
+
+// dans le rappel audio (Mix_HookMusic avec SDL_mixer) : generer les echantillons avec
+// OPL3_GenerateStream, en appelant xmi.serve() tous les rate/120 echantillons et
+// seq.tick() tous les rate/20 (voir render() dans src/main.cpp).
+// Piste isolee (GAMEFLOW, MIDGAMES, SOUNDFX) : SCMusicSequencer::registerAndStart(&xmi, &lib, data, size, &err).
+```
 
 ## Fichiers du jeu nécessaires
 

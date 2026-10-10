@@ -317,7 +317,7 @@ ce pilote, qui appelle ensuite la partie voix OPL décrite ici. Voir `MUSIC_SYST
 
 ---
 
-## 11. Partie voix lue intégralement (2026-10-07) — portée dans `tools/sc_player/src/ail_adlib.c`
+## 11. Partie voix lue intégralement (2026-10-07) — portée dans `tools/sc_player/librealspace/AILAdlibDriver.cpp`
 
 Toute la partie « voix OPL » (`sub_501` à `sub_28BE`) a été lue et portée. C'est le **système TVFX
 d'AIL 2.0** (équivalent de `YAMAHA.INC`). Les §6, §8 et §9 ci-dessus sont confirmés et complétés

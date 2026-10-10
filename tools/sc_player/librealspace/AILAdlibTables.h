@@ -1,6 +1,6 @@
 /* Genere par tools/gen_adlib_tables.py depuis ADLIB.ADV (pilote AdLib AIL de Strike Commander). Ne pas editer. */
-#ifndef ADLIB_TABLES_H
-#define ADLIB_TABLES_H
+#ifndef AIL_ADLIB_TABLES_H
+#define AIL_ADLIB_TABLES_H
 #include <stdint.h>
 /* @0xAAC : F-Number, 12 demi-tons x 16 pas ('mov ax, cs:[di+0AACh]') */
 static const uint16_t ADL_FNUM[192] = {

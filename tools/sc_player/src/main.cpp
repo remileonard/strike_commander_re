@@ -30,27 +30,29 @@
 #include "imgui_impl_sdlrenderer2.h"
 extern "C" {
 #include "opl3.h"
-#include "ail_adlib.h"
-#include "ail_xmidi.h"
-#include "sc_data.h"
-#include "sc_music.h"
-#include "sc_timbre_test.h"
 }
+#include "AILAdlibDriver.h"
+#include "AILXmidiDriver.h"
+#include "SCMusicSet.h"
+#include "SCMusicSequencer.h"
+#include "SCTimbreTest.h"
+#include "SCArchive.h"
 
 static const int RATE = 44100;
 
 struct Engine {
-    opl3_chip   chip;
-    AdlDriver   adl;
-    XmiDriver   xmi;
-    ScMusicData data;
-    ScMusic     music;
+    opl3_chip        chip;
+    AILAdlibDriver   adl;
+    AILXmidiDriver   xmi;
+    SCMusicSet       set;
+    std::vector<uint8_t> libData;
+    SCTimbreLibrary  lib;
+    SCMusicSequencer music;
     double      acc_drv = 0, acc_game = 0;
     unsigned long long samples = 0;
 };
 static Engine g;
 
-static void opl_write(void *, uint16_t reg, uint8_t val) { OPL3_WriteReg(&g.chip, reg, val); }
 
 /* Avance la musique et produit n echantillons stereo 16 bits. */
 static void render(int16_t *out, int n)
@@ -67,8 +69,8 @@ static void render(int16_t *out, int n)
         g.samples += (unsigned long long)chunk;
         g.acc_drv += chunk * drv_step;
         g.acc_game += chunk * game_step;
-        if (g.acc_game >= 1.0) { g.acc_game -= 1.0; sc_music_tick(&g.music); }
-        if (g.acc_drv >= 1.0) { g.acc_drv -= 1.0; xmi_serve(&g.xmi); }
+        if (g.acc_game >= 1.0) { g.acc_game -= 1.0; g.music.tick(); }
+        if (g.acc_drv >= 1.0) { g.acc_drv -= 1.0; g.xmi.serve(); }
     }
 }
 
@@ -89,6 +91,54 @@ static std::string find_file(const std::string &dir, const char *name)
     return dir + "/" + up;
 }
 
+static bool read_file(const std::string &path, std::vector<uint8_t> &out)
+{
+    FILE *f = fopen(path.c_str(), "rb");
+    if (!f) return false;
+    fseek(f, 0, SEEK_END);
+    long n = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    out.resize(n > 0 ? (size_t)n : 0);
+    bool ok = fread(out.data(), 1, out.size(), f) == out.size();
+    fclose(f);
+    return ok;
+}
+
+/* Remplit g.set et g.lib. Structure reelle (verifiee sur le COMBAT.ADL fourni par Remi) :
+ *   COMBAT.DAT : enregistrement 0 = longueurs de phrase, matrice, entrees de liaison
+ *   COMBAT.ADL : fichier -> 1 entree = le jeu ; jeu : [0] archive des liaisons, [1..N] pistes */
+static bool load_files(const std::string &dat, const std::string &adl, const std::string &libp)
+{
+    std::vector<uint8_t> buf, rec;
+    SCArchive a;
+    if (!read_file(dat, buf)) { fprintf(stderr, "impossible d'ouvrir %s\n", dat.c_str()); return false; }
+    if (!a.open(buf.data(), buf.size()) || !a.record(0, rec) || !g.set.parseDat(rec.data(), rec.size())) {
+        fprintf(stderr, "%s : format inattendu\n", dat.c_str()); return false;
+    }
+    if (!read_file(adl, buf)) { fprintf(stderr, "impossible d'ouvrir %s\n", adl.c_str()); return false; }
+    SCArchive l1, l2, l3;
+    std::vector<uint8_t> r2, r3;
+    if (!l1.open(buf.data(), buf.size()) || !l1.record(0, r2) || !l2.open(r2.data(), r2.size())) {
+        fprintf(stderr, "%s : index invalide\n", adl.c_str()); return false;
+    }
+    if (l2.count() < (uint32_t)g.set.trackCount + 1)
+        fprintf(stderr, "%s : %u enregistrements, %d pistes attendues + 1\n", adl.c_str(), l2.count(), g.set.trackCount);
+    g.set.tracks.assign((size_t)g.set.trackCount, {});
+    for (int i = 0; i < g.set.trackCount; i++)
+        if (!l2.record((uint32_t)i + 1, g.set.tracks[(size_t)i])) fprintf(stderr, "%s : piste %d absente\n", adl.c_str(), i);
+    g.set.linkTracks.clear();
+    if (l2.record(0, r3) && l3.open(r3.data(), r3.size())) {
+        g.set.linkTracks.resize(l3.count());
+        for (uint32_t i = 0; i < l3.count(); i++) l3.record(i, g.set.linkTracks[i]);
+    } else {
+        fprintf(stderr, "%s : archive des pistes de liaison illisible\n", adl.c_str());
+    }
+    if (read_file(libp, g.libData)) g.lib.set(g.libData.data(), g.libData.size());
+    else   /* sans bibliotheque : les pistes se chargent et s'enchainent, mais aucun timbre -> silence */
+        fprintf(stderr, "ATTENTION : %s introuvable (bibliotheque de timbres) : aucune note ne sonnera\n", libp.c_str());
+    return true;
+}
+
 static bool load(const std::string &dir_arg)
 {
     std::vector<std::string> dirs;
@@ -97,7 +147,7 @@ static bool load(const std::string &dir_arg)
         std::string dat = find_file(d, "COMBAT.DAT");
         if (!exists(dat)) continue;
         std::string adl = find_file(d, "COMBAT.ADL"), lib = find_file(d, "STRIKE.AD");
-        if (sc_data_load(&g.data, dat.c_str(), adl.c_str(), lib.c_str()) != 0) return false;
+        if (!load_files(dat, adl, lib)) return false;
         fprintf(stderr, "donnees : %s, %s, %s\n", dat.c_str(), adl.c_str(), lib.c_str());
         return true;
     }
@@ -108,9 +158,10 @@ static bool load(const std::string &dir_arg)
 static void engine_init()
 {
     OPL3_Reset(&g.chip, RATE);
-    adl_init(&g.adl, opl_write, nullptr);
-    xmi_init(&g.xmi, &g.adl);
-    sc_music_init(&g.music, &g.xmi, &g.data);
+    g.adl.init([](uint16_t reg, uint8_t val) { OPL3_WriteReg(&g.chip, reg, val); });
+    g.xmi.init(&g.adl);
+    g.music.init(&g.xmi, &g.lib);
+    g.music.setMusicSet(&g.set);
 }
 
 static const char *tune_label(int t)
@@ -162,15 +213,15 @@ static int wav_mode(const char *path, double seconds, int tune, const std::vecto
     if (!f) { fprintf(stderr, "impossible d'ecrire %s\n", path); return 1; }
     uint32_t total = (uint32_t)(seconds * RATE);
     wav_header(f, total);
-    sc_music_request(&g.music, tune);
+    g.music.request(tune);
     std::vector<int16_t> buf(2 * 1024);
     size_t next = 0;
     int last_state = -1, last_cur = -1;
     for (uint32_t pos = 0; pos < total; ) {
         double t = (double)pos / RATE;
         while (next < at.size() && at[next].first <= t) {
-            if (at[next].second < 0) { fprintf(stderr, "t=%6.2f s : arret avec fondu\n", t); sc_music_stop(&g.music, 1); }
-            else { fprintf(stderr, "t=%6.2f s : demande de la piste 0x%02X\n", t, at[next].second); sc_music_request(&g.music, at[next].second); }
+            if (at[next].second < 0) { fprintf(stderr, "t=%6.2f s : arret avec fondu\n", t); g.music.stop(true); }
+            else { fprintf(stderr, "t=%6.2f s : demande de la piste 0x%02X\n", t, at[next].second); g.music.request(at[next].second); }
             next++;
         }
         int n = (int)std::min<uint32_t>(1024, total - pos);
@@ -179,10 +230,10 @@ static int wav_mode(const char *path, double seconds, int tune, const std::vecto
         pos += (uint32_t)n;
         if (g.music.state != last_state || g.music.current != last_cur) {
             fprintf(stderr, "t=%6.2f s : etat %s, piste 0x%02X, mesure %d, voix %d",
-                    t, state_label(g.music.state), g.music.current, sc_music_measure(&g.music), adl_active_voices(&g.adl));
-            if (g.music.last_matrix >= 0)
+                    t, state_label(g.music.state), g.music.current, g.music.measure(), g.adl.activeVoices());
+            if (g.music.lastMatrix >= 0)
                 fprintf(stderr, " (derniere resolution : entree %d, position %d, valeur 0x%02X)",
-                        g.music.last_matrix, g.music.last_pos, g.music.last_value);
+                        g.music.lastMatrix, g.music.lastPos, g.music.lastValue);
             fprintf(stderr, "\n");
             last_state = g.music.state; last_cur = g.music.current;
         }
@@ -195,12 +246,7 @@ static int wav_mode(const char *path, double seconds, int tune, const std::vecto
 static const int TEST_CHAN = 8;      /* canal MIDI 9 : accepte par le pilote (1..9), pas le canal 10 des percussions */
 static const int TEST_NOTE = 60;
 
-static std::vector<ScTimbreInfo> timbre_list()
-{
-    std::vector<ScTimbreInfo> v(512);
-    v.resize((size_t)sc_timbre_list(&g.data, v.data(), (int)v.size()));
-    return v;
-}
+static std::vector<SCTimbreInfo> timbre_list() { return SCTimbreTest::list(g.lib); }
 
 /* --timbre-wav : chaque timbre joue jusqu'a la liberation de sa voix ; voir les commentaires de la boucle. */
 static int timbre_wav_mode(const char *path, int bank, bool all)
@@ -211,18 +257,18 @@ static int timbre_wav_mode(const char *path, int bank, bool all)
     std::vector<int16_t> buf(2 * 441);
     uint32_t total = 0;
     auto run = [&](double sec) { for (int k = 0; k < (int)(sec * 100); k++) { render(buf.data(), 441); fwrite(buf.data(), 4, 441, f); total += 441; } };
-    for (const ScTimbreInfo &t : timbre_list()) {
+    for (const SCTimbreInfo &t : timbre_list()) {
         if (bank >= 0 && t.bank != bank) continue;
-        if (!all && t.kind != TIMBRE_TVFX_NOTE && t.kind != TIMBRE_TVFX_ABS) continue;
+        if (!all && !t.isTvfx()) continue;
         fprintf(stderr, "t=%7.2f s : banque %3d patch %3d, %s, longueur %d", total / (double)RATE, t.bank, t.patch,
-                sc_timbre_kind_label(t.kind), t.length);
-        if (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS)
+                SCTimbreTest::kindLabel(t.kind), t.length);
+        if (t.isTvfx())
             fprintf(stderr, ", duree %s", t.duration == 0xFFFF ? "jusqu'au Note Off" : (std::to_string((t.duration + 1) / 60.0).substr(0, 4) + " s").c_str());
         fprintf(stderr, "\n");
-        sc_timbre_play(&g.adl, &t, TEST_CHAN, TEST_NOTE, 127);
+        SCTimbreTest::play(g.adl, t, TEST_CHAN, TEST_NOTE, 127);
         /* TVFX a duree propre : il passe seul en relachement, pas de Note Off.
          * Timbre tenu (OPL simple, TVFX type 1, duree 0xFFFF) : Note Off a 1,5 s. */
-        bool own = (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS) && t.duration != 0xFFFF;
+        bool own = t.isTvfx() && t.duration != 0xFFFF;
         double own_len = own ? (t.duration + 1) / 60.0 : 0;
         double off_at = !own ? 1.5 : (own_len > 8.0 ? 8.0 : 1e9);   /* effet en boucle : Note Off a 8 s */
         double limit = (own && own_len <= 8.0 ? own_len : off_at) + 4.0;
@@ -231,12 +277,12 @@ static int timbre_wav_mode(const char *path, int bank, bool all)
         bool off = false;
         while (el < limit) {
             run(0.05); el += 0.05;
-            if (!off && el >= off_at) { sc_timbre_stop(&g.adl, TEST_CHAN, TEST_NOTE); off = true; }
-            if (adl_active_voices(&g.adl) == 0) break;
+            if (!off && el >= off_at) { SCTimbreTest::stop(g.adl, TEST_CHAN, TEST_NOTE); off = true; }
+            if (g.adl.activeVoices() == 0) break;
         }
-        if (adl_active_voices(&g.adl)) {
+        if (g.adl.activeVoices()) {
             fprintf(stderr, "            voix toujours active apres %.1f s : relachement sans fin, coupee par le test\n", limit);
-            adl_kill_all(&g.adl);
+            g.adl.killAll();
         } else {
             fprintf(stderr, "            voix liberee a %.2f s\n", el);
         }
@@ -277,11 +323,11 @@ int main(int argc, char **argv)
     }
     if (!load(dir)) return 1;
     fprintf(stderr, "combat.dat : %d pistes, %d entrees de liaison ; combat.adl : %d pistes de liaison\n",
-            g.data.track_count, g.data.link_entry_count, g.data.link_track_count);
+            g.set.trackCount, (int)g.set.linkEntries.size(), (int)g.set.linkTracks.size());
     engine_init();
     if (!timbre_wav.empty()) return timbre_wav_mode(timbre_wav.c_str(), test_bank, test_all);
     if (!wav.empty()) return wav_mode(wav.c_str(), seconds, tune, at);
-    std::vector<ScTimbreInfo> timbres = timbre_list();
+    std::vector<SCTimbreInfo> timbres = timbre_list();
     static bool tvfx_only = true;
     static int filt_bank = -1, test_note = TEST_NOTE, test_vel = 127, playing = -1;
 
@@ -302,7 +348,7 @@ int main(int argc, char **argv)
     SDL_AudioDeviceID dev = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
     if (!dev) fprintf(stderr, "SDL_OpenAudioDevice : %s\n", SDL_GetError());
     SDL_LockAudioDevice(dev);
-    sc_music_request(&g.music, tune);
+    g.music.request(tune);
     SDL_UnlockAudioDevice(dev);
     SDL_PauseAudioDevice(dev, 0);
 
@@ -321,42 +367,42 @@ int main(int argc, char **argv)
         if (ImGui::BeginTabBar("tabs")) {
         if (ImGui::BeginTabItem("Musique")) {
         SDL_LockAudioDevice(dev);
-        ScMusic snap = g.music;
-        int measure = sc_music_measure(&g.music);
-        int beat = g.music.main_ch.handle >= 0 ? xmi_beat_count(&g.xmi, g.music.main_ch.handle) : 0;
-        int voices = adl_active_voices(&g.adl);
+        SCMusicSequencer snap = g.music;
+        int measure = g.music.measure();
+        int beat = g.music.mainCh.handle >= 0 ? g.xmi.beatCount(g.music.mainCh.handle) : 0;
+        int voices = g.adl.activeVoices();
         SDL_UnlockAudioDevice(dev);
 
         char req[16];
         if (snap.requested == 0xFFFF) snprintf(req, sizeof req, "arret"); else snprintf(req, sizeof req, "0x%02X", snap.requested);
         ImGui::Text("Piste courante 0x%02X   demandee %s   etat %s", snap.current, req, state_label(snap.state));
         ImGui::Text("Mesure %d, temps %d   voix actives %d / 16   piste de reprise 0x%02X   erreur %d",
-                    measure, beat, voices, snap.resume_tune, snap.error);
-        if (snap.last_matrix >= 0)
+                    measure, beat, voices, snap.resumeTune, snap.error);
+        if (snap.lastMatrix >= 0)
             ImGui::Text("Derniere resolution : entree de liaison %d, position %d, valeur 0x%02X -> %s",
-                        snap.last_matrix == 0xFF ? -1 : snap.last_matrix, snap.last_pos, snap.last_value,
-                        snap.last_value == 0 ? "bascule directe" :
-                        (snap.last_link >= 0 ? ("piste de liaison " + std::to_string(snap.last_link)).c_str() : "refusee"));
-        if (snap.state == 3) ImGui::TextColored(ImVec4(1, 0.8f, 0.3f, 1), "Liaison %d en cours", snap.link_ch.index);
-        bool near = snap.enemy_near & 1;
+                        snap.lastMatrix == 0xFF ? -1 : snap.lastMatrix, snap.lastPos, snap.lastValue,
+                        snap.lastValue == 0 ? "bascule directe" :
+                        (snap.lastLink >= 0 ? ("piste de liaison " + std::to_string(snap.lastLink)).c_str() : "refusee"));
+        if (snap.state == 3) ImGui::TextColored(ImVec4(1, 0.8f, 0.3f, 1), "Liaison %d en cours", snap.linkCh.index);
+        bool near = snap.enemyNear & 1;
         if (ImGui::Checkbox("Avion ennemi proche (choix de reprise apres la piste 8)", &near)) {
-            SDL_LockAudioDevice(dev); g.music.enemy_near = near ? 1 : 0; SDL_UnlockAudioDevice(dev);
+            SDL_LockAudioDevice(dev); g.music.enemyNear = near ? 1 : 0; SDL_UnlockAudioDevice(dev);
         }
         ImGui::Separator();
         ImGui::Text("Demander une piste (Music_RequestTune) : le changement attend la barre de mesure suivante.");
-        for (int t = 0; t < g.data.track_count; t++) {
+        for (int t = 0; t < g.set.trackCount; t++) {
             char lbl[160];
             snprintf(lbl, sizeof lbl, "0x%02X  %s##t%d", t, tune_label(t), t);
             bool cur = (t == snap.current && snap.requested != 0xFFFF);
             if (cur) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.2f, 0.5f, 0.2f, 1));
-            if (ImGui::Button(lbl, ImVec2(430, 0))) { SDL_LockAudioDevice(dev); sc_music_request(&g.music, t); SDL_UnlockAudioDevice(dev); }
+            if (ImGui::Button(lbl, ImVec2(430, 0))) { SDL_LockAudioDevice(dev); g.music.request(t); SDL_UnlockAudioDevice(dev); }
             if (cur) ImGui::PopStyleColor();
             if (t % 2 == 0) ImGui::SameLine();
         }
         ImGui::Separator();
-        if (ImGui::Button("Arret avec fondu (1 s)", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 1); SDL_UnlockAudioDevice(dev); }
+        if (ImGui::Button("Arret avec fondu (1 s)", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); g.music.stop(true); SDL_UnlockAudioDevice(dev); }
         ImGui::SameLine();
-        if (ImGui::Button("Arret immediat", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 0); SDL_UnlockAudioDevice(dev); }
+        if (ImGui::Button("Arret immediat", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); g.music.stop(false); SDL_UnlockAudioDevice(dev); }
         ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Test des timbres (TVFX)", nullptr,
@@ -365,9 +411,9 @@ int main(int argc, char **argv)
                                "(banque), programme (patch), Note On sur le canal MIDI %d. Les TVFX de type 2 ont une "
                                "frequence absolue (la note est ignoree) et une duree propre ; le type 1 et les timbres OPL "
                                "simples tiennent jusqu'au Note Off.", TEST_CHAN + 1);
-            if (ImGui::Button("Arreter la musique")) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 0); SDL_UnlockAudioDevice(dev); }
+            if (ImGui::Button("Arreter la musique")) { SDL_LockAudioDevice(dev); g.music.stop(false); SDL_UnlockAudioDevice(dev); }
             ImGui::SameLine();
-            if (ImGui::Button("Silence total (outil de test)")) { SDL_LockAudioDevice(dev); adl_kill_all(&g.adl); playing = -1; SDL_UnlockAudioDevice(dev); }
+            if (ImGui::Button("Silence total (outil de test)")) { SDL_LockAudioDevice(dev); g.adl.killAll(); playing = -1; SDL_UnlockAudioDevice(dev); }
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("N'existe pas dans le pilote : coupe toutes les voix. Certains TVFX ont une courbe de\n"
                                   "relachement qui tient le niveau ; le pilote ne les libere que sous 0x400.");
@@ -376,9 +422,9 @@ int main(int argc, char **argv)
             ImGui::SetNextItemWidth(200); ImGui::SliderInt("note", &test_note, 0, 127);
             ImGui::SameLine(); ImGui::SetNextItemWidth(200); ImGui::SliderInt("velocite", &test_vel, 1, 127);
             SDL_LockAudioDevice(dev);
-            int nv = adl_active_voices(&g.adl);
+            int nv = g.adl.activeVoices();
             std::string vinfo;
-            for (int v = 0; v < ADL_VOICES; v++) {
+            for (int v = 0; v < AILAdlibDriver::VOICES; v++) {
                 if (!g.adl.v_state[v]) continue;
                 char b[96];
                 snprintf(b, sizeof b, "[v%d %s can.MIDI %d OPL %d niv %d/%d] ", v, g.adl.v_state[v] == 2 ? "relache" : "joue",
@@ -392,18 +438,18 @@ int main(int argc, char **argv)
             /* liste deroulante des timbres retenus par les filtres */
             std::vector<int> shown;
             for (size_t i = 0; i < timbres.size(); i++) {
-                const ScTimbreInfo &t = timbres[i];
-                bool tv = t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS;
+                const SCTimbreInfo &t = timbres[i];
+                bool tv = t.isTvfx();
                 if ((tvfx_only && !tv) || (filt_bank >= 0 && t.bank != filt_bank)) continue;
                 shown.push_back((int)i);
             }
             auto label = [&](int i) {
-                const ScTimbreInfo &t = timbres[(size_t)i];
+                const SCTimbreInfo &t = timbres[(size_t)i];
                 char b[96];
-                if (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS) {
-                    if (t.duration == 0xFFFF) snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, jusqu'au Note Off", t.bank, t.patch, sc_timbre_kind_label(t.kind));
-                    else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, %.2f s", t.bank, t.patch, sc_timbre_kind_label(t.kind), (t.duration + 1) / 60.0);
-                } else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s", t.bank, t.patch, sc_timbre_kind_label(t.kind));
+                if (t.isTvfx()) {
+                    if (t.duration == 0xFFFF) snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, jusqu'au Note Off", t.bank, t.patch, SCTimbreTest::kindLabel(t.kind));
+                    else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s, %.2f s", t.bank, t.patch, SCTimbreTest::kindLabel(t.kind), (t.duration + 1) / 60.0);
+                } else snprintf(b, sizeof b, "banque %d  patch %3d  -  %s", t.bank, t.patch, SCTimbreTest::kindLabel(t.kind));
                 return std::string(b);
             };
             static int sel = 0;
@@ -411,8 +457,8 @@ int main(int argc, char **argv)
             auto play = [&](int k) {
                 if (k < 0 || k >= (int)shown.size()) return;
                 SDL_LockAudioDevice(dev);
-                if (playing >= 0) sc_timbre_stop(&g.adl, TEST_CHAN, playing);
-                sc_timbre_play(&g.adl, &timbres[(size_t)shown[(size_t)k]], TEST_CHAN, test_note, test_vel);
+                if (playing >= 0) SCTimbreTest::stop(g.adl, TEST_CHAN, playing);
+                SCTimbreTest::play(g.adl, timbres[(size_t)shown[(size_t)k]], TEST_CHAN, test_note, test_vel);
                 playing = test_note;
                 SDL_UnlockAudioDevice(dev);
             };
@@ -431,7 +477,7 @@ int main(int argc, char **argv)
             if (ImGui::Button("Jouer", ImVec2(160, 32))) play(sel);
             ImGui::SameLine();
             if (ImGui::Button("Stop (Note Off)", ImVec2(160, 32)) && playing >= 0) {
-                SDL_LockAudioDevice(dev); sc_timbre_stop(&g.adl, TEST_CHAN, playing); playing = -1; SDL_UnlockAudioDevice(dev);
+                SDL_LockAudioDevice(dev); SCTimbreTest::stop(g.adl, TEST_CHAN, playing); playing = -1; SDL_UnlockAudioDevice(dev);
             }
             ImGui::TextDisabled("< et > passent au timbre precedent / suivant et le jouent.");
             ImGui::EndTabItem();
@@ -462,7 +508,5 @@ int main(int argc, char **argv)
     SDL_DestroyRenderer(ren);
     SDL_DestroyWindow(win);
     SDL_Quit();
-    adl_shutdown(&g.adl);
-    sc_data_free(&g.data);
     return 0;
 }
