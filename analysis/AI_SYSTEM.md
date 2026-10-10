@@ -663,7 +663,7 @@ propre switch interne :
 
 - **Cas « leader mort/hors-jeu »** : calcule la distance à la cible
   d'escorte (via `[vtable+0x3C]` sur celle-ci, comme dans
-  `MissionRecord_LoadEntityDatabase_7B035`), compare contre
+  `Player_ShotDownSequence_7B035`, ex-`MissionRecord_LoadEntityDatabase_7B035`), compare contre
   un seuil, puis appelle **`[vtable+8]` directement sur le nœud
   `ID=20`** (`+0xC1`) — même idiome de finalisation que
   `Entity_ProximityTest_ThreatGate` et `AI_BehaviorStateMachine`, dans

@@ -890,8 +890,8 @@ loc_3EE86:
 loc_3EEB3:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6C5j
 		push	1
 
-loc_3EEB5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6CFj
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+loc_3EEB5:				; CODE XREF: HUD_RenderSymbologyMain+6CFj
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		push	0
 		push	di
@@ -1295,8 +1295,8 @@ loc_3F1C6:
 loc_3F24A:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A67j
 		push	1
 
-loc_3F24C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A71j
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+loc_3F24C:				; CODE XREF: HUD_RenderSymbologyMain+A71j
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx]
@@ -3109,7 +3109,7 @@ loc_400B3:
 		push	2
 
 loc_400C2:
-		call	Weapon_HUDBox_TimerCaseI_5A906
+		call	SoundFX_PlayOrUpdate_5A906
 		add	sp, 8
 
 loc_400CA:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+778j
@@ -3217,7 +3217,7 @@ loc_401C5:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+6FCj
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	2
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
 loc_401D6:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+8E2j

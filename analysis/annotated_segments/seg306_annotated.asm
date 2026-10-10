@@ -19,7 +19,7 @@ stru_6C2D0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A9Eo
 ; d'overlay actuellement charge en memoire. fileoff=2BD70h, codesize=41Eh, nentries=1.
 ; ==============================================================================================
 VROOMM_StubThunk_6C2F0	proc far		; DATA XREF: seg339:off_6F588o
-		jmp	Gauge_ComputeAndRenderNeedle_9D910
+		jmp	Collision_OnTerrainContact_9D910
 VROOMM_StubThunk_6C2F0	endp
 
 seg306		ends

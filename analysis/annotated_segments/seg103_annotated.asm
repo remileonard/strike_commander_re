@@ -277,14 +277,11 @@ Aero_ComputeAoAWithTrim_480CA	endp
 ; Aero_DynamicPressure. PORTANCE = (si[0x61]·dword_72A24·alpha_eff·q) · normalize(0,
 ; -v_corps.c2, v_corps.c1)  ~ vers +c2 (haut corps). FORCE LATÉRALE = (si[0x61]>>2 ·c_beta·q)
 ; · normalize(v_corps.c1, -v_corps.c0, 0). Sortie = somme des deux (buffer 0xC). Effet de bord
-; : si |alpha_eff| > seuil si[0x4B] ET difficulté word_70466>10 ET joueur -> flags_75.bit6
-; (alerte) + portance mise à zéro (départ/décrochage). normalize = Vector_Normalize3D_559BB /
-; Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas des rotations). Detail :
-; analysis/DATA_MODEL.md 6.2. | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais
-; le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame
-; dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils
-; (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F
-; (PilotProfile_RescaleSkillByDifficulty_12FC9).
+; : si |alpha_eff| > seuil si[0x4B] ET plus de 10 images écoulées depuis le début de la
+; mission (word_70466 = compteur d'images, cmp word_70466,0Ah / jbe) ET joueur ->
+; flags_75.bit6 (alerte) + portance mise à zéro (départ/décrochage). normalize =
+; Vector_Normalize3D_559BB / Vector_NormalizeInPlace_5593A (ce sont des NORMALISATIONS, pas
+; des rotations). Detail : analysis/DATA_MODEL.md 6.2.
 ; ==============================================================================================
 Aero_ComputeLiftAndSideForce_4812B	proc far		; CODE XREF: Aero_SumLinearForces_48639+69p
 

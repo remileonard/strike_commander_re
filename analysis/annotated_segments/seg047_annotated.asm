@@ -299,7 +299,7 @@ loc_270B0:				; CODE XREF: Config_ReadCalibration:loc_27061j
 					; DATA XREF: seg047:021Ao
 		mov	al, byte_7236B	; case 0x18
 		mov	[bp+var_7], al
-		call	Widget_Helper_5AA95
+		call	SoundFX_StopAll_5AA95
 		push	5240h
 		call	VROOMM_StubThunk_6B7F0
 		pop	cx
@@ -316,7 +316,7 @@ loc_270D3:
 		push	1
 
 loc_270D5:				; CODE XREF: Config_ReadCalibration+180j
-		call	Widget_Helper_5A9E6
+		call	Music_Stop_5A9E6
 		pop	cx
 		jmp	short loc_27122	; default
 ; ���������������������������������������������������������������������������
@@ -346,7 +346,7 @@ loc_270E6:				; CODE XREF: Config_ReadCalibration:loc_27061j
 
 loc_27100:				; CODE XREF: Config_ReadCalibration:loc_270E4j
 					; Config_ReadCalibration+17Cj
-		call	Weapon_HUDBox_InstantiateInstance_5AA02
+		call	Music_SelectStartTune_5AA02
 		jmp	short loc_27122	; default
 ; ���������������������������������������������������������������������������
 
@@ -361,12 +361,12 @@ loc_27107:				; CODE XREF: Config_ReadCalibration:loc_27061j
 		mov	byte_7236C, al
 		cmp	[bp+var_7], 0
 		jz	short loc_27122	; default
-		call	Widget_Helper_5AA73
+		call	SoundFX_Disable_5AA73
 
 loc_27122:				; CODE XREF: Config_ReadCalibration+5Aj
 					; Config_ReadCalibration+8Fj ...
 		push	5C06h		; default
-		call	Weapon_HUDBox_FullUpdateCycle_5AB79
+		call	Sound_FrameUpdate_5AB79
 		pop	cx
 		mov	al, 1
 

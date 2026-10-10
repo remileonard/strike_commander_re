@@ -807,9 +807,9 @@ PagedMemory_WriteByte_5BD14	endp
 
 ; ==============================================================================================
 ; far, libère/réinitialise une plage d'adresses paginées (PagedMemory_ResolveAddress_5BBCC
-; ×3). Référencée par Sequencer_ReleaseSlot_59F87 (seg123).
+; ×3). Référencée par Music_ChannelInit_59F87 (seg123).
 ; ==============================================================================================
-PagedMemory_ReleaseRange_5BD80	proc far		; CODE XREF: Sequencer_ProcessQueue_59FF5+62P
+PagedMemory_ReleaseRange_5BD80	proc far		; CODE XREF: Music_ChannelRegisterSequence_59FF5+62P
 					; Registry_MainOperationVariant_5B421+2AP
 
 var_12		= dword	ptr -12h

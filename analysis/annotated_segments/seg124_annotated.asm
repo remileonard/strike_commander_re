@@ -8,14 +8,20 @@ seg124		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 493 lignes, NON DÉTAILLÉE — référencée deux fois par TextRenderer_Main (sub_27477,
-; seg048). Combine des appels au sous-système séquenceur/minuteur
-; (Sequencer_AdvanceActiveSlot_59F1D, Sequencer_ProcessQueue_59FF5,
-; Sequencer_ReleaseSlot_59F87) et au sous-système d'allocation (sub_5Cxxx). Probable
-; gestionnaire de champ de saisie/édition de texte dynamique. Candidat prioritaire pour
-; session dédiée.
+; Ex-'TextRenderer_InputFieldHandler_5A0F3' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). ★ far, 493 lignes — CHARGEUR DU PILOTE SON AIL/XMIDI.
+; Anciennement mal étiquetée Sound_LoadDriverAndTimbreCache_5A0F3 (classée par erreur car
+; référencée deux fois par TextRenderer_Main, sub_27477 — coïncidence d'appelant, pas de lien
+; fonctionnel). Séquence confirmée ligne à ligne : (1) lit le chunk IFF 'SOUND' via
+; ResourceRecord (sub_2B06C) pour obtenir le nom du pilote ; (2) concatène '.drv' (offset
+; 3894h) pour former le nom de fichier pilote ; (3) ouvre/charge le pilote (sub_603A2/603A8) ;
+; (4) alloue le CACHE DE TIMBRES via Memory_TypedFreeWrapperB_5C774 avec le message d'erreur
+; 'No memory for timbre cache.' (offset 38B6h) en cas d'échec ; (5) construit en interne un
+; enregistrement dans le système de slots temporisés générique en appelant directement
+; Music_ChannelInit_59F87/Music_ChannelRegisterSequence_59FF5/Music_ChannelStopSequence_59F1D
+; (seg123). Appelée par Program_InitVideoFontArgs (sub_14279, init programme).
 ; ==============================================================================================
-TextRenderer_InputFieldHandler_5A0F3	proc far		; CODE XREF: TextRenderer_Main+4B9P
+Sound_LoadDriverAndTimbreCache_5A0F3	proc far		; CODE XREF: TextRenderer_Main+4B9P
 					; TextRenderer_Main+644P
 
 var_174		= word ptr -174h
@@ -120,10 +126,10 @@ loc_5A124:
 		jmp	short loc_5A181
 ; ���������������������������������������������������������������������������
 
-loc_5A17D:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+82j
+loc_5A17D:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+82j
 		mov	eax, [bp+var_47]
 
-loc_5A181:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+88j
+loc_5A181:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+88j
 		add	eax, 10h
 		mov	[bp+var_4], eax
 		mov	[bp+var_8], eax
@@ -167,12 +173,12 @@ loc_5A181:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+88j
 loc_5A1FF:
 		add	sp, 8
 		push	large [bp+var_10]
-		call	ModuleRegistry_QueryOrDispatch_6015A
+		call	AIL_register_driver_6015A
 		add	sp, 4
 		mov	[si+4],	ax
 		cmp	word ptr [si+4], 0FFFFh
 		push	word ptr [si+4]
-		call	ModuleRegistry_QueryModuleField_60228
+		call	AIL_describe_driver_60228
 		pop	cx
 		mov	[si+8],	dx
 		mov	[si+6],	ax
@@ -181,34 +187,34 @@ loc_5A1FF:
 		les	bx, [si+6]
 		mov	di, es:[bx+0Ch]
 
-loc_5A230:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+134j
+loc_5A230:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+134j
 		cmp	[bp+arg_6], 0FFFFh
 		jnz	short loc_5A240
 		les	bx, [si+6]
 		mov	ax, es:[bx+0Eh]
 		mov	[bp+arg_6], ax
 
-loc_5A240:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+141j
+loc_5A240:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+141j
 		cmp	[bp+arg_8], 0FFFFh
 		jnz	short loc_5A250
 		les	bx, [si+6]
 		mov	ax, es:[bx+10h]
 		mov	[bp+arg_8], ax
 
-loc_5A250:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+151j
+loc_5A250:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+151j
 		cmp	[bp+arg_A], 0FFFFh
 		jnz	short loc_5A260
 		les	bx, [si+6]
 		mov	ax, es:[bx+12h]
 		mov	[bp+arg_A], ax
 
-loc_5A260:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+161j
+loc_5A260:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+161j
 		push	[bp+arg_A]
 		push	[bp+arg_8]
 		push	[bp+arg_6]
 		push	di
 		push	word ptr [si+4]
-		call	ModuleRegistry_Opcode_65_6024E
+		call	AIL_detect_device_6024E
 		add	sp, 0Ah
 		or	ax, ax
 		jnz	short loc_5A28F
@@ -220,7 +226,7 @@ loc_5A260:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+161j
 		call	CRT_Exit
 		pop	cx
 
-loc_5A28F:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+184j
+loc_5A28F:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+184j
 		mov	al, 1
 		mov	byte_709A1, al
 		mov	ah, 0
@@ -231,7 +237,7 @@ loc_5A28F:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+184j
 		push	[bp+arg_6]
 		push	di
 		push	word ptr [si+4]
-		call	ModuleRegistry_ConfigureModuleExtended_60254
+		call	AIL_init_driver_60254
 		add	sp, 0Ch
 		mov	byte ptr [si+83h], 1
 		les	bx, [si+6]
@@ -240,9 +246,9 @@ loc_5A28F:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+184j
 		jmp	loc_5A564
 ; ���������������������������������������������������������������������������
 
-loc_5A2C1:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+1C9j
+loc_5A2C1:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+1C9j
 		push	word ptr [si+4]
-		call	ModuleRegistry_Opcode_99_603A2
+		call	AIL_default_timbre_cache_size_603A2
 		pop	cx
 		mov	di, ax
 		or	di, di
@@ -283,10 +289,10 @@ loc_5A314:
 		push	dx
 		push	ax
 		push	word ptr [si+4]
-		call	ModuleRegistry_Opcode_9A_603A8
+		call	AIL_define_timbre_cache_603A8
 		add	sp, 8
 
-loc_5A337:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+1DBj
+loc_5A337:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+1DBj
 		push	38D3h
 		lea	ax, [bp+var_24]
 		push	ax
@@ -337,23 +343,23 @@ loc_5A337:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+1DBj
 		jmp	short loc_5A3BA
 ; ���������������������������������������������������������������������������
 
-loc_5A3B6:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+2BBj
+loc_5A3B6:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+2BBj
 		mov	eax, [bp+var_47]
 
-loc_5A3BA:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+2C1j
+loc_5A3BA:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+2C1j
 		mov	[bp+var_2E], eax
 		cmp	[bp+var_2E], 0
 		jnz	short loc_5A3C8
 		jmp	loc_5A564
 ; ���������������������������������������������������������������������������
 
-loc_5A3C8:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+2D0j
+loc_5A3C8:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+2D0j
 		cmp	byte_709A1, 0
 		jnz	short loc_5A3D2
 		jmp	loc_5A564
 ; ���������������������������������������������������������������������������
 
-loc_5A3D2:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+2DAj
+loc_5A3D2:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+2DAj
 		mov	[bp+var_38], 0
 		mov	[bp+var_34], 2
 		mov	[bp+var_33], 0
@@ -406,32 +412,32 @@ loc_5A413:
 		push	si
 		lea	ax, [bp+var_174]
 		push	ax
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_38]
 		push	ax
 		lea	ax, [bp+var_174]
 		push	ax
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		cmp	[bp+var_174], 0
 		jz	short loc_5A4B2
 		push	[bp+var_172]
 		mov	bx, [bp+var_174]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AA_603CC
+		call	AIL_start_sequence_603CC
 		add	sp, 4
 		jmp	short $+2
 
-loc_5A4B2:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3A8j
-					; TextRenderer_InputFieldHandler_5A0F3+3EDj
+loc_5A4B2:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+3A8j
+					; Sound_LoadDriverAndTimbreCache_5A0F3+3EDj
 		cmp	[bp+var_174], 0
 		jz	short loc_5A4DA
 		push	[bp+var_172]
 		mov	bx, [bp+var_174]
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 2
 		jnz	short loc_5A4D6
@@ -439,23 +445,23 @@ loc_5A4B2:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3A8j
 		jmp	short loc_5A4D8
 ; ���������������������������������������������������������������������������
 
-loc_5A4D6:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3DCj
+loc_5A4D6:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+3DCj
 		xor	ax, ax
 
-loc_5A4D8:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3E1j
+loc_5A4D8:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+3E1j
 		jmp	short loc_5A4DC
 ; ���������������������������������������������������������������������������
 
-loc_5A4DA:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3C4j
+loc_5A4DA:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+3C4j
 		mov	al, 1
 
-loc_5A4DC:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3:loc_5A4D8j
+loc_5A4DC:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3:loc_5A4D8j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5A4B2
 		lea	ax, [bp+var_174]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	[bp+var_16B], 0
 		jz	short loc_5A515
@@ -471,8 +477,8 @@ loc_5A4DC:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3:loc_5A4D8j
 		add	sp, 8
 		jmp	short $+2
 
-loc_5A515:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3FFj
-					; TextRenderer_InputFieldHandler_5A0F3+407j
+loc_5A515:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+3FFj
+					; Sound_LoadDriverAndTimbreCache_5A0F3+407j
 		mov	[bp+var_170], 0
 		mov	[bp+var_16B], 0
 		mov	[bp+var_16A], 0
@@ -490,14 +496,14 @@ loc_5A515:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+3FFj
 		add	sp, 8
 		jmp	short $+2
 
-loc_5A550:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+43Dj
-					; TextRenderer_InputFieldHandler_5A0F3+444j
+loc_5A550:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+43Dj
+					; Sound_LoadDriverAndTimbreCache_5A0F3+444j
 		mov	[bp+var_38], 0
 		mov	[bp+var_33], 0
 		mov	[bp+var_32], 0
 
-loc_5A564:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+1CBj
-					; TextRenderer_InputFieldHandler_5A0F3+2D2j ...
+loc_5A564:				; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+1CBj
+					; Sound_LoadDriverAndTimbreCache_5A0F3+2D2j ...
 		push	2
 		lea	ax, [bp+var_B8]
 		push	ax
@@ -507,7 +513,7 @@ loc_5A564:				; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+1CBj
 		pop	si
 		leave
 		retf
-TextRenderer_InputFieldHandler_5A0F3	endp
+Sound_LoadDriverAndTimbreCache_5A0F3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -515,10 +521,13 @@ TextRenderer_InputFieldHandler_5A0F3	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_63F46/sub_63FA1/sub_63511/sub_5C6F3 — probable allocation/placement d'un
-; objet texte à une coordonnée donnée. Appelée par Sequencer_ValidatePlacement_5A62A.
+; Ex-'TextObject_Allocate_5A577'. far, 89L, LUE 2026-10-06. Cherche un timbre dans la
+; bibliotheque de timbres (format Global Timbre Library d'AIL) : index d'entrees de 6 octets
+; (patch, banque, offset u32), fin sur banque 0xFF ; a l'offset trouve, un mot de longueur
+; puis les donnees du timbre ; renvoie un buffer (pool 5C44h) commencant par cette longueur,
+; ou NULL.
 ; ==============================================================================================
-TextObject_Allocate_5A577	proc far		; CODE XREF: Sequencer_ValidatePlacement_5A62A+28p
+Music_LoadTimbreFromLibrary_5A577	proc far		; CODE XREF: Music_InstallTimbre_5A62A+28p
 
 var_A		= dword	ptr -0Ah
 var_6		= word ptr -6
@@ -538,8 +547,8 @@ arg_3		= byte ptr  9
 		call	StreamReader_PrepareForRead_63F46
 		pop	cx
 
-loc_5A58D:				; CODE XREF: TextObject_Allocate_5A577+41j
-					; TextObject_Allocate_5A577+49j
+loc_5A58D:				; CODE XREF: Music_LoadTimbreFromLibrary_5A577+41j
+					; Music_LoadTimbreFromLibrary_5A577+49j
 		push	large 0FFFFFFFFh
 		push	large 6
 		push	ss
@@ -557,7 +566,7 @@ loc_5A58D:				; CODE XREF: TextObject_Allocate_5A577+41j
 		jmp	short loc_5A627
 ; ���������������������������������������������������������������������������
 
-loc_5A5B2:				; CODE XREF: TextObject_Allocate_5A577+33j
+loc_5A5B2:				; CODE XREF: Music_LoadTimbreFromLibrary_5A577+33j
 		mov	al, byte ptr [bp+var_6+1]
 		cmp	al, [bp+arg_3]
 		jnz	short loc_5A58D
@@ -602,11 +611,11 @@ loc_5A613:
 		mov	dx, word ptr [bp+var_A+2]
 		mov	ax, word ptr [bp+var_A]
 
-loc_5A627:				; CODE XREF: TextObject_Allocate_5A577+39j
+loc_5A627:				; CODE XREF: Music_LoadTimbreFromLibrary_5A577+39j
 		pop	si
 		leave
 		retf
-TextObject_Allocate_5A577	endp
+Music_LoadTimbreFromLibrary_5A577	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -614,12 +623,12 @@ TextObject_Allocate_5A577	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, vérifie si une coordonnée (x,y) est libre (sub_603C6), sinon tente d'y placer un objet
-; (TextObject_Allocate_5A577) ; en cas d'échec, affiche un message d'erreur (sub_6B70F,
-; ressource 0xD003) si un buffer de texte est actif, ou pose byte_7084A=4. Référencée par
-; Sequencer_ProcessQueue_59FF5 (seg123) et en interne du segment.
+; Ex-'Sequencer_ValidatePlacement_5A62A'. far, 74L, LUE 2026-10-06. Si
+; AIL_timbre_status_603C6(banque, patch) == 0 : charge le timbre depuis la bibliotheque
+; (Music_LoadTimbreFromLibrary_5A577), AIL_install_timbre_603B4 puis libere le buffer ; timbre
+; introuvable -> erreur 0xD003 si dword_709CC l'exige, sinon byte_7084A = 4.
 ; ==============================================================================================
-Sequencer_ValidatePlacement_5A62A	proc far		; CODE XREF: Sequencer_ProcessQueue_59FF5+F0P
+Music_InstallTimbre_5A62A	proc far		; CODE XREF: Music_ChannelRegisterSequence_59FF5+F0P
 					; seg124:06FDp
 
 var_4		= dword	ptr -4
@@ -638,14 +647,14 @@ arg_2		= word ptr  8
 		cbw
 		push	ax
 		push	word ptr [si+4]
-		call	ModuleRegistry_Opcode_9F_603C6
+		call	AIL_timbre_status_603C6
 		add	sp, 6
 		or	ax, ax
 		jnz	short loc_5A6B2
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr TextObject_Allocate_5A577
+		call	near ptr Music_LoadTimbreFromLibrary_5A577
 		add	sp, 4
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
@@ -660,7 +669,7 @@ arg_2		= word ptr  8
 		cbw
 		push	ax
 		push	word ptr [si+4]
-		call	ModuleRegistry_Opcode_9C_603B4
+		call	AIL_install_timbre_603B4
 		add	sp, 0Ah
 		cmp	[bp+var_4], 0
 		jz	short loc_5A6B2
@@ -674,7 +683,7 @@ arg_2		= word ptr  8
 		jmp	short loc_5A6B2
 ; ���������������������������������������������������������������������������
 
-loc_5A698:				; CODE XREF: Sequencer_ValidatePlacement_5A62A+39j
+loc_5A698:				; CODE XREF: Music_InstallTimbre_5A62A+39j
 		les	bx, dword_709CC
 		cmp	byte ptr es:[bx], 0
 		jz	short loc_5A6AD
@@ -684,15 +693,15 @@ loc_5A698:				; CODE XREF: Sequencer_ValidatePlacement_5A62A+39j
 		jmp	short loc_5A6B2
 ; ���������������������������������������������������������������������������
 
-loc_5A6AD:				; CODE XREF: Sequencer_ValidatePlacement_5A62A+76j
+loc_5A6AD:				; CODE XREF: Music_InstallTimbre_5A62A+76j
 		mov	byte_7084A, 4
 
-loc_5A6B2:				; CODE XREF: Sequencer_ValidatePlacement_5A62A+21j
-					; Sequencer_ValidatePlacement_5A62A+57j ...
+loc_5A6B2:				; CODE XREF: Music_InstallTimbre_5A62A+21j
+					; Music_InstallTimbre_5A62A+57j ...
 		pop	si
 		leave
 		retf
-Sequencer_ValidatePlacement_5A62A	endp
+Music_InstallTimbre_5A62A	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -822,7 +831,7 @@ loc_5A7D3:				; CODE XREF: seg124:070Bj
 		push	word ptr [bp-2]
 		push	si
 		push	cs
-		call	near ptr Sequencer_ValidatePlacement_5A62A
+		call	near ptr Music_InstallTimbre_5A62A
 		add	sp, 4
 
 loc_5A7F3:				; CODE XREF: seg124:06E1j
@@ -883,11 +892,11 @@ loc_5A832:				; CODE XREF: seg124:0682j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, ferme un objet texte (+0x83 flag) : émet un tag de debug ("SCSCSCFY!") via sub_60303,
-; appelle sub_60200 (fermeture), réinitialise le handle. Référencée par TextRenderer_Main
-; (seg048) et sub_5ABD1.
+; Ex-'TextObject_CloseAndLog_5A856'. far, 32L, LUE 2026-10-06. Si le pilote est actif (+0x83)
+; : AIL_shutdown_driver_60303(handle, message de sortie 'SCSCSCFY!') puis
+; AIL_release_driver_handle_60200, handle = -1.
 ; ==============================================================================================
-TextObject_CloseAndLog_5A856	proc far		; CODE XREF: seg048:1324P
+Music_ShutdownDriver_5A856	proc far		; CODE XREF: seg048:1324P
 					; TextObjectCluster_DestructAll_5ABD1+A3P ...
 
 arg_0		= word ptr  6
@@ -904,20 +913,20 @@ arg_0		= word ptr  6
 		push	ds
 		push	offset aScscscfy ; "SCSCSCFY!"
 		push	word ptr [si+4]
-		call	ModuleRegistry_CleanupModuleReference_60303
+		call	AIL_shutdown_driver_60303
 		add	sp, 8
 		push	word ptr [si+4]
 
 loc_5A87C:
-		call	ModuleRegistry_ReleaseSlotIfSet_60200
+		call	AIL_release_driver_handle_60200
 		pop	cx
 		mov	word ptr [si+4], 0FFFFh
 		mov	byte ptr [si+83h], 0
 
-loc_5A88C:				; CODE XREF: TextObject_CloseAndLog_5A856+Cj
+loc_5A88C:				; CODE XREF: Music_ShutdownDriver_5A856+Cj
 		pop	si
 		pop	bp
 		retf
-TextObject_CloseAndLog_5A856	endp
+Music_ShutdownDriver_5A856	endp
 
 seg124		ends

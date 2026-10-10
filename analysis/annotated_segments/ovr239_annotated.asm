@@ -10,7 +10,7 @@ ovr239		segment	para public 'OVERLAY' use16
 ; far, même motif que AIManeuver_LoadFormationData_77E78 (seg232) — chargement de données de
 ; formation.
 ; ==============================================================================================
-AIManeuver_LoadFormationDataC_7AEE0	proc far		; CODE XREF: VROOMM_StubThunk_6ADAFJ MissionRecord_LoadEntityDatabase_7B035+DAp
+AIManeuver_LoadFormationDataC_7AEE0	proc far		; CODE XREF: VROOMM_StubThunk_6ADAFJ Player_ShotDownSequence_7B035+DAp
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -132,7 +132,7 @@ AIManeuver_Helper5_7AF9E	endp
 ; lire.
 ; ==============================================================================================
 EntityTracker_RegisterAndSelect	proc far		; CODE XREF: VROOMM_StubThunk_6ADBEJ
-					; MissionRecord_LoadEntityDatabase_7B035:loc_7B14Cp
+					; Player_ShotDownSequence_7B035:loc_7B14Cp
 
 arg_0		= word ptr  6
 
@@ -219,12 +219,19 @@ Camera_UpdateAndNotify_7AFCA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 3103 lignes — la plus grosse fonction de tout le fichier, NON DÉTAILLÉE — combine
-; ResourceRecord_SeekAndRead_64743, IndexedRecordReader_ConstructVariantC_65A8A/VariantA_65A1A
-; (seg196), Path_ResolveDataFile (seg057) — chargement massif d'une base d'entités depuis un
-; fichier de données résolu par chemin. Candidat prioritaire absolu pour session dédiée.
+; ⭐⚠️ far, 3103 lignes — la plus grosse fonction de tout le fichier, corps NON DÉTAILLÉ (ex-
+; MissionRecord_LoadEntityDatabase_7B035, nom faux). Séquence jouée quand l'avion du joueur
+; est détruit : appelée par STRIKE_EXE_MAIN_LOOP via VROOMM_StubThunk_6ADC3 quand byte_6E4B4
+; != 0 (cmp byte_6E4B4,0 ; ce drapeau est posé par Debris_SpawnOrchestratorVariant_9D770 quand
+; l'objet détruit est le joueur : cmp word_722E6,di / mov byte_6E4B4,1), avec les arguments
+; (joueur, byte_6E4B7, byte_6E4B5). Elle charge OBJECTS\EJECT.PAK (push offset aEject /
+; aObjects / a_pak_2 → Path_ResolveDataFile), crée l'objet éjecté, l'enregistre
+; (EntityTracker_RegisterAndSelect), puis demande la piste musicale 0x0B (push 0Bh / call
+; Music_RequestTune_5A984). Retour non nul → byte_706AF = 3 (fin de mission) ; nul →
+; byte_6E4B4 = 0. Le détail des 3100 lignes (caméra, parachute, conditions de survie) reste à
+; lire.
 ; ==============================================================================================
-MissionRecord_LoadEntityDatabase_7B035	proc far		; CODE XREF: VROOMM_StubThunk_6ADC3J
+Player_ShotDownSequence_7B035	proc far		; CODE XREF: VROOMM_StubThunk_6ADC3J
 
 var_28A		= dword	ptr -28Ah
 var_280		= dword	ptr -280h
@@ -431,7 +438,7 @@ loc_7B074:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_7B092:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+52j
+loc_7B092:				; CODE XREF: Player_ShotDownSequence_7B035+52j
 		mov	bx, [bp+var_16]
 		push	large dword ptr	[bx+76h]
 		push	large dword ptr	[bx+65h]
@@ -455,10 +462,10 @@ loc_7B092:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+52j
 		jmp	short loc_7B0D0
 ; ���������������������������������������������������������������������������
 
-loc_7B0CD:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+94j
+loc_7B0CD:				; CODE XREF: Player_ShotDownSequence_7B035+94j
 		mov	ax, word ptr [bp+var_2E+2]
 
-loc_7B0D0:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+96j
+loc_7B0D0:				; CODE XREF: Player_ShotDownSequence_7B035+96j
 		mov	[bp-2Ah], ax
 		push	ds
 		push	offset a_pak_2	; ".PAK"
@@ -483,7 +490,7 @@ loc_7B0D0:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+96j
 		pop	cx
 		jmp	short $+2
 
-loc_7B10C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+CAj
+loc_7B10C:				; CODE XREF: Player_ShotDownSequence_7B035+CAj
 		push	0
 		push	cs
 		call	near ptr AIManeuver_LoadFormationDataC_7AEE0
@@ -543,14 +550,14 @@ loc_7B156:
 		mov	eax, [bx+6]
 		mov	[bp+var_E], eax
 		push	0Bh
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		cmp	[bp+arg_2], 3
 		jnb	short loc_7B1AA
 		jmp	loc_7B53B
 ; ���������������������������������������������������������������������������
 
-loc_7B1AA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+170j
+loc_7B1AA:				; CODE XREF: Player_ShotDownSequence_7B035+170j
 		mov	[bp+var_32], 0
 		mov	byte ptr [bp+var_2E], 2
 		mov	byte ptr [bp+var_2E+1],	0
@@ -568,11 +575,11 @@ loc_7B1AA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+170j
 		jmp	short loc_7B1EA
 ; ���������������������������������������������������������������������������
 
-loc_7B1E3:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1A6j
+loc_7B1E3:				; CODE XREF: Player_ShotDownSequence_7B035+1A6j
 		mov	bx, [bp+var_18]
 		mov	eax, [bx+71h]
 
-loc_7B1EA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1ACj
+loc_7B1EA:				; CODE XREF: Player_ShotDownSequence_7B035+1ACj
 		mov	[bp+var_36], eax
 		push	0
 		push	0
@@ -610,7 +617,7 @@ loc_7B247:
 loc_7B24F:
 		add	sp, 8
 
-loc_7B252:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1F7j
+loc_7B252:				; CODE XREF: Player_ShotDownSequence_7B035+1F7j
 		mov	[bp+var_44], 0
 		mov	byte ptr [bp+var_40], 2
 		mov	byte ptr [bp+var_40+1],	0
@@ -628,11 +635,11 @@ loc_7B252:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1F7j
 		jmp	short loc_7B292
 ; ���������������������������������������������������������������������������
 
-loc_7B28B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+24Ej
+loc_7B28B:				; CODE XREF: Player_ShotDownSequence_7B035+24Ej
 		mov	bx, [bp+var_18]
 		mov	eax, [bx+71h]
 
-loc_7B292:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+254j
+loc_7B292:				; CODE XREF: Player_ShotDownSequence_7B035+254j
 		mov	[bp+var_48], eax
 		push	0
 		push	0
@@ -666,7 +673,7 @@ loc_7B292:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+254j
 		call	IndexedRecordReader_SeekToIndex_65C6D
 		add	sp, 8
 
-loc_7B2FA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+29Fj
+loc_7B2FA:				; CODE XREF: Player_ShotDownSequence_7B035+29Fj
 		mov	[bp+var_50], 19h
 		mov	eax, [bp+var_50]
 		mov	[bp+var_8], eax
@@ -705,17 +712,17 @@ loc_7B349:
 		jmp	loc_7B4CB
 ; ���������������������������������������������������������������������������
 
-loc_7B363:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+329j
+loc_7B363:				; CODE XREF: Player_ShotDownSequence_7B035+329j
 		cmp	[bp+var_32], 0
 		jnz	short loc_7B36D
 		jmp	loc_7B4CB
 ; ���������������������������������������������������������������������������
 
-loc_7B36D:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+333j
+loc_7B36D:				; CODE XREF: Player_ShotDownSequence_7B035+333j
 		jmp	loc_7B4C2
 ; ���������������������������������������������������������������������������
 
-loc_7B370:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+493j
+loc_7B370:				; CODE XREF: Player_ShotDownSequence_7B035+493j
 		call	CombatTarget_WeaponActionSubsystem
 		mov	byte ptr [bp+var_54+3],	al
 		mov	ax, di
@@ -776,7 +783,7 @@ loc_7B370:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+493j
 		call	Render_MeasureOrDrawTextString_61F52
 		add	sp, 0Ch
 
-loc_7B41B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+3B5j
+loc_7B41B:				; CODE XREF: Player_ShotDownSequence_7B035+3B5j
 		mov	bx, [bp+var_4]
 		shl	bx, 1
 		lea	ax, [bp+var_180]
@@ -803,7 +810,7 @@ loc_7B44A:
 		call	Render_MeasureOrDrawTextString_61F52
 		add	sp, 0Ch
 
-loc_7B45A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+3F4j
+loc_7B45A:				; CODE XREF: Player_ShotDownSequence_7B035+3F4j
 		push	5130h
 		call	Resource_AccessUnified
 		pop	cx
@@ -815,10 +822,10 @@ loc_7B45A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+3F4j
 		jmp	short loc_7B479
 ; ���������������������������������������������������������������������������
 
-loc_7B477:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+43Bj
+loc_7B477:				; CODE XREF: Player_ShotDownSequence_7B035+43Bj
 		xor	ax, ax
 
-loc_7B479:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+440j
+loc_7B479:				; CODE XREF: Player_ShotDownSequence_7B035+440j
 		or	al, al
 		jz	short loc_7B498
 		inc	[bp+var_4]
@@ -829,7 +836,7 @@ loc_7B479:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+440j
 		mov	eax, [bp+var_5A]
 		mov	[bp+var_8], eax
 
-loc_7B498:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+446j
+loc_7B498:				; CODE XREF: Player_ShotDownSequence_7B035+446j
 		mov	al, byte_722D1
 		mov	ah, 0
 		cmp	ax, 1
@@ -838,29 +845,29 @@ loc_7B498:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+446j
 		jmp	short loc_7B4CB
 ; ���������������������������������������������������������������������������
 
-loc_7B4A8:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+46Bj
+loc_7B4A8:				; CODE XREF: Player_ShotDownSequence_7B035+46Bj
 		cmp	byte_6E345, 0
 		jz	short loc_7B4B5
 		mov	[bp+var_A], 1
 		jmp	short loc_7B4CB
 ; ���������������������������������������������������������������������������
 
-loc_7B4B5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+478j
+loc_7B4B5:				; CODE XREF: Player_ShotDownSequence_7B035+478j
 		cmp	byte_706AF, 0
 		jz	short loc_7B4C2
 		mov	[bp+var_A], 1
 		jmp	short loc_7B4CB
 ; ���������������������������������������������������������������������������
 
-loc_7B4C2:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7B36Dj
-					; MissionRecord_LoadEntityDatabase_7B035+485j
+loc_7B4C2:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7B36Dj
+					; Player_ShotDownSequence_7B035+485j
 		cmp	byte ptr [bp+var_54+3],	0
 		jz	short loc_7B4CB
 		jmp	loc_7B370
 ; ���������������������������������������������������������������������������
 
-loc_7B4CB:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+32Bj
-					; MissionRecord_LoadEntityDatabase_7B035+335j ...
+loc_7B4CB:				; CODE XREF: Player_ShotDownSequence_7B035+32Bj
+					; Player_ShotDownSequence_7B035+335j ...
 		cmp	byte ptr [bp+var_40+1],	0
 		jz	short loc_7B4EF
 		cmp	[bp+var_44], 0
@@ -875,8 +882,8 @@ loc_7B4CB:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+32Bj
 		add	sp, 8
 		jmp	short $+2
 
-loc_7B4EF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+49Aj
-					; MissionRecord_LoadEntityDatabase_7B035+4A1j
+loc_7B4EF:				; CODE XREF: Player_ShotDownSequence_7B035+49Aj
+					; Player_ShotDownSequence_7B035+4A1j
 		mov	[bp+var_44], 0
 		mov	byte ptr [bp+var_40+1],	0
 		mov	[bp+var_40+2], 0
@@ -894,19 +901,19 @@ loc_7B4EF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+49Aj
 		add	sp, 8
 		jmp	short $+2
 
-loc_7B527:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+4D2j
-					; MissionRecord_LoadEntityDatabase_7B035+4D9j
+loc_7B527:				; CODE XREF: Player_ShotDownSequence_7B035+4D2j
+					; Player_ShotDownSequence_7B035+4D9j
 		mov	[bp+var_32], 0
 		mov	byte ptr [bp+var_2E+1],	0
 		mov	[bp+var_2E+2], 0
 
-loc_7B53B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+172j
+loc_7B53B:				; CODE XREF: Player_ShotDownSequence_7B035+172j
 		cmp	[bp+arg_2], 1
 		jnb	short loc_7B544
 		jmp	loc_7B986
 ; ���������������������������������������������������������������������������
 
-loc_7B544:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+50Aj
+loc_7B544:				; CODE XREF: Player_ShotDownSequence_7B035+50Aj
 		cmp	[bp+arg_2], 3
 
 loc_7B548:
@@ -916,7 +923,7 @@ loc_7B54A:
 		jmp	loc_7B986
 ; ���������������������������������������������������������������������������
 
-loc_7B54D:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7B548j
+loc_7B54D:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7B548j
 		mov	al, [bp+var_A]
 		mov	ah, 0
 
@@ -928,13 +935,13 @@ loc_7B556:
 		jmp	loc_7B986
 ; ���������������������������������������������������������������������������
 
-loc_7B559:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+51Fj
+loc_7B559:				; CODE XREF: Player_ShotDownSequence_7B035+51Fj
 		cmp	byte_706AF, 0
 		jz	short loc_7B563
 		jmp	loc_7B986
 ; ���������������������������������������������������������������������������
 
-loc_7B563:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+529j
+loc_7B563:				; CODE XREF: Player_ShotDownSequence_7B035+529j
 		mov	[bp+var_32], 0
 		mov	byte ptr [bp+var_2E], 2
 		mov	byte ptr [bp+var_2E+1],	0
@@ -952,11 +959,11 @@ loc_7B563:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+529j
 		jmp	short loc_7B5A3
 ; ���������������������������������������������������������������������������
 
-loc_7B59C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+55Fj
+loc_7B59C:				; CODE XREF: Player_ShotDownSequence_7B035+55Fj
 		mov	bx, [bp+var_18]
 		mov	eax, [bx+71h]
 
-loc_7B5A3:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+565j
+loc_7B5A3:				; CODE XREF: Player_ShotDownSequence_7B035+565j
 		mov	[bp+var_36], eax
 		push	0
 		push	0
@@ -990,17 +997,17 @@ loc_7B5A3:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+565j
 		call	IndexedRecordReader_SeekToIndex_65C6D
 		add	sp, 8
 
-loc_7B60B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+5B0j
+loc_7B60B:				; CODE XREF: Player_ShotDownSequence_7B035+5B0j
 		cmp	[bp+var_32], 0
 		jz	short loc_7B618
 		mov	[bp+var_3B], 1
 		jmp	short loc_7B61C
 ; ���������������������������������������������������������������������������
 
-loc_7B618:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+5DBj
+loc_7B618:				; CODE XREF: Player_ShotDownSequence_7B035+5DBj
 		mov	[bp+var_3B], 0
 
-loc_7B61C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+5E1j
+loc_7B61C:				; CODE XREF: Player_ShotDownSequence_7B035+5E1j
 		push	seg stub239
 		push	offset VROOMM_StubThunk_6ADAA
 		push	large 10005h
@@ -1013,7 +1020,7 @@ loc_7B61C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+5E1j
 		jmp	loc_7B733
 ; ���������������������������������������������������������������������������
 
-loc_7B63F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+704j
+loc_7B63F:				; CODE XREF: Player_ShotDownSequence_7B035+704j
 		push	[bp+var_2]
 		push	[bp+var_1A]
 
@@ -1029,11 +1036,11 @@ loc_7B645:
 		jmp	short loc_7B668
 ; ���������������������������������������������������������������������������
 
-loc_7B661:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+624j
+loc_7B661:				; CODE XREF: Player_ShotDownSequence_7B035+624j
 		mov	bx, [bp+var_1A]
 		mov	eax, [bx+71h]
 
-loc_7B668:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+62Aj
+loc_7B668:				; CODE XREF: Player_ShotDownSequence_7B035+62Aj
 		mov	[bp+var_40], eax
 		push	0
 		push	0
@@ -1083,7 +1090,7 @@ loc_7B668:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+62Aj
 		jmp	short loc_7B73C
 ; ���������������������������������������������������������������������������
 
-loc_7B6F5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+6B8j
+loc_7B6F5:				; CODE XREF: Player_ShotDownSequence_7B035+6B8j
 		push	0
 		mov	bx, [bp+var_2]
 		imul	bx, 0Ah
@@ -1107,14 +1114,14 @@ loc_7B6F5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+6B8j
 		add	sp, 8
 		inc	[bp+var_2]
 
-loc_7B733:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+607j
+loc_7B733:				; CODE XREF: Player_ShotDownSequence_7B035+607j
 		cmp	[bp+var_2], 5
 		jge	short loc_7B73C
 		jmp	loc_7B63F
 ; ���������������������������������������������������������������������������
 
-loc_7B73C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+6BEj
-					; MissionRecord_LoadEntityDatabase_7B035+702j
+loc_7B73C:				; CODE XREF: Player_ShotDownSequence_7B035+6BEj
+					; Player_ShotDownSequence_7B035+702j
 		mov	[bp+var_4], 0
 
 loc_7B741:
@@ -1141,7 +1148,7 @@ loc_7B741:
 		call	Struct_GetElementCountMinusOne_625CC
 		mov	word ptr [bp+var_48], ax
 
-loc_7B781:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+715j
+loc_7B781:				; CODE XREF: Player_ShotDownSequence_7B035+715j
 		mov	[bp+var_4C], 0Ch
 		mov	eax, [bp+var_4C]
 		mov	[bp+var_8], eax
@@ -1160,11 +1167,11 @@ loc_7B781:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+715j
 		jmp	loc_7B933
 ; ���������������������������������������������������������������������������
 
-loc_7B7BC:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+782j
+loc_7B7BC:				; CODE XREF: Player_ShotDownSequence_7B035+782j
 		jmp	loc_7B927
 ; ���������������������������������������������������������������������������
 
-loc_7B7BF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+8FBj
+loc_7B7BF:				; CODE XREF: Player_ShotDownSequence_7B035+8FBj
 		mov	ax, di
 		add	ax, 12h
 		mov	word ptr [bp+var_50], ax
@@ -1246,10 +1253,10 @@ loc_7B852:
 		jmp	short loc_7B899
 ; ���������������������������������������������������������������������������
 
-loc_7B897:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+85Bj
+loc_7B897:				; CODE XREF: Player_ShotDownSequence_7B035+85Bj
 		xor	ax, ax
 
-loc_7B899:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+860j
+loc_7B899:				; CODE XREF: Player_ShotDownSequence_7B035+860j
 		or	al, al
 		jz	short loc_7B8FD
 		inc	[bp+var_4]
@@ -1281,12 +1288,12 @@ loc_7B899:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+860j
 		call	Struct_GetElementCountMinusOne_625CC
 		mov	word ptr [bp+var_48], ax
 
-loc_7B8ED:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+871j
+loc_7B8ED:				; CODE XREF: Player_ShotDownSequence_7B035+871j
 		mov	[bp+var_54], 0Ch
 		mov	eax, [bp+var_54]
 		mov	[bp+var_8], eax
 
-loc_7B8FD:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+866j
+loc_7B8FD:				; CODE XREF: Player_ShotDownSequence_7B035+866j
 		mov	al, byte_722D1
 		mov	ah, 0
 		cmp	ax, 1
@@ -1295,30 +1302,30 @@ loc_7B8FD:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+866j
 		jmp	short loc_7B933
 ; ���������������������������������������������������������������������������
 
-loc_7B90D:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+8D0j
+loc_7B90D:				; CODE XREF: Player_ShotDownSequence_7B035+8D0j
 		cmp	byte_6E345, 0
 		jz	short loc_7B91A
 		mov	[bp+var_A], 1
 		jmp	short loc_7B933
 ; ���������������������������������������������������������������������������
 
-loc_7B91A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+8DDj
+loc_7B91A:				; CODE XREF: Player_ShotDownSequence_7B035+8DDj
 		cmp	byte_706AF, 0
 		jz	short loc_7B927
 		mov	[bp+var_A], 1
 		jmp	short loc_7B933
 ; ���������������������������������������������������������������������������
 
-loc_7B927:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7B7BCj
-					; MissionRecord_LoadEntityDatabase_7B035+8EAj
+loc_7B927:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7B7BCj
+					; Player_ShotDownSequence_7B035+8EAj
 		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7B933
 		jmp	loc_7B7BF
 ; ���������������������������������������������������������������������������
 
-loc_7B933:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+784j
-					; MissionRecord_LoadEntityDatabase_7B035+881j ...
+loc_7B933:				; CODE XREF: Player_ShotDownSequence_7B035+784j
+					; Player_ShotDownSequence_7B035+881j ...
 		push	seg stub239
 		push	offset VROOMM_StubThunk_6ADA5
 		push	large 10005h
@@ -1347,14 +1354,14 @@ loc_7B94B:
 		add	sp, 8
 		jmp	short $+2
 
-loc_7B972:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+91Dj
-					; MissionRecord_LoadEntityDatabase_7B035+924j
+loc_7B972:				; CODE XREF: Player_ShotDownSequence_7B035+91Dj
+					; Player_ShotDownSequence_7B035+924j
 		mov	[bp+var_32], 0
 		mov	byte ptr [bp+var_2E+1],	0
 		mov	[bp+var_2E+2], 0
 
-loc_7B986:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+50Cj
-					; MissionRecord_LoadEntityDatabase_7B035:loc_7B54Aj	...
+loc_7B986:				; CODE XREF: Player_ShotDownSequence_7B035+50Cj
+					; Player_ShotDownSequence_7B035:loc_7B54Aj	...
 		mov	al, [bp+arg_4]
 		mov	ah, 0
 		or	ax, ax
@@ -1362,13 +1369,13 @@ loc_7B986:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+50Cj
 		jmp	loc_7C03A
 ; ���������������������������������������������������������������������������
 
-loc_7B992:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+958j
+loc_7B992:				; CODE XREF: Player_ShotDownSequence_7B035+958j
 		cmp	[bp+arg_2], 2
 		jnb	short loc_7B99B
 		jmp	loc_7C03A
 ; ���������������������������������������������������������������������������
 
-loc_7B99B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+961j
+loc_7B99B:				; CODE XREF: Player_ShotDownSequence_7B035+961j
 		mov	al, [bp+var_A]
 		mov	ah, 0
 		or	ax, ax
@@ -1376,7 +1383,7 @@ loc_7B99B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+961j
 		jmp	loc_7C03A
 ; ���������������������������������������������������������������������������
 
-loc_7B9A7:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+96Dj
+loc_7B9A7:				; CODE XREF: Player_ShotDownSequence_7B035+96Dj
 		mov	eax, [di+20h]
 		shl	eax, 2
 		mov	[bp+var_32+2], eax
@@ -1486,7 +1493,7 @@ loc_7B9A7:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+96Dj
 		jmp	loc_7C00F
 ; ���������������������������������������������������������������������������
 
-loc_7BB46:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FFCj
+loc_7BB46:				; CODE XREF: Player_ShotDownSequence_7B035+FFCj
 		mov	dword ptr [bp-5Ch], 0FFFFFF67h
 		mov	[bp+var_60], 0FFFFFEE7h
 		mov	[bp+var_64], 66h ; 'f'
@@ -1595,10 +1602,10 @@ loc_7BC43:
 		jmp	short loc_7BCC7
 ; ���������������������������������������������������������������������������
 
-loc_7BCC5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+C89j
+loc_7BCC5:				; CODE XREF: Player_ShotDownSequence_7B035+C89j
 		xor	ax, ax
 
-loc_7BCC7:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+C8Ej
+loc_7BCC7:				; CODE XREF: Player_ShotDownSequence_7B035+C8Ej
 		or	al, al
 		jz	short loc_7BD44
 		lea	ax, [bp+var_36+2]
@@ -1631,7 +1638,7 @@ loc_7BCC7:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+C8Ej
 		jmp	short loc_7BDBB
 ; ���������������������������������������������������������������������������
 
-loc_7BD44:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+C94j
+loc_7BD44:				; CODE XREF: Player_ShotDownSequence_7B035+C94j
 		mov	[bp+var_78+2], 400h
 
 loc_7BD4C:
@@ -1667,7 +1674,7 @@ loc_7BD58:
 		mov	eax, [bp+var_1F4]
 		add	[si+1Ch], eax
 
-loc_7BDBB:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+D0Dj
+loc_7BDBB:				; CODE XREF: Player_ShotDownSequence_7B035+D0Dj
 		mov	ax, di
 		add	ax, 12h
 		mov	word ptr [bp+var_78], ax
@@ -1829,7 +1836,7 @@ loc_7BF54:
 		jmp	short loc_7C034
 ; ���������������������������������������������������������������������������
 
-loc_7BFE5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FA4j
+loc_7BFE5:				; CODE XREF: Player_ShotDownSequence_7B035+FA4j
 		mov	al, byte_722D1
 		mov	ah, 0
 		cmp	ax, 1
@@ -1838,22 +1845,22 @@ loc_7BFE5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FA4j
 		jmp	short loc_7C034
 ; ���������������������������������������������������������������������������
 
-loc_7BFF5:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FB8j
+loc_7BFF5:				; CODE XREF: Player_ShotDownSequence_7B035+FB8j
 		cmp	byte_6E345, 0
 		jz	short loc_7C002
 		mov	[bp+var_A], 1
 		jmp	short loc_7C034
 ; ���������������������������������������������������������������������������
 
-loc_7C002:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FC5j
+loc_7C002:				; CODE XREF: Player_ShotDownSequence_7B035+FC5j
 		cmp	byte_706AF, 0
 		jz	short loc_7C00F
 		mov	[bp+var_A], 1
 		jmp	short loc_7C034
 ; ���������������������������������������������������������������������������
 
-loc_7C00F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+B0Ej
-					; MissionRecord_LoadEntityDatabase_7B035+FD2j
+loc_7C00F:				; CODE XREF: Player_ShotDownSequence_7B035+B0Ej
+					; Player_ShotDownSequence_7B035+FD2j
 		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 
@@ -1874,19 +1881,19 @@ loc_7C01F:
 		jmp	loc_7BB46
 ; ���������������������������������������������������������������������������
 
-loc_7C034:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+FAEj
-					; MissionRecord_LoadEntityDatabase_7B035+FBEj ...
+loc_7C034:				; CODE XREF: Player_ShotDownSequence_7B035+FAEj
+					; Player_ShotDownSequence_7B035+FBEj ...
 		mov	al, byte_6E4B7
 		mov	[bp+arg_2], al
 
-loc_7C03A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+95Aj
-					; MissionRecord_LoadEntityDatabase_7B035+963j ...
+loc_7C03A:				; CODE XREF: Player_ShotDownSequence_7B035+95Aj
+					; Player_ShotDownSequence_7B035+963j ...
 		cmp	[bp+arg_2], 1
 		jbe	short loc_7C043
 		jmp	loc_7C38A
 ; ���������������������������������������������������������������������������
 
-loc_7C043:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1009j
+loc_7C043:				; CODE XREF: Player_ShotDownSequence_7B035+1009j
 		mov	al, [bp+var_A]
 		mov	ah, 0
 		or	ax, ax
@@ -1894,13 +1901,13 @@ loc_7C043:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1009j
 		jmp	loc_7C38A
 ; ���������������������������������������������������������������������������
 
-loc_7C04F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1015j
+loc_7C04F:				; CODE XREF: Player_ShotDownSequence_7B035+1015j
 		cmp	byte_706AF, 0
 		jz	short loc_7C059
 		jmp	loc_7C38A
 ; ���������������������������������������������������������������������������
 
-loc_7C059:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+101Fj
+loc_7C059:				; CODE XREF: Player_ShotDownSequence_7B035+101Fj
 		push	seg stub239
 		push	offset VROOMM_StubThunk_6ADAA
 		push	large 10003h
@@ -1914,7 +1921,7 @@ loc_7C059:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+101Fj
 		jmp	loc_7C17C
 ; ���������������������������������������������������������������������������
 
-loc_7C080:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+114Dj
+loc_7C080:				; CODE XREF: Player_ShotDownSequence_7B035+114Dj
 		mov	ax, [bp+var_2]
 		add	ax, 5
 		push	ax
@@ -1930,11 +1937,11 @@ loc_7C080:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+114Dj
 		jmp	short loc_7C0AD
 ; ���������������������������������������������������������������������������
 
-loc_7C0A6:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1069j
+loc_7C0A6:				; CODE XREF: Player_ShotDownSequence_7B035+1069j
 		mov	bx, [bp+var_1A]
 		mov	eax, [bx+71h]
 
-loc_7C0AD:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+106Fj
+loc_7C0AD:				; CODE XREF: Player_ShotDownSequence_7B035+106Fj
 		mov	[bp+var_2E], eax
 		push	0
 		push	0
@@ -1988,7 +1995,7 @@ loc_7C11A:
 		jmp	short loc_7C185
 ; ���������������������������������������������������������������������������
 
-loc_7C13A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+10FDj
+loc_7C13A:				; CODE XREF: Player_ShotDownSequence_7B035+10FDj
 		push	0
 		mov	bx, [bp+var_2]
 		imul	bx, 0Ah
@@ -2014,14 +2021,14 @@ loc_7C13A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+10FDj
 		add	sp, 8
 		inc	[bp+var_2]
 
-loc_7C17C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1048j
+loc_7C17C:				; CODE XREF: Player_ShotDownSequence_7B035+1048j
 		cmp	[bp+var_2], 3
 		jge	short loc_7C185
 		jmp	loc_7C080
 ; ���������������������������������������������������������������������������
 
-loc_7C185:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1103j
-					; MissionRecord_LoadEntityDatabase_7B035+114Bj
+loc_7C185:				; CODE XREF: Player_ShotDownSequence_7B035+1103j
+					; Player_ShotDownSequence_7B035+114Bj
 		mov	word ptr [bp+var_36+2],	0
 		mov	[bp+var_3A+2], 10h
 		mov	eax, [bp+var_3A+2]
@@ -2042,11 +2049,11 @@ loc_7C185:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1103j
 		jmp	loc_7C36F
 ; ���������������������������������������������������������������������������
 
-loc_7C1CD:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1193j
+loc_7C1CD:				; CODE XREF: Player_ShotDownSequence_7B035+1193j
 		jmp	loc_7C363
 ; ���������������������������������������������������������������������������
 
-loc_7C1D0:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1337j
+loc_7C1D0:				; CODE XREF: Player_ShotDownSequence_7B035+1337j
 		mov	ax, di
 		add	ax, 12h
 		mov	word ptr [bp+var_40], ax
@@ -2101,7 +2108,7 @@ loc_7C247:
 		jmp	short loc_7C27A
 ; ���������������������������������������������������������������������������
 
-loc_7C24E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+11D7j
+loc_7C24E:				; CODE XREF: Player_ShotDownSequence_7B035+11D7j
 		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 
 loc_7C253:
@@ -2119,8 +2126,8 @@ loc_7C253:
 		call	Render_MeasureOrDrawTextString_61F52
 		add	sp, 0Ch
 
-loc_7C27A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+11ECj
-					; MissionRecord_LoadEntityDatabase_7B035+1215j ...
+loc_7C27A:				; CODE XREF: Player_ShotDownSequence_7B035+11ECj
+					; Player_ShotDownSequence_7B035+1215j ...
 		push	large 0
 		mov	bx, word ptr [bp+var_36+2]
 		imul	bx, 0Ah
@@ -2158,10 +2165,10 @@ loc_7C27A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+11ECj
 		jmp	short loc_7C2EF
 ; ���������������������������������������������������������������������������
 
-loc_7C2ED:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+12B1j
+loc_7C2ED:				; CODE XREF: Player_ShotDownSequence_7B035+12B1j
 		xor	ax, ax
 
-loc_7C2EF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+12B6j
+loc_7C2EF:				; CODE XREF: Player_ShotDownSequence_7B035+12B6j
 		or	al, al
 		jnz	short loc_7C36F
 		push	3Fh ; '?'
@@ -2177,7 +2184,7 @@ loc_7C2EF:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+12B6j
 		jmp	short loc_7C339
 ; ���������������������������������������������������������������������������
 
-loc_7C30C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+128Fj
+loc_7C30C:				; CODE XREF: Player_ShotDownSequence_7B035+128Fj
 		mov	eax, dword_70458
 		sub	[bp+var_8], eax
 
@@ -2190,10 +2197,10 @@ loc_7C319:
 		jmp	short loc_7C322
 ; ���������������������������������������������������������������������������
 
-loc_7C320:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7C319j
+loc_7C320:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7C319j
 		xor	ax, ax
 
-loc_7C322:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+12E9j
+loc_7C322:				; CODE XREF: Player_ShotDownSequence_7B035+12E9j
 		or	al, al
 		jz	short loc_7C339
 
@@ -2203,8 +2210,8 @@ loc_7C326:
 		mov	eax, [bp+var_4C]
 		mov	[bp+var_8], eax
 
-loc_7C339:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+12D3j
-					; MissionRecord_LoadEntityDatabase_7B035+12D5j ...
+loc_7C339:				; CODE XREF: Player_ShotDownSequence_7B035+12D3j
+					; Player_ShotDownSequence_7B035+12D5j ...
 		mov	al, byte_722D1
 		mov	ah, 0
 		cmp	ax, 1
@@ -2215,30 +2222,30 @@ loc_7C341:
 		jmp	short loc_7C36F
 ; ���������������������������������������������������������������������������
 
-loc_7C349:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7C341j
+loc_7C349:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7C341j
 		cmp	byte_6E345, 0
 		jz	short loc_7C356
 		mov	[bp+var_A], 1
 		jmp	short loc_7C36F
 ; ���������������������������������������������������������������������������
 
-loc_7C356:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1319j
+loc_7C356:				; CODE XREF: Player_ShotDownSequence_7B035+1319j
 		cmp	byte_706AF, 0
 		jz	short loc_7C363
 		mov	[bp+var_A], 1
 		jmp	short loc_7C36F
 ; ���������������������������������������������������������������������������
 
-loc_7C363:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7C1CDj
-					; MissionRecord_LoadEntityDatabase_7B035+1326j
+loc_7C363:				; CODE XREF: Player_ShotDownSequence_7B035:loc_7C1CDj
+					; Player_ShotDownSequence_7B035+1326j
 		call	CombatTarget_WeaponActionSubsystem
 		or	al, al
 		jz	short loc_7C36F
 		jmp	loc_7C1D0
 ; ���������������������������������������������������������������������������
 
-loc_7C36F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1195j
-					; MissionRecord_LoadEntityDatabase_7B035+12BCj ...
+loc_7C36F:				; CODE XREF: Player_ShotDownSequence_7B035+1195j
+					; Player_ShotDownSequence_7B035+12BCj ...
 		push	seg stub239
 		push	offset VROOMM_StubThunk_6ADA5
 		push	large 10003h
@@ -2248,8 +2255,8 @@ loc_7C36F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1195j
 		call	CRT_Doprnt_Core
 		add	sp, 0Ch
 
-loc_7C38A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+100Bj
-					; MissionRecord_LoadEntityDatabase_7B035+1017j ...
+loc_7C38A:				; CODE XREF: Player_ShotDownSequence_7B035+100Bj
+					; Player_ShotDownSequence_7B035+1017j ...
 		mov	al, [bp+var_A]
 		mov	ah, 0
 		or	ax, ax
@@ -2257,13 +2264,13 @@ loc_7C38A:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+100Bj
 		jmp	loc_7D1BA
 ; ���������������������������������������������������������������������������
 
-loc_7C396:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+135Cj
+loc_7C396:				; CODE XREF: Player_ShotDownSequence_7B035+135Cj
 		cmp	byte_706AF, 0
 		jz	short loc_7C3A0
 		jmp	loc_7D1BA
 ; ���������������������������������������������������������������������������
 
-loc_7C3A0:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1366j
+loc_7C3A0:				; CODE XREF: Player_ShotDownSequence_7B035+1366j
 		mov	[bp+var_32+2], 380h
 		mov	eax, [di+20h]
 		mov	edx, [bp+var_32+2]
@@ -2307,7 +2314,7 @@ loc_7C415:
 		jmp	loc_7C69C
 ; ���������������������������������������������������������������������������
 
-loc_7C42D:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+13F3j
+loc_7C42D:				; CODE XREF: Player_ShotDownSequence_7B035+13F3j
 		push	di
 		push	ss
 		lea	ax, [bp+var_1A8]
@@ -2376,10 +2383,10 @@ loc_7C511:
 		jmp	short loc_7C51E
 ; ���������������������������������������������������������������������������
 
-loc_7C51C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+14E0j
+loc_7C51C:				; CODE XREF: Player_ShotDownSequence_7B035+14E0j
 		xor	ax, ax
 
-loc_7C51E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+14E5j
+loc_7C51E:				; CODE XREF: Player_ShotDownSequence_7B035+14E5j
 		or	al, al
 		jz	short loc_7C53B
 		mov	[bp+var_60], 0A000h
@@ -2390,7 +2397,7 @@ loc_7C51E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+14E5j
 		call	UI_ApplyLineOfSightCheck_55A9E
 		add	sp, 4
 
-loc_7C53B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+14EBj
+loc_7C53B:				; CODE XREF: Player_ShotDownSequence_7B035+14EBj
 		mov	eax, [bp+var_180]
 		neg	eax
 
@@ -2489,13 +2496,13 @@ loc_7C622:
 		jmp	loc_7C9B2
 ; ���������������������������������������������������������������������������
 
-loc_7C69C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+13F5j
+loc_7C69C:				; CODE XREF: Player_ShotDownSequence_7B035+13F5j
 		cmp	word_722EC, 0
 		jnz	short loc_7C6A6
 		jmp	loc_7C829
 ; ���������������������������������������������������������������������������
 
-loc_7C6A6:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+166Cj
+loc_7C6A6:				; CODE XREF: Player_ShotDownSequence_7B035+166Cj
 		mov	ax, word_722EC
 		add	ax, 12h
 		mov	[bp+var_102], ax
@@ -2596,7 +2603,7 @@ loc_7C752:
 		jmp	loc_7C9B2
 ; ���������������������������������������������������������������������������
 
-loc_7C829:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+166Ej
+loc_7C829:				; CODE XREF: Player_ShotDownSequence_7B035+166Ej
 		mov	ax, di
 		add	ax, 12h
 		mov	word ptr [bp+var_90], ax
@@ -2695,8 +2702,8 @@ loc_7C942:
 		mov	eax, [bp+var_106]
 		mov	[bp+var_44], eax
 
-loc_7C9B2:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1664j
-					; MissionRecord_LoadEntityDatabase_7B035+17F1j
+loc_7C9B2:				; CODE XREF: Player_ShotDownSequence_7B035+1664j
+					; Player_ShotDownSequence_7B035+17F1j
 		mov	byte_6E4B6, 1
 		push	0
 		push	di
@@ -2706,13 +2713,13 @@ loc_7C9B2:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1664j
 		jmp	loc_7D19C
 ; ���������������������������������������������������������������������������
 
-loc_7C9CA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2182j
+loc_7C9CA:				; CODE XREF: Player_ShotDownSequence_7B035+2182j
 		cmp	byte ptr [bp+var_40+1],	0
 		jnz	short loc_7C9D3
 		jmp	loc_7CE41
 ; ���������������������������������������������������������������������������
 
-loc_7C9D3:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1999j
+loc_7C9D3:				; CODE XREF: Player_ShotDownSequence_7B035+1999j
 		mov	[bp+var_B8], 80h ; '�'
 		mov	eax, [bp+var_184]
 		mov	edx, [bp+var_B8]
@@ -2858,16 +2865,16 @@ loc_7CC20:
 		jmp	short loc_7CC27
 ; ���������������������������������������������������������������������������
 
-loc_7CC25:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BE9j
+loc_7CC25:				; CODE XREF: Player_ShotDownSequence_7B035+1BE9j
 		xor	ax, ax
 
-loc_7CC27:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BEEj
+loc_7CC27:				; CODE XREF: Player_ShotDownSequence_7B035+1BEEj
 		or	al, al
 		jnz	short loc_7CC2E
 		jmp	loc_7CDBC
 ; ���������������������������������������������������������������������������
 
-loc_7CC2E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BF4j
+loc_7CC2E:				; CODE XREF: Player_ShotDownSequence_7B035+1BF4j
 		mov	eax, [bp+var_19C]
 		mov	edx, [bp+var_2E+2]
 		imul	edx
@@ -2964,7 +2971,7 @@ loc_7CD21:
 		jmp	short loc_7CDD7
 ; ���������������������������������������������������������������������������
 
-loc_7CDBC:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BF6j
+loc_7CDBC:				; CODE XREF: Player_ShotDownSequence_7B035+1BF6j
 		mov	eax, [bp-190h]
 		mov	[si+14h], eax
 		mov	eax, [bp+var_18C]
@@ -2972,7 +2979,7 @@ loc_7CDBC:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1BF6j
 		mov	eax, [bp+var_188]
 		mov	[si+1Ch], eax
 
-loc_7CDD7:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1D85j
+loc_7CDD7:				; CODE XREF: Player_ShotDownSequence_7B035+1D85j
 		mov	ax, si
 		add	ax, 14h
 		mov	word ptr [bp+var_112], ax
@@ -3004,13 +3011,13 @@ loc_7CE21:
 		jmp	loc_7D142
 ; ���������������������������������������������������������������������������
 
-loc_7CE41:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+199Bj
+loc_7CE41:				; CODE XREF: Player_ShotDownSequence_7B035+199Bj
 		cmp	word_722EC, 0
 		jnz	short loc_7CE4B
 		jmp	loc_7D142
 ; ���������������������������������������������������������������������������
 
-loc_7CE4B:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1E11j
+loc_7CE4B:				; CODE XREF: Player_ShotDownSequence_7B035+1E11j
 		mov	ax, word_722EC
 		add	ax, 12h
 		mov	[bp+var_102], ax
@@ -3202,8 +3209,8 @@ loc_7D10E:
 		mov	eax, [bp+var_278]
 		mov	[si+1Ch], eax
 
-loc_7D142:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1E09j
-					; MissionRecord_LoadEntityDatabase_7B035+1E13j
+loc_7D142:				; CODE XREF: Player_ShotDownSequence_7B035+1E09j
+					; Player_ShotDownSequence_7B035+1E13j
 		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		cmp	byte ptr [bp+var_B4+1],	0
 		jz	short loc_7D161
@@ -3213,7 +3220,7 @@ loc_7D142:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1E09j
 		add	sp, 4
 		mov	byte ptr [bp+var_B4+1],	0
 
-loc_7D161:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2117j
+loc_7D161:				; CODE XREF: Player_ShotDownSequence_7B035+2117j
 		push	5130h
 		call	Resource_AccessUnified
 		pop	cx
@@ -3227,32 +3234,32 @@ loc_7D161:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2117j
 		jmp	short loc_7D1BA
 ; ���������������������������������������������������������������������������
 
-loc_7D182:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2145j
+loc_7D182:				; CODE XREF: Player_ShotDownSequence_7B035+2145j
 		cmp	byte_6E345, 0
 		jz	short loc_7D18F
 		mov	[bp+var_A], 1
 		jmp	short loc_7D1BA
 ; ���������������������������������������������������������������������������
 
-loc_7D18F:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2152j
+loc_7D18F:				; CODE XREF: Player_ShotDownSequence_7B035+2152j
 		cmp	byte_706AF, 0
 		jz	short loc_7D19C
 		mov	[bp+var_A], 1
 		jmp	short loc_7D1BA
 ; ���������������������������������������������������������������������������
 
-loc_7D19C:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+1992j
-					; MissionRecord_LoadEntityDatabase_7B035+215Fj
+loc_7D19C:				; CODE XREF: Player_ShotDownSequence_7B035+1992j
+					; Player_ShotDownSequence_7B035+215Fj
 		cmp	[bp+var_44], 0
 		jl	short loc_7D1A8
 		mov	ax, 1
 		jmp	short loc_7D1AA
 ; ���������������������������������������������������������������������������
 
-loc_7D1A8:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+216Cj
+loc_7D1A8:				; CODE XREF: Player_ShotDownSequence_7B035+216Cj
 		xor	ax, ax
 
-loc_7D1AA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2171j
+loc_7D1AA:				; CODE XREF: Player_ShotDownSequence_7B035+2171j
 		or	al, al
 		jz	short loc_7D1BA
 		call	CombatTarget_WeaponActionSubsystem
@@ -3261,8 +3268,8 @@ loc_7D1AA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2171j
 		jmp	loc_7C9CA
 ; ���������������������������������������������������������������������������
 
-loc_7D1BA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+135Ej
-					; MissionRecord_LoadEntityDatabase_7B035+1368j ...
+loc_7D1BA:				; CODE XREF: Player_ShotDownSequence_7B035+135Ej
+					; Player_ShotDownSequence_7B035+1368j ...
 		push	si
 		push	59CDh
 		call	EntityTracker_RemoveByTarget
@@ -3277,7 +3284,7 @@ loc_7D1BA:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+135Ej
 		add	sp, 4
 		jmp	short $+2
 
-loc_7D1DE:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2195j
+loc_7D1DE:				; CODE XREF: Player_ShotDownSequence_7B035+2195j
 		cmp	[bp+var_1A], 0
 		jz	short loc_7D1F6
 		push	3
@@ -3288,7 +3295,7 @@ loc_7D1DE:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+2195j
 		add	sp, 4
 		jmp	short $+2
 
-loc_7D1F6:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+21ADj
+loc_7D1F6:				; CODE XREF: Player_ShotDownSequence_7B035+21ADj
 		mov	al, [bp+var_9]
 		mov	[bp+var_28], al
 		push	2
@@ -3316,8 +3323,8 @@ loc_7D224:
 		add	sp, 8
 		jmp	short $+2
 
-loc_7D22E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+21D9j
-					; MissionRecord_LoadEntityDatabase_7B035+21E0j
+loc_7D22E:				; CODE XREF: Player_ShotDownSequence_7B035+21D9j
+					; Player_ShotDownSequence_7B035+21E0j
 		mov	[bp+var_14], 0
 		mov	[bp+var_F], 0
 		mov	[bp+var_E], 0
@@ -3326,7 +3333,7 @@ loc_7D22E:				; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+21D9j
 		pop	si
 		leave
 		retf
-MissionRecord_LoadEntityDatabase_7B035	endp
+Player_ShotDownSequence_7B035	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

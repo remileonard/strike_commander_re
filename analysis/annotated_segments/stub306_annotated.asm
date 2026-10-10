@@ -18,7 +18,7 @@ stru_6C0C0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A4Eo
 ; far, thunk fixe VROOMM (jmp sub_9C9A0) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2AD00h, codesize=23Dh, nentries=2.
 ; ==============================================================================================
-VROOMM_StubThunk_6C0E0	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+35AP
+VROOMM_StubThunk_6C0E0	proc far		; CODE XREF: Collision_OnTerrainContact_9D910+35AP
 		jmp	Debris_ComputeRandomizedForces_9C9A0
 VROOMM_StubThunk_6C0E0	endp
 
@@ -31,7 +31,7 @@ VROOMM_StubThunk_6C0E0	endp
 ; far, thunk fixe VROOMM (jmp sub_9CB2C) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2AD00h, codesize=23Dh, nentries=2.
 ; ==============================================================================================
-VROOMM_StubThunk_6C0E5	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+372P
+VROOMM_StubThunk_6C0E5	proc far		; CODE XREF: Collision_OnTerrainContact_9D910+372P
 		jmp	Debris_AllocateFamily_9CB2C
 VROOMM_StubThunk_6C0E5	endp
 

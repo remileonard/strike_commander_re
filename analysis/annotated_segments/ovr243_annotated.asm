@@ -526,11 +526,15 @@ HUDSymbol_Helper2_8094F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 190 lignes, NON DÉTAILLÉE — combine Matrix_LocalToWorld_58828 (seg117),
-; UI_ApplyLineOfSightAndTransform_57DAE (seg116), TextObject_AllocateVariantA_5A984 (×2,
-; seg125).
+; ⚠️ far, 190 lignes (ex-HUDSymbol_DrawWithLineOfSight_80971, nom faux). Phase 0 de la caméra
+; arme (WEAP, code caméra 0x0B), appelée par WeaponCam_Tick_82693 quand +0xA3 == 0. Place la
+; caméra au lanceur (+0x9F) plus un décalage et vise l'arme (+0x89). Quand le minuteur +0xC0
+; est écoulé : si l'arme est de catégorie 9 (bombe, +0x9E), passe en phase 2 (mov byte ptr
+; [si+0A3h],2) et demande la piste 0x15 seulement si la piste courante est 0x13 (cmp
+; word_70859,13h / jz → push 15h) ; sinon (missile), passe en phase 1 et demande la piste 0x08
+; (mov byte ptr [si+0A3h],1 / push 8).
 ; ==============================================================================================
-HUDSymbol_DrawWithLineOfSight_80971	proc far		; CODE XREF: VROOMM_StubThunk_6AF44J HUDSymbol_ConstructWithViewMatrix_82693+A6p
+WeaponCam_LaunchPhase_80971	proc far		; CODE XREF: VROOMM_StubThunk_6AF44J WeaponCam_Tick_82693+A6p
 
 var_48		= dword	ptr -48h
 var_44		= dword	ptr -44h
@@ -622,10 +626,10 @@ arg_0		= word ptr  6
 		jmp	short loc_80A59
 ; ���������������������������������������������������������������������������
 
-loc_80A57:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+DFj
+loc_80A57:				; CODE XREF: WeaponCam_LaunchPhase_80971+DFj
 		xor	ax, ax
 
-loc_80A59:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+E4j
+loc_80A59:				; CODE XREF: WeaponCam_LaunchPhase_80971+E4j
 		or	al, al
 		jz	short loc_80A7B
 		lea	ax, [bp+var_24]
@@ -640,7 +644,7 @@ loc_80A59:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+E4j
 		jmp	loc_80B70
 ; ���������������������������������������������������������������������������
 
-loc_80A7B:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+EAj
+loc_80A7B:				; CODE XREF: WeaponCam_LaunchPhase_80971+EAj
 		mov	al, [si+9Eh]
 		mov	ah, 0
 		cmp	ax, 9
@@ -671,14 +675,14 @@ loc_80A7B:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+EAj
 		jmp	loc_80B70
 ; ���������������������������������������������������������������������������
 
-loc_80AE9:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+173j
+loc_80AE9:				; CODE XREF: WeaponCam_LaunchPhase_80971+173j
 		push	15h
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		jmp	short loc_80B70
 ; ���������������������������������������������������������������������������
 
-loc_80AF3:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+113j
+loc_80AF3:				; CODE XREF: WeaponCam_LaunchPhase_80971+113j
 		mov	di, si
 		add	di, 0C4h ; '�'
 		mov	eax, [di]
@@ -710,16 +714,16 @@ loc_80AF3:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+113j
 		mov	[si+90h], eax
 		mov	byte ptr [si+0A3h], 1
 		push	8
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
-loc_80B70:				; CODE XREF: HUDSymbol_DrawWithLineOfSight_80971+107j
-					; HUDSymbol_DrawWithLineOfSight_80971+175j ...
+loc_80B70:				; CODE XREF: WeaponCam_LaunchPhase_80971+107j
+					; WeaponCam_LaunchPhase_80971+175j ...
 		pop	di
 		pop	si
 		leave
 		retf
-HUDSymbol_DrawWithLineOfSight_80971	endp
+WeaponCam_LaunchPhase_80971	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -732,7 +736,7 @@ HUDSymbol_DrawWithLineOfSight_80971	endp
 ; d'un symbole HUD avec test de clipping caméra. Motif répété identiquement pour plusieurs
 ; symboles (voir ovr244). Candidat prioritaire pour session dédiée.
 ; ==============================================================================================
-HUDSymbol_RenderWithClipTest_80B74	proc far		; CODE XREF: VROOMM_StubThunk_6AF49J HUDSymbol_ConstructWithViewMatrix_82693+AFp
+HUDSymbol_RenderWithClipTest_80B74	proc far		; CODE XREF: VROOMM_StubThunk_6AF49J WeaponCam_Tick_82693+AFp
 
 var_1CC		= dword	ptr -1CCh
 var_1C8		= dword	ptr -1C8h
@@ -1516,7 +1520,7 @@ HUDSymbol_RenderWithClipTest_80B74	endp
 ; ⚠️ far, 392 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74, ajoute
 ; UI_ApplyLineOfSightCheck_55A9E (seg116).
 ; ==============================================================================================
-HUDSymbol_RenderWithClipTestB_81467	proc far		; CODE XREF: VROOMM_StubThunk_6AF4EJ HUDSymbol_ConstructWithViewMatrix_82693+B8p
+HUDSymbol_RenderWithClipTestB_81467	proc far		; CODE XREF: VROOMM_StubThunk_6AF4EJ WeaponCam_Tick_82693+B8p
 
 var_DE		= dword	ptr -0DEh
 var_DA		= dword	ptr -0DAh
@@ -1918,7 +1922,7 @@ HUDSymbol_RenderWithClipTestB_81467	endp
 ; ⚠️ far, 323 lignes, NON DÉTAILLÉE — combine Vector_NormalizeInPlace_5593A (seg116, ×2),
 ; Camera_TransformPoint.
 ; ==============================================================================================
-HUDSymbol_RenderWithLOSCheck_818A2	proc far		; CODE XREF: VROOMM_StubThunk_6AF58J HUDSymbol_ConstructWithViewMatrix_82693+C1p
+HUDSymbol_RenderWithLOSCheck_818A2	proc far		; CODE XREF: VROOMM_StubThunk_6AF58J WeaponCam_Tick_82693+C1p
 
 var_B4		= dword	ptr -0B4h
 var_B0		= dword	ptr -0B0h
@@ -2250,7 +2254,7 @@ HUDSymbol_RenderWithLOSCheck_818A2	endp
 ; ==============================================================================================
 ; ⚠️ far, 379 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74.
 ; ==============================================================================================
-HUDSymbol_RenderWithClipTestC_81C26	proc far		; CODE XREF: VROOMM_StubThunk_6AF53J HUDSymbol_ConstructWithViewMatrix_82693+18Dp
+HUDSymbol_RenderWithClipTestC_81C26	proc far		; CODE XREF: VROOMM_StubThunk_6AF53J WeaponCam_Tick_82693+18Dp
 
 var_FA		= dword	ptr -0FAh
 var_F6		= dword	ptr -0F6h
@@ -2638,7 +2642,7 @@ HUDSymbol_RenderWithClipTestC_81C26	endp
 ; ==============================================================================================
 ; far, combine longueur vectorielle et UI_ApplyLineOfSightAndTransform_57DAE (127 lignes).
 ; ==============================================================================================
-HUDSymbol_ComputeTransform_8203D	proc far		; CODE XREF: VROOMM_StubThunk_6AF5DJ HUDSymbol_ConstructWithViewMatrix_82693+CAp
+HUDSymbol_ComputeTransform_8203D	proc far		; CODE XREF: VROOMM_StubThunk_6AF5DJ WeaponCam_Tick_82693+CAp
 
 var_38		= dword	ptr -38h
 var_34		= dword	ptr -34h
@@ -2777,7 +2781,7 @@ HUDSymbol_ComputeTransform_8203D	endp
 ; versions brutes sont INVERSEES (voir Math_CosDeg_5483F) : toute mention de sinus/cosinus
 ; tiree de ces noms dans ce resume est a relire.
 ; ==============================================================================================
-HUDSymbol_RenderWithLOSCheckB_82181	proc far		; CODE XREF: VROOMM_StubThunk_6AF3FJ HUDSymbol_ConstructWithViewMatrix_82693+195p
+HUDSymbol_RenderWithLOSCheckB_82181	proc far		; CODE XREF: VROOMM_StubThunk_6AF3FJ WeaponCam_Tick_82693+195p
 
 var_112		= dword	ptr -112h
 var_10E		= dword	ptr -10Eh
@@ -3258,9 +3262,11 @@ HUDSymbol_RenderWithLOSCheckB_82181	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 245 lignes, NON DÉTAILLÉE — combine SetReference16 et Camera_ComputeViewMatrix.
+; ⚠️ far, 245 lignes (ex-HUDSymbol_ConstructWithViewMatrix_82693, nom faux). Tick par image de
+; la caméra arme : machine à phases +0xA3 (0 à 4) ; phase 0 = WeaponCam_LaunchPhase_80971 ;
+; calcule la matrice de vue (Camera_ComputeViewMatrix).
 ; ==============================================================================================
-HUDSymbol_ConstructWithViewMatrix_82693	proc far		; CODE XREF: VROOMM_StubThunk_6AF7BJ
+WeaponCam_Tick_82693	proc far		; CODE XREF: VROOMM_StubThunk_6AF7BJ
 
 var_1E		= dword	ptr -1Eh
 var_1A		= dword	ptr -1Ah
@@ -3283,7 +3289,7 @@ arg_0		= word ptr  6
 		jmp	loc_82764
 ; ���������������������������������������������������������������������������
 
-loc_826A8:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+10j
+loc_826A8:				; CODE XREF: WeaponCam_Tick_82693+10j
 		mov	di, [si+89h]
 		add	di, 12h
 		mov	eax, [di]
@@ -3315,7 +3321,7 @@ loc_826E2:
 		cmp	byte ptr [si+9Eh], 8
 		jnz	short loc_82720
 
-loc_82707:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+6Bj
+loc_82707:				; CODE XREF: WeaponCam_Tick_82693+6Bj
 		mov	bx, [si+89h]
 		mov	ax, [bx+55h]
 		mov	[bp+var_2], ax
@@ -3326,7 +3332,7 @@ loc_82707:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+6Bj
 		call	SetReference16
 		add	sp, 4
 
-loc_82720:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+72j
+loc_82720:				; CODE XREF: WeaponCam_Tick_82693+72j
 		mov	al, [si+0A3h]
 		mov	ah, 0
 		mov	bx, ax
@@ -3335,19 +3341,19 @@ loc_82720:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+72j
 		jmp	loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_82730:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+98j
+loc_82730:				; CODE XREF: WeaponCam_Tick_82693+98j
 		shl	bx, 1
 		jmp	cs:off_82846[bx] ; switch jump
 
 loc_82737:				; DATA XREF: ovr243:off_82846o
 		push	si		; case 0x0
 		push	cs
-		call	near ptr HUDSymbol_DrawWithLineOfSight_80971
+		call	near ptr WeaponCam_LaunchPhase_80971
 		pop	cx
 		jmp	loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_82740:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
+loc_82740:				; CODE XREF: WeaponCam_Tick_82693+9Fj
 					; DATA XREF: ovr243:off_82846o
 		push	si		; case 0x1
 		push	cs
@@ -3356,7 +3362,7 @@ loc_82740:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
 		jmp	loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_82749:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
+loc_82749:				; CODE XREF: WeaponCam_Tick_82693+9Fj
 					; DATA XREF: ovr243:off_82846o
 		push	si		; case 0x3
 		push	cs
@@ -3367,7 +3373,7 @@ loc_8274F:				; default
 		jmp	loc_82839
 ; ���������������������������������������������������������������������������
 
-loc_82752:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
+loc_82752:				; CODE XREF: WeaponCam_Tick_82693+9Fj
 					; DATA XREF: ovr243:off_82846o
 		push	si		; case 0x2
 		push	cs
@@ -3376,7 +3382,7 @@ loc_82752:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
 		jmp	loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_8275B:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fj
+loc_8275B:				; CODE XREF: WeaponCam_Tick_82693+9Fj
 					; DATA XREF: ovr243:off_82846o
 		push	si		; case 0x4
 		push	cs
@@ -3387,29 +3393,29 @@ loc_82761:				; default
 		jmp	loc_82839
 ; ���������������������������������������������������������������������������
 
-loc_82764:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+12j
+loc_82764:				; CODE XREF: WeaponCam_Tick_82693+12j
 		cmp	dword ptr [si+13Dh], 0
 		jle	short loc_82771
 		mov	ax, 1
 		jmp	short loc_82773
 ; ���������������������������������������������������������������������������
 
-loc_82771:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+D7j
+loc_82771:				; CODE XREF: WeaponCam_Tick_82693+D7j
 		xor	ax, ax
 
-loc_82773:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+DCj
+loc_82773:				; CODE XREF: WeaponCam_Tick_82693+DCj
 		or	al, al
 		jnz	short loc_8277A
 		jmp	loc_8282E
 ; ���������������������������������������������������������������������������
 
-loc_8277A:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+E2j
+loc_8277A:				; CODE XREF: WeaponCam_Tick_82693+E2j
 		cmp	word ptr [si+0A1h], 0
 		jnz	short loc_82784
 		jmp	loc_82811
 ; ���������������������������������������������������������������������������
 
-loc_82784:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+ECj
+loc_82784:				; CODE XREF: WeaponCam_Tick_82693+ECj
 		push	word ptr [si+0A1h]
 		mov	bx, [si+0A1h]
 		mov	bx, [bx]
@@ -3460,8 +3466,8 @@ loc_827DD:
 		mov	[si+90h], eax
 		mov	byte ptr [si+0A3h], 6
 
-loc_82811:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+EEj
-					; HUDSymbol_ConstructWithViewMatrix_82693+101j ...
+loc_82811:				; CODE XREF: WeaponCam_Tick_82693+EEj
+					; WeaponCam_Tick_82693+101j ...
 		mov	al, [si+0A3h]
 		mov	ah, 0
 		cmp	ax, 6
@@ -3469,7 +3475,7 @@ loc_82811:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+EEj
 		jmp	short loc_82826
 ; ���������������������������������������������������������������������������
 
-loc_8281E:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+187j
+loc_8281E:				; CODE XREF: WeaponCam_Tick_82693+187j
 		push	si
 		push	cs
 		call	near ptr HUDSymbol_RenderWithClipTestC_81C26
@@ -3477,7 +3483,7 @@ loc_8281E:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+187j
 		jmp	short loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_82826:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+189j
+loc_82826:				; CODE XREF: WeaponCam_Tick_82693+189j
 		push	si
 		push	cs
 		call	near ptr HUDSymbol_RenderWithLOSCheckB_82181
@@ -3485,29 +3491,29 @@ loc_82826:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+189j
 		jmp	short loc_82839	; default
 ; ���������������������������������������������������������������������������
 
-loc_8282E:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+E4j
+loc_8282E:				; CODE XREF: WeaponCam_Tick_82693+E4j
 		mov	al, [si+141h]
 		mov	byte_72A8E, al
 		mov	al, 0
 		jmp	short loc_82842
 ; ���������������������������������������������������������������������������
 
-loc_82839:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Aj
-					; HUDSymbol_ConstructWithViewMatrix_82693+AAj ...
+loc_82839:				; CODE XREF: WeaponCam_Tick_82693+9Aj
+					; WeaponCam_Tick_82693+AAj ...
 		push	si		; default
 		call	Camera_ComputeViewMatrix
 		pop	cx
 		mov	al, 1
 
-loc_82842:				; CODE XREF: HUDSymbol_ConstructWithViewMatrix_82693+1A4j
+loc_82842:				; CODE XREF: WeaponCam_Tick_82693+1A4j
 		pop	di
 		pop	si
 		leave
 		retf
-HUDSymbol_ConstructWithViewMatrix_82693	endp
+WeaponCam_Tick_82693	endp
 
 ; ���������������������������������������������������������������������������
-off_82846	dw offset loc_82737	; DATA XREF: HUDSymbol_ConstructWithViewMatrix_82693+9Fr
+off_82846	dw offset loc_82737	; DATA XREF: WeaponCam_Tick_82693+9Fr
 		dw offset loc_82740	; jump table for switch	statement
 		dw offset loc_82752
 		dw offset loc_82749
@@ -3544,10 +3550,11 @@ HUDSymbol_Helper3_82850	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 219 lignes, NON DÉTAILLÉE — combine SetReference16 (×3),
-; AI_ComputeGeometryHelper_56E29 (seg116), Matrix_LocalToWorld_58828.
+; ⚠️ far, 219 lignes (ex-HUDSymbol_ConstructWithGeometry_8285A, nom faux). Démarrage de la
+; caméra arme, appelé par Mission_PlayerEventHandler via VROOMM_StubThunk_6AF85 : +0x89 = arme
+; suivie, +0x9F = lanceur, +0x9E = catégorie de l'arme (call [bx+34h] puis mov [si+9Eh],al).
 ; ==============================================================================================
-HUDSymbol_ConstructWithGeometry_8285A	proc far		; CODE XREF: VROOMM_StubThunk_6AF85J
+WeaponCam_Start_8285A	proc far		; CODE XREF: VROOMM_StubThunk_6AF85J
 
 var_42		= dword	ptr -42h
 var_3E		= dword	ptr -3Eh
@@ -3623,8 +3630,8 @@ loc_82862:
 		jmp	loc_82969
 ; ���������������������������������������������������������������������������
 
-loc_828C9:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+63j
-					; HUDSymbol_ConstructWithGeometry_8285A+6Aj
+loc_828C9:				; CODE XREF: WeaponCam_Start_8285A+63j
+					; WeaponCam_Start_8285A+6Aj
 		mov	di, [bp+arg_A]
 		mov	eax, [di]
 		mov	[si+14h], eax
@@ -3670,7 +3677,7 @@ loc_828C9:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+63j
 		jmp	loc_82A7E
 ; ���������������������������������������������������������������������������
 
-loc_82969:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+6Cj
+loc_82969:				; CODE XREF: WeaponCam_Start_8285A+6Cj
 		mov	al, [si+9Eh]
 		mov	ah, 0
 		cmp	ax, 9
@@ -3686,7 +3693,7 @@ loc_82969:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+6Cj
 		jmp	short loc_829B6
 ; ���������������������������������������������������������������������������
 
-loc_82996:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+118j
+loc_82996:				; CODE XREF: WeaponCam_Start_8285A+118j
 		mov	di, si
 		add	di, 0A4h ; '�'
 		mov	eax, [di]
@@ -3696,7 +3703,7 @@ loc_82996:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+118j
 		mov	eax, [di+8]
 		mov	[si+0F0h], eax
 
-loc_829B6:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+13Aj
+loc_829B6:				; CODE XREF: WeaponCam_Start_8285A+13Aj
 		mov	di, si
 		add	di, 0E8h ; '�'
 		mov	eax, [di]
@@ -3757,7 +3764,7 @@ loc_82A63:
 		mov	[si+0C0h], eax
 		mov	byte ptr [si+0A3h], 0
 
-loc_82A7E:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+10Cj
+loc_82A7E:				; CODE XREF: WeaponCam_Start_8285A+10Cj
 		mov	byte ptr [si+10Ch], 0
 		mov	eax, [si+139h]
 		mov	[si+13Dh], eax
@@ -3765,7 +3772,7 @@ loc_82A7E:				; CODE XREF: HUDSymbol_ConstructWithGeometry_8285A+10Cj
 		pop	si
 		leave
 		retf
-HUDSymbol_ConstructWithGeometry_8285A	endp
+WeaponCam_Start_8285A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -237,7 +237,7 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | FourCC | Taille struct | Vtable finale | Catégorie (`vtable+8`) | Type d'objet |
 |---|---|---|---|---|
 | `BOBJ` | 0x35 | `1B6F` | 0 | basic object |
-| `ORNT` | 0x36 | `1B6F` (non retracé au-delà) | 0 ? | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
+| `ORNT` | 0x36 | **`2578`** (`IFF_LoadModelMain` : `mov word ptr es:[bx], 2578h` après la base `1B6F`) | **1** (vtable `0x6F628`, slot +8 = `mov al, 1`, corrigé 2026-10-06) | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
 | `TRCR` | 0x82 | `255C` | 0x0D | tracer / traçante |
 | `AFTB` | 0x36 | `2518` | 0x0E | afterburner (tuyère) |
 | `MOBL` | 0x37 | `2504` | 2 | objet mobile |
@@ -1703,15 +1703,17 @@ hook de vue externe. Le slot `[0x14]` est la partie caméra.)
 
 #### c) Base d'entités — `MissionRecord_*` (ovr239-257)
 
-`MissionRecord_LoadEntityDatabase_7B035` (**3103 L, plus grosse fonction du
-binaire**) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
-charge en masse une base d'entités depuis un fichier indexé (potentiellement LZW).
+`Player_ShotDownSequence_7B035` (**3103 L, plus grosse fonction du
+binaire**, ex-`MissionRecord_LoadEntityDatabase_7B035`) : `Path_ResolveDataFile` + `IndexedRecordReader` (variantes A/C) —
+**ce n'est pas un chargeur de base d'entités** : c'est la séquence jouée quand l'avion du
+joueur est détruit (lancée par `STRIKE_EXE_MAIN_LOOP` sur `byte_6E4B4`), qui charge
+`OBJECTS\EJECT.PAK` (voir `MUSIC_SYSTEM.md` §5.4).
 Tags ASCII vus : `EJECT`, chunk générique **`DATA`** (`0x41544144`, cf.
 `PlayerComponent_LoadDataChunk_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
 (816 L, ovr249) = variante `Path_ResolveDataFile` + `InitAndValidate` + lecture
-massive de champs. `MissionRecord_LoadAndBuildWidgetTree_7D31A` (1081 L, ovr240) =
-même motif + construction de l'arbre de widgets (`UIScreen_BuildWidgetTree_53A94`,
-seg114). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
+massive de champs. `Player_EjectSequence_7D31A` (1081 L, ovr240, ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`) =
+séquence d'éjection volontaire (lancée sur `byte_6E4B8`, Ctrl+E), même chargement de `EJECT.PAK`,
+puis destruction de l'avion abandonné via `World_OnObjectDestroyed_53A94` (ex-`UIScreen_BuildWidgetTree_53A94`). Les ~50 `MissionRecord_LoadWithDwordFields*` / `LoadFieldGroupMix*` sont
 des lecteurs de sous-enregistrements selon la disposition de champs.
 
 ### 6.7 Composants d'avion & dégâts
@@ -2039,7 +2041,7 @@ Fichier .IFF
    interne de `AREA`/`SPOT`/`PART`/`CAST`/`NUMS`/`MSGS`/`FLAG`/`PLYR` (fonctions
    `A9956`/`A974A`/`AA6C9`/… seg457), le contenu du chunk `PROG` (bytecode Expr VM),
    le rôle exact de `SCNE.heading` (`+0x0A`, candidat cap), et
-   `MissionRecord_LoadEntityDatabase_7B035` (3103 L, base d'entités indexée).
+   `Player_ShotDownSequence_7B035` (3103 L, séquence « avion du joueur détruit », corps à lire).
 4. **`ResourceFile_LoadTypeA…G`** (ovr266-269, 7 fonctions 470–1400 L quasi
    identiques) — identifier les 7 types de fichiers correspondants.
 5. **LZW** — la table de dictionnaire n'a pas été tracée (seul le paramétrage

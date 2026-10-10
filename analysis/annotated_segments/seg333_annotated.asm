@@ -96,7 +96,7 @@ VROOMM_StubThunk_6CE29	endp
 ; far, thunk fixe VROOMM (jmp sub_A8BD1) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
-VROOMM_StubThunk_6CE2E	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94:loc_53CD3P
+VROOMM_StubThunk_6CE2E	proc far		; CODE XREF: World_OnObjectDestroyed_53A94:loc_53CD3P
 					; Expr_ResolveBuiltinCallSite_7E81D+119P
 		jmp	MissionScenario_ResolveFieldChain_A8BD1
 VROOMM_StubThunk_6CE2E	endp

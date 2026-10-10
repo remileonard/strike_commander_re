@@ -180,8 +180,8 @@ IndexedRecordReader_ConstructVariantB_65A4A	endp
 ; far, alloue (sub_658), construit via StreamReader_ConstructAndBind_63B23 (seg190) et
 ; initialise les champs d'index (sub_65B03), dispatch vtable [bx+0xC].
 ; ==============================================================================================
-IndexedRecordReader_ConstructVariantC_65A8A	proc far		; CODE XREF: MissionRecord_LoadEntityDatabase_7B035+71P
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+64P ...
+IndexedRecordReader_ConstructVariantC_65A8A	proc far		; CODE XREF: Player_ShotDownSequence_7B035+71P
+					; Player_EjectSequence_7D31A+64P ...
 
 var_A		= dword	ptr -0Ah
 var_6		= dword	ptr -6
@@ -496,8 +496,8 @@ IndexedRecordReader_ReadIndexTable_65B73	endp
 ; IndexedRecordReader_AdvanceIndex_65E2C, StreamReader_ReadTyped_63FA1 et
 ; IndexedRecordReader_ReadIndexTable_65B73 — positionnement sur une entrée d'index donnée.
 ; ==============================================================================================
-IndexedRecordReader_SeekToIndex_65C6D	proc far		; CODE XREF: TextRenderer_InputFieldHandler_5A0F3+107P
-					; TextRenderer_InputFieldHandler_5A0F3+352P ...
+IndexedRecordReader_SeekToIndex_65C6D	proc far		; CODE XREF: Sound_LoadDriverAndTimbreCache_5A0F3+107P
+					; Sound_LoadDriverAndTimbreCache_5A0F3+352P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

@@ -1105,7 +1105,7 @@ loc_9E535:
 		push	8
 
 loc_9E55E:
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 
 loc_9E566:				; CODE XREF: WeaponSystem_ReleaseBomb_9E289+48j
@@ -3968,8 +3968,8 @@ PlayerComponent_HelperVariantF_9F760	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 87 lignes, NON DÉTAILLÉE — combine sub_3FD (formatage), sub_43D43,
-; PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, Weapon_HUDBox_TimerCaseJ_5A95E
-; (seg125). Référencée via jmp depuis un stub VROOMM (sub_6C41B).
+; PlayerComponent_HelperVariantF_9F760 (×2), sub_43D9B, SoundFX_Stop_5A95E (seg125).
+; Référencée via jmp depuis un stub VROOMM (sub_6C41B).
 ; ==============================================================================================
 PlayerComponent_FormatAndDisplay_9F784	proc far		; CODE XREF: VROOMM_StubThunk_6C41BJ
 
@@ -4049,7 +4049,7 @@ loc_9F7EB:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+37j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	2
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
 loc_9F829:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+12j

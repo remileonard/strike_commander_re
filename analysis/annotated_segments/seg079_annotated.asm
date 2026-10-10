@@ -447,7 +447,7 @@ loc_386A2:				; CODE XREF: Debris_SpawnOrchestrator:loc_3865Dj
 loc_386B1:				; CODE XREF: Debris_SpawnOrchestrator+70j
 		push	[bp+arg_6]
 		push	si
-		call	Combat_TeamOpposedCheckAndDispatch_53A94
+		call	World_OnObjectDestroyed_53A94
 		add	sp, 4
 		cmp	word_722E6, si
 		jnz	short loc_386D1
@@ -591,7 +591,7 @@ loc_3879F:				; CODE XREF: Debris_SpawnOrchestrator+15Ej
 		push	0
 		push	eax
 		push	3
-		call	Weapon_HUDBox_TimerCaseH_5A8DC
+		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		push	di
 		push	59C3h

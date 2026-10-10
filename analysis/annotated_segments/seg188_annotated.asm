@@ -64,9 +64,9 @@ loc_63502:
 
 ; ==============================================================================================
 ; far, lit un champ 16 bits typé (tag 2) via sub_63FA1. Référencée par
-; TextObject_Allocate_5A577 (seg124).
+; Music_LoadTimbreFromLibrary_5A577 (seg124).
 ; ==============================================================================================
-Handle_ReadWordField_63511	proc far		; CODE XREF: TextObject_Allocate_5A577+55P
+Handle_ReadWordField_63511	proc far		; CODE XREF: Music_LoadTimbreFromLibrary_5A577+55P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6

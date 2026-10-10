@@ -116,7 +116,7 @@ arg_4		= byte ptr  0Ah
 
 loc_8EF4B:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+3Ej
 					; Config_LoadAndApplySettings_8EEBC+4Ej
-		call	Widget_Helper_5A9BA
+		call	Music_Pause_5A9BA
 		cmp	byte_721F0, 2
 		jnz	short loc_8EF5C
 		mov	ax, 1
@@ -618,7 +618,7 @@ loc_8F3E7:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+527j
 
 loc_8F42C:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+52Dj
 					; Config_LoadAndApplySettings_8EEBC+534j ...
-		call	Widget_Helper_5A9D0
+		call	Music_Resume_5A9D0
 		cmp	[bp+var_5], 0
 		jz	short loc_8F455
 		cmp	[bp+var_A], 0

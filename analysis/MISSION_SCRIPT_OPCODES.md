@@ -389,9 +389,9 @@ rapport entre eux :
 | `Expr_Node_EvaluateVisibility` | Graphe de nœuds générique |
 | `STRIKE_EXE_MAIN_LOOP` | **Boucle principale du jeu** (corrigé — pas une simple interface) |
 | `Weapon_HUDBox_UpdateAndRender` | HUD d'armement |
-| `AITargeting_ComputeOrientationExtended` | Ciblage IA |
+| `Landing_TaxiPhase_765B2` (ex-`AITargeting_ComputeOrientationExtended`) | Fin de l'atterrissage du joueur (entrée +0x40 du script, voir `MUSIC_SYSTEM.md` §5.4) |
 | `UIScript_ParseAndEvaluate` | Script d'interface |
-| `Gauge_ComputeAndRenderNeedle` | Instruments de bord |
+| `Collision_OnTerrainContact_9D910` (ex-`Gauge_ComputeAndRenderNeedle`) | Contact au sol accepté du joueur (entrée +0x40 du script) |
 | `PartEntry_ResolveSpawnPositionAndActivate` | Mission (celui qu'on a tracé) |
 
 **Conclusion** : `MissionScript_ExecutePROG` (l'interprète à 209 cas)

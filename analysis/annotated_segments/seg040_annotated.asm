@@ -589,9 +589,16 @@ Radar_TargetTypeFilter	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,127L — ne s'active que si arg_2 est le joueur (word_722E6), exclut les états spéciaux
-; (+0x11 == 0xB ou 7, probable détruit/hors-jeu) : handler d'événement de mission conditionné
-; à une action du joueur (probable comptage de kill/objectif).
+; far,127L — appelé à chaque lancement d'arme (3 appels dans HUD_RenderSymbologyMain seg088,
+; juste après SoundFX_Play_5A8DC et la décrémentation du compteur de munitions [+0x13] ; 1
+; appel dans TimedTrigger_SpawnAndBindGeometry_9E289 seg432). Ne s'active que si le tireur
+; (arg_2) est le joueur (word_722E6), si la catégorie de l'arme (arg_4, vtable +0x34) vaut 9
+; (bombe) ou 8 (missile), et si l'option de caméra automatique le permet : le champ +0x11 de
+; l'objet passé en premier argument (push 59CDh) est l'option « caméra automatique » (fait
+; donné par Rémi) ; la caméra arme n'est pas lancée si ce champ vaut 0x0B ou 7 (cmp byte ptr
+; [si+11h],0Bh / jnz puis cmp byte ptr [si+11h],7 / jnz, sinon jmp loc_233EE = sortie). Lance
+; alors la caméra arme (EntityTracker_RenderByCode(0x0B), VROOMM_StubThunk_6AF85 →
+; WeaponCam_Start_8285A, EntityTracker_ApplySelection) et affiche « Weapon Camera ».
 ; ==============================================================================================
 Mission_PlayerEventHandler	proc far		; CODE XREF: WeaponSystem_LaunchFromStation_3E744+780P
 					; WeaponSystem_LaunchFromStation_3E744+B29P ...

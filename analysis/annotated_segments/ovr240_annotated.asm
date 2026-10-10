@@ -33,12 +33,15 @@ MissionRecord_Helper2_7D310	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 1081 lignes, NON DÉTAILLÉE — même motif que MissionRecord_LoadEntityDatabase_7B035,
-; mais combine aussi UIScreen_BuildWidgetTree_53A94 (seg114) — lie le chargement de base de
-; données d'entités à la construction d'arborescence de widgets. Candidat prioritaire pour
-; session dédiée.
+; ⭐⚠️ far, 1081 lignes, corps NON DÉTAILLÉ (ex-MissionRecord_LoadAndBuildWidgetTree_7D31A, nom
+; faux). Séquence d'éjection volontaire du joueur : appelée par STRIKE_EXE_MAIN_LOOP via
+; VROOMM_StubThunk_6ADFA quand byte_6E4B8 != 0 (la boucle pose d'abord byte_6E4B4 = 1).
+; byte_6E4B8 est posé par Player_MainUpdate sur la touche de code 0x12 (E) avec Ctrl (tables
+; d'état clavier byte_72DE5 / byte_72E1D, indice 0x1D = Ctrl), ou quand byte_6E33B != 0.
+; Charge aussi OBJECTS\EJECT.PAK (push offset aEject) et demande la piste musicale 0x0A (push
+; 0Ah / call Music_RequestTune_5A984). Retour non nul → byte_706AF = 2 ; nul → byte_706AF = 3.
 ; ==============================================================================================
-MissionRecord_LoadAndBuildWidgetTree_7D31A	proc far		; CODE XREF: VROOMM_StubThunk_6ADFAJ
+Player_EjectSequence_7D31A	proc far		; CODE XREF: VROOMM_StubThunk_6ADFAJ
 
 var_D0		= dword	ptr -0D0h
 var_C6		= dword	ptr -0C6h
@@ -126,10 +129,10 @@ loc_7D323:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_7D360:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3Bj
+loc_7D360:				; CODE XREF: Player_EjectSequence_7D31A+3Bj
 		push	0
 		push	[bp+arg_0]
-		call	Combat_TeamOpposedCheckAndDispatch_53A94
+		call	World_OnObjectDestroyed_53A94
 		add	sp, 4
 		push	large dword ptr	[si+76h]
 		push	large dword ptr	[si+65h]
@@ -153,10 +156,10 @@ loc_7D360:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3Bj
 		jmp	short loc_7D3A5
 ; ���������������������������������������������������������������������������
 
-loc_7D3A3:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+85j
+loc_7D3A3:				; CODE XREF: Player_EjectSequence_7D31A+85j
 		mov	ax, bx
 
-loc_7D3A5:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+87j
+loc_7D3A5:				; CODE XREF: Player_EjectSequence_7D31A+87j
 		mov	si, ax
 		push	ds
 		push	offset a_pak_3	; ".PAK"
@@ -180,7 +183,7 @@ loc_7D3A5:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+87j
 		pop	cx
 		jmp	short $+2
 
-loc_7D3D5:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0j
+loc_7D3D5:				; CODE XREF: Player_EjectSequence_7D31A+B0j
 		push	80h ; '�'
 		call	CRT_Malloc16_Retry
 		pop	cx
@@ -195,10 +198,10 @@ loc_7D3D5:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0j
 		jmp	short loc_7D3F6
 ; ���������������������������������������������������������������������������
 
-loc_7D3F4:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+C8j
+loc_7D3F4:				; CODE XREF: Player_EjectSequence_7D31A+C8j
 		mov	ax, si
 
-loc_7D3F6:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+D8j
+loc_7D3F6:				; CODE XREF: Player_EjectSequence_7D31A+D8j
 		mov	si, ax
 		mov	ax, [si+5Ch]
 		add	ax, 2
@@ -241,10 +244,10 @@ loc_7D3F6:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+D8j
 		jmp	short loc_7D48A
 ; ���������������������������������������������������������������������������
 
-loc_7D486:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+164j
+loc_7D486:				; CODE XREF: Player_EjectSequence_7D31A+164j
 		mov	eax, [di+71h]
 
-loc_7D48A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+16Aj
+loc_7D48A:				; CODE XREF: Player_EjectSequence_7D31A+16Aj
 		mov	[bp+var_36], eax
 		push	0
 		push	0
@@ -278,7 +281,7 @@ loc_7D48A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+16Aj
 		call	IndexedRecordReader_SeekToIndex_65C6D
 		add	sp, 8
 
-loc_7D4F0:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+1B2j
+loc_7D4F0:				; CODE XREF: Player_EjectSequence_7D31A+1B2j
 		push	3
 		push	[bp+var_C]
 		call	IndexedRecordReader_AdvanceIndex_65E2C
@@ -292,11 +295,11 @@ loc_7D4F0:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+1B2j
 		jmp	short loc_7D518
 ; ���������������������������������������������������������������������������
 
-loc_7D511:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+1EFj
+loc_7D511:				; CODE XREF: Player_EjectSequence_7D31A+1EFj
 		mov	bx, [bp+var_C]
 		mov	eax, [bx+71h]
 
-loc_7D518:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+1F5j
+loc_7D518:				; CODE XREF: Player_EjectSequence_7D31A+1F5j
 		mov	[bp+var_3E], eax
 		push	0
 		push	0
@@ -332,7 +335,7 @@ loc_7D522:
 		call	IndexedRecordReader_SeekToIndex_65C6D
 		add	sp, 8
 
-loc_7D580:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+240j
+loc_7D580:				; CODE XREF: Player_EjectSequence_7D31A+240j
 		cmp	[bp+var_C], 0
 		jz	short loc_7D598
 		push	3
@@ -343,7 +346,7 @@ loc_7D580:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+240j
 		add	sp, 4
 		jmp	short $+2
 
-loc_7D598:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+26Aj
+loc_7D598:				; CODE XREF: Player_EjectSequence_7D31A+26Aj
 		or	di, di
 		jz	short loc_7D5A9
 		push	3
@@ -353,12 +356,12 @@ loc_7D598:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+26Aj
 		add	sp, 4
 		jmp	short $+2
 
-loc_7D5A9:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+280j
+loc_7D5A9:				; CODE XREF: Player_EjectSequence_7D31A+280j
 		mov	[bp+var_46], 19h
 		mov	eax, [bp+var_46]
 		mov	[bp+var_4], eax
 		push	0Ah
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 		mov	[bp+var_48], 0
 		mov	[bp+var_49], 1
@@ -367,17 +370,17 @@ loc_7D5A9:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+280j
 		jmp	loc_7D72E
 ; ���������������������������������������������������������������������������
 
-loc_7D5D4:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+2B5j
+loc_7D5D4:				; CODE XREF: Player_EjectSequence_7D31A+2B5j
 		cmp	[bp+var_28], 0
 		jnz	short loc_7D5DE
 		jmp	loc_7D72E
 ; ���������������������������������������������������������������������������
 
-loc_7D5DE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+2BFj
+loc_7D5DE:				; CODE XREF: Player_EjectSequence_7D31A+2BFj
 		jmp	loc_7D725
 ; ���������������������������������������������������������������������������
 
-loc_7D5E1:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+411j
+loc_7D5E1:				; CODE XREF: Player_EjectSequence_7D31A+411j
 		call	CombatTarget_WeaponActionSubsystem
 		mov	[bp+var_49], al
 		mov	di, [bp+arg_0]
@@ -454,7 +457,7 @@ loc_7D615:
 		mov	[bp+var_7], 1
 		mov	[bp+var_49], 0
 
-loc_7D6C6:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3A2j
+loc_7D6C6:				; CODE XREF: Player_EjectSequence_7D31A+3A2j
 		mov	eax, dword_70458
 		sub	[bp+var_4], eax
 		cmp	[bp+var_4], 0
@@ -463,10 +466,10 @@ loc_7D6C6:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3A2j
 		jmp	short loc_7D6DC
 ; ���������������������������������������������������������������������������
 
-loc_7D6DA:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3B9j
+loc_7D6DA:				; CODE XREF: Player_EjectSequence_7D31A+3B9j
 		xor	ax, ax
 
-loc_7D6DC:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3BEj
+loc_7D6DC:				; CODE XREF: Player_EjectSequence_7D31A+3BEj
 		or	al, al
 		jz	short loc_7D6FB
 		inc	[bp+var_48]
@@ -477,7 +480,7 @@ loc_7D6DC:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3BEj
 		mov	eax, [bp+var_5A]
 		mov	[bp+var_4], eax
 
-loc_7D6FB:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3C4j
+loc_7D6FB:				; CODE XREF: Player_EjectSequence_7D31A+3C4j
 		mov	al, byte_722D1
 		mov	ah, 0
 		cmp	ax, 1
@@ -486,7 +489,7 @@ loc_7D6FB:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3C4j
 		jmp	short loc_7D72E
 ; ���������������������������������������������������������������������������
 
-loc_7D70B:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3E9j
+loc_7D70B:				; CODE XREF: Player_EjectSequence_7D31A+3E9j
 		cmp	byte_6E345, 0
 		jz	short loc_7D718
 
@@ -495,22 +498,22 @@ loc_7D712:
 		jmp	short loc_7D72E
 ; ���������������������������������������������������������������������������
 
-loc_7D718:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+3F6j
+loc_7D718:				; CODE XREF: Player_EjectSequence_7D31A+3F6j
 		cmp	byte_706AF, 0
 		jz	short loc_7D725
 		mov	[bp+var_5], 1
 		jmp	short loc_7D72E
 ; ���������������������������������������������������������������������������
 
-loc_7D725:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A:loc_7D5DEj
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+403j
+loc_7D725:				; CODE XREF: Player_EjectSequence_7D31A:loc_7D5DEj
+					; Player_EjectSequence_7D31A+403j
 		cmp	[bp+var_49], 0
 		jz	short loc_7D72E
 		jmp	loc_7D5E1
 ; ���������������������������������������������������������������������������
 
-loc_7D72E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+2B7j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+2C1j ...
+loc_7D72E:				; CODE XREF: Player_EjectSequence_7D31A+2B7j
+					; Player_EjectSequence_7D31A+2C1j ...
 		cmp	byte ptr [bp+var_2E+1],	0
 		jz	short loc_7D752
 		cmp	[bp+var_32], 0
@@ -525,8 +528,8 @@ loc_7D72E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+2B7j
 		add	sp, 8
 		jmp	short $+2
 
-loc_7D752:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+418j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+41Fj
+loc_7D752:				; CODE XREF: Player_EjectSequence_7D31A+418j
+					; Player_EjectSequence_7D31A+41Fj
 		mov	[bp+var_32], 0
 		mov	byte ptr [bp+var_2E+1],	0
 		mov	[bp+var_2E+2], 0
@@ -544,8 +547,8 @@ loc_7D752:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+418j
 		add	sp, 8
 		jmp	short $+2
 
-loc_7D78A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+450j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+457j
+loc_7D78A:				; CODE XREF: Player_EjectSequence_7D31A+450j
+					; Player_EjectSequence_7D31A+457j
 		mov	[bp+var_28], 0
 		mov	byte ptr [bp+var_24+1],	0
 		mov	[bp+var_24+2], 0
@@ -560,7 +563,7 @@ loc_7D78A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+450j
 		jmp	loc_7D964
 ; ���������������������������������������������������������������������������
 
-loc_7D7C1:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+4A2j
+loc_7D7C1:				; CODE XREF: Player_EjectSequence_7D31A+4A2j
 		mov	di, [bp+var_A]
 		add	di, 12h
 		mov	eax, [di]
@@ -644,7 +647,7 @@ loc_7D7C1:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+4A2j
 		jmp	short loc_7D93E
 ; ���������������������������������������������������������������������������
 
-loc_7D8FD:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+640j
+loc_7D8FD:				; CODE XREF: Player_EjectSequence_7D31A+640j
 		call	Frame_UpdateTimingAndNotifyTrackedObjects_500F6
 		mov	eax, [bp+var_42]
 		mov	edx, dword_70458
@@ -663,7 +666,7 @@ loc_7D8FD:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+640j
 		cmp	ax, 1
 		jz	short loc_7D95C
 
-loc_7D93E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+5E1j
+loc_7D93E:				; CODE XREF: Player_EjectSequence_7D31A+5E1j
 		mov	eax, dword_70458
 		sub	[bp+var_3E], eax
 		mov	eax, [bp+var_3E]
@@ -675,12 +678,12 @@ loc_7D93E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+5E1j
 		or	al, al
 		jnz	short loc_7D8FD
 
-loc_7D95C:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+622j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+637j
+loc_7D95C:				; CODE XREF: Player_EjectSequence_7D31A+622j
+					; Player_EjectSequence_7D31A+637j
 		mov	[bp+var_5], 1
 		mov	[bp+var_6], 0
 
-loc_7D964:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+4A4j
+loc_7D964:				; CODE XREF: Player_EjectSequence_7D31A+4A4j
 		mov	al, [bp+var_5]
 		mov	ah, 0
 		or	ax, ax
@@ -688,13 +691,13 @@ loc_7D964:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+4A4j
 		jmp	loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7D970:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+651j
+loc_7D970:				; CODE XREF: Player_EjectSequence_7D31A+651j
 		cmp	byte_706AF, 0
 		jz	short loc_7D97A
 		jmp	loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7D97A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+65Bj
+loc_7D97A:				; CODE XREF: Player_EjectSequence_7D31A+65Bj
 		mov	ax, word ptr [bp+var_1A]
 		add	ax, 5Ah	; 'Z'
 		push	word ptr [bp+var_1A+2]
@@ -713,7 +716,7 @@ loc_7D97A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+65Bj
 		jmp	loc_7DD54
 ; ���������������������������������������������������������������������������
 
-loc_7D9A8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+689j
+loc_7D9A8:				; CODE XREF: Player_EjectSequence_7D31A+689j
 		mov	[bp+var_28+2], 499h
 		mov	eax, [bp+var_28+2]
 		mov	[bp+var_24+2], eax
@@ -798,7 +801,7 @@ loc_7D9A8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+689j
 		jmp	loc_7DD34
 ; ���������������������������������������������������������������������������
 
-loc_7DAE8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A35j
+loc_7DAE8:				; CODE XREF: Player_EjectSequence_7D31A+A35j
 		mov	di, [bp+var_16]
 		cmp	[bp+var_14], 0
 		jnz	short loc_7DB25
@@ -807,13 +810,13 @@ loc_7DAE8:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A35j
 		cmp	byte ptr [bp+var_48+1],	0
 		jz	short loc_7DB08
 
-loc_7DAFD:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7DBj
+loc_7DAFD:				; CODE XREF: Player_EjectSequence_7D31A+7DBj
 		mov	[bp+var_6], 0
 		mov	[bp+var_5], 1
 		jmp	loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7DB08:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7E1j
+loc_7DB08:				; CODE XREF: Player_EjectSequence_7D31A+7E1j
 		cmp	byte ptr [di+5Bh], 0
 		jz	short loc_7DB25
 		mov	ax, [di+59h]
@@ -825,8 +828,8 @@ loc_7DB08:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7E1j
 		add	sp, 4
 		mov	byte ptr [bp+var_48+1],	1
 
-loc_7DB25:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7D5j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+7F2j
+loc_7DB25:				; CODE XREF: Player_EjectSequence_7D31A+7D5j
+					; Player_EjectSequence_7D31A+7F2j
 		cmp	[bp+var_14], 0
 		jz	short loc_7DB4A
 		mov	di, [bp+var_14]
@@ -840,7 +843,7 @@ loc_7DB25:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7D5j
 		jmp	short loc_7DB67
 ; ���������������������������������������������������������������������������
 
-loc_7DB4A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+80Fj
+loc_7DB4A:				; CODE XREF: Player_EjectSequence_7D31A+80Fj
 		mov	di, [bp+var_16]
 		add	di, 12h
 		mov	eax, [di]
@@ -850,7 +853,7 @@ loc_7DB4A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+80Fj
 		mov	eax, [di+8]
 		mov	[bp+var_76], eax
 
-loc_7DB67:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+82Ej
+loc_7DB67:				; CODE XREF: Player_EjectSequence_7D31A+82Ej
 		mov	eax, [bp+var_66]
 		mov	[bp+var_8A], eax
 		mov	eax, [bp+var_62]
@@ -960,32 +963,32 @@ loc_7DB67:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+82Ej
 		jmp	short loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7DD1A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+9F8j
+loc_7DD1A:				; CODE XREF: Player_EjectSequence_7D31A+9F8j
 		cmp	byte_6E345, 0
 		jz	short loc_7DD27
 		mov	[bp+var_5], 1
 		jmp	short loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7DD27:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A05j
+loc_7DD27:				; CODE XREF: Player_EjectSequence_7D31A+A05j
 		cmp	byte_706AF, 0
 		jz	short loc_7DD34
 		mov	[bp+var_5], 1
 		jmp	short loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7DD34:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+7CBj
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+A12j
+loc_7DD34:				; CODE XREF: Player_EjectSequence_7D31A+7CBj
+					; Player_EjectSequence_7D31A+A12j
 		cmp	[bp+var_24+2], 0
 		jl	short loc_7DD40
 		mov	ax, 1
 		jmp	short loc_7DD42
 ; ���������������������������������������������������������������������������
 
-loc_7DD40:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A1Fj
+loc_7DD40:				; CODE XREF: Player_EjectSequence_7D31A+A1Fj
 		xor	ax, ax
 
-loc_7DD42:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A24j
+loc_7DD42:				; CODE XREF: Player_EjectSequence_7D31A+A24j
 		or	al, al
 		jz	short loc_7DD58
 		call	CombatTarget_WeaponActionSubsystem
@@ -994,15 +997,15 @@ loc_7DD42:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A24j
 		jmp	loc_7DAE8
 ; ���������������������������������������������������������������������������
 
-loc_7DD52:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A33j
+loc_7DD52:				; CODE XREF: Player_EjectSequence_7D31A+A33j
 		jmp	short loc_7DD58
 ; ���������������������������������������������������������������������������
 
-loc_7DD54:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+68Bj
+loc_7DD54:				; CODE XREF: Player_EjectSequence_7D31A+68Bj
 		mov	[bp+var_5], 1
 
-loc_7DD58:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+653j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+65Dj ...
+loc_7DD58:				; CODE XREF: Player_EjectSequence_7D31A+653j
+					; Player_EjectSequence_7D31A+65Dj ...
 		push	si
 		push	59CDh
 		call	EntityTracker_RemoveByTarget
@@ -1014,13 +1017,13 @@ loc_7DD58:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+653j
 		jmp	loc_7DE26
 ; ���������������������������������������������������������������������������
 
-loc_7DD70:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A51j
+loc_7DD70:				; CODE XREF: Player_EjectSequence_7D31A+A51j
 		cmp	byte_706AF, 0
 		jz	short loc_7DD7A
 		jmp	loc_7DE26
 ; ���������������������������������������������������������������������������
 
-loc_7DD7A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A5Bj
+loc_7DD7A:				; CODE XREF: Player_EjectSequence_7D31A+A5Bj
 		push	8
 		push	59CDh
 		call	EntityTracker_RenderByCode
@@ -1031,13 +1034,13 @@ loc_7DD7A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A5Bj
 		jmp	loc_7DE26
 ; ���������������������������������������������������������������������������
 
-loc_7DD90:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A71j
+loc_7DD90:				; CODE XREF: Player_EjectSequence_7D31A+A71j
 		cmp	[bp+var_14], 0
 		jnz	short loc_7DD99
 		jmp	loc_7DE26
 ; ���������������������������������������������������������������������������
 
-loc_7DD99:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A7Aj
+loc_7DD99:				; CODE XREF: Player_EjectSequence_7D31A+A7Aj
 		mov	ax, [bp+var_14]
 		mov	[bp-20h], ax
 		push	ax
@@ -1063,7 +1066,7 @@ loc_7DD99:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A7Aj
 		jmp	short loc_7DE0E
 ; ���������������������������������������������������������������������������
 
-loc_7DDDE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0Aj
+loc_7DDDE:				; CODE XREF: Player_EjectSequence_7D31A+B0Aj
 		call	CombatTarget_WeaponActionSubsystem
 		mov	ah, 0
 		or	ax, ax
@@ -1080,24 +1083,24 @@ loc_7DDDE:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+B0Aj
 		cmp	byte_706AF, 0
 		jnz	short loc_7DE26
 
-loc_7DE0E:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+AC2j
+loc_7DE0E:				; CODE XREF: Player_EjectSequence_7D31A+AC2j
 		cmp	[bp+var_24], 0
 		jl	short loc_7DE1A
 		mov	ax, 1
 		jmp	short loc_7DE1C
 ; ���������������������������������������������������������������������������
 
-loc_7DE1A:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+AF9j
+loc_7DE1A:				; CODE XREF: Player_EjectSequence_7D31A+AF9j
 		xor	ax, ax
 
-loc_7DE1C:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+AFEj
+loc_7DE1C:				; CODE XREF: Player_EjectSequence_7D31A+AFEj
 		or	al, al
 		jz	short loc_7DE26
 		cmp	[bp+var_14], 0
 		jnz	short loc_7DDDE
 
-loc_7DE26:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A53j
-					; MissionRecord_LoadAndBuildWidgetTree_7D31A+A5Dj ...
+loc_7DE26:				; CODE XREF: Player_EjectSequence_7D31A+A53j
+					; Player_EjectSequence_7D31A+A5Dj ...
 		mov	al, [bp+var_6]
 		mov	[bp+var_1D], al
 		lea	ax, [bp+var_16]
@@ -1118,7 +1121,7 @@ loc_7DE26:				; CODE XREF: MissionRecord_LoadAndBuildWidgetTree_7D31A+A53j
 		pop	si
 		leave
 		retf
-MissionRecord_LoadAndBuildWidgetTree_7D31A	endp
+Player_EjectSequence_7D31A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

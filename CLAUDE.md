@@ -69,6 +69,15 @@ Conséquences directes :
   champ. Pas de correction proposée sans cette citation.
 
 **Faits établis (ne pas remettre en question sans preuve nouvelle) :**
+- **`STRIKE.EXE` ne contient que la SIMULATION** : aucun écran de briefing ni menu de mission dans
+  ce binaire. Briefings et menus vivent dans un binaire **séparé, `OPTEST.EXE`, jamais exploré**
+  ici (fait donné par Rémi). Une fonction de `STRIKE.EXE` qui ressemble à de l'UI de menu ou de
+  briefing est à réinterpréter comme une séquence jouée dans le simulateur (vue d'établissement,
+  décollage, mise en formation…).
+- **Le son passe par la bibliothèque AIL 2.0 de Miles Design** : seg161 = `AIL.ASM` compilé
+  (fonctions renommées d'après les noms officiels, ex. `AIL_start_sequence_603CC`), sources
+  publiques dans `analysis/ail_sources/`. La musique est du XMIDI joué **par le pilote**
+  (`ADLIB.ADV` contient l'interpréteur `XMIDI.ASM`). Voir `analysis/MUSIC_SYSTEM.md` §1.
 - Le jeu est écrit en **Borland C++**, compilé pour DOS 16 bits (segments
   `far`/`near`, conventions d'appel Borland classiques).
 - Il utilise le gestionnaire d'overlay propriétaire de Borland,
@@ -160,6 +169,13 @@ strike_commander_re/
 │   ├── PHYSICS.md                   modèle de vol / dynamique de l'avion
 │   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
 │   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
+│   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
+│   │                                  transitions, déclencheurs, effets sonores, voix)
+│   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
+│   ├── ail_sources/                 sources publiques AIL 2.0 (AIL.ASM, AIL.INC, XMIDI.ASM)
+│   ├── adlib_driver_source/         ADLIB.ADV + son désassemblage
+│   ├── sample_dat_files/            COMBAT.DAT réel + décodage JSON
+│   ├── sample_prof_files/           fichiers PROF d'exemple (Billy, Stern, Gwen, Hammer, C-130…)
 │   ├── CAMERA_SYSTEM.md             ⭐ référence caméra : format COMP, parsing
 │   │                                  WRLD/CAMR, caméra de suivi (F2) — pour
 │   │                                  l'implémentation du système de caméra
@@ -182,6 +198,9 @@ strike_commander_re/
     ├── build_function_index.py      reconstruit function_index.json à
     │                                  partir de strike.asm +
     │                                  known_functions.json
+    ├── sc_player/                   ⭐ lecteur de la musique du jeu (C + SDL2/ImGui) :
+    │                                  séquenceur du jeu, XMIDI et pilote AdLib portés
+    │                                  depuis le code ; voir tools/sc_player/README.md
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer
@@ -331,7 +350,7 @@ Règles :
 `Categorie_RoleCourtEtDescriptif_ADRESSE` — l'adresse (ex. `_51106`) est
 **toujours conservée en suffixe** pour la traçabilité, même après
 renommage. Exemples : `AI_ThrottleController_6250`,
-`Expr_VM_Interpreter_51106`, `MissionRecord_LoadEntityDatabase_7B035`.
+`Expr_VM_Interpreter_51106`, `Player_ShotDownSequence_7B035`.
 
 ## Pièges méthodologiques déjà rencontrés (à ne pas répéter)
 
@@ -401,14 +420,15 @@ renommage. Exemples : `AI_ThrottleController_6250`,
 | VM à bytecode (Expr_VM) | seg114 | `Expr_VM_Interpreter_51106` (209 opcodes, **jamais lu en détail**) |
 | Mémoire paginée / EMS | seg127-138 | `MemoryManager` (nom confirmé par chaînes de debug) |
 | Format de ressources IFF + LZW | seg193-197 | `ResourceRecord_*`, `LZW_Decompress_66068` |
-| Registre de modules à créneaux temporisés | seg161 | `ModuleRegistry_TimerISR_5FBBE` |
+| Bibliothèque son AIL 2.0 (minuteries, pilotes, API) | seg161 | `AIL_API_timer_ISR_5FBBE`, `AIL_call_driver_5FBA6` |
+| Musique (XMIDI, transitions, déclencheurs) | seg121-125, seg458 | `Music_RequestTune_5A984`, `Music_TuneTransitionResolve_595C2` |
 | Système clavier (bas niveau → file d'événements) | seg202-203, seg211 | `Keyboard_BIOSInterceptHandler_681BC` |
 | Système souris | seg210 | `Mouse_EventCallback_68109` |
 | Segment de données global (vtables + 378 chaînes debug) | seg339 | — (pas de fonctions, uniquement données) |
 | Chargeur de mission | seg455 | `MissionLoader_LoadEntitiesMain_A767F` |
 | Cluster AudioQueue (file audio/messages indexée) | seg458-461 | `AudioQueue_ProcessMain_AA84E` |
 | IA de manœuvre/ciblage | ovr230-232 | `AI_ManeuverSolutionMain_781D0` (**jamais lu en détail**) |
-| Base de données d'entités de mission | ovr239-240 | `MissionRecord_LoadEntityDatabase_7B035` (**la plus grosse fonction du fichier, jamais lue en détail**) |
+| Séquences avion abattu / éjection (ex-« base d'entités de mission ») | ovr239-240 | `Player_ShotDownSequence_7B035` (**la plus grosse fonction du fichier**, rôle tracé, corps jamais lu en détail), `Player_EjectSequence_7D31A` |
 
 Pour le récit complet de chaque découverte (avec justification), voir les
 sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 1
@@ -418,11 +438,12 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
 
 1. `Expr_VM_Interpreter_51106` — jamais lu en détail malgré son rôle
    transversal central (HUD, IA, UI, mission passent tous par cette VM).
-2. `MissionRecord_LoadEntityDatabase_7B035` (3103 lignes, ovr239) — la
-   plus grosse fonction du fichier.
+2. `Player_ShotDownSequence_7B035` (3103 lignes, ovr239) — la
+   plus grosse fonction du fichier : séquence jouée quand l'avion du joueur est
+   détruit (charge `EJECT.PAK`, piste 0x0B ; voir `MUSIC_SYSTEM.md` §5.4). Corps à lire.
 3. `AI_ManeuverSolutionMain_781D0` (2373 lignes, ovr232) — cœur probable
    du calcul de manœuvre de combat aérien.
-4. Contenu exact du cluster AudioQueue (seg458-461) : audio ou texte ?
+4. ~~Contenu du cluster AudioQueue~~ : catalogue musical **et** son numérisé VOC ; système son entièrement décrit dans `MUSIC_SYSTEM.md` (questions restantes : §8).
 5. **Tick physique de l'avion : tranché** — c'est **`PhysicsTicks`**
    (seg103, ~0x4A85B ; slot Update des vtables de la classe `JDYN`, appelé par
    4 thunks seg082). `FlightPhysics_TickCandidate_4F4EE` (seg109) est le tick

@@ -953,7 +953,7 @@ loc_278BE:				; CODE XREF: TextRenderer_Main+442j
 
 loc_2792F:				; CODE XREF: TextRenderer_Main+56Cj
 		push	di
-		call	TextRenderer_InputFieldHandler_5A0F3
+		call	Sound_LoadDriverAndTimbreCache_5A0F3
 		add	sp, 0Ch
 		mov	ax, di
 		jmp	loc_279E8
@@ -1104,7 +1104,7 @@ loc_27A55:
 
 loc_27ABA:				; CODE XREF: TextRenderer_Main+6F2j
 		push	di
-		call	TextRenderer_InputFieldHandler_5A0F3
+		call	Sound_LoadDriverAndTimbreCache_5A0F3
 		add	sp, 0Ch
 		mov	ax, di
 		jmp	loc_27B6E
@@ -1295,11 +1295,11 @@ loc_27C68:				; CODE XREF: TextRenderer_Main+7CBj
 		mov	word_70852, ax
 		push	ax
 		push	5BE3h
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		push	word_70852
 		push	5BF5h
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		push	di
 		call	VROOMM_StubThunk_6CFB9
@@ -2421,7 +2421,7 @@ loc_285FD:				; DATA XREF: seg339:13A2o
 		mov	bp, sp
 		mov	ax, [bp+6]
 		push	ax
-		call	TextObject_CloseAndLog_5A856
+		call	Music_ShutdownDriver_5A856
 		pop	cx
 		pop	bp
 		retf

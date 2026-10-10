@@ -44,7 +44,7 @@ VROOMM_StubThunk_6B1F5	endp
 ; far, thunk fixe VROOMM (jmp sub_87325) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=13AF0h, codesize=0F6Fh, nentries=11.
 ; ==============================================================================================
-VROOMM_StubThunk_6B1FA	proc far		; CODE XREF: MissionRecord_LoadEntityDatabase_7B035:loc_7B156P
+VROOMM_StubThunk_6B1FA	proc far		; CODE XREF: Player_ShotDownSequence_7B035:loc_7B156P
 					; Cockpit_ApplyViewRecord_84EC0+1BP
 		jmp	IndexedRecordReader_ReleaseAndAdvance_87325
 VROOMM_StubThunk_6B1FA	endp

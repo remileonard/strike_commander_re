@@ -8,9 +8,9 @@ seg458		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; ⭐ far, enregistre le module auprès du minuteur matériel : référence explicitement
-; Interrupt_TimerISR_5940B (seg121) via Stopwatch_RegisterTickModuleVariant_67662 (seg207, tag
-; 5DC2h, cadence 0x14). Confirme le lien direct entre ce cluster et le registre de modules à
-; créneaux temporisés (seg161) découvert plusieurs lots auparavant.
+; Music_SequencerTickISR_5940B (seg121) via Stopwatch_RegisterTickModuleVariant_67662 (seg207,
+; tag 5DC2h, cadence 0x14). Confirme le lien direct entre ce cluster et le registre de modules
+; à créneaux temporisés (seg161) découvert plusieurs lots auparavant.
 ; ==============================================================================================
 AudioQueue_RegisterTickModule_AA810	proc far		; CODE XREF: VROOMM_StubThunk_6CFB9J
 
@@ -22,7 +22,7 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	large 14h
 		push	seg seg121
-		push	offset Interrupt_TimerISR_5940B
+		push	offset Music_SequencerTickISR_5940B
 		push	5DC2h
 		call	Stopwatch_RegisterTickModuleVariant_67662
 		add	sp, 0Ah
@@ -38,9 +38,10 @@ AudioQueue_RegisterTickModule_AA810	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle AudioQueue_ProcessMain_AB1EF.
+; Ex-'AudioQueue_AdvanceSlot_AA831'. far. LUE 2026-10-06. Music_StopWithFade_AB1EF(fondu) puis
+; remet a zero byte_70869 (un combat a eu lieu) et byte_7086A (ennemis proches).
 ; ==============================================================================================
-AudioQueue_AdvanceSlot_AA831	proc far		; CODE XREF: VROOMM_StubThunk_6CFBEJ
+Music_StopAndResetCombat_AA831	proc far		; CODE XREF: VROOMM_StubThunk_6CFBEJ
 
 arg_0		= word ptr  6
 
@@ -57,7 +58,7 @@ loc_AA834:
 		push	cs
 
 loc_AA83C:
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AA83F:
 		add	sp, 4
@@ -69,7 +70,7 @@ loc_AA847:
 		mov	byte_7086A, 0
 		pop	bp
 		retf
-AudioQueue_AdvanceSlot_AA831	endp
+Music_StopAndResetCombat_AA831	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -129,7 +130,7 @@ loc_AA861:
 		push	cs
 
 loc_AA862:
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AA865:
 		add	sp, 4
@@ -322,14 +323,14 @@ loc_AA9D3:				; CODE XREF: AudioQueue_ProcessMain_AA84E+180j
 		push	si
 		nop
 		push	cs
-		call	near ptr AudioQueue_ReleaseAndAdvance_AACA6
+		call	near ptr AudioQueue_LoadTrackTable_AACA6
 		add	sp, 6
 		lea	ax, [bp+var_238]
 		push	ax
 		push	si
 		nop
 		push	cs
-		call	near ptr AudioQueue_ProcessAndAdvance_AAFA0
+		call	near ptr AudioQueue_LoadTransitionTable_AAFA0
 		add	sp, 4
 		push	2
 		lea	ax, [bp+var_238]
@@ -646,11 +647,19 @@ AudioQueue_ProcessMain_AA84E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 196 lignes, NON DÉTAILLÉE — combine Handle_ReadByteField_63534 (×3, seg188),
-; sub_1069, Sequencer_ReleaseSlot_59F87 (seg123), IndexedRecordReader_AdvanceIndex_65E2C,
-; allocateurs typés (seg131).
+; Ex-'AudioQueue_ReleaseAndAdvance_AACA6' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). ★ far, 196 lignes — CHARGE LA TABLE DES PISTES
+; PRINCIPALES, lue ligne à ligne intégralement (anciennement AudioQueue_LoadTrackTable_AACA6).
+; arg_2=lecteur flux combat.dat, arg_4=lecteur IndexedRecordReader du niveau 2 (archive de
+; transitions brute). Séquence : (1) word_7084C = Handle_ReadByteField_63534(combat.dat, -1) —
+; nombre de pistes lu directement depuis le .dat ; (2) alloue word_70854 = table de word_7084C
+; TrackDescriptor (12 octets chacun, via sub_1069) ; (3) word_70867 = [niveau2+0x5D]-1 ; (4)
+; boucle sur les entrées 1..word_70867 du niveau 1 : lit 2 octets depuis combat.dat, lit la
+; taille via IndexedRecordReader_AdvanceIndex_65E2C, alloue un buffer (tag 0x5C44), charge les
+; données réelles via IndexedRecordReader_SeekToIndex_65C6D, enregistre dans le séquenceur.
+; Voir MUSIC_SYSTEM.md §2.4.
 ; ==============================================================================================
-AudioQueue_ReleaseAndAdvance_AACA6	proc far		; CODE XREF: VROOMM_StubThunk_6CFAAJ AudioQueue_ProcessMain_AA84E+1B9p
+AudioQueue_LoadTrackTable_AACA6	proc far		; CODE XREF: VROOMM_StubThunk_6CFAAJ AudioQueue_ProcessMain_AA84E+1B9p
 
 var_1E		= word ptr -1Eh
 var_1C		= word ptr -1Ch
@@ -697,7 +706,7 @@ arg_4		= word ptr  0Ah
 		push	word_70852
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		mov	ax, [di+5Dh]
 		dec	ax
@@ -706,7 +715,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_AADFD
 ; ���������������������������������������������������������������������������
 
-loc_AAD22:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6+160j
+loc_AAD22:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6+160j
 		mov	ax, [bp+var_2]
 		inc	ax
 		mov	[bp+var_4], ax
@@ -748,10 +757,10 @@ loc_AAD72:
 		jmp	short loc_AAD78
 ; ���������������������������������������������������������������������������
 
-loc_AAD74:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6:loc_AAD6Cj
+loc_AAD74:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6:loc_AAD6Cj
 		mov	eax, [di+71h]
 
-loc_AAD78:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6:loc_AAD72j
+loc_AAD78:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6:loc_AAD72j
 		mov	[bp+var_8], eax
 		cmp	[bp+var_8], 0
 		jz	short loc_AADFA
@@ -795,7 +804,7 @@ loc_AADE4:
 		push	ax
 
 loc_AADE8:
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 
 loc_AADED:
 		add	sp, 6
@@ -805,23 +814,23 @@ loc_AADF0:
 		push	ax
 
 loc_AADF4:
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 
-loc_AADFA:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6+DBj
+loc_AADFA:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6+DBj
 		inc	[bp+var_2]
 
-loc_AADFD:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6+79j
+loc_AADFD:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6+79j
 		mov	ax, [bp+var_2]
 		cmp	ax, word_70867
 		jge	short loc_AAE09
 		jmp	loc_AAD22
 ; ���������������������������������������������������������������������������
 
-loc_AAE09:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6+15Ej
+loc_AAE09:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6+15Ej
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	[bp+var_15], 0
 		jz	short loc_AAE37
@@ -839,13 +848,13 @@ loc_AAE2D:
 		add	sp, 8
 		jmp	short $+2
 
-loc_AAE37:				; CODE XREF: AudioQueue_ReleaseAndAdvance_AACA6+171j
-					; AudioQueue_ReleaseAndAdvance_AACA6+178j
+loc_AAE37:				; CODE XREF: AudioQueue_LoadTrackTable_AACA6+171j
+					; AudioQueue_LoadTrackTable_AACA6+178j
 		pop	di
 		pop	si
 		leave
 		retf
-AudioQueue_ReleaseAndAdvance_AACA6	endp
+AudioQueue_LoadTrackTable_AACA6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -853,8 +862,8 @@ AudioQueue_ReleaseAndAdvance_AACA6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 186 lignes, NON DÉTAILLÉE — variante de AudioQueue_ReleaseAndAdvance_AACA6, combine
-; aussi IndexedRecordReader_SeekToIndex_65C6D (seg196) et Sequencer_ProcessQueue_59FF5
+; ⚠️ far, 186 lignes, NON DÉTAILLÉE — variante de AudioQueue_LoadTrackTable_AACA6, combine
+; aussi IndexedRecordReader_SeekToIndex_65C6D (seg196) et Music_ChannelRegisterSequence_59FF5
 ; (seg123).
 ; ==============================================================================================
 AudioQueue_ReleaseAndAdvanceB_AAE3B	proc far		; CODE XREF: VROOMM_StubThunk_6CFAFJ AudioQueue_ProcessMain_AA84E+29Fp
@@ -908,7 +917,7 @@ loc_AAE6F:
 		push	ax
 
 loc_AAE73:
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		mov	ax, word_70867
 		mov	[bp+var_2], ax
@@ -998,11 +1007,11 @@ loc_AAF46:
 		push	si
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 
 loc_AAF5F:				; CODE XREF: AudioQueue_ReleaseAndAdvanceB_AAE3B:loc_AAEE6j
@@ -1020,7 +1029,7 @@ loc_AAF6E:				; CODE XREF: AudioQueue_ReleaseAndAdvanceB_AAE3B+12Ej
 		push	ax
 
 loc_AAF72:
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	[bp+var_15], 0
 		jz	short loc_AAF9C
@@ -1050,12 +1059,18 @@ AudioQueue_ReleaseAndAdvanceB_AAE3B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 213 lignes, NON DÉTAILLÉE — combine IndexedRecordReader_AdvanceIndex_65E2C,
-; IndexedRecordReader_ConstructVariantC_65A8A (seg196), sub_1069, Sequencer_ReleaseSlot_59F87,
-; IndexedRecordReader_SeekToIndex_65C6D — cycle complet de traitement d'un élément de la file
-; audio/message.
+; Ex-'AudioQueue_ProcessAndAdvance_AAFA0' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). ★ far, 213 lignes — CHARGE LA TABLE DES PISTES DE
+; TRANSITION, lue ligne à ligne intégralement (anciennement
+; AudioQueue_LoadTransitionTable_AAFA0). arg_2=lecteur IndexedRecordReader du niveau 2.
+; Séquence : (1) relit SA PROPRE entrée 0 et construit un NIVEAU 3
+; (IndexedRecordReader_ConstructVariantC_65A8A) ; (2) word_7084E = [niveau3+0x5D] — la borne
+; testée dans Music_TuneTransitionResolve_595C2 ; (3) alloue word_70856 = table de word_7084E
+; TransitionDescriptor (10 octets chacun), callback overlay stub239 (différent de seg335) ;
+; (4) boucle sur les word_7084E entrées du niveau 3, même mécanique de chargement. Voir
+; MUSIC_SYSTEM.md §2.4.
 ; ==============================================================================================
-AudioQueue_ProcessAndAdvance_AAFA0	proc far		; CODE XREF: VROOMM_StubThunk_6CFB4J AudioQueue_ProcessMain_AA84E+1C7p
+AudioQueue_LoadTransitionTable_AAFA0	proc far		; CODE XREF: VROOMM_StubThunk_6CFB4J AudioQueue_ProcessMain_AA84E+1C7p
 
 var_9A		= word ptr -9Ah
 var_98		= word ptr -98h
@@ -1097,10 +1112,10 @@ arg_2		= word ptr  8
 		jmp	short loc_AAFD7
 ; ���������������������������������������������������������������������������
 
-loc_AAFD3:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+2Bj
+loc_AAFD3:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+2Bj
 		mov	eax, [si+71h]
 
-loc_AAFD7:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+31j
+loc_AAFD7:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+31j
 		mov	edx, [bp+var_4]
 		add	edx, eax
 		mov	[bp+var_8], edx
@@ -1140,13 +1155,13 @@ loc_AB03E:
 		push	word_70852
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	Sequencer_ReleaseSlot_59F87
+		call	Music_ChannelInit_59F87
 		add	sp, 4
 		xor	di, di
 		jmp	loc_AB109
 ; ���������������������������������������������������������������������������
 
-loc_AB054:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+16Fj
+loc_AB054:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+16Fj
 		mov	ax, di
 		imul	ax, 0Ah
 		mov	si, word_70856
@@ -1164,10 +1179,10 @@ loc_AB054:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+16Fj
 		jmp	short loc_AB082
 ; ���������������������������������������������������������������������������
 
-loc_AB07E:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+D6j
+loc_AB07E:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+D6j
 		mov	eax, [bp+var_1B]
 
-loc_AB082:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+DCj
+loc_AB082:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+DCj
 		mov	[bp+var_C], eax
 		cmp	[bp+var_C], 0
 		jz	short loc_AB108
@@ -1208,26 +1223,26 @@ loc_AB0EA:
 		push	si
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	Sequencer_ProcessQueue_59FF5
+		call	Music_ChannelRegisterSequence_59FF5
 		add	sp, 6
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 
-loc_AB108:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+EBj
+loc_AB108:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+EBj
 		inc	di
 
-loc_AB109:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+B1j
+loc_AB109:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+B1j
 		cmp	di, word_7084E
 		jge	short loc_AB112
 		jmp	loc_AB054
 ; ���������������������������������������������������������������������������
 
-loc_AB112:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+16Dj
+loc_AB112:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+16Dj
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	[bp+var_91], 0
 		jz	short loc_AB145
@@ -1245,8 +1260,8 @@ loc_AB112:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+16Dj
 loc_AB143:
 		jmp	short $+2
 
-loc_AB145:				; CODE XREF: AudioQueue_ProcessAndAdvance_AAFA0+182j
-					; AudioQueue_ProcessAndAdvance_AAFA0+18Aj
+loc_AB145:				; CODE XREF: AudioQueue_LoadTransitionTable_AAFA0+182j
+					; AudioQueue_LoadTransitionTable_AAFA0+18Aj
 		mov	[bp+var_96], 0
 		mov	[bp+var_91], 0
 
@@ -1267,7 +1282,7 @@ loc_AB168:
 		pop	si
 		leave
 		retf
-AudioQueue_ProcessAndAdvance_AAFA0	endp
+AudioQueue_LoadTransitionTable_AAFA0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1275,11 +1290,11 @@ AudioQueue_ProcessAndAdvance_AAFA0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle deux fois ModuleRegistry_Opcode_AB_603D2 (seg161, thunk d'activation
-; d'emplacement du registre de modules) — confirme que ce cluster utilise directement les
-; thunks d'opcode du registre de modules découverts en seg161.
+; Ex-'AudioQueue_ActivateSlotOpcode_AB16F'. far. LUE 2026-10-06. AIL_stop_sequence_603D2 sur
+; les deux canaux musicaux (principal 5BE3h et transition 5BF5h) : pause (la position est
+; gardee).
 ; ==============================================================================================
-AudioQueue_ActivateSlotOpcode_AB16F	proc far		; CODE XREF: VROOMM_StubThunk_6CFD2J
+Music_PauseChannels_AB16F	proc far		; CODE XREF: VROOMM_StubThunk_6CFD2J
 
 arg_0		= word ptr  6
 
@@ -1293,11 +1308,11 @@ loc_AB172:
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AB_603D2
+		call	AIL_stop_sequence_603D2
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB191:				; CODE XREF: AudioQueue_ActivateSlotOpcode_AB16F+Bj
+loc_AB191:				; CODE XREF: Music_PauseChannels_AB16F+Bj
 		cmp	word_72CA5, 0
 		jz	short loc_AB1AD
 		push	word_72CA7
@@ -1305,16 +1320,16 @@ loc_AB191:				; CODE XREF: AudioQueue_ActivateSlotOpcode_AB16F+Bj
 		push	word ptr [bx+4]
 
 loc_AB1A3:
-		call	ModuleRegistry_Opcode_AB_603D2
+		call	AIL_stop_sequence_603D2
 		add	sp, 4
 
 loc_AB1AB:
 		jmp	short $+2
 
-loc_AB1AD:				; CODE XREF: AudioQueue_ActivateSlotOpcode_AB16F+27j
+loc_AB1AD:				; CODE XREF: Music_PauseChannels_AB16F+27j
 		pop	bp
 		retf
-AudioQueue_ActivateSlotOpcode_AB16F	endp
+Music_PauseChannels_AB16F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1322,10 +1337,10 @@ AudioQueue_ActivateSlotOpcode_AB16F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐ far, appelle deux fois ModuleRegistry_Opcode_AD_603D8 (seg161, thunk de désactivation
-; d'emplacement).
+; Ex-'AudioQueue_DeactivateSlotOpcode_AB1AF'. far. LUE 2026-10-06. AIL_resume_sequence_603D8
+; sur les deux canaux musicaux.
 ; ==============================================================================================
-AudioQueue_DeactivateSlotOpcode_AB1AF	proc far		; CODE XREF: VROOMM_StubThunk_6CFD7J
+Music_ResumeChannels_AB1AF	proc far		; CODE XREF: VROOMM_StubThunk_6CFD7J
 
 arg_0		= word ptr  6
 
@@ -1343,11 +1358,11 @@ loc_AB1B5:
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AD_603D8
+		call	AIL_resume_sequence_603D8
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB1D1:				; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+Bj
+loc_AB1D1:				; CODE XREF: Music_ResumeChannels_AB1AF+Bj
 		cmp	word_72CA5, 0
 		jz	short loc_AB1ED
 		push	word_72CA7
@@ -1355,16 +1370,16 @@ loc_AB1D1:				; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+Bj
 		push	word ptr [bx+4]
 
 loc_AB1E3:
-		call	ModuleRegistry_Opcode_AD_603D8
+		call	AIL_resume_sequence_603D8
 
 loc_AB1E8:
 		add	sp, 4
 		jmp	short $+2
 
-loc_AB1ED:				; CODE XREF: AudioQueue_DeactivateSlotOpcode_AB1AF+27j
+loc_AB1ED:				; CODE XREF: Music_ResumeChannels_AB1AF+27j
 		pop	bp
 		retf
-AudioQueue_DeactivateSlotOpcode_AB1AF	endp
+Music_ResumeChannels_AB1AF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1372,13 +1387,13 @@ AudioQueue_DeactivateSlotOpcode_AB1AF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 123 lignes, NON DÉTAILLÉE — appelle directement Sequencer_AdvanceActiveSlot_59F1D
-; (seg123, ×2) et les thunks d'opcode du registre de modules (ModuleRegistry_Opcode_AE_603DE
-; probe, _B1_603F0, _AF_603E4) — cœur du traitement des emplacements actifs de la file
-; audio/séquenceur.
+; Ex-'AudioQueue_ProcessSequencerSlots_AB1EF'. far. LUE 2026-10-06. (musique, fondu) : piste
+; demandee = 0xFFFF, canal de transition arrete ; si fondu et piste principale en cours :
+; AIL_set_relative_volume_603F0(0, 1000 ms) puis attente active jusqu'a volume nul
+; (AIL_relative_volume_603E4) ; arrete le canal principal.
 ; ==============================================================================================
-AudioQueue_ProcessSequencerSlots_AB1EF	proc far		; CODE XREF: VROOMM_StubThunk_6CFDCJ
-					; AudioQueue_AdvanceSlot_AA831:loc_AA83Cp	...
+Music_StopWithFade_AB1EF	proc far		; CODE XREF: VROOMM_StubThunk_6CFDCJ
+					; Music_StopAndResetCombat_AA831:loc_AA83Cp	...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -1393,20 +1408,20 @@ loc_AB1F5:
 		mov	word_70859, 0FFFFh
 		mov	byte_70858, 0
 		push	5BF5h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		cmp	[bp+arg_2], 0
 		jnz	short loc_AB212
 		jmp	loc_AB2B2
 ; ���������������������������������������������������������������������������
 
-loc_AB212:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+1Ej
+loc_AB212:				; CODE XREF: Music_StopWithFade_AB1EF+1Ej
 		cmp	word_72C93, 0
 		jz	short loc_AB23A
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 1
 		jnz	short loc_AB236
@@ -1414,17 +1429,17 @@ loc_AB212:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+1Ej
 		jmp	short loc_AB238
 ; ���������������������������������������������������������������������������
 
-loc_AB236:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+40j
+loc_AB236:				; CODE XREF: Music_StopWithFade_AB1EF+40j
 		xor	ax, ax
 
-loc_AB238:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+45j
+loc_AB238:				; CODE XREF: Music_StopWithFade_AB1EF+45j
 		jmp	short loc_AB23C
 ; ���������������������������������������������������������������������������
 
-loc_AB23A:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+28j
+loc_AB23A:				; CODE XREF: Music_StopWithFade_AB1EF+28j
 		mov	al, 0
 
-loc_AB23C:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF:loc_AB238j
+loc_AB23C:				; CODE XREF: Music_StopWithFade_AB1EF:loc_AB238j
 		or	al, al
 		jz	short loc_AB2B2
 
@@ -1439,20 +1454,20 @@ loc_AB24D:
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_B1_603F0
+		call	AIL_set_relative_volume_603F0
 		add	sp, 8
 
 loc_AB260:
 		jmp	short $+2
 
-loc_AB262:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+56j
-					; AudioQueue_ProcessSequencerSlots_AB1EF+C1j
+loc_AB262:				; CODE XREF: Music_StopWithFade_AB1EF+56j
+					; Music_StopWithFade_AB1EF+C1j
 		cmp	word_72C93, 0
 		jz	short loc_AB28A
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AE_603DE
+		call	AIL_sequence_status_603DE
 		add	sp, 4
 		cmp	ax, 1
 		jnz	short loc_AB286
@@ -1460,17 +1475,17 @@ loc_AB262:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+56j
 		jmp	short loc_AB288
 ; ���������������������������������������������������������������������������
 
-loc_AB286:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+90j
+loc_AB286:				; CODE XREF: Music_StopWithFade_AB1EF+90j
 		xor	ax, ax
 
-loc_AB288:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+95j
+loc_AB288:				; CODE XREF: Music_StopWithFade_AB1EF+95j
 		jmp	short loc_AB28C
 ; ���������������������������������������������������������������������������
 
-loc_AB28A:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+78j
+loc_AB28A:				; CODE XREF: Music_StopWithFade_AB1EF+78j
 		mov	al, 0
 
-loc_AB28C:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF:loc_AB288j
+loc_AB28C:				; CODE XREF: Music_StopWithFade_AB1EF:loc_AB288j
 		or	al, al
 		jz	short loc_AB2B2
 		cmp	word_72C93, 0
@@ -1478,28 +1493,28 @@ loc_AB28C:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF:loc_AB288j
 		push	word_72C95
 		mov	bx, word_72C93
 		push	word ptr [bx+4]
-		call	ModuleRegistry_Opcode_AF_603E4
+		call	AIL_relative_volume_603E4
 
 loc_AB2A7:
 		add	sp, 4
 		jmp	short loc_AB2AE
 ; ���������������������������������������������������������������������������
 
-loc_AB2AC:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+A6j
+loc_AB2AC:				; CODE XREF: Music_StopWithFade_AB1EF+A6j
 		xor	ax, ax
 
-loc_AB2AE:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+BBj
+loc_AB2AE:				; CODE XREF: Music_StopWithFade_AB1EF+BBj
 		or	ax, ax
 		jnz	short loc_AB262
 
-loc_AB2B2:				; CODE XREF: AudioQueue_ProcessSequencerSlots_AB1EF+20j
-					; AudioQueue_ProcessSequencerSlots_AB1EF+4Fj ...
+loc_AB2B2:				; CODE XREF: Music_StopWithFade_AB1EF+20j
+					; Music_StopWithFade_AB1EF+4Fj ...
 		push	5BE3h
-		call	Sequencer_AdvanceActiveSlot_59F1D
+		call	Music_ChannelStopSequence_59F1D
 		pop	cx
 		pop	bp
 		retf
-AudioQueue_ProcessSequencerSlots_AB1EF	endp
+Music_StopWithFade_AB1EF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1705,8 +1720,8 @@ AudioQueue_ReleaseAllSlots_AB2BD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine AudioQueue_ProcessSequencerSlots_AB1EF, Stopwatch_UnregisterTickModule_6769F
-; (seg207), AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2).
+; far, combine Music_StopWithFade_AB1EF, Stopwatch_UnregisterTickModule_6769F (seg207),
+; AudioQueue_ReleaseAllSlots_AB2BD, sub_E77 (×2).
 ; ==============================================================================================
 AudioQueue_UnregisterAndCleanup_AB44A	proc far		; CODE XREF: VROOMM_StubThunk_6CFCDJ
 
@@ -1722,7 +1737,7 @@ arg_0		= word ptr  6
 		push	1
 		push	si
 		push	cs
-		call	near ptr AudioQueue_ProcessSequencerSlots_AB1EF
+		call	near ptr Music_StopWithFade_AB1EF
 
 loc_AB464:
 		add	sp, 4

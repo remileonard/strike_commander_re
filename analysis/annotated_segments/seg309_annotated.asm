@@ -425,7 +425,7 @@ VROOMM_StubThunk_6C416	endp
 ; far, thunk fixe VROOMM (jmp sub_9F784) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C41B	proc far		; CODE XREF: Gauge_ComputeAndRenderNeedle_9D910+366P
+VROOMM_StubThunk_6C41B	proc far		; CODE XREF: Collision_OnTerrainContact_9D910+366P
 		jmp	PlayerComponent_FormatAndDisplay_9F784
 VROOMM_StubThunk_6C41B	endp
 

@@ -7,7 +7,7 @@ ovr249		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Video_ClearTextPage, Path_ResolveDataFile, Widget_Helper_5AAB2 (seg125).
+; far, combine Video_ClearTextPage, Path_ResolveDataFile, Speech_LoadBank_5AAB2 (seg125).
 ; ==============================================================================================
 UIScreen_ClearAndLoadResource_869C0	proc far		; CODE XREF: VROOMM_StubThunk_6B204J Cockpit_LoadViewTable_86B53+1Ep
 
@@ -104,7 +104,7 @@ arg_0		= word ptr  6
 		push	0
 		lea	ax, [bp+var_64]
 		push	ax
-		call	Widget_Helper_5AAB2
+		call	Speech_LoadBank_5AAB2
 		add	sp, 4
 		pop	di
 		pop	si

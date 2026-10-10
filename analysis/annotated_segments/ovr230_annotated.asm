@@ -2093,7 +2093,7 @@ loc_76BB4:				; CODE XREF: Landing_Phase3_TouchdownRoll_765B2+5DEj
 		or	ax, ax
 		jnz	short loc_76BCD
 		push	14h
-		call	TextObject_AllocateVariantA_5A984
+		call	Music_RequestTune_5A984
 		pop	cx
 
 loc_76BCD:				; CODE XREF: Landing_Phase3_TouchdownRoll_765B2+5D4j

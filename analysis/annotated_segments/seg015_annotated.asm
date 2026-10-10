@@ -361,11 +361,11 @@ Resource_InitTwoChannels	proc far		; CODE XREF: Video_InitShakeEffect_85D95+7P
 		mov	bp, sp
 		push	0
 		push	6
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	7
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		pop	bp
 		retf
@@ -412,12 +412,12 @@ arg_0		= byte ptr  6
 		push	0
 		lea	ax, [bp+var_50]
 		push	ax
-		call	Widget_Helper_5AAD7
+		call	Speech_PlayClip_5AAD7
 		add	sp, 8
 		or	al, al
 		jz	short locret_1519C
 		push	1
-		call	Widget_Helper_5AB09
+		call	Speech_SetField49_5AB09
 		pop	cx
 
 locret_1519C:				; CODE XREF: Cockpit_LoadBettyPack+Bj
@@ -2248,13 +2248,13 @@ loc_1614E:				; CODE XREF: Cockpit_DetectPlayerMissile+171j
 		push	0
 		mov	al, byte ptr [bp+var_E+2]
 		push	ax
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	large 0
 		mov	al, byte ptr [bp+var_A]
 		push	ax
-		call	Weapon_HUDBox_TimerCaseI_5A906
+		call	SoundFX_PlayOrUpdate_5A906
 		add	sp, 8
 		jmp	short loc_16187
 ; ���������������������������������������������������������������������������
@@ -2263,13 +2263,13 @@ loc_1616F:				; CODE XREF: Cockpit_DetectPlayerMissile+14Dj
 					; Cockpit_DetectPlayerMissile:loc_16127j
 		push	0
 		push	6
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 		push	0
 		push	7
 
 loc_1617F:
-		call	Weapon_HUDBox_TimerCaseJ_5A95E
+		call	SoundFX_Stop_5A95E
 		add	sp, 4
 
 loc_16187:				; CODE XREF: Cockpit_DetectPlayerMissile+19Aj

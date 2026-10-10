@@ -419,7 +419,7 @@ Camera_TransformPoint	endp
 ; de test de clipping caméra sur un point d'objet.
 ; ==============================================================================================
 Camera_ClipTestWrapper	proc far		; CODE XREF: seg014:0191P
-					; MissionRecord_LoadEntityDatabase_7B035+BE6P ...
+					; Player_ShotDownSequence_7B035+BE6P ...
 
 var_8		= dword	ptr -8
 arg_0		= word ptr  6
@@ -458,7 +458,7 @@ Camera_ClipTestWrapper	endp
 ; caméra.
 ; ==============================================================================================
 Camera_FrustumClipTest	proc far		; CODE XREF: Camera_ClipTestWrapper+1Dp
-					; MissionRecord_LoadEntityDatabase_7B035+209FP ...
+					; Player_ShotDownSequence_7B035+209FP ...
 
 var_36		= dword	ptr -36h
 var_32		= dword	ptr -32h

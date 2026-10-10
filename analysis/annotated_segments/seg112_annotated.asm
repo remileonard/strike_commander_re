@@ -1402,7 +1402,7 @@ UIScreen_ComputeDerivedFields_503EB	endp
 ; far, enveloppe fine transmettant 2 arguments + id widget 59CDh à sub_23241 (probable setter
 ; générique de valeur de widget).
 ; ==============================================================================================
-UIScreen_SetWidgetValue_50654	proc far		; CODE XREF: Combat_TeamOpposedCheckAndDispatch_53A94+2DEP
+UIScreen_SetWidgetValue_50654	proc far		; CODE XREF: World_OnObjectDestroyed_53A94+2DEP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

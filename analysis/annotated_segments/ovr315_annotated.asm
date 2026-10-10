@@ -223,7 +223,7 @@ loc_9D8C3:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+13Dj
 		jnz	short loc_9D8F5
 		push	[bp+arg_6]
 		push	di
-		call	Combat_TeamOpposedCheckAndDispatch_53A94
+		call	World_OnObjectDestroyed_53A94
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+58h]

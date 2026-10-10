@@ -594,7 +594,7 @@ loc_BE36:				; CODE XREF: Radio_PlayerSpottedCallout+ACj Radio_PlayerSpottedCal
 		cmp	byte ptr es:[bx+15Bh], 0FFh
 		jz	short loc_BE73
 		push	1
-		call	Widget_Helper_5AB2C
+		call	Speech_QueryStatus_5AB2C
 		pop	cx
 		mov	ah, 0
 		or	ax, ax

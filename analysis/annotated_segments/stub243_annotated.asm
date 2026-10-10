@@ -71,7 +71,7 @@ VROOMM_StubThunk_6AF3F	endp
 ; d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6AF44	proc far
-		jmp	HUDSymbol_DrawWithLineOfSight_80971
+		jmp	WeaponCam_LaunchPhase_80971
 VROOMM_StubThunk_6AF44	endp
 
 
@@ -214,7 +214,7 @@ VROOMM_StubThunk_6AF76	endp
 ; d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6AF7B	proc far		; DATA XREF: seg339:off_6D71Ao
-		jmp	HUDSymbol_ConstructWithViewMatrix_82693
+		jmp	WeaponCam_Tick_82693
 VROOMM_StubThunk_6AF7B	endp
 
 
@@ -240,7 +240,7 @@ VROOMM_StubThunk_6AF80	endp
 ; d'overlay actuellement charge en memoire. fileoff=0D330h, codesize=2682h, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6AF85	proc far		; CODE XREF: Mission_PlayerEventHandler+B2P
-		jmp	HUDSymbol_ConstructWithGeometry_8285A
+		jmp	WeaponCam_Start_8285A
 VROOMM_StubThunk_6AF85	endp
 
 stub243		ends

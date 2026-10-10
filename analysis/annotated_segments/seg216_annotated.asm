@@ -3,15 +3,15 @@ seg216		segment	byte public 'UNK' use16
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 unk_69DE0	db    0			; DATA XREF: seg216:078Eo
 		db    0
-word_69DE2	dw 4F8h			; DATA XREF: VROOMM_Helper_68384+16r
-seg_69DE4	dw seg seg212		; DATA XREF: VROOMM_Helper_68384+1Ar
-byte_69DE6	db 0			; DATA XREF: VROOMM_OpenFile_684A7+22r
+word_69DE2	dw 4F8h			; DATA XREF: VROOMM_InstallIntHandler_68384+16r
+seg_69DE4	dw seg seg212		; DATA XREF: VROOMM_InstallIntHandler_68384+1Ar
+byte_69DE6	db 0			; DATA XREF: VROOMM_TryOpenFile_684A7+22r
 		align 10h
 		db  4Ah	; J
 		db    9
 off_69DF2	dw offset nullsub_7	; DATA XREF: seg212:loc_683F2r
 off_69DF4	dw offset nullsub_7	; DATA XREF: seg212:01ADr
-off_69DF6	dd nullsub_1		; DATA XREF: VROOMM_AllocateAndRelocate_6855F+B0r
+off_69DF6	dd nullsub_1		; DATA XREF: VROOMM_ScanMemoryArena_6855F+B0r
 					; seg212:0550r	...
 		db  0Eh
 		db    0
@@ -147,27 +147,27 @@ unk_69E6D	db    0
 		db    0
 		db    0
 		db    0
-word_69E80	dw 3FCDh		; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68263r
+word_69E80	dw 3FCDh		; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68263r
 					; seg212:07E5r	...
 		align 4
-word_69E84	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68311w
-word_69E86	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68314w
-word_69E88	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254+112w
-word_69E8A	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68356r
+word_69E84	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68311w
+word_69E86	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68314w
+word_69E88	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+112w
+word_69E8A	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68356r
 					; seg212:08FAr
 		align 8
-word_69E90	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254:loc_68341w
-word_69E92	dw 0			; DATA XREF: VROOMM_ReadAndParseHeader_684DF+30w
-word_69E94	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254+EAw
-					; VROOMM_LocateAndValidate_68254:loc_68352r	...
-word_69E96	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254+F3w
-					; VROOMM_LocateAndValidate_68254+FAr ...
-word_69E98	dw 0			; DATA XREF: VROOMM_LocateAndValidate_68254+4Cw
-					; VROOMM_LocateAndValidate_68254:loc_6832Fw	...
+word_69E90	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68341w
+word_69E92	dw 0			; DATA XREF: VROOMM_ScanFreeMemoryBlocks_684DF+30w
+word_69E94	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+EAw
+					; VROOMM_OpenAndParseOverlayFile_68254:loc_68352r	...
+word_69E96	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+F3w
+					; VROOMM_OpenAndParseOverlayFile_68254+FAr ...
+word_69E98	dw 0			; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+4Cw
+					; VROOMM_OpenAndParseOverlayFile_68254:loc_6832Fw	...
 		align 4
-word_69E9C	dw 0			; DATA XREF: VROOMM_AdvanceLoadPointer_68979+Dr
-					; VROOMM_AdvanceLoadPointer_68979+14w
-off_69E9E	dd EntryPoint_RuntimeInit		; DATA XREF: VROOMM_LocateAndValidate_68254:loc_6827Ao
+word_69E9C	dw 0			; DATA XREF: VROOMM_UpdateFreeListOffset_68979+Dr
+					; VROOMM_UpdateFreeListOffset_68979+14w
+off_69E9E	dd EntryPoint_RuntimeInit		; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_6827Ao
 		db  5Bh	; [
 		db  31h	; 1
 		db    1
@@ -1965,7 +1965,7 @@ unk_6A9E3	db 0FFh
 		db    0
 		db    0
 		db    0
-aStrike_exe	db 'strike.exe',0       ; DATA XREF: VROOMM_LocateAndValidate_68254:loc_6827Ao
+aStrike_exe	db 'strike.exe',0       ; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_6827Ao
 		align 2
 unk_6A9F4	db    1
 		db    4

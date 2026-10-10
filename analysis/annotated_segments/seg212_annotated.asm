@@ -2,21 +2,29 @@ seg212		segment	byte public 'CODE' use16
 		assume cs:seg212
 		;org 9
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
-seg_68249	dw seg seg216		; DATA XREF: VROOMM_LocateAndValidate_68254+7r VROOMM_Helper_68384+4r ...
-seg_6824B	dw seg seg339		; DATA XREF: VROOMM_LocateAndValidate_68254+C4r
+seg_68249	dw seg seg216		; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+7r VROOMM_InstallIntHandler_68384+4r ...
+seg_6824B	dw seg seg339		; DATA XREF: VROOMM_OpenAndParseOverlayFile_68254+C4r
 byte_6824D	db 50h,	41h, 54h, 48h, 3Dh
-word_68252	dw 0			; DATA XREF: VROOMM_ReadAndParseHeader_684DF:loc_684EBw
+word_68252	dw 0			; DATA XREF: VROOMM_ScanFreeMemoryBlocks_684DF:loc_684EBw
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 224 lignes, NON DÉTAILLÉE — recherche le fichier « strike.exe » (chaîne embarquée),
-; teste la version DOS puis valide/ouvre le fichier via VROOMM_OpenWithDefaultPath_684A7 et
-; VROOMM_CheckCopyright_683F9. Point d'entrée du loader VROOMM (Borland) pour ce segment.
+; Ex-'VROOMM_LocateAndValidate_68254' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). far, ~230 lignes - POINT D'ENTREE PRINCIPAL du moteur bas
+; niveau VROOMM. Ouvre le fichier .EXE du jeu (par defaut 'strike.exe', ou un nom fourni en
+; argument) en cherchant dans les repertoires de la variable d'environnement PATH (via
+; VROOMM_SearchPathAndOpen_68405/6844A). Lit et VALIDE L'EN-TETE DOS MZ (signature
+; 0x5A4D='MZ'), calcule la position du bloc d'overlay dans le fichier, VALIDE UNE SIGNATURE
+; D'OVERLAY 'BF'/'OV' (0x4246/0x564F) - confirmant le format d'en-tete d'overlay proprietaire
+; Borland/VROOMM. Extrait la position/taille des donnees d'overlay et les stocke dans seg339
+; (word_71A18/word_71A1A). Appelle VROOMM_InstallIntHandler_68384 pour installer le
+; gestionnaire d'interruption, puis VROOMM_ScanMemoryArena_6855F pour detecter la memoire
+; disponible.
 ; ==============================================================================================
-VROOMM_LocateAndValidate_68254	proc far		; CODE XREF: seg212:093Ap
+VROOMM_OpenAndParseOverlayFile_68254	proc far		; CODE XREF: seg212:093Ap
 
 var_14		= word ptr -14h
 var_12		= word ptr -12h
@@ -43,8 +51,8 @@ loc_68263:
 		jmp	loc_68379
 ; ���������������������������������������������������������������������������
 
-loc_6826D:				; CODE XREF: VROOMM_LocateAndValidate_68254+14j
-		call	VROOMM_CheckDOSVersionAndOpen_68405
+loc_6826D:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+14j
+		call	VROOMM_SearchPathEnvAndOpen_68405
 		jnb	short loc_6829E
 
 loc_68272:
@@ -62,17 +70,17 @@ loc_6827A:				; "strike.exe"
 loc_6827F:
 		mov	[bp+arg_2], 69EAh
 
-loc_68284:				; CODE XREF: VROOMM_LocateAndValidate_68254:loc_68278j
-		call	VROOMM_CheckCopyright_683F9
+loc_68284:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68278j
+		call	VROOMM_SearchPathAndOpen_683F9
 		jnb	short loc_6829E
-		call	VROOMM_ReadHeader_6844A
+		call	VROOMM_MatchPathPrefix_6844A
 		jnb	short loc_6829E
 		mov	ax, 0FFFEh
 		jmp	loc_6837B
 ; ���������������������������������������������������������������������������
 
-loc_68294:				; CODE XREF: VROOMM_LocateAndValidate_68254+59j
-					; VROOMM_LocateAndValidate_68254+69j ...
+loc_68294:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+59j
+					; VROOMM_OpenAndParseOverlayFile_68254+69j ...
 		mov	ah, 3Eh
 		int	21h		; DOS -	2+ - CLOSE A FILE WITH HANDLE
 					; BX = file handle
@@ -80,12 +88,12 @@ loc_68294:				; CODE XREF: VROOMM_LocateAndValidate_68254+59j
 		jmp	loc_6837B
 ; ���������������������������������������������������������������������������
 
-loc_6829E:				; CODE XREF: VROOMM_LocateAndValidate_68254+1Cj
-					; VROOMM_LocateAndValidate_68254+33j ...
+loc_6829E:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+1Cj
+					; VROOMM_OpenAndParseOverlayFile_68254+33j ...
 		mov	bx, ax
 		mov	word_69E98, bx
 		mov	cx, 14h
-		call	VROOMM_CloseFile_684CF
+		call	VROOMM_ReadFileExact_684CF
 		mov	cx, 0FFFDh
 		jb	short loc_68294
 		xor	ax, ax
@@ -96,13 +104,13 @@ loc_6829E:				; CODE XREF: VROOMM_LocateAndValidate_68254+1Cj
 		jmp	short loc_68294
 ; ���������������������������������������������������������������������������
 
-loc_682BF:				; CODE XREF: VROOMM_LocateAndValidate_68254+64j
+loc_682BF:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+64j
 		mov	ax, [bp+var_10]
 		mov	cx, [bp+var_12]
 		jcxz	short loc_682C8
 		dec	ax
 
-loc_682C8:				; CODE XREF: VROOMM_LocateAndValidate_68254+71j
+loc_682C8:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+71j
 		mov	dx, 200h
 
 loc_682CB:
@@ -114,7 +122,7 @@ loc_682D2:
 		adc	dx, 0
 		and	ax, 0FFF0h
 
-loc_682D8:				; CODE XREF: VROOMM_LocateAndValidate_68254+BBj
+loc_682D8:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+BBj
 		push	dx
 		push	ax
 		mov	cx, dx
@@ -123,7 +131,7 @@ loc_682D8:				; CODE XREF: VROOMM_LocateAndValidate_68254+BBj
 		int	21h		; DOS -	2+ - MOVE FILE READ/WRITE POINTER (LSEEK)
 					; AL = method: offset from beginning of	file
 		mov	cx, 10h
-		call	VROOMM_CloseFile_684CF
+		call	VROOMM_ReadFileExact_684CF
 		pop	ax
 		pop	dx
 		mov	cx, 0FFFDh
@@ -150,7 +158,7 @@ loc_68300:
 		jmp	short loc_68294
 ; ���������������������������������������������������������������������������
 
-loc_68302:				; CODE XREF: VROOMM_LocateAndValidate_68254:loc_682FEj
+loc_68302:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_682FEj
 		cmp	[bp+var_12], 564Fh
 		jz	short loc_68311
 		add	ax, [bp+var_10]
@@ -158,7 +166,7 @@ loc_68302:				; CODE XREF: VROOMM_LocateAndValidate_68254:loc_682FEj
 		jmp	short loc_682D8
 ; ���������������������������������������������������������������������������
 
-loc_68311:				; CODE XREF: VROOMM_LocateAndValidate_68254+B3j
+loc_68311:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+B3j
 		mov	word_69E84, ax
 
 loc_68314:
@@ -181,7 +189,7 @@ loc_6832F:
 		mov	word_69E98, 0
 		nop
 		push	cs
-		call	near ptr VROOMM_Helper_68384
+		call	near ptr VROOMM_InstallIntHandler_68384
 		mov	ax, [bp+arg_6]
 		inc	ax
 		mov	word_69E94, ax
@@ -190,7 +198,7 @@ loc_68341:
 		mov	word_69E90, ax
 		mov	bx, [bp+arg_4]
 		mov	word_69E96, bx
-		call	VROOMM_ReadAndParseHeader_684DF
+		call	VROOMM_ScanFreeMemoryBlocks_684DF
 		mov	bx, word_69E96
 
 loc_68352:
@@ -205,11 +213,11 @@ loc_6835C:
 		jmp	loc_68294
 ; ���������������������������������������������������������������������������
 
-loc_68362:				; CODE XREF: VROOMM_LocateAndValidate_68254+106j
+loc_68362:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+106j
 		shr	bx, 1
 		shr	bx, 1
 		mov	word_69E88, bx
-		call	VROOMM_AllocateAndRelocate_6855F
+		call	VROOMM_ScanMemoryArena_6855F
 		jnb	short loc_68379
 
 loc_6836F:
@@ -222,12 +230,12 @@ loc_68373:
 		db 90h
 ; ���������������������������������������������������������������������������
 
-loc_68379:				; CODE XREF: VROOMM_LocateAndValidate_68254+16j
-					; VROOMM_LocateAndValidate_68254+119j
+loc_68379:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+16j
+					; VROOMM_OpenAndParseOverlayFile_68254+119j
 		xor	ax, ax
 
-loc_6837B:				; CODE XREF: VROOMM_LocateAndValidate_68254+3Dj
-					; VROOMM_LocateAndValidate_68254+47j ...
+loc_6837B:				; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+3Dj
+					; VROOMM_OpenAndParseOverlayFile_68254+47j ...
 		pop	di
 		pop	si
 
@@ -239,7 +247,7 @@ loc_6837D:
 loc_68380:
 		pop	bp
 		retf	8
-VROOMM_LocateAndValidate_68254	endp
+VROOMM_OpenAndParseOverlayFile_68254	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -247,9 +255,14 @@ VROOMM_LocateAndValidate_68254	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, rôle exact non détaillé (voisin du chargeur d'exécutable).
+; Ex-'VROOMM_Helper_68384' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). far - installe le VECTEUR D'INTERRUPTION DOS propre a VROOMM (INT 21h
+; fonction 25h SET INTERRUPT VECTOR, sauvegarde l'ancien via fonction 35h GET INTERRUPT
+; VECTOR) - c'est le point d'ancrage qui permet au moteur d'intercepter des appels pour
+; charger les overlays a la demande. Ouvre aussi (ou ferme) le fichier d'overlay lui-meme (DOS
+; INT 21h AH=3Dh).
 ; ==============================================================================================
-VROOMM_Helper_68384	proc far		; CODE XREF: VROOMM_LocateAndValidate_68254+E3p
+VROOMM_InstallIntHandler_68384	proc far		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+E3p
 					; seg212:loc_683E9p
 		push	bp
 		mov	bp, sp
@@ -288,7 +301,7 @@ loc_683BE:
 		jmp	short loc_683D4
 ; ���������������������������������������������������������������������������
 
-loc_683C6:				; CODE XREF: VROOMM_Helper_68384+30j
+loc_683C6:				; CODE XREF: VROOMM_InstallIntHandler_68384+30j
 		lea	dx, aCopyright1991B+0Ah
 		mov	ah, 3Dh	; '='
 
@@ -301,18 +314,25 @@ loc_683CF:				; DOS -	2+ - OPEN DISK FILE WITH HANDLE
 					; 0 - read, 1 -	write, 2 - read	& write
 		mov	seg_6D168, ax
 
-loc_683D4:				; CODE XREF: VROOMM_Helper_68384+40j
+loc_683D4:				; CODE XREF: VROOMM_InstallIntHandler_68384+40j
 		pop	ds
 		pop	bp
 		retf
-VROOMM_Helper_68384	endp
+VROOMM_InstallIntHandler_68384	endp
 
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, référencée via vtable (DATA XREF implicite) — rôle exact non détaillé.
+; Ex-'VROOMM_Helper2_683D7' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). far, 27 lignes - point d'entree via vtable (seg339:off_72010). Si
+; word_69E98 (indicateur de fichier ouvert par sub_68254) est non-nul, restaure l'ancien
+; gestionnaire d'interruption (rappel a VROOMM_InstallIntHandler_68384, effet de bascule).
+; Enchaine systematiquement deux appels indirects via des pointeurs de fonction stockes en
+; donnees (off_69DF4 puis off_69DF2, tous deux initialement 'nullsub_7' - des points
+; d'extension/hook laisses vides par defaut, potentiellement rebranches ailleurs au
+; chargement).
 ; ==============================================================================================
-VROOMM_Helper2_683D7:				; DATA XREF: seg339:off_72010o
+VROOMM_RestoreIntAndDispatch_683D7:				; DATA XREF: seg339:off_72010o
 		push	bp
 		mov	bp, sp
 		push	ds
@@ -324,7 +344,7 @@ VROOMM_Helper2_683D7:				; DATA XREF: seg339:off_72010o
 		push	cs
 
 loc_683E9:
-		call	near ptr VROOMM_Helper_68384
+		call	near ptr VROOMM_InstallIntHandler_68384
 
 loc_683EC:				; CODE XREF: seg212:01A5j
 		push	cs
@@ -344,10 +364,11 @@ loc_683F2:
 
 
 ; ==============================================================================================
-; near, copie/vérifie une chaîne (proche d'un texte « Copyright 1991 » embarqué) avant
-; d'appeler VROOMM_OpenFile_684A7.
+; Ex-'VROOMM_CheckCopyright_683F9' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - essaie d'ouvrir le fichier directement (chemin fourni
+; tel quel), sinon delegue a VROOMM_SearchPathEnvAndOpen_68405 pour chercher dans PATH.
 ; ==============================================================================================
-VROOMM_CheckCopyright_683F9	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254:loc_68284p
+VROOMM_SearchPathAndOpen_683F9	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_68284p
 		push	ds
 
 loc_683FA:
@@ -356,21 +377,27 @@ loc_683FA:
 		pop	es
 
 loc_68400:
-		call	VROOMM_OpenFile_684A7
+		call	VROOMM_TryOpenFile_684A7
 		pop	ds
 
 locret_68404:
 		retn
-VROOMM_CheckCopyright_683F9	endp
+VROOMM_SearchPathAndOpen_683F9	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; far, vérifie la version DOS (int 21h) puis ouvre un fichier via VROOMM_OpenFile_684A7.
+; Ex-'VROOMM_CheckDOSVersionAndOpen_68405' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). near - implemente l'algorithme classique DOS de
+; RECHERCHE DE FICHIER VIA LA VARIABLE D'ENVIRONNEMENT PATH : parcourt le bloc d'environnement
+; (deux chaines ASCIIZ ignorees en tete, probable COMSPEC), cherche l'entree commencant par
+; 'PATH=' (verifiee par VROOMM_MatchPathPrefix_6844A), construit un chemin complet
+; (repertoire+'\'+nom de fichier) pour chaque repertoire liste, tente l'ouverture
+; (VROOMM_TryOpenFile_684A7) jusqu'a succes.
 ; ==============================================================================================
-VROOMM_CheckDOSVersionAndOpen_68405	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254:loc_6826Dp
+VROOMM_SearchPathEnvAndOpen_68405	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254:loc_6826Dp
 		mov	ah, 30h
 
 loc_68407:				; DOS -	GET DOS	VERSION
@@ -389,8 +416,8 @@ loc_68413:
 		xor	si, si
 		cld
 
-loc_6841F:				; CODE XREF: VROOMM_CheckDOSVersionAndOpen_68405+1Dj
-					; VROOMM_CheckDOSVersionAndOpen_68405+22j
+loc_6841F:				; CODE XREF: VROOMM_SearchPathEnvAndOpen_68405+1Dj
+					; VROOMM_SearchPathEnvAndOpen_68405+22j
 		lodsb
 
 loc_68420:
@@ -406,8 +433,8 @@ loc_68420:
 		assume es:seg216
 		mov	bx, di
 
-loc_68435:				; CODE XREF: VROOMM_CheckDOSVersionAndOpen_68405+38j
-					; VROOMM_CheckDOSVersionAndOpen_68405+3Cj
+loc_68435:				; CODE XREF: VROOMM_SearchPathEnvAndOpen_68405+38j
+					; VROOMM_SearchPathEnvAndOpen_68405+3Cj
 		lodsb
 		stosb
 		or	al, al
@@ -418,31 +445,34 @@ loc_68435:				; CODE XREF: VROOMM_CheckDOSVersionAndOpen_68405+38j
 		jmp	short loc_68435
 ; ���������������������������������������������������������������������������
 
-loc_68443:				; CODE XREF: VROOMM_CheckDOSVersionAndOpen_68405+34j
+loc_68443:				; CODE XREF: VROOMM_SearchPathEnvAndOpen_68405+34j
 		mov	di, bx
-		call	VROOMM_OpenFile_684A7
+		call	VROOMM_TryOpenFile_684A7
 		pop	ds
 
-locret_68449:				; CODE XREF: VROOMM_CheckDOSVersionAndOpen_68405+6j
+locret_68449:				; CODE XREF: VROOMM_SearchPathEnvAndOpen_68405+6j
 		retn
-VROOMM_CheckDOSVersionAndOpen_68405	endp
+VROOMM_SearchPathEnvAndOpen_68405	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 88 lignes, NON DÉTAILLÉE — lit l'en-tête du fichier ouvert (int 21h READ) et appelle
-; VROOMM_ComputeSizeFromHeader_689F1 — probable lecture de l'en-tête MZ.
+; Ex-'VROOMM_ReadHeader_6844A' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). near - compare les 5 premiers octets de l'entree d'environnement
+; courante contre la chaine litterale 'PATH=' (donnee brute byte_6824D). Si correspondance,
+; construit le chemin complet avec le repertoire trouve + nom de fichier, essaie l'ouverture.
+; Sinon avance a l'entree d'environnement suivante.
 ; ==============================================================================================
-VROOMM_ReadHeader_6844A	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254+35p
+VROOMM_MatchPathPrefix_6844A	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+35p
 		push	ds
 		mov	ax, seg	seg339
 		mov	ds, ax
 		mov	ds, word_6D13C
 		xor	si, si
 
-loc_68456:				; CODE XREF: VROOMM_ReadHeader_6844A+21j
+loc_68456:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+21j
 		mov	di, 0Dh
 		push	cs
 		pop	es
@@ -453,21 +483,21 @@ loc_68456:				; CODE XREF: VROOMM_ReadHeader_6844A+21j
 		jz	short loc_68470
 		dec	si
 
-loc_68464:				; CODE XREF: VROOMM_ReadHeader_6844A+1Dj
+loc_68464:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+1Dj
 		lodsb
 		or	al, al
 		jnz	short loc_68464
 		cmp	al, [si]
 		jnz	short loc_68456
 
-loc_6846D:				; CODE XREF: VROOMM_ReadHeader_6844A+29j
+loc_6846D:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+29j
 		pop	ds
 		stc
 		retn
 ; ���������������������������������������������������������������������������
 
-loc_68470:				; CODE XREF: VROOMM_ReadHeader_6844A+17j
-					; VROOMM_ReadHeader_6844A:loc_684A3j
+loc_68470:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+17j
+					; VROOMM_MatchPathPrefix_6844A:loc_684A3j
 		cmp	byte ptr [si], 0
 		jz	short loc_6846D
 		lea	di, aCopyright1991B+0Ah
@@ -476,7 +506,7 @@ loc_68470:				; CODE XREF: VROOMM_ReadHeader_6844A+17j
 		assume es:seg216
 		xor	al, al
 
-loc_68480:				; CODE XREF: VROOMM_ReadHeader_6844A+42j
+loc_68480:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+42j
 		mov	ah, al
 		lodsb
 
@@ -489,10 +519,10 @@ loc_68483:
 		jmp	short loc_68480
 ; ���������������������������������������������������������������������������
 
-loc_6848E:				; CODE XREF: VROOMM_ReadHeader_6844A+3Bj
+loc_6848E:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+3Bj
 		dec	si
 
-loc_6848F:				; CODE XREF: VROOMM_ReadHeader_6844A+3Fj
+loc_6848F:				; CODE XREF: VROOMM_MatchPathPrefix_6844A+3Fj
 		cmp	ah, 3Ah	; ':'
 
 loc_68492:
@@ -504,15 +534,15 @@ loc_68494:
 		mov	al, 5Ch	; '\'
 		stosb
 
-loc_6849C:				; CODE XREF: VROOMM_ReadHeader_6844A:loc_68492j
-					; VROOMM_ReadHeader_6844A+4Dj
+loc_6849C:				; CODE XREF: VROOMM_MatchPathPrefix_6844A:loc_68492j
+					; VROOMM_MatchPathPrefix_6844A+4Dj
 		push	ds
 
 loc_6849D:
 		push	si
 
 loc_6849E:
-		call	VROOMM_OpenFile_684A7
+		call	VROOMM_TryOpenFile_684A7
 		pop	si
 
 loc_684A2:
@@ -522,25 +552,27 @@ loc_684A3:
 		jb	short loc_68470
 		pop	ds
 		retn
-VROOMM_ReadHeader_6844A	endp
+VROOMM_MatchPathPrefix_6844A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, copie un chemin (12 caractères max, ou chemin par défaut) puis ouvre le fichier (int
-; 21h AH=3Dh).
+; Ex-'VROOMM_OpenFile_684A7' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). near - copie un nom de fichier optionnel (argument far) dans un buffer,
+; puis appelle DOS INT 21h AH=3Dh (OPEN DISK FILE WITH HANDLE) avec le mode d'acces configure
+; (byte_69DE6).
 ; ==============================================================================================
-VROOMM_OpenFile_684A7	proc near		; CODE XREF: VROOMM_CheckCopyright_683F9:loc_68400p
-					; VROOMM_CheckDOSVersionAndOpen_68405+40p ...
+VROOMM_TryOpenFile_684A7	proc near		; CODE XREF: VROOMM_SearchPathAndOpen_683F9:loc_68400p
+					; VROOMM_SearchPathEnvAndOpen_68405+40p ...
 		lds	si, [bp+6]
 		mov	ax, ds
 		or	ax, si
 		jz	short loc_684BE
 		mov	cx, 0Ch
 
-loc_684B3:				; CODE XREF: VROOMM_OpenFile_684A7+12j
+loc_684B3:				; CODE XREF: VROOMM_TryOpenFile_684A7+12j
 		lodsb
 		stosb
 		or	al, al
@@ -549,8 +581,8 @@ loc_684B3:				; CODE XREF: VROOMM_OpenFile_684A7+12j
 		sub	al, al
 		stosb
 
-loc_684BE:				; CODE XREF: VROOMM_OpenFile_684A7+7j
-					; VROOMM_OpenFile_684A7+10j
+loc_684BE:				; CODE XREF: VROOMM_TryOpenFile_684A7+7j
+					; VROOMM_TryOpenFile_684A7+10j
 		lea	dx, aCopyright1991B+0Ah
 		mov	ax, seg	seg216
 		mov	ds, ax
@@ -562,17 +594,20 @@ loc_684BE:				; CODE XREF: VROOMM_OpenFile_684A7+7j
 					; AL = access mode
 					; 0 - read
 		retn
-VROOMM_OpenFile_684A7	endp
+VROOMM_TryOpenFile_684A7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; far, ferme un fichier (int 21h AH=3Eh).
+; Ex-'VROOMM_CloseFile_684CF' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). near - DOS INT 21h AH=3Fh (READ FROM FILE), verifie que le nombre
+; d'octets lus correspond exactement a la demande (detecte une lecture partielle/EOF premature
+; comme une erreur).
 ; ==============================================================================================
-VROOMM_CloseFile_684CF	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254+53p
-					; VROOMM_LocateAndValidate_68254+92p
+VROOMM_ReadFileExact_684CF	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+53p
+					; VROOMM_OpenAndParseOverlayFile_68254+92p
 		push	ds
 		lea	dx, [bp-14h]
 
@@ -588,19 +623,22 @@ loc_684D3:
 		jb	short locret_684DE
 		cmp	ax, cx
 
-locret_684DE:				; CODE XREF: VROOMM_CloseFile_684CF+Bj
+locret_684DE:				; CODE XREF: VROOMM_ReadFileExact_684CF+Bj
 		retn
-VROOMM_CloseFile_684CF	endp
+VROOMM_ReadFileExact_684CF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 84 lignes, NON DÉTAILLÉE — combine VROOMM_ComputeSizeFromHeader_689F1 — lit et
-; interprète l'en-tête MZ du fichier exécutable/overlay ciblé.
+; Ex-'VROOMM_ReadAndParseHeader_684DF' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - parcourt une table de descripteurs memoire (base
+; seg339+0x6D16E, stride 8 octets, jusqu'a 0xC08/8=385 entrees) cherchant des blocs
+; reutilisables/libres pour l'allocation d'overlay, calcule la meilleure correspondance de
+; taille (bx = meilleur candidat).
 ; ==============================================================================================
-VROOMM_ReadAndParseHeader_684DF	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254+F7p
+VROOMM_ScanFreeMemoryBlocks_684DF	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+F7p
 					; seg212:loc_68B37p
 		mov	ax, seg	seg339
 
@@ -625,7 +663,7 @@ loc_684F4:
 loc_684F8:
 		lea	si, off_6D16E+2
 
-loc_684FC:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF+74j
+loc_684FC:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+74j
 		test	word ptr [si+4], 2
 		jz	short loc_68509
 
@@ -633,12 +671,12 @@ loc_68503:
 		cmp	word ptr [si+2], 0
 		jnz	short loc_6850C
 
-loc_68509:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF+22j
+loc_68509:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+22j
 		jmp	short loc_6854A
 ; ���������������������������������������������������������������������������
 		align 2
 
-loc_6850C:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF+28j
+loc_6850C:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+28j
 		mov	ax, [si]
 		push	es
 		mov	es:12h,	ax
@@ -654,7 +692,7 @@ loc_6851E:
 ; ���������������������������������������������������������������������������
 		align 2
 
-loc_68528:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF+3Cj
+loc_68528:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+3Cj
 		pop	ax
 		mov	word ptr es:18h, 4CAh
 
@@ -665,37 +703,39 @@ loc_68533:
 		mov	dx, word_6D156
 		add	es:4, ax
 		adc	es:6, dx
-		call	VROOMM_ComputeSizeFromHeader_689F1
+		call	VROOMM_ComputeSegmentSpan_689F1
 		cmp	bx, dx
 		jnb	short loc_6854A
 		xchg	bx, dx
 
-loc_6854A:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF:loc_68509j
-					; VROOMM_ReadAndParseHeader_684DF+46j ...
+loc_6854A:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF:loc_68509j
+					; VROOMM_ScanFreeMemoryBlocks_684DF+46j ...
 		add	si, 8
 		cmp	si, 0C08h
 		jnb	short loc_68555
 		jmp	short loc_684FC
 ; ���������������������������������������������������������������������������
 
-loc_68555:				; CODE XREF: VROOMM_ReadAndParseHeader_684DF+72j
+loc_68555:				; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+72j
 		xor	ax, ax
 		add	bx, 2
 		mov	word_6D15A, bx
 		retn
-VROOMM_ReadAndParseHeader_684DF	endp
+VROOMM_ScanFreeMemoryBlocks_684DF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 117 lignes, NON DÉTAILLÉE — orchestre VROOMM_SkipRelocationsA_6862C,
-; VROOMM_SkipRelocationsB_68665, VROOMM_PatchFarJumpTable_688D7 et un pointeur de fonction
-; externe (off_69DF6) — probable allocation mémoire et relogement de l'image exécutable
-; chargée.
+; Ex-'VROOMM_AllocateAndRelocate_6855F' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - PARCOURT LA CHAINE MCB DOS (Memory Control Block, la
+; structure standard DOS de gestion memoire par blocs de paragraphes) pour determiner la
+; memoire totale disponible pour les overlays. Pour chaque bloc libre assez grand, appelle des
+; sous-routines de decoupage/preparation (VROOMM_ReadRawSegment_6862C,
+; VROOMM_ApplyRelocationsToBlock_68665, VROOMM_PatchFarCallStub_688D7).
 ; ==============================================================================================
-VROOMM_AllocateAndRelocate_6855F	proc near		; CODE XREF: VROOMM_LocateAndValidate_68254+116p
+VROOMM_ScanMemoryArena_6855F	proc near		; CODE XREF: VROOMM_OpenAndParseOverlayFile_68254+116p
 		mov	cx, word_6D162
 
 loc_68563:
@@ -705,7 +745,7 @@ loc_68563:
 		mov	di, word_6D166
 		push	ds
 
-loc_68572:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+47j
+loc_68572:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+47j
 		mov	ds, cx
 		assume ds:nothing
 
@@ -735,8 +775,8 @@ loc_6859E:
 		jmp	short loc_68572
 ; ���������������������������������������������������������������������������
 
-loc_685A8:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+19j
-					; VROOMM_AllocateAndRelocate_6855F:loc_68596j
+loc_685A8:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+19j
+					; VROOMM_ScanMemoryArena_6855F:loc_68596j
 		mov	ds, bx
 		mov	word ptr ds:1Ch, 0
 		pop	ds
@@ -750,7 +790,7 @@ loc_685A8:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+19j
 		db 90h
 ; ���������������������������������������������������������������������������
 
-loc_685BF:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+5Bj
+loc_685BF:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+5Bj
 		mov	cl, 4
 		rol	si, cl
 		mov	di, si
@@ -760,27 +800,27 @@ loc_685BF:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+5Bj
 		assume es:nothing
 		mov	dx, es:4
 		mov	cx, es:6
-		call	VROOMM_SkipRelocationsA_6862C
+		call	VROOMM_ReadRawSegment_6862C
 		jb	short locret_6861E
 		mov	ax, seg_6D16C
 		push	ds
 
-loc_685E2:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+BBj
+loc_685E2:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+BBj
 		mov	es, ax
 		mov	cx, es:0Ah
 		jcxz	short loc_685EE
-		call	VROOMM_SkipRelocationsB_68665
+		call	VROOMM_ApplyRelocationsToBlock_68665
 
-loc_685EE:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+8Aj
+loc_685EE:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+8Aj
 		cmp	word ptr es:0Ch, 0
 
 loc_685F4:
 		jz	short loc_685F9
 
 loc_685F6:
-		call	VROOMM_PatchFarJumpTable_688D7
+		call	VROOMM_PatchFarCallStub_688D7
 
-loc_685F9:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F:loc_685F4j
+loc_685F9:				; CODE XREF: VROOMM_ScanMemoryArena_6855F:loc_685F4j
 		mov	ax, es:10h
 		dec	ax
 
@@ -806,12 +846,12 @@ loc_68613:
 		pop	ds
 		assume ds:seg339
 
-loc_6861D:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+5Dj
+loc_6861D:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+5Dj
 		clc
 
-locret_6861E:				; CODE XREF: VROOMM_AllocateAndRelocate_6855F+7Dj
+locret_6861E:				; CODE XREF: VROOMM_ScanMemoryArena_6855F+7Dj
 		retn
-VROOMM_AllocateAndRelocate_6855F	endp
+VROOMM_ScanMemoryArena_6855F	endp
 
 ; ���������������������������������������������������������������������������
 		mov	cl, 4
@@ -829,9 +869,13 @@ loc_68625:
 
 
 ; ==============================================================================================
-; ⚠️ far, 63 lignes, NON DÉTAILLÉE — parcourt la table de relogement MZ (int 21h LSEEK/READ).
+; Ex-'VROOMM_SkipRelocationsA_6862C' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - positionne le pointeur de fichier (DOS INT 21h AH=42h
+; LSEEK) puis lit des blocs de donnees brutes (DOS INT 21h AH=3Fh) directement dans la memoire
+; allouee pour un segment d'overlay, par blocs de 0xFFF0 octets max (limite de segment 64Ko),
+; en avancant le pointeur de segment de destination entre chaque bloc.
 ; ==============================================================================================
-VROOMM_SkipRelocationsA_6862C	proc near		; CODE XREF: VROOMM_AllocateAndRelocate_6855F+7Ap
+VROOMM_ReadRawSegment_6862C	proc near		; CODE XREF: VROOMM_ScanMemoryArena_6855F+7Ap
 					; seg212:04E7p
 		push	ax
 
@@ -848,7 +892,7 @@ loc_68631:
 		jmp	short loc_68643
 ; ���������������������������������������������������������������������������
 
-loc_6863C:				; CODE XREF: VROOMM_SkipRelocationsA_6862C+35j
+loc_6863C:				; CODE XREF: VROOMM_ReadRawSegment_6862C+35j
 		mov	ax, ds
 
 loc_6863E:
@@ -856,7 +900,7 @@ loc_6863E:
 		mov	ds, ax
 		assume ds:nothing
 
-loc_68643:				; CODE XREF: VROOMM_SkipRelocationsA_6862C+Ej
+loc_68643:				; CODE XREF: VROOMM_ReadRawSegment_6862C+Ej
 		mov	cx, 0FFF0h
 
 loc_68646:
@@ -866,7 +910,7 @@ loc_68648:
 		jnz	short loc_6864C
 		mov	cx, si
 
-loc_6864C:				; CODE XREF: VROOMM_SkipRelocationsA_6862C:loc_68648j
+loc_6864C:				; CODE XREF: VROOMM_ReadRawSegment_6862C:loc_68648j
 		xor	dx, dx
 		mov	ah, 3Fh
 
@@ -888,22 +932,25 @@ loc_68656:
 		or	ax, di
 		jnz	short loc_6863C
 
-loc_68663:				; CODE XREF: VROOMM_SkipRelocationsA_6862C:loc_68652j
-					; VROOMM_SkipRelocationsA_6862C:loc_68656j
+loc_68663:				; CODE XREF: VROOMM_ReadRawSegment_6862C:loc_68652j
+					; VROOMM_ReadRawSegment_6862C:loc_68656j
 		pop	ds
 		assume ds:seg339
 		retn
-VROOMM_SkipRelocationsA_6862C	endp
+VROOMM_ReadRawSegment_6862C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 60 lignes, NON DÉTAILLÉE — variante de VROOMM_SkipRelocationsA_6862C (int 21h
-; LSEEK/READ).
+; Ex-'VROOMM_SkipRelocationsB_68665' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - applique une TABLE DE RELOCATION (format standard EXE
+; DOS : paires offset/segment) sur du code fraichement charge, patchant les adresses absolues
+; embarquees selon le segment reel de chargement. Delegue a VROOMM_PatchFarJumpOpcode_686AA
+; pour la reconnaissance/patch d'instructions specifiques.
 ; ==============================================================================================
-VROOMM_SkipRelocationsB_68665	proc near		; CODE XREF: VROOMM_AllocateAndRelocate_6855F+8Cp
+VROOMM_ApplyRelocationsToBlock_68665	proc near		; CODE XREF: VROOMM_ScanMemoryArena_6855F+8Cp
 					; seg212:04F3p
 		push	ds
 		push	es
@@ -935,7 +982,7 @@ loc_68683:
 		shr	cx, 1
 		cld
 
-loc_68686:				; CODE XREF: VROOMM_SkipRelocationsB_68665+40j
+loc_68686:				; CODE XREF: VROOMM_ApplyRelocationsToBlock_68665+40j
 		lodsw
 		mov	bx, ax
 		mov	di, es:[bx]
@@ -953,25 +1000,29 @@ loc_68692:
 loc_6869C:
 		test	ax, 1
 		jz	short loc_686A4
-		call	VROOMM_Helper3_686AA
+		call	VROOMM_PatchFarJumpOpcode_686AA
 
-loc_686A4:				; CODE XREF: VROOMM_SkipRelocationsB_68665+3Aj
+loc_686A4:				; CODE XREF: VROOMM_ApplyRelocationsToBlock_68665+3Aj
 		pop	ds
 		assume ds:seg339
 		loop	loc_68686
 		pop	es
 		pop	ds
 		retn
-VROOMM_SkipRelocationsB_68665	endp
+VROOMM_ApplyRelocationsToBlock_68665	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; far, rôle exact non détaillé, référencée par VROOMM_AllocateAndFinalize_6879E.
+; Ex-'VROOMM_Helper3_686AA' (nom de notre base) ; renommee par la session musique (archive
+; handoff 2026-10-06). near - reconnait des sequences d'opcodes x86 specifiques (0xB8=MOV
+; AX,imm16 et 0x50='PUSH AX', motif d'appel indirect via registre) dans le code fraichement
+; charge et les associe a une entree de table de stubs (off_6D0BC) - mecanisme de PATCH
+; D'ADRESSAGE POUR LES APPELS INTER-OVERLAY.
 ; ==============================================================================================
-VROOMM_Helper3_686AA	proc near		; CODE XREF: VROOMM_SkipRelocationsB_68665+3Cp
+VROOMM_PatchFarJumpOpcode_686AA	proc near		; CODE XREF: VROOMM_ApplyRelocationsToBlock_68665+3Cp
 		push	cx
 		mov	ds, dx
 		mov	ah, es:[bx-1]
@@ -1018,7 +1069,7 @@ loc_686EE:
 loc_686F2:
 		mov	ax, es:[bx+4]
 
-loc_686F6:				; CODE XREF: VROOMM_Helper3_686AA:loc_686FEj
+loc_686F6:				; CODE XREF: VROOMM_PatchFarJumpOpcode_686AA:loc_686FEj
 		cmp	ax, [di+2]
 
 loc_686F9:
@@ -1030,19 +1081,19 @@ loc_686FE:
 		jmp	short loc_68708
 ; ���������������������������������������������������������������������������
 
-loc_68702:				; CODE XREF: VROOMM_Helper3_686AA:loc_686F9j
+loc_68702:				; CODE XREF: VROOMM_PatchFarJumpOpcode_686AA:loc_686F9j
 		mov	es:[bx+4], di
 
-loc_68706:				; CODE XREF: VROOMM_Helper3_686AA+Fj
-					; VROOMM_Helper3_686AA:loc_686C9j	...
+loc_68706:				; CODE XREF: VROOMM_PatchFarJumpOpcode_686AA+Fj
+					; VROOMM_PatchFarJumpOpcode_686AA:loc_686C9j	...
 		pop	cx
 		retn
 ; ���������������������������������������������������������������������������
 
-loc_68708:				; CODE XREF: VROOMM_Helper3_686AA+56j
+loc_68708:				; CODE XREF: VROOMM_PatchFarJumpOpcode_686AA+56j
 		pop	cx
 		retn
-VROOMM_Helper3_686AA	endp
+VROOMM_PatchFarJumpOpcode_686AA	endp
 
 ; ���������������������������������������������������������������������������
 		mov	si, es:8
@@ -1052,11 +1103,11 @@ VROOMM_Helper3_686AA	endp
 		mov	dx, es:4
 		mov	cx, es:6
 		mov	ax, es:10h
-		call	VROOMM_SkipRelocationsA_6862C
+		call	VROOMM_ReadRawSegment_6862C
 		jb	short locret_68737
 		mov	cx, es:0Ah
 		jcxz	short loc_68736
-		call	VROOMM_SkipRelocationsB_68665
+		call	VROOMM_ApplyRelocationsToBlock_68665
 
 loc_68736:				; CODE XREF: seg212:04F1j
 		clc
@@ -1100,7 +1151,7 @@ loc_68754:
 		push	word ptr es:[bx]
 		sub	word ptr [bp+2], 2
 		jnz	short loc_68765
-		call	VROOMM_ApplyRelocationsMain_687E8
+		call	VROOMM_DemandLoadDispatch_687E8
 		jmp	short loc_6877D
 ; ���������������������������������������������������������������������������
 
@@ -1111,7 +1162,7 @@ loc_68765:				; CODE XREF: seg212:051Ej
 		mov	[bp+0],	ax
 
 loc_68771:
-		call	VROOMM_ApplyRelocationsMain_687E8
+		call	VROOMM_DemandLoadDispatch_687E8
 		mov	ax, [bp+0]
 		xchg	ax, [bp-6]
 		mov	[bp+0],	ax
@@ -1142,25 +1193,26 @@ loc_6879A:
 
 
 ; ==============================================================================================
-; far, orchestre VROOMM_ComputeSizeFromHeader_689F1, VROOMM_PatchFarJumpTable_6887B,
-; VROOMM_CheckImageHasTrailer_68863, VROOMM_ComputeParagraphs_689E5,
-; VROOMM_MoveImageAndFixup_68928, VROOMM_AdvanceLoadPointer_68979,
-; VROOMM_ComputeRemainingSpace_689C9.
+; Ex-'VROOMM_AllocateAndFinalize_6879E' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - COEUR DE LA LOGIQUE DE CHARGEMENT A LA DEMANDE :
+; incremente un compteur de chargement (word_6D16A), calcule si le segment demande est deja en
+; memoire (VROOMM_ComputeAvailableOffset_689C9) ou doit etre charge/remplace (LRU - libere le
+; segment le moins recemment utilise via VROOMM_EvictOldestBlock_6887B si necessaire).
 ; ==============================================================================================
-VROOMM_AllocateAndFinalize_6879E	proc near		; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+21p
+VROOMM_LoadOnDemandCore_6879E	proc near		; CODE XREF: VROOMM_DemandLoadDispatch_687E8+21p
 		push	es
 		inc	word_6D16A
-		call	VROOMM_ComputeSizeFromHeader_689F1
+		call	VROOMM_ComputeSegmentSpan_689F1
 		jmp	short loc_687D6
 ; ���������������������������������������������������������������������������
 
-loc_687A8:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E+3Ej
+loc_687A8:				; CODE XREF: VROOMM_LoadOnDemandCore_6879E+3Ej
 		popf
 		push	dx
 		jnb	short loc_687AF
-		call	VROOMM_PatchFarJumpTable_6887B
+		call	VROOMM_EvictOldestBlock_6887B
 
-loc_687AF:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E+Cj
+loc_687AF:				; CODE XREF: VROOMM_LoadOnDemandCore_6879E+Cj
 		mov	es, seg_6D16C
 		mov	ax, es:1Ch
 		mov	seg_6D16C, ax
@@ -1168,21 +1220,21 @@ loc_687AF:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E+Cj
 
 loc_687C0:
 		jnz	short loc_687CA
-		call	VROOMM_CheckImageHasTrailer_68863
-		call	VROOMM_ComputeParagraphs_689E5
+		call	VROOMM_FinalizeLoadedSegment_68863
+		call	VROOMM_ComputeParagraphCount_689E5
 		jmp	short loc_687D5
 ; ���������������������������������������������������������������������������
 
-loc_687CA:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E:loc_687C0j
+loc_687CA:				; CODE XREF: VROOMM_LoadOnDemandCore_6879E:loc_687C0j
 		dec	byte ptr es:1Bh
-		call	VROOMM_MoveImageAndFixup_68928
-		call	VROOMM_AdvanceLoadPointer_68979
+		call	VROOMM_CopyAndRelocateBlock_68928
+		call	VROOMM_UpdateFreeListOffset_68979
 
-loc_687D5:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E+2Aj
+loc_687D5:				; CODE XREF: VROOMM_LoadOnDemandCore_6879E+2Aj
 		pop	dx
 
-loc_687D6:				; CODE XREF: VROOMM_AllocateAndFinalize_6879E+8j
-		call	VROOMM_ComputeRemainingSpace_689C9
+loc_687D6:				; CODE XREF: VROOMM_LoadOnDemandCore_6879E+8j
+		call	VROOMM_ComputeAvailableOffset_689C9
 		pushf
 		cmp	dx, ax
 		ja	short loc_687A8
@@ -1197,18 +1249,20 @@ loc_687E3:
 
 locret_687E7:
 		retn
-VROOMM_AllocateAndFinalize_6879E	endp ; sp =  2
+VROOMM_LoadOnDemandCore_6879E	endp ; sp =  2
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 85 lignes, NON DÉTAILLÉE — applique la table de relogement MZ (comparable à
-; VROOMM_AllocateAndFinalize_6879E, mêmes helpers PatchFarJumpTable/CheckImageHasTrailer/Compu
-; teParagraphs/AdvanceLoadPointer/ComputeRemainingSpace).
+; Ex-'VROOMM_ApplyRelocationsMain_687E8' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - dispatche entre chargement immediat et differe selon
+; l'etat du segment demande (drapeaux es:0x1A/es:0x1B), gere le compteur de recharge
+; (seg_6D15C), et la boucle de recherche parmi les segments actuellement charges pour trouver
+; ou placer le nouveau.
 ; ==============================================================================================
-VROOMM_ApplyRelocationsMain_687E8	proc near		; CODE XREF: seg212:0520p
+VROOMM_DemandLoadDispatch_687E8	proc near		; CODE XREF: seg212:0520p
 					; seg212:loc_68771p ...
 
 ; FUNCTION CHUNK AT 02DF SIZE 0000001D BYTES
@@ -1227,9 +1281,9 @@ loc_687F4:
 		db 90h
 ; ���������������������������������������������������������������������������
 
-loc_68803:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+Aj
+loc_68803:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+Aj
 		or	byte ptr es:1Ah, 8
-		call	VROOMM_AllocateAndFinalize_6879E
+		call	VROOMM_LoadOnDemandCore_6879E
 		push	ds
 		dec	ax
 		mov	ds, ax
@@ -1237,20 +1291,20 @@ loc_68803:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+Aj
 		pop	ds
 		call	word ptr es:18h
 		jb	short loc_6885E
-		call	VROOMM_AdvanceLoadPointer_68979
+		call	VROOMM_UpdateFreeListOffset_68979
 
-loc_6881F:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+18j
-		call	VROOMM_ConditionalPatchTrampoline_688B6
+loc_6881F:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+18j
+		call	VROOMM_MaybePatchCallSite_688B6
 		mov	al, es:1Ah
 		and	al, 3
 		add	es:1Bh,	al
 		push	es
-		call	VROOMM_ComputeRemainingSpace_689C9
+		call	VROOMM_ComputeAvailableOffset_689C9
 
 loc_68831:
 		mov	es, seg_6D16C
 
-loc_68835:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+72j
+loc_68835:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+72j
 		mov	cx, es:1Ch
 		jcxz	short loc_6885C
 
@@ -1273,62 +1327,65 @@ loc_6884C:
 		jmp	short loc_68856
 ; ���������������������������������������������������������������������������
 
-loc_68850:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+62j
-		call	VROOMM_PatchIntTrampoline_688F5
-		call	VROOMM_ComputeParagraphs_689E5
+loc_68850:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+62j
+		call	VROOMM_PatchIntCallStub_688F5
+		call	VROOMM_ComputeParagraphCount_689E5
 
-loc_68856:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+66j
+loc_68856:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+66j
 		pop	cx
 		pop	es
 		add	ax, cx
 		jmp	short loc_68835
 ; ���������������������������������������������������������������������������
 
-loc_6885C:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+52j
-					; VROOMM_ApplyRelocationsMain_687E8:loc_68840j
+loc_6885C:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+52j
+					; VROOMM_DemandLoadDispatch_687E8:loc_68840j
 		pop	es
 		retn
 ; ���������������������������������������������������������������������������
 
-loc_6885E:				; CODE XREF: VROOMM_ApplyRelocationsMain_687E8+32j
+loc_6885E:				; CODE XREF: VROOMM_DemandLoadDispatch_687E8+32j
 		jmp	far ptr	loc_2DF
-VROOMM_ApplyRelocationsMain_687E8	endp
+VROOMM_DemandLoadDispatch_687E8	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, vérifie un motif d'en-tête à l'offset image+0x18 (constante 0x4CA) et appelle un
-; pointeur externe (off_6D0C0) si présent.
+; Ex-'VROOMM_CheckImageHasTrailer_68863' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - appelle VROOMM_PatchFarCallStub_688F5 puis, si un
+; marqueur particulier (0x4CA) est present, un gestionnaire externe additionnel (off_6D0C0) -
+; finalise l'etat d'un segment nouvellement charge.
 ; ==============================================================================================
-VROOMM_CheckImageHasTrailer_68863	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E+24p
-		call	VROOMM_PatchIntTrampoline_688F5
+VROOMM_FinalizeLoadedSegment_68863	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E+24p
+		call	VROOMM_PatchIntCallStub_688F5
 		cmp	word ptr es:18h, 4CAh
 		jnz	short loc_68873
 
 loc_6886F:
 		call	off_6D0C0
 
-loc_68873:				; CODE XREF: VROOMM_CheckImageHasTrailer_68863+Aj
+loc_68873:				; CODE XREF: VROOMM_FinalizeLoadedSegment_68863+Aj
 		mov	word ptr es:10h, 0
 		retn
-VROOMM_CheckImageHasTrailer_68863	endp
+VROOMM_FinalizeLoadedSegment_68863	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 44 lignes, NON DÉTAILLÉE — écrit des instructions JMP FAR (opcode 0xEA) dans l'image
-; chargée, motif de patch de table de sauts (probable installation de points d'entrée
-; d'overlay).
+; Ex-'VROOMM_PatchFarJumpTable_6887B' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - implemente une politique D'EVICTION LRU (least-
+; recently-used) : parcourt tous les blocs actuellement charges, en libere autant que
+; necessaire pour faire de la place au nouveau chargement demande.
 ; ==============================================================================================
-VROOMM_PatchFarJumpTable_6887B	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E+Ep
+VROOMM_EvictOldestBlock_6887B	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E+Ep
 		mov	ax, seg_6D16C
 		xor	cx, cx
 
-loc_68880:				; CODE XREF: VROOMM_PatchFarJumpTable_6887B+Fj
+loc_68880:				; CODE XREF: VROOMM_EvictOldestBlock_6887B+Fj
 		inc	cx
 		push	ax
 
@@ -1345,7 +1402,7 @@ loc_68884:
 loc_68892:
 		mov	word ptr off_6D15E+2, ax
 
-loc_68895:				; CODE XREF: VROOMM_PatchFarJumpTable_6887B+32j
+loc_68895:				; CODE XREF: VROOMM_EvictOldestBlock_6887B+32j
 		pop	es
 		push	cx
 
@@ -1357,56 +1414,61 @@ loc_6889A:
 		mov	seg_6D16C, es
 
 loc_688A2:
-		call	VROOMM_ComputeParagraphs_689E5
+		call	VROOMM_ComputeParagraphCount_689E5
 
 loc_688A5:
 		sub	word ptr off_6D15E+2, ax
-		call	VROOMM_MoveImageAndFixup_68928
+		call	VROOMM_CopyAndRelocateBlock_68928
 		pop	cx
 		loop	loc_68895
 		mov	ax, seg_6D164
 		mov	word ptr off_6D15E+2, ax
 		retn
-VROOMM_PatchFarJumpTable_6887B	endp
+VROOMM_EvictOldestBlock_6887B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, patche un trampoline JMP FAR (0xEA) à l'offset image+0x20 si nécessaire (délègue à
-; VROOMM_PatchFarJumpTable_688D7).
+; Ex-'VROOMM_ConditionalPatchTrampoline_688B6' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). near - verifie le type d'instruction au site d'appel
+; (0xEA=JMP FAR direct) et delegue soit a VROOMM_PatchFarCallStub_688D7 (creation de stubs de
+; saut far) soit a VROOMM_LookupOrRegisterOffset_68997.
 ; ==============================================================================================
-VROOMM_ConditionalPatchTrampoline_688B6	proc near		; CODE XREF: VROOMM_ApplyRelocationsMain_687E8:loc_6881Fp
+VROOMM_MaybePatchCallSite_688B6	proc near		; CODE XREF: VROOMM_DemandLoadDispatch_687E8:loc_6881Fp
 		cmp	word ptr es:0Ch, 0
 		jnz	short loc_688BF
 		retn
 ; ���������������������������������������������������������������������������
 
-loc_688BF:				; CODE XREF: VROOMM_ConditionalPatchTrampoline_688B6+6j
+loc_688BF:				; CODE XREF: VROOMM_MaybePatchCallSite_688B6+6j
 		cmp	byte ptr es:20h, 0EAh ;	'�'
 		jz	short locret_688F4
 		mov	cx, es:2
-		jcxz	short VROOMM_PatchFarJumpTable_688D7
+		jcxz	short VROOMM_PatchFarCallStub_688D7
 		mov	ax, es:10h
 
 loc_688D2:
 		mov	dx, es
 
 loc_688D4:
-		call	VROOMM_PatchRelocationEntry_68997
-VROOMM_ConditionalPatchTrampoline_688B6	endp
+		call	VROOMM_LookupOrRegisterOffset_68997
+VROOMM_MaybePatchCallSite_688B6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, écrit une série d'instructions JMP FAR (opcode 0xEA) pour reconstruire une table de
-; sauts après relogement.
+; Ex-'VROOMM_PatchFarJumpTable_688D7' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - genere dynamiquement du CODE MACHINE X86 BRUT (ecrit
+; l'opcode 0xEA = JMP FAR direct suivi de l'offset/segment cible) dans la table de stubs -
+; c'est le mecanisme qui cree les thunks VROOMM_StubThunk_XXXX rencontres partout ailleurs
+; dans le desassemblage.
 ; ==============================================================================================
-VROOMM_PatchFarJumpTable_688D7	proc near		; CODE XREF: VROOMM_AllocateAndRelocate_6855F:loc_685F6p
-					; VROOMM_ConditionalPatchTrampoline_688B6+16j
+VROOMM_PatchFarCallStub_688D7	proc near		; CODE XREF: VROOMM_ScanMemoryArena_6855F:loc_685F6p
+					; VROOMM_MaybePatchCallSite_688B6+16j
 		mov	bx, es:10h
 		mov	cx, es:0Ch
 
@@ -1414,7 +1476,7 @@ loc_688E1:
 		mov	di, 20h	; ' '
 		cld
 
-loc_688E5:				; CODE XREF: VROOMM_PatchFarJumpTable_688D7:loc_688F2j
+loc_688E5:				; CODE XREF: VROOMM_PatchFarCallStub_688D7:loc_688F2j
 		mov	dx, es:[di+2]
 		mov	al, 0EAh ; '�'
 		stosb
@@ -1428,21 +1490,22 @@ loc_688F1:
 loc_688F2:
 		loop	loc_688E5
 
-locret_688F4:				; CODE XREF: VROOMM_ConditionalPatchTrampoline_688B6+Fj
+locret_688F4:				; CODE XREF: VROOMM_MaybePatchCallSite_688B6+Fj
 		retn
-VROOMM_PatchFarJumpTable_688D7	endp
+VROOMM_PatchFarCallStub_688D7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, écrit une série d'instructions INT (opcode 0xCD) — motif de patch de trampoline
-; d'interruption (probable installation de points d'entrée pour hooks matériels du type de
-; ceux du seg154/seg161/seg211).
+; Ex-'VROOMM_PatchIntTrampoline_688F5' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - variante generant des STUBS BASES SUR INT (ecrit
+; l'opcode 0xCD = INT n) plutot que des sauts far directs, pour les points d'entree
+; necessitant le mecanisme d'interruption plutot qu'un jmp far.
 ; ==============================================================================================
-VROOMM_PatchIntTrampoline_688F5	proc near		; CODE XREF: VROOMM_ApplyRelocationsMain_687E8:loc_68850p
-					; VROOMM_CheckImageHasTrailer_68863p
+VROOMM_PatchIntCallStub_688F5	proc near		; CODE XREF: VROOMM_DemandLoadDispatch_687E8:loc_68850p
+					; VROOMM_FinalizeLoadedSegment_68863p
 		cmp	byte ptr es:20h, 0CDh ;	'�'
 		jz	short locret_68927
 		mov	ax, es
@@ -1452,13 +1515,13 @@ loc_688FF:
 
 loc_68904:
 		xor	cx, cx
-		call	VROOMM_PatchRelocationEntry_68997
+		call	VROOMM_LookupOrRegisterOffset_68997
 		mov	es:2, cx
 		mov	cx, es:0Ch
 		mov	di, 20h	; ' '
 		cld
 
-loc_68917:				; CODE XREF: VROOMM_PatchIntTrampoline_688F5:loc_68925j
+loc_68917:				; CODE XREF: VROOMM_PatchIntCallStub_688F5:loc_68925j
 		mov	dx, es:[di+1]
 		mov	ax, word_6D150
 		stosw
@@ -1470,21 +1533,22 @@ loc_68917:				; CODE XREF: VROOMM_PatchIntTrampoline_688F5:loc_68925j
 loc_68925:
 		loop	loc_68917
 
-locret_68927:				; CODE XREF: VROOMM_PatchIntTrampoline_688F5+6j
+locret_68927:				; CODE XREF: VROOMM_PatchIntCallStub_688F5+6j
 		retn
-VROOMM_PatchIntTrampoline_688F5	endp
+VROOMM_PatchIntCallStub_688F5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; ⚠️ far, 52 lignes, NON DÉTAILLÉE — déplace l'image chargée en mémoire (rep movsw, direction
-; ajustée selon chevauchement) et retouche l'en-tête (patch de trampolines via
-; VROOMM_PatchIntTrampoline_688F5 ou table de relogement).
+; Ex-'VROOMM_MoveImageAndFixup_68928' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - copie un bloc de memoire (rep movsw, avec support de
+; copie en sens inverse via std/cld pour les chevauchements) entre deux zones, utilise pendant
+; la compaction/reorganisation des segments d'overlay charges.
 ; ==============================================================================================
-VROOMM_MoveImageAndFixup_68928	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E+31p
-					; VROOMM_PatchFarJumpTable_6887B+2Ep
+VROOMM_CopyAndRelocateBlock_68928	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E+31p
+					; VROOMM_EvictOldestBlock_6887B+2Ep
 		mov	ax, word ptr off_6D15E+2
 		mov	dx, es:10h
 		mov	es:10h,	ax
@@ -1502,7 +1566,7 @@ loc_68943:
 		shl	si, 1
 		std
 
-loc_68949:				; CODE XREF: VROOMM_MoveImageAndFixup_68928+19j
+loc_68949:				; CODE XREF: VROOMM_CopyAndRelocateBlock_68928+19j
 		mov	di, si
 		push	ds
 		push	es
@@ -1518,12 +1582,12 @@ loc_68949:				; CODE XREF: VROOMM_MoveImageAndFixup_68928+19j
 		pop	ds
 		cmp	byte ptr es:20h, 0CDh ;	'�'
 		jz	short locret_68978
-		call	VROOMM_FindRelocationSlot_689A3
+		call	VROOMM_FindOffsetInTable_689A3
 		mov	cx, es:0Ch
 		mov	di, 23h	; '#'
 		cld
 
-loc_68972:				; CODE XREF: VROOMM_MoveImageAndFixup_68928:loc_68976j
+loc_68972:				; CODE XREF: VROOMM_CopyAndRelocateBlock_68928:loc_68976j
 		stosw
 
 loc_68973:
@@ -1532,21 +1596,23 @@ loc_68973:
 loc_68976:
 		loop	loc_68972
 
-locret_68978:				; CODE XREF: VROOMM_MoveImageAndFixup_68928+3Cj
+locret_68978:				; CODE XREF: VROOMM_CopyAndRelocateBlock_68928+3Cj
 		retn
-VROOMM_MoveImageAndFixup_68928	endp
+VROOMM_CopyAndRelocateBlock_68928	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, avance un pointeur de chargement global (off_6D15E) et met à jour une chaîne de
-; segments alloués.
+; Ex-'VROOMM_AdvanceLoadPointer_68979' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - met a jour le pointeur courant dans la table de blocs
+; libres (off_6D15E) apres une operation d'allocation/liberation, cherchant le prochain
+; emplacement disponible dans la table.
 ; ==============================================================================================
-VROOMM_AdvanceLoadPointer_68979	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E+34p
-					; VROOMM_ApplyRelocationsMain_687E8+34p
-		call	VROOMM_ComputeParagraphs_689E5
+VROOMM_UpdateFreeListOffset_68979	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E+34p
+					; VROOMM_DemandLoadDispatch_687E8+34p
+		call	VROOMM_ComputeParagraphCount_689E5
 
 loc_6897C:
 		add	word ptr off_6D15E+2, ax
@@ -1555,7 +1621,7 @@ loc_6897C:
 loc_68981:
 		mov	ax, 69E8h
 
-loc_68984:				; CODE XREF: VROOMM_AdvanceLoadPointer_68979+12j
+loc_68984:				; CODE XREF: VROOMM_UpdateFreeListOffset_68979+12j
 		mov	ds, ax
 		assume ds:nothing
 		mov	ax, ds:1Ch
@@ -1568,48 +1634,50 @@ loc_68991:
 		pop	ds
 		assume ds:seg339
 		retn
-VROOMM_AdvanceLoadPointer_68979	endp
+VROOMM_UpdateFreeListOffset_68979	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, patche une entrée de la table de relogement trouvée (échange avec
-; VROOMM_FindRelocationSlot_689A3).
+; Ex-'VROOMM_PatchRelocationEntry_68997' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - recherche (ou enregistre) un offset dans la table via
+; VROOMM_FindOffsetInTable_689A3, echange une valeur en place si trouve.
 ; ==============================================================================================
-VROOMM_PatchRelocationEntry_68997	proc near		; CODE XREF: VROOMM_ConditionalPatchTrampoline_688B6:loc_688D4p
-					; VROOMM_PatchIntTrampoline_688F5+11p
-		call	VROOMM_FindRelocationSlot_689A3
+VROOMM_LookupOrRegisterOffset_68997	proc near		; CODE XREF: VROOMM_MaybePatchCallSite_688B6:loc_688D4p
+					; VROOMM_PatchIntCallStub_688F5+11p
+		call	VROOMM_FindOffsetInTable_689A3
 		or	bx, bx
 		jz	short locret_689A2
 		xchg	cx, ss:[bx+2]
 
-locret_689A2:				; CODE XREF: VROOMM_PatchRelocationEntry_68997+5j
+locret_689A2:				; CODE XREF: VROOMM_LookupOrRegisterOffset_68997+5j
 		retn
-VROOMM_PatchRelocationEntry_68997	endp
+VROOMM_LookupOrRegisterOffset_68997	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, recherche binaire/linéaire dans une table de relogement (segment:offset). Appelée par
-; VROOMM_MoveImageAndFixup_68928 et VROOMM_PatchRelocationEntry_68997.
+; Ex-'VROOMM_FindRelocationSlot_689A3' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - recherche binaire/lineaire dans une table de
+; correspondances (offset->segment) utilisee par le mecanisme de patch de relocation.
 ; ==============================================================================================
-VROOMM_FindRelocationSlot_689A3	proc near		; CODE XREF: VROOMM_MoveImageAndFixup_68928+3Ep VROOMM_PatchRelocationEntry_68997p
+VROOMM_FindOffsetInTable_689A3	proc near		; CODE XREF: VROOMM_CopyAndRelocateBlock_68928+3Ep VROOMM_LookupOrRegisterOffset_68997p
 		xor	bx, bx
 		push	cx
 		push	bp
 		jmp	short loc_689AD
 ; ���������������������������������������������������������������������������
 
-loc_689A9:				; CODE XREF: VROOMM_FindRelocationSlot_689A3+11j
-					; VROOMM_FindRelocationSlot_689A3+16j ...
+loc_689A9:				; CODE XREF: VROOMM_FindOffsetInTable_689A3+11j
+					; VROOMM_FindOffsetInTable_689A3+16j ...
 		shl	cx, 1
 		mov	bp, cx
 
-loc_689AD:				; CODE XREF: VROOMM_FindRelocationSlot_689A3+4j
+loc_689AD:				; CODE XREF: VROOMM_FindOffsetInTable_689A3+4j
 		mov	cx, [bp+0]
 		shr	cx, 1
 		jz	short loc_689C6
@@ -1625,7 +1693,7 @@ loc_689C4:
 		jmp	short loc_689A9
 ; ���������������������������������������������������������������������������
 
-loc_689C6:				; CODE XREF: VROOMM_FindRelocationSlot_689A3+Fj
+loc_689C6:				; CODE XREF: VROOMM_FindOffsetInTable_689A3+Fj
 		pop	bp
 
 loc_689C7:
@@ -1633,18 +1701,20 @@ loc_689C7:
 
 locret_689C8:
 		retn
-VROOMM_FindRelocationSlot_689A3	endp
+VROOMM_FindOffsetInTable_689A3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, calcule l'espace mémoire restant disponible pour le chargement (comparaison de
-; segments).
+; Ex-'VROOMM_ComputeRemainingSpace_689C9' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). near - calcule l'espace disponible avant la prochaine
+; limite de segment charge, utilise pour decider si un nouveau segment peut etre place sans
+; collision avec un segment deja resident.
 ; ==============================================================================================
-VROOMM_ComputeRemainingSpace_689C9	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E:loc_687D6p
-					; VROOMM_ApplyRelocationsMain_687E8+46p
+VROOMM_ComputeAvailableOffset_689C9	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E:loc_687D6p
+					; VROOMM_DemandLoadDispatch_687E8+46p
 		mov	ax, seg_6D16C
 		or	ax, ax
 
@@ -1657,44 +1727,47 @@ loc_689D2:
 		sub	ax, word ptr off_6D15E+2
 		jnb	short locret_689E4
 
-loc_689DC:				; CODE XREF: VROOMM_ComputeRemainingSpace_689C9:loc_689CEj
+loc_689DC:				; CODE XREF: VROOMM_ComputeAvailableOffset_689C9:loc_689CEj
 		mov	ax, word_6D166
 
 loc_689DF:
 		sub	ax, word ptr off_6D15E+2
 		stc
 
-locret_689E4:				; CODE XREF: VROOMM_ComputeRemainingSpace_689C9+11j
+locret_689E4:				; CODE XREF: VROOMM_ComputeAvailableOffset_689C9+11j
 		retn
-VROOMM_ComputeRemainingSpace_689C9	endp
+VROOMM_ComputeAvailableOffset_689C9	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, convertit une taille de fichier MZ (champ « pages ») en nombre de paragraphes (arrondi
-; au paragraphe supérieur, classique du format MZ).
+; Ex-'VROOMM_ComputeParagraphs_689E5' (nom de notre base) ; renommee par la session musique
+; (archive handoff 2026-10-06). near - convertit une taille en octets (es:8) en nombre de
+; PARAGRAPHES DOS (unite d'allocation memoire = 16 octets), arrondi.
 ; ==============================================================================================
-VROOMM_ComputeParagraphs_689E5	proc near		; CODE XREF: VROOMM_AllocateAndFinalize_6879E+27p
-					; VROOMM_ApplyRelocationsMain_687E8+6Bp ...
+VROOMM_ComputeParagraphCount_689E5	proc near		; CODE XREF: VROOMM_LoadOnDemandCore_6879E+27p
+					; VROOMM_DemandLoadDispatch_687E8+6Bp ...
 		mov	ax, es:8
 		add	ax, 11h
 		mov	cl, 4
 		shr	ax, cl
 		retn
-VROOMM_ComputeParagraphs_689E5	endp
+VROOMM_ComputeParagraphCount_689E5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
 ; ==============================================================================================
-; near, calcule la taille totale de l'image (pages + paragraphes supplémentaires demandés) à
-; partir de l'en-tête MZ — arithmétique standard de calcul de taille d'exécutable DOS.
+; Ex-'VROOMM_ComputeSizeFromHeader_689F1' (nom de notre base) ; renommee par la session
+; musique (archive handoff 2026-10-06). near - calcule l'etendue totale en paragraphes d'un
+; segment de donnees + code (es:8 = taille code, es:0xA = taille donnees), arrondis
+; independamment puis sommes.
 ; ==============================================================================================
-VROOMM_ComputeSizeFromHeader_689F1	proc near		; CODE XREF: VROOMM_ReadAndParseHeader_684DF+62p
-					; VROOMM_AllocateAndFinalize_6879E+5p
+VROOMM_ComputeSegmentSpan_689F1	proc near		; CODE XREF: VROOMM_ScanFreeMemoryBlocks_684DF+62p
+					; VROOMM_LoadOnDemandCore_6879E+5p
 		mov	cl, 4
 
 loc_689F3:
@@ -1712,7 +1785,7 @@ loc_68A01:
 		shr	dx, cl
 		add	dx, ax
 		retn
-VROOMM_ComputeSizeFromHeader_689F1	endp
+VROOMM_ComputeSegmentSpan_689F1	endp
 
 ; ���������������������������������������������������������������������������
 		push	ds
@@ -1862,7 +1935,7 @@ loc_68AFE:				; CODE XREF: seg212:08B4j
 		mov	word ptr [bp+8], 0
 		push	si
 		push	di
-		call	VROOMM_ApplyRelocationsMain_687E8
+		call	VROOMM_DemandLoadDispatch_687E8
 		pop	di
 		pop	si
 		mov	bx, [bp+6]
@@ -1887,9 +1960,13 @@ loc_68B2C:				; CODE XREF: seg212:08ACj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; ⭐ far, 80 lignes, référencée via vtable (DATA XREF seg339) — point d'entrée principal du
-; loader VROOMM : appelle VROOMM_ReadAndParseHeader_684DF puis enchaîne le chargement complet
-; de l'image d'overlay (parsing MZ, relogement, patch de trampolines JMP/INT).
+; far, 80 lignes, referencee via vtable (seg339:off_71F62) - CONFIRME point d'entree principal
+; de (re)chargement VROOMM : appelle VROOMM_ScanFreeMemoryBlocks_684DF puis calcule une taille
+; de bloc requise a partir de word_69E8A et de la table de segments deja chargee
+; (seg339:word_71A1C). Tente une allocation (sub_5D90E) ; SI L'ALLOCATION ECHOUE (taille
+; insuffisante), retente en relancant l'ouverture complete du fichier depuis zero via
+; VROOMM_OpenAndParseOverlayFile_68254 - mecanisme de RECUPERATION PAR AGRANDISSEMENT
+; DYNAMIQUE DE LA ZONE D'OVERLAY.
 ; ==============================================================================================
 VROOMM_MainEntry_68B2F:				; DATA XREF: seg339:off_71F62o
 		push	ds
@@ -1904,7 +1981,7 @@ loc_68B32:
 		assume ds:seg216
 
 loc_68B37:
-		call	VROOMM_ReadAndParseHeader_684DF
+		call	VROOMM_ScanFreeMemoryBlocks_684DF
 		mov	bx, word_69E8A
 
 loc_68B3E:
@@ -1952,7 +2029,7 @@ loc_68B58:				; CODE XREF: seg212:0914j
 		push	ax
 		nop
 		push	cs
-		call	near ptr VROOMM_LocateAndValidate_68254
+		call	near ptr VROOMM_OpenAndParseOverlayFile_68254
 		or	ax, ax
 		jnz	short loc_68B85
 		pop	di
