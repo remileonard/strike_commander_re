@@ -695,7 +695,7 @@ Utilisateur connu : l'IA en attaque au sol, phases 2 et 3 (`GroundAttack_Phase2_
 
 ### 9.3 Saut instantané vers un point (`JDYN_JumpToPoint_49242`, ex-`Pilot_SteeringCommandToTarget`)
 
-Fonction distincte du mode ci-dessus (appelée par `FlightState_ResetHud` et
+Fonction distincte du mode ci-dessus (appelée par `Takeoff_Phase0_GroundRoll_120E8` et
 `Pilot_LowLevelControlCommand`) : elle **téléporte** l'avion.
 - orientation reconstruite **à plat** sur le cap demandé ; vitesse = vitesse demandée le long du nez ;
 - carburant consommé pour le trajet : `durée = distance / vitesse`, `burn = durée · (10 − 9·g_fuel) · sfc`,

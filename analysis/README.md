@@ -427,7 +427,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
     plusieurs duplicats identifiés par l'overlay VROOMM (`sub_45C0D`,
     `sub_46164` sont des copies exactes de `Camera_InitAttachedWithTarget`).
 25. **Moteur HUD/viseur et gestion d'armement** (seg087-091) : deux fonctions
-    massives (`HUD_RenderSymbologyMain`, 1882L, et `HUD_RenderSymbologyAlt`,
+    massives (`WeaponSystem_LaunchFromStation_3E744`, 1882L, et `WeaponSystem_FrameUpdate_3F8C0`,
     2016L) forment le rendu de la symbologie du viseur ; complétées par la
     résolution des stations d'armement (hardpoints), le largage de
     contre-mesures chaff/flare (avec physique et audio 3D dédiés), et le
@@ -472,7 +472,7 @@ suffixe pour recoupement avec strike.map et les futures sessions.
 
 ## ⭐ Découverte majeure de cette session : VM à bytecode transversale (seg109-114+)
 
-En remontant `Player_MainUpdate` (`sub_13100`) et `HUD_RenderSymbologyMain`
+En remontant `Player_MainUpdate` (`sub_13100`) et `WeaponSystem_LaunchFromStation_3E744`
 (`sub_3E744`) pour la question ouverte de la physique du joueur, l'analyse de
 seg109-114 a mis au jour un **sous-système générique inattendu, partagé par
 au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
@@ -498,7 +498,7 @@ au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
     `Player_MainUpdate`** (2 sites d'appel) — candidat pour la résolution de
     points d'attache/hardpoints de l'avion du joueur.
   - `HUD_ResolveNodePosition_547B1` est appelée **directement par
-    `HUD_RenderSymbologyMain`** — positionnement d'éléments de symbologie.
+    `WeaponSystem_LaunchFromStation_3E744`** — positionnement d'éléments de symbologie.
   - `AI_ResolveNodePosition_54274` est référencée **depuis seg004** (cœur IA
     de vol/combat) — résolution de position de référence pour l'IA.
   - `UIScreen_ConstructWidgetBinding_536F7` relie widgets et champs calculés,
@@ -774,7 +774,7 @@ format IFF/ResourceRecord déjà documenté (seg193-194) :
   classes de base, initialisation de sous-objets composites (`sub_6CACA`
   et apparentés, motif déjà documenté en seg109), enregistrement dans un
   conteneur.
-- **`TimedTrigger_SpawnAndBindGeometry_9E289`** (419L) relie explicitement
+- **`WeaponSystem_ReleaseBomb_9E289`** (419L) relie explicitement
   ce cluster au système de trigger temporisé du seg109
   (`Trigger_TimedRangedSpawnOnce_4F351`) : instanciation d'objet, référence
   faible (`SetReference`, `sub_3A44E`), ajout à liste membre — c'est très

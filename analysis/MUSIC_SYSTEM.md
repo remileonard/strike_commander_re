@@ -261,7 +261,7 @@ détruit est le joueur, ou si c'est un avion dont le pilote s'est éjecté.
 | 4 / 0x13 / `TUNE` | `Music_SelectStartTune_5AA02` (depuis `Cockpit_LoadAndDrawCalibration_8FDC0`) | si §5.1 ne choisit rien : ennemis proches → 4 si un combat a déjà eu lieu, sinon 0x13 ; aucun ennemi → `TUNE` |
 | 0x0B | `Player_ShotDownSequence_7B035` | **avion du joueur détruit** : `STRIKE_EXE_MAIN_LOOP` lance la séquence quand `byte_6E4B4 != 0`, drapeau posé par `Debris_SpawnOrchestratorVariant_9D770` quand l'objet détruit est le joueur (`cmp word_722E6,di` / `mov byte_6E4B4,1`). La séquence charge `OBJECTS\EJECT.PAK` puis demande 0x0B (`push 0Bh`), sans condition |
 | 0x0A | `Player_EjectSequence_7D31A` | **éjection volontaire du joueur** : `STRIKE_EXE_MAIN_LOOP` lance la séquence quand `byte_6E4B8 != 0`, drapeau posé par `Player_MainUpdate` sur Ctrl+E (touche de code 0x12 avec Ctrl, tables d'état clavier indice 0x1D) ou quand `byte_6E33B != 0`. Charge aussi `EJECT.PAK`, puis demande 0x0A (`push 0Ah`), sans condition |
-| 0x14 | `Landing_TaxiPhase_765B2` | **atterrissage terminé** : fin de la phase sol de la séquence d'atterrissage (caméra « LANDING », `Landing_SequenceTick_75C18`), quand l'avion est le joueur (`mov byte ptr es:[bx+94h],1`, puis `cmp ax,word_722E6`) |
+| 0x14 | `Landing_Phase3_TouchdownRoll_765B2` | **atterrissage terminé** : fin de la phase sol de la séquence d'atterrissage (caméra « LANDING », `LandingBehavior_Tick_75C18`), quand l'avion est le joueur (`mov byte ptr es:[bx+94h],1`, puis `cmp ax,word_722E6`) |
 | 0x14 | `Collision_OnTerrainContact_9D910` | **le joueur touche le sol sans casse** (objet heurté = « TERRAIN », contact accepté), après plus de 100 images de mission (`cmp word_70466,64h / jbe` : `word_70466` est le compteur d'images, incrémenté dans `CombatTarget_WeaponActionSubsystem`), ce qui écarte le contact au départ sur la piste |
 | 0x08 | `WeaponCam_LaunchPhase_80971` | **caméra arme sur un missile du joueur** : fin de la phase de lancement (`mov byte ptr [si+0A3h],1 / push 8`) |
 | 0x15 | `WeaponCam_LaunchPhase_80971` | **caméra arme sur une bombe du joueur** (catégorie 9), **seulement si la piste courante est 0x13** (`cmp word_70859,13h / jz` → `push 15h`) ; sinon pas de changement |
@@ -272,8 +272,8 @@ n'a pas pris la main (`[word_706A0+0xA1] == 0`). Une mission peut donc remplacer
 d'atterrissage.
 
 **Caméra arme.** Elle est lancée par `Mission_PlayerEventHandler`, appelé à chaque lancement d'arme
-(3 appels dans `HUD_RenderSymbologyMain` juste après le bruit de tir `SoundFX_Play_5A8DC` et la
-décrémentation du compteur de munitions, et 1 dans `TimedTrigger_SpawnAndBindGeometry_9E289`). Elle ne
+(3 appels dans `WeaponSystem_LaunchFromStation_3E744` juste après le bruit de tir `SoundFX_Play_5A8DC` et la
+décrémentation du compteur de munitions, et 1 dans `WeaponSystem_ReleaseBomb_9E289`). Elle ne
 démarre que si le tireur est le joueur, que l'arme est de catégorie 8 (missile) ou 9 (bombe), **et
 que l'option « caméra automatique » est active** : c'est le champ `+0x11` testé par
 `Mission_PlayerEventHandler` (fait donné par Rémi) ; les valeurs 0x0B et 7 bloquent la caméra

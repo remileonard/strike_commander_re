@@ -54,7 +54,7 @@ typées, chacune sachant se calculer elle-même. Une seule entrée est
 
 **`word_72A8F`** = pointeur vers l'entrée active. Lu partout où le rendu /
 le HUD a besoin de la position caméra (seg011 `Player_MainUpdate`, seg088
-`HUD_RenderSymbologyMain`, seg079, seg107…). Position monde de la caméra =
+`WeaponSystem_LaunchFromStation_3E744`, seg079, seg107…). Position monde de la caméra =
 `word_72A8F[+0x14/+0x18/+0x1C]` (i32, **fixed-point 24.8**, `/256` = pieds ;
 la 3ᵉ composante `+0x1C` = altitude côté ASM).
 
@@ -966,7 +966,7 @@ au runtime ; s'adapter à libRealSpace (Matrix 4×4, OpenGL Y-up).
 | **F6** (external)              | idem → code `8` + "External View"                                          |
 | **F7** (target)                | idem → code `9` + "Target View"                                            |
 | **TAKEOFF** (décollage)        | seg009, état de vol, `Kneeboard_SelectByID(0x59CD, "TAKEOFF")` quand `entité[+0x11] == word_722E6` |
-| **AUTOPILT**                   | `UIScript_ParseAndEvaluate_7A054` (ovr233) → `SelectByID("AUTOPILT")` + `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C` |
+| **AUTOPILT**                   | `Autopilot_JumpSequence_7A054` (ovr233) → `SelectByID("AUTOPILT")` + `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C` |
 | **script mission** (VM)        | `Expr_VM_OpcodeHelperA_53504`, opcode VM `+0xA38` : `Kneeboard_FindByID` + `Kneeboard_ApplySelection` |
 | **fin de séquence COMP**       | opcode `FE` → `word_72A8C = Kneeboard_FindByID(0x59CD, "<vue>")` → enchaîne  |
 

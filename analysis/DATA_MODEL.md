@@ -1284,7 +1284,7 @@ Le loader **ne décode pas** les paramètres — seuls les 8 octets d'ID et le t
 lus. Le payload (offsets 24.8, script `COMP`) est consommé à l'activation.
 
 **Objet caméra runtime — `word_72A8F`** (caméra active courante ;
-`DATA XREF: Player_MainUpdate`). Layout partiel vérifié (`HUD_RenderSymbologyMain`/
+`DATA XREF: Player_MainUpdate`). Layout partiel vérifié (`WeaponSystem_LaunchFromStation_3E744`/
 `…Alt` seg088, `Debris_SpawnOrchestrator` seg079) :
 
 | off | type | rôle |
@@ -1302,7 +1302,7 @@ position en `+0x12/+0x16/+0x1A`, la caméra a 2 octets de plus avant.
 **Chaîne d'activation** (tracée) : `Kneeboard_SelectByID(0x59CD, "<nom>")`
 (`sub_23C4F`) sélectionne par nom 8 c —
 `"TAKEOFF"` ← état de vol seg009 (`entité[+0x11] == word_722E6`),
-`"AUTOPILT"` ← `UIScript_ParseAndEvaluate_7A054` (ovr233) puis
+`"AUTOPILT"` ← `Autopilot_JumpSequence_7A054` (ovr233) puis
 `Camera_DetachParent(word_72A8F)` + reset `word_7046E`/`dword_70468`/`byte_7046C`,
 par state-code ← `Player_MainUpdate` (`Kneeboard_SelectByStateCode(0x59CD, 4)`),
 par script mission ← `Expr_VM_OpcodeHelperA_53504` (opcode VM `+0xA38` :

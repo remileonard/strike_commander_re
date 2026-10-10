@@ -68,7 +68,7 @@ flowchart TD
     end
 
     subgraph AUTO["Pilotage automatique - byte_6D558"]
-        UISCRIPT["UIScript_ParseAndEvaluate_7A054<br/>nom trompeur"]
+        UISCRIPT["Autopilot_JumpSequence_7A054<br/>nom trompeur"]
         CMD["Pilot_LowLevelControlCommand<br/>Pilot_IssueControlCommand_79DA0<br/>ordres directs à l'avion"]
         CAM["EntityTracker_SelectByID<br/>entrée AUTOPILT"]
         FLAG["byte_6D558 = 1<br/>puis boucle imbriquée<br/>puis byte_6D558 = 0"]
@@ -721,7 +721,7 @@ Pour un masque d'arme autre que le canon, si `si` > 0, `AI_BehaviorSelector` fai
 - **Pourquoi un coéquipier avec `GOAL=1` seul décolle mais ignore ensuite « Follow »** : au sol, `AI_TopLevelThink` appelle `Goal_ExecuteAction_A8AC` sans consulter le tableau `GOAL` ; le décollage s'exécute donc. Une fois en vol, le tableau est vide et aucun gestionnaire ne tourne, d'où l'absence de suivi. *(Corrigé 2026-09-25 : `Goal_MoraleReaction_878F`, la valeur `5`, est une réaction au moral et ne fait pas le suivi ; avec `GOAL = 5, 1`, l'avion décolle puis ne fait plus rien, vérifié en jeu par Rémi : le suivi exige la valeur `2`, voir `AI_SYSTEM.md` §4.4.)*
 - **Liste 0x59C3** : liste chaînée d'objets monde (tête à +0xB de l'en-tête, suivant à +2 du nœud, drapeau actif à +5, pointeur de vtable à +0 de l'objet). Ses nœuds ne sont **pas** des entités IA : le slot +4 de la vtable IA (0x110) est un destructeur, alors que `WorldObjects_CallSlot4OnAll_22D6C` appelle le slot +4 de chaque nœud. L'objet du monde pointe vers son entité IA à +0x55.
 - **`AIEntity_MasterTick_5ACC`** n'exécute ni GOAL ni MVRS : il prépare l'état (drapeaux, seuils `dword_7203D` / `dword_72039`, chronomètre +0x175, score de menace `word_6D3BC`) puis aiguille vers `Goal_FollowAllyExec` ou `AI_TriggerBehaviorUpdate`. La décision est dans cette dernière (non lue).
-- **`byte_6D558`** : drapeau « pilotage automatique ». Mis à 1 et remis à 0 par `UIScript_ParseAndEvaluate_7A054` autour d'une boucle imbriquée. À 1, `WorldObject_UpdateWithAIEntity_3D9FB` n'appelle pas `AIEntity_MasterTick_5ACC`. Selon Rémi (connaissance du jeu) : en pilotage automatique le jeu est mis en pause, le joueur est téléporté vers la destination, le jeu repart, et la caméra change pendant ce temps.
+- **`byte_6D558`** : drapeau « pilotage automatique ». Mis à 1 et remis à 0 par `Autopilot_JumpSequence_7A054` autour d'une boucle imbriquée. À 1, `WorldObject_UpdateWithAIEntity_3D9FB` n'appelle pas `AIEntity_MasterTick_5ACC`. Selon Rémi (connaissance du jeu) : en pilotage automatique le jeu est mis en pause, le joueur est téléporté vers la destination, le jeu repart, et la caméra change pendant ce temps.
 - **Les nœuds de `WorldObjects_UpdateAllAndRemoveDead_221F2` sont mis à jour de façon hiérarchique** : `WorldObject_TestAliveAndUpdateChildren_3800A` met à jour la liste des sous-objets (+0x1E) avec la même fonction.
 - **Le nom du PROF vient de la mission** (chunk `CAST`, 9 octets par entrée : nom sur 8 octets et un identifiant), pas du modèle d'avion (indication de Rémi).
 - **Catégories d'objet** (`vtable+8` de la classe modèle, fixée par le chunk présent dans `OBJECTS\<nom>.IFF`) : table complète dans la section `Targeting_AcquireBestThreat`. `SWPN` modélise les défenses fixes (AA, batteries, SAM, navires) : fait vérifié côté données.
@@ -808,7 +808,7 @@ Lecteurs (tous des octets 0-255 ; **table corrigée le 2026-09-24**, l'index des
 | LAU-3 (`PODR`) | 4 | 7 | 2 | 0 | 0 | 45 | 0 | 25 |
 
 - **`+0x4D` (`weapon_category`)** : famille du chercheur ou de l'arme : 0 canon, 1 IR (AIM-9), 2 radar (AIM-120, SA-2, SA-6), 3 guidée sol (AGM-65D, GBU-15), 4 bombe libre, 7 roquettes. Signification des valeurs 3, 4, 7 par déduction des armes concernées, non lue dans le code.
-- **`+0x4E` (`target_domain`)** : vaut 1 pour les cinq missiles guidés qui visent un avion (AIM-9J/9M, AIM-120, SA-2, SA-6 : donc pas « lancé depuis un avion »), 2 pour toutes les autres (canon, roquettes, bombes, AGM-65D, GBU-15). Nom `air_only` / `other` = **inférence** ; l'assembleur ne teste que `== 1` (`Targeting_AcquireBestThreat` pour « missile qui me vise », `HUD_RenderSymbologyMain`, `seg092`), la valeur 2 n'est lue nulle part ; `WeaponStation_ResolveStateA` prend 1 par défaut si le point d'emport est vide. `other` ne signifie pas « n'attaque pas les avions » (le canon en fait partie).
+- **`+0x4E` (`target_domain`)** : vaut 1 pour les cinq missiles guidés qui visent un avion (AIM-9J/9M, AIM-120, SA-2, SA-6 : donc pas « lancé depuis un avion »), 2 pour toutes les autres (canon, roquettes, bombes, AGM-65D, GBU-15). Nom `air_only` / `other` = **inférence** ; l'assembleur ne teste que `== 1` (`Targeting_AcquireBestThreat` pour « missile qui me vise », `WeaponSystem_LaunchFromStation_3E744`, `seg092`), la valeur 2 n'est lue nulle part ; `WeaponStation_ResolveStateA` prend 1 par défaut si le point d'emport est vide. `other` ne signifie pas « n'attaque pas les avions » (le canon en fait partie).
 - **Le missile et la bombe ne se distinguent pas par le `WDAT`** : AGM-65D (`MISS`) et GBU-15 (`BOMB`) ont exactement les mêmes octets de chercheur ; seule la classe IFF (catégorie d'objet 8 ou 9) diffère.
 - **`weapon_aspec` 0** (canon, bombes libres, roquettes) sort de la table de sauts de `WeaponStation_TestTargetLock` et `Targeting_SelectAndPrioritize` (cas `default`) : pas de test de verrouillage. Les aspecs des missiles guidés : 1 (AIM-9J), 2 (AIM-9M), 4 (AIM-120, SA-2, SA-6), 5 (AGM-65D, GBU-15, cas non lu).
 - Les ids des armes correspondent aux masques : `0x83C` = ids 3, 4, 5, 6, 12 ; `0x700` = ids 9, 10, 11 ; la GBU-15 (id 8) est dans `0xFC` mais pas dans `0x83C`.
@@ -1080,7 +1080,7 @@ Toutes les distances et altitudes sont en mètres, et le point visé est toujour
   - l'octet `modèle+0x5E` est non nul ;
   - `nez · direction(cible) > cos(modèle[+0x61] × t)`, avec `t = distance / vitesse du lanceur`.
 
-  Le cône autorisé grandit avec le temps de vol. `+0x5E` et `+0x61` viennent du chunk `DATA` du modèle (`PlayerComponent_LoadFieldsWithRetry_9FAD0` : octets `+0x5E`, `+0x5F`, `+0x60`, word `+0x61`).
+  Le cône autorisé grandit avec le temps de vol. `+0x5E` et `+0x61` viennent du chunk `DATA` du modèle (`BombModel_LoadDATAChunk_9FAD0` : octets `+0x5E`, `+0x5F`, `+0x60`, word `+0x61`).
 - **`BombModel_PredictImpact_41311`** (méthode `+0x18`). L'objet `+0x0D` du point d'emport lui est passé comme porteur : sa vitesse et sa position sont utilisées.
   - **Identifiant 7** : impact à **2500 m** (masque `0x40`) ou **3000 m** devant le porteur, dans la direction horizontale de sa vitesse, au niveau du terrain.
   - **MK-20 / MK-82** : `Z = altitude porteur − hauteur passée`, puis `t = (−vz − √(vz² − 2gZ)) / g`, avec `g = −9,8`, et une correction `t −= Z / (3 × (2000 − altitude porteur) + 290)`. L'impact est `position porteur + vitesse horizontale × t`, au niveau du terrain.

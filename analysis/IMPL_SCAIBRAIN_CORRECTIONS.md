@@ -1148,7 +1148,7 @@ au sol lancée comme manœuvre 19 ne notifie qu'une fois, par `endManeuver`.
 ## §20 `AI_BehaviorSelector` porté (2026-10-03)
 
 - `SCAIBrain::behaviorSelector()` traduit `AI_BehaviorSelector` (détail dans `known_functions.json`) ;
-  `SCAIBrain::weaponRecoveryBusy()` traduit `AI_WeaponRecoveryBusy_9027` (ex-`AI_RadarScanTarget`).
+  `SCAIBrain::weaponRecoveryBusy()` traduit `AI_WeaponRecoveryBusy_9027` (ex-`AI_WeaponRecoveryBusy_9027`).
 - `combatStep` (étape 4) abandonne le comportement en cours si le sélecteur agit (gâchette ou q > 0).
 - Fin de `topLevelThink` : continuation de rafale de canon quand le sélecteur n'est pas passé ce tick
   (`loc_850B`, bit 2 de +0x28B effacé en tête de `AI_TriggerBehaviorUpdate`).
