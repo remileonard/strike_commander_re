@@ -69,11 +69,24 @@ Le test vérifie quatre points :
 
 Ces musiques de test ne sont pas celles du jeu.
 
-## Ce qui reste à vérifier avec les vrais fichiers
+## Vérifié sur les vrais fichiers (2026-10-10)
 
-- Le contenu réel de `COMBAT.ADL` : présence de LZW et forme des pistes (FORM XMID seul ou XDIR + CAT).
-- Le contenu de `STRIKE.AD` : longueurs de timbre 0x0E (OPL simple) ou autre (TVFX).
-  - Le pilote ignore la longueur 0x19.
-  - Il n'applique pas le volume aux voix TVFX : seul le timbre OPL simple fixe le masque
-    `0x1824` (`sub_2617`). Le portage fait de même.
+- `COMBAT.ADL` : fichier → 1 jeu de musique → [0] archive des 25 liaisons, [1..22] pistes.
+  Aucun enregistrement n'est compressé. Chaque piste est en FORM XDIR + CAT XMID.
+- Les 47 séquences se lisent en entier :
+  - les pistes principales bouclent ;
+  - les ponctuations 0x10 à 0x12 durent de 3 à 5 s ;
+  - les liaisons durent de 2,6 à 5,5 s.
+- `STRIKE.AD` : 282 timbres. Aucun timbre ne manque pour les pistes testées.
+  - 195 timbres OPL simples (longueur 0x0E).
+  - 87 timbres TVFX, tous de type 2 (fréquence absolue).
+  - Aucun timbre de longueur 0x19, que le pilote ignorerait.
+- Transitions sur données réelles : 4 → 0x10 à la position 5, entrée 24, valeur 0x14,
+  donc la liaison n° 19 est jouée, puis le retour à 4.
+
+## Reste à comparer
+
+- L'écoute, comparée au jeu original, n'a pas encore été faite.
+- Le pilote n'applique pas le volume aux voix TVFX : seul le timbre OPL simple fixe le masque
+  `0x1824` (`sub_2617`). Le fondu d'arrêt ne baisse donc pas une voix TVFX. Le portage fait de même.
 - Le jeu boucle sans fin si un timbre manque dans la bibliothèque. Le lecteur s'arrête et le signale.
