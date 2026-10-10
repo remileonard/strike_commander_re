@@ -8,146 +8,90 @@
 
 #include "precomp.h"
 
-static MemMusic *copyMusic(const uint8_t *src, size_t size) {
-    uint8_t *data = new uint8_t[size];
-    memcpy(data, src, size);
-    MemMusic *music = new MemMusic();
-    music->data = data;
-    music->size = size;
-    return music;
+static bool isForm(const uint8_t *data, size_t size) {
+    return data != NULL && size >= 4 && memcmp(data, "FORM", 4) == 0;
 }
 
 static bool isForm(const PakEntry *e) {
-    return e != NULL && e->size >= 4 && memcmp(e->data, "FORM", 4) == 0;
+    return e != NULL && isForm(e->data, e->size);
 }
 
+// Configuration de Strike Commander. Pour donner des transitions a un fichier, il suffit de
+// passer son .dat a LoadMusicFile.
 void RSMusic::init() {
-    PakArchive *pak = new PakArchive();
-    TreEntry *entry = assetManager.GetEntryByName("..\\..\\DATA\\MIDGAMES\\AMUSIC.PAK");
-    if (entry == NULL) {
-        printf("RSMusic::init: Could not find ..\\..\\DATA\\MIDGAMES\\AMUSIC.PAK\n");
-        return;
-    }
-    pak->InitFromRAM("..\\..\\DATA\\MIDGAMES\\AMUSIC.PAK", entry->data, entry->size);
+    LoadTimbres("..\\..\\DATA\\SOUND\\STRIKE.AD");
 
-    for (size_t i = 0; i < pak->GetNumEntries(); i++) {
-        PakEntry *e = pak->GetEntry(i);
-        MemMusic *music = copyMusic(e->data, e->size);
-        musics[0].push_back(music);
-        midgames_musics[0].push_back(music);
+    // banque 0 : AMUSIC.PAK (pistes a plat, pas de .dat)
+    std::vector<RSMusicSet *> amusic = LoadMusicFile("..\\..\\DATA\\MIDGAMES\\AMUSIC.PAK");
+    if (!amusic.empty()) {
+        SetBank(0, amusic[0]);
+        midgames_musics[0] = amusic[0]->tracks;
     }
-    TreEntry *gameflow = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL");
-    if (gameflow == NULL) {
-        printf("RSMusic::init: Could not find ..\\..\\DATA\\SOUND\\GAMEFLOW.ADL\n");
-        return;
-    }
-    pak = new PakArchive();
-    pak->InitFromRAM("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL", gameflow->data, gameflow->size);
-    for (size_t i = 0; i < pak->GetNumEntries(); i++) {
-        PakEntry *e = pak->GetEntry(i);
-        PakArchive *subpak = new PakArchive();
-        subpak->InitFromRAM("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL", e->data, e->size);
+
+    // banque 1 : toutes les pistes de GAMEFLOW.ADL ; gameflow_musics[i] = pistes du jeu i,
+    // precedees de celles du jeu 0
+    std::vector<RSMusicSet *> gameflow = LoadMusicFile("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL");
+    for (size_t i = 0; i < gameflow.size(); i++) {
         if (i > 0) {
-            for (size_t t = 0; t < gameflow_musics[0].size(); t++) {
-                gameflow_musics[i].push_back(gameflow_musics[0][t]);
-            }
+            gameflow_musics[i] = gameflow_musics[0];
         }
-        for (size_t j = 0; j < subpak->GetNumEntries(); j++) {
-            PakEntry *sub = subpak->GetEntry(j);
-            if (sub->data[0] != 'F') {
-                continue;
-            }
-            MemMusic *music = copyMusic(sub->data, sub->size);
-            musics[1].push_back(music);
-            gameflow_musics[i].push_back(music);
+        for (MemMusic *m : gameflow[i]->tracks) {
+            musics[1].push_back(m);
+            gameflow_musics[i].push_back(m);
         }
     }
 
-    loadCombat();
-    if (!combat_sets.empty()) {
-        music_sets[2] = &combat_sets[0]; // musics[2] = pistes principales de COMBAT.ADL
+    // banque 2 : COMBAT.ADL, avec les transitions de COMBAT.DAT
+    std::vector<RSMusicSet *> combat = LoadMusicFile("..\\..\\DATA\\SOUND\\COMBAT.ADL", "..\\..\\DATA\\SOUND\\COMBAT.DAT");
+    for (size_t i = 0; i < combat.size(); i++) {
+        combat_musics[i] = combat[i]->tracks;
     }
-    loadSoundFx();
+    if (!combat.empty()) {
+        SetBank(2, combat[0]);
+    }
 
-    TreEntry *lib = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\STRIKE.AD");
+    // effets XMIDI (pas de banque : RSMixer::playSoundFx)
+    std::vector<RSMusicSet *> soundfx = LoadMusicFile("..\\..\\DATA\\SOUND\\SOUNDFX.ADL");
+    for (size_t i = 0; i < soundfx.size(); i++) {
+        soundfx_musics[i] = soundfx[i]->tracks;
+    }
+}
+
+bool RSMusic::LoadTimbres(const char *file) {
+    TreEntry *lib = assetManager.GetEntryByName(file);
     if (lib == NULL) {
         // Sans bibliotheque, les sequences s'enchainent mais aucune note ne sonne.
-        printf("RSMusic::init: Could not find ..\\..\\DATA\\SOUND\\STRIKE.AD (no timbre bank: music will be silent)\n");
-    } else {
-        timbre_data.assign(lib->data, lib->data + lib->size);
-        timbres.set(timbre_data.data(), timbre_data.size());
+        printf("RSMusic: Could not find %s (no timbre bank: music will be silent)\n", file);
+        return false;
+    }
+    timbre_data.assign(lib->data, lib->data + lib->size);
+    timbres.set(timbre_data.data(), timbre_data.size());
+    return true;
+}
+
+RSMusic::~RSMusic() {
+    for (std::unique_ptr<RSMusicSet> &set : owned) {
+        for (MemMusic *m : set->tracks) {
+            delete m;
+        }
     }
 }
 
-// COMBAT.ADL (verifie sur le vrai fichier) :
-//   fichier : une entree par jeu de musique (le vrai fichier : 1)
-//   jeu     : [0] = archive des pistes de liaison, [1..N] = pistes principales (FORM XDIR + CAT XMID)
-// COMBAT.DAT, enregistrement 0 : longueurs de phrase, matrice de transition, entrees de liaison
-//   (AudioQueue_LoadTrackTable_AACA6, AudioQueue_LoadTransitionTable_AAFA0).
-void RSMusic::loadCombat() {
-    TreEntry *dat = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\COMBAT.DAT");
-    TreEntry *combat = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\COMBAT.ADL");
-    if (combat == NULL || dat == NULL) {
-        printf("RSMusic::init: Could not find ..\\..\\DATA\\SOUND\\COMBAT.ADL / COMBAT.DAT\n");
-        return;
-    }
-    PakArchive *datpak = new PakArchive();
-    datpak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.DAT", dat->data, dat->size);
-
-    PakArchive *pak = new PakArchive();
-    pak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.ADL", combat->data, combat->size);
-    for (size_t i = 0; i < pak->GetNumEntries(); i++) {
-        SCMusicSet set;
-        PakEntry *rec = datpak->GetNumEntries() > 0
-                            ? datpak->GetEntry(i < datpak->GetNumEntries() ? i : 0)
-                            : NULL;
-        if (rec == NULL || !set.parseDat(rec->data, rec->size)) {
-            printf("RSMusic::init: COMBAT.DAT: unexpected format\n");
-        }
-        PakEntry *e = pak->GetEntry(i);
-        PakArchive *setpak = new PakArchive();
-        setpak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.ADL", e->data, e->size);
-        for (size_t j = 1; j < setpak->GetNumEntries(); j++) { // pistes principales
-            PakEntry *t = setpak->GetEntry(j);
-            if (t == NULL) {
-                continue;
-            }
-            set.tracks.emplace_back(t->data, t->data + t->size);
-            MemMusic *music = copyMusic(t->data, t->size);
-            musics[2].push_back(music);
-            combat_musics[i].push_back(music);
-        }
-        if (setpak->GetNumEntries() > 0) { // pistes de liaison
-            PakEntry *l = setpak->GetEntry(0);
-            PakArchive *linkpak = new PakArchive();
-            linkpak->InitFromRAM("..\\..\\DATA\\SOUND\\COMBAT.ADL", l->data, l->size);
-            for (size_t k = 0; k < linkpak->GetNumEntries(); k++) {
-                PakEntry *lt = linkpak->GetEntry(k);
-                if (lt == NULL) {
-                    set.linkTracks.emplace_back();
-                } else {
-                    set.linkTracks.emplace_back(lt->data, lt->data + lt->size);
-                }
-            }
-        }
-        if ((int)set.tracks.size() < set.trackCount) {
-            printf("RSMusic::init: COMBAT.ADL set %zu: %zu tracks, COMBAT.DAT expects %d\n",
-                   i, set.tracks.size(), set.trackCount);
-        }
-        combat_sets.push_back(std::move(set));
-    }
+RSMusicSet *RSMusic::newSet() {
+    owned.push_back(std::unique_ptr<RSMusicSet>(new RSMusicSet()));
+    return owned.back().get();
 }
 
 // Ajoute a out chaque sequence XMIDI (entree commencant par "FORM") trouvee dans pak,
 // en descendant dans les sous-archives.
-void RSMusic::collectTracks(PakArchive *pak, const char *name, std::vector<MemMusic *> &out, int depth) {
+void RSMusic::collectTracks(PakArchive *pak, const char *name, std::vector<std::vector<uint8_t>> &out, int depth) {
     for (size_t j = 0; j < pak->GetNumEntries(); j++) {
         PakEntry *sub = pak->GetEntry(j);
         if (sub == NULL || sub->size == 0) {
             continue;
         }
         if (isForm(sub)) {
-            out.push_back(copyMusic(sub->data, sub->size));
+            out.emplace_back(sub->data, sub->data + sub->size);
         } else if (depth < 4) {
             PakArchive *subpak = new PakArchive();
             subpak->InitFromRAM(name, sub->data, sub->size);
@@ -156,27 +100,119 @@ void RSMusic::collectTracks(PakArchive *pak, const char *name, std::vector<MemMu
     }
 }
 
-void RSMusic::loadSoundFx() {
-    TreEntry *soundfx = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\SOUNDFX.ADL");
-    if (soundfx == NULL) {
-        printf("RSMusic::init: Could not find ..\\..\\DATA\\SOUND\\SOUNDFX.ADL\n");
-        return;
+// Structure de COMBAT.ADL (verifiee sur le vrai fichier) : [0] archive des pistes de liaison,
+// [1..N] pistes principales (AudioQueue_LoadTrackTable_AACA6, AudioQueue_LoadTransitionTable_AAFA0).
+// Renvoie false si le jeu n'a pas cette structure.
+bool RSMusic::loadSetWithLinks(PakArchive *setpak, const char *name, RSMusicSet *set) {
+    size_t n = setpak->GetNumEntries();
+    if (n < 2 || isForm(setpak->GetEntry(0))) {
+        return false;
+    }
+    for (size_t j = 1; j < n; j++) {
+        if (!isForm(setpak->GetEntry(j))) {
+            return false;
+        }
+    }
+    for (size_t j = 1; j < n; j++) {
+        PakEntry *t = setpak->GetEntry(j);
+        set->data.tracks.emplace_back(t->data, t->data + t->size);
+    }
+    PakEntry *l = setpak->GetEntry(0);
+    PakArchive *linkpak = new PakArchive();
+    linkpak->InitFromRAM(name, l->data, l->size);
+    for (size_t k = 0; k < linkpak->GetNumEntries(); k++) {
+        PakEntry *lt = linkpak->GetEntry(k);
+        if (lt == NULL) {
+            set->data.linkTracks.emplace_back();
+        } else {
+            set->data.linkTracks.emplace_back(lt->data, lt->data + lt->size);
+        }
+    }
+    return true;
+}
+
+std::vector<RSMusicSet *> RSMusic::LoadMusicFile(const char *file, const char *datFile) {
+    std::vector<RSMusicSet *> result;
+    TreEntry *entry = assetManager.GetEntryByName(file);
+    if (entry == NULL) {
+        printf("RSMusic: Could not find %s\n", file);
+        return result;
+    }
+    PakArchive *datpak = NULL;
+    if (datFile != NULL) {
+        TreEntry *dat = assetManager.GetEntryByName(datFile);
+        if (dat == NULL) {
+            printf("RSMusic: Could not find %s (no transitions for %s)\n", datFile, file);
+        } else {
+            datpak = new PakArchive();
+            datpak->InitFromRAM(datFile, dat->data, dat->size);
+        }
     }
     PakArchive *pak = new PakArchive();
-    pak->InitFromRAM("..\\..\\DATA\\SOUND\\SOUNDFX.ADL", soundfx->data, soundfx->size);
-    for (size_t i = 0; i < pak->GetNumEntries(); i++) {
-        PakEntry *e = pak->GetEntry(i);
-        if (e == NULL || e->size == 0) {
-            continue;
+    pak->InitFromRAM(file, entry->data, entry->size);
+
+    if (pak->GetNumEntries() > 0 && isForm(pak->GetEntry(0))) {
+        // pistes a plat : un seul jeu, une piste par entree (les numeros restent ceux du fichier)
+        RSMusicSet *set = newSet();
+        for (size_t i = 0; i < pak->GetNumEntries(); i++) {
+            PakEntry *e = pak->GetEntry(i);
+            if (e == NULL) {
+                set->data.tracks.emplace_back();
+            } else {
+                set->data.tracks.emplace_back(e->data, e->data + e->size);
+            }
         }
-        if (isForm(e)) {
-            soundfx_musics[i].push_back(copyMusic(e->data, e->size));
-            continue;
+        result.push_back(set);
+    } else {
+        for (size_t i = 0; i < pak->GetNumEntries(); i++) {
+            PakEntry *e = pak->GetEntry(i);
+            RSMusicSet *set = newSet();
+            result.push_back(set);
+            if (e == NULL || e->size == 0) {
+                continue;
+            }
+            PakArchive *setpak = new PakArchive();
+            setpak->InitFromRAM(file, e->data, e->size);
+            bool withLinks = loadSetWithLinks(setpak, file, set);
+            if (!withLinks) {
+                collectTracks(setpak, file, set->data.tracks, 0);
+            }
+            if (datpak == NULL) {
+                continue;
+            }
+            PakEntry *rec = datpak->GetEntry(i);
+            if (!withLinks || rec == NULL || !set->data.parseDat(rec->data, rec->size)) {
+                printf("RSMusic: %s set %zu: no usable transitions in %s\n", file, i, datFile);
+                continue;
+            }
+            if ((int)set->data.tracks.size() < set->data.trackCount) {
+                printf("RSMusic: %s set %zu: %zu tracks, %s expects %d\n", file, i, set->data.tracks.size(),
+                       datFile, set->data.trackCount);
+            }
+            set->hasDat = true;
         }
-        PakArchive *subpak = new PakArchive();
-        subpak->InitFromRAM("..\\..\\DATA\\SOUND\\SOUNDFX.ADL", e->data, e->size);
-        collectTracks(subpak, "..\\..\\DATA\\SOUND\\SOUNDFX.ADL", soundfx_musics[i], 0);
     }
+    // MemMusic : vues sur les pistes du jeu (data.tracks n'est plus modifie)
+    for (RSMusicSet *set : result) {
+        for (std::vector<uint8_t> &t : set->data.tracks) {
+            MemMusic *music = new MemMusic();
+            music->data = t.data();
+            music->size = t.size();
+            set->tracks.push_back(music);
+        }
+    }
+    music_files[file] = result;
+    return result;
+}
+
+void RSMusic::SetBank(uint8_t bank, RSMusicSet *set) {
+    if (set == NULL) {
+        bank_sets.erase(bank);
+        musics.erase(bank);
+        return;
+    }
+    bank_sets[bank] = set;
+    musics[bank] = set->tracks;
 }
 
 void RSMusic::SwitchBank(uint8_t bank) {
@@ -185,6 +221,7 @@ void RSMusic::SwitchBank(uint8_t bank) {
     }
     this->bank = bank;
 }
+
 MemMusic *RSMusic::GetMusic(uint32_t index) {
     if (musics.find(bank) == musics.end()) {
         return NULL;
@@ -196,9 +233,9 @@ MemMusic *RSMusic::GetMusic(uint32_t index) {
 }
 
 SCMusicSet *RSMusic::GetMusicSet() {
-    auto it = music_sets.find(bank);
-    if (it == music_sets.end()) {
+    auto it = bank_sets.find(bank);
+    if (it == bank_sets.end() || !it->second->hasDat) {
         return NULL;
     }
-    return it->second;
+    return &it->second->data;
 }

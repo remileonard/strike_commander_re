@@ -11,26 +11,50 @@ Ce sont les versions de `RSMusic` et `RSMixer` de libRealSpace qui utilisent le 
 3. Retirer `Mix_ADLMIDI_setCustomBankFile` et `assets/STRIKE.wopl` : ils ne servent plus.
    La banque d'instruments est maintenant `DATA\SOUND\STRIKE.AD`, celle du jeu.
 
-## RSMusic : ce qui change
+## RSMusic : un utilitaire de chargement
 
-- **COMBAT.ADL** est chargé avec sa vraie structure, vérifiée sur le fichier :
-  - le fichier a une entrée par jeu de musique (le vrai fichier en a 1) ;
-  - dans le jeu, l'entrée [0] est l'archive des 25 pistes de liaison ;
-  - les entrées [1..22] sont les pistes principales.
-  
-  `combat_sets[i]` est le `SCMusicSet` complet (pistes, liaisons, matrice de `COMBAT.DAT`).
-  `combat_musics[i]` et `musics[2]` contiennent les 22 pistes principales, dans l'ordre des numéros de piste.
-- Deux bugs de l'ancienne version sont corrigés :
-  - `subpak->GetEntry(k)` était lu au lieu de `subsubpak->GetEntry(k)` ;
-  - les entrées en `'F'` étaient sautées, alors que ce sont justement les pistes principales.
-- **SOUNDFX.ADL** :
-  - corrigé : l'archive était ouverte avec les données de COMBAT.ADL (`combat->data`) ;
-  - je ne connais pas sa structure. Chaque entrée de premier niveau `i` donne
-    `soundfx_musics[i]`, qui reçoit toutes les séquences `FORM` trouvées en descendant dans les
-    sous-archives ;
-  - les effets ne vont plus dans `musics[2]`.
-- **STRIKE.AD** est chargé dans `timbres` (`SCTimbreLibrary`).
-- AMUSIC.PAK et GAMEFLOW.ADL ne changent pas.
+`RSMusic` charge n'importe quel fichier de musique, **avec ou sans `.dat`** : c'est le consommateur
+qui choisit. Le jeu construit lui aussi ses chemins ainsi : `SOUND\<nom>.dat` et `SOUND\<nom>.adl`, et
+l'enregistrement `i` du `.dat` va avec l'entrée `i` du `.adl` (`AudioQueue_ProcessMain_AA84E`,
+`analysis/MUSIC_SYSTEM.md` §2.1).
+
+```cpp
+// sans .dat : pistes jouees seules
+std::vector<RSMusicSet *> sets = music->LoadMusicFile("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL");
+// avec .dat : transitions (pistes de liaison, matrice, longueurs de phrase)
+std::vector<RSMusicSet *> sets = music->LoadMusicFile("..\\..\\DATA\\SOUND\\XXX.ADL",
+                                                      "..\\..\\DATA\\SOUND\\XXX.DAT");
+music->SetBank(5, sets[0]);   // la banque 5 sert ce jeu ; RSMixer::playMusic suit ses transitions
+```
+
+- **Structure lue** :
+  - entrées de premier niveau qui sont des pistes (`FORM`) : un seul jeu, une piste par entrée
+    (AMUSIC.PAK) ;
+  - sinon, un jeu par entrée de premier niveau. Si son entrée 0 est une archive et les suivantes
+    des pistes, c'est la structure de COMBAT.ADL : [0] pistes de liaison, [1..N] pistes principales.
+    Sinon, toutes les séquences `FORM` trouvées dans ses sous-archives.
+- **`RSMusicSet`** :
+  - `tracks` : les pistes principales (`MemMusic`) ;
+  - `data` : le `SCMusicSet` (pistes, liaisons, données du `.dat`) ;
+  - `hasDat` : les transitions sont disponibles. Il faut un `.dat` lisible **et** la structure à
+    pistes de liaison. Sinon un message le signale, et le jeu reste jouable sans transitions.
+- **`SetBank(banque, jeu)`** : `GetMusic` sert les pistes du jeu ; `GetMusicSet` renvoie ses
+  transitions si `hasDat`, ce qui fait passer `RSMixer::playMusic` par le séquenceur.
+- **`music_files[nom]`** : les jeux déjà chargés, par nom de fichier.
+- **`LoadTimbres(fichier)`** : la bibliothèque de timbres (STRIKE.AD).
+- **`init()`** n'est plus que la configuration de Strike Commander. Chaque fichier y est déclaré
+  avec ou sans `.dat` ; en ajouter un, c'est une ligne :
+  - banque 0 : AMUSIC.PAK, sans `.dat` ;
+  - banque 1 : GAMEFLOW.ADL, sans `.dat` (toutes ses pistes, comme avant) ;
+  - banque 2 : COMBAT.ADL avec COMBAT.DAT ;
+  - SOUNDFX.ADL, sans `.dat` (effets, `soundfx_musics`).
+- Les tables existantes (`midgames_musics`, `gameflow_musics`, `combat_musics`, `soundfx_musics`,
+  `musics`) sont remplies comme avant.
+- Corrigés au passage : `subpak->GetEntry(k)` au lieu de `subsubpak->GetEntry(k)`, les pistes
+  principales en `'F'` sautées dans COMBAT, et SOUNDFX.ADL ouvert avec les données de COMBAT.ADL.
+- Les `PakArchive` sont créés par `new` et jamais libérés, comme dans la version d'origine : je ne
+  sais pas si leur destructeur libère le tampon qu'on leur passe. Les pistes sont recopiées, donc les
+  libérer ne poserait pas de problème si ce n'est pas le cas.
 
 ## RSMixer : ce qui change
 
@@ -43,8 +67,8 @@ Ce sont les versions de `RSMusic` et `RSMixer` de libRealSpace qui utilisent le 
 - Les VOC (`playSoundVoc`, `stopSound`…) ne changent pas.
 - **RSMixer ne connaît pas les évènements de combat.** Il joue la piste demandée, avec la
   transition du `.dat` si elle existe :
-  - `playMusic(index)` dans une banque qui a un `.dat` (banque 2 = COMBAT.ADL + COMBAT.DAT,
-    déclarée dans `RSMusic::music_sets`) : le changement attend la barre de mesure suivante, puis passe
+  - `playMusic(index)` dans une banque qui a un `.dat` (un jeu chargé avec son `.dat` et donné
+    à la banque par `RSMusic::SetBank` ; dans `init()`, la banque 2 = COMBAT.ADL + COMBAT.DAT) : le changement attend la barre de mesure suivante, puis passe
     par la piste de liaison que donne COMBAT.DAT (`Music_RequestTune_5A984`). `loop` est ignoré :
     les pistes bouclent d'elles-mêmes (FOR/NEXT XMIDI) ;
   - `playMusic(index, loop)` dans une autre banque : la piste joue seule. -1 = sans fin, n = n fois ;
@@ -103,6 +127,7 @@ integration/test/run.sh /chemin/SOUND build
 ```
 
 Le test compile `RSMusic` et `RSMixer` avec des substituts d'`AssetManager`, de `PakArchive` et de
-`SDL_mixer_ext` (`test/stubs/`). Il passe en banque 2, appelle `playMusic` avec 4 → 0x10 → 9 → 0x13, puis
-`stopMusic(true)`, et fait tourner le crochet audio sur 60 s. Il compare ensuite le résultat au WAV de `sc_player`
+`SDL_mixer_ext` (`test/stubs/`). Il charge un fichier avec un `.dat` par `LoadMusicFile`, le donne à la banque 5 par `SetBank`,
+appelle `playMusic` avec 4 → 0x10 → 9 → 0x13, puis `stopMusic(true)`, et fait tourner le crochet
+audio sur 60 s. Il compare ensuite le résultat au WAV de `sc_player`
 dans le même scénario : **les deux sont identiques octet pour octet** sur les vrais fichiers (2026-10-10).

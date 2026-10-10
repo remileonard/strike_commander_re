@@ -9,10 +9,15 @@ int main(int, char **argv) {
     RSMixer &m = RSMixer::getInstance();
     m.init();
     RSMusic *mu = m.music;
-    printf("combat_sets %zu : %d pistes, %zu liaisons, %zu entrees ; combat_musics[0] %zu ; soundfx_musics[0] %zu ; timbres %s\n",
-           mu->combat_sets.size(), mu->combat_sets[0].trackCount, mu->combat_sets[0].linkTracks.size(),
-           mu->combat_sets[0].linkEntries.size(), mu->combat_musics[0].size(), mu->soundfx_musics[0].size(),
-           mu->timbres.loaded() ? "oui" : "non");
+    RSMusicSet *combat = mu->music_files["..\\..\\DATA\\SOUND\\COMBAT.ADL"][0];
+    printf("COMBAT : %zu jeu(x), .dat %d : %d pistes, %zu liaisons, %zu entrees ; combat_musics[0] %zu ; soundfx_musics[0] %zu ; timbres %s\n",
+           mu->music_files["..\\..\\DATA\\SOUND\\COMBAT.ADL"].size(), (int)combat->hasDat, combat->data.trackCount,
+           combat->data.linkTracks.size(), combat->data.linkEntries.size(), mu->combat_musics[0].size(),
+           mu->soundfx_musics[0].size(), mu->timbres.loaded() ? "oui" : "non");
+    // un autre fichier avec .dat : meme structure, banque choisie par le consommateur
+    std::vector<RSMusicSet *> other = mu->LoadMusicFile("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL", "..\\..\\DATA\\SOUND\\COMBAT.DAT");
+    std::vector<RSMusicSet *> nodat = mu->LoadMusicFile("..\\..\\DATA\\SOUND\\GAMEFLOW.ADL");
+    printf("GAMEFLOW avec .dat : %d ; sans .dat : %d (%zu pistes)\n", (int)other[0]->hasDat, (int)nodat[0]->hasDat, nodat[0]->tracks.size());
     FILE *f = fopen(argv[2], "wb");
     struct {
         double t;
@@ -27,7 +32,8 @@ int main(int, char **argv) {
         { 55,
           -1 }
     };
-    m.switchBank(2); // COMBAT.ADL : pistes avec transitions (COMBAT.DAT)
+    mu->SetBank(5, other[0]); // jeu charge par LoadMusicFile, avec son .dat, dans une banque libre
+    m.switchBank(5);
     m.playMusic(4);
     size_t next = 0;
     const int RATE = 44100;
@@ -59,7 +65,7 @@ int main(int, char **argv) {
     // piste isolee + effet
     m.switchBank(0); // banque sans .dat : piste jouee seule
     m.playMusic(mu->combat_musics[0][19], 1);
-    int fx = m.playSoundFx(mu->soundfx_musics[0][30], 50);
+    int fx = m.playSoundFx(mu->soundfx_musics[0][10], 50);
     int pk = 0;
     for (int k = 0; k < 200; k++) {
         g_hook(g_hookArg, (Uint8 *)buf, 4096);
