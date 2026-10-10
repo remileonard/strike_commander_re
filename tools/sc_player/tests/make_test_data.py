@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Fabrique un jeu de donnees SYNTHETIQUE pour tester sc_player sans les fichiers du jeu.
   COMBAT.DAT : copie du vrai fichier (analysis/sample_dat_files/COMBAT.DAT)
-  COMBAT.ADL : archive a 3 niveaux, pistes XMIDI fabriquees (certaines compressees en LZW)
+  COMBAT.ADL : meme structure que le vrai fichier (fichier -> jeu -> liaisons / pistes),
+               pistes XMIDI fabriquees (certaines compressees en LZW)
   STRIKE.AD  : bibliotheque de timbres (format Global Timbre Library) avec timbres OPL simples
                et un timbre TVFX
 Ces musiques ne sont PAS celles du jeu : elles servent seulement a verifier la mecanique
@@ -88,9 +89,9 @@ for t in range(22):
     bars = 2 if 0x10 <= t <= 0x12 else 8
     tracks.append(xmid(notes, bars, timbres=((t % 4, 0), (4, 0))))
 links = [xmid([(1, 72 + i % 12), (1, 76 + i % 12)], 1, timbres=((2, 0), (4, 0))) for i in range(22)]
-level3 = archive(links, compress={0, 5})
-level2 = archive([level3])
-adl = archive([level2] + tracks, compress={1, 2, 5})
+links_ar = archive(links, compress={0, 5})                  # archive des pistes de liaison
+music_set = archive([links_ar] + tracks, compress={1, 2, 5})  # le jeu : 0 = liaisons, 1..N = pistes
+adl = archive([music_set])                                  # le fichier : 1 entree
 open(os.path.join(out, 'COMBAT.ADL'), 'wb').write(adl)
 
 def bnk(transpose, mod, car, fbc):

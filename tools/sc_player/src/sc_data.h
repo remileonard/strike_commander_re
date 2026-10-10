@@ -3,9 +3,10 @@
  *
  * combat.dat (enregistrement 0 de l'archive, MUSIC_SYSTEM.md 2.3) :
  *   u8 N ; N x (A, B) ; matrice N x N (0xFF = aucune) ; u8 E ; E x ([L] puis L+1 octets)
- * combat.adl (MUSIC_SYSTEM.md 2.4) :
- *   niveau 1 : entree 0 -> niveau 2 ; entrees 1..N -> pistes principales (XMIDI)
- *   niveau 2 : entree 0 -> niveau 3 ; niveau 3 : les pistes de liaison (XMIDI)
+ * combat.adl (MUSIC_SYSTEM.md 2.4, verifie sur le vrai fichier) :
+ *   fichier : 1 entree = le jeu de musique
+ *   jeu     : entree 0 -> archive des pistes de liaison (25) ; entrees 1..N -> pistes principales
+ *   chaque piste : FORM XDIR + CAT XMID (une sequence)
  * Bibliotheque de timbres (Music_LoadTimbreFromLibrary_5A577) : entrees de 6 octets
  *   (patch, banque, offset u32), fin sur banque 0xFF ; a l'offset : u16 longueur puis donnees.
  *   Nom : "strike." + suffixe du pilote ("AD" pour ADLIB.ADV), dans SOUND.

@@ -91,13 +91,34 @@ principale pendant la liaison (ex. `0x82`, `0x98`), valeur supérieure au nombre
 ### 2.4 `combat.adl` : trois niveaux d'archive
 
 ```
-combat.adl (niveau 1)
-├── entrée 0 → niveau 2
-│   └── entrée 0 → niveau 3 : les word_7084E pistes de LIAISON (table word_70856, 10 o/descripteur)
-├── entrée 1 → piste principale 0   ┐
-├── …                               ├─ table word_70854, 12 o/descripteur
-└── entrée N → piste principale N−1 ┘
+combat.adl (fichier)                         vérifié sur le vrai fichier (Rémi, 2026-10-10)
+└── entrée 0 : le jeu de musique (comme l'enregistrement 0 de combat.dat)
+    ├── entrée 0      → archive des 25 pistes de LIAISON (word_7084E = 25)
+    ├── entrée 1      → piste principale 0
+    ├── …
+    └── entrée 22     → piste principale 21
+chaque piste : FORM XDIR (INFO = 1) + CAT XMID (un seul FORM XMID : TIMB + EVNT), non compressée
 ```
+
+**Correction (2026-10-10)** : la version précédente de ce schéma omettait le niveau « fichier ».
+Le premier niveau ne contient qu'une entrée, le jeu de musique, et c'est dans ce jeu que l'entrée 0
+est l'archive des liaisons et que les entrées 1 à 22 sont les pistes principales.
+
+**Lecture complète des 47 séquences** (`tools/sc_player`, interpréteur XMIDI du pilote) :
+- les 22 pistes principales et les 25 liaisons se lisent sans erreur ;
+- les pistes principales bouclent indéfiniment (FOR/NEXT), sauf les ponctuations 0x10 à 0x12
+  (3 à 5 s) ; les liaisons durent de 2,6 à 5,5 s.
+
+**Observation sur A et B** (mesure atteinte au premier saut de boucle, comparée à combat.dat) :
+- le premier saut tombe à la mesure A, ou A − 1 pour 0x0B, 0x0C et 0x0F : A est la longueur du
+  premier passage, introduction comprise ;
+- 11 pistes n'ont pas d'introduction : la boucle fait exactement A mesures ;
+- pour les autres, la boucle est plus courte (piste 0 : 19 puis 18 ; piste 0x0A : 34 puis 22) et
+  B − 1 vaut le plus souvent la longueur de l'introduction (pistes 0, 2, 0x0A, 0x0C, 0x0D, 0x0F,
+  0x13), donc B est la position dans la phrase où la boucle reprend ;
+- le compteur de mesures n'est pas remis à zéro au saut (piste 0 : sauts aux mesures 19, 37, 54), donc
+  « (mesure mod A) + 1 » n'est exact qu'au premier passage. C'est le comportement du code du jeu,
+  pas une erreur du portage.
 
 - `AudioQueue_LoadTrackTable_AACA6` : lit le nombre de pistes et les deux octets `(A, B)` de chaque
   piste dans le `.dat`, charge chaque piste principale.
