@@ -56,6 +56,8 @@ seq.request(4);          // Music_RequestTune_5A984 ; seq.stop(true) = arret ave
 // Piste isolee (GAMEFLOW, MIDGAMES, SOUNDFX) : SCMusicSequencer::registerAndStart(&xmi, &lib, data, size, &err).
 ```
 
+Versions de `RSMusic` et `RSMixer` prêtes à intégrer : voir `integration/README.md`.
+
 ## Fichiers du jeu nécessaires
 
 Dans le répertoire `SOUND` du jeu (le nom est cherché sans tenir compte de la casse) :
