@@ -4,15 +4,22 @@
 //
 #include "AILXmidiDriver.h"
 #include "AILAdlibTables.h"
+#include "AILMidi.h"
 #include <cstring>
 using std::memset; using std::memcmp;
+using namespace AILMidi;
 
 #define QUANT_TIME_16 0x208D5          // 16 000 000 / 120
 #define XMI_NSEQS AILXmidiDriver::NSEQS
 #define XMI_MAX_NOTES XmidiSequence::MAX_NOTES
 #define XMI_FOR_NEST XmidiSequence::FOR_NEST
+// index (x 16 canaux) des controleurs journalises, dans l'ordre de ADL_CTRL_LOGGED
 enum { C_PV = 0, C_MODUL = 16, C_PAN = 32, C_EXP = 48, C_SUS = 64, C_PBS = 80,
        C_LOCK = 96, C_PROT = 112, C_VPROT = 128 };
+// lock_status[canal] (XMIDI.ASM : 'bit 7: locked')
+const uint8_t LOCKED    = 0x80;   // canal pris par CHAN_LOCK
+const uint8_t PROTECTED = 0x40;   // canal reserve par CHAN_PROTECT
+const uint8_t NONE      = 0xFF;   // valeur de journal / note / canal : absente
 
 namespace {
 uint32_t be32(const uint8_t *p);
@@ -77,10 +84,10 @@ void rewindSeq(XmidiSequence *s)
     for (int i = 0; i < XMI_FOR_NEST; i++) s->for_cnt[i] = -1;
     for (int c = 0; c < 16; c++) {
         s->chan_map[c] = (uint8_t)c;
-        s->chan_program[c] = s->chan_pitch_l[c] = s->chan_pitch_h[c] = s->chan_indirect[c] = 0xFF;
+        s->chan_program[c] = s->chan_pitch_l[c] = s->chan_pitch_h[c] = s->chan_indirect[c] = NONE;
     }
-    memset(s->chan_controls, 0xFF, sizeof(s->chan_controls));
-    memset(s->note_chan, 0xFF, sizeof(s->note_chan));
+    memset(s->chan_controls, NONE, sizeof(s->chan_controls));
+    memset(s->note_chan, NONE, sizeof(s->note_chan));
     s->interval_cnt = 0; s->note_count = 0;
     s->vol_percent = s->vol_target = 100;
     s->tempo_percent = s->tempo_target = 100;
@@ -100,10 +107,10 @@ void AILXmidiDriver::flushChannelNotes(int chan)
         if (!s->used || !s->note_count) continue;
         for (int i = 0; i < XMI_MAX_NOTES; i++) {
             if (s->note_chan[i] != chan) continue;
-            s->note_chan[i] = 0xFF;
+            s->note_chan[i] = NONE;
             int m = s->chan_map[chan];
             active_notes[m]--;
-            send(0x80 | m, s->note_num[i], 0);
+            send(NOTE_OFF | m, s->note_num[i], 0);
             s->note_count--;
         }
     }
@@ -112,11 +119,11 @@ void AILXmidiDriver::flushChannelNotes(int chan)
 void AILXmidiDriver::flushNoteQueue(XmidiSequence *s)
 {
     for (int i = 0; i < XMI_MAX_NOTES; i++) {
-        if (s->note_chan[i] == 0xFF) continue;
+        if (s->note_chan[i] == NONE) continue;
         int m = s->chan_map[s->note_chan[i]];
-        s->note_chan[i] = 0xFF;
+        s->note_chan[i] = NONE;
         active_notes[m]--;
-        send(0x80 | m, s->note_num[i], 0);
+        send(NOTE_OFF | m, s->note_num[i], 0);
     }
     s->note_count = 0;
 }
@@ -124,54 +131,54 @@ void AILXmidiDriver::flushNoteQueue(XmidiSequence *s)
 int AILXmidiDriver::lockChannel()
 {
     int best = -1;
-    for (int mask = 0xC0;; mask = 0x80) {
+    for (int mask = LOCKED | PROTECTED;; mask = LOCKED) {
         unsigned cl = 0xFFFF;
         for (int c = 8; c >= 1; c--) {
             if (lock_status[c] & mask) continue;
             if (active_notes[c] >= cl) continue;
             cl = active_notes[c]; best = c;
         }
-        if (best >= 0 || mask == 0x80) break;
+        if (best >= 0 || mask == LOCKED) break;
     }
     if (best < 0) return 0;
-    send(0xB0 | best, 64, 0);
+    send(CONTROL_CHANGE | best, SUSTAIN, 0);
     flushChannelNotes(best);
     active_notes[best] = 0;
-    lock_status[best] |= 0x80;
+    lock_status[best] |= LOCKED;
     return best + 1;
 }
 
 void AILXmidiDriver::releaseChannel(int chan1)
 {
     int c = chan1 - 1;
-    if (c < 0 || c > 15 || !(lock_status[c] & 0x80)) return;
-    lock_status[c] &= 0x7F;
+    if (c < 0 || c > 15 || !(lock_status[c] & LOCKED)) return;
+    lock_status[c] &= (uint8_t)~LOCKED;
     active_notes[c] = 0;
-    send(0xB0 | c, 64, 0);
-    send(0xB0 | c, 123, 0);
+    send(CONTROL_CHANGE | c, SUSTAIN, 0);
+    send(CONTROL_CHANGE | c, ALL_NOTES_OFF, 0);
     for (int i = 0; i < 9; i++) {
         uint8_t v = global_controls[i * 16 + c];
-        if (v != 0xFF) send(0xB0 | c, ADL_CTRL_LOGGED[i], v);
+        if (v != NONE) send(CONTROL_CHANGE | c, ADL_CTRL_LOGGED[i], v);
     }
-    if (global_program[c] != 0xFF) send(0xC0 | c, global_program[c], 0);
-    if (global_pitch_l[c] != 0xFF && global_pitch_h[c] != 0xFF)
-        send(0xE0 | c, global_pitch_l[c], global_pitch_h[c]);
+    if (global_program[c] != NONE) send(PROGRAM_CHANGE | c, global_program[c], 0);
+    if (global_pitch_l[c] != NONE && global_pitch_h[c] != NONE)
+        send(PITCH_BEND | c, global_pitch_l[c], global_pitch_h[c]);
 }
 
 void AILXmidiDriver::resetSequence(XmidiSequence *s)
 {
     for (int c = 0; c < 16; c++) {
-        if ((int8_t)s->chan_controls[C_SUS + c] >= 64) {
+        if ((int8_t)s->chan_controls[C_SUS + c] >= SWITCH_ON) {
             global_controls[C_SUS + c] = 0;
-            send(0xB0 | c, 64, 0);
+            send(CONTROL_CHANGE | c, SUSTAIN, 0);
         }
-        if ((int8_t)s->chan_controls[C_LOCK + c] >= 64) {
+        if ((int8_t)s->chan_controls[C_LOCK + c] >= SWITCH_ON) {
             flushChannelNotes(c);
             releaseChannel(s->chan_map[c] + 1);
             s->chan_map[c] = (uint8_t)c;
         }
-        if ((int8_t)s->chan_controls[C_PROT + c] >= 64) lock_status[c] &= 0xBF;
-        if ((int8_t)s->chan_controls[C_VPROT + c] >= 64) send(0xB0 | c, 112, 0);
+        if ((int8_t)s->chan_controls[C_PROT + c] >= SWITCH_ON) lock_status[c] &= (uint8_t)~PROTECTED;
+        if ((int8_t)s->chan_controls[C_VPROT + c] >= SWITCH_ON) send(CONTROL_CHANGE | c, VOICE_PROTECT, 0);
     }
 }
 
@@ -179,26 +186,26 @@ void AILXmidiDriver::xmidiVolume(XmidiSequence *s)          /* sub_311D */
 {
     for (int c = 0; c < 16; c++) {
         uint8_t pv = s->chan_controls[C_PV + c];
-        if (pv == 0xFF) continue;
+        if (pv == NONE) continue;
         unsigned v = (unsigned)pv * (unsigned)s->vol_percent / 100u;
         if (v >= 127) v = 127;
         global_controls[C_PV + c] = (uint8_t)v;
-        if (lock_status[c] & 0x80) continue;
-        send(0xB0 | s->chan_map[c], 7, (int)v);
+        if (lock_status[c] & LOCKED) continue;
+        send(CONTROL_CHANGE | s->chan_map[c], PART_VOLUME, (int)v);
     }
 }
 
 /* ---- XMIDI_control, version ADLIB.ADV (sub_317C) ---- */
 void AILXmidiDriver::xmidiControl(XmidiSequence *s, int chan, int con, int val)
 {
-    if (s->chan_indirect[chan] != 0xFF) s->chan_indirect[chan] = 0xFF;   /* table de controle : NULL dans le jeu */
-    if (ctrl_hash[con] != 0xFF) {
+    if (s->chan_indirect[chan] != NONE) s->chan_indirect[chan] = NONE;   /* table de controle : NULL dans le jeu */
+    if (ctrl_hash[con] != NONE) {
         int i = ctrl_hash[con] + chan;
         global_controls[i] = (uint8_t)val;
         s->chan_controls[i] = (uint8_t)val;
     }
     switch (con) {
-    case 7:
+    case PART_VOLUME:
         if (s->vol_percent != 100) {
             unsigned v = (unsigned)val * (unsigned)s->vol_percent / 100u;
             if (v >= 127) v = 127;
@@ -206,17 +213,17 @@ void AILXmidiDriver::xmidiControl(XmidiSequence *s, int chan, int con, int val)
             global_controls[C_PV + chan] = (uint8_t)val;
         }
         break;
-    case 118:                                   /* CLEAR_BEAT_BAR */
+    case CLEAR_BEAT_BAR:
         s->beat_count = 0; s->measure_count = 0;
         s->beat_fraction = s->time_fraction;
         return;
-    case 119: return;                           /* CALLBACK_TRIG : pas de fonction de rappel */
-    case 116:                                   /* FOR_LOOP */
+    case CALLBACK_TRIG: return;                 /* pas de fonction de rappel */
+    case FOR_LOOP:
         for (int i = 0; i < XMI_FOR_NEST; i++)
             if (s->for_cnt[i] == -1) { s->for_cnt[i] = val; s->for_ptrs[i] = s->evnt_ptr; break; }
         return;
-    case 117:                                   /* NEXT_LOOP */
-        if (val < 64) return;
+    case NEXT_LOOP:
+        if (val < SWITCH_ON) return;
         for (int i = XMI_FOR_NEST - 1; i >= 0; i--) {
             if (s->for_cnt[i] == -1) continue;
             if (s->for_cnt[i] != 0 && --s->for_cnt[i] == 0) { s->for_cnt[i] = -1; return; }
@@ -224,12 +231,12 @@ void AILXmidiDriver::xmidiControl(XmidiSequence *s, int chan, int con, int val)
             return;
         }
         return;
-    case 111:                                   /* CHAN_PROTECT */
-        lock_status[chan] |= 0x40;
-        if (val < 64) lock_status[chan] &= 0xBF;
+    case CHAN_PROTECT:
+        lock_status[chan] |= PROTECTED;
+        if (val < SWITCH_ON) lock_status[chan] &= (uint8_t)~PROTECTED;
         return;
-    case 110:                                   /* CHAN_LOCK */
-        if (val >= 64) {
+    case CHAN_LOCK:
+        if (val >= SWITCH_ON) {
             int c = lockChannel() - 1;
             s->chan_map[chan] = (uint8_t)(c == -1 ? chan : c);
         } else {
@@ -238,33 +245,33 @@ void AILXmidiDriver::xmidiControl(XmidiSequence *s, int chan, int con, int val)
             s->chan_map[chan] = (uint8_t)chan;
         }
         return;
-    case 115: s->chan_indirect[chan] = (uint8_t)val; return;   /* INDIRECT_C_PFX */
+    case INDIRECT_C_PFX: s->chan_indirect[chan] = (uint8_t)val; return;
     default: break;
     }
-    if (lock_status[chan] & 0x80) return;
-    send(0xB0 | s->chan_map[chan], con, val);
+    if (lock_status[chan] & LOCKED) return;
+    send(CONTROL_CHANGE | s->chan_map[chan], con, val);
 }
 
 void AILXmidiDriver::restoreSequence(XmidiSequence *s)
 {
     for (int c = 0; c < 16; c++) {
         uint8_t l = s->chan_controls[C_LOCK + c];
-        if (l == 0xFF || (int8_t)l < 64) continue;
+        if (l == NONE || (int8_t)l < SWITCH_ON) continue;
         int m = lockChannel() - 1;
         s->chan_map[c] = (uint8_t)(m == -1 ? c : m);
     }
     for (int i = 0; i < 9; i++) {
         int con = ADL_CTRL_LOGGED[i];
-        if (con == 110) continue;
+        if (con == CHAN_LOCK) continue;
         for (int c = 0; c < 16; c++) {
             uint8_t v = s->chan_controls[i * 16 + c];
-            if (v != 0xFF) xmidiControl(s, c, con, v);
+            if (v != NONE) xmidiControl(s, c, con, v);
         }
     }
     for (int c = 0; c < 16; c++) {
-        if (s->chan_pitch_l[c] != 0xFF && s->chan_pitch_h[c] != 0xFF)
-            send(0xE0 | s->chan_map[c], s->chan_pitch_l[c], s->chan_pitch_h[c]);
-        if (s->chan_program[c] != 0xFF) send(0xC0 | s->chan_map[c], s->chan_program[c], 0);
+        if (s->chan_pitch_l[c] != NONE && s->chan_pitch_h[c] != NONE)
+            send(PITCH_BEND | s->chan_map[c], s->chan_pitch_l[c], s->chan_pitch_h[c]);
+        if (s->chan_program[c] != NONE) send(PROGRAM_CHANGE | s->chan_map[c], s->chan_program[c], 0);
     }
 }
 
@@ -275,25 +282,25 @@ void AILXmidiDriver::init(AILAdlibDriver *driver)
     current = 0;
     memset(active_notes, 0, sizeof active_notes);
     memset(lock_status, 0, sizeof lock_status);
-    memset(global_controls, 0xFF, sizeof(global_controls));
-    memset(global_program, 0xFF, sizeof(global_program));
-    memset(global_pitch_l, 0xFF, sizeof(global_pitch_l));
-    memset(global_pitch_h, 0xFF, sizeof(global_pitch_h));
-    memset(ctrl_hash, 0xFF, sizeof(ctrl_hash));
+    memset(global_controls, NONE, sizeof(global_controls));
+    memset(global_program, NONE, sizeof(global_program));
+    memset(global_pitch_l, NONE, sizeof(global_pitch_l));
+    memset(global_pitch_h, NONE, sizeof(global_pitch_h));
+    memset(ctrl_hash, NONE, sizeof(ctrl_hash));
     for (int i = 0; i < 9; i++) ctrl_hash[ADL_CTRL_LOGGED[i]] = (uint8_t)(i * 16);
     for (int i = 0; i < 9; i++) {                          /* valeurs initiales, canaux 1..9 */
         uint8_t v = ADL_CTRL_DEFAULT[i];
-        if (v == 0xFF) continue;
+        if (v == NONE) continue;
         for (int c = 1; c <= 9; c++) {
             global_controls[i * 16 + c] = v;
-            send(0xB0 | c, ADL_CTRL_LOGGED[i], v);
+            send(CONTROL_CHANGE | c, ADL_CTRL_LOGGED[i], v);
         }
     }
     for (int c = 1; c <= 9; c++) {
-        global_pitch_l[c] = 0; global_pitch_h[c] = 0x40;
-        send(0xE0 | c, 0, 0x40);
+        global_pitch_l[c] = PITCH_CENTER_L; global_pitch_h[c] = PITCH_CENTER_H;
+        send(PITCH_BEND | c, PITCH_CENTER_L, PITCH_CENTER_H);
         uint8_t prg = ADL_PRG_DEFAULT[c - 1];
-        if (prg != 0xFF) { global_program[c] = prg; send(0xC0 | c, prg, 0); }
+        if (prg != NONE) { global_program[c] = prg; send(PROGRAM_CHANGE | c, prg, 0); }
     }
 }
 
@@ -396,19 +403,19 @@ size_t AILXmidiDriver::noteOn(XmidiSequence *s)
 {
     const uint8_t *b = s->base;
     size_t p = s->evnt_ptr;
-    int chan = b[p] & 0x0F, note = b[p + 1], vel = b[p + 2];
+    int chan = b[p] & CHANNEL_MASK, note = b[p + 1], vel = b[p + 2];
     size_t q = p + 3;
     uint32_t dur = vln(b, s->len, &q);
     size_t len = q - p;
-    if (lock_status[chan] & 0x80) return len;
+    if (lock_status[chan] & LOCKED) return len;
     int slot = 0;
-    for (int i = 0; i < XMI_MAX_NOTES; i++) if (s->note_chan[i] == 0xFF) { slot = i; s->note_count++; break; }
+    for (int i = 0; i < XMI_MAX_NOTES; i++) if (s->note_chan[i] == NONE) { slot = i; s->note_count++; break; }
     s->note_chan[slot] = (uint8_t)chan;
     s->note_num[slot] = (uint8_t)note;
     s->note_time[slot] = (int32_t)dur - 1;
     int m = s->chan_map[chan];
     active_notes[m]++;
-    send(0x90 | m, note, vel);
+    send(NOTE_ON | m, note, vel);
     return len;
 }
 
@@ -422,12 +429,12 @@ size_t AILXmidiDriver::meta(XmidiSequence *s, int h)
     uint32_t dlen = vln(b, s->len, &q);
     size_t ev_len = (q - p) + dlen;
     const uint8_t *d = b + q;
-    if (type == 0x2F) {
+    if (type == META_END_OF_TRACK) {
         resetSequence(s);
         s->status = SEQ_DONE;
         if (s->post_release) { s->used = 0; }
         (void)h;
-    } else if (type == 0x58) {
+    } else if (type == META_TIME_SIGNATURE) {
         s->time_numerator = d[0];
         int cl = d[1] - 2;
         int32_t tf;
@@ -435,7 +442,7 @@ size_t AILXmidiDriver::meta(XmidiSequence *s, int h)
         else tf = QUANT_TIME_16 >> (-cl);
         s->time_fraction = tf;
         s->beat_fraction = tf;
-    } else if (type == 0x51) {
+    } else if (type == META_TEMPO) {
         uint32_t us = ((uint32_t)d[0] << 16) | ((uint32_t)d[1] << 8) | d[2];
         s->time_per_beat = (int32_t)(us << 4);
     }
@@ -491,12 +498,12 @@ void AILXmidiDriver::serve()
 
             if (s->note_count) {
                 for (int i = 0; i < XMI_MAX_NOTES && s->note_count; i++) {
-                    if (s->note_chan[i] == 0xFF) continue;
+                    if (s->note_chan[i] == NONE) continue;
                     if (--s->note_time[i] >= 0) continue;
                     int m = s->chan_map[s->note_chan[i]];
-                    s->note_chan[i] = 0xFF;
+                    s->note_chan[i] = NONE;
                     active_notes[m]--;
-                    send(0x80 | m, s->note_num[i], 0);
+                    send(NOTE_OFF | m, s->note_num[i], 0);
                     s->note_count--;
                 }
             }
@@ -506,28 +513,28 @@ void AILXmidiDriver::serve()
                     const uint8_t *b = s->base;
                     size_t p = s->evnt_ptr;
                     int st = b[p];
-                    if (st < 0x80) { s->evnt_ptr++; s->interval_cnt = st; break; }
-                    int op = st & 0xF0, ch = st & 0x0F;
+                    if (st < NOTE_OFF) { s->evnt_ptr++; s->interval_cnt = st; break; }   /* < 0x80 : intervalle */
+                    int op = st & STATUS_MASK, ch = st & CHANNEL_MASK;
                     int d1 = (p + 1 < s->len) ? b[p + 1] : 0, d2 = (p + 2 < s->len) ? b[p + 2] : 0;
                     size_t sz;
-                    if (op == 0xF0) sz = (ch == 0x0F) ? meta(s, h) : sysex(s);
-                    else if (op == 0xE0) {
+                    if (op == SYSEX) sz = (st == META) ? meta(s, h) : sysex(s);
+                    else if (op == PITCH_BEND) {
                         s->chan_pitch_l[ch] = (uint8_t)d1; s->chan_pitch_h[ch] = (uint8_t)d2;
                         global_pitch_l[ch] = (uint8_t)d1; global_pitch_h[ch] = (uint8_t)d2;
                         sz = 3;
-                        if (!(lock_status[ch] & 0x80)) send(op | s->chan_map[ch], d1, d2);
-                    } else if (op == 0xD0) {
+                        if (!(lock_status[ch] & LOCKED)) send(op | s->chan_map[ch], d1, d2);
+                    } else if (op == CHANNEL_PRESSURE) {
                         sz = 2;
-                        if (!(lock_status[ch] & 0x80)) send(op | s->chan_map[ch], d1, d2);
-                    } else if (op == 0xC0) {
+                        if (!(lock_status[ch] & LOCKED)) send(op | s->chan_map[ch], d1, d2);
+                    } else if (op == PROGRAM_CHANGE) {
                         s->chan_program[ch] = (uint8_t)d1; global_program[ch] = (uint8_t)d1;
                         sz = 2;
-                        if (!(lock_status[ch] & 0x80)) send(op | s->chan_map[ch], d1, d2);
-                    } else if (op == 0xB0) { xmidiControl(s, ch, d1, d2); sz = 3; }
-                    else if (op == 0xA0) {
+                        if (!(lock_status[ch] & LOCKED)) send(op | s->chan_map[ch], d1, d2);
+                    } else if (op == CONTROL_CHANGE) { xmidiControl(s, ch, d1, d2); sz = 3; }
+                    else if (op == POLY_PRESSURE) {
                         sz = 3;
-                        if (!(lock_status[ch] & 0x80)) send(op | s->chan_map[ch], d1, d2);
-                    } else sz = noteOn(s);
+                        if (!(lock_status[ch] & LOCKED)) send(op | s->chan_map[ch], d1, d2);
+                    } else sz = noteOn(s);                     /* NOTE_ON (XMIDI : pas de NOTE_OFF) */
                     s->evnt_ptr += sz;
                     if (!s->used || s->status != SEQ_PLAYING) { done = 1; break; }
                 }

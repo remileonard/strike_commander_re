@@ -3,6 +3,9 @@
 //  libRealSpace
 //
 #include "SCTimbreTest.h"
+#include "AILMidi.h"
+
+using namespace AILMidi;
 
 std::vector<SCTimbreInfo> SCTimbreTest::list(const SCTimbreLibrary &lib)
 {
@@ -30,13 +33,13 @@ std::vector<SCTimbreInfo> SCTimbreTest::list(const SCTimbreLibrary &lib)
 
 void SCTimbreTest::play(AILAdlibDriver &adl, const SCTimbreInfo &t, int chan, int note, int vel)
 {
-    adl.send(0xB0 | chan, 114, t.bank);                  // PATCH_BANK_SEL
+    adl.send(CONTROL_CHANGE | chan, PATCH_BANK_SEL, t.bank);
     adl.installTimbre(t.bank, t.patch, t.data);
-    adl.send(0xC0 | chan, t.patch, 0);
-    adl.send(0x90 | chan, note, vel);
+    adl.send(PROGRAM_CHANGE | chan, t.patch, 0);
+    adl.send(NOTE_ON | chan, note, vel);
 }
 
-void SCTimbreTest::stop(AILAdlibDriver &adl, int chan, int note) { adl.send(0x80 | chan, note, 0); }
+void SCTimbreTest::stop(AILAdlibDriver &adl, int chan, int note) { adl.send(NOTE_OFF | chan, note, 0); }
 
 const char *SCTimbreTest::kindLabel(int kind)
 {

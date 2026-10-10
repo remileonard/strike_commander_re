@@ -9,6 +9,7 @@ Reproduit la chaîne musicale du jeu, chaque étage étant porté depuis le code
 | Partie voix du pilote AdLib (16 voix → 9 canaux OPL2, priorités, timbres OPL simples et TVFX) | 120 Hz (TVFX à 60 Hz) | `ADLIB.ADV` lu dans `analysis/adlib_driver_source/adlib.asm` | `librealspace/AILAdlibDriver.cpp` |
 | Tables du pilote (F-Number, octaves, vélocité, registres initiaux, contrôleurs par défaut) | — | extraites du binaire `ADLIB.ADV` | `librealspace/AILAdlibTables.h` (généré par `tools/gen_adlib_tables.py`) |
 | Données d'un jeu de musique (`COMBAT.DAT` + pistes de `COMBAT.ADL`) et bibliothèque de timbres `STRIKE.AD` | — | `AudioQueue_LoadTrackTable_AACA6`, `AudioQueue_LoadTransitionTable_AAFA0`, `Music_LoadTimbreFromLibrary_5A577` | `librealspace/SCMusicSet.cpp` |
+| Constantes MIDI / XMIDI (types de message, contrôleurs avec les noms d'`AIL.INC`, évènements meta) | — | `analysis/ail_sources/AIL.INC` | `librealspace/AILMidi.h` |
 | Test des timbres (liste, jouer, Note Off) | — | `Music_InstallTimbre_5A62A` | `librealspace/SCTimbreTest.cpp` |
 | Archive indexée + LZW (lecteur autonome seulement) | — | `IndexedRecordReader_*` (seg196), `LZW_Decompress_66068` (seg197) | `src/SCArchive.cpp` |
 
