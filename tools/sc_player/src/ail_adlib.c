@@ -512,6 +512,15 @@ void adl_shutdown(AdlDriver *d)
     memset(d->c_data, 0, sizeof(d->c_data));
 }
 
+void adl_kill_all(AdlDriver *d)
+{
+    for (int v = 0; v < ADL_VOICES; v++) {
+        if (!d->v_state[v]) continue;
+        release_opl(d, v);
+        d->v_state[v] = 0;
+    }
+}
+
 int adl_active_voices(const AdlDriver *d)
 {
     int n = 0;

@@ -49,6 +49,39 @@ L'interface propose un bouton par piste, libellé avec l'événement du jeu qui 
 (`analysis/MUSIC_SYSTEM.md` §5.5). Elle affiche l'état du séquenceur, la mesure, la piste de reprise
 et la dernière résolution de liaison.
 
+## Test des timbres (TVFX)
+
+L'onglet « Test des timbres (TVFX) » liste les timbres de `STRIKE.AD`, avec un filtre par banque et
+une case « TVFX seulement ». Le bouton « Jouer » envoie au pilote ce qu'enverrait une séquence XMIDI,
+sur le canal MIDI 9 : contrôleur 114 (banque), programme (patch), puis Note On. « Stop » envoie le
+Note Off. `--timbre-tab` ouvre directement cet onglet.
+
+Mode sans fenêtre :
+
+```sh
+./build/sc_player --sound SOUND --timbre-wav tvfx.wav            # tous les TVFX, l'un après l'autre
+./build/sc_player --sound SOUND --timbre-wav b65.wav --bank 65   # une seule banque
+./build/sc_player --sound SOUND --timbre-wav tout.wav --all      # aussi les timbres OPL simples
+```
+
+Règles de lecture dans ce mode :
+- un TVFX qui a sa propre durée joue en entier, sans Note Off ;
+- un effet en boucle (durée supérieure à 8 s) reçoit un Note Off à 8 s ;
+- un timbre tenu (OPL simple, ou TVFX de durée 0xFFFF) reçoit un Note Off à 1,5 s ;
+- le journal indique quand chaque voix se libère.
+
+Ce qu'on observe sur le vrai `STRIKE.AD` :
+- **Les 87 TVFX sont tous en banque 65, tous de type 2** (fréquence absolue).
+- **21 sont des effets en boucle**, d'une durée de 20 à 1 000 s.
+- **86 se libèrent seuls.** Le pilote ne libère une voix TVFX que lorsque ses deux niveaux passent
+  sous 0x400.
+- **Le patch 0 ne se libère jamais.** Sa courbe de relâchement baisse le niveau une seule fois,
+  puis le tient pour 65 532 ticks. Le jeu arrête un effet par `SoundFX_StopEffect_59A8A`, puis
+  `Music_ChannelStopSequence_59F1D`, ce qui n'envoie que des Note Off. Ce timbre continue donc de
+  sonner tant qu'une voix plus prioritaire ne lui prend pas son canal OPL.
+- Le bouton « Silence total » coupe toutes les voix. **Il n'existe pas dans le pilote** :
+  c'est un outil de test (`adl_kill_all`).
+
 ## Tests (sans les fichiers du jeu)
 
 ```sh

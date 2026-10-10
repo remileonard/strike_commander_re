@@ -12,7 +12,10 @@
  *   sc_player [--sound DIR] [--tune N]                      interface graphique
  *   sc_player [--sound DIR] --wav out.wav --seconds S [--tune N] [--at T:N ...]
  *       rendu sans fenetre ; --at 12.5:16 demande la piste 0x10 a t = 12,5 s ; --at 20:stop arrete avec fondu
- *   --screenshot fichier.bmp : enregistre la fenetre apres 2 s et quitte
+ *   --screenshot fichier.bmp : enregistre la fenetre apres 2 s et quitte ; --timbre-tab : ouvre le test des timbres
+ *   sc_player [--sound DIR] --timbre-wav out.wav [--bank N] [--all]
+ *       test des timbres sans fenetre : joue a la suite chaque timbre TVFX de STRIKE.AD
+ *       (--all : aussi les timbres OPL simples ; --bank : une seule banque)
  */
 #include <SDL.h>
 #include <cstdio>
@@ -31,6 +34,7 @@ extern "C" {
 #include "ail_xmidi.h"
 #include "sc_data.h"
 #include "sc_music.h"
+#include "sc_timbre_test.h"
 }
 
 static const int RATE = 44100;
@@ -140,18 +144,24 @@ static const char *state_label(int s)
     return (s >= 0 && s < 4) ? n[s] : "?";
 }
 
-static int wav_mode(const char *path, double seconds, int tune, const std::vector<std::pair<double, int>> &at)
+static void wav_header(FILE *f, uint32_t total)
 {
-    FILE *f = fopen(path, "wb");
-    if (!f) { fprintf(stderr, "impossible d'ecrire %s\n", path); return 1; }
-    uint32_t total = (uint32_t)(seconds * RATE);
     uint32_t bytes = total * 4;
     uint8_t h[44] = { 'R','I','F','F' };
     auto w32 = [&](int o, uint32_t v) { h[o] = v & 255; h[o+1] = (v >> 8) & 255; h[o+2] = (v >> 16) & 255; h[o+3] = v >> 24; };
     auto w16 = [&](int o, uint16_t v) { h[o] = v & 255; h[o+1] = v >> 8; };
     w32(4, 36 + bytes); memcpy(h + 8, "WAVEfmt ", 8); w32(16, 16); w16(20, 1); w16(22, 2);
     w32(24, RATE); w32(28, RATE * 4); w16(32, 4); w16(34, 16); memcpy(h + 36, "data", 4); w32(40, bytes);
+    fseek(f, 0, SEEK_SET);
     fwrite(h, 1, 44, f);
+}
+
+static int wav_mode(const char *path, double seconds, int tune, const std::vector<std::pair<double, int>> &at)
+{
+    FILE *f = fopen(path, "wb");
+    if (!f) { fprintf(stderr, "impossible d'ecrire %s\n", path); return 1; }
+    uint32_t total = (uint32_t)(seconds * RATE);
+    wav_header(f, total);
     sc_music_request(&g.music, tune);
     std::vector<int16_t> buf(2 * 1024);
     size_t next = 0;
@@ -182,9 +192,67 @@ static int wav_mode(const char *path, double seconds, int tune, const std::vecto
     return 0;
 }
 
+static const int TEST_CHAN = 8;      /* canal MIDI 9 : accepte par le pilote (1..9), pas le canal 10 des percussions */
+static const int TEST_NOTE = 60;
+
+static std::vector<ScTimbreInfo> timbre_list()
+{
+    std::vector<ScTimbreInfo> v(512);
+    v.resize((size_t)sc_timbre_list(&g.data, v.data(), (int)v.size()));
+    return v;
+}
+
+/* --timbre-wav : chaque timbre joue jusqu'a la liberation de sa voix ; voir les commentaires de la boucle. */
+static int timbre_wav_mode(const char *path, int bank, bool all)
+{
+    FILE *f = fopen(path, "wb");
+    if (!f) { fprintf(stderr, "impossible d'ecrire %s\n", path); return 1; }
+    wav_header(f, 0);
+    std::vector<int16_t> buf(2 * 441);
+    uint32_t total = 0;
+    auto run = [&](double sec) { for (int k = 0; k < (int)(sec * 100); k++) { render(buf.data(), 441); fwrite(buf.data(), 4, 441, f); total += 441; } };
+    for (const ScTimbreInfo &t : timbre_list()) {
+        if (bank >= 0 && t.bank != bank) continue;
+        if (!all && t.kind != TIMBRE_TVFX_NOTE && t.kind != TIMBRE_TVFX_ABS) continue;
+        fprintf(stderr, "t=%7.2f s : banque %3d patch %3d, %s, longueur %d", total / (double)RATE, t.bank, t.patch,
+                sc_timbre_kind_label(t.kind), t.length);
+        if (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS)
+            fprintf(stderr, ", duree %s", t.duration == 0xFFFF ? "jusqu'au Note Off" : (std::to_string((t.duration + 1) / 60.0).substr(0, 4) + " s").c_str());
+        fprintf(stderr, "\n");
+        sc_timbre_play(&g.adl, &t, TEST_CHAN, TEST_NOTE, 127);
+        /* TVFX a duree propre : il passe seul en relachement, pas de Note Off.
+         * Timbre tenu (OPL simple, TVFX type 1, duree 0xFFFF) : Note Off a 1,5 s. */
+        bool own = (t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS) && t.duration != 0xFFFF;
+        double own_len = own ? (t.duration + 1) / 60.0 : 0;
+        double off_at = !own ? 1.5 : (own_len > 8.0 ? 8.0 : 1e9);   /* effet en boucle : Note Off a 8 s */
+        double limit = (own && own_len <= 8.0 ? own_len : off_at) + 4.0;
+        if (own && own_len > 8.0) fprintf(stderr, "            effet long (%.0f s) : Note Off a 8 s\n", own_len);
+        double el = 0;
+        bool off = false;
+        while (el < limit) {
+            run(0.05); el += 0.05;
+            if (!off && el >= off_at) { sc_timbre_stop(&g.adl, TEST_CHAN, TEST_NOTE); off = true; }
+            if (adl_active_voices(&g.adl) == 0) break;
+        }
+        if (adl_active_voices(&g.adl)) {
+            fprintf(stderr, "            voix toujours active apres %.1f s : relachement sans fin, coupee par le test\n", limit);
+            adl_kill_all(&g.adl);
+        } else {
+            fprintf(stderr, "            voix liberee a %.2f s\n", el);
+        }
+        run(0.3);
+    }
+    wav_header(f, total);
+    fclose(f);
+    fprintf(stderr, "%s ecrit (%.1f s)\n", path, total / (double)RATE);
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
-    std::string dir, wav, shot;
+    std::string dir, wav, shot, timbre_wav;
+    int test_bank = -1;
+    bool test_all = false, open_timbre_tab = false;
     double seconds = 30;
     int tune = 4;
     std::vector<std::pair<double, int>> at;
@@ -193,6 +261,10 @@ int main(int argc, char **argv)
         if (a == "--sound" && i + 1 < argc) dir = argv[++i];
         else if (a == "--wav" && i + 1 < argc) wav = argv[++i];
         else if (a == "--screenshot" && i + 1 < argc) shot = argv[++i];
+        else if (a == "--timbre-wav" && i + 1 < argc) timbre_wav = argv[++i];
+        else if (a == "--bank" && i + 1 < argc) test_bank = (int)strtol(argv[++i], nullptr, 0);
+        else if (a == "--all") test_all = true;
+        else if (a == "--timbre-tab") open_timbre_tab = true;
         else if (a == "--seconds" && i + 1 < argc) seconds = atof(argv[++i]);
         else if (a == "--tune" && i + 1 < argc) tune = (int)strtol(argv[++i], nullptr, 0);
         else if (a == "--at" && i + 1 < argc) {
@@ -207,7 +279,11 @@ int main(int argc, char **argv)
     fprintf(stderr, "combat.dat : %d pistes, %d entrees de liaison ; combat.adl : %d pistes de liaison\n",
             g.data.track_count, g.data.link_entry_count, g.data.link_track_count);
     engine_init();
+    if (!timbre_wav.empty()) return timbre_wav_mode(timbre_wav.c_str(), test_bank, test_all);
     if (!wav.empty()) return wav_mode(wav.c_str(), seconds, tune, at);
+    std::vector<ScTimbreInfo> timbres = timbre_list();
+    static bool tvfx_only = true;
+    static int filt_bank = -1, test_note = TEST_NOTE, test_vel = 127, playing = -1;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) { fprintf(stderr, "SDL_Init : %s\n", SDL_GetError()); return 1; }
     SDL_Window *win = SDL_CreateWindow("Strike Commander - musique", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -242,6 +318,8 @@ int main(int argc, char **argv)
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGui::Begin("player", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
+        if (ImGui::BeginTabBar("tabs")) {
+        if (ImGui::BeginTabItem("Musique")) {
         SDL_LockAudioDevice(dev);
         ScMusic snap = g.music;
         int measure = sc_music_measure(&g.music);
@@ -279,12 +357,82 @@ int main(int argc, char **argv)
         if (ImGui::Button("Arret avec fondu (1 s)", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 1); SDL_UnlockAudioDevice(dev); }
         ImGui::SameLine();
         if (ImGui::Button("Arret immediat", ImVec2(220, 30))) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 0); SDL_UnlockAudioDevice(dev); }
+        ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Test des timbres (TVFX)", nullptr,
+                                (open_timbre_tab && frame < 2) ? ImGuiTabItemFlags_SetSelected : 0)) {
+            ImGui::TextWrapped("Joue un timbre de STRIKE.AD par le pilote, comme une sequence XMIDI : controleur 114 "
+                               "(banque), programme (patch), Note On sur le canal MIDI %d. Les TVFX de type 2 ont une "
+                               "frequence absolue (la note est ignoree) et une duree propre ; le type 1 et les timbres OPL "
+                               "simples tiennent jusqu'au Note Off.", TEST_CHAN + 1);
+            if (ImGui::Button("Arreter la musique")) { SDL_LockAudioDevice(dev); sc_music_stop(&g.music, 0); SDL_UnlockAudioDevice(dev); }
+            ImGui::SameLine();
+            if (ImGui::Button("Silence total (outil de test)")) { SDL_LockAudioDevice(dev); adl_kill_all(&g.adl); playing = -1; SDL_UnlockAudioDevice(dev); }
+            if (ImGui::IsItemHovered())
+                ImGui::SetTooltip("N'existe pas dans le pilote : coupe toutes les voix. Certains TVFX ont une courbe de\n"
+                                  "relachement qui tient le niveau ; le pilote ne les libere que sous 0x400.");
+            ImGui::SameLine(); ImGui::Checkbox("TVFX seulement", &tvfx_only);
+            ImGui::SameLine(); ImGui::SetNextItemWidth(120); ImGui::InputInt("banque (-1 = toutes)", &filt_bank);
+            ImGui::SetNextItemWidth(200); ImGui::SliderInt("note", &test_note, 0, 127);
+            ImGui::SameLine(); ImGui::SetNextItemWidth(200); ImGui::SliderInt("velocite", &test_vel, 1, 127);
+            SDL_LockAudioDevice(dev);
+            int nv = adl_active_voices(&g.adl);
+            std::string vinfo;
+            for (int v = 0; v < ADL_VOICES; v++) {
+                if (!g.adl.v_state[v]) continue;
+                char b[96];
+                snprintf(b, sizeof b, "[v%d %s can.MIDI %d OPL %d niv %d/%d] ", v, g.adl.v_state[v] == 2 ? "relache" : "joue",
+                         g.adl.v_chan[v] + 1, g.adl.v_opl[v] == 0xFF ? -1 : g.adl.v_opl[v],
+                         g.adl.p_val[1][v] >> 10, g.adl.p_val[2][v] >> 10);
+                vinfo += b;
+            }
+            SDL_UnlockAudioDevice(dev);
+            ImGui::TextWrapped("Voix actives : %d  %s", nv, vinfo.c_str());
+            ImGui::Separator();
+            if (ImGui::BeginTable("timbres", 6, ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY | ImGuiTableFlags_Borders)) {
+                ImGui::TableSetupColumn("Banque"); ImGui::TableSetupColumn("Patch"); ImGui::TableSetupColumn("Type");
+                ImGui::TableSetupColumn("Longueur"); ImGui::TableSetupColumn("Duree"); ImGui::TableSetupColumn("");
+                ImGui::TableHeadersRow();
+                for (size_t i = 0; i < timbres.size(); i++) {
+                    const ScTimbreInfo &t = timbres[i];
+                    bool tv = t.kind == TIMBRE_TVFX_NOTE || t.kind == TIMBRE_TVFX_ABS;
+                    if (tvfx_only && !tv) continue;
+                    if (filt_bank >= 0 && t.bank != filt_bank) continue;
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn(); ImGui::Text("%d", t.bank);
+                    ImGui::TableNextColumn(); ImGui::Text("%d", t.patch);
+                    ImGui::TableNextColumn(); ImGui::Text("%s", sc_timbre_kind_label(t.kind));
+                    ImGui::TableNextColumn(); ImGui::Text("%d", t.length);
+                    ImGui::TableNextColumn();
+                    if (tv) { if (t.duration == 0xFFFF) ImGui::Text("Note Off"); else ImGui::Text("%.2f s", (t.duration + 1) / 60.0); }
+                    ImGui::TableNextColumn();
+                    char b1[32], b2[32];
+                    snprintf(b1, sizeof b1, "Jouer##p%zu", i); snprintf(b2, sizeof b2, "Stop##s%zu", i);
+                    if (ImGui::SmallButton(b1)) {
+                        SDL_LockAudioDevice(dev);
+                        if (playing >= 0) sc_timbre_stop(&g.adl, TEST_CHAN, playing);
+                        sc_timbre_play(&g.adl, &t, TEST_CHAN, test_note, test_vel);
+                        playing = test_note;
+                        SDL_UnlockAudioDevice(dev);
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::SmallButton(b2) && playing >= 0) {
+                        SDL_LockAudioDevice(dev); sc_timbre_stop(&g.adl, TEST_CHAN, playing); playing = -1; SDL_UnlockAudioDevice(dev);
+                    }
+                }
+                ImGui::EndTable();
+            }
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+        }
         ImGui::End();
         ImGui::Render();
         SDL_SetRenderDrawColor(ren, 20, 20, 25, 255);
         SDL_RenderClear(ren);
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), ren);
-        if (!shot.empty() && ++frame == 120) {           /* --screenshot : capture apres ~2 s */
+        frame++;
+        if (!shot.empty() && frame == 120) {             /* --screenshot : capture apres ~2 s */
             int w, h;
             SDL_GetRendererOutputSize(ren, &w, &h);
             SDL_Surface *sf = SDL_CreateRGBSurfaceWithFormat(0, w, h, 32, SDL_PIXELFORMAT_ARGB8888);

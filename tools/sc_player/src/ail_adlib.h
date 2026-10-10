@@ -73,5 +73,9 @@ void adl_serve(AdlDriver *d);                                    /* serve_synth,
 int  adl_timbre_status(AdlDriver *d, int bank, int patch);       /* 0 si absent */
 void adl_install_timbre(AdlDriver *d, int bank, int patch, const uint8_t *data); /* fn 0x9C */
 int  adl_active_voices(const AdlDriver *d);
+/* OUTIL DE TEST, absent du pilote : coupe toutes les voix (key off) et les libere.
+ * Necessaire pour les TVFX dont la courbe de relachement tient le niveau : le pilote
+ * ne libere une voix TVFX que lorsque ses deux niveaux passent sous 0x400. */
+void adl_kill_all(AdlDriver *d);
 
 #endif

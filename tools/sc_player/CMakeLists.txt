@@ -24,7 +24,8 @@ target_include_directories(nuked_opl3 PUBLIC ${NUKED_DIR})
 
 # Coeur reutilisable (sans SDL ni ImGui) : c'est ce qu'il faut reprendre dans libRealSpace.
 add_library(sc_music_core STATIC
-    src/sc_archive.c src/sc_data.c src/ail_adlib.c src/ail_xmidi.c src/sc_music.c)
+    src/sc_archive.c src/sc_data.c src/ail_adlib.c src/ail_xmidi.c src/sc_music.c
+    src/sc_timbre_test.c)
 target_include_directories(sc_music_core PUBLIC src)
 if(NOT MSVC)
   target_compile_options(sc_music_core PRIVATE -Wall -Wextra)
