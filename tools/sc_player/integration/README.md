@@ -41,19 +41,26 @@ Ce sont les versions de `RSMusic` et `RSMixer` de libRealSpace qui utilisent le 
   - le son est rendu à la fréquence que renvoie `Mix_QuerySpec`. Les formats S16 et F32 sont gérés, en mono ou en stéréo.
 - `setVolume(v, -1)` applique le gain dans le crochet, car `Mix_VolumeMusic` n'agit pas sur `Mix_HookMusic`.
 - Les VOC (`playSoundVoc`, `stopSound`…) ne changent pas.
-- Une seule musique joue à la fois : `playMusic` arrête la musique de combat, et l'inverse.
-- `playMusic(mus, loop)` : -1 = sans fin, n = n fois. Les pistes principales bouclent d'elles-mêmes (FOR/NEXT XMIDI).
-- Fonctions ajoutées :
-  - `requestCombatTune(tune, set = 0)` : `Music_RequestTune_5A984`. Le changement attend la barre de mesure suivante, puis passe par la piste de liaison donnée par COMBAT.DAT.
-  - `stopCombatMusic(fade = true)` : `Music_StopWithFade_AB1EF`.
-  - `getCombatTune()` : piste de combat courante, -1 si arrêt.
-  - `setEnemyNear(bool)` : choix de la piste de reprise après la piste 8.
-  - `playSoundFx(mus, volume)`, `setSoundFxVolume`, `stopSoundFx`, `isSoundFxPlaying` :
-    - effets XMIDI sur 5 canaux, comme le jeu (`SoundFX_FindFreeChannel_598A6`) ;
-    - volume en pourcentage : le jeu donne `100 − distance/10` (`SoundFX_Play3D_59902`) ;
-    - `stopSoundFx` n'envoie que des Note Off, comme `SoundFX_StopEffect_59A8A`.
+- **RSMixer ne connaît pas les évènements de combat.** Il joue la piste demandée, avec la
+  transition du `.dat` si elle existe :
+  - `playMusic(index)` dans une banque qui a un `.dat` (banque 2 = COMBAT.ADL + COMBAT.DAT,
+    déclarée dans `RSMusic::music_sets`) : le changement attend la barre de mesure suivante, puis passe
+    par la piste de liaison que donne COMBAT.DAT (`Music_RequestTune_5A984`). `loop` est ignoré :
+    les pistes bouclent d'elles-mêmes (FOR/NEXT XMIDI) ;
+  - `playMusic(index, loop)` dans une autre banque : la piste joue seule. -1 = sans fin, n = n fois ;
+  - `playMusic(MemMusic*, loop)` : même règle, selon que la piste appartient ou non à une banque avec `.dat` ;
+  - `stopMusic(fade = false)` : `fade` = fondu d'une seconde (`Music_StopWithFade_AB1EF`) ;
+  - `getMusicID()` : la piste qui joue réellement, par exemple la piste de reprise après une ponctuation.
+  
+  Choisir la piste selon la situation (ennemi proche, dégâts, éjection…) reste le travail du code de jeu
+  de libRealSpace (`analysis/MUSIC_SYSTEM.md` §5).
+- Une seule musique joue à la fois.
+- Effets XMIDI : `playSoundFx(mus, volume)`, `setSoundFxVolume`, `stopSoundFx`, `isSoundFxPlaying` :
+  - 5 canaux, comme le jeu (`SoundFX_FindFreeChannel_598A6`) ;
+  - volume en pourcentage : le jeu donne `100 − distance/10` (`SoundFX_Play3D_59902`) ;
+  - `stopSoundFx` n'envoie que des Note Off, comme `SoundFX_StopEffect_59A8A`.
 - Le rendu tourne dans le fil audio. Toutes les fonctions prennent `engineMutex`.
-- Le pilote gère 8 séquences : 1 piste isolée, 2 pour la musique de combat (piste principale et liaison), et 5 effets.
+- Le pilote gère 8 séquences : 1 piste isolée, 2 pour le séquenceur (piste principale et liaison), et 5 effets.
 
 ## Test
 
@@ -62,6 +69,6 @@ integration/test/run.sh /chemin/SOUND build
 ```
 
 Le test compile `RSMusic` et `RSMixer` avec des substituts d'`AssetManager`, de `PakArchive` et de
-`SDL_mixer_ext` (`test/stubs/`). Il appelle le crochet audio sur 60 s de musique de combat, avec les demandes
-4 → 0x10 → 9 → 0x13 puis un arrêt avec fondu. Il compare ensuite le résultat au WAV de `sc_player`
+`SDL_mixer_ext` (`test/stubs/`). Il passe en banque 2, appelle `playMusic` avec 4 → 0x10 → 9 → 0x13, puis
+`stopMusic(true)`, et fait tourner le crochet audio sur 60 s. Il compare ensuite le résultat au WAV de `sc_player`
 dans le même scénario : **les deux sont identiques octet pour octet** sur les vrais fichiers (2026-10-10).

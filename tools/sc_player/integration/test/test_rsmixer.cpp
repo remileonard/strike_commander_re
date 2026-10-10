@@ -27,7 +27,8 @@ int main(int, char **argv) {
         { 55,
           -1 }
     };
-    m.requestCombatTune(4);
+    m.switchBank(2); // COMBAT.ADL : pistes avec transitions (COMBAT.DAT)
+    m.playMusic(4);
     size_t next = 0;
     const int RATE = 44100;
     uint32_t total = 60 * RATE;
@@ -36,9 +37,9 @@ int main(int, char **argv) {
         double t = (double)pos / RATE;
         while (next < 4 && at[next].t <= t) {
             if (at[next].tune < 0) {
-                m.stopCombatMusic(true);
+                m.stopMusic(true);
             } else {
-                m.requestCombatTune(at[next].tune);
+                m.playMusic((uint32_t)at[next].tune);
             }
             next++;
         }
@@ -47,11 +48,12 @@ int main(int, char **argv) {
         fwrite(buf, 4, n, f);
         pos += n;
         if (pos % (RATE * 10) < 1024) {
-            printf("t=%.0f combat tune %d\n", t, m.getCombatTune());
+            printf("t=%.0f piste %d\n", t, (int)m.getMusicID());
         }
     }
     fclose(f);
     // piste isolee + effet
+    m.switchBank(0); // banque sans .dat : piste jouee seule
     m.playMusic(mu->combat_musics[0][19], 1);
     int fx = m.playSoundFx(mu->soundfx_musics[0][30], 50);
     int pk = 0;
@@ -64,7 +66,6 @@ int main(int, char **argv) {
     printf("crete piste isolee + effet : %d\n", pk);
     m.stopMusic();
     m.stopSoundFx(fx);
-    m.stopCombatMusic(false);
     pk = 0;
     for (int k = 0; k < 50; k++) {
         g_hook(g_hookArg, (Uint8 *)buf, 4096);

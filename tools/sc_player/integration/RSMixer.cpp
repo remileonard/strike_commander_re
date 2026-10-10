@@ -71,9 +71,6 @@ void RSMixer::init() {
         });
         xmi.init(&adl);
         sequencer.init(&xmi, &this->music->timbres);
-        if (!this->music->combat_sets.empty()) {
-            sequencer.setMusicSet(&this->music->combat_sets[0]);
-        }
     }
     Mix_HookMusic(RSMixer::musicHook, this);
     Mix_ChannelFinished(ChannelFinishedCallback);
@@ -213,6 +210,10 @@ void RSMixer::render(int16_t *out, int frames) {
         if (accGame >= 1.0) {
             accGame -= 1.0;
             sequencer.tick();
+            if (sequenced && !sequencer.active()) {
+                sequenced = false; // arret (fondu termine)
+                isplaying = false;
+            }
         }
         if (accDriver >= 1.0) {
             accDriver -= 1.0;
@@ -234,11 +235,31 @@ void RSMixer::stopMusicLocked() {
     this->isplaying = false;
 }
 
+// Banque avec un .dat : la piste est demandee au sequenceur, qui attend la barre de mesure
+// et joue la piste de liaison du .dat avant de passer a la piste demandee.
+void RSMixer::playSequenced(const SCMusicSet *set, uint32_t index) {
+    std::lock_guard<std::recursive_mutex> lock(engineMutex);
+    if (musicHandle >= 0) {
+        stopMusicLocked();
+    }
+    sequencer.setMusicSet(set); // arrete la musique si le jeu de pistes change
+    sequencer.request((int)index);
+    this->sequenced = true;
+    this->isplaying = true;
+    this->current_music = index;
+    this->currentMusicMemPtr = this->music->GetMusic(index);
+}
+
 void RSMixer::playMusic(uint32_t index, int loop) {
-    if (this->isplaying && this->current_music == index) {
+    if (shuttingDown || !this->music) {
         return;
     }
-    if (shuttingDown || !this->music) {
+    const SCMusicSet *set = this->music->GetMusicSet();
+    if (set != nullptr && (int)index < set->trackCount) {
+        playSequenced(set, index);
+        return;
+    }
+    if (this->isplaying && !this->sequenced && this->current_music == index) {
         return;
     }
     MemMusic *mus = this->music->GetMusic(index);
@@ -254,17 +275,30 @@ void RSMixer::playMusic(uint32_t index, int loop) {
 }
 
 void RSMixer::playMusic(MemMusic *mus, int loop) {
-    if (this->isplaying && this->currentMusicMemPtr == mus) {
+    if (shuttingDown || !this->music || !mus) {
+        return;
+    }
+    const SCMusicSet *set = this->music->GetMusicSet();
+    if (set != nullptr) {
+        auto it = this->music->musics.find(this->music->bank);
+        if (it != this->music->musics.end()) {
+            for (size_t i = 0; i < it->second.size(); i++) {
+                if (it->second[i] == mus) {
+                    playMusic((uint32_t)i, loop);
+                    return;
+                }
+            }
+        }
+    }
+    if (this->isplaying && !this->sequenced && this->currentMusicMemPtr == mus) {
         return;
     }
     std::lock_guard<std::recursive_mutex> lock(engineMutex);
     stopMusicLocked();
     sequencer.stop(false); // une seule musique a la fois, comme le jeu
+    this->sequenced = false;
     this->currentMusicMemPtr = mus;
     this->current_music = UINT32_MAX;
-    if (!mus || shuttingDown || !this->music) {
-        return;
-    }
     int err = 0;
     musicHandle = SCMusicSequencer::registerAndStart(&xmi, &this->music->timbres, mus->data, mus->size, &err);
     if (musicHandle < 0) {
@@ -275,55 +309,26 @@ void RSMixer::playMusic(MemMusic *mus, int loop) {
     this->isplaying = true;
 }
 
-void RSMixer::stopMusic() {
+void RSMixer::stopMusic(bool fade) {
     if (shuttingDown) {
         return;
     }
     std::lock_guard<std::recursive_mutex> lock(engineMutex);
     stopMusicLocked();
-    sequencer.stop(false);
-    this->currentMusicMemPtr = nullptr;
-    this->current_music = UINT32_MAX;
-}
-
-// ---------------------------------------------------------------------------------------
-// Musique de combat
-// ---------------------------------------------------------------------------------------
-
-void RSMixer::requestCombatTune(int tune, int set) {
-    if (shuttingDown || !this->music) {
-        return;
-    }
-    if (set < 0 || set >= (int)this->music->combat_sets.size()) {
-        printf("RSMixer: no combat music set %d\n", set);
-        return;
-    }
-    std::lock_guard<std::recursive_mutex> lock(engineMutex);
-    if (musicHandle >= 0) {
-        stopMusicLocked();
-    }
-    this->currentMusicMemPtr = nullptr;
-    this->current_music = UINT32_MAX;
-    sequencer.setMusicSet(&this->music->combat_sets[(size_t)set]); // arrete si le jeu change
-    sequencer.request(tune);
-}
-
-void RSMixer::stopCombatMusic(bool fade) {
-    if (shuttingDown) {
-        return;
-    }
-    std::lock_guard<std::recursive_mutex> lock(engineMutex);
     sequencer.stop(fade);
+    if (!fade) {
+        this->sequenced = false;
+    }
+    this->currentMusicMemPtr = nullptr;
+    this->current_music = UINT32_MAX;
 }
 
-int RSMixer::getCombatTune() {
+uint32_t RSMixer::getMusicID() {
     std::lock_guard<std::recursive_mutex> lock(engineMutex);
-    return sequencer.requested == 0xFFFF ? -1 : sequencer.current;
-}
-
-void RSMixer::setEnemyNear(bool near) {
-    std::lock_guard<std::recursive_mutex> lock(engineMutex);
-    sequencer.enemyNear = near ? 1 : 0;
+    if (this->sequenced) {
+        return sequencer.active() ? (uint32_t)sequencer.current : UINT32_MAX;
+    }
+    return this->isplaying ? this->current_music : UINT32_MAX;
 }
 
 // ---------------------------------------------------------------------------------------

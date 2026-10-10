@@ -64,6 +64,9 @@ void RSMusic::init() {
     }
 
     loadCombat();
+    if (!combat_sets.empty()) {
+        music_sets[2] = &combat_sets[0]; // musics[2] = pistes principales de COMBAT.ADL
+    }
     loadSoundFx();
 
     TreEntry *lib = assetManager.GetEntryByName("..\\..\\DATA\\SOUND\\STRIKE.AD");
@@ -190,4 +193,12 @@ MemMusic *RSMusic::GetMusic(uint32_t index) {
         return NULL;
     }
     return musics[bank][index];
+}
+
+SCMusicSet *RSMusic::GetMusicSet() {
+    auto it = music_sets.find(bank);
+    if (it == music_sets.end()) {
+        return NULL;
+    }
+    return it->second;
 }

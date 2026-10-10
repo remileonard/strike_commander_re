@@ -54,7 +54,9 @@ class RSMixer {
 
     static void musicHook(void *udata, Uint8 *stream, int len);
     void render(int16_t *out, int frames); // appele sous engineMutex
+    bool sequenced{ false };               // la musique courante passe par le sequenceur (banque avec .dat)
     void stopMusicLocked();
+    void playSequenced(const SCMusicSet *set, uint32_t index);
     void serveDriver();
 
 public:
@@ -69,24 +71,19 @@ public:
     RSMixer();
     ~RSMixer();
     void init();
-    // Piste isolee (AMUSIC, GAMEFLOW...). loop : -1 = sans fin, n >= 1 = n fois (0 = une fois).
+    // Joue la piste index de la banque courante.
+    // - Banque avec un .dat (COMBAT.ADL + COMBAT.DAT) : le changement de piste attend la barre
+    //   de mesure suivante et passe par la piste de liaison que donne le .dat, s'il y en a une
+    //   (Music_RequestTune_5A984). loop est ignore : les pistes bouclent d'elles-memes.
+    // - Autre banque : piste jouee seule. loop : -1 = sans fin, n >= 1 = n fois (0 = une fois).
     void playMusic(uint32_t index, int loop = 1);
+    // Meme chose ; si mus appartient a une banque avec un .dat, il passe par les transitions.
     void playMusic(MemMusic *mus, int loop = 1);
     void switchBank(uint8_t bank);
-    void stopMusic();
-    uint32_t getMusicID() {
-        return this->current_music;
-    };
-
-    // Musique de combat (sequenceur du jeu sur COMBAT.ADL / COMBAT.DAT) :
-    // Music_RequestTune_5A984. Le changement attend la barre de mesure suivante et passe par
-    // une piste de liaison si COMBAT.DAT en donne une. set = jeu de COMBAT.ADL (0 en general).
-    void requestCombatTune(int tune, int set = 0);
-    // Music_StopWithFade_AB1EF (fade = fondu d'une seconde)
-    void stopCombatMusic(bool fade = true);
-    int getCombatTune(); // piste courante, -1 si arret
-    // byte_7086A bit 0 : choix de la reprise apres la piste 8 (avion ennemi proche)
-    void setEnemyNear(bool near);
+    // fade : fondu d'une seconde (Music_StopWithFade_AB1EF), sinon arret immediat
+    void stopMusic(bool fade = false);
+    // Piste en train de jouer (apres une transition), UINT32_MAX si aucune
+    uint32_t getMusicID();
 
     // Effets XMIDI (SOUNDFX.ADL) : 5 canaux comme le jeu. volume en pourcentage (0..100,
     // SoundFX_Play3D_59902 : 100 - distance/10). Renvoie le canal, -1 si aucun libre.

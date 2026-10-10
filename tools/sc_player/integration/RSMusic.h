@@ -41,10 +41,14 @@ public:
 
     // Jeux de musique de COMBAT.ADL (le vrai fichier en contient un seul : combat_sets[0]).
     std::vector<SCMusicSet> combat_sets;
+    // Banques dont les pistes ont un .dat (transitions) : banque 2 -> combat_sets[0]
+    std::unordered_map<uint8_t, SCMusicSet *> music_sets;
     // STRIKE.AD : "strike." + suffixe "AD" du pilote ADLIB.ADV (Music_LoadTimbreFromLibrary_5A577)
     SCTimbreLibrary timbres;
 
     void init();
     void SwitchBank(uint8_t bank);
     MemMusic *GetMusic(uint32_t index);
+    // Jeu de pistes (.dat) de la banque courante, nullptr si elle n'en a pas
+    SCMusicSet *GetMusicSet();
 };
