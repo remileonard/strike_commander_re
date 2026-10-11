@@ -411,6 +411,12 @@ commandes de manche.
 
 ## Les actions confirmées des manœuvres `MVRS` (relu le 2026-09-25)
 
+> **Référence complète (2026-10-11)** : `MVRS_MANOEUVRES.html` décrit, manœuvre par manœuvre, le score, la
+> préparation, les phases, la fin et un schéma de vol, avec les points à vérifier dans `DebugStrike`.
+> Corrections apportées à cette occasion : le score d'ID 2 est nul pour un avion ; ID 1, 3 et 4 exigent
+> une cible de classe chasseur qui me pointe à moins de 20° (`word_72093` ≤ 20) ; `byte_720E1` est le
+> face-à-face proche (pas « moi dans ses 6 h ») ; minuteurs d'ID 5 et ID 6 = 5 s, remis à 10 s à chaque phase.
+
 Relecture de la loi de pilotage `AI_GuidanceSolution_Major` avec les vrais noms trigonométriques,
 puis lecture des méthodes d'application et de tick de chaque identifiant autre que 9 à 12. Les
 anciens noms qui décrivaient autre chose (interception, fusée de proximité, clairance
@@ -463,7 +469,7 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 | ID | Nom de la manœuvre | Déclenchement | Ce que fait le tick |
 |---|---|---|---|
 | 1 | Virage de réacquisition par jambes | tournoi | Jambes de 1 s (nœud ID20) : la 1re à ±30° du nez côté cible, puis −60° à chaque jambe ; fin quand la cible est à moins de 60° du nez, sans cible, ou après 4 jambes. **Bug d'origine** : le test d'alternance `test ax, 0` est toujours faux, les jambes tournent donc toujours du même côté. |
-| 2 | Dégagement (break) | tournoi (score 10 constant) | Côté choisi par le manche latéral du moment (> 3/16 → un côté, < −3/16 → l'autre, sinon au hasard) ; manche latéral à fond de ce côté, manche tiré à fond (ou poussé à moitié si l'avion est sur le dos par rapport à l'axe visé), jusqu'au minuteur. |
+| 2 | Dégagement (break) | tournoi, **jamais pour un avion** (score `MVRS_ID2_Score_3FCB` nul si `byte_720DF`, corrigé 2026-10-11) | Côté choisi par le manche latéral du moment (> 3/16 → un côté, < −3/16 → l'autre, sinon au hasard) ; manche latéral à fond de ce côté, manche tiré à fond (ou poussé à moitié si l'avion est sur le dos par rapport à l'axe visé), jusqu'au minuteur. |
 | 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (jambes de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (FL/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
 | 4 | Virage défensif | **alerte de menace**, hors tournoi (`entité+0xBD`) | Plein gaz, inclinaison 90° (60° si trop bas) côté cible, tiré à fond ; quand le cap a tourné de 90° ou minuteur écoulé : assiette +10°, fin. |
 | 5 | Montée verticale et retournement (type Immelmann) | tournoi | Reprise de vitesse (piqué −30° si très haut), à plat, assiette +90°, roulis pour mettre la cible dans le plan de portance, tirer jusqu'à 45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |

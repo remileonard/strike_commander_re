@@ -815,6 +815,14 @@ me vise à moins de 1800 m en rapprochement, `FL` ≥ 13 et jet de pilotage ; ve
 dégagement (ID2) = `unknown_vector` du `NUMS` ; garde au sol `entité+0xE1` prise telle quelle
 (≤ 5 m, déclenchement surtout par « sous le plancher en descente »).
 
+### Validé au banc de manœuvre (2026-10-11)
+
+Banc de `DebugStrike` (tick de la manœuvre seul, sans score ni tournoi). Corrigé dans `tickManeuver`
+(case 5/6) : minuteur remis à 10 s à chaque changement de phase (`loc_10AA1`, `loc_105B9`) ; ID 5 phase 3 =
+assiette 0 puis ailes à plat ; ID 5 phases 2 à 4 = gaz vers `JDYN+0x80`. Split-S (ID 6) et renversement
+vertical (ID 5) vont jusqu'à la phase 8 (≈ 8,5 s). Écarts mineurs restants pour ID 6 : zones mortes
+(phase 3 : 2°, phases 4, 7, 8 : 10°) et condition de fin de la phase 5. Référence : `MVRS_MANOEUVRES.html`.
+
 ## 9. Questions ouvertes (côté rétro-ingénierie, ne pas deviner)
 
 1. ~~Loi de pilotage~~ : complète (§7, relue le 2026-09-25). Reste le rôle des bits 7-8 de `flags_75` (état à 3 valeurs qui réduit le taux de roulis à 60 %) et la nature exacte de `JDYN+0x59`.

@@ -15,8 +15,13 @@ seg008		segment	byte public 'CODE' use16
 ; cible - moi ; positions dans 3 s (Physics_ApplyForceAtPoint, 0x300) ; word_72095 = angle
 ; nez->cible ; dword_720AB.. = vitesse cible, dword_720BB = sa norme ; word_72097 = angle
 ; entre ligne de visee et vitesse cible, word_72093 = 180 - celui-ci ; dword_7209B = distance
-; ; byte_720E0 = cible dans mon arriere (angle nez >= 100 et ...), byte_720E1 = je suis dans
-; ses 6 heures proche (angle nez <= 60, word_72093 < 60, distance < 3 x portee).
+; ; byte_720E0 = cible derriere moi : angle nez >= 100 et (word_720DD <= 80 ou (word_72093 <
+; 50 et proche)) ; byte_720E1 = FACE A FACE proche (corrige 2026-10-11, pas 'moi dans ses 6
+; h') : angle nez <= 60, word_72093 < 60 (sa vitesse pointe vers moi) et proche. 'Proche' =
+; distance < 3 x |vitesse de la cible projetee sur la ligne de visee|
+; (Targeting_ComputeGeometryHelperB_5517F). word_720DD = angle(mon nez, position relative dans
+; 3 s dword_720D1/D5/D9) ; word_72093 = 180 - angle(D, Vcible) : 0 = la cible fonce sur moi.
+; Detail par manoeuvre : analysis/MVRS_MANOEUVRES.html.
 ; ==============================================================================================
 MVRS_BuildCombatContext_E5A4	proc far		; CODE XREF: MVRS_SharedContextSyncAndID2Score_EC22+1Ep
 
@@ -671,10 +676,12 @@ MVRS_BuildCombatContext_E5A4	endp
 ; synchronise le noeud depuis un parametre de CONTEXTE PARTAGE externe (arg_4, structure a 3
 ; champs : [+0]=identifiant/reference, [+2]=pointeur optionnel vers un vecteur 3D, [+6]=une
 ; valeur scalaire), copiant ces donnees dans les champs du noeud (+0x13=reference via
-; SetReference, +0x15/+0x19/+0x1D=position ou zero, +0xD=scalaire). (2) Lorsqu'elle EST ELLE-
-; MEME la fonction de score directement enregistree (cas de MVRS ID=0x2, tag 0x28C), elle
-; retourne TOUJOURS 10 - aucune logique de score additionnelle. Le nom
-; 'Missile_FrameUpdateWrapper' herite du balayage initial reste approprie au role (1).
+; SetReference, +0x15/+0x19/+0x1D=position ou zero, +0xD=scalaire). (2) Elle renvoie toujours
+; 10 quand elle est elle-meme le score enregistre : c'est le cas de la classe de base (tag
+; 0x2A0), PAS de l'ID 2 (corrige 2026-10-11 : le score de l'ID 2, tag 0x28C, est
+; MVRS_ID2_Score_3FCB, table seg339 0x6D0B0 + 0x28C + 4 = off_6D340). Elle marque aussi le
+; noeud evalue (+0x0C = 1). Le nom 'Missile_FrameUpdateWrapper' herite du balayage initial
+; reste approprie au role (1).
 ; ==============================================================================================
 MVRS_SharedContextSyncAndID2Score_EC22	proc far		; CODE XREF: seg002:000DP seg002:0148P ...
 

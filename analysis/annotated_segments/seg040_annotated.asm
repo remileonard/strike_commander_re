@@ -66,14 +66,14 @@ TrackedObjects_CallSlot18OnActive_22F10	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,381L — vérifie de nombreux flags globaux d'état de mission (difficulté word_70466, flags
-; byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence
-; (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : évaluateur
-; de déclencheur d'événement scripté de mission (trigger de zone/proximité). | CORRIGE
-; 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut
-; de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem,
-; remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de
-; demarrage en frames. La difficulte est word_7235F
+; far,381L — vérifie de nombreux flags globaux d'état de mission (compteur d'images
+; word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de
+; référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies :
+; évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité). |
+; CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le
+; debut de la mission ('inc word_70466' une fois par frame dans
+; CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3,
+; > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F
 ; (PilotProfile_RescaleSkillByDifficulty_12FC9).
 ; ==============================================================================================
 Mission_TriggerEvaluator	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+490P

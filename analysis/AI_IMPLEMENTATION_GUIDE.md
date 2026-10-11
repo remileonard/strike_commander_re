@@ -247,7 +247,7 @@ enum class GoalSelector : uint8_t {
 enum class MVRSInstinct : uint8_t {
     None                   = 0,
     PursuitBase            = 1,  // angulaire complet, gagnant applique aussi GeometricUtility
-    PursuitAlwaysTen       = 2,  // score toujours 10, application = rupture directionnelle
+    PursuitAlwaysTen       = 2,  // CORRIGE 2026-10-11 : score MVRS_ID2_Score_3FCB, nul pour un avion ; application = rupture directionnelle
     PursuitSimple          = 3,  // angulaire simplifie, ajustement FL
     PursuitExtended        = 4,  // angulaire etendu, application = solution d'interception
     PursuitImmelmannSplitS = 5,  // declenche la sequence acrobatique a 8 phases

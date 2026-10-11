@@ -890,7 +890,7 @@ loc_3EE86:
 loc_3EEB3:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6C5j
 		push	1
 
-loc_3EEB5:				; CODE XREF: HUD_RenderSymbologyMain+6CFj
+loc_3EEB5:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+6CFj
 		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		push	0
@@ -1295,7 +1295,7 @@ loc_3F1C6:
 loc_3F24A:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A67j
 		push	1
 
-loc_3F24C:				; CODE XREF: HUD_RenderSymbologyMain+A71j
+loc_3F24C:				; CODE XREF: WeaponSystem_LaunchFromStation_3E744+A71j
 		call	SoundFX_Play_5A8DC
 		add	sp, 8
 		les	bx, [bp+arg_0]

@@ -757,10 +757,10 @@ chaque fonction de score **et** d'application a été lue intégralement.*
 | ID | Tag | Score — contenu réel | Application — contenu réel |
 |---|---|---|---|
 | 1 | `0x2B4` | Angulaire, base 5, gardes `byte_720C3`/`word_72093`, `sub_564A`/`sub_56E5` | Calcul géométrique complet (delta de position 3D via `[vtable+0x3C]`/`[vtable+0x4C]`, longueur via `sub_5828E`), pose `node+0x26=0/1`, **appelle directement l'application d'`ID=20`** (`entité+0x22→+0xC1→vtable+8`) (`loc_EEA0`) |
-| 2 | `0x28C` | **Toujours 10** (`sub_EC22`, sert aussi de synchronisation de contexte partagée par tous les scores) | Rupture gauche/droite, pile ou face si ambigu (`loc_F2C8`) |
+| 2 | `0x28C` | `MVRS_ID2_Score_3FCB` (corrigé 2026-10-11 : le « toujours 10 » de `sub_EC22` est le score de la classe de base, tag `0x2A0`) : base 5, **nul si l'entité est un avion** (`byte_720DF`), donc jamais choisi par un avion IA | Rupture gauche/droite, pile ou face si ambigu (`loc_F2C8`) |
 | 3 | `0x278` | Angulaire simple (pas de `sub_564A`/`sub_56E5`), ajustement `TH` `/4` | Minuteur générique `0x400` (`loc_F6C2`) |
 | 4 | `0x264` | Angulaire étendu, double seuil de menace (`dword_720CD` vs deux seuils) | **Solution d'interception complète** : `Angle_DeltaNormalized_A`, pose bit0/1 de `entité+0x32`, écrit position anticipée dans `node+0x26/2A/2E` (`loc_FCE1`) |
-| 5 | `0x250` | Sous-mode riche, fenêtre temporelle `dword_720D9`, lit `avion+0x8B` — **déclenche la séquence Immelmann/Split S à 8 phases** (`node+0x26=1` si `dword_72034` dépassé) | Minuteur `0x400`, amorce phase 1 (`loc_100B6`) |
+| 5 | `0x250` | Sous-mode riche, fenêtre temporelle `dword_720D9`, lit `avion+0x8B` — **déclenche la séquence Immelmann/Split S à 8 phases** (`node+0x26=1` si `dword_72034` dépassé) | Minuteur `0x500` (5 s), phase posée par le score (`loc_100B6`) |
 | 6 | `0x23C` | Garde de portée capteur (`dword_7203D+0xFA000`), sous-mode différent (`node+0x26=2`) | Minuteur `0x500` seul — les phases vivent dans le suivi `loc_10673` |
 | 7 | `0x228` | Base 1 (plancher), garde `flags_75` bit6/`TH`, pose bits `entité+0x32`, écrit position d'interception | Lit ces mêmes bits pour choisir le minuteur (`0x100`/`0x200`/`0x400` selon capteur) (`loc_10AF2`) |
 | 8 | `0x214` | **Toujours 0** (relu 2026-09-25 : score vide, jamais choisi) | Manœuvre complète « se caler derrière la cible, 100 dans son axe, à 900 » (`MVRS_ID8_TickShadowTarget_111AE`), inaccessible |

@@ -180,8 +180,13 @@ loc_3FC6:				; CODE XREF: seg002:0129j seg002:012Fj
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; Ex-'MVRS_ID3_ScoreGeneric_3FCB'. far - LUE INTEGRALEMENT. Fonction de SCORE pour MVRS ID=0x3
-; (tag 0x278). Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via
+; Ex-'MVRS_ID3_ScoreGeneric_3FCB'. far - LUE INTEGRALEMENT. Fonction de SCORE de l'ID 2 (tag
+; 0x28C ; relu 2026-10-11). Base 5 ; nul sans cible, si la classe de la cible <= 6, si
+; word_72093 > 20, trop lent, trop bas, ou si byte_720DF (entite avion) : un avion IA ne la
+; choisit donc jamais. Puis - usages/2 ; angle nez > 135, word_72093 < 30 et d < 1800 : +7 ;
+; sinon -3 cible devant, -3 si d > 1800 ; vitesse indiquee < mini : -6 ;
+; Pilot_SkillCheck_B7(SM, 5) : +3. [Ancienne phrase : Fonction de SCORE pour MVRS ID=0x3 (tag
+; 0x278).] Meme famille angulaire generique que 0x4/0x5/0x6/0x7/0x8 (base=5, ajuste via
 ; word_72093/72095, seuils NUMS dword_7201C, gardee par byte_720C3/byte_72038). Borne 0-9. |
 ; IDENTIFIANT CORRIGE 2026-09-25 : methode de l'enregistrement seg339 a 0x6D0B0 + tag (tags
 ; lus dans le switch de PilotProfile_ResolveNamedPropertyNode_742FC, verifies par le noeud ID

@@ -93,7 +93,7 @@ SoundFX_Play_5A8DC	endp
 ; joue pas, sinon met a jour son volume selon la distance.
 ; ==============================================================================================
 SoundFX_PlayOrUpdate_5A906	proc far		; CODE XREF: Cockpit_DetectPlayerMissile+192P
-					; HUD_RenderSymbologyAlt:loc_400C2P
+					; WeaponSystem_FrameUpdate_3F8C0:loc_400C2P
 
 arg_0		= byte ptr  6
 arg_2		= dword	ptr  8
