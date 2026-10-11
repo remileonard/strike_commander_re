@@ -552,6 +552,11 @@ Chaque réaction ne s'exécute que si `reaction_level ≤ son niveau` (esquive :
 poursuite** n'ont lieu que si `reaction_level ≤ 1` (à ajouter comme garde dans `updateFireControl`
 et `updatePursuit`, ou dans `combatStep` du §8bis). L'actuel `threat_state == 2` est ce niveau 2 :
 le fusionner avec `reaction_level`.
+**Fait (2026-10-11)** : `threat_state` et `evasion_hold` supprimés ; le ciblage pose/efface `reaction_level = 2` ;
+`reactToMissile` = `AI_MissileEvasionReaction_9A77` (gaz max si aligné, sinon croisière) ; `combatStep` l'appelle
+en tête et dans la branche sans cible aérienne. Leurres (`AI_EvalTargetAttribute`, `sub_9996`) portés le 2026-10-11 dans `SCAIBrain::missileCountermeasures`,
+largage commun joueur/IA dans `SCPlane::DeployCountermeasure` (`Countermeasure_DeployChaffFlare`). Le leurre lui-même reste
+le mécanisme simplifié du portage (minuteur de 5 s sur l'avion), pas la signature décroissante des objets `DECY`.
 
 ### B. Entrée en combat contre un attaquant (`AI_EngageAttackerReaction_E246`)
 
@@ -770,7 +775,7 @@ plancher (mode 1) → éjection, réplique 9 (« She's breaking up. Ejecting! »
 
 | ID | Manœuvre | À porter |
 |---|---|---|
-| 1 | Réacquisition par jambes de 1 s | 1re jambe à ±30° côté cible, puis −60° à chaque jambe, toujours du même côté (bug d'origine), max 4 jambes, fin si cible < 60° du nez |
+| 1 | Réacquisition par segments de cap de 1 s | 1er segment à ±30° côté cible, puis −60° à chaque segment, toujours du même côté (bug d'origine), max 4 segments, fin si cible < 60° du nez |
 | 2 | Dégagement | manche latéral à fond du côté du manche actuel (au hasard si neutre), manche tiré à fond |
 | 3 | Manœuvre d'énergie | piqué si trop lent, chandelle si trop bas, sinon au hasard ; assiette 5° + 40° × (FL/16)² ; 4 s |
 | 4 | Virage défensif (sur alerte de menace) | plein gaz, inclinaison 90° (60° si trop bas) côté cible, tirer ; fin après 90° de cap |
@@ -791,7 +796,7 @@ le calcul de `AI_Sensor_WeaponVelocityCache` n'est pas lu) et le GBU-15 / AGM-65
   projection = `Targeting_ComputeGeometryHelperB_5517F`) ; scores 1 à 7 transcrits ligne à ligne
   (branches mortes de l'original conservées dans le résultat), 13 à 16 et 19 d'après leurs résumés
   relus ; tournoi à 8 nœuds fixes + entrées du fichier (25 au plus), bruit ±1, plancher −1000 ;
-  application et tick de 1 à 7, 13 à 16, 19 ; jambes ID20 ; éjection (`AI_EjectDecision_50FF`).
+  application et tick de 1 à 7, 13 à 16, 19 ; segments ID20 ; éjection (`AI_EjectDecision_50FF`).
   `combatStep` : tir/poursuite seulement si le tir part ou si la qualité de solution est > 0 (sinon
   manœuvre en cours, sinon tournoi), comme `AI_BehaviorSelector`.
 - **Réflexes** 14 (sol) et 15 (décrochage) en tête de tick, niveaux 4 et 5 ; **alerte de menace**
@@ -1102,7 +1107,7 @@ au sol lancée comme manœuvre 19 ne notifie qu'une fois, par `endManeuver`.
   (+0x285 : A +10, aptitude +5 ; posée en 4a, état 3 du suivi), bit 1 de +0x28B `escort_leader_free` (posé sur le
   leader par `escortQueryLeader`, effacé en fin de tick ; remplace `fire_control_active`, jamais écrit).
 - Évitement de collision (étape 3, niveau `REACT_COLLISION` = 3, ex-`REACT_NEW_TARGET`) : `scanCollisionThreats`
-  / `collisionCourse` ; manœuvre 20 = jambe ID20 de 2 s, plein gaz, direction `-(a × b)` (a = moi − lui,
+  / `collisionCourse` ; manœuvre 20 = segment ID20 de 2 s, plein gaz, direction `-(a × b)` (a = moi − lui,
   b = sa vitesse × 4 s), repli (5, 5, 1000) asm. Les réflexes de l'étape 3 terminent le tick s'ils réagissent.
 - Classe (porté) : un avion ne prend de cible aérienne que si sa classe est >= 6, et jamais un avion dont le pilote
   s'est éjecté ; score d'un avion candidat de classe c (la mienne m, référence 6) : c <= 6 → B = 0, sinon A et

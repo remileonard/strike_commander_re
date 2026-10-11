@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Manœuvres MVRS de Strike Commander</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -106,6 +111,8 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
+</head>
+<body>
 
 <div class="wrap">
 <nav class="toc" aria-label="Sommaire">
@@ -194,7 +201,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <table>
     <thead><tr><th>ID</th><th>Manœuvre</th><th>Déclenchement</th><th>Durée max</th><th>Choisie par un avion IA quand…</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td>Réacquisition par jambes</td><td>tournoi</td><td>4 jambes de 1 s</td><td>un chasseur me pointe (± 20°), sur le côté ou derrière, sans être dans mes 6 h</td></tr>
+      <tr><td class="num">1</td><td>Réacquisition par segments de cap</td><td>tournoi</td><td>4 segments de 1 s</td><td>un chasseur me pointe (± 20°), sur le côté ou derrière, sans être dans mes 6 h</td></tr>
       <tr><td class="num">2</td><td>Dégagement en tonneau</td><td>tournoi</td><td>2 s</td><td><b>jamais</b> : score nul pour une entité « avion »</td></tr>
       <tr><td class="num">3</td><td>Manœuvre d'énergie</td><td>tournoi</td><td>4 s</td><td>un chasseur me pointe (± 20°), surtout derrière moi et à moins de 1800 m</td></tr>
       <tr><td class="num">4</td><td>Virage défensif</td><td>alerte de menace (et tournoi)</td><td>3 s (+2 s)</td><td>alerte : une menace est détectée ; tournoi : un chasseur me pointe</td></tr>
@@ -215,8 +222,8 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
 
 <!-- ============================ ID 1 ============================ -->
 <article class="mv" id="id1">
-  <header><span class="id">ID 1 · tag 0x2B4</span><h2>Réacquisition par jambes</h2></header>
-  <ul class="chips"><li>Déclenchement <b>tournoi</b></li><li>Durée <b>4 jambes</b></li><li>Gaz <b>plein (jambes)</b></li><li>Fonctions <b>MVRS_ID1_*</b></li></ul>
+  <header><span class="id">ID 1 · tag 0x2B4</span><h2>Réacquisition par segments de cap</h2></header>
+  <ul class="chips"><li>Déclenchement <b>tournoi</b></li><li>Durée <b>4 segments</b></li><li>Gaz <b>plein (segments)</b></li><li>Fonctions <b>MVRS_ID1_*</b></li></ul>
   <div class="grid2">
     <div>
       <h3>Score (base 5)</h3>
@@ -227,19 +234,19 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <li>Avion : − FL/2. Borné à 0…9.</li>
       </ul>
       <h3>Préparation</h3>
-      <p>La première jambe vise mon nez tourné de 30° <b>du côté de la cible</b>, à plat. Une jambe est un nœud ID 20 de 1 s. Minuteur du nœud : 4 (compte les jambes).</p>
+      <p>Le premier segment vise mon nez tourné de 30° <b>du côté de la cible</b>, à plat. Un segment est un nœud ID 20 de 1 s. Minuteur du nœud : 4 (compte les segments).</p>
       <h3>Déroulé</h3>
       <ol class="phases">
-        <li><span>J</span><div>Chaque jambe : guidage vers sa direction, gaz plein, jusqu'à 1 s ou alignement.</div></li>
-        <li><span>T</span><div>À la fin d'une jambe, le tick d'ID 1 retire 1 au minuteur, mesure l'écart de cap vers la cible, puis lance une nouvelle jambe : <b>mon nez actuel tourné de −60°</b>, à plat, 1 s.</div></li>
+        <li><span>S</span><div>Chaque segment : guidage vers sa direction, gaz plein, jusqu'à 1 s ou alignement.</div></li>
+        <li><span>T</span><div>À la fin d'un segment, le tick d'ID 1 retire 1 au minuteur, mesure l'écart de cap vers la cible, puis lance un nouveau segment : <b>mon nez actuel tourné de −60°</b>, à plat, 1 s.</div></li>
       </ol>
       <h3>Fin</h3>
-      <p>Écart de cap vers la cible &lt; 60°, plus de cible, ou minuteur à 0 (4 jambes en tout).</p>
-      <p class="bug">Bug de l'original : le test d'alternance (<code>test ax, 0</code>) est toujours faux. Toutes les jambes suivantes tournent de −60°. Si la cible est du côté « + », la 2ᵉ jambe repart à l'opposé de la cible.</p>
+      <p>Écart de cap vers la cible &lt; 60°, plus de cible, ou minuteur à 0 (4 segments en tout).</p>
+      <p class="bug">Bug de l'original : le test d'alternance (<code>test ax, 0</code>) est toujours faux. Tous les segments suivants tournent de −60°. Si la cible est du côté « + », le 2ᵉ segment repart à l'opposé de la cible.</p>
     </div>
     <figure>
       <div class="svgbox">
-      <svg viewBox="0 0 520 280" role="img" aria-label="Vue de dessus : deux cas de jambes de réacquisition">
+      <svg viewBox="0 0 520 280" role="img" aria-label="Vue de dessus : deux cas de segments de réacquisition">
         <text class="g-title" x="12" y="20">VUE DE DESSUS</text>
         <line class="g-frame" x1="260" y1="30" x2="260" y2="270"/>
         <text class="g-lbl" x="20" y="44">Cible côté « + » : ne réacquiert pas</text>
@@ -256,7 +263,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <text class="g-lbl-t" x="168" y="270">cible</text>
         <text class="g-lbl" x="140" y="196">+30°</text>
         <text class="g-lbl" x="122" y="150">−60°</text>
-        <text class="g-lbl" x="30" y="236">fin : 4 jambes</text>
+        <text class="g-lbl" x="30" y="236">fin : 4 segments</text>
         <!-- cas B -->
         <polyline class="g-path" points="400,240 380,205.4 340,205.4"/>
         <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(400,244)"/>
@@ -272,15 +279,15 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <line class="g-hz" x1="340" y1="205.4" x2="330" y2="148"/>
       </svg>
       </div>
-      <figcaption>Une jambe = 1 s (ou moins si l'avion est aligné). Le côté gauche ou droit est illustratif : seul compte le côté « + » ou « − » du premier virage.</figcaption>
+      <figcaption>Un segment = 1 s (ou moins si l'avion est aligné). Le côté gauche ou droit est illustratif : seul compte le côté « + » ou « − » du premier virage.</figcaption>
     </figure>
   </div>
   <div class="check">
     <h3>À vérifier dans l'outil</h3>
     <ul>
-      <li>Première jambe : cap qui tourne d'environ 30° vers la cible, à plat, gaz plein.</li>
-      <li>Jambes suivantes : −60° par rapport au nez du moment, à chaque fois du même côté.</li>
-      <li>Au plus 4 jambes ; fin dès que la cible est à moins de 60° en cap.</li>
+      <li>Premier segment : cap qui tourne d'environ 30° vers la cible, à plat, gaz plein.</li>
+      <li>Segments suivants : −60° par rapport au nez du moment, à chaque fois du même côté.</li>
+      <li>Au plus 4 segments ; fin dès que la cible est à moins de 60° en cap.</li>
     </ul>
   </div>
 </article>
@@ -353,7 +360,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <p>Pente de base : <b>p = 5 + 40 × (FL/16)²</b> degrés (5° à FL 0, 45° à FL 16).</p>
       <ol class="phases">
         <li><span>0</span><div>Choix. Trop lent et pas trop bas → 2 (piqué). Trop lent et trop bas → 1 (jinks). Trop bas seulement → 4 (montée). Sinon au hasard : 1 chance sur 4 → 2, 1 sur 4 → 4, 2 sur 4 → 1.</div></li>
-        <li><span>1</span><div>Jink : jambe ID 20 de 1 s vers mon nez tourné de 32° ou 64° (au hasard), le côté alternant d'une fois sur l'autre ; minuteur −1 s ; retour à 0.</div></li>
+        <li><span>1</span><div>Jink : segment ID 20 de 1 s vers mon nez tourné de 32° ou 64° (au hasard), le côté alternant d'une fois sur l'autre ; minuteur −1 s ; retour à 0.</div></li>
         <li><span>2</span><div>Gaz croisière, roulis vers 180° (zone 15) puis tirer à fond. Passe en 3 dès que l'assiette est ≥ −30°, c'est-à-dire tout de suite en pratique.</div></li>
         <li><span>3</span><div>Piqué : assiette −p (zone 10) jusqu'à ce que la vitesse indiquée atteigne la croisière ou que l'avion soit trop bas ; alors assiette +5 et retour à 0.</div></li>
         <li><span>4</span><div>Ailes à plat (zone 15) puis tirer à fond. Passe en 5 dès que l'assiette est ≤ 30°, donc tout de suite en général.</div></li>
@@ -393,7 +400,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <circle class="g-ph" cx="414" cy="212" r="9"/><text class="g-phn" x="414" y="216">1</text>
         <circle class="g-ph" cx="446" cy="186" r="9"/><text class="g-phn" x="446" y="190">1</text>
         <circle class="g-ph" cx="420" cy="160" r="9"/><text class="g-phn" x="420" y="164">1</text>
-        <text class="g-lbl" x="360" y="96">jambes de 1 s</text>
+        <text class="g-lbl" x="360" y="96">segments de 1 s</text>
         <text class="g-lbl" x="360" y="110">±32° ou ±64°</text>
         <text class="g-lbl" x="360" y="124">côté alterné</text>
       </svg>
@@ -900,7 +907,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td class="num">8</td><td>Se caler derrière la cible</td><td>Score toujours 0, jamais choisi. Le tick existe : point visé = cible + 100 m dans l'axe de sa vitesse, vitesse d'interception avec 900 m de garde, 2 s.</td></tr>
       <tr><td class="num">9–12</td><td>Emplacements vides</td><td>Score toujours 0 ; application et tick se terminent aussitôt.</td></tr>
       <tr><td class="num">19</td><td>Attaque au sol</td><td>Score 5 avec une cible au sol et une arme air-sol chargée ; machine à 5 phases décrite dans <code>NOTE_ATTAQUE_SOL.md</code>.</td></tr>
-      <tr><td class="num">20</td><td>Jambe dans une direction</td><td>Outil (nœud <code>+0xC1</code>), score 0. Guidage vers une direction mémorisée, gaz plein, jusqu'au minuteur ou à l'alignement. Sert aux jambes d'ID 1 et ID 3.</td></tr>
+      <tr><td class="num">20</td><td>Segment de cap</td><td>Outil (nœud <code>+0xC1</code>), score 0. Guidage vers une direction mémorisée, gaz plein, jusqu'au minuteur ou à l'alignement. Sert aux segments d'ID 1 et ID 3.</td></tr>
       <tr><td class="num">21</td><td>Navigation au pilote automatique</td><td>Outil (nœud <code>+0xD1</code>), score 0. Remet le nez à moins de 15° de l'horizon, puis active le pilote automatique cinématique ; fin au point atteint ou au minuteur (2 s, 30 s pour l'errance).</td></tr>
     </tbody>
   </table>
@@ -928,3 +935,9 @@ Fin : minuteur / condition (laquelle) / abandon    Durée totale : ___ s
 </section>
 </main>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
+</script>
+</body>
+</html>

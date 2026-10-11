@@ -993,9 +993,9 @@ AI_ManeuverSpeedCmd_ED1E	endp
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, LUE 2026-09-25. Application MVRS ID1 : premiere jambe = noeud ID20 (entite+0xC1) vers
+; far, LUE 2026-09-25. Application MVRS ID1 : premier segment = noeud ID20 (entite+0xC1) vers
 ; le nez tourne de +/-30 deg du cote de la cible (Vector2D_CrossSign_526F), minuteur du noeud
-; 4, jambes de 1 s.
+; 4, segments de 1 s.
 ; ==============================================================================================
 MVRS_ID1_ApplyReacquireTurn_EEA0:				; DATA XREF: seg339:02BCo
 		push	bp
@@ -1192,12 +1192,13 @@ loc_F0BF:				; CODE XREF: seg008:0958j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, LUE 2026-09-25. Tick MVRS ID1 'virage de reacquisition par jambes' : a chaque fin de
-; jambe ID20, nouvelle jambe tournee de -60 deg (le test d'alternance 'test ax,0' est toujours
-; faux : toujours du meme cote), minuteur -1 par jambe. Fin quand la cible est a moins de 60
-; deg du nez, sans cible, ou apres 4 jambes. Vitesse via AI_ManeuverSpeedCmd_ED1E.
+; far, LUE 2026-09-25. Tick MVRS ID1 'virage de reacquisition par segments de cap' : a chaque
+; fin de segment ID20, nouveau segment tourne de -60 deg (le test d'alternance 'test ax,0' est
+; toujours faux : toujours du meme cote), minuteur -1 par segment. Fin quand la cible est a
+; moins de 60 deg du nez, sans cible, ou apres 4 segments. Vitesse via
+; AI_ManeuverSpeedCmd_ED1E.
 ; ==============================================================================================
-MVRS_ID1_TickReacquireLegs_F0C3:				; DATA XREF: seg339:02C0o
+MVRS_ID1_TickReacquireSegments_F0C3:				; DATA XREF: seg339:02C0o
 		push	bp
 		mov	bp, sp
 		sub	sp, 58h
@@ -1868,7 +1869,7 @@ loc_F6E7:				; CODE XREF: seg008:1137j
 ; Ex-'MVRS_ID3_Tick_F72B'. far, LUE 2026-09-25. Tick MVRS ID3 'manoeuvre d'energie' (phase
 ; node+0x27, minuteur 4 s -> phase 6). Phase 0 choix : trop lent et pas trop bas -> 2 (piqué),
 ; trop lent et trop bas -> 1 (jinks), pas trop lent et trop bas -> 4 (chandelle), sinon rand&3
-; : 1->2, 2->4, sinon 1. 1 : jambe ID20 de 1 s a +/-32/64 deg en alternant, retour 0. 2 :
+; : 1->2, 2->4, sinon 1. 1 : segment ID20 de 1 s a +/-32/64 deg en alternant, retour 0. 2 :
 ; croisiere, roulis 180 puis tire a fond jusqu'a assiette >= -30 (avance immediatement en
 ; pratique). 3 : si trop bas ou vitesse >= croisiere -> assiette +5 puis 0 ; sinon assiette
 ; -(40 FL^2/256)-5. 4 : ailes a plat, tire jusqu'a assiette <= 30. 5 : si altitude > plancher
@@ -4047,7 +4048,12 @@ loc_10BBC:				; CODE XREF: seg008:loc_10B90j
 ; bit3 efface, node+0x26 = Physics_ApplyForceAtPoint(cible, 4 s) ; sinon
 ; AI_InterceptDispatcher. Sans bit : nez <= 60 et (180 - angle(D, Vt)) < 60 -> bit3 et
 ; AI_InterceptDispatcher ; sinon AI_InterceptDispatcher, FIN DE LA MANOEUVRE s'il renvoie 1
-; (recalage de visee fait).
+; (recalage de visee fait). | UNITE VERIFIEE 2026-10-11 : seuil de relance du minuteur (4 s) =
+; 2*|v|^2/9 avec v = vitesse de la cible (methode +0x4C du noeud = copie de [+0x51]+8) en m/s
+; : WorldObject_IntegrateBodyMotion_3D31D fait position += ([+0x51]+8) * dword_7045E, et
+; dword_7045E = dt en secondes (Frame_UpdateTimingAndNotifyTrackedObjects_500F6 : 1/fps,
+; 0,04..0,5 s). A 250 m/s le seuil vaut ~13,9 km (environ 2 v^2/g, deux rayons de virage a 1
+; g) : en poursuite la relance est quasi permanente.
 ; ==============================================================================================
 MVRS_ID7_TickPursuit_10BD9:				; DATA XREF: seg339:0234o
 		push	bp

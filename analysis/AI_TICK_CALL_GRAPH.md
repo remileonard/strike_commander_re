@@ -329,7 +329,7 @@ portaient un **identifiant décalé d'un cran** ; ils sont corrigés dans `known
 
 | ID | Tag | Score | Application | Tick |
 |---|---|---|---|---|
-| 1 | `0x2B4` | `MVRS_ID1_ScoreAngularGuarded_3E90` | `MVRS_ID1_ApplyReacquireTurn_EEA0` | `MVRS_ID1_TickReacquireLegs_F0C3` |
+| 1 | `0x2B4` | `MVRS_ID1_ScoreAngularGuarded_3E90` | `MVRS_ID1_ApplyReacquireTurn_EEA0` | `MVRS_ID1_TickReacquireSegments_F0C3` |
 | 2 | `0x28C` | `MVRS_ID2_Score_3FCB` | `MVRS_ID2_ApplyBreakDirection_F2C8` | `MVRS_ID2_TickBreak_F3B6` |
 | 3 | `0x278` | `MVRS_ID3_ScoreAngularSimple_4128` | `MVRS_ID3_ApplyGenericTimer_F6C2` | `MVRS_ID3_TickEnergyManeuver_F72B` |
 | 4 | `0x264` | `MVRS_ID4_ScoreAngularExtended_41DD` | `MVRS_ID4_ApplyInterceptSolution_FCE1` | `MVRS_ID4_TickDefensiveBreakTurn_FE39` |
@@ -468,9 +468,9 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 
 | ID | Nom de la manœuvre | Déclenchement | Ce que fait le tick |
 |---|---|---|---|
-| 1 | Virage de réacquisition par jambes | tournoi | Jambes de 1 s (nœud ID20) : la 1re à ±30° du nez côté cible, puis −60° à chaque jambe ; fin quand la cible est à moins de 60° du nez, sans cible, ou après 4 jambes. **Bug d'origine** : le test d'alternance `test ax, 0` est toujours faux, les jambes tournent donc toujours du même côté. |
+| 1 | Virage de réacquisition par segments de cap | tournoi | Segments de 1 s (nœud ID20) : la 1re à ±30° du nez côté cible, puis −60° à chaque segment ; fin quand la cible est à moins de 60° du nez, sans cible, ou après 4 segments. **Bug d'origine** : le test d'alternance `test ax, 0` est toujours faux, les segments tournent donc toujours du même côté. |
 | 2 | Dégagement (break) | tournoi, **jamais pour un avion** (score `MVRS_ID2_Score_3FCB` nul si `byte_720DF`, corrigé 2026-10-11) | Côté choisi par le manche latéral du moment (> 3/16 → un côté, < −3/16 → l'autre, sinon au hasard) ; manche latéral à fond de ce côté, manche tiré à fond (ou poussé à moitié si l'avion est sur le dos par rapport à l'axe visé), jusqu'au minuteur. |
-| 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (jambes de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (FL/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
+| 3 | Manœuvre d'énergie | tournoi | Choix selon trop lent / trop bas : piqué (reprendre de la vitesse), chandelle (prendre de l'altitude) ou jinks (segments de 1 s à ±32°/±64°). Assiette de montée/descente = 5° + 40° × (FL/16)². Minuteur 4 s. Phase 2 (dos puis tirer jusqu'à −30°) avance sans attendre en pratique. |
 | 4 | Virage défensif | **alerte de menace**, hors tournoi (`entité+0xBD`) | Plein gaz, inclinaison 90° (60° si trop bas) côté cible, tiré à fond ; quand le cap a tourné de 90° ou minuteur écoulé : assiette +10°, fin. |
 | 5 | Montée verticale et retournement (type Immelmann) | tournoi | Reprise de vitesse (piqué −30° si très haut), à plat, assiette +90°, roulis pour mettre la cible dans le plan de portance, tirer jusqu'à 45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
 | 6 | Split-S | tournoi | Monter à +30° jusqu'à plancher + 2000, puis +20° à vitesse minimale jusqu'à passer sous la croisière ; se mettre sur le dos, assiette −90°, roulis vers la cible, tirer jusqu'à −45°, viser l'élévation de la cible, ailes à plat. Minuteur 5 s. |
@@ -481,7 +481,7 @@ Entrées : `D` = direction voulue, `R` = direction de référence (vitesse de l'
 | 15 | **Récupération nez haut / décrochage** | réflexe niveau 5 (`AI_StallRecoveryReflex_E159`, nœud `entité+0xC9`) | Test d'éjection (mode 1), puis `AI_NoseHighRecovery_676F` : ralenti si décroché nez > 60°, sinon plein gaz et assiette −30° ; fin quand le nez est repassé sous l'horizon. Minuteur 2 s. Score 10 si sans cible, pilote automatique coupé et (décroché, ou vitesse ≤ minimale avec nez > 30°). |
 | 16 | **Reprendre de la vitesse** (pas un retour à la base) | tournoi (score 1 si `FL` < 12) | `AI_RegainSpeed_68D4` : manette à la vitesse max `JDYN+0x80`, assiette +5°, jusqu'à dépasser (croisière + mini)/2. Minuteur 1,5 s. |
 | 19 | Attaque au sol | tournoi | Voir « L'attaque au sol ». |
-| 20 | Voler dans une direction | outil (nœud `entité+0xC1`) | Suit une direction mémorisée à plein gaz pendant le minuteur (jambes d'ID1 et ID3, alerte de proximité). |
+| 20 | Voler dans une direction | outil (nœud `entité+0xC1`) | Suit une direction mémorisée à plein gaz pendant le minuteur (segments d'ID1 et ID3, alerte de proximité). |
 | 21 | Navigation au pilote automatique | outil (nœud `entité+0xD1`) | Voir plus haut. |
 
 **Conséquences pour les niveaux de réaction** : les niveaux 4 et 5 de `entité+0x27F` sont ces deux

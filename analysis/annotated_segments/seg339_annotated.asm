@@ -211,7 +211,7 @@ off_6D340	dd MVRS_ID2_Score_3FCB
 		dd VROOMM_StubThunk_6AA85
 		dd MVRS_ID1_ScoreAngularGuarded_3E90
 		dd MVRS_ID1_ApplyReacquireTurn_EEA0
-		dd MVRS_ID1_TickReacquireLegs_F0C3
+		dd MVRS_ID1_TickReacquireSegments_F0C3
 		dd MVRS_SharedDefaultTickNoOp_ED16
 		dd StreamReader_DestructWrapper_659C1
 		dd StreamReader_ReleaseBuffer_65643
