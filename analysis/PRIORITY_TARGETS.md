@@ -71,7 +71,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 399 | `sub_9C42F` | `Debris_ComputeScaledPhysics_9C42F` | ovr303 |
 | 395 | `sub_53D92` | `UIScreen_BuildWidgetTree_Recurse_53D92` | seg114 |
 | 394 | `sub_8D66C` | `UIWidget_LoadDefinitionFromIFF_8D66C` | ovr258 |
-| 392 | `sub_A636C` | `MissionText_LoadAndFormatFromIFF_A636C` | seg450 |
+| 392 | `sub_A636C` | `SmokeSet_LoadFromIFF_A636C` | seg450 |
 | 392 | `sub_81467` | `HUDSymbol_RenderWithClipTestB_81467` | ovr243 |
 | 379 | `sub_81C26` | `HUDSymbol_RenderWithClipTestC_81C26` | ovr243 |
 | 369 | `sub_62EC8` | `Render_ClipAndDrawLineVariant_62EC8` | seg183 |
@@ -141,7 +141,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 227 | `sub_A3CF6` | `GaugeWidget_FormatDisplayValue_A3CF6` | seg444 |
 | 227 | `sub_95E20` | `AircraftComponent_LoadFieldGroupPair_95E20` | ovr276 |
 | 227 | `sub_91B70` | `Cockpit_ApplyFormatAndDraw_91B70` | ovr268 |
-| 226 | `sub_A61D0` | `TextLabel_LoadFieldsExtended_A61D0` | seg450 |
+| 226 | `sub_A61D0` | `SmokeSet_LoadSmokeModel_A61D0` | seg450 |
 | 225 | `sub_8C32C` | `MissionRecord_LoadFieldGroupMixD_8C32C` | ovr255 |
 | 224 | `sub_68254` | `VROOMM_OpenAndParseOverlayFile_68254` | None |
 | 220 | `sub_73940` | `AircraftDamageModel_ComputeStatus_73940` | ovr228 |

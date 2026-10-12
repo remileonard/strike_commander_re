@@ -256,7 +256,7 @@ loc_A7778:				; CODE XREF: World_ParseWrldForm_A767F+F4j
 		push	si
 		nop
 		push	cs
-		call	near ptr MissionLoader_LoadChunkB_A7CA1
+		call	near ptr World_LoadSmokeSet_A7CA1
 		pop	cx
 		push	ds
 		push	offset word_72A94
@@ -941,10 +941,12 @@ MissionLoader_LoadChunkA_A7C8E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743, sub_2AFE0, alloue (sub_658), sub_6CC3D,
-; enregistrement conteneur (sub_21F8D).
+; far, LECTEUR DU CHUNK SMOK D'UN MONDE (ex-MissionLoader_LoadChunkB) : nom du jeu de fumées
+; (ex. 'SMOKESET'), alloue l'objet jeu de fumées (0x33 o, vtable 30BAh) et le remplit par
+; SmokeSet_LoadFromIFF_A636C ; résultat dans word_70483 (utilisé par SmokeTrail_Tick_3D57E,
+; SmokeGen_Tick_4C057, Particle_SpawnWithColor).
 ; ==============================================================================================
-MissionLoader_LoadChunkB_A7CA1	proc far		; CODE XREF: VROOMM_StubThunk_6CDB9J World_ParseWrldForm_A767F+12Ap
+World_LoadSmokeSet_A7CA1	proc far		; CODE XREF: VROOMM_StubThunk_6CDB9J World_ParseWrldForm_A767F+12Ap
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -965,7 +967,7 @@ arg_0		= word ptr  6
 		jmp	loc_A7D43
 ; ���������������������������������������������������������������������������
 
-loc_A7CC3:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Dj
+loc_A7CC3:				; CODE XREF: World_LoadSmokeSet_A7CA1+1Dj
 		mov	[bp+var_C], si
 		push	[bp+var_C]
 		lea	ax, [bp+var_A]
@@ -998,10 +1000,10 @@ loc_A7CC3:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Dj
 		jmp	short loc_A7D2D
 ; ���������������������������������������������������������������������������
 
-loc_A7D2B:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+40j
+loc_A7D2B:				; CODE XREF: World_LoadSmokeSet_A7CA1+40j
 		mov	ax, si
 
-loc_A7D2D:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+88j
+loc_A7D2D:				; CODE XREF: World_LoadSmokeSet_A7CA1+88j
 		mov	word_70483, ax
 
 loc_A7D30:
@@ -1016,14 +1018,14 @@ loc_A7D3B:
 loc_A7D40:
 		add	sp, 4
 
-loc_A7D43:				; CODE XREF: MissionLoader_LoadChunkB_A7CA1+1Fj
-					; MissionLoader_LoadChunkB_A7CA1+94j
+loc_A7D43:				; CODE XREF: World_LoadSmokeSet_A7CA1+1Fj
+					; World_LoadSmokeSet_A7CA1+94j
 		pop	si
 
 locret_A7D44:
 		leave
 		retf
-MissionLoader_LoadChunkB_A7CA1	endp
+World_LoadSmokeSet_A7CA1	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

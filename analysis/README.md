@@ -1182,11 +1182,11 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `PaletteScreen_DrawWidgetBorderB_A1E6D` | 268 | seg442 | Dessin de bordure de widget (variante) |
 | `GaugeWidget_DrawWithLabel_A4388` | 155 | seg445 | Dessin du widget jauge avec étiquette |
 | `PaletteScreen_AcquireOwnership_A1240` (rappel) | — | seg442 | Verrou d'exclusion mutuelle, appelé par ~50 fonctions du module |
-| `MissionText_LoadAndFormatFromIFF_A636C` | 392 | seg450 | **Chargement/formatage de texte de mission depuis IFF — probable dialogue/briefing** |
+| `SmokeSet_LoadFromIFF_A636C` | 392 | seg450 | **Lecteur du jeu de fumées (`FORM SMOK` : modèles de fumée et formes) — ex-« texte de mission », corrigé 2026-10-12** |
 | `PlayerComponent_LoadFieldsMassive_A5D18` | 239 | seg449 | Chargement massif de ~30 champs (propriétés visuelles/matériau) |
 | `PlayerComponent_LoadFieldsWithRetryF_A4BE1` | 132 | seg448 | Chargement combinant IFF et flux de fichier |
 | `PlayerComponentVariantAG_ConstructAndInit_A54C8` | 152 | seg448 | Plus grosse variante de constructeur du cluster |
-| `TextLabel_LoadFieldsExtended_A61D0` | 226 | seg450 | Chargement étendu de champs de texte IFF |
+| `SmokeSet_LoadSmokeModel_A61D0` | 226 | seg450 | Lecteur d'un modèle de fumée (`INFO`/`ANIM`/`SCRI`) — ex-« champs de texte », corrigé 2026-10-12 |
 | `MissionScenario_LoadMainRecord_A8331` | 775 | seg456 | **⭐ Plus grosse fonction du reste du fichier — chargement du bloc principal d'un scénario/mission** |
 | `MissionScenario_ResolveAndBindExpressions_A8F22` | 492 | seg456 | Résolution/liaison des expressions calculées d'un scénario |
 | `MissionLoader_LoadEntitiesMain_A767F` | 239 | seg455 | **Chargement des entités de mission, lié à seg112** |

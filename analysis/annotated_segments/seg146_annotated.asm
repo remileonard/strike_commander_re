@@ -13,7 +13,7 @@ seg146		segment	byte public 'CODE' use16
 ; multi-lignes. Référencée par sub_97215 et sub_A60AC.
 ; ==============================================================================================
 Text_ComputeMaxLineWidth_5E6BF	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFieldsD_97215+CEP
-					; TextLabel_MeasureAndAllocate_A60AC+B9P
+					; SmokeSet_LoadShape_A60AC+B9P
 
 var_A		= word ptr -0Ah
 var_8		= word ptr -8

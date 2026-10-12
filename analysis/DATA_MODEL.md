@@ -306,8 +306,54 @@ Présence du chunk → `+0x38 = 1`. F-16 : `(0, −3584, 0)` brut = `(0, −14, 
   répartit les particules **le long du segment parcouru** : la traînée est continue quelle que soit la
   vitesse. Le nombre de particules = longueur du segment ÷ espacement lu dans le modèle de fumée (`+1`).
 - **Jeu de fumées** : le chunk `WRLD/SMOK` du monde (`"SMOKESET"`) charge les modèles de fumée (42 o
-  chacun) dans `word_70483` (`MissionLoader_LoadChunkB_A7CA1`). Sans jeu chargé, ni `SMOK` ni `SMKG`
+  chacun) dans `word_70483` (`World_LoadSmokeSet_A7CA1`). Sans jeu chargé, ni `SMOK` ni `SMKG`
   n'émettent.
+
+**Jeu de fumées — `SmokeSet_LoadFromIFF_A636C`** (seg450, lu 2026-10-12). Le chunk `WRLD/SMOK` d'un
+monde donne un nom (ex. `"SMOKESET"`) ; `World_LoadSmokeSet_A7CA1` charge `OBJECTS\<nom>.IFF` et range
+l'objet jeu de fumées dans `word_70483`. Racine **`FORM SMOK`** obligatoire (erreur `B007h`).
+
+| Bloc | Contenu |
+|---|---|
+| `INFO` | 3× uint16 : nombre de modèles de fumée (tableau de 42 o, `+0x0B`/`+0x0D`) ; nombre de formes (tableau de 12 o, `+0x0F`/`+0x11`) ; nombre max de particules actives (réserve circulaire de 48 o par particule, `+0x13`) — tableau vide → erreur `B006h` |
+| `FORM TYPE` | sous-FORM dans l'ordre : chaque `FORM SMOK` = modèle de fumée suivant (`SmokeSet_LoadSmokeModel_A61D0`), chaque `FORM SHAP` = forme suivante (`SmokeSet_LoadShape_A60AC`). **Index d'un modèle = rang parmi les `FORM SMOK`** ; index d'une forme = rang parmi les `FORM SHAP` |
+
+**Modèle de fumée (`FORM SMOK`)** — chunk `INFO` de 25 o (`push large 19h`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x00` | mode de rendu : 0 = disque dont la taille varie ; 1 ou 2 = forme `SHAP` (sprite) |
+| int32 24.8 | `+0x01` | espacement entre deux particules le long d'une traînée (m) |
+| int32 24.8 | `+0x0D` | taille au début (m) |
+| int32 24.8 | — | taille à la fin (m) → `+0x09` = (fin − début) ÷ durée |
+| int32 24.8 | `+0x05` | durée de vie (s) |
+| int32 24.8 | `+0x1B` | dispersion de position à la création (m ; mot bas pris par `Math_RandomJitter_54E1C`) |
+| uint8 | `+0x15` | teinte au début |
+| uint8 | `+0x17` | teinte à la fin → `+0x11` = (fin − début) ÷ durée |
+| uint8 | `+0x19` | paramètre de dessin passé à `Render_DrawScaledSprite_621A2` (rôle non établi) |
+| uint8 | `+0x1A` | idem |
+
+Chunk **`ANIM`** facultatif (8 o) : uint8 forme A (`+0x27`) ; uint8 chance de A en % (`+0x28`, 100 =
+toujours A) ; uint8 forme B (`+0x29`) ; uint8 mode (`+0x1F`) ; int16 images par seconde (`+0x21`) ; int16
+pas (`+0x23` : 1, −1, 0 = pas d'animation). Absent → formes = 255 (aucune). Modes (`switch` sur
+`mode − 'R'`, table `off_4C70E`) : **`R`** aller-retour, **`S`** s'arrête sur la dernière image, **`T`**
+la particule disparaît après la dernière image, **`W`** boucle ; `U`/`V` sans effet. ⚠️ En mode `R`, le
+jeu inverse le pas **dans le modèle** (`mov word ptr [bx+23h], 0FFFFh`) : toutes les particules du
+modèle changent de sens ensemble.
+
+Chunk **`SCRI`** facultatif : n octets = ordre des images (n = taille du chunk) ; sinon les images de la
+forme dans l'ordre.
+
+**Forme (`FORM SHAP`)** : chunk `SHAP` obligatoire (erreur `B005h`), copié brut = image(s) de sprite ;
+le jeu en déduit une demi-taille moyenne ((hauteur + largeur) ÷ 4).
+
+**Vie d'une particule** (`Particle_InitFromSmokeModel_4C168`, `Particle_UpdateLifeSizeShadeFrame_4C413`) :
+créée avec la taille et la teinte de début, position + aléa ±dispersion ; à chaque image, durée −= dt
+(≤ 0 → supprimée), taille et teinte interpolées **linéairement** de début à fin sur la durée de vie,
+image d'animation avancée. Au rendu, la taille est projetée (× focale `dword_72202` ÷ profondeur) et la
+teinte sert d'index (`>> 8`, `shl bx, 8`) dans une **table de remappage de palette** de 256 o
+(`dword_72528`) : niveau d'ombre / de transparence de la fumée. Pour une forme : forme A avec la chance
+du modèle, sinon forme B (`Math_RandomChance_54E4F`).
 
 **Chunks communs d'un objet — `Object_LoadCommonChunks_9BA85`** (ovr302, lu 2026-10-12 ; appelé par
 les lecteurs de classe via `VROOMM_StubThunk_6BFFF` — `ORNT`/`RNWY` par `IFF_LoadAngleParam`, `EXPL`
@@ -2182,9 +2228,8 @@ modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur géné
 
 ### 6.10 Textes / dialogues / audio
 
-- `MissionText_LoadAndFormatFromIFF_A636C` (392 L, seg450) : IFF compressé →
-  `TextLabel_LoadFieldsExtended_A61D0` + mesure multi-ligne
-  (`Text_ComputeMaxLineWidth_5E6BF` / `…Height_5E706`) + `ReadPayload`.
+- ~~`MissionText_LoadAndFormatFromIFF_A636C`~~ : **ce n'est pas un texte** — c'est le lecteur du jeu de
+  fumées, renommé `SmokeSet_LoadFromIFF_A636C` (voir §6.1, « Jeu de fumées », 2026-10-12).
 - `MissionText_LoadSubtitleRecord_87A60` (ovr251), `…B_94710` (ovr270),
   `MissionText_DrawTypewriterSynced_975CC` (ovr287) : sous-titres synchronisés
   audio/vidéo (`AV_SyncComputeOffset`, `Text_TypewriterDrawChar`).

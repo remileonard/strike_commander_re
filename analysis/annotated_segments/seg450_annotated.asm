@@ -298,13 +298,13 @@ SmokeGen_InitInstance_A6048	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 119 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743, allocateurs
-; typés (Memory_TypedFreeWrapperC_5C6F3, Memory_TypedAllocDispatchB_5C832 ×3),
-; ResourceRecord_ReadDwordFieldB_64AFF, Text_ComputeMaxLineHeight_5E706,
-; Text_ComputeMaxLineWidth_5E6BF (seg146-147) — mesure et alloue l'espace d'affichage d'un
-; texte multi-lignes chargé depuis le format IFF.
+; far, LECTEUR D'UNE FORME DE FUMÉE (FORM SHAP d'un jeu de fumées ; ex-
+; TextLabel_MeasureAndAllocate). Chunk SHAP obligatoire (sinon erreur B005h) : contenu brut
+; (taille du chunk) copié dans un bloc mémoire = image(s) de sprite ; +0x0A =
+; (Text_ComputeMaxLineHeight_5E706 + Text_ComputeMaxLineWidth_5E6BF) / 4 = demi-taille moyenne
+; de l'image. Élément de 12 o.
 ; ==============================================================================================
-TextLabel_MeasureAndAllocate_A60AC	proc far		; CODE XREF: VROOMM_StubThunk_6CC2EJ MissionText_LoadAndFormatFromIFF_A636C+287p
+SmokeSet_LoadShape_A60AC	proc far		; CODE XREF: VROOMM_StubThunk_6CC2EJ SmokeSet_LoadFromIFF_A636C+287p
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -332,7 +332,7 @@ loc_A60BC:
 		jmp	loc_A617B
 ; ���������������������������������������������������������������������������
 
-loc_A60D2:				; CODE XREF: TextLabel_MeasureAndAllocate_A60AC+21j
+loc_A60D2:				; CODE XREF: SmokeSet_LoadShape_A60AC+21j
 		mov	eax, [di+72h]
 		mov	[bp+var_4], eax
 		push	1
@@ -408,7 +408,7 @@ loc_A6151:
 		jmp	short loc_A6184
 ; ���������������������������������������������������������������������������
 
-loc_A617B:				; CODE XREF: TextLabel_MeasureAndAllocate_A60AC+23j
+loc_A617B:				; CODE XREF: SmokeSet_LoadShape_A60AC+23j
 		push	0B005h
 
 loc_A617E:
@@ -417,12 +417,12 @@ loc_A617E:
 loc_A6183:
 		pop	cx
 
-loc_A6184:				; CODE XREF: TextLabel_MeasureAndAllocate_A60AC+CDj
+loc_A6184:				; CODE XREF: SmokeSet_LoadShape_A60AC+CDj
 		pop	di
 		pop	si
 		leave
 		retf
-TextLabel_MeasureAndAllocate_A60AC	endp
+SmokeSet_LoadShape_A60AC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -487,11 +487,21 @@ TextLabel_AllocateBuffer_A6188	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 226 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (×3),
-; ReadFieldGroupA_64A19 (×2), ReadFinalField_64B51 (×4), ReadFieldGroupB_64A54 (×2, seg193),
-; alloue (sub_658) — chargement étendu de champs de texte depuis le format IFF.
+; far, LUE 2026-10-12. LECTEUR D'UN MODÈLE DE FUMÉE (FORM SMOK d'un jeu de fumées ; ex-
+; TextLabel_LoadFieldsExtended). Chunk INFO 25 o (ReadFieldGroupA 19h) : uint8 → +0x00 mode de
+; rendu (0 = disque dimensionné ; 1/2 = forme SHAP) ; int32 24.8 → +0x01 espacement le long
+; d'une traînée ; int32 24.8 taille début → +0x0D ; int32 24.8 taille fin ; int32 24.8 → +0x05
+; durée de vie ; +0x09 = (taille fin − début) / durée ; int32 24.8 → +0x1B dispersion de
+; position (mot bas utilisé par Math_RandomJitter_54E1C) ; uint8 teinte début → +0x15 ; uint8
+; teinte fin → +0x17 ; +0x11 = (fin − début)/durée ; uint8 → +0x19 et uint8 → +0x1A
+; (paramètres passés à Render_DrawScaledSprite_621A2). Chunk ANIM facultatif : uint8 forme A →
+; +0x27, uint8 chance de A (100 = toujours) → +0x28, uint8 forme B → +0x29, uint8 mode → +0x1F
+; ('R' aller-retour, 'S' s'arrête sur la dernière image, 'T' la particule meurt après la
+; dernière, 'W' boucle), int16 images/s → +0x21, int16 pas (1, −1, 0 = pas d'animation) →
+; +0x23 ; absent → +0x27 = +0x29 = 255 (aucune forme). Chunk SCRI facultatif : n octets (n =
+; taille) → +0x20 n, +0x25 tableau = ordre des images.
 ; ==============================================================================================
-TextLabel_LoadFieldsExtended_A61D0	proc far		; CODE XREF: VROOMM_StubThunk_6CC38J MissionText_LoadAndFormatFromIFF_A636C+260p
+SmokeSet_LoadSmokeModel_A61D0	proc far		; CODE XREF: VROOMM_StubThunk_6CC38J SmokeSet_LoadFromIFF_A636C+260p
 
 var_2C		= dword	ptr -2Ch
 var_27		= dword	ptr -27h
@@ -534,7 +544,7 @@ loc_A61F3:
 		jmp	loc_A62C2
 ; ���������������������������������������������������������������������������
 
-loc_A61F6:				; CODE XREF: TextLabel_LoadFieldsExtended_A61D0:loc_A61F1j
+loc_A61F6:				; CODE XREF: SmokeSet_LoadSmokeModel_A61D0:loc_A61F1j
 		push	large 19h
 
 loc_A61F9:
@@ -618,7 +628,7 @@ loc_A6291:
 		mov	al, [bp+var_14]
 		mov	[si+1Ah], al
 
-loc_A62C2:				; CODE XREF: TextLabel_LoadFieldsExtended_A61D0:loc_A61F3j
+loc_A62C2:				; CODE XREF: SmokeSet_LoadSmokeModel_A61D0:loc_A61F3j
 		push	0
 
 loc_A62C4:
@@ -671,12 +681,12 @@ loc_A6313:
 		jmp	short loc_A631D
 ; ���������������������������������������������������������������������������
 
-loc_A6315:				; CODE XREF: TextLabel_LoadFieldsExtended_A61D0+105j
+loc_A6315:				; CODE XREF: SmokeSet_LoadSmokeModel_A61D0+105j
 		mov	al, 0FFh
 		mov	[si+29h], al
 		mov	[si+27h], al
 
-loc_A631D:				; CODE XREF: TextLabel_LoadFieldsExtended_A61D0:loc_A6313j
+loc_A631D:				; CODE XREF: SmokeSet_LoadSmokeModel_A61D0:loc_A6313j
 		push	0
 		push	large 49524353h
 		push	di
@@ -710,13 +720,13 @@ loc_A6344:
 		call	ResourceRecord_ReadFieldGroupA_64A19
 		add	sp, 0Ah
 
-loc_A6368:				; CODE XREF: TextLabel_LoadFieldsExtended_A61D0+160j
-					; TextLabel_LoadFieldsExtended_A61D0+17Bj
+loc_A6368:				; CODE XREF: SmokeSet_LoadSmokeModel_A61D0+160j
+					; SmokeSet_LoadSmokeModel_A61D0+17Bj
 		pop	di
 		pop	si
 		leave
 		retf
-TextLabel_LoadFieldsExtended_A61D0	endp
+SmokeSet_LoadSmokeModel_A61D0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -724,17 +734,17 @@ TextLabel_LoadFieldsExtended_A61D0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 392 lignes, NON DÉTAILLÉE — la plus grosse fonction du segment : construit un
-; StreamReader (StreamReader_ConstructVariantA_63A39, seg190), combine
-; ResourceRecord_InitAndValidate_645CD, ReadFieldGroupB_64A54 (×3), la recherche de sous-
-; enregistrement (ResourceRecord_SeekAndReadB_647B2, ComputeRecordBounds_646DB,
-; AllocateAndDecode_64C21, seg193), TextLabel_LoadFieldsExtended_A61D0,
-; TextLabel_MeasureAndAllocate_A60AC, ResourceRecord_ReleaseAndClear_64D25 (×3),
-; ResourceRecord_ReadPayload_64DB3 — probable chargement complet et formatage d'un texte de
-; mission (dialogue/briefing) depuis le format IFF compressé. Candidat prioritaire pour
-; session dédiée si le contenu exact doit être confirmé.
+; far, 392 L, LUE 2026-10-12. LECTEUR DU JEU DE FUMÉES (ex-MissionText_LoadAndFormatFromIFF :
+; aucun rapport avec du texte). Appelé par World_LoadSmokeSet_A7CA1 avec le nom du chunk
+; WRLD/SMOK (ex. 'SMOKESET'). Fichier OBJECTS\<nom>.IFF, racine FORM SMOK obligatoire (sinon
+; erreur B007h). Chunk INFO : 3× uint16 → +0x0B nombre de modèles de fumée (tableau +0x0D,
+; éléments de 0x2A = 42 o), +0x0F nombre de formes (tableau +0x11, éléments de 12 o), +0x13
+; nombre max de particules (réserve de +0x13 × 0x30 o, buffer circulaire +0x15/+0x21/+0x25) ;
+; tableau vide → erreur B006h. Puis FORM TYPE : parcourt ses sous-FORM dans l'ordre ; FORM
+; SMOK → SmokeSet_LoadSmokeModel_A61D0 (modèle suivant), FORM SHAP → SmokeSet_LoadShape_A60AC
+; (forme suivante). L'index d'un modèle = son rang parmi les FORM SMOK.
 ; ==============================================================================================
-MissionText_LoadAndFormatFromIFF_A636C	proc far		; CODE XREF: VROOMM_StubThunk_6CC3DJ
+SmokeSet_LoadFromIFF_A636C	proc far		; CODE XREF: VROOMM_StubThunk_6CC3DJ
 
 var_104		= word ptr -104h
 var_B4		= word ptr -0B4h
@@ -799,7 +809,7 @@ loc_A63F0:
 		jmp	loc_A6656
 ; ���������������������������������������������������������������������������
 
-loc_A63F3:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+82j
+loc_A63F3:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+82j
 		push	0
 		push	large 4F464E49h
 		lea	ax, [bp+var_B4]
@@ -813,7 +823,7 @@ loc_A6400:
 		jmp	loc_A6572
 ; ���������������������������������������������������������������������������
 
-loc_A640F:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+9Ej
+loc_A640F:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+9Ej
 		lea	ax, [bp+var_B4]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_64A54
@@ -854,14 +864,14 @@ loc_A6471:
 		cmp	word ptr [si+11h], 0
 		jnz	short loc_A6486
 
-loc_A647D:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+109j
+loc_A647D:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+109j
 		push	0B006h
 
 loc_A6480:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A6486:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+10Fj
+loc_A6486:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+10Fj
 		push	1
 
 loc_A6488:
@@ -929,7 +939,7 @@ loc_A6511:
 		jmp	short loc_A653A
 ; ���������������������������������������������������������������������������
 
-loc_A6523:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+1D1j
+loc_A6523:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+1D1j
 		push	30h ; '0'
 		push	ds
 		push	offset word_72A30
@@ -939,7 +949,7 @@ loc_A6523:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+1D1j
 		inc	di
 		add	word ptr [bp+var_C], 30h ; '0'
 
-loc_A653A:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+1B5j
+loc_A653A:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+1B5j
 		cmp	[si+13h], di
 		jg	short loc_A6523
 		push	0
@@ -959,7 +969,7 @@ loc_A653A:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+1B5j
 		mov	word ptr [si+1Fh], 0
 		mov	byte ptr [si+0Ah], 1
 
-loc_A6572:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+A0j
+loc_A6572:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+A0j
 		push	0
 
 loc_A6574:
@@ -977,13 +987,13 @@ loc_A657F:
 		jmp	loc_A664A
 ; ���������������������������������������������������������������������������
 
-loc_A658E:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+21Dj
+loc_A658E:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+21Dj
 		mov	di, [si+0Dh]
 		mov	si, [si+11h]
 		jmp	short loc_A6611
 ; ���������������������������������������������������������������������������
 
-loc_A6596:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2D0j
+loc_A6596:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2D0j
 		lea	ax, [bp+var_B4]
 		push	ax
 		call	ResourceRecord_ComputeRecordBounds_646DB
@@ -1000,10 +1010,10 @@ loc_A6596:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2D0j
 		jmp	short loc_A65C1
 ; ���������������������������������������������������������������������������
 
-loc_A65BF:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+24Cj
+loc_A65BF:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+24Cj
 		xor	ax, ax
 
-loc_A65C1:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+251j
+loc_A65C1:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+251j
 		or	ax, ax
 		jz	short loc_A65D7
 
@@ -1012,35 +1022,35 @@ loc_A65C5:
 		push	ax
 		push	di
 		push	cs
-		call	near ptr TextLabel_LoadFieldsExtended_A61D0
+		call	near ptr SmokeSet_LoadSmokeModel_A61D0
 		add	sp, 4
 		add	di, 2Ah	; '*'
 		jmp	short loc_A65FC
 ; ���������������������������������������������������������������������������
 
-loc_A65D7:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+257j
+loc_A65D7:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+257j
 		cmp	[bp+var_47], 50414853h
 		jnz	short loc_A65E6
 		mov	ax, 1
 		jmp	short loc_A65E8
 ; ���������������������������������������������������������������������������
 
-loc_A65E6:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+273j
+loc_A65E6:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+273j
 		xor	ax, ax
 
-loc_A65E8:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+278j
+loc_A65E8:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+278j
 		or	ax, ax
 		jz	short loc_A65FC
 		lea	ax, [bp+var_B4]
 		push	ax
 		push	si
 		push	cs
-		call	near ptr TextLabel_MeasureAndAllocate_A60AC
+		call	near ptr SmokeSet_LoadShape_A60AC
 		add	sp, 4
 		add	si, 0Ch
 
-loc_A65FC:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+269j
-					; MissionText_LoadAndFormatFromIFF_A636C+27Ej
+loc_A65FC:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+269j
+					; SmokeSet_LoadFromIFF_A636C+27Ej
 		lea	ax, [bp+var_B4]
 		push	ax
 
@@ -1054,14 +1064,14 @@ loc_A6607:
 		jmp	short loc_A6611
 ; ���������������������������������������������������������������������������
 
-loc_A6609:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+237j
+loc_A6609:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+237j
 		mov	eax, [bp+var_3E]
 
 loc_A660D:
 		mov	[bp+var_4F], eax
 
-loc_A6611:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+228j
-					; MissionText_LoadAndFormatFromIFF_A636C:loc_A6607j
+loc_A6611:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+228j
+					; SmokeSet_LoadFromIFF_A636C:loc_A6607j
 		cmp	[bp+var_38], 0
 		jnz	short loc_A6624
 		lea	ax, [bp+var_B4]
@@ -1071,7 +1081,7 @@ loc_A6611:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+228j
 		jmp	short loc_A6638
 ; ���������������������������������������������������������������������������
 
-loc_A6624:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2A9j
+loc_A6624:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2A9j
 		mov	bx, [bp+var_38]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_4F]
@@ -1080,34 +1090,34 @@ loc_A6624:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2A9j
 		jmp	short loc_A6638
 ; ���������������������������������������������������������������������������
 
-loc_A6636:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2C3j
+loc_A6636:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2C3j
 		xor	ax, ax
 
-loc_A6638:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2B6j
-					; MissionText_LoadAndFormatFromIFF_A636C+2C8j
+loc_A6638:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2B6j
+					; SmokeSet_LoadFromIFF_A636C+2C8j
 		or	ax, ax
 		jnz	short loc_A663F
 		jmp	loc_A6596
 ; ���������������������������������������������������������������������������
 
-loc_A663F:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2CEj
+loc_A663F:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2CEj
 		lea	ax, [bp+var_B4]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_A664A:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+21Fj
+loc_A664A:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+21Fj
 		lea	ax, [bp+var_B4]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_64D25
 		jmp	short loc_A665E
 ; ���������������������������������������������������������������������������
 
-loc_A6656:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C:loc_A63F0j
+loc_A6656:				; CODE XREF: SmokeSet_LoadFromIFF_A636C:loc_A63F0j
 		push	0B007h
 		call	VROOMM_StubThunk_6B70F
 
-loc_A665E:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2E8j
+loc_A665E:				; CODE XREF: SmokeSet_LoadFromIFF_A636C+2E8j
 		pop	cx
 		mov	[bp+var_B4], 2E0h
 		lea	ax, [bp+var_B4]
@@ -1125,7 +1135,7 @@ loc_A665E:				; CODE XREF: MissionText_LoadAndFormatFromIFF_A636C+2E8j
 locret_A6681:
 		leave
 		retf
-MissionText_LoadAndFormatFromIFF_A636C	endp
+SmokeSet_LoadFromIFF_A636C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

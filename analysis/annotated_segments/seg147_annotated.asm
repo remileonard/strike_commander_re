@@ -13,7 +13,7 @@ seg147		segment	byte public 'CODE' use16
 ; verticale au lieu d'horizontale). Mêmes appelants (sub_97215, sub_A60AC).
 ; ==============================================================================================
 Text_ComputeMaxLineHeight_5E706	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFieldsD_97215+A9P
-					; TextLabel_MeasureAndAllocate_A60AC+9BP
+					; SmokeSet_LoadShape_A60AC+9BP
 
 var_A		= word ptr -0Ah
 var_6		= word ptr -6

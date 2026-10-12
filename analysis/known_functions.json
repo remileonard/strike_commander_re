@@ -2740,9 +2740,9 @@
     "summary": "⚠️ far, 199 lignes, NON DÉTAILLÉE — variante de IndexedRecordReader_ScanAndReadTyped_99120."
   },
   "sub_A61D0": {
-    "new_name": "TextLabel_LoadFieldsExtended_A61D0",
+    "new_name": "SmokeSet_LoadSmokeModel_A61D0",
     "segment": "seg450",
-    "summary": "⚠️ far, 226 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (×3), ReadFieldGroupA_64A19 (×2), ReadFinalField_64B51 (×4), ReadFieldGroupB_64A54 (×2, seg193), alloue (sub_658) — chargement étendu de champs de texte depuis le format IFF."
+    "summary": "far, LUE 2026-10-12. LECTEUR D'UN MODÈLE DE FUMÉE (FORM SMOK d'un jeu de fumées ; ex-TextLabel_LoadFieldsExtended). Chunk INFO 25 o (ReadFieldGroupA 19h) : uint8 → +0x00 mode de rendu (0 = disque dimensionné ; 1/2 = forme SHAP) ; int32 24.8 → +0x01 espacement le long d'une traînée ; int32 24.8 taille début → +0x0D ; int32 24.8 taille fin ; int32 24.8 → +0x05 durée de vie ; +0x09 = (taille fin − début) / durée ; int32 24.8 → +0x1B dispersion de position (mot bas utilisé par Math_RandomJitter_54E1C) ; uint8 teinte début → +0x15 ; uint8 teinte fin → +0x17 ; +0x11 = (fin − début)/durée ; uint8 → +0x19 et uint8 → +0x1A (paramètres passés à Render_DrawScaledSprite_621A2). Chunk ANIM facultatif : uint8 forme A → +0x27, uint8 chance de A (100 = toujours) → +0x28, uint8 forme B → +0x29, uint8 mode → +0x1F ('R' aller-retour, 'S' s'arrête sur la dernière image, 'T' la particule meurt après la dernière, 'W' boucle), int16 images/s → +0x21, int16 pas (1, −1, 0 = pas d'animation) → +0x23 ; absent → +0x27 = +0x29 = 255 (aucune forme). Chunk SCRI facultatif : n octets (n = taille) → +0x20 n, +0x25 tableau = ordre des images."
   },
   "sub_9D4B5": {
     "new_name": "Camera_InitAndGetHandleWrapper_9D4B5",
@@ -6275,9 +6275,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A12DF) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_A60AC": {
-    "new_name": "TextLabel_MeasureAndAllocate_A60AC",
+    "new_name": "SmokeSet_LoadShape_A60AC",
     "segment": "seg450",
-    "summary": "⚠️ far, 119 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743, allocateurs typés (Memory_TypedFreeWrapperC_5C6F3, Memory_TypedAllocDispatchB_5C832 ×3), ResourceRecord_ReadDwordFieldB_64AFF, Text_ComputeMaxLineHeight_5E706, Text_ComputeMaxLineWidth_5E6BF (seg146-147) — mesure et alloue l'espace d'affichage d'un texte multi-lignes chargé depuis le format IFF."
+    "summary": "far, LECTEUR D'UNE FORME DE FUMÉE (FORM SHAP d'un jeu de fumées ; ex-TextLabel_MeasureAndAllocate). Chunk SHAP obligatoire (sinon erreur B005h) : contenu brut (taille du chunk) copié dans un bloc mémoire = image(s) de sprite ; +0x0A = (Text_ComputeMaxLineHeight_5E706 + Text_ComputeMaxLineWidth_5E6BF) / 4 = demi-taille moyenne de l'image. Élément de 12 o."
   },
   "sub_673B9": {
     "new_name": "TextScrollDisplay_RegisterEntries_673B9",
@@ -12165,9 +12165,9 @@
     "summary": "far,43L — si le token est de type 0xA7 (identifiant), résout le symbole via une table de noms (sub_52DDB, word_706A0+0x34) et retourne un champ associé (+0x52) : **résolution de symbole nommé (table de symboles) du parseur script IA.**"
   },
   "sub_A636C": {
-    "new_name": "MissionText_LoadAndFormatFromIFF_A636C",
+    "new_name": "SmokeSet_LoadFromIFF_A636C",
     "segment": "seg450",
-    "summary": "⚠️ far, 392 lignes, NON DÉTAILLÉE — la plus grosse fonction du segment : construit un StreamReader (StreamReader_ConstructVariantA_63A39, seg190), combine ResourceRecord_InitAndValidate_645CD, ReadFieldGroupB_64A54 (×3), la recherche de sous-enregistrement (ResourceRecord_SeekAndReadB_647B2, ComputeRecordBounds_646DB, AllocateAndDecode_64C21, seg193), TextLabel_LoadFieldsExtended_A61D0, TextLabel_MeasureAndAllocate_A60AC, ResourceRecord_ReleaseAndClear_64D25 (×3), ResourceRecord_ReadPayload_64DB3 — probable chargement complet et formatage d'un texte de mission (dialogue/briefing) depuis le format IFF compressé. Candidat prioritaire pour session dédiée si le contenu exact doit être confirmé."
+    "summary": "far, 392 L, LUE 2026-10-12. LECTEUR DU JEU DE FUMÉES (ex-MissionText_LoadAndFormatFromIFF : aucun rapport avec du texte). Appelé par World_LoadSmokeSet_A7CA1 avec le nom du chunk WRLD/SMOK (ex. 'SMOKESET'). Fichier OBJECTS\\<nom>.IFF, racine FORM SMOK obligatoire (sinon erreur B007h). Chunk INFO : 3× uint16 → +0x0B nombre de modèles de fumée (tableau +0x0D, éléments de 0x2A = 42 o), +0x0F nombre de formes (tableau +0x11, éléments de 12 o), +0x13 nombre max de particules (réserve de +0x13 × 0x30 o, buffer circulaire +0x15/+0x21/+0x25) ; tableau vide → erreur B006h. Puis FORM TYPE : parcourt ses sous-FORM dans l'ordre ; FORM SMOK → SmokeSet_LoadSmokeModel_A61D0 (modèle suivant), FORM SHAP → SmokeSet_LoadShape_A60AC (forme suivante). L'index d'un modèle = son rang parmi les FORM SMOK."
   },
   "sub_43936": {
     "new_name": "Effect_SpawnPeriodicAtAttach",
@@ -15195,9 +15195,9 @@
     "summary": "Ex-'Interrupt_TimerInitState_597C2' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). Anciennement Music_SequencerTickInit_597C2. Un des 4 cas de Music_SequencerTickDispatch_59436 — initialisation d'état du séquenceur musical."
   },
   "sub_A7CA1": {
-    "new_name": "MissionLoader_LoadChunkB_A7CA1",
+    "new_name": "World_LoadSmokeSet_A7CA1",
     "segment": "seg455",
-    "summary": "far, combine ResourceRecord_SeekAndRead_64743, sub_2AFE0, alloue (sub_658), sub_6CC3D, enregistrement conteneur (sub_21F8D)."
+    "summary": "far, LECTEUR DU CHUNK SMOK D'UN MONDE (ex-MissionLoader_LoadChunkB) : nom du jeu de fumées (ex. 'SMOKESET'), alloue l'objet jeu de fumées (0x33 o, vtable 30BAh) et le remplit par SmokeSet_LoadFromIFF_A636C ; résultat dans word_70483 (utilisé par SmokeTrail_Tick_3D57E, SmokeGen_Tick_4C057, Particle_SpawnWithColor)."
   },
   "sub_9B57E": {
     "new_name": "Debris_ReleaseForceBufferWrapper_9B57E",
@@ -15600,9 +15600,9 @@
     "summary": "far, aucun appel externe visible (14 lignes)."
   },
   "sub_4C168": {
-    "new_name": "ParticleEmitter_InitFromChunk",
+    "new_name": "Particle_InitFromSmokeModel_4C168",
     "segment": "seg106",
-    "summary": "far,49L — copie des offsets depuis une structure de chunk (+0xD/+5/+0x15) vers des champs de rendu (+0x20/+0x24/+0x28), réinitialise l'état d'animation (+0x1A/1C/1E, +0x2C/2D/2E) : **initialisation d'un émetteur/pool de particules depuis une définition de chunk.**"
+    "summary": "far, INITIALISE UNE PARTICULE DEPUIS SON MODÈLE DE FUMÉE (ex-ParticleEmitter_InitFromChunk) : particule +0x06 = modèle, +0x20 = taille de début (modèle +0x0D), +0x24 = durée de vie (modèle +0x05), +0x28 = teinte de début (modèle +0x15 << 8), vitesse +0x1A/+0x1C/+0x1E = 0, image +0x2E = 0, +0x2D = 2. Appelée par ParticlePool_AllocElement."
   },
   "sub_ABBEF": {
     "new_name": "AudioQueue_MainProcessEntry_ABBEF",
@@ -17755,9 +17755,9 @@
     "summary": "far — wrapper sprintf (sub_1233) avec format fixe 291Dh : génère un message formaté standard (probable message d'erreur runtime)."
   },
   "sub_4C413": {
-    "new_name": "ParticleEmitter_PeriodicUpdate",
+    "new_name": "Particle_UpdateLifeSizeShadeFrame_4C413",
     "segment": "seg106",
-    "summary": "far,351L — décrémente un timer (delta-temps physique dword_70458), teste le flag +0x2C bit1 pour dispatcher un comportement : **mise à jour périodique d'un émetteur de particules avec minuteur et branchement selon l'état.**"
+    "summary": "far, MISE À JOUR D'UNE PARTICULE À CHAQUE IMAGE (ex-ParticleEmitter_PeriodicUpdate). Durée de vie +0x24 −= dt (dword_70458) ; ≤ 0 → renvoie 0 (particule supprimée). Si mode de rendu 1 ou 2 et pas d'animation ≠ 0 : compteur +0x2F += images/s (modèle +0x21) × dt ; à chaque passage de 256, image +0x2E += pas (modèle +0x23), bornée au nombre d'images (SCRI, sinon nombre d'images de la forme) selon le mode +0x1F : 'R' aller-retour (inverse le pas DU MODÈLE, partagé par toutes ses particules), 'S' arrêt (pas = 0), 'T' particule supprimée, 'W' boucle. Puis taille +0x20 += modèle +0x09 × dt et teinte +0x28 += modèle +0x11 × dt (interpolation linéaire début → fin sur la durée de vie). Le rendu (seg106) projette la taille (× dword_72202 ÷ profondeur) et utilise la teinte (>> 8) comme index d'une table de remappage de palette de 256 o (dword_72528)."
   },
   "sub_49A7C": {
     "new_name": "Autopilot_BankForTurn_49A7C",

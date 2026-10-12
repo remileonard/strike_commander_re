@@ -13,7 +13,7 @@ seg176		segment	byte public 'CODE' use16
 ; ParticleEmitter_PeriodicUpdate_4C413 (seg106) et CachedObject_BuildAndTransform_5DEC9
 ; (seg141).
 ; ==============================================================================================
-Struct_GetElementCountMinusOne_625CC	proc far		; CODE XREF: ParticleEmitter_PeriodicUpdate+145P
+Struct_GetElementCountMinusOne_625CC	proc far		; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+145P
 					; CachedObject_BuildAndTransform_5DEC9+3FP ...
 
 arg_0		= dword	ptr  6

@@ -818,7 +818,7 @@ défaut en virgule fixe 8.8 (`PlayerComponent_ResetVisualStateDefaults_A5620`)
 transparence, etc.).
 
 **seg450 (10 fonctions) : chargement de texte de mission.**
-`MissionText_LoadAndFormatFromIFF_A636C` (392L) combine construction de
+`SmokeSet_LoadFromIFF_A636C` (392L) combine construction de
 StreamReader, recherche de sous-enregistrement IFF (même cluster que le
 LZW, seg196-197) et mesure de texte multi-lignes (seg146-147) — probable
 chargeur de dialogue/briefing de mission compressé. Non lu en détail

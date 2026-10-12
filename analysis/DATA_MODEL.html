@@ -142,6 +142,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <li><a href="#scne"><span>4e</span><span>PLAY / SCNE</span></a></li>
     <li><a href="#autres"><span>4f</span><span>Autres chunks</span></a></li>
     <li><a href="#wrld"><span>5</span><span>Monde WRLD</span></a></li>
+    <li><a href="#fumees"><span>5b</span><span>Jeu de fumées</span></a></li>
     <li><a href="#terrain"><span>6</span><span>Terrain PAK</span></a></li>
     <li><a href="#camr"><span>7</span><span>Caméras CAMR</span></a></li>
     <li><a href="#ponts"><span>8</span><span>Ponts campagne</span></a></li>
@@ -325,7 +326,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <ol class="phases">
     <li><span>1</span><div><b>Allumage</b> : la traînée démarre quand l'objet est détruit (et dans certains cas de contact avec le sol), seulement si son modèle a un chunk <code>SMOK</code>.</div></li>
     <li><span>2</span><div><b>À chaque image</b> : le jeu calcule où se trouve le point d'émission maintenant et où il était à l'image précédente, puis répartit des particules <b>le long de ce segment</b>. La traînée reste donc continue même à grande vitesse ; le nombre de particules dépend de la longueur du segment et de l'espacement donné par le modèle de fumée.</div></li>
-    <li><span>3</span><div><b>Jeu de fumées</b> : les modèles de fumée viennent du chunk <code>SMOK</code> du monde (<code>SMOKESET</code>), 42 octets chacun. Sans jeu chargé, aucune fumée n'est émise (ni traînée, ni <code>SMKG</code>).</div></li>
+    <li><span>3</span><div><b>Jeu de fumées</b> : les modèles de fumée viennent du <a href="#fumees">jeu de fumées</a> nommé par le chunk <code>SMOK</code> du monde (<code>SMOKESET</code>). Sans jeu chargé, aucune fumée n'est émise (ni traînée, ni <code>SMKG</code>).</div></li>
   </ol>
   <p>Aucun de ces FORM trouvé : le chargement échoue (erreur 49173). Les chunks lus par la plupart des classes sont décrits dans la fiche suivante.</p>
   <h3>Composants de dégâts d'un avion</h3>
@@ -845,13 +846,67 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td class="num">TERA</td><td><b>nom du terrain</b> → <code>DATA\&lt;nom&gt;.PAK</code></td></tr>
       <tr><td class="num">SKYS</td><td>ciel et soleil (couleur, direction, intensité)</td></tr>
       <tr><td class="num">GLNT</td><td>reflets du soleil (eau, métal)</td></tr>
-      <tr><td class="num">SMOK</td><td>nom du <b>jeu de fumées</b> (ex. <code>SMOKESET</code>) : les modèles de fumée que <code>SMKG</code> et les traînées <code>SMOK</code> désignent par leur numéro</td></tr>
+      <tr><td class="num">SMOK</td><td>nom du <a href="#fumees"><b>jeu de fumées</b></a> (ex. <code>SMOKESET</code>) : les modèles de fumée que <code>SMKG</code> et les traînées <code>SMOK</code> désignent par leur numéro</td></tr>
       <tr><td class="num">LGHT</td><td>éclairage (14 octets)</td></tr>
       <tr><td class="num">HORZ</td><td>horizon : 2 <code>uint32</code></td></tr>
       <tr><td class="num">SCAL</td><td>échelle du monde : <code>uint32</code></td></tr>
       <tr><td class="num">FORM CAMR</td><td><a href="#camr">caméras scriptées</a></td></tr>
     </tbody>
   </table></div>
+</article>
+
+<!-- ============================ FUMEES ============================ -->
+<article class="mv" id="fumees">
+  <header><span class="id">OBJECTS\&lt;SMOKESET&gt;.IFF</span><h2>Le jeu de fumées</h2></header>
+  <ul class="chips"><li>racine <b>FORM SMOK</b></li><li>nommé par le chunk <b>SMOK</b> du monde</li><li>lecteur <b>SmokeSet_LoadFromIFF_A636C</b></li></ul>
+  <p>Toutes les fumées du jeu (traînées des objets, générateurs <code>SMKG</code>) sont des particules décrites par des <b>modèles de fumée</b>. Le monde charge un jeu de fumées par son nom (ex. <code>SMOKESET</code>) ; les objets désignent ensuite un modèle par son <b>numéro</b>.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bloc</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">INFO</td><td>3 <code>uint16</code> : nombre de modèles de fumée, nombre de formes, nombre maximum de particules affichées en même temps</td></tr>
+      <tr><td class="num">FORM TYPE</td><td>la liste, dans l'ordre :</td></tr>
+      <tr><td class="num">· FORM SMOK</td><td>un modèle de fumée ; son numéro = son rang parmi les <code>FORM SMOK</code> (0, 1, 2…)</td></tr>
+      <tr><td class="num">· FORM SHAP</td><td>une forme (image de sprite) ; son numéro = son rang parmi les <code>FORM SHAP</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Un modèle de fumée : chunk INFO (25 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>mode de rendu</td><td>uint8</td><td class="num">1</td><td>0 = disque dont la taille varie ; 1 ou 2 = forme <code>SHAP</code> (sprite)</td></tr>
+      <tr><td>espacement</td><td>float</td><td class="num">4</td><td>mètres entre deux particules le long d'une traînée</td></tr>
+      <tr><td>taille au début</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>taille à la fin</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>durée de vie</td><td>float</td><td class="num">4</td><td>secondes</td></tr>
+      <tr><td>dispersion</td><td>float</td><td class="num">4</td><td>mètres : position tirée au hasard autour du point d'émission</td></tr>
+      <tr><td>teinte au début</td><td>uint8</td><td class="num">1</td><td>numéro d'une table de remappage de palette (ombre / transparence)</td></tr>
+      <tr><td>teinte à la fin</td><td>uint8</td><td class="num">1</td><td>idem</td></tr>
+      <tr><td>dessin A</td><td>uint8</td><td class="num">1</td><td>paramètre de dessin du sprite — rôle non établi</td></tr>
+      <tr><td>dessin B</td><td>uint8</td><td class="num">1</td><td>paramètre de dessin du sprite — rôle non établi</td></tr>
+    </tbody>
+  </table></div>
+  <p>Pendant sa durée de vie, chaque particule passe <b>linéairement</b> de la taille et de la teinte de début à celles de fin, puis disparaît.</p>
+
+  <h3>Chunk ANIM (facultatif, 8 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>forme A</td><td>uint8</td><td class="num">1</td><td>numéro de forme <code>SHAP</code></td></tr>
+      <tr><td>chance de A</td><td>uint8</td><td class="num">1</td><td>pourcentage : chaque particule prend la forme A avec cette chance, sinon la forme B (100 = toujours A)</td></tr>
+      <tr><td>forme B</td><td>uint8</td><td class="num">1</td><td>numéro de forme <code>SHAP</code></td></tr>
+      <tr><td>mode</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>lettre : <code>R</code> aller-retour, <code>S</code> s'arrête sur la dernière image, <code>T</code> la particule disparaît après la dernière image, <code>W</code> boucle</td></tr>
+      <tr><td>vitesse</td><td>int16</td><td class="num">2</td><td>images par seconde</td></tr>
+      <tr><td>pas</td><td>int16</td><td class="num">2</td><td>1 = en avant, −1 = en arrière, 0 = pas d'animation</td></tr>
+    </tbody>
+  </table></div>
+  <p>Sans <code>ANIM</code>, le modèle n'a pas de forme. ⚠️ En mode <code>R</code>, le jeu inverse le pas <b>dans le modèle</b> : toutes les particules de ce modèle changent de sens en même temps.</p>
+
+  <h3>Chunk SCRI (facultatif)</h3>
+  <p>Une suite de <code>uint8</code> : l'ordre des images à jouer (autant d'octets que d'images). Sans <code>SCRI</code>, les images de la forme sont jouées dans l'ordre.</p>
+
+  <h3>Une forme : FORM SHAP</h3>
+  <p>Un chunk <code>SHAP</code> obligatoire, copié tel quel : la ou les images du sprite.</p>
 </article>
 
 <!-- ============================ TERRAIN ============================ -->
@@ -998,7 +1053,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
     <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
     <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : premier champ de <code>EJEC</code> ; format des modèles de fumée (42 octets) ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
+    <li>Objets : premier champ de <code>EJEC</code> ; deux paramètres de dessin des modèles de fumée ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
     <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>
