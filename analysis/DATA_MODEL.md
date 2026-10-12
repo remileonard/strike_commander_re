@@ -1013,7 +1013,7 @@ pour la passe de liaison `ExprSlot` :
 | 4a | ↳ `FILE` | `ReadFieldGroupA` 8 o | (local) → `sub_6CDCD` | nom du fichier monde à charger |
 | 4b | ↳ (sinon) | `sub_6CDC8` | — | monde inline |
 | 5 | `CAST` | `sub_6CF0D` | `si+0x2E` | acteurs / personnages |
-| 6 | `AREA` | `sub_6CED6` | `si+0x1A` | zones géographiques |
+| 6 | `AREA` | `sub_6CED6` → `ExprSlot_ConstructMain_A974A` | `si+0x1A` | zones géographiques nommées (sphère / cylindre / boîte) — format ci-dessous |
 | 7 | `SPOT` | `sub_6CEE5` | `si+0x1E` | points nommés |
 | 8 | `NUMS` | `sub_6CEF4` | `si+0x24` | variables numériques de mission |
 | 9 | `MSGS` | `sub_6CF03` | `si+0x28` | messages / dialogues |
@@ -1038,6 +1038,76 @@ objet les flags `+0x39 |= 0x10|0x20`, on lit son id `+0x52`, `SetReference16`
 (`si+0x5C/60/64`) est **recalculée** via `Expr_Node_StoreResultVector_52C9C`.
 Enfin `Expr_Node_RecomputeAllFields_532EA(si+0x3A)` (évalue toutes les scènes) et
 `Lexer_CountTokensAndFormat(si+0x68)`.
+
+##### `AREA` → zones géographiques — `ExprSlot_ConstructMain_A974A` (seg457)
+
+Liste de **zones nommées**, chacune une forme 3D (sphère, cylindre vertical ou boîte) qui
+sert à savoir **dans quelle zone se trouve le joueur**. Le chunk est une suite
+d'enregistrements collés, **sans compteur** : la 1ʳᵉ lettre de chaque enregistrement donne
+la forme, et donc sa taille.
+
+Entiers i32 **little-endian lus bruts** (`ResourceRecord_ReadFieldGroupC_64A7E` :
+`push large 4` / `add dword ptr [si+65h], 4`, pas d'inversion). Toutes les distances sont en
+24.8 → **÷ 256 = mètres**. Colonne « libRealSpace » : repère **Y-up** (Y = altitude,
+Z = profondeur) — la 2ᵉ coordonnée du fichier est Z, la 3ᵉ est Y.
+
+**En-tête commun** (`ExprSlot_LoadFieldGroup_A9450` : `push large 20h` +
+`ResourceRecord_ReadFieldGroupA_64A19`, puis 3× `ReadFieldGroupC`) :
+
+| Off. disque | Type | Champ (asm, Z-up) | libRealSpace | → objet |
+|---|---|---|---|---|
+| `0x00` | u8 | forme `'S'` / `'C'` / `'B'` | — | (classe : vtable) |
+| `0x01` | char[32] | nom de la zone (ex. « Strike Base ») | — | `+0x02` |
+| `0x21` | i32 | c0 | **X** | `+0x22` |
+| `0x25` | i32 | c1 | **Z** (profondeur) | `+0x26` |
+| `0x29` | i32 | c2 = altitude | **Y** | `+0x2A` |
+
+**Queue selon la forme :**
+
+| Forme | Lecteur | Off. disque → objet | Sens (libRealSpace) | Taille disque | Alloc. objet |
+|---|---|---|---|---|---|
+| `'S'` sphère | `ExprSlot_ReleaseAndLoad_A94E9` | `0x2D` → `+0x2E` | rayon | 49 o (1 + `30h`) | `0x32` |
+| `'C'` cylindre vertical | `ExprSlot_ReleaseAndLoadB_A9690` | `0x2D` → `+0x2E` ; `0x31` → `+0x32` | **hauteur** (le long de Y) ; **rayon** (plan X/Z) | 53 o (1 + `34h`) | `0x36` |
+| `'B'` boîte | `ExprSlot_ReleaseAndLoadExtended_A9565` | `0x2D` → `+0x2E` ; `0x31` → `+0x32` ; `0x35` → `+0x36` ; `0x39` → `+0x3A` ; `0x3D` → `+0x3E` | étendue **+X** ; **−X** ; **+Z** ; **−Z** ; **hauteur** (le long de Y) | 65 o (1 + `40h`) | `0x42` |
+
+Tailles prouvées par la passe de comptage : `add dword ptr [bx+65h], 30h` (`'S'`), `40h`
+(`'B'`), `34h` (`'C'`). Lettre inconnue : erreur `900Dh` (comptage) / `900Fh` (lecture).
+Fin de chunk de taille impaire : l'octet de bourrage IFF est sauté (`test word ptr [bx+72h],1`
+puis `inc dword ptr [bx+65h]` si on est sur le dernier octet).
+
+**Test d'appartenance** (méthode `+4` de la vtable de chaque forme, `seg339:off_70791…off_707A5` ;
+méthode `+0` = lettre de la forme). Point testé = position monde (mêmes unités). **Bornes
+incluses.** Écrit en repère libRealSpace :
+
+- **Sphère** — `HitShape_Sphere_ContainsPoint_52E91` : la référence est le **centre** ;
+  dedans si `distance3D(point, centre) ≤ rayon` (`Math_VectorLength3D_Raw_5828E` puis
+  `cmp eax, es:[bx+2Eh] / jg` → dehors).
+- **Cylindre** — `HitShape_Radial2D_ContainsPoint_52F99` : le Y de référence est le
+  **plancher** ; dedans si `Y ≤ y ≤ Y + hauteur` **et** distance dans le plan X/Z ≤ rayon
+  (composante d'altitude mise à 0 : `mov dword ptr [bp-0Ch], 0`, puis `cmp eax, es:[bx+32h]`).
+- **Boîte** — `HitShape_Box_ContainsPoint_52F0F` : boîte alignée sur les axes, étendues
+  **asymétriques**, Y de référence = **plancher** :
+  `X − (−X) ≤ x ≤ X + (+X)`, `Z − (−Z) ≤ z ≤ Z + (+Z)`, `Y ≤ y ≤ Y + hauteur`
+  (`mov eax, es:[bx+22h] / add eax, es:[bx+2Eh] / cmp eax, [si] / jge` ;
+  `sub eax, es:[bx+32h] / cmp eax, [si] / jg` ; altitude : `add eax, es:[bx+3Eh] / cmp eax, [si+8] / jl`,
+  puis `mov eax, [si+8] / cmp eax, es:[bx+2Ah] / jl`).
+
+**En mémoire** : `MissionScenario+0x1A` = `[+0]` u16 nombre de zones, `[+2]` near ptr vers un
+tableau de **far ptr** (4 o) vers les objets zone (allocation `shl ax, 2` après la passe de
+comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
+`GeomNode_SumAndCount_53034(liste, i)` renvoie l'élément i, ou un pointeur **nul** si
+`i ≥ nombre` (`cmp [si], dx / jbe`) — d'où `area_id = −1` = « pas de zone ».
+
+**Utilisateurs** :
+- `SCNE.area_id` (ci-dessous) : à chaque tick, `MAIN_GAME_TICK` passe la position du joueur
+  (`MissionScenario+0x54`, à défaut le vecteur global `dword_707F8`) à
+  `Scene_DetectAndActivateChange_532EA` → `Scene_FindMatchingByAreaContainment_53236`, qui renvoie
+  la **première** scène active dont la zone contient ce point (`call dword ptr [bx+4]`) ;
+- `PART` : `PartEntry_LoadAndResolveNames_A9E3C` convertit un index de zone en pointeur (entrée `+0x1D`) ;
+- `HOME` : index de la zone de la base de départ (`si+0x58`) ;
+- opcodes de script `0x80` / `0x81` / `0x82` (`Expr_VM_Interpreter_51106`) : prennent un index
+  de zone et retrouvent la scène rattachée (`Expr_Node_Accessor_532AD`) ; `0x80` met son
+  `is_active` à 1, `0x82` le teste, `0x81` non détaillé.
 
 ##### `PLAY` → chunks `SCNE` (scènes) — `MissionPlay_LoadScenes_AA595` (seg457)
 
