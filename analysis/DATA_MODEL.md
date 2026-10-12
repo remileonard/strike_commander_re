@@ -1012,7 +1012,7 @@ pour la passe de liaison `ExprSlot` :
 | 4 | `WRLD` | `enter_form` | — | sous-FORM monde (**obligatoire**, erreur `9015h`) |
 | 4a | ↳ `FILE` | `ReadFieldGroupA` 8 o | (local) → `sub_6CDCD` | nom du fichier monde à charger |
 | 4b | ↳ (sinon) | `sub_6CDC8` | — | monde inline |
-| 5 | `CAST` | `sub_6CF0D` | `si+0x2E` | acteurs / personnages |
+| 5 | `CAST` | `sub_6CF0D` → `PLAY_LoadCASTTeamNames_A9956` | `si+0x2E` | noms de pilotes (`PLAYER`, IA → profil `INTEL\<nom>.IFF`, ailiers `TEAMn`) — format ci-dessous |
 | 6 | `AREA` | `sub_6CED6` → `ExprSlot_ConstructMain_A974A` | `si+0x1A` | zones géographiques nommées (sphère / cylindre / boîte) — format ci-dessous |
 | 7 | `SPOT` | `sub_6CEE5` → `Mission_LoadSpotList_AA6C9` | `si+0x1E` | points relatifs à une zone `AREA` — format ci-dessous |
 | 8 | `NUMS` | `sub_6CEF4` | `si+0x24` | variables numériques de mission |
@@ -1038,6 +1038,46 @@ objet les flags `+0x39 |= 0x10|0x20`, on lit son id `+0x52`, `SetReference16`
 (`si+0x5C/60/64`) est **recalculée** via `Expr_Node_StoreResultVector_52C9C`.
 Enfin `Expr_Node_RecomputeAllFields_532EA(si+0x3A)` (évalue toutes les scènes) et
 `Lexer_CountTokensAndFormat(si+0x68)`.
+
+##### `CAST` → noms de pilotes — `PLAY_LoadCASTTeamNames_A9956` (seg457)
+
+Liste des **noms de pilotes** de la mission. Chaque objet `PART` y renvoie par son index
+(disque `0x00` → entrée `+0x1B`) ; le nom décide **qui pilote** l'objet.
+
+Enregistrements de **9 octets**, sans compteur : nombre = taille ÷ 9 (`mov bx, 9 / div bx`),
+**sans contrôle** du reste (contrairement à `SPOT` / `PART`). Le chunk entier est lu brut
+(`push large dword ptr [di+72h]` / `ResourceRecord_ReadDwordFieldB_64AFF`).
+
+| Disque | Type | Champ |
+|---|---|---|
+| `0x00` | char[8] | nom, complété par des zéros (`PLAYER`, `STERN`, `NULL`, `TEAM0`…) |
+| `0x08` | u8 | zéro de fin (réécrit à 0 après un remplacement) |
+
+En mémoire : `MissionScenario+0x2E` = `[+0]` u16 nombre, `[+2]` far ptr vers le buffer.
+Accès depuis une entrée `PART` : `Mission_GetCastName_52C5F` = `&CAST[entrée+0x1B]`, ou nul si
+l'index ≥ nombre (`cmp [bx+2Eh], dx / jbe`, puis `imul ax, 9`).
+
+**Noms spéciaux `TEAMn` = ailiers choisis dans la campagne.** À la lecture, tout nom commençant
+par `TEAM` (`cmp dword ptr es:[bx], 4D414554h`) est remplacé **sur place** ; n = 5ᵉ caractère
+− `'0'` (`add ax, 0FFD0h`) :
+
+- mission lancée depuis la campagne (`byte_7070E = 1`, posé par
+  `MissionScenario_LoadFromIFF_A8C44`) et n < 3 → n-ième nom du chunk `TEAM` de
+  `DATA\OP2MISN.IFF` (écrit par `OPTEST.EXE` ; 3 noms de 9 o rangés en `MissionScenario+0x86` :
+  `imul ax, 9` / `add dx, 86h`) ; n ≥ 3 → inchangé ;
+- mission chargée directement (`byte_7070E = 0`) → **`BILLY`** (`push offset aBilly`).
+
+Copie de 8 octets en tête d'enregistrement puis `+0x08 = 0` : pas de débordement sur l'entrée
+suivante.
+
+**Usage à l'activation** (`AIAircraft_SpawnAndConditionalLoadProfile_53363`) : comparaison sur
+8 caractères avec `PLAYER` → type 2 (joueur), `NETWORK` → type 3, sinon type 1 (IA) ; le pointeur
+du nom est rangé dans l'entité (`mov [di+6], eax`). Pour un objet piloté qui n'est pas le joueur
+(`and ax, 6Fh / cmp ax, 4Eh` et type ≠ 2), le **profil de comportement** est chargé depuis
+**`INTEL\<nom CAST>.IFF`** (`PilotProfile_LoadFromPROF_73B4F` : `push offset aIntel_0` /
+`push large dword ptr [bx+6]` / `push offset a_iff`) — chunks `GOAL` / `MVRS` / `ATRB`… Ex. `STERN`
+→ `INTEL\STERN.IFF` ; `TEAM0` remplacé par `BILLY` → `INTEL\BILLY.IFF`. Le joueur n'a jamais de
+profil. Le nom `CAST` est aussi écrit dans le chunk `KILL` de `MISN2OP.IFF`.
 
 ##### `AREA` → zones géographiques — `ExprSlot_ConstructMain_A974A` (seg457)
 
@@ -1327,7 +1367,7 @@ Utilise les primitives **d'écriture** (`WriteFieldGroupA/B`, `WriteTyped`,
 | `INFO` | 8 o depuis `si` |
 | `STAT` | 8× u16 depuis `si+0xA1` (stats par équipe) |
 | `JETS` | par participant : marqueur si nœud `+0x39` bit posé **et** type `+0x00` == `"F-16"` (`0x36312D46`) |
-| `KILL` | par participant : u16 `+0x3E`, u16 `+0x40`, descripteur 8 o via `Expr_LookupBuiltinFuncDesc_52C5F` |
+| `KILL` | par participant : u16 `+0x3E`, u16 `+0x40`, descripteur 8 o via `Mission_GetCastName_52C5F` |
 | `EXIT` | 1 o depuis `byte_706AF` |
 | `DIED` | par équipe : résolution via `Expr_Node_LookupAndConvert_52D69(si+0x34)`, test du bit `+0x39` |
 | `SCOR` | score (suite non détaillée) |

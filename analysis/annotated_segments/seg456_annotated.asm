@@ -2075,10 +2075,9 @@ MissionScenario_LoadFromIFF_A8C44	endp
 ; via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped,
 ; AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par
 ; participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par
-; participant : u16 +0x3E, u16 +0x40, descripteur 8o via Expr_LookupBuiltinFuncDesc_52C5F)
-; EXIT(1o de byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34))
-; SCOR(score). Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md
-; §6.6a.
+; participant : u16 +0x3E, u16 +0x40, descripteur 8o via Mission_GetCastName_52C5F) EXIT(1o de
+; byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34)) SCOR(score).
+; Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md §6.6a.
 ; ==============================================================================================
 MissionScenario_ResolveAndBindExpressions_A8F22	proc far		; CODE XREF: VROOMM_StubThunk_6CE56J MissionScenario_RecomputeFields_A9382+4Cp
 
@@ -2395,7 +2394,7 @@ loc_A91C4:
 		add	sp, 0Eh
 		add	[bp+var_C7], 2
 		push	large dword ptr	[bp-0Ch]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	[bp+var_12], dx
 		mov	[bp+var_14], ax

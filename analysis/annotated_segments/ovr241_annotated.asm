@@ -1349,7 +1349,7 @@ GlyphObject_MeasureAndRelease_7E7CC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 205 lignes, NON DÉTAILLÉE — combine Expr_LookupBuiltinFuncDesc_52C5F (seg114, ×2) —
+; ⚠️ far, 205 lignes, NON DÉTAILLÉE — combine Mission_GetCastName_52C5F (seg114, ×2) —
 ; résolution de site d'appel de fonction native pour la VM d'expression.
 ; ==============================================================================================
 Expr_ResolveBuiltinCallSite_7E81D	proc far		; CODE XREF: VROOMM_StubThunk_6AE6BJ GlyphObject_MeasureAndDraw_7F587+44p
@@ -1438,7 +1438,7 @@ arg_2		= word ptr  8
 		jz	short loc_7E8DF
 		push	dx
 		push	word ptr [bp+var_12]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_A+2], dx
 		mov	word ptr [bp+var_A], ax
@@ -1519,7 +1519,7 @@ loc_7E964:				; CODE XREF: Expr_ResolveBuiltinCallSite_7E81D+13Bj
 
 loc_7E978:				; CODE XREF: Expr_ResolveBuiltinCallSite_7E81D:loc_7E952j
 		push	large [bp+var_12]
-		call	Expr_LookupBuiltinFuncDesc_52C5F
+		call	Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_E+2], dx
 		mov	word ptr [bp+var_E], ax

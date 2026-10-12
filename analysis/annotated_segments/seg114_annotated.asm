@@ -2991,7 +2991,7 @@ loc_52244:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+312j
 		push	bx
 		nop
 		push	cs
-		call	near ptr Expr_LookupBuiltinFuncDesc_52C5F
+		call	near ptr Mission_GetCastName_52C5F
 		add	sp, 4
 		push	dx
 		push	ax
@@ -4318,10 +4318,17 @@ Expr_Node_UpdateAndPropagate_52AC6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, table lookup bornée par index (octet +0x1B) dans une table de descripteurs de fonctions
-; natives (base word_706A0+0x30, stride 9 octets) — alimente Expr_VM_CallNativeFunction.
+; far, NOM CAST D'UN OBJET DE MISSION (ex-Expr_LookupBuiltinFuncDesc : aucun rapport avec des
+; fonctions natives). Arg : far ptr entrée PART (85 o). Renvoie &CAST[entrée+0x1B] (far ptr
+; vers le nom de 9 o) ou NULL si l'index ≥ nombre de noms : mov al, es:[bx+1Bh] / cmp
+; [bx+2Eh], dx / jbe → NULL ; sinon imul ax, 9 / add bx, [bx+30h] (liste CAST =
+; word_706A0+0x2E : [+0] nombre, [+2] far ptr). Appelants :
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC (nom passé à
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 → PLAYER / NETWORK / IA + profil
+; INTEL\<nom>.IFF), Expr_Node_LookupAndConvert_52D69, écriture du chunk KILL de MISN2OP.IFF.
+; Format CAST : DATA_MODEL.md.
 ; ==============================================================================================
-Expr_LookupBuiltinFuncDesc_52C5F	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3C0p
+Mission_GetCastName_52C5F	proc far		; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+3C0p
 					; Expr_Node_LookupAndConvert_52D69+1Cp ...
 
 var_4		= dword	ptr -4
@@ -4346,12 +4353,12 @@ arg_0		= dword	ptr  6
 		mov	word ptr [bp+var_4], bx
 		jmp	short $+2
 
-loc_52C94:				; CODE XREF: Expr_LookupBuiltinFuncDesc_52C5F+20j
+loc_52C94:				; CODE XREF: Mission_GetCastName_52C5F+20j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		leave
 		retf
-Expr_LookupBuiltinFuncDesc_52C5F	endp
+Mission_GetCastName_52C5F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -4535,7 +4542,7 @@ Expr_LookupTableEntry85B_52D45	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Expr_LookupBuiltinFuncDesc_52C5F avec un appel externe (sub_2E3C) —
+; far, combine Mission_GetCastName_52C5F avec un appel externe (sub_2E3C) —
 ; conversion/formatage d'une valeur de fonction native.
 ; ==============================================================================================
 Expr_Node_LookupAndConvert_52D69	proc far		; CODE XREF: MissionScenario_ConvertFieldValue_A8B8F+10P
@@ -4563,7 +4570,7 @@ arg_2		= dword	ptr  8
 loc_52D80:				; CODE XREF: Expr_Node_LookupAndConvert_52D69+68j
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr Expr_LookupBuiltinFuncDesc_52C5F
+		call	near ptr Mission_GetCastName_52C5F
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax

@@ -11226,8 +11226,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "Expr_LookupBuiltinFuncDesc_52C5F",
-"summary": "far, table lookup bornée par index (octet +0x1B) dans une table de descripteurs de fonctions natives (base word_706A0+0x30, stride 9 octets) — alimente Expr_VM_CallNativeFunction."
+"new_name": "Mission_GetCastName_52C5F",
+"summary": "far, NOM CAST D'UN OBJET DE MISSION (ex-Expr_LookupBuiltinFuncDesc : aucun rapport avec des fonctions natives). Arg : far ptr entrée PART (85 o). Renvoie &CAST[entrée+0x1B] (far ptr vers le nom de 9 o) ou NULL si l'index ≥ nombre de noms : mov al, es:[bx+1Bh] / cmp [bx+2Eh], dx / jbe → NULL ; sinon imul ax, 9 / add bx, [bx+30h] (liste CAST = word_706A0+0x2E : [+0] nombre, [+2] far ptr). Appelants : PartEntry_ResolveSpawnPositionAndActivate_51EDC (nom passé à AIAircraft_SpawnAndConditionalLoadProfile_53363 → PLAYER / NETWORK / IA + profil INTEL\\<nom>.IFF), Expr_Node_LookupAndConvert_52D69, écriture du chunk KILL de MISN2OP.IFF. Format CAST : DATA_MODEL.md."
 },
 "sub_52C9C": {
 "segment": "seg114",
@@ -11285,7 +11285,7 @@
 "sub_2E3C"
 ],
 "new_name": "Expr_Node_LookupAndConvert_52D69",
-"summary": "far, combine Expr_LookupBuiltinFuncDesc_52C5F avec un appel externe (sub_2E3C) — conversion/formatage d'une valeur de fonction native."
+"summary": "far, combine Mission_GetCastName_52C5F avec un appel externe (sub_2E3C) — conversion/formatage d'une valeur de fonction native."
 },
 "sub_52DDB": {
 "segment": "seg114",
@@ -30937,7 +30937,7 @@
 "sub_7E9C9"
 ],
 "new_name": "Expr_ResolveBuiltinCallSite_7E81D",
-"summary": "⚠️ far, 205 lignes, NON DÉTAILLÉE — combine `Expr_LookupBuiltinFuncDesc_52C5F` (seg114, ×2) — résolution de site d'appel de fonction native pour la VM d'expression."
+"summary": "⚠️ far, 205 lignes, NON DÉTAILLÉE — combine `Mission_GetCastName_52C5F` (seg114, ×2) — résolution de site d'appel de fonction native pour la VM d'expression."
 },
 "sub_7E9C9": {
 "segment": "ovr241",
@@ -44155,7 +44155,7 @@
 "sub_65643"
 ],
 "new_name": "MissionScenario_ResolveAndBindExpressions_A8F22",
-"summary": "far,492L — pont mission->campagne (ÉCRITURE). Écrit DATA\\MISN2OP.IFF, FORM racine 'INVN', via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped, AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par participant : u16 +0x3E, u16 +0x40, descripteur 8o via Expr_LookupBuiltinFuncDesc_52C5F) EXIT(1o de byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34)) SCOR(score). Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md §6.6a."
+"summary": "far,492L — pont mission->campagne (ÉCRITURE). Écrit DATA\\MISN2OP.IFF, FORM racine 'INVN', via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped, AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par participant : u16 +0x3E, u16 +0x40, descripteur 8o via Mission_GetCastName_52C5F) EXIT(1o de byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34)) SCOR(score). Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md §6.6a."
 },
 "sub_A9382": {
 "segment": "seg456",
@@ -44319,7 +44319,7 @@
 "sub_2E74"
 ],
 "new_name": "PLAY_LoadCASTTeamNames_A9956",
-"summary": "far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4 octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers PilotProfile_LoadFromPROF."
+"summary": "far, LUE INTÉGRALEMENT. LECTEUR DU CHUNK CAST de MISN (via VROOMM_StubThunk_6CF0D ; liste rangée à MissionScenario+0x2E). Enregistrements de 9 o = nom de pilote char[8] + zéro de fin ; nombre = taille ÷ 9 (mov bx, 9 / div bx), sans contrôle du reste. Le chunk entier est lu brut (ResourceRecord_ReadDwordFieldB_64AFF, taille [di+72h]) ; liste = [+0] u16 nombre, [+2] far ptr buffer. Noms spéciaux 'TEAMn' (cmp dword ptr es:[bx], 4D414554h ; n = 5e caractère − '0', add ax, 0FFD0h) remplacés SUR PLACE (8 octets en tête d'enregistrement puis +0x08 = 0 — pas de débordement sur l'entrée suivante) : si byte_7070E = 1 (mission lancée depuis la campagne, posé par MissionScenario_LoadFromIFF_A8C44) et n < 3 → n-ième nom d'équipe de DATA\\OP2MISN.IFF (chunk TEAM, word_706A0+0x86+n×9 : ailiers choisis par le joueur) ; n ≥ 3 → inchangé ; si byte_7070E = 0 (mission chargée directement) → 'BILLY'. Usage : Mission_GetCastName_52C5F (index PART+0x1B) → AIAircraft_SpawnAndConditionalLoadProfile_53363 : 'PLAYER' = joueur (pas de profil), 'NETWORK' = réseau, sinon IA avec profil INTEL\\<nom>.IFF (PilotProfile_LoadFromPROF_73B4F)."
 },
 "sub_A9A44": {
 "segment": "seg457",

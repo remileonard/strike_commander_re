@@ -802,16 +802,19 @@ ExprSlot_ReleaseArray_A98EC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 125 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). RENOMMEE (ancien
-; nom 'ExprSlot_ReleaseAndReloadDword' n'avait aucun rapport). C'EST LE VRAI LECTEUR DU CHUNK
-; CAST (confirme via DATA_MODEL.md 'sub_6CF0D->A9956'). Taille d'enregistrement : 9 octets
-; (compteur = taille_chunk/9). Pour chaque entree : si le tag vaut le litteral 'TEAM' (4
-; octets), lit un 5eme octet comme caractere ASCII de numero d'equipe (0-9), puis copie un nom
-; de pilote de 8 caracteres par-dessus (deborde volontairement sur l'entree suivante) — soit
-; 'BILLY' en dur si byte_7070E==0 (mode test/defaut), soit une entree resolue depuis une table
-; nommee (word_706A0+0x86+idx*9) sinon. CONCLUSION : CAST est la table qui associe un numero
-; d'equipe au NOM DE FICHIER PROF a charger — le chainon manquant vers
-; PilotProfile_LoadFromPROF.
+; far, LUE INTÉGRALEMENT. LECTEUR DU CHUNK CAST de MISN (via VROOMM_StubThunk_6CF0D ; liste
+; rangée à MissionScenario+0x2E). Enregistrements de 9 o = nom de pilote char[8] + zéro de fin
+; ; nombre = taille ÷ 9 (mov bx, 9 / div bx), sans contrôle du reste. Le chunk entier est lu
+; brut (ResourceRecord_ReadDwordFieldB_64AFF, taille [di+72h]) ; liste = [+0] u16 nombre, [+2]
+; far ptr buffer. Noms spéciaux 'TEAMn' (cmp dword ptr es:[bx], 4D414554h ; n = 5e caractère −
+; '0', add ax, 0FFD0h) remplacés SUR PLACE (8 octets en tête d'enregistrement puis +0x08 = 0 —
+; pas de débordement sur l'entrée suivante) : si byte_7070E = 1 (mission lancée depuis la
+; campagne, posé par MissionScenario_LoadFromIFF_A8C44) et n < 3 → n-ième nom d'équipe de
+; DATA\OP2MISN.IFF (chunk TEAM, word_706A0+0x86+n×9 : ailiers choisis par le joueur) ; n ≥ 3 →
+; inchangé ; si byte_7070E = 0 (mission chargée directement) → 'BILLY'. Usage :
+; Mission_GetCastName_52C5F (index PART+0x1B) →
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 : 'PLAYER' = joueur (pas de profil),
+; 'NETWORK' = réseau, sinon IA avec profil INTEL\<nom>.IFF (PilotProfile_LoadFromPROF_73B4F).
 ; ==============================================================================================
 PLAY_LoadCASTTeamNames_A9956	proc far		; CODE XREF: VROOMM_StubThunk_6CF0DJ
 
