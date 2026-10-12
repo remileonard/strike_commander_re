@@ -4882,7 +4882,7 @@
   "loc_52F0F": {
     "new_name": "HitShape_Box_ContainsPoint_52F0F",
     "segment": "seg114",
-    "summary": "far, référencée via vtable, test de collision boîte (AABB) : 6 comparaisons de bornes le long de X/Y/Z (centre +0x22/+0x26/+0x2A, demi-extents +0x2E/+0x32/+0x36/+0x3A/+0x3E)."
+    "summary": "far, méthode +4 (« le point est-il dans la zone ? ») de la forme 'B' (boîte) du chunk AREA de MISN (vtable seg339:off_70799, tag 'B' = HitShape_ClassStub_ReturnConst42h_52F8B). Args : (far ptr zone, near ptr point = 3× i32 24.8, composantes asm c0/c1/c2, c2 = altitude). Boîte alignée sur les axes, étendues ASYMÉTRIQUES, PAS des demi-extents autour d'un centre : c0 : [+0x22] − [+0x32] ≤ p.c0 ≤ [+0x22] + [+0x2E] ; c1 : [+0x26] − [+0x3A] ≤ p.c1 ≤ [+0x26] + [+0x36] ; altitude c2 : [+0x2A] ≤ p.c2 ≤ [+0x2A] + [+0x3E] ([+0x2A] = PLANCHER, [+0x3E] = hauteur). Bornes incluses. Renvoie 1 dedans, 0 dehors. Preuve : mov eax,es:[bx+22h] / add eax,es:[bx+2Eh] / cmp eax,[si] / jge ; sub eax,es:[bx+32h] / cmp eax,[si] / jg → 0 ; altitude : add eax,es:[bx+3Eh] / cmp eax,[si+8] / jl → 0 puis mov eax,[si+8] / cmp eax,es:[bx+2Ah] / jl → 0. Champs lus par ExprSlot_ReleaseAndLoadExtended_A9565 dans l'ordre +0x2E,+0x32,+0x36,+0x3A,+0x3E (disque 0x2D..0x3D de l'enregistrement AREA 'B', 65 o). En repère libRealSpace (Y-up, mètres après ÷256) : +0x2E = étendue +X, +0x32 = −X, +0x36 = +Z, +0x3A = −Z, +0x3E = hauteur le long de Y ; référence (+0x22, +0x26, +0x2A) = (X, Z, Y plancher). Appelée via call dword ptr [bx+4] depuis Scene_FindMatchingByAreaContainment_53236."
   },
   "sub_8CBB0": {
     "new_name": "UISublist_ConstructStrings_8CBB0",
