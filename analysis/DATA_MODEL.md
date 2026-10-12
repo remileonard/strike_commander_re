@@ -16,7 +16,7 @@ appels**, plusieurs gros chargeurs restant `⚠️ NON DÉTAILLÉE` ligne à lig
 (voir § « Zones non lues » en fin de document).
 
 > **Convention d'axes (cf. `CLAUDE.md`)** : les vecteurs position/vitesse sont
-> `3× i32` en virgule fixe 24.8 (`val / 256` = pieds). La **3ᵉ composante (le
+> `3× i32` en virgule fixe 24.8 (`val / 256` = mètres). La **3ᵉ composante (le
 > dernier i32, offset le plus élevé) est l'altitude**. Côté ASM/jeu = **Z-up**,
 > composantes `(X, Y, Z)` avec **Z = altitude** ; libRealSpace = **Y-up**,
 > `(X, Y, Z)` avec **Y = altitude** → le portage **échange les composantes 1 et 2**.
@@ -1067,7 +1067,7 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 | `0x0A` | u16 | `heading` — **candidat : cap en degrés** (0–359). Dans MISN-1A : `180` pour les scènes ancrées à une aire, `0` pour celles à `pos` explicite. Rôle non tracé dans le code ; à confirmer sur d'autres missions (valeurs ≠ 0/180 attendues si c'est bien un cap). | — | `+0x19` |
 | `0x0C` | i32 | `pos_x` — fixed-point ÷256 | — | `+0x1B` |
 | `0x10` | i32 | `pos_y` — fixed-point ÷256 | — | `+0x1F` |
-| `0x14` | i32 | `pos_z` — fixed-point ÷256 (**Z = altitude**, pieds) | — | `+0x23` |
+| `0x14` | i32 | `pos_z` — fixed-point ÷256 (**Z = altitude**, mètres) | — | `+0x23` |
 | `0x18…` | u16 × `(taille−24)/2` | **liste d'unités** de la scène | `malloc` + copie brute | `+0x14` count, `+0x16` ptr |
 
 Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, = `arg`).
@@ -1093,9 +1093,9 @@ repère de piste `RWYEXT18`).
 | SCNE | `area_id` → zone | `prog` (act / leav / upd) | `pos` ÷256 | queue (slots `PART`) → unités |
 |--:|---|---|---|---|
 | 0 | `-1` (globale) | –, –, **1** | — | `[0,3,1]` → PLAYER, STRIBASE, STERN |
-| 1 | 0 Strike Base | – | (-70762, 126343, **3580 ft**) | `[7]` → RWYEXT18 (runway) |
+| 1 | 0 Strike Base | – | (-70762, 126343, **3580 m**) | `[7]` → RWYEXT18 (runway) |
 | 2 | 1 Restricted Airspace | – | — | `[4,5,6]` → MiG-21R ×3 |
-| 3 | 3 Nouakchott | – | (-130000, -56500, **1000 ft**) | `[]` |
+| 3 | 3 Nouakchott | – | (-130000, -56500, **1000 m**) | `[]` |
 | 4 | 2 Cargo Destination | – | — | `[8]` → RWYEXT18 (runway) |
 | 5 | 4 Rendezvous | **13**, –, – | — | `[]` (le C-130 est activé ici par `PROG` 13) |
 
@@ -1243,15 +1243,15 @@ fichier `0x18E`, `FORM CAMR` = 882 o) — en-tête commun aux caméras simples :
 +0x08  u16       flags = 0     (CHASECAM : 14 o à 0 ici — slot look-at secondaire vide)
 +0x0A  char[8]   sujet         entité porteuse = "PLAYER"
        (CKPT)  +0x12 char[8]   nom d'art cockpit = "F16-CKPT"
-+..    u32       farClip = 50000 (0xC350)   — constant, pieds
++..    u32       farClip = 50000 (0xC350)   — constant, mètres
 +..    u16       fov     = 40 (0x28)        — constant
 +..    u8/u16    nearClip (contient 0x0A = 10)
 +..    u32       0
 +..    u16,u16   viewport = 319, 199 (0x13F, 0xC7) = rect de rendu (w-1, h-1)
-+..    i32[]     (VICT / WEAP)  table d'offsets — FIXED-POINT 24.8 (val/256 = pieds)
++..    i32[]     (VICT / WEAP)  table d'offsets — FIXED-POINT 24.8 (val/256 = mètres)
 ```
 
-Table d'offsets `WEAPON` (÷256, pieds) : `-10, 20, -30, -8, 1.5, [153], -4, [307],
+Table d'offsets `WEAPON` (÷256, mètres) : `-10, 20, -30, -8, 1.5, [153], -4, [307],
 0, -6, 10, 2.5, 20, 5, [153], 2.5, 6, 0.5, [-153], -0.5, 102` — vecteurs de
 keyframe/boîte relatifs au sujet ; les valeurs entre `[]` (octet bas non nul, ex.
 `0x99`=153, `0x66`=102) sont de petits params séparés (angles / marqueurs), **pas**
@@ -1289,7 +1289,7 @@ lus. Le payload (offsets 24.8, script `COMP`) est consommé à l'activation.
 
 | off | type | rôle |
 |---|---|---|
-| `+0x14` / `+0x18` / `+0x1C` | i32 | **position X / Y / Z** monde (Z = altitude), **fixed-point 24.8** (÷256 = pieds) |
+| `+0x14` / `+0x18` / `+0x1C` | i32 | **position X / Y / Z** monde (Z = altitude), **fixed-point 24.8** (÷256 = mètres) |
 | `+0x11` | u8 | code d'état (via `[vtable+0x14]` ; `4` = mode spécial) |
 | `+0x50` | far ptr | **vtable** — `[0x00]` tick/avance keyframe, `[0x04]` stop précédente, `[0x10]` start (parse le script), `[0x14]` get state |
 | `+0x5C` | ptr | sous-objet (cible secondaire) |
@@ -1816,7 +1816,7 @@ sur `sub_99120`) :
 | 3 | table param3 | `param3 × 2` o | suite de runs `[count, polyIdx_0 … polyIdx_{count-1}]` ; `0xFFFF` = « liste vide » |
 | 4 | grille | `param2² × 2` o | chaque case = index (en mots) dans la table param3 |
 
-- **Coordonnées sommet = fixed-point 24.8** : `valeur / 256` = pieds monde (même
+- **Coordonnées sommet = fixed-point 24.8** : `valeur / 256` = mètres monde (même
   système que `SCNE` / `JDYN` / `HOME`). Ordre **X, Y, Z** (Z = altitude, 3ᵉ composante).
   `pad` @+0xC : per-vertex, valeurs observées `0` / `0x4C` / `0xB1` — rôle non figé
   (corrélé texturé/bord).
@@ -1853,7 +1853,7 @@ sur `sub_99120`) :
 **Vérifié sur `ALASKA.TRI`** (15 196 o, standalone) : PAK imbriqué de 324 entrées,
 **3 régions distinctes** de 4 632 o, chacune `numvertice=192 nbpoly=118 param2=1
 param3=119`, `param3Table = [118, 0, 1, 2, … , 117]`, `grille = [0]`. Y = 2521 /
-1576 / 456 ft → 3 aérodromes ; géométrie **strictement identique** aux 3 (même
+1576 / 456 m → 3 aérodromes ; géométrie **strictement identique** aux 3 (même
 modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur générique
 `scratchpad/tri_parse_general.py` consomme les 3 régions exactement.
 

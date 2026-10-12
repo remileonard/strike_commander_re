@@ -1866,7 +1866,7 @@ EntityTracker_Destruct	endp
 ; MAURITAN.IFF) : +0x00 char[8] nom interne, +0x08 u16 flags (CHASECAM: 14o), +0x0A char[8]
 ; sujet 'PLAYER', (CKPT: +0x12 char[8] art 'F16-CKPT'), puis u32 farClip=50000, u16 fov=40,
 ; nearClip~10, u32 0, u16,u16 viewport 319,199 ; VICT/WEAP ajoutent une table d'offsets i32
-; FIXED-POINT 24.8 (val/256 = pieds, relatifs au sujet). COMP : en-tête + u8 compte + char[8]
+; FIXED-POINT 24.8 (val/256 = mètres, relatifs au sujet). COMP : en-tête + u8 compte + char[8]
 ; sujet + SCRIPT keyframes variable (opcodes 1o, petits int signés, offsets i32/256), terminé
 ; par octet 0xFE + char[8] vue de reprise ('COCKPIT'). Objet caméra runtime word_72A8F :
 ; +0x14/+0x18/+0x1C i32 X/Z/Y monde 24.8 (preuve : HUD_RenderSymbologyMain/Alt seg088,

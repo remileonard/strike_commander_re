@@ -21,7 +21,7 @@ ovr291		segment	para public 'OVERLAY' use16
 ; 0x0E<=v<=0x11 -> double-face), 6 octets UV @+0xA (copies via sub_3FD cx=6). Record de sortie
 ; : stride 0x1E (30) octets. Cf. analysis/DATA_MODEL.md §6.8bis. NB : l'ancienne annotation
 ; 'IndexedRecordReader_ScanAndReadTyped' etait trompeuse. || Coords sommet = int32 FIXED-POINT
-; 24.8 (valeur/256 = pieds monde, meme systeme que SCNE/JDYN/HOME) ; poly+0x08 = 'color'. ||
+; 24.8 (valeur/256 = mètres monde, meme systeme que SCNE/JDYN/HOME) ; poly+0x08 = 'color'. ||
 ; TABLE param3 + GRILLE (queue, loc_99519..loc_9961A) : APRES les polygones viennent [param3 x
 ; u16] = table de listes, rangee telle quelle en [di+1Ch] et CONSERVEE ; puis [param2^2 x u16]
 ; = grille, lue dans un buffer TEMPORAIRE. Chaque case de la grille = index (en mots) dans la

@@ -55,7 +55,7 @@ typées, chacune sachant se calculer elle-même. Une seule entrée est
 **`word_72A8F`** = pointeur vers l'entrée active. Lu partout où le rendu /
 le HUD a besoin de la position caméra (seg011 `Player_MainUpdate`, seg088
 `WeaponSystem_LaunchFromStation_3E744`, seg079, seg107…). Position monde de la caméra =
-`word_72A8F[+0x14/+0x18/+0x1C]` (i32, **fixed-point 24.8**, `/256` = pieds ;
+`word_72A8F[+0x14/+0x18/+0x1C]` (i32, **fixed-point 24.8**, `/256` = mètres ;
 la 3ᵉ composante `+0x1C` = altitude côté ASM).
 
 > **Preuve du 24.8** : partout, `delta = entité[+0x12/+0x16/+0x1A] −
@@ -109,7 +109,7 @@ En-tête commun, décodé sur `MAURITAN.IFF` (payload copié verbatim, longueur
 +0x00  char[8]   nom interne     "CHASECAM" / "COCKPIT" / "VICTIM" / "AUTOTRAC" / "WEAPON" / "ROTATCAM"
 +0x08  ...       slot look-at    CHAS : 14 o à 0    │ autres : 2 o à 0   (jamais renseigné dans les WRLD livrés)
 +0x16  char[8]   sujet           entité porteuse, ex. "PLAYER"  (CKPT insère avant : char[8] art cockpit "F16-CKPT")
-+0x1E  u32       farClip         50000 (0xC350)     — pieds ; le moteur applique <<8
++0x1E  u32       farClip         50000 (0xC350)     — mètres ; le moteur applique <<8
 +0x22  u16       fov             40 (0x28)          — le moteur applique <<8
 +0x24  u32       nearClip        contient ~10 (0x0A) — l'ASM lit UN dword ici (pas pad + octet)
 +0x28  u16 ×4    rect viewport   x, y, w, h   (0, 0, 319, 199) = (w-1, h-1)
@@ -123,7 +123,7 @@ En-tête commun, décodé sur `MAURITAN.IFF` (payload copié verbatim, longueur
 ### 2.4 Queue étendue `VICT` / `WEAP` — table d'offsets 24.8
 
 Après l'en-tête, une table `i32` de vecteurs de keyframe/boîte relatifs au
-sujet, en **fixed-point 24.8** (`/256` = pieds). Exemple `WEAPON` (÷256) :
+sujet, en **fixed-point 24.8** (`/256` = mètres). Exemple `WEAPON` (÷256) :
 
 ```
 -10, 20, -30, -8, 1.5, [153], -4, [307], 0, -6, 10, 2.5, 20, 5, [153], 2.5, 6, 0.5, [-153], -0.5, 102
@@ -302,8 +302,8 @@ en-tête : `count = 5`, `byte = 4`.
 | 4 | `0xFF` | — (défaut zoom) | 30 | (0, 0, 0) | (0, 7.875, 1.5625) |
 
 → **offset identique pour les 5 = la position de l'œil du pilote** relative
-à l'origine de l'avion : 0 latéral, **7.875 pieds vers l'avant**, **1.5625
-pieds au-dessus**. Les records ne diffèrent que par la **direction de
+à l'origine de l'avion : 0 latéral, **7.875 mètres vers l'avant**, **1.5625
+mètres au-dessus**. Les records ne diffèrent que par la **direction de
 regard** (angle `+0x0F` : 0 avant / ±90 côtés / 180 arrière) et le FOV.
 
 ### Application par frame — `Cockpit_ApplyViewRecord_84EC0` (ovr245)
@@ -909,7 +909,7 @@ roulis/tangage/lacet sur un axe sans vérification explicite dans le code.
 ### 6.2 Règle du 24.8
 
 - Opérande sur laquelle l'ASM fait `shl eax, 8` → **entier déjà en unités**
-  (pieds / degrés) : garder tel quel en float, **pas** de `/256`.
+  (mètres / degrés) : garder tel quel en float, **pas** de `/256`.
 - Opérande stockée **brute** dans un champ `+0x..` ensuite utilisé avec de
   la maths 24.8 → **réel = brut / 256** : convertir **au décodage**, jamais
   au runtime.
@@ -1059,7 +1059,7 @@ Base seg339 pour résoudre un tag : `vtable = 0x6D070 + tag` (vérifié `0x228A�
 - Jeu d'opcodes `COMP` complet (§5.2), champs objet, interpréteur par
   frame, `STARTCAM` décodé et rejoué dans le port.
 - Table de vues **cockpit** (`OBJECTS\*.IFF CKPT/INFO`) décodée sur le F-16
-  (§3bis) : œil pilote `(0, 7.875, 1.5625)` pieds, directions F3/F4/F5.
+  (§3bis) : œil pilote `(0, 7.875, 1.5625)` mètres, directions F3/F4/F5.
 - **Caméra orbitale `Camera_OrbitTrackCompute_1493A`** (§4bis, seg014
   propre) : `targetPos = subject.pos − distance · (orbitMat · rangée_orient)`,
   position lissée `+= diff/4` par frame, look-at sujet, orbite tournée par
