@@ -165,11 +165,11 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <dd>
       <code>unsigned char</code> 1 octet (0 à 255) · <code>char</code> 1 octet signé ·
       <code>unsigned short</code> 2 octets · <code>short</code> 2 octets signé ·
-      <code>int</code> 4 octets signé · <code>unsigned int</code> 4 octets ·
+      <code>int</code> 4 octets signé · <code>unsigned int</code> 4 octets · <code>float</code> 4 octets (voir ci-dessous) ·
       <code>string[N]</code> N caractères complétés par des zéros.
     </dd>
-    <dt>int (fixe)</dt>
-    <dd>Un <code>int</code> de 4 octets en virgule fixe : <b>le lire puis le diviser par 256</b> donne la valeur réelle (un float). Un <code>char</code> ou un <code>short</code> se lit, sauf mention, <b>tel quel</b> (un cap de 180 = 180°).</dd>
+    <dt>float</dt>
+    <dd>Un nombre à virgule, sur <b>4 octets</b>. Il n'est <b>pas</b> stocké au format float IEEE : c'est un nombre en virgule fixe, qu'on lit comme un entier signé de 4 octets puis qu'on <b>divise par 256</b>. Dans un éditeur hexadécimal, on voit donc 256 fois la valeur (12 800 pour 50,0). Les <code>char</code> et <code>short</code> se lisent, sauf mention, <b>tels quels</b> (un cap de 180 = 180°).</dd>
     <dt>Repère</dt>
     <dd><b>Y-up, comme libRealSpace</b> : X et Z forment le plan horizontal (Z = profondeur), Y est l'altitude. Dans les fichiers, un vecteur de 3 nombres est rangé <b>X, puis Z, puis Y</b> : le 2ᵉ est la profondeur, le 3ᵉ l'altitude.</dd>
     <dt>Unités</dt>
@@ -295,13 +295,13 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="num">DYNM</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>masse à vide (kg)</td></tr>
+      <tr><td class="num">DYNM</td><td>float</td><td class="num">4</td><td>masse à vide (kg)</td></tr>
       <tr><td class="num">ATMO</td><td>unsigned&nbsp;int</td><td class="num">4</td><td>modèle d'atmosphère, partagé par tous les avions (suivi d'un bloc s'il est déjà défini)</td></tr>
-      <tr><td class="num">THRS · poussée</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>poussée maximale avec post-combustion (N)</td></tr>
+      <tr><td class="num">THRS · poussée</td><td>float</td><td class="num">4</td><td>poussée maximale avec post-combustion (N)</td></tr>
       <tr><td class="num">THRS · fraction sans PC</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>part de la poussée disponible sans post-combustion : valeur ÷ 256 (0 à 1)</td></tr>
       <tr><td class="num">THRS · fraction à la référence</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>poussée restante à la vitesse/altitude de référence : valeur ÷ 256</td></tr>
       <tr><td class="num">THRS · coupure</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>échelle de la coupure de poussée : entier (× 100 → mètres)</td></tr>
-      <tr><td class="num">STBL</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>stabilité / autorité en tangage (sans unité)</td></tr>
+      <tr><td class="num">STBL</td><td>float</td><td class="num">4</td><td>stabilité / autorité en tangage (sans unité)</td></tr>
     </tbody>
   </table></div>
 
@@ -309,25 +309,25 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td>capacité carburant</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>kg ; le carburant courant part de cette valeur, à 0 le moteur s'éteint</td></tr>
-      <tr><td class="num">2</td><td>consommation</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>coefficient de consommation de carburant</td></tr>
-      <tr><td class="num">3</td><td>traînée aérofrein</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>traînée ajoutée aérofrein sorti</td></tr>
-      <tr><td class="num">4</td><td>traînée train</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>traînée ajoutée train sorti</td></tr>
-      <tr><td class="num">5</td><td>traînée au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>freinage au roulage</td></tr>
-      <tr><td class="num">6</td><td>traînée au sol, aérofrein</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>supplément au sol quand l'aérofrein est sorti</td></tr>
-      <tr><td class="num">7</td><td>accélération de roulis max</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>°/s² (à confirmer)</td></tr>
-      <tr><td class="num">8</td><td>taux de rotation max</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>°/s ; borne aussi le roulis</td></tr>
+      <tr><td class="num">1</td><td>capacité carburant</td><td>float</td><td class="num">4</td><td>kg ; le carburant courant part de cette valeur, à 0 le moteur s'éteint</td></tr>
+      <tr><td class="num">2</td><td>consommation</td><td>float</td><td class="num">4</td><td>coefficient de consommation de carburant</td></tr>
+      <tr><td class="num">3</td><td>traînée aérofrein</td><td>float</td><td class="num">4</td><td>traînée ajoutée aérofrein sorti</td></tr>
+      <tr><td class="num">4</td><td>traînée train</td><td>float</td><td class="num">4</td><td>traînée ajoutée train sorti</td></tr>
+      <tr><td class="num">5</td><td>traînée au sol</td><td>float</td><td class="num">4</td><td>freinage au roulage</td></tr>
+      <tr><td class="num">6</td><td>traînée au sol, aérofrein</td><td>float</td><td class="num">4</td><td>supplément au sol quand l'aérofrein est sorti</td></tr>
+      <tr><td class="num">7</td><td>accélération de roulis max</td><td>float</td><td class="num">4</td><td>°/s² (à confirmer)</td></tr>
+      <tr><td class="num">8</td><td>taux de rotation max</td><td>float</td><td class="num">4</td><td>°/s ; borne aussi le roulis</td></tr>
       <tr><td class="num">9</td><td>incidence de décrochage</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés</td></tr>
       <tr><td class="num">10</td><td>calage de l'aile</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés, toujours ajouté à l'incidence</td></tr>
       <tr><td class="num">11</td><td>incrément des volets</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés ajoutés volets sortis</td></tr>
-      <tr><td class="num">12</td><td>limite verticale au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s (à confirmer)</td></tr>
-      <tr><td class="num">13</td><td>vitesse limite au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s : au-delà, l'avion n'est plus « au sol »</td></tr>
+      <tr><td class="num">12</td><td>limite verticale au sol</td><td>float</td><td class="num">4</td><td>m/s (à confirmer)</td></tr>
+      <tr><td class="num">13</td><td>vitesse limite au sol</td><td>float</td><td class="num">4</td><td>m/s : au-delà, l'avion n'est plus « au sol »</td></tr>
       <tr><td class="num">14</td><td>inclinaison limite au sol</td><td>char</td><td class="num">1</td><td>degrés (à confirmer)</td></tr>
       <tr><td class="num">15</td><td>tangage limite au sol</td><td>char</td><td class="num">1</td><td>degrés ; aucun lecteur trouvé dans la physique</td></tr>
       <tr><td class="num">16</td><td>marge de tangage au sol</td><td>char</td><td class="num">1</td><td>degrés (à confirmer)</td></tr>
-      <tr><td class="num">17</td><td>vitesse d'efficacité des gouvernes</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s (F-16 : 50) ; en dessous, le roulis faiblit ; au sol, nez plaqué</td></tr>
-      <tr><td class="num">18</td><td>traînée induite</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>coefficient (joue le rôle de 1/(π·e·AR))</td></tr>
-      <tr><td class="num">19</td><td>gain de portance</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>agilité de la cellule (rôle de Clα·S)</td></tr>
+      <tr><td class="num">17</td><td>vitesse d'efficacité des gouvernes</td><td>float</td><td class="num">4</td><td>m/s (F-16 : 50) ; en dessous, le roulis faiblit ; au sol, nez plaqué</td></tr>
+      <tr><td class="num">18</td><td>traînée induite</td><td>float</td><td class="num">4</td><td>coefficient (joue le rôle de 1/(π·e·AR))</td></tr>
+      <tr><td class="num">19</td><td>gain de portance</td><td>float</td><td class="num">4</td><td>agilité de la cellule (rôle de Clα·S)</td></tr>
       <tr><td class="num">20</td><td>incidence commandée max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés à pleine butée du manche</td></tr>
       <tr><td class="num">21</td><td>dérapage commandé max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés à pleine butée du palonnier</td></tr>
       <tr><td class="num">22</td><td>facteur de charge max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>g à pleine butée du manche</td></tr>
@@ -455,32 +455,32 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <tbody>
           <tr><td>forme</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>lettre <code>S</code> (sphère), <code>C</code> (cylindre) ou <code>B</code> (boîte)</td></tr>
           <tr><td>nom</td><td>string[32]</td><td class="num">32</td><td>ex. « Strike Base »</td></tr>
-          <tr><td>référence X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>référence Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-          <tr><td>référence Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+          <tr><td>référence X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>référence Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>référence Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
         </tbody>
       </table></div>
       <h3>Suite pour une sphère (S) — total 49 octets</h3>
       <div class="tablewrap"><table>
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
-          <tr><td>rayon</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>rayon</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
         </tbody>
       </table></div>
       <h3>Suite pour un cylindre (C) — total 53 octets</h3>
       <div class="tablewrap"><table>
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
-          <tr><td>hauteur</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
-          <tr><td>rayon</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, dans le plan X/Z</td></tr>
+          <tr><td>hauteur</td><td>float</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
+          <tr><td>rayon</td><td>float</td><td class="num">4</td><td>mètres, dans le plan X/Z</td></tr>
         </tbody>
       </table></div>
       <h3>Suite pour une boîte (B) — total 65 octets</h3>
       <div class="tablewrap"><table>
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
-          <tr><td>étendue +X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>étendue −X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>étendue +Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>étendue −Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>hauteur</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
+          <tr><td>étendue +X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue −X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue +Z</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue −Z</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>hauteur</td><td>float</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
         </tbody>
       </table></div>
     </div>
@@ -548,9 +548,9 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
         <tbody>
           <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
-          <tr><td>décalage X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>décalage Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-          <tr><td>décalage Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+          <tr><td>décalage X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>décalage Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>décalage Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
         </tbody>
       </table></div>
       <pre class="tpl">position = décalage + référence de la zone   si la zone existe
@@ -591,9 +591,9 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>composant</td><td>string[8]</td><td class="num">8</td><td>nom chargé dans un composant de l'entité — rôle non tranché</td></tr>
       <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
       <tr><td>mode de placement</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>0 = relatif à la zone ; autre = relatif au joueur</td></tr>
-      <tr><td>décalage X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-      <tr><td>décalage Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-      <tr><td>décalage Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>décalage X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>décalage Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>décalage Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
       <tr><td>cap</td><td>short</td><td class="num">2</td><td>degrés (absolu, ou ajouté au cap du joueur)</td></tr>
       <tr><td>vitesse initiale</td><td>short</td><td class="num">2</td><td>0 = à l'arrêt ; unité non prouvée, m/s probable</td></tr>
       <tr><td>camp</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>1 = allié, 255 = ennemi, autre = neutre</td></tr>
@@ -656,9 +656,9 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>script à chaque image</td><td>short</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
       <tr><td>position propre</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>1 = utilise la position ci-dessous ; 0 = utilise la zone</td></tr>
       <tr><td>cap</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>nom supposé : 180 ou 0 observés, rôle non tracé dans le code</td></tr>
-      <tr><td>position X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-      <tr><td>position Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-      <tr><td>position Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
       <tr><td>liste d'objets</td><td>unsigned&nbsp;short&nbsp;×&nbsp;n</td><td class="num">2 × n</td><td>index dans <code>PART</code> ; n = (taille du chunk − 24) ÷ 2</td></tr>
     </tbody>
   </table></div>
@@ -684,9 +684,9 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
-      <tr><td>position X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-      <tr><td>position Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-      <tr><td>position Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
     </tbody>
   </table></div>
   <dl class="vocab">
@@ -766,9 +766,9 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <h3>Sommet .TRI (13 octets)</h3>
       <div class="tablewrap"><table>
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
-          <tr><td>X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
-          <tr><td>Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-          <tr><td>Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+          <tr><td>X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
           <tr><td>marque</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>0, 76 ou 177 observés ; rôle non établi</td></tr>
         </tbody>
       </table></div>
@@ -820,7 +820,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>sujet</td><td>string[8]</td><td class="num">8</td><td>objet suivi (<code>PLAYER</code>)</td></tr>
       <tr><td>plan lointain</td><td>unsigned&nbsp;int</td><td class="num">4</td><td>50 000 m</td></tr>
       <tr><td>champ de vision</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>40°</td></tr>
-      <tr><td colspan="4">… puis plan proche (≈ 10), zone d'affichage 319 × 199 ; <code>VICT</code> et <code>WEAP</code> ajoutent une table de décalages <code>int (fixe)</code> ; <code>COMP</code> ajoute un script d'images clés terminé par l'octet 254 et le nom de la vue de reprise.</td></tr>
+      <tr><td colspan="4">… puis plan proche (≈ 10), zone d'affichage 319 × 199 ; <code>VICT</code> et <code>WEAP</code> ajoutent une table de décalages <code>float</code> ; <code>COMP</code> ajoute un script d'images clés terminé par l'octet 254 et le nom de la vue de reprise.</td></tr>
     </tbody>
   </table></div>
 </article>
