@@ -51,6 +51,16 @@ Après chaque modification : `clang-format --style=file:tools/sc_player/.clang-f
 puis `python3 tools/sc_player/tools/style_check.py <fichiers>` (doit ne rien signaler ;
 `--fix` découpe les déclarations multiples et les listes).
 
+**4. Parler à Rémi dans SON repère et SES unités : Y-up, en mètres.**
+Pour Rémi, **X et Z = plan horizontal (Z = profondeur), Y = altitude** (repère libRealSpace).
+L'assembleur est en Z-up (3ᵉ composante = altitude) : c'est à toi de traduire, jamais à lui.
+- Tout ce que tu écris pour Rémi (axes, champs de fichier, formules, tests) se nomme en Y-up :
+  « altitude = Y », « distance dans le plan X/Z », « le 2ᵉ i32 du fichier est Z, le 3ᵉ est Y ».
+- Pour un champ de fichier, indique l'échange à la lecture (`libRS.x = c0`, `libRS.y = c2`,
+  `libRS.z = c1`) ; les composantes Z-up ne restent que dans les citations d'assembleur.
+- Les distances du monde sont en **mètres** (après ÷ 256), **jamais en pieds**, même si un
+  ancien document d'`analysis/` dit « ft » ou « pieds ».
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur
