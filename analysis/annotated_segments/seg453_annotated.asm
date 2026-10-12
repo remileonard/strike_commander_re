@@ -7,12 +7,16 @@ seg453		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, recherche un sous-enregistrement IFF de type « DATA » (tag ASCII 0x41544144,
-; ResourceRecord_SeekAndRead_64743, seg193) et charge 3 champs (ReadFieldGroupC_64A7E ×3) plus
-; un champ via sub_2B007 — confirme l'existence d'un tag de chunk IFF générique « DATA » en
-; complément de FORM/CHUNK (seg339).
+; far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable
+; probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle
+; non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de
+; libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de
+; l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks
+; communs + ANGL, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable
+; 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 =
+; EjectSeat_SpawnInstance_A6D18.
 ; ==============================================================================================
-PlayerComponent_LoadDataChunk_A6CA0	proc far		; CODE XREF: VROOMM_StubThunk_6CCF0J
+EjectSeat_LoadFromIFF_A6CA0	proc far		; CODE XREF: VROOMM_StubThunk_6CCF0J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -60,7 +64,7 @@ arg_4		= word ptr  0Ah
 		call	String_ConstructFromFarPtrLen
 		add	sp, 6
 
-loc_A6D08:				; CODE XREF: PlayerComponent_LoadDataChunk_A6CA0+1Aj
+loc_A6D08:				; CODE XREF: EjectSeat_LoadFromIFF_A6CA0+1Aj
 		push	si
 		push	large [bp+arg_0]
 		call	VROOMM_StubThunk_6C1CA
@@ -68,7 +72,7 @@ loc_A6D08:				; CODE XREF: PlayerComponent_LoadDataChunk_A6CA0+1Aj
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadDataChunk_A6CA0	endp
+EjectSeat_LoadFromIFF_A6CA0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -76,12 +80,11 @@ PlayerComponent_LoadDataChunk_A6CA0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, constructeur de la classe dont le destructeur est Dtor_ScalarDeleting_4F316 (seg109,
-; même tag vtable 32F6h) : alloue (sub_658, 0x5C octets), initialise deux classes de base
-; (sub_3C9BC, sub_3DC27), remet à zéro les champs +0x55/+0x59, appelle
-; TriggerObject_InitDerived_A6DA2.
+; far, méthode +4 de la classe EJEC : crée l'instance (CRT_Malloc16_Retry(0x5C),
+; WorldObject_BaseConstruct, Camera_ResetState, vtable 32F6h, +0x55/+0x59 = 0),
+; EjectSeat_InitInstance_A6DA2, puis +0x51 = vtable+8 de la dynamique du modèle (+0x36).
 ; ==============================================================================================
-TriggerObject_Construct_A6D18	proc far		; CODE XREF: VROOMM_StubThunk_6CCF5J
+EjectSeat_SpawnInstance_A6D18	proc far		; CODE XREF: VROOMM_StubThunk_6CCF5J
 
 var_6		= word ptr -6
 var_4		= dword	ptr -4
@@ -114,16 +117,16 @@ arg_0		= dword	ptr  6
 		push	si
 		nop
 		push	cs
-		call	near ptr TriggerObject_InitDerived_A6DA2
+		call	near ptr EjectSeat_InitInstance_A6DA2
 		add	sp, 6
 		mov	ax, si
 		jmp	short loc_A6D70
 ; ���������������������������������������������������������������������������
 
-loc_A6D6E:				; CODE XREF: TriggerObject_Construct_A6D18+1Bj
+loc_A6D6E:				; CODE XREF: EjectSeat_SpawnInstance_A6D18+1Bj
 		mov	ax, si
 
-loc_A6D70:				; CODE XREF: TriggerObject_Construct_A6D18+54j
+loc_A6D70:				; CODE XREF: EjectSeat_SpawnInstance_A6D18+54j
 		mov	si, ax
 		push	ax
 
@@ -153,12 +156,12 @@ loc_A6D87:
 		mov	[bp+var_6], ax
 		mov	[si+51h], ax
 
-loc_A6D9D:				; CODE XREF: TriggerObject_Construct_A6D18:loc_A6D81j
+loc_A6D9D:				; CODE XREF: EjectSeat_SpawnInstance_A6D18:loc_A6D81j
 		mov	ax, si
 		pop	si
 		leave
 		retf
-TriggerObject_Construct_A6D18	endp
+EjectSeat_SpawnInstance_A6D18	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -166,11 +169,10 @@ TriggerObject_Construct_A6D18	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle sub_3DC3D (fonction précédemment signalée dans les notes méthodologiques du
-; projet comme possible source de confusion avec des duplicats — ici utilisée normalement dans
-; un chemin de construction).
+; far, initialise l'instance EJEC : +0x55 = délai (modèle +0x57), +0x5B = 0 (pas encore
+; libéré), Camera_InitAttachedWithTarget_3DC3D(source), bits d'état +4 (−1, +0, +3, +6).
 ; ==============================================================================================
-TriggerObject_InitDerived_A6DA2	proc far		; CODE XREF: VROOMM_StubThunk_6CCFAJ TriggerObject_Construct_A6D18+4Cp
+EjectSeat_InitInstance_A6DA2	proc far		; CODE XREF: VROOMM_StubThunk_6CCFAJ EjectSeat_SpawnInstance_A6D18+4Cp
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -204,7 +206,7 @@ arg_2		= dword	ptr  8
 		pop	si
 		leave
 		retf
-TriggerObject_InitDerived_A6DA2	endp
+EjectSeat_InitInstance_A6DA2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

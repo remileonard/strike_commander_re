@@ -8435,7 +8435,7 @@
 "sub_4D1C9"
 ],
 "new_name": "Emitter_UpdateFromEntitySMOKVec_3D57E",
-"summary": "far, 437 L. NOM PRÉCÉDENT (Camera_ChaseComputeMain) FAUX — ce n'est PAS le calcul de la caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A), *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle (JDYN_LoadAngleAndChunk_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3× u32 +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points = obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38 (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] + word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé."
+"summary": "far, 437 L. NOM PRÉCÉDENT (Camera_ChaseComputeMain) FAUX — ce n'est PAS le calcul de la caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A), *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle (MobileObject_LoadDynamicsAndSmoke_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3× u32 +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points = obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38 (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] + word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé."
 },
 "sub_3D9B4": {
 "segment": "seg085",
@@ -10703,7 +10703,7 @@
 "type": "far",
 "calls": [],
 "new_name": "Timer_Tick_4F9E6",
-"summary": "far, décrémente le minuteur selon son mode (dword_70458 = temps global si mode0, 0x100 = 1 frame fixe si mode1, sinon force à 0), retourne si le minuteur est encore actif (valeur>0). Utilisé par Trigger_TimedRangedSpawnOnce_4F351 (même sémantique de champ +0x55)."
+"summary": "far, décrémente le minuteur selon son mode (dword_70458 = temps global si mode0, 0x100 = 1 frame fixe si mode1, sinon force à 0), retourne si le minuteur est encore actif (valeur>0). Utilisé par EjectSeat_TickReleaseObject_4F351 (même sémantique de champ +0x55)."
 },
 "sub_4FA31": {
 "segment": "seg110",
@@ -38714,8 +38714,8 @@
 "sub_64A7E",
 "sub_64A7E"
 ],
-"new_name": "JDYN_LoadAngleAndChunk_9D189",
-"summary": "far, combine `IFF_LoadAngleParam` et `JDYN_LoadChunk` — chargement combiné IFF/JDYN d'un paramètre d'angle."
+"new_name": "MobileObject_LoadDynamicsAndSmoke_9D189",
+"summary": "far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) : IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C → +0x36, puis chunk SMOK facultatif : uint8 → +0x39, 3× int32 → +0x3A/+0x3E/+0x42, +0x38 = 1 (traînée de fumée ; sens des champs non établi)."
 },
 "sub_9D214": {
 "segment": "ovr310",
@@ -38932,7 +38932,7 @@
 "sub_22E27"
 ],
 "new_name": "TimedTrigger_NotifySingleListener_9DD30",
-"summary": "far, résout un handle faible via sub_22E27 (motif +0x1E déjà vu dans `Trigger_TimedRangedSpawnOnce_4F351`, seg109) puis, si résolu et non nul, appelle sa méthode virtuelle de notification (dword ptr [bx+4]) avec le champ +0x0A comme argument far. Retourne si un listener a été notifié. Référencée via jmp depuis un stub VROOMM (sub_6C320) et par TimedTrigger_ReleaseIfInactive_9DDCF."
+"summary": "far, résout un handle faible via sub_22E27 (motif +0x1E déjà vu dans `EjectSeat_TickReleaseObject_4F351`, seg109) puis, si résolu et non nul, appelle sa méthode virtuelle de notification (dword ptr [bx+4]) avec le champ +0x0A comme argument far. Retourne si un listener a été notifié. Référencée via jmp depuis un stub VROOMM (sub_6C320) et par TimedTrigger_ReleaseIfInactive_9DDCF."
 },
 "sub_9DD81": {
 "segment": "seg430",
@@ -43004,8 +43004,8 @@
 "sub_3C9BC",
 "sub_A6048"
 ],
-"new_name": "TextLabel_ConstructAndInit_A5F20",
-"summary": "far, alloue (sub_658), initialise une classe de base (sub_3C9BC), appelle TextLabel_InitRandomTimer_A6048."
+"new_name": "SmokeGen_SpawnInstance_A5F20",
+"summary": "far, méthode +4 de la classe SMKG : crée l'instance (CRT_Malloc16_Retry(0x5B), WorldObject_BaseConstruct, vtable 30EEh, +0x51 = 0), SmokeGen_InitInstance_A6048, instance +6 = modèle+0x2B."
 },
 "sub_A5F89": {
 "segment": "seg450",
@@ -43024,8 +43024,8 @@
 "sub_6B70F",
 "sub_3C942"
 ],
-"new_name": "TextLabel_LoadFieldsFromIFF_A5F89",
-"summary": "⚠️ far, 94 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743, ReadFinalField_64B51 (×2), ReadFieldGroupC_64A7E (×3), ReadFieldGroupB_64A54 (seg193), gestion d'erreur, sub_3C942 (init classe de base)."
+"new_name": "SmokeGen_LoadFromIFF_A5F89",
+"summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36 couleur des particules ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050)."
 },
 "sub_A6023": {
 "segment": "seg450",
@@ -43049,8 +43049,8 @@
 "sub_4F9A2",
 "sub_54E4F"
 ],
-"new_name": "TextLabel_InitRandomTimer_A6048",
-"summary": "far, combine TextLabel_Helper_A6023, sub_37C89, Timer_SetAbsolute_4F9A2 (seg110), Math_RandomChance_54E4F (seg115) — probable initialisation d'un minuteur avec déclenchement aléatoire pour l'affichage du libellé de texte."
+"new_name": "SmokeGen_InitInstance_A6048",
+"summary": "far, INITIALISE UN GÉNÉRATEUR DE FUMÉE (ex-TextLabel_InitRandomTimer) : attache à la source (Debris_BodyAttachToSubpart), minuteur +0x51 = durée (modèle +0x37, Timer_SetAbsolute_4F9A2), actif (+0x5A = 1) seulement si Math_RandomChance_54E4F(modèle +0x43)."
 },
 "sub_A60AC": {
 "segment": "seg450",
@@ -43318,8 +43318,8 @@
 "sub_2B007",
 "sub_6C1CA"
 ],
-"new_name": "PlayerComponent_LoadDataChunk_A6CA0",
-"summary": "far, recherche un sous-enregistrement IFF de type « DATA » (tag ASCII 0x41544144, ResourceRecord_SeekAndRead_64743, seg193) et charge 3 champs (ReadFieldGroupC_64A7E ×3) plus un champ via sub_2B007 — confirme l'existence d'un tag de chunk IFF générique « DATA » en complément de FORM/CHUNK (seg339)."
+"new_name": "EjectSeat_LoadFromIFF_A6CA0",
+"summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ANGL, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18."
 },
 "sub_A6D18": {
 "segment": "seg453",
@@ -43334,8 +43334,8 @@
 "sub_A6DA2",
 "sub_6C00E"
 ],
-"new_name": "TriggerObject_Construct_A6D18",
-"summary": "far, constructeur de la classe dont le destructeur est `Dtor_ScalarDeleting_4F316` (seg109, même tag vtable 32F6h) : alloue (sub_658, 0x5C octets), initialise deux classes de base (sub_3C9BC, sub_3DC27), remet à zéro les champs +0x55/+0x59, appelle TriggerObject_InitDerived_A6DA2."
+"new_name": "EjectSeat_SpawnInstance_A6D18",
+"summary": "far, méthode +4 de la classe EJEC : crée l'instance (CRT_Malloc16_Retry(0x5C), WorldObject_BaseConstruct, Camera_ResetState, vtable 32F6h, +0x55/+0x59 = 0), EjectSeat_InitInstance_A6DA2, puis +0x51 = vtable+8 de la dynamique du modèle (+0x36)."
 },
 "sub_A6DA2": {
 "segment": "seg453",
@@ -43346,8 +43346,8 @@
 "calls": [
 "sub_3DC3D"
 ],
-"new_name": "TriggerObject_InitDerived_A6DA2",
-"summary": "far, appelle sub_3DC3D (fonction précédemment signalée dans les notes méthodologiques du projet comme possible source de confusion avec des duplicats — ici utilisée normalement dans un chemin de construction)."
+"new_name": "EjectSeat_InitInstance_A6DA2",
+"summary": "far, initialise l'instance EJEC : +0x55 = délai (modèle +0x57), +0x5B = 0 (pas encore libéré), Camera_InitAttachedWithTarget_3DC3D(source), bits d'état +4 (−1, +0, +3, +6)."
 },
 "sub_A6DF2": {
 "segment": "seg453",
@@ -45414,8 +45414,8 @@
 "lines": 1,
 "type": "label",
 "calls": [],
-"new_name": "Trigger_TimedRangedSpawnOnce_4F351",
-"summary": "far, méthode virtuelle probable (\"Update\"/\"Tick\") d'un objet trigger : si non déjà déclenché (+0x5B), timer (+0x55, décrément par dword_70458) expiré et cible en portée (sub_378CA), instancie un objet enfant depuis un template (+0x0E) via sub_38B70, copie position/orientation, l'enregistre dans une liste membre (+0x59, dtor sub_3A3EC) et notifie un listener optionnel (+0x1E, résolu via sub_22E27). Hypothèse : trigger d'effet/évènement scripté à usage unique — non vérifié en détail."
+"new_name": "EjectSeat_TickReleaseObject_4F351",
+"summary": "far, LUE 2026-10-12. Mise à jour de l'objet EJEC (vtable 32F6h, seg339:off_703B6). Si pas encore fait (+0x5B = 0) : délai +0x55 −= dt (dword_70458) ; hauteur sous l'objet via Terrain_QueryAltitudeAt (à confirmer) ; si délai < 0 ET (modèle +0x53 << 8) > cette hauteur : crée UNE FOIS l'objet nommé modèle +0x4A (ObjectPrototype_FindOrLoadAndInstantiate_38B70), même orientation (+0x2C), même position, même vitesse (vtable +0x4C → +0x50), ajouté à la liste 59C3h, référencé en +0x59, +0x5B = 1 ; notifie un écouteur optionnel (+0x1E). Renvoie 1."
 },
 "loc_A002": {
 "segment": "seg004",
@@ -47756,5 +47756,15 @@
 "calls": [],
 "new_name": "Explosion_SpawnInstance_4BCF4",
 "summary": "far, méthode +4 de la classe EXPL (vtable 0x23E0, seg339:23E4) : crée l'instance d'explosion (CRT_Malloc16_Retry(0x5E), WorldObject_BaseConstruct, vtable 0x302A, +0x5A = 0), l'attache à la source (Explosion_AttachToSource_4BDDA), puis copie du modèle : +0x3A (dword) → instance +0x51 (rayon), +0x38 (DAMG) → +0x55 (dégâts max), +0x36 → +0x57. Ces valeurs sont ensuite remplacées par celles du chunk EXPL de l'objet détruit (Explosion_ApplyRadiusAndDamage_4BDFD)."
+},
+"loc_4C057": {
+"segment": "seg106",
+"start_line": 152412,
+"end_line": 152412,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "SmokeGen_Tick_4C057",
+"summary": "far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 : compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et Particle_SpawnWithColor(word_70483, couleur = modèle +0x36, position +0x12, vitesse construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux autres à 0). Puis WorldObject_IsAlive_3CBB7."
 }
 }

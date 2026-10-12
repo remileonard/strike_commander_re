@@ -47,7 +47,7 @@ VROOMM_StubThunk_6C1C5	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6C1CA	proc far		; CODE XREF: IFF_LoadModelMain+447P
 					; Weapon_LoadWDATWrapper_A07ED+CP	...
-		jmp	JDYN_LoadAngleAndChunk_9D189
+		jmp	MobileObject_LoadDynamicsAndSmoke_9D189
 VROOMM_StubThunk_6C1CA	endp
 
 

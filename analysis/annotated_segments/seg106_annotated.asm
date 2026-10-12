@@ -12,7 +12,16 @@ loc_4C055:				; DATA XREF: seg216:0416o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4C057:				; DATA XREF: seg339:off_701AEo
+; ==============================================================================================
+; far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si
+; actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet
+; supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 :
+; compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et
+; Particle_SpawnWithColor(word_70483, couleur = modèle +0x36, position +0x12, vitesse
+; construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux
+; autres à 0). Puis WorldObject_IsAlive_3CBB7.
+; ==============================================================================================
+SmokeGen_Tick_4C057:				; DATA XREF: seg339:off_701AEo
 		push	bp
 		mov	bp, sp
 		sub	sp, 20h

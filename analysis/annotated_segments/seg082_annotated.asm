@@ -37,7 +37,7 @@ loc_3A499:				; CODE XREF: seg082:001Aj
 ; §6.2.
 ; ==============================================================================================
 JDYN_LoadChunkAndConstruct_3A49C	proc far		; CODE XREF: JDYN_LoadChunkWrapper_9D0C0+2FP
-					; JDYN_LoadAngleAndChunk_9D189+1FP ...
+					; MobileObject_LoadDynamicsAndSmoke_9D189+1FP ...
 
 var_E		= word ptr -0Eh
 var_C		= word ptr -0Ch

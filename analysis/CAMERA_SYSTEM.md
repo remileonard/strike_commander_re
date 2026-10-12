@@ -440,7 +440,7 @@ seg015, > 0x220 o, table de vues en `+0x133`), `di` = l'entrée.
 
 ### 4.4 `SMOK` — statut
 
-Chunk `REAL/OBJT/JETP/SMOK` du modèle 3D avion (`JDYN_LoadAngleAndChunk_9D189`,
+Chunk `REAL/OBJT/JETP/SMOK` du modèle 3D avion (`MobileObject_LoadDynamicsAndSmoke_9D189`,
 ovr310) : `entité[+0x39]` u8 (F-16 : 3) + vec3 `entité[+0x3A/+0x3E/+0x42]`
 (F-16 : `(0, −3584, 0)` = `(0, −14, 0)` en 24.8).
 

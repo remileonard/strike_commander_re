@@ -777,7 +777,7 @@ format IFF/ResourceRecord déjà documenté (seg193-194) :
   conteneur.
 - **`WeaponSystem_ReleaseBomb_9E289`** (419L) relie explicitement
   ce cluster au système de trigger temporisé du seg109
-  (`Trigger_TimedRangedSpawnOnce_4F351`) : instanciation d'objet, référence
+  (`EjectSeat_TickReleaseObject_4F351`) : instanciation d'objet, référence
   faible (`SetReference`, `sub_3A44E`), ajout à liste membre — c'est très
   probablement **l'implémentation d'overlay réelle** vers laquelle
   pointaient les stubs fixes du seg109/seg430-431.

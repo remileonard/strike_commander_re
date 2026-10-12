@@ -3342,7 +3342,7 @@ off_7019E	dd loc_37CF4
 off_701A2	dd Debris_NotifyChildValidate
 off_701A6	dd loc_37D2E
 off_701AA	dd loc_37DD1
-off_701AE	dd loc_4C057
+off_701AE	dd SmokeGen_Tick_4C057
 off_701B2	dd loc_38046
 off_701B6	dd VROOMM_StubThunk_6CC10
 off_701BA	dd loc_3CC19
@@ -3472,7 +3472,7 @@ off_703A6	dd loc_37CF4
 off_703AA	dd Debris_NotifyChildValidate
 off_703AE	dd loc_37D2E
 off_703B2	dd loc_37DD1
-off_703B6	dd Trigger_TimedRangedSpawnOnce_4F351
+off_703B6	dd EjectSeat_TickReleaseObject_4F351
 off_703BA	dd WorldObject_IntegrateBodyMotion_3D31D
 off_703BE	dd Dtor_ScalarDeleting_4F316
 off_703C2	dd loc_3CF4C

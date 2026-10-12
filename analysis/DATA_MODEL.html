@@ -282,10 +282,34 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td class="num">RNWY</td><td class="num">17</td><td>piste : décor orienté (chunks communs + <code>ANGL</code>)</td></tr>
       <tr><td class="num">EXPL</td><td class="num">15</td><td>explosion (chunks communs ; <code>DAMG</code> = dégâts par défaut)</td></tr>
       <tr><td class="num">DEBR</td><td class="num">11</td><td>débris : <code>INFO</code> + une dynamique <code>DYNM</code> (il tombe)</td></tr>
-      <tr><td class="num">SMKG</td><td class="num">18</td><td>lecteur non lu (générateur de fumée, d'après le nom)</td></tr>
-      <tr><td class="num">EJEC</td><td class="num">22</td><td>lecteur non lu (siège éjectable, d'après le nom)</td></tr>
+      <tr><td class="num">SMKG</td><td class="num">18</td><td><b>générateur de fumée</b> (chunk <code>INFO</code> ci-dessous)</td></tr>
+      <tr><td class="num">EJEC</td><td class="num">22</td><td>objet qui en <b>libère un autre</b> après un délai (siège éjectable → parachute, d'après le tag ; chunk <code>DATA</code> ci-dessous)</td></tr>
     </tbody>
   </table></div>
+  <h3>SMKG : le chunk INFO du générateur de fumée</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>couleur</td><td>uint8</td><td class="num">1</td><td>couleur des particules</td></tr>
+      <tr><td>durée</td><td>float</td><td class="num">4</td><td>secondes d'émission</td></tr>
+      <tr><td>vitesse de montée</td><td>float</td><td class="num">4</td><td>vitesse verticale des particules (sur Y)</td></tr>
+      <tr><td>intervalle</td><td>float</td><td class="num">4</td><td>secondes entre deux particules</td></tr>
+      <tr><td>chance d'activation</td><td>uint16</td><td class="num">2</td><td>chance que le générateur soit actif à sa création (sur ~100)</td></tr>
+      <tr><td>auto-suppression</td><td>uint8</td><td class="num">1</td><td>1 = l'objet disparaît à la fin de la durée ; 0 = il s'arrête seulement</td></tr>
+    </tbody>
+  </table></div>
+  <p>Ce chunk est obligatoire. Le générateur lit aussi les chunks communs et <code>ANGL</code>.</p>
+  <h3>EJEC : le chunk DATA</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>réservé</td><td>int32</td><td class="num">4</td><td>rôle non établi</td></tr>
+      <tr><td>délai</td><td>float</td><td class="num">4</td><td>secondes avant la libération</td></tr>
+      <tr><td>hauteur de libération</td><td>int32</td><td class="num">4</td><td>mètres : l'objet est libéré une fois sous cette hauteur</td></tr>
+      <tr><td>objet libéré</td><td>string</td><td class="num">n</td><td>nom de l'objet créé (parachute probable), terminé par un zéro</td></tr>
+    </tbody>
+  </table></div>
+  <p>Quand le délai est écoulé et que l'objet est sous la hauteur de libération, le jeu crée <b>une seule fois</b> l'objet nommé, à la même position, avec la même orientation et la même vitesse. <code>EJEC</code> a aussi sa propre dynamique de vol et peut avoir une traînée de fumée (chunk <code>SMOK</code>).</p>
   <p>Aucun de ces FORM trouvé : le chargement échoue (erreur 49173). Les chunks lus par la plupart des classes sont décrits dans la fiche suivante.</p>
   <h3>Composants de dégâts d'un avion</h3>
   <ul class="chips"><li>RUDDER</li><li>ELEVATOR</li><li>AILERON</li><li>LWING</li><li>RWING</li><li>ENGINE</li><li>LANDGEAR</li><li>FLAPS</li></ul>
@@ -957,7 +981,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
     <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
     <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : lecteurs de <code>SMKG</code> et <code>EJEC</code> non lus ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
+    <li>Objets : premier champ de <code>EJEC</code> et chunk <code>SMOK</code> ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
     <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>

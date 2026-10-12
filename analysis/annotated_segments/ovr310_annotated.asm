@@ -125,10 +125,12 @@ Debris_ConstructWithCameraAttach_9D0FA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine IFF_LoadAngleParam et JDYN_LoadChunk — chargement combiné IFF/JDYN d'un
-; paramètre d'angle.
+; far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) :
+; IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C →
+; +0x36, puis chunk SMOK facultatif : uint8 → +0x39, 3× int32 → +0x3A/+0x3E/+0x42, +0x38 = 1
+; (traînée de fumée ; sens des champs non établi).
 ; ==============================================================================================
-JDYN_LoadAngleAndChunk_9D189	proc far		; CODE XREF: VROOMM_StubThunk_6C1CAJ
+MobileObject_LoadDynamicsAndSmoke_9D189	proc far		; CODE XREF: VROOMM_StubThunk_6C1CAJ
 					; Camera_Helper_9D286:loc_9D2A1p
 
 arg_0		= dword	ptr  6
@@ -193,11 +195,11 @@ loc_9D1A1:
 		mov	es:[bx+42h], eax
 		mov	byte ptr es:[bx+38h], 1
 
-loc_9D211:				; CODE XREF: JDYN_LoadAngleAndChunk_9D189+3Aj
+loc_9D211:				; CODE XREF: MobileObject_LoadDynamicsAndSmoke_9D189+3Aj
 		pop	si
 		pop	bp
 		retf
-JDYN_LoadAngleAndChunk_9D189	endp
+MobileObject_LoadDynamicsAndSmoke_9D189	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -312,7 +314,7 @@ arg_4		= word ptr  0Ah
 		push	cs
 
 loc_9D2A1:
-		call	near ptr JDYN_LoadAngleAndChunk_9D189
+		call	near ptr MobileObject_LoadDynamicsAndSmoke_9D189
 		add	sp, 6
 		push	large [bp+arg_0]
 		les	bx, [bp+arg_0]

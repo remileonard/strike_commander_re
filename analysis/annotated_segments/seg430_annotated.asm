@@ -8,7 +8,7 @@ seg430		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; far, résout un handle faible via sub_22E27 (motif +0x1E déjà vu dans
-; Trigger_TimedRangedSpawnOnce_4F351, seg109) puis, si résolu et non nul, appelle sa méthode
+; EjectSeat_TickReleaseObject_4F351, seg109) puis, si résolu et non nul, appelle sa méthode
 ; virtuelle de notification (dword ptr [bx+4]) avec le champ +0x0A comme argument far.
 ; Retourne si un listener a été notifié. Référencée via jmp depuis un stub VROOMM (sub_6C320)
 ; et par TimedTrigger_ReleaseIfInactive_9DDCF.

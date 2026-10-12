@@ -732,7 +732,7 @@ conteneur).
 
 **Lien confirmé avec le système de trigger temporisé du seg109** :
 `TimedTrigger_SpawnAndBindGeometry_9E289` (419L, seg432) utilise
-exactement le même motif que `Trigger_TimedRangedSpawnOnce_4F351`
+exactement le même motif que `EjectSeat_TickReleaseObject_4F351`
 (instanciation, SetReference, ajout à liste membre) — probablement
 l'implémentation d'overlay réelle vers laquelle pointent les stubs fixes.
 `TimedTrigger_NotifySingleListener_9DD30`/`NotifyConditional_9DD81`/
@@ -837,10 +837,10 @@ DE SEGMENT (3122/3449 fonctions, 90.5%).**
 **seg451-452 :** suite PlayerComponent, calcul de paliers d'interpolation
 (échelles ×1/×1/4/×1/40 d'un intervalle — probable animation par étapes).
 
-**seg453 :** `TriggerObject_Construct_A6D18` construit la classe dont le
+**seg453 :** `EjectSeat_SpawnInstance_A6D18` construit la classe dont le
 destructeur est `Dtor_ScalarDeleting_4F316` (seg109, même tag vtable
 32F6h) — bonne confirmation croisée entre début et fin de session.
-`PlayerComponent_LoadDataChunk_A6CA0` confirme un tag de chunk IFF
+`EjectSeat_LoadFromIFF_A6CA0` confirme un tag de chunk IFF
 générique "DATA" (0x41544144 en ASCII) en complément de FORM/CHUNK
 (seg339).
 

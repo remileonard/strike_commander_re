@@ -75,7 +75,7 @@ Timer_SetRelativeFrames_4F9BB	endp
 ; ==============================================================================================
 ; far, décrémente le minuteur selon son mode (dword_70458 = temps global si mode0, 0x100 = 1
 ; frame fixe si mode1, sinon force à 0), retourne si le minuteur est encore actif (valeur>0).
-; Utilisé par Trigger_TimedRangedSpawnOnce_4F351 (même sémantique de champ +0x55).
+; Utilisé par EjectSeat_TickReleaseObject_4F351 (même sémantique de champ +0x55).
 ; ==============================================================================================
 Timer_Tick_4F9E6	proc far		; CODE XREF: seg087:02A0P seg089:0762P ...
 

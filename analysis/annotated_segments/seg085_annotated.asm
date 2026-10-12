@@ -1216,8 +1216,8 @@ Camera_EnableFollowIfActive	endp
 ; caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort
 ; si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A),
 ; *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle
-; (JDYN_LoadAngleAndChunk_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3× u32
-; +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points =
+; (MobileObject_LoadDynamicsAndSmoke_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3×
+; u32 +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points =
 ; obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38
 ; (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] +
 ; word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate

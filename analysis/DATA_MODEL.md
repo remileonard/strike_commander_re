@@ -257,12 +257,35 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | `RNWY` | 0x36 | `23F4` (base `2578` = `ORNT`) | **17** (`loc_460FC` : `mov al, 11h`) | piste de décollage (fait vérifié côté données) — chunks communs + `ANGL` (`IFF_LoadAngleParam_Wrapper`) |
 | `EXPL` | 0x3E | `23E0` (base `2578`) | **15** (`loc_4BD81` : `mov al, 0Fh`) | explosion — chunks communs, `DAMG` recopié en `+0x38` (`Explosion_LoadFromIFF_4BCD5`) |
 | `DEBR` | 0x3B | `23CC` (base `2504` = `MOBL`) | **11** (`loc_4BA42` : `mov al, 0Bh`) | débris — `INFO` (`IFF_LoadInfoChunk`) + dynamique `DYNM` (`JDYN_LoadChunkWrapper_9D0C0`) ; pas de chunks communs |
-| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | lecteur `VROOMM_StubThunk_6CC1A` non lu (générateur de fumée ? d'après le nom) |
-| `EJEC` | 0x5B | `23A4` (base `252C` = `OMOB`) | **22** (`ClassStub_ReturnConst16h_4F2BA`) | lecteur `VROOMM_StubThunk_6CCF0` non lu (siège éjectable ? d'après le nom) ; aucun FORM reconnu → erreur `C015h` |
+| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | **générateur de fumée** (`SmokeGen_LoadFromIFF_A5F89`) : chunk `INFO` obligatoire (format ci-dessous) + chunks communs + `ANGL` |
+| `EJEC` | 0x5B | `23A4` (base `252C` = `OMOB`) | **22** (`ClassStub_ReturnConst16h_4F2BA`) | objet qui en **libère un autre** après un délai et sous une hauteur (siège éjectable → parachute, d'après le tag) : chunk `DATA` (`EjectSeat_LoadFromIFF_A6CA0`) + `MobileObject_LoadDynamicsAndSmoke_9D189` ; aucun FORM reconnu → erreur `C015h` |
 
 **Catégorie d'un objet (établi le 2026-09-20).** La classe d'un objet est fixée par le **premier chunk présent** dans l'ordre de probe de `IFF_LoadModelMain` (`BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY, …`). Chaque bloc alloue une taille (`Memory_TypedFreeWrapper_5C6F3`, tag `0x5C44`) et écrit une **suite de mots de vtable** (constructeurs chaînés, le dernier gagne). Le **troisième pointeur (`vtable+8`) est, dans chaque classe lue, un `mov al, <constante> ; retf`** : la constante est la catégorie. Elle est lue par `Targeting_AcquireBestThreat` (6 = avion, 8 = missile, 0x13 = défense fixe) pour choisir les cibles et menaces de l'IA (voir `AI_TICK_CALL_GRAPH.md`). Le mapping chunk → vtable est celui du dernier `mov word ptr es:[bx], …` de chaque bloc.
 
 **Base des vtables de `seg339`.** Les XREF d'IDA donnent **adresse linéaire = tag + `0x6D0B0`** (ex. `seg339:24D0` référence `loc_3E4A5`, la catégorie de `JETP`, à `0x6F580` = `0x6D0B0 + 0x24C8 + 8`). L'ancienne base `0x6D070` (§6.2) est décalée de `0x40`.
+
+**`SMKG` · chunk `INFO`** (obligatoire, erreur `B004h` ; tick `SmokeGen_Tick_4C057`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x36` | couleur des particules (`Particle_SpawnWithColor`) |
+| int32 24.8 | `+0x37` | durée d'émission (s) |
+| int32 24.8 | `+0x3B` | vitesse de montée des particules (composante d'altitude seule) |
+| int32 24.8 | `+0x3F` | intervalle entre deux particules (s) |
+| uint16 | `+0x43` | chance d'être actif à la création (`Math_RandomChance_54E4F`, échelle ~100) |
+| uint8 | `+0x45` | ≠ 0 : l'objet se supprime à la fin de la durée ; 0 : il s'arrête seulement |
+
+**`EJEC` · chunk `DATA`** (facultatif ; tick `EjectSeat_TickReleaseObject_4F351`) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| int32 | `+0x46` | rôle non établi |
+| int32 24.8 | `+0x57` | délai avant libération (s) |
+| int32 | `+0x53` | hauteur de libération (entier, `<< 8` → m), comparée à la hauteur donnée par `Terrain_QueryAltitudeAt` |
+| chaîne C | `+0x4A` | nom de l'objet libéré (créé une seule fois, même position, orientation et vitesse) |
+
+`MobileObject_LoadDynamicsAndSmoke_9D189` (objets mobiles orientés) lit aussi une dynamique `DYNM` et un
+chunk `SMOK` facultatif (uint8 + 3× int32 → `+0x39`, `+0x3A/+0x3E/+0x42` ; traînée de fumée, sens non établi).
 
 **Chunks communs d'un objet — `Object_LoadCommonChunks_9BA85`** (ovr302, lu 2026-10-12 ; appelé par
 les lecteurs de classe via `VROOMM_StubThunk_6BFFF` — `ORNT`/`RNWY` par `IFF_LoadAngleParam`, `EXPL`
@@ -1962,7 +1985,7 @@ binaire**, ex-`MissionRecord_LoadEntityDatabase_7B035`) : `Path_ResolveDataFile`
 joueur est détruit (lancée par `STRIKE_EXE_MAIN_LOOP` sur `byte_6E4B4`), qui charge
 `OBJECTS\EJECT.PAK` (voir `MUSIC_SYSTEM.md` §5.4).
 Tags ASCII vus : `EJECT`, chunk générique **`DATA`** (`0x41544144`, cf.
-`PlayerComponent_LoadDataChunk_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
+`EjectSeat_LoadFromIFF_A6CA0`). `MissionRecord_LoadFullDatabase_86B53`
 (816 L, ovr249) = variante `Path_ResolveDataFile` + `InitAndValidate` + lecture
 massive de champs. `Player_EjectSequence_7D31A` (1081 L, ovr240, ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`) =
 séquence d'éjection volontaire (lancée sur `byte_6E4B8`, Ctrl+E), même chargement de `EJECT.PAK`,

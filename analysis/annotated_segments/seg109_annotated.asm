@@ -101,14 +101,15 @@ loc_4F34D:				; CODE XREF: seg109:0073j seg109:0094j
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, méthode virtuelle probable ("Update"/"Tick") d'un objet trigger : si non déjà déclenché
-; (+0x5B), timer (+0x55, décrément par dword_70458) expiré et cible en portée (sub_378CA),
-; instancie un objet enfant depuis un template (+0x0E) via sub_38B70, copie
-; position/orientation, l'enregistre dans une liste membre (+0x59, dtor sub_3A3EC) et notifie
-; un listener optionnel (+0x1E, résolu via sub_22E27). Hypothèse : trigger d'effet/évènement
-; scripté à usage unique — non vérifié en détail.
+; far, LUE 2026-10-12. Mise à jour de l'objet EJEC (vtable 32F6h, seg339:off_703B6). Si pas
+; encore fait (+0x5B = 0) : délai +0x55 −= dt (dword_70458) ; hauteur sous l'objet via
+; Terrain_QueryAltitudeAt (à confirmer) ; si délai < 0 ET (modèle +0x53 << 8) > cette hauteur
+; : crée UNE FOIS l'objet nommé modèle +0x4A (ObjectPrototype_FindOrLoadAndInstantiate_38B70),
+; même orientation (+0x2C), même position, même vitesse (vtable +0x4C → +0x50), ajouté à la
+; liste 59C3h, référencé en +0x59, +0x5B = 1 ; notifie un écouteur optionnel (+0x1E). Renvoie
+; 1.
 ; ==============================================================================================
-Trigger_TimedRangedSpawnOnce_4F351:				; DATA XREF: seg339:off_703B6o
+EjectSeat_TickReleaseObject_4F351:				; DATA XREF: seg339:off_703B6o
 		push	bp
 		mov	bp, sp
 		sub	sp, 36h

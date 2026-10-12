@@ -7,10 +7,11 @@ seg450		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, alloue (sub_658), initialise une classe de base (sub_3C9BC), appelle
-; TextLabel_InitRandomTimer_A6048.
+; far, méthode +4 de la classe SMKG : crée l'instance (CRT_Malloc16_Retry(0x5B),
+; WorldObject_BaseConstruct, vtable 30EEh, +0x51 = 0), SmokeGen_InitInstance_A6048, instance
+; +6 = modèle+0x2B.
 ; ==============================================================================================
-TextLabel_ConstructAndInit_A5F20	proc far		; CODE XREF: VROOMM_StubThunk_6CC1FJ
+SmokeGen_SpawnInstance_A5F20	proc far		; CODE XREF: VROOMM_StubThunk_6CC1FJ
 
 var_C		= dword	ptr -0Ch
 var_8		= dword	ptr -8
@@ -48,16 +49,16 @@ loc_A5F50:
 		push	si
 		nop
 		push	cs
-		call	near ptr TextLabel_InitRandomTimer_A6048
+		call	near ptr SmokeGen_InitInstance_A6048
 		add	sp, 6
 		mov	ax, si
 		jmp	short loc_A5F6B
 ; ���������������������������������������������������������������������������
 
-loc_A5F69:				; CODE XREF: TextLabel_ConstructAndInit_A5F20+1Bj
+loc_A5F69:				; CODE XREF: SmokeGen_SpawnInstance_A5F20+1Bj
 		mov	ax, si
 
-loc_A5F6B:				; CODE XREF: TextLabel_ConstructAndInit_A5F20+47j
+loc_A5F6B:				; CODE XREF: SmokeGen_SpawnInstance_A5F20+47j
 		mov	si, ax
 		mov	ax, word ptr [bp+arg_0+2]
 
@@ -80,7 +81,7 @@ loc_A5F84:
 		pop	si
 		leave
 		retf
-TextLabel_ConstructAndInit_A5F20	endp
+SmokeGen_SpawnInstance_A5F20	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -88,11 +89,16 @@ TextLabel_ConstructAndInit_A5F20	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 94 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743,
-; ReadFinalField_64B51 (×2), ReadFieldGroupC_64A7E (×3), ReadFieldGroupB_64A54 (seg193),
-; gestion d'erreur, sub_3C942 (init classe de base).
+; far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-
+; TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant
+; la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36
+; couleur des particules ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B
+; vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ;
+; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ;
+; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs
+; + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050).
 ; ==============================================================================================
-TextLabel_LoadFieldsFromIFF_A5F89	proc far		; CODE XREF: VROOMM_StubThunk_6CC1AJ
+SmokeGen_LoadFromIFF_A5F89	proc far		; CODE XREF: VROOMM_StubThunk_6CC1AJ
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -166,14 +172,14 @@ loc_A6001:
 		jmp	short loc_A6013
 ; ���������������������������������������������������������������������������
 
-loc_A600A:				; CODE XREF: TextLabel_LoadFieldsFromIFF_A5F89+1Aj
+loc_A600A:				; CODE XREF: SmokeGen_LoadFromIFF_A5F89+1Aj
 		push	0B004h
 
 loc_A600D:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A6013:				; CODE XREF: TextLabel_LoadFieldsFromIFF_A5F89+7Fj
+loc_A6013:				; CODE XREF: SmokeGen_LoadFromIFF_A5F89+7Fj
 		push	si
 
 loc_A6014:
@@ -185,7 +191,7 @@ loc_A6014:
 loc_A6021:
 		pop	bp
 		retf
-TextLabel_LoadFieldsFromIFF_A5F89	endp
+SmokeGen_LoadFromIFF_A5F89	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -195,7 +201,7 @@ TextLabel_LoadFieldsFromIFF_A5F89	endp
 ; ==============================================================================================
 ; far, aucun appel externe visible (rôle exact non détaillé).
 ; ==============================================================================================
-TextLabel_Helper_A6023	proc far		; CODE XREF: VROOMM_StubThunk_6CC24J TextLabel_InitRandomTimer_A6048+Cp
+TextLabel_Helper_A6023	proc far		; CODE XREF: VROOMM_StubThunk_6CC24J SmokeGen_InitInstance_A6048+Cp
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -225,11 +231,12 @@ TextLabel_Helper_A6023	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine TextLabel_Helper_A6023, sub_37C89, Timer_SetAbsolute_4F9A2 (seg110),
-; Math_RandomChance_54E4F (seg115) — probable initialisation d'un minuteur avec déclenchement
-; aléatoire pour l'affichage du libellé de texte.
+; far, INITIALISE UN GÉNÉRATEUR DE FUMÉE (ex-TextLabel_InitRandomTimer) : attache à la source
+; (Debris_BodyAttachToSubpart), minuteur +0x51 = durée (modèle +0x37,
+; Timer_SetAbsolute_4F9A2), actif (+0x5A = 1) seulement si Math_RandomChance_54E4F(modèle
+; +0x43).
 ; ==============================================================================================
-TextLabel_InitRandomTimer_A6048	proc far		; CODE XREF: VROOMM_StubThunk_6CC29J TextLabel_ConstructAndInit_A5F20+3Fp
+SmokeGen_InitInstance_A6048	proc far		; CODE XREF: VROOMM_StubThunk_6CC29J SmokeGen_SpawnInstance_A5F20+3Fp
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -278,11 +285,11 @@ loc_A6091:
 		jz	short loc_A60A9
 		mov	byte ptr [si+5Ah], 1
 
-loc_A60A9:				; CODE XREF: TextLabel_InitRandomTimer_A6048+5Bj
+loc_A60A9:				; CODE XREF: SmokeGen_InitInstance_A6048+5Bj
 		pop	si
 		leave
 		retf
-TextLabel_InitRandomTimer_A6048	endp
+SmokeGen_InitInstance_A6048	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

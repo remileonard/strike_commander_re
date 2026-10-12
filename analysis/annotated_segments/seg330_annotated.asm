@@ -19,7 +19,7 @@ stru_6CCD0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0B5Eo
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCF0	proc far		; CODE XREF: IFF_LoadModelMain+ECFP
-		jmp	PlayerComponent_LoadDataChunk_A6CA0
+		jmp	EjectSeat_LoadFromIFF_A6CA0
 VROOMM_StubThunk_6CCF0	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6CCF0	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCF5	proc far		; DATA XREF: seg339:off_6F458o
-		jmp	TriggerObject_Construct_A6D18
+		jmp	EjectSeat_SpawnInstance_A6D18
 VROOMM_StubThunk_6CCF5	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6CCF5	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CCFA	proc far
-		jmp	TriggerObject_InitDerived_A6DA2
+		jmp	EjectSeat_InitInstance_A6DA2
 VROOMM_StubThunk_6CCFA	endp
 
 

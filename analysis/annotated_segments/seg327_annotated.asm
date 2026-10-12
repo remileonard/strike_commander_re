@@ -45,7 +45,7 @@ VROOMM_StubThunk_6CC15	endp
 ; d'overlay actuellement charge en memoire. fileoff=34870h, codesize=7C5h, nentries=10.
 ; ==============================================================================================
 VROOMM_StubThunk_6CC1A	proc far		; CODE XREF: IFF_LoadModelMain+E21P
-		jmp	TextLabel_LoadFieldsFromIFF_A5F89
+		jmp	SmokeGen_LoadFromIFF_A5F89
 VROOMM_StubThunk_6CC1A	endp
 
 
@@ -58,7 +58,7 @@ VROOMM_StubThunk_6CC1A	endp
 ; d'overlay actuellement charge en memoire. fileoff=34870h, codesize=7C5h, nentries=10.
 ; ==============================================================================================
 VROOMM_StubThunk_6CC1F	proc far		; DATA XREF: seg339:off_6F46Co
-		jmp	TextLabel_ConstructAndInit_A5F20
+		jmp	SmokeGen_SpawnInstance_A5F20
 VROOMM_StubThunk_6CC1F	endp
 
 
@@ -84,7 +84,7 @@ VROOMM_StubThunk_6CC24	endp
 ; d'overlay actuellement charge en memoire. fileoff=34870h, codesize=7C5h, nentries=10.
 ; ==============================================================================================
 VROOMM_StubThunk_6CC29	proc far
-		jmp	TextLabel_InitRandomTimer_A6048
+		jmp	SmokeGen_InitInstance_A6048
 VROOMM_StubThunk_6CC29	endp
 
 
