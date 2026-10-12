@@ -46,7 +46,10 @@ nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outli
 nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
 main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
 main > *, article.mv > * { min-width: 0; }
-td, dd, li, p { overflow-wrap: anywhere; }
+dd, li, p { overflow-wrap: break-word; }
+td { overflow-wrap: normal; }
+article.mv a, section a { color: var(--accent); }
+nav.toc a { color: var(--fg); }
 header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
 header.top p { max-width: 70ch; margin: 0 0 10px; }
 .eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
@@ -57,8 +60,6 @@ code, .mono { font-family: var(--font-mono); font-size: .88em; }
 code { background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
 .note { border-left: 3px solid var(--mark); background: var(--mark-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 78ch; }
 .note p { margin: 4px 0; }
-article.mv a, section a { color: var(--accent); }
-nav.toc a { color: var(--fg); }
 .tablewrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 14px; }
 th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
@@ -76,6 +77,9 @@ article.mv > header h2 { font-family: var(--font-display); font-size: 25px; marg
 .chips li b { color: var(--fg); font-weight: 600; }
 .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 26px; align-items: start; }
 .grid2 > * { min-width: 0; }
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.stack > * { min-width: 0; }
+.stack figure { max-width: 640px; }
 ol.phases { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
 ol.phases li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }
 ol.phases li > span { font-family: var(--font-mono); font-weight: 500; color: var(--mark); background: var(--mark-soft); border-radius: 4px; text-align: center; height: 22px; line-height: 22px; font-size: 12.5px; }
@@ -148,59 +152,74 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
 <header class="top">
   <div class="eyebrow">STRIKE.EXE · fichiers de données · référence de portage</div>
   <h1>Le modèle de données de Strike Commander</h1>
-  <p>Ce document décrit ce que contiennent les fichiers du jeu et comment ils s'enchaînent : une mission désigne son monde, ses pilotes, ses zones et ses objets ; un objet désigne son modèle 3D et sa dynamique de vol ; un pilote désigne son profil de comportement. Chaque fiche donne la disposition sur disque, le sens de chaque champ et la façon dont le jeu s'en sert.</p>
-  <p>Toutes les dispositions viennent des lecteurs de <code>STRIKE.EXE</code> (segments annotés de <code>analysis/annotated_segments/</code>) ; le détail et les citations d'assembleur sont dans <code>analysis/DATA_MODEL.md</code>. Ce qui n'est pas prouvé est signalé comme tel.</p>
+  <p>Ce document décrit ce que contiennent les fichiers du jeu et comment ils s'enchaînent : une mission désigne son monde, ses pilotes, ses zones et ses objets ; un objet désigne son modèle 3D et sa dynamique de vol ; un pilote désigne son profil de comportement. Chaque fiche liste les champs dans l'ordre où ils sont rangés dans le fichier, avec leur type, leur taille et leur sens.</p>
+  <p>Toutes les dispositions viennent des lecteurs de <code>STRIKE.EXE</code> ; le détail et les preuves sont dans <code>analysis/DATA_MODEL.md</code> et <code>analysis/PHYSICS.md</code>. Ce qui n'est pas prouvé est signalé comme tel.</p>
 </header>
 
 <section id="conventions">
   <h2 class="sec">Conventions de lecture</h2>
   <dl class="vocab">
+    <dt>Ordre des champs</dt>
+    <dd>Les tableaux listent les champs <b>dans l'ordre du fichier</b>, sans trou sauf mention. Il suffit de les lire l'un après l'autre.</dd>
+    <dt>Types</dt>
+    <dd>
+      <code>unsigned char</code> 1 octet (0 à 255) · <code>char</code> 1 octet signé ·
+      <code>unsigned short</code> 2 octets · <code>short</code> 2 octets signé ·
+      <code>int</code> 4 octets signé · <code>unsigned int</code> 4 octets ·
+      <code>string[N]</code> N caractères complétés par des zéros.
+    </dd>
+    <dt>int (fixe)</dt>
+    <dd>Un <code>int</code> de 4 octets en virgule fixe : <b>le lire puis le diviser par 256</b> donne la valeur réelle (un float). Un <code>char</code> ou un <code>short</code> se lit, sauf mention, <b>tel quel</b> (un cap de 180 = 180°).</dd>
     <dt>Repère</dt>
-    <dd><b>Y-up, comme libRealSpace</b> : X et Z forment le plan horizontal (Z = profondeur), Y est l'altitude. Le jeu, lui, range ses vecteurs en Z-up (3ᵉ composante = altitude). Sur disque, un vecteur de 3 entiers se lit donc <code>X = c0</code>, <code>Z = c1</code>, <code>Y = c2</code> : <b>le 2ᵉ i32 est Z, le 3ᵉ est Y</b>.</dd>
+    <dd><b>Y-up, comme libRealSpace</b> : X et Z forment le plan horizontal (Z = profondeur), Y est l'altitude. Dans les fichiers, un vecteur de 3 nombres est rangé <b>X, puis Z, puis Y</b> : le 2ᵉ est la profondeur, le 3ᵉ l'altitude.</dd>
     <dt>Unités</dt>
     <dd>Distances en <b>mètres</b>, angles en <b>degrés</b>. Jamais de pieds.</dd>
-    <dt>Virgule fixe 24.8</dt>
-    <dd>Un i32 « 24.8 » se divise par 256 à la lecture (256 = 1,0). Un entier de 8 ou 16 bits que le code décale de 8 (<code>shl 8</code>) se lit <b>tel quel</b> (ex. un cap de 180 = 180°).</dd>
     <dt>Ordre des octets</dt>
-    <dd>Tailles de chunk IFF en <b>big-endian</b> ; tous les champs internes en <b>little-endian</b>.</dd>
+    <dd>Tailles de chunk IFF en big-endian ; tous les champs en little-endian (ordre x86).</dd>
+    <dt>Noms des champs</dt>
+    <dd>Les noms de champs sont ceux de ce document, pas ceux du jeu (le binaire n'en contient pas). Un nom suivi de « supposé » ou une description « rôle non établi » signale un champ dont le sens n'est pas prouvé.</dd>
     <dt>Index</dt>
-    <dd>Un index désigne le rang d'un enregistrement dans son chunk, à partir de 0. Un index hors liste (souvent <code>0xFFFF</code> ou <code>0xFF</code>) veut dire « aucun ».</dd>
+    <dd>Un index désigne le rang d'un enregistrement dans son chunk, à partir de 0. Un index hors liste (souvent 65535, c'est-à-dire −1, ou 255) veut dire « aucun ».</dd>
   </dl>
 </section>
 
 <section id="fichiers">
   <h2 class="sec">Où sont les fichiers</h2>
-  <p>Presque tous les chargements passent par <code>Path_ResolveDataFile</code> : un nom sans <code>\</code> devient <code>..\..\DATA\&lt;dossier&gt;\&lt;nom&gt;.&lt;ext&gt;</code>.</p>
+  <p>Un nom sans <code>\</code> devient <code>..\..\DATA\&lt;dossier&gt;\&lt;nom&gt;.&lt;ext&gt;</code>.</p>
   <div class="tablewrap"><table>
-    <thead><tr><th>Dossier / fichier</th><th>Contenu</th><th>Racine IFF</th></tr></thead>
+    <thead><tr><th>Fichier</th><th>Contenu</th><th>Racine</th></tr></thead>
     <tbody>
-      <tr><td class="num">OBJECTS\&lt;type&gt;.IFF</td><td>un objet : modèle 3D, catégorie, dynamique de vol (ex. <code>F-16DES.IFF</code>, <code>MIG21.IFF</code>)</td><td><code>FORM REAL</code></td></tr>
+      <tr><td class="num">OBJECTS\&lt;type&gt;.IFF</td><td>un objet : modèle 3D, catégorie, dynamique de vol (ex. <code>F-16DES.IFF</code>)</td><td><code>FORM REAL</code></td></tr>
       <tr><td class="num">MISSIONS\&lt;mission&gt;.IFF</td><td>une mission (ex. <code>MISN-1A.IFF</code>)</td><td><code>FORM MISN</code></td></tr>
       <tr><td class="num">MISSIONS\&lt;monde&gt;.IFF</td><td>un monde : terrain, ciel, caméras (ex. <code>MAURITAN.IFF</code>)</td><td><code>FORM WRLD</code></td></tr>
-      <tr><td class="num">DATA\&lt;théâtre&gt;.PAK</td><td>le terrain d'un théâtre : altitudes, pistes, objets</td><td>archive PAK</td></tr>
+      <tr><td class="num">DATA\&lt;théâtre&gt;.PAK</td><td>le terrain d'un théâtre</td><td>archive PAK</td></tr>
       <tr><td class="num">INTEL\&lt;pilote&gt;.IFF</td><td>le profil de comportement d'un pilote IA (ex. <code>STERN.IFF</code>)</td><td><code>FORM PROF</code></td></tr>
       <tr><td class="num">DATA\OP2MISN.IFF</td><td>ce que la campagne (<code>OPTEST.EXE</code>) transmet à la mission</td><td><code>FORM INVN</code></td></tr>
       <tr><td class="num">DATA\MISN2OP.IFF</td><td>le résultat de la mission, écrit par le simulateur</td><td><code>FORM INVN</code></td></tr>
       <tr><td class="num">COCKPITS\*</td><td>les cockpits</td><td>IFF</td></tr>
-      <tr><td class="num">SOUND\*.ADL / .DAT</td><td>la musique (voir <code>MUSIC_SYSTEM.md</code>)</td><td>XMIDI</td></tr>
-      <tr><td class="num">sc.cfg, *.sav</td><td>réglages ; sauvegarde (blob binaire, pas d'IFF)</td><td>—</td></tr>
+      <tr><td class="num">SOUND\*.ADL et *.DAT</td><td>la musique (voir <code>MUSIC_SYSTEM.md</code>)</td><td>XMIDI</td></tr>
+      <tr><td class="num">sc.cfg</td><td>les réglages</td><td>IFF</td></tr>
+      <tr><td class="num">*.sav</td><td>la sauvegarde (bloc binaire brut)</td><td>—</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section id="iff">
   <h2 class="sec">Le conteneur IFF</h2>
-  <p>Tous les fichiers de données (sauf la sauvegarde) sont des IFF. Un fichier est une arborescence de blocs :</p>
-  <pre class="tpl">FORM &lt;type&gt;   taille BE   ← conteneur : 4 octets de type puis des sous-blocs
-  CHUNK &lt;tag&gt; taille BE   ← données ; paddé à une longueur paire
-  FORM &lt;type&gt; …           ← conteneurs imbriqués, récursifs
-  CAT  &lt;type&gt; …           ← concaténation d'éléments
-PACK : table [offset u32 × N] → enregistrements de taille variable, parfois compressés LZW</pre>
+  <p>Tous les fichiers de données (sauf la sauvegarde) sont des IFF : une arborescence de blocs.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bloc</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">FORM</td><td>conteneur : tag de 4 caractères, taille (big-endian), type de 4 caractères, puis des sous-blocs</td></tr>
+      <tr><td class="num">CHUNK</td><td>données : tag de 4 caractères, taille (big-endian), puis les données ; complété à une longueur paire</td></tr>
+      <tr><td class="num">CAT</td><td>concaténation d'éléments</td></tr>
+      <tr><td class="num">PACK</td><td>table d'adresses, puis des enregistrements de taille variable, parfois compressés en LZW</td></tr>
+    </tbody>
+  </table></div>
   <ul>
-    <li><b>Tailles big-endian, champs little-endian.</b> Le jeu lit les champs avec des primitives u8 / u16 / u32 / N octets / chaîne C.</li>
-    <li>La recherche d'un chunk (<code>seek_chunk</code>) parcourt <b>le niveau courant</b> jusqu'à trouver le tag demandé : l'ordre des chunks n'importe pas pour ceux que le lecteur cherche par tag.</li>
-    <li><b>LZW</b> : codes de 9 à 12 bits, 256 symboles + <i>clear</i> (256) + fin (257), premier code libre 258 — paramétrage de type GIF.</li>
-    <li><b>Archive PAK</b> (terrain) : <code>u32 taille_fichier</code>, puis <code>u32 (offset | 0xE0000000) × N</code>, puis les données. Les PAK s'emboîtent.</li>
+    <li>Le jeu cherche un chunk <b>par son tag</b> dans le niveau courant : l'ordre des chunks n'a pas d'importance pour ceux qu'il cherche ainsi.</li>
+    <li><b>LZW</b> : codes de 9 à 12 bits, 256 symboles, code 256 = remise à zéro, code 257 = fin, premier code libre 258 (comme le GIF).</li>
+    <li><b>Archive PAK</b> (terrain) : <code>unsigned int</code> taille du fichier, puis une adresse <code>unsigned int</code> par sous-ressource (les 3 bits de poids fort sont mis à 1 et ne font pas partie de l'adresse), puis les données. Les PAK s'emboîtent.</li>
   </ul>
 </section>
 
@@ -234,63 +253,93 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
 <article class="mv" id="objets">
   <header><span class="id">OBJECTS\*.IFF</span><h2>Objets 3D et catégories</h2></header>
   <ul class="chips"><li>racine <b>FORM REAL</b></li><li>lecteur <b>IFF_LoadModelMain</b></li></ul>
-  <p>Un fichier d'objet contient <code>FORM REAL</code> → <code>FORM OBJT</code> → <b>un</b> sous-FORM qui fixe la classe de l'objet. Le jeu essaie les types dans l'ordre ci-dessous et garde le premier présent. Chaque classe renvoie une <b>catégorie</b>, que l'IA utilise pour choisir ses cibles (6 avion, 8 missile, 0x13 défense fixe).</p>
+  <p>Un fichier d'objet contient <code>FORM REAL</code>, puis <code>FORM OBJT</code>, puis <b>un</b> sous-FORM qui fixe la classe de l'objet. Le jeu essaie les types dans l'ordre du tableau et garde le premier présent. Chaque classe a une <b>catégorie</b>, que l'IA utilise pour choisir ses cibles.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>FORM</th><th>Catégorie</th><th>Objet</th></tr></thead>
     <tbody>
       <tr><td class="num">BOBJ</td><td class="num">0</td><td>objet simple</td></tr>
-      <tr><td class="num">ORNT</td><td class="num">1</td><td>décor orienté (immeuble…), chunk <code>ANGL</code> = angle</td></tr>
-      <tr><td class="num">MOBL / OMOB</td><td class="num">2 / 3</td><td>objet mobile / mobile orienté</td></tr>
-      <tr><td class="num">GUID / ARMG</td><td class="num">4 / 5</td><td>non utilisés par les missiles du jeu (seul <code>MISS</code> l'est)</td></tr>
+      <tr><td class="num">ORNT</td><td class="num">1</td><td>décor orienté (immeuble…) ; chunk <code>ANGL</code> = angle</td></tr>
+      <tr><td class="num">TRCR</td><td class="num">13</td><td>traçante</td></tr>
+      <tr><td class="num">AFTB</td><td class="num">14</td><td>post-combustion</td></tr>
+      <tr><td class="num">MOBL</td><td class="num">2</td><td>objet mobile</td></tr>
+      <tr><td class="num">OMOB</td><td class="num">3</td><td>objet mobile orienté</td></tr>
+      <tr><td class="num">GUID</td><td class="num">4</td><td>non utilisé par les missiles du jeu</td></tr>
+      <tr><td class="num">ARMG</td><td class="num">5</td><td>rôle non établi</td></tr>
       <tr><td class="num">JETP</td><td class="num"><b>6</b></td><td><b>avion</b> (contient la dynamique <code>DYNM</code>)</td></tr>
+      <tr><td class="num">XMIT</td><td class="num">21</td><td>émetteur</td></tr>
       <tr><td class="num">WEAP</td><td class="num">7</td><td>arme</td></tr>
       <tr><td class="num">MISS</td><td class="num"><b>8</b></td><td><b>missile</b></td></tr>
-      <tr><td class="num">BOMB / DURD</td><td class="num">9</td><td>bombe / Durandal</td></tr>
-      <tr><td class="num">PODR</td><td class="num">0x0A</td><td>nacelle</td></tr>
-      <tr><td class="num">TRCR / AFTB</td><td class="num">0x0D / 0x0E</td><td>traçante / post-combustion</td></tr>
-      <tr><td class="num">DECY</td><td class="num">0x10</td><td>leurres</td></tr>
-      <tr><td class="num">SWPN</td><td class="num"><b>0x13</b></td><td><b>défenses fixes</b> : AA, SAM, navires</td></tr>
-      <tr><td class="num">GRND</td><td class="num">0x14</td><td>objet au sol</td></tr>
-      <tr><td class="num">XMIT</td><td class="num">0x15</td><td>émetteur</td></tr>
-      <tr><td class="num">RNWY / EXPL / DEBR</td><td>non lue</td><td>piste / explosion / débris</td></tr>
+      <tr><td class="num">PODR</td><td class="num">10</td><td>nacelle</td></tr>
+      <tr><td class="num">BOMB</td><td class="num">9</td><td>bombe</td></tr>
+      <tr><td class="num">DURD</td><td class="num">9</td><td>Durandal (bombe anti-piste)</td></tr>
+      <tr><td class="num">DECY</td><td class="num">16</td><td>leurres</td></tr>
+      <tr><td class="num">SWPN</td><td class="num"><b>19</b></td><td><b>défense fixe</b> : AA, SAM, navire</td></tr>
+      <tr><td class="num">GRND</td><td class="num">20</td><td>objet au sol</td></tr>
+      <tr><td class="num">RNWY</td><td>non lue</td><td>piste</td></tr>
+      <tr><td class="num">EXPL</td><td>non lue</td><td>explosion</td></tr>
+      <tr><td class="num">DEBR</td><td>non lue</td><td>débris</td></tr>
     </tbody>
   </table></div>
-  <p>Chunk commun <code>INFO</code> : rayon de collision (u16, défaut 20). Pièces d'un avion : <code>FUSELAGE</code>, <code>LWING</code>, <code>RWING</code>, <code>HARDPT#</code>, <code>POD</code>, <code>GUN</code>… ; 8 composants de dégâts : <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code>, <code>ENGINE</code>, <code>LANDGEAR</code>, <code>FLAPS</code>.</p>
+  <p>Chunk commun <code>INFO</code> : rayon de collision (<code>unsigned short</code>, défaut 20).</p>
+  <h3>Composants de dégâts d'un avion</h3>
+  <ul class="chips"><li>RUDDER</li><li>ELEVATOR</li><li>AILERON</li><li>LWING</li><li>RWING</li><li>ENGINE</li><li>LANDGEAR</li><li>FLAPS</li></ul>
 </article>
 
 <!-- ============================ DYNM ============================ -->
 <article class="mv" id="dynm">
   <header><span class="id">JETP → DYNM</span><h2>Dynamique de vol d'un avion</h2></header>
-  <ul class="chips"><li>dans <b>OBJECTS\&lt;avion&gt;.IFF</b></li><li>struct <b>JDYN 197 o</b></li><li>codes d'erreur <b>A001 → A005</b></li></ul>
-  <p>Le FORM <code>DYNM</code> d'un avion regroupe 5 chunks lus en séquence. Les armes ont à la place un seul chunk de dynamique (<code>MISS</code>, <code>GBMB</code>, <code>DURD</code>, <code>AGRV</code>, <code>SURF</code>, <code>PARA</code>).</p>
-  <pre class="tpl">FORM JETP
- └─ FORM DYNM
-     ├─ DYNM   u32            masse à vide (÷256)
-     ├─ ATMO   u32 (+ bloc)   modèle d'atmosphère (partagé par tous les avions)
-     ├─ THRS   u32 + 3× u8    poussée maximale avec PC (÷256) + 3 fractions moteur
-     ├─ STBL   u32            stabilité / autorité de tangage
-     └─ JDYN   73 octets      enveloppe de vol (28 champs)</pre>
-  <h3>Champs principaux</h3>
+  <ul class="chips"><li>dans <b>OBJECTS\&lt;avion&gt;.IFF</b></li><li>5 chunks lus dans l'ordre</li></ul>
+  <p>Le FORM <code>DYNM</code> d'un avion regroupe les 5 chunks ci-dessous. Les armes ont à la place un seul chunk de dynamique (<code>MISS</code>, <code>GBMB</code>, <code>DURD</code>, <code>AGRV</code>, <code>SURF</code> ou <code>PARA</code>).</p>
+
+  <h3>DYNM, ATMO, THRS, STBL</h3>
   <div class="tablewrap"><table>
-    <thead><tr><th>Champ (struct)</th><th>Sens</th></tr></thead>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="num">THRS u8 ×3</td><td>fraction de poussée sans PC (MIL) ; fraction à la vitesse de référence ; échelle de la vitesse où la poussée s'annule</td></tr>
-      <tr><td class="num">+0x69</td><td>capacité carburant (copiée en carburant courant <code>+0x6D</code> ; à 0 → extinction moteur)</td></tr>
-      <tr><td class="num">+0x33</td><td>coefficient de consommation</td></tr>
-      <tr><td class="num">+0x37 / +0x3B</td><td>traînée ajoutée par l'aérofrein / par le train sorti</td></tr>
-      <tr><td class="num">+0x3F / +0x43</td><td>traînée au sol (roulage), et son supplément aérofrein sorti</td></tr>
-      <tr><td class="num">+0x4B</td><td>angle d'incidence de décrochage (u8, degrés)</td></tr>
-      <tr><td class="num">+0x4C / +0x4D</td><td>calage de l'aile (toujours ajouté à l'incidence) / incrément des volets</td></tr>
-      <tr><td class="num">+0x59</td><td>vitesse de référence (F-16 : 50 m/s) : sous elle, le taux de roulis diminue ; effet de sol</td></tr>
-      <tr><td class="num">+0x5D</td><td>coefficient de traînée induite</td></tr>
-      <tr><td class="num">+0x61</td><td>gain de portance / agilité de la cellule</td></tr>
-      <tr><td class="num">+0x71</td><td>taux de roulis maximal (°/s)</td></tr>
-      <tr><td class="num">+0x47</td><td>accélération de roulis maximale (°/s²)</td></tr>
-      <tr><td class="num">+0x80 / +0x82 / +0x84</td><td>vitesses de consigne de l'IA : poursuite max (déf. 500), min (100), croisière (231)</td></tr>
-      <tr><td class="num">+0x86</td><td>seuil de distance de l'IA (déf. 11005)</td></tr>
+      <tr><td class="num">DYNM</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>masse à vide (kg)</td></tr>
+      <tr><td class="num">ATMO</td><td>unsigned&nbsp;int</td><td class="num">4</td><td>modèle d'atmosphère, partagé par tous les avions (suivi d'un bloc s'il est déjà défini)</td></tr>
+      <tr><td class="num">THRS · poussée</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>poussée maximale avec post-combustion (N)</td></tr>
+      <tr><td class="num">THRS · fraction sans PC</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>part de la poussée disponible sans post-combustion : valeur ÷ 256 (0 à 1)</td></tr>
+      <tr><td class="num">THRS · fraction à la référence</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>poussée restante à la vitesse/altitude de référence : valeur ÷ 256</td></tr>
+      <tr><td class="num">THRS · coupure</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>échelle de la coupure de poussée : entier (× 100 → mètres)</td></tr>
+      <tr><td class="num">STBL</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>stabilité / autorité en tangage (sans unité)</td></tr>
     </tbody>
   </table></div>
-  <p>Le modèle de vol complet (portance, traînée, poussée, asservissement) est décrit dans <code>PHYSICS.md</code> et <code>DATA_MODEL.md</code> §6.2.</p>
+
+  <h3>JDYN : l'enveloppe de vol (28 champs, 73 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>capacité carburant</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>kg ; le carburant courant part de cette valeur, à 0 le moteur s'éteint</td></tr>
+      <tr><td class="num">2</td><td>consommation</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>coefficient de consommation de carburant</td></tr>
+      <tr><td class="num">3</td><td>traînée aérofrein</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>traînée ajoutée aérofrein sorti</td></tr>
+      <tr><td class="num">4</td><td>traînée train</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>traînée ajoutée train sorti</td></tr>
+      <tr><td class="num">5</td><td>traînée au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>freinage au roulage</td></tr>
+      <tr><td class="num">6</td><td>traînée au sol, aérofrein</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>supplément au sol quand l'aérofrein est sorti</td></tr>
+      <tr><td class="num">7</td><td>accélération de roulis max</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>°/s² (à confirmer)</td></tr>
+      <tr><td class="num">8</td><td>taux de rotation max</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>°/s ; borne aussi le roulis</td></tr>
+      <tr><td class="num">9</td><td>incidence de décrochage</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés</td></tr>
+      <tr><td class="num">10</td><td>calage de l'aile</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés, toujours ajouté à l'incidence</td></tr>
+      <tr><td class="num">11</td><td>incrément des volets</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés ajoutés volets sortis</td></tr>
+      <tr><td class="num">12</td><td>limite verticale au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s (à confirmer)</td></tr>
+      <tr><td class="num">13</td><td>vitesse limite au sol</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s : au-delà, l'avion n'est plus « au sol »</td></tr>
+      <tr><td class="num">14</td><td>inclinaison limite au sol</td><td>char</td><td class="num">1</td><td>degrés (à confirmer)</td></tr>
+      <tr><td class="num">15</td><td>tangage limite au sol</td><td>char</td><td class="num">1</td><td>degrés ; aucun lecteur trouvé dans la physique</td></tr>
+      <tr><td class="num">16</td><td>marge de tangage au sol</td><td>char</td><td class="num">1</td><td>degrés (à confirmer)</td></tr>
+      <tr><td class="num">17</td><td>vitesse d'efficacité des gouvernes</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>m/s (F-16 : 50) ; en dessous, le roulis faiblit ; au sol, nez plaqué</td></tr>
+      <tr><td class="num">18</td><td>traînée induite</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>coefficient (joue le rôle de 1/(π·e·AR))</td></tr>
+      <tr><td class="num">19</td><td>gain de portance</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>agilité de la cellule (rôle de Clα·S)</td></tr>
+      <tr><td class="num">20</td><td>incidence commandée max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés à pleine butée du manche</td></tr>
+      <tr><td class="num">21</td><td>dérapage commandé max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>degrés à pleine butée du palonnier</td></tr>
+      <tr><td class="num">22</td><td>facteur de charge max</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>g à pleine butée du manche</td></tr>
+      <tr><td class="num">23</td><td>IA : vitesse de poursuite max</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>défaut 500</td></tr>
+      <tr><td class="num">24</td><td>IA : vitesse de poursuite min</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>défaut 100</td></tr>
+      <tr><td class="num">25</td><td>IA : vitesse de croisière</td><td>short</td><td class="num">2</td><td>défaut 231</td></tr>
+      <tr><td class="num">26</td><td>IA : seuil de distance</td><td>unsigned&nbsp;int</td><td class="num">4</td><td>défaut 11005 ; entier tel quel</td></tr>
+      <tr><td class="num">27</td><td>IA : réservé</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>défaut 3 ; chargé, jamais lu</td></tr>
+      <tr><td class="num">28</td><td>IA : poids de décision</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>défaut 2 ; pondère un score de décision</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le modèle de vol complet (portance, traînée, poussée, asservissement) est décrit dans <code>PHYSICS.md</code>.</p>
 </article>
 
 <!-- ============================ PROF ============================ -->
@@ -298,60 +347,64 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
   <header><span class="id">INTEL\&lt;nom&gt;.IFF</span><h2>Profil de pilote</h2></header>
   <ul class="chips"><li>racine <b>FORM PROF</b></li><li>chargé pour <b>chaque pilote IA</b></li><li>jamais pour le joueur</li></ul>
   <p>Le nom vient du chunk <code>CAST</code> de la mission : un pilote nommé <code>STERN</code> charge <code>INTEL\STERN.IFF</code>. Le fichier contient sa voix radio et son comportement.</p>
-  <pre class="tpl">FORM PROF
- ├─ VERS   u16 (= 2)
- ├─ FORM RADI                      la radio
- │   ├─ SPCH  u8 (optionnel)       jeu de voix INTEL\SPEECH\*.PAK
- │   ├─ INFO  u16 id + nom + indicatif (chaînes C)
- │   ├─ OPTS  lettres : ordres/questions qu'on peut lui adresser
- │   └─ MSGS  (u8 index, chaîne C)… : répliques (index partagés dans tout le jeu)
- └─ FORM _AI_                      le comportement
-     ├─ AI\0_ marqueur vide
-     ├─ MVRS  table de manœuvres pondérées (voir MVRS_MANOEUVRES.html)
-     ├─ GOAL  jusqu'à 10 sélecteurs de comportement
-     └─ ATRB  10 octets d'attributs, 0 à 16</pre>
-  <h3>ATRB, dans l'ordre du fichier</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Bloc</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">VERS</td><td><code>short</code> : version (toujours 2)</td></tr>
+      <tr><td class="num">FORM RADI</td><td>la radio :</td></tr>
+      <tr><td class="num">· SPCH</td><td><code>unsigned char</code>, optionnel : jeu de voix <code>INTEL\SPEECH\*.PAK</code></td></tr>
+      <tr><td class="num">· INFO</td><td><code>unsigned short</code> identifiant, puis deux chaînes terminées par un zéro : nom et indicatif</td></tr>
+      <tr><td class="num">· OPTS</td><td>une lettre par ordre ou question qu'on peut lui adresser par radio</td></tr>
+      <tr><td class="num">· MSGS</td><td>suite de (<code>unsigned char</code> numéro, chaîne) : ses répliques ; les numéros sont partagés dans tout le jeu</td></tr>
+      <tr><td class="num">FORM _AI_</td><td>le comportement :</td></tr>
+      <tr><td class="num">· AI_</td><td>chunk vide : marqueur « pilote IA »</td></tr>
+      <tr><td class="num">· MVRS</td><td>table de manœuvres pondérées (voir <code>MVRS_MANOEUVRES.html</code>)</td></tr>
+      <tr><td class="num">· GOAL</td><td>jusqu'à 10 sélecteurs de comportement</td></tr>
+      <tr><td class="num">· ATRB</td><td>10 <code>unsigned char</code> d'attributs (tableau suivant)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>ATRB, dans l'ordre du fichier (chacun 1 octet, 0 à 16)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Code</th><th>Attribut (0 → 16)</th><th>Défaut</th></tr></thead>
     <tbody>
-      <tr><td class="num">0</td><td class="num">TH</td><td>Trigger Happy : prudent → tire facilement</td><td class="num">8</td></tr>
-      <tr><td class="num">1</td><td class="num">CN</td><td>Confidence : s'effraie → impossible à effrayer</td><td class="num">8</td></tr>
-      <tr><td class="num">2</td><td class="num">VB</td><td>Verbosity : muet → bavard</td><td class="num">8</td></tr>
-      <tr><td class="num">3</td><td class="num">LY</td><td>Loyalty : n'obéit jamais → obéit toujours</td><td class="num">8</td></tr>
-      <tr><td class="num">4</td><td class="num">FL</td><td>Flying : pilotage</td><td class="num">10</td></tr>
-      <tr><td class="num">5</td><td class="num">AG</td><td>Air-to-Ground</td><td class="num">10</td></tr>
-      <tr><td class="num">6</td><td class="num">AA</td><td>Air-to-Air</td><td class="num">10</td></tr>
-      <tr><td class="num">7</td><td class="num">SM</td><td>Showmanship : démonstratif</td><td class="num">8</td></tr>
-      <tr><td class="num">8</td><td class="num">AR</td><td>Aggressiveness : prudent → agressif</td><td class="num">8</td></tr>
-      <tr><td class="num">9</td><td>—</td><td>sans nom connu, écrêté à 3</td><td class="num">0</td></tr>
+      <tr><td class="num">1</td><td class="num">TH</td><td>Trigger Happy : prudent → tire facilement</td><td class="num">8</td></tr>
+      <tr><td class="num">2</td><td class="num">CN</td><td>Confidence : s'effraie → impossible à effrayer</td><td class="num">8</td></tr>
+      <tr><td class="num">3</td><td class="num">VB</td><td>Verbosity : muet → bavard</td><td class="num">8</td></tr>
+      <tr><td class="num">4</td><td class="num">LY</td><td>Loyalty : n'obéit jamais → obéit toujours</td><td class="num">8</td></tr>
+      <tr><td class="num">5</td><td class="num">FL</td><td>Flying : pilotage</td><td class="num">10</td></tr>
+      <tr><td class="num">6</td><td class="num">AG</td><td>Air-to-Ground</td><td class="num">10</td></tr>
+      <tr><td class="num">7</td><td class="num">AA</td><td>Air-to-Air</td><td class="num">10</td></tr>
+      <tr><td class="num">8</td><td class="num">SM</td><td>Showmanship : démonstratif</td><td class="num">8</td></tr>
+      <tr><td class="num">9</td><td class="num">AR</td><td>Aggressiveness : prudent → agressif</td><td class="num">8</td></tr>
+      <tr><td class="num">10</td><td class="num">XX</td><td>sans nom dans le manuel, plafonné à 3</td><td class="num">0</td></tr>
     </tbody>
   </table></div>
-  <p>Validé sur Billy : <code>10,14,12,13,15,9,15,16,15</code> = valeurs du manuel. Détail : <code>AI_SYSTEM.md</code>.</p>
+  <p>Validé sur Billy : 10, 14, 12, 13, 15, 9, 15, 16, 15 = les valeurs du manuel. Détail : <code>AI_SYSTEM.md</code>.</p>
 </article>
 
 <!-- ============================ MISN ============================ -->
 <section id="misn">
   <h2 class="sec">La mission : FORM MISN</h2>
-  <p>Une mission est construite comme une <b>pièce de théâtre</b> : <code>CAST</code> = la distribution (les pilotes), <code>PLAY</code> = la pièce, découpée en <code>SCNE</code> = scènes, <code>PROG</code> = les didascalies (scripts). Les chunks sont lus dans cet ordre par <code>MissionScenario_LoadMainRecord_A8331</code> :</p>
+  <p>Une mission est construite comme une <b>pièce de théâtre</b> : <code>CAST</code> = la distribution (les pilotes), <code>PLAY</code> = la pièce, découpée en <code>SCNE</code> = scènes, <code>PROG</code> = les didascalies (scripts). Le jeu lit les chunks dans cet ordre :</p>
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Chunk</th><th>Contenu</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td class="num">VERS</td><td>version u16 ; fatale si &lt; 0x500</td></tr>
-      <tr><td class="num">2</td><td class="num">NAME</td><td>nom de la mission (≤ 16 caractères, défaut « UNK »)</td></tr>
-      <tr><td class="num">3</td><td class="num">TUNE</td><td>piste musicale (u8)</td></tr>
-      <tr><td class="num">4</td><td class="num">WRLD</td><td>sous-FORM obligatoire : <code>FILE</code> = nom du monde (8 car.), ou monde en ligne</td></tr>
+      <tr><td class="num">1</td><td class="num">VERS</td><td><code>unsigned short</code> : version ; la mission est refusée sous 1280</td></tr>
+      <tr><td class="num">2</td><td class="num">NAME</td><td><code>string</code> de 16 caractères au plus : nom de la mission (défaut « UNK »)</td></tr>
+      <tr><td class="num">3</td><td class="num">TUNE</td><td><code>unsigned char</code> : piste musicale</td></tr>
+      <tr><td class="num">4</td><td class="num">WRLD</td><td>sous-FORM obligatoire : chunk <code>FILE</code> = <code>string[8]</code> nom du monde, ou monde décrit en ligne</td></tr>
       <tr><td class="num">5</td><td class="num"><a href="#cast">CAST</a></td><td>noms de pilotes</td></tr>
       <tr><td class="num">6</td><td class="num"><a href="#area">AREA</a></td><td>zones géographiques</td></tr>
       <tr><td class="num">7</td><td class="num"><a href="#spot">SPOT</a></td><td>points rattachés à une zone</td></tr>
       <tr><td class="num">8</td><td class="num">NUMS</td><td>variables numériques du script</td></tr>
       <tr><td class="num">9</td><td class="num">MSGS</td><td>messages</td></tr>
       <tr><td class="num">10</td><td class="num">FLAG</td><td>drapeaux d'événement</td></tr>
-      <tr><td class="num">11</td><td class="num">PROG</td><td>scripts (bytecode de la VM de mission, taille paire)</td></tr>
+      <tr><td class="num">11</td><td class="num">PROG</td><td>scripts (bytecode de la VM de mission)</td></tr>
       <tr><td class="num">12</td><td class="num"><a href="#part">PART</a></td><td>objets de la mission</td></tr>
-      <tr><td class="num">13</td><td class="num">TEAM</td><td>équipe du joueur (≤ 8 entrées de 2 o)</td></tr>
+      <tr><td class="num">13</td><td class="num">TEAM</td><td>équipe du joueur : jusqu'à 8 <code>unsigned short</code></td></tr>
       <tr><td class="num">14</td><td class="num"><a href="#scne">PLAY</a></td><td>FORM contenant les scènes <code>SCNE</code></td></tr>
       <tr><td class="num">15</td><td class="num">LOAD</td><td>emport</td></tr>
-      <tr><td class="num">16</td><td class="num"><a href="#autres">HOME</a></td><td>base de départ : zone + position</td></tr>
+      <tr><td class="num">16</td><td class="num"><a href="#autres">HOME</a></td><td>base de départ : zone et position</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -359,30 +412,30 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
 <!-- ============================ CAST ============================ -->
 <article class="mv" id="cast">
   <header><span class="id">CAST</span><h2>Noms de pilotes</h2></header>
-  <ul class="chips"><li>enregistrements <b>9 o</b></li><li>nombre = taille ÷ 9</li><li>lecteur <b>PLAY_LoadCASTTeamNames_A9956</b></li></ul>
+  <ul class="chips"><li>enregistrement de <b>9 octets</b></li><li>nombre = taille du chunk ÷ 9</li><li>lecteur <b>PLAY_LoadCASTTeamNames_A9956</b></li></ul>
   <div class="grid2">
     <div>
       <div class="tablewrap"><table>
-        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td class="num">0x00</td><td class="num">char[8]</td><td>nom (<code>PLAYER</code>, <code>STERN</code>, <code>NULL</code>, <code>TEAM0</code>…)</td></tr>
-          <tr><td class="num">0x08</td><td class="num">u8</td><td>zéro de fin</td></tr>
+          <tr><td>nom</td><td>string[8]</td><td class="num">8</td><td><code>PLAYER</code>, <code>STERN</code>, <code>NULL</code>, <code>TEAM0</code>…</td></tr>
+          <tr><td>fin</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>zéro de fin</td></tr>
         </tbody>
       </table></div>
       <p>Chaque objet <code>PART</code> désigne son pilote par un index dans cette liste. Le nom décide qui le pilote :</p>
       <ul>
-        <li><code>PLAYER</code> → le joueur, sans profil ;</li>
-        <li><code>NETWORK</code> → un joueur en réseau ;</li>
-        <li>tout autre nom → une IA, profil chargé depuis <code>INTEL\&lt;nom&gt;.IFF</code>.</li>
+        <li><code>PLAYER</code> : le joueur, sans profil ;</li>
+        <li><code>NETWORK</code> : un joueur en réseau ;</li>
+        <li>tout autre nom : une IA, profil chargé depuis <code>INTEL\&lt;nom&gt;.IFF</code>.</li>
       </ul>
     </div>
     <div>
       <h3>Les ailiers : TEAM0, TEAM1, TEAM2</h3>
-      <p>À la lecture, tout nom <code>TEAMn</code> est <b>remplacé sur place</b> :</p>
+      <p>À la lecture, tout nom <code>TEAMn</code> est <b>remplacé</b> :</p>
       <ol class="phases">
-        <li><span>1</span><div>mission lancée depuis la campagne et n &lt; 3 → n-ième nom du chunk <code>TEAM</code> de <code>OP2MISN.IFF</code> : <b>les ailiers choisis par le joueur</b> ;</div></li>
-        <li><span>2</span><div>n ≥ 3 → le nom reste <code>TEAMn</code> ;</div></li>
-        <li><span>3</span><div>mission chargée hors campagne → tous les <code>TEAMn</code> deviennent <b><code>BILLY</code></b>.</div></li>
+        <li><span>1</span><div>mission lancée depuis la campagne et n = 0, 1 ou 2 : n-ième nom du chunk <code>TEAM</code> de <code>OP2MISN.IFF</code>, <b>les ailiers choisis par le joueur</b> ;</div></li>
+        <li><span>2</span><div>n de 3 à 9 : le nom reste <code>TEAMn</code> ;</div></li>
+        <li><span>3</span><div>mission chargée hors campagne : tous les <code>TEAMn</code> deviennent <b><code>BILLY</code></b>.</div></li>
       </ol>
       <p>Ex. <code>TEAM0</code> remplacé par <code>BILLY</code> charge <code>INTEL\BILLY.IFF</code>.</p>
     </div>
@@ -392,46 +445,58 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
 <!-- ============================ AREA ============================ -->
 <article class="mv" id="area">
   <header><span class="id">AREA</span><h2>Zones géographiques</h2></header>
-  <ul class="chips"><li>enregistrements <b>49 / 53 / 65 o</b> selon la forme</li><li>pas de compteur</li><li>lecteur <b>ExprSlot_ConstructMain_A974A</b></li></ul>
-  <p>Une zone est un <b>volume nommé</b> : sphère, cylindre vertical ou boîte. Le jeu s'en sert pour savoir dans quelle zone se trouve le joueur (et donc quelle scène activer), et comme origine des <code>SPOT</code> et des objets <code>PART</code>. La première lettre de l'enregistrement donne la forme, donc sa taille.</p>
-  <div class="grid2">
+  <ul class="chips"><li>enregistrement de <b>49, 53 ou 65 octets</b> selon la forme</li><li>pas de compteur</li><li>lecteur <b>ExprSlot_ConstructMain_A974A</b></li></ul>
+  <p>Une zone est un <b>volume nommé</b> : sphère, cylindre vertical ou boîte. Le jeu s'en sert pour savoir dans quelle zone se trouve le joueur (et donc quelle scène activer), et comme origine des <code>SPOT</code> et des objets <code>PART</code>. La première lettre de l'enregistrement donne la forme, donc sa taille ; les enregistrements se suivent sans séparateur.</p>
+  <div class="stack">
     <div>
+      <h3>Début commun</h3>
       <div class="tablewrap"><table>
-        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td class="num">0x00</td><td class="num">u8</td><td>forme : <code>'S'</code>, <code>'C'</code> ou <code>'B'</code></td></tr>
-          <tr><td class="num">0x01</td><td class="num">char[32]</td><td>nom (ex. « Strike Base »)</td></tr>
-          <tr><td class="num">0x21</td><td class="num">i32</td><td>référence <b>X</b> ÷ 256</td></tr>
-          <tr><td class="num">0x25</td><td class="num">i32</td><td>référence <b>Z</b> ÷ 256</td></tr>
-          <tr><td class="num">0x29</td><td class="num">i32</td><td>référence <b>Y</b> (altitude) ÷ 256</td></tr>
+          <tr><td>forme</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>lettre <code>S</code> (sphère), <code>C</code> (cylindre) ou <code>B</code> (boîte)</td></tr>
+          <tr><td>nom</td><td>string[32]</td><td class="num">32</td><td>ex. « Strike Base »</td></tr>
+          <tr><td>référence X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>référence Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>référence Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
         </tbody>
       </table></div>
-      <h3>Suite selon la forme (÷ 256 → m)</h3>
+      <h3>Suite pour une sphère (S) — total 49 octets</h3>
       <div class="tablewrap"><table>
-        <thead><tr><th>Forme</th><th>Champs</th><th>Taille</th></tr></thead>
-        <tbody>
-          <tr><td class="num">'S' sphère</td><td><code>0x2D</code> rayon</td><td class="num">49</td></tr>
-          <tr><td class="num">'C' cylindre</td><td><code>0x2D</code> hauteur, <code>0x31</code> rayon</td><td class="num">53</td></tr>
-          <tr><td class="num">'B' boîte</td><td><code>0x2D</code> +X, <code>0x31</code> −X, <code>0x35</code> +Z, <code>0x39</code> −Z, <code>0x3D</code> hauteur</td><td class="num">65</td></tr>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
+          <tr><td>rayon</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Suite pour un cylindre (C) — total 53 octets</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
+          <tr><td>hauteur</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
+          <tr><td>rayon</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, dans le plan X/Z</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Suite pour une boîte (B) — total 65 octets</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
+          <tr><td>étendue +X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue −X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue +Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>étendue −Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>hauteur</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres, vers le haut depuis le plancher</td></tr>
         </tbody>
       </table></div>
     </div>
     <figure>
       <div class="svgbox">
         <svg viewBox="0 0 600 300" role="img" aria-label="Les trois formes de zone et leur point de référence">
-          <text class="g-title" x="100" y="22" text-anchor="middle">Sphère 'S'</text>
-          <text class="g-title" x="300" y="22" text-anchor="middle">Cylindre 'C'</text>
-          <text class="g-title" x="500" y="22" text-anchor="middle">Boîte 'B'</text>
-          <!-- sol -->
+          <text class="g-title" x="100" y="22" text-anchor="middle">Sphère S</text>
+          <text class="g-title" x="300" y="22" text-anchor="middle">Cylindre C</text>
+          <text class="g-title" x="500" y="22" text-anchor="middle">Boîte B</text>
           <line class="g-ground" x1="10" y1="250" x2="590" y2="250"/>
-          <!-- sphère -->
           <circle class="g-path" cx="100" cy="150" r="70"/>
           <ellipse class="g-hz" cx="100" cy="150" rx="70" ry="18"/>
           <line class="g-lim" x1="100" y1="150" x2="170" y2="150"/>
           <text class="g-lbl-a" x="122" y="143">rayon</text>
           <circle class="g-ph" cx="100" cy="150" r="5"/>
           <text class="g-lbl" x="100" y="275" text-anchor="middle">référence = centre</text>
-          <!-- cylindre -->
           <ellipse class="g-path" cx="300" cy="80" rx="62" ry="15"/>
           <line class="g-path" x1="238" y1="80" x2="238" y2="210"/>
           <line class="g-path" x1="362" y1="80" x2="362" y2="210"/>
@@ -443,7 +508,6 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
           <text class="g-lbl-a" x="386" y="150">hauteur</text>
           <circle class="g-ph" cx="300" cy="210" r="5"/>
           <text class="g-lbl" x="300" y="275" text-anchor="middle">référence = centre du plancher</text>
-          <!-- boîte -->
           <path class="g-path" d="M430 210 L560 210 L585 190 L455 190 Z"/>
           <path class="g-path" d="M430 90 L560 90 L585 70 L455 70 Z"/>
           <line class="g-path" x1="430" y1="90" x2="430" y2="210"/>
@@ -468,7 +532,7 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
       <li><b>Sphère</b> : distance 3D au centre ≤ rayon.</li>
       <li><b>Cylindre</b> : <code>Y ≤ y ≤ Y + hauteur</code> et distance dans le plan X/Z ≤ rayon.</li>
       <li><b>Boîte</b> : <code>X − (−X) ≤ x ≤ X + (+X)</code>, <code>Z − (−Z) ≤ z ≤ Z + (+Z)</code>, <code>Y ≤ y ≤ Y + hauteur</code>.</li>
-      <li>À chaque tick, le jeu teste la position du joueur contre les zones des scènes actives et prend la <b>première</b> qui la contient.</li>
+      <li>À chaque image, le jeu teste la position du joueur contre les zones des scènes actives et prend la <b>première</b> qui la contient.</li>
     </ul>
   </div>
 </article>
@@ -476,21 +540,21 @@ PACK : table [offset u32 × N] → enregistrements de taille variable, parfois c
 <!-- ============================ SPOT ============================ -->
 <article class="mv" id="spot">
   <header><span class="id">SPOT</span><h2>Points rattachés à une zone</h2></header>
-  <ul class="chips"><li>enregistrements <b>14 o</b></li><li>nombre = taille ÷ 14</li><li>lecteur <b>Mission_LoadSpotList_AA6C9</b></li></ul>
-  <div class="grid2">
+  <ul class="chips"><li>enregistrement de <b>14 octets</b></li><li>nombre = taille du chunk ÷ 14</li><li>lecteur <b>Mission_LoadSpotList_AA6C9</b></li></ul>
+  <div class="stack">
     <div>
       <p>Un spot est une <b>destination</b> pour les ordres de mission (aller à, défendre…). Ce n'est pas la zone qui référence un spot : c'est le spot qui pointe vers sa zone, et sa position est <b>relative</b> au point de référence de la zone.</p>
       <div class="tablewrap"><table>
-        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td class="num">0x00</td><td class="num">u16</td><td>index de la zone <code>AREA</code></td></tr>
-          <tr><td class="num">0x02</td><td class="num">i32</td><td>décalage <b>X</b> ÷ 256</td></tr>
-          <tr><td class="num">0x06</td><td class="num">i32</td><td>décalage <b>Z</b> ÷ 256</td></tr>
-          <tr><td class="num">0x0A</td><td class="num">i32</td><td>décalage <b>Y</b> ÷ 256</td></tr>
+          <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
+          <tr><td>décalage X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>décalage Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>décalage Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
         </tbody>
       </table></div>
-      <pre class="tpl">position = décalage + référence(zone)   si la zone existe
-position = décalage                     sinon (coordonnées absolues)</pre>
+      <pre class="tpl">position = décalage + référence de la zone   si la zone existe
+position = décalage                         sinon (coordonnées absolues)</pre>
     </div>
     <figure>
       <div class="svgbox">
@@ -508,7 +572,7 @@ position = décalage                     sinon (coordonnées absolues)</pre>
           <text class="g-lbl" x="86" y="224">X →</text>
         </svg>
       </div>
-      <figcaption>Un décalage (0, 0, 0) tombe exactement sur la référence de la zone (centre de la sphère, centre du plancher sinon).</figcaption>
+      <figcaption>Un décalage nul tombe exactement sur la référence de la zone (centre de la sphère, centre du plancher sinon).</figcaption>
     </figure>
   </div>
 </article>
@@ -516,42 +580,49 @@ position = décalage                     sinon (coordonnées absolues)</pre>
 <!-- ============================ PART ============================ -->
 <article class="mv" id="part">
   <header><span class="id">PART</span><h2>Objets de la mission</h2></header>
-  <ul class="chips"><li>enregistrements <b>62 o fixes</b></li><li>nombre = taille ÷ 62</li><li>lecteur <b>PartEntry_LoadAndResolveNames_A9E3C</b></li><li>activation <b>PartEntry_ResolveSpawnPositionAndActivate_51EDC</b></li></ul>
+  <ul class="chips"><li>enregistrement de <b>62 octets</b></li><li>nombre = taille du chunk ÷ 62</li><li>lecteur <b>PartEntry_LoadAndResolveNames_A9E3C</b></li><li>activation <b>PartEntry_ResolveSpawnPositionAndActivate_51EDC</b></li></ul>
   <p>Chaque enregistrement décrit un objet : avion, véhicule, base, repère de piste. Il dit quel modèle charger, quel pilote, où et comment le faire apparaître, son camp et ses scripts. L'objet n'existe dans le monde qu'une fois <b>activé</b> (par sa scène ou par le script).</p>
   <div class="tablewrap"><table>
-    <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="num">0x00</td><td class="num">u16</td><td>index <code>CAST</code> : le pilote</td></tr>
-      <tr><td class="num">0x02</td><td class="num">char[8]</td><td><b>type d'objet</b> = fichier <code>OBJECTS\&lt;type&gt;.IFF</code> (ex. <code>F-16DES</code>, <code>MIG21</code>)</td></tr>
-      <tr><td class="num">0x0A</td><td class="num">char[8]</td><td><b>type de remplacement</b> une fois détruit</td></tr>
-      <tr><td class="num">0x12</td><td class="num">char[8]</td><td>nom chargé dans un composant de l'entité — rôle non tranché</td></tr>
-      <tr><td class="num">0x1A</td><td class="num">u16</td><td>index de la zone <code>AREA</code></td></tr>
-      <tr><td class="num">0x1C</td><td class="num">u8</td><td><b>mode de placement</b> : 0 = relatif à la zone, ≠ 0 = relatif au joueur</td></tr>
-      <tr><td class="num">0x1D / 0x21 / 0x25</td><td class="num">i32 ×3</td><td>décalage <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256</td></tr>
-      <tr><td class="num">0x29</td><td class="num">i16</td><td><b>cap</b> en degrés (absolu, ou ajouté au cap du joueur)</td></tr>
-      <tr><td class="num">0x2B</td><td class="num">i16</td><td><b>vitesse initiale</b> (0 = à l'arrêt) — unité non prouvée, m/s probable</td></tr>
-      <tr><td class="num">0x2D</td><td class="num">u8</td><td><b>camp</b> : 1 = allié, 0xFF = ennemi, autre = neutre</td></tr>
-      <tr><td class="num">0x2E</td><td class="num">u8</td><td><b>allié à suivre</b> par défaut (index <code>PART</code>)</td></tr>
-      <tr><td class="num">0x2F</td><td class="num">u8</td><td>inutilisé</td></tr>
-      <tr><td class="num">0x30 / 0x32 / 0x34</td><td class="num">i16 ×3</td><td><b>poste en formation</b> derrière l'allié : côté (X), avant (Z), haut (Y), mètres</td></tr>
-      <tr><td class="num">0x36 … 0x3C</td><td class="num">u16 ×4</td><td>scripts <code>PROG</code> : à l'activation, à chaque tick, à la destruction, à l'initialisation</td></tr>
+      <tr><td>pilote</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>CAST</code></td></tr>
+      <tr><td>type d'objet</td><td>string[8]</td><td class="num">8</td><td>fichier <code>OBJECTS\&lt;type&gt;.IFF</code> (ex. <code>F-16DES</code>, <code>MIG21</code>)</td></tr>
+      <tr><td>type si détruit</td><td>string[8]</td><td class="num">8</td><td>modèle chargé à la place une fois l'objet détruit</td></tr>
+      <tr><td>composant</td><td>string[8]</td><td class="num">8</td><td>nom chargé dans un composant de l'entité — rôle non tranché</td></tr>
+      <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
+      <tr><td>mode de placement</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>0 = relatif à la zone ; autre = relatif au joueur</td></tr>
+      <tr><td>décalage X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>décalage Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>décalage Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>cap</td><td>short</td><td class="num">2</td><td>degrés (absolu, ou ajouté au cap du joueur)</td></tr>
+      <tr><td>vitesse initiale</td><td>short</td><td class="num">2</td><td>0 = à l'arrêt ; unité non prouvée, m/s probable</td></tr>
+      <tr><td>camp</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>1 = allié, 255 = ennemi, autre = neutre</td></tr>
+      <tr><td>allié à suivre</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>index dans <code>PART</code> (255 = aucun)</td></tr>
+      <tr><td>réservé</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>jamais lu</td></tr>
+      <tr><td>poste en formation, côté</td><td>short</td><td class="num">2</td><td>mètres, sur X, derrière l'allié suivi</td></tr>
+      <tr><td>poste en formation, avant</td><td>short</td><td class="num">2</td><td>mètres, sur Z</td></tr>
+      <tr><td>poste en formation, haut</td><td>short</td><td class="num">2</td><td>mètres, sur Y</td></tr>
+      <tr><td>script à l'activation</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro dans <code>PROG</code></td></tr>
+      <tr><td>script à chaque image</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro dans <code>PROG</code></td></tr>
+      <tr><td>script à la destruction</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro dans <code>PROG</code></td></tr>
+      <tr><td>script d'initialisation</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro dans <code>PROG</code></td></tr>
     </tbody>
   </table></div>
   <div class="grid2">
     <div>
       <h3>À l'activation</h3>
       <ol class="phases">
-        <li><span>1</span><div><b>Modèle</b> : le type normal, ou le type de remplacement si l'objet a déjà été détruit (ses scripts sont alors effacés). Nom vide → rien n'apparaît.</div></li>
-        <li><span>2</span><div><b>Position</b> : mode 0 → référence de la zone + décalage (comme un <code>SPOT</code>), cap absolu. Mode ≠ 0 → décalage exprimé dans le repère de l'avion du joueur (X côté, Z vers le nez, Y vers le haut de l'avion), cap = cap du joueur + cap du fichier.</div></li>
+        <li><span>1</span><div><b>Modèle</b> : le type normal, ou le type « si détruit » si l'objet a déjà été détruit (ses scripts sont alors effacés). Nom vide : rien n'apparaît.</div></li>
+        <li><span>2</span><div><b>Position</b> : mode 0, référence de la zone + décalage (comme un <code>SPOT</code>), cap absolu. Autre mode : décalage exprimé dans le repère de l'avion du joueur (X sur le côté, Z vers le nez, Y vers le haut de l'avion), cap = cap du joueur + cap du fichier.</div></li>
         <li><span>3</span><div>L'objet apparaît <b>à plat</b> (seulement tourné autour de la verticale), avec sa vitesse initiale le long du nez.</div></li>
         <li><span>4</span><div>Un <b>avion à vitesse nulle</b> est posé <b>au sol, train sorti</b>.</div></li>
-        <li><span>5</span><div>Camp copié, ordre « suivre » donné vers l'allié, compteur d'objets actifs du camp incrémenté.</div></li>
+        <li><span>5</span><div>Camp copié, ordre « suivre » donné vers l'allié, compteur d'objets actifs du camp augmenté.</div></li>
       </ol>
     </div>
     <figure>
       <div class="svgbox">
         <svg viewBox="0 0 420 250" role="img" aria-label="Placement relatif au joueur">
-          <text class="g-title" x="20" y="24">Mode ≠ 0 : relatif au joueur (vue de dessus)</text>
+          <text class="g-title" x="20" y="24">Placement relatif au joueur (vue de dessus)</text>
           <polygon class="g-me" points="210,90 196,140 210,130 224,140"/>
           <text class="g-lbl" x="232" y="128">joueur</text>
           <line class="g-lim" x1="210" y1="110" x2="210" y2="40"/>
@@ -567,36 +638,40 @@ position = décalage                     sinon (coordonnées absolues)</pre>
       <figcaption>Le décalage tourne avec le joueur : un objet placé « 500 m derrière » apparaît toujours derrière lui, quel que soit son cap.</figcaption>
     </figure>
   </div>
-  <p class="note"><b>Drapeaux d'exécution</b> (pas sur disque, champ <code>+0x39</code> de l'entrée) : bit 0 actif ; bit 1 détruit ; bit 4 visible sur la carte de navigation ; bit 5 accompagne le joueur au pilote automatique.</p>
+  <div class="note"><p><b>État pendant la partie</b> (pas dans le fichier) : actif, détruit, visible sur la carte de navigation, accompagne le joueur au pilote automatique.</p></div>
 </article>
 
 <!-- ============================ SCNE ============================ -->
 <article class="mv" id="scne">
   <header><span class="id">PLAY / SCNE</span><h2>Scènes</h2></header>
-  <ul class="chips"><li>FORM <b>PLAY</b> → N chunks <b>SCNE</b> (≤ 32)</li><li>en-tête <b>24 o</b> + liste d'objets</li><li>lecteur <b>MissionPlay_LoadScenes_AA595</b></li></ul>
+  <ul class="chips"><li>FORM <b>PLAY</b> contenant jusqu'à <b>32</b> chunks <b>SCNE</b></li><li>en-tête de <b>24 octets</b> puis une liste d'objets</li><li>lecteur <b>MissionPlay_LoadScenes_AA595</b></li></ul>
   <p>Une scène est un morceau de la mission rattaché à une zone : quand le joueur entre dans la zone, la scène s'active, fait apparaître ses objets et lance son script.</p>
   <div class="tablewrap"><table>
-    <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td class="num">0x00</td><td class="num">u8</td><td>active au départ</td></tr>
-      <tr><td class="num">0x01</td><td class="num">u16</td><td>index de la zone <code>AREA</code> (−1 = scène globale)</td></tr>
-      <tr><td class="num">0x03 / 0x05 / 0x07</td><td class="num">i16 ×3</td><td>scripts <code>PROG</code> : à l'activation, en quittant, à chaque tick (−1 = aucun)</td></tr>
-      <tr><td class="num">0x09</td><td class="num">u8</td><td>a sa propre position (1) ou utilise la zone (0)</td></tr>
-      <tr><td class="num">0x0A</td><td class="num">u16</td><td>candidat : cap en degrés (180 / 0 observés) — non tracé</td></tr>
-      <tr><td class="num">0x0C / 0x10 / 0x14</td><td class="num">i32 ×3</td><td>position <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256</td></tr>
-      <tr><td class="num">0x18 …</td><td class="num">u16 × n</td><td><b>liste d'objets</b> : index dans <code>PART</code>, n = (taille − 24) ÷ 2</td></tr>
+      <tr><td>active au départ</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>0 ou 1</td></tr>
+      <tr><td>zone</td><td>short</td><td class="num">2</td><td>index dans <code>AREA</code> (−1 = scène globale)</td></tr>
+      <tr><td>script à l'activation</td><td>short</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
+      <tr><td>script en quittant</td><td>short</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
+      <tr><td>script à chaque image</td><td>short</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
+      <tr><td>position propre</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>1 = utilise la position ci-dessous ; 0 = utilise la zone</td></tr>
+      <tr><td>cap</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>nom supposé : 180 ou 0 observés, rôle non tracé dans le code</td></tr>
+      <tr><td>position X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>position Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>position Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>liste d'objets</td><td>unsigned&nbsp;short&nbsp;×&nbsp;n</td><td class="num">2 × n</td><td>index dans <code>PART</code> ; n = (taille du chunk − 24) ÷ 2</td></tr>
     </tbody>
   </table></div>
   <h3>Exemple : MISN-1A « Mauritania »</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Scène</th><th>Zone</th><th>Scripts</th><th>Objets</th></tr></thead>
     <tbody>
-      <tr><td class="num">0</td><td>globale</td><td>tick : 1</td><td>PLAYER, STRIBASE, STERN</td></tr>
+      <tr><td class="num">0</td><td>globale</td><td>à chaque image : 1</td><td>PLAYER, STRIBASE, STERN</td></tr>
       <tr><td class="num">1</td><td>Strike Base</td><td>—</td><td>repère de piste</td></tr>
-      <tr><td class="num">2</td><td>Restricted Airspace</td><td>—</td><td>MiG-21 ×3</td></tr>
+      <tr><td class="num">2</td><td>Restricted Airspace</td><td>—</td><td>3 MiG-21</td></tr>
       <tr><td class="num">3</td><td>Nouakchott</td><td>—</td><td>—</td></tr>
       <tr><td class="num">4</td><td>Cargo Destination</td><td>—</td><td>repère de piste</td></tr>
-      <tr><td class="num">5</td><td>Rendezvous</td><td>activation : 13 (fait apparaître le C-130)</td><td>—</td></tr>
+      <tr><td class="num">5</td><td>Rendezvous</td><td>à l'activation : 13 (fait apparaître le C-130)</td><td>—</td></tr>
     </tbody>
   </table></div>
 </article>
@@ -604,11 +679,21 @@ position = décalage                     sinon (coordonnées absolues)</pre>
 <!-- ============================ AUTRES ============================ -->
 <article class="mv" id="autres">
   <header><span class="id">HOME · TEAM · PROG · …</span><h2>Autres chunks de la mission</h2></header>
+  <h3>HOME : base de départ</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>zone</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
+      <tr><td>position X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>position Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>position Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+    </tbody>
+  </table></div>
   <dl class="vocab">
-    <dt><code>HOME</code></dt><dd>u16 index de la zone de départ, puis 3 i32 : position <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256.</dd>
-    <dt><code>TEAM</code></dt><dd>l'équipe du joueur (≤ 8 entrées de 2 o) : presque toujours le joueur et les objets qui l'accompagnent.</dd>
-    <dt><code>PROG</code></dt><dd>les scripts de la mission, en bytecode de la VM de mission (opcodes décrits dans <code>MISSION_SCRIPT_OPCODES.md</code>). <code>PART</code> et <code>SCNE</code> y renvoient par numéro.</dd>
-    <dt><code>NUMS</code> / <code>FLAG</code></dt><dd>variables numériques et drapeaux d'événement du script.</dd>
+    <dt><code>TEAM</code></dt><dd>l'équipe du joueur : presque toujours le joueur et les objets qui l'accompagnent.</dd>
+    <dt><code>PROG</code></dt><dd>les scripts de la mission, en bytecode de la VM de mission (opcodes dans <code>MISSION_SCRIPT_OPCODES.md</code>). <code>PART</code> et <code>SCNE</code> y renvoient par numéro.</dd>
+    <dt><code>NUMS</code></dt><dd>variables numériques du script.</dd>
+    <dt><code>FLAG</code></dt><dd>drapeaux d'événement du script.</dd>
     <dt><code>MSGS</code></dt><dd>messages affichés ou dits pendant la mission.</dd>
     <dt><code>LOAD</code></dt><dd>emport.</dd>
     <dt><code>TUNE</code></dt><dd>piste musicale de la mission.</dd>
@@ -619,19 +704,19 @@ position = décalage                     sinon (coordonnées absolues)</pre>
 <article class="mv" id="wrld">
   <header><span class="id">FORM WRLD</span><h2>Le monde</h2></header>
   <ul class="chips"><li>fichier <b>MISSIONS\&lt;FILE&gt;.IFF</b></li><li>lecteur <b>MissionLoader_LoadEntitiesMain_A767F</b></li></ul>
-  <p>Le chunk <code>WRLD/FILE</code> de la mission donne le nom du monde (ex. <code>MAURITAN</code>), dans le même dossier que la mission.</p>
+  <p>Le chunk <code>WRLD/FILE</code> de la mission donne le nom du monde (ex. <code>MAURITAN</code>), rangé dans le même dossier que la mission.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Chunk</th><th>Contenu</th></tr></thead>
     <tbody>
-      <tr><td class="num">INFO</td><td>métadonnées (u16)</td></tr>
-      <tr><td class="num">PALT</td><td>palette → <code>DATA\PALETTE.IFF</code></td></tr>
+      <tr><td class="num">INFO</td><td><code>unsigned short</code> : métadonnées</td></tr>
+      <tr><td class="num">PALT</td><td>nom de la palette → <code>DATA\PALETTE.IFF</code></td></tr>
       <tr><td class="num">TERA</td><td><b>nom du terrain</b> → <code>DATA\&lt;nom&gt;.PAK</code></td></tr>
       <tr><td class="num">SKYS</td><td>ciel et soleil (couleur, direction, intensité)</td></tr>
       <tr><td class="num">GLNT</td><td>reflets du soleil (eau, métal)</td></tr>
       <tr><td class="num">SMOK</td><td>jeu d'effets de fumée</td></tr>
-      <tr><td class="num">LGHT</td><td>éclairage (14 o)</td></tr>
-      <tr><td class="num">HORZ</td><td>horizon (2 × u32)</td></tr>
-      <tr><td class="num">SCAL</td><td>échelle du monde (u32)</td></tr>
+      <tr><td class="num">LGHT</td><td>éclairage (14 octets)</td></tr>
+      <tr><td class="num">HORZ</td><td>horizon : 2 <code>unsigned int</code></td></tr>
+      <tr><td class="num">SCAL</td><td>échelle du monde : <code>unsigned int</code></td></tr>
       <tr><td class="num">FORM CAMR</td><td><a href="#camr">caméras scriptées</a></td></tr>
     </tbody>
   </table></div>
@@ -640,25 +725,72 @@ position = décalage                     sinon (coordonnées absolues)</pre>
 <!-- ============================ TERRAIN ============================ -->
 <article class="mv" id="terrain">
   <header><span class="id">DATA\&lt;théâtre&gt;.PAK</span><h2>Le terrain</h2></header>
-  <ul class="chips"><li>archive <b>PAK</b>, 7 sous-ressources</li><li>grille <b>18 × 18</b> cellules</li><li><b>20 × 20</b> sommets par cellule</li></ul>
+  <ul class="chips"><li>archive <b>PAK</b>, 7 sous-ressources</li><li>grille de <b>18 × 18</b> cellules</li><li><b>20 × 20</b> sommets par cellule</li></ul>
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Ressource</th><th>Contenu</th></tr></thead>
     <tbody>
-      <tr><td class="num">0</td><td class="num">FORM TERA</td><td>descripteur : <code>VERS</code>, <code>INFO</code>, <code>FORM BLOX</code> (<code>ELEV</code>, <code>ATRI</code>, <code>OBJS</code> : dimensions et noms des fichiers suivants), <code>FORM TXMS</code> (textures du sol par niveau de détail)</td></tr>
-      <tr><td class="num">1</td><td class="num">.ELV</td><td>altitudes, détail fort : PAK de 324 cellules, chaque cellule 20 × 20 sommets × 6 o (<code>u16, u16 hauteur, u16</code>)</td></tr>
-      <tr><td class="num">2 / 3</td><td class="num">.MED / .LOW</td><td>idem, détail moyen / faible</td></tr>
-      <tr><td class="num">4</td><td class="num">.AVG</td><td>valeur moyenne par cellule</td></tr>
-      <tr><td class="num">5</td><td class="num">.TRI</td><td><b>pistes et aires d'aérodrome</b> posées sur le terrain</td></tr>
-      <tr><td class="num">6</td><td class="num">.OBJ</td><td>324 × u16, une valeur par cellule (rôle non tranché)</td></tr>
+      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descripteur : version, <code>FORM BLOX</code> (dimensions et noms des fichiers suivants), <code>FORM TXMS</code> (textures du sol par niveau de détail)</td></tr>
+      <tr><td class="num">2</td><td class="num">.ELV</td><td>altitudes, détail fort : 324 cellules de 20 × 20 sommets</td></tr>
+      <tr><td class="num">3</td><td class="num">.MED</td><td>altitudes, détail moyen</td></tr>
+      <tr><td class="num">4</td><td class="num">.LOW</td><td>altitudes, détail faible</td></tr>
+      <tr><td class="num">5</td><td class="num">.AVG</td><td>une valeur moyenne par cellule</td></tr>
+      <tr><td class="num">6</td><td class="num">.TRI</td><td><b>pistes et aires d'aérodrome</b> posées sur le terrain</td></tr>
+      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>unsigned short</code>, un par cellule (rôle non tranché)</td></tr>
     </tbody>
   </table></div>
-  <h3>Géométrie d'une région .TRI</h3>
-  <pre class="tpl">en-tête     8 o    u16 nb_sommets, u16 nb_triangles, u16 grille, u16 taille_table
-sommets    13 o    i32 X, i32 Z, i32 Y (÷ 256 → m), u8 (rôle non figé)
-triangles  16 o    u8, u16 i0, u16 i1, u16 i2, u8 type, u16 couleur, 3 × (u8 u, u8 v)
-table      2 o ×n  listes [nombre, indices de triangles…] ; 0xFFFF = vide
-grille     2 o ×g² index spatial : chaque case renvoie à une liste de la table</pre>
-  <p>Toujours des <b>triangles</b> (pas de quadrilatères dans Strike Commander). Couleur <code>0xFF</code> et UV <code>(0xFF, 0xFF)</code> = face sans texture ; couleur 0x0E à 0x11 = face double.</p>
+  <h3>Un sommet d'altitude (.ELV, .MED, .LOW)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>attribut A</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>rôle non établi</td></tr>
+      <tr><td>hauteur</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>altitude du sommet</td></tr>
+      <tr><td>attribut B</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>rôle non établi</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Une région .TRI</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nombre de sommets</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>nombre de triangles</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>taille de la grille</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>côté g de la grille d'index</td></tr>
+      <tr><td>taille de la table</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>nombre de mots de la table de listes</td></tr>
+      <tr><td>sommets</td><td>13&nbsp;octets&nbsp;chacun</td><td class="num">13 × n</td><td>tableau suivant</td></tr>
+      <tr><td>triangles</td><td>16&nbsp;octets&nbsp;chacun</td><td class="num">16 × n</td><td>tableau suivant</td></tr>
+      <tr><td>table de listes</td><td>unsigned&nbsp;short</td><td class="num">2 × n</td><td>suites [nombre, numéros de triangles…] ; 65535 = liste vide</td></tr>
+      <tr><td>grille</td><td>unsigned&nbsp;short</td><td class="num">2 × g²</td><td>chaque case renvoie à une liste de la table (index spatial)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="stack">
+    <div>
+      <h3>Sommet .TRI (13 octets)</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
+          <tr><td>X</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres</td></tr>
+          <tr><td>Z</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+          <tr><td>Y</td><td>int&nbsp;(fixe)</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+          <tr><td>marque</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>0, 76 ou 177 observés ; rôle non établi</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h3>Triangle .TRI (16 octets)</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
+          <tr><td>drapeau</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>rôle non établi</td></tr>
+          <tr><td>sommet 1</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro de sommet</td></tr>
+          <tr><td>sommet 2</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro de sommet</td></tr>
+          <tr><td>sommet 3</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>numéro de sommet</td></tr>
+          <tr><td>type</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>6 = à plat, 255 = texturé (observé)</td></tr>
+          <tr><td>couleur</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>palette ou texture ; 14 à 17 = face double ; 255 = sans texture</td></tr>
+          <tr><td>u, v sommet 1</td><td>2&nbsp;×&nbsp;unsigned&nbsp;char</td><td class="num">2</td><td>coordonnées de texture (255 = aucune)</td></tr>
+          <tr><td>u, v sommet 2</td><td>2&nbsp;×&nbsp;unsigned&nbsp;char</td><td class="num">2</td><td>—</td></tr>
+          <tr><td>u, v sommet 3</td><td>2&nbsp;×&nbsp;unsigned&nbsp;char</td><td class="num">2</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <p>Toujours des <b>triangles</b> : Strike Commander n'a pas de quadrilatères.</p>
 </article>
 
 <!-- ============================ CAMR ============================ -->
@@ -670,17 +802,27 @@ grille     2 o ×g² index spatial : chaque case renvoie à une liste de la tabl
     <thead><tr><th>Chunk</th><th>Caméra</th></tr></thead>
     <tbody>
       <tr><td class="num">STRT</td><td>nom du jeu de caméras</td></tr>
-      <tr><td class="num">CHAS / CKPT</td><td>caméra de poursuite / cockpit (avec le nom d'art du cockpit, ex. <code>F16-CKPT</code>)</td></tr>
-      <tr><td class="num">VICT / TARG / WEAP / ROTA</td><td>vue de la victime, de la cible, de l'arme, rotative</td></tr>
+      <tr><td class="num">CHAS</td><td>caméra de poursuite</td></tr>
+      <tr><td class="num">CKPT</td><td>cockpit (avec le nom d'art du cockpit, ex. <code>F16-CKPT</code>)</td></tr>
+      <tr><td class="num">VICT</td><td>vue de la victime</td></tr>
+      <tr><td class="num">TARG</td><td>vue de la cible</td></tr>
+      <tr><td class="num">WEAP</td><td>vue de l'arme</td></tr>
+      <tr><td class="num">ROTA</td><td>caméra rotative</td></tr>
       <tr><td class="num">COMP</td><td>séquences scriptées : <code>STARTCAM</code>, <code>TAKEOFF</code>, <code>LANDING</code>, <code>AUTOPILT</code></td></tr>
     </tbody>
   </table></div>
-  <pre class="tpl">0x00  char[8]  nom interne (CHASECAM, COCKPIT, VICTIM…)
-0x08  u16      drapeaux
-0x0A  char[8]  sujet (PLAYER)
-…     u32      plan lointain = 50 000 m ; u16 champ de vision = 40° ; plan proche ≈ 10
-…     u16 ×2   zone d'affichage 319 × 199
-COMP : script d'images clés (opcodes 1 o, décalages i32 ÷ 256), terminé par 0xFE + vue de reprise</pre>
+  <h3>Début commun d'une caméra</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nom interne</td><td>string[8]</td><td class="num">8</td><td><code>CHASECAM</code>, <code>COCKPIT</code>, <code>VICTIM</code>…</td></tr>
+      <tr><td>drapeaux</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>0 observé</td></tr>
+      <tr><td>sujet</td><td>string[8]</td><td class="num">8</td><td>objet suivi (<code>PLAYER</code>)</td></tr>
+      <tr><td>plan lointain</td><td>unsigned&nbsp;int</td><td class="num">4</td><td>50 000 m</td></tr>
+      <tr><td>champ de vision</td><td>unsigned&nbsp;short</td><td class="num">2</td><td>40°</td></tr>
+      <tr><td colspan="4">… puis plan proche (≈ 10), zone d'affichage 319 × 199 ; <code>VICT</code> et <code>WEAP</code> ajoutent une table de décalages <code>int (fixe)</code> ; <code>COMP</code> ajoute un script d'images clés terminé par l'octet 254 et le nom de la vue de reprise.</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ PONTS ============================ -->
@@ -693,10 +835,10 @@ COMP : script d'images clés (opcodes 1 o, décalages i32 ÷ 256), terminé par 
       <div class="tablewrap"><table>
         <tbody>
           <tr><td class="num">INFO</td><td>description</td></tr>
-          <tr><td class="num">NAME</td><td>nom du pilote du joueur</td></tr>
-          <tr><td class="num">SNAM</td><td>escadrille</td></tr>
-          <tr><td class="num">CALL</td><td>indicatif</td></tr>
-          <tr><td class="num">TEAM</td><td>jusqu'à 3 noms d'ailiers (9 o) → remplacent <code>TEAM0..2</code> du <code>CAST</code></td></tr>
+          <tr><td class="num">NAME</td><td><code>string</code> (16 au plus) : nom du pilote du joueur</td></tr>
+          <tr><td class="num">SNAM</td><td><code>string</code> (16 au plus) : escadrille</td></tr>
+          <tr><td class="num">CALL</td><td><code>string</code> (16 au plus) : indicatif</td></tr>
+          <tr><td class="num">TEAM</td><td>jusqu'à 3 <code>string[9]</code> : noms des ailiers, qui remplacent <code>TEAM0</code> à <code>TEAM2</code> du <code>CAST</code></td></tr>
           <tr><td class="num">PLYR</td><td>état des joueurs, rattaché aux objets</td></tr>
         </tbody>
       </table></div>
@@ -705,11 +847,11 @@ COMP : script d'images clés (opcodes 1 o, décalages i32 ÷ 256), terminé par 
       <h3>MISN2OP.IFF : mission → campagne</h3>
       <div class="tablewrap"><table>
         <tbody>
-          <tr><td class="num">INFO</td><td>8 o</td></tr>
-          <tr><td class="num">STAT</td><td>8 × u16 de statistiques</td></tr>
+          <tr><td class="num">INFO</td><td>8 octets</td></tr>
+          <tr><td class="num">STAT</td><td>8 <code>unsigned short</code> de statistiques</td></tr>
           <tr><td class="num">JETS</td><td>un marqueur par F-16 de la mission</td></tr>
           <tr><td class="num">KILL</td><td>par participant : deux compteurs et son nom <code>CAST</code></td></tr>
-          <tr><td class="num">EXIT</td><td>code de sortie de la mission (1 o)</td></tr>
+          <tr><td class="num">EXIT</td><td><code>unsigned char</code> : code de sortie de la mission</td></tr>
           <tr><td class="num">DIED</td><td>pertes par équipe</td></tr>
           <tr><td class="num">SCOR</td><td>score</td></tr>
         </tbody>
@@ -721,11 +863,11 @@ COMP : script d'images clés (opcodes 1 o, décalages i32 ÷ 256), terminé par 
 <section id="ouvert">
   <h2 class="sec">Points ouverts</h2>
   <ul>
-    <li><code>PART</code> : rôle du troisième nom (octet <code>0x12</code>) et unité exacte de la vitesse initiale.</li>
-    <li><code>SCNE</code> : le champ <code>0x0A</code> (cap ?) n'est pas tracé dans le code.</li>
-    <li>Terrain : rôle de <code>.OBJ</code> et de l'octet libre des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : classes <code>RNWY</code>, <code>EXPL</code>, <code>DEBR</code> non lues.</li>
-    <li>ATRB : nom du 10ᵉ attribut.</li>
+    <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
+    <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
+    <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
+    <li>Objets : classes <code>RNWY</code>, <code>EXPL</code> et <code>DEBR</code> non lues.</li>
+    <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>
 </section>
