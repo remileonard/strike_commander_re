@@ -1131,7 +1131,7 @@ En mémoire (`MissionScenario+0x1E`) : `[+0]` u16 nombre, `[+2]` far ptr vers le
 records de 16 o (`shl ax, 4` pour l'allocation, `add word ptr [bp+var_4], 10h` par record).
 
 **Position monde d'un spot** — `AreaRelPos_ToWorld_50EEB` (appelée par
-`Player_ResolveAttachPointN_5305A`, qui renvoie (0, 0, 0) si le numéro de spot est hors liste) :
+`Mission_GetSpotWorldPosition_5305A`, qui renvoie (0, 0, 0) si le numéro de spot est hors liste) :
 
 ```
 position = décalage + point_de_référence(zone)   si la zone existe

@@ -642,7 +642,7 @@ loc_1CC65:				; CODE XREF: Compiler_EmitByTokenType+3Cj
 		push	ss
 		lea	ax, [bp+var_1A]
 		push	ax
-		call	Player_ResolveAttachPointN_5305A
+		call	Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		push	large [bp+var_4]
 		push	ss

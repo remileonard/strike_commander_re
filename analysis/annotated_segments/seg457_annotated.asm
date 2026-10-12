@@ -3167,7 +3167,7 @@ ExprSlot_Helper9_AA6B3	endp
 ; records de 16 o (shl ax,4) : +0 far ptr zone AREA (PtrList_GetAt_53034(scénario+0x1A, index)
 ; ; nul si index hors liste), +4/+8/+0xC décalage. Position monde = AreaRelPos_ToWorld_50EEB
 ; (décalage + point de référence de la zone, ou décalage seul si zone nulle). Utilisé par les
-; ordres de mission (0xA1, 0xA2…) via Player_ResolveAttachPointN_5305A. Détail :
+; ordres de mission (0xA1, 0xA2…) via Mission_GetSpotWorldPosition_5305A. Détail :
 ; DATA_MODEL.md, chunk SPOT.
 ; ==============================================================================================
 Mission_LoadSpotList_AA6C9	proc far		; CODE XREF: VROOMM_StubThunk_6CEE5J

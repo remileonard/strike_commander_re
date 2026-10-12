@@ -929,7 +929,7 @@ automatique) et `SCPilot` pour la tenue d'assiette.
   ciel, observé par Rémi avec `GOAL = 5, 1`). Menaces sautées en `0xA1`/`0xA2` ; réflexes et esquive sautés
   tant qu'un comportement est en cours ; l'entrée en combat contre un attaquant reste active. Le cerveau
   tourne à 25 Hz : « 1° par tick » est repris tel quel.
-- Tracé le 2026-09-26 (plus d'approximation) : spot absent → (0, 0, 0) (`Player_ResolveAttachPointN_5305A`) ;
+- Tracé le 2026-09-26 (plus d'approximation) : spot absent → (0, 0, 0) (`Mission_GetSpotWorldPosition_5305A`) ;
   après décollage ou atterrissage, un nouvel ordre du même type est aussitôt accompli (l'objet reste en
   `entité+0x15` / `+0x11`) ; l'avion atterri reste en mode cinématique (`+0x59` jamais remis à 0).
 - **Indéfini dans l'original** : sur une piste non axiale, le cap (`+0x58` / `+0x9F`) n'est jamais écrit et
@@ -997,7 +997,7 @@ inchangé. Données : les 48 usages sont dans les scripts du **joueur** uniqueme
 
 **FLY_TO_WP 0xA5** : VM → `MissionScript_CallNativeHandler_52513` (même cas que 0xA4) → `Goal_SetObjective_A307` :
 +0x11F = spot[param1] (position monde), +0x12B = spot[param2] (opcode 9 suivant ; absent → index 0xFFFF →
-(0,0,0) par `Player_ResolveAttachPointN_5305A`). Données : les 121 usages sans opcode 9 sont tous du **joueur** ;
+(0,0,0) par `Mission_GetSpotWorldPosition_5305A`). Données : les 121 usages sans opcode 9 sont tous du **joueur** ;
 les 80 usages IA ont tous un opcode 9, dont le spot est un **vecteur vitesse** (zone 0xFFFF) : (0,100,0), (0,150,0),
 (0,120,0), (100,0,0) m/s = vitesse ET cap d'arrivée voulus au point. Exécution `Goal_ReturnToBase` (sub_B331) :
 comportement en cours → son tick ; sinon bloc de commandes P = +0x11F, drapeau atteint +0x1A = 0, W = +0x12B (0xA4/0xA5 ;

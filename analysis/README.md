@@ -495,7 +495,7 @@ au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
   avec stubs de tag de classe (motif vtable identique à seg109), pour tester
   si un point tombe dans une région.
 - **Preuves d'usage transversal, à confirmer par lecture approfondie** :
-  - `Player_ResolveAttachPointN_5305A` est appelée **directement par
+  - `Mission_GetSpotWorldPosition_5305A` est appelée **directement par
     `Player_MainUpdate`** (2 sites d'appel) — candidat pour la résolution de
     points d'attache/hardpoints de l'avion du joueur.
   - `HUD_ResolveNodePosition_547B1` est appelée **directement par

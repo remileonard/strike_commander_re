@@ -1799,7 +1799,7 @@ rond aussi net exclut une position monde absolue (qui aurait des
 coordonnées réalistes, pas un chiffre rond simple) et confirme
 l'hypothèse d'un **décalage de formation** (300 unités sur le côté,
 même altitude) — cohérent avec tout ce qu'on avait déduit du code
-(`Player_ResolveAttachPointN_5305A`, calcul dynamique de position
+(`Mission_GetSpotWorldPosition_5305A`, calcul dynamique de position
 relative).
 
 Plusieurs autres valeurs rondes (-40, -800, 1800, 2000) suggèrent des

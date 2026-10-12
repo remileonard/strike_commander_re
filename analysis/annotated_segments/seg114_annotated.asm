@@ -165,7 +165,7 @@ Str_GetNthEntry_50EC8	endp
 ; zone[+0x22/+0x26/+0x2A] (point de référence de la zone) si le pointeur de zone est non nul
 ; (cmp dword ptr es:[bx],0 / jz ; add [bp+var_10], es:[bx+22h]…), sinon décalage seul
 ; (position absolue). Si dst = 0, alloue un buffer de 12 o (push 0Ch / CRT_Malloc16_Retry).
-; Utilisé pour les SPOT (Player_ResolveAttachPointN_5305A, records de 16 o) et pour la
+; Utilisé pour les SPOT (Mission_GetSpotWorldPosition_5305A, records de 16 o) et pour la
 ; position des entrées PART (Expr_Node_StoreResultVector_52C9C : rec = part+0x1D, zone en
 ; +0x1D, décalage en +0x21).
 ; ==============================================================================================
@@ -1997,7 +1997,7 @@ loc_5199C:				; CODE XREF: Expr_VM_Interpreter_51106+891j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		push	large dword ptr	[di+12h]
 		push	ss
@@ -3496,7 +3496,7 @@ loc_5257A:				; DATA XREF: seg114:off_52A88o
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_56]
 		mov	[bp+var_4A], eax
@@ -3526,7 +3526,7 @@ loc_525B5:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_62]
 		mov	[bp+var_4A], eax
@@ -3558,7 +3558,7 @@ loc_525F3:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_DA]
 		mov	[bp+var_CE], eax
@@ -3578,7 +3578,7 @@ loc_525F3:
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_6E]
 		mov	[bp+var_4A], eax
@@ -3599,7 +3599,7 @@ loc_5265A:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_DA]
 		mov	[bp+var_CE], eax
@@ -3619,7 +3619,7 @@ loc_5265A:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_7A]
 		mov	[bp+var_4A], eax
@@ -3687,7 +3687,7 @@ loc_5270B:				; CODE XREF: MissionScript_CallNativeHandler_52513+1F3j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_E6]
 		mov	[bp+var_DA], eax
@@ -3844,7 +3844,7 @@ loc_528B1:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_9E]
 		mov	[bp+var_4A], eax
@@ -3969,7 +3969,7 @@ loc_529BA:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Player_ResolveAttachPointN_5305A
+		call	near ptr Mission_GetSpotWorldPosition_5305A
 		add	sp, 8
 		mov	eax, [bp+var_C2]
 		mov	[bp+var_4A], eax
@@ -5061,13 +5061,16 @@ PtrList_GetAt_53034	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre
-; d'entrees, +2 far ptr, pas 16 octets) via AreaRelPos_ToWorld_50EEB ; si n >= nombre
-; d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la
-; resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1,
-; 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde.
+; far, POSITION MONDE DU SPOT n (ex-Player_ResolveAttachPointN : rien à voir avec un point
+; d'attache du joueur). Args : (dst, seg dst, liste SPOT, n). Tous les appelants passent la
+; liste SPOT du scénario (word_706A0+0x1E ; add ax,1Eh avant l'appel). liste = [+0] u16
+; nombre, [+2] far ptr tableau de records de 16 o (shl bx,4). Si n ≥ nombre (cmp [si],cx /
+; jbe) : renvoie (0, 0, 0) — un 2e opérande absent (0xFFFF) donne donc l'origine du monde.
+; Sinon : AreaRelPos_ToWorld_50EEB(record) = décalage du spot + point de référence de sa zone
+; AREA. Appelants : ordres de mission via MissionScript_CallNativeHandler_52513 (0xA1, 0xA2…),
+; Player_MainUpdate, seg011, seg029. Format SPOT : DATA_MODEL.md.
 ; ==============================================================================================
-Player_ResolveAttachPointN_5305A	proc far		; CODE XREF: Player_MainUpdate+5FEP
+Mission_GetSpotWorldPosition_5305A	proc far		; CODE XREF: Player_MainUpdate+5FEP
 					; Player_MainUpdate+620P ...
 
 var_1C		= dword	ptr -1Ch
@@ -5102,11 +5105,11 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_5308D
 ; ���������������������������������������������������������������������������
 
-loc_53089:				; CODE XREF: Player_ResolveAttachPointN_5305A+1Ej
+loc_53089:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+1Ej
 		xor	dx, dx
 		xor	ax, ax
 
-loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
+loc_5308D:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+2Dj
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 		cmp	[bp+var_4], 0
@@ -5126,7 +5129,7 @@ loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
 		mov	eax, [bp+var_14]
 		mov	[bp+var_8], eax
 
-loc_530C0:				; CODE XREF: Player_ResolveAttachPointN_5305A+3Ej
+loc_530C0:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+3Ej
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_530CB
@@ -5134,7 +5137,7 @@ loc_530C0:				; CODE XREF: Player_ResolveAttachPointN_5305A+3Ej
 		jmp	short loc_530D5
 ; ���������������������������������������������������������������������������
 
-loc_530CB:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Bj
+loc_530CB:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+6Bj
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
@@ -5142,7 +5145,7 @@ loc_530CB:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Bj
 loc_530D3:
 		mov	si, ax
 
-loc_530D5:				; CODE XREF: Player_ResolveAttachPointN_5305A+6Fj
+loc_530D5:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+6Fj
 		or	ax, ax
 		jz	short loc_530F4
 
@@ -5157,16 +5160,16 @@ loc_530D9:
 		jmp	short loc_530F6
 ; ���������������������������������������������������������������������������
 
-loc_530F4:				; CODE XREF: Player_ResolveAttachPointN_5305A+7Dj
+loc_530F4:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+7Dj
 		mov	ax, si
 
-loc_530F6:				; CODE XREF: Player_ResolveAttachPointN_5305A+98j
+loc_530F6:				; CODE XREF: Mission_GetSpotWorldPosition_5305A+98j
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	si
 		leave
 		retf
-Player_ResolveAttachPointN_5305A	endp
+Mission_GetSpotWorldPosition_5305A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

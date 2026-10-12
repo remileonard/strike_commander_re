@@ -753,7 +753,7 @@ PilotProfile_LoadFromPROF_73B4F	endp
 ; CALCULEE DYNAMIQUEMENT, pas une position absolue figee. Preuve :
 ; MissionScript_CallNativeHandler_52513 (le vrai point d'entree natif pour tous les opcodes
 ; OP_SET_OBJ_*, avec son PROPRE switch parallele sur la meme plage 0xA1-0xBF) calcule ce
-; vecteur via Player_ResolveAttachPointN_5305A (appelee 6 fois dans la fonction) - une
+; vecteur via Mission_GetSpotWorldPosition_5305A (appelee 6 fois dans la fonction) - une
 ; resolution de POINT D'ATTACHE NOMME (via le contexte VM partage word_706A0), pas une lecture
 ; litterale de coordonnees du script. Cohere avec un usage de navigation IA (position de
 ; formation, interception, cible d'attaque) relative a une autre entite (probablement le
