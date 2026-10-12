@@ -581,7 +581,7 @@ Heap_ValidateBlock_5D3AA	endp
 ; UIScreen_RenderGraphVGA (sub_509EE, seg113) — probable cache/liste de zones à rafraîchir
 ; pour l'affichage.
 ; ==============================================================================================
-DisplayCache_ComputeChecksum_5D43F	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+10P
+DisplayCache_ComputeChecksum_5D43F	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+10P
 					; WeaponSystem_LaunchFromStation_3E744:loc_3E8B6P	...
 		push	di
 		cmp	byte_70E27, 0

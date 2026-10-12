@@ -63,7 +63,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 439 | `sub_509EE` | `UIScreen_RenderGraphVGA_509EE` | seg113 |
 | 438 | `sub_98CF0` | `Terrain_ComputeVisibilityAndAltitude_98CF0` | ovr290 |
 | 428 | `sub_613B0` | `Render_ClipAndDrawLine_613B0` | seg168 |
-| 420 | `sub_9BA85` | `Debris_LoadFieldMix_9BA85` | ovr302 |
+| 420 | `sub_9BA85` | `Object_LoadCommonChunks_9BA85` | ovr302 |
 | 419 | `sub_A21AF` | `PaletteScreen_UpdateWidgetMain_A21AF` | seg442 |
 | 419 | `sub_9E289` | `WeaponSystem_ReleaseBomb_9E289` | seg432 |
 | 413 | `sub_9A95A` | `TerrainSector_LoadIndexedRecord_9A95A` | ovr296 |

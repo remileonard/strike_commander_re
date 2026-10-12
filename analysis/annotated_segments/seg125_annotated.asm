@@ -57,7 +57,7 @@ Sound_StopAll_5A88F	endp
 ; Ex-'Weapon_HUDBox_TimerCaseH_5A8DC'. far. LUE 2026-10-06. Facade publique (si effets actifs,
 ; byte_7236C, objet word_7099B) : SoundFX_Play3D_59902(effet, distance, emetteur).
 ; ==============================================================================================
-SoundFX_Play_5A8DC	proc far		; CODE XREF: Debris_SpawnOrchestrator+1B9P
+SoundFX_Play_5A8DC	proc far		; CODE XREF: Object_SpawnDestructionEffects_3863A+1B9P
 					; seg087:00B9P	...
 
 arg_0		= byte ptr  6

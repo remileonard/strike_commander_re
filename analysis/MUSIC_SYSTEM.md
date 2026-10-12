@@ -271,7 +271,7 @@ courante est `0x14` (musique d'atterrissage, §5.4), ou si un changement est dé
 
 ### 5.3 À la destruction d'un objet : `World_OnObjectDestroyed_53A94`
 
-Gestionnaire appelé par les générateurs de débris (`Debris_SpawnOrchestrator`,
+Gestionnaire appelé par les générateurs de débris (`Object_SpawnDestructionEffects_3863A`,
 `Debris_SpawnOrchestratorVariant_9D770`), par l'éjection (`AI_EjectDecision_50FF`) et par
 `Player_EjectSequence_7D31A`. La musique n'est concernée que pour les catégories 1
 (`ORNT`, décor orienté : immeubles…), 6 (avion), 0x13 (défense fixe), 0x14 (objet au sol) et 0x15

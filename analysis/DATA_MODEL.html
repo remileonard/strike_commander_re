@@ -131,6 +131,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <li><a href="#iff"><span>—</span><span>Le conteneur IFF</span></a></li>
     <li><a href="#carte"><span>—</span><span>Vue d'ensemble</span></a></li>
     <li><a href="#objets"><span>1</span><span>Objets 3D</span></a></li>
+    <li><a href="#communs"><span>1b</span><span>Destruction</span></a></li>
     <li><a href="#dynm"><span>2</span><span>Dynamique d'avion</span></a></li>
     <li><a href="#prof"><span>3</span><span>Profil de pilote</span></a></li>
     <li><a href="#misn"><span>4</span><span>Mission MISN</span></a></li>
@@ -278,14 +279,101 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td class="num">DECY</td><td class="num">16</td><td>leurres</td></tr>
       <tr><td class="num">SWPN</td><td class="num"><b>19</b></td><td><b>défense fixe</b> : AA, SAM, navire</td></tr>
       <tr><td class="num">GRND</td><td class="num">20</td><td>objet au sol</td></tr>
-      <tr><td class="num">RNWY</td><td>non lue</td><td>piste</td></tr>
-      <tr><td class="num">EXPL</td><td>non lue</td><td>explosion</td></tr>
-      <tr><td class="num">DEBR</td><td>non lue</td><td>débris</td></tr>
+      <tr><td class="num">RNWY</td><td class="num">17</td><td>piste : décor orienté (chunks communs + <code>ANGL</code>)</td></tr>
+      <tr><td class="num">EXPL</td><td class="num">15</td><td>explosion (chunks communs ; <code>DAMG</code> = dégâts par défaut)</td></tr>
+      <tr><td class="num">DEBR</td><td class="num">11</td><td>débris : <code>INFO</code> + une dynamique <code>DYNM</code> (il tombe)</td></tr>
+      <tr><td class="num">SMKG</td><td class="num">18</td><td>lecteur non lu (générateur de fumée, d'après le nom)</td></tr>
+      <tr><td class="num">EJEC</td><td class="num">22</td><td>lecteur non lu (siège éjectable, d'après le nom)</td></tr>
     </tbody>
   </table></div>
-  <p>Chunk commun <code>INFO</code> : rayon de collision (<code>uint16</code>, défaut 20).</p>
+  <p>Aucun de ces FORM trouvé : le chargement échoue (erreur 49173). Les chunks lus par la plupart des classes sont décrits dans la fiche suivante.</p>
   <h3>Composants de dégâts d'un avion</h3>
   <ul class="chips"><li>RUDDER</li><li>ELEVATOR</li><li>AILERON</li><li>LWING</li><li>RWING</li><li>ENGINE</li><li>LANDGEAR</li><li>FLAPS</li></ul>
+</article>
+
+<!-- ============================ CHUNKS COMMUNS ============================ -->
+<article class="mv" id="communs">
+  <header><span class="id">DAMG · EXPL · DEBR · DEST · CHLD</span><h2>Chunks communs des objets et destruction</h2></header>
+  <ul class="chips"><li>lecteur <b>Object_LoadCommonChunks_9BA85</b></li><li>tous facultatifs</li><li>destruction <b>Object_SpawnDestructionEffects_3863A</b></li></ul>
+  <p>La plupart des classes d'objets lisent les mêmes chunks : solidité, signature, et ce que l'objet produit quand il est détruit (une explosion, des débris, une épave). Chaque chunk est cherché par son tag ; s'il manque, la valeur par défaut s'applique.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Contenu</th><th>Si absent</th></tr></thead>
+    <tbody>
+      <tr><td class="num">DAMG</td><td><code>uint16</code> : points de dégâts encaissables ; 65535 = indestructible</td><td class="num">10</td></tr>
+      <tr><td class="num">TRGT</td><td><code>uint16</code> (seul l'octet bas est gardé) : type de cible — nom d'après le tag, usage non lu</td><td class="num">0</td></tr>
+      <tr><td class="num">SIGN</td><td>3 <code>uint8</code> : signatures (radar, infrarouge, visuelle ?) — usage non lu</td><td class="num">0</td></tr>
+      <tr><td class="num">EXPL</td><td>l'explosion créée à la destruction (tableau ci-dessous)</td><td>pas d'explosion</td></tr>
+      <tr><td class="num">DEBR</td><td>les débris éjectés à la destruction (tableaux ci-dessous)</td><td>pas de débris</td></tr>
+      <tr><td class="num">DEST</td><td>les objets laissés à la destruction, une épave par exemple (tableau ci-dessous)</td><td>rien</td></tr>
+      <tr><td class="num">CHLD</td><td>les sous-objets attachés (tableau ci-dessous)</td><td>aucun</td></tr>
+      <tr><td class="num">INFO</td><td>lu par <code>DEBR</code> : <code>uint16</code> rayon de collision, <code>uint8</code> drapeau, puis un second <code>uint8</code> si le drapeau n'est pas nul</td><td class="num">20, 0</td></tr>
+      <tr><td class="num">ANGL</td><td>lu par <code>ORNT</code> et <code>RNWY</code> : <code>uint8</code> angle</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>EXPL (12 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>modèle</td><td>string[8]</td><td class="num">8</td><td>objet explosion à créer (un <code>OBJECTS\&lt;nom&gt;.IFF</code> de classe <code>EXPL</code>)</td></tr>
+      <tr><td>rayon</td><td>int16</td><td class="num">2</td><td>mètres</td></tr>
+      <tr><td>dégâts max</td><td>int16</td><td class="num">2</td><td>dégâts au centre de l'explosion</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Dégâts reçus</b> par un objet à la distance <i>d</i> du centre, diminuée de la taille de l'objet (et bornée à 0) : <code>dégâts = dégâts_max × (rayon − d) ÷ rayon</code> si <i>d</i> &lt; rayon, sinon 0 ; on garde la partie entière. La décroissance est <b>linéaire</b>. Ces valeurs remplacent celles de la classe <code>EXPL</code> (dont le <code>DAMG</code> donne les dégâts par défaut).</p>
+
+  <h3>DEBR</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nombre à créer</td><td>uint16</td><td class="num">2</td><td>nombre de débris éjectés à chaque destruction</td></tr>
+      <tr><td>modèles de débris</td><td>26&nbsp;octets&nbsp;chacun</td><td class="num">26 × n</td><td>n = (taille du chunk − 2) ÷ 26 ; chaque débris créé en tire un au hasard</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Un modèle de débris (26 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>modèle</td><td>string[8]</td><td class="num">8</td><td>objet débris à créer (classe <code>DEBR</code>)</td></tr>
+      <tr><td>dispersion X</td><td>int16</td><td class="num">2</td><td>mètres : position tirée entre −valeur et +valeur autour de l'objet détruit</td></tr>
+      <tr><td>dispersion Z</td><td>int16</td><td class="num">2</td><td>mètres</td></tr>
+      <tr><td>dispersion Y</td><td>int16</td><td class="num">2</td><td>mètres</td></tr>
+      <tr><td>vitesse X</td><td>int16</td><td class="num">2</td><td>vitesse de base (m/s probable)</td></tr>
+      <tr><td>vitesse Z</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>vitesse Y</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>dispersion vitesse X</td><td>int16</td><td class="num">2</td><td>aléa ajouté, entre −valeur et +valeur</td></tr>
+      <tr><td>dispersion vitesse Z</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>dispersion vitesse Y</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+  <p>Vitesse finale d'un débris = <b>0,6 × vitesse de l'objet détruit</b> + vitesse de base + aléa. Le jeu ne crée pas de débris s'il manque de ressources (seuil interne).</p>
+
+  <h3>Un objet DEST (14 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>modèle</td><td>string[8]</td><td class="num">8</td><td>objet à créer</td></tr>
+      <tr><td>décalage X</td><td>int16</td><td class="num">2</td><td>mètres, sans aléa</td></tr>
+      <tr><td>décalage Z</td><td>int16</td><td class="num">2</td><td>mètres</td></tr>
+      <tr><td>décalage Y</td><td>int16</td><td class="num">2</td><td>mètres</td></tr>
+    </tbody>
+  </table></div>
+  <p>Chaque objet <code>DEST</code> reprend l'orientation de l'objet détruit et 0,6 × sa vitesse. Le nombre d'objets = taille du chunk ÷ 14. Ils ne sont créés que s'il reste assez de mémoire.</p>
+
+  <h3>Un sous-objet CHLD (32 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nom</td><td>string[8]</td><td class="num">8</td><td>sous-objet</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>mètres, relative à l'objet</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
+      <tr><td>angle 1</td><td>int32</td><td class="num">4</td><td>degrés</td></tr>
+      <tr><td>angle 2</td><td>int32</td><td class="num">4</td><td>degrés</td></tr>
+      <tr><td>angle 3</td><td>int32</td><td class="num">4</td><td>degrés</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le nombre de sous-objets = taille du chunk ÷ 32. Les trois angles forment la matrice d'orientation ; lequel est le cap, le tangage ou le roulis n'est pas vérifié.</p>
 </article>
 
 <!-- ============================ DYNM ============================ -->
@@ -869,7 +957,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
     <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
     <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : classes <code>RNWY</code>, <code>EXPL</code> et <code>DEBR</code> non lues.</li>
+    <li>Objets : lecteurs de <code>SMKG</code> et <code>EJEC</code> non lus ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
     <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>

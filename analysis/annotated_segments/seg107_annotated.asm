@@ -918,7 +918,7 @@ loc_4DF0D:				; CODE XREF: seg107:0868j
 		shl	eax, 8
 		mov	[bp-30h], eax
 		push	si
-		call	Debris_ConfigureByTargetType
+		call	Explosion_ApplyRadiusAndDamage_4BDFD
 		add	sp, 0Ah
 		push	di
 		mov	bx, [di]

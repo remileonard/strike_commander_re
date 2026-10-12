@@ -130,12 +130,18 @@ locret_3844D:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,200L — tire un nombre aléatoire (sub_5D43F) comparé à un seuil (0x1800), résout un point
-; d'attache indexé (sub_54DF4, table 0x1A octets/entrée), appelle sub_38B70 avec un
-; identifiant fixe (0x571C) : génération probabiliste de débris à un point d'attache lors de
-; la destruction d'un composant.
+; far, LUE 2026-10-12. CRÉE LES DÉBRIS D'UN OBJET DÉTRUIT depuis son chunk DEBR (ex-
+; Debris_SpawnAtAttachPoint). Args : (modèle, objet source, nombre = modèle+0x1D). Rien si pas
+; de liste ou si DisplayCache_ComputeChecksum_5D43F ≤ 6144 (garde de budget, rôle exact non
+; tranché). Vitesse de la source (vtable +0x4C) mise à l'échelle 0x99/256 = 0,6
+; (Utility_Helper_55A62). Pour chaque débris : enregistrement tiré au hasard
+; (Math_RandomScale_54DF4(modèle+0x1F) ; imul ax, 1Ah), objet créé par son nom
+; (ObjectPrototype_FindOrLoadAndInstantiate_38B70), position = source + aléa[−d, +d] sur
+; chaque axe (Math_RandomJitter_54E1C(rec+8/+0x0A/+0x0C), <<8), vitesse = 0,6 × vitesse source
+; + rec+0x0E/+0x10/+0x12 (<<8) + aléa(rec+0x14/+0x16/+0x18) ; vitesse posée par vtable +0x50 ;
+; ajouté à la liste des objets (59C3h).
 ; ==============================================================================================
-Debris_SpawnAtAttachPoint	proc far		; CODE XREF: Debris_SpawnOrchestrator+1E2p
+Debris_SpawnFromDebrList_3844F	proc far		; CODE XREF: Object_SpawnDestructionEffects_3863A+1E2p
 					; Debris_SpawnOrchestratorVariant_9D770+191P ...
 
 var_32		= dword	ptr -32h
@@ -174,13 +180,13 @@ loc_38452:
 		jmp	loc_38636
 ; ���������������������������������������������������������������������������
 
-loc_3847A:				; CODE XREF: Debris_SpawnAtAttachPoint+26j
+loc_3847A:				; CODE XREF: Debris_SpawnFromDebrList_3844F+26j
 		cmp	[bp+var_4], 1800h
 		jg	short loc_38487
 		jmp	loc_38636
 ; ���������������������������������������������������������������������������
 
-loc_38487:				; CODE XREF: Debris_SpawnAtAttachPoint+33j
+loc_38487:				; CODE XREF: Debris_SpawnFromDebrList_3844F+33j
 		push	di
 		push	ss
 		lea	ax, [bp+var_1E]
@@ -200,7 +206,7 @@ loc_38487:				; CODE XREF: Debris_SpawnAtAttachPoint+33j
 		jmp	loc_3862B
 ; ���������������������������������������������������������������������������
 
-loc_384BC:				; CODE XREF: Debris_SpawnAtAttachPoint+1E4j
+loc_384BC:				; CODE XREF: Debris_SpawnFromDebrList_3844F+1E4j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+1Fh]
 		call	Math_RandomScale_54DF4
@@ -227,7 +233,7 @@ loc_384BC:				; CODE XREF: Debris_SpawnAtAttachPoint+1E4j
 		jmp	loc_38628
 ; ���������������������������������������������������������������������������
 
-loc_38502:				; CODE XREF: Debris_SpawnAtAttachPoint+AEj
+loc_38502:				; CODE XREF: Debris_SpawnFromDebrList_3844F+AEj
 		les	bx, [bp+var_C]
 		mov	ax, es:[bx+8]
 		call	Math_RandomJitter_54E1C
@@ -312,29 +318,29 @@ loc_38562:
 		call	Gauge_ResolveInterpolated
 		add	sp, 4
 
-loc_3861C:				; CODE XREF: Debris_SpawnAtAttachPoint+1BFj
+loc_3861C:				; CODE XREF: Debris_SpawnFromDebrList_3844F+1BFj
 		push	si
 		push	59C3h
 		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
-loc_38628:				; CODE XREF: Debris_SpawnAtAttachPoint+B0j
+loc_38628:				; CODE XREF: Debris_SpawnFromDebrList_3844F+B0j
 		inc	[bp+var_E]
 
-loc_3862B:				; CODE XREF: Debris_SpawnAtAttachPoint+6Aj
+loc_3862B:				; CODE XREF: Debris_SpawnFromDebrList_3844F+6Aj
 		mov	ax, [bp+var_E]
 		cmp	ax, [bp+arg_6]
 		jge	short loc_38636
 		jmp	loc_384BC
 ; ���������������������������������������������������������������������������
 
-loc_38636:				; CODE XREF: Debris_SpawnAtAttachPoint+28j
-					; Debris_SpawnAtAttachPoint+35j ...
+loc_38636:				; CODE XREF: Debris_SpawnFromDebrList_3844F+28j
+					; Debris_SpawnFromDebrList_3844F+35j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_SpawnAtAttachPoint	endp
+Debris_SpawnFromDebrList_3844F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -342,11 +348,17 @@ Debris_SpawnAtAttachPoint	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,420L — grosse fonction du même cluster (buffer conséquent, appelle sub_3844F) : candidat
-; pour l'orchestrateur complet de génération de débris lors de la destruction d'un objet, à
-; approfondir.
+; far, LUE 2026-10-12. EFFETS DE DESTRUCTION D'UN OBJET (ex-Debris_SpawnOrchestrator ; slot de
+; vtable commun à de nombreuses classes d'objets). Après World_OnObjectDestroyed_53A94 : (1)
+; si chunk EXPL (modèle+0x19) : crée l'objet explosion nommé (char[8]), à la position de la
+; source, Explosion_ApplyRadiusAndDamage_4BDFD(rayon = int16 +8, dégâts = int16 +0x0A), même
+; orientation que la source, son SoundFX_Play_5A8DC(3, distance à la caméra) ; (2) si chunk
+; DEBR : Debris_SpawnFromDebrList_3844F(modèle, source, modèle+0x1D) ; (3) si chunk DEST et
+; Registry_LookupForTextRenderer_5B5D9 > 150000 (garde mémoire probable) : crée chaque objet
+; DEST (char[8]) à source + décalage int16 ×3 (<<8, sans aléa), orientation de la source,
+; vitesse = 0,6 × vitesse source. Renvoie 1.
 ; ==============================================================================================
-Debris_SpawnOrchestrator	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+4CP
+Object_SpawnDestructionEffects_3863A	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+4CP
 					; DATA XREF: seg339:off_6EC2Bo	...
 
 var_2E		= dword	ptr -2Eh
@@ -392,7 +404,7 @@ loc_3865D:
 		jmp	short loc_386A2
 ; ���������������������������������������������������������������������������
 
-loc_3865F:				; CODE XREF: Debris_SpawnOrchestrator:loc_38656j
+loc_3865F:				; CODE XREF: Object_SpawnDestructionEffects_3863A:loc_38656j
 		push	si
 		mov	bx, [si]
 
@@ -405,12 +417,12 @@ loc_38662:
 		jmp	short loc_386A2
 ; ���������������������������������������������������������������������������
 
-loc_38672:				; CODE XREF: Debris_SpawnOrchestrator+30j
+loc_38672:				; CODE XREF: Object_SpawnDestructionEffects_3863A+30j
 		dec	word_70481
 		jmp	short loc_386A2
 ; ���������������������������������������������������������������������������
 
-loc_38678:				; CODE XREF: Debris_SpawnOrchestrator+17j
+loc_38678:				; CODE XREF: Object_SpawnDestructionEffects_3863A+17j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+38h]
@@ -421,12 +433,12 @@ loc_38678:				; CODE XREF: Debris_SpawnOrchestrator+17j
 		jmp	short loc_386A2
 ; ���������������������������������������������������������������������������
 
-loc_3868B:				; CODE XREF: Debris_SpawnOrchestrator+49j
+loc_3868B:				; CODE XREF: Object_SpawnDestructionEffects_3863A+49j
 		dec	word_70479
 		jmp	short loc_386A2
 ; ���������������������������������������������������������������������������
 
-loc_38691:				; CODE XREF: Debris_SpawnOrchestrator+21j
+loc_38691:				; CODE XREF: Object_SpawnDestructionEffects_3863A+21j
 		push	si
 		mov	bx, [si]
 		call	dword ptr [bx+38h]
@@ -435,8 +447,8 @@ loc_38691:				; CODE XREF: Debris_SpawnOrchestrator+21j
 		jz	short loc_386A2
 		dec	word_7047B
 
-loc_386A2:				; CODE XREF: Debris_SpawnOrchestrator:loc_3865Dj
-					; Debris_SpawnOrchestrator+36j ...
+loc_386A2:				; CODE XREF: Object_SpawnDestructionEffects_3863A:loc_3865Dj
+					; Object_SpawnDestructionEffects_3863A+36j ...
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+3], 0
 		jz	short loc_386B1
@@ -444,7 +456,7 @@ loc_386A2:				; CODE XREF: Debris_SpawnOrchestrator:loc_3865Dj
 		jmp	loc_3896A
 ; ���������������������������������������������������������������������������
 
-loc_386B1:				; CODE XREF: Debris_SpawnOrchestrator+70j
+loc_386B1:				; CODE XREF: Object_SpawnDestructionEffects_3863A+70j
 		push	[bp+arg_6]
 		push	si
 		call	World_OnObjectDestroyed_53A94
@@ -459,8 +471,8 @@ loc_386B1:				; CODE XREF: Debris_SpawnOrchestrator+70j
 		jmp	loc_3896A
 ; ���������������������������������������������������������������������������
 
-loc_386D1:				; CODE XREF: Debris_SpawnOrchestrator+87j
-					; Debris_SpawnOrchestrator+90j
+loc_386D1:				; CODE XREF: Object_SpawnDestructionEffects_3863A+87j
+					; Object_SpawnDestructionEffects_3863A+90j
 		mov	byte_70447, 0
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+19h], 0
@@ -468,7 +480,7 @@ loc_386D1:				; CODE XREF: Debris_SpawnOrchestrator+87j
 		jmp	loc_38807
 ; ���������������������������������������������������������������������������
 
-loc_386E4:				; CODE XREF: Debris_SpawnOrchestrator+A5j
+loc_386E4:				; CODE XREF: Object_SpawnDestructionEffects_3863A+A5j
 		mov	eax, es:[bx+19h]
 		mov	[bp+var_6+2], eax
 		push	1
@@ -485,7 +497,7 @@ loc_386E4:				; CODE XREF: Debris_SpawnOrchestrator+A5j
 		jmp	loc_38807
 ; ���������������������������������������������������������������������������
 
-loc_38709:				; CODE XREF: Debris_SpawnOrchestrator+CAj
+loc_38709:				; CODE XREF: Object_SpawnDestructionEffects_3863A+CAj
 		mov	dx, si
 		add	dx, 12h
 		mov	bx, dx
@@ -524,7 +536,7 @@ loc_38747:
 		push	di
 
 loc_3874C:
-		call	Debris_ConfigureByTargetType
+		call	Explosion_ApplyRadiusAndDamage_4BDFD
 		add	sp, 0Ah
 
 loc_38754:
@@ -562,10 +574,10 @@ loc_38754:
 		jmp	short loc_3879F
 ; ���������������������������������������������������������������������������
 
-loc_3879A:				; CODE XREF: Debris_SpawnOrchestrator+148j
+loc_3879A:				; CODE XREF: Object_SpawnDestructionEffects_3863A+148j
 		mov	word ptr [di+5Ch], 0
 
-loc_3879F:				; CODE XREF: Debris_SpawnOrchestrator+15Ej
+loc_3879F:				; CODE XREF: Object_SpawnDestructionEffects_3863A+15Ej
 		mov	eax, [di+12h]
 		mov	bx, word_72A8F
 		sub	eax, [bx+14h]
@@ -598,8 +610,8 @@ loc_3879F:				; CODE XREF: Debris_SpawnOrchestrator+15Ej
 		call	List_AppendIfNonNull_21F8D
 		add	sp, 4
 
-loc_38807:				; CODE XREF: Debris_SpawnOrchestrator+A7j
-					; Debris_SpawnOrchestrator+CCj
+loc_38807:				; CODE XREF: Object_SpawnDestructionEffects_3863A+A7j
+					; Object_SpawnDestructionEffects_3863A+CCj
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+21h], 0
 		jz	short loc_38822
@@ -610,19 +622,19 @@ loc_38817:
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr Debris_SpawnAtAttachPoint
+		call	near ptr Debris_SpawnFromDebrList_3844F
 
 loc_3881F:
 		add	sp, 8
 
-loc_38822:				; CODE XREF: Debris_SpawnOrchestrator+1D6j
+loc_38822:				; CODE XREF: Object_SpawnDestructionEffects_3863A+1D6j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+27h], 0
 		jnz	short loc_38830
 		jmp	loc_38968
 ; ���������������������������������������������������������������������������
 
-loc_38830:				; CODE XREF: Debris_SpawnOrchestrator+1F1j
+loc_38830:				; CODE XREF: Object_SpawnDestructionEffects_3863A+1F1j
 		call	Registry_LookupForTextRenderer_5B5D9
 		push	dx
 		push	ax
@@ -634,7 +646,7 @@ loc_38841:
 		jmp	loc_38968
 ; ���������������������������������������������������������������������������
 
-loc_38844:				; CODE XREF: Debris_SpawnOrchestrator+205j
+loc_38844:				; CODE XREF: Object_SpawnDestructionEffects_3863A+205j
 		push	si
 		push	59C3h
 		call	Container_Op_2258E
@@ -645,7 +657,7 @@ loc_38844:				; CODE XREF: Debris_SpawnOrchestrator+205j
 		jmp	loc_38968
 ; ���������������������������������������������������������������������������
 
-loc_3885C:				; CODE XREF: Debris_SpawnOrchestrator+21Dj
+loc_3885C:				; CODE XREF: Object_SpawnDestructionEffects_3863A+21Dj
 		push	si
 		push	ss
 		lea	ax, [bp+var_22]
@@ -670,7 +682,7 @@ loc_38862:
 		jmp	loc_38959
 ; ���������������������������������������������������������������������������
 
-loc_3889D:				; CODE XREF: Debris_SpawnOrchestrator+32Bj
+loc_3889D:				; CODE XREF: Object_SpawnDestructionEffects_3863A+32Bj
 		mov	eax, [bp+var_A]
 		mov	[bp+var_12+2], eax
 		push	1
@@ -687,7 +699,7 @@ loc_3889D:				; CODE XREF: Debris_SpawnOrchestrator+32Bj
 		jmp	loc_38952
 ; ���������������������������������������������������������������������������
 
-loc_388C1:				; CODE XREF: Debris_SpawnOrchestrator+282j
+loc_388C1:				; CODE XREF: Object_SpawnDestructionEffects_3863A+282j
 		les	bx, [bp+var_A]
 		movsx	eax, word ptr es:[bx+8]
 		shl	eax, 8
@@ -734,20 +746,20 @@ loc_3891B:
 		call	Gauge_ResolveInterpolated
 		add	sp, 4
 
-loc_38941:				; CODE XREF: Debris_SpawnOrchestrator+2F9j
+loc_38941:				; CODE XREF: Object_SpawnDestructionEffects_3863A+2F9j
 		mov	word ptr [bp+var_12], di
 		push	word ptr [bp+var_12]
 		push	[bp+var_2]
 		call	List_AppendTail_22C23
 		add	sp, 4
 
-loc_38952:				; CODE XREF: Debris_SpawnOrchestrator+284j
+loc_38952:				; CODE XREF: Object_SpawnDestructionEffects_3863A+284j
 		inc	word ptr [bp+var_E+2]
 
 loc_38955:
 		add	word ptr [bp+var_A], 0Eh
 
-loc_38959:				; CODE XREF: Debris_SpawnOrchestrator+260j
+loc_38959:				; CODE XREF: Object_SpawnDestructionEffects_3863A+260j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+25h]
 		cmp	ax, word ptr [bp+var_E+2]
@@ -755,17 +767,17 @@ loc_38959:				; CODE XREF: Debris_SpawnOrchestrator+260j
 		jmp	loc_3889D
 ; ���������������������������������������������������������������������������
 
-loc_38968:				; CODE XREF: Debris_SpawnOrchestrator+1F3j
-					; Debris_SpawnOrchestrator:loc_38841j	...
+loc_38968:				; CODE XREF: Object_SpawnDestructionEffects_3863A+1F3j
+					; Object_SpawnDestructionEffects_3863A:loc_38841j	...
 		mov	al, 1
 
-loc_3896A:				; CODE XREF: Debris_SpawnOrchestrator+74j
-					; Debris_SpawnOrchestrator+94j
+loc_3896A:				; CODE XREF: Object_SpawnDestructionEffects_3863A+74j
+					; Object_SpawnDestructionEffects_3863A+94j
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_SpawnOrchestrator	endp
+Object_SpawnDestructionEffects_3863A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1153,8 +1165,8 @@ loc_38B6C:				; CODE XREF: seg079:07E5j
 ; incrémente le compteur de références du prototype (+4). Anciennement
 ; Debris_LoadAndInstantiate (usage réel : tous les objets de modèle, dont les avions IA).
 ; ==============================================================================================
-ObjectPrototype_FindOrLoadAndInstantiate_38B70	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+A4p
-					; Debris_SpawnOrchestrator+C0p ...
+ObjectPrototype_FindOrLoadAndInstantiate_38B70	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+A4p
+					; Object_SpawnDestructionEffects_3863A+C0p ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4

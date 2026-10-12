@@ -1115,8 +1115,8 @@ Math_RandomScale_54DF4	endp
 ; far, variante de Math_RandomScale centrée : retourne une valeur aléatoire dans [-x,+x].
 ; Référencée par sub_3844F.
 ; ==============================================================================================
-Math_RandomJitter_54E1C	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+BAP
-					; Debris_SpawnAtAttachPoint+D9P ...
+Math_RandomJitter_54E1C	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+BAP
+					; Debris_SpawnFromDebrList_3844F+D9P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2

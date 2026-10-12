@@ -254,13 +254,51 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | `DECY` | 0x3B | `2430` | 0x10 | leurres (fait vérifié côté données) |
 | `SWPN` | 0x51 | `241C` | **0x13** | **défenses fixes : AA, batteries, SAM, navires** (fait vérifié côté données : objets chargés et codés dans libRealSpace) |
 | `GRND` | 0x46 | `2408` | 0x14 | objet au sol |
-| `RNWY` | 0x36 | non lue | non lue | piste de décollage (fait vérifié côté données) |
-| `EXPL` | 0x3E | non lue | non lue | explosion |
-| `DEBR` | 0x3B | non lue | non lue | débris |
+| `RNWY` | 0x36 | `23F4` (base `2578` = `ORNT`) | **17** (`loc_460FC` : `mov al, 11h`) | piste de décollage (fait vérifié côté données) — chunks communs + `ANGL` (`IFF_LoadAngleParam_Wrapper`) |
+| `EXPL` | 0x3E | `23E0` (base `2578`) | **15** (`loc_4BD81` : `mov al, 0Fh`) | explosion — chunks communs, `DAMG` recopié en `+0x38` (`Explosion_LoadFromIFF_4BCD5`) |
+| `DEBR` | 0x3B | `23CC` (base `2504` = `MOBL`) | **11** (`loc_4BA42` : `mov al, 0Bh`) | débris — `INFO` (`IFF_LoadInfoChunk`) + dynamique `DYNM` (`JDYN_LoadChunkWrapper_9D0C0`) ; pas de chunks communs |
+| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | lecteur `VROOMM_StubThunk_6CC1A` non lu (générateur de fumée ? d'après le nom) |
+| `EJEC` | 0x5B | `23A4` (base `252C` = `OMOB`) | **22** (`ClassStub_ReturnConst16h_4F2BA`) | lecteur `VROOMM_StubThunk_6CCF0` non lu (siège éjectable ? d'après le nom) ; aucun FORM reconnu → erreur `C015h` |
 
 **Catégorie d'un objet (établi le 2026-09-20).** La classe d'un objet est fixée par le **premier chunk présent** dans l'ordre de probe de `IFF_LoadModelMain` (`BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY, …`). Chaque bloc alloue une taille (`Memory_TypedFreeWrapper_5C6F3`, tag `0x5C44`) et écrit une **suite de mots de vtable** (constructeurs chaînés, le dernier gagne). Le **troisième pointeur (`vtable+8`) est, dans chaque classe lue, un `mov al, <constante> ; retf`** : la constante est la catégorie. Elle est lue par `Targeting_AcquireBestThreat` (6 = avion, 8 = missile, 0x13 = défense fixe) pour choisir les cibles et menaces de l'IA (voir `AI_TICK_CALL_GRAPH.md`). Le mapping chunk → vtable est celui du dernier `mov word ptr es:[bx], …` de chaque bloc.
 
 **Base des vtables de `seg339`.** Les XREF d'IDA donnent **adresse linéaire = tag + `0x6D0B0`** (ex. `seg339:24D0` référence `loc_3E4A5`, la catégorie de `JETP`, à `0x6F580` = `0x6D0B0 + 0x24C8 + 8`). L'ancienne base `0x6D070` (§6.2) est décalée de `0x40`.
+
+**Chunks communs d'un objet — `Object_LoadCommonChunks_9BA85`** (ovr302, lu 2026-10-12 ; appelé par
+les lecteurs de classe via `VROOMM_StubThunk_6BFFF` — `ORNT`/`RNWY` par `IFF_LoadAngleParam`, `EXPL`
+par `Explosion_LoadFromIFF_4BCD5`…). Chunks cherchés par tag (`ResourceRecord_SeekAndRead_64743`),
+tous facultatifs ; repère Y-up dans la colonne « sens » (triplets rangés X, Z, Y) :
+
+| Chunk | Disque | → modèle | Sens |
+|---|---|---|---|
+| `DAMG` | uint16 | `+0x06` | points de dégâts encaissables ; 65535 → `+0x03 = 1` (indestructible) ; absent → 10 |
+| `TRGT` | uint16 (octet bas gardé) | `+0x11` | type de cible (nom d'après le tag, consommateur non lu) ; absent → 0 |
+| `SIGN` | 3× uint8 | `+0x12/+0x13/+0x14` | signatures (radar / IR / visuelle ? consommateur non lu) ; absent → 0 |
+| `EXPL` | 12 o : char[8] modèle, int16 rayon (m), int16 dégâts max | `+0x19` (far ptr) | explosion créée à la destruction |
+| `DEBR` | uint16 nombre de débris à créer, puis n × 26 o (n = (taille − 2) ÷ 26) | `+0x1D`, `+0x1F` n, `+0x21` tableau | débris éjectés (format ci-dessous) |
+| `DEST` | n × 14 o (n = taille ÷ 14) : char[8] modèle, 3× int16 décalage (m) | `+0x25` n, `+0x27` tableau | objets laissés à la destruction (épave), posés sans aléa |
+| `CHLD` | n × 32 o (n = taille ÷ 32) : char[8] nom, 3× int32 24.8 position, 3× int32 angles | `+0x0F` n, `+0x0D` tableau (records mémoire 0x39 o) | sous-objets attachés ; angles → `Matrix_BuildFullOrientation_575B2` (ordre cap/tangage/roulis non vérifié) |
+
+Enregistrement `DEBR` (26 o) : char[8] modèle ; 3× int16 dispersion de position ; 3× int16 vitesse de
+base ; 3× int16 dispersion de vitesse (tous entiers, `<< 8` dans le code).
+
+**À la destruction — `Object_SpawnDestructionEffects_3863A`** (seg079) :
+1. `EXPL` : crée l'objet nommé, à la position de la source, puis
+   `Explosion_ApplyRadiusAndDamage_4BDFD` (instance `+0x51` = rayon, `+0x55` = dégâts max) ; son
+   `SoundFX_Play_5A8DC(3, distance caméra)`.
+2. `DEBR` : `Debris_SpawnFromDebrList_3844F` crée `+0x1D` débris, chacun tiré au hasard dans la liste
+   (`Math_RandomScale_54DF4` / `imul ax, 1Ah`) : position = source + aléa [−d, +d] par axe
+   (`Math_RandomJitter_54E1C`) ; vitesse = 0,6 × vitesse source (`0x99/256`, `Utility_Helper_55A62`) +
+   vitesse de base + aléa. Gardé par `DisplayCache_ComputeChecksum_5D43F > 6144` (budget, rôle exact non
+   tranché).
+3. `DEST` : si `Registry_LookupForTextRenderer_5B5D9 > 150000` (garde mémoire probable), chaque objet à
+   source + décalage exact, orientation de la source, vitesse = 0,6 × vitesse source.
+
+**Dégâts d'une explosion — `Explosion_DamageAtDistance_4BE51`** : `d` = distance 3D explosion–cible moins
+la taille de la cible (bornée à 0) ; si `rayon > d` : `dégâts = dégâts_max × (rayon − d) / rayon`, sinon 0 ;
+partie entière. **Décroissance linéaire.** L'instance (`Explosion_SpawnInstance_4BCF4`) prend d'abord les
+valeurs de la classe `EXPL` (`DAMG` = dégâts), remplacées ensuite par celles du chunk `EXPL` de l'objet
+détruit.
 
 Chunk transverse **`INFO`** (`IFF_LoadInfoChunk`, seg104) : `+0x37` (w) =
 **rayon de collision** (défaut `0x14` = 20), `+0x39` (b) flag, `+0x3A` (b) flag2.
@@ -1500,7 +1538,7 @@ lus. Le payload (offsets 24.8, script `COMP`) est consommé à l'activation.
 
 **Objet caméra runtime — `word_72A8F`** (caméra active courante ;
 `DATA XREF: Player_MainUpdate`). Layout partiel vérifié (`WeaponSystem_LaunchFromStation_3E744`/
-`…Alt` seg088, `Debris_SpawnOrchestrator` seg079) :
+`…Alt` seg088, `Object_SpawnDestructionEffects_3863A` seg079) :
 
 | off | type | rôle |
 |---|---|---|
@@ -1745,7 +1783,7 @@ de corps rigide attaché à l'avion**, pas une formule position/lookat/distance.
   `seg339:off_6F880`) l'appelle à chaque tick si `[cam+0x73] & 1 == 0`, puis fait
   tourner un timer à `cam+0x68` (`Timer_SetAbsolute_4F9A2` / `Timer_Tick_4F9E6`) avec
   `[cam+0x6D] << 8`.
-- **Câblage** : `Camera_InitAttachWithModeFlags` (seg105:157) = `[cam+0x59]=1`,
+- **Câblage** : `Explosion_AttachToSource_4BDDA` (seg105:157) = `[cam+0x59]=1`,
   `[cam+4] |= 5`, `Debris_BodyAttachToSubpart(cam, parent)`. Le constructeur seg105
   (`loc_4BD1x`) fait ensuite `cam[+0x51] = *(parent + 0x3A)` (un **pointeur** — il est
   déréférencé comme objet à vtable dans `Camera_ComputeMountedPosition`),

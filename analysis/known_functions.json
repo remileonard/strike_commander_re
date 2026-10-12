@@ -2962,7 +2962,7 @@
   "sub_53A94": {
     "new_name": "World_OnObjectDestroyed_53A94",
     "segment": "seg114",
-    "summary": "Ex-'Combat_TeamOpposedCheckAndDispatch_53A94'. ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit une arborescence de widgets/nœuds (dispatch vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B pour ajout à liste membre, appelle UIScreen_SetWidgetValue_50654 en fin). Candidat pour session dédiée. REMONTEE PARTIELLE (476 lignes, portion pertinente lue completement a la demande de Remi) : LE NOM PRECEDENT ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion lue ne construit aucun widget. Pose byte_6E4BF=1 (source du declencheur du message de destruction 0x0D via RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a +0x50 (meme champ deja vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A) qui sont l'OPPOSE EXACTE l'une de l'autre (var_4 == -var_6) - probable verification 'cible detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a pas ete relu en detail. RELU 2026-10-06 (partie son et camps) : GESTIONNAIRE DE DESTRUCTION D'UN OBJET (objet detruit, auteur), appele par Debris_SpawnOrchestrator, Debris_SpawnOrchestratorVariant_9D770, AI_EjectDecision_50FF et MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de l'objet detruit (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur, var_7 = pilote ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non ejecte) : objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit rien et que l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense fixe ou objet au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 = XMIT ; table word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il s'agit de l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F."
+    "summary": "Ex-'Combat_TeamOpposedCheckAndDispatch_53A94'. ⚠️ far, 476 lignes, NON DÉTAILLÉE — construit une arborescence de widgets/nœuds (dispatch vtable, Expr_Node_Accessor_52E17 ×3, sub_3A40B pour ajout à liste membre, appelle UIScreen_SetWidgetValue_50654 en fin). Candidat pour session dédiée. REMONTEE PARTIELLE (476 lignes, portion pertinente lue completement a la demande de Remi) : LE NOM PRECEDENT ('UIScreen_BuildWidgetTree') ETAIT TROMPEUR - la portion lue ne construit aucun widget. Pose byte_6E4BF=1 (source du declencheur du message de destruction 0x0D via RadioFlags_ShiftHistory) quand deux entites (di, si) ont une valeur a +0x50 (meme champ deja vu comme identifiant d'appartenance dans AI_MissileThreatTrigger_A) qui sont l'OPPOSE EXACTE l'une de l'autre (var_4 == -var_6) - probable verification 'cible detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350 lignes precedentes) n'a pas ete relu en detail. RELU 2026-10-06 (partie son et camps) : GESTIONNAIRE DE DESTRUCTION D'UN OBJET (objet detruit, auteur), appele par Object_SpawnDestructionEffects_3863A, Debris_SpawnOrchestratorVariant_9D770, AI_EjectDecision_50FF et MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de l'objet detruit (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur, var_7 = pilote ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non ejecte) : objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit rien et que l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense fixe ou objet au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 = XMIT ; table word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il s'agit de l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F."
   },
   "sub_4FBF1": {
     "new_name": "CombatTarget_WeaponActionSubsystem",
@@ -3662,7 +3662,7 @@
   "sub_9D770": {
     "new_name": "Debris_SpawnOrchestratorVariant_9D770",
     "segment": "ovr315",
-    "summary": "⚠️ far, 242 lignes, NON DÉTAILLÉE — combine `Debris_SpawnOrchestrator`, `Math_RandomChance_54E4F` (seg115), allocateurs typés — variante/orchestration finale du spawn de débris."
+    "summary": "⚠️ far, 242 lignes, NON DÉTAILLÉE — combine `Object_SpawnDestructionEffects_3863A`, `Math_RandomChance_54E4F` (seg115), allocateurs typés — variante/orchestration finale du spawn de débris."
   },
   "sub_44A70": {
     "new_name": "Collision_NarrowPhaseTest",
@@ -4540,9 +4540,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7E0BD) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28."
   },
   "sub_4BCD5": {
-    "new_name": "IFF_RecordSubtype",
+    "new_name": "Explosion_LoadFromIFF_4BCD5",
     "segment": "seg105",
-    "summary": "far,19L — copie un tag lu (sub_6BFFF) vers un champ de type (+0x38) : **enregistrement du sous-type de chunk IFF détecté.**"
+    "summary": "far, LECTEUR DE LA CLASSE EXPL (FORM EXPL d'un OBJECTS\\*.IFF ; ex-IFF_RecordSubtype). Lit les chunks communs (Object_LoadCommonChunks_9BA85) puis recopie DAMG (+6) en +0x38 (dégâts par défaut de l'explosion). Classe : 62 o, vtable 0x23E0, catégorie 15 (loc_4BD81 : mov al, 0Fh) ; méthode +4 = Explosion_SpawnInstance_4BCF4."
   },
   "sub_A53E3": {
     "new_name": "PlayerComponentVariantAF_ConstructAndInit_A53E3",
@@ -5840,9 +5840,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9DF63) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39."
   },
   "sub_3863A": {
-    "new_name": "Debris_SpawnOrchestrator",
+    "new_name": "Object_SpawnDestructionEffects_3863A",
     "segment": "seg079",
-    "summary": "far,420L — grosse fonction du même cluster (buffer conséquent, appelle sub_3844F) : **candidat pour l'orchestrateur complet de génération de débris lors de la destruction d'un objet**, à approfondir."
+    "summary": "far, LUE 2026-10-12. EFFETS DE DESTRUCTION D'UN OBJET (ex-Debris_SpawnOrchestrator ; slot de vtable commun à de nombreuses classes d'objets). Après World_OnObjectDestroyed_53A94 : (1) si chunk EXPL (modèle+0x19) : crée l'objet explosion nommé (char[8]), à la position de la source, Explosion_ApplyRadiusAndDamage_4BDFD(rayon = int16 +8, dégâts = int16 +0x0A), même orientation que la source, son SoundFX_Play_5A8DC(3, distance à la caméra) ; (2) si chunk DEBR : Debris_SpawnFromDebrList_3844F(modèle, source, modèle+0x1D) ; (3) si chunk DEST et Registry_LookupForTextRenderer_5B5D9 > 150000 (garde mémoire probable) : crée chaque objet DEST (char[8]) à source + décalage int16 ×3 (<<8, sans aléa), orientation de la source, vitesse = 0,6 × vitesse source. Renvoie 1."
   },
   "sub_A6DF2": {
     "new_name": "TriggerObject_SpawnAndBindFull_A6DF2",
@@ -6942,7 +6942,7 @@
   "sub_23E7D": {
     "new_name": "Cinematic_LoadCameraDef",
     "segment": "seg041",
-    "summary": "far,338L — initialise une zone d'affichage (coordonnées 0,0,0x13F,0xC7), charge une position de texte selon un mode (byte_721F0), recherche des tags de type dans un fichier/objet ('CAMR'=0x524D4143, 'ATCH'=0x48435441 en magic numbers little-endian) via sub_647B2/sub_64BC1 : **candidat pour le chargement/analyse d'un fichier de définition de caméra ou de points d'attache (probable système de cinématique/replay de mission)**, à approfondir. || TRACÉ (session 2026-08-30) : PARSEUR DU 'FORM CAMR' du monde WRLD (caméras scriptées de mission). Appelé Cinematic_LoadCameraDef(listeManager=0x59CD, resourceRecord) via MissionLoader_LoadChunkA_A7C8E depuis World_ParseWrldForm_A767F ; SeekAndReadB('CAMR'=524D4143h), sinon retour immédiat. Itère les sous-chunks, dispatch par tag (record[+0x6D], dword LE) vers un code var_4 : STRT->(String_ConstructFromPtrLen(liste+6,rec), nom du jeu de caméras), CAMR->0, ATCH(48435441h)->1, CHAS(53414843h)->3, CKPT(54504B43h)->4 (+ stub 6B120->HUDSymbol_ConstructVariantN_859C7 ovr246 ; word_6E4B2=obj[+0x5C]), CONT(544E4F43h)->6, VICT(54434956h)->7, ROTA(41544F52h)->8, TARG(47524154h)->9, WEAP(50414557h)->0Bh, COMP(504D4F43h)->13h ; inconnu->14h ignoré. Chaque tag reconnu -> entrée registre 26 o type 0x119C en queue de liste 0x59CD (LinkedListB_InsertAtTail_5F57F) via Kneeboard_EntryConstructText/Obj : +0x04 u8 code type, +0x05 8o = ID (8 premiers octets du payload = nom pour COMP: 'STARTCAM'/'TAKEOFF\\0'/'LANDING\\0'/'AUTOPILT' ; CKPT: obj[+0x53],obj[+0x57]), +0x0E réf objet (CKPT), +0x10 far ptr = PAYLOAD BRUT du chunk (ResourceRecord_ReadFieldGroupA, longueur record[+0x72]), +0x16 u32 longueur. NE DÉCODE PAS les paramètres : seuls l'ID 8o et le tag sont lus. Layout sous-chunk CAMR (décodé sur MAURITAN.IFF) : +0x00 char[8] nom interne, +0x08 u16 flags (CHASECAM: 14o), +0x0A char[8] sujet 'PLAYER', (CKPT: +0x12 char[8] art 'F16-CKPT'), puis u32 farClip=50000, u16 fov=40, nearClip~10, u32 0, u16,u16 viewport 319,199 ; VICT/WEAP ajoutent une table d'offsets i32 FIXED-POINT 24.8 (val/256 = mètres, relatifs au sujet). COMP : en-tête + u8 compte + char[8] sujet + SCRIPT keyframes variable (opcodes 1o, petits int signés, offsets i32/256), terminé par octet 0xFE + char[8] vue de reprise ('COCKPIT'). Objet caméra runtime word_72A8F : +0x14/+0x18/+0x1C i32 X/Z/Y monde 24.8 (preuve : HUD_RenderSymbologyMain/Alt seg088, Debris_SpawnOrchestrator seg079 : delta entité[+0x12/+0x16/+0x1A] - cam[+0x14/..] -> Math_VectorLength3D_5828E -> sar eax,8) ; +0x50 far vtable ([0]=tick keyframe, [4]=stop préc, [0x10]=start/parse script, [0x14]=get state, 4=mode spécial) ; +0x5C sous-objet ; +0x60 dword. Activation : Kneeboard_SelectByID(0x59CD,nom) depuis seg009 (état vol, 'TAKEOFF'), ovr233 UIScript_ParseAndEvaluate_7A054 ('AUTOPILT' + Camera_DetachParent), Player_MainUpdate (Kneeboard_SelectByStateCode(0x59CD,4)), Expr_VM_OpcodeHelperA_53504 (opcode +0xA38). OUVERT : interpréteur COMP dans vtable [cam+0x50] slots [0x10]/[0x00], overlay-swappés, non ouverts. Détail complet : DATA_MODEL.md §6.6b b-bis."
+    "summary": "far,338L — initialise une zone d'affichage (coordonnées 0,0,0x13F,0xC7), charge une position de texte selon un mode (byte_721F0), recherche des tags de type dans un fichier/objet ('CAMR'=0x524D4143, 'ATCH'=0x48435441 en magic numbers little-endian) via sub_647B2/sub_64BC1 : **candidat pour le chargement/analyse d'un fichier de définition de caméra ou de points d'attache (probable système de cinématique/replay de mission)**, à approfondir. || TRACÉ (session 2026-08-30) : PARSEUR DU 'FORM CAMR' du monde WRLD (caméras scriptées de mission). Appelé Cinematic_LoadCameraDef(listeManager=0x59CD, resourceRecord) via MissionLoader_LoadChunkA_A7C8E depuis World_ParseWrldForm_A767F ; SeekAndReadB('CAMR'=524D4143h), sinon retour immédiat. Itère les sous-chunks, dispatch par tag (record[+0x6D], dword LE) vers un code var_4 : STRT->(String_ConstructFromPtrLen(liste+6,rec), nom du jeu de caméras), CAMR->0, ATCH(48435441h)->1, CHAS(53414843h)->3, CKPT(54504B43h)->4 (+ stub 6B120->HUDSymbol_ConstructVariantN_859C7 ovr246 ; word_6E4B2=obj[+0x5C]), CONT(544E4F43h)->6, VICT(54434956h)->7, ROTA(41544F52h)->8, TARG(47524154h)->9, WEAP(50414557h)->0Bh, COMP(504D4F43h)->13h ; inconnu->14h ignoré. Chaque tag reconnu -> entrée registre 26 o type 0x119C en queue de liste 0x59CD (LinkedListB_InsertAtTail_5F57F) via Kneeboard_EntryConstructText/Obj : +0x04 u8 code type, +0x05 8o = ID (8 premiers octets du payload = nom pour COMP: 'STARTCAM'/'TAKEOFF\\0'/'LANDING\\0'/'AUTOPILT' ; CKPT: obj[+0x53],obj[+0x57]), +0x0E réf objet (CKPT), +0x10 far ptr = PAYLOAD BRUT du chunk (ResourceRecord_ReadFieldGroupA, longueur record[+0x72]), +0x16 u32 longueur. NE DÉCODE PAS les paramètres : seuls l'ID 8o et le tag sont lus. Layout sous-chunk CAMR (décodé sur MAURITAN.IFF) : +0x00 char[8] nom interne, +0x08 u16 flags (CHASECAM: 14o), +0x0A char[8] sujet 'PLAYER', (CKPT: +0x12 char[8] art 'F16-CKPT'), puis u32 farClip=50000, u16 fov=40, nearClip~10, u32 0, u16,u16 viewport 319,199 ; VICT/WEAP ajoutent une table d'offsets i32 FIXED-POINT 24.8 (val/256 = mètres, relatifs au sujet). COMP : en-tête + u8 compte + char[8] sujet + SCRIPT keyframes variable (opcodes 1o, petits int signés, offsets i32/256), terminé par octet 0xFE + char[8] vue de reprise ('COCKPIT'). Objet caméra runtime word_72A8F : +0x14/+0x18/+0x1C i32 X/Z/Y monde 24.8 (preuve : HUD_RenderSymbologyMain/Alt seg088, Object_SpawnDestructionEffects_3863A seg079 : delta entité[+0x12/+0x16/+0x1A] - cam[+0x14/..] -> Math_VectorLength3D_5828E -> sar eax,8) ; +0x50 far vtable ([0]=tick keyframe, [4]=stop préc, [0x10]=start/parse script, [0x14]=get state, 4=mode spécial) ; +0x5C sous-objet ; +0x60 dword. Activation : Kneeboard_SelectByID(0x59CD,nom) depuis seg009 (état vol, 'TAKEOFF'), ovr233 UIScript_ParseAndEvaluate_7A054 ('AUTOPILT' + Camera_DetachParent), Player_MainUpdate (Kneeboard_SelectByStateCode(0x59CD,4)), Expr_VM_OpcodeHelperA_53504 (opcode +0xA38). OUVERT : interpréteur COMP dans vtable [cam+0x50] slots [0x10]/[0x00], overlay-swappés, non ouverts. Détail complet : DATA_MODEL.md §6.6b b-bis."
   },
   "sub_67DA4": {
     "new_name": "OptionCounter_Construct_67DA4",
@@ -10930,9 +10930,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_9B48F) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=28FE0h, codesize=6AFh, nentries=10."
   },
   "sub_9BA85": {
-    "new_name": "Debris_LoadFieldMix_9BA85",
+    "new_name": "Object_LoadCommonChunks_9BA85",
     "segment": "ovr302",
-    "summary": "⚠️ far, 420 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743/ReadFieldGroupB_64A54 répétés."
+    "summary": "far, LUE 2026-10-12. LECTEUR DES CHUNKS COMMUNS D'UN OBJET (ex-Debris_LoadFieldMix ; via VROOMM_StubThunk_6BFFF, appelé par les lecteurs de classe d'IFF_LoadModelMain : ORNT/RNWY via IFF_LoadAngleParam, EXPL via Explosion_LoadFromIFF_4BCD5, etc.). Alloue d'abord un sous-objet de 23 o (objet+8 ; +0x10 = 0x5DC00 = 1500,0). Chunks cherchés par tag dans le niveau courant (tous facultatifs) : DAMG uint16 → +6 (points de dégâts ; 65535 → +3 = 1 indestructible ; absent → 10) ; TRGT uint16 → +0x11 (octet bas) ; SIGN 3× uint8 → +0x12/+0x13/+0x14 (absent → 0) ; EXPL 12 o bruts → +0x19 (far ptr) = {char[8] modèle d'explosion, int16 rayon (m), int16 dégâts max} ; DEBR uint16 → +0x1D (nombre de débris à créer) puis (taille−2)/26 enregistrements de 26 o → +0x1F nombre, +0x21 tableau = {char[8] modèle, 3× int16 dispersion de position, 3× int16 vitesse de base, 3× int16 dispersion de vitesse} ; DEST taille/14 enregistrements de 14 o → +0x25 nombre, +0x27 tableau = {char[8] modèle, 3× int16 décalage} ; CHLD taille/32 enregistrements de 32 o (sous-objets attachés : char[8] nom, 3× int32 24.8 position, 3× int32 angles → Matrix_BuildFullOrientation_575B2) → +0x0F nombre, +0x0D tableau de records mémoire de 0x39 o. Consommateurs : Object_SpawnDestructionEffects_3863A (EXPL/DEBR/DEST), Debris_SpawnFromDebrList_3844F (DEBR). Détail : DATA_MODEL.md §6.1."
   },
   "sub_29E4": {
     "new_name": "CRT_Strcat",
@@ -11680,9 +11680,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A1289) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_4BDFD": {
-    "new_name": "Debris_ConfigureByTargetType",
+    "new_name": "Explosion_ApplyRadiusAndDamage_4BDFD",
     "segment": "seg105",
-    "summary": "far,49L — teste un type de cible (vtable[0x24] ∈ {3,5}), copie des paramètres de position/durée (arg_3/arg_6/arg_8) avec valeur par défaut (100) : **configuration des paramètres d'un débris/effet selon le type de cible (position, durée de vie).**"
+    "summary": "far, APPLIQUE LE RAYON ET LES DÉGÂTS D'UN CHUNK EXPL À UNE EXPLOSION CRÉÉE (ex-Debris_ConfigureByTargetType). Appelée par Object_SpawnDestructionEffects_3863A avec (instance, rayon<<8, dégâts, 100). Instance +0x51 = rayon (24.8), +0x55 = dégâts max, +0x57 = 3e paramètre sauf s'il vaut 100 ; si le sous-objet +0x0A est de type 3 ou 5 (vtable +0x24), son +0x0D = rayon entier. Lus par Explosion_DamageAtDistance_4BE51."
   },
   "sub_67B0D": {
     "new_name": "Joystick_UpdateCalibration_67B0D",
@@ -13775,9 +13775,9 @@
     "summary": "far,47L — constructeur en cascade (types 0x10E4→0x1ADC→0x258C) : reset physique de débris (sub_37C4C), initialise un sous-objet UI (sub_56D43/sub_56D72), positionne un flag (+4 bit4) : **constructeur d'objet composite complet (corps physique + rendu + UI), classe de base d'un objet du monde de jeu (avion/débris/armement).**"
   },
   "sub_4BDDA": {
-    "new_name": "Camera_InitAttachWithModeFlags",
+    "new_name": "Explosion_AttachToSource_4BDDA",
     "segment": "seg105",
-    "summary": "far,20L — positionne des flags (+0x59=1, +4 bits 0 et 2) puis attache une cible (sub_37C89) : **initialisation d'un composant caméra/attache avec flags de mode combinés.**"
+    "summary": "far, ATTACHE UNE EXPLOSION À L'OBJET QUI LA PRODUIT (ex-Camera_InitAttachWithModeFlags, aucun rapport avec une caméra) : instance +0x59 = 1, bits 0 et 2 de +4, puis Debris_BodyAttachToSubpart(instance, source). Appelée par Explosion_SpawnInstance_4BCF4."
   },
   "sub_8ED6E": {
     "new_name": "CRT_FormatAndValidateStream_8ED6E",
@@ -15295,9 +15295,9 @@
     "summary": "Ex-'Interrupt_TimerCaseB_5974D' (nom de notre base) ; renommee par la session musique (archive handoff 2026-10-06). ★ far — COMMIT DE LECTURE + REPRISE APRÈS PISTE TRANSITOIRE, lue ligne à ligne intégralement. Anciennement Music_TuneTransitionCommit_5974D. Un des 4 cas de Music_SequencerTickDispatch_59436. Libère le canal transition (5BF5h) et conditionnellement le canal principal (5BE3h, si byte_72CA1==1), commit byte_72C90=word_70859, recharge et démarre la lecture (Music_ChannelRegisterSequence_59FF5 + sub_603CC) sur le canal 5BE3h. Registre de reprise à un seul niveau : si la piste qui vient de démarrer (di) est une piste transitoire de menu (0x10 ≤ di ≤ 0x12), REMPLACE immédiatement word_70859 par word_7085B (piste sauvegardée avant la transition, positionnée dans Music_TuneTransitionResolve_595C2). Voir MUSIC_SYSTEM.md §4.4."
   },
   "sub_3844F": {
-    "new_name": "Debris_SpawnAtAttachPoint",
+    "new_name": "Debris_SpawnFromDebrList_3844F",
     "segment": "seg079",
-    "summary": "far,200L — tire un nombre aléatoire (sub_5D43F) comparé à un seuil (0x1800), résout un point d'attache indexé (sub_54DF4, table 0x1A octets/entrée), appelle sub_38B70 avec un identifiant fixe (0x571C) : **génération probabiliste de débris à un point d'attache lors de la destruction d'un composant.**"
+    "summary": "far, LUE 2026-10-12. CRÉE LES DÉBRIS D'UN OBJET DÉTRUIT depuis son chunk DEBR (ex-Debris_SpawnAtAttachPoint). Args : (modèle, objet source, nombre = modèle+0x1D). Rien si pas de liste ou si DisplayCache_ComputeChecksum_5D43F ≤ 6144 (garde de budget, rôle exact non tranché). Vitesse de la source (vtable +0x4C) mise à l'échelle 0x99/256 = 0,6 (Utility_Helper_55A62). Pour chaque débris : enregistrement tiré au hasard (Math_RandomScale_54DF4(modèle+0x1F) ; imul ax, 1Ah), objet créé par son nom (ObjectPrototype_FindOrLoadAndInstantiate_38B70), position = source + aléa[−d, +d] sur chaque axe (Math_RandomJitter_54E1C(rec+8/+0x0A/+0x0C), <<8), vitesse = 0,6 × vitesse source + rec+0x0E/+0x10/+0x12 (<<8) + aléa(rec+0x14/+0x16/+0x18) ; vitesse posée par vtable +0x50 ; ajouté à la liste des objets (59C3h)."
   },
   "sub_6CBB5": {
     "new_name": "VROOMM_StubThunk_6CBB5",
@@ -18933,5 +18933,15 @@
     "new_name": "OrntModel_GetCategory_3C93B",
     "segment": "seg084",
     "summary": "far, LUE 2026-10-06. 'mov al, 1 / retf' : categorie 1, slot +8 de la vtable 0x6F628 (tag 2578h) que IFF_LoadModelMain pose sur les objets ORNT (decor oriente : immeubles...) juste apres la base 1B6Fh, avant IFF_LoadAngleParam. 2578h sert aussi de tag intermediaire aux classes derivees (TRCR, AFTB, MOBL...)."
+  },
+  "loc_4BE51": {
+    "new_name": "Explosion_DamageAtDistance_4BE51",
+    "segment": "seg105",
+    "summary": "far, méthode de vtable (seg339:off_7015E) de l'objet explosion (vtable 0x302A). DÉGÂTS INFLIGÉS PAR L'EXPLOSION À UNE CIBLE : d = distance 3D (Math_VectorLength3D_Raw_5828E) entre l'explosion (+0x12) et la cible (+0x12), moins la taille de la cible (cible vtable[0] → +8 → +0x10), bornée à 0 ; si rayon (+0x51) > d : facteur = (rayon − d) / rayon (shl eax, 8 / idiv) sinon 0 ; dégâts = facteur × dégâts max (+0x55, <<8 puis imul/shrd 8) ; renvoie la partie entière (mov ax, [bp-3]). Décroissance LINÉAIRE avec la distance."
+  },
+  "loc_4BCF4": {
+    "new_name": "Explosion_SpawnInstance_4BCF4",
+    "segment": "seg105",
+    "summary": "far, méthode +4 de la classe EXPL (vtable 0x23E0, seg339:23E4) : crée l'instance d'explosion (CRT_Malloc16_Retry(0x5E), WorldObject_BaseConstruct, vtable 0x302A, +0x5A = 0), l'attache à la source (Explosion_AttachToSource_4BDDA), puis copie du modèle : +0x3A (dword) → instance +0x51 (rayon), +0x38 (DAMG) → +0x55 (dégâts max), +0x36 → +0x57. Ces valeurs sont ensuite remplacées par celles du chunk EXPL de l'objet détruit (Explosion_ApplyRadiusAndDamage_4BDFD)."
   }
 }

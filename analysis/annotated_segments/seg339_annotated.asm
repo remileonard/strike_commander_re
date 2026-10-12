@@ -1331,7 +1331,7 @@ byte_6E4B4	db 0			; DATA XREF: Mission_TriggerEvaluator+2Ar
 byte_6E4B5	db 0			; DATA XREF: RadioFlags_ResetBank:loc_28EB9w
 					; STRIKE_EXE_MAIN_LOOP+30r ...
 byte_6E4B6	db 0			; DATA XREF: RadioFlags_ResetBank+Dw
-					; Debris_SpawnOrchestrator+89r ...
+					; Object_SpawnDestructionEffects_3863A+89r ...
 byte_6E4B7	db 2			; DATA XREF: RadioFlags_ResetBank+12w
 					; STRIKE_EXE_MAIN_LOOP+34r ...
 byte_6E4B8	db 0			; DATA XREF: Player_MainUpdate+8Dw
@@ -1903,7 +1903,7 @@ off_6EC1B	dd VROOMM_StubThunk_6BFF0
 off_6EC1F	dd VROOMM_StubThunk_6C009
 		dd loc_3837E
 off_6EC27	dd loc_38377
-off_6EC2B	dd Debris_SpawnOrchestrator
+off_6EC2B	dd Object_SpawnDestructionEffects_3863A
 off_6EC2F	dd loc_383DF
 		align 2
 byte_6EC34	db 0			; DATA XREF: Explosion_CreateFireball+1DCw
@@ -2426,75 +2426,75 @@ aPlayer_1	db 'PLAYER',0           ; DATA XREF: Debris_AllocateFamily_9CB2C+3Bo
 off_6F454	dd Dtor_ScalarDeleting_4F2C1
 off_6F458	dd VROOMM_StubThunk_6CCF5
 		dd ClassStub_ReturnConst16h_4F2BA
-off_6F460	dd Debris_SpawnOrchestrator
+off_6F460	dd Object_SpawnDestructionEffects_3863A
 off_6F464	dd loc_383DF
 off_6F468	dd loc_3C827
 off_6F46C	dd VROOMM_StubThunk_6CC1F
 		dd loc_4C050
-off_6F474	dd Debris_SpawnOrchestrator
+off_6F474	dd Object_SpawnDestructionEffects_3863A
 		dd loc_383DF
 off_6F47C	dd loc_4BA49
 off_6F480	dd loc_4B973
 		dd loc_4BA42
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F48C	dd loc_383DF
 off_6F490	dd loc_4BD88
-		dd loc_4BCF4
+		dd Explosion_SpawnInstance_4BCF4
 		dd loc_4BD81
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F4A0	dd loc_4BDD3
 		dd loc_3C86C
 off_6F4A8	dd loc_46103
 off_6F4AC	dd loc_460FC
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F4B4	dd VROOMM_StubThunk_6C0B0
 		dd loc_4538E
 off_6F4BC	dd VROOMM_StubThunk_6C675
 off_6F4C0	dd loc_45387
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 		dd loc_383DF
 		dd loc_43416
 off_6F4D0	dd VROOMM_StubThunk_6C5E5
 off_6F4D4	dd loc_4340F
-off_6F4D8	dd Debris_SpawnOrchestrator
+off_6F4D8	dd Object_SpawnDestructionEffects_3863A
 off_6F4DC	dd loc_383DF
 off_6F4E0	dd loc_3C8B1
 off_6F4E4	dd VROOMM_StubThunk_6C085
 		dd DecoyModel_GetCategory_45190
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F4F0	dd loc_383DF
 off_6F4F4	dd loc_41905
 off_6F4F8	dd VROOMM_StubThunk_6C489
 off_6F4FC	dd loc_418B3
-off_6F500	dd Debris_SpawnOrchestrator
+off_6F500	dd Object_SpawnDestructionEffects_3863A
 off_6F504	dd VROOMM_StubThunk_6C5AF
 		dd BombModel_TestGuidedLockCone_41735
 off_6F50C	dd BombModel_PredictImpact_41311
 off_6F510	dd Countermeasure_DestructA
 off_6F514	dd VROOMM_StubThunk_6C475
 		dd loc_418B3
-off_6F51C	dd Debris_SpawnOrchestrator
+off_6F51C	dd Object_SpawnDestructionEffects_3863A
 off_6F520	dd VROOMM_StubThunk_6C5AF
 		dd BombModel_TestGuidedLockCone_41735
 		dd BombModel_PredictImpact_41311
 		dd loc_46036
 off_6F530	dd loc_45FCA
 off_6F534	dd loc_45FC3
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F53C	dd VROOMM_StubThunk_6C5AF
 off_6F540	dd MissileModel_TestInRange_42F71
 off_6F544	dd loc_45CEA
 off_6F548	dd loc_42D04
 off_6F54C	dd VROOMM_StubThunk_6C535
 off_6F550	dd loc_42CFD
-off_6F554	dd Debris_SpawnOrchestrator
+off_6F554	dd Object_SpawnDestructionEffects_3863A
 		dd VROOMM_StubThunk_6C5AF
 		dd MissileModel_TestInRange_42F71
 off_6F560	dd WeaponModel_InitialVelocityZero_42E80
 		dd loc_45BC2
 		dd VROOMM_StubThunk_6C6D5
 		dd loc_45BBB
-off_6F570	dd Debris_SpawnOrchestrator
+off_6F570	dd Object_SpawnDestructionEffects_3863A
 off_6F574	dd loc_383DF
 		dd loc_3E51D
 off_6F57C	dd VROOMM_StubThunk_6C290
@@ -2504,32 +2504,32 @@ off_6F588	dd VROOMM_StubThunk_6C2F0
 		dd Camera_DestructCompoundA
 off_6F590	dd VROOMM_StubThunk_6C205
 		dd loc_3DE1C
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 		dd loc_383DF
 off_6F5A0	dd Camera_DestructTypeC
 off_6F5A4	dd VROOMM_StubThunk_6C1D9
 off_6F5A8	dd loc_3DCD4
-off_6F5AC	dd Debris_SpawnOrchestrator
+off_6F5AC	dd Object_SpawnDestructionEffects_3863A
 off_6F5B0	dd loc_383DF
 off_6F5B4	dd Camera_DestructSimple
 		dd VROOMM_StubThunk_6C1C5
 off_6F5BC	dd loc_3DADB
-off_6F5C0	dd Debris_SpawnOrchestrator
+off_6F5C0	dd Object_SpawnDestructionEffects_3863A
 		dd loc_383DF
 		dd loc_4EF1B
 		dd VROOMM_StubThunk_6CCB9
 off_6F5D0	dd loc_4EF66
-off_6F5D4	dd Debris_SpawnOrchestrator
+off_6F5D4	dd Object_SpawnDestructionEffects_3863A
 off_6F5D8	dd loc_4EF6D
 off_6F5DC	dd Camera_DestructTypeB
 		dd VROOMM_StubThunk_6C1CF
 		dd loc_3DBBA
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 		dd loc_383DF
 off_6F5F0	dd Targeting_DestructComponent
 off_6F5F4	dd VROOMM_StubThunk_6C5AA
 off_6F5F8	dd loc_4333C
-off_6F5FC	dd Debris_SpawnOrchestrator
+off_6F5FC	dd Object_SpawnDestructionEffects_3863A
 off_6F600	dd VROOMM_StubThunk_6C5AF
 off_6F604	dd MissileModel_TestInRange_42F71
 off_6F608	dd WeaponModel_InitialVelocityZero_42E80
@@ -2543,7 +2543,7 @@ off_6F624	dd loc_4D770
 		dd loc_3C8F6
 		dd loc_3C996
 off_6F630	dd OrntModel_GetCategory_3C93B
-		dd Debris_SpawnOrchestrator
+		dd Object_SpawnDestructionEffects_3863A
 off_6F638	dd loc_383DF
 off_6F63C	dd loc_37CF4
 off_6F640	dd Debris_NotifyChildValidate
@@ -3325,7 +3325,7 @@ off_7014E	dd loc_3CBC6
 off_70152	dd loc_3CB3A
 off_70156	dd WorldObject_GetSignatureByte0_381E5
 off_7015A	dd VROOMM_StubThunk_6BFB0
-off_7015E	dd loc_4BE51
+off_7015E	dd Explosion_DamageAtDistance_4BE51
 off_70162	dd loc_38342
 off_70166	dd loc_4C7ED
 off_7016A	dd loc_21E2C
@@ -3550,15 +3550,15 @@ byte_70477	db 0			; DATA XREF: Cockpit_ViewPanTransitionMain_15B67:loc_15E79r
 					; MissionLoader_SpawnEntity_A7B1E+134w
 byte_70478	db 1			; DATA XREF: seg020:loc_17931w
 					; UIScreen_ComputeDerivedFields_503EB:loc_503FEr	...
-word_70479	dw 0			; DATA XREF: Debris_SpawnOrchestrator:loc_3868Bw
+word_70479	dw 0			; DATA XREF: Object_SpawnDestructionEffects_3863A:loc_3868Bw
 					; WeaponSystem_LaunchFromStation_3E744:loc_3E8D1r	...
-word_7047B	dw 0			; DATA XREF: Debris_SpawnOrchestrator+64w
+word_7047B	dw 0			; DATA XREF: Object_SpawnDestructionEffects_3863A+64w
 					; WeaponSystem_LaunchFromStation_3E744+E84r ...
-word_7047D	dw 0			; DATA XREF: Debris_SpawnOrchestrator+4Bw
+word_7047D	dw 0			; DATA XREF: Object_SpawnDestructionEffects_3863A+4Bw
 					; WeaponSystem_LaunchFromStation_3E744+187r ...
-word_7047F	dw 0			; DATA XREF: Debris_SpawnOrchestrator+32w
+word_7047F	dw 0			; DATA XREF: Object_SpawnDestructionEffects_3863A+32w
 					; WeaponSystem_LaunchFromStation_3E744+BDDr ...
-word_70481	dw 0			; DATA XREF: Debris_SpawnOrchestrator:loc_38672w
+word_70481	dw 0			; DATA XREF: Object_SpawnDestructionEffects_3863A:loc_38672w
 					; WeaponSystem_LaunchFromStation_3E744:loc_3F327r	...
 word_70483	dw 0			; DATA XREF: Emitter_UpdateFromEntitySMOKVec_3D57E:loc_3D5A0r
 					; Emitter_UpdateFromEntitySMOKVec_3D57E+426r ...

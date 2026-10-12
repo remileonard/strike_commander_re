@@ -582,7 +582,7 @@ loc_9DCF4:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9DC3Dj
 		push	ax
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
-		call	Debris_SpawnAtAttachPoint
+		call	Debris_SpawnFromDebrList_3844F
 		add	sp, 8
 
 loc_9DD18:				; CODE XREF: Collision_OnTerrainContact_9D910+3F6j

@@ -7,7 +7,7 @@ ovr315		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 242 lignes, NON DÉTAILLÉE — combine Debris_SpawnOrchestrator,
+; ⚠️ far, 242 lignes, NON DÉTAILLÉE — combine Object_SpawnDestructionEffects_3863A,
 ; Math_RandomChance_54E4F (seg115), allocateurs typés — variante/orchestration finale du spawn
 ; de débris.
 ; ==============================================================================================
@@ -71,7 +71,7 @@ loc_9D7B4:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770:loc_9D7AFj
 
 loc_9D7B8:
 		push	large [bp+arg_0]
-		call	Debris_SpawnOrchestrator
+		call	Object_SpawnDestructionEffects_3863A
 		add	sp, 8
 		jmp	loc_9D90B
 ; ���������������������������������������������������������������������������
@@ -243,7 +243,7 @@ loc_9D8F5:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+15Aj
 		push	di
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	Debris_SpawnAtAttachPoint
+		call	Debris_SpawnFromDebrList_3844F
 		add	sp, 8
 		mov	al, 0
 

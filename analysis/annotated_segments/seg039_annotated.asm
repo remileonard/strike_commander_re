@@ -239,8 +239,8 @@ loc_21F8A:				; CODE XREF: seg039:00F6j
 ; d'égalité). Appelée avec le tag 0x59C3 (liste des entités du monde) au spawn et au
 ; chargement de mission.
 ; ==============================================================================================
-List_AppendIfNonNull_21F8D	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+1D1P
-					; Debris_SpawnOrchestrator+1C5P ...
+List_AppendIfNonNull_21F8D	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+1D1P
+					; Object_SpawnDestructionEffects_3863A+1C5P ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -1488,7 +1488,7 @@ Container_FindByKey	endp
 ; far,51L — (cluster conteneur) — variante de recherche/insertion, non détaillée.
 ; ==============================================================================================
 Container_Op_2258E	proc far		; CODE XREF: World_IterateObjects+2Ap
-					; Debris_SpawnOrchestrator+20EP
+					; Object_SpawnDestructionEffects_3863A+20EP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

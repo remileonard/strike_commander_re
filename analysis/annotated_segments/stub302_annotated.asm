@@ -31,7 +31,7 @@ VROOMM_StubThunk_6BFF0	endp
 ; far, thunk fixe VROOMM (jmp sub_9BF6A) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=29A70h, codesize=7CCh, nentries=9.
 ; ==============================================================================================
-VROOMM_StubThunk_6BFF5	proc far		; DATA XREF: Debris_LoadFieldMix_9BA85+2CFo
+VROOMM_StubThunk_6BFF5	proc far		; DATA XREF: Object_LoadCommonChunks_9BA85+2CFo
 		jmp	Debris_ConstructEmptyWithFormation_9BF6A
 VROOMM_StubThunk_6BFF5	endp
 
@@ -60,7 +60,7 @@ VROOMM_StubThunk_6BFFA	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6BFFF	proc far		; CODE XREF: IFF_LoadModelMain+164P
 					; IFF_LoadAngleParam+1CP ...
-		jmp	Debris_LoadFieldMix_9BA85
+		jmp	Object_LoadCommonChunks_9BA85
 VROOMM_StubThunk_6BFFF	endp
 
 

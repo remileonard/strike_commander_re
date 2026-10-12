@@ -6806,18 +6806,18 @@ STRIKE_EXE_MAIN_LOOP	endp
 ; detruite appartient au camp oppose', PAS un trait ATRB. Le reste de la fonction (les ~350
 ; lignes precedentes) n'a pas ete relu en detail. RELU 2026-10-06 (partie son et camps) :
 ; GESTIONNAIRE DE DESTRUCTION D'UN OBJET (objet detruit, auteur), appele par
-; Debris_SpawnOrchestrator, Debris_SpawnOrchestratorVariant_9D770, AI_EjectDecision_50FF et
-; MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de l'objet detruit
-; (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur, var_7 = pilote
-; ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non ejecte) :
-; objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit rien et que
-; l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense fixe ou objet
-; au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 = XMIT ; table
-; word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il s'agit de
-; l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
+; Object_SpawnDestructionEffects_3863A, Debris_SpawnOrchestratorVariant_9D770,
+; AI_EjectDecision_50FF et MissionRecord_LoadAndBuildWidgetTree_7D31A. var_2 = categorie de
+; l'objet detruit (vtable+0x34), var_6 / var_4 = camps ([+0x50]) de l'objet et de l'auteur,
+; var_7 = pilote ejecte. Musique (si le joueur n'est ni mort ni l'objet detruit, et pilote non
+; ejecte) : objet du camp adverse (0xFF) -> Music_OnObjectDestroyed_5AA49 ; s'il ne choisit
+; rien et que l'auteur est le joueur : ponctuation 0x10 (avion, categorie 6), 0x11 (defense
+; fixe ou objet au sol, 0x13/0x14), 0x12 (autre : categorie 1 = ORNT, decor oriente, ou 0x15 =
+; XMIT ; table word_53D7E = 1, 6, 0x13, 0x14, 0x15). Objet du camp du joueur (1) : 0x0E s'il
+; s'agit de l'objet designe par la mission (VROOMM_StubThunk_6CE2E(word_706A0)), sinon 0x0F.
 ; ==============================================================================================
 World_OnObjectDestroyed_53A94	proc far		; CODE XREF: AI_EjectDecision_50FF+13CP
-					; Debris_SpawnOrchestrator+7BP ...
+					; Object_SpawnDestructionEffects_3863A+7BP ...
 
 var_16		= word ptr -16h
 var_14		= word ptr -14h

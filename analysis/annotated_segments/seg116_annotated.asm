@@ -1704,8 +1704,8 @@ Utility_Helper_55A37	endp
 ; ==============================================================================================
 ; far, référencée par sub_3844F (rôle exact non détaillé).
 ; ==============================================================================================
-Utility_Helper_55A62	proc far		; CODE XREF: Debris_SpawnAtAttachPoint+5DP
-					; Debris_SpawnOrchestrator+247P
+Utility_Helper_55A62	proc far		; CODE XREF: Debris_SpawnFromDebrList_3844F+5DP
+					; Object_SpawnDestructionEffects_3863A+247P
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8

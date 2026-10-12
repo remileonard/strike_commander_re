@@ -1000,7 +1000,7 @@ identifiés, avec quelques ajouts :
 - **Terrain** : `Terrain_ComputeVisibilityAndAltitude_98CF0`,
   chargement de cartes d'élévation, gestion de tuiles.
 - **Débris/particules** : système complet de simulation physique de
-  débris (`Debris_ComputeTorque`, `Debris_SpawnOrchestrator`,
+  débris (`Debris_ComputeTorque`, `Object_SpawnDestructionEffects_3863A`,
   `Particle_ListFreeAll`).
 - **Caméra** : famille de constructeurs (`Camera_ConstructWithSecondaryTarget`,
   `Camera_ConstructAttachedWithTarget`, etc.).

@@ -8,10 +8,12 @@ seg105		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,19L — copie un tag lu (sub_6BFFF) vers un champ de type (+0x38) : enregistrement du
-; sous-type de chunk IFF détecté.
+; far, LECTEUR DE LA CLASSE EXPL (FORM EXPL d'un OBJECTS\*.IFF ; ex-IFF_RecordSubtype). Lit
+; les chunks communs (Object_LoadCommonChunks_9BA85) puis recopie DAMG (+6) en +0x38 (dégâts
+; par défaut de l'explosion). Classe : 62 o, vtable 0x23E0, catégorie 15 (loc_4BD81 : mov al,
+; 0Fh) ; méthode +4 = Explosion_SpawnInstance_4BCF4.
 ; ==============================================================================================
-IFF_RecordSubtype	proc far		; CODE XREF: IFF_LoadModelMain+D07P
+Explosion_LoadFromIFF_4BCD5	proc far		; CODE XREF: IFF_LoadModelMain+D07P
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -29,11 +31,19 @@ loc_4BCD8:				; DATA XREF: seg216:040Eo
 		mov	es:[bx+38h], ax
 		pop	bp
 		retf
-IFF_RecordSubtype	endp
+Explosion_LoadFromIFF_4BCD5	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4BCF4:				; DATA XREF: seg339:23E4o
+; ==============================================================================================
+; far, méthode +4 de la classe EXPL (vtable 0x23E0, seg339:23E4) : crée l'instance d'explosion
+; (CRT_Malloc16_Retry(0x5E), WorldObject_BaseConstruct, vtable 0x302A, +0x5A = 0), l'attache à
+; la source (Explosion_AttachToSource_4BDDA), puis copie du modèle : +0x3A (dword) → instance
+; +0x51 (rayon), +0x38 (DAMG) → +0x55 (dégâts max), +0x36 → +0x57. Ces valeurs sont ensuite
+; remplacées par celles du chunk EXPL de l'objet détruit
+; (Explosion_ApplyRadiusAndDamage_4BDFD).
+; ==============================================================================================
+Explosion_SpawnInstance_4BCF4:				; DATA XREF: seg339:23E4o
 		push	bp
 		mov	bp, sp
 		sub	sp, 14h
@@ -55,7 +65,7 @@ loc_4BCF4:				; DATA XREF: seg339:23E4o
 		push	si
 		nop
 		push	cs
-		call	near ptr Camera_InitAttachWithModeFlags
+		call	near ptr Explosion_AttachToSource_4BDDA
 		add	sp, 6
 		mov	ax, si
 		jmp	short loc_4BD34
@@ -151,10 +161,11 @@ loc_4BDD3:				; DATA XREF: seg339:off_6F4A0o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,20L — positionne des flags (+0x59=1, +4 bits 0 et 2) puis attache une cible (sub_37C89)
-; : initialisation d'un composant caméra/attache avec flags de mode combinés.
+; far, ATTACHE UNE EXPLOSION À L'OBJET QUI LA PRODUIT (ex-Camera_InitAttachWithModeFlags,
+; aucun rapport avec une caméra) : instance +0x59 = 1, bits 0 et 2 de +4, puis
+; Debris_BodyAttachToSubpart(instance, source). Appelée par Explosion_SpawnInstance_4BCF4.
 ; ==============================================================================================
-Camera_InitAttachWithModeFlags	proc far		; CODE XREF: seg105:0058p
+Explosion_AttachToSource_4BDDA	proc far		; CODE XREF: seg105:0058p
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
@@ -173,7 +184,7 @@ arg_2		= dword	ptr  8
 		pop	si
 		pop	bp
 		retf
-Camera_InitAttachWithModeFlags	endp
+Explosion_AttachToSource_4BDDA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -181,11 +192,13 @@ Camera_InitAttachWithModeFlags	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,49L — teste un type de cible (vtable[0x24] ∈ {3,5}), copie des paramètres de
-; position/durée (arg_3/arg_6/arg_8) avec valeur par défaut (100) : configuration des
-; paramètres d'un débris/effet selon le type de cible (position, durée de vie).
+; far, APPLIQUE LE RAYON ET LES DÉGÂTS D'UN CHUNK EXPL À UNE EXPLOSION CRÉÉE (ex-
+; Debris_ConfigureByTargetType). Appelée par Object_SpawnDestructionEffects_3863A avec
+; (instance, rayon<<8, dégâts, 100). Instance +0x51 = rayon (24.8), +0x55 = dégâts max, +0x57
+; = 3e paramètre sauf s'il vaut 100 ; si le sous-objet +0x0A est de type 3 ou 5 (vtable
+; +0x24), son +0x0D = rayon entier. Lus par Explosion_DamageAtDistance_4BE51.
 ; ==============================================================================================
-Debris_ConfigureByTargetType	proc far		; CODE XREF: Debris_SpawnOrchestrator:loc_3874CP
+Explosion_ApplyRadiusAndDamage_4BDFD	proc far		; CODE XREF: Object_SpawnDestructionEffects_3863A:loc_3874CP
 					; seg107:08B0P
 
 var_4		= word ptr -4
@@ -213,13 +226,13 @@ arg_8		= word ptr  0Eh
 		cmp	[bp+var_2], 3
 		jnz	short loc_4BE37
 
-loc_4BE2A:				; CODE XREF: Debris_ConfigureByTargetType+25j
+loc_4BE2A:				; CODE XREF: Explosion_ApplyRadiusAndDamage_4BDFD+25j
 		mov	ax, [bp+arg_3]
 		mov	[bp+var_4], ax
 		les	bx, [si+0Ah]
 		mov	es:[bx+0Dh], ax
 
-loc_4BE37:				; CODE XREF: Debris_ConfigureByTargetType+2Bj
+loc_4BE37:				; CODE XREF: Explosion_ApplyRadiusAndDamage_4BDFD+2Bj
 		mov	eax, [bp+8]
 		mov	[si+51h], eax
 		mov	ax, [bp+arg_6]
@@ -228,16 +241,24 @@ loc_4BE37:				; CODE XREF: Debris_ConfigureByTargetType+2Bj
 		jz	short loc_4BE4D
 		mov	[si+57h], di
 
-loc_4BE4D:				; CODE XREF: Debris_ConfigureByTargetType+4Bj
+loc_4BE4D:				; CODE XREF: Explosion_ApplyRadiusAndDamage_4BDFD+4Bj
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_ConfigureByTargetType	endp
+Explosion_ApplyRadiusAndDamage_4BDFD	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4BE51:				; DATA XREF: seg339:off_7015Eo
+; ==============================================================================================
+; far, méthode de vtable (seg339:off_7015E) de l'objet explosion (vtable 0x302A). DÉGÂTS
+; INFLIGÉS PAR L'EXPLOSION À UNE CIBLE : d = distance 3D (Math_VectorLength3D_Raw_5828E) entre
+; l'explosion (+0x12) et la cible (+0x12), moins la taille de la cible (cible vtable[0] → +8 →
+; +0x10), bornée à 0 ; si rayon (+0x51) > d : facteur = (rayon − d) / rayon (shl eax, 8 /
+; idiv) sinon 0 ; dégâts = facteur × dégâts max (+0x55, <<8 puis imul/shrd 8) ; renvoie la
+; partie entière (mov ax, [bp-3]). Décroissance LINÉAIRE avec la distance.
+; ==============================================================================================
+Explosion_DamageAtDistance_4BE51:				; DATA XREF: seg339:off_7015Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 58h

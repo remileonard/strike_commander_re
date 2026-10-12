@@ -1436,7 +1436,7 @@ loc_3C50D:				; CODE XREF: IFF_LoadModelMain+C24j
 		push	ax
 		push	word ptr [bp+var_6A+2]
 		push	bx
-		call	IFF_RecordSubtype
+		call	Explosion_LoadFromIFF_4BCD5
 
 loc_3C582:
 		add	sp, 6
