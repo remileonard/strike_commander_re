@@ -483,7 +483,11 @@ loc_378B1:				; CODE XREF: seg077:02F7j seg077:0326j
 ; far,162L — interpole la hauteur du terrain à une position donnée (sub_32901) après
 ; vérification du frustum (sub_32F55) : requête d'altitude du terrain à une position 3D —
 ; utilisée à la fois par le rendu et par l'IA de vol (seg003) pour le suivi de
-; terrain/évitement.
+; terrain/évitement. | LUE 2026-10-12 : h = Terrain_HeightSample (valeur .OBJ de la cellule,
+; plafond) ; pour chaque patch voisin (liste +0xB5, nombre +0xB3) visible, si h × 256 >
+; altitude de la position ([di+8]) ou si arg_A force : altitude précise sur le maillage
+; (Camera_TransformIfVisible). Sinon renvoie h × 256 : au-dessus du plafond .OBJ d'une
+; cellule, le jeu ne calcule pas le relief exact.
 ; ==============================================================================================
 Terrain_QueryAltitudeAt	proc far		; CODE XREF: AI_Sensor_TooLow_56E5+93P seg003:0C6DP ...
 

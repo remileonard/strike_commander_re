@@ -2284,12 +2284,12 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
 
 | # | nom | taille | format |
 |---|---|---|---|
-| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o** (`u16 a, u16 h (hauteur), u16 c`) |
+| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o**. **Corrigé 2026-10-12 d'après le code** (`Terrain_LoadElevCell_99B7F`, `Render_TerrainPipelineMain`) : `i16 hauteur @+0` (min/max/moyenne de la cellule ; × axes caméra au rendu), `u8 éclairage @+2`, `u8 couleur @+3` (le triangle prend celle de son sommet le plus bas), `u8 texture du 1er triangle @+4`, `u8 texture du 2e @+5` (0xFF = aucune). L'ancienne lecture `u16 a, u16 h, u16 c` est à revérifier sur les données. |
 | `[2]` | `.MED` | 195 700 o | idem, LOD moyen |
 | `[3]` | `.LOW` | 49 900 o | idem, LOD bas |
 | `[4]` | `.AVG` | 15 196 o | PAK imbriqué de 324 cellules (quasi toutes « vides » → valeur moyenne/couleur uniforme par cellule) |
 | `[5]` | `.TRI` | 3 480 o | **PAK imbriqué de 324 cellules** ; cellules non vides = régions de géométrie de piste/aire, parsées par `sub_99120` (§6.8bis) |
-| `[6]` | `.OBJ` | 648 o | **tableau plat de 324 `u16`** (1 par cellule 18×18), champ lisse ~0→6510 — candidat : altitude/couleur de base par cellule |
+| `[6]` | `.OBJ` | 648 o | **tableau plat de 324 `u16`** (1 par cellule 18×18) = **altitude plafond de la cellule** (m, entier) : lu en entier par `Terrain_LoadHeightmapFromIFFB_99CEF` dans `[lod+0x8A]`, renvoyé par `Terrain_HeightSample` ; `Terrain_QueryAltitudeAt` ne calcule le relief exact que sous ce plafond. |
 
 **PAK imbriqué** : `dd taille` puis `dd (offset|0xE0000000) × 324` ; les cellules
 vides pointent toutes vers le même offset (fin de table). 18×18 = 324 = grille de
@@ -2341,8 +2341,10 @@ sur `sub_99120`) :
 
 - **Coordonnées sommet = fixed-point 24.8** : `valeur / 256` = mètres monde (même
   système que `SCNE` / `JDYN` / `HOME`). Ordre **X, Y, Z** (Z = altitude, 3ᵉ composante).
-  `pad` @+0xC : per-vertex, valeurs observées `0` / `0x4C` / `0xB1` — rôle non figé
-  (corrélé texturé/bord).
+  `pad` @+0xC = **éclairage du sommet** (→ sommet +0x1D, octet haut de l'intensité dans
+  `Render_ObjectPipelineMain`) ; valeurs observées `0` / `0x4C` / `0xB1`. `flag0` @+0 du polygone =
+  **groupe de détail** (→ +0x1C) : `TriOverlay_RenderRegion_31BFF` ne dessine le triangle que si
+  l'observateur est sous la hauteur du groupe et à moins de son rayon (tables de l'en-tête `ATRI`).
 - **Polygone** : `stride 16 o`, **toujours 3 indices** — le format Strike Commander
   n'a **pas** de mix triangle/quad (le pointeur source avance de `0x10` sans
   condition ; le mix quad est une évolution *Pacific Strike*). Les indices sont

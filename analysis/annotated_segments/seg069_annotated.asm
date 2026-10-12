@@ -17,7 +17,7 @@ seg069		segment	byte public 'CODE' use16
 ; jeu. Bien trop volumineuse pour une passe rapide ; priorité absolue pour une session
 ; d'analyse dédiée.
 ; ==============================================================================================
-Render_ObjectPipelineMain	proc far		; CODE XREF: Model_ResetTransformCache+11EP
+Render_ObjectPipelineMain	proc far		; CODE XREF: TriOverlay_RenderRegion_31BFF+11EP
 					; Model_RenderWithSubcomponents+150P
 
 var_534		= dword	ptr -534h

@@ -38,7 +38,11 @@ ovr291		segment	para public 'OVERLAY' use16
 ; (StreamReader_SeekVariant) : chaque entree .TRI se parse independamment, ne pas lire ces 2
 ; tables ne decale rien. Format TRIANGLES SEUL cote Strike Commander (record poly fixe 16 o, 3
 ; indices, avance 0x10 sans condition) ; le mix triangle/quad existe dans Pacific Strike
-; (RealSpace modifie), pas ici.
+; (RealSpace modifie), pas ici. | PRÉCISÉ 2026-10-12 : octet +0xC du sommet (« pad ») → sommet
+; +0x1D = ÉCLAIRAGE du sommet (Render_ObjectPipelineMain : octet haut de l'intensité [di+0Ch])
+; ; octet +0 du triangle (« flag0 ») → triangle +0x1C = GROUPE DE DÉTAIL
+; (TriOverlay_RenderRegion_31BFF) ; triangle +0x1D = double face (couleur 14..17 ou matériau
+; absent).
 ; ==============================================================================================
 TRI_ParseOverlayGeometry_99120	proc far		; CODE XREF: VROOMM_StubThunk_6BD30J
 

@@ -149,9 +149,17 @@ Terrain_ReleaseSectorAndTile_99AA0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 199 lignes, NON DÉTAILLÉE — variante de IndexedRecordReader_ScanAndReadTyped_99120.
+; far, 199 lignes, LUE 2026-10-12. Ex-'IndexedRecordReader_ScanAndReadTypedB'. CHARGE UNE
+; CELLULE D'ALTITUDE (.ELV/.MED/.LOW, entrée arg_4 du PAK imbriqué), appelée par
+; Terrain_ComputeLODMesh via VROOMM_StubThunk_6BDC0. Lit tout le blob (taille = [rr+0x61] ou
+; [rr+0x71]) ; n = taille ÷ 6 sommets de 6 octets. Pour chaque sommet : octets +4 et +5 (≠
+; 0xFF) → Terrain_SectorRefInc (compteur d'utilisation de la texture n°, table 0x553E ;
+; seulement si byte_6EA75 = mémoire libre < 3 000 000) ; int16 +0 → max (+0x10), min (+0x0E)
+; et moyenne (+0x12) de la cellule. Donc le sommet = int16 HAUTEUR @+0, uint8 éclairage @+2,
+; uint8 couleur @+3, uint8 texture du 1er triangle @+4, uint8 texture du 2e @+5 (voir
+; Render_TerrainPipelineMain).
 ; ==============================================================================================
-IndexedRecordReader_ScanAndReadTypedB_99B7F	proc far		; CODE XREF: VROOMM_StubThunk_6BDC0J
+Terrain_LoadElevCell_99B7F	proc far		; CODE XREF: VROOMM_StubThunk_6BDC0J
 
 var_16		= word ptr -16h
 var_14		= dword	ptr -14h
@@ -188,7 +196,7 @@ loc_99B90:
 		jmp	loc_99CEB
 ; ���������������������������������������������������������������������������
 
-loc_99BA7:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+23j
+loc_99BA7:				; CODE XREF: Terrain_LoadElevCell_99B7F+23j
 		push	[bp+arg_4]
 		push	di
 		call	IndexedRecordReader_AdvanceIndex_65E2C
@@ -201,10 +209,10 @@ loc_99BA7:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+23j
 		jmp	short loc_99BC8
 ; ���������������������������������������������������������������������������
 
-loc_99BC4:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+3Dj
+loc_99BC4:				; CODE XREF: Terrain_LoadElevCell_99B7F+3Dj
 		mov	eax, [di+71h]
 
-loc_99BC8:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+43j
+loc_99BC8:				; CODE XREF: Terrain_LoadElevCell_99B7F+43j
 		mov	[bp+var_4], eax
 		mov	[bp+var_8], eax
 
@@ -279,7 +287,7 @@ loc_99C63:
 		jmp	short loc_99CCF
 ; ���������������������������������������������������������������������������
 
-loc_99C6F:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+153j
+loc_99C6F:				; CODE XREF: Terrain_LoadElevCell_99B7F+153j
 		cmp	byte_6EA75, 0
 		jz	short loc_99C9C
 		les	bx, [bp+var_14]
@@ -294,7 +302,7 @@ loc_99C83:
 		call	Terrain_SectorRefInc
 		pop	cx
 
-loc_99C89:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+101j
+loc_99C89:				; CODE XREF: Terrain_LoadElevCell_99B7F+101j
 		les	bx, [bp+var_14]
 
 loc_99C8C:
@@ -309,8 +317,8 @@ loc_99C93:
 		call	Terrain_SectorRefInc
 		pop	cx
 
-loc_99C9C:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+F5j
-					; IndexedRecordReader_ScanAndReadTypedB_99B7F:loc_99C93j
+loc_99C9C:				; CODE XREF: Terrain_LoadElevCell_99B7F+F5j
+					; Terrain_LoadElevCell_99B7F:loc_99C93j
 		mov	ax, [si+10h]
 		les	bx, [bp+var_14]
 		cmp	ax, es:[bx]
@@ -318,7 +326,7 @@ loc_99C9C:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+F5j
 		mov	ax, es:[bx]
 		mov	[si+10h], ax
 
-loc_99CAD:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+126j
+loc_99CAD:				; CODE XREF: Terrain_LoadElevCell_99B7F+126j
 		mov	ax, [si+0Eh]
 		les	bx, [bp+var_14]
 		cmp	ax, es:[bx]
@@ -326,14 +334,14 @@ loc_99CAD:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+126j
 		mov	ax, es:[bx]
 		mov	[si+0Eh], ax
 
-loc_99CBE:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+137j
+loc_99CBE:				; CODE XREF: Terrain_LoadElevCell_99B7F+137j
 		les	bx, [bp+var_14]
 		movsx	eax, word ptr es:[bx]
 		add	[bp+var_10], eax
 		add	word ptr [bp+var_14], 6
 		inc	di
 
-loc_99CCF:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+EEj
+loc_99CCF:				; CODE XREF: Terrain_LoadElevCell_99B7F+EEj
 		cmp	di, [bp+var_16]
 		jl	short loc_99C6F
 		movsx	ebx, [bp+var_16]
@@ -344,12 +352,12 @@ loc_99CCF:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+EEj
 		mov	ax, [bp+arg_6]
 		mov	[si+2],	ax
 
-loc_99CEB:				; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F+25j
+loc_99CEB:				; CODE XREF: Terrain_LoadElevCell_99B7F+25j
 		pop	di
 		pop	si
 		leave
 		retf
-IndexedRecordReader_ScanAndReadTypedB_99B7F	endp
+Terrain_LoadElevCell_99B7F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -358,7 +366,12 @@ IndexedRecordReader_ScanAndReadTypedB_99B7F	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 190 lignes, NON DÉTAILLÉE — variante de Terrain_LoadHeightmapFromIFF_998C0, avec
-; StreamReader.
+; StreamReader. | LUE 2026-10-12 : lecteur d'un enregistrement ELEV de 46 o (ReadFieldGroupA
+; 2Eh ; un par niveau de détail, nombre = taille ÷ 46, enregistrements mémoire de 0x9A o,
+; Terrain_BuildAndLoadTilePath_9AECE) : nom du fichier d'altitude → Terrain_HeightmapAllocate
+; ; puis lit EN ENTIER la sous-ressource 6 du PAK (= .OBJ, dim² uint16) dans [+0x8A] (grille
+; de plafonds lue par Terrain_HeightSample) ; champs +0x82, +0x86, +0x8E, +0x90, +0x92, +0x96
+; depuis l'en-tête.
 ; ==============================================================================================
 Terrain_LoadHeightmapFromIFFB_99CEF	proc far		; CODE XREF: VROOMM_StubThunk_6BDCAJ
 

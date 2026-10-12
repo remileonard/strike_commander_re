@@ -39,11 +39,18 @@ loc_31BFC:				; CODE XREF: seg070:0010j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,159L — nettoie les flags de cache de transformation (+0x10, bits 0x80/0x40) sur tous les
-; sommets d'un modèle, résout le nom du modèle (sub_5C832), parcourt les listes de polygones
-; (+0x18) : réinitialisation du cache de transformation d'un modèle 3D avant un nouveau rendu.
+; far, 159 lignes, LUE 2026-10-12. Ex-'Model_ResetTransformCache' (nom faux). DESSINE UNE
+; RÉGION .TRI (pistes) — appelée par Model_RenderMain (mode 0) avec (région, observateur
+; arg_2, descripteur terrain+0x73 arg_4). Efface les bits 0x80/0x40 de cache des sommets
+; (+0x10), puis pour chaque triangle de la liste de la case (+0x18) : g = octet +0x1C du
+; triangle (= « drapeau » du fichier .TRI) = GROUPE DE DÉTAIL ; dessiné seulement si g ≤
+; [desc+9], si la hauteur de visibilité du groupe (desc+0x2D + 4g = terrain+0xA0, table ATRI
+; 2, mètres entiers << 8) est supérieure à l'altitude de l'observateur (arg_2+0x1C, asm c2),
+; et si le triangle n'est pas hors de la boîte du groupe (desc+0x3D + 16g, calculée par
+; Model_RenderMain = observateur ± rayon ATRI table 1 ; Render_TriangleBBoxReject) ; alors
+; Render_ObjectPipelineMain.
 ; ==============================================================================================
-Model_ResetTransformCache	proc far		; CODE XREF: Model_RenderMain+41Ap
+TriOverlay_RenderRegion_31BFF	proc far		; CODE XREF: Model_RenderMain+41Ap
 
 var_1A		= dword	ptr -1Ah
 var_16		= word ptr -16h
@@ -70,7 +77,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_31D3B
 ; ���������������������������������������������������������������������������
 
-loc_31C16:				; CODE XREF: Model_ResetTransformCache+12j
+loc_31C16:				; CODE XREF: TriOverlay_RenderRegion_31BFF+12j
 		push	0
 		mov	al, [si+0Ch]
 		push	ax
@@ -88,14 +95,14 @@ loc_31C16:				; CODE XREF: Model_ResetTransformCache+12j
 		jmp	short loc_31C55
 ; ���������������������������������������������������������������������������
 
-loc_31C43:				; CODE XREF: Model_ResetTransformCache+59j
+loc_31C43:				; CODE XREF: TriOverlay_RenderRegion_31BFF+59j
 		les	bx, [bp+var_4]
 		and	byte ptr es:[bx+10h], 7Fh
 		and	byte ptr es:[bx+10h], 0BFh
 		inc	dx
 		add	word ptr [bp+var_4], 1Eh
 
-loc_31C55:				; CODE XREF: Model_ResetTransformCache+42j
+loc_31C55:				; CODE XREF: TriOverlay_RenderRegion_31BFF+42j
 		cmp	[si+6],	dx
 		jg	short loc_31C43
 		mov	[bp+var_6], 0
@@ -112,7 +119,7 @@ loc_31C55:				; CODE XREF: Model_ResetTransformCache+42j
 		jmp	loc_31D3B
 ; ���������������������������������������������������������������������������
 
-loc_31C81:				; CODE XREF: Model_ResetTransformCache+7Dj
+loc_31C81:				; CODE XREF: TriOverlay_RenderRegion_31BFF+7Dj
 		les	bx, [bp+var_A]
 		add	word ptr [bp+var_A], 2
 		mov	ax, es:[bx]
@@ -127,7 +134,7 @@ loc_31C8B:
 		jmp	loc_31D2A
 ; ���������������������������������������������������������������������������
 
-loc_31CA0:				; CODE XREF: Model_ResetTransformCache+130j
+loc_31CA0:				; CODE XREF: TriOverlay_RenderRegion_31BFF+130j
 		les	bx, [bp+var_A]
 		mov	ax, es:[bx]
 		mov	[bp+var_E], ax
@@ -156,10 +163,10 @@ loc_31CA0:				; CODE XREF: Model_ResetTransformCache+130j
 		jmp	short loc_31CEF
 ; ���������������������������������������������������������������������������
 
-loc_31CED:				; CODE XREF: Model_ResetTransformCache+E7j
+loc_31CED:				; CODE XREF: TriOverlay_RenderRegion_31BFF+E7j
 		xor	ax, ax
 
-loc_31CEF:				; CODE XREF: Model_ResetTransformCache+ECj
+loc_31CEF:				; CODE XREF: TriOverlay_RenderRegion_31BFF+ECj
 		or	al, al
 		jz	short loc_31D25
 		les	bx, [bp+var_12]
@@ -181,27 +188,27 @@ loc_31CEF:				; CODE XREF: Model_ResetTransformCache+ECj
 		call	Render_ObjectPipelineMain
 		add	sp, 4
 
-loc_31D25:				; CODE XREF: Model_ResetTransformCache+C7j
-					; Model_ResetTransformCache+F2j ...
+loc_31D25:				; CODE XREF: TriOverlay_RenderRegion_31BFF+C7j
+					; TriOverlay_RenderRegion_31BFF+F2j ...
 		inc	si
 		add	word ptr [bp+var_A], 2
 
-loc_31D2A:				; CODE XREF: Model_ResetTransformCache+9Ej
+loc_31D2A:				; CODE XREF: TriOverlay_RenderRegion_31BFF+9Ej
 		cmp	si, [bp+var_C]
 		jge	short loc_31D32
 		jmp	loc_31CA0
 ; ���������������������������������������������������������������������������
 
-loc_31D32:				; CODE XREF: Model_ResetTransformCache+12Ej
+loc_31D32:				; CODE XREF: TriOverlay_RenderRegion_31BFF+12Ej
 		mov	dword_6EA68, 0
 
-loc_31D3B:				; CODE XREF: Model_ResetTransformCache+14j
-					; Model_ResetTransformCache+7Fj
+loc_31D3B:				; CODE XREF: TriOverlay_RenderRegion_31BFF+14j
+					; TriOverlay_RenderRegion_31BFF+7Fj
 		pop	di
 		pop	si
 		leave
 		retf
-Model_ResetTransformCache	endp
+TriOverlay_RenderRegion_31BFF	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -947,7 +954,7 @@ loc_32296:				; CODE XREF: Model_RenderMain:loc_32288j
 		les	bx, [bp+var_4]
 		push	word ptr es:[bx]
 		push	cs
-		call	near ptr Model_ResetTransformCache
+		call	near ptr TriOverlay_RenderRegion_31BFF
 
 loc_322A4:
 		add	sp, 6

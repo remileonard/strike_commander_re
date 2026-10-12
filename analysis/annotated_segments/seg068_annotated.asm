@@ -116,7 +116,7 @@ locret_2F9A6:
 ; calcule un code de sortie combiné (AND des 4 bits par sommet, façon Cohen-Sutherland) : test
 ; de rejet rapide 'triangle entièrement hors de la zone visible' (bounding-box reject).
 ; ==============================================================================================
-Render_TriangleBBoxReject	proc far		; CODE XREF: Model_ResetTransformCache+10CP
+Render_TriangleBBoxReject	proc far		; CODE XREF: TriOverlay_RenderRegion_31BFF+10CP
 					; Model_RenderWithSubcomponents+13EP
 
 var_6		= dword	ptr -6

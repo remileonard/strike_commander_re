@@ -239,8 +239,8 @@ Terrain_SectorLoadOnDemand	endp
 ; far,20L — incrémente un compteur de référence indexé (table à 0x553E) : incrément de
 ; compteur de référence d'un secteur de terrain.
 ; ==============================================================================================
-Terrain_SectorRefInc	proc far		; CODE XREF: IndexedRecordReader_ScanAndReadTypedB_99B7F:loc_99C83P
-					; IndexedRecordReader_ScanAndReadTypedB_99B7F+117P
+Terrain_SectorRefInc	proc far		; CODE XREF: Terrain_LoadElevCell_99B7F:loc_99C83P
+					; Terrain_LoadElevCell_99B7F+117P
 
 arg_0		= byte ptr  6
 

@@ -402,7 +402,9 @@ Terrain_TileIndexResolve	endp
 ; ==============================================================================================
 ; far,184L — division fixed-point par la taille de tuile (+0x86), boucle sur une grille de
 ; hauteur de terrain (buffer local important) : échantillonnage/interpolation d'une grille de
-; hauteur de terrain (heightfield).
+; hauteur de terrain (heightfield). | LUE 2026-10-12 (fin) : renvoie le uint16 de la grille
+; [lod+0x8A] de la case (x, z) = le fichier .OBJ (sous-ressource 6 du PAK, lu par
+; Terrain_LoadHeightmapFromIFFB_99CEF) = ALTITUDE PLAFOND DE LA CELLULE (mètres entiers).
 ; ==============================================================================================
 Terrain_HeightSample	proc far		; CODE XREF: Camera_TransformIfVisible+59p
 					; Terrain_UpdateLODPerFrame+119P ...

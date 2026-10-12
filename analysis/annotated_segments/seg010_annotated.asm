@@ -710,7 +710,11 @@ Goal_ResetNeutralState	endp
 ; es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 =
 ; FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 =
 ; SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1,
-; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table.
+; LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table. | COMPLÉMENT 2026-10-12 : le
+; 10e octet (entité +0xB9, plafonné à 3) est le SORT DU PILOTE : 1 = s'éjecte toujours quand
+; son avion est détruit, 2 = ne s'éjecte jamais (Aircraft_OnDestroyed_9D770 ; 0 = tirage de 30
+; %), 3 = les impacts n'abîment aucun composant de son avion (Aircraft_OnCollision_9D910 saute
+; DamageSys_ApplyHit_9C9A0, seuls des débris sont créés).
 ; ==============================================================================================
 PilotProfile_LoadATRB_12E47:				; DATA XREF: seg339:0368o
 		push	bp

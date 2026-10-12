@@ -1780,8 +1780,8 @@ a_obj		db '.OBJ',0
 		dd loc_334F0
 		dd TerrainTile_ListDestruct
 		align 2
-dword_6EA68	dd 0			; DATA XREF: Model_ResetTransformCache+30w
-					; Model_ResetTransformCache:loc_31D32w	...
+dword_6EA68	dd 0			; DATA XREF: TriOverlay_RenderRegion_31BFF+30w
+					; TriOverlay_RenderRegion_31BFF:loc_31D32w	...
 byte_6EA6C	db 1			; DATA XREF: Cockpit_ReadControlsFrame_8F720+C3r
 					; TerrainSector_LoadFieldMix_99FF4:loc_9A115r	...
 aTxmpack	db 'TXMPACK',0          ; DATA XREF: Terrain_SectorIndexResolve+78o

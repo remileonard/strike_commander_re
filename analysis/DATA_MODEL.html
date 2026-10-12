@@ -844,7 +844,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
       <tr><td class="num">7</td><td class="num">AA</td><td>Air-to-Air</td><td class="num">10</td></tr>
       <tr><td class="num">8</td><td class="num">SM</td><td>Showmanship : démonstratif</td><td class="num">8</td></tr>
       <tr><td class="num">9</td><td class="num">AR</td><td>Aggressiveness : prudent → agressif</td><td class="num">8</td></tr>
-      <tr><td class="num">10</td><td class="num">XX</td><td>sans nom dans le manuel, plafonné à 3</td><td class="num">0</td></tr>
+      <tr><td class="num">10</td><td class="num">—</td><td><b>sort du pilote</b> (sans nom dans le manuel, plafonné à 3) : 0 = normal (s'éjecte au hasard, 30 %, quand son avion est détruit) ; 1 = s'éjecte toujours ; 2 = ne s'éjecte jamais ; 3 = son avion ne subit aucun dégât de composant quand il est touché</td><td class="num">0</td></tr>
     </tbody>
   </table></div>
   <p>Validé sur Billy : 10, 14, 12, 13, 15, 9, 15, 16, 15 = les valeurs du manuel. Détail : <code>AI_SYSTEM.md</code>.</p>
@@ -1218,16 +1218,31 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td class="num">4</td><td class="num">.LOW</td><td>altitudes, détail faible</td></tr>
       <tr><td class="num">5</td><td class="num">.AVG</td><td>une valeur moyenne par cellule</td></tr>
       <tr><td class="num">6</td><td class="num">.TRI</td><td><b>pistes et aires d'aérodrome</b> posées sur le terrain</td></tr>
-      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>uint16</code>, un par cellule (rôle non tranché)</td></tr>
+      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>uint16</code>, un par cellule : <b>altitude plafond</b> de la cellule (mètres, entier). Au-dessus de cette altitude, le jeu renvoie ce plafond comme hauteur du sol sans calculer le relief exact</td></tr>
     </tbody>
   </table></div>
   <h3>Un sommet d'altitude (.ELV, .MED, .LOW)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td>attribut A</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td></tr>
-      <tr><td>hauteur</td><td>uint16</td><td class="num">2</td><td>altitude du sommet</td></tr>
-      <tr><td>attribut B</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td></tr>
+      <tr><td>hauteur</td><td>int16</td><td class="num">2</td><td>altitude du sommet (mètres) ; le jeu en tire le min, le max et la moyenne de la cellule</td></tr>
+      <tr><td>éclairage</td><td>uint8</td><td class="num">1</td><td>intensité lumineuse du sommet, interpolée sur la face</td></tr>
+      <tr><td>couleur</td><td>uint8</td><td class="num">1</td><td>couleur de base ; un triangle prend celle de son sommet le plus bas</td></tr>
+      <tr><td>texture 1</td><td>uint8</td><td class="num">1</td><td>texture du 1er triangle de la case (dans la liste <code>TXMS</code>) ; 255 = aucune. Selon les options de détail graphique, des plages de numéros (0–215, 216–222, 236–247) sont dessinées sans texture ; à partir de 223, le rendu reçoit aussi la position des trois sommets de la face (placage de texture particulier)</td></tr>
+      <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture du 2e triangle de la case</td></tr>
+    </tbody>
+  </table></div>
+  <p>⚠️ Cet ordre vient du code : le lecteur des cellules prend l'<code>int16</code> en tête de chaque sommet de 6 octets pour le min, le max et la moyenne d'altitude, et le rendu le multiplie par les axes de la caméra. Une lecture précédente des données plaçait la hauteur au 2ᵉ mot : à vérifier sur les fichiers.</p>
+  <h3>Le chunk ATRI (dans FORM BLOX, 53 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>côté de la grille de cellules (18)</td></tr>
+      <tr><td>taille d'une cellule</td><td>uint32</td><td class="num">4</td><td>mètres, entier (20000)</td></tr>
+      <tr><td>nombre de groupes</td><td>uint16</td><td class="num">2</td><td>groupes de détail des triangles <code>.TRI</code> (4 au plus)</td></tr>
+      <tr><td>rayons</td><td>4&nbsp;×&nbsp;uint32</td><td class="num">16</td><td>mètres : un triangle du groupe n'est dessiné qu'à moins de cette distance de l'observateur</td></tr>
+      <tr><td>hauteurs</td><td>4&nbsp;×&nbsp;uint32</td><td class="num">16</td><td>mètres : il n'est dessiné que si l'observateur vole plus bas</td></tr>
+      <tr><td>fichier</td><td>string[13]</td><td class="num">13</td><td>nom du <code>.TRI</code> (<code>MAURITAN.TRI</code>)</td></tr>
     </tbody>
   </table></div>
   <h3>Une région .TRI</h3>
@@ -1252,7 +1267,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
           <tr><td>X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
           <tr><td>Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
           <tr><td>Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
-          <tr><td>marque</td><td>uint8</td><td class="num">1</td><td>0, 76 ou 177 observés ; rôle non établi</td></tr>
+          <tr><td>éclairage</td><td>uint8</td><td class="num">1</td><td>intensité lumineuse du sommet (0, 76 ou 177 observés), comme pour les modèles 3D</td></tr>
         </tbody>
       </table></div>
     </div>
@@ -1260,7 +1275,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <h3>Triangle .TRI (16 octets)</h3>
       <div class="tablewrap"><table>
         <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead><tbody>
-          <tr><td>drapeau</td><td>uint8</td><td class="num">1</td><td>rôle non établi</td></tr>
+          <tr><td>groupe</td><td>uint8</td><td class="num">1</td><td>groupe de détail (rayon et hauteur dans <code>ATRI</code>)</td></tr>
           <tr><td>sommet 1</td><td>uint16</td><td class="num">2</td><td>numéro de sommet</td></tr>
           <tr><td>sommet 2</td><td>uint16</td><td class="num">2</td><td>numéro de sommet</td></tr>
           <tr><td>sommet 3</td><td>uint16</td><td class="num">2</td><td>numéro de sommet</td></tr>
@@ -1347,8 +1362,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
   <h2 class="sec">Points ouverts</h2>
   <p>Tout ce qui précède vient de la lecture du code ; un champ « jamais utilisé » a été cherché dans tout le binaire. Restent à lire dans le code :</p>
   <ul>
-    <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude, de la « marque » des sommets <code>.TRI</code> et du « drapeau » des triangles (code de rendu du terrain, pas encore lu).</li>
-    <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
+    <li>Terrain : le chunk <code>OBJS</code> de <code>FORM BLOX</code> crée une grille d'un pointeur par cellule dont le consommateur n'est pas encore tracé ; c'est le candidat pour le placement des bâtiments d'aérodrome.</li>
   </ul>
 </section>
 </main>

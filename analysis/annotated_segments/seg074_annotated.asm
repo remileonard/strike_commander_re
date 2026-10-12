@@ -14,7 +14,14 @@ seg074		segment	byte public 'CODE' use16
 ; sub_2FEE2), résout la texture terrain (sub_5C832), puis itère sur la grille de sommets du
 ; secteur (segment GS) en les transformant/soumettant au rendu. Pipeline principal de rendu du
 ; terrain — l'équivalent 'terrain' de la fonction de rendu d'objets sub_2FEE2 (seg069).
-; Priorité absolue pour une session d'analyse dédiée.
+; Priorité absolue pour une session d'analyse dédiée. | COMPLÉMENT 2026-10-12 (sommet .ELV,
+; via le pointeur +0x11 du sommet transformé) : int16 +0 = hauteur (cwde, × axes caméra
+; dword_7221E/72236/7222A) ; uint8 +2 = ÉCLAIRAGE du sommet (octet haut de l'intensité
+; [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base : le triangle prend celle de
+; son sommet le PLUS BAS (comparaison des int16 +0), byte_6EAE0, puis
+; Interp_ResolveCachedGuarded(541Ah, couleur, intensité) ; uint8 +4 / +5 = TEXTURE du triangle
+; (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF = pas de texture ; ≥ 0xDF = traitement
+; particulier (var_580).
 ; ==============================================================================================
 Render_TerrainPipelineMain	proc far		; CODE XREF: Terrain_TileBoundaryTest+78P
 

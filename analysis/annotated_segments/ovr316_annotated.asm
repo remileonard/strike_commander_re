@@ -16,7 +16,9 @@ ovr316		segment	para public 'OVERLAY' use16
 ; (word_706A0+0x4E, entrée +0x40) et, après 100 images, musique 0x14 (posé). Autre objet :
 ; DamageSys_ApplyHit_9C9A0 sur les composants (+0x5E), PlayerComponent_FormatAndDisplay_9F784,
 ; puis DamageSys_DamagePercent_9CB2C comparé à JINF champ 9 (modèle +0x68, défaut 30 %) : au-
-; delà, avion perdu (byte_6E4B7 pour le joueur selon la catégorie de l'objet heurté).
+; delà, avion perdu (byte_6E4B7 pour le joueur selon la catégorie de l'objet heurté). | Pilote
+; +0xB9 (10e octet ATRB) == 3 : aucun dégât de composant, seulement
+; Debris_SpawnFromDebrList_3844F (moitié du nombre DEBR au hasard).
 ; ==============================================================================================
 Aircraft_OnCollision_9D910	proc far		; CODE XREF: VROOMM_StubThunk_6C2F0J
 
