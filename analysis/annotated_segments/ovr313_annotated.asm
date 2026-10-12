@@ -7,15 +7,19 @@ ovr313		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LECTEUR DE LA CLASSE JETP (avion) : Armed_LoadFromIFF_9D380 (ARMG),
-; Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle +0x4E), puis chunk EJEC facultatif
-; : chaîne → +0x5A = nom de l'objet siège éjectable (+0x63 = 1 si présent), puis chunk JINF
-; facultatif : uint8 → +0x53, uint16 → +0x54, uint16 → +0x56, uint8 → +0x52 (CLASSE DE COMBAT
-; : ≥ 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246, comparée à byte_72038 = 6
-; par Targeting_AcquireBestThreat), uint16 → +0x64, uint8 → +0x59, uint16 → +0x66, uint8 →
-; +0x58, uint16 → +0x68. Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6,
-; +0x68 = 30. (Correction 2026-10-12 : EJEC est lu AVANT JINF, il contient le nom de l'objet
-; éjecté.)
+; far, LECTEUR DE LA CLASSE JETP (avion), JINF lu en détail 2026-10-12 :
+; Armed_LoadFromIFF_9D380 (ARMG), Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle
+; +0x4E), chunk EJEC facultatif (chaîne → +0x5A nom de l'objet siège éjectable, +0x63 = 1),
+; chunk JINF facultatif, 9 champs : (1) uint8 → +0x53 bit 0 = train escamotable
+; (Aircraft_InitGearChildren_9DDCF) ; (2) uint16 → +0x54 rang du 1er sous-objet CHLD du train
+; ; (3) uint16 → +0x56 nombre de sous-objets du train (Aircraft_Update_3DEFB les
+; affiche/masque un par un) ; (4) uint8 → +0x52 classe de combat (≥ 9 chasseur ;
+; AI_EngageAttackerReaction_E246, Targeting_AcquireBestThreat) ; (5) uint16 → +0x64 chance (%)
+; d'explosion immédiate à la destruction, sinon chute en fumée (Aircraft_OnDestroyed_9D770) ;
+; (6) uint8 → +0x59 drapeau du sous-objet spécial ; (7) uint16 → +0x66 son rang CHLD
+; (Aircraft_InitSpecialChild_9DD81) ; (8) uint8 → +0x58 type de fumée de la chute ; (9) uint16
+; → +0x68 seuil de dégâts (%) au-delà duquel l'avion est perdu (Aircraft_OnCollision_9D910).
+; Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30.
 ; ==============================================================================================
 Aircraft_LoadEJECAndJINF_9D4F0	proc far		; CODE XREF: VROOMM_StubThunk_6C260J
 

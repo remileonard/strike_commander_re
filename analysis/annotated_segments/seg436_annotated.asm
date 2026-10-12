@@ -7,14 +7,17 @@ seg436		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 128 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'DATA' D'UN OBJET SWPN
-; (defense fixe AA/SAM/navire ; ancien nom 'PlayerComponent_LoadFieldsWithRetryC' faux).
-; Appelle IFF_LoadAngleParam puis lit 'DATA' (push large 41544144h) : valeur group C ->
-; objet+0x36 (weapons_round, munitions), group C -> +0x3A (detection_range), group C -> +0x3E
-; (effective_range : LA PORTEE utilisee par Targeting_AcquireBestThreat pour noter une defense
-; fixe), word -> +0x42, group C -> +0x44, byte -> +0x48 (max_simultaneous_shots), pointeur far
-; vers l'objet arme charge (stub VROOMM 6C394, nom de l'arme sur 8 caracteres) -> +0x49/+0x4B,
-; group C -> +0x4D. Correspond a RSEntity::parseREAL_OBJT_SWPN_DATA de libRealSpace.
+; far, 128 lignes, LUE INTEGRALEMENT (2026-09-20), consommateurs lus 2026-10-12. CHARGEUR DU
+; CHUNK 'DATA' D'UN OBJET SWPN (défense fixe AA/SAM/navire) après
+; Object_LoadCommonAndAllegiance_3C942 : int32 → +0x36 munitions (copiées dans l'instance
+; +0x53, −1 par tir) ; int32 → +0x3A portée de détection (m entiers :
+; World_FindNearestInCone_22A7D, 180°, camp 1, catégorie 6) ; int32 → +0x3E portée de tir (m
+; entiers, << 8) ; uint16 → +0x42 dispersion des obus (aléa Math_RandomScale_54DF4(+0x42)) ;
+; int32 24.8 → +0x44 cadence (s entre deux tirs : instance +0x57 −= dt) ; uint8 → +0x48 lance-
+; missiles (≠ 0 : instancie l'arme +0x49, cible à plus de 305 m au-dessus du sol, plafond de
+; missiles par camp) / canon (0 : Effect_SpawnPeriodicAtAttach) ; string[8] → objet arme
+; chargé (+0x49/+0x4B) ; int32 → +0x4D décalage du point de départ (m entiers ; missile :
+; altitude + 2 × valeur).
 ; ==============================================================================================
 SwpnModel_LoadDataChunk_A0A00	proc far		; CODE XREF: VROOMM_StubThunk_6C5E0J
 
@@ -33,7 +36,7 @@ arg_4		= word ptr  0Ah
 		mov	byte_6E33B, cl
 		push	si
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 
 loc_A0A21:
 		add	sp, 6

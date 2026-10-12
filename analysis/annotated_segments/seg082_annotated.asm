@@ -34,7 +34,18 @@ loc_3A499:				; CODE XREF: seg082:001Aj
 ; pointeurs de membre réécrits à chaque étape de la construction multi-base Borland C++. Le
 ; vrai chargement de champs est délégué à sub_6CBCE -> PlayerComponent_LoadFieldsWrapper_A5CEA
 ; -> LoadFieldsMassive_A5D18. Layout du chunk JDYN (28 champs) : voir analysis/DATA_MODEL.md
-; §6.2.
+; §6.2. | COMPLÉMENT 2026-10-12 (lu en entier) : recherches avec arg 0 → depuis le début du
+; FORM DYNM, donc ordre des chunks libre ; ORDRE DE PRIORITÉ si plusieurs variantes : JDYN,
+; MISS, GBMB, DURD, AGRV, SURF, PARA (la première trouvée gagne). Pas de FORM DYNM → erreur
+; C011h ; FORM DYNM sans variante connue → C010h. Le pointeur rangé (modèle +0x35 ou +0x36)
+; vise TOUJOURS le sous-objet DYNM de base. Vtables DYNM finales : JDYN 0x2312, MISS 0x1F66,
+; GBMB 0x1F16, DURD 0x1E06, AGRV 0x1E8E, SURF 0x1DB6, PARA 0x1D4A (base 0x223A). Slots DYNM :
+; +0/+4/+8 clonage (le +8 crée la dynamique d'une instance), +0x0C destructeur, +0x3C tick
+; sans commande, +0x40 tick avec commande, +0x48 DYNM_AsJDYN (0 sauf JDYN). Variante imposée
+; par le code : JETP → JDYN obligatoire (Aircraft_OnCollision_9D910 déréférence AsJDYN sans
+; test) ; MISS (classe) → MISS (Missile_UpdateSeekerAndFuse_42458 écrit dyn+0x39 / +0x37) ;
+; MISS/GBMB/DURD (variantes) lisent la cible +0x55 et le lanceur (+0x38) de l'instance →
+; classes d'armes. Détail : DATA_MODEL.html § Dynamique.
 ; ==============================================================================================
 JDYN_LoadChunkAndConstruct_3A49C	proc far		; CODE XREF: JDYN_LoadChunkWrapper_9D0C0+2FP
 					; MobileObject_LoadDynamicsAndSmoke_9D189+1FP ...
@@ -2179,7 +2190,7 @@ loc_3B5C8:				; DATA XREF: seg339:off_6F41Eo
 		add	ax, 0FF4Fh
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	far ptr	loc_4A825
+		jmp	far ptr	JDYN_TickUncontrolled_4A825
 ; ���������������������������������������������������������������������������
 
 loc_3B5DF:				; DATA XREF: seg339:236Ao
@@ -2229,7 +2240,7 @@ loc_3B63B:				; DATA XREF: seg339:off_6F40Ao
 		add	ax, 0FF72h
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	far ptr	loc_4B093
+		jmp	far ptr	JDYN_AsJDYN_4B093
 ; ���������������������������������������������������������������������������
 
 loc_3B652:				; DATA XREF: seg339:off_6F406o
@@ -2265,7 +2276,7 @@ loc_3B682:
 		add	ax, 0FF72h
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	far ptr	loc_4A825
+		jmp	far ptr	JDYN_TickUncontrolled_4A825
 ; ���������������������������������������������������������������������������
 
 loc_3B697:				; DATA XREF: seg339:off_6F3FAo
@@ -2457,7 +2468,7 @@ loc_3B7F2:				; DATA XREF: seg339:22FEo
 
 loc_3B7F4:
 		add	word ptr ss:[bx+4], 0FFDEh
-		jmp	far ptr	loc_4A825
+		jmp	far ptr	JDYN_TickUncontrolled_4A825
 ; ���������������������������������������������������������������������������
 
 loc_3B7FE:				; DATA XREF: seg339:off_6F3AAo
@@ -2501,7 +2512,7 @@ loc_3B83A:				; DATA XREF: seg339:off_6F396o
 loc_3B846:				; DATA XREF: seg339:22E2o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFE2h
-		jmp	far ptr	loc_4A825
+		jmp	far ptr	JDYN_TickUncontrolled_4A825
 ; ���������������������������������������������������������������������������
 
 loc_3B852:				; DATA XREF: seg339:off_6F38Eo

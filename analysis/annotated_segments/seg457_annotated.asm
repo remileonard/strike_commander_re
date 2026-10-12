@@ -2612,19 +2612,17 @@ ExprSlot_ReleaseSingleE_AA37D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,123L — parse un chunk 'SCNE' (scene) en un record de 0x27 octets. Appele par
-; MissionPlay_LoadScenes_AA595. En-tete disque fixe de 24 octets (ReadFieldGroupA) : +0x00 u8
-; is_active ; +0x01 u16 area_id (index dans AREA, -1=scene globale ; resolu par
-; PtrList_GetAt_53034(ctx+0x1A) -> record+0x04) ; +0x03/+0x05/+0x07 3x i16 = handlers PROG
-; on_activated/on_leaving/on_mission_update (-1=aucun ; resolus par
-; Expr_LookupNamedValue_51E4A(ctx+0x40=liste PROG) -> record+0x08/+0x0C/+0x10) ; +0x09 u8
-; has_own_coord ; +0x0A u16 heading (candidat cap deg ; =180 si ancre a l'aire, =0 si coord
-; explicite) ; +0x0C/+0x10/+0x14 3x i32 position (X, Y, Z) fixed-point /256 ; 3e composante
-; (+0x14) = Z = altitude (repere ASM Z-up, cf. CLAUDE.md) -> record+0x1B/+0x1F/+0x23. Puis
-; (taille_chunk-24)/2 mots u16 en queue = LISTE D'UNITES : index dans le chunk PART en ORDRE
-; DE STOCKAGE (pas un id d'entite, pas un index CAST, sans offset) -> PART[slot].entity_id ->
-; CAST[entity_id]. malloc + ReadFieldGroupA -> record+0x14 count, +0x16 ptr. Verifie sur
-; MISSIONS/MISN-1A.IFF. Detail complet : analysis/DATA_MODEL.md §6.6a.
+; far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par
+; MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8
+; active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ;
+; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à
+; l'activation / en quittant / à chaque image (-1 = aucun ;
+; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ;
+; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. VÉRIFIÉ
+; 2026-10-12 : AUCUN ACCÈS aux champs record+0x18 à +0x26 dans le binaire (recherche de toutes
+; les fonctions lisant +0x18/+0x19/+0x1B/+0x1F/+0x23) — ces 15 octets (drapeau, « cap »,
+; position) sont chargés et jamais utilisés. Puis (taille − 24)/2 u16 = index dans PART des
+; objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF.
 ; ==============================================================================================
 MissionScene_ParseRecord_AA3A5	proc far		; CODE XREF: VROOMM_StubThunk_6CF3FJ MissionPlay_LoadScenes_AA595+DFp
 

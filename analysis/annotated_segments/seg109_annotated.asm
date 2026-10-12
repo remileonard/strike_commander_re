@@ -258,7 +258,7 @@ loc_4F43B:				; CODE XREF: seg109:0186j
 		jz	short loc_4F4E8
 		push	0
 		push	word ptr [si+1Eh]
-		call	Container_Op_22E27
+		call	WorldObject_GetNthChild_22E27
 		add	sp, 4
 		mov	si, ax
 		or	si, si

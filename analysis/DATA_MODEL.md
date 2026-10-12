@@ -444,6 +444,135 @@ Cache & instanciation : `Debris_FindModelByID_38A79` / `Debris_LoadAndInstantiat
 objet. Pièces d'objet / hardpoints confirmés (seg339) : `FUSELAGE`, `LWING`,
 `RWING`, `LOWEJECT`, `CHAFF`, `FLARE`, `HARDPT#`, `POD`, `GUN`, `BIGSPHER`.
 
+### 6.1b Compléments objets (lus le 2026-10-12) : variante de dynamique, armes, volumes, avion
+
+Repère : Y-up, mètres. Un « float » = int32 du fichier ÷ 256 ; un « entier » se lit tel quel.
+
+**Recherche des chunks.** `ResourceRecord_SeekAndRead_64743` et `ResourceRecord_SeekAndReadB_647B2`
+sont toujours appelées avec arg 0, ce qui mène à `ResourceRecord_SeekToStart_64BF8` : la recherche
+repart du début du FORM courant. L'ordre des chunks est donc libre. Un tag présent deux fois n'est lu
+qu'une fois.
+
+**FORM DYNM** (`JDYN_LoadChunkAndConstruct_3A49C`).
+- Priorité des variantes : JDYN > MISS > GBMB > DURD > AGRV > SURF > PARA.
+- Erreurs : pas de FORM DYNM → C011h ; FORM DYNM sans variante connue → C010h.
+- Slot +0x48 de la vtable DYNM = `DYNM_AsJDYN_Base_46922`. Il renvoie 0, sauf pour JDYN
+  (`JDYN_AsJDYN_4B093`).
+- Contraintes posées par le code :
+  - JETP → JDYN obligatoire : `Aircraft_OnCollision_9D910` fait `[AsJDYN()+0x75]` sans test.
+  - Classe MISS → variante MISS : `Missile_UpdateSeekerAndFuse_42458` écrit `dyn+0x39`.
+  - Variantes MISS et GBMB : elles lisent la cible (instance +0x55) et le lanceur (méthode +0x38) →
+    réservées aux armes.
+  - GRND : la dynamique n'est jamais « tickée » (`GroundObj_IntegrateMotion_458C8`). Le second appel
+    de `GroundObj_LoadFromIFF_A0D80` relit le même FORM.
+- Formats des variantes :
+
+  | Variante | Contenu du chunk |
+  |---|---|
+  | MISS | 5 float : taux de virage max (°/s), vitesse max (m/s), accélération (m/s²), vitesse de croisière X (m/s), vitesse de croisière Y (m/s, repère du missile) |
+  | GBMB | 1 float : taux de virage max (°/s) |
+  | DURD | uint16 distance de freinage (m) ; int32 entier vitesse de chute min (m/s) |
+  | SURF | 2 int32, jamais lus : l'objet est immobile |
+  | AGRV, PARA | vides : seul le tag compte |
+
+- Au sol (`Aero_ControlOrchestrator_48FC2`) : JDYN champs 12 à 16 = vitesse verticale max (m/s),
+  vitesse horizontale max (m/s), roulis max, cabré max, piqué max (uint8, en °).
+
+**Communs.**
+
+| Chunk | Contenu |
+|---|---|
+| ALGN | int8 camp : 1 joueur, −1 adverse, 0 neutre. Va dans l'instance +0x50. |
+| TRGT | type de cible : 0 aucun, 1 avion, 2 sol, 4 leurre |
+| SIGN | octet 1 = IR, octet 2 = radar (chercheur 4), octet 3 = chercheur 3 |
+| CHLD | angles = float (degrés), appliqués dans l'ordre tangage (autour de X), roulis (autour de Z = nez), cap (autour de Y) |
+| DEBR | vitesses en m/s |
+
+**EXTE** (`Object_LoadExteChunk_9BDE9`, `Exte_LoadVolume_9BFB0`).
+- En-tête : float rayon de l'objet (défaut 1500 m), uint16 n, uint8 « collisions dès la création ».
+- Puis n volumes, chacun commence par un `unsigned char` :
+  - `S` : string nom, 4 int32 entiers (centre X, Z, Y ; rayon) ;
+  - `B` : string nom, 6 int32 entiers (bornes X, X, Z, Z, Y, Y) ;
+  - `L` : string nom seul.
+- Les noms sont les zones de dégâts : FUSELAGE, LWING, RWING, BIGSPHER.
+
+**Dégâts.**
+- Points d'un impact = méthode +0x84 du projectile :
+  - choc : DAMG × min(v²/200, 10) ;
+  - missile : choc + EXPL × (60 à 100 %) ;
+  - canon : WDAT × INFO champ 9 × (de 100 % à 50 % au fil de la vie).
+- Contre le joueur, les points sont divisés par 2.
+- `DamageSys_ApplyHit_9C9A0` répartit les points sur les composants SYSM dont la **zone** (second
+  nom) est celle du volume touché. BIGSPHER → zone tirée au hasard : FUSELAGE 50 %, LWING 25 %,
+  RWING 25 %.
+- Avion perdu quand `DamageSys_DamagePercent_9CB2C` ≥ JINF champ 9.
+
+**JINF** (9 champs), dans l'ordre :
+1. bit 0 : train escamotable ;
+2. rang du premier sous-objet CHLD du train ;
+3. nombre de sous-objets du train ;
+4. classe de combat ;
+5. chance (%) d'explosion immédiate ;
+6. drapeau du sous-objet spécial ;
+7. rang de ce sous-objet ;
+8. type de fumée de la chute ;
+9. seuil de perte (%).
+
+Valeurs par défaut des champs 1, 4, 5, 6, 8 et 9 : 0, 2, 5, 0, 6 et 30.
+
+**WDAT** (22 octets), dans l'ordre :
+1. dégâts (seulement pour TRCR) ;
+2. rayon (jamais lu) ;
+3. catégorie tirée (8 / 9 / 10 / 13) ;
+4. identifiant 1..12 ;
+5. famille ;
+6. domaine (1 = air-air) ;
+7. chercheur 1..6 ;
+8. portée d'accrochage (int32, m) ;
+9. demi-cône (°) ;
+10. portée de tir (int32, m) ;
+11. intervalle de tir (float, s).
+
+**DATA selon la classe.**
+
+| Classe | Contenu |
+|---|---|
+| MISS | int32 délai du chercheur (s) ; uint8 jamais lu ; uint16 rayon de l'allumeur (m) |
+| BOMB | uint8 guidée ; uint8 délai d'armement (s) ; uint8 jamais lu ; uint16 ouverture du cône (°/s) |
+| PODR | string roquette ; uint8 présence ; uint16 vitesse de départ (m/s) |
+| SWPN | int32 munitions ; int32 portée de détection (m) ; int32 portée de tir (m) ; uint16 dispersion ; float cadence (s) ; uint8 lance-missiles ; string[8] arme ; int32 décalage de départ (m) |
+| EJEC | le premier int32 n'est jamais lu |
+
+**TRCR INFO** (7 float puis 2 uint16), dans l'ordre :
+1. vitesse de départ ;
+2. jamais lu ;
+3. dispersion au départ ;
+4. dispersion à la fin ;
+5. durée de vie ;
+6. dispersion de vitesse ;
+7. part héritée de la vitesse du tireur ;
+8. jamais lu ;
+9. multiplicateur de dégâts.
+
+**FORM WEAP** (`WeaponSys_LoadFromIFF_9ED62`). S'il manque, un FORM WFIL contient le nom d'un fichier
+dont la racine est un FORM WEAP.
+
+| Chunk | Contenu |
+|---|---|
+| INFO | int32 portée du capteur (m), uint16 demi-angle (°) |
+| HPTS | n × 13 octets : uint8 type 0..4, puis 3 float de position (X, Z, Y) |
+| DCOY | uint16 CHAFF, uint16 FLARE |
+| WPNS | n × 10 octets : uint16 quantité, string[8] objet |
+
+Capacités par type de point d'emport : voir `WeaponSys_LoadStoresOnHardpoint_9EA2E`.
+
+**Mission et fumées.**
+- PART : vitesse initiale en m/s. Le 3ᵉ nom désigne l'armement imposé (FORM WEAP). Le camp remplace
+  celui d'ALGN.
+- SCNE : les octets 0x09 à 0x17 (drapeau, « cap », position) ne sont jamais lus.
+- Fumées : mode 0 = disque ombré ; mode 1 = sprite opaque ; mode 2 = sprite avec les couleurs
+  A..A+B−1 translucides, peintes par table[teinte + c − A][fond].
+
 ### 6.2 Modèle de vol / dynamique — `JDYN_LoadChunk` (`sub_3A49C`, seg082, 577 L)
 
 **Relecture détaillée (session dédiée).** `JDYN_LoadChunk` est d'abord un

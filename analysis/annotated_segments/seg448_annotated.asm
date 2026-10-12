@@ -763,10 +763,13 @@ PlayerComponent_LoadFieldsWithRetryG_A4F01	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, initialise sous-objet composite (sub_6CAC0), appelle
-; PlayerComponent_LoadFieldsWithRetryF_A4BE1.
+; far, LUE 2026-10-12. Ex-'PlayerComponentVariantY_ConstructAndInit'. Lecture de la variante
+; AGRV : chunk DYNM (masse, AircraftDynamics_ReadMassChunk_A4A20) puis ATMO
+; (AircraftDynamics_ReadAtmoChunk_A4BE1). Le chunk AGRV lui-même n'est jamais lu : c'est un
+; MARQUEUR (seul son tag compte). Tick +0x3C = FlightControl_ComputeAngularAccel (forces /
+; masse : chute libre avec traînée).
 ; ==============================================================================================
-PlayerComponentVariantY_ConstructAndInit_A4F40	proc far		; CODE XREF: VROOMM_StubThunk_6CB2DJ
+DynAgrv_Construct_A4F40	proc far		; CODE XREF: VROOMM_StubThunk_6CB2DJ
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -806,7 +809,7 @@ loc_A4F57:
 		pop	si
 		pop	bp
 		retf
-PlayerComponentVariantY_ConstructAndInit_A4F40	endp
+DynAgrv_Construct_A4F40	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

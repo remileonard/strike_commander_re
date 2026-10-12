@@ -1894,7 +1894,7 @@ off_6EBB4	dd Debris_BodyDetach
 		dd loc_38090
 		dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
-		dd Debris_CombinePhysicsBodies
+		dd WorldObject_CollisionDamage_38210
 		dd loc_38342
 		db  25h	; %
 unk_6EC19	db  58h	; X
@@ -1962,7 +1962,7 @@ off_6ED02	dd loc_37F99
 off_6ED06	dd loc_38090
 		dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
-off_6ED12	dd Debris_CombinePhysicsBodies
+off_6ED12	dd WorldObject_CollisionDamage_38210
 		dd loc_38342
 off_6ED1A	dd loc_37CF4
 off_6ED1E	dd loc_451A1
@@ -1997,7 +1997,7 @@ off_6ED6E	dd loc_380E1
 		dd loc_38090
 		dd Decoy_GetFadingSignature0_451F1
 		dd VROOMM_StubThunk_6BFB0
-		dd Debris_CombinePhysicsBodies
+		dd WorldObject_CollisionDamage_38210
 off_6EDA2	dd loc_38342
 off_6EDA6	dd Decoy_GetFadingSignature1_45285
 off_6EDAA	dd Ctor_CompositeObjectA_4F5A4
@@ -2038,7 +2038,7 @@ off_6EE32	dd loc_46912
 off_6EE36	dd loc_3AB2D
 off_6EE3A	dd loc_3AB16
 off_6EE3E	dd loc_3AAFF
-off_6EE42	dd loc_46922
+off_6EE42	dd DYNM_AsJDYN_Base_46922
 off_6EE46	dd loc_3AAE8
 off_6EE4A	dd loc_3AAD1
 off_6EE4E	dd loc_3AABA
@@ -2062,10 +2062,10 @@ off_6EE92	dd loc_462A7
 off_6EE96	dd loc_462ED
 off_6EE9A	dd loc_462F5
 off_6EE9E	dd loc_46912
-off_6EEA2	dd loc_4536C
+off_6EEA2	dd SurfBody_TickNoOp_4536C
 off_6EEA6	dd loc_45376
 off_6EEAA	dd loc_4691A
-off_6EEAE	dd loc_46922
+off_6EEAE	dd DYNM_AsJDYN_Base_46922
 		dd loc_4692C
 		dd VROOMM_StubThunk_6C4F2
 		dd VROOMM_StubThunk_6C4F7
@@ -2082,10 +2082,10 @@ off_6EEDE	dd loc_4629F
 		dd loc_462ED
 		dd loc_462F5
 		dd loc_46912
-off_6EEF2	dd loc_421A7
+off_6EEF2	dd DurdBody_Tick_421A7
 		dd loc_42436
 off_6EEFA	dd loc_4691A
-		dd loc_46922
+		dd DYNM_AsJDYN_Base_46922
 		dd loc_4692C
 off_6EF06	dd VROOMM_StubThunk_6CB32
 		dd VROOMM_StubThunk_6CB37
@@ -2119,7 +2119,7 @@ off_6EF6E	dd loc_462ED
 		dd loc_3AD35
 		dd loc_3AD1E
 		dd loc_3AD07
-		dd loc_46922
+		dd DYNM_AsJDYN_Base_46922
 		dd loc_4692C
 		dd VROOMM_StubThunk_6C4BB
 		dd VROOMM_StubThunk_6C4C0
@@ -2153,7 +2153,7 @@ off_6EFFE	dd loc_46912
 off_6F002	dd loc_3AE8E
 off_6F006	dd loc_3AE77
 off_6F00A	dd loc_3AE60
-off_6F00E	dd loc_46922
+off_6F00E	dd DYNM_AsJDYN_Base_46922
 off_6F012	dd loc_4692C
 off_6F016	dd VROOMM_StubThunk_6C56C
 		dd VROOMM_StubThunk_6C571
@@ -2173,7 +2173,7 @@ off_6F04E	dd loc_46912
 off_6F052	dd MissileBody_GuidanceTick_42A4E
 off_6F056	dd loc_42CE7
 off_6F05A	dd loc_4691A
-off_6F05E	dd loc_46922
+off_6F05E	dd DYNM_AsJDYN_Base_46922
 off_6F062	dd loc_4692C
 off_6F066	dd VROOMM_StubThunk_6CB55
 off_6F06A	dd VROOMM_StubThunk_6CB5A
@@ -2201,7 +2201,7 @@ off_6F0B6	dd loc_462ED
 off_6F0C2	dd loc_3B0C5
 		dd loc_3B0AE
 off_6F0CA	dd loc_3B097
-		dd loc_46922
+		dd DYNM_AsJDYN_Base_46922
 off_6F0D2	dd loc_3B080
 off_6F0D6	dd loc_3B069
 off_6F0DA	dd loc_3B052
@@ -2235,7 +2235,7 @@ off_6F146	dd loc_46912
 off_6F14A	dd loc_26F6F
 		dd loc_26F6F
 off_6F152	dd loc_3B172
-off_6F156	dd loc_46922
+off_6F156	dd DYNM_AsJDYN_Base_46922
 		dd loc_4692C
 off_6F15E	dd loc_26F6F
 		dd loc_26F6F
@@ -2267,7 +2267,7 @@ off_6F1B6	dd loc_3B236
 off_6F1CA	dd loc_26F6F
 		dd loc_26F6F
 off_6F1D2	dd loc_3B1DA
-off_6F1D6	dd loc_46922
+off_6F1D6	dd DYNM_AsJDYN_Base_46922
 off_6F1DA	dd loc_4692C
 off_6F1DE	dd VROOMM_StubThunk_6CB7D
 off_6F1E2	dd VROOMM_StubThunk_6CB82
@@ -2300,7 +2300,7 @@ off_6F24A	dd loc_46912
 		dd loc_3B3AD
 off_6F252	dd loc_3B396
 		dd loc_3B37F
-off_6F25A	dd loc_46922
+off_6F25A	dd DYNM_AsJDYN_Base_46922
 off_6F25E	dd loc_3B368
 off_6F262	dd loc_3B351
 off_6F266	dd loc_3B33A
@@ -2334,7 +2334,7 @@ off_6F2D2	dd loc_46912
 off_6F2D6	dd loc_26F6F
 off_6F2DA	dd loc_26F6F
 off_6F2DE	dd loc_3B4CD
-off_6F2E2	dd loc_46922
+off_6F2E2	dd DYNM_AsJDYN_Base_46922
 off_6F2E6	dd loc_4692C
 		dd loc_26F6F
 off_6F2EE	dd loc_26F6F
@@ -2354,7 +2354,7 @@ off_6F322	dd loc_46912
 off_6F326	dd loc_26F6F
 		dd loc_26F6F
 off_6F32E	dd loc_4691A
-off_6F332	dd loc_46922
+off_6F332	dd DYNM_AsJDYN_Base_46922
 off_6F336	dd loc_4692C
 		dd VROOMM_StubThunk_6CBD3
 off_6F33E	dd VROOMM_StubThunk_6CBD8
@@ -2364,7 +2364,7 @@ off_6F34A	dd loc_46C9F
 		dd loc_46B74
 off_6F352	dd loc_46BC0
 off_6F356	dd loc_46BE6
-off_6F35A	dd loc_4A825
+off_6F35A	dd JDYN_TickUncontrolled_4A825
 off_6F35E	dd PhysicsTicks
 off_6F362	dd loc_498AD
 off_6F366	dd loc_3B4FB
@@ -2374,7 +2374,7 @@ off_6F372	dd loc_49050
 off_6F376	dd JDYN_TotalMass_47FF8
 off_6F37A	dd loc_491B7
 off_6F37E	dd loc_4AF1C
-off_6F382	dd loc_4B093
+off_6F382	dd JDYN_AsJDYN_4B093
 off_6F386	dd loc_3B86A
 		dd loc_3B85E
 off_6F38E	dd loc_3B852
@@ -2417,11 +2417,11 @@ off_6F41E	dd loc_3B5C8
 		dd loc_3B5B1
 		dd loc_3B59A
 		dd loc_3B583
-aBigspher_1	db 'BIGSPHER',0         ; DATA XREF: Debris_ComputeRandomizedForces_9C9A0+55o
+aBigspher_1	db 'BIGSPHER',0         ; DATA XREF: DamageSys_ApplyHit_9C9A0+55o
 aFuselage	db 'FUSELAGE',0
 aLwing_0	db 'LWING',0
 aRwing_0	db 'RWING',0
-aPlayer_1	db 'PLAYER',0           ; DATA XREF: Debris_AllocateFamily_9CB2C+3Bo
+aPlayer_1	db 'PLAYER',0           ; DATA XREF: DamageSys_DamagePercent_9CB2C+3Bo
 		align 2
 off_6F454	dd Dtor_ScalarDeleting_4F2C1
 off_6F458	dd VROOMM_StubThunk_6CCF5
@@ -2578,7 +2578,7 @@ off_6F6A4	dd loc_3CC36
 		dd loc_3CB3A
 off_6F6B8	dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
-off_6F6C0	dd Debris_CombinePhysicsBodies
+off_6F6C0	dd WorldObject_CollisionDamage_38210
 		dd loc_38342
 off_6F6C8	dd loc_37CF4
 off_6F6CC	dd Debris_NotifyChildValidate
@@ -2613,7 +2613,7 @@ off_6F738	dd loc_3CB78
 off_6F740	dd loc_3CB3A
 		dd WorldObject_GetSignatureByte0_381E5
 off_6F748	dd VROOMM_StubThunk_6BFB0
-off_6F74C	dd Debris_CombinePhysicsBodies
+off_6F74C	dd WorldObject_CollisionDamage_38210
 off_6F750	dd loc_38342
 off_6F754	dd loc_37CF4
 off_6F758	dd Debris_NotifyChildValidate
@@ -2648,7 +2648,7 @@ off_6F7C4	dd loc_3CB78
 off_6F7CC	dd loc_3CB3A
 off_6F7D0	dd WorldObject_GetSignatureByte0_381E5
 off_6F7D4	dd VROOMM_StubThunk_6BFB0
-off_6F7D8	dd Debris_CombinePhysicsBodies
+off_6F7D8	dd WorldObject_CollisionDamage_38210
 		dd loc_38342
 		dd loc_37CF4
 off_6F7E4	dd Debris_NotifyChildValidate
@@ -2683,13 +2683,13 @@ off_6F854	dd loc_3CBC6
 off_6F858	dd loc_3CB3A
 off_6F85C	dd WorldObject_GetSignatureByte0_381E5
 off_6F860	dd VROOMM_StubThunk_6BFB0
-off_6F864	dd Debris_CombinePhysicsBodies
+off_6F864	dd WorldObject_CollisionDamage_38210
 		dd loc_38342
 off_6F86C	dd loc_37CF4
 off_6F870	dd loc_3DEE7
 off_6F874	dd loc_37D2E
 off_6F878	dd loc_37DD1
-		dd loc_3DEFB
+		dd Aircraft_Update_3DEFB
 off_6F880	dd loc_3E115
 		dd loc_3E4AC
 		dd VROOMM_StubThunk_6C350
@@ -2718,9 +2718,9 @@ off_6F8E0	dd loc_3CBC6
 off_6F8E4	dd loc_3CB3A
 		dd Aircraft_ComputeSeekerSignature_3E2F1
 		dd loc_3E201
-off_6F8F0	dd Debris_CombinePhysicsBodies
+off_6F8F0	dd WorldObject_CollisionDamage_38210
 off_6F8F4	dd loc_3E419
-aLoweject	db 'LOWEJECT',0         ; DATA XREF: Debris_SpawnOrchestratorVariant_9D770+C9o
+aLoweject	db 'LOWEJECT',0         ; DATA XREF: Aircraft_OnDestroyed_9D770+C9o
 algn_6F901:
 		align 2
 word_6F902	dw 19h			; DATA XREF: seg087:0069r
@@ -2728,7 +2728,7 @@ word_6F902	dw 19h			; DATA XREF: seg087:0069r
 aChaff		db 'CHAFF',0            ; DATA XREF: Countermeasure_DeployChaffFlare+23o
 aFlare		db 'FLARE',0            ; DATA XREF: Countermeasure_DeployChaffFlare+41o
 aHardpt		db 'HARDPT#',0          ; DATA XREF: PlayerComponent_FormatAndDisplay_9F784+27o
-aPod		db 'POD',0              ; DATA XREF: PlayerComponent_LoadAndApply_9EDD4:loc_9EEC6o
+aPod		db 'POD',0              ; DATA XREF: WeaponSys_LoadWPNS_9EDD4:loc_9EEC6o
 aGun_0		db 'GUN',0              ; DATA XREF: PlayerComponent_FormatAndDisplay_9F784+74o
 off_6F920	dd loc_37CF4
 off_6F924	dd Debris_NotifyChildValidate
@@ -2763,7 +2763,7 @@ off_6F994	dd loc_3CBC6
 off_6F998	dd loc_3CB3A
 off_6F99C	dd WorldObject_GetSignatureByte0_381E5
 off_6F9A0	dd VROOMM_StubThunk_6BFB0
-off_6F9A4	dd Debris_CombinePhysicsBodies
+off_6F9A4	dd WorldObject_CollisionDamage_38210
 off_6F9A8	dd loc_38342
 off_6F9AC	dd loc_37CF4
 off_6F9B0	dd Debris_NotifyChildValidate
@@ -2798,7 +2798,7 @@ off_6FA20	dd loc_3CBC6
 off_6FA24	dd loc_3CB3A
 off_6FA28	dd WorldObject_GetSignatureByte0_381E5
 off_6FA2C	dd VROOMM_StubThunk_6BFB0
-off_6FA30	dd Debris_CombinePhysicsBodies
+off_6FA30	dd WorldObject_CollisionDamage_38210
 off_6FA34	dd loc_38342
 		dd loc_37CF4
 off_6FA3C	dd Debris_NotifyChildValidate
@@ -2833,7 +2833,7 @@ off_6FAAC	dd loc_3CBC6
 off_6FAB0	dd loc_3CB3A
 off_6FAB4	dd WorldObject_GetSignatureByte0_381E5
 		dd VROOMM_StubThunk_6BFB0
-		dd Debris_CombinePhysicsBodies
+		dd WorldObject_CollisionDamage_38210
 off_6FAC0	dd loc_38342
 off_6FAC4	dd loc_37CF4
 off_6FAC8	dd Debris_NotifyChildValidate
@@ -2868,7 +2868,7 @@ off_6FB38	dd loc_3CBC6
 off_6FB3C	dd loc_3CB3A
 off_6FB40	dd WorldObject_GetSignatureByte0_381E5
 off_6FB44	dd loc_42618
-		dd loc_4256C
+		dd Missile_CollisionDamage_4256C
 off_6FB4C	dd loc_38342
 off_6FB50	dd loc_37CF4
 off_6FB54	dd Debris_NotifyChildValidate
@@ -2903,10 +2903,10 @@ off_6FBC4	dd loc_3CBC6
 off_6FBC8	dd loc_3CB3A
 off_6FBCC	dd WorldObject_GetSignatureByte0_381E5
 off_6FBD0	dd VROOMM_StubThunk_6BFB0
-off_6FBD4	dd Debris_CombinePhysicsBodies
+off_6FBD4	dd WorldObject_CollisionDamage_38210
 		dd loc_43CBB
 aTerrain	db 'TERRAIN',0          ; DATA XREF: seg079:0080o
-					; Collision_OnTerrainContact_9D910+49o ...
+					; Aircraft_OnCollision_9D910+49o ...
 unk_6FBE4	db    0
 dword_6FBE5	dd 0			; DATA XREF: Collision_PrepareObjectPair+C2r
 					; Collision_PrepareObjectPair+ECr ...
@@ -2933,8 +2933,8 @@ off_6FC06	dd loc_37CF4
 off_6FC0A	dd Debris_NotifyChildValidate
 off_6FC0E	dd loc_37D2E
 off_6FC12	dd loc_37DD1
-off_6FC16	dd loc_45883
-off_6FC1A	dd loc_458C8
+off_6FC16	dd GroundObj_Update_45883
+off_6FC1A	dd GroundObj_IntegrateMotion_458C8
 off_6FC1E	dd loc_45A74
 off_6FC22	dd VROOMM_StubThunk_6C67A
 off_6FC26	dd VROOMM_StubThunk_6C190
@@ -2962,7 +2962,7 @@ off_6FC7A	dd loc_3CBC6
 off_6FC7E	dd loc_3CB3A
 off_6FC82	dd WorldObject_GetSignatureByte0_381E5
 off_6FC86	dd VROOMM_StubThunk_6BFB0
-		dd Debris_CombinePhysicsBodies
+		dd WorldObject_CollisionDamage_38210
 off_6FC8E	dd loc_453E3
 aHDDDSD		db 'H: %d',0Ah
 		db 'D: %d',0Ah
@@ -3003,7 +3003,7 @@ off_6FD40	dd loc_3CBC6
 off_6FD44	dd loc_3CB3A
 off_6FD48	dd WorldObject_GetSignatureByte0_381E5
 off_6FD4C	dd VROOMM_StubThunk_6BFB0
-off_6FD50	dd Debris_CombinePhysicsBodies
+off_6FD50	dd WorldObject_CollisionDamage_38210
 off_6FD54	dd loc_45B76
 off_6FD58	dd loc_37CF4
 off_6FD5C	dd Debris_NotifyChildValidate
@@ -3038,7 +3038,7 @@ off_6FDC8	dd loc_37E3F
 off_6FDD0	dd loc_38090
 off_6FDD4	dd WorldObject_GetSignatureByte0_381E5
 off_6FDD8	dd VROOMM_StubThunk_6BFB0
-off_6FDDC	dd Debris_CombinePhysicsBodies
+off_6FDDC	dd WorldObject_CollisionDamage_38210
 off_6FDE0	dd loc_38342
 off_6FDE4	dd loc_37CF4
 		dd loc_461AE
@@ -3073,7 +3073,7 @@ off_6FE58	dd loc_3CBC6
 off_6FE5C	dd loc_3CB3A
 off_6FE60	dd WorldObject_GetSignatureByte0_381E5
 off_6FE64	dd VROOMM_StubThunk_6BFB0
-off_6FE68	dd Debris_CombinePhysicsBodies
+off_6FE68	dd WorldObject_CollisionDamage_38210
 off_6FE6C	dd loc_38342
 word_6FE70	dw 0			; DATA XREF: GaugeWidget_FormatDisplayValue_A3CF6+120r
 word_6FE72	dw 0			; DATA XREF: PaletteScreen_AcquireOwnership_A1240+6r PaletteScreen_AcquireOwnership_A1240+Dw ...
@@ -3290,7 +3290,7 @@ off_700C2	dd loc_37F99
 off_700C6	dd loc_38090
 		dd WorldObject_GetSignatureByte0_381E5
 off_700CE	dd VROOMM_StubThunk_6BFB0
-off_700D2	dd Debris_CombinePhysicsBodies
+off_700D2	dd WorldObject_CollisionDamage_38210
 off_700D6	dd loc_38342
 off_700DA	dd loc_37CF4
 off_700DE	dd Debris_NotifyChildValidate
@@ -3371,7 +3371,7 @@ off_70212	dd loc_3CBC6
 off_70216	dd loc_3CB3A
 		dd WorldObject_GetSignatureByte0_381E5
 off_7021E	dd VROOMM_StubThunk_6BFB0
-off_70222	dd Debris_CombinePhysicsBodies
+off_70222	dd WorldObject_CollisionDamage_38210
 off_70226	dd loc_38342
 off_7022A	dd loc_4EB84
 		dd loc_290DD
@@ -3417,7 +3417,7 @@ off_702CA	dd loc_37F99
 off_702CE	dd loc_38090
 off_702D2	dd WorldObject_GetSignatureByte0_381E5
 off_702D6	dd VROOMM_StubThunk_6BFB0
-off_702DA	dd loc_4E0E5
+off_702DA	dd Tracer_CollisionDamage_4E0E5
 off_702DE	dd loc_38342
 off_702E2	dd loc_37CF4
 off_702E6	dd Debris_NotifyChildValidate
@@ -3452,7 +3452,7 @@ off_70356	dd loc_3CBC6
 off_7035A	dd loc_3CB3A
 off_7035E	dd WorldObject_GetSignatureByte0_381E5
 off_70362	dd VROOMM_StubThunk_6BFB0
-off_70366	dd Debris_CombinePhysicsBodies
+off_70366	dd WorldObject_CollisionDamage_38210
 off_7036A	dd loc_38342
 		dd loc_4F13B
 off_70372	dd loc_2BDCF
@@ -3501,7 +3501,7 @@ off_7041A	dd loc_3CBC6
 off_7041E	dd loc_3CB3A
 off_70422	dd WorldObject_GetSignatureByte0_381E5
 off_70426	dd VROOMM_StubThunk_6BFB0
-off_7042A	dd Debris_CombinePhysicsBodies
+off_7042A	dd WorldObject_CollisionDamage_38210
 off_7042E	dd loc_38342
 unk_70432	db  54h	; T		; DATA XREF: Terrain_SectorIndexResolve:loc_3358Ao
 					; TextureLoader_OpenAndLoadFull_98A60+24o ...
@@ -3579,7 +3579,7 @@ aGamePaused	db 'game paused',0      ; DATA XREF: CombatTarget_WeaponActionSubsys
 aTimeBurst	db 'Time Burst',0       ; DATA XREF: CombatTarget_WeaponActionSubsystem+3A9o
 aMissions	db 'MISSIONS',0         ; DATA XREF: World_OpenAndParseFile_A75D0+4Bo
 dword_704CD	dd 454E4F4Eh		; DATA XREF: PlayerComponent_ReadFieldAndDispatch_9DF2A:loc_9DF30o
-					; PlayerComponent_LoadAndApply_9EDD4+14Do ...
+					; WeaponSys_LoadWPNS_9EDD4+14Do ...
 dword_704D1	dd 0			; DATA XREF: MissionLoader_LoadFormation_A78F5+43r
 dword_704D5	dd 4E5553h		; DATA XREF: MissionLoader_SpawnEntity_A7B1E+FFr
 dword_704D9	dd 0			; DATA XREF: MissionLoader_SpawnEntity_A7B1E+10Ar

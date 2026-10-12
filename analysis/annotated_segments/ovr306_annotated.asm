@@ -7,10 +7,19 @@ ovr306		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 218 lignes, NON DÉTAILLÉE — combine CRT_MemFamily_Extra4 et Math_RandomScale_54DF4
-; (seg115, répété) — calcul de forces aléatoires pour la dispersion de débris.
+; far, LUE 2026-10-12. Ex-'Debris_ComputeRandomizedForces' (FAUX : aucune force). RÉPARTIT LES
+; DÉGÂTS D'UN IMPACT SUR LES COMPOSANTS SYSM d'un avion. Args : (table des composants,
+; projectile si, nom du volume touché arg_6). Points P = projectile→vtable+0x84(propriétaire)
+; (WorldObject_CollisionDamage_38210, Missile_CollisionDamage_4256C,
+; Tracer_CollisionDamage_4E0E5 ou Explosion_DamageAtDistance_4BE51) ; P ≤ 0 → rien ; cible =
+; joueur (word_722E6) → P ÷ 2 (au moins 1). ZONE : le nom du volume touché, sauf « BIGSPHER »
+; (sphère englobante) → tirage Math_RandomScale_54DF4(4) : 0-1 FUSELAGE, 2 LWING, 3 RWING.
+; Collecte jusqu'à 17 composants dont le SECOND NOM (+0x0B) est cette zone ; part d'un rang
+; tiré au hasard et parcourt la liste en boucle : chaque composant absorbe min(P, résistance −
+; dégâts) (+1 += …, borné à la résistance), P diminue d'autant, jusqu'à P = 0 ou tous
+; parcourus.
 ; ==============================================================================================
-Debris_ComputeRandomizedForces_9C9A0	proc far		; CODE XREF: VROOMM_StubThunk_6C0E0J
+DamageSys_ApplyHit_9C9A0	proc far		; CODE XREF: VROOMM_StubThunk_6C0E0J
 
 var_54		= word ptr -54h
 var_14		= byte ptr -14h
@@ -45,7 +54,7 @@ arg_6		= dword	ptr  0Ch
 		jmp	loc_9CB28
 ; ���������������������������������������������������������������������������
 
-loc_9C9CD:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+28j
+loc_9C9CD:				; CODE XREF: DamageSys_ApplyHit_9C9A0+28j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+6]
 		cmp	ax, word_722E6
@@ -55,8 +64,8 @@ loc_9C9CD:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+28j
 		jnz	short loc_9C9E3
 		mov	si, 1
 
-loc_9C9E3:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+38j
-					; Debris_ComputeRandomizedForces_9C9A0+3Ej
+loc_9C9E3:				; CODE XREF: DamageSys_ApplyHit_9C9A0+38j
+					; DamageSys_ApplyHit_9C9A0+3Ej
 		les	bx, [bp+arg_0]
 		mov	eax, es:[bx]
 		mov	[bp+var_8], eax
@@ -78,7 +87,7 @@ loc_9C9E3:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+38j
 		jmp	short loc_9CA34
 ; ���������������������������������������������������������������������������
 
-loc_9CA1D:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+71j
+loc_9CA1D:				; CODE XREF: DamageSys_ApplyHit_9C9A0+71j
 		cmp	dx, 2
 		jnz	short loc_9CA2C
 		mov	word ptr [bp+var_4+2], ds
@@ -86,17 +95,17 @@ loc_9CA1D:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+71j
 		jmp	short loc_9CA34
 ; ���������������������������������������������������������������������������
 
-loc_9CA2C:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+80j
+loc_9CA2C:				; CODE XREF: DamageSys_ApplyHit_9C9A0+80j
 		mov	word ptr [bp+var_4+2], ds
 		mov	word ptr [bp+var_4], 2396h
 
-loc_9CA34:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+62j
-					; Debris_ComputeRandomizedForces_9C9A0+7Bj ...
+loc_9CA34:				; CODE XREF: DamageSys_ApplyHit_9C9A0+62j
+					; DamageSys_ApplyHit_9C9A0+7Bj ...
 		mov	[bp+var_A], 0
 		jmp	short loc_9CA77
 ; ���������������������������������������������������������������������������
 
-loc_9CA3B:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+E1j
+loc_9CA3B:				; CODE XREF: DamageSys_ApplyHit_9C9A0+E1j
 		push	large [bp+var_4]
 		mov	ax, word ptr [bp+var_8]
 		add	ax, 0Bh
@@ -118,17 +127,17 @@ loc_9CA3B:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+E1j
 		cmp	di, 10h
 		jg	short loc_9CA83
 
-loc_9CA70:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+B3j
+loc_9CA70:				; CODE XREF: DamageSys_ApplyHit_9C9A0+B3j
 		inc	[bp+var_A]
 		add	word ptr [bp+var_8], 14h
 
-loc_9CA77:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+99j
+loc_9CA77:				; CODE XREF: DamageSys_ApplyHit_9C9A0+99j
 		les	bx, [bp+arg_0]
 		mov	ax, es:[bx+4]
 		cmp	ax, [bp+var_A]
 		jg	short loc_9CA3B
 
-loc_9CA83:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+CEj
+loc_9CA83:				; CODE XREF: DamageSys_ApplyHit_9C9A0+CEj
 		mov	ax, di
 
 loc_9CA85:
@@ -143,7 +152,7 @@ loc_9CA92:
 		jmp	loc_9CB19
 ; ���������������������������������������������������������������������������
 
-loc_9CA95:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+185j
+loc_9CA95:				; CODE XREF: DamageSys_ApplyHit_9C9A0+185j
 		mov	bx, cx
 		shl	bx, 2
 		lea	ax, [bp+var_54]
@@ -168,7 +177,7 @@ loc_9CAC3:
 		jge	short loc_9CACB
 		mov	[bp+var_13], dl
 
-loc_9CACB:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+126j
+loc_9CACB:				; CODE XREF: DamageSys_ApplyHit_9C9A0+126j
 		mov	al, [bp+var_13]
 		mov	[bp+var_14], al
 		les	bx, [bp+var_12]
@@ -191,12 +200,12 @@ loc_9CAE4:
 		jmp	short loc_9CB02
 ; ���������������������������������������������������������������������������
 
-loc_9CAF8:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+148j
+loc_9CAF8:				; CODE XREF: DamageSys_ApplyHit_9C9A0+148j
 		les	bx, [bp+var_12]
 		mov	al, [bp+var_14]
 		add	es:[bx+1], al
 
-loc_9CB02:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+156j
+loc_9CB02:				; CODE XREF: DamageSys_ApplyHit_9C9A0+156j
 		mov	al, [bp+var_13]
 		mov	ah, 0
 		sub	[bp+var_E], ax
@@ -209,11 +218,11 @@ loc_9CB02:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+156j
 		jmp	short loc_9CB19
 ; ���������������������������������������������������������������������������
 
-loc_9CB18:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+172j
+loc_9CB18:				; CODE XREF: DamageSys_ApplyHit_9C9A0+172j
 		inc	cx
 
-loc_9CB19:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0:loc_9CA92j
-					; Debris_ComputeRandomizedForces_9C9A0+176j
+loc_9CB19:				; CODE XREF: DamageSys_ApplyHit_9C9A0:loc_9CA92j
+					; DamageSys_ApplyHit_9C9A0+176j
 		cmp	[bp+var_E], 0
 		jle	short loc_9CB28
 		cmp	[bp+var_C], 0
@@ -221,13 +230,13 @@ loc_9CB19:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0:loc_9CA92j
 		jmp	loc_9CA95
 ; ���������������������������������������������������������������������������
 
-loc_9CB28:				; CODE XREF: Debris_ComputeRandomizedForces_9C9A0+2Aj
-					; Debris_ComputeRandomizedForces_9C9A0+17Dj ...
+loc_9CB28:				; CODE XREF: DamageSys_ApplyHit_9C9A0+2Aj
+					; DamageSys_ApplyHit_9C9A0+17Dj ...
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_ComputeRandomizedForces_9C9A0	endp
+DamageSys_ApplyHit_9C9A0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -235,9 +244,12 @@ Debris_ComputeRandomizedForces_9C9A0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle CRT_MemFamily_Extra4 (99 lignes).
+; far, LUE 2026-10-12. Ex-'Debris_AllocateFamily' (FAUX). TAUX DE DÉGÂTS GLOBAL d'un avion, en
+; % : 100 si le composant « PLAYER » (le pilote) a des dégâts ≥ sa résistance ; sinon Σ dégâts
+; × 100 / Σ résistances. Comparé par Aircraft_OnCollision_9D910 au champ 9 de JINF (modèle
+; +0x68, défaut 30) : au-delà, l'avion est perdu.
 ; ==============================================================================================
-Debris_AllocateFamily_9CB2C	proc far		; CODE XREF: VROOMM_StubThunk_6C0E5J
+DamageSys_DamagePercent_9CB2C	proc far		; CODE XREF: VROOMM_StubThunk_6C0E5J
 
 var_1C		= word ptr -1Ch
 var_1A		= dword	ptr -1Ah
@@ -263,7 +275,7 @@ arg_0		= dword	ptr  6
 		jmp	short loc_9CBA0
 ; ���������������������������������������������������������������������������
 
-loc_9CB53:				; CODE XREF: Debris_AllocateFamily_9CB2C+7Bj
+loc_9CB53:				; CODE XREF: DamageSys_DamagePercent_9CB2C+7Bj
 		les	bx, [bp+var_C]
 		mov	al, es:[bx]
 		mov	ah, 0
@@ -293,8 +305,8 @@ loc_9CB85:
 		jmp	short loc_9CBD9
 ; ���������������������������������������������������������������������������
 
-loc_9CB8A:				; CODE XREF: Debris_AllocateFamily_9CB2C+52j
-					; Debris_AllocateFamily_9CB2C:loc_9CB83j
+loc_9CB8A:				; CODE XREF: DamageSys_DamagePercent_9CB2C+52j
+					; DamageSys_DamagePercent_9CB2C:loc_9CB83j
 		movsx	eax, di
 		add	[bp+var_4], eax
 		movsx	eax, [bp+var_1C]
@@ -302,7 +314,7 @@ loc_9CB8A:				; CODE XREF: Debris_AllocateFamily_9CB2C+52j
 		inc	si
 		add	word ptr [bp+var_C], 14h
 
-loc_9CBA0:				; CODE XREF: Debris_AllocateFamily_9CB2C+25j
+loc_9CBA0:				; CODE XREF: DamageSys_DamagePercent_9CB2C+25j
 		les	bx, [bp+arg_0]
 
 loc_9CBA3:
@@ -330,11 +342,11 @@ loc_9CBB5:
 		mov	ax, word ptr [bp+var_12+1]
 		mov	[bp+var_E], ax
 
-loc_9CBD9:				; CODE XREF: Debris_AllocateFamily_9CB2C+5Cj
+loc_9CBD9:				; CODE XREF: DamageSys_DamagePercent_9CB2C+5Cj
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_AllocateFamily_9CB2C	endp
+DamageSys_DamagePercent_9CB2C	endp
 
 ovr306		ends

@@ -7,11 +7,17 @@ seg451		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 197 lignes, NON DÉTAILLÉE — combine sub_3C942, sub_6C5A0,
-; ResourceRecord_SeekAndRead_64743, ReadFieldGroupC_64A7E (×7), ReadFieldGroupB_64A54 (×2,
-; seg193), gestion d'erreur — motif standard de chargement massif de champs IFF.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryM'. Lecteur de la classe TRCR
+; (rafale de canon traçante) : Object_LoadCommonAndAllegiance_3C942, WDAT, puis chunk INFO
+; (obligatoire, sinon B008h), 7 int32 24.8 puis 2 uint16 : 1 → +0x7C vitesse de départ (m/s) ;
+; 2 → +0x5E jamais lu ; 3 → +0x62 dispersion au départ (m par image, amplitude du tremblement
+; aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5 → +0x6A
+; durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (± m/s) ; 7
+; → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A jamais lu ; 9
+; uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5). Dérivé : +0x6E =
+; (fin − départ) × dt / durée (calculé avec le dt du chargement).
 ; ==============================================================================================
-PlayerComponent_LoadFieldsWithRetryM_A66F0	proc far		; CODE XREF: VROOMM_StubThunk_6CC70J
+TracerModel_LoadINFOChunk_A66F0	proc far		; CODE XREF: VROOMM_StubThunk_6CC70J
 
 var_2C		= dword	ptr -2Ch
 var_28		= dword	ptr -28h
@@ -42,7 +48,7 @@ loc_A6702:
 		mov	byte_6E33B, cl
 		push	si
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		push	si
 		push	large [bp+arg_0]
@@ -58,7 +64,7 @@ loc_A6702:
 		jmp	loc_A6896
 ; ���������������������������������������������������������������������������
 
-loc_A673C:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+47j
+loc_A673C:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+47j
 		push	si
 		call	ResourceRecord_ReadFieldGroupC_64A7E
 		push	dx
@@ -149,10 +155,10 @@ loc_A67F4:
 		jmp	short loc_A6809
 ; ���������������������������������������������������������������������������
 
-loc_A6807:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+110j
+loc_A6807:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+110j
 		xor	ax, ax
 
-loc_A6809:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+115j
+loc_A6809:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+115j
 		or	al, al
 		jz	short loc_A682D
 
@@ -165,7 +171,7 @@ loc_A680D:
 		les	bx, [bp+arg_0]
 		mov	es:[bx+76h], eax
 
-loc_A682D:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+11Bj
+loc_A682D:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+11Bj
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 6Ah	; 'j'
@@ -198,16 +204,16 @@ loc_A6874:
 		jmp	short loc_A689F
 ; ���������������������������������������������������������������������������
 
-loc_A6896:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+49j
+loc_A6896:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+49j
 		push	0B008h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A689F:				; CODE XREF: PlayerComponent_LoadFieldsWithRetryM_A66F0+1A4j
+loc_A689F:				; CODE XREF: TracerModel_LoadINFOChunk_A66F0+1A4j
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadFieldsWithRetryM_A66F0	endp
+TracerModel_LoadINFOChunk_A66F0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

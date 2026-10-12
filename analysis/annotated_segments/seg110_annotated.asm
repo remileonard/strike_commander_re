@@ -270,7 +270,7 @@ Timer_TickFarPtr_4FA80	endp
 ; far, appelle Timer_SetAbsolute puis remet à zéro 4 octets de compteurs/flags de pulsation
 ; (+5..+8) de l'objet.
 ; ==============================================================================================
-Timer_SetAbsoluteAndResetPulses_4FAFC	proc far		; CODE XREF: PlayerComponent_InitPulseTimer_A0455+29P
+Timer_SetAbsoluteAndResetPulses_4FAFC	proc far		; CODE XREF: Missile_InitSeekerDelay_A0455+29P
 					; PlayerComponent_RegisterAndInitPulses_A0B40+3CP
 
 arg_0		= word ptr  6

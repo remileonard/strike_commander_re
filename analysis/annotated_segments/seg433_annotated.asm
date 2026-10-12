@@ -15,7 +15,9 @@ seg433		segment	para public 'OVERLAY' use16
 ; ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position
 ; absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03
 ; 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete
-; suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001.
+; suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001. |
+; COMPLÉMENT 2026-10-12 : octet +0x5F = DÉLAI D'ARMEMENT (s entières,
+; Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : aucun lecteur trouvé.
 ; ==============================================================================================
 BombModel_LoadDATAChunk_9FAD0	proc far		; CODE XREF: VROOMM_StubThunk_6C470J PlayerComponentVariantB_ConstructAndInit_9FBDE+26p
 
@@ -378,9 +380,12 @@ PlayerComponentVariantC_ConstructAndInit_9FC45	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Timer_SetAbsolute_4F9A2 (seg110) — initialise un champ minuteur du composant.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_InitTimerField'. À la création d'une bombe :
+; minuteur +0x5A = DATA champ 2 du modèle (+0x5F, uint8 en secondes entières) et +4 bit 1
+; effacé ; la mise à jour de la bombe (loc_41A59) repose ce bit quand le minuteur est échu
+; (bit 1 = l'objet peut entrer en collision ; même bit que EXTE).
 ; ==============================================================================================
-PlayerComponent_InitTimerField_9FD1C	proc far		; CODE XREF: VROOMM_StubThunk_6C47AJ PlayerComponent_SubHelperA_9FD58+16p
+Bomb_InitArmingDelay_9FD1C	proc far		; CODE XREF: VROOMM_StubThunk_6C47AJ PlayerComponent_SubHelperA_9FD58+16p
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -429,7 +434,7 @@ loc_9FD45:
 		pop	si
 		leave
 		retf
-PlayerComponent_InitTimerField_9FD1C	endp
+Bomb_InitArmingDelay_9FD1C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -454,7 +459,7 @@ arg_2		= dword	ptr  8
 		add	sp, 6
 		push	si
 		push	cs
-		call	near ptr PlayerComponent_InitTimerField_9FD1C
+		call	near ptr Bomb_InitArmingDelay_9FD1C
 		pop	cx
 		pop	si
 		pop	bp
@@ -1238,7 +1243,7 @@ loc_A0133:
 		push	si
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldGroupB_A014E
+		call	near ptr DynDurd_LoadDURDChunk_A014E
 		add	sp, 4
 		push	di
 		push	si
@@ -1256,10 +1261,12 @@ PlayerComponent_SubHelperK_A012B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54, ReadFieldGroupC_64A7E
-; (seg193), gestion d'erreur.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupB'. LECTEUR DU CHUNK 'DURD'
+; (dynamique Durandal) : uint16 → +0x21 = distance de freinage D (mètres, entier) ; int32 →
+; shl 8 → +0x23 = vitesse verticale minimale (m/s, ENTIER tel quel, négatif = vers le bas).
+; Chunk absent : erreur 0xC004. Consommateur : DurdBody_Tick_421A7.
 ; ==============================================================================================
-PlayerComponent_LoadFieldGroupB_A014E	proc far		; CODE XREF: VROOMM_StubThunk_6C4E3J PlayerComponent_SubHelperK_A012B+Fp
+DynDurd_LoadDURDChunk_A014E	proc far		; CODE XREF: VROOMM_StubThunk_6C4E3J PlayerComponent_SubHelperK_A012B+Fp
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -1304,17 +1311,17 @@ loc_A015E:
 		jmp	short loc_A01A5
 ; ���������������������������������������������������������������������������
 
-loc_A019C:				; CODE XREF: PlayerComponent_LoadFieldGroupB_A014E+21j
+loc_A019C:				; CODE XREF: DynDurd_LoadDURDChunk_A014E+21j
 		push	0C004h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_A01A5:				; CODE XREF: PlayerComponent_LoadFieldGroupB_A014E+4Cj
+loc_A01A5:				; CODE XREF: DynDurd_LoadDURDChunk_A014E+4Cj
 		pop	di
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadFieldGroupB_A014E	endp
+DynDurd_LoadDURDChunk_A014E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

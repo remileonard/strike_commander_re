@@ -230,10 +230,11 @@ PlayerComponent_ReadFieldAndDispatch_9DF2A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine PlayerComponent_ReadFieldAndDispatch_9DF2A, sub_2B007 et sub_3B876 — charge des
-; données de composant depuis le format ResourceRecord/IFF. Appelée par sub_9EDD4.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFromResourceRecord'. UNE ARME DE WPNS (10 o) :
+; uint16 → +0x10 quantité ; string[8] → +4 nom de l'objet, chargé par IFF_LoadModelMain
+; (OBJECTS\<nom>.IFF) → +0 modèle.
 ; ==============================================================================================
-PlayerComponent_LoadFromResourceRecord_9DF63	proc far		; CODE XREF: VROOMM_StubThunk_6C385J PlayerComponent_ReleaseAndReload_9DFC5+54p	...
+WeaponSys_LoadWeaponEntry_9DF63	proc far		; CODE XREF: VROOMM_StubThunk_6C385J PlayerComponent_ReleaseAndReload_9DFC5+54p	...
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -297,7 +298,7 @@ loc_9DFB2:
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFromResourceRecord_9DF63	endp
+WeaponSys_LoadWeaponEntry_9DF63	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -354,7 +355,7 @@ loc_9DFF3:
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr PlayerComponent_LoadFromResourceRecord_9DF63
+		call	near ptr WeaponSys_LoadWeaponEntry_9DF63
 		add	sp, 6
 
 loc_9E01F:				; CODE XREF: PlayerComponent_ReleaseAndReload_9DFC5+26j
@@ -1241,7 +1242,7 @@ PlayerComponent_ReleaseHelper_9E58E	endp
 ; ==============================================================================================
 ; far, appelle sub_9E731. Référencée par sub_9F1D0/9F434/9F760.
 ; ==============================================================================================
-PlayerComponent_Helper_9E651	proc far		; CODE XREF: VROOMM_StubThunk_6C39EJ PlayerComponent_LoadTripleField_9E682+1Ep	...
+PlayerComponent_Helper_9E651	proc far		; CODE XREF: VROOMM_StubThunk_6C39EJ WeaponSys_LoadHardpoint_9E682+1Ep	...
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -1281,11 +1282,12 @@ PlayerComponent_Helper_9E651	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine PlayerComponent_Helper_9E651, ResourceRecord_ReadFinalField_64B51,
-; ResourceRecord_ReadFieldGroupC_64A7E (×3, seg193) — lecture de 3 champs depuis le format
-; IFF.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadTripleField'. UN POINT D'EMPORT HPTS (13 o) :
+; uint8 → +0x15 TYPE (0 à 4, voir WeaponSys_LoadStoresOnHardpoint_9EA2E) ; 3 int32 24.8 →
+; +1/+5/+9 position dans le repère de l'avion (asm c0, c1, c2 ; libRS.x = c0, libRS.y = c2,
+; libRS.z = c1).
 ; ==============================================================================================
-PlayerComponent_LoadTripleField_9E682	proc far		; CODE XREF: VROOMM_StubThunk_6C3A3J PlayerComponent_LoadMultiField_9F07F+F7p
+WeaponSys_LoadHardpoint_9E682	proc far		; CODE XREF: VROOMM_StubThunk_6C3A3J WeaponSys_LoadInfoHptsDcoy_9F07F+F7p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -1361,7 +1363,7 @@ loc_9E6E5:
 		jmp	short loc_9E729
 ; ���������������������������������������������������������������������������
 
-loc_9E716:				; CODE XREF: PlayerComponent_LoadTripleField_9E682+AAj
+loc_9E716:				; CODE XREF: WeaponSys_LoadHardpoint_9E682+AAj
 		les	bx, [bp+arg_0]
 		les	bx, es:[bx+16h]
 		mov	ax, dx
@@ -1370,13 +1372,13 @@ loc_9E716:				; CODE XREF: PlayerComponent_LoadTripleField_9E682+AAj
 		mov	word ptr es:[bx], 0
 		inc	dx
 
-loc_9E729:				; CODE XREF: PlayerComponent_LoadTripleField_9E682+92j
+loc_9E729:				; CODE XREF: WeaponSys_LoadHardpoint_9E682+92j
 		cmp	dx, 8
 		jl	short loc_9E716
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadTripleField_9E682	endp
+WeaponSys_LoadHardpoint_9E682	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1844,10 +1846,15 @@ PlayerComponent_ComputeComplex_9E812	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 269 lignes, NON DÉTAILLÉE — appelle sub_2E74 (externe), référencée 3 fois par
-; sub_9F286. Candidat pour session dédiée.
+; far, LUE PARTIELLEMENT 2026-10-12. Ex-'PlayerComponent_ComputeComplexB'. Charge des armes
+; (masque si, quantité di) sur un point d'emport selon son TYPE HPTS (+0x15) : capacité
+; maximale par arme (bit = id d'arme − 1) — type 0 : canon seulement (0x800, toute la
+; quantité) ; 1 : AIM-9J, AIM-9M, AIM-120 ×1 ; 2 : AIM-9J/M ×1, AGM-65D ×3, LAU-3 ×2, MK-20
+; ×6, MK-82 ×6, Durandal ×3, GBU-15 ×1, AIM-120 ×2 ; 3 : AGM-65D ×3, LAU-3 ×2, MK-20 ×6, MK-82
+; ×6, Durandal ×3, GBU-15 ×1 ; 4 : AIM-9J/M ×1 ; autre : rien. Le nombre chargé (+0x13) ne
+; dépasse pas cette capacité.
 ; ==============================================================================================
-PlayerComponent_ComputeComplexB_9EA2E	proc far		; CODE XREF: VROOMM_StubThunk_6C3BCJ PlayerComponent_OrchestrateComplex_9F286+99p	...
+WeaponSys_LoadStoresOnHardpoint_9EA2E	proc far		; CODE XREF: VROOMM_StubThunk_6C3BCJ PlayerComponent_OrchestrateComplex_9F286+99p	...
 
 var_A		= word ptr -0Ah
 var_8		= word ptr -8
@@ -1882,7 +1889,7 @@ loc_9EA45:
 		jmp	loc_9EB8A
 ; ���������������������������������������������������������������������������
 
-loc_9EA48:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EA43j
+loc_9EA48:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EA43j
 		les	bx, [bp+arg_4]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_9EA5B
@@ -1891,10 +1898,10 @@ loc_9EA48:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EA43j
 		jmp	short loc_9EA5D
 ; ���������������������������������������������������������������������������
 
-loc_9EA5B:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+22j
+loc_9EA5B:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+22j
 		xor	ax, ax
 
-loc_9EA5D:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+2Bj
+loc_9EA5D:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+2Bj
 		mov	si, ax
 		les	bx, [bp+arg_0]
 
@@ -1906,8 +1913,8 @@ loc_9EA62:
 		jmp	loc_9EB8A
 ; ���������������������������������������������������������������������������
 
-loc_9EA72:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+39j
-					; PlayerComponent_ComputeComplexB_9EA2E+3Fj
+loc_9EA72:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+39j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E+3Fj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+15h]
 		mov	ah, 0
@@ -1917,7 +1924,7 @@ loc_9EA72:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+39j
 		jmp	loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EA85:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+52j
+loc_9EA85:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+52j
 		shl	bx, 1
 		jmp	cs:off_9EBCD[bx] ; switch jump
 
@@ -1930,14 +1937,14 @@ loc_9EA91:
 		jmp	loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EA96:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EA91j
+loc_9EA96:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EA91j
 		mov	dx, di
 		jmp	loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 		jmp	loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EA9E:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+59j
+loc_9EA9E:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+59j
 					; DATA XREF: seg432:off_9EBCDo
 		mov	ax, si		; case 0x4
 		cmp	ax, 1
@@ -1953,7 +1960,7 @@ loc_9EAA3:				; case 0x80
 		jmp	short loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EAB0:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+59j
+loc_9EAB0:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+59j
 					; DATA XREF: seg432:off_9EBCDo
 		mov	ax, si		; case 0x1
 		cmp	ax, 1
@@ -1969,13 +1976,13 @@ loc_9EAB0:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+59j
 		jmp	short loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EAC7:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+59j
+loc_9EAC7:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+59j
 					; DATA XREF: seg432:off_9EBCDo
 		mov	[bp+var_4], si	; case 0x2
 		mov	cx, 9		; switch 9 cases
 		mov	bx, offset word_9EBA9
 
-loc_9EAD0:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+ADj
+loc_9EAD0:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+ADj
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_4]
 		jz	short loc_9EADF
@@ -1984,35 +1991,35 @@ loc_9EAD0:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+ADj
 		jmp	short loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EADF:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+A8j
+loc_9EADF:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+A8j
 		jmp	word ptr cs:[bx+12h] ; switch jump
 ; ���������������������������������������������������������������������������
 		jmp	short loc_9EB0B	; case 0x8
 ; ���������������������������������������������������������������������������
 
-loc_9EAE5:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EADFj
+loc_9EAE5:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EADFj
 					; DATA XREF: seg432:0D5Bo
 		jmp	short loc_9EB0B	; case 0x8
 ; ���������������������������������������������������������������������������
 
-loc_9EAE7:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EADFj
+loc_9EAE7:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EADFj
 					; DATA XREF: seg432:0D5Bo
 		jmp	short loc_9EB10	; case 0x4
 ; ���������������������������������������������������������������������������
 
-loc_9EAE9:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EADFj
+loc_9EAE9:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EADFj
 					; DATA XREF: seg432:0D5Bo
 		jmp	short loc_9EB15	; case 0x10
 ; ���������������������������������������������������������������������������
 
-loc_9EAEB:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EADFj
+loc_9EAEB:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EADFj
 					; DATA XREF: seg432:0D5Bo
 		jmp	short loc_9EB1A	; case 0x1
 ; ���������������������������������������������������������������������������
 		jmp	short loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EAEF:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+59j
+loc_9EAEF:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+59j
 					; DATA XREF: seg432:off_9EBCDo
 		mov	[bp+var_6], si	; case 0x3
 
@@ -2020,7 +2027,7 @@ loc_9EAF2:				; switch 6 cases
 		mov	cx, 6
 		mov	bx, offset word_9EB91
 
-loc_9EAF8:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+D5j
+loc_9EAF8:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+D5j
 		mov	ax, cs:[bx]
 		cmp	ax, [bp+var_6]
 		jz	short loc_9EB07
@@ -2029,42 +2036,42 @@ loc_9EAF8:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+D5j
 		jmp	short loc_9EB1F	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EB07:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+D0j
+loc_9EB07:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+D0j
 		jmp	word ptr cs:[bx+0Ch] ; switch jump
 
-loc_9EB0B:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+B5j
-					; PlayerComponent_ComputeComplexB_9EA2E:loc_9EAE5j
+loc_9EB0B:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+B5j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EAE5j
 					; DATA XREF: ...
 		mov	dx, 2		; case 0x8
 		jmp	short loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EB10:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EAE7j
-					; PlayerComponent_ComputeComplexB_9EA2E:loc_9EB07j
+loc_9EB10:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EAE7j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EB07j
 					; DATA XREF: ...
 		mov	dx, 3		; case 0x4
 		jmp	short loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EB15:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EAE9j
-					; PlayerComponent_ComputeComplexB_9EA2E:loc_9EB07j
+loc_9EB15:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EAE9j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EB07j
 					; DATA XREF: ...
 		mov	dx, 6		; case 0x10
 		jmp	short loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EB1A:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EAA3j
-					; PlayerComponent_ComputeComplexB_9EA2E+7Aj ...
+loc_9EB1A:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EAA3j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E+7Aj ...
 		mov	dx, 1		; case 0x80
 		jmp	short loc_9EB21	; default
 ; ���������������������������������������������������������������������������
 
-loc_9EB1F:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+65j
-					; PlayerComponent_ComputeComplexB_9EA2E+6Dj ...
+loc_9EB1F:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+65j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E+6Dj ...
 		xor	dx, dx		; default
 
-loc_9EB21:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+54j
-					; PlayerComponent_ComputeComplexB_9EA2E+6Aj ...
+loc_9EB21:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+54j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E+6Aj ...
 		les	bx, [bp+arg_0]	; default
 		mov	ax, di
 		add	ax, es:[bx+13h]
@@ -2075,7 +2082,7 @@ loc_9EB21:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+54j
 		jmp	short loc_9EB47
 ; ���������������������������������������������������������������������������
 
-loc_9EB37:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+FEj
+loc_9EB37:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+FEj
 		les	bx, [bp+arg_0]
 		mov	ax, dx
 
@@ -2084,7 +2091,7 @@ loc_9EB3C:
 		mov	[bp+var_2], ax
 		mov	es:[bx+13h], dx
 
-loc_9EB47:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+107j
+loc_9EB47:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+107j
 		cmp	[bp+var_2], 0
 		jle	short loc_9EB8A
 		les	bx, [bp+arg_0]
@@ -2108,17 +2115,17 @@ loc_9EB47:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E+107j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+22h], 0
 
-loc_9EB8A:				; CODE XREF: PlayerComponent_ComputeComplexB_9EA2E:loc_9EA45j
-					; PlayerComponent_ComputeComplexB_9EA2E+41j ...
+loc_9EB8A:				; CODE XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E:loc_9EA45j
+					; WeaponSys_LoadStoresOnHardpoint_9EA2E+41j ...
 		mov	ax, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-PlayerComponent_ComputeComplexB_9EA2E	endp
+WeaponSys_LoadStoresOnHardpoint_9EA2E	endp
 
 ; ���������������������������������������������������������������������������
-word_9EB91	dw	4,     8,   10h,   20h ; DATA XREF: PlayerComponent_ComputeComplexB_9EA2E+C7o
+word_9EB91	dw	4,     8,   10h,   20h ; DATA XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+C7o
 		dw    40h,   80h	; value	table for switch statement
 off_9EB9D	dw offset loc_9EB10	; jump table for switch	statement
 		dw offset loc_9EB0B
@@ -2126,7 +2133,7 @@ off_9EB9D	dw offset loc_9EB10	; jump table for switch	statement
 		dw offset loc_9EB15
 		dw offset loc_9EB10
 		dw offset loc_9EB1A
-word_9EBA9	dw	1,     2,     4,     8 ; DATA XREF: PlayerComponent_ComputeComplexB_9EA2E+9Fo
+word_9EBA9	dw	1,     2,     4,     8 ; DATA XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+9Fo
 		dw    10h,   20h,   40h,   80h ; value table for switch	statement
 		dw   100h
 		dw offset loc_9EAEB	; jump table for switch	statement
@@ -2138,7 +2145,7 @@ word_9EBA9	dw	1,     2,     4,     8 ; DATA XREF: PlayerComponent_ComputeComplex
 		dw offset loc_9EAE7
 		dw offset loc_9EAEB
 		dw offset loc_9EAE5
-off_9EBCD	dw offset loc_9EA8C	; DATA XREF: PlayerComponent_ComputeComplexB_9EA2E+59r
+off_9EBCD	dw offset loc_9EA8C	; DATA XREF: WeaponSys_LoadStoresOnHardpoint_9EA2E+59r
 		dw offset loc_9EAB0	; jump table for switch	statement
 		dw offset loc_9EAC7
 		dw offset loc_9EAEF
@@ -2190,7 +2197,7 @@ arg_4		= word ptr  0Ah
 		push	bx
 		nop
 		push	cs
-		call	near ptr PlayerComponent_Dispatch_9ED62
+		call	near ptr WeaponSys_LoadFromIFF_9ED62
 
 loc_9EC30:
 		add	sp, 6
@@ -2230,7 +2237,7 @@ PlayerComponent_ReleaseAndLoad_9EBD7	endp
 ; far, combine PlayerComponent_SetReferenceHelper_9EC8A et PlayerComponent_Helper_9ED43.
 ; Référencée via jmp depuis un stub VROOMM (sub_6C3C6) et par plusieurs fonctions du cluster.
 ; ==============================================================================================
-PlayerComponent_DispatchPair_9EC4D	proc far		; CODE XREF: VROOMM_StubThunk_6C3C6J PlayerComponent_Dispatch_9ED62+1Fp	...
+PlayerComponent_DispatchPair_9EC4D	proc far		; CODE XREF: VROOMM_StubThunk_6C3C6J WeaponSys_LoadFromIFF_9ED62+1Fp	...
 
 arg_0		= dword	ptr  6
 
@@ -2376,11 +2383,14 @@ PlayerComponent_Helper_9ED43	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 68 lignes, NON DÉTAILLÉE — combine PlayerComponent_DispatchPair_9EC4D, sub_9EF74,
-; ResourceRecord_SeekAndReadB_647B2 (seg193), sub_2AFE0, sub_9EFBE. Référencée via jmp depuis
-; un stub VROOMM (sub_6C3D0).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_Dispatch'. LECTEUR DE L'ARMEMENT d'un modèle
+; ARMG/JETP (via PlayerComponent_ReleaseAndLoad_9EBD7, modèle +0x4A).
+; WeaponSys_LoadFormWEAP_9EF74 sur le fichier courant ; si pas de FORM WEAP : FORM WFIL
+; (ResourceRecord_SeekAndReadB_647B2('WFIL')) dont le contenu est une chaîne = nom d'un
+; fichier OBJECTS\<nom>.IFF, ouvert par WeaponSys_LoadFromFile_9EFBE (dont la racine est un
+; FORM WEAP).
 ; ==============================================================================================
-PlayerComponent_Dispatch_9ED62	proc far		; CODE XREF: VROOMM_StubThunk_6C3D0J PlayerComponent_ReleaseAndLoad_9EBD7+56p
+WeaponSys_LoadFromIFF_9ED62	proc far		; CODE XREF: VROOMM_StubThunk_6C3D0J PlayerComponent_ReleaseAndLoad_9EBD7+56p
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -2410,7 +2420,7 @@ loc_9ED65:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadSequence_9EF74
+		call	near ptr WeaponSys_LoadFormWEAP_9EF74
 		add	sp, 6
 		mov	ah, 0
 		or	ax, ax
@@ -2439,15 +2449,15 @@ loc_9EDC1:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr PlayerComponent_ConstructFromStream_9EFBE
+		call	near ptr WeaponSys_LoadFromFile_9EFBE
 		add	sp, 6
 
-loc_9EDD1:				; CODE XREF: PlayerComponent_Dispatch_9ED62+36j
-					; PlayerComponent_Dispatch_9ED62+4Bj
+loc_9EDD1:				; CODE XREF: WeaponSys_LoadFromIFF_9ED62+36j
+					; WeaponSys_LoadFromIFF_9ED62+4Bj
 		pop	si
 		leave
 		retf
-PlayerComponent_Dispatch_9ED62	endp
+WeaponSys_LoadFromIFF_9ED62	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2455,12 +2465,13 @@ PlayerComponent_Dispatch_9ED62	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 239 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (seg193),
-; Memory_TypedFree_5C7B6, PlayerComponent_SetReferenceHelper_9EC8A,
-; PlayerComponent_LoadFromResourceRecord_9DF63, sub_2E3C, sub_2DF4, sub_9F286. Candidat pour
-; session dédiée.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadAndApply'. Chunk WPNS (exige des points
+; d'emport) : n = taille ÷ 10 armes, chacune lue par WeaponSys_LoadWeaponEntry_9DF63 dans des
+; enregistrements de 0x12 o (+0x14 tableau, +0x1C nombre) ; une arme dont le nom commence par
+; « POD » donne +0x1E = quantité × 19 (roquettes) ; un enregistrement vide termine la liste ;
+; puis PlayerComponent_OrchestrateComplex_9F286 répartit les armes sur les points d'emport.
 ; ==============================================================================================
-PlayerComponent_LoadAndApply_9EDD4	proc far		; CODE XREF: VROOMM_StubThunk_6C3E4J PlayerComponent_LoadSequence_9EF74+37p
+WeaponSys_LoadWPNS_9EDD4	proc far		; CODE XREF: VROOMM_StubThunk_6C3E4J WeaponSys_LoadFormWEAP_9EF74+37p
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -2487,7 +2498,7 @@ loc_9EDDF:
 		jmp	loc_9EF70
 ; ���������������������������������������������������������������������������
 
-loc_9EDFD:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+24j
+loc_9EDFD:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+24j
 		push	0
 		push	large 534E5057h
 		push	si
@@ -2498,7 +2509,7 @@ loc_9EDFD:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+24j
 		jmp	loc_9EF70
 ; ���������������������������������������������������������������������������
 
-loc_9EE15:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+3Cj
+loc_9EE15:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+3Cj
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+14h], 0
 		jz	short loc_9EE3C
@@ -2518,7 +2529,7 @@ loc_9EE34:
 loc_9EE39:
 		add	sp, 8
 
-loc_9EE3C:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+4Aj
+loc_9EE3C:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+4Aj
 		push	large [bp+arg_0]
 		push	cs
 
@@ -2544,7 +2555,7 @@ loc_9EE5D:
 		jmp	loc_9EF70
 ; ���������������������������������������������������������������������������
 
-loc_9EE67:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+8Ej
+loc_9EE67:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+8Ej
 		push	1
 		push	0
 		push	2
@@ -2566,18 +2577,18 @@ loc_9EE91:
 		jmp	loc_9EF70
 ; ���������������������������������������������������������������������������
 
-loc_9EE9C:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+C3j
+loc_9EE9C:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+C3j
 		mov	eax, es:[bx+14h]
 		mov	[bp+var_8], eax
 		xor	di, di
 		jmp	short loc_9EF00
 ; ���������������������������������������������������������������������������
 
-loc_9EEA9:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+133j
+loc_9EEA9:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+133j
 		push	si
 		push	large [bp+var_8]
 		push	cs
-		call	near ptr PlayerComponent_LoadFromResourceRecord_9DF63
+		call	near ptr WeaponSys_LoadWeaponEntry_9DF63
 
 loc_9EEB2:
 		add	sp, 6
@@ -2618,10 +2629,10 @@ loc_9EEDF:
 		jmp	short loc_9EEE6
 ; ���������������������������������������������������������������������������
 
-loc_9EEE4:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+109j
+loc_9EEE4:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+109j
 		xor	ax, ax
 
-loc_9EEE6:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+10Ej
+loc_9EEE6:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+10Ej
 		or	al, al
 		jz	short loc_9EEFB
 		les	bx, [bp+var_8]
@@ -2634,11 +2645,11 @@ loc_9EEF4:
 		les	bx, [bp+arg_0]
 		mov	es:[bx+1Eh], ax
 
-loc_9EEFB:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+114j
+loc_9EEFB:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+114j
 		inc	di
 		add	word ptr [bp+var_8], 12h
 
-loc_9EF00:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+D3j
+loc_9EF00:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+D3j
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+1Ch], di
 		jg	short loc_9EEA9
@@ -2692,13 +2703,13 @@ loc_9EF5C:
 		call	near ptr PlayerComponent_OrchestrateComplex_9F286
 		add	sp, 4
 
-loc_9EF70:				; CODE XREF: PlayerComponent_LoadAndApply_9EDD4+26j
-					; PlayerComponent_LoadAndApply_9EDD4+3Ej ...
+loc_9EF70:				; CODE XREF: WeaponSys_LoadWPNS_9EDD4+26j
+					; WeaponSys_LoadWPNS_9EDD4+3Ej ...
 		pop	di
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadAndApply_9EDD4	endp
+WeaponSys_LoadWPNS_9EDD4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2706,11 +2717,11 @@ PlayerComponent_LoadAndApply_9EDD4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndReadB_647B2, sub_9F07F,
-; PlayerComponent_LoadAndApply_9EDD4, ResourceRecord_ReleaseAndClear_64D25 (seg193).
-; Référencée via jmp depuis un stub VROOMM (sub_6C3D5) et par PlayerComponent_Dispatch_9ED62.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadSequence'. Entre dans le FORM WEAP, puis
+; WeaponSys_LoadInfoHptsDcoy_9F07F et WeaponSys_LoadWPNS_9EDD4, puis ressort. Renvoie 1 si le
+; FORM existe.
 ; ==============================================================================================
-PlayerComponent_LoadSequence_9EF74	proc far		; CODE XREF: VROOMM_StubThunk_6C3D5J PlayerComponent_Dispatch_9ED62+2Cp	...
+WeaponSys_LoadFormWEAP_9EF74	proc far		; CODE XREF: VROOMM_StubThunk_6C3D5J WeaponSys_LoadFromIFF_9ED62+2Cp	...
 
 var_1		= byte ptr -1
 arg_0		= dword	ptr  6
@@ -2735,23 +2746,23 @@ loc_9EF92:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadMultiField_9F07F
+		call	near ptr WeaponSys_LoadInfoHptsDcoy_9F07F
 		add	sp, 6
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr PlayerComponent_LoadAndApply_9EDD4
+		call	near ptr WeaponSys_LoadWPNS_9EDD4
 		add	sp, 6
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_9EFB8:				; CODE XREF: PlayerComponent_LoadSequence_9EF74+22j
+loc_9EFB8:				; CODE XREF: WeaponSys_LoadFormWEAP_9EF74+22j
 		mov	al, [bp+var_1]
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadSequence_9EF74	endp
+WeaponSys_LoadFormWEAP_9EF74	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2759,12 +2770,13 @@ PlayerComponent_LoadSequence_9EF74	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 103 lignes, NON DÉTAILLÉE — combine sub_2B06C, StreamReader_ConstructVariantA_63A39
-; (seg190), dispatch vtable [bx+0x14], PlayerComponent_LoadSequence_9EF74, gestion d'erreur
-; (sub_6B70F), sub_645A5 (seg193), StreamReader_ReleaseBuffer_65643 (seg195). Référencée via
-; jmp depuis un stub VROOMM (sub_6C3DA) et par PlayerComponent_Dispatch_9ED62.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_ConstructFromStream'. (système d'armes, nom) :
+; ouvre OBJECTS\<nom>.IFF (Path_ResolveDataFile) et y lit le FORM WEAP
+; (WeaponSys_LoadFormWEAP_9EF74) ; échec → erreur C01Bh. Utilisé par FORM WFIL et par le 3e
+; nom d'un enregistrement PART (emport imposé par la mission,
+; PartEntry_ResolveSpawnPositionAndActivate_51EDC).
 ; ==============================================================================================
-PlayerComponent_ConstructFromStream_9EFBE	proc far		; CODE XREF: VROOMM_StubThunk_6C3DAJ PlayerComponent_Dispatch_9ED62+69p
+WeaponSys_LoadFromFile_9EFBE	proc far		; CODE XREF: VROOMM_StubThunk_6C3DAJ WeaponSys_LoadFromIFF_9ED62+69p
 
 var_FA		= word ptr -0FAh
 var_9D		= dword	ptr -9Dh
@@ -2838,11 +2850,11 @@ loc_9F036:
 loc_9F03D:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr PlayerComponent_LoadSequence_9EF74
+		call	near ptr WeaponSys_LoadFormWEAP_9EF74
 		add	sp, 6
 		mov	[bp+var_1], al
 
-loc_9F04B:				; CODE XREF: PlayerComponent_ConstructFromStream_9EFBE:loc_9F036j
+loc_9F04B:				; CODE XREF: WeaponSys_LoadFromFile_9EFBE:loc_9F036j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -2853,7 +2865,7 @@ loc_9F057:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9F05D:				; CODE XREF: PlayerComponent_ConstructFromStream_9EFBE+94j
+loc_9F05D:				; CODE XREF: WeaponSys_LoadFromFile_9EFBE+94j
 		mov	[bp+var_FA], 2E0h
 		lea	ax, [bp+var_FA]
 		push	ax
@@ -2866,7 +2878,7 @@ loc_9F05D:				; CODE XREF: PlayerComponent_ConstructFromStream_9EFBE+94j
 		add	sp, 4
 		leave
 		retf
-PlayerComponent_ConstructFromStream_9EFBE	endp
+WeaponSys_LoadFromFile_9EFBE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2874,12 +2886,15 @@ PlayerComponent_ConstructFromStream_9EFBE	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 176 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (×2),
-; ResourceRecord_ReadFieldGroupC_64A7E, ResourceRecord_ReadFieldGroupB_64A54, sub_9F82C,
-; Memory_TypedFree_5C7B6, PlayerComponent_Helper_9ED43. Référencée via jmp depuis un stub
-; VROOMM (sub_6C3DF) et par PlayerComponent_LoadSequence_9EF74.
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadMultiField'. Chunks du FORM WEAP, tous
+; facultatifs. INFO : int32 → +0x3E portée du capteur (mètres entiers), uint16 → +0x42 demi-
+; angle (degrés) — passés à World_SelectTargetInCone_22795 par WeaponSystem_FrameUpdate_3F8C0.
+; HPTS : n = taille ÷ 13 points d'emport, enregistrements mémoire de 0x23 o (+0x34 tableau,
+; +0x38 nombre), chacun lu par WeaponSys_LoadHardpoint_9E682. DCOY : uint16 → +0x3C paillettes
+; (CHAFF), uint16 → +0x3A leurres IR (FLARE) (Countermeasure_DeployChaffFlare) ; absent → 0,
+; 0.
 ; ==============================================================================================
-PlayerComponent_LoadMultiField_9F07F	proc far		; CODE XREF: VROOMM_StubThunk_6C3DFJ PlayerComponent_LoadSequence_9EF74+2Bp
+WeaponSys_LoadInfoHptsDcoy_9F07F	proc far		; CODE XREF: VROOMM_StubThunk_6C3DFJ WeaponSys_LoadFormWEAP_9EF74+2Bp
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -2913,7 +2928,7 @@ arg_4		= word ptr  0Ah
 		les	bx, [bp+arg_0]
 		mov	es:[bx+42h], ax
 
-loc_9F0C0:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+1Ej
+loc_9F0C0:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+1Ej
 		push	0
 
 loc_9F0C2:
@@ -2928,7 +2943,7 @@ loc_9F0C9:
 		jmp	loc_9F18A
 ; ���������������������������������������������������������������������������
 
-loc_9F0D8:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+54j
+loc_9F0D8:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+54j
 		les	bx, [bp+arg_0]
 		cmp	dword ptr es:[bx+34h], 0
 		jz	short loc_9F10E
@@ -2949,7 +2964,7 @@ loc_9F0D8:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+54j
 		call	Memory_TypedFree_5C7B6
 		add	sp, 8
 
-loc_9F10E:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+62j
+loc_9F10E:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+62j
 		push	large [bp+arg_0]
 		push	cs
 		call	near ptr PlayerComponent_Helper_9ED43
@@ -2993,27 +3008,27 @@ loc_9F15E:
 loc_9F165:
 		mov	word ptr es:[bx+38h], 0
 
-loc_9F16B:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+E4j
+loc_9F16B:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+E4j
 		xor	di, di
 		jmp	short loc_9F181
 ; ���������������������������������������������������������������������������
 
-loc_9F16F:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+109j
+loc_9F16F:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+109j
 		push	di
 		push	si
 		push	large [bp+var_8]
 		push	cs
-		call	near ptr PlayerComponent_LoadTripleField_9E682
+		call	near ptr WeaponSys_LoadHardpoint_9E682
 		add	sp, 8
 		inc	di
 		add	word ptr [bp+var_8], 23h ; '#'
 
-loc_9F181:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+EEj
+loc_9F181:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+EEj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+38h], di
 		jg	short loc_9F16F
 
-loc_9F18A:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+56j
+loc_9F18A:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+56j
 		push	0
 		push	large 594F4344h
 		push	si
@@ -3040,7 +3055,7 @@ loc_9F1B7:
 		jmp	short loc_9F1CC
 ; ���������������������������������������������������������������������������
 
-loc_9F1BD:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+11Ej
+loc_9F1BD:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+11Ej
 		les	bx, [bp+arg_0]
 
 loc_9F1C0:
@@ -3049,12 +3064,12 @@ loc_9F1C0:
 loc_9F1C6:
 		mov	word ptr es:[bx+3Ah], 0
 
-loc_9F1CC:				; CODE XREF: PlayerComponent_LoadMultiField_9F07F+13Cj
+loc_9F1CC:				; CODE XREF: WeaponSys_LoadInfoHptsDcoy_9F07F+13Cj
 		pop	di
 		pop	si
 		leave
 		retf
-PlayerComponent_LoadMultiField_9F07F	endp
+WeaponSys_LoadInfoHptsDcoy_9F07F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -3220,7 +3235,7 @@ PlayerComponent_HelperVariantC_9F24C	endp
 ; es:[arg_0+0x38]) de (nombre d'armes word station+0x13) x (masse d'une arme = objet DYNM
 ; (station+0x0F)->+0x36, methode vtable+0x10). Lue par JDYN_TotalMass_47FF8.
 ; ==============================================================================================
-PlayerComponent_OrchestrateComplex_9F286	proc far		; CODE XREF: VROOMM_StubThunk_6C3E9J PlayerComponent_LoadAndApply_9EDD4+196p
+PlayerComponent_OrchestrateComplex_9F286	proc far		; CODE XREF: VROOMM_StubThunk_6C3E9J WeaponSys_LoadWPNS_9EDD4+196p
 
 var_1A		= dword	ptr -1Ah
 var_16		= dword	ptr -16h
@@ -3307,7 +3322,7 @@ loc_9F2ED:				; CODE XREF: PlayerComponent_OrchestrateComplex_9F286+DFj
 		push	large [bp+var_C]
 		push	large [bp+var_10]
 		push	cs
-		call	near ptr PlayerComponent_ComputeComplexB_9EA2E
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_9EA2E
 		add	sp, 0Ah
 		sub	si, ax
 		add	word ptr [bp+var_10], 23h ; '#'
@@ -3319,7 +3334,7 @@ loc_9F332:
 		push	cs
 
 loc_9F337:
-		call	near ptr PlayerComponent_ComputeComplexB_9EA2E
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_9EA2E
 
 loc_9F33A:
 		add	sp, 0Ah
@@ -3340,7 +3355,7 @@ loc_9F346:
 		push	cs
 
 loc_9F34F:
-		call	near ptr PlayerComponent_ComputeComplexB_9EA2E
+		call	near ptr WeaponSys_LoadStoresOnHardpoint_9EA2E
 		add	sp, 0Ah
 		sub	si, ax
 		add	word ptr [bp+var_10], 23h ; '#'
@@ -4068,7 +4083,7 @@ PlayerComponent_FormatAndDisplay_9F784	endp
 ; far, appelle Memory_TypedFree_5C7B6. Référencée via jmp depuis un stub VROOMM (sub_6C411) et
 ; par PlayerComponent_LoadMultiField_9F07F.
 ; ==============================================================================================
-PlayerComponent_ReleaseHelperB_9F82C	proc far		; CODE XREF: VROOMM_StubThunk_6C411J PlayerComponent_LoadMultiField_9F07F+6Ap	...
+PlayerComponent_ReleaseHelperB_9F82C	proc far		; CODE XREF: VROOMM_StubThunk_6C411J WeaponSys_LoadInfoHptsDcoy_9F07F+6Ap	...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4

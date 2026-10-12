@@ -13,7 +13,14 @@ seg175		segment	byte public 'CODE' use16
 ; dont deux pointeurs far). Référencée depuis seg032 (zoom carte/radar) ET seg106 (émetteur de
 ; particules) — probable primitive de rendu de sprite/icône avec mise à l'échelle et/ou
 ; rotation, partagée entre plusieurs sous-systèmes. Candidat prioritaire pour session dédiée
-; (aucune lecture de détail effectuée).
+; (aucune lecture de détail effectuée). | LU EN PARTIE 2026-10-12 (arguments et boucle de
+; pixels). Args : (surface, x, y, forme far, n° d'image, largeur, hauteur, table de remappage
+; far, A, B). Forme = format de sprite RealSpace : dword en +0, table de dwords d'offsets
+; d'images à partir de +4, chaque image commence par 4 int16 d'étendue (droite, gauche, haut,
+; bas). Pixel de couleur c : c < A ou c ≥ A + B → couleur c dessinée telle quelle ; A ≤ c < A
+; + B → pixel TRANSLUCIDE : nouvelle couleur = table[(c − A) × 256 + couleur déjà à l'écran]
+; (xlat). Appelé par le rendu des particules en mode 2 (A, B = octets +0x19/+0x1A du modèle de
+; fumée ; table = remappage de la teinte courante).
 ; ==============================================================================================
 Render_DrawScaledSprite_621A2	proc far		; CODE XREF: seg032:0783P seg106:0C30P ...
 

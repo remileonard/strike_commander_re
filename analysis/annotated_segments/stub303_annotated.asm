@@ -31,8 +31,8 @@ VROOMM_StubThunk_6C040	endp
 ; far, thunk fixe VROOMM (jmp sub_9C7BA) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2A2A0h, codesize=856h, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6C045	proc far		; DATA XREF: Debris_LoadFieldMixC_9BFB0+337o
-					; Debris_LoadFieldMixC_9BFB0+355o ...
+VROOMM_StubThunk_6C045	proc far		; DATA XREF: Exte_LoadVolume_9BFB0+337o
+					; Exte_LoadVolume_9BFB0+355o ...
 		jmp	Debris_AllocateExtended_9C7BA
 VROOMM_StubThunk_6C045	endp
 
@@ -46,7 +46,7 @@ VROOMM_StubThunk_6C045	endp
 ; d'overlay actuellement charge en memoire. fileoff=2A2A0h, codesize=856h, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6C04A	proc far		; CODE XREF: Object_LoadExteChunk_9BDE9+71P
-		jmp	Debris_LoadFieldMixC_9BFB0
+		jmp	Exte_LoadVolume_9BFB0
 VROOMM_StubThunk_6C04A	endp
 
 

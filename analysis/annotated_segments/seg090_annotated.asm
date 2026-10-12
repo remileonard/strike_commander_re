@@ -171,7 +171,12 @@ loc_42568:				; CODE XREF: seg090:002Fj seg090:0123j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4256C:				; DATA XREF: seg339:2A98o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Méthode +0x84 de l'instance MISS (vtable 0x2A14) : dégâts de
+; choc WorldObject_CollisionDamage_38210 + dégâts max du chunk EXPL du modèle (int16, modèle
+; +0x19 → +0x0A) × (10 − Math_RandomScale_54DF4(5)) / 10, soit 60 à 100 % de la valeur EXPL.
+; ==============================================================================================
+Missile_CollisionDamage_4256C:				; DATA XREF: seg339:2A98o
 		push	bp
 		mov	bp, sp
 		sub	sp, 18h
@@ -180,7 +185,7 @@ loc_4256C:				; DATA XREF: seg339:2A98o
 		mov	si, [bp+6]
 		push	word ptr [bp+8]
 		push	si
-		call	Debris_CombinePhysicsBodies
+		call	WorldObject_CollisionDamage_38210
 		add	sp, 4
 
 loc_42583:

@@ -698,7 +698,7 @@ Effect_NotifyAndResetList	endp
 ; far,46L — copie 8 octets dans un objet et initialise 3 champs à zéro (position?) :
 ; initialisation d'un effet visuel/particule avec position nulle.
 ; ==============================================================================================
-Effect_InitZeroPosition	proc far		; CODE XREF: Debris_LoadFieldMixC_9BFB0+44FP
+Effect_InitZeroPosition	proc far		; CODE XREF: Exte_LoadVolume_9BFB0+44FP
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h

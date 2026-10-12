@@ -3326,7 +3326,7 @@ loc_40288:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9A0j
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_56], ax
 		push	ax
@@ -3349,7 +3349,7 @@ loc_402C5:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9CAj
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	[bp+var_58], ax
 		push	ax
@@ -3437,7 +3437,7 @@ loc_40383:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9A7j
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_60+2],	ax
 		push	ax
@@ -3460,7 +3460,7 @@ loc_403DB:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+AE6j
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_60], ax
 		push	ax
@@ -3638,7 +3638,7 @@ loc_4054C:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C64j
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_56], ax
 		push	ax
@@ -3655,7 +3655,7 @@ loc_4057B:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C8Ej
 		push	di
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	[bp+var_58], ax
 		push	ax
@@ -3685,7 +3685,7 @@ loc_405C8:
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_5C+2],	ax
 		push	ax
@@ -3777,7 +3777,7 @@ loc_40672:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+C6Bj
 		push	59C3h
 
 loc_406B5:
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 
 loc_406BA:
 		add	sp, 10h
@@ -3798,7 +3798,7 @@ loc_406C3:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+DD8j
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_68+2],	ax
 		push	ax
@@ -3822,7 +3822,7 @@ loc_406E7:				; CODE XREF: WeaponSystem_FrameUpdate_3F8C0:loc_406C1j
 		push	word ptr es:[bx+0Dh]
 		push	word ptr es:[bx+9]
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	word ptr [bp+var_68], ax
 		push	ax

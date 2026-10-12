@@ -21,12 +21,15 @@ OrntModel_GetCategory_3C93B:				; DATA XREF: seg339:off_6F630o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk
-; 'ALGN' (4E474C41h, octets disque A L G N) via sub_64743, résout une valeur associée
-; (sub_64B51) stockée à +0x35 : chargement d'un paramètre angulaire depuis un chunk IFF
-; (probable angle d'attache/orientation d'un sous-composant).
+; far, LUE 2026-10-12. Ex-'IFF_LoadAngleParam' (FAUX : pas un angle). Lecteur de base des
+; classes ORNT et dérivées : Object_LoadCommonChunks_9BA85 puis chunk ALGN facultatif : uint8
+; (int8) → modèle +0x35 = CAMP de l'objet (ALLÉGEANCE) ; absent → 0. Recopié dans l'instance
+; +0x50 (WorldObject_BaseConstructAttached, Camera_InitAttachedWithTarget_3DC3D…) : 1 = camp
+; du joueur, 0xFF (−1) = adverse, 0 = neutre. Le champ « camp » de PART l'écrase
+; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Lu par Targeting_AcquireBestThreat,
+; World_OnObjectDestroyed_53A94, Goal_MoraleReaction_878F, Music_ScanNearbyEnemies_590E0…
 ; ==============================================================================================
-IFF_LoadAngleParam	proc far		; CODE XREF: IFF_LoadModelMain:loc_3BA6EP
+Object_LoadCommonAndAllegiance_3C942	proc far		; CODE XREF: IFF_LoadModelMain:loc_3BA6EP
 					; IFF_LoadAngleParam_Wrapper+AP	...
 
 arg_0		= dword	ptr  6
@@ -61,17 +64,17 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_3C993
 ; ���������������������������������������������������������������������������
 
-loc_3C98B:				; CODE XREF: IFF_LoadAngleParam+37j
+loc_3C98B:				; CODE XREF: Object_LoadCommonAndAllegiance_3C942+37j
 		les	bx, [bp+arg_0]
 
 loc_3C98E:
 		mov	byte ptr es:[bx+35h], 0
 
-loc_3C993:				; CODE XREF: IFF_LoadAngleParam+47j
+loc_3C993:				; CODE XREF: Object_LoadCommonAndAllegiance_3C942+47j
 		pop	si
 		pop	bp
 		retf
-IFF_LoadAngleParam	endp
+Object_LoadCommonAndAllegiance_3C942	endp
 
 ; ���������������������������������������������������������������������������
 

@@ -212,7 +212,7 @@
   "sub_9FAD0": {
     "new_name": "BombModel_LoadDATAChunk_9FAD0",
     "segment": "seg433",
-    "summary": "far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA' (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet -> +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60, mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001."
+    "summary": "far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA' (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet -> +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60, mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001. | COMPLÉMENT 2026-10-12 : octet +0x5F = DÉLAI D'ARMEMENT (s entières, Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : aucun lecteur trouvé."
   },
   "sub_6B31F": {
     "new_name": "VROOMM_StubThunk_6B31F",
@@ -607,7 +607,7 @@
   "sub_48FC2": {
     "new_name": "Aero_ControlOrchestrator_48FC2",
     "segment": "seg103",
-    "summary": "far, seg103 L2099-2185 (relu intégralement, session 2026-09-05). ORCHESTRATEUR complet du vecteur moment (tangage,roulis,lacet) retourné à `PhysicsTicks`, assemblé dans un buffer malloc'é de 12 octets. Séquence exacte : (1) `Aero_ComputeAoACommand_48862(si)` - calcule la CONSIGNE de tangage (loi de charge/var_30) et l'écrit dans `si[0x16]`, PAS de valeur de retour capturée ici ; (2) `Aero_ResetAccumulatorFlags75Bit5(si)` - calcule la consigne de lacet (palonnier seul, confirmé indépendant du roulis/alpha) et l'écrit dans `si[0x1A]`, pas de retour capturé ; (3) `Aero_ApplyGroundEffect(si)` -> slot 0 (tangage) = extrait `m_alpha` de `Aero_ComputeForcesMain_4791E` (qui lit `si[0x16]` en interne comme consigne), + effet de sol ; (4) `Aero_ComputeControlFlags75Bit5C(si)` -> slot 1 (roulis) = loi directe manche (confirmée correcte par Rémi) ; (5) `Aero_ExtractRollMoment(si)` [mal nommée, cf. son entrée] -> slot 2 (lacet) = extrait `m_beta` d'un DEUXIÈME appel à `Aero_ComputeForcesMain_4791E` (qui lit `si[0x1A]` comme consigne). **Point clé : `Aero_ComputeForcesMain` est appelée DEUX FOIS par tick (une pour tangage via 3, une pour lacet via 5), la même loi d'asservissement racine carrée servant aux deux axes** - alpha_actuel et beta_actuel étant tous deux dérivés de la même vitesse corps courante (donc du roulis courant via la transformation monde->corps), c'est ce qui relie physiquement roulis et lacet sans mécanisme de couplage discret séparé."
+    "summary": "far, seg103 L2099-2185 (relu intégralement, session 2026-09-05). ORCHESTRATEUR complet du vecteur moment (tangage,roulis,lacet) retourné à `PhysicsTicks`, assemblé dans un buffer malloc'é de 12 octets. Séquence exacte : (1) `Aero_ComputeAoACommand_48862(si)` - calcule la CONSIGNE de tangage (loi de charge/var_30) et l'écrit dans `si[0x16]`, PAS de valeur de retour capturée ici ; (2) `Aero_ResetAccumulatorFlags75Bit5(si)` - calcule la consigne de lacet (palonnier seul, confirmé indépendant du roulis/alpha) et l'écrit dans `si[0x1A]`, pas de retour capturé ; (3) `Aero_ApplyGroundEffect(si)` -> slot 0 (tangage) = extrait `m_alpha` de `Aero_ComputeForcesMain_4791E` (qui lit `si[0x16]` en interne comme consigne), + effet de sol ; (4) `Aero_ComputeControlFlags75Bit5C(si)` -> slot 1 (roulis) = loi directe manche (confirmée correcte par Rémi) ; (5) `Aero_ExtractRollMoment(si)` [mal nommée, cf. son entrée] -> slot 2 (lacet) = extrait `m_beta` d'un DEUXIÈME appel à `Aero_ComputeForcesMain_4791E` (qui lit `si[0x1A]` comme consigne). **Point clé : `Aero_ComputeForcesMain` est appelée DEUX FOIS par tick (une pour tangage via 3, une pour lacet via 5), la même loi d'asservissement racine carrée servant aux deux axes** - alpha_actuel et beta_actuel étant tous deux dérivés de la même vitesse corps courante (donc du roulis courant via la transformation monde->corps), c'est ce qui relie physiquement roulis et lacet sans mécanisme de couplage discret séparé. | COMPLÉMENT 2026-10-12 (fin de la fonction) : DÉCISION « AU SOL » (A+0x20). Toutes les conditions : vitesse verticale (asm c2, A+0x10) > −JDYN champ 12 (+0x4E, m/s) ; |roulis| (Matrix_RollAngle_57C67) < champ 14 (+0x56, uint8 °) ; tangage du nez (Matrix_NosePitchAngle_57C3A) < champ 15 (+0x57, uint8 °) et > −champ 16 (+0x58, uint8 °) ; vitesse horizontale < champ 13 (+0x52, m/s) ; train sorti (+0x75 bit 2) ; pas éjecté (bit 5). Alors au sol = 1 et, si la vitesse verticale < −champ12/2, rebond : vz = −(vz + champ12/4) ; sinon vz négative ramenée à 0. Sinon au sol = 0."
   },
   "sub_6B545": {
     "new_name": "VROOMM_StubThunk_6B545",
@@ -680,9 +680,9 @@
     "summary": "far,61L — variante de sub_29A0D/sub_29DB3 (résolution teinte dommage) sur offset +0x27 : **résolution de couleur teintée dommage, troisième variante.**"
   },
   "sub_A0D80": {
-    "new_name": "PlayerComponent_ApplyFlagsAndReleaseRef_A0D80",
+    "new_name": "GroundObj_LoadFromIFF_A0D80",
     "segment": "seg438",
-    "summary": "far, combine sub_6C1CA (application de flags, motif seg435) et sub_3A49C (probable libération de référence)."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_ApplyFlagsAndReleaseRef'. LECTEUR DE LA CLASSE GRND (objet au sol, vtable 0x2408, catégorie 20) : MobileObject_LoadDynamicsAndSmoke_9D189 (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de l'original) : un fichier GRND n'a qu'un FORM DYNM, un second ne serait jamais lu. L'instance GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de base compte."
   },
   "sub_6070E": {
     "new_name": "GlyphObject_ScalarDeletingDtorA_6070E",
@@ -1355,9 +1355,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8CF10) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=19FE0h, codesize=763h, nentries=14."
   },
   "sub_9EFBE": {
-    "new_name": "PlayerComponent_ConstructFromStream_9EFBE",
+    "new_name": "WeaponSys_LoadFromFile_9EFBE",
     "segment": "seg432",
-    "summary": "⚠️ far, 103 lignes, NON DÉTAILLÉE — combine sub_2B06C, `StreamReader_ConstructVariantA_63A39` (seg190), dispatch vtable [bx+0x14], PlayerComponent_LoadSequence_9EF74, gestion d'erreur (sub_6B70F), sub_645A5 (seg193), `StreamReader_ReleaseBuffer_65643` (seg195). Référencée via jmp depuis un stub VROOMM (sub_6C3DA) et par PlayerComponent_Dispatch_9ED62."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_ConstructFromStream'. (système d'armes, nom) : ouvre OBJECTS\\<nom>.IFF (Path_ResolveDataFile) et y lit le FORM WEAP (WeaponSys_LoadFormWEAP_9EF74) ; échec → erreur C01Bh. Utilisé par FORM WFIL et par le 3e nom d'un enregistrement PART (emport imposé par la mission, PartEntry_ResolveSpawnPositionAndActivate_51EDC)."
   },
   "loc_A002": {
     "new_name": "AI_ProximityRadioCalloutTrigger_A002",
@@ -2162,7 +2162,7 @@
   "sub_A0340": {
     "new_name": "MissileModel_LoadDATAChunk_A0340",
     "segment": "seg434",
-    "summary": "far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODELE missile (bloc MISS d'IFF_LoadModelMain, via VROOMM_StubThunk_6C530), apres le chargeur de base (VROOMM_StubThunk_6C5A5) : dword -> +0x5E, octet -> +0x62, word -> +0x63 = RAYON DE L'ALLUMEUR DE PROXIMITE (lu par Missile_UpdateSeekerAndFuse_42458, en unites entieres, << 8). Sens de +0x5E et +0x62 non trace."
+    "summary": "far, LUE (2026-09-24), consommateurs lus 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 jamais lu (aucun accès trouvé) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ; Missile_UpdateSeekerAndFuse_42458)."
   },
   "loc_680DA": {
     "new_name": "TextScrollDisplayB_Method_DestructThunk_680DA",
@@ -2382,7 +2382,7 @@
   "sub_AA3A5": {
     "new_name": "MissionScene_ParseRecord_AA3A5",
     "segment": "seg457",
-    "summary": "far,123L — parse un chunk 'SCNE' (scene) en un record de 0x27 octets. Appele par MissionPlay_LoadScenes_AA595. En-tete disque fixe de 24 octets (ReadFieldGroupA) : +0x00 u8 is_active ; +0x01 u16 area_id (index dans AREA, -1=scene globale ; resolu par PtrList_GetAt_53034(ctx+0x1A) -> record+0x04) ; +0x03/+0x05/+0x07 3x i16 = handlers PROG on_activated/on_leaving/on_mission_update (-1=aucun ; resolus par Expr_LookupNamedValue_51E4A(ctx+0x40=liste PROG) -> record+0x08/+0x0C/+0x10) ; +0x09 u8 has_own_coord ; +0x0A u16 heading (candidat cap deg ; =180 si ancre a l'aire, =0 si coord explicite) ; +0x0C/+0x10/+0x14 3x i32 position (X, Y, Z) fixed-point /256 ; 3e composante (+0x14) = Z = altitude (repere ASM Z-up, cf. CLAUDE.md) -> record+0x1B/+0x1F/+0x23. Puis (taille_chunk-24)/2 mots u16 en queue = LISTE D'UNITES : index dans le chunk PART en ORDRE DE STOCKAGE (pas un id d'entite, pas un index CAST, sans offset) -> PART[slot].entity_id -> CAST[entity_id]. malloc + ReadFieldGroupA -> record+0x14 count, +0x16 ptr. Verifie sur MISSIONS/MISN-1A.IFF. Detail complet : analysis/DATA_MODEL.md §6.6a."
+    "summary": "far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8 active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à l'activation / en quittant / à chaque image (-1 = aucun ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. VÉRIFIÉ 2026-10-12 : AUCUN ACCÈS aux champs record+0x18 à +0x26 dans le binaire (recherche de toutes les fonctions lisant +0x18/+0x19/+0x1B/+0x1F/+0x23) — ces 15 octets (drapeau, « cap », position) sont chargés et jamais utilisés. Puis (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF."
   },
   "sub_8790A": {
     "new_name": "TextScroll_Helper2_8790A",
@@ -2407,7 +2407,7 @@
   "sub_A0A00": {
     "new_name": "SwpnModel_LoadDataChunk_A0A00",
     "segment": "seg436",
-    "summary": "far, 128 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'DATA' D'UN OBJET SWPN (defense fixe AA/SAM/navire ; ancien nom 'PlayerComponent_LoadFieldsWithRetryC' faux). Appelle IFF_LoadAngleParam puis lit 'DATA' (push large 41544144h) : valeur group C -> objet+0x36 (weapons_round, munitions), group C -> +0x3A (detection_range), group C -> +0x3E (effective_range : LA PORTEE utilisee par Targeting_AcquireBestThreat pour noter une defense fixe), word -> +0x42, group C -> +0x44, byte -> +0x48 (max_simultaneous_shots), pointeur far vers l'objet arme charge (stub VROOMM 6C394, nom de l'arme sur 8 caracteres) -> +0x49/+0x4B, group C -> +0x4D. Correspond a RSEntity::parseREAL_OBJT_SWPN_DATA de libRealSpace."
+    "summary": "far, 128 lignes, LUE INTEGRALEMENT (2026-09-20), consommateurs lus 2026-10-12. CHARGEUR DU CHUNK 'DATA' D'UN OBJET SWPN (défense fixe AA/SAM/navire) après Object_LoadCommonAndAllegiance_3C942 : int32 → +0x36 munitions (copiées dans l'instance +0x53, −1 par tir) ; int32 → +0x3A portée de détection (m entiers : World_FindNearestInCone_22A7D, 180°, camp 1, catégorie 6) ; int32 → +0x3E portée de tir (m entiers, << 8) ; uint16 → +0x42 dispersion des obus (aléa Math_RandomScale_54DF4(+0x42)) ; int32 24.8 → +0x44 cadence (s entre deux tirs : instance +0x57 −= dt) ; uint8 → +0x48 lance-missiles (≠ 0 : instancie l'arme +0x49, cible à plus de 305 m au-dessus du sol, plafond de missiles par camp) / canon (0 : Effect_SpawnPeriodicAtAttach) ; string[8] → objet arme chargé (+0x49/+0x4B) ; int32 → +0x4D décalage du point de départ (m entiers ; missile : altitude + 2 × valeur)."
   },
   "sub_6AC57": {
     "new_name": "VROOMM_StubThunk_6AC57",
@@ -2742,7 +2742,7 @@
   "sub_A61D0": {
     "new_name": "SmokeSet_LoadSmokeModel_A61D0",
     "segment": "seg450",
-    "summary": "far, LUE 2026-10-12. LECTEUR D'UN MODÈLE DE FUMÉE (FORM SMOK d'un jeu de fumées ; ex-TextLabel_LoadFieldsExtended). Chunk INFO 25 o (ReadFieldGroupA 19h) : uint8 → +0x00 mode de rendu (0 = disque dimensionné ; 1/2 = forme SHAP) ; int32 24.8 → +0x01 espacement le long d'une traînée ; int32 24.8 taille début → +0x0D ; int32 24.8 taille fin ; int32 24.8 → +0x05 durée de vie ; +0x09 = (taille fin − début) / durée ; int32 24.8 → +0x1B dispersion de position (mot bas utilisé par Math_RandomJitter_54E1C) ; uint8 teinte début → +0x15 ; uint8 teinte fin → +0x17 ; +0x11 = (fin − début)/durée ; uint8 → +0x19 et uint8 → +0x1A (paramètres passés à Render_DrawScaledSprite_621A2). Chunk ANIM facultatif : uint8 forme A → +0x27, uint8 chance de A (100 = toujours) → +0x28, uint8 forme B → +0x29, uint8 mode → +0x1F ('R' aller-retour, 'S' s'arrête sur la dernière image, 'T' la particule meurt après la dernière, 'W' boucle), int16 images/s → +0x21, int16 pas (1, −1, 0 = pas d'animation) → +0x23 ; absent → +0x27 = +0x29 = 255 (aucune forme). Chunk SCRI facultatif : n octets (n = taille) → +0x20 n, +0x25 tableau = ordre des images."
+    "summary": "far, LUE 2026-10-12. LECTEUR D'UN MODÈLE DE FUMÉE (FORM SMOK d'un jeu de fumées ; ex-TextLabel_LoadFieldsExtended). Chunk INFO 25 o (ReadFieldGroupA 19h) : uint8 → +0x00 mode de rendu (0 = disque dimensionné ; 1/2 = forme SHAP) ; int32 24.8 → +0x01 espacement le long d'une traînée ; int32 24.8 taille début → +0x0D ; int32 24.8 taille fin ; int32 24.8 → +0x05 durée de vie ; +0x09 = (taille fin − début) / durée ; int32 24.8 → +0x1B dispersion de position (mot bas utilisé par Math_RandomJitter_54E1C) ; uint8 teinte début → +0x15 ; uint8 teinte fin → +0x17 ; +0x11 = (fin − début)/durée ; uint8 → +0x19 et uint8 → +0x1A (paramètres passés à Render_DrawScaledSprite_621A2). Chunk ANIM facultatif : uint8 forme A → +0x27, uint8 chance de A (100 = toujours) → +0x28, uint8 forme B → +0x29, uint8 mode → +0x1F ('R' aller-retour, 'S' s'arrête sur la dernière image, 'T' la particule meurt après la dernière, 'W' boucle), int16 images/s → +0x21, int16 pas (1, −1, 0 = pas d'animation) → +0x23 ; absent → +0x27 = +0x29 = 255 (aucune forme). Chunk SCRI facultatif : n octets (n = taille) → +0x20 n, +0x25 tableau = ordre des images. | PRÉCISÉ 2026-10-12 : +0x19 (dessin A) = première couleur translucide du sprite, +0x1A (dessin B) = nombre de couleurs translucides (Render_DrawScaledSprite_621A2). Mode de rendu : 0 = disque ombré (Render_PlotPixelClippedColorMap, table de la teinte), 1 = sprite opaque (Render_DrawRotatedScaledSprite_62800), 2 = sprite avec couleurs translucides A..A+B−1 (Render_DrawScaledSprite_621A2) ; autre valeur : rien n'est dessiné."
   },
   "sub_9D4B5": {
     "new_name": "Camera_InitAndGetHandleWrapper_9D4B5",
@@ -2922,7 +2922,7 @@
   "sub_64A54": {
     "new_name": "ResourceRecord_ReadFieldGroupB_64A54",
     "segment": "seg193",
-    "summary": "far, lit un groupe de champs via StreamReader_ReadTyped_63FA1."
+    "summary": "far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. | PRÉCISÉ 2026-10-12 : lit 2 octets (StreamReader_ReadTyped_63FA1 taille 2) à la position courante et avance de 2 = uint16/int16."
   },
   "sub_6C004": {
     "new_name": "VROOMM_StubThunk_6C004",
@@ -3167,7 +3167,7 @@
   "sub_9D4F0": {
     "new_name": "Aircraft_LoadEJECAndJINF_9D4F0",
     "segment": "ovr313",
-    "summary": "far, LECTEUR DE LA CLASSE JETP (avion) : Armed_LoadFromIFF_9D380 (ARMG), Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle +0x4E), puis chunk EJEC facultatif : chaîne → +0x5A = nom de l'objet siège éjectable (+0x63 = 1 si présent), puis chunk JINF facultatif : uint8 → +0x53, uint16 → +0x54, uint16 → +0x56, uint8 → +0x52 (CLASSE DE COMBAT : ≥ 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246, comparée à byte_72038 = 6 par Targeting_AcquireBestThreat), uint16 → +0x64, uint8 → +0x59, uint16 → +0x66, uint8 → +0x58, uint16 → +0x68. Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30. (Correction 2026-10-12 : EJEC est lu AVANT JINF, il contient le nom de l'objet éjecté.)"
+    "summary": "far, LECTEUR DE LA CLASSE JETP (avion), JINF lu en détail 2026-10-12 : Armed_LoadFromIFF_9D380 (ARMG), Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle +0x4E), chunk EJEC facultatif (chaîne → +0x5A nom de l'objet siège éjectable, +0x63 = 1), chunk JINF facultatif, 9 champs : (1) uint8 → +0x53 bit 0 = train escamotable (Aircraft_InitGearChildren_9DDCF) ; (2) uint16 → +0x54 rang du 1er sous-objet CHLD du train ; (3) uint16 → +0x56 nombre de sous-objets du train (Aircraft_Update_3DEFB les affiche/masque un par un) ; (4) uint8 → +0x52 classe de combat (≥ 9 chasseur ; AI_EngageAttackerReaction_E246, Targeting_AcquireBestThreat) ; (5) uint16 → +0x64 chance (%) d'explosion immédiate à la destruction, sinon chute en fumée (Aircraft_OnDestroyed_9D770) ; (6) uint8 → +0x59 drapeau du sous-objet spécial ; (7) uint16 → +0x66 son rang CHLD (Aircraft_InitSpecialChild_9DD81) ; (8) uint8 → +0x58 type de fumée de la chute ; (9) uint16 → +0x68 seuil de dégâts (%) au-delà duquel l'avion est perdu (Aircraft_OnCollision_9D910). Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30."
   },
   "sub_6B360": {
     "new_name": "VROOMM_StubThunk_6B360",
@@ -3185,9 +3185,9 @@
     "summary": "far, combine `ResourceHandle_IsValid_6755B` (seg205), `TextScrollDisplay_Destruct_6728A` (seg206) — nettoyage symétrique de InputSystem_InitAll_8F47A."
   },
   "sub_A0455": {
-    "new_name": "PlayerComponent_InitPulseTimer_A0455",
+    "new_name": "Missile_InitSeekerDelay_A0455",
     "segment": "seg434",
-    "summary": "far, appelle Timer_SetAbsoluteAndResetPulses_4FAFC (seg110)."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_InitPulseTimer'. À la création d'un missile : minuteur +0x5A = DATA champ 1 du modèle (+0x5E, int32 en secondes ENTIÈRES, << 8). Tant qu'il court, le chercheur ne choisit pas de cible (Missile_UpdateSeekerAndFuse_42458)."
   },
   "sub_524B4": {
     "new_name": "Expr_Node_RecomputeIfDirty_524B4",
@@ -3660,9 +3660,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_AA7E3) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46."
   },
   "sub_9D770": {
-    "new_name": "Debris_SpawnOrchestratorVariant_9D770",
+    "new_name": "Aircraft_OnDestroyed_9D770",
     "segment": "ovr315",
-    "summary": "⚠️ far, 242 lignes, NON DÉTAILLÉE — combine `Object_SpawnDestructionEffects_3863A`, `Math_RandomChance_54E4F` (seg115), allocateurs typés — variante/orchestration finale du spawn de débris."
+    "summary": "far, LUE 2026-10-12. Ex-'Debris_SpawnOrchestratorVariant'. Méthode +0x0C (destruction) du modèle JETP. AVION IA (≠ joueur) : si le modèle a un siège éjectable (EJEC, +0x63) et que le pilote n'est pas déjà éjecté (JDYN +0x75 bit 5) : éjection (TriggerObject_SpawnAndBindFull_A6DF2 avec l'objet EJEC, ou l'objet « LOWEJECT » quand la mémoire libre de l'allocateur 5C44h, méthode +0x14 via Memory_TypedAllocDispatchC_5C86D, est sous 0xFFFF) si le pilote est forcé (+0xB9 == 1) ou sur un tirage de 30 % avec plus de 0xC800 de mémoire libre et +0xB9 != 2 ; message radio 9 ou 10. Puis, si l'instance a +0x73 bit 0 OU Math_RandomChance_54E4F(JINF champ 5, modèle +0x64, défaut 5) : EXPLOSION IMMÉDIATE (Object_SpawnDestructionEffects_3863A). SINON CHUTE : World_OnObjectDestroyed_53A94, type de fumée = JINF champ 8 (modèle +0x58, défaut 6) → instance +0x54, traînée activée (SmokeTrail_EnableIfModelHasSmok_3D566), dynamique→+0x18. Joueur : byte_6E4B4/6E4B5 puis destruction."
   },
   "sub_44A70": {
     "new_name": "Collision_NarrowPhaseTest",
@@ -3802,7 +3802,7 @@
   "sub_9CBE0": {
     "new_name": "DamageSys_LoadRecord_9CBE0",
     "segment": "ovr307",
-    "summary": "far, LIT UN COMPOSANT DE DÉGÂTS (chunk SYSM) : uint8 résistance → +0, uint8 dégâts subis → +1, chaîne nom → +2, chaîne second nom → +0x0B (String_ConstructFromFarPtrLen ×2). Enregistrement mémoire de 20 o."
+    "summary": "far, LIT UN COMPOSANT DE DÉGÂTS (chunk SYSM) : uint8 résistance → +0, uint8 dégâts subis → +1, chaîne nom → +2, chaîne second nom → +0x0B (String_ConstructFromFarPtrLen ×2). Enregistrement mémoire de 20 o. | COMPLÉMENT 2026-10-12 : le second nom (+0x0B) est la ZONE du composant (FUSELAGE, LWING, RWING) : DamageSys_ApplyHit_9C9A0 ne répartit un impact que sur les composants de la zone touchée. Le composant nommé PLAYER est le pilote (DamageSys_DamagePercent_9CB2C)."
   },
   "sub_A3EA5": {
     "new_name": "GaugeWidget_RenderModeDispatch_A3EA5",
@@ -3945,9 +3945,9 @@
     "summary": "⚠️ far, 88 lignes, NON DÉTAILLÉE — construit une chaîne de champs via une série de stubs voisins (sub_6CEDB/6CEEA/6CEF9/6CF08/6CF12/6CF3A)."
   },
   "sub_9DD30": {
-    "new_name": "TimedTrigger_NotifySingleListener_9DD30",
+    "new_name": "Aircraft_SetChildVisible_9DD30",
     "segment": "seg430",
-    "summary": "far, résout un handle faible via sub_22E27 (motif +0x1E déjà vu dans `EjectSeat_TickReleaseObject_4F351`, seg109) puis, si résolu et non nul, appelle sa méthode virtuelle de notification (dword ptr [bx+4]) avec le champ +0x0A comme argument far. Retourne si un listener a été notifié. Référencée via jmp depuis un stub VROOMM (sub_6C320) et par TimedTrigger_ReleaseIfInactive_9DDCF."
+    "summary": "far, LUE 2026-10-12. Ex-'TimedTrigger_NotifySingleListener'. (instance, rang n) : sous-objet attaché n° n (WorldObject_GetNthChild_22E27 sur la liste +0x1E = sous-objets CHLD) ; s'il existe, appelle sa méthode +4 avec 0 (masque/désactive). Renvoie 1 si le sous-objet existe."
   },
   "sub_6BE42": {
     "new_name": "VROOMM_StubThunk_6BE42",
@@ -3972,7 +3972,7 @@
   "sub_62800": {
     "new_name": "Render_DrawRotatedScaledSprite_62800",
     "segment": "seg179",
-    "summary": "⚠️ far, 736 lignes, NON DÉTAILLÉE — la plus grosse fonction rencontrée dans ce cluster de primitives 2D, structure de frame locale très similaire à `Render_DrawScaledSprite_621A2` (seg175, ~0x2D8 octets), utilise des extensions de signe 32 bits (movsx esi) suggérant un traitement d'angle de rotation. Référencée depuis seg063 et seg106 (émetteur de particules) — probable variante « avec rotation » de la primitive de rendu de sprite/icône. Candidat prioritaire pour session dédiée (aucune lecture de détail effectuée, fonction volumineuse)."
+    "summary": "⚠️ far, 736 lignes, NON DÉTAILLÉE — la plus grosse fonction rencontrée dans ce cluster de primitives 2D, structure de frame locale très similaire à `Render_DrawScaledSprite_621A2` (seg175, ~0x2D8 octets), utilise des extensions de signe 32 bits (movsx esi) suggérant un traitement d'angle de rotation. Référencée depuis seg063 et seg106 (émetteur de particules) — probable variante « avec rotation » de la primitive de rendu de sprite/icône. Candidat prioritaire pour session dédiée (aucune lecture de détail effectuée, fonction volumineuse). | PRÉCISÉ 2026-10-12 : appelé par le rendu des particules en MODE 1 avec (surface, x, y, forme, n° d'image, largeur, hauteur) — 16 octets d'arguments, PAS de table de remappage ni de A/B : sprite dessiné opaque, la teinte ne s'applique pas."
   },
   "sub_630BA": {
     "new_name": "File_CreateWithRetry_630BA",
@@ -4865,9 +4865,9 @@
     "summary": "far, alloue (sub_658), initialise via sub_674F5 puis TextScroll_ComputeParams_67048 — constructeur d'un objet de défilement de texte."
   },
   "sub_9E682": {
-    "new_name": "PlayerComponent_LoadTripleField_9E682",
+    "new_name": "WeaponSys_LoadHardpoint_9E682",
     "segment": "seg432",
-    "summary": "far, combine PlayerComponent_Helper_9E651, ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupC_64A7E (×3, seg193) — lecture de 3 champs depuis le format IFF."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadTripleField'. UN POINT D'EMPORT HPTS (13 o) : uint8 → +0x15 TYPE (0 à 4, voir WeaponSys_LoadStoresOnHardpoint_9EA2E) ; 3 int32 24.8 → +1/+5/+9 position dans le repère de l'avion (asm c0, c1, c2 ; libRS.x = c0, libRS.y = c2, libRS.z = c1)."
   },
   "sub_6BBFE": {
     "new_name": "VROOMM_StubThunk_6BBFE",
@@ -5510,9 +5510,9 @@
     "summary": "far, 115 lignes, entre sub_645CD et sub_64698 — dispatch vtable [bx+0x1C] pour obtenir un tag/type (stocké en +0x65), puis lecture via sub_64D25/sub_64DB3. ⚠️ Adresse exacte non résolue."
   },
   "sub_9FD1C": {
-    "new_name": "PlayerComponent_InitTimerField_9FD1C",
+    "new_name": "Bomb_InitArmingDelay_9FD1C",
     "segment": "seg433",
-    "summary": "far, appelle Timer_SetAbsolute_4F9A2 (seg110) — initialise un champ minuteur du composant."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_InitTimerField'. À la création d'une bombe : minuteur +0x5A = DATA champ 2 du modèle (+0x5F, uint8 en secondes entières) et +4 bit 1 effacé ; la mise à jour de la bombe (loc_41A59) repose ce bit quand le minuteur est échu (bit 1 = l'objet peut entrer en collision ; même bit que EXTE)."
   },
   "unnamed_seg161_d": {
     "new_name": "AIL_sound_buffer_thunks_UNRESOLVED",
@@ -6090,9 +6090,9 @@
     "summary": "far,21L — attache une cible (sub_3DC3D) puis active le flag de guidage (sub_45A49) : **initialisation du guidage de missile avec verrouillage sur une cible.**"
   },
   "sub_9DF63": {
-    "new_name": "PlayerComponent_LoadFromResourceRecord_9DF63",
+    "new_name": "WeaponSys_LoadWeaponEntry_9DF63",
     "segment": "seg432",
-    "summary": "far, combine PlayerComponent_ReadFieldAndDispatch_9DF2A, sub_2B007 et sub_3B876 — charge des données de composant depuis le format ResourceRecord/IFF. Appelée par sub_9EDD4."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFromResourceRecord'. UNE ARME DE WPNS (10 o) : uint16 → +0x10 quantité ; string[8] → +4 nom de l'objet, chargé par IFF_LoadModelMain (OBJECTS\\<nom>.IFF) → +0 modèle."
   },
   "sub_6C97D": {
     "new_name": "VROOMM_StubThunk_6C97D",
@@ -6300,9 +6300,9 @@
     "summary": "⚠️ far, 87 lignes, NON DÉTAILLÉE — combine PlayerComponent_ReleaseHelperB_9F82C, Memory_TypedFree_5C7B6 (×3), sub_3A432 (×3). Référencée via jmp depuis un stub VROOMM (sub_6C40C)."
   },
   "sub_42127": {
-    "new_name": "Flare_PhysicsTick",
+    "new_name": "DurdBody_DivePhase_42127",
     "segment": "seg089",
-    "summary": "far,74L — variante de sub_42016 sur des offsets différents (+0x10 vs +0x23, vitesse +0x39) : **simulation physique d'un second type de leurre déployé (flare) : durée de vie + trajectoire.**"
+    "summary": "far, LUE 2026-10-12. Ex-'Flare_PhysicsTick' (FAUX : pas un leurre). PHASE 2 de la Durandal (corps DURD) : vitesse horizontale forcée à 0 ; vitesse verticale += +0x39·dt sans descendre sous Vmin (+0x23) : chute verticale."
   },
   "sub_57C67": {
     "new_name": "Matrix_RollAngle_57C67",
@@ -6395,9 +6395,9 @@
     "summary": "far, appelle `JDYN_LoadChunk` — chargeur de modèle JDYN (format 3D)."
   },
   "sub_38210": {
-    "new_name": "Debris_CombinePhysicsBodies",
+    "new_name": "WorldObject_CollisionDamage_38210",
     "segment": "seg078",
-    "summary": "far,148L — compare deux objets par vtable[0], combine leurs positions transformées (vtable[0x4C]) : **fusion/combinaison de deux corps physiques (probable calcul de collision entre débris).**"
+    "summary": "far, LUE 2026-10-12. Ex-'Debris_CombinePhysicsBodies' (FAUX). Méthode +0x84 générique des objets du monde : POINTS DE DÉGÂTS INFLIGÉS PAR CHOC à un autre objet. v = |vitesse(this) + vitesse(autre)| (méthodes +0x4C) ; k = min(v² / 200, 10) ; renvoie k × DAMG du modèle (modèle +6, chunk DAMG). Voir DamageSys_ApplyHit_9C9A0."
   },
   "sub_4F9BB": {
     "new_name": "Timer_SetRelativeFrames_4F9BB",
@@ -7100,9 +7100,9 @@
     "summary": "far, combine sub_229C et TextScroll_HelperB_670A5."
   },
   "sub_9F07F": {
-    "new_name": "PlayerComponent_LoadMultiField_9F07F",
+    "new_name": "WeaponSys_LoadInfoHptsDcoy_9F07F",
     "segment": "seg432",
-    "summary": "⚠️ far, 176 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (×2), ResourceRecord_ReadFieldGroupC_64A7E, ResourceRecord_ReadFieldGroupB_64A54, sub_9F82C, Memory_TypedFree_5C7B6, PlayerComponent_Helper_9ED43. Référencée via jmp depuis un stub VROOMM (sub_6C3DF) et par PlayerComponent_LoadSequence_9EF74."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadMultiField'. Chunks du FORM WEAP, tous facultatifs. INFO : int32 → +0x3E portée du capteur (mètres entiers), uint16 → +0x42 demi-angle (degrés) — passés à World_SelectTargetInCone_22795 par WeaponSystem_FrameUpdate_3F8C0. HPTS : n = taille ÷ 13 points d'emport, enregistrements mémoire de 0x23 o (+0x34 tableau, +0x38 nombre), chacun lu par WeaponSys_LoadHardpoint_9E682. DCOY : uint16 → +0x3C paillettes (CHAFF), uint16 → +0x3A leurres IR (FLARE) (Countermeasure_DeployChaffFlare) ; absent → 0, 0."
   },
   "sub_6C870": {
     "new_name": "VROOMM_StubThunk_6C870",
@@ -7377,7 +7377,7 @@
   "sub_64A7E": {
     "new_name": "ResourceRecord_ReadFieldGroupC_64A7E",
     "segment": "seg193",
-    "summary": "far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. Référencée par sub_8DF49."
+    "summary": "far, lit un groupe de champs via StreamReader_ReadTyped_63FA1. Référencée par sub_8DF49. | PRÉCISÉ 2026-10-12 : lit 4 octets (taille 4) et avance de 4 = uint32/int32 (24.8 selon l'usage)."
   },
   "sub_9BECD": {
     "new_name": "Debris_ListFindAndDispatch_9BECD",
@@ -8160,9 +8160,9 @@
     "summary": "far, appelle sub_5D6B3 — implémentation de la libération pour PagedResourceB. Référencée par PagedResourceB_Method_ReleaseIfSet_5C2E6 (seg129) et Runtime_HeapFreeHook_5D937."
   },
   "sub_22795": {
-    "new_name": "WorldObjects_Cluster_22795",
+    "new_name": "World_SelectTargetInCone_22795",
     "segment": "seg039",
-    "summary": "far,380L — grosse fonction du cluster conteneur/monde de jeu (buffer local 0x7C) — à approfondir en session dédiée."
+    "summary": "far, LU (structure) 2026-10-12. Ex-'WorldObjects_Cluster'. Cherche une cible dans une liste d'objets du monde, dans une portée (arg_6, MÈTRES ENTIERS, << 8) et un demi-cône (arg_A, degrés ; 180 = toutes directions) autour du nez de l'objet. Appelé par WeaponSystem_FrameUpdate_3F8C0 avec la portée et le demi-angle du chunk INFO du FORM WEAP."
   },
   "sub_6ADBE": {
     "new_name": "VROOMM_StubThunk_6ADBE",
@@ -8235,9 +8235,9 @@
     "summary": "far,65L — retire une entrée du registre par correspondance exacte (pointeur + segment), met le champ cible à zéro : **invalidation d'une référence faible spécifique (nullification + désenregistrement).**"
   },
   "sub_A700F": {
-    "new_name": "TriggerObject_ConstructSubobjects_A700F",
+    "new_name": "DynPara_Construct_A700F",
     "segment": "seg453",
-    "summary": "far, initialise 4 sous-objets composites (sub_6CAC0 ×2, sub_6CB00, sub_6CB19, sub_6CB64) puis libère un tampon (Memory_TypedFreeWrapperC_5C6F3)."
+    "summary": "far, LUE 2026-10-12. Ex-'TriggerObject_ConstructSubobjects'. Lecture de la variante PARA : DYNM (masse), ATMO, STBL (AircraftDynamics_ReadMassChunk_A4A20 / ReadAtmoChunk_A4BE1 / ReadStblChunk_A52B8). Le chunk PARA n'est jamais lu : MARQUEUR. Tick +0x3C = FlightPhysics_TickCandidate_4F4EE."
   },
   "sub_9CE90": {
     "new_name": "Debris_ReleaseWithErrorCheck_9CE90",
@@ -8270,9 +8270,9 @@
     "summary": "far, 26 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_TickGroup' errone). Quand une scene devient active : appelle Scene_EnsureUnitsSpawned_530FF (fait apparaitre les unites associees non encore presentes), PUIS Expr_VM_ExecuteSingleInstruction_51E7E — DECLENCHE L'EXECUTION DU SCRIPT on_is_activated DE CETTE SCENE (parametres calcules depuis scene+2+0x40 = reference au champ progs_id resolu de la scene, scene+8)."
   },
   "sub_3C942": {
-    "new_name": "IFF_LoadAngleParam",
+    "new_name": "Object_LoadCommonAndAllegiance_3C942",
     "segment": "seg084",
-    "summary": "far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk 'ALGN' (4E474C41h, octets disque A L G N) via sub_64743, résout une valeur associée (sub_64B51) stockée à +0x35 : **chargement d'un paramètre angulaire depuis un chunk IFF (probable angle d'attache/orientation d'un sous-composant).**"
+    "summary": "far, LUE 2026-10-12. Ex-'IFF_LoadAngleParam' (FAUX : pas un angle). Lecteur de base des classes ORNT et dérivées : Object_LoadCommonChunks_9BA85 puis chunk ALGN facultatif : uint8 (int8) → modèle +0x35 = CAMP de l'objet (ALLÉGEANCE) ; absent → 0. Recopié dans l'instance +0x50 (WorldObject_BaseConstructAttached, Camera_InitAttachedWithTarget_3DC3D…) : 1 = camp du joueur, 0xFF (−1) = adverse, 0 = neutre. Le champ « camp » de PART l'écrase (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Lu par Targeting_AcquireBestThreat, World_OnObjectDestroyed_53A94, Goal_MoraleReaction_878F, Music_ScanNearbyEnemies_590E0…"
   },
   "sub_5493E": {
     "new_name": "Math_AcosDeg_5493E",
@@ -8370,9 +8370,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7E9C9) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28."
   },
   "sub_9BFB0": {
-    "new_name": "Debris_LoadFieldMixC_9BFB0",
+    "new_name": "Exte_LoadVolume_9BFB0",
     "segment": "ovr303",
-    "summary": "⚠️ far, 541 lignes, NON DÉTAILLÉE — combine ReadFinalField_64B51, `String_ConstructFromFarPtrLen`, ReadFieldGroupC_64A7E répété."
+    "summary": "far, LUE 2026-10-12. Ex-'Debris_LoadFieldMixC'. UN VOLUME DU CHUNK EXTE. unsigned char lettre : 'S' sphère → string nom, 3 int32 centre, int32 rayon (ENTIERS tels quels : shl 8 puis sar 8), objet vtable 0x1BA2 (Particle_Init : +0x0F rayon, +0x13/+0x17/+0x1B centre, +6 nom) ; 'B' boîte → string nom, 6 int32 entiers = 3 paires de bornes (c0, c1, c2 ; chaque paire triée min/max par Debris_ComputeScaledPhysics_9C42F), objet 0x37 o vtable 0x1BCA ; 'L' → string nom seul, objet vtable 0x1BB6 (position nulle) ; autre lettre → erreur C008h. Les noms sont les ZONES de dégâts (FUSELAGE, LWING, RWING, BIGSPHER) : voir DamageSys_ApplyHit_9C9A0."
   },
   "sub_988BD": {
     "new_name": "TextureLoader_LoadWithDwordFieldsB_988BD",
@@ -8887,7 +8887,7 @@
   "sub_A0700": {
     "new_name": "Weapon_LoadWDATChunk_A0700",
     "segment": "seg435",
-    "summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain)."
+    "summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain). | COMPLÉMENT 2026-10-12 (consommateurs) : +0x46 dégâts : lu seulement pour les traçantes (Tracer_CollisionDamage_4E0E5) ; missiles et bombes infligent les dégâts de leur EXPL. +0x48 rayon : aucun lecteur trouvé (recherche des accès modèle +0x48). +0x4A = catégorie de l'objet tiré (8 missile, 9 bombe, 10 nacelle, 13 traçante) : WeaponSystem_LaunchFromStation_3E744 aiguille sur (+0x4A − 8). +0x4E domaine : 1 = missile air-air (byte_6E4C6 → réveille Targeting_AcquireBestThreat). +0x50 portée de verrouillage (m entiers) et +0x54 demi-cône (°) : Proximity_TestOriented. +0x56 portée efficace (m entiers). +0x5A intervalle de tir (float s)."
   },
   "sub_536F7": {
     "new_name": "MAIN_GAME_TICK",
@@ -9377,7 +9377,7 @@
   "sub_3A49C": {
     "new_name": "JDYN_LoadChunkAndConstruct_3A49C",
     "segment": "seg082",
-    "summary": "far,577L — chargeur+constructeur du bloc dynamique IFF. enter_form('DYNM') puis seek_chunk d'UN sous-chunk : JDYN(struct 0xC5, avion) / MISS(0x3C) / GBMB(0x49) / DURD(0x47) / AGRV(0x3B) / SURF(0x29) / PARA(0x5B). Pour JDYN : malloc(0xC5), met en place des pointeurs intérieurs vers 2 sous-objets embarqués (A @+0x8E, B @+0xB1), construit A puis B via stubs VROOMM sub_6CACA/6CB0A/6CB73 -> variantes PlayerComponent (seg447-448). Les 'mov word ptr [si+X],NNNNh' ne sont PAS des patchs de coefficients : ce sont les tags de vtable / pointeurs de membre réécrits à chaque étape de la construction multi-base Borland C++. Le vrai chargement de champs est délégué à sub_6CBCE -> PlayerComponent_LoadFieldsWrapper_A5CEA -> LoadFieldsMassive_A5D18. Layout du chunk JDYN (28 champs) : voir analysis/DATA_MODEL.md §6.2."
+    "summary": "far,577L — chargeur+constructeur du bloc dynamique IFF. enter_form('DYNM') puis seek_chunk d'UN sous-chunk : JDYN(struct 0xC5, avion) / MISS(0x3C) / GBMB(0x49) / DURD(0x47) / AGRV(0x3B) / SURF(0x29) / PARA(0x5B). Pour JDYN : malloc(0xC5), met en place des pointeurs intérieurs vers 2 sous-objets embarqués (A @+0x8E, B @+0xB1), construit A puis B via stubs VROOMM sub_6CACA/6CB0A/6CB73 -> variantes PlayerComponent (seg447-448). Les 'mov word ptr [si+X],NNNNh' ne sont PAS des patchs de coefficients : ce sont les tags de vtable / pointeurs de membre réécrits à chaque étape de la construction multi-base Borland C++. Le vrai chargement de champs est délégué à sub_6CBCE -> PlayerComponent_LoadFieldsWrapper_A5CEA -> LoadFieldsMassive_A5D18. Layout du chunk JDYN (28 champs) : voir analysis/DATA_MODEL.md §6.2. | COMPLÉMENT 2026-10-12 (lu en entier) : recherches avec arg 0 → depuis le début du FORM DYNM, donc ordre des chunks libre ; ORDRE DE PRIORITÉ si plusieurs variantes : JDYN, MISS, GBMB, DURD, AGRV, SURF, PARA (la première trouvée gagne). Pas de FORM DYNM → erreur C011h ; FORM DYNM sans variante connue → C010h. Le pointeur rangé (modèle +0x35 ou +0x36) vise TOUJOURS le sous-objet DYNM de base. Vtables DYNM finales : JDYN 0x2312, MISS 0x1F66, GBMB 0x1F16, DURD 0x1E06, AGRV 0x1E8E, SURF 0x1DB6, PARA 0x1D4A (base 0x223A). Slots DYNM : +0/+4/+8 clonage (le +8 crée la dynamique d'une instance), +0x0C destructeur, +0x3C tick sans commande, +0x40 tick avec commande, +0x48 DYNM_AsJDYN (0 sauf JDYN). Variante imposée par le code : JETP → JDYN obligatoire (Aircraft_OnCollision_9D910 déréférence AsJDYN sans test) ; MISS (classe) → MISS (Missile_UpdateSeekerAndFuse_42458 écrit dyn+0x39 / +0x37) ; MISS/GBMB/DURD (variantes) lisent la cible +0x55 et le lanceur (+0x38) de l'instance → classes d'armes. Détail : DATA_MODEL.html § Dynamique."
   },
   "sub_6C3A8": {
     "new_name": "VROOMM_StubThunk_6C3A8",
@@ -9485,9 +9485,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A1E6D) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_9DDCF": {
-    "new_name": "TimedTrigger_ReleaseIfInactive_9DDCF",
+    "new_name": "Aircraft_InitGearChildren_9DDCF",
     "segment": "seg430",
-    "summary": "far, gère des bits de flags d'état (+0x73) à partir d'un champ source (arg+0x53), puis si actif, parcourt une plage d'indices de listeners ([arg+0x54, arg+0x54+arg+0x56)) en appelant TimedTrigger_NotifySingleListener_9DD30 pour chacun — désactive le flag si aucun listener ne confirme le maintien. Référencée via jmp depuis un stub VROOMM (sub_6C32A)."
+    "summary": "far, LUE 2026-10-12. Ex-'TimedTrigger_ReleaseIfInactive'. À la création d'un avion : +0x73 bit 1 (« a un train escamotable ») = JINF champ 1 bit 0 (modèle +0x53) ; si posé et si l'avion a des sous-objets, chaque sous-objet CHLD de rang [JINF champ 2, champ 2 + champ 3) (modèle +0x54 / +0x56) doit exister (Aircraft_SetChildVisible_9DD30), sinon le bit est retiré. +0x73 bits 2 et 3 remis à 0, +0x62 = 0."
   },
   "sub_6C3E9": {
     "new_name": "VROOMM_StubThunk_6C3E9",
@@ -10110,9 +10110,9 @@
     "summary": "far, 67 lignes, entre sub_5C86D et sub_5C916 — dispatch vtable [bx+18h]/[bx+1Ch] combiné à Memory_ValidateAllocatorIndex_5C9A6 ×2. ⚠️ Adresse exacte non résolue."
   },
   "sub_9ED62": {
-    "new_name": "PlayerComponent_Dispatch_9ED62",
+    "new_name": "WeaponSys_LoadFromIFF_9ED62",
     "segment": "seg432",
-    "summary": "⚠️ far, 68 lignes, NON DÉTAILLÉE — combine PlayerComponent_DispatchPair_9EC4D, sub_9EF74, ResourceRecord_SeekAndReadB_647B2 (seg193), sub_2AFE0, sub_9EFBE. Référencée via jmp depuis un stub VROOMM (sub_6C3D0)."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_Dispatch'. LECTEUR DE L'ARMEMENT d'un modèle ARMG/JETP (via PlayerComponent_ReleaseAndLoad_9EBD7, modèle +0x4A). WeaponSys_LoadFormWEAP_9EF74 sur le fichier courant ; si pas de FORM WEAP : FORM WFIL (ResourceRecord_SeekAndReadB_647B2('WFIL')) dont le contenu est une chaîne = nom d'un fichier OBJECTS\\<nom>.IFF, ouvert par WeaponSys_LoadFromFile_9EFBE (dont la racine est un FORM WEAP)."
   },
   "unnamed_seg110_b": {
     "new_name": "Timer_SetRelativeFramesAndResetPulses_UNRESOLVED",
@@ -10395,9 +10395,9 @@
     "summary": "far, 35 lignes — lit un champ 32 bits typé (tag 4) via sub_63FA1. ⚠️ Adresse exacte non résolue."
   },
   "sub_9C9A0": {
-    "new_name": "Debris_ComputeRandomizedForces_9C9A0",
+    "new_name": "DamageSys_ApplyHit_9C9A0",
     "segment": "ovr306",
-    "summary": "⚠️ far, 218 lignes, NON DÉTAILLÉE — combine CRT_MemFamily_Extra4 et `Math_RandomScale_54DF4` (seg115, répété) — calcul de forces aléatoires pour la dispersion de débris."
+    "summary": "far, LUE 2026-10-12. Ex-'Debris_ComputeRandomizedForces' (FAUX : aucune force). RÉPARTIT LES DÉGÂTS D'UN IMPACT SUR LES COMPOSANTS SYSM d'un avion. Args : (table des composants, projectile si, nom du volume touché arg_6). Points P = projectile→vtable+0x84(propriétaire) (WorldObject_CollisionDamage_38210, Missile_CollisionDamage_4256C, Tracer_CollisionDamage_4E0E5 ou Explosion_DamageAtDistance_4BE51) ; P ≤ 0 → rien ; cible = joueur (word_722E6) → P ÷ 2 (au moins 1). ZONE : le nom du volume touché, sauf « BIGSPHER » (sphère englobante) → tirage Math_RandomScale_54DF4(4) : 0-1 FUSELAGE, 2 LWING, 3 RWING. Collecte jusqu'à 17 composants dont le SECOND NOM (+0x0B) est cette zone ; part d'un rang tiré au hasard et parcourt la liste en boucle : chaque composant absorbe min(P, résistance − dégâts) (+1 += …, borné à la résistance), P diminue d'autant, jusqu'à P = 0 ou tous parcourus."
   },
   "sub_3DB56": {
     "new_name": "Camera_AttachSubcomponent",
@@ -10437,7 +10437,7 @@
   "sub_64743": {
     "new_name": "ResourceRecord_SeekAndRead_64743",
     "segment": "seg193",
-    "summary": "⚠️ far, 100 lignes, NON DÉTAILLÉE — combine sub_64BF8 (positionnement), sub_64BC1 (bornes) et sub_64DB3 (lecture)."
+    "summary": "far, LUE 2026-10-12. CHERCHE UN CHUNK par son tag dans le niveau courant (FORM courant) : arg_6 == 0 → ResourceRecord_SeekToStart_64BF8 (repart du DÉBUT du FORM courant, +0x0C après son en-tête) ; sinon continue depuis la position courante. Parcourt les chunks (ResourceRecord_ComputeAlignedBounds_64BC1) jusqu'à trouver [rr+0x6D] == tag ou la fin du FORM. Renvoie 1 si trouvé (positionné au début des données). Tous les lecteurs de chunks passent 0 : l'ordre des chunks dans un FORM est donc LIBRE, et un tag présent deux fois n'est lu qu'une fois (la première occurrence)."
   },
   "sub_64AD9": {
     "new_name": "ResourceRecord_ReadViaHelper_64AD9",
@@ -10477,7 +10477,7 @@
   "sub_647B2": {
     "new_name": "ResourceRecord_SeekAndReadB_647B2",
     "segment": "seg193",
-    "summary": "⚠️ far, 99 lignes, NON DÉTAILLÉE — combine sub_64BF8, ResourceRecord_ComputeRecordBounds_646DB, sub_64C21, sub_64DB3."
+    "summary": "far, LUE 2026-10-12. ENTRE DANS UN FORM de type donné : comme ResourceRecord_SeekAndRead_64743 (arg_6 == 0 → recherche depuis le début du FORM courant), mais ne retient que les chunks 'FORM' (ResourceRecord_ComputeRecordBounds_646DB teste 4D524F46h) dont le type vaut le tag ; trouvé → ResourceRecord_AllocateAndDecode_64C21 empile le niveau (on lit ensuite à l'intérieur ; sortie par ResourceRecord_ReleaseAndClear_64D25). Renvoie 1 si trouvé."
   },
   "sub_6B37E": {
     "new_name": "VROOMM_StubThunk_6B37E",
@@ -10720,9 +10720,9 @@
     "summary": "far, référencée via vtable — variante de construction plus légère (sub_5EA03, libération conditionnelle via sub_338, sans les tags vtable)."
   },
   "sub_A0C36": {
-    "new_name": "PlayerComponent_LoadFieldGroupD_A0C36",
+    "new_name": "DynSurf_LoadSURFChunk_A0C36",
     "segment": "seg437",
-    "summary": "far, combine ResourceRecord_SeekAndRead_64743 et ReadFieldGroupC_64A7E (×2, seg193)."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32 → +0x21, +0x25 du modèle. JAMAIS LUS : le clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 + PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE."
   },
   "sub_6AF30": {
     "new_name": "VROOMM_StubThunk_6AF30",
@@ -10890,9 +10890,9 @@
     "summary": "far, accesseur/mutateur de champ de nœud, utilisé par plusieurs constructeurs d'écran UI (sub_53A94/sub_53D92/sub_54274)."
   },
   "sub_9EA2E": {
-    "new_name": "PlayerComponent_ComputeComplexB_9EA2E",
+    "new_name": "WeaponSys_LoadStoresOnHardpoint_9EA2E",
     "segment": "seg432",
-    "summary": "⚠️ far, 269 lignes, NON DÉTAILLÉE — appelle sub_2E74 (externe), référencée 3 fois par sub_9F286. Candidat pour session dédiée."
+    "summary": "far, LUE PARTIELLEMENT 2026-10-12. Ex-'PlayerComponent_ComputeComplexB'. Charge des armes (masque si, quantité di) sur un point d'emport selon son TYPE HPTS (+0x15) : capacité maximale par arme (bit = id d'arme − 1) — type 0 : canon seulement (0x800, toute la quantité) ; 1 : AIM-9J, AIM-9M, AIM-120 ×1 ; 2 : AIM-9J/M ×1, AGM-65D ×3, LAU-3 ×2, MK-20 ×6, MK-82 ×6, Durandal ×3, GBU-15 ×1, AIM-120 ×2 ; 3 : AGM-65D ×3, LAU-3 ×2, MK-20 ×6, MK-82 ×6, Durandal ×3, GBU-15 ×1 ; 4 : AIM-9J/M ×1 ; autre : rien. Le nombre chargé (+0x13) ne dépasse pas cette capacité."
   },
   "sub_EC22": {
     "new_name": "MVRS_SharedContextSyncAndID2Score_EC22",
@@ -10932,7 +10932,7 @@
   "sub_9BA85": {
     "new_name": "Object_LoadCommonChunks_9BA85",
     "segment": "ovr302",
-    "summary": "far, LUE 2026-10-12. LECTEUR DES CHUNKS COMMUNS D'UN OBJET (ex-Debris_LoadFieldMix ; via VROOMM_StubThunk_6BFFF, appelé par les lecteurs de classe d'IFF_LoadModelMain : ORNT/RNWY via IFF_LoadAngleParam, EXPL via Explosion_LoadFromIFF_4BCD5, etc.). Alloue d'abord un sous-objet de 23 o (objet+8 ; +0x10 = 0x5DC00 = 1500,0). Chunks cherchés par tag dans le niveau courant (tous facultatifs) : DAMG uint16 → +6 (points de dégâts ; 65535 → +3 = 1 indestructible ; absent → 10) ; TRGT uint16 → +0x11 (octet bas) ; SIGN 3× uint8 → +0x12/+0x13/+0x14 (absent → 0) ; EXPL 12 o bruts → +0x19 (far ptr) = {char[8] modèle d'explosion, int16 rayon (m), int16 dégâts max} ; DEBR uint16 → +0x1D (nombre de débris à créer) puis (taille−2)/26 enregistrements de 26 o → +0x1F nombre, +0x21 tableau = {char[8] modèle, 3× int16 dispersion de position, 3× int16 vitesse de base, 3× int16 dispersion de vitesse} ; DEST taille/14 enregistrements de 14 o → +0x25 nombre, +0x27 tableau = {char[8] modèle, 3× int16 décalage} ; CHLD taille/32 enregistrements de 32 o (sous-objets attachés : char[8] nom, 3× int32 24.8 position, 3× int32 angles → Matrix_BuildFullOrientation_575B2) → +0x0F nombre, +0x0D tableau de records mémoire de 0x39 o. Consommateurs : Object_SpawnDestructionEffects_3863A (EXPL/DEBR/DEST), Debris_SpawnFromDebrList_3844F (DEBR). Détail : DATA_MODEL.md §6.1."
+    "summary": "far, LUE 2026-10-12. LECTEUR DES CHUNKS COMMUNS D'UN OBJET (ex-Debris_LoadFieldMix ; via VROOMM_StubThunk_6BFFF, appelé par les lecteurs de classe d'IFF_LoadModelMain : ORNT/RNWY via IFF_LoadAngleParam, EXPL via Explosion_LoadFromIFF_4BCD5, etc.). Alloue d'abord un sous-objet de 23 o (objet+8 ; +0x10 = 0x5DC00 = 1500,0). Chunks cherchés par tag dans le niveau courant (tous facultatifs) : DAMG uint16 → +6 (points de dégâts ; 65535 → +3 = 1 indestructible ; absent → 10) ; TRGT uint16 → +0x11 (octet bas) ; SIGN 3× uint8 → +0x12/+0x13/+0x14 (absent → 0) ; EXPL 12 o bruts → +0x19 (far ptr) = {char[8] modèle d'explosion, int16 rayon (m), int16 dégâts max} ; DEBR uint16 → +0x1D (nombre de débris à créer) puis (taille−2)/26 enregistrements de 26 o → +0x1F nombre, +0x21 tableau = {char[8] modèle, 3× int16 dispersion de position, 3× int16 vitesse de base, 3× int16 dispersion de vitesse} ; DEST taille/14 enregistrements de 14 o → +0x25 nombre, +0x27 tableau = {char[8] modèle, 3× int16 décalage} ; CHLD taille/32 enregistrements de 32 o (sous-objets attachés : char[8] nom, 3× int32 24.8 position, 3× int32 angles → Matrix_BuildFullOrientation_575B2) → +0x0F nombre, +0x0D tableau de records mémoire de 0x39 o. Consommateurs : Object_SpawnDestructionEffects_3863A (EXPL/DEBR/DEST), Debris_SpawnFromDebrList_3844F (DEBR). Détail : DATA_MODEL.md §6.1. | COMPLÉMENT 2026-10-12 (consommateurs) : TRGT (+0x11) = TYPE DE CIBLE : 0 aucun, 1 avion, 2 cible au sol, 4 leurre (Targeting_FilterByWeaponType garde 1 et 4 ; GroundAttack_CanEngage_77000 exige 2 ; MissileBody_GuidanceTick_42A4E relève le point visé si > 1). SIGN : octet 1 (+0x12) = signature IR sans référence (Aircraft_ComputeSeekerSignature_3E2F1), recopiée instance +0x28 ; octet 2 (+0x13) = signature radar, chercheur 4 (AIM-120, SA-2, SA-6 ; Debris_GetSubpartAttrib) ; octet 3 (+0x14) = signature du chercheur 3 (aucune arme), instance +0x29. CHLD : les 3 angles (int32 24.8, degrés) sont appliqués dans l'ordre axe X, Y, Z de l'objet (Matrix_BuildFullOrientation_575B2) = tangage (autour de l'envergure), roulis (autour du nez), cap (autour de la verticale). DEBR : vitesses en m/s (posées par la méthode +0x50 = vitesse de la dynamique). DAMG (+6) sert aussi aux dégâts de choc (WorldObject_CollisionDamage_38210)."
   },
   "sub_29E4": {
     "new_name": "CRT_Strcat",
@@ -11095,9 +11095,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8FC61) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14."
   },
   "sub_9EDD4": {
-    "new_name": "PlayerComponent_LoadAndApply_9EDD4",
+    "new_name": "WeaponSys_LoadWPNS_9EDD4",
     "segment": "seg432",
-    "summary": "⚠️ far, 239 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743 (seg193), Memory_TypedFree_5C7B6, PlayerComponent_SetReferenceHelper_9EC8A, PlayerComponent_LoadFromResourceRecord_9DF63, sub_2E3C, sub_2DF4, sub_9F286. Candidat pour session dédiée."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadAndApply'. Chunk WPNS (exige des points d'emport) : n = taille ÷ 10 armes, chacune lue par WeaponSys_LoadWeaponEntry_9DF63 dans des enregistrements de 0x12 o (+0x14 tableau, +0x1C nombre) ; une arme dont le nom commence par « POD » donne +0x1E = quantité × 19 (roquettes) ; un enregistrement vide termine la liste ; puis PlayerComponent_OrchestrateComplex_9F286 répartit les armes sur les points d'emport."
   },
   "sub_A8B8F": {
     "new_name": "MissionScenario_ConvertFieldValue_A8B8F",
@@ -11250,9 +11250,9 @@
     "summary": "far, 88L, LUE 2026-09-25. +0x149 = 1, bit 5 de +0x28B (ordre verrouille). Si le leader +0x145 existe et n'est pas le joueur, et que son entite IA (+0x55) a l'octet +6 == 1 : recopie son objectif +0x11D, sa cible de mission +0x137 et sa reference de navigation +0x10F. Si le leader est le joueur : byte_6E4D4 = 0, reference de navigation +0x10F et cible de mission +0x137 = le joueur (l'objectif, en general 0xAA suivre, est garde). Appelee par Goal_MoraleReaction_878F et AI_MessageDispatcher."
   },
   "sub_A66F0": {
-    "new_name": "PlayerComponent_LoadFieldsWithRetryM_A66F0",
+    "new_name": "TracerModel_LoadINFOChunk_A66F0",
     "segment": "seg451",
-    "summary": "⚠️ far, 197 lignes, NON DÉTAILLÉE — combine sub_3C942, sub_6C5A0, ResourceRecord_SeekAndRead_64743, ReadFieldGroupC_64A7E (×7), ReadFieldGroupB_64A54 (×2, seg193), gestion d'erreur — motif standard de chargement massif de champs IFF."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryM'. Lecteur de la classe TRCR (rafale de canon traçante) : Object_LoadCommonAndAllegiance_3C942, WDAT, puis chunk INFO (obligatoire, sinon B008h), 7 int32 24.8 puis 2 uint16 : 1 → +0x7C vitesse de départ (m/s) ; 2 → +0x5E jamais lu ; 3 → +0x62 dispersion au départ (m par image, amplitude du tremblement aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5 → +0x6A durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (± m/s) ; 7 → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A jamais lu ; 9 uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5). Dérivé : +0x6E = (fin − départ) × dt / durée (calculé avec le dt du chargement)."
   },
   "sub_4791E": {
     "new_name": "Aero_ComputeForcesMain_4791E",
@@ -11307,7 +11307,7 @@
   "sub_A6CA0": {
     "new_name": "EjectSeat_LoadFromIFF_A6CA0",
     "segment": "seg453",
-    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18."
+    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18. | COMPLÉMENT 2026-10-12 : int32 +0x46 jamais lu (ni EjectSeat_SpawnInstance_A6D18, ni EjectSeat_InitInstance_A6DA2, ni EjectSeat_TickReleaseObject_4F351 ; recherche des accès modèle +0x46)."
   },
   "sub_67499": {
     "new_name": "Input_GetCalibratedYValue_67499",
@@ -12552,7 +12552,7 @@
   "sub_9BDE9": {
     "new_name": "Object_LoadExteChunk_9BDE9",
     "segment": "ovr302",
-    "summary": "far, chunk EXTE du niveau OBJT (lu après la classe par IFF_LoadModelMain via VROOMM_StubThunk_6C004) : int32 → sous-objet (+8)+0x10 (défaut 0x5DC00 posé par Object_LoadCommonChunks_9BA85), uint16 n, uint8 → +0x16, puis n éléments (Debris_LoadFieldMixC_9BFB0) commençant chacun par une lettre 'S', 'B' ou 'L', un nom et des valeurs int32 — volumes (collision ?) chaînés en liste. Format détaillé non lu."
+    "summary": "far, LUE 2026-10-12. CHUNK EXTE du niveau OBJT (après la classe, via VROOMM_StubThunk_6C004) : int32 24.8 → sous-objet (+8)+0x10 = RAYON DE L'OBJET (m ; défaut 1500 posé par Object_LoadCommonChunks_9BA85) recopié dans l'instance +0x20 (Debris_BodyAttachToSubpart : taille angulaire vue par AI_IncomingThreatWarning, relèvement du point visé /8 pour une cible au sol) ; uint16 n ; uint8 → +0x16 : ≠ 0 → l'instance démarre avec +4 bit 1 (collisions actives) ; puis n volumes (Exte_LoadVolume_9BFB0 : 'S' sphère, 'B' boîte, 'L' nom seul) chaînés en liste (+0/+4, nombre +0x14)."
   },
   "sub_65158": {
     "new_name": "ResourceRecord_ReadAndWriteBridgeB_65158",
@@ -12570,9 +12570,9 @@
     "summary": "far, 352L, LUE INTEGRALEMENT (2026-09-24). Ex-'Sound3D_ComputeSecondChannel' (FAUX : aucun son). LOI DE GUIDAGE DU MISSILE, appelee par MissileBody_GuidanceTick_42A4E quand le corps a une cible (+0x35) et le guidage actif (+0x39). Entrees : point vise P = globals dword_7287A/7E/82 (position +0x12 de la cible), position propre = dword_72886/8A/8E, matrice d'orientation du missile copiee dans le global 0x57E2. (1) D = P - moi, dist = |D| ; vitesse = |corps+8/+C/+10| ; t = dist/vitesse borne a 1.0 (0x100 ; 1.0 si vitesse nulle). (2) ANTICIPATION : D += vitesse_cible (cible->vtable+0x4C) * t. (3) L = Matrix_WorldToLocal_58768(D, 0x57E2) = D projete sur les 3 lignes de la matrice (repere missile : c0, c1, c2). (4) ROULIS INSTANTANE : a = Math_ArcTan2_54B0A(c0, c2) = atan(c0/c2), corrige de +/-180 (0xB400) si c2 <= 0 (signe de c0) ; Matrix_BuildAxisY_570C5(0x57E2, a) + Matrix_OrthonormalizeKeepRow1_57660 : rotation autour de l'axe c1 (le nez) qui amene la cible dans le plan (c1, c2) cote +c2. Pas de limite de vitesse sur ce roulis. (5) TANGAGE LIMITE : D re-projete, b = atan(c2/c1), et si c1 < 0 (cible derriere) b = 180 - |b| ; borne max = corps+0x21 * dt (dword_70458) : si b > borne, b = borne (le code ne borne que le cote positif ; apres le roulis la cible est cote +c2, donc b >= 0). Matrix_BuildAxisX_56EC3(0x57E2, b) + Matrix_OrthonormalizeKeepRow0_575DF : rotation autour de c0 (axe des ailes). (6) [missile]->vtable+0x40(0x57E2) : ecrit la nouvelle orientation. Loi de poursuite avec anticipation en 'bank-to-turn' : roulis immediat vers la cible puis cabrage a vitesse angulaire bornee (corps+0x21 = 1er dword du chunk dynamique MISS, en degres 24.8 par unite de temps). Matrix_BuildAxisY_570C5 ignore les angles < 0x38 (0,22 deg)."
   },
   "sub_22A7D": {
-    "new_name": "WorldObjects_Cluster_22A7D",
+    "new_name": "World_FindNearestInCone_22A7D",
     "segment": "seg039",
-    "summary": "far,188L — fonction du cluster conteneur avec 5 arguments (buffer local 0x42) — à approfondir en session dédiée."
+    "summary": "far, LUE 2026-10-12. Ex-'WorldObjects_Cluster'. CHERCHE L'OBJET LE PLUS PROCHE dans une liste d'objets du monde (arg_0, ex. 59C3h) vu depuis un objet (arg_2) : portée arg_4 en MÈTRES ENTIERS (comparée à distance >> 8), demi-cône arg_8 en degrés autour du nez de l'objet (Math_CosDeg_5483F ; 180 = toutes directions), filtre TYPE DE CIBLE arg_A (TRGT, octet +0x11 du modèle de la cible renvoyé par sa méthode [0] ; 0 = tous) et catégorie arg_C (vtable+8 de la cible, 0x17 = toutes). Renvoie l'objet retenu (0 sinon). Appelé par la défense fixe SWPN avec sa portée de détection DATA, 180°, TRGT 1, catégorie 6 (avions)."
   },
   "sub_A5280": {
     "new_name": "PlayerComponentVariantAD_ConstructAndInit_A5280",
@@ -12982,7 +12982,7 @@
   "sub_51EDC": {
     "new_name": "PartEntry_ResolveSpawnPositionAndActivate_51EDC",
     "segment": "seg114",
-    "summary": "far, 547 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). CORRIGE : nommee a tort 'GeomNode_BuildOrRefreshCluster' par une session anterieure (balayage rapide, jamais verifie) — aucun contenu ne concerne un cluster geometrique. Appelee directement depuis MissionScript_ExecutePROG_51106 (offset +0x6FB). Opere sur la MEME structure MissionObject a 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et Math_HeadingAngle_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat via SetReference — **RESOUT LA QUESTION OUVERTE DU CONTROLEUR** : c'est une entite avion/pilote IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md)."
+    "summary": "far, 547 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). CORRIGE : nommee a tort 'GeomNode_BuildOrRefreshCluster' par une session anterieure (balayage rapide, jamais verifie) — aucun contenu ne concerne un cluster geometrique. Appelee directement depuis MissionScript_ExecutePROG_51106 (offset +0x6FB). Opere sur la MEME structure MissionObject a 85 octets que MissionObject_ResetState/LoadAndResolveNames. CALCULE une position de formation en combinant plusieurs points nommes ponderes (+0x21, +0x25, +0x29, mis a l'echelle et accumules), via Formation_ComputeGeometryHelper_56D43 et Math_HeadingAngle_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat via SetReference — **RESOUT LA QUESTION OUVERTE DU CONTROLEUR** : c'est une entite avion/pilote IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md). | COMPLÉMENT 2026-10-12 : VITESSE INITIALE (+0x2F, int16) en MÈTRES PAR SECONDE : AIAircraft_SpawnAndConditionalLoadProfile_53363 fait nez × vitesse × dword_7045E (dt) puis la méthode +0x48 de l'instance (loc_3D0F9) multiplie par dword_70462 (= 1/dt) : la dynamique reçoit vitesse m/s. 3e NOM (PART +0x12, string[8]) : s'il n'est pas vide, WeaponSys_LoadFromFile_9EFBE(système d'armes de l'instance +0x5A, nom) = EMPORT IMPOSÉ : OBJECTS\\<nom>.IFF dont la racine est un FORM WEAP. CAMP (+0x31) → instance +0x50 (écrase l'ALGN du modèle). Avion de vitesse nulle : dynamique +0x20 = 1 (au sol) et JDYN +0x75 |= 4 (train sorti)."
   },
   "sub_A82B0": {
     "new_name": "MissionScenario_ReleaseAndStoreField_A82B0",
@@ -13805,9 +13805,9 @@
     "summary": "far,31L — remet à zéro 15 entrées de 0x1A octets (deux champs 16-bit + deux flags) : **réinitialisation d'un pool de 15 slots (probable pool de connexions/liaisons entre objets).**"
   },
   "sub_9EF74": {
-    "new_name": "PlayerComponent_LoadSequence_9EF74",
+    "new_name": "WeaponSys_LoadFormWEAP_9EF74",
     "segment": "seg432",
-    "summary": "far, combine ResourceRecord_SeekAndReadB_647B2, sub_9F07F, PlayerComponent_LoadAndApply_9EDD4, ResourceRecord_ReleaseAndClear_64D25 (seg193). Référencée via jmp depuis un stub VROOMM (sub_6C3D5) et par PlayerComponent_Dispatch_9ED62."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadSequence'. Entre dans le FORM WEAP, puis WeaponSys_LoadInfoHptsDcoy_9F07F et WeaponSys_LoadWPNS_9EDD4, puis ressort. Renvoie 1 si le FORM existe."
   },
   "sub_A730E": {
     "new_name": "TextCycler_AdvanceRandomB_A730E",
@@ -14585,9 +14585,9 @@
     "summary": "far, combine allocation et `Formation_ComputeGeometryHelper_56D43` (seg116)."
   },
   "sub_A4F40": {
-    "new_name": "PlayerComponentVariantY_ConstructAndInit_A4F40",
+    "new_name": "DynAgrv_Construct_A4F40",
     "segment": "seg448",
-    "summary": "far, initialise sous-objet composite (sub_6CAC0), appelle PlayerComponent_LoadFieldsWithRetryF_A4BE1."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponentVariantY_ConstructAndInit'. Lecture de la variante AGRV : chunk DYNM (masse, AircraftDynamics_ReadMassChunk_A4A20) puis ATMO (AircraftDynamics_ReadAtmoChunk_A4BE1). Le chunk AGRV lui-même n'est jamais lu : c'est un MARQUEUR (seul son tag compte). Tick +0x3C = FlightControl_ComputeAngularAccel (forces / masse : chute libre avec traînée)."
   },
   "sub_4114D": {
     "new_name": "Countermeasure_DeployChaffFlare",
@@ -15320,9 +15320,9 @@
     "summary": "far,71L — orchestre sub_47290 (reset), sub_47140 et sub_46F5E, additionne les résultats, divise par la masse (sub_46392) : **orchestrateur de calcul d'accélération angulaire composite (somme de moments / inertie).**"
   },
   "sub_A0FB0": {
-    "new_name": "PlayerComponent_LoadFieldsWithRetryD_A0FB0",
+    "new_name": "PodModel_LoadDATAChunk_A0FB0",
     "segment": "seg439",
-    "summary": "far, combine sub_3C942, sub_6C5A0 (stub voisin), ResourceRecord_SeekAndRead_64743, sub_2B007, ReadFinalField_64B51, ReadFieldGroupB_64A54 (seg193), gestion d'erreur — motif standard de chargement de champs IFF."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryD'. Lecteur de la classe PODR (nacelle de roquettes) : Object_LoadCommonAndAllegiance_3C942, Weapon_LoadWDATWrapper (WDAT), puis chunk DATA (obligatoire, sinon erreur C01Ch) : string → +0x5F nom de l'objet tiré (la roquette, instanciée par WeaponSystem_LaunchFromStation_3E744) ; uint8 → +0x5E recopié dans l'instance +0x2C (0 : la méthode +0x10 de l'instance renvoie faux, la nacelle disparaît) ; uint16 → +0x68 vitesse de départ (m/s, entier : << 8 dans la prédiction d'impact loc_45CEA)."
   },
   "sub_A012B": {
     "new_name": "PlayerComponent_SubHelperK_A012B",
@@ -16332,7 +16332,7 @@
   "sub_64B51": {
     "new_name": "ResourceRecord_ReadFinalField_64B51",
     "segment": "seg193",
-    "summary": "far, lit un champ final via StreamReader_ReadTyped_63FA1. Référencée par sub_3C942."
+    "summary": "far, lit un champ final via StreamReader_ReadTyped_63FA1. Référencée par sub_3C942. | PRÉCISÉ 2026-10-12 : lit 1 octet (taille 1) et avance de 1 = uint8."
   },
   "sub_6B25F": {
     "new_name": "VROOMM_StubThunk_6B25F",
@@ -16480,9 +16480,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A4ABC) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=33280h, codesize=0EEh, nentries=6."
   },
   "sub_A014E": {
-    "new_name": "PlayerComponent_LoadFieldGroupB_A014E",
+    "new_name": "DynDurd_LoadDURDChunk_A014E",
     "segment": "seg433",
-    "summary": "far, combine ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54, ReadFieldGroupC_64A7E (seg193), gestion d'erreur."
+    "summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupB'. LECTEUR DU CHUNK 'DURD' (dynamique Durandal) : uint16 → +0x21 = distance de freinage D (mètres, entier) ; int32 → `shl 8` → +0x23 = vitesse verticale minimale (m/s, ENTIER tel quel, négatif = vers le bas). Chunk absent : erreur 0xC004. Consommateur : DurdBody_Tick_421A7."
   },
   "sub_6B6D5": {
     "new_name": "VROOMM_StubThunk_6B6D5",
@@ -16570,9 +16570,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_ABDAF) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=3A990h, codesize=38Fh, nentries=4."
   },
   "sub_9D910": {
-    "new_name": "Collision_OnTerrainContact_9D910",
+    "new_name": "Aircraft_OnCollision_9D910",
     "segment": "ovr316",
-    "summary": "⭐⚠️ far, 577 lignes, début lu (ex-`Gauge_ComputeAndRenderNeedle_9D910`, nom faux : pas une jauge). **Réaction au contact d'un objet avec le terrain** : compare le nom de l'objet heurté à « TERRAIN » (`push offset aTerrain / call CRT_MemFamily_Extra7`). Si l'objet a le drapeau `[+0x51]+0x20` (après appel vtable `+0x14` ; probablement train sorti — non prouvé) et, pour le joueur, si `byte_6E4D0 != 0` : contact accepté, l'altitude est recalée sur le sol (`Terrain_QueryAltitudeAt` + `Gauge_ComputeNeedlePosition` → `[obj+0x1A]`). Si c'est le joueur : exécute le gestionnaire du script de mission (`word_706A0+0x4E`, entrée `+0x40`) puis, si le script n'a pas pris la main (`[word_706A0+0xA1] == 0`) **et** que plus de 100 images se sont écoulées depuis le début de la mission (`cmp word_70466,64h / jbe`), **demande la piste musicale 0x14** (posé sans encombre). Le reste (contact refusé = crash) n'est pas lu."
+    "summary": "⭐ far, 577 lignes, LUE PARTIELLEMENT 2026-10-12 (ex-Collision_OnTerrainContact_9D910, ex-Gauge_ComputeAndRenderNeedle). Méthode +0x10 du modèle JETP : CHOC D'UN AVION avec un objet (arg_6). Tête : JDYN = dynamique(+0x36)→vtable+0x48 (DYNM_AsJDYN, déréférencé SANS test : [ax+0x75] — un JETP doit avoir une dynamique JDYN). Contact avec « TERRAIN » : si [+0x51]+0x20 (au sol, posé par Aero_ControlOrchestrator_48FC2) et, pour le joueur, byte_6E4D0 : contact accepté, altitude recalée sur le sol ; joueur : script de mission (word_706A0+0x4E, entrée +0x40) et, après 100 images, musique 0x14 (posé). Autre objet : DamageSys_ApplyHit_9C9A0 sur les composants (+0x5E), PlayerComponent_FormatAndDisplay_9F784, puis DamageSys_DamagePercent_9CB2C comparé à JINF champ 9 (modèle +0x68, défaut 30 %) : au-delà, avion perdu (byte_6E4B7 pour le joueur selon la catégorie de l'objet heurté)."
   },
   "sub_500F6": {
     "new_name": "Frame_UpdateTimingAndNotifyTrackedObjects_500F6",
@@ -16655,9 +16655,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_87D74) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=14CB0h, codesize=4A0h, nentries=8."
   },
   "sub_9DD81": {
-    "new_name": "TimedTrigger_NotifyConditional_9DD81",
+    "new_name": "Aircraft_InitSpecialChild_9DD81",
     "segment": "seg430",
-    "summary": "far, variante conditionnelle de TimedTrigger_NotifySingleListener_9DD30 : ne notifie que si un flag externe (arg+0x59) est posé, résout le handle faible (sub_22E27) et le stocke dans le champ local +0x65 avant de dispatcher. Référencée via jmp depuis un stub VROOMM (sub_6C325)."
+    "summary": "far, LUE 2026-10-12. Ex-'TimedTrigger_NotifyConditional'. À la création d'un avion (Camera_ConstructWithHandle_9D610) : si JINF champ 6 (modèle +0x59) ≠ 0, le sous-objet CHLD de rang JINF champ 7 (modèle +0x66) est mémorisé en +0x65 et sa méthode +4 appelée avec 0. La mise à jour (Aircraft_Update_3DEFB) le désactive définitivement après 3 images où sa méthode +8 est vraie (compteur +0x67)."
   },
   "sub_6B794": {
     "new_name": "VROOMM_StubThunk_6B794",
@@ -17122,7 +17122,7 @@
   "sub_621A2": {
     "new_name": "Render_DrawScaledSprite_621A2",
     "segment": "seg175",
-    "summary": "⚠️ far, 675 lignes, NON DÉTAILLÉE — la plus grosse fonction de ce lot, aucun appel externe (calcul entièrement inline), immense frame locale (0x2DA octets ≈ 730 octets, 10 arguments dont deux pointeurs far). Référencée depuis seg032 (zoom carte/radar) ET seg106 (émetteur de particules) — probable primitive de rendu de sprite/icône avec mise à l'échelle et/ou rotation, partagée entre plusieurs sous-systèmes. Candidat prioritaire pour session dédiée (aucune lecture de détail effectuée)."
+    "summary": "⚠️ far, 675 lignes, NON DÉTAILLÉE — la plus grosse fonction de ce lot, aucun appel externe (calcul entièrement inline), immense frame locale (0x2DA octets ≈ 730 octets, 10 arguments dont deux pointeurs far). Référencée depuis seg032 (zoom carte/radar) ET seg106 (émetteur de particules) — probable primitive de rendu de sprite/icône avec mise à l'échelle et/ou rotation, partagée entre plusieurs sous-systèmes. Candidat prioritaire pour session dédiée (aucune lecture de détail effectuée). | LU EN PARTIE 2026-10-12 (arguments et boucle de pixels). Args : (surface, x, y, forme far, n° d'image, largeur, hauteur, table de remappage far, A, B). Forme = format de sprite RealSpace : dword en +0, table de dwords d'offsets d'images à partir de +4, chaque image commence par 4 int16 d'étendue (droite, gauche, haut, bas). Pixel de couleur c : c < A ou c ≥ A + B → couleur c dessinée telle quelle ; A ≤ c < A + B → pixel TRANSLUCIDE : nouvelle couleur = table[(c − A) × 256 + couleur déjà à l'écran] (xlat). Appelé par le rendu des particules en mode 2 (A, B = octets +0x19/+0x1A du modèle de fumée ; table = remappage de la teinte courante)."
   },
   "sub_46D13": {
     "new_name": "Aero_DynamicPressure_46D13",
@@ -17502,12 +17502,12 @@
   "sub_37C89": {
     "new_name": "Debris_BodyAttachToSubpart",
     "segment": "seg078",
-    "summary": "far,52L — appelle sub_37C4C (reset), enregistre une référence de sous-composant (+0xE), copie sa position d'origine (+0x20) : **initialisation d'un corps physique de débris attaché à un sous-composant de modèle (probable pièce détachée après dommage).**"
+    "summary": "far,52L — appelle sub_37C4C (reset), enregistre une référence de sous-composant (+0xE), copie sa position d'origine (+0x20) : **initialisation d'un corps physique de débris attaché à un sous-composant de modèle (probable pièce détachée après dommage).** | PRÉCISÉ 2026-10-12 : instance +0x20 = rayon de l'objet (EXTE, modèle (+8)+0x10) ; +4 bit 1 = EXTE octet (+0x16) ≠ 0 (collisions actives) ; +0x28 = SIGN octet 1 ; +0x29 = SIGN octet 3."
   },
   "sub_22E27": {
-    "new_name": "Container_Op_22E27",
+    "new_name": "WorldObject_GetNthChild_22E27",
     "segment": "seg039",
-    "summary": "far,44L — (cluster conteneur) — accesseur/test additionnel, non détaillé."
+    "summary": "far, LUE 2026-10-12. Ex-'Container_Op'. (liste, n) : renvoie le n-ième élément d'une liste chaînée (tête [liste+0x0B], suivant [élément+2]) ou 0. Sert aux sous-objets attachés (CHLD) d'un avion (instance +0x1E)."
   },
   "sub_6BE24": {
     "new_name": "VROOMM_StubThunk_6BE24",
@@ -18275,9 +18275,9 @@
     "summary": "far, destructeur scalar-deleting détruisant 3 sous-objets membres (sub_3A432 ×3 à offsets +0x29/+0x27/+0x13) puis libération conditionnelle."
   },
   "sub_42016": {
-    "new_name": "Chaff_PhysicsTick",
+    "new_name": "DurdBody_BrakePhase_42016",
     "segment": "seg089",
-    "summary": "far,149L — intègre le temps écoulé (dword_70458, delta-temps physique) dans un timer de vie (+0x35 vs seuil +0x31), intègre une vitesse (+0x29) dans une position (+0x3D) : **simulation physique d'un leurre déployé (chaff) : durée de vie + trajectoire balistique.**"
+    "summary": "far, LUE 2026-10-12. Ex-'Chaff_PhysicsTick' (FAUX : pas un leurre). PHASE 1 de la Durandal (corps DURD) : chrono +0x35 += dt ; tant qu'il est < t (+0x31) : vitesse horizontale += a·dt le long de la direction +0x3D/+0x41 (freinage linéaire jusqu'à 0) ; vitesse verticale += +0x2D·dt sans descendre sous Vmin (+0x23). Chrono écoulé : +0x27 = 1 (passage en phase 2)."
   },
   "sub_556D4": {
     "new_name": "Vector_RotateHeading2D_556D4",
@@ -18710,9 +18710,9 @@
     "summary": "far, référencée via vtable (DATA XREF seg339) — copie un octet depuis un pointeur source dans le champ +0x16, retourne 0."
   },
   "sub_9CB2C": {
-    "new_name": "Debris_AllocateFamily_9CB2C",
+    "new_name": "DamageSys_DamagePercent_9CB2C",
     "segment": "ovr306",
-    "summary": "far, appelle CRT_MemFamily_Extra4 (99 lignes)."
+    "summary": "far, LUE 2026-10-12. Ex-'Debris_AllocateFamily' (FAUX). TAUX DE DÉGÂTS GLOBAL d'un avion, en % : 100 si le composant « PLAYER » (le pilote) a des dégâts ≥ sa résistance ; sinon Σ dégâts × 100 / Σ résistances. Comparé par Aircraft_OnCollision_9D910 au champ 9 de JINF (modèle +0x68, défaut 30) : au-delà, l'avion est perdu."
   },
   "sub_2A347": {
     "new_name": "Mesh_FaceSetupVariant",
@@ -18948,5 +18948,55 @@
     "new_name": "SmokeGen_Tick_4C057",
     "segment": "seg106",
     "summary": "far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 : compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et Particle_SpawnWithColor(word_70483, type de fumée = modèle +0x36, position +0x12, vitesse construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux autres à 0). Puis WorldObject_IsAlive_3CBB7."
+  },
+  "loc_46922": {
+    "new_name": "DYNM_AsJDYN_Base_46922",
+    "segment": "seg101",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x48 de la vtable DYNM de base (seg339 tag 0x223A) : « est-ce un JDYN ? » → renvoie 0 (`xor ax,ax`). Toutes les variantes MISS/GBMB/DURD/AGRV/SURF/PARA gardent ce slot ; seule JDYN le remplace (thunk loc_3B63B → JDYN_AsJDYN_4B093, renvoie l'objet JDYN). Appelé ~60 fois sur [instance+0x51] ou [modèle+0x36] par l'IA, le HUD, la physique, les collisions."
+  },
+  "loc_4B093": {
+    "new_name": "JDYN_AsJDYN_4B093",
+    "segment": "seg103",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x48 de la vtable JDYN (atteint depuis la vtable du sous-objet DYNM 0x2312 par le thunk d'ajusteur loc_3B63B, `add ax,0FF72h` = −0x8E) : renvoie `this` = l'objet JDYN complet (0xC5 o). Pendant de DYNM_AsJDYN_Base_46922 (renvoie 0). C'est le SEUL test de type de la dynamique dans le binaire."
+  },
+  "loc_4A825": {
+    "new_name": "JDYN_TickUncontrolled_4A825",
+    "segment": "seg103",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x3C du JDYN (tick SANS commande, appelé par la mise à jour des objets non pilotés Camera_ExternalUpdate_3D9B4) : Aero_SumLinearForces_48639 puis Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni autopilote. Le tick AVEC commande (+0x40) est PhysicsTicks."
+  },
+  "loc_421A7": {
+    "new_name": "DurdBody_Tick_421A7",
+    "segment": "seg089",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x3C du corps de dynamique DURD (vtable 0x1E06, chunk DURD lu par PlayerComponent_LoadFieldGroupB_A014E). PREMIÈRE IMAGE (+0x28 != 0) : lanceur = propriétaire→vtable+0x38 (SetReference16 → +0x45) ; vitesse verticale (asm c2, +0x10) bornée à ≤ 0 ; direction horizontale = (vx, vz) normalisée → +0x3D/+0x41 ; durée de freinage t = 2·D/|v| (+0x31, D = 1er champ DURD, uint16 en mètres) ; décélération horizontale a = −|v|/t (+0x29) : la vitesse horizontale tombe à 0 en parcourant D ; accélération verticale = −(4/3)·Hsol/t² (+0x2D, Hsol = Terrain_QueryAltitudeAt à la position du lanceur) ; si la vitesse verticale atteinte (+0x2D·t) passe sous Vmin (+0x23 = 2e champ DURD), +0x39 = accélération de la 2e phase. +0x28 = 0, chrono +0x35 = 0. ENSUITE : phase 1 (DurdBody_BrakePhase_42016) tant que chrono < t, puis phase 2 (DurdBody_DivePhase_42127, +0x27 = 1). Tick +0x40 = loc_42436 (rien, renvoie 1)."
+  },
+  "loc_4536C": {
+    "new_name": "SurfBody_TickNoOp_4536C",
+    "segment": "seg096",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x3C du corps SURF (vtable 0x1DB6) : `mov al,1 / retf` — ne fait rien. Le slot +0x40 (loc_45376) rappelle +0x3C. La dynamique SURF est donc immobile."
+  },
+  "loc_458C8": {
+    "new_name": "GroundObj_IntegrateMotion_458C8",
+    "segment": "seg097",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x14 (déplacement) de l'instance GRND (vtable 0x2B56). La dynamique de l'objet n'est JAMAIS « tickée » (aucun appel +0x3C/+0x40) : seule sa VITESSE (champs de base DYNM +8/+0xC/+0x10) est lue, × dt (dword_7045E), et l'objet est translaté (WorldObject_TranslateBy_37D54) ; puis son altitude est recalée sur le sol (Terrain_QueryAltitudeAt → +0x1A) et, s'il bouge, son orientation suit la pente (normale du sol, Matrix_ApplyToVectorZ_576E5). Sans dynamique : vitesse globale dword_707F8. La variante de dynamique d'un GRND est donc sans effet."
+  },
+  "loc_45883": {
+    "new_name": "GroundObj_Update_45883",
+    "segment": "seg097",
+    "summary": "far (label), LUE 2026-10-12. Slot +0x10 (mise à jour) de l'instance GRND : si vivant, selon l'état +0x55 (0xA5 : Missile_TestSearchRange puis Missile_ComputeImpactPlane, sinon Missile_TestProximityFuze), puis SmokeTrail_Tick_3D57E. N'appelle pas la dynamique."
+  },
+  "loc_4256C": {
+    "new_name": "Missile_CollisionDamage_4256C",
+    "segment": "seg090",
+    "summary": "far (label), LUE 2026-10-12. Méthode +0x84 de l'instance MISS (vtable 0x2A14) : dégâts de choc WorldObject_CollisionDamage_38210 + dégâts max du chunk EXPL du modèle (int16, modèle +0x19 → +0x0A) × (10 − Math_RandomScale_54DF4(5)) / 10, soit 60 à 100 % de la valeur EXPL."
+  },
+  "loc_4E0E5": {
+    "new_name": "Tracer_CollisionDamage_4E0E5",
+    "segment": "seg107",
+    "summary": "far (label), LUE 2026-10-12. Méthode +0x84 de l'instance TRCR (vtable 0x31A6) : dégâts = WDAT dégâts (modèle +0x46) × INFO champ 9 (uint16, modèle +0x80) × (0,5 + temps restant (+0x3C) / (2 × durée de vie INFO champ 5, modèle +0x6A)) : de 100 % au départ à 50 % en fin de vie."
+  },
+  "loc_3DEFB": {
+    "new_name": "Aircraft_Update_3DEFB",
+    "segment": "seg087",
+    "summary": "far (label), LUE PARTIELLEMENT 2026-10-12. Méthode +0x10 (mise à jour) de l'instance JETP (vtable 0x27BC). Après Camera_ResolvePositionVelocity_3DDC4 : si +0x73 bit 0 → renvoie 0. TRAIN D'ATTERRISSAGE (si +0x73 bit 1) : quand l'ordre de train de la dynamique (JDYN +0x75 bit 2) diffère de l'état +0x73 bit 2, une séquence démarre (+0x73 bit 3) : toutes les 25/256 s (word_6F902 = 0x19, horloge +0x71 += dt) le sous-objet suivant de la plage JINF [champ 2, champ 2 + champ 3) est affiché (méthode +4 avec 1) ou masqué (0), index +0x62 ; sons 4 (rentrée) / 5 (sortie) pour le joueur en vue cockpit (byte_72A8E == 4). Sous-objet spécial +0x65 (JINF champs 6-7) : désactivé après 3 images actives. Puis secousse d'écran (+0x68 minuteur) pour le joueur."
   }
 }

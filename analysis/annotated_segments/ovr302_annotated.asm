@@ -429,7 +429,18 @@ Debris_Helper3_9BA29	endp
 ; char[8] nom, 3× int32 24.8 position, 3× int32 angles → Matrix_BuildFullOrientation_575B2) →
 ; +0x0F nombre, +0x0D tableau de records mémoire de 0x39 o. Consommateurs :
 ; Object_SpawnDestructionEffects_3863A (EXPL/DEBR/DEST), Debris_SpawnFromDebrList_3844F
-; (DEBR). Détail : DATA_MODEL.md §6.1.
+; (DEBR). Détail : DATA_MODEL.md §6.1. | COMPLÉMENT 2026-10-12 (consommateurs) : TRGT (+0x11)
+; = TYPE DE CIBLE : 0 aucun, 1 avion, 2 cible au sol, 4 leurre (Targeting_FilterByWeaponType
+; garde 1 et 4 ; GroundAttack_CanEngage_77000 exige 2 ; MissileBody_GuidanceTick_42A4E relève
+; le point visé si > 1). SIGN : octet 1 (+0x12) = signature IR sans référence
+; (Aircraft_ComputeSeekerSignature_3E2F1), recopiée instance +0x28 ; octet 2 (+0x13) =
+; signature radar, chercheur 4 (AIM-120, SA-2, SA-6 ; Debris_GetSubpartAttrib) ; octet 3
+; (+0x14) = signature du chercheur 3 (aucune arme), instance +0x29. CHLD : les 3 angles (int32
+; 24.8, degrés) sont appliqués dans l'ordre axe X, Y, Z de l'objet
+; (Matrix_BuildFullOrientation_575B2) = tangage (autour de l'envergure), roulis (autour du
+; nez), cap (autour de la verticale). DEBR : vitesses en m/s (posées par la méthode +0x50 =
+; vitesse de la dynamique). DAMG (+6) sert aussi aux dégâts de choc
+; (WorldObject_CollisionDamage_38210).
 ; ==============================================================================================
 Object_LoadCommonChunks_9BA85	proc far		; CODE XREF: VROOMM_StubThunk_6BFFFJ
 
@@ -858,11 +869,13 @@ Object_LoadCommonChunks_9BA85	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, chunk EXTE du niveau OBJT (lu après la classe par IFF_LoadModelMain via
-; VROOMM_StubThunk_6C004) : int32 → sous-objet (+8)+0x10 (défaut 0x5DC00 posé par
-; Object_LoadCommonChunks_9BA85), uint16 n, uint8 → +0x16, puis n éléments
-; (Debris_LoadFieldMixC_9BFB0) commençant chacun par une lettre 'S', 'B' ou 'L', un nom et des
-; valeurs int32 — volumes (collision ?) chaînés en liste. Format détaillé non lu.
+; far, LUE 2026-10-12. CHUNK EXTE du niveau OBJT (après la classe, via VROOMM_StubThunk_6C004)
+; : int32 24.8 → sous-objet (+8)+0x10 = RAYON DE L'OBJET (m ; défaut 1500 posé par
+; Object_LoadCommonChunks_9BA85) recopié dans l'instance +0x20 (Debris_BodyAttachToSubpart :
+; taille angulaire vue par AI_IncomingThreatWarning, relèvement du point visé /8 pour une
+; cible au sol) ; uint16 n ; uint8 → +0x16 : ≠ 0 → l'instance démarre avec +4 bit 1
+; (collisions actives) ; puis n volumes (Exte_LoadVolume_9BFB0 : 'S' sphère, 'B' boîte, 'L'
+; nom seul) chaînés en liste (+0/+4, nombre +0x14).
 ; ==============================================================================================
 Object_LoadExteChunk_9BDE9	proc far		; CODE XREF: VROOMM_StubThunk_6C004J
 

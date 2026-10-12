@@ -142,7 +142,7 @@ locret_3844D:
 ; ajouté à la liste des objets (59C3h).
 ; ==============================================================================================
 Debris_SpawnFromDebrList_3844F	proc far		; CODE XREF: Object_SpawnDestructionEffects_3863A+1E2p
-					; Debris_SpawnOrchestratorVariant_9D770+191P ...
+					; Aircraft_OnDestroyed_9D770+191P ...
 
 var_32		= dword	ptr -32h
 var_2A		= dword	ptr -2Ah
@@ -358,7 +358,7 @@ Debris_SpawnFromDebrList_3844F	endp
 ; DEST (char[8]) à source + décalage int16 ×3 (<<8, sans aléa), orientation de la source,
 ; vitesse = 0,6 × vitesse source. Renvoie 1.
 ; ==============================================================================================
-Object_SpawnDestructionEffects_3863A	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+4CP
+Object_SpawnDestructionEffects_3863A	proc far		; CODE XREF: Aircraft_OnDestroyed_9D770+4CP
 					; DATA XREF: seg339:off_6EC2Bo	...
 
 var_2E		= dword	ptr -2Eh

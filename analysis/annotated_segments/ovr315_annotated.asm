@@ -7,11 +7,20 @@ ovr315		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 242 lignes, NON DÉTAILLÉE — combine Object_SpawnDestructionEffects_3863A,
-; Math_RandomChance_54E4F (seg115), allocateurs typés — variante/orchestration finale du spawn
-; de débris.
+; far, LUE 2026-10-12. Ex-'Debris_SpawnOrchestratorVariant'. Méthode +0x0C (destruction) du
+; modèle JETP. AVION IA (≠ joueur) : si le modèle a un siège éjectable (EJEC, +0x63) et que le
+; pilote n'est pas déjà éjecté (JDYN +0x75 bit 5) : éjection
+; (TriggerObject_SpawnAndBindFull_A6DF2 avec l'objet EJEC, ou l'objet « LOWEJECT » quand la
+; mémoire libre de l'allocateur 5C44h, méthode +0x14 via Memory_TypedAllocDispatchC_5C86D, est
+; sous 0xFFFF) si le pilote est forcé (+0xB9 == 1) ou sur un tirage de 30 % avec plus de
+; 0xC800 de mémoire libre et +0xB9 != 2 ; message radio 9 ou 10. Puis, si l'instance a +0x73
+; bit 0 OU Math_RandomChance_54E4F(JINF champ 5, modèle +0x64, défaut 5) : EXPLOSION IMMÉDIATE
+; (Object_SpawnDestructionEffects_3863A). SINON CHUTE : World_OnObjectDestroyed_53A94, type de
+; fumée = JINF champ 8 (modèle +0x58, défaut 6) → instance +0x54, traînée activée
+; (SmokeTrail_EnableIfModelHasSmok_3D566), dynamique→+0x18. Joueur : byte_6E4B4/6E4B5 puis
+; destruction.
 ; ==============================================================================================
-Debris_SpawnOrchestratorVariant_9D770	proc far		; CODE XREF: VROOMM_StubThunk_6C2C0J
+Aircraft_OnDestroyed_9D770	proc far		; CODE XREF: VROOMM_StubThunk_6C2C0J
 
 var_6		= dword	ptr -6
 var_1		= byte ptr -1
@@ -64,8 +73,8 @@ loc_9D7B1:
 		jmp	loc_9D895
 ; ���������������������������������������������������������������������������
 
-loc_9D7B4:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770:loc_9D7AFj
-					; Debris_SpawnOrchestratorVariant_9D770+145j ...
+loc_9D7B4:				; CODE XREF: Aircraft_OnDestroyed_9D770:loc_9D7AFj
+					; Aircraft_OnDestroyed_9D770+145j ...
 		push	[bp+arg_6]
 		push	di
 
@@ -76,14 +85,14 @@ loc_9D7B8:
 		jmp	loc_9D90B
 ; ���������������������������������������������������������������������������
 
-loc_9D7C7:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770:loc_9D7A3j
+loc_9D7C7:				; CODE XREF: Aircraft_OnDestroyed_9D770:loc_9D7A3j
 		les	bx, [bp+arg_0]
 		cmp	byte ptr es:[bx+63h], 0
 		jnz	short loc_9D7D4
 		jmp	loc_9D878
 ; ���������������������������������������������������������������������������
 
-loc_9D7D4:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+5Fj
+loc_9D7D4:				; CODE XREF: Aircraft_OnDestroyed_9D770+5Fj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -91,7 +100,7 @@ loc_9D7D4:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+5Fj
 		jmp	loc_9D878
 ; ���������������������������������������������������������������������������
 
-loc_9D7E0:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+6Bj
+loc_9D7E0:				; CODE XREF: Aircraft_OnDestroyed_9D770+6Bj
 		les	bx, [bp+var_6]
 		cmp	byte ptr es:[bx+0B9h], 1
 		jz	short loc_9D81D
@@ -113,7 +122,7 @@ loc_9D7E0:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+6Bj
 		cmp	byte ptr es:[bx+0B9h], 2
 		jz	short loc_9D869
 
-loc_9D81D:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+79j
+loc_9D81D:				; CODE XREF: Aircraft_OnDestroyed_9D770+79j
 		push	0
 		push	2
 		push	5C44h
@@ -129,13 +138,13 @@ loc_9D81D:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+79j
 		jmp	short loc_9D848
 ; ���������������������������������������������������������������������������
 
-loc_9D83E:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+C6j
+loc_9D83E:				; CODE XREF: Aircraft_OnDestroyed_9D770+C6j
 		mov	ax, word ptr [bp+arg_0]
 		add	ax, 5Ah	; 'Z'
 		push	word ptr [bp+arg_0+2]
 		push	ax
 
-loc_9D848:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+CCj
+loc_9D848:				; CODE XREF: Aircraft_OnDestroyed_9D770+CCj
 		push	si
 		call	VROOMM_StubThunk_6CCFF
 		add	sp, 6
@@ -149,14 +158,14 @@ loc_9D848:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+CCj
 loc_9D85F:
 		and	byte ptr [bx+75h], 0DFh
 
-loc_9D863:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+104j
+loc_9D863:				; CODE XREF: Aircraft_OnDestroyed_9D770+104j
 		push	0
 		push	9
 		jmp	short loc_9D885
 ; ���������������������������������������������������������������������������
 
-loc_9D869:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+85j
-					; Debris_SpawnOrchestratorVariant_9D770+A0j ...
+loc_9D869:				; CODE XREF: Aircraft_OnDestroyed_9D770+85j
+					; Aircraft_OnDestroyed_9D770+A0j ...
 		les	bx, [bp+var_6]
 		cmp	byte ptr es:[bx+0B9h], 1
 		jnz	short loc_9D881
@@ -165,28 +174,28 @@ loc_9D869:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+85j
 		jmp	short loc_9D881
 ; ���������������������������������������������������������������������������
 
-loc_9D878:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+61j
-					; Debris_SpawnOrchestratorVariant_9D770+6Dj
+loc_9D878:				; CODE XREF: Aircraft_OnDestroyed_9D770+61j
+					; Aircraft_OnDestroyed_9D770+6Dj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_9D895
 
-loc_9D881:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+102j
-					; Debris_SpawnOrchestratorVariant_9D770+106j
+loc_9D881:				; CODE XREF: Aircraft_OnDestroyed_9D770+102j
+					; Aircraft_OnDestroyed_9D770+106j
 		push	0
 
 loc_9D883:
 		push	0Ah
 
-loc_9D885:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+F7j
+loc_9D885:				; CODE XREF: Aircraft_OnDestroyed_9D770+F7j
 		push	word_722E6
 		push	large [bp+var_6]
 		call	Radio_PlayMessage
 		add	sp, 0Ah
 
-loc_9D895:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770:loc_9D7B1j
-					; Debris_SpawnOrchestratorVariant_9D770+10Fj
+loc_9D895:				; CODE XREF: Aircraft_OnDestroyed_9D770:loc_9D7B1j
+					; Aircraft_OnDestroyed_9D770+10Fj
 		mov	al, [si+73h]
 		and	ax, 1
 		or	al, al
@@ -203,20 +212,20 @@ loc_9D8AB:
 		or	al, al
 		jz	short loc_9D8C3
 
-loc_9D8AF:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+12Dj
+loc_9D8AF:				; CODE XREF: Aircraft_OnDestroyed_9D770+12Dj
 		cmp	word_722E6, di
 		jz	short loc_9D8B8
 		jmp	loc_9D7B4
 ; ���������������������������������������������������������������������������
 
-loc_9D8B8:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+143j
+loc_9D8B8:				; CODE XREF: Aircraft_OnDestroyed_9D770+143j
 		mov	byte_6E4B5, 1
 		jmp	loc_9D7B4
 ; ���������������������������������������������������������������������������
 		jmp	loc_9D7B4
 ; ���������������������������������������������������������������������������
 
-loc_9D8C3:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+13Dj
+loc_9D8C3:				; CODE XREF: Aircraft_OnDestroyed_9D770+13Dj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -237,7 +246,7 @@ loc_9D8C3:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+13Dj
 		call	dword ptr [bx+18h]
 		pop	cx
 
-loc_9D8F5:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+15Aj
+loc_9D8F5:				; CODE XREF: Aircraft_OnDestroyed_9D770+15Aj
 		les	bx, [bp+arg_0]
 		push	word ptr es:[bx+1Dh]
 		push	di
@@ -247,11 +256,11 @@ loc_9D8F5:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+15Aj
 		add	sp, 8
 		mov	al, 0
 
-loc_9D90B:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+54j
+loc_9D90B:				; CODE XREF: Aircraft_OnDestroyed_9D770+54j
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_SpawnOrchestratorVariant_9D770	endp
+Aircraft_OnDestroyed_9D770	endp
 
 ovr315		ends

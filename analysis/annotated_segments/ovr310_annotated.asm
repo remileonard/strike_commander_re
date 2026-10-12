@@ -149,7 +149,7 @@ loc_9D18D:
 
 loc_9D191:
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		push	si
 		mov	ax, word ptr [bp+arg_0]

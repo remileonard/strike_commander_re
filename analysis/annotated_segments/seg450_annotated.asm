@@ -185,7 +185,7 @@ loc_A6013:				; CODE XREF: SmokeGen_LoadFromIFF_A5F89+7Fj
 
 loc_A6014:
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		pop	si
 
@@ -499,7 +499,12 @@ TextLabel_AllocateBuffer_A6188	endp
 ; ('R' aller-retour, 'S' s'arrête sur la dernière image, 'T' la particule meurt après la
 ; dernière, 'W' boucle), int16 images/s → +0x21, int16 pas (1, −1, 0 = pas d'animation) →
 ; +0x23 ; absent → +0x27 = +0x29 = 255 (aucune forme). Chunk SCRI facultatif : n octets (n =
-; taille) → +0x20 n, +0x25 tableau = ordre des images.
+; taille) → +0x20 n, +0x25 tableau = ordre des images. | PRÉCISÉ 2026-10-12 : +0x19 (dessin A)
+; = première couleur translucide du sprite, +0x1A (dessin B) = nombre de couleurs translucides
+; (Render_DrawScaledSprite_621A2). Mode de rendu : 0 = disque ombré
+; (Render_PlotPixelClippedColorMap, table de la teinte), 1 = sprite opaque
+; (Render_DrawRotatedScaledSprite_62800), 2 = sprite avec couleurs translucides A..A+B−1
+; (Render_DrawScaledSprite_621A2) ; autre valeur : rien n'est dessiné.
 ; ==============================================================================================
 SmokeSet_LoadSmokeModel_A61D0	proc far		; CODE XREF: VROOMM_StubThunk_6CC38J SmokeSet_LoadFromIFF_A636C+260p
 

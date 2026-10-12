@@ -7,11 +7,12 @@ seg434		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA'
-; du MODELE missile (bloc MISS d'IFF_LoadModelMain, via VROOMM_StubThunk_6C530), apres le
-; chargeur de base (VROOMM_StubThunk_6C5A5) : dword -> +0x5E, octet -> +0x62, word -> +0x63 =
-; RAYON DE L'ALLUMEUR DE PROXIMITE (lu par Missile_UpdateSeekerAndFuse_42458, en unites
-; entieres, << 8). Sens de +0x5E et +0x62 non trace.
+; far, LUE (2026-09-24), consommateurs lus 2026-10-12.
+; Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après
+; le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur
+; (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 jamais
+; lu (aucun accès trouvé) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ;
+; Missile_UpdateSeekerAndFuse_42458).
 ; ==============================================================================================
 MissileModel_LoadDATAChunk_A0340	proc far		; CODE XREF: VROOMM_StubThunk_6C530J
 
@@ -185,9 +186,11 @@ PlayerComponentVariantJ_ConstructAndInit_A03B6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle Timer_SetAbsoluteAndResetPulses_4FAFC (seg110).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_InitPulseTimer'. À la création d'un missile :
+; minuteur +0x5A = DATA champ 1 du modèle (+0x5E, int32 en secondes ENTIÈRES, << 8). Tant
+; qu'il court, le chercheur ne choisit pas de cible (Missile_UpdateSeekerAndFuse_42458).
 ; ==============================================================================================
-PlayerComponent_InitPulseTimer_A0455	proc far		; CODE XREF: VROOMM_StubThunk_6C53AJ PlayerComponent_SubHelperP_A0488+16p
+Missile_InitSeekerDelay_A0455	proc far		; CODE XREF: VROOMM_StubThunk_6C53AJ PlayerComponent_SubHelperP_A0488+16p
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -214,7 +217,7 @@ loc_A0458:
 		add	sp, 4
 		leave
 		retf
-PlayerComponent_InitPulseTimer_A0455	endp
+Missile_InitSeekerDelay_A0455	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -239,7 +242,7 @@ arg_2		= dword	ptr  8
 		add	sp, 6
 		push	si
 		push	cs
-		call	near ptr PlayerComponent_InitPulseTimer_A0455
+		call	near ptr Missile_InitSeekerDelay_A0455
 		pop	cx
 		push	si
 		call	SmokeTrail_EnableIfModelHasSmok_3D566

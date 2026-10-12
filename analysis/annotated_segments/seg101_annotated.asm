@@ -1015,7 +1015,14 @@ loc_4691A:				; DATA XREF: seg339:off_6EEAAo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_46922:				; DATA XREF: seg339:off_6EE42o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x48 de la vtable DYNM de base (seg339 tag 0x223A) : «
+; est-ce un JDYN ? » → renvoie 0 (xor ax,ax). Toutes les variantes
+; MISS/GBMB/DURD/AGRV/SURF/PARA gardent ce slot ; seule JDYN le remplace (thunk loc_3B63B →
+; JDYN_AsJDYN_4B093, renvoie l'objet JDYN). Appelé ~60 fois sur [instance+0x51] ou
+; [modèle+0x36] par l'IA, le HUD, la physique, les collisions.
+; ==============================================================================================
+DYNM_AsJDYN_Base_46922:				; DATA XREF: seg339:off_6EE42o
 					; seg339:off_6EEAEo ...
 		push	bp
 		mov	bp, sp

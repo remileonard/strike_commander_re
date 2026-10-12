@@ -73,7 +73,7 @@ loc_A0C20:
 		push	si
 		nop
 		push	cs
-		call	near ptr PlayerComponent_LoadFieldGroupD_A0C36
+		call	near ptr DynSurf_LoadSURFChunk_A0C36
 		add	sp, 4
 		pop	di
 
@@ -91,9 +91,13 @@ PlayerComponent_SubHelperAA_A0C03	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndRead_64743 et ReadFieldGroupC_64A7E (×2, seg193).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32
+; → +0x21, +0x25 du modèle. JAMAIS LUS : le clonage vers l'instance
+; (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 +
+; PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks
+; SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE.
 ; ==============================================================================================
-PlayerComponent_LoadFieldGroupD_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
+DynSurf_LoadSURFChunk_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -134,12 +138,12 @@ loc_A0C57:
 		pop	cx
 		mov	[si+25h], eax
 
-loc_A0C74:				; CODE XREF: PlayerComponent_LoadFieldGroupD_A0C36+1Ej
+loc_A0C74:				; CODE XREF: DynSurf_LoadSURFChunk_A0C36+1Ej
 		pop	di
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_LoadFieldGroupD_A0C36	endp
+DynSurf_LoadSURFChunk_A0C36	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

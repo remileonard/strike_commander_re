@@ -2624,7 +2624,15 @@ Expr_VM_ExecuteSingleInstruction_51E7E	endp
 ; Math_HeadingAngle_553CF. PUIS, si le controleur (+0x52) est encore NUL, appelle
 ; AIAircraft_SpawnAndConditionalLoadProfile_53363 avec cette position, et assigne le resultat
 ; via SetReference — RESOUT LA QUESTION OUVERTE DU CONTROLEUR : c'est une entite avion/pilote
-; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md).
+; IA complete, la meme classe que toute la documentation MVRS/ATRB/GOAL (voir AI_SYSTEM.md). |
+; COMPLÉMENT 2026-10-12 : VITESSE INITIALE (+0x2F, int16) en MÈTRES PAR SECONDE :
+; AIAircraft_SpawnAndConditionalLoadProfile_53363 fait nez × vitesse × dword_7045E (dt) puis
+; la méthode +0x48 de l'instance (loc_3D0F9) multiplie par dword_70462 (= 1/dt) : la dynamique
+; reçoit vitesse m/s. 3e NOM (PART +0x12, string[8]) : s'il n'est pas vide,
+; WeaponSys_LoadFromFile_9EFBE(système d'armes de l'instance +0x5A, nom) = EMPORT IMPOSÉ :
+; OBJECTS\<nom>.IFF dont la racine est un FORM WEAP. CAMP (+0x31) → instance +0x50 (écrase
+; l'ALGN du modèle). Avion de vitesse nulle : dynamique +0x20 = 1 (au sol) et JDYN +0x75 |= 4
+; (train sorti).
 ; ==============================================================================================
 PartEntry_ResolveSpawnPositionAndActivate_51EDC	proc far		; CODE XREF: Expr_VM_Interpreter_51106+6FBp
 					; Scene_EnsureUnitsSpawned_530FF+6Bp

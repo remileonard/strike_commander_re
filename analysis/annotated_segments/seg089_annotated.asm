@@ -1677,11 +1677,12 @@ loc_4200C:				; CODE XREF: seg082:0A19J seg082:0AB0J
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,149L — intègre le temps écoulé (dword_70458, delta-temps physique) dans un timer de vie
-; (+0x35 vs seuil +0x31), intègre une vitesse (+0x29) dans une position (+0x3D) : simulation
-; physique d'un leurre déployé (chaff) : durée de vie + trajectoire balistique.
+; far, LUE 2026-10-12. Ex-'Chaff_PhysicsTick' (FAUX : pas un leurre). PHASE 1 de la Durandal
+; (corps DURD) : chrono +0x35 += dt ; tant qu'il est < t (+0x31) : vitesse horizontale += a·dt
+; le long de la direction +0x3D/+0x41 (freinage linéaire jusqu'à 0) ; vitesse verticale +=
+; +0x2D·dt sans descendre sous Vmin (+0x23). Chrono écoulé : +0x27 = 1 (passage en phase 2).
 ; ==============================================================================================
-Chaff_PhysicsTick	proc far		; CODE XREF: seg089:111Cp
+DurdBody_BrakePhase_42016	proc far		; CODE XREF: seg089:111Cp
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -1726,16 +1727,16 @@ loc_42036:
 		jmp	short loc_4203A
 ; ���������������������������������������������������������������������������
 
-loc_42038:				; CODE XREF: Chaff_PhysicsTick:loc_42031j
+loc_42038:				; CODE XREF: DurdBody_BrakePhase_42016:loc_42031j
 		xor	ax, ax
 
-loc_4203A:				; CODE XREF: Chaff_PhysicsTick:loc_42036j
+loc_4203A:				; CODE XREF: DurdBody_BrakePhase_42016:loc_42036j
 		or	al, al
 		jnz	short loc_42041
 		jmp	loc_4211F
 ; ���������������������������������������������������������������������������
 
-loc_42041:				; CODE XREF: Chaff_PhysicsTick+26j
+loc_42041:				; CODE XREF: DurdBody_BrakePhase_42016+26j
 		mov	eax, [si+29h]
 		mov	edx, dword_70458
 		imul	edx
@@ -1784,10 +1785,10 @@ loc_42092:
 		jmp	short loc_420DB
 ; ���������������������������������������������������������������������������
 
-loc_420D9:				; CODE XREF: Chaff_PhysicsTick+BCj
+loc_420D9:				; CODE XREF: DurdBody_BrakePhase_42016+BCj
 		xor	ax, ax
 
-loc_420DB:				; CODE XREF: Chaff_PhysicsTick+C1j
+loc_420DB:				; CODE XREF: DurdBody_BrakePhase_42016+C1j
 		or	al, al
 		jz	short loc_42123
 		mov	eax, [si+2Dh]
@@ -1809,10 +1810,10 @@ loc_420FC:
 		jmp	short loc_42111
 ; ���������������������������������������������������������������������������
 
-loc_4210F:				; CODE XREF: Chaff_PhysicsTick+F2j
+loc_4210F:				; CODE XREF: DurdBody_BrakePhase_42016+F2j
 		xor	ax, ax
 
-loc_42111:				; CODE XREF: Chaff_PhysicsTick+F7j
+loc_42111:				; CODE XREF: DurdBody_BrakePhase_42016+F7j
 		or	al, al
 		jz	short loc_42123
 		mov	eax, [si+23h]
@@ -1820,16 +1821,16 @@ loc_42111:				; CODE XREF: Chaff_PhysicsTick+F7j
 		jmp	short loc_42123
 ; ���������������������������������������������������������������������������
 
-loc_4211F:				; CODE XREF: Chaff_PhysicsTick+28j
+loc_4211F:				; CODE XREF: DurdBody_BrakePhase_42016+28j
 		mov	byte ptr [si+27h], 1
 
-loc_42123:				; CODE XREF: Chaff_PhysicsTick+C7j
-					; Chaff_PhysicsTick+FDj ...
+loc_42123:				; CODE XREF: DurdBody_BrakePhase_42016+C7j
+					; DurdBody_BrakePhase_42016+FDj ...
 		pop	di
 		pop	si
 		leave
 		retf
-Chaff_PhysicsTick	endp
+DurdBody_BrakePhase_42016	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1837,10 +1838,11 @@ Chaff_PhysicsTick	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,74L — variante de sub_42016 sur des offsets différents (+0x10 vs +0x23, vitesse +0x39) :
-; simulation physique d'un second type de leurre déployé (flare) : durée de vie + trajectoire.
+; far, LUE 2026-10-12. Ex-'Flare_PhysicsTick' (FAUX : pas un leurre). PHASE 2 de la Durandal
+; (corps DURD) : vitesse horizontale forcée à 0 ; vitesse verticale += +0x39·dt sans descendre
+; sous Vmin (+0x23) : chute verticale.
 ; ==============================================================================================
-Flare_PhysicsTick	proc far		; CODE XREF: seg089:1115p
+DurdBody_DivePhase_42127	proc far		; CODE XREF: seg089:1115p
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -1868,10 +1870,10 @@ loc_4212E:
 		jmp	short loc_42162
 ; ���������������������������������������������������������������������������
 
-loc_42160:				; CODE XREF: Flare_PhysicsTick+32j
+loc_42160:				; CODE XREF: DurdBody_DivePhase_42127+32j
 		xor	ax, ax
 
-loc_42162:				; CODE XREF: Flare_PhysicsTick+37j
+loc_42162:				; CODE XREF: DurdBody_DivePhase_42127+37j
 		or	al, al
 		jz	short loc_421A4
 		mov	eax, [si+39h]
@@ -1899,25 +1901,38 @@ loc_42191:
 		jmp	short loc_42198
 ; ���������������������������������������������������������������������������
 
-loc_42196:				; CODE XREF: Flare_PhysicsTick+68j
+loc_42196:				; CODE XREF: DurdBody_DivePhase_42127+68j
 		xor	ax, ax
 
-loc_42198:				; CODE XREF: Flare_PhysicsTick+6Dj
+loc_42198:				; CODE XREF: DurdBody_DivePhase_42127+6Dj
 		or	al, al
 		jz	short loc_421A4
 		mov	eax, [si+23h]
 		mov	[si+10h], eax
 
-loc_421A4:				; CODE XREF: Flare_PhysicsTick+3Dj
-					; Flare_PhysicsTick+73j
+loc_421A4:				; CODE XREF: DurdBody_DivePhase_42127+3Dj
+					; DurdBody_DivePhase_42127+73j
 		pop	si
 		leave
 		retf
-Flare_PhysicsTick	endp
+DurdBody_DivePhase_42127	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_421A7:				; DATA XREF: seg339:off_6EEF2o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x3C du corps de dynamique DURD (vtable 0x1E06, chunk
+; DURD lu par PlayerComponent_LoadFieldGroupB_A014E). PREMIÈRE IMAGE (+0x28 != 0) : lanceur =
+; propriétaire→vtable+0x38 (SetReference16 → +0x45) ; vitesse verticale (asm c2, +0x10) bornée
+; à ≤ 0 ; direction horizontale = (vx, vz) normalisée → +0x3D/+0x41 ; durée de freinage t =
+; 2·D/|v| (+0x31, D = 1er champ DURD, uint16 en mètres) ; décélération horizontale a = −|v|/t
+; (+0x29) : la vitesse horizontale tombe à 0 en parcourant D ; accélération verticale =
+; −(4/3)·Hsol/t² (+0x2D, Hsol = Terrain_QueryAltitudeAt à la position du lanceur) ; si la
+; vitesse verticale atteinte (+0x2D·t) passe sous Vmin (+0x23 = 2e champ DURD), +0x39 =
+; accélération de la 2e phase. +0x28 = 0, chrono +0x35 = 0. ENSUITE : phase 1
+; (DurdBody_BrakePhase_42016) tant que chrono < t, puis phase 2 (DurdBody_DivePhase_42127,
+; +0x27 = 1). Tick +0x40 = loc_42436 (rien, renvoie 1).
+; ==============================================================================================
+DurdBody_Tick_421A7:				; DATA XREF: seg339:off_6EEF2o
 		push	bp
 		mov	bp, sp
 		sub	sp, 52h
@@ -2161,7 +2176,7 @@ loc_4241D:				; CODE XREF: seg089:0EA8j
 
 loc_42424:
 		push	cs
-		call	near ptr Flare_PhysicsTick
+		call	near ptr DurdBody_DivePhase_42127
 
 loc_42428:
 		jmp	short loc_4242F
@@ -2170,7 +2185,7 @@ loc_42428:
 loc_4242A:				; CODE XREF: seg089:1111j
 		push	si
 		push	cs
-		call	near ptr Chaff_PhysicsTick
+		call	near ptr DurdBody_BrakePhase_42016
 
 loc_4242F:				; CODE XREF: seg089:loc_42428j
 		pop	cx

@@ -1127,7 +1127,13 @@ ParticleEmitter_InitAttached	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4E0E5:				; DATA XREF: seg339:off_702DAo
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Méthode +0x84 de l'instance TRCR (vtable 0x31A6) : dégâts =
+; WDAT dégâts (modèle +0x46) × INFO champ 9 (uint16, modèle +0x80) × (0,5 + temps restant
+; (+0x3C) / (2 × durée de vie INFO champ 5, modèle +0x6A)) : de 100 % au départ à 50 % en fin
+; de vie.
+; ==============================================================================================
+Tracer_CollisionDamage_4E0E5:				; DATA XREF: seg339:off_702DAo
 		push	bp
 		mov	bp, sp
 		sub	sp, 18h

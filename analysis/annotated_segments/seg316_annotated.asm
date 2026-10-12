@@ -19,7 +19,7 @@ stru_6C680	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0AEEo
 ; d'overlay actuellement charge en memoire. fileoff=2F630h, codesize=73h, nentries=1.
 ; ==============================================================================================
 VROOMM_StubThunk_6C6A0	proc far		; CODE XREF: IFF_LoadModelMain+8F3P
-		jmp	PlayerComponent_LoadFieldsWithRetryD_A0FB0
+		jmp	PodModel_LoadDATAChunk_A0FB0
 VROOMM_StubThunk_6C6A0	endp
 
 seg316		ends

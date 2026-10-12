@@ -284,7 +284,7 @@ loc_3BA03:				; CODE XREF: IFF_LoadModelMain+124j
 		push	bx
 
 loc_3BA6E:
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		mov	dx, word ptr [bp+var_22+2]
 		mov	ax, word ptr [bp+var_22]

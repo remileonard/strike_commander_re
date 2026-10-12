@@ -1785,10 +1785,12 @@ Container_IterateFiltered	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,380L — grosse fonction du cluster conteneur/monde de jeu (buffer local 0x7C) — à
-; approfondir en session dédiée.
+; far, LU (structure) 2026-10-12. Ex-'WorldObjects_Cluster'. Cherche une cible dans une liste
+; d'objets du monde, dans une portée (arg_6, MÈTRES ENTIERS, << 8) et un demi-cône (arg_A,
+; degrés ; 180 = toutes directions) autour du nez de l'objet. Appelé par
+; WeaponSystem_FrameUpdate_3F8C0 avec la portée et le demi-angle du chunk INFO du FORM WEAP.
 ; ==============================================================================================
-WorldObjects_Cluster_22795	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9E7P
+World_SelectTargetInCone_22795	proc far		; CODE XREF: WeaponSystem_FrameUpdate_3F8C0+9E7P
 					; WeaponSystem_FrameUpdate_3F8C0+A28P ...
 
 var_7C		= dword	ptr -7Ch
@@ -1900,7 +1902,7 @@ loc_22852:
 		mov	[bp+var_28], eax
 		mov	[bp+var_20], eax
 
-loc_2286A:				; CODE XREF: WorldObjects_Cluster_22795+8Aj
+loc_2286A:				; CODE XREF: World_SelectTargetInCone_22795+8Aj
 		cmp	[bp+arg_E], 0
 		jz	short loc_2288A
 		mov	eax, [bp+arg_6]
@@ -1912,19 +1914,19 @@ loc_2286A:				; CODE XREF: WorldObjects_Cluster_22795+8Aj
 		jmp	short loc_22899
 ; ���������������������������������������������������������������������������
 
-loc_2288A:				; CODE XREF: WorldObjects_Cluster_22795+D9j
+loc_2288A:				; CODE XREF: World_SelectTargetInCone_22795+D9j
 		mov	eax, [bp+var_20]
 		neg	eax
 		mov	[bp+var_40], eax
 		mov	[bp+var_44], eax
 
-loc_22899:				; CODE XREF: WorldObjects_Cluster_22795+F3j
+loc_22899:				; CODE XREF: World_SelectTargetInCone_22795+F3j
 		mov	[bp+var_2C], eax
 		mov	[bp+var_46], 0
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_228A5:				; CODE XREF: WorldObjects_Cluster_22795+2A9j
+loc_228A5:				; CODE XREF: World_SelectTargetInCone_22795+2A9j
 		push	[bp+var_46]
 		mov	bx, [bp+var_46]
 		mov	bx, [bx]
@@ -1937,7 +1939,7 @@ loc_228A5:				; CODE XREF: WorldObjects_Cluster_22795+2A9j
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_228C0:				; CODE XREF: WorldObjects_Cluster_22795+126j
+loc_228C0:				; CODE XREF: World_SelectTargetInCone_22795+126j
 		mov	ax, [bp+var_46]
 		mov	[bp+var_4C], ax
 		cmp	[bp+var_46], di
@@ -1945,13 +1947,13 @@ loc_228C0:				; CODE XREF: WorldObjects_Cluster_22795+126j
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_228CE:				; CODE XREF: WorldObjects_Cluster_22795+134j
+loc_228CE:				; CODE XREF: World_SelectTargetInCone_22795+134j
 		cmp	ax, [bp+arg_4]
 		jnz	short loc_228D6
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_228D6:				; CODE XREF: WorldObjects_Cluster_22795+13Cj
+loc_228D6:				; CODE XREF: World_SelectTargetInCone_22795+13Cj
 		les	bx, [bp+var_4A]
 		mov	al, es:[bx+11h]
 		cmp	al, [bp+arg_C]
@@ -1959,7 +1961,7 @@ loc_228D6:				; CODE XREF: WorldObjects_Cluster_22795+13Cj
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_228E5:				; CODE XREF: WorldObjects_Cluster_22795+14Bj
+loc_228E5:				; CODE XREF: World_SelectTargetInCone_22795+14Bj
 		mov	bx, [bp+var_4C]
 		mov	eax, [bx+12h]
 		sub	eax, [di+12h]
@@ -1989,16 +1991,16 @@ loc_228E5:				; CODE XREF: WorldObjects_Cluster_22795+14Bj
 		jmp	short loc_22943
 ; ���������������������������������������������������������������������������
 
-loc_22941:				; CODE XREF: WorldObjects_Cluster_22795+1A5j
+loc_22941:				; CODE XREF: World_SelectTargetInCone_22795+1A5j
 		xor	ax, ax
 
-loc_22943:				; CODE XREF: WorldObjects_Cluster_22795+1AAj
+loc_22943:				; CODE XREF: World_SelectTargetInCone_22795+1AAj
 		or	al, al
 		jnz	short loc_2294A
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_2294A:				; CODE XREF: WorldObjects_Cluster_22795+1B0j
+loc_2294A:				; CODE XREF: World_SelectTargetInCone_22795+1B0j
 		lea	ax, [bp+var_7C]
 		push	ax
 		call	Vector_NormalizeInPlace_5593A
@@ -2021,17 +2023,17 @@ loc_2294A:				; CODE XREF: WorldObjects_Cluster_22795+1B0j
 		jmp	short loc_22981
 ; ���������������������������������������������������������������������������
 
-loc_2297F:				; CODE XREF: WorldObjects_Cluster_22795+1E3j
+loc_2297F:				; CODE XREF: World_SelectTargetInCone_22795+1E3j
 		xor	ax, ax
 
-loc_22981:				; CODE XREF: WorldObjects_Cluster_22795+1E8j
+loc_22981:				; CODE XREF: World_SelectTargetInCone_22795+1E8j
 		or	al, al
 		jnz	short loc_22988
 		jmp	loc_22A2E
 ; ���������������������������������������������������������������������������
 
-loc_22988:				; CODE XREF: WorldObjects_Cluster_22795+1C4j
-					; WorldObjects_Cluster_22795+1EEj
+loc_22988:				; CODE XREF: World_SelectTargetInCone_22795+1C4j
+					; World_SelectTargetInCone_22795+1EEj
 		mov	eax, [bp+var_50]
 		cmp	eax, [bp+var_8]
 		jge	short loc_22997
@@ -2039,10 +2041,10 @@ loc_22988:				; CODE XREF: WorldObjects_Cluster_22795+1C4j
 		jmp	short loc_22999
 ; ���������������������������������������������������������������������������
 
-loc_22997:				; CODE XREF: WorldObjects_Cluster_22795+1FBj
+loc_22997:				; CODE XREF: World_SelectTargetInCone_22795+1FBj
 		xor	ax, ax
 
-loc_22999:				; CODE XREF: WorldObjects_Cluster_22795+200j
+loc_22999:				; CODE XREF: World_SelectTargetInCone_22795+200j
 		or	al, al
 		jz	short loc_229AD
 		mov	eax, [bp+var_50]
@@ -2052,7 +2054,7 @@ loc_22999:				; CODE XREF: WorldObjects_Cluster_22795+200j
 		jmp	short loc_229D0
 ; ���������������������������������������������������������������������������
 
-loc_229AD:				; CODE XREF: WorldObjects_Cluster_22795+206j
+loc_229AD:				; CODE XREF: World_SelectTargetInCone_22795+206j
 		mov	eax, [bp+var_50]
 		cmp	eax, [bp+var_12]
 		jle	short loc_229BC
@@ -2060,10 +2062,10 @@ loc_229AD:				; CODE XREF: WorldObjects_Cluster_22795+206j
 		jmp	short loc_229BE
 ; ���������������������������������������������������������������������������
 
-loc_229BC:				; CODE XREF: WorldObjects_Cluster_22795+220j
+loc_229BC:				; CODE XREF: World_SelectTargetInCone_22795+220j
 		xor	ax, ax
 
-loc_229BE:				; CODE XREF: WorldObjects_Cluster_22795+225j
+loc_229BE:				; CODE XREF: World_SelectTargetInCone_22795+225j
 		or	al, al
 		jz	short loc_229D0
 		mov	eax, [bp+var_50]
@@ -2071,8 +2073,8 @@ loc_229BE:				; CODE XREF: WorldObjects_Cluster_22795+225j
 		mov	ax, [bp+var_4C]
 		mov	[bp+var_E], ax
 
-loc_229D0:				; CODE XREF: WorldObjects_Cluster_22795+216j
-					; WorldObjects_Cluster_22795+22Bj
+loc_229D0:				; CODE XREF: World_SelectTargetInCone_22795+216j
+					; World_SelectTargetInCone_22795+22Bj
 		mov	eax, [bp+var_50]
 		sub	eax, [bp+var_20]
 		mov	[bp+var_60], eax
@@ -2088,16 +2090,16 @@ loc_229D0:				; CODE XREF: WorldObjects_Cluster_22795+216j
 		jmp	short loc_229FE
 ; ���������������������������������������������������������������������������
 
-loc_229FC:				; CODE XREF: WorldObjects_Cluster_22795+260j
+loc_229FC:				; CODE XREF: World_SelectTargetInCone_22795+260j
 		xor	ax, ax
 
-loc_229FE:				; CODE XREF: WorldObjects_Cluster_22795+265j
+loc_229FE:				; CODE XREF: World_SelectTargetInCone_22795+265j
 		or	al, al
 		jz	short loc_22A2E
 		jmp	short loc_22A20
 ; ���������������������������������������������������������������������������
 
-loc_22A04:				; CODE XREF: WorldObjects_Cluster_22795+253j
+loc_22A04:				; CODE XREF: World_SelectTargetInCone_22795+253j
 		cmp	[bp+var_30], 0
 		jge	short loc_22A2E
 		mov	eax, [bp+var_30]
@@ -2107,21 +2109,21 @@ loc_22A04:				; CODE XREF: WorldObjects_Cluster_22795+253j
 		jmp	short loc_22A1C
 ; ���������������������������������������������������������������������������
 
-loc_22A1A:				; CODE XREF: WorldObjects_Cluster_22795+27Ej
+loc_22A1A:				; CODE XREF: World_SelectTargetInCone_22795+27Ej
 		xor	ax, ax
 
-loc_22A1C:				; CODE XREF: WorldObjects_Cluster_22795+283j
+loc_22A1C:				; CODE XREF: World_SelectTargetInCone_22795+283j
 		or	al, al
 		jz	short loc_22A2E
 
-loc_22A20:				; CODE XREF: WorldObjects_Cluster_22795+26Dj
+loc_22A20:				; CODE XREF: World_SelectTargetInCone_22795+26Dj
 		mov	eax, [bp+var_30]
 		mov	[bp+var_2C], eax
 		mov	ax, [bp+var_4C]
 		mov	[bp+var_2], ax
 
-loc_22A2E:				; CODE XREF: WorldObjects_Cluster_22795+10Dj
-					; WorldObjects_Cluster_22795+128j ...
+loc_22A2E:				; CODE XREF: World_SelectTargetInCone_22795+10Dj
+					; World_SelectTargetInCone_22795+128j ...
 		lea	ax, [bp+var_46]
 		push	ax
 		push	si
@@ -2133,13 +2135,13 @@ loc_22A2E:				; CODE XREF: WorldObjects_Cluster_22795+10Dj
 		jmp	loc_228A5
 ; ���������������������������������������������������������������������������
 
-loc_22A41:				; CODE XREF: WorldObjects_Cluster_22795+2A7j
+loc_22A41:				; CODE XREF: World_SelectTargetInCone_22795+2A7j
 		cmp	[bp+var_2], 0
 		jz	short loc_22A4D
 		mov	ax, [bp+var_2]
 		mov	[bp+arg_4], ax
 
-loc_22A4D:				; CODE XREF: WorldObjects_Cluster_22795+2B0j
+loc_22A4D:				; CODE XREF: World_SelectTargetInCone_22795+2B0j
 		cmp	[bp+arg_E], 0
 		jz	short loc_22A64
 		cmp	[bp+var_2], 0
@@ -2150,24 +2152,24 @@ loc_22A4D:				; CODE XREF: WorldObjects_Cluster_22795+2B0j
 		jmp	short loc_22A73
 ; ���������������������������������������������������������������������������
 
-loc_22A64:				; CODE XREF: WorldObjects_Cluster_22795+2BCj
+loc_22A64:				; CODE XREF: World_SelectTargetInCone_22795+2BCj
 		cmp	[bp+var_2], 0
 		jnz	short loc_22A76
 		cmp	[bp+var_E], 0
 		jz	short loc_22A76
 		mov	ax, [bp+var_E]
 
-loc_22A73:				; CODE XREF: WorldObjects_Cluster_22795+2CDj
+loc_22A73:				; CODE XREF: World_SelectTargetInCone_22795+2CDj
 		mov	[bp+arg_4], ax
 
-loc_22A76:				; CODE XREF: WorldObjects_Cluster_22795+2C2j
-					; WorldObjects_Cluster_22795+2C8j ...
+loc_22A76:				; CODE XREF: World_SelectTargetInCone_22795+2C2j
+					; World_SelectTargetInCone_22795+2C8j ...
 		mov	ax, [bp+arg_4]
 		pop	di
 		pop	si
 		leave
 		retf
-WorldObjects_Cluster_22795	endp
+World_SelectTargetInCone_22795	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2175,10 +2177,15 @@ WorldObjects_Cluster_22795	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,188L — fonction du cluster conteneur avec 5 arguments (buffer local 0x42) — à
-; approfondir en session dédiée.
+; far, LUE 2026-10-12. Ex-'WorldObjects_Cluster'. CHERCHE L'OBJET LE PLUS PROCHE dans une
+; liste d'objets du monde (arg_0, ex. 59C3h) vu depuis un objet (arg_2) : portée arg_4 en
+; MÈTRES ENTIERS (comparée à distance >> 8), demi-cône arg_8 en degrés autour du nez de
+; l'objet (Math_CosDeg_5483F ; 180 = toutes directions), filtre TYPE DE CIBLE arg_A (TRGT,
+; octet +0x11 du modèle de la cible renvoyé par sa méthode [0] ; 0 = tous) et catégorie arg_C
+; (vtable+8 de la cible, 0x17 = toutes). Renvoie l'objet retenu (0 sinon). Appelé par la
+; défense fixe SWPN avec sa portée de détection DATA, 180°, TRGT 1, catégorie 6 (avions).
 ; ==============================================================================================
-WorldObjects_Cluster_22A7D	proc far		; CODE XREF: seg092:0109P
+World_FindNearestInCone_22A7D	proc far		; CODE XREF: seg092:0109P
 
 var_42		= dword	ptr -42h
 var_3E		= dword	ptr -3Eh
@@ -2247,7 +2254,7 @@ arg_C		= byte ptr  12h
 		jmp	loc_22BE2
 ; ���������������������������������������������������������������������������
 
-loc_22AF1:				; CODE XREF: WorldObjects_Cluster_22A7D+175j
+loc_22AF1:				; CODE XREF: World_FindNearestInCone_22A7D+175j
 		push	[bp+var_14]
 		mov	bx, [bp+var_14]
 		mov	bx, [bx]
@@ -2260,7 +2267,7 @@ loc_22AF1:				; CODE XREF: WorldObjects_Cluster_22A7D+175j
 		jmp	loc_22BE2
 ; ���������������������������������������������������������������������������
 
-loc_22B0C:				; CODE XREF: WorldObjects_Cluster_22A7D+8Aj
+loc_22B0C:				; CODE XREF: World_FindNearestInCone_22A7D+8Aj
 		mov	ax, [bp+var_14]
 		mov	[bp+var_1A], ax
 		mov	di, [bp+var_1A]
@@ -2310,7 +2317,7 @@ loc_22B81:
 loc_22B84:
 		jnz	short loc_22BE2
 
-loc_22B86:				; CODE XREF: WorldObjects_Cluster_22A7D+FBj
+loc_22B86:				; CODE XREF: World_FindNearestInCone_22A7D+FBj
 		cmp	[bp+arg_C], 17h
 		jz	short loc_22BA1
 		push	large [bp+var_18]
@@ -2321,7 +2328,7 @@ loc_22B86:				; CODE XREF: WorldObjects_Cluster_22A7D+FBj
 		cmp	al, [bp+arg_C]
 		jnz	short loc_22BE2
 
-loc_22BA1:				; CODE XREF: WorldObjects_Cluster_22A7D+10Dj
+loc_22BA1:				; CODE XREF: World_FindNearestInCone_22A7D+10Dj
 		mov	eax, [bp+var_1E]
 		cmp	eax, [bp+var_6]
 		jge	short loc_22BE2
@@ -2346,8 +2353,8 @@ loc_22BA1:				; CODE XREF: WorldObjects_Cluster_22A7D+10Dj
 		mov	eax, [bp+var_1E]
 		mov	[bp+var_6], eax
 
-loc_22BE2:				; CODE XREF: WorldObjects_Cluster_22A7D+71j
-					; WorldObjects_Cluster_22A7D+8Cj ...
+loc_22BE2:				; CODE XREF: World_FindNearestInCone_22A7D+71j
+					; World_FindNearestInCone_22A7D+8Cj ...
 		lea	ax, [bp+var_14]
 		push	ax
 		push	si
@@ -2359,13 +2366,13 @@ loc_22BE2:				; CODE XREF: WorldObjects_Cluster_22A7D+71j
 		jmp	loc_22AF1
 ; ���������������������������������������������������������������������������
 
-loc_22BF5:				; CODE XREF: WorldObjects_Cluster_22A7D+173j
+loc_22BF5:				; CODE XREF: World_FindNearestInCone_22A7D+173j
 		mov	ax, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-WorldObjects_Cluster_22A7D	endp
+World_FindNearestInCone_22A7D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2857,9 +2864,11 @@ Container_Op_22DE5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,44L — (cluster conteneur) — accesseur/test additionnel, non détaillé.
+; far, LUE 2026-10-12. Ex-'Container_Op'. (liste, n) : renvoie le n-ième élément d'une liste
+; chaînée (tête [liste+0x0B], suivant [élément+2]) ou 0. Sert aux sous-objets attachés (CHLD)
+; d'un avion (instance +0x1E).
 ; ==============================================================================================
-Container_Op_22E27	proc far		; CODE XREF: seg087:016CP seg109:0212P ...
+WorldObject_GetNthChild_22E27	proc far		; CODE XREF: seg087:016CP seg109:0212P ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -2875,34 +2884,34 @@ arg_2		= word ptr  8
 		jmp	short loc_22E42
 ; ���������������������������������������������������������������������������
 
-loc_22E3B:				; CODE XREF: Container_Op_22E27+33j
+loc_22E3B:				; CODE XREF: WorldObject_GetNthChild_22E27+33j
 		mov	ax, dx
 		dec	dx
 		or	ax, ax
 		jle	short loc_22E5C
 
-loc_22E42:				; CODE XREF: Container_Op_22E27+12j
+loc_22E42:				; CODE XREF: WorldObject_GetNthChild_22E27+12j
 		cmp	[bp+var_2], 0
 		jnz	short loc_22E4D
 		mov	ax, [si+0Bh]
 		jmp	short loc_22E53
 ; ���������������������������������������������������������������������������
 
-loc_22E4D:				; CODE XREF: Container_Op_22E27+1Fj
+loc_22E4D:				; CODE XREF: WorldObject_GetNthChild_22E27+1Fj
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+2]
 
-loc_22E53:				; CODE XREF: Container_Op_22E27+24j
+loc_22E53:				; CODE XREF: WorldObject_GetNthChild_22E27+24j
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0
 		jnz	short loc_22E3B
 
-loc_22E5C:				; CODE XREF: Container_Op_22E27+19j
+loc_22E5C:				; CODE XREF: WorldObject_GetNthChild_22E27+19j
 		mov	ax, [bp+var_2]
 		pop	si
 		leave
 		retf
-Container_Op_22E27	endp
+WorldObject_GetNthChild_22E27	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

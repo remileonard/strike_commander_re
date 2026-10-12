@@ -26,7 +26,7 @@ arg_4		= word ptr  0Ah
 loc_A1043:
 		push	[bp+arg_4]
 		push	large [bp+arg_0]
-		call	IFF_LoadAngleParam
+		call	Object_LoadCommonAndAllegiance_3C942
 		add	sp, 6
 		pop	bp
 

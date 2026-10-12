@@ -9,7 +9,10 @@ ovr307		segment	para public 'OVERLAY' use16
 ; ==============================================================================================
 ; far, LIT UN COMPOSANT DE DÉGÂTS (chunk SYSM) : uint8 résistance → +0, uint8 dégâts subis →
 ; +1, chaîne nom → +2, chaîne second nom → +0x0B (String_ConstructFromFarPtrLen ×2).
-; Enregistrement mémoire de 20 o.
+; Enregistrement mémoire de 20 o. | COMPLÉMENT 2026-10-12 : le second nom (+0x0B) est la ZONE
+; du composant (FUSELAGE, LWING, RWING) : DamageSys_ApplyHit_9C9A0 ne répartit un impact que
+; sur les composants de la zone touchée. Le composant nommé PLAYER est le pilote
+; (DamageSys_DamagePercent_9CB2C).
 ; ==============================================================================================
 DamageSys_LoadRecord_9CBE0	proc far		; CODE XREF: VROOMM_StubThunk_6C110J Aircraft_LoadDamageSystems_9CCE5+7Ep
 

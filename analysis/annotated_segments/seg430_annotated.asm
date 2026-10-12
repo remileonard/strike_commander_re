@@ -7,13 +7,11 @@ seg430		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, résout un handle faible via sub_22E27 (motif +0x1E déjà vu dans
-; EjectSeat_TickReleaseObject_4F351, seg109) puis, si résolu et non nul, appelle sa méthode
-; virtuelle de notification (dword ptr [bx+4]) avec le champ +0x0A comme argument far.
-; Retourne si un listener a été notifié. Référencée via jmp depuis un stub VROOMM (sub_6C320)
-; et par TimedTrigger_ReleaseIfInactive_9DDCF.
+; far, LUE 2026-10-12. Ex-'TimedTrigger_NotifySingleListener'. (instance, rang n) : sous-objet
+; attaché n° n (WorldObject_GetNthChild_22E27 sur la liste +0x1E = sous-objets CHLD) ; s'il
+; existe, appelle sa méthode +4 avec 0 (masque/désactive). Renvoie 1 si le sous-objet existe.
 ; ==============================================================================================
-TimedTrigger_NotifySingleListener_9DD30	proc far		; CODE XREF: VROOMM_StubThunk_6C320J TimedTrigger_ReleaseIfInactive_9DDCF+4Dp
+Aircraft_SetChildVisible_9DD30	proc far		; CODE XREF: VROOMM_StubThunk_6C320J Aircraft_InitGearChildren_9DDCF+4Dp
 
 var_8		= word ptr -8
 var_6		= dword	ptr -6
@@ -37,7 +35,7 @@ loc_9DD41:
 		mov	[bp+var_8], ax
 		push	ax
 		push	word ptr [si+1Eh]
-		call	Container_Op_22E27
+		call	WorldObject_GetNthChild_22E27
 		add	sp, 4
 		mov	si, ax
 		or	si, si
@@ -60,13 +58,13 @@ loc_9DD65:
 		call	dword ptr [bx+4]
 		add	sp, 6
 
-loc_9DD7B:				; CODE XREF: TimedTrigger_NotifySingleListener_9DD30+24j
-					; TimedTrigger_NotifySingleListener_9DD30:loc_9DD63j
+loc_9DD7B:				; CODE XREF: Aircraft_SetChildVisible_9DD30+24j
+					; Aircraft_SetChildVisible_9DD30:loc_9DD63j
 		mov	al, [bp+var_1]
 		pop	si
 		leave
 		retf
-TimedTrigger_NotifySingleListener_9DD30	endp
+Aircraft_SetChildVisible_9DD30	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -74,12 +72,13 @@ TimedTrigger_NotifySingleListener_9DD30	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante conditionnelle de TimedTrigger_NotifySingleListener_9DD30 : ne notifie que si
-; un flag externe (arg+0x59) est posé, résout le handle faible (sub_22E27) et le stocke dans
-; le champ local +0x65 avant de dispatcher. Référencée via jmp depuis un stub VROOMM
-; (sub_6C325).
+; far, LUE 2026-10-12. Ex-'TimedTrigger_NotifyConditional'. À la création d'un avion
+; (Camera_ConstructWithHandle_9D610) : si JINF champ 6 (modèle +0x59) ≠ 0, le sous-objet CHLD
+; de rang JINF champ 7 (modèle +0x66) est mémorisé en +0x65 et sa méthode +4 appelée avec 0.
+; La mise à jour (Aircraft_Update_3DEFB) le désactive définitivement après 3 images où sa
+; méthode +8 est vraie (compteur +0x67).
 ; ==============================================================================================
-TimedTrigger_NotifyConditional_9DD81	proc far		; CODE XREF: VROOMM_StubThunk_6C325J
+Aircraft_InitSpecialChild_9DD81	proc far		; CODE XREF: VROOMM_StubThunk_6C325J
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -103,7 +102,7 @@ loc_9DD9F:
 		mov	[bp+var_2], ax
 		push	ax
 		push	word ptr [si+1Eh]
-		call	Container_Op_22E27
+		call	WorldObject_GetNthChild_22E27
 		add	sp, 4
 		mov	[si+65h], ax
 		cmp	word ptr [si+65h], 0
@@ -116,12 +115,12 @@ loc_9DD9F:
 		call	dword ptr [bx+4]
 		add	sp, 6
 
-loc_9DDCC:				; CODE XREF: TimedTrigger_NotifyConditional_9DD81+Ej
-					; TimedTrigger_NotifyConditional_9DD81+18j ...
+loc_9DDCC:				; CODE XREF: Aircraft_InitSpecialChild_9DD81+Ej
+					; Aircraft_InitSpecialChild_9DD81+18j ...
 		pop	si
 		leave
 		retf
-TimedTrigger_NotifyConditional_9DD81	endp
+Aircraft_InitSpecialChild_9DD81	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -129,12 +128,13 @@ TimedTrigger_NotifyConditional_9DD81	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, gère des bits de flags d'état (+0x73) à partir d'un champ source (arg+0x53), puis si
-; actif, parcourt une plage d'indices de listeners ([arg+0x54, arg+0x54+arg+0x56)) en appelant
-; TimedTrigger_NotifySingleListener_9DD30 pour chacun — désactive le flag si aucun listener ne
-; confirme le maintien. Référencée via jmp depuis un stub VROOMM (sub_6C32A).
+; far, LUE 2026-10-12. Ex-'TimedTrigger_ReleaseIfInactive'. À la création d'un avion : +0x73
+; bit 1 (« a un train escamotable ») = JINF champ 1 bit 0 (modèle +0x53) ; si posé et si
+; l'avion a des sous-objets, chaque sous-objet CHLD de rang [JINF champ 2, champ 2 + champ 3)
+; (modèle +0x54 / +0x56) doit exister (Aircraft_SetChildVisible_9DD30), sinon le bit est
+; retiré. +0x73 bits 2 et 3 remis à 0, +0x62 = 0.
 ; ==============================================================================================
-TimedTrigger_ReleaseIfInactive_9DDCF	proc far		; CODE XREF: VROOMM_StubThunk_6C32AJ
+Aircraft_InitGearChildren_9DDCF	proc far		; CODE XREF: VROOMM_StubThunk_6C32AJ
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -172,11 +172,11 @@ loc_9DDEA:
 		jmp	short loc_9DE2F
 ; ���������������������������������������������������������������������������
 
-loc_9DE19:				; CODE XREF: TimedTrigger_ReleaseIfInactive_9DDCF+63j
+loc_9DE19:				; CODE XREF: Aircraft_InitGearChildren_9DDCF+63j
 		push	di
 		push	si
 		push	cs
-		call	near ptr TimedTrigger_NotifySingleListener_9DD30
+		call	near ptr Aircraft_SetChildVisible_9DD30
 		add	sp, 4
 		mov	ah, 0
 		or	ax, ax
@@ -185,15 +185,15 @@ loc_9DE19:				; CODE XREF: TimedTrigger_ReleaseIfInactive_9DDCF+63j
 		jmp	short loc_9DE34
 ; ���������������������������������������������������������������������������
 
-loc_9DE2E:				; CODE XREF: TimedTrigger_ReleaseIfInactive_9DDCF+57j
+loc_9DE2E:				; CODE XREF: Aircraft_InitGearChildren_9DDCF+57j
 		inc	di
 
-loc_9DE2F:				; CODE XREF: TimedTrigger_ReleaseIfInactive_9DDCF+48j
+loc_9DE2F:				; CODE XREF: Aircraft_InitGearChildren_9DDCF+48j
 		cmp	di, [bp+var_2]
 		jl	short loc_9DE19
 
-loc_9DE34:				; CODE XREF: TimedTrigger_ReleaseIfInactive_9DDCF+2Dj
-					; TimedTrigger_ReleaseIfInactive_9DDCF+33j ...
+loc_9DE34:				; CODE XREF: Aircraft_InitGearChildren_9DDCF+2Dj
+					; Aircraft_InitGearChildren_9DDCF+33j ...
 		and	byte ptr [si+73h], 0FBh
 
 loc_9DE38:
@@ -203,6 +203,6 @@ loc_9DE38:
 		pop	si
 		leave
 		retf
-TimedTrigger_ReleaseIfInactive_9DDCF	endp
+Aircraft_InitGearChildren_9DDCF	endp
 
 seg430		ends

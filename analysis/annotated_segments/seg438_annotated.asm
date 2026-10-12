@@ -7,10 +7,16 @@ seg438		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine sub_6C1CA (application de flags, motif seg435) et sub_3A49C (probable
-; libération de référence).
+; far, LUE 2026-10-12. Ex-'PlayerComponent_ApplyFlagsAndReleaseRef'. LECTEUR DE LA CLASSE GRND
+; (objet au sol, vtable 0x2408, catégorie 20) : MobileObject_LoadDynamicsAndSmoke_9D189
+; (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C
+; sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg
+; 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de
+; l'original) : un fichier GRND n'a qu'un FORM DYNM, un second ne serait jamais lu. L'instance
+; GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de
+; base compte.
 ; ==============================================================================================
-PlayerComponent_ApplyFlagsAndReleaseRef_A0D80	proc far		; CODE XREF: VROOMM_StubThunk_6C670J
+GroundObj_LoadFromIFF_A0D80	proc far		; CODE XREF: VROOMM_StubThunk_6C670J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -41,7 +47,7 @@ loc_A0D8A:
 		pop	si
 		pop	bp
 		retf
-PlayerComponent_ApplyFlagsAndReleaseRef_A0D80	endp
+GroundObj_LoadFromIFF_A0D80	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

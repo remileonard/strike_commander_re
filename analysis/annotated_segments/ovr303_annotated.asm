@@ -7,10 +7,16 @@ ovr303		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 541 lignes, NON DÉTAILLÉE — combine ReadFinalField_64B51,
-; String_ConstructFromFarPtrLen, ReadFieldGroupC_64A7E répété.
+; far, LUE 2026-10-12. Ex-'Debris_LoadFieldMixC'. UN VOLUME DU CHUNK EXTE. unsigned char
+; lettre : 'S' sphère → string nom, 3 int32 centre, int32 rayon (ENTIERS tels quels : shl 8
+; puis sar 8), objet vtable 0x1BA2 (Particle_Init : +0x0F rayon, +0x13/+0x17/+0x1B centre, +6
+; nom) ; 'B' boîte → string nom, 6 int32 entiers = 3 paires de bornes (c0, c1, c2 ; chaque
+; paire triée min/max par Debris_ComputeScaledPhysics_9C42F), objet 0x37 o vtable 0x1BCA ; 'L'
+; → string nom seul, objet vtable 0x1BB6 (position nulle) ; autre lettre → erreur C008h. Les
+; noms sont les ZONES de dégâts (FUSELAGE, LWING, RWING, BIGSPHER) : voir
+; DamageSys_ApplyHit_9C9A0.
 ; ==============================================================================================
-Debris_LoadFieldMixC_9BFB0	proc far		; CODE XREF: VROOMM_StubThunk_6C04AJ
+Exte_LoadVolume_9BFB0	proc far		; CODE XREF: VROOMM_StubThunk_6C04AJ
 
 var_CC		= dword	ptr -0CCh
 var_C8		= dword	ptr -0C8h
@@ -107,19 +113,19 @@ loc_9BFF1:
 		jmp	loc_9C155
 ; ���������������������������������������������������������������������������
 
-loc_9BFF4:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+3Fj
+loc_9BFF4:				; CODE XREF: Exte_LoadVolume_9BFB0+3Fj
 		cmp	ax, 4Ch	; 'L'
 		jnz	short loc_9BFFC
 		jmp	loc_9C384
 ; ���������������������������������������������������������������������������
 
-loc_9BFFC:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+47j
+loc_9BFFC:				; CODE XREF: Exte_LoadVolume_9BFB0+47j
 		cmp	ax, 53h	; 'S'
 		jz	short loc_9C004
 		jmp	loc_9C41D
 ; ���������������������������������������������������������������������������
 
-loc_9C004:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+4Fj
+loc_9C004:				; CODE XREF: Exte_LoadVolume_9BFB0+4Fj
 		mov	[bp+var_16], si
 		push	[bp+var_16]
 		push	ss
@@ -249,18 +255,18 @@ loc_9C0F2:
 		jmp	short loc_9C14C
 ; ���������������������������������������������������������������������������
 
-loc_9C146:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+14Dj
+loc_9C146:				; CODE XREF: Exte_LoadVolume_9BFB0+14Dj
 		mov	dx, word ptr [bp+var_4C+2]
 		mov	ax, word ptr [bp+var_4C]
 
-loc_9C14C:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+194j
-					; Debris_LoadFieldMixC_9BFB0+3C6j ...
+loc_9C14C:				; CODE XREF: Exte_LoadVolume_9BFB0+194j
+					; Exte_LoadVolume_9BFB0+3C6j ...
 		mov	word ptr [bp+var_6+2], dx
 		mov	word ptr [bp+var_6], ax
 		jmp	loc_9C426
 ; ���������������������������������������������������������������������������
 
-loc_9C155:				; CODE XREF: Debris_LoadFieldMixC_9BFB0:loc_9BFF1j
+loc_9C155:				; CODE XREF: Exte_LoadVolume_9BFB0:loc_9BFF1j
 		mov	[bp+var_66], si
 		push	[bp+var_66]
 		lea	ax, [bp+var_70]
@@ -398,7 +404,7 @@ loc_9C2B1:
 		jmp	loc_9C379
 ; ���������������������������������������������������������������������������
 
-loc_9C2BC:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+307j
+loc_9C2BC:				; CODE XREF: Exte_LoadVolume_9BFB0+307j
 		les	bx, [bp+var_B0]
 
 loc_9C2C0:
@@ -467,13 +473,13 @@ loc_9C2C0:
 		jmp	loc_9C14C
 ; ���������������������������������������������������������������������������
 
-loc_9C379:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+309j
+loc_9C379:				; CODE XREF: Exte_LoadVolume_9BFB0+309j
 		mov	dx, word ptr [bp+var_B0+2]
 		mov	ax, word ptr [bp+var_B0]
 		jmp	loc_9C14C
 ; ���������������������������������������������������������������������������
 
-loc_9C384:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+49j
+loc_9C384:				; CODE XREF: Exte_LoadVolume_9BFB0+49j
 		mov	[bp+var_B2], si
 
 loc_9C388:
@@ -533,24 +539,24 @@ loc_9C3F3:
 		jmp	loc_9C14C
 ; ���������������������������������������������������������������������������
 
-loc_9C412:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+41Ej
+loc_9C412:				; CODE XREF: Exte_LoadVolume_9BFB0+41Ej
 		mov	dx, word ptr [bp+var_C0+2]
 		mov	ax, word ptr [bp+var_C0]
 		jmp	loc_9C14C
 ; ���������������������������������������������������������������������������
 
-loc_9C41D:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+51j
+loc_9C41D:				; CODE XREF: Exte_LoadVolume_9BFB0+51j
 		push	0C008h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9C426:				; CODE XREF: Debris_LoadFieldMixC_9BFB0+1A2j
+loc_9C426:				; CODE XREF: Exte_LoadVolume_9BFB0+1A2j
 		mov	dx, word ptr [bp+var_6+2]
 		mov	ax, word ptr [bp+var_6]
 		pop	si
 		leave
 		retf
-Debris_LoadFieldMixC_9BFB0	endp
+Exte_LoadVolume_9BFB0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -561,7 +567,7 @@ Debris_LoadFieldMixC_9BFB0	endp
 ; ⚠️ far, 399 lignes, NON DÉTAILLÉE — appelle Math_VectorLength3D_Scaled_54F57 (seg116) —
 ; calcul physique de débris avec mise à l'échelle anti-débordement.
 ; ==============================================================================================
-Debris_ComputeScaledPhysics_9C42F	proc far		; CODE XREF: VROOMM_StubThunk_6C04FJ Debris_LoadFieldMixC_9BFB0+3B8p
+Debris_ComputeScaledPhysics_9C42F	proc far		; CODE XREF: VROOMM_StubThunk_6C04FJ Exte_LoadVolume_9BFB0+3B8p
 
 var_A4		= dword	ptr -0A4h
 var_A0		= dword	ptr -0A0h

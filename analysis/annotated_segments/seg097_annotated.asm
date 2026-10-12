@@ -666,7 +666,12 @@ Missile_TestProximityFuze	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_45883:				; DATA XREF: seg339:off_6FC16o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x10 (mise à jour) de l'instance GRND : si vivant, selon
+; l'état +0x55 (0xA5 : Missile_TestSearchRange puis Missile_ComputeImpactPlane, sinon
+; Missile_TestProximityFuze), puis SmokeTrail_Tick_3D57E. N'appelle pas la dynamique.
+; ==============================================================================================
+GroundObj_Update_45883:				; DATA XREF: seg339:off_6FC16o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -715,7 +720,16 @@ loc_458C5:				; CODE XREF: seg097:0541j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_458C8:				; DATA XREF: seg339:off_6FC1Ao
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x14 (déplacement) de l'instance GRND (vtable 0x2B56). La
+; dynamique de l'objet n'est JAMAIS « tickée » (aucun appel +0x3C/+0x40) : seule sa VITESSE
+; (champs de base DYNM +8/+0xC/+0x10) est lue, × dt (dword_7045E), et l'objet est translaté
+; (WorldObject_TranslateBy_37D54) ; puis son altitude est recalée sur le sol
+; (Terrain_QueryAltitudeAt → +0x1A) et, s'il bouge, son orientation suit la pente (normale du
+; sol, Matrix_ApplyToVectorZ_576E5). Sans dynamique : vitesse globale dword_707F8. La variante
+; de dynamique d'un GRND est donc sans effet.
+; ==============================================================================================
+GroundObj_IntegrateMotion_458C8:				; DATA XREF: seg339:off_6FC1Ao
 		push	bp
 		mov	bp, sp
 		sub	sp, 48h

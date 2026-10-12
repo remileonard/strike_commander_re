@@ -2147,7 +2147,14 @@ Aero_ExtractRollMoment	endp
 ; (une pour tangage via 3, une pour lacet via 5), la même loi d'asservissement racine carrée
 ; servant aux deux axes - alpha_actuel et beta_actuel étant tous deux dérivés de la même
 ; vitesse corps courante (donc du roulis courant via la transformation monde->corps), c'est ce
-; qui relie physiquement roulis et lacet sans mécanisme de couplage discret séparé.
+; qui relie physiquement roulis et lacet sans mécanisme de couplage discret séparé. |
+; COMPLÉMENT 2026-10-12 (fin de la fonction) : DÉCISION « AU SOL » (A+0x20). Toutes les
+; conditions : vitesse verticale (asm c2, A+0x10) > −JDYN champ 12 (+0x4E, m/s) ; |roulis|
+; (Matrix_RollAngle_57C67) < champ 14 (+0x56, uint8 °) ; tangage du nez
+; (Matrix_NosePitchAngle_57C3A) < champ 15 (+0x57, uint8 °) et > −champ 16 (+0x58, uint8 °) ;
+; vitesse horizontale < champ 13 (+0x52, m/s) ; train sorti (+0x75 bit 2) ; pas éjecté (bit
+; 5). Alors au sol = 1 et, si la vitesse verticale < −champ12/2, rebond : vz = −(vz +
+; champ12/4) ; sinon vz négative ramenée à 0. Sinon au sol = 0.
 ; ==============================================================================================
 Aero_ControlOrchestrator_48FC2	proc far		; CODE XREF: seg103:2D08p
 
@@ -5115,7 +5122,13 @@ Autopilot_FlyToPointKinematic_49C2E	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4A825:				; CODE XREF: seg082:116AJ seg082:1222J ...
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x3C du JDYN (tick SANS commande, appelé par la mise à
+; jour des objets non pilotés Camera_ExternalUpdate_3D9B4) : Aero_SumLinearForces_48639 puis
+; Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni
+; autopilote. Le tick AVEC commande (+0x40) est PhysicsTicks.
+; ==============================================================================================
+JDYN_TickUncontrolled_4A825:				; CODE XREF: seg082:116AJ seg082:1222J ...
 		push	bp
 
 loc_4A826:
@@ -6206,7 +6219,13 @@ Aero_MaxRollRate_4AF35	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4B093:				; CODE XREF: seg082:11DDJ
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x48 de la vtable JDYN (atteint depuis la vtable du sous-
+; objet DYNM 0x2312 par le thunk d'ajusteur loc_3B63B, add ax,0FF72h = −0x8E) : renvoie this =
+; l'objet JDYN complet (0xC5 o). Pendant de DYNM_AsJDYN_Base_46922 (renvoie 0). C'est le SEUL
+; test de type de la dynamique dans le binaire.
+; ==============================================================================================
+JDYN_AsJDYN_4B093:				; CODE XREF: seg082:11DDJ
 					; DATA XREF: seg339:off_6F382o
 		push	bp
 		mov	bp, sp

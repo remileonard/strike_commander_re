@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C535	endp
 ; d'overlay actuellement charge en memoire. fileoff=2E8E0h, codesize=3B1h, nentries=15.
 ; ==============================================================================================
 VROOMM_StubThunk_6C53A	proc far
-		jmp	PlayerComponent_InitPulseTimer_A0455
+		jmp	Missile_InitSeekerDelay_A0455
 VROOMM_StubThunk_6C53A	endp
 
 

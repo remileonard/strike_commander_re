@@ -72,7 +72,7 @@ VROOMM_StubThunk_6CCFF	endp
 ; d'overlay actuellement charge en memoire. fileoff=356B0h, codesize=3BEh, nentries=5.
 ; ==============================================================================================
 VROOMM_StubThunk_6CD04	proc far		; CODE XREF: JDYN_LoadChunkAndConstruct_3A49C+505P
-		jmp	TriggerObject_ConstructSubobjects_A700F
+		jmp	DynPara_Construct_A700F
 VROOMM_StubThunk_6CD04	endp
 
 seg330		ends

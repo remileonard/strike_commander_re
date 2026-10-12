@@ -1190,8 +1190,8 @@ WorldObject_IntegrateBodyMotion_3D31D	endp
 ; est remplacé), par Collision_OnTerrainContact_9D910 et par deux fonctions PlayerComponent
 ; (seg434/seg438).
 ; ==============================================================================================
-SmokeTrail_EnableIfModelHasSmok_3D566	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+173P
-					; Collision_OnTerrainContact_9D910:loc_9DCEEP	...
+SmokeTrail_EnableIfModelHasSmok_3D566	proc far		; CODE XREF: Aircraft_OnDestroyed_9D770+173P
+					; Aircraft_OnCollision_9D910:loc_9DCEEP	...
 
 arg_0		= word ptr  6
 

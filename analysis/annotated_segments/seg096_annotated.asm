@@ -3,7 +3,11 @@ seg096		segment	byte public 'CODE' use16
 		;org 0Ch
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_4536C:				; DATA XREF: seg339:off_6EEA2o
+; ==============================================================================================
+; far (label), LUE 2026-10-12. Slot +0x3C du corps SURF (vtable 0x1DB6) : mov al,1 / retf — ne
+; fait rien. Le slot +0x40 (loc_45376) rappelle +0x3C. La dynamique SURF est donc immobile.
+; ==============================================================================================
+SurfBody_TickNoOp_4536C:				; DATA XREF: seg339:off_6EEA2o
 		push	bp
 		mov	bp, sp
 		mov	ax, [bp+6]

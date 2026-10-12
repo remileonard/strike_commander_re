@@ -137,7 +137,7 @@ loc_434D0:				; CODE XREF: seg092:00D9j
 		push	large dword ptr	es:[bx+3Ah]
 		push	si
 		push	59C3h
-		call	WorldObjects_Cluster_22A7D
+		call	World_FindNearestInCone_22A7D
 		add	sp, 0Eh
 
 loc_43501:
@@ -194,7 +194,7 @@ loc_4354E:				; CODE XREF: seg092:0122j seg092:012Dj ...
 		push	word ptr [si+51h]
 		push	si
 		push	59C3h
-		call	WorldObjects_Cluster_22795
+		call	World_SelectTargetInCone_22795
 		add	sp, 10h
 		mov	[bp-0Ch], ax
 		push	ax

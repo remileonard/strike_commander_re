@@ -18,8 +18,8 @@ stru_6C580	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0ACEo
 ; far, thunk fixe VROOMM (jmp sub_A0700) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2ECE0h, codesize=2F5h, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6C5A0	proc far		; CODE XREF: PlayerComponent_LoadFieldsWithRetryD_A0FB0+19P
-					; PlayerComponent_LoadFieldsWithRetryM_A66F0+2CP
+VROOMM_StubThunk_6C5A0	proc far		; CODE XREF: PodModel_LoadDATAChunk_A0FB0+19P
+					; TracerModel_LoadINFOChunk_A66F0+2CP
 		jmp	Weapon_LoadWDATChunk_A0700
 VROOMM_StubThunk_6C5A0	endp
 

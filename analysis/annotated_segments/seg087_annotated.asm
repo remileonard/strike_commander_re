@@ -17,7 +17,18 @@ loc_3DEEA:				; DATA XREF: seg216:off_6A15Eo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3DEFB:				; DATA XREF: seg339:27CCo
+; ==============================================================================================
+; far (label), LUE PARTIELLEMENT 2026-10-12. Méthode +0x10 (mise à jour) de l'instance JETP
+; (vtable 0x27BC). Après Camera_ResolvePositionVelocity_3DDC4 : si +0x73 bit 0 → renvoie 0.
+; TRAIN D'ATTERRISSAGE (si +0x73 bit 1) : quand l'ordre de train de la dynamique (JDYN +0x75
+; bit 2) diffère de l'état +0x73 bit 2, une séquence démarre (+0x73 bit 3) : toutes les 25/256
+; s (word_6F902 = 0x19, horloge +0x71 += dt) le sous-objet suivant de la plage JINF [champ 2,
+; champ 2 + champ 3) est affiché (méthode +4 avec 1) ou masqué (0), index +0x62 ; sons 4
+; (rentrée) / 5 (sortie) pour le joueur en vue cockpit (byte_72A8E == 4). Sous-objet spécial
+; +0x65 (JINF champs 6-7) : désactivé après 3 images actives. Puis secousse d'écran (+0x68
+; minuteur) pour le joueur.
+; ==============================================================================================
+Aircraft_Update_3DEFB:				; DATA XREF: seg339:27CCo
 		push	bp
 		mov	bp, sp
 		sub	sp, 6
@@ -185,7 +196,7 @@ loc_3E036:				; CODE XREF: seg087:014Cj
 		mov	[bp-4],	dx
 		push	word ptr [bp-4]
 		push	word ptr [si+1Eh]
-		call	Container_Op_22E27
+		call	WorldObject_GetNthChild_22E27
 		add	sp, 4
 		mov	[si+63h], ax
 		cmp	word ptr [si+63h], 0
