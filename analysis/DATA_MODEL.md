@@ -1019,7 +1019,7 @@ pour la passe de liaison `ExprSlot` :
 | 9 | `MSGS` | `sub_6CF03` | `si+0x28` | messages / dialogues |
 | 10 | `FLAG` | `sub_6CE9F` | `si+0x48` | flags d'événement de mission |
 | 11 | `PROG` | `sub_6CEB3` (assert `size` pair) | `si+0x40` | **programme scripté** (bytecode Expr VM) |
-| 12 | `PART` | `sub_6CF35` → `A9CC3` | `si+0x34` | participants / factions |
+| 12 | `PART` | `sub_6CF35` → `PartEntry_AllocateArray_AA23D` | `si+0x34` | objets de la mission (type, pilote, placement, camp, scripts) — format ci-dessous |
 | 13 | `TEAM` | count = `size/2` (≤8) ; `ReadDwordFieldB` | `si+0x84` count, `si+0x74` tableau | équipes (dwords) |
 | 14 | `PLAY` | `enter_form('PLAY')` → `sub_6CF58` → `MissionPlay_LoadScenes_AA595(si+0x3A)` → `pop` | `si+0x3A` | **la « pièce » : FORM contenant N chunks `SCNE`** (voir plus bas) |
 | 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | emport (loadout) |
@@ -1146,6 +1146,74 @@ plancher** pour un cylindre ou une boîte — un décalage (0, 0, 0) tombe exact
 La même fonction calcule la position des entrées `PART` : `Expr_Node_StoreResultVector_52C9C`
 lui passe `part+0x1D` (pointeur de zone en `+0x1D`, décalage en `+0x21`), même structure.
 
+##### `PART` → objets de la mission — `PartEntry_AllocateArray_AA23D` (seg457)
+
+Liste des **objets de la mission** (avions, véhicules, bases, repères de piste) : quel modèle
+charger, quel pilote, où et comment le faire apparaître, son camp et ses 4 scripts. Un objet
+n'existe dans le monde qu'une fois **activé** (opcode `0x90` ou activation de sa scène).
+
+Enregistrements **fixes de 62 octets** (pas de taille variable) : nombre = taille ÷ 62
+(`mov bx, 3Eh / div bx`) ; erreur `9036h` si la taille n'est pas un multiple de 62. En mémoire,
+`MissionScenario+0x34` = `[+0]` u16 nombre, `[+2]` far ptr vers un tableau d'**entrées de 85 o**
+(`imul ax, 55h`) ; accès par index : `Expr_LookupTableEntry85B_52D45` (nul si hors liste).
+Chaque entrée est remplie par `PartEntry_LoadAndResolveNames_A9E3C` : `PartEntry_ResetState_A9DFD`,
+lecture brute des 62 o (`push large 3Eh` / `ResourceRecord_ReadFieldGroupA_64A19`), puis copie.
+
+| Disque | Type | Champ (libRealSpace : Y-up, mètres) | → entrée |
+|---|---|---|---|
+| `0x00` | u16 | index `CAST` = rôle / pilote (`PLAYER`, `STERN`, `NULL`…) ; seul l'octet bas est gardé (`mov al, byte ptr [bp+var_4A]`) | `+0x1B` |
+| `0x02` | char[8] | **type d'objet** (modèle chargé, ex. `F-16DES`, `MIG21`, `RWYEXT18`) | `+0x00` (+ nul en `+0x08`) |
+| `0x0A` | char[8] | **type de remplacement une fois détruit** | `+0x09` (+ nul en `+0x11`) |
+| `0x12` | char[8] | nom chargé dans le composant `+0x5A` de l'entité (`PlayerComponent_ConstructFromStream_9EFBE`) — **rôle non tranché** ; vide = rien | `+0x12` (+ nul en `+0x1A`) |
+| `0x1A` | u16 | index de la zone `AREA` (`PtrList_GetAt_53034`) | `+0x1D` (far ptr) |
+| `0x1C` | u8 | **mode de placement** : 0 = relatif à la zone, ≠ 0 = relatif au joueur | `+0x1C` |
+| `0x1D` | i32 | décalage **X** (÷ 256 → m) | `+0x21` |
+| `0x21` | i32 | décalage **Z** (profondeur) | `+0x25` |
+| `0x25` | i32 | décalage **Y** (altitude) | `+0x29` |
+| `0x29` | i16 | **cap** en degrés (entier tel quel : `movsx` puis `shl eax, 8`) | `+0x2D` |
+| `0x2B` | i16 | **vitesse initiale** (0 = à l'arrêt) — unité non prouvée (m/s probable) | `+0x2F` |
+| `0x2D` | u8 | **camp** : 1 = allié, 0xFF = ennemi, autre = neutre | `+0x31` |
+| `0x2E` | u8 | **allié à suivre par défaut** (index `PART`, 0xFF = aucun) | `+0x32` |
+| `0x2F` | u8 | inutilisé (jamais copié) | — |
+| `0x30` / `0x32` / `0x34` | i16 ×3 | **poste en formation** de l'ordre « suivre » : côté (X), avant (Z), haut (Y), mètres, entiers (session 2026-09-27, non relu ici) | `+0x33` / `+0x35` / `+0x37` |
+| `0x36` / `0x38` / `0x3A` / `0x3C` | u16 ×4 | scripts `PROG` : `on_is_activated`, `on_mission_update`, `on_is_destroyed`, `on_missions_init` (`Expr_LookupNamedValue_51E4A(scénario+0x40, id)`) | `+0x42` / `+0x46` / `+0x4A` / `+0x4E` (far ptr résolus) |
+
+**Champs d'exécution** (pas sur disque) : `+0x39` drapeaux — bit 0 actif, bit 1 **détruit**
+(posé par `World_OnObjectDestroyed_53A94`), bit 4 visible sur la carte de navigation (`0xB6`/`0xB7`),
+bit 5 accompagne le joueur au pilote automatique (`0xB8`/`0xB9`) ; `+0x3A` dword ; `+0x3E`/`+0x40`
+remis à 0 au chargement ; `+0x52` **entité créée** (contrôleur, nul tant que l'objet n'est pas
+activé) ; `+0x32` vaut 0xFF puis l'allié lu ; `+0x54` = 0xFF.
+
+**Activation** — `PartEntry_ResolveSpawnPositionAndActivate_51EDC` (opcode `0x90`,
+`Scene_EnsureUnitsSpawned_530FF`) :
+
+1. **Modèle.** Rien si l'objet est déjà actif (bit 0) ou a déjà une entité (`+0x52`). S'il a été
+   **détruit** (bit 1), on prend le **type de remplacement** (`+0x09`) et on efface les 4 scripts ;
+   sinon le type `+0x00`. Nom vide → rien n'apparaît (`cmp byte ptr es:[bx], 0`).
+2. **Position et cap** (`cmp byte ptr es:[bx+1Ch], 0`) :
+   - **mode 0 (zone)** : `AreaRelPos_ToWorld_50EEB(entrée+0x1D)` = point de référence de la zone +
+     décalage, exactement comme un `SPOT` ; cap = `+0x2D` (absolu) ;
+   - **mode ≠ 0 (joueur)** : le décalage est exprimé dans le **repère de l'avion du joueur**
+     (X = côté, Z = avant/nez, Y = haut de l'avion) : position = position du joueur
+     (`Expr_Node_GetFocusedNode_543BA`, `+0x12`) + décalage tourné par la matrice d'orientation du
+     joueur (copie `AI_ComputeGeometryHelper_56E29`, puis 3× `imul edx / shrd eax, edx, 8`) ; cap =
+     cap du nez du joueur (`Math_HeadingAngle_553CF`) + `+0x2D`.
+   - Dans les deux cas l'objet apparaît **à plat** : matrice = rotation autour de la verticale
+     seulement (`Matrix_BuildAxisZ_572BC` avec −cap, puis `Matrix_OrthonormalizeKeepRow1_57660`).
+3. **Création** : `AIAircraft_SpawnAndConditionalLoadProfile_53363(scénario, type, CAST[+0x1B],
+   position, matrice, vitesse +0x2F)` ; le nom `CAST` décide `PLAYER` / `NETWORK` / IA. Si la
+   vitesse ≠ 0 : vitesse = `vitesse · dword_7045E` (pas de temps) le long du nez de l'objet
+   (`shl eax, 8`, `imul … dword_7045E`, appel vtable `+0x48`).
+4. **Avion à vitesse nulle** (catégorie 6 et `+0x2F == 0`) : posé **au sol, train sorti**
+   (`mov [bx+20h], al` = indicateur « au sol » ; `or byte ptr [bx+75h], 4` = bit 2 de `flags_75`).
+5. **Si l'objet n'est pas détruit** : nom `+0x12` chargé (si non vide), camp `+0x31` copié dans
+   l'entité (`+0x50`), ordre `0xB3` (suivre) vers l'allié `+0x32` s'il existe
+   (`Expr_LookupNamedValue_52DDB(scénario+0x34, …)` puis appel vtable `+0x88`), compteur d'objets
+   actifs du camp incrémenté (`word_706A3` camp 1, `word_706A7` camp 0xFF — lus par l'ordre
+   « défendre la zone »). Enfin `Shared_TriggerExprInstruction_5247D`.
+
+Désactivation : opcode `0x91`, `PartEntry_Deactivate_5242A`.
+
 ##### `PLAY` → chunks `SCNE` (scènes) — `MissionPlay_LoadScenes_AA595` (seg457)
 
 `enter_form('PLAY')` puis **2 passes** sur les sous-chunks :
@@ -1183,9 +1251,9 @@ Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, =
 
 Chaque valeur `u16` (octet haut = 0) est un **index dans le chunk `PART`, dans son
 ordre de stockage** — **ni un id d'entité, ni un index `CAST`, sans offset**.
-`PART` est une liste de records de taille variable, chacun commençant par
-`<u16 entity_id> <char[8] type>` ; **l'ordre de stockage ≠ l'ordre des
-`entity_id`**. Résolution : `slot → PART[slot].entity_id → CAST[entity_id]` (nom).
+`PART` est une liste de records **fixes de 62 octets** (format plus haut), chacun
+commençant par `<u16 index CAST> <char[8] type>` ; **l'ordre de stockage ≠ l'ordre des
+index `CAST`**. Résolution : `slot → PART[slot].cast → CAST[cast]` (nom).
 
 `CAST` (chunk séparé, records de 9 o, noms `PLAYER`/`STERN`/`NULL`/…) n'est **pas**
 indexé par les scènes : il sert vraisemblablement à associer des scripts / rôles
