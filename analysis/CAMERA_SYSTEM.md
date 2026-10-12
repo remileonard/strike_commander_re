@@ -447,10 +447,10 @@ ovr310) : `entité[+0x39]` u8 (F-16 : 3) + vec3 `entité[+0x3A/+0x3E/+0x42]`
 - **L'objet caméra externe seg085 en tire des données** :
   `Camera_InitAttachedWithTarget_3DC3D` fait `cam[+0x54] = entité[+0x39]`
   (le compte SMOK).
-- Mais le **vecteur** SMOK est consommé par `Emitter_UpdateFromEntitySMOKVec_3D57E`
+- Mais le **vecteur** SMOK est consommé par `SmokeTrail_Tick_3D57E`
   (appelé par `Camera_ExternalUpdate_3D9B4` / `Camera_LookAtSecondaryTarget_3D9FB`)
   qui calcule 2 points `cam.pos + ligne_orient·SMOK.y + mvt_mount` et
-  **spawne N éléments** via `Elements_SpawnAlongSegment_4D1C9` (×`cam[+0x54]`).
+  **spawne N éléments** via `Particles_SpawnAlongSegment_4D1C9` (×`cam[+0x54]`).
   → **traînée moteur** ; il *lit* `cam.pos`, ne l'*écrit* pas.
 - Donc l'intuition « SMOK réutilisé par la caméra » n'est pas absurde
   (le compte SMOK sert de param), mais le **vecteur** SMOK sert à la fumée,

@@ -1160,7 +1160,7 @@ Math_RandomJitter_54E1C	endp
 ; par sub_4D04E et ChaseCamera_RenderEffect_4D1C9 (spawn probabiliste d'effet).
 ; ==============================================================================================
 Math_RandomChance_54E4F	proc far		; CODE XREF: Particle_SpawnWithColor+132P
-					; Elements_SpawnAlongSegment_4D1C9+310P ...
+					; Particles_SpawnAlongSegment_4D1C9+310P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2

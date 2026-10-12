@@ -268,7 +268,7 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 
 | Disque | → modèle | Sens |
 |---|---|---|
-| uint8 | `+0x36` | couleur des particules (`Particle_SpawnWithColor`) |
+| uint8 | `+0x36` | **type de fumée** = index dans le jeu de fumées du monde (`Particle_SpawnWithColor` : `imul ax, 2Ah`, modèles de 42 o de `word_70483`) |
 | int32 24.8 | `+0x37` | durée d'émission (s) |
 | int32 24.8 | `+0x3B` | vitesse de montée des particules (composante d'altitude seule) |
 | int32 24.8 | `+0x3F` | intervalle entre deux particules (s) |
@@ -284,8 +284,30 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | int32 | `+0x53` | hauteur de libération (entier, `<< 8` → m), comparée à la hauteur donnée par `Terrain_QueryAltitudeAt` |
 | chaîne C | `+0x4A` | nom de l'objet libéré (créé une seule fois, même position, orientation et vitesse) |
 
-`MobileObject_LoadDynamicsAndSmoke_9D189` (objets mobiles orientés) lit aussi une dynamique `DYNM` et un
-chunk `SMOK` facultatif (uint8 + 3× int32 → `+0x39`, `+0x3A/+0x3E/+0x42` ; traînée de fumée, sens non établi).
+`MobileObject_LoadDynamicsAndSmoke_9D189` (objets mobiles orientés : `OMOB`, `EJEC`…) lit aussi une
+dynamique `DYNM` et un chunk **`SMOK` = traînée de fumée** (facultatif, lu 2026-10-12) :
+
+| Disque | → modèle | Sens |
+|---|---|---|
+| uint8 | `+0x39` | **type de fumée** : index dans le jeu de fumées du monde (recopié en instance `+0x54` par `Camera_InitAttachedWithTarget_3DC3D`) |
+| int32 24.8 | `+0x3A` | point d'émission c0 → libRS **X** (repère de l'objet) |
+| int32 24.8 | `+0x3E` | point d'émission c1 (axe du nez) → libRS **Z** |
+| int32 24.8 | `+0x42` | point d'émission c2 → libRS **Y** |
+
+Présence du chunk → `+0x38 = 1`. F-16 : `(0, −3584, 0)` brut = `(0, −14, 0)` → 14 m derrière le centre.
+
+- **Allumage** : `SmokeTrail_EnableIfModelHasSmok_3D566` pose instance `+0x53 = 1` si le modèle a un `SMOK`.
+  Appelée notamment par `Debris_SpawnOrchestratorVariant_9D770` juste après `World_OnObjectDestroyed_53A94`
+  (l'objet détruit se met à fumer, son type de fumée y est remplacé par une valeur de l'objet appelant),
+  ainsi que par `Collision_OnTerrainContact_9D910`.
+- **Chaque image** : `SmokeTrail_Tick_3D57E` calcule le point d'émission courant (position + matrice de
+  l'objet · S, `Matrix_LocalToWorld_58828`) et sa position à l'image précédente (déplacement de l'ancre
+  pendant l'image, `vitesse · dword_7045E`), puis `Particles_SpawnAlongSegment_4D1C9(jeu, type, A, B, dt)`
+  répartit les particules **le long du segment parcouru** : la traînée est continue quelle que soit la
+  vitesse. Le nombre de particules = longueur du segment ÷ espacement lu dans le modèle de fumée (`+1`).
+- **Jeu de fumées** : le chunk `WRLD/SMOK` du monde (`"SMOKESET"`) charge les modèles de fumée (42 o
+  chacun) dans `word_70483` (`MissionLoader_LoadChunkB_A7CA1`). Sans jeu chargé, ni `SMOK` ni `SMKG`
+  n'émettent.
 
 **Chunks communs d'un objet — `Object_LoadCommonChunks_9BA85`** (ovr302, lu 2026-10-12 ; appelé par
 les lecteurs de classe via `VROOMM_StubThunk_6BFFF` — `ORNT`/`RNWY` par `IFF_LoadAngleParam`, `EXPL`

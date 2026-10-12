@@ -92,11 +92,12 @@ SmokeGen_SpawnInstance_A5F20	endp
 ; far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-
 ; TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant
 ; la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36
-; couleur des particules ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B
-; vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ;
-; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ;
-; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs
-; + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050).
+; type de fumée (index dans le jeu de fumées du monde, word_70483) ; int32 24.8 → +0x37 durée
+; d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F
+; intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création
+; (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée
+; (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h,
+; catégorie 18 (loc_4C050).
 ; ==============================================================================================
 SmokeGen_LoadFromIFF_A5F89	proc far		; CODE XREF: VROOMM_StubThunk_6CC1AJ
 

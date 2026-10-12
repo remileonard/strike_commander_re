@@ -229,7 +229,7 @@ loc_9D8C3:				; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+13Dj
 		mov	al, es:[bx+58h]
 		mov	[si+54h], al
 		push	di
-		call	Camera_EnableFollowIfActive
+		call	SmokeTrail_EnableIfModelHasSmok_3D566
 		pop	cx
 		push	word ptr [di+51h]
 		mov	bx, [di+51h]

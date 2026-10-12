@@ -290,7 +290,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
-      <tr><td>couleur</td><td>uint8</td><td class="num">1</td><td>couleur des particules</td></tr>
+      <tr><td>type de fumée</td><td>uint8</td><td class="num">1</td><td>numéro du modèle de fumée dans le jeu de fumées du monde (chunk <code>SMOK</code> du <code>WRLD</code>)</td></tr>
       <tr><td>durée</td><td>float</td><td class="num">4</td><td>secondes d'émission</td></tr>
       <tr><td>vitesse de montée</td><td>float</td><td class="num">4</td><td>vitesse verticale des particules (sur Y)</td></tr>
       <tr><td>intervalle</td><td>float</td><td class="num">4</td><td>secondes entre deux particules</td></tr>
@@ -310,6 +310,23 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     </tbody>
   </table></div>
   <p>Quand le délai est écoulé et que l'objet est sous la hauteur de libération, le jeu crée <b>une seule fois</b> l'objet nommé, à la même position, avec la même orientation et la même vitesse. <code>EJEC</code> a aussi sa propre dynamique de vol et peut avoir une traînée de fumée (chunk <code>SMOK</code>).</p>
+  <h3>SMOK : la traînée de fumée d'un objet mobile</h3>
+  <p>Les objets mobiles orientés (<code>OMOB</code>, <code>EJEC</code>…) peuvent avoir un chunk <code>SMOK</code> facultatif : ils laissent alors une traînée de fumée, par exemple un avion qui tombe en flammes.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>type de fumée</td><td>uint8</td><td class="num">1</td><td>numéro du modèle de fumée dans le jeu de fumées du monde</td></tr>
+      <tr><td>point d'émission X</td><td>float</td><td class="num">4</td><td>mètres, dans le repère de l'objet (côté)</td></tr>
+      <tr><td>point d'émission Z</td><td>float</td><td class="num">4</td><td>mètres, dans le repère de l'objet (axe du nez)</td></tr>
+      <tr><td>point d'émission Y</td><td>float</td><td class="num">4</td><td>mètres, dans le repère de l'objet (haut)</td></tr>
+    </tbody>
+  </table></div>
+  <p>F-16 : X = 0, Z = −14, Y = 0 : la fumée sort 14 m derrière le centre de l'avion.</p>
+  <ol class="phases">
+    <li><span>1</span><div><b>Allumage</b> : la traînée démarre quand l'objet est détruit (et dans certains cas de contact avec le sol), seulement si son modèle a un chunk <code>SMOK</code>.</div></li>
+    <li><span>2</span><div><b>À chaque image</b> : le jeu calcule où se trouve le point d'émission maintenant et où il était à l'image précédente, puis répartit des particules <b>le long de ce segment</b>. La traînée reste donc continue même à grande vitesse ; le nombre de particules dépend de la longueur du segment et de l'espacement donné par le modèle de fumée.</div></li>
+    <li><span>3</span><div><b>Jeu de fumées</b> : les modèles de fumée viennent du chunk <code>SMOK</code> du monde (<code>SMOKESET</code>), 42 octets chacun. Sans jeu chargé, aucune fumée n'est émise (ni traînée, ni <code>SMKG</code>).</div></li>
+  </ol>
   <p>Aucun de ces FORM trouvé : le chargement échoue (erreur 49173). Les chunks lus par la plupart des classes sont décrits dans la fiche suivante.</p>
   <h3>Composants de dégâts d'un avion</h3>
   <ul class="chips"><li>RUDDER</li><li>ELEVATOR</li><li>AILERON</li><li>LWING</li><li>RWING</li><li>ENGINE</li><li>LANDGEAR</li><li>FLAPS</li></ul>
@@ -828,7 +845,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td class="num">TERA</td><td><b>nom du terrain</b> → <code>DATA\&lt;nom&gt;.PAK</code></td></tr>
       <tr><td class="num">SKYS</td><td>ciel et soleil (couleur, direction, intensité)</td></tr>
       <tr><td class="num">GLNT</td><td>reflets du soleil (eau, métal)</td></tr>
-      <tr><td class="num">SMOK</td><td>jeu d'effets de fumée</td></tr>
+      <tr><td class="num">SMOK</td><td>nom du <b>jeu de fumées</b> (ex. <code>SMOKESET</code>) : les modèles de fumée que <code>SMKG</code> et les traînées <code>SMOK</code> désignent par leur numéro</td></tr>
       <tr><td class="num">LGHT</td><td>éclairage (14 octets)</td></tr>
       <tr><td class="num">HORZ</td><td>horizon : 2 <code>uint32</code></td></tr>
       <tr><td class="num">SCAL</td><td>échelle du monde : <code>uint32</code></td></tr>
@@ -981,7 +998,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
     <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
     <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : premier champ de <code>EJEC</code> et chunk <code>SMOK</code> ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
+    <li>Objets : premier champ de <code>EJEC</code> ; format des modèles de fumée (42 octets) ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
     <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>

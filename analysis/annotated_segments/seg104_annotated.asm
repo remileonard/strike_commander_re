@@ -396,7 +396,7 @@ loc_4BBB4:
 		mov	ah, 0
 		push	ax
 		push	word_70483
-		call	Elements_SpawnAlongSegment_4D1C9
+		call	Particles_SpawnAlongSegment_4D1C9
 		add	sp, 0Ch
 
 loc_4BC92:				; CODE XREF: seg104:01EBj seg104:01F8j ...

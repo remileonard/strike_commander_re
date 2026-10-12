@@ -567,7 +567,7 @@ loc_9DCE8:				; CODE XREF: Collision_OnTerrainContact_9D910+39Cj
 		push	di
 
 loc_9DCEE:
-		call	Camera_EnableFollowIfActive
+		call	SmokeTrail_EnableIfModelHasSmok_3D566
 		pop	cx
 
 loc_9DCF4:				; CODE XREF: Collision_OnTerrainContact_9D910:loc_9DC3Dj

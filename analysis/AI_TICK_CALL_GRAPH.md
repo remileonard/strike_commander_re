@@ -24,7 +24,7 @@ flowchart TD
         MASTER["AIEntity_MasterTick_5ACC<br/>slot +0xC de la vtable 0x110<br/>entité pointée par +0x55"]
         SLOT8["slot +8 de l'entité : loc_4F85<br/>pas de nom, pas lu"]
         MOUNT["objet à +0x51<br/>slot +0x40, pas identifié"]
-        EMIT["Emitter_UpdateFromEntitySMOKVec_3D57E<br/>pas lu"]
+        EMIT["SmokeTrail_Tick_3D57E<br/>pas lu"]
         CLEAR["AircraftStateBits_Clear_12806<br/>remet à zéro 3 octets de drapeaux<br/>aucun affichage"]
         FOLLOW["Goal_FollowAllyExec"]
         TRIGGER["AI_TriggerBehaviorUpdate<br/>c'est là que se trouve la décision<br/>pas lu"]

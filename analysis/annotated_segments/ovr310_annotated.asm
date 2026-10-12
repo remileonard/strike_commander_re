@@ -127,8 +127,11 @@ Debris_ConstructWithCameraAttach_9D0FA	endp
 ; ==============================================================================================
 ; far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) :
 ; IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C →
-; +0x36, puis chunk SMOK facultatif : uint8 → +0x39, 3× int32 → +0x3A/+0x3E/+0x42, +0x38 = 1
-; (traînée de fumée ; sens des champs non établi).
+; +0x36, puis chunk SMOK facultatif = TRAÎNÉE DE FUMÉE : uint8 → +0x39 type de fumée (index
+; dans le jeu de fumées du monde ; recopié en instance +0x54 par
+; Camera_InitAttachedWithTarget_3DC3D), 3× int32 24.8 → +0x3A/+0x3E/+0x42 point d'émission
+; dans le repère de l'objet (F-16 : (0, −14, 0) en asm, soit 14 m derrière), +0x38 = 1
+; (l'objet a une traînée). Consommateur : SmokeTrail_Tick_3D57E.
 ; ==============================================================================================
 MobileObject_LoadDynamicsAndSmoke_9D189	proc far		; CODE XREF: VROOMM_StubThunk_6C1CAJ
 					; Camera_Helper_9D286:loc_9D2A1p

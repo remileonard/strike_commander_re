@@ -560,7 +560,7 @@ Targeting_ComputeGeometryHelperB_5517F	endp
 ; Targeting_ComputeGeometryHelperB_5517F.
 ; ==============================================================================================
 ChaseCamera_ComputeGeometryHelper_5525B	proc far		; CODE XREF: Particle_SpawnWithColor+82P
-					; Elements_SpawnAlongSegment_4D1C9+3B2P
+					; Particles_SpawnAlongSegment_4D1C9+3B2P
 
 var_1C		= dword	ptr -1Ch
 var_18		= dword	ptr -18h
@@ -3979,7 +3979,7 @@ AI_ComputeGeometryHelper_56E29	endp
 ; generique de rotation d'objet.
 ; ==============================================================================================
 WorldObject_BuildOrientationMatrix_56E8A	proc far		; CODE XREF: seg084:01EBP
-					; Emitter_UpdateFromEntitySMOKVec_3D57E+2B2P ...
+					; SmokeTrail_Tick_3D57E+2B2P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

@@ -1183,10 +1183,14 @@ WorldObject_IntegrateBodyMotion_3D31D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,19L — positionne un flag (+0x53) si la cible référencée (+0xE) a un indicateur actif
-; (+0x38) : activation conditionnelle du mode caméra suiveuse selon l'état de la cible.
+; far, ALLUME LA TRAÎNÉE DE FUMÉE D'UN OBJET (ex-Camera_EnableFollowIfActive, aucun rapport
+; avec une caméra) : instance +0x53 = 1 si le modèle (+0x0E) a un chunk SMOK (modèle +0x38 ≠
+; 0). Appelée notamment par Debris_SpawnOrchestratorVariant_9D770 juste après
+; World_OnObjectDestroyed_53A94 (l'objet détruit se met à fumer ; son type de fumée +0x54 y
+; est remplacé), par Collision_OnTerrainContact_9D910 et par deux fonctions PlayerComponent
+; (seg434/seg438).
 ; ==============================================================================================
-Camera_EnableFollowIfActive	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+173P
+SmokeTrail_EnableIfModelHasSmok_3D566	proc far		; CODE XREF: Debris_SpawnOrchestratorVariant_9D770+173P
 					; Collision_OnTerrainContact_9D910:loc_9DCEEP	...
 
 arg_0		= word ptr  6
@@ -1200,11 +1204,11 @@ arg_0		= word ptr  6
 		jz	short loc_3D57B
 		mov	byte ptr [si+53h], 1
 
-loc_3D57B:				; CODE XREF: Camera_EnableFollowIfActive+Fj
+loc_3D57B:				; CODE XREF: SmokeTrail_EnableIfModelHasSmok_3D566+Fj
 		pop	si
 		pop	bp
 		retf
-Camera_EnableFollowIfActive	endp
+SmokeTrail_EnableIfModelHasSmok_3D566	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1212,18 +1216,18 @@ Camera_EnableFollowIfActive	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 437 L. NOM PRÉCÉDENT (Camera_ChaseComputeMain) FAUX — ce n'est PAS le calcul de la
-; caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort
-; si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A),
-; *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle
-; (MobileObject_LoadDynamicsAndSmoke_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3×
-; u32 +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points =
-; obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38
-; (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] +
-; word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate
-; (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé.
+; far, 437 L, LUE 2026-10-12. TRAÎNÉE DE FUMÉE D'UN OBJET, à chaque image (ex-
+; Emitter_UpdateFromEntitySMOKVec). Rien si la traînée est éteinte (+0x53 = 0), si le sous-
+; objet visuel est absent ou si aucun jeu de fumées n'est chargé (word_70483 = 0). S = point
+; d'émission du chunk SMOK (modèle +0x3A/+0x3E/+0x42, repère de l'objet). Point courant =
+; position (+0x12) + matrice de l'objet (+0x2C) · S (Matrix_LocalToWorld_58828) ; point
+; précédent = position + matrice de l'ancre · S + déplacement de l'ancre pendant l'image
+; (vitesse +0x51 · dword_7045E, ou vecteur global dword_707F8). Branche particulière si S.c0 =
+; 0 et S.c2 = 0 (point sur l'axe du nez) : S.c1 multiplie la ligne +0x38 de l'objet. Puis
+; Particles_SpawnAlongSegment_4D1C9(word_70483, type = +0x54, point courant, point précédent,
+; dt) : particules réparties le long du segment parcouru.
 ; ==============================================================================================
-Emitter_UpdateFromEntitySMOKVec_3D57E	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+28p
+SmokeTrail_Tick_3D57E	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+28p
 					; WorldObject_UpdateWithAIEntity_3D9FB:loc_3DACEp	...
 
 var_F0		= dword	ptr -0F0h
@@ -1300,20 +1304,20 @@ loc_3D581:
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D593:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+10j
+loc_3D593:				; CODE XREF: SmokeTrail_Tick_3D57E+10j
 		les	bx, [si+0Ah]
 		cmp	byte ptr es:[bx+8], 0
 		jnz	short loc_3D5A0
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D5A0:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+1Dj
+loc_3D5A0:				; CODE XREF: SmokeTrail_Tick_3D57E+1Dj
 		cmp	word_70483, 0
 		jnz	short loc_3D5AA
 		jmp	loc_3D9B0
 ; ���������������������������������������������������������������������������
 
-loc_3D5AA:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+27j
+loc_3D5AA:				; CODE XREF: SmokeTrail_Tick_3D57E+27j
 		cmp	word ptr [si+51h], 0
 		jz	short loc_3D62B
 
@@ -1364,7 +1368,7 @@ loc_3D5D2:
 		jmp	short loc_3D648
 ; ���������������������������������������������������������������������������
 
-loc_3D62B:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+30j
+loc_3D62B:				; CODE XREF: SmokeTrail_Tick_3D57E+30j
 		mov	eax, dword_707F8
 		mov	[bp+var_58], eax
 		mov	eax, dword_707FC
@@ -1374,7 +1378,7 @@ loc_3D62B:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+30j
 		mov	dx, ss
 		lea	ax, [bp+var_58]
 
-loc_3D648:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+ABj
+loc_3D648:				; CODE XREF: SmokeTrail_Tick_3D57E+ABj
 		mov	ax, [si+10h]
 		mov	dx, [si+0Eh]
 		add	dx, 3Ah	; ':'
@@ -1393,32 +1397,32 @@ loc_3D648:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+ABj
 		jmp	short loc_3D682
 ; ���������������������������������������������������������������������������
 
-loc_3D680:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+FBj
+loc_3D680:				; CODE XREF: SmokeTrail_Tick_3D57E+FBj
 		xor	ax, ax
 
-loc_3D682:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+100j
+loc_3D682:				; CODE XREF: SmokeTrail_Tick_3D57E+100j
 		or	al, al
 		jnz	short loc_3D689
 		jmp	loc_3D7CD
 ; ���������������������������������������������������������������������������
 
-loc_3D689:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+106j
+loc_3D689:				; CODE XREF: SmokeTrail_Tick_3D57E+106j
 		cmp	[bp+var_5C], 0
 		jnz	short loc_3D695
 		mov	ax, 1
 		jmp	short loc_3D697
 ; ���������������������������������������������������������������������������
 
-loc_3D695:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+110j
+loc_3D695:				; CODE XREF: SmokeTrail_Tick_3D57E+110j
 		xor	ax, ax
 
-loc_3D697:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+115j
+loc_3D697:				; CODE XREF: SmokeTrail_Tick_3D57E+115j
 		or	al, al
 		jnz	short loc_3D69E
 		jmp	loc_3D7CD
 ; ���������������������������������������������������������������������������
 
-loc_3D69E:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+11Bj
+loc_3D69E:				; CODE XREF: SmokeTrail_Tick_3D57E+11Bj
 		mov	di, si
 		add	di, 38h	; '8'
 		mov	eax, [di]
@@ -1507,8 +1511,8 @@ loc_3D7C1:
 		jmp	loc_3D98A
 ; ���������������������������������������������������������������������������
 
-loc_3D7CD:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+108j
-					; Emitter_UpdateFromEntitySMOKVec_3D57E+11Dj
+loc_3D7CD:				; CODE XREF: SmokeTrail_Tick_3D57E+108j
+					; SmokeTrail_Tick_3D57E+11Dj
 		mov	ax, si
 		add	ax, 2Ch	; ','
 		mov	word ptr [bp+var_20+2],	ax
@@ -1532,7 +1536,7 @@ loc_3D7CD:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+108j
 		jmp	short loc_3D826
 ; ���������������������������������������������������������������������������
 
-loc_3D805:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+269j
+loc_3D805:				; CODE XREF: SmokeTrail_Tick_3D57E+269j
 		mov	eax, dword_707F8
 		mov	[bp+var_94], eax
 		mov	eax, dword_707FC
@@ -1542,7 +1546,7 @@ loc_3D805:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+269j
 		mov	dx, ss
 		lea	ax, [bp+var_94]
 
-loc_3D826:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+285j
+loc_3D826:				; CODE XREF: SmokeTrail_Tick_3D57E+285j
 		lea	ax, [bp+var_94]
 		push	ax
 		lea	ax, [bp+var_88]
@@ -1638,7 +1642,7 @@ loc_3D8C0:
 		mov	eax, [bp+var_E0]
 		mov	[bp+var_38], eax
 
-loc_3D98A:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+24Cj
+loc_3D98A:				; CODE XREF: SmokeTrail_Tick_3D57E+24Cj
 		sub	sp, 4
 		mov	eax, dword_70458
 		mov	[bp+var_F0], eax
@@ -1650,16 +1654,16 @@ loc_3D98A:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+24Cj
 		mov	ah, 0
 		push	ax
 		push	word_70483
-		call	Elements_SpawnAlongSegment_4D1C9
+		call	Particles_SpawnAlongSegment_4D1C9
 		add	sp, 0Ch
 
-loc_3D9B0:				; CODE XREF: Emitter_UpdateFromEntitySMOKVec_3D57E+12j
-					; Emitter_UpdateFromEntitySMOKVec_3D57E+1Fj ...
+loc_3D9B0:				; CODE XREF: SmokeTrail_Tick_3D57E+12j
+					; SmokeTrail_Tick_3D57E+1Fj ...
 		pop	di
 		pop	si
 		leave
 		retf
-Emitter_UpdateFromEntitySMOKVec_3D57E	endp
+SmokeTrail_Tick_3D57E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1703,7 +1707,7 @@ loc_3D9C6:
 loc_3D9DA:				; CODE XREF: Camera_ExternalUpdate_3D9B4+16j
 		push	si
 		push	cs
-		call	near ptr Emitter_UpdateFromEntitySMOKVec_3D57E
+		call	near ptr SmokeTrail_Tick_3D57E
 		pop	cx
 		mov	al, 1
 		jmp	short loc_3D9E6
@@ -1748,11 +1752,11 @@ loc_3D9F1:				; DATA XREF: seg339:off_6F6FCo
 ; AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0,
 ; appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot
 ; +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement
-; slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1
-; (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le
-; corps). | 2026-09-27 : l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne
-; (pas de lecture des commandes ni de tick de dynamique). Pose par le decollage/atterrissage
-; (roulage, approche) et par Goal_FollowAllyExec pendant la formation.
+; slot +8 puis slot +0x40. (4) SmokeTrail_Tick_3D57E(objet), renvoie 1 (vivant). Anciennement
+; Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps). | 2026-09-27 :
+; l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne (pas de lecture des
+; commandes ni de tick de dynamique). Pose par le decollage/atterrissage (roulage, approche)
+; et par Goal_FollowAllyExec pendant la formation.
 ; ==============================================================================================
 WorldObject_UpdateWithAIEntity_3D9FB	proc far		; CODE XREF: Camera_ResolvePositionVelocity_3DDC4:loc_3DDCFP
 					; DATA XREF: seg339:off_6F6D8o
@@ -1876,7 +1880,7 @@ loc_3DACC:				; CODE XREF: WorldObject_UpdateWithAIEntity_3D9FB+58j
 		push	cs
 
 loc_3DACE:
-		call	near ptr Emitter_UpdateFromEntitySMOKVec_3D57E
+		call	near ptr SmokeTrail_Tick_3D57E
 		pop	cx
 
 loc_3DAD2:

@@ -3500,9 +3500,9 @@
     "summary": "far, appelle `Expr_Node_StoreResultVector_52C9C` (seg114)."
   },
   "sub_4D1C9": {
-    "new_name": "Elements_SpawnAlongSegment_4D1C9",
+    "new_name": "Particles_SpawnAlongSegment_4D1C9",
     "segment": "seg106",
-    "summary": "far, 450 L. NOM PRÉCÉDENT (ChaseCamera_RenderEffect) FAUX. Relu 2026-09-06 : étant donnés 2 points monde (arg_4=A, arg_6=B), alloue N éléments de ring buffer (via sub_4CFA0) répartis de A vers B, N = (|B-A|<<8) / template[idx*0x2A +1]. Chaque élément (0x30 o) : [+0x0A/+0x0E/+0x12]=position (interpolée A->B, jitter sub_54E1C ×3), [+0x24]=durée de vie (de arg_8), [+0x08]=index type/couleur (template[+0x27/0x28/0x29] + Math_RandomChance_54E4F), [+0x20/+0x28/+0x2E]=params. TYPE D'ÉLÉMENT NON CONFIRMÉ (particules ? décalques ? marqueurs ?). Appelée par sub_3D57E et le chargeur IFF seg104. Pas de rendu caméra."
+    "summary": "far, 450 L. NOMS PRÉCÉDENTS (ChaseCamera_RenderEffect, Elements_SpawnAlongSegment) FAUX OU VAGUES. Relu 2026-09-06 : étant donnés 2 points monde (arg_4=A, arg_6=B), alloue N éléments de ring buffer (via sub_4CFA0) répartis de A vers B, N = (|B-A|<<8) / template[idx*0x2A +1]. Chaque élément (0x30 o) : [+0x0A/+0x0E/+0x12]=position (interpolée A->B, jitter sub_54E1C ×3), [+0x24]=durée de vie (de arg_8), [+0x08]=index type/couleur (template[+0x27/0x28/0x29] + Math_RandomChance_54E4F), [+0x20/+0x28/+0x2E]=params. CONFIRMÉ 2026-10-12 : particules de fumée (appelée par SmokeTrail_Tick_3D57E) ; arg_2 = index du modèle de fumée dans le jeu de fumées word_70483 (chunk WRLD/SMOK, modèles de 0x2A = 42 o). Appelée par sub_3D57E et le chargeur IFF seg104. Pas de rendu caméra."
   },
   "sub_6D064": {
     "new_name": "VROOMM_StubThunk_6D064",
@@ -4600,9 +4600,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A2034) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57."
   },
   "sub_3D566": {
-    "new_name": "Camera_EnableFollowIfActive",
+    "new_name": "SmokeTrail_EnableIfModelHasSmok_3D566",
     "segment": "seg085",
-    "summary": "far,19L — positionne un flag (+0x53) si la cible référencée (+0xE) a un indicateur actif (+0x38) : **activation conditionnelle du mode caméra suiveuse selon l'état de la cible.**"
+    "summary": "far, ALLUME LA TRAÎNÉE DE FUMÉE D'UN OBJET (ex-Camera_EnableFollowIfActive, aucun rapport avec une caméra) : instance +0x53 = 1 si le modèle (+0x0E) a un chunk SMOK (modèle +0x38 ≠ 0). Appelée notamment par Debris_SpawnOrchestratorVariant_9D770 juste après World_OnObjectDestroyed_53A94 (l'objet détruit se met à fumer ; son type de fumée +0x54 y est remplacé), par Collision_OnTerrainContact_9D910 et par deux fonctions PlayerComponent (seg434/seg438)."
   },
   "sub_54F57": {
     "new_name": "Math_VectorLength3D_Scaled_54F57",
@@ -4892,7 +4892,7 @@
   "sub_3D9FB": {
     "new_name": "WorldObject_UpdateWithAIEntity_3D9FB",
     "segment": "seg085",
-    "summary": "far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 → renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0, appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement slot +8 puis slot +0x40. (4) Emitter_UpdateFromEntitySMOKVec_3D57E(objet), renvoie 1 (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps). | 2026-09-27 : l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne (pas de lecture des commandes ni de tick de dynamique). Pose par le decollage/atterrissage (roulage, approche) et par Goal_FollowAllyExec pendant la formation."
+    "summary": "far, slot +0x10 de la classe d'objet monde dont la vtable commence en seg339:0x2618 (posée par WorldObject_ConstructWithAIEntity_9D2CC). Appelée pour chaque objet par WorldObjects_UpdateAllAndRemoveDead_221F2. Séquence : (1) WorldObject_IsAlive_3CBB7 ; si 0 → renvoie 0 (l'objet sera retiré). (2) Si byte_6D558 (pilotage automatique) == 0 : appelle AIEntity_MasterTick_5ACC (slot +0xC de l'entité pointée par +0x55) ; si l'octet +0x59 == 0, appelle ensuite le slot +8 de l'entité (loc_4F85, pas lu) et passe son résultat au slot +0x40 de l'objet à +0x51 (pas identifié). (3) Si byte_6D558 != 0 : pas de tick IA, seulement slot +8 puis slot +0x40. (4) SmokeTrail_Tick_3D57E(objet), renvoie 1 (vivant). Anciennement Camera_LookAtSecondaryTarget (nom de caméra sans rapport avec le corps). | 2026-09-27 : l'octet +0x59 SUSPEND LA PHYSIQUE : non nul -> seul le tick IA tourne (pas de lecture des commandes ni de tick de dynamique). Pose par le decollage/atterrissage (roulage, approche) et par Goal_FollowAllyExec pendant la formation."
   },
   "sub_21E90": {
     "new_name": "Container_Construct",
@@ -8597,7 +8597,7 @@
   "sub_9D189": {
     "new_name": "MobileObject_LoadDynamicsAndSmoke_9D189",
     "segment": "ovr310",
-    "summary": "far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) : IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C → +0x36, puis chunk SMOK facultatif : uint8 → +0x39, 3× int32 → +0x3A/+0x3E/+0x42, +0x38 = 1 (traînée de fumée ; sens des champs non établi)."
+    "summary": "far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) : IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C → +0x36, puis chunk SMOK facultatif = TRAÎNÉE DE FUMÉE : uint8 → +0x39 type de fumée (index dans le jeu de fumées du monde ; recopié en instance +0x54 par Camera_InitAttachedWithTarget_3DC3D), 3× int32 24.8 → +0x3A/+0x3E/+0x42 point d'émission dans le repère de l'objet (F-16 : (0, −14, 0) en asm, soit 14 m derrière), +0x38 = 1 (l'objet a une traînée). Consommateur : SmokeTrail_Tick_3D57E."
   },
   "sub_53896": {
     "new_name": "STRIKE_EXE_MAIN_LOOP",
@@ -14450,9 +14450,9 @@
     "summary": "⚠️ far, 123 lignes, NON DÉTAILLÉE — référencée par sub_2AE7C. Construit une table de 16 entrées via des pointeurs `fs:`/`lfs` et un index à 4 bits (masque 0Fh) extrait par décalage variable — probable table de hachage/dispatch pour un parseur ou une table de symboles. Candidat pour lecture approfondie si le contexte de sub_2AE7C le justifie."
   },
   "sub_3D57E": {
-    "new_name": "Emitter_UpdateFromEntitySMOKVec_3D57E",
+    "new_name": "SmokeTrail_Tick_3D57E",
     "segment": "seg085",
-    "summary": "far, 437 L. NOM PRÉCÉDENT (Camera_ChaseComputeMain) FAUX — ce n'est PAS le calcul de la caméra de poursuite. Relu 2026-09-06 : MAJ par frame d'un émetteur ancré sur l'avion. Abort si obj[+0x53]==0 / es:[[obj+0x0A]+8]==0 / word_70483==0. Charge S = { *(entity+0x3A), *(entity+0x3E), *(entity+0x42) } = le vec3 écrit par le chunk IFF SMOK du modèle (MobileObject_LoadDynamicsAndSmoke_9D189, ovr310 : SeekAndRead('SMOK') -> u8 +0x39 puis 3× u32 +0x3A/+0x3E/+0x42 ; F-16 = (0,-3584,0) = (0,-14,0) en 24.8). Calcule 2 points = obj.pos(+0x12) + orientation·S [+ pos_ancre×dword_7045E/256], orientation = ligne obj+0x38 (branche S.x!=0&&S.z!=0) ou matrice obj+0x2C / de l'ancre. Passe les 2 points + obj[+0x54] + word_70483 à Elements_SpawnAlongSegment_4D1C9. Appelée depuis Camera_ExternalUpdate (sub_3D9B4) et sub_3DA0B. Rôle exact de SMOK non confirmé."
+    "summary": "far, 437 L, LUE 2026-10-12. TRAÎNÉE DE FUMÉE D'UN OBJET, à chaque image (ex-Emitter_UpdateFromEntitySMOKVec). Rien si la traînée est éteinte (+0x53 = 0), si le sous-objet visuel est absent ou si aucun jeu de fumées n'est chargé (word_70483 = 0). S = point d'émission du chunk SMOK (modèle +0x3A/+0x3E/+0x42, repère de l'objet). Point courant = position (+0x12) + matrice de l'objet (+0x2C) · S (Matrix_LocalToWorld_58828) ; point précédent = position + matrice de l'ancre · S + déplacement de l'ancre pendant l'image (vitesse +0x51 · dword_7045E, ou vecteur global dword_707F8). Branche particulière si S.c0 = 0 et S.c2 = 0 (point sur l'axe du nez) : S.c1 multiplie la ligne +0x38 de l'objet. Puis Particles_SpawnAlongSegment_4D1C9(word_70483, type = +0x54, point courant, point précédent, dt) : particules réparties le long du segment parcouru."
   },
   "sub_6BFFA": {
     "new_name": "VROOMM_StubThunk_6BFFA",
@@ -14552,7 +14552,7 @@
   "sub_4D04E": {
     "new_name": "Particle_SpawnWithColor",
     "segment": "seg106",
-    "summary": "far,164L — alloue un élément (sub_4CFA0), résout une couleur (sub_54E1C ×3, RGB), configure les paramètres de rendu (sub_5525B) : **création d'une nouvelle particule dans l'émetteur avec couleur résolue.**"
+    "summary": "far,164L — alloue un élément (sub_4CFA0), résout une couleur (sub_54E1C ×3, RGB), configure les paramètres de rendu (sub_5525B) : **création d'une nouvelle particule dans l'émetteur avec couleur résolue.** | 2026-10-12 : arg_2 n'est pas une couleur mais l'INDEX du modèle de fumée dans le jeu de fumées word_70483 (imul ax, 2Ah : modèles de 42 o, chunk WRLD/SMOK) ; appelée par SmokeGen_Tick_4C057 avec le 1er octet du chunk INFO de SMKG."
   },
   "sub_2B007": {
     "new_name": "String_ConstructFromFarPtrLen",
@@ -18112,7 +18112,7 @@
   "sub_A5F89": {
     "new_name": "SmokeGen_LoadFromIFF_A5F89",
     "segment": "seg450",
-    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36 couleur des particules ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050)."
+    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36 type de fumée (index dans le jeu de fumées du monde, word_70483) ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050)."
   },
   "sub_849B2": {
     "new_name": "HUDSymbol_RenderWithClipTestE_849B2",
@@ -18947,6 +18947,6 @@
   "loc_4C057": {
     "new_name": "SmokeGen_Tick_4C057",
     "segment": "seg106",
-    "summary": "far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 : compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et Particle_SpawnWithColor(word_70483, couleur = modèle +0x36, position +0x12, vitesse construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux autres à 0). Puis WorldObject_IsAlive_3CBB7."
+    "summary": "far, méthode de mise à jour (seg339:off_701AE) du générateur de fumée (vtable 30EEh). Si actif (+0x5A) : Timer_Tick_4F9E6(+0x51) ; à expiration, si modèle +0x45 ≠ 0 renvoie 0 (objet supprimé), sinon +0x5A = 0 (arrêt). Si le sous-objet visuel est présent et word_70483 ≠ 0 : compte à rebours +0x56 −= dt (dword_70458) ; à 0, +0x56 = intervalle (modèle +0x3F) et Particle_SpawnWithColor(word_70483, type de fumée = modèle +0x36, position +0x12, vitesse construite par Utility_Helper_55E65 avec la composante d'altitude = modèle +0x3B, les deux autres à 0). Puis WorldObject_IsAlive_3CBB7."
   }
 }

@@ -121,7 +121,7 @@ loc_A0E2D:
 		mov	[bp+var_6], ax
 		mov	[si+51h], ax
 		push	si
-		call	Camera_EnableFollowIfActive
+		call	SmokeTrail_EnableIfModelHasSmok_3D566
 		pop	cx
 		mov	ax, si
 		pop	si

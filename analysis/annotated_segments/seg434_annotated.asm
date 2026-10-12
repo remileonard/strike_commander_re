@@ -242,7 +242,7 @@ arg_2		= dword	ptr  8
 		call	near ptr PlayerComponent_InitPulseTimer_A0455
 		pop	cx
 		push	si
-		call	Camera_EnableFollowIfActive
+		call	SmokeTrail_EnableIfModelHasSmok_3D566
 		pop	cx
 		pop	si
 		pop	bp

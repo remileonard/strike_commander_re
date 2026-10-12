@@ -700,7 +700,7 @@ loc_458B2:				; CODE XREF: seg097:051Aj
 
 loc_458B8:				; CODE XREF: seg097:0530j
 		push	si
-		call	Emitter_UpdateFromEntitySMOKVec_3D57E
+		call	SmokeTrail_Tick_3D57E
 		pop	cx
 		mov	al, 1
 		jmp	short loc_458C5
