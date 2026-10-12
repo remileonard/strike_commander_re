@@ -186,6 +186,8 @@ strike_commander_re/
 │   │                                  point de départ pour choisir une cible
 │   ├── DATA_MODEL.md                modèle de données décodé (assets, missions,
 │   │                                  physique §6.2, caméras §6.6b) — cité en détail
+│   ├── DATA_MODEL.html              version lisible (HTML) du modèle de données :
+│   │                                  fichiers, IFF, objets, profils, mission, monde
 │   ├── PHYSICS.md                   modèle de vol / dynamique de l'avion
 │   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
 │   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA

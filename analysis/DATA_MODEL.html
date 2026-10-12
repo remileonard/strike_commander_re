@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modèle de données Strike Commander</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Référence de formats : colonne de lecture + sommaire latéral, une carte par fichier ou chunk (texte | schéma) */
+:root {
+  --bg: #eef2f1;
+  --panel: #ffffff;
+  --fg: #18211f;
+  --muted: #56645f;
+  --rule: #cfd8d5;
+  --accent: #0a6b70;
+  --accent-soft: #d6ecec;
+  --target: #b3262e;
+  --mark: #a86a0c;
+  --mark-soft: #f6e8cf;
+  --ground: #8a7a5c;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; font-size: 13px; }
+nav.toc h2 { font-family: var(--font-display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: grid; grid-template-columns: 34px 1fr; padding: 3px 6px; border-radius: 4px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outline: none; }
+nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
+main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+main > *, article.mv > * { min-width: 0; }
+td, dd, li, p { overflow-wrap: anywhere; }
+header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
+header.top p { max-width: 70ch; margin: 0 0 10px; }
+.eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h2.sec { font-family: var(--font-display); font-size: 26px; margin: 8px 0 0; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-size: 19px; margin: 18px 0 6px; }
+p, li { max-width: 72ch; }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
+.note { border-left: 3px solid var(--mark); background: var(--mark-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 78ch; }
+.note p { margin: 4px 0; }
+article.mv a, section a { color: var(--accent); }
+nav.toc a { color: var(--fg); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; }
+dl.vocab { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 6px 18px; margin: 0; }
+dl.vocab dt { font-weight: 600; }
+dl.vocab dd { margin: 0; }
+article.mv { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px 22px; scroll-margin-top: 16px; }
+article.mv > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 12px; }
+article.mv > header .id { font-family: var(--font-mono); font-size: 15px; color: var(--accent); }
+article.mv > header h2 { font-family: var(--font-display); font-size: 25px; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.chips li { font-size: 12.5px; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.chips li b { color: var(--fg); font-weight: 600; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 26px; align-items: start; }
+.grid2 > * { min-width: 0; }
+ol.phases { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+ol.phases li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }
+ol.phases li > span { font-family: var(--font-mono); font-weight: 500; color: var(--mark); background: var(--mark-soft); border-radius: 4px; text-align: center; height: 22px; line-height: 22px; font-size: 12.5px; }
+figure { margin: 0; }
+figure .svgbox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); }
+figure svg { display: block; width: 100%; min-width: 420px; height: auto; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.check { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+.check h3 { margin-top: 0; color: var(--accent); }
+.check ul { margin: 4px 0; padding-left: 18px; }
+.bug { color: var(--target); font-weight: 600; }
+pre.mermaid { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; }
+pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; }
+/* schémas */
+.g-ground { stroke: var(--ground); stroke-width: 2; fill: none; }
+.g-hz { stroke: var(--rule); stroke-width: 1.2; stroke-dasharray: 5 5; fill: none; }
+.g-lim { stroke: var(--mark); stroke-width: 1.2; stroke-dasharray: 6 4; fill: none; }
+.g-path { stroke: var(--accent); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.g-alt { stroke: var(--accent); stroke-width: 1.8; fill: none; stroke-dasharray: 5 4; }
+.g-tgtpath { stroke: var(--target); stroke-width: 1.8; fill: none; stroke-dasharray: 4 4; }
+.g-me { fill: var(--fg); }
+.g-tgt { fill: var(--target); }
+.g-ph { fill: var(--mark); }
+.g-phn { fill: var(--panel); font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-anchor: middle; }
+.g-lbl { fill: var(--muted); font-family: var(--font-body); font-size: 11.5px; }
+.g-lbl-a { fill: var(--accent); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-lbl-t { fill: var(--target); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-title { fill: var(--fg); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: .03em; }
+.g-frame { stroke: var(--rule); stroke-width: 1; fill: none; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab dd { margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sommaire">
+  <h2>Sommaire</h2>
+  <ol>
+    <li><a href="#conventions"><span>—</span><span>Conventions</span></a></li>
+    <li><a href="#fichiers"><span>—</span><span>Où sont les fichiers</span></a></li>
+    <li><a href="#iff"><span>—</span><span>Le conteneur IFF</span></a></li>
+    <li><a href="#carte"><span>—</span><span>Vue d'ensemble</span></a></li>
+    <li><a href="#objets"><span>1</span><span>Objets 3D</span></a></li>
+    <li><a href="#dynm"><span>2</span><span>Dynamique d'avion</span></a></li>
+    <li><a href="#prof"><span>3</span><span>Profil de pilote</span></a></li>
+    <li><a href="#misn"><span>4</span><span>Mission MISN</span></a></li>
+    <li><a href="#cast"><span>4a</span><span>CAST</span></a></li>
+    <li><a href="#area"><span>4b</span><span>AREA</span></a></li>
+    <li><a href="#spot"><span>4c</span><span>SPOT</span></a></li>
+    <li><a href="#part"><span>4d</span><span>PART</span></a></li>
+    <li><a href="#scne"><span>4e</span><span>PLAY / SCNE</span></a></li>
+    <li><a href="#autres"><span>4f</span><span>Autres chunks</span></a></li>
+    <li><a href="#wrld"><span>5</span><span>Monde WRLD</span></a></li>
+    <li><a href="#terrain"><span>6</span><span>Terrain PAK</span></a></li>
+    <li><a href="#camr"><span>7</span><span>Caméras CAMR</span></a></li>
+    <li><a href="#ponts"><span>8</span><span>Ponts campagne</span></a></li>
+    <li><a href="#ouvert"><span>—</span><span>Points ouverts</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">STRIKE.EXE · fichiers de données · référence de portage</div>
+  <h1>Le modèle de données de Strike Commander</h1>
+  <p>Ce document décrit ce que contiennent les fichiers du jeu et comment ils s'enchaînent : une mission désigne son monde, ses pilotes, ses zones et ses objets ; un objet désigne son modèle 3D et sa dynamique de vol ; un pilote désigne son profil de comportement. Chaque fiche donne la disposition sur disque, le sens de chaque champ et la façon dont le jeu s'en sert.</p>
+  <p>Toutes les dispositions viennent des lecteurs de <code>STRIKE.EXE</code> (segments annotés de <code>analysis/annotated_segments/</code>) ; le détail et les citations d'assembleur sont dans <code>analysis/DATA_MODEL.md</code>. Ce qui n'est pas prouvé est signalé comme tel.</p>
+</header>
+
+<section id="conventions">
+  <h2 class="sec">Conventions de lecture</h2>
+  <dl class="vocab">
+    <dt>Repère</dt>
+    <dd><b>Y-up, comme libRealSpace</b> : X et Z forment le plan horizontal (Z = profondeur), Y est l'altitude. Le jeu, lui, range ses vecteurs en Z-up (3ᵉ composante = altitude). Sur disque, un vecteur de 3 entiers se lit donc <code>X = c0</code>, <code>Z = c1</code>, <code>Y = c2</code> : <b>le 2ᵉ i32 est Z, le 3ᵉ est Y</b>.</dd>
+    <dt>Unités</dt>
+    <dd>Distances en <b>mètres</b>, angles en <b>degrés</b>. Jamais de pieds.</dd>
+    <dt>Virgule fixe 24.8</dt>
+    <dd>Un i32 « 24.8 » se divise par 256 à la lecture (256 = 1,0). Un entier de 8 ou 16 bits que le code décale de 8 (<code>shl 8</code>) se lit <b>tel quel</b> (ex. un cap de 180 = 180°).</dd>
+    <dt>Ordre des octets</dt>
+    <dd>Tailles de chunk IFF en <b>big-endian</b> ; tous les champs internes en <b>little-endian</b>.</dd>
+    <dt>Index</dt>
+    <dd>Un index désigne le rang d'un enregistrement dans son chunk, à partir de 0. Un index hors liste (souvent <code>0xFFFF</code> ou <code>0xFF</code>) veut dire « aucun ».</dd>
+  </dl>
+</section>
+
+<section id="fichiers">
+  <h2 class="sec">Où sont les fichiers</h2>
+  <p>Presque tous les chargements passent par <code>Path_ResolveDataFile</code> : un nom sans <code>\</code> devient <code>..\..\DATA\&lt;dossier&gt;\&lt;nom&gt;.&lt;ext&gt;</code>.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Dossier / fichier</th><th>Contenu</th><th>Racine IFF</th></tr></thead>
+    <tbody>
+      <tr><td class="num">OBJECTS\&lt;type&gt;.IFF</td><td>un objet : modèle 3D, catégorie, dynamique de vol (ex. <code>F-16DES.IFF</code>, <code>MIG21.IFF</code>)</td><td><code>FORM REAL</code></td></tr>
+      <tr><td class="num">MISSIONS\&lt;mission&gt;.IFF</td><td>une mission (ex. <code>MISN-1A.IFF</code>)</td><td><code>FORM MISN</code></td></tr>
+      <tr><td class="num">MISSIONS\&lt;monde&gt;.IFF</td><td>un monde : terrain, ciel, caméras (ex. <code>MAURITAN.IFF</code>)</td><td><code>FORM WRLD</code></td></tr>
+      <tr><td class="num">DATA\&lt;théâtre&gt;.PAK</td><td>le terrain d'un théâtre : altitudes, pistes, objets</td><td>archive PAK</td></tr>
+      <tr><td class="num">INTEL\&lt;pilote&gt;.IFF</td><td>le profil de comportement d'un pilote IA (ex. <code>STERN.IFF</code>)</td><td><code>FORM PROF</code></td></tr>
+      <tr><td class="num">DATA\OP2MISN.IFF</td><td>ce que la campagne (<code>OPTEST.EXE</code>) transmet à la mission</td><td><code>FORM INVN</code></td></tr>
+      <tr><td class="num">DATA\MISN2OP.IFF</td><td>le résultat de la mission, écrit par le simulateur</td><td><code>FORM INVN</code></td></tr>
+      <tr><td class="num">COCKPITS\*</td><td>les cockpits</td><td>IFF</td></tr>
+      <tr><td class="num">SOUND\*.ADL / .DAT</td><td>la musique (voir <code>MUSIC_SYSTEM.md</code>)</td><td>XMIDI</td></tr>
+      <tr><td class="num">sc.cfg, *.sav</td><td>réglages ; sauvegarde (blob binaire, pas d'IFF)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="iff">
+  <h2 class="sec">Le conteneur IFF</h2>
+  <p>Tous les fichiers de données (sauf la sauvegarde) sont des IFF. Un fichier est une arborescence de blocs :</p>
+  <pre class="tpl">FORM &lt;type&gt;   taille BE   ← conteneur : 4 octets de type puis des sous-blocs
+  CHUNK &lt;tag&gt; taille BE   ← données ; paddé à une longueur paire
+  FORM &lt;type&gt; …           ← conteneurs imbriqués, récursifs
+  CAT  &lt;type&gt; …           ← concaténation d'éléments
+PACK : table [offset u32 × N] → enregistrements de taille variable, parfois compressés LZW</pre>
+  <ul>
+    <li><b>Tailles big-endian, champs little-endian.</b> Le jeu lit les champs avec des primitives u8 / u16 / u32 / N octets / chaîne C.</li>
+    <li>La recherche d'un chunk (<code>seek_chunk</code>) parcourt <b>le niveau courant</b> jusqu'à trouver le tag demandé : l'ordre des chunks n'importe pas pour ceux que le lecteur cherche par tag.</li>
+    <li><b>LZW</b> : codes de 9 à 12 bits, 256 symboles + <i>clear</i> (256) + fin (257), premier code libre 258 — paramétrage de type GIF.</li>
+    <li><b>Archive PAK</b> (terrain) : <code>u32 taille_fichier</code>, puis <code>u32 (offset | 0xE0000000) × N</code>, puis les données. Les PAK s'emboîtent.</li>
+  </ul>
+</section>
+
+<section id="carte">
+  <h2 class="sec">Vue d'ensemble : qui pointe vers qui</h2>
+  <pre class="mermaid">flowchart LR
+  OP["OP2MISN.IFF<br/>(campagne)"] -->|"nom des ailiers TEAM"| CAST
+  M["MISSIONS\mission.IFF<br/>FORM MISN"] --> W["WRLD / FILE<br/>→ MISSIONS\monde.IFF"]
+  M --> CAST["CAST<br/>noms de pilotes"]
+  M --> AREA["AREA<br/>zones"]
+  M --> SPOT["SPOT<br/>points"]
+  M --> PART["PART<br/>objets"]
+  M --> PLAY["PLAY / SCNE<br/>scènes"]
+  M --> PROG["PROG<br/>scripts"]
+  SPOT -->|"index de zone"| AREA
+  PART -->|"index de zone"| AREA
+  PLAY -->|"index de zone"| AREA
+  PLAY -->|"liste d'objets"| PART
+  PART -->|"index CAST"| CAST
+  PART -->|"4 scripts"| PROG
+  PLAY -->|"3 scripts"| PROG
+  PART -->|"type"| OBJ["OBJECTS\type.IFF<br/>REAL → JETP → DYNM"]
+  CAST -->|"nom ≠ PLAYER"| PROF["INTEL\pilote.IFF<br/>FORM PROF"]
+  W --> TERA["TERA → DATA\théâtre.PAK"]
+  W --> CAMR["FORM CAMR<br/>caméras"]
+  M -.->|"fin de mission"| OUT["MISN2OP.IFF"]</pre>
+  <p>La mission est le centre : elle référence tout le reste par <b>nom</b> (fichiers d'objets, de monde, de profils) ou par <b>index</b> (zones, pilotes, objets, scripts à l'intérieur du même fichier).</p>
+</section>
+
+<!-- ============================ OBJETS ============================ -->
+<article class="mv" id="objets">
+  <header><span class="id">OBJECTS\*.IFF</span><h2>Objets 3D et catégories</h2></header>
+  <ul class="chips"><li>racine <b>FORM REAL</b></li><li>lecteur <b>IFF_LoadModelMain</b></li></ul>
+  <p>Un fichier d'objet contient <code>FORM REAL</code> → <code>FORM OBJT</code> → <b>un</b> sous-FORM qui fixe la classe de l'objet. Le jeu essaie les types dans l'ordre ci-dessous et garde le premier présent. Chaque classe renvoie une <b>catégorie</b>, que l'IA utilise pour choisir ses cibles (6 avion, 8 missile, 0x13 défense fixe).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>FORM</th><th>Catégorie</th><th>Objet</th></tr></thead>
+    <tbody>
+      <tr><td class="num">BOBJ</td><td class="num">0</td><td>objet simple</td></tr>
+      <tr><td class="num">ORNT</td><td class="num">1</td><td>décor orienté (immeuble…), chunk <code>ANGL</code> = angle</td></tr>
+      <tr><td class="num">MOBL / OMOB</td><td class="num">2 / 3</td><td>objet mobile / mobile orienté</td></tr>
+      <tr><td class="num">GUID / ARMG</td><td class="num">4 / 5</td><td>non utilisés par les missiles du jeu (seul <code>MISS</code> l'est)</td></tr>
+      <tr><td class="num">JETP</td><td class="num"><b>6</b></td><td><b>avion</b> (contient la dynamique <code>DYNM</code>)</td></tr>
+      <tr><td class="num">WEAP</td><td class="num">7</td><td>arme</td></tr>
+      <tr><td class="num">MISS</td><td class="num"><b>8</b></td><td><b>missile</b></td></tr>
+      <tr><td class="num">BOMB / DURD</td><td class="num">9</td><td>bombe / Durandal</td></tr>
+      <tr><td class="num">PODR</td><td class="num">0x0A</td><td>nacelle</td></tr>
+      <tr><td class="num">TRCR / AFTB</td><td class="num">0x0D / 0x0E</td><td>traçante / post-combustion</td></tr>
+      <tr><td class="num">DECY</td><td class="num">0x10</td><td>leurres</td></tr>
+      <tr><td class="num">SWPN</td><td class="num"><b>0x13</b></td><td><b>défenses fixes</b> : AA, SAM, navires</td></tr>
+      <tr><td class="num">GRND</td><td class="num">0x14</td><td>objet au sol</td></tr>
+      <tr><td class="num">XMIT</td><td class="num">0x15</td><td>émetteur</td></tr>
+      <tr><td class="num">RNWY / EXPL / DEBR</td><td>non lue</td><td>piste / explosion / débris</td></tr>
+    </tbody>
+  </table></div>
+  <p>Chunk commun <code>INFO</code> : rayon de collision (u16, défaut 20). Pièces d'un avion : <code>FUSELAGE</code>, <code>LWING</code>, <code>RWING</code>, <code>HARDPT#</code>, <code>POD</code>, <code>GUN</code>… ; 8 composants de dégâts : <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code>, <code>ENGINE</code>, <code>LANDGEAR</code>, <code>FLAPS</code>.</p>
+</article>
+
+<!-- ============================ DYNM ============================ -->
+<article class="mv" id="dynm">
+  <header><span class="id">JETP → DYNM</span><h2>Dynamique de vol d'un avion</h2></header>
+  <ul class="chips"><li>dans <b>OBJECTS\&lt;avion&gt;.IFF</b></li><li>struct <b>JDYN 197 o</b></li><li>codes d'erreur <b>A001 → A005</b></li></ul>
+  <p>Le FORM <code>DYNM</code> d'un avion regroupe 5 chunks lus en séquence. Les armes ont à la place un seul chunk de dynamique (<code>MISS</code>, <code>GBMB</code>, <code>DURD</code>, <code>AGRV</code>, <code>SURF</code>, <code>PARA</code>).</p>
+  <pre class="tpl">FORM JETP
+ └─ FORM DYNM
+     ├─ DYNM   u32            masse à vide (÷256)
+     ├─ ATMO   u32 (+ bloc)   modèle d'atmosphère (partagé par tous les avions)
+     ├─ THRS   u32 + 3× u8    poussée maximale avec PC (÷256) + 3 fractions moteur
+     ├─ STBL   u32            stabilité / autorité de tangage
+     └─ JDYN   73 octets      enveloppe de vol (28 champs)</pre>
+  <h3>Champs principaux</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ (struct)</th><th>Sens</th></tr></thead>
+    <tbody>
+      <tr><td class="num">THRS u8 ×3</td><td>fraction de poussée sans PC (MIL) ; fraction à la vitesse de référence ; échelle de la vitesse où la poussée s'annule</td></tr>
+      <tr><td class="num">+0x69</td><td>capacité carburant (copiée en carburant courant <code>+0x6D</code> ; à 0 → extinction moteur)</td></tr>
+      <tr><td class="num">+0x33</td><td>coefficient de consommation</td></tr>
+      <tr><td class="num">+0x37 / +0x3B</td><td>traînée ajoutée par l'aérofrein / par le train sorti</td></tr>
+      <tr><td class="num">+0x3F / +0x43</td><td>traînée au sol (roulage), et son supplément aérofrein sorti</td></tr>
+      <tr><td class="num">+0x4B</td><td>angle d'incidence de décrochage (u8, degrés)</td></tr>
+      <tr><td class="num">+0x4C / +0x4D</td><td>calage de l'aile (toujours ajouté à l'incidence) / incrément des volets</td></tr>
+      <tr><td class="num">+0x59</td><td>vitesse de référence (F-16 : 50 m/s) : sous elle, le taux de roulis diminue ; effet de sol</td></tr>
+      <tr><td class="num">+0x5D</td><td>coefficient de traînée induite</td></tr>
+      <tr><td class="num">+0x61</td><td>gain de portance / agilité de la cellule</td></tr>
+      <tr><td class="num">+0x71</td><td>taux de roulis maximal (°/s)</td></tr>
+      <tr><td class="num">+0x47</td><td>accélération de roulis maximale (°/s²)</td></tr>
+      <tr><td class="num">+0x80 / +0x82 / +0x84</td><td>vitesses de consigne de l'IA : poursuite max (déf. 500), min (100), croisière (231)</td></tr>
+      <tr><td class="num">+0x86</td><td>seuil de distance de l'IA (déf. 11005)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le modèle de vol complet (portance, traînée, poussée, asservissement) est décrit dans <code>PHYSICS.md</code> et <code>DATA_MODEL.md</code> §6.2.</p>
+</article>
+
+<!-- ============================ PROF ============================ -->
+<article class="mv" id="prof">
+  <header><span class="id">INTEL\&lt;nom&gt;.IFF</span><h2>Profil de pilote</h2></header>
+  <ul class="chips"><li>racine <b>FORM PROF</b></li><li>chargé pour <b>chaque pilote IA</b></li><li>jamais pour le joueur</li></ul>
+  <p>Le nom vient du chunk <code>CAST</code> de la mission : un pilote nommé <code>STERN</code> charge <code>INTEL\STERN.IFF</code>. Le fichier contient sa voix radio et son comportement.</p>
+  <pre class="tpl">FORM PROF
+ ├─ VERS   u16 (= 2)
+ ├─ FORM RADI                      la radio
+ │   ├─ SPCH  u8 (optionnel)       jeu de voix INTEL\SPEECH\*.PAK
+ │   ├─ INFO  u16 id + nom + indicatif (chaînes C)
+ │   ├─ OPTS  lettres : ordres/questions qu'on peut lui adresser
+ │   └─ MSGS  (u8 index, chaîne C)… : répliques (index partagés dans tout le jeu)
+ └─ FORM _AI_                      le comportement
+     ├─ AI\0_ marqueur vide
+     ├─ MVRS  table de manœuvres pondérées (voir MVRS_MANOEUVRES.html)
+     ├─ GOAL  jusqu'à 10 sélecteurs de comportement
+     └─ ATRB  10 octets d'attributs, 0 à 16</pre>
+  <h3>ATRB, dans l'ordre du fichier</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Code</th><th>Attribut (0 → 16)</th><th>Défaut</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td class="num">TH</td><td>Trigger Happy : prudent → tire facilement</td><td class="num">8</td></tr>
+      <tr><td class="num">1</td><td class="num">CN</td><td>Confidence : s'effraie → impossible à effrayer</td><td class="num">8</td></tr>
+      <tr><td class="num">2</td><td class="num">VB</td><td>Verbosity : muet → bavard</td><td class="num">8</td></tr>
+      <tr><td class="num">3</td><td class="num">LY</td><td>Loyalty : n'obéit jamais → obéit toujours</td><td class="num">8</td></tr>
+      <tr><td class="num">4</td><td class="num">FL</td><td>Flying : pilotage</td><td class="num">10</td></tr>
+      <tr><td class="num">5</td><td class="num">AG</td><td>Air-to-Ground</td><td class="num">10</td></tr>
+      <tr><td class="num">6</td><td class="num">AA</td><td>Air-to-Air</td><td class="num">10</td></tr>
+      <tr><td class="num">7</td><td class="num">SM</td><td>Showmanship : démonstratif</td><td class="num">8</td></tr>
+      <tr><td class="num">8</td><td class="num">AR</td><td>Aggressiveness : prudent → agressif</td><td class="num">8</td></tr>
+      <tr><td class="num">9</td><td>—</td><td>sans nom connu, écrêté à 3</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p>Validé sur Billy : <code>10,14,12,13,15,9,15,16,15</code> = valeurs du manuel. Détail : <code>AI_SYSTEM.md</code>.</p>
+</article>
+
+<!-- ============================ MISN ============================ -->
+<section id="misn">
+  <h2 class="sec">La mission : FORM MISN</h2>
+  <p>Une mission est construite comme une <b>pièce de théâtre</b> : <code>CAST</code> = la distribution (les pilotes), <code>PLAY</code> = la pièce, découpée en <code>SCNE</code> = scènes, <code>PROG</code> = les didascalies (scripts). Les chunks sont lus dans cet ordre par <code>MissionScenario_LoadMainRecord_A8331</code> :</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Chunk</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num">VERS</td><td>version u16 ; fatale si &lt; 0x500</td></tr>
+      <tr><td class="num">2</td><td class="num">NAME</td><td>nom de la mission (≤ 16 caractères, défaut « UNK »)</td></tr>
+      <tr><td class="num">3</td><td class="num">TUNE</td><td>piste musicale (u8)</td></tr>
+      <tr><td class="num">4</td><td class="num">WRLD</td><td>sous-FORM obligatoire : <code>FILE</code> = nom du monde (8 car.), ou monde en ligne</td></tr>
+      <tr><td class="num">5</td><td class="num"><a href="#cast">CAST</a></td><td>noms de pilotes</td></tr>
+      <tr><td class="num">6</td><td class="num"><a href="#area">AREA</a></td><td>zones géographiques</td></tr>
+      <tr><td class="num">7</td><td class="num"><a href="#spot">SPOT</a></td><td>points rattachés à une zone</td></tr>
+      <tr><td class="num">8</td><td class="num">NUMS</td><td>variables numériques du script</td></tr>
+      <tr><td class="num">9</td><td class="num">MSGS</td><td>messages</td></tr>
+      <tr><td class="num">10</td><td class="num">FLAG</td><td>drapeaux d'événement</td></tr>
+      <tr><td class="num">11</td><td class="num">PROG</td><td>scripts (bytecode de la VM de mission, taille paire)</td></tr>
+      <tr><td class="num">12</td><td class="num"><a href="#part">PART</a></td><td>objets de la mission</td></tr>
+      <tr><td class="num">13</td><td class="num">TEAM</td><td>équipe du joueur (≤ 8 entrées de 2 o)</td></tr>
+      <tr><td class="num">14</td><td class="num"><a href="#scne">PLAY</a></td><td>FORM contenant les scènes <code>SCNE</code></td></tr>
+      <tr><td class="num">15</td><td class="num">LOAD</td><td>emport</td></tr>
+      <tr><td class="num">16</td><td class="num"><a href="#autres">HOME</a></td><td>base de départ : zone + position</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============================ CAST ============================ -->
+<article class="mv" id="cast">
+  <header><span class="id">CAST</span><h2>Noms de pilotes</h2></header>
+  <ul class="chips"><li>enregistrements <b>9 o</b></li><li>nombre = taille ÷ 9</li><li>lecteur <b>PLAY_LoadCASTTeamNames_A9956</b></li></ul>
+  <div class="grid2">
+    <div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0x00</td><td class="num">char[8]</td><td>nom (<code>PLAYER</code>, <code>STERN</code>, <code>NULL</code>, <code>TEAM0</code>…)</td></tr>
+          <tr><td class="num">0x08</td><td class="num">u8</td><td>zéro de fin</td></tr>
+        </tbody>
+      </table></div>
+      <p>Chaque objet <code>PART</code> désigne son pilote par un index dans cette liste. Le nom décide qui le pilote :</p>
+      <ul>
+        <li><code>PLAYER</code> → le joueur, sans profil ;</li>
+        <li><code>NETWORK</code> → un joueur en réseau ;</li>
+        <li>tout autre nom → une IA, profil chargé depuis <code>INTEL\&lt;nom&gt;.IFF</code>.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Les ailiers : TEAM0, TEAM1, TEAM2</h3>
+      <p>À la lecture, tout nom <code>TEAMn</code> est <b>remplacé sur place</b> :</p>
+      <ol class="phases">
+        <li><span>1</span><div>mission lancée depuis la campagne et n &lt; 3 → n-ième nom du chunk <code>TEAM</code> de <code>OP2MISN.IFF</code> : <b>les ailiers choisis par le joueur</b> ;</div></li>
+        <li><span>2</span><div>n ≥ 3 → le nom reste <code>TEAMn</code> ;</div></li>
+        <li><span>3</span><div>mission chargée hors campagne → tous les <code>TEAMn</code> deviennent <b><code>BILLY</code></b>.</div></li>
+      </ol>
+      <p>Ex. <code>TEAM0</code> remplacé par <code>BILLY</code> charge <code>INTEL\BILLY.IFF</code>.</p>
+    </div>
+  </div>
+</article>
+
+<!-- ============================ AREA ============================ -->
+<article class="mv" id="area">
+  <header><span class="id">AREA</span><h2>Zones géographiques</h2></header>
+  <ul class="chips"><li>enregistrements <b>49 / 53 / 65 o</b> selon la forme</li><li>pas de compteur</li><li>lecteur <b>ExprSlot_ConstructMain_A974A</b></li></ul>
+  <p>Une zone est un <b>volume nommé</b> : sphère, cylindre vertical ou boîte. Le jeu s'en sert pour savoir dans quelle zone se trouve le joueur (et donc quelle scène activer), et comme origine des <code>SPOT</code> et des objets <code>PART</code>. La première lettre de l'enregistrement donne la forme, donc sa taille.</p>
+  <div class="grid2">
+    <div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0x00</td><td class="num">u8</td><td>forme : <code>'S'</code>, <code>'C'</code> ou <code>'B'</code></td></tr>
+          <tr><td class="num">0x01</td><td class="num">char[32]</td><td>nom (ex. « Strike Base »)</td></tr>
+          <tr><td class="num">0x21</td><td class="num">i32</td><td>référence <b>X</b> ÷ 256</td></tr>
+          <tr><td class="num">0x25</td><td class="num">i32</td><td>référence <b>Z</b> ÷ 256</td></tr>
+          <tr><td class="num">0x29</td><td class="num">i32</td><td>référence <b>Y</b> (altitude) ÷ 256</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Suite selon la forme (÷ 256 → m)</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Forme</th><th>Champs</th><th>Taille</th></tr></thead>
+        <tbody>
+          <tr><td class="num">'S' sphère</td><td><code>0x2D</code> rayon</td><td class="num">49</td></tr>
+          <tr><td class="num">'C' cylindre</td><td><code>0x2D</code> hauteur, <code>0x31</code> rayon</td><td class="num">53</td></tr>
+          <tr><td class="num">'B' boîte</td><td><code>0x2D</code> +X, <code>0x31</code> −X, <code>0x35</code> +Z, <code>0x39</code> −Z, <code>0x3D</code> hauteur</td><td class="num">65</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 600 300" role="img" aria-label="Les trois formes de zone et leur point de référence">
+          <text class="g-title" x="100" y="22" text-anchor="middle">Sphère 'S'</text>
+          <text class="g-title" x="300" y="22" text-anchor="middle">Cylindre 'C'</text>
+          <text class="g-title" x="500" y="22" text-anchor="middle">Boîte 'B'</text>
+          <!-- sol -->
+          <line class="g-ground" x1="10" y1="250" x2="590" y2="250"/>
+          <!-- sphère -->
+          <circle class="g-path" cx="100" cy="150" r="70"/>
+          <ellipse class="g-hz" cx="100" cy="150" rx="70" ry="18"/>
+          <line class="g-lim" x1="100" y1="150" x2="170" y2="150"/>
+          <text class="g-lbl-a" x="122" y="143">rayon</text>
+          <circle class="g-ph" cx="100" cy="150" r="5"/>
+          <text class="g-lbl" x="100" y="275" text-anchor="middle">référence = centre</text>
+          <!-- cylindre -->
+          <ellipse class="g-path" cx="300" cy="80" rx="62" ry="15"/>
+          <line class="g-path" x1="238" y1="80" x2="238" y2="210"/>
+          <line class="g-path" x1="362" y1="80" x2="362" y2="210"/>
+          <path class="g-path" d="M238 210 A62 15 0 0 0 362 210"/>
+          <path class="g-hz" d="M238 210 A62 15 0 0 1 362 210"/>
+          <line class="g-lim" x1="300" y1="210" x2="362" y2="210"/>
+          <text class="g-lbl-a" x="318" y="204">rayon</text>
+          <line class="g-lim" x1="380" y1="80" x2="380" y2="210"/>
+          <text class="g-lbl-a" x="386" y="150">hauteur</text>
+          <circle class="g-ph" cx="300" cy="210" r="5"/>
+          <text class="g-lbl" x="300" y="275" text-anchor="middle">référence = centre du plancher</text>
+          <!-- boîte -->
+          <path class="g-path" d="M430 210 L560 210 L585 190 L455 190 Z"/>
+          <path class="g-path" d="M430 90 L560 90 L585 70 L455 70 Z"/>
+          <line class="g-path" x1="430" y1="90" x2="430" y2="210"/>
+          <line class="g-path" x1="560" y1="90" x2="560" y2="210"/>
+          <line class="g-path" x1="585" y1="70" x2="585" y2="190"/>
+          <line class="g-hz" x1="455" y1="70" x2="455" y2="190"/>
+          <circle class="g-ph" cx="480" cy="200" r="5"/>
+          <line class="g-lim" x1="480" y1="228" x2="560" y2="228"/>
+          <line class="g-lim" x1="430" y1="228" x2="480" y2="228"/>
+          <text class="g-lbl-a" x="520" y="242" text-anchor="middle">+X</text>
+          <text class="g-lbl-a" x="455" y="242" text-anchor="middle">−X</text>
+          <text class="g-lbl" x="500" y="275" text-anchor="middle">référence au plancher</text>
+          <text class="g-lbl" x="500" y="292" text-anchor="middle">±X, ±Z asymétriques</text>
+        </svg>
+      </div>
+      <figcaption>Point de référence (orange) de chaque forme. Toutes les bornes sont incluses.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>Test « le point est-il dans la zone ? »</h3>
+    <ul>
+      <li><b>Sphère</b> : distance 3D au centre ≤ rayon.</li>
+      <li><b>Cylindre</b> : <code>Y ≤ y ≤ Y + hauteur</code> et distance dans le plan X/Z ≤ rayon.</li>
+      <li><b>Boîte</b> : <code>X − (−X) ≤ x ≤ X + (+X)</code>, <code>Z − (−Z) ≤ z ≤ Z + (+Z)</code>, <code>Y ≤ y ≤ Y + hauteur</code>.</li>
+      <li>À chaque tick, le jeu teste la position du joueur contre les zones des scènes actives et prend la <b>première</b> qui la contient.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ SPOT ============================ -->
+<article class="mv" id="spot">
+  <header><span class="id">SPOT</span><h2>Points rattachés à une zone</h2></header>
+  <ul class="chips"><li>enregistrements <b>14 o</b></li><li>nombre = taille ÷ 14</li><li>lecteur <b>Mission_LoadSpotList_AA6C9</b></li></ul>
+  <div class="grid2">
+    <div>
+      <p>Un spot est une <b>destination</b> pour les ordres de mission (aller à, défendre…). Ce n'est pas la zone qui référence un spot : c'est le spot qui pointe vers sa zone, et sa position est <b>relative</b> au point de référence de la zone.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0x00</td><td class="num">u16</td><td>index de la zone <code>AREA</code></td></tr>
+          <tr><td class="num">0x02</td><td class="num">i32</td><td>décalage <b>X</b> ÷ 256</td></tr>
+          <tr><td class="num">0x06</td><td class="num">i32</td><td>décalage <b>Z</b> ÷ 256</td></tr>
+          <tr><td class="num">0x0A</td><td class="num">i32</td><td>décalage <b>Y</b> ÷ 256</td></tr>
+        </tbody>
+      </table></div>
+      <pre class="tpl">position = décalage + référence(zone)   si la zone existe
+position = décalage                     sinon (coordonnées absolues)</pre>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 420 240" role="img" aria-label="Un spot est décalé par rapport au point de référence de sa zone">
+          <text class="g-title" x="20" y="24">Vue de dessus (plan X/Z)</text>
+          <rect class="g-hz" x="40" y="60" width="200" height="140" rx="4"/>
+          <text class="g-lbl" x="48" y="78">zone AREA</text>
+          <circle class="g-ph" cx="140" cy="130" r="6"/>
+          <text class="g-lbl" x="120" y="156">référence</text>
+          <line class="g-path" x1="140" y1="130" x2="330" y2="80"/>
+          <circle class="g-tgt" cx="330" cy="80" r="7"/>
+          <text class="g-lbl-t" x="342" y="84">SPOT</text>
+          <text class="g-lbl-a" x="215" y="96">décalage (X, Z)</text>
+          <line class="g-frame" x1="30" y1="220" x2="80" y2="220"/>
+          <text class="g-lbl" x="86" y="224">X →</text>
+        </svg>
+      </div>
+      <figcaption>Un décalage (0, 0, 0) tombe exactement sur la référence de la zone (centre de la sphère, centre du plancher sinon).</figcaption>
+    </figure>
+  </div>
+</article>
+
+<!-- ============================ PART ============================ -->
+<article class="mv" id="part">
+  <header><span class="id">PART</span><h2>Objets de la mission</h2></header>
+  <ul class="chips"><li>enregistrements <b>62 o fixes</b></li><li>nombre = taille ÷ 62</li><li>lecteur <b>PartEntry_LoadAndResolveNames_A9E3C</b></li><li>activation <b>PartEntry_ResolveSpawnPositionAndActivate_51EDC</b></li></ul>
+  <p>Chaque enregistrement décrit un objet : avion, véhicule, base, repère de piste. Il dit quel modèle charger, quel pilote, où et comment le faire apparaître, son camp et ses scripts. L'objet n'existe dans le monde qu'une fois <b>activé</b> (par sa scène ou par le script).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0x00</td><td class="num">u16</td><td>index <code>CAST</code> : le pilote</td></tr>
+      <tr><td class="num">0x02</td><td class="num">char[8]</td><td><b>type d'objet</b> = fichier <code>OBJECTS\&lt;type&gt;.IFF</code> (ex. <code>F-16DES</code>, <code>MIG21</code>)</td></tr>
+      <tr><td class="num">0x0A</td><td class="num">char[8]</td><td><b>type de remplacement</b> une fois détruit</td></tr>
+      <tr><td class="num">0x12</td><td class="num">char[8]</td><td>nom chargé dans un composant de l'entité — rôle non tranché</td></tr>
+      <tr><td class="num">0x1A</td><td class="num">u16</td><td>index de la zone <code>AREA</code></td></tr>
+      <tr><td class="num">0x1C</td><td class="num">u8</td><td><b>mode de placement</b> : 0 = relatif à la zone, ≠ 0 = relatif au joueur</td></tr>
+      <tr><td class="num">0x1D / 0x21 / 0x25</td><td class="num">i32 ×3</td><td>décalage <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256</td></tr>
+      <tr><td class="num">0x29</td><td class="num">i16</td><td><b>cap</b> en degrés (absolu, ou ajouté au cap du joueur)</td></tr>
+      <tr><td class="num">0x2B</td><td class="num">i16</td><td><b>vitesse initiale</b> (0 = à l'arrêt) — unité non prouvée, m/s probable</td></tr>
+      <tr><td class="num">0x2D</td><td class="num">u8</td><td><b>camp</b> : 1 = allié, 0xFF = ennemi, autre = neutre</td></tr>
+      <tr><td class="num">0x2E</td><td class="num">u8</td><td><b>allié à suivre</b> par défaut (index <code>PART</code>)</td></tr>
+      <tr><td class="num">0x2F</td><td class="num">u8</td><td>inutilisé</td></tr>
+      <tr><td class="num">0x30 / 0x32 / 0x34</td><td class="num">i16 ×3</td><td><b>poste en formation</b> derrière l'allié : côté (X), avant (Z), haut (Y), mètres</td></tr>
+      <tr><td class="num">0x36 … 0x3C</td><td class="num">u16 ×4</td><td>scripts <code>PROG</code> : à l'activation, à chaque tick, à la destruction, à l'initialisation</td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div>
+      <h3>À l'activation</h3>
+      <ol class="phases">
+        <li><span>1</span><div><b>Modèle</b> : le type normal, ou le type de remplacement si l'objet a déjà été détruit (ses scripts sont alors effacés). Nom vide → rien n'apparaît.</div></li>
+        <li><span>2</span><div><b>Position</b> : mode 0 → référence de la zone + décalage (comme un <code>SPOT</code>), cap absolu. Mode ≠ 0 → décalage exprimé dans le repère de l'avion du joueur (X côté, Z vers le nez, Y vers le haut de l'avion), cap = cap du joueur + cap du fichier.</div></li>
+        <li><span>3</span><div>L'objet apparaît <b>à plat</b> (seulement tourné autour de la verticale), avec sa vitesse initiale le long du nez.</div></li>
+        <li><span>4</span><div>Un <b>avion à vitesse nulle</b> est posé <b>au sol, train sorti</b>.</div></li>
+        <li><span>5</span><div>Camp copié, ordre « suivre » donné vers l'allié, compteur d'objets actifs du camp incrémenté.</div></li>
+      </ol>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 420 250" role="img" aria-label="Placement relatif au joueur">
+          <text class="g-title" x="20" y="24">Mode ≠ 0 : relatif au joueur (vue de dessus)</text>
+          <polygon class="g-me" points="210,90 196,140 210,130 224,140"/>
+          <text class="g-lbl" x="232" y="128">joueur</text>
+          <line class="g-lim" x1="210" y1="110" x2="210" y2="40"/>
+          <text class="g-lbl-a" x="216" y="48">Z (nez)</text>
+          <line class="g-lim" x1="210" y1="110" x2="300" y2="110"/>
+          <text class="g-lbl-a" x="304" y="114">X (côté)</text>
+          <line class="g-path" x1="210" y1="110" x2="120" y2="190"/>
+          <polygon class="g-tgt" points="120,175 110,205 120,198 130,205"/>
+          <text class="g-lbl-t" x="40" y="222">objet PART</text>
+          <text class="g-lbl" x="140" y="160">décalage</text>
+        </svg>
+      </div>
+      <figcaption>Le décalage tourne avec le joueur : un objet placé « 500 m derrière » apparaît toujours derrière lui, quel que soit son cap.</figcaption>
+    </figure>
+  </div>
+  <p class="note"><b>Drapeaux d'exécution</b> (pas sur disque, champ <code>+0x39</code> de l'entrée) : bit 0 actif ; bit 1 détruit ; bit 4 visible sur la carte de navigation ; bit 5 accompagne le joueur au pilote automatique.</p>
+</article>
+
+<!-- ============================ SCNE ============================ -->
+<article class="mv" id="scne">
+  <header><span class="id">PLAY / SCNE</span><h2>Scènes</h2></header>
+  <ul class="chips"><li>FORM <b>PLAY</b> → N chunks <b>SCNE</b> (≤ 32)</li><li>en-tête <b>24 o</b> + liste d'objets</li><li>lecteur <b>MissionPlay_LoadScenes_AA595</b></li></ul>
+  <p>Une scène est un morceau de la mission rattaché à une zone : quand le joueur entre dans la zone, la scène s'active, fait apparaître ses objets et lance son script.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Octet</th><th>Type</th><th>Champ</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0x00</td><td class="num">u8</td><td>active au départ</td></tr>
+      <tr><td class="num">0x01</td><td class="num">u16</td><td>index de la zone <code>AREA</code> (−1 = scène globale)</td></tr>
+      <tr><td class="num">0x03 / 0x05 / 0x07</td><td class="num">i16 ×3</td><td>scripts <code>PROG</code> : à l'activation, en quittant, à chaque tick (−1 = aucun)</td></tr>
+      <tr><td class="num">0x09</td><td class="num">u8</td><td>a sa propre position (1) ou utilise la zone (0)</td></tr>
+      <tr><td class="num">0x0A</td><td class="num">u16</td><td>candidat : cap en degrés (180 / 0 observés) — non tracé</td></tr>
+      <tr><td class="num">0x0C / 0x10 / 0x14</td><td class="num">i32 ×3</td><td>position <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256</td></tr>
+      <tr><td class="num">0x18 …</td><td class="num">u16 × n</td><td><b>liste d'objets</b> : index dans <code>PART</code>, n = (taille − 24) ÷ 2</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Exemple : MISN-1A « Mauritania »</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Scène</th><th>Zone</th><th>Scripts</th><th>Objets</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>globale</td><td>tick : 1</td><td>PLAYER, STRIBASE, STERN</td></tr>
+      <tr><td class="num">1</td><td>Strike Base</td><td>—</td><td>repère de piste</td></tr>
+      <tr><td class="num">2</td><td>Restricted Airspace</td><td>—</td><td>MiG-21 ×3</td></tr>
+      <tr><td class="num">3</td><td>Nouakchott</td><td>—</td><td>—</td></tr>
+      <tr><td class="num">4</td><td>Cargo Destination</td><td>—</td><td>repère de piste</td></tr>
+      <tr><td class="num">5</td><td>Rendezvous</td><td>activation : 13 (fait apparaître le C-130)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ AUTRES ============================ -->
+<article class="mv" id="autres">
+  <header><span class="id">HOME · TEAM · PROG · …</span><h2>Autres chunks de la mission</h2></header>
+  <dl class="vocab">
+    <dt><code>HOME</code></dt><dd>u16 index de la zone de départ, puis 3 i32 : position <b>X</b>, <b>Z</b>, <b>Y</b> ÷ 256.</dd>
+    <dt><code>TEAM</code></dt><dd>l'équipe du joueur (≤ 8 entrées de 2 o) : presque toujours le joueur et les objets qui l'accompagnent.</dd>
+    <dt><code>PROG</code></dt><dd>les scripts de la mission, en bytecode de la VM de mission (opcodes décrits dans <code>MISSION_SCRIPT_OPCODES.md</code>). <code>PART</code> et <code>SCNE</code> y renvoient par numéro.</dd>
+    <dt><code>NUMS</code> / <code>FLAG</code></dt><dd>variables numériques et drapeaux d'événement du script.</dd>
+    <dt><code>MSGS</code></dt><dd>messages affichés ou dits pendant la mission.</dd>
+    <dt><code>LOAD</code></dt><dd>emport.</dd>
+    <dt><code>TUNE</code></dt><dd>piste musicale de la mission.</dd>
+  </dl>
+</article>
+
+<!-- ============================ WRLD ============================ -->
+<article class="mv" id="wrld">
+  <header><span class="id">FORM WRLD</span><h2>Le monde</h2></header>
+  <ul class="chips"><li>fichier <b>MISSIONS\&lt;FILE&gt;.IFF</b></li><li>lecteur <b>MissionLoader_LoadEntitiesMain_A767F</b></li></ul>
+  <p>Le chunk <code>WRLD/FILE</code> de la mission donne le nom du monde (ex. <code>MAURITAN</code>), dans le même dossier que la mission.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">INFO</td><td>métadonnées (u16)</td></tr>
+      <tr><td class="num">PALT</td><td>palette → <code>DATA\PALETTE.IFF</code></td></tr>
+      <tr><td class="num">TERA</td><td><b>nom du terrain</b> → <code>DATA\&lt;nom&gt;.PAK</code></td></tr>
+      <tr><td class="num">SKYS</td><td>ciel et soleil (couleur, direction, intensité)</td></tr>
+      <tr><td class="num">GLNT</td><td>reflets du soleil (eau, métal)</td></tr>
+      <tr><td class="num">SMOK</td><td>jeu d'effets de fumée</td></tr>
+      <tr><td class="num">LGHT</td><td>éclairage (14 o)</td></tr>
+      <tr><td class="num">HORZ</td><td>horizon (2 × u32)</td></tr>
+      <tr><td class="num">SCAL</td><td>échelle du monde (u32)</td></tr>
+      <tr><td class="num">FORM CAMR</td><td><a href="#camr">caméras scriptées</a></td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ TERRAIN ============================ -->
+<article class="mv" id="terrain">
+  <header><span class="id">DATA\&lt;théâtre&gt;.PAK</span><h2>Le terrain</h2></header>
+  <ul class="chips"><li>archive <b>PAK</b>, 7 sous-ressources</li><li>grille <b>18 × 18</b> cellules</li><li><b>20 × 20</b> sommets par cellule</li></ul>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Ressource</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td class="num">FORM TERA</td><td>descripteur : <code>VERS</code>, <code>INFO</code>, <code>FORM BLOX</code> (<code>ELEV</code>, <code>ATRI</code>, <code>OBJS</code> : dimensions et noms des fichiers suivants), <code>FORM TXMS</code> (textures du sol par niveau de détail)</td></tr>
+      <tr><td class="num">1</td><td class="num">.ELV</td><td>altitudes, détail fort : PAK de 324 cellules, chaque cellule 20 × 20 sommets × 6 o (<code>u16, u16 hauteur, u16</code>)</td></tr>
+      <tr><td class="num">2 / 3</td><td class="num">.MED / .LOW</td><td>idem, détail moyen / faible</td></tr>
+      <tr><td class="num">4</td><td class="num">.AVG</td><td>valeur moyenne par cellule</td></tr>
+      <tr><td class="num">5</td><td class="num">.TRI</td><td><b>pistes et aires d'aérodrome</b> posées sur le terrain</td></tr>
+      <tr><td class="num">6</td><td class="num">.OBJ</td><td>324 × u16, une valeur par cellule (rôle non tranché)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Géométrie d'une région .TRI</h3>
+  <pre class="tpl">en-tête     8 o    u16 nb_sommets, u16 nb_triangles, u16 grille, u16 taille_table
+sommets    13 o    i32 X, i32 Z, i32 Y (÷ 256 → m), u8 (rôle non figé)
+triangles  16 o    u8, u16 i0, u16 i1, u16 i2, u8 type, u16 couleur, 3 × (u8 u, u8 v)
+table      2 o ×n  listes [nombre, indices de triangles…] ; 0xFFFF = vide
+grille     2 o ×g² index spatial : chaque case renvoie à une liste de la table</pre>
+  <p>Toujours des <b>triangles</b> (pas de quadrilatères dans Strike Commander). Couleur <code>0xFF</code> et UV <code>(0xFF, 0xFF)</code> = face sans texture ; couleur 0x0E à 0x11 = face double.</p>
+</article>
+
+<!-- ============================ CAMR ============================ -->
+<article class="mv" id="camr">
+  <header><span class="id">FORM CAMR</span><h2>Caméras scriptées</h2></header>
+  <ul class="chips"><li>dans <b>WRLD</b></li><li>référence complète <b>CAMERA_SYSTEM.md</b></li></ul>
+  <p>Chaque sous-chunk décrit une caméra ; le jeu la sélectionne par son nom de 8 caractères.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Caméra</th></tr></thead>
+    <tbody>
+      <tr><td class="num">STRT</td><td>nom du jeu de caméras</td></tr>
+      <tr><td class="num">CHAS / CKPT</td><td>caméra de poursuite / cockpit (avec le nom d'art du cockpit, ex. <code>F16-CKPT</code>)</td></tr>
+      <tr><td class="num">VICT / TARG / WEAP / ROTA</td><td>vue de la victime, de la cible, de l'arme, rotative</td></tr>
+      <tr><td class="num">COMP</td><td>séquences scriptées : <code>STARTCAM</code>, <code>TAKEOFF</code>, <code>LANDING</code>, <code>AUTOPILT</code></td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tpl">0x00  char[8]  nom interne (CHASECAM, COCKPIT, VICTIM…)
+0x08  u16      drapeaux
+0x0A  char[8]  sujet (PLAYER)
+…     u32      plan lointain = 50 000 m ; u16 champ de vision = 40° ; plan proche ≈ 10
+…     u16 ×2   zone d'affichage 319 × 199
+COMP : script d'images clés (opcodes 1 o, décalages i32 ÷ 256), terminé par 0xFE + vue de reprise</pre>
+</article>
+
+<!-- ============================ PONTS ============================ -->
+<article class="mv" id="ponts">
+  <header><span class="id">OP2MISN · MISN2OP</span><h2>Ponts avec la campagne</h2></header>
+  <p>Les menus et la campagne vivent dans <code>OPTEST.EXE</code>. Les deux programmes se parlent par deux fichiers <code>FORM INVN</code>.</p>
+  <div class="grid2">
+    <div>
+      <h3>OP2MISN.IFF : campagne → mission</h3>
+      <div class="tablewrap"><table>
+        <tbody>
+          <tr><td class="num">INFO</td><td>description</td></tr>
+          <tr><td class="num">NAME</td><td>nom du pilote du joueur</td></tr>
+          <tr><td class="num">SNAM</td><td>escadrille</td></tr>
+          <tr><td class="num">CALL</td><td>indicatif</td></tr>
+          <tr><td class="num">TEAM</td><td>jusqu'à 3 noms d'ailiers (9 o) → remplacent <code>TEAM0..2</code> du <code>CAST</code></td></tr>
+          <tr><td class="num">PLYR</td><td>état des joueurs, rattaché aux objets</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h3>MISN2OP.IFF : mission → campagne</h3>
+      <div class="tablewrap"><table>
+        <tbody>
+          <tr><td class="num">INFO</td><td>8 o</td></tr>
+          <tr><td class="num">STAT</td><td>8 × u16 de statistiques</td></tr>
+          <tr><td class="num">JETS</td><td>un marqueur par F-16 de la mission</td></tr>
+          <tr><td class="num">KILL</td><td>par participant : deux compteurs et son nom <code>CAST</code></td></tr>
+          <tr><td class="num">EXIT</td><td>code de sortie de la mission (1 o)</td></tr>
+          <tr><td class="num">DIED</td><td>pertes par équipe</td></tr>
+          <tr><td class="num">SCOR</td><td>score</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</article>
+
+<section id="ouvert">
+  <h2 class="sec">Points ouverts</h2>
+  <ul>
+    <li><code>PART</code> : rôle du troisième nom (octet <code>0x12</code>) et unité exacte de la vitesse initiale.</li>
+    <li><code>SCNE</code> : le champ <code>0x0A</code> (cap ?) n'est pas tracé dans le code.</li>
+    <li>Terrain : rôle de <code>.OBJ</code> et de l'octet libre des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
+    <li>Objets : classes <code>RNWY</code>, <code>EXPL</code>, <code>DEBR</code> non lues.</li>
+    <li>ATRB : nom du 10ᵉ attribut.</li>
+    <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
+</script>
+</body>
+</html>
