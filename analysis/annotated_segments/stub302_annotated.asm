@@ -73,7 +73,7 @@ VROOMM_StubThunk_6BFFF	endp
 ; d'overlay actuellement charge en memoire. fileoff=29A70h, codesize=7CCh, nentries=9.
 ; ==============================================================================================
 VROOMM_StubThunk_6C004	proc far		; CODE XREF: IFF_LoadModelMain+F02P
-		jmp	Debris_LoadFieldMixB_9BDE9
+		jmp	Object_LoadExteChunk_9BDE9
 VROOMM_StubThunk_6C004	endp
 
 

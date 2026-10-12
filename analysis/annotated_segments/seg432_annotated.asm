@@ -4014,7 +4014,7 @@ loc_9F7BD:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+71j
 		lea	ax, [bp+var_C]
 		push	ax
 		push	large [bp+var_4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_9F7E8
@@ -4037,7 +4037,7 @@ loc_9F7EB:				; CODE XREF: PlayerComponent_FormatAndDisplay_9F784+37j
 		push	ds
 		push	offset aGun_0	; "GUN"
 		push	large [bp+var_4]
-		call	Roster_FindByNameOrder
+		call	DamageSys_CompareDamageToMax_43D9B
 		add	sp, 8
 		or	al, al
 		jz	short loc_9F829

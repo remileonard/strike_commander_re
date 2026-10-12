@@ -166,7 +166,7 @@ loc_75854:				; CODE XREF: LandingBehavior_Start_75746+C9j
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+11h]
 		push	large dword ptr	[bx+5Eh]
-		call	Roster_FindByNameOrder
+		call	DamageSys_CompareDamageToMax_43D9B
 		add	sp, 8
 		mov	[bp+var_1], al
 		push	1

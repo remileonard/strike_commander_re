@@ -8637,8 +8637,8 @@ CRT_MemFamily_Extra3	endp
 ; ==============================================================================================
 ; far — (cluster mémoire/chaînes, à approfondir si besoin).
 ; ==============================================================================================
-CRT_MemFamily_Extra4	proc far		; CODE XREF: Roster_FindByNameAndFlag+28P
-					; Roster_FindByNameOrder+28P ...
+CRT_MemFamily_Extra4	proc far		; CODE XREF: DamageSys_IsDamaged_43D43+28P
+					; DamageSys_CompareDamageToMax_43D9B+28P ...
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah

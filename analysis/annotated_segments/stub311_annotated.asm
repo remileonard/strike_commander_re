@@ -20,7 +20,7 @@ stru_6C1E0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A76o
 ; ==============================================================================================
 VROOMM_StubThunk_6C200	proc far		; CODE XREF: IFF_LoadModelMain+5A1P
 					; Aircraft_LoadEJECAndJINF_9D4F0+CP
-		jmp	Camera_Helper2_9D380
+		jmp	Armed_LoadFromIFF_9D380
 VROOMM_StubThunk_6C200	endp
 
 

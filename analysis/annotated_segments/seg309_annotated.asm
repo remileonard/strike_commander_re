@@ -518,7 +518,7 @@ VROOMM_StubThunk_6C439	endp
 ; far, thunk fixe VROOMM (jmp sub_9EBD7) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2C2E0h, codesize=1C61h, nentries=39.
 ; ==============================================================================================
-VROOMM_StubThunk_6C43E	proc far		; CODE XREF: Camera_Helper2_9D380+2FP
+VROOMM_StubThunk_6C43E	proc far		; CODE XREF: Armed_LoadFromIFF_9D380+2FP
 		jmp	PlayerComponent_ReleaseAndLoad_9EBD7
 VROOMM_StubThunk_6C43E	endp
 

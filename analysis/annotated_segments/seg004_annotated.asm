@@ -4024,7 +4024,7 @@ loc_A157:				; CODE XREF: seg004:1F70j seg004:1F89j
 		les	bx, [bp+6]
 		mov	bx, es:[bx+102h]
 		push	large dword ptr	[bx+5Eh]
-		call	Roster_SumAttributeB
+		call	DamageSys_SumDamage_43D0F
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_A187

@@ -1443,7 +1443,7 @@ loc_1F328:				; DATA XREF: seg339:0754o
 		push	ds
 		push	offset aRadio_1	; "RADIO"
 		push	large dword ptr	[di+5Eh]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

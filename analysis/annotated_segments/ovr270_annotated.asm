@@ -11,7 +11,7 @@ ovr270		segment	para public 'OVERLAY' use16
 ; ResourceRecord_SeekAndReadB_647B2/Memory_TypedFreeWrapper_5C6F3 répétés — variante de
 ; MissionText_LoadSubtitleRecord_87A60 (seg251).
 ; ==============================================================================================
-MissionText_LoadSubtitleRecordB_94710	proc far		; CODE XREF: VROOMM_StubThunk_6B8B5J MissionText_LoadSubtitleWithString_94A86+C5p	...
+MissionText_LoadSubtitleRecordB_94710	proc far		; CODE XREF: VROOMM_StubThunk_6B8B5J Model_LoadAppearance_94A86+C5p	...
 
 var_26		= dword	ptr -26h
 var_22		= dword	ptr -22h
@@ -370,9 +370,13 @@ MissionText_LoadSubtitleRecordB_94710	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine String_ConstructFromPtrLen, ResourceRecord_AllocateAndDecode_64C21 (seg193).
+; far, LECTEUR DE L'APPARENCE 3D (ex-MissionText_LoadSubtitleWithString, aucun rapport avec du
+; texte) : FORM APPR, avec soit un chunk FILE (apparence dans un autre fichier), soit FORM
+; POLY (INFO, AINF, VERT, FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…) via
+; MissionText_LoadSubtitleRecordB_94710. Appelé par IFF_LoadModelMain au niveau REAL (après
+; OBJT) et pour le FORM DAPR de la classe DURD.
 ; ==============================================================================================
-MissionText_LoadSubtitleWithString_94A86	proc far		; CODE XREF: VROOMM_StubThunk_6B8BAJ
+Model_LoadAppearance_94A86	proc far		; CODE XREF: VROOMM_StubThunk_6B8BAJ
 
 var_B8		= word ptr -0B8h
 var_5B		= dword	ptr -5Bh
@@ -401,7 +405,7 @@ arg_0		= word ptr  6
 		jmp	loc_94B95
 ; ���������������������������������������������������������������������������
 
-loc_94AB1:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+26j
+loc_94AB1:				; CODE XREF: Model_LoadAppearance_94A86+26j
 		push	0
 		push	large 454C4946h
 		push	si
@@ -412,7 +416,7 @@ loc_94AB1:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+26j
 		jmp	loc_94B82
 ; ���������������������������������������������������������������������������
 
-loc_94AC9:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+3Ej
+loc_94AC9:				; CODE XREF: Model_LoadAppearance_94A86+3Ej
 		mov	[bp+var_10], si
 		push	[bp+var_10]
 		lea	ax, [bp+var_E]
@@ -446,10 +450,10 @@ loc_94AC9:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+3Ej
 		jmp	short loc_94B3A
 ; ���������������������������������������������������������������������������
 
-loc_94B38:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+ABj
+loc_94B38:				; CODE XREF: Model_LoadAppearance_94A86+ABj
 		xor	ax, ax
 
-loc_94B3A:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B0j
+loc_94B3A:				; CODE XREF: Model_LoadAppearance_94A86+B0j
 		or	ax, ax
 		jz	short loc_94B57
 		push	si
@@ -465,12 +469,12 @@ loc_94B3A:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B0j
 		jmp	short loc_94B60
 ; ���������������������������������������������������������������������������
 
-loc_94B57:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+B6j
+loc_94B57:				; CODE XREF: Model_LoadAppearance_94A86+B6j
 		push	6003h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_94B60:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+CFj
+loc_94B60:				; CODE XREF: Model_LoadAppearance_94A86+CFj
 		mov	[bp+var_B8], 2E0h
 		lea	ax, [bp+var_B8]
 		push	ax
@@ -486,7 +490,7 @@ loc_94B73:
 		jmp	short loc_94B8E
 ; ���������������������������������������������������������������������������
 
-loc_94B82:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+40j
+loc_94B82:				; CODE XREF: Model_LoadAppearance_94A86+40j
 		push	si
 		push	cs
 		call	near ptr MissionText_LoadSubtitleRecordB_94710
@@ -494,18 +498,18 @@ loc_94B82:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+40j
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 
-loc_94B8E:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+FAj
+loc_94B8E:				; CODE XREF: Model_LoadAppearance_94A86+FAj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_94B95:				; CODE XREF: MissionText_LoadSubtitleWithString_94A86+28j
+loc_94B95:				; CODE XREF: Model_LoadAppearance_94A86+28j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		pop	si
 		leave
 		retf
-MissionText_LoadSubtitleWithString_94A86	endp
+Model_LoadAppearance_94A86	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

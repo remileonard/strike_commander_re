@@ -46,7 +46,7 @@ VROOMM_StubThunk_6B8B5	endp
 ; ==============================================================================================
 VROOMM_StubThunk_6B8BA	proc far		; CODE XREF: IFF_LoadModelMain+F5AP
 					; PlayerComponentVariantB_ConstructAndInit_9FBDE+42P
-		jmp	MissionText_LoadSubtitleWithString_94A86
+		jmp	Model_LoadAppearance_94A86
 VROOMM_StubThunk_6B8BA	endp
 
 stub270		ends

@@ -7,9 +7,11 @@ ovr307		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ReadFinalField_64B51 (×2) et String_ConstructFromFarPtrLen (×2).
+; far, LIT UN COMPOSANT DE DÉGÂTS (chunk SYSM) : uint8 résistance → +0, uint8 dégâts subis →
+; +1, chaîne nom → +2, chaîne second nom → +0x0B (String_ConstructFromFarPtrLen ×2).
+; Enregistrement mémoire de 20 o.
 ; ==============================================================================================
-Debris_LoadStringFields_9CBE0	proc far		; CODE XREF: VROOMM_StubThunk_6C110J Debris_LoadSubrecordWithRelease_9CCE5+7Ep
+DamageSys_LoadRecord_9CBE0	proc far		; CODE XREF: VROOMM_StubThunk_6C110J Aircraft_LoadDamageSystems_9CCE5+7Ep
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -45,7 +47,7 @@ arg_4		= word ptr  0Ah
 		pop	si
 		pop	bp
 		retf
-Debris_LoadStringFields_9CBE0	endp
+DamageSys_LoadRecord_9CBE0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -146,7 +148,7 @@ loc_9CCB4:
 		push	large dword ptr	es:[bx]
 		nop
 		push	cs
-		call	near ptr Debris_LoadSubrecordWithRelease_9CCE5
+		call	near ptr Aircraft_LoadDamageSystems_9CCE5
 		add	sp, 6
 		pop	bp
 		retf
@@ -158,9 +160,13 @@ Debris_ReleaseWrapper_9CCB3	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndReadB_647B2/ReadFieldGroupB_64A54 et libération typée.
+; far, LUE 2026-10-12. LECTEUR DES COMPOSANTS DE DÉGÂTS D'UN AVION (JETP, via
+; Debris_ReleaseWrapper_9CCB3 / VROOMM_StubThunk_6C12E, modèle +0x4E). FORM DAMG obligatoire
+; (sinon erreur C00Dh) contenant le chunk SYSM obligatoire (sinon C00Ch) : uint16 nombre, puis
+; nombre × enregistrement (DamageSys_LoadRecord_9CBE0) ; liste mémoire = +0 far ptr tableau de
+; 20 o, +4 nombre. Ne pas confondre avec le chunk commun DAMG (uint16 points de dégâts).
 ; ==============================================================================================
-Debris_LoadSubrecordWithRelease_9CCE5	proc far		; CODE XREF: VROOMM_StubThunk_6C11AJ Debris_ReleaseWrapper_9CCB3+2Ap
+Aircraft_LoadDamageSystems_9CCE5	proc far		; CODE XREF: VROOMM_StubThunk_6C11AJ Debris_ReleaseWrapper_9CCB3+2Ap
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -182,7 +188,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_9CD8A
 ; ���������������������������������������������������������������������������
 
-loc_9CD08:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+1Ej
+loc_9CD08:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+1Ej
 		push	0
 		push	large 4D535953h
 		push	si
@@ -214,28 +220,28 @@ loc_9CD08:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+1Ej
 		jmp	short loc_9CD6E
 ; ���������������������������������������������������������������������������
 
-loc_9CD5D:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+90j
+loc_9CD5D:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+90j
 		push	si
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr Debris_LoadStringFields_9CBE0
+		call	near ptr DamageSys_LoadRecord_9CBE0
 		add	sp, 6
 		inc	di
 		add	word ptr [bp+var_4], 14h
 
-loc_9CD6E:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+76j
+loc_9CD6E:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+76j
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+4], di
 		jg	short loc_9CD5D
 		jmp	short loc_9CD82
 ; ���������������������������������������������������������������������������
 
-loc_9CD79:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+36j
+loc_9CD79:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+36j
 		push	0C00Ch
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_9CD82:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+92j
+loc_9CD82:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+92j
 		push	si
 
 loc_9CD83:
@@ -245,17 +251,17 @@ loc_9CD88:
 		jmp	short loc_9CD92
 ; ���������������������������������������������������������������������������
 
-loc_9CD8A:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5+20j
+loc_9CD8A:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5+20j
 		push	0C00Dh
 		call	VROOMM_StubThunk_6B70F
 
-loc_9CD92:				; CODE XREF: Debris_LoadSubrecordWithRelease_9CCE5:loc_9CD88j
+loc_9CD92:				; CODE XREF: Aircraft_LoadDamageSystems_9CCE5:loc_9CD88j
 		pop	cx
 		pop	di
 		pop	si
 		leave
 		retf
-Debris_LoadSubrecordWithRelease_9CCE5	endp
+Aircraft_LoadDamageSystems_9CCE5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -1079,7 +1079,7 @@ int Goal_ExecuteAction(Entity* entity, int slot) {
 
 **Moral** (`AI_ComputeMorale_CD4A`, rangé dans `entité+0xF5`) : score de départ 100, puis
 - carburant : `+ 51 × restant / capacité − 50` ;
-- −100 si `Roster_SumAttributeB` de l'avion est non nul (sens de l'attribut non établi) ;
+- −100 si `DamageSys_SumDamage_43D0F` de l'avion est non nul (sens de l'attribut non établi) ;
 - −50 si l'ordre en cours ne peut pas être tenu (pas d'arme adaptée à la cible, pas de cible) ;
 - tant que des adversaires sont en vie : −8 par adversaire vivant, −32 par perte de son camp, et
   plafond à 79 ;
@@ -1580,7 +1580,7 @@ pour y répondre avec certitude plutôt que par extrapolation.*
 mécanisme d'alerte de danger, entièrement décodé :**
 
 - Calcule un **ratio de menace** via deux sommes sur une liste
-  d'enregistrements (`Roster_SumAttributeB × 100 / Roster_SumAttributeA`)
+  d'enregistrements (`DamageSys_SumDamage_43D0F × 100 / DamageSys_SumMaxPoints_43CDC`)
   — vraisemblablement un pourcentage de verrouillage/poursuite actif.
   Si > 80%, ou si la cible entre dans la portée du seuil capteur
   (`dword_7203D`), l'alerte se déclenche.

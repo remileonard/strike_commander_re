@@ -540,8 +540,8 @@ Méthode `+0x34` de la vtable secondaire de JDYN, appelée **en tête de chaque 
 (et par `JDYN_IsEngineDestroyed_47FCD`). Elle remet les 7 gains à 1,0, puis, pour chaque
 composant présent dans la liste de composants de l'avion :
 
-`gain = (B − A) / B`, avec `B` = somme de l'attribut B du composant (`Roster_SumFoundAttributeB`) et
-`A` = somme de l'attribut A (`Roster_SumFoundAttributeA`). Le gain vaut 1 pour un composant intact
+`gain = (B − A) / B`, avec `B` = somme de l'attribut B du composant (`DamageSys_MaxPointsOf_43E47`) et
+`A` = somme de l'attribut A (`DamageSys_DamageOf_43DF5`). Le gain vaut 1 pour un composant intact
 et descend vers 0 avec les dégâts. (Côté libRealSpace, ces attributs correspondent à ce que
 `SCPlane::system_health` stocke par composant : à vérifier côté données.)
 

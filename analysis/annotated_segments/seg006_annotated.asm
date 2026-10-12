@@ -2547,13 +2547,13 @@ word_CD32	dw	6,     7,     8,   10h ; DATA XREF: Radio_CanPlayMessage+30o
 ; Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25.
 ; CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye :
 ; 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100
-; ; pas de recalcul si Roster_SumAttributeA du roster de l'objet est nul ou si la capacite
-; carburant [avion+0x69] est nulle ; -100 si Roster_SumAttributeB non nul (sens de l'attribut
-; non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] - 0x32) ; -50 si
-; l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol 0xFC ou cible air
-; sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-air ; 0xAA suivre :
-; condition sur l'objet global word_706A0 non tracee) ; equilibre des camps (compteurs
-; word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par
+; ; pas de recalcul si DamageSys_SumMaxPoints_43CDC du roster de l'objet est nul ou si la
+; capacite carburant [avion+0x69] est nulle ; -100 si DamageSys_SumDamage_43D0F non nul (sens
+; de l'attribut non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] -
+; 0x32) ; -50 si l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol
+; 0xFC ou cible air sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-
+; air ; 0xAA suivre : condition sur l'objet global word_706A0 non tracee) ; equilibre des
+; camps (compteurs word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par
 ; PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94)
 ; : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire
 ; vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus
@@ -2605,7 +2605,7 @@ loc_CD84:
 		mov	word ptr [bp+var_6], dx
 		push	ax
 		push	dx
-		call	Roster_SumAttributeA
+		call	DamageSys_SumMaxPoints_43CDC
 		add	sp, 4
 		or	ax, ax
 		jnz	short loc_CD98
@@ -2632,7 +2632,7 @@ loc_CDAD:				; CODE XREF: AI_ComputeMorale_CD4A+5Fj
 
 loc_CDB4:				; CODE XREF: AI_ComputeMorale_CD4A+65j
 		push	large [bp+var_6]
-		call	Roster_SumAttributeB
+		call	DamageSys_SumDamage_43D0F
 		add	sp, 4
 		or	ax, ax
 		jz	short loc_CDC7

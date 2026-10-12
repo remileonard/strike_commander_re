@@ -131,7 +131,9 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <li><a href="#iff"><span>—</span><span>Le conteneur IFF</span></a></li>
     <li><a href="#carte"><span>—</span><span>Vue d'ensemble</span></a></li>
     <li><a href="#objets"><span>1</span><span>Objets 3D</span></a></li>
-    <li><a href="#communs"><span>1b</span><span>Destruction</span></a></li>
+    <li><a href="#arbo"><span>1a</span><span>Arborescence</span></a></li>
+    <li><a href="#jetp"><span>1b</span><span>Avion JETP</span></a></li>
+    <li><a href="#communs"><span>1c</span><span>Destruction</span></a></li>
     <li><a href="#dynm"><span>2</span><span>Dynamique d'avion</span></a></li>
     <li><a href="#prof"><span>3</span><span>Profil de pilote</span></a></li>
     <li><a href="#misn"><span>4</span><span>Mission MISN</span></a></li>
@@ -263,7 +265,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <thead><tr><th>FORM</th><th>Catégorie</th><th>Objet</th></tr></thead>
     <tbody>
       <tr><td class="num">BOBJ</td><td class="num">0</td><td>objet simple</td></tr>
-      <tr><td class="num">ORNT</td><td class="num">1</td><td>décor orienté (immeuble…) ; chunk <code>ANGL</code> = angle</td></tr>
+      <tr><td class="num">ORNT</td><td class="num">1</td><td>décor orienté (immeuble…) ; chunks communs + <code>ALGN</code></td></tr>
       <tr><td class="num">TRCR</td><td class="num">13</td><td>traçante</td></tr>
       <tr><td class="num">AFTB</td><td class="num">14</td><td>post-combustion</td></tr>
       <tr><td class="num">MOBL</td><td class="num">2</td><td>objet mobile</td></tr>
@@ -280,9 +282,9 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td class="num">DECY</td><td class="num">16</td><td>leurres</td></tr>
       <tr><td class="num">SWPN</td><td class="num"><b>19</b></td><td><b>défense fixe</b> : AA, SAM, navire</td></tr>
       <tr><td class="num">GRND</td><td class="num">20</td><td>objet au sol</td></tr>
-      <tr><td class="num">RNWY</td><td class="num">17</td><td>piste : décor orienté (chunks communs + <code>ANGL</code>)</td></tr>
+      <tr><td class="num">RNWY</td><td class="num">17</td><td>piste : décor orienté (chunks communs + <code>ALGN</code>)</td></tr>
       <tr><td class="num">EXPL</td><td class="num">15</td><td>explosion (chunks communs ; <code>DAMG</code> = dégâts par défaut)</td></tr>
-      <tr><td class="num">DEBR</td><td class="num">11</td><td>débris : <code>INFO</code> + une dynamique <code>DYNM</code> (il tombe)</td></tr>
+      <tr><td class="num">DEBR</td><td class="num">11</td><td>débris : <code>INFO</code> + chunks communs + une dynamique <code>DYNM</code> (il tombe)</td></tr>
       <tr><td class="num">SMKG</td><td class="num">18</td><td><b>générateur de fumée</b> (chunk <code>INFO</code> ci-dessous)</td></tr>
       <tr><td class="num">EJEC</td><td class="num">22</td><td>objet qui en <b>libère un autre</b> après un délai (siège éjectable → parachute, d'après le tag ; chunk <code>DATA</code> ci-dessous)</td></tr>
     </tbody>
@@ -299,7 +301,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td>auto-suppression</td><td>uint8</td><td class="num">1</td><td>1 = l'objet disparaît à la fin de la durée ; 0 = il s'arrête seulement</td></tr>
     </tbody>
   </table></div>
-  <p>Ce chunk est obligatoire. Le générateur lit aussi les chunks communs et <code>ANGL</code>.</p>
+  <p>Ce chunk est obligatoire. Le générateur lit ensuite les chunks communs et <code>ALGN</code>.</p>
   <h3>EJEC : le chunk DATA</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
@@ -329,8 +331,124 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <li><span>3</span><div><b>Jeu de fumées</b> : les modèles de fumée viennent du <a href="#fumees">jeu de fumées</a> nommé par le chunk <code>SMOK</code> du monde (<code>SMOKESET</code>). Sans jeu chargé, aucune fumée n'est émise (ni traînée, ni <code>SMKG</code>).</div></li>
   </ol>
   <p>Aucun de ces FORM trouvé : le chargement échoue (erreur 49173). Les chunks lus par la plupart des classes sont décrits dans la fiche suivante.</p>
-  <h3>Composants de dégâts d'un avion</h3>
-  <ul class="chips"><li>RUDDER</li><li>ELEVATOR</li><li>AILERON</li><li>LWING</li><li>RWING</li><li>ENGINE</li><li>LANDGEAR</li><li>FLAPS</li></ul>
+</article>
+
+<!-- ============================ ARBORESCENCE ============================ -->
+<article class="mv" id="arbo">
+  <header><span class="id">FORM REAL</span><h2>Arborescence d'un fichier objet selon sa classe</h2></header>
+  <ul class="chips"><li>lecteur <b>IFF_LoadModelMain</b></li><li>une seule classe par fichier</li></ul>
+  <p>Tous les fichiers d'objets ont la même enveloppe. Ce qui change, c'est le contenu du FORM de classe : chaque classe reprend les chunks d'une classe de base et en ajoute. Le jeu les cherche par leur tag, dans le niveau où ils sont rangés.</p>
+  <pre class="tpl">FORM REAL
+ ├─ FORM OBJT
+ │   ├─ FORM &lt;classe&gt;      une seule : BOBJ, ORNT, JETP… (chunks selon la classe, schéma ci-dessous)
+ │   └─ EXTE               facultatif : volumes de l'objet (format non détaillé)
+ └─ FORM APPR              apparence 3D : chunk FILE (dans un autre fichier) ou FORM POLY
+                           (INFO, AINF, VERT, FORM TRIS, FORM LINS, FORM SPRS, FORM TXMS…)</pre>
+  <h3>Chunks lus par chaque classe</h3>
+  <p>Une flèche va d'une classe de base vers une classe qui la reprend ; chaque case indique ce que la classe <b>ajoute</b>. Le nombre est la catégorie.</p>
+  <pre class="mermaid">flowchart LR
+  C["Chunks communs<br/>DAMG · TRGT · SIGN · EXPL · DEBR · DEST · CHLD"]
+  C --> BOBJ["BOBJ · 0<br/>(rien de plus)"]
+  C --> EXPL["EXPL · 15<br/>(rien de plus)"]
+  C --> ORNT["ORNT · 1<br/>+ ALGN"]
+  C --> MOBL["MOBL · 2<br/>+ FORM DYNM"]
+  ORNT --> RNWY["RNWY · 17"]
+  ORNT --> AFTB["AFTB · 14"]
+  ORNT --> XMIT["XMIT · 21"]
+  ORNT --> SWPN["SWPN · 19<br/>+ DATA"]
+  ORNT --> SMKG["SMKG · 18<br/>+ INFO"]
+  ORNT --> TRCR["TRCR · 13<br/>+ WDAT + INFO"]
+  ORNT --> PODR["PODR · 10<br/>+ WDAT + DATA"]
+  ORNT --> OMOB["OMOB · 3<br/>+ FORM DYNM + SMOK"]
+  MOBL --> DECY["DECY · 16<br/>+ DATA"]
+  MOBL --> DEBR["DEBR · 11<br/>+ INFO"]
+  OMOB --> EJEC["EJEC · 22<br/>+ DATA"]
+  OMOB --> GRND["GRND · 20<br/>+ 2e FORM DYNM ?"]
+  OMOB --> WEAP["WEAP · 7<br/>+ WDAT"]
+  OMOB --> GUID["GUID · 4<br/>+ pilote IA (aucun chunk)"]
+  WEAP --> MISS["MISS · 8<br/>+ DATA"]
+  WEAP --> BOMB["BOMB · 9<br/>+ DATA"]
+  BOMB --> DURD["DURD · 9<br/>+ FORM DAPR"]
+  GUID --> ARMG["ARMG · 5<br/>+ FORM WEAP"]
+  ARMG --> JETP["JETP · 6<br/>+ FORM DAMG + EJEC + JINF"]</pre>
+  <h3>Liste complète par classe</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Classe</th><th>Catégorie</th><th>Chunks dans le FORM de classe</th></tr></thead>
+    <tbody>
+      <tr><td class="num">BOBJ</td><td class="num">0</td><td>communs</td></tr>
+      <tr><td class="num">ORNT</td><td class="num">1</td><td>communs, ALGN</td></tr>
+      <tr><td class="num">MOBL</td><td class="num">2</td><td>communs, FORM DYNM</td></tr>
+      <tr><td class="num">OMOB</td><td class="num">3</td><td>communs, ALGN, FORM DYNM, SMOK</td></tr>
+      <tr><td class="num">GUID</td><td class="num">4</td><td>comme OMOB ; crée le pilote, exige la catégorie 6 : n'existe donc que dans JETP</td></tr>
+      <tr><td class="num">ARMG</td><td class="num">5</td><td>comme GUID, + FORM WEAP (INFO, HPTS, DCOY, WPNS : armement et points d'emport) ; même restriction</td></tr>
+      <tr><td class="num">JETP</td><td class="num">6</td><td>comme ARMG, + FORM DAMG (SYSM), EJEC, JINF</td></tr>
+      <tr><td class="num">WEAP</td><td class="num">7</td><td>communs, ALGN, FORM DYNM, SMOK, WDAT</td></tr>
+      <tr><td class="num">MISS</td><td class="num">8</td><td>comme WEAP, + DATA</td></tr>
+      <tr><td class="num">BOMB</td><td class="num">9</td><td>comme WEAP, + DATA</td></tr>
+      <tr><td class="num">DURD</td><td class="num">9</td><td>comme BOMB, + FORM DAPR (une seconde apparence 3D)</td></tr>
+      <tr><td class="num">PODR</td><td class="num">10</td><td>communs, ALGN, WDAT, DATA</td></tr>
+      <tr><td class="num">DEBR</td><td class="num">11</td><td>INFO, communs, FORM DYNM</td></tr>
+      <tr><td class="num">TRCR</td><td class="num">13</td><td>communs, ALGN, WDAT, INFO</td></tr>
+      <tr><td class="num">AFTB</td><td class="num">14</td><td>communs, ALGN</td></tr>
+      <tr><td class="num">EXPL</td><td class="num">15</td><td>communs</td></tr>
+      <tr><td class="num">DECY</td><td class="num">16</td><td>communs, FORM DYNM, DATA</td></tr>
+      <tr><td class="num">RNWY</td><td class="num">17</td><td>communs, ALGN</td></tr>
+      <tr><td class="num">SMKG</td><td class="num">18</td><td>INFO, communs, ALGN</td></tr>
+      <tr><td class="num">SWPN</td><td class="num">19</td><td>communs, ALGN, DATA</td></tr>
+      <tr><td class="num">GRND</td><td class="num">20</td><td>communs, ALGN, FORM DYNM, SMOK, puis un second appel au lecteur de dynamique (deuxième FORM DYNM ? à vérifier sur un fichier)</td></tr>
+      <tr><td class="num">XMIT</td><td class="num">21</td><td>communs, ALGN</td></tr>
+      <tr><td class="num">EJEC</td><td class="num">22</td><td>DATA, communs, ALGN, FORM DYNM, SMOK</td></tr>
+    </tbody>
+  </table></div>
+  <p>Les formats de <code>WDAT</code>, des <code>DATA</code> d'armes et du <code>FORM WEAP</code> ne sont pas encore décrits ici.</p>
+</article>
+
+<!-- ============================ JETP ============================ -->
+<article class="mv" id="jetp">
+  <header><span class="id">JETP</span><h2>Avion : composants de dégâts, siège éjectable, informations</h2></header>
+  <ul class="chips"><li>lecteur <b>Aircraft_LoadEJECAndJINF_9D4F0</b></li><li>dégâts <b>Aircraft_LoadDamageSystems_9CCE5</b></li></ul>
+  <h3>FORM DAMG → chunk SYSM : les composants de dégâts</h3>
+  <p>Le <code>FORM DAMG</code> et son chunk <code>SYSM</code> sont <b>obligatoires</b> pour un avion (sans eux, le chargement échoue). Ne pas confondre avec le chunk commun <code>DAMG</code>, qui n'est qu'un nombre de points de dégâts.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nombre</td><td>uint16</td><td class="num">2</td><td>nombre de composants</td></tr>
+      <tr><td>composants</td><td>chacun&nbsp;ci-dessous</td><td class="num">—</td><td>un enregistrement par composant</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Un composant</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>résistance</td><td>uint8</td><td class="num">1</td><td>points que le composant peut encaisser</td></tr>
+      <tr><td>dégâts</td><td>uint8</td><td class="num">1</td><td>dégâts déjà subis (valeur de départ)</td></tr>
+      <tr><td>nom</td><td>string</td><td class="num">n</td><td>terminé par un zéro (9 caractères au plus) : <code>FUEL</code>, <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code>, <code>ENGINE</code>, <code>LANDGEAR</code>, <code>FLAPS</code>…</td></tr>
+      <tr><td>second nom</td><td>string</td><td class="num">n</td><td>terminé par un zéro (9 caractères au plus) — rôle non établi</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le jeu retrouve un composant <b>par son nom</b>. Pour <code>FUEL</code>, <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code> et <code>ENGINE</code>, il calcule à chaque image un gain d'efficacité = (résistance − dégâts) ÷ résistance : 1 intact, 0 détruit (voir <code>PHYSICS.md</code>). <code>LANDGEAR</code> et <code>FLAPS</code> commandent le train et les volets. L'IA estime l'état de l'avion par la somme des dégâts ÷ la somme des résistances.</p>
+  <h3>Chunk EJEC (facultatif)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>siège éjectable</td><td>string</td><td class="num">n</td><td>nom de l'objet éjecté (un <code>OBJECTS\&lt;nom&gt;.IFF</code>, de classe <code>EJEC</code> probablement), terminé par un zéro</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Chunk JINF (facultatif)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th><th>Si absent</th></tr></thead>
+    <tbody>
+      <tr><td>info A</td><td>uint8</td><td class="num">1</td><td>rôle non établi</td><td class="num">0</td></tr>
+      <tr><td>info B</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td><td>—</td></tr>
+      <tr><td>info C</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td><td>—</td></tr>
+      <tr><td>classe de combat</td><td>uint8</td><td class="num">1</td><td>9 ou plus pour les chasseurs ; l'IA s'en sert pour choisir ses réactions et ses cibles</td><td class="num">2</td></tr>
+      <tr><td>info D</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td><td class="num">5</td></tr>
+      <tr><td>info E</td><td>uint8</td><td class="num">1</td><td>rôle non établi</td><td class="num">0</td></tr>
+      <tr><td>info F</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td><td>—</td></tr>
+      <tr><td>info G</td><td>uint8</td><td class="num">1</td><td>rôle non établi</td><td class="num">6</td></tr>
+      <tr><td>info H</td><td>uint16</td><td class="num">2</td><td>rôle non établi</td><td class="num">30</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ CHUNKS COMMUNS ============================ -->
@@ -349,7 +467,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <tr><td class="num">DEST</td><td>les objets laissés à la destruction, une épave par exemple (tableau ci-dessous)</td><td>rien</td></tr>
       <tr><td class="num">CHLD</td><td>les sous-objets attachés (tableau ci-dessous)</td><td>aucun</td></tr>
       <tr><td class="num">INFO</td><td>lu par <code>DEBR</code> : <code>uint16</code> rayon de collision, <code>uint8</code> drapeau, puis un second <code>uint8</code> si le drapeau n'est pas nul</td><td class="num">20, 0</td></tr>
-      <tr><td class="num">ANGL</td><td>lu par <code>ORNT</code> et <code>RNWY</code> : <code>uint8</code> angle</td><td class="num">0</td></tr>
+      <tr><td class="num">ALGN</td><td>lu par <code>ORNT</code> et toutes les classes qui en dérivent (voir l'arborescence) : <code>uint8</code> — rôle non établi (alignement, d'après le nom)</td><td class="num">0</td></tr>
     </tbody>
   </table></div>
 
@@ -1053,7 +1171,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <li><code>PART</code> : rôle du champ « composant » et unité exacte de la vitesse initiale.</li>
     <li><code>SCNE</code> : le champ « cap » (nom supposé) n'est pas tracé dans le code.</li>
     <li>Terrain : rôle de <code>.OBJ</code>, des « attribut A / B » des sommets d'altitude et de la « marque » des sommets <code>.TRI</code> ; placement des bâtiments d'aérodrome.</li>
-    <li>Objets : premier champ de <code>EJEC</code> ; deux paramètres de dessin des modèles de fumée ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
+    <li>Objets : formats de <code>WDAT</code>, des <code>DATA</code> d'armes, du <code>FORM WEAP</code> et de <code>EXTE</code> ; rôle de <code>ALGN</code> ; champs de <code>JINF</code> ; second nom des composants <code>SYSM</code> ; premier champ de <code>EJEC</code> ; deux paramètres de dessin des modèles de fumée ; usage de <code>TRGT</code> et <code>SIGN</code> ; ordre des angles de <code>CHLD</code> ; unité des vitesses des débris.</li>
     <li><code>ATRB</code> : nom du 10ᵉ attribut.</li>
     <li>Aucun fichier de mission réel n'est dans le dépôt : les formats <code>AREA</code>, <code>SPOT</code>, <code>PART</code> et <code>CAST</code> viennent du code seul.</li>
   </ul>

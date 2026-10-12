@@ -19,7 +19,7 @@ stru_6C0F0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0A56o
 ; d'overlay actuellement charge en memoire. fileoff=2AF50h, codesize=2A2h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6C110	proc far
-		jmp	Debris_LoadStringFields_9CBE0
+		jmp	DamageSys_LoadRecord_9CBE0
 VROOMM_StubThunk_6C110	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6C115	endp
 ; d'overlay actuellement charge en memoire. fileoff=2AF50h, codesize=2A2h, nentries=7.
 ; ==============================================================================================
 VROOMM_StubThunk_6C11A	proc far
-		jmp	Debris_LoadSubrecordWithRelease_9CCE5
+		jmp	Aircraft_LoadDamageSystems_9CCE5
 VROOMM_StubThunk_6C11A	endp
 
 

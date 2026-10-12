@@ -2709,7 +2709,7 @@ loc_49422:
 		push	offset aFlaps	; "FLAPS"
 		push	ax
 		push	dx
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax
@@ -2791,7 +2791,7 @@ locret_494DC:
 ; tete de PhysicsTicks. Remet les gains dword_72A14..72A2C a 1,0, puis pour chaque composant
 ; present dans le roster (FUEL -> 72A14, RUDDER -> 72A18, ELEVATOR -> 72A1C, AILERON -> 72A20,
 ; LWING+RWING -> 72A24 et 72A28, ENGINE -> 72A2C) : gain = (attribut B - attribut A) /
-; attribut B (Roster_SumFoundAttributeB / A). Les gains valent 1,0 quand le composant est
+; attribut B (DamageSys_MaxPointsOf_43E47 / A). Les gains valent 1,0 quand le composant est
 ; intact et baissent avec les dommages (DATA_MODEL.md les disait toujours a 1,0).
 ; ==============================================================================================
 JDYN_UpdateDamageGains_494DD:				; DATA XREF: seg339:22BEo
@@ -2819,14 +2819,14 @@ loc_49514:
 		push	offset aFuel_0	; "FUEL"
 		push	ax
 		push	dx
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_495B8
 		push	ds
 		push	offset aFuel_0	; "FUEL"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-0Ah], ax
@@ -2836,7 +2836,7 @@ loc_49514:
 		push	ds
 		push	offset aFuel_0	; "FUEL"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-10h], ax
@@ -2863,7 +2863,7 @@ loc_495B8:				; CODE XREF: seg103:1587j
 		push	ds
 		push	offset aRudder	; "RUDDER"
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 
 loc_495C5:
 		add	sp, 8
@@ -2874,7 +2874,7 @@ loc_495C5:
 loc_495CD:				; "RUDDER"
 		push	offset aRudder
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 
 loc_495D9:
 		add	sp, 8
@@ -2888,7 +2888,7 @@ loc_495E1:
 		push	ds
 		push	offset aRudder	; "RUDDER"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-10h], ax
@@ -2913,14 +2913,14 @@ loc_4963B:				; CODE XREF: seg103:160Aj
 		push	ds
 		push	offset aElevator ; "ELEVATOR"
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_496BE
 		push	ds
 		push	offset aElevator ; "ELEVATOR"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-0Ah], ax
@@ -2930,7 +2930,7 @@ loc_4963B:				; CODE XREF: seg103:160Aj
 		push	ds
 		push	offset aElevator ; "ELEVATOR"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-10h], ax
@@ -2959,7 +2959,7 @@ loc_496BE:				; CODE XREF: seg103:168Dj
 
 loc_496C2:
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 
 loc_496CB:
 		add	sp, 8
@@ -2974,7 +2974,7 @@ loc_496D6:
 		push	large dword ptr	[bp-4]
 
 loc_496DA:
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 
 loc_496E2:
@@ -2990,7 +2990,7 @@ loc_496E7:
 		push	ds
 		push	offset aAileron	; "AILERON"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-10h], ax
@@ -3013,14 +3013,14 @@ loc_49741:				; CODE XREF: seg103:1710j
 		push	ds
 		push	offset aLwing	; "LWING"
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_4976C
 		push	ds
 		push	offset aRwing	; "RWING"
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_4976C
@@ -3031,7 +3031,7 @@ loc_4976C:				; CODE XREF: seg103:1793j seg103:17A7j
 		push	ds
 		push	offset aRwing	; "RWING"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-0Ah], ax
@@ -3041,7 +3041,7 @@ loc_4976C:				; CODE XREF: seg103:1793j seg103:17A7j
 		push	ds
 		push	offset aLwing	; "LWING"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-0Ch], ax
@@ -3053,7 +3053,7 @@ loc_497A8:
 		push	ds
 		push	offset aRwing	; "RWING"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-12h], ax
@@ -3071,7 +3071,7 @@ loc_497D3:				; "LWING"
 
 loc_497D6:
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-14h], ax
@@ -3096,14 +3096,14 @@ loc_49827:				; CODE XREF: seg103:17A9j
 		push	ds
 		push	offset aEngine	; "ENGINE"
 		push	large dword ptr	[bp-4]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_498AA
 		push	ds
 		push	offset aEngine	; "ENGINE"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeB
+		call	DamageSys_MaxPointsOf_43E47
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-0Ah], ax
@@ -3113,7 +3113,7 @@ loc_49827:				; CODE XREF: seg103:17A9j
 		push	ds
 		push	offset aEngine	; "ENGINE"
 		push	large dword ptr	[bp-4]
-		call	Roster_SumFoundAttributeA
+		call	DamageSys_DamageOf_43DF5
 		add	sp, 8
 		mov	ah, 0
 		mov	[bp-10h], ax
@@ -5484,7 +5484,7 @@ loc_4AAD5:				; CODE XREF: seg103:2AFCj
 		push	ds
 		push	offset aFlaps	; "FLAPS"
 		push	large dword ptr	[bp-12h]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 
 loc_4AAF3:
 		add	sp, 8
@@ -5599,7 +5599,7 @@ loc_4ABC5:
 		push	ds
 		push	offset aLandgear ; "LANDGEAR"
 		push	large dword ptr	[bp-12h]
-		call	Roster_FindByNameOrder
+		call	DamageSys_CompareDamageToMax_43D9B
 		add	sp, 8
 		mov	ah, 0
 		or	ax, ax

@@ -237,7 +237,7 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | FourCC | Taille struct | Vtable finale | Catégorie (`vtable+8`) | Type d'objet |
 |---|---|---|---|---|
 | `BOBJ` | 0x35 | `1B6F` | 0 | basic object |
-| `ORNT` | 0x36 | **`2578`** (`IFF_LoadModelMain` : `mov word ptr es:[bx], 2578h` après la base `1B6F`) | **1** (vtable `0x6F628`, slot +8 = `mov al, 1`, corrigé 2026-10-06) | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ANGL` via `IFF_LoadAngleParam` → angle `+0x35`) |
+| `ORNT` | 0x36 | **`2578`** (`IFF_LoadModelMain` : `mov word ptr es:[bx], 2578h` après la base `1B6F`) | **1** (vtable `0x6F628`, slot +8 = `mov al, 1`, corrigé 2026-10-06) | objet de décor orienté : immeuble, etc. (fait vérifié côté données) (+ chunk `ALGN` via `IFF_LoadAngleParam` → angle `+0x35`) |
 | `TRCR` | 0x82 | `255C` | 0x0D | tracer / traçante |
 | `AFTB` | 0x36 | `2518` | 0x0E | afterburner (tuyère) |
 | `MOBL` | 0x37 | `2504` | 2 | objet mobile |
@@ -254,10 +254,10 @@ Consommateurs : `MissionRecord_LoadEntityDatabase`, `TextCycler`, `TerrainSector
 | `DECY` | 0x3B | `2430` | 0x10 | leurres (fait vérifié côté données) |
 | `SWPN` | 0x51 | `241C` | **0x13** | **défenses fixes : AA, batteries, SAM, navires** (fait vérifié côté données : objets chargés et codés dans libRealSpace) |
 | `GRND` | 0x46 | `2408` | 0x14 | objet au sol |
-| `RNWY` | 0x36 | `23F4` (base `2578` = `ORNT`) | **17** (`loc_460FC` : `mov al, 11h`) | piste de décollage (fait vérifié côté données) — chunks communs + `ANGL` (`IFF_LoadAngleParam_Wrapper`) |
+| `RNWY` | 0x36 | `23F4` (base `2578` = `ORNT`) | **17** (`loc_460FC` : `mov al, 11h`) | piste de décollage (fait vérifié côté données) — chunks communs + `ALGN` (`IFF_LoadAngleParam_Wrapper`) |
 | `EXPL` | 0x3E | `23E0` (base `2578`) | **15** (`loc_4BD81` : `mov al, 0Fh`) | explosion — chunks communs, `DAMG` recopié en `+0x38` (`Explosion_LoadFromIFF_4BCD5`) |
-| `DEBR` | 0x3B | `23CC` (base `2504` = `MOBL`) | **11** (`loc_4BA42` : `mov al, 0Bh`) | débris — `INFO` (`IFF_LoadInfoChunk`) + dynamique `DYNM` (`JDYN_LoadChunkWrapper_9D0C0`) ; pas de chunks communs |
-| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | **générateur de fumée** (`SmokeGen_LoadFromIFF_A5F89`) : chunk `INFO` obligatoire (format ci-dessous) + chunks communs + `ANGL` |
+| `DEBR` | 0x3B | `23CC` (base `2504` = `MOBL`) | **11** (`loc_4BA42` : `mov al, 0Bh`) | débris — `INFO` (`IFF_LoadInfoChunk`) + chunks communs et dynamique `DYNM` (`JDYN_LoadChunkWrapper_9D0C0`, qui appelle `Object_LoadCommonChunks_9BA85` avant la dynamique) |
+| `SMKG` | 0x46 | `23B8` (base `2578`) | **18** (`loc_4C050` : `mov al, 12h`) | **générateur de fumée** (`SmokeGen_LoadFromIFF_A5F89`) : chunk `INFO` obligatoire (format ci-dessous) + chunks communs + `ALGN` |
 | `EJEC` | 0x5B | `23A4` (base `252C` = `OMOB`) | **22** (`ClassStub_ReturnConst16h_4F2BA`) | objet qui en **libère un autre** après un délai et sous une hauteur (siège éjectable → parachute, d'après le tag) : chunk `DATA` (`EjectSeat_LoadFromIFF_A6CA0`) + `MobileObject_LoadDynamicsAndSmoke_9D189` ; aucun FORM reconnu → erreur `C015h` |
 
 **Catégorie d'un objet (établi le 2026-09-20).** La classe d'un objet est fixée par le **premier chunk présent** dans l'ordre de probe de `IFF_LoadModelMain` (`BOBJ, ORNT, TRCR, AFTB, MOBL, OMOB, GUID, ARMG, JETP, XMIT, WEAP, MISS, PODR, BOMB, DURD, DECY, SWPN, GRND, RNWY, …`). Chaque bloc alloue une taille (`Memory_TypedFreeWrapper_5C6F3`, tag `0x5C44`) et écrit une **suite de mots de vtable** (constructeurs chaînés, le dernier gagne). Le **troisième pointeur (`vtable+8`) est, dans chaque classe lue, un `mov al, <constante> ; retf`** : la constante est la catégorie. Elle est lue par `Targeting_AcquireBestThreat` (6 = avion, 8 = missile, 0x13 = défense fixe) pour choisir les cibles et menaces de l'IA (voir `AI_TICK_CALL_GRAPH.md`). Le mapping chunk → vtable est celui du dernier `mov word ptr es:[bx], …` de chaque bloc.
@@ -308,6 +308,51 @@ Présence du chunk → `+0x38 = 1`. F-16 : `(0, −3584, 0)` brut = `(0, −14, 
 - **Jeu de fumées** : le chunk `WRLD/SMOK` du monde (`"SMOKESET"`) charge les modèles de fumée (42 o
   chacun) dans `word_70483` (`World_LoadSmokeSet_A7CA1`). Sans jeu chargé, ni `SMOK` ni `SMKG`
   n'émettent.
+
+**Arborescence d'un fichier objet (lue 2026-10-12, `IFF_LoadModelMain`)** :
+
+```
+FORM REAL
+ ├─ FORM OBJT
+ │   ├─ FORM <classe>    une seule (ordre d'essai du tableau) — chunks selon la classe, ci-dessous
+ │   └─ EXTE             facultatif (Object_LoadExteChunk_9BDE9) : int32, uint16 n, uint8, puis n volumes
+ │                       commençant par 'S' / 'B' / 'L' + nom + int32 (format non détaillé)
+ └─ FORM APPR            apparence 3D (Model_LoadAppearance_94A86) : FILE, ou FORM POLY (INFO, AINF, VERT,
+                         FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…)
+```
+
+Lecteurs de classe, chacun reprenant celui de sa base (« communs » = `Object_LoadCommonChunks_9BA85`) :
+
+| Classe | Lecteur | Chunks |
+|---|---|---|
+| `BOBJ` 0 | `Object_LoadCommonChunks_9BA85` | communs |
+| `ORNT` 1 | `IFF_LoadAngleParam` | communs + `ALGN` (uint8 → `+0x35` ; octets disque `A L G N`, `push large 4E474C41h` — **l'ancien « ANGL » était une erreur de lecture du tag**) |
+| `MOBL` 2 | `JDYN_LoadChunkWrapper_9D0C0` | communs + `FORM DYNM` |
+| `OMOB` 3 | `MobileObject_LoadDynamicsAndSmoke_9D189` | `ORNT` + `FORM DYNM` (→ `+0x36`) + `SMOK` |
+| `GUID` 4 | `Guided_LoadFromIFF_9D286` | `OMOB` + entité pilote (`Guided_CreatePilotEntity_9CF55`, exige catégorie 6 sinon erreur `C013h`) |
+| `ARMG` 5 | `Armed_LoadFromIFF_9D380` | `GUID` + `FORM WEAP` (`INFO`, `HPTS`, `DCOY`, `WPNS`) |
+| `JETP` 6 | `Aircraft_LoadEJECAndJINF_9D4F0` | `ARMG` + `FORM DAMG`/`SYSM` + `EJEC` + `JINF` |
+| `WEAP` 7 | `Weapon_LoadWDATWrapper_A07ED` | `OMOB` + `WDAT` |
+| `MISS` 8 | `MissileModel_LoadDATAChunk_A0340` | `WEAP` + `DATA` |
+| `BOMB` 9 | `BombModel_LoadDATAChunk_9FAD0` | `WEAP` + `DATA` |
+| `DURD` 9 | `PlayerComponentVariantB_ConstructAndInit_9FBDE` | `BOMB` + `FORM DAPR` (seconde apparence, `Model_LoadAppearance_94A86` → `+0x63`) |
+| `PODR` 10 | `PlayerComponent_LoadFieldsWithRetryD_A0FB0` | `ORNT` + `WDAT` + `DATA` |
+| `DEBR` 11 | `IFF_LoadInfoChunk` | `INFO` + `MOBL` |
+| `TRCR` 13 | `PlayerComponent_LoadFieldsWithRetryM_A66F0` | `ORNT` + `WDAT` + `INFO` |
+| `AFTB` 14 | `PlayerComponent_InitBaseClassMinimal_A6BD7` | `ORNT` |
+| `EXPL` 15 | `Explosion_LoadFromIFF_4BCD5` | communs |
+| `DECY` 16 | `DecoyModel_LoadDATALifetime_9C810` | `MOBL` + `DATA` |
+| `RNWY` 17 | `IFF_LoadAngleParam_Wrapper` | `ORNT` |
+| `SMKG` 18 | `SmokeGen_LoadFromIFF_A5F89` | `INFO` + `ORNT` |
+| `SWPN` 19 | `SwpnModel_LoadDataChunk_A0A00` | `ORNT` + `DATA` |
+| `GRND` 20 | `PlayerComponent_ApplyFlagsAndReleaseRef_A0D80` | `OMOB` puis second `JDYN_LoadChunkAndConstruct_3A49C(+0x36)` (deuxième `FORM DYNM` ? à vérifier) |
+| `XMIT` 21 | `PlayerComponent_InitBaseClass_A1030` | `ORNT` |
+| `EJEC` 22 | `EjectSeat_LoadFromIFF_A6CA0` | `DATA` + `OMOB` |
+
+**`JETP` · `EJEC`** (facultatif) : chaîne → `+0x5A` = nom de l'objet siège éjectable (`+0x63 = 1`).
+**`JETP` · `JINF`** (facultatif) : uint8 `+0x53`, uint16 `+0x54`, uint16 `+0x56`, uint8 `+0x52` (classe de
+combat, ≥ 9 chasseurs), uint16 `+0x64`, uint8 `+0x59`, uint16 `+0x66`, uint8 `+0x58`, uint16 `+0x68` ; absent →
+`+0x53 = 0`, `+0x52 = 2`, `+0x64 = 5`, `+0x59 = 0`, `+0x58 = 6`, `+0x68 = 30`.
 
 **Jeu de fumées — `SmokeSet_LoadFromIFF_A636C`** (seg450, lu 2026-10-12). Le chunk `WRLD/SMOK` d'un
 monde donne un nom (ex. `"SMOKESET"`) ; `World_LoadSmokeSet_A7CA1` charge `OBJECTS\<nom>.IFF` et range
@@ -2062,17 +2107,22 @@ des lecteurs de sous-enregistrements selon la disposition de champs.
 
 ### 6.7 Composants d'avion & dégâts
 
-- `AircraftDamageModel_LoadComponents_73B4F` (440 L, ovr228) : StreamReader + IFF,
-  **boucle ×8** (`ReleaseComponentArray_742FC`) = les 8 composants confirmés
-  (seg339) : `RUDDER`, `ELEVATOR`, `AILERON`, `LWING`, `RWING`, `ENGINE`,
-  `LANDGEAR`, `FLAPS`. `LoadFromIFF_73FB4` (293 L) = ~15 champs u32.
-- `PlayerComponent_Load*` (seg432-453, ~40 fonctions) : chargement IFF des
-  composants d'état / visuels du joueur (`LoadFromResourceRecord_9DF63` appelle
-  même `IFF_LoadModelMain`). `LoadFieldsMassive_A5D18` = ~30 champs
-  matériau/visuels. `LoadDataChunk_A6CA0` : chunk **`DATA`** + 3 champs u32.
-- `AircraftComponent_Load*` (ovr272-285, ~14 fonctions) : sous-enregistrements de
-  composants (variantes par disposition de champs — `LoadWithDwordFields`,
-  `LoadFieldSequence`, `LoadFieldGroupPair`, …).
+**Corrigé 2026-10-12.** L'ancien paragraphe citait `AircraftDamageModel_LoadComponents_73B4F` : ce nom
+n'existe plus, `sub_73B4F` est `PilotProfile_LoadFromPROF_73B4F` (profil IA). Les composants de dégâts
+sont lus par **`Aircraft_LoadDamageSystems_9CCE5`** (classe `JETP`) : `FORM DAMG` (obligatoire, erreur
+`C00Dh`) → chunk **`SYSM`** (obligatoire, erreur `C00Ch`) = uint16 nombre puis, par composant
+(`DamageSys_LoadRecord_9CBE0`, record mémoire 20 o) : uint8 résistance (`+0`), uint8 dégâts subis (`+1`),
+chaîne nom (`+2`, ≤ 9 o : `FUEL`, `RUDDER`, `ELEVATOR`, `AILERON`, `LWING`, `RWING`, `ENGINE`, `LANDGEAR`,
+`FLAPS`…), chaîne second nom (`+0x0B`, rôle non établi). Accès par nom : `DamageSys_IsDamaged_43D43`,
+`DamageSys_DamageOf_43DF5`, `DamageSys_MaxPointsOf_43E47`, `DamageSys_SumDamage_43D0F`,
+`DamageSys_SumMaxPoints_43CDC`, `DamageSys_CompareDamageToMax_43D9B` (ex-`Roster_*`, « pilotes » à tort).
+Gain d'efficacité = (résistance − dégâts) / résistance (`JDYN_UpdateDamageGains_494DD`, `PHYSICS.md` §5.9).
+Format détaillé et arborescence par classe : `DATA_MODEL.html` (fiches « Arborescence » et « Avion JETP »).
+
+- `PlayerComponent_Load*` (seg432-453, ~40 fonctions) : lecteurs génériques de paramètres (dynamiques,
+  armes) — voir §6.2.
+- `AircraftComponent_Load*` (ovr272-285) : lecteurs de l'apparence 3D (`FORM POLY` : `VERT`, `TRIS`…),
+  appelés par `Model_LoadAppearance_94A86`.
 
 ### 6.8 Terrain / carte — `DATA\<nom>.PAK` + seg071-077 + ovr290-299
 
@@ -2296,7 +2346,7 @@ Fichier .IFF
   WorldObjectModel          MissionScenario ──(champs numériques)──► Expr VM / Nodes (seg114)
    ├─ vtable/type (BOBJ … DEBR)  ├─ MISN: VERS/NAME/CAST/TEAM/PLYR/LOAD/FLAG/PROG/STAT…
    ├─ INFO: rayon de collision   └─ WRLD: INFO/TERA/PALT/LGHT/SKYS/HORZ/SMOK/SCAL
-   ├─ ANGL: angle d'attache            │
+   ├─ ALGN: angle d'attache            │
    ├─ DYNM/JDYN ──► FlightModel        ├── entités ──► MissionLoader_SpawnEntity
    │     (197 o, fixed 24.8)           │      ├─ position   (LoadPosition)
    ├─ géométrie 3D (chunks OBJT)       │      ├─ waypoints   (LoadWaypoint)

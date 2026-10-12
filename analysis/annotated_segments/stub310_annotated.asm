@@ -73,8 +73,8 @@ VROOMM_StubThunk_6C1CF	endp
 ; d'overlay actuellement charge en memoire. fileoff=2B470h, codesize=2B4h, nentries=6.
 ; ==============================================================================================
 VROOMM_StubThunk_6C1D4	proc far		; CODE XREF: IFF_LoadModelMain+4EDP
-					; Camera_Helper2_9D380+1CP
-		jmp	Camera_Helper_9D286
+					; Armed_LoadFromIFF_9D380+1CP
+		jmp	Guided_LoadFromIFF_9D286
 VROOMM_StubThunk_6C1D4	endp
 
 

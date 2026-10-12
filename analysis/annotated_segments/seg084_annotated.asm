@@ -22,9 +22,9 @@ OrntModel_GetCategory_3C93B:				; DATA XREF: seg339:off_6F630o
 
 ; ==============================================================================================
 ; far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk
-; 'NGLA' via sub_64743, résout une valeur associée (sub_64B51) stockée à +0x35 : chargement
-; d'un paramètre angulaire depuis un chunk IFF (probable angle d'attache/orientation d'un
-; sous-composant).
+; 'ALGN' (4E474C41h, octets disque A L G N) via sub_64743, résout une valeur associée
+; (sub_64B51) stockée à +0x35 : chargement d'un paramètre angulaire depuis un chunk IFF
+; (probable angle d'attache/orientation d'un sous-composant).
 ; ==============================================================================================
 IFF_LoadAngleParam	proc far		; CODE XREF: IFF_LoadModelMain:loc_3BA6EP
 					; IFF_LoadAngleParam_Wrapper+AP	...

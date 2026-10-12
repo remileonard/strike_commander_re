@@ -126,7 +126,7 @@ Debris_ConstructWithCameraAttach_9D0FA	endp
 
 ; ==============================================================================================
 ; far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) :
-; IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C →
+; IFF_LoadAngleParam (chunks communs + ALGN), dynamique JDYN_LoadChunkAndConstruct_3A49C →
 ; +0x36, puis chunk SMOK facultatif = TRAÎNÉE DE FUMÉE : uint8 → +0x39 type de fumée (index
 ; dans le jeu de fumées du monde ; recopié en instance +0x54 par
 ; Camera_InitAttachedWithTarget_3DC3D), 3× int32 24.8 → +0x3A/+0x3E/+0x42 point d'émission
@@ -134,7 +134,7 @@ Debris_ConstructWithCameraAttach_9D0FA	endp
 ; (l'objet a une traînée). Consommateur : SmokeTrail_Tick_3D57E.
 ; ==============================================================================================
 MobileObject_LoadDynamicsAndSmoke_9D189	proc far		; CODE XREF: VROOMM_StubThunk_6C1CAJ
-					; Camera_Helper_9D286:loc_9D2A1p
+					; Guided_LoadFromIFF_9D286:loc_9D2A1p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -297,9 +297,11 @@ Camera_ConstructAttachedWithTarget_9D214	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, thunk voisin uniquement (37 lignes).
+; far, LECTEUR DE LA CLASSE GUID (ex-Camera_Helper) : MobileObject_LoadDynamicsAndSmoke_9D189
+; (chunks communs + ALGN + FORM DYNM + SMOK) puis Guided_CreatePilotEntity_9CF55(modèle+0x46,
+; catégorie). Base de ARMG.
 ; ==============================================================================================
-Camera_Helper_9D286	proc far		; CODE XREF: VROOMM_StubThunk_6C1D4J
+Guided_LoadFromIFF_9D286	proc far		; CODE XREF: VROOMM_StubThunk_6C1D4J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -335,7 +337,7 @@ loc_9D2B4:
 		add	sp, 6
 		pop	bp
 		retf
-Camera_Helper_9D286	endp
+Guided_LoadFromIFF_9D286	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

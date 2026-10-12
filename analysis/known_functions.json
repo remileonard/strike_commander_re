@@ -25,9 +25,9 @@
     "summary": "⚠️ far, 232 lignes, NON DÉTAILLÉE — combine `Joystick_GetButtonRawByte_67B82` (×2, seg208), allocateur typé, `Mouse_InitAndRead` — lecture combinée des contrôles cockpit. | LU 2026-10-03 (fin) : parcourt la liste 0x59C3 et applique PilotProfile_RescaleSkillByDifficulty_12FC9 au profil (entite +0x55, +0x1A) de chaque avion (categorie 6) du camp 0xFF : application de l'option de difficulte."
   },
   "sub_9CF55": {
-    "new_name": "Debris_ReleaseWithErrorCheckB_9CF55",
+    "new_name": "Guided_CreatePilotEntity_9CF55",
     "segment": "ovr308",
-    "summary": "far, variante de Debris_ReleaseWithErrorCheck_9CE90."
+    "summary": "far, LUE 2026-10-12. Niveau GUID d'un objet : CRÉE L'ENTITÉ PILOTE (IA) de l'objet (ex-Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — d'où « GUID jamais utilisé seul ». Alloue 0xBD o (vtables 0xAA → 0x390, sous-objet profil +0x1A vtable 0x368), rangé en modèle +0x46. Ne lit aucun chunk."
   },
   "sub_63EE5": {
     "new_name": "StreamReader_RefillBuffer_63EE5",
@@ -2300,9 +2300,9 @@
     "summary": "far, libère un tampon typé (Memory_TypedFree_5C7B6)."
   },
   "sub_43DF5": {
-    "new_name": "Roster_SumFoundAttributeA",
+    "new_name": "DamageSys_DamageOf_43DF5",
     "segment": "seg093",
-    "summary": "far,46L — recherche par nom (sub_2DC4) puis somme le champ+1 (avec accumulateur borné 8-bit) : **somme d'un attribut du pilote trouvé (probable total de victoires).**"
+    "summary": "far, DÉGÂTS SUBIS (+1) du composant nommé (somme bornée à 8 bits). Utilisé par JDYN_UpdateDamageGains_494DD : gain = (résistance − dégâts) / résistance. Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "sub_5D183": {
     "new_name": "Runtime_StackCheckHelperB_5D183",
@@ -3167,7 +3167,7 @@
   "sub_9D4F0": {
     "new_name": "Aircraft_LoadEJECAndJINF_9D4F0",
     "segment": "ovr313",
-    "summary": "far, 123L, LUE 2026-10-02. Ex-'MissionRecord_LoadStringFields_9D4F0'. Chargeur de deux chunks du modele d'avion apres le chargeur de base. 'EJEC' (43454A45h) : chaine -> +0x5A (longueur +0x59), mot -> +0x66, octet -> +0x58, mot -> +0x68. 'JINF' (464E494Ah) : octet -> +0x53, mot -> +0x54, mot -> +0x56, octet -> +0x52 (CLASSE DE COMBAT : >= 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246 et comparee a byte_72038 = 6 par Targeting_AcquireBestThreat), mot -> +0x64, octet... Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30."
+    "summary": "far, LECTEUR DE LA CLASSE JETP (avion) : Armed_LoadFromIFF_9D380 (ARMG), Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle +0x4E), puis chunk EJEC facultatif : chaîne → +0x5A = nom de l'objet siège éjectable (+0x63 = 1 si présent), puis chunk JINF facultatif : uint8 → +0x53, uint16 → +0x54, uint16 → +0x56, uint8 → +0x52 (CLASSE DE COMBAT : ≥ 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246, comparée à byte_72038 = 6 par Targeting_AcquireBestThreat), uint16 → +0x64, uint8 → +0x59, uint16 → +0x66, uint8 → +0x58, uint16 → +0x68. Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30. (Correction 2026-10-12 : EJEC est lu AVANT JINF, il contient le nom de l'objet éjecté.)"
   },
   "sub_6B360": {
     "new_name": "VROOMM_StubThunk_6B360",
@@ -3800,9 +3800,9 @@
     "summary": "far, 102 lignes, LUE EN ENTIER. Argument : pointeur far vers un bloc d'états de 0x2B octets (vtable 0x130, créé par loc_1297E ; l'entité IA le référence à +0x07/+0x09). Appelle WorldObjectA_Method_NoOp_737E0 (via VROOMM_StubThunk_6AA2F, non lue), puis met à zéro les 8 bits de l'octet +0x1B, les 8 bits de +0x1C et les bits 0-1 de +0x1D (la valeur écrite vient de `mov al,0`) : REMISE À ZÉRO d'un bloc de drapeaux, pas un encodage. Aucun affichage, aucune lecture d'un état d'avion. Appelée par HUD_ResetPanel, Player_MainUpdate et AIEntity_MasterTick_5ACC : le bloc est donc commun au joueur et aux entités IA. Anciennement HUD_EncodeInstruments ('encodeur d'état des instruments de bord') : nom trompeur, rien de HUD dans le corps."
   },
   "sub_9CBE0": {
-    "new_name": "Debris_LoadStringFields_9CBE0",
+    "new_name": "DamageSys_LoadRecord_9CBE0",
     "segment": "ovr307",
-    "summary": "far, combine ReadFinalField_64B51 (×2) et `String_ConstructFromFarPtrLen` (×2)."
+    "summary": "far, LIT UN COMPOSANT DE DÉGÂTS (chunk SYSM) : uint8 résistance → +0, uint8 dégâts subis → +1, chaîne nom → +2, chaîne second nom → +0x0B (String_ConstructFromFarPtrLen ×2). Enregistrement mémoire de 20 o."
   },
   "sub_A3EA5": {
     "new_name": "GaugeWidget_RenderModeDispatch_A3EA5",
@@ -6930,9 +6930,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_86189) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=12F80h, codesize=32Ch, nentries=8."
   },
   "sub_43D9B": {
-    "new_name": "Roster_FindByNameOrder",
+    "new_name": "DamageSys_CompareDamageToMax_43D9B",
     "segment": "seg093",
-    "summary": "far,53L — variante comparant deux champs (offset+1 vs offset+0, ordre) : **recherche par nom avec test d'ordre de deux attributs (probable rang/ancienneté).**"
+    "summary": "far, recherche par nom puis compare dégâts subis (+1) et résistance (+0) du composant (sens exact du test non vérifié : détruit ?). Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "unnamed_seg110_a": {
     "new_name": "Timer_SetRelativeFramesFarPtr_UNRESOLVED",
@@ -8272,7 +8272,7 @@
   "sub_3C942": {
     "new_name": "IFF_LoadAngleParam",
     "segment": "seg084",
-    "summary": "far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk 'NGLA' via sub_64743, résout une valeur associée (sub_64B51) stockée à +0x35 : **chargement d'un paramètre angulaire depuis un chunk IFF (probable angle d'attache/orientation d'un sous-composant).**"
+    "summary": "far,46L — vérifie le support VESA (INT15h), copie un tag (sub_6BFFF), recherche le chunk 'ALGN' (4E474C41h, octets disque A L G N) via sub_64743, résout une valeur associée (sub_64B51) stockée à +0x35 : **chargement d'un paramètre angulaire depuis un chunk IFF (probable angle d'attache/orientation d'un sous-composant).**"
   },
   "sub_5493E": {
     "new_name": "Math_AcosDeg_5493E",
@@ -8597,7 +8597,7 @@
   "sub_9D189": {
     "new_name": "MobileObject_LoadDynamicsAndSmoke_9D189",
     "segment": "ovr310",
-    "summary": "far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) : IFF_LoadAngleParam (chunks communs + ANGL), dynamique JDYN_LoadChunkAndConstruct_3A49C → +0x36, puis chunk SMOK facultatif = TRAÎNÉE DE FUMÉE : uint8 → +0x39 type de fumée (index dans le jeu de fumées du monde ; recopié en instance +0x54 par Camera_InitAttachedWithTarget_3DC3D), 3× int32 24.8 → +0x3A/+0x3E/+0x42 point d'émission dans le repère de l'objet (F-16 : (0, −14, 0) en asm, soit 14 m derrière), +0x38 = 1 (l'objet a une traînée). Consommateur : SmokeTrail_Tick_3D57E."
+    "summary": "far, lecteur commun des objets mobiles orientés (OMOB, EJEC…) (ex-JDYN_LoadAngleAndChunk) : IFF_LoadAngleParam (chunks communs + ALGN), dynamique JDYN_LoadChunkAndConstruct_3A49C → +0x36, puis chunk SMOK facultatif = TRAÎNÉE DE FUMÉE : uint8 → +0x39 type de fumée (index dans le jeu de fumées du monde ; recopié en instance +0x54 par Camera_InitAttachedWithTarget_3DC3D), 3× int32 24.8 → +0x3A/+0x3E/+0x42 point d'émission dans le repère de l'objet (F-16 : (0, −14, 0) en asm, soit 14 m derrière), +0x38 = 1 (l'objet a une traînée). Consommateur : SmokeTrail_Tick_3D57E."
   },
   "sub_53896": {
     "new_name": "STRIKE_EXE_MAIN_LOOP",
@@ -11307,7 +11307,7 @@
   "sub_A6CA0": {
     "new_name": "EjectSeat_LoadFromIFF_A6CA0",
     "segment": "seg453",
-    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ANGL, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18."
+    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18."
   },
   "sub_67499": {
     "new_name": "Input_GetCalibratedYValue_67499",
@@ -12550,9 +12550,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A36BD) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_9BDE9": {
-    "new_name": "Debris_LoadFieldMixB_9BDE9",
+    "new_name": "Object_LoadExteChunk_9BDE9",
     "segment": "ovr302",
-    "summary": "far, combine ReadFieldGroupC_64A7E/ReadFieldGroupB_64A54/ReadFinalField_64B51 (117 lignes)."
+    "summary": "far, chunk EXTE du niveau OBJT (lu après la classe par IFF_LoadModelMain via VROOMM_StubThunk_6C004) : int32 → sous-objet (+8)+0x10 (défaut 0x5DC00 posé par Object_LoadCommonChunks_9BA85), uint16 n, uint8 → +0x16, puis n éléments (Debris_LoadFieldMixC_9BFB0) commençant chacun par une lettre 'S', 'B' ou 'L', un nom et des valeurs int32 — volumes (collision ?) chaînés en liste. Format détaillé non lu."
   },
   "sub_65158": {
     "new_name": "ResourceRecord_ReadAndWriteBridgeB_65158",
@@ -12900,9 +12900,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_7F5D5) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28."
   },
   "sub_43D43": {
-    "new_name": "Roster_FindByNameAndFlag",
+    "new_name": "DamageSys_IsDamaged_43D43",
     "segment": "seg093",
-    "summary": "far,52L — parcourt une liste de 20 octets/entrée, compare un nom (sub_2DC4=strcmp) puis teste un flag (offset+1 > 0) : **recherche d'un pilote par nom avec test d'un attribut (probable statut actif).**"
+    "summary": "far, LE COMPOSANT NOMMÉ EST-IL TOUCHÉ ? Parcourt la liste (pas de 14h), compare le nom +2 (CRT_MemFamily_Extra4) et renvoie 1 si ses dégâts (+1) > 0. Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "sub_8383D": {
     "new_name": "HUDSymbol_ConstructVariantE_8383D",
@@ -13522,7 +13522,7 @@
   "sub_CD4A": {
     "new_name": "AI_ComputeMorale_CD4A",
     "segment": "seg006",
-    "summary": "Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25. CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye : 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100 ; pas de recalcul si Roster_SumAttributeA du roster de l'objet est nul ou si la capacite carburant [avion+0x69] est nulle ; -100 si Roster_SumAttributeB non nul (sens de l'attribut non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] - 0x32) ; -50 si l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol 0xFC ou cible air sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-air ; 0xAA suivre : condition sur l'objet global word_706A0 non tracee) ; equilibre des camps (compteurs word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94) : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79 tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
+    "summary": "Ex-'Radio_SelectContextMessage' (ne choisit aucun message). far, 337L, LUE 2026-09-25. CALCUL DU MORAL, une fois par tick (bit 5 de +0x28C), resultat range dans +0xF5 et renvoye : 2 (bon, score >= 80), 3 (correct, >= 50), 4 (ebranle, >= 25), 5 (panique, < 25). Score : 100 ; pas de recalcul si DamageSys_SumMaxPoints_43CDC du roster de l'objet est nul ou si la capacite carburant [avion+0x69] est nulle ; -100 si DamageSys_SumDamage_43D0F non nul (sens de l'attribut non etabli) ; + carburant restant/capacite * 51 - 50 ([+0x6D]*0x33/[+0x69] - 0x32) ; -50 si l'ordre ne peut pas etre tenu (0xA7 detruire : cible sol sans arme air-sol 0xFC ou cible air sans arme air-air 0xF03 ; 0xA8 defendre : pas de cible ou pas d'arme air-air ; 0xAA suivre : condition sur l'objet global word_706A0 non tracee) ; equilibre des camps (compteurs word_706A3/A7 = apparus du camp 1/0xFF, word_706A5/A9 = detruits, tenus par PartEntry_ResolveSpawnPositionAndActivate_51EDC et Combat_TeamOpposedCheckAndDispatch_53A94) : si des adversaires restent en vie et que l'objet n'est pas neutre, -8 par adversaire vivant et -32 par perte de son camp ; -50 si une reaction est active (+0x27F != 0) ; + bonus de loyaute LY (+0xB3) : 0 si < 3, 15 si < 6, 30 si < 12, 50 si < 15, 75 sinon ; plafond 79 tant que des adversaires vivent ; plancher 25 si LY > 9 ; 0 si LY <= 0. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
   },
   "sub_7D249": {
     "new_name": "MissionRecord_Helper_7D249",
@@ -13675,9 +13675,9 @@
     "summary": "far,65L — destructeur (type 0x189E) : notifie l'enfant référencé (+9, vtable[4]) avant de le libérer (sub_29115) : **destructeur de widget composite avec notification de l'enfant.**"
   },
   "sub_94A86": {
-    "new_name": "MissionText_LoadSubtitleWithString_94A86",
+    "new_name": "Model_LoadAppearance_94A86",
     "segment": "ovr270",
-    "summary": "far, combine `String_ConstructFromPtrLen`, `ResourceRecord_AllocateAndDecode_64C21` (seg193)."
+    "summary": "far, LECTEUR DE L'APPARENCE 3D (ex-MissionText_LoadSubtitleWithString, aucun rapport avec du texte) : FORM APPR, avec soit un chunk FILE (apparence dans un autre fichier), soit FORM POLY (INFO, AINF, VERT, FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…) via MissionText_LoadSubtitleRecordB_94710. Appelé par IFF_LoadModelMain au niveau REAL (après OBJT) et pour le FORM DAPR de la classe DURD."
   },
   "sub_46392": {
     "new_name": "Physics_ComputeAcceleration",
@@ -13875,9 +13875,9 @@
     "summary": "far, alloue via sub_658. Référencée depuis seg209 (segment distant non encore couvert)."
   },
   "sub_9D380": {
-    "new_name": "Camera_Helper2_9D380",
+    "new_name": "Armed_LoadFromIFF_9D380",
     "segment": "ovr311",
-    "summary": "far, thunks voisins uniquement (40 lignes)."
+    "summary": "far, LECTEUR DE LA CLASSE ARMG (objet armé ; ex-Camera_Helper2) : Guided_LoadFromIFF_9D286 puis PlayerComponent_ReleaseAndLoad_9EBD7 (modèle +0x4A) = FORM WEAP (chunks INFO, HPTS points d'emport, DCOY leurres, WPNS armes, qui chargent leurs OBJECTS\\*.IFF par IFF_LoadModelMain). Base de JETP."
   },
   "sub_503EB": {
     "new_name": "UIScreen_ComputeDerivedFields_503EB",
@@ -15710,9 +15710,9 @@
     "summary": "far, variante de PaletteScreen_ApplyTextStyle_A241D."
   },
   "sub_9D286": {
-    "new_name": "Camera_Helper_9D286",
+    "new_name": "Guided_LoadFromIFF_9D286",
     "segment": "ovr310",
-    "summary": "far, thunk voisin uniquement (37 lignes)."
+    "summary": "far, LECTEUR DE LA CLASSE GUID (ex-Camera_Helper) : MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN + FORM DYNM + SMOK) puis Guided_CreatePilotEntity_9CF55(modèle+0x46, catégorie). Base de ARMG."
   },
   "sub_23C82": {
     "new_name": "EntityTracker_SelectByStateCode",
@@ -15850,9 +15850,9 @@
     "summary": "far, prépare le flux avant lecture (dispatch vtable [bx+0xC], StreamReader_ValidateState_63DB5, sub_6404E). Référencée par `Music_LoadTimbreFromLibrary_5A577` (seg124)."
   },
   "sub_43E47": {
-    "new_name": "Roster_SumFoundAttributeB",
+    "new_name": "DamageSys_MaxPointsOf_43E47",
     "segment": "seg093",
-    "summary": "far,50L — variante sommant le champ+0 : **somme d'un second attribut du pilote trouvé.**"
+    "summary": "far, RÉSISTANCE (+0) du composant nommé. Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "sub_A6BFB": {
     "new_name": "PlayerComponentVariantAI_ConstructAndInit_A6BFB",
@@ -16200,9 +16200,9 @@
     "summary": "far, 269L, LUE 2026-09-27. POSTE EN FORMATION (monde) : (a, b, c) = entite+0x14A (cote, avant, haut) si voix +0x6B == 9 (octet SPCH du RADI du profil), ou camp != joueur (objet+0x50 != 1), ou byte_6E4CD (adversaire actif) ; sinon (300, -200, 50) m. S = normalise(N.c1, -N.c0, 0), U = S x N, a de signe tel que le poste reste du cote ou se trouve deja l'ailier (Angle_DeltaNormalized_A(N, ailier - leader) < 0 -> -|a|). Poste = S*a + N*b + U*c ; si hauteur-sol du leader + composante verticale < 500 m, composante verticale = 500 m."
   },
   "sub_43D0F": {
-    "new_name": "Roster_SumAttributeB",
+    "new_name": "DamageSys_SumDamage_43D0F",
     "segment": "seg093",
-    "summary": "far,32L — variante de sub_43CDC sommant le champ offset+1 : **somme d'un second attribut de roster (probable score/kills).**"
+    "summary": "far, SOMME DES DÉGÂTS SUBIS (octet +1) de tous les composants de dégâts. Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "sub_6D090": {
     "new_name": "VROOMM_StubThunk_6D090",
@@ -16990,9 +16990,9 @@
     "summary": "far, combine AudioQueue_Helper_AB82E, AudioQueue_LoadAndPlayEntry_AB592, Music_ChannelInit_59F87 (seg123)."
   },
   "sub_9CCE5": {
-    "new_name": "Debris_LoadSubrecordWithRelease_9CCE5",
+    "new_name": "Aircraft_LoadDamageSystems_9CCE5",
     "segment": "ovr307",
-    "summary": "far, combine ResourceRecord_SeekAndReadB_647B2/ReadFieldGroupB_64A54 et libération typée."
+    "summary": "far, LUE 2026-10-12. LECTEUR DES COMPOSANTS DE DÉGÂTS D'UN AVION (JETP, via Debris_ReleaseWrapper_9CCB3 / VROOMM_StubThunk_6C12E, modèle +0x4E). FORM DAMG obligatoire (sinon erreur C00Dh) contenant le chunk SYSM obligatoire (sinon C00Ch) : uint16 nombre, puis nombre × enregistrement (DamageSys_LoadRecord_9CBE0) ; liste mémoire = +0 far ptr tableau de 20 o, +4 nombre. Ne pas confondre avec le chunk commun DAMG (uint16 points de dégâts)."
   },
   "sub_2E1D": {
     "new_name": "CRT_MemFamily_Extra6",
@@ -17575,9 +17575,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8D284) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=1A910h, codesize=97Eh, nentries=20."
   },
   "sub_43CDC": {
-    "new_name": "Roster_SumAttributeA",
+    "new_name": "DamageSys_SumMaxPoints_43CDC",
     "segment": "seg093",
-    "summary": "far,34L — parcourt une table d'entrées de 20 octets et somme un champ (offset+0) : **somme d'un attribut sur une liste de pilotes/entrées de roster.**"
+    "summary": "far, SOMME DES RÉSISTANCES (octet +0) de tous les composants de dégâts (liste SYSM : +0 far ptr tableau, +4 nombre). Enregistrement SYSM de 20 o (DamageSys_LoadRecord_9CBE0) : +0 uint8 résistance (points), +1 uint8 dégâts subis, +2 nom (chaîne, ≤ 9 o, ex. RUDDER), +0x0B second nom (chaîne, ≤ 9 o, rôle non établi). Ex-Roster_* : ce n'est PAS un roster de pilotes."
   },
   "sub_603C6": {
     "new_name": "AIL_timbre_status_603C6",
@@ -18112,7 +18112,7 @@
   "sub_A5F89": {
     "new_name": "SmokeGen_LoadFromIFF_A5F89",
     "segment": "seg450",
-    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36 type de fumée (index dans le jeu de fumées du monde, word_70483) ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050)."
+    "summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE SMKG (générateur de fumée ; ex-TextLabel_LoadFieldsFromIFF, aucun rapport avec du texte ; chaîne 'SmokeSlots' juste avant la vtable d'instance 30EEh). Chunk INFO obligatoire (absent → erreur B004h) : uint8 → +0x36 type de fumée (index dans le jeu de fumées du monde, word_70483) ; int32 24.8 → +0x37 durée d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée (≠0). Puis IFF_LoadAngleParam (chunks communs + ALGN). Classe : 70 o, vtable 23B8h, catégorie 18 (loc_4C050)."
   },
   "sub_849B2": {
     "new_name": "HUDSymbol_RenderWithClipTestE_849B2",
@@ -18817,7 +18817,7 @@
   "loc_494DD": {
     "new_name": "JDYN_UpdateDamageGains_494DD",
     "segment": "seg103",
-    "summary": "far, LUE (2026-09-25). Methode +0x34 de la vtable secondaire JDYN (tag 0x228A), appelee en tete de PhysicsTicks. Remet les gains dword_72A14..72A2C a 1,0, puis pour chaque composant present dans le roster (FUEL -> 72A14, RUDDER -> 72A18, ELEVATOR -> 72A1C, AILERON -> 72A20, LWING+RWING -> 72A24 et 72A28, ENGINE -> 72A2C) : gain = (attribut B - attribut A) / attribut B (Roster_SumFoundAttributeB / A). Les gains valent 1,0 quand le composant est intact et baissent avec les dommages (DATA_MODEL.md les disait toujours a 1,0)."
+    "summary": "far, LUE (2026-09-25). Methode +0x34 de la vtable secondaire JDYN (tag 0x228A), appelee en tete de PhysicsTicks. Remet les gains dword_72A14..72A2C a 1,0, puis pour chaque composant present dans le roster (FUEL -> 72A14, RUDDER -> 72A18, ELEVATOR -> 72A1C, AILERON -> 72A20, LWING+RWING -> 72A24 et 72A28, ENGINE -> 72A2C) : gain = (attribut B - attribut A) / attribut B (DamageSys_MaxPointsOf_43E47 / A). Les gains valent 1,0 quand le composant est intact et baissent avec les dommages (DATA_MODEL.md les disait toujours a 1,0)."
   },
   "loc_111AE": {
     "new_name": "MVRS_ID8_TickShadowTarget_111AE",

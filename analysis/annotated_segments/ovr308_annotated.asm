@@ -105,9 +105,12 @@ Debris_ReleaseWithErrorCheck_9CE90	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de Debris_ReleaseWithErrorCheck_9CE90.
+; far, LUE 2026-10-12. Niveau GUID d'un objet : CRÉE L'ENTITÉ PILOTE (IA) de l'objet (ex-
+; Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — d'où « GUID
+; jamais utilisé seul ». Alloue 0xBD o (vtables 0xAA → 0x390, sous-objet profil +0x1A vtable
+; 0x368), rangé en modèle +0x46. Ne lit aucun chunk.
 ; ==============================================================================================
-Debris_ReleaseWithErrorCheckB_9CF55	proc far		; CODE XREF: VROOMM_StubThunk_6C165J
+Guided_CreatePilotEntity_9CF55	proc far		; CODE XREF: VROOMM_StubThunk_6C165J
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -123,7 +126,7 @@ arg_4		= byte ptr  0Ah
 		jmp	loc_9D00F
 ; ���������������������������������������������������������������������������
 
-loc_9CF68:				; CODE XREF: Debris_ReleaseWithErrorCheckB_9CF55+Ej
+loc_9CF68:				; CODE XREF: Guided_CreatePilotEntity_9CF55+Ej
 		push	1
 		push	0
 		push	2
@@ -180,25 +183,25 @@ loc_9CFB7:
 		jmp	short loc_9D003
 ; ���������������������������������������������������������������������������
 
-loc_9CFFD:				; CODE XREF: Debris_ReleaseWithErrorCheckB_9CF55+32j
+loc_9CFFD:				; CODE XREF: Guided_CreatePilotEntity_9CF55+32j
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 
-loc_9D003:				; CODE XREF: Debris_ReleaseWithErrorCheckB_9CF55+A6j
+loc_9D003:				; CODE XREF: Guided_CreatePilotEntity_9CF55+A6j
 		les	bx, [bp+arg_0]
 		mov	es:[bx+2], dx
 		mov	es:[bx], ax
 		jmp	short locret_9D018
 ; ���������������������������������������������������������������������������
 
-loc_9D00F:				; CODE XREF: Debris_ReleaseWithErrorCheckB_9CF55+10j
+loc_9D00F:				; CODE XREF: Guided_CreatePilotEntity_9CF55+10j
 		push	0C013h
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-locret_9D018:				; CODE XREF: Debris_ReleaseWithErrorCheckB_9CF55+B8j
+locret_9D018:				; CODE XREF: Guided_CreatePilotEntity_9CF55+B8j
 		leave
 		retf
-Debris_ReleaseWithErrorCheckB_9CF55	endp
+Guided_CreatePilotEntity_9CF55	endp
 
 ovr308		ends

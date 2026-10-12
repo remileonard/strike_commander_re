@@ -96,7 +96,7 @@ SmokeGen_SpawnInstance_A5F20	endp
 ; d'émission (s) ; int32 24.8 → +0x3B vitesse de montée des particules ; int32 24.8 → +0x3F
 ; intervalle entre deux particules (s) ; uint16 → +0x43 chance d'être actif à la création
 ; (Math_RandomChance_54E4F, échelle ~100) ; uint8 → +0x45 se supprime à la fin de la durée
-; (≠0). Puis IFF_LoadAngleParam (chunks communs + ANGL). Classe : 70 o, vtable 23B8h,
+; (≠0). Puis IFF_LoadAngleParam (chunks communs + ALGN). Classe : 70 o, vtable 23B8h,
 ; catégorie 18 (loc_4C050).
 ; ==============================================================================================
 SmokeGen_LoadFromIFF_A5F89	proc far		; CODE XREF: VROOMM_StubThunk_6CC1AJ

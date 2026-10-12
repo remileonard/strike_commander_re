@@ -627,7 +627,7 @@ sortir de `runGoalSelectors()` (en tête de `tick()`), et implémenter la valeur
 ```cpp
 int SCAIBrain::computeMorale() {                    // AI_ComputeMorale_CD4A, une fois par tick
     int s = 100;
-    if (has_damaged_component) s -= 100;             // Roster_SumAttributeB non nul : sens à confirmer côté données
+    if (has_damaged_component) s -= 100;             // DamageSys_SumDamage_43D0F non nul : sens à confirmer côté données
     s += (int)(51.0f * fuel / fuel_capacity) - 50;
     if (!canHoldOrder()) s -= 50;                    // détruire : pas d'arme adaptée ; défendre : pas de cible ou pas d'arme air-air
     int enemies_alive = count_alive(other_team), own_losses = count_destroyed(my_team);

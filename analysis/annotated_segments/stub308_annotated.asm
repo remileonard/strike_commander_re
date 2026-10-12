@@ -31,8 +31,8 @@ VROOMM_StubThunk_6C160	endp
 ; far, thunk fixe VROOMM (jmp sub_9CF55) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=2B220h, codesize=18Ah, nentries=2.
 ; ==============================================================================================
-VROOMM_StubThunk_6C165	proc far		; CODE XREF: Camera_Helper_9D286+3CP
-		jmp	Debris_ReleaseWithErrorCheckB_9CF55
+VROOMM_StubThunk_6C165	proc far		; CODE XREF: Guided_LoadFromIFF_9D286+3CP
+		jmp	Guided_CreatePilotEntity_9CF55
 VROOMM_StubThunk_6C165	endp
 
 stub308		ends

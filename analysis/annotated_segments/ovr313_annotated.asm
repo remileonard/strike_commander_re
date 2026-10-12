@@ -7,13 +7,15 @@ ovr313		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 123L, LUE 2026-10-02. Ex-'MissionRecord_LoadStringFields_9D4F0'. Chargeur de deux
-; chunks du modele d'avion apres le chargeur de base. 'EJEC' (43454A45h) : chaine -> +0x5A
-; (longueur +0x59), mot -> +0x66, octet -> +0x58, mot -> +0x68. 'JINF' (464E494Ah) : octet ->
-; +0x53, mot -> +0x54, mot -> +0x56, octet -> +0x52 (CLASSE DE COMBAT : >= 9 pour les
-; chasseurs, lue par AI_EngageAttackerReaction_E246 et comparee a byte_72038 = 6 par
-; Targeting_AcquireBestThreat), mot -> +0x64, octet... Sans JINF : +0x53 = 0, +0x52 = 2, +0x64
-; = 5, +0x59 = 0, +0x58 = 6, +0x68 = 30.
+; far, LECTEUR DE LA CLASSE JETP (avion) : Armed_LoadFromIFF_9D380 (ARMG),
+; Aircraft_LoadDamageSystems_9CCE5 (FORM DAMG/SYSM, modèle +0x4E), puis chunk EJEC facultatif
+; : chaîne → +0x5A = nom de l'objet siège éjectable (+0x63 = 1 si présent), puis chunk JINF
+; facultatif : uint8 → +0x53, uint16 → +0x54, uint16 → +0x56, uint8 → +0x52 (CLASSE DE COMBAT
+; : ≥ 9 pour les chasseurs, lue par AI_EngageAttackerReaction_E246, comparée à byte_72038 = 6
+; par Targeting_AcquireBestThreat), uint16 → +0x64, uint8 → +0x59, uint16 → +0x66, uint8 →
+; +0x58, uint16 → +0x68. Sans JINF : +0x53 = 0, +0x52 = 2, +0x64 = 5, +0x59 = 0, +0x58 = 6,
+; +0x68 = 30. (Correction 2026-10-12 : EJEC est lu AVANT JINF, il contient le nom de l'objet
+; éjecté.)
 ; ==============================================================================================
 Aircraft_LoadEJECAndJINF_9D4F0	proc far		; CODE XREF: VROOMM_StubThunk_6C260J
 

@@ -12,7 +12,7 @@ seg453		segment	para public 'OVERLAY' use16
 ; non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de
 ; libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de
 ; l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks
-; communs + ANGL, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable
+; communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable
 ; 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 =
 ; EjectSeat_SpawnInstance_A6D18.
 ; ==============================================================================================

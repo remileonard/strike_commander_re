@@ -273,13 +273,13 @@ loc_5126:				; CODE XREF: AI_EjectDecision_50FF+Ej AI_EjectDecision_50FF+22j
 		mov	word ptr [bp+var_6], dx
 		push	ax
 		push	dx
-		call	Roster_SumAttributeB
+		call	DamageSys_SumDamage_43D0F
 		add	sp, 4
 		movzx	eax, ax
 		imul	eax, 64h
 		push	eax
 		push	large [bp+var_6]
-		call	Roster_SumAttributeA
+		call	DamageSys_SumMaxPoints_43CDC
 		add	sp, 4
 		movzx	ebx, ax
 		pop	eax

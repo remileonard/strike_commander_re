@@ -789,11 +789,11 @@ loc_59398:				; CODE XREF: Music_CombatIntensitySelector_59302+8Fj
 		mov	eax, [bx+5Eh]
 		mov	[bp+var_6], eax
 		push	large [bp+var_6]
-		call	Roster_SumAttributeA
+		call	DamageSys_SumMaxPoints_43CDC
 		add	sp, 4
 		mov	[bp+var_8], ax
 		push	large [bp+var_6]
-		call	Roster_SumAttributeB
+		call	DamageSys_SumDamage_43D0F
 		add	sp, 4
 		mov	[bp+var_A], ax
 		imul	ax, 64h

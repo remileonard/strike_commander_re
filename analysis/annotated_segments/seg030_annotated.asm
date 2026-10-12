@@ -107,7 +107,7 @@ loc_1CFA7:				; DATA XREF: seg339:0E0Eo
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 
 loc_1CFCF:
 		add	sp, 8
@@ -1094,7 +1094,7 @@ loc_1D929:				; DATA XREF: seg339:0E12o
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1D95B
@@ -1961,7 +1961,7 @@ loc_1E207:				; DATA XREF: seg339:0DFAo
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jz	short loc_1E238
@@ -2093,7 +2093,7 @@ loc_1E304:
 		mov	[bp-2],	ax
 		mov	bx, [bp-2]
 		push	large dword ptr	[bx]
-		call	Roster_FindByNameAndFlag
+		call	DamageSys_IsDamaged_43D43
 		add	sp, 8
 		or	al, al
 		jnz	short loc_1E32D
