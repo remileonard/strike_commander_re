@@ -487,9 +487,10 @@ au moins trois systèmes du jeu (HUD, IA de vol seg004, UI seg112-113)** :
   `Expr_Node_ForceRecompute_5247D`) en exécutant un bytecode associé
   (`Expr_VM_Execute_51E7E`) — motif classique de graphe de dépendances
   "façon tableur".
-- **`GeomNode_SumOffsetsUpChain_50EEB`** : cumule des offsets de position
-  (X/Y/Z) en remontant une chaîne de nœuds parents — calcul de position
-  résolue dans une hiérarchie d'attache.
+- **`AreaRelPos_ToWorld_50EEB`** (ex-`GeomNode_SumOffsetsUpChain`) : position
+  monde d'un point défini **relativement à une zone `AREA`** = décalage + point de
+  référence de la zone (un seul parent, pas de chaîne) — sert aux `SPOT` et aux
+  entrées `PART` (voir `DATA_MODEL.md`, chunks `AREA` / `SPOT`).
 - **Hiérarchie de formes de collision (`HitShape_*`)** : Sphere/Box/Radial2D
   avec stubs de tag de classe (motif vtable identique à seg109), pour tester
   si un point tombe dans une région.

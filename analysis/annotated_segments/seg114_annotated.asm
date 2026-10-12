@@ -159,12 +159,17 @@ Str_GetNthEntry_50EC8	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, cumule 3 champs dword (+0x22/+0x26/+0x2A, probable position X/Y/Z) en remontant une
-; chaîne de pointeurs (parents successifs), alloue (sub_658, 0Ch) ou réutilise un buffer
-; résultat. Cœur du calcul de position résolue d'un nœud dans sa hiérarchie — utilisé
-; largement dans tout le cluster seg109-117.
+; far, POSITION MONDE D'UNE POSITION RELATIVE À UNE ZONE AREA (ex-GeomNode_SumOffsetsUpChain :
+; il n'y a PAS de chaîne, un seul parent). Args : (dst near ptr ou 0, seg dst, far ptr rec).
+; rec = { +0 far ptr zone AREA, +4/+8/+0xC 3× i32 24.8 décalage }. Résultat = décalage +
+; zone[+0x22/+0x26/+0x2A] (point de référence de la zone) si le pointeur de zone est non nul
+; (cmp dword ptr es:[bx],0 / jz ; add [bp+var_10], es:[bx+22h]…), sinon décalage seul
+; (position absolue). Si dst = 0, alloue un buffer de 12 o (push 0Ch / CRT_Malloc16_Retry).
+; Utilisé pour les SPOT (Player_ResolveAttachPointN_5305A, records de 16 o) et pour la
+; position des entrées PART (Expr_Node_StoreResultVector_52C9C : rec = part+0x1D, zone en
+; +0x1D, décalage en +0x21).
 ; ==============================================================================================
-GeomNode_SumOffsetsUpChain_50EEB	proc far		; CODE XREF: Lexer_ResolveConstantAlt+5BP
+AreaRelPos_ToWorld_50EEB	proc far		; CODE XREF: Lexer_ResolveConstantAlt+5BP
 					; PartEntry_ResolveSpawnPositionAndActivate_51EDC+325p ...
 
 var_10		= dword	ptr -10h
@@ -210,7 +215,7 @@ loc_50F21:
 		mov	eax, es:[bx+2Ah]
 		add	[bp+var_8], eax
 
-loc_50F46:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+3Bj
+loc_50F46:				; CODE XREF: AreaRelPos_ToWorld_50EEB+3Bj
 		mov	si, [bp+arg_0]
 		or	si, si
 		jz	short loc_50F51
@@ -218,13 +223,13 @@ loc_50F46:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+3Bj
 		jmp	short loc_50F5B
 ; ���������������������������������������������������������������������������
 
-loc_50F51:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+60j
+loc_50F51:				; CODE XREF: AreaRelPos_ToWorld_50EEB+60j
 		push	0Ch
 		call	CRT_Malloc16_Retry
 		pop	cx
 		mov	si, ax
 
-loc_50F5B:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+64j
+loc_50F5B:				; CODE XREF: AreaRelPos_ToWorld_50EEB+64j
 		or	ax, ax
 		jz	short loc_50F7A
 		mov	eax, [bp+var_10]
@@ -237,16 +242,16 @@ loc_50F5B:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+64j
 		jmp	short loc_50F7C
 ; ���������������������������������������������������������������������������
 
-loc_50F7A:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+72j
+loc_50F7A:				; CODE XREF: AreaRelPos_ToWorld_50EEB+72j
 		mov	ax, si
 
-loc_50F7C:				; CODE XREF: GeomNode_SumOffsetsUpChain_50EEB+8Dj
+loc_50F7C:				; CODE XREF: AreaRelPos_ToWorld_50EEB+8Dj
 		mov	dx, [bp+arg_2]
 		mov	ax, [bp+arg_0]
 		pop	si
 		leave
 		retf
-GeomNode_SumOffsetsUpChain_50EEB	endp
+AreaRelPos_ToWorld_50EEB	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1647,7 +1652,7 @@ loc_51733:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -1678,7 +1683,7 @@ loc_51772:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -1712,7 +1717,7 @@ loc_517AA:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_C+2], dx
 		mov	word ptr [bp+var_C], ax
@@ -2936,7 +2941,7 @@ loc_521F0:				; CODE XREF: PartEntry_ResolveSpawnPositionAndActivate_51EDC+86j
 		lea	ax, [bp+var_A0]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_A0]
 		mov	[bp+var_94], eax
@@ -3640,7 +3645,7 @@ loc_526C6:				; CODE XREF: MissionScript_CallNativeHandler_52513+62j
 		push	ax
 		nop
 		push	cs
-		call	near ptr GeomNode_SumAndCount_53034
+		call	near ptr PtrList_GetAt_53034
 		add	sp, 4
 		mov	word ptr [bp+var_3A+2],	dx
 		mov	word ptr [bp+var_3A], ax
@@ -4355,7 +4360,7 @@ Expr_LookupBuiltinFuncDesc_52C5F	endp
 
 ; ==============================================================================================
 ; far, alloue (sub_658) ou réutilise un buffer, y stocke un vecteur 3D résolu via
-; GeomNode_SumOffsetsUpChain_50EEB.
+; AreaRelPos_ToWorld_50EEB.
 ; ==============================================================================================
 Expr_Node_StoreResultVector_52C9C	proc far		; CODE XREF: Compiler_EmitByTokenType+90P
 					; Compiler_EmitByTokenType+12FP ...
@@ -4412,7 +4417,7 @@ loc_52CE9:				; CODE XREF: Expr_Node_StoreResultVector_52C9C+Dj
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 
 loc_52CFE:				; CODE XREF: Expr_Node_StoreResultVector_52C9C:loc_52CE7j
@@ -5012,10 +5017,13 @@ loc_53031:				; CODE XREF: seg114:2158j seg114:21CDj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelée par l'opcode VM +0x642 : combine GeomNode_SumOffsetsUpChain_50EEB avec une
-; allocation (sub_658).
+; far, ACCÈS À L'ÉLÉMENT i D'UNE LISTE DE POINTEURS FAR (ex-GeomNode_SumAndCount : ni somme ni
+; comptage). Args : (liste, i) ; liste = [+0] u16 nombre, [+2] near ptr tableau de far ptr (4
+; o). Renvoie liste[i], ou NULL si i ≥ nombre (cmp [si],dx / jbe), d'où area_id = −1 / 0xFFFF
+; = « pas de zone ». Sert à convertir un index AREA (liste MissionScenario+0x1A) en pointeur
+; de zone : SCNE, SPOT, PART, HOME, opcodes VM 0x80/0x81/0x82.
 ; ==============================================================================================
-GeomNode_SumAndCount_53034	proc far		; CODE XREF: Expr_VM_Interpreter_51106+642p
+PtrList_GetAt_53034	proc far		; CODE XREF: Expr_VM_Interpreter_51106+642p
 					; Expr_VM_Interpreter_51106+678p ...
 
 arg_0		= word ptr  6
@@ -5037,15 +5045,15 @@ arg_2		= word ptr  8
 		jmp	short loc_53057
 ; ���������������������������������������������������������������������������
 
-loc_53053:				; CODE XREF: GeomNode_SumAndCount_53034+Cj
+loc_53053:				; CODE XREF: PtrList_GetAt_53034+Cj
 		xor	dx, dx
 		xor	ax, ax
 
-loc_53057:				; CODE XREF: GeomNode_SumAndCount_53034+1Dj
+loc_53057:				; CODE XREF: PtrList_GetAt_53034+1Dj
 		pop	si
 		pop	bp
 		retf
-GeomNode_SumAndCount_53034	endp
+PtrList_GetAt_53034	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5054,7 +5062,7 @@ GeomNode_SumAndCount_53034	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre
-; d'entrees, +2 far ptr, pas 16 octets) via GeomNode_SumOffsetsUpChain_50EEB ; si n >= nombre
+; d'entrees, +2 far ptr, pas 16 octets) via AreaRelPos_ToWorld_50EEB ; si n >= nombre
 ; d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la
 ; resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1,
 ; 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde.
@@ -5109,7 +5117,7 @@ loc_5308D:				; CODE XREF: Player_ResolveAttachPointN_5305A+2Dj
 		lea	ax, [bp+var_1C]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_1C]
 		mov	[bp+var_10], eax
@@ -8090,20 +8098,20 @@ Expr_Node_ComputeAggregateField_54121	endp
 
 ; ==============================================================================================
 ; far, référencée depuis seg004 (cœur IA) : combine Expr_Node_Accessor_52E17,
-; Expr_LookupNamedValue_52D08 et GeomNode_SumOffsetsUpChain_50EEB — confirme l'usage du
-; système GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE
-; INTEGRALEMENT (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de
-; Remi). CONCLUSION : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une
-; POSITION NOMMEE en combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 /
-; Expr_LookupNamedValue_52D08 - le meme systeme que MissionScript_ExecutePROG) et la
-; HIERARCHIE GEOMETRIQUE (GeomNode_SumOffsetsUpChain_50EEB - somme les decalages en remontant
-; l'arbre de noeuds d'un modele 3D, typiquement pour resoudre un point d'ancrage nomme comme
-; un point de formation ou un point d'attache d'arme). En cas d'echec de resolution, replie
-; sur des valeurs GLOBALES fixes (dword_707F8/7FC/800) ou sur les champs d'un objet reference
-; alternatif (+0x22). AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour
-; DEPLACER une entite dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES
-; COMPLEMENTAIRES MAIS DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y
-; deplacer' - aucun lien de classe/famille commun confirme.
+; Expr_LookupNamedValue_52D08 et AreaRelPos_ToWorld_50EEB — confirme l'usage du système
+; GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE INTEGRALEMENT
+; (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de Remi). CONCLUSION
+; : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une POSITION NOMMEE en
+; combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 / Expr_LookupNamedValue_52D08 -
+; le meme systeme que MissionScript_ExecutePROG) et la HIERARCHIE GEOMETRIQUE
+; (AreaRelPos_ToWorld_50EEB - somme les decalages en remontant l'arbre de noeuds d'un modele
+; 3D, typiquement pour resoudre un point d'ancrage nomme comme un point de formation ou un
+; point d'attache d'arme). En cas d'echec de resolution, replie sur des valeurs GLOBALES fixes
+; (dword_707F8/7FC/800) ou sur les champs d'un objet reference alternatif (+0x22).
+; AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour DEPLACER une entite
+; dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES COMPLEMENTAIRES MAIS
+; DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y deplacer' - aucun
+; lien de classe/famille commun confirme.
 ; ==============================================================================================
 AI_ResolveNodePosition_54274	proc far		; CODE XREF: seg004:081AP seg004:0942P
 
@@ -8166,7 +8174,7 @@ loc_542C1:
 		lea	ax, [bp+var_20]
 		push	ax
 		push	cs
-		call	near ptr GeomNode_SumOffsetsUpChain_50EEB
+		call	near ptr AreaRelPos_ToWorld_50EEB
 
 loc_542D3:
 		add	sp, 8

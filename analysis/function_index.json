@@ -10965,8 +10965,8 @@
 "calls": [
 "sub_658"
 ],
-"new_name": "GeomNode_SumOffsetsUpChain_50EEB",
-"summary": "far, cumule 3 champs dword (+0x22/+0x26/+0x2A, probable position X/Y/Z) en remontant une chaîne de pointeurs (parents successifs), alloue (sub_658, 0Ch) ou réutilise un buffer résultat. Cœur du calcul de position résolue d'un nœud dans sa hiérarchie — utilisé largement dans tout le cluster seg109-117."
+"new_name": "AreaRelPos_ToWorld_50EEB",
+"summary": "far, POSITION MONDE D'UNE POSITION RELATIVE À UNE ZONE AREA (ex-GeomNode_SumOffsetsUpChain : il n'y a PAS de chaîne, un seul parent). Args : (dst near ptr ou 0, seg dst, far ptr rec). rec = { +0 far ptr zone AREA, +4/+8/+0xC 3× i32 24.8 décalage }. Résultat = décalage + zone[+0x22/+0x26/+0x2A] (point de référence de la zone) si le pointeur de zone est non nul (cmp dword ptr es:[bx],0 / jz ; add [bp+var_10], es:[bx+22h]…), sinon décalage seul (position absolue). Si dst = 0, alloue un buffer de 12 o (push 0Ch / CRT_Malloc16_Retry). Utilisé pour les SPOT (Player_ResolveAttachPointN_5305A, records de 16 o) et pour la position des entrées PART (Expr_Node_StoreResultVector_52C9C : rec = part+0x1D, zone en +0x1D, décalage en +0x21)."
 },
 "sub_50F85": {
 "segment": "seg114",
@@ -11240,7 +11240,7 @@
 "sub_50EEB"
 ],
 "new_name": "Expr_Node_StoreResultVector_52C9C",
-"summary": "far, alloue (sub_658) ou réutilise un buffer, y stocke un vecteur 3D résolu via GeomNode_SumOffsetsUpChain_50EEB."
+"summary": "far, alloue (sub_658) ou réutilise un buffer, y stocke un vecteur 3D résolu via AreaRelPos_ToWorld_50EEB."
 },
 "sub_52D08": {
 "segment": "seg114",
@@ -11326,8 +11326,8 @@
 "lines": 31,
 "type": "far",
 "calls": [],
-"new_name": "GeomNode_SumAndCount_53034",
-"summary": "far, appelée par l'opcode VM +0x642 : combine GeomNode_SumOffsetsUpChain_50EEB avec une allocation (sub_658)."
+"new_name": "PtrList_GetAt_53034",
+"summary": "far, ACCÈS À L'ÉLÉMENT i D'UNE LISTE DE POINTEURS FAR (ex-GeomNode_SumAndCount : ni somme ni comptage). Args : (liste, i) ; liste = [+0] u16 nombre, [+2] near ptr tableau de far ptr (4 o). Renvoie liste[i], ou NULL si i ≥ nombre (cmp [si],dx / jbe), d'où area_id = −1 / 0xFFFF = « pas de zone ». Sert à convertir un index AREA (liste MissionScenario+0x1A) en pointeur de zone : SCNE, SPOT, PART, HOME, opcodes VM 0x80/0x81/0x82."
 },
 "sub_5305A": {
 "segment": "seg114",
@@ -11340,7 +11340,7 @@
 "sub_658"
 ],
 "new_name": "Player_ResolveAttachPointN_5305A",
-"summary": "far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre d'entrees, +2 far ptr, pas 16 octets) via GeomNode_SumOffsetsUpChain_50EEB ; si n >= nombre d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1, 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde."
+"summary": "far, LUE 2026-09-26. Position monde du point n (arg_6) d'une table (arg_4 : +0 nombre d'entrees, +2 far ptr, pas 16 octets) via AreaRelPos_ToWorld_50EEB ; si n >= nombre d'entrees : renvoie (0, 0, 0) (cmp [si], cx / jbe). Avec la table word_706A0+0x1E, c'est la resolution des spots de mission par MissionScript_CallNativeHandler_52513 (ordres 0xA1, 0xA2, etc.) ; un 2e operande absent (0xFFFF) donne donc l'origine du monde."
 },
 "sub_530FF": {
 "segment": "seg114",
@@ -11644,7 +11644,7 @@
 "sub_658"
 ],
 "new_name": "AI_ResolveNodePosition_54274",
-"summary": "far, référencée depuis **seg004** (cœur IA) : combine Expr_Node_Accessor_52E17, Expr_LookupNamedValue_52D08 et GeomNode_SumOffsetsUpChain_50EEB — confirme l'usage du système GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE INTEGRALEMENT (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de Remi). CONCLUSION : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une POSITION NOMMEE en combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 / Expr_LookupNamedValue_52D08 - le meme systeme que MissionScript_ExecutePROG) et la HIERARCHIE GEOMETRIQUE (GeomNode_SumOffsetsUpChain_50EEB - somme les decalages en remontant l'arbre de noeuds d'un modele 3D, typiquement pour resoudre un point d'ancrage nomme comme un point de formation ou un point d'attache d'arme). En cas d'echec de resolution, replie sur des valeurs GLOBALES fixes (dword_707F8/7FC/800) ou sur les champs d'un objet reference alternatif (+0x22). AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour DEPLACER une entite dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES COMPLEMENTAIRES MAIS DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y deplacer' - aucun lien de classe/famille commun confirme."
+"summary": "far, référencée depuis **seg004** (cœur IA) : combine Expr_Node_Accessor_52E17, Expr_LookupNamedValue_52D08 et AreaRelPos_ToWorld_50EEB — confirme l'usage du système GeomNode par l'IA de vol/combat pour résoudre des positions de référence. LUE INTEGRALEMENT (verification du lien avec AI_ManeuverSolutionMain_781D0, a la demande de Remi). CONCLUSION : CE N'EST PAS LA MEME FAMILLE. AI_ResolveNodePosition_54274 resout une POSITION NOMMEE en combinant le systeme d'EXPRESSIONS (Expr_Node_Accessor_52E17 / Expr_LookupNamedValue_52D08 - le meme systeme que MissionScript_ExecutePROG) et la HIERARCHIE GEOMETRIQUE (AreaRelPos_ToWorld_50EEB - somme les decalages en remontant l'arbre de noeuds d'un modele 3D, typiquement pour resoudre un point d'ancrage nomme comme un point de formation ou un point d'attache d'arme). En cas d'echec de resolution, replie sur des valeurs GLOBALES fixes (dword_707F8/7FC/800) ou sur les champs d'un objet reference alternatif (+0x22). AI_ManeuverSolutionMain_781D0, elle, interprete le bytecode COMP pour DEPLACER une entite dans le temps (integrateur cinematique). CE SONT DEUX MECANISMES COMPLEMENTAIRES MAIS DISTINCTS : l'un repond a 'ou est ce point', l'autre anime 'comment s'y deplacer' - aucun lien de classe/famille commun confirme."
 },
 "sub_543BA": {
 "segment": "seg114",
@@ -30851,7 +30851,7 @@
 "sub_50EEB"
 ],
 "new_name": "GlyphObject_ResolveHierarchyOffset_7E5F2",
-"summary": "far, appelle `GeomNode_SumOffsetsUpChain_50EEB` (seg114)."
+"summary": "far, appelle `AreaRelPos_ToWorld_50EEB` (seg114)."
 },
 "sub_7E690": {
 "segment": "ovr241",
@@ -43999,7 +43999,7 @@
 "sub_65643"
 ],
 "new_name": "MissionScenario_LoadMainRecord_A8331",
-"summary": "far,775L — charge une mission MISSIONS\\<name>.IFF, FORM racine 'MISN'. Lit 16 chunks dans l'ordre : VERS(u16,>=0x500 sinon fatal) NAME(char[<=16]@si+9,'UNK') TUNE(u8->byte_706A2) WRLD(sous-form obligatoire, avec FILE 8o -> sub_6CDCD, sinon sub_6CDC8) CAST(sub_6CF0D@si+0x2E) AREA(sub_6CED6@si+0x1A) SPOT(sub_6CEE5@si+0x1E) NUMS(sub_6CEF4@si+0x24) MSGS(sub_6CF03@si+0x28) FLAG(sub_6CE9F@si+0x48) PROG(sub_6CEB3@si+0x40, bytecode scripté) PART(sub_6CF35@si+0x34) TEAM(count=size/2<=8 @si+0x84, dwords @si+0x74) PLAY(FORM 'la piece' -> MissionPlay_LoadScenes_AA595, contient N chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via GeomNode_SumAndCount_53034 -> si+0x58, + vecteur pos u32 si+0x5C/60/64). Puis câblage Expr VM : Expr_Node_Accessor_532AD(si+0x3A)->si+0x4E, ConvertFieldValue_A8B8F->si+0x54, flags +0x39|=0x10|0x20, SetReference16(5236h), HOME recalculé depuis le nœud si [si+0x50]!=0. Struct MissionScenario détaillée : DATA_MODEL.md §6.6a."
+"summary": "far,775L — charge une mission MISSIONS\\<name>.IFF, FORM racine 'MISN'. Lit 16 chunks dans l'ordre : VERS(u16,>=0x500 sinon fatal) NAME(char[<=16]@si+9,'UNK') TUNE(u8->byte_706A2) WRLD(sous-form obligatoire, avec FILE 8o -> sub_6CDCD, sinon sub_6CDC8) CAST(sub_6CF0D@si+0x2E) AREA(sub_6CED6@si+0x1A) SPOT(sub_6CEE5@si+0x1E) NUMS(sub_6CEF4@si+0x24) MSGS(sub_6CF03@si+0x28) FLAG(sub_6CE9F@si+0x48) PROG(sub_6CEB3@si+0x40, bytecode scripté) PART(sub_6CF35@si+0x34) TEAM(count=size/2<=8 @si+0x84, dwords @si+0x74) PLAY(FORM 'la piece' -> MissionPlay_LoadScenes_AA595, contient N chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via PtrList_GetAt_53034 -> si+0x58, + vecteur pos u32 si+0x5C/60/64). Puis câblage Expr VM : Expr_Node_Accessor_532AD(si+0x3A)->si+0x4E, ConvertFieldValue_A8B8F->si+0x54, flags +0x39|=0x10|0x20, SetReference16(5236h), HOME recalculé depuis le nœud si [si+0x50]!=0. Struct MissionScenario détaillée : DATA_MODEL.md §6.6a."
 },
 "sub_A8A40": {
 "segment": "seg456",
@@ -44458,7 +44458,7 @@
 "sub_51E4A"
 ],
 "new_name": "PartEntry_LoadAndResolveNames_A9E3C",
-"summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via GeomNode_SumAndCount_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert). | 2026-09-27 : enregistrement PART de 62 octets : +0x1C octet 28, +0x21/+0x25/+0x29 dwords 29/33/37, +0x2D/+0x2F mots 41/43, +0x31 octet 45, +0x32 octet 46 = ALLIE PAR DEFAUT de l'ordre 'suivre', +0x33/+0x35/+0x37 mots 48/50/52 = POSTE (cote, avant, haut, m) de l'ordre 'suivre', 4 programmes mots 54..60."
+"summary": "far, 183 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi — croisement avec DATA_MODEL.md et l'implementation C de Remi). RENOMMEE (MissionObject -> PartEntry) : cette structure de 85 octets EST une entree du chunk PART (participants/factions), confirme par DATA_MODEL.md ('sub_6CF35->AA23D (PART)'). \n\nDECOUVERTE MAJEURE : contient les 4 identifiants de script 'progs_id' de l'implementation de Remi, resolus ICI en pointeurs directs vers le PROG via 4 appels identiques a Expr_LookupNamedValue_51E4A(word_706A0+0x40, id_brut) :\n  - PartEntry+0x42/0x44 (far ptr) = on_is_activated  (progs_id[0])\n  - PartEntry+0x46/0x48 (far ptr) = on_mission_update (progs_id[1])\n  - PartEntry+0x4A/0x4C (far ptr) = on_is_destroyed  (progs_id[2])\n  - PartEntry+0x4E/0x50 (far ptr) = on_missions_init (progs_id[3])\nOrdre et noms confirmes par l'implementation C de Remi. Chaque champ est un pointeur RESOLU vers le script reel (pas l'id brut) — resolution faite une fois au chargement, pas a chaque execution. Suivi de deux champs remis a zero (+0x3E, +0x40) — candidats pour l'etat d'execution courant, a confirmer. \n\nDebut de fonction (avant les progs_id) : appelle PartEntry_ResetState_A9DFD, lit 62 octets bruts du chunk (ResourceRecord_ReadFieldGroupA), en extrait +0x1B (1er octet), resout 3 noms de 8 caracteres via sub_2E74 (aux offsets entite+9, +0x12, +0x1A -- roles precis non elucides), resout une position nommee via PtrList_GetAt_53034 -> +0x1D/+0x1F/+0x1C, copie des champs +0x21/+0x25/+0x29/+0x2D/+0x2F/+0x31/+0x32/+0x33/+0x35/+0x37 (roles precis non elucides, correspondent probablement a d'autres champs de l'implementation de Remi -- point ouvert). | 2026-09-27 : enregistrement PART de 62 octets : +0x1C octet 28, +0x21/+0x25/+0x29 dwords 29/33/37, +0x2D/+0x2F mots 41/43, +0x31 octet 45, +0x32 octet 46 = ALLIE PAR DEFAUT de l'ordre 'suivre', +0x33/+0x35/+0x37 mots 48/50/52 = POSTE (cote, avant, haut, m) de l'ordre 'suivre', 4 programmes mots 54..60."
 },
 "sub_A9FD0": {
 "segment": "seg457",
@@ -44671,7 +44671,7 @@
 "sub_64A19"
 ],
 "new_name": "MissionScene_ParseRecord_AA3A5",
-"summary": "far,123L — parse un chunk 'SCNE' (scene) en un record de 0x27 octets. Appele par MissionPlay_LoadScenes_AA595. En-tete disque fixe de 24 octets (ReadFieldGroupA) : +0x00 u8 is_active ; +0x01 u16 area_id (index dans AREA, -1=scene globale ; resolu par GeomNode_SumAndCount_53034(ctx+0x1A) -> record+0x04) ; +0x03/+0x05/+0x07 3x i16 = handlers PROG on_activated/on_leaving/on_mission_update (-1=aucun ; resolus par Expr_LookupNamedValue_51E4A(ctx+0x40=liste PROG) -> record+0x08/+0x0C/+0x10) ; +0x09 u8 has_own_coord ; +0x0A u16 heading (candidat cap deg ; =180 si ancre a l'aire, =0 si coord explicite) ; +0x0C/+0x10/+0x14 3x i32 position (X, Y, Z) fixed-point /256 ; 3e composante (+0x14) = Z = altitude (repere ASM Z-up, cf. CLAUDE.md) -> record+0x1B/+0x1F/+0x23. Puis (taille_chunk-24)/2 mots u16 en queue = LISTE D'UNITES : index dans le chunk PART en ORDRE DE STOCKAGE (pas un id d'entite, pas un index CAST, sans offset) -> PART[slot].entity_id -> CAST[entity_id]. malloc + ReadFieldGroupA -> record+0x14 count, +0x16 ptr. Verifie sur MISSIONS/MISN-1A.IFF. Detail complet : analysis/DATA_MODEL.md §6.6a."
+"summary": "far,123L — parse un chunk 'SCNE' (scene) en un record de 0x27 octets. Appele par MissionPlay_LoadScenes_AA595. En-tete disque fixe de 24 octets (ReadFieldGroupA) : +0x00 u8 is_active ; +0x01 u16 area_id (index dans AREA, -1=scene globale ; resolu par PtrList_GetAt_53034(ctx+0x1A) -> record+0x04) ; +0x03/+0x05/+0x07 3x i16 = handlers PROG on_activated/on_leaving/on_mission_update (-1=aucun ; resolus par Expr_LookupNamedValue_51E4A(ctx+0x40=liste PROG) -> record+0x08/+0x0C/+0x10) ; +0x09 u8 has_own_coord ; +0x0A u16 heading (candidat cap deg ; =180 si ancre a l'aire, =0 si coord explicite) ; +0x0C/+0x10/+0x14 3x i32 position (X, Y, Z) fixed-point /256 ; 3e composante (+0x14) = Z = altitude (repere ASM Z-up, cf. CLAUDE.md) -> record+0x1B/+0x1F/+0x23. Puis (taille_chunk-24)/2 mots u16 en queue = LISTE D'UNITES : index dans le chunk PART en ORDRE DE STOCKAGE (pas un id d'entite, pas un index CAST, sans offset) -> PART[slot].entity_id -> CAST[entity_id]. malloc + ReadFieldGroupA -> record+0x14 count, +0x16 ptr. Verifie sur MISSIONS/MISN-1A.IFF. Detail complet : analysis/DATA_MODEL.md §6.6a."
 },
 "sub_AA49A": {
 "segment": "seg457",
@@ -44771,8 +44771,8 @@
 "sub_64A19",
 "sub_53034"
 ],
-"new_name": "ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9",
-"summary": "⚠️ far, 104 lignes, NON DÉTAILLÉE — combine ExprSlot_Helper9_AA6B3, gestion d'erreur, Memory_TypedFreeWrapperC_5C6F3, ReadFieldGroupA_64A19, GeomNode_SumAndCount_53034."
+"new_name": "Mission_LoadSpotList_AA6C9",
+"summary": "far, LECTEUR DU CHUNK 'SPOT' de MISN (via VROOMM_StubThunk_6CEE5 depuis MissionScenario_LoadMainRecord_A8331 ; liste rangée à MissionScenario+0x1E). Enregistrements disque fixes de 14 o : nombre = taille ÷ 14 (mov bx,0Eh / div bx) ; erreur 9114h si taille ≠ nombre×14 (imul ax,0Eh / cmp eax,[di+72h]). Disque : +0x00 u16 index AREA de rattachement ; +0x02/+0x06/+0x0A 3× i32 24.8 = décalage relatif à la zone (asm c0/c1/c2, c2 = altitude ; libRealSpace : X, Z, Y ; ÷256 → m). Mémoire : liste [+0] u16 nombre, [+2] far ptr tableau de records de 16 o (shl ax,4) : +0 far ptr zone AREA (PtrList_GetAt_53034(scénario+0x1A, index) ; nul si index hors liste), +4/+8/+0xC décalage. Position monde = AreaRelPos_ToWorld_50EEB (décalage + point de référence de la zone, ou décalage seul si zone nulle). Utilisé par les ordres de mission (0xA1, 0xA2…) via Player_ResolveAttachPointN_5305A. Détail : DATA_MODEL.md, chunk SPOT."
 },
 "sub_AA7A4": {
 "segment": "seg457",

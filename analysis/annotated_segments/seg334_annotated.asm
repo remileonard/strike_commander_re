@@ -243,7 +243,7 @@ VROOMM_StubThunk_6CEE0	endp
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
 VROOMM_StubThunk_6CEE5	proc far		; CODE XREF: MissionScenario_LoadMainRecord_A8331:loc_A8635P
-		jmp	ExprSlot_LoadFieldGroupWithErrorCheck_AA6C9
+		jmp	Mission_LoadSpotList_AA6C9
 VROOMM_StubThunk_6CEE5	endp
 
 

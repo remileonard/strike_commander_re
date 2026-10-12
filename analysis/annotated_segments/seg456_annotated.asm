@@ -516,7 +516,7 @@ MissionScenario_ReleaseAndStoreField_A82B0	endp
 ; NUMS(sub_6CEF4@si+0x24) MSGS(sub_6CF03@si+0x28) FLAG(sub_6CE9F@si+0x48)
 ; PROG(sub_6CEB3@si+0x40, bytecode scripté) PART(sub_6CF35@si+0x34) TEAM(count=size/2<=8
 ; @si+0x84, dwords @si+0x74) PLAY(FORM 'la piece' -> MissionPlay_LoadScenes_AA595, contient N
-; chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via GeomNode_SumAndCount_53034 ->
+; chunks SCNE ; objet @si+0x3A) LOAD(A8225) HOME(index AREA via PtrList_GetAt_53034 ->
 ; si+0x58, + vecteur pos u32 si+0x5C/60/64). Puis câblage Expr VM :
 ; Expr_Node_Accessor_532AD(si+0x3A)->si+0x4E, ConvertFieldValue_A8B8F->si+0x54, flags
 ; +0x39|=0x10|0x20, SetReference16(5236h), HOME recalculé depuis le nœud si [si+0x50]!=0.
@@ -1114,7 +1114,7 @@ loc_A8857:				; CODE XREF: MissionScenario_LoadMainRecord_A8331+508j
 		mov	ax, si
 		add	ax, 1Ah
 		push	ax
-		call	GeomNode_SumAndCount_53034
+		call	PtrList_GetAt_53034
 		add	sp, 4
 		mov	[si+5Ah], dx
 		mov	[si+58h], ax

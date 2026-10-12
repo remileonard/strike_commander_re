@@ -935,7 +935,7 @@ loc_1CE64:				; CODE XREF: Lexer_ResolveConstantAlt+41j
 		push	ss
 		lea	ax, [bp+var_10]
 		push	ax
-		call	GeomNode_SumOffsetsUpChain_50EEB
+		call	AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_10]
 		mov	[di], eax

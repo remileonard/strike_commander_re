@@ -1014,7 +1014,7 @@ pour la passe de liaison `ExprSlot` :
 | 4b | ↳ (sinon) | `sub_6CDC8` | — | monde inline |
 | 5 | `CAST` | `sub_6CF0D` | `si+0x2E` | acteurs / personnages |
 | 6 | `AREA` | `sub_6CED6` → `ExprSlot_ConstructMain_A974A` | `si+0x1A` | zones géographiques nommées (sphère / cylindre / boîte) — format ci-dessous |
-| 7 | `SPOT` | `sub_6CEE5` | `si+0x1E` | points nommés |
+| 7 | `SPOT` | `sub_6CEE5` → `Mission_LoadSpotList_AA6C9` | `si+0x1E` | points relatifs à une zone `AREA` — format ci-dessous |
 | 8 | `NUMS` | `sub_6CEF4` | `si+0x24` | variables numériques de mission |
 | 9 | `MSGS` | `sub_6CF03` | `si+0x28` | messages / dialogues |
 | 10 | `FLAG` | `sub_6CE9F` | `si+0x48` | flags d'événement de mission |
@@ -1023,7 +1023,7 @@ pour la passe de liaison `ExprSlot` :
 | 13 | `TEAM` | count = `size/2` (≤8) ; `ReadDwordFieldB` | `si+0x84` count, `si+0x74` tableau | équipes (dwords) |
 | 14 | `PLAY` | `enter_form('PLAY')` → `sub_6CF58` → `MissionPlay_LoadScenes_AA595(si+0x3A)` → `pop` | `si+0x3A` | **la « pièce » : FORM contenant N chunks `SCNE`** (voir plus bas) |
 | 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | emport (loadout) |
-| 16 | `HOME` | `ReadFieldGroupB` u16 → `GeomNode_SumAndCount_53034(si+0x1A)` → `si+0x58` ; puis 3× `ReadFieldGroupC` u32 → `si+0x5C/0x60/0x64` | `si+0x58`, `si+0x5C/60/64` | base de départ : index dans la liste `AREA` + **vecteur position** (X, Y, Z ; Z = altitude, fixed-point) |
+| 16 | `HOME` | `ReadFieldGroupB` u16 → `PtrList_GetAt_53034(si+0x1A)` → `si+0x58` ; puis 3× `ReadFieldGroupC` u32 → `si+0x5C/0x60/0x64` | `si+0x58`, `si+0x5C/60/64` | base de départ : index dans la liste `AREA` + **vecteur position** (X, Y, Z ; Z = altitude, fixed-point) |
 
 > **Modèle « théâtre »** : la narration scriptée d'une mission est structurée comme
 > une pièce de théâtre. `CAST` = distribution (personnages), `PLAY` = la pièce
@@ -1095,7 +1095,7 @@ incluses.** Écrit en repère libRealSpace :
 **En mémoire** : `MissionScenario+0x1A` = `[+0]` u16 nombre de zones, `[+2]` near ptr vers un
 tableau de **far ptr** (4 o) vers les objets zone (allocation `shl ax, 2` après la passe de
 comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
-`GeomNode_SumAndCount_53034(liste, i)` renvoie l'élément i, ou un pointeur **nul** si
+`PtrList_GetAt_53034(liste, i)` renvoie l'élément i, ou un pointeur **nul** si
 `i ≥ nombre` (`cmp [si], dx / jbe`) — d'où `area_id = −1` = « pas de zone ».
 
 **Utilisateurs** :
@@ -1108,6 +1108,43 @@ comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
 - opcodes de script `0x80` / `0x81` / `0x82` (`Expr_VM_Interpreter_51106`) : prennent un index
   de zone et retrouvent la scène rattachée (`Expr_Node_Accessor_532AD`) ; `0x80` met son
   `is_active` à 1, `0x82` le teste, `0x81` non détaillé.
+
+##### `SPOT` → points rattachés à une zone — `Mission_LoadSpotList_AA6C9` (seg457)
+
+Un `SPOT` est un **point défini relativement à une zone `AREA`** (la zone ne référence
+jamais de spot : c'est le spot qui pointe vers la zone). Les ordres de mission (`0xA1`,
+`0xA2`… via `MissionScript_CallNativeHandler_52513`) s'en servent comme destinations.
+
+Enregistrements fixes de **14 octets**, sans compteur : nombre = taille ÷ 14
+(`mov bx, 0Eh / div bx`) ; erreur `9114h` si la taille n'est pas un multiple de 14
+(`imul ax, 0Eh / cmp eax, [di+72h]`). Lecture brute en un bloc
+(`push large 0Eh` / `ResourceRecord_ReadFieldGroupA_64A19`), little-endian.
+
+| Off. disque | Type | Champ (asm, Z-up) | libRealSpace | → record mémoire (16 o) |
+|---|---|---|---|---|
+| `0x00` | u16 | index de la zone `AREA` | — | `+0x00` far ptr zone (`PtrList_GetAt_53034(scénario+0x1A, index)`, **nul** si index hors liste) |
+| `0x02` | i32 | décalage c0 | **X** (÷ 256 → m) | `+0x04` |
+| `0x06` | i32 | décalage c1 | **Z** (profondeur) | `+0x08` |
+| `0x0A` | i32 | décalage c2 = altitude | **Y** | `+0x0C` |
+
+En mémoire (`MissionScenario+0x1E`) : `[+0]` u16 nombre, `[+2]` far ptr vers le tableau de
+records de 16 o (`shl ax, 4` pour l'allocation, `add word ptr [bp+var_4], 10h` par record).
+
+**Position monde d'un spot** — `AreaRelPos_ToWorld_50EEB` (appelée par
+`Player_ResolveAttachPointN_5305A`, qui renvoie (0, 0, 0) si le numéro de spot est hors liste) :
+
+```
+position = décalage + point_de_référence(zone)   si la zone existe
+position = décalage                               sinon (index 0xFFFF ou hors liste → absolu)
+```
+
+Preuve : copie du décalage (`mov eax, es:[si]` sur `rec+4`…), test du pointeur de zone
+(`cmp dword ptr es:[bx], 0 / jz`), puis `add [bp+var_10], es:[bx+22h]` / `+26h` / `+2Ah`.
+Le point de référence est celui du chunk `AREA` : **centre** pour une sphère, **centre du
+plancher** pour un cylindre ou une boîte — un décalage (0, 0, 0) tombe exactement dessus.
+
+La même fonction calcule la position des entrées `PART` : `Expr_Node_StoreResultVector_52C9C`
+lui passe `part+0x1D` (pointeur de zone en `+0x1D`, décalage en `+0x21`), même structure.
 
 ##### `PLAY` → chunks `SCNE` (scènes) — `MissionPlay_LoadScenes_AA595` (seg457)
 
@@ -1129,7 +1166,7 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 | Off. disque | Taille | Champ | Résolution moteur | → record (0x27 o) |
 |---|---|---|---|---|
 | `0x00` | u8 | `is_active` | copié tel quel | `+0x00` |
-| `0x01` | u16 | `area_id` (index dans `AREA`, `-1` = scène globale) | `GeomNode_SumAndCount_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
+| `0x01` | u16 | `area_id` (index dans `AREA`, `-1` = scène globale) | `PtrList_GetAt_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
 | `0x03` | i16 | `on_is_activated` (ref `PROG`, `-1` = aucun) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
 | `0x05` | i16 | `on_leaving` | idem | `+0x0C` |
 | `0x07` | i16 | `on_mission_update` | idem | `+0x10` |

@@ -991,7 +991,7 @@ Font_LoadDefinitionFromIFF_7E1B4	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, appelle GeomNode_SumOffsetsUpChain_50EEB (seg114).
+; far, appelle AreaRelPos_ToWorld_50EEB (seg114).
 ; ==============================================================================================
 GlyphObject_ResolveHierarchyOffset_7E5F2	proc far		; CODE XREF: VROOMM_StubThunk_6AE39J GlyphObject_StoreComputedPosition_7E690+10p
 
@@ -1059,7 +1059,7 @@ loc_7E656:				; CODE XREF: GlyphObject_ResolveHierarchyOffset_7E5F2+5Ej
 		push	ss
 		lea	ax, [bp+var_12]
 		push	ax
-		call	GeomNode_SumOffsetsUpChain_50EEB
+		call	AreaRelPos_ToWorld_50EEB
 		add	sp, 8
 		mov	eax, [bp+var_12]
 		mov	[di], eax
