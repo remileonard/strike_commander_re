@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strike Commander MVRS Manoeuvres</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Flight test sheet: reading column + side contents, one card per manoeuvre (text | diagram) */
+:root {
+  --bg: #eef2f1;
+  --panel: #ffffff;
+  --fg: #18211f;
+  --muted: #56645f;
+  --rule: #cfd8d5;
+  --accent: #0a6b70;
+  --accent-soft: #d6ecec;
+  --target: #b3262e;
+  --mark: #a86a0c;
+  --mark-soft: #f6e8cf;
+  --ground: #8a7a5c;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; font-size: 13px; }
+nav.toc h2 { font-family: var(--font-display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: grid; grid-template-columns: 34px 1fr; padding: 3px 6px; border-radius: 4px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outline: none; }
+nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
+main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+main > * { min-width: 0; }
+header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
+header.top p { max-width: 70ch; margin: 0 0 10px; }
+.eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h2.sec { font-family: var(--font-display); font-size: 26px; margin: 8px 0 0; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-size: 19px; margin: 18px 0 6px; }
+p, li { max-width: 72ch; }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
+.note { border-left: 3px solid var(--mark); background: var(--mark-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 78ch; }
+.note p { margin: 4px 0; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; }
+dl.vocab { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 6px 18px; margin: 0; }
+dl.vocab dt { font-weight: 600; }
+dl.vocab dd { margin: 0; }
+article.mv { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px 22px; scroll-margin-top: 16px; }
+article.mv > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 12px; }
+article.mv > header .id { font-family: var(--font-mono); font-size: 15px; color: var(--accent); }
+article.mv > header h2 { font-family: var(--font-display); font-size: 25px; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.chips li { font-size: 12.5px; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.chips li b { color: var(--fg); font-weight: 600; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 26px; align-items: start; }
+.grid2 > * { min-width: 0; }
+ol.phases { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+ol.phases li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }
+ol.phases li > span { font-family: var(--font-mono); font-weight: 500; color: var(--mark); background: var(--mark-soft); border-radius: 4px; text-align: center; height: 22px; line-height: 22px; font-size: 12.5px; }
+figure { margin: 0; }
+figure .svgbox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); }
+figure svg { display: block; width: 100%; min-width: 420px; height: auto; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.check { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+.check h3 { margin-top: 0; color: var(--accent); }
+.check ul { margin: 4px 0; padding-left: 18px; }
+.bug { color: var(--target); font-weight: 600; }
+pre.mermaid { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; }
+pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; }
+/* diagrams */
+.g-ground { stroke: var(--ground); stroke-width: 2; fill: none; }
+.g-hz { stroke: var(--rule); stroke-width: 1.2; stroke-dasharray: 5 5; fill: none; }
+.g-lim { stroke: var(--mark); stroke-width: 1.2; stroke-dasharray: 6 4; fill: none; }
+.g-path { stroke: var(--accent); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.g-alt { stroke: var(--accent); stroke-width: 1.8; fill: none; stroke-dasharray: 5 4; }
+.g-tgtpath { stroke: var(--target); stroke-width: 1.8; fill: none; stroke-dasharray: 4 4; }
+.g-me { fill: var(--fg); }
+.g-tgt { fill: var(--target); }
+.g-ph { fill: var(--mark); }
+.g-phn { fill: var(--panel); font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-anchor: middle; }
+.g-lbl { fill: var(--muted); font-family: var(--font-body); font-size: 11.5px; }
+.g-lbl-a { fill: var(--accent); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-lbl-t { fill: var(--target); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-title { fill: var(--fg); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: .03em; }
+.g-frame { stroke: var(--rule); stroke-width: 1; fill: none; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab dd { margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#cadre"><span>—</span><span>Common framework</span></a></li>
+    <li><a href="#vocab"><span>—</span><span>Vocabulary</span></a></li>
+    <li><a href="#resume"><span>—</span><span>Overview</span></a></li>
+    <li><a href="#id1"><span>1</span><span>Reacquisition</span></a></li>
+    <li><a href="#id2"><span>2</span><span>Break away</span></a></li>
+    <li><a href="#id3"><span>3</span><span>Energy</span></a></li>
+    <li><a href="#id4"><span>4</span><span>Defensive turn</span></a></li>
+    <li><a href="#id5"><span>5</span><span>Vertical reversal</span></a></li>
+    <li><a href="#id6"><span>6</span><span>Split-S</span></a></li>
+    <li><a href="#id7"><span>7</span><span>Pursuit</span></a></li>
+    <li><a href="#id13"><span>13</span><span>Climb</span></a></li>
+    <li><a href="#id14"><span>14</span><span>Ground avoidance</span></a></li>
+    <li><a href="#id15"><span>15</span><span>Stall recovery</span></a></li>
+    <li><a href="#id16"><span>16</span><span>Speed recovery</span></a></li>
+    <li><a href="#outils"><span>8–21</span><span>Other nodes</span></a></li>
+    <li><a href="#essais"><span>—</span><span>Test protocol</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">STRIKE.EXE · MVRS nodes · test reference</div>
+  <h1>Strike Commander MVRS manoeuvres</h1>
+  <p>This document describes what each AI manoeuvre does in the original game: when it is chosen, how it is set up, what it commands phase by phase and when it ends. Each card ends with a list of points to observe in the <code>DebugStrike</code> test tool, to compare the port with the original.</p>
+  <p>All values come from the score, apply and tick functions read in <code>seg002</code>, <code>seg003</code> and <code>seg008</code>. Angles are in degrees, distances in metres, speeds in the unit of the <code>JDYN</code> fields, durations in seconds. Stick: 16 = full deflection.</p>
+</header>
+
+<section id="cadre">
+  <h2 class="sec">Common framework: when a manoeuvre runs</h2>
+  <p>A manoeuvre is a <b>behaviour</b>: once applied, it is pushed (<code>Behavior_PushRunning_756A4</code>) and keeps control of the aircraft until it pops itself (<code>Behavior_PopFinished_75612</code>) or is abandoned. In the meantime, its tick is called at every AI tick.</p>
+  <pre class="mermaid">flowchart TD
+  T["AI_TopLevelThink (every tick)"] --> A["Threat alert?<br/>abandons and applies ID 4 (3 s)"]
+  T --> R["Nothing running: reflexes<br/>ID 15 stall, ID 14 ground, collision"]
+  T --> M["Missile evasion / reaction to an attacker"]
+  T --> G["Profile GOAL"]
+  G --> S["AI_BehaviorStateMachine<br/>(air target, reaction ≤ 1)"]
+  S --> B{"AI_BehaviorSelector:<br/>shot or firing solution?"}
+  B -- yes --> F["Pursuit and fire,<br/>running behaviour abandoned"]
+  B -- no --> C{"Behaviour running?"}
+  C -- yes --> K["its tick"]
+  C -- no --> TO["MVRS tournament<br/>score + PROF weight ± 1"]
+  TO --> AP["Winner applied<br/>(pushed, 2 s timer by default)"]</pre>
+  <ul>
+    <li><b>The tournament only runs when there is an air target but no firing solution</b>. As soon as <code>AI_BehaviorSelector</code> finds a positive shot quality, the running manoeuvre is abandoned.</li>
+    <li>Candidates: the 8 fixed nodes (ID 20, 14, 15, 16, 21, 7, 19, 4) and the identifiers of the <code>MVRS</code> chunk (25 at most). Rating = node score + weight from the file ± 1 at random. <b>A score of 0 excludes the candidate</b>, whatever its weight. On a tie, the first one keeps its place.</li>
+    <li>The tournament passes each node a context: the air target and a <b>2 s</b> timer. An apply that does not set its own timer keeps these 2 s (ID 2, ID 4 outside an alert).</li>
+    <li>“Uses” = number of times the manoeuvre has already been applied (<code>node+2</code>). Several scores subtract it: the AI varies its manoeuvres.</li>
+    <li>Every apply switches off the autopilot (<code>JDYN+0x68 = 0xFF</code>).</li>
+  </ul>
+</section>
+
+<section id="vocab">
+  <h2 class="sec">Vocabulary of scores and ticks</h2>
+  <p>Scores read a context computed once per frame (<code>MVRS_BuildCombatContext_E5A4</code>). The names below are this document's; the original's global variable is in parentheses.</p>
+  <dl class="vocab">
+    <dt>Nose angle</dt><dd>Angle between my nose and the direction of the target: 0 = dead ahead, 180 = dead astern (<code>word_72095</code>).</dd>
+    <dt>Pointing</dt><dd>Angle between the target's velocity and the target → me line: <b>0 = the target is heading straight at me</b>, 180 = it is moving away (<code>word_72093</code> = 180 − <code>word_72097</code>).</dd>
+    <dt>Aspect</dt><dd>Angle between the me → target line and the target's velocity (<code>word_72097</code>): 0 = it has its back to me.</dd>
+    <dt>Future angle</dt><dd>Angle between my nose and the target's relative position in 3 s (<code>word_720DD</code>).</dd>
+    <dt>Future altitude difference</dt><dd>Target's altitude minus mine, both extrapolated to 3 s (<code>dword_720D9</code>).</dd>
+    <dt>d</dt><dd>Distance to the target (<code>dword_7209B</code>). Usual threshold: 1800 m (<code>dword_7201C</code>).</dd>
+    <dt>Close</dt><dd>d &lt; 3 × the component of the target's velocity along the line of sight.</dd>
+    <dt>Target behind me</dt><dd>Nose angle ≥ 100 and (future angle ≤ 80, or pointing &lt; 50 and close) (<code>byte_720E0</code>).</dd>
+    <dt>Head-on</dt><dd>Nose angle ≤ 60, pointing &lt; 60 and close (<code>byte_720E1</code>).</dd>
+    <dt>Aircraft</dt><dd>The AI entity is of type 1, an aircraft (<code>byte_720DF</code>). True for all airborne AIs.</dd>
+    <dt>Fighter</dt><dd>Target's model class &gt; 6 (<code>byte_720C3 &gt; byte_72038</code>).</dd>
+    <dt>Floor</dt><dd>Terrain altitude + 200 m (<code>dword_7203D</code>, <code>entity+0xE5</code> = 200 m).</dd>
+    <dt>Too low</dt><dd>Altitude &lt; terrain + 4 × 200 = terrain + 800 m (<code>AI_Sensor_TooLow_56E5</code>).</dd>
+    <dt>Min manoeuvre speed</dt><dd>Min speed <code>JDYN+0x82</code>, raised towards cruise when the nose is high (<code>dword_72039</code>).</dd>
+    <dt>Too slow</dt><dd>Stalled, or indicated speed ≤ min manoeuvre speed (<code>AI_Sensor_TooSlow_564A</code>).</dd>
+    <dt>Cruise, min, max</dt><dd><code>JDYN+0x84</code>, <code>+0x82</code>, <code>+0x80</code>. “Full throttle” = notch 10 written directly; “cruise throttle” = throttle law towards cruise speed.</dd>
+    <dt>Attitude(a, z)</dt><dd>Commands pitch towards <i>a</i>; “reached” when the error is below the dead zone <i>z</i> (<code>AI_PitchToAngleCmd_7E18</code>).</dd>
+    <dt>Roll(r, z)</dt><dd>Same for bank (<code>AI_RollToAngleCmd_8104</code>).</dd>
+    <dt>Guidance(D)</dt><dd>Steering law towards a direction D (<code>AI_GuidanceSolution_Major</code>), with altitude protections. Returns “aligned” when the heading and elevation errors are zero.</dd>
+  </dl>
+</section>
+
+<section id="resume">
+  <h2 class="sec">Overview</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>ID</th><th>Manoeuvre</th><th>Trigger</th><th>Max duration</th><th>Chosen by an AI aircraft when…</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Reacquisition by heading segments</td><td>tournament</td><td>4 segments of 1 s</td><td>a fighter is pointing at me (± 20°), on the side or behind, without being on my six</td></tr>
+      <tr><td class="num">2</td><td>Barrel-roll break</td><td>tournament</td><td>2 s</td><td><b>never</b>: zero score for an “aircraft” entity</td></tr>
+      <tr><td class="num">3</td><td>Energy manoeuvre</td><td>tournament</td><td>4 s</td><td>a fighter is pointing at me (± 20°), especially behind me and closer than 1800 m</td></tr>
+      <tr><td class="num">4</td><td>Defensive turn</td><td>threat alert (and tournament)</td><td>3 s (+2 s)</td><td>alert: a threat is detected; tournament: a fighter is pointing at me</td></tr>
+      <tr><td class="num">5</td><td>Vertical reversal</td><td>tournament</td><td>5 s then 10 s per phase</td><td>I am going at least at cruise speed, the target is not on my six</td></tr>
+      <tr><td class="num">6</td><td>Split-S</td><td>tournament</td><td>5 s then 10 s per phase</td><td>I am more than 4000 m above the floor, the target will be much lower</td></tr>
+      <tr><td class="num">7</td><td>Pursuit</td><td>tournament</td><td>1, 2 or 4 s</td><td><b>always a candidate</b> (score ≥ 1)</td></tr>
+      <tr><td class="num">13</td><td>Climb</td><td>tournament</td><td>≈ 2 s of climb</td><td>I am below my ceiling, not too slow; favoured when far and faster than the target</td></tr>
+      <tr><td class="num">14</td><td>Ground avoidance</td><td>level-4 reflex</td><td>2 s</td><td>too close to the ground, or below the floor while descending</td></tr>
+      <tr><td class="num">15</td><td>Stall recovery</td><td>level-5 reflex</td><td>2 s</td><td>stalled, or slow with the nose above 30°</td></tr>
+      <tr><td class="num">16</td><td>Speed recovery</td><td>tournament</td><td>1,5 s</td><td>piloting FL &lt; 12 (score 1)</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="note">
+    <p><b>Consequence to keep in mind for the tests.</b> Manoeuvres 1, 3 and 4 require the target to be a fighter pointing at me within 20°. Outside that situation, an AI aircraft can only choose 7 (pursuit), 5, 6, 13, 16 and ground attack 19. An AI that “does little” outside a head-on engagement can therefore be faithful to the original.</p>
+  </div>
+</section>
+
+<!-- ============================ ID 1 ============================ -->
+<article class="mv" id="id1">
+  <header><span class="id">ID 1 · tag 0x2B4</span><h2>Reacquisition by heading segments</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>4 segments</b></li><li>Throttle <b>full (segments)</b></li><li>Functions <b>MVRS_ID1_*</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 5)</h3>
+      <p>Zero if: no target, target not a fighter, pointing &gt; 20, too slow, too low, or aircraft with the target on my six. Then − uses/2.</p>
+      <ul>
+        <li>Nose angle &gt; 90 (target on the side or behind): +2, and another +2 if nose angle &gt; 135 and d &lt; 1800.</li>
+        <li>Otherwise: −3 (target ahead), −3 if d &gt; 1800.</li>
+        <li>Aircraft: − FL/2. Clamped to 0…9.</li>
+      </ul>
+      <h3>Setup</h3>
+      <p>The first segment aims at my nose rotated by 30° <b>towards the target's side</b>, level. A segment is an ID 20 node of 1 s. Node timer: 4 (counts the segments).</p>
+      <h3>Sequence</h3>
+      <ol class="phases">
+        <li><span>S</span><div>Each segment: guidance towards its direction, full throttle, until 1 s or alignment.</div></li>
+        <li><span>T</span><div>At the end of a segment, the ID 1 tick subtracts 1 from the timer, measures the heading error towards the target, then starts a new segment: <b>my current nose rotated by −60°</b>, level, 1 s.</div></li>
+      </ol>
+      <h3>End</h3>
+      <p>Heading error towards the target &lt; 60°, no more target, or timer at 0 (4 segments in all).</p>
+      <p class="bug">Bug in the original: the alternation test (<code>test ax, 0</code>) is always false. All the following segments turn by −60°. If the target is on the “+” side, the 2nd segment heads off away from the target.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 280" role="img" aria-label="Top view: two cases of reacquisition segments">
+        <text class="g-title" x="12" y="20">VUE DE DESSUS</text>
+        <line class="g-frame" x1="260" y1="30" x2="260" y2="270"/>
+        <text class="g-lbl" x="20" y="44">Target on the “+” side: does not reacquire</text>
+        <text class="g-lbl" x="276" y="44">Target on the “−” side: reacquires</text>
+        <!-- cas A -->
+        <polyline class="g-path" points="110,240 130,205.4 110,170.8 70,170.8 50,205.4"/>
+        <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(110,244)"/>
+        <circle class="g-ph" cx="130" cy="205.4" r="9"/><text class="g-phn" x="130" y="209.4">1</text>
+        <circle class="g-ph" cx="110" cy="170.8" r="9"/><text class="g-phn" x="110" y="174.8">2</text>
+        <circle class="g-ph" cx="70" cy="170.8" r="9"/><text class="g-phn" x="70" y="174.8">3</text>
+        <circle class="g-ph" cx="50" cy="205.4" r="9"/><text class="g-phn" x="50" y="209.4">4</text>
+        <circle class="g-tgt" cx="215" cy="250" r="6"/>
+        <line class="g-tgtpath" x1="215" y1="250" x2="185" y2="246"/>
+        <text class="g-lbl-t" x="168" y="270">target</text>
+        <text class="g-lbl" x="140" y="196">+30°</text>
+        <text class="g-lbl" x="122" y="150">−60°</text>
+        <text class="g-lbl" x="30" y="236">end: 4 segments</text>
+        <!-- cas B -->
+        <polyline class="g-path" points="400,240 380,205.4 340,205.4"/>
+        <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(400,244)"/>
+        <circle class="g-ph" cx="380" cy="205.4" r="9"/><text class="g-phn" x="380" y="209.4">1</text>
+        <circle class="g-ph" cx="340" cy="205.4" r="9"/><text class="g-phn" x="340" y="209.4">2</text>
+        <circle class="g-tgt" cx="285" cy="235" r="6"/>
+        <line class="g-tgtpath" x1="285" y1="235" x2="312" y2="230"/>
+        <text class="g-lbl-t" x="276" y="258">target</text>
+        <text class="g-lbl" x="392" y="196">−30°</text>
+        <text class="g-lbl" x="318" y="188">−60°</text>
+        <text class="g-lbl" x="320" y="128">end: target within</text>
+        <text class="g-lbl" x="320" y="142">60° of the nose</text>
+        <line class="g-hz" x1="340" y1="205.4" x2="330" y2="148"/>
+      </svg>
+      </div>
+      <figcaption>One segment = 1 s (or less if the aircraft is aligned). Left or right is illustrative: only the “+” or “−” side of the first turn matters.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>First segment: heading turning by about 30° towards the target, level, full throttle.</li>
+      <li>Following segments: −60° relative to the nose at that moment, always to the same side.</li>
+      <li>At most 4 segments; ends as soon as the target is within 60° in heading.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 2 ============================ -->
+<article class="mv" id="id2">
+  <header><span class="id">ID 2 · tag 0x28C</span><h2>Barrel-roll break</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>2 s</b></li><li>Throttle <b>manoeuvre speed</b></li><li>Functions <b>MVRS_ID2_*</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 5)</h3>
+      <p>Zero if: no target, target not a fighter, pointing &gt; 20, too slow, too low, <b>or if the entity is an aircraft</b>. An AI aircraft therefore never chooses this manoeuvre in the tournament.</p>
+      <ul>
+        <li>− uses/2. Nose angle &gt; 135, pointing &lt; 30 and d &lt; 1800: +7.</li>
+        <li>Otherwise: −3 if target ahead, −3 if d &gt; 1800.</li>
+        <li>Indicated speed &lt; min: −6. SM skill roll succeeded: +3.</li>
+      </ul>
+      <h3>Setup</h3>
+      <p>The roll direction follows the lateral stick at that moment: &gt; 3 → + side, &lt; −3 → − side, otherwise drawn at random.</p>
+      <h3>Sequence (every tick)</h3>
+      <ol class="phases">
+        <li><span>R</span><div>Lateral stick <b>fully over</b> (±16) to the chosen side, continuously: the aircraft rolls non-stop.</div></li>
+        <li><span>P</span><div>Pitch stick pulled fully back (16, limited by the pilot) when the nose is above the horizon on its dominant axis, otherwise pushed halfway (−8).</div></li>
+        <li><span>V</span><div>Speed: <code>AI_ManeuverSpeedCmd_ED1E</code> with the target's speed.</div></li>
+      </ol>
+      <h3>End</h3>
+      <p>2 s timer elapsed, or no more target.</p>
+      <p class="bug">Peculiarity: the node's reference vector (<code>node+0x26</code>, <code>+0x2A</code>) is zeroed at construction and never written. The “pull or push” choice therefore depends only on the aircraft's attitude.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 240" role="img" aria-label="Side view: continuous roll">
+        <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+        <line class="g-hz" x1="20" y1="130" x2="500" y2="130"/>
+        <path class="g-path" d="M40,130 C90,130 110,80 150,80 C190,80 200,180 240,180 C280,180 290,80 330,80 C370,80 380,180 420,180 C450,180 470,150 490,140"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,130)"/>
+        <text class="g-lbl" x="150" y="68">lateral stick fully over, continuously</text>
+        <text class="g-lbl" x="210" y="206">pull if nose high, push halfway if nose low</text>
+        <text class="g-lbl-a" x="404" y="70">0 → 2 s</text>
+        <path class="g-alt" d="M140,110 a14,14 0 1,1 20,0"/>
+        <path class="g-alt" d="M320,110 a14,14 0 1,1 20,0"/>
+      </svg>
+      </div>
+      <figcaption>Principle diagram: the aircraft rolls around its flight path for 2 s, pulling or pushing according to its attitude.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>In the tournament, an AI aircraft must never choose ID 2.</li>
+      <li>When forced: continuous roll to the same side for 2 s, pitch stick at +16 or −8.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 3 ============================ -->
+<article class="mv" id="id3">
+  <header><span class="id">ID 3 · tag 0x278</span><h2>Energy manoeuvre</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>4 s</b></li><li>Throttle <b>cruise</b></li><li>Functions <b>MVRS_ID3_*</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 5)</h3>
+      <p>Zero if: no target, target not a fighter, pointing &gt; 20. No usage penalty.</p>
+      <ul>
+        <li>Nose angle &lt; 90 (target ahead): −3.</li>
+        <li>Nose angle &gt; 135 and d ≤ 1800: +3. d &gt; 1800: −3.</li>
+        <li>Aircraft: − FL/4.</li>
+      </ul>
+      <h3>Sequence</h3>
+      <p>Base slope: <b>p = 5 + 40 × (FL/16)²</b> degrees (5° at FL 0, 45° at FL 16).</p>
+      <ol class="phases">
+        <li><span>0</span><div>Choice. Too slow and not too low → 2 (dive). Too slow and too low → 1 (jinks). Too low only → 4 (climb). Otherwise at random: 1 chance in 4 → 2, 1 in 4 → 4, 2 in 4 → 1.</div></li>
+        <li><span>1</span><div>Jink: ID 20 segment of 1 s towards my nose rotated by 32° or 64° (at random), the side alternating from one time to the next; timer −1 s; back to 0.</div></li>
+        <li><span>2</span><div>Cruise throttle, roll towards 180° (zone 15) then pull fully. Moves to 3 as soon as the attitude is ≥ −30°, i.e. immediately in practice.</div></li>
+        <li><span>3</span><div>Dive: attitude −p (zone 10) until the indicated speed reaches cruise or the aircraft is too low; then attitude +5 and back to 0.</div></li>
+        <li><span>4</span><div>Wings level (zone 15) then pull fully. Moves to 5 as soon as the attitude is ≤ 30°, so usually immediately.</div></li>
+        <li><span>5</span><div>Climb: attitude +p (zone 10) while the aircraft is below terrain + 800 m and not too slow; otherwise attitude −5 and back to 0.</div></li>
+        <li><span>6</span><div>Timer elapsed: cruise throttle, attitude 0 (zone 5), then end.</div></li>
+      </ol>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 260" role="img" aria-label="Three branches of the energy manoeuvre">
+        <text class="g-title" x="12" y="20">DIVE (too slow)</text>
+        <text class="g-title" x="186" y="20">CLIMB (too low)</text>
+        <text class="g-title" x="360" y="20">JINKS (top view)</text>
+        <line class="g-frame" x1="174" y1="28" x2="174" y2="250"/>
+        <line class="g-frame" x1="348" y1="28" x2="348" y2="250"/>
+        <!-- piqué -->
+        <line class="g-hz" x1="12" y1="70" x2="166" y2="70"/>
+        <path class="g-path" d="M18,70 L50,70 L120,150 C135,166 150,160 162,150"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(18,70)"/>
+        <circle class="g-ph" cx="50" cy="70" r="9"/><text class="g-phn" x="50" y="74">3</text>
+        <text class="g-lbl" x="70" y="100">attitude −p</text>
+        <text class="g-lbl" x="14" y="200">until cruise</text>
+        <text class="g-lbl" x="14" y="214">speed</text>
+        <text class="g-lbl" x="112" y="182">then +5°</text>
+        <!-- montée -->
+        <path class="g-ground" d="M180,236 L342,236"/>
+        <line class="g-lim" x1="180" y1="150" x2="342" y2="150"/>
+        <text class="g-lbl" x="250" y="144">terrain + 800 m</text>
+        <path class="g-path" d="M188,214 L214,214 L300,130 C312,120 326,120 338,124"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(188,214)"/>
+        <circle class="g-ph" cx="214" cy="214" r="9"/><text class="g-phn" x="214" y="218">5</text>
+        <text class="g-lbl" x="246" y="196">attitude +p</text>
+        <text class="g-lbl" x="290" y="112">then −5°</text>
+        <!-- jinks -->
+        <path class="g-path" d="M430,240 L414,212 L446,186 L420,160 L452,128"/>
+        <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(430,244)"/>
+        <circle class="g-ph" cx="414" cy="212" r="9"/><text class="g-phn" x="414" y="216">1</text>
+        <circle class="g-ph" cx="446" cy="186" r="9"/><text class="g-phn" x="446" y="190">1</text>
+        <circle class="g-ph" cx="420" cy="160" r="9"/><text class="g-phn" x="420" y="164">1</text>
+        <text class="g-lbl" x="360" y="96">1 s segments</text>
+        <text class="g-lbl" x="360" y="110">±32° or ±64°</text>
+        <text class="g-lbl" x="360" y="124">alternating side</text>
+      </svg>
+      </div>
+      <figcaption>Phases 2 and 4 last only one tick: the roll onto the back before the dive does not have time to happen.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Dive: attitude −p held until cruise speed, then pull back up to +5°.</li>
+      <li>Climb: only below terrain + 800 m; stops above.</li>
+      <li>Jinks: heading changes of 32° or 64°, alternating side, each jink takes 1 s off.</li>
+      <li>Ends after about 4 s, on a levelling-off.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 4 ============================ -->
+<article class="mv" id="id4">
+  <header><span class="id">ID 4 · tag 0x264 · fixed node +0xBD</span><h2>Defensive turn</h2></header>
+  <ul class="chips"><li>Trigger <b>threat alert</b>, also in the tournament</li><li>Duration <b>3 s (alert) / 2 s (tournament), +2 s grace</b></li><li>Throttle <b>full</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Triggered by an alert</h3>
+      <p><code>AI_TopLevelThink</code>: if <code>AI_IncomingThreatWarning</code> answers, the running behaviour is abandoned and the ID 4 node is applied directly, with the threat as target and a 3 s timer.</p>
+      <h3>Tournament score (base 5)</h3>
+      <p>Zero if: no target, target not a fighter, pointing &gt; 20, too slow, too low, or aircraft with the target on my six. No usage penalty.</p>
+      <ul>
+        <li>Target ahead (nose angle &lt; 35): +4 if future angle &gt; 135 and pointing &lt; 45 (we are about to cross), otherwise −10.</li>
+        <li>Nose angle &gt; 90: +2, and +2 if nose angle &gt; 135 and d &lt; 1800.</li>
+        <li>Otherwise: −2 (target ahead), −3 if d &gt; 3600.</li>
+        <li>Indicated speed &lt; min: −8; otherwise &lt; cruise: −2.</li>
+      </ul>
+      <h3>Setup</h3>
+      <p>Turn side = side of the target relative to my nose. The initial horizontal heading is stored.</p>
+      <h3>Sequence (every tick)</h3>
+      <ol class="phases">
+        <li><span>1</span><div>Full throttle. Desired bank: 90°, or 60° if too low.</div></li>
+        <li><span>2</span><div>Roll towards that bank (zone 30). Once within 30°: roll (zone 5) and stick pulled fully back.</div></li>
+        <li><span>3</span><div>When the heading has turned by 90° or more, or the timer has elapsed: attitude +10 (zone 10).</div></li>
+      </ol>
+      <h3>End</h3>
+      <p>Attitude +10 reached, or timer below −2 s.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 260" role="img" aria-label="Top view: 90-degree defensive turn">
+        <text class="g-title" x="12" y="20">VUE DE DESSUS</text>
+        <path class="g-path" d="M150,240 L150,200 A70,70 0 0,1 220,130 L300,130"/>
+        <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(150,244)"/>
+        <circle class="g-ph" cx="150" cy="200" r="9"/><text class="g-phn" x="150" y="204">1</text>
+        <circle class="g-ph" cx="170" cy="150" r="9"/><text class="g-phn" x="170" y="154">2</text>
+        <circle class="g-ph" cx="220" cy="130" r="9"/><text class="g-phn" x="220" y="134">3</text>
+        <circle class="g-tgt" cx="390" cy="70" r="6"/>
+        <line class="g-tgtpath" x1="390" y1="70" x2="330" y2="110"/>
+        <text class="g-lbl-t" x="400" y="66">threat</text>
+        <text class="g-lbl" x="60" y="190">full throttle</text>
+        <text class="g-lbl" x="60" y="152">90° bank</text>
+        <text class="g-lbl" x="60" y="166">(60° if too low)</text>
+        <text class="g-lbl" x="60" y="128">stick pulled fully back</text>
+        <text class="g-lbl" x="232" y="118">heading turned by 90°:</text>
+        <text class="g-lbl" x="232" y="104">attitude +10°, end</text>
+        <line class="g-hz" x1="150" y1="200" x2="150" y2="110"/>
+        <text class="g-lbl" x="112" y="104">initial heading</text>
+      </svg>
+      </div>
+      <figcaption>The turn is made towards the target (the threat in the case of an alert).</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Full throttle, bank rising to 90° (60° below terrain + 800 m) towards the target's side.</li>
+      <li>Stick pulled fully back only once the bank is within 30° of the setpoint.</li>
+      <li>Ends around 90° of heading or at the end of the timer, after pulling up to +10°.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 5 ============================ -->
+<article class="mv" id="id5">
+  <header><span class="id">ID 5 · tag 0x250</span><h2>Vertical reversal</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>5 s, then 10 s for each phase</b></li><li>Throttle <b>max (phases 2 to 4), cruise afterwards</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 3)</h3>
+      <p>Zero if: no target, too slow, target on my six, indicated speed &lt; cruise, or entity not an aircraft. Then − 2 × uses. Starting phase: 3.</p>
+      <ul>
+        <li>Future altitude difference &lt; −2500: −7; ≥ +1250: +2.</li>
+        <li>Target ahead (nose angle &lt; 35): +4 if future angle &gt; 145 and pointing &lt; 45, otherwise −10.</li>
+        <li>Nose angle &gt; 90 and pointing &lt; 45: +7 if d &lt; 3600, otherwise −2.</li>
+        <li>My speed &lt; half of the target's: −4; &lt; the target's: −2; &gt; double: +2.</li>
+        <li>Agility <code>JDYN+0x8B</code> = a: +(3 + (a−2)×3/2) if a ≥ 2, otherwise −(3 + (2−a)×3/2).</li>
+        <li>Too low: +4. Otherwise, above 25,000 m: −6 and start in phase 1.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Sequence</h3>
+      <ol class="phases">
+        <li><span>1</span><div>Above 22,500 m: dive −30° (zone 10). Otherwise phase 2.</div></li>
+        <li><span>2</span><div>Speed recovery: max throttle, attitude −30° (zone 5), or +5° (zone 2) if too low, until cruise.</div></li>
+        <li><span>3</span><div>Attitude 0 (zone 5), then wings level (zone 5).</div></li>
+        <li><span>4</span><div>Attitude +90° (zone 10): vertical climb.</div></li>
+        <li><span>5</span><div>Roll that places the target in the lift plane (zone 5). Moves to 6 once placed and if the target is lower than me or I am too slow.</div></li>
+        <li><span>6</span><div>Pull fully until the attitude comes back down to 45° or less: the nose comes back towards the target.</div></li>
+        <li><span>7</span><div>Attitude towards the target's elevation (zone 10), 0 without a target.</div></li>
+        <li><span>8</span><div>Wings level (zone 10), then end.</div></li>
+      </ol>
+      <p>Also ends when the timer goes below 0: 5 s at the start, reset to 10 s at each phase change.</p>
+    </div>
+  </div>
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Side view: vertical reversal">
+      <text class="g-title" x="12" y="20">SIDE VIEW (usual start in phase 3)</text>
+      <path class="g-ground" d="M10,236 L630,236"/>
+      <path class="g-path" d="M150,200 L300,200 A60,60 0 0,0 360,140 L360,90 A40,40 0 0,0 348.3,61.7 C320,40 250,70 170,150"/>
+      <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(150,200)"/>
+      <circle class="g-ph" cx="230" cy="200" r="9"/><text class="g-phn" x="230" y="204">3</text>
+      <circle class="g-ph" cx="345" cy="160" r="9"/><text class="g-phn" x="345" y="164">4</text>
+      <circle class="g-ph" cx="360" cy="105" r="9"/><text class="g-phn" x="360" y="109">5</text>
+      <circle class="g-ph" cx="357" cy="72" r="9"/><text class="g-phn" x="357" y="76">6</text>
+      <circle class="g-ph" cx="292" cy="56" r="9"/><text class="g-phn" x="292" y="60">7</text>
+      <circle class="g-ph" cx="210" cy="112" r="9"/><text class="g-phn" x="210" y="116">8</text>
+      <circle class="g-tgt" cx="90" cy="185" r="6"/>
+      <line class="g-tgtpath" x1="90" y1="185" x2="140" y2="185"/>
+      <text class="g-lbl-t" x="56" y="176">target</text>
+      <text class="g-lbl" x="196" y="222">level, max throttle</text>
+      <text class="g-lbl" x="372" y="150">+90°, max throttle</text>
+      <text class="g-lbl" x="372" y="110">roll: target in</text>
+      <text class="g-lbl" x="372" y="124">the lift plane</text>
+      <text class="g-lbl" x="372" y="70">pull until ≤ 45°</text>
+      <text class="g-lbl" x="236" y="34">towards the target's elevation</text>
+      <text class="g-lbl" x="100" y="96">wings level, end</text>
+      <line class="g-hz" x1="440" y1="200" x2="620" y2="200"/>
+      <text class="g-lbl" x="446" y="192">phases 1-2 (rare): dive −30°</text>
+      <text class="g-lbl" x="446" y="222">to regain speed</text>
+    </svg>
+    </div>
+    <figcaption>The vertical climb bleeds speed: phase 5 usually waits for the aircraft to become “too slow” before pulling.</figcaption>
+  </figure>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Start in phase 3: level off, then pitch up to 90°, max throttle.</li>
+      <li>Roll in the vertical towards the target, then pull through to 45° of attitude, the target ahead.</li>
+      <li>Each phase must progress in less than 10 s, otherwise the manoeuvre stops.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 6 ============================ -->
+<article class="mv" id="id6">
+  <header><span class="id">ID 6 · tag 0x23C</span><h2>Split-S</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>5 s, then 10 s for each phase</b></li><li>Throttle <b>cruise (min in phase 2)</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 3)</h3>
+      <p>Zero if: altitude &lt; floor + 4000 m, aircraft with the target on my six, no target, or entity not an aircraft. Then − 2 × uses. Starting phase: 3.</p>
+      <ul>
+        <li>Future altitude difference &gt; −2000: −7; ≤ −2000 (target much lower): +2.</li>
+        <li>Same angle and distance terms as ID 5 (+4 / −10, +7 / −2).</li>
+        <li>Indicated speed &gt; cruise: −4 and start in phase 2. Otherwise too slow: +6.</li>
+        <li>My speed &gt; double the target's: −6; &gt; the target's: −3; &lt; the target's: +2.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Sequence</h3>
+      <ol class="phases">
+        <li><span>1</span><div>Climb at +30° (zone 10) up to floor + 2000 m. The score never sets this phase.</div></li>
+        <li><span>2</span><div>Too fast: attitude +20° (zone 5), throttle towards min speed, until below cruise.</div></li>
+        <li><span>3</span><div>Attitude 0 (zone 5), then roll to 180° (zone 2): inverted.</div></li>
+        <li><span>4</span><div>Attitude −90° (zone 10): nose towards the ground.</div></li>
+        <li><span>5</span><div>Roll that places the target in the lift plane (zone 5).</div></li>
+        <li><span>6</span><div>Pull fully until the attitude comes back up to −45° or more.</div></li>
+        <li><span>7</span><div>Attitude towards the target's elevation (zone 10), 0 without a target.</div></li>
+        <li><span>8</span><div>Wings level (zone 10), then end.</div></li>
+      </ol>
+      <p>Same timer as ID 5: 5 s at the start, 10 s at each new phase.</p>
+    </div>
+  </div>
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 640 260" role="img" aria-label="Side view: split-S">
+      <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+      <path class="g-ground" d="M10,246 L630,246"/>
+      <line class="g-lim" x1="10" y1="226" x2="630" y2="226"/>
+      <text class="g-lbl" x="470" y="220">floor (terrain + 200 m)</text>
+      <line class="g-lim" x1="10" y1="120" x2="630" y2="120"/>
+      <text class="g-lbl" x="470" y="114">floor + 4000 m (minimum)</text>
+      <path class="g-alt" d="M70,70 L150,52"/>
+      <path class="g-path" d="M150,52 L300,52 A44,44 0 0,1 344,96 L344,140 A44,44 0 0,1 331.1,171.1 C300,200 250,200 190,196"/>
+      <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(70,70) rotate(-12)"/>
+      <circle class="g-ph" cx="110" cy="61" r="9"/><text class="g-phn" x="110" y="65">2</text>
+      <circle class="g-ph" cx="230" cy="52" r="9"/><text class="g-phn" x="230" y="56">3</text>
+      <circle class="g-ph" cx="336" cy="70" r="9"/><text class="g-phn" x="336" y="74">4</text>
+      <circle class="g-ph" cx="344" cy="122" r="9"/><text class="g-phn" x="344" y="126">5</text>
+      <circle class="g-ph" cx="341" cy="158" r="9"/><text class="g-phn" x="341" y="162">6</text>
+      <circle class="g-ph" cx="280" cy="191" r="9"/><text class="g-phn" x="280" y="195">7</text>
+      <circle class="g-ph" cx="200" cy="196" r="9"/><text class="g-phn" x="200" y="200">8</text>
+      <circle class="g-tgt" cx="80" cy="205" r="6"/>
+      <line class="g-tgtpath" x1="80" y1="205" x2="130" y2="205"/>
+      <text class="g-lbl-t" x="46" y="196">target</text>
+      <text class="g-lbl" x="36" y="44">+20°, min throttle</text>
+      <text class="g-lbl" x="180" y="40">level then inverted</text>
+      <text class="g-lbl" x="358" y="92">−90°</text>
+      <text class="g-lbl" x="358" y="134">roll towards the target</text>
+      <text class="g-lbl" x="358" y="166">pull until ≥ −45°</text>
+      <text class="g-lbl" x="150" y="182">towards the target, wings level</text>
+    </svg>
+    </div>
+    <figcaption>The split-S is only chosen when high (at least 4000 m above the floor) and above all when the target will be clearly lower.</figcaption>
+  </figure>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Too fast: climb at +20° and throttle back before rolling over.</li>
+      <li>Roll inverted, nose to −90°, roll towards the target, pull through to −45°, then level off facing the target.</li>
+      <li>Never phase 1 from the tournament.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 7 ============================ -->
+<article class="mv" id="id7">
+  <header><span class="id">ID 7 · tag 0x228 · fixed node +0xD5</span><h2>Pursuit</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament (always a candidate)</b></li><li>Duration <b>1, 2 or 4 s</b></li><li>Throttle <b>intercept speed</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 5, clamped to 1…9)</h3>
+      <p>The floor is 1, not 0: even stalled or without a target, ID 7 stays a candidate. The score clears bits 0, 1 and 3 of the node, then:</p>
+      <ul>
+        <li>Stalled or no target: 0, raised to 1.</li>
+        <li>FL ≤ 13 and piloting roll (FL, −7) failed: simple computation. +2 if the target is ahead (nose angle &lt; 60) and moving away (aspect &lt; 60), otherwise +2 if d &gt; 1800, −2 otherwise.</li>
+        <li>Full computation: pointing &lt; 90 → bit 0. Nose angle &gt; 110 → bit 0 and −3; nose angle &lt; 50 → +3. Aspect &lt; 90 (moving away) → +4.</li>
+        <li>Target elevation &gt; 45°: −(4 + 6(e−20)/25), and −4 if too slow, otherwise −2. Elevation &lt; −30°: −4. In between: +4.</li>
+        <li>Aircraft and target on my six: stores its relative position at 3 s, bit 1, +10. Otherwise aircraft and head-on: same storage, bit 3, +10.</li>
+      </ul>
+      <h3>Setup</h3>
+      <p>Timer 1 s if bit 0, otherwise 2 s; 4 s if bit 1 or 3 and not too low. Bits 2 and 4 cleared.</p>
+    </div>
+    <div>
+      <h3>Sequence (every tick, according to the bits)</h3>
+      <ol class="phases">
+        <li><span>b2</span><div><b>Target on my six</b> (bit 1 and aspect ≥ 80 → bit 2): guidance towards the stored relative position, level, with a 45° climb if I am not too slow; throttle towards the min manoeuvre speed. Bit 2 drops when the aspect goes back below 80.</div></li>
+        <li><span>b4</span><div><b>Lead point</b>: if the target is within 45° of the nose → intercept, bit 4 cleared. Otherwise guidance towards the stored point; bit 4 cleared once aligned.</div></li>
+        <li><span>b3</span><div><b>Head-on</b>: when d ≤ 2 × V²/9 (V = target speed) → 4 s timer, bit 4, point = target position + 4 s of its velocity. Otherwise intercept.</div></li>
+        <li><span>—</span><div><b>No bit</b>: if nose angle ≤ 60 and pointing &lt; 60 → bit 3, then intercept. Otherwise intercept, and <b>end of the manoeuvre</b> if it answers “aligned”.</div></li>
+      </ol>
+      <p>Intercept (<code>AI_InterceptDispatcher</code>): intercept speed with a 450 m stand-off distance, then aim snap (<code>AI_GunSnapAim_6977</code>, closer than 1800 m, within the window and if the AA roll succeeds), otherwise steering law towards the target.</p>
+      <p>A collision test (<code>AI_CollisionCourseTest_DD21</code>) runs before the b3 and “no bit” cases. Also ends when the timer expires, or without a target.</p>
+      <p class="bug">Bug in the original: in b4 mode, the absolute position of the lead point is passed to the guidance as a direction.</p>
+    </div>
+  </div>
+  <figure>
+    <div class="svgbox">
+    <svg viewBox="0 0 640 250" role="img" aria-label="Three pursuit modes">
+      <text class="g-title" x="12" y="20">INTERCEPT (no bit)</text>
+      <text class="g-title" x="226" y="20">CIBLE DANS MES 6 H (b2)</text>
+      <text class="g-title" x="440" y="20">FACE À FACE (b3 → b4)</text>
+      <line class="g-frame" x1="214" y1="28" x2="214" y2="240"/>
+      <line class="g-frame" x1="428" y1="28" x2="428" y2="240"/>
+      <!-- interception -->
+      <path class="g-path" d="M50,226 C50,170 90,120 150,96"/>
+      <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(50,230)"/>
+      <circle class="g-tgt" cx="170" cy="88" r="6"/>
+      <line class="g-tgtpath" x1="170" y1="88" x2="200" y2="70"/>
+      <text class="g-lbl-t" x="150" y="64">target</text>
+      <text class="g-lbl" x="20" y="150">steering law</text>
+      <text class="g-lbl" x="20" y="164">+ intercept speed</text>
+      <text class="g-lbl" x="76" y="206">aim snap</text>
+      <text class="g-lbl" x="76" y="220">&lt; 1800 m → end</text>
+      <!-- 6h -->
+      <path class="g-ground" d="M222,236 L420,236"/>
+      <text class="g-lbl" x="226" y="50">side view</text>
+      <path class="g-path" d="M260,200 L300,200 L380,120"/>
+      <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(260,200)"/>
+      <circle class="g-tgt" cx="236" cy="200" r="6"/>
+      <line class="g-tgtpath" x1="236" y1="200" x2="256" y2="200"/>
+      <text class="g-lbl-t" x="226" y="222">target</text>
+      <text class="g-lbl" x="330" y="200">45° climb</text>
+      <text class="g-lbl" x="320" y="104">towards its position</text>
+      <text class="g-lbl" x="320" y="118">relative at 3 s</text>
+      <text class="g-lbl" x="226" y="150">throttle: min</text>
+      <text class="g-lbl" x="226" y="164">manoeuvre speed</text>
+      <!-- face à face -->
+      <polygon class="g-me" points="0,-8 6,6 -6,6" transform="translate(470,230)"/>
+      <path class="g-path" d="M470,226 L470,180 C470,140 520,110 570,92"/>
+      <circle class="g-tgt" cx="560" cy="160" r="6"/>
+      <line class="g-tgtpath" x1="560" y1="160" x2="600" y2="92"/>
+      <text class="g-lbl-t" x="568" y="170">target</text>
+      <text class="g-lbl" x="586" y="82">✕</text>
+      <text class="g-lbl" x="512" y="60">point = target + 4 s</text>
+      <text class="g-lbl" x="512" y="74">of its velocity</text>
+      <text class="g-lbl" x="440" y="160">d ≤ 2V²/9</text>
+    </svg>
+    </div>
+    <figcaption>In practice, the pursuit chains intercept and aim snap; the “aligned” ending hands control back to firing (<code>AI_BehaviorSelector</code>).</figcaption>
+  </figure>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>ID 7 appears in every tournament evaluation with a score of at least 1.</li>
+      <li>Target behind me: 45° climb and speed reduction (bit 2).</li>
+      <li>Head-on: switches to the lead point (bit 4), then back to intercept within 45°.</li>
+      <li>No bit: the manoeuvre ends as soon as it is aligned or the aim snap happens.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 13 ============================ -->
+<article class="mv" id="id13">
+  <header><span class="id">ID 13 · tag 0x1B0</span><h2>Long-range climb</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>4 s, counted double while climbing</b></li><li>Throttle <b>full, then cruise</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score (base 1)</h3>
+      <p>Zero if: no target, too slow, or altitude ≥ ceiling <code>JDYN+0x86</code>. Then − 2 × uses.</p>
+      <ul>
+        <li>If the target is slower than me, at most 400 m below me, my speed ≥ (cruise + min manoeuvre)/2, aircraft, and target on my six or head-on: +5 × (my speed − its speed)/its speed, or +5 if it is flying below min speed.</li>
+        <li>d &gt; 17,700 m and pointing &lt; 30: +5. Otherwise d &lt; 1800: −5, and another −5 if pointing &lt; 20.</li>
+        <li>Agility <code>JDYN+0x8B</code> = a: +(a−1) if a ≥ 2, otherwise −(3−a).</li>
+        <li>Too low: +4.</li>
+      </ul>
+      <h3>Sequence</h3>
+      <ol class="phases">
+        <li><span>1</span><div>Target within 17,700 m (horizontal distance): end. Otherwise level guidance towards the target; phase 2 once aligned.</div></li>
+        <li><span>2</span><div>Too slow: attitude 0 then wings level (zone 5). Otherwise phase 3.</div></li>
+        <li><span>3</span><div>Zoom climb at 30° + 30° × (speed − cruise)/min speed, at most 60° (30° if I am below cruise), wings level, full throttle. The timer runs down twice as fast. Phase 4 at the end of the timer, if too slow or if the target comes within 17,700 m.</div></li>
+        <li><span>4</span><div>Attitude 0 (zone 5), cruise throttle, then end.</div></li>
+      </ol>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 240" role="img" aria-label="Side view: climb">
+        <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+        <path class="g-ground" d="M10,226 L510,226"/>
+        <path class="g-path" d="M30,190 L120,190 L230,100 L320,96"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(30,190)"/>
+        <circle class="g-ph" cx="60" cy="190" r="9"/><text class="g-phn" x="60" y="194">1</text>
+        <circle class="g-ph" cx="110" cy="190" r="9"/><text class="g-phn" x="110" y="194">2</text>
+        <circle class="g-ph" cx="175" cy="145" r="9"/><text class="g-phn" x="175" y="149">3</text>
+        <circle class="g-ph" cx="270" cy="98" r="9"/><text class="g-phn" x="270" y="102">4</text>
+        <text class="g-lbl" x="30" y="214">heading on the target, level</text>
+        <text class="g-lbl" x="190" y="160">30° to 60°, full throttle</text>
+        <text class="g-lbl" x="240" y="84">level, cruise</text>
+        <line class="g-hz" x1="340" y1="170" x2="440" y2="170"/>
+        <text class="g-lbl" x="350" y="162">≥ 17 700 m</text>
+        <circle class="g-tgt" cx="470" cy="170" r="6"/>
+        <text class="g-lbl-t" x="452" y="194">target</text>
+      </svg>
+      </div>
+      <figcaption>Long-range manoeuvre: it converts excess speed into altitude before the engagement.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>With a target within 17,700 m, the manoeuvre ends immediately.</li>
+      <li>Otherwise: level turn towards the target, zoom climb between 30° and 60° depending on the excess speed, about 2 s, then levelling-off.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 14 ============================ -->
+<article class="mv" id="id14">
+  <header><span class="id">ID 14 · tag 0x19C · fixed node +0xC5</span><h2>Ground avoidance</h2></header>
+  <ul class="chips"><li>Trigger <b>reflex, level 4</b></li><li>Duration <b>2 s</b></li><li>Throttle <b>full (notch 1 in a fast dive)</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Trigger</h3>
+      <p><code>AI_GroundAvoidReflex_E06C</code>, when no behaviour is running and the reaction level is ≤ 4. Score 10 (otherwise 0) if the autopilot is off and:</p>
+      <ul>
+        <li>height above the ground &lt; ground clearance (<code>entity+0xE1</code>) × (1 + sin(roll/2)/2),</li>
+        <li>or altitude below the floor and negative vertical speed.</li>
+      </ul>
+      <p>In the tournament, this node always has a target and its score is 0.</p>
+      <h3>Sequence (every tick)</h3>
+      <ol class="phases">
+        <li><span>E</span><div>Ejection test (mode 2): damage &gt; 80 % or stalled.</div></li>
+        <li><span>1</span><div>If the aircraft is climbing and above the floor: attitude +30°, full throttle, end.</div></li>
+        <li><span>2</span><div>Otherwise: throttle notch 1 if the nose is below the horizon and the speed above the min manoeuvre speed, otherwise full throttle; attitude +30° (zone 10).</div></li>
+      </ol>
+      <p>Also ends after 2 s.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 220" role="img" aria-label="Side view: ground avoidance">
+        <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+        <path class="g-ground" d="M10,206 L180,206 C220,206 240,186 280,186 C320,186 340,206 510,206"/>
+        <path class="g-lim" d="M10,176 L180,176 C220,176 240,156 280,156 C320,156 340,176 510,176"/>
+        <text class="g-lbl" x="380" y="170">floor: terrain + 200 m</text>
+        <path class="g-path" d="M40,110 L170,180 C190,190 210,186 230,170 L320,110"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,110) rotate(28)"/>
+        <circle class="g-ph" cx="195" cy="186" r="9"/><text class="g-phn" x="195" y="190">2</text>
+        <circle class="g-ph" cx="290" cy="130" r="9"/><text class="g-phn" x="290" y="134">1</text>
+        <text class="g-lbl" x="70" y="104">below the floor, descending</text>
+        <text class="g-lbl" x="210" y="124">attitude +30°</text>
+        <text class="g-lbl" x="330" y="104">above and climbing: end</text>
+      </svg>
+      </div>
+      <figcaption>The ground clearance in <code>entity+0xE1</code> is small; the trigger mostly comes from “below the floor while descending”.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Descend below terrain + 200 m (reflexes ticked): the reflex must take over, attitude +30°.</li>
+      <li>Ends as soon as the aircraft climbs above the floor, or after 2 s.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 15 ============================ -->
+<article class="mv" id="id15">
+  <header><span class="id">ID 15 · tag 0x188 · fixed node +0xC9</span><h2>Nose-high and stall recovery</h2></header>
+  <ul class="chips"><li>Trigger <b>reflex, level 5</b></li><li>Duration <b>2 s</b></li><li>Throttle <b>full, idle if stalled with the nose very high</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Trigger</h3>
+      <p><code>AI_StallRecoveryReflex_E159</code>, when no behaviour is running and the reaction level is ≤ 5; it comes before ground avoidance. Score 10 (otherwise 0) if the autopilot is off and the aircraft is stalled, or its indicated speed is ≤ min speed with an attitude &gt; 30°.</p>
+      <h3>Sequence (every tick)</h3>
+      <ol class="phases">
+        <li><span>E</span><div>Ejection test (mode 1): damage &gt; 80 %, or stalled below the floor.</div></li>
+        <li><span>1</span><div>Ends if the nose is at or below the horizon, and the aircraft is no longer both stalled and slow.</div></li>
+        <li><span>2</span><div>Stalled with an attitude &gt; 60°: throttle at idle (notch 0).</div></li>
+        <li><span>3</span><div>Otherwise full throttle and, when not stalled, attitude −30° (zone 10).</div></li>
+      </ol>
+      <p>Also ends after 2 s. The steering law also calls this recovery when the aircraft stalls during guidance.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 220" role="img" aria-label="Side view: nose-high recovery">
+        <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+        <line class="g-hz" x1="10" y1="150" x2="510" y2="150"/>
+        <path class="g-path" d="M40,190 L120,70 C130,56 146,52 160,62 L300,170"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,190) rotate(-56)"/>
+        <circle class="g-ph" cx="110" cy="85" r="9"/><text class="g-phn" x="110" y="89">2</text>
+        <circle class="g-ph" cx="200" cy="93" r="9"/><text class="g-phn" x="200" y="97">3</text>
+        <circle class="g-ph" cx="275" cy="150" r="9"/><text class="g-phn" x="275" y="154">1</text>
+        <text class="g-lbl" x="20" y="60">stalled, nose &gt; 60°:</text>
+        <text class="g-lbl" x="20" y="74">idle</text>
+        <text class="g-lbl" x="214" y="84">full throttle, attitude −30°</text>
+        <text class="g-lbl" x="300" y="146">nose below the horizon: end</text>
+      </svg>
+      </div>
+      <figcaption>The reflex only stops when the nose has come back below the horizon.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Pitch the AI aircraft up beyond 30° until min speed: the reflex must push the nose towards −30°, full throttle.</li>
+      <li>Stalled at more than 60° of attitude: throttle at idle.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ ID 16 ============================ -->
+<article class="mv" id="id16">
+  <header><span class="id">ID 16 · tag 0x174 · fixed node +0xCD</span><h2>Speed recovery</h2></header>
+  <ul class="chips"><li>Trigger <b>tournament</b></li><li>Duration <b>1.5 s</b></li><li>Throttle <b>max speed</b></li></ul>
+  <div class="grid2">
+    <div>
+      <h3>Score</h3>
+      <p>1 if the FL piloting skill is below 12, otherwise 0. No other condition: it is the fallback manoeuvre of average pilots.</p>
+      <h3>Sequence (every tick)</h3>
+      <ol class="phases">
+        <li><span>1</span><div>Ends if the indicated speed exceeds (cruise + min manoeuvre)/2.</div></li>
+        <li><span>2</span><div>Otherwise: throttle towards max speed (<code>JDYN+0x80</code>), attitude +5° (zone 5).</div></li>
+      </ol>
+      <p>Also ends after 1.5 s.</p>
+    </div>
+    <figure>
+      <div class="svgbox">
+      <svg viewBox="0 0 520 160" role="img" aria-label="Side view: speed recovery">
+        <text class="g-title" x="12" y="20">VUE DE CÔTÉ</text>
+        <line class="g-hz" x1="10" y1="110" x2="510" y2="110"/>
+        <path class="g-path" d="M40,110 L360,82"/>
+        <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,110) rotate(-5)"/>
+        <text class="g-lbl" x="120" y="134">attitude +5°, throttle towards max speed, 1.5 s at most</text>
+        <text class="g-lbl" x="370" y="80">ends when the speed</text>
+        <text class="g-lbl" x="370" y="94">exceeds (cruise + min)/2</text>
+      </svg>
+      </div>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>To check in the tool</h3>
+    <ul>
+      <li>Profile with FL ≥ 12: ID 16 always has a score of 0.</li>
+      <li>Slow aircraft: slight 5° pitch-up, max throttle, stops at the speed threshold or after 1.5 s.</li>
+    </ul>
+  </div>
+</article>
+
+<section id="outils">
+  <h2 class="sec">Other nodes (8 to 12, 19, 20, 21)</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>ID</th><th>Role</th><th>Expected behaviour</th></tr></thead>
+    <tbody>
+      <tr><td class="num">8</td><td>Get behind the target</td><td>Score always 0, never chosen. The tick exists: aimed point = target + 100 m along its velocity, intercept speed with a 900 m stand-off, 2 s.</td></tr>
+      <tr><td class="num">9–12</td><td>Empty slots</td><td>Score always 0; apply and tick end immediately.</td></tr>
+      <tr><td class="num">19</td><td>Ground attack</td><td>Score 5 with a ground target and an air-to-ground weapon loaded; 5-phase state machine described in <code>NOTE_ATTAQUE_SOL.md</code> (in French).</td></tr>
+      <tr><td class="num">20</td><td>Heading segment</td><td>Tool (node <code>+0xC1</code>), score 0. Guidance towards a stored direction, full throttle, until the timer or alignment. Used for the segments of ID 1 and ID 3.</td></tr>
+      <tr><td class="num">21</td><td>Autopilot navigation</td><td>Tool (node <code>+0xD1</code>), score 0. Brings the nose back within 15° of the horizon, then engages the kinematic autopilot; ends at the reached point or on the timer (2 s, 30 s for wandering).</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="essais">
+  <h2 class="sec">Test protocol with DebugStrike</h2>
+  <ol>
+    <li>Open <b>Debug → IA sur l'avion du joueur</b> (AI on the player's aircraft), choose a profile (note its FL and its MVRS weights), enable the AI.</li>
+    <li>Set up the situation: altitude, speed, and a target picked on the radar in the card's geometry (ahead, behind, head-on, far, lower).</li>
+    <li><b>Évaluer le tournoi</b> (evaluate the tournament) once: record the scores. They must match the card (expected zero scores included).</li>
+    <li><b>Mode test MVRS</b> (MVRS test mode), “Une fois puis errance” (once then wander), reflexes ticked except for ID 14 and ID 15 alone: start the manoeuvre and record the sequence of phases, attitude, bank, throttle, duration and the reason it ended.</li>
+    <li>Compare with the card's “To check in the tool” section.</li>
+  </ol>
+  <p>Result sheet to copy for each test:</p>
+  <pre class="tpl">Manoeuvre: ID __      Profile: ______ (FL __)      Aircraft: ______
+Situation: altitude ____ m, speed ____, target ______ at ____ m, nose angle ___°, pointing ___°
+Tournament scores: ID1 _ ID3 _ ID4 _ ID5 _ ID6 _ ID7 _ ID13 _ ID16 _ ID19 _
+Observed sequence (phase: attitude / bank / throttle / duration):
+  1: ___________________________________________
+  2: ___________________________________________
+End: timer / condition (which) / abandoned    Total duration: ___ s
+Difference from the card: ___________________________________________</pre>
+</section>
+</main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
+</script>
+</body>
+</html>

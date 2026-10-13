@@ -44,7 +44,8 @@ nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 nav.toc a { color: var(--fg); text-decoration: none; display: grid; grid-template-columns: 34px 1fr; padding: 3px 6px; border-radius: 4px; }
 nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outline: none; }
 nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
-main { min-width: 0; display: grid; gap: 28px; }
+main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+main > * { min-width: 0; }
 header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
 header.top p { max-width: 70ch; margin: 0 0 10px; }
 .eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }

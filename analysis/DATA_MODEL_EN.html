@@ -1,0 +1,1376 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strike Commander Data Model</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Format reference: reading column + side contents, one card per file or chunk (text | diagram) */
+:root {
+  --bg: #eef2f1;
+  --panel: #ffffff;
+  --fg: #18211f;
+  --muted: #56645f;
+  --rule: #cfd8d5;
+  --accent: #0a6b70;
+  --accent-soft: #d6ecec;
+  --target: #b3262e;
+  --mark: #a86a0c;
+  --mark-soft: #f6e8cf;
+  --ground: #8a7a5c;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14; --ground: #b3a07a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; font-size: 13px; }
+nav.toc h2 { font-family: var(--font-display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: grid; grid-template-columns: 34px 1fr; padding: 3px 6px; border-radius: 4px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outline: none; }
+nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
+main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+main > *, article.mv > * { min-width: 0; }
+dd, li, p { overflow-wrap: break-word; }
+td { overflow-wrap: normal; }
+article.mv a, section a { color: var(--accent); }
+nav.toc a { color: var(--fg); }
+header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
+header.top p { max-width: 70ch; margin: 0 0 10px; }
+.eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h2.sec { font-family: var(--font-display); font-size: 26px; margin: 8px 0 0; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-size: 19px; margin: 18px 0 6px; }
+p, li { max-width: 72ch; }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
+.note { border-left: 3px solid var(--mark); background: var(--mark-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 78ch; }
+.note p { margin: 4px 0; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; }
+dl.vocab { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); gap: 6px 18px; margin: 0; }
+dl.vocab dt { font-weight: 600; }
+dl.vocab dd { margin: 0; }
+article.mv { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px 22px; scroll-margin-top: 16px; }
+article.mv > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 12px; }
+article.mv > header .id { font-family: var(--font-mono); font-size: 15px; color: var(--accent); }
+article.mv > header h2 { font-family: var(--font-display); font-size: 25px; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.chips li { font-size: 12.5px; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.chips li b { color: var(--fg); font-weight: 600; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 26px; align-items: start; }
+.grid2 > * { min-width: 0; }
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.stack > * { min-width: 0; }
+.stack figure { max-width: 640px; }
+ol.phases { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+ol.phases li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }
+ol.phases li > span { font-family: var(--font-mono); font-weight: 500; color: var(--mark); background: var(--mark-soft); border-radius: 4px; text-align: center; height: 22px; line-height: 22px; font-size: 12.5px; }
+figure { margin: 0; }
+figure .svgbox { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); }
+figure svg { display: block; width: 100%; min-width: 420px; height: auto; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; }
+.check { margin-top: 14px; border-top: 1px dashed var(--rule); padding-top: 10px; }
+.check h3 { margin-top: 0; color: var(--accent); }
+.check ul { margin: 4px 0; padding-left: 18px; }
+.bug { color: var(--target); font-weight: 600; }
+pre.mermaid { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; }
+pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; }
+/* diagrams */
+.g-ground { stroke: var(--ground); stroke-width: 2; fill: none; }
+.g-hz { stroke: var(--rule); stroke-width: 1.2; stroke-dasharray: 5 5; fill: none; }
+.g-lim { stroke: var(--mark); stroke-width: 1.2; stroke-dasharray: 6 4; fill: none; }
+.g-path { stroke: var(--accent); stroke-width: 2.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.g-alt { stroke: var(--accent); stroke-width: 1.8; fill: none; stroke-dasharray: 5 4; }
+.g-tgtpath { stroke: var(--target); stroke-width: 1.8; fill: none; stroke-dasharray: 4 4; }
+.g-me { fill: var(--fg); }
+.g-tgt { fill: var(--target); }
+.g-ph { fill: var(--mark); }
+.g-phn { fill: var(--panel); font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-anchor: middle; }
+.g-lbl { fill: var(--muted); font-family: var(--font-body); font-size: 11.5px; }
+.g-lbl-a { fill: var(--accent); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-lbl-t { fill: var(--target); font-family: var(--font-body); font-size: 11.5px; font-weight: 600; }
+.g-title { fill: var(--fg); font-family: var(--font-display); font-size: 13px; font-weight: 600; letter-spacing: .03em; }
+.g-frame { stroke: var(--rule); stroke-width: 1; fill: none; }
+
+/* file trees */
+ul.tree, ul.tree ul { list-style: none; margin: 0; padding-left: 22px; }
+ul.tree { padding-left: 0; font-size: 14px; }
+.clstree, .treebox { overflow-x: auto; }
+@media (max-width: 600px) { ul.tree ul { padding-left: 12px; } ul.tree li { padding-left: 12px; } }
+ul.tree li { position: relative; padding: 3px 0 3px 18px; }
+ul.tree > li { padding-left: 0; }
+ul.tree ul > li::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; border-left: 1px solid var(--muted); }
+ul.tree ul > li::after { content: ""; position: absolute; left: 0; top: 14px; width: 13px; border-top: 1px solid var(--muted); }
+ul.tree ul > li:last-child::before { bottom: auto; height: 14px; }
+ul.tree .t { font-family: var(--font-mono); font-size: 13px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; }
+ul.tree .t.form { background: var(--accent); color: var(--panel); font-weight: 500; }
+ul.tree .t.chunk { background: var(--accent-soft); color: var(--fg); }
+ul.tree a { text-decoration: none; }
+ul.tree a .t { text-decoration: underline; text-underline-offset: 2px; }
+ul.tree .d { color: var(--muted); }
+ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark); border-radius: 999px; padding: 0 6px; margin-left: 4px; }
+.treebox { background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; overflow-x: auto; }
+.treepick { margin: 4px 0 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.treepick select { font: inherit; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--rule); background: var(--panel); color: var(--fg); max-width: 100%; }
+.js .clstree { display: none; }
+.js .clstree.on { display: block; }
+.clstree h3 { margin-top: 6px; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab { grid-template-columns: minmax(0, 1fr); }
+  dl.vocab dd { margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#conventions"><span>—</span><span>Conventions</span></a></li>
+    <li><a href="#fichiers"><span>—</span><span>Where the files are</span></a></li>
+    <li><a href="#iff"><span>—</span><span>The IFF container</span></a></li>
+    <li><a href="#carte"><span>—</span><span>Overview</span></a></li>
+    <li><a href="#objets"><span>1</span><span>3D objects</span></a></li>
+    <li><a href="#arbo"><span>1a</span><span>Object tree</span></a></li>
+    <li><a href="#jetp"><span>1b</span><span>JETP aircraft</span></a></li>
+    <li><a href="#communs"><span>1c</span><span>Destruction</span></a></li>
+    <li><a href="#dynm"><span>2</span><span>DYNM dynamics</span></a></li>
+    <li><a href="#armes"><span>2a</span><span>Weapons and loadout</span></a></li>
+    <li><a href="#prof"><span>3</span><span>Pilot profile</span></a></li>
+    <li><a href="#misn"><span>4</span><span>MISN mission</span></a></li>
+    <li><a href="#cast"><span>4a</span><span>CAST</span></a></li>
+    <li><a href="#area"><span>4b</span><span>AREA</span></a></li>
+    <li><a href="#spot"><span>4c</span><span>SPOT</span></a></li>
+    <li><a href="#part"><span>4d</span><span>PART</span></a></li>
+    <li><a href="#scne"><span>4e</span><span>PLAY / SCNE</span></a></li>
+    <li><a href="#autres"><span>4f</span><span>Other chunks</span></a></li>
+    <li><a href="#wrld"><span>5</span><span>WRLD world</span></a></li>
+    <li><a href="#fumees"><span>5b</span><span>Smoke set</span></a></li>
+    <li><a href="#terrain"><span>6</span><span>PAK terrain</span></a></li>
+    <li><a href="#camr"><span>7</span><span>CAMR cameras</span></a></li>
+    <li><a href="#ponts"><span>8</span><span>Campaign bridges</span></a></li>
+    <li><a href="#ouvert"><span>—</span><span>Open points</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">STRIKE.EXE · data files · porting reference</div>
+  <h1>The Strike Commander data model</h1>
+  <p>This document describes what the game files contain and how they link together: a mission names its world, its pilots, its areas and its objects; an object names its 3D model and its flight dynamics; a pilot names its behaviour profile. Each card lists the fields in the order in which they are stored in the file, with their type, size and meaning.</p>
+  <p>All layouts come from the readers in <code>STRIKE.EXE</code>; details and proofs are in <code>analysis/DATA_MODEL.md</code> and <code>analysis/PHYSICS.md</code> (in French). Anything not proven is flagged as such.</p>
+</header>
+
+<section id="conventions">
+  <h2 class="sec">Reading conventions</h2>
+  <dl class="vocab">
+    <dt>Field order</dt>
+    <dd>Tables list the fields <b>in file order</b>, with no gaps unless stated. Just read them one after another.</dd>
+    <dt>Types</dt>
+    <dd>
+      Integers are named by size and sign:
+      <code>uint8</code> 1 byte (0 to 255) · <code>int8</code> 1 signed byte (−128 to 127) ·
+      <code>uint16</code> 2 bytes · <code>int16</code> 2 signed bytes ·
+      <code>uint32</code> 4 bytes · <code>int32</code> 4 signed bytes ·
+      <code>float</code> 4 bytes (see below) ·
+      <code>unsigned char</code> 1 character (a letter) ·
+      <code>string[N]</code> N characters padded with zeros.
+    </dd>
+    <dt>float</dt>
+    <dd>A decimal number on <b>4 bytes</b>. It is <b>not</b> stored as an IEEE float: it is a fixed-point number, read as a signed 4-byte integer and then <b>divided by 256</b>. In a hex editor you therefore see 256 times the value (12,800 for 50.0). Integers are read, unless stated, <b>as is</b> (a heading of 180 = 180°).</dd>
+    <dt>Frame of reference</dt>
+    <dd><b>Y-up, like libRealSpace</b>: X and Z form the horizontal plane (Z = depth), Y is altitude. In the files, a 3-number vector is stored <b>X, then Z, then Y</b>: the 2nd is depth, the 3rd is altitude.</dd>
+    <dt>Units</dt>
+    <dd>Distances in <b>metres</b>, angles in <b>degrees</b>. Never feet.</dd>
+    <dt>Byte order</dt>
+    <dd>IFF chunk sizes are big-endian; all fields are little-endian (x86 order).</dd>
+    <dt>Field names</dt>
+    <dd>Field names are those of this document, not the game's (the binary contains none). A name followed by “assumed” or a description “role not established” flags a field whose meaning is not proven.</dd>
+    <dt>Index</dt>
+    <dd>An index is the rank of a record in its chunk, starting at 0. An index outside the list (often 65535, i.e. −1, or 255) means “none”.</dd>
+  </dl>
+</section>
+
+<section id="fichiers">
+  <h2 class="sec">Where the files are</h2>
+  <p>A name without <code>\</code> becomes <code>..\..\DATA\&lt;folder&gt;\&lt;name&gt;.&lt;ext&gt;</code>.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>File</th><th>Contents</th><th>Root</th></tr></thead>
+    <tbody>
+      <tr><td class="num">OBJECTS\&lt;type&gt;.IFF</td><td>an object: 3D model, category, flight dynamics (e.g. <code>F-16DES.IFF</code>)</td><td><code>FORM REAL</code></td></tr>
+      <tr><td class="num">MISSIONS\&lt;mission&gt;.IFF</td><td>a mission (e.g. <code>MISN-1A.IFF</code>)</td><td><code>FORM MISN</code></td></tr>
+      <tr><td class="num">MISSIONS\&lt;world&gt;.IFF</td><td>a world: terrain, sky, cameras (e.g. <code>MAURITAN.IFF</code>)</td><td><code>FORM WRLD</code></td></tr>
+      <tr><td class="num">DATA\&lt;theatre&gt;.PAK</td><td>the terrain of a theatre</td><td>PAK archive</td></tr>
+      <tr><td class="num">INTEL\&lt;pilot&gt;.IFF</td><td>the behaviour profile of an AI pilot (e.g. <code>STERN.IFF</code>)</td><td><code>FORM PROF</code></td></tr>
+      <tr><td class="num">DATA\OP2MISN.IFF</td><td>what the campaign (<code>OPTEST.EXE</code>) passes to the mission</td><td><code>FORM INVN</code></td></tr>
+      <tr><td class="num">DATA\MISN2OP.IFF</td><td>the mission result, written by the simulator</td><td><code>FORM INVN</code></td></tr>
+      <tr><td class="num">COCKPITS\*</td><td>the cockpits</td><td>IFF</td></tr>
+      <tr><td class="num">SOUND\*.ADL and *.DAT</td><td>the music (see <code>MUSIC_SYSTEM.md</code>)</td><td>XMIDI</td></tr>
+      <tr><td class="num">sc.cfg</td><td>the settings</td><td>IFF</td></tr>
+      <tr><td class="num">*.sav</td><td>the saved game (raw binary block)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="iff">
+  <h2 class="sec">The IFF container</h2>
+  <p>All data files (except the saved game) are IFF: a tree of blocks.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Block</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td class="num">FORM</td><td>container: 4-character tag, size (big-endian), 4-character type, then sub-blocks</td></tr>
+      <tr><td class="num">CHUNK</td><td>data: 4-character tag, size (big-endian), then the data; padded to an even length</td></tr>
+      <tr><td class="num">CAT</td><td>concatenation of elements</td></tr>
+      <tr><td class="num">PACK</td><td>address table, then variable-size records, sometimes LZW-compressed</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>The game looks up a chunk <b>by its tag</b> in the current level: chunk order does not matter for the chunks it looks up this way.</li>
+    <li><b>LZW</b>: 9- to 12-bit codes, 256 symbols, code 256 = reset, code 257 = end, first free code 258 (as in GIF).</li>
+    <li><b>PAK archive</b> (terrain): <code>uint32</code> file size, then one <code>uint32</code> address per sub-resource (the 3 high bits are set to 1 and are not part of the address), then the data. PAKs nest.</li>
+  </ul>
+</section>
+
+<section id="carte">
+  <h2 class="sec">Overview: what points to what</h2>
+  <pre class="mermaid">flowchart LR
+  OP["OP2MISN.IFF<br/>(campaign)"] -->|"TEAM wingmen names"| CAST
+  M["MISSIONS\mission.IFF<br/>FORM MISN"] --> W["WRLD / FILE<br/>→ MISSIONS\world.IFF"]
+  M --> CAST["CAST<br/>pilot names"]
+  M --> AREA["AREA<br/>areas"]
+  M --> SPOT["SPOT<br/>points"]
+  M --> PART["PART<br/>objects"]
+  M --> PLAY["PLAY / SCNE<br/>scenes"]
+  M --> PROG["PROG<br/>scripts"]
+  SPOT -->|"area index"| AREA
+  PART -->|"area index"| AREA
+  PLAY -->|"area index"| AREA
+  PLAY -->|"object list"| PART
+  PART -->|"CAST index"| CAST
+  PART -->|"4 scripts"| PROG
+  PLAY -->|"3 scripts"| PROG
+  PART -->|"type"| OBJ["OBJECTS\type.IFF<br/>REAL → JETP → DYNM"]
+  CAST -->|"name ≠ PLAYER"| PROF["INTEL\pilot.IFF<br/>FORM PROF"]
+  W --> TERA["TERA → DATA\theatre.PAK"]
+  W --> CAMR["FORM CAMR<br/>cameras"]
+  M -.->|"end of mission"| OUT["MISN2OP.IFF"]</pre>
+  <p>The mission is the hub: it references everything else by <b>name</b> (object, world and profile files) or by <b>index</b> (areas, pilots, objects, scripts inside the same file).</p>
+</section>
+
+<!-- ============================ OBJETS ============================ -->
+<article class="mv" id="objets">
+  <header><span class="id">OBJECTS\*.IFF</span><h2>3D objects and categories</h2></header>
+  <ul class="chips"><li>root <b>FORM REAL</b></li><li>reader <b>IFF_LoadModelMain</b></li></ul>
+  <p>An object file contains <b>one</b> class FORM (in <code>FORM REAL</code> → <code>FORM OBJT</code>). The class sets the file's chunks and the object's <b>category</b>, which the AI uses to choose its targets.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Category</th><th>FORM</th><th>Object</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td class="num">BOBJ</td><td>simple object</td></tr>
+      <tr><td class="num">1</td><td class="num">ORNT</td><td>oriented scenery (building…)</td></tr>
+      <tr><td class="num">2</td><td class="num">MOBL</td><td>mobile object</td></tr>
+      <tr><td class="num">3</td><td class="num">OMOB</td><td>oriented mobile object</td></tr>
+      <tr><td class="num">4</td><td class="num">GUID</td><td>piloted object</td></tr>
+      <tr><td class="num">5</td><td class="num">ARMG</td><td>armed piloted object</td></tr>
+      <tr><td class="num">6</td><td class="num">JETP</td><td>aircraft</td></tr>
+      <tr><td class="num">7</td><td class="num">WEAP</td><td>weapon</td></tr>
+      <tr><td class="num">8</td><td class="num">MISS</td><td>missile</td></tr>
+      <tr><td class="num">9</td><td class="num">BOMB</td><td>bomb</td></tr>
+      <tr><td class="num">9</td><td class="num">DURD</td><td>Durandal (anti-runway bomb)</td></tr>
+      <tr><td class="num">10</td><td class="num">PODR</td><td>pod</td></tr>
+      <tr><td class="num">11</td><td class="num">DEBR</td><td>debris</td></tr>
+      <tr><td class="num">13</td><td class="num">TRCR</td><td>tracer</td></tr>
+      <tr><td class="num">14</td><td class="num">AFTB</td><td>afterburner</td></tr>
+      <tr><td class="num">15</td><td class="num">EXPL</td><td>explosion</td></tr>
+      <tr><td class="num">16</td><td class="num">DECY</td><td>decoy</td></tr>
+      <tr><td class="num">17</td><td class="num">RNWY</td><td>runway</td></tr>
+      <tr><td class="num">18</td><td class="num">SMKG</td><td>smoke generator</td></tr>
+      <tr><td class="num">19</td><td class="num">SWPN</td><td>fixed defence: AA, SAM, ship</td></tr>
+      <tr><td class="num">20</td><td class="num">GRND</td><td>ground object</td></tr>
+      <tr><td class="num">21</td><td class="num">XMIT</td><td>transmitter</td></tr>
+      <tr><td class="num">22</td><td class="num">EJEC</td><td>object that releases another one (ejection seat → parachute)</td></tr>
+    </tbody>
+  </table></div>
+  <p>The exact contents of each class are given by its <a href="#arbo">full tree</a>. Category 12 does not exist; two classes share category 9.</p>
+  <h3>SMKG: the smoke generator's INFO chunk</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>smoke type</td><td>uint8</td><td class="num">1</td><td>number of the smoke model in the world's smoke set (<code>SMOK</code> chunk of <code>WRLD</code>)</td></tr>
+      <tr><td>duration</td><td>float</td><td class="num">4</td><td>seconds of emission</td></tr>
+      <tr><td>rise speed</td><td>float</td><td class="num">4</td><td>vertical speed of the particles (along Y)</td></tr>
+      <tr><td>interval</td><td>float</td><td class="num">4</td><td>seconds between two particles</td></tr>
+      <tr><td>activation chance</td><td>uint16</td><td class="num">2</td><td>chance that the generator is active when created (out of ~100)</td></tr>
+      <tr><td>self-removal</td><td>uint8</td><td class="num">1</td><td>1 = the object disappears at the end of the duration; 0 = it only stops</td></tr>
+    </tbody>
+  </table></div>
+  <p>This chunk is mandatory. The generator then reads the common chunks and <code>ALGN</code>.</p>
+  <h3>EJEC: the DATA chunk</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>value 1</td><td>int32</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>delay</td><td>float</td><td class="num">4</td><td>seconds before release</td></tr>
+      <tr><td>release height</td><td>int32</td><td class="num">4</td><td>metres: the object is released once below this height</td></tr>
+      <tr><td>released object</td><td>string</td><td class="num">n</td><td>name of the created object (the parachute), zero-terminated</td></tr>
+    </tbody>
+  </table></div>
+  <p>When the delay has elapsed and the object is below the release height, the game creates the named object <b>once only</b>, at the same position, with the same orientation and the same speed. <code>EJEC</code> also has its own flight dynamics and can have a smoke trail (<code>SMOK</code> chunk).</p>
+  <h3>SMOK: a mobile object's smoke trail</h3>
+  <p>Oriented mobile objects (<code>OMOB</code>, <code>EJEC</code>…) can have an optional <code>SMOK</code> chunk: they then leave a smoke trail, for example an aircraft falling in flames.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>smoke type</td><td>uint8</td><td class="num">1</td><td>number of the smoke model in the world's smoke set</td></tr>
+      <tr><td>emission point X</td><td>float</td><td class="num">4</td><td>metres, in the object's frame (side)</td></tr>
+      <tr><td>emission point Z</td><td>float</td><td class="num">4</td><td>metres, in the object's frame (nose axis)</td></tr>
+      <tr><td>emission point Y</td><td>float</td><td class="num">4</td><td>metres, in the object's frame (up)</td></tr>
+    </tbody>
+  </table></div>
+  <p>F-16: X = 0, Z = −14, Y = 0: the smoke comes out 14 m behind the aircraft's centre.</p>
+  <ol class="phases">
+    <li><span>1</span><div><b>Ignition</b>: the trail starts when the object is destroyed (and in some cases of ground contact), only if its model has a <code>SMOK</code> chunk.</div></li>
+    <li><span>2</span><div><b>Every frame</b>: the game computes where the emission point is now and where it was in the previous frame, then spreads particles <b>along that segment</b>. The trail therefore stays continuous even at high speed; the number of particles depends on the segment length and on the spacing given by the smoke model.</div></li>
+    <li><span>3</span><div><b>Smoke set</b>: smoke models come from the <a href="#fumees">smoke set</a> named by the world's <code>SMOK</code> chunk (<code>SMOKESET</code>). With no set loaded, no smoke is emitted (neither trail nor <code>SMKG</code>).</div></li>
+  </ol>
+</article>
+
+<!-- ============================ ARBORESCENCE ============================ -->
+<article class="mv" id="arbo">
+  <header><span class="id">FORM REAL</span><h2>Full tree of an object file</h2></header>
+  <ul class="chips"><li>reader <b>IFF_LoadModelMain</b></li><li>choose a class</li></ul>
+  <p>The tree starts at the root of the file and shows <b>everything</b> an object of the chosen class contains. Within one level the game looks up each chunk by its tag: their order does not matter. An underlined tag links to the card describing its format.</p>
+  <div class="treebox">
+<div class="treepick"><label for="clspick">Class:</label> <select id="clspick">
+<option value="BOBJ">0 · BOBJ — simple object</option>
+<option value="ORNT">1 · ORNT — oriented scenery (building…)</option>
+<option value="MOBL">2 · MOBL — mobile object</option>
+<option value="OMOB">3 · OMOB — oriented mobile object</option>
+<option value="GUID">4 · GUID — piloted object</option>
+<option value="ARMG">5 · ARMG — armed piloted object</option>
+<option value="JETP" selected>6 · JETP — aircraft</option>
+<option value="WEAP">7 · WEAP — weapon</option>
+<option value="MISS">8 · MISS — missile</option>
+<option value="BOMB">9 · BOMB — bomb</option>
+<option value="DURD">9 · DURD — Durandal (anti-runway bomb)</option>
+<option value="PODR">10 · PODR — pod</option>
+<option value="DEBR">11 · DEBR — debris</option>
+<option value="TRCR">13 · TRCR — tracer gun burst</option>
+<option value="AFTB">14 · AFTB — afterburner</option>
+<option value="EXPL">15 · EXPL — explosion</option>
+<option value="DECY">16 · DECY — decoy</option>
+<option value="RNWY">17 · RNWY — runway</option>
+<option value="SMKG">18 · SMKG — smoke generator</option>
+<option value="SWPN">19 · SWPN — fixed defence: AA, SAM, ship</option>
+<option value="GRND">20 · GRND — ground object</option>
+<option value="XMIT">21 · XMIT — transmitter</option>
+<option value="EJEC">22 · EJEC — object that releases another one (ejection seat → parachute)</option>
+</select></div>
+<div class="clstree" data-cls="BOBJ"><h3>BOBJ · category 0 — simple object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM BOBJ</span></a> <span class="d">simple object · category 0</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="ORNT"><h3>ORNT · category 1 — oriented scenery (building…)</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM ORNT</span></a> <span class="d">oriented scenery (building…) · category 1</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="MOBL"><h3>MOBL · category 2 — mobile object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM MOBL</span></a> <span class="d">mobile object · category 2</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="OMOB"><h3>OMOB · category 3 — oriented mobile object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM OMOB</span></a> <span class="d">oriented mobile object · category 3</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="GUID"><h3>GUID · category 4 — piloted object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM GUID</span></a> <span class="d">piloted object · category 4</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>JDYN variant required</b></span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="ARMG"><h3>ARMG · category 5 — armed piloted object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM ARMG</span></a> <span class="d">armed piloted object · category 5</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>JDYN variant required</b></span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t form">FORM WEAP</span></a> <span class="d">loadout — or, in its place, a FORM WFIL: string, name of an OBJECTS\&lt;name&gt;.IFF file whose root is a FORM WEAP</span><ul><li><a href="#armes"><span class="t chunk">INFO</span></a> <span class="o">optional</span> <span class="d">sensor range and angle (6 bytes)</span></li><li><a href="#armes"><span class="t chunk">HPTS</span></a> <span class="o">optional</span> <span class="d">hardpoints (13 bytes each)</span></li><li><a href="#armes"><span class="t chunk">DCOY</span></a> <span class="o">optional</span> <span class="d">chaff and flares (4 bytes)</span></li><li><a href="#armes"><span class="t chunk">WPNS</span></a> <span class="d">carried weapons (10 bytes each)</span></li></ul></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="JETP"><h3>JETP · category 6 — aircraft</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM JETP</span></a> <span class="d">aircraft · category 6</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>JDYN variant required</b></span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t form">FORM WEAP</span></a> <span class="d">loadout — or, in its place, a FORM WFIL: string, name of an OBJECTS\&lt;name&gt;.IFF file whose root is a FORM WEAP</span><ul><li><a href="#armes"><span class="t chunk">INFO</span></a> <span class="o">optional</span> <span class="d">sensor range and angle (6 bytes)</span></li><li><a href="#armes"><span class="t chunk">HPTS</span></a> <span class="o">optional</span> <span class="d">hardpoints (13 bytes each)</span></li><li><a href="#armes"><span class="t chunk">DCOY</span></a> <span class="o">optional</span> <span class="d">chaff and flares (4 bytes)</span></li><li><a href="#armes"><span class="t chunk">WPNS</span></a> <span class="d">carried weapons (10 bytes each)</span></li></ul></li><li><a href="#jetp"><span class="t form">FORM DAMG</span></a> <span class="d">damage components (required)</span><ul><li><a href="#jetp"><span class="t chunk">SYSM</span></a> <span class="d">list of components</span></li></ul></li><li><a href="#jetp"><span class="t chunk">EJEC</span></a> <span class="o">optional</span> <span class="d">ejection seat</span></li><li><a href="#jetp"><span class="t chunk">JINF</span></a> <span class="o">optional</span> <span class="d">aircraft information</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="WEAP"><h3>WEAP · category 7 — weapon</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM WEAP</span></a> <span class="d">weapon · category 7</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">GBMB variant</span> <span class="d">GBMB + ATMO + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">GBMB</span></a> <span class="d">guided bomb: turn rate (4 bytes)</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">DURD variant</span> <span class="d">DURD + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">DURD</span></a> <span class="d">Durandal: braking, fall (6 bytes)</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="MISS"><h3>MISS · category 8 — missile</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM MISS</span></a> <span class="d">missile · category 8</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>MISS variant required</b></span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">MISS</span></a> <span class="d">missile: turn, speed, acceleration (20 bytes)</span></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">seeker delay, fuze (7 bytes)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="BOMB"><h3>BOMB · category 9 — bomb</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM BOMB</span></a> <span class="d">bomb · category 9</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">GBMB variant</span> <span class="d">GBMB + ATMO + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">GBMB</span></a> <span class="d">guided bomb: turn rate (4 bytes)</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">DURD variant</span> <span class="d">DURD + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">DURD</span></a> <span class="d">Durandal: braking, fall (6 bytes)</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">guided, arming delay, cone (5 bytes)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="DURD"><h3>DURD · category 9 — Durandal (anti-runway bomb)</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM DURD</span></a> <span class="d">Durandal (anti-runway bomb) · category 9</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">DURD variant</span> <span class="d">DURD + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">DURD</span></a> <span class="d">Durandal: braking, fall (6 bytes)</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">GBMB variant</span> <span class="d">GBMB + ATMO + DYNM</span><ul><li><a href="#dynm"><span class="t chunk">GBMB</span></a> <span class="d">guided bomb: turn rate (4 bytes)</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li></ul></li><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">same as BOMB (5 bytes)</span></li><li><span class="t form">FORM DAPR</span> <span class="d">second 3D appearance (same contents as FORM APPR)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="PODR"><h3>PODR · category 10 — pod</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM PODR</span></a> <span class="d">pod · category 10</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">rocket, presence, speed</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="DEBR"><h3>DEBR · category 11 — debris</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM DEBR</span></a> <span class="d">debris · category 11</span><ul><li><a href="#communs"><span class="t chunk">INFO</span></a> <span class="d">collision radius, flags</span></li><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="TRCR"><h3>TRCR · category 13 — tracer gun burst</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM TRCR</span></a> <span class="d">tracer gun burst · category 13</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#armes"><span class="t chunk">WDAT</span></a> <span class="d">weapon data (22 bytes)</span></li><li><a href="#armes"><span class="t chunk">INFO</span></a> <span class="d">burst: speed, spread, duration (32 bytes)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="AFTB"><h3>AFTB · category 14 — afterburner</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM AFTB</span></a> <span class="d">afterburner · category 14</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="EXPL"><h3>EXPL · category 15 — explosion</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM EXPL</span></a> <span class="d">explosion · category 15</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="DECY"><h3>DECY · category 16 — decoy</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM DECY</span></a> <span class="d">decoy · category 16</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">lifetime (int32)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="RNWY"><h3>RNWY · category 17 — runway</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM RNWY</span></a> <span class="d">runway · category 17</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="SMKG"><h3>SMKG · category 18 — smoke generator</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM SMKG</span></a> <span class="d">smoke generator · category 18</span><ul><li><a href="#objets"><span class="t chunk">INFO</span></a> <span class="d">smoke settings (required)</span></li><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="SWPN"><h3>SWPN · category 19 — fixed defence: AA, SAM, ship</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM SWPN</span></a> <span class="d">fixed defence: AA, SAM, ship · category 19</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#armes"><span class="t chunk">DATA</span></a> <span class="d">ammunition, ranges, rate of fire, weapon</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="GRND"><h3>GRND · category 20 — ground object</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM GRND</span></a> <span class="d">ground object · category 20</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="XMIT"><h3>XMIT · category 21 — transmitter</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM XMIT</span></a> <span class="d">transmitter · category 21</span><ul><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+<div class="clstree" data-cls="EJEC"><h3>EJEC · category 22 — object that releases another one (ejection seat → parachute)</h3><ul class="tree"><li><span class="t form">FORM REAL</span> <span class="d">root of the OBJECTS\&lt;name&gt;.IFF file</span><ul><li><span class="t form">FORM OBJT</span><ul><li><a href="#objets"><span class="t form">FORM EJEC</span></a> <span class="d">object that releases another one (ejection seat → parachute) · category 22</span><ul><li><a href="#objets"><span class="t chunk">DATA</span></a> <span class="d">delay, height, released object</span></li><li><a href="#communs"><span class="t chunk">DAMG</span></a> <span class="o">optional</span> <span class="d">damage points</span></li><li><a href="#communs"><span class="t chunk">TRGT</span></a> <span class="o">optional</span> <span class="d">target type</span></li><li><a href="#communs"><span class="t chunk">SIGN</span></a> <span class="o">optional</span> <span class="d">signatures</span></li><li><a href="#communs"><span class="t chunk">EXPL</span></a> <span class="o">optional</span> <span class="d">explosion on destruction</span></li><li><a href="#communs"><span class="t chunk">DEBR</span></a> <span class="o">optional</span> <span class="d">debris on destruction</span></li><li><a href="#communs"><span class="t chunk">DEST</span></a> <span class="o">optional</span> <span class="d">wreck on destruction</span></li><li><a href="#communs"><span class="t chunk">CHLD</span></a> <span class="o">optional</span> <span class="d">attached sub-objects</span></li><li><a href="#communs"><span class="t chunk">ALGN</span></a> <span class="o">optional</span> <span class="d">int8: side (1 player, −1 enemy, 0 neutral)</span></li><li><a href="#dynm"><span class="t form">FORM DYNM</span></a> <span class="d">dynamics: <b>only one</b> of these variants</span><ul><li><span class="t chunk">AGRV variant</span> <span class="d">AGRV + DYNM + ATMO</span><ul><li><a href="#dynm"><span class="t chunk">AGRV</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li></ul></li><li><span class="t chunk">PARA variant</span> <span class="d">PARA + DYNM + ATMO + STBL</span><ul><li><a href="#dynm"><span class="t chunk">PARA</span></a> <span class="d">contents not read by the loader</span></li><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li></ul></li><li><span class="t chunk">SURF variant</span> <span class="d">DYNM + SURF</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">SURF</span></a> <span class="d">2 int32</span></li></ul></li><li><span class="t chunk">JDYN variant</span> <span class="d">DYNM + ATMO + THRS + STBL + JDYN</span><ul><li><a href="#dynm"><span class="t chunk">DYNM</span></a> <span class="d">mass</span></li><li><a href="#dynm"><span class="t chunk">ATMO</span></a> <span class="d">atmosphere</span></li><li><a href="#dynm"><span class="t chunk">THRS</span></a> <span class="d">thrust</span></li><li><a href="#dynm"><span class="t chunk">STBL</span></a> <span class="d">stability</span></li><li><a href="#dynm"><span class="t chunk">JDYN</span></a> <span class="d">flight envelope (73 bytes)</span></li></ul></li></ul></li><li><a href="#smok"><span class="t chunk">SMOK</span></a> <span class="o">optional</span> <span class="d">smoke trail</span></li></ul></li><li><a href="#communs"><span class="t chunk">EXTE</span></a> <span class="o">optional</span> <span class="d">collision radius and volumes</span></li></ul></li><li><span class="t form">FORM APPR</span> <span class="d">3D appearance</span><ul><li><span class="t chunk">FILE</span> <span class="o">optional</span> <span class="d">appearance stored in another file</span></li><li><span class="t form">FORM POLY</span> <span class="o">optional</span> <span class="d">geometry (format already ported in libRealSpace)</span><ul><li><span class="t chunk">INFO</span></li><li><span class="t chunk">AINF</span></li><li><span class="t chunk">VERT</span></li><li><span class="t form">FORM TRIS</span><ul><li><span class="t chunk">VTRI</span></li></ul></li><li><span class="t form">FORM LINS</span><ul><li><span class="t chunk">VLIN</span></li></ul></li><li><span class="t form">FORM SPRS</span><ul><li><span class="t chunk">VSPR</span></li></ul></li><li><span class="t form">FORM TXMS</span> <span class="d">textures</span></li></ul></li></ul></li></ul></li></ul></div>
+  </div>
+</article>
+
+<!-- ============================ JETP ============================ -->
+<article class="mv" id="jetp">
+  <header><span class="id">JETP</span><h2>Aircraft: damage components, ejection seat, information</h2></header>
+  <ul class="chips"><li>reader <b>Aircraft_LoadEJECAndJINF_9D4F0</b></li><li>damage <b>Aircraft_LoadDamageSystems_9CCE5</b></li></ul>
+  <h3>FORM DAMG → SYSM chunk: the damage components</h3>
+  <p>The <code>FORM DAMG</code> and its <code>SYSM</code> chunk are part of every <code>FORM JETP</code>. Not to be confused with the common <code>DAMG</code> chunk, which is only a number of damage points.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>count</td><td>uint16</td><td class="num">2</td><td>number of components</td></tr>
+      <tr><td>components</td><td>each&nbsp;below</td><td class="num">—</td><td>one record per component</td></tr>
+    </tbody>
+  </table></div>
+  <h3>A component</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>strength</td><td>uint8</td><td class="num">1</td><td>points the component can absorb</td></tr>
+      <tr><td>damage</td><td>uint8</td><td class="num">1</td><td>damage already taken (starting value)</td></tr>
+      <tr><td>name</td><td>string</td><td class="num">n</td><td>zero-terminated (at most 9 characters): <code>FUEL</code>, <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code>, <code>ENGINE</code>, <code>LANDGEAR</code>, <code>FLAPS</code>…</td></tr>
+      <tr><td>zone</td><td>string</td><td class="num">n</td><td>zero-terminated (at most 9 characters): part of the aircraft where the component sits, <code>FUSELAGE</code>, <code>LWING</code> or <code>RWING</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>The game finds a component <b>by its name</b>. For <code>FUEL</code>, <code>RUDDER</code>, <code>ELEVATOR</code>, <code>AILERON</code>, <code>LWING</code>, <code>RWING</code> and <code>ENGINE</code>, it computes every frame an efficiency gain = (strength − damage) ÷ strength: 1 intact, 0 destroyed (see <code>PHYSICS.md</code>). <code>LANDGEAR</code> and <code>FLAPS</code> drive the landing gear and the flaps. The <code>PLAYER</code> component is the pilot.</p>
+  <h3>How a hit damages the components</h3>
+  <ol class="phases">
+    <li><span>1</span><div><b>Damage points</b>: given by what hits the aircraft. Any object: <code>DAMG</code> × min(v² ÷ 200, 10), where v is the sum of the two objects' speeds (m/s). A missile: that impact + 60 to 100 % of the max damage of its <code>EXPL</code>. A gun burst: <code>WDAT</code> damage × the multiplier from its <code>INFO</code>, from 100 % down to 50 % over its life. An explosion: the linear <code>EXPL</code> formula. Against the player, points are halved (at least 1).</div></li>
+    <li><span>2</span><div><b>Zone hit</b>: the name of the <code>EXTE</code> volume struck (<code>FUSELAGE</code>, <code>LWING</code>, <code>RWING</code>). If it is the global <code>BIGSPHER</code> sphere, the zone is drawn at random: fuselage 50 %, left wing 25 %, right wing 25 %.</div></li>
+    <li><span>3</span><div><b>Distribution</b>: the components of that zone are taken (17 at most), starting from a random one. Each absorbs what it has left (strength − damage) until the points run out.</div></li>
+    <li><span>4</span><div><b>Loss of the aircraft</b>: damage rate = sum of damage × 100 ÷ sum of strengths (100 if <code>PLAYER</code> is destroyed). Beyond the <code>JINF</code> threshold (30 % by default), the aircraft is lost.</div></li>
+  </ol>
+  <h3>EJEC chunk (optional)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>ejection seat</td><td>string</td><td class="num">n</td><td>name of the ejected object (an <code>OBJECTS\&lt;name&gt;.IFF</code> of class <code>EJEC</code>), zero-terminated; when free memory is low (less than 64 KB), the game creates <code>LOWEJECT</code> instead</td></tr>
+    </tbody>
+  </table></div>
+  <h3>JINF chunk (optional)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th><th>If absent</th></tr></thead>
+    <tbody>
+      <tr><td>retractable gear</td><td>uint8</td><td class="num">1</td><td>bit 0 = 1: the aircraft has a landing gear that retracts (<code>CHLD</code> sub-objects below)</td><td class="num">0</td></tr>
+      <tr><td>first gear sub-object</td><td>uint16</td><td class="num">2</td><td>rank, in the <code>CHLD</code> list, of the first gear element</td><td>—</td></tr>
+      <tr><td>number of gear sub-objects</td><td>uint16</td><td class="num">2</td><td>gear elements; they are shown or hidden one by one, every 25/256 s, when the pilot lowers or raises the gear</td><td>—</td></tr>
+      <tr><td>combat class</td><td>uint8</td><td class="num">1</td><td>9 or more for fighters; the AI uses it to choose its reactions and targets</td><td class="num">2</td></tr>
+      <tr><td>explosion chance</td><td>uint16</td><td class="num">2</td><td>%: when the aircraft is destroyed, chance that it explodes immediately; otherwise it falls smoking</td><td class="num">5</td></tr>
+      <tr><td>special sub-object active</td><td>uint8</td><td class="num">1</td><td>≠ 0: the sub-object below exists</td><td class="num">0</td></tr>
+      <tr><td>special sub-object</td><td>uint16</td><td class="num">2</td><td>rank in <code>CHLD</code>; the game deactivates it after 3 frames during which it is active</td><td>—</td></tr>
+      <tr><td>fall smoke</td><td>uint8</td><td class="num">1</td><td>number of the trail's smoke model when the aircraft falls</td><td class="num">6</td></tr>
+      <tr><td>loss threshold</td><td>uint16</td><td class="num">2</td><td>% of damage (see above) beyond which the aircraft is lost</td><td class="num">30</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ CHUNKS COMMUNS ============================ -->
+<article class="mv" id="communs">
+  <header><span class="id">DAMG · EXPL · DEBR · DEST · CHLD</span><h2>Common object chunks and destruction</h2></header>
+  <ul class="chips"><li>reader <b>Object_LoadCommonChunks_9BA85</b></li><li>all optional</li><li>destruction <b>Object_SpawnDestructionEffects_3863A</b></li></ul>
+  <p>Most object classes read the same chunks: toughness, signature, and what the object produces when destroyed (an explosion, debris, a wreck). Each chunk is looked up by its tag; if it is missing, the default value applies.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Contents</th><th>If absent</th></tr></thead>
+    <tbody>
+      <tr><td class="num">DAMG</td><td><code>uint16</code>: damage points it can absorb; 65535 = indestructible</td><td class="num">10</td></tr>
+      <tr><td class="num">TRGT</td><td><code>uint16</code> (only the low byte is kept): <b>target type</b> — 0 = not a target, 1 = aircraft, 2 = ground target, 4 = decoy. Missile seekers only track 1 and 4; the AI's ground attack requires 2; a missile aims slightly above a target of type 2 or more (radius ÷ 8)</td><td class="num">0</td></tr>
+      <tr><td class="num">SIGN</td><td>3 <code>uint8</code>: <b>signatures</b> seen by the seekers — 1 = basic infrared, 2 = radar (AIM-120, SA-2, SA-6), 3 = type-3 seeker (no weapon in the game uses it). An infrared missile keeps its target or switches to a decoy according to these values</td><td class="num">0</td></tr>
+      <tr><td class="num">EXPL</td><td>the explosion created on destruction (table below)</td><td>no explosion</td></tr>
+      <tr><td class="num">DEBR</td><td>the debris thrown out on destruction (tables below)</td><td>no debris</td></tr>
+      <tr><td class="num">DEST</td><td>the objects left behind on destruction, a wreck for instance (table below)</td><td>nothing</td></tr>
+      <tr><td class="num">CHLD</td><td>the attached sub-objects (table below)</td><td>none</td></tr>
+      <tr><td class="num">INFO</td><td>read by <code>DEBR</code>: <code>uint16</code> collision radius, <code>uint8</code> flag, then a second <code>uint8</code> if the flag is not zero</td><td class="num">20, 0</td></tr>
+      <tr><td class="num">ALGN</td><td>read by <code>ORNT</code> and all the classes derived from it (see the tree): <code>int8</code> — <b>side</b> (allegiance): 1 = player's side, −1 = enemy, 0 = neutral. The side given by <code>PART</code> replaces it for mission objects</td><td class="num">0</td></tr>
+      <tr><td class="num">EXTE</td><td>read at the <code>OBJT</code> level, after the class FORM: object radius and collision volumes (tables below)</td><td>radius 1500 m, no volume</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>EXPL (12 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>model</td><td>string[8]</td><td class="num">8</td><td>explosion object to create (an <code>OBJECTS\&lt;name&gt;.IFF</code> of class <code>EXPL</code>)</td></tr>
+      <tr><td>radius</td><td>int16</td><td class="num">2</td><td>metres</td></tr>
+      <tr><td>max damage</td><td>int16</td><td class="num">2</td><td>damage at the centre of the explosion</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Damage taken</b> by an object at distance <i>d</i> from the centre, reduced by the object's size (and clamped at 0): <code>damage = max_damage × (radius − d) ÷ radius</code> if <i>d</i> &lt; radius, else 0; the integer part is kept. The falloff is <b>linear</b>. These values replace those of the <code>EXPL</code> class (whose <code>DAMG</code> gives the default damage).</p>
+
+  <h3>DEBR</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>number to create</td><td>uint16</td><td class="num">2</td><td>number of debris pieces thrown out at each destruction</td></tr>
+      <tr><td>debris models</td><td>26&nbsp;bytes&nbsp;each</td><td class="num">26 × n</td><td>n = (chunk size − 2) ÷ 26; each debris piece created picks one at random</td></tr>
+    </tbody>
+  </table></div>
+  <h3>A debris model (26 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>model</td><td>string[8]</td><td class="num">8</td><td>debris object to create (class <code>DEBR</code>)</td></tr>
+      <tr><td>spread X</td><td>int16</td><td class="num">2</td><td>metres: position drawn between −value and +value around the destroyed object</td></tr>
+      <tr><td>spread Z</td><td>int16</td><td class="num">2</td><td>metres</td></tr>
+      <tr><td>spread Y</td><td>int16</td><td class="num">2</td><td>metres</td></tr>
+      <tr><td>speed X</td><td>int16</td><td class="num">2</td><td>base speed (m/s)</td></tr>
+      <tr><td>speed Z</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>speed Y</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>speed spread X</td><td>int16</td><td class="num">2</td><td>random amount added, between −value and +value</td></tr>
+      <tr><td>speed spread Z</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>speed spread Y</td><td>int16</td><td class="num">2</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+  <p>Speeds are in <b>m/s</b> (integers). Final speed of a debris piece = <b>0.6 × speed of the destroyed object</b> + base speed + random amount. The game creates no debris if it is short of resources (internal threshold).</p>
+
+  <h3>A DEST object (14 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>model</td><td>string[8]</td><td class="num">8</td><td>object to create</td></tr>
+      <tr><td>offset X</td><td>int16</td><td class="num">2</td><td>metres, no randomness</td></tr>
+      <tr><td>offset Z</td><td>int16</td><td class="num">2</td><td>metres</td></tr>
+      <tr><td>offset Y</td><td>int16</td><td class="num">2</td><td>metres</td></tr>
+    </tbody>
+  </table></div>
+  <p>Each <code>DEST</code> object takes the orientation of the destroyed object and 0.6 × its speed. The number of objects = chunk size ÷ 14. They are only created if enough memory remains.</p>
+
+  <h3>A CHLD sub-object (32 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>name</td><td>string[8]</td><td class="num">8</td><td>sub-object</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>metres, relative to the object</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>pitch</td><td>float</td><td class="num">4</td><td>degrees, rotation about the X axis (side)</td></tr>
+      <tr><td>roll</td><td>float</td><td class="num">4</td><td>degrees, rotation about the Z axis (nose)</td></tr>
+      <tr><td>heading</td><td>float</td><td class="num">4</td><td>degrees, rotation about the Y axis (vertical)</td></tr>
+    </tbody>
+  </table></div>
+  <p>The number of sub-objects = chunk size ÷ 32. Rotations are applied in this order: pitch, then roll, then heading, each about the object's current axis. An aircraft's sub-objects are also used for the landing gear (see <code>JINF</code>).</p>
+
+  <h3>EXTE: collision radius and volumes</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>radius</td><td>float</td><td class="num">4</td><td>metres: size of the object (as seen by the AI, point aimed at by missiles)</td></tr>
+      <tr><td>number of volumes</td><td>uint16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>immediate collision</td><td>uint8</td><td class="num">1</td><td>≠ 0: the object can hit others as soon as it is created; 0: only once clear (weapons)</td></tr>
+      <tr><td>volumes</td><td>sequence</td><td class="num">—</td><td>each starts with a letter, below</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>shape</td><td>unsigned&nbsp;char</td><td class="num">1</td><td><code>S</code> sphere, <code>B</code> box, <code>L</code> name only</td></tr>
+      <tr><td>name</td><td>string</td><td class="num">n</td><td>zero-terminated: the damage <b>zone</b> (<code>FUSELAGE</code>, <code>LWING</code>, <code>RWING</code>, <code>BIGSPHER</code> = global sphere)</td></tr>
+      <tr><td>S: centre X, Z, Y then radius</td><td>4&nbsp;×&nbsp;int32</td><td class="num">16</td><td>metres, integers read as is (file order: X, Z, Y, radius)</td></tr>
+      <tr><td>B: bounds X, Z, Y</td><td>6&nbsp;×&nbsp;int32</td><td class="num">24</td><td>metres, integers: two bounds per axis (X1, X2, Z1, Z2, Y1, Y2), in any order</td></tr>
+      <tr><td>L</td><td>—</td><td class="num">0</td><td>nothing after the name</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ DYNM ============================ -->
+<article class="mv" id="dynm">
+  <header><span class="id">FORM DYNM</span><h2>Dynamics: how the object moves</h2></header>
+  <ul class="chips"><li>one variant per object</li></ul>
+  <p>Every mobile object has <b>one</b> <code>FORM DYNM</code>, which contains <b>one</b> variant among <code>JDYN</code>, <code>MISS</code>, <code>GBMB</code>, <code>DURD</code>, <code>AGRV</code>, <code>SURF</code> and <code>PARA</code>, recognised by the chunk bearing its name. Chunk order within a FORM is free.</p>
+
+  <h3>The variants</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Variant</th><th>Chunks read</th><th>Motion</th></tr></thead>
+    <tbody>
+      <tr><td class="num">JDYN</td><td><code>DYNM</code>, <code>ATMO</code>, <code>THRS</code>, <code>STBL</code>, <code>JDYN</code></td><td>full aircraft flight model: thrust, lift, drag, pilot or AI controls</td></tr>
+      <tr><td class="num">MISS</td><td><code>DYNM</code>, <code>MISS</code></td><td>missile: propulsion up to max speed, then cruise; guidance towards the target; without a target, ballistic flight</td></tr>
+      <tr><td class="num">GBMB</td><td><code>GBMB</code>, <code>ATMO</code>, <code>DYNM</code></td><td>guided bomb: constant speed inherited from the release, guided towards the target; without a target, free fall</td></tr>
+      <tr><td class="num">DURD</td><td><code>DURD</code>, <code>DYNM</code></td><td>Durandal: horizontal braking to a stop over a given distance, then vertical fall</td></tr>
+      <tr><td class="num">AGRV</td><td><code>AGRV</code>, <code>DYNM</code>, <code>ATMO</code></td><td>free fall: gravity and drag, nothing else</td></tr>
+      <tr><td class="num">SURF</td><td><code>DYNM</code>, <code>SURF</code></td><td></td></tr>
+      <tr><td class="num">PARA</td><td><code>PARA</code>, <code>DYNM</code>, <code>ATMO</code>, <code>STBL</code></td><td>simple aerodynamic forces with stability (parachute)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Variant per class</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Class</th><th>Variant</th></tr></thead>
+    <tbody>
+      <tr><td class="num">GUID, ARMG, JETP</td><td><code>JDYN</code></td></tr>
+      <tr><td class="num">MISS</td><td><code>MISS</code></td></tr>
+      <tr><td class="num">WEAP, BOMB, DURD</td><td><code>GBMB</code>, <code>DURD</code> or <code>AGRV</code></td></tr>
+      <tr><td class="num">MOBL, OMOB, DEBR, DECY, GRND, EJEC</td><td><code>AGRV</code>, <code>PARA</code>, <code>SURF</code> or <code>JDYN</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>DYNM, ATMO, THRS, STBL</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">DYNM</td><td>float</td><td class="num">4</td><td>empty mass (kg)</td></tr>
+      <tr><td class="num">ATMO</td><td>uint32</td><td class="num">4</td><td>atmosphere model, shared by all aircraft (followed by a block if already defined)</td></tr>
+      <tr><td class="num">THRS · thrust</td><td>float</td><td class="num">4</td><td>maximum thrust with afterburner (N)</td></tr>
+      <tr><td class="num">THRS · fraction without AB</td><td>uint8</td><td class="num">1</td><td>share of the thrust available without afterburner: value ÷ 256 (0 to 1)</td></tr>
+      <tr><td class="num">THRS · fraction at reference</td><td>uint8</td><td class="num">1</td><td>thrust remaining at the reference speed/altitude: value ÷ 256</td></tr>
+      <tr><td class="num">THRS · cut-off</td><td>uint8</td><td class="num">1</td><td>scale of the thrust cut-off: integer (× 100 → metres)</td></tr>
+      <tr><td class="num">STBL</td><td>float</td><td class="num">4</td><td>pitch stability / authority (no unit)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>JDYN: the flight envelope (28 fields, 73 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>fuel capacity</td><td>float</td><td class="num">4</td><td>kg; current fuel starts from this value, at 0 the engine shuts down</td></tr>
+      <tr><td class="num">2</td><td>consumption</td><td>float</td><td class="num">4</td><td>fuel consumption coefficient</td></tr>
+      <tr><td class="num">3</td><td>airbrake drag</td><td>float</td><td class="num">4</td><td>drag added with the airbrake out</td></tr>
+      <tr><td class="num">4</td><td>gear drag</td><td>float</td><td class="num">4</td><td>drag added with the gear down</td></tr>
+      <tr><td class="num">5</td><td>ground drag</td><td>float</td><td class="num">4</td><td>braking while taxiing</td></tr>
+      <tr><td class="num">6</td><td>ground drag, airbrake</td><td>float</td><td class="num">4</td><td>extra on the ground when the airbrake is out</td></tr>
+      <tr><td class="num">7</td><td>max roll acceleration</td><td>float</td><td class="num">4</td><td>°/s²; limits the change of the AI's lateral stick</td></tr>
+      <tr><td class="num">8</td><td>max rotation rate</td><td>float</td><td class="num">4</td><td>°/s; also limits roll</td></tr>
+      <tr><td class="num">9</td><td>stall angle of attack</td><td>uint8</td><td class="num">1</td><td>degrees</td></tr>
+      <tr><td class="num">10</td><td>wing incidence</td><td>uint8</td><td class="num">1</td><td>degrees, always added to the angle of attack</td></tr>
+      <tr><td class="num">11</td><td>flaps increment</td><td>uint8</td><td class="num">1</td><td>degrees added with flaps down</td></tr>
+      <tr><td class="num">12</td><td>max vertical speed at touchdown</td><td>float</td><td class="num">4</td><td>m/s: the aircraft only counts as landed if it descends more slowly</td></tr>
+      <tr><td class="num">13</td><td>max horizontal speed on the ground</td><td>float</td><td class="num">4</td><td>m/s: beyond it, the aircraft is no longer “on the ground”</td></tr>
+      <tr><td class="num">14</td><td>max bank on the ground</td><td>uint8</td><td class="num">1</td><td>degrees of roll</td></tr>
+      <tr><td class="num">15</td><td>max nose-up attitude on the ground</td><td>uint8</td><td class="num">1</td><td>degrees, nose up</td></tr>
+      <tr><td class="num">16</td><td>max nose-down attitude on the ground</td><td>uint8</td><td class="num">1</td><td>degrees, nose down</td></tr>
+      <tr><td class="num">17</td><td>control-surface effectiveness speed</td><td>float</td><td class="num">4</td><td>m/s (F-16: 50); below it, roll weakens; on the ground, nose held down</td></tr>
+      <tr><td class="num">18</td><td>induced drag</td><td>float</td><td class="num">4</td><td>coefficient (plays the role of 1/(π·e·AR))</td></tr>
+      <tr><td class="num">19</td><td>lift gain</td><td>float</td><td class="num">4</td><td>airframe agility (role of Clα·S)</td></tr>
+      <tr><td class="num">20</td><td>max commanded angle of attack</td><td>uint8</td><td class="num">1</td><td>degrees at full stick deflection</td></tr>
+      <tr><td class="num">21</td><td>max commanded sideslip</td><td>uint8</td><td class="num">1</td><td>degrees at full rudder deflection</td></tr>
+      <tr><td class="num">22</td><td>max load factor</td><td>uint8</td><td class="num">1</td><td>g at full stick deflection</td></tr>
+      <tr><td class="num">23</td><td>AI: max pursuit speed</td><td>uint16</td><td class="num">2</td><td>default 500</td></tr>
+      <tr><td class="num">24</td><td>AI: min pursuit speed</td><td>uint16</td><td class="num">2</td><td>default 100</td></tr>
+      <tr><td class="num">25</td><td>AI: cruise speed</td><td>int16</td><td class="num">2</td><td>default 231</td></tr>
+      <tr><td class="num">26</td><td>AI: distance threshold</td><td>uint32</td><td class="num">4</td><td>default 11005; integer as is</td></tr>
+      <tr><td class="num">27</td><td>AI: reserved</td><td>uint8</td><td class="num">1</td><td>default 3; role not established</td></tr>
+      <tr><td class="num">28</td><td>AI: decision weight</td><td>uint8</td><td class="num">1</td><td>default 2; weights a decision score</td></tr>
+    </tbody>
+  </table></div>
+  <h3>When is the aircraft “on the ground”?</h3>
+  <p>Every frame, the aircraft is landed if <b>all</b> these conditions are true, otherwise it is flying:</p>
+  <ol class="phases">
+    <li><span>1</span><div>it descends more slowly than field 12 (m/s);</div></li>
+    <li><span>2</span><div>its roll is below field 14, and its attitude is between −field 16 and +field 15 (degrees);</div></li>
+    <li><span>3</span><div>its horizontal speed is below field 13 (m/s);</div></li>
+    <li><span>4</span><div>its gear is down and the pilot has not ejected.</div></li>
+  </ol>
+  <p>If it touches down descending faster than half of field 12, it bounces: vertical speed = −(vertical speed + field 12 ÷ 4). Otherwise its negative vertical speed is cancelled.</p>
+  <p>The full flight model (lift, drag, thrust, control loop) is described in <code>PHYSICS.md</code>.</p>
+
+  <h3>MISS: missile dynamics (20 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>max turn rate</td><td>float</td><td class="num">4</td><td>°/s: maximum rotation of the nose towards the target</td></tr>
+      <tr><td>max speed</td><td>float</td><td class="num">4</td><td>m/s, cruise speed along the nose</td></tr>
+      <tr><td>acceleration</td><td>float</td><td class="num">4</td><td>m/s² during propulsion; propulsion stops when max speed is reached</td></tr>
+      <tr><td>cruise velocity X</td><td>float</td><td class="num">4</td><td>m/s, sideways component (missile frame)</td></tr>
+      <tr><td>cruise velocity Y</td><td>float</td><td class="num">4</td><td>m/s, upward component (missile frame)</td></tr>
+    </tbody>
+  </table></div>
+  <p>At launch, the missile starts at its launcher's speed, then accelerates along the nose. It leads the target's position (its velocity × time of arrival, at most 1 s), rolls in one step to bring it into its plane, then turns in pitch by at most the turn rate. Without a target: ballistic fall, nose along the velocity.</p>
+
+  <h3>GBMB: the guided bomb (4 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>max turn rate</td><td>float</td><td class="num">4</td><td>°/s</td></tr>
+    </tbody>
+  </table></div>
+  <p>When guided, the bomb keeps the aircraft's velocity at the moment of release, with no gravity and no loss of speed. Without a target, it falls freely.</p>
+
+  <h3>DURD: the Durandal (6 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>braking distance</td><td>uint16</td><td class="num">2</td><td>metres travelled horizontally before stopping</td></tr>
+      <tr><td>min fall speed</td><td>int32</td><td class="num">4</td><td>m/s, integer (negative = downwards): the vertical speed does not go below it</td></tr>
+    </tbody>
+  </table></div>
+  <p>On the first frame, the game computes the braking time t = 2 × distance ÷ speed, then a deceleration that cancels the horizontal speed in t. Phase 1: braking, the vertical speed grows downwards without passing the min fall speed. Phase 2 (after t): zero horizontal speed, vertical fall.</p>
+
+  <h3>SURF (8 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>value 1</td><td>int32</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>value 2</td><td>int32</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+    </tbody>
+  </table></div>
+  <p>For <code>AGRV</code> and <code>PARA</code>, the loader only looks for the tag and does not read the chunk contents.</p>
+</article>
+
+<!-- ============================ ARMES ============================ -->
+<article class="mv" id="armes">
+  <header><span class="id">WDAT · DATA · FORM WEAP</span><h2>Weapons and loadout</h2></header>
+  <ul class="chips"><li>weapon <b>Weapon_LoadWDATChunk_A0700</b></li><li>loadout <b>WeaponSys_LoadFromIFF_9ED62</b></li></ul>
+  <p>A weapon is an object like any other (<code>WEAP</code>, <code>MISS</code>, <code>BOMB</code>, <code>DURD</code>, <code>PODR</code>, <code>TRCR</code>) with a <code>WDAT</code> chunk, plus a chunk specific to its class. An aircraft (<code>ARMG</code>, <code>JETP</code>) carries its weapons through its <code>FORM WEAP</code>.</p>
+
+  <h3>WDAT: common weapon data (22 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>damage</td><td>uint16</td><td class="num">2</td><td>used by gun bursts (<code>TRCR</code>); missiles and bombs do the damage of their <code>EXPL</code></td></tr>
+      <tr><td>radius</td><td>uint16</td><td class="num">2</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>fired category</td><td>uint8</td><td class="num">1</td><td>category of the launched object: 8 missile, 9 bomb, 10 rocket pod, 13 gun; selects how it is fired</td></tr>
+      <tr><td>identifier</td><td>uint8</td><td class="num">1</td><td>1 AIM-9J, 2 AIM-9M, 3 AGM-65D, 4 LAU-3, 5 MK-20, 6 MK-82, 7 Durandal, 8 GBU-15, 9 AIM-120, 10 SA-2, 11 SA-6, 12 20 mm gun</td></tr>
+      <tr><td>family</td><td>uint8</td><td class="num">1</td><td>0 gun, 1 infrared, 2 radar, 3 guided air-to-ground, 4 dumb bomb, 7 rockets</td></tr>
+      <tr><td>domain</td><td>uint8</td><td class="num">1</td><td>1 = air-to-air missile: firing it alerts AI pilots; 2 = other</td></tr>
+      <tr><td>seeker</td><td>uint8</td><td class="num">1</td><td>1 AIM-9J (rear aspect), 2 AIM-9M (all aspect), 3 unused, 4 radar (AIM-120, SA-2, SA-6), 5 AGM-65D, 6 GBU-15</td></tr>
+      <tr><td>lock-on range</td><td>int32</td><td class="num">4</td><td>metres, integer</td></tr>
+      <tr><td>half-cone</td><td>uint8</td><td class="num">1</td><td>degrees around the nose (AIM-9J 40, AIM-9M 45)</td></tr>
+      <tr><td>firing range</td><td>int32</td><td class="num">4</td><td>metres, integer (AGM-65D: 15000)</td></tr>
+      <tr><td>firing interval</td><td>float</td><td class="num">4</td><td>seconds between two shots (AIM-9 and AIM-120: 1; SA-2: 15; SA-6: 10)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>DATA per class</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Class</th><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">MISS</td><td>seeker delay</td><td>int32</td><td class="num">4</td><td>seconds (integer) before the seeker chooses a target</td></tr>
+      <tr><td class="num">MISS</td><td>value 2</td><td>uint8</td><td class="num">1</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td class="num">MISS</td><td>fuze radius</td><td>uint16</td><td class="num">2</td><td>metres: the missile explodes when the target is closer</td></tr>
+      <tr><td class="num">BOMB</td><td>guided</td><td>uint8</td><td class="num">1</td><td>1 = guided bomb (GBU-15), 0 = dumb</td></tr>
+      <tr><td class="num">BOMB</td><td>arming delay</td><td>uint8</td><td class="num">1</td><td>seconds before the bomb can hit anything</td></tr>
+      <tr><td class="num">BOMB</td><td>value 3</td><td>uint8</td><td class="num">1</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td class="num">BOMB</td><td>cone opening</td><td>uint16</td><td class="num">2</td><td>°/s: opening speed of a guided bomb's lock-on cone.</td></tr>
+      <tr><td class="num">PODR</td><td>projectile</td><td>string</td><td class="num">n</td><td>name of the fired object (the rocket), zero-terminated</td></tr>
+      <tr><td class="num">PODR</td><td>present</td><td>uint8</td><td class="num">1</td><td>0: the pod disappears at its first update</td></tr>
+      <tr><td class="num">PODR</td><td>launch speed</td><td>uint16</td><td class="num">2</td><td>m/s of the rockets</td></tr>
+      <tr><td class="num">DECY</td><td>lifetime</td><td>int32</td><td class="num">4</td><td>integer, in game time steps</td></tr>
+      <tr><td class="num">SWPN</td><td>ammunition</td><td>int32</td><td class="num">4</td><td>number of shots</td></tr>
+      <tr><td class="num">SWPN</td><td>detection range</td><td>int32</td><td class="num">4</td><td>metres, integer: the defence looks for the nearest aircraft (<code>TRGT</code> 1) within this radius</td></tr>
+      <tr><td class="num">SWPN</td><td>firing range</td><td>int32</td><td class="num">4</td><td>metres, integer</td></tr>
+      <tr><td class="num">SWPN</td><td>spread</td><td>uint16</td><td class="num">2</td><td>randomness of the shells</td></tr>
+      <tr><td class="num">SWPN</td><td>rate of fire</td><td>float</td><td class="num">4</td><td>seconds between two shots</td></tr>
+      <tr><td class="num">SWPN</td><td>missile launcher</td><td>uint8</td><td class="num">1</td><td>≠ 0: fires the weapon below, only at a target more than 305 m above the ground; 0: gun</td></tr>
+      <tr><td class="num">SWPN</td><td>weapon</td><td>string[8]</td><td class="num">8</td><td>weapon object (<code>OBJECTS\&lt;name&gt;.IFF</code>)</td></tr>
+      <tr><td class="num">SWPN</td><td>launch offset</td><td>int32</td><td class="num">4</td><td>metres, integer: a missile starts 2 × this value above the defence</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>TRCR: the gun burst's INFO chunk (32 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>launch speed</td><td>float</td><td class="num">4</td><td>m/s, along the shooter's nose</td></tr>
+      <tr><td>value 2</td><td>float</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>initial spread</td><td>float</td><td class="num">4</td><td>metres: random jitter added every frame on each axis</td></tr>
+      <tr><td>final spread</td><td>float</td><td class="num">4</td><td>metres; the spread goes linearly from one to the other</td></tr>
+      <tr><td>lifetime</td><td>float</td><td class="num">4</td><td>seconds</td></tr>
+      <tr><td>speed spread</td><td>float</td><td class="num">4</td><td>± m/s added at random to the launch speed</td></tr>
+      <tr><td>inherited speed</td><td>float</td><td class="num">4</td><td>share of the shooter's speed added (clamped at 1)</td></tr>
+      <tr><td>value 8</td><td>uint16</td><td class="num">2</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>damage multiplier</td><td>uint16</td><td class="num">2</td><td>damage of one hit = <code>WDAT</code> damage × this number × (from 100 % at the start to 50 % at the end of its life)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>FORM WEAP: an aircraft's loadout</h3>
+  <p>Present in <code>ARMG</code> and <code>JETP</code>. Instead of the <code>FORM WEAP</code>, the file can contain a <code>FORM WFIL</code>: its contents are a string, the name of an <code>OBJECTS\&lt;name&gt;.IFF</code> file whose root is a <code>FORM WEAP</code>. A mission can also impose another loadout (3rd name in <a href="#part">PART</a>).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="num">INFO</td><td>sensor range</td><td>int32</td><td class="num">4</td><td>metres, integer: target search distance</td></tr>
+      <tr><td class="num">INFO</td><td>sensor half-angle</td><td>uint16</td><td class="num">2</td><td>degrees around the nose (180 = all directions)</td></tr>
+      <tr><td class="num">HPTS</td><td>hardpoints</td><td>13&nbsp;bytes&nbsp;each</td><td class="num">13 × n</td><td>n = chunk size ÷ 13; table below</td></tr>
+      <tr><td class="num">DCOY</td><td>chaff</td><td>uint16</td><td class="num">2</td><td>number of <code>CHAFF</code> (absent: 0)</td></tr>
+      <tr><td class="num">DCOY</td><td>infrared flares</td><td>uint16</td><td class="num">2</td><td>number of <code>FLARE</code> (absent: 0)</td></tr>
+      <tr><td class="num">WPNS</td><td>weapons</td><td>10&nbsp;bytes&nbsp;each</td><td class="num">10 × n</td><td>n = chunk size ÷ 10; table below</td></tr>
+    </tbody>
+  </table></div>
+  <div class="stack">
+  <div class="tablewrap"><table>
+    <thead><tr><th colspan="4">An HPTS hardpoint (13 bytes)</th></tr><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>type</td><td>uint8</td><td class="num">1</td><td>0 to 4, capacity table below</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>metres, aircraft frame (side)</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>metres (nose axis)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>metres (up)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th colspan="4">A WPNS weapon (10 bytes)</th></tr><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>quantity</td><td>uint16</td><td class="num">2</td><td>number carried; a pod whose name starts with <code>POD</code> counts 19 rockets each</td></tr>
+      <tr><td>object</td><td>string[8]</td><td class="num">8</td><td>weapon file <code>OBJECTS\&lt;name&gt;.IFF</code></td></tr>
+    </tbody>
+  </table></div>
+  </div>
+  <h3>Capacity of a hardpoint by type</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Accepted weapons (maximum number)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>gun only (the whole quantity)</td></tr>
+      <tr><td class="num">1</td><td>AIM-9J 1, AIM-9M 1, AIM-120 1 (wingtip rail)</td></tr>
+      <tr><td class="num">2</td><td>AIM-9J 1, AIM-9M 1, AGM-65D 3, LAU-3 2, MK-20 6, MK-82 6, Durandal 3, GBU-15 1, AIM-120 2</td></tr>
+      <tr><td class="num">3</td><td>AGM-65D 3, LAU-3 2, MK-20 6, MK-82 6, Durandal 3, GBU-15 1</td></tr>
+      <tr><td class="num">4</td><td>AIM-9J 1, AIM-9M 1</td></tr>
+    </tbody>
+  </table></div>
+  <p>The <code>WPNS</code> weapons are distributed over the hardpoints within these capacities; two hardpoints of the same type share the quantity.</p>
+</article>
+
+<!-- ============================ PROF ============================ -->
+<article class="mv" id="prof">
+  <header><span class="id">INTEL\&lt;name&gt;.IFF</span><h2>Pilot profile</h2></header>
+  <ul class="chips"><li>root <b>FORM PROF</b></li><li>loaded for <b>each AI pilot</b></li><li>never for the player</li></ul>
+  <p>The name comes from the mission's <code>CAST</code> chunk: a pilot named <code>STERN</code> loads <code>INTEL\STERN.IFF</code>. The file contains the pilot's radio voice and behaviour.</p>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM PROF</span> <span class="d">root of the INTEL\&lt;pilot&gt;.IFF file</span><ul><li><span class="t chunk">VERS</span> <span class="d">int16: version (2)</span></li><li><span class="t form">FORM RADI</span> <span class="d">the radio</span><ul><li><span class="t chunk">SPCH</span> <span class="o">optional</span> <span class="d">uint8: voice set INTEL\SPEECH\*.PAK</span></li><li><span class="t chunk">INFO</span> <span class="d">uint16 identifier, name, callsign</span></li><li><span class="t chunk">OPTS</span> <span class="d">one letter per radio order or question</span></li><li><span class="t chunk">MSGS</span> <span class="d">lines: (uint8 number, string)…</span></li></ul></li><li><span class="t form">FORM _AI_</span> <span class="d">the behaviour</span><ul><li><span class="t chunk">AI_</span> <span class="d">chunk whose contents are not read by the loader</span></li><li><span class="t chunk">MVRS</span> <span class="d">weighted manoeuvres (see MVRS_MANOEUVRES_EN.html)</span></li><li><span class="t chunk">GOAL</span> <span class="d">up to 10 behaviour selectors</span></li><li><a href="#prof"><span class="t chunk">ATRB</span></a> <span class="d">10 uint8 attributes</span></li></ul></li></ul></li></ul></div>
+  <h3>ATRB, in file order (1 byte each, 0 to 16)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Code</th><th>Attribute (0 → 16)</th><th>Default</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num">TH</td><td>Trigger Happy: careful → fires readily</td><td class="num">8</td></tr>
+      <tr><td class="num">2</td><td class="num">CN</td><td>Confidence: easily scared → impossible to scare</td><td class="num">8</td></tr>
+      <tr><td class="num">3</td><td class="num">VB</td><td>Verbosity: silent → talkative</td><td class="num">8</td></tr>
+      <tr><td class="num">4</td><td class="num">LY</td><td>Loyalty: never obeys → always obeys</td><td class="num">8</td></tr>
+      <tr><td class="num">5</td><td class="num">FL</td><td>Flying: piloting</td><td class="num">10</td></tr>
+      <tr><td class="num">6</td><td class="num">AG</td><td>Air-to-Ground</td><td class="num">10</td></tr>
+      <tr><td class="num">7</td><td class="num">AA</td><td>Air-to-Air</td><td class="num">10</td></tr>
+      <tr><td class="num">8</td><td class="num">SM</td><td>Showmanship: showy</td><td class="num">8</td></tr>
+      <tr><td class="num">9</td><td class="num">AR</td><td>Aggressiveness: careful → aggressive</td><td class="num">8</td></tr>
+      <tr><td class="num">10</td><td class="num">—</td><td><b>pilot's fate</b> (unnamed in the manual, capped at 3): 0 = normal (ejects at random, 30 %, when the aircraft is destroyed); 1 = always ejects; 2 = never ejects; 3 = the aircraft takes no component damage when hit</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p>Validated on Billy: 10, 14, 12, 13, 15, 9, 15, 16, 15 = the manual's values. Details: <code>AI_SYSTEM.md</code>.</p>
+</article>
+
+<!-- ============================ MISN ============================ -->
+<section id="misn">
+  <h2 class="sec">The mission: FORM MISN</h2>
+  <p>A mission is built like a <b>stage play</b>: <code>CAST</code> = the cast (the pilots), <code>PLAY</code> = the play, divided into <code>SCNE</code> = scenes, <code>PROG</code> = the stage directions (scripts). The game reads the chunks in tree order:</p>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM MISN</span> <span class="d">root of the MISSIONS\&lt;mission&gt;.IFF file — chunks read in this order</span><ul><li><span class="t chunk">VERS</span> <span class="d">uint16: version</span></li><li><span class="t chunk">NAME</span> <span class="d">string (16 at most): mission name</span></li><li><span class="t chunk">TUNE</span> <span class="d">uint8: music track</span></li><li><a href="#wrld"><span class="t form">FORM WRLD</span></a> <span class="d">the world (required)</span><ul><li><a href="#wrld"><span class="t chunk">FILE</span></a> <span class="d">string[8]: name of the world file MISSIONS\&lt;name&gt;.IFF</span></li></ul></li><li><a href="#cast"><span class="t chunk">CAST</span></a> <span class="d">pilot names</span></li><li><a href="#area"><span class="t chunk">AREA</span></a> <span class="d">areas</span></li><li><a href="#spot"><span class="t chunk">SPOT</span></a> <span class="d">points attached to an area</span></li><li><a href="#autres"><span class="t chunk">NUMS</span></a> <span class="d">script numeric variables</span></li><li><a href="#autres"><span class="t chunk">MSGS</span></a> <span class="d">messages</span></li><li><a href="#autres"><span class="t chunk">FLAG</span></a> <span class="d">event flags</span></li><li><a href="#autres"><span class="t chunk">PROG</span></a> <span class="d">scripts (bytecode)</span></li><li><a href="#part"><span class="t chunk">PART</span></a> <span class="d">mission objects</span></li><li><a href="#autres"><span class="t chunk">TEAM</span></a> <span class="d">player's team: up to 8 uint16</span></li><li><a href="#scne"><span class="t form">FORM PLAY</span></a> <span class="d">the play</span><ul><li><a href="#scne"><span class="t chunk">SCNE</span></a> <span class="d">a scene (up to 32 SCNE chunks)</span></li></ul></li><li><a href="#autres"><span class="t chunk">LOAD</span></a> <span class="d">loadout</span></li><li><a href="#autres"><span class="t chunk">HOME</span></a> <span class="d">home base: area and position</span></li></ul></li></ul></div>
+</section>
+
+<!-- ============================ CAST ============================ -->
+<article class="mv" id="cast">
+  <header><span class="id">CAST</span><h2>Pilot names</h2></header>
+  <ul class="chips"><li>record of <b>9 bytes</b></li><li>count = chunk size ÷ 9</li><li>reader <b>PLAY_LoadCASTTeamNames_A9956</b></li></ul>
+  <div class="grid2">
+    <div>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>name</td><td>string[8]</td><td class="num">8</td><td><code>PLAYER</code>, <code>STERN</code>, <code>NULL</code>, <code>TEAM0</code>…</td></tr>
+          <tr><td>end</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>terminating zero</td></tr>
+        </tbody>
+      </table></div>
+      <p>Each <code>PART</code> object names its pilot by an index into this list. The name decides who flies it:</p>
+      <ul>
+        <li><code>PLAYER</code>: the player, no profile;</li>
+        <li><code>NETWORK</code>: a network player;</li>
+        <li>any other name: an AI, profile loaded from <code>INTEL\&lt;name&gt;.IFF</code>.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Wingmen: TEAM0, TEAM1, TEAM2</h3>
+      <p>On reading, any <code>TEAMn</code> name is <b>replaced</b>:</p>
+      <ol class="phases">
+        <li><span>1</span><div>mission launched from the campaign and n = 0, 1 or 2: n-th name of the <code>TEAM</code> chunk of <code>OP2MISN.IFF</code>, <b>the wingmen chosen by the player</b>;</div></li>
+        <li><span>2</span><div>n from 3 to 9: the name stays <code>TEAMn</code>;</div></li>
+        <li><span>3</span><div>mission loaded outside the campaign: every <code>TEAMn</code> becomes <b><code>BILLY</code></b>.</div></li>
+      </ol>
+      <p>E.g. <code>TEAM0</code> replaced by <code>BILLY</code> loads <code>INTEL\BILLY.IFF</code>.</p>
+    </div>
+  </div>
+</article>
+
+<!-- ============================ AREA ============================ -->
+<article class="mv" id="area">
+  <header><span class="id">AREA</span><h2>Geographic areas</h2></header>
+  <ul class="chips"><li>record of <b>49, 53 or 65 bytes</b> depending on the shape</li><li>no counter</li><li>reader <b>ExprSlot_ConstructMain_A974A</b></li></ul>
+  <p>An area is a <b>named volume</b>: sphere, vertical cylinder or box. The game uses it to know which area the player is in (and therefore which scene to activate), and as the origin of <code>SPOT</code>s and <code>PART</code> objects. The first letter of the record gives the shape, hence its size; records follow one another with no separator.</p>
+  <div class="stack">
+    <div>
+      <h3>Common start</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>shape</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>letter <code>S</code> (sphere), <code>C</code> (cylinder) or <code>B</code> (box)</td></tr>
+          <tr><td>name</td><td>string[32]</td><td class="num">32</td><td>e.g. “Strike Base”</td></tr>
+          <tr><td>reference X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>reference Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+          <tr><td>reference Y</td><td>float</td><td class="num">4</td><td>metres (altitude)</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Continuation for a sphere (S) — 49 bytes in total</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead><tbody>
+          <tr><td>radius</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Continuation for a cylinder (C) — 53 bytes in total</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead><tbody>
+          <tr><td>height</td><td>float</td><td class="num">4</td><td>metres, upwards from the floor</td></tr>
+          <tr><td>radius</td><td>float</td><td class="num">4</td><td>metres, in the X/Z plane</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Continuation for a box (B) — 65 bytes in total</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead><tbody>
+          <tr><td>extent +X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>extent −X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>extent +Z</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>extent −Z</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>height</td><td>float</td><td class="num">4</td><td>metres, upwards from the floor</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 600 300" role="img" aria-label="The three area shapes and their reference point">
+          <text class="g-title" x="100" y="22" text-anchor="middle">Sphere S</text>
+          <text class="g-title" x="300" y="22" text-anchor="middle">Cylinder C</text>
+          <text class="g-title" x="500" y="22" text-anchor="middle">Box B</text>
+          <line class="g-ground" x1="10" y1="250" x2="590" y2="250"/>
+          <circle class="g-path" cx="100" cy="150" r="70"/>
+          <ellipse class="g-hz" cx="100" cy="150" rx="70" ry="18"/>
+          <line class="g-lim" x1="100" y1="150" x2="170" y2="150"/>
+          <text class="g-lbl-a" x="122" y="143">radius</text>
+          <circle class="g-ph" cx="100" cy="150" r="5"/>
+          <text class="g-lbl" x="100" y="275" text-anchor="middle">reference = centre</text>
+          <ellipse class="g-path" cx="300" cy="80" rx="62" ry="15"/>
+          <line class="g-path" x1="238" y1="80" x2="238" y2="210"/>
+          <line class="g-path" x1="362" y1="80" x2="362" y2="210"/>
+          <path class="g-path" d="M238 210 A62 15 0 0 0 362 210"/>
+          <path class="g-hz" d="M238 210 A62 15 0 0 1 362 210"/>
+          <line class="g-lim" x1="300" y1="210" x2="362" y2="210"/>
+          <text class="g-lbl-a" x="318" y="204">radius</text>
+          <line class="g-lim" x1="380" y1="80" x2="380" y2="210"/>
+          <text class="g-lbl-a" x="386" y="150">height</text>
+          <circle class="g-ph" cx="300" cy="210" r="5"/>
+          <text class="g-lbl" x="300" y="275" text-anchor="middle">reference = centre of the floor</text>
+          <path class="g-path" d="M430 210 L560 210 L585 190 L455 190 Z"/>
+          <path class="g-path" d="M430 90 L560 90 L585 70 L455 70 Z"/>
+          <line class="g-path" x1="430" y1="90" x2="430" y2="210"/>
+          <line class="g-path" x1="560" y1="90" x2="560" y2="210"/>
+          <line class="g-path" x1="585" y1="70" x2="585" y2="190"/>
+          <line class="g-hz" x1="455" y1="70" x2="455" y2="190"/>
+          <circle class="g-ph" cx="480" cy="200" r="5"/>
+          <line class="g-lim" x1="480" y1="228" x2="560" y2="228"/>
+          <line class="g-lim" x1="430" y1="228" x2="480" y2="228"/>
+          <text class="g-lbl-a" x="520" y="242" text-anchor="middle">+X</text>
+          <text class="g-lbl-a" x="455" y="242" text-anchor="middle">−X</text>
+          <text class="g-lbl" x="500" y="275" text-anchor="middle">reference at the floor</text>
+          <text class="g-lbl" x="500" y="292" text-anchor="middle">asymmetric ±X, ±Z</text>
+        </svg>
+      </div>
+      <figcaption>Reference point (orange) of each shape. All bounds are inclusive.</figcaption>
+    </figure>
+  </div>
+  <div class="check">
+    <h3>Test “is the point inside the area?”</h3>
+    <ul>
+      <li><b>Sphere</b>: 3D distance to the centre ≤ radius.</li>
+      <li><b>Cylinder</b>: <code>Y ≤ y ≤ Y + height</code> and distance in the X/Z plane ≤ radius.</li>
+      <li><b>Box</b>: <code>X − (−X) ≤ x ≤ X + (+X)</code>, <code>Z − (−Z) ≤ z ≤ Z + (+Z)</code>, <code>Y ≤ y ≤ Y + height</code>.</li>
+      <li>Every frame, the game tests the player's position against the areas of the active scenes and takes the <b>first</b> one that contains it.</li>
+    </ul>
+  </div>
+</article>
+
+<!-- ============================ SPOT ============================ -->
+<article class="mv" id="spot">
+  <header><span class="id">SPOT</span><h2>Points attached to an area</h2></header>
+  <ul class="chips"><li>record of <b>14 bytes</b></li><li>count = chunk size ÷ 14</li><li>reader <b>Mission_LoadSpotList_AA6C9</b></li></ul>
+  <div class="stack">
+    <div>
+      <p>A spot is a <b>destination</b> for mission orders (go to, defend…). It is not the area that references a spot: the spot points to its area, and its position is <b>relative</b> to the area's reference point.</p>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>zone</td><td>uint16</td><td class="num">2</td><td>index into <code>AREA</code></td></tr>
+          <tr><td>offset X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>offset Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+          <tr><td>offset Y</td><td>float</td><td class="num">4</td><td>metres (altitude)</td></tr>
+        </tbody>
+      </table></div>
+      <pre class="tpl">position = offset + area reference   if the area exists
+position = offset                    otherwise (absolute coordinates)</pre>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 420 240" role="img" aria-label="A spot is offset from its area's reference point">
+          <text class="g-title" x="20" y="24">Top view (X/Z plane)</text>
+          <rect class="g-hz" x="40" y="60" width="200" height="140" rx="4"/>
+          <text class="g-lbl" x="48" y="78">AREA zone</text>
+          <circle class="g-ph" cx="140" cy="130" r="6"/>
+          <text class="g-lbl" x="120" y="156">reference</text>
+          <line class="g-path" x1="140" y1="130" x2="330" y2="80"/>
+          <circle class="g-tgt" cx="330" cy="80" r="7"/>
+          <text class="g-lbl-t" x="342" y="84">SPOT</text>
+          <text class="g-lbl-a" x="215" y="96">offset (X, Z)</text>
+          <line class="g-frame" x1="30" y1="220" x2="80" y2="220"/>
+          <text class="g-lbl" x="86" y="224">X →</text>
+        </svg>
+      </div>
+      <figcaption>A zero offset falls exactly on the area's reference (centre of the sphere, otherwise centre of the floor).</figcaption>
+    </figure>
+  </div>
+</article>
+
+<!-- ============================ PART ============================ -->
+<article class="mv" id="part">
+  <header><span class="id">PART</span><h2>Mission objects</h2></header>
+  <ul class="chips"><li>record of <b>62 bytes</b></li><li>count = chunk size ÷ 62</li><li>reader <b>PartEntry_LoadAndResolveNames_A9E3C</b></li><li>activation <b>PartEntry_ResolveSpawnPositionAndActivate_51EDC</b></li></ul>
+  <p>Each record describes an object: aircraft, vehicle, base, runway marker. It says which model to load, which pilot, where and how to spawn it, its side and its scripts. The object only exists in the world once <b>activated</b> (by its scene or by the script).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>pilot</td><td>uint16</td><td class="num">2</td><td>index into <code>CAST</code></td></tr>
+      <tr><td>object type</td><td>string[8]</td><td class="num">8</td><td>file <code>OBJECTS\&lt;type&gt;.IFF</code> (e.g. <code>F-16DES</code>, <code>MIG21</code>)</td></tr>
+      <tr><td>type if destroyed</td><td>string[8]</td><td class="num">8</td><td>model loaded instead once the object is destroyed</td></tr>
+      <tr><td>imposed loadout</td><td>string[8]</td><td class="num">8</td><td>empty = the model's loadout; otherwise an <code>OBJECTS\&lt;name&gt;.IFF</code> file whose root is a <a href="#armes">FORM WEAP</a>, loaded instead</td></tr>
+      <tr><td>zone</td><td>uint16</td><td class="num">2</td><td>index into <code>AREA</code></td></tr>
+      <tr><td>placement mode</td><td>uint8</td><td class="num">1</td><td>0 = relative to the area; other = relative to the player</td></tr>
+      <tr><td>offset X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>offset Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+      <tr><td>offset Y</td><td>float</td><td class="num">4</td><td>metres (altitude)</td></tr>
+      <tr><td>heading</td><td>int16</td><td class="num">2</td><td>degrees (absolute, or added to the player's heading)</td></tr>
+      <tr><td>initial speed</td><td>int16</td><td class="num">2</td><td>m/s along the nose; 0 = stationary</td></tr>
+      <tr><td>side</td><td>uint8</td><td class="num">1</td><td>1 = ally, 255 = enemy, other = neutral; replaces the model's <code>ALGN</code> side</td></tr>
+      <tr><td>ally to follow</td><td>uint8</td><td class="num">1</td><td>index into <code>PART</code> (255 = none)</td></tr>
+      <tr><td>reserved</td><td>uint8</td><td class="num">1</td><td>role not established</td></tr>
+      <tr><td>formation slot, side</td><td>int16</td><td class="num">2</td><td>metres, along X, behind the followed ally</td></tr>
+      <tr><td>formation slot, forward</td><td>int16</td><td class="num">2</td><td>metres, along Z</td></tr>
+      <tr><td>formation slot, up</td><td>int16</td><td class="num">2</td><td>metres, along Y</td></tr>
+      <tr><td>script on activation</td><td>uint16</td><td class="num">2</td><td>number in <code>PROG</code></td></tr>
+      <tr><td>script every frame</td><td>uint16</td><td class="num">2</td><td>number in <code>PROG</code></td></tr>
+      <tr><td>script on destruction</td><td>uint16</td><td class="num">2</td><td>number in <code>PROG</code></td></tr>
+      <tr><td>initialisation script</td><td>uint16</td><td class="num">2</td><td>number in <code>PROG</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="grid2">
+    <div>
+      <h3>On activation</h3>
+      <ol class="phases">
+        <li><span>1</span><div><b>Model</b>: the normal type, or the “if destroyed” type if the object has already been destroyed (its scripts are then cleared). Empty name: nothing appears.</div></li>
+        <li><span>2</span><div><b>Position</b>: mode 0, area reference + offset (like a <code>SPOT</code>), absolute heading. Other mode: offset expressed in the frame of the player's aircraft (X sideways, Z towards the nose, Y towards the top of the aircraft), heading = player's heading + the file's heading.</div></li>
+        <li><span>3</span><div>The object appears <b>level</b> (only rotated about the vertical), with its initial speed along the nose.</div></li>
+        <li><span>4</span><div>An <b>aircraft at zero speed</b> is placed <b>on the ground, gear down</b>.</div></li>
+        <li><span>5</span><div>Side copied, “follow” order given towards the ally, the side's active-object counter incremented.</div></li>
+      </ol>
+    </div>
+    <figure>
+      <div class="svgbox">
+        <svg viewBox="0 0 420 250" role="img" aria-label="Placement relative to the player">
+          <text class="g-title" x="20" y="24">Placement relative to the player (top view)</text>
+          <polygon class="g-me" points="210,90 196,140 210,130 224,140"/>
+          <text class="g-lbl" x="232" y="128">player</text>
+          <line class="g-lim" x1="210" y1="110" x2="210" y2="40"/>
+          <text class="g-lbl-a" x="216" y="48">Z (nose)</text>
+          <line class="g-lim" x1="210" y1="110" x2="300" y2="110"/>
+          <text class="g-lbl-a" x="304" y="114">X (side)</text>
+          <line class="g-path" x1="210" y1="110" x2="120" y2="190"/>
+          <polygon class="g-tgt" points="120,175 110,205 120,198 130,205"/>
+          <text class="g-lbl-t" x="40" y="222">PART object</text>
+          <text class="g-lbl" x="140" y="160">offset</text>
+        </svg>
+      </div>
+      <figcaption>The offset turns with the player: an object placed “500 m behind” always appears behind them, whatever their heading.</figcaption>
+    </figure>
+  </div>
+  <div class="note"><p><b>State during play</b> (not in the file): active, destroyed, visible on the navigation map, accompanies the player on autopilot.</p></div>
+</article>
+
+<!-- ============================ SCNE ============================ -->
+<article class="mv" id="scne">
+  <header><span class="id">PLAY / SCNE</span><h2>Scenes</h2></header>
+  <ul class="chips"><li>FORM <b>PLAY</b> containing up to <b>32</b> <b>SCNE</b> chunks</li><li>header of <b>24 bytes</b> then an object list</li><li>reader <b>MissionPlay_LoadScenes_AA595</b></li></ul>
+  <p>A scene is a piece of the mission attached to an area: when the player enters the area, the scene activates, spawns its objects and runs its script.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>active at start</td><td>uint8</td><td class="num">1</td><td>0 or 1</td></tr>
+      <tr><td>zone</td><td>int16</td><td class="num">2</td><td>index into <code>AREA</code> (−1 = global scene)</td></tr>
+      <tr><td>script on activation</td><td>int16</td><td class="num">2</td><td>number in <code>PROG</code> (−1 = none)</td></tr>
+      <tr><td>script on leaving</td><td>int16</td><td class="num">2</td><td>number in <code>PROG</code> (−1 = none)</td></tr>
+      <tr><td>script every frame</td><td>int16</td><td class="num">2</td><td>number in <code>PROG</code> (−1 = none)</td></tr>
+      <tr><td>own position</td><td>uint8</td><td class="num">1</td><td>stored in memory by the loader; 0 or 1 observed; role not established</td></tr>
+      <tr><td>heading</td><td>uint16</td><td class="num">2</td><td>stored in memory by the loader; 180 or 0 observed; role not established</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>stored in memory by the loader; role not established</td></tr>
+      <tr><td>object list</td><td>uint16&nbsp;×&nbsp;n</td><td class="num">2 × n</td><td>index into <code>PART</code>; n = (chunk size − 24) ÷ 2</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Example: MISN-1A “Mauritania”</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Scene</th><th>Area</th><th>Scripts</th><th>Objects</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>global</td><td>every frame: 1</td><td>PLAYER, STRIBASE, STERN</td></tr>
+      <tr><td class="num">1</td><td>Strike Base</td><td>—</td><td>runway marker</td></tr>
+      <tr><td class="num">2</td><td>Restricted Airspace</td><td>—</td><td>3 MiG-21</td></tr>
+      <tr><td class="num">3</td><td>Nouakchott</td><td>—</td><td>—</td></tr>
+      <tr><td class="num">4</td><td>Cargo Destination</td><td>—</td><td>runway marker</td></tr>
+      <tr><td class="num">5</td><td>Rendezvous</td><td>on activation: 13 (spawns the C-130)</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ AUTRES ============================ -->
+<article class="mv" id="autres">
+  <header><span class="id">HOME · TEAM · PROG · …</span><h2>Other mission chunks</h2></header>
+  <h3>HOME: home base</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>zone</td><td>uint16</td><td class="num">2</td><td>index into <code>AREA</code></td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>metres (altitude)</td></tr>
+    </tbody>
+  </table></div>
+  <dl class="vocab">
+    <dt><code>TEAM</code></dt><dd>the player's team: almost always the player and the objects accompanying them.</dd>
+    <dt><code>PROG</code></dt><dd>the mission scripts, in mission-VM bytecode (opcodes in <code>MISSION_SCRIPT_OPCODES.md</code>). <code>PART</code> and <code>SCNE</code> refer to them by number.</dd>
+    <dt><code>NUMS</code></dt><dd>script numeric variables.</dd>
+    <dt><code>FLAG</code></dt><dd>script event flags.</dd>
+    <dt><code>MSGS</code></dt><dd>messages displayed or spoken during the mission.</dd>
+    <dt><code>LOAD</code></dt><dd>loadout.</dd>
+    <dt><code>TUNE</code></dt><dd>the mission's music track.</dd>
+  </dl>
+</article>
+
+<!-- ============================ WRLD ============================ -->
+<article class="mv" id="wrld">
+  <header><span class="id">FORM WRLD</span><h2>The world</h2></header>
+  <ul class="chips"><li>file <b>MISSIONS\&lt;FILE&gt;.IFF</b></li><li>reader <b>MissionLoader_LoadEntitiesMain_A767F</b></li></ul>
+  <p>The mission's <code>WRLD/FILE</code> chunk gives the name of the world (e.g. <code>MAURITAN</code>), stored in the same folder as the mission.</p>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM WRLD</span> <span class="d">root of the MISSIONS\&lt;world&gt;.IFF file</span><ul><li><span class="t chunk">INFO</span> <span class="d">uint16: metadata</span></li><li><span class="t chunk">PALT</span> <span class="d">palette name → DATA\PALETTE.IFF</span></li><li><a href="#terrain"><span class="t chunk">TERA</span></a> <span class="d">terrain name → DATA\&lt;name&gt;.PAK</span></li><li><span class="t chunk">SKYS</span> <span class="d">sky and sun</span></li><li><span class="t chunk">GLNT</span> <span class="d">sun glints</span></li><li><a href="#fumees"><span class="t chunk">SMOK</span></a> <span class="d">smoke set name → OBJECTS\&lt;name&gt;.IFF</span></li><li><span class="t chunk">LGHT</span> <span class="d">lighting (14 bytes)</span></li><li><span class="t chunk">HORZ</span> <span class="o">optional</span> <span class="d">horizon: 2 uint32</span></li><li><span class="t chunk">SCAL</span> <span class="o">optional</span> <span class="d">world scale: uint32</span></li><li><a href="#camr"><span class="t form">FORM CAMR</span></a> <span class="d">scripted cameras</span><ul><li><a href="#camr"><span class="t chunk">STRT</span></a> <span class="d">camera set name</span></li><li><a href="#camr"><span class="t chunk">CHAS / CKPT / VICT / TARG / WEAP / ROTA</span></a> <span class="d">one camera each</span></li><li><a href="#camr"><span class="t chunk">COMP</span></a> <span class="d">scripted sequence (STARTCAM, TAKEOFF…)</span></li></ul></li></ul></li></ul></div>
+</article>
+
+<!-- ============================ FUMEES ============================ -->
+<article class="mv" id="fumees">
+  <header><span class="id">OBJECTS\&lt;SMOKESET&gt;.IFF</span><h2>The smoke set</h2></header>
+  <ul class="chips"><li>root <b>FORM SMOK</b></li><li>named by the world's <b>SMOK</b> chunk</li><li>reader <b>SmokeSet_LoadFromIFF_A636C</b></li></ul>
+  <p>All the game's smoke (object trails, <code>SMKG</code> generators) consists of particles described by <b>smoke models</b>. The world loads a smoke set by name (e.g. <code>SMOKESET</code>); objects then designate a model by its <b>number</b>.</p>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM SMOK</span> <span class="d">root of the OBJECTS\&lt;smoke set&gt;.IFF file</span><ul><li><a href="#fumees"><span class="t chunk">INFO</span></a> <span class="d">numbers of models, shapes, particles</span></li><li><a href="#fumees"><span class="t form">FORM TYPE</span></a> <span class="d">the list, in order</span><ul><li><a href="#fumees"><span class="t form">FORM SMOK</span></a> <span class="d">a smoke model (number = rank)</span><ul><li><a href="#fumees"><span class="t chunk">INFO</span></a> <span class="d">25 bytes</span></li><li><a href="#fumees"><span class="t chunk">ANIM</span></a> <span class="o">optional</span> <span class="d">animation</span></li><li><a href="#fumees"><span class="t chunk">SCRI</span></a> <span class="o">optional</span> <span class="d">frame order</span></li></ul></li><li><a href="#fumees"><span class="t form">FORM SHAP</span></a> <span class="d">a shape (number = rank)</span><ul><li><a href="#fumees"><span class="t chunk">SHAP</span></a> <span class="d">sprite image(s)</span></li></ul></li></ul></li></ul></li></ul></div>
+  <p>The <code>INFO</code> chunk contains 3 <code>uint16</code>: number of smoke models, number of shapes, maximum number of particles displayed at once. A model's number is its rank among the <code>FORM SMOK</code>s (0, 1, 2…), a shape's number its rank among the <code>FORM SHAP</code>s.</p>
+
+  <h3>A smoke model: INFO chunk (25 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>render mode</td><td>uint8</td><td class="num">1</td><td>0 = shaded disc (tint); 1 = opaque <code>SHAP</code> sprite (the tint has no effect); 2 = sprite with translucent colours (see drawings A and B); other: nothing is drawn</td></tr>
+      <tr><td>spacing</td><td>float</td><td class="num">4</td><td>metres between two particles along a trail</td></tr>
+      <tr><td>start size</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>end size</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+      <tr><td>lifetime</td><td>float</td><td class="num">4</td><td>seconds</td></tr>
+      <tr><td>spread</td><td>float</td><td class="num">4</td><td>metres: position drawn at random around the emission point</td></tr>
+      <tr><td>start tint</td><td>uint8</td><td class="num">1</td><td>number of a palette remapping table (shadow / transparency)</td></tr>
+      <tr><td>end tint</td><td>uint8</td><td class="num">1</td><td>same</td></tr>
+      <tr><td>first translucent colour</td><td>uint8</td><td class="num">1</td><td>mode 2: number of the first sprite colour that is not painted as is</td></tr>
+      <tr><td>number of translucent colours</td><td>uint8</td><td class="num">1</td><td>mode 2: number of these colours (see below)</td></tr>
+    </tbody>
+  </table></div>
+  <p>During its lifetime, each particle goes <b>linearly</b> from the start size and tint to the end ones, then disappears.</p>
+  <p><b>Translucent colours (mode 2).</b> Let A be the first translucent colour and B their number. A sprite pixel of colour c is painted as is if c &lt; A or c ≥ A + B. If A ≤ c &lt; A + B, it does not paint its colour: it <b>replaces the colour already on screen</b> with table[tint + (c − A)][colour on screen], where table is the sequence of 256-byte palette remapping tables. This is how smoke darkens or lightens the scenery behind it.</p>
+
+  <h3>ANIM chunk (optional, 8 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>shape A</td><td>uint8</td><td class="num">1</td><td><code>SHAP</code> shape number</td></tr>
+      <tr><td>chance of A</td><td>uint8</td><td class="num">1</td><td>percentage: each particle takes shape A with this chance, otherwise shape B (100 = always A)</td></tr>
+      <tr><td>shape B</td><td>uint8</td><td class="num">1</td><td><code>SHAP</code> shape number</td></tr>
+      <tr><td>mode</td><td>unsigned&nbsp;char</td><td class="num">1</td><td>letter: <code>R</code> back and forth, <code>S</code> stops on the last frame, <code>T</code> the particle disappears after the last frame, <code>W</code> loops</td></tr>
+      <tr><td>speed</td><td>int16</td><td class="num">2</td><td>frames per second</td></tr>
+      <tr><td>step</td><td>int16</td><td class="num">2</td><td>1 = forwards, −1 = backwards, 0 = no animation</td></tr>
+    </tbody>
+  </table></div>
+  <p>Without <code>ANIM</code>, the model has no shape. ⚠️ In <code>R</code> mode, the game reverses the step <b>in the model</b>: all particles of that model change direction at the same time.</p>
+
+  <h3>SCRI chunk (optional)</h3>
+  <p>A sequence of <code>uint8</code>: the order of the frames to play (as many bytes as frames). Without <code>SCRI</code>, the shape's frames are played in order.</p>
+
+  <h3>A shape: FORM SHAP</h3>
+  <p>A required <code>SHAP</code> chunk, copied as is: the sprite's image(s), in RealSpace sprite format (the same as the <code>.PAK</code> images already read by libRealSpace): a dword, then a table of dwords giving each image's offset; each image starts with 4 int16 (extent right, left, top, bottom) followed by the pixels.</p>
+</article>
+
+<!-- ============================ TERRAIN ============================ -->
+<article class="mv" id="terrain">
+  <header><span class="id">DATA\&lt;theatre&gt;.PAK</span><h2>The terrain</h2></header>
+  <ul class="chips"><li><b>PAK</b> archive, 7 sub-resources</li><li>grid of <b>18 × 18</b> cells</li><li><b>20 × 20</b> vertices per cell</li></ul>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Resource</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descriptor: version, <code>FORM BLOX</code> (dimensions and names of the following files), <code>FORM TXMS</code> (ground textures per level of detail)</td></tr>
+      <tr><td class="num">2</td><td class="num">.ELV</td><td>elevations, high detail: 324 cells of 20 × 20 vertices</td></tr>
+      <tr><td class="num">3</td><td class="num">.MED</td><td>elevations, medium detail</td></tr>
+      <tr><td class="num">4</td><td class="num">.LOW</td><td>elevations, low detail</td></tr>
+      <tr><td class="num">5</td><td class="num">.AVG</td><td>one average value per cell</td></tr>
+      <tr><td class="num">6</td><td class="num">.TRI</td><td><b>airfield runways and aprons</b> laid on the terrain</td></tr>
+      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>uint16</code>, one per cell: <b>ceiling altitude</b> of the cell (metres, integer). Above this altitude, the game returns this ceiling as the ground height without computing the exact relief</td></tr>
+    </tbody>
+  </table></div>
+  <h3>An elevation vertex (.ELV, .MED, .LOW)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>height</td><td>int16</td><td class="num">2</td><td>altitude of the vertex (metres); the game derives the cell's min, max and average from it</td></tr>
+      <tr><td>lighting</td><td>uint8</td><td class="num">1</td><td>light intensity of the vertex, interpolated over the face</td></tr>
+      <tr><td>colour</td><td>uint8</td><td class="num">1</td><td>base colour; a triangle takes that of its lowest vertex</td></tr>
+      <tr><td>texture 1</td><td>uint8</td><td class="num">1</td><td>texture of the square's 1st triangle (in the <code>TXMS</code> list); 255 = none. Depending on the graphics detail options, ranges of numbers (0–215, 216–222, 236–247) are drawn without texture; from 223 on, the renderer also receives the position of the face's three vertices (special texture mapping)</td></tr>
+      <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture of the square's 2nd triangle</td></tr>
+    </tbody>
+  </table></div>
+  <p>⚠️ This order comes from the code: the cell reader takes the <code>int16</code> at the head of each 6-byte vertex for the min, max and average altitude, and the renderer multiplies it by the camera axes. An earlier reading of the data put the height in the 2nd word: to be checked against the files.</p>
+  <h3>The ATRI chunk (in FORM BLOX, 53 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>side of the cell grid (18)</td></tr>
+      <tr><td>cell size</td><td>uint32</td><td class="num">4</td><td>metres, integer (20000)</td></tr>
+      <tr><td>number of groups</td><td>uint16</td><td class="num">2</td><td>detail groups of the <code>.TRI</code> triangles (4 at most)</td></tr>
+      <tr><td>radii</td><td>4&nbsp;×&nbsp;uint32</td><td class="num">16</td><td>metres: a triangle of the group is only drawn within this distance of the viewer</td></tr>
+      <tr><td>heights</td><td>4&nbsp;×&nbsp;uint32</td><td class="num">16</td><td>metres: it is only drawn if the viewer flies lower</td></tr>
+      <tr><td>file</td><td>string[13]</td><td class="num">13</td><td>name of the <code>.TRI</code> (<code>MAURITAN.TRI</code>)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>A .TRI region</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>number of vertices</td><td>uint16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>number of triangles</td><td>uint16</td><td class="num">2</td><td>—</td></tr>
+      <tr><td>grid size</td><td>uint16</td><td class="num">2</td><td>side g of the index grid</td></tr>
+      <tr><td>table size</td><td>uint16</td><td class="num">2</td><td>number of words in the list table</td></tr>
+      <tr><td>vertices</td><td>13&nbsp;bytes&nbsp;each</td><td class="num">13 × n</td><td>following table</td></tr>
+      <tr><td>triangles</td><td>16&nbsp;bytes&nbsp;each</td><td class="num">16 × n</td><td>following table</td></tr>
+      <tr><td>list table</td><td>uint16</td><td class="num">2 × n</td><td>sequences [count, triangle numbers…]; 65535 = empty list</td></tr>
+      <tr><td>grid</td><td>uint16</td><td class="num">2 × g²</td><td>each square points to a list in the table (spatial index)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="stack">
+    <div>
+      <h3>.TRI vertex (13 bytes)</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead><tbody>
+          <tr><td>X</td><td>float</td><td class="num">4</td><td>metres</td></tr>
+          <tr><td>Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+          <tr><td>Y</td><td>float</td><td class="num">4</td><td>metres (altitude)</td></tr>
+          <tr><td>lighting</td><td>uint8</td><td class="num">1</td><td>light intensity of the vertex (0, 76 or 177 observed), as for 3D models</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h3>.TRI triangle (16 bytes)</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead><tbody>
+          <tr><td>group</td><td>uint8</td><td class="num">1</td><td>detail group (radius and height in <code>ATRI</code>)</td></tr>
+          <tr><td>vertex 1</td><td>uint16</td><td class="num">2</td><td>vertex number</td></tr>
+          <tr><td>vertex 2</td><td>uint16</td><td class="num">2</td><td>vertex number</td></tr>
+          <tr><td>vertex 3</td><td>uint16</td><td class="num">2</td><td>vertex number</td></tr>
+          <tr><td>type</td><td>uint8</td><td class="num">1</td><td>6 = flat, 255 = textured (observed)</td></tr>
+          <tr><td>colour</td><td>uint16</td><td class="num">2</td><td>palette or texture; 14 to 17 = double-sided face; 255 = no texture</td></tr>
+          <tr><td>u, v vertex 1</td><td>2&nbsp;×&nbsp;uint8</td><td class="num">2</td><td>texture coordinates (255 = none)</td></tr>
+          <tr><td>u, v vertex 2</td><td>2&nbsp;×&nbsp;uint8</td><td class="num">2</td><td>—</td></tr>
+          <tr><td>u, v vertex 3</td><td>2&nbsp;×&nbsp;uint8</td><td class="num">2</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+  <p>Always <b>triangles</b>: Strike Commander has no quads.</p>
+</article>
+
+<!-- ============================ CAMR ============================ -->
+<article class="mv" id="camr">
+  <header><span class="id">FORM CAMR</span><h2>Scripted cameras</h2></header>
+  <ul class="chips"><li>in <b>WRLD</b></li><li>full reference <b>CAMERA_SYSTEM.md</b></li></ul>
+  <p>Each sub-chunk describes a camera; the game selects it by its 8-character name.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Camera</th></tr></thead>
+    <tbody>
+      <tr><td class="num">STRT</td><td>camera set name</td></tr>
+      <tr><td class="num">CHAS</td><td>chase camera</td></tr>
+      <tr><td class="num">CKPT</td><td>cockpit (with the cockpit art name, e.g. <code>F16-CKPT</code>)</td></tr>
+      <tr><td class="num">VICT</td><td>victim view</td></tr>
+      <tr><td class="num">TARG</td><td>target view</td></tr>
+      <tr><td class="num">WEAP</td><td>weapon view</td></tr>
+      <tr><td class="num">ROTA</td><td>rotating camera</td></tr>
+      <tr><td class="num">COMP</td><td>scripted sequences: <code>STARTCAM</code>, <code>TAKEOFF</code>, <code>LANDING</code>, <code>AUTOPILT</code></td></tr>
+    </tbody>
+  </table></div>
+  <h3>Common start of a camera</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>internal name</td><td>string[8]</td><td class="num">8</td><td><code>CHASECAM</code>, <code>COCKPIT</code>, <code>VICTIM</code>…</td></tr>
+      <tr><td>flags</td><td>uint16</td><td class="num">2</td><td>0 observed</td></tr>
+      <tr><td>subject</td><td>string[8]</td><td class="num">8</td><td>followed object (<code>PLAYER</code>)</td></tr>
+      <tr><td>far plane</td><td>uint32</td><td class="num">4</td><td>50 000 m</td></tr>
+      <tr><td>field of view</td><td>uint16</td><td class="num">2</td><td>40°</td></tr>
+      <tr><td colspan="4">… then near plane (≈ 10), viewport 319 × 199; <code>VICT</code> and <code>WEAP</code> add a table of <code>float</code> offsets; <code>COMP</code> adds a keyframe script terminated by byte 254 and the name of the view to return to.</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- ============================ PONTS ============================ -->
+<article class="mv" id="ponts">
+  <header><span class="id">OP2MISN · MISN2OP</span><h2>Bridges with the campaign</h2></header>
+  <p>The menus and the campaign live in <code>OPTEST.EXE</code>. The two programs talk through two <code>FORM INVN</code> files.</p>
+  <div class="grid2">
+    <div>
+      <h3>OP2MISN.IFF: campaign → mission</h3>
+      <div class="tablewrap"><table>
+        <tbody>
+          <tr><td class="num">INFO</td><td>description</td></tr>
+          <tr><td class="num">NAME</td><td><code>string</code> (16 at most): name of the player's pilot</td></tr>
+          <tr><td class="num">SNAM</td><td><code>string</code> (16 at most): squadron</td></tr>
+          <tr><td class="num">CALL</td><td><code>string</code> (16 at most): callsign</td></tr>
+          <tr><td class="num">TEAM</td><td>up to 3 <code>string[9]</code>: wingmen names, which replace <code>TEAM0</code> to <code>TEAM2</code> in the <code>CAST</code></td></tr>
+          <tr><td class="num">PLYR</td><td>players' state, attached to the objects</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h3>MISN2OP.IFF: mission → campaign</h3>
+      <div class="tablewrap"><table>
+        <tbody>
+          <tr><td class="num">INFO</td><td>8 bytes</td></tr>
+          <tr><td class="num">STAT</td><td>8 <code>uint16</code> of statistics</td></tr>
+          <tr><td class="num">JETS</td><td>one marker per F-16 of the mission</td></tr>
+          <tr><td class="num">KILL</td><td>per participant: two counters and their <code>CAST</code> name</td></tr>
+          <tr><td class="num">EXIT</td><td><code>uint8</code>: mission exit code</td></tr>
+          <tr><td class="num">DIED</td><td>losses per team</td></tr>
+          <tr><td class="num">SCOR</td><td>score</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</article>
+
+<section id="ouvert">
+  <h2 class="sec">Open points</h2>
+  <p>Everything above comes from reading the code. Still to be read in the code:</p>
+  <ul>
+    <li>Terrain: the <code>OBJS</code> chunk of <code>FORM BLOX</code> creates a grid of one pointer per cell whose consumer has not been traced yet; it is the candidate for placing airfield buildings.</li>
+  </ul>
+</section>
+</main>
+</div>
+<script>
+document.documentElement.classList.add("js");
+(function(){var sel=document.getElementById("clspick");if(!sel)return;
+function show(){var v=sel.value;document.querySelectorAll(".clstree").forEach(function(d){d.classList.toggle("on",d.getAttribute("data-cls")===v);});}
+sel.addEventListener("change",show);show();})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+mermaid.initialize({ startOnLoad: true, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
+</script>
+</body>
+</html>
