@@ -106,9 +106,10 @@ Debris_ReleaseWithErrorCheck_9CE90	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-10-12. Niveau GUID d'un objet : CRÉE L'ENTITÉ PILOTE (IA) de l'objet (ex-
-; Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — d'où « GUID
-; jamais utilisé seul ». Alloue 0xBD o (vtables 0xAA → 0x390, sous-objet profil +0x1A vtable
-; 0x368), rangé en modèle +0x46. Ne lit aucun chunk.
+; Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — donc un
+; fichier dont la classe est FORM GUID (catégorie 4) ou FORM ARMG (catégorie 5) est refusé ;
+; les chunks de ces étages ne se trouvent que dans un FORM JETP. Alloue 0xBD o (vtables 0xAA →
+; 0x390, sous-objet profil +0x1A vtable 0x368), rangé en modèle +0x46. Ne lit aucun chunk.
 ; ==============================================================================================
 Guided_CreatePilotEntity_9CF55	proc far		; CODE XREF: VROOMM_StubThunk_6C165J
 
