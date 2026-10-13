@@ -14,9 +14,9 @@ seg453		segment	para public 'OVERLAY' use16
 ; l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks
 ; communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable
 ; 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 =
-; EjectSeat_SpawnInstance_A6D18. | COMPLÉMENT 2026-10-12 : int32 +0x46 jamais lu (ni
-; EjectSeat_SpawnInstance_A6D18, ni EjectSeat_InitInstance_A6DA2, ni
-; EjectSeat_TickReleaseObject_4F351 ; recherche des accès modèle +0x46).
+; EjectSeat_SpawnInstance_A6D18. | COMPLÉMENT 2026-10-12 : int32 +0x46 : rôle non établi (non
+; lu par EjectSeat_SpawnInstance_A6D18, EjectSeat_InitInstance_A6DA2 ni
+; EjectSeat_TickReleaseObject_4F351).
 ; ==============================================================================================
 EjectSeat_LoadFromIFF_A6CA0	proc far		; CODE XREF: VROOMM_StubThunk_6CCF0J
 
@@ -462,7 +462,8 @@ TriggerObject_SpawnAndBindFull_A6DF2	endp
 ; ==============================================================================================
 ; far, LUE 2026-10-12. Ex-'TriggerObject_ConstructSubobjects'. Lecture de la variante PARA :
 ; DYNM (masse), ATMO, STBL (AircraftDynamics_ReadMassChunk_A4A20 / ReadAtmoChunk_A4BE1 /
-; ReadStblChunk_A52B8). Le chunk PARA n'est jamais lu : MARQUEUR. Tick +0x3C =
+; ReadStblChunk_A52B8). Le constructeur ne lit pas le contenu du chunk PARA (seul son tag est
+; cherché par JDYN_LoadChunkAndConstruct_3A49C). Tick +0x3C =
 ; FlightPhysics_TickCandidate_4F4EE.
 ; ==============================================================================================
 DynPara_Construct_A700F	proc far		; CODE XREF: VROOMM_StubThunk_6CD04J

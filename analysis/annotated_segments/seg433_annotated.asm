@@ -17,7 +17,7 @@ seg433		segment	para public 'OVERLAY' use16
 ; 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete
 ; suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001. |
 ; COMPLÉMENT 2026-10-12 : octet +0x5F = DÉLAI D'ARMEMENT (s entières,
-; Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : aucun lecteur trouvé.
+; Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : rôle non établi.
 ; ==============================================================================================
 BombModel_LoadDATAChunk_9FAD0	proc far		; CODE XREF: VROOMM_StubThunk_6C470J PlayerComponentVariantB_ConstructAndInit_9FBDE+26p
 

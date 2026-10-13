@@ -765,9 +765,9 @@ PlayerComponent_LoadFieldsWithRetryG_A4F01	endp
 ; ==============================================================================================
 ; far, LUE 2026-10-12. Ex-'PlayerComponentVariantY_ConstructAndInit'. Lecture de la variante
 ; AGRV : chunk DYNM (masse, AircraftDynamics_ReadMassChunk_A4A20) puis ATMO
-; (AircraftDynamics_ReadAtmoChunk_A4BE1). Le chunk AGRV lui-même n'est jamais lu : c'est un
-; MARQUEUR (seul son tag compte). Tick +0x3C = FlightControl_ComputeAngularAccel (forces /
-; masse : chute libre avec traînée).
+; (AircraftDynamics_ReadAtmoChunk_A4BE1). Le constructeur ne lit pas le contenu du chunk AGRV
+; (seul son tag est cherché par JDYN_LoadChunkAndConstruct_3A49C). Tick +0x3C =
+; FlightControl_ComputeAngularAccel (forces / masse : chute libre avec traînée).
 ; ==============================================================================================
 DynAgrv_Construct_A4F40	proc far		; CODE XREF: VROOMM_StubThunk_6CB2DJ
 

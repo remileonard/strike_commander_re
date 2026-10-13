@@ -10,8 +10,8 @@ seg434		segment	para public 'OVERLAY' use16
 ; far, LUE (2026-09-24), consommateurs lus 2026-10-12.
 ; Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après
 ; le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur
-; (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 jamais
-; lu (aucun accès trouvé) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ;
+; (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 (rôle
+; non établi) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ;
 ; Missile_UpdateSeekerAndFuse_42458).
 ; ==============================================================================================
 MissileModel_LoadDATAChunk_A0340	proc far		; CODE XREF: VROOMM_StubThunk_6C530J

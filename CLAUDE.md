@@ -61,6 +61,13 @@ L'assembleur est en Z-up (3ᵉ composante = altitude) : c'est à toi de traduire
 - Les distances du monde sont en **mètres** (après ÷ 256), **jamais en pieds**, même si un
   ancien document d'`analysis/` dit « ft » ou « pieds ».
 
+**5. N'écrire que ce qui a été constaté.**
+Dans les documents (`DATA_MODEL.html`, `.md`, résumés de `known_functions.json`) comme dans les
+réponses, ne pas affirmer une absence (« jamais lu », « jamais utilisé », « aucun lecteur ») ni
+une interprétation qui n'a pas été vue dans le code ou dans nos échanges. Un champ dont on n'a vu
+que le chargement s'écrit « rangé en mémoire par le chargeur ; rôle non établi ». Une recherche
+de motifs qui ne trouve rien ne prouve pas une absence.
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur

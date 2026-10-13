@@ -92,10 +92,11 @@ PlayerComponent_SubHelperAA_A0C03	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32
-; → +0x21, +0x25 du modèle. JAMAIS LUS : le clonage vers l'instance
+; → +0x21, +0x25 du modèle. Le clonage vers l'instance
 ; (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 +
 ; PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks
-; SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE.
+; SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE ; rôle des deux valeurs non
+; établi.
 ; ==============================================================================================
 DynSurf_LoadSURFChunk_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
 

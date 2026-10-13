@@ -10,12 +10,12 @@ seg451		segment	para public 'OVERLAY' use16
 ; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryM'. Lecteur de la classe TRCR
 ; (rafale de canon traçante) : Object_LoadCommonAndAllegiance_3C942, WDAT, puis chunk INFO
 ; (obligatoire, sinon B008h), 7 int32 24.8 puis 2 uint16 : 1 → +0x7C vitesse de départ (m/s) ;
-; 2 → +0x5E jamais lu ; 3 → +0x62 dispersion au départ (m par image, amplitude du tremblement
-; aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5 → +0x6A
-; durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (± m/s) ; 7
-; → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A jamais lu ; 9
-; uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5). Dérivé : +0x6E =
-; (fin − départ) × dt / durée (calculé avec le dt du chargement).
+; 2 → +0x5E rôle non établi ; 3 → +0x62 dispersion au départ (m par image, amplitude du
+; tremblement aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5
+; → +0x6A durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (±
+; m/s) ; 7 → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A rôle
+; non établi ; 9 uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5).
+; Dérivé : +0x6E = (fin − départ) × dt / durée (calculé avec le dt du chargement).
 ; ==============================================================================================
 TracerModel_LoadINFOChunk_A66F0	proc far		; CODE XREF: VROOMM_StubThunk_6CC70J
 

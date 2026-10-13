@@ -12,7 +12,7 @@ seg438		segment	para public 'OVERLAY' use16
 ; (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C
 ; sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg
 ; 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de
-; l'original) : un fichier GRND n'a qu'un FORM DYNM, un second ne serait jamais lu. L'instance
+; l'original) : les deux recherches trouvent le premier FORM DYNM du FORM GRND. L'instance
 ; GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de
 ; base compte.
 ; ==============================================================================================

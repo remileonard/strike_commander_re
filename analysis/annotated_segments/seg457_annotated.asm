@@ -2618,11 +2618,10 @@ ExprSlot_ReleaseSingleE_AA37D	endp
 ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à
 ; l'activation / en quittant / à chaque image (-1 = aucun ;
 ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ;
-; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. VÉRIFIÉ
-; 2026-10-12 : AUCUN ACCÈS aux champs record+0x18 à +0x26 dans le binaire (recherche de toutes
-; les fonctions lisant +0x18/+0x19/+0x1B/+0x1F/+0x23) — ces 15 octets (drapeau, « cap »,
-; position) sont chargés et jamais utilisés. Puis (taille − 24)/2 u16 = index dans PART des
-; objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF.
+; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. Rôle des
+; champs record+0x18 à +0x26 (drapeau, « cap », position) non établi. Puis (taille − 24)/2 u16
+; = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur
+; MISSIONS/MISN-1A.IFF.
 ; ==============================================================================================
 MissionScene_ParseRecord_AA3A5	proc far		; CODE XREF: VROOMM_StubThunk_6CF3FJ MissionPlay_LoadScenes_AA595+DFp
 

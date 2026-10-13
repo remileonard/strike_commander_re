@@ -39520,7 +39520,7 @@
 "sub_6B70F"
 ],
 "new_name": "BombModel_LoadDATAChunk_9FAD0",
-"summary": "far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA' (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet -> +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60, mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001. | COMPLÉMENT 2026-10-12 : octet +0x5F = DÉLAI D'ARMEMENT (s entières, Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : aucun lecteur trouvé."
+"summary": "far, LU 2026-09-28. Ex-'PlayerComponent_LoadFieldsWithRetry_9FAD0'. Chargeur du chunk 'DATA' (41544144h) des modeles BOMB, apres le chargeur de base (VROOMM_StubThunk_6C5A5) : octet -> +0x5E (bombe guidee : 1 pour la GBU-15, 0 pour MK-20/MK-82), octet -> +0x5F, octet -> +0x60, mot -> +0x61 (taux d'ouverture du cone de verrouillage, deg/s, lu par BombModel_TestGuidedLockCone_41735). Les lectures (ResourceRecord_ReadFinalField_64B51, ResourceRecord_ReadFieldGroupB_64A54 -> StreamReader_ReadTyped_63FA1) se font a une position absolue du fichier SANS borne de chunk : le DATA de la GBU-15 ne fait que 3 octets (01 03 00), le mot +0x61 est donc lu dans l'octet de bourrage (00) et le 1er octet de l'en-tete suivant 'FORM' (0x46) : +0x61 = 0x4600 = 17920. Chunk absent -> erreur fatale 0xC001. | COMPLÉMENT 2026-10-12 : octet +0x5F = DÉLAI D'ARMEMENT (s entières, Bomb_InitArmingDelay_9FD1C) ; octet +0x60 : rôle non établi."
 },
 "sub_9FB3F": {
 "segment": "seg433",
@@ -39906,7 +39906,7 @@
 "sub_6B70F"
 ],
 "new_name": "MissileModel_LoadDATAChunk_A0340",
-"summary": "far, LUE (2026-09-24), consommateurs lus 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 jamais lu (aucun accès trouvé) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ; Missile_UpdateSeekerAndFuse_42458)."
+"summary": "far, LUE (2026-09-24), consommateurs lus 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 (rôle non établi) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ; Missile_UpdateSeekerAndFuse_42458)."
 },
 "sub_A03B6": {
 "segment": "seg434",
@@ -40116,7 +40116,7 @@
 "sub_6B70F"
 ],
 "new_name": "Weapon_LoadWDATChunk_A0700",
-"summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain). | COMPLÉMENT 2026-10-12 (consommateurs) : +0x46 dégâts : lu seulement pour les traçantes (Tracer_CollisionDamage_4E0E5) ; missiles et bombes infligent les dégâts de leur EXPL. +0x48 rayon : aucun lecteur trouvé (recherche des accès modèle +0x48). +0x4A = catégorie de l'objet tiré (8 missile, 9 bombe, 10 nacelle, 13 traçante) : WeaponSystem_LaunchFromStation_3E744 aiguille sur (+0x4A − 8). +0x4E domaine : 1 = missile air-air (byte_6E4C6 → réveille Targeting_AcquireBestThreat). +0x50 portée de verrouillage (m entiers) et +0x54 demi-cône (°) : Proximity_TestOriented. +0x56 portée efficace (m entiers). +0x5A intervalle de tir (float s)."
+"summary": "far, 114 lignes, LUE INTEGRALEMENT (2026-09-20). CHARGEUR DU CHUNK 'WDAT' (push large 54414457h) d'un objet arme (ancien nom 'PlayerComponent_LoadAllFields' faux : aucun lien avec l'avion du joueur). Champs lus dans l'ordre et rangés dans l'objet modele : word damage (+0x46), word radius (+0x48), byte (+0x4A), byte weapon_id converti par WeaponId_ToTypeMask_9DE60 en MASQUE DE BIT stocke en word a +0x4B, byte weapon_category (+0x4D ; famille : 0 canon, 1 IR, 2 radar, 3 guidee sol, 4 bombe libre, 7 roquettes), byte target_domain (+0x4E ; 1 = missile guide anti-avion, 2 = autre ; nom infere), byte weapon_aspec (+0x4F ; deja liste), byte weapon_aspec (+0x4F), valeur 'group C' target_range (+0x50), byte tracking_cone (+0x54), valeur 'group C' effective_range (+0x56), valeur 'group C' (+0x5A) = INTERVALLE DE TIR (dword 24.8, secondes ; minuteur de WeaponSystem_LaunchFromStation_3E744 : AIM-9 et AIM-120 1,0 s, SA-2 15 s, SA-6 10 s, canons 0). +0x4B est le masque teste par WeaponStation_FindLoadedCompatible et Targeting_AcquireBestThreat (masques 1, 3, 0x700, 0x83C = ensembles d'identifiants d'arme, bit = id-1). Pose aussi byte_6E33B=1 (comme IFF_LoadModelMain). | COMPLÉMENT 2026-10-12 (consommateurs) : +0x46 dégâts : lu seulement pour les traçantes (Tracer_CollisionDamage_4E0E5) ; missiles et bombes infligent les dégâts de leur EXPL. +0x48 rayon : rôle non établi. +0x4A = catégorie de l'objet tiré (8 missile, 9 bombe, 10 nacelle, 13 traçante) : WeaponSystem_LaunchFromStation_3E744 aiguille sur (+0x4A − 8). +0x4E domaine : 1 = missile air-air (byte_6E4C6 → réveille Targeting_AcquireBestThreat). +0x50 portée de verrouillage (m entiers) et +0x54 demi-cône (°) : Proximity_TestOriented. +0x56 portée efficace (m entiers). +0x5A intervalle de tir (float s)."
 },
 "sub_A07ED": {
 "segment": "seg435",
@@ -40262,7 +40262,7 @@
 "sub_64A7E"
 ],
 "new_name": "DynSurf_LoadSURFChunk_A0C36",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32 → +0x21, +0x25 du modèle. JAMAIS LUS : le clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 + PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32 → +0x21, +0x25 du modèle. Le clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 + PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE ; rôle des deux valeurs non établi."
 },
 "sub_A0C78": {
 "segment": "seg437",
@@ -40340,7 +40340,7 @@
 "sub_3A49C"
 ],
 "new_name": "GroundObj_LoadFromIFF_A0D80",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_ApplyFlagsAndReleaseRef'. LECTEUR DE LA CLASSE GRND (objet au sol, vtable 0x2408, catégorie 20) : MobileObject_LoadDynamicsAndSmoke_9D189 (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de l'original) : un fichier GRND n'a qu'un FORM DYNM, un second ne serait jamais lu. L'instance GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de base compte."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_ApplyFlagsAndReleaseRef'. LECTEUR DE LA CLASSE GRND (objet au sol, vtable 0x2408, catégorie 20) : MobileObject_LoadDynamicsAndSmoke_9D189 (communs + ALGN + FORM DYNM → +0x36 + SMOK) puis un SECOND JDYN_LoadChunkAndConstruct_3A49C sur +0x36. Les recherches repartant du début du FORM (ResourceRecord_SeekAndReadB_647B2, arg 0), ce second appel relit LE MÊME FORM DYNM et remplace le premier objet (fuite mémoire de l'original) : les deux recherches trouvent le premier FORM DYNM du FORM GRND. L'instance GRND ne « tick » jamais sa dynamique (GroundObj_IntegrateMotion_458C8) : seule la vitesse de base compte."
 },
 "sub_A0DBA": {
 "segment": "seg438",
@@ -42601,7 +42601,7 @@
 "sub_A4BE1"
 ],
 "new_name": "DynAgrv_Construct_A4F40",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponentVariantY_ConstructAndInit'. Lecture de la variante AGRV : chunk DYNM (masse, AircraftDynamics_ReadMassChunk_A4A20) puis ATMO (AircraftDynamics_ReadAtmoChunk_A4BE1). Le chunk AGRV lui-même n'est jamais lu : c'est un MARQUEUR (seul son tag compte). Tick +0x3C = FlightControl_ComputeAngularAccel (forces / masse : chute libre avec traînée)."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponentVariantY_ConstructAndInit'. Lecture de la variante AGRV : chunk DYNM (masse, AircraftDynamics_ReadMassChunk_A4A20) puis ATMO (AircraftDynamics_ReadAtmoChunk_A4BE1). Le constructeur ne lit pas le contenu du chunk AGRV (seul son tag est cherché par JDYN_LoadChunkAndConstruct_3A49C). Tick +0x3C = FlightControl_ComputeAngularAccel (forces / masse : chute libre avec traînée)."
 },
 "sub_A4F68": {
 "segment": "seg448",
@@ -43192,7 +43192,7 @@
 "sub_6B70F"
 ],
 "new_name": "TracerModel_LoadINFOChunk_A66F0",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryM'. Lecteur de la classe TRCR (rafale de canon traçante) : Object_LoadCommonAndAllegiance_3C942, WDAT, puis chunk INFO (obligatoire, sinon B008h), 7 int32 24.8 puis 2 uint16 : 1 → +0x7C vitesse de départ (m/s) ; 2 → +0x5E jamais lu ; 3 → +0x62 dispersion au départ (m par image, amplitude du tremblement aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5 → +0x6A durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (± m/s) ; 7 → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A jamais lu ; 9 uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5). Dérivé : +0x6E = (fin − départ) × dt / durée (calculé avec le dt du chargement)."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryM'. Lecteur de la classe TRCR (rafale de canon traçante) : Object_LoadCommonAndAllegiance_3C942, WDAT, puis chunk INFO (obligatoire, sinon B008h), 7 int32 24.8 puis 2 uint16 : 1 → +0x7C vitesse de départ (m/s) ; 2 → +0x5E rôle non établi ; 3 → +0x62 dispersion au départ (m par image, amplitude du tremblement aléatoire de la trajectoire, instance +0x40) ; 4 → +0x66 dispersion à la fin ; 5 → +0x6A durée de vie (s, instance +0x3C) ; 6 → +0x72 dispersion de la vitesse de départ (± m/s) ; 7 → +0x76 part de la vitesse du tireur héritée (bornée à 1,0) ; 8 uint16 → +0x7A rôle non établi ; 9 uint16 → +0x80 multiplicateur de dégâts (Tracer_CollisionDamage_4E0E5). Dérivé : +0x6E = (fin − départ) × dt / durée (calculé avec le dt du chargement)."
 },
 "sub_A68A2": {
 "segment": "seg451",
@@ -43319,7 +43319,7 @@
 "sub_6C1CA"
 ],
 "new_name": "EjectSeat_LoadFromIFF_A6CA0",
-"summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18. | COMPLÉMENT 2026-10-12 : int32 +0x46 jamais lu (ni EjectSeat_SpawnInstance_A6D18, ni EjectSeat_InitInstance_A6DA2, ni EjectSeat_TickReleaseObject_4F351 ; recherche des accès modèle +0x46)."
+"summary": "far, LUE 2026-10-12. LECTEUR DE LA CLASSE EJEC (nom d'après le tag : siège éjectable probable ; ex-PlayerComponent_LoadDataChunk). Chunk DATA facultatif : int32 → +0x46 (rôle non établi) ; int32 24.8 → +0x57 délai avant libération (s) ; int32 → +0x53 hauteur de libération (entier, <<8 → m) ; puis chaîne → +0x4A (String_ConstructFromFarPtrLen) = nom de l'objet libéré (parachute probable). Puis MobileObject_LoadDynamicsAndSmoke_9D189 (chunks communs + ALGN, dynamique DYNM en +0x36, chunk SMOK). Classe : 91 o, base OMOB, vtable 23A4h, catégorie 22 (ClassStub_ReturnConst16h_4F2BA) ; méthode +4 = EjectSeat_SpawnInstance_A6D18. | COMPLÉMENT 2026-10-12 : int32 +0x46 : rôle non établi (non lu par EjectSeat_SpawnInstance_A6D18, EjectSeat_InitInstance_A6DA2 ni EjectSeat_TickReleaseObject_4F351)."
 },
 "sub_A6D18": {
 "segment": "seg453",
@@ -43376,7 +43376,7 @@
 "sub_6CAC0"
 ],
 "new_name": "DynPara_Construct_A700F",
-"summary": "far, LUE 2026-10-12. Ex-'TriggerObject_ConstructSubobjects'. Lecture de la variante PARA : DYNM (masse), ATMO, STBL (AircraftDynamics_ReadMassChunk_A4A20 / ReadAtmoChunk_A4BE1 / ReadStblChunk_A52B8). Le chunk PARA n'est jamais lu : MARQUEUR. Tick +0x3C = FlightPhysics_TickCandidate_4F4EE."
+"summary": "far, LUE 2026-10-12. Ex-'TriggerObject_ConstructSubobjects'. Lecture de la variante PARA : DYNM (masse), ATMO, STBL (AircraftDynamics_ReadMassChunk_A4A20 / ReadAtmoChunk_A4BE1 / ReadStblChunk_A52B8). Le constructeur ne lit pas le contenu du chunk PARA (seul son tag est cherché par JDYN_LoadChunkAndConstruct_3A49C). Tick +0x3C = FlightPhysics_TickCandidate_4F4EE."
 },
 "sub_A7060": {
 "segment": "seg454",
@@ -44671,7 +44671,7 @@
 "sub_64A19"
 ],
 "new_name": "MissionScene_ParseRecord_AA3A5",
-"summary": "far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8 active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à l'activation / en quittant / à chaque image (-1 = aucun ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. VÉRIFIÉ 2026-10-12 : AUCUN ACCÈS aux champs record+0x18 à +0x26 dans le binaire (recherche de toutes les fonctions lisant +0x18/+0x19/+0x1B/+0x1F/+0x23) — ces 15 octets (drapeau, « cap », position) sont chargés et jamais utilisés. Puis (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF."
+"summary": "far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8 active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à l'activation / en quittant / à chaque image (-1 = aucun ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. Rôle des champs record+0x18 à +0x26 (drapeau, « cap », position) non établi. Puis (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF."
 },
 "sub_AA49A": {
 "segment": "seg457",

@@ -472,7 +472,7 @@ qu'une fois.
   | MISS | 5 float : taux de virage max (°/s), vitesse max (m/s), accélération (m/s²), vitesse de croisière X (m/s), vitesse de croisière Y (m/s, repère du missile) |
   | GBMB | 1 float : taux de virage max (°/s) |
   | DURD | uint16 distance de freinage (m) ; int32 entier vitesse de chute min (m/s) |
-  | SURF | 2 int32, jamais lus : l'objet est immobile |
+  | SURF | 2 int32 (rôle non établi) ; l'objet est immobile |
   | AGRV, PARA | vides : seul le tag compte |
 
 - Au sol (`Aero_ControlOrchestrator_48FC2`) : JDYN champs 12 à 16 = vitesse verticale max (m/s),
@@ -522,7 +522,7 @@ Valeurs par défaut des champs 1, 4, 5, 6, 8 et 9 : 0, 2, 5, 0, 6 et 30.
 
 **WDAT** (22 octets), dans l'ordre :
 1. dégâts (seulement pour TRCR) ;
-2. rayon (jamais lu) ;
+2. rayon (rôle non établi) ;
 3. catégorie tirée (8 / 9 / 10 / 13) ;
 4. identifiant 1..12 ;
 5. famille ;
@@ -537,21 +537,21 @@ Valeurs par défaut des champs 1, 4, 5, 6, 8 et 9 : 0, 2, 5, 0, 6 et 30.
 
 | Classe | Contenu |
 |---|---|
-| MISS | int32 délai du chercheur (s) ; uint8 jamais lu ; uint16 rayon de l'allumeur (m) |
-| BOMB | uint8 guidée ; uint8 délai d'armement (s) ; uint8 jamais lu ; uint16 ouverture du cône (°/s) |
+| MISS | int32 délai du chercheur (s) ; uint8 (rôle non établi) ; uint16 rayon de l'allumeur (m) |
+| BOMB | uint8 guidée ; uint8 délai d'armement (s) ; uint8 (rôle non établi) ; uint16 ouverture du cône (°/s) |
 | PODR | string roquette ; uint8 présence ; uint16 vitesse de départ (m/s) |
 | SWPN | int32 munitions ; int32 portée de détection (m) ; int32 portée de tir (m) ; uint16 dispersion ; float cadence (s) ; uint8 lance-missiles ; string[8] arme ; int32 décalage de départ (m) |
-| EJEC | le premier int32 n'est jamais lu |
+| EJEC | premier int32 : rôle non établi |
 
 **TRCR INFO** (7 float puis 2 uint16), dans l'ordre :
 1. vitesse de départ ;
-2. jamais lu ;
+2. rôle non établi ;
 3. dispersion au départ ;
 4. dispersion à la fin ;
 5. durée de vie ;
 6. dispersion de vitesse ;
 7. part héritée de la vitesse du tireur ;
-8. jamais lu ;
+8. rôle non établi ;
 9. multiplicateur de dégâts.
 
 **FORM WEAP** (`WeaponSys_LoadFromIFF_9ED62`). S'il manque, un FORM WFIL contient le nom d'un fichier
@@ -569,7 +569,7 @@ Capacités par type de point d'emport : voir `WeaponSys_LoadStoresOnHardpoint_9E
 **Mission et fumées.**
 - PART : vitesse initiale en m/s. Le 3ᵉ nom désigne l'armement imposé (FORM WEAP). Le camp remplace
   celui d'ALGN.
-- SCNE : les octets 0x09 à 0x17 (drapeau, « cap », position) ne sont jamais lus.
+- SCNE : rôle des octets 0x09 à 0x17 (drapeau, « cap », position) non établi.
 - Fumées : mode 0 = disque ombré ; mode 1 = sprite opaque ; mode 2 = sprite avec les couleurs
   A..A+B−1 translucides, peintes par table[teinte + c − A][fond].
 
