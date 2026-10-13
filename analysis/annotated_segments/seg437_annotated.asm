@@ -95,8 +95,8 @@ PlayerComponent_SubHelperAA_A0C03	endp
 ; → +0x21, +0x25 du modèle. Le clonage vers l'instance
 ; (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 +
 ; PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks
-; SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE ; rôle des deux valeurs non
-; établi.
+; SURF (loc_4536C, loc_45376) ne font rien. Rôle des deux valeurs et comportement de l'objet
+; SURF non établis (sous-système non étudié).
 ; ==============================================================================================
 DynSurf_LoadSURFChunk_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
 

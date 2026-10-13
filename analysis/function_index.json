@@ -38641,7 +38641,7 @@
 "sub_6B70F"
 ],
 "new_name": "Guided_CreatePilotEntity_9CF55",
-"summary": "far, LUE 2026-10-12. Niveau GUID d'un objet : CRÉE L'ENTITÉ PILOTE (IA) de l'objet (ex-Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — d'où « GUID jamais utilisé seul ». Alloue 0xBD o (vtables 0xAA → 0x390, sous-objet profil +0x1A vtable 0x368), rangé en modèle +0x46. Ne lit aucun chunk."
+"summary": "far, LUE 2026-10-12. Niveau GUID d'un objet : CRÉE L'ENTITÉ PILOTE (IA) de l'objet (ex-Debris_ReleaseWithErrorCheckB). Exige catégorie = 6 (avion) sinon erreur C013h — donc un fichier dont la classe est FORM GUID (catégorie 4) ou FORM ARMG (catégorie 5) est refusé ; les chunks de ces étages ne se trouvent que dans un FORM JETP. Alloue 0xBD o (vtables 0xAA → 0x390, sous-objet profil +0x1A vtable 0x368), rangé en modèle +0x46. Ne lit aucun chunk."
 },
 "sub_9D020": {
 "segment": "ovr309",
@@ -40262,7 +40262,7 @@
 "sub_64A7E"
 ],
 "new_name": "DynSurf_LoadSURFChunk_A0C36",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32 → +0x21, +0x25 du modèle. Le clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 + PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks SURF (loc_4536C, loc_45376) ne font rien. SURF = objet IMMOBILE ; rôle des deux valeurs non établi."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadFieldGroupD'. LECTEUR DU CHUNK 'SURF' : 2 int32 → +0x21, +0x25 du modèle. Le clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 + PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks SURF (loc_4536C, loc_45376) ne font rien. Rôle des deux valeurs et comportement de l'objet SURF non établis (sous-système non étudié)."
 },
 "sub_A0C78": {
 "segment": "seg437",
@@ -47815,7 +47815,7 @@
 "type": "label",
 "calls": [],
 "new_name": "SurfBody_TickNoOp_4536C",
-"summary": "far (label), LUE 2026-10-12. Slot +0x3C du corps SURF (vtable 0x1DB6) : `mov al,1 / retf` — ne fait rien. Le slot +0x40 (loc_45376) rappelle +0x3C. La dynamique SURF est donc immobile."
+"summary": "far (label), LUE 2026-10-12. Slot +0x3C du corps SURF (vtable 0x1DB6) : `mov al,1 / retf` — ne fait rien. Le slot +0x40 (loc_45376) rappelle +0x3C. Comportement de l'objet SURF non établi (ce qui le déplace éventuellement n'a pas été cherché)."
 },
 "loc_458C8": {
 "segment": "seg097",

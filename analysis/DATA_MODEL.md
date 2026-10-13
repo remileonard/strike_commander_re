@@ -472,7 +472,7 @@ qu'une fois.
   | MISS | 5 float : taux de virage max (°/s), vitesse max (m/s), accélération (m/s²), vitesse de croisière X (m/s), vitesse de croisière Y (m/s, repère du missile) |
   | GBMB | 1 float : taux de virage max (°/s) |
   | DURD | uint16 distance de freinage (m) ; int32 entier vitesse de chute min (m/s) |
-  | SURF | 2 int32 (rôle non établi) ; l'objet est immobile |
+  | SURF | 2 int32 (rôle non établi) |
   | AGRV, PARA | vides : seul le tag compte |
 
 - Au sol (`Aero_ControlOrchestrator_48FC2`) : JDYN champs 12 à 16 = vitesse verticale max (m/s),
