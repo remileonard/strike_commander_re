@@ -68,6 +68,14 @@ une interprétation qui n'a pas été vue dans le code ou dans nos échanges. Un
 que le chargement s'écrit « rangé en mémoire par le chargeur ; rôle non établi ». Une recherche
 de motifs qui ne trouve rien ne prouve pas une absence.
 
+**6. Séparer le format des fichiers du code C++.**
+`DATA_MODEL.html` décrit la représentation physique des données : un fichier objet contient UN
+seul FORM de classe (`JETP`, `GUID`, `ARMG`…), décrit par ses propres chunks. Ne jamais y
+transposer la hiérarchie des classes C++ (« le lecteur de JETP appelle celui de GUID ») ni les
+conditions que le programme impose au chargement (erreurs, priorités de recherche, refus) : cela
+induit en erreur quand on ouvre les fichiers. Le comportement du code va dans
+`known_functions.json` et les documents de comportement.
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur
