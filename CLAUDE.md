@@ -241,6 +241,7 @@ strike_commander_re/
     ├── tri_map.py                   lecteur .TRI (d'après DATA_MODEL.html seul) → vue SVG
     ├── terrain_map.py               lecteur <théâtre>.PAK (PAK, LZW, altitudes) → relief PNG
     ├── terrain_viewer.py (+ .html)  visionneuse interactive du terrain (zoom, pistes, objets) ;
+    │                                  terrain_3d.py : vue 3D Pygame + PyOpenGL, rendu du jeu ;
     │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
