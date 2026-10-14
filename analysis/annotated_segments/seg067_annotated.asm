@@ -8,9 +8,16 @@ seg067		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,233L — variante de résolution d'interpolation par table (recherche par intervalle avec
-; cache dword_6E9BA/BE/C2) précédée d'un test de borne (+0x58) : résolution d'interpolation
-; cachée avec garde de limite (utilisée par le setup de face du seg055).
+; far, 233 L, LUE 2026-10-14. INDEX DE PALETTE D'UN SOMMET OMBRÉ AVEC BROUILLARD (utilisée par
+; le rendu du terrain et le setup de face seg055). Args : (table, couleur, intensité 0..255,
+; profondeur 24.8, surcharge). couleur ≥ [table+58h] → 0. Profondeur ÷ 256 → facteur de
+; brouillard f : 0 sous [table+72h], max [table+6Ah] au-delà de [table+76h], sinon recherche
+; dichotomique dans la table de seuils dword [table+48h] (nombre [table+4Ch], cache
+; dword_6E9BA/BE/C2), f = (rang+1) << ([table+68h]−[table+4Eh]). Entrée e = [table+5Ah] +
+; couleur × 15. n = surcharge ou mot e+0Bh (nombre de teintes). v = (intensité × n + 0x80) >>
+; 8. Résultat = e+6 (première teinte) + v si f = 0 ; sinon e+6 + v + (((mot e+0Dh) − v) × f +
+; [[e]+6Eh]) >> [[e]+68h] : la teinte glisse vers la teinte de brouillard e+0Dh quand la
+; distance croît. Ancien résumé : 'résolution d'interpolation cachée avec garde de limite'.
 ; ==============================================================================================
 Interp_ResolveCachedGuarded	proc far		; CODE XREF: seg055:0B18P seg055:0E87P ...
 

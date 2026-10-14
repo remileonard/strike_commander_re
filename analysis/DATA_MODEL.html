@@ -1230,8 +1230,8 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td>hauteur</td><td>int16</td><td class="num">2</td><td>altitude du sommet (mètres) ; le jeu en tire le min, le max et la moyenne de la cellule</td></tr>
-      <tr><td>éclairage</td><td>uint8</td><td class="num">1</td><td>intensité lumineuse du sommet, interpolée sur la face</td></tr>
-      <tr><td>couleur</td><td>uint8</td><td class="num">1</td><td>couleur de base ; un triangle prend celle de son sommet le plus bas</td></tr>
+      <tr><td>éclairage</td><td>uint8</td><td class="num">1</td><td>intensité lumineuse du sommet, 0 à 255 ; donne la teinte dans la gamme de la couleur de base</td></tr>
+      <tr><td>couleur</td><td>uint8</td><td class="num">1</td><td>couleur de base. Le triangle prend celle de son sommet <b>le plus haut</b> (hauteur comparée comme un entier non signé : une hauteur négative compte comme plus haute que toute hauteur positive ; à égalité, le dernier des trois)</td></tr>
       <tr><td>texture 1</td><td>uint8</td><td class="num">1</td><td>texture du 1er triangle de la case (dans la liste <code>TXMS</code>) ; 255 = aucune. Selon les options de détail graphique, des plages de numéros (0–215, 216–222, 236–247) sont dessinées sans texture ; à partir de 223, le rendu reçoit aussi la position des trois sommets de la face (placage de texture particulier)</td></tr>
       <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture du 2e triangle de la case</td></tr>
     </tbody>

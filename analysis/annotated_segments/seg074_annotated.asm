@@ -17,11 +17,18 @@ seg074		segment	byte public 'CODE' use16
 ; Priorité absolue pour une session d'analyse dédiée. | COMPLÉMENT 2026-10-12 (sommet .ELV,
 ; via le pointeur +0x11 du sommet transformé) : int16 +0 = hauteur (cwde, × axes caméra
 ; dword_7221E/72236/7222A) ; uint8 +2 = ÉCLAIRAGE du sommet (octet haut de l'intensité
-; [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base : le triangle prend celle de
-; son sommet le PLUS BAS (comparaison des int16 +0), byte_6EAE0, puis
-; Interp_ResolveCachedGuarded(541Ah, couleur, intensité) ; uint8 +4 / +5 = TEXTURE du triangle
-; (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF = pas de texture ; ≥ 0xDF = traitement
-; particulier (var_580).
+; [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base du triangle : celle du sommet
+; dont le mot +0 (hauteur) est le PLUS GRAND en comparaison NON SIGNÉE (loc_349F0 : mov
+; al,fs:[bx+3] / mov dx,fs:[bx] puis cmp dx,fs:[bx] / ja → on garde le plus grand ; égalité →
+; le dernier ; une hauteur négative compte comme très grande) — CORRIGÉ 2026-10-14, l'ancienne
+; mention « le plus bas » était fausse ; rangée dans gs:[si] et byte_6EAE0. Intensité : mov
+; ah,fs:[bx+2] / xor al,al / mov [di+0Ch],ax = éclairage × 256 (interpolée par le découpage).
+; Par sommet du polygone découpé : Interp_ResolveCachedGuarded(541Ah, couleur, intensité >> 8,
+; profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21 = 1
+; (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages)
+; chaque sommet garde son index (dégradé), sinon les 3 reçoivent la moyenne ÷ 3 (face unie) ;
+; uint8 +4 / +5 = TEXTURE du triangle (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF =
+; pas de texture ; ≥ 0xDF = traitement particulier (var_580).
 ; ==============================================================================================
 Render_TerrainPipelineMain	proc far		; CODE XREF: Terrain_TileBoundaryTest+78P
 

@@ -2284,7 +2284,7 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
 
 | # | nom | taille | format |
 |---|---|---|---|
-| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o**. **Corrigé 2026-10-12 d'après le code** (`Terrain_LoadElevCell_99B7F`, `Render_TerrainPipelineMain`) : `i16 hauteur @+0` (min/max/moyenne de la cellule ; × axes caméra au rendu), `u8 éclairage @+2`, `u8 couleur @+3` (le triangle prend celle de son sommet le plus bas), `u8 texture du 1er triangle @+4`, `u8 texture du 2e @+5` (0xFF = aucune). **Ordre vérifié sur `ALASKA.PAK` (2026-10-14)** : sous les 3 pistes, `i16 @+0` = 2520 / 1575 / 455 m pour des pistes à 2521 / 1576 / 456 m ; le mot `@+2` donne 1716 / 1716 / 1204. L'ancienne lecture `u16 a, u16 h, u16 c` est fausse. |
+| `[1]` | `.ELV` | 778 900 o | **PAK imbriqué de 324 cellules (grille 18×18)** ; chaque cellule = 2400 o = **20×20 sommets × 6 o**. **Corrigé 2026-10-12 d'après le code** (`Terrain_LoadElevCell_99B7F`, `Render_TerrainPipelineMain`) : `i16 hauteur @+0` (min/max/moyenne de la cellule ; × axes caméra au rendu), `u8 éclairage @+2`, `u8 couleur @+3` (le triangle prend celle de son sommet le plus **haut**, comparaison non signée — corrigé 2026-10-14, voir « Couleur affichée » ci-dessous), `u8 texture du 1er triangle @+4`, `u8 texture du 2e @+5` (0xFF = aucune). **Ordre vérifié sur `ALASKA.PAK` (2026-10-14)** : sous les 3 pistes, `i16 @+0` = 2520 / 1575 / 455 m pour des pistes à 2521 / 1576 / 456 m ; le mot `@+2` donne 1716 / 1716 / 1204. L'ancienne lecture `u16 a, u16 h, u16 c` est fausse. |
 | `[2]` | `.MED` | 195 700 o | idem, LOD moyen |
 | `[3]` | `.LOW` | 49 900 o | idem, LOD bas |
 | `[4]` | `.AVG` | 15 196 o | PAK imbriqué de 324 cellules (quasi toutes « vides » → valeur moyenne/couleur uniforme par cellule) |
@@ -2307,6 +2307,16 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
 - **Disposition** : cellule c = ligne c ÷ 18, colonne c mod 18 ; colonnes vers +X depuis X = −180 000 m, lignes vers −Z depuis Z = +180 000 m (en libRS : X et Z horizontaux). Dans une cellule n × n, sommet k = ligne k ÷ n, colonne k mod n, même sens ; raccord sans saut entre cellules voisines.
 - **`ELEV`** (46 o × 3) : `dw 15` (?), `dw espacement` (1000/2000/4000), `dd 8` (?), `dd 6000/12000/24000` (?), `dw 18`, `dw n` (20/10/5), `dd 20000`, `string[13]` fichier d'altitudes, `string[13]` `ALASKA.AVG`. **`OBJS`** (27 o) : `dw 18`, `dd 20000`, `dd 9000`, `dd 20000`, `string[13]` `ALASKA.OBJ`.
 - ⚠️ **Désaccord avec la correspondance extension → index ci-dessous** (`.AVG`→4, `.TRI`→5, lue dans `Terrain_HeightmapAllocate_33346`) : dans les données, la ressource `[4]` est le `.TRI` et la `[5]` les listes d'objets. Non tranché (sémantique exacte de `IndexedRecordReader.AdvanceIndex` à relire). La ligne `[4] .AVG 15 196 o` de MAURITAN ci-dessus a d'ailleurs la taille d'un `.TRI` à 3 régions.
+
+**Couleur affichée d'un triangle de terrain (lu 2026-10-14 dans `Render_TerrainPipelineMain` et `Interp_ResolveCachedGuarded`)** :
+1. **Couleur de base du triangle** = octet +3 du sommet dont la hauteur (+0) est la plus grande en comparaison **non signée** (`cmp dx, fs:[bx]` / `ja` : on garde le plus grand ; à égalité, le dernier ; une hauteur négative passe devant toute hauteur positive).
+2. **Intensité du sommet** = octet +2 × 256 (`mov ah, fs:[bx+2]` / `xor al, al`), interpolée par le découpage du polygone.
+3. **Index de palette de chaque sommet** = `Interp_ResolveCachedGuarded(table 541Ah, couleur, intensité ÷ 256, profondeur)` :
+   - entrée de la couleur dans la table : enregistrements de 15 octets ; `+6` = première teinte, `+0Bh` = nombre de teintes n, `+0Dh` = teinte de brouillard ;
+   - teinte = première + arrondi(intensité × n ÷ 256) ;
+   - avec la distance (profondeur ÷ 256), la teinte glisse vers la teinte de brouillard, par paliers lus dans une table de seuils de la même structure (rien sous le 1er seuil, maximum au-delà du dernier).
+4. **Remplissage** : si `byte_6EB21` = 1 (valeur par défaut ; réglage lu par `Cockpit_ReadControlsFrame_8F720`), chaque sommet garde son index et la face est dégradée ; sinon les 3 sommets reçoivent la moyenne des 3 index (face unie).
+- Non établi : qui remplit la table `541Ah` (teintes par couleur, seuils de brouillard), et la profondeur exacte utilisée (`[si+12h]` du sommet transformé).
 
 **PAK imbriqué** : `dd taille` puis `dd (offset|0xE0000000) × 324` ; les cellules
 vides pointent toutes vers le même offset (fin de table). 18×18 = 324 = grille de

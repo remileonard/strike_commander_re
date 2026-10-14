@@ -1230,8 +1230,8 @@ position = offset                    otherwise (absolute coordinates)</pre>
     <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td>height</td><td>int16</td><td class="num">2</td><td>altitude of the vertex (metres); the game derives the cell's min, max and average from it</td></tr>
-      <tr><td>lighting</td><td>uint8</td><td class="num">1</td><td>light intensity of the vertex, interpolated over the face</td></tr>
-      <tr><td>colour</td><td>uint8</td><td class="num">1</td><td>base colour; a triangle takes that of its lowest vertex</td></tr>
+      <tr><td>lighting</td><td>uint8</td><td class="num">1</td><td>light intensity of the vertex, 0 to 255; gives the shade within the base colour's range</td></tr>
+      <tr><td>colour</td><td>uint8</td><td class="num">1</td><td>base colour. The triangle takes that of its <b>highest</b> vertex (height compared as an unsigned integer: a negative height counts as higher than any positive height; on a tie, the last of the three)</td></tr>
       <tr><td>texture 1</td><td>uint8</td><td class="num">1</td><td>texture of the square's 1st triangle (in the <code>TXMS</code> list); 255 = none. Depending on the graphics detail options, ranges of numbers (0–215, 216–222, 236–247) are drawn without texture; from 223 on, the renderer also receives the position of the face's three vertices (special texture mapping)</td></tr>
       <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture of the square's 2nd triangle</td></tr>
     </tbody>
