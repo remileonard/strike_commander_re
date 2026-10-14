@@ -1578,7 +1578,7 @@ loc_508A3:
 		mov	word_72B4C, ax
 		mov	word_72B4A, 178Ah
 		push	5A9Ah
-		call	ProgressBar_InitFull
+		call	LightSet_Init_2B191
 		pop	cx
 		mov	word_72B63, 11E8h
 		mov	word_72B63, 1892h

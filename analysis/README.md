@@ -1197,7 +1197,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `AudioQueue_MainProcessEntry_ABBEF` | 254 | seg461 | Point d'entrée principal de traitement (dernière fonction du fichier) |
 | `AudioQueue_ReleaseAllSlots_AB2BD` | 188 | seg458 | Nettoyage complet de la file audio/message |
 | `MissionLoader_LoadFormation_A78F5` | 134 | seg455 | Chargement d'une formation d'unités de mission |
-| `MissionLoader_LoadPosition_A7A10` | 145 | seg455 | Chargement de coordonnées d'une entité de mission |
+| `World_LoadLGHTChunk_A7A10` | 145 | seg455 | Chargement de coordonnées d'une entité de mission |
 
 ## Prochaine étape
 

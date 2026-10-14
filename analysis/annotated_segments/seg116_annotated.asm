@@ -2260,7 +2260,7 @@ Utility_Helper_55E11	endp
 ; ==============================================================================================
 ; far, référencée par sub_2B0F2 (rôle exact non détaillé).
 ; ==============================================================================================
-Utility_Helper_55E65	proc far		; CODE XREF: ListItem_ConstructThreeParams+37P
+Utility_Helper_55E65	proc far		; CODE XREF: Light_Construct_2B0F2+37P
 					; Aero_ComputeForcesMain_4791E+4F9P ...
 
 arg_0		= word ptr  6

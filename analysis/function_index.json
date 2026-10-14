@@ -6178,8 +6178,8 @@
 "sub_55E65",
 "sub_5593A"
 ],
-"new_name": "ListItem_ConstructThreeParams",
-"summary": "far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids. Nom proposé : Light_Construct_2B0F2."
+"new_name": "Light_Construct_2B0F2",
+"summary": "far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids. Ex-'ListItem_ConstructThreeParams'."
 },
 "sub_2B14A": {
 "segment": "seg058",
@@ -6203,8 +6203,8 @@
 "calls": [
 "sub_2B228"
 ],
-"new_name": "ProgressBar_InitFull",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité 100 %. Appelée par seg112. Nom proposé : LightSet_Init_2B191."
+"new_name": "LightSet_Init_2B191",
+"summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité 100 %. Appelée par seg112. Ex-'ProgressBar_InitFull'."
 },
 "sub_2B1AF": {
 "segment": "seg058",
@@ -6241,8 +6241,8 @@
 "lines": 34,
 "type": "far",
 "calls": [],
-"new_name": "ProgressBar_PercentToFixed",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou 256 (1,0) au-delà de 100. Nom proposé : LightSet_SetIntensityPercent_2B228."
+"new_name": "LightSet_SetIntensityPercent_2B228",
+"summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou 256 (1,0) au-delà de 100. Ex-'ProgressBar_PercentToFixed'."
 },
 "sub_2B24F": {
 "segment": "seg058",
@@ -6253,8 +6253,8 @@
 "calls": [
 "sub_2B49F"
 ],
-"new_name": "ProgressBar_UpdateValue",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_SetAmbientWeight_2B24F."
+"new_name": "LightSet_SetAmbientWeight_2B24F",
+"summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts (LightSet_RecomputeShares_2B49F). Ex-'ProgressBar_UpdateValue'."
 },
 "sub_2B266": {
 "segment": "seg058",
@@ -6268,8 +6268,8 @@
 "sub_5F6D5",
 "sub_2B49F"
 ],
-"new_name": "ListItem_AddNumberedLimited",
-"summary": "far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0 si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_InsertLight_2B266."
+"new_name": "LightSet_InsertLight_2B266",
+"summary": "far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0 si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les parts (LightSet_RecomputeShares_2B49F). Ex-'ListItem_AddNumberedLimited'."
 },
 "sub_2B2DB": {
 "segment": "seg058",
@@ -6282,8 +6282,8 @@
 "sub_2B0F2",
 "sub_2B266"
 ],
-"new_name": "ListItem_ConstructComplex",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via ListItem_ConstructThreeParams, puis ListItem_AddNumberedLimited). Nom proposé : LightSet_AddLight_2B2DB."
+"new_name": "LightSet_AddLight_2B2DB",
+"summary": "far, LUE 2026-10-14. AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via Light_Construct_2B0F2, puis LightSet_InsertLight_2B266). Ex-'ListItem_ConstructComplex'."
 },
 "sub_2B49F": {
 "segment": "seg058",
@@ -6296,8 +6296,8 @@
 "sub_5F6A9",
 "sub_5F6A9"
 ],
-"new_name": "ProgressBar_WeightedSum",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Nom proposé : LightSet_RecomputeShares_2B49F."
+"new_name": "LightSet_RecomputeShares_2B49F",
+"summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Ex-'ProgressBar_WeightedSum'."
 },
 "sub_2B54A": {
 "segment": "seg058",
@@ -6306,8 +6306,8 @@
 "lines": 73,
 "type": "far",
 "calls": [],
-"new_name": "Render_FaceDotProductTest",
-"summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Nom proposé : LightSet_FaceIntensity_2B54A."
+"new_name": "LightSet_FaceIntensity_2B54A",
+"summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Ex-'Render_FaceDotProductTest'."
 },
 "sub_2B5F9": {
 "segment": "seg059",
@@ -43690,8 +43690,8 @@
 "sub_64A19",
 "sub_2B2DB"
 ],
-"new_name": "MissionLoader_LoadPosition_A7A10",
-"summary": "far, LUE 2026-10-14. NOM TROMPEUR : LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant → ProgressBar_UpdateValue (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 → ProgressBar_PercentToFixed (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici → ListItem_ConstructComplex. Nom proposé : World_LoadLGHTChunk_A7A10."
+"new_name": "World_LoadLGHTChunk_A7A10",
+"summary": "far, LUE 2026-10-14. LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant → LightSet_SetAmbientWeight_2B24F (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 → LightSet_SetIntensityPercent_2B228 (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici → LightSet_AddLight_2B2DB. Ex-'MissionLoader_LoadPosition_A7A10'."
 },
 "sub_A7B1E": {
 "segment": "seg455",

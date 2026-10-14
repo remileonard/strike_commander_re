@@ -585,9 +585,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3991) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_2B2DB": {
-    "new_name": "ListItem_ConstructComplex",
+    "new_name": "LightSet_AddLight_2B2DB",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via ListItem_ConstructThreeParams, puis ListItem_AddNumberedLimited). Nom proposé : LightSet_AddLight_2B2DB."
+    "summary": "far, LUE 2026-10-14. AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via Light_Construct_2B0F2, puis LightSet_InsertLight_2B266). Ex-'ListItem_ConstructComplex'."
   },
   "sub_A0C78": {
     "new_name": "PlayerComponent_SubHelperBB_A0C78",
@@ -785,9 +785,9 @@
     "summary": "far,44L — constructeur d'un objet (0x82 octets), initialise 3 champs et un sous-composant (sub_65A1A) : **constructeur d'un descripteur de terrain/tuile complexe.**"
   },
   "sub_2B0F2": {
-    "new_name": "ListItem_ConstructThreeParams",
+    "new_name": "Light_Construct_2B0F2",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids. Nom proposé : Light_Construct_2B0F2."
+    "summary": "far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids. Ex-'ListItem_ConstructThreeParams'."
   },
   "sub_67517": {
     "new_name": "HandlerRegistry4Slot_Register_67517",
@@ -3075,9 +3075,9 @@
     "summary": "⚠️ far, 230 lignes, NON DÉTAILLÉE — combine PlayerComponent_HelperVariantA_9F1D0, PlayerComponent_ComputeComplexB_9EA2E (×3), dispatch vtable [bx+0x10]. Référencée via jmp depuis un stub VROOMM (sub_6C3E9) et par PlayerComponent_LoadAndApply_9EDD4. Candidat pour session dédiée. | Complement 2026-09-26 (fin de fonction lue) : calcule la MASSE D'EMPORT es:[arg_0+0x20] = somme sur les stations (tableau far es:[arg_0+0x34], pas 0x23, nombre es:[arg_0+0x38]) de (nombre d'armes word station+0x13) x (masse d'une arme = objet DYNM (station+0x0F)->+0x36, methode vtable+0x10). Lue par JDYN_TotalMass_47FF8."
   },
   "sub_2B191": {
-    "new_name": "ProgressBar_InitFull",
+    "new_name": "LightSet_Init_2B191",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité 100 %. Appelée par seg112. Nom proposé : LightSet_Init_2B191."
+    "summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité 100 %. Appelée par seg112. Ex-'ProgressBar_InitFull'."
   },
   "sub_3314B": {
     "new_name": "TerrainTile_ListConstruct",
@@ -11120,9 +11120,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_99A76) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=27B10h, codesize=0A2h, nentries=2."
   },
   "sub_2B266": {
-    "new_name": "ListItem_AddNumberedLimited",
+    "new_name": "LightSet_InsertLight_2B266",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0 si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_InsertLight_2B266."
+    "summary": "far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0 si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les parts (LightSet_RecomputeShares_2B49F). Ex-'ListItem_AddNumberedLimited'."
   },
   "sub_6BE29": {
     "new_name": "VROOMM_StubThunk_6BE29",
@@ -11825,9 +11825,9 @@
     "summary": "far — retourne word_72E68 (axe X calibre). PLANTE volontairement (Runtime_FatalErrorHandler tag 4100h) si word_71200 != 0, c-a-d si le MODE SOURIS/VUE est actif. word_72E68/72E6A est une paire PARTAGEE gardee par word_71200 : en vol (==0) elle porte les axes joystick / touches curseur, lus par Player_MainUpdate pour le roulis (÷0x0A) ; en mode souris (==1) elle porte les coords souris (vue cockpit 3D), ecrites par Mouse_EventCallback_68109. Voir DATA_MODEL.md §6.2 'Entrees joueur'."
   },
   "sub_2B49F": {
-    "new_name": "ProgressBar_WeightedSum",
+    "new_name": "LightSet_RecomputeShares_2B49F",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Nom proposé : LightSet_RecomputeShares_2B49F."
+    "summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Ex-'ProgressBar_WeightedSum'."
   },
   "sub_43013": {
     "new_name": "Targeting_FilterByWeaponType",
@@ -12220,9 +12220,9 @@
     "summary": "far, stub retournant AL='S' (53h) — tag de classe pour la forme Sphere de la hiérarchie HitShape."
   },
   "sub_2B24F": {
-    "new_name": "ProgressBar_UpdateValue",
+    "new_name": "LightSet_SetAmbientWeight_2B24F",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_SetAmbientWeight_2B24F."
+    "summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts (LightSet_RecomputeShares_2B49F). Ex-'ProgressBar_UpdateValue'."
   },
   "sub_6CFBE": {
     "new_name": "VROOMM_StubThunk_6CFBE",
@@ -14040,9 +14040,9 @@
     "summary": "far, alloue (sub_658), initialise deux classes de base (sub_3C9BC, sub_3DC27), appelle PlayerComponent_SubHelperP_A0488, enregistre dans un conteneur (sub_6C00E), dispatch vtable [bx+8]."
   },
   "sub_A7A10": {
-    "new_name": "MissionLoader_LoadPosition_A7A10",
+    "new_name": "World_LoadLGHTChunk_A7A10",
     "segment": "seg455",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant → ProgressBar_UpdateValue (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 → ProgressBar_PercentToFixed (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici → ListItem_ConstructComplex. Nom proposé : World_LoadLGHTChunk_A7A10."
+    "summary": "far, LUE 2026-10-14. LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant → LightSet_SetAmbientWeight_2B24F (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 → LightSet_SetIntensityPercent_2B228 (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici → LightSet_AddLight_2B2DB. Ex-'MissionLoader_LoadPosition_A7A10'."
   },
   "sub_6707C": {
     "new_name": "TextScroll_Helper_6707C",
@@ -17850,9 +17850,9 @@
     "summary": "far, combine GaugeWidget_InsertListNode_A312F et GaugeWidget_AllocateExtra_A3ADD."
   },
   "sub_2B228": {
-    "new_name": "ProgressBar_PercentToFixed",
+    "new_name": "LightSet_SetIntensityPercent_2B228",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou 256 (1,0) au-delà de 100. Nom proposé : LightSet_SetIntensityPercent_2B228."
+    "summary": "far, LUE 2026-10-14. JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou 256 (1,0) au-delà de 100. Ex-'ProgressBar_PercentToFixed'."
   },
   "sub_55ED8": {
     "new_name": "Math_VectorLength3D_Scaled_Variant_55ED8",
@@ -17980,9 +17980,9 @@
     "summary": "far, 97 lignes, entre sub_576E5 et sub_5776A. ⚠️ Adresse non résolue."
   },
   "sub_2B54A": {
-    "new_name": "Render_FaceDotProductTest",
+    "new_name": "LightSet_FaceIntensity_2B54A",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Nom proposé : LightSet_FaceIntensity_2B54A."
+    "summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Ex-'Render_FaceDotProductTest'."
   },
   "sub_55A9E": {
     "new_name": "UI_ApplyLineOfSightCheck_55A9E",

@@ -1209,7 +1209,7 @@ loc_29B5C:				; CODE XREF: Mesh_FacePrepareIndirect+12Aj
 		push	ax
 		push	si
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+arg_0]
 		mov	es:[bx+4], al
@@ -1253,7 +1253,7 @@ loc_29BA9:				; CODE XREF: Mesh_FacePrepareIndirect+3Fj
 		push	ax
 		push	si
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+arg_0]
 		mov	es:[bx+4], al
@@ -1749,7 +1749,7 @@ loc_29EE9:
 		push	ax
 		push	word ptr [bp-6]
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 		les	bx, es:[bx+0Ah]
@@ -1801,7 +1801,7 @@ loc_29F47:
 		push	ax
 		push	word ptr [bp-10h]
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 		les	bx, es:[bx+0Eh]
@@ -1841,7 +1841,7 @@ loc_29FDF:
 		push	5A9Ah
 
 loc_29FE9:
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 		les	bx, es:[bx+12h]
@@ -2757,7 +2757,7 @@ loc_2A6F2:
 		push	ax
 		push	word ptr [bp-6]
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 
@@ -2799,7 +2799,7 @@ loc_2A73D:
 		push	ax
 		push	word ptr [bp-10h]
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 		les	bx, es:[bx+0Eh]
@@ -2845,7 +2845,7 @@ loc_2A7F3:
 		push	ax
 		push	word ptr [bp-1Ah]
 		push	5A9Ah
-		call	Render_FaceDotProductTest
+		call	LightSet_FaceIntensity_2B54A
 		add	sp, 6
 		les	bx, [bp+6]
 		les	bx, es:[bx+12h]
