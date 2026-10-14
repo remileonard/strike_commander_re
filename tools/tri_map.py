@@ -31,9 +31,11 @@ def read_pak(data):
     first = struct.unpack_from("<I", data, 4)[0] & 0x1FFFFFFF
     count = (first - 4) // 4
     offsets = [struct.unpack_from("<I", data, 4 + 4 * i)[0] for i in range(count)]
+    # Constat (ALASKA.PAK) : 3 bits de poids fort = 111 pour une entrée stockée telle quelle,
+    # 001 pour une entrée compressée en LZW (voir tools/terrain_map.py).
     for raw in offsets:
-        if raw >> 29 != 0b111:
-            print(f"attention : adresse 0x{raw:08X} sans les 3 bits de poids fort", file=sys.stderr)
+        if raw >> 29 not in (0b111, 0b001):
+            print(f"attention : adresse 0x{raw:08X}, bits de poids fort inattendus", file=sys.stderr)
     offsets = [raw & 0x1FFFFFFF for raw in offsets]
     entries = []
     for i, start in enumerate(offsets):
