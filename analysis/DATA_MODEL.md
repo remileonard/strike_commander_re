@@ -2429,8 +2429,8 @@ modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur géné
 Lecteur : `World_LoadLGHTChunk_A7A10` objet jeu de lumières `5A9Ah` (fonctions de seg058, `LightSet_*`).
 - Chunk : `uint16` poids ambiant ; `uint16` pourcentage (borné à 100, puis × 255 ÷ 100, puis passé à une fonction qui borne encore à 100 : un pourcentage ≥ 40 donne une intensité de 1,0) ; puis enregistrements de 10 o jusqu'à la fin : `uint16` poids, 3 `int16` direction (ordre fichier X, Z, Y ; libRS : `x = c0`, `y = c2`, `z = c1`), `uint8` normaliser (≠ 0 → longueur 1), 1 octet non référencé par le lecteur.
 - Parts : total = poids ambiant + Σ poids ; part d'une lumière = poids × intensité ÷ total ; part ambiante = poids ambiant × intensité ÷ total.
-- **Usage : modèles 3D uniquement** dans ce qui a été lu. `LightSet_FaceIntensity_2B54A`, appelée par `Mesh_FacePrepareIndirect` : intensité de la face = part ambiante + max(0, normale · direction de la **première** lumière) × sa part, bornée à 255. C'est un éclairage directionnel calculé à l'exécution. Le terrain, lui, prend l'octet d'éclairage précalculé de ses sommets (§6.8, « Couleur affichée »).
-- Non établi : le repère de la normale au moment du produit (monde ou objet), et l'usage des lumières au-delà de la première.
+- **Usage : modèles 3D uniquement** dans ce qui a été lu. `LightSet_FaceIntensity_2B54A`, appelée par `Mesh_FacePrepareIndirect` et les autres méthodes d'éclairage des éléments de face : intensité = part ambiante + max(0, A · normale) × part de la **première** lumière, bornée à 255. La normale est celle des données du modèle (non transformée dans ces fonctions ; inversée pour une face vue de dos). A est un vecteur passé par l'appelant de ces méthodes, dont l'origine n'est pas tracée : la direction rangée dans les lumières n'est pas lue dans ce calcul (corrigé 2026-10-14). Le terrain, lui, prend l'octet d'éclairage précalculé de ses sommets (§6.8, « Couleur affichée »).
+- Non établi : l'origine du vecteur A (et donc dans quel repère la lumière est exprimée), et l'usage des lumières au-delà de la première.
 
 ### 6.9 Config & sauvegarde
 

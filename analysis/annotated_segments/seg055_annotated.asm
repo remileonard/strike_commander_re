@@ -1098,9 +1098,14 @@ Render_DamageTintResolve	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,163L — traite une face avec flag actif (+0x25 bit0), calcule des deltas géométriques à
-; partir de 3 sommets référencés indirectement (+0xA/+0xE/+0x12) : préparation géométrique
-; d'une face avant rendu (variante avec sommets indirects).
+; far, 163 L, LUE 2026-10-14. MÉTHODE D'ÉCLAIRAGE D'UNE FACE (élément de face, slot +0Ch des
+; tables d'éléments seg339 ~0x6E6xx). Lit la normale de la face dans les données du modèle
+; (pointeur +6 de l'élément → dd +1, +5, +9), sans la transformer ici. Si le drapeau +25h bit
+; 0 est mis : face vue de dos (signe du produit en croix 2D des sommets projetés +1/+3 des 3
+; sommets indirects +0Ah/+0Eh/+12h) → normale inversée (Utility_Helper_55A37 = négation d'un
+; vecteur) ; résultat mis en cache par les bits 0/1 de +5. Puis
+; LightSet_FaceIntensity_2B54A(5A9Ah, vecteur reçu en 3e argument, normale) → octet +4 de
+; l'élément.
 ; ==============================================================================================
 Mesh_FacePrepareIndirect	proc far		; CODE XREF: seg055:0BCBp seg055:1215p ...
 

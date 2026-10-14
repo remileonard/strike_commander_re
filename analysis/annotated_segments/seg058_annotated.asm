@@ -833,12 +833,13 @@ LightSet_RecomputeShares_2B49F	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par
-; Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire
-; normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière
-; ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face).
-; Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant.
-; Ex-'Render_FaceDotProductTest'.
+; far, LUE 2026-10-14, corrigé le même jour. INTENSITÉ LUMINEUSE D'UNE FACE (ou d'un sommet)
+; de modèle 3D. Args : (jeu de lumières, vecteur A, vecteur B) ; appelée par
+; Mesh_FacePrepareIndirect et les méthodes d'éclairage des éléments de face (seg055) avec A =
+; vecteur passé par l'appelant de ces méthodes (origine non tracée) et B = normale de la face
+; lue dans les données du modèle. intensité = part ambiante (+0Bh) + (si A · B > 0) (A · B) ×
+; part de la PREMIÈRE lumière de la liste (+0Fh du 1er élément) ; bornée à 255. La direction
+; rangée dans les lumières n'est pas lue ici. Ex-'Render_FaceDotProductTest'.
 ; ==============================================================================================
 LightSet_FaceIntensity_2B54A	proc far		; CODE XREF: Mesh_FacePrepareIndirect+E7P
 					; Mesh_FacePrepareIndirect+146P ...

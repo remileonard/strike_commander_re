@@ -13212,7 +13212,7 @@
   "sub_29A7D": {
     "new_name": "Mesh_FacePrepareIndirect",
     "segment": "seg055",
-    "summary": "far,163L — traite une face avec flag actif (+0x25 bit0), calcule des deltas géométriques à partir de 3 sommets référencés indirectement (+0xA/+0xE/+0x12) : **préparation géométrique d'une face avant rendu (variante avec sommets indirects).**"
+    "summary": "far, 163 L, LUE 2026-10-14. MÉTHODE D'ÉCLAIRAGE D'UNE FACE (élément de face, slot +0Ch des tables d'éléments seg339 ~0x6E6xx). Lit la normale de la face dans les données du modèle (pointeur +6 de l'élément → dd +1, +5, +9), sans la transformer ici. Si le drapeau +25h bit 0 est mis : face vue de dos (signe du produit en croix 2D des sommets projetés +1/+3 des 3 sommets indirects +0Ah/+0Eh/+12h) → normale inversée (Utility_Helper_55A37 = négation d'un vecteur) ; résultat mis en cache par les bits 0/1 de +5. Puis LightSet_FaceIntensity_2B54A(5A9Ah, vecteur reçu en 3e argument, normale) → octet +4 de l'élément."
   },
   "loc_5C3FE": {
     "new_name": "PagedResourceB_Method_PassThrough_5C3FE",
@@ -17982,7 +17982,7 @@
   "sub_2B54A": {
     "new_name": "LightSet_FaceIntensity_2B54A",
     "segment": "seg058",
-    "summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Ex-'Render_FaceDotProductTest'."
+    "summary": "far, LUE 2026-10-14, corrigé le même jour. INTENSITÉ LUMINEUSE D'UNE FACE (ou d'un sommet) de modèle 3D. Args : (jeu de lumières, vecteur A, vecteur B) ; appelée par Mesh_FacePrepareIndirect et les méthodes d'éclairage des éléments de face (seg055) avec A = vecteur passé par l'appelant de ces méthodes (origine non tracée) et B = normale de la face lue dans les données du modèle. intensité = part ambiante (+0Bh) + (si A · B > 0) (A · B) × part de la PREMIÈRE lumière de la liste (+0Fh du 1er élément) ; bornée à 255. La direction rangée dans les lumières n'est pas lue ici. Ex-'Render_FaceDotProductTest'."
   },
   "sub_55A9E": {
     "new_name": "UI_ApplyLineOfSightCheck_55A9E",
