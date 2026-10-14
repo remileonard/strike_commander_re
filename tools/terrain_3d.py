@@ -18,7 +18,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  G : diagonale « \\ » / « / »   + / - : exagération du relief
+  G : diagonale « \\ » / « / »
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -42,11 +42,10 @@ VS = """#version 120
 attribute vec3 aPos;
 attribute float aShade;
 uniform mat4 uMVP;
-uniform float uExag;
 varying float vShade;
 void main() {
     vShade = aShade;
-    gl_Position = uMVP * vec4(aPos.x, aPos.y * uExag, aPos.z, 1.0);
+    gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 }
 """
 
@@ -315,7 +314,6 @@ def main():
     prog = compile_program()
     GL.glUseProgram(prog)
     u_mvp = GL.glGetUniformLocation(prog, "uMVP")
-    u_exag = GL.glGetUniformLocation(prog, "uExag")
     u_smooth = GL.glGetUniformLocation(prog, "uSmooth")
     GL.glUniform1i(GL.glGetUniformLocation(prog, "uPal"), 0)
     tex = palette_texture(world.palette)
@@ -327,7 +325,6 @@ def main():
     markers = Mesh(*world.marker_mesh())
 
     cam = Camera()
-    exag = 1.0
     obj_index = -1
     dragging = False
     clock = pygame.time.Clock()
@@ -361,22 +358,18 @@ def main():
                 elif e.key == pygame.K_g:
                     slash = not slash
                     terrain.upload(*world.terrain_mesh(slash))
-                elif e.key in (pygame.K_PLUS, pygame.K_KP_PLUS, pygame.K_EQUALS):
-                    exag = min(4.0, exag + 0.5)
-                elif e.key in (pygame.K_MINUS, pygame.K_KP_MINUS):
-                    exag = max(1.0, exag - 0.5)
                 elif e.key == pygame.K_HOME:
                     cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
                     cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
                 elif e.key == pygame.K_o and world.objects:
                     obj_index = (obj_index + 1) % len(world.objects)
                     o = world.objects[obj_index]
-                    cam.go_to(o["x"], o["y"] * exag, -o["z"], 400)
+                    cam.go_to(o["x"], o["y"], -o["z"], 400)
                 elif pygame.K_1 <= e.key <= pygame.K_9:
                     k = e.key - pygame.K_1
                     if k < len(world.runways):
                         x, y, z = runway_centre(world.runways[k])
-                        cam.go_to(x, y * exag, z, 3000)
+                        cam.go_to(x, y, z, 3000)
                 elif e.key == pygame.K_F12:
                     save_png(width, height, "terrain_3d.png")
 
@@ -402,7 +395,7 @@ def main():
             cam.y += step
         if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
             cam.y -= step
-        ground = world.ground(cam.x, cam.z) * exag
+        ground = world.ground(cam.x, cam.z)
         cam.y = max(cam.y, ground + 5)
 
         GL.glViewport(0, 0, width, height)
@@ -414,7 +407,6 @@ def main():
         mvp = multiply(perspective(math.radians(60), width / max(1, height), near, 600000.0),
                        look((cam.x, cam.y, cam.z), f))
         GL.glUniformMatrix4fv(u_mvp, 1, GL.GL_FALSE, mvp)
-        GL.glUniform1f(u_exag, exag)
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
         GL.glUniform1f(u_smooth, 1.0)
@@ -428,8 +420,8 @@ def main():
 
         cap = math.degrees(cam.yaw) % 360
         lines = [f"X {cam.x:.0f} m   Z {-cam.z:.0f} m",
-                 f"altitude Y {cam.y / exag:.0f} m   sol {ground / exag:.0f} m",
-                 f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s   relief ×{exag:g}",
+                 f"altitude Y {cam.y:.0f} m   sol {ground:.0f} m",
+                 f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s",
                  f"diagonale {'/' if slash else chr(92)}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")

@@ -67,7 +67,6 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
   <div class="opts">
     <label><input type="checkbox" id="diag"> diagonale « / » au lieu de « \ »</label>
     <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
-    <label>relief × <span id="exagV">1</span> <input type="range" id="exag" min="1" max="4" step="0.5" value="1"></label>
   </div>
   <h2>Aller à</h2>
   <ul class="list" id="goto"></ul>
@@ -94,9 +93,9 @@ const D = {"name":"ALASKA.PAK","grid":18,"side":360,"cellSize":20000,"spacing":1
   const cv = document.getElementById("gl");
   const gl = cv.getContext("webgl", { antialias: true });
   if (!gl) { err("WebGL indisponible dans ce navigateur."); return; }
-  const vs = `attribute vec3 aPos; attribute float aShade; uniform mat4 uMVP; uniform float uExag;
+  const vs = `attribute vec3 aPos; attribute float aShade; uniform mat4 uMVP;
     varying float vShade;
-    void main() { vShade = aShade; gl_Position = uMVP * vec4(aPos.x, aPos.y * uExag, aPos.z, 1.0); }`;
+    void main() { vShade = aShade; gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0); }`;
   const fs = `precision highp float; varying float vShade; uniform sampler2D uPal; uniform float uSmooth;
     vec4 pal(float idx) { return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5)); }
     void main() {
@@ -112,7 +111,7 @@ const D = {"name":"ALASKA.PAK","grid":18,"side":360,"cellSize":20000,"spacing":1
   gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
   gl.linkProgram(prog); gl.useProgram(prog);
   const aPos = gl.getAttribLocation(prog, "aPos"), aShade = gl.getAttribLocation(prog, "aShade");
-  const uMVP = gl.getUniformLocation(prog, "uMVP"), uExag = gl.getUniformLocation(prog, "uExag");
+  const uMVP = gl.getUniformLocation(prog, "uMVP");
   const uSmooth = gl.getUniformLocation(prog, "uSmooth");
 
   const palTex = gl.createTexture();
@@ -191,14 +190,13 @@ const D = {"name":"ALASKA.PAK","grid":18,"side":360,"cellSize":20000,"spacing":1
 
   // caméra (yaw 0 = vers +Z du fichier, π/2 = vers +X)
   const cam = { x: -139500, y: 900, z: 58600, yaw: Math.PI / 2, pitch: -0.12, speed: 300 };
-  let exag = 1;
   const fwdOf = () => [Math.cos(cam.pitch) * Math.sin(cam.yaw), Math.sin(cam.pitch), -Math.cos(cam.pitch) * Math.cos(cam.yaw)];
   function groundAt(x, z) {
     const fj = (x + HALF) / SP, fi = (z + HALF) / SP;
     const j = Math.max(0, Math.min(N - 2, Math.floor(fj))), i = Math.max(0, Math.min(N - 2, Math.floor(fi)));
     const u = Math.max(0, Math.min(1, fj - j)), v = Math.max(0, Math.min(1, fi - i));
     const h = (a, b) => H[a * N + b];
-    return ((h(i, j) * (1 - u) + h(i, j + 1) * u) * (1 - v) + (h(i + 1, j) * (1 - u) + h(i + 1, j + 1) * u) * v) * exag;
+    return ((h(i, j) * (1 - u) + h(i, j + 1) * u) * (1 - v) + (h(i + 1, j) * (1 - u) + h(i + 1, j + 1) * u) * v);
   }
 
   let W = 0, Hh = 0;
@@ -263,7 +261,6 @@ const D = {"name":"ALASKA.PAK","grid":18,"side":360,"cellSize":20000,"spacing":1
     const near = Math.max(2, (cam.y - g) * 0.05);
     const MVP = mul(persp(60 * Math.PI / 180, cv.width / cv.height, near, 600000), look([cam.x, cam.y, cam.z], f));
     gl.uniformMatrix4fv(uMVP, false, new Float32Array(MVP));
-    gl.uniform1f(uExag, exag);
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, palTex);
     gl.uniform1f(uSmooth, 1);
     draw(terrain, gl.TRIANGLES);
@@ -281,21 +278,20 @@ const D = {"name":"ALASKA.PAK","grid":18,"side":360,"cellSize":20000,"spacing":1
       if (!show || pw <= 0 || Math.hypot(x - cam.x, y - cam.y, z - cam.z) > 15000) { el.style.display = "none"; return; }
       el.style.display = ""; el.style.left = ((px / pw) * 0.5 + 0.5) * W + "px"; el.style.top = (0.5 - (py / pw) * 0.5) * Hh + "px";
     };
-    D.objects.forEach((o, k) => place(objLabels[k], o.x, (o.y + 60) * exag, -o.z));
-    runCentres.forEach((c, k) => place(runLabels[k], c[0], c[1] * exag, -c[2]));
+    D.objects.forEach((o, k) => place(objLabels[k], o.x, o.y + 60, -o.z));
+    runCentres.forEach((c, k) => place(runLabels[k], c[0], c[1], -c[2]));
 
     const cap = ((cam.yaw * 180 / Math.PI) % 360 + 360) % 360;
     document.getElementById("hud").textContent =
-      `X ${cam.x.toFixed(0)} m   Z ${(-cam.z).toFixed(0)} m\naltitude Y ${(cam.y / exag).toFixed(0)} m   sol ${(g / exag).toFixed(0)} m\ncap ${cap.toFixed(0)}°   vitesse ${cam.speed.toFixed(0)} m/s   relief ×${exag}`;
+      `X ${cam.x.toFixed(0)} m   Z ${(-cam.z).toFixed(0)} m\naltitude Y ${cam.y.toFixed(0)} m   sol ${g.toFixed(0)} m\ncap ${cap.toFixed(0)}°   vitesse ${cam.speed.toFixed(0)} m/s`;
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 
   document.getElementById("diag").onchange = (e) => buildTerrain(e.target.checked);
-  document.getElementById("exag").oninput = (e) => { exag = +e.target.value; document.getElementById("exagV").textContent = exag; };
 
   function goTo(x, y, z, dist) {
-    cam.x = x - dist; cam.z = z; cam.y = y * exag + dist * 0.4; cam.yaw = Math.PI / 2; cam.pitch = -0.38; cam.speed = Math.max(100, dist / 4);
+    cam.x = x - dist; cam.z = z; cam.y = y + dist * 0.4; cam.yaw = Math.PI / 2; cam.pitch = -0.38; cam.speed = Math.max(100, dist / 4);
   }
   function item(name, meta, fn) {
     const li = document.createElement("li"), b = document.createElement("button");
