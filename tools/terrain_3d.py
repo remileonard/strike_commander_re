@@ -18,7 +18,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  G : diagonale « \\ » / « / »
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -57,7 +57,7 @@ vec4 pal(float idx) {
     return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5));
 }
 void main() {
-    float base = floor(vShade);
+    float base = floor(vShade + 0.5 * (1.0 - uSmooth));   // face unie : arrondi au plus proche
     float t = (vShade - base) * uSmooth;
     gl_FragColor = mix(pal(base), pal(base + 1.0), t);
 }
@@ -111,8 +111,10 @@ class Terrain:
         bottom = h[(i + 1) * n + j] * (1 - u) + h[(i + 1) * n + j + 1] * u
         return top * (1 - v) + bottom * v
 
-    def terrain_mesh(self, slash):
-        """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle."""
+    def terrain_mesh(self, slash, flat):
+        """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle.
+        flat : mode « face unie » du jeu (byte_6EB21 ≠ 1 dans Render_TerrainPipelineMain) — les
+        3 sommets reçoivent la moyenne de leurs 3 teintes (somme ÷ 3, partie entière)."""
         n = self.n
         h = self.h
         light = self.light
@@ -128,10 +130,13 @@ class Terrain:
             if (h[k2] & 0xFFFF) >= (h[kb] & 0xFFFF):
                 kb = k2
             first, shades, _ = rang[colour[kb]] if colour[kb] < len(rang) else rang[0]
-            for k in (k0, k1, k2):
+            tones = [first + ((light[k] * shades + 128) >> 8) for k in (k0, k1, k2)]
+            if flat:
+                tones = [sum(tones) // 3] * 3
+            for k, tone in zip((k0, k1, k2), tones):
                 i, j = divmod(k, n)
                 pos.extend((self.gl_x(j), h[k], self.gl_z(i)))
-                shade.append(first + ((light[k] * shades + 128) >> 8))
+                shade.append(tone)
 
         for i in range(n - 1):
             for j in range(n - 1):
@@ -299,6 +304,7 @@ def main():
     ap.add_argument("--palette", default=None, help="PALETTE.IFF (défaut : à côté du .PAK)")
     ap.add_argument("--size", default="1280x800", help="taille de la fenêtre")
     ap.add_argument("--screenshot", default=None, help="rend une image dans ce PNG puis quitte")
+    ap.add_argument("--flat", action="store_true", help="démarre en ombrage plat")
     args = ap.parse_args()
 
     palette_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")
@@ -320,7 +326,8 @@ def main():
 
     slash = False
     print("construction du maillage…")
-    terrain = Mesh(*world.terrain_mesh(slash))
+    flat = args.flat
+    terrain = Mesh(*world.terrain_mesh(slash, flat))
     runways = Mesh(*world.runway_mesh())
     markers = Mesh(*world.marker_mesh())
 
@@ -357,7 +364,10 @@ def main():
                     running = False
                 elif e.key == pygame.K_g:
                     slash = not slash
-                    terrain.upload(*world.terrain_mesh(slash))
+                    terrain.upload(*world.terrain_mesh(slash, flat))
+                elif e.key == pygame.K_f:
+                    flat = not flat
+                    terrain.upload(*world.terrain_mesh(slash, flat))
                 elif e.key == pygame.K_HOME:
                     cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
                     cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
@@ -409,7 +419,7 @@ def main():
         GL.glUniformMatrix4fv(u_mvp, 1, GL.GL_FALSE, mvp)
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
-        GL.glUniform1f(u_smooth, 1.0)
+        GL.glUniform1f(u_smooth, 0.0 if flat else 1.0)
         terrain.draw(GL.GL_TRIANGLES)
         GL.glUniform1f(u_smooth, 0.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
@@ -422,7 +432,7 @@ def main():
         lines = [f"X {cam.x:.0f} m   Z {-cam.z:.0f} m",
                  f"altitude Y {cam.y:.0f} m   sol {ground:.0f} m",
                  f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s",
-                 f"diagonale {'/' if slash else chr(92)}"]
+                 f"ombrage {'plat' if flat else 'dégradé'}   diagonale {'/' if slash else chr(92)}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)

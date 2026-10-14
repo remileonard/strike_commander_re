@@ -65,12 +65,13 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
   <p id="err"></p>
   <h2>Rendu</h2>
   <div class="opts">
+    <label><input type="checkbox" id="flat"> ombrage plat (mode « face unie » du jeu)</label>
     <label><input type="checkbox" id="diag"> diagonale « / » au lieu de « \ »</label>
     <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
   </div>
   <h2>Aller à</h2>
   <ul class="list" id="goto"></ul>
-  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères.</p>
+  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères.</p>
 </aside>
 <script>
 const D = /*__DATA__*/null;
@@ -99,7 +100,7 @@ const D = /*__DATA__*/null;
   const fs = `precision highp float; varying float vShade; uniform sampler2D uPal; uniform float uSmooth;
     vec4 pal(float idx) { return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5)); }
     void main() {
-      float base = floor(vShade);
+      float base = floor(vShade + 0.5 * (1.0 - uSmooth));
       gl_FragColor = mix(pal(base), pal(base + 1.0), (vShade - base) * uSmooth);
     }`;
   function shader(type, src) {
@@ -132,7 +133,7 @@ const D = /*__DATA__*/null;
   }
   // terrain : 2 triangles par carré, sommets non partagés (couleur de base propre au triangle)
   let terrain = null;
-  function buildTerrain(slash) {
+  function buildTerrain(slash, flat) {
     const ntri = (N - 1) * (N - 1) * 2;
     const pos = new Float32Array(ntri * 9), sh = new Float32Array(ntri * 3);
     let t = 0;
@@ -142,12 +143,14 @@ const D = /*__DATA__*/null;
       if (hu(k1) >= hu(kb)) kb = k1;
       if (hu(k2) >= hu(kb)) kb = k2;
       const r = RANG[C[kb]] || RANG[0];
-      for (const k of [k0, k1, k2]) {
+      let tones = [k0, k1, k2].map((k) => r[0] + ((L[k] * r[1] + 128) >> 8));
+      if (flat) { const m = Math.floor((tones[0] + tones[1] + tones[2]) / 3); tones = [m, m, m]; }
+      [k0, k1, k2].forEach((k, q) => {
         const i = (k / N) | 0, j = k % N, o = 3 * t;
         pos[o] = posX(j); pos[o + 1] = H[k]; pos[o + 2] = posZ(i);
-        sh[t] = r[0] + ((L[k] * r[1] + 128) >> 8);
+        sh[t] = tones[q];
         t++;
-      }
+      });
     }
     for (let i = 0; i < N - 1; i++) for (let j = 0; j < N - 1; j++) {
       const A = i * N + j, B = A + 1, Cc = A + N, Dd = A + N + 1;
@@ -168,7 +171,7 @@ const D = /*__DATA__*/null;
     for (const o of D.objects) { pos.push(o.x, o.y, -o.z, o.x, o.y + 60, -o.z); sh.push(55, 55); }
     return upload(new Float32Array(pos), new Float32Array(sh));
   })();
-  buildTerrain(false);
+  buildTerrain(false, false);
 
   // matrices (colonnes d'abord)
   function persp(fovy, asp, n, f) {
@@ -262,7 +265,7 @@ const D = /*__DATA__*/null;
     const MVP = mul(persp(60 * Math.PI / 180, cv.width / cv.height, near, 600000), look([cam.x, cam.y, cam.z], f));
     gl.uniformMatrix4fv(uMVP, false, new Float32Array(MVP));
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, palTex);
-    gl.uniform1f(uSmooth, 1);
+    gl.uniform1f(uSmooth, document.getElementById("flat").checked ? 0 : 1);
     draw(terrain, gl.TRIANGLES);
     gl.uniform1f(uSmooth, 0);
     gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -8);
@@ -288,7 +291,9 @@ const D = /*__DATA__*/null;
   }
   requestAnimationFrame(frame);
 
-  document.getElementById("diag").onchange = (e) => buildTerrain(e.target.checked);
+  const rebuild = () => buildTerrain(document.getElementById("diag").checked, document.getElementById("flat").checked);
+  document.getElementById("diag").onchange = rebuild;
+  document.getElementById("flat").onchange = rebuild;
 
   function goTo(x, y, z, dist) {
     cam.x = x - dist; cam.z = z; cam.y = y + dist * 0.4; cam.yaw = Math.PI / 2; cam.pitch = -0.38; cam.speed = Math.max(100, dist / 4);
