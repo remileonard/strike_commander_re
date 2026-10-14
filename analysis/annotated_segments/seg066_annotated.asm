@@ -461,9 +461,12 @@ loc_2EA79:				; CODE XREF: seg066:026Ej
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,57L — calcule un pointeur de mip-level de texture selon un décalage binaire (mipmapping,
-; shift par +0x4E), met en cache la base et une valeur de fin : sélection de niveau de mipmap
-; pour le texture mapping.
+; far, LUE 2026-10-14. NOM TROMPEUR : CHOISIT LA LIGNE DE SEUILS DE BROUILLARD de la palette
+; (arg_0 = palette, arg_2 = valeur). Si valeur ≥ [+7Ch] (= lignes [+46h] << pas [+7Ah], 10
+; 240) → dernière ligne ; sinon ligne = valeur >> [+7Ah] (÷ 512). Ligne = (1 << [+4Eh]) dd
+; dans le tableau [+42h] ; range son adresse dans [+48h], son 1er seuil dans [+72h], son
+; dernier dans [+76h], invalide le cache dword_6E9BA. Appelée par Terrain_UpdateLODPerFrame.
+; Utilisée ensuite par Interp_ResolveCachedGuarded. Nom proposé : Palette_SelectFogRow_2EA80.
 ; ==============================================================================================
 Texture_SelectMipLevel	proc far		; CODE XREF: Terrain_UpdateLODPerFrame+1A1P
 					; TextureLoader_SelectMipLevel_980F0+55P

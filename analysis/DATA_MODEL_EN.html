@@ -171,6 +171,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
     <li><a href="#wrld"><span>5</span><span>WRLD world</span></a></li>
     <li><a href="#fumees"><span>5b</span><span>Smoke set</span></a></li>
     <li><a href="#terrain"><span>6</span><span>PAK terrain</span></a></li>
+    <li><a href="#palette"><span>6b</span><span>Palette</span></a></li>
     <li><a href="#camr"><span>7</span><span>CAMR cameras</span></a></li>
     <li><a href="#ponts"><span>8</span><span>Campaign bridges</span></a></li>
     <li><a href="#ouvert"><span>—</span><span>Open points</span></a></li>
@@ -1337,6 +1338,47 @@ position = offset                    otherwise (absolute coordinates)</pre>
 </article>
 
 <!-- ============================ CAMR ============================ -->
+<article class="mv" id="palette">
+  <header><span class="id">DATA\PALETTE.IFF</span><h2>The palette</h2></header>
+  <ul class="chips"><li>root <b>FORM PALT</b></li><li>named by the world's <b>PALT</b> chunk</li><li>reader <b>TextureLoader_LoadMixedFields_983FB</b></li></ul>
+  <p>The 256-colour palette and, for each terrain base colour, its range of shades. Chunks are looked up by their tag.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Contents</th></tr></thead>
+    <tbody>
+      <tr><td class="num">INFO</td><td>14 bytes, table below</td></tr>
+      <tr><td class="num">PALT</td><td>4 bytes (<code>00 00 00 01</code> observed), then 256 colours of 3 <code>uint8</code> R, G, B from 0 to 63 (× 4 for 0 to 255)</td></tr>
+      <tr><td class="num">BLWH</td><td>same layout as <code>PALT</code>; role not established</td></tr>
+      <tr><td class="num">RANG</td><td><code>uint16</code> number of base colours, then one 13-byte record per colour (table below)</td></tr>
+      <tr><td class="num">TABL</td><td>string (<code>palfade</code>): name of a second file read by the loader; according to the code, the fog threshold table (20 × 32 <code>uint32</code>) comes from it. That file is not in the repository</td></tr>
+      <tr><td class="num">FORM BILD</td><td><code>INFO</code> (20 bytes), <code>TABL</code> (46 bytes); role not established</td></tr>
+    </tbody>
+  </table></div>
+  <h3>INFO (14 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>value 1</td><td>uint32</td><td class="num">4</td><td>512 observed; read by the loader without being stored</td></tr>
+      <tr><td>fog precision</td><td>uint16</td><td class="num">2</td><td>16: the fog factor goes from 0 to 2¹⁶ (= full effect)</td></tr>
+      <tr><td>value 2</td><td>uint16</td><td class="num">2</td><td>16 observed; stored in memory by the loader; role not established</td></tr>
+      <tr><td>thresholds per row</td><td>uint16</td><td class="num">2</td><td>log₂ of the number of thresholds in a fog row (5 → 32)</td></tr>
+      <tr><td>number of rows</td><td>uint16</td><td class="num">2</td><td>rows of fog thresholds (20)</td></tr>
+      <tr><td>row step</td><td>uint16</td><td class="num">2</td><td>9: the row used = value received ÷ 2⁹ (512), the last one beyond 20 × 512 = 10,240</td></tr>
+    </tbody>
+  </table></div>
+  <h3>A RANG base colour (13 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>first shade</td><td>uint16</td><td class="num">2</td><td>palette index of the darkest shade</td></tr>
+      <tr><td>number of shades</td><td>uint16</td><td class="num">2</td><td>n: the range runs from “first” to “first + n − 1”</td></tr>
+      <tr><td>fog shade</td><td>uint16</td><td class="num">2</td><td>offset from “first” of the shade reached at maximum fog</td></tr>
+      <tr><td>values 3 to 5</td><td>3&nbsp;×&nbsp;uint8</td><td class="num">3</td><td>values 0 to 63 observed, like an R, G, B colour; stored in memory by the loader; role not established</td></tr>
+      <tr><td>values 6 to 9</td><td>4&nbsp;×&nbsp;uint8</td><td class="num">4</td><td>0 or 1 observed; stored in memory by the loader; role not established</td></tr>
+    </tbody>
+  </table></div>
+  <p>A base colour's number is its rank in <code>RANG</code>; it is the value of the “colour” byte of the terrain elevation vertices.</p>
+</article>
+
 <article class="mv" id="camr">
   <header><span class="id">FORM CAMR</span><h2>Scripted cameras</h2></header>
   <ul class="chips"><li>in <b>WRLD</b></li><li>full reference <b>CAMERA_SYSTEM.md</b></li></ul>

@@ -7,7 +7,10 @@ ovr288		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, alloue (CRT_Malloc16_Retry, 52 lignes).
+; far, LUE 2026-10-14. CONVERTIT UN ENREGISTREMENT RANG (13 o) EN ENTRÉE DE COULEUR DE BASE
+; (15 o) : +0 → e+6 (première teinte), +2 → e+0Bh (nombre de teintes), +4 → e+0Dh (décalage de
+; la teinte de brouillard), +6..8 → e+8..A, +9..12 → e+2..5, e+0 = palette. Lue par
+; Interp_ResolveCachedGuarded.
 ; ==============================================================================================
 TextureLoader_Allocate_97F40	proc far		; CODE XREF: VROOMM_StubThunk_6BC65J TextureLoader_FormatAndLoad_985F6+60p
 
@@ -640,8 +643,11 @@ TextureLoader_ReleaseMultipleB_9829D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 138 lignes, NON DÉTAILLÉE — combine ReadFieldGroupC_64A7E/ReadFieldGroupB_64A54
-; (répété).
+; far, LUE 2026-10-14 (partie chunks). CHARGEUR DE PALETTE.IFF : INFO (dd non rangé, puis +68h
+; précision du brouillard, +52h, +4Eh log2 seuils par ligne, +46h lignes, +7Ah pas ; calcule
+; +6Ah = 1<<+68h, +6Eh = moitié, +4Ch = 1<<+4Eh, +7Ch = +46h<<+7Ah) ; PALT
+; (TextureLoader_LoadWithDwordFields_98784) ; SKYC ; BLWH ; RANG
+; (TextureLoader_FormatAndLoad_985F6, sinon +58h = 0).
 ; ==============================================================================================
 TextureLoader_LoadMixedFields_983FB	proc far		; CODE XREF: VROOMM_StubThunk_6BC6FJ TextureLoader_SelectMipLevel_980F0+1Cp
 
@@ -882,7 +888,9 @@ TextureLoader_LoadMixedFieldsB_98527	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ReadFieldGroupB_64A54, CRT_Doprnt_Dispatch, ReadFieldGroupA_64A19, CRT_Fmemcpy.
+; far, LUE 2026-10-14. LECTEUR DU CHUNK 'RANG' de PALETTE.IFF : uint16 nombre de couleurs de
+; base → palette+58h ; alloue nombre × 15 o → palette+5Ah ; pour chacune, lit 13 o et les
+; convertit par TextureLoader_Allocate_97F40 en entrée de 15 o.
 ; ==============================================================================================
 TextureLoader_FormatAndLoad_985F6	proc far		; CODE XREF: VROOMM_StubThunk_6BC7EJ TextureLoader_LoadMixedFields_983FB+11Bp
 
@@ -1309,7 +1317,10 @@ TextureLoader_LoadWithDwordFieldsB_988BD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de TextureLoader_LoadWithDwordFields_98784 (52 lignes).
+; far, LUE 2026-10-14. LIT LE TABLEAU DES SEUILS DE BROUILLARD de la palette : contrôle que la
+; taille vaut lignes [+46h] << [+4Eh] × 4 (sinon erreur 900Ah), alloue et lit les dword dans
+; palette+42h. Appelée par TextureLoader_OpenAndLoadSubrecord_98670 (fichier nommé par TABL, «
+; palfade »).
 ; ==============================================================================================
 TextureLoader_LoadWithDwordFieldsC_98956	proc far		; CODE XREF: VROOMM_StubThunk_6BC88J TextureLoader_OpenAndLoadSubrecord_98670+B4p
 

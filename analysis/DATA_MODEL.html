@@ -171,6 +171,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
     <li><a href="#wrld"><span>5</span><span>Monde WRLD</span></a></li>
     <li><a href="#fumees"><span>5b</span><span>Jeu de fumées</span></a></li>
     <li><a href="#terrain"><span>6</span><span>Terrain PAK</span></a></li>
+    <li><a href="#palette"><span>6b</span><span>Palette</span></a></li>
     <li><a href="#camr"><span>7</span><span>Caméras CAMR</span></a></li>
     <li><a href="#ponts"><span>8</span><span>Ponts campagne</span></a></li>
     <li><a href="#ouvert"><span>—</span><span>Points ouverts</span></a></li>
@@ -1337,6 +1338,47 @@ position = décalage                         sinon (coordonnées absolues)</pre>
 </article>
 
 <!-- ============================ CAMR ============================ -->
+<article class="mv" id="palette">
+  <header><span class="id">DATA\PALETTE.IFF</span><h2>La palette</h2></header>
+  <ul class="chips"><li>racine <b>FORM PALT</b></li><li>nommée par le chunk <b>PALT</b> du monde</li><li>lecteur <b>TextureLoader_LoadMixedFields_983FB</b></li></ul>
+  <p>La palette de 256 couleurs et, pour chaque couleur de base du terrain, sa gamme de teintes. Les chunks sont cherchés par leur tag.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Chunk</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">INFO</td><td>14 octets, tableau ci-dessous</td></tr>
+      <tr><td class="num">PALT</td><td>4 octets (<code>00 00 00 01</code> observés), puis 256 couleurs de 3 <code>uint8</code> R, V, B sur 0 à 63 (× 4 pour 0 à 255)</td></tr>
+      <tr><td class="num">BLWH</td><td>même disposition que <code>PALT</code> ; rôle non établi</td></tr>
+      <tr><td class="num">RANG</td><td><code>uint16</code> nombre de couleurs de base, puis un enregistrement de 13 octets par couleur (tableau ci-dessous)</td></tr>
+      <tr><td class="num">TABL</td><td>chaîne (<code>palfade</code>) : nom d'un second fichier lu par le chargeur ; d'après le code, c'est de lui que vient le tableau des seuils de brouillard (20 × 32 <code>uint32</code>). Ce fichier n'est pas dans le dépôt</td></tr>
+      <tr><td class="num">FORM BILD</td><td><code>INFO</code> (20 octets), <code>TABL</code> (46 octets) ; rôle non établi</td></tr>
+    </tbody>
+  </table></div>
+  <h3>INFO (14 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>valeur 1</td><td>uint32</td><td class="num">4</td><td>512 observé ; lu par le chargeur sans être rangé</td></tr>
+      <tr><td>précision du brouillard</td><td>uint16</td><td class="num">2</td><td>16 : le facteur de brouillard va de 0 à 2¹⁶ (= effet complet)</td></tr>
+      <tr><td>valeur 2</td><td>uint16</td><td class="num">2</td><td>16 observé ; rangée en mémoire par le chargeur ; rôle non établi</td></tr>
+      <tr><td>seuils par ligne</td><td>uint16</td><td class="num">2</td><td>log₂ du nombre de seuils d'une ligne de brouillard (5 → 32)</td></tr>
+      <tr><td>nombre de lignes</td><td>uint16</td><td class="num">2</td><td>lignes de seuils de brouillard (20)</td></tr>
+      <tr><td>pas des lignes</td><td>uint16</td><td class="num">2</td><td>9 : la ligne utilisée = valeur reçue ÷ 2⁹ (512), la dernière au-delà de 20 × 512 = 10 240</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Une couleur de base RANG (13 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>première teinte</td><td>uint16</td><td class="num">2</td><td>index de palette de la teinte la plus sombre</td></tr>
+      <tr><td>nombre de teintes</td><td>uint16</td><td class="num">2</td><td>n : la gamme va de « première » à « première + n − 1 »</td></tr>
+      <tr><td>teinte de brouillard</td><td>uint16</td><td class="num">2</td><td>décalage depuis « première » de la teinte atteinte au brouillard maximal</td></tr>
+      <tr><td>valeurs 3 à 5</td><td>3&nbsp;×&nbsp;uint8</td><td class="num">3</td><td>valeurs 0 à 63 observées, comme une couleur R, V, B ; rangées en mémoire par le chargeur ; rôle non établi</td></tr>
+      <tr><td>valeurs 6 à 9</td><td>4&nbsp;×&nbsp;uint8</td><td class="num">4</td><td>0 ou 1 observés ; rangées en mémoire par le chargeur ; rôle non établi</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le numéro d'une couleur de base est son rang dans <code>RANG</code> ; c'est la valeur de l'octet « couleur » des sommets d'altitude du terrain.</p>
+</article>
+
 <article class="mv" id="camr">
   <header><span class="id">FORM CAMR</span><h2>Caméras scriptées</h2></header>
   <ul class="chips"><li>dans <b>WRLD</b></li><li>référence complète <b>CAMERA_SYSTEM.md</b></li></ul>
