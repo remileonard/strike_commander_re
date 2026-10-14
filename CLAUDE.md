@@ -238,6 +238,10 @@ strike_commander_re/
     ├── sc_player/                   ⭐ lecteur de la musique du jeu (C++ + SDL2/ImGui) :
     │                                  séquenceur du jeu, XMIDI et pilote AdLib portés
     │                                  depuis le code ; voir tools/sc_player/README.md
+    ├── tri_map.py                   lecteur .TRI (d'après DATA_MODEL.html seul) → vue SVG
+    ├── terrain_map.py               lecteur <théâtre>.PAK (PAK, LZW, altitudes) → relief PNG
+    ├── terrain_viewer.py (+ .html)  visionneuse interactive du terrain (zoom, pistes, objets) ;
+    │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer

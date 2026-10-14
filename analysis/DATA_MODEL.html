@@ -250,8 +250,13 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
   </table></div>
   <ul>
     <li>Le jeu cherche un chunk <b>par son tag</b> dans le niveau courant : l'ordre des chunks n'a pas d'importance pour ceux qu'il cherche ainsi.</li>
-    <li><b>LZW</b> : codes de 9 à 12 bits, 256 symboles, code 256 = remise à zéro, code 257 = fin, premier code libre 258 (comme le GIF).</li>
-    <li><b>Archive PAK</b> (terrain) : <code>uint32</code> taille du fichier, puis une adresse <code>uint32</code> par sous-ressource (les 3 bits de poids fort sont mis à 1 et ne font pas partie de l'adresse), puis les données. Les PAK s'emboîtent.</li>
+    <li><b>LZW</b> : codes de 9 à 12 bits, 256 symboles, code 256 = remise à zéro, code 257 = fin, premier code libre 258 (comme le GIF). Constaté sur <code>ALASKA.PAK</code> : les bits se lisent du poids faible vers le poids fort (ordre GIF), et la largeur passe à n + 1 bits quand la table atteint 2ⁿ entrées.</li>
+    <li><b>Archive PAK</b> (terrain) : <code>uint32</code> taille du fichier, puis une adresse <code>uint32</code> par sous-ressource, puis les données. Les PAK s'emboîtent. Constaté sur <code>ALASKA.PAK</code> :
+      <ul>
+        <li>le nombre d'entrées n'est pas écrit : la table s'arrête à la première adresse, là où commencent les données ;</li>
+        <li>les 3 bits de poids fort d'une adresse ne font pas partie de l'adresse : <code>111</code> = entrée stockée telle quelle, <code>001</code> = entrée compressée, qui commence par sa taille décompressée (<code>uint32</code>) suivie du flux LZW ;</li>
+        <li>une entrée vide a la même adresse que la suivante (longueur 0).</li>
+      </ul></li>
   </ul>
 </section>
 
@@ -1207,15 +1212,19 @@ position = décalage                         sinon (coordonnées absolues)</pre>
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Ressource</th><th>Contenu</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descripteur : version, <code>FORM BLOX</code> (dimensions et noms des fichiers suivants), <code>FORM TXMS</code> (textures du sol par niveau de détail)</td></tr>
-      <tr><td class="num">2</td><td class="num">.ELV</td><td>altitudes, détail fort : 324 cellules de 20 × 20 sommets</td></tr>
-      <tr><td class="num">3</td><td class="num">.MED</td><td>altitudes, détail moyen</td></tr>
-      <tr><td class="num">4</td><td class="num">.LOW</td><td>altitudes, détail faible</td></tr>
-      <tr><td class="num">5</td><td class="num">.AVG</td><td>une valeur moyenne par cellule</td></tr>
-      <tr><td class="num">6</td><td class="num">.TRI</td><td><b>pistes et aires d'aérodrome</b> posées sur le terrain</td></tr>
-      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>uint16</code>, un par cellule : <b>altitude plafond</b> de la cellule (mètres, entier). Au-dessus de cette altitude, le jeu renvoie ce plafond comme hauteur du sol sans calculer le relief exact</td></tr>
+      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descripteur : <code>VERS</code>, <code>INFO</code>, <code>FORM BLOX</code> (chunks <code>ELEV</code>, <code>ATRI</code>, <code>OBJS</code> : dimensions et noms des fichiers), <code>FORM TXMS</code> (textures du sol par niveau de détail)</td></tr>
+      <tr><td class="num">2</td><td class="num">.ELV</td><td>altitudes, détail fort : PAK de 324 cellules compressées, <b>20 × 20</b> sommets espacés de 1000 m</td></tr>
+      <tr><td class="num">3</td><td class="num">.MED</td><td>altitudes, détail moyen : PAK de 324 cellules compressées, <b>10 × 10</b> sommets espacés de 2000 m</td></tr>
+      <tr><td class="num">4</td><td class="num">.LOW</td><td>altitudes, détail faible : PAK de 324 cellules compressées, <b>5 × 5</b> sommets espacés de 4000 m</td></tr>
+      <tr><td class="num">5</td><td class="num">.TRI</td><td><b>pistes</b> posées sur le terrain : PAK de 324 régions (tableaux ci-dessous) ; identique, octet pour octet, au fichier <code>ALASKA.TRI</code></td></tr>
+      <tr><td class="num">6</td><td class="num">objets</td><td><b>bâtiments posés</b> sur le terrain : PAK de 324 listes d'objets, une par cellule (tableau ci-dessous)</td></tr>
+      <tr><td class="num">7</td><td class="num">plafonds</td><td>324 <code>uint16</code>, un par cellule : <b>altitude plafond</b> de la cellule (mètres, entier). Au-dessus de cette altitude, le jeu renvoie ce plafond comme hauteur du sol sans calculer le relief exact. Sur <code>ALASKA.PAK</code>, la valeur est l'altitude maximale des sommets <code>.ELV</code> de la cellule pour 320 cellules sur 324 (5 m de moins pour les 4 autres)</td></tr>
     </tbody>
   </table></div>
+  <p>Le PAK ne contient pas de noms de fichiers. <code>FORM BLOX</code> nomme <code>ALASKA.ELV</code>, <code>.MED</code>, <code>.LOW</code> et <code>ALASKA.AVG</code> (chunk <code>ELEV</code>), <code>ALASKA.TRI</code> (<code>ATRI</code>) et <code>ALASKA.OBJ</code> (<code>OBJS</code>). Le rattachement des ressources 6 et 7 à <code>.OBJ</code> et <code>.AVG</code> n'est pas établi.</p>
+  <h3>Les cellules</h3>
+  <p>Constaté sur <code>ALASKA.PAK</code>. Le monde est un carré de 18 × 20 km = 360 km de côté, centré sur (0, 0) : X et Z vont de −180 000 à +180 000 m. La cellule n° c est en <b>ligne c ÷ 18</b>, <b>colonne c mod 18</b>. Les colonnes vont vers +X à partir de X = −180 000 ; les lignes vont vers −Z à partir de Z = +180 000.</p>
+  <p>Dans une cellule de n × n sommets (n = 20, 10 ou 5), le sommet n° k est en <b>ligne k ÷ n</b>, <b>colonne k mod n</b>, dans le même sens que les cellules. Les bords de deux cellules voisines se raccordent sans saut.</p>
   <h3>Un sommet d'altitude (.ELV, .MED, .LOW)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
@@ -1227,7 +1236,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture du 2e triangle de la case</td></tr>
     </tbody>
   </table></div>
-  <p>⚠️ Cet ordre vient du code : le lecteur des cellules prend l'<code>int16</code> en tête de chaque sommet de 6 octets pour le min, le max et la moyenne d'altitude, et le rendu le multiplie par les axes de la caméra. Une lecture précédente des données plaçait la hauteur au 2ᵉ mot : à vérifier sur les fichiers.</p>
+  <p>Ordre <b>vérifié sur <code>ALASKA.PAK</code></b> : sous le centre des trois pistes, l'<code>int16</code> en tête du sommet vaut 2520, 1575 et 455 m, et les pistes sont à 2521, 1576 et 456 m. Le 2ᵉ mot donne 1716, 1716 et 1204 : la hauteur est bien en tête. Valeurs observées : couleur 0, 4 ou 6.</p>
   <h3>Le chunk ATRI (dans FORM BLOX, 53 octets)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
@@ -1240,7 +1249,35 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>fichier</td><td>string[13]</td><td class="num">13</td><td>nom du <code>.TRI</code> (<code>MAURITAN.TRI</code>)</td></tr>
     </tbody>
   </table></div>
+  <h3>Le chunk ELEV (dans FORM BLOX, 3 × 46 octets)</h3>
+  <p>Constaté sur <code>ALASKA.PAK</code> : trois enregistrements de 46 octets, un par niveau de détail (<code>.ELV</code>, <code>.MED</code>, <code>.LOW</code>).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>valeur 1</td><td>uint16</td><td class="num">2</td><td>15 observé ; rôle non établi</td></tr>
+      <tr><td>espacement</td><td>uint16</td><td class="num">2</td><td>mètres entre deux sommets (1000, 2000, 4000)</td></tr>
+      <tr><td>valeur 2</td><td>uint32</td><td class="num">4</td><td>8 observé ; rôle non établi</td></tr>
+      <tr><td>valeur 3</td><td>uint32</td><td class="num">4</td><td>6000, 12000, 24000 observés (6 × l'espacement) ; rôle non établi</td></tr>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>côté de la grille de cellules (18)</td></tr>
+      <tr><td>sommets par côté</td><td>uint16</td><td class="num">2</td><td>n : 20, 10, 5</td></tr>
+      <tr><td>taille d'une cellule</td><td>uint32</td><td class="num">4</td><td>mètres, entier (20000)</td></tr>
+      <tr><td>fichier d'altitudes</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.ELV</code>, <code>.MED</code>, <code>.LOW</code></td></tr>
+      <tr><td>second fichier</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.AVG</code> pour les trois</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Le chunk OBJS (dans FORM BLOX, 27 octets)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>18 observé</td></tr>
+      <tr><td>valeur 1</td><td>uint32</td><td class="num">4</td><td>20000 observé ; rôle non établi</td></tr>
+      <tr><td>valeur 2</td><td>uint32</td><td class="num">4</td><td>9000 observé ; rôle non établi</td></tr>
+      <tr><td>valeur 3</td><td>uint32</td><td class="num">4</td><td>20000 observé ; rôle non établi</td></tr>
+      <tr><td>fichier</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.OBJ</code></td></tr>
+    </tbody>
+  </table></div>
   <h3>Une région .TRI</h3>
+  <p>Constaté sur <code>ALASKA.TRI</code> : le fichier est un PAK de 324 entrées, une par cellule ; seules 3 sont remplies (cellules 92, 189 et 200, une piste chacune). Les sommets sont en <b>coordonnées du monde</b>, pas relatives à la cellule. Chaque région observée a une grille d'index de 1 × 1 et une seule liste contenant tous ses triangles.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
@@ -1284,6 +1321,19 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     </div>
   </div>
   <p>Toujours des <b>triangles</b> : Strike Commander n'a pas de quadrilatères.</p>
+  <h3>Les objets posés (ressource 6)</h3>
+  <p>Constaté sur <code>ALASKA.PAK</code> : PAK de 324 entrées, une par cellule ; seules les cellules 189 et 200 sont remplies (3 et 4 objets : hangars, tour, fûts, radar). Une entrée commence par un <code>uint16</code>, le nombre d'objets, suivi d'un enregistrement de 70 octets par objet.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>nom</td><td>string[13]</td><td class="num">13</td><td><code>HANGAR3</code>, <code>TOWA24</code>, <code>DRUMD24</code>, <code>HANGB22</code>, <code>DRUMB16</code>, <code>RDRSTL2</code></td></tr>
+      <tr><td>second nom</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>… ; 8 caractères au plus, le 9ᵉ octet n'est pas toujours un zéro ; rôle non établi</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>mètres, coordonnées du monde</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>mètres (altitude) : celle du sol de l'aérodrome (1575 et 455 m)</td></tr>
+      <tr><td>matrice</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3 ; identité pour 6 objets, rotation d'un quart de tour pour <code>HANGAR3</code> ; ordre des lignes et des axes non établi</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ CAMR ============================ -->
@@ -1355,9 +1405,10 @@ position = décalage                         sinon (coordonnées absolues)</pre>
 
 <section id="ouvert">
   <h2 class="sec">Points ouverts</h2>
-  <p>Tout ce qui précède vient de la lecture du code. Restent à lire dans le code :</p>
+  <p>Tout ce qui précède vient de la lecture du code, sauf ce qui est marqué « constaté », qui vient des fichiers (<code>ALASKA.PAK</code>, <code>ALASKA.TRI</code>, lus par <code>tools/terrain_map.py</code> et <code>tools/terrain_viewer.py</code>). Restent ouverts :</p>
   <ul>
-    <li>Terrain : le chunk <code>OBJS</code> de <code>FORM BLOX</code> crée une grille d'un pointeur par cellule dont le consommateur n'est pas encore tracé ; c'est le candidat pour le placement des bâtiments d'aérodrome.</li>
+    <li>Terrain : le chunk <code>OBJS</code> de <code>FORM BLOX</code> crée dans le code une grille d'un pointeur par cellule ; la ressource 6 du PAK contient une liste d'objets par cellule. Le lien entre les deux n'est pas tracé dans le code.</li>
+    <li>Terrain : rôle des valeurs non établies des chunks <code>ELEV</code> et <code>OBJS</code>, du second nom et de la matrice des objets posés.</li>
   </ul>
 </section>
 </main>

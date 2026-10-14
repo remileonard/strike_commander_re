@@ -250,8 +250,13 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
   </table></div>
   <ul>
     <li>The game looks up a chunk <b>by its tag</b> in the current level: chunk order does not matter for the chunks it looks up this way.</li>
-    <li><b>LZW</b>: 9- to 12-bit codes, 256 symbols, code 256 = reset, code 257 = end, first free code 258 (as in GIF).</li>
-    <li><b>PAK archive</b> (terrain): <code>uint32</code> file size, then one <code>uint32</code> address per sub-resource (the 3 high bits are set to 1 and are not part of the address), then the data. PAKs nest.</li>
+    <li><b>LZW</b>: 9- to 12-bit codes, 256 symbols, code 256 = reset, code 257 = end, first free code 258 (as in GIF). Observed on <code>ALASKA.PAK</code>: bits are read from least to most significant (GIF order), and the width grows to n + 1 bits when the table reaches 2ⁿ entries.</li>
+    <li><b>PAK archive</b> (terrain): <code>uint32</code> file size, then one <code>uint32</code> address per sub-resource, then the data. PAKs nest. Observed on <code>ALASKA.PAK</code>:
+      <ul>
+        <li>the number of entries is not stored: the table ends at the first address, where the data starts;</li>
+        <li>the 3 high bits of an address are not part of the address: <code>111</code> = entry stored as is, <code>001</code> = compressed entry, which starts with its uncompressed size (<code>uint32</code>) followed by the LZW stream;</li>
+        <li>an empty entry has the same address as the next one (length 0).</li>
+      </ul></li>
   </ul>
 </section>
 
@@ -1207,15 +1212,19 @@ position = offset                    otherwise (absolute coordinates)</pre>
   <div class="tablewrap"><table>
     <thead><tr><th>#</th><th>Resource</th><th>Contents</th></tr></thead>
     <tbody>
-      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descriptor: version, <code>FORM BLOX</code> (dimensions and names of the following files), <code>FORM TXMS</code> (ground textures per level of detail)</td></tr>
-      <tr><td class="num">2</td><td class="num">.ELV</td><td>elevations, high detail: 324 cells of 20 × 20 vertices</td></tr>
-      <tr><td class="num">3</td><td class="num">.MED</td><td>elevations, medium detail</td></tr>
-      <tr><td class="num">4</td><td class="num">.LOW</td><td>elevations, low detail</td></tr>
-      <tr><td class="num">5</td><td class="num">.AVG</td><td>one average value per cell</td></tr>
-      <tr><td class="num">6</td><td class="num">.TRI</td><td><b>airfield runways and aprons</b> laid on the terrain</td></tr>
-      <tr><td class="num">7</td><td class="num">.OBJ</td><td>324 <code>uint16</code>, one per cell: <b>ceiling altitude</b> of the cell (metres, integer). Above this altitude, the game returns this ceiling as the ground height without computing the exact relief</td></tr>
+      <tr><td class="num">1</td><td class="num">FORM TERA</td><td>descriptor: <code>VERS</code>, <code>INFO</code>, <code>FORM BLOX</code> (<code>ELEV</code>, <code>ATRI</code>, <code>OBJS</code> chunks: dimensions and file names), <code>FORM TXMS</code> (ground textures per level of detail)</td></tr>
+      <tr><td class="num">2</td><td class="num">.ELV</td><td>elevations, high detail: PAK of 324 compressed cells, <b>20 × 20</b> vertices 1000 m apart</td></tr>
+      <tr><td class="num">3</td><td class="num">.MED</td><td>elevations, medium detail: PAK of 324 compressed cells, <b>10 × 10</b> vertices 2000 m apart</td></tr>
+      <tr><td class="num">4</td><td class="num">.LOW</td><td>elevations, low detail: PAK of 324 compressed cells, <b>5 × 5</b> vertices 4000 m apart</td></tr>
+      <tr><td class="num">5</td><td class="num">.TRI</td><td><b>runways</b> laid on the terrain: PAK of 324 regions (tables below); identical, byte for byte, to the <code>ALASKA.TRI</code> file</td></tr>
+      <tr><td class="num">6</td><td class="num">objects</td><td><b>buildings placed</b> on the terrain: PAK of 324 object lists, one per cell (table below)</td></tr>
+      <tr><td class="num">7</td><td class="num">ceilings</td><td>324 <code>uint16</code>, one per cell: <b>ceiling altitude</b> of the cell (metres, integer). Above this altitude, the game returns this ceiling as the ground height without computing the exact relief. On <code>ALASKA.PAK</code>, the value is the maximum altitude of the cell's <code>.ELV</code> vertices for 320 cells out of 324 (5 m less for the other 4)</td></tr>
     </tbody>
   </table></div>
+  <p>The PAK contains no file names. <code>FORM BLOX</code> names <code>ALASKA.ELV</code>, <code>.MED</code>, <code>.LOW</code> and <code>ALASKA.AVG</code> (<code>ELEV</code> chunk), <code>ALASKA.TRI</code> (<code>ATRI</code>) and <code>ALASKA.OBJ</code> (<code>OBJS</code>). Which of resources 6 and 7 is <code>.OBJ</code> and which is <code>.AVG</code> is not established.</p>
+  <h3>The cells</h3>
+  <p>Observed on <code>ALASKA.PAK</code>. The world is a square of 18 × 20 km = 360 km a side, centred on (0, 0): X and Z run from −180,000 to +180,000 m. Cell number c is at <b>row c ÷ 18</b>, <b>column c mod 18</b>. Columns go towards +X starting at X = −180,000; rows go towards −Z starting at Z = +180,000.</p>
+  <p>In a cell of n × n vertices (n = 20, 10 or 5), vertex number k is at <b>row k ÷ n</b>, <b>column k mod n</b>, in the same direction as the cells. The edges of two neighbouring cells join without a step.</p>
   <h3>An elevation vertex (.ELV, .MED, .LOW)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
@@ -1227,7 +1236,7 @@ position = offset                    otherwise (absolute coordinates)</pre>
       <tr><td>texture 2</td><td>uint8</td><td class="num">1</td><td>texture of the square's 2nd triangle</td></tr>
     </tbody>
   </table></div>
-  <p>⚠️ This order comes from the code: the cell reader takes the <code>int16</code> at the head of each 6-byte vertex for the min, max and average altitude, and the renderer multiplies it by the camera axes. An earlier reading of the data put the height in the 2nd word: to be checked against the files.</p>
+  <p>Order <b>checked on <code>ALASKA.PAK</code></b>: under the centre of the three runways, the <code>int16</code> at the head of the vertex is 2520, 1575 and 455 m, and the runways are at 2521, 1576 and 456 m. The 2nd word gives 1716, 1716 and 1204: the height is indeed first. Observed values: colour 0, 4 or 6.</p>
   <h3>The ATRI chunk (in FORM BLOX, 53 bytes)</h3>
   <div class="tablewrap"><table>
     <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
@@ -1240,7 +1249,35 @@ position = offset                    otherwise (absolute coordinates)</pre>
       <tr><td>file</td><td>string[13]</td><td class="num">13</td><td>name of the <code>.TRI</code> (<code>MAURITAN.TRI</code>)</td></tr>
     </tbody>
   </table></div>
+  <h3>The ELEV chunk (in FORM BLOX, 3 × 46 bytes)</h3>
+  <p>Observed on <code>ALASKA.PAK</code>: three 46-byte records, one per level of detail (<code>.ELV</code>, <code>.MED</code>, <code>.LOW</code>).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>value 1</td><td>uint16</td><td class="num">2</td><td>15 observed; role not established</td></tr>
+      <tr><td>spacing</td><td>uint16</td><td class="num">2</td><td>metres between two vertices (1000, 2000, 4000)</td></tr>
+      <tr><td>value 2</td><td>uint32</td><td class="num">4</td><td>8 observed; role not established</td></tr>
+      <tr><td>value 3</td><td>uint32</td><td class="num">4</td><td>6000, 12000, 24000 observed (6 × the spacing); role not established</td></tr>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>side of the cell grid (18)</td></tr>
+      <tr><td>vertices per side</td><td>uint16</td><td class="num">2</td><td>n: 20, 10, 5</td></tr>
+      <tr><td>cell size</td><td>uint32</td><td class="num">4</td><td>metres, integer (20000)</td></tr>
+      <tr><td>elevation file</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.ELV</code>, <code>.MED</code>, <code>.LOW</code></td></tr>
+      <tr><td>second file</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.AVG</code> for all three</td></tr>
+    </tbody>
+  </table></div>
+  <h3>The OBJS chunk (in FORM BLOX, 27 bytes)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>dimension</td><td>uint16</td><td class="num">2</td><td>18 observed</td></tr>
+      <tr><td>value 1</td><td>uint32</td><td class="num">4</td><td>20000 observed; role not established</td></tr>
+      <tr><td>value 2</td><td>uint32</td><td class="num">4</td><td>9000 observed; role not established</td></tr>
+      <tr><td>value 3</td><td>uint32</td><td class="num">4</td><td>20000 observed; role not established</td></tr>
+      <tr><td>file</td><td>string[13]</td><td class="num">13</td><td><code>ALASKA.OBJ</code></td></tr>
+    </tbody>
+  </table></div>
   <h3>A .TRI region</h3>
+  <p>Observed on <code>ALASKA.TRI</code>: the file is a PAK of 324 entries, one per cell; only 3 are filled (cells 92, 189 and 200, one runway each). Vertices are in <b>world coordinates</b>, not relative to the cell. Each region observed has a 1 × 1 index grid and a single list containing all its triangles.</p>
   <div class="tablewrap"><table>
     <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
     <tbody>
@@ -1284,6 +1321,19 @@ position = offset                    otherwise (absolute coordinates)</pre>
     </div>
   </div>
   <p>Always <b>triangles</b>: Strike Commander has no quads.</p>
+  <h3>Placed objects (resource 6)</h3>
+  <p>Observed on <code>ALASKA.PAK</code>: PAK of 324 entries, one per cell; only cells 189 and 200 are filled (3 and 4 objects: hangars, tower, drums, radar). An entry starts with a <code>uint16</code>, the number of objects, followed by one 70-byte record per object.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>name</td><td>string[13]</td><td class="num">13</td><td><code>HANGAR3</code>, <code>TOWA24</code>, <code>DRUMD24</code>, <code>HANGB22</code>, <code>DRUMB16</code>, <code>RDRSTL2</code></td></tr>
+      <tr><td>second name</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>…; at most 8 characters, the 9th byte is not always zero; role not established</td></tr>
+      <tr><td>position X</td><td>float</td><td class="num">4</td><td>metres, world coordinates</td></tr>
+      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
+      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>metres (altitude): that of the airfield ground (1575 and 455 m)</td></tr>
+      <tr><td>matrix</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3; identity for 6 objects, a quarter-turn rotation for <code>HANGAR3</code>; row and axis order not established</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ CAMR ============================ -->
@@ -1355,9 +1405,10 @@ position = offset                    otherwise (absolute coordinates)</pre>
 
 <section id="ouvert">
   <h2 class="sec">Open points</h2>
-  <p>Everything above comes from reading the code. Still to be read in the code:</p>
+  <p>Everything above comes from reading the code, except what is marked “observed”, which comes from the files (<code>ALASKA.PAK</code>, <code>ALASKA.TRI</code>, read by <code>tools/terrain_map.py</code> and <code>tools/terrain_viewer.py</code>). Still open:</p>
   <ul>
-    <li>Terrain: the <code>OBJS</code> chunk of <code>FORM BLOX</code> creates a grid of one pointer per cell whose consumer has not been traced yet; it is the candidate for placing airfield buildings.</li>
+    <li>Terrain: in the code, the <code>OBJS</code> chunk of <code>FORM BLOX</code> creates a grid of one pointer per cell; resource 6 of the PAK holds one object list per cell. The link between the two has not been traced in the code.</li>
+    <li>Terrain: role of the unestablished values of the <code>ELEV</code> and <code>OBJS</code> chunks, and of the placed objects' second name and matrix.</li>
   </ul>
 </section>
 </main>
