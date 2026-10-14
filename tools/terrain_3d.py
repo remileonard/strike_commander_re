@@ -4,7 +4,8 @@
 Rendu comme le jeu (Render_TerrainPipelineMain → Render_MeshPrimitive_21085, voir DATA_MODEL.md §6.8) :
 couleurs de PALETTE.IFF ; couleur de base du triangle = celle du sommet le plus haut (comparaison
 non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur
-le triangle puis tramage en damier sur les pixels de l'écran. Pistes (.TRI) : octet « couleur »
+le triangle. Pas de tramage : la teinte est rendue en continu, en mélangeant les deux couleurs de
+palette voisines (le jeu, limité à 256 couleurs, tramait en damier). Pistes (.TRI) : octet « couleur »
 pris comme index de palette, face unie. Textures du sol non dessinées. La diagonale qui coupe
 chaque carré n'est pas établie : touche G pour changer.
 
@@ -17,7 +18,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  T : tramage oui/non  G : diagonale « \\ » / « / »   + / - : exagération du relief
+  G : diagonale « \\ » / « / »   + / - : exagération du relief
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -52,11 +53,14 @@ void main() {
 FS = """#version 120
 varying float vShade;
 uniform sampler2D uPal;
-uniform float uDither;
+uniform float uSmooth;
+vec4 pal(float idx) {
+    return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5));
+}
 void main() {
-    float d = mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.0) * 0.5 * uDither;
-    float idx = clamp(floor(vShade + d), 0.0, 255.0);
-    gl_FragColor = texture2D(uPal, vec2((idx + 0.5) / 256.0, 0.5));
+    float base = floor(vShade);
+    float t = (vShade - base) * uSmooth;
+    gl_FragColor = mix(pal(base), pal(base + 1.0), t);
 }
 """
 
@@ -312,7 +316,7 @@ def main():
     GL.glUseProgram(prog)
     u_mvp = GL.glGetUniformLocation(prog, "uMVP")
     u_exag = GL.glGetUniformLocation(prog, "uExag")
-    u_dither = GL.glGetUniformLocation(prog, "uDither")
+    u_smooth = GL.glGetUniformLocation(prog, "uSmooth")
     GL.glUniform1i(GL.glGetUniformLocation(prog, "uPal"), 0)
     tex = palette_texture(world.palette)
 
@@ -323,7 +327,6 @@ def main():
     markers = Mesh(*world.marker_mesh())
 
     cam = Camera()
-    dither = True
     exag = 1.0
     obj_index = -1
     dragging = False
@@ -355,8 +358,6 @@ def main():
             elif e.type == pygame.KEYDOWN:
                 if e.key == pygame.K_ESCAPE:
                     running = False
-                elif e.key == pygame.K_t:
-                    dither = not dither
                 elif e.key == pygame.K_g:
                     slash = not slash
                     terrain.upload(*world.terrain_mesh(slash))
@@ -416,9 +417,9 @@ def main():
         GL.glUniform1f(u_exag, exag)
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
-        GL.glUniform1f(u_dither, 1.0 if dither else 0.0)
+        GL.glUniform1f(u_smooth, 1.0)
         terrain.draw(GL.GL_TRIANGLES)
-        GL.glUniform1f(u_dither, 0.0)
+        GL.glUniform1f(u_smooth, 0.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glPolygonOffset(-2, -8)
         runways.draw(GL.GL_TRIANGLES)
@@ -429,7 +430,7 @@ def main():
         lines = [f"X {cam.x:.0f} m   Z {-cam.z:.0f} m",
                  f"altitude Y {cam.y / exag:.0f} m   sol {ground / exag:.0f} m",
                  f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s   relief ×{exag:g}",
-                 f"tramage {'oui' if dither else 'non'}   diagonale {'/' if slash else chr(92)}"]
+                 f"diagonale {'/' if slash else chr(92)}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)
