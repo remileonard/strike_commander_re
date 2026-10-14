@@ -311,12 +311,12 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <h3>Déroulé (chaque tick)</h3>
       <ol class="phases">
         <li><span>R</span><div>Manche latéral <b>à fond</b> (±16) du côté choisi, en continu : l'avion roule sans arrêt.</div></li>
-        <li><span>P</span><div>Manche de tangage tiré à fond (16, borné par le pilote) quand le nez est au-dessus de l'horizon sur son axe dominant, sinon poussé à moitié (−8).</div></li>
+        <li><span>P</span><div>Manche de tangage tiré à fond (16, borné par le pilote) ou poussé à moitié (−8). Le jeu prend l'axe du monde (X, Y ou Z) sur lequel le nez a sa plus grande composante, puis tire si le vecteur « haut » de l'avion a, sur cet axe, le signe opposé à celui du nez ; sinon il pousse. En vol presque à plat, cet axe est horizontal : le choix dépend alors surtout du cap et de l'inclinaison, pas de la position du nez par rapport à l'horizon.</div></li>
         <li><span>V</span><div>Vitesse : <code>AI_ManeuverSpeedCmd_ED1E</code> avec la vitesse de la cible.</div></li>
       </ol>
       <h3>Fin</h3>
       <p>Minuteur de 2 s écoulé, ou plus de cible.</p>
-      <p class="bug">Particularité : le vecteur de référence du nœud (<code>nœud+0x26</code>, <code>+0x2A</code>) est mis à zéro à la construction et jamais écrit. Le choix « tirer ou pousser » ne dépend donc que de l'attitude de l'avion.</p>
+      <p class="bug">Particularité : le vecteur de référence du nœud (<code>nœud+0x26</code>, <code>+0x2A</code>) est mis à zéro à la construction ; aucune écriture n'a été trouvée ensuite (méthodes du nœud, classe de base, pile de comportements). Le jeu compare donc ce vecteur nul au nez : le choix « tirer ou pousser » ne dépend que de l'attitude de l'avion.</p>
     </div>
     <figure>
       <div class="svgbox">
@@ -326,7 +326,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <path class="g-path" d="M40,130 C90,130 110,80 150,80 C190,80 200,180 240,180 C280,180 290,80 330,80 C370,80 380,180 420,180 C450,180 470,150 490,140"/>
         <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,130)"/>
         <text class="g-lbl" x="150" y="68">manche latéral à fond, en continu</text>
-        <text class="g-lbl" x="210" y="206">tirer si nez haut, pousser à moitié si nez bas</text>
+        <text class="g-lbl" x="210" y="206">tirer à fond ou pousser à moitié selon l'attitude</text>
         <text class="g-lbl-a" x="404" y="70">0 → 2 s</text>
         <path class="g-alt" d="M140,110 a14,14 0 1,1 20,0"/>
         <path class="g-alt" d="M320,110 a14,14 0 1,1 20,0"/>
@@ -423,7 +423,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
 <!-- ============================ ID 4 ============================ -->
 <article class="mv" id="id4">
   <header><span class="id">ID 4 · tag 0x264 · nœud fixe +0xBD</span><h2>Virage défensif</h2></header>
-  <ul class="chips"><li>Déclenchement <b>alerte de menace</b>, aussi au tournoi</li><li>Durée <b>3 s (alerte) / 2 s (tournoi), +2 s de grâce</b></li><li>Gaz <b>plein</b></li></ul>
+  <ul class="chips"><li>Déclenchement <b>alerte de menace</b>, aussi au tournoi</li><li>Durée <b>3 s (alerte) / 2 s (tournoi), +2 s de grâce</b></li><li>Gaz <b>inchangés</b></li></ul>
   <div class="grid2">
     <div>
       <h3>Déclenchement par alerte</h3>
@@ -440,8 +440,8 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <p>Côté du virage = côté de la cible par rapport à mon nez. Le cap horizontal de départ est mémorisé.</p>
       <h3>Déroulé (chaque tick)</h3>
       <ol class="phases">
-        <li><span>1</span><div>Gaz plein. Inclinaison voulue : 90°, ou 60° si trop bas.</div></li>
-        <li><span>2</span><div>Roulis vers cette inclinaison (zone 30). Une fois à moins de 30° : roulis (zone 5) et manche tiré à fond.</div></li>
+        <li><span>1</span><div>Aucune commande de gaz (ni à l'application ni au tick) : la manette garde sa valeur. Inclinaison voulue : 90°, ou 60° si trop bas.</div></li>
+        <li><span>2</span><div>Roulis vers cette inclinaison (zone 30). Une fois à moins de 30° : roulis (zone 5) et manche tiré à fond. Le test est refait à chaque tick, sans phase mémorisée.</div></li>
         <li><span>3</span><div>Quand le cap a tourné de 90° ou plus, ou que le minuteur est écoulé : assiette +10 (zone 10).</div></li>
       </ol>
       <h3>Fin</h3>
@@ -459,7 +459,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <circle class="g-tgt" cx="390" cy="70" r="6"/>
         <line class="g-tgtpath" x1="390" y1="70" x2="330" y2="110"/>
         <text class="g-lbl-t" x="400" y="66">menace</text>
-        <text class="g-lbl" x="60" y="190">gaz plein</text>
+        <text class="g-lbl" x="60" y="190">gaz inchangés</text>
         <text class="g-lbl" x="60" y="152">inclinaison 90°</text>
         <text class="g-lbl" x="60" y="166">(60° si trop bas)</text>
         <text class="g-lbl" x="60" y="128">manche tiré à fond</text>
@@ -475,7 +475,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <div class="check">
     <h3>À vérifier dans l'outil</h3>
     <ul>
-      <li>Gaz plein, inclinaison qui monte à 90° (60° sous terrain + 800 m) du côté de la cible.</li>
+      <li>Gaz inchangés, inclinaison qui monte à 90° (60° sous terrain + 800 m) du côté de la cible.</li>
       <li>Manche tiré à fond seulement une fois l'inclinaison à moins de 30° de la consigne.</li>
       <li>Fin vers 90° de cap ou au bout du minuteur, après une remontée à +10°.</li>
     </ul>
@@ -734,6 +734,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <li><span>3</span><div>Chandelle à 30° + 30° × (vitesse − croisière)/vitesse mini, au plus 60° (30° si je suis sous la croisière), ailes à plat, gaz plein. Le minuteur descend deux fois plus vite. Phase 4 au bout du minuteur, si trop lent ou si la cible passe sous 17 700 m.</div></li>
         <li><span>4</span><div>Assiette 0 (zone 5), gaz croisière, puis fin.</div></li>
       </ol>
+      <p class="bug">Constaté au banc : la phase 1 n'atteint presque jamais l'alignement. Il faut un écart de cap et d'élévation tous deux sous 0,224° (le jeu teste un écart nul sur des angles au 1/256). Quand la cible reste quelques degrés sous le nez, le pilote ne pousse le manche que de −16 × (v/10)² (environ −1,2 pour 2,8° d'écart) ; l'incidence demandée change alors de moins que la zone morte du servo (0,22°) et le nez ne bouge plus. La phase 1 dure donc jusqu'à ce que la cible passe sous 17 700 m, puis la manœuvre se termine sans chandelle.</p>
     </div>
     <figure>
       <div class="svgbox">
@@ -762,7 +763,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <h3>À vérifier dans l'outil</h3>
     <ul>
       <li>Avec une cible à moins de 17 700 m, la manœuvre se termine tout de suite.</li>
-      <li>Sinon : virage à plat vers la cible, chandelle entre 30° et 60° selon l'excès de vitesse, environ 2 s, puis remise à plat.</li>
+      <li>Sinon : virage à plat vers la cible, puis en général une longue phase 1 qui ne s'aligne pas (manche poussé d'environ −1,2, nez immobile) et une fin à 17 700 m. Si l'alignement est atteint : chandelle entre 30° et 60° selon l'excès de vitesse, environ 2 s, puis remise à plat.</li>
     </ul>
   </div>
 </article>

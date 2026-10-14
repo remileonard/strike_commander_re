@@ -311,12 +311,12 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <h3>Sequence (every tick)</h3>
       <ol class="phases">
         <li><span>R</span><div>Lateral stick <b>fully over</b> (±16) to the chosen side, continuously: the aircraft rolls non-stop.</div></li>
-        <li><span>P</span><div>Pitch stick pulled fully back (16, limited by the pilot) when the nose is above the horizon on its dominant axis, otherwise pushed halfway (−8).</div></li>
+        <li><span>P</span><div>Pitch stick pulled fully back (16, limited by the pilot) or pushed halfway (−8). The game takes the world axis (X, Y or Z) on which the nose has its largest component, then pulls if the aircraft's “up” vector has, on that axis, the sign opposite to the nose's; otherwise it pushes. In near-level flight that axis is horizontal, so the choice then depends mostly on heading and bank, not on where the nose sits relative to the horizon.</div></li>
         <li><span>V</span><div>Speed: <code>AI_ManeuverSpeedCmd_ED1E</code> with the target's speed.</div></li>
       </ol>
       <h3>End</h3>
       <p>2 s timer elapsed, or no more target.</p>
-      <p class="bug">Peculiarity: the node's reference vector (<code>node+0x26</code>, <code>+0x2A</code>) is zeroed at construction and never written. The “pull or push” choice therefore depends only on the aircraft's attitude.</p>
+      <p class="bug">Peculiarity: the node's reference vector (<code>node+0x26</code>, <code>+0x2A</code>) is zeroed at construction; no later write was found (node methods, base class, behavior stack). The game therefore compares this zero vector with the nose: the “pull or push” choice depends only on the aircraft's attitude.</p>
     </div>
     <figure>
       <div class="svgbox">
@@ -326,7 +326,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <path class="g-path" d="M40,130 C90,130 110,80 150,80 C190,80 200,180 240,180 C280,180 290,80 330,80 C370,80 380,180 420,180 C450,180 470,150 490,140"/>
         <polygon class="g-me" points="0,-6 14,0 0,6" transform="translate(40,130)"/>
         <text class="g-lbl" x="150" y="68">lateral stick fully over, continuously</text>
-        <text class="g-lbl" x="210" y="206">pull if nose high, push halfway if nose low</text>
+        <text class="g-lbl" x="210" y="206">pull fully or push halfway depending on attitude</text>
         <text class="g-lbl-a" x="404" y="70">0 → 2 s</text>
         <path class="g-alt" d="M140,110 a14,14 0 1,1 20,0"/>
         <path class="g-alt" d="M320,110 a14,14 0 1,1 20,0"/>
@@ -423,7 +423,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
 <!-- ============================ ID 4 ============================ -->
 <article class="mv" id="id4">
   <header><span class="id">ID 4 · tag 0x264 · fixed node +0xBD</span><h2>Defensive turn</h2></header>
-  <ul class="chips"><li>Trigger <b>threat alert</b>, also in the tournament</li><li>Duration <b>3 s (alert) / 2 s (tournament), +2 s grace</b></li><li>Throttle <b>full</b></li></ul>
+  <ul class="chips"><li>Trigger <b>threat alert</b>, also in the tournament</li><li>Duration <b>3 s (alert) / 2 s (tournament), +2 s grace</b></li><li>Throttle <b>unchanged</b></li></ul>
   <div class="grid2">
     <div>
       <h3>Triggered by an alert</h3>
@@ -440,8 +440,8 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
       <p>Turn side = side of the target relative to my nose. The initial horizontal heading is stored.</p>
       <h3>Sequence (every tick)</h3>
       <ol class="phases">
-        <li><span>1</span><div>Full throttle. Desired bank: 90°, or 60° if too low.</div></li>
-        <li><span>2</span><div>Roll towards that bank (zone 30). Once within 30°: roll (zone 5) and stick pulled fully back.</div></li>
+        <li><span>1</span><div>No throttle command (neither at apply nor in the tick): the throttle keeps its value. Desired bank: 90°, or 60° if too low.</div></li>
+        <li><span>2</span><div>Roll towards that bank (zone 30). Once within 30°: roll (zone 5) and stick pulled fully back. The test is repeated every tick, with no stored phase.</div></li>
         <li><span>3</span><div>When the heading has turned by 90° or more, or the timer has elapsed: attitude +10 (zone 10).</div></li>
       </ol>
       <h3>End</h3>
@@ -459,7 +459,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <circle class="g-tgt" cx="390" cy="70" r="6"/>
         <line class="g-tgtpath" x1="390" y1="70" x2="330" y2="110"/>
         <text class="g-lbl-t" x="400" y="66">threat</text>
-        <text class="g-lbl" x="60" y="190">full throttle</text>
+        <text class="g-lbl" x="60" y="190">throttle unchanged</text>
         <text class="g-lbl" x="60" y="152">90° bank</text>
         <text class="g-lbl" x="60" y="166">(60° if too low)</text>
         <text class="g-lbl" x="60" y="128">stick pulled fully back</text>
@@ -475,7 +475,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
   <div class="check">
     <h3>To check in the tool</h3>
     <ul>
-      <li>Full throttle, bank rising to 90° (60° below terrain + 800 m) towards the target's side.</li>
+      <li>Throttle unchanged, bank rising to 90° (60° below terrain + 800 m) towards the target's side.</li>
       <li>Stick pulled fully back only once the bank is within 30° of the setpoint.</li>
       <li>Ends around 90° of heading or at the end of the timer, after pulling up to +10°.</li>
     </ul>
@@ -734,6 +734,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
         <li><span>3</span><div>Zoom climb at 30° + 30° × (speed − cruise)/min speed, at most 60° (30° if I am below cruise), wings level, full throttle. The timer runs down twice as fast. Phase 4 at the end of the timer, if too slow or if the target comes within 17,700 m.</div></li>
         <li><span>4</span><div>Attitude 0 (zone 5), cruise throttle, then end.</div></li>
       </ol>
+      <p class="bug">Observed on the test bench: phase 1 almost never reaches alignment. It needs both the heading and elevation errors under 0.224° (the game tests for a zero error on angles quantised to 1/256). When the target stays a few degrees below the nose, the pilot only pushes the stick by −16 × (v/10)² (about −1.2 for a 2.8° error); the commanded angle of attack then changes by less than the servo dead zone (0.22°) and the nose stops moving. Phase 1 therefore lasts until the target comes within 17,700 m, and the manoeuvre ends without a zoom climb.</p>
     </div>
     <figure>
       <div class="svgbox">
@@ -762,7 +763,7 @@ pre.tpl { background: var(--panel); border: 1px solid var(--rule); border-radius
     <h3>To check in the tool</h3>
     <ul>
       <li>With a target within 17,700 m, the manoeuvre ends immediately.</li>
-      <li>Otherwise: level turn towards the target, zoom climb between 30° and 60° depending on the excess speed, about 2 s, then levelling-off.</li>
+      <li>Otherwise: level turn towards the target, then usually a long phase 1 that never aligns (stick pushed about −1.2, nose motionless) and an end at 17,700 m. If alignment is reached: zoom climb between 30° and 60° depending on the excess speed, about 2 s, then levelling-off.</li>
     </ul>
   </div>
 </article>

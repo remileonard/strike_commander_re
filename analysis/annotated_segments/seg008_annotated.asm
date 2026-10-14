@@ -1507,7 +1507,16 @@ loc_F390:				; CODE XREF: seg008:0D9Aj seg008:0DDCj
 ; - mon nez) ; manche a fond tire (+16) si mon vecteur haut a le meme signe sur cet axe, sinon
 ; pousse a moitie (-8) ; manche lateral +/-16 selon le cote choisi a l'application (manche >
 ; 3/16 -> 1, < -3/16 -> 0, sinon aleatoire). Jusqu'au minuteur ; vitesse via
-; AI_ManeuverSpeedCmd_ED1E.
+; AI_ManeuverSpeedCmd_ED1E. | PRECISE 2026-10-14 : fin si minuteur +0x0D < 0 OU pas de cible
+; +0x13 (Behavior_PopFinished_75612). Vitesse demandee = norme de la vitesse de la cible
+; (methode +0x4C de +0x13, Math_VectorLength3D_Raw) passee a AI_ManeuverSpeedCmd_ED1E puis
+; AI_ThrottleCmd_HUD. Vecteur memorise lu en +0x26/+0x2A (deux dwords, 3e composante forcee a
+; 0) : mis a 0 a la construction (PilotProfile_ResolveNamedPropertyNode_742FC, cas ID 2 : xor
+; eax,eax / mov es:[bx+2Ah],eax / mov es:[bx+26h],eax) ; aucune ecriture trouvee dans les
+; methodes du noeud (table 0x28C), la classe de base 0x2A0,
+; MVRS_SharedContextSyncAndID2Score_EC22 (qui range le vecteur de contexte en
+; +0x15/+0x19/+0x1D, pas en +0x26) ni la pile de comportements. Le vecteur compare est donc
+; l'oppose du nez.
 ; ==============================================================================================
 MVRS_ID2_TickBreak_F3B6:				; DATA XREF: seg339:0298o
 		push	bp

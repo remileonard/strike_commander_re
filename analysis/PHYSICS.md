@@ -461,8 +461,10 @@ float AoACommand() {
     float T = c, B = c;
     if (n != 0.0f) { T = n * k + c; B = g1 * k + c; }
 
-    // (7) sélection : on garde A s'il est entre T et B (bornes incluses), sinon A = T
-    if (!(A >= std::min(T, B) && A <= std::max(T, B))) A = T;
+    // (7) sélection (loc_48B42, relu 2026-10-14) : on garde A si T est entre A et B (bornes
+    //     incluses), sinon A = T. Au manche neutre T = B : A (l'incidence actuelle) est donc
+    //     TOUJOURS gardée, l'incidence est figée tant que le manche reste au neutre.
+    if (!(T >= std::min(A, B) && T <= std::max(A, B))) A = T;
 
     // (8) borne, avec le gain de dégâts ELEVATOR
     float L = pitch_stick_gain * g_elevator;                      // (si[0x65] << 8) · dword_72A1C
@@ -471,8 +473,12 @@ float AoACommand() {
 ```
 Remarques :
 - `|α|` est calculé (`var_A`) mais **jamais relu** ; `si[0x59]` n'est pas lu.
-- Au neutre en vol (d = 0) : T = B = cos θ · k + c, soit l'incidence qui porte `cos θ` g. Si l'avion
-  vole déjà à cette incidence, `A = α` est gardé → erreur nulle → le manche neutre est stable.
+- Au neutre en vol (d = 0) : T = B, donc la sélection garde toujours A = α (×|cos roulis| si α < 0) :
+  la consigne est l'incidence actuelle, l'erreur est nulle et le manche neutre ne fait rien. En
+  particulier, pendant un tonneau au neutre, une incidence positive reste positive sur le dos : la
+  portance tire alors vers le sol. Corrigé le 2026-10-14 : la version précédente gardait A « s'il est
+  entre T et B », ce qui ne correspond pas à `loc_48B42` (tests `cmp var_2C, var_1A` puis
+  `cmp var_2C, var_28`) ; le portage `SCJetpPlane` était déjà conforme.
 - **Au sol, en décrochage franc, ou sans le bit 4 : A = 0** (et non α). Le bit 4 est posé par défaut
   à la création (`flags_75 = bit4|bit7`).
   Tracé 2026-09-26 : `PhysicsTicks` bascule le bit 4 quand le bit 7 de l'octet de commandes `+0x1C`
