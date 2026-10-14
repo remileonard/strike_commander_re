@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terrain __TITLE__</title>
+<style>
+:root {
+  --bg: #eef2f1; --panel: #ffffff; --fg: #18211f; --muted: #56645f; --rule: #cfd8d5;
+  --accent: #0a6b70; --accent-soft: #d6ecec; --sel: #d1342f;
+  --font: "Segoe UI", Helvetica, Arial, sans-serif; --mono: ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638; --sel: #f07a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638; --sel: #f07a80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 14px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 320px; height: 100vh; overflow: hidden; }
+#map { position: relative; min-width: 0; }
+canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+canvas.drag { cursor: grabbing; }
+#hud { position: absolute; left: 10px; bottom: 10px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 6px 10px; font-family: var(--mono); font-size: 12px; pointer-events: none;
+  white-space: pre; }
+#hud:empty { display: none; }
+#scale { position: absolute; right: 12px; bottom: 12px; background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 4px 8px; font-size: 12px; pointer-events: none; }
+#scale div { height: 4px; background: var(--fg); margin-top: 3px; }
+#zoomctl { position: absolute; right: 12px; top: 12px; display: grid; gap: 4px; }
+#zoomctl button { width: 32px; height: 32px; font-size: 18px; border-radius: 6px; border: 1px solid var(--rule);
+  background: var(--panel); color: var(--fg); cursor: pointer; }
+aside { background: var(--panel); border-left: 1px solid var(--rule); overflow-y: auto; padding: 14px; min-width: 0; }
+h1 { font-size: 18px; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 16px 0 6px; }
+.layers label { display: flex; gap: 6px; align-items: center; margin: 3px 0; }
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li button { all: unset; display: block; width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 6px;
+  cursor: pointer; }
+ul.list li button:hover, ul.list li button:focus-visible { background: var(--accent-soft); }
+ul.list li button.on { background: var(--accent-soft); outline: 2px solid var(--accent); }
+.nm { font-weight: 600; font-family: var(--mono); }
+.meta { color: var(--muted); font-size: 12px; font-family: var(--mono); }
+#detail { margin-top: 10px; font-family: var(--mono); font-size: 12px; white-space: pre-wrap; background: var(--bg);
+  border: 1px solid var(--rule); border-radius: 6px; padding: 8px; }
+.note { color: var(--muted); font-size: 12px; margin-top: 14px; }
+@media (max-width: 720px) {
+  body { grid-template-columns: minmax(0, 1fr); grid-template-rows: 60vh minmax(0, 1fr); }
+  aside { border-left: 0; border-top: 1px solid var(--rule); }
+}
+</style>
+</head>
+<body>
+<div id="map">
+  <canvas id="cv" aria-label="Carte du terrain"></canvas>
+  <div id="zoomctl"><button id="zin" title="Zoom avant">+</button><button id="zout" title="Zoom arrière">−</button><button id="zall" title="Toute la carte">⤢</button></div>
+  <div id="hud"></div>
+  <div id="scale"><span id="scalelbl"></span><div id="scalebar"></div></div>
+</div>
+<aside>
+  <h1 id="title"></h1>
+  <p class="sub">Molette : zoom · glisser : déplacer · double-clic : zoom avant. X vers la droite, Z vers le haut, altitude Y.</p>
+  <h2>Calques</h2>
+  <div class="layers">
+    <label><input type="radio" name="base" value="relief" checked> relief (altitude, ombrage calculé)</label>
+    <label><input type="radio" name="base" value="light"> champ « éclairage » (brut)</label>
+    <label><input type="radio" name="base" value="colour"> champ « couleur » (brut)</label>
+    <label><input type="checkbox" id="showgrid" checked> grille des cellules (20 km)</label>
+    <label><input type="checkbox" id="showlabels" checked> noms des objets</label>
+  </div>
+  <h2>Pistes (.TRI)</h2>
+  <ul class="list" id="runways"></ul>
+  <h2>Objets posés</h2>
+  <ul class="list" id="objects"></ul>
+  <div id="detail">Clique un élément pour centrer la carte dessus.</div>
+  <p class="note">Couleurs du relief arbitraires (la palette du jeu n'est pas lue). Les enregistrements d'objets ne sont pas dans DATA_MODEL : leur disposition est un constat sur le fichier.</p>
+</aside>
+<script>
+const D = /*__DATA__*/null;
+(function () {
+  "use strict";
+  const N = D.side, SP = D.spacing, HALF = D.grid * D.cellSize / 2;
+  const dec = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+  const hb = dec(D.height);
+  const H = new Int16Array(hb.buffer, hb.byteOffset, N * N);
+  const L = dec(D.light), C = dec(D.colour);
+  document.getElementById("title").textContent = D.name;
+
+  // --- calques de fond (1 pixel = 1 sommet) ---
+  const stops = [[0, [40, 90, 160]], [1, [70, 140, 80]], [600, [120, 160, 80]], [1500, [170, 150, 100]],
+                 [2500, [140, 110, 90]], [3200, [235, 235, 235]]];
+  function hypso(h) {
+    if (h <= 0) return stops[0][1];
+    for (let k = 0; k < stops.length - 1; k++) {
+      const [h0, c0] = stops[k], [h1, c1] = stops[k + 1];
+      if (h <= h1) { const t = (h - h0) / (h1 - h0); return c0.map((a, i) => a + (c1[i] - a) * t); }
+    }
+    return stops[stops.length - 1][1];
+  }
+  const colourPal = {};
+  function palFor(v) {
+    if (!(v in colourPal)) { const hue = (v * 67) % 360; colourPal[v] = hsl(hue, 55, 55); }
+    return colourPal[v];
+  }
+  function hsl(h, s, l) {
+    s /= 100; l /= 100;
+    const k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [f(0) * 255, f(8) * 255, f(4) * 255];
+  }
+  function makeLayer(fn) {
+    const c = document.createElement("canvas"); c.width = N; c.height = N;
+    const g = c.getContext("2d"), img = g.createImageData(N, N);
+    for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
+      const [r, gg, b] = fn(i, j), p = 4 * (i * N + j);
+      img.data[p] = r; img.data[p + 1] = gg; img.data[p + 2] = b; img.data[p + 3] = 255;
+    }
+    g.putImageData(img, 0, 0); return c;
+  }
+  const at = (i, j) => H[Math.max(0, Math.min(N - 1, i)) * N + Math.max(0, Math.min(N - 1, j))];
+  const layers = {
+    relief: makeLayer((i, j) => {
+      const dx = (at(i, j + 1) - at(i, j - 1)) / (2 * SP), dz = (at(i + 1, j) - at(i - 1, j)) / (2 * SP);
+      const sh = Math.max(0.35, Math.min(1.25, 1 - 1.6 * (dx + dz)));
+      return hypso(H[i * N + j]).map((v) => Math.min(255, v * sh));
+    }),
+    light: makeLayer((i, j) => { const v = L[i * N + j]; return [v, v, v]; }),
+    colour: makeLayer((i, j) => palFor(C[i * N + j])),
+  };
+  let base = "relief";
+
+  // --- vue ---
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  let W = 0, Hh = 0, dpr = 1;
+  const view = { cx: 0, cz: 0, s: 1 };          // centre (m) et échelle (px écran par m)
+  let selected = null;
+  function fitAll() { view.cx = 0; view.cz = 0; view.s = Math.min(W, Hh) / (2 * HALF) * 0.98; }
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    const r = cv.getBoundingClientRect(); W = r.width; Hh = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(Hh * dpr);
+    draw();
+  }
+  const sx = (x) => (x - view.cx) * view.s + W / 2;
+  const sy = (z) => (view.cz - z) * view.s + Hh / 2;
+  const wx = (px) => (px - W / 2) / view.s + view.cx;
+  const wz = (py) => view.cz - (py - Hh / 2) / view.s;
+
+  function draw() {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--bg");
+    ctx.fillRect(0, 0, W, Hh);
+    ctx.imageSmoothingEnabled = view.s * SP < 2;
+    // sommet j à X = −HALF + j·SP : le pixel j couvre [X, X + SP]
+    ctx.drawImage(layers[base], sx(-HALF), sy(HALF), 2 * HALF * view.s, 2 * HALF * view.s);
+    if (document.getElementById("showgrid").checked) drawGrid();
+    D.runways.forEach((r, k) => drawRunway(r, selected && selected.kind === "r" && selected.k === k));
+    D.objects.forEach((o, k) => drawObject(o, selected && selected.kind === "o" && selected.k === k));
+    updateScale();
+  }
+  function drawGrid() {
+    ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.lineWidth = 1; ctx.beginPath();
+    for (let q = 0; q <= D.grid; q++) {
+      const v = -HALF + q * D.cellSize;
+      ctx.moveTo(sx(v), sy(HALF)); ctx.lineTo(sx(v), sy(-HALF));
+      ctx.moveTo(sx(-HALF), sy(v)); ctx.lineTo(sx(HALF), sy(v));
+    }
+    ctx.stroke();
+    if (D.cellSize * view.s > 70) {
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.font = "11px sans-serif";
+      for (let row = 0; row < D.grid; row++) for (let col = 0; col < D.grid; col++) {
+        const x = sx(-HALF + col * D.cellSize) + 3, y = sy(HALF - row * D.cellSize) + 12;
+        if (x > -60 && x < W && y > 0 && y < Hh + 20) ctx.fillText("case " + (row * D.grid + col), x, y);
+      }
+    }
+  }
+  function runwayColour(c, l) {
+    const k = 0.45 + 0.55 * l / 255;
+    const b = c === 255 ? [150, 150, 150] : hsl((c * 47) % 360, 55, 60);
+    return `rgb(${b.map((v) => Math.round(v * k)).join(",")})`;
+  }
+  function drawRunway(r, on) {
+    let x0 = Infinity, x1 = -Infinity, z0 = Infinity, z1 = -Infinity;
+    r.v.forEach(([x, z]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); z0 = Math.min(z0, z); z1 = Math.max(z1, z); });
+    const big = Math.max(x1 - x0, z1 - z0) * view.s;
+    if (big > 30) {
+      for (const [a, b, c, col] of r.t) {
+        ctx.beginPath();
+        ctx.moveTo(sx(r.v[a][0]), sy(r.v[a][1])); ctx.lineTo(sx(r.v[b][0]), sy(r.v[b][1])); ctx.lineTo(sx(r.v[c][0]), sy(r.v[c][1]));
+        ctx.closePath();
+        ctx.fillStyle = runwayColour(col, (r.light[a] + r.light[b] + r.light[c]) / 3); ctx.fill();
+        if (big > 1500) { ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.lineWidth = 0.5; ctx.stroke(); }
+      }
+    }
+    // repère toujours visible
+    const cx = sx((x0 + x1) / 2), cy = sy((z0 + z1) / 2);
+    ctx.strokeStyle = on ? cssVar("--sel") : "#c0392b"; ctx.lineWidth = on ? 3 : 2;
+    ctx.strokeRect(Math.min(sx(x0), cx - 5) - 2, Math.min(sy(z1), cy - 5) - 2,
+                   Math.max(sx(x1) - sx(x0), 10) + 4, Math.max(sy(z0) - sy(z1), 10) + 4);
+  }
+  function drawObject(o, on) {
+    const x = sx(o.x), y = sy(o.z);
+    ctx.beginPath(); ctx.arc(x, y, on ? 6 : 4, 0, 2 * Math.PI);
+    ctx.fillStyle = on ? cssVar("--sel") : "#ffd23f"; ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 1; ctx.stroke();
+    if (document.getElementById("showlabels").checked && view.s > 0.05) {
+      ctx.font = (on ? "bold " : "") + "12px sans-serif"; ctx.lineWidth = 3; ctx.lineJoin = "round"; ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.strokeText(o.name, x + 7, y - 6); ctx.fillStyle = "#111"; ctx.fillText(o.name, x + 7, y - 6);
+    }
+  }
+  const cssVar = (n) => getComputedStyle(document.body).getPropertyValue(n).trim();
+  function updateScale() {
+    const target = 120 / view.s; const p = Math.pow(10, Math.floor(Math.log10(target)));
+    const m = [1, 2, 5, 10].map((k) => k * p).filter((v) => v <= target).pop();
+    document.getElementById("scalebar").style.width = (m * view.s) + "px";
+    document.getElementById("scalelbl").textContent = m >= 1000 ? (m / 1000) + " km" : m + " m";
+  }
+
+  // --- souris ---
+  function zoomAt(px, py, f) {
+    const x = wx(px), z = wz(py);
+    view.s = Math.max(Math.min(W, Hh) / (4 * HALF), Math.min(50, view.s * f));
+    view.cx = x - (px - W / 2) / view.s; view.cz = z + (py - Hh / 2) / view.s;
+    draw();
+  }
+  cv.addEventListener("wheel", (e) => { e.preventDefault(); zoomAt(e.offsetX, e.offsetY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
+  let drag = null;
+  cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, cx: view.cx, cz: view.cz }; cv.setPointerCapture(e.pointerId); cv.classList.add("drag"); });
+  cv.addEventListener("pointermove", (e) => {
+    if (drag) { view.cx = drag.cx - (e.clientX - drag.x) / view.s; view.cz = drag.cz + (e.clientY - drag.y) / view.s; draw(); }
+    hud(e.offsetX, e.offsetY);
+  });
+  const endDrag = () => { drag = null; cv.classList.remove("drag"); };
+  cv.addEventListener("pointerup", endDrag);
+  cv.addEventListener("pointerleave", () => { document.getElementById("hud").textContent = ""; }); cv.addEventListener("pointercancel", endDrag);
+  cv.addEventListener("dblclick", (e) => zoomAt(e.offsetX, e.offsetY, 2.5));
+  document.getElementById("zin").onclick = () => zoomAt(W / 2, Hh / 2, 2);
+  document.getElementById("zout").onclick = () => zoomAt(W / 2, Hh / 2, 0.5);
+  document.getElementById("zall").onclick = () => { fitAll(); draw(); };
+  function hud(px, py) {
+    const x = wx(px), z = wz(py);
+    const j = Math.floor((x + HALF) / SP), i = Math.floor((HALF - z) / SP);
+    let s = `X ${x.toFixed(0)} m   Z ${z.toFixed(0)} m`;
+    if (i >= 0 && j >= 0 && i < N && j < N) {
+      const cell = Math.floor(i / (N / D.grid)) * D.grid + Math.floor(j / (N / D.grid));
+      s += `\nsol Y ${H[i * N + j]} m   case ${cell}\néclairage ${L[i * N + j]}   couleur ${C[i * N + j]}`;
+    }
+    document.getElementById("hud").textContent = s;
+  }
+
+  // --- panneau ---
+  function animateTo(cx, cz, s) {
+    const a = { ...view }, t0 = performance.now(), dur = 600;
+    const la = Math.log(a.s), lb = Math.log(s);
+    (function step(t) {
+      const u = Math.min(1, (t - t0) / dur), e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+      view.cx = a.cx + (cx - a.cx) * e; view.cz = a.cz + (cz - a.cz) * e; view.s = Math.exp(la + (lb - la) * e);
+      draw(); if (u < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+  const fmt = (v) => v.toFixed(0);
+  function select(kind, k, btn) {
+    selected = { kind, k };
+    document.querySelectorAll("ul.list button").forEach((b) => b.classList.toggle("on", b === btn));
+    const det = document.getElementById("detail");
+    if (kind === "r") {
+      const r = D.runways[k];
+      const xs = r.v.map((v) => v[0]), zs = r.v.map((v) => v[1]);
+      const x0 = Math.min(...xs), x1 = Math.max(...xs), z0 = Math.min(...zs), z1 = Math.max(...zs);
+      det.textContent = `piste — case ${r.cell}\n${r.v.length} sommets, ${r.t.length} triangles\nX ${fmt(x0)} … ${fmt(x1)} m\nZ ${fmt(z0)} … ${fmt(z1)} m\nY ${r.y} m`;
+      animateTo((x0 + x1) / 2, (z0 + z1) / 2, Math.min(W, Hh) * 0.8 / Math.max(x1 - x0, z1 - z0));
+    } else {
+      const o = D.objects[k], m = o.m.map((v) => v.toFixed(2).padStart(5));
+      det.textContent = `${o.name} — case ${o.cell}\nsecond nom : ${o.name2}\nX ${o.x.toFixed(1)} m\nZ ${o.z.toFixed(1)} m\nY ${o.y.toFixed(1)} m\nmatrice :\n ${m.slice(0, 3).join(" ")}\n ${m.slice(3, 6).join(" ")}\n ${m.slice(6).join(" ")}`;
+      animateTo(o.x, o.z, Math.max(view.s, 0.8));
+    }
+  }
+  function item(list, kind, k, name, meta) {
+    const li = document.createElement("li"), b = document.createElement("button");
+    b.innerHTML = `<div class="nm"></div><div class="meta"></div>`;
+    b.querySelector(".nm").textContent = name; b.querySelector(".meta").textContent = meta;
+    b.onclick = () => select(kind, k, b); li.appendChild(b); list.appendChild(li);
+  }
+  D.runways.forEach((r, k) => {
+    const xs = r.v.map((v) => v[0]), zs = r.v.map((v) => v[1]);
+    const lx = Math.max(...xs) - Math.min(...xs), lz = Math.max(...zs) - Math.min(...zs);
+    item(document.getElementById("runways"), "r", k, `piste ${k + 1} · case ${r.cell}`,
+         `${fmt(Math.max(lx, lz))} × ${fmt(Math.min(lx, lz))} m · Y ${r.y} m · axe ${lx > lz ? "X" : "Z"}`);
+  });
+  D.objects.forEach((o, k) => item(document.getElementById("objects"), "o", k, o.name,
+    `case ${o.cell} · X ${fmt(o.x)} Z ${fmt(o.z)} Y ${fmt(o.y)}`));
+  document.querySelectorAll('input[name="base"]').forEach((r) => r.onchange = () => { base = r.value; draw(); });
+  document.getElementById("showgrid").onchange = draw;
+  document.getElementById("showlabels").onchange = draw;
+  window.addEventListener("resize", resize);
+  resize(); fitAll(); draw();
+})();
+</script>
+</body>
+</html>
