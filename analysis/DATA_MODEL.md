@@ -2424,6 +2424,14 @@ modèle de piste réinstancié), seul l'octet `type` diffère. Le parseur géné
 > chunk distinct (candidat : `OBJS` → `<théâtre>.OBJ`), soit format spécifique à un
 > théâtre. Les bâtiments eux-mêmes restent des `OBJECTS\*.IFF` (§6.1).
 
+#### 6.8ter Lumières `WRLD/LGHT` (lu 2026-10-14)
+
+Lecteur : `MissionLoader_LoadPosition_A7A10` (nom trompeur), objet jeu de lumières `5A9Ah` (fonctions de seg058, toutes à noms trompeurs « ProgressBar_* » / « ListItem_* »).
+- Chunk : `uint16` poids ambiant ; `uint16` pourcentage (borné à 100, puis × 255 ÷ 100, puis passé à une fonction qui borne encore à 100 : un pourcentage ≥ 40 donne une intensité de 1,0) ; puis enregistrements de 10 o jusqu'à la fin : `uint16` poids, 3 `int16` direction (ordre fichier X, Z, Y ; libRS : `x = c0`, `y = c2`, `z = c1`), `uint8` normaliser (≠ 0 → longueur 1), 1 octet non référencé par le lecteur.
+- Parts : total = poids ambiant + Σ poids ; part d'une lumière = poids × intensité ÷ total ; part ambiante = poids ambiant × intensité ÷ total.
+- **Usage : modèles 3D uniquement** dans ce qui a été lu. `Render_FaceDotProductTest`, appelée par `Mesh_FacePrepareIndirect` : intensité de la face = part ambiante + max(0, normale · direction de la **première** lumière) × sa part, bornée à 255. C'est un éclairage directionnel calculé à l'exécution. Le terrain, lui, prend l'octet d'éclairage précalculé de ses sommets (§6.8, « Couleur affichée »).
+- Non établi : le repère de la normale au moment du produit (monde ou objet), et l'usage des lumières au-delà de la première.
+
 ### 6.9 Config & sauvegarde
 
 - `Config_LoadOrCreate_26F2B` (seg047) + `Config_LoadAndApplySettings_8EEBC`

@@ -1155,7 +1155,27 @@ position = offset                    otherwise (absolute coordinates)</pre>
   <header><span class="id">FORM WRLD</span><h2>The world</h2></header>
   <ul class="chips"><li>file <b>MISSIONS\&lt;FILE&gt;.IFF</b></li><li>reader <b>MissionLoader_LoadEntitiesMain_A767F</b></li></ul>
   <p>The mission's <code>WRLD/FILE</code> chunk gives the name of the world (e.g. <code>MAURITAN</code>), stored in the same folder as the mission.</p>
-  <div class="treebox"><ul class="tree"><li><span class="t form">FORM WRLD</span> <span class="d">root of the MISSIONS\&lt;world&gt;.IFF file</span><ul><li><span class="t chunk">INFO</span> <span class="d">uint16: metadata</span></li><li><span class="t chunk">PALT</span> <span class="d">palette name → DATA\PALETTE.IFF</span></li><li><a href="#terrain"><span class="t chunk">TERA</span></a> <span class="d">terrain name → DATA\&lt;name&gt;.PAK</span></li><li><span class="t chunk">SKYS</span> <span class="d">sky and sun</span></li><li><span class="t chunk">GLNT</span> <span class="d">sun glints</span></li><li><a href="#fumees"><span class="t chunk">SMOK</span></a> <span class="d">smoke set name → OBJECTS\&lt;name&gt;.IFF</span></li><li><span class="t chunk">LGHT</span> <span class="d">lighting (14 bytes)</span></li><li><span class="t chunk">HORZ</span> <span class="o">optional</span> <span class="d">horizon: 2 uint32</span></li><li><span class="t chunk">SCAL</span> <span class="o">optional</span> <span class="d">world scale: uint32</span></li><li><a href="#camr"><span class="t form">FORM CAMR</span></a> <span class="d">scripted cameras</span><ul><li><a href="#camr"><span class="t chunk">STRT</span></a> <span class="d">camera set name</span></li><li><a href="#camr"><span class="t chunk">CHAS / CKPT / VICT / TARG / WEAP / ROTA</span></a> <span class="d">one camera each</span></li><li><a href="#camr"><span class="t chunk">COMP</span></a> <span class="d">scripted sequence (STARTCAM, TAKEOFF…)</span></li></ul></li></ul></li></ul></div>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM WRLD</span> <span class="d">root of the MISSIONS\&lt;world&gt;.IFF file</span><ul><li><span class="t chunk">INFO</span> <span class="d">uint16: metadata</span></li><li><span class="t chunk">PALT</span> <span class="d">palette name → DATA\PALETTE.IFF</span></li><li><a href="#terrain"><span class="t chunk">TERA</span></a> <span class="d">terrain name → DATA\&lt;name&gt;.PAK</span></li><li><span class="t chunk">SKYS</span> <span class="d">sky and sun</span></li><li><span class="t chunk">GLNT</span> <span class="d">sun glints</span></li><li><a href="#fumees"><span class="t chunk">SMOK</span></a> <span class="d">smoke set name → OBJECTS\&lt;name&gt;.IFF</span></li><li><span class="t chunk">LGHT</span> <span class="d">lights: ambient and directional (table below)</span></li><li><span class="t chunk">HORZ</span> <span class="o">optional</span> <span class="d">horizon: 2 uint32</span></li><li><span class="t chunk">SCAL</span> <span class="o">optional</span> <span class="d">world scale: uint32</span></li><li><a href="#camr"><span class="t form">FORM CAMR</span></a> <span class="d">scripted cameras</span><ul><li><a href="#camr"><span class="t chunk">STRT</span></a> <span class="d">camera set name</span></li><li><a href="#camr"><span class="t chunk">CHAS / CKPT / VICT / TARG / WEAP / ROTA</span></a> <span class="d">one camera each</span></li><li><a href="#camr"><span class="t chunk">COMP</span></a> <span class="d">scripted sequence (STARTCAM, TAKEOFF…)</span></li></ul></li></ul></li></ul></div>
+  <h3>LGHT: the lights (4 bytes, then 10 bytes per light)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>ambient weight</td><td>uint16</td><td class="num">2</td><td>share of the ambient light, compared with the lights' weights</td></tr>
+      <tr><td>intensity</td><td>uint16</td><td class="num">2</td><td>percentage, clamped to 100</td></tr>
+      <tr><td>lights</td><td>10&nbsp;bytes&nbsp;each</td><td class="num">10 × n</td><td>up to the end of the chunk (next table)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>weight</td><td>uint16</td><td class="num">2</td><td>share of this light</td></tr>
+      <tr><td>direction X</td><td>int16</td><td class="num">2</td><td>integer as is</td></tr>
+      <tr><td>direction Z</td><td>int16</td><td class="num">2</td><td>integer as is (depth)</td></tr>
+      <tr><td>direction Y</td><td>int16</td><td class="num">2</td><td>integer as is (vertical)</td></tr>
+      <tr><td>normalise</td><td>uint8</td><td class="num">1</td><td>≠ 0: the vector is brought to a length of 1 on loading</td></tr>
+      <tr><td>value 1</td><td>uint8</td><td class="num">1</td><td>read with the record; role not established</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ FUMEES ============================ -->

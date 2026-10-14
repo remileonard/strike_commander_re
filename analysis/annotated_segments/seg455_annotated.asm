@@ -550,9 +550,13 @@ MissionLoader_LoadFormation_A78F5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 145 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743,
-; ReadFieldGroupB_64A54, sub_2B24F, sub_2B228, ReadFieldGroupA_64A19, sub_2B2DB — chargement
-; de champs de position (coordonnées) d'une entité de mission.
+; far, LUE 2026-10-14. NOM TROMPEUR : LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par
+; World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant →
+; ProgressBar_UpdateValue (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 →
+; ProgressBar_PercentToFixed (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ;
+; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<<
+; 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici →
+; ListItem_ConstructComplex. Nom proposé : World_LoadLGHTChunk_A7A10.
 ; ==============================================================================================
 MissionLoader_LoadPosition_A7A10	proc far		; CODE XREF: VROOMM_StubThunk_6CDB4J World_ParseWrldForm_A767F+123p
 

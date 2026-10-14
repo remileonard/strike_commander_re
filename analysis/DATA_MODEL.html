@@ -1155,7 +1155,27 @@ position = décalage                         sinon (coordonnées absolues)</pre>
   <header><span class="id">FORM WRLD</span><h2>Le monde</h2></header>
   <ul class="chips"><li>fichier <b>MISSIONS\&lt;FILE&gt;.IFF</b></li><li>lecteur <b>MissionLoader_LoadEntitiesMain_A767F</b></li></ul>
   <p>Le chunk <code>WRLD/FILE</code> de la mission donne le nom du monde (ex. <code>MAURITAN</code>), rangé dans le même dossier que la mission.</p>
-  <div class="treebox"><ul class="tree"><li><span class="t form">FORM WRLD</span> <span class="d">racine du fichier MISSIONS\&lt;monde&gt;.IFF</span><ul><li><span class="t chunk">INFO</span> <span class="d">uint16 : métadonnées</span></li><li><span class="t chunk">PALT</span> <span class="d">nom de la palette → DATA\PALETTE.IFF</span></li><li><a href="#terrain"><span class="t chunk">TERA</span></a> <span class="d">nom du terrain → DATA\&lt;nom&gt;.PAK</span></li><li><span class="t chunk">SKYS</span> <span class="d">ciel et soleil</span></li><li><span class="t chunk">GLNT</span> <span class="d">reflets du soleil</span></li><li><a href="#fumees"><span class="t chunk">SMOK</span></a> <span class="d">nom du jeu de fumées → OBJECTS\&lt;nom&gt;.IFF</span></li><li><span class="t chunk">LGHT</span> <span class="d">éclairage (14 octets)</span></li><li><span class="t chunk">HORZ</span> <span class="o">facultatif</span> <span class="d">horizon : 2 uint32</span></li><li><span class="t chunk">SCAL</span> <span class="o">facultatif</span> <span class="d">échelle du monde : uint32</span></li><li><a href="#camr"><span class="t form">FORM CAMR</span></a> <span class="d">caméras scriptées</span><ul><li><a href="#camr"><span class="t chunk">STRT</span></a> <span class="d">nom du jeu de caméras</span></li><li><a href="#camr"><span class="t chunk">CHAS / CKPT / VICT / TARG / WEAP / ROTA</span></a> <span class="d">une caméra chacun</span></li><li><a href="#camr"><span class="t chunk">COMP</span></a> <span class="d">séquence scriptée (STARTCAM, TAKEOFF…)</span></li></ul></li></ul></li></ul></div>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM WRLD</span> <span class="d">racine du fichier MISSIONS\&lt;monde&gt;.IFF</span><ul><li><span class="t chunk">INFO</span> <span class="d">uint16 : métadonnées</span></li><li><span class="t chunk">PALT</span> <span class="d">nom de la palette → DATA\PALETTE.IFF</span></li><li><a href="#terrain"><span class="t chunk">TERA</span></a> <span class="d">nom du terrain → DATA\&lt;nom&gt;.PAK</span></li><li><span class="t chunk">SKYS</span> <span class="d">ciel et soleil</span></li><li><span class="t chunk">GLNT</span> <span class="d">reflets du soleil</span></li><li><a href="#fumees"><span class="t chunk">SMOK</span></a> <span class="d">nom du jeu de fumées → OBJECTS\&lt;nom&gt;.IFF</span></li><li><span class="t chunk">LGHT</span> <span class="d">lumières : ambiante et directionnelles (tableau ci-dessous)</span></li><li><span class="t chunk">HORZ</span> <span class="o">facultatif</span> <span class="d">horizon : 2 uint32</span></li><li><span class="t chunk">SCAL</span> <span class="o">facultatif</span> <span class="d">échelle du monde : uint32</span></li><li><a href="#camr"><span class="t form">FORM CAMR</span></a> <span class="d">caméras scriptées</span><ul><li><a href="#camr"><span class="t chunk">STRT</span></a> <span class="d">nom du jeu de caméras</span></li><li><a href="#camr"><span class="t chunk">CHAS / CKPT / VICT / TARG / WEAP / ROTA</span></a> <span class="d">une caméra chacun</span></li><li><a href="#camr"><span class="t chunk">COMP</span></a> <span class="d">séquence scriptée (STARTCAM, TAKEOFF…)</span></li></ul></li></ul></li></ul></div>
+  <h3>LGHT : les lumières (4 octets, puis 10 octets par lumière)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>poids ambiant</td><td>uint16</td><td class="num">2</td><td>part de la lumière ambiante, comparée aux poids des lumières</td></tr>
+      <tr><td>intensité</td><td>uint16</td><td class="num">2</td><td>pourcentage, borné à 100</td></tr>
+      <tr><td>lumières</td><td>10&nbsp;octets&nbsp;chacune</td><td class="num">10 × n</td><td>jusqu'à la fin du chunk (tableau suivant)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>poids</td><td>uint16</td><td class="num">2</td><td>part de cette lumière</td></tr>
+      <tr><td>direction X</td><td>int16</td><td class="num">2</td><td>entier tel quel</td></tr>
+      <tr><td>direction Z</td><td>int16</td><td class="num">2</td><td>entier tel quel (profondeur)</td></tr>
+      <tr><td>direction Y</td><td>int16</td><td class="num">2</td><td>entier tel quel (vertical)</td></tr>
+      <tr><td>normaliser</td><td>uint8</td><td class="num">1</td><td>≠ 0 : le vecteur est ramené à une longueur de 1 au chargement</td></tr>
+      <tr><td>valeur 1</td><td>uint8</td><td class="num">1</td><td>lue avec l'enregistrement ; rôle non établi</td></tr>
+    </tbody>
+  </table></div>
 </article>
 
 <!-- ============================ FUMEES ============================ -->

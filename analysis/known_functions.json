@@ -587,7 +587,7 @@
   "sub_2B2DB": {
     "new_name": "ListItem_ConstructComplex",
     "segment": "seg058",
-    "summary": "far,85L — construit un élément complexe (17 octets : 3 valeurs 32-bit + 1 flag) : **construction d'un élément de liste multi-paramètres (probable ligne de statistiques/résultats de mission).**"
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via ListItem_ConstructThreeParams, puis ListItem_AddNumberedLimited). Nom proposé : LightSet_AddLight_2B2DB."
   },
   "sub_A0C78": {
     "new_name": "PlayerComponent_SubHelperBB_A0C78",
@@ -787,7 +787,7 @@
   "sub_2B0F2": {
     "new_name": "ListItem_ConstructThreeParams",
     "segment": "seg058",
-    "summary": "far,55L — construit un élément avec 3 valeurs 32-bit (arg_4/8/C) et un flag, appelle sub_55E65 (probable formatage type sprintf) : **construction d'un élément de liste avec 3 paramètres numériques formatés.**"
+    "summary": "far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids. Nom proposé : Light_Construct_2B0F2."
   },
   "sub_67517": {
     "new_name": "HandlerRegistry4Slot_Register_67517",
@@ -3077,7 +3077,7 @@
   "sub_2B191": {
     "new_name": "ProgressBar_InitFull",
     "segment": "seg058",
-    "summary": "far,20L — initialise un champ (+6=1, +7=0) puis appelle sub_2B228(100) : **initialisation d'une barre de progression à 100%.**"
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant 0, intensité 100 %. Appelée par seg112. Nom proposé : LightSet_Init_2B191."
   },
   "sub_3314B": {
     "new_name": "TerrainTile_ListConstruct",
@@ -11122,7 +11122,7 @@
   "sub_2B266": {
     "new_name": "ListItem_AddNumberedLimited",
     "segment": "seg058",
-    "summary": "far,73L — construit un élément numérique (type 0x1786, valeur arg_2), l'ajoute à la liste (sub_5F57F) ; compte les éléments (sub_5F6D5) et court-circuite si ≤1 : **ajout d'un élément numéroté à une liste avec limite.**"
+    "summary": "far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0 si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_InsertLight_2B266."
   },
   "sub_6BE29": {
     "new_name": "VROOMM_StubThunk_6BE29",
@@ -11827,7 +11827,7 @@
   "sub_2B49F": {
     "new_name": "ProgressBar_WeightedSum",
     "segment": "seg058",
-    "summary": "far,93L — parcourt une liste, accumule une somme pondérée (poids ×valeur par élément, +9 comme diviseur commun) : **calcul de moyenne/somme pondérée sur une liste (barre de progression agrégée, ex: chargement multi-fichiers).**"
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Nom proposé : LightSet_RecomputeShares_2B49F."
   },
   "sub_43013": {
     "new_name": "Targeting_FilterByWeaponType",
@@ -12222,7 +12222,7 @@
   "sub_2B24F": {
     "new_name": "ProgressBar_UpdateValue",
     "segment": "seg058",
-    "summary": "far,22L — stocke une valeur (+7) puis appelle sub_2B49F (recalcul) : **mise à jour de la valeur affichée d'une barre de progression.**"
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis recalcule les parts (ProgressBar_WeightedSum). Nom proposé : LightSet_SetAmbientWeight_2B24F."
   },
   "sub_6CFBE": {
     "new_name": "VROOMM_StubThunk_6CFBE",
@@ -14042,7 +14042,7 @@
   "sub_A7A10": {
     "new_name": "MissionLoader_LoadPosition_A7A10",
     "segment": "seg455",
-    "summary": "⚠️ far, 145 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743, ReadFieldGroupB_64A54, sub_2B24F, sub_2B228, ReadFieldGroupA_64A19, sub_2B2DB — chargement de champs de position (coordonnées) d'une entité de mission."
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : LECTEUR DU CHUNK 'LGHT' du FORM WRLD (appelé par World_ParseWrldForm_A767F), objet jeu de lumières 5A9Ah. uint16 poids ambiant → ProgressBar_UpdateValue (+7) ; uint16 pourcentage, borné à 100 puis × 255 ÷ 100 → ProgressBar_PercentToFixed (+9 ; ce dernier borne à son tour à 100 : ≥ 40 % donne 1,0) ; puis jusqu'à la fin du chunk, enregistrements de 10 o : uint16 poids, 3 int16 direction (<< 8 ; ordre fichier X, Z, Y), uint8 normaliser, 1 octet non référencé ici → ListItem_ConstructComplex. Nom proposé : World_LoadLGHTChunk_A7A10."
   },
   "sub_6707C": {
     "new_name": "TextScroll_Helper_6707C",
@@ -17852,7 +17852,7 @@
   "sub_2B228": {
     "new_name": "ProgressBar_PercentToFixed",
     "segment": "seg058",
-    "summary": "far,34L — convertit un pourcentage (borné à 100) en valeur fixed-point 8-bit (×256/100), stockée à +9 : **calcul de remplissage d'une barre de progression (%→pixels).**"
+    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — intensité globale +9 = pourcentage × 256 ÷ 100, ou 256 (1,0) au-delà de 100. Nom proposé : LightSet_SetIntensityPercent_2B228."
   },
   "sub_55ED8": {
     "new_name": "Math_VectorLength3D_Scaled_Variant_55ED8",
@@ -17982,7 +17982,7 @@
   "sub_2B54A": {
     "new_name": "Render_FaceDotProductTest",
     "segment": "seg058",
-    "summary": "far,73L — calcule le produit scalaire de deux vecteurs 3D (di·bx), le compare à 0 : **test d'orientation de face (dot product normale·direction) pour éclairage ou backface culling — utilisé par sub_29A7D (préparation de face triangulaire).**"
+    "summary": "far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face). Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Nom proposé : LightSet_FaceIntensity_2B54A."
   },
   "sub_55A9E": {
     "new_name": "UI_ApplyLineOfSightCheck_55A9E",

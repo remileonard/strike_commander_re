@@ -30,9 +30,9 @@ Value_IdAccessor	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,55L — construit un élément avec 3 valeurs 32-bit (arg_4/8/C) et un flag, appelle
-; sub_55E65 (probable formatage type sprintf) : construction d'un élément de liste avec 3
-; paramètres numériques formatés.
+; far, LUE 2026-10-14. CONSTRUIT UNE LUMIÈRE (17 o) : +0 drapeau normaliser, +1 vecteur
+; direction (3 dd, normalisé par Vector_NormalizeInPlace_5593A si drapeau ≠ 0), +0Dh poids.
+; Nom proposé : Light_Construct_2B0F2.
 ; ==============================================================================================
 ListItem_ConstructThreeParams	proc far		; CODE XREF: ListItem_ConstructComplex:loc_2B342p
 
@@ -152,8 +152,8 @@ ListItem_ConstructVector3D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,20L — initialise un champ (+6=1, +7=0) puis appelle sub_2B228(100) : initialisation
-; d'une barre de progression à 100%.
+; far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — initialisation : +6 = 1, poids ambiant
+; 0, intensité 100 %. Appelée par seg112. Nom proposé : LightSet_Init_2B191.
 ; ==============================================================================================
 ProgressBar_InitFull	proc far		; CODE XREF: seg112:0CC4P
 
@@ -278,8 +278,8 @@ Collection_Destruct	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,34L — convertit un pourcentage (borné à 100) en valeur fixed-point 8-bit (×256/100),
-; stockée à +9 : calcul de remplissage d'une barre de progression (%→pixels).
+; far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — intensité globale +9 = pourcentage ×
+; 256 ÷ 100, ou 256 (1,0) au-delà de 100. Nom proposé : LightSet_SetIntensityPercent_2B228.
 ; ==============================================================================================
 ProgressBar_PercentToFixed	proc far		; CODE XREF: ProgressBar_InitFull+15p
 					; MissionLoader_LoadPosition_A7A10:loc_A7A78P
@@ -322,8 +322,9 @@ ProgressBar_PercentToFixed	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,22L — stocke une valeur (+7) puis appelle sub_2B49F (recalcul) : mise à jour de la
-; valeur affichée d'une barre de progression.
+; far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — fixe le poids ambiant (+7) puis
+; recalcule les parts (ProgressBar_WeightedSum). Nom proposé :
+; LightSet_SetAmbientWeight_2B24F.
 ; ==============================================================================================
 ProgressBar_UpdateValue	proc far		; CODE XREF: MissionLoader_LoadPosition_A7A10+31P
 
@@ -354,9 +355,9 @@ ProgressBar_UpdateValue	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,73L — construit un élément numérique (type 0x1786, valeur arg_2), l'ajoute à la liste
-; (sub_5F57F) ; compte les éléments (sub_5F6D5) et court-circuite si ≤1 : ajout d'un élément
-; numéroté à une liste avec limite.
+; far, LUE 2026-10-14. AJOUTE la lumière à la liste du jeu de lumières (nœud 6 o), met +6 à 0
+; si la liste a plus d'une lumière ou si le drapeau de la lumière est nul, puis recalcule les
+; parts (ProgressBar_WeightedSum). Nom proposé : LightSet_InsertLight_2B266.
 ; ==============================================================================================
 ListItem_AddNumberedLimited	proc far		; CODE XREF: ListItem_ConstructComplex+79p
 					; seg058:02DCp
@@ -438,9 +439,9 @@ ListItem_AddNumberedLimited	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,85L — construit un élément complexe (17 octets : 3 valeurs 32-bit + 1 flag) :
-; construction d'un élément de liste multi-paramètres (probable ligne de
-; statistiques/résultats de mission).
+; far, LUE 2026-10-14. NOM TROMPEUR : AJOUTE UNE LUMIÈRE au jeu de lumières (objet de 17 o via
+; ListItem_ConstructThreeParams, puis ListItem_AddNumberedLimited). Nom proposé :
+; LightSet_AddLight_2B2DB.
 ; ==============================================================================================
 ListItem_ConstructComplex	proc far		; CODE XREF: MissionLoader_LoadPosition_A7A10+CFP
 
@@ -729,9 +730,10 @@ loc_2B49B:				; CODE XREF: seg058:03A6j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,93L — parcourt une liste, accumule une somme pondérée (poids ×valeur par élément, +9
-; comme diviseur commun) : calcul de moyenne/somme pondérée sur une liste (barre de
-; progression agrégée, ex: chargement multi-fichiers).
+; far, LUE 2026-10-14. NOM TROMPEUR : JEU DE LUMIÈRES — total = poids ambiant (+7) + somme des
+; poids des lumières (+0Dh) ; part de chaque lumière (+0Fh) = poids × intensité (+9) ÷ total ;
+; part ambiante (+0Bh) = poids ambiant × intensité ÷ total ; total nul → parts à 0. Nom
+; proposé : LightSet_RecomputeShares_2B49F.
 ; ==============================================================================================
 ProgressBar_WeightedSum	proc far		; CODE XREF: ProgressBar_UpdateValue+10p
 					; ListItem_AddNumberedLimited+6Dp
@@ -833,9 +835,12 @@ ProgressBar_WeightedSum	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,73L — calcule le produit scalaire de deux vecteurs 3D (di·bx), le compare à 0 : test
-; d'orientation de face (dot product normale·direction) pour éclairage ou backface culling —
-; utilisé par sub_29A7D (préparation de face triangulaire).
+; far, LUE 2026-10-14. INTENSITÉ LUMINEUSE D'UNE FACE de modèle 3D (appelée par
+; Mesh_FacePrepareIndirect, seg055) : intensité = part ambiante (+0Bh) + (si produit scalaire
+; normale · direction de la PREMIÈRE lumière de la liste > 0) produit × part de cette lumière
+; ; bornée à 255 ; renvoyée en octet (rangé par l'appelant en +4 de l'élément de face).
+; Éclairage directionnel calculé à l'exécution (type Lambert) + ambiant. Nom proposé :
+; LightSet_FaceIntensity_2B54A.
 ; ==============================================================================================
 Render_FaceDotProductTest	proc far		; CODE XREF: Mesh_FacePrepareIndirect+E7P
 					; Mesh_FacePrepareIndirect+146P ...
