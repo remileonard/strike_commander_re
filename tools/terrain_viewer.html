@@ -72,9 +72,13 @@ ul.list li button.on { background: var(--accent-soft); outline: 2px solid var(--
   <p class="sub">Molette : zoom · glisser : déplacer · double-clic : zoom avant. X vers la droite, Z vers le haut, altitude Y.</p>
   <h2>Calques</h2>
   <div class="layers">
-    <label><input type="radio" name="base" value="relief" checked> relief (altitude, ombrage calculé)</label>
+    <label><input type="radio" name="base" value="game" checked> jeu : palette, Gouraud, tramage</label>
+    <label><input type="radio" name="base" value="relief"> relief (altitude, ombrage calculé)</label>
     <label><input type="radio" name="base" value="light"> champ « éclairage » (brut)</label>
     <label><input type="radio" name="base" value="colour"> champ « couleur » (brut)</label>
+    <label><input type="checkbox" id="dither" checked> tramage en damier (calque jeu)</label>
+    <label><input type="checkbox" id="diag"> diagonale « / » au lieu de « \\ » (calque jeu)</label>
+    <label><input type="checkbox" id="showtex"> marquer les cases texturées (octets texture ≠ 255)</label>
     <label><input type="checkbox" id="showgrid" checked> grille des cellules (20 km)</label>
     <label><input type="checkbox" id="showlabels" checked> noms des objets</label>
   </div>
@@ -83,7 +87,7 @@ ul.list li button.on { background: var(--accent-soft); outline: 2px solid var(--
   <h2>Objets posés</h2>
   <ul class="list" id="objects"></ul>
   <div id="detail">Clique un élément pour centrer la carte dessus.</div>
-  <p class="note">Couleurs du relief arbitraires (la palette du jeu n'est pas lue). Les enregistrements d'objets ne sont pas dans DATA_MODEL : leur disposition est un constat sur le fichier.</p>
+  <p class="note">Calque « jeu » : couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée puis tramage en damier. Non reproduits : textures du sol (dessinées par le jeu par-dessus la teinte ; l'option « cases texturées » les montre), brouillard (seuils absents). Non établi : la diagonale des carrés (réglable) ; le tramage suit ici les pixels de la carte, pas ceux de l'écran. Pistes : octet « couleur » pris comme index de palette. Les enregistrements d'objets ne sont pas dans DATA_MODEL : leur disposition est un constat sur le fichier.</p>
 </aside>
 <script>
 const D = /*__DATA__*/null;
@@ -94,6 +98,7 @@ const D = /*__DATA__*/null;
   const hb = dec(D.height);
   const H = new Int16Array(hb.buffer, hb.byteOffset, N * N);
   const L = dec(D.light), C = dec(D.colour);
+  const T = D.textured ? dec(D.textured) : new Uint8Array(N * N);
   document.getElementById("title").textContent = D.name;
 
   // --- calques de fond (1 pixel = 1 sommet) ---
@@ -137,7 +142,56 @@ const D = /*__DATA__*/null;
     light: makeLayer((i, j) => { const v = L[i * N + j]; return [v, v, v]; }),
     colour: makeLayer((i, j) => palFor(C[i * N + j])),
   };
-  let base = "relief";
+  // --- calque « jeu » : rendu du jeu d'après Render_TerrainPipelineMain / Render_MeshPrimitive_21085 ---
+  const PAL = D.palette || null, RANG = D.rang || [];
+  const S = 4;                                   // pixels par carré de sommets
+  function makeGameLayer(dither, slash) {
+    const W2 = N * S;
+    const c = document.createElement("canvas"); c.width = W2; c.height = W2;
+    const g = c.getContext("2d"), img = g.createImageData(W2, W2), px = img.data;
+    const shade = new Float32Array(N * N);
+    const hu = (k) => H[k] & 0xFFFF;              // hauteur comparée en non signé
+    function fill(k0, k1, k2, tri, i, j) {
+      // couleur de base = sommet le plus haut (égalité : le dernier)
+      let kb = k0;
+      if (hu(k1) >= hu(kb)) kb = k1;
+      if (hu(k2) >= hu(kb)) kb = k2;
+      const r = RANG[C[kb]] || RANG[0];
+      const sh = (k) => r[0] + ((L[k] * r[1] + 128) >> 8);
+      const s0 = sh(k0), s1 = sh(k1), s2 = sh(k2);
+      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+        const u = (x + 0.5) / S, v = (y + 0.5) / S;
+        let val;
+        if (!slash) {                              // diagonale « \ » : A(0,0)–D(1,1)
+          if (tri === 0) { if (u < v) continue; val = s0 + (s1 - s0) * u + (s2 - s1) * v; }
+          else { if (u >= v) continue; val = s0 + (s1 - s2) * u + (s2 - s0) * v; }
+        } else {                                   // diagonale « / » : B(1,0)–C(0,1)
+          if (tri === 0) { if (u + v > 1) continue; val = s0 + (s1 - s0) * u + (s2 - s0) * v; }
+          else { if (u + v <= 1) continue; val = s0 + (s1 - s0) * (1 - u) + (s2 - s0) * (1 - v); }
+        }
+        const X = j * S + x, Y = i * S + y;
+        const idx = Math.max(0, Math.min(255, Math.floor(val + (dither && ((X ^ Y) & 1) ? 0.5 : 0))));
+        const p = 4 * (Y * W2 + X);
+        px[p] = PAL[3 * idx]; px[p + 1] = PAL[3 * idx + 1]; px[p + 2] = PAL[3 * idx + 2]; px[p + 3] = 255;
+      }
+    }
+    for (let i = 0; i < N - 1; i++) for (let j = 0; j < N - 1; j++) {
+      const A = i * N + j, B = A + 1, Cc = A + N, Dd = A + N + 1;
+      if (!slash) { fill(A, B, Dd, 0, i, j); fill(A, Dd, Cc, 1, i, j); }
+      else { fill(A, B, Cc, 0, i, j); fill(Dd, Cc, B, 1, i, j); }
+    }
+    g.putImageData(img, 0, 0); return c;
+  }
+  if (PAL) layers.game = makeGameLayer(true, false);
+  else { const r = document.querySelector('input[value="game"]'); r.disabled = true; r.checked = false; document.querySelector('input[value="relief"]').checked = true; }
+  const texLayer = (function () {
+    const c = document.createElement("canvas"); c.width = N; c.height = N;
+    const g = c.getContext("2d"), img = g.createImageData(N, N);
+    for (let k = 0; k < N * N; k++) if (T[k]) { img.data[4 * k] = 230; img.data[4 * k + 1] = 0; img.data[4 * k + 2] = 200; img.data[4 * k + 3] = 140; }
+    g.putImageData(img, 0, 0); return c;
+  })();
+  let base = PAL ? "game" : "relief";
+  function rebuildGame() { if (PAL) { layers.game = makeGameLayer(document.getElementById("dither").checked, document.getElementById("diag").checked); draw(); } }
 
   // --- vue ---
   const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
@@ -160,13 +214,51 @@ const D = /*__DATA__*/null;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--bg");
     ctx.fillRect(0, 0, W, Hh);
-    ctx.imageSmoothingEnabled = view.s * SP < 2;
+    ctx.imageSmoothingEnabled = 2 * HALF * view.s / layers[base].width < 1;
     // sommet j à X = −HALF + j·SP : le pixel j couvre [X, X + SP]
-    ctx.drawImage(layers[base], sx(-HALF), sy(HALF), 2 * HALF * view.s, 2 * HALF * view.s);
+    if (base === "game" && 2 * HALF * view.s / layers.game.width >= 1) {
+      drawGameDirect();                          // zoom fort : rendu au pixel d'écran
+    } else {
+      ctx.drawImage(layers[base], sx(-HALF), sy(HALF), 2 * HALF * view.s, 2 * HALF * view.s);
+    }
+    if (document.getElementById("showtex").checked) {
+      ctx.drawImage(texLayer, sx(-HALF), sy(HALF), 2 * HALF * view.s, 2 * HALF * view.s);
+    }
     if (document.getElementById("showgrid").checked) drawGrid();
     D.runways.forEach((r, k) => drawRunway(r, selected && selected.kind === "r" && selected.k === k));
     D.objects.forEach((o, k) => drawObject(o, selected && selected.kind === "o" && selected.k === k));
     updateScale();
+  }
+  // Rendu direct au pixel d'écran : même algorithme que makeGameLayer, tramage sur l'écran.
+  function drawGameDirect() {
+    const w = cv.width, h = cv.height, img = ctx.createImageData(w, h), px = img.data;
+    const dither = document.getElementById("dither").checked, slash = document.getElementById("diag").checked;
+    const bg = [0, 0, 0];
+    for (let y = 0; y < h; y++) {
+      const Z = wz(y / dpr), fi = (HALF - Z) / SP, i = Math.floor(fi), v = fi - i;
+      for (let x = 0; x < w; x++) {
+        const p = 4 * (y * w + x);
+        const X = wx(x / dpr), fj = (X + HALF) / SP, j = Math.floor(fj), u = fj - j;
+        if (i < 0 || j < 0 || i >= N - 1 || j >= N - 1) { px[p] = bg[0]; px[p + 1] = bg[1]; px[p + 2] = bg[2]; px[p + 3] = 255; continue; }
+        const A = i * N + j, B = A + 1, Cc = A + N, Dd = A + N + 1;
+        let k0, k1, k2, w0, w1, w2;
+        if (!slash) {
+          if (u >= v) { k0 = A; k1 = B; k2 = Dd; w0 = 1 - u; w1 = u - v; w2 = v; }
+          else { k0 = A; k1 = Dd; k2 = Cc; w0 = 1 - v; w1 = u; w2 = v - u; }
+        } else {
+          if (u + v <= 1) { k0 = A; k1 = B; k2 = Cc; w0 = 1 - u - v; w1 = u; w2 = v; }
+          else { k0 = Dd; k1 = Cc; k2 = B; w0 = u + v - 1; w1 = 1 - u; w2 = 1 - v; }
+        }
+        let kb = k0;
+        if ((H[k1] & 0xFFFF) >= (H[kb] & 0xFFFF)) kb = k1;
+        if ((H[k2] & 0xFFFF) >= (H[kb] & 0xFFFF)) kb = k2;
+        const r = RANG[C[kb]] || RANG[0];
+        const val = w0 * (r[0] + ((L[k0] * r[1] + 128) >> 8)) + w1 * (r[0] + ((L[k1] * r[1] + 128) >> 8)) + w2 * (r[0] + ((L[k2] * r[1] + 128) >> 8));
+        const idx = Math.max(0, Math.min(255, Math.floor(val + (dither && ((x ^ y) & 1) ? 0.5 : 0))));
+        px[p] = PAL[3 * idx]; px[p + 1] = PAL[3 * idx + 1]; px[p + 2] = PAL[3 * idx + 2]; px[p + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
   }
   function drawGrid() {
     ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.lineWidth = 1; ctx.beginPath();
@@ -185,6 +277,7 @@ const D = /*__DATA__*/null;
     }
   }
   function runwayColour(c, l) {
+    if (PAL && c < 256) return `rgb(${PAL[3 * c]},${PAL[3 * c + 1]},${PAL[3 * c + 2]})`;
     const k = 0.45 + 0.55 * l / 255;
     const b = c === 255 ? [150, 150, 150] : hsl((c * 47) % 360, 55, 60);
     return `rgb(${b.map((v) => Math.round(v * k)).join(",")})`;
@@ -301,6 +394,9 @@ const D = /*__DATA__*/null;
     `case ${o.cell} · X ${fmt(o.x)} Z ${fmt(o.z)} Y ${fmt(o.y)}`));
   document.querySelectorAll('input[name="base"]').forEach((r) => r.onchange = () => { base = r.value; draw(); });
   document.getElementById("showgrid").onchange = draw;
+  document.getElementById("dither").onchange = rebuildGame;
+  document.getElementById("showtex").onchange = draw;
+  document.getElementById("diag").onchange = rebuildGame;
   document.getElementById("showlabels").onchange = draw;
   window.addEventListener("resize", resize);
   resize(); fitAll(); draw();

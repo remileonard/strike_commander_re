@@ -50,6 +50,32 @@ def read_objects(data, top, index):
     return objects
 
 
+def read_palette(path):
+    """DATA\\PALETTE.IFF (DATA_MODEL.html, « La palette ») : chunk PALT = 4 octets puis
+    256 × (R, V, B) sur 0..63 ; chunk RANG = uint16 nombre, puis 13 octets par couleur de base
+    (uint16 première teinte, uint16 nombre de teintes, uint16 décalage de brouillard, …)."""
+    t = open(path, "rb").read()
+    pal = None
+    rang = []
+    p = 12
+    while p + 8 <= len(t):
+        tag = t[p:p + 4]
+        n = struct.unpack(">I", t[p + 4:p + 8])[0]
+        body = t[p + 8:p + 8 + n]
+        if tag == b"PALT":
+            pal = [min(255, v * 4) for v in body[4:4 + 768]]
+        elif tag == b"RANG":
+            count = struct.unpack_from("<H", body, 0)[0]
+            for k in range(count):
+                first, shades, fog = struct.unpack_from("<3H", body, 2 + 13 * k)
+                rang.append([first, shades, fog])
+        if tag == b"FORM":
+            p += 12
+            continue
+        p += 8 + n + (n & 1)
+    return pal, rang
+
+
 def read_runways(data, top, index):
     start, end = top[index]
     tri = data[start:end]
@@ -73,6 +99,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("pak")
     ap.add_argument("-o", "--output", default=None)
+    ap.add_argument("--palette", default=None, help="PALETTE.IFF (défaut : à côté du .PAK)")
     args = ap.parse_args()
 
     data = open(args.pak, "rb").read()
@@ -82,11 +109,13 @@ def main():
     n = cells[0][0]
     height, light = assemble(cells, grid)
     colour = [[0] * (grid * n) for _ in range(grid * n)]
+    textured = [[0] * (grid * n) for _ in range(grid * n)]
     for c, (_, verts) in enumerate(cells):
         row, col = divmod(c, grid)
         for k, v in enumerate(verts):
             i, j = divmod(k, n)
             colour[row * n + i][col * n + j] = v[2]
+            textured[row * n + i][col * n + j] = 1 if (v[3] != 255 or v[4] != 255) else 0
     side = grid * n
     payload = {
         "name": os.path.basename(args.pak),
@@ -98,9 +127,18 @@ def main():
                                                *[h for row in height for h in row])).decode(),
         "light": base64.b64encode(bytes(v for row in light for v in row)).decode(),
         "colour": base64.b64encode(bytes(v for row in colour for v in row)).decode(),
+        "textured": base64.b64encode(bytes(v for row in textured for v in row)).decode(),
         "runways": read_runways(data, top, 4),
         "objects": read_objects(data, top, 5),
     }
+    pal_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")
+    if os.path.exists(pal_path):
+        pal, rang = read_palette(pal_path)
+        payload["palette"] = pal
+        payload["rang"] = rang
+        print(f"palette : {pal_path} ({len(rang)} couleurs de base)")
+    else:
+        print(f"pas de palette ({pal_path} absent) : calque « jeu » désactivé")
     here = os.path.dirname(os.path.abspath(__file__))
     template = open(os.path.join(here, "terrain_viewer.html")).read()
     page = template.replace("/*__DATA__*/null", json.dumps(payload, separators=(",", ":")))
