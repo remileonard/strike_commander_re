@@ -2316,6 +2316,7 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
    - teinte = première + arrondi(intensité × n ÷ 256) ;
    - avec la distance (profondeur ÷ 256), la teinte glisse vers la teinte de brouillard, par paliers lus dans une table de seuils de la même structure (rien sous le 1er seuil, maximum au-delà du dernier).
 4. **Remplissage** : si `byte_6EB21` = 1 (valeur par défaut ; réglage lu par `Cockpit_ReadControlsFrame_8F720`), chaque sommet garde son index et la face est dégradée ; sinon les 3 sommets reçoivent la moyenne des 3 index (face unie).
+5. **Tracé** (lu 2026-10-14) : chaque triangle devient un objet de la liste de primitives (`dword_724AE`) ; classe `193Ah` = triangle ombré, `1A76h` / `1A72h` = triangle texturé (dessine d'abord le triangle ombré, puis la texture). `Render_DispatchFlatOrPerspective` : 3 teintes égales → `Render_PolygonPrimitive_20848` (face unie, index = teinte ÷ 256 tronqué) ; sinon `Render_MeshPrimitive_21085` = **Gouraud sur l'index de palette** : teinte interpolée linéairement le long des bords puis de chaque ligne (virgule fixe 16.16), et **tramage en damier** : sur un pixel sur deux (parité de x XOR y), on ajoute ½ teinte avant de prendre la partie entière. Les pixels alternent donc entre deux teintes voisines là où la teinte tombe entre deux.
 - Non établi : qui remplit la table `541Ah` (teintes par couleur, seuils de brouillard), et la profondeur exacte utilisée (`[si+12h]` du sommet transformé).
 
 **PAK imbriqué** : `dd taille` puis `dd (offset|0xE0000000) × 324` ; les cellules

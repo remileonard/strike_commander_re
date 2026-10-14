@@ -1186,9 +1186,16 @@ Render_PolygonPrimitive_20C58	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,815L — même famille (stub d'alignement + gros buffer local 0x54) : primitive de rendu
-; graphique majeure (candidat : tracé de terrain/mesh 3D du jeu), très volumineuse, à
-; approfondir en session dédiée.
+; far, 815 L, LUE 2026-10-14 (boucle de remplissage). RASTÉRISEUR DE GOURAUD sur INDEX DE
+; PALETTE, avec tramage en damier. Sommets de 22 octets (x, y, teinte 8.8). Parcours par
+; lignes : chaque bord avance x et teinte en 16.16 (idiv par la hauteur du bord) ; par ligne,
+; pente de teinte = (teinte droite − teinte gauche) ÷ largeur (var_52). Boucle de pixels :
+; deux accumulateurs (bx/cl et bp/ch) décalés d'une demi-teinte selon la parité (x de début
+; XOR numéro de ligne ss:10DEh) : mov ax,ss:10E0h / xor ax,ss:10DEh / shl ax,0Fh (0x8000 ou
+; 0), puis xor ah,80h pour l'autre ; les pixels sont écrits par paires (mov es:[di],cx),
+; l'octet écrit = partie entière de l'accumulateur. Effet : index = partie entière (teinte + 0
+; ou ½ selon un damier) → tramage 2 niveaux entre teintes voisines. Ancien résumé : 'primitive
+; de rendu graphique majeure, candidat terrain/mesh'.
 ; ==============================================================================================
 Render_MeshPrimitive_21085	proc far		; CODE XREF: Render_MeshPrimitive_21085+32p
 					; seg042:0D4DP	...

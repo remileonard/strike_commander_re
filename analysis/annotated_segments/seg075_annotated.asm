@@ -72,11 +72,13 @@ locret_367E4:				; CODE XREF: seg075:0099j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,61L — copie 9 coordonnées (3 sommets) dans un buffer partagé (word_72778...), teste si
-; le triangle est plat sur un axe (Z constant) → appelle Render_PolygonPrimitive_20848
-; (seg037, cas simplifié 2D) ; sinon appelle Render_MeshPrimitive_21085 (cas général 3D) :
-; dispatcher de rastérisation choisissant entre le rasterizer plat et le rasterizer
-; perspective, confirmant le rôle des 4 grosses fonctions du seg037.
+; far, LUE 2026-10-14. Méthode n° 0 de la table 193Ah (seg339:6E9EA) = classe des triangles
+; ombrés de la liste de primitives (dword_724AE) ; aussi appelée en premier par les classes
+; texturées 1A76h (loc_3686E) et 1A72h (loc_368FE), qui dessinent ensuite la texture. Copie
+; les 3 sommets de l'enregistrement (x +6/+0C/+12, y +8/+0E/+14, teinte 8.8 +0A/+10/+16) dans
+; word_72778… ; si les 3 teintes sont égales → teinte >> 8 et Render_PolygonPrimitive_20848
+; (face d'une seule couleur) ; sinon Render_MeshPrimitive_21085 (dégradé de Gouraud). Ancien
+; résumé : 'dispatch flat/perspective'.
 ; ==============================================================================================
 Render_DispatchFlatOrPerspective	proc far		; CODE XREF: seg075:0149p seg075:01D9p
 					; DATA XREF: ...
