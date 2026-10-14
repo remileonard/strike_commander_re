@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Génère une visionneuse interactive (une page HTML autonome) d'un terrain DATA\\<théâtre>.PAK.
+"""Génère une visionneuse interactive (une page HTML autonome) d'un terrain DATA\\<théâtre>.PAK,
+et une vue 3D WebGL (<nom>_3d.html, modèle tools/terrain_3d.html) quand la palette est disponible.
 
 Carte : zoom à la molette, déplacement à la souris (glisser), double-clic pour zoomer.
 Panneau latéral : pistes (.TRI) et objets posés sur le terrain ; un clic centre la carte.
@@ -146,6 +147,14 @@ def main():
     out = args.output or os.path.splitext(args.pak)[0] + "_viewer.html"
     with open(out, "w") as f:
         f.write(page)
+    if "palette" in payload:
+        page3d = open(os.path.join(here, "terrain_3d.html")).read()
+        page3d = page3d.replace("/*__DATA__*/null", json.dumps(payload, separators=(",", ":")))
+        page3d = page3d.replace("__TITLE__", payload["name"])
+        out3d = os.path.splitext(out)[0].replace("_viewer", "") + "_3d.html"
+        with open(out3d, "w") as f:
+            f.write(page3d)
+        print(f"{out3d} : vue 3D WebGL")
     print(f"{out} : {len(payload['runways'])} pistes, {len(payload['objects'])} objets, "
           f"{len(page) // 1024} Ko")
 
