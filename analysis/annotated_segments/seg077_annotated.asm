@@ -230,7 +230,7 @@ loc_37705:				; CODE XREF: Terrain_UpdateLODPerFrame+190j
 loc_3770A:				; CODE XREF: Terrain_UpdateLODPerFrame+195j
 		push	eax
 		push	541Ah
-		call	Texture_SelectMipLevel
+		call	Palette_SelectFogRow_2EA80
 		add	sp, 6
 		mov	word ptr [si+127h], 0
 		mov	word ptr [si+11Bh], 0

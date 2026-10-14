@@ -461,14 +461,14 @@ loc_2EA79:				; CODE XREF: seg066:026Ej
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-10-14. NOM TROMPEUR : CHOISIT LA LIGNE DE SEUILS DE BROUILLARD de la palette
-; (arg_0 = palette, arg_2 = valeur). Si valeur ≥ [+7Ch] (= lignes [+46h] << pas [+7Ah], 10
-; 240) → dernière ligne ; sinon ligne = valeur >> [+7Ah] (÷ 512). Ligne = (1 << [+4Eh]) dd
-; dans le tableau [+42h] ; range son adresse dans [+48h], son 1er seuil dans [+72h], son
-; dernier dans [+76h], invalide le cache dword_6E9BA. Appelée par Terrain_UpdateLODPerFrame.
-; Utilisée ensuite par Interp_ResolveCachedGuarded. Nom proposé : Palette_SelectFogRow_2EA80.
+; far, LUE 2026-10-14. CHOISIT LA LIGNE DE SEUILS DE BROUILLARD de la palette (arg_0 =
+; palette, arg_2 = valeur). Si valeur ≥ [+7Ch] (= lignes [+46h] << pas [+7Ah], 10 240) →
+; dernière ligne ; sinon ligne = valeur >> [+7Ah] (÷ 512). Ligne = (1 << [+4Eh]) dd dans le
+; tableau [+42h] ; range son adresse dans [+48h], son 1er seuil dans [+72h], son dernier dans
+; [+76h], invalide le cache dword_6E9BA. Appelée par Terrain_UpdateLODPerFrame. Utilisée
+; ensuite par Palette_ShadeIndexWithFog_2F24E. Ex-'Texture_SelectMipLevel'.
 ; ==============================================================================================
-Texture_SelectMipLevel	proc far		; CODE XREF: Terrain_UpdateLODPerFrame+1A1P
+Palette_SelectFogRow_2EA80	proc far		; CODE XREF: Terrain_UpdateLODPerFrame+1A1P
 					; TextureLoader_SelectMipLevel_980F0+55P
 
 arg_0		= word ptr  6
@@ -495,7 +495,7 @@ arg_2		= dword	ptr  8
 		jmp	short loc_2EACE
 ; ���������������������������������������������������������������������������
 
-loc_2EAAE:				; CODE XREF: Texture_SelectMipLevel+10j
+loc_2EAAE:				; CODE XREF: Palette_SelectFogRow_2EA80+10j
 		mov	cl, [di+7Ah]
 		mov	eax, [bp+arg_2]
 		sar	eax, cl
@@ -510,7 +510,7 @@ loc_2EAC3:
 		mov	[di+4Ah], dx
 		mov	[di+48h], bx
 
-loc_2EACE:				; CODE XREF: Texture_SelectMipLevel+2Cj
+loc_2EACE:				; CODE XREF: Palette_SelectFogRow_2EA80+2Cj
 		les	bx, [di+48h]
 		mov	eax, es:[bx]
 		mov	[di+72h], eax
@@ -524,7 +524,7 @@ loc_2EACE:				; CODE XREF: Texture_SelectMipLevel+2Cj
 		pop	si
 		pop	bp
 		retf
-Texture_SelectMipLevel	endp
+Palette_SelectFogRow_2EA80	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

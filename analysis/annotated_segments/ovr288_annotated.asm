@@ -10,7 +10,7 @@ ovr288		segment	para public 'OVERLAY' use16
 ; far, LUE 2026-10-14. CONVERTIT UN ENREGISTREMENT RANG (13 o) EN ENTRÉE DE COULEUR DE BASE
 ; (15 o) : +0 → e+6 (première teinte), +2 → e+0Bh (nombre de teintes), +4 → e+0Dh (décalage de
 ; la teinte de brouillard), +6..8 → e+8..A, +9..12 → e+2..5, e+0 = palette. Lue par
-; Interp_ResolveCachedGuarded.
+; Palette_ShadeIndexWithFog_2F24E.
 ; ==============================================================================================
 TextureLoader_Allocate_97F40	proc far		; CODE XREF: VROOMM_StubThunk_6BC65J TextureLoader_FormatAndLoad_985F6+60p
 
@@ -284,8 +284,8 @@ TextureLoader_OpenAndDecode_9800A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine String_ConstructEmpty/FromPtrLen, Texture_SelectMipLevel — sélection du niveau
-; de mipmap d'une texture.
+; far, combine String_ConstructEmpty/FromPtrLen, Palette_SelectFogRow_2EA80 — sélection du
+; niveau de mipmap d'une texture.
 ; ==============================================================================================
 TextureLoader_SelectMipLevel_980F0	proc far		; CODE XREF: VROOMM_StubThunk_6BC9CJ
 					; TextureLoader_OpenAndDecode_9800A:loc_980ADp
@@ -334,7 +334,7 @@ arg_2		= word ptr  8
 loc_98141:				; CODE XREF: TextureLoader_SelectMipLevel_980F0+35j
 		push	large 0
 		push	si
-		call	Texture_SelectMipLevel
+		call	Palette_SelectFogRow_2EA80
 		add	sp, 6
 		pop	di
 		pop	si

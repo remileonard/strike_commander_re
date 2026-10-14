@@ -1017,7 +1017,7 @@
   "sub_97F40": {
     "new_name": "TextureLoader_Allocate_97F40",
     "segment": "ovr288",
-    "summary": "far, LUE 2026-10-14. CONVERTIT UN ENREGISTREMENT RANG (13 o) EN ENTRÉE DE COULEUR DE BASE (15 o) : +0 → e+6 (première teinte), +2 → e+0Bh (nombre de teintes), +4 → e+0Dh (décalage de la teinte de brouillard), +6..8 → e+8..A, +9..12 → e+2..5, e+0 = palette. Lue par Interp_ResolveCachedGuarded."
+    "summary": "far, LUE 2026-10-14. CONVERTIT UN ENREGISTREMENT RANG (13 o) EN ENTRÉE DE COULEUR DE BASE (15 o) : +0 → e+6 (première teinte), +2 → e+0Bh (nombre de teintes), +4 → e+0Dh (décalage de la teinte de brouillard), +6..8 → e+8..A, +9..12 → e+2..5, e+0 = palette. Lue par Palette_ShadeIndexWithFog_2F24E."
   },
   "sub_A98EC": {
     "new_name": "ExprSlot_ReleaseArray_A98EC",
@@ -7360,9 +7360,9 @@
     "summary": "far, référencée via vtable (DATA XREF seg339) — destructeur du gestionnaire : vide la chaîne de callbacks (LinkedList_RemoveAllAndDestroy_5F397), libère l'objet si demandé."
   },
   "sub_2F24E": {
-    "new_name": "Interp_ResolveCachedGuarded",
+    "new_name": "Palette_ShadeIndexWithFog_2F24E",
     "segment": "seg067",
-    "summary": "far, 233 L, LUE 2026-10-14. INDEX DE PALETTE D'UN SOMMET OMBRÉ AVEC BROUILLARD (utilisée par le rendu du terrain et le setup de face seg055). Args : (table, couleur, intensité 0..255, profondeur 24.8, surcharge). couleur ≥ [table+58h] → 0. Profondeur ÷ 256 → facteur de brouillard f : 0 sous [table+72h], max [table+6Ah] au-delà de [table+76h], sinon recherche dichotomique dans la table de seuils dword [table+48h] (nombre [table+4Ch], cache dword_6E9BA/BE/C2), f = (rang+1) << ([table+68h]−[table+4Eh]). Entrée e = [table+5Ah] + couleur × 15. n = surcharge ou mot e+0Bh (nombre de teintes). v = (intensité × n + 0x80) >> 8. Résultat = e+6 (première teinte) + v si f = 0 ; sinon e+6 + v + (((mot e+0Dh) − v) × f + [[e]+6Eh]) >> [[e]+68h] : la teinte glisse vers la teinte de brouillard e+0Dh quand la distance croît. Ancien résumé : 'résolution d'interpolation cachée avec garde de limite'."
+    "summary": "far, 233 L, LUE 2026-10-14. INDEX DE PALETTE D'UN SOMMET OMBRÉ AVEC BROUILLARD (utilisée par le rendu du terrain et le setup de face seg055). Args : (table, couleur, intensité 0..255, profondeur 24.8, surcharge). couleur ≥ [table+58h] → 0. Profondeur ÷ 256 → facteur de brouillard f : 0 sous [table+72h], max [table+6Ah] au-delà de [table+76h], sinon recherche dichotomique dans la table de seuils dword [table+48h] (nombre [table+4Ch], cache dword_6E9BA/BE/C2), f = (rang+1) << ([table+68h]−[table+4Eh]). Entrée e = [table+5Ah] + couleur × 15. n = surcharge ou mot e+0Bh (nombre de teintes). v = (intensité × n + 0x80) >> 8. Résultat = e+6 (première teinte) + v si f = 0 ; sinon e+6 + v + (((mot e+0Dh) − v) × f + [[e]+6Eh]) >> [[e]+68h] : la teinte glisse vers la teinte de brouillard e+0Dh quand la distance croît. Ancien résumé : 'résolution d'interpolation cachée avec garde de limite'. Ex-'Interp_ResolveCachedGuarded'."
   },
   "sub_6C9F0": {
     "new_name": "VROOMM_StubThunk_6C9F0",
@@ -11075,9 +11075,9 @@
     "summary": "far,381L — vérifie de nombreux flags globaux d'état de mission (compteur d'images word_70466, flags byte_6E4B4/B8/70471/6E4CC), calcule la distance du joueur à un point de référence (sub_46889) vs seuil 0x400, déclenche sub_23C82(code 4) si conditions réunies : **évaluateur de déclencheur d'événement scripté de mission (trigger de zone/proximité).** | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
   },
   "sub_2EA80": {
-    "new_name": "Texture_SelectMipLevel",
+    "new_name": "Palette_SelectFogRow_2EA80",
     "segment": "seg066",
-    "summary": "far, LUE 2026-10-14. NOM TROMPEUR : CHOISIT LA LIGNE DE SEUILS DE BROUILLARD de la palette (arg_0 = palette, arg_2 = valeur). Si valeur ≥ [+7Ch] (= lignes [+46h] << pas [+7Ah], 10 240) → dernière ligne ; sinon ligne = valeur >> [+7Ah] (÷ 512). Ligne = (1 << [+4Eh]) dd dans le tableau [+42h] ; range son adresse dans [+48h], son 1er seuil dans [+72h], son dernier dans [+76h], invalide le cache dword_6E9BA. Appelée par Terrain_UpdateLODPerFrame. Utilisée ensuite par Interp_ResolveCachedGuarded. Nom proposé : Palette_SelectFogRow_2EA80."
+    "summary": "far, LUE 2026-10-14. CHOISIT LA LIGNE DE SEUILS DE BROUILLARD de la palette (arg_0 = palette, arg_2 = valeur). Si valeur ≥ [+7Ch] (= lignes [+46h] << pas [+7Ah], 10 240) → dernière ligne ; sinon ligne = valeur >> [+7Ah] (÷ 512). Ligne = (1 << [+4Eh]) dd dans le tableau [+42h] ; range son adresse dans [+48h], son 1er seuil dans [+72h], son dernier dans [+76h], invalide le cache dword_6E9BA. Appelée par Terrain_UpdateLODPerFrame. Utilisée ensuite par Palette_ShadeIndexWithFog_2F24E. Ex-'Texture_SelectMipLevel'."
   },
   "sub_63362": {
     "new_name": "File_SeekAndWriteViaPagedMemory_63362",
@@ -18057,7 +18057,7 @@
   "sub_980F0": {
     "new_name": "TextureLoader_SelectMipLevel_980F0",
     "segment": "ovr288",
-    "summary": "far, combine `String_ConstructEmpty`/`FromPtrLen`, `Texture_SelectMipLevel` — sélection du niveau de mipmap d'une texture."
+    "summary": "far, combine `String_ConstructEmpty`/`FromPtrLen`, `Palette_SelectFogRow_2EA80` — sélection du niveau de mipmap d'une texture."
   },
   "sub_6CF62": {
     "new_name": "VROOMM_StubThunk_6CF62",
@@ -18102,7 +18102,7 @@
   "sub_345D6": {
     "new_name": "Render_TerrainPipelineMain",
     "segment": "seg074",
-    "summary": "far,**2938 lignes — la plus grosse fonction de toute la base**. Déclenche le streaming de secteur terrain (sub_33735), configure la caméra (mêmes globals dword_7220A/E/212 que le pipeline objet sub_2FEE2), fixe les bornes de clipping (dword_6EB14/18, partagées avec sub_2FEE2), résout la texture terrain (sub_5C832), puis itère sur la grille de sommets du secteur (segment GS) en les transformant/soumettant au rendu. **Pipeline principal de rendu du terrain — l'équivalent 'terrain' de la fonction de rendu d'objets sub_2FEE2 (seg069)**. Priorité absolue pour une session d'analyse dédiée. | COMPLÉMENT 2026-10-12 (sommet .ELV, via le pointeur +0x11 du sommet transformé) : int16 +0 = hauteur (cwde, × axes caméra dword_7221E/72236/7222A) ; uint8 +2 = ÉCLAIRAGE du sommet (octet haut de l'intensité [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base du triangle : celle du sommet dont le mot +0 (hauteur) est le PLUS GRAND en comparaison NON SIGNÉE (loc_349F0 : `mov al,fs:[bx+3] / mov dx,fs:[bx]` puis `cmp dx,fs:[bx] / ja` → on garde le plus grand ; égalité → le dernier ; une hauteur négative compte comme très grande) — CORRIGÉ 2026-10-14, l'ancienne mention « le plus bas » était fausse ; rangée dans gs:[si] et byte_6EAE0. Intensité : `mov ah,fs:[bx+2] / xor al,al / mov [di+0Ch],ax` = éclairage × 256 (interpolée par le découpage). Par sommet du polygone découpé : Interp_ResolveCachedGuarded(541Ah, couleur, intensité >> 8, profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21 = 1 (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages) chaque sommet garde son index (dégradé), sinon les 3 reçoivent la moyenne ÷ 3 (face unie) ; uint8 +4 / +5 = TEXTURE du triangle (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF = pas de texture ; ≥ 0xDF = traitement particulier (var_580)."
+    "summary": "far,**2938 lignes — la plus grosse fonction de toute la base**. Déclenche le streaming de secteur terrain (sub_33735), configure la caméra (mêmes globals dword_7220A/E/212 que le pipeline objet sub_2FEE2), fixe les bornes de clipping (dword_6EB14/18, partagées avec sub_2FEE2), résout la texture terrain (sub_5C832), puis itère sur la grille de sommets du secteur (segment GS) en les transformant/soumettant au rendu. **Pipeline principal de rendu du terrain — l'équivalent 'terrain' de la fonction de rendu d'objets sub_2FEE2 (seg069)**. Priorité absolue pour une session d'analyse dédiée. | COMPLÉMENT 2026-10-12 (sommet .ELV, via le pointeur +0x11 du sommet transformé) : int16 +0 = hauteur (cwde, × axes caméra dword_7221E/72236/7222A) ; uint8 +2 = ÉCLAIRAGE du sommet (octet haut de l'intensité [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base du triangle : celle du sommet dont le mot +0 (hauteur) est le PLUS GRAND en comparaison NON SIGNÉE (loc_349F0 : `mov al,fs:[bx+3] / mov dx,fs:[bx]` puis `cmp dx,fs:[bx] / ja` → on garde le plus grand ; égalité → le dernier ; une hauteur négative compte comme très grande) — CORRIGÉ 2026-10-14, l'ancienne mention « le plus bas » était fausse ; rangée dans gs:[si] et byte_6EAE0. Intensité : `mov ah,fs:[bx+2] / xor al,al / mov [di+0Ch],ax` = éclairage × 256 (interpolée par le découpage). Par sommet du polygone découpé : Palette_ShadeIndexWithFog_2F24E(541Ah, couleur, intensité >> 8, profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21 = 1 (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages) chaque sommet garde son index (dégradé), sinon les 3 reçoivent la moyenne ÷ 3 (face unie) ; uint8 +4 / +5 = TEXTURE du triangle (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF = pas de texture ; ≥ 0xDF = traitement particulier (var_580)."
   },
   "sub_91AA6": {
     "new_name": "Cockpit_Helper_91AA6",

@@ -2395,7 +2395,7 @@ loc_318E7:				; CODE XREF: Render_ObjectPipelineMain+19FCj
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	ah, al
 		xor	al, al
@@ -2412,7 +2412,7 @@ loc_318E7:				; CODE XREF: Render_ObjectPipelineMain+19FCj
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		lea	si, [bp+var_2B0]
 		mov	ah, al
@@ -2450,7 +2450,7 @@ loc_31960:				; CODE XREF: Render_ObjectPipelineMain+1A75j
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		pop	es
 		pop	di

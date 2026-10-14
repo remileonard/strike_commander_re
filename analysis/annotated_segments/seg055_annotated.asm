@@ -1441,7 +1441,7 @@ loc_29CF4:
 
 loc_29CF5:
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	dl, al
 
@@ -1894,7 +1894,7 @@ loc_2A03F:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	[bp-56h], ax
 		les	bx, [bp+6]
@@ -1927,7 +1927,7 @@ loc_2A03F:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	[bp-40h], ax
 		les	bx, [bp+6]
@@ -1986,7 +1986,7 @@ loc_2A12F:
 		push	541Ah
 
 loc_2A133:
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 
 loc_2A13B:
@@ -2416,7 +2416,7 @@ loc_2A45C:				; CODE XREF: seg055:125Aj
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	dl, al
 
@@ -2907,7 +2907,7 @@ loc_2A822:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	[bp-5Ch], ax
 		les	bx, [bp+6]
@@ -2955,7 +2955,7 @@ loc_2A8F8:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	[bp-46h], ax
 		les	bx, [bp+6]
@@ -2997,7 +2997,7 @@ loc_2A8F8:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		mov	[bp-30h], ax
 		cmp	byte_6E682, 0

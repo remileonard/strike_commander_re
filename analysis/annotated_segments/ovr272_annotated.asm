@@ -340,7 +340,7 @@ loc_9506B:
 		push	0C8h ; '�'
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		les	bx, [bp+arg_0]
 		mov	es:[bx+85h], al

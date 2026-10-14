@@ -23,9 +23,9 @@ seg074		segment	byte public 'CODE' use16
 ; le dernier ; une hauteur négative compte comme très grande) — CORRIGÉ 2026-10-14, l'ancienne
 ; mention « le plus bas » était fausse ; rangée dans gs:[si] et byte_6EAE0. Intensité : mov
 ; ah,fs:[bx+2] / xor al,al / mov [di+0Ch],ax = éclairage × 256 (interpolée par le découpage).
-; Par sommet du polygone découpé : Interp_ResolveCachedGuarded(541Ah, couleur, intensité >> 8,
-; profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21 = 1
-; (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages)
+; Par sommet du polygone découpé : Palette_ShadeIndexWithFog_2F24E(541Ah, couleur, intensité
+; >> 8, profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21
+; = 1 (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages)
 ; chaque sommet garde son index (dégradé), sinon les 3 reçoivent la moyenne ÷ 3 (face unie) ;
 ; uint8 +4 / +5 = TEXTURE du triangle (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF =
 ; pas de texture ; ≥ 0xDF = traitement particulier (var_580).
@@ -2711,7 +2711,7 @@ loc_36431:				; CODE XREF: Render_TerrainPipelineMain:loc_363F2j
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		xchg	al, ah
 		xor	al, al
@@ -2727,7 +2727,7 @@ loc_36431:				; CODE XREF: Render_TerrainPipelineMain:loc_363F2j
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		xchg	al, ah
 		xor	al, al
@@ -2751,7 +2751,7 @@ loc_364B7:				; CODE XREF: Render_TerrainPipelineMain+211Aj
 		xor	ah, ah
 		push	ax
 		push	541Ah
-		call	Interp_ResolveCachedGuarded
+		call	Palette_ShadeIndexWithFog_2F24E
 		add	sp, 0Ch
 		pop	es
 		pop	bx
