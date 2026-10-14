@@ -119,8 +119,9 @@ def svg_map(regions, cells, cell_size, title):
     out = []
     pad = 20
     panel_w = 560
-    width = pad + size + pad + panel_w + pad
-    height = max(pad + 30 + size + pad, pad + 30 + len(regions) * 260 + pad)
+    cell_px = 220                                # vue d'une case entière
+    width = pad + size + pad + cell_px + pad + panel_w + pad
+    height = max(pad + 30 + size + pad, pad + 30 + len(regions) * 280 + pad)
     out.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
                f'viewBox="0 0 {width} {height}" font-family="sans-serif" font-size="12">')
     out.append(f'<rect width="{width}" height="{height}" fill="#fafaf7"/>')
@@ -137,11 +138,8 @@ def svg_map(regions, cells, cell_size, title):
         cs = size / cells
         out.append(f'<rect x="{col * cs}" y="{row * cs}" width="{cs}" height="{cs}" '
                    f'fill="none" stroke="#c0392b" stroke-width="2"/>')
-        xs = [v["x"] for v in r["vertices"]]
-        zs = [v["z"] for v in r["vertices"]]
-        x0, y0 = to_px(min(xs), max(zs))
-        x1, y1 = to_px(max(xs), min(zs))
-        out.append(f'<rect x="{x0 - 1}" y="{y0 - 1}" width="{x1 - x0 + 2}" height="{y1 - y0 + 2}" fill="#222"/>')
+        # Les vrais triangles, à l'échelle de la carte (vectoriel : zoomer dans le visualiseur).
+        draw_triangles(out, r, lambda v: to_px(v["x"], v["z"]))
         out.append(f'<text x="{col * cs + 2}" y="{row * cs - 3}" fill="#c0392b">case {r["cell"]}</text>')
     out.append(f'<text x="{size / 2}" y="{size + 16}" text-anchor="middle">X →  '
                f'({cells} × {cells} cases de {cell_size / 1000:g} km)</text>')
@@ -160,14 +158,29 @@ def svg_map(regions, cells, cell_size, title):
         rotate = wz > wx                          # piste orientée selon Z : on la couche
         long_side = max(wx, wz)
         s = (panel_w - 20) / long_side
-        top = pad + 30 + k * 260
+        top = pad + 30 + k * 280
 
         def local(v):
             if rotate:
                 return (v["z"] - min(zs)) * s + 10, (v["x"] - min(xs)) * s + 30
             return (v["x"] - min(xs)) * s + 10, (max(zs) - v["z"]) * s + 30
 
-        out.append(f'<g transform="translate({px0},{top})">')
+        # Vue de la case entière (cell_size × cell_size), piste à sa vraie place.
+        row, col = divmod(r["cell"], cells)
+        cx0 = col * cell_size - half
+        cz1 = half - row * cell_size
+        k_cell = cell_px / cell_size
+        out.append(f'<g transform="translate({px0},{top + 30})">')
+        out.append(f'<rect width="{cell_px}" height="{cell_px}" fill="#e8eee9" stroke="#c0392b" stroke-width="2"/>')
+        for q in range(1, 4):
+            t = q * cell_px / 4
+            out.append(f'<line x1="{t}" y1="0" x2="{t}" y2="{cell_px}" stroke="#c5cfc8"/>')
+            out.append(f'<line x1="0" y1="{t}" x2="{cell_px}" y2="{t}" stroke="#c5cfc8"/>')
+        draw_triangles(out, r, lambda v: ((v["x"] - cx0) * k_cell, (cz1 - v["z"]) * k_cell))
+        out.append(f'<text x="0" y="{cell_px + 14}" font-size="11">case entière {cell_size / 1000:g} km '
+                   f'(quadrillage {cell_size / 4000:g} km)</text>')
+        out.append('</g>')
+        out.append(f'<g transform="translate({px0 + cell_px + pad},{top})">')
         out.append(f'<text x="0" y="12" font-weight="bold">case {r["cell"]} (ligne {r["cell"] // cells}, '
                    f'colonne {r["cell"] % cells})</text>')
         out.append(f'<text x="0" y="26">{len(V)} sommets, {len(r["triangles"])} triangles · '
