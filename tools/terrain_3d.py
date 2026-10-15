@@ -25,9 +25,10 @@ r passant de 0 au bord à R sommets à 1,5 cellule ; --skirt-smooth-height lisse
 --skirt-smooth-rgb (touche C) : le lissage porte sur la couleur RVB affichée (palette) au lieu de
 l'éclairage et de la couleur majoritaire : le blanc et le vert se mélangent. Le bruit et les plaques
 ne s'appliquent pas dans ce mode.
---skirt-noise-rgb A (touche B) : bruit en RVB sur les jupes, après le lissage s'il est actif :
-luminosité × (1 + A × bruit) et décalage de teinte ± A/12 par canal (bruits indépendants), même
-rampe que le bruit d'éclairage (nul au bord, plein à 1,5 cellule). A ≈ 0,15 à 0,3.
+--skirt-noise-rgb A (touche B) : bruit sur la couleur RVB des jupes qui reste dans les teintes de la
+carte : chaque couleur de base présente autour du sommet glisse le long de SA gamme de la palette
+(éclairage + A × bruit), puis les couleurs sont mélangées selon leur part. A ≈ 40 à 80.
+--skirt-ramp C : largeur de la transition carte → jupe (lissage et bruits), en cellules, courbe en S.
 
 Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
 
@@ -159,6 +160,13 @@ class Terrain:
         bottom = h[self.key(i + 1, j)] * (1 - u) + h[self.key(i + 1, j + 1)] * u
         return top * (1 - v) + bottom * v
 
+    ramp_cells = 3.0                    # largeur de la transition carte → jupe, en cellules
+
+    def ramp(self, out):
+        """0 au bord de la carte, 1 à ramp_cells cellules, courbe en S (smoothstep)."""
+        x = min(1.0, out / (self.ramp_cells * self.cn))
+        return x * x * (3 - 2 * x)
+
     @staticmethod
     def hash01(i, j):
         """Valeur pseudo-aléatoire déterministe dans [−1, 1] pour un nœud entier (i, j)."""
@@ -189,7 +197,7 @@ class Terrain:
         out = max(0, -i, i - (n - 1), -j, j - (n - 1))
         if out == 0 or amplitude == 0:
             return 0
-        ramp = min(1.0, out / (1.5 * self.cn))
+        ramp = self.ramp(out)
         x = j * self.spacing
         z = i * self.spacing
         noise = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
@@ -236,6 +244,8 @@ class Terrain:
         s_light = sat(self.light)
         s_h = sat(self.h) if with_height else None
         s_col = [sat([1.0 if c == k else 0.0 for c in self.colour]) for k in range(len(self.rang))]
+        present = sorted(set(self.colour))
+        s_lc = {k: sat([lv if c == k else 0.0 for lv, c in zip(self.light, self.colour)]) for k in present} if rgb else {}
 
         def box(s, a, b, r):
             a0 = a - r
@@ -250,7 +260,7 @@ class Terrain:
                 d = max(0, -i, i - (n - 1), -j, j - (n - 1))
                 if d == 0:
                     continue
-                r = int(round(radius * min(1.0, d / (1.5 * self.cn))))
+                r = int(round(radius * self.ramp(d)))
                 if r == 0:
                     continue
                 a = i - lo
@@ -260,24 +270,33 @@ class Terrain:
                 cv = max(range(len(s_col)), key=lambda k: box(s_col[k], a, b, r))
                 hv = box(s_h, a, b, r) / area if with_height else None
                 col = tuple(box(s, a, b, r) / area for s in s_rgb) if rgb else None
-                out[(i, j)] = (lv, cv, hv, col)
+                comp = None
+                if rgb:
+                    comp = []
+                    for k in present:
+                        cnt = box(s_col[k], a, b, r)
+                        if cnt > 0:
+                            comp.append((k, cnt / area, box(s_lc[k], a, b, r) / cnt))
+                out[(i, j)] = (lv, cv, hv, col, comp)
         return out
 
-    def rgb_noise(self, i, j, c, amplitude):
-        """Couleur RVB c du sommet affiché (i, j) modulée par le bruit des jupes ; inchangée dans la carte."""
+    def pal_rgb(self, c, lv):
+        """Couleur RVB (0..1) de la teinte de la couleur de base c pour l'éclairage lv (0..255)."""
+        first, shades, _ = self.rang[c] if c < len(self.rang) else self.rang[0]
+        lv = max(0, min(255, int(round(lv))))
+        tone = min(255, first + ((lv * shades + 128) >> 8))
+        return tuple(self.palette[3 * tone + q] / 255.0 for q in range(3))
+
+    def light_shift(self, i, j, amplitude):
+        """Décalage d'éclairage (unités de l'octet) du sommet affiché (i, j) : nul dans la carte."""
         n = self.n
         out = max(0, -i, i - (n - 1), -j, j - (n - 1))
         if out == 0 or amplitude == 0:
-            return c
-        f = amplitude * min(1.0, out / (1.5 * self.cn))
+            return 0.0
         x = j * self.spacing
         z = i * self.spacing
         lum = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
-        res = []
-        for q in range(3):
-            tint = self.value_noise(x + 7919.0 * (q + 1), z - 6271.0 * (q + 1), 17000.0)
-            res.append(max(0.0, min(1.0, c[q] * (1.0 + f * lum) + f / 12.0 * tint)))
-        return tuple(res)
+        return amplitude * self.ramp(out) * lum
 
     def terrain_mesh_rgb(self, slash, flat, skirt, smooth, noise_rgb=0.0):
         """Jupe en couleurs RVB : sommet lissé → sa couleur RVB moyenne ; sommet non lissé (au bord)
@@ -302,14 +321,18 @@ class Terrain:
             base = colour[ks[kb]]
             first, shades, _ = rang[base] if base < len(rang) else rang[0]
             cols = []
-            for k, s in zip(ks, ss):
-                if s is not None and s[3] is not None:
-                    cols.append(s[3])
+            for p, k, s in zip((p0, p1, p2), ks, ss):
+                shift = self.light_shift(p[0], p[1], noise_rgb) if noise_rgb else 0.0
+                if s is not None and s[4]:
+                    # mélange des couleurs de la carte présentes autour, chacune glissée le long de sa gamme
+                    acc = [0.0, 0.0, 0.0]
+                    for c, frac, lv in s[4]:
+                        rgbc = self.pal_rgb(c, lv + shift)
+                        for q in range(3):
+                            acc[q] += frac * rgbc[q]
+                    cols.append(tuple(acc))
                 else:
-                    tone = min(255, first + ((light[k] * shades + 128) >> 8))
-                    cols.append(tuple(pal[3 * tone + q] / 255.0 for q in range(3)))
-            if noise_rgb:
-                cols = [self.rgb_noise(q[0], q[1], c, noise_rgb) for q, c in zip((p0, p1, p2), cols)]
+                    cols.append(self.pal_rgb(base, light[k] + shift))
             if flat:
                 m = tuple(sum(c[q] for c in cols) / 3 for q in range(3))
                 cols = [m, m, m]
@@ -567,7 +590,10 @@ def main():
     ap.add_argument("--skirt-smooth-rgb", action="store_true",
                     help="le lissage porte sur la couleur RVB affichée (touche C)")
     ap.add_argument("--skirt-noise-rgb", type=float, default=0.0,
-                    help="essai esthétique : amplitude du bruit RVB des jupes (touche B ; ≈ 0,15 à 0,3)")
+                    help="essai esthétique : bruit RVB des jupes le long des gammes de la palette, "
+                         "amplitude en unités d'éclairage (touche B ; ≈ 40 à 80)")
+    ap.add_argument("--skirt-ramp", type=float, default=3.0,
+                    help="largeur de la transition carte → jupe, en cellules (défaut 3)")
     ap.add_argument("--skirt-noise", type=float, default=0.0,
                     help="amplitude du bruit d'éclairage des jupes (essai esthétique ; 40 ≈ ±4 teintes ; défaut 0)")
     args = ap.parse_args()
@@ -601,7 +627,8 @@ def main():
     smooth_cache = {}
 
     rgb_mode = args.skirt_smooth_rgb
-    noise_rgb_amp = args.skirt_noise_rgb if args.skirt_noise_rgb > 0 else 0.2
+    noise_rgb_amp = args.skirt_noise_rgb if args.skirt_noise_rgb > 0 else 60.0
+    world.ramp_cells = args.skirt_ramp
     noise_rgb = args.skirt_noise_rgb
 
     def use_rgb():

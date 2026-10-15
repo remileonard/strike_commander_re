@@ -339,48 +339,73 @@ la moyenne de son carré (`BoxSum / (2r + 1)²`). Il faut alors dessiner ces tri
 couleurs de sommet propres, sans appliquer la règle « couleur du sommet le plus haut » de
 `renderColoredTriangle`. Les textures restent celles des sommets source.
 
-### 5ter. Bruit en RVB, après le lissage (PAS le jeu)
+### 5ter. Bruit en RVB qui reste dans les teintes de la carte, et transition plus douce (PAS le jeu)
 
-Même idée que le §4, mais appliquée à la couleur RVB des copies, après le lissage RVB (§5bis) ou seul.
-Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 0.3` (touche B), captures
+Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 60 --skirt-ramp 3` (touche B), captures
 `data/ALASKA_3d_jupes_rvb_bruit.png` (coin) et `data/ALASKA_3d_jupes_rvb_bruit_sol.png` (vue basse).
 
+**Transition carte → jupe.** Remarque de Rémi : avec une rampe linéaire sur 1,5 cellule, la frontière
+entre la carte détaillée et la jupe lissée est trop nette. La rampe (lissage et bruits) devient une
+courbe en S sur `ramp_cells` cellules (3 par défaut) :
+
 ```
-f      = A × rampe                      (rampe : 0 au bord, 1 à 1,5 cellule, comme au §4)
-lum    = 0,65 × bruitValeur(7,3 km) + 0,35 × bruitValeur(31 km)
-teinte = bruitValeur(17 km), un tirage indépendant par canal (décalage de position différent)
-canal' = clamp(canal × (1 + f × lum) + f / 12 × teinte, 0, 1)
+x     = min(1, d / (ramp_cells × n))          (d = distance hors carte en sommets)
+rampe = x² × (3 − 2x)
 ```
 
-Constat :
-- A ≈ 0,3 : la surface lissée gagne des variations douces de luminosité (marbrures de 5 à 30 km) qui
-  évitent l'aspect « flou » uniforme, sans faire réapparaître la répétition ;
-- la variation de teinte doit rester faible : avec ± A/3 par canal (premier essai), des reflets rose
-  et violet apparaissent ; à ± A/12 la teinte reste dans les verts, gris et bleus de la carte.
+**Bruit dans les teintes de la carte.** Remarque de Rémi : le bruit doit rester dans les teintes de la
+carte. Un premier essai décalait R, V et B séparément (reflets rose et violet) : abandonné. Le bruit
+fait maintenant **glisser chaque couleur de base le long de SA gamme de palette** (`RANG`), puis on
+mélange :
+
+```
+décalage = A × rampe × (0,65 × bruitValeur(7,3 km) + 0,35 × bruitValeur(31 km))   (unités d'éclairage)
+pour chaque couleur de base c présente dans le carré de lissage du sommet :
+    part_c        = nombre de sommets de couleur c / nombre de sommets du carré
+    éclairage_c   = moyenne de l'éclairage des sommets de couleur c du carré
+RVB = Σ_c part_c × palette[première_c + ((éclairage_c + décalage) × n_c + 128) >> 8]
+```
+
+Sans lissage (ou au ras du bord, r = 0) : `RVB = palette[teinte(couleur de base du triangle,
+éclairage du sommet + décalage)]`. Toute couleur affichée est donc une teinte de la carte ou un
+mélange de teintes présentes autour. A ≈ 40 à 80 (60 sur les captures).
+
+Calcul : en plus des tables du §5, une table de sommes cumulées par couleur de base c pour
+l'indicateur « le sommet est de couleur c » (part) et une pour « éclairage si le sommet est de
+couleur c, 0 sinon » (moyenne d'éclairage de c = somme / nombre).
 
 ```cpp
-// Couleur RVB (0..1) d'une copie hors carte, modulée par le bruit ; à appeler après le lissage RVB.
-static void ApplySkirtRgbNoise(float color[3], int gRow, int gCol, int side, int perBlock, float spacing,
-                               float amplitude) {
-    int out = 0;
-    out = std::max(out, -gRow);
-    out = std::max(out, gRow - (side - 1));
-    out = std::max(out, -gCol);
-    out = std::max(out, gCol - (side - 1));
-    if (out == 0) {
-        return;
-    }
-    float f = amplitude * std::min(1.0f, (float)out / (1.5f * (float)perBlock));
-    float x = gCol * spacing;
-    float z = gRow * spacing;
-    float lum = 0.65f * ValueNoise(x, z, 7300.0f) + 0.35f * ValueNoise(x + 5000.0f, z - 9000.0f, 31000.0f);
-    for (int q = 0; q < 3; q++) {
-        float tint = ValueNoise(x + 7919.0f * (float)(q + 1), z - 6271.0f * (float)(q + 1), 17000.0f);
-        float c = color[q] * (1.0f + f * lum) + f / 12.0f * tint;
-        color[q] = std::max(0.0f, std::min(1.0f, c));
+// Teinte RVB (0..1) de la couleur de base c pour un éclairage lv (0..255), formule du jeu.
+static void PaletteRgb(RSArea *area, int c, float lv, float rgb[3]) {
+    int light = std::max(0, std::min(255, (int)lroundf(lv)));
+    int tone = area->rangFirst[c] + ((light * area->rangCount[c] + 128) >> 8);
+    tone = std::min(255, tone);
+    Texel *t = Renderer.getPalette()->GetRGBColor(tone);
+    rgb[0] = t->r / 255.0f;
+    rgb[1] = t->g / 255.0f;
+    rgb[2] = t->b / 255.0f;
+}
+
+// Couleur d'une copie hors carte : mélange des couleurs de base du carré, chacune décalée sur sa gamme.
+// parts[c] et lights[c] viennent des tables de sommes cumulées ; shift = décalage du bruit.
+static void SkirtNoisyColor(RSArea *area, const float parts[], const float lights[], int colourCount,
+                            float shift, float out[3]) {
+    out[0] = 0.0f;
+    out[1] = 0.0f;
+    out[2] = 0.0f;
+    for (int c = 0; c < colourCount; c++) {
+        if (parts[c] <= 0.0f) {
+            continue;
+        }
+        float rgb[3];
+        PaletteRgb(area, c, lights[c] + shift, rgb);
+        out[0] += parts[c] * rgb[0];
+        out[1] += parts[c] * rgb[1];
+        out[2] += parts[c] * rgb[2];
     }
 }
 ```
 
-`ValueNoise` est celle du §4. Dans `SCRenderer`, `color` est `MapVertex::color` (les trois premières
-composantes).
+`rangFirst` / `rangCount` sont la première teinte et le nombre de teintes de chaque couleur de base
+(chunk `RANG` de `PALETTE.IFF`, voir la revue du renderer). Le décalage `shift` se calcule comme au
+§4 (`ValueNoise`), multiplié par `A × rampe`.
