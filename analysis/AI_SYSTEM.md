@@ -1931,3 +1931,35 @@ constructeur » des nœuds `MVRS` (cadre obsolète depuis la découverte
 de la table statique), et le rôle des 3 constantes du constructeur
 d'entité (`+0x139`/`+0x13D`/`+0x141`, mécanisme compris via
 `Goal_SetObjective_A307`).
+
+## 12. Défenses fixes SWPN (catégorie 0x13) — lu 2026-10-15
+
+Une instance SWPN (vtable seg339 0x6FB50) n'a pas d'entité IA : sa mise à jour est
+`SwpnInstance_Update_43491` (slot +0x10), un automate fixe qui ne lit ni GOAL ni MVRS. Dans
+`AIAircraft_SpawnAndConditionalLoadProfile_53363`, le PROF n'est chargé que si
+`(instance+4 & 0x6F) == 0x4E` ; le constructeur SWPN lu (`PlayerComponent_SubHelperX_A0B8B` →
+`PlayerComponent_RegisterAndInitPulses_A0B40`) pose les bits 0x10 et 0x40, pas le bit 0x08 que pose
+le constructeur des avions IA (`Camera_Helper3_9D490`, nom faux).
+
+Ordres de mission : `MissionScript_CallNativeHandler_52513` envoie l'ordre au slot +0x88 de
+l'instance, `SwpnInstance_OnOrder_43CBB` : ordre 0xBE → munitions = 0 (la défense ne tire plus),
+renvoie 1 ; tout autre ordre est ignoré (renvoie 0).
+
+Tick (`SwpnInstance_Update_43491`), données = chunk DATA du modèle SWPN :
+1. Minuteur +0x5B (valeur 1 000 000 s posée à la construction, sert à ses impulsions).
+2. Délai entre tirs +0x57 > 0 : décompté de dt ; rien d'autre ce tick.
+3. Sinon, **une frame sur 10** (impulsion +0x63) : recherche de cible dans la portée de détection,
+   toutes directions : l'avion le plus proche (`World_FindNearestInCone_22A7D`, TRGT 1, catégorie 6),
+   puis les suivants (`World_SelectTargetInCone_22795`) jusqu'au premier d'un **autre camp** que
+   le mien et, pour un avion, dont le pilote n'est pas éjecté. Aucun → pas de cible. Le camp 0xFF
+   pose `byte_6E4C2` (rôle non établi).
+4. Avec cible : tir seulement si distance < portée de tir **et** si la cible n'est pas trop près de
+   l'horizon : avec u = direction unitaire, il faut ux² + uz² ≤ cos 15° (0,966), soit une
+   élévation d'au moins ~10,6°. Sinon la cible est abandonnée.
+5. Tir si munitions > 0 :
+   - lance-missiles : la cible doit être à plus de 305 m au-dessus du sol (`cmp …, 13100h`) ; plafond
+     de missiles du camp IA (`word_70479`, +1) ; missile créé à ma position, altitude + 2 × décalage
+     DATA, nez vers la cible, cible = la mienne, lanceur = moi, guidage actif ;
+   - canon : `Effect_SpawnPeriodicAtAttach` (non détaillé) ;
+   - missile : munitions −1, délai = cadence DATA.
+6. Mort → renvoie 0 (retirée) ; sinon l'altitude est recollée au terrain et renvoie 1.

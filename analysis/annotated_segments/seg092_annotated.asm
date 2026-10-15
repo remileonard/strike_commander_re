@@ -86,7 +86,25 @@ loc_4348F:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_43491:				; DATA XREF: seg339:off_6FB60o
+; ==============================================================================================
+; far (label), LUE 2026-10-15. Slot +0x10 (mise a jour) de l'instance SWPN (vtable seg339
+; 0x6FB50) : automate fixe, sans entite IA ni GOAL/MVRS.
+; Timer_TickWithBlinkPulses_4FB46(+0x5B). Si delai +0x57 > 0 : -= dt. Sinon : une frame sur 10
+; (impulsion +0x63 = minuteur+8) cherche la cible (+0x51) :
+; World_FindNearestInCone_22A7D(59C3h, moi, portee de detection modele+0x3A, 180, TRGT 1,
+; categorie 6) puis World_SelectTargetInCone_22795 jusqu'a un objet de camp (+0x50) different
+; et, si categorie 6, pilote non ejecte (flags_75 bit 5) ; camp 0xFF -> byte_6E4C2 = 1. Avec
+; cible : tir si distance < modele+0x3E << 8 et si u = (moi - cible) normalise verifie ux^2 +
+; uy^2 (plan horizontal Z-up) <= cos 15 (elevation >= ~10,6 deg), sinon cible abandonnee. Tir
+; si munitions +0x53 > 0 : lance-missiles (modele+0x48) : cible a plus de 305 m du sol
+; (13100h), plafond word_70479 < DisplayCache_ComputeChecksum_5D43F/1000,
+; ObjectPrototype_FindOrLoadAndInstantiate_38B70(arme +0x49/+0x4B), nez vers la cible,
+; missile+0x63 = octet +0x13 du modele de la cible, +0x55 cible, +0x57 et corps+0x37 lanceur,
+; corps+0x39 = 1, position = moi, altitude += 2 * (modele+0x4D << 8), ajout a 59C3h,
+; munitions--, +0x57 = cadence modele+0x44 ; canon : Effect_SpawnPeriodicAtAttach. Fin : mort
+; -> 0 ; sinon altitude = Terrain_QueryAltitudeAt, renvoie 1.
+; ==============================================================================================
+SwpnInstance_Update_43491:				; DATA XREF: seg339:off_6FB60o
 		push	bp
 
 loc_43492:
@@ -952,7 +970,12 @@ Effect_SpawnPeriodicAtAttach	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_43C70:				; DATA XREF: seg339:off_6FB68o
+; ==============================================================================================
+; far (label), LUE 2026-10-15. Slot +0x18 (destructeur) de l'instance SWPN : vtable 2AA0h,
+; libere la reference de cible +0x51 (SetReference16 0, WeakRef_InvalidateIfSet),
+; WorldObject_BaseDestruct, libere la memoire si bit 0 de l'argument.
+; ==============================================================================================
+SwpnInstance_Destruct_43C70:				; DATA XREF: seg339:off_6FB68o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -1000,7 +1023,13 @@ loc_43CB7:				; CODE XREF: seg092:088Dj seg092:08BEj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_43CBB:				; DATA XREF: seg339:2B28o
+; ==============================================================================================
+; far (label), LUE 2026-10-15. Slot +0x88 de l'instance SWPN (seg339:2B28 = 0x6FBD8) :
+; reception d'un ordre de mission (MissionScript_CallNativeHandler_52513, 2e argument = code
+; d'ordre). Ordre 0xBE : munitions +0x53 = 0, renvoie 1. Tout autre ordre : renvoie 0, sans
+; effet.
+; ==============================================================================================
+SwpnInstance_OnOrder_43CBB:				; DATA XREF: seg339:2B28o
 		push	bp
 		mov	bp, sp
 		push	si

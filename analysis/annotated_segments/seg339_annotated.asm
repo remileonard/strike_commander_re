@@ -2874,9 +2874,9 @@ off_6FB50	dd loc_37CF4
 off_6FB54	dd Debris_NotifyChildValidate
 off_6FB58	dd loc_37D2E
 off_6FB5C	dd loc_37DD1
-off_6FB60	dd loc_43491
+off_6FB60	dd SwpnInstance_Update_43491
 off_6FB64	dd loc_38046
-off_6FB68	dd loc_43C70
+off_6FB68	dd SwpnInstance_Destruct_43C70
 off_6FB6C	dd loc_3CC19
 off_6FB70	dd VROOMM_StubThunk_6C190
 		dd VROOMM_StubThunk_6C195
@@ -2904,7 +2904,7 @@ off_6FBC8	dd loc_3CB3A
 off_6FBCC	dd WorldObject_GetSignatureByte0_381E5
 off_6FBD0	dd VROOMM_StubThunk_6BFB0
 off_6FBD4	dd WorldObject_CollisionDamage_38210
-		dd loc_43CBB
+		dd SwpnInstance_OnOrder_43CBB
 aTerrain	db 'TERRAIN',0          ; DATA XREF: seg079:0080o
 					; Aircraft_OnCollision_9D910+49o ...
 unk_6FBE4	db    0
