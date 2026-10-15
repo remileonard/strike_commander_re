@@ -341,7 +341,7 @@ couleurs de sommet propres, sans appliquer la règle « couleur du sommet le plu
 
 ### 5ter. Bruit en RVB qui reste dans les teintes de la carte, et transition plus douce (PAS le jeu)
 
-Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 60 --skirt-ramp 3` (touche B), captures
+Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 60 --skirt-ramp 3` (touche B), et dans la vue WebGL (`<nom>_3d.html`, section « Jupes : essais esthétiques », destination « coin nord-ouest » ; capture `data/ALASKA_3d_web_jupes.png`), captures
 `data/ALASKA_3d_jupes_rvb_bruit.png` (coin) et `data/ALASKA_3d_jupes_rvb_bruit_sol.png` (vue basse).
 
 **Transition carte → jupe.** Remarque de Rémi : avec une rampe linéaire sur 1,5 cellule, la frontière

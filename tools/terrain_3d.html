@@ -70,9 +70,18 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
     <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
     <label><input type="checkbox" id="skirtOn" checked> jupes : 4 cellules hors carte, cellule du bord répétée (comme le jeu)</label>
   </div>
+  <h2>Jupes : essais esthétiques (pas le jeu)</h2>
+  <div class="opts">
+    <label><input type="checkbox" id="smoothOn" checked> lissage RVB</label>
+    <label><input type="checkbox" id="smoothH"> lisser aussi l'altitude</label>
+    <label><input type="checkbox" id="noiseOn" checked> bruit dans les teintes de la carte</label>
+    <label>rayon du lissage (sommets) <input type="number" id="smoothR" value="8" min="1" max="20" step="1"></label>
+    <label>amplitude du bruit (éclairage) <input type="number" id="noiseA" value="60" min="0" max="160" step="10"></label>
+    <label>transition (cellules) <input type="number" id="rampC" value="3" min="0.5" max="4" step="0.5"></label>
+  </div>
   <h2>Aller à</h2>
   <ul class="list" id="goto"></ul>
-  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km.</p>
+  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km. Essais esthétiques (absents du jeu) : lissage moyen RVB des jupes (rayon croissant avec la distance au bord, courbe en S sur « transition » cellules) et bruit qui fait glisser chaque couleur de base le long de sa gamme de palette, puis mélange les couleurs présentes autour (teintes de la carte uniquement) ; voir analysis/IMPL_TERRAIN_SKIRTS.md §5 à 5ter.</p>
 </aside>
 <script>
 const D = /*__DATA__*/null;
@@ -174,6 +183,124 @@ const D = /*__DATA__*/null;
   function buildTerrain(slash, flat) {
     terrain = buildMesh(slash, flat, 0, terrain);
     skirt = buildMesh(slash, flat, SK, skirt);
+    buildSkirtRGB(slash, flat);
+  }
+
+  // --- essais esthétiques des jupes (pas le jeu) : lissage RVB et bruit dans les teintes de la carte ---
+  const progRGB = gl.createProgram();
+  gl.attachShader(progRGB, shader(gl.VERTEX_SHADER, `attribute vec3 aPos; attribute vec3 aCol; uniform mat4 uMVP;
+    varying vec3 vCol; void main() { vCol = aCol; gl_Position = uMVP * vec4(aPos, 1.0); }`));
+  gl.attachShader(progRGB, shader(gl.FRAGMENT_SHADER, `precision highp float; varying vec3 vCol;
+    void main() { gl_FragColor = vec4(vCol, 1.0); }`));
+  gl.linkProgram(progRGB);
+  const aPosR = gl.getAttribLocation(progRGB, "aPos"), aColR = gl.getAttribLocation(progRGB, "aCol");
+  const uMVPR = gl.getUniformLocation(progRGB, "uMVP");
+  const num = (id) => parseFloat(document.getElementById(id).value) || 0;
+  const chk = (id) => document.getElementById(id).checked;
+  const outOf = (i, j) => Math.max(0, -i, i - (N - 1), -j, j - (N - 1));
+  function ramp(out) { const x = Math.min(1, out / (Math.max(0.5, num("rampC")) * CN)); return x * x * (3 - 2 * x); }
+  function hash01(i, j) {
+    let h = (Math.imul(i, 374761393) + Math.imul(j, 668265263)) >>> 0;
+    h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    h = (h ^ (h >>> 16)) >>> 0;
+    return (h & 0xFFFF) / 32767.5 - 1;
+  }
+  function valueNoise(x, z, period) {
+    const fx = x / period, fz = z / period, i0 = Math.floor(fx), j0 = Math.floor(fz);
+    let u = fx - i0, v = fz - j0; u = u * u * (3 - 2 * u); v = v * v * (3 - 2 * v);
+    const a = hash01(i0, j0), b = hash01(i0 + 1, j0), c = hash01(i0, j0 + 1), d = hash01(i0 + 1, j0 + 1);
+    return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v;
+  }
+  function lightShift(i, j, amp) {
+    const out = outOf(i, j); if (!out || !amp) return 0;
+    const x = j * SP, z = i * SP;
+    return amp * ramp(out) * (0.65 * valueNoise(x, z, 7300) + 0.35 * valueNoise(x + 5000, z - 9000, 31000));
+  }
+  function palRGB(c, lv, o) {
+    const r = RANG[c] || RANG[0];
+    const l = Math.max(0, Math.min(255, Math.round(lv)));
+    const tone = Math.min(255, r[0] + ((l * r[1] + 128) >> 8));
+    o[0] = PAL[3 * tone] / 255; o[1] = PAL[3 * tone + 1] / 255; o[2] = PAL[3 * tone + 2] / 255;
+  }
+  const COLS = []; for (let k = 0; k < N * N; k++) if (!COLS.includes(C[k])) COLS.push(C[k]);
+  // composition lissée de chaque sommet de la jupe : part et éclairage moyen par couleur, altitude moyenne
+  const GW = N + 2 * SK * CN, G0 = -SK * CN;           // grille affichée de la jupe
+  let smooth = null;                                    // { r: rayon, part: [Float32Array], lit: [...], h, on }
+  function buildSmooth() {
+    const R = Math.max(1, Math.round(num("smoothR")));
+    if (smooth && smooth.R === R) return;
+    const lo = G0 - R, m = GW + 2 * R, w = m + 1;
+    const idx = new Int32Array(m * m);
+    for (let a = 0; a < m; a++) for (let b = 0; b < m; b++) idx[a * m + b] = key(lo + a, lo + b);
+    function sat(f) {
+      const s = new Float64Array(w * w);
+      for (let a = 0; a < m; a++) { let row = 0; for (let b = 0; b < m; b++) { row += f(idx[a * m + b]); s[(a + 1) * w + b + 1] = s[a * w + b + 1] + row; } }
+      return s;
+    }
+    const box = (s, a, b, r) => s[(a + r + 1) * w + b + r + 1] - s[(a - r) * w + b + r + 1] - s[(a + r + 1) * w + b - r] + s[(a - r) * w + b - r];
+    const sc = COLS.map((c) => sat((k) => (C[k] === c ? 1 : 0)));
+    const sl = COLS.map((c) => sat((k) => (C[k] === c ? L[k] : 0)));
+    const sh = sat((k) => H[k]);
+    const part = COLS.map(() => new Float32Array(GW * GW)), lit = COLS.map(() => new Float32Array(GW * GW));
+    const hs = new Float32Array(GW * GW), on = new Uint8Array(GW * GW);
+    for (let i = G0; i < G0 + GW; i++) for (let j = G0; j < G0 + GW; j++) {
+      const out = outOf(i, j); if (!out) continue;
+      const r = Math.round(R * ramp(out)); if (!r) continue;
+      const a = i - lo, b = j - lo, area = (2 * r + 1) * (2 * r + 1), g = (i - G0) * GW + (j - G0);
+      on[g] = 1; hs[g] = box(sh, a, b, r) / area;
+      COLS.forEach((c, q) => { const n = box(sc[q], a, b, r); part[q][g] = n / area; lit[q][g] = n > 0 ? box(sl[q], a, b, r) / n : 0; });
+    }
+    smooth = { R, ramp: num("rampC"), part, lit, hs, on };
+  }
+  let skirtRGB = null;
+  function buildSkirtRGB(slash, flat) {
+    const useS = chk("smoothOn"), useN = chk("noiseOn");
+    if (!useS && !useN) return;
+    if (useS) { if (smooth && smooth.ramp !== num("rampC")) smooth = null; buildSmooth(); }
+    const amp = useN ? num("noiseA") : 0, useH = useS && chk("smoothH");
+    const M = N - 1 + 2 * SK * CN, ntri = (M * M - (N - 1) * (N - 1)) * 2;
+    const pos = new Float32Array(ntri * 9), col = new Float32Array(ntri * 9);
+    let t = 0;
+    const tmp = [0, 0, 0], acc = [0, 0, 0];
+    function vert(p, base, o) {
+      const k = key(p[0], p[1]), g = (p[0] - G0) * GW + (p[1] - G0), sm = useS && smooth.on[g];
+      const shift = amp ? lightShift(p[0], p[1], amp) : 0;
+      if (sm) {
+        acc[0] = acc[1] = acc[2] = 0;
+        COLS.forEach((c, q) => { const f = smooth.part[q][g]; if (f > 0) { palRGB(c, smooth.lit[q][g] + shift, tmp); acc[0] += f * tmp[0]; acc[1] += f * tmp[1]; acc[2] += f * tmp[2]; } });
+        o[0] = acc[0]; o[1] = acc[1]; o[2] = acc[2];
+      } else palRGB(base, L[k] + shift, o);
+      return useH && sm ? smooth.hs[g] : H[k];
+    }
+    const hOf = (p) => { const g = (p[0] - G0) * GW + (p[1] - G0); return useH && useS && smooth.on[g] ? smooth.hs[g] : H[key(p[0], p[1])]; };
+    const c3 = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    function tri(p0, p1, p2) {
+      const ps = [p0, p1, p2];
+      let kb = 0;
+      for (const q of [1, 2]) if ((hOf(ps[q]) & 0xFFFF) >= (hOf(ps[kb]) & 0xFFFF)) kb = q;
+      const base = C[key(ps[kb][0], ps[kb][1])];
+      const hv = ps.map((p, q) => vert(p, base, c3[q]));
+      if (flat) for (let q = 0; q < 3; q++) { const m = (c3[0][q] + c3[1][q] + c3[2][q]) / 3; c3[0][q] = c3[1][q] = c3[2][q] = m; }
+      for (let q = 0; q < 3; q++) {
+        const o = 3 * t; pos[o] = posX(ps[q][1]); pos[o + 1] = hv[q]; pos[o + 2] = posZ(ps[q][0]);
+        col[o] = c3[q][0]; col[o + 1] = c3[q][1]; col[o + 2] = c3[q][2]; t++;
+      }
+    }
+    const lo = -SK * CN, hi = N - 1 + SK * CN;
+    for (let i = lo; i < hi; i++) for (let j = lo; j < hi; j++) {
+      if (i >= 0 && i < N - 1 && j >= 0 && j < N - 1) continue;
+      const A = [i, j], B = [i, j + 1], Cc = [i + 1, j], Dd = [i + 1, j + 1];
+      if (!slash) { tri(A, B, Dd); tri(A, Dd, Cc); } else { tri(A, B, Cc); tri(Dd, Cc, B); }
+    }
+    skirtRGB = upload(pos, col, skirtRGB);
+  }
+  function drawRGB(b, MVP) {
+    gl.useProgram(progRGB);
+    gl.uniformMatrix4fv(uMVPR, false, new Float32Array(MVP));
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.enableVertexAttribArray(aPosR); gl.vertexAttribPointer(aPosR, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.enableVertexAttribArray(aColR); gl.vertexAttribPointer(aColR, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, b.n / 3);
+    gl.useProgram(prog);
   }
   const runways = (function () {
     const pos = [], sh = [];
@@ -283,7 +410,11 @@ const D = /*__DATA__*/null;
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, palTex);
     gl.uniform1f(uSmooth, document.getElementById("flat").checked ? 0 : 1);
     draw(terrain, gl.TRIANGLES);
-    if (document.getElementById("skirtOn").checked) draw(skirt, gl.TRIANGLES);
+    if (chk("skirtOn")) {
+      if ((chk("smoothOn") || chk("noiseOn")) && skirtRGB) drawRGB(skirtRGB, MVP);
+      else draw(skirt, gl.TRIANGLES);
+      gl.uniform1f(uSmooth, chk("flat") ? 0 : 1);
+    }
     gl.uniform1f(uSmooth, 0);
     gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -8);
     draw(runways, gl.TRIANGLES);
@@ -311,6 +442,8 @@ const D = /*__DATA__*/null;
   const rebuild = () => buildTerrain(document.getElementById("diag").checked, document.getElementById("flat").checked);
   document.getElementById("diag").onchange = rebuild;
   document.getElementById("flat").onchange = rebuild;
+  const rebuildSkirt = () => buildSkirtRGB(chk("diag"), chk("flat"));
+  for (const id of ["smoothOn", "smoothH", "noiseOn", "smoothR", "noiseA", "rampC"]) document.getElementById(id).onchange = rebuildSkirt;
 
   function goTo(x, y, z, dist) {
     cam.x = x - dist; cam.z = z; cam.y = y + dist * 0.4; cam.yaw = Math.PI / 2; cam.pitch = -0.38; cam.speed = Math.max(100, dist / 4);
@@ -322,6 +455,7 @@ const D = /*__DATA__*/null;
     b.onclick = () => { fn(); cv.focus(); }; li.appendChild(b); document.getElementById("goto").appendChild(li);
   }
   item("vue d'ensemble", "au-dessus de la carte", () => { cam.x = 0; cam.z = 260000; cam.y = 120000; cam.yaw = 0; cam.pitch = -0.6; cam.speed = 5000; });
+  item("coin nord-ouest", "hors carte, pour voir les jupes", () => { cam.x = -330000; cam.z = -330000; cam.y = 150000; cam.yaw = 135 * Math.PI / 180; cam.pitch = -35 * Math.PI / 180; cam.speed = 5000; });
   D.runways.forEach((r, k) => item(`piste ${k + 1} · case ${r.cell}`, `Y ${r.y} m`, () => goTo(runCentres[k][0], r.y, -runCentres[k][2], 3000)));
   D.objects.forEach((o) => item(o.name, `case ${o.cell} · Y ${o.y.toFixed(0)} m`, () => goTo(o.x, o.y, -o.z, 400)));
 })();
