@@ -42,11 +42,21 @@ loc_32657:				; CODE XREF: seg071:0015j seg071:001Cj
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,347L — divise des coordonnées par une taille de tuile (+0x86), calcule un index de tuile
-; avec bornage (0..+0x7) : résolution d'index de tuile de texture terrain (tile lookup pour le
-; rendu du sol/terrain).
+; far, 347L, LUE 2026-10-15. Ex-'Terrain_BuildVertexWindow_3266E'. CONSTRUIT LA FENETRE DE
+; SOMMETS DU MAILLAGE TERRAIN (arg_0 = terrain du niveau de detail, arg_2 = maillage, arg_4 =
+; sommet de depart (col, ligne) en coordonnees de sommet globales). Pour chaque sommet de la
+; fenetre (maillage+0x11 par cote) : cellule = coordonnee / n (n = sommets par cellule,
+; terrain+0x86 ; arrondi vers le bas pour les negatifs : 'or cx,cx / jge / dec') BORNEE a [0,
+; dim-1] (dim = terrain+7 = 18 : 'cmp ax,[si+7] / jg / dec ax', '< 0 -> 0') ; position dans la
+; cellule = coordonnee mod n, ramenee dans [0, n-1] (+n si negative) et qui repart a 0 a
+; chaque cellule. Le pointeur range (maillage+0x17, 4 o par sommet) vise l'enregistrement de 6
+; o de ce sommet dans la cellule bornee (table des cellules terrain+3, dim x dim). Consequence
+; : HORS DE LA CARTE, la cellule du bord est REPETEE en entier, cellule apres cellule (motif
+; periodique de 20 km), et un coin repete la cellule de coin dans les deux directions.
+; maillage+0x0D = moyenne du mot +0x12 des cellules touchees. Appelee par
+; Terrain_ComputeLODMesh, qui charge les cellules de la fenetre avec le meme bornage.
 ; ==============================================================================================
-Terrain_TileIndexResolve	proc far		; CODE XREF: Terrain_ComputeLODMesh+3B9p
+Terrain_BuildVertexWindow_3266E	proc far		; CODE XREF: Terrain_ComputeLODMesh+3B9p
 
 var_2C		= word ptr -2Ch
 var_2A		= word ptr -2Ah
@@ -106,14 +116,14 @@ loc_326A2:
 loc_326A8:
 		dec	[bp+var_2]
 
-loc_326AB:				; CODE XREF: Terrain_TileIndexResolve+38j
+loc_326AB:				; CODE XREF: Terrain_BuildVertexWindow_3266E+38j
 		or	di, di
 
 loc_326AD:
 		jge	short loc_326B2
 		dec	[bp+var_4]
 
-loc_326B2:				; CODE XREF: Terrain_TileIndexResolve:loc_326ADj
+loc_326B2:				; CODE XREF: Terrain_BuildVertexWindow_3266E:loc_326ADj
 		mov	ax, [bp+var_2]
 		mov	[bp+var_6], ax
 		mov	ax, [bp+var_4]
@@ -124,30 +134,30 @@ loc_326B2:				; CODE XREF: Terrain_TileIndexResolve:loc_326ADj
 		jmp	short loc_326D7
 ; ���������������������������������������������������������������������������
 
-loc_326CB:				; CODE XREF: Terrain_TileIndexResolve+54j
+loc_326CB:				; CODE XREF: Terrain_BuildVertexWindow_3266E+54j
 		mov	ax, [si+7]
 		cmp	ax, [bp+var_6]
 		jg	short loc_326D7
 		dec	ax
 		mov	[bp+var_6], ax
 
-loc_326D7:				; CODE XREF: Terrain_TileIndexResolve+5Bj
-					; Terrain_TileIndexResolve+63j
+loc_326D7:				; CODE XREF: Terrain_BuildVertexWindow_3266E+5Bj
+					; Terrain_BuildVertexWindow_3266E+63j
 		cmp	[bp+var_8], 0
 		jge	short loc_326E4
 		mov	[bp+var_8], 0
 		jmp	short loc_326F0
 ; ���������������������������������������������������������������������������
 
-loc_326E4:				; CODE XREF: Terrain_TileIndexResolve+6Dj
+loc_326E4:				; CODE XREF: Terrain_BuildVertexWindow_3266E+6Dj
 		mov	ax, [si+7]
 		cmp	ax, [bp+var_8]
 		jg	short loc_326F0
 		dec	ax
 		mov	[bp+var_8], ax
 
-loc_326F0:				; CODE XREF: Terrain_TileIndexResolve+74j
-					; Terrain_TileIndexResolve+7Cj
+loc_326F0:				; CODE XREF: Terrain_BuildVertexWindow_3266E+74j
+					; Terrain_BuildVertexWindow_3266E+7Cj
 		mov	[bp+var_A], cx
 		mov	[bp+var_C], di
 		cmp	[bp+var_A], 0
@@ -155,13 +165,13 @@ loc_326F0:				; CODE XREF: Terrain_TileIndexResolve+74j
 		mov	ax, [si+86h]
 		add	[bp+var_A], ax
 
-loc_32703:				; CODE XREF: Terrain_TileIndexResolve+8Cj
+loc_32703:				; CODE XREF: Terrain_BuildVertexWindow_3266E+8Cj
 		cmp	[bp+var_C], 0
 		jge	short loc_32710
 		mov	ax, [si+86h]
 		add	[bp+var_C], ax
 
-loc_32710:				; CODE XREF: Terrain_TileIndexResolve+99j
+loc_32710:				; CODE XREF: Terrain_BuildVertexWindow_3266E+99j
 		mov	eax, [si+3]
 		mov	[bp+var_10], eax
 		mov	ax, [bp+var_8]
@@ -211,7 +221,7 @@ loc_3274D:
 		jmp	loc_328D6
 ; ���������������������������������������������������������������������������
 
-loc_32782:				; CODE XREF: Terrain_TileIndexResolve+273j
+loc_32782:				; CODE XREF: Terrain_BuildVertexWindow_3266E+273j
 		mov	ax, [si+86h]
 		cmp	ax, [bp+var_C]
 
@@ -230,20 +240,20 @@ loc_32790:
 		jmp	short loc_327AE
 ; ���������������������������������������������������������������������������
 
-loc_3279E:				; CODE XREF: Terrain_TileIndexResolve+12Bj
+loc_3279E:				; CODE XREF: Terrain_BuildVertexWindow_3266E+12Bj
 		cmp	[bp+var_4], 0
 		jge	short loc_327AB
 		mov	[bp+var_8], 0
 		jmp	short loc_327B1
 ; ���������������������������������������������������������������������������
 
-loc_327AB:				; CODE XREF: Terrain_TileIndexResolve+134j
+loc_327AB:				; CODE XREF: Terrain_BuildVertexWindow_3266E+134j
 		mov	ax, [bp+var_4]
 
-loc_327AE:				; CODE XREF: Terrain_TileIndexResolve+12Ej
+loc_327AE:				; CODE XREF: Terrain_BuildVertexWindow_3266E+12Ej
 		mov	[bp+var_8], ax
 
-loc_327B1:				; CODE XREF: Terrain_TileIndexResolve+13Bj
+loc_327B1:				; CODE XREF: Terrain_BuildVertexWindow_3266E+13Bj
 		mov	eax, [si+3]
 		mov	[bp+var_10], eax
 		mov	ax, [bp+var_8]
@@ -271,8 +281,8 @@ loc_327B1:				; CODE XREF: Terrain_TileIndexResolve+13Bj
 		add	[bp+var_26], eax
 		inc	[bp+var_28]
 
-loc_32801:				; CODE XREF: Terrain_TileIndexResolve:loc_32789j
-					; Terrain_TileIndexResolve+161j
+loc_32801:				; CODE XREF: Terrain_BuildVertexWindow_3266E:loc_32789j
+					; Terrain_BuildVertexWindow_3266E+161j
 		mov	ax, [bp+var_A]
 		mov	[bp+var_1A], ax
 		mov	eax, [bp+var_22]
@@ -283,7 +293,7 @@ loc_32801:				; CODE XREF: Terrain_TileIndexResolve:loc_32789j
 		jmp	loc_328B8
 ; ���������������������������������������������������������������������������
 
-loc_3281D:				; CODE XREF: Terrain_TileIndexResolve+255j
+loc_3281D:				; CODE XREF: Terrain_BuildVertexWindow_3266E+255j
 		mov	ax, [si+86h]
 		cmp	ax, [bp+var_1A]
 		jg	short loc_3289C
@@ -297,18 +307,18 @@ loc_3281D:				; CODE XREF: Terrain_TileIndexResolve+255j
 		jmp	short loc_32849
 ; ���������������������������������������������������������������������������
 
-loc_3283C:				; CODE XREF: Terrain_TileIndexResolve+1C6j
+loc_3283C:				; CODE XREF: Terrain_BuildVertexWindow_3266E+1C6j
 		cmp	[bp+var_16], 0
 		jge	short loc_32846
 		xor	cx, cx
 		jmp	short loc_32849
 ; ���������������������������������������������������������������������������
 
-loc_32846:				; CODE XREF: Terrain_TileIndexResolve+1D2j
+loc_32846:				; CODE XREF: Terrain_BuildVertexWindow_3266E+1D2j
 		mov	cx, [bp+var_16]
 
-loc_32849:				; CODE XREF: Terrain_TileIndexResolve+1CCj
-					; Terrain_TileIndexResolve+1D6j
+loc_32849:				; CODE XREF: Terrain_BuildVertexWindow_3266E+1CCj
+					; Terrain_BuildVertexWindow_3266E+1D6j
 		mov	eax, [si+3]
 		mov	[bp+var_14], eax
 		mov	ax, [bp+var_8]
@@ -345,8 +355,8 @@ loc_32890:
 		add	[bp+var_26], eax
 		inc	[bp+var_28]
 
-loc_3289C:				; CODE XREF: Terrain_TileIndexResolve+1B6j
-					; Terrain_TileIndexResolve+1F8j
+loc_3289C:				; CODE XREF: Terrain_BuildVertexWindow_3266E+1B6j
+					; Terrain_BuildVertexWindow_3266E+1F8j
 		mov	bx, [bp+var_18]
 		mov	ax, word ptr [bp+var_1E+2]
 		mov	dx, word ptr [bp+var_1E]
@@ -357,7 +367,7 @@ loc_3289C:				; CODE XREF: Terrain_TileIndexResolve+1B6j
 		inc	[bp+var_1A]
 		inc	[bp+var_2A]
 
-loc_328B8:				; CODE XREF: Terrain_TileIndexResolve+1ACj
+loc_328B8:				; CODE XREF: Terrain_BuildVertexWindow_3266E+1ACj
 		mov	bx, [bp+arg_2]
 		mov	ax, [bx+11h]
 		cmp	ax, [bp+var_2A]
@@ -365,14 +375,14 @@ loc_328B8:				; CODE XREF: Terrain_TileIndexResolve+1ACj
 		jmp	loc_3281D
 ; ���������������������������������������������������������������������������
 
-loc_328C6:				; CODE XREF: Terrain_TileIndexResolve+253j
+loc_328C6:				; CODE XREF: Terrain_BuildVertexWindow_3266E+253j
 		mov	ax, [si+86h]
 		imul	ax, 6
 		add	word ptr [bp+var_22], ax
 		inc	[bp+var_C]
 		inc	[bp+var_2C]
 
-loc_328D6:				; CODE XREF: Terrain_TileIndexResolve+111j
+loc_328D6:				; CODE XREF: Terrain_BuildVertexWindow_3266E+111j
 		mov	bx, [bp+arg_2]
 		mov	ax, [bx+11h]
 		cmp	ax, [bp+var_2C]
@@ -380,7 +390,7 @@ loc_328D6:				; CODE XREF: Terrain_TileIndexResolve+111j
 		jmp	loc_32782
 ; ���������������������������������������������������������������������������
 
-loc_328E4:				; CODE XREF: Terrain_TileIndexResolve+271j
+loc_328E4:				; CODE XREF: Terrain_BuildVertexWindow_3266E+271j
 		movsx	ebx, [bp+var_28]
 		mov	eax, [bp+var_26]
 		cdq
@@ -392,7 +402,7 @@ loc_328E4:				; CODE XREF: Terrain_TileIndexResolve+271j
 		pop	si
 		leave
 		retf
-Terrain_TileIndexResolve	endp
+Terrain_BuildVertexWindow_3266E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -599,7 +609,13 @@ Terrain_HeightSample	endp
 ; ==============================================================================================
 ; far,610L — grosse fonction du cluster terrain (buffer local 0x86, itère sur +0x11 niveaux),
 ; appelée par sub_3756E (probable coordinateur de rendu terrain) : candidat pour le calcul de
-; mesh de terrain adaptatif (LOD/tessellation du sol par tuile), à approfondir.
+; mesh de terrain adaptatif (LOD/tessellation du sol par tuile), à approfondir. | LU
+; PARTIELLEMENT 2026-10-15 : position de l'observateur / taille de cellule (+9) -> cellule
+; (arrondi vers le bas pour les negatifs), fenetre de +0x11 sommets autour ; boucle de
+; chargement des cellules de la fenetre avec BORNAGE de l'indice a [0, dim-1] (+0x47) en
+; colonne et en ligne (loc_32D0D..loc_32D46), cellule absente -> chargee
+; (VROOMM_StubThunk_6BDC0 -> Terrain_LoadElevCell_99B7F) et ajoutee au cache
+; (TerrainTile_CacheEntryConstruct) ; puis Terrain_BuildVertexWindow_3266E.
 ; ==============================================================================================
 Terrain_ComputeLODMesh	proc far		; CODE XREF: Terrain_UpdateLODPerFrame+99P
 
@@ -1097,7 +1113,7 @@ loc_32E0E:				; CODE XREF: Terrain_ComputeLODMesh+39Bj
 		push	si
 		push	word ptr [si+45h]
 		push	cs
-		call	near ptr Terrain_TileIndexResolve
+		call	near ptr Terrain_BuildVertexWindow_3266E
 		add	sp, 6
 		mov	eax, [bp+var_2C]
 

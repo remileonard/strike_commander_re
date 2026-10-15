@@ -7032,8 +7032,8 @@
 "sub_5C832",
 "sub_5C832"
 ],
-"new_name": "Terrain_TileIndexResolve",
-"summary": "far,347L — divise des coordonnées par une taille de tuile (+0x86), calcule un index de tuile avec bornage (0..+0x7) : **résolution d'index de tuile de texture terrain (tile lookup pour le rendu du sol/terrain).**"
+"new_name": "Terrain_BuildVertexWindow_3266E",
+"summary": "far, 347L, LUE 2026-10-15. Ex-'Terrain_BuildVertexWindow_3266E'. CONSTRUIT LA FENETRE DE SOMMETS DU MAILLAGE TERRAIN (arg_0 = terrain du niveau de detail, arg_2 = maillage, arg_4 = sommet de depart (col, ligne) en coordonnees de sommet globales). Pour chaque sommet de la fenetre (maillage+0x11 par cote) : cellule = coordonnee / n (n = sommets par cellule, terrain+0x86 ; arrondi vers le bas pour les negatifs : 'or cx,cx / jge / dec') BORNEE a [0, dim-1] (dim = terrain+7 = 18 : 'cmp ax,[si+7] / jg / dec ax', '< 0 -> 0') ; position dans la cellule = coordonnee mod n, ramenee dans [0, n-1] (+n si negative) et qui repart a 0 a chaque cellule. Le pointeur range (maillage+0x17, 4 o par sommet) vise l'enregistrement de 6 o de ce sommet dans la cellule bornee (table des cellules terrain+3, dim x dim). Consequence : HORS DE LA CARTE, la cellule du bord est REPETEE en entier, cellule apres cellule (motif periodique de 20 km), et un coin repete la cellule de coin dans les deux directions. maillage+0x0D = moyenne du mot +0x12 des cellules touchees. Appelee par Terrain_ComputeLODMesh, qui charge les cellules de la fenetre avec le meme bornage."
 },
 "sub_32901": {
 "segment": "seg071",
@@ -7058,7 +7058,7 @@
 "sub_3266E"
 ],
 "new_name": "Terrain_ComputeLODMesh",
-"summary": "far,610L — grosse fonction du cluster terrain (buffer local 0x86, itère sur +0x11 niveaux), appelée par sub_3756E (probable coordinateur de rendu terrain) : **candidat pour le calcul de mesh de terrain adaptatif (LOD/tessellation du sol par tuile)**, à approfondir."
+"summary": "far,610L — grosse fonction du cluster terrain (buffer local 0x86, itère sur +0x11 niveaux), appelée par sub_3756E (probable coordinateur de rendu terrain) : **candidat pour le calcul de mesh de terrain adaptatif (LOD/tessellation du sol par tuile)**, à approfondir. | LU PARTIELLEMENT 2026-10-15 : position de l'observateur / taille de cellule (+9) -> cellule (arrondi vers le bas pour les negatifs), fenetre de +0x11 sommets autour ; boucle de chargement des cellules de la fenetre avec BORNAGE de l'indice a [0, dim-1] (+0x47) en colonne et en ligne (loc_32D0D..loc_32D46), cellule absente -> chargee (VROOMM_StubThunk_6BDC0 -> Terrain_LoadElevCell_99B7F) et ajoutee au cache (TerrainTile_CacheEntryConstruct) ; puis Terrain_BuildVertexWindow_3266E."
 },
 "sub_32ED1": {
 "segment": "seg071",
