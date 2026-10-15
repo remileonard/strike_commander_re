@@ -161,3 +161,93 @@ Points à garder en tête :
 - **Largeur** : le jeu n'a pas de largeur fixe, la jupe va aussi loin que sa fenêtre de vue. Pour le
   portage, `skirtCells` se règle sur la distance de vue (`max_view_distance` / 20 000, arrondi
   au-dessus).
+
+## 4. Essai esthétique : casser la répétition sans toucher à la géométrie (PAS le jeu)
+
+Ce qui suit n'existe pas dans le jeu : c'est une proposition, essayée dans `tools/terrain_3d.py`
+(`--skirt-noise A`, touche N ; `--skirt-patches`, touche P). Captures : `data/ALASKA_3d_jupes.png`
+(jupes du jeu) et `data/ALASKA_3d_jupes_bruit.png` (A = 90 et plaques).
+
+Constat de l'essai : la répétition se voit surtout aux **plaques de couleur** (forêt / neige) et au
+relief. Bruiter seulement l'éclairage (±4 teintes, A = 40) ne se remarque presque pas ; échanger la
+couleur de base par plaques casse nettement le motif.
+
+Deux réglages, appliqués aux **copies** de la jupe au moment de leur construction (rien ne change
+dans la carte elle-même ni dans les positions) :
+
+1. **Éclairage** : `éclairage' = clamp(éclairage + A × rampe × bruit(xMonde, zMonde), 0, 255)`, puis
+   la teinte habituelle `première + (éclairage' × n + 128) >> 8`. La teinte reste dans la gamme de sa
+   couleur de base.
+   - bruit = `0,65 × bruitValeur(période 7,3 km) + 0,35 × bruitValeur(période 31 km)` : des périodes
+     sans rapport avec les 20 km d'une cellule ;
+   - rampe = `min(1, d / 30)` avec d = distance hors carte en sommets (1,5 cellule en ELV) : rien au
+     bord de la carte, le raccord avec la vraie carte reste invisible.
+2. **Plaques** : sur les sommets à plus d'une demi-cellule hors carte, si `bruitValeur(période 23 km)`
+   dépasse 0,25, la couleur de base 4 (forêt) devient 6 (neige) et inversement. La mer (0) et les
+   autres couleurs ne changent pas. Dans l'outil, le test est fait au premier sommet du triangle.
+
+Le bruit dépend de la position monde du sommet **affiché** (gLigne, gColonne), pas du sommet source :
+deux répétitions d'une même cellule reçoivent donc des valeurs différentes. Il est déterministe
+(hash entier), les jupes sont les mêmes à chaque chargement.
+
+```cpp
+// Valeur pseudo-aléatoire déterministe dans [-1, 1] pour un nœud entier (i, j).
+static float Hash01(int i, int j) {
+    uint32_t h = (uint32_t)i * 374761393u + (uint32_t)j * 668265263u;
+    h = (h ^ (h >> 13)) * 1274126177u;
+    h = h ^ (h >> 16);
+    return (float)(h & 0xFFFF) / 32767.5f - 1.0f;
+}
+
+// Bruit de valeur lisse : interpolation smoothstep entre des nœuds espacés de « period » mètres.
+static float ValueNoise(float x, float z, float period) {
+    float fx = x / period;
+    float fz = z / period;
+    int i0 = (int)floorf(fx);
+    int j0 = (int)floorf(fz);
+    float u = fx - (float)i0;
+    float v = fz - (float)j0;
+    u = u * u * (3.0f - 2.0f * u);
+    v = v * v * (3.0f - 2.0f * v);
+    float a = Hash01(i0, j0);
+    float b = Hash01(i0 + 1, j0);
+    float c = Hash01(i0, j0 + 1);
+    float d = Hash01(i0 + 1, j0 + 1);
+    float top = a * (1.0f - u) + b * u;
+    float bottom = c * (1.0f - u) + d * u;
+    return top * (1.0f - v) + bottom * v;
+}
+
+// À appeler dans SkirtVertex, sur la copie, avant de calculer sa couleur RVB.
+// side = sommets par côté de la carte (360 en ELV) ; amplitude ≈ 40 à 90.
+static void ApplySkirtNoise(MapVertex *v, int gRow, int gCol, int side, int perBlock, float spacing,
+                            float amplitude, bool patches) {
+    int out = 0;
+    out = std::max(out, -gRow);
+    out = std::max(out, gRow - (side - 1));
+    out = std::max(out, -gCol);
+    out = std::max(out, gCol - (side - 1));
+    if (out == 0) {
+        return;
+    }
+    float x = gCol * spacing;
+    float z = gRow * spacing;
+    float ramp = std::min(1.0f, (float)out / (1.5f * (float)perBlock));
+    float n = 0.65f * ValueNoise(x, z, 7300.0f) + 0.35f * ValueNoise(x + 5000.0f, z - 9000.0f, 31000.0f);
+    int light = (int)lroundf((float)v->flag + amplitude * ramp * n);
+    light = std::max(0, std::min(255, light));
+    v->flag = (uint8_t)light;
+    if (patches && out >= perBlock / 2) {
+        bool swap = ValueNoise(x - 3000.0f, z + 11000.0f, 23000.0f) > 0.25f;
+        if (swap && v->type == 4) {
+            v->type = 6;
+        } else if (swap && v->type == 6) {
+            v->type = 4;
+        }
+    }
+}
+```
+
+`flag` et `type` sont les octets éclairage (+2) et couleur (+3) du sommet. Après l'appel, la couleur
+RVB de la copie se calcule comme pour un sommet normal, avec la formule de teinte du jeu
+(`DATA_MODEL.md` §6.8).

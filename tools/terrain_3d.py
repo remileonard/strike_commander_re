@@ -13,6 +13,13 @@ Jupes (touche J) : au-delà des bords, le terrain continue comme dans le jeu
 (Terrain_BuildVertexWindow_3266E) : l'indice de cellule est borné à [0, 17], la position dans la
 cellule continue, donc la cellule du bord se répète toutes les 20 km (celle du coin dans les deux
 directions). --skirt N règle la largeur en cellules (0 = pas de jupe).
+Bruit des jupes (touche N, --skirt-noise A) : essai esthétique, PAS un comportement du jeu.
+L'octet d'éclairage du sommet copié reçoit A × bruit(position monde) avant le calcul de teinte
+(la teinte reste dans la gamme de sa couleur de base) ; bruit lisse à 2 octaves de périodes
+7,3 km et 31 km (sans rapport avec les 20 km d'une cellule) ; amplitude nulle au bord de la carte,
+pleine à 1,5 cellule. --skirt-patches : en plus, sur les jupes, la couleur de base d'un triangle
+passe de forêt (4) à neige (6) ou l'inverse là où un second bruit (période 23 km) dépasse un seuil
+(touche P).
 
 Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
 
@@ -23,7 +30,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -126,7 +133,51 @@ class Terrain:
         bottom = h[self.key(i + 1, j)] * (1 - u) + h[self.key(i + 1, j + 1)] * u
         return top * (1 - v) + bottom * v
 
-    def terrain_mesh(self, slash, flat, skirt=0):
+    @staticmethod
+    def hash01(i, j):
+        """Valeur pseudo-aléatoire déterministe dans [−1, 1] pour un nœud entier (i, j)."""
+        h = (i * 374761393 + j * 668265263) & 0xFFFFFFFF
+        h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+        h ^= h >> 16
+        return (h & 0xFFFF) / 32767.5 - 1.0
+
+    def value_noise(self, x, z, period):
+        """Bruit de valeur lisse (interpolation smoothstep entre nœuds espacés de « period »)."""
+        fx = x / period
+        fz = z / period
+        i0 = math.floor(fx)
+        j0 = math.floor(fz)
+        u = fx - i0
+        v = fz - j0
+        u = u * u * (3 - 2 * u)
+        v = v * v * (3 - 2 * v)
+        a = self.hash01(i0, j0)
+        b = self.hash01(i0 + 1, j0)
+        c = self.hash01(i0, j0 + 1)
+        d = self.hash01(i0 + 1, j0 + 1)
+        return (a * (1 - u) + b * u) * (1 - v) + (c * (1 - u) + d * u) * v
+
+    def skirt_noise(self, i, j, amplitude):
+        """Décalage de l'octet d'éclairage du sommet affiché (i, j) ; nul dans la carte."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out == 0 or amplitude == 0:
+            return 0
+        ramp = min(1.0, out / (1.5 * self.cn))
+        x = j * self.spacing
+        z = i * self.spacing
+        noise = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
+        return amplitude * ramp * noise
+
+    def patch_swap(self, i, j):
+        """Vrai si la couleur de base du triangle (i, j) doit être échangée (jupes seulement)."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out < self.cn // 2:
+            return False
+        return self.value_noise(j * self.spacing - 3000.0, i * self.spacing + 11000.0, 23000.0) > 0.25
+
+    def terrain_mesh(self, slash, flat, skirt=0, noise=0.0, patches=False):
         """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle.
         flat : mode « face unie » du jeu (byte_6EB21 ≠ 1 dans Render_TerrainPipelineMain) — les
         3 sommets reçoivent la moyenne de leurs 3 teintes (somme ÷ 3, partie entière).
@@ -149,8 +200,15 @@ class Terrain:
                 kb = k1
             if (h[k2] & 0xFFFF) >= (h[kb] & 0xFFFF):
                 kb = k2
-            first, shades, _ = rang[colour[kb]] if colour[kb] < len(rang) else rang[0]
-            tones = [first + ((light[k] * shades + 128) >> 8) for k in (k0, k1, k2)]
+            base = colour[kb]
+            if patches and base in (4, 6) and self.patch_swap(p0[0], p0[1]):
+                base = 10 - base
+            first, shades, _ = rang[base] if base < len(rang) else rang[0]
+            lights = [light[k] for k in (k0, k1, k2)]
+            if noise:
+                lights = [max(0, min(255, int(round(lv + self.skirt_noise(p[0], p[1], noise)))))
+                          for lv, p in zip(lights, (p0, p1, p2))]
+            tones = [first + ((lv * shades + 128) >> 8) for lv in lights]
             if flat:
                 tones = [sum(tones) // 3] * 3
             for (i, j), k, tone in zip((p0, p1, p2), (k0, k1, k2), tones):
@@ -333,6 +391,10 @@ def main():
                     help="caméra de départ : X,Y,Z,cap,assiette (m, m, m, degrés, degrés ; Z du fichier)")
     ap.add_argument("--skirt", type=int, default=4,
                     help="largeur des jupes en cellules de 20 km (0 = aucune ; défaut 4)")
+    ap.add_argument("--skirt-patches", action="store_true",
+                    help="essai esthétique : échange forêt/neige par plaques sur les jupes")
+    ap.add_argument("--skirt-noise", type=float, default=0.0,
+                    help="amplitude du bruit d'éclairage des jupes (essai esthétique ; 40 ≈ ±4 teintes ; défaut 0)")
     args = ap.parse_args()
 
     palette_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")
@@ -356,7 +418,10 @@ def main():
     print("construction du maillage…")
     flat = args.flat
     terrain = Mesh(*world.terrain_mesh(slash, flat))
-    skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt)) if args.skirt > 0 else None
+    noise_amp = args.skirt_noise if args.skirt_noise > 0 else 40.0
+    noise = args.skirt_noise
+    patches = args.skirt_patches
+    skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt, noise, patches)) if args.skirt > 0 else None
     show_skirt = skirt is not None
     runways = Mesh(*world.runway_mesh())
     markers = Mesh(*world.marker_mesh())
@@ -401,14 +466,20 @@ def main():
                     slash = not slash
                     terrain.upload(*world.terrain_mesh(slash, flat))
                     if skirt:
-                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt))
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches))
                 elif e.key == pygame.K_f:
                     flat = not flat
                     terrain.upload(*world.terrain_mesh(slash, flat))
                     if skirt:
-                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt))
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches))
                 elif e.key == pygame.K_j and skirt:
                     show_skirt = not show_skirt
+                elif e.key == pygame.K_p and skirt:
+                    patches = not patches
+                    skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches))
+                elif e.key == pygame.K_n and skirt:
+                    noise = 0.0 if noise else noise_amp
+                    skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches))
                 elif e.key == pygame.K_HOME:
                     cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
                     cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
@@ -476,7 +547,9 @@ def main():
                  f"altitude Y {cam.y:.0f} m   sol {ground:.0f} m",
                  f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s",
                  f"ombrage {'plat' if flat else 'dégradé'}   diagonale {'/' if slash else chr(92)}   "
-                 f"jupes {f'{args.skirt} cellules' if show_skirt else 'non'}"]
+                 f"jupes {f'{args.skirt} cellules' if show_skirt else 'non'}"
+                 f"{f'   bruit {noise:g}' if show_skirt and noise else ''}"
+                 f"{'   plaques' if show_skirt and patches else ''}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)
