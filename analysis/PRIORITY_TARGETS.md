@@ -66,7 +66,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 420 | `sub_9BA85` | `Object_LoadCommonChunks_9BA85` | ovr302 |
 | 419 | `sub_A21AF` | `PaletteScreen_UpdateWidgetMain_A21AF` | seg442 |
 | 419 | `sub_9E289` | `WeaponSystem_ReleaseBomb_9E289` | seg432 |
-| 413 | `sub_9A95A` | `TerrainSector_LoadIndexedRecord_9A95A` | ovr296 |
+| 413 | `sub_9A95A` | `TerrainCell_LoadPlacedObjects_9A95A` | ovr296 |
 | 408 | `sub_849B2` | `HUDSymbol_RenderWithClipTestE_849B2` | ovr244 |
 | 399 | `sub_9C42F` | `Debris_ComputeScaledPhysics_9C42F` | ovr303 |
 | 395 | `sub_53D92` | `UIScreen_BuildWidgetTree_Recurse_53D92` | seg114 |

@@ -1348,11 +1348,11 @@ position = décalage                         sinon (coordonnées absolues)</pre>
     <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td>nom</td><td>string[13]</td><td class="num">13</td><td><code>HANGAR3</code>, <code>TOWA24</code>, <code>DRUMD24</code>, <code>HANGB22</code>, <code>DRUMB16</code>, <code>RDRSTL2</code></td></tr>
-      <tr><td>second nom</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>… ; 8 caractères au plus, le 9ᵉ octet n'est pas toujours un zéro ; rôle non établi</td></tr>
+      <tr><td>second nom</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>… ; 8 caractères au plus, le 9ᵉ octet n'est pas toujours un zéro. Objet créé à la place du 1er nom quand l'objet de cette place a été retiré du monde par une collision (le jeu note sa place et relit l'enregistrement au rechargement de la cellule)</td></tr>
       <tr><td>position X</td><td>float</td><td class="num">4</td><td>mètres, coordonnées du monde</td></tr>
       <tr><td>position Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
       <tr><td>position Y</td><td>float</td><td class="num">4</td><td>mètres (altitude) : celle du sol de l'aérodrome (1575 et 455 m)</td></tr>
-      <tr><td>matrice</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3 ; identité pour 6 objets, rotation d'un quart de tour pour <code>HANGAR3</code> ; ordre des lignes et des axes non établi</td></tr>
+      <tr><td>matrice</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3 ; identité pour 6 objets, rotation d'un quart de tour pour <code>HANGAR3</code> ; lignes 0, 1, 2 de la matrice d'orientation de l'objet, dans l'ordre du fichier (3 float par ligne)</td></tr>
     </tbody>
   </table></div>
 </article>
@@ -1470,7 +1470,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
   <p>Tout ce qui précède vient de la lecture du code, sauf ce qui est marqué « constaté », qui vient des fichiers (<code>ALASKA.PAK</code>, <code>ALASKA.TRI</code>, lus par <code>tools/terrain_map.py</code> et <code>tools/terrain_viewer.py</code>). Restent ouverts :</p>
   <ul>
     <li>Terrain : le chunk <code>OBJS</code> de <code>FORM BLOX</code> crée dans le code une grille d'un pointeur par cellule ; la ressource 6 du PAK contient une liste d'objets par cellule. Le lien entre les deux n'est pas tracé dans le code.</li>
-    <li>Terrain : rôle des valeurs non établies des chunks <code>ELEV</code> et <code>OBJS</code>, du second nom et de la matrice des objets posés.</li>
+    <li>Terrain : rôle des valeurs non établies des chunks <code>ELEV</code> et <code>OBJS</code>, des objets posés.</li>
   </ul>
 </section>
 </main>

@@ -1833,8 +1833,8 @@ byte_6EB21	db 1			; DATA XREF: Render_TerrainPipelineMain+1FA9r
 					; Cockpit_ReadControlsFrame_8F720+DAw
 off_6EB22	dd loc_368FE
 off_6EB26	dd loc_3686E
-dword_6EB2A	dd 0			; DATA XREF: Picking_TestAndMarkBitfield+2Dr
-					; TerrainSector_LoadIndexedRecord_9A95A+100r ...
+dword_6EB2A	dd 0			; DATA XREF: TerrainCell_MarkPlacedObjectGone_37010+2Dr
+					; TerrainCell_LoadPlacedObjects_9A95A+100r ...
 off_6EB2E	dd loc_36FA1
 off_6EB32	dd VROOMM_StubThunk_6BE7A
 off_6EB36	dd loc_36F97

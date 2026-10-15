@@ -7382,8 +7382,8 @@
 "sub_37010",
 "sub_5F6A9"
 ],
-"new_name": "Picking_FindSelectableObject",
-"summary": "far,50L — parcourt une liste d'objets (table 0x5510), pour chacun de type 3 (vtable[8]) teste une condition via sub_37010 (test de sélection) : **recherche d'un objet sélectionnable dans le monde (probable ciblage/sélection à la souris).**"
+"new_name": "TerrainCells_MarkPlacedObjectGone_36AA4",
+"summary": "far, 50L, LUE 2026-10-15. Parcourt la liste arg_0 (secteurs de terrain, categorie vtable+8 = 3) et appelle TerrainCell_MarkPlacedObjectGone_37010(secteur, objet arg_2) jusqu'au premier qui reconnait l'objet. Ex-'TerrainCells_MarkPlacedObjectGone_36AA4'."
 },
 "sub_36AEC": {
 "segment": "seg076",
@@ -7444,8 +7444,8 @@
 "lines": 54,
 "type": "far",
 "calls": [],
-"new_name": "Picking_TestAndMarkBitfield",
-"summary": "far,54L — parcourt une table d'indices (+0xA, 16 bits), teste la correspondance avec un critère, positionne un bit dans un tableau de bits global (dword_6EB2A) avec poids binaire croissant : **test et marquage de sélection d'une pièce de modèle (bitfield de surbrillance par partie).**"
+"new_name": "TerrainCell_MarkPlacedObjectGone_37010",
+"summary": "far, 54L, LUE 2026-10-15. Pour un secteur de terrain (arg_0) et un objet (arg_2) : cherche l'objet dans la table des objets poses du secteur (+0x0A, +4 entrees) ; trouve a l'indice k -> pose le bit k de dword_6EB2A[cellule +8] et renvoie 1, sinon 0. Au prochain chargement de la cellule, TerrainCell_LoadPlacedObjects_9A95A instancie alors le 2e nom de l'enregistrement. Ex-'TerrainCell_MarkPlacedObjectGone_37010'."
 },
 "sub_37069": {
 "segment": "seg076",
@@ -7578,8 +7578,8 @@
 "calls": [
 "sub_36AA4"
 ],
-"new_name": "Picking_FindSelectableTyped",
-"summary": "far,22L — wrapper vers sub_36AA4 (recherche d'objet sélectionnable) avec offset fixe (+0x171) : **wrapper de recherche de sélection pour un type d'objet spécifique.**"
+"new_name": "Terrain_MarkPlacedObjectGone_37C33",
+"summary": "far, 22L, LUE 2026-10-15. TerrainCells_MarkPlacedObjectGone_36AA4(terrain arg_0 + 0x171, objet). Appelee par Collision_MainLoop pour chacun des deux objets d'une paire en collision qui est retire de la liste du monde (Container_Op_223C5 sur 59C3h) : un objet pose du terrain detruit par collision est remplace, au rechargement de sa cellule, par son 2e nom. Ex-'Terrain_MarkPlacedObjectGone_37C33'."
 },
 "sub_37C4C": {
 "segment": "seg078",
@@ -37850,8 +37850,8 @@
 "sub_63DF6",
 "sub_220BF"
 ],
-"new_name": "TerrainSector_LoadIndexedRecord_9A95A",
-"summary": "⚠️ far, 413 lignes, NON DÉTAILLÉE — combine `IndexedRecordReader_AdvanceIndex_65E2C` (seg196), CRT_Msg_Sprintf1, allocation et copie de chaîne."
+"new_name": "TerrainCell_LoadPlacedObjects_9A95A",
+"summary": "far, 413 lignes, LUE 2026-10-15. CHARGEMENT DES OBJETS POSES D'UNE CELLULE DE TERRAIN (arg_4 = numero de cellule ; enregistrements du PAK d'objets du theatre). IndexedRecordReader_AdvanceIndex_65E2C(lecteur, cellule) ; entree vide -> aucun objet. Sinon : nom de secteur sprintf(1A8Eh, cellule) ; uint16 nombre -> +4 ; table de pointeurs +0x0A (2 octets par objet) ; masque m = dword_6EB2A[cellule]. Pour chaque objet k : enregistrement de 70 octets (ReadTyped 46h) ; si le bit k de m est pose, instancie le 2e nom (octet +13 de l'enregistrement), sinon le 1er (+0) : ObjectPrototype_FindOrLoadAndInstantiate_38B70 (directement, PAS par AIAircraft_SpawnAndConditionalLoadProfile_53363 : ni PROF ni ordres de mission). Position +0x12 = les 3 dd +22 (c0, c1, c2 dans l'ordre du fichier) ; orientation (vtable+0x3C) ligne 0 = dd +34..+42, ligne 1 (+0x0C) = dd +46..+54, ligne 2 (+0x18) = dd +58..+66 (Utility_Helper_55E65). Objet ajoute a la liste du secteur (+6) ; pointeur range dans la table (+0x0A)[k] ; la liste du secteur est ajoutee aux objets du monde 59C3h (Container_Append) : les objets poses sont mis a jour par la boucle du monde comme les autres (une SWPN posee execute SwpnInstance_Update_43491). Effet de bord observe en tete : int 15h (AX=1209h, BX=5650h) puis byte_6E33B = 1 (mov cl,1 / mov byte_6E33B, cl) ; role non etabli. Ex-'TerrainCell_LoadPlacedObjects_9A95A'."
 },
 "sub_9AC10": {
 "segment": "ovr297",

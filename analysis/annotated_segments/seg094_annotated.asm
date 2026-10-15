@@ -2345,7 +2345,7 @@ loc_45130:				; CODE XREF: Collision_MainLoop+1A0j
 		add	sp, 4
 		push	[bp+var_6]
 		push	word_70474
-		call	Picking_FindSelectableTyped
+		call	Terrain_MarkPlacedObjectGone_37C33
 		add	sp, 4
 
 loc_45153:				; CODE XREF: Collision_MainLoop+22Cj
@@ -2357,7 +2357,7 @@ loc_45153:				; CODE XREF: Collision_MainLoop+22Cj
 		add	sp, 4
 		push	[bp+var_8]
 		push	word_70474
-		call	Picking_FindSelectableTyped
+		call	Terrain_MarkPlacedObjectGone_37C33
 		add	sp, 4
 
 loc_45176:				; CODE XREF: Collision_MainLoop+180j

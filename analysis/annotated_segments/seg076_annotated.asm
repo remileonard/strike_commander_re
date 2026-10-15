@@ -8,11 +8,11 @@ seg076		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,50L — parcourt une liste d'objets (table 0x5510), pour chacun de type 3 (vtable[8])
-; teste une condition via sub_37010 (test de sélection) : recherche d'un objet sélectionnable
-; dans le monde (probable ciblage/sélection à la souris).
+; far, 50L, LUE 2026-10-15. Parcourt la liste arg_0 (secteurs de terrain, categorie vtable+8 =
+; 3) et appelle TerrainCell_MarkPlacedObjectGone_37010(secteur, objet arg_2) jusqu'au premier
+; qui reconnait l'objet. Ex-'TerrainCells_MarkPlacedObjectGone_36AA4'.
 ; ==============================================================================================
-Picking_FindSelectableObject	proc far		; CODE XREF: Picking_FindSelectableTyped+FP
+TerrainCells_MarkPlacedObjectGone_36AA4	proc far		; CODE XREF: Terrain_MarkPlacedObjectGone_37C33+FP
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -29,7 +29,7 @@ loc_36AAE:				; DATA XREF: seg216:0326o
 		jmp	short loc_36AD6
 ; ���������������������������������������������������������������������������
 
-loc_36AB5:				; CODE XREF: Picking_FindSelectableObject+43j
+loc_36AB5:				; CODE XREF: TerrainCells_MarkPlacedObjectGone_36AA4+43j
 		mov	bx, [bp+var_2]
 		mov	si, [bx+4]
 		push	si
@@ -42,13 +42,13 @@ loc_36AB5:				; CODE XREF: Picking_FindSelectableObject+43j
 		push	si
 		nop
 		push	cs
-		call	near ptr Picking_TestAndMarkBitfield
+		call	near ptr TerrainCell_MarkPlacedObjectGone_37010
 		add	sp, 4
 		or	al, al
 		jnz	short loc_36AE9
 
-loc_36AD6:				; CODE XREF: Picking_FindSelectableObject+Fj
-					; Picking_FindSelectableObject+20j
+loc_36AD6:				; CODE XREF: TerrainCells_MarkPlacedObjectGone_36AA4+Fj
+					; TerrainCells_MarkPlacedObjectGone_36AA4+20j
 		lea	ax, [bp+var_2]
 		push	ax
 		push	5510h
@@ -57,11 +57,11 @@ loc_36AD6:				; CODE XREF: Picking_FindSelectableObject+Fj
 		or	ax, ax
 		jnz	short loc_36AB5
 
-loc_36AE9:				; CODE XREF: Picking_FindSelectableObject+30j
+loc_36AE9:				; CODE XREF: TerrainCells_MarkPlacedObjectGone_36AA4+30j
 		pop	si
 		leave
 		retf
-Picking_FindSelectableObject	endp
+TerrainCells_MarkPlacedObjectGone_36AA4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -762,12 +762,13 @@ loc_3700D:				; CODE XREF: seg076:loc_37002j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,54L — parcourt une table d'indices (+0xA, 16 bits), teste la correspondance avec un
-; critère, positionne un bit dans un tableau de bits global (dword_6EB2A) avec poids binaire
-; croissant : test et marquage de sélection d'une pièce de modèle (bitfield de surbrillance
-; par partie).
+; far, 54L, LUE 2026-10-15. Pour un secteur de terrain (arg_0) et un objet (arg_2) : cherche
+; l'objet dans la table des objets poses du secteur (+0x0A, +4 entrees) ; trouve a l'indice k
+; -> pose le bit k de dword_6EB2A[cellule +8] et renvoie 1, sinon 0. Au prochain chargement de
+; la cellule, TerrainCell_LoadPlacedObjects_9A95A instancie alors le 2e nom de
+; l'enregistrement. Ex-'TerrainCell_MarkPlacedObjectGone_37010'.
 ; ==============================================================================================
-Picking_TestAndMarkBitfield	proc far		; CODE XREF: Picking_FindSelectableObject+28p
+TerrainCell_MarkPlacedObjectGone_37010	proc far		; CODE XREF: TerrainCells_MarkPlacedObjectGone_36AA4+28p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -787,7 +788,7 @@ arg_2		= word ptr  8
 		jmp	short loc_3705E
 ; ���������������������������������������������������������������������������
 
-loc_37030:				; CODE XREF: Picking_TestAndMarkBitfield+51j
+loc_37030:				; CODE XREF: TerrainCell_MarkPlacedObjectGone_37010+51j
 		mov	ax, [di]
 		cmp	ax, [bp+arg_2]
 		jnz	short loc_3704F
@@ -801,26 +802,26 @@ loc_37030:				; CODE XREF: Picking_TestAndMarkBitfield+51j
 		jmp	short loc_37065
 ; ���������������������������������������������������������������������������
 
-loc_3704F:				; CODE XREF: Picking_TestAndMarkBitfield+25j
+loc_3704F:				; CODE XREF: TerrainCell_MarkPlacedObjectGone_37010+25j
 		mov	eax, [bp+var_4]
 		shl	eax, 1
 		mov	[bp+var_4], eax
 		inc	dx
 		add	di, 2
 
-loc_3705E:				; CODE XREF: Picking_TestAndMarkBitfield+1Ej
+loc_3705E:				; CODE XREF: TerrainCell_MarkPlacedObjectGone_37010+1Ej
 		cmp	[si+4],	dx
 		jg	short loc_37030
 
-loc_37063:				; CODE XREF: Picking_TestAndMarkBitfield+Fj
+loc_37063:				; CODE XREF: TerrainCell_MarkPlacedObjectGone_37010+Fj
 		mov	al, 0
 
-loc_37065:				; CODE XREF: Picking_TestAndMarkBitfield+3Dj
+loc_37065:				; CODE XREF: TerrainCell_MarkPlacedObjectGone_37010+3Dj
 		pop	di
 		pop	si
 		leave
 		retf
-Picking_TestAndMarkBitfield	endp
+TerrainCell_MarkPlacedObjectGone_37010	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

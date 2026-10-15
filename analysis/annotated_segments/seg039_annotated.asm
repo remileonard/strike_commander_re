@@ -495,7 +495,7 @@ Container_FindOrInsert	endp
 ; far,35L — insère un nœud en fin de liste (chaînage tête/queue) : append au conteneur liste.
 ; ==============================================================================================
 Container_Append	proc far		; CODE XREF: Container_FindOrInsert+67p
-					; TerrainSector_LoadIndexedRecord_9A95A+29DP
+					; TerrainCell_LoadPlacedObjects_9A95A+29DP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

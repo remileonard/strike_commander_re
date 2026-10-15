@@ -1067,10 +1067,13 @@ Terrain_CheckAdjacentDistance	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,22L — wrapper vers sub_36AA4 (recherche d'objet sélectionnable) avec offset fixe
-; (+0x171) : wrapper de recherche de sélection pour un type d'objet spécifique.
+; far, 22L, LUE 2026-10-15. TerrainCells_MarkPlacedObjectGone_36AA4(terrain arg_0 + 0x171,
+; objet). Appelee par Collision_MainLoop pour chacun des deux objets d'une paire en collision
+; qui est retire de la liste du monde (Container_Op_223C5 sur 59C3h) : un objet pose du
+; terrain detruit par collision est remplace, au rechargement de sa cellule, par son 2e nom.
+; Ex-'Terrain_MarkPlacedObjectGone_37C33'.
 ; ==============================================================================================
-Picking_FindSelectableTyped	proc far		; CODE XREF: Collision_MainLoop+243P
+Terrain_MarkPlacedObjectGone_37C33	proc far		; CODE XREF: Collision_MainLoop+243P
 					; Collision_MainLoop+266P
 
 arg_0		= word ptr  6
@@ -1087,10 +1090,10 @@ loc_37C3E:
 
 loc_37C41:
 		push	ax
-		call	Picking_FindSelectableObject
+		call	TerrainCells_MarkPlacedObjectGone_36AA4
 		add	sp, 4
 		pop	bp
 		retf
-Picking_FindSelectableTyped	endp
+Terrain_MarkPlacedObjectGone_37C33	endp
 
 seg077		ends

@@ -1348,11 +1348,11 @@ position = offset                    otherwise (absolute coordinates)</pre>
     <thead><tr><th>Field</th><th>Type</th><th>Bytes</th><th>Description</th></tr></thead>
     <tbody>
       <tr><td>name</td><td>string[13]</td><td class="num">13</td><td><code>HANGAR3</code>, <code>TOWA24</code>, <code>DRUMD24</code>, <code>HANGB22</code>, <code>DRUMB16</code>, <code>RDRSTL2</code></td></tr>
-      <tr><td>second name</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>…; at most 8 characters, the 9th byte is not always zero; role not established</td></tr>
+      <tr><td>second name</td><td>string[9]</td><td class="num">9</td><td><code>HANGAR3D</code>, <code>TOWA24D</code>, <code>DRUM1D</code>, <code>HANGBD</code>, <code>RADARST</code>…; at most 8 characters, the 9th byte is not always zero. Object created instead of the 1st name when the object at this place was removed from the world by a collision (the game records its place and rereads the record when the cell reloads)</td></tr>
       <tr><td>position X</td><td>float</td><td class="num">4</td><td>metres, world coordinates</td></tr>
       <tr><td>position Z</td><td>float</td><td class="num">4</td><td>metres (depth)</td></tr>
       <tr><td>position Y</td><td>float</td><td class="num">4</td><td>metres (altitude): that of the airfield ground (1575 and 455 m)</td></tr>
-      <tr><td>matrix</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3; identity for 6 objects, a quarter-turn rotation for <code>HANGAR3</code>; row and axis order not established</td></tr>
+      <tr><td>matrix</td><td>9&nbsp;×&nbsp;float</td><td class="num">36</td><td>3 × 3; identity for 6 objects, a quarter-turn rotation for <code>HANGAR3</code>; rows 0, 1, 2 of the object's orientation matrix, in file order (3 floats per row)</td></tr>
     </tbody>
   </table></div>
 </article>
@@ -1470,7 +1470,7 @@ position = offset                    otherwise (absolute coordinates)</pre>
   <p>Everything above comes from reading the code, except what is marked “observed”, which comes from the files (<code>ALASKA.PAK</code>, <code>ALASKA.TRI</code>, read by <code>tools/terrain_map.py</code> and <code>tools/terrain_viewer.py</code>). Still open:</p>
   <ul>
     <li>Terrain: in the code, the <code>OBJS</code> chunk of <code>FORM BLOX</code> creates a grid of one pointer per cell; resource 6 of the PAK holds one object list per cell. The link between the two has not been traced in the code.</li>
-    <li>Terrain: role of the unestablished values of the <code>ELEV</code> and <code>OBJS</code> chunks, and of the placed objects' second name and matrix.</li>
+    <li>Terrain: role of the unestablished values of the <code>ELEV</code> and <code>OBJS</code> chunks, of the placed objects.</li>
   </ul>
 </section>
 </main>
