@@ -206,6 +206,7 @@ strike_commander_re/
 │   ├── PHYSICS.md                   modèle de vol / dynamique de l'avion
 │   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
 │   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
+│   ├── IMPL_TERRAIN_SKIRTS.md       à porter : jupes du terrain hors carte (cellule du bord répétée)
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
