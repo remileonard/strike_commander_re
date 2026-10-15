@@ -56,8 +56,9 @@ Pour Rémi, **X et Z = plan horizontal (Z = profondeur), Y = altitude** (repère
 L'assembleur est en Z-up (3ᵉ composante = altitude) : c'est à toi de traduire, jamais à lui.
 - Tout ce que tu écris pour Rémi (axes, champs de fichier, formules, tests) se nomme en Y-up :
   « altitude = Y », « distance dans le plan X/Z », « le 2ᵉ i32 du fichier est Z, le 3ᵉ est Y ».
-- Pour un champ de fichier, indique l'échange à la lecture (`libRS.x = c0`, `libRS.y = c2`,
-  `libRS.z = c1`) ; les composantes Z-up ne restent que dans les citations d'assembleur.
+- Pour un champ de fichier, indique la conversion à la lecture (`libRS.x = c0`, `libRS.y = c2`,
+  `libRS.z = −c1`, voir « Pourquoi Z est inversé » plus bas) ; les composantes Z-up ne restent que
+  dans les citations d'assembleur.
 - Les distances du monde sont en **mètres** (après ÷ 256), **jamais en pieds**, même si un
   ancien document d'`analysis/` dit « ft » ou « pieds ».
 
@@ -136,8 +137,17 @@ Conséquences directes :
   une vraie seconde source reste à retrouver si nécessaire.
   **Convention de nommage :** côté ASM/jeu on est en **Z-up** — composantes
   `(X, Y, Z)` avec **Z = altitude**. libRealSpace est en **Y-up** — `(X, Y, Z)`
-  avec **Y = altitude** : le portage **échange les composantes 1 et 2**
-  (`libRS.x = asm.c0`, `libRS.y = asm.c2`, `libRS.z = asm.c1`).
+  avec **Y = altitude** : le portage **échange les composantes 1 et 2 et inverse Z**
+  (`libRS.x = asm.c0`, `libRS.y = asm.c2`, `libRS.z = −asm.c1`).
+  **Pourquoi Z est inversé (essayé et annulé le 2026-10-16) :** le jeu est en repère direct
+  (c0 = est, c1 = nord, c2 = haut). Échanger seulement c1 et c2 donne un repère **indirect** ;
+  or la caméra de libRealSpace (`Camera::CalcViewMatrix`, OpenGL standard), les rotations de
+  l'avion (`rotateM`, nez en −Z) et les modèles sont en repère direct → **image en miroir**
+  (est/ouest inversés), qu'aucune correction de cap ne rattrape. Le `−` sur c1 est donc la
+  conversion de repère, pas une rustine : il se fait **une seule fois, à la lecture** (terrain,
+  pistes `.TRI`, objets posés, positions de mission), et le nord est vers −Z. Le seul autre
+  endroit où il se voit est le cap lu dans un fichier : `yaw = 360 − cap` (miroir de l'angle).
+  Toute autre compensation de signe sur Z dans le code est un bug de lecture, pas la convention.
   Ne jamais assumer roulis/tangage/lacet sur un axe sans vérification explicite
   dans le code — erreur déjà commise une fois.
 

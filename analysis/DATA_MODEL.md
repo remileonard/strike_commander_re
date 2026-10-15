@@ -19,7 +19,9 @@ appels**, plusieurs gros chargeurs restant `⚠️ NON DÉTAILLÉE` ligne à lig
 > `3× i32` en virgule fixe 24.8 (`val / 256` = mètres). La **3ᵉ composante (le
 > dernier i32, offset le plus élevé) est l'altitude**. Côté ASM/jeu = **Z-up**,
 > composantes `(X, Y, Z)` avec **Z = altitude** ; libRealSpace = **Y-up**,
-> `(X, Y, Z)` avec **Y = altitude** → le portage **échange les composantes 1 et 2**.
+> `(X, Y, Z)` avec **Y = altitude** → le portage **échange les composantes 1 et 2 et inverse
+> la profondeur** (`libRS.z = −c1`) : sans ce signe, le repère devient indirect et le rendu
+> OpenGL de libRealSpace affiche le monde en miroir (raison détaillée dans `CLAUDE.md`).
 > Les tables ci-dessous nomment donc la 3ᵉ composante `Z` (= altitude).
 
 ---
