@@ -96,7 +96,17 @@ PlayerComponent_SubHelperAA_A0C03	endp
 ; (PlayerComponentVariantP_ConstructAndInit_A0D23 → PlayerComponent_SubHelperY_A0BE0 +
 ; PlayerComponent_Helper_A4ABC) remet +0x21 à 0 et ne recopie que masse et vitesse ; les ticks
 ; SURF (loc_4536C, loc_45376) ne font rien. Rôle des deux valeurs et comportement de l'objet
-; SURF non établis (sous-système non étudié).
+; SURF non établis (sous-système non étudié). | RECHERCHE DE CONSOMMATEUR 2026-10-15 : vtable
+; du corps SURF (seg339 0x6EE66) : +0 construction
+; (PlayerComponentVariantQ_ConstructAndInit_A0CA2 : +0x21 = 0), +4
+; (PlayerComponent_SubHelperZ_A0CE2 -> PlayerComponent_SubHelperY_A0BE0 : +2 = proprietaire,
+; +0x21 = 0), +8 clonage vers l'instance (PlayerComponentVariantP_ConstructAndInit_A0D23 :
+; SubHelperY puis PlayerComponent_Helper_A4ABC = copie de +4 et +8/+0x0C/+0x10 seulement),
+; +0x3C / +0x40 SurfBody_TickNoOp_4536C / loc_45376 (ne lisent rien) ; les autres slots sont
+; ceux de la DYNM de base. L'instance n'a donc jamais +0x25 recopie et a +0x21 = 0. Aucune
+; lecture de +0x21/+0x25 trouvee non plus apres un chargement du pointeur de dynamique d'un
+; modele (+0x35/+0x36) dans les segments annotes. Consommateur non trouve (ce qui ne prouve
+; pas son absence).
 ; ==============================================================================================
 DynSurf_LoadSURFChunk_A0C36	proc far		; CODE XREF: VROOMM_StubThunk_6C62AJ PlayerComponent_SubHelperAA_A0C03+29p
 
