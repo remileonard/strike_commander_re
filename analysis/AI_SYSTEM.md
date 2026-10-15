@@ -1943,9 +1943,9 @@ Une instance SWPN (vtable seg339 0x6FB50) n'a pas d'entité IA : sa mise à jour
 `PlayerComponent_RegisterAndInitPulses_A0B40`) pose les bits 0x10 et 0x40, pas le bit 0x08 que pose
 le constructeur des avions IA (`Camera_Helper3_9D490`, nom faux).
 
-Ordres de mission : `MissionScript_CallNativeHandler_52513` envoie l'ordre au slot +0x88 de
-l'instance, `SwpnInstance_OnOrder_43CBB` : ordre 0xBE → munitions = 0 (la défense ne tire plus),
-renvoie 1 ; tout autre ordre est ignoré (renvoie 0).
+Opcodes de PROG transmis à l'instance : `MissionScript_CallNativeHandler_52513` passe le code d'opcode au
+slot +0x88 de l'instance, `SwpnInstance_OnOrder_43CBB` : opcode 0xBE (190) → munitions = 0 (la défense ne
+tire plus, reste ciblable et destructible), renvoie 1 ; tout autre opcode transmis est ignoré (renvoie 0).
 
 Tick (`SwpnInstance_Update_43491`), données = chunk DATA du modèle SWPN :
 1. Minuteur +0x5B (valeur 1 000 000 s posée à la construction, sert à ses impulsions).

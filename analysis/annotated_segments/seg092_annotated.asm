@@ -1025,9 +1025,9 @@ loc_43CB7:				; CODE XREF: seg092:088Dj seg092:08BEj
 
 ; ==============================================================================================
 ; far (label), LUE 2026-10-15. Slot +0x88 de l'instance SWPN (seg339:2B28 = 0x6FBD8) :
-; reception d'un ordre de mission (MissionScript_CallNativeHandler_52513, 2e argument = code
-; d'ordre). Ordre 0xBE : munitions +0x53 = 0, renvoie 1. Tout autre ordre : renvoie 0, sans
-; effet.
+; reception d'un opcode de PROG transmis par MissionScript_CallNativeHandler_52513 (2e
+; argument = code d'opcode). Opcode 0xBE (190) : munitions +0x53 = 0, renvoie 1 (la defense
+; reste dans le monde, ciblable et destructible). Tout autre opcode : renvoie 0, sans effet.
 ; ==============================================================================================
 SwpnInstance_OnOrder_43CBB:				; DATA XREF: seg339:2B28o
 		push	bp
