@@ -251,3 +251,68 @@ static void ApplySkirtNoise(MapVertex *v, int gRow, int gCol, int side, int perB
 `flag` et `type` sont les octets éclairage (+2) et couleur (+3) du sommet. Après l'appel, la couleur
 RVB de la copie se calcule comme pour un sommet normal, avec la formule de teinte du jeu
 (`DATA_MODEL.md` §6.8).
+
+## 5. Essai esthétique : lissage moyen des jupes (PAS le jeu)
+
+Autre proposition de Rémi, essayée dans `tools/terrain_3d.py` (`--skirt-smooth R`, touche M ;
+`--skirt-smooth-height` pour lisser aussi l'altitude). Captures : `data/ALASKA_3d_jupes_lissage.png`
+(vue de coin, R = 8, altitude lissée) et `data/ALASKA_3d_jupes_lissage_sol.png` (vue basse au nord).
+
+Principe : chaque sommet hors carte prend la **moyenne** d'un carré de (2r + 1) × (2r + 1) sommets
+de la grille étendue autour de lui (valeurs répétées du jeu, §2), avec un rayon qui grandit avec la
+distance au bord :
+
+```
+d = distance hors carte, en sommets (0 dans la carte)
+r = round(R × min(1, d / (1,5 × n)))        (n = sommets par cellule ; r = 0 au bord)
+éclairage' = moyenne des éclairages du carré
+couleur'   = couleur la plus fréquente du carré (une moyenne d'indices de couleur n'a pas de sens)
+altitude'  = moyenne des altitudes du carré (option)
+```
+
+Constat de l'essai (ALASKA, R = 8, soit ±8 km) :
+- la répétition disparaît : au-delà d'environ une cellule, les jupes deviennent une surface douce,
+  avec de grandes plaques de couleur, qui prolonge le caractère du bord (neige au nord, mer au sud) ;
+- le raccord avec la carte reste continu (r = 0 au bord) ;
+- avec l'altitude lissée, le relief s'aplatit nettement : vu de près, la jupe devient une plaine,
+  ce qui contraste avec le relief de la carte ; sans l'altitude, le relief répété reste, mais ses
+  couleurs sont unies ;
+- des bandes restent visibles perpendiculairement au bord : le long du bord, les cellules ne se
+  répètent pas et diffèrent entre elles, la moyenne les adoucit sans les effacer ;
+- l'outil garde l'altitude non lissée pour poser la caméra au-dessus du sol (`Terrain.ground`).
+
+Calcul : des **tables de sommes cumulées** (une par grandeur, et une par couleur pour la couleur
+majoritaire) donnent la somme d'un carré en 4 lectures, quel que soit r. Le calcul se fait une fois,
+au chargement de la carte (2,6 s en Python pour 4 cellules de jupe ; négligeable en C++).
+
+```cpp
+// Table de sommes cumulées sur la grille étendue (width × width), valeurs lues avec SkirtVertex.
+// sat[(a + 1) * (width + 1) + (b + 1)] = somme des valeurs des lignes 0..a et colonnes 0..b.
+static std::vector<double> BuildSat(const std::vector<float> &values, int width) {
+    std::vector<double> sat((width + 1) * (width + 1), 0.0);
+    for (int a = 0; a < width; a++) {
+        double row = 0.0;
+        for (int b = 0; b < width; b++) {
+            row += values[a * width + b];
+            sat[(a + 1) * (width + 1) + (b + 1)] = sat[a * (width + 1) + (b + 1)] + row;
+        }
+    }
+    return sat;
+}
+
+// Somme du carré de rayon r centré sur (a, b) ; le carré doit rester dans la grille.
+static double BoxSum(const std::vector<double> &sat, int width, int a, int b, int r) {
+    int a0 = a - r;
+    int b0 = b - r;
+    int a1 = a + r + 1;
+    int b1 = b + r + 1;
+    int w = width + 1;
+    return sat[a1 * w + b1] - sat[a0 * w + b1] - sat[a1 * w + b0] + sat[a0 * w + b0];
+}
+```
+
+La grille étendue doit déborder de R sommets au-delà de la jupe pour que les carrés des sommets les
+plus éloignés restent dedans. Ensuite, pour chaque copie de sommet hors carte : `flag` = moyenne de
+l'éclairage, `type` = couleur dont la somme d'indicateurs est la plus grande, et éventuellement
+`v.y` = moyenne de l'altitude × `HEIGH_MAP_SCALE`, puis la couleur RVB comme pour un sommet normal.
+Le lissage peut se combiner avec le bruit et les plaques de la section 4 (le lissage d'abord).
