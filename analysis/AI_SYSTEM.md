@@ -1934,6 +1934,8 @@ d'entité (`+0x139`/`+0x13D`/`+0x141`, mécanisme compris via
 
 ## 12. Défenses fixes SWPN (catégorie 0x13) — lu 2026-10-15
 
+Chemin de création d'un objet de mission (PART), quelle que soit sa classe : `Expr_VM_Interpreter_51106` (opcode 0x90) ou `Scene_EnsureUnitsSpawned_530FF` → `PartEntry_ResolveSpawnPositionAndActivate_51EDC` → `AIAircraft_SpawnAndConditionalLoadProfile_53363` (seul appelant), qui instancie le modèle nommé par `ObjectPrototype_FindOrLoadAndInstantiate_38B70` sans tester sa classe : malgré son nom, elle crée aussi les SWPN placées comme PART. Les objets posés par le terrain (listes d'objets du PAK de théâtre) ne passent pas par ce chemin tracé.
+
 Une instance SWPN (vtable seg339 0x6FB50) n'a pas d'entité IA : sa mise à jour est
 `SwpnInstance_Update_43491` (slot +0x10), un automate fixe qui ne lit ni GOAL ni MVRS. Dans
 `AIAircraft_SpawnAndConditionalLoadProfile_53363`, le PROF n'est chargé que si
