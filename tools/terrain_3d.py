@@ -25,6 +25,9 @@ r passant de 0 au bord à R sommets à 1,5 cellule ; --skirt-smooth-height lisse
 --skirt-smooth-rgb (touche C) : le lissage porte sur la couleur RVB affichée (palette) au lieu de
 l'éclairage et de la couleur majoritaire : le blanc et le vert se mélangent. Le bruit et les plaques
 ne s'appliquent pas dans ce mode.
+--skirt-noise-rgb A (touche B) : bruit en RVB sur les jupes, après le lissage s'il est actif :
+luminosité × (1 + A × bruit) et décalage de teinte ± A/12 par canal (bruits indépendants), même
+rampe que le bruit d'éclairage (nul au bord, plein à 1,5 cellule). A ≈ 0,15 à 0,3.
 
 Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
 
@@ -35,7 +38,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques   M : lissage   C : lissage RVB
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques   M : lissage   C : lissage RVB   B : bruit RVB
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -260,7 +263,23 @@ class Terrain:
                 out[(i, j)] = (lv, cv, hv, col)
         return out
 
-    def terrain_mesh_rgb(self, slash, flat, skirt, smooth):
+    def rgb_noise(self, i, j, c, amplitude):
+        """Couleur RVB c du sommet affiché (i, j) modulée par le bruit des jupes ; inchangée dans la carte."""
+        n = self.n
+        out = max(0, -i, i - (n - 1), -j, j - (n - 1))
+        if out == 0 or amplitude == 0:
+            return c
+        f = amplitude * min(1.0, out / (1.5 * self.cn))
+        x = j * self.spacing
+        z = i * self.spacing
+        lum = 0.65 * self.value_noise(x, z, 7300.0) + 0.35 * self.value_noise(x + 5000.0, z - 9000.0, 31000.0)
+        res = []
+        for q in range(3):
+            tint = self.value_noise(x + 7919.0 * (q + 1), z - 6271.0 * (q + 1), 17000.0)
+            res.append(max(0.0, min(1.0, c[q] * (1.0 + f * lum) + f / 12.0 * tint)))
+        return tuple(res)
+
+    def terrain_mesh_rgb(self, slash, flat, skirt, smooth, noise_rgb=0.0):
         """Jupe en couleurs RVB : sommet lissé → sa couleur RVB moyenne ; sommet non lissé (au bord)
         → couleur du jeu (couleur de base du sommet le plus haut, teinte du sommet)."""
         n = self.n
@@ -289,6 +308,8 @@ class Terrain:
                 else:
                     tone = min(255, first + ((light[k] * shades + 128) >> 8))
                     cols.append(tuple(pal[3 * tone + q] / 255.0 for q in range(3)))
+            if noise_rgb:
+                cols = [self.rgb_noise(q[0], q[1], c, noise_rgb) for q, c in zip((p0, p1, p2), cols)]
             if flat:
                 m = tuple(sum(c[q] for c in cols) / 3 for q in range(3))
                 cols = [m, m, m]
@@ -545,6 +566,8 @@ def main():
     ap.add_argument("--skirt-smooth-height", action="store_true", help="le lissage porte aussi sur l'altitude")
     ap.add_argument("--skirt-smooth-rgb", action="store_true",
                     help="le lissage porte sur la couleur RVB affichée (touche C)")
+    ap.add_argument("--skirt-noise-rgb", type=float, default=0.0,
+                    help="essai esthétique : amplitude du bruit RVB des jupes (touche B ; ≈ 0,15 à 0,3)")
     ap.add_argument("--skirt-noise", type=float, default=0.0,
                     help="amplitude du bruit d'éclairage des jupes (essai esthétique ; 40 ≈ ±4 teintes ; défaut 0)")
     args = ap.parse_args()
@@ -578,6 +601,11 @@ def main():
     smooth_cache = {}
 
     rgb_mode = args.skirt_smooth_rgb
+    noise_rgb_amp = args.skirt_noise_rgb if args.skirt_noise_rgb > 0 else 0.2
+    noise_rgb = args.skirt_noise_rgb
+
+    def use_rgb():
+        return bool(skirt) and ((rgb_mode and smoothing) or noise_rgb > 0)
 
     def smooth_now(rgb=False):
         if not smoothing or args.skirt <= 0:
@@ -589,18 +617,19 @@ def main():
         return smooth_cache[(smooth_radius, rgb)]
 
     def skirt_rgb_mesh():
-        return world.terrain_mesh_rgb(slash, flat, args.skirt, smooth_now(True) or {})
+        smooth = smooth_now(True) if rgb_mode else None
+        return world.terrain_mesh_rgb(slash, flat, args.skirt, smooth or {}, noise_rgb)
 
     skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now())) if args.skirt > 0 else None
     prog_rgb = compile_program(VS_RGB, FS_RGB, "aCol")
     u_mvp_rgb = GL.glGetUniformLocation(prog_rgb, "uMVP")
-    skirt_rgb = Mesh(*skirt_rgb_mesh(), size=3) if (skirt and rgb_mode and smoothing) else None
+    skirt_rgb = Mesh(*skirt_rgb_mesh(), size=3) if use_rgb() else None
     show_skirt = skirt is not None
     runways = Mesh(*world.runway_mesh())
     markers = Mesh(*world.marker_mesh())
 
     def refresh_rgb(mesh):
-        if not (skirt and rgb_mode and smoothing):
+        if not use_rgb():
             return mesh
         if mesh is None:
             return Mesh(*skirt_rgb_mesh(), size=3)
@@ -657,6 +686,9 @@ def main():
                     skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_j and skirt:
                     show_skirt = not show_skirt
+                elif e.key == pygame.K_b and skirt:
+                    noise_rgb = 0.0 if noise_rgb else noise_rgb_amp
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_c and skirt:
                     rgb_mode = not rgb_mode
                     skirt_rgb = refresh_rgb(skirt_rgb)
@@ -725,7 +757,7 @@ def main():
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
         GL.glUniform1f(u_smooth, 0.0 if flat else 1.0)
         terrain.draw(GL.GL_TRIANGLES)
-        if show_skirt and rgb_mode and smoothing and skirt_rgb:
+        if show_skirt and use_rgb() and skirt_rgb:
             GL.glUseProgram(prog_rgb)
             GL.glUniformMatrix4fv(u_mvp_rgb, 1, GL.GL_FALSE, mvp)
             skirt_rgb.draw(GL.GL_TRIANGLES)
@@ -748,7 +780,8 @@ def main():
                  f"{f'   bruit {noise:g}' if show_skirt and noise else ''}"
                  f"{'   plaques' if show_skirt and patches else ''}"
                  f"{f'   lissage {smooth_radius}' if show_skirt and smoothing else ''}"
-                 f"{' RVB' if show_skirt and smoothing and rgb_mode else ''}"]
+                 f"{' RVB' if show_skirt and smoothing and rgb_mode else ''}"
+                 f"{f'   bruit RVB {noise_rgb:g}' if show_skirt and noise_rgb else ''}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)

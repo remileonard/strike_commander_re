@@ -338,3 +338,49 @@ sommet. On construit trois tables de sommes cumulées (`BuildSat`, §5) sur `col
 la moyenne de son carré (`BoxSum / (2r + 1)²`). Il faut alors dessiner ces triangles avec leurs
 couleurs de sommet propres, sans appliquer la règle « couleur du sommet le plus haut » de
 `renderColoredTriangle`. Les textures restent celles des sommets source.
+
+### 5ter. Bruit en RVB, après le lissage (PAS le jeu)
+
+Même idée que le §4, mais appliquée à la couleur RVB des copies, après le lissage RVB (§5bis) ou seul.
+Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 0.3` (touche B), captures
+`data/ALASKA_3d_jupes_rvb_bruit.png` (coin) et `data/ALASKA_3d_jupes_rvb_bruit_sol.png` (vue basse).
+
+```
+f      = A × rampe                      (rampe : 0 au bord, 1 à 1,5 cellule, comme au §4)
+lum    = 0,65 × bruitValeur(7,3 km) + 0,35 × bruitValeur(31 km)
+teinte = bruitValeur(17 km), un tirage indépendant par canal (décalage de position différent)
+canal' = clamp(canal × (1 + f × lum) + f / 12 × teinte, 0, 1)
+```
+
+Constat :
+- A ≈ 0,3 : la surface lissée gagne des variations douces de luminosité (marbrures de 5 à 30 km) qui
+  évitent l'aspect « flou » uniforme, sans faire réapparaître la répétition ;
+- la variation de teinte doit rester faible : avec ± A/3 par canal (premier essai), des reflets rose
+  et violet apparaissent ; à ± A/12 la teinte reste dans les verts, gris et bleus de la carte.
+
+```cpp
+// Couleur RVB (0..1) d'une copie hors carte, modulée par le bruit ; à appeler après le lissage RVB.
+static void ApplySkirtRgbNoise(float color[3], int gRow, int gCol, int side, int perBlock, float spacing,
+                               float amplitude) {
+    int out = 0;
+    out = std::max(out, -gRow);
+    out = std::max(out, gRow - (side - 1));
+    out = std::max(out, -gCol);
+    out = std::max(out, gCol - (side - 1));
+    if (out == 0) {
+        return;
+    }
+    float f = amplitude * std::min(1.0f, (float)out / (1.5f * (float)perBlock));
+    float x = gCol * spacing;
+    float z = gRow * spacing;
+    float lum = 0.65f * ValueNoise(x, z, 7300.0f) + 0.35f * ValueNoise(x + 5000.0f, z - 9000.0f, 31000.0f);
+    for (int q = 0; q < 3; q++) {
+        float tint = ValueNoise(x + 7919.0f * (float)(q + 1), z - 6271.0f * (float)(q + 1), 17000.0f);
+        float c = color[q] * (1.0f + f * lum) + f / 12.0f * tint;
+        color[q] = std::max(0.0f, std::min(1.0f, c));
+    }
+}
+```
+
+`ValueNoise` est celle du §4. Dans `SCRenderer`, `color` est `MapVertex::color` (les trois premières
+composantes).
