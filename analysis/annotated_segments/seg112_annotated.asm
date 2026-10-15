@@ -631,7 +631,7 @@ loc_5004B:				; CODE XREF: CombatTarget_WeaponActionSubsystem+453j
 		pop	eax
 		mov	dword_72B9E, eax
 		push	59C3h
-		call	Container_Op_22320
+		call	WorldObjects_IntegrateAllMotion_22320
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx

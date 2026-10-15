@@ -19,15 +19,22 @@ Missile_GetCategory_4244E:				; DATA XREF: seg339:off_6FAF8o
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far, LUE (2026-09-24). Mise a jour de l'objet MISSILE (categorie 8). Si +0x59 : l'efface et
-; renvoie 1 ; si +0x26 non nul : renvoie 1. Sinon, si le minuteur +0x5A echoit
-; (Timer_TickWithBlinkPulses_4FB46) et que le chercheur est actif (+0x61) : +0x55 =
-; Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible actuelle +0x55, le missile lui-
-; meme, +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). Puis
-; Camera_ExternalUpdate_3D9B4 (tick du corps -> MissileBody_GuidanceTick_42A4E). ALLUMEUR DE
-; PROXIMITE : si cible presente et distance (positions +0x12) < modele+0x63 << 8 (word du
-; chunk DATA du modele MISS), renvoie 0 (le missile explose/disparait) ; sinon renvoie l'etat
-; du corps.
+; far, LUE 2026-09-24, RELUE 2026-10-15. Slot +0x10 (mise a jour) de l'instance MISSILE
+; (categorie 8, vtable seg339 0x6FAC4) ; valeur de retour : 1 = vivant, 0 = a retirer
+; (WorldObjects_UpdateAllAndRemoveDead_221F2 retire alors le missile et appelle le slot +0x0C
+; de son modele = Object_SpawnDestructionEffects_3863A : explosion EXPL avec degats de zone).
+; (1) Si +0x59 : l'efface et renvoie 1 (tick saute). (2) Si +0x26 non nul : renvoie 1 sans
+; rien faire (role de +0x26 non etabli). (3) DUREE DE VOL :
+; Timer_TickWithBlinkPulses_4FB46(+0x5A) ; minuteur epuise -> renvoie 0. (4) CHERCHEUR, une
+; frame sur 5 : si l'impulsion 'toutes les 5 frames' du minuteur (+0x61 = minuteur+7) est
+; posee : +0x55 = Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible +0x55, le missile,
+; octet +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). (5)
+; WorldObject_TickBodyAndSmoke_3D9B4 : objet mort -> renvoie 0 ; sinon tick du corps
+; (MissileBody_GuidanceTick_42A4E) et trainee. (6) ALLUMEUR DE PROXIMITE : si cible et
+; distance 3D (positions +0x12) < modele+0x63 << 8 (uint16 du chunk DATA, m) : renvoie 0.
+; Sinon 1. La position n'est pas integree ici : slot +0x14
+; (WorldObject_IntegrateBodyMotion_3D31D) appele par WorldObjects_IntegrateAllMotion_22320
+; apres la mise a jour.
 ; ==============================================================================================
 Missile_UpdateSeekerAndFuse_42458:				; DATA XREF: seg339:off_6FAD4o
 		push	bp
@@ -101,7 +108,7 @@ loc_424D3:				; CODE XREF: seg090:0088j
 
 loc_424DA:				; CODE XREF: seg090:005Cj seg090:0091j
 		push	si
-		call	Camera_ExternalUpdate_3D9B4
+		call	WorldObject_TickBodyAndSmoke_3D9B4
 		pop	cx
 		mov	[bp-3],	al
 		cmp	word ptr [si+55h], 0
@@ -821,11 +828,11 @@ MissileBody_SetCruiseVelocity_42A1B	endp
 ; ==============================================================================================
 ; far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe
 ; construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present :
-; 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position
-; propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ;
-; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible
-; : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible
-; +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de
+; 0x3C octets, vtable 0x1F66 ; appelee par WorldObject_TickBodyAndSmoke_3D9B4). Ordre :
+; position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans
+; 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ;
+; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele
+; cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de
 ; [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur
 ; depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du
 ; lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A ==

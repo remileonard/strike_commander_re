@@ -117,7 +117,7 @@ EjectSeat_TickReleaseObject_4F351:				; DATA XREF: seg339:off_703B6o
 		push	di
 		mov	si, [bp+6]
 		push	si
-		call	Camera_ExternalUpdate_3D9B4
+		call	WorldObject_TickBodyAndSmoke_3D9B4
 		pop	cx
 		or	al, al
 		jnz	short loc_4F36A

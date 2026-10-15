@@ -131,7 +131,14 @@ loc_4629F:				; DATA XREF: seg339:1DDEo
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_462A7:				; DATA XREF: seg339:off_6EE92o
+; ==============================================================================================
+; far (label), LU 2026-10-15. Slot +0x2C de la vtable DYNM de base (seg339 0x6EE92 ; garde par
+; le corps MISS, vtable 0x6F016) : vitesse angulaire du corps = vecteur nul
+; (dword_707F8..70800 ; alloue 12 octets si le tampon est nul). Pour un missile, la rotation
+; de WorldObject_IntegrateBodyMotion_3D31D est donc nulle : son orientation ne change que par
+; MissileBody_SteerToTarget_42738 et l'alignement balistique.
+; ==============================================================================================
+DynBody_GetAngularVelocityZero_462A7:				; DATA XREF: seg339:off_6EE92o
 					; seg339:1E32o	...
 		push	bp
 		mov	bp, sp

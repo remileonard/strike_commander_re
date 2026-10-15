@@ -2058,7 +2058,7 @@ off_6EE76	dd loc_461ED
 		dd loc_46251
 		dd loc_46259
 		dd loc_4629F
-off_6EE92	dd loc_462A7
+off_6EE92	dd DynBody_GetAngularVelocityZero_462A7
 off_6EE96	dd loc_462ED
 off_6EE9A	dd loc_462F5
 off_6EE9E	dd loc_46912
@@ -2078,7 +2078,7 @@ off_6EED2	dd loc_4620B
 off_6EED6	dd loc_46251
 		dd loc_46259
 off_6EEDE	dd loc_4629F
-		dd loc_462A7
+		dd DynBody_GetAngularVelocityZero_462A7
 		dd loc_462ED
 		dd loc_462F5
 		dd loc_46912
@@ -2112,7 +2112,7 @@ off_6EF56	dd loc_4690A
 		dd loc_46251
 		dd loc_46259
 off_6EF66	dd loc_4629F
-off_6EF6A	dd loc_462A7
+off_6EF6A	dd DynBody_GetAngularVelocityZero_462A7
 off_6EF6E	dd loc_462ED
 		dd loc_462F5
 		dd loc_46912
@@ -2146,7 +2146,7 @@ off_6EFDA	dd loc_46902
 		dd loc_46251
 		dd loc_46259
 		dd loc_4629F
-off_6EFF2	dd loc_462A7
+off_6EFF2	dd DynBody_GetAngularVelocityZero_462A7
 off_6EFF6	dd loc_462ED
 off_6EFFA	dd loc_462F5
 off_6EFFE	dd loc_46912
@@ -2166,7 +2166,7 @@ off_6F032	dd loc_4620B
 		dd loc_46251
 off_6F03A	dd loc_46259
 off_6F03E	dd loc_4629F
-		dd loc_462A7
+		dd DynBody_GetAngularVelocityZero_462A7
 off_6F046	dd loc_462ED
 off_6F04A	dd loc_462F5
 off_6F04E	dd loc_46912
@@ -2194,7 +2194,7 @@ off_6F0A2	dd loc_4620B
 off_6F0A6	dd loc_46251
 off_6F0AA	dd loc_46259
 		dd loc_4629F
-off_6F0B2	dd loc_462A7
+off_6F0B2	dd DynBody_GetAngularVelocityZero_462A7
 off_6F0B6	dd loc_462ED
 		dd loc_462F5
 		dd loc_46912
@@ -2228,7 +2228,7 @@ off_6F11E	dd loc_461ED
 		dd loc_46251
 		dd loc_46259
 		dd loc_4629F
-off_6F13A	dd loc_462A7
+off_6F13A	dd DynBody_GetAngularVelocityZero_462A7
 off_6F13E	dd loc_462ED
 off_6F142	dd loc_462F5
 off_6F146	dd loc_46912
@@ -2327,7 +2327,7 @@ off_6F2B2	dd loc_4690A
 		dd loc_46251
 		dd loc_46259
 off_6F2C2	dd loc_4629F
-off_6F2C6	dd loc_462A7
+off_6F2C6	dd DynBody_GetAngularVelocityZero_462A7
 off_6F2CA	dd loc_462ED
 off_6F2CE	dd loc_462F5
 off_6F2D2	dd loc_46912
@@ -2347,7 +2347,7 @@ off_6F306	dd loc_4620B
 		dd loc_46251
 		dd loc_46259
 off_6F312	dd loc_4629F
-off_6F316	dd loc_462A7
+off_6F316	dd DynBody_GetAngularVelocityZero_462A7
 off_6F31A	dd loc_462ED
 off_6F31E	dd loc_462F5
 off_6F322	dd loc_46912
@@ -2619,7 +2619,7 @@ off_6F754	dd loc_37CF4
 off_6F758	dd Debris_NotifyChildValidate
 off_6F75C	dd loc_37D2E
 off_6F760	dd loc_37DD1
-off_6F764	dd Camera_ExternalUpdate_3D9B4
+off_6F764	dd WorldObject_TickBodyAndSmoke_3D9B4
 		dd WorldObject_IntegrateBodyMotion_3D31D
 off_6F76C	dd Camera_DestructWithMount
 		dd loc_3CF4C

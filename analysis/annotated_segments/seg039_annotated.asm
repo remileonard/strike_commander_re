@@ -948,10 +948,15 @@ WorldObjects_UpdateAllAndRemoveDead_221F2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,41L — (cluster conteneur, taille compatible avec un accesseur ou insertion) — même
-; famille que sub_2204C, non détaillée.
+; far, 41L, LUE 2026-10-15. INTEGRATION DU MOUVEMENT DE TOUS LES OBJETS d'une liste (59C3h =
+; objets du monde) : pour chaque noeud (tete [liste]+0x0B, suivant +2), appelle le slot +0x14
+; (pour un missile : WorldObject_IntegrateBodyMotion_3D31D, position += vitesse du corps *
+; dt). Appelee par CombatTarget_WeaponActionSubsystem juste APRES
+; WorldObjects_UpdateFrame_ResetCounters_221C2 (mises a jour +0x10 de tous les objets) :
+; chaque frame, tous les objets sont mis a jour, puis tous sont deplaces.
+; Ex-'Container_Op_22320'.
 ; ==============================================================================================
-Container_Op_22320	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+46AP
+WorldObjects_IntegrateAllMotion_22320	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+46AP
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -965,14 +970,14 @@ arg_0		= word ptr  6
 		jmp	short loc_2233D
 ; ���������������������������������������������������������������������������
 
-loc_22331:				; CODE XREF: Container_Op_22320+37j
+loc_22331:				; CODE XREF: WorldObjects_IntegrateAllMotion_22320+37j
 		push	[bp+var_2]
 		mov	bx, [bp+var_2]
 		mov	bx, [bx]
 		call	dword ptr [bx+14h]
 		pop	cx
 
-loc_2233D:				; CODE XREF: Container_Op_22320+Fj
+loc_2233D:				; CODE XREF: WorldObjects_IntegrateAllMotion_22320+Fj
 		cmp	[bp+var_2], 0
 		jnz	short loc_2234A
 		mov	bx, [si]
@@ -980,18 +985,18 @@ loc_2233D:				; CODE XREF: Container_Op_22320+Fj
 		jmp	short loc_22350
 ; ���������������������������������������������������������������������������
 
-loc_2234A:				; CODE XREF: Container_Op_22320+21j
+loc_2234A:				; CODE XREF: WorldObjects_IntegrateAllMotion_22320+21j
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+2]
 
-loc_22350:				; CODE XREF: Container_Op_22320+28j
+loc_22350:				; CODE XREF: WorldObjects_IntegrateAllMotion_22320+28j
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0
 		jnz	short loc_22331
 		pop	si
 		leave
 		retf
-Container_Op_22320	endp
+WorldObjects_IntegrateAllMotion_22320	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

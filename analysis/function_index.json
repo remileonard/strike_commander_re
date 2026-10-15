@@ -4416,8 +4416,8 @@
 "lines": 41,
 "type": "far",
 "calls": [],
-"new_name": "Container_Op_22320",
-"summary": "far,41L — (cluster conteneur, taille compatible avec un accesseur ou insertion) — même famille que sub_2204C, non détaillée."
+"new_name": "WorldObjects_IntegrateAllMotion_22320",
+"summary": "far, 41L, LUE 2026-10-15. INTEGRATION DU MOUVEMENT DE TOUS LES OBJETS d'une liste (59C3h = objets du monde) : pour chaque noeud (tete [liste]+0x0B, suivant +2), appelle le slot +0x14 (pour un missile : WorldObject_IntegrateBodyMotion_3D31D, position += vitesse du corps * dt). Appelee par CombatTarget_WeaponActionSubsystem juste APRES WorldObjects_UpdateFrame_ResetCounters_221C2 (mises a jour +0x10 de tous les objets) : chaque frame, tous les objets sont mis a jour, puis tous sont deplaces. Ex-'Container_Op_22320'."
 },
 "sub_2235C": {
 "segment": "seg039",
@@ -8447,8 +8447,8 @@
 "sub_3CBB7",
 "sub_3D57E"
 ],
-"new_name": "Camera_ExternalUpdate_3D9B4",
-"summary": "far,46L — teste l'état détruit puis délègue soit à un point de montage caméra (+0x51, vtable[0x3C]) soit au calcul complet (sub_3D57E) : **mise à jour de la caméra externe (avec ou sans point de montage fixe).**"
+"new_name": "WorldObject_TickBodyAndSmoke_3D9B4",
+"summary": "far, 46L, LUE 2026-10-15. MISE A JOUR DU CORPS PHYSIQUE ET DE LA TRAINEE d'un objet monde (aucun rapport avec la camera). Si WorldObject_IsAlive_3CBB7(objet) est faux : renvoie 0. Sinon : si un corps existe (+0x51), appelle son tick (corps->vtable+0x3C : MissileBody_GuidanceTick_42A4E pour un missile ; valeur de retour ignoree), puis SmokeTrail_Tick_3D57E(objet), et renvoie 1. Appelants : Missile_UpdateSeekerAndFuse_42458 et d'autres mises a jour d'objets (seg089...). Ex-'Camera_ExternalUpdate_3D9B4'."
 },
 "sub_3D9FB": {
 "segment": "seg085",
@@ -39906,7 +39906,7 @@
 "sub_6B70F"
 ],
 "new_name": "MissileModel_LoadDATAChunk_A0340",
-"summary": "far, LUE (2026-09-24), consommateurs lus 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 (rôle non établi) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ; Missile_UpdateSeekerAndFuse_42458)."
+"summary": "far, LUE (2026-09-24), consommateurs lus 2026-10-12. Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E DURÉE DE VOL (secondes ENTIÈRES ; Missile_InitFlightTimer_A0455 → minuteur +0x5A ; à 0 le missile est retiré et explose — corrigé 2026-10-15, ex « délai du chercheur ») ; uint8 → +0x62 (rôle non établi) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ; Missile_UpdateSeekerAndFuse_42458)."
 },
 "sub_A03B6": {
 "segment": "seg434",
@@ -39933,8 +39933,8 @@
 "calls": [
 "sub_4FAFC"
 ],
-"new_name": "Missile_InitSeekerDelay_A0455",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_InitPulseTimer'. À la création d'un missile : minuteur +0x5A = DATA champ 1 du modèle (+0x5E, int32 en secondes ENTIÈRES, << 8). Tant qu'il court, le chercheur ne choisit pas de cible (Missile_UpdateSeekerAndFuse_42458)."
+"new_name": "Missile_InitFlightTimer_A0455",
+"summary": "far, LUE 2026-10-12, CORRIGEE 2026-10-15. A la creation d'un missile : Timer_SetAbsoluteAndResetPulses_4FAFC(instance+0x5A, DATA champ 1 du modele (+0x5E, int32 secondes entieres) << 8) : minuteur en mode 0 (decremente de dt chaque tick par Timer_Tick_4F9E6), compteurs de pulsation remis a 0. C'est la DUREE DE VOL : quand le minuteur atteint 0, Missile_UpdateSeekerAndFuse_42458 renvoie 0 et le missile est retire et explose. (L'ancien resume 'delai du chercheur' etait faux : le test porte sur la valeur de retour du minuteur, vraie tant qu'il reste du temps.) Ex-'Missile_InitSeekerDelay_A0455'."
 },
 "sub_A0488": {
 "segment": "seg434",
@@ -47425,7 +47425,7 @@
 "type": "label",
 "calls": [],
 "new_name": "MissileBody_GuidanceTick_42A4E",
-"summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present : 0x3C octets, vtable 0x1F66 ; appelee par Camera_ExternalUpdate_3D9B4). Ordre : position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A == 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente -> MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse += dword_6FFD7 * dt (gravite), Vector_PrescaleBelow256_55B04 / Vector_NormalizeInPlace_5593A sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_OrthonormalizeKeepRow1_57660 + [missile]->vtable+0x40). Renvoie 1."
+"summary": "far, LUE (2026-09-24). Methode virtuelle +0x3C (tick) du CORPS PHYSIQUE du missile (classe construite par JDYN_LoadChunkAndConstruct_3A49C quand le chunk dynamique MISS est present : 0x3C octets, vtable 0x1F66 ; appelee par WorldObject_TickBodyAndSmoke_3D9B4). Ordre : position propre -> dword_72886.. ; orientation du missile ([+2]->vtable+0x3C) copiee dans 0x57E2 ; corps+0x35 = [missile]+0x55 (SetReference16 : la cible choisie par le chercheur) ; si cible : point vise = position cible (+0x12) -> dword_7287A.., et si target_type (modele cible +0x11) > 1, altitude += (champ +0x10 du sous-objet modele+0x08) >> 3. Si le bit 1 de [missile]+4 est nul et le lanceur (+0x37) existe : pose ce bit quand la distance au lanceur depasse 4 * (somme des deux valeurs +0x10 des sous-objets modele+0x08) (degagement du lanceur). Guidage : si +0x35 et +0x39 -> MissileBody_SteerToTarget_42738. Vitesse : +0x3A == 0 -> MissileBody_BoostPhase_42632 ; sinon cible presente -> MissileBody_SetCruiseVelocity_42A1B ; sinon VOL BALISTIQUE : altitude de la vitesse += dword_6FFD7 * dt (gravite), Vector_PrescaleBelow256_55B04 / Vector_NormalizeInPlace_5593A sur le vecteur vitesse, puis le nez est aligne sur la vitesse (Matrix_OrthonormalizeKeepRow1_57660 + [missile]->vtable+0x40). Renvoie 1."
 },
 "loc_42458": {
 "segment": "seg090",
@@ -47435,7 +47435,7 @@
 "type": "label",
 "calls": [],
 "new_name": "Missile_UpdateSeekerAndFuse_42458",
-"summary": "far, LUE (2026-09-24). Mise a jour de l'objet MISSILE (categorie 8). Si +0x59 : l'efface et renvoie 1 ; si +0x26 non nul : renvoie 1. Sinon, si le minuteur +0x5A echoit (Timer_TickWithBlinkPulses_4FB46) et que le chercheur est actif (+0x61) : +0x55 = Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible actuelle +0x55, le missile lui-meme, +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). Puis Camera_ExternalUpdate_3D9B4 (tick du corps -> MissileBody_GuidanceTick_42A4E). ALLUMEUR DE PROXIMITE : si cible presente et distance (positions +0x12) < modele+0x63 << 8 (word du chunk DATA du modele MISS), renvoie 0 (le missile explose/disparait) ; sinon renvoie l'etat du corps."
+"summary": "far, LUE 2026-09-24, RELUE 2026-10-15. Slot +0x10 (mise a jour) de l'instance MISSILE (categorie 8, vtable seg339 0x6FAC4) ; valeur de retour : 1 = vivant, 0 = a retirer (WorldObjects_UpdateAllAndRemoveDead_221F2 retire alors le missile et appelle le slot +0x0C de son modele = Object_SpawnDestructionEffects_3863A : explosion EXPL avec degats de zone). (1) Si +0x59 : l'efface et renvoie 1 (tick saute). (2) Si +0x26 non nul : renvoie 1 sans rien faire (role de +0x26 non etabli). (3) DUREE DE VOL : Timer_TickWithBlinkPulses_4FB46(+0x5A) ; minuteur epuise -> renvoie 0. (4) CHERCHEUR, une frame sur 5 : si l'impulsion 'toutes les 5 frames' du minuteur (+0x61 = minuteur+7) est posee : +0x55 = Targeting_SelectAndPrioritize(modele d'arme +0x0E, cible +0x55, le missile, octet +0x63) ; corps+0x39 (guidage actif) = (+0x55 non nul). (5) WorldObject_TickBodyAndSmoke_3D9B4 : objet mort -> renvoie 0 ; sinon tick du corps (MissileBody_GuidanceTick_42A4E) et trainee. (6) ALLUMEUR DE PROXIMITE : si cible et distance 3D (positions +0x12) < modele+0x63 << 8 (uint16 du chunk DATA, m) : renvoie 0. Sinon 1. La position n'est pas integree ici : slot +0x14 (WorldObject_IntegrateBodyMotion_3D31D) appele par WorldObjects_IntegrateAllMotion_22320 apres la mise a jour."
 },
 "loc_4244E": {
 "segment": "seg090",
@@ -47795,7 +47795,7 @@
 "type": "label",
 "calls": [],
 "new_name": "JDYN_TickUncontrolled_4A825",
-"summary": "far (label), LUE 2026-10-12. Slot +0x3C du JDYN (tick SANS commande, appelé par la mise à jour des objets non pilotés Camera_ExternalUpdate_3D9B4) : Aero_SumLinearForces_48639 puis Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni autopilote. Le tick AVEC commande (+0x40) est PhysicsTicks."
+"summary": "far (label), LUE 2026-10-12. Slot +0x3C du JDYN (tick SANS commande, appelé par la mise à jour des objets non pilotés WorldObject_TickBodyAndSmoke_3D9B4) : Aero_SumLinearForces_48639 puis Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni autopilote. Le tick AVEC commande (+0x40) est PhysicsTicks."
 },
 "loc_421A7": {
 "segment": "seg089",
@@ -47866,5 +47866,15 @@
 "calls": [],
 "new_name": "Aircraft_Update_3DEFB",
 "summary": "far (label), LUE PARTIELLEMENT 2026-10-12. Méthode +0x10 (mise à jour) de l'instance JETP (vtable 0x27BC). Après Camera_ResolvePositionVelocity_3DDC4 : si +0x73 bit 0 → renvoie 0. TRAIN D'ATTERRISSAGE (si +0x73 bit 1) : quand l'ordre de train de la dynamique (JDYN +0x75 bit 2) diffère de l'état +0x73 bit 2, une séquence démarre (+0x73 bit 3) : toutes les 25/256 s (word_6F902 = 0x19, horloge +0x71 += dt) le sous-objet suivant de la plage JINF [champ 2, champ 2 + champ 3) est affiché (méthode +4 avec 1) ou masqué (0), index +0x62 ; sons 4 (rentrée) / 5 (sortie) pour le joueur en vue cockpit (byte_72A8E == 4). Sous-objet spécial +0x65 (JINF champs 6-7) : désactivé après 3 images actives. Puis secousse d'écran (+0x68 minuteur) pour le joueur."
+},
+"loc_462A7": {
+"segment": "seg101",
+"start_line": 140941,
+"end_line": 140941,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "DynBody_GetAngularVelocityZero_462A7",
+"summary": "far (label), LU 2026-10-15. Slot +0x2C de la vtable DYNM de base (seg339 0x6EE92 ; garde par le corps MISS, vtable 0x6F016) : vitesse angulaire du corps = vecteur nul (dword_707F8..70800 ; alloue 12 octets si le tampon est nul). Pour un missile, la rotation de WorldObject_IntegrateBodyMotion_3D31D est donc nulle : son orientation ne change que par MissileBody_SteerToTarget_42738 et l'alignement balistique."
 }
 }

@@ -537,7 +537,7 @@ Valeurs par défaut des champs 1, 4, 5, 6, 8 et 9 : 0, 2, 5, 0, 6 et 30.
 
 | Classe | Contenu |
 |---|---|
-| MISS | int32 délai du chercheur (s) ; uint8 (rôle non établi) ; uint16 rayon de l'allumeur (m) |
+| MISS | int32 durée de vol (s ; à 0 le missile explose — corrigé 2026-10-15, ex « délai du chercheur ») ; uint8 (rôle non établi) ; uint16 rayon de l'allumeur (m) |
 | BOMB | uint8 guidée ; uint8 délai d'armement (s) ; uint8 (rôle non établi) ; uint16 ouverture du cône (°/s) |
 | PODR | string roquette ; uint8 présence ; uint16 vitesse de départ (m/s) |
 | SWPN | int32 munitions ; int32 portée de détection (m) ; int32 portée de tir (m) ; uint16 dispersion ; float cadence (s) ; uint8 lance-missiles ; string[8] arme ; int32 décalage de départ (m) |

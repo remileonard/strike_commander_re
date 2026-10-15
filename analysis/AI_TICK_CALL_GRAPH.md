@@ -899,7 +899,7 @@ Missile_UpdateSeekerAndFuse_42458 (objet missile, catégorie 8)
  ├─ si minuteur +0x5A échu et chercheur actif (+0x61) :
  │     +0x55 = Targeting_SelectAndPrioritize(modèle +0x0E, +0x55, le missile, +0x63)
  │     corps+0x39 = (+0x55 ≠ 0)                        guidage actif / coupé
- ├─ Camera_ExternalUpdate_3D9B4 → corps->vtable+0x3C = MissileBody_GuidanceTick_42A4E
+ ├─ WorldObject_TickBodyAndSmoke_3D9B4 → corps->vtable+0x3C = MissileBody_GuidanceTick_42A4E
  │     corps+0x35 = missile+0x55                        (SetReference16, à chaque tick)
  │     si +0x35 et +0x39 : MissileBody_SteerToTarget_42738
  │     si +0x3A == 0      : MissileBody_BoostPhase_42632

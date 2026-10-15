@@ -497,7 +497,7 @@ loc_3CBB3:
 ; far, enrobage de WorldObject_TestAliveAndUpdateChildren_3800A : renvoie non nul si l'objet
 ; est vivant (le nom d'origine, IsDestroyed, était inversé).
 ; ==============================================================================================
-WorldObject_IsAlive_3CBB7	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+8P WorldObject_UpdateWithAIEntity_3D9FB+BP ...
+WorldObject_IsAlive_3CBB7	proc far		; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+8P WorldObject_UpdateWithAIEntity_3D9FB+BP ...
 
 arg_0		= word ptr  6
 

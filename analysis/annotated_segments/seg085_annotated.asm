@@ -1227,7 +1227,7 @@ SmokeTrail_EnableIfModelHasSmok_3D566	endp
 ; Particles_SpawnAlongSegment_4D1C9(word_70483, type = +0x54, point courant, point précédent,
 ; dt) : particules réparties le long du segment parcouru.
 ; ==============================================================================================
-SmokeTrail_Tick_3D57E	proc far		; CODE XREF: Camera_ExternalUpdate_3D9B4+28p
+SmokeTrail_Tick_3D57E	proc far		; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+28p
 					; WorldObject_UpdateWithAIEntity_3D9FB:loc_3DACEp	...
 
 var_F0		= dword	ptr -0F0h
@@ -1671,11 +1671,14 @@ SmokeTrail_Tick_3D57E	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — teste l'état détruit puis délègue soit à un point de montage caméra (+0x51,
-; vtable[0x3C]) soit au calcul complet (sub_3D57E) : mise à jour de la caméra externe (avec ou
-; sans point de montage fixe).
+; far, 46L, LUE 2026-10-15. MISE A JOUR DU CORPS PHYSIQUE ET DE LA TRAINEE d'un objet monde
+; (aucun rapport avec la camera). Si WorldObject_IsAlive_3CBB7(objet) est faux : renvoie 0.
+; Sinon : si un corps existe (+0x51), appelle son tick (corps->vtable+0x3C :
+; MissileBody_GuidanceTick_42A4E pour un missile ; valeur de retour ignoree), puis
+; SmokeTrail_Tick_3D57E(objet), et renvoie 1. Appelants : Missile_UpdateSeekerAndFuse_42458 et
+; d'autres mises a jour d'objets (seg089...). Ex-'Camera_ExternalUpdate_3D9B4'.
 ; ==============================================================================================
-Camera_ExternalUpdate_3D9B4	proc far		; CODE XREF: seg089:078AP
+WorldObject_TickBodyAndSmoke_3D9B4	proc far		; CODE XREF: seg089:078AP
 					; seg089:loc_41B6FP ...
 
 arg_0		= word ptr  6
@@ -1704,7 +1707,7 @@ loc_3D9C6:
 		pop	cx
 		jmp	short $+2
 
-loc_3D9DA:				; CODE XREF: Camera_ExternalUpdate_3D9B4+16j
+loc_3D9DA:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+16j
 		push	si
 		push	cs
 		call	near ptr SmokeTrail_Tick_3D57E
@@ -1713,14 +1716,14 @@ loc_3D9DA:				; CODE XREF: Camera_ExternalUpdate_3D9B4+16j
 		jmp	short loc_3D9E6
 ; ���������������������������������������������������������������������������
 
-loc_3D9E4:				; CODE XREF: Camera_ExternalUpdate_3D9B4+10j
+loc_3D9E4:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+10j
 		mov	al, 0
 
-loc_3D9E6:				; CODE XREF: Camera_ExternalUpdate_3D9B4+2Ej
+loc_3D9E6:				; CODE XREF: WorldObject_TickBodyAndSmoke_3D9B4+2Ej
 		pop	si
 		pop	bp
 		retf
-Camera_ExternalUpdate_3D9B4	endp
+WorldObject_TickBodyAndSmoke_3D9B4	endp
 
 ; ���������������������������������������������������������������������������
 

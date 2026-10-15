@@ -935,7 +935,7 @@ loc_41A91:
 
 loc_41A99:				; CODE XREF: seg089:loc_41A91j
 		push	si
-		call	Camera_ExternalUpdate_3D9B4
+		call	WorldObject_TickBodyAndSmoke_3D9B4
 		pop	cx
 		mov	ah, 0
 		or	ax, ax
@@ -1048,7 +1048,7 @@ loc_41B6E:				; CODE XREF: seg089:0833j
 		push	si
 
 loc_41B6F:
-		call	Camera_ExternalUpdate_3D9B4
+		call	WorldObject_TickBodyAndSmoke_3D9B4
 		pop	cx
 		mov	ah, 0
 

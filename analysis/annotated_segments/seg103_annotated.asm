@@ -5124,8 +5124,8 @@ Autopilot_FlyToPointKinematic_49C2E	endp
 
 ; ==============================================================================================
 ; far (label), LUE 2026-10-12. Slot +0x3C du JDYN (tick SANS commande, appelé par la mise à
-; jour des objets non pilotés Camera_ExternalUpdate_3D9B4) : Aero_SumLinearForces_48639 puis
-; Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni
+; jour des objets non pilotés WorldObject_TickBodyAndSmoke_3D9B4) : Aero_SumLinearForces_48639
+; puis Physics_IntegratePosition_46300 — forces et intégration de la vitesse, sans manette ni
 ; autopilote. Le tick AVEC commande (+0x40) est PhysicsTicks.
 ; ==============================================================================================
 JDYN_TickUncontrolled_4A825:				; CODE XREF: seg082:116AJ seg082:1222J ...

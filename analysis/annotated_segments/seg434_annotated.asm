@@ -9,9 +9,10 @@ seg434		segment	para public 'OVERLAY' use16
 ; ==============================================================================================
 ; far, LUE (2026-09-24), consommateurs lus 2026-10-12.
 ; Ex-'PlayerComponent_LoadFieldsWithRetryB'. Chargeur du chunk 'DATA' du MODÈLE missile (après
-; le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E délai d'activation du chercheur
-; (secondes ENTIÈRES ; Missile_InitSeekerDelay_A0455 → minuteur +0x5A) ; uint8 → +0x62 (rôle
-; non établi) ; uint16 → +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ;
+; le chargeur de base VROOMM_StubThunk_6C5A5) : int32 → +0x5E DURÉE DE VOL (secondes ENTIÈRES
+; ; Missile_InitFlightTimer_A0455 → minuteur +0x5A ; à 0 le missile est retiré et explose —
+; corrigé 2026-10-15, ex « délai du chercheur ») ; uint8 → +0x62 (rôle non établi) ; uint16 →
+; +0x63 RAYON DE L'ALLUMEUR DE PROXIMITÉ (m entiers, << 8 ;
 ; Missile_UpdateSeekerAndFuse_42458).
 ; ==============================================================================================
 MissileModel_LoadDATAChunk_A0340	proc far		; CODE XREF: VROOMM_StubThunk_6C530J
@@ -186,11 +187,15 @@ PlayerComponentVariantJ_ConstructAndInit_A03B6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-10-12. Ex-'PlayerComponent_InitPulseTimer'. À la création d'un missile :
-; minuteur +0x5A = DATA champ 1 du modèle (+0x5E, int32 en secondes ENTIÈRES, << 8). Tant
-; qu'il court, le chercheur ne choisit pas de cible (Missile_UpdateSeekerAndFuse_42458).
+; far, LUE 2026-10-12, CORRIGEE 2026-10-15. A la creation d'un missile :
+; Timer_SetAbsoluteAndResetPulses_4FAFC(instance+0x5A, DATA champ 1 du modele (+0x5E, int32
+; secondes entieres) << 8) : minuteur en mode 0 (decremente de dt chaque tick par
+; Timer_Tick_4F9E6), compteurs de pulsation remis a 0. C'est la DUREE DE VOL : quand le
+; minuteur atteint 0, Missile_UpdateSeekerAndFuse_42458 renvoie 0 et le missile est retire et
+; explose. (L'ancien resume 'delai du chercheur' etait faux : le test porte sur la valeur de
+; retour du minuteur, vraie tant qu'il reste du temps.) Ex-'Missile_InitSeekerDelay_A0455'.
 ; ==============================================================================================
-Missile_InitSeekerDelay_A0455	proc far		; CODE XREF: VROOMM_StubThunk_6C53AJ PlayerComponent_SubHelperP_A0488+16p
+Missile_InitFlightTimer_A0455	proc far		; CODE XREF: VROOMM_StubThunk_6C53AJ PlayerComponent_SubHelperP_A0488+16p
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -217,7 +222,7 @@ loc_A0458:
 		add	sp, 4
 		leave
 		retf
-Missile_InitSeekerDelay_A0455	endp
+Missile_InitFlightTimer_A0455	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -242,7 +247,7 @@ arg_2		= dword	ptr  8
 		add	sp, 6
 		push	si
 		push	cs
-		call	near ptr Missile_InitSeekerDelay_A0455
+		call	near ptr Missile_InitFlightTimer_A0455
 		pop	cx
 		push	si
 		call	SmokeTrail_EnableIfModelHasSmok_3D566

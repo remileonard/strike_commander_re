@@ -716,3 +716,59 @@ Fonction distincte du mode ci-dessus (appelée par `Takeoff_Phase0_GroundRoll_12
 (seg101-103, seg447-449) — voir `DATA_MODEL.md` §6.2 pour chaque citation
 de ligne assembleur exacte, et `known_functions.json` pour les résumés de
 fonction individuels.*
+
+## 10. Missiles guidés (catégorie 8, dynamique `MISS`) — rédigé 2026-10-15
+
+Repère Y-up, mètres, secondes. Repère du missile en libRS : `x` = latéral (asm c0), `y` = normal
+(asm c2), `z` = nez (asm c1). **Modèle cinématique** : ni masse, ni portance, ni traînée ; la vitesse
+est écrite directement, l'orientation est tournée par la loi de guidage.
+
+Données : chunk dynamique `MISS` (5 float ÷ 256 : taux de virage max °/s, vitesse max m/s,
+accélération m/s², vitesse de croisière latérale et normale m/s) ; chunk `DATA` du modèle
+(int32 **durée de vol** en s, uint8 rôle non établi, uint16 rayon de l'allumeur en m).
+
+### 10.1 Ordre dans la frame
+`CombatTarget_WeaponActionSubsystem` appelle `WorldObjects_UpdateFrame_ResetCounters_221C2`
+(slot +0x10 de chaque objet : mise à jour) **puis** `WorldObjects_IntegrateAllMotion_22320` (slot +0x14
+de chaque objet : déplacement). Un objet dont la mise à jour renvoie 0 est retiré par
+`WorldObjects_UpdateAllAndRemoveDead_221F2`, qui appelle alors le slot +0x0C de son modèle
+(`Object_SpawnDestructionEffects_3863A` pour un missile : explosion `EXPL` avec dégâts de zone, débris).
+
+### 10.2 Mise à jour (`Missile_UpdateSeekerAndFuse_42458`)
+```
+si drapeau +0x59 : l'effacer ; renvoyer 1                 (tick sauté)
+si +0x26 ≠ 0     : renvoyer 1                             (rôle non établi)
+durée de vol -= dt ; si ≤ 0 : renvoyer 0                  → explosion
+une frame sur 5 (impulsion du minuteur) :
+    cible = Targeting_SelectAndPrioritize(arme, cible, missile, octet +0x63)
+    guidage actif = (cible ≠ nul)
+si l'objet est mort : renvoyer 0                          → explosion
+tick du corps (MissileBody_GuidanceTick_42A4E), traînée de fumée
+si cible et distance(missile, cible) < rayon de l'allumeur : renvoyer 0   → explosion
+renvoyer 1
+```
+La durée de vol est décomptée en temps (`dt`), le chercheur en frames (1 sur 5). Le missile part
+avec la cible donnée au tir et le chercheur peut la changer dès la 5ᵉ frame.
+
+### 10.3 Corps (`MissileBody_GuidanceTick_42A4E`)
+- **Guidage** (si cible et guidage actif) : `MissileBody_SteerToTarget_42738` — point visé = cible +
+  vitesse_cible × min(distance / vitesse, 1 s) ; roulis instantané autour du nez pour mettre la cible
+  dans le plan (nez, normal), côté +normal ; puis cabré vers elle, au plus taux_max × dt.
+- **Vitesse** :
+  - propulsion tant que |v| < vitesse max (`MissileBody_BoostPhase_42632`) : au 1er tick v = vitesse
+    du lanceur ; ensuite v ramenée sur le nez seul, `v_nez += accélération × dt` ;
+  - puis, avec cible : v = (latéral, normal, nez) = (champ 4, champ 5, vitesse max) dans le repère
+    du missile (`MissileBody_SetCruiseVelocity_42A1B`) ;
+  - sans cible : `v.y += −9,8 × dt` et nez réaligné sur la vitesse (balistique).
+
+### 10.4 Déplacement (`WorldObject_IntegrateBodyMotion_3D31D`, slot +0x14)
+`position += v × dt` (vitesse du corps, `dword_7045E` = `dt`). La vitesse angulaire du corps MISS est
+le vecteur nul (`DynBody_GetAngularVelocityZero_462A7`) : la rotation faite ensuite par cette
+fonction est nulle, l'orientation ne change que par le guidage ou l'alignement balistique.
+
+### 10.5 Fin de vie
+Le missile est retiré et **explose** (même chemin dans les trois cas) quand :
+1. sa durée de vol est écoulée (explosion en l'air, où il se trouve) ;
+2. il est mort (`WorldObject_IsAlive_3CBB7` faux, par exemple après une collision) ;
+3. sa cible est à moins du rayon de l'allumeur.
+Non tracé : ce qui met le missile « mort » (collision avec le sol ou un objet) et ce qui pose +0x26 / +0x59.
