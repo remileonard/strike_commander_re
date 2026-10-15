@@ -68,10 +68,11 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
     <label><input type="checkbox" id="flat"> ombrage plat (mode « face unie » du jeu)</label>
     <label><input type="checkbox" id="diag"> diagonale « / » au lieu de « \ »</label>
     <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
+    <label><input type="checkbox" id="skirtOn" checked> jupes : 4 cellules hors carte, cellule du bord répétée (comme le jeu)</label>
   </div>
   <h2>Aller à</h2>
   <ul class="list" id="goto"></ul>
-  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères.</p>
+  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km.</p>
 </aside>
 <script>
 const D = /*__DATA__*/null;
@@ -88,6 +89,11 @@ const D = /*__DATA__*/null;
   if (!PAL) { err("Pas de palette : relance terrain_viewer.py avec PALETTE.IFF."); return; }
 
   // Repère GL : x = X du fichier, y = altitude Y, z = −Z du fichier.
+  const CN = N / D.grid;           // sommets par cellule
+  const SK = 4;                     // largeur des jupes, en cellules
+  // Comme Terrain_BuildVertexWindow_3266E : cellule bornée à [0, grille − 1], position dans la cellule = g mod n.
+  const src = (g) => Math.min(Math.max(Math.floor(g / CN), 0), D.grid - 1) * CN + (((g % CN) + CN) % CN);
+  const key = (i, j) => src(i) * N + src(j);
   const posX = (j) => -HALF + j * SP;
   const posZ = (i) => -(HALF - i * SP);
 
@@ -132,32 +138,42 @@ const D = /*__DATA__*/null;
     b.n = sh.length; return b;
   }
   // terrain : 2 triangles par carré, sommets non partagés (couleur de base propre au triangle)
-  let terrain = null;
-  function buildTerrain(slash, flat) {
-    const ntri = (N - 1) * (N - 1) * 2;
+  let terrain = null, skirt = null;
+  // skirt = 0 : la carte seule ; skirt > 0 : seulement les carrés hors de la carte, sur skirt cellules
+  function buildMesh(slash, flat, sk, old) {
+    const M = N - 1 + 2 * sk * CN;
+    const ntri = (sk ? M * M - (N - 1) * (N - 1) : (N - 1) * (N - 1)) * 2;
     const pos = new Float32Array(ntri * 9), sh = new Float32Array(ntri * 3);
     let t = 0;
     const hu = (k) => H[k] & 0xFFFF;
-    function tri(k0, k1, k2) {
+    function tri(p0, p1, p2) {
+      const k0 = key(p0[0], p0[1]), k1 = key(p1[0], p1[1]), k2 = key(p2[0], p2[1]);
       let kb = k0;
       if (hu(k1) >= hu(kb)) kb = k1;
       if (hu(k2) >= hu(kb)) kb = k2;
       const r = RANG[C[kb]] || RANG[0];
       let tones = [k0, k1, k2].map((k) => r[0] + ((L[k] * r[1] + 128) >> 8));
       if (flat) { const m = Math.floor((tones[0] + tones[1] + tones[2]) / 3); tones = [m, m, m]; }
-      [k0, k1, k2].forEach((k, q) => {
-        const i = (k / N) | 0, j = k % N, o = 3 * t;
-        pos[o] = posX(j); pos[o + 1] = H[k]; pos[o + 2] = posZ(i);
+      [p0, p1, p2].forEach((p, q) => {
+        const k = [k0, k1, k2][q], o = 3 * t;
+        pos[o] = posX(p[1]); pos[o + 1] = H[k]; pos[o + 2] = posZ(p[0]);
         sh[t] = tones[q];
         t++;
       });
     }
-    for (let i = 0; i < N - 1; i++) for (let j = 0; j < N - 1; j++) {
-      const A = i * N + j, B = A + 1, Cc = A + N, Dd = A + N + 1;
+    const lo = -sk * CN, hi = N - 1 + sk * CN;
+    for (let i = lo; i < hi; i++) for (let j = lo; j < hi; j++) {
+      const inside = i >= 0 && i < N - 1 && j >= 0 && j < N - 1;
+      if (inside === (sk > 0)) continue;
+      const A = [i, j], B = [i, j + 1], Cc = [i + 1, j], Dd = [i + 1, j + 1];
       if (!slash) { tri(A, B, Dd); tri(A, Dd, Cc); }
       else { tri(A, B, Cc); tri(Dd, Cc, B); }
     }
-    terrain = upload(pos, sh, terrain);
+    return upload(pos, sh, old);
+  }
+  function buildTerrain(slash, flat) {
+    terrain = buildMesh(slash, flat, 0, terrain);
+    skirt = buildMesh(slash, flat, SK, skirt);
   }
   const runways = (function () {
     const pos = [], sh = [];
@@ -196,9 +212,9 @@ const D = /*__DATA__*/null;
   const fwdOf = () => [Math.cos(cam.pitch) * Math.sin(cam.yaw), Math.sin(cam.pitch), -Math.cos(cam.pitch) * Math.cos(cam.yaw)];
   function groundAt(x, z) {
     const fj = (x + HALF) / SP, fi = (z + HALF) / SP;
-    const j = Math.max(0, Math.min(N - 2, Math.floor(fj))), i = Math.max(0, Math.min(N - 2, Math.floor(fi)));
-    const u = Math.max(0, Math.min(1, fj - j)), v = Math.max(0, Math.min(1, fi - i));
-    const h = (a, b) => H[a * N + b];
+    const j = Math.floor(fj), i = Math.floor(fi);
+    const u = fj - j, v = fi - i;
+    const h = (a, b) => H[key(a, b)];
     return ((h(i, j) * (1 - u) + h(i, j + 1) * u) * (1 - v) + (h(i + 1, j) * (1 - u) + h(i + 1, j + 1) * u) * v);
   }
 
@@ -267,6 +283,7 @@ const D = /*__DATA__*/null;
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, palTex);
     gl.uniform1f(uSmooth, document.getElementById("flat").checked ? 0 : 1);
     draw(terrain, gl.TRIANGLES);
+    if (document.getElementById("skirtOn").checked) draw(skirt, gl.TRIANGLES);
     gl.uniform1f(uSmooth, 0);
     gl.enable(gl.POLYGON_OFFSET_FILL); gl.polygonOffset(-2, -8);
     draw(runways, gl.TRIANGLES);

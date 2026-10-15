@@ -9,6 +9,11 @@ palette voisines (le jeu, limité à 256 couleurs, tramait en damier). Pistes (.
 pris comme index de palette, face unie. Textures du sol non dessinées. La diagonale qui coupe
 chaque carré n'est pas établie : touche G pour changer.
 
+Jupes (touche J) : au-delà des bords, le terrain continue comme dans le jeu
+(Terrain_BuildVertexWindow_3266E) : l'indice de cellule est borné à [0, 17], la position dans la
+cellule continue, donc la cellule du bord se répète toutes les 20 km (celle du coin dans les deux
+directions). --skirt N règle la largeur en cellules (0 = pas de jupe).
+
 Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
 
 Usage : python3 tools/terrain_3d.py data/ALASKA.PAK [--palette data/PALETTE.IFF]
@@ -18,7 +23,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -73,6 +78,7 @@ class Terrain:
         cells = read_elevations(data, top, 1)
         self.grid = int(math.isqrt(len(cells)))
         n = cells[0][0]
+        self.cn = n                     # sommets par cellule
         self.n = self.grid * n
         self.spacing = CELL_SIZE / n
         self.half = self.grid * CELL_SIZE / 2
@@ -98,23 +104,34 @@ class Terrain:
     def gl_z(self, i):
         return -(self.half - i * self.spacing)
 
+    def src(self, g):
+        """Indice de sommet global (ligne ou colonne, peut sortir de la carte) → sommet lu,
+        comme Terrain_BuildVertexWindow_3266E : cellule bornée à [0, grille − 1], position dans la
+        cellule = g mod n (le // et le % de Python arrondissent vers le bas, comme le jeu)."""
+        c = min(max(g // self.cn, 0), self.grid - 1)
+        return c * self.cn + g % self.cn
+
+    def key(self, i, j):
+        return self.src(i) * self.n + self.src(j)
+
     def ground(self, x, z):
         fj = (x + self.half) / self.spacing
         fi = (z + self.half) / self.spacing
-        j = max(0, min(self.n - 2, int(math.floor(fj))))
-        i = max(0, min(self.n - 2, int(math.floor(fi))))
-        u = max(0.0, min(1.0, fj - j))
-        v = max(0.0, min(1.0, fi - i))
+        j = int(math.floor(fj))
+        i = int(math.floor(fi))
+        u = fj - j
+        v = fi - i
         h = self.h
-        n = self.n
-        top = h[i * n + j] * (1 - u) + h[i * n + j + 1] * u
-        bottom = h[(i + 1) * n + j] * (1 - u) + h[(i + 1) * n + j + 1] * u
+        top = h[self.key(i, j)] * (1 - u) + h[self.key(i, j + 1)] * u
+        bottom = h[self.key(i + 1, j)] * (1 - u) + h[self.key(i + 1, j + 1)] * u
         return top * (1 - v) + bottom * v
 
-    def terrain_mesh(self, slash, flat):
+    def terrain_mesh(self, slash, flat, skirt=0):
         """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle.
         flat : mode « face unie » du jeu (byte_6EB21 ≠ 1 dans Render_TerrainPipelineMain) — les
-        3 sommets reçoivent la moyenne de leurs 3 teintes (somme ÷ 3, partie entière)."""
+        3 sommets reçoivent la moyenne de leurs 3 teintes (somme ÷ 3, partie entière).
+        skirt = 0 : la carte seule ; skirt > 0 : seulement les carrés hors de la carte, sur
+        skirt cellules de large tout autour."""
         n = self.n
         h = self.h
         light = self.light
@@ -123,7 +140,10 @@ class Terrain:
         pos = array.array("f")
         shade = array.array("f")
 
-        def tri(k0, k1, k2):
+        def tri(p0, p1, p2):
+            k0 = self.key(*p0)
+            k1 = self.key(*p1)
+            k2 = self.key(*p2)
             kb = k0
             if (h[k1] & 0xFFFF) >= (h[kb] & 0xFFFF):
                 kb = k1
@@ -133,17 +153,21 @@ class Terrain:
             tones = [first + ((light[k] * shades + 128) >> 8) for k in (k0, k1, k2)]
             if flat:
                 tones = [sum(tones) // 3] * 3
-            for k, tone in zip((k0, k1, k2), tones):
-                i, j = divmod(k, n)
+            for (i, j), k, tone in zip((p0, p1, p2), (k0, k1, k2), tones):
                 pos.extend((self.gl_x(j), h[k], self.gl_z(i)))
                 shade.append(tone)
 
-        for i in range(n - 1):
-            for j in range(n - 1):
-                a = i * n + j
-                b = a + 1
-                c = a + n
-                d = a + n + 1
+        lo = -skirt * self.cn
+        hi = n - 1 + skirt * self.cn
+        for i in range(lo, hi):
+            for j in range(lo, hi):
+                inside = 0 <= i < n - 1 and 0 <= j < n - 1
+                if inside == (skirt > 0):
+                    continue
+                a = (i, j)
+                b = (i, j + 1)
+                c = (i + 1, j)
+                d = (i + 1, j + 1)
                 if not slash:
                     tri(a, b, d)
                     tri(a, d, c)
@@ -305,6 +329,10 @@ def main():
     ap.add_argument("--size", default="1280x800", help="taille de la fenêtre")
     ap.add_argument("--screenshot", default=None, help="rend une image dans ce PNG puis quitte")
     ap.add_argument("--flat", action="store_true", help="démarre en ombrage plat")
+    ap.add_argument("--view", default=None,
+                    help="caméra de départ : X,Y,Z,cap,assiette (m, m, m, degrés, degrés ; Z du fichier)")
+    ap.add_argument("--skirt", type=int, default=4,
+                    help="largeur des jupes en cellules de 20 km (0 = aucune ; défaut 4)")
     args = ap.parse_args()
 
     palette_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")
@@ -328,10 +356,17 @@ def main():
     print("construction du maillage…")
     flat = args.flat
     terrain = Mesh(*world.terrain_mesh(slash, flat))
+    skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt)) if args.skirt > 0 else None
+    show_skirt = skirt is not None
     runways = Mesh(*world.runway_mesh())
     markers = Mesh(*world.marker_mesh())
 
     cam = Camera()
+    if args.view:
+        vx, vy, vz, vcap, vpitch = (float(v) for v in args.view.split(","))
+        cam.x, cam.y, cam.z = vx, vy, -vz
+        cam.yaw, cam.pitch = math.radians(vcap), math.radians(vpitch)
+        cam.speed = max(300.0, vy / 4)
     obj_index = -1
     dragging = False
     clock = pygame.time.Clock()
@@ -365,9 +400,15 @@ def main():
                 elif e.key == pygame.K_g:
                     slash = not slash
                     terrain.upload(*world.terrain_mesh(slash, flat))
+                    if skirt:
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt))
                 elif e.key == pygame.K_f:
                     flat = not flat
                     terrain.upload(*world.terrain_mesh(slash, flat))
+                    if skirt:
+                        skirt.upload(*world.terrain_mesh(slash, flat, args.skirt))
+                elif e.key == pygame.K_j and skirt:
+                    show_skirt = not show_skirt
                 elif e.key == pygame.K_HOME:
                     cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
                     cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
@@ -421,6 +462,8 @@ def main():
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
         GL.glUniform1f(u_smooth, 0.0 if flat else 1.0)
         terrain.draw(GL.GL_TRIANGLES)
+        if show_skirt:
+            skirt.draw(GL.GL_TRIANGLES)
         GL.glUniform1f(u_smooth, 0.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
         GL.glPolygonOffset(-2, -8)
@@ -432,7 +475,8 @@ def main():
         lines = [f"X {cam.x:.0f} m   Z {-cam.z:.0f} m",
                  f"altitude Y {cam.y:.0f} m   sol {ground:.0f} m",
                  f"cap {cap:.0f}°   vitesse {cam.speed:.0f} m/s",
-                 f"ombrage {'plat' if flat else 'dégradé'}   diagonale {'/' if slash else chr(92)}"]
+                 f"ombrage {'plat' if flat else 'dégradé'}   diagonale {'/' if slash else chr(92)}   "
+                 f"jupes {f'{args.skirt} cellules' if show_skirt else 'non'}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)
