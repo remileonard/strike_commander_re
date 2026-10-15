@@ -1,10 +1,29 @@
 # Jupes du terrain : continuer la carte au-delà des bords (à porter dans libRealSpace)
 
-Rédigé le 2026-10-15. Repère Y-up, mètres. Comportement lu dans le code du jeu, reproduit et vérifié
-visuellement dans `tools/terrain_3d.py` (option `--skirt`, touche J) et dans la vue WebGL
-(`<nom>_3d.html`, case « jupes »).
+Rédigé le 2026-10-15, mis à jour pour le port. Repère Y-up, mètres.
 
-## 1. Ce que fait le jeu
+Le document a deux parties :
+- **Partie A — ce que fait le jeu** (§1 à §3) : la cellule du bord se répète au-delà de la carte. C'est
+  le comportement de l'original, lu dans le code.
+- **Partie B — l'habillage retenu** (§4 à §6), qui **n'existe pas dans le jeu** : lissage RVB des
+  jupes, bruit qui reste dans les teintes de la carte, transition douce. C'est le résultat des essais
+  faits avec Rémi dans `tools/terrain_3d.py` et la vue WebGL.
+- Annexe : les variantes essayées puis écartées, et ce qui n'est pas établi.
+
+Outils de référence (mêmes calculs, même bruit, mêmes résultats) :
+- `python3 tools/terrain_3d.py data/ALASKA.PAK --skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 60 --skirt-ramp 3`
+  (touches J jupes, M lissage, C RVB, B bruit) ;
+- vue WebGL `data/ALASKA_3d.html` (régénérée par `tools/terrain_viewer.py`) : section « Jupes : essais
+  esthétiques », destination « coin nord-ouest ».
+
+Captures (`data/`) : `ALASKA_3d_jupes.png` (jupes du jeu), `ALASKA_3d_jupes_rvb_bruit.png` et
+`ALASKA_3d_jupes_rvb_bruit_sol.png` (habillage retenu, Pygame), `ALASKA_3d_web_jupes.png` (WebGL).
+
+---
+
+# Partie A — ce que fait le jeu
+
+## 1. La règle
 
 Le jeu ne dessine pas de bord : la fenêtre de sommets autour de l'observateur continue au-delà de
 la grille de 18 × 18 cellules. Pour chaque sommet de cette fenêtre :
@@ -19,8 +38,7 @@ la grille de 18 × 18 cellules. Pour chaque sommet de cette fenêtre :
 
 Résultat : la cellule du bord se **répète en entier** toutes les 20 km vers l'extérieur ; au-delà
 d'un coin, la cellule de coin se répète dans les deux directions. Le relief n'est pas continu à
-chaque raccord de répétition (le bord droit de la cellule touche son propre bord gauche) : c'est
-le comportement du jeu.
+chaque raccord de répétition (le bord droit de la cellule touche son propre bord gauche).
 
 Preuves (fonctions de `known_functions.json`) :
 - `Terrain_BuildVertexWindow_3266E` (seg071) remplit la fenêtre :
@@ -32,9 +50,6 @@ Preuves (fonctions de `known_functions.json`) :
     `(ligne dans la cellule × n + colonne dans la cellule) × 6` dans la cellule.
 - `Terrain_ComputeLODMesh` (seg071) charge les cellules de la fenêtre avec le même bornage
   (`loc_32D0D` … `loc_32D46`) : une cellule hors carte n'est jamais demandée au fichier.
-
-Non vérifié : la requête d'altitude (`Terrain_QueryAltitudeAt`) hors carte. Les outils appliquent
-la même règle au sol sous la caméra ; ce n'est pas lu dans le code du jeu.
 
 ## 2. La formule
 
@@ -48,7 +63,7 @@ dansCellule(g)  = g mod n            (toujours dans [0, n − 1])
 Le sommet affiché en (gLigne, gColonne) prend les données du sommet
 `dansCellule(gColonne) + dansCellule(gLigne) × n` de la cellule `cellule(gLigne) × 18 + cellule(gColonne)`,
 et sa position monde est celle de (gLigne, gColonne) : `gColonne × espacement − 180 000`, et de même
-pour la ligne, avec l'espacement du niveau de détail (1000 m en ELV).
+pour la ligne, avec l'espacement du niveau de détail (1000 m en ELV, 2000 m en MED, 4000 m en LOW).
 
 Exemples (n = 20) : g = −1 → cellule 0, sommet 19 ; g = −20 → cellule 0, sommet 0 ;
 g = 360 → cellule 17, sommet 0 ; g = 379 → cellule 17, sommet 19.
@@ -57,7 +72,7 @@ La règle porte sur des **indices de grille**, pas sur des coordonnées : elle s
 à la convention de `RSArea` (lignes de cellules vers +z depuis −180 000), sans se soucier du signe
 de l'axe.
 
-## 3. Proposition pour `RSArea` / `SCRenderer`
+## 3. Jupes du jeu dans `RSArea` / `SCRenderer`
 
 Principe : construire une fois par niveau de détail, au chargement, une **copie** des sommets de la
 zone hors carte (`MapVertex` avec la position recalculée et les données du sommet source), puis
@@ -112,7 +127,7 @@ MapVertex RSArea::SkirtVertex(int lod, int gRow, int gCol) {
 Construction (une fois par niveau de détail), sur `skirtCells` cellules de large :
 
 ```cpp
-// Grille étendue : indices globaux de lo à hi inclus, rangés dans skirtVertices[lod].
+// Grille de la jupe : indices globaux de lo à hi inclus, rangés dans skirtVertices[lod].
 int perBlock = GetAreaBlockByID(lod, 0)->sideSize;
 int side = perBlock * BLOCK_PER_MAP_SIDE;
 int lo = -skirtCells * perBlock;
@@ -162,35 +177,88 @@ Points à garder en tête :
   portage, `skirtCells` se règle sur la distance de vue (`max_view_distance` / 20 000, arrondi
   au-dessus).
 
-## 4. Essai esthétique : casser la répétition sans toucher à la géométrie (PAS le jeu)
+---
 
-Ce qui suit n'existe pas dans le jeu : c'est une proposition, essayée dans `tools/terrain_3d.py`
-(`--skirt-noise A`, touche N ; `--skirt-patches`, touche P). Captures : `data/ALASKA_3d_jupes.png`
-(jupes du jeu) et `data/ALASKA_3d_jupes_bruit.png` (A = 90 et plaques).
+# Partie B — l'habillage retenu (PAS le jeu)
 
-Constat de l'essai : la répétition se voit surtout aux **plaques de couleur** (forêt / neige) et au
-relief. Bruiter seulement l'éclairage (±4 teintes, A = 40) ne se remarque presque pas ; échanger la
-couleur de base par plaques casse nettement le motif.
+## 4. Le principe
 
-Deux réglages, appliqués aux **copies** de la jupe au moment de leur construction (rien ne change
-dans la carte elle-même ni dans les positions) :
+Trois effets, appliqués **aux copies des sommets de la jupe, une fois au chargement**. Rien ne change
+dans la carte elle-même, et la géométrie de la jupe reste celle du jeu (l'altitude n'est pas lissée
+par défaut, voir §6).
 
-1. **Éclairage** : `éclairage' = clamp(éclairage + A × rampe × bruit(xMonde, zMonde), 0, 255)`, puis
-   la teinte habituelle `première + (éclairage' × n + 128) >> 8`. La teinte reste dans la gamme de sa
-   couleur de base.
-   - bruit = `0,65 × bruitValeur(période 7,3 km) + 0,35 × bruitValeur(période 31 km)` : des périodes
-     sans rapport avec les 20 km d'une cellule ;
-   - rampe = `min(1, d / 30)` avec d = distance hors carte en sommets (1,5 cellule en ELV) : rien au
-     bord de la carte, le raccord avec la vraie carte reste invisible.
-2. **Plaques** : sur les sommets à plus d'une demi-cellule hors carte, si `bruitValeur(période 23 km)`
-   dépasse 0,25, la couleur de base 4 (forêt) devient 6 (neige) et inversement. La mer (0) et les
-   autres couleurs ne changent pas. Dans l'outil, le test est fait au premier sommet du triangle.
+1. **Transition douce.** Tout l'effet est pondéré par une rampe en S qui vaut 0 au bord de la carte
+   et 1 à `rampCells` cellules (3 par défaut) :
+   ```
+   d     = distance hors carte, en sommets = max(0, −gLigne, gLigne − (côté − 1), −gColonne, gColonne − (côté − 1))
+   x     = min(1, d / (rampCells × n))
+   rampe = x² × (3 − 2x)
+   ```
+2. **Lissage RVB.** Chaque sommet hors carte prend la couleur moyenne d'un carré de (2r + 1)² sommets
+   autour de lui, sur la grille répétée du jeu (§2), avec `r = round(R × rampe)` (R = 8 km, soit 8
+   sommets en ELV). Le blanc de la neige et le vert de la forêt se mélangent ; la répétition disparaît.
+3. **Bruit dans les teintes de la carte.** Pour ne pas obtenir un flou uniforme, chaque couleur de
+   base présente dans le carré **glisse le long de sa propre gamme de palette** (`RANG`) d'un décalage
+   d'éclairage bruité, puis les couleurs sont mélangées selon leur part. Toute couleur affichée est
+   ainsi une teinte de la palette ou un mélange de teintes présentes autour.
 
-Le bruit dépend de la position monde du sommet **affiché** (gLigne, gColonne), pas du sommet source :
-deux répétitions d'une même cellule reçoivent donc des valeurs différentes. Il est déterministe
-(hash entier), les jupes sont les mêmes à chaque chargement.
+Formule complète, pour un sommet hors carte avec r > 0 :
+
+```
+décalage = A × rampe × (0,65 × bruitValeur(x, z, 7 300 m) + 0,35 × bruitValeur(x + 5 000, z − 9 000, 31 000 m))
+pour chaque couleur de base c :
+    part_c      = (nombre de sommets de couleur c du carré) / (2r + 1)²
+    éclairage_c = moyenne de l'éclairage des sommets de couleur c du carré
+RVB = Σ_c part_c × palette[première_c + ((éclairage_c + décalage) × n_c + 128) >> 8]
+```
+
+- `x`, `z` = position monde du sommet **affiché** (gColonne × espacement, gLigne × espacement) : deux
+  répétitions d'une même cellule reçoivent un bruit différent. Les périodes (7,3 km et 31 km) n'ont
+  pas de rapport avec les 20 km d'une cellule. Le bruit est déterministe (hash entier).
+- L'éclairage décalé est borné à [0, 255] avant le calcul de teinte ; `première_c` et `n_c` sont la
+  première teinte et le nombre de teintes de la couleur c (chunk `RANG` de `PALETTE.IFF`).
+- Sommets avec r = 0 (au ras du bord, quand R × rampe < 0,5) : on garde la copie du jeu, dessinée
+  avec la règle du jeu. Dans les outils, le décalage du bruit y est aussi appliqué, mais il vaut au plus
+  A / 16 (≈ 4 unités d'éclairage, moins d'une teinte) : on peut l'ignorer.
+
+## 5. Réglages
+
+| Réglage | Valeur de l'essai | Rôle |
+|---|---|---|
+| `skirtCells` | 4 (80 km) | largeur des jupes ; à régler sur la distance de vue |
+| `rampCells` | 3 cellules (60 km) | largeur de la transition carte → jupe |
+| `smoothMeters` | 8 000 m | rayon maximal du lissage (R = smoothMeters / espacement : 8 en ELV, 4 en MED, 2 en LOW) |
+| `noiseAmplitude` (A) | 60 | amplitude du bruit, en unités de l'octet d'éclairage (40 à 80 conseillé) |
+| périodes du bruit | 7 300 m et 31 000 m (poids 0,65 / 0,35) | taille des marbrures |
+
+Avec `skirtCells` = 4 et `rampCells` = 3, la zone pleinement lissée ne fait qu'une cellule : avec
+une jupe plus large, la transition se voit mieux.
+
+## 6. Code pour `RSArea` / `SCRenderer`
+
+Prérequis : `RSArea` garde la table `RANG` (première teinte et nombre de teintes par couleur de
+base), nécessaire de toute façon pour corriger le calcul de teinte du renderer actuel. Ci-dessous,
+`rangFirst[c]`, `rangCount[c]` et `rangSize` (nombre de couleurs de base, 7 pour `PALETTE.IFF`).
+
+### 6.1 Outils : rampe, bruit, teinte, sommes cumulées
 
 ```cpp
+// Distance hors carte, en sommets (0 dans la carte).
+static int OutOfMap(int gRow, int gCol, int side) {
+    int out = 0;
+    out = std::max(out, -gRow);
+    out = std::max(out, gRow - (side - 1));
+    out = std::max(out, -gCol);
+    out = std::max(out, gCol - (side - 1));
+    return out;
+}
+
+// Rampe en S : 0 au bord de la carte, 1 à rampCells cellules.
+static float SkirtRamp(int out, int perBlock, float rampCells) {
+    float x = std::min(1.0f, (float)out / (rampCells * (float)perBlock));
+    return x * x * (3.0f - 2.0f * x);
+}
+
 // Valeur pseudo-aléatoire déterministe dans [-1, 1] pour un nœud entier (i, j).
 static float Hash01(int i, int j) {
     uint32_t h = (uint32_t)i * 374761393u + (uint32_t)j * 668265263u;
@@ -218,76 +286,28 @@ static float ValueNoise(float x, float z, float period) {
     return top * (1.0f - v) + bottom * v;
 }
 
-// À appeler dans SkirtVertex, sur la copie, avant de calculer sa couleur RVB.
-// side = sommets par côté de la carte (360 en ELV) ; amplitude ≈ 40 à 90.
-static void ApplySkirtNoise(MapVertex *v, int gRow, int gCol, int side, int perBlock, float spacing,
-                            float amplitude, bool patches) {
-    int out = 0;
-    out = std::max(out, -gRow);
-    out = std::max(out, gRow - (side - 1));
-    out = std::max(out, -gCol);
-    out = std::max(out, gCol - (side - 1));
-    if (out == 0) {
-        return;
-    }
-    float x = gCol * spacing;
-    float z = gRow * spacing;
-    float ramp = std::min(1.0f, (float)out / (1.5f * (float)perBlock));
+// Décalage d'éclairage du bruit pour le sommet affiché en (x, z) mètres.
+static float SkirtLightShift(float x, float z, float amplitude, float ramp) {
     float n = 0.65f * ValueNoise(x, z, 7300.0f) + 0.35f * ValueNoise(x + 5000.0f, z - 9000.0f, 31000.0f);
-    int light = (int)lroundf((float)v->flag + amplitude * ramp * n);
-    light = std::max(0, std::min(255, light));
-    v->flag = (uint8_t)light;
-    if (patches && out >= perBlock / 2) {
-        bool swap = ValueNoise(x - 3000.0f, z + 11000.0f, 23000.0f) > 0.25f;
-        if (swap && v->type == 4) {
-            v->type = 6;
-        } else if (swap && v->type == 6) {
-            v->type = 4;
-        }
-    }
+    return amplitude * ramp * n;
 }
-```
 
-`flag` et `type` sont les octets éclairage (+2) et couleur (+3) du sommet. Après l'appel, la couleur
-RVB de la copie se calcule comme pour un sommet normal, avec la formule de teinte du jeu
-(`DATA_MODEL.md` §6.8).
+// Teinte RVB (0..1) de la couleur de base c pour un éclairage lv, formule du jeu.
+void RSArea::PaletteRgb(int c, float lv, float rgb[3]) {
+    if (c < 0 || c >= rangSize) {
+        c = 0;
+    }
+    int light = std::max(0, std::min(255, (int)lroundf(lv)));
+    int tone = rangFirst[c] + ((light * rangCount[c] + 128) >> 8);
+    tone = std::min(255, tone);
+    Texel *t = Renderer.getPalette()->GetRGBColor(tone);
+    rgb[0] = t->r / 255.0f;
+    rgb[1] = t->g / 255.0f;
+    rgb[2] = t->b / 255.0f;
+}
 
-## 5. Essai esthétique : lissage moyen des jupes (PAS le jeu)
-
-Autre proposition de Rémi, essayée dans `tools/terrain_3d.py` (`--skirt-smooth R`, touche M ;
-`--skirt-smooth-height` pour lisser aussi l'altitude). Captures : `data/ALASKA_3d_jupes_lissage.png`
-(vue de coin, R = 8, altitude lissée) et `data/ALASKA_3d_jupes_lissage_sol.png` (vue basse au nord).
-
-Principe : chaque sommet hors carte prend la **moyenne** d'un carré de (2r + 1) × (2r + 1) sommets
-de la grille étendue autour de lui (valeurs répétées du jeu, §2), avec un rayon qui grandit avec la
-distance au bord :
-
-```
-d = distance hors carte, en sommets (0 dans la carte)
-r = round(R × min(1, d / (1,5 × n)))        (n = sommets par cellule ; r = 0 au bord)
-éclairage' = moyenne des éclairages du carré
-couleur'   = couleur la plus fréquente du carré (une moyenne d'indices de couleur n'a pas de sens)
-altitude'  = moyenne des altitudes du carré (option)
-```
-
-Constat de l'essai (ALASKA, R = 8, soit ±8 km) :
-- la répétition disparaît : au-delà d'environ une cellule, les jupes deviennent une surface douce,
-  avec de grandes plaques de couleur, qui prolonge le caractère du bord (neige au nord, mer au sud) ;
-- le raccord avec la carte reste continu (r = 0 au bord) ;
-- avec l'altitude lissée, le relief s'aplatit nettement : vu de près, la jupe devient une plaine,
-  ce qui contraste avec le relief de la carte ; sans l'altitude, le relief répété reste, mais ses
-  couleurs sont unies ;
-- des bandes restent visibles perpendiculairement au bord : le long du bord, les cellules ne se
-  répètent pas et diffèrent entre elles, la moyenne les adoucit sans les effacer ;
-- l'outil garde l'altitude non lissée pour poser la caméra au-dessus du sol (`Terrain.ground`).
-
-Calcul : des **tables de sommes cumulées** (une par grandeur, et une par couleur pour la couleur
-majoritaire) donnent la somme d'un carré en 4 lectures, quel que soit r. Le calcul se fait une fois,
-au chargement de la carte (2,6 s en Python pour 4 cellules de jupe ; négligeable en C++).
-
-```cpp
-// Table de sommes cumulées sur la grille étendue (width × width), valeurs lues avec SkirtVertex.
-// sat[(a + 1) * (width + 1) + (b + 1)] = somme des valeurs des lignes 0..a et colonnes 0..b.
+// Table de sommes cumulées (width × width) : sat[(a + 1) * (width + 1) + (b + 1)] = somme des
+// valeurs des lignes 0..a et colonnes 0..b.
 static std::vector<double> BuildSat(const std::vector<float> &values, int width) {
     std::vector<double> sat((width + 1) * (width + 1), 0.0);
     for (int a = 0; a < width; a++) {
@@ -311,101 +331,212 @@ static double BoxSum(const std::vector<double> &sat, int width, int a, int b, in
 }
 ```
 
-La grille étendue doit déborder de R sommets au-delà de la jupe pour que les carrés des sommets les
-plus éloignés restent dedans. Ensuite, pour chaque copie de sommet hors carte : `flag` = moyenne de
-l'éclairage, `type` = couleur dont la somme d'indicateurs est la plus grande, et éventuellement
-`v.y` = moyenne de l'altitude × `HEIGH_MAP_SCALE`, puis la couleur RVB comme pour un sommet normal.
-Le lissage peut se combiner avec le bruit et les plaques de la section 4 (le lissage d'abord).
+### 6.2 Construction de la jupe habillée (une fois par niveau de détail)
 
-### 5bis. Variante RVB (proposée par Rémi, retenue comme la meilleure)
-
-Au lieu de moyenner l'éclairage et de prendre la couleur majoritaire, on moyenne la **couleur RVB
-affichée** de chaque sommet : le blanc de la neige et le vert de la forêt se mélangent, sans frontière
-nette. Essai : `--skirt-smooth 8 --skirt-smooth-rgb` (touche C), captures
-`data/ALASKA_3d_jupes_lissage_rvb.png` (coin, altitude lissée aussi) et
-`data/ALASKA_3d_jupes_lissage_rvb_sol.png` (vue basse au nord, altitude non lissée).
-
-- Couleur RVB d'un sommet source pour la moyenne : `palette[première(couleur du sommet) +
-  (éclairage × n + 128) >> 8]`, avec la couleur **du sommet lui-même** (la règle du sommet le plus
-  haut porte sur un triangle, pas sur un sommet).
-- Sommets non lissés (r = 0, au ras du bord) : couleur du jeu (couleur de base du sommet le plus haut
-  du triangle), pour que le raccord avec la carte reste exact.
-- Le triangle est dessiné en dégradé RVB entre ses trois sommets (`glColor` par sommet).
-
-Pour `SCRenderer` c'est le cas le plus simple : `MapVertex::color` est déjà une couleur RVB par
-sommet. On construit trois tables de sommes cumulées (`BuildSat`, §5) sur `color[0]`, `color[1]`,
-`color[2]` des copies de la grille étendue, puis on remplace la couleur de chaque copie hors carte par
-la moyenne de son carré (`BoxSum / (2r + 1)²`). Il faut alors dessiner ces triangles avec leurs
-couleurs de sommet propres, sans appliquer la règle « couleur du sommet le plus haut » de
-`renderColoredTriangle`. Les textures restent celles des sommets source.
-
-### 5ter. Bruit en RVB qui reste dans les teintes de la carte, et transition plus douce (PAS le jeu)
-
-Essai : `--skirt-smooth 8 --skirt-smooth-rgb --skirt-noise-rgb 60 --skirt-ramp 3` (touche B), et dans la vue WebGL (`<nom>_3d.html`, section « Jupes : essais esthétiques », destination « coin nord-ouest » ; capture `data/ALASKA_3d_web_jupes.png`), captures
-`data/ALASKA_3d_jupes_rvb_bruit.png` (coin) et `data/ALASKA_3d_jupes_rvb_bruit_sol.png` (vue basse).
-
-**Transition carte → jupe.** Remarque de Rémi : avec une rampe linéaire sur 1,5 cellule, la frontière
-entre la carte détaillée et la jupe lissée est trop nette. La rampe (lissage et bruits) devient une
-courbe en S sur `ramp_cells` cellules (3 par défaut) :
-
-```
-x     = min(1, d / (ramp_cells × n))          (d = distance hors carte en sommets)
-rampe = x² × (3 − 2x)
-```
-
-**Bruit dans les teintes de la carte.** Remarque de Rémi : le bruit doit rester dans les teintes de la
-carte. Un premier essai décalait R, V et B séparément (reflets rose et violet) : abandonné. Le bruit
-fait maintenant **glisser chaque couleur de base le long de SA gamme de palette** (`RANG`), puis on
-mélange :
-
-```
-décalage = A × rampe × (0,65 × bruitValeur(7,3 km) + 0,35 × bruitValeur(31 km))   (unités d'éclairage)
-pour chaque couleur de base c présente dans le carré de lissage du sommet :
-    part_c        = nombre de sommets de couleur c / nombre de sommets du carré
-    éclairage_c   = moyenne de l'éclairage des sommets de couleur c du carré
-RVB = Σ_c part_c × palette[première_c + ((éclairage_c + décalage) × n_c + 128) >> 8]
-```
-
-Sans lissage (ou au ras du bord, r = 0) : `RVB = palette[teinte(couleur de base du triangle,
-éclairage du sommet + décalage)]`. Toute couleur affichée est donc une teinte de la carte ou un
-mélange de teintes présentes autour. A ≈ 40 à 80 (60 sur les captures).
-
-Calcul : en plus des tables du §5, une table de sommes cumulées par couleur de base c pour
-l'indicateur « le sommet est de couleur c » (part) et une pour « éclairage si le sommet est de
-couleur c, 0 sinon » (moyenne d'éclairage de c = somme / nombre).
+La grille de travail déborde de R sommets au-delà de la jupe, pour que les carrés des sommets les
+plus éloignés restent dedans. Les tables (deux par couleur de base) ne servent qu'à la construction :
+elles peuvent être libérées ensuite.
 
 ```cpp
-// Teinte RVB (0..1) de la couleur de base c pour un éclairage lv (0..255), formule du jeu.
-static void PaletteRgb(RSArea *area, int c, float lv, float rgb[3]) {
-    int light = std::max(0, std::min(255, (int)lroundf(lv)));
-    int tone = area->rangFirst[c] + ((light * area->rangCount[c] + 128) >> 8);
-    tone = std::min(255, tone);
-    Texel *t = Renderer.getPalette()->GetRGBColor(tone);
-    rgb[0] = t->r / 255.0f;
-    rgb[1] = t->g / 255.0f;
-    rgb[2] = t->b / 255.0f;
-}
+struct SkirtSettings {
+    int cells;
+    float rampCells;
+    float smoothMeters;
+    float noiseAmplitude;
+};
 
-// Couleur d'une copie hors carte : mélange des couleurs de base du carré, chacune décalée sur sa gamme.
-// parts[c] et lights[c] viennent des tables de sommes cumulées ; shift = décalage du bruit.
-static void SkirtNoisyColor(RSArea *area, const float parts[], const float lights[], int colourCount,
-                            float shift, float out[3]) {
-    out[0] = 0.0f;
-    out[1] = 0.0f;
-    out[2] = 0.0f;
-    for (int c = 0; c < colourCount; c++) {
-        if (parts[c] <= 0.0f) {
-            continue;
+struct SkirtGrid {
+    int lo;
+    int width;
+    int side;
+    std::vector<MapVertex> vertices;
+    std::vector<uint8_t> smoothed;
+};
+
+void RSArea::BuildSkirt(int lod, const SkirtSettings &settings, SkirtGrid *grid) {
+    int perBlock = GetAreaBlockByID(lod, 0)->sideSize;
+    int side = perBlock * BLOCK_PER_MAP_SIDE;
+    float spacing = (float)BLOCK_WIDTH / (float)perBlock;
+    int radius = std::max(1, (int)lroundf(settings.smoothMeters / spacing));
+
+    // Grille de travail : jupe + marge du rayon ; deux valeurs par couleur de base.
+    int wlo = -settings.cells * perBlock - radius;
+    int wwidth = side + 2 * (settings.cells * perBlock + radius);
+    std::vector<std::vector<float>> isColour(rangSize, std::vector<float>(wwidth * wwidth, 0.0f));
+    std::vector<std::vector<float>> lightOfColour(rangSize, std::vector<float>(wwidth * wwidth, 0.0f));
+    for (int a = 0; a < wwidth; a++) {
+        for (int b = 0; b < wwidth; b++) {
+            MapVertex src = SkirtVertex(lod, wlo + a, wlo + b);
+            int c = src.type;
+            if (c < 0 || c >= rangSize) {
+                c = 0;
+            }
+            isColour[c][a * wwidth + b] = 1.0f;
+            lightOfColour[c][a * wwidth + b] = (float)src.flag;
         }
-        float rgb[3];
-        PaletteRgb(area, c, lights[c] + shift, rgb);
-        out[0] += parts[c] * rgb[0];
-        out[1] += parts[c] * rgb[1];
-        out[2] += parts[c] * rgb[2];
+    }
+    std::vector<std::vector<double>> satColour(rangSize);
+    std::vector<std::vector<double>> satLight(rangSize);
+    for (int c = 0; c < rangSize; c++) {
+        satColour[c] = BuildSat(isColour[c], wwidth);
+        satLight[c] = BuildSat(lightOfColour[c], wwidth);
+    }
+
+    // Jupe affichée : copies du jeu (§3), puis couleur habillée là où r > 0.
+    grid->lo = -settings.cells * perBlock;
+    grid->width = side + 2 * settings.cells * perBlock;
+    grid->side = side;
+    grid->vertices.resize(grid->width * grid->width);
+    grid->smoothed.assign(grid->width * grid->width, 0);
+    for (int gRow = grid->lo; gRow < grid->lo + grid->width; gRow++) {
+        for (int gCol = grid->lo; gCol < grid->lo + grid->width; gCol++) {
+            int index = (gRow - grid->lo) * grid->width + (gCol - grid->lo);
+            MapVertex v = SkirtVertex(lod, gRow, gCol);
+            int out = OutOfMap(gRow, gCol, side);
+            if (out > 0) {
+                float ramp = SkirtRamp(out, perBlock, settings.rampCells);
+                int r = (int)lroundf((float)radius * ramp);
+                if (r > 0) {
+                    int a = gRow - wlo;
+                    int b = gCol - wlo;
+                    double area = (double)((2 * r + 1) * (2 * r + 1));
+                    float shift = SkirtLightShift(gCol * spacing, gRow * spacing, settings.noiseAmplitude, ramp);
+                    float rgb[3];
+                    float mix[3];
+                    mix[0] = 0.0f;
+                    mix[1] = 0.0f;
+                    mix[2] = 0.0f;
+                    for (int c = 0; c < rangSize; c++) {
+                        double count = BoxSum(satColour[c], wwidth, a, b, r);
+                        if (count <= 0.0) {
+                            continue;
+                        }
+                        float part = (float)(count / area);
+                        float light = (float)(BoxSum(satLight[c], wwidth, a, b, r) / count);
+                        PaletteRgb(c, light + shift, rgb);
+                        mix[0] += part * rgb[0];
+                        mix[1] += part * rgb[1];
+                        mix[2] += part * rgb[2];
+                    }
+                    v.color[0] = mix[0];
+                    v.color[1] = mix[1];
+                    v.color[2] = mix[2];
+                    grid->smoothed[index] = 1;
+                }
+            }
+            grid->vertices[index] = v;
+        }
     }
 }
 ```
 
-`rangFirst` / `rangCount` sont la première teinte et le nombre de teintes de chaque couleur de base
-(chunk `RANG` de `PALETTE.IFF`, voir la revue du renderer). Le décalage `shift` se calcule comme au
-§4 (`ValueNoise`), multiplié par `A × rampe`.
+Mémoire de travail en ELV avec les réglages du §5 : grille de 536 × 536 sommets, 7 couleurs × 2
+tables de `double` ≈ 32 Mo pendant la construction (libérés à la sortie de la fonction).
+
+### 6.3 Rendu
+
+Un sommet **lissé** porte déjà sa couleur finale (`color`) et doit être dessiné **tel quel**, sans la
+règle « couleur du sommet le plus haut » de `renderColoredTriangle`. Un sommet **non lissé** garde la
+règle du jeu. Un triangle peut mélanger les deux (dans la zone de transition) :
+
+```cpp
+// Triangle de jupe : couleur lissée pour les sommets lissés, règle du jeu pour les autres.
+void SCRenderer::renderSkirtTriangle(RSArea *area, const SkirtGrid &grid, int k0, int k1, int k2) {
+    int ks[3];
+    ks[0] = k0;
+    ks[1] = k1;
+    ks[2] = k2;
+    // Couleur de base du jeu : celle du sommet le plus haut (à égalité, le dernier).
+    int top = ks[0];
+    for (int q = 1; q < 3; q++) {
+        if (grid.vertices[ks[q]].v.y >= grid.vertices[top].v.y) {
+            top = ks[q];
+        }
+    }
+    int baseColour = grid.vertices[top].type;
+    for (int q = 0; q < 3; q++) {
+        const MapVertex &v = grid.vertices[ks[q]];
+        if (grid.smoothed[ks[q]]) {
+            glColor3f(v.color[0], v.color[1], v.color[2]);
+        } else {
+            float rgb[3];
+            area->PaletteRgb(baseColour, (float)v.flag, rgb);
+            glColor3f(rgb[0], rgb[1], rgb[2]);
+        }
+        glVertex3f(v.v.x, v.v.y, v.v.z);
+    }
+}
+```
+
+Boucle de rendu des carrés hors carte, avec le même découpage que `renderQuad` (triangle bas :
+courant, bas-droite, bas ; triangle haut : courant, droite, bas-droite) :
+
+```cpp
+for (int gRow = grid.lo; gRow < grid.lo + grid.width - 1; gRow++) {
+    for (int gCol = grid.lo; gCol < grid.lo + grid.width - 1; gCol++) {
+        bool inside = (gRow >= 0) && (gRow < grid.side - 1) && (gCol >= 0) && (gCol < grid.side - 1);
+        if (inside) {
+            continue;
+        }
+        int current = (gRow - grid.lo) * grid.width + (gCol - grid.lo);
+        int right = current + 1;
+        int bottom = current + grid.width;
+        int bottomRight = bottom + 1;
+        bool anySmoothed = grid.smoothed[current] || grid.smoothed[right] || grid.smoothed[bottom] ||
+                           grid.smoothed[bottomRight];
+        if (!anySmoothed) {
+            // Carré entièrement « jeu » : chemin normal, textures comprises.
+            MapVertex *base = (MapVertex *)grid.vertices.data();
+            renderQuad(&base[current], &base[right], &base[bottomRight], &base[bottom], area);
+            continue;
+        }
+        renderSkirtTriangle(area, grid, current, bottomRight, bottom);
+        renderSkirtTriangle(area, grid, current, right, bottomRight);
+    }
+}
+```
+
+Remarques pour le rendu :
+- **Comparaison des hauteurs** : le jeu compare les hauteurs brutes en **non signé** (§6.8 de
+  `DATA_MODEL.md`) ; avec `v.y` en flottant, une hauteur négative ne passe pas devant les positives.
+  Si `MapVertex` garde la hauteur brute, l'utiliser à la place pour être exact.
+- **Textures** : les essais n'ont dessiné aucune texture sur les jupes. La proposition ci-dessus garde
+  les textures (via `renderQuad`) sur les carrés entièrement « jeu », près du bord, et n'en met pas
+  sur les carrés lissés, où une texture répétée trahirait la répétition. C'est un choix à valider
+  à l'écran.
+- **Ombrage plat** : en mode « face unie », prendre la moyenne RVB des 3 couleurs du triangle.
+- **Visibilité** et **largeur** : mêmes remarques qu'au §3 (blocs virtuels par cellule répétée,
+  `skirtCells` réglé sur la distance de vue).
+
+---
+
+# Annexe
+
+## A.1 Option : lisser aussi l'altitude
+
+Une table de sommes cumulées de plus sur la hauteur des sommets source donne la hauteur moyenne du
+carré ; on la met dans `v.v.y` (× `HEIGH_MAP_SCALE`) des copies lissées. Constat de l'essai
+(`--skirt-smooth-height`, case « lisser aussi l'altitude ») : vu de haut, la jupe devient une surface
+douce ; vu de près, elle devient une plaine qui contraste avec le relief de la carte. Si on l'active,
+la requête d'altitude hors carte (caméra, collisions) doit lire la même hauteur lissée, sinon un
+avion peut traverser le sol affiché.
+
+## A.2 Variantes essayées puis écartées
+
+| Variante | Constat |
+|---|---|
+| Bruit sur l'octet d'éclairage seul (±4 teintes) | presque invisible : la répétition vient surtout des plaques de couleur et du relief |
+| Échange forêt ↔ neige par plaques de bruit | casse le motif, mais bords en dents de scie (couleur changée par triangle) |
+| Lissage de l'éclairage + couleur majoritaire | la répétition disparaît, mais les frontières de couleur restent nettes ; le lissage RVB est meilleur |
+| Bruit RVB par canal (± A/3, puis ± A/12) | sort des teintes de la carte (reflets rose et violet) ; remplacé par le glissement le long des gammes |
+| Rampe linéaire sur 1,5 cellule | frontière carte / jupe trop nette ; remplacée par la rampe en S sur 3 cellules |
+
+Les options correspondantes restent dans `tools/terrain_3d.py` pour comparaison :
+`--skirt-noise` (touche N), `--skirt-patches` (P), `--skirt-smooth` sans `--skirt-smooth-rgb` (M sans C).
+
+## A.3 Non établi
+
+- La requête d'altitude du jeu (`Terrain_QueryAltitudeAt`) hors carte : elle n'a pas été lue. Les
+  outils appliquent la règle du §2 au sol sous la caméra.
+- Les niveaux de détail MED et LOW : la règle du jeu est la même (n différent, lu dans
+  `Terrain_BuildVertexWindow_3266E`), mais l'habillage n'a été essayé qu'en ELV.
