@@ -1164,7 +1164,7 @@ loc_80F68:				; CODE XREF: HUDSymbol_RenderWithClipTest_80B74+3EFj
 		push	ax
 		lea	ax, [bp+var_13C]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_10C]
 		add	[bp+var_13C], eax
@@ -1518,7 +1518,7 @@ HUDSymbol_RenderWithClipTest_80B74	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 392 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74, ajoute
-; UI_ApplyLineOfSightCheck_55A9E (seg116).
+; Vector_SetLength_55A9E (seg116).
 ; ==============================================================================================
 HUDSymbol_RenderWithClipTestB_81467	proc far		; CODE XREF: VROOMM_StubThunk_6AF4EJ WeaponCam_Tick_82693+B8p
 
@@ -1688,7 +1688,7 @@ loc_81599:				; CODE XREF: HUDSymbol_RenderWithClipTestB_81467+12Ej
 		push	ax
 		lea	ax, [bp+var_72]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_66]
 		sub	eax, [bp+var_72]
@@ -2444,7 +2444,7 @@ loc_81D99:				; CODE XREF: HUDSymbol_RenderWithClipTestC_81C26+16Fj
 		push	ax
 		lea	ax, [bp+var_8E]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_52]
 		sub	eax, [bp+var_8E]

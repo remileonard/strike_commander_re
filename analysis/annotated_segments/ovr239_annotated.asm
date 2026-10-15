@@ -1612,7 +1612,7 @@ loc_7BCC7:				; CODE XREF: Player_ShotDownSequence_7B035+C8Ej
 		push	ax
 		lea	ax, [bp+var_1FC]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_1C0]
 		sub	eax, [bp+var_1FC]
@@ -2394,7 +2394,7 @@ loc_7C51E:				; CODE XREF: Player_ShotDownSequence_7B035+14E5j
 		push	ax
 		lea	ax, [bp+var_184]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 
 loc_7C53B:				; CODE XREF: Player_ShotDownSequence_7B035+14EBj

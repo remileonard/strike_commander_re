@@ -2189,7 +2189,7 @@ hook de vue externe. Le slot `[0x14]` est la partie caméra.)
    `si[+0x183/+0x185/+0x187]`, puis **porté à `0x6400` = 100.0 unités** (distance chase).
 5. **Le « lag » = un simple rate-limit** : le vecteur avant `si[+0x14F]` est ramené
    vers la cible avec un **pas maximum de `0x600` = 6.0 unités/frame**
-   (`UI_ApplyLineOfSightCheck_55A9E` = clamp de longueur de vecteur). Pas de force,
+   (`Vector_SetLength_55A9E` = clamp de longueur de vecteur). Pas de force,
    pas de ressort amorti, pas d'intégration.
 6. Matrice d'orientation `si[+0x143]` (3×3) reconstruite via
    `Matrix_BuildFromAngle_56D72` / `Matrix_BuildAxisZ_572BC` / `Matrix_BuildAxisX_56EC3`

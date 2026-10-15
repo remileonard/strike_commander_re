@@ -389,7 +389,7 @@ seg015, > 0x220 o, table de vues en `+0x133`), `di` = l'entrée.
      ref_fwd = si[+0x14F]                               ; vecteur avant courant de la vue
      tgt     = ref_fwd * 0x6400                         ; * 100.0
      step    = tgt - D
-     si  |step| > 0x600  :  step = clamp_len(step, 0x600)   (UI_ApplyLineOfSightCheck_55A9E)
+     si  |step| > 0x600  :  step = clamp_len(step, 0x600)   (Vector_SetLength_55A9E)
      D      += step                                     ; => pas MAX 0x600 = 6.0 unités / frame
    ⇒ le "lag" est un simple RATE-LIMIT par frame. Pas de force, pas de ressort amorti, pas d'EDO.
 

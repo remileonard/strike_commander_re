@@ -338,7 +338,7 @@ loc_4BBAD:
 
 loc_4BBB4:
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	di, si
 		add	di, 12h

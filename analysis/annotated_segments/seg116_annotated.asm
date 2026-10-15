@@ -1738,9 +1738,11 @@ Utility_Helper_55A62	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée depuis seg014/seg015 (UI cockpit), appelle Vector_NormalizeInPlace_5593A.
+; far, LUE 2026-10-15. Vector_NormalizeInPlace_5593A(v) puis v *= *longueur (24.8 ; saute si
+; longueur = 1,0) : met le vecteur a la longueur donnee. Renvoie v.
+; Ex-'Vector_SetLength_55A9E'.
 ; ==============================================================================================
-UI_ApplyLineOfSightCheck_55A9E	proc far		; CODE XREF: seg014:0235P seg015:0978P ...
+Vector_SetLength_55A9E	proc far		; CODE XREF: seg014:0235P seg015:0978P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1784,13 +1786,13 @@ loc_55AA6:
 		shrd	eax, edx, 8
 		mov	[si+8],	eax
 
-loc_55AFE:				; CODE XREF: UI_ApplyLineOfSightCheck_55A9E+1Bj
+loc_55AFE:				; CODE XREF: Vector_SetLength_55A9E+1Bj
 		mov	ax, si
 		pop	di
 		pop	si
 		leave
 		retf
-UI_ApplyLineOfSightCheck_55A9E	endp
+Vector_SetLength_55A9E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2966,9 +2968,11 @@ Map_ComputeBearingToPoint_56304	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, référencée par seg097 (système de missile) — utilise sub_5828E (longueur vectorielle).
+; far, LUE (debut) 2026-10-15. Distance entre deux points 2D (deux dd par point : c0, c1,
+; c'est-a-dire le plan horizontal), resultat 24.8 dans *arg_0. Appelee par
+; GroundObj_OnScriptOpcode_453E3. Ex-'Math_Distance2D_563C9'.
 ; ==============================================================================================
-Missile_ComputeDistanceToTarget_563C9	proc far		; CODE XREF: seg097:00F8P
+Math_Distance2D_563C9	proc far		; CODE XREF: seg097:00F8P
 
 var_20		= dword	ptr -20h
 var_1C		= dword	ptr -1Ch
@@ -3023,7 +3027,7 @@ arg_6		= word ptr  0Ch
 		pop	si
 		leave
 		retf
-Missile_ComputeDistanceToTarget_563C9	endp
+Math_Distance2D_563C9	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

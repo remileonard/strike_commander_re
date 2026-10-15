@@ -2963,7 +2963,7 @@ off_6FC7E	dd loc_3CB3A
 off_6FC82	dd WorldObject_GetSignatureByte0_381E5
 off_6FC86	dd VROOMM_StubThunk_6BFB0
 		dd WorldObject_CollisionDamage_38210
-off_6FC8E	dd loc_453E3
+off_6FC8E	dd GroundObj_OnScriptOpcode_453E3
 aHDDDSD		db 'H: %d',0Ah
 		db 'D: %d',0Ah
 		db 'S: %d',0Ah,0
@@ -3004,7 +3004,7 @@ off_6FD44	dd loc_3CB3A
 off_6FD48	dd WorldObject_GetSignatureByte0_381E5
 off_6FD4C	dd VROOMM_StubThunk_6BFB0
 off_6FD50	dd WorldObject_CollisionDamage_38210
-off_6FD54	dd loc_45B76
+off_6FD54	dd Xmit_OnScriptOpcode_45B76
 off_6FD58	dd loc_37CF4
 off_6FD5C	dd Debris_NotifyChildValidate
 off_6FD60	dd loc_37D2E

@@ -921,7 +921,7 @@ loc_7A5F3:
 		push	ax
 		lea	ax, [bp+var_BC]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_BC]
 		add	[bp+var_80], eax

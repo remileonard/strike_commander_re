@@ -1101,3 +1101,25 @@ mission.
   `friendlies` (initialisé depuis `TEAM`) ; `0xB8` ajoute, `0xB9` retire (`OP_JOIN_PLAYER_TEAM`,
   `OP_LEAVE_PLAYER_TEAM`). Les affichages (radar, carte, radio) bouclent aussi sur `friendlies` ; la
   façon dont le radar de l'original choisit ses contacts n'a pas été lue.
+
+## Opcodes 0xA5 (165) et 0xA6 (166) selon la classe de l'objet (lu 2026-10-15)
+
+`MissionScript_CallNativeHandler_52513` : 0xA5 partage le cas de 0xA4 (`loc_5265A`) : deux SPOT
+résolus (`Mission_GetSpotWorldPosition_5305A`), SPOT[1er paramètre] et SPOT[2e paramètre] ; 0xA6 va
+directement à la sortie commune (aucune position, aucun objet). Puis slot +0x88 de l'instance, dont
+la valeur de retour devient l'état « en cours » de l'instruction (0 = terminé).
+
+Slot +0x88 par classe (relevé dans les vtables de seg339, entrée qui suit les dégâts de collision) :
+
+| Classe | +0x88 | 0xA5 | 0xA6 |
+|---|---|---|---|
+| avion IA (0x27BC) | `loc_3E419` → `Goal_SetObjective_A307` | objectif 0xA5 : aller au SPOT ; terminé à moins de 500 m à l'horizontale | défaut : objectif 0xBF, errance autour de sa position, jamais terminé |
+| GRND (véhicule au sol) | `GroundObj_OnScriptOpcode_453E3` | rouler vers SPOT[1er param.] ; terminé (renvoie 0) à moins de 100 m à l'horizontale | état 0xA6 rangé : le véhicule freine jusqu'à l'arrêt ; renvoie 1 |
+| XMIT (émetteur, 0x15) | `Xmit_OnScriptOpcode_45B76` | rien ; renvoie 1 | rien ; renvoie 1 |
+| SWPN | `SwpnInstance_OnOrder_43CBB` | rien ; renvoie 0 | rien ; renvoie 0 |
+| autres (missile, bombe, objets…) | `loc_38342` (`xor ax,ax`) | rien ; renvoie 0 | rien ; renvoie 0 |
+
+GRND en route (`GroundObj_Update_45883`, état 0xA5), **par frame, sans dt** : vitesse +0,25 m/s
+jusqu'à 12,5 m/s (`GroundObj_AccelerateToCruise_45675`), cap tourné de 1° vers le point
+(`GroundObj_SteerTowardPoint_454A6`). Tout autre état : −0,25 m/s par frame jusqu'à l'arrêt
+(`GroundObj_Decelerate_45797`). Le déplacement suit la pente du sol (`GroundObj_IntegrateMotion_458C8`).

@@ -9548,8 +9548,8 @@
 "sub_58034",
 "sub_55A9E"
 ],
-"new_name": "Missile_ComputeImpactPlane",
-"summary": "far,214L — calcule la distance à un point d'aiguisage (offset+0x59 vs +0x12) puis résout un plan de collision (sub_54B0A, deux fois) : **calcul du point d'impact/plan de collision entre un missile et sa cible verrouillée (guidage terminal).**"
+"new_name": "GroundObj_SteerTowardPoint_454A6",
+"summary": "far, 214L, LUE 2026-10-15. VIRAGE D'UN OBJET GRND vers le point +0x59 (etat 0xA5) : v = vitesse ; si |v| = 0 rien ; cap de v = Math_ArcTan2_54B0A(v.c0, v.c1), cap vers le point idem ; ecart en degres entiers (octet haut du 24.8), ramene a [-180, 180] ; ecart non nul : rotation horizontale de v de 1 degre vers le point (signe oppose a l'ecart), longueur conservee (Vector_SetLength_55A9E), ecrit (vtable+0x50). PAR FRAME : 1 degre par frame. Ex-'GroundObj_SteerTowardPoint_454A6'."
 },
 "sub_45675": {
 "segment": "seg097",
@@ -9561,8 +9561,8 @@
 "sub_5828E",
 "sub_55A9E"
 ],
-"new_name": "Missile_TestSearchRange",
-"summary": "far,144L — calcule la distance à la cible, la compare à un seuil de 0xC80 (3200, probable rayon de recherche en unités du jeu) : **test de portée de recherche/acquisition pour le guidage de missile.**"
+"new_name": "GroundObj_AccelerateToCruise_45675",
+"summary": "far, 144L, LUE 2026-10-15. ACCELERATION D'UN OBJET GRND en route (etat 0xA5) : v = vitesse (vtable+0x4C) ; si |v| < 0xC80 (12,5 m/s) : direction = v (ou le nez, ligne 1 de l'orientation, si v = 0), increment = min(0x40 = 0,25 m/s, 12,5 - |v|), v += Vector_SetLength_55A9E(direction, increment), ecrit (vtable+0x50). PAR FRAME (pas de dt) : +0,25 m/s par frame jusqu'a 12,5 m/s. Ex-'GroundObj_AccelerateToCruise_45675'."
 },
 "sub_45797": {
 "segment": "seg097",
@@ -9574,8 +9574,8 @@
 "sub_5828E",
 "sub_55A9E"
 ],
-"new_name": "Missile_TestProximityFuze",
-"summary": "far,127L — calcule la distance à la cible, compare à un seuil de 0x40 (64, probable rayon de fuze de proximité) : **test de déclenchement de la fuze de proximité du missile (distance critique de détonation).**"
+"new_name": "GroundObj_Decelerate_45797",
+"summary": "far, 127L, LUE 2026-10-15. FREINAGE D'UN OBJET GRND (tout etat autre que 0xA5) : si |v| > 0 : v -= Vector_SetLength_55A9E(v, min(0x40 = 0,25 m/s, |v|)) ; l'objet s'arrete a raison de 0,25 m/s par frame. Ex-'GroundObj_Decelerate_45797'."
 },
 "sub_45A49": {
 "segment": "seg097",
@@ -12130,8 +12130,8 @@
 "calls": [
 "sub_5593A"
 ],
-"new_name": "UI_ApplyLineOfSightCheck_55A9E",
-"summary": "far, référencée depuis seg014/seg015 (UI cockpit), appelle Vector_NormalizeInPlace_5593A."
+"new_name": "Vector_SetLength_55A9E",
+"summary": "far, LUE 2026-10-15. Vector_NormalizeInPlace_5593A(v) puis v *= *longueur (24.8 ; saute si longueur = 1,0) : met le vecteur a la longueur donnee. Renvoie v. Ex-'Vector_SetLength_55A9E'."
 },
 "sub_55B04": {
 "segment": "seg116",
@@ -12268,8 +12268,8 @@
 "calls": [
 "sub_5828E"
 ],
-"new_name": "Missile_ComputeDistanceToTarget_563C9",
-"summary": "far, référencée par seg097 (système de missile) — utilise sub_5828E (longueur vectorielle)."
+"new_name": "Math_Distance2D_563C9",
+"summary": "far, LUE (debut) 2026-10-15. Distance entre deux points 2D (deux dd par point : c0, c1, c'est-a-dire le plan horizontal), resultat 24.8 dans *arg_0. Appelee par GroundObj_OnScriptOpcode_453E3. Ex-'Math_Distance2D_563C9'."
 },
 "sub_5647A": {
 "segment": "seg116",
@@ -31497,7 +31497,7 @@
 "sub_57DAE"
 ],
 "new_name": "HUDSymbol_RenderWithClipTestB_81467",
-"summary": "⚠️ far, 392 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74, ajoute `UI_ApplyLineOfSightCheck_55A9E` (seg116)."
+"summary": "⚠️ far, 392 lignes, NON DÉTAILLÉE — variante de HUDSymbol_RenderWithClipTest_80B74, ajoute `Vector_SetLength_55A9E` (seg116)."
 },
 "sub_818A2": {
 "segment": "ovr243",
@@ -45935,7 +45935,7 @@
 "type": "label",
 "calls": [],
 "new_name": "Camera_OrbitTrackCompute_1493A",
-"summary": "far, ~0xB0 L — CAMÉRA ORBITALE / SUIVI (ROTA, et probable base de CHASE/TARGET). Slot de vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par Matrix_WorldToLocal_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée. targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8). POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20] (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas -> Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_OrthonormalizeKeepRow1_57660 accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir CAMERA_SYSTEM.md §4bis."
+"summary": "far, ~0xB0 L — CAMÉRA ORBITALE / SUIVI (ROTA, et probable base de CHASE/TARGET). Slot de vtable (DATA XREF seg339:07AC ; présente dans les vtables des entrées caméra type ROTA tag 0x6A2). si = objet entrée caméra. subject = si[+0x89]. R = subject->vtable[0x3C]() (matrice d'orientation du sujet). axe = { R[+0x0C], R[+0x10], R[+0x14] } (rangée 1) transformé par Matrix_WorldToLocal_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée. targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8). POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité (Vector_SetLength_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20] (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas -> Matrix_BuildAxisZ_572BC / Matrix_BuildAxisX_56EC3 / Matrix_OrthonormalizeKeepRow1_57660 accumulés dans si[+0x8B] (rotation de l'orbite, bornée par si[+0x9B]/+0xAB). ZOOM : byte_72DE3==1 -> si[+0xAF] += dword_70448 (borné si[+0xB3] max) ; byte_72DE2==1 -> si[+0xAF] -= dword_70448 (borné si[+0xB7] min). Camera_ComputeViewMatrix_2E2AC(si) en fin. Champs : +0x14/18/1C pos lissée, +0x20 matrice de visée, +0x2C matrice de travail, +0x89 sujet, +0x8B matrice d'orbite, +0x9B/+0xAB limites d'angle, +0xAF distance, +0xB3 dist max, +0xB7 dist min. Voir CAMERA_SYSTEM.md §4bis."
 },
 "loc_5CCBB": {
 "segment": "seg134",
@@ -47835,7 +47835,7 @@
 "type": "label",
 "calls": [],
 "new_name": "GroundObj_Update_45883",
-"summary": "far (label), LUE 2026-10-12. Slot +0x10 (mise à jour) de l'instance GRND : si vivant, selon l'état +0x55 (0xA5 : Missile_TestSearchRange puis Missile_ComputeImpactPlane, sinon Missile_TestProximityFuze), puis SmokeTrail_Tick_3D57E. N'appelle pas la dynamique."
+"summary": "far (label), LUE 2026-10-12, RELUE 2026-10-15. Slot +0x10 (mise a jour) de l'instance GRND. Mort -> 0. Etat +0x55 (dernier opcode de PROG recu, GroundObj_OnScriptOpcode_453E3) = 0xA5 : GroundObj_AccelerateToCruise_45675 puis GroundObj_SteerTowardPoint_454A6(point +0x59) ; sinon GroundObj_Decelerate_45797. Puis SmokeTrail_Tick_3D57E, renvoie 1. N'appelle pas la dynamique (deplacement : GroundObj_IntegrateMotion_458C8)."
 },
 "loc_4256C": {
 "segment": "seg090",
@@ -47906,5 +47906,25 @@
 "calls": [],
 "new_name": "SwpnInstance_Destruct_43C70",
 "summary": "far (label), LUE 2026-10-15. Slot +0x18 (destructeur) de l'instance SWPN : vtable 2AA0h, libere la reference de cible +0x51 (SetReference16 0, WeakRef_InvalidateIfSet), WorldObject_BaseDestruct, libere la memoire si bit 0 de l'argument."
+},
+"loc_453E3": {
+"segment": "seg097",
+"start_line": 138939,
+"end_line": 138939,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "GroundObj_OnScriptOpcode_453E3",
+"summary": "far (label), LUE 2026-10-15. Slot +0x88 de l'instance GRND (seg339 0x6FC8E) : reception d'un opcode de PROG (MissionScript_CallNativeHandler_52513 : instance, opcode, objet resolu, &position, &position 2). +0x55 = opcode (TOUT opcode est range), +0x57 = objet resolu (SetReference16), +0x59/+0x5D/+0x61 = position (pour 0xA5 : SPOT du 1er parametre). Renvoie 1 ('en cours'), sauf 0xA5 deja arrive : Math_Distance2D_563C9(ma position, point) < 6400h (100 m) -> +0x55 = 0 et renvoie 0. Effet dans GroundObj_Update_45883 : etat 0xA5 = rouler vers le point, tout autre etat = freiner jusqu'a l'arret."
+},
+"loc_45B76": {
+"segment": "seg098",
+"start_line": 139931,
+"end_line": 139931,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "Xmit_OnScriptOpcode_45B76",
+"summary": "far (label), LUE 2026-10-15. Slot +0x88 de l'instance XMIT (categorie 0x15, seg339 0x6FD54) : opcode 0xAB (message) avec l'octet +0x5D non nul -> RadioQueue_AllocateSlot(+0x51, message) ; renvoie 1 pour tout opcode."
 }
 }

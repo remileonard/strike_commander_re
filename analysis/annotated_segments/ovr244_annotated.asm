@@ -592,7 +592,7 @@ loc_82FB1:				; CODE XREF: HUDSymbol_RenderWithClipTestD_82DEB+1C2j
 		push	ax
 		lea	ax, [bp+var_11A]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_DE]
 		sub	eax, [bp+var_11A]

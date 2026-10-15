@@ -55,7 +55,16 @@ loc_453D9:				; DATA XREF: seg339:off_6FC3Ao
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_453E3:				; DATA XREF: seg339:off_6FC8Eo
+; ==============================================================================================
+; far (label), LUE 2026-10-15. Slot +0x88 de l'instance GRND (seg339 0x6FC8E) : reception d'un
+; opcode de PROG (MissionScript_CallNativeHandler_52513 : instance, opcode, objet resolu,
+; &position, &position 2). +0x55 = opcode (TOUT opcode est range), +0x57 = objet resolu
+; (SetReference16), +0x59/+0x5D/+0x61 = position (pour 0xA5 : SPOT du 1er parametre). Renvoie
+; 1 ('en cours'), sauf 0xA5 deja arrive : Math_Distance2D_563C9(ma position, point) < 6400h
+; (100 m) -> +0x55 = 0 et renvoie 0. Effet dans GroundObj_Update_45883 : etat 0xA5 = rouler
+; vers le point, tout autre etat = freiner jusqu'a l'arret.
+; ==============================================================================================
+GroundObj_OnScriptOpcode_453E3:				; DATA XREF: seg339:off_6FC8Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 1Ch
@@ -123,7 +132,7 @@ loc_45467:
 		push	ss
 		lea	ax, [bp-1Ch]
 		push	ax
-		call	Missile_ComputeDistanceToTarget_563C9
+		call	Math_Distance2D_563C9
 		add	sp, 8
 		cmp	dword ptr [bp-1Ch], 6400h
 		jge	short loc_4548F
@@ -152,11 +161,14 @@ loc_4549F:				; CODE XREF: seg097:00ADj seg097:0113j
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,214L — calcule la distance à un point d'aiguisage (offset+0x59 vs +0x12) puis résout un
-; plan de collision (sub_54B0A, deux fois) : calcul du point d'impact/plan de collision entre
-; un missile et sa cible verrouillée (guidage terminal).
+; far, 214L, LUE 2026-10-15. VIRAGE D'UN OBJET GRND vers le point +0x59 (etat 0xA5) : v =
+; vitesse ; si |v| = 0 rien ; cap de v = Math_ArcTan2_54B0A(v.c0, v.c1), cap vers le point
+; idem ; ecart en degres entiers (octet haut du 24.8), ramene a [-180, 180] ; ecart non nul :
+; rotation horizontale de v de 1 degre vers le point (signe oppose a l'ecart), longueur
+; conservee (Vector_SetLength_55A9E), ecrit (vtable+0x50). PAR FRAME : 1 degre par frame.
+; Ex-'GroundObj_SteerTowardPoint_454A6'.
 ; ==============================================================================================
-Missile_ComputeImpactPlane	proc far		; CODE XREF: seg097:052Ap
+GroundObj_SteerTowardPoint_454A6	proc far		; CODE XREF: seg097:052Ap
 
 var_4A		= dword	ptr -4Ah
 var_46		= dword	ptr -46h
@@ -208,16 +220,16 @@ arg_0		= word ptr  6
 		jmp	short loc_454ED
 ; ���������������������������������������������������������������������������
 
-loc_454EB:				; CODE XREF: Missile_ComputeImpactPlane+3Ej
+loc_454EB:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+3Ej
 		xor	ax, ax
 
-loc_454ED:				; CODE XREF: Missile_ComputeImpactPlane+43j
+loc_454ED:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+43j
 		or	al, al
 		jz	short loc_454F4
 		jmp	loc_45671
 ; ���������������������������������������������������������������������������
 
-loc_454F4:				; CODE XREF: Missile_ComputeImpactPlane+49j
+loc_454F4:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+49j
 		mov	di, si
 		add	di, 59h	; 'Y'
 		mov	cx, si
@@ -269,13 +281,13 @@ loc_4555E:
 		jmp	short loc_4557F
 ; ���������������������������������������������������������������������������
 
-loc_45575:				; CODE XREF: Missile_ComputeImpactPlane+C7j
+loc_45575:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+C7j
 		cmp	bx, 0FF4Ch
 		jge	short loc_4557F
 		add	bx, 168h
 
-loc_4557F:				; CODE XREF: Missile_ComputeImpactPlane+CDj
-					; Missile_ComputeImpactPlane+D3j
+loc_4557F:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+CDj
+					; GroundObj_SteerTowardPoint_454A6+D3j
 		mov	eax, [bp+var_3E]
 		mov	[bp+var_20], eax
 		mov	eax, [bp+var_3A]
@@ -285,13 +297,13 @@ loc_4557F:				; CODE XREF: Missile_ComputeImpactPlane+CDj
 		jmp	loc_45671
 ; ���������������������������������������������������������������������������
 
-loc_45596:				; CODE XREF: Missile_ComputeImpactPlane+EBj
+loc_45596:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+EBj
 		mov	cx, 1
 		or	bx, bx
 		jle	short loc_455A0
 		mov	cx, 0FFFFh
 
-loc_455A0:				; CODE XREF: Missile_ComputeImpactPlane+F5j
+loc_455A0:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+F5j
 		mov	[bp+var_22], cx
 		movsx	eax, [bp+var_22]
 		shl	eax, 8
@@ -354,7 +366,7 @@ loc_45650:
 		push	ax
 
 loc_4565C:
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		lea	ax, [bp+var_3E]
 		push	ax
@@ -363,13 +375,13 @@ loc_4565C:
 		call	dword ptr [bx+50h]
 		add	sp, 4
 
-loc_45671:				; CODE XREF: Missile_ComputeImpactPlane+4Bj
-					; Missile_ComputeImpactPlane+EDj
+loc_45671:				; CODE XREF: GroundObj_SteerTowardPoint_454A6+4Bj
+					; GroundObj_SteerTowardPoint_454A6+EDj
 		pop	di
 		pop	si
 		leave
 		retf
-Missile_ComputeImpactPlane	endp
+GroundObj_SteerTowardPoint_454A6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -377,11 +389,13 @@ Missile_ComputeImpactPlane	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,144L — calcule la distance à la cible, la compare à un seuil de 0xC80 (3200, probable
-; rayon de recherche en unités du jeu) : test de portée de recherche/acquisition pour le
-; guidage de missile.
+; far, 144L, LUE 2026-10-15. ACCELERATION D'UN OBJET GRND en route (etat 0xA5) : v = vitesse
+; (vtable+0x4C) ; si |v| < 0xC80 (12,5 m/s) : direction = v (ou le nez, ligne 1 de
+; l'orientation, si v = 0), increment = min(0x40 = 0,25 m/s, 12,5 - |v|), v +=
+; Vector_SetLength_55A9E(direction, increment), ecrit (vtable+0x50). PAR FRAME (pas de dt) :
+; +0,25 m/s par frame jusqu'a 12,5 m/s. Ex-'GroundObj_AccelerateToCruise_45675'.
 ; ==============================================================================================
-Missile_TestSearchRange	proc far		; CODE XREF: seg097:051Ep
+GroundObj_AccelerateToCruise_45675	proc far		; CODE XREF: seg097:051Ep
 
 var_38		= dword	ptr -38h
 var_34		= dword	ptr -34h
@@ -438,26 +452,26 @@ arg_0		= word ptr  6
 		jmp	short loc_456E5
 ; ���������������������������������������������������������������������������
 
-loc_456E3:				; CODE XREF: Missile_TestSearchRange+67j
+loc_456E3:				; CODE XREF: GroundObj_AccelerateToCruise_45675+67j
 		xor	ax, ax
 
-loc_456E5:				; CODE XREF: Missile_TestSearchRange+6Cj
+loc_456E5:				; CODE XREF: GroundObj_AccelerateToCruise_45675+6Cj
 		or	al, al
 		jnz	short loc_456EC
 		jmp	loc_45793
 ; ���������������������������������������������������������������������������
 
-loc_456EC:				; CODE XREF: Missile_TestSearchRange+72j
+loc_456EC:				; CODE XREF: GroundObj_AccelerateToCruise_45675+72j
 		cmp	[bp+var_4], 0
 		jnz	short loc_456F8
 		mov	ax, 1
 		jmp	short loc_456FA
 ; ���������������������������������������������������������������������������
 
-loc_456F8:				; CODE XREF: Missile_TestSearchRange+7Cj
+loc_456F8:				; CODE XREF: GroundObj_AccelerateToCruise_45675+7Cj
 		xor	ax, ax
 
-loc_456FA:				; CODE XREF: Missile_TestSearchRange+81j
+loc_456FA:				; CODE XREF: GroundObj_AccelerateToCruise_45675+81j
 		or	al, al
 		jz	short loc_45721
 		push	si
@@ -473,7 +487,7 @@ loc_456FA:				; CODE XREF: Missile_TestSearchRange+81j
 		mov	eax, [di+8]
 		mov	[bp+var_30], eax
 
-loc_45721:				; CODE XREF: Missile_TestSearchRange+87j
+loc_45721:				; CODE XREF: GroundObj_AccelerateToCruise_45675+87j
 		mov	[bp+var_18], 40h ; '@'
 		mov	eax, [bp+var_18]
 		mov	[bp+var_14], eax
@@ -487,10 +501,10 @@ loc_45721:				; CODE XREF: Missile_TestSearchRange+87j
 		jmp	short loc_4574E
 ; ���������������������������������������������������������������������������
 
-loc_4574C:				; CODE XREF: Missile_TestSearchRange+D0j
+loc_4574C:				; CODE XREF: GroundObj_AccelerateToCruise_45675+D0j
 		xor	ax, ax
 
-loc_4574E:				; CODE XREF: Missile_TestSearchRange+D5j
+loc_4574E:				; CODE XREF: GroundObj_AccelerateToCruise_45675+D5j
 		or	al, al
 		jz	short loc_4575E
 		mov	eax, [bp+var_C]
@@ -499,12 +513,12 @@ loc_4574E:				; CODE XREF: Missile_TestSearchRange+D5j
 loc_4575A:
 		mov	[bp+var_14], eax
 
-loc_4575E:				; CODE XREF: Missile_TestSearchRange+DBj
+loc_4575E:				; CODE XREF: GroundObj_AccelerateToCruise_45675+DBj
 		lea	ax, [bp+var_14]
 		push	ax
 		lea	ax, [bp+var_38]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_38]
 		add	[bp+var_2C], eax
@@ -519,12 +533,12 @@ loc_4575E:				; CODE XREF: Missile_TestSearchRange+DBj
 		call	dword ptr [bx+50h]
 		add	sp, 4
 
-loc_45793:				; CODE XREF: Missile_TestSearchRange+74j
+loc_45793:				; CODE XREF: GroundObj_AccelerateToCruise_45675+74j
 		pop	di
 		pop	si
 		leave
 		retf
-Missile_TestSearchRange	endp
+GroundObj_AccelerateToCruise_45675	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -532,11 +546,11 @@ Missile_TestSearchRange	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,127L — calcule la distance à la cible, compare à un seuil de 0x40 (64, probable rayon de
-; fuze de proximité) : test de déclenchement de la fuze de proximité du missile (distance
-; critique de détonation).
+; far, 127L, LUE 2026-10-15. FREINAGE D'UN OBJET GRND (tout etat autre que 0xA5) : si |v| > 0
+; : v -= Vector_SetLength_55A9E(v, min(0x40 = 0,25 m/s, |v|)) ; l'objet s'arrete a raison de
+; 0,25 m/s par frame. Ex-'GroundObj_Decelerate_45797'.
 ; ==============================================================================================
-Missile_TestProximityFuze	proc far		; CODE XREF: seg097:0534p
+GroundObj_Decelerate_45797	proc far		; CODE XREF: seg097:0534p
 
 var_40		= dword	ptr -40h
 var_3C		= dword	ptr -3Ch
@@ -590,16 +604,16 @@ arg_0		= word ptr  6
 		jmp	short loc_457F3
 ; ���������������������������������������������������������������������������
 
-loc_457F1:				; CODE XREF: Missile_TestProximityFuze+53j
+loc_457F1:				; CODE XREF: GroundObj_Decelerate_45797+53j
 		xor	ax, ax
 
-loc_457F3:				; CODE XREF: Missile_TestProximityFuze+58j
+loc_457F3:				; CODE XREF: GroundObj_Decelerate_45797+58j
 		or	al, al
 		jnz	short loc_457FA
 		jmp	loc_45880
 ; ���������������������������������������������������������������������������
 
-loc_457FA:				; CODE XREF: Missile_TestProximityFuze+5Ej
+loc_457FA:				; CODE XREF: GroundObj_Decelerate_45797+5Ej
 		mov	[bp+var_10], 40h ; '@'
 		mov	eax, [bp+var_10]
 		mov	[bp+var_C], eax
@@ -610,21 +624,21 @@ loc_457FA:				; CODE XREF: Missile_TestProximityFuze+5Ej
 		jmp	short loc_4581B
 ; ���������������������������������������������������������������������������
 
-loc_45819:				; CODE XREF: Missile_TestProximityFuze+7Bj
+loc_45819:				; CODE XREF: GroundObj_Decelerate_45797+7Bj
 		xor	ax, ax
 
-loc_4581B:				; CODE XREF: Missile_TestProximityFuze+80j
+loc_4581B:				; CODE XREF: GroundObj_Decelerate_45797+80j
 		or	al, al
 		jz	short loc_45827
 		mov	eax, [bp+var_4]
 		mov	[bp+var_C], eax
 
-loc_45827:				; CODE XREF: Missile_TestProximityFuze+86j
+loc_45827:				; CODE XREF: GroundObj_Decelerate_45797+86j
 		lea	ax, [bp+var_C]
 		push	ax
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp+var_28]
 		sub	eax, [bp+var_1C]
@@ -658,18 +672,20 @@ loc_45867:
 		call	dword ptr [bx+50h]
 		add	sp, 4
 
-loc_45880:				; CODE XREF: Missile_TestProximityFuze+60j
+loc_45880:				; CODE XREF: GroundObj_Decelerate_45797+60j
 		pop	si
 		leave
 		retf
-Missile_TestProximityFuze	endp
+GroundObj_Decelerate_45797	endp
 
 ; ���������������������������������������������������������������������������
 
 ; ==============================================================================================
-; far (label), LUE 2026-10-12. Slot +0x10 (mise à jour) de l'instance GRND : si vivant, selon
-; l'état +0x55 (0xA5 : Missile_TestSearchRange puis Missile_ComputeImpactPlane, sinon
-; Missile_TestProximityFuze), puis SmokeTrail_Tick_3D57E. N'appelle pas la dynamique.
+; far (label), LUE 2026-10-12, RELUE 2026-10-15. Slot +0x10 (mise a jour) de l'instance GRND.
+; Mort -> 0. Etat +0x55 (dernier opcode de PROG recu, GroundObj_OnScriptOpcode_453E3) = 0xA5 :
+; GroundObj_AccelerateToCruise_45675 puis GroundObj_SteerTowardPoint_454A6(point +0x59) ;
+; sinon GroundObj_Decelerate_45797. Puis SmokeTrail_Tick_3D57E, renvoie 1. N'appelle pas la
+; dynamique (deplacement : GroundObj_IntegrateMotion_458C8).
 ; ==============================================================================================
 GroundObj_Update_45883:				; DATA XREF: seg339:off_6FC16o
 		push	bp
@@ -685,14 +701,14 @@ GroundObj_Update_45883:				; DATA XREF: seg339:off_6FC16o
 		jnz	short loc_458B2
 		push	si
 		push	cs
-		call	near ptr Missile_TestSearchRange
+		call	near ptr GroundObj_AccelerateToCruise_45675
 		pop	cx
 		mov	ax, si
 		add	ax, 59h	; 'Y'
 		push	ax
 		push	si
 		push	cs
-		call	near ptr Missile_ComputeImpactPlane
+		call	near ptr GroundObj_SteerTowardPoint_454A6
 		add	sp, 4
 		jmp	short loc_458B8
 ; ���������������������������������������������������������������������������
@@ -700,7 +716,7 @@ GroundObj_Update_45883:				; DATA XREF: seg339:off_6FC16o
 loc_458B2:				; CODE XREF: seg097:051Aj
 		push	si
 		push	cs
-		call	near ptr Missile_TestProximityFuze
+		call	near ptr GroundObj_Decelerate_45797
 		pop	cx
 
 loc_458B8:				; CODE XREF: seg097:0530j

@@ -147,8 +147,8 @@ loc_14937:				; CODE XREF: seg014:00D1j seg014:00DBj
 ; Matrix_WorldToLocal_58768(&axe, si+0x8B) — si[+0x8B] = MATRICE D'ORBITE 3x3 accumulée.
 ; targetPos = subject.pos(+0x12) - si[+0xAF] * axe (si[+0xAF] = distance d'orbite, 24.8).
 ; POSITION LISSÉE : diff = targetPos - si[+0x14..] ; si |diff| > si[+0xB3] -> pas limité
-; (UI_ApplyLineOfSightCheck_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le
-; 'lag'. ORIENTATION : look = subject.pos - si[+0x14..] ;
+; (Vector_SetLength_55A9E) ; sinon si[+0x14..] += diff/4 par frame (0x400 -> /4) = le 'lag'.
+; ORIENTATION : look = subject.pos - si[+0x14..] ;
 ; UI_ApplyLineOfSightAndTransform_57DAE(si+0x20, ...) construit la matrice de visée si[+0x20]
 ; (caméra regarde le sujet). ENTRÉES JOUEUR : boutons joystick
 ; (Joystick_TestButtonMasked_67B6C) + Joystick_GetAxisMin/Max_67BC9/67BD8 -> deltas ->
@@ -271,7 +271,7 @@ loc_14A77:				; CODE XREF: seg014:0223j
 		push	ax
 		lea	ax, [bp-74h]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 		mov	eax, [bp-68h]
 		sub	eax, [bp-74h]

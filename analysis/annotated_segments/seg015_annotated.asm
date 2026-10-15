@@ -1134,7 +1134,7 @@ loc_15853:				; CODE XREF: seg015:095Fj
 		push	ax
 		lea	ax, [bp-0AEh]
 		push	ax
-		call	UI_ApplyLineOfSightCheck_55A9E
+		call	Vector_SetLength_55A9E
 		add	sp, 4
 
 loc_15870:				; CODE XREF: seg015:08CCj seg015:0965j
