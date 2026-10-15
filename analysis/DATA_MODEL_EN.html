@@ -486,7 +486,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
     <tbody>
       <tr><td class="num">DAMG</td><td><code>uint16</code>: damage points it can absorb; 65535 = indestructible</td><td class="num">10</td></tr>
       <tr><td class="num">TRGT</td><td><code>uint16</code> (only the low byte is kept): <b>target type</b> — 0 = not a target, 1 = aircraft, 2 = ground target, 4 = decoy. Missile seekers only track 1 and 4; the AI's ground attack requires 2; a missile aims slightly above a target of type 2 or more (radius ÷ 8)</td><td class="num">0</td></tr>
-      <tr><td class="num">SIGN</td><td>3 <code>uint8</code>: <b>signatures</b> seen by the seekers — 1 = basic infrared, 2 = radar (AIM-120, SA-2, SA-6), 3 = type-3 seeker (no weapon in the game uses it). An infrared missile keeps its target or switches to a decoy according to these values</td><td class="num">0</td></tr>
+      <tr><td class="num">SIGN</td><td>3 <code>uint8</code>: <b>signatures</b> seen by the seekers — 1 = basic infrared, 2 = radar (AIM-120, SA-2, SA-6), 3 = type-3 seeker (no weapon in the game uses it); the 3rd byte is also used by the cockpit RWR: an object only appears on it when this byte is non-zero. An infrared missile keeps its target or switches to a decoy according to these values</td><td class="num">0</td></tr>
       <tr><td class="num">EXPL</td><td>the explosion created on destruction (table below)</td><td>no explosion</td></tr>
       <tr><td class="num">DEBR</td><td>the debris thrown out on destruction (tables below)</td><td>no debris</td></tr>
       <tr><td class="num">DEST</td><td>the objects left behind on destruction, a wreck for instance (table below)</td><td>nothing</td></tr>

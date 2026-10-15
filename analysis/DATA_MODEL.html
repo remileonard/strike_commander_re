@@ -486,7 +486,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
     <tbody>
       <tr><td class="num">DAMG</td><td><code>uint16</code> : points de dégâts encaissables ; 65535 = indestructible</td><td class="num">10</td></tr>
       <tr><td class="num">TRGT</td><td><code>uint16</code> (seul l'octet bas est gardé) : <b>type de cible</b> — 0 = pas une cible, 1 = avion, 2 = cible au sol, 4 = leurre. Les chercheurs des missiles ne suivent que 1 et 4 ; l'attaque au sol de l'IA exige 2 ; un missile vise un peu au-dessus d'une cible de type 2 ou plus (rayon ÷ 8)</td><td class="num">0</td></tr>
-      <tr><td class="num">SIGN</td><td>3 <code>uint8</code> : <b>signatures</b> vues par les chercheurs — 1 = infrarouge de base, 2 = radar (AIM-120, SA-2, SA-6), 3 = chercheur de type 3 (aucune arme du jeu ne l'utilise). Un missile infrarouge garde sa cible ou bascule sur un leurre selon ces valeurs</td><td class="num">0</td></tr>
+      <tr><td class="num">SIGN</td><td>3 <code>uint8</code> : <b>signatures</b> vues par les chercheurs — 1 = infrarouge de base, 2 = radar (AIM-120, SA-2, SA-6), 3 = chercheur de type 3 (aucune arme du jeu ne l'utilise) ; le 3ᵉ octet sert aussi au RWR du cockpit : un objet n'y apparaît que s'il est non nul. Un missile infrarouge garde sa cible ou bascule sur un leurre selon ces valeurs</td><td class="num">0</td></tr>
       <tr><td class="num">EXPL</td><td>l'explosion créée à la destruction (tableau ci-dessous)</td><td>pas d'explosion</td></tr>
       <tr><td class="num">DEBR</td><td>les débris éjectés à la destruction (tableaux ci-dessous)</td><td>pas de débris</td></tr>
       <tr><td class="num">DEST</td><td>les objets laissés à la destruction, une épave par exemple (tableau ci-dessous)</td><td>rien</td></tr>

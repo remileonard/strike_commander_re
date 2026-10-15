@@ -484,7 +484,7 @@ qu'une fois.
 |---|---|
 | ALGN | int8 camp : 1 joueur, −1 adverse, 0 neutre. Va dans l'instance +0x50. |
 | TRGT | type de cible : 0 aucun, 1 avion, 2 sol, 4 leurre |
-| SIGN | octet 1 = IR, octet 2 = radar (chercheur 4), octet 3 = chercheur 3 |
+| SIGN | octet 1 = IR, octet 2 = radar (chercheur 4), octet 3 = chercheur 3 et présence sur le RWR du cockpit (`Cockpit_RwrUpdate_1F561` : non nul = affiché) |
 | CHLD | angles = float (degrés), appliqués dans l'ordre tangage (autour de X), roulis (autour de Z = nez), cap (autour de Y) |
 | DEBR | vitesses en m/s |
 

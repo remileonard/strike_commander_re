@@ -4620,9 +4620,9 @@
     "summary": "⭐ far, **fonction de rendu/validation de trame** : bascule le mode vidéo (sub_2962) si le mode demandé diffère du mode courant (word_70EA2), détruit les sous-objets mis en cache (CachedObject_DestructSubobjects_5E95A), puis dispatche deux appels virtuels ([bx] et [si+2]). Référencée dans des dizaines de segments (constructeurs de classes du cluster mémoire paginée/texte : PagedResourceC_Construct_5CD3A, TextObjectCluster_DestructVariantA_5C42C, etc.) — probable point de synchronisation d'affichage commun à toutes ces classes."
   },
   "sub_1F51C": {
-    "new_name": "UIList_DrawAllMarkers",
+    "new_name": "Rwr_DrawContacts_1F51C",
     "segment": "seg032",
-    "summary": "far,40L — itère une liste (sub_5F6A9) et blitte chaque élément (sub_61F52) à une position décalée (+arg_6) : **rendu de tous les éléments d'une liste graphique (icônes/marqueurs UI).**"
+    "summary": "far, 40L, LU 2026-10-15. Ex-'UIList_DrawAllMarkers'. DESSINE LES CONTACTS DU RWR : pour chaque contact de la liste, Render_MeasureOrDrawTextString_61F52(word_70E60, x, y, jeu de symboles arg_2, numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit (Cockpit_RwrDraw_1FA28)."
   },
   "sub_27F9E": {
     "new_name": "Input_CalibrationHandler",
@@ -6575,9 +6575,9 @@
     "summary": "far, appelle `UI_ApplyEncodingHelper_5E576`."
   },
   "sub_1F4BB": {
-    "new_name": "UIList_CreateMarker",
+    "new_name": "Rwr_AddContact_1F4BB",
     "segment": "seg032",
-    "summary": "far,62L — alloue (sub_658=malloc court) un petit objet 'événement' (type 0xEC0) contenant 3 valeurs (position/couleur?), l'insère dans une liste (sub_5F57F) : **constructeur d'un élément graphique attaché à une liste (marqueur/icône UI).**"
+    "summary": "far, 62L, LU 2026-10-15. Ex-'UIList_CreateMarker'. AJOUTE UN CONTACT A LA LISTE DU RWR (liste de l'instrument +0x5E) : petit objet de 10 o (vtable 0EC0h) : +4 = x ecran, +6 = y ecran, +8 = numero de symbole. Appelee par Cockpit_RwrUpdate_1F561."
   },
   "sub_22BB": {
     "new_name": "CRT_Memset",
@@ -19028,5 +19028,25 @@
     "new_name": "Xmit_OnScriptOpcode_45B76",
     "segment": "seg098",
     "summary": "far (label), LUE 2026-10-15. Slot +0x88 de l'instance XMIT (categorie 0x15, seg339 0x6FD54) : opcode 0xAB (message) avec l'octet +0x5D non nul -> RadioQueue_AllocateSlot(+0x51, message) ; renvoie 1 pour tout opcode."
+  },
+  "loc_1F561": {
+    "new_name": "Cockpit_RwrUpdate_1F561",
+    "segment": "seg032",
+    "summary": "far (label), LU 2026-10-15. MISE A JOUR DE L'ECRAN RWR du cockpit (methode de l'instrument, seg339:092E). Une fois toutes les +0x34 frames (compteur +0x32). Disposition : si l'octet +0x21D du cockpit (instrument+2) est non nul, rayon/marge = +0x38/+0x3A et centre = +0x2A, sinon +0x50/+0x52 et +0x6C (role exact de +0x21D non etabli). Vide la liste +0x5E, prend l'avion du joueur (cockpit+0x1E -> +0x50 -> vtable+0x1C), puis pour chaque objet du monde (World_IterateObjects 59C3h) autre que lui : (1) il faut un modele et un 3e octet SIGN non nul (Debris_GetStateFlag = instance+0x29, copie du modele +0x14) ; (2) distance 3D < portee +0x2E (m entiers) ; (3) categorie (modele vtable+8) : SWPN (13h) et XMIT (15h) toujours retenus ; les autres seulement si l'angle entre leur nez (orientation ligne 1) et la direction vers le joueur est < 60 deg (Targeting_ComputeBearingElevation_55B1A, cmp 3C00h), ou si byte_7235E est non nul. Position : vecteur relatif ramene dans le repere de cap du joueur (composante verticale ignoree), echelle = portee / (rayon - marge) m par pixel, puis decale de la marge vers l'exterieur. SYMBOLE (si) selon la categorie : 8 missile -> 0 ; 6 avion (pilote non ejecte) -> classe JINF du modele (+0x52) < 8 : 0Ah, < 10 : 0Ch, < 11 : 0Eh, sinon 10h ; 13h SWPN -> masque d'arme du modele d'arme (+0x49 -> +0x4B) 200h (SA-2) : 4, 400h (SA-6) : 6, 800h (canon 20 mm) : 2, autre : aucun symbole ; 15h XMIT -> 8 ; 1 ORNT -> 8 si le 3e octet SIGN du modele (+0x14) est non nul ; autres categories : aucun symbole. VERROUILLAGE : si la cible de l'emetteur est le joueur, symbole + 1 (cible = +0x55 pour un missile, entite IA +0x55 -> +0x287 pour un avion, mot +0x55 de l'instance pour une SWPN). Rwr_AddContact_1F4BB(liste, x, y, symbole)."
+  },
+  "loc_1FA28": {
+    "new_name": "Cockpit_RwrDraw_1FA28",
+    "segment": "seg032",
+    "summary": "far (label), LU 2026-10-15 (structure). DESSIN DE L'ECRAN RWR : selon l'octet +0x21D du cockpit, cadre +0x22..+0x28 et image +0x46 (decalage de symbole 0), ou cadre +0x64..+0x6A et image +0x54 (decalage de symbole 18) ; Rwr_DrawContacts_1F51C avec le jeu de symboles +0x3C/+0x40, puis Render_DrawScaledSprite_621A2 du fond."
+  },
+  "loc_1FC8F": {
+    "new_name": "Cockpit_MissileWarningLampsUpdate_1FC8F",
+    "segment": "seg033",
+    "summary": "far (label), LU 2026-10-15. VOYANTS D'ALERTE MISSILE du cockpit (methode d'instrument, seg339:08EA). Parcourt les objets du monde : missiles (categorie 8) dont la cible (+0x55) est le joueur. Masque d'arme du modele (+0x4B) & 3 (AIM-9J/9M, infrarouge) -> voyant 1 ; & 700h (AIM-120, SA-2, SA-6, radar) -> voyant 2. Periode de clignotement selon la distance du missile : < 2500 m : 0,047 s (0Ch), < 4500 m : 0,2 s (33h), sinon 0,4 s (66h). Chaque voyant : +0x40/+0x41 actif, +0x42/+0x43 etat allume (inverse a chaque periode), +0x44/+0x48 minuteur, +0x4C/+0x50 periode. Avec plusieurs missiles, la periode retenue est celle du dernier missile parcouru."
+  },
+  "loc_1FE81": {
+    "new_name": "Cockpit_MissileWarningLampsDraw_1FE81",
+    "segment": "seg033",
+    "summary": "far (label). Dessin des voyants d'alerte missile (methode d'instrument, seg339:08EE) ; non lu en detail."
   }
 }

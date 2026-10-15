@@ -3,7 +3,17 @@ seg033		segment	byte public 'CODE' use16
 		;org 0Fh
 		assume es:nothing, ss:nothing, ds:seg339, fs:nothing, gs:nothing
 
-loc_1FC8F:				; DATA XREF: seg339:08EAo
+; ==============================================================================================
+; far (label), LU 2026-10-15. VOYANTS D'ALERTE MISSILE du cockpit (methode d'instrument,
+; seg339:08EA). Parcourt les objets du monde : missiles (categorie 8) dont la cible (+0x55)
+; est le joueur. Masque d'arme du modele (+0x4B) & 3 (AIM-9J/9M, infrarouge) -> voyant 1 ; &
+; 700h (AIM-120, SA-2, SA-6, radar) -> voyant 2. Periode de clignotement selon la distance du
+; missile : < 2500 m : 0,047 s (0Ch), < 4500 m : 0,2 s (33h), sinon 0,4 s (66h). Chaque voyant
+; : +0x40/+0x41 actif, +0x42/+0x43 etat allume (inverse a chaque periode), +0x44/+0x48
+; minuteur, +0x4C/+0x50 periode. Avec plusieurs missiles, la periode retenue est celle du
+; dernier missile parcouru.
+; ==============================================================================================
+Cockpit_MissileWarningLampsUpdate_1FC8F:				; DATA XREF: seg339:08EAo
 		push	bp
 		mov	bp, sp
 		sub	sp, 36h
@@ -244,7 +254,11 @@ loc_1FE77:				; CODE XREF: seg033:01A9j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_1FE81:				; DATA XREF: seg339:08EEo
+; ==============================================================================================
+; far (label). Dessin des voyants d'alerte missile (methode d'instrument, seg339:08EE) ; non
+; lu en detail.
+; ==============================================================================================
+Cockpit_MissileWarningLampsDraw_1FE81:				; DATA XREF: seg339:08EEo
 		push	bp
 		mov	bp, sp
 		sub	sp, 0Ah

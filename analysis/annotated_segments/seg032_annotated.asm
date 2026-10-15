@@ -8,11 +8,11 @@ seg032		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,62L — alloue (sub_658=malloc court) un petit objet 'événement' (type 0xEC0) contenant 3
-; valeurs (position/couleur?), l'insère dans une liste (sub_5F57F) : constructeur d'un élément
-; graphique attaché à une liste (marqueur/icône UI).
+; far, 62L, LU 2026-10-15. Ex-'UIList_CreateMarker'. AJOUTE UN CONTACT A LA LISTE DU RWR
+; (liste de l'instrument +0x5E) : petit objet de 10 o (vtable 0EC0h) : +4 = x ecran, +6 = y
+; ecran, +8 = numero de symbole. Appelee par Cockpit_RwrUpdate_1F561.
 ; ==============================================================================================
-UIList_CreateMarker	proc far		; CODE XREF: seg032:0544p
+Rwr_AddContact_1F4BB	proc far		; CODE XREF: seg032:0544p
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -60,10 +60,10 @@ loc_1F4C6:
 		jmp	short loc_1F50B
 ; ���������������������������������������������������������������������������
 
-loc_1F509:				; CODE XREF: UIList_CreateMarker+29j
+loc_1F509:				; CODE XREF: Rwr_AddContact_1F4BB+29j
 		mov	ax, di
 
-loc_1F50B:				; CODE XREF: UIList_CreateMarker+4Cj
+loc_1F50B:				; CODE XREF: Rwr_AddContact_1F4BB+4Cj
 		mov	[bp+var_2], ax
 		push	ax
 		push	si
@@ -73,7 +73,7 @@ loc_1F50B:				; CODE XREF: UIList_CreateMarker+4Cj
 		pop	si
 		leave
 		retf
-UIList_CreateMarker	endp
+Rwr_AddContact_1F4BB	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -81,10 +81,12 @@ UIList_CreateMarker	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — itère une liste (sub_5F6A9) et blitte chaque élément (sub_61F52) à une position
-; décalée (+arg_6) : rendu de tous les éléments d'une liste graphique (icônes/marqueurs UI).
+; far, 40L, LU 2026-10-15. Ex-'UIList_DrawAllMarkers'. DESSINE LES CONTACTS DU RWR : pour
+; chaque contact de la liste, Render_MeasureOrDrawTextString_61F52(word_70E60, x, y, jeu de
+; symboles arg_2, numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit
+; (Cockpit_RwrDraw_1FA28).
 ; ==============================================================================================
-UIList_DrawAllMarkers	proc far		; CODE XREF: seg032:071Dp
+Rwr_DrawContacts_1F51C	proc far		; CODE XREF: seg032:071Dp
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -100,7 +102,7 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_1F54D
 ; ���������������������������������������������������������������������������
 
-loc_1F52D:				; CODE XREF: UIList_DrawAllMarkers+40j
+loc_1F52D:				; CODE XREF: Rwr_DrawContacts_1F51C+40j
 		mov	bx, [bp+var_2]
 		mov	ax, [bx+8]
 		add	ax, [bp+arg_6]
@@ -112,7 +114,7 @@ loc_1F52D:				; CODE XREF: UIList_DrawAllMarkers+40j
 		call	Render_MeasureOrDrawTextString_61F52
 		add	sp, 0Ch
 
-loc_1F54D:				; CODE XREF: UIList_DrawAllMarkers+Fj
+loc_1F54D:				; CODE XREF: Rwr_DrawContacts_1F51C+Fj
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -123,11 +125,33 @@ loc_1F54D:				; CODE XREF: UIList_DrawAllMarkers+Fj
 		pop	si
 		leave
 		retf
-UIList_DrawAllMarkers	endp
+Rwr_DrawContacts_1F51C	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_1F561:				; DATA XREF: seg339:092Eo
+; ==============================================================================================
+; far (label), LU 2026-10-15. MISE A JOUR DE L'ECRAN RWR du cockpit (methode de l'instrument,
+; seg339:092E). Une fois toutes les +0x34 frames (compteur +0x32). Disposition : si l'octet
+; +0x21D du cockpit (instrument+2) est non nul, rayon/marge = +0x38/+0x3A et centre = +0x2A,
+; sinon +0x50/+0x52 et +0x6C (role exact de +0x21D non etabli). Vide la liste +0x5E, prend
+; l'avion du joueur (cockpit+0x1E -> +0x50 -> vtable+0x1C), puis pour chaque objet du monde
+; (World_IterateObjects 59C3h) autre que lui : (1) il faut un modele et un 3e octet SIGN non
+; nul (Debris_GetStateFlag = instance+0x29, copie du modele +0x14) ; (2) distance 3D < portee
+; +0x2E (m entiers) ; (3) categorie (modele vtable+8) : SWPN (13h) et XMIT (15h) toujours
+; retenus ; les autres seulement si l'angle entre leur nez (orientation ligne 1) et la
+; direction vers le joueur est < 60 deg (Targeting_ComputeBearingElevation_55B1A, cmp 3C00h),
+; ou si byte_7235E est non nul. Position : vecteur relatif ramene dans le repere de cap du
+; joueur (composante verticale ignoree), echelle = portee / (rayon - marge) m par pixel, puis
+; decale de la marge vers l'exterieur. SYMBOLE (si) selon la categorie : 8 missile -> 0 ; 6
+; avion (pilote non ejecte) -> classe JINF du modele (+0x52) < 8 : 0Ah, < 10 : 0Ch, < 11 :
+; 0Eh, sinon 10h ; 13h SWPN -> masque d'arme du modele d'arme (+0x49 -> +0x4B) 200h (SA-2) :
+; 4, 400h (SA-6) : 6, 800h (canon 20 mm) : 2, autre : aucun symbole ; 15h XMIT -> 8 ; 1 ORNT
+; -> 8 si le 3e octet SIGN du modele (+0x14) est non nul ; autres categories : aucun symbole.
+; VERROUILLAGE : si la cible de l'emetteur est le joueur, symbole + 1 (cible = +0x55 pour un
+; missile, entite IA +0x55 -> +0x287 pour un avion, mot +0x55 de l'instance pour une SWPN).
+; Rwr_AddContact_1F4BB(liste, x, y, symbole).
+; ==============================================================================================
+Cockpit_RwrUpdate_1F561:				; DATA XREF: seg339:092Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 10Ah
@@ -656,7 +680,7 @@ loc_1F9E6:				; CODE XREF: seg032:0533j
 		add	ax, 5Eh	; '^'
 		push	ax
 		push	cs
-		call	near ptr UIList_CreateMarker
+		call	near ptr Rwr_AddContact_1F4BB
 		add	sp, 8
 
 loc_1F9FA:				; CODE XREF: seg032:loc_1F5CFj
@@ -697,7 +721,13 @@ word_1FA14	dw	1,     6,     8,   13h ; DATA XREF: seg032:043Bo
 		dw offset loc_1F9C9
 ; ���������������������������������������������������������������������������
 
-loc_1FA28:				; DATA XREF: seg339:off_6D9E2o
+; ==============================================================================================
+; far (label), LU 2026-10-15 (structure). DESSIN DE L'ECRAN RWR : selon l'octet +0x21D du
+; cockpit, cadre +0x22..+0x28 et image +0x46 (decalage de symbole 0), ou cadre +0x64..+0x6A et
+; image +0x54 (decalage de symbole 18) ; Rwr_DrawContacts_1F51C avec le jeu de symboles
+; +0x3C/+0x40, puis Render_DrawScaledSprite_621A2 du fond.
+; ==============================================================================================
+Cockpit_RwrDraw_1FA28:				; DATA XREF: seg339:off_6D9E2o
 		push	bp
 		mov	bp, sp
 		sub	sp, 3Ch
@@ -865,7 +895,7 @@ loc_1FBC1:
 		add	ax, 5Eh	; '^'
 		push	ax
 		push	cs
-		call	near ptr UIList_DrawAllMarkers
+		call	near ptr Rwr_DrawContacts_1F51C
 		add	sp, 8
 		push	1
 		mov	al, [si+36h]

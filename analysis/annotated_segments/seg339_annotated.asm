@@ -603,8 +603,8 @@ aDFs		db '%d %Fs',0
 		dd VROOMM_StubThunk_6B295
 off_6D992	dd VROOMM_StubThunk_6B0E9
 		dd VROOMM_StubThunk_6B0E4
-		dd loc_1FC8F
-		dd loc_1FE81
+		dd Cockpit_MissileWarningLampsUpdate_1FC8F
+		dd Cockpit_MissileWarningLampsDraw_1FE81
 		dd VROOMM_StubThunk_6B0E9
 		dd VROOMM_StubThunk_6B0E4
 		dd loc_174EE
@@ -620,8 +620,8 @@ off_6D992	dd VROOMM_StubThunk_6B0E9
 		dd VROOMM_StubThunk_6B290
 off_6D9D6	dd VROOMM_StubThunk_6B0E9
 off_6D9DA	dd VROOMM_StubThunk_6B0E4
-		dd loc_1F561
-off_6D9E2	dd loc_1FA28
+		dd Cockpit_RwrUpdate_1F561
+off_6D9E2	dd Cockpit_RwrDraw_1FA28
 aObjects_0	db 'OBJECTS',0          ; DATA XREF: MissionRecord_LoadAndDecodeMain_88206+15o
 aHud		db 'HUD',0              ; DATA XREF: MissionRecord_LoadAndDecodeMain_88206+11o
 aGear		db 'GEAR',0             ; DATA XREF: MissionRecord_LoadWithStringConstruct_88CAD:loc_89106o
