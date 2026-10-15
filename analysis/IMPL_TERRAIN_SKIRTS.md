@@ -316,3 +316,25 @@ plus éloignés restent dedans. Ensuite, pour chaque copie de sommet hors carte 
 l'éclairage, `type` = couleur dont la somme d'indicateurs est la plus grande, et éventuellement
 `v.y` = moyenne de l'altitude × `HEIGH_MAP_SCALE`, puis la couleur RVB comme pour un sommet normal.
 Le lissage peut se combiner avec le bruit et les plaques de la section 4 (le lissage d'abord).
+
+### 5bis. Variante RVB (proposée par Rémi, retenue comme la meilleure)
+
+Au lieu de moyenner l'éclairage et de prendre la couleur majoritaire, on moyenne la **couleur RVB
+affichée** de chaque sommet : le blanc de la neige et le vert de la forêt se mélangent, sans frontière
+nette. Essai : `--skirt-smooth 8 --skirt-smooth-rgb` (touche C), captures
+`data/ALASKA_3d_jupes_lissage_rvb.png` (coin, altitude lissée aussi) et
+`data/ALASKA_3d_jupes_lissage_rvb_sol.png` (vue basse au nord, altitude non lissée).
+
+- Couleur RVB d'un sommet source pour la moyenne : `palette[première(couleur du sommet) +
+  (éclairage × n + 128) >> 8]`, avec la couleur **du sommet lui-même** (la règle du sommet le plus
+  haut porte sur un triangle, pas sur un sommet).
+- Sommets non lissés (r = 0, au ras du bord) : couleur du jeu (couleur de base du sommet le plus haut
+  du triangle), pour que le raccord avec la carte reste exact.
+- Le triangle est dessiné en dégradé RVB entre ses trois sommets (`glColor` par sommet).
+
+Pour `SCRenderer` c'est le cas le plus simple : `MapVertex::color` est déjà une couleur RVB par
+sommet. On construit trois tables de sommes cumulées (`BuildSat`, §5) sur `color[0]`, `color[1]`,
+`color[2]` des copies de la grille étendue, puis on remplace la couleur de chaque copie hors carte par
+la moyenne de son carré (`BoxSum / (2r + 1)²`). Il faut alors dessiner ces triangles avec leurs
+couleurs de sommet propres, sans appliquer la règle « couleur du sommet le plus haut » de
+`renderColoredTriangle`. Les textures restent celles des sommets source.

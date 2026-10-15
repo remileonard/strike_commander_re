@@ -22,6 +22,9 @@ passe de forêt (4) à neige (6) ou l'inverse là où un second bruit (période 
 (touche P). --skirt-smooth R : lissage moyen des jupes (touche M) : chaque sommet hors carte prend
 la moyenne de l'éclairage (et la couleur majoritaire) d'un carré de (2r + 1)² sommets autour de lui,
 r passant de 0 au bord à R sommets à 1,5 cellule ; --skirt-smooth-height lisse aussi l'altitude.
+--skirt-smooth-rgb (touche C) : le lissage porte sur la couleur RVB affichée (palette) au lieu de
+l'éclairage et de la couleur majoritaire : le blanc et le vert se mélangent. Le bruit et les plaques
+ne s'appliquent pas dans ce mode.
 
 Dépendances : pip install pygame "PyOpenGL>=3.1.9" (pas besoin de numpy)
 
@@ -32,7 +35,7 @@ Commandes :
   Z/W ou ↑ : avancer   S ou ↓ : reculer   Q/A ou ← , D ou → : de côté
   Espace : monter      Maj : descendre
   1, 2, 3… : aller à la piste n     O : objet suivant     Origine (Home) : vue d'ensemble
-  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques   M : lissage
+  F : ombrage plat / dégradé   G : diagonale « \\ » / « / »   J : jupes   N : bruit   P : plaques   M : lissage   C : lissage RVB
   F12 : capture d'écran (PNG)      Échap : quitter
 """
 
@@ -74,6 +77,24 @@ void main() {
     float base = floor(vShade + 0.5 * (1.0 - uSmooth));   // face unie : arrondi au plus proche
     float t = (vShade - base) * uSmooth;
     gl_FragColor = mix(pal(base), pal(base + 1.0), t);
+}
+"""
+
+VS_RGB = """#version 120
+attribute vec3 aPos;
+attribute vec3 aCol;
+uniform mat4 uMVP;
+varying vec3 vCol;
+void main() {
+    vCol = aCol;
+    gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+"""
+
+FS_RGB = """#version 120
+varying vec3 vCol;
+void main() {
+    gl_FragColor = vec4(vCol, 1.0);
 }
 """
 
@@ -179,7 +200,7 @@ class Terrain:
             return False
         return self.value_noise(j * self.spacing - 3000.0, i * self.spacing + 11000.0, 23000.0) > 0.25
 
-    def smoothed_skirt(self, skirt, radius, with_height):
+    def smoothed_skirt(self, skirt, radius, with_height, rgb=False):
         """Valeurs lissées (éclairage, couleur majoritaire, altitude) de la grille étendue.
         Moyenne en boîte de rayon r(i, j) = round(radius × rampe), rampe = 0 au bord de la carte,
         1 à 1,5 cellule ; calculée par tables de sommes cumulées sur les valeurs répétées du jeu."""
@@ -198,6 +219,17 @@ class Terrain:
                     s[a + 1][b + 1] = s[a][b + 1] + row
             return s
 
+        rgb_src = None
+        if rgb:
+            pal = self.palette
+            rgb_src = ([], [], [])
+            for k in range(len(self.light)):
+                c = self.colour[k]
+                first, shades, _ = self.rang[c] if c < len(self.rang) else self.rang[0]
+                tone = min(255, first + ((self.light[k] * shades + 128) >> 8))
+                for q in range(3):
+                    rgb_src[q].append(pal[3 * tone + q] / 255.0)
+        s_rgb = [sat(ch) for ch in rgb_src] if rgb else None
         s_light = sat(self.light)
         s_h = sat(self.h) if with_height else None
         s_col = [sat([1.0 if c == k else 0.0 for c in self.colour]) for k in range(len(self.rang))]
@@ -224,8 +256,63 @@ class Terrain:
                 lv = box(s_light, a, b, r) / area
                 cv = max(range(len(s_col)), key=lambda k: box(s_col[k], a, b, r))
                 hv = box(s_h, a, b, r) / area if with_height else None
-                out[(i, j)] = (lv, cv, hv)
+                col = tuple(box(s, a, b, r) / area for s in s_rgb) if rgb else None
+                out[(i, j)] = (lv, cv, hv, col)
         return out
+
+    def terrain_mesh_rgb(self, slash, flat, skirt, smooth):
+        """Jupe en couleurs RVB : sommet lissé → sa couleur RVB moyenne ; sommet non lissé (au bord)
+        → couleur du jeu (couleur de base du sommet le plus haut, teinte du sommet)."""
+        n = self.n
+        h = self.h
+        light = self.light
+        colour = self.colour
+        rang = self.rang
+        pal = self.palette
+        pos = array.array("f")
+        col = array.array("f")
+
+        def tri(p0, p1, p2):
+            ks = [self.key(*q) for q in (p0, p1, p2)]
+            ss = [smooth.get(q) for q in (p0, p1, p2)]
+            hs = [h[k] if (s is None or s[2] is None) else s[2] for k, s in zip(ks, ss)]
+            kb = 0
+            for q in (1, 2):
+                if (int(hs[q]) & 0xFFFF) >= (int(hs[kb]) & 0xFFFF):
+                    kb = q
+            base = colour[ks[kb]]
+            first, shades, _ = rang[base] if base < len(rang) else rang[0]
+            cols = []
+            for k, s in zip(ks, ss):
+                if s is not None and s[3] is not None:
+                    cols.append(s[3])
+                else:
+                    tone = min(255, first + ((light[k] * shades + 128) >> 8))
+                    cols.append(tuple(pal[3 * tone + q] / 255.0 for q in range(3)))
+            if flat:
+                m = tuple(sum(c[q] for c in cols) / 3 for q in range(3))
+                cols = [m, m, m]
+            for (i, j), hv, c in zip((p0, p1, p2), hs, cols):
+                pos.extend((self.gl_x(j), hv, self.gl_z(i)))
+                col.extend(c)
+
+        lo = -skirt * self.cn
+        hi = n - 1 + skirt * self.cn
+        for i in range(lo, hi):
+            for j in range(lo, hi):
+                if 0 <= i < n - 1 and 0 <= j < n - 1:
+                    continue
+                a = (i, j)
+                b = (i, j + 1)
+                c = (i + 1, j)
+                d = (i + 1, j + 1)
+                if not slash:
+                    tri(a, b, d)
+                    tri(a, d, c)
+                else:
+                    tri(a, b, c)
+                    tri(d, c, b)
+        return pos, col
 
     def terrain_mesh(self, slash, flat, skirt=0, noise=0.0, patches=False, smooth=None):
         """2 triangles par carré, sommets non partagés : la couleur de base est propre au triangle.
@@ -315,7 +402,7 @@ class Terrain:
 
 # --- OpenGL ----------------------------------------------------------------------------------
 
-def compile_program():
+def compile_program(vs=VS, fs=FS, attr="aShade"):
     def shader(kind, src):
         s = GL.glCreateShader(kind)
         GL.glShaderSource(s, src)
@@ -325,10 +412,10 @@ def compile_program():
         return s
 
     prog = GL.glCreateProgram()
-    GL.glAttachShader(prog, shader(GL.GL_VERTEX_SHADER, VS))
-    GL.glAttachShader(prog, shader(GL.GL_FRAGMENT_SHADER, FS))
+    GL.glAttachShader(prog, shader(GL.GL_VERTEX_SHADER, vs))
+    GL.glAttachShader(prog, shader(GL.GL_FRAGMENT_SHADER, fs))
     GL.glBindAttribLocation(prog, 0, "aPos")
-    GL.glBindAttribLocation(prog, 1, "aShade")
+    GL.glBindAttribLocation(prog, 1, attr)
     GL.glLinkProgram(prog)
     if not GL.glGetProgramiv(prog, GL.GL_LINK_STATUS):
         raise RuntimeError(GL.glGetProgramInfoLog(prog).decode())
@@ -336,7 +423,8 @@ def compile_program():
 
 
 class Mesh:
-    def __init__(self, pos, shade):
+    def __init__(self, pos, shade, size=1):
+        self.size = size
         self.vbo_pos = GL.glGenBuffers(1)
         self.vbo_shade = GL.glGenBuffers(1)
         self.upload(pos, shade)
@@ -346,7 +434,7 @@ class Mesh:
         GL.glBufferData(GL.GL_ARRAY_BUFFER, len(pos) * 4, pos.tobytes(), GL.GL_STATIC_DRAW)
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_shade)
         GL.glBufferData(GL.GL_ARRAY_BUFFER, len(shade) * 4, shade.tobytes(), GL.GL_STATIC_DRAW)
-        self.count = len(shade)
+        self.count = len(shade) // self.size
 
     def draw(self, mode):
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_pos)
@@ -354,7 +442,7 @@ class Mesh:
         GL.glVertexAttribPointer(0, 3, GL.GL_FLOAT, GL.GL_FALSE, 0, None)
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo_shade)
         GL.glEnableVertexAttribArray(1)
-        GL.glVertexAttribPointer(1, 1, GL.GL_FLOAT, GL.GL_FALSE, 0, None)
+        GL.glVertexAttribPointer(1, self.size, GL.GL_FLOAT, GL.GL_FALSE, 0, None)
         GL.glDrawArrays(mode, 0, self.count)
 
 
@@ -455,6 +543,8 @@ def main():
     ap.add_argument("--skirt-smooth", type=int, default=0,
                     help="essai esthétique : rayon max (sommets) du lissage moyen des jupes (défaut 0)")
     ap.add_argument("--skirt-smooth-height", action="store_true", help="le lissage porte aussi sur l'altitude")
+    ap.add_argument("--skirt-smooth-rgb", action="store_true",
+                    help="le lissage porte sur la couleur RVB affichée (touche C)")
     ap.add_argument("--skirt-noise", type=float, default=0.0,
                     help="amplitude du bruit d'éclairage des jupes (essai esthétique ; 40 ≈ ±4 teintes ; défaut 0)")
     args = ap.parse_args()
@@ -487,19 +577,35 @@ def main():
     smoothing = args.skirt_smooth > 0
     smooth_cache = {}
 
-    def smooth_now():
+    rgb_mode = args.skirt_smooth_rgb
+
+    def smooth_now(rgb=False):
         if not smoothing or args.skirt <= 0:
             return None
-        if smooth_radius not in smooth_cache:
+        if (smooth_radius, rgb) not in smooth_cache:
             print("lissage des jupes…")
-            smooth_cache[smooth_radius] = world.smoothed_skirt(args.skirt, smooth_radius,
-                                                               args.skirt_smooth_height)
-        return smooth_cache[smooth_radius]
+            smooth_cache[(smooth_radius, rgb)] = world.smoothed_skirt(args.skirt, smooth_radius,
+                                                                      args.skirt_smooth_height, rgb)
+        return smooth_cache[(smooth_radius, rgb)]
+
+    def skirt_rgb_mesh():
+        return world.terrain_mesh_rgb(slash, flat, args.skirt, smooth_now(True) or {})
 
     skirt = Mesh(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now())) if args.skirt > 0 else None
+    prog_rgb = compile_program(VS_RGB, FS_RGB, "aCol")
+    u_mvp_rgb = GL.glGetUniformLocation(prog_rgb, "uMVP")
+    skirt_rgb = Mesh(*skirt_rgb_mesh(), size=3) if (skirt and rgb_mode and smoothing) else None
     show_skirt = skirt is not None
     runways = Mesh(*world.runway_mesh())
     markers = Mesh(*world.marker_mesh())
+
+    def refresh_rgb(mesh):
+        if not (skirt and rgb_mode and smoothing):
+            return mesh
+        if mesh is None:
+            return Mesh(*skirt_rgb_mesh(), size=3)
+        mesh.upload(*skirt_rgb_mesh())
+        return mesh
 
     cam = Camera()
     if args.view:
@@ -542,22 +648,30 @@ def main():
                     terrain.upload(*world.terrain_mesh(slash, flat))
                     if skirt:
                         skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_f:
                     flat = not flat
                     terrain.upload(*world.terrain_mesh(slash, flat))
                     if skirt:
                         skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_j and skirt:
                     show_skirt = not show_skirt
+                elif e.key == pygame.K_c and skirt:
+                    rgb_mode = not rgb_mode
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_m and skirt:
                     smoothing = not smoothing
                     skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_p and skirt:
                     patches = not patches
                     skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_n and skirt:
                     noise = 0.0 if noise else noise_amp
                     skirt.upload(*world.terrain_mesh(slash, flat, args.skirt, noise, patches, smooth_now()))
+                    skirt_rgb = refresh_rgb(skirt_rgb)
                 elif e.key == pygame.K_HOME:
                     cam.x, cam.y, cam.z = 0.0, 120000.0, 260000.0
                     cam.yaw, cam.pitch, cam.speed = 0.0, -0.6, 5000.0
@@ -611,7 +725,12 @@ def main():
         GL.glBindTexture(GL.GL_TEXTURE_2D, tex)
         GL.glUniform1f(u_smooth, 0.0 if flat else 1.0)
         terrain.draw(GL.GL_TRIANGLES)
-        if show_skirt:
+        if show_skirt and rgb_mode and smoothing and skirt_rgb:
+            GL.glUseProgram(prog_rgb)
+            GL.glUniformMatrix4fv(u_mvp_rgb, 1, GL.GL_FALSE, mvp)
+            skirt_rgb.draw(GL.GL_TRIANGLES)
+            GL.glUseProgram(prog)
+        elif show_skirt:
             skirt.draw(GL.GL_TRIANGLES)
         GL.glUniform1f(u_smooth, 0.0)
         GL.glEnable(GL.GL_POLYGON_OFFSET_FILL)
@@ -628,7 +747,8 @@ def main():
                  f"jupes {f'{args.skirt} cellules' if show_skirt else 'non'}"
                  f"{f'   bruit {noise:g}' if show_skirt and noise else ''}"
                  f"{'   plaques' if show_skirt and patches else ''}"
-                 f"{f'   lissage {smooth_radius}' if show_skirt and smoothing else ''}"]
+                 f"{f'   lissage {smooth_radius}' if show_skirt and smoothing else ''}"
+                 f"{' RVB' if show_skirt and smoothing and rgb_mode else ''}"]
         if obj_index >= 0:
             lines.append(f"objet : {world.objects[obj_index]['name']}")
         draw_hud(font, lines, height)
