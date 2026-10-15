@@ -2341,7 +2341,7 @@ loc_45130:				; CODE XREF: Collision_MainLoop+1A0j
 		jz	short loc_45153
 		push	[bp+var_6]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		push	[bp+var_6]
 		push	word_70474
@@ -2353,7 +2353,7 @@ loc_45153:				; CODE XREF: Collision_MainLoop+22Cj
 		jz	short loc_45176
 		push	[bp+var_8]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		push	[bp+var_8]
 		push	word_70474

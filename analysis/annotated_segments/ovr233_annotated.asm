@@ -298,9 +298,9 @@ Pilot_IssueControlCommand_79DA0	endp
 ; chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde
 ; +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A :
 ; l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste
-; (Container_Op_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par
-; l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du
-; joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu.
+; (WorldObjects_RemoveAndDelete_223C5). Le bit 5 = 'accompagne le joueur au pilote
+; automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le
+; pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu.
 ; ==============================================================================================
 Autopilot_JumpSequence_7A054	proc far		; CODE XREF: VROOMM_StubThunk_6AC85J UIScript_Helper_7A79E+32p	...
 
@@ -573,7 +573,7 @@ loc_7A255:				; CODE XREF: Autopilot_JumpSequence_7A054+1DDj
 loc_7A264:				; CODE XREF: Autopilot_JumpSequence_7A054+208j
 		push	word ptr [bp+var_60]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		mov	ax, [bp+var_5C]
 		mov	word ptr [bp+var_60+2],	ax

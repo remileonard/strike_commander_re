@@ -1114,9 +1114,14 @@ Container_Clear	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — (cluster conteneur) — accesseur ou test additionnel, non détaillé.
+; far, 40L, LUE 2026-10-15. Parcourt les sous-listes de la liste arg_0 (59C3h = objets du
+; monde ; tete [arg_0], suivante +9) et appelle Container_RemoveAndDeleteObject_22DE5(sous-
+; liste, objet arg_2) jusqu'a la premiere qui contient l'objet : retire et DETRUIT l'objet,
+; sans explosion. Appelants : Collision_MainLoop (objets retires apres collision) et
+; MissionObject_RemoveInstanceFromWorld_53337 (opcode 0x91).
+; Ex-'WorldObjects_RemoveAndDelete_223C5'.
 ; ==============================================================================================
-Container_Op_223C5	proc far		; CODE XREF: Collision_MainLoop+234P
+WorldObjects_RemoveAndDelete_223C5	proc far		; CODE XREF: Collision_MainLoop+234P
 					; Collision_MainLoop+257P ...
 
 arg_0		= word ptr  6
@@ -1130,12 +1135,12 @@ arg_2		= word ptr  8
 		jmp	short loc_223E7
 ; ���������������������������������������������������������������������������
 
-loc_223D0:				; CODE XREF: Container_Op_223C5+24j
+loc_223D0:				; CODE XREF: WorldObjects_RemoveAndDelete_223C5+24j
 		push	[bp+arg_2]
 		push	si
 		nop
 		push	cs
-		call	near ptr Container_Op_22DE5
+		call	near ptr Container_RemoveAndDeleteObject_22DE5
 		add	sp, 4
 		or	al, al
 		jz	short loc_223E4
@@ -1143,19 +1148,19 @@ loc_223D0:				; CODE XREF: Container_Op_223C5+24j
 		jmp	short loc_223ED
 ; ���������������������������������������������������������������������������
 
-loc_223E4:				; CODE XREF: Container_Op_223C5+19j
+loc_223E4:				; CODE XREF: WorldObjects_RemoveAndDelete_223C5+19j
 		mov	si, [si+9]
 
-loc_223E7:				; CODE XREF: Container_Op_223C5+9j
+loc_223E7:				; CODE XREF: WorldObjects_RemoveAndDelete_223C5+9j
 		or	si, si
 		jnz	short loc_223D0
 		mov	al, 0
 
-loc_223ED:				; CODE XREF: Container_Op_223C5+1Dj
+loc_223ED:				; CODE XREF: WorldObjects_RemoveAndDelete_223C5+1Dj
 		pop	si
 		pop	bp
 		retf
-Container_Op_223C5	endp
+WorldObjects_RemoveAndDelete_223C5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2478,7 +2483,7 @@ List_AppendTail_22C23	endp
 ; nœud connu du conteneur.
 ; ==============================================================================================
 Container_RemoveNode	proc far		; CODE XREF: WorldObjects_UpdateAllAndRemoveDead_221F2+6Ep
-					; Container_Op_22DE5+18p ...
+					; Container_RemoveAndDeleteObject_22DE5+18p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2806,9 +2811,12 @@ Container_Op_22DAB	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,54L — (cluster conteneur) — opération de taille moyenne, non détaillée.
+; far, 54L, LUE 2026-10-15. Cherche l'objet arg_2 dans la liste arg_0 (tete +0x0B, suivant +2)
+; ; trouve : Container_RemoveNode puis destructeur de l'objet (slot +0x18, argument 3 =
+; detruire et liberer), renvoie 1 ; sinon 0. Aucun effet de destruction (pas
+; d'Object_SpawnDestructionEffects_3863A). Ex-'Container_RemoveAndDeleteObject_22DE5'.
 ; ==============================================================================================
-Container_Op_22DE5	proc far		; CODE XREF: Container_Op_223C5+11p
+Container_RemoveAndDeleteObject_22DE5	proc far		; CODE XREF: WorldObjects_RemoveAndDelete_223C5+11p
 					; Debris_ContainerOpWrapper_9B62B+13P
 
 arg_0		= word ptr  6
@@ -2824,7 +2832,7 @@ arg_2		= word ptr  8
 		jmp	short loc_22E1D
 ; ���������������������������������������������������������������������������
 
-loc_22DF4:				; CODE XREF: Container_Op_22DE5+3Aj
+loc_22DF4:				; CODE XREF: Container_RemoveAndDeleteObject_22DE5+3Aj
 		cmp	di, [bp+arg_2]
 		jnz	short loc_22E18
 		push	di
@@ -2842,26 +2850,26 @@ loc_22DF4:				; CODE XREF: Container_Op_22DE5+3Aj
 		add	sp, 4
 		jmp	short $+2
 
-loc_22E14:				; CODE XREF: Container_Op_22DE5+20j
+loc_22E14:				; CODE XREF: Container_RemoveAndDeleteObject_22DE5+20j
 		mov	al, 1
 		jmp	short loc_22E23
 ; ���������������������������������������������������������������������������
 
-loc_22E18:				; CODE XREF: Container_Op_22DE5+12j
+loc_22E18:				; CODE XREF: Container_RemoveAndDeleteObject_22DE5+12j
 		mov	dx, di
 		mov	di, [di+2]
 
-loc_22E1D:				; CODE XREF: Container_Op_22DE5+Dj
+loc_22E1D:				; CODE XREF: Container_RemoveAndDeleteObject_22DE5+Dj
 		or	di, di
 		jnz	short loc_22DF4
 		mov	al, 0
 
-loc_22E23:				; CODE XREF: Container_Op_22DE5+31j
+loc_22E23:				; CODE XREF: Container_RemoveAndDeleteObject_22DE5+31j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-Container_Op_22DE5	endp
+Container_RemoveAndDeleteObject_22DE5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

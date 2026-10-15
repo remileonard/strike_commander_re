@@ -3188,14 +3188,16 @@ PartEntry_ResolveSpawnPositionAndActivate_51EDC	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN OBJET DE MISSION :
-; opcode de script 0x91 (Expr_VM_Interpreter_51106, cas 0x91), inverse de 0x90
-; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Efface le bit actif de l'objet (+0x39),
-; decremente les compteurs d'objets actifs par camp (word_706A3 / word_706A7, lus par
-; Goal_IsComplete pour l'ordre 0xA9) selon l'etat anterieur, notifie via
-; Expr_Node_NotifyChange_53337. Exemple MISN-1A : le C-130 se desactive (0x91 8) apres son
-; atterrissage. NB : l'opcode 0xBE n'est PAS une desactivation : c'est un ordre transmis a
-; Goal_SetObjective_A307 (cas par defaut, objectif 0xBF).
+; far, RELUE 2026-10-15. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN
+; OBJET DE MISSION : opcode de script 0x91 (Expr_VM_Interpreter_51106), inverse de 0x90
+; (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Si l'objet a une instance (+0x52) : (1)
+; si le bit 1 de +0x39 est nul (shl 0Eh / sar 0Fh), decremente le compteur d'objets actifs de
+; son camp (+0x31 : 0xFF -> word_706A7, 1 -> word_706A3 ; lus par Goal_IsComplete pour l'ordre
+; 0xA9) ; (2) MissionObject_RemoveInstanceFromWorld_53337 : l'instance est RETIREE du monde et
+; DETRUITE (destructeur slot +0x18), sans explosion ni debris. Dans tous les cas : bit 0
+; (actif) de +0x39 efface. Le champ +0x52 n'est pas remis a zero ici. Exemple MISN-1A : le
+; C-130 se desactive (0x91 8) apres son atterrissage. NB : l'opcode 0xBE n'est PAS une
+; desactivation.
 ; ==============================================================================================
 PartEntry_Deactivate_5242A	proc far		; CODE XREF: Expr_VM_Interpreter_51106+720p
 					; Expr_Node_UpdateAndPropagate_52AC6+133p ...
@@ -3231,7 +3233,7 @@ loc_52460:				; CODE XREF: PartEntry_Deactivate_5242A+19j
 		push	word_706A0
 		nop
 		push	cs
-		call	near ptr Expr_Node_NotifyChange_53337
+		call	near ptr MissionObject_RemoveInstanceFromWorld_53337
 		add	sp, 4
 
 loc_52473:				; CODE XREF: PartEntry_Deactivate_5242A+Bj
@@ -5686,9 +5688,11 @@ Scene_DetectAndActivateChange_532EA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, notifie un changement de valeur de nœud (appel externe sub_223C5).
+; far, LUE 2026-10-15. WorldObjects_RemoveAndDelete_223C5(59C3h, instance arg_2) : retire du
+; monde et detruit l'instance d'un objet de mission. Appelee par PartEntry_Deactivate_5242A
+; (opcode 0x91). Ex-'MissionObject_RemoveInstanceFromWorld_53337'.
 ; ==============================================================================================
-Expr_Node_NotifyChange_53337	proc far		; CODE XREF: PartEntry_Deactivate_5242A+43p
+MissionObject_RemoveInstanceFromWorld_53337	proc far		; CODE XREF: PartEntry_Deactivate_5242A+43p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5698,11 +5702,11 @@ arg_2		= word ptr  8
 		mov	ax, [bp+arg_0]
 		push	[bp+arg_2]
 		push	59C3h
-		call	Container_Op_223C5
+		call	WorldObjects_RemoveAndDelete_223C5
 		add	sp, 4
 		pop	bp
 		retf
-Expr_Node_NotifyChange_53337	endp
+MissionObject_RemoveInstanceFromWorld_53337	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

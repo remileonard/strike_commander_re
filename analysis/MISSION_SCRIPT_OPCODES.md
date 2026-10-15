@@ -1075,7 +1075,9 @@ mission.
 
 - `0x90` (144) : activation d'un objet de mission (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`).
 - `0x91` (145) : **désactivation** (`PartEntry_Deactivate_5242A` : bit actif +0x39 effacé, compteurs
-  d'objets actifs par camp décrémentés). Utilisé 56 fois dans MISSIONS.TRE ; ex. MISN-1A, le C-130
+  d'objets actifs par camp décrémentés si le bit 1 de +0x39 est nul ; relu 2026-10-15 : l'instance est
+  **retirée du monde et détruite** par `MissionObject_RemoveInstanceFromWorld_53337` →
+  `WorldObjects_RemoveAndDelete_223C5`, sans explosion ni débris). Utilisé 56 fois dans MISSIONS.TRE ; ex. MISN-1A, le C-130
   (PROG 5) se désactive après son atterrissage (`SET_LABEL(52)` puis `0x91(8)`).
 - `0xBE` (190) : **ordre**, pas une désactivation. `Expr_VM_Interpreter_51106` vérifie que l'objet est
   actif puis passe par `MissionScript_CallNativeHandler_52513` (entrée 0x1D de la table : sortie commune)

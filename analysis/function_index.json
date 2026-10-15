@@ -4452,8 +4452,8 @@
 "calls": [
 "sub_22DE5"
 ],
-"new_name": "Container_Op_223C5",
-"summary": "far,40L — (cluster conteneur) — accesseur ou test additionnel, non détaillé."
+"new_name": "WorldObjects_RemoveAndDelete_223C5",
+"summary": "far, 40L, LUE 2026-10-15. Parcourt les sous-listes de la liste arg_0 (59C3h = objets du monde ; tete [arg_0], suivante +9) et appelle Container_RemoveAndDeleteObject_22DE5(sous-liste, objet arg_2) jusqu'a la premiere qui contient l'objet : retire et DETRUIT l'objet, sans explosion. Appelants : Collision_MainLoop (objets retires apres collision) et MissionObject_RemoveInstanceFromWorld_53337 (opcode 0x91). Ex-'WorldObjects_RemoveAndDelete_223C5'."
 },
 "sub_223F0": {
 "segment": "seg039",
@@ -4655,8 +4655,8 @@
 "calls": [
 "sub_22C56"
 ],
-"new_name": "Container_Op_22DE5",
-"summary": "far,54L — (cluster conteneur) — opération de taille moyenne, non détaillée."
+"new_name": "Container_RemoveAndDeleteObject_22DE5",
+"summary": "far, 54L, LUE 2026-10-15. Cherche l'objet arg_2 dans la liste arg_0 (tete +0x0B, suivant +2) ; trouve : Container_RemoveNode puis destructeur de l'objet (slot +0x18, argument 3 = detruire et liberer), renvoie 1 ; sinon 0. Aucun effet de destruction (pas d'Object_SpawnDestructionEffects_3863A). Ex-'Container_RemoveAndDeleteObject_22DE5'."
 },
 "sub_22E27": {
 "segment": "seg039",
@@ -7579,7 +7579,7 @@
 "sub_36AA4"
 ],
 "new_name": "Terrain_MarkPlacedObjectGone_37C33",
-"summary": "far, 22L, LUE 2026-10-15. TerrainCells_MarkPlacedObjectGone_36AA4(terrain arg_0 + 0x171, objet). Appelee par Collision_MainLoop pour chacun des deux objets d'une paire en collision qui est retire de la liste du monde (Container_Op_223C5 sur 59C3h) : un objet pose du terrain detruit par collision est remplace, au rechargement de sa cellule, par son 2e nom. Ex-'Terrain_MarkPlacedObjectGone_37C33'."
+"summary": "far, 22L, LUE 2026-10-15. TerrainCells_MarkPlacedObjectGone_36AA4(terrain arg_0 + 0x171, objet). Appelee par Collision_MainLoop pour chacun des deux objets d'une paire en collision qui est retire de la liste du monde (WorldObjects_RemoveAndDelete_223C5 sur 59C3h) : un objet pose du terrain detruit par collision est remplace, au rechargement de sa cellule, par son 2e nom. Ex-'Terrain_MarkPlacedObjectGone_37C33'."
 },
 "sub_37C4C": {
 "segment": "seg078",
@@ -11132,7 +11132,7 @@
 "sub_53337"
 ],
 "new_name": "PartEntry_Deactivate_5242A",
-"summary": "far. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN OBJET DE MISSION : opcode de script 0x91 (Expr_VM_Interpreter_51106, cas 0x91), inverse de 0x90 (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Efface le bit actif de l'objet (+0x39), decremente les compteurs d'objets actifs par camp (word_706A3 / word_706A7, lus par Goal_IsComplete pour l'ordre 0xA9) selon l'etat anterieur, notifie via Expr_Node_NotifyChange_53337. Exemple MISN-1A : le C-130 se desactive (0x91 8) apres son atterrissage. NB : l'opcode 0xBE n'est PAS une desactivation : c'est un ordre transmis a Goal_SetObjective_A307 (cas par defaut, objectif 0xBF)."
+"summary": "far, RELUE 2026-10-15. Ex-'Expr_Node_ClearDirtyAndNotify' (2026-10-03). DESACTIVATION D'UN OBJET DE MISSION : opcode de script 0x91 (Expr_VM_Interpreter_51106), inverse de 0x90 (PartEntry_ResolveSpawnPositionAndActivate_51EDC). Si l'objet a une instance (+0x52) : (1) si le bit 1 de +0x39 est nul (shl 0Eh / sar 0Fh), decremente le compteur d'objets actifs de son camp (+0x31 : 0xFF -> word_706A7, 1 -> word_706A3 ; lus par Goal_IsComplete pour l'ordre 0xA9) ; (2) MissionObject_RemoveInstanceFromWorld_53337 : l'instance est RETIREE du monde et DETRUITE (destructeur slot +0x18), sans explosion ni debris. Dans tous les cas : bit 0 (actif) de +0x39 efface. Le champ +0x52 n'est pas remis a zero ici. Exemple MISN-1A : le C-130 se desactive (0x91 8) apres son atterrissage. NB : l'opcode 0xBE n'est PAS une desactivation."
 },
 "sub_5247D": {
 "segment": "seg114",
@@ -11449,8 +11449,8 @@
 "calls": [
 "sub_223C5"
 ],
-"new_name": "Expr_Node_NotifyChange_53337",
-"summary": "far, notifie un changement de valeur de nœud (appel externe sub_223C5)."
+"new_name": "MissionObject_RemoveInstanceFromWorld_53337",
+"summary": "far, LUE 2026-10-15. WorldObjects_RemoveAndDelete_223C5(59C3h, instance arg_2) : retire du monde et detruit l'instance d'un objet de mission. Appelee par PartEntry_Deactivate_5242A (opcode 0x91). Ex-'MissionObject_RemoveInstanceFromWorld_53337'."
 },
 "sub_5334D": {
 "segment": "seg114",
@@ -30275,7 +30275,7 @@
 "sub_1CBCB"
 ],
 "new_name": "Autopilot_JumpSequence_7A054",
-"summary": "far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A : l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste (Container_Op_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu."
+"summary": "far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A : l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste (WorldObjects_RemoveAndDelete_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu."
 },
 "sub_7A79E": {
 "segment": "ovr233",
@@ -38141,7 +38141,7 @@
 "sub_22DE5"
 ],
 "new_name": "Debris_ContainerOpWrapper_9B62B",
-"summary": "far, appelle une opération de conteneur (Container_Op_22DE5)."
+"summary": "far, appelle une opération de conteneur (Container_RemoveAndDeleteObject_22DE5)."
 },
 "sub_9B649": {
 "segment": "ovr300",
@@ -38199,7 +38199,7 @@
 "sub_223C5"
 ],
 "new_name": "Debris_ContainerOpWrapperB_9B78D",
-"summary": "far, appelle une opération de conteneur (Container_Op_223C5)."
+"summary": "far, appelle une opération de conteneur (WorldObjects_RemoveAndDelete_223C5)."
 },
 "sub_9B7C0": {
 "segment": "ovr301",
