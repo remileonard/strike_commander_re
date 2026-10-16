@@ -102,6 +102,18 @@
   <h2>Rendu</h2>
   <label><input id="low" type="checkbox" checked> 320 × 200 (pixels du jeu)</label>
   <label><input id="linear" type="checkbox"> filtrage GL_LINEAR (SCRenderer)</label>
+
+  <h2>Textures</h2>
+  <label>Combinaison <select id="texenv">
+    <option value="modulate">GL_MODULATE : texel × intensité (vers le noir)</option>
+    <option value="interpolate">GL_INTERPOLATE : texel ↔ teinte d'ombre</option>
+  </select></label>
+  <label>Test alpha <select id="aref"><option value="0.1">GL_GREATER 0,1 (SCRenderer)</option><option value="0.5">GL_GREATER 0,5</option></select></label>
+  <label><input id="bleed" type="checkbox"> étaler les couleurs sous les texels transparents</label>
+  <label><input id="mip" type="checkbox"> mipmaps (GL_LINEAR_MIPMAP_LINEAR)</label>
+  <p class="note">Ombre de GL_INTERPOLATE : 1re teinte de la gamme RANG de la couleur de fond de la face
+  (octet 4 de VTRI). Approximation des tables FADE du jeu, absentes du dépôt. Textures complétées en
+  puissance de 2 (bords répétés) pour les mipmaps WebGL 1.</p>
   <label>Fond <select id="bg"><option value="0">noir</option><option value="sky">ciel</option><option value="grey">gris</option></select></label>
 
   <h2>Lumière (WRLD/LGHT)</h2>
@@ -147,13 +159,17 @@ const FIXED_FS = `
 precision mediump float;
 uniform sampler2D uTexture;
 uniform bool uTexture2D;     // glEnable(GL_TEXTURE_2D), mode GL_MODULATE
+uniform bool uInterpolate;   // GL_COMBINE : RGB = INTERPOLATE(texture, couleur, alpha couleur), A = REPLACE(texture)
 uniform bool uAlphaTest;     // glEnable(GL_ALPHA_TEST)
 uniform float uAlphaRef;     // glAlphaFunc(GL_GREATER, ref)
 varying vec4 vColor;
 varying vec2 vTexCoord;
 void main() {
   vec4 c = vColor;
-  if (uTexture2D) { c *= texture2D(uTexture, vTexCoord); }
+  if (uTexture2D) {
+    vec4 t = texture2D(uTexture, vTexCoord);
+    if (uInterpolate) { c = vec4(mix(vColor.rgb, t.rgb, vColor.a), t.a); } else { c *= t; }
+  }
   if (uAlphaTest && !(c.a > uAlphaRef)) { discard; }
   gl_FragColor = c;
 }`;
@@ -181,6 +197,7 @@ const fixed = (() => {
     mv: gl.getUniformLocation(p, "uModelView"),
     tex: gl.getUniformLocation(p, "uTexture"),
     tex2d: gl.getUniformLocation(p, "uTexture2D"),
+    interp: gl.getUniformLocation(p, "uInterpolate"),
     at: gl.getUniformLocation(p, "uAlphaTest"),
     aref: gl.getUniformLocation(p, "uAlphaRef"),
   };
@@ -189,6 +206,7 @@ const fixed = (() => {
   return { loc, buf, mode: 0, data: [], color: [1, 1, 1, 1], uv: [0, 0], texture2D: false, alphaTest: false };
 })();
 function glEnableTexture2D(on) { fixed.texture2D = on; }
+function glTexEnvInterpolate(on) { fixed.interpolate = on; }
 function glAlphaTest(on, ref) { fixed.alphaTest = on; fixed.alphaRef = ref; }
 function glLoadMatrices(projection, modelView) {
   gl.uniformMatrix4fv(fixed.loc.proj, false, projection);
@@ -205,6 +223,7 @@ function glEnd() {
   const n = fixed.data.length / 9;
   if (!n) { return; }
   gl.uniform1i(fixed.loc.tex2d, fixed.texture2D ? 1 : 0);
+  gl.uniform1i(fixed.loc.interp, fixed.interpolate ? 1 : 0);
   gl.uniform1i(fixed.loc.at, fixed.alphaTest ? 1 : 0);
   gl.uniform1f(fixed.loc.aref, fixed.alphaRef || 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, fixed.buf);
@@ -284,32 +303,84 @@ const rang = D.rang;
 const remap = Uint8Array.from(atob(D.remap), (c) => c.charCodeAt(0));
 
 // Une texture GL par TXMP, RVBA depuis la palette ; texel 0xFF → alpha 0 (test alpha).
-const textures = D.textures.map((t) => {
-  const px = Uint8Array.from(atob(t[3]), (c) => c.charCodeAt(0));
-  const rgba = new Uint8Array(t[1] * t[2] * 4);
-  for (let i = 0; i < px.length; i++) {
-    const c = px[i];
-    rgba[4 * i] = pal[3 * c];
-    rgba[4 * i + 1] = pal[3 * c + 1];
-    rgba[4 * i + 2] = pal[3 * c + 2];
-    rgba[4 * i + 3] = c === 0xFF ? 0 : 255;
-  }
-  const id = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, id);
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, t[1], t[2], 0, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  return { id, width: t[1], height: t[2], first: px[0] };
-});
-function setFiltering(linear) {
-  for (const t of textures) {
-    gl.bindTexture(gl.TEXTURE_2D, t.id);
-    const f = linear ? gl.LINEAR : gl.NEAREST;
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, f);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, f);
+// Complétée à la puissance de 2 supérieure (bords répétés) : WebGL 1 n'a de mipmaps qu'en puissance de 2.
+const pot = (n) => { let p = 1; while (p < n) { p *= 2; } return p; };
+function bleed(rgba, w, h) {         // étale le RVB des voisins opaques sous les texels transparents
+  const filled = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) { filled[i] = rgba[4 * i + 3] !== 0 ? 1 : 0; }
+  for (let passe = 0; passe < 3; passe++) {
+    const src = rgba.slice();
+    const done = filled.slice();
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        if (done[y * w + x]) { continue; }
+        let r = 0;
+        let g = 0;
+        let b = 0;
+        let n = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          for (let dx = -1; dx <= 1; dx++) {
+            const xx = x + dx;
+            const yy = y + dy;
+            if (xx < 0 || yy < 0 || xx >= w || yy >= h || !done[yy * w + xx]) { continue; }
+            const j = 4 * (yy * w + xx);
+            r += src[j];
+            g += src[j + 1];
+            b += src[j + 2];
+            n++;
+          }
+        }
+        if (n > 0) {
+          const i = 4 * (y * w + x);
+          rgba[i] = r / n;
+          rgba[i + 1] = g / n;
+          rgba[i + 2] = b / n;
+          filled[y * w + x] = 1;
+        }
+      }
+    }
   }
 }
+const textures = D.textures.map((t) => {
+  const px = Uint8Array.from(atob(t[3]), (c) => c.charCodeAt(0));
+  return { id: gl.createTexture(), px, width: t[1], height: t[2], potW: pot(t[1]), potH: pot(t[2]), first: px[0] };
+});
+function uploadTextures() {
+  for (const t of textures) {
+    const w = t.width;
+    const h = t.height;
+    let rgba = new Uint8Array(w * h * 4);
+    for (let i = 0; i < t.px.length; i++) {
+      const c = t.px[i];
+      rgba[4 * i] = pal[3 * c];
+      rgba[4 * i + 1] = pal[3 * c + 1];
+      rgba[4 * i + 2] = pal[3 * c + 2];
+      rgba[4 * i + 3] = c === 0xFF ? 0 : 255;
+    }
+    if (ui.bleed.checked) { bleed(rgba, w, h); }
+    const out = new Uint8Array(t.potW * t.potH * 4);
+    for (let y = 0; y < t.potH; y++) {
+      for (let x = 0; x < t.potW; x++) {
+        const s = 4 * (Math.min(y, h - 1) * w + Math.min(x, w - 1));
+        out.set(rgba.subarray(s, s + 4), 4 * (y * t.potW + x));
+      }
+    }
+    gl.bindTexture(gl.TEXTURE_2D, t.id);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, t.potW, t.potH, 0, gl.RGBA, gl.UNSIGNED_BYTE, out);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    const f = ui.linear.checked ? gl.LINEAR : gl.NEAREST;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, f);
+    if (ui.mip.checked) {
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, ui.linear.checked ? gl.LINEAR_MIPMAP_LINEAR : gl.NEAREST_MIPMAP_NEAREST);
+    } else {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, f);
+    }
+  }
+}
+function setFiltering() { uploadTextures(); }
 
 // =====================================================================================
 // Teintes du jeu (OBJECT_RENDER.md §3), calculées sur le CPU puis données par glColor.
@@ -506,15 +577,23 @@ function drawFaceTexture(fi, frontSeen) {
   const uv = uvOf[fi];
   const tex = textures[uv[0]];
   const k = textureFactors(fi, frontSeen);
+  const interp = ui.texenv.value === "interpolate";
+  const ramp = rampOf(f[4]);
+  const shadow = ramp >= 0 ? rgbOf(rang[ramp][0]) : [0, 0, 0];
+  glTexEnvInterpolate(interp);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, tex.id);
   glEnableTexture2D(true);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
-    glColor4f(k[j], k[j], k[j], 1);
+    if (interp) {
+      glColor4f(shadow[0], shadow[1], shadow[2], k[j]);   // RVB = ombre, A = intensité
+    } else {
+      glColor4f(k[j], k[j], k[j], 1);
+    }
     // Texel = pixels[v × largeur + u] : u = colonne (1er octet de UVXY), v = ligne.
-    glTexCoord2f((uv[1][2 * j] + 0.5) / tex.width, (uv[1][2 * j + 1] + 0.5) / tex.height);
+    glTexCoord2f((uv[1][2 * j] + 0.5) / tex.potW, (uv[1][2 * j + 1] + 0.5) / tex.potH);
     glVertex3f(v[0], v[1], v[2]);
   }
   glEnd();
@@ -617,7 +696,7 @@ function drawModel() {
   gl.frontFace(gl.CW);
   gl.cullFace(gl.BACK);
   const setCull = (fi) => { if (faces[fi][7] & 1) { gl.disable(gl.CULL_FACE); } else { gl.enable(gl.CULL_FACE); } };
-  glAlphaTest(true, 0.1);              // glAlphaFunc(GL_GREATER, 0.1f) : texel 0xFF transparent
+  glAlphaTest(true, +ui.aref.value);   // glAlphaFunc(GL_GREATER, ref) : texel 0xFF transparent
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   let drawn = 0;
@@ -693,9 +772,9 @@ for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw", "oyaw", 
   ui[id].addEventListener("input", () => { upd(); drawModel(); });
   upd();
 }
-for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour"]) {
+for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour", "texenv", "aref", "bleed", "mip"]) {
   ui[id] = $(id);
-  ui[id].addEventListener("change", () => { resize(); setFiltering(ui.linear.checked); drawModel(); });
+  ui[id].addEventListener("change", () => { resize(); setFiltering(); drawModel(); });
 }
 document.querySelectorAll("input[name=order]").forEach((r) => r.addEventListener("change", drawModel));
 ui.lod.add(new Option("auto (par la distance)", "auto"));
@@ -773,7 +852,7 @@ const COLOUR_NOTES = {
 function updateColourNote() { $("colourNote").textContent = COLOUR_NOTES[ui.colour.value]; }
 ui.colour.addEventListener("change", updateColourNote);
 updateColourNote();
-setFiltering(false);
+setFiltering();
 resize();
 drawModel();
 requestAnimationFrame(tick);
