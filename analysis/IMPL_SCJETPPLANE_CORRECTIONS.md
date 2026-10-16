@@ -14,8 +14,8 @@ d'assembleur servent à la traçabilité ; la référence complète est
 - **Unités** : libRealSpace calcule en **flottants**, en valeurs réelles (m, m/s, degrés, g, kg,
   N, s). Aucune valeur de ce document n'est en virgule fixe.
 - **Axes** : le jeu d'origine est Z-up (c0 = envergure/est, c1 = nez/nord, c2 = haut) ;
-  libRealSpace est Y-up. Correspondance : `x = c0`, `y = c2` (altitude), `z = c1`. Le cap du jeu
-  vaut `atan2(c0, c1)`, soit `atan2(x, z)` en libRealSpace.
+  libRealSpace est Y-up. Correspondance : `x = c0`, `y = c2` (altitude), `z = −c1` (nord vers −Z,
+  voir `CLAUDE.md`). Le cap du jeu vaut `atan2(c0, c1)`, soit `atan2(x, −z)` en libRealSpace.
 - **Ne rien casser qui marche.** Rémi a validé en jeu : le sens des axes du manche, le servo de
   tangage actuel (vol stable manche au neutre), la composition incrémentale de `ptw`. Chaque
   correction ci-dessous est **locale** ; ne pas réécrire `processInput` en entier.

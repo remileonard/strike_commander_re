@@ -12016,7 +12016,7 @@
 "sub_54A0E"
 ],
 "new_name": "Math_HeadingAngle_553CF",
-"summary": "far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_ComputeApproachAngles' (FAUX : un seul vecteur, rien de specifique a l'IA). CAP HORIZONTAL d'un vecteur v, en degres dans ]-180, 180] : angle mesure depuis l'axe +c1 vers l'axe +c0, soit atan2(v.c0, v.c1). Copie + Math_VectorLengthUnscaled_55920(v, 1000) (garde anti-debordement), composante d'altitude mise a 0, L = |(c0, c1)|. L == 0 -> 720 deg (valeur sentinelle). Si |c1| >= |c0| : c1 >= 0 -> asin(c0/L) ; c1 < 0 et c0 >= 0 -> 180 - asin(c0/L) ; c1 < 0 et c0 < 0 -> -180 - asin(c0/L). Sinon : c0 >= 0 -> acos(c1/L) ; c0 < 0 -> -acos(c1/L) (Math_AsinOfRatio_54A76 / Math_AcosOfRatio_54A0E). Les quatre branches ne sont coherentes (meme angle) qu'avec les vrais noms des arcs, ce qui confirme leur inversion. En libRealSpace (Y-up, libRS.z = asm.c1) : atan2(x, z)."
+"summary": "far, LUE INTEGRALEMENT (2026-09-24). Ex-'AI_ComputeApproachAngles' (FAUX : un seul vecteur, rien de specifique a l'IA). CAP HORIZONTAL d'un vecteur v, en degres dans ]-180, 180] : angle mesure depuis l'axe +c1 vers l'axe +c0, soit atan2(v.c0, v.c1). Copie + Math_VectorLengthUnscaled_55920(v, 1000) (garde anti-debordement), composante d'altitude mise a 0, L = |(c0, c1)|. L == 0 -> 720 deg (valeur sentinelle). Si |c1| >= |c0| : c1 >= 0 -> asin(c0/L) ; c1 < 0 et c0 >= 0 -> 180 - asin(c0/L) ; c1 < 0 et c0 < 0 -> -180 - asin(c0/L). Sinon : c0 >= 0 -> acos(c1/L) ; c0 < 0 -> -acos(c1/L) (Math_AsinOfRatio_54A76 / Math_AcosOfRatio_54A0E). Les quatre branches ne sont coherentes (meme angle) qu'avec les vrais noms des arcs, ce qui confirme leur inversion. En libRealSpace (Y-up, libRS.z = −asm.c1) : atan2(x, −z)."
 },
 "sub_5554E": {
 "segment": "seg116",
@@ -39101,7 +39101,7 @@
 "sub_5C6F3"
 ],
 "new_name": "WeaponSys_LoadHardpoint_9E682",
-"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadTripleField'. UN POINT D'EMPORT HPTS (13 o) : uint8 → +0x15 TYPE (0 à 4, voir WeaponSys_LoadStoresOnHardpoint_9EA2E) ; 3 int32 24.8 → +1/+5/+9 position dans le repère de l'avion (asm c0, c1, c2 ; libRS.x = c0, libRS.y = c2, libRS.z = c1)."
+"summary": "far, LUE 2026-10-12. Ex-'PlayerComponent_LoadTripleField'. UN POINT D'EMPORT HPTS (13 o) : uint8 → +0x15 TYPE (0 à 4, voir WeaponSys_LoadStoresOnHardpoint_9EA2E) ; 3 int32 24.8 → +1/+5/+9 position dans le repère de l'avion (asm c0, c1, c2 ; libRS.x = c0, libRS.y = c2, libRS.z = −c1)."
 },
 "sub_9E731": {
 "segment": "seg432",

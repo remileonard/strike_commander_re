@@ -804,7 +804,7 @@ Math_ElevationAngle_552E1	endp
 ; asin(c0/L). Sinon : c0 >= 0 -> acos(c1/L) ; c0 < 0 -> -acos(c1/L) (Math_AsinOfRatio_54A76 /
 ; Math_AcosOfRatio_54A0E). Les quatre branches ne sont coherentes (meme angle) qu'avec les
 ; vrais noms des arcs, ce qui confirme leur inversion. En libRealSpace (Y-up, libRS.z =
-; asm.c1) : atan2(x, z).
+; −asm.c1) : atan2(x, −z).
 ; ==============================================================================================
 Math_HeadingAngle_553CF	proc far		; CODE XREF: AI_GunSnapAim_6977+F7P
 					; AI_GunSnapAim_6977+109P ...

@@ -12,7 +12,8 @@ complètes sont dans `strike_commander_re/analysis/` : `NOTE_ATTAQUE_SOL.md`,
   `SCJetpPlane` pour le pilote automatique (voir `IMPL_SCJETPPLANE_CORRECTIONS.md` §1, **à faire
   avant le §2 ci-dessous**).
 - **Unités** : flottants, valeurs réelles (m, m/s, degrés, s). Axes : jeu Z-up, libRealSpace Y-up
-  (`x = c0`, `y = c2` altitude, `z = c1`). Le cap du jeu vaut `atan2(c0, c1)` = `atan2(x, z)`.
+  (`x = c0`, `y = c2` altitude, `z = −c1`, nord vers −Z : voir `CLAUDE.md`). Le cap du jeu vaut
+  `atan2(c0, c1)` = `atan2(x, −z)`.
 - **Cadence** : le cerveau tourne à 25 Hz (choix de Rémi). C'est aussi la cadence maximale de
   l'original, qui attend activement au-delà de 25 images/s : les réglages de l'original
   s'appliquent tels quels au tick de 0,04 s. Ne pas reproduire le défaut de l'original sur

@@ -1285,7 +1285,7 @@ PlayerComponent_Helper_9E651	endp
 ; far, LUE 2026-10-12. Ex-'PlayerComponent_LoadTripleField'. UN POINT D'EMPORT HPTS (13 o) :
 ; uint8 → +0x15 TYPE (0 à 4, voir WeaponSys_LoadStoresOnHardpoint_9EA2E) ; 3 int32 24.8 →
 ; +1/+5/+9 position dans le repère de l'avion (asm c0, c1, c2 ; libRS.x = c0, libRS.y = c2,
-; libRS.z = c1).
+; libRS.z = −c1).
 ; ==============================================================================================
 WeaponSys_LoadHardpoint_9E682	proc far		; CODE XREF: VROOMM_StubThunk_6C3A3J WeaponSys_LoadInfoHptsDcoy_9F07F+F7p
 
