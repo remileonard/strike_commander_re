@@ -14,7 +14,7 @@ Elle propose les modes « jeu », « entre-deux », « tout éclairé », « SCR
 GL_LIGHTING », les réglages de textures et le brouillard. La planche `data/F-16DES_modes.png`
 compare les rendus « jeu », « entre-deux » et « SCRenderer ».
 
-Correspondance des champs avec ton code :
+Correspondance des champs avec libRealSpace :
 
 | `VTRI` (8 octets) | `Triangle` | Sens |
 |---|---|---|
@@ -39,7 +39,7 @@ Correspondance des champs avec ton code :
 | Brouillard | aucun | l'index glisse vers le gris 192 de sa gamme, 32 paliers | §8 |
 | Niveau de détail | `object_detail` fixé | choisi par la distance (`LVLn`) | §9 |
 
-Ta normale de face est déjà la bonne. `AccumulateFaceNormal` calcule `(V0 − V1) × (V2 − V1)`, ce qui
+La normale de face de `SCRenderer` est déjà la bonne. `AccumulateFaceNormal` calcule `(V0 − V1) × (V2 − V1)`, ce qui
 est exactement `(V0 − V2) × (V0 − V1)` du jeu (`Face_ComputeNormal_2931E`) développé autrement.
 
 ---
@@ -130,7 +130,7 @@ lumière (`LightSet_FaceIntensity_2B54A`). La direction est fixe dans le monde :
 est repassée dans le repère de l'objet (`Matrix_WorldToLocal_58768`). Les normales s'utilisent
 alors telles quelles, sans les transformer.
 
-Dans ton `drawModel`, avec `MV` (`glGetFloatv(GL_MODELVIEW_MATRIX)`) et `V`
+Dans `SCRenderer::drawModel`, avec `MV` (`glGetFloatv(GL_MODELVIEW_MATRIX)`) et `V`
 (`camera.getViewMatrix()->ToGL()`), `worldDirToObject` donne la lumière dans le repère de l'objet et
 `eyeInObject` donne la position de l'œil dans ce même repère. Ces deux fonctions supposent une
 matrice sans échelle : avec le `glScalef` de la tuyère, renormaliser.
@@ -220,7 +220,7 @@ float objectIntensity(const ObjectLight &light, const Vector3D &lightLocal, cons
 
 ## 4. Éclairage selon le type de face
 
-`faceIsTextureOnly` remplace ton test `property == 6 || property == 9` de la passe couleur, et
+`faceIsTextureOnly` remplace le test `property == 6 || property == 9` de la passe couleur, et
 `faceHasTextureOverlay` désigne les faces dont la texture se dessine par-dessus la couleur (passe
 texture en `GL_EQUAL`). Le type 9 n'est pas lu dans le code du jeu : il est classé ici avec un
 éclairage par face, d'après sa table de méthodes, qui a la même méthode d'éclairage que les
@@ -258,7 +258,7 @@ bool faceIsTextureOnly(int type) {
 
 À faire **une fois au chargement** (`SCRenderer::prepare`) :
 - **retirer `FixEntityWinding`**. Avec l'ordre des sommets du fichier, une face vue de devant tourne
-  dans le sens horaire à l'écran. Tes `glFrontFace(GL_CW)` + `glCullFace(GL_BACK)` rejettent alors
+  dans le sens horaire à l'écran. Les `glFrontFace(GL_CW)` + `glCullFace(GL_BACK)` de `SCRenderer` rejettent alors
   exactement les faces que rejette le jeu (`FaceElement_CullAndProject_24EE2`), vérifié dans la
   visionneuse : 70 faces sur 135 dans les deux cas, vue 3/4 avant. L'heuristique « centre de la
   face − centre de l'objet » peut retourner à tort des faces d'une forme creuse (verrière, entrées
@@ -557,10 +557,10 @@ void setupObjectFog(const std::vector<RangRamp> &ramps, VGAPalette &palette, flo
 ## 9. Niveau de détail par la distance
 
 `depth` est la profondeur du centre de l'objet dans le repère de la caméra (`−` z œil).
-`projScale` est l'échelle de projection en pixels. Pour la tienne, c'est la moitié de la hauteur
+`projScale` est l'échelle de projection en pixels. Dans libRealSpace, c'est la moitié de la hauteur
 de l'écran divisée par `tan(fovy / 2)`. Le jeu prend le plus grand `LVLi` dont la distance est
 inférieure ou égale à `profondeur × 179,2 ÷ échelle`. `minLevel` est l'option de détail du joueur :
-c'est ton `object_detail`, qui devient un niveau minimal au lieu d'un niveau fixe.
+c'est l'option `object_detail`, qui devient un niveau minimal au lieu d'un niveau fixe.
 
 ```cpp
 // depth = profondeur du centre de l'objet (m) ; projScale = échelle de projection (pixels) ;
@@ -595,7 +595,7 @@ int selectObjectLod(const std::vector<uint32_t> &lodDistances, float depth, floa
   correction de perspective. Invisible sur de petits objets ; OpenGL fait mieux.
 - **Gouraud sur l'index** de palette : le jeu interpole l'index, puis lit la couleur. En RVB, la
   différence ne se voit quasiment pas.
-- **Tri des faces sans tampon de profondeur** : ton tampon de profondeur fait mieux. La visionneuse
+- **Tri des faces sans tampon de profondeur** : le tampon de profondeur de `SCRenderer` fait mieux. La visionneuse
   offre les deux (« Ordre de dessin »), et ils donnent presque la même image sur le F-16.
 
 ## Ce qui attend des données
@@ -603,7 +603,7 @@ int selectObjectLod(const std::vector<uint32_t> &lodDistances, float depth, floa
 - Tables `FADE` (assombrissement des texels et des couleurs hors gamme, brouillard des faces non
   éclairées) et `D_HZ` (distances du brouillard) : `DATA\PALETTE\PALFADE.IFF`.
 - Tables de translucidité des faces de type 2 (`dword_72528`) : origine non tracée. La visionneuse
-  mélange à 50 % ; ton `GL_ONE, GL_ONE` additif donne une verrière plus claire.
+  mélange à 50 % ; le `GL_ONE, GL_ONE` additif de `SCRenderer` donne une verrière plus claire.
 
 ## Non établi
 

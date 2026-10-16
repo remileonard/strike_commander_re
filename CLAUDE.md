@@ -77,6 +77,11 @@ conditions que le programme impose au chargement (erreurs, priorités de recherc
 induit en erreur quand on ouvre les fichiers. Le comportement du code va dans
 `known_functions.json` et les documents de comportement.
 
+**7. Pas de possessifs pour parler du portage.**
+Dire « libRealSpace », « le portage », « `SCRenderer` », « le code de libRealSpace » — **jamais**
+« ton code », « ton portage », « ton renderer », « ta fonction », « tes passes », ni dans les
+réponses ni dans les documents.
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur
