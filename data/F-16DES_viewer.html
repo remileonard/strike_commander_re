@@ -122,6 +122,17 @@
   puissance de 2 (bords répétés) pour les mipmaps WebGL 1.</p>
   <label>Fond <select id="bg"><option value="0">noir</option><option value="sky">ciel</option><option value="grey">gris</option></select></label>
 
+  <h2>Brouillard</h2>
+  <label><input id="fogOn" type="checkbox"> brouillard</label>
+  <label><input id="fogSteps" type="checkbox" checked> 32 paliers (comme le jeu)</label>
+  <label><input id="fogSky" type="checkbox" checked> fond = couleur du brouillard</label>
+  <label class="range">Début m <input id="fogStart" type="range" min="0" max="3000" step="10" value="100"><output></output></label>
+  <label class="range">Fin m <input id="fogEnd" type="range" min="50" max="6000" step="10" value="1500"><output></output></label>
+  <p class="note">Mode « jeu » : l'index de chaque sommet glisse vers la teinte de brouillard de sa gamme
+  (Palette_ShadeIndexWithFog_2F24E), profondeur du sommet le plus lointain pour une face unie, de chaque
+  sommet pour un dégradé. Textures, verrières et modes RVB : mélange RVB vers la couleur du brouillard
+  (comme glFog GL_LINEAR). Distances des 32 paliers : fichier « palfade » absent, ici réglables.</p>
+
   <h2>Lumière (WRLD/LGHT)</h2>
   <label class="range">Cap lumière <input id="lyaw" type="range" min="-180" max="180" step="1" value="0"><output></output></label>
   <label class="range">Ambiante <input id="amb" type="range" min="0" max="10" step="1" value="3"><output></output></label>
@@ -166,6 +177,7 @@ uniform float uShininess;    // GL_SHININESS
 varying vec4 vColor;
 varying vec4 vColorBack;     // GL_LIGHT_MODEL_TWO_SIDE : couleur de la face arrière
 varying vec2 vTexCoord;
+varying float vEyeDepth;
 vec4 lit(vec3 n, vec4 m) {
   float d = max(dot(n, uLightEye), 0.0);
   vec3 c = m.rgb * (uLightAmbient + uLightDiffuse * d);
@@ -184,6 +196,7 @@ void main() {
     vColorBack = lit(-n, aColor);
   }
   vTexCoord = aTexCoord;
+  vEyeDepth = -(uModelView * vec4(aVertex, 1.0)).z;
   gl_Position = uProjection * uModelView * vec4(aVertex, 1.0);
 }`;
 const FIXED_FS = `
@@ -194,9 +207,13 @@ uniform bool uInterpolate;   // GL_COMBINE : RGB = INTERPOLATE(texture, couleur,
 uniform bool uAlphaTest;     // glEnable(GL_ALPHA_TEST)
 uniform float uAlphaRef;     // glAlphaFunc(GL_GREATER, ref)
 uniform bool uTwoSide;       // GL_LIGHT_MODEL_TWO_SIDE
+uniform bool uFog;           // glEnable(GL_FOG), GL_FOG_MODE = GL_LINEAR
+uniform vec3 uFogParams;     // GL_FOG_START, GL_FOG_END, paliers (1 = 32 paliers comme le jeu)
+uniform vec3 uFogColor;      // GL_FOG_COLOR
 varying vec4 vColor;
 varying vec4 vColorBack;
 varying vec2 vTexCoord;
+varying float vEyeDepth;
 void main() {
   vec4 c = (uTwoSide && !gl_FrontFacing) ? vColorBack : vColor;
   if (uTexture2D) {
@@ -204,6 +221,11 @@ void main() {
     if (uInterpolate) { c = vec4(mix(c.rgb, t.rgb, c.a), t.a); } else { c *= t; }
   }
   if (uAlphaTest && !(c.a > uAlphaRef)) { discard; }
+  if (uFog) {
+    float x = clamp((vEyeDepth - uFogParams.x) / max(1.0, uFogParams.y - uFogParams.x), 0.0, 1.0);
+    if (uFogParams.z > 0.5 && x > 0.0 && x < 1.0) { x = (floor(x * 32.0) + 1.0) / 32.0; }
+    c.rgb = mix(c.rgb, uFogColor, x);
+  }
   gl_FragColor = c;
 }`;
 
@@ -239,6 +261,9 @@ const fixed = (() => {
     spec: gl.getUniformLocation(p, "uSpecular"),
     shin: gl.getUniformLocation(p, "uShininess"),
     twoSide: gl.getUniformLocation(p, "uTwoSide"),
+    fog: gl.getUniformLocation(p, "uFog"),
+    fogParams: gl.getUniformLocation(p, "uFogParams"),
+    fogColor: gl.getUniformLocation(p, "uFogColor"),
     at: gl.getUniformLocation(p, "uAlphaTest"),
     aref: gl.getUniformLocation(p, "uAlphaRef"),
   };
@@ -249,6 +274,13 @@ const fixed = (() => {
 function glEnableTexture2D(on) { fixed.texture2D = on; }
 function glTexEnvInterpolate(on) { fixed.interpolate = on; }
 function glEnableLighting(on) { fixed.lighting = on; }
+function glEnableFog(on) { fixed.fog = on; }
+// Réglages du brouillard (glFogf GL_FOG_START / GL_FOG_END, glFogfv GL_FOG_COLOR)
+const fog = { on: false, start: 0, end: 1, steps: true };
+function glFogSetup() {
+  gl.uniform3f(fixed.loc.fogParams, fog.start, fog.end, fog.steps ? 1 : 0);
+  gl.uniform3f(fixed.loc.fogColor, FOG_RGB[0], FOG_RGB[1], FOG_RGB[2]);
+}
 function glLightModelTwoSide(on) { fixed.twoSide = on; }
 function glNormal3f(x, y, z) { fixed.normal = [x, y, z]; }
 // GL_LIGHT0 directionnelle : direction donnée dans le monde, passée en repère œil par la vue
@@ -284,6 +316,7 @@ function glEnd() {
   gl.uniform1i(fixed.loc.interp, fixed.interpolate ? 1 : 0);
   gl.uniform1i(fixed.loc.lighting, fixed.lighting ? 1 : 0);
   gl.uniform1i(fixed.loc.twoSide, fixed.twoSide ? 1 : 0);
+  gl.uniform1i(fixed.loc.fog, fixed.fog && fog.on ? 1 : 0);
   gl.uniform1i(fixed.loc.at, fixed.alphaTest ? 1 : 0);
   gl.uniform1f(fixed.loc.aref, fixed.alphaRef || 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, fixed.buf);
@@ -475,7 +508,26 @@ function litFlat(c, i) {           // types 4 et 7
   if (r < 0) { return remap[tableLevel(i) * 256 + c]; }
   return shade(r, i, c - rang[r][0]);
 }
+// Facteur de brouillard d'une profondeur (m) : 0 avant le début, 1 après la fin, 32 paliers en option.
+function fogFactor(depth) {
+  if (!fog.on) { return 0; }
+  const x = (depth - fog.start) / Math.max(1, fog.end - fog.start);
+  if (x <= 0) { return 0; }
+  if (x >= 1) { return 1; }
+  return fog.steps ? (Math.floor(x * 32) + 1) / 32 : x;
+}
+// Index après brouillard : glisse vers la teinte de brouillard de la gamme (première + 3e champ de RANG).
+function fogIndex(index, ramp, depth) {
+  const r = ramp >= 0 ? ramp : rampOf(index);
+  if (r < 0 || !fog.on) { return index; }
+  const to = rang[r][0] + rang[r][2];
+  return index + Math.floor((to - index) * fogFactor(depth) + 0.5);
+}
+let vertexDepth = [];
+const faceDepth = (fi) => Math.max(vertexDepth[faces[fi][1]], vertexDepth[faces[fi][2]], vertexDepth[faces[fi][3]]);
 function rgbOf(index) { return [pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255]; }
+// Couleur du brouillard : teinte de brouillard de la gamme 1 (gris 192 pour les 7 gammes de PALETTE.IFF).
+const FOG_RGB = (() => { const k = rang[1] ? rang[1][0] + rang[1][2] : 63; return [pal[3 * k] / 255, pal[3 * k + 1] / 255, pal[3 * k + 2] / 255]; })();
 const colourMode = () => ui.colour.value;       // "game", "hybrid", "all", "sc", "gl"
 
 // ---- Entre-deux : règles du jeu (quelles faces sont éclairées, normale de face ou de sommet,
@@ -564,7 +616,7 @@ function faceColors(fi, frontSeen) {
     return [c, c, c];
   }
   if (kind === 1 || kind === 5 || kind > 9) {                        // non éclairée
-    const c = rgbOf(colour);
+    const c = rgbOf(mode === "game" ? fogIndex(colour, -1, faceDepth(fi)) : colour);
     return [c, c, c];
   }
   const n = litNormal(fi, frontSeen);
@@ -578,15 +630,15 @@ function faceColors(fi, frontSeen) {
     const c = shadeAlongRamp(colour, intensityF(n));
     return [c, c, c];
   }
-  if (kind === 4 || kind === 7) {                                    // jeu : par face
-    const c = rgbOf(litFlat(colour, intensity(n)));
+  if (kind === 4 || kind === 7) {                                    // jeu : par face (profondeur = clé de tri)
+    const c = rgbOf(fogIndex(litFlat(colour, intensity(n)), rampOf(colour), faceDepth(fi)));
     return [c, c, c];
   }
   if (kind === 3 || kind === 8) {                                    // jeu : par sommet
     let r = rampOf(colour);
     let ov = 0;
     if (r < 0) { r = 0; } else { ov = colour - rang[r][0]; }
-    const idx = vs.map((v) => shade(r, intensity(vertexNormal[v]), ov));
+    const idx = vs.map((v) => fogIndex(shade(r, intensity(vertexNormal[v]), ov), r, vertexDepth[v]));
     if (!ui.gouraud.checked) { const m = Math.floor((idx[0] + idx[1] + idx[2]) / 3); return [rgbOf(m), rgbOf(m), rgbOf(m)]; }
     return idx.map(rgbOf);
   }
@@ -651,6 +703,7 @@ function drawFaceColor(fi, frontSeen) {
   if (!cols) { return; }
   const f = faces[fi];
   const lighting = glFaceSetup(fi);
+  glEnableFog(colourMode() !== "game");
   glEnableTexture2D(false);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
@@ -675,6 +728,7 @@ function drawFaceTexture(fi, frontSeen) {
   const ramp = rampOf(f[4]);
   const shadow = ramp >= 0 ? rgbOf(rang[ramp][0]) : [0, 0, 0];
   glTexEnvInterpolate(interp);
+  glEnableFog(true);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, tex.id);
   glEnableTexture2D(true);
@@ -703,6 +757,7 @@ function drawFaceTransparent(fi) {
   const sc = colourMode() === "sc";
   if (sc) { gl.blendFunc(gl.ONE, gl.ONE); }                         // SCRenderer : glBlendFunc(GL_ONE, GL_ONE)
   const lighting = glFaceSetup(fi);
+  glEnableFog(true);
   glEnableTexture2D(false);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
@@ -771,7 +826,8 @@ function drawModel() {
 
   const bg = ui.bg.value === "sky" ? [0.42, 0.55, 0.70] : ui.bg.value === "grey" ? [0.35, 0.35, 0.35] : [0, 0, 0];
   gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clearColor(bg[0], bg[1], bg[2], 1);
+  const sky = ui.fogOn.checked && ui.fogSky.checked ? FOG_RGB : bg;
+  gl.clearColor(sky[0], sky[1], sky[2], 1);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const depthC = -transformPoint(MV, centre)[2];
@@ -799,6 +855,12 @@ function drawModel() {
   gl.frontFace(gl.CW);
   gl.cullFace(gl.BACK);
   const setCull = (fi) => { if (faces[fi][7] & 1) { gl.disable(gl.CULL_FACE); } else { gl.enable(gl.CULL_FACE); } };
+  vertexDepth = vertices.map((v) => -transformPoint(MV, v)[2]);
+  fog.on = ui.fogOn.checked;
+  fog.start = +ui.fogStart.value;
+  fog.end = Math.max(fog.start + 1, +ui.fogEnd.value);
+  fog.steps = ui.fogSteps.checked;
+  glFogSetup();
   glAlphaTest(true, +ui.aref.value);   // glAlphaFunc(GL_GREATER, ref) : texel 0xFF transparent
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -868,14 +930,14 @@ function resize() {
   const h = low ? 200 : Math.round(w * 200 / 320);
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
 }
-for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw", "oyaw", "opitch", "oroll", "glspec", "glshin"]) {
+for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw", "oyaw", "opitch", "oroll", "glspec", "glshin", "fogStart", "fogEnd"]) {
   ui[id] = $(id);
   const out = ui[id].parentElement.querySelector("output");
   const upd = () => { out.textContent = Math.round(ui[id].value); };
   ui[id].addEventListener("input", () => { upd(); drawModel(); });
   upd();
 }
-for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour", "texenv", "aref", "bleed", "mip", "glfacen"]) {
+for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour", "texenv", "aref", "bleed", "mip", "glfacen", "fogOn", "fogSteps", "fogSky"]) {
   ui[id] = $(id);
   ui[id].addEventListener("change", () => { resize(); setFiltering(); drawModel(); });
 }

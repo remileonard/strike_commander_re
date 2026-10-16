@@ -87,6 +87,28 @@ lumière). Les tables sont le chunk `FADE` du `FORM FTBL` du fichier nommé par 
 `PALETTE.IFF` (« palfade »), **absent du dépôt** : l'outil assombrit un texel de gamme dans sa gamme
 comme une face (approximation).
 
+## 3bis. Brouillard (lu le 2026-10-16)
+
+Même formule pour le terrain et pour les objets (`Palette_ShadeIndexWithFog_2F24E`) : la teinte
+éclairée glisse **en index** vers la teinte de brouillard de sa gamme, `première + 3ᵉ champ de RANG`
+(le gris 192 pour les 7 gammes de `PALETTE.IFF`) :
+```
+teinte = teinte éclairée + arrondi((teinte de brouillard − teinte éclairée) × f)
+f = 0 avant le 1er seuil, 1 après le dernier, sinon (rang du seuil franchi + 1) / 32
+```
+- Comme la gamme va du sombre au clair puis vers le gris, une teinte sombre **passe par des teintes
+  plus claires de sa couleur** avant de devenir grise : ce n'est pas un mélange RVB vers le gris.
+- Profondeur : celle du sommet pour un dégradé ; pour une face unie, la clé de tri (sommet le plus
+  lointain). Faces non éclairées (types 0, 1, 5) et texels : table de brouillard `FADE` choisie par
+  la profondeur (`Palette_FogRemapColour_29194`, `Palette_ShadeTableFor_2E8CD`).
+- **Seuils** : 20 lignes de 32 distances, chunk `D_HZ` du fichier « palfade » (absent du dépôt). La
+  ligne est choisie chaque image par la **hauteur de la caméra au-dessus du sol**, par tranche de
+  512 m (`Terrain_UpdateLODPerFrame` : altitude caméra − `Terrain_HeightSample`, passée à
+  `Palette_SelectFogRow_2EA80`).
+- Les visionneuses (`tools/terrain_3d.html`, `tools/object_viewer.html`) prennent des paliers
+  régulièrement espacés entre un début et une fin réglables ; en RVB, mélange vers la couleur du
+  brouillard comme `glFog(GL_LINEAR)`.
+
 ## 4. Types de faces (octet 0 de `VTRI`)
 
 | Type | Éclairage | Dessin | Fonctions |

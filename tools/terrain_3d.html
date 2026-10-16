@@ -70,6 +70,14 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
     <label><input type="checkbox" id="labelsOn" checked> noms des objets</label>
     <label><input type="checkbox" id="skirtOn" checked> jupes : 4 cellules hors carte, cellule du bord répétée (comme le jeu)</label>
   </div>
+  <h2>Brouillard</h2>
+  <div class="opts">
+    <label><input type="checkbox" id="fogOn"> brouillard (Palette_ShadeIndexWithFog_2F24E)</label>
+    <label><input type="checkbox" id="fogSteps" checked> 32 paliers (comme le jeu)</label>
+    <label><input type="checkbox" id="fogSky" checked> fond = couleur du brouillard</label>
+    <label>début (m) <input type="number" id="fogStart" value="6000" min="0" max="200000" step="500"></label>
+    <label>fin (m) <input type="number" id="fogEnd" value="40000" min="500" max="400000" step="1000"></label>
+  </div>
   <h2>Jupes : essais esthétiques (pas le jeu)</h2>
   <div class="opts">
     <label><input type="checkbox" id="smoothOn" checked> lissage RVB</label>
@@ -81,7 +89,7 @@ ul.list li button:hover, ul.list li button:focus-visible { background: var(--acc
   </div>
   <h2>Aller à</h2>
   <ul class="list" id="goto"></ul>
-  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km. Essais esthétiques (absents du jeu) : lissage moyen RVB des jupes (rayon croissant avec la distance au bord, courbe en S sur « transition » cellules) et bruit qui fait glisser chaque couleur de base le long de sa gamme de palette, puis mélange les couleurs présentes autour (teintes de la carte uniquement) ; voir analysis/IMPL_TERRAIN_SKIRTS.md §5 à 5ter.</p>
+  <p class="note">Couleurs de PALETTE.IFF. Couleur de base du triangle = celle du sommet le plus haut (comparaison non signée) ; teinte du sommet = première + (éclairage × n + 128) ÷ 256 ; teinte interpolée sur le triangle et rendue en continu (mélange des deux couleurs de palette voisines) ; en ombrage plat, comme le mode « face unie » du jeu, le triangle prend la moyenne des 3 teintes (partie entière). Pistes : octet « couleur » comme index de palette, face unie. Textures du sol non dessinées. Diagonale des carrés non établie (réglable). Objets posés : simples repères. Brouillard : la teinte de chaque sommet glisse vers la teinte de brouillard de sa gamme (première + 3e champ de RANG, gris 192) selon sa profondeur, en 32 paliers ; les distances des paliers viennent du fichier « palfade » (absent du dépôt), une ligne de seuils par tranche de 512 m de hauteur de la caméra au-dessus du sol : ici début et fin réglables, paliers régulièrement espacés. Jupes : au-delà des bords, l'indice de cellule est borné à [0, 17] et la position dans la cellule continue (Terrain_BuildVertexWindow_3266E) : la cellule du bord se répète toutes les 20 km. Essais esthétiques (absents du jeu) : lissage moyen RVB des jupes (rayon croissant avec la distance au bord, courbe en S sur « transition » cellules) et bruit qui fait glisser chaque couleur de base le long de sa gamme de palette, puis mélange les couleurs présentes autour (teintes de la carte uniquement) ; voir analysis/IMPL_TERRAIN_SKIRTS.md §5 à 5ter.</p>
 </aside>
 <script>
 const D = /*__DATA__*/null;
@@ -109,9 +117,27 @@ const D = /*__DATA__*/null;
   const cv = document.getElementById("gl");
   const gl = cv.getContext("webgl", { antialias: true });
   if (!gl) { err("WebGL indisponible dans ce navigateur."); return; }
-  const vs = `attribute vec3 aPos; attribute float aShade; uniform mat4 uMVP;
+  // Brouillard (Palette_ShadeIndexWithFog_2F24E) : teinte = teinte éclairée + arrondi((teinte de brouillard
+  // − teinte éclairée) × f), f = (rang du seuil franchi + 1) / 32, 0 avant le 1er seuil, 1 après le dernier.
+  const FOG = `uniform vec3 uEye; uniform vec3 uFwd; uniform vec3 uFog; uniform float uFogSteps;
+    float fogF(vec3 p) {
+      if (uFog.x < 0.5) return 0.0;
+      float x = (dot(p - uEye, uFwd) - uFog.y) / max(1.0, uFog.z - uFog.y);
+      if (x <= 0.0) return 0.0;
+      if (x >= 1.0) return 1.0;
+      return uFogSteps > 0.5 ? (floor(x * 32.0) + 1.0) / 32.0 : x;
+    }`;
+  const vs = `attribute vec3 aPos; attribute float aShade; attribute float aFogTo; uniform mat4 uMVP;
     varying float vShade;
-    void main() { vShade = aShade; gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0); }`;
+    ` + FOG + `
+    void main() {
+      vShade = aShade;
+      if (aFogTo >= 0.0) {
+        float d = (aFogTo - aShade) * fogF(aPos);
+        vShade = aShade + (uFogSteps > 0.5 ? floor(d + 0.5) : d);
+      }
+      gl_Position = uMVP * vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    }`;
   const fs = `precision highp float; varying float vShade; uniform sampler2D uPal; uniform float uSmooth;
     vec4 pal(float idx) { return texture2D(uPal, vec2((clamp(idx, 0.0, 255.0) + 0.5) / 256.0, 0.5)); }
     void main() {
@@ -127,6 +153,10 @@ const D = /*__DATA__*/null;
   gl.attachShader(prog, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, shader(gl.FRAGMENT_SHADER, fs));
   gl.linkProgram(prog); gl.useProgram(prog);
   const aPos = gl.getAttribLocation(prog, "aPos"), aShade = gl.getAttribLocation(prog, "aShade");
+  const aFogTo = gl.getAttribLocation(prog, "aFogTo");
+  const fogLoc = (pr) => ({ eye: gl.getUniformLocation(pr, "uEye"), fwd: gl.getUniformLocation(pr, "uFwd"),
+    fog: gl.getUniformLocation(pr, "uFog"), steps: gl.getUniformLocation(pr, "uFogSteps"), col: gl.getUniformLocation(pr, "uFogColor") });
+  const fogU = fogLoc(prog);
   const uMVP = gl.getUniformLocation(prog, "uMVP");
   const uSmooth = gl.getUniformLocation(prog, "uSmooth");
 
@@ -140,19 +170,23 @@ const D = /*__DATA__*/null;
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-  function upload(pos, sh, old) {
-    const b = old || { p: gl.createBuffer(), s: gl.createBuffer() };
+  function upload(pos, sh, old, fogTo) {
+    const b = old || { p: gl.createBuffer(), s: gl.createBuffer(), f: gl.createBuffer() };
     gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
     gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.bufferData(gl.ARRAY_BUFFER, sh, gl.STATIC_DRAW);
+    b.hasFog = !!fogTo;
+    if (fogTo) { gl.bindBuffer(gl.ARRAY_BUFFER, b.f); gl.bufferData(gl.ARRAY_BUFFER, fogTo, gl.STATIC_DRAW); }
     b.n = sh.length; return b;
   }
+  // Gamme d'un index de palette (Table_LookupByRange_2E975) : index de sa teinte de brouillard, ou -1.
+  const fogToOf = (c) => { for (const r of RANG) { if (r[0] <= c && c <= r[0] + r[2]) return r[0] + r[2]; } return -1; };
   // terrain : 2 triangles par carré, sommets non partagés (couleur de base propre au triangle)
   let terrain = null, skirt = null;
   // skirt = 0 : la carte seule ; skirt > 0 : seulement les carrés hors de la carte, sur skirt cellules
   function buildMesh(slash, flat, sk, old) {
     const M = N - 1 + 2 * sk * CN;
     const ntri = (sk ? M * M - (N - 1) * (N - 1) : (N - 1) * (N - 1)) * 2;
-    const pos = new Float32Array(ntri * 9), sh = new Float32Array(ntri * 3);
+    const pos = new Float32Array(ntri * 9), sh = new Float32Array(ntri * 3), fz = new Float32Array(ntri * 3);
     let t = 0;
     const hu = (k) => H[k] & 0xFFFF;
     function tri(p0, p1, p2) {
@@ -167,6 +201,7 @@ const D = /*__DATA__*/null;
         const k = [k0, k1, k2][q], o = 3 * t;
         pos[o] = posX(p[1]); pos[o + 1] = H[k]; pos[o + 2] = posZ(p[0]);
         sh[t] = tones[q];
+        fz[t] = r[0] + r[2];
         t++;
       });
     }
@@ -178,7 +213,7 @@ const D = /*__DATA__*/null;
       if (!slash) { tri(A, B, Dd); tri(A, Dd, Cc); }
       else { tri(A, B, Cc); tri(Dd, Cc, B); }
     }
-    return upload(pos, sh, old);
+    return upload(pos, sh, old, fz);
   }
   function buildTerrain(slash, flat) {
     terrain = buildMesh(slash, flat, 0, terrain);
@@ -189,12 +224,25 @@ const D = /*__DATA__*/null;
   // --- essais esthétiques des jupes (pas le jeu) : lissage RVB et bruit dans les teintes de la carte ---
   const progRGB = gl.createProgram();
   gl.attachShader(progRGB, shader(gl.VERTEX_SHADER, `attribute vec3 aPos; attribute vec3 aCol; uniform mat4 uMVP;
-    varying vec3 vCol; void main() { vCol = aCol; gl_Position = uMVP * vec4(aPos, 1.0); }`));
+    uniform vec3 uFogColor;
+    ` + FOG + `
+    varying vec3 vCol; void main() { vCol = mix(aCol, uFogColor, fogF(aPos)); gl_Position = uMVP * vec4(aPos, 1.0); }`));
   gl.attachShader(progRGB, shader(gl.FRAGMENT_SHADER, `precision highp float; varying vec3 vCol;
     void main() { gl_FragColor = vec4(vCol, 1.0); }`));
   gl.linkProgram(progRGB);
   const aPosR = gl.getAttribLocation(progRGB, "aPos"), aColR = gl.getAttribLocation(progRGB, "aCol");
   const uMVPR = gl.getUniformLocation(progRGB, "uMVP");
+  const fogR = fogLoc(progRGB);
+  const FOGRGB = (() => { const k = RANG[1] ? RANG[1][0] + RANG[1][2] : 63; return [PAL[3 * k] / 255, PAL[3 * k + 1] / 255, PAL[3 * k + 2] / 255]; })();
+  let fogState = null;
+  function setFog(u) {
+    const s = fogState;
+    gl.uniform3f(u.eye, s.eye[0], s.eye[1], s.eye[2]);
+    gl.uniform3f(u.fwd, s.fwd[0], s.fwd[1], s.fwd[2]);
+    gl.uniform3f(u.fog, s.on ? 1 : 0, s.start, s.end);
+    gl.uniform1f(u.steps, s.steps ? 1 : 0);
+    if (u.col) { gl.uniform3f(u.col, FOGRGB[0], FOGRGB[1], FOGRGB[2]); }
+  }
   const num = (id) => parseFloat(document.getElementById(id).value) || 0;
   const chk = (id) => document.getElementById(id).checked;
   const outOf = (i, j) => Math.max(0, -i, i - (N - 1), -j, j - (N - 1));
@@ -297,17 +345,18 @@ const D = /*__DATA__*/null;
   function drawRGB(b, MVP) {
     gl.useProgram(progRGB);
     gl.uniformMatrix4fv(uMVPR, false, new Float32Array(MVP));
+    setFog(fogR);
     gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.enableVertexAttribArray(aPosR); gl.vertexAttribPointer(aPosR, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.enableVertexAttribArray(aColR); gl.vertexAttribPointer(aColR, 3, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, b.n / 3);
     gl.useProgram(prog);
   }
   const runways = (function () {
-    const pos = [], sh = [];
+    const pos = [], sh = [], fz = [];
     for (const r of D.runways) for (const [a, b, c, col] of r.t) for (const k of [a, b, c]) {
-      pos.push(r.v[k][0], r.y, -r.v[k][1]); sh.push(Math.min(col, 255));
+      pos.push(r.v[k][0], r.y, -r.v[k][1]); sh.push(Math.min(col, 255)); fz.push(fogToOf(Math.min(col, 255)));
     }
-    return upload(new Float32Array(pos), new Float32Array(sh));
+    return upload(new Float32Array(pos), new Float32Array(sh), null, new Float32Array(fz));
   })();
   const markers = (function () {
     const pos = [], sh = [];
@@ -375,6 +424,11 @@ const D = /*__DATA__*/null;
   function draw(b, mode) {
     gl.bindBuffer(gl.ARRAY_BUFFER, b.p); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, b.s); gl.enableVertexAttribArray(aShade); gl.vertexAttribPointer(aShade, 1, gl.FLOAT, false, 0, 0);
+    if (b.hasFog) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, b.f); gl.enableVertexAttribArray(aFogTo); gl.vertexAttribPointer(aFogTo, 1, gl.FLOAT, false, 0, 0);
+    } else {
+      gl.disableVertexAttribArray(aFogTo); gl.vertexAttrib1f(aFogTo, -1);
+    }
     gl.drawArrays(mode, 0, b.n);
   }
 
@@ -402,7 +456,11 @@ const D = /*__DATA__*/null;
     if (cam.y < g + 5) cam.y = g + 5;
 
     gl.viewport(0, 0, cv.width, cv.height);
-    gl.clearColor(0.55, 0.66, 0.78, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    fogState = { eye: [cam.x, cam.y, cam.z], fwd: f, on: chk("fogOn"), steps: chk("fogSteps"),
+      start: num("fogStart"), end: Math.max(num("fogStart") + 1, num("fogEnd")) };
+    if (fogState.on && chk("fogSky")) { gl.clearColor(FOGRGB[0], FOGRGB[1], FOGRGB[2], 1); } else { gl.clearColor(0.55, 0.66, 0.78, 1); }
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    setFog(fogU);
     gl.enable(gl.DEPTH_TEST);
     const near = Math.max(2, (cam.y - g) * 0.05);
     const MVP = mul(persp(60 * Math.PI / 180, cv.width / cv.height, near, 600000), look([cam.x, cam.y, cam.z], f));
