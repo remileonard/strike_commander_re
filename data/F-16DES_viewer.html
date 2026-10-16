@@ -88,8 +88,14 @@
     <option value="hybrid">entre-deux : RVB le long de la gamme</option>
     <option value="all">tout éclairé : RVB le long de la gamme, par sommet</option>
     <option value="sc">SCRenderer : RVB × lambert</option>
+    <option value="gl">OpenGL : GL_LIGHTING (GL_LIGHT0 directionnelle)</option>
   </select></label>
   <p class="note" id="colourNote"></p>
+  <div id="glopts">
+    <label><input id="glfacen" type="checkbox"> normales de face pour les types 4 et 7 (jeu)</label>
+    <label class="range">Spéculaire <input id="glspec" type="range" min="0" max="100" step="1" value="0"><output></output></label>
+    <label class="range">Brillance <input id="glshin" type="range" min="1" max="128" step="1" value="24"><output></output></label>
+  </div>
 
   <h2>Ordre de dessin</h2>
   <label><input type="radio" name="order" value="sort" checked> tri des faces du jeu, sans profondeur</label>
@@ -146,12 +152,37 @@ const FIXED_VS = `
 attribute vec3 aVertex;
 attribute vec4 aColor;
 attribute vec2 aTexCoord;
+attribute vec3 aNormal;
 uniform mat4 uProjection;
 uniform mat4 uModelView;
+// Éclairage du pipeline fixe : glEnable(GL_LIGHTING), GL_LIGHT0 directionnelle (w = 0),
+// GL_COLOR_MATERIAL (GL_AMBIENT_AND_DIFFUSE), GL_NORMALIZE, spéculaire à observateur infini.
+uniform bool uLighting;
+uniform vec3 uLightEye;      // direction vers la lumière, repère œil (glLightfv GL_POSITION)
+uniform vec3 uLightAmbient;  // GL_AMBIENT de GL_LIGHT0 (ambiant global du modèle = 0)
+uniform vec3 uLightDiffuse;  // GL_DIFFUSE
+uniform vec3 uSpecular;      // GL_SPECULAR lumière × matériau
+uniform float uShininess;    // GL_SHININESS
 varying vec4 vColor;
+varying vec4 vColorBack;     // GL_LIGHT_MODEL_TWO_SIDE : couleur de la face arrière
 varying vec2 vTexCoord;
+vec4 lit(vec3 n, vec4 m) {
+  float d = max(dot(n, uLightEye), 0.0);
+  vec3 c = m.rgb * (uLightAmbient + uLightDiffuse * d);
+  if (d > 0.0 && uShininess > 0.0) {
+    vec3 h = normalize(uLightEye + vec3(0.0, 0.0, 1.0));
+    c += uSpecular * pow(max(dot(n, h), 0.0), uShininess);
+  }
+  return vec4(min(c, vec3(1.0)), m.a);
+}
 void main() {
   vColor = aColor;
+  vColorBack = aColor;
+  if (uLighting) {
+    vec3 n = normalize(mat3(uModelView) * aNormal);
+    vColor = lit(n, aColor);
+    vColorBack = lit(-n, aColor);
+  }
   vTexCoord = aTexCoord;
   gl_Position = uProjection * uModelView * vec4(aVertex, 1.0);
 }`;
@@ -162,13 +193,15 @@ uniform bool uTexture2D;     // glEnable(GL_TEXTURE_2D), mode GL_MODULATE
 uniform bool uInterpolate;   // GL_COMBINE : RGB = INTERPOLATE(texture, couleur, alpha couleur), A = REPLACE(texture)
 uniform bool uAlphaTest;     // glEnable(GL_ALPHA_TEST)
 uniform float uAlphaRef;     // glAlphaFunc(GL_GREATER, ref)
+uniform bool uTwoSide;       // GL_LIGHT_MODEL_TWO_SIDE
 varying vec4 vColor;
+varying vec4 vColorBack;
 varying vec2 vTexCoord;
 void main() {
-  vec4 c = vColor;
+  vec4 c = (uTwoSide && !gl_FrontFacing) ? vColorBack : vColor;
   if (uTexture2D) {
     vec4 t = texture2D(uTexture, vTexCoord);
-    if (uInterpolate) { c = vec4(mix(vColor.rgb, t.rgb, vColor.a), t.a); } else { c *= t; }
+    if (uInterpolate) { c = vec4(mix(c.rgb, t.rgb, c.a), t.a); } else { c *= t; }
   }
   if (uAlphaTest && !(c.a > uAlphaRef)) { discard; }
   gl_FragColor = c;
@@ -198,15 +231,39 @@ const fixed = (() => {
     tex: gl.getUniformLocation(p, "uTexture"),
     tex2d: gl.getUniformLocation(p, "uTexture2D"),
     interp: gl.getUniformLocation(p, "uInterpolate"),
+    n: gl.getAttribLocation(p, "aNormal"),
+    lighting: gl.getUniformLocation(p, "uLighting"),
+    lightEye: gl.getUniformLocation(p, "uLightEye"),
+    lightAmb: gl.getUniformLocation(p, "uLightAmbient"),
+    lightDif: gl.getUniformLocation(p, "uLightDiffuse"),
+    spec: gl.getUniformLocation(p, "uSpecular"),
+    shin: gl.getUniformLocation(p, "uShininess"),
+    twoSide: gl.getUniformLocation(p, "uTwoSide"),
     at: gl.getUniformLocation(p, "uAlphaTest"),
     aref: gl.getUniformLocation(p, "uAlphaRef"),
   };
   gl.uniform1i(loc.tex, 0);
   const buf = gl.createBuffer();
-  return { loc, buf, mode: 0, data: [], color: [1, 1, 1, 1], uv: [0, 0], texture2D: false, alphaTest: false };
+  return { loc, buf, mode: 0, data: [], color: [1, 1, 1, 1], uv: [0, 0], normal: [0, 1, 0], texture2D: false, alphaTest: false, lighting: false, twoSide: false };
 })();
 function glEnableTexture2D(on) { fixed.texture2D = on; }
 function glTexEnvInterpolate(on) { fixed.interpolate = on; }
+function glEnableLighting(on) { fixed.lighting = on; }
+function glLightModelTwoSide(on) { fixed.twoSide = on; }
+function glNormal3f(x, y, z) { fixed.normal = [x, y, z]; }
+// GL_LIGHT0 directionnelle : direction donnée dans le monde, passée en repère œil par la vue
+// (comme glLightfv(GL_LIGHT0, GL_POSITION, {x, y, z, 0}) appelé avec la seule matrice de vue).
+function glLight0(view, dirWorld, ambient, diffuse, specular, shininess) {
+  const e = [view[0] * dirWorld[0] + view[4] * dirWorld[1] + view[8] * dirWorld[2],
+             view[1] * dirWorld[0] + view[5] * dirWorld[1] + view[9] * dirWorld[2],
+             view[2] * dirWorld[0] + view[6] * dirWorld[1] + view[10] * dirWorld[2]];
+  const l = Math.hypot(e[0], e[1], e[2]) || 1;
+  gl.uniform3f(fixed.loc.lightEye, e[0] / l, e[1] / l, e[2] / l);
+  gl.uniform3f(fixed.loc.lightAmb, ambient, ambient, ambient);
+  gl.uniform3f(fixed.loc.lightDif, diffuse, diffuse, diffuse);
+  gl.uniform3f(fixed.loc.spec, specular, specular, specular);
+  gl.uniform1f(fixed.loc.shin, shininess);
+}
 function glAlphaTest(on, ref) { fixed.alphaTest = on; fixed.alphaRef = ref; }
 function glLoadMatrices(projection, modelView) {
   gl.uniformMatrix4fv(fixed.loc.proj, false, projection);
@@ -217,24 +274,29 @@ function glColor4f(r, g, b, a) { fixed.color = [r, g, b, a]; }
 function glTexCoord2f(u, v) { fixed.uv = [u, v]; }
 function glVertex3f(x, y, z) {
   const c = fixed.color;
-  fixed.data.push(x, y, z, c[0], c[1], c[2], c[3], fixed.uv[0], fixed.uv[1]);
+  const n = fixed.normal;
+  fixed.data.push(x, y, z, c[0], c[1], c[2], c[3], fixed.uv[0], fixed.uv[1], n[0], n[1], n[2]);
 }
 function glEnd() {
-  const n = fixed.data.length / 9;
+  const n = fixed.data.length / 12;
   if (!n) { return; }
   gl.uniform1i(fixed.loc.tex2d, fixed.texture2D ? 1 : 0);
   gl.uniform1i(fixed.loc.interp, fixed.interpolate ? 1 : 0);
+  gl.uniform1i(fixed.loc.lighting, fixed.lighting ? 1 : 0);
+  gl.uniform1i(fixed.loc.twoSide, fixed.twoSide ? 1 : 0);
   gl.uniform1i(fixed.loc.at, fixed.alphaTest ? 1 : 0);
   gl.uniform1f(fixed.loc.aref, fixed.alphaRef || 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, fixed.buf);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(fixed.data), gl.STREAM_DRAW);
-  const S = 9 * 4;
+  const S = 12 * 4;
   gl.enableVertexAttribArray(fixed.loc.v);
   gl.vertexAttribPointer(fixed.loc.v, 3, gl.FLOAT, false, S, 0);
   gl.enableVertexAttribArray(fixed.loc.c);
   gl.vertexAttribPointer(fixed.loc.c, 4, gl.FLOAT, false, S, 12);
   gl.enableVertexAttribArray(fixed.loc.t);
   gl.vertexAttribPointer(fixed.loc.t, 2, gl.FLOAT, false, S, 28);
+  gl.enableVertexAttribArray(fixed.loc.n);
+  gl.vertexAttribPointer(fixed.loc.n, 3, gl.FLOAT, false, S, 36);
   gl.drawArrays(fixed.mode, 0, n);
 }
 
@@ -414,7 +476,7 @@ function litFlat(c, i) {           // types 4 et 7
   return shade(r, i, c - rang[r][0]);
 }
 function rgbOf(index) { return [pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255]; }
-const colourMode = () => ui.colour.value;       // "game", "hybrid", "all", "sc"
+const colourMode = () => ui.colour.value;       // "game", "hybrid", "all", "sc", "gl"
 
 // ---- Entre-deux : règles du jeu (quelles faces sont éclairées, normale de face ou de sommet,
 // lumière directionnelle du LGHT) mais teintes continues en RVB le long de la gamme RANG.
@@ -459,6 +521,19 @@ function faceColors(fi, frontSeen) {
   const colour = f[4];
   const vs = [f[1], f[2], f[3]];
   const mode = colourMode();
+  if (mode === "gl") {
+    // GL_COLOR_MATERIAL : la couleur de la face est le matériau, l'éclairage est fait par GL.
+    if (kind === 2) { return null; }
+    if (kind === 6) {
+      if (ui.tex.checked) { return null; }
+      const t = uvOf[fi];
+      if (!t || t[0] >= textures.length) { return null; }
+      const c = rgbOf(textures[t[0]].first);
+      return [c, c, c];
+    }
+    const c = rgbOf(colour);
+    return [c, c, c];
+  }
   if (mode === "sc") {
     if (kind === 2) { return null; }
     if ((kind === 6 || kind === 9) && ui.tex.checked) { return null; }
@@ -549,6 +624,7 @@ function textureFactors(fi, frontSeen) {
 }
 function hasTexturePass(fi) {
   if (!uvOf[fi] || uvOf[fi][0] >= textures.length) { return false; }
+  if (colourMode() === "gl") { const k = faces[fi][0]; return k === 6 || k === 7 || k === 8; }
   if (colourMode() === "sc") { return currentLevel === 0; }         // SCRenderer : textures au LOD 0
   const k = faces[fi][0];
   return k === 6 || k === 7 || k === 8;
@@ -558,18 +634,33 @@ function hasTexturePass(fi) {
 // Rendu, découpé comme SCRenderer::drawModel (passe couleur, passe texture, passe transparente).
 // =====================================================================================
 let currentLevel = 0;
+// Mode OpenGL : normale envoyée par glNormal3f (repère de l'objet) et face double en éclairage deux faces.
+function glFaceSetup(fi) {
+  const on = colourMode() === "gl";
+  glEnableLighting(on);
+  glLightModelTwoSide(on && (faces[fi][7] & 1) === 1);
+  return on;
+}
+function glNormalFor(fi, j) {
+  const f = faces[fi];
+  const n = (ui.glfacen.checked && (f[0] === 4 || f[0] === 7)) ? faceNormal[fi] : vertexNormal[f[1 + j]];
+  glNormal3f(n[0], n[1], n[2]);
+}
 function drawFaceColor(fi, frontSeen) {
   const cols = faceColors(fi, frontSeen);
   if (!cols) { return; }
   const f = faces[fi];
+  const lighting = glFaceSetup(fi);
   glEnableTexture2D(false);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
+    if (lighting) { glNormalFor(fi, j); }
     glColor4f(cols[j][0], cols[j][1], cols[j][2], 1);
     glVertex3f(v[0], v[1], v[2]);
   }
   glEnd();
+  glEnableLighting(false);
 }
 function drawFaceTexture(fi, frontSeen) {
   if (!ui.tex.checked || !hasTexturePass(fi)) { return; }
@@ -577,7 +668,10 @@ function drawFaceTexture(fi, frontSeen) {
   const uv = uvOf[fi];
   const tex = textures[uv[0]];
   const k = textureFactors(fi, frontSeen);
-  const interp = ui.texenv.value === "interpolate";
+  const lighting = glFaceSetup(fi);
+  // Avec GL_LIGHTING, l'alpha de la couleur éclairée est celui du matériau : pas d'intensité à
+  // interpoler, la texture est modulée par la couleur éclairée d'un matériau blanc.
+  const interp = !lighting && ui.texenv.value === "interpolate";
   const ramp = rampOf(f[4]);
   const shadow = ramp >= 0 ? rgbOf(rang[ramp][0]) : [0, 0, 0];
   glTexEnvInterpolate(interp);
@@ -587,7 +681,10 @@ function drawFaceTexture(fi, frontSeen) {
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
-    if (interp) {
+    if (lighting) {
+      glNormalFor(fi, j);
+      glColor4f(1, 1, 1, 1);
+    } else if (interp) {
       glColor4f(shadow[0], shadow[1], shadow[2], k[j]);   // RVB = ombre, A = intensité
     } else {
       glColor4f(k[j], k[j], k[j], 1);
@@ -598,22 +695,26 @@ function drawFaceTexture(fi, frontSeen) {
   }
   glEnd();
   glEnableTexture2D(false);
+  glEnableLighting(false);
 }
 function drawFaceTransparent(fi) {
   const f = faces[fi];
   if (f[0] !== 2) { return; }
   const sc = colourMode() === "sc";
   if (sc) { gl.blendFunc(gl.ONE, gl.ONE); }                         // SCRenderer : glBlendFunc(GL_ONE, GL_ONE)
+  const lighting = glFaceSetup(fi);
   glEnableTexture2D(false);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
+    if (lighting) { glNormalFor(fi, j); }
     const c = rgbOf(f[4]);
     const k = sc ? lambertSC(vertexNormal[f[1 + j]], f[7] & 1) : 1;
     glColor4f(c[0] * k, c[1] * k, c[2] * k, 0.5);                  // APPROX : table de translucidité absente
     glVertex3f(v[0], v[1], v[2]);
   }
   glEnd();
+  glEnableLighting(false);
   if (sc) { gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); }
 }
 
@@ -665,6 +766,8 @@ function drawModel() {
   const total = Math.max(1, aw + lw);
   ambient = Math.floor(aw * 255 / total);
   share = Math.floor(lw * 255 / total);
+  // GL_LIGHT0 : mêmes parts que le LGHT (ambiante, diffuse), direction fixe dans le monde.
+  glLight0(view, lightWorld, ambient / 255, share / 255, +ui.glspec.value / 100, +ui.glshin.value);
 
   const bg = ui.bg.value === "sky" ? [0.42, 0.55, 0.70] : ui.bg.value === "grey" ? [0.35, 0.35, 0.35] : [0, 0, 0];
   gl.viewport(0, 0, canvas.width, canvas.height);
@@ -765,14 +868,14 @@ function resize() {
   const h = low ? 200 : Math.round(w * 200 / 320);
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
 }
-for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw", "oyaw", "opitch", "oroll"]) {
+for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw", "oyaw", "opitch", "oroll", "glspec", "glshin"]) {
   ui[id] = $(id);
   const out = ui[id].parentElement.querySelector("output");
   const upd = () => { out.textContent = Math.round(ui[id].value); };
   ui[id].addEventListener("input", () => { upd(); drawModel(); });
   upd();
 }
-for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour", "texenv", "aref", "bleed", "mip"]) {
+for (const id of ["tex", "gouraud", "low", "linear", "spin", "ospin", "lod", "bg", "colour", "texenv", "aref", "bleed", "mip", "glfacen"]) {
   ui[id] = $(id);
   ui[id].addEventListener("change", () => { resize(); setFiltering(); drawModel(); });
 }
@@ -847,9 +950,13 @@ const COLOUR_NOTES = {
   game: "Règles du jeu : teinte entière de la gamme RANG, faces 1/5/6 non éclairées, 4/7 par face, 3/8 par sommet.",
   hybrid: "Mêmes règles d'éclairage que le jeu (types, normales, lumière directionnelle du LGHT), mais la teinte glisse en continu entre les couleurs de la gamme ; textures × intensité.",
   all: "Toutes les faces éclairées (y compris 1, 5 et 6), par sommet avec les normales de sommet, formule de lumière du jeu ; teinte continue en RVB le long de la gamme RANG ; textures × intensité du sommet.",
+  gl: "Vraie lumière du pipeline fixe : glEnable(GL_LIGHTING), GL_LIGHT0 directionnelle (w = 0) fixée dans le monde, ambiante et diffuse = parts du LGHT, GL_COLOR_MATERIAL (couleur de la face = matériau), glNormal3f par sommet, GL_LIGHT_MODEL_TWO_SIDE pour les faces doubles, spéculaire réglable. Calcul par sommet en repère œil, couleur interpolée par GL. Textures : GL_MODULATE avec un matériau blanc.",
   sc: "Comme SCRenderer::drawModel : lambert par sommet pour toutes les faces (ambiante 0,4, |N·L| si face double), RVB × lambert, textures au LOD 0 seulement, transparentes en GL_ONE/GL_ONE. Lumière prise directionnelle (SCRenderer : ponctuelle).",
 };
-function updateColourNote() { $("colourNote").textContent = COLOUR_NOTES[ui.colour.value]; }
+function updateColourNote() {
+  $("colourNote").textContent = COLOUR_NOTES[ui.colour.value];
+  $("glopts").style.display = ui.colour.value === "gl" ? "" : "none";
+}
 ui.colour.addEventListener("change", updateColourNote);
 updateColourNote();
 setFiltering();
