@@ -84,6 +84,7 @@
   <label>Mode <select id="colour">
     <option value="game">jeu : index de la gamme RANG</option>
     <option value="hybrid">entre-deux : RVB le long de la gamme</option>
+    <option value="all">tout éclairé : RVB le long de la gamme, par sommet</option>
     <option value="sc">SCRenderer : RVB × lambert</option>
   </select></label>
   <p class="note" id="colourNote"></p>
@@ -340,7 +341,7 @@ function litFlat(c, i) {           // types 4 et 7
   return shade(r, i, c - rang[r][0]);
 }
 function rgbOf(index) { return [pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255]; }
-const colourMode = () => ui.colour.value;       // "game", "hybrid", "sc"
+const colourMode = () => ui.colour.value;       // "game", "hybrid", "all", "sc"
 
 // ---- Entre-deux : règles du jeu (quelles faces sont éclairées, normale de face ou de sommet,
 // lumière directionnelle du LGHT) mais teintes continues en RVB le long de la gamme RANG.
@@ -392,6 +393,21 @@ function faceColors(fi, frontSeen) {
     return vs.map((v) => { const k = lambertSC(vertexNormal[v], f[7] & 1); return [c[0] * k, c[1] * k, c[2] * k]; });
   }
   if (kind === 2) { return null; }                                   // passe transparente
+  if (mode === "all") {
+    // Tout éclairé : chaque sommet reçoit l'intensité de sa normale (normale de face inversée
+    // pour une face double vue de dos), teinte continue le long de la gamme RANG.
+    if (kind === 6 && ui.tex.checked) { return null; }
+    let c0 = colour;
+    if (kind === 6) {
+      const t = uvOf[fi];
+      if (!t || t[0] >= textures.length) { return null; }
+      c0 = textures[t[0]].first;
+    }
+    const cs = vs.map((v) => shadeAlongRamp(c0, intensityF(allNormal(fi, v, frontSeen))));
+    if (ui.gouraud.checked) { return cs; }
+    const m = [0, 1, 2].map((q) => (cs[0][q] + cs[1][q] + cs[2][q]) / 3);
+    return [m, m, m];
+  }
   if (kind === 6) {
     if (ui.tex.checked) { return null; }                             // texture seule
     const t = uvOf[fi];
@@ -430,12 +446,19 @@ function faceColors(fi, frontSeen) {
   return [c, c, c];
 }
 
+// Normale d'un sommet en mode « tout éclairé » : normale de sommet ; pour une face double vue de
+// dos, normale de face inversée (la normale de sommet ne dit rien du côté vu).
+function allNormal(fi, v, frontSeen) {
+  if ((faces[fi][7] & 1) && !frontSeen) { return litNormal(fi, frontSeen); }
+  return vertexNormal[v];
+}
 // Facteur GL_MODULATE de la texture, par sommet.
 function textureFactors(fi, frontSeen) {
   const f = faces[fi];
   const vs = [f[1], f[2], f[3]];
   const mode = colourMode();
   if (mode === "sc") { return vs.map((v) => lambertSC(vertexNormal[v], f[7] & 1)); }
+  if (mode === "all") { return vs.map((v) => intensityF(allNormal(fi, v, frontSeen))); }
   if (f[0] === 6) { return [1, 1, 1]; }                              // non éclairée
   if (mode === "hybrid") {
     if (f[0] === 8) { return vs.map((v) => intensityF(vertexNormal[v])); }
@@ -730,6 +753,7 @@ function tick() {
 const COLOUR_NOTES = {
   game: "Règles du jeu : teinte entière de la gamme RANG, faces 1/5/6 non éclairées, 4/7 par face, 3/8 par sommet.",
   hybrid: "Mêmes règles d'éclairage que le jeu (types, normales, lumière directionnelle du LGHT), mais la teinte glisse en continu entre les couleurs de la gamme ; textures × intensité.",
+  all: "Toutes les faces éclairées (y compris 1, 5 et 6), par sommet avec les normales de sommet, formule de lumière du jeu ; teinte continue en RVB le long de la gamme RANG ; textures × intensité du sommet.",
   sc: "Comme SCRenderer::drawModel : lambert par sommet pour toutes les faces (ambiante 0,4, |N·L| si face double), RVB × lambert, textures au LOD 0 seulement, transparentes en GL_ONE/GL_ONE. Lumière prise directionnelle (SCRenderer : ponctuelle).",
 };
 function updateColourNote() { $("colourNote").textContent = COLOUR_NOTES[ui.colour.value]; }
