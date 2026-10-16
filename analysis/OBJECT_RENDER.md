@@ -4,6 +4,8 @@ Ce document décrit **ce que fait le code** pour dessiner un objet (avion, véhi
 Le format des chunks est dans `DATA_MODEL.md` (§ « Apparence 3D FORM POLY ») et dans
 `DATA_MODEL.html`. L'outil `tools/object_render.py` reproduit ce chemin (rendu logiciel 320×200)
 et a servi à produire `data/F-16DES_render.png` et `data/F-16DES_render_sheet.png`.
+`tools/object_viewer.py` produit la même chose en WebGL dans une page autonome
+(`data/F-16DES_viewer.html` : orbite à la souris, niveau de détail, options du jeu).
 
 Repère : les formules sont écrites comme dans le jeu (Z-up : c0 = droite de l'objet, c1 = nez,
 c2 = haut). Pour libRealSpace : `x = c0`, `y = c2`, `z = −c1`. Ce changement de repère est une

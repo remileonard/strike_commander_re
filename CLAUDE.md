@@ -258,6 +258,7 @@ strike_commander_re/
     │                                  vue 3D WebGL <nom>_3d.html générée avec la visionneuse ;
     │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
     ├── object_render.py             rendu logiciel d'un objet .IFF comme le jeu (OBJECT_RENDER.md) → PNG
+    ├── object_viewer.py (+ .html)   même rendu en WebGL : page autonome <objet>_viewer.html (orbite, LOD, options)
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer
