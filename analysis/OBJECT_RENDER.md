@@ -140,6 +140,8 @@ de chaque paire de `UVXY` (colonne), `v` = 2e (ligne). `0xFF` = transparent (`cm
 
 ## 5. Pour le portage (pipeline fixe)
 
+Le guide de portage détaillé, avec le C++, est `IMPL_OBJECT_RENDER.md`.
+
 - Un sommet de modèle n'a qu'une position. **Normale de face** pour les types 4, 7 ; **normale de
   sommet** (somme normalisée des normales de face) pour les types 3, 8.
 - Face double : pas de rejet ; pour l'éclairage, normale inversée si le triangle est vu de dos.

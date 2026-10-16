@@ -219,6 +219,8 @@ strike_commander_re/
 │   ├── IMPL_TERRAIN_SKIRTS.md       à porter : jupes du terrain hors carte (cellule du bord répétée)
 │   ├── OBJECT_RENDER.md             rendu des objets 3D (FORM POLY) : niveaux de détail, rejet, tri,
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
+│   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
+│   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
