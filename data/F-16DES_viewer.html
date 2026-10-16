@@ -51,7 +51,9 @@
 <aside>
   <h1>F-16DES.IFF</h1>
   <p class="sub">Pipeline fixe à la manière de SCRenderer (glBegin / glColor / glTexCoord, GL_MODULATE,
-  test alpha), couleurs choisies selon les règles du jeu (OBJECT_RENDER.md). Glisser = tourner, molette = distance.</p>
+  test alpha), couleurs choisies selon les règles du jeu (OBJECT_RENDER.md). Glisser = tourner l'objet (Maj = roulis),
+  molette = distance.</p>
+  <label>Souris <select id="mouse"><option value="object">tourne l'objet (lumière fixe)</option><option value="camera">tourne la caméra</option></select></label>
 
   <h2>Vue</h2>
   <label class="range">Cap <input id="yaw" type="range" min="-180" max="180" step="1" value="35"><output></output></label>
@@ -710,16 +712,28 @@ document.querySelectorAll("button[data-view]").forEach((b) => b.addEventListener
 let drag = null;
 canvas.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY]; canvas.setPointerCapture(e.pointerId); });
 canvas.addEventListener("pointerup", () => { drag = null; });
+const wrap180 = (a) => (a > 180 ? a - 360 : a < -180 ? a + 360 : a);
+function nudge(id, value) {
+  ui[id].value = value;
+  ui[id].dispatchEvent(new Event("input"));
+}
 canvas.addEventListener("pointermove", (e) => {
   if (!drag) { return; }
-  let y = +ui.yaw.value + (e.clientX - drag[0]) * 0.5;
-  if (y > 180) { y -= 360; }
-  if (y < -180) { y += 360; }
-  ui.yaw.value = y;
-  ui.pitch.value = Math.max(-89, Math.min(89, +ui.pitch.value + (e.clientY - drag[1]) * 0.5));
+  const dx = (e.clientX - drag[0]) * 0.5;
+  const dy = (e.clientY - drag[1]) * 0.5;
   drag = [e.clientX, e.clientY];
-  ui.yaw.dispatchEvent(new Event("input"));
-  ui.pitch.dispatchEvent(new Event("input"));
+  if ($("mouse").value === "object") {
+    // Objet : glisser à droite = nez vers la droite, vers le haut = nez vers le haut ; Maj = roulis.
+    if (e.shiftKey) {
+      nudge("oroll", wrap180(+ui.oroll.value + dx));
+    } else {
+      nudge("oyaw", wrap180(+ui.oyaw.value + dx));
+      nudge("opitch", Math.max(-90, Math.min(90, +ui.opitch.value - dy)));
+    }
+    return;
+  }
+  nudge("yaw", wrap180(+ui.yaw.value + dx));
+  nudge("pitch", Math.max(-89, Math.min(89, +ui.pitch.value + dy)));
 });
 canvas.addEventListener("wheel", (e) => {
   e.preventDefault();
