@@ -71,6 +71,14 @@
   <h2>Niveau de détail</h2>
   <label>Niveau <select id="lod"></select></label>
 
+  <h2>Couleurs</h2>
+  <label>Mode <select id="colour">
+    <option value="game">jeu : index de la gamme RANG</option>
+    <option value="hybrid">entre-deux : RVB le long de la gamme</option>
+    <option value="sc">SCRenderer : RVB × lambert</option>
+  </select></label>
+  <p class="note" id="colourNote"></p>
+
   <h2>Ordre de dessin</h2>
   <label><input type="radio" name="order" value="sort" checked> tri des faces du jeu, sans profondeur</label>
   <label><input type="radio" name="order" value="depth"> 3 passes + tampon de profondeur (SCRenderer)</label>
@@ -297,56 +305,129 @@ function litFlat(c, i) {           // types 4 et 7
   if (r < 0) { return remap[tableLevel(i) * 256 + c]; }
   return shade(r, i, c - rang[r][0]);
 }
-function glColorIndex(index, alpha) {
-  glColor4f(pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255, alpha);
+function rgbOf(index) { return [pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255]; }
+const colourMode = () => ui.colour.value;       // "game", "hybrid", "sc"
+
+// ---- Entre-deux : règles du jeu (quelles faces sont éclairées, normale de face ou de sommet,
+// lumière directionnelle du LGHT) mais teintes continues en RVB le long de la gamme RANG.
+function intensityF(n) {            // même formule que le jeu, sans arrondi : 0..1
+  const d = dot(lightDir, n);
+  return Math.min(255, ambient + (d > 0 ? d * share : 0)) / 255;
+}
+function shadeAlongRamp(colour, i) { // i = 1 → la couleur elle-même ; i = 0 → 1re teinte de la gamme
+  const r = rampOf(colour);
+  if (r < 0) { const c = rgbOf(colour); return [c[0] * i, c[1] * i, c[2] * i]; }
+  const first = rang[r][0];
+  let n = colour - first;
+  if (n === 0) { n = rang[r][1]; }
+  const tt = i * n;
+  const k0 = Math.min(n - 1, Math.floor(tt));
+  const f = tt - k0;
+  const ca = rgbOf(first + k0);
+  const cb = rgbOf(first + k0 + 1);
+  return [ca[0] + (cb[0] - ca[0]) * f, ca[1] + (cb[1] - ca[1]) * f, ca[2] + (cb[2] - ca[2]) * f];
 }
 
-// Couleur de chaque sommet d'une face, selon son type (octet 0 de VTRI).
+// ---- À la SCRenderer : lambert par sommet pour toutes les faces, ambiante 0,4, |N·L| pour les
+// faces doubles, couleur = RVB de la palette × lambert (ComputeLambertAt / ComputeLambertAtTwoSided).
+function lambertSC(n, twoSided) {
+  let d = dot(norm(n), lightDir);
+  if (twoSided) { d = Math.abs(d); } else if (d < 0) { d = 0; }
+  return Math.min(1, d + 0.4);
+}
+
+// Normale d'éclairage d'une face (jeu et entre-deux) : face double vue de dos → inversée.
+function litNormal(fi, frontSeen) {
+  const n = faceNormal[fi];
+  if ((faces[fi][7] & 1) && !frontSeen) { return [-n[0], -n[1], -n[2]]; }  // Face_LightFlat_29A7D
+  return n;
+}
+
+// Couleur RVB de chaque sommet d'une face, selon son type (octet 0 de VTRI) et le mode choisi.
 // Rend null si la face n'a pas de passe couleur.
 function faceColors(fi, frontSeen) {
   const f = faces[fi];
   const kind = f[0];
   const colour = f[4];
-  let n = faceNormal[fi];
-  if ((f[7] & 1) && !frontSeen) { n = [-n[0], -n[1], -n[2]]; }   // Face_LightFlat_29A7D
-  if (kind === 1 || kind === 5 || kind > 9) { return [colour, colour, colour]; }   // non éclairée
-  if (kind === 4 || kind === 7) { const c = litFlat(colour, intensity(n)); return [c, c, c]; }
-  if (kind === 3 || kind === 8) {                                    // éclairée par sommet
+  const vs = [f[1], f[2], f[3]];
+  const mode = colourMode();
+  if (mode === "sc") {
+    if (kind === 2) { return null; }
+    if ((kind === 6 || kind === 9) && ui.tex.checked) { return null; }
+    const c = rgbOf(colour);
+    return vs.map((v) => { const k = lambertSC(vertexNormal[v], f[7] & 1); return [c[0] * k, c[1] * k, c[2] * k]; });
+  }
+  if (kind === 2) { return null; }                                   // passe transparente
+  if (kind === 6) {
+    if (ui.tex.checked) { return null; }                             // texture seule
+    const t = uvOf[fi];
+    if (!t || t[0] >= textures.length) { return null; }
+    const c = rgbOf(textures[t[0]].first);                           // texture coupée : 1er texel
+    return [c, c, c];
+  }
+  if (kind === 1 || kind === 5 || kind > 9) {                        // non éclairée
+    const c = rgbOf(colour);
+    return [c, c, c];
+  }
+  const n = litNormal(fi, frontSeen);
+  if (mode === "hybrid") {
+    if (kind === 3 || kind === 8) {
+      const cs = vs.map((v) => shadeAlongRamp(colour, intensityF(vertexNormal[v])));
+      if (ui.gouraud.checked) { return cs; }
+      const m = [0, 1, 2].map((q) => (cs[0][q] + cs[1][q] + cs[2][q]) / 3);
+      return [m, m, m];
+    }
+    const c = shadeAlongRamp(colour, intensityF(n));
+    return [c, c, c];
+  }
+  if (kind === 4 || kind === 7) {                                    // jeu : par face
+    const c = rgbOf(litFlat(colour, intensity(n)));
+    return [c, c, c];
+  }
+  if (kind === 3 || kind === 8) {                                    // jeu : par sommet
     let r = rampOf(colour);
     let ov = 0;
     if (r < 0) { r = 0; } else { ov = colour - rang[r][0]; }
-    const idx = [f[1], f[2], f[3]].map((v) => shade(r, intensity(vertexNormal[v]), ov));
-    if (!ui.gouraud.checked) { const m = Math.floor((idx[0] + idx[1] + idx[2]) / 3); return [m, m, m]; }
-    return idx;
+    const idx = vs.map((v) => shade(r, intensity(vertexNormal[v]), ov));
+    if (!ui.gouraud.checked) { const m = Math.floor((idx[0] + idx[1] + idx[2]) / 3); return [rgbOf(m), rgbOf(m), rgbOf(m)]; }
+    return idx.map(rgbOf);
   }
-  if (kind === 6 && !ui.tex.checked) {                               // texture coupée : 1er texel
-    const t = uvOf[fi];
-    return t && t[0] < textures.length ? [textures[t[0]].first, textures[t[0]].first, textures[t[0]].first] : null;
-  }
-  return null;                                                       // 2 (transparente), 6 (texture seule)
+  const c = rgbOf(colour);
+  return [c, c, c];
 }
-// Facteur GL_MODULATE de la texture : approximation de la table FADE (0..16 pas).
-function textureFactor(fi, frontSeen) {
+
+// Facteur GL_MODULATE de la texture, par sommet.
+function textureFactors(fi, frontSeen) {
   const f = faces[fi];
-  if (f[0] === 6) { return 1; }                                      // non éclairée
-  let i;
-  if (f[0] === 8) {
-    i = Math.floor((intensity(vertexNormal[f[1]]) + intensity(vertexNormal[f[2]]) + intensity(vertexNormal[f[3]])) / 3);
-  } else {
-    let n = faceNormal[fi];
-    if ((f[7] & 1) && !frontSeen) { n = [-n[0], -n[1], -n[2]]; }
-    i = intensity(n);
+  const vs = [f[1], f[2], f[3]];
+  const mode = colourMode();
+  if (mode === "sc") { return vs.map((v) => lambertSC(vertexNormal[v], f[7] & 1)); }
+  if (f[0] === 6) { return [1, 1, 1]; }                              // non éclairée
+  if (mode === "hybrid") {
+    if (f[0] === 8) { return vs.map((v) => intensityF(vertexNormal[v])); }
+    const k = intensityF(litNormal(fi, frontSeen));
+    return [k, k, k];
   }
-  return 1 - tableLevel(i) / 17;
+  let i;                                                             // jeu : approximation de la table FADE
+  if (f[0] === 8) {
+    i = Math.floor(vs.reduce((s, v) => s + intensity(vertexNormal[v]), 0) / 3);
+  } else {
+    i = intensity(litNormal(fi, frontSeen));
+  }
+  const k = 1 - tableLevel(i) / 17;
+  return [k, k, k];
 }
 function hasTexturePass(fi) {
+  if (!uvOf[fi] || uvOf[fi][0] >= textures.length) { return false; }
+  if (colourMode() === "sc") { return currentLevel === 0; }         // SCRenderer : textures au LOD 0
   const k = faces[fi][0];
-  return (k === 6 || k === 7 || k === 8) && uvOf[fi] && uvOf[fi][0] < textures.length;
+  return k === 6 || k === 7 || k === 8;
 }
 
 // =====================================================================================
 // Rendu, découpé comme SCRenderer::drawModel (passe couleur, passe texture, passe transparente).
 // =====================================================================================
+let currentLevel = 0;
 function drawFaceColor(fi, frontSeen) {
   const cols = faceColors(fi, frontSeen);
   if (!cols) { return; }
@@ -355,7 +436,7 @@ function drawFaceColor(fi, frontSeen) {
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
-    glColorIndex(cols[j], 1);
+    glColor4f(cols[j][0], cols[j][1], cols[j][2], 1);
     glVertex3f(v[0], v[1], v[2]);
   }
   glEnd();
@@ -365,14 +446,14 @@ function drawFaceTexture(fi, frontSeen) {
   const f = faces[fi];
   const uv = uvOf[fi];
   const tex = textures[uv[0]];
-  const k = textureFactor(fi, frontSeen);
+  const k = textureFactors(fi, frontSeen);
   gl.activeTexture(gl.TEXTURE0);
   gl.bindTexture(gl.TEXTURE_2D, tex.id);
   glEnableTexture2D(true);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
-    glColor4f(k, k, k, 1);
+    glColor4f(k[j], k[j], k[j], 1);
     // Texel = pixels[v × largeur + u] : u = colonne (1er octet de UVXY), v = ligne.
     glTexCoord2f((uv[1][2 * j] + 0.5) / tex.width, (uv[1][2 * j + 1] + 0.5) / tex.height);
     glVertex3f(v[0], v[1], v[2]);
@@ -383,14 +464,19 @@ function drawFaceTexture(fi, frontSeen) {
 function drawFaceTransparent(fi) {
   const f = faces[fi];
   if (f[0] !== 2) { return; }
+  const sc = colourMode() === "sc";
+  if (sc) { gl.blendFunc(gl.ONE, gl.ONE); }                         // SCRenderer : glBlendFunc(GL_ONE, GL_ONE)
   glEnableTexture2D(false);
   glBegin(GL_TRIANGLES);
   for (let j = 0; j < 3; j++) {
     const v = vertices[f[1 + j]];
-    glColorIndex(f[4], 0.5);           // APPROX : table de translucidité absente
+    const c = rgbOf(f[4]);
+    const k = sc ? lambertSC(vertexNormal[f[1 + j]], f[7] & 1) : 1;
+    glColor4f(c[0] * k, c[1] * k, c[2] * k, 0.5);                  // APPROX : table de translucidité absente
     glVertex3f(v[0], v[1], v[2]);
   }
   glEnd();
+  if (sc) { gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); }
 }
 
 function chooseLevel(depth, focal) {    // Poly_SelectDetailLevel_2BCA4 (byte_6E8CE = 0)
@@ -436,6 +522,7 @@ function drawModel() {
   const depthC = -transformPoint(MV, centre)[2];
   const size = D.radius * focal / Math.max(0.01, depthC);
   const level = chooseLevel(depthC, focal);
+  currentLevel = level;
   const list = (levels.find((l) => l[0] === level) || levels[0])[2].filter((fi) => fi < faces.length);
   const info = ["profondeur  " + depthC.toFixed(1) + " m", "taille      " + size.toFixed(1) + " px", "niveau      LVL" + level];
   if (size <= 0.1) {
@@ -533,7 +620,7 @@ for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw"]) {
   ui[id].addEventListener("input", () => { upd(); drawModel(); });
   upd();
 }
-for (const id of ["tex", "gouraud", "low", "linear", "spin", "lod", "bg"]) {
+for (const id of ["tex", "gouraud", "low", "linear", "spin", "lod", "bg", "colour"]) {
   ui[id] = $(id);
   ui[id].addEventListener("change", () => { resize(); setFiltering(ui.linear.checked); drawModel(); });
 }
@@ -579,6 +666,14 @@ function tick() {
   }
   requestAnimationFrame(tick);
 }
+const COLOUR_NOTES = {
+  game: "Règles du jeu : teinte entière de la gamme RANG, faces 1/5/6 non éclairées, 4/7 par face, 3/8 par sommet.",
+  hybrid: "Mêmes règles d'éclairage que le jeu (types, normales, lumière directionnelle du LGHT), mais la teinte glisse en continu entre les couleurs de la gamme ; textures × intensité.",
+  sc: "Comme SCRenderer::drawModel : lambert par sommet pour toutes les faces (ambiante 0,4, |N·L| si face double), RVB × lambert, textures au LOD 0 seulement, transparentes en GL_ONE/GL_ONE. Lumière prise directionnelle (SCRenderer : ponctuelle).",
+};
+function updateColourNote() { $("colourNote").textContent = COLOUR_NOTES[ui.colour.value]; }
+ui.colour.addEventListener("change", updateColourNote);
+updateColourNote();
 setFiltering(false);
 resize();
 drawModel();
