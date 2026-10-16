@@ -20,8 +20,9 @@ c'est-à-dire `COLOUR_HYBRID` de la §6 :
   3 et 8 par sommet (normales de sommet) ; lumière directionnelle du `LGHT` ; normale inversée pour
   une face double vue de dos ;
 - la teinte **continue en RVB le long de la gamme RANG** (`shadeAlongRamp`), au lieu de l'index entier ;
-- les textures des types 7 et 8 par-dessus la couleur, multipliées par l'intensité de la face
-  (type 7) ou du sommet (type 8), type 6 non éclairé.
+- les textures des types 7 et 8 par-dessus la couleur, en **`GL_MODULATE`** : texel × intensité de la
+  face (type 7) ou du sommet (type 8), donnée par `glColor4f(i, i, i, 1)` ; type 6 non éclairé
+  (`glColor4f(1, 1, 1, 1)`).
 
 Les modes `COLOUR_GAME` et `COLOUR_ALL_LIT` restent dans le code pour comparer.
 
@@ -437,7 +438,11 @@ texel.
 ## 7. Textures
 
 Dans la passe texture :
-- **`GL_INTERPOLATE` vers une teinte d'ombre** au lieu de `GL_MODULATE`. On appelle
+- **Combinaison retenue : `GL_MODULATE`** (choix du 2026-10-16), comme aujourd'hui dans
+  `drawModelTexturePass`. Par sommet, `glColor4f(i, i, i, 1)` avec l'intensité de la face (type 7),
+  du sommet (type 8) ou 1 (type 6, non éclairé) — au lieu du lambert actuel appliqué à toutes les
+  faces texturées.
+- Variante écartée, gardée pour mémoire : **`GL_INTERPOLATE` vers une teinte d'ombre**. On appelle
   `setupTextureInterpolate()`, puis par sommet
   `glColor4f(ombre.x, ombre.y, ombre.z, intensité)`, avec `ombre = textureShadowColour(...)` (1re
   teinte de la gamme de la couleur de fond) et l'intensité du sommet ou de la face selon le type
