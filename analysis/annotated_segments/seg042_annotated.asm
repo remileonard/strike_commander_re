@@ -1244,7 +1244,7 @@ loc_24B02:				; DATA XREF: seg339:1254o
 		mov	al, es:[bx+0Ah]
 		push	ax
 		push	large dword ptr	[bp+6]
-		call	Keyframe_ResolveEasingValue
+		call	Palette_FogRemapColour_29194
 		add	sp, 6
 		jmp	short loc_24B38
 ; ���������������������������������������������������������������������������
@@ -1333,7 +1333,7 @@ arg_C		= dword	ptr  12h
 		push	541Ah
 
 loc_24BB2:
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 
 loc_24BB7:
 		add	sp, 4
@@ -1465,7 +1465,7 @@ loc_24C57:
 		mov	al, es:[bx+0Ah]
 		push	ax
 		push	large dword ptr	[bp+6]
-		call	Keyframe_ResolveEasingValue
+		call	Palette_FogRemapColour_29194
 		add	sp, 6
 		les	bx, [bp+6]
 		mov	es:[bx+12h], al
@@ -1473,7 +1473,7 @@ loc_24C57:
 		mov	al, es:[bx+0Bh]
 		push	ax
 		push	large dword ptr	[bp+6]
-		call	Keyframe_ResolveEasingValue
+		call	Palette_FogRemapColour_29194
 		add	sp, 6
 
 loc_24C8A:

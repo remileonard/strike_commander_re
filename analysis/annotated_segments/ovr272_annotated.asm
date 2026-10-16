@@ -7,11 +7,18 @@ ovr272		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 516 lignes, NON DÉTAILLÉE — combine allocateurs typés et ReadDwordFieldB_64AFF
-; répété — même motif que MissionRecord_LoadWithDwordFields_89850 (seg254). Candidat pour
-; session dédiée.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK VTRI (ex-
+; AircraftComponent_LoadWithDwordFields) : 8 o par face. Octets 1, 2, 3 = indices de sommets
+; (imul 18h vers les sommets, imul 12h vers les sommets projetés) ; octet 0 = type (switch 10
+; cas off_952AE) qui choisit la préparation (FaceType*_Setup) et le modèle d'élément copié
+; (CRT_MemFamily_Extra1 depuis word_72372… : table de méthodes posée par
+; FaceElements_InitTemplates_2AC16). Type 0 : 72372 ; 1 et 5 : 723A3 ; 2 : 72389 ; 3 : 723D6 ;
+; 4 : 723BA ; 6 : 723EE ; 7 : 7240C ; 8 : 72430 ; 9 : 72450. Range dans +28h[face] le décalage
+; de l'élément. Au 1er face de type 3 : couleur du point lointain +85h =
+; Palette_ShadeIndexWithFog_2F24E(541Ah, gamme de l'octet 4, 200, 0, 0) (0 si la couleur n'est
+; dans aucune gamme).
 ; ==============================================================================================
-AircraftComponent_LoadWithDwordFields_94D40	proc far		; CODE XREF: VROOMM_StubThunk_6B910J
+Poly_LoadVTRI_94D40	proc far		; CODE XREF: VROOMM_StubThunk_6B910J
 
 var_3C		= word ptr -3Ch
 var_3A		= word ptr -3Ah
@@ -116,7 +123,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_9527A
 ; ���������������������������������������������������������������������������
 
-loc_94E38:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+543j
+loc_94E38:				; CODE XREF: Poly_LoadVTRI_94D40+543j
 		les	bx, [bp+var_30]
 		mov	al, es:[bx+1]
 		mov	ah, 0
@@ -207,7 +214,7 @@ loc_94EFC:				; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupSolidColor
+		call	FaceType0_Setup_29732
 		add	sp, 14h
 		push	17h
 		push	ds
@@ -220,15 +227,15 @@ loc_94EFC:				; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudParamsInit
+		call	FaceElement_Init_295C0
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 17h
 		add	word ptr dword_6E8D4, 27h ; '''
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_94F57:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B3j
-					; AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_94F57:				; CODE XREF: Poly_LoadVTRI_94D40+1B3j
+					; Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ...
 		push	large [bp+var_30] ; default
 		push	large [bp+var_C]
@@ -241,7 +248,7 @@ loc_94F67:
 		push	large [dword_6E8D4]
 
 loc_94F6C:
-		call	Mesh_FaceSetupSolidColorWrap
+		call	FaceType1_Setup_29837
 		add	sp, 14h
 		push	17h
 		push	ds
@@ -254,21 +261,21 @@ loc_94F6C:
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudParamsInit
+		call	FaceElement_Init_295C0
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 17h
 		add	word ptr dword_6E8D4, 27h ; '''
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_94FB2:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_94FB2:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x2
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupTexturedColor
+		call	FaceType2_Setup_298F5
 		add	sp, 14h
 		push	1Ah
 		push	ds
@@ -281,21 +288,21 @@ loc_94FB2:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudParamsInit
+		call	FaceElement_Init_295C0
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 1Ah
 		add	word ptr dword_6E8D4, 2Ah ; '*'
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_9500D:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_9500D:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x4
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupDamageTint
+		call	FaceType4_Setup_29BDA
 		add	sp, 14h
 		push	1Ch
 		push	ds
@@ -308,7 +315,7 @@ loc_9500D:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudSetupFlag
+		call	FaceElementType4_Init_29C13
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 1Ch
 
@@ -317,7 +324,7 @@ loc_95060:
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_95068:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_95068:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		mov	al, [bp+var_19]	; case 0x3
 
@@ -330,7 +337,7 @@ loc_9506B:
 		cbw
 		push	ax
 		push	541Ah
-		call	Table_LookupByRange
+		call	Table_LookupByRange_2E975
 		add	sp, 4
 		mov	dx, ax
 		cmp	dx, 0FFFFh
@@ -347,20 +354,20 @@ loc_9506B:
 		jmp	short loc_950B3
 ; ���������������������������������������������������������������������������
 
-loc_950AA:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+34Aj
+loc_950AA:				; CODE XREF: Poly_LoadVTRI_94D40+34Aj
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+85h], 0
 
-loc_950B3:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+368j
+loc_950B3:				; CODE XREF: Poly_LoadVTRI_94D40+368j
 		mov	[bp+var_19], 1
 
-loc_950B7:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+32Fj
+loc_950B7:				; CODE XREF: Poly_LoadVTRI_94D40+32Fj
 		push	large [bp+var_30]
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupDamageTintAlt
+		call	FaceType3_Setup_29E1B
 		add	sp, 14h
 		push	18h
 		push	ds
@@ -373,21 +380,21 @@ loc_950B7:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+32Fj
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudCopyChannels
+		call	FaceElementType3_Init_29E4E
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 18h
 		add	word ptr dword_6E8D4, 28h ; '('
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_95112:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_95112:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x6
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetup
+		call	Face_SetupGeometry_294C0
 		add	sp, 14h
 		push	1Eh
 		push	ds
@@ -400,20 +407,20 @@ loc_95112:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudParamsInit
+		call	FaceElement_Init_295C0
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 1Eh
 		jmp	loc_95270
 ; ���������������������������������������������������������������������������
 
-loc_95168:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_95168:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x7
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupVariant
+		call	FaceType7_Setup_2A347
 		add	sp, 14h
 		push	24h ; '$'
 		push	ds
@@ -426,21 +433,21 @@ loc_95168:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudSetupVariant
+		call	FaceElementType7_Init_2A380
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 24h ; '$'
 		add	word ptr dword_6E8D4, 29h ; ')'
 		jmp	loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_951C3:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_951C3:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x8
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetupDamageTintAlt2
+		call	FaceType8_Setup_2A62F
 		add	sp, 14h
 		push	20h ; ' '
 		push	ds
@@ -453,21 +460,21 @@ loc_951C3:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [bp+var_10]
 		push	large [dword_6E8D4]
 		push	large [dword_6E8D0]
-		call	Mesh_GouraudCopyChannelsFinal
+		call	FaceElementType8_Init_2A662
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 20h ; ' '
 		add	word ptr dword_6E8D4, 28h ; '('
 		jmp	short loc_95275
 ; ���������������������������������������������������������������������������
 
-loc_9521D:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
+loc_9521D:				; CODE XREF: Poly_LoadVTRI_94D40+1B7j
 					; DATA XREF: ovr272:off_952AEo
 		push	large [bp+var_30] ; case 0x9
 		push	large [bp+var_C]
 		push	large [bp+var_8]
 		push	large [bp+var_4]
 		push	large [dword_6E8D4]
-		call	Mesh_FaceSetup
+		call	Face_SetupGeometry_294C0
 		add	sp, 14h
 		push	24h ; '$'
 		push	ds
@@ -482,30 +489,30 @@ loc_9521D:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7j
 		push	large [dword_6E8D0]
 
 loc_95263:
-		call	Mesh_GouraudParamsInit
+		call	FaceElement_Init_295C0
 
 loc_95268:
 		add	sp, 14h
 		add	word ptr dword_6E8D0, 24h ; '$'
 
-loc_95270:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+425j
+loc_95270:				; CODE XREF: Poly_LoadVTRI_94D40+425j
 		add	word ptr dword_6E8D4, 26h ; '&'
 
-loc_95275:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+214j
-					; AircraftComponent_LoadWithDwordFields_94D40+26Fj ...
+loc_95275:				; CODE XREF: Poly_LoadVTRI_94D40+214j
+					; Poly_LoadVTRI_94D40+26Fj ...
 		inc	si
 
 loc_95276:
 		add	word ptr [bp+var_30], 8
 
-loc_9527A:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+F5j
+loc_9527A:				; CODE XREF: Poly_LoadVTRI_94D40+F5j
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+26h], si
 		jle	short loc_95286
 		jmp	loc_94E38
 ; ���������������������������������������������������������������������������
 
-loc_95286:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+541j
+loc_95286:				; CODE XREF: Poly_LoadVTRI_94D40+541j
 		cmp	[bp+var_1F], 0
 		jz	short loc_952AA
 		cmp	[bp+var_24], 0
@@ -520,16 +527,16 @@ loc_95286:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+541j
 		add	sp, 8
 		jmp	short $+2
 
-loc_952AA:				; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+54Aj
-					; AircraftComponent_LoadWithDwordFields_94D40+551j
+loc_952AA:				; CODE XREF: Poly_LoadVTRI_94D40+54Aj
+					; Poly_LoadVTRI_94D40+551j
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadWithDwordFields_94D40	endp
+Poly_LoadVTRI_94D40	endp
 
 ; ���������������������������������������������������������������������������
-off_952AE	dw offset loc_94EFC	; DATA XREF: AircraftComponent_LoadWithDwordFields_94D40+1B7r
+off_952AE	dw offset loc_94EFC	; DATA XREF: Poly_LoadVTRI_94D40+1B7r
 		dw offset loc_94F57	; jump table for switch	statement
 		dw offset loc_94FB2
 		dw offset loc_95068

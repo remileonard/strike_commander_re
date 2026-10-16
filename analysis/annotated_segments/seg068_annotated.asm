@@ -68,11 +68,11 @@ loc_2F93A:
 		mov	[bp-4],	eax
 		push	eax
 		push	541Ah
-		call	Interp_ResolveCached
+		call	Palette_FogTableIndex_2F404
 		add	sp, 6
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		push	dx
 		push	ax

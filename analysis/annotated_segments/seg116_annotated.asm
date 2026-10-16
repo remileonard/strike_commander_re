@@ -1672,7 +1672,7 @@ Vector_Normalize3D_559BB	endp
 ; ==============================================================================================
 ; far, référencée par sub_29A7D (rôle exact non détaillé, hors cluster identifié).
 ; ==============================================================================================
-Utility_Helper_55A37	proc far		; CODE XREF: Mesh_FacePrepareIndirect+D9P
+Utility_Helper_55A37	proc far		; CODE XREF: Face_LightFlat_29A7D+D9P
 					; Terrain_StreamingMain+709P ...
 
 arg_0		= word ptr  6
@@ -3066,7 +3066,7 @@ Math_Distance2D_563C9	endp
 ; far, référencée par Damage_SimulationTick (sub_2BF6C, seg060) — helper de calcul de dommages
 ; (rôle exact non détaillé).
 ; ==============================================================================================
-Damage_ComputeHelperA_5647A	proc far		; CODE XREF: Damage_SimulationTick+70EP
+Damage_ComputeHelperA_5647A	proc far		; CODE XREF: PolyInstance_Render_2BF6C+70EP
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -3107,7 +3107,7 @@ Damage_ComputeHelperA_5647A	endp
 ; far, référencée par Damage_SimulationTick (sub_2BF6C) — appelle sub_58476 (fonction
 ; mathématique externe non identifiée).
 ; ==============================================================================================
-Damage_ComputeHelperB_564CE	proc far		; CODE XREF: Damage_SimulationTick+76BP
+Damage_ComputeHelperB_564CE	proc far		; CODE XREF: PolyInstance_Render_2BF6C+76BP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3173,7 +3173,7 @@ Damage_ComputeHelperB_564CE	endp
 ; ⚠️ far, 288 lignes, NON DÉTAILLÉE — référencée par Damage_SimulationTick (sub_2BF6C).
 ; Candidat pour session dédiée (probable calcul de propagation/répartition de dommages).
 ; ==============================================================================================
-Damage_ComputeMainHelper_56559	proc far		; CODE XREF: Damage_SimulationTick+74FP
+Damage_ComputeMainHelper_56559	proc far		; CODE XREF: PolyInstance_Render_2BF6C+74FP
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
@@ -3680,7 +3680,7 @@ Damage_ComputeMainHelper_56559	endp
 ; ==============================================================================================
 ; far, référencée par sub_2BE0A (voisin de Damage_SimulationTick).
 ; ==============================================================================================
-Damage_ComputeHelperC_56C6A	proc far		; CODE XREF: Damage_UpdateHudIcon+27P
+Damage_ComputeHelperC_56C6A	proc far		; CODE XREF: PolyInstance_UpdateFromObject_2BE0A+27P
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah

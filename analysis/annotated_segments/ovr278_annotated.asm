@@ -7,9 +7,13 @@ ovr278		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 191 lignes, NON DÉTAILLÉE — combine ReadFieldGroupA_64A19/ReadFieldGroupC_64A7E.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM DETA (ex-
+; AircraftComponent_LoadMixedFields) : chunks LVL0 à LVL7 (tag 304C564Ch + n × 1000000h).
+; Chacun : uint32 distance → +64h[i], puis (taille − 4) ÷ 2 uint16 numéros de face → liste
+; +2Ch[i], nombre +4Ch[i], +5Ch[i] = 1 ; chaque numéro est remplacé par le décalage de
+; l'élément (+28h). Sans DETA : un seul niveau, toutes les faces, distance 0.
 ; ==============================================================================================
-AircraftComponent_LoadMixedFields_96140	proc far		; CODE XREF: VROOMM_StubThunk_6BA30J
+Poly_LoadDETA_96140	proc far		; CODE XREF: VROOMM_StubThunk_6BA30J
 
 var_10		= dword	ptr -10h
 var_C		= word ptr -0Ch
@@ -28,7 +32,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_9616A
 ; ���������������������������������������������������������������������������
 
-loc_9614C:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+2Dj
+loc_9614C:				; CODE XREF: Poly_LoadDETA_96140+2Dj
 		mov	ax, dx
 		shl	ax, 2
 		les	bx, [bp+arg_0]
@@ -41,7 +45,7 @@ loc_9615F:
 		mov	byte ptr es:[bx+5Ch], 0
 		inc	dx
 
-loc_9616A:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+Aj
+loc_9616A:				; CODE XREF: Poly_LoadDETA_96140+Aj
 		cmp	dx, 8
 		jl	short loc_9614C
 		push	0
@@ -56,14 +60,14 @@ loc_96171:
 		jmp	loc_962AA
 ; ���������������������������������������������������������������������������
 
-loc_96189:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+44j
+loc_96189:				; CODE XREF: Poly_LoadDETA_96140+44j
 		mov	[bp+var_4], 304C564Ch
 		xor	di, di
 		mov	[bp+var_6], 0
 		jmp	loc_96296
 ; ���������������������������������������������������������������������������
 
-loc_9619B:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+15Cj
+loc_9619B:				; CODE XREF: Poly_LoadDETA_96140+15Cj
 		push	0
 		push	large [bp+var_4]
 		push	[bp+arg_4]
@@ -76,7 +80,7 @@ loc_961B0:
 		jmp	loc_9628B
 ; ���������������������������������������������������������������������������
 
-loc_961B3:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+6Ej
+loc_961B3:				; CODE XREF: Poly_LoadDETA_96140+6Ej
 		push	[bp+arg_4]
 
 loc_961B6:
@@ -140,7 +144,7 @@ loc_961B6:
 		jmp	short loc_96285
 ; ���������������������������������������������������������������������������
 
-loc_96264:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+148j
+loc_96264:				; CODE XREF: Poly_LoadDETA_96140+148j
 		les	bx, [bp+arg_0]
 
 loc_96267:
@@ -161,29 +165,29 @@ loc_96272:
 		inc	dx
 		add	word ptr [bp+var_10], 2
 
-loc_96285:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+122j
+loc_96285:				; CODE XREF: Poly_LoadDETA_96140+122j
 		cmp	dx, [bp+var_C]
 		jl	short loc_96264
 		inc	di
 
-loc_9628B:				; CODE XREF: AircraftComponent_LoadMixedFields_96140:loc_961B0j
+loc_9628B:				; CODE XREF: Poly_LoadDETA_96140:loc_961B0j
 		add	[bp+var_4], 1000000h
 		inc	[bp+var_6]
 
-loc_96296:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+58j
+loc_96296:				; CODE XREF: Poly_LoadDETA_96140+58j
 		cmp	[bp+var_6], 8
 		jge	short loc_9629F
 		jmp	loc_9619B
 ; ���������������������������������������������������������������������������
 
-loc_9629F:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+15Aj
+loc_9629F:				; CODE XREF: Poly_LoadDETA_96140+15Aj
 		push	[bp+arg_4]
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 		jmp	short loc_962CD
 ; ���������������������������������������������������������������������������
 
-loc_962AA:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+46j
+loc_962AA:				; CODE XREF: Poly_LoadDETA_96140+46j
 		les	bx, [bp+arg_0]
 
 loc_962AD:
@@ -194,11 +198,11 @@ loc_962AD:
 		mov	es:[bx+4Ch], ax
 		mov	byte ptr es:[bx+5Ch], 0
 
-loc_962CD:				; CODE XREF: AircraftComponent_LoadMixedFields_96140+168j
+loc_962CD:				; CODE XREF: Poly_LoadDETA_96140+168j
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadMixedFields_96140	endp
+Poly_LoadDETA_96140	endp
 
 ovr278		ends

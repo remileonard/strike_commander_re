@@ -124,10 +124,11 @@ Mesh_SubdivideRecursive	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,47L — appelle 3 fois sub_61960 (tracé de segment) entre les 3 paires de sommets : tracé
-; du contour (wireframe) d'un triangle.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Trace les 3 arêtes d'un triangle
+; (Render_FillClippedRect_61960 = tracé de segment) ; utilisé à la place du remplissage quand
+; byte_6E684 ≠ 0 (mode fil de fer). Ex-Mesh_DrawTriangleWireframe.
 ; ==============================================================================================
-Mesh_DrawTriangleWireframe	proc far		; CODE XREF: seg055:0706p seg055:081Ep ...
+Face_DrawWireframe_292BE	proc far		; CODE XREF: seg055:0706p seg055:081Ep ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -173,7 +174,7 @@ arg_6		= word ptr  0Ch
 		pop	si
 		pop	bp
 		retf
-Mesh_DrawTriangleWireframe	endp
+Face_DrawWireframe_292BE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -181,11 +182,11 @@ Mesh_DrawTriangleWireframe	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,100L — calcule deux vecteurs d'arête (V2-V1, V3-V1) à partir de 3 pointeurs de sommets
-; (+0x19/+0x1D/+0x21, structures 3D 12 octets) : calcul des vecteurs d'arête d'une face
-; triangulaire (base du calcul de normale).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). NORMALE DE FACE (ex-
+; Mesh_ComputeEdgeVectors) : a = V0 − V2, b = V0 − V1 (sommets +19h/+1Dh/+21h), N = a × b
+; (Vector_CrossProduct3D_550B7) normalisée → +1/+5/+9.
 ; ==============================================================================================
-Mesh_ComputeEdgeVectors	proc far		; CODE XREF: Mesh_FaceSetup+54p
+Face_ComputeNormal_2931E	proc far		; CODE XREF: Face_SetupGeometry_294C0+54p
 
 var_30		= dword	ptr -30h
 var_2C		= dword	ptr -2Ch
@@ -284,7 +285,7 @@ loc_29351:
 		mov	es:[bx+9], eax
 		leave
 		retf
-Mesh_ComputeEdgeVectors	endp
+Face_ComputeNormal_2931E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -292,10 +293,10 @@ Mesh_ComputeEdgeVectors	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,61L — calcule le centroïde (moyenne /3) des 3 sommets d'un triangle sur les 3 axes :
-; calcul du barycentre d'une face triangulaire (tri de profondeur/culling).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Centre de la face = moyenne des 3
+; sommets (÷ 3) → +0Dh/+11h/+15h. Utilisé par le rejet des faces vues de dos (loc_24EE2).
 ; ==============================================================================================
-Mesh_ComputeCentroid	proc far		; CODE XREF: Mesh_FaceSetup:loc_2951Fp
+Face_ComputeCentroid_2941F	proc far		; CODE XREF: Face_SetupGeometry_294C0:loc_2951Fp
 
 arg_0		= dword	ptr  6
 
@@ -355,7 +356,7 @@ loc_2943F:
 		mov	es:[bx+15h], eax
 		pop	bp
 		retf
-Mesh_ComputeCentroid	endp
+Face_ComputeCentroid_2941F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -363,12 +364,14 @@ Mesh_ComputeCentroid	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,87L — stocke 3 pointeurs de sommets (+0x19/+0x1D/+0x21), copie 2 bits de flags depuis un
-; matériau (+0x25), appelle sub_2931E (arêtes) et sub_2941F (centroïde) : constructeur/setup
-; de face triangulaire pour le rasterizer (init géométrie + matériau).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). PRÉPARATION COMMUNE D'UNE FACE
+; (ex-Mesh_FaceSetup) : 3 pointeurs de sommets +19h/+1Dh/+21h ; drapeau +25h bit 0 = octet 7
+; de VTRI & 1 (face double), bit 1 = octet 5 & 1 ; Face_ComputeNormal_2931E,
+; Face_ComputeCentroid_2941F ; ajoute la normale de la face à la normale (+0Ch..+14h) de ses 3
+; sommets.
 ; ==============================================================================================
-Mesh_FaceSetup	proc far		; CODE XREF: Mesh_FaceSetupSolidColor+18p
-					; Mesh_FaceSetupTexturedColor+19p ...
+Face_SetupGeometry_294C0	proc far		; CODE XREF: FaceType0_Setup_29732+18p
+					; FaceType2_Setup_298F5+19p ...
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -401,13 +404,13 @@ arg_10		= dword	ptr  16h
 		push	word ptr [bp+arg_0+2]
 		push	bx
 		push	cs
-		call	near ptr Mesh_ComputeEdgeVectors
+		call	near ptr Face_ComputeNormal_2931E
 		add	sp, 4
 		push	large [bp+arg_0]
 		push	cs
 
 loc_2951F:
-		call	near ptr Mesh_ComputeCentroid
+		call	near ptr Face_ComputeCentroid_2941F
 		add	sp, 4
 
 loc_29525:
@@ -453,7 +456,7 @@ loc_29553:
 		add	es:[bx+14h], eax
 		pop	bp
 		retf
-Mesh_FaceSetup	endp
+Face_SetupGeometry_294C0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -461,11 +464,11 @@ Mesh_FaceSetup	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,23L — stocke 4 valeurs 32-bit consécutives (+6/+0xA/+0xE/+0x12) : initialisation de
-; paramètres de shading (probable couleurs de sommets Gouraud).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de dessin : +6 = données
+; de face, +0Ah/+0Eh/+12h = les 3 sommets projetés. Ex-Mesh_GouraudParamsInit.
 ; ==============================================================================================
-Mesh_GouraudParamsInit	proc far		; CODE XREF: Mesh_GouraudSetupFlag:loc_29C2Ep
-					; Mesh_GouraudCopyChannels+1Bp ...
+FaceElement_Init_295C0	proc far		; CODE XREF: FaceElementType4_Init_29C13:loc_29C2Ep
+					; FaceElementType3_Init_29E4E+1Bp ...
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -486,7 +489,7 @@ arg_10		= dword	ptr  16h
 		mov	es:[bx+12h], eax
 		pop	bp
 		retf
-Mesh_GouraudParamsInit	endp
+FaceElement_Init_295C0	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -497,7 +500,11 @@ loc_295EC:				; DATA XREF: seg339:1601o seg339:164Do ...
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_295F1:				; DATA XREF: seg339:15DDo seg339:1605o ...
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Renvoie le ET du bit 3 de +11h des
+; 3 sommets projetés.
+; ==============================================================================================
+FaceElement_AllVerticesFlag3_295F1:				; DATA XREF: seg339:15DDo seg339:1605o ...
 		push	bp
 		mov	bp, sp
 		les	bx, [bp+6]
@@ -523,7 +530,11 @@ loc_2961F:
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2962D:				; DATA XREF: seg339:15E1o seg339:1609o ...
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Clé de tri de la face = la plus
+; grande profondeur (+9) de ses 3 sommets projetés → +2.
+; ==============================================================================================
+FaceElement_DepthKey_2962D:				; DATA XREF: seg339:15E1o seg339:1609o ...
 		push	bp
 		mov	bp, sp
 		sub	sp, 0Ch
@@ -648,11 +659,11 @@ loc_29722:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,28L — appelle sub_294C0 (setup face) puis copie un champ couleur/matériau (+4→+0x26) :
-; setup de face triangulaire avec couleur unie.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 0, 1
+; et 5 : Face_SetupGeometry_294C0 puis couleur (octet 4) → +26h. Ex-Mesh_FaceSetupSolidColor.
 ; ==============================================================================================
-Mesh_FaceSetupSolidColor	proc far		; CODE XREF: Mesh_FaceSetupSolidColorWrap+18p
-					; AircraftComponent_LoadWithDwordFields_94D40+1D1P
+FaceType0_Setup_29732	proc far		; CODE XREF: FaceType1_Setup_29837+18p
+					; Poly_LoadVTRI_94D40+1D1P
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -670,7 +681,7 @@ loc_29733:
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
@@ -678,11 +689,16 @@ loc_29733:
 		mov	es:[bx+26h], al
 		pop	bp
 		retf
-Mesh_FaceSetupSolidColor	endp
+FaceType0_Setup_29732	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_29760:				; DATA XREF: seg339:16DDo seg339:1749o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). « Éclairage » des types 0, 1, 5 :
+; couleur = Palette_FogRemapColour_29194(élément, couleur +26h des données) → +16h. Aucune
+; lumière : ces faces ne dépendent que du brouillard.
+; ==============================================================================================
+FaceType1_Light_29760:				; DATA XREF: seg339:16DDo seg339:1749o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -693,7 +709,7 @@ loc_29760:				; DATA XREF: seg339:16DDo seg339:1749o
 		mov	al, es:[bx+26h]
 		push	ax
 		push	large dword ptr	[bp+6]
-		call	Keyframe_ResolveEasingValue
+		call	Palette_FogRemapColour_29194
 		add	sp, 6
 		les	bx, [bp+6]
 		mov	es:[bx+16h], al
@@ -701,7 +717,11 @@ loc_29760:				; DATA XREF: seg339:16DDo seg339:1749o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2978F:				; DATA XREF: seg339:1729o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 0 : les 3 arêtes en
+; couleur +16h (Render_FillClippedRect_61960).
+; ==============================================================================================
+FaceType0_Draw_2978F:				; DATA XREF: seg339:1729o
 		push	bp
 		mov	bp, sp
 		sub	sp, 0Ch
@@ -769,9 +789,11 @@ loc_29830:				; DATA XREF: seg339:173Do
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,23L — wrapper trivial vers sub_29732.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de types 1
+; et 5 (et tout type hors 0..9) : appelle FaceType0_Setup_29732. Ex-
+; Mesh_FaceSetupSolidColorWrap.
 ; ==============================================================================================
-Mesh_FaceSetupSolidColorWrap	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40:loc_94F6CP
+FaceType1_Setup_29837	proc far		; CODE XREF: Poly_LoadVTRI_94D40:loc_94F6CP
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -787,17 +809,22 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetupSolidColor
+		call	near ptr FaceType0_Setup_29732
 
 loc_29852:
 		add	sp, 14h
 		pop	bp
 		retf
-Mesh_FaceSetupSolidColorWrap	endp
+FaceType1_Setup_29837	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_29857:				; DATA XREF: seg339:16BDo
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin des types 1 et 5 : triangle
+; d'une seule couleur +16h (Render_PolygonPrimitive_20848), ou Face_DrawWireframe_292BE si
+; byte_6E684.
+; ==============================================================================================
+FaceType1_Draw_29857:				; DATA XREF: seg339:16BDo
 		push	bp
 		mov	bp, sp
 		sub	sp, 42h
@@ -851,7 +878,7 @@ loc_298D5:				; CODE XREF: seg055:06E1j
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 
 loc_298E9:				; CODE XREF: seg055:06F3j
 		add	sp, 8
@@ -871,11 +898,11 @@ loc_298EE:				; DATA XREF: seg339:16D1o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,50L — appelle sub_294C0 puis résout une couleur via une table de police/texture
-; (sub_5C832 sur 0x72528h) si un index est négatif : setup de face avec résolution de
-; texture/couleur spéciale (probable texte 3D ou icône dans le monde).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 2
+; (translucides) : Face_SetupGeometry_294C0 ; octet 4 (signé) < 0 → +26h = 0, sinon +26h =
+; table de 256 o n° octet 4 dans dword_72528 (base + n × 256). Ex-Mesh_FaceSetupTexturedColor.
 ; ==============================================================================================
-Mesh_FaceSetupTexturedColor	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+287P
+FaceType2_Setup_298F5	proc far		; CODE XREF: Poly_LoadVTRI_94D40+287P
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -892,7 +919,7 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
@@ -905,7 +932,7 @@ arg_10		= dword	ptr  16h
 		jmp	short loc_29945
 ; ���������������������������������������������������������������������������
 
-loc_29928:				; CODE XREF: Mesh_FaceSetupTexturedColor+2Bj
+loc_29928:				; CODE XREF: FaceType2_Setup_298F5+2Bj
 		push	0
 		mov	al, byte_7252C
 		push	ax
@@ -917,18 +944,22 @@ loc_29928:				; CODE XREF: Mesh_FaceSetupTexturedColor+2Bj
 		shl	bx, 8
 		add	ax, bx
 
-loc_29945:				; CODE XREF: Mesh_FaceSetupTexturedColor+31j
+loc_29945:				; CODE XREF: FaceType2_Setup_298F5+31j
 		les	bx, [bp+arg_0]
 		mov	es:[bx+28h], dx
 		mov	es:[bx+26h], ax
 		pop	si
 		pop	bp
 		retf
-Mesh_FaceSetupTexturedColor	endp
+FaceType2_Setup_298F5	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_29953:				; DATA XREF: seg339:1701o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Type 2 : copie la table de
+; translucidité (+26h des données) → +16h.
+; ==============================================================================================
+FaceType2_Light_29953:				; DATA XREF: seg339:1701o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -943,7 +974,12 @@ loc_29953:				; DATA XREF: seg339:1701o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_29977:				; DATA XREF: seg339:16E1o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 2 :
+; Render_PolygonPrimitive_20C58 avec la table +16h : chaque pixel de l'écran devient
+; table[pixel] (mov bl,es:[di] / mov al,fs:[bx+si]) : face translucide.
+; ==============================================================================================
+FaceType2_Draw_29977:				; DATA XREF: seg339:16E1o
 		push	bp
 		mov	bp, sp
 		sub	sp, 42h
@@ -1006,7 +1042,7 @@ loc_299F5:
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 		add	sp, 8
 
 locret_29A04:				; CODE XREF: seg055:loc_299EBj
@@ -1026,12 +1062,13 @@ loc_29A06:				; DATA XREF: seg339:16F5o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,61L — recherche une teinte de dégât dans une table (sub_2E975, 0x541Ah, pas de 0xF
-; octets/entrée, base word_72524) et soustrait un décalage : résolution de couleur avec effet
-; de dommage/usure (damage tint).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). GAMME DE LA COULEUR (types 4 et 7
+; ; ex-Render_DamageTintResolve, aucun rapport avec les dégâts).
+; Table_LookupByRange_2E975(541Ah, couleur) : trouvée → +0 = n° de gamme, +1 = couleur −
+; première teinte (entrée +6), +2 = 1 ; sinon +0 = couleur, +1 = 0, +2 = 0.
 ; ==============================================================================================
-Render_DamageTintResolve	proc far		; CODE XREF: Mesh_FaceSetupDamageTint+31p
-					; Mesh_FaceSetupVariant+31p
+Face_ResolveRamp_29A0D	proc far		; CODE XREF: FaceType4_Setup_29BDA+31p
+					; FaceType7_Setup_2A347+31p
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -1051,7 +1088,7 @@ arg_4		= byte ptr  0Ah
 		mov	word ptr [bp+var_6], dx
 		push	[bp+var_2]
 		push	541Ah
-		call	Table_LookupByRange
+		call	Table_LookupByRange_2E975
 		add	sp, 4
 		mov	dx, ax
 		cmp	dx, 0FFFFh
@@ -1068,11 +1105,11 @@ loc_29A44:
 		jmp	short loc_29A5B
 ; ���������������������������������������������������������������������������
 
-loc_29A54:				; CODE XREF: Render_DamageTintResolve+2Ej
+loc_29A54:				; CODE XREF: Face_ResolveRamp_29A0D+2Ej
 		les	bx, [bp+var_6]
 		mov	byte ptr es:[bx], 0
 
-loc_29A5B:				; CODE XREF: Render_DamageTintResolve+45j
+loc_29A5B:				; CODE XREF: Face_ResolveRamp_29A0D+45j
 		cmp	dx, 0FFFFh
 		jnz	short loc_29A70
 		les	bx, [bp+arg_0]
@@ -1082,15 +1119,15 @@ loc_29A5B:				; CODE XREF: Render_DamageTintResolve+45j
 		jmp	short locret_29A7B
 ; ���������������������������������������������������������������������������
 
-loc_29A70:				; CODE XREF: Render_DamageTintResolve+51j
+loc_29A70:				; CODE XREF: Face_ResolveRamp_29A0D+51j
 		les	bx, [bp+arg_0]
 		mov	es:[bx], dl
 		mov	byte ptr es:[bx+2], 1
 
-locret_29A7B:				; CODE XREF: Render_DamageTintResolve+61j
+locret_29A7B:				; CODE XREF: Face_ResolveRamp_29A0D+61j
 		leave
 		retf
-Render_DamageTintResolve	endp
+Face_ResolveRamp_29A0D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1098,16 +1135,15 @@ Render_DamageTintResolve	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 163 L, LUE 2026-10-14. MÉTHODE D'ÉCLAIRAGE D'UNE FACE (élément de face, slot +0Ch des
-; tables d'éléments seg339 ~0x6E6xx). Lit la normale de la face dans les données du modèle
-; (pointeur +6 de l'élément → dd +1, +5, +9), sans la transformer ici. Si le drapeau +25h bit
-; 0 est mis : face vue de dos (signe du produit en croix 2D des sommets projetés +1/+3 des 3
-; sommets indirects +0Ah/+0Eh/+12h) → normale inversée (Utility_Helper_55A37 = négation d'un
-; vecteur) ; résultat mis en cache par les bits 0/1 de +5. Puis
-; LightSet_FaceIntensity_2B54A(5A9Ah, vecteur reçu en 3e argument, normale) → octet +4 de
-; l'élément.
+; far, LUE 2026-10-14, complétée 2026-10-16. ÉCLAIRAGE PAR FACE (types 4, 7, 9 ; ex-
+; Mesh_FacePrepareIndirect). Normale de la face (+1/+5/+9 des données). Face double (+25h bit
+; 0) vue de dos ((P1.x−P0.x)(P2.y−P1.y) − (P1.y−P0.y)(P2.x−P1.x) < 0 à l'écran) → normale
+; inversée (Utility_Helper_55A37). LightSet_FaceIntensity_2B54A(5A9Ah, lumière, normale) →
+; octet +4 ; calcul mis en cache par les bits 0/1 de +5 (une fois par image, ou à chaque
+; changement de côté). Le 1er argument « vecteur A » est la direction de la 1re lumière passée
+; dans le repère de l'objet par PolyInstance_Render_2BF6C.
 ; ==============================================================================================
-Mesh_FacePrepareIndirect	proc far		; CODE XREF: seg055:0BCBp seg055:1215p ...
+Face_LightFlat_29A7D	proc far		; CODE XREF: seg055:0BCBp seg055:1215p ...
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch
@@ -1139,7 +1175,7 @@ arg_8		= word ptr  0Eh
 		jmp	loc_29BA9
 ; ���������������������������������������������������������������������������
 
-loc_29ABF:				; CODE XREF: Mesh_FacePrepareIndirect+3Dj
+loc_29ABF:				; CODE XREF: Face_LightFlat_29A7D+3Dj
 		les	bx, [bp+arg_4]
 		les	bx, es:[bx+0Eh]
 		mov	ax, es:[bx+1]
@@ -1176,10 +1212,10 @@ loc_29AEE:
 		jmp	short loc_29B20
 ; ���������������������������������������������������������������������������
 
-loc_29B1E:				; CODE XREF: Mesh_FacePrepareIndirect+9Bj
+loc_29B1E:				; CODE XREF: Face_LightFlat_29A7D+9Bj
 		mov	al, 0
 
-loc_29B20:				; CODE XREF: Mesh_FacePrepareIndirect+9Fj
+loc_29B20:				; CODE XREF: Face_LightFlat_29A7D+9Fj
 		mov	dl, al
 
 loc_29B22:
@@ -1200,7 +1236,7 @@ loc_29B26:
 		or	ax, ax
 		jnz	short loc_29B75
 
-loc_29B45:				; CODE XREF: Mesh_FacePrepareIndirect+B7j
+loc_29B45:				; CODE XREF: Face_LightFlat_29A7D+B7j
 		les	bx, [bp+arg_0]
 		or	byte ptr es:[bx+5], 1
 		or	byte ptr es:[bx+5], 2
@@ -1209,7 +1245,7 @@ loc_29B45:				; CODE XREF: Mesh_FacePrepareIndirect+B7j
 		call	Utility_Helper_55A37
 		pop	cx
 
-loc_29B5C:				; CODE XREF: Mesh_FacePrepareIndirect+12Aj
+loc_29B5C:				; CODE XREF: Face_LightFlat_29A7D+12Aj
 		lea	ax, [bp+var_10]
 		push	ax
 		push	si
@@ -1221,8 +1257,8 @@ loc_29B5C:				; CODE XREF: Mesh_FacePrepareIndirect+12Aj
 		jmp	short loc_29BD7
 ; ���������������������������������������������������������������������������
 
-loc_29B75:				; CODE XREF: Mesh_FacePrepareIndirect+A7j
-					; Mesh_FacePrepareIndirect+C6j
+loc_29B75:				; CODE XREF: Face_LightFlat_29A7D+A7j
+					; Face_LightFlat_29A7D+C6j
 		mov	al, dl
 		mov	ah, 0
 		or	ax, ax
@@ -1239,14 +1275,14 @@ loc_29B75:				; CODE XREF: Mesh_FacePrepareIndirect+A7j
 		or	ax, ax
 		jnz	short loc_29BD7
 
-loc_29B9A:				; CODE XREF: Mesh_FacePrepareIndirect+10Cj
+loc_29B9A:				; CODE XREF: Face_LightFlat_29A7D+10Cj
 		les	bx, [bp+arg_0]
 		and	byte ptr es:[bx+5], 0FEh
 		or	byte ptr es:[bx+5], 2
 		jmp	short loc_29B5C
 ; ���������������������������������������������������������������������������
 
-loc_29BA9:				; CODE XREF: Mesh_FacePrepareIndirect+3Fj
+loc_29BA9:				; CODE XREF: Face_LightFlat_29A7D+3Fj
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+5]
 		shr	ax, 1
@@ -1264,12 +1300,12 @@ loc_29BA9:				; CODE XREF: Mesh_FacePrepareIndirect+3Fj
 		mov	es:[bx+4], al
 		or	byte ptr es:[bx+5], 2
 
-loc_29BD7:				; CODE XREF: Mesh_FacePrepareIndirect+F6j
-					; Mesh_FacePrepareIndirect+FEj ...
+loc_29BD7:				; CODE XREF: Face_LightFlat_29A7D+F6j
+					; Face_LightFlat_29A7D+FEj ...
 		pop	si
 		leave
 		retf
-Mesh_FacePrepareIndirect	endp
+Face_LightFlat_29A7D	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1277,10 +1313,11 @@ Mesh_FacePrepareIndirect	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,35L — appelle sub_294C0 puis sub_29A0D (teinte dommage) sur le champ couleur (+0x26) :
-; setup de face avec couleur teintée par les dommages.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 4 :
+; Face_SetupGeometry_294C0 puis Face_ResolveRamp_29A0D(+26h, couleur). Ex-
+; Mesh_FaceSetupDamageTint.
 ; ==============================================================================================
-Mesh_FaceSetupDamageTint	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+2E2P
+FaceType4_Setup_29BDA	proc far		; CODE XREF: Poly_LoadVTRI_94D40+2E2P
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -1300,7 +1337,7 @@ loc_29BE9:
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
@@ -1310,11 +1347,11 @@ loc_29BE9:
 		push	word ptr [bp+arg_0+2]
 		push	ax
 		push	cs
-		call	near ptr Render_DamageTintResolve
+		call	near ptr Face_ResolveRamp_29A0D
 		add	sp, 6
 		pop	bp
 		retf
-Mesh_FaceSetupDamageTint	endp
+FaceType4_Setup_29BDA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1322,10 +1359,11 @@ Mesh_FaceSetupDamageTint	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,46L — appelle sub_295C0 (shading Gouraud) puis copie un bit de flag matériau
-; (+0x28→+0x1B bit2) : setup de shading Gouraud avec flag matériau.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 4 :
+; FaceElement_Init_295C0 ; bit 2 de +1Bh = « couleur dans une gamme » ; +18h = gamme (ou
+; couleur), +19h = décalage dans la gamme. Ex-Mesh_GouraudSetupFlag.
 ; ==============================================================================================
-Mesh_GouraudSetupFlag	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+313P
+FaceElementType4_Init_29C13	proc far		; CODE XREF: Poly_LoadVTRI_94D40+313P
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -1345,7 +1383,7 @@ arg_10		= dword	ptr  16h
 		push	cs
 
 loc_29C2E:
-		call	near ptr Mesh_GouraudParamsInit
+		call	near ptr FaceElement_Init_295C0
 
 loc_29C31:
 		add	sp, 14h
@@ -1370,11 +1408,18 @@ loc_29C38:
 		mov	es:[bx+19h], al
 		leave
 		retf
-Mesh_GouraudSetupFlag	endp
+FaceElementType4_Init_29C13	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_29C73:				; DATA XREF: seg339:1695o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 4 (couleur éclairée
+; par face). Couleur dans une gamme (+1Bh bit 2) : Palette_ShadeIndexWithFog_2F24E(541Ah,
+; gamme +18h, intensité +1Ah, profondeur, décalage +19h) ; sinon table
+; Palette_ShadeTableFor_2E8CD(541Ah, intensité, profondeur)[couleur +18h]. Triangle uni
+; (Render_PolygonPrimitive_20848).
+; ==============================================================================================
+FaceType4_Draw_29C73:				; DATA XREF: seg339:1695o
 		push	bp
 		mov	bp, sp
 		sub	sp, 46h
@@ -1392,7 +1437,7 @@ loc_29C73:				; DATA XREF: seg339:1695o
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Gauge_ResolveAndApplyLabel
+		call	Palette_ShadeTableFor_2E8CD
 		add	sp, 8
 		mov	[bp-2],	dx
 		mov	[bp-4],	ax
@@ -1502,7 +1547,7 @@ loc_29D69:				; CODE XREF: seg055:0B75j
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 
 loc_29D7D:				; CODE XREF: seg055:0B87j
 		add	sp, 8
@@ -1527,7 +1572,11 @@ loc_29D8F:				; DATA XREF: seg339:16A9o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_29D96:				; DATA XREF: seg339:16B5o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 4 :
+; Face_LightFlat_29A7D sur le sous-objet +16h (intensité → +1Ah).
+; ==============================================================================================
+FaceType4_Light_29D96:				; DATA XREF: seg339:16B5o
 		push	bp
 		mov	bp, sp
 		push	word ptr [bp+0Ah]
@@ -1537,7 +1586,7 @@ loc_29D96:				; DATA XREF: seg339:16B5o
 		push	word ptr [bp+8]
 		push	ax
 		push	cs
-		call	near ptr Mesh_FacePrepareIndirect
+		call	near ptr Face_LightFlat_29A7D
 		add	sp, 0Ah
 		pop	bp
 		retf
@@ -1547,10 +1596,11 @@ loc_29D96:				; DATA XREF: seg339:16B5o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,69L — variante de sub_29A0D sur un offset différent (+0x27) : résolution de couleur
-; teintée dommage, second canal.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Gamme de la couleur pour le type 3
+; : trouvée → +26h = gamme, +27h = décalage ; sinon +26h = 0 et +27h = 0 (gamme 0). Ex-
+; Render_DamageTintResolveAlt.
 ; ==============================================================================================
-Render_DamageTintResolveAlt	proc far		; CODE XREF: Mesh_FaceSetupDamageTintAlt+2Bp
+Face_ResolveRampOrZero_29DB3	proc far		; CODE XREF: FaceType3_Setup_29E1B+2Bp
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -1570,7 +1620,7 @@ arg_4		= byte ptr  0Ah
 		mov	word ptr [bp+var_6], dx
 		push	[bp+var_2]
 		push	541Ah
-		call	Table_LookupByRange
+		call	Table_LookupByRange_2E975
 		add	sp, 4
 		mov	dx, ax
 		cmp	dx, 0FFFFh
@@ -1599,11 +1649,11 @@ loc_29DF7:
 		jmp	short loc_29E03
 ; ���������������������������������������������������������������������������
 
-loc_29DFC:				; CODE XREF: Render_DamageTintResolveAlt:loc_29DE3j
+loc_29DFC:				; CODE XREF: Face_ResolveRampOrZero_29DB3:loc_29DE3j
 		les	bx, [bp+var_6]
 		mov	byte ptr es:[bx], 0
 
-loc_29E03:				; CODE XREF: Render_DamageTintResolveAlt+47j
+loc_29E03:				; CODE XREF: Face_ResolveRampOrZero_29DB3+47j
 		cmp	dx, 0FFFFh
 		jnz	short loc_29E12
 		les	bx, [bp+arg_0]
@@ -1611,14 +1661,14 @@ loc_29E03:				; CODE XREF: Render_DamageTintResolveAlt+47j
 		jmp	short locret_29E19
 ; ���������������������������������������������������������������������������
 
-loc_29E12:				; CODE XREF: Render_DamageTintResolveAlt+53j
+loc_29E12:				; CODE XREF: Face_ResolveRampOrZero_29DB3+53j
 		les	bx, [bp+arg_0]
 		mov	es:[bx+26h], dl
 
-locret_29E19:				; CODE XREF: Render_DamageTintResolveAlt+5Dj
+locret_29E19:				; CODE XREF: Face_ResolveRampOrZero_29DB3+5Dj
 		leave
 		retf
-Render_DamageTintResolveAlt	endp
+Face_ResolveRampOrZero_29DB3	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1626,10 +1676,10 @@ Render_DamageTintResolveAlt	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,36L — appelle sub_294C0 puis sub_29DB3 : setup de face avec couleur teintée dommage,
-; second canal.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 3 :
+; Face_SetupGeometry_294C0 puis Face_ResolveRampOrZero_29DB3. Ex-Mesh_FaceSetupDamageTintAlt.
 ; ==============================================================================================
-Mesh_FaceSetupDamageTintAlt	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+38CP
+FaceType3_Setup_29E1B	proc far		; CODE XREF: Poly_LoadVTRI_94D40+38CP
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -1653,18 +1703,18 @@ loc_29E2E:
 		push	cs
 
 loc_29E33:
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Render_DamageTintResolveAlt
+		call	near ptr Face_ResolveRampOrZero_29DB3
 		add	sp, 6
 		pop	bp
 		retf
-Mesh_FaceSetupDamageTintAlt	endp
+FaceType3_Setup_29E1B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1672,10 +1722,10 @@ Mesh_FaceSetupDamageTintAlt	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,33L — appelle sub_295C0 puis copie 2 champs couleur (+0x26/+0x27→+0x16/+0x17) : setup de
-; shading avec copie de 2 canaux couleur.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 3 :
+; FaceElement_Init_295C0 ; +16h = gamme, +17h = décalage. Ex-Mesh_GouraudCopyChannels.
 ; ==============================================================================================
-Mesh_GouraudCopyChannels	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+3BDP
+FaceElementType3_Init_29E4E	proc far		; CODE XREF: Poly_LoadVTRI_94D40+3BDP
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -1693,7 +1743,7 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_GouraudParamsInit
+		call	near ptr FaceElement_Init_295C0
 		add	sp, 14h
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_4], eax
@@ -1707,11 +1757,16 @@ arg_10		= dword	ptr  16h
 		mov	es:[bx+17h], al
 		leave
 		retf
-Mesh_GouraudCopyChannels	endp
+FaceElementType3_Init_29E4E	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_29E95:				; DATA XREF: seg339:168Do
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 3 : pour chaque
+; sommet pas encore éclairé (+11h bit 0), LightSet_FaceIntensity_2B54A(5A9Ah, lumière, normale
+; du sommet +0Ch..+14h) → octet +0 du sommet projeté.
+; ==============================================================================================
+FaceType3_LightVertices_29E95:				; DATA XREF: seg339:168Do
 		push	bp
 		mov	bp, sp
 		sub	sp, 46h
@@ -1861,7 +1916,13 @@ loc_2A002:				; CODE XREF: seg055:0DD1j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2A006:				; DATA XREF: seg339:off_6E71Do
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 3 (Gouraud) : par
+; sommet Palette_ShadeIndexWithFog_2F24E(541Ah, gamme +16h, intensité du sommet, profondeur du
+; sommet, décalage +17h). byte_6E682 ≠ 0 et couleurs différentes → dégradé
+; Render_MeshPrimitive_21085 ; sinon moyenne ÷ 3 en triangle uni.
+; ==============================================================================================
+FaceType3_Draw_2A006:				; DATA XREF: seg339:off_6E71Do
 		push	bp
 		mov	bp, sp
 		sub	sp, 5Ah
@@ -2028,7 +2089,7 @@ loc_2A170:				; CODE XREF: seg055:0F63j
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 		jmp	short loc_2A1B6
 ; ���������������������������������������������������������������������������
 
@@ -2065,7 +2126,14 @@ loc_2A1BB:				; DATA XREF: seg339:1681o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2A1C2:				; DATA XREF: seg339:1649o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 6 (texture non
+; éclairée). byte_6E683 ≠ 0 et texture +16h : Render_MeshPrimitive_216F6(sommets avec u =
+; +18h/+1Ah/+1Ch et v = +19h/+1Bh/+1Dh × 256, texels, largeur = octet +5 de l'entrée de
+; texture, pas de ligne des texels, table de brouillard) ; sinon triangle uni de la couleur du
+; 1er texel.
+; ==============================================================================================
+FaceType6_Draw_2A1C2:				; DATA XREF: seg339:1649o
 		push	bp
 		mov	bp, sp
 		sub	sp, 46h
@@ -2139,11 +2207,11 @@ loc_2A254:				; CODE XREF: seg055:106Fj
 		mov	[bp-4],	eax
 		push	eax
 		push	541Ah
-		call	Interp_ResolveCached
+		call	Palette_FogTableIndex_2F404
 		add	sp, 6
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		push	dx
 		push	ax
@@ -2188,7 +2256,7 @@ loc_2A2E1:
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 		jmp	short loc_2A33B
 ; ���������������������������������������������������������������������������
 
@@ -2248,10 +2316,11 @@ locret_2A346:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,31L — variante de sub_29732/sub_29BDA (setup face + couleur) : setup de face
-; triangulaire, variante additionnelle.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 7 :
+; Face_SetupGeometry_294C0 puis Face_ResolveRamp_29A0D(+26h, couleur). Ex-
+; Mesh_FaceSetupVariant.
 ; ==============================================================================================
-Mesh_FaceSetupVariant	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+43DP
+FaceType7_Setup_2A347	proc far		; CODE XREF: Poly_LoadVTRI_94D40+43DP
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -2267,7 +2336,7 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
@@ -2277,11 +2346,11 @@ arg_10		= dword	ptr  16h
 		push	word ptr [bp+arg_0+2]
 		push	ax
 		push	cs
-		call	near ptr Render_DamageTintResolve
+		call	near ptr Face_ResolveRamp_29A0D
 		add	sp, 6
 		pop	bp
 		retf
-Mesh_FaceSetupVariant	endp
+FaceType7_Setup_2A347	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2289,10 +2358,11 @@ Mesh_FaceSetupVariant	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — variante de sub_29C13 (shading Gouraud + flag matériau) sur offset différent :
-; setup de shading Gouraud, variante.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 7 :
+; FaceElement_Init_295C0 ; bit 2 de +23h = « couleur dans une gamme », +20h = gamme (ou
+; couleur), +21h = décalage. Ex-Mesh_GouraudSetupVariant.
 ; ==============================================================================================
-Mesh_GouraudSetupVariant	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+46EP
+FaceElementType7_Init_2A380	proc far		; CODE XREF: Poly_LoadVTRI_94D40+46EP
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -2310,7 +2380,7 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_GouraudParamsInit
+		call	near ptr FaceElement_Init_295C0
 		add	sp, 14h
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_4], eax
@@ -2331,11 +2401,15 @@ arg_10		= dword	ptr  16h
 		mov	es:[bx+21h], al
 		leave
 		retf
-Mesh_GouraudSetupVariant	endp
+FaceElementType7_Init_2A380	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_2A3E0:				; DATA XREF: seg339:1641o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 7 :
+; Face_LightFlat_29A7D sur le sous-objet +1Eh (intensité → +22h).
+; ==============================================================================================
+FaceType7_Light_2A3E0:				; DATA XREF: seg339:1641o
 		push	bp
 		mov	bp, sp
 
@@ -2349,13 +2423,19 @@ loc_2A3E3:
 
 loc_2A3F4:
 		push	cs
-		call	near ptr Mesh_FacePrepareIndirect
+		call	near ptr Face_LightFlat_29A7D
 		add	sp, 0Ah
 		pop	bp
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2A3FD:				; DATA XREF: seg339:1621o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 7 : triangle uni de
+; la couleur éclairée (comme le type 4 : gamme +20h, décalage +21h, intensité +22h), puis si
+; byte_6E683 et texture +16h : texture par-dessus, texels remappés par
+; Palette_ShadeTableFor_2E8CD(intensité, profondeur).
+; ==============================================================================================
+FaceType7_Draw_2A3FD:				; DATA XREF: seg339:1621o
 		push	bp
 		mov	bp, sp
 		sub	sp, 46h
@@ -2367,7 +2447,7 @@ loc_2A3FD:				; DATA XREF: seg339:1621o
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Gauge_ResolveAndApplyLabel
+		call	Palette_ShadeTableFor_2E8CD
 		add	sp, 8
 
 loc_2A423:
@@ -2500,7 +2580,7 @@ loc_2A530:
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 
 loc_2A540:				; CODE XREF: seg055:134Aj
 		add	sp, 8
@@ -2567,10 +2647,11 @@ loc_2A5C0:				; DATA XREF: seg339:1635o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,61L — variante de sub_29A0D/sub_29DB3 (résolution teinte dommage) sur offset +0x27 :
-; résolution de couleur teintée dommage, troisième variante.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Comme
+; Face_ResolveRampOrZero_29DB3, pour le type 8 (couleur hors gamme → gamme 0, décalage 0). Ex-
+; Render_DamageTintResolveAlt2.
 ; ==============================================================================================
-Render_DamageTintResolveAlt2	proc far		; CODE XREF: Mesh_FaceSetupDamageTintAlt2+2Bp
+Face_ResolveRampOrZeroB_2A5C7	proc far		; CODE XREF: FaceType8_Setup_2A62F+2Bp
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -2590,7 +2671,7 @@ arg_4		= byte ptr  0Ah
 		mov	word ptr [bp+var_6], dx
 		push	[bp+var_2]
 		push	541Ah
-		call	Table_LookupByRange
+		call	Table_LookupByRange_2E975
 
 loc_2A5EF:
 		add	sp, 4
@@ -2611,11 +2692,11 @@ loc_2A5F7:
 		jmp	short loc_2A617
 ; ���������������������������������������������������������������������������
 
-loc_2A610:				; CODE XREF: Render_DamageTintResolveAlt2:loc_2A5F7j
+loc_2A610:				; CODE XREF: Face_ResolveRampOrZeroB_2A5C7:loc_2A5F7j
 		les	bx, [bp+var_6]
 		mov	byte ptr es:[bx], 0
 
-loc_2A617:				; CODE XREF: Render_DamageTintResolveAlt2+47j
+loc_2A617:				; CODE XREF: Face_ResolveRampOrZeroB_2A5C7+47j
 		cmp	dx, 0FFFFh
 		jnz	short loc_2A626
 		les	bx, [bp+arg_0]
@@ -2623,14 +2704,14 @@ loc_2A617:				; CODE XREF: Render_DamageTintResolveAlt2+47j
 		jmp	short locret_2A62D
 ; ���������������������������������������������������������������������������
 
-loc_2A626:				; CODE XREF: Render_DamageTintResolveAlt2+53j
+loc_2A626:				; CODE XREF: Face_ResolveRampOrZeroB_2A5C7+53j
 		les	bx, [bp+arg_0]
 		mov	es:[bx+26h], dl
 
-locret_2A62D:				; CODE XREF: Render_DamageTintResolveAlt2+5Dj
+locret_2A62D:				; CODE XREF: Face_ResolveRampOrZeroB_2A5C7+5Dj
 		leave
 		retf
-Render_DamageTintResolveAlt2	endp
+Face_ResolveRampOrZeroB_2A5C7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2638,10 +2719,11 @@ Render_DamageTintResolveAlt2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,32L — appelle sub_294C0 puis sub_2A5C7 : setup de face avec couleur teintée dommage
-; (variante).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 8 :
+; Face_SetupGeometry_294C0 puis Face_ResolveRampOrZeroB_2A5C7. Ex-
+; Mesh_FaceSetupDamageTintAlt2.
 ; ==============================================================================================
-Mesh_FaceSetupDamageTintAlt2	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+498P
+FaceType8_Setup_2A62F	proc far		; CODE XREF: Poly_LoadVTRI_94D40+498P
 
 arg_0		= dword	ptr  6
 arg_4		= dword	ptr  0Ah
@@ -2661,18 +2743,18 @@ loc_2A632:
 loc_2A642:
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_FaceSetup
+		call	near ptr Face_SetupGeometry_294C0
 		add	sp, 14h
 		les	bx, [bp+arg_10]
 		mov	al, es:[bx+4]
 		push	ax
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Render_DamageTintResolveAlt2
+		call	near ptr Face_ResolveRampOrZeroB_2A5C7
 		add	sp, 6
 		pop	bp
 		retf
-Mesh_FaceSetupDamageTintAlt2	endp
+FaceType8_Setup_2A62F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2680,10 +2762,10 @@ Mesh_FaceSetupDamageTintAlt2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,33L — variante finale du cluster shading/couleur (copie de 2 champs couleur) : setup de
-; shading, variante finale du cluster.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 8 :
+; FaceElement_Init_295C0 ; +1Eh = gamme, +1Fh = décalage. Ex-Mesh_GouraudCopyChannelsFinal.
 ; ==============================================================================================
-Mesh_GouraudCopyChannelsFinal	proc far		; CODE XREF: AircraftComponent_LoadWithDwordFields_94D40+4C9P
+FaceElementType8_Init_2A662	proc far		; CODE XREF: Poly_LoadVTRI_94D40+4C9P
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -2701,7 +2783,7 @@ arg_10		= dword	ptr  16h
 		push	large [bp+arg_4]
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Mesh_GouraudParamsInit
+		call	near ptr FaceElement_Init_295C0
 		add	sp, 14h
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_4], eax
@@ -2715,11 +2797,15 @@ arg_10		= dword	ptr  16h
 		mov	es:[bx+1Fh], al
 		leave
 		retf
-Mesh_GouraudCopyChannelsFinal	endp
+FaceElementType8_Init_2A662	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_2A6A9:				; DATA XREF: seg339:161Do
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 8 : comme
+; FaceType3_LightVertices_29E95 (intensité par sommet).
+; ==============================================================================================
+FaceType8_LightVertices_2A6A9:				; DATA XREF: seg339:161Do
 		push	bp
 		mov	bp, sp
 		sub	sp, 46h
@@ -2865,7 +2951,13 @@ loc_2A816:				; CODE XREF: seg055:15E5j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2A81A:				; DATA XREF: seg339:15FDo
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 8 : dégradé de
+; Gouraud (gamme +1Eh, décalage +1Fh, intensité de chaque sommet), puis si byte_6E683 et
+; texture +16h : texture par-dessus, remappée par Palette_ShadeTableFor_2E8CD(moyenne des 3
+; intensités, profondeur).
+; ==============================================================================================
+FaceType8_Draw_2A81A:				; DATA XREF: seg339:15FDo
 		push	bp
 		mov	bp, sp
 		sub	sp, 60h
@@ -3041,7 +3133,7 @@ loc_2A9E9:
 loc_2A9EA:
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 
 loc_2A9F2:
 		jmp	short loc_2AA1D
@@ -3089,7 +3181,7 @@ loc_2AA36:
 		idiv	bx
 		push	ax
 		push	541Ah
-		call	Gauge_ResolveAndApplyLabel
+		call	Palette_ShadeTableFor_2E8CD
 		add	sp, 8
 		mov	[bp-1Ch], dx
 		mov	[bp-1Eh], ax
@@ -3146,7 +3238,7 @@ loc_2AAAC:				; DATA XREF: seg339:15F5o
 		push	word ptr [bp+8]
 		push	ax
 		push	cs
-		call	near ptr Mesh_FacePrepareIndirect
+		call	near ptr Face_LightFlat_29A7D
 		add	sp, 0Ah
 		pop	bp
 		retf
@@ -3228,7 +3320,7 @@ loc_2AB47:
 		mov	ah, 0
 		push	ax
 		push	541Ah
-		call	Gauge_ResolveAndApplyLabel
+		call	Palette_ShadeTableFor_2E8CD
 		add	sp, 8
 		push	dx
 		push	ax
@@ -3273,7 +3365,7 @@ loc_2ABDF:
 		push	ax
 		push	word_70E60
 		push	cs
-		call	near ptr Mesh_DrawTriangleWireframe
+		call	near ptr Face_DrawWireframe_292BE
 		jmp	short loc_2ABFD
 ; ���������������������������������������������������������������������������
 
@@ -3312,7 +3404,15 @@ loc_2AC0F:				; DATA XREF: seg339:15E9o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2AC16:				; DATA XREF: seg339:4DDAo
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Pose la table de méthodes de
+; chaque modèle d'élément de face : type 0 → 1729h, 1 et 5 → 16BDh, 2 → 16E1h, 3 → 166Dh, 4 →
+; 1695h (sous-objet d'éclairage +16h → 16B9h), 6 → 1649h, 7 → 1621h (+1Eh → 1645h), 8 → 15FDh,
+; 9 → 15D5h (+16h → 15F9h). Méthodes : +0 dessin, +4 remise à zéro, +8 test de sommets, +0Ch
+; clé de tri, +14h n° de type, +18h visibilité et projection (loc_24EE2), +1Ch déplacement des
+; pointeurs, +20h éclairage.
+; ==============================================================================================
+FaceElements_InitTemplates_2AC16:				; DATA XREF: seg339:4DDAo
 		push	bp
 		mov	bp, sp
 		mov	word_72372, 11E8h

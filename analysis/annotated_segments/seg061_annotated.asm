@@ -1024,7 +1024,7 @@ loc_2D29F:				; CODE XREF: seg061:0957j
 ; far,14L — initialise une petite structure avec des valeurs par défaut 1:1 (+4/+6) :
 ; constructeur avec échelle par défaut 1:1.
 ; ==============================================================================================
-Descriptor_ConstructDefaultScale	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710:loc_9495EP
+Descriptor_ConstructDefaultScale	proc far		; CODE XREF: Appearance_CreateFromIFF_94710:loc_9495EP
 
 arg_0		= dword	ptr  6
 

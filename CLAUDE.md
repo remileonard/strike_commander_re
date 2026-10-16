@@ -217,6 +217,8 @@ strike_commander_re/
 │   ├── IMPL_SCJETPPLANE_CORRECTIONS.md  corrections à porter dans libRealSpace : physique
 │   ├── IMPL_SCAIBRAIN_CORRECTIONS.md    corrections à porter dans libRealSpace : IA
 │   ├── IMPL_TERRAIN_SKIRTS.md       à porter : jupes du terrain hors carte (cellule du bord répétée)
+│   ├── OBJECT_RENDER.md             rendu des objets 3D (FORM POLY) : niveaux de détail, rejet, tri,
+│   │                                  éclairage par type de face, textures — lu 2026-10-16
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
@@ -255,6 +257,7 @@ strike_commander_re/
     │                                  terrain_3d.py : vue 3D Pygame + PyOpenGL, rendu du jeu, jupes hors carte (--skirt) ;
     │                                  vue 3D WebGL <nom>_3d.html générée avec la visionneuse ;
     │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
+    ├── object_render.py             rendu logiciel d'un objet .IFF comme le jeu (OBJECT_RENDER.md) → PNG
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer

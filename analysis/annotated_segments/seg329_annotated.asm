@@ -31,7 +31,7 @@ VROOMM_StubThunk_6CCA0	endp
 ; far, thunk fixe VROOMM (jmp sub_A6900) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=352F0h, codesize=391h, nentries=7.
 ; ==============================================================================================
-VROOMM_StubThunk_6CCA5	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710+2F8P
+VROOMM_StubThunk_6CCA5	proc far		; CODE XREF: Appearance_CreateFromIFF_94710+2F8P
 		jmp	PlayerComponent_LoadAndComputeRange_A6900
 VROOMM_StubThunk_6CCA5	endp
 

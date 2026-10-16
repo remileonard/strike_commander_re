@@ -159,10 +159,12 @@ Palette_DestructResource	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,27L — résout une valeur (sub_2F55E) puis l'applique via sub_2E8F1 : wrapper de
-; résolution+application de texte/valeur (probable étiquette de jauge).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). TABLE D'OMBRE ET DE BROUILLARD
+; d'une couleur hors gamme (ex-Gauge_ResolveAndApplyLabel). Args (541Ah, intensité, profondeur
+; 24.8) → Interp_ResolveNormalizedIndex_2F55E puis Text_ResolveTruncated_2E8F1 : pointeur de
+; table de 256 o, ou 0 (couleur inchangée).
 ; ==============================================================================================
-Gauge_ResolveAndApplyLabel	proc far		; CODE XREF: seg055:0AC1P seg055:123BP ...
+Palette_ShadeTableFor_2E8CD	proc far		; CODE XREF: seg055:0AC1P seg055:123BP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -177,18 +179,18 @@ loc_2E8D1:
 		push	large [bp+arg_4]
 		push	[bp+arg_2]
 		push	si
-		call	Interp_ResolveNormalizedIndex
+		call	Palette_ShadeTableIndex_2F55E
 		add	sp, 8
 		push	ax
 		push	si
 		nop
 		push	cs
-		call	near ptr Text_ResolveTruncated
+		call	near ptr Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		pop	si
 		pop	bp
 		retf
-Gauge_ResolveAndApplyLabel	endp
+Palette_ShadeTableFor_2E8CD	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -196,12 +198,13 @@ Gauge_ResolveAndApplyLabel	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,82L — résout un texte (sub_5C832) borné par une largeur maximale (+0x52), utilisé par
-; les keyframes d'easing (seg024/029194) : résolution de texte tronqué à une largeur (utilisé
-; dans le système d'interpolation/easing des keyframes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Adresse d'une table FADE de 256 o
+; (ex-Text_ResolveTruncated). n° 0 → 0 ; n° > 0 → base [+5Eh] + (min(n°, N) − 1) × 256 ; n° <
+; 0 → base + [+50h] (= N × 256) + (min(|n°|, N) − 1) × 256. Les tables viennent du chunk FADE
+; du FORM FTBL du fichier nommé par TABL (TextureLoader_LoadWithDwordFieldsD_989B8).
 ; ==============================================================================================
-Text_ResolveTruncated	proc far		; CODE XREF: Keyframe_InitWithEasing:loc_24BB2P
-					; Keyframe_ResolveEasingValue+23P ...
+Palette_FadeTablePtr_2E8F1	proc far		; CODE XREF: Keyframe_InitWithEasing:loc_24BB2P
+					; Palette_FogRemapColour_29194+23P ...
 
 var_6		= word ptr -6
 var_4		= dword	ptr -4
@@ -221,14 +224,14 @@ arg_2		= word ptr  8
 		jmp	short loc_2E96B
 ; ���������������������������������������������������������������������������
 
-loc_2E90D:				; CODE XREF: Text_ResolveTruncated+10j
+loc_2E90D:				; CODE XREF: Palette_FadeTablePtr_2E8F1+10j
 		or	di, di
 		jle	short loc_2E930
 		cmp	[si+52h], di
 		jge	short loc_2E919
 		mov	di, [si+52h]
 
-loc_2E919:				; CODE XREF: Text_ResolveTruncated+23j
+loc_2E919:				; CODE XREF: Palette_FadeTablePtr_2E8F1+23j
 		push	0
 		mov	al, [si+62h]
 		push	ax
@@ -239,7 +242,7 @@ loc_2E919:				; CODE XREF: Text_ResolveTruncated+23j
 		jmp	short loc_2E95D
 ; ���������������������������������������������������������������������������
 
-loc_2E930:				; CODE XREF: Text_ResolveTruncated+1Ej
+loc_2E930:				; CODE XREF: Palette_FadeTablePtr_2E8F1+1Ej
 		mov	[bp+var_6], di
 
 loc_2E933:
@@ -252,7 +255,7 @@ loc_2E933:
 		jge	short loc_2E945
 		mov	di, [si+52h]
 
-loc_2E945:				; CODE XREF: Text_ResolveTruncated+4Fj
+loc_2E945:				; CODE XREF: Palette_FadeTablePtr_2E8F1+4Fj
 		push	0
 		mov	al, [si+62h]
 		push	ax
@@ -264,7 +267,7 @@ loc_2E952:
 		add	sp, 0Ah
 		add	ax, [si+50h]
 
-loc_2E95D:				; CODE XREF: Text_ResolveTruncated+3Dj
+loc_2E95D:				; CODE XREF: Palette_FadeTablePtr_2E8F1+3Dj
 		mov	bx, di
 		dec	bx
 		shl	bx, 8
@@ -272,7 +275,7 @@ loc_2E95D:				; CODE XREF: Text_ResolveTruncated+3Dj
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
 
-loc_2E96B:				; CODE XREF: Text_ResolveTruncated+1Aj
+loc_2E96B:				; CODE XREF: Palette_FadeTablePtr_2E8F1+1Aj
 		mov	dx, word ptr [bp+var_4+2]
 		mov	ax, word ptr [bp+var_4]
 		pop	di
@@ -281,7 +284,7 @@ loc_2E96B:				; CODE XREF: Text_ResolveTruncated+1Aj
 
 locret_2E974:
 		retf
-Text_ResolveTruncated	endp
+Palette_FadeTablePtr_2E8F1	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -289,12 +292,13 @@ Text_ResolveTruncated	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,72L — recherche linéaire dans une table de plages (pas 0xF octets, base+longueur) où une
-; valeur tombe, retourne l'index : table lookup par intervalle — utilisée par les fonctions de
-; teinte de dommage du seg055 (sub_29A0D/sub_29DB3).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). GAMME RANG D'UNE COULEUR :
+; première entrée (15 o, [+5Ah], nombre [+58h]) telle que e+6 ≤ couleur ≤ e+6 + e+0Dh
+; (première teinte + 3e champ de RANG, bornes comprises : cmp [bx+6],di / jg, add ax,[bx+0Dh]
+; / cmp ax,di / jl) ; sinon FFFFh.
 ; ==============================================================================================
-Table_LookupByRange	proc far		; CODE XREF: Render_DamageTintResolve+21P
-					; Render_DamageTintResolveAlt+23P ...
+Table_LookupByRange_2E975	proc far		; CODE XREF: Face_ResolveRamp_29A0D+21P
+					; Face_ResolveRampOrZero_29DB3+23P ...
 
 var_3		= byte ptr -3
 var_2		= word ptr -2
@@ -314,7 +318,7 @@ arg_2		= word ptr  8
 		jmp	short loc_2E9D0
 ; ���������������������������������������������������������������������������
 
-loc_2E990:				; CODE XREF: Table_LookupByRange+67j
+loc_2E990:				; CODE XREF: Table_LookupByRange_2E975+67j
 		mov	ax, cx
 		imul	ax, 0Fh
 		mov	bx, [si+5Ah]
@@ -337,20 +341,20 @@ loc_2E990:				; CODE XREF: Table_LookupByRange+67j
 		jmp	short loc_2E9C4
 ; ���������������������������������������������������������������������������
 
-loc_2E9C2:				; CODE XREF: Table_LookupByRange+28j
-					; Table_LookupByRange+46j
+loc_2E9C2:				; CODE XREF: Table_LookupByRange_2E975+28j
+					; Table_LookupByRange_2E975+46j
 		xor	ax, ax
 
-loc_2E9C4:				; CODE XREF: Table_LookupByRange+4Bj
+loc_2E9C4:				; CODE XREF: Table_LookupByRange_2E975+4Bj
 		or	al, al
 		jz	short loc_2E9CF
 		mov	[bp+var_2], cx
 		mov	[bp+var_3], 1
 
-loc_2E9CF:				; CODE XREF: Table_LookupByRange+51j
+loc_2E9CF:				; CODE XREF: Table_LookupByRange_2E975+51j
 		inc	cx
 
-loc_2E9D0:				; CODE XREF: Table_LookupByRange+19j
+loc_2E9D0:				; CODE XREF: Table_LookupByRange_2E975+19j
 		cmp	[si+58h], cx
 		jle	short loc_2E9DE
 		mov	al, [bp+var_3]
@@ -358,13 +362,13 @@ loc_2E9D0:				; CODE XREF: Table_LookupByRange+19j
 		or	ax, ax
 		jz	short loc_2E990
 
-loc_2E9DE:				; CODE XREF: Table_LookupByRange+5Ej
+loc_2E9DE:				; CODE XREF: Table_LookupByRange_2E975+5Ej
 		mov	ax, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-Table_LookupByRange	endp
+Table_LookupByRange_2E975	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

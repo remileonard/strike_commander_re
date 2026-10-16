@@ -19,7 +19,7 @@ stru_6BA40	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0976o
 ; d'overlay actuellement charge en memoire. fileoff=241D0h, codesize=185h, nentries=2.
 ; ==============================================================================================
 VROOMM_StubThunk_6BA60	proc far		; CODE XREF: PlayerComponent_LoadAndComputeRange_A6900+B2P
-		jmp	AircraftComponent_Helper_962E0
+		jmp	Poly_InitFields_962E0
 VROOMM_StubThunk_6BA60	endp
 
 
@@ -31,9 +31,9 @@ VROOMM_StubThunk_6BA60	endp
 ; far, thunk fixe VROOMM (jmp sub_96321) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=241D0h, codesize=185h, nentries=2.
 ; ==============================================================================================
-VROOMM_StubThunk_6BA65	proc far		; CODE XREF: MissionText_LoadSubtitleRecordB_94710+CFP
+VROOMM_StubThunk_6BA65	proc far		; CODE XREF: Appearance_CreateFromIFF_94710+CFP
 					; PlayerComponent_LoadAndComputeRange_A6900+EFP
-		jmp	AircraftComponent_LoadMixedFieldsB_96321
+		jmp	Poly_LoadFromIFF_96321
 VROOMM_StubThunk_6BA65	endp
 
 stub279		ends

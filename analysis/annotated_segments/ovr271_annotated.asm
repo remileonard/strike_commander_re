@@ -7,9 +7,11 @@ ovr271		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine ResourceRecord_SeekAndReadB_647B2/ReleaseAndClear_64D25 (38 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM LINS / chunk VLIN →
+; VROOMM_StubThunk_6B940 (AircraftComponent_LoadWithDwordFieldsB_952D0, non lu). Ex-
+; MissionText_ReleaseSubrecordA.
 ; ==============================================================================================
-MissionText_ReleaseSubrecordA_94BF0	proc far		; CODE XREF: VROOMM_StubThunk_6B8E5J MissionText_AllocateMultiBuffer_94C80+7Cp
+Poly_LoadLINS_94BF0	proc far		; CODE XREF: VROOMM_StubThunk_6B8E5J Poly_BuildFaceElements_94C80+7Cp
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -37,16 +39,16 @@ arg_4		= word ptr  0Ah
 		call	VROOMM_StubThunk_6B940
 		add	sp, 6
 
-loc_94C2E:				; CODE XREF: MissionText_ReleaseSubrecordA_94BF0+2Fj
+loc_94C2E:				; CODE XREF: Poly_LoadLINS_94BF0+2Fj
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_94C35:				; CODE XREF: MissionText_ReleaseSubrecordA_94BF0+1Aj
+loc_94C35:				; CODE XREF: Poly_LoadLINS_94BF0+1Aj
 		pop	si
 		pop	bp
 		retf
-MissionText_ReleaseSubrecordA_94BF0	endp
+Poly_LoadLINS_94BF0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -54,9 +56,11 @@ MissionText_ReleaseSubrecordA_94BF0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante de MissionText_ReleaseSubrecordA_94BF0.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM SPRS / chunk VSPR →
+; VROOMM_StubThunk_6B970 (AircraftComponent_LoadWithDwordFieldsC_95590, non lu). Ex-
+; MissionText_ReleaseSubrecordB.
 ; ==============================================================================================
-MissionText_ReleaseSubrecordB_94C38	proc far		; CODE XREF: VROOMM_StubThunk_6B8EAJ MissionText_AllocateMultiBuffer_94C80+A2p
+Poly_LoadSPRS_94C38	proc far		; CODE XREF: VROOMM_StubThunk_6B8EAJ Poly_BuildFaceElements_94C80+A2p
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -94,16 +98,16 @@ loc_94C6E:
 loc_94C73:
 		add	sp, 6
 
-loc_94C76:				; CODE XREF: MissionText_ReleaseSubrecordB_94C38:loc_94C67j
+loc_94C76:				; CODE XREF: Poly_LoadSPRS_94C38:loc_94C67j
 		push	si
 		call	ResourceRecord_ReleaseAndClear_64D25
 		pop	cx
 
-loc_94C7D:				; CODE XREF: MissionText_ReleaseSubrecordB_94C38+1Aj
+loc_94C7D:				; CODE XREF: Poly_LoadSPRS_94C38+1Aj
 		pop	si
 		pop	bp
 		retf
-MissionText_ReleaseSubrecordB_94C38	endp
+Poly_LoadSPRS_94C38	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -111,9 +115,12 @@ MissionText_ReleaseSubrecordB_94C38	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, alloue 3 blocs typés (Memory_TypedAllocDispatchB_5C832 ×3, 68 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CONSTRUIT LES ÉLÉMENTS DE DESSIN
+; (ex-MissionText_AllocateMultiBuffer). Pointeurs de remplissage dword_6E8D0 (éléments, +1Ch)
+; et dword_6E8D4 (données de face, +12h), puis Poly_LoadTRIS_95FD0, Poly_LoadLINS_94BF0,
+; Poly_LoadSPRS_94C38, Poly_LoadDETA_96140.
 ; ==============================================================================================
-MissionText_AllocateMultiBuffer_94C80	proc far		; CODE XREF: VROOMM_StubThunk_6B8E0J
+Poly_BuildFaceElements_94C80	proc far		; CODE XREF: VROOMM_StubThunk_6B8E0J
 
 arg_0		= dword	ptr  6
 arg_4		= word ptr  0Ah
@@ -158,7 +165,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr MissionText_ReleaseSubrecordA_94BF0
+		call	near ptr Poly_LoadLINS_94BF0
 		add	sp, 6
 		push	0
 		les	bx, [bp+arg_0]
@@ -171,7 +178,7 @@ arg_4		= word ptr  0Ah
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr MissionText_ReleaseSubrecordB_94C38
+		call	near ptr Poly_LoadSPRS_94C38
 		add	sp, 6
 		push	si
 		push	large [bp+arg_0]
@@ -180,6 +187,6 @@ arg_4		= word ptr  0Ah
 		pop	si
 		pop	bp
 		retf
-MissionText_AllocateMultiBuffer_94C80	endp
+Poly_BuildFaceElements_94C80	endp
 
 ovr271		ends

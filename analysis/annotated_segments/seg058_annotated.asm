@@ -841,8 +841,8 @@ LightSet_RecomputeShares_2B49F	endp
 ; part de la PREMIÈRE lumière de la liste (+0Fh du 1er élément) ; bornée à 255. La direction
 ; rangée dans les lumières n'est pas lue ici. Ex-'Render_FaceDotProductTest'.
 ; ==============================================================================================
-LightSet_FaceIntensity_2B54A	proc far		; CODE XREF: Mesh_FacePrepareIndirect+E7P
-					; Mesh_FacePrepareIndirect+146P ...
+LightSet_FaceIntensity_2B54A	proc far		; CODE XREF: Face_LightFlat_29A7D+E7P
+					; Face_LightFlat_29A7D+146P ...
 
 var_14		= dword	ptr -14h
 var_10		= dword	ptr -10h

@@ -382,7 +382,7 @@ off_69F26	dd loc_1689B
 		db  0Dh
 		db    1
 		db    0
-		dd loc_24EE2+2
+		dd FaceElement_CullAndProject_24EE2+2
 		db 0C7h	; �
 		db    9
 		db    1

@@ -323,6 +323,38 @@ FORM REAL
                          FORM TRIS/VTRI, FORM LINS/VLIN, FORM SPRS/VSPR, FORM TXMS…)
 ```
 
+**Apparence 3D `FORM POLY` (lue 2026-10-16)** — format des chunks, tel que le lit
+`Poly_LoadFromIFF_96321` ; comportement du rendu : `OBJECT_RENDER.md`. Tailles en octets, petit-boutiste.
+
+| Chunk | Contenu |
+|---|---|
+| `INFO` | `uint8` (lu seul ; le chunk du F-16 fait 2 o, `00 56`, le 2e octet n'est pas lu) : ≠ 0 = objet dessiné même quand l'œil est dans sa sphère |
+| `AINF` | `int32` période de l'animation de texture (défaut 0Ch sans chunk), `uint16` (rangé en +96h) |
+| `VERT` | 12 o par sommet : 3 `int32` 24.8 (c0, c1, c2 ; ÷ 256 = mètres ; libRS `x = c0`, `y = c2`, `z = −c1`) |
+| `FORM DETA` | chunks `LVL0` … `LVL7` : `uint32` distance (mètres, entier), puis des `uint16` numéros de face (jusqu'à la fin du chunk) |
+| `FORM TRIS` / `VTRI` | 8 o par face, tableau ci-dessous |
+| `FORM TRIS` / `FORM TXMS` / `INFO` | `uint16` nombre de `TXMP`, puis (si le chunk fait plus de 2 o) `uint16` nombre de `TXMA` |
+| `FORM TXMS` / `TXMP` | `char[8]` nom, `uint16` largeur, `uint16` hauteur, puis largeur × hauteur octets (index de palette, ligne après ligne ; `0xFF` = transparent) |
+| `FORM TXMS` / `TXMA` | texture animée : en-tête de 14 o lu, suite non détaillée |
+| `FORM TRIS` / `UVXY` | 8 o : `uint8` numéro de face, `uint8` numéro de texture (≥ nombre de `TXMP` → `TXMA` n° − nombre de `TXMP`), puis 3 × (`uint8` u = colonne, `uint8` v = ligne) dans l'ordre des sommets de la face |
+| `FORM LINS` / `VLIN` | 7 o par ligne (contenu non lu) |
+| `FORM SPRS` / `VSPR` | 8 o par sprite (contenu non lu) |
+
+Une face `VTRI` (8 o) :
+
+| Octet | Contenu |
+|---|---|
+| 0 | type de face, 0 à 9 (mode d'éclairage et de dessin, `OBJECT_RENDER.md` §4) |
+| 1, 2, 3 | numéros des 3 sommets (`uint8`) |
+| 4 | couleur (index de palette) ; type 2 : numéro de table de translucidité |
+| 5 | bit 0 rangé avec la face ; rôle non établi (0 sur tout le F-16) |
+| 6 | 1, 2, 4 ou 8 observés sur le F-16 ; non lu par la préparation des faces |
+| 7 | bit 0 = face double (dessinée des deux côtés) |
+
+Constat sur `F-16DES.IFF` : 164 sommets, 263 faces, `LVL0` (0 m, 135 faces), `LVL1` (500 m, 99),
+`LVL2` (1000 m, 25), `LVL3` (1500 m, 4), 15 textures (`JETEXHST` 40 × 40…), 73 entrées `UVXY`
+(faces de types 6, 7, 8).
+
 Lecteurs de classe, chacun reprenant celui de sa base (« communs » = `Object_LoadCommonChunks_9BA85`) :
 
 | Classe | Lecteur | Chunks |
@@ -2322,7 +2354,7 @@ tables de stubs VROOMM.) Vérifié sur `MAURITAN.PAK` (1 044 396 o, 7 sous-resso
 4. **Remplissage** : si `byte_6EB21` = 1 (valeur par défaut ; réglage lu par `Cockpit_ReadControlsFrame_8F720`), chaque sommet garde son index et la face est dégradée ; sinon les 3 sommets reçoivent la moyenne des 3 index (face unie).
 5. **Tracé** (lu 2026-10-14) : chaque triangle devient un objet de la liste de primitives (`dword_724AE`) ; classe `193Ah` = triangle ombré, `1A76h` / `1A72h` = triangle texturé (dessine d'abord le triangle ombré, puis la texture). `Render_DispatchFlatOrPerspective` : 3 teintes égales → `Render_PolygonPrimitive_20848` (face unie, index = teinte ÷ 256 tronqué) ; sinon `Render_MeshPrimitive_21085` = **Gouraud sur l'index de palette** : teinte interpolée linéairement le long des bords puis de chaque ligne (virgule fixe 16.16), et **tramage en damier** : sur un pixel sur deux (parité de x XOR y), on ajoute ½ teinte avant de prendre la partie entière. Les pixels alternent donc entre deux teintes voisines là où la teinte tombe entre deux.
 6. **La table `541Ah` est la palette** (`DATA\PALETTE.IFF`, lue par `TextureLoader_LoadMixedFields_983FB`) : `INFO` → `+68h` précision du brouillard (16), `+4Eh` log₂ seuils par ligne (5), `+46h` lignes (20), `+7Ah` pas (9) ; `RANG` (`TextureLoader_FormatAndLoad_985F6`) → `+58h` nombre de couleurs, `+5Ah` entrées de 15 o converties depuis les enregistrements de 13 o par `TextureLoader_Allocate_97F40` (`+0`→`e+6` première teinte, `+2`→`e+0Bh` n, `+4`→`e+0Dh` décalage de brouillard, `+6..8`→`e+8..A`, `+9..12`→`e+2..5`, `e+0` = la palette). Seuils de brouillard : 20 lignes × 32 `dd` lues par `TextureLoader_LoadWithDwordFieldsC_98956` (taille contrôlée = 20 << 5 × 4 = 2 560 o) dans le fichier nommé par `TABL` (« palfade », absent du dépôt). `Palette_SelectFogRow_2EA80` choisit la ligne : valeur ÷ 512, dernière ligne au-delà de 10 240, et range son 1er et son dernier seuil dans `+72h` / `+76h` ; appelée par `Terrain_UpdateLODPerFrame`.
-   **Couleurs de base de `PALETTE.IFF`** (première..dernière teinte, brouillard = première + décalage, RVB × 4) : 0 = 160..166 (bleu, (24,56,76)→(16,96,124)) ; 1 = 32..54 ((52,40,24)→(196,160,96)) ; 2 = 96..118 ((32,28,20)→(120,100,76)) ; 3 = 64..86 ((32,36,20)→(116,136,68)) ; 4 = 128..150 ((16,24,8)→(60,92,36)) ; 5 = 1..22 (gris (36)→(144)) ; 6 = 176..198 ((64)→(244), blanc). Brouillard : première + 31 (+15 pour la 0) = gris (192,192,192) pour les 7. ALASKA n'utilise que 0, 4 et 6.
+   **Couleurs de base de `PALETTE.IFF`** (première..dernière teinte, brouillard = première + décalage, RVB × 4) : 0 = 160..166 (bleu, (24,56,76)→(16,96,124)) ; 1 = 32..54 ((52,40,24)→(196,160,96)) ; 2 = 96..118 ((32,28,20)→(120,100,76)) ; 3 = 64..86 ((32,36,20)→(116,136,68)) ; 4 = 128..150 ((16,24,8)→(60,92,36)) ; 5 = 1..22 (gris (36)→(144)) ; 6 = 176..198 ((64)→(244), blanc). Brouillard : première + 31 (+15 pour la 0) = gris (192,192,192) pour les 7. ALASKA n'utilise que 0, 4 et 6. **Appartenance d'une couleur à une gamme** (`Table_LookupByRange_2E975`, lu 2026-10-16) : première ≤ couleur ≤ première + 3e champ (le décalage de brouillard), bornes comprises — la gamme 1 couvre donc 32..63, la 5 couvre 1..31.
 - Non établi : la valeur passée à `Palette_SelectFogRow_2EA80` (altitude de l'observateur ?), et la profondeur exacte utilisée (`[si+12h]` du sommet transformé).
 
 **PAK imbriqué** : `dd taille` puis `dd (offset|0xE0000000) × 324` ; les cellules

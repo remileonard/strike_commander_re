@@ -7,9 +7,13 @@ ovr283		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocation, ReadFinalField_64B51 (×2), gestion d'erreur (125 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK UVXY (ex-
+; AircraftComponent_LoadFinalFieldsWithErrorCheck) : 8 o par entrée. uint8 numéro de face (<
+; nombre de faces, sinon erreur 600Ah) → élément ; uint8 numéro de texture : < nb TXMP → +8Ah
+; + n×6, sinon n − nb TXMP < nb TXMA → +8Ch + m×12, sinon 0 (erreur 600Bh) → élément +16h ; 6
+; octets (u0, v0, u1, v1, u2, v2) → élément +18h.
 ; ==============================================================================================
-AircraftComponent_LoadFinalFieldsWithErrorCheck_96650	proc far		; CODE XREF: VROOMM_StubThunk_6BB20J
+Poly_LoadUVXY_96650	proc far		; CODE XREF: VROOMM_StubThunk_6BB20J
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -46,7 +50,7 @@ loc_9665F:
 		jmp	loc_96738
 ; ���������������������������������������������������������������������������
 
-loc_96692:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+EDj
+loc_96692:				; CODE XREF: Poly_LoadUVXY_96650+EDj
 		push	si
 		call	ResourceRecord_ReadFinalField_64B51
 		pop	cx
@@ -65,12 +69,12 @@ loc_96692:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650
 		jmp	short loc_966C6
 ; ���������������������������������������������������������������������������
 
-loc_966BD:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+52j
+loc_966BD:				; CODE XREF: Poly_LoadUVXY_96650+52j
 		push	600Ah
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_966C6:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+6Bj
+loc_966C6:				; CODE XREF: Poly_LoadUVXY_96650+6Bj
 		push	si
 		call	ResourceRecord_ReadFinalField_64B51
 		pop	cx
@@ -86,7 +90,7 @@ loc_966C6:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650
 		jmp	short loc_9670A
 ; ���������������������������������������������������������������������������
 
-loc_966EB:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+8Bj
+loc_966EB:				; CODE XREF: Poly_LoadUVXY_96650+8Bj
 		les	bx, [bp+arg_0]
 		sub	cx, es:[bx+86h]
 		cmp	es:[bx+88h], cx
@@ -98,11 +102,11 @@ loc_966EB:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650
 		jmp	short loc_9670A
 ; ���������������������������������������������������������������������������
 
-loc_96708:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+A8j
+loc_96708:				; CODE XREF: Poly_LoadUVXY_96650+A8j
 		xor	ax, ax
 
-loc_9670A:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+99j
-					; AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+B6j
+loc_9670A:				; CODE XREF: Poly_LoadUVXY_96650+99j
+					; Poly_LoadUVXY_96650+B6j
 		les	bx, [bp+var_4]
 		mov	es:[bx+16h], ax
 		cmp	word ptr es:[bx+16h], 0
@@ -111,7 +115,7 @@ loc_9670A:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_96721:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+C6j
+loc_96721:				; CODE XREF: Poly_LoadUVXY_96650+C6j
 		push	large 6
 		mov	ax, word ptr [bp+var_4]
 		add	ax, 18h
@@ -122,17 +126,17 @@ loc_96721:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650
 		add	sp, 0Ah
 		inc	di
 
-loc_96738:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+3Fj
+loc_96738:				; CODE XREF: Poly_LoadUVXY_96650+3Fj
 		cmp	di, [bp+var_8]
 		jge	short loc_96740
 		jmp	loc_96692
 ; ���������������������������������������������������������������������������
 
-loc_96740:				; CODE XREF: AircraftComponent_LoadFinalFieldsWithErrorCheck_96650+EBj
+loc_96740:				; CODE XREF: Poly_LoadUVXY_96650+EBj
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadFinalFieldsWithErrorCheck_96650	endp
+Poly_LoadUVXY_96650	endp
 
 ovr283		ends

@@ -5764,8 +5764,8 @@
 "sub_2F404",
 "sub_2E8F1"
 ],
-"new_name": "Keyframe_ResolveEasingValue",
-"summary": "far,42L — résout une table d'interpolation (sub_2F404/sub_2E8F1, table 0x541A) selon la progression d'une animation (+2 >>8), indexe la table par un paramètre (arg_4) : **résolution de valeur d'easing/interpolation pour le système de keyframe (utilisée par seg042).**"
+"new_name": "Palette_FogRemapColour_29194",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). COULEUR D'UNE FACE NON ÉCLAIRÉE (ex-Keyframe_ResolveEasingValue, aucun rapport avec des keyframes). Args (élément, couleur). Profondeur = clé +2 de l'élément ÷ 256 → Interp_ResolveCached_2F404(541Ah, …) (rang de brouillard) → Text_ResolveTruncated_2E8F1 (table de 256 o) ; table nulle (pas de brouillard) → couleur inchangée, sinon table[couleur]."
 },
 "sub_291E2": {
 "segment": "seg055",
@@ -5791,8 +5791,8 @@
 "sub_61960",
 "sub_61960"
 ],
-"new_name": "Mesh_DrawTriangleWireframe",
-"summary": "far,47L — appelle 3 fois sub_61960 (tracé de segment) entre les 3 paires de sommets : **tracé du contour (wireframe) d'un triangle.**"
+"new_name": "Face_DrawWireframe_292BE",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Trace les 3 arêtes d'un triangle (Render_FillClippedRect_61960 = tracé de segment) ; utilisé à la place du remplissage quand byte_6E684 ≠ 0 (mode fil de fer). Ex-Mesh_DrawTriangleWireframe."
 },
 "sub_2931E": {
 "segment": "seg055",
@@ -5804,8 +5804,8 @@
 "sub_550B7",
 "sub_559BB"
 ],
-"new_name": "Mesh_ComputeEdgeVectors",
-"summary": "far,100L — calcule deux vecteurs d'arête (V2-V1, V3-V1) à partir de 3 pointeurs de sommets (+0x19/+0x1D/+0x21, structures 3D 12 octets) : **calcul des vecteurs d'arête d'une face triangulaire (base du calcul de normale).**"
+"new_name": "Face_ComputeNormal_2931E",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). NORMALE DE FACE (ex-Mesh_ComputeEdgeVectors) : a = V0 − V2, b = V0 − V1 (sommets +19h/+1Dh/+21h), N = a × b (Vector_CrossProduct3D_550B7) normalisée → +1/+5/+9."
 },
 "sub_2941F": {
 "segment": "seg055",
@@ -5814,8 +5814,8 @@
 "lines": 61,
 "type": "far",
 "calls": [],
-"new_name": "Mesh_ComputeCentroid",
-"summary": "far,61L — calcule le centroïde (moyenne /3) des 3 sommets d'un triangle sur les 3 axes : **calcul du barycentre d'une face triangulaire (tri de profondeur/culling).**"
+"new_name": "Face_ComputeCentroid_2941F",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Centre de la face = moyenne des 3 sommets (÷ 3) → +0Dh/+11h/+15h. Utilisé par le rejet des faces vues de dos (loc_24EE2)."
 },
 "sub_294C0": {
 "segment": "seg055",
@@ -5827,8 +5827,8 @@
 "sub_2931E",
 "sub_2941F"
 ],
-"new_name": "Mesh_FaceSetup",
-"summary": "far,87L — stocke 3 pointeurs de sommets (+0x19/+0x1D/+0x21), copie 2 bits de flags depuis un matériau (+0x25), appelle sub_2931E (arêtes) et sub_2941F (centroïde) : **constructeur/setup de face triangulaire pour le rasterizer (init géométrie + matériau).**"
+"new_name": "Face_SetupGeometry_294C0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). PRÉPARATION COMMUNE D'UNE FACE (ex-Mesh_FaceSetup) : 3 pointeurs de sommets +19h/+1Dh/+21h ; drapeau +25h bit 0 = octet 7 de VTRI & 1 (face double), bit 1 = octet 5 & 1 ; Face_ComputeNormal_2931E, Face_ComputeCentroid_2941F ; ajoute la normale de la face à la normale (+0Ch..+14h) de ses 3 sommets."
 },
 "sub_295C0": {
 "segment": "seg055",
@@ -5837,8 +5837,8 @@
 "lines": 23,
 "type": "far",
 "calls": [],
-"new_name": "Mesh_GouraudParamsInit",
-"summary": "far,23L — stocke 4 valeurs 32-bit consécutives (+6/+0xA/+0xE/+0x12) : **initialisation de paramètres de shading (probable couleurs de sommets Gouraud).**"
+"new_name": "FaceElement_Init_295C0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de dessin : +6 = données de face, +0Ah/+0Eh/+12h = les 3 sommets projetés. Ex-Mesh_GouraudParamsInit."
 },
 "sub_29732": {
 "segment": "seg055",
@@ -5849,8 +5849,8 @@
 "calls": [
 "sub_294C0"
 ],
-"new_name": "Mesh_FaceSetupSolidColor",
-"summary": "far,28L — appelle sub_294C0 (setup face) puis copie un champ couleur/matériau (+4→+0x26) : **setup de face triangulaire avec couleur unie.**"
+"new_name": "FaceType0_Setup_29732",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 0, 1 et 5 : Face_SetupGeometry_294C0 puis couleur (octet 4) → +26h. Ex-Mesh_FaceSetupSolidColor."
 },
 "sub_29837": {
 "segment": "seg055",
@@ -5861,8 +5861,8 @@
 "calls": [
 "sub_29732"
 ],
-"new_name": "Mesh_FaceSetupSolidColorWrap",
-"summary": "far,23L — wrapper trivial vers sub_29732."
+"new_name": "FaceType1_Setup_29837",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de types 1 et 5 (et tout type hors 0..9) : appelle FaceType0_Setup_29732. Ex-Mesh_FaceSetupSolidColorWrap."
 },
 "sub_298F5": {
 "segment": "seg055",
@@ -5874,8 +5874,8 @@
 "sub_294C0",
 "sub_5C832"
 ],
-"new_name": "Mesh_FaceSetupTexturedColor",
-"summary": "far,50L — appelle sub_294C0 puis résout une couleur via une table de police/texture (sub_5C832 sur 0x72528h) si un index est négatif : **setup de face avec résolution de texture/couleur spéciale (probable texte 3D ou icône dans le monde).**"
+"new_name": "FaceType2_Setup_298F5",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 2 (translucides) : Face_SetupGeometry_294C0 ; octet 4 (signé) < 0 → +26h = 0, sinon +26h = table de 256 o n° octet 4 dans dword_72528 (base + n × 256). Ex-Mesh_FaceSetupTexturedColor."
 },
 "sub_29A0D": {
 "segment": "seg055",
@@ -5886,8 +5886,8 @@
 "calls": [
 "sub_2E975"
 ],
-"new_name": "Render_DamageTintResolve",
-"summary": "far,61L — recherche une teinte de dégât dans une table (sub_2E975, 0x541Ah, pas de 0xF octets/entrée, base word_72524) et soustrait un décalage : **résolution de couleur avec effet de dommage/usure (damage tint).**"
+"new_name": "Face_ResolveRamp_29A0D",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). GAMME DE LA COULEUR (types 4 et 7 ; ex-Render_DamageTintResolve, aucun rapport avec les dégâts). Table_LookupByRange_2E975(541Ah, couleur) : trouvée → +0 = n° de gamme, +1 = couleur − première teinte (entrée +6), +2 = 1 ; sinon +0 = couleur, +1 = 0, +2 = 0."
 },
 "sub_29A7D": {
 "segment": "seg055",
@@ -5900,8 +5900,8 @@
 "sub_2B54A",
 "sub_2B54A"
 ],
-"new_name": "Mesh_FacePrepareIndirect",
-"summary": "far, 163 L, LUE 2026-10-14. MÉTHODE D'ÉCLAIRAGE D'UNE FACE (élément de face, slot +0Ch des tables d'éléments seg339 ~0x6E6xx). Lit la normale de la face dans les données du modèle (pointeur +6 de l'élément → dd +1, +5, +9), sans la transformer ici. Si le drapeau +25h bit 0 est mis : face vue de dos (signe du produit en croix 2D des sommets projetés +1/+3 des 3 sommets indirects +0Ah/+0Eh/+12h) → normale inversée (Utility_Helper_55A37 = négation d'un vecteur) ; résultat mis en cache par les bits 0/1 de +5. Puis LightSet_FaceIntensity_2B54A(5A9Ah, vecteur reçu en 3e argument, normale) → octet +4 de l'élément."
+"new_name": "Face_LightFlat_29A7D",
+"summary": "far, LUE 2026-10-14, complétée 2026-10-16. ÉCLAIRAGE PAR FACE (types 4, 7, 9 ; ex-Mesh_FacePrepareIndirect). Normale de la face (+1/+5/+9 des données). Face double (+25h bit 0) vue de dos ((P1.x−P0.x)(P2.y−P1.y) − (P1.y−P0.y)(P2.x−P1.x) < 0 à l'écran) → normale inversée (Utility_Helper_55A37). LightSet_FaceIntensity_2B54A(5A9Ah, lumière, normale) → octet +4 ; calcul mis en cache par les bits 0/1 de +5 (une fois par image, ou à chaque changement de côté). Le 1er argument « vecteur A » est la direction de la 1re lumière passée dans le repère de l'objet par PolyInstance_Render_2BF6C."
 },
 "sub_29BDA": {
 "segment": "seg055",
@@ -5913,8 +5913,8 @@
 "sub_294C0",
 "sub_29A0D"
 ],
-"new_name": "Mesh_FaceSetupDamageTint",
-"summary": "far,35L — appelle sub_294C0 puis sub_29A0D (teinte dommage) sur le champ couleur (+0x26) : **setup de face avec couleur teintée par les dommages.**"
+"new_name": "FaceType4_Setup_29BDA",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 4 : Face_SetupGeometry_294C0 puis Face_ResolveRamp_29A0D(+26h, couleur). Ex-Mesh_FaceSetupDamageTint."
 },
 "sub_29C13": {
 "segment": "seg055",
@@ -5925,8 +5925,8 @@
 "calls": [
 "sub_295C0"
 ],
-"new_name": "Mesh_GouraudSetupFlag",
-"summary": "far,46L — appelle sub_295C0 (shading Gouraud) puis copie un bit de flag matériau (+0x28→+0x1B bit2) : **setup de shading Gouraud avec flag matériau.**"
+"new_name": "FaceElementType4_Init_29C13",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 4 : FaceElement_Init_295C0 ; bit 2 de +1Bh = « couleur dans une gamme » ; +18h = gamme (ou couleur), +19h = décalage dans la gamme. Ex-Mesh_GouraudSetupFlag."
 },
 "sub_29DB3": {
 "segment": "seg055",
@@ -5937,8 +5937,8 @@
 "calls": [
 "sub_2E975"
 ],
-"new_name": "Render_DamageTintResolveAlt",
-"summary": "far,69L — variante de sub_29A0D sur un offset différent (+0x27) : **résolution de couleur teintée dommage, second canal.**"
+"new_name": "Face_ResolveRampOrZero_29DB3",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Gamme de la couleur pour le type 3 : trouvée → +26h = gamme, +27h = décalage ; sinon +26h = 0 et +27h = 0 (gamme 0). Ex-Render_DamageTintResolveAlt."
 },
 "sub_29E1B": {
 "segment": "seg055",
@@ -5950,8 +5950,8 @@
 "sub_294C0",
 "sub_29DB3"
 ],
-"new_name": "Mesh_FaceSetupDamageTintAlt",
-"summary": "far,36L — appelle sub_294C0 puis sub_29DB3 : **setup de face avec couleur teintée dommage, second canal.**"
+"new_name": "FaceType3_Setup_29E1B",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 3 : Face_SetupGeometry_294C0 puis Face_ResolveRampOrZero_29DB3. Ex-Mesh_FaceSetupDamageTintAlt."
 },
 "sub_29E4E": {
 "segment": "seg055",
@@ -5962,8 +5962,8 @@
 "calls": [
 "sub_295C0"
 ],
-"new_name": "Mesh_GouraudCopyChannels",
-"summary": "far,33L — appelle sub_295C0 puis copie 2 champs couleur (+0x26/+0x27→+0x16/+0x17) : **setup de shading avec copie de 2 canaux couleur.**"
+"new_name": "FaceElementType3_Init_29E4E",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 3 : FaceElement_Init_295C0 ; +16h = gamme, +17h = décalage. Ex-Mesh_GouraudCopyChannels."
 },
 "sub_2A347": {
 "segment": "seg055",
@@ -5975,8 +5975,8 @@
 "sub_294C0",
 "sub_29A0D"
 ],
-"new_name": "Mesh_FaceSetupVariant",
-"summary": "far,31L — variante de sub_29732/sub_29BDA (setup face + couleur) : **setup de face triangulaire, variante additionnelle.**"
+"new_name": "FaceType7_Setup_2A347",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 7 : Face_SetupGeometry_294C0 puis Face_ResolveRamp_29A0D(+26h, couleur). Ex-Mesh_FaceSetupVariant."
 },
 "sub_2A380": {
 "segment": "seg055",
@@ -5987,8 +5987,8 @@
 "calls": [
 "sub_295C0"
 ],
-"new_name": "Mesh_GouraudSetupVariant",
-"summary": "far,40L — variante de sub_29C13 (shading Gouraud + flag matériau) sur offset différent : **setup de shading Gouraud, variante.**"
+"new_name": "FaceElementType7_Init_2A380",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 7 : FaceElement_Init_295C0 ; bit 2 de +23h = « couleur dans une gamme », +20h = gamme (ou couleur), +21h = décalage. Ex-Mesh_GouraudSetupVariant."
 },
 "sub_2A5C7": {
 "segment": "seg055",
@@ -5999,8 +5999,8 @@
 "calls": [
 "sub_2E975"
 ],
-"new_name": "Render_DamageTintResolveAlt2",
-"summary": "far,61L — variante de sub_29A0D/sub_29DB3 (résolution teinte dommage) sur offset +0x27 : **résolution de couleur teintée dommage, troisième variante.**"
+"new_name": "Face_ResolveRampOrZeroB_2A5C7",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Comme Face_ResolveRampOrZero_29DB3, pour le type 8 (couleur hors gamme → gamme 0, décalage 0). Ex-Render_DamageTintResolveAlt2."
 },
 "sub_2A62F": {
 "segment": "seg055",
@@ -6012,8 +6012,8 @@
 "sub_294C0",
 "sub_2A5C7"
 ],
-"new_name": "Mesh_FaceSetupDamageTintAlt2",
-"summary": "far,32L — appelle sub_294C0 puis sub_2A5C7 : **setup de face avec couleur teintée dommage (variante).**"
+"new_name": "FaceType8_Setup_2A62F",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Préparation des faces de type 8 : Face_SetupGeometry_294C0 puis Face_ResolveRampOrZeroB_2A5C7. Ex-Mesh_FaceSetupDamageTintAlt2."
 },
 "sub_2A662": {
 "segment": "seg055",
@@ -6024,8 +6024,8 @@
 "calls": [
 "sub_295C0"
 ],
-"new_name": "Mesh_GouraudCopyChannelsFinal",
-"summary": "far,33L — variante finale du cluster shading/couleur (copie de 2 champs couleur) : **setup de shading, variante finale du cluster.**"
+"new_name": "FaceElementType8_Init_2A662",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Élément de type 8 : FaceElement_Init_295C0 ; +1Eh = gamme, +1Fh = décalage. Ex-Mesh_GouraudCopyChannelsFinal."
 },
 "sub_2AD65": {
 "segment": "seg056",
@@ -6373,8 +6373,8 @@
 "lines": 86,
 "type": "far",
 "calls": [],
-"new_name": "Damage_SelectWeightedComponent",
-"summary": "far,86L — calcule un seuil de probabilité pondéré par la difficulté (constante 0xB33A, échelle dword_72202), recherche dans une table de 8 entrées (+0x64, pas 4 octets) la première dont la probabilité dépasse le seuil : **sélection pondérée d'un composant/type de panne selon un tirage de probabilité (système de dommages structurels).**"
+"new_name": "Poly_SelectDetailLevel_2BCA4",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHOIX DU NIVEAU DE DÉTAIL (ex-Damage_SelectWeightedComponent, aucun rapport avec les dégâts). Args (apparence, profondeur en m entière). Seuil = profondeur × 0B33Ah (179,2) ÷ dword_72202 (échelle de projection). Pour i de 7 à 1 : si distance +64h[i] ≠ 0 et distance ≤ seuil → i ; sinon si byte_6E8CE ≥ i → i. Sinon 0."
 },
 "sub_2BD51": {
 "segment": "seg060",
@@ -6385,8 +6385,8 @@
 "calls": [
 "sub_4FBC3"
 ],
-"new_name": "Damage_CheckTimer",
-"summary": "far,51L — reset du timer de vérification de panne une fois par image (+0x98 mémorise le compteur d'images word_70466) ; sinon décrémente le timer (dword_70458) et déclenche sub_4FBC3 (+0x86) à expiration : **minuteur de vérification périodique de panne de composant, sensible à la difficulté.** | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3, > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F (PilotProfile_RescaleSkillByDifficulty_12FC9)."
+"new_name": "PolyAppearance_AnimTimerTick_2BD51",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). MINUTEUR DE L'ANIMATION DE TEXTURE (ex-Damage_CheckTimer) : une fois par image (+98h = word_70466), +92h −= dword_70458 ; à échéance Anim_UpdateFrameCycleArray_4FBC3(+86h) et +92h = +8Eh (période AINF)."
 },
 "sub_2BE0A": {
 "segment": "seg060",
@@ -6397,8 +6397,8 @@
 "calls": [
 "sub_56C6A"
 ],
-"new_name": "Damage_UpdateHudIcon",
-"summary": "far,26L — récupère une position via vtable[0x3C]+0x12 puis notifie l'affichage (sub_56C6A, offset +0x5D) : **mise à jour de l'icône de dommage sur le HUD/panneau à une position 3D.**"
+"new_name": "PolyInstance_UpdateFromObject_2BE0A",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Lit une valeur de l'objet porteur (méthode +3Ch de l'objet +6, argument +12h) et la passe à Damage_ComputeHelperC_56C6A avec +5Dh de l'instance. Rôle exact non lu. Ex-Damage_UpdateHudIcon."
 },
 "sub_2BE63": {
 "segment": "seg060",
@@ -6409,8 +6409,8 @@
 "calls": [
 "sub_5C832"
 ],
-"new_name": "Damage_ResetComponentFlags",
-"summary": "far,42L — parcourt un tableau de composants (12 octets/entrée, compteur +9), résout le nom (sub_5C832) et efface le bit 0 du flag d'état (+0x11) de chacun : **réinitialisation du flag 'endommagé' de tous les composants d'un système.**"
+"new_name": "PolyInstance_ClearVertexLightFlags_2BE63",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Efface le bit 0 (éclairage du sommet déjà calculé) de l'octet +11h des sommets projetés (12h o, nombre +9). Ex-Damage_ResetComponentFlags."
 },
 "sub_2BEA5": {
 "segment": "seg060",
@@ -6421,8 +6421,8 @@
 "calls": [
 "sub_5C832"
 ],
-"new_name": "Damage_ResetAllFlags",
-"summary": "far,40L — variante de sub_2BE63 effaçant 3 bits de flag (+0x11, bits 1/2/3) : **réinitialisation complète de l'état de tous les composants (dommage/feu/défaillance).**"
+"new_name": "PolyInstance_ClearVertexFrameFlags_2BEA5",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Efface les bits 1, 2, 3 (transformé, projeté, hors champ) de l'octet +11h des sommets projetés, après le dessin. Ex-Damage_ResetAllFlags."
 },
 "sub_2BEF7": {
 "segment": "seg060",
@@ -6433,8 +6433,8 @@
 "calls": [
 "sub_5C832"
 ],
-"new_name": "Damage_ResolveComponentPositions",
-"summary": "far,64L — résout la position 3D (+0x28/+0x2A via un objet référencé +2) et le nom (sub_5C832, +0x17/+0x1B) de chaque composant, calcule sa position projetée : **résolution des positions d'affichage des composants endommagés (diagramme de dommages du cockpit).**"
+"new_name": "PolyInstance_ResetFaceElements_2BEF7",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Appelle la méthode +4 de chaque élément de dessin (liste +28h, nombre +15h) : remise à zéro de l'éclairage mis en cache pour les types 4, 7, 9. Ex-Damage_ResolveComponentPositions."
 },
 "sub_2BF6C": {
 "segment": "seg060",
@@ -6467,8 +6467,8 @@
 "sub_2BEA5",
 "sub_27144"
 ],
-"new_name": "Damage_SimulationTick",
-"summary": "far,**1019 lignes**. Lit le timer PIT haute précision (sub_27144) en tout début, utilise une table indexée (word_72B4C) de vecteurs 3D par composant. **Candidat très fort pour la fonction principale de simulation de dommages structurels/défaillance de composants** (calcul par tick, cohérent avec sub_2BCA4/sub_2BD51 qui l'entourent) — bien trop volumineuse pour une passe rapide, prioritaire pour une session dédiée."
+"new_name": "PolyInstance_Render_2BF6C",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). RENDU D'UNE INSTANCE D'OBJET POLY (ex-Damage_SimulationTick, aucun rapport avec les dégâts ; méthode 0 de la table seg339:183Ah). Direction de la 1re lumière = word_72B4C → [+4]+1. Position de l'objet − œil, passée dans le repère caméra. Distance < rayon (+20h de l'objet) : dessiné seulement si INFO de POLY (+84h) ≠ 0. Test contre les bords du champ : |x| et |haut| comparés à rayon × [si+68h/6Ch] + profondeur × [si+70h/74h]. Taille projetée = rayon × dword_72202 ÷ profondeur : ≤ 19h (0,1 pixel) → rien ; ≤ 133h (1,2 pixel) → un point de couleur +85h dans la file ; sinon maillage : niveau Poly_SelectDetailLevel_2BCA4, matrices, direction de la lumière passée dans le repère de l'objet (Matrix_WorldToLocal_58768) et normalisée ; pour chaque face du niveau : méthode +18h (rejet de la face vue de dos, transformation et projection des sommets, loc_24EE2) ; si visible méthode +20h (éclairage, avec la lumière) ; clé +2 += décalage ±400h (objets à porteur, non détaillé) ; ajout dans la file dword_724AE (word_724AC / word_724AA). Puis PolyInstance_ClearVertexFrameFlags_2BEA5."
 },
 "sub_2C954": {
 "segment": "seg061",
@@ -6710,8 +6710,8 @@
 "sub_2F55E",
 "sub_2E8F1"
 ],
-"new_name": "Gauge_ResolveAndApplyLabel",
-"summary": "far,27L — résout une valeur (sub_2F55E) puis l'applique via sub_2E8F1 : **wrapper de résolution+application de texte/valeur (probable étiquette de jauge).**"
+"new_name": "Palette_ShadeTableFor_2E8CD",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). TABLE D'OMBRE ET DE BROUILLARD d'une couleur hors gamme (ex-Gauge_ResolveAndApplyLabel). Args (541Ah, intensité, profondeur 24.8) → Interp_ResolveNormalizedIndex_2F55E puis Text_ResolveTruncated_2E8F1 : pointeur de table de 256 o, ou 0 (couleur inchangée)."
 },
 "sub_2E8F1": {
 "segment": "seg066",
@@ -6723,8 +6723,8 @@
 "sub_5C832",
 "sub_5C832"
 ],
-"new_name": "Text_ResolveTruncated",
-"summary": "far,82L — résout un texte (sub_5C832) borné par une largeur maximale (+0x52), utilisé par les keyframes d'easing (seg024/029194) : **résolution de texte tronqué à une largeur (utilisé dans le système d'interpolation/easing des keyframes).**"
+"new_name": "Palette_FadeTablePtr_2E8F1",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Adresse d'une table FADE de 256 o (ex-Text_ResolveTruncated). n° 0 → 0 ; n° > 0 → base [+5Eh] + (min(n°, N) − 1) × 256 ; n° < 0 → base + [+50h] (= N × 256) + (min(|n°|, N) − 1) × 256. Les tables viennent du chunk FADE du FORM FTBL du fichier nommé par TABL (TextureLoader_LoadWithDwordFieldsD_989B8)."
 },
 "sub_2E975": {
 "segment": "seg066",
@@ -6733,8 +6733,8 @@
 "lines": 72,
 "type": "far",
 "calls": [],
-"new_name": "Table_LookupByRange",
-"summary": "far,72L — recherche linéaire dans une table de plages (pas 0xF octets, base+longueur) où une valeur tombe, retourne l'index : **table lookup par intervalle — utilisée par les fonctions de teinte de dommage du seg055 (sub_29A0D/sub_29DB3).**"
+"new_name": "Table_LookupByRange_2E975",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). GAMME RANG D'UNE COULEUR : première entrée (15 o, [+5Ah], nombre [+58h]) telle que e+6 ≤ couleur ≤ e+6 + e+0Dh (première teinte + 3e champ de RANG, bornes comprises : `cmp [bx+6],di / jg`, `add ax,[bx+0Dh] / cmp ax,di / jl`) ; sinon FFFFh."
 },
 "sub_2EA80": {
 "segment": "seg066",
@@ -6842,8 +6842,8 @@
 "lines": 185,
 "type": "far",
 "calls": [],
-"new_name": "Interp_ResolveCached",
-"summary": "far,185L — même algorithme de recherche par intervalle avec cache (utilisé par le système d'easing des keyframes, sub_29194) : **résolution générique d'interpolation par table triée avec cache — moteur commun aux systèmes d'easing (keyframe) et de texture mapping (mipmap).**"
+"new_name": "Palette_FogTableIndex_2F404",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). N° de table de brouillard pour une profondeur (ex-Interp_ResolveCached) : même recherche de seuils que Palette_ShadeIndexWithFog_2F24E (cache dword_6E9BA/BE/C2)."
 },
 "sub_2F55E": {
 "segment": "seg067",
@@ -6852,8 +6852,8 @@
 "lines": 216,
 "type": "far",
 "calls": [],
-"new_name": "Interp_ResolveNormalizedIndex",
-"summary": "far,216L — variante avec normalisation d'index (multiplication par le nombre d'entrées +0x52, arrondi) avant la recherche par intervalle cachée : **résolution d'interpolation avec normalisation d'index (jauge/gradient proportionnel).**"
+"new_name": "Palette_ShadeTableIndex_2F55E",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). N° de table (ex-Interp_ResolveNormalizedIndex). niveau = ((intensité × (N + 1) + 80h) >> 8) − 1, N = [+52h] (16 dans PALETTE.IFF), borné à ≥ 0. Facteur de brouillard f (mêmes seuils que Palette_ShadeIndexWithFog_2F24E) ; f = 0 → n° = niveau − N (0 à pleine lumière, négatif = plus sombre) ; branche avec brouillard (f ≠ 0) non détaillée."
 },
 "sub_2F9A8": {
 "segment": "seg068",
@@ -36316,8 +36316,8 @@
 "sub_6B70F",
 "sub_64D25"
 ],
-"new_name": "MissionText_LoadSubtitleRecordB_94710",
-"summary": "⚠️ far, 352 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndReadB_647B2/Memory_TypedFreeWrapper_5C6F3 répétés — variante de MissionText_LoadSubtitleRecord_87A60 (seg251)."
+"new_name": "Appearance_CreateFromIFF_94710",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FABRIQUE D'APPARENCE 3D (ex-MissionText_LoadSubtitleRecordB). Essaie dans l'ordre FORM POLY (objet 9Eh o, table de méthodes 15C4h, lecteur Poly_LoadFromIFF_96321), FLAT (17h o, 15B8h), DIST (17h o, 15ACh), ANIM (22h o, 15A0h), TRCR (4 o, 1594h), AFTB, NONE (2 o) ; erreur 6002h si rien. Tags : push large 594C4F50h 'POLY', 54414C46h 'FLAT', 54534944h 'DIST', 4D494E41h 'ANIM', 52435254h 'TRCR', 42544641h 'AFTB', 454E4F4Eh 'NONE'."
 },
 "sub_94A86": {
 "segment": "ovr270",
@@ -36366,8 +36366,8 @@
 "sub_6B940",
 "sub_64D25"
 ],
-"new_name": "MissionText_ReleaseSubrecordA_94BF0",
-"summary": "far, combine ResourceRecord_SeekAndReadB_647B2/ReleaseAndClear_64D25 (38 lignes)."
+"new_name": "Poly_LoadLINS_94BF0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM LINS / chunk VLIN → VROOMM_StubThunk_6B940 (AircraftComponent_LoadWithDwordFieldsB_952D0, non lu). Ex-MissionText_ReleaseSubrecordA."
 },
 "sub_94C38": {
 "segment": "ovr271",
@@ -36381,8 +36381,8 @@
 "sub_6B970",
 "sub_64D25"
 ],
-"new_name": "MissionText_ReleaseSubrecordB_94C38",
-"summary": "far, variante de MissionText_ReleaseSubrecordA_94BF0."
+"new_name": "Poly_LoadSPRS_94C38",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM SPRS / chunk VSPR → VROOMM_StubThunk_6B970 (AircraftComponent_LoadWithDwordFieldsC_95590, non lu). Ex-MissionText_ReleaseSubrecordB."
 },
 "sub_94C80": {
 "segment": "ovr271",
@@ -36400,8 +36400,8 @@
 "sub_94C38",
 "sub_6BA30"
 ],
-"new_name": "MissionText_AllocateMultiBuffer_94C80",
-"summary": "far, alloue 3 blocs typés (Memory_TypedAllocDispatchB_5C832 ×3, 68 lignes)."
+"new_name": "Poly_BuildFaceElements_94C80",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CONSTRUIT LES ÉLÉMENTS DE DESSIN (ex-MissionText_AllocateMultiBuffer). Pointeurs de remplissage dword_6E8D0 (éléments, +1Ch) et dword_6E8D4 (données de face, +12h), puis Poly_LoadTRIS_95FD0, Poly_LoadLINS_94BF0, Poly_LoadSPRS_94C38, Poly_LoadDETA_96140."
 },
 "sub_94D40": {
 "segment": "ovr272",
@@ -36447,8 +36447,8 @@
 "sub_295C0",
 "sub_5C7B6"
 ],
-"new_name": "AircraftComponent_LoadWithDwordFields_94D40",
-"summary": "⭐⚠️ far, 516 lignes, NON DÉTAILLÉE — combine allocateurs typés et ReadDwordFieldB_64AFF répété — même motif que MissionRecord_LoadWithDwordFields_89850 (seg254). Candidat pour session dédiée."
+"new_name": "Poly_LoadVTRI_94D40",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK VTRI (ex-AircraftComponent_LoadWithDwordFields) : 8 o par face. Octets 1, 2, 3 = indices de sommets (imul 18h vers les sommets, imul 12h vers les sommets projetés) ; octet 0 = type (switch 10 cas off_952AE) qui choisit la préparation (FaceType*_Setup) et le modèle d'élément copié (CRT_MemFamily_Extra1 depuis word_72372… : table de méthodes posée par FaceElements_InitTemplates_2AC16). Type 0 : 72372 ; 1 et 5 : 723A3 ; 2 : 72389 ; 3 : 723D6 ; 4 : 723BA ; 6 : 723EE ; 7 : 7240C ; 8 : 72430 ; 9 : 72450. Range dans +28h[face] le décalage de l'élément. Au 1er face de type 3 : couleur du point lointain +85h = Palette_ShadeIndexWithFog_2F24E(541Ah, gamme de l'octet 4, 200, 0, 0) (0 si la couleur n'est dans aucune gamme)."
 },
 "sub_952D0": {
 "segment": "ovr273",
@@ -36543,8 +36543,8 @@
 "sub_5C774",
 "sub_5C6F3"
 ],
-"new_name": "AircraftComponent_LoadFieldSequence_95800",
-"summary": "⭐⚠️ far, 666 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndRead_64743/SeekAndReadB_647B2 répétés."
+"new_name": "Poly_SizeBuffers_95800",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). PASSE DE DIMENSIONNEMENT (ex-AircraftComponent_LoadFieldSequence). VERT : nombre de sommets = taille ÷ 12 → +2. FORM TRIS/VTRI : taille ÷ 8 faces, cumule pour chaque face selon son octet 0 (type 0..9) la taille de son élément de dessin (17h..24h o) et de ses données de face (26h..2Ah o). FORM LINS/VLIN : 7 o par ligne ; FORM SPRS/VSPR : 8 o. Alloue +12h (sommets 18h o + données de face), +8 (sommets projetés 12h o), +1Ch (éléments de dessin), +28h (une entrée de 4 o par primitive)."
 },
 "sub_95E20": {
 "segment": "ovr276",
@@ -36569,8 +36569,8 @@
 "sub_6CD53",
 "sub_64DB3"
 ],
-"new_name": "AircraftComponent_LoadFieldGroupPair_95E20",
-"summary": "⚠️ far, 227 lignes, NON DÉTAILLÉE — combine ReadFieldGroupB_64A54 ×2, gestion d'erreur."
+"new_name": "Poly_LoadTXMS_95E20",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM TXMS (ex-AircraftComponent_LoadFieldGroupPair). INFO : uint16 nombre de TXMP, puis (si taille > 2) uint16 nombre de TXMA → tables +86h/+8Ah (6 o par texture) et +88h/+8Ch (12 o par texture animée). TXMP : en-tête 12 o (8 o nom, uint16 largeur, uint16 hauteur), puis largeur × hauteur octets ; erreur 6007h si trop de TXMP. TXMA : en-tête 14 o puis VROOMM_StubThunk_6CD53 (format non lu). Fin du FORM par ResourceRecord_ReadPayload_64DB3."
 },
 "sub_95FD0": {
 "segment": "ovr277",
@@ -36596,8 +36596,8 @@
 "sub_6BB20",
 "sub_64D25"
 ],
-"new_name": "AircraftComponent_LoadSubrecord_95FD0",
-"summary": "⚠️ far, 165 lignes, NON DÉTAILLÉE — combine ResourceRecord_SeekAndReadB_647B2 (×2)."
+"new_name": "Poly_LoadTRIS_95FD0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM TRIS (ex-AircraftComponent_LoadSubrecord) : VTRI → Poly_LoadVTRI_94D40 ; FORM TXMS → Poly_LoadTXMS_95E20 (sinon chunks TXMS, 8 o par entrée, et ANMS, 10 o, via VROOMM_StubThunk_6CD62 puis 6BAC0/6BAF0) ; UVXY → Poly_LoadUVXY_96650."
 },
 "sub_96140": {
 "segment": "ovr278",
@@ -36613,8 +36613,8 @@
 "sub_64A19",
 "sub_64D25"
 ],
-"new_name": "AircraftComponent_LoadMixedFields_96140",
-"summary": "⚠️ far, 191 lignes, NON DÉTAILLÉE — combine ReadFieldGroupA_64A19/ReadFieldGroupC_64A7E."
+"new_name": "Poly_LoadDETA_96140",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). FORM DETA (ex-AircraftComponent_LoadMixedFields) : chunks LVL0 à LVL7 (tag 304C564Ch + n × 1000000h). Chacun : uint32 distance → +64h[i], puis (taille − 4) ÷ 2 uint16 numéros de face → liste +2Ch[i], nombre +4Ch[i], +5Ch[i] = 1 ; chaque numéro est remplacé par le décalage de l'élément (+28h). Sans DETA : un seul niveau, toutes les faces, distance 0."
 },
 "sub_962E0": {
 "segment": "ovr279",
@@ -36623,8 +36623,8 @@
 "lines": 19,
 "type": "far",
 "calls": [],
-"new_name": "AircraftComponent_Helper_962E0",
-"summary": "far, aucun appel externe visible (19 lignes)."
+"new_name": "Poly_InitFields_962E0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Met à zéro l'apparence POLY : +4 sommets, +28h table face→élément, +9Ah, +26h nombre de faces, +2 nombre de sommets, +84h, +85h couleur du point lointain, +98h = FFFFh."
 },
 "sub_96321": {
 "segment": "ovr279",
@@ -36644,8 +36644,8 @@
 "sub_6B8E0",
 "sub_559BB"
 ],
-"new_name": "AircraftComponent_LoadMixedFieldsB_96321",
-"summary": "far, combine ReadFinalField_64B51/ReadFieldGroupC_64A7E/ReadFieldGroupB_64A54 (132 lignes)."
+"new_name": "Poly_LoadFromIFF_96321",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). LECTEUR DE FORM POLY (ex-AircraftComponent_LoadMixedFieldsB). INFO : uint8 → +84h (si 0, l'objet n'est pas dessiné quand l'œil est dans sa sphère, voir PolyInstance_Render_2BF6C). AINF : int32 → +8Eh et +92h (période de l'animation de texture, défaut 0Ch), uint16 → +96h. Puis Poly_SizeBuffers_95800, Poly_LoadVERT_96470, Poly_BuildFaceElements_94C80, et normalise la normale (+0Ch..+14h) de chaque sommet (stride 18h, Vector_Normalize3D_559BB)."
 },
 "sub_96470": {
 "segment": "ovr280",
@@ -36660,8 +36660,8 @@
 "sub_64A7E",
 "sub_64A7E"
 ],
-"new_name": "AircraftComponent_LoadFieldGroupC_96470",
-"summary": "far, combine allocation et ReadFieldGroupC_64A7E répété (127 lignes)."
+"new_name": "Poly_LoadVERT_96470",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK VERT (ex-AircraftComponent_LoadFieldGroupC) : 3 int32 24.8 par sommet (c0, c1, c2 Z-up) → sommet de 18h o +0/+4/+8 ; +0Ch..+14h (normale de sommet, cumulée ensuite par Face_SetupGeometry_294C0) mis à 0."
 },
 "sub_96590": {
 "segment": "ovr281",
@@ -36704,8 +36704,8 @@
 "sub_6B70F",
 "sub_64A19"
 ],
-"new_name": "AircraftComponent_LoadFinalFieldsWithErrorCheck_96650",
-"summary": "far, combine allocation, ReadFinalField_64B51 (×2), gestion d'erreur (125 lignes)."
+"new_name": "Poly_LoadUVXY_96650",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK UVXY (ex-AircraftComponent_LoadFinalFieldsWithErrorCheck) : 8 o par entrée. uint8 numéro de face (< nombre de faces, sinon erreur 600Ah) → élément ; uint8 numéro de texture : < nb TXMP → +8Ah + n×6, sinon n − nb TXMP < nb TXMA → +8Ch + m×12, sinon 0 (erreur 600Bh) → élément +16h ; 6 octets (u0, v0, u1, v1, u2, v2) → élément +18h."
 },
 "sub_96750": {
 "segment": "ovr284",
@@ -36765,8 +36765,8 @@
 "sub_2BE63",
 "sub_2BEF7"
 ],
-"new_name": "AircraftComponent_ConstructAndCalibrate_96917",
-"summary": "⭐⚠️ far, 729 lignes, NON DÉTAILLÉE — combine `Descriptor_Construct`, `Calibration_ComputeHelper_56CE5` (seg116, ×2), `Damage_UpdateHudIcon` — construction et calibration d'un composant de dommages avec mise à jour d'icône HUD. Candidat prioritaire pour session dédiée."
+"new_name": "PolyAppearance_CreateInstance_96917",
+"summary": "far, LUE 2026-10-16 en partie. Crée l'instance de rendu d'une apparence POLY (méthode 1 de la table 15C4h via loc_2C92D) ; appelle PolyInstance_UpdateFromObject_2BE0A, PolyInstance_ClearVertexLightFlags_2BE63, PolyInstance_ResetFaceElements_2BEF7. Corps non lu en détail."
 },
 "sub_9707A": {
 "segment": "ovr284",
@@ -47966,5 +47966,195 @@
 "calls": [],
 "new_name": "Cockpit_MissileWarningLampsDraw_1FE81",
 "summary": "far (label). Dessin des voyants d'alerte missile (methode d'instrument, seg339:08EE) ; non lu en detail."
+},
+"loc_2AC16": {
+"segment": "seg055",
+"start_line": 86213,
+"end_line": 86213,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceElements_InitTemplates_2AC16",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Pose la table de méthodes de chaque modèle d'élément de face : type 0 → 1729h, 1 et 5 → 16BDh, 2 → 16E1h, 3 → 166Dh, 4 → 1695h (sous-objet d'éclairage +16h → 16B9h), 6 → 1649h, 7 → 1621h (+1Eh → 1645h), 8 → 15FDh, 9 → 15D5h (+16h → 15F9h). Méthodes : +0 dessin, +4 remise à zéro, +8 test de sommets, +0Ch clé de tri, +14h n° de type, +18h visibilité et projection (loc_24EE2), +1Ch déplacement des pointeurs, +20h éclairage."
+},
+"loc_24EE2": {
+"segment": "seg043",
+"start_line": 74267,
+"end_line": 74267,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceElement_CullAndProject_24EE2",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). VISIBILITÉ D'UNE FACE ET PROJECTION DE SES SOMMETS (méthode +18h de tous les éléments). Face simple (+25h bit 0 = 0) : d = (centre + position objet−œil dans le repère objet) · normale ; d ≥ 0 (jns) → face vue de dos, non dessinée. Puis pour chaque sommet non encore transformé (+11h bit 1) : x = ligne 0 · v + t0 → +5, profondeur = ligne 1 · v + t1 → +9, haut = ligne 2 · v + t2 → +0Dh ; écran x = 514Eh + x × [5152h] ÷ profondeur, y = 5150h − haut × [5156h] ÷ profondeur, bornés à ±7D00h → +1/+3."
+},
+"loc_2962D": {
+"segment": "seg055",
+"start_line": 83491,
+"end_line": 83491,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceElement_DepthKey_2962D",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Clé de tri de la face = la plus grande profondeur (+9) de ses 3 sommets projetés → +2."
+},
+"loc_295F1": {
+"segment": "seg055",
+"start_line": 83465,
+"end_line": 83465,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceElement_AllVerticesFlag3_295F1",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Renvoie le ET du bit 3 de +11h des 3 sommets projetés."
+},
+"loc_29760": {
+"segment": "seg055",
+"start_line": 83646,
+"end_line": 83646,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType1_Light_29760",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). « Éclairage » des types 0, 1, 5 : couleur = Palette_FogRemapColour_29194(élément, couleur +26h des données) → +16h. Aucune lumière : ces faces ne dépendent que du brouillard."
+},
+"loc_29857": {
+"segment": "seg055",
+"start_line": 83758,
+"end_line": 83758,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType1_Draw_29857",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin des types 1 et 5 : triangle d'une seule couleur +16h (Render_PolygonPrimitive_20848), ou Face_DrawWireframe_292BE si byte_6E684."
+},
+"loc_2978F": {
+"segment": "seg055",
+"start_line": 83665,
+"end_line": 83665,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType0_Draw_2978F",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 0 : les 3 arêtes en couleur +16h (Render_FillClippedRect_61960)."
+},
+"loc_29953": {
+"segment": "seg055",
+"start_line": 83884,
+"end_line": 83884,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType2_Light_29953",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Type 2 : copie la table de translucidité (+26h des données) → +16h."
+},
+"loc_29977": {
+"segment": "seg055",
+"start_line": 83899,
+"end_line": 83899,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType2_Draw_29977",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 2 : Render_PolygonPrimitive_20C58 avec la table +16h : chaque pixel de l'écran devient table[pixel] (`mov bl,es:[di] / mov al,fs:[bx+si]`) : face translucide."
+},
+"loc_29C73": {
+"segment": "seg055",
+"start_line": 84307,
+"end_line": 84307,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType4_Draw_29C73",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 4 (couleur éclairée par face). Couleur dans une gamme (+1Bh bit 2) : Palette_ShadeIndexWithFog_2F24E(541Ah, gamme +18h, intensité +1Ah, profondeur, décalage +19h) ; sinon table Palette_ShadeTableFor_2E8CD(541Ah, intensité, profondeur)[couleur +18h]. Triangle uni (Render_PolygonPrimitive_20848)."
+},
+"loc_29D96": {
+"segment": "seg055",
+"start_line": 84460,
+"end_line": 84460,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType4_Light_29D96",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 4 : Face_LightFlat_29A7D sur le sous-objet +16h (intensité → +1Ah)."
+},
+"loc_29E95": {
+"segment": "seg055",
+"start_line": 84632,
+"end_line": 84632,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType3_LightVertices_29E95",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 3 : pour chaque sommet pas encore éclairé (+11h bit 0), LightSet_FaceIntensity_2B54A(5A9Ah, lumière, normale du sommet +0Ch..+14h) → octet +0 du sommet projeté."
+},
+"loc_2A006": {
+"segment": "seg055",
+"start_line": 84782,
+"end_line": 84782,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType3_Draw_2A006",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 3 (Gouraud) : par sommet Palette_ShadeIndexWithFog_2F24E(541Ah, gamme +16h, intensité du sommet, profondeur du sommet, décalage +17h). byte_6E682 ≠ 0 et couleurs différentes → dégradé Render_MeshPrimitive_21085 ; sinon moyenne ÷ 3 en triangle uni."
+},
+"loc_2A1C2": {
+"segment": "seg055",
+"start_line": 84986,
+"end_line": 84986,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType6_Draw_2A1C2",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 6 (texture non éclairée). byte_6E683 ≠ 0 et texture +16h : Render_MeshPrimitive_216F6(sommets avec u = +18h/+1Ah/+1Ch et v = +19h/+1Bh/+1Dh × 256, texels, largeur = octet +5 de l'entrée de texture, pas de ligne des texels, table de brouillard) ; sinon triangle uni de la couleur du 1er texel."
+},
+"loc_2A3E0": {
+"segment": "seg055",
+"start_line": 85248,
+"end_line": 85248,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType7_Light_2A3E0",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 7 : Face_LightFlat_29A7D sur le sous-objet +1Eh (intensité → +22h)."
+},
+"loc_2A3FD": {
+"segment": "seg055",
+"start_line": 85268,
+"end_line": 85268,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType7_Draw_2A3FD",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 7 : triangle uni de la couleur éclairée (comme le type 4 : gamme +20h, décalage +21h, intensité +22h), puis si byte_6E683 et texture +16h : texture par-dessus, texels remappés par Palette_ShadeTableFor_2E8CD(intensité, profondeur)."
+},
+"loc_2A6A9": {
+"segment": "seg055",
+"start_line": 85620,
+"end_line": 85620,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType8_LightVertices_2A6A9",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Éclairage du type 8 : comme FaceType3_LightVertices_29E95 (intensité par sommet)."
+},
+"loc_2A81A": {
+"segment": "seg055",
+"start_line": 85766,
+"end_line": 85766,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "FaceType8_Draw_2A81A",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Dessin du type 8 : dégradé de Gouraud (gamme +1Eh, décalage +1Fh, intensité de chaque sommet), puis si byte_6E683 et texture +16h : texture par-dessus, remappée par Palette_ShadeTableFor_2E8CD(moyenne des 3 intensités, profondeur)."
+},
+"loc_2C92D": {
+"segment": "seg060",
+"start_line": 90046,
+"end_line": 90046,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "PolyAppearance_NewInstance_2C92D",
+"summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Méthode 1 de la table 15C4h (apparence POLY) : appelle PolyAppearance_CreateInstance_96917 (via VROOMM_StubThunk_6BB55)."
 }
 }

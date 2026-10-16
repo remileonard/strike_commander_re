@@ -200,12 +200,12 @@ AircraftComponent_ReleaseMultiple_96750	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 729 lignes, NON DÉTAILLÉE — combine Descriptor_Construct,
-; Calibration_ComputeHelper_56CE5 (seg116, ×2), Damage_UpdateHudIcon — construction et
-; calibration d'un composant de dommages avec mise à jour d'icône HUD. Candidat prioritaire
-; pour session dédiée.
+; far, LUE 2026-10-16 en partie. Crée l'instance de rendu d'une apparence POLY (méthode 1 de
+; la table 15C4h via loc_2C92D) ; appelle PolyInstance_UpdateFromObject_2BE0A,
+; PolyInstance_ClearVertexLightFlags_2BE63, PolyInstance_ResetFaceElements_2BEF7. Corps non lu
+; en détail.
 ; ==============================================================================================
-AircraftComponent_ConstructAndCalibrate_96917	proc far		; CODE XREF: VROOMM_StubThunk_6BB55J
+PolyAppearance_CreateInstance_96917	proc far		; CODE XREF: VROOMM_StubThunk_6BB55J
 
 var_6E		= dword	ptr -6Eh
 var_6A		= dword	ptr -6Ah
@@ -262,8 +262,8 @@ arg_8		= word ptr  0Eh
 		jmp	loc_97071
 ; ���������������������������������������������������������������������������
 
-loc_96949:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+Cj
-					; AircraftComponent_ConstructAndCalibrate_96917+2Dj
+loc_96949:				; CODE XREF: PolyAppearance_CreateInstance_96917+Cj
+					; PolyAppearance_CreateInstance_96917+2Dj
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_4], eax
 		mov	ax, [bp+arg_8]
@@ -322,7 +322,7 @@ loc_969C2:
 		mov	byte ptr es:[bx+27h], 0
 		push	word ptr [bp+arg_0+2]
 		push	bx
-		call	Damage_UpdateHudIcon
+		call	PolyInstance_UpdateFromObject_2BE0A
 		add	sp, 4
 		mov	eax, [bp+arg_4]
 		mov	[bp+var_A], eax
@@ -340,7 +340,7 @@ loc_969C2:
 		jmp	loc_96B09
 ; ���������������������������������������������������������������������������
 
-loc_96A58:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+13Cj
+loc_96A58:				; CODE XREF: PolyAppearance_CreateInstance_96917+13Cj
 		mov	eax, [bp+arg_0]
 		mov	es:[bx+9Ah], eax
 		mov	ax, word ptr [bp+var_A+2]
@@ -396,7 +396,7 @@ loc_96AC3:
 		jmp	loc_9704D
 ; ���������������������������������������������������������������������������
 
-loc_96B09:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+13Ej
+loc_96B09:				; CODE XREF: PolyAppearance_CreateInstance_96917+13Ej
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 17h
@@ -408,13 +408,13 @@ loc_96B09:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+13Ej
 		jmp	loc_96D5E
 ; ���������������������������������������������������������������������������
 
-loc_96B26:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+20Aj
+loc_96B26:				; CODE XREF: PolyAppearance_CreateInstance_96917+20Aj
 		cmp	byte ptr es:[bx+20h], 3
 		jz	short loc_96B30
 		jmp	loc_96CB8
 ; ���������������������������������������������������������������������������
 
-loc_96B30:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+214j
+loc_96B30:				; CODE XREF: PolyAppearance_CreateInstance_96917+214j
 		les	bx, [bp+var_22]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_96B44
@@ -423,8 +423,8 @@ loc_96B30:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+214j
 		jmp	loc_96CB8
 ; ���������������������������������������������������������������������������
 
-loc_96B44:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+221j
-					; AircraftComponent_ConstructAndCalibrate_96917+228j
+loc_96B44:				; CODE XREF: PolyAppearance_CreateInstance_96917+221j
+					; PolyAppearance_CreateInstance_96917+228j
 		push	1
 		push	0
 		push	2
@@ -465,8 +465,8 @@ loc_96B44:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+221j
 		jmp	loc_96C5E
 ; ���������������������������������������������������������������������������
 
-loc_96BBC:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+291j
-					; AircraftComponent_ConstructAndCalibrate_96917+2A0j
+loc_96BBC:				; CODE XREF: PolyAppearance_CreateInstance_96917+291j
+					; PolyAppearance_CreateInstance_96917+2A0j
 		les	bx, [bp+var_22]
 
 loc_96BBF:
@@ -486,8 +486,8 @@ loc_96BBF:
 		add	sp, 8
 		jmp	short $+2
 
-loc_96BED:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+2ADj
-					; AircraftComponent_ConstructAndCalibrate_96917+2B4j
+loc_96BED:				; CODE XREF: PolyAppearance_CreateInstance_96917+2ADj
+					; PolyAppearance_CreateInstance_96917+2B4j
 		les	bx, [bp+var_22]
 		mov	dword ptr es:[bx], 0
 		mov	byte ptr es:[bx+5], 0
@@ -517,7 +517,7 @@ loc_96BED:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+2ADj
 		mov	es:[bx+6], eax
 		jmp	short $+2
 
-loc_96C5E:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+2A2j
+loc_96C5E:				; CODE XREF: PolyAppearance_CreateInstance_96917+2A2j
 		mov	eax, [bp+var_26]
 		mov	[bp+var_2A], eax
 		push	0
@@ -550,8 +550,8 @@ loc_96C5E:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+2A2j
 		jmp	loc_96D5E
 ; ���������������������������������������������������������������������������
 
-loc_96CB8:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+216j
-					; AircraftComponent_ConstructAndCalibrate_96917+22Aj
+loc_96CB8:				; CODE XREF: PolyAppearance_CreateInstance_96917+216j
+					; PolyAppearance_CreateInstance_96917+22Aj
 		les	bx, [bp+var_22]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_96CDD
@@ -562,7 +562,7 @@ loc_96CB8:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+216j
 		jmp	loc_96D5E
 ; ���������������������������������������������������������������������������
 
-loc_96CD4:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3B8j
+loc_96CD4:				; CODE XREF: PolyAppearance_CreateInstance_96917+3B8j
 		push	0
 		push	2
 		jmp	short loc_96D3D
@@ -570,7 +570,7 @@ loc_96CD4:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3B8j
 		jmp	loc_96D5E
 ; ���������������������������������������������������������������������������
 
-loc_96CDD:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3A9j
+loc_96CDD:				; CODE XREF: PolyAppearance_CreateInstance_96917+3A9j
 		les	bx, [bp+var_A]
 		mov	eax, es:[bx+22h]
 		mov	[bp+var_3C], eax
@@ -599,7 +599,7 @@ loc_96CDD:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3A9j
 		mov	al, es:[bx+20h]
 		push	ax
 
-loc_96D3D:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3C1j
+loc_96D3D:				; CODE XREF: PolyAppearance_CreateInstance_96917+3C1j
 		les	bx, [bp+var_A]
 		push	large dword ptr	es:[bx+22h]
 		push	large dword ptr	es:[bx+1Ch]
@@ -610,8 +610,8 @@ loc_96D3D:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+3C1j
 		add	sp, 12h
 		jmp	short $+2
 
-loc_96D5E:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+20Cj
-					; AircraftComponent_ConstructAndCalibrate_96917+39Ej ...
+loc_96D5E:				; CODE XREF: PolyAppearance_CreateInstance_96917+20Cj
+					; PolyAppearance_CreateInstance_96917+39Ej ...
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 0Bh
@@ -623,13 +623,13 @@ loc_96D5E:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+20Cj
 		jmp	loc_96FB3
 ; ���������������������������������������������������������������������������
 
-loc_96D7B:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+45Fj
+loc_96D7B:				; CODE XREF: PolyAppearance_CreateInstance_96917+45Fj
 		cmp	byte ptr es:[bx+0Ch], 3
 		jz	short loc_96D85
 		jmp	loc_96F0D
 ; ���������������������������������������������������������������������������
 
-loc_96D85:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+469j
+loc_96D85:				; CODE XREF: PolyAppearance_CreateInstance_96917+469j
 		les	bx, [bp+var_46]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_96D99
@@ -638,8 +638,8 @@ loc_96D85:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+469j
 		jmp	loc_96F0D
 ; ���������������������������������������������������������������������������
 
-loc_96D99:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+476j
-					; AircraftComponent_ConstructAndCalibrate_96917+47Dj
+loc_96D99:				; CODE XREF: PolyAppearance_CreateInstance_96917+476j
+					; PolyAppearance_CreateInstance_96917+47Dj
 		push	1
 		push	0
 		push	2
@@ -692,8 +692,8 @@ loc_96DC2:
 		jmp	loc_96EB3
 ; ���������������������������������������������������������������������������
 
-loc_96E11:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+4E6j
-					; AircraftComponent_ConstructAndCalibrate_96917+4F5j
+loc_96E11:				; CODE XREF: PolyAppearance_CreateInstance_96917+4E6j
+					; PolyAppearance_CreateInstance_96917+4F5j
 		les	bx, [bp+var_46]
 		cmp	byte ptr es:[bx+5], 0
 		jz	short loc_96E42
@@ -711,8 +711,8 @@ loc_96E11:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+4E6j
 		add	sp, 8
 		jmp	short $+2
 
-loc_96E42:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+502j
-					; AircraftComponent_ConstructAndCalibrate_96917+509j
+loc_96E42:				; CODE XREF: PolyAppearance_CreateInstance_96917+502j
+					; PolyAppearance_CreateInstance_96917+509j
 		les	bx, [bp+var_46]
 		mov	dword ptr es:[bx], 0
 		mov	byte ptr es:[bx+5], 0
@@ -744,7 +744,7 @@ loc_96E42:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+502j
 loc_96EB1:
 		jmp	short $+2
 
-loc_96EB3:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+4F7j
+loc_96EB3:				; CODE XREF: PolyAppearance_CreateInstance_96917+4F7j
 		mov	eax, [bp+var_4A]
 		mov	[bp+var_4E], eax
 		push	0
@@ -777,8 +777,8 @@ loc_96EB3:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+4F7j
 		jmp	loc_96FB3
 ; ���������������������������������������������������������������������������
 
-loc_96F0D:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+46Bj
-					; AircraftComponent_ConstructAndCalibrate_96917+47Fj
+loc_96F0D:				; CODE XREF: PolyAppearance_CreateInstance_96917+46Bj
+					; PolyAppearance_CreateInstance_96917+47Fj
 		les	bx, [bp+var_46]
 		cmp	dword ptr es:[bx], 0
 		jz	short loc_96F32
@@ -789,7 +789,7 @@ loc_96F0D:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+46Bj
 		jmp	loc_96FB3
 ; ���������������������������������������������������������������������������
 
-loc_96F29:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+60Dj
+loc_96F29:				; CODE XREF: PolyAppearance_CreateInstance_96917+60Dj
 		push	0
 		push	2
 		jmp	short loc_96F92
@@ -797,7 +797,7 @@ loc_96F29:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+60Dj
 		jmp	loc_96FB3
 ; ���������������������������������������������������������������������������
 
-loc_96F32:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+5FEj
+loc_96F32:				; CODE XREF: PolyAppearance_CreateInstance_96917+5FEj
 		les	bx, [bp+var_A]
 		mov	eax, es:[bx+0Eh]
 		mov	[bp+var_60], eax
@@ -826,7 +826,7 @@ loc_96F32:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+5FEj
 		mov	al, es:[bx+0Ch]
 		push	ax
 
-loc_96F92:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+616j
+loc_96F92:				; CODE XREF: PolyAppearance_CreateInstance_96917+616j
 		les	bx, [bp+var_A]
 		push	large dword ptr	es:[bx+0Eh]
 		push	large dword ptr	es:[bx+8]
@@ -847,8 +847,8 @@ loc_96FAE:
 loc_96FB1:
 		jmp	short $+2
 
-loc_96FB3:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+461j
-					; AircraftComponent_ConstructAndCalibrate_96917+5F3j ...
+loc_96FB3:				; CODE XREF: PolyAppearance_CreateInstance_96917+461j
+					; PolyAppearance_CreateInstance_96917+5F3j ...
 		les	bx, [bp+var_A]
 
 loc_96FB6:
@@ -872,7 +872,7 @@ loc_96FC4:
 		jmp	short loc_97044
 ; ���������������������������������������������������������������������������
 
-loc_96FE3:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+734j
+loc_96FE3:				; CODE XREF: PolyAppearance_CreateInstance_96917+734j
 		push	0
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+0Fh]
@@ -911,29 +911,29 @@ loc_96FE3:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+734j
 		inc	si
 		add	word ptr [bp+var_6A], 2
 
-loc_97044:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+6CAj
+loc_97044:				; CODE XREF: PolyAppearance_CreateInstance_96917+6CAj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+15h], si
 		jg	short loc_96FE3
 
-loc_9704D:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+1EFj
+loc_9704D:				; CODE XREF: PolyAppearance_CreateInstance_96917+1EFj
 		push	large [bp+arg_0]
-		call	Damage_ResetAllFlags
+		call	PolyInstance_ClearVertexFrameFlags_2BEA5
 		add	sp, 4
 		push	large [bp+arg_0]
-		call	Damage_ResetComponentFlags
+		call	PolyInstance_ClearVertexLightFlags_2BE63
 		add	sp, 4
 		push	large [bp+arg_0]
-		call	Damage_ResolveComponentPositions
+		call	PolyInstance_ResetFaceElements_2BEF7
 		add	sp, 4
 
-loc_97071:				; CODE XREF: AircraftComponent_ConstructAndCalibrate_96917+2Fj
+loc_97071:				; CODE XREF: PolyAppearance_CreateInstance_96917+2Fj
 		mov	dx, word ptr [bp+arg_0+2]
 		mov	ax, word ptr [bp+arg_0]
 		pop	si
 		leave
 		retf
-AircraftComponent_ConstructAndCalibrate_96917	endp
+PolyAppearance_CreateInstance_96917	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

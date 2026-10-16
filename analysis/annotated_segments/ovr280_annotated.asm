@@ -7,9 +7,12 @@ ovr280		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocation et ReadFieldGroupC_64A7E répété (127 lignes).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHUNK VERT (ex-
+; AircraftComponent_LoadFieldGroupC) : 3 int32 24.8 par sommet (c0, c1, c2 Z-up) → sommet de
+; 18h o +0/+4/+8 ; +0Ch..+14h (normale de sommet, cumulée ensuite par
+; Face_SetupGeometry_294C0) mis à 0.
 ; ==============================================================================================
-AircraftComponent_LoadFieldGroupC_96470	proc far		; CODE XREF: VROOMM_StubThunk_6BA90J
+Poly_LoadVERT_96470	proc far		; CODE XREF: VROOMM_StubThunk_6BA90J
 
 var_34		= dword	ptr -34h
 var_30		= dword	ptr -30h
@@ -45,7 +48,7 @@ loc_96473:
 		jmp	loc_9658B
 ; ���������������������������������������������������������������������������
 
-loc_96493:				; CODE XREF: AircraftComponent_LoadFieldGroupC_96470+1Ej
+loc_96493:				; CODE XREF: Poly_LoadVERT_96470+1Ej
 		push	0
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+16h]
@@ -67,7 +70,7 @@ loc_964BB:
 		jmp	loc_9657F
 ; ���������������������������������������������������������������������������
 
-loc_964BE:				; CODE XREF: AircraftComponent_LoadFieldGroupC_96470+118j
+loc_964BE:				; CODE XREF: Poly_LoadVERT_96470+118j
 		push	si
 		call	ResourceRecord_ReadFieldGroupC_64A7E
 		push	dx
@@ -122,19 +125,19 @@ loc_96564:
 		inc	di
 		add	word ptr [bp+var_4], 18h
 
-loc_9657F:				; CODE XREF: AircraftComponent_LoadFieldGroupC_96470:loc_964BBj
+loc_9657F:				; CODE XREF: Poly_LoadVERT_96470:loc_964BBj
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+2], di
 		jle	short loc_9658B
 		jmp	loc_964BE
 ; ���������������������������������������������������������������������������
 
-loc_9658B:				; CODE XREF: AircraftComponent_LoadFieldGroupC_96470+20j
-					; AircraftComponent_LoadFieldGroupC_96470+116j
+loc_9658B:				; CODE XREF: Poly_LoadVERT_96470+20j
+					; Poly_LoadVERT_96470+116j
 		pop	di
 		pop	si
 		leave
 		retf
-AircraftComponent_LoadFieldGroupC_96470	endp
+Poly_LoadVERT_96470	endp
 
 ovr280		ends

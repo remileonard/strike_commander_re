@@ -483,7 +483,7 @@ Debris_ComputeNetForce	endp
 ; buffer de couple ; sinon retourne le buffer de force local : résolution du buffer de
 ; force/couple actif d'un débris (avec ou sans parent).
 ; ==============================================================================================
-Debris_ResolveForceBuffer	proc far		; CODE XREF: Damage_SimulationTick+A3P
+Debris_ResolveForceBuffer	proc far		; CODE XREF: PolyInstance_Render_2BF6C+A3P
 					; Debris_TransferForceToParent+59p ...
 
 arg_0		= word ptr  6

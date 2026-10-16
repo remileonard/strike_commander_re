@@ -555,7 +555,7 @@ loc_2BA8D:				; DATA XREF: seg339:17AEo seg339:17D2o
 		mov	al, es:[bx+9]
 		push	ax
 		push	large dword ptr	[bp+6]
-		call	Keyframe_ResolveEasingValue
+		call	Palette_FogRemapColour_29194
 		add	sp, 6
 		les	bx, [bp+6]
 		mov	es:[bx+10h], al

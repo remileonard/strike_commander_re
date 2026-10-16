@@ -15,12 +15,13 @@ loc_2BC9D:				; DATA XREF: seg339:15CCo
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,86L — calcule un seuil de probabilité pondéré par la difficulté (constante 0xB33A,
-; échelle dword_72202), recherche dans une table de 8 entrées (+0x64, pas 4 octets) la
-; première dont la probabilité dépasse le seuil : sélection pondérée d'un composant/type de
-; panne selon un tirage de probabilité (système de dommages structurels).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). CHOIX DU NIVEAU DE DÉTAIL (ex-
+; Damage_SelectWeightedComponent, aucun rapport avec les dégâts). Args (apparence, profondeur
+; en m entière). Seuil = profondeur × 0B33Ah (179,2) ÷ dword_72202 (échelle de projection).
+; Pour i de 7 à 1 : si distance +64h[i] ≠ 0 et distance ≤ seuil → i ; sinon si byte_6E8CE ≥ i
+; → i. Sinon 0.
 ; ==============================================================================================
-Damage_SelectWeightedComponent	proc far		; CODE XREF: Damage_SimulationTick+69Dp
+Poly_SelectDetailLevel_2BCA4	proc far		; CODE XREF: PolyInstance_Render_2BF6C+69Dp
 
 var_22		= dword	ptr -22h
 var_1E		= word ptr -1Eh
@@ -62,7 +63,7 @@ arg_4		= dword	ptr  0Ah
 		jmp	short loc_2BD48
 ; ���������������������������������������������������������������������������
 
-loc_2BD08:				; CODE XREF: Damage_SelectWeightedComponent+A7j
+loc_2BD08:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+A7j
 		mov	ax, [bp+var_1E]
 		shl	ax, 2
 		les	bx, [bp+arg_0]
@@ -78,34 +79,34 @@ loc_2BD08:				; CODE XREF: Damage_SelectWeightedComponent+A7j
 		jmp	short loc_2BD35
 ; ���������������������������������������������������������������������������
 
-loc_2BD33:				; CODE XREF: Damage_SelectWeightedComponent+88j
+loc_2BD33:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+88j
 		xor	ax, ax
 
-loc_2BD35:				; CODE XREF: Damage_SelectWeightedComponent+8Dj
+loc_2BD35:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+8Dj
 		or	al, al
 		jz	short loc_2BD3E
 
-loc_2BD39:				; CODE XREF: Damage_SelectWeightedComponent+A2j
+loc_2BD39:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+A2j
 		mov	al, byte ptr [bp+var_1E]
 		jmp	short locret_2BD4F
 ; ���������������������������������������������������������������������������
 
-loc_2BD3E:				; CODE XREF: Damage_SelectWeightedComponent+93j
+loc_2BD3E:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+93j
 		mov	al, byte_6E8CE
 		mov	ah, 0
 		cmp	ax, [bp+var_1E]
 		jge	short loc_2BD39
 
-loc_2BD48:				; CODE XREF: Damage_SelectWeightedComponent+62j
-					; Damage_SelectWeightedComponent+75j
+loc_2BD48:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+62j
+					; Poly_SelectDetailLevel_2BCA4+75j
 		dec	[bp+var_1E]
 		jg	short loc_2BD08
 		mov	al, 0
 
-locret_2BD4F:				; CODE XREF: Damage_SelectWeightedComponent+98j
+locret_2BD4F:				; CODE XREF: Poly_SelectDetailLevel_2BCA4+98j
 		leave
 		retf
-Damage_SelectWeightedComponent	endp
+Poly_SelectDetailLevel_2BCA4	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -113,16 +114,11 @@ Damage_SelectWeightedComponent	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,51L — reset du timer de vérification de panne une fois par image (+0x98 mémorise le
-; compteur d'images word_70466) ; sinon décrémente le timer (dword_70458) et déclenche
-; sub_4FBC3 (+0x86) à expiration : minuteur de vérification périodique de panne de composant,
-; sensible à la difficulté. | CORRIGE 2026-10-03 : word_70466 n'est PAS la difficulte mais le
-; COMPTEUR DE FRAMES depuis le debut de la mission ('inc word_70466' une fois par frame dans
-; CombatTarget_WeaponActionSubsystem, remis a 0 par le chargeur de mission) ; les seuils (> 3,
-; > 10...) sont des delais de demarrage en frames. La difficulte est word_7235F
-; (PilotProfile_RescaleSkillByDifficulty_12FC9).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). MINUTEUR DE L'ANIMATION DE TEXTURE
+; (ex-Damage_CheckTimer) : une fois par image (+98h = word_70466), +92h −= dword_70458 ; à
+; échéance Anim_UpdateFrameCycleArray_4FBC3(+86h) et +92h = +8Eh (période AINF).
 ; ==============================================================================================
-Damage_CheckTimer	proc far		; CODE XREF: seg060:0C64p
+PolyAppearance_AnimTimerTick_2BD51	proc far		; CODE XREF: seg060:0C64p
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -159,20 +155,20 @@ loc_2BD6D:
 		jmp	short locret_2BDBF
 ; ���������������������������������������������������������������������������
 
-loc_2BDA8:				; CODE XREF: Damage_CheckTimer+30j
+loc_2BDA8:				; CODE XREF: PolyAppearance_AnimTimerTick_2BD51+30j
 		mov	eax, [bp+var_4]
 		mov	[bp+var_8], eax
 		mov	eax, [bp+var_8]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+92h], eax
 
-loc_2BDBD:				; CODE XREF: Damage_CheckTimer+12j
+loc_2BDBD:				; CODE XREF: PolyAppearance_AnimTimerTick_2BD51+12j
 		mov	al, 0
 
-locret_2BDBF:				; CODE XREF: Damage_CheckTimer+55j
+locret_2BDBF:				; CODE XREF: PolyAppearance_AnimTimerTick_2BD51+55j
 		leave
 		retf
-Damage_CheckTimer	endp
+PolyAppearance_AnimTimerTick_2BD51	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -225,11 +221,12 @@ loc_2BDF8:				; DATA XREF: seg339:1846o seg339:32CAo
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,26L — récupère une position via vtable[0x3C]+0x12 puis notifie l'affichage (sub_56C6A,
-; offset +0x5D) : mise à jour de l'icône de dommage sur le HUD/panneau à une position 3D.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Lit une valeur de l'objet porteur
+; (méthode +3Ch de l'objet +6, argument +12h) et la passe à Damage_ComputeHelperC_56C6A avec
+; +5Dh de l'instance. Rôle exact non lu. Ex-Damage_UpdateHudIcon.
 ; ==============================================================================================
-Damage_UpdateHudIcon	proc far		; CODE XREF: seg060:01B3p
-					; AircraftComponent_ConstructAndCalibrate_96917+106P
+PolyInstance_UpdateFromObject_2BE0A	proc far		; CODE XREF: seg060:01B3p
+					; PolyAppearance_CreateInstance_96917+106P
 
 arg_0		= dword	ptr  6
 
@@ -253,7 +250,7 @@ arg_0		= dword	ptr  6
 		add	sp, 8
 		pop	bp
 		retf
-Damage_UpdateHudIcon	endp
+PolyInstance_UpdateFromObject_2BE0A	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -263,17 +260,17 @@ loc_2BE3B:				; DATA XREF: seg339:185Ao
 		mov	bp, sp
 		push	large dword ptr	[bp+6]
 		push	cs
-		call	near ptr Damage_UpdateHudIcon
+		call	near ptr PolyInstance_UpdateFromObject_2BE0A
 		add	sp, 4
 		push	large dword ptr	[bp+6]
 		nop
 		push	cs
-		call	near ptr Damage_ResetComponentFlags
+		call	near ptr PolyInstance_ClearVertexLightFlags_2BE63
 		add	sp, 4
 		push	large dword ptr	[bp+6]
 		nop
 		push	cs
-		call	near ptr Damage_ResolveComponentPositions
+		call	near ptr PolyInstance_ResetFaceElements_2BEF7
 		add	sp, 4
 		pop	bp
 
@@ -285,12 +282,12 @@ locret_2BE62:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,42L — parcourt un tableau de composants (12 octets/entrée, compteur +9), résout le nom
-; (sub_5C832) et efface le bit 0 du flag d'état (+0x11) de chacun : réinitialisation du flag
-; 'endommagé' de tous les composants d'un système.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Efface le bit 0 (éclairage du
+; sommet déjà calculé) de l'octet +11h des sommets projetés (12h o, nombre +9). Ex-
+; Damage_ResetComponentFlags.
 ; ==============================================================================================
-Damage_ResetComponentFlags	proc far		; CODE XREF: seg060:01BFp
-					; AircraftComponent_ConstructAndCalibrate_96917+746P
+PolyInstance_ClearVertexLightFlags_2BE63	proc far		; CODE XREF: seg060:01BFp
+					; PolyAppearance_CreateInstance_96917+746P
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -318,19 +315,19 @@ loc_2BE73:
 		jmp	short loc_2BE9A
 ; ���������������������������������������������������������������������������
 
-loc_2BE8D:				; CODE XREF: Damage_ResetComponentFlags+3Ej
+loc_2BE8D:				; CODE XREF: PolyInstance_ClearVertexLightFlags_2BE63+3Ej
 		les	bx, [bp+var_4]
 		and	byte ptr es:[bx+11h], 0FEh
 		inc	dx
 		add	word ptr [bp+var_4], 12h
 
-loc_2BE9A:				; CODE XREF: Damage_ResetComponentFlags+28j
+loc_2BE9A:				; CODE XREF: PolyInstance_ClearVertexLightFlags_2BE63+28j
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+9], dx
 		jg	short loc_2BE8D
 		leave
 		retf
-Damage_ResetComponentFlags	endp
+PolyInstance_ClearVertexLightFlags_2BE63	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -338,11 +335,12 @@ Damage_ResetComponentFlags	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,40L — variante de sub_2BE63 effaçant 3 bits de flag (+0x11, bits 1/2/3) :
-; réinitialisation complète de l'état de tous les composants (dommage/feu/défaillance).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Efface les bits 1, 2, 3
+; (transformé, projeté, hors champ) de l'octet +11h des sommets projetés, après le dessin. Ex-
+; Damage_ResetAllFlags.
 ; ==============================================================================================
-Damage_ResetAllFlags	proc far		; CODE XREF: Damage_SimulationTick+93Dp
-					; AircraftComponent_ConstructAndCalibrate_96917+73AP
+PolyInstance_ClearVertexFrameFlags_2BEA5	proc far		; CODE XREF: PolyInstance_Render_2BF6C+93Dp
+					; PolyAppearance_CreateInstance_96917+73AP
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -366,7 +364,7 @@ arg_0		= dword	ptr  6
 		jmp	short loc_2BEEC
 ; ���������������������������������������������������������������������������
 
-loc_2BED5:				; CODE XREF: Damage_ResetAllFlags+4Ej
+loc_2BED5:				; CODE XREF: PolyInstance_ClearVertexFrameFlags_2BEA5+4Ej
 		les	bx, [bp+var_4]
 		and	byte ptr es:[bx+11h], 0FDh
 		and	byte ptr es:[bx+11h], 0FBh
@@ -374,13 +372,13 @@ loc_2BED5:				; CODE XREF: Damage_ResetAllFlags+4Ej
 		inc	dx
 		add	word ptr [bp+var_4], 12h
 
-loc_2BEEC:				; CODE XREF: Damage_ResetAllFlags+2Ej
+loc_2BEEC:				; CODE XREF: PolyInstance_ClearVertexFrameFlags_2BEA5+2Ej
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+9], dx
 		jg	short loc_2BED5
 		leave
 		retf
-Damage_ResetAllFlags	endp
+PolyInstance_ClearVertexFrameFlags_2BEA5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -388,12 +386,12 @@ Damage_ResetAllFlags	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,64L — résout la position 3D (+0x28/+0x2A via un objet référencé +2) et le nom
-; (sub_5C832, +0x17/+0x1B) de chaque composant, calcule sa position projetée : résolution des
-; positions d'affichage des composants endommagés (diagramme de dommages du cockpit).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Appelle la méthode +4 de chaque
+; élément de dessin (liste +28h, nombre +15h) : remise à zéro de l'éclairage mis en cache pour
+; les types 4, 7, 9. Ex-Damage_ResolveComponentPositions.
 ; ==============================================================================================
-Damage_ResolveComponentPositions	proc far		; CODE XREF: seg060:01CBp
-					; AircraftComponent_ConstructAndCalibrate_96917+752P
+PolyInstance_ResetFaceElements_2BEF7	proc far		; CODE XREF: seg060:01CBp
+					; PolyAppearance_CreateInstance_96917+752P
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -429,7 +427,7 @@ loc_2BF25:
 		jmp	short loc_2BF60
 ; ���������������������������������������������������������������������������
 
-loc_2BF37:				; CODE XREF: Damage_ResolveComponentPositions+70j
+loc_2BF37:				; CODE XREF: PolyInstance_ResetFaceElements_2BEF7+70j
 		les	bx, [bp+var_4]
 		mov	ax, word ptr [bp+var_8]
 		add	ax, es:[bx]
@@ -448,14 +446,14 @@ loc_2BF37:				; CODE XREF: Damage_ResolveComponentPositions+70j
 		inc	si
 		add	word ptr [bp+var_4], 2
 
-loc_2BF60:				; CODE XREF: Damage_ResolveComponentPositions+3Ej
+loc_2BF60:				; CODE XREF: PolyInstance_ResetFaceElements_2BEF7+3Ej
 		les	bx, [bp+arg_0]
 		cmp	es:[bx+15h], si
 		jg	short loc_2BF37
 		pop	si
 		leave
 		retf
-Damage_ResolveComponentPositions	endp
+PolyInstance_ResetFaceElements_2BEF7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -463,13 +461,21 @@ Damage_ResolveComponentPositions	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,1019 lignes. Lit le timer PIT haute précision (sub_27144) en tout début, utilise une
-; table indexée (word_72B4C) de vecteurs 3D par composant. Candidat très fort pour la fonction
-; principale de simulation de dommages structurels/défaillance de composants (calcul par tick,
-; cohérent avec sub_2BCA4/sub_2BD51 qui l'entourent) — bien trop volumineuse pour une passe
-; rapide, prioritaire pour une session dédiée.
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). RENDU D'UNE INSTANCE D'OBJET POLY
+; (ex-Damage_SimulationTick, aucun rapport avec les dégâts ; méthode 0 de la table
+; seg339:183Ah). Direction de la 1re lumière = word_72B4C → [+4]+1. Position de l'objet − œil,
+; passée dans le repère caméra. Distance < rayon (+20h de l'objet) : dessiné seulement si INFO
+; de POLY (+84h) ≠ 0. Test contre les bords du champ : |x| et |haut| comparés à rayon ×
+; [si+68h/6Ch] + profondeur × [si+70h/74h]. Taille projetée = rayon × dword_72202 ÷ profondeur
+; : ≤ 19h (0,1 pixel) → rien ; ≤ 133h (1,2 pixel) → un point de couleur +85h dans la file ;
+; sinon maillage : niveau Poly_SelectDetailLevel_2BCA4, matrices, direction de la lumière
+; passée dans le repère de l'objet (Matrix_WorldToLocal_58768) et normalisée ; pour chaque
+; face du niveau : méthode +18h (rejet de la face vue de dos, transformation et projection des
+; sommets, loc_24EE2) ; si visible méthode +20h (éclairage, avec la lumière) ; clé +2 +=
+; décalage ±400h (objets à porteur, non détaillé) ; ajout dans la file dword_724AE (word_724AC
+; / word_724AA). Puis PolyInstance_ClearVertexFrameFlags_2BEA5.
 ; ==============================================================================================
-Damage_SimulationTick	proc far		; CODE XREF: seg108:041FP
+PolyInstance_Render_2BF6C	proc far		; CODE XREF: seg108:041FP
 					; DATA XREF: seg339:183Ao
 
 var_14C		= dword	ptr -14Ch
@@ -584,7 +590,7 @@ loc_2BF73:
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_2BFBB:				; CODE XREF: Damage_SimulationTick+44j
+loc_2BFBB:				; CODE XREF: PolyInstance_Render_2BF6C+44j
 		les	bx, [bp+arg_0]
 		mov	al, es:[bx+9Fh]
 		and	ax, 1
@@ -593,7 +599,7 @@ loc_2BFBB:				; CODE XREF: Damage_SimulationTick+44j
 		jmp	loc_2C8B9
 ; ���������������������������������������������������������������������������
 
-loc_2BFCD:				; CODE XREF: Damage_SimulationTick+5Cj
+loc_2BFCD:				; CODE XREF: PolyInstance_Render_2BF6C+5Cj
 		and	byte ptr es:[bx+9Fh], 0FDh
 		lea	ax, [bp+var_11C]
 		push	ax
@@ -609,10 +615,10 @@ loc_2BFCD:				; CODE XREF: Damage_SimulationTick+5Cj
 		jmp	short loc_2BFFF
 ; ���������������������������������������������������������������������������
 
-loc_2BFFD:				; CODE XREF: Damage_SimulationTick+8Aj
+loc_2BFFD:				; CODE XREF: PolyInstance_Render_2BF6C+8Aj
 		xor	ax, ax
 
-loc_2BFFF:				; CODE XREF: Damage_SimulationTick+8Fj
+loc_2BFFF:				; CODE XREF: PolyInstance_Render_2BF6C+8Fj
 		mov	[bp+var_D], al
 		cmp	[bp+var_D], 0
 		jz	short loc_2C043
@@ -641,7 +647,7 @@ loc_2C038:
 		jmp	short loc_2C074
 ; ���������������������������������������������������������������������������
 
-loc_2C043:				; CODE XREF: Damage_SimulationTick+9Aj
+loc_2C043:				; CODE XREF: PolyInstance_Render_2BF6C+9Aj
 		les	bx, [bp+arg_0]
 		mov	di, es:[bx+6]
 		add	di, 12h
@@ -656,7 +662,7 @@ loc_2C043:				; CODE XREF: Damage_SimulationTick+9Aj
 		mov	bx, [bx]
 		call	dword ptr [bx+3Ch]
 
-loc_2C074:				; CODE XREF: Damage_SimulationTick+D5j
+loc_2C074:				; CODE XREF: PolyInstance_Render_2BF6C+D5j
 		pop	cx
 		push	ax
 		lea	ax, [bp+var_11C]
@@ -668,7 +674,7 @@ loc_2C074:				; CODE XREF: Damage_SimulationTick+D5j
 		jmp	loc_2C111
 ; ���������������������������������������������������������������������������
 
-loc_2C08C:				; CODE XREF: Damage_SimulationTick+11Bj
+loc_2C08C:				; CODE XREF: PolyInstance_Render_2BF6C+11Bj
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+6]
 		cmp	dword ptr [bx+1Ah], 0
@@ -698,17 +704,17 @@ loc_2C08C:				; CODE XREF: Damage_SimulationTick+11Bj
 		jge	short loc_2C0FA
 		mov	[bp+var_34], 400h
 
-loc_2C0FA:				; CODE XREF: Damage_SimulationTick+184j
+loc_2C0FA:				; CODE XREF: PolyInstance_Render_2BF6C+184j
 		cmp	[bp+var_2C], 0
 		jle	short loc_2C109
 		mov	[bp+var_34], 0FFFFFC00h
 
-loc_2C109:				; CODE XREF: Damage_SimulationTick+193j
+loc_2C109:				; CODE XREF: PolyInstance_Render_2BF6C+193j
 		mov	eax, [bp+var_34]
 		add	[bp+var_12], eax
 
-loc_2C111:				; CODE XREF: Damage_SimulationTick+11Dj
-					; Damage_SimulationTick+12Cj
+loc_2C111:				; CODE XREF: PolyInstance_Render_2BF6C+11Dj
+					; PolyInstance_Render_2BF6C+12Cj
 		mov	eax, [bp+var_F8]
 		sub	eax, [si+14h]
 		mov	[bp+var_E0], eax
@@ -768,11 +774,11 @@ loc_2C174:
 		jmp	loc_2C8DD
 ; ���������������������������������������������������������������������������
 
-loc_2C1B2:				; CODE XREF: Damage_SimulationTick+241j
+loc_2C1B2:				; CODE XREF: PolyInstance_Render_2BF6C+241j
 		jmp	loc_2C5F1
 ; ���������������������������������������������������������������������������
 
-loc_2C1B5:				; CODE XREF: Damage_SimulationTick+22Fj
+loc_2C1B5:				; CODE XREF: PolyInstance_Render_2BF6C+22Fj
 		mov	eax, dword_72540
 		mov	[bp+var_30], eax
 		shl	eax, 8
@@ -792,7 +798,7 @@ loc_2C1B5:				; CODE XREF: Damage_SimulationTick+22Fj
 		jmp	loc_2C270
 ; ���������������������������������������������������������������������������
 
-loc_2C1ED:				; CODE XREF: Damage_SimulationTick+27Cj
+loc_2C1ED:				; CODE XREF: PolyInstance_Render_2BF6C+27Cj
 		les	bx, [bp+var_38]
 		cmp	byte ptr es:[bx+11h], 1
 		jnz	short loc_2C270
@@ -840,18 +846,18 @@ loc_2C230:
 		jmp	short loc_2C261
 ; ���������������������������������������������������������������������������
 
-loc_2C25F:				; CODE XREF: Damage_SimulationTick+2ECj
+loc_2C25F:				; CODE XREF: PolyInstance_Render_2BF6C+2ECj
 		xor	ax, ax
 
-loc_2C261:				; CODE XREF: Damage_SimulationTick+2F1j
+loc_2C261:				; CODE XREF: PolyInstance_Render_2BF6C+2F1j
 		or	al, al
 		jz	short loc_2C270
 		mov	eax, [bp+var_2C]
 		sar	eax, 1
 		mov	[bp+var_2C], eax
 
-loc_2C270:				; CODE XREF: Damage_SimulationTick+27Ej
-					; Damage_SimulationTick+289j ...
+loc_2C270:				; CODE XREF: PolyInstance_Render_2BF6C+27Ej
+					; PolyInstance_Render_2BF6C+289j ...
 		mov	eax, [bp+var_2C]
 		add	eax, [bp+var_16]
 		mov	[bp+var_44], eax
@@ -863,10 +869,10 @@ loc_2C270:				; CODE XREF: Damage_SimulationTick+27Ej
 		jmp	short loc_2C291
 ; ���������������������������������������������������������������������������
 
-loc_2C28F:				; CODE XREF: Damage_SimulationTick+31Cj
+loc_2C28F:				; CODE XREF: PolyInstance_Render_2BF6C+31Cj
 		xor	ax, ax
 
-loc_2C291:				; CODE XREF: Damage_SimulationTick+321j
+loc_2C291:				; CODE XREF: PolyInstance_Render_2BF6C+321j
 		or	al, al
 		jnz	short loc_2C2BA
 		mov	eax, dword_6E9A6
@@ -880,21 +886,21 @@ loc_2C291:				; CODE XREF: Damage_SimulationTick+321j
 		jmp	short loc_2C2B6
 ; ���������������������������������������������������������������������������
 
-loc_2C2B4:				; CODE XREF: Damage_SimulationTick+341j
+loc_2C2B4:				; CODE XREF: PolyInstance_Render_2BF6C+341j
 		xor	ax, ax
 
-loc_2C2B6:				; CODE XREF: Damage_SimulationTick+346j
+loc_2C2B6:				; CODE XREF: PolyInstance_Render_2BF6C+346j
 		or	al, al
 		jz	short loc_2C2C6
 
-loc_2C2BA:				; CODE XREF: Damage_SimulationTick+327j
-					; Damage_SimulationTick:loc_2C332j	...
+loc_2C2BA:				; CODE XREF: PolyInstance_Render_2BF6C+327j
+					; PolyInstance_Render_2BF6C:loc_2C332j	...
 		les	bx, [bp+arg_0]
 		or	byte ptr es:[bx+9Fh], 2
 		jmp	loc_2C8DD
 ; ���������������������������������������������������������������������������
 
-loc_2C2C6:				; CODE XREF: Damage_SimulationTick+34Cj
+loc_2C2C6:				; CODE XREF: PolyInstance_Render_2BF6C+34Cj
 		mov	eax, [bp+var_16]
 		mov	[bp+var_54], eax
 		mov	di, si
@@ -919,7 +925,7 @@ loc_2C2C6:				; CODE XREF: Damage_SimulationTick+34Cj
 		jge	short loc_2C317
 		neg	eax
 
-loc_2C317:				; CODE XREF: Damage_SimulationTick+3A6j
+loc_2C317:				; CODE XREF: PolyInstance_Render_2BF6C+3A6j
 		mov	[bp+var_60], eax
 		mov	eax, [bp+var_60]
 		mov	[bp+var_64], eax
@@ -929,10 +935,10 @@ loc_2C317:				; CODE XREF: Damage_SimulationTick+3A6j
 		jmp	short loc_2C330
 ; ���������������������������������������������������������������������������
 
-loc_2C32E:				; CODE XREF: Damage_SimulationTick+3BBj
+loc_2C32E:				; CODE XREF: PolyInstance_Render_2BF6C+3BBj
 		xor	ax, ax
 
-loc_2C330:				; CODE XREF: Damage_SimulationTick+3C0j
+loc_2C330:				; CODE XREF: PolyInstance_Render_2BF6C+3C0j
 		or	al, al
 
 loc_2C332:
@@ -964,7 +970,7 @@ loc_2C373:
 		jge	short loc_2C384
 		neg	eax
 
-loc_2C384:				; CODE XREF: Damage_SimulationTick+413j
+loc_2C384:				; CODE XREF: PolyInstance_Render_2BF6C+413j
 		mov	[bp+var_88], eax
 		mov	eax, [bp+var_88]
 		mov	[bp+var_8C], eax
@@ -974,23 +980,23 @@ loc_2C384:				; CODE XREF: Damage_SimulationTick+413j
 		jmp	short loc_2C3A0
 ; ���������������������������������������������������������������������������
 
-loc_2C39E:				; CODE XREF: Damage_SimulationTick+42Bj
+loc_2C39E:				; CODE XREF: PolyInstance_Render_2BF6C+42Bj
 		xor	ax, ax
 
-loc_2C3A0:				; CODE XREF: Damage_SimulationTick+430j
+loc_2C3A0:				; CODE XREF: PolyInstance_Render_2BF6C+430j
 		or	al, al
 		jz	short loc_2C3A7
 		jmp	loc_2C2BA
 ; ���������������������������������������������������������������������������
 
-loc_2C3A7:				; CODE XREF: Damage_SimulationTick+436j
+loc_2C3A7:				; CODE XREF: PolyInstance_Render_2BF6C+436j
 		mov	eax, [bp+var_C]
 		cmp	eax, [bp+var_16]
 		jg	short loc_2C3B4
 		jmp	loc_2C598
 ; ���������������������������������������������������������������������������
 
-loc_2C3B4:				; CODE XREF: Damage_SimulationTick+443j
+loc_2C3B4:				; CODE XREF: PolyInstance_Render_2BF6C+443j
 		push	eax
 		push	large [dword_72202]
 		push	large [bp+var_16]
@@ -1007,19 +1013,19 @@ loc_2C3B4:				; CODE XREF: Damage_SimulationTick+443j
 		jmp	loc_2C2BA
 ; ���������������������������������������������������������������������������
 
-loc_2C3E2:				; CODE XREF: Damage_SimulationTick+471j
+loc_2C3E2:				; CODE XREF: PolyInstance_Render_2BF6C+471j
 		cmp	[bp+var_7C], 133h
 		jle	short loc_2C3EF
 		jmp	loc_2C598
 ; ���������������������������������������������������������������������������
 
-loc_2C3EF:				; CODE XREF: Damage_SimulationTick+47Ej
+loc_2C3EF:				; CODE XREF: PolyInstance_Render_2BF6C+47Ej
 		cmp	[bp+var_D], 0
 		jz	short loc_2C3F8
 		jmp	loc_2C8DD
 ; ���������������������������������������������������������������������������
 
-loc_2C3F8:				; CODE XREF: Damage_SimulationTick+487j
+loc_2C3F8:				; CODE XREF: PolyInstance_Render_2BF6C+487j
 		mov	eax, [bp+var_C]
 		mov	[bp+var_88], eax
 		mov	eax, [bp+var_88]
@@ -1062,14 +1068,14 @@ loc_2C472:
 		jmp	short loc_2C4A3
 ; ���������������������������������������������������������������������������
 
-loc_2C48D:				; CODE XREF: Damage_SimulationTick+514j
+loc_2C48D:				; CODE XREF: PolyInstance_Render_2BF6C+514j
 		cmp	[bp+var_A6], 0FFFF8300h
 		jge	short loc_2C4A3
 		mov	[bp+var_A6], 0FFFF8300h
 		jmp	short $+2
 
-loc_2C4A3:				; CODE XREF: Damage_SimulationTick+51Fj
-					; Damage_SimulationTick+52Aj
+loc_2C4A3:				; CODE XREF: PolyInstance_Render_2BF6C+51Fj
+					; PolyInstance_Render_2BF6C+52Aj
 		mov	ax, word ptr [bp+var_A6]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+28h], ax
@@ -1106,7 +1112,7 @@ loc_2C523:
 		jmp	short loc_2C53B
 ; ���������������������������������������������������������������������������
 
-loc_2C525:				; CODE XREF: Damage_SimulationTick+5ACj
+loc_2C525:				; CODE XREF: PolyInstance_Render_2BF6C+5ACj
 		cmp	[bp+var_C4], 0FFFF8300h
 
 loc_2C52E:
@@ -1116,8 +1122,8 @@ loc_2C530:
 		mov	[bp+var_C4], 0FFFF8300h
 		jmp	short $+2
 
-loc_2C53B:				; CODE XREF: Damage_SimulationTick:loc_2C523j
-					; Damage_SimulationTick:loc_2C52Ej
+loc_2C53B:				; CODE XREF: PolyInstance_Render_2BF6C:loc_2C523j
+					; PolyInstance_Render_2BF6C:loc_2C52Ej
 		mov	ax, word ptr [bp+var_C4]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+2Ah], ax
@@ -1143,14 +1149,14 @@ loc_2C53B:				; CODE XREF: Damage_SimulationTick:loc_2C523j
 		mov	es:[bx], dx
 		jmp	short $+2
 
-loc_2C58D:				; CODE XREF: Damage_SimulationTick+602j
+loc_2C58D:				; CODE XREF: PolyInstance_Render_2BF6C+602j
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+8], 1
 		jmp	loc_2C2BA
 ; ���������������������������������������������������������������������������
 
-loc_2C598:				; CODE XREF: Damage_SimulationTick+445j
-					; Damage_SimulationTick+480j
+loc_2C598:				; CODE XREF: PolyInstance_Render_2BF6C+445j
+					; PolyInstance_Render_2BF6C+480j
 		mov	eax, dword_72540
 		mov	[bp+var_68], eax
 		shl	eax, 8
@@ -1164,10 +1170,10 @@ loc_2C598:				; CODE XREF: Damage_SimulationTick+445j
 		jmp	short loc_2C5C1
 ; ���������������������������������������������������������������������������
 
-loc_2C5BF:				; CODE XREF: Damage_SimulationTick+64Cj
+loc_2C5BF:				; CODE XREF: PolyInstance_Render_2BF6C+64Cj
 		xor	ax, ax
 
-loc_2C5C1:				; CODE XREF: Damage_SimulationTick+651j
+loc_2C5C1:				; CODE XREF: PolyInstance_Render_2BF6C+651j
 		or	al, al
 		jz	short loc_2C5F1
 		mov	eax, dword_6E9A6
@@ -1181,28 +1187,28 @@ loc_2C5C1:				; CODE XREF: Damage_SimulationTick+651j
 		jmp	short loc_2C5E6
 ; ���������������������������������������������������������������������������
 
-loc_2C5E4:				; CODE XREF: Damage_SimulationTick+671j
+loc_2C5E4:				; CODE XREF: PolyInstance_Render_2BF6C+671j
 		xor	ax, ax
 
-loc_2C5E6:				; CODE XREF: Damage_SimulationTick+676j
+loc_2C5E6:				; CODE XREF: PolyInstance_Render_2BF6C+676j
 		or	al, al
 		jz	short loc_2C5F1
 		mov	byte_6E680, 1
 		jmp	short loc_2C5F6
 ; ���������������������������������������������������������������������������
 
-loc_2C5F1:				; CODE XREF: Damage_SimulationTick:loc_2C1B2j
-					; Damage_SimulationTick+657j ...
+loc_2C5F1:				; CODE XREF: PolyInstance_Render_2BF6C:loc_2C1B2j
+					; PolyInstance_Render_2BF6C+657j ...
 		mov	byte_6E680, 0
 
-loc_2C5F6:				; CODE XREF: Damage_SimulationTick+683j
+loc_2C5F6:				; CODE XREF: PolyInstance_Render_2BF6C+683j
 		mov	eax, [bp+var_C]
 		sar	eax, 8
 		push	eax
 		les	bx, [bp+arg_0]
 		push	large dword ptr	es:[bx+2]
 		push	cs
-		call	near ptr Damage_SelectWeightedComponent
+		call	near ptr Poly_SelectDetailLevel_2BCA4
 		add	sp, 8
 		les	bx, [bp+arg_0]
 		mov	es:[bx+2Ch], al
@@ -1242,7 +1248,7 @@ loc_2C672:
 		jmp	loc_2C8C2
 ; ���������������������������������������������������������������������������
 
-loc_2C675:				; CODE XREF: Damage_SimulationTick+704j
+loc_2C675:				; CODE XREF: PolyInstance_Render_2BF6C+704j
 		lea	ax, [bp+var_14C]
 		push	ax
 		call	Damage_ComputeHelperA_5647A
@@ -1273,7 +1279,7 @@ loc_2C675:				; CODE XREF: Damage_SimulationTick+704j
 		jmp	short loc_2C6DF
 ; ���������������������������������������������������������������������������
 
-loc_2C6C5:				; CODE XREF: Damage_SimulationTick+718j
+loc_2C6C5:				; CODE XREF: PolyInstance_Render_2BF6C+718j
 		lea	ax, [bp+var_E0]
 		push	ax
 		push	5166h
@@ -1284,7 +1290,7 @@ loc_2C6C5:				; CODE XREF: Damage_SimulationTick+718j
 		call	Damage_ComputeHelperB_564CE
 		add	sp, 8
 
-loc_2C6DF:				; CODE XREF: Damage_SimulationTick+757j
+loc_2C6DF:				; CODE XREF: PolyInstance_Render_2BF6C+757j
 		mov	eax, [bp+var_14C]
 		mov	[bp+var_2C], eax
 		mov	eax, [bp+var_2C]
@@ -1382,7 +1388,7 @@ loc_2C796:
 		jmp	loc_2C89C
 ; ���������������������������������������������������������������������������
 
-loc_2C80F:				; CODE XREF: Damage_SimulationTick+935j
+loc_2C80F:				; CODE XREF: PolyInstance_Render_2BF6C+935j
 		les	bx, [bp+var_26]
 		mov	ax, [bp+var_20]
 		mov	dx, [bp+var_22]
@@ -1445,33 +1451,33 @@ loc_2C88E:
 		mov	es:[bx], dx
 		jmp	short $+2
 
-loc_2C897:				; CODE XREF: Damage_SimulationTick:loc_2C826j
-					; Damage_SimulationTick+8D8j ...
+loc_2C897:				; CODE XREF: PolyInstance_Render_2BF6C:loc_2C826j
+					; PolyInstance_Render_2BF6C+8D8j ...
 		inc	si
 		add	word ptr [bp+var_26], 2
 
-loc_2C89C:				; CODE XREF: Damage_SimulationTick+8A0j
+loc_2C89C:				; CODE XREF: PolyInstance_Render_2BF6C+8A0j
 		cmp	si, [bp+var_28]
 		jge	short loc_2C8A4
 		jmp	loc_2C80F
 ; ���������������������������������������������������������������������������
 
-loc_2C8A4:				; CODE XREF: Damage_SimulationTick+933j
+loc_2C8A4:				; CODE XREF: PolyInstance_Render_2BF6C+933j
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr Damage_ResetAllFlags
+		call	near ptr PolyInstance_ClearVertexFrameFlags_2BEA5
 		add	sp, 4
 		les	bx, [bp+arg_0]
 		mov	byte ptr es:[bx+8], 1
 		jmp	short loc_2C8C2
 ; ���������������������������������������������������������������������������
 
-loc_2C8B9:				; CODE XREF: Damage_SimulationTick+5Ej
+loc_2C8B9:				; CODE XREF: PolyInstance_Render_2BF6C+5Ej
 		les	bx, [bp+arg_0]
 		or	byte ptr es:[bx+9Fh], 2
 
-loc_2C8C2:				; CODE XREF: Damage_SimulationTick:loc_2C672j
-					; Damage_SimulationTick+94Bj
+loc_2C8C2:				; CODE XREF: PolyInstance_Render_2BF6C:loc_2C672j
+					; PolyInstance_Render_2BF6C+94Bj
 		call	PIT_ReadHighPrecision
 		push	dx
 		push	ax
@@ -1481,13 +1487,13 @@ loc_2C8C2:				; CODE XREF: Damage_SimulationTick:loc_2C672j
 		add	dword_704EC, eax
 		inc	dword_704E8
 
-loc_2C8DD:				; CODE XREF: Damage_SimulationTick+243j
-					; Damage_SimulationTick+357j ...
+loc_2C8DD:				; CODE XREF: PolyInstance_Render_2BF6C+243j
+					; PolyInstance_Render_2BF6C+357j ...
 		pop	di
 		pop	si
 		leave
 		retf
-Damage_SimulationTick	endp
+PolyInstance_Render_2BF6C	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -1505,7 +1511,7 @@ loc_2C8E8:				; DATA XREF: seg339:1852o
 		les	bx, [bp+6]
 		push	large dword ptr	es:[bx+2]
 		push	cs
-		call	near ptr Damage_CheckTimer
+		call	near ptr PolyAppearance_AnimTimerTick_2BD51
 		add	sp, 4
 		or	al, al
 		jz	short loc_2C929
@@ -1531,7 +1537,11 @@ loc_2C92B:				; CODE XREF: seg060:0C97j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2C92D:				; DATA XREF: seg339:15C8o
+; ==============================================================================================
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Méthode 1 de la table 15C4h
+; (apparence POLY) : appelle PolyAppearance_CreateInstance_96917 (via VROOMM_StubThunk_6BB55).
+; ==============================================================================================
+PolyAppearance_NewInstance_2C92D:				; DATA XREF: seg339:15C8o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4

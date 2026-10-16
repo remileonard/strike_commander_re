@@ -14,11 +14,13 @@ loc_2918F:				; DATA XREF: seg339:11A4o seg339:11C8o ...
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,42L — résout une table d'interpolation (sub_2F404/sub_2E8F1, table 0x541A) selon la
-; progression d'une animation (+2 >>8), indexe la table par un paramètre (arg_4) : résolution
-; de valeur d'easing/interpolation pour le système de keyframe (utilisée par seg042).
+; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). COULEUR D'UNE FACE NON ÉCLAIRÉE
+; (ex-Keyframe_ResolveEasingValue, aucun rapport avec des keyframes). Args (élément, couleur).
+; Profondeur = clé +2 de l'élément ÷ 256 → Interp_ResolveCached_2F404(541Ah, …) (rang de
+; brouillard) → Text_ResolveTruncated_2E8F1 (table de 256 o) ; table nulle (pas de brouillard)
+; → couleur inchangée, sinon table[couleur].
 ; ==============================================================================================
-Keyframe_ResolveEasingValue	proc far		; CODE XREF: seg042:0A27P seg042:0B67P ...
+Palette_FogRemapColour_29194	proc far		; CODE XREF: seg042:0A27P seg042:0B67P ...
 
 var_4		= dword	ptr -4
 arg_0		= dword	ptr  6
@@ -32,11 +34,11 @@ arg_4		= byte ptr  0Ah
 		sar	eax, 8
 		push	eax
 		push	541Ah
-		call	Interp_ResolveCached
+		call	Palette_FogTableIndex_2F404
 		add	sp, 6
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		mov	word ptr [bp+var_4+2], dx
 		mov	word ptr [bp+var_4], ax
@@ -46,19 +48,19 @@ arg_4		= byte ptr  0Ah
 		jmp	short loc_291DE
 ; ���������������������������������������������������������������������������
 
-loc_291D1:				; CODE XREF: Keyframe_ResolveEasingValue+36j
+loc_291D1:				; CODE XREF: Palette_FogRemapColour_29194+36j
 		mov	al, [bp+arg_4]
 		mov	ah, 0
 		les	bx, [bp+var_4]
 		add	bx, ax
 		mov	dl, es:[bx]
 
-loc_291DE:				; CODE XREF: Keyframe_ResolveEasingValue+3Bj
+loc_291DE:				; CODE XREF: Palette_FogRemapColour_29194+3Bj
 		mov	al, dl
 
 locret_291E0:
 		leave
 		retf
-Keyframe_ResolveEasingValue	endp
+Palette_FogRemapColour_29194	endp
 
 seg054		ends

@@ -179,7 +179,7 @@ loc_3686F:
 		cbw
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		push	dx
 		push	ax
@@ -262,7 +262,7 @@ loc_3696B:
 		cbw
 		push	ax
 		push	541Ah
-		call	Text_ResolveTruncated
+		call	Palette_FadeTablePtr_2E8F1
 		add	sp, 4
 		push	dx
 		push	ax

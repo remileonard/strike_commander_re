@@ -1519,7 +1519,7 @@ off_6E634	dd Object_DestructGeneric_29115
 		dd loc_2D226
 		dd loc_2C94D
 		dd VROOMM_StubThunk_6BB50
-		dd loc_2C92D
+		dd PolyAppearance_NewInstance_2C92D
 		dd loc_2BC9D
 byte_6E680	db 0			; DATA XREF: Cinematic_SplineCompute:loc_243C7r
 					; Cinematic_SplineCompute+281r ...
@@ -1529,98 +1529,98 @@ byte_6E683	db 1			; DATA XREF: seg055:1060r seg055:1363r ...
 byte_6E684	db 0			; DATA XREF: seg055:06DAr seg055:07E7r ...
 		dd loc_2AAC9
 		dd loc_2AC02
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_2AC0F
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
 		dd loc_2AAAC
-		dd Mesh_FacePrepareIndirect
-		dd loc_2A81A
+		dd Face_LightFlat_29A7D
+		dd FaceType8_Draw_2A81A
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_2AAA5
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_2A6A9
-		dd loc_2A3FD
+		dd FaceType8_LightVertices_2A6A9
+		dd FaceType7_Draw_2A3FD
 		dd loc_2A5B3
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_2A5C0
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_2A3E0
-		dd Mesh_FacePrepareIndirect
-		dd loc_2A1C2
+		dd FaceType7_Light_2A3E0
+		dd Face_LightFlat_29A7D
+		dd FaceType6_Draw_2A1C2
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_2A340
-off_6E711	dd loc_24EE2
+off_6E711	dd FaceElement_CullAndProject_24EE2
 off_6E715	dd loc_29695
 		dd loc_29689
-off_6E71D	dd loc_2A006
+off_6E71D	dd FaceType3_Draw_2A006
 off_6E721	dd loc_295EC
-off_6E725	dd loc_295F1
-		dd loc_2962D
+off_6E725	dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 off_6E72D	dd loc_2968E
 		dd loc_2A1BB
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_29E95
-		dd Mesh_FacePrepareIndirect
-		dd loc_29C73
+		dd FaceType3_LightVertices_29E95
+		dd Face_LightFlat_29A7D
+		dd FaceType4_Draw_29C73
 		dd loc_29D82
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_29D8F
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_29D96
-		dd Mesh_FacePrepareIndirect
-		dd loc_29857
+		dd FaceType4_Light_29D96
+		dd Face_LightFlat_29A7D
+		dd FaceType1_Draw_29857
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_298EE
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_29760
-		dd loc_29977
+		dd FaceType1_Light_29760
+		dd FaceType2_Draw_29977
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_29A06
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_29953
+		dd FaceType2_Light_29953
 		dd loc_26F6F
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_26F6F
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
 		dd loc_29689
-		dd loc_2978F
+		dd FaceType0_Draw_2978F
 		dd loc_295EC
-		dd loc_295F1
-		dd loc_2962D
+		dd FaceElement_AllVerticesFlag3_295F1
+		dd FaceElement_DepthKey_2962D
 		dd loc_2968E
 		dd loc_29830
-		dd loc_24EE2
+		dd FaceElement_CullAndProject_24EE2
 		dd loc_29695
-		dd loc_29760
+		dd FaceType1_Light_29760
 		align 2
 aNoFarMemForEle	db 'No far mem for element list.',0Ah,0
 aSort_queue	db 'sort_queue',0
@@ -1665,16 +1665,16 @@ asc_6E834	db '\',0                ; DATA XREF: Path_ResolveDataFile+56o
 		dd loc_2B6EF
 		dd loc_2B6B4
 		dd loc_2B6AF
-byte_6E8CE	db 0			; DATA XREF: Damage_SelectWeightedComponent:loc_2BD3Er
+byte_6E8CE	db 0			; DATA XREF: Poly_SelectDetailLevel_2BCA4:loc_2BD3Er
 					; Cockpit_ReadControlsFrame_8F720+C0w
 		align 2
-dword_6E8D0	dd 0			; DATA XREF: MissionText_AllocateMultiBuffer_94C80+2Bw
-					; AircraftComponent_LoadWithDwordFields_94D40+188r ...
-dword_6E8D4	dd 0			; DATA XREF: MissionText_AllocateMultiBuffer_94C80+4Cw
-					; AircraftComponent_LoadWithDwordFields_94D40+1CCr ...
+dword_6E8D0	dd 0			; DATA XREF: Poly_BuildFaceElements_94C80+2Bw
+					; Poly_LoadVTRI_94D40+188r ...
+dword_6E8D4	dd 0			; DATA XREF: Poly_BuildFaceElements_94C80+4Cw
+					; Poly_LoadVTRI_94D40+1CCr ...
 aPolyapprPS	db 'PolyAppr p',27h,'s',0Ah,0
 		dd loc_2DDEA
-		dd Damage_SimulationTick
+		dd PolyInstance_Render_2BF6C
 		dd loc_2BDCF
 		dd loc_2BDE8
 		dd loc_2BDF8
@@ -3590,9 +3590,9 @@ dword_704E1	dd 0			; DATA XREF: Camera_ComputeViewMatrix:loc_2E3CEr
 		align 2
 word_704E6	dw 0			; DATA XREF: Targeting_AcquireBestThreat+B67r
 					; AI_TopLevelThink+1F0r ...
-dword_704E8	dd 0			; DATA XREF: Damage_SimulationTick+96Cw
+dword_704E8	dd 0			; DATA XREF: PolyInstance_Render_2BF6C+96Cw
 					; UIScreen_RenderGraphVGA_509EE+11Fr ...
-dword_704EC	dd 0			; DATA XREF: Damage_SimulationTick+967w
+dword_704EC	dd 0			; DATA XREF: PolyInstance_Render_2BF6C+967w
 					; UIScreen_RenderGraphVGA_509EE+11Ar ...
 dword_704F0	dd 0			; DATA XREF: seg077:0362w
 					; UIScreen_RenderGraphVGA_509EE+115r
@@ -7434,7 +7434,7 @@ unk_71E82	db    1
 		dd VROOMM_StubThunk_6B7BC
 		db    1
 		db  20h
-		dd loc_2AC16
+		dd FaceElements_InitTemplates_2AC16
 		db    1
 		db  20h
 off_71E90	dd loc_2BC4A
@@ -8613,12 +8613,12 @@ word_72499	dw 0			; DATA XREF: seg059:068Dw seg059:0693w ...
 		db    0
 		db    0
 		db    0
-word_724AA	dw 0			; DATA XREF: Damage_SimulationTick+5FEr
-					; Damage_SimulationTick+906r ...
-word_724AC	dw 0			; DATA XREF: Damage_SimulationTick+5FBr
-					; Damage_SimulationTick+604r ...
-dword_724AE	dd 0			; DATA XREF: Damage_SimulationTick+60Er
-					; Damage_SimulationTick+916r ...
+word_724AA	dw 0			; DATA XREF: PolyInstance_Render_2BF6C+5FEr
+					; PolyInstance_Render_2BF6C+906r ...
+word_724AC	dw 0			; DATA XREF: PolyInstance_Render_2BF6C+5FBr
+					; PolyInstance_Render_2BF6C+604r ...
+dword_724AE	dd 0			; DATA XREF: PolyInstance_Render_2BF6C+60Er
+					; PolyInstance_Render_2BF6C+916r ...
 		db    0
 		db    0
 		db    0
@@ -8697,13 +8697,13 @@ word_7251C	dw 0			; DATA XREF: Render_ObjectPipelineMain+1C6Cr
 		db    0
 		db    0
 		db    0
-word_72524	dw 0			; DATA XREF: Render_DamageTintResolve+33r
-					; Render_DamageTintResolveAlt:loc_29DE8r	...
+word_72524	dw 0			; DATA XREF: Face_ResolveRamp_29A0D+33r
+					; Face_ResolveRampOrZero_29DB3:loc_29DE8r	...
 		align 4
 dword_72528	dd 0			; DATA XREF: seg032:0742r
-					; Mesh_FaceSetupTexturedColor+39r ...
+					; FaceType2_Setup_298F5+39r ...
 byte_7252C	db 0			; DATA XREF: seg032:073Er
-					; Mesh_FaceSetupTexturedColor+35r ...
+					; FaceType2_Setup_298F5+35r ...
 byte_7252D	db 0			; DATA XREF: seg066:loc_2F222w
 dword_7252E	dd 0			; DATA XREF: seg066:loc_2F227w
 word_72532	dw 0			; DATA XREF: Render_ObjectPipelineMain+1C79r
@@ -10089,7 +10089,7 @@ word_72B44	dw 0			; DATA XREF: Collision_NarrowPhaseTest:loc_44A7Er
 		db    0
 		db    0
 word_72B4A	dw 0			; DATA XREF: seg112:0CADw seg112:0CBBw
-word_72B4C	dw 0			; DATA XREF: Damage_SimulationTick+19r
+word_72B4C	dw 0			; DATA XREF: PolyInstance_Render_2BF6C+19r
 					; seg112:0CB8w
 word_72B4E	dw 0			; DATA XREF: seg112:0CB5w
 		db    0
