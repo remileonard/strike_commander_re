@@ -14,6 +14,17 @@ Elle propose les modes « jeu », « entre-deux », « tout éclairé », « SCR
 GL_LIGHTING », les réglages de textures et le brouillard. La planche `data/F-16DES_modes.png`
 compare les rendus « jeu », « entre-deux » et « SCRenderer ».
 
+**Choix retenu pour l'implémentation (2026-10-16) : le mode intermédiaire (« entre-deux »)**,
+c'est-à-dire `COLOUR_HYBRID` de la §6 :
+- les règles d'éclairage du jeu : faces 1, 5, 6 non éclairées ; 4 et 7 par face (normale de face) ;
+  3 et 8 par sommet (normales de sommet) ; lumière directionnelle du `LGHT` ; normale inversée pour
+  une face double vue de dos ;
+- la teinte **continue en RVB le long de la gamme RANG** (`shadeAlongRamp`), au lieu de l'index entier ;
+- les textures des types 7 et 8 par-dessus la couleur, multipliées par l'intensité de la face
+  (type 7) ou du sommet (type 8), type 6 non éclairé.
+
+Les modes `COLOUR_GAME` et `COLOUR_ALL_LIT` restent dans le code pour comparer.
+
 Correspondance des champs avec libRealSpace :
 
 | `VTRI` (8 octets) | `Triangle` | Sens |
@@ -330,7 +341,7 @@ bool faceSeenFromFront(const Vector3D &v0, const Vector3D &v1, const Vector3D &v
 
 `faceVertexColour` regroupe les §2 à §5. Trois modes :
 - `COLOUR_GAME` : les index du jeu, exacts ;
-- `COLOUR_HYBRID` : les règles du jeu, teinte continue (mode « entre-deux » de la visionneuse) ;
+- `COLOUR_HYBRID` : les règles du jeu, teinte continue (mode « entre-deux » de la visionneuse) — **mode retenu** ;
 - `COLOUR_ALL_LIT` : toutes les faces éclairées par sommet, teinte continue (mode « tout éclairé »).
 
 ```cpp
@@ -404,7 +415,7 @@ shadingCtx.ramps = this->ramps; // lu une fois depuis PALETTE.IFF
 shadingCtx.light = this->objectLight; // makeObjectLight(...) depuis WRLD/LGHT
 shadingCtx.lightLocal = worldDirToObject(MV, V, shadingCtx.light.dirWorld);
 shadingCtx.eyeLocal = eyeInObject(MV);
-shadingCtx.mode = COLOUR_HYBRID;
+shadingCtx.mode = COLOUR_HYBRID; // mode retenu
 ```
 
 Dans `drawModelColorPass`, la boucle des 3 sommets devient :
