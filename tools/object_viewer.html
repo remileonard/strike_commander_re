@@ -17,12 +17,11 @@
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
     font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
   body { display: flex; min-height: 100%; }
-  #view { flex: 1; position: relative; min-width: 0; display: flex; align-items: center; justify-content: center; }
+  #view { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; }
   canvas { background: #000; width: 100%; height: auto; max-height: 100vh; aspect-ratio: 16 / 10;
     touch-action: none; cursor: grab; }
   canvas.pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
-  canvas:active { cursor: grabbing; }
-  aside { width: 300px; flex: none; background: var(--panel); border-left: 1px solid var(--line);
+  aside { width: 310px; flex: none; background: var(--panel); border-left: 1px solid var(--line);
     padding: 14px 16px; overflow-y: auto; max-height: 100vh; }
   h1 { font-size: 15px; margin: 0 0 2px; }
   .sub { color: var(--muted); margin: 0 0 12px; }
@@ -32,10 +31,10 @@
   label.range { display: grid; grid-template-columns: 92px 1fr 44px; }
   label.range output { text-align: right; color: var(--accent); font-variant-numeric: tabular-nums; }
   input[type=range] { width: 100%; accent-color: var(--accent); }
-  input[type=checkbox] { accent-color: var(--accent); }
+  input[type=checkbox], input[type=radio] { accent-color: var(--accent); }
   select { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; }
   #info { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; white-space: pre;
-    background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 8px; color: var(--text); }
+    background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 8px; }
   .note { color: var(--muted); font-size: 12px; }
   button { background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px;
     padding: 4px 8px; cursor: pointer; }
@@ -51,7 +50,8 @@
 <div id="view"><canvas id="c" width="320" height="200" class="pixel"></canvas></div>
 <aside>
   <h1>__TITLE__</h1>
-  <p class="sub">Rendu WebGL selon les règles du jeu (OBJECT_RENDER.md). Glisser = tourner, molette = distance.</p>
+  <p class="sub">Pipeline fixe à la manière de SCRenderer (glBegin / glColor / glTexCoord, GL_MODULATE,
+  test alpha), couleurs choisies selon les règles du jeu (OBJECT_RENDER.md). Glisser = tourner, molette = distance.</p>
 
   <h2>Vue</h2>
   <label class="range">Cap <input id="yaw" type="range" min="-180" max="180" step="1" value="35"><output></output></label>
@@ -71,15 +71,17 @@
   <h2>Niveau de détail</h2>
   <label>Niveau <select id="lod"></select></label>
 
+  <h2>Ordre de dessin</h2>
+  <label><input type="radio" name="order" value="sort" checked> tri des faces du jeu, sans profondeur</label>
+  <label><input type="radio" name="order" value="depth"> 3 passes + tampon de profondeur (SCRenderer)</label>
+
   <h2>Options du jeu</h2>
   <label><input id="tex" type="checkbox" checked> textures (byte_6E683)</label>
   <label><input id="gouraud" type="checkbox" checked> dégradés de Gouraud (byte_6E682)</label>
-  <label><input id="wire" type="checkbox"> fil de fer (byte_6E684)</label>
 
   <h2>Rendu</h2>
-  <label><input id="affine" type="checkbox" checked> textures affines (comme le jeu)</label>
   <label><input id="low" type="checkbox" checked> 320 × 200 (pixels du jeu)</label>
-  <label><input id="cull" type="checkbox" checked> rejet des faces vues de dos</label>
+  <label><input id="linear" type="checkbox"> filtrage GL_LINEAR (SCRenderer)</label>
   <label>Fond <select id="bg"><option value="0">noir</option><option value="sky">ciel</option><option value="grey">gris</option></select></label>
 
   <h2>Lumière (WRLD/LGHT)</h2>
@@ -89,42 +91,194 @@
 
   <h2>État</h2>
   <div id="info"></div>
-  <p class="note">Approximations : tables d'assombrissement FADE (fichier « palfade ») et tables de
-  translucidité des faces de type 2 absentes du dépôt. Le brouillard n'est pas reproduit.</p>
+  <p class="note">Différences avec le jeu dues au pipeline fixe : dégradé interpolé en RVB (le jeu interpole
+  l'index de palette), textures en perspective (le jeu est affine), texels assombris par GL_MODULATE
+  (le jeu remappe par une table FADE, absente du dépôt), verrières (type 2) en mélange 50 %.</p>
 </aside>
 
 <script>
 "use strict";
 const D = /*DATA*/null;
 
-// ---------------------------------------------------------------- données
-const W_LOW = 320;
-const H_LOW = 200;
-const pal = D.palette;
-const rang = D.rang;
-const remap = Uint8Array.from(atob(D.remap), (c) => c.charCodeAt(0));
-const verts = D.vertices.map((v) => [v[0] / 256, v[1] / 256, v[2] / 256]);
-const faces = D.faces;
-const levels = D.levels;
-const uvOf = D.uv;
+// =====================================================================================
+// Couche « pipeline fixe » : glBegin / glColor4f / glTexCoord2f / glVertex3f / glEnd,
+// matrices MODELVIEW et PROJECTION, GL_TEXTURE_2D + GL_MODULATE, GL_ALPHA_TEST, GL_BLEND,
+// GL_CULL_FACE + glFrontFace, GL_DEPTH_TEST + glDepthFunc/glDepthMask.
+// Un seul shader, qui ne fait que ce que fait le pipeline fixe.
+// =====================================================================================
+const canvas = document.getElementById("c");
+const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false, depth: true });
+if (!gl) { document.getElementById("info").textContent = "WebGL indisponible"; throw new Error("webgl"); }
 
-// ---------------------------------------------------------------- vecteurs
+const FIXED_VS = `
+attribute vec3 aVertex;
+attribute vec4 aColor;
+attribute vec2 aTexCoord;
+uniform mat4 uProjection;
+uniform mat4 uModelView;
+varying vec4 vColor;
+varying vec2 vTexCoord;
+void main() {
+  vColor = aColor;
+  vTexCoord = aTexCoord;
+  gl_Position = uProjection * uModelView * vec4(aVertex, 1.0);
+}`;
+const FIXED_FS = `
+precision mediump float;
+uniform sampler2D uTexture;
+uniform bool uTexture2D;     // glEnable(GL_TEXTURE_2D), mode GL_MODULATE
+uniform bool uAlphaTest;     // glEnable(GL_ALPHA_TEST)
+uniform float uAlphaRef;     // glAlphaFunc(GL_GREATER, ref)
+varying vec4 vColor;
+varying vec2 vTexCoord;
+void main() {
+  vec4 c = vColor;
+  if (uTexture2D) { c *= texture2D(uTexture, vTexCoord); }
+  if (uAlphaTest && !(c.a > uAlphaRef)) { discard; }
+  gl_FragColor = c;
+}`;
+
+const GL_TRIANGLES = gl.TRIANGLES;
+const GL_LINES = gl.LINES;
+const fixed = (() => {
+  function compile(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { throw new Error(gl.getShaderInfoLog(s)); }
+    return s;
+  }
+  const p = gl.createProgram();
+  gl.attachShader(p, compile(gl.VERTEX_SHADER, FIXED_VS));
+  gl.attachShader(p, compile(gl.FRAGMENT_SHADER, FIXED_FS));
+  gl.linkProgram(p);
+  gl.useProgram(p);
+  const loc = {
+    v: gl.getAttribLocation(p, "aVertex"),
+    c: gl.getAttribLocation(p, "aColor"),
+    t: gl.getAttribLocation(p, "aTexCoord"),
+    proj: gl.getUniformLocation(p, "uProjection"),
+    mv: gl.getUniformLocation(p, "uModelView"),
+    tex: gl.getUniformLocation(p, "uTexture"),
+    tex2d: gl.getUniformLocation(p, "uTexture2D"),
+    at: gl.getUniformLocation(p, "uAlphaTest"),
+    aref: gl.getUniformLocation(p, "uAlphaRef"),
+  };
+  gl.uniform1i(loc.tex, 0);
+  const buf = gl.createBuffer();
+  return { loc, buf, mode: 0, data: [], color: [1, 1, 1, 1], uv: [0, 0], texture2D: false, alphaTest: false };
+})();
+function glEnableTexture2D(on) { fixed.texture2D = on; }
+function glAlphaTest(on, ref) { fixed.alphaTest = on; fixed.alphaRef = ref; }
+function glLoadMatrices(projection, modelView) {
+  gl.uniformMatrix4fv(fixed.loc.proj, false, projection);
+  gl.uniformMatrix4fv(fixed.loc.mv, false, modelView);
+}
+function glBegin(mode) { fixed.mode = mode; fixed.data.length = 0; }
+function glColor4f(r, g, b, a) { fixed.color = [r, g, b, a]; }
+function glTexCoord2f(u, v) { fixed.uv = [u, v]; }
+function glVertex3f(x, y, z) {
+  const c = fixed.color;
+  fixed.data.push(x, y, z, c[0], c[1], c[2], c[3], fixed.uv[0], fixed.uv[1]);
+}
+function glEnd() {
+  const n = fixed.data.length / 9;
+  if (!n) { return; }
+  gl.uniform1i(fixed.loc.tex2d, fixed.texture2D ? 1 : 0);
+  gl.uniform1i(fixed.loc.at, fixed.alphaTest ? 1 : 0);
+  gl.uniform1f(fixed.loc.aref, fixed.alphaRef || 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, fixed.buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(fixed.data), gl.STREAM_DRAW);
+  const S = 9 * 4;
+  gl.enableVertexAttribArray(fixed.loc.v);
+  gl.vertexAttribPointer(fixed.loc.v, 3, gl.FLOAT, false, S, 0);
+  gl.enableVertexAttribArray(fixed.loc.c);
+  gl.vertexAttribPointer(fixed.loc.c, 4, gl.FLOAT, false, S, 12);
+  gl.enableVertexAttribArray(fixed.loc.t);
+  gl.vertexAttribPointer(fixed.loc.t, 2, gl.FLOAT, false, S, 28);
+  gl.drawArrays(fixed.mode, 0, n);
+}
+
+// Matrices column-major, comme glGetFloatv(GL_MODELVIEW_MATRIX)
+function perspective(fovyDeg, aspect, near, far) {
+  const f = 1 / Math.tan(fovyDeg * Math.PI / 360);
+  return new Float32Array([f / aspect, 0, 0, 0, 0, f, 0, 0, 0, 0, (far + near) / (near - far), -1,
+                           0, 0, 2 * far * near / (near - far), 0]);
+}
+function lookAt(eye, target, up) {
+  const f = norm(sub(target, eye));
+  const s = norm(cross(f, up));
+  const u = cross(s, f);
+  return new Float32Array([s[0], u[0], -f[0], 0, s[1], u[1], -f[1], 0, s[2], u[2], -f[2], 0,
+                           -dot(s, eye), -dot(u, eye), dot(f, eye), 1]);
+}
 function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
 function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
 function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
 function norm(a) { const n = Math.hypot(a[0], a[1], a[2]); return n ? [a[0] / n, a[1] / n, a[2] / n] : [0, 0, 0]; }
+function transformPoint(M, v) {   // TransformPointCM de SCRenderer
+  return [M[0] * v[0] + M[4] * v[1] + M[8] * v[2] + M[12],
+          M[1] * v[0] + M[5] * v[1] + M[9] * v[2] + M[13],
+          M[2] * v[0] + M[6] * v[1] + M[10] * v[2] + M[14]];
+}
 
-// ---------------------------------------------------------------- teintes (OBJECT_RENDER.md §3)
+// =====================================================================================
+// Données de l'objet, lues dans le repère de libRealSpace : x = c0, y = c2, z = −c1.
+// C'est une rotation : les normales du jeu gardent leur sens.
+// =====================================================================================
+const toLibRS = (c) => [c[0], c[2], -c[1]];
+const vertices = D.vertices.map((v) => toLibRS([v[0] / 256, v[1] / 256, v[2] / 256]));
+const faceNormal = D.faceNormal.map(toLibRS);
+const vertexNormal = D.vertexNormal.map(toLibRS);
+const centre = toLibRS(D.centre);
+const faces = D.faces;
+const levels = D.levels;
+const uvOf = D.uv;
+const pal = D.palette;
+const rang = D.rang;
+const remap = Uint8Array.from(atob(D.remap), (c) => c.charCodeAt(0));
+
+// Une texture GL par TXMP, RVBA depuis la palette ; texel 0xFF → alpha 0 (test alpha).
+const textures = D.textures.map((t) => {
+  const px = Uint8Array.from(atob(t[3]), (c) => c.charCodeAt(0));
+  const rgba = new Uint8Array(t[1] * t[2] * 4);
+  for (let i = 0; i < px.length; i++) {
+    const c = px[i];
+    rgba[4 * i] = pal[3 * c];
+    rgba[4 * i + 1] = pal[3 * c + 1];
+    rgba[4 * i + 2] = pal[3 * c + 2];
+    rgba[4 * i + 3] = c === 0xFF ? 0 : 255;
+  }
+  const id = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, id);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, t[1], t[2], 0, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  return { id, width: t[1], height: t[2], first: px[0] };
+});
+function setFiltering(linear) {
+  for (const t of textures) {
+    gl.bindTexture(gl.TEXTURE_2D, t.id);
+    const f = linear ? gl.LINEAR : gl.NEAREST;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, f);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, f);
+  }
+}
+
+// =====================================================================================
+// Teintes du jeu (OBJECT_RENDER.md §3), calculées sur le CPU puis données par glColor.
+// =====================================================================================
 let ambient = 0;
 let share = 0;
-let lightDir = [0, 0, 1];
-function intensity(n) {           // LightSet_FaceIntensity_2B54A
+let lightDir = [0, 1, 0];          // direction de la 1re lumière, repère de l'objet
+function intensity(n) {            // LightSet_FaceIntensity_2B54A : 0..255
   const d = dot(lightDir, n);
   let v = ambient;
   if (d > 0) { v += Math.floor(d * share); }
   return Math.min(255, v);
 }
-function rampOf(c) {              // Table_LookupByRange_2E975 : première ≤ c ≤ première + 3e champ
+function rampOf(c) {               // Table_LookupByRange_2E975 : première ≤ c ≤ première + 3e champ
   for (let k = 0; k < rang.length; k++) {
     if (rang[k][0] <= c && c <= rang[k][0] + rang[k][2]) { return k; }
   }
@@ -134,156 +288,256 @@ function shade(ramp, i, override) { // Palette_ShadeIndexWithFog_2F24E sans brou
   const n = override ? override : rang[ramp][1];
   return rang[ramp][0] + ((i * n + 0x80) >> 8);
 }
-function tableLevel(i) {          // Palette_ShadeTableIndex_2F55E sans brouillard
+function tableLevel(i) {           // Palette_ShadeTableIndex_2F55E sans brouillard : 0..16
   const level = ((i * 17 + 0x80) >> 8) - 1;
   return 16 - Math.max(0, level);
 }
-function darken(c, steps) { return remap[steps * 256 + c]; }
-function litFlat(c, i) {          // types 4 et 7
+function litFlat(c, i) {           // types 4 et 7
   const r = rampOf(c);
-  if (r < 0) { return darken(c, tableLevel(i)); }
+  if (r < 0) { return remap[tableLevel(i) * 256 + c]; }
   return shade(r, i, c - rang[r][0]);
 }
+function glColorIndex(index, alpha) {
+  glColor4f(pal[3 * index] / 255, pal[3 * index + 1] / 255, pal[3 * index + 2] / 255, alpha);
+}
 
-// ---------------------------------------------------------------- WebGL
-const canvas = document.getElementById("c");
-const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
-if (!gl) { document.getElementById("info").textContent = "WebGL indisponible"; throw new Error("webgl"); }
+// Couleur de chaque sommet d'une face, selon son type (octet 0 de VTRI).
+// Rend null si la face n'a pas de passe couleur.
+function faceColors(fi, frontSeen) {
+  const f = faces[fi];
+  const kind = f[0];
+  const colour = f[4];
+  let n = faceNormal[fi];
+  if ((f[7] & 1) && !frontSeen) { n = [-n[0], -n[1], -n[2]]; }   // Face_LightFlat_29A7D
+  if (kind === 1 || kind === 5 || kind > 9) { return [colour, colour, colour]; }   // non éclairée
+  if (kind === 4 || kind === 7) { const c = litFlat(colour, intensity(n)); return [c, c, c]; }
+  if (kind === 3 || kind === 8) {                                    // éclairée par sommet
+    let r = rampOf(colour);
+    let ov = 0;
+    if (r < 0) { r = 0; } else { ov = colour - rang[r][0]; }
+    const idx = [f[1], f[2], f[3]].map((v) => shade(r, intensity(vertexNormal[v]), ov));
+    if (!ui.gouraud.checked) { const m = Math.floor((idx[0] + idx[1] + idx[2]) / 3); return [m, m, m]; }
+    return idx;
+  }
+  if (kind === 6 && !ui.tex.checked) {                               // texture coupée : 1er texel
+    const t = uvOf[fi];
+    return t && t[0] < textures.length ? [textures[t[0]].first, textures[t[0]].first, textures[t[0]].first] : null;
+  }
+  return null;                                                       // 2 (transparente), 6 (texture seule)
+}
+// Facteur GL_MODULATE de la texture : approximation de la table FADE (0..16 pas).
+function textureFactor(fi, frontSeen) {
+  const f = faces[fi];
+  if (f[0] === 6) { return 1; }                                      // non éclairée
+  let i;
+  if (f[0] === 8) {
+    i = Math.floor((intensity(vertexNormal[f[1]]) + intensity(vertexNormal[f[2]]) + intensity(vertexNormal[f[3]])) / 3);
+  } else {
+    let n = faceNormal[fi];
+    if ((f[7] & 1) && !frontSeen) { n = [-n[0], -n[1], -n[2]]; }
+    i = intensity(n);
+  }
+  return 1 - tableLevel(i) / 17;
+}
+function hasTexturePass(fi) {
+  const k = faces[fi][0];
+  return (k === 6 || k === 7 || k === 8) && uvOf[fi] && uvOf[fi][0] < textures.length;
+}
 
-const VS = `
-attribute vec3 aPos;      // x clip × w, y clip × w, w = profondeur
-attribute float aIdx;     // index de palette (8.8 interpolé comme Render_MeshPrimitive_21085)
-attribute vec2 aUV;       // texel
-attribute vec4 aRect;     // rectangle de la texture dans l'atlas
-attribute vec3 aMode;     // mode, pas d'assombrissement, alpha
-uniform float uAffine;
-varying float vIdx;
-varying vec2 vUV;
-varying float vK;
-varying vec4 vRect;
-varying vec3 vMode;
-void main() {
-  gl_Position = vec4(aPos.x, aPos.y, 0.0, aPos.z);
-  // Interpolation affine : on multiplie par w, la correction de perspective le divise, on redivise.
-  float k = uAffine > 0.5 ? aPos.z : 1.0;
-  vIdx = aIdx * k;
-  vUV = aUV * k;
-  vK = k;
-  vRect = aRect;
-  vMode = aMode;
-}`;
-const FS = `
-precision highp float;
-uniform sampler2D uPal;
-uniform sampler2D uAtlas;
-uniform sampler2D uRemap;
-uniform vec2 uAtlasSize;
-varying float vIdx;
-varying vec2 vUV;
-varying float vK;
-varying vec4 vRect;
-varying vec3 vMode;
-vec4 pal(float i) { return texture2D(uPal, vec2((i + 0.5) / 256.0, 0.5)); }
-void main() {
-  float idx = vIdx / vK;
-  vec2 uv = vUV / vK;
-  if (vMode.x < 0.5) {
-    gl_FragColor = vec4(pal(floor(idx + 0.001)).rgb, vMode.z);
+// =====================================================================================
+// Rendu, découpé comme SCRenderer::drawModel (passe couleur, passe texture, passe transparente).
+// =====================================================================================
+function drawFaceColor(fi, frontSeen) {
+  const cols = faceColors(fi, frontSeen);
+  if (!cols) { return; }
+  const f = faces[fi];
+  glEnableTexture2D(false);
+  glBegin(GL_TRIANGLES);
+  for (let j = 0; j < 3; j++) {
+    const v = vertices[f[1 + j]];
+    glColorIndex(cols[j], 1);
+    glVertex3f(v[0], v[1], v[2]);
+  }
+  glEnd();
+}
+function drawFaceTexture(fi, frontSeen) {
+  if (!ui.tex.checked || !hasTexturePass(fi)) { return; }
+  const f = faces[fi];
+  const uv = uvOf[fi];
+  const tex = textures[uv[0]];
+  const k = textureFactor(fi, frontSeen);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, tex.id);
+  glEnableTexture2D(true);
+  glBegin(GL_TRIANGLES);
+  for (let j = 0; j < 3; j++) {
+    const v = vertices[f[1 + j]];
+    glColor4f(k, k, k, 1);
+    // Texel = pixels[v × largeur + u] : u = colonne (1er octet de UVXY), v = ligne.
+    glTexCoord2f((uv[1][2 * j] + 0.5) / tex.width, (uv[1][2 * j + 1] + 0.5) / tex.height);
+    glVertex3f(v[0], v[1], v[2]);
+  }
+  glEnd();
+  glEnableTexture2D(false);
+}
+function drawFaceTransparent(fi) {
+  const f = faces[fi];
+  if (f[0] !== 2) { return; }
+  glEnableTexture2D(false);
+  glBegin(GL_TRIANGLES);
+  for (let j = 0; j < 3; j++) {
+    const v = vertices[f[1 + j]];
+    glColorIndex(f[4], 0.5);           // APPROX : table de translucidité absente
+    glVertex3f(v[0], v[1], v[2]);
+  }
+  glEnd();
+}
+
+function chooseLevel(depth, focal) {    // Poly_SelectDetailLevel_2BCA4 (byte_6E8CE = 0)
+  if (ui.lod.value !== "auto") { return +ui.lod.value; }
+  const seuil = Math.floor(depth) * 179.2 / focal;
+  for (let i = 7; i >= 1; i--) {
+    const lv = levels.find((l) => l[0] === i);
+    if (lv && lv[1] !== 0 && lv[1] <= seuil) { return i; }
+  }
+  return 0;
+}
+
+function drawModel() {
+  const focal = +ui.focal.value;
+  const yaw = ui.yaw.value * Math.PI / 180;
+  const pitch = ui.pitch.value * Math.PI / 180;
+  const dist = +ui.dist.value;
+  // Œil autour de l'objet, repère libRealSpace : cap 0 = devant le nez (nez vers −Z), 90 = à sa droite (+X).
+  const eye = [centre[0] + dist * Math.cos(pitch) * Math.sin(yaw),
+               centre[1] + dist * Math.sin(pitch),
+               centre[2] - dist * Math.cos(pitch) * Math.cos(yaw)];
+  const up = Math.abs(ui.pitch.value) > 88 ? [0, 0, -1] : [0, 1, 0];
+  const MV = lookAt(eye, centre, up);
+  const fovy = 2 * Math.atan((200 / 2) / focal) * 180 / Math.PI;
+  const P = perspective(fovy, 320 / 200, 0.5, 20000);
+  glLoadMatrices(P, MV);
+
+  // Lumière du LGHT (repère jeu) tournée autour de la verticale, convertie en libRS.
+  const L = D.light.dir;
+  const ly = ui.lyaw.value * Math.PI / 180;
+  lightDir = norm(toLibRS([L[0] * Math.cos(ly) - L[1] * Math.sin(ly), L[0] * Math.sin(ly) + L[1] * Math.cos(ly), L[2]]));
+  const aw = +ui.amb.value;
+  const lw = +ui.lw.value;
+  const total = Math.max(1, aw + lw);
+  ambient = Math.floor(aw * 255 / total);
+  share = Math.floor(lw * 255 / total);
+
+  const bg = ui.bg.value === "sky" ? [0.42, 0.55, 0.70] : ui.bg.value === "grey" ? [0.35, 0.35, 0.35] : [0, 0, 0];
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clearColor(bg[0], bg[1], bg[2], 1);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const depthC = -transformPoint(MV, centre)[2];
+  const size = D.radius * focal / Math.max(0.01, depthC);
+  const level = chooseLevel(depthC, focal);
+  const list = (levels.find((l) => l[0] === level) || levels[0])[2].filter((fi) => fi < faces.length);
+  const info = ["profondeur  " + depthC.toFixed(1) + " m", "taille      " + size.toFixed(1) + " px", "niveau      LVL" + level];
+  if (size <= 0.1) {
+    $("info").textContent = info.concat(["dessin      rien (≤ 0,1 px)"]).join("\n");
     return;
   }
-  vec2 t = clamp(floor(uv), vec2(0.0), vRect.zw - 1.0) + vRect.xy;
-  float texel = floor(texture2D(uAtlas, (t + 0.5) / uAtlasSize).r * 255.0 + 0.5);
-  if (texel > 254.5) { discard; }
-  float c = floor(texture2D(uRemap, vec2((texel + 0.5) / 256.0, (vMode.y + 0.5) / 17.0)).r * 255.0 + 0.5);
-  gl_FragColor = vec4(pal(c).rgb, 1.0);
-}`;
-function compile(type, src) {
-  const s = gl.createShader(type);
-  gl.shaderSource(s, src);
-  gl.compileShader(s);
-  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { throw new Error(gl.getShaderInfoLog(s)); }
-  return s;
-}
-const prog = gl.createProgram();
-gl.attachShader(prog, compile(gl.VERTEX_SHADER, VS));
-gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FS));
-gl.linkProgram(prog);
-gl.useProgram(prog);
-const loc = {};
-for (const a of ["aPos", "aIdx", "aUV", "aRect", "aMode"]) { loc[a] = gl.getAttribLocation(prog, a); }
-for (const u of ["uAffine", "uPal", "uAtlas", "uRemap", "uAtlasSize"]) { loc[u] = gl.getUniformLocation(prog, u); }
+  // Vue de face ou de dos : (centre de la face − œil) · N < 0 = face vue de devant (loc_24EE2).
+  const front = (fi) => {
+    const f = faces[fi];
+    const a = vertices[f[1]];
+    const b = vertices[f[2]];
+    const c = vertices[f[3]];
+    const cen = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3, (a[2] + b[2] + c[2]) / 3];
+    return dot(sub(cen, eye), faceNormal[fi]) < 0;
+  };
 
-function texture(unit, w, h, format, pixels) {
-  const t = gl.createTexture();
-  gl.activeTexture(gl.TEXTURE0 + unit);
-  gl.bindTexture(gl.TEXTURE_2D, t);
-  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-  gl.texImage2D(gl.TEXTURE_2D, 0, format, w, h, 0, format, gl.UNSIGNED_BYTE, pixels);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  return t;
-}
-// Palette 256 × 1
-const palPix = new Uint8Array(256 * 4);
-for (let i = 0; i < 256; i++) {
-  palPix[4 * i] = pal[3 * i];
-  palPix[4 * i + 1] = pal[3 * i + 1];
-  palPix[4 * i + 2] = pal[3 * i + 2];
-  palPix[4 * i + 3] = 255;
-}
-texture(0, 256, 1, gl.RGBA, palPix);
-// Atlas des TXMP (rangées successives), index de palette bruts
-const ATLAS_W = 256;
-const rects = [];
-let ax = 0;
-let ay = 0;
-let rowH = 0;
-for (const t of D.textures) {
-  const w = t[1];
-  const h = t[2];
-  if (ax + w > ATLAS_W) { ax = 0; ay += rowH; rowH = 0; }
-  rects.push([ax, ay, w, h]);
-  ax += w;
-  rowH = Math.max(rowH, h);
-}
-const ATLAS_H = Math.max(1, ay + rowH);
-const atlas = new Uint8Array(ATLAS_W * ATLAS_H).fill(255);
-D.textures.forEach((t, k) => {
-  const px = Uint8Array.from(atob(t[3]), (c) => c.charCodeAt(0));
-  const r = rects[k];
-  for (let y = 0; y < r[3]; y++) {
-    atlas.set(px.subarray(y * r[2], (y + 1) * r[2]), (r[1] + y) * ATLAS_W + r[0]);
+  // Rejet des faces vues de dos par GL : la normale du jeu (V0 − V2) × (V0 − V1) donne des faces
+  // avant tournant dans le sens horaire à l'écran → glFrontFace(GL_CW), glCullFace(GL_BACK).
+  gl.frontFace(gl.CW);
+  gl.cullFace(gl.BACK);
+  const setCull = (fi) => { if (faces[fi][7] & 1) { gl.disable(gl.CULL_FACE); } else { gl.enable(gl.CULL_FACE); } };
+  glAlphaTest(true, 0.1);              // glAlphaFunc(GL_GREATER, 0.1f) : texel 0xFF transparent
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  let drawn = 0;
+
+  if (order() === "sort") {
+    // Comme le jeu : faces triées du plus loin au plus proche (clé = sommet le plus lointain),
+    // sans tampon de profondeur ; chaque face dessine sa couleur puis sa texture.
+    gl.disable(gl.DEPTH_TEST);
+    const queue = list.map((fi) => {
+      const f = faces[fi];
+      const d = Math.max(...[f[1], f[2], f[3]].map((v) => -transformPoint(MV, vertices[v])[2]));
+      return [d, fi];
+    }).sort((a, b) => b[0] - a[0]);
+    for (const [, fi] of queue) {
+      if (!(faces[fi][7] & 1) && !front(fi)) { continue; }
+      drawn++;
+      setCull(fi);
+      const fs = front(fi);
+      drawFaceColor(fi, fs);
+      drawFaceTexture(fi, fs);
+      drawFaceTransparent(fi);
+    }
+  } else {
+    // Comme SCRenderer::drawModel : tampon de profondeur, 3 passes.
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+    gl.depthMask(true);
+    for (const fi of list) {             // passe 1 : couleur
+      setCull(fi);
+      drawFaceColor(fi, front(fi));
+    }
+    for (const fi of list) {             // passe 2 : texture (sur la couleur : GL_EQUAL, sans écriture)
+      if (!hasTexturePass(fi)) { continue; }
+      const overlay = faces[fi][0] !== 6;
+      gl.depthFunc(overlay ? gl.EQUAL : gl.LESS);
+      gl.depthMask(!overlay);
+      setCull(fi);
+      drawFaceTexture(fi, front(fi));
+    }
+    gl.depthFunc(gl.LESS);
+    gl.depthMask(false);
+    for (const fi of list) {             // passe 3 : transparentes
+      setCull(fi);
+      drawFaceTransparent(fi);
+    }
+    gl.depthMask(true);
+    drawn = list.filter((fi) => (faces[fi][7] & 1) || front(fi)).length;
   }
-});
-texture(1, ATLAS_W, ATLAS_H, gl.LUMINANCE, atlas);
-texture(2, 256, 17, gl.LUMINANCE, remap);
-gl.uniform1i(loc.uPal, 0);
-gl.uniform1i(loc.uAtlas, 1);
-gl.uniform1i(loc.uRemap, 2);
-gl.uniform2f(loc.uAtlasSize, ATLAS_W, ATLAS_H);
-gl.disable(gl.DEPTH_TEST);              // le jeu trie les faces, sans tampon de profondeur
-gl.disable(gl.CULL_FACE);               // le rejet est fait sur le CPU, comme le jeu
-gl.enable(gl.BLEND);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-const buf = gl.createBuffer();
-const STRIDE = 14;                      // floats par sommet
+  gl.disable(gl.BLEND);
+  gl.disable(gl.CULL_FACE);
+  info.push("faces       " + drawn + " / " + list.length + " visibles");
+  info.push("lumière     ambiante " + ambient + ", part " + share);
+  $("info").textContent = info.join("\n");
+}
 
-// ---------------------------------------------------------------- interface
+// =====================================================================================
+// Interface
+// =====================================================================================
 const $ = (id) => document.getElementById(id);
 const ui = {};
+const order = () => document.querySelector("input[name=order]:checked").value;
+function resize() {
+  const low = ui.low.checked;
+  canvas.classList.toggle("pixel", low);
+  const w = low ? 320 : Math.round(canvas.clientWidth * devicePixelRatio);
+  const h = low ? 200 : Math.round(w * 200 / 320);
+  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+}
 for (const id of ["yaw", "pitch", "dist", "focal", "lyaw", "amb", "lw"]) {
   ui[id] = $(id);
   const out = ui[id].parentElement.querySelector("output");
-  const upd = () => { out.textContent = ui[id].value; };
-  ui[id].addEventListener("input", () => { upd(); draw(); });
+  const upd = () => { out.textContent = Math.round(ui[id].value); };
+  ui[id].addEventListener("input", () => { upd(); drawModel(); });
   upd();
 }
-for (const id of ["tex", "gouraud", "wire", "affine", "low", "cull", "spin", "lod", "bg"]) {
+for (const id of ["tex", "gouraud", "low", "linear", "spin", "lod", "bg"]) {
   ui[id] = $(id);
-  ui[id].addEventListener("change", () => { resize(); draw(); });
+  ui[id].addEventListener("change", () => { resize(); setFiltering(ui.linear.checked); drawModel(); });
 }
+document.querySelectorAll("input[name=order]").forEach((r) => r.addEventListener("change", drawModel));
 ui.lod.add(new Option("auto (par la distance)", "auto"));
 for (const lv of levels) { ui.lod.add(new Option("LVL" + lv[0] + " — " + lv[1] + " m, " + lv[2].length + " faces", String(lv[0]))); }
 ui.dist.value = Math.round(D.radius * 2.2);
@@ -314,191 +568,20 @@ canvas.addEventListener("wheel", (e) => {
   ui.dist.value = Math.max(5, Math.min(3000, +ui.dist.value * Math.exp(e.deltaY * 0.001)));
   ui.dist.dispatchEvent(new Event("input"));
 }, { passive: false });
-
-function resize() {
-  const low = ui.low.checked;
-  canvas.classList.toggle("pixel", low);
-  const w = low ? W_LOW : Math.round(canvas.clientWidth * devicePixelRatio);
-  const h = low ? H_LOW : Math.round(w * H_LOW / W_LOW);
-  if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-}
-window.addEventListener("resize", () => { resize(); draw(); });
-
-// ---------------------------------------------------------------- rendu (OBJECT_RENDER.md §2)
-function chooseLevel(depth, focal) {   // Poly_SelectDetailLevel_2BCA4 (byte_6E8CE = 0)
-  if (ui.lod.value !== "auto") { return +ui.lod.value; }
-  const seuil = Math.floor(depth) * 179.2 / focal;
-  for (let i = 7; i >= 1; i--) {
-    const lv = levels.find((l) => l[0] === i);
-    if (lv && lv[1] !== 0 && lv[1] <= seuil) { return i; }
-  }
-  return 0;
-}
-
-function draw() {
-  const focal = +ui.focal.value;
-  const yaw = ui.yaw.value * Math.PI / 180;
-  const pitch = ui.pitch.value * Math.PI / 180;
-  const dist = +ui.dist.value;
-  const C = D.centre;
-  // Repère du jeu (Z-up) : cap mesuré depuis le nez (+c1) vers la droite (+c0).
-  const eye = [C[0] + dist * Math.cos(pitch) * Math.sin(yaw),
-               C[1] + dist * Math.cos(pitch) * Math.cos(yaw),
-               C[2] + dist * Math.sin(pitch)];
-  const fwd = norm(sub(C, eye));
-  let right = norm(cross(fwd, [0, 0, 1]));
-  if (!right[0] && !right[1] && !right[2]) { right = [1, 0, 0]; }
-  const up = cross(right, fwd);
-  // Lumière : direction LGHT tournée autour de la verticale, objet sans rotation.
-  const L = D.light.dir;
-  const ly = ui.lyaw.value * Math.PI / 180;
-  lightDir = norm([L[0] * Math.cos(ly) - L[1] * Math.sin(ly), L[0] * Math.sin(ly) + L[1] * Math.cos(ly), L[2]]);
-  const aw = +ui.amb.value;
-  const lw = +ui.lw.value;
-  const total = Math.max(1, aw + lw);
-  ambient = Math.floor(aw * 255 / total);
-  share = Math.floor(lw * 255 / total);
-
-  const bg = ui.bg.value === "sky" ? [0.42, 0.55, 0.70] : ui.bg.value === "grey" ? [0.35, 0.35, 0.35] : [0, 0, 0];
-  gl.viewport(0, 0, canvas.width, canvas.height);
-  gl.clearColor(bg[0], bg[1], bg[2], 1);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-  gl.uniform1f(loc.uAffine, ui.affine.checked ? 1 : 0);
-
-  const depthC = dot(sub(C, eye), fwd);
-  const size = D.radius * focal / Math.max(0.01, depthC);
-  const level = chooseLevel(depthC, focal);
-  const info = [];
-  info.push("profondeur  " + depthC.toFixed(1) + " m");
-  info.push("taille      " + size.toFixed(1) + " px");
-  info.push("niveau      LVL" + level);
-  if (size <= 0.1) {                    // PolyInstance_Render_2BF6C : trop petit
-    info.push("dessin      rien (≤ 0,1 px)");
-    $("info").textContent = info.join("\n");
-    return;
-  }
-  // Sommets : repère caméra (x droite, d profondeur, y haut) puis écran 320 × 200 (y vers le bas).
-  const cam = verts.map((v) => { const p = sub(v, eye); return [dot(right, p), dot(fwd, p), dot(up, p)]; });
-  const scr = cam.map((c) => { const d = Math.max(0.1, c[1]); return [W_LOW / 2 + c[0] * focal / d, H_LOW / 2 - c[2] * focal / d]; });
-  const out = [];
-  function vtx(vi, idx, u, v, rect, mode, steps, alpha) {
-    const c = cam[vi];
-    const d = Math.max(0.1, c[1]);
-    out.push(c[0] * focal / (W_LOW / 2), c[2] * focal / (H_LOW / 2), d, idx, u, v,
-             rect[0], rect[1], rect[2], rect[3], mode, steps, alpha, 0);
-  }
-  const NORECT = [0, 0, 1, 1];
-  if (size <= 1.2) {                    // un seul point, couleur +85h (0 sans face de type 3)
-    info.push("dessin      un point");
-  }
-  const list = (levels.find((l) => l[0] === level) || levels[0])[2];
-  const queue = [];
-  const eyeFix = eye.map((e) => e * 256);
-  for (const fi of list) {
-    if (fi >= faces.length) { continue; }
-    const f = faces[fi];
-    if (cam[f[1]][1] < 0.5 || cam[f[2]][1] < 0.5 || cam[f[3]][1] < 0.5) { continue; }
-    // FaceElement_CullAndProject_24EE2 : face simple vue de dos → ignorée
-    if (ui.cull.checked && !(f[7] & 1) && dot(sub(D.centroid[fi], eyeFix), D.faceNormal[fi]) >= 0) { continue; }
-    queue.push([Math.max(cam[f[1]][1], cam[f[2]][1], cam[f[3]][1]), fi]);
-  }
-  queue.sort((a, b) => b[0] - a[0]);    // du plus loin au plus proche
-  const texOn = ui.tex.checked;
-  const gouraudOn = ui.gouraud.checked;
-  let lines = [];
-  for (const [, fi] of queue) {
-    const f = faces[fi];
-    const kind = f[0];
-    const colour = f[4];
-    const vs = [f[1], f[2], f[3]];
-    let n = D.faceNormal[fi];
-    if (f[7] & 1) {                     // Face_LightFlat_29A7D : face double vue de dos
-      const [a, b, c] = vs.map((v) => scr[v]);
-      if ((b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]) < 0) { n = [-n[0], -n[1], -n[2]]; }
-    }
-    const fI = intensity(n);
-    const uvr = uvOf[fi];
-    const tex = uvr && uvr[0] < D.textures.length ? uvr : null;
-    const rect = tex ? rects[tex[0]] : NORECT;
-    const t = tex ? tex[1] : [0, 0, 0, 0, 0, 0];
-    const flat = (c, alpha) => { for (const v of vs) { vtx(v, c, 0, 0, NORECT, 0, 0, alpha); } };
-    const textured = (steps) => { vs.forEach((v, k) => vtx(v, 0, t[2 * k], t[2 * k + 1], rect, 1, steps, 1)); };
-    if (ui.wire.checked) { lines.push([vs, colour]); continue; }
-    if (kind === 0) { lines.push([vs, colour]); continue; }
-    if (kind === 1 || kind === 5 || kind > 9) {
-      flat(colour, 1);
-    } else if (kind === 2) {
-      flat(colour, 0.5);                // APPROX : table de translucidité absente
-    } else if (kind === 4) {
-      flat(litFlat(colour, fI), 1);
-    } else if (kind === 3 || kind === 8) {
-      let r = rampOf(colour);
-      let ov = 0;
-      if (r < 0) { r = 0; } else { ov = colour - rang[r][0]; }
-      const vI = vs.map((v) => intensity(D.vertexNormal[v]));
-      const idx = vI.map((i) => shade(r, i, ov));
-      if (!gouraudOn) {
-        const m = Math.floor((idx[0] + idx[1] + idx[2]) / 3);
-        flat(m, 1);
-      } else {
-        vs.forEach((v, k) => vtx(v, idx[k], 0, 0, NORECT, 0, 0, 1));
-      }
-      if (kind === 8 && tex && texOn) { textured(tableLevel(Math.floor((vI[0] + vI[1] + vI[2]) / 3))); }
-    } else if (kind === 6) {
-      if (tex && texOn) { textured(0); } else if (tex) {
-        const k = D.textures[tex[0]];
-        flat(atob(k[3]).charCodeAt(0), 1);   // texture coupée : couleur du 1er texel
-      }
-    } else if (kind === 7) {
-      flat(litFlat(colour, fI), 1);
-      if (tex && texOn) { textured(tableLevel(fI)); }
-    } else {
-      flat(colour, 1);
-    }
-  }
-  const arr = new Float32Array(out);
-  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, arr, gl.STREAM_DRAW);
-  const F = 4;
-  gl.enableVertexAttribArray(loc.aPos);
-  gl.vertexAttribPointer(loc.aPos, 3, gl.FLOAT, false, STRIDE * F, 0);
-  gl.enableVertexAttribArray(loc.aIdx);
-  gl.vertexAttribPointer(loc.aIdx, 1, gl.FLOAT, false, STRIDE * F, 3 * F);
-  gl.enableVertexAttribArray(loc.aUV);
-  gl.vertexAttribPointer(loc.aUV, 2, gl.FLOAT, false, STRIDE * F, 4 * F);
-  gl.enableVertexAttribArray(loc.aRect);
-  gl.vertexAttribPointer(loc.aRect, 4, gl.FLOAT, false, STRIDE * F, 6 * F);
-  gl.enableVertexAttribArray(loc.aMode);
-  gl.vertexAttribPointer(loc.aMode, 3, gl.FLOAT, false, STRIDE * F, 10 * F);
-  gl.drawArrays(gl.TRIANGLES, 0, arr.length / STRIDE);
-  if (lines.length) {                   // contours (type 0 ou fil de fer)
-    out.length = 0;
-    for (const [vs, c] of lines) {
-      for (const [a, b] of [[0, 1], [1, 2], [2, 0]]) {
-        vtx(vs[a], c, 0, 0, NORECT, 0, 0, 1);
-        vtx(vs[b], c, 0, 0, NORECT, 0, 0, 1);
-      }
-    }
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(out), gl.STREAM_DRAW);
-    gl.drawArrays(gl.LINES, 0, out.length / STRIDE);
-  }
-  info.push("faces       " + queue.length + " / " + list.length + " dessinées");
-  info.push("lumière     ambiante " + ambient + ", part " + share);
-  $("info").textContent = info.join("\n");
-}
-
+window.addEventListener("resize", () => { resize(); drawModel(); });
 function tick() {
   if (ui.spin.checked) {
     let y = +ui.yaw.value + 0.6;
     if (y > 180) { y -= 360; }
     ui.yaw.value = y;
     ui.yaw.parentElement.querySelector("output").textContent = Math.round(y);
-    draw();
+    drawModel();
   }
   requestAnimationFrame(tick);
 }
+setFiltering(false);
 resize();
-draw();
+drawModel();
 requestAnimationFrame(tick);
 </script>
 </body>

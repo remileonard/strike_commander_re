@@ -127,6 +127,15 @@ de chaque paire de `UVXY` (colonne), `v` = 2e (ligne). `0xFF` = transparent (`cm
 - Types 1, 5, 6 : **non éclairés** (seul le brouillard les modifie).
 - Types 7, 8 : couleur de fond dessinée d'abord, texture par-dessus avec transparence 0xFF.
 - Ordre de dessin : le jeu trie les faces (peintre), sans tampon de profondeur.
+- **Sens des faces** : avec la normale du jeu `N = (V0 − V2) × (V0 − V1)`, une face vue de devant a
+  ses sommets dans le **sens horaire à l'écran**, dans le repère du jeu comme dans celui de
+  libRealSpace (rotation). `glFrontFace(GL_CW)` + `glCullFace(GL_BACK)` rejette donc exactement les
+  faces que rejette `FaceElement_CullAndProject_24EE2`, **sans réorienter les faces** ; vérifié dans
+  `tools/object_viewer.html` (mêmes 70 faces sur 135 que le test du jeu, vue 3/4 avant du F-16).
+  Les faces doubles (octet 7 bit 0) se dessinent sans rejet.
+- `tools/object_viewer.html` suit la structure de `SCRenderer::drawModel` (passes couleur, texture,
+  transparence ; `glColor` calculé sur le CPU ; `GL_MODULATE` ; test alpha pour le texel 0xFF) avec,
+  au choix, le tri des faces du jeu ou le tampon de profondeur.
 
 ## Non établi
 
