@@ -1,0 +1,750 @@
+{
+  "_doc": "Catalogue du moteur des cinématiques pour tools/midgame_extract.py. Clés = noms de known_functions.json. args = rôle de chaque argument dans l'ordre d'appel ; ret = type de l'objet renvoyé ; type = type donné à l'objet passé en 1er argument (constructeurs) ; hide = opération omise du rapport (libérations). Valeurs en décimal.",
+  "dseg_base": 274464,
+  "functions": {
+    "Path_Build_C82C": {
+      "op": "chemin",
+      "args": [
+        "dest",
+        "dossier",
+        "nom",
+        "extension"
+      ],
+      "special": "path"
+    },
+    "IndexedRecordReader_ConstructVariantB_3D2BA": {
+      "op": "ouvre_pak",
+      "args": [
+        "pak",
+        "chemin",
+        "mode"
+      ],
+      "special": "pak_open"
+    },
+    "IndexedRecordReader_ConstructVariantA_3D28A": {
+      "op": "pak_vide",
+      "args": [
+        "pak"
+      ],
+      "special": "pak_new"
+    },
+    "IndexedRecordReader_Destruct_3D240": {
+      "op": "ferme_pak",
+      "args": [
+        "pak",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "Pak_LoadEntry_C40A": {
+      "op": "charge",
+      "args": [
+        "pak",
+        "entrée",
+        "ressource",
+        "mémoire"
+      ],
+      "special": "load"
+    },
+    "ConvData_LoadByName_C38E": {
+      "op": "charge_convdata_type0",
+      "args": [
+        "nom",
+        "ressource",
+        "drapeau"
+      ],
+      "special": "load_name"
+    },
+    "ConvData_LoadNormalOrNight_C3A6": {
+      "op": "charge_convdata_type2",
+      "args": [
+        "ressource",
+        "type",
+        "nuit"
+      ],
+      "special": "load_daynight"
+    },
+    "Palette_LoadFromResource_2CCE5": {
+      "op": "palette_depuis",
+      "args": [
+        "palette",
+        "ressource"
+      ],
+      "special": "palette_load"
+    },
+    "Palette_Alloc_2CC76": {
+      "op": "palette_alloue",
+      "args": [
+        "palette",
+        "premier",
+        "nombre"
+      ]
+    },
+    "Palette_CopyInto_2CF80": {
+      "op": "palette_copie",
+      "args": [
+        "destination",
+        "source",
+        "premier",
+        "nombre"
+      ],
+      "show": [
+        "destination",
+        "source"
+      ]
+    },
+    "Palette_Upload_2CDE1": {
+      "op": "palette_envoie",
+      "args": [
+        "palette",
+        "premier",
+        "nombre",
+        "pas"
+      ],
+      "show": [
+        "palette",
+        "pas"
+      ]
+    },
+    "Palette_FillRange_2CF08": {
+      "op": "palette_remplit",
+      "args": [
+        "palette",
+        "couleur",
+        "premier",
+        "nombre"
+      ],
+      "show": [
+        "palette",
+        "couleur",
+        "premier",
+        "nombre"
+      ]
+    },
+    "Palette_FadeFromColor_2D165": {
+      "op": "fondu_apparition",
+      "args": [
+        "palette",
+        "couleur",
+        "pas",
+        "premier",
+        "nombre"
+      ]
+    },
+    "Palette_FadeToColor_2D09C": {
+      "op": "fondu_disparition",
+      "args": [
+        "palette",
+        "couleur",
+        "pas",
+        "premier",
+        "nombre"
+      ]
+    },
+    "Palette_Destruct_2D048": {
+      "op": "libère_palette",
+      "args": [
+        "palette",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "Scene_Create_C55E": {
+      "op": "Scene_Create",
+      "args": [
+        "objet",
+        "cadence",
+        "palette",
+        "surface"
+      ],
+      "type": "scene",
+      "special": "scene"
+    },
+    "Scene_SetFps_2DE27": {
+      "op": "Scene_SetFps",
+      "args": [
+        "scène",
+        "cadence"
+      ]
+    },
+    "Scene_Tick_C652": {
+      "op": "Scene_Tick",
+      "args": [
+        "scène"
+      ]
+    },
+    "Scene_Destruct_2DCFC": {
+      "op": "Scene_Destruct",
+      "args": [
+        "scène",
+        "drapeaux"
+      ],
+      "ends": true
+    },
+    "LayerGroup_Add_2DB84": {
+      "op": "ajoute",
+      "args": [
+        "parent",
+        "calque"
+      ],
+      "special": "add"
+    },
+    "LayerGroup_Remove_2DBC1": {
+      "op": "retire",
+      "args": [
+        "parent",
+        "calque"
+      ]
+    },
+    "Layer_Construct_2DF9B": {
+      "op": "Layer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "Layer",
+      "ret": "layer"
+    },
+    "ImageLayer_Construct_2E02C": {
+      "op": "ImageLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "image"
+      ],
+      "type": "ImageLayer",
+      "ret": "layer"
+    },
+    "AnimLayer_Construct_2E5CF": {
+      "op": "AnimLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "AnimLayer",
+      "ret": "layer"
+    },
+    "JitterImageLayer_Construct_B12E": {
+      "op": "JitterImageLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "image"
+      ],
+      "type": "JitterImageLayer",
+      "ret": "layer"
+    },
+    "ClippedMovingLayer_Construct_B3F8": {
+      "op": "ClippedMovingLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "ClippedMovingLayer",
+      "ret": "layer"
+    },
+    "ClippedMovingImageLayer_Construct_B45E": {
+      "op": "ClippedMovingImageLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "image"
+      ],
+      "type": "ClippedMovingImageLayer",
+      "ret": "layer"
+    },
+    "OverlayImageLayer_Construct_A9D6": {
+      "op": "OverlayImageLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "image"
+      ],
+      "type": "OverlayImageLayer",
+      "ret": "layer"
+    },
+    "OverlayAnimLayer_Construct_A505": {
+      "op": "OverlayAnimLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "OverlayAnimLayer",
+      "ret": "layer"
+    },
+    "TriggeredAnimLayer_Construct_B068": {
+      "op": "TriggeredAnimLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "image"
+      ],
+      "type": "TriggeredAnimLayer",
+      "ret": "layer"
+    },
+    "ToggleLayer_Construct_B57B": {
+      "op": "ToggleLayer",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y",
+        "sens"
+      ],
+      "type": "ToggleLayer",
+      "ret": "layer"
+    },
+    "TalkingHeadOverlay_Construct_B20F": {
+      "op": "TalkingHeadOverlay",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "TalkingHeadOverlay",
+      "ret": "layer"
+    },
+    "TalkingHead_Construct_98F4": {
+      "op": "TalkingHead",
+      "args": [
+        "objet",
+        "ressource",
+        "x",
+        "y"
+      ],
+      "type": "TalkingHead",
+      "ret": "layer"
+    },
+    "TalkingHead_SetBaseFrame_9D32": {
+      "op": "tête_image_de_base",
+      "args": [
+        "tête",
+        "image"
+      ]
+    },
+    "TalkingHead_SetLipText_9C4F": {
+      "op": "tête_texte_de_lèvres",
+      "args": [
+        "tête",
+        "texte"
+      ]
+    },
+    "AnimLayer_IsFinished_2E654": {
+      "op": "animation_finie",
+      "args": [
+        "calque"
+      ],
+      "ret": "value"
+    },
+    "MusicChannel_Init_78A4": {
+      "op": "canal_init",
+      "args": [
+        "canal",
+        "pilote"
+      ]
+    },
+    "MusicChannel_RegisterSequence_7918": {
+      "op": "canal_enregistre",
+      "args": [
+        "canal",
+        "ressource",
+        "x"
+      ]
+    },
+    "Music_ChannelStopSequence_783A": {
+      "op": "canal_arrête",
+      "args": [
+        "canal"
+      ]
+    },
+    "AIL_start_sequence_30C42": {
+      "op": "AIL_start_sequence",
+      "args": [
+        "pilote",
+        "séquence"
+      ]
+    },
+    "AIL_stop_sequence_30C48": {
+      "op": "AIL_stop_sequence",
+      "args": [
+        "pilote",
+        "séquence"
+      ]
+    },
+    "VoicePlayer_SetDriver_7A3D": {
+      "op": "voix_pilote",
+      "args": [
+        "voix",
+        "pilote"
+      ]
+    },
+    "VoicePlayer_Stop_7B5A": {
+      "op": "voix_arrête",
+      "args": [
+        "voix"
+      ]
+    },
+    "sub_7D11": {
+      "op": "voix_charge (sub_7D11, non lue)",
+      "args": [
+        "voix",
+        "ressource"
+      ]
+    },
+    "sub_83FE": {
+      "op": "voix_joue (sub_83FE, non lue)",
+      "args": [
+        "voix",
+        "x"
+      ]
+    },
+    "sub_84CC": {
+      "op": "voix_finie (sub_84CC, non lue)",
+      "args": [
+        "voix"
+      ],
+      "ret": "value"
+    },
+    "sub_C8F5": {
+      "op": "sous_titre (sub_C8F5, non lue)",
+      "args": [
+        "zone",
+        "texte"
+      ]
+    },
+    "sub_3139A": {
+      "op": "police_couleur (sub_3139A, non lue)",
+      "args": [
+        "police",
+        "couleur"
+      ]
+    },
+    "Input_Flush_CDDC": {
+      "op": "vide_entrées",
+      "args": []
+    },
+    "Input_CheckSkip_D24A": {
+      "op": "touche_passer",
+      "args": [],
+      "ret": "value"
+    },
+    "Keyboard_QueryAndDispatch_3E5C7": {
+      "op": "lit_touche",
+      "args": [
+        "événement",
+        "x"
+      ]
+    },
+    "Stopwatch_WaitElapsed_3F023": {
+      "op": "attend",
+      "args": [
+        "chronomètre"
+      ]
+    },
+    "Render_MeasureOrDrawTextString_32CD8": {
+      "op": "dessine_image",
+      "args": [
+        "surface",
+        "x",
+        "y",
+        "données",
+        "image"
+      ]
+    },
+    "Memory_TypedAllocDispatchB_2B920": {
+      "op": "verrouille",
+      "args": [
+        "tag",
+        "bloc",
+        "x",
+        "y"
+      ],
+      "ret": "pointer",
+      "special": "lock"
+    },
+    "Memory_TypedFree_2B8A4": {
+      "op": "libère_bloc",
+      "args": [
+        "tag",
+        "bloc",
+        "type",
+        "x"
+      ],
+      "hide": true
+    },
+    "TextArray_Init_CBE1": {
+      "op": "tableau_textes",
+      "args": [
+        "tableau",
+        "nombre",
+        "longueur"
+      ]
+    },
+    "TextArray_Destruct_CC03": {
+      "op": "libère_textes",
+      "args": [
+        "tableau",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "CRT_Malloc16_Retry": {
+      "op": "alloue",
+      "args": [
+        "taille"
+      ],
+      "ret": "heap"
+    },
+    "CRT_Fmemcpy": {
+      "op": "copie_mémoire",
+      "args": [
+        "source",
+        "destination"
+      ],
+      "special": "memcpy",
+      "callee_words": 4
+    },
+    "Struct_GetElementCountMinusOne_33352": {
+      "op": "nombre_images_moins_1",
+      "args": [
+        "données"
+      ],
+      "ret": "value",
+      "callee_words": 2
+    },
+    "Stub_Midgame1_PlayPart2_423E0": {
+      "op": "suite",
+      "special": "follow",
+      "target": "Midgame1_PlayPart2_671C0"
+    },
+    "GlyphObject_ScalarDeletingDtorA_313D6": {
+      "op": "libère_police",
+      "args": [
+        "objet",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "TextFormat_ReleaseStyleList_2EBFA": {
+      "op": "libère_style",
+      "args": [
+        "objet"
+      ],
+      "hide": true
+    },
+    "TextFormat_ReleaseAttribute_2EC80": {
+      "op": "réinitialise_style",
+      "args": [
+        "x",
+        "y"
+      ],
+      "hide": true
+    },
+    "SmallObject_UnregisterFromList_2CB7A": {
+      "op": "désenregistre",
+      "args": [
+        "objet",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "StreamReader_ReleaseBuffer_3CEB3": {
+      "op": "libère_flux",
+      "args": [
+        "flux",
+        "drapeaux"
+      ],
+      "hide": true
+    },
+    "ResourceRecord_Helper_3BE15": {
+      "op": "iff_ferme_form",
+      "args": [
+        "flux"
+      ]
+    },
+    "ResourceRecord_ReleaseAndClear_3C595": {
+      "op": "iff_ferme",
+      "args": [
+        "flux"
+      ]
+    },
+    "ResourceRecord_SeekAndRead_3BFB3": {
+      "op": "iff_chunk",
+      "args": [
+        "flux",
+        "balise",
+        "x"
+      ]
+    },
+    "ResourceRecord_SeekAndReadB_3C022": {
+      "op": "iff_form",
+      "args": [
+        "flux",
+        "balise",
+        "x"
+      ]
+    },
+    "ResourceRecord_ReadFieldGroupA_3C289": {
+      "op": "iff_lit",
+      "args": [
+        "flux",
+        "destination",
+        "taille"
+      ]
+    },
+    "ResourceRecord_ReadFieldGroupB_3C2C4": {
+      "op": "iff_lit_mot",
+      "args": [
+        "flux"
+      ],
+      "ret": "value"
+    },
+    "StreamReader_ConstructVariantA_3B2A9": {
+      "op": "flux_iff",
+      "args": [
+        "flux"
+      ]
+    },
+    "CRT_Doprnt_Dispatch": {
+      "op": "tableau_objets",
+      "args": [
+        "tableau",
+        "taille",
+        "nombre",
+        "x"
+      ],
+      "special": "objarray"
+    },
+    "Widget_ApplyStyleAndAllocate_3144B": {
+      "op": "zone_texte",
+      "args": [
+        "zone",
+        "style",
+        "police"
+      ],
+      "special": "widget"
+    }
+  },
+  "vtables": {
+    "6367": "Layer",
+    "6519": "MovingLayer",
+    "4958": "LoopAnimLayer",
+    "16248": "AnimLayer",
+    "5803": "JitterImageLayer",
+    "5703": "ClippedMovingLayer",
+    "6043": "OverlayImageLayer",
+    "6139": "OverlayAnimLayer",
+    "5851": "TriggeredAnimLayer",
+    "5655": "ToggleLayer",
+    "5751": "TalkingHeadOverlay",
+    "6275": "TalkingHead",
+    "6794": "scene"
+  },
+  "secondary_vtables": [
+    6551,
+    4990,
+    6399,
+    16280,
+    6826,
+    4540,
+    4552,
+    4568,
+    4584,
+    4604,
+    6239,
+    6255
+  ],
+  "fields": {
+    "scene": {
+      "12": "x",
+      "14": "y",
+      "16": "durée_image",
+      "29": "compteur",
+      "31": "terminée",
+      "32": "drapeau_S"
+    },
+    "layer": {
+      "2": "parent",
+      "12": "x",
+      "14": "y",
+      "27": "image"
+    },
+    "MovingLayer": {
+      "29": "vx",
+      "31": "vy"
+    },
+    "ClippedMovingLayer": {
+      "29": "vx",
+      "31": "vy",
+      "33": "découpe_gauche",
+      "35": "découpe_haut",
+      "37": "découpe_droite",
+      "39": "découpe_bas"
+    },
+    "ClippedMovingImageLayer": {
+      "29": "vx",
+      "31": "vy",
+      "33": "découpe_gauche",
+      "35": "découpe_haut",
+      "37": "découpe_droite",
+      "39": "découpe_bas"
+    },
+    "LoopAnimLayer": {
+      "29": "mode"
+    },
+    "TriggeredAnimLayer": {
+      "29": "lecture"
+    },
+    "ToggleLayer": {
+      "29": "sens"
+    },
+    "surface": {
+      "4": "gauche",
+      "6": "haut",
+      "8": "droite",
+      "10": "bas"
+    }
+  },
+  "methods": {
+    "voice": {
+      "0": "finie",
+      "16": "joue"
+    },
+    "layer": {
+      "0": "détruit",
+      "4": "x_absolu",
+      "8": "y_absolu"
+    },
+    "font": {
+      "8": "couleur"
+    },
+    "pak": {
+      "20": "ouvre"
+    },
+    "stream": {
+      "20": "ouvre"
+    }
+  },
+  "args_of": {
+    "Midgame1_PlayPart2_671C0": "from_caller"
+  }
+}

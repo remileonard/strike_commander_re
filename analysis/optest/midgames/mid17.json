@@ -1,0 +1,2778 @@
+{
+ "fonction": "sub_98210",
+ "exécutable": "optest",
+ "parties": [
+  {
+   "fonction": "sub_98210",
+   "scènes": [
+    {
+     "scène": 1,
+     "objet": "scène1",
+     "cadence": "9",
+     "ligne": 287118,
+     "calques": [
+      {
+       "nom": "c1",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 12, x=0, y=0",
+       "ligne": 287125
+      },
+      {
+       "nom": "c2",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 13, x=0, y=0",
+       "ligne": 287133
+      },
+      {
+       "nom": "c3",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 14, x=0, y=-23",
+       "ligne": 287141
+      },
+      {
+       "nom": "c4",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 15, x=0, y=-23",
+       "ligne": 287149
+      },
+      {
+       "nom": "c5",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 16, x=0, y=-23",
+       "ligne": 287157
+      },
+      {
+       "nom": "c6",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 17, x=0, y=-23",
+       "ligne": 287165
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène1",
+       "calque": "c1",
+       "ligne": 287171
+      },
+      {
+       "parent": "scène1",
+       "calque": "c2",
+       "ligne": 287176
+      },
+      {
+       "parent": "scène1",
+       "calque": "c3",
+       "ligne": 287181
+      },
+      {
+       "parent": "scène1",
+       "calque": "c4",
+       "ligne": 287186
+      },
+      {
+       "parent": "scène1",
+       "calque": "c5",
+       "ligne": 287489
+      },
+      {
+       "parent": "scène1",
+       "calque": "c6",
+       "ligne": 287494
+      },
+      {
+       "parent": "scène1",
+       "calque": "c5",
+       "ligne": 287775
+      },
+      {
+       "parent": "scène1",
+       "calque": "c6",
+       "ligne": 287780
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal6(midgames 10)"
+       ],
+       "ligne": 287199
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal5(midgames 9)"
+       ],
+       "ligne": 287208
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 287216
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287238
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v310",
+        "v312"
+       ],
+       "ligne": 287245
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287261
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287280
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v314",
+        "v316"
+       ],
+       "ligne": 287287
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287303
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287322
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v318",
+        "v320"
+       ],
+       "ligne": 287329
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287345
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287353
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287387
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17voc 2"
+       ],
+       "ligne": 287399
+      },
+      {
+       "op": "voix_charge (sub_7D11, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "ressource=mid17voc 2"
+       ],
+       "ligne": 287405
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 287412
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287423
+      },
+      {
+       "op": "voix_joue (sub_83FE, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "x=-1"
+       ],
+       "ligne": 287433
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 287440
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287461
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v324",
+        "0"
+       ],
+       "ligne": 287468
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène1",
+        "calque=c3"
+       ],
+       "ligne": 287479
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène1",
+        "calque=c4"
+       ],
+       "ligne": 287484
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287520
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287542
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287556
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17voc 0"
+       ],
+       "ligne": 287573
+      },
+      {
+       "op": "voix_charge (sub_7D11, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "ressource=mid17voc 0"
+       ],
+       "ligne": 287579
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287588
+      },
+      {
+       "op": "voix_joue (sub_83FE, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "x=-1"
+       ],
+       "ligne": 287598
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 287604
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287627
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287646
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 287655
+      },
+      {
+       "op": "v3342→0.méthode8",
+       "arguments": [
+        "35"
+       ],
+       "ligne": 287703
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287737
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v310",
+        "v312"
+       ],
+       "ligne": 287744
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[0]"
+       ],
+       "ligne": 287753
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène1",
+        "calque=c3"
+       ],
+       "ligne": 287765
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène1",
+        "calque=c4"
+       ],
+       "ligne": 287770
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287812
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 287836
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 287868
+      },
+      {
+       "op": "c3.détruit",
+       "arguments": [
+        "3"
+       ],
+       "ligne": 287900
+      },
+      {
+       "op": "c4.détruit",
+       "arguments": [
+        "3"
+       ],
+       "ligne": 287911
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 287949
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v310",
+        "v312"
+       ],
+       "ligne": 287956
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[1]"
+       ],
+       "ligne": 287971
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 288000
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 288015
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 288049
+      },
+      {
+       "op": "v3342→0.méthode8",
+       "arguments": [
+        "15"
+       ],
+       "ligne": 288079
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 288103
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[4]"
+       ],
+       "ligne": 288127
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 288149
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 288189
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 288237
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[6]"
+       ],
+       "ligne": 288262
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 288292
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène1"
+       ],
+       "ligne": 288324
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène1",
+        "drapeaux=0"
+       ],
+       "ligne": 288353
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal1"
+       ],
+       "ligne": 288471
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 288773
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 288796
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "asoundfx 22"
+       ],
+       "ligne": 288914
+      },
+      {
+       "op": "canal_init",
+       "arguments": [
+        "canal=canal1",
+        "pilote=word_46849"
+       ],
+       "ligne": 288919
+      },
+      {
+       "op": "canal_enregistre",
+       "arguments": [
+        "canal=canal1",
+        "ressource=asoundfx 22",
+        "x=0"
+       ],
+       "ligne": 288926
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 18"
+       ],
+       "ligne": 288940
+      }
+     ]
+    },
+    {
+     "scène": 2,
+     "objet": "scène2",
+     "cadence": "20",
+     "ligne": 288948,
+     "calques": [
+      {
+       "nom": "c7",
+       "type": "OverlayImageLayer",
+       "paramètres": "ressource=midgames 18, x=0, y=0, image=0",
+       "ligne": 288956
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène2",
+       "calque": "c7",
+       "ligne": 288962
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal7(midgames 11)"
+       ],
+       "ligne": 288975
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal8(convdata type 2 \"normal\")"
+       ],
+       "ligne": 288984
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 288992
+      },
+      {
+       "op": "v3342→0.méthode8",
+       "arguments": [
+        "224"
+       ],
+       "ligne": 288998
+      },
+      {
+       "op": "sub_85A",
+       "arguments": [
+        "0"
+       ],
+       "ligne": 289003
+      },
+      {
+       "op": "sub_6F2",
+       "arguments": [
+        "sub_85A(0)"
+       ],
+       "ligne": 289006
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289017
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17voc 3"
+       ],
+       "ligne": 289029
+      },
+      {
+       "op": "voix_charge (sub_7D11, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "ressource=mid17voc 3"
+       ],
+       "ligne": 289035
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 289042
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289054
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289071
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "v264",
+        "midgames 14.+0"
+       ],
+       "ligne": 289078
+      },
+      {
+       "op": "voix_joue (sub_83FE, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "x=-1"
+       ],
+       "ligne": 289087
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 289093
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289115
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289134
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289157
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 289166
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 289213
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289256
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "word_48ECE",
+        "mid17voc 3.+0"
+       ],
+       "ligne": 289263
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[7]"
+       ],
+       "ligne": 289281
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 289303
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289318
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289352
+      },
+      {
+       "op": "CRT_Rand",
+       "arguments": [],
+       "ligne": 289400
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289443
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "word_48ECE",
+        "mid17voc 3.+0"
+       ],
+       "ligne": 289450
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[8]"
+       ],
+       "ligne": 289467
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3422",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 289489
+      },
+      {
+       "op": "AIL_stop_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 289504
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène2"
+       ],
+       "ligne": 289538
+      },
+      {
+       "op": "fondu_disparition",
+       "arguments": [
+        "palette=pal1",
+        "couleur=&v30",
+        "pas=1",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 289571
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène2",
+        "drapeaux=0"
+       ],
+       "ligne": 289576
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal1"
+       ],
+       "ligne": 289599
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 289901
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 289924
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "asoundfx 7"
+       ],
+       "ligne": 290046
+      },
+      {
+       "op": "canal_init",
+       "arguments": [
+        "canal=canal1",
+        "pilote=word_46849"
+       ],
+       "ligne": 290051
+      },
+      {
+       "op": "canal_enregistre",
+       "arguments": [
+        "canal=canal1",
+        "ressource=asoundfx 7",
+        "x=0"
+       ],
+       "ligne": 290058
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 290068
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "word_48EB0",
+        "v238"
+       ],
+       "ligne": 290075
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 10"
+       ],
+       "ligne": 290091
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal9(mid17 10)"
+       ],
+       "ligne": 290098
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 11"
+       ],
+       "ligne": 290110
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal10(mid17 11)"
+       ],
+       "ligne": 290117
+      }
+     ]
+    },
+    {
+     "scène": 3,
+     "objet": "scène3",
+     "cadence": "15",
+     "ligne": 290125,
+     "calques": [
+      {
+       "nom": "c8",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 3, x=0, y=0",
+       "ligne": 290132
+      },
+      {
+       "nom": "c9",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 50, x=0, y=0",
+       "ligne": 290140
+      },
+      {
+       "nom": "c10",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 4, x=0, y=0",
+       "ligne": 290148
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène3",
+       "calque": "c8",
+       "ligne": 290172
+      },
+      {
+       "parent": "scène3",
+       "calque": "c9",
+       "ligne": 290177
+      },
+      {
+       "parent": "scène3",
+       "calque": "c10",
+       "ligne": 290182
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal9(mid17 10)"
+       ],
+       "ligne": 290158
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal10(mid17 11)"
+       ],
+       "ligne": 290167
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 290194
+      },
+      {
+       "op": "Widget_Method_DispatchC_314CB",
+       "arguments": [
+        "zone1",
+        "0"
+       ],
+       "ligne": 290199
+      },
+      {
+       "op": "Widget_Method_Dispatch8_314A9",
+       "arguments": [
+        "zone1",
+        "248"
+       ],
+       "ligne": 290204
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène3"
+       ],
+       "ligne": 290250
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène3",
+        "drapeaux=0"
+       ],
+       "ligne": 290280
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal1"
+       ],
+       "ligne": 290332
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 290634
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 290657
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "asoundfx 93"
+       ],
+       "ligne": 290789
+      },
+      {
+       "op": "canal_init",
+       "arguments": [
+        "canal=canal1",
+        "pilote=word_46849"
+       ],
+       "ligne": 290794
+      },
+      {
+       "op": "canal_enregistre",
+       "arguments": [
+        "canal=canal1",
+        "ressource=asoundfx 93",
+        "x=0"
+       ],
+       "ligne": 290801
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal1.+0→4",
+        "séquence=v3374"
+       ],
+       "ligne": 290811
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal1.+0→4",
+        "v3374",
+        "word_48F5C",
+        "mid17 10.+0"
+       ],
+       "ligne": 290818
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 1"
+       ],
+       "ligne": 290834
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 5"
+       ],
+       "ligne": 290846
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 47"
+       ],
+       "ligne": 290858
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal11(midgames 47)"
+       ],
+       "ligne": 290865
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 8"
+       ],
+       "ligne": 290877
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal12(mid17 8)"
+       ],
+       "ligne": 290884
+      }
+     ]
+    },
+    {
+     "scène": 4,
+     "objet": "scène4",
+     "cadence": "15",
+     "ligne": 290892,
+     "calques": [
+      {
+       "nom": "c11",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 1, x=0, y=0",
+       "ligne": 290899
+      },
+      {
+       "nom": "c12",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 5, x=0, y=0",
+       "ligne": 290907
+      },
+      {
+       "nom": "c13",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 48, x=0, y=0",
+       "ligne": 291017
+      },
+      {
+       "nom": "c14",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 49, x=0, y=0",
+       "ligne": 291025
+      },
+      {
+       "nom": "c15",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 7, x=0, y=0",
+       "ligne": 291033
+      },
+      {
+       "nom": "c16",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 6, x=0, y=0",
+       "ligne": 291041
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène4",
+       "calque": "c11",
+       "ligne": 290931
+      },
+      {
+       "parent": "scène4",
+       "calque": "c12",
+       "ligne": 290936
+      },
+      {
+       "parent": "scène4",
+       "calque": "c13",
+       "ligne": 291052
+      },
+      {
+       "parent": "scène4",
+       "calque": "c15",
+       "ligne": 291057
+      },
+      {
+       "parent": "scène4",
+       "calque": "c12",
+       "ligne": 291062
+      },
+      {
+       "parent": "scène4",
+       "calque": "c14",
+       "ligne": 291157
+      },
+      {
+       "parent": "scène4",
+       "calque": "c12",
+       "ligne": 291162
+      },
+      {
+       "parent": "scène4",
+       "calque": "c16",
+       "ligne": 291261
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal12(mid17 8)"
+       ],
+       "ligne": 290917
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal11(midgames 47)"
+       ],
+       "ligne": 290926
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 290948
+      },
+      {
+       "op": "Widget_Method_DispatchC_314CB",
+       "arguments": [
+        "zone1",
+        "0"
+       ],
+       "ligne": 290953
+      },
+      {
+       "op": "Widget_Method_Dispatch8_314A9",
+       "arguments": [
+        "zone1",
+        "0"
+       ],
+       "ligne": 290958
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène4"
+       ],
+       "ligne": 290962
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 48"
+       ],
+       "ligne": 290974
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 49"
+       ],
+       "ligne": 290986
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 7"
+       ],
+       "ligne": 290998
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 6"
+       ],
+       "ligne": 291010
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène4",
+        "calque=c12"
+       ],
+       "ligne": 291047
+      },
+      {
+       "op": "Scene_SetFps",
+       "arguments": [
+        "scène=scène4",
+        "cadence=13"
+       ],
+       "ligne": 291078
+      },
+      {
+       "op": "Scene_SetFps",
+       "arguments": [
+        "scène=scène4",
+        "cadence=11"
+       ],
+       "ligne": 291087
+      },
+      {
+       "op": "Scene_SetFps",
+       "arguments": [
+        "scène=scène4",
+        "cadence=9"
+       ],
+       "ligne": 291096
+      },
+      {
+       "op": "Scene_SetFps",
+       "arguments": [
+        "scène=scène4",
+        "cadence=7"
+       ],
+       "ligne": 291105
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène4",
+        "calque=c13"
+       ],
+       "ligne": 291136
+      },
+      {
+       "op": "c13.détruit",
+       "arguments": [
+        "3"
+       ],
+       "ligne": 291144
+      },
+      {
+       "op": "retire",
+       "arguments": [
+        "parent=scène4",
+        "calque=c12"
+       ],
+       "ligne": 291152
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "asoundfx 20"
+       ],
+       "ligne": 291217
+      },
+      {
+       "op": "canal_init",
+       "arguments": [
+        "canal=canal3",
+        "pilote=word_46849"
+       ],
+       "ligne": 291222
+      },
+      {
+       "op": "canal_enregistre",
+       "arguments": [
+        "canal=canal3",
+        "ressource=asoundfx 20",
+        "x=0"
+       ],
+       "ligne": 291229
+      },
+      {
+       "op": "AIL_start_sequence",
+       "arguments": [
+        "pilote=canal3.+0→4",
+        "séquence=v3388"
+       ],
+       "ligne": 291239
+      },
+      {
+       "op": "sub_30C66",
+       "arguments": [
+        "canal3.+0→4",
+        "v3388",
+        "v370",
+        "0"
+       ],
+       "ligne": 291246
+      },
+      {
+       "op": "Scene_SetFps",
+       "arguments": [
+        "scène=scène4",
+        "cadence=15"
+       ],
+       "ligne": 291256
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène4"
+       ],
+       "ligne": 291296
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène4",
+        "drapeaux=0"
+       ],
+       "ligne": 291401
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal3"
+       ],
+       "ligne": 291491
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal1"
+       ],
+       "ligne": 291514
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 291835
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 291858
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "optshps 116"
+       ],
+       "ligne": 291968
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 4"
+       ],
+       "ligne": 291980
+      }
+     ]
+    },
+    {
+     "scène": 5,
+     "objet": "scène5",
+     "cadence": "9",
+     "ligne": 291988,
+     "calques": [
+      {
+       "nom": "c17",
+       "type": "Layer",
+       "paramètres": "ressource=midgames 4, x=0, y=0",
+       "ligne": 292005
+      },
+      {
+       "nom": "c18",
+       "type": "TalkingHeadOverlay",
+       "paramètres": "ressource=convdata type 0 \"air\", x=160, y=129",
+       "ligne": 292013
+      },
+      {
+       "nom": "c19",
+       "type": "ImageLayer",
+       "paramètres": "ressource=convdata type 0 \"air\", x=160, y=129, image=51",
+       "ligne": 292022
+      },
+      {
+       "nom": "c20",
+       "type": "Layer",
+       "paramètres": "ressource=optshps 116, x=0, y=-64",
+       "ligne": 292030
+      },
+      {
+       "nom": "c21",
+       "type": "ToggleLayer",
+       "paramètres": "ressource=midgames 0, x=160, y=128, sens=1",
+       "ligne": 292124
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène5",
+       "calque": "c20",
+       "ligne": 292075
+      },
+      {
+       "parent": "scène5",
+       "calque": "c17",
+       "ligne": 292080
+      },
+      {
+       "parent": "scène5",
+       "calque": "c18",
+       "ligne": 292085
+      },
+      {
+       "parent": "scène5",
+       "calque": "c19",
+       "ligne": 292090
+      },
+      {
+       "parent": "scène5",
+       "calque": "c21",
+       "ligne": 292130
+      }
+     ],
+     "opérations": [
+      {
+       "op": "charge_convdata_type0",
+       "arguments": [
+        "\"air\"",
+        "drapeau=3"
+       ],
+       "ligne": 291998
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal2(optpals 21)"
+       ],
+       "ligne": 292040
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal3(midgames 6)"
+       ],
+       "ligne": 292049
+      },
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal4(convdata type 2 \"normal\")"
+       ],
+       "ligne": 292058
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 292070
+      },
+      {
+       "op": "Widget_Method_DispatchC_314CB",
+       "arguments": [
+        "zone1",
+        "0"
+       ],
+       "ligne": 292095
+      },
+      {
+       "op": "Widget_Method_Dispatch8_314A9",
+       "arguments": [
+        "zone1",
+        "127"
+       ],
+       "ligne": 292100
+      },
+      {
+       "op": "tête_image_de_base",
+       "arguments": [
+        "tête=c18",
+        "image=-1"
+       ],
+       "ligne": 292104
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "midgames 0"
+       ],
+       "ligne": 292116
+      },
+      {
+       "op": "tête_image_de_base",
+       "arguments": [
+        "tête=c18",
+        "image=18"
+       ],
+       "ligne": 292142
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène5"
+       ],
+       "ligne": 292158
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène5",
+        "drapeaux=0"
+       ],
+       "ligne": 292222
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 292524
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 292547
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 2"
+       ],
+       "ligne": 292657
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 0"
+       ],
+       "ligne": 292669
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17 9"
+       ],
+       "ligne": 292681
+      },
+      {
+       "op": "palette_depuis",
+       "arguments": [
+        "pal13(mid17 9)"
+       ],
+       "ligne": 292688
+      }
+     ]
+    },
+    {
+     "scène": 6,
+     "objet": "scène6",
+     "cadence": "9",
+     "ligne": 292696,
+     "calques": [
+      {
+       "nom": "c22",
+       "type": "OverlayImageLayer",
+       "paramètres": "ressource=mid17 0, x=5, y=0, image=0",
+       "ligne": 292704
+      },
+      {
+       "nom": "c23",
+       "type": "Layer",
+       "paramètres": "ressource=mid17 2, x=0, y=0",
+       "ligne": 292712
+      }
+     ],
+     "ajouts": [
+      {
+       "parent": "scène6",
+       "calque": "c23",
+       "ligne": 292727
+      },
+      {
+       "parent": "scène6",
+       "calque": "c22",
+       "ligne": 292732
+      }
+     ],
+     "opérations": [
+      {
+       "op": "palette_copie",
+       "arguments": [
+        "destination=pal1",
+        "source=pal13(mid17 9)"
+       ],
+       "ligne": 292722
+      },
+      {
+       "op": "palette_envoie",
+       "arguments": [
+        "palette=pal1",
+        "pas=0"
+       ],
+       "ligne": 292744
+      },
+      {
+       "op": "Widget_Method_DispatchC_314CB",
+       "arguments": [
+        "zone1",
+        "0"
+       ],
+       "ligne": 292749
+      },
+      {
+       "op": "Widget_Method_Dispatch8_314A9",
+       "arguments": [
+        "zone1",
+        "128"
+       ],
+       "ligne": 292754
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 292770
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 292779
+      },
+      {
+       "op": "charge",
+       "arguments": [
+        "mid17voc 1"
+       ],
+       "ligne": 292796
+      },
+      {
+       "op": "voix_charge (sub_7D11, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "ressource=mid17voc 1"
+       ],
+       "ligne": 292802
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 292811
+      },
+      {
+       "op": "voix_joue (sub_83FE, non lue)",
+       "arguments": [
+        "voix=voix1",
+        "x=-1"
+       ],
+       "ligne": 292821
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 292839
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 292871
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 292880
+      },
+      {
+       "op": "sous_titre (sub_C8F5, non lue)",
+       "arguments": [
+        "zone=zone1",
+        "texte=textes1[9]"
+       ],
+       "ligne": 292934
+      },
+      {
+       "op": "Primitive_SetRectColorAndDraw_2CBE5",
+       "arguments": [
+        "&v3408",
+        "v3337",
+        "v3335",
+        "v3333",
+        "v3331",
+        "0",
+        "&v3360"
+       ],
+       "ligne": 292973
+      },
+      {
+       "op": "Scene_Tick",
+       "arguments": [
+        "scène=scène6"
+       ],
+       "ligne": 293005
+      },
+      {
+       "op": "fondu_disparition",
+       "arguments": [
+        "palette=pal1",
+        "couleur=&v30",
+        "pas=2",
+        "premier=0",
+        "nombre=256"
+       ],
+       "ligne": 293038
+      },
+      {
+       "op": "Scene_Destruct",
+       "arguments": [
+        "scène=scène6",
+        "drapeaux=0"
+       ],
+       "ligne": 293043
+      },
+      {
+       "op": "voix_arrête",
+       "arguments": [
+        "voix=voix1"
+       ],
+       "ligne": 293363
+      },
+      {
+       "op": "canal_arrête",
+       "arguments": [
+        "canal=canal2"
+       ],
+       "ligne": 293386
+      }
+     ]
+    }
+   ],
+   "pseudo_code": [
+    "bp = sp                                                                                               ⟨285431⟩",
+    "byte_495FC = 0                                                                                        ⟨285436⟩",
+    "tableau_textes(tableau=textes1, nombre=10, longueur=200)                                              ⟨285442⟩",
+    "v11 = 0                                                                                               ⟨285444⟩",
+    "v12 = 0                                                                                               ⟨285445⟩",
+    "v13 = 0                                                                                               ⟨285446⟩",
+    "si word_4684B != 0 :",
+    "    v12 = 1                                                                                           ⟨285449⟩",
+    "v16 = word_46F46                                                                                      ⟨285453⟩",
+    "v470 = 0                                                                                              ⟨285454⟩",
+    "TextFormat_ApplyStyleAttribute_2E9A4(&v470, v16)                                                      ⟨285459⟩",
+    "v484 = 0                                                                                              ⟨285461⟩",
+    "TextRenderer_ApplyFormatChange_2EA21(&v484, 0)                                                        ⟨285470⟩",
+    "SmallObject_RegisterInList_2CB40(&v20, &v484)                                                         ⟨285476⟩",
+    "palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨285482⟩",
+    "v30 = 0                                                                                               ⟨285488⟩",
+    "si v12 != 0 :",
+    "    si sub_6734(chemin1) == 0 : aller à loc_983F5                                                     ⟨285581⟩",
+    "    pak mid17voc.ouvre(chemin1, 1)                                                                    ⟨285588⟩",
+    "sinon :",
+    "    v12 = 0                                                                                           ⟨285595⟩",
+    "v40 = 0                                                                                               ⟨285598⟩",
+    "v35 = 0                                                                                               ⟨285600⟩",
+    "v34 = 0                                                                                               ⟨285601⟩",
+    "v42 = byte_46848                                                                                      ⟨285603⟩",
+    "si v42 != 1 :",
+    "    si v42 == 2 : aller à loc_985A5                                                                   ⟨285613⟩",
+    "sinon :",
+    "    si sub_6734(chemin1) != 0 :",
+    "        pak rsoundfx.ouvre(chemin1, 1)                                                                ⟨285649⟩",
+    "        flux_iff(flux=flux1)                                                                          ⟨285663⟩",
+    "        v3433 = 256                                                                                   ⟨285666⟩",
+    "        flux1.ouvre(chemin1, 1)                                                                       ⟨285675⟩",
+    "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨285681⟩",
+    "        iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨285687⟩",
+    "        iff_lit_mot(flux=flux1)                                                                       ⟨285691⟩",
+    "        word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨285693⟩",
+    "        tant que si <= 106 :",
+    "            iff_lit_mot(flux=flux1)                                                                   ⟨285701⟩",
+    "            ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨285705⟩",
+    "        iff_ferme_form(flux=flux1)                                                                    ⟨285713⟩",
+    "        v13 = 1                                                                                       ⟨285715⟩",
+    "        iff_ferme_form(flux=flux1)                                                                    ⟨285719⟩",
+    "    si sub_6734(chemin1) != 0 :",
+    "        v11 = 1                                                                                       ⟨285745⟩",
+    "        si v13 == 0 :",
+    "            word_48F76 = 90                                                                           ⟨285750⟩",
+    "    aller à loc_98710                                                                                 ⟨285754⟩",
+    "    loc_985A5:                                                                                        ⟨285757⟩",
+    "    si sub_6734(chemin1) != 0 :",
+    "        pak asoundfx.ouvre(chemin1, 1)                                                                ⟨285785⟩",
+    "        flux_iff(flux=flux1)                                                                          ⟨285799⟩",
+    "        v3433 = 256                                                                                   ⟨285802⟩",
+    "        flux1.ouvre(chemin1, 1)                                                                       ⟨285811⟩",
+    "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨285817⟩",
+    "        iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨285823⟩",
+    "        iff_lit_mot(flux=flux1)                                                                       ⟨285827⟩",
+    "        word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨285829⟩",
+    "        tant que si <= 106 :",
+    "            iff_lit_mot(flux=flux1)                                                                   ⟨285837⟩",
+    "            ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨285841⟩",
+    "        iff_ferme_form(flux=flux1)                                                                    ⟨285849⟩",
+    "        v13 = 1                                                                                       ⟨285851⟩",
+    "        iff_ferme_form(flux=flux1)                                                                    ⟨285855⟩",
+    "    si sub_6734(chemin1) != 0 :",
+    "        v11 = 1                                                                                       ⟨285881⟩",
+    "        si v13 == 0 :",
+    "            word_48F76 = 255                                                                          ⟨285886⟩",
+    "loc_98710:                                                                                            ⟨285892⟩",
+    "v48 = word_4556E                                                                                      ⟨285895⟩",
+    "v46 = word_45570                                                                                      ⟨285897⟩",
+    "v44 = byte_45572                                                                                      ⟨285899⟩",
+    "si v13 != 0 :",
+    "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨285915⟩",
+    "    tant que si < 5 :",
+    "        charge(asoundfx v48[si])                                                                      ⟨285934⟩",
+    "        canal_enregistre(canal=canal1, ressource=asoundfx v48[si], x=0)                               ⟨285941⟩",
+    "        canal_arrête(canal=canal1)                                                                    ⟨285945⟩",
+    "    canal_arrête(canal=canal1)                                                                        ⟨285977⟩",
+    "v1214 = 0                                                                                             ⟨286000⟩",
+    "v1209 = 0                                                                                             ⟨286002⟩",
+    "v1208 = 0                                                                                             ⟨286003⟩",
+    "v1218 = 0                                                                                             ⟨286004⟩",
+    "si v11 != 0 :",
+    "    si v12 != 0 :",
+    "        v225 = 14                                                                                     ⟨286017⟩",
+    "    sinon :",
+    "        v225 = 13                                                                                     ⟨286022⟩",
+    "    charge(amusic v225)                                                                               ⟨286033⟩",
+    "    canal_init(canal=canal2, pilote=word_46849)                                                       ⟨286038⟩",
+    "    canal_enregistre(canal=canal2, ressource=amusic v225, x=0)                                        ⟨286045⟩",
+    "v1227 = booléen                                                                                       ⟨286062⟩",
+    "v1223 = booléen                                                                                       ⟨286063⟩",
+    "si v12 != 0 :",
+    "    voix_pilote(voix=voix1, pilote=word_4684B)                                                        ⟨286069⟩",
+    "sinon :",
+    "    flux_iff(flux=flux1)                                                                              ⟨286087⟩",
+    "    v3433 = 256                                                                                       ⟨286090⟩",
+    "    flux1.ouvre(chemin1, 1)                                                                           ⟨286099⟩",
+    "    iff_form(flux=flux1, balise='MG17', x=0)                                                          ⟨286105⟩",
+    "    iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨286111⟩",
+    "    tant que si < 10 :",
+    "        iff_chunk(flux=flux1, balise='TEXT', x=1)                                                     ⟨286122⟩",
+    "        v226 = v3416                                                                                  ⟨286125⟩",
+    "        iff_lit(flux=flux1, destination=textes1[0] + (textes1.+0·si), taille=v226)                    ⟨286136⟩",
+    "        v3429 = v3412                                                                                 ⟨286139⟩",
+    "    iff_ferme_form(flux=flux1)                                                                        ⟨286147⟩",
+    "    si CRT_Strlen(arg_10) != 0 :",
+    "        CRT_Strcat(textes1[1], arg_10)                                                                ⟨286158⟩",
+    "        CRT_Strcat(textes1[1], textes1[3])                                                            ⟨286169⟩",
+    "    sinon :",
+    "        si CRT_Strlen(arg_8) != 0 :",
+    "            CRT_Strcat(textes1[1], arg_8)                                                             ⟨286184⟩",
+    "            CRT_Strcat(textes1[1], textes1[3])                                                        ⟨286195⟩",
+    "        sinon :",
+    "            si CRT_Strlen(arg_6) != 0 :",
+    "                CRT_Strcat(textes1[1], arg_6)                                                         ⟨286210⟩",
+    "                CRT_Strcat(textes1[1], textes1[3])                                                    ⟨286221⟩",
+    "            sinon :",
+    "                CRT_Strcat(textes1[1], textes1[2])                                                    ⟨286235⟩",
+    "                CRT_Strcat(textes1[1], textes1[3])                                                    ⟨286246⟩",
+    "    si CRT_Strlen(arg_6) != 0 :",
+    "        CRT_Strcat(textes1[4], arg_6)                                                                 ⟨286262⟩",
+    "        CRT_Strcat(textes1[4], 9555)                                                                  ⟨286270⟩",
+    "    sinon :",
+    "        si CRT_Strlen(arg_8) != 0 :",
+    "            CRT_Strcat(textes1[4], arg_8)                                                             ⟨286287⟩",
+    "            CRT_Strcat(textes1[4], 9555)                                                              ⟨286295⟩",
+    "        sinon :",
+    "            si CRT_Strlen(arg_10) != 0 :",
+    "                CRT_Strcat(textes1[4], arg_10)                                                        ⟨286312⟩",
+    "                CRT_Strcat(textes1[4], 9555)                                                          ⟨286320⟩",
+    "            sinon :",
+    "                CRT_Strcat(textes1[4], textes1[5])                                                    ⟨286337⟩",
+    "                CRT_Strcat(textes1[4], 9555)                                                          ⟨286345⟩",
+    "    iff_ferme_form(flux=flux1)                                                                        ⟨286353⟩",
+    "charge(optpals 21)                                                                                    ⟨286372⟩",
+    "palette_depuis(pal2(optpals 21))                                                                      ⟨286379⟩",
+    "charge(midgames 6)                                                                                    ⟨286391⟩",
+    "palette_depuis(pal3(midgames 6))                                                                      ⟨286398⟩",
+    "charge_convdata_type2(\"normal\")                                                                       ⟨286408⟩",
+    "palette_depuis(pal4(convdata type 2 \"normal\"))                                                        ⟨286415⟩",
+    "v106 = 0                                                                                              ⟨286417⟩",
+    "v102 = 2                                                                                              ⟨286418⟩",
+    "v101 = 0                                                                                              ⟨286419⟩",
+    "v100 = 0                                                                                              ⟨286420⟩",
+    "TextRenderer_LoadResourceFile_3DA1F(chemin1, 2)                                                       ⟨286434⟩",
+    "v108 = ?                                                                                              ⟨286436⟩",
+    "v110 = TextRenderer_LoadResourceFile_3DA1F(chemin1, 2)                                                ⟨286437⟩",
+    "v106 = v110                                                                                           ⟨286439⟩",
+    "v102 = 2                                                                                              ⟨286440⟩",
+    "v101 = 1                                                                                              ⟨286441⟩",
+    "v100 = 0                                                                                              ⟨286442⟩",
+    "GlyphObject_ConstructWithBuffer_311CF(&v3328, &v106)                                                  ⟨286447⟩",
+    "v120 = word_46F46                                                                                     ⟨286454⟩",
+    "zone_texte(zone=zone1, police=&v3328)                                                                 ⟨286460⟩",
+    "v122 = 152                                                                                            ⟨286464⟩",
+    "v124 = 319                                                                                            ⟨286466⟩",
+    "v126 = 199                                                                                            ⟨286468⟩",
+    "v3335 = v122                                                                                          ⟨286472⟩",
+    "v3333 = v124                                                                                          ⟨286474⟩",
+    "v3331 = v126                                                                                          ⟨286476⟩",
+    "Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨286480⟩",
+    "Widget_Method_Dispatch8_314A9(zone1, 200)                                                             ⟨286485⟩",
+    "charge(mid17 3)                                                                                       ⟨286497⟩",
+    "charge(midgames 50)                                                                                   ⟨286509⟩",
+    "charge(mid17 4)                                                                                       ⟨286521⟩",
+    "charge(midgames 9)                                                                                    ⟨286533⟩",
+    "palette_depuis(pal5(midgames 9))                                                                      ⟨286540⟩",
+    "charge(midgames 10)                                                                                   ⟨286552⟩",
+    "palette_depuis(pal6(midgames 10))                                                                     ⟨286559⟩",
+    "charge(midgames 11)                                                                                   ⟨286571⟩",
+    "palette_depuis(pal7(midgames 11))                                                                     ⟨286578⟩",
+    "charge_convdata_type2(\"normal\")                                                                       ⟨286588⟩",
+    "palette_depuis(pal8(convdata type 2 \"normal\"))                                                        ⟨286595⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨286781⟩",
+    "    v101 = 0                                                                                          ⟨286782⟩",
+    "    v100 = 0                                                                                          ⟨286783⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨286859⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨286882⟩",
+    "    retour                                                                                            ⟨286978⟩",
+    "si v11 != 0 :",
+    "    v222 = word_48F76                                                                                 ⟨286985⟩",
+    "    si canal2.+0 != 0 :",
+    "        AIL_start_sequence(pilote=canal2.+0→4, séquence=v1216)                                        ⟨286992⟩",
+    "        sub_30C66(canal2.+0→4, v1216, v222, 0)                                                        ⟨286999⟩",
+    "v3374 = -1                                                                                            ⟨287015⟩",
+    "si v13 != 0 :",
+    "    charge(asoundfx 22)                                                                               ⟨287024⟩",
+    "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨287029⟩",
+    "    canal_enregistre(canal=canal1, ressource=asoundfx 22, x=0)                                        ⟨287036⟩",
+    "charge(midgames 12)                                                                                   ⟨287050⟩",
+    "charge(midgames 13)                                                                                   ⟨287062⟩",
+    "charge(midgames 14)                                                                                   ⟨287074⟩",
+    "charge(midgames 15)                                                                                   ⟨287086⟩",
+    "charge(midgames 16)                                                                                   ⟨287098⟩",
+    "charge(midgames 17)                                                                                   ⟨287110⟩",
+    "",
+    "──── scène1 ────",
+    "scène1 = Scene_Create(cadence=9, palette=255, surface=&v470)                                          ⟨287118⟩",
+    "c1 = Layer(ressource=midgames 12, x=0, y=0)                                                           ⟨287125⟩",
+    "c2 = Layer(ressource=midgames 13, x=0, y=0)                                                           ⟨287133⟩",
+    "c3 = Layer(ressource=midgames 14, x=0, y=-23)                                                         ⟨287141⟩",
+    "c4 = Layer(ressource=midgames 15, x=0, y=-23)                                                         ⟨287149⟩",
+    "c5 = Layer(ressource=midgames 16, x=0, y=-23)                                                         ⟨287157⟩",
+    "c6 = Layer(ressource=midgames 17, x=0, y=-23)                                                         ⟨287165⟩",
+    "ajoute c1 à scène1                                                                                    ⟨287171⟩",
+    "ajoute c2 à scène1                                                                                    ⟨287176⟩",
+    "ajoute c3 à scène1                                                                                    ⟨287181⟩",
+    "ajoute c4 à scène1                                                                                    ⟨287186⟩",
+    "palette_copie(destination=pal1, source=pal6(midgames 10))                                             ⟨287199⟩",
+    "palette_copie(destination=pal1, source=pal5(midgames 9))                                              ⟨287208⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨287216⟩",
+    "c2.image = 0                                                                                          ⟨287218⟩",
+    "tant que (scène1.compteur < 16) et (scène1.terminée == 0) :",
+    "    v308 = scène1.compteur                                                                            ⟨287224⟩",
+    "    si v308 == 6 :",
+    "        c2.image = 1                                                                                  ⟨287227⟩",
+    "        si v13 != 0 :",
+    "            v310 = word_48ECE                                                                         ⟨287231⟩",
+    "            v312 = 0                                                                                  ⟨287232⟩",
+    "            si canal1.+0 != 0 :",
+    "                AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287238⟩",
+    "                sub_30C66(canal1.+0→4, v3374, v310, v312)                                             ⟨287245⟩",
+    "    si v308 == 8 :",
+    "        c2.image = 0                                                                                  ⟨287253⟩",
+    "        si v13 != 0 :",
+    "            si canal1.+0 != 0 :",
+    "                AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                 ⟨287261⟩",
+    "    si v308 == 10 :",
+    "        c2.image = 1                                                                                  ⟨287269⟩",
+    "        si v13 != 0 :",
+    "            v314 = word_48ECE                                                                         ⟨287273⟩",
+    "            v316 = 0                                                                                  ⟨287274⟩",
+    "            si canal1.+0 != 0 :",
+    "                AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287280⟩",
+    "                sub_30C66(canal1.+0→4, v3374, v314, v316)                                             ⟨287287⟩",
+    "    si v308 == 11 :",
+    "        c2.image = 0                                                                                  ⟨287295⟩",
+    "        si v13 != 0 :",
+    "            si canal1.+0 != 0 :",
+    "                AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                 ⟨287303⟩",
+    "    si v308 == 13 :",
+    "        c2.image = 1                                                                                  ⟨287311⟩",
+    "        si v13 != 0 :",
+    "            v318 = word_48ECE                                                                         ⟨287315⟩",
+    "            v320 = 0                                                                                  ⟨287316⟩",
+    "            si canal1.+0 != 0 :",
+    "                AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287322⟩",
+    "                sub_30C66(canal1.+0→4, v3374, v318, v320)                                             ⟨287329⟩",
+    "    si v308 == 15 :",
+    "        c2.image = 0                                                                                  ⟨287337⟩",
+    "        si v13 != 0 :",
+    "            si canal1.+0 != 0 :",
+    "                AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                 ⟨287345⟩",
+    "    Scene_Tick(scène=scène1)                                                                          ⟨287353⟩",
+    "scène1.compteur = 0                                                                                   ⟨287378⟩",
+    "si v12 != 0 :",
+    "    Scene_Tick(scène=scène1)                                                                          ⟨287387⟩",
+    "    charge(mid17voc 2)                                                                                ⟨287399⟩",
+    "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 2)                                 ⟨287405⟩",
+    "    v318 = 0                                                                                          ⟨287407⟩",
+    "    tant que v318 < 4 :",
+    "        CRT_Rand()                                                                                    ⟨287412⟩",
+    "        v320 = (CRT_Rand()·2) / -32768                                                                ⟨287418⟩",
+    "        c2.image = v320                                                                               ⟨287420⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287423⟩",
+    "        v318 = v318 + 1                                                                               ⟨287425⟩",
+    "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨287433⟩",
+    "    v318 = 0                                                                                          ⟨287435⟩",
+    "    tant que sub_8500(voix1) != 0 :",
+    "        CRT_Rand()                                                                                    ⟨287440⟩",
+    "        v322 = (CRT_Rand()·2) / -32768                                                                ⟨287446⟩",
+    "        c2.image = v322                                                                               ⟨287448⟩",
+    "        si v318 == 2 :",
+    "            si v13 != 0 :",
+    "                v324 = word_48ECE                                                                     ⟨287454⟩",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287461⟩",
+    "                    sub_30C66(canal1.+0→4, v3374, v324, 0)                                            ⟨287468⟩",
+    "        si v318 == 19 :",
+    "            retire(parent=scène1, calque=c3)                                                          ⟨287479⟩",
+    "            retire(parent=scène1, calque=c4)                                                          ⟨287484⟩",
+    "            ajoute c5 à scène1                                                                        ⟨287489⟩",
+    "            ajoute c6 à scène1                                                                        ⟨287494⟩",
+    "        v318 = v318 + 1                                                                               ⟨287499⟩",
+    "        si v318 == 10 :",
+    "            c5.image = 1                                                                              ⟨287503⟩",
+    "            c6.image = 1                                                                              ⟨287505⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287520⟩",
+    "    si v13 != 0 :",
+    "        si canal1.+0 != 0 :",
+    "            AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                     ⟨287542⟩",
+    "    c2.image = 0                                                                                      ⟨287548⟩",
+    "    v318 = 0                                                                                          ⟨287549⟩",
+    "    tant que v318 < 4 :",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287556⟩",
+    "        v318 = v318 + 1                                                                               ⟨287558⟩",
+    "    charge(mid17voc 0)                                                                                ⟨287573⟩",
+    "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 0)                                 ⟨287579⟩",
+    "    v318 = 0                                                                                          ⟨287581⟩",
+    "    tant que v318 < 4 :",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287588⟩",
+    "        v318 = v318 + 1                                                                               ⟨287590⟩",
+    "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨287598⟩",
+    "    tant que sub_8500(voix1) != 0 :",
+    "        CRT_Rand()                                                                                    ⟨287604⟩",
+    "        v338 = ((CRT_Rand()·2) / -32768) + 1                                                          ⟨287611⟩",
+    "        c6.image = v338                                                                               ⟨287614⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287627⟩",
+    "    v318 = 0                                                                                          ⟨287639⟩",
+    "    tant que v318 < 4 :",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287646⟩",
+    "        v318 = v318 + 1                                                                               ⟨287648⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨287655⟩",
+    "sinon :",
+    "    v3342→0.méthode8(35)                                                                              ⟨287703⟩",
+    "    v6 = 62                                                                                           ⟨287705⟩",
+    "    v4 = scène1.compteur                                                                              ⟨287707⟩",
+    "    tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :",
+    "        v308 = scène1.compteur                                                                        ⟨287722⟩",
+    "        si v4 + 10 == v308 :",
+    "            si v13 != 0 :",
+    "                v310 = word_48ECE                                                                     ⟨287730⟩",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287737⟩",
+    "                    sub_30C66(canal1.+0→4, v3374, v310, v312)                                         ⟨287744⟩",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                              ⟨287753⟩",
+    "            c2.image = 1                                                                              ⟨287755⟩",
+    "        si v4 + 14 == v308 :",
+    "            retire(parent=scène1, calque=c3)                                                          ⟨287765⟩",
+    "            retire(parent=scène1, calque=c4)                                                          ⟨287770⟩",
+    "            ajoute c5 à scène1                                                                        ⟨287775⟩",
+    "            ajoute c6 à scène1                                                                        ⟨287780⟩",
+    "        si v4 + 15 == v308 :",
+    "            c5.image = 1                                                                              ⟨287789⟩",
+    "            c6.image = 1                                                                              ⟨287791⟩",
+    "        si (v4 + ((v6·70) / 100)) - 3 < v308 :",
+    "            c2.image = 0                                                                              ⟨287798⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v308 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨287812⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v308 :",
+    "            v3422 = 4540                                                                              ⟨287822⟩",
+    "            v3422 = 4552                                                                              ⟨287823⟩",
+    "            v3422 = 4568                                                                              ⟨287824⟩",
+    "            v3422 = 4584                                                                              ⟨287825⟩",
+    "            v3422 = 4604                                                                              ⟨287826⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨287836⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨287868⟩",
+    "    c3.détruit(3)                                                                                     ⟨287900⟩",
+    "    c4.détruit(3)                                                                                     ⟨287911⟩",
+    "    c2.image = 1                                                                                      ⟨287916⟩",
+    "    v6 = 66                                                                                           ⟨287917⟩",
+    "    v4 = scène1.compteur                                                                              ⟨287919⟩",
+    "    tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :",
+    "        v308 = scène1.compteur                                                                        ⟨287934⟩",
+    "        si v4 + 1 == v308 :",
+    "            si v13 != 0 :",
+    "                v310 = word_48ECE                                                                     ⟨287942⟩",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287949⟩",
+    "                    sub_30C66(canal1.+0→4, v3374, v310, v312)                                         ⟨287956⟩",
+    "        si v4 + 2 == v308 :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[1])                              ⟨287971⟩",
+    "        si (v4 + ((v6·70) / 100)) - 3 < v308 :",
+    "            c2.image = 0                                                                              ⟨287979⟩",
+    "        si (v4 + ((v6·70) / 100)) - 2 == v308 :",
+    "            v3422 = 4540                                                                              ⟨287986⟩",
+    "            v3422 = 4552                                                                              ⟨287987⟩",
+    "            v3422 = 4568                                                                              ⟨287988⟩",
+    "            v3422 = 4584                                                                              ⟨287989⟩",
+    "            v3422 = 4604                                                                              ⟨287990⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨288000⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v308 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨288015⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨288049⟩",
+    "    v3342→0.méthode8(15)                                                                              ⟨288079⟩",
+    "    v6 = 35                                                                                           ⟨288081⟩",
+    "    v4 = scène1.compteur                                                                              ⟨288083⟩",
+    "    tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :",
+    "        v308 = scène1.compteur                                                                        ⟨288098⟩",
+    "        si v4 + 6 < v308 :",
+    "            CRT_Rand()                                                                                ⟨288103⟩",
+    "            v310 = ((CRT_Rand()·2) / -32768) + 1                                                      ⟨288110⟩",
+    "            c6.image = v310                                                                           ⟨288113⟩",
+    "        si v4 + 6 == v308 :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[4])                              ⟨288127⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v308 :",
+    "            v3422 = 4540                                                                              ⟨288135⟩",
+    "            v3422 = 4552                                                                              ⟨288136⟩",
+    "            v3422 = 4568                                                                              ⟨288137⟩",
+    "            v3422 = 4584                                                                              ⟨288138⟩",
+    "            v3422 = 4604                                                                              ⟨288139⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨288149⟩",
+    "        si (v4 + ((v6·70) / 100)) - 6 < v308 :",
+    "            c6.image = 1                                                                              ⟨288158⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨288189⟩",
+    "    v6 = 38                                                                                           ⟨288215⟩",
+    "    v4 = scène1.compteur                                                                              ⟨288217⟩",
+    "    tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :",
+    "        v308 = scène1.compteur                                                                        ⟨288232⟩",
+    "        si v4 + 6 < v308 :",
+    "            CRT_Rand()                                                                                ⟨288237⟩",
+    "            v310 = ((CRT_Rand()·2) / -32768) + 1                                                      ⟨288244⟩",
+    "            c6.image = v310                                                                           ⟨288247⟩",
+    "        si v4 + 6 == v308 :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[6])                              ⟨288262⟩",
+    "        si (v4 + ((v6·70) / 100)) - 6 < v308 :",
+    "            c6.image = 1                                                                              ⟨288271⟩",
+    "        si (v4 + ((v6·70) / 100)) - 2 == v308 :",
+    "            v3422 = 4540                                                                              ⟨288278⟩",
+    "            v3422 = 4552                                                                              ⟨288279⟩",
+    "            v3422 = 4568                                                                              ⟨288280⟩",
+    "            v3422 = 4584                                                                              ⟨288281⟩",
+    "            v3422 = 4604                                                                              ⟨288282⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨288292⟩",
+    "        Scene_Tick(scène=scène1)                                                                      ⟨288324⟩",
+    "Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨288353⟩",
+    "canal_arrête(canal=canal1)                                                                            ⟨288471⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨288695⟩",
+    "    v101 = 0                                                                                          ⟨288696⟩",
+    "    v100 = 0                                                                                          ⟨288697⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨288773⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨288796⟩",
+    "    retour                                                                                            ⟨288892⟩",
+    "v3374 = -1                                                                                            ⟨288905⟩",
+    "si v13 != 0 :",
+    "    charge(asoundfx 22)                                                                               ⟨288914⟩",
+    "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨288919⟩",
+    "    canal_enregistre(canal=canal1, ressource=asoundfx 22, x=0)                                        ⟨288926⟩",
+    "charge(midgames 18)                                                                                   ⟨288940⟩",
+    "",
+    "──── scène2 ────",
+    "scène2 = Scene_Create(cadence=20, palette=255, surface=&v470)                                         ⟨288948⟩",
+    "c7 = OverlayImageLayer(ressource=midgames 18, x=0, y=0, image=0)                                      ⟨288956⟩",
+    "ajoute c7 à scène2                                                                                    ⟨288962⟩",
+    "palette_copie(destination=pal1, source=pal7(midgames 11))                                             ⟨288975⟩",
+    "palette_copie(destination=pal1, source=pal8(convdata type 2 \"normal\"))                                ⟨288984⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨288992⟩",
+    "v3342→0.méthode8(224)                                                                                 ⟨288998⟩",
+    "c7.image = 0                                                                                          ⟨289000⟩",
+    "sub_85A(0)                                                                                            ⟨289003⟩",
+    "sub_6F2(sub_85A(0))                                                                                   ⟨289006⟩",
+    "v248 = 4                                                                                              ⟨289008⟩",
+    "si v12 != 0 :",
+    "    Scene_Tick(scène=scène2)                                                                          ⟨289017⟩",
+    "    charge(mid17voc 3)                                                                                ⟨289029⟩",
+    "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 3)                                 ⟨289035⟩",
+    "    tant que v260 < 4 :",
+    "        CRT_Rand()                                                                                    ⟨289042⟩",
+    "        v262 = ((CRT_Rand()·6) / -32768) + 3                                                          ⟨289049⟩",
+    "        c7.image = v262                                                                               ⟨289051⟩",
+    "        Scene_Tick(scène=scène2)                                                                      ⟨289054⟩",
+    "        v260 = v260 + 1                                                                               ⟨289056⟩",
+    "    si v13 != 0 :",
+    "        v264 = word_48EC2                                                                             ⟨289064⟩",
+    "        si canal1.+0 != 0 :",
+    "            AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                    ⟨289071⟩",
+    "            sub_30C66(canal1.+0→4, v3374, v264, midgames 14.+0)                                       ⟨289078⟩",
+    "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨289087⟩",
+    "    tant que sub_8500(voix1) != 0 :",
+    "        CRT_Rand()                                                                                    ⟨289093⟩",
+    "        v268 = ((CRT_Rand()·6) / -32768) + 3                                                          ⟨289100⟩",
+    "        c7.image = v268                                                                               ⟨289102⟩",
+    "        Scene_Tick(scène=scène2)                                                                      ⟨289115⟩",
+    "    si v13 != 0 :",
+    "        si canal1.+0 != 0 :",
+    "            AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                     ⟨289134⟩",
+    "    tant que v260 < 5 :",
+    "        si v248 < 1 :",
+    "            v248 = 1                                                                                  ⟨289147⟩",
+    "        v270 = v248                                                                                   ⟨289151⟩",
+    "        v248 = v248 - 1                                                                               ⟨289152⟩",
+    "        c7.image = v270                                                                               ⟨289154⟩",
+    "        Scene_Tick(scène=scène2)                                                                      ⟨289157⟩",
+    "        v260 = v260 + 1                                                                               ⟨289159⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨289166⟩",
+    "sinon :",
+    "    v6 = 70                                                                                           ⟨289191⟩",
+    "    v4 = scène2.compteur                                                                              ⟨289193⟩",
+    "    tant que (scène2.compteur < v4 + ((v6·70) / 100)) et (scène2.terminée == 0) :",
+    "        v250 = scène2.compteur                                                                        ⟨289208⟩",
+    "        si (v4 + ((v6·70) / 100)) - 10 > v250 :",
+    "            CRT_Rand()                                                                                ⟨289213⟩",
+    "            v252 = ((CRT_Rand()·6) / -32768) + 3                                                      ⟨289222⟩",
+    "            c7.image = v252                                                                           ⟨289224⟩",
+    "        sinon :",
+    "            v254 = midgames 12.+0                                                                     ⟨289237⟩",
+    "            c7.image = v254                                                                           ⟨289239⟩",
+    "        si v4 + 1 == v250 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨289256⟩",
+    "                    sub_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)                          ⟨289263⟩",
+    "        si v4 + 2 == v250 :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[7])                              ⟨289281⟩",
+    "        si (v4 + ((v6·70) / 100)) - 2 == v250 :",
+    "            v3422 = 4540                                                                              ⟨289289⟩",
+    "            v3422 = 4552                                                                              ⟨289290⟩",
+    "            v3422 = 4568                                                                              ⟨289291⟩",
+    "            v3422 = 4584                                                                              ⟨289292⟩",
+    "            v3422 = 4604                                                                              ⟨289293⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨289303⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v250 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨289318⟩",
+    "        Scene_Tick(scène=scène2)                                                                      ⟨289352⟩",
+    "    v6 = 82                                                                                           ⟨289378⟩",
+    "    v4 = scène2.compteur                                                                              ⟨289380⟩",
+    "    tant que (scène2.compteur < v4 + ((v6·70) / 100)) et (scène2.terminée == 0) :",
+    "        v250 = scène2.compteur                                                                        ⟨289395⟩",
+    "        si (v4 + ((v6·70) / 100)) - 10 > v250 :",
+    "            CRT_Rand()                                                                                ⟨289400⟩",
+    "            v252 = ((CRT_Rand()·6) / -32768) + 3                                                      ⟨289409⟩",
+    "            c7.image = v252                                                                           ⟨289411⟩",
+    "        sinon :",
+    "            v254 = midgames 12.+0                                                                     ⟨289424⟩",
+    "            c7.image = v254                                                                           ⟨289426⟩",
+    "        si v4 + 1 == v250 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨289443⟩",
+    "                    sub_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)                          ⟨289450⟩",
+    "        si v4 + 2 == v250 :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[8])                              ⟨289467⟩",
+    "        si (v4 + ((v6·70) / 100)) - 2 == v250 :",
+    "            v3422 = 4540                                                                              ⟨289475⟩",
+    "            v3422 = 4552                                                                              ⟨289476⟩",
+    "            v3422 = 4568                                                                              ⟨289477⟩",
+    "            v3422 = 4584                                                                              ⟨289478⟩",
+    "            v3422 = 4604                                                                              ⟨289479⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨289489⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == v250 :",
+    "            si v13 != 0 :",
+    "                si canal1.+0 != 0 :",
+    "                    AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨289504⟩",
+    "        Scene_Tick(scène=scène2)                                                                      ⟨289538⟩",
+    "fondu_disparition(palette=pal1, couleur=&v30, pas=1, premier=0, nombre=256)                           ⟨289571⟩",
+    "Scene_Destruct(scène=scène2, drapeaux=0)                                                              ⟨289576⟩",
+    "canal_arrête(canal=canal1)                                                                            ⟨289599⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨289823⟩",
+    "    v101 = 0                                                                                          ⟨289824⟩",
+    "    v100 = 0                                                                                          ⟨289825⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨289901⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨289924⟩",
+    "    retour                                                                                            ⟨290020⟩",
+    "v3374 = -1                                                                                            ⟨290033⟩",
+    "si v13 != 0 :",
+    "    charge(asoundfx 7)                                                                                ⟨290046⟩",
+    "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨290051⟩",
+    "    canal_enregistre(canal=canal1, ressource=asoundfx 7, x=0)                                         ⟨290058⟩",
+    "    si canal1.+0 != 0 :",
+    "        AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                        ⟨290068⟩",
+    "        sub_30C66(canal1.+0→4, v3374, word_48EB0, v238)                                               ⟨290075⟩",
+    "charge(mid17 10)                                                                                      ⟨290091⟩",
+    "palette_depuis(pal9(mid17 10))                                                                        ⟨290098⟩",
+    "charge(mid17 11)                                                                                      ⟨290110⟩",
+    "palette_depuis(pal10(mid17 11))                                                                       ⟨290117⟩",
+    "",
+    "──── scène3 ────",
+    "scène3 = Scene_Create(cadence=15, palette=255, surface=&v470)                                         ⟨290125⟩",
+    "c8 = Layer(ressource=mid17 3, x=0, y=0)                                                               ⟨290132⟩",
+    "c9 = Layer(ressource=midgames 50, x=0, y=0)                                                           ⟨290140⟩",
+    "c10 = Layer(ressource=mid17 4, x=0, y=0)                                                              ⟨290148⟩",
+    "palette_copie(destination=pal1, source=pal9(mid17 10))                                                ⟨290158⟩",
+    "palette_copie(destination=pal1, source=pal10(mid17 11))                                               ⟨290167⟩",
+    "ajoute c8 à scène3                                                                                    ⟨290172⟩",
+    "ajoute c9 à scène3                                                                                    ⟨290177⟩",
+    "ajoute c10 à scène3                                                                                   ⟨290182⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨290194⟩",
+    "Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨290199⟩",
+    "Widget_Method_Dispatch8_314A9(zone1, 248)                                                             ⟨290204⟩",
+    "tant que (scène3.compteur < 73) et (scène3.terminée == 0) :",
+    "    v280 = scène3.compteur                                                                            ⟨290213⟩",
+    "    si v280 < 51 :",
+    "        v282 = si                                                                                     ⟨290216⟩",
+    "        c10.image = v282                                                                              ⟨290220⟩",
+    "    sinon :",
+    "        v284 = v278                                                                                   ⟨290226⟩",
+    "        v278 = v278 + 1                                                                               ⟨290227⟩",
+    "        c9.image = v284                                                                               ⟨290230⟩",
+    "        c10.image = si                                                                                ⟨290235⟩",
+    "    Scene_Tick(scène=scène3)                                                                          ⟨290250⟩",
+    "Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨290280⟩",
+    "canal_arrête(canal=canal1)                                                                            ⟨290332⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨290556⟩",
+    "    v101 = 0                                                                                          ⟨290557⟩",
+    "    v100 = 0                                                                                          ⟨290558⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨290634⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨290657⟩",
+    "    retour                                                                                            ⟨290753⟩",
+    "v3374 = -1                                                                                            ⟨290770⟩",
+    "v3386 = 0                                                                                             ⟨290771⟩",
+    "v3381 = 0                                                                                             ⟨290773⟩",
+    "v3380 = 0                                                                                             ⟨290774⟩",
+    "v3390 = 0                                                                                             ⟨290775⟩",
+    "si v13 != 0 :",
+    "    charge(asoundfx 93)                                                                               ⟨290789⟩",
+    "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨290794⟩",
+    "    canal_enregistre(canal=canal1, ressource=asoundfx 93, x=0)                                        ⟨290801⟩",
+    "    si canal1.+0 != 0 :",
+    "        AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                        ⟨290811⟩",
+    "        sub_30C66(canal1.+0→4, v3374, word_48F5C, mid17 10.+0)                                        ⟨290818⟩",
+    "charge(mid17 1)                                                                                       ⟨290834⟩",
+    "charge(mid17 5)                                                                                       ⟨290846⟩",
+    "charge(midgames 47)                                                                                   ⟨290858⟩",
+    "palette_depuis(pal11(midgames 47))                                                                    ⟨290865⟩",
+    "charge(mid17 8)                                                                                       ⟨290877⟩",
+    "palette_depuis(pal12(mid17 8))                                                                        ⟨290884⟩",
+    "",
+    "──── scène4 ────",
+    "scène4 = Scene_Create(cadence=15, palette=255, surface=&v470)                                         ⟨290892⟩",
+    "c11 = Layer(ressource=mid17 1, x=0, y=0)                                                              ⟨290899⟩",
+    "c12 = Layer(ressource=mid17 5, x=0, y=0)                                                              ⟨290907⟩",
+    "palette_copie(destination=pal1, source=pal12(mid17 8))                                                ⟨290917⟩",
+    "palette_copie(destination=pal1, source=pal11(midgames 47))                                            ⟨290926⟩",
+    "ajoute c11 à scène4                                                                                   ⟨290931⟩",
+    "ajoute c12 à scène4                                                                                   ⟨290936⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨290948⟩",
+    "Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨290953⟩",
+    "Widget_Method_Dispatch8_314A9(zone1, 0)                                                               ⟨290958⟩",
+    "Scene_Tick(scène=scène4)                                                                              ⟨290962⟩",
+    "charge(midgames 48)                                                                                   ⟨290974⟩",
+    "charge(midgames 49)                                                                                   ⟨290986⟩",
+    "charge(mid17 7)                                                                                       ⟨290998⟩",
+    "charge(mid17 6)                                                                                       ⟨291010⟩",
+    "c13 = Layer(ressource=midgames 48, x=0, y=0)                                                          ⟨291017⟩",
+    "c14 = Layer(ressource=midgames 49, x=0, y=0)                                                          ⟨291025⟩",
+    "c15 = Layer(ressource=mid17 7, x=0, y=0)                                                              ⟨291033⟩",
+    "c16 = Layer(ressource=mid17 6, x=0, y=0)                                                              ⟨291041⟩",
+    "retire(parent=scène4, calque=c12)                                                                     ⟨291047⟩",
+    "ajoute c13 à scène4                                                                                   ⟨291052⟩",
+    "ajoute c15 à scène4                                                                                   ⟨291057⟩",
+    "ajoute c12 à scène4                                                                                   ⟨291062⟩",
+    "v354 = 0                                                                                              ⟨291065⟩",
+    "scène4.compteur = 0                                                                                   ⟨291066⟩",
+    "tant que (scène4.compteur < 83) et (scène4.terminée == 0) :",
+    "    v356 = scène4.compteur                                                                            ⟨291072⟩",
+    "    si v356 == 20 :",
+    "        Scene_SetFps(scène=scène4, cadence=13)                                                        ⟨291078⟩",
+    "    si v356 == 30 :",
+    "        Scene_SetFps(scène=scène4, cadence=11)                                                        ⟨291087⟩",
+    "    si v356 == 40 :",
+    "        Scene_SetFps(scène=scène4, cadence=9)                                                         ⟨291096⟩",
+    "    si v356 == 50 :",
+    "        Scene_SetFps(scène=scène4, cadence=7)                                                         ⟨291105⟩",
+    "    si v356 < 30 :",
+    "        v358 = si                                                                                     ⟨291111⟩",
+    "        c13.image = v358                                                                              ⟨291115⟩",
+    "        v360 = v354                                                                                   ⟨291117⟩",
+    "        v354 = v354 + 1                                                                               ⟨291118⟩",
+    "        c15.image = v360                                                                              ⟨291121⟩",
+    "    sinon :",
+    "        si v356 == 30 :",
+    "            retire(parent=scène4, calque=c13)                                                         ⟨291136⟩",
+    "            c13.détruit(3)                                                                            ⟨291144⟩",
+    "            retire(parent=scène4, calque=c12)                                                         ⟨291152⟩",
+    "            ajoute c14 à scène4                                                                       ⟨291157⟩",
+    "            ajoute c12 à scène4                                                                       ⟨291162⟩",
+    "            v362 = 0                                                                                  ⟨291164⟩",
+    "            c14.image = v362                                                                          ⟨291168⟩",
+    "            v364 = v354                                                                               ⟨291170⟩",
+    "            v354 = v354 + 1                                                                           ⟨291171⟩",
+    "            c15.image = v364                                                                          ⟨291174⟩",
+    "        sinon :",
+    "            si v356 > 30 :",
+    "                si v356 >= 50 : aller à loc_9C5BC                                                     ⟨291182⟩",
+    "                v366 = si                                                                             ⟨291183⟩",
+    "                c14.image = v366                                                                      ⟨291187⟩",
+    "                v368 = v354                                                                           ⟨291189⟩",
+    "                v354 = v354 + 1                                                                       ⟨291190⟩",
+    "                c15.image = v368                                                                      ⟨291193⟩",
+    "            sinon :",
+    "                si v356 == 50 :",
+    "                    si v13 != 0 :",
+    "                        charge(asoundfx 20)                                                           ⟨291217⟩",
+    "                        canal_init(canal=canal3, pilote=word_46849)                                   ⟨291222⟩",
+    "                        canal_enregistre(canal=canal3, ressource=asoundfx 20, x=0)                    ⟨291229⟩",
+    "                        v370 = word_48ECA                                                             ⟨291232⟩",
+    "                        si canal3.+0 != 0 :",
+    "                            AIL_start_sequence(pilote=canal3.+0→4, séquence=v3388)                    ⟨291239⟩",
+    "                            sub_30C66(canal3.+0→4, v3388, v370, 0)                                    ⟨291246⟩",
+    "                    Scene_SetFps(scène=scène4, cadence=15)                                            ⟨291256⟩",
+    "                    ajoute c16 à scène4                                                               ⟨291261⟩",
+    "                    v374 = 0                                                                          ⟨291263⟩",
+    "                    c16.image = v374                                                                  ⟨291267⟩",
+    "                sinon :",
+    "                    si v356 < 66 :",
+    "                        si v356 & 1 != 0 :",
+    "                            v376 = si                                                                 ⟨291276⟩",
+    "                            c16.image = v376                                                          ⟨291280⟩",
+    "    Scene_Tick(scène=scène4)                                                                          ⟨291296⟩",
+    "Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨291401⟩",
+    "canal_arrête(canal=canal3)                                                                            ⟨291491⟩",
+    "canal_arrête(canal=canal1)                                                                            ⟨291514⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨291757⟩",
+    "    v101 = 0                                                                                          ⟨291758⟩",
+    "    v100 = 0                                                                                          ⟨291759⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨291835⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨291858⟩",
+    "    retour                                                                                            ⟨291954⟩",
+    "charge(optshps 116)                                                                                   ⟨291968⟩",
+    "charge(midgames 4)                                                                                    ⟨291980⟩",
+    "",
+    "──── scène5 ────",
+    "scène5 = Scene_Create(cadence=9, palette=255, surface=&v470)                                          ⟨291988⟩",
+    "charge_convdata_type0(\"air\", drapeau=3)                                                               ⟨291998⟩",
+    "c17 = Layer(ressource=midgames 4, x=0, y=0)                                                           ⟨292005⟩",
+    "c18 = TalkingHeadOverlay(ressource=convdata type 0 \"air\", x=160, y=129)                               ⟨292013⟩",
+    "c19 = ImageLayer(ressource=convdata type 0 \"air\", x=160, y=129, image=51)                             ⟨292022⟩",
+    "c20 = Layer(ressource=optshps 116, x=0, y=-64)                                                        ⟨292030⟩",
+    "palette_copie(destination=pal1, source=pal2(optpals 21))                                              ⟨292040⟩",
+    "palette_copie(destination=pal1, source=pal3(midgames 6))                                              ⟨292049⟩",
+    "palette_copie(destination=pal1, source=pal4(convdata type 2 \"normal\"))                                ⟨292058⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨292070⟩",
+    "ajoute c20 à scène5                                                                                   ⟨292075⟩",
+    "ajoute c17 à scène5                                                                                   ⟨292080⟩",
+    "ajoute c18 à scène5                                                                                   ⟨292085⟩",
+    "ajoute c19 à scène5                                                                                   ⟨292090⟩",
+    "Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨292095⟩",
+    "Widget_Method_Dispatch8_314A9(zone1, 127)                                                             ⟨292100⟩",
+    "tête_image_de_base(tête=c18, image=-1)                                                                ⟨292104⟩",
+    "charge(midgames 0)                                                                                    ⟨292116⟩",
+    "c21 = ToggleLayer(ressource=midgames 0, x=160, y=128, sens=1)                                         ⟨292124⟩",
+    "ajoute c21 à scène5                                                                                   ⟨292130⟩",
+    "tant que (scène5.compteur < 15) et (scène5.terminée == 0) :",
+    "    v274 = scène5.compteur                                                                            ⟨292137⟩",
+    "    si v274 == 12 :",
+    "        tête_image_de_base(tête=c18, image=18)                                                        ⟨292142⟩",
+    "    Scene_Tick(scène=scène5)                                                                          ⟨292158⟩",
+    "Scene_Destruct(scène=scène5, drapeaux=0)                                                              ⟨292222⟩",
+    "si byte_495FC != 0 :",
+    "    v106 = 0                                                                                          ⟨292446⟩",
+    "    v101 = 0                                                                                          ⟨292447⟩",
+    "    v100 = 0                                                                                          ⟨292448⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨292524⟩",
+    "    canal_arrête(canal=canal2)                                                                        ⟨292547⟩",
+    "    retour                                                                                            ⟨292643⟩",
+    "charge(mid17 2)                                                                                       ⟨292657⟩",
+    "charge(mid17 0)                                                                                       ⟨292669⟩",
+    "charge(mid17 9)                                                                                       ⟨292681⟩",
+    "palette_depuis(pal13(mid17 9))                                                                        ⟨292688⟩",
+    "",
+    "──── scène6 ────",
+    "scène6 = Scene_Create(cadence=9, palette=255, surface=&v470)                                          ⟨292696⟩",
+    "c22 = OverlayImageLayer(ressource=mid17 0, x=5, y=0, image=0)                                         ⟨292704⟩",
+    "c23 = Layer(ressource=mid17 2, x=0, y=0)                                                              ⟨292712⟩",
+    "palette_copie(destination=pal1, source=pal13(mid17 9))                                                ⟨292722⟩",
+    "ajoute c23 à scène6                                                                                   ⟨292727⟩",
+    "ajoute c22 à scène6                                                                                   ⟨292732⟩",
+    "palette_envoie(palette=pal1, pas=0)                                                                   ⟨292744⟩",
+    "Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨292749⟩",
+    "Widget_Method_Dispatch8_314A9(zone1, 128)                                                             ⟨292754⟩",
+    "c22.image = midgames 14.+0                                                                            ⟨292761⟩",
+    "si v12 != 0 :",
+    "    Scene_Tick(scène=scène6)                                                                          ⟨292770⟩",
+    "    tant que si < 4 :",
+    "        Scene_Tick(scène=scène6)                                                                      ⟨292779⟩",
+    "    charge(mid17voc 1)                                                                                ⟨292796⟩",
+    "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 1)                                 ⟨292802⟩",
+    "    tant que si < 4 :",
+    "        Scene_Tick(scène=scène6)                                                                      ⟨292811⟩",
+    "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨292821⟩",
+    "    tant que sub_8500(voix1) != 0 :",
+    "        Scene_Tick(scène=scène6)                                                                      ⟨292839⟩",
+    "    tant que si < 17 :",
+    "        si si > 4 :",
+    "            si si < 13 :",
+    "                v280 = midgames 14.+0                                                                 ⟨292861⟩",
+    "                c22.image = v280                                                                      ⟨292865⟩",
+    "        Scene_Tick(scène=scène6)                                                                      ⟨292871⟩",
+    "    voix_arrête(voix=voix1)                                                                           ⟨292880⟩",
+    "sinon :",
+    "    v6 = 75                                                                                           ⟨292905⟩",
+    "    v4 = scène6.compteur                                                                              ⟨292907⟩",
+    "    tant que (scène6.compteur < v4 + ((v6·70) / 100)) et (scène6.terminée == 0) :",
+    "        si v4 + 8 == scène6.compteur :",
+    "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])                              ⟨292934⟩",
+    "        si v4 + 24 < scène6.compteur :",
+    "            si v4 + 33 > scène6.compteur :",
+    "                c22.image = midgames 14.+0                                                            ⟨292951⟩",
+    "        si (v4 + ((v6·70) / 100)) - 1 == scène6.compteur :",
+    "            v3408 = 4540                                                                              ⟨292959⟩",
+    "            v3408 = 4552                                                                              ⟨292960⟩",
+    "            v3408 = 4568                                                                              ⟨292961⟩",
+    "            v3408 = 4584                                                                              ⟨292962⟩",
+    "            v3408 = 4604                                                                              ⟨292963⟩",
+    "            Primitive_SetRectColorAndDraw_2CBE5(&v3408, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨292973⟩",
+    "        Scene_Tick(scène=scène6)                                                                      ⟨293005⟩",
+    "fondu_disparition(palette=pal1, couleur=&v30, pas=2, premier=0, nombre=256)                           ⟨293038⟩",
+    "Scene_Destruct(scène=scène6, drapeaux=0)                                                              ⟨293043⟩",
+    "v106 = 0                                                                                              ⟨293285⟩",
+    "v101 = 0                                                                                              ⟨293286⟩",
+    "v100 = 0                                                                                              ⟨293287⟩",
+    "voix_arrête(voix=voix1)                                                                               ⟨293363⟩",
+    "canal_arrête(canal=canal2)                                                                            ⟨293386⟩",
+    "retour                                                                                                ⟨293482⟩"
+   ]
+  }
+ ],
+ "tableaux": []
+}

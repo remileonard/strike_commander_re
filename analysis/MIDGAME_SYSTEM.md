@@ -250,7 +250,7 @@ si Échap : sortir de la cinématique
 | une animation est arrivée à sa dernière image (`AnimLayer_IsFinished_2E654`) | 1, 3, 6, 11, 13, 24 (phase 3) |
 | la réplique parlée est finie (méthode +0 du lecteur de voix, ou `sub_84CC` dans la scène 8) | dialogues avec voix : 8, 9, 15, 20, 21, 22, 23 |
 | un calque a atteint une position (méthode « y absolu ») | 3 |
-| une variable comptée par la cinématique atteint une valeur | 24 (phase 2) |
+| le y de la scène atteint une valeur | 24 (phase 2) |
 | Échap (`byte_495FC`) | toujours |
 
 Une scène peut enchaîner **plusieurs boucles** (phases). Exemples : « attendre 20 images, ajouter
@@ -833,9 +833,11 @@ mobile optshps 116 (0, 0), vitesse (0, 0)            ← racine
 ```
 
 1. Phase 1 : 20 images.
-2. Compteur à 0 ; le groupe 19 prend la vitesse (0, 1). Phase 2 : 26 images (une variable
-   comptée de -50 à -24) ; à l'image 10, l'animation 33 est remplacée par l'**animation** `mid1` 34
-   (0, 10). Le groupe 19 s'arrête.
+2. Compteur à 0 ; le groupe 19 prend la vitesse (0, 1). Phase 2 : tant que le **y de la scène**
+   (champ +14, que `Scene_Tick` ajoute à tous les calques ; mis à -50 juste après la création de la
+   scène) est inférieur à -24, il augmente de 1 après chaque image : toute la scène redescend de
+   26 pixels. À l'image 10, l'animation 33 est remplacée par l'**animation** `mid1` 34 (0, 10).
+   Le groupe 19 s'arrête.
 3. Phase 3 : jusqu'à la fin de l'animation 34, qui est ensuite retirée ; une image.
 4. Compteur à 0 ; **animation** `mid1` 9 (0, 0) ajoutée ; palette `mid1` 46 ; arrêt de la musique
    (`AIL_stop_sequence`, si carte Roland ou AdLib) ; réplique 13 (ou effet 5). Phase 4 : 31 images ;
