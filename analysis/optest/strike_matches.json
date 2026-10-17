@@ -1,0 +1,7268 @@
+{
+ "sub_2769": {
+  "segment": "seg000",
+  "kind": "rejetée",
+  "reason": "constantes inversées : conversion en minuscules, pas en majuscules",
+  "chosen": null
+ },
+ "sub_59F42": {
+  "segment": "ovr191",
+  "kind": "rejetée",
+  "reason": "lit un autre champ de la structure",
+  "chosen": null
+ },
+ "sub_5D01A": {
+  "segment": "ovr191",
+  "kind": "rejetée",
+  "reason": "ajoute 3 et non 10",
+  "chosen": null
+ },
+ "sub_5D029": {
+  "segment": "ovr191",
+  "kind": "rejetée",
+  "reason": "ajoute 3 et non 10",
+  "chosen": null
+ },
+ "sub_5D038": {
+  "segment": "ovr191",
+  "kind": "rejetée",
+  "reason": "ajoute 3 et non 10",
+  "chosen": null
+ },
+ "sub_C3F07": {
+  "segment": "ovr225",
+  "kind": "rejetée",
+  "reason": "dépile 2 octets d'arguments et non 4",
+  "chosen": null
+ },
+ "start": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 135,
+  "candidates": {
+   "start": "EntryPoint_RuntimeInit"
+  },
+  "chosen": "start",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_11303": {
+  "segment": "seg024",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_A2CEC": "PaletteScreen_LookupByteTable_A2CEC"
+  },
+  "chosen": "sub_A2CEC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_11363": {
+  "segment": "seg024",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_A2D4A": "PaletteScreen_DispatchWidgetLayoutB_A2D4A"
+  },
+  "chosen": "sub_A2D4A",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_116EE": {
+  "segment": "seg025",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_121F6": {
+  "segment": "seg026",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_8D266": "UIWidget_Helper_8D266",
+   "sub_A9737": "ExprSlot_ResetFields_A9737",
+   "sub_AA0F7": "ExprSlot_Helper2_AA0F7",
+   "sub_AA1AB": "ExprSlot_Helper3_AA1AB",
+   "sub_AA227": "ExprSlot_Helper4_AA227",
+   "sub_AA2F4": "ProgBuffer_ResetState_AA2F4",
+   "sub_AA56C": "ExprSlot_Helper7_AA56C",
+   "sub_AA6B3": "ExprSlot_Helper9_AA6B3"
+  },
+  "chosen": null
+ },
+ "sub_13D4": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_16E6": "CRT_AllocaGuard"
+  },
+  "chosen": "sub_16E6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_13F6": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_1708": "CRT_AllocaGrow"
+  },
+  "chosen": "sub_1708",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1443": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_1755": "CRT_FatalStackError"
+  },
+  "chosen": "sub_1755",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_1463": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_1775": "PIT_ReadTick16"
+  },
+  "chosen": "sub_1775",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_149E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 46,
+  "candidates": {
+   "sub_17B0": "PIT_DelayLoop"
+  },
+  "chosen": "sub_17B0",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_14FF": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_1811": "CRT_InstallProtectedHandler"
+  },
+  "chosen": "sub_1811",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_1527": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 76,
+  "candidates": {
+   "sub_1839": "CRT_Int86"
+  },
+  "chosen": "sub_1839",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_157C1": {
+  "segment": "seg029",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_398CB": "Effect_BBoxClipTest"
+  },
+  "chosen": "sub_398CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_15C3": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_18D5": "CRT_Int86x"
+  },
+  "chosen": "sub_18D5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_163": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_163": "Ovl_CopyStubTable"
+  },
+  "chosen": "sub_163",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_1667": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_1979": "Heap_ReallocShrink"
+  },
+  "chosen": "sub_1979",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_1684": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_1996": "Heap_ShrinkTail"
+  },
+  "chosen": "sub_1996",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_16BE": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_19D0": "Heap_FreeCoalesce"
+  },
+  "chosen": "sub_19D0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_16F7": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_1A09": "Heap_FreelistUnlink"
+  },
+  "chosen": "sub_1A09",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_16FAC": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 250,
+  "candidates": {
+   "sub_25BA4": "Render_LineClipped"
+  },
+  "chosen": "sub_25BA4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1713": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_1A25": "Heap_FreelistInsert"
+  },
+  "chosen": "sub_1A25",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1736": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 42,
+  "candidates": {
+   "sub_1A48": "Heap_Malloc"
+  },
+  "chosen": "sub_1A48",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_1796": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_1AA8": "Heap_GrowSegment"
+  },
+  "chosen": "sub_1AA8",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_17D6": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_1AE8": "Heap_GrowExtended"
+  },
+  "chosen": "sub_1AE8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_17FF": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_1B11": "Heap_SplitBlock_Alt"
+  },
+  "chosen": "sub_1B11",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1818": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_1B2A": "Heap_SplitBlock"
+  },
+  "chosen": "sub_1B2A",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_184D": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_1B5F": "Heap_SplitBlock_Commit"
+  },
+  "chosen": "sub_1B5F",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_18E2": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_1BF4": "Heap_Validate"
+  },
+  "chosen": "sub_1BF4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_18F9A": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_25DFA": "Render_SampleTexture"
+  },
+  "chosen": "sub_25DFA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_198DB": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 176,
+  "candidates": {
+   "sub_26739": "Render_TriangleEdgeSetup"
+  },
+  "chosen": "sub_26739",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_19AF7": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 65,
+  "candidates": {
+   "sub_26955": "Render_EdgeInterpolateAttrib"
+  },
+  "chosen": "sub_26955",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_19B90": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_269EE": "Render_GradientStepSelect"
+  },
+  "chosen": "sub_269EE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_19BB9": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_26A17": "Render_ScanlineAdvance"
+  },
+  "chosen": "sub_26A17",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_19BDC": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_26A3A": "Render_ShadeIntensityClamp"
+  },
+  "chosen": "sub_26A3A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1B4": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_1B0": "CRT_SaveIntVectors"
+  },
+  "chosen": "sub_1B0",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_1C57": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_1F18": "PC_SoundOn"
+  },
+  "chosen": "sub_1F18",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1C8A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_1F4B": "CRT_Write_TextMode"
+  },
+  "chosen": "sub_1F4B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_1D3A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_1F7E": "CRT_SetFileAttr"
+  },
+  "chosen": "sub_1F7E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_1D55": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 60,
+  "candidates": {
+   "sub_1F99": "Stdio_Fflush"
+  },
+  "chosen": "sub_1F99",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_1D5FD": {
+  "segment": "seg043",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_2AF07": "Widget_DestructTwoLabels"
+  },
+  "chosen": "sub_2AF07",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_1D67F": {
+  "segment": "seg044",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_1D72E": {
+  "segment": "seg044",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_2B191": "LightSet_Init_2B191"
+  },
+  "chosen": "sub_2B191",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_1D7CD": {
+  "segment": "seg044",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2B228": "LightSet_SetIntensityPercent_2B228"
+  },
+  "chosen": "sub_2B228",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_1DB23": {
+  "segment": "seg044",
+  "kind": "stricte",
+  "instructions": 60,
+  "candidates": {
+   "sub_2B54A": "LightSet_FaceIntensity_2B54A"
+  },
+  "chosen": "sub_2B54A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1DBE0": {
+  "segment": "seg045",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_2B5F9": "Render_EdgeSetup"
+  },
+  "chosen": "sub_2B5F9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1E70": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_2070": "CRT_Strrchr_Like"
+  },
+  "chosen": "sub_2070",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_1EA87": {
+  "segment": "seg046",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E6CB": "Camera_UpdateViewportClip"
+  },
+  "chosen": "sub_2E6CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 8
+ },
+ "sub_1EA9": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 49,
+  "candidates": {
+   "sub_20A9": "Stdio_CountNewlines"
+  },
+  "chosen": "sub_20A9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1EBFF": {
+  "segment": "seg047",
+  "kind": "stricte",
+  "instructions": 39,
+  "candidates": {
+   "sub_2E801": "VGA_LoadPalette"
+  },
+  "chosen": "sub_2E801",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1ECAB": {
+  "segment": "seg047",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2E8A6": "Palette_DestructResource"
+  },
+  "chosen": "sub_2E8A6",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_1ECD2": {
+  "segment": "seg047",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E8CD": "Palette_ShadeTableFor_2E8CD"
+  },
+  "chosen": "sub_2E8CD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1F06": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 53,
+  "candidates": {
+   "sub_2106": "Stdio_WriteTextMode"
+  },
+  "chosen": "sub_2106",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_1F54F": {
+  "segment": "seg047",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2F064": "Cockpit_PanAzimuthUpdate"
+  },
+  "chosen": "sub_2F064",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1F7": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_1F3": "CRT_RestoreIntVectors"
+  },
+  "chosen": "sub_1F3",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_1F752": {
+  "segment": "seg048",
+  "kind": "stricte",
+  "instructions": 158,
+  "candidates": {
+   "sub_2F24E": "Palette_ShadeIndexWithFog_2F24E"
+  },
+  "chosen": "sub_2F24E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1F908": {
+  "segment": "seg048",
+  "kind": "stricte",
+  "instructions": 119,
+  "candidates": {
+   "sub_2F404": "Palette_FogTableIndex_2F404"
+  },
+  "chosen": "sub_2F404",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1FDBC": {
+  "segment": "seg049",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_21E90": "Container_Construct"
+  },
+  "chosen": "sub_21E90",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_1FDDE": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_21EB2": "Container_ConstructTyped"
+  },
+  "chosen": "sub_21EB2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1FF3C": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_21FC6": "Container_UnlinkNode"
+  },
+  "chosen": "sub_21FC6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1FF6B": {
+  "segment": "seg049",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_21FF5": "Container_FindAndRemove"
+  },
+  "chosen": "sub_21FF5",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_20050": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_220BF": "Container_Append"
+  },
+  "chosen": "sub_220BF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2094": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2235": "CRT_Itoa_Signed10"
+  },
+  "chosen": "sub_2235",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_20BC": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_225D": "CRT_Itoa_Unsigned"
+  },
+  "chosen": "sub_225D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_20D45": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_22C23": "List_AppendTail_22C23"
+  },
+  "chosen": "sub_22C23",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_20D6": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2277": "CRT_Itoa_BaseVariant"
+  },
+  "chosen": "sub_2277",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_20D7C": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_22C56": "Container_RemoveNode"
+  },
+  "chosen": "sub_22C56",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_20EEC": {
+  "segment": "seg049",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_22DAB": "Container_Op_22DAB"
+  },
+  "chosen": "sub_22DAB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_20FB": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_229C": "CRT_Memmove"
+  },
+  "chosen": "sub_229C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_21083": {
+  "segment": "seg050",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_37C4C": "Debris_BodyReset"
+  },
+  "chosen": "sub_37C4C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_211A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_22BB": "CRT_Memset"
+  },
+  "chosen": "sub_22BB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2140": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_22E1": "CRT_Memset_Public"
+  },
+  "chosen": "sub_22E1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_21BE": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_22FC": "CRT_Msg_NullPtrAssign"
+  },
+  "chosen": "sub_22FC",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_21D5": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2313": "Stdio_Ungetc"
+  },
+  "chosen": "sub_2313",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_21EE": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 134,
+  "candidates": {
+   "sub_232C": "Stdio_Putc"
+  },
+  "chosen": "sub_232C",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_2237A": {
+  "segment": "seg053",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_3A3EC": "WeakRef_InvalidateIfSet"
+  },
+  "chosen": "sub_3A3EC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_223C2": {
+  "segment": "seg053",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_3A432": "WeakRef_InvalidateFar"
+  },
+  "chosen": "sub_3A432",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_224": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_220": "CRT_RunAtexitTable_MinPrio"
+  },
+  "chosen": "sub_220",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2336": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 195,
+  "candidates": {
+   "sub_2474": "Stdio_Fread"
+  },
+  "chosen": "sub_2474",
+  "calls_confirmed": 10,
+  "operand_diffs": 2
+ },
+ "sub_2375C": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5505B": "Math_DotProduct3D_5505B"
+  },
+  "chosen": "sub_5505B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2410A": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_55920": "Math_VectorLengthUnscaled_55920"
+  },
+  "chosen": "sub_55920",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_241B4": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 47,
+  "candidates": {
+   "sub_559BB": "Vector_Normalize3D_559BB"
+  },
+  "chosen": "sub_559BB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24233": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_55A37": "Utility_Helper_55A37"
+  },
+  "chosen": "sub_55A37",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_246F0": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_55E65": "Utility_Helper_55E65"
+  },
+  "chosen": "sub_55E65",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24AFE": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 53,
+  "candidates": {
+   "sub_56215": "UI_ComputeScaledVectorHelper_56215"
+  },
+  "chosen": "sub_56215",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24DD7": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5647A": "Damage_ComputeHelperA_5647A"
+  },
+  "chosen": "sub_5647A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24DE": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 83,
+  "candidates": {
+   "sub_261C": "Stdio_SetupFileStruct"
+  },
+  "chosen": "sub_261C",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_2574E": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_56D72": "Matrix_BuildFromAngle_56D72"
+  },
+  "chosen": "sub_56D72",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2589B": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_56E8A": "WorldObject_BuildOrientationMatrix_56E8A"
+  },
+  "chosen": "sub_56E8A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25DE": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2945": "CRT_Msg_Sprintf1"
+  },
+  "chosen": "sub_2945",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_25FB": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_2962": "CRT_Msg_Sprintf2"
+  },
+  "chosen": "sub_2962",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_26047": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_575B2": "Matrix_BuildFullOrientation_575B2"
+  },
+  "chosen": "sub_575B2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2617": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_29E4": "CRT_Strcat"
+  },
+  "chosen": "sub_29E4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2650": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 31,
+  "candidates": {
+   "sub_2A1D": "CRT_Strchr_WordAligned"
+  },
+  "chosen": "sub_2A1D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_268": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_264": "CRT_RunInitTable_MaxPrio"
+  },
+  "chosen": "sub_264",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2686": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2A53": "CRT_Strncmp_Like"
+  },
+  "chosen": "sub_2A53",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26B5": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2A82": "CRT_Strcpy"
+  },
+  "chosen": "sub_2A82",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26BB4": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5804C": "Math_FixedMulDiv_5804C"
+  },
+  "chosen": "sub_5804C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26C11": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_580A7": "Math_CosRaw_580A7"
+  },
+  "chosen": "sub_580A7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26C57": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_580ED": "Math_Tan_Raw_580ED"
+  },
+  "chosen": "sub_580ED",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26D0A": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_581A0": "Math_AsinRaw_581A0"
+  },
+  "chosen": "sub_581A0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26D4D": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_581E3": "Math_AcosRaw_581E3"
+  },
+  "chosen": "sub_581E3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26D7": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_2AA4": "CRT_Strdup"
+  },
+  "chosen": "sub_2AA4",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_26DF9": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_5828E": "Math_VectorLength3D_Raw_5828E"
+  },
+  "chosen": "sub_5828E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26E59": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_582EE": "Math_Sqrt_Raw_582EE"
+  },
+  "chosen": "sub_582EE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26F0E": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_583A3": "Math_Helper_583A3"
+  },
+  "chosen": "sub_583A3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26FE1": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 204,
+  "candidates": {
+   "sub_58476": "Math_VectorTransformByMatrix3x3_58476"
+  },
+  "chosen": "sub_58476",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_270F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_2ADC": "CRT_Stricmp"
+  },
+  "chosen": "sub_2ADC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_272D3": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_58768": "Matrix_WorldToLocal_58768"
+  },
+  "chosen": "sub_58768",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_27393": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_58828": "Matrix_LocalToWorld_58828"
+  },
+  "chosen": "sub_58828",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_27454": {
+  "segment": "seg059",
+  "kind": "stricte",
+  "instructions": 85,
+  "candidates": {
+   "sub_588E8": "Parser_BuildHashIndex_588E8"
+  },
+  "chosen": "sub_588E8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_274F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_2B1C": "CRT_Strlen"
+  },
+  "chosen": "sub_2B1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2751E": {
+  "segment": "seg060",
+  "kind": "stricte",
+  "instructions": 405,
+  "candidates": {
+   "sub_20848": "Render_PolygonPrimitive_20848"
+  },
+  "chosen": "sub_20848",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_27D5F": {
+  "segment": "seg060",
+  "kind": "approchée",
+  "instructions": 611,
+  "candidates": {
+   "sub_21085": "Render_MeshPrimitive_21085"
+  },
+  "chosen": "sub_21085",
+  "calls_confirmed": 1,
+  "operand_diffs": 10
+ },
+ "sub_280A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2B6D": "CRT_Strncpy_Pad"
+  },
+  "chosen": "sub_2B6D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_283D0": {
+  "segment": "seg060",
+  "kind": "approchée",
+  "instructions": 647,
+  "candidates": {
+   "sub_216F6": "Render_MeshPrimitive_216F6"
+  },
+  "chosen": "sub_216F6",
+  "calls_confirmed": 1,
+  "operand_diffs": 12
+ },
+ "sub_2879": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_2B99": "CRT_Strupr"
+  },
+  "chosen": "sub_2B99",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_28CDB": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_5A9E6": "Music_Stop_5A9E6"
+  },
+  "chosen": "sub_5A9E6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_28D24": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5AAB2": "Speech_LoadBank_5AAB2"
+  },
+  "chosen": "sub_5AAB2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_291F4": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_291FC": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_29F4D": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 98,
+  "candidates": {
+   "sub_5AE5F": "Registry_ResolveOrInsertNode_5AE5F"
+  },
+  "chosen": "sub_5AE5F",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_2A089": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 49,
+  "candidates": {
+   "sub_5AF9B": "Registry_ResolveNodeVariant_5AF9B"
+  },
+  "chosen": "sub_5AF9B",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2A124": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 177,
+  "candidates": {
+   "sub_5B036": "Registry_BuildOrUpdateEntry_5B036"
+  },
+  "chosen": "sub_5B036",
+  "calls_confirmed": 12,
+  "operand_diffs": 0
+ },
+ "sub_2A359": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 140,
+  "candidates": {
+   "sub_5B26B": "Registry_MainOperation_5B26B"
+  },
+  "chosen": "sub_5B26B",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_2A50F": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 88,
+  "candidates": {
+   "sub_5B421": "Registry_MainOperationVariant_5B421"
+  },
+  "chosen": "sub_5B421",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_2A61E": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_5B530": "Registry_ResolveNodeVariantB_5B530"
+  },
+  "chosen": "sub_5B530",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_2A6C7": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 59,
+  "candidates": {
+   "sub_5B5D9": "Registry_LookupForTextRenderer_5B5D9"
+  },
+  "chosen": "sub_5B5D9",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2A778": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_5B68A": "Registry_LookupVariant_5B68A"
+  },
+  "chosen": "sub_5B68A",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2A8DF": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5B7F1": "PagedMemory_DetectDriverSignatureA_5B7F1"
+  },
+  "chosen": "sub_5B7F1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2A8F0": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5B802": "PagedMemory_DetectDriverSignatureB_5B802"
+  },
+  "chosen": "sub_5B802",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2A901": {
+  "segment": "seg066",
+  "kind": "approchée",
+  "instructions": 56,
+  "candidates": {
+   "sub_5B813": "PagedMemory_LoadPage_5B813"
+  },
+  "chosen": "sub_5B813",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_2A98B": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_5B89D": "PagedMemory_InitDriver_5B89D"
+  },
+  "chosen": "sub_5B89D",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2AA32": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5B944": "PagedMemory_CheckDriverPresent_5B944"
+  },
+  "chosen": "sub_5B944",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2AA75": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_5B987": "PagedMemory_ReadByte_5B987"
+  },
+  "chosen": "sub_5B987",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2AADF": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 77,
+  "candidates": {
+   "sub_5B9F1": "PagedMemory_ReadStruct_5B9F1"
+  },
+  "chosen": "sub_5B9F1",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_2ABFB": {
+  "segment": "seg066",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_5BB0D": "PagedMemory_InitSubsystem_5BB0D"
+  },
+  "chosen": "sub_5BB0D",
+  "calls_confirmed": 7,
+  "operand_diffs": 1
+ },
+ "sub_2ACBA": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 80,
+  "candidates": {
+   "sub_5BBCC": "PagedMemory_ResolveAddress_5BBCC"
+  },
+  "chosen": "sub_5BBCC",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2AD82": {
+  "segment": "seg066",
+  "kind": "approchée",
+  "instructions": 44,
+  "candidates": {
+   "sub_5BC94": "PagedMemory_Helper_5BC94"
+  },
+  "chosen": "sub_5BC94",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2AE02": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_5BD14": "PagedMemory_WriteByte_5BD14"
+  },
+  "chosen": "sub_5BD14",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2AE6E": {
+  "segment": "seg066",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_5BD80": "PagedMemory_ReleaseRange_5BD80"
+  },
+  "chosen": "sub_5BD80",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2AF2E": {
+  "segment": "seg066",
+  "kind": "approchée",
+  "instructions": 211,
+  "candidates": {
+   "sub_5BE40": "PagedMemory_ReadFormattedString_5BE40"
+  },
+  "chosen": "sub_5BE40",
+  "calls_confirmed": 12,
+  "operand_diffs": 5
+ },
+ "sub_2B23C": {
+  "segment": "seg067",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_5C14E": "PagedMemory_ReadTextResource_5C14E"
+  },
+  "chosen": "sub_5C14E",
+  "calls_confirmed": 3,
+  "operand_diffs": 7
+ },
+ "sub_2B3AD": {
+  "segment": "seg068",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_5C2BF": "PagedResourceB_Method_ReadDefault_5C2BF"
+  },
+  "chosen": "sub_5C2BF",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2B43D": {
+  "segment": "seg068",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_5C34F": "PagedResourceB_Construct_5C34F"
+  },
+  "chosen": "sub_5C34F",
+  "calls_confirmed": 3,
+  "operand_diffs": 8
+ },
+ "sub_2B51A": {
+  "segment": "seg069",
+  "kind": "approchée",
+  "instructions": 55,
+  "candidates": {
+   "sub_5C42C": "TextObjectCluster_DestructVariantA_5C42C"
+  },
+  "chosen": "sub_5C42C",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2B588": {
+  "segment": "seg069",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_5C49A": "TextObjectCluster_DestructVariantB_5C49A"
+  },
+  "chosen": "sub_5C49A",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2B5F6": {
+  "segment": "seg069",
+  "kind": "approchée",
+  "instructions": 57,
+  "candidates": {
+   "sub_5C508": "TextObjectCluster_DestructVariantC_5C508"
+  },
+  "chosen": "sub_5C508",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2B667": {
+  "segment": "seg069",
+  "kind": "approchée",
+  "instructions": 81,
+  "candidates": {
+   "sub_5C579": "TextObjectCluster_DestructSubobjects_5C579"
+  },
+  "chosen": "sub_5C579",
+  "calls_confirmed": 8,
+  "operand_diffs": 7
+ },
+ "sub_2B731": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_5C643": "Memory_TypedFreeVariant_5C643"
+  },
+  "chosen": "sub_5C643",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_2B7E1": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_5C6F3": "Memory_TypedFreeWrapper_5C6F3"
+  },
+  "chosen": "sub_5C6F3",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2B862": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_5C774": "Memory_TypedFreeWrapperB_5C774"
+  },
+  "chosen": "sub_5C774",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2B8A4": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5C7B6": "Memory_TypedFree_5C7B6"
+  },
+  "chosen": "sub_5C7B6",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2B8DE": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_5C7F0": "Memory_TypedAllocDispatch_5C7F0"
+  },
+  "chosen": "sub_5C7F0",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2B920": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5C832": "Memory_TypedAllocDispatchB_5C832"
+  },
+  "chosen": "sub_5C832",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2B95B": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_5C86D": "Memory_TypedAllocDispatchC_5C86D"
+  },
+  "chosen": "sub_5C86D",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2BA04": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_5C916": "Memory_TypedAllocDispatchE_5C916"
+  },
+  "chosen": "sub_5C916",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2BA94": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_5C9A6": "Memory_ValidateAllocatorIndex_5C9A6"
+  },
+  "chosen": "sub_5C9A6",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2BAC1": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 52,
+  "candidates": {
+   "sub_5C9D3": "Memory_AllocatorTableConstructor_5C9D3"
+  },
+  "chosen": "sub_5C9D3",
+  "calls_confirmed": 6,
+  "operand_diffs": 2
+ },
+ "sub_2BB3D": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_5CA4F": "Memory_AllocatorTable_ConstructSubobject_5CA4F"
+  },
+  "chosen": "sub_5CA4F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2BB8C": {
+  "segment": "seg071",
+  "kind": "approchée",
+  "instructions": 54,
+  "candidates": {
+   "sub_5CA9E": "TextRenderer_ReleaseCachedGlyph_5CA9E"
+  },
+  "chosen": "sub_5CA9E",
+  "calls_confirmed": 6,
+  "operand_diffs": 4
+ },
+ "sub_2BC1E": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5CB30": "Memory_AllocatorSlot_Helper_5CB30"
+  },
+  "chosen": "sub_5CB30",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BC51": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_5CB63": "Memory_AllocatorSlotArray_Construct_5CB63"
+  },
+  "chosen": "sub_5CB63",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2BC87": {
+  "segment": "seg072",
+  "kind": "approchée",
+  "instructions": 131,
+  "candidates": {
+   "sub_5CB99": "Memory_AllocatorTable_PopulateSlots_5CB99"
+  },
+  "chosen": "sub_5CB99",
+  "calls_confirmed": 16,
+  "operand_diffs": 1
+ },
+ "sub_2BE28": {
+  "segment": "seg073",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_5CD3A": "PagedResourceC_Construct_5CD3A"
+  },
+  "chosen": "sub_5CD3A",
+  "calls_confirmed": 2,
+  "operand_diffs": 8
+ },
+ "sub_2C0E6": {
+  "segment": "seg075",
+  "kind": "approchée",
+  "instructions": 111,
+  "candidates": {
+   "sub_5CFF8": "Heap_ValidateBlockDetailed_5CFF8"
+  },
+  "chosen": "sub_5CFF8",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_2C1F2": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_5D104": "Runtime_StackCheckHelperA_5D104"
+  },
+  "chosen": "sub_5D104",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C271": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_5D183": "Runtime_StackCheckHelperB_5D183"
+  },
+  "chosen": "sub_5D183",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C319": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 90,
+  "candidates": {
+   "sub_5D22B": "Runtime_StackOverflowCheck_5D22B"
+  },
+  "chosen": "sub_5D22B",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2C3FC": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_5D30E": "Heap_FreeAndCoalesce_5D30E"
+  },
+  "chosen": "sub_5D30E",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2C498": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 59,
+  "candidates": {
+   "sub_5D3AA": "Heap_ValidateBlock_5D3AA"
+  },
+  "chosen": "sub_5D3AA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2C52D": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5D43F": "DisplayCache_ComputeChecksum_5D43F"
+  },
+  "chosen": "sub_5D43F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C557": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_5D469": "DisplayCache_GetHeadValue_5D469"
+  },
+  "chosen": "sub_5D469",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C570": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 69,
+  "candidates": {
+   "sub_5D482": "PagedResourceB_TreeSearchRecursive_5D482"
+  },
+  "chosen": "sub_5D482",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2C643": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 83,
+  "candidates": {
+   "sub_5D555": "PagedResourceB_Write_5D555"
+  },
+  "chosen": "sub_5D555",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C71D": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_5D62F": "PagedResourceB_Release_5D62F"
+  },
+  "chosen": "sub_5D62F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2C7A1": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 67,
+  "candidates": {
+   "sub_5D6B3": "PagedResourceB_ReleaseInternal_5D6B3"
+  },
+  "chosen": "sub_5D6B3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2C859": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_5D76B": "DisplayCache_Helper_5D76B"
+  },
+  "chosen": "sub_5D76B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C895": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_5D7A7": "PagedResourceB_ReleaseInternalCore_5D7A7"
+  },
+  "chosen": "sub_5D7A7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C9DF": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5D8F1": "PagedResourceB_ReadHelper_5D8F1"
+  },
+  "chosen": "sub_5D8F1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2C9FC": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_5D90E": "PagedResourceB_Read_5D90E"
+  },
+  "chosen": "sub_5D90E",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2CA25": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_5D937": "Runtime_HeapFreeHook_5D937"
+  },
+  "chosen": "sub_5D937",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2CA48": {
+  "segment": "seg077",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_5D95A": "PagedResourceB_Init_5D95A"
+  },
+  "chosen": "sub_5D95A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2CB40": {
+  "segment": "seg079",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_5D999": "SmallObject_RegisterInList_5D999"
+  },
+  "chosen": "sub_5D999",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2CB7A": {
+  "segment": "seg079",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5D9D3": "SmallObject_UnregisterFromList_5D9D3"
+  },
+  "chosen": "sub_5D9D3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2CC2B": {
+  "segment": "seg081",
+  "kind": "stricte",
+  "instructions": 31,
+  "candidates": {
+   "sub_5D9FD": "TextRenderer_GetOrInitFormatState_5D9FD"
+  },
+  "chosen": "sub_5D9FD",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2D201": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5DA48": "CachedObject_Allocate_5DA48"
+  },
+  "chosen": "sub_5DA48",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_2D440": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 60,
+  "candidates": {
+   "sub_5DC87": "CachedObject_Destruct_5DC87"
+  },
+  "chosen": "sub_5DC87",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_2D4E2": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_5DD29": "CachedObject_ReleaseFields_5DD29"
+  },
+  "chosen": "sub_5DD29",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_2D560": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_5DDA7": "CachedObject_DestructCore_5DDA7"
+  },
+  "chosen": "sub_5DDA7",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_2D5ED": {
+  "segment": "seg083",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_5DE34": "CachedObject_DestructHelper_5DE34"
+  },
+  "chosen": "sub_5DE34",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2D63F": {
+  "segment": "seg083",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_5DE86": "CachedObject_DestructHelper_5DE86"
+  },
+  "chosen": "sub_5DE86",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2D682": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 94,
+  "candidates": {
+   "sub_5DEC9": "CachedObject_BuildAndTransform_5DEC9"
+  },
+  "chosen": "sub_5DEC9",
+  "calls_confirmed": 5,
+  "operand_diffs": 3
+ },
+ "sub_2D777": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_5DFBE": "CachedObject_AllocateAndInit_5DFBE"
+  },
+  "chosen": "sub_5DFBE",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2D7C5": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 56,
+  "candidates": {
+   "sub_5E00C": "CachedObject_BuildComposite_5E00C"
+  },
+  "chosen": "sub_5E00C",
+  "calls_confirmed": 5,
+  "operand_diffs": 3
+ },
+ "sub_2D8E3": {
+  "segment": "seg083",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_5E12A": "CachedObject_BuildVariant_5E12A"
+  },
+  "chosen": "sub_5E12A",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_2DB1C": {
+  "segment": "seg084",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_23E48": "EntityTracker_Destruct",
+   "sub_2B1F3": "Collection_Destruct",
+   "sub_331D7": "TerrainTile_ListDestruct"
+  },
+  "chosen": null
+ },
+ "sub_2DE2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 126,
+  "candidates": {
+   "sub_2BB9": "Stdio_WriteLowLevel"
+  },
+  "chosen": "sub_2BB9",
+  "calls_confirmed": 5,
+  "operand_diffs": 3
+ },
+ "sub_2E2C3": {
+  "segment": "seg084",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_2E94F": {
+  "segment": "seg085",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_5E27B": "TextRenderer_EncodeCharA_5E27B"
+  },
+  "chosen": "sub_5E27B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2E977": {
+  "segment": "seg085",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5E2A3": "TextRenderer_EncodeCharB_5E2A3"
+  },
+  "chosen": "sub_5E2A3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2E9A4": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_5E2D0": "TextFormat_ApplyStyleAttribute_5E2D0"
+  },
+  "chosen": "sub_5E2D0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2E9FD": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5E329": "TextFormat_ApplyStyleAttributeB_5E329"
+  },
+  "chosen": "sub_5E329",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2EA21": {
+  "segment": "seg086",
+  "kind": "approchée",
+  "instructions": 81,
+  "candidates": {
+   "sub_5E34D": "TextRenderer_ApplyFormatChange_5E34D"
+  },
+  "chosen": "sub_5E34D",
+  "calls_confirmed": 4,
+  "operand_diffs": 3
+ },
+ "sub_2EAF1": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_5E41D": "TextFormat_SetAttribute_5E41D"
+  },
+  "chosen": "sub_5E41D",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2EB31": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_5E45D": "TextFormat_InitAttributeTable_5E45D"
+  },
+  "chosen": "sub_5E45D",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2EB9C": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_5E4C8": "TextFormat_ResolveStyleEntry_5E4C8"
+  },
+  "chosen": "sub_5E4C8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2EBFA": {
+  "segment": "seg086",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_5E526": "TextFormat_ReleaseStyleList_5E526"
+  },
+  "chosen": "sub_5E526",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_2EC4A": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5E576": "UI_ApplyEncodingHelper_5E576"
+  },
+  "chosen": "sub_5E576",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2EC65": {
+  "segment": "seg086",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_36FD9": "Picking_ResolveSymbol",
+   "sub_5E576": "UI_ApplyEncodingHelper_5E576",
+   "sub_9B62B": "Debris_ContainerOpWrapper_9B62B"
+  },
+  "chosen": "sub_5E576",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2EC80": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_5E5AC": "TextFormat_ReleaseAttribute_5E5AC"
+  },
+  "chosen": "sub_5E5AC",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2ECC8": {
+  "segment": "seg086",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5E5F4": "UI_Helper_5E5F4"
+  },
+  "chosen": "sub_5E5F4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2ED42": {
+  "segment": "seg088",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_5E66E": "TextFormat_RebuildLinearTable_5E66E"
+  },
+  "chosen": "sub_5E66E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2EF0": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_2CC7": "Stdio_ErrorHandler"
+  },
+  "chosen": "sub_2CC7",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_2EF02": {
+  "segment": "seg090",
+  "kind": "stricte",
+  "instructions": 67,
+  "candidates": {
+   "sub_5E74E": "Font_ComputeGlyphBoundingBox_5E74E"
+  },
+  "chosen": "sub_5E74E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2EFEE": {
+  "segment": "seg092",
+  "kind": "stricte",
+  "instructions": 8,
+  "candidates": {
+   "sub_5E7D6": "Video_ReadCRTCPortBase_5E7D6"
+  },
+  "chosen": null
+ },
+ "sub_2F05F": {
+  "segment": "seg095",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_5E7EA": "Video_SetModeIfChanged_5E7EA"
+  },
+  "chosen": "sub_5E7EA",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2F08E": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 58,
+  "candidates": {
+   "sub_5E819": "DisplaySurface_Construct_5E819"
+  },
+  "chosen": "sub_5E819",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_2F113": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_5E89E": "DisplaySurface_CloneOrResize_5E89E"
+  },
+  "chosen": "sub_5E89E",
+  "calls_confirmed": 9,
+  "operand_diffs": 0
+ },
+ "sub_2F1CF": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5E95A": "CachedObject_DestructSubobjects_5E95A"
+  },
+  "chosen": "sub_5E95A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F1EC": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5E977": "DisplaySurface_Helper_5E977"
+  },
+  "chosen": "sub_5E977",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F21E": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_5E9A9": "DisplaySurface_ConstructWithMode_5E9A9"
+  },
+  "chosen": "sub_5E9A9",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2F278": {
+  "segment": "seg097",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5EA03": "Member_ClearAndFree_5EA03"
+  },
+  "chosen": "sub_5EA03",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F298": {
+  "segment": "seg097",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_5EA23": "Member_AllocateAndCopy_5EA23"
+  },
+  "chosen": "sub_5EA23",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_2F2DA": {
+  "segment": "seg097",
+  "kind": "stricte",
+  "instructions": 41,
+  "candidates": {
+   "sub_5EA65": "Member_CopyRaw_5EA65"
+  },
+  "chosen": "sub_5EA65",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F329": {
+  "segment": "seg097",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_5EAB4": "Member_NullTerminateIfSet_5EAB4"
+  },
+  "chosen": "sub_5EAB4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F362": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_5EAED": "FontStyle_ClearFlag_5EAED"
+  },
+  "chosen": "sub_5EAED",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F38D": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 50,
+  "candidates": {
+   "sub_5EB18": "FontStyle_Construct_5EB18"
+  },
+  "chosen": "sub_5EB18",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F413": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 51,
+  "candidates": {
+   "sub_5EB9E": "FontStyle_Destruct_5EB9E"
+  },
+  "chosen": "sub_5EB9E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F487": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 84,
+  "candidates": {
+   "sub_5EC12": "FontStyle_CombineFlags_5EC12"
+  },
+  "chosen": "sub_5EC12",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F4D": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_2D24": "CRT_MemFamily_Extra1"
+  },
+  "chosen": "sub_2D24",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F661": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_5EDEC": "FontStyle_ApplyVariantB_5EDEC"
+  },
+  "chosen": "sub_5EDEC",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2F71": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 39,
+  "candidates": {
+   "sub_2D48": "CRT_MemFamily_Extra2"
+  },
+  "chosen": "sub_2D48",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F829": {
+  "segment": "seg099",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_5EFB4": "PagedMemory_InstallExceptionHandler_5EFB4"
+  },
+  "chosen": "sub_5EFB4",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2F848": {
+  "segment": "seg100",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5EFD3": "Video_PrintString_5EFD3"
+  },
+  "chosen": "sub_5EFD3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F8C1": {
+  "segment": "seg100",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F04C": "Video_PrintChar_5F04C"
+  },
+  "chosen": "sub_5F04C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F8F5": {
+  "segment": "seg100",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F080": "Video_PrintCharVariant_5F080"
+  },
+  "chosen": "sub_5F080",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2FA11": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5F19C": "LinkedList_InsertAtHead_5F19C"
+  },
+  "chosen": "sub_5F19C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FA3F": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5F1CA": "LinkedList_InsertAtTail_5F1CA"
+  },
+  "chosen": "sub_5F1CA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FA6D": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5F1F8": "LinkedList_InsertAfter_5F1F8"
+  },
+  "chosen": "sub_5F1F8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2FABA": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5F245": "LinkedList_InsertBefore_5F245"
+  },
+  "chosen": "sub_5F245",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2FB0": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_2D87": "CRT_MemFamily_Extra3"
+  },
+  "chosen": "sub_2D87",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FB99": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5F324": "LinkedList_Remove_5F324"
+  },
+  "chosen": "sub_5F324",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FC0C": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F397": "LinkedList_RemoveAllAndDestroy_5F397",
+   "sub_5F66B": "LinkedListB_Helper_5F66B"
+  },
+  "chosen": null
+ },
+ "sub_2FC4A": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F3D5": "LinkedList_Helper_5F3D5",
+   "sub_5F6A9": "LinkedListB_Helper_5F6A9"
+  },
+  "chosen": null
+ },
+ "sub_2FC76": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F401": "LinkedList_Helper_5F401"
+  },
+  "chosen": "sub_5F401",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FCCD": {
+  "segment": "seg102",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2FCD5": {
+  "segment": "seg102",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5F460": "DisplayContext_CommitFrame_5F460"
+  },
+  "chosen": "sub_5F460",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2FD1E": {
+  "segment": "seg102",
+  "kind": "approchée",
+  "instructions": 13,
+  "candidates": {
+   "sub_5F4A9": "DisplayContext_CommitFrameWithTag_5F4A9"
+  },
+  "chosen": "sub_5F4A9",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_2FD55": {
+  "segment": "seg103",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_5F4E0": "PagedResourceC_RefreshAllInstances_5F4E0"
+  },
+  "chosen": "sub_5F4E0",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_2FD7D": {
+  "segment": "seg103",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5F508": "PagedResourceC_RefreshAndFinalize_5F508"
+  },
+  "chosen": "sub_5F508",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2FDF4": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5F57F": "LinkedListB_InsertAtTail_5F57F"
+  },
+  "chosen": "sub_5F57F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FE19": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_5F5A4": "LinkedListB_FindAndDispatch_5F5A4"
+  },
+  "chosen": "sub_5F5A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2FE79": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 47,
+  "candidates": {
+   "sub_5F604": "LinkedListB_FindByKey_5F604"
+  },
+  "chosen": "sub_5F604",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FED": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2DF4": "CRT_MemFamily_Extra5"
+  },
+  "chosen": "sub_2DF4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FEE0": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F397": "LinkedList_RemoveAllAndDestroy_5F397",
+   "sub_5F66B": "LinkedListB_Helper_5F66B"
+  },
+  "chosen": null
+ },
+ "sub_2FF1E": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F3D5": "LinkedList_Helper_5F3D5",
+   "sub_5F6A9": "LinkedListB_Helper_5F6A9"
+  },
+  "chosen": null
+ },
+ "sub_2FF4A": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_5F6D5": "LinkedListB_Helper_5F6D5"
+  },
+  "chosen": "sub_5F6D5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2FF75": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 58,
+  "candidates": {
+   "sub_5F700": "Runtime_FatalErrorHandler_5F700"
+  },
+  "chosen": "sub_5F700",
+  "calls_confirmed": 9,
+  "operand_diffs": 3
+ },
+ "sub_3016": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2E1D": "CRT_MemFamily_Extra6"
+  },
+  "chosen": "sub_2E1D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3035": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_2E3C": "CRT_MemFamily_Extra7"
+  },
+  "chosen": "sub_2E3C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_303E4": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FB6E": "AIL_find_proc_5FB6E"
+  },
+  "chosen": "sub_5FB6E",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3041C": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_5FBA6": "AIL_call_driver_5FBA6"
+  },
+  "chosen": "sub_5FBA6",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_30503": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_5FC8D": "AIL_init_DDA_arrays_5FC8D"
+  },
+  "chosen": "sub_5FC8D",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_30540": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_5FCCA": "AIL_hook_timer_process_5FCCA"
+  },
+  "chosen": "sub_5FCCA",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_30586": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_5FD10": "AIL_unhook_timer_process_5FD10"
+  },
+  "chosen": "sub_5FD10",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_305B0": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FD3A": "AIL_set_PIT_divisor_5FD3A"
+  },
+  "chosen": "sub_5FD3A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_305D3": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FD5D": "AIL_set_PIT_period_5FD5D"
+  },
+  "chosen": "sub_5FD5D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_305FD": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_5FD87": "AIL_ul_divide_5FD87"
+  },
+  "chosen": "sub_5FD87",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_30648": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 50,
+  "candidates": {
+   "sub_5FDD2": "AIL_program_timers_5FDD2"
+  },
+  "chosen": "sub_5FDD2",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_306D": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_2E74": "CRT_MemFamily_Extra8"
+  },
+  "chosen": "sub_2E74",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_306D7": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_5FE61": "AIL_startup_5FE61"
+  },
+  "chosen": "sub_5FE61",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_30715": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_5FE9F": "AIL_shutdown_5FE9F"
+  },
+  "chosen": "sub_5FE9F",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_3077E": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_5FF08": "AIL_register_timer_5FF08"
+  },
+  "chosen": "sub_5FF08",
+  "calls_confirmed": 3,
+  "operand_diffs": 8
+ },
+ "sub_30833": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_5FFBD": "AIL_release_timer_handle_5FFBD"
+  },
+  "chosen": "sub_5FFBD",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_30876": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_60000": "AIL_release_all_timers_60000"
+  },
+  "chosen": "sub_60000",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3088E": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60018": "AIL_start_timer_60018",
+   "sub_60052": "AIL_stop_timer_60052"
+  },
+  "chosen": null
+ },
+ "sub_308C8": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60018": "AIL_start_timer_60018",
+   "sub_60052": "AIL_stop_timer_60052"
+  },
+  "chosen": null
+ },
+ "sub_30902": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_6008C": "AIL_set_timer_period_6008C"
+  },
+  "chosen": "sub_6008C",
+  "calls_confirmed": 1,
+  "operand_diffs": 7
+ },
+ "sub_30951": {
+  "segment": "seg106",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_600DB": "AIL_set_timer_frequency_600DB"
+  },
+  "chosen": "sub_600DB",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_309D0": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 65,
+  "candidates": {
+   "sub_6015A": "AIL_register_driver_6015A"
+  },
+  "chosen": "sub_6015A",
+  "calls_confirmed": 2,
+  "operand_diffs": 5
+ },
+ "sub_30A76": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_60200": "AIL_release_driver_handle_60200"
+  },
+  "chosen": "sub_60200",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_30A9E": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_60228": "AIL_describe_driver_60228"
+  },
+  "chosen": "sub_60228",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_30ACA": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 79,
+  "candidates": {
+   "sub_60254": "AIL_init_driver_60254"
+  },
+  "chosen": "sub_60254",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_30B79": {
+  "segment": "seg106",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60303": "AIL_shutdown_driver_60303"
+  },
+  "chosen": "sub_60303",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_3111E": {
+  "segment": "seg108",
+  "kind": "stricte",
+  "instructions": 45,
+  "candidates": {
+   "sub_60456": "GlyphObject_ComputeMetrics_60456"
+  },
+  "chosen": "sub_60456",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31191": {
+  "segment": "seg108",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_604C9": "GlyphObject_AllocateBuffer_604C9"
+  },
+  "chosen": "sub_604C9",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_311CF": {
+  "segment": "seg108",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_60507": "GlyphObject_ConstructWithBuffer_60507"
+  },
+  "chosen": "sub_60507",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_31296": {
+  "segment": "seg108",
+  "kind": "approchée",
+  "instructions": 59,
+  "candidates": {
+   "sub_605CE": "GlyphObject_ResolveAndCache_605CE"
+  },
+  "chosen": "sub_605CE",
+  "calls_confirmed": 4,
+  "operand_diffs": 2
+ },
+ "sub_31312": {
+  "segment": "seg108",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_6064A": "GlyphObject_MeasureChar_6064A"
+  },
+  "chosen": "sub_6064A",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_313D6": {
+  "segment": "seg108",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_6070E": "GlyphObject_ScalarDeletingDtorA_6070E"
+  },
+  "chosen": "sub_6070E",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_3144B": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_607E1": "Widget_ApplyStyleAndAllocate_607E1"
+  },
+  "chosen": "sub_607E1",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_314A9": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_6083F": "Widget_Method_Dispatch8_6083F"
+  },
+  "chosen": "sub_6083F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_314CB": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_60861": "Widget_Method_DispatchC_60861"
+  },
+  "chosen": "sub_60861",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3159D": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 69,
+  "candidates": {
+   "sub_60933": "Widget_RenderWithAttributes_60933"
+  },
+  "chosen": "sub_60933",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_316EE": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 50,
+  "candidates": {
+   "sub_60A84": "Widget_Method_DispatchChain_60A84"
+  },
+  "chosen": "sub_60A84",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31755": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_60AEB": "Widget_ComputeBoundsExtent_60AEB"
+  },
+  "chosen": "sub_60AEB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31787": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 74,
+  "candidates": {
+   "sub_60B1D": "Widget_UpdateLayoutAndBounds_60B1D"
+  },
+  "chosen": "sub_60B1D",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_31810": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 189,
+  "candidates": {
+   "sub_60BA6": "Widget_RenderComplexLayout_60BA6"
+  },
+  "chosen": "sub_60BA6",
+  "calls_confirmed": 11,
+  "operand_diffs": 0
+ },
+ "sub_31A3B": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_60DD1": "Widget_RenderComplexLayoutWrapper_60DD1"
+  },
+  "chosen": "sub_60DD1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_31A60": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_31A68": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 45,
+  "candidates": {
+   "sub_60DFE": "GlyphObject_RenderToWidget_60DFE"
+  },
+  "chosen": "sub_60DFE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31ACA": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 88,
+  "candidates": {
+   "sub_60E60": "GlyphObject_LayoutAndRenderAll_60E60"
+  },
+  "chosen": "sub_60E60",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_31EEA": {
+  "segment": "seg112",
+  "kind": "stricte",
+  "instructions": 77,
+  "candidates": {
+   "sub_60F02": "Rect_ComputeIntersection_60F02"
+  },
+  "chosen": "sub_60F02",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31F7C": {
+  "segment": "seg113",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_60F94": "Rect_FillRegion_60F94"
+  },
+  "chosen": "sub_60F94",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_31FCA": {
+  "segment": "seg114",
+  "kind": "stricte",
+  "instructions": 70,
+  "candidates": {
+   "sub_60FE2": "Rect_BlitOverlapRegion_60FE2"
+  },
+  "chosen": "sub_60FE2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32056": {
+  "segment": "seg115",
+  "kind": "stricte",
+  "instructions": 294,
+  "candidates": {
+   "sub_6106E": "Render_DrawFilledEllipse_6106E"
+  },
+  "chosen": "sub_6106E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_32398": {
+  "segment": "seg116",
+  "kind": "stricte",
+  "instructions": 286,
+  "candidates": {
+   "sub_61612": "Render_DrawEllipseOutline_61612"
+  },
+  "chosen": "sub_61612",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_326E6": {
+  "segment": "seg117",
+  "kind": "stricte",
+  "instructions": 206,
+  "candidates": {
+   "sub_61960": "Render_FillClippedRect_61960"
+  },
+  "chosen": "sub_61960",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_328DE": {
+  "segment": "seg118",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_61B58": "Render_SetPixelClipped_61B58"
+  },
+  "chosen": "sub_61B58",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32914": {
+  "segment": "seg119",
+  "kind": "stricte",
+  "instructions": 122,
+  "candidates": {
+   "sub_61B8E": "Render_DrawHorizontalLineClipped_61B8E"
+  },
+  "chosen": "sub_61B8E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32A58": {
+  "segment": "seg120",
+  "kind": "stricte",
+  "instructions": 309,
+  "candidates": {
+   "sub_61CD2": "Render_DrawTextString_61CD2"
+  },
+  "chosen": "sub_61CD2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32CD8": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 302,
+  "candidates": {
+   "sub_61F52": "Render_MeasureOrDrawTextString_61F52"
+  },
+  "chosen": "sub_61F52",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32F28": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 427,
+  "candidates": {
+   "sub_621A2": "Render_DrawScaledSprite_621A2"
+  },
+  "chosen": "sub_621A2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33352": {
+  "segment": "seg123",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_625CC": "Struct_GetElementCountMinusOne_625CC"
+  },
+  "chosen": "sub_625CC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33368": {
+  "segment": "seg124",
+  "kind": "stricte",
+  "instructions": 140,
+  "candidates": {
+   "sub_625E2": "Render_DrawOrMeasureTextVariant_625E2"
+  },
+  "chosen": "sub_625E2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_334A0": {
+  "segment": "seg125",
+  "kind": "stricte",
+  "instructions": 107,
+  "candidates": {
+   "sub_6271A": "Render_BlitClippedRegion_6271A"
+  },
+  "chosen": "sub_6271A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33586": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 403,
+  "candidates": {
+   "sub_62800": "Render_DrawRotatedScaledSprite_62800"
+  },
+  "chosen": "sub_62800",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33984": {
+  "segment": "seg127",
+  "kind": "stricte",
+  "instructions": 140,
+  "candidates": {
+   "sub_62BFE": "Render_DrawOrMeasureTextVariantB_62BFE"
+  },
+  "chosen": "sub_62BFE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33ABC": {
+  "segment": "seg128",
+  "kind": "stricte",
+  "instructions": 104,
+  "candidates": {
+   "sub_62D36": "Render_BlitClippedRegionVariant_62D36"
+  },
+  "chosen": "sub_62D36",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_36B": "CRT_ExitSequence"
+  },
+  "chosen": "sub_36B",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_33E78": {
+  "segment": "seg130",
+  "kind": "stricte",
+  "instructions": 207,
+  "candidates": {
+   "sub_62EC8": "Render_ClipAndDrawLineVariant_62EC8"
+  },
+  "chosen": "sub_62EC8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_392": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_3C2": "CRT_Exit"
+  },
+  "chosen": "sub_3C2",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3A1": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3D1": "CRT_Abort"
+  },
+  "chosen": "sub_3D1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3A92A": {
+  "segment": "seg138",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_630BA": "File_CreateWithRetry_630BA"
+  },
+  "chosen": "sub_630BA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3A957": {
+  "segment": "seg139",
+  "kind": "stricte",
+  "instructions": 108,
+  "candidates": {
+   "sub_630E7": "File_ReadOrDelegateToPaged_630E7"
+  },
+  "chosen": "sub_630E7",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3AA53": {
+  "segment": "seg139",
+  "kind": "stricte",
+  "instructions": 80,
+  "candidates": {
+   "sub_631E3": "File_WriteOrDelegateToPaged_631E3"
+  },
+  "chosen": "sub_631E3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3AB04": {
+  "segment": "seg139",
+  "kind": "stricte",
+  "instructions": 80,
+  "candidates": {
+   "sub_63294": "File_ReadViaPagedMemory_63294"
+  },
+  "chosen": "sub_63294",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3ABD2": {
+  "segment": "seg139",
+  "kind": "stricte",
+  "instructions": 81,
+  "candidates": {
+   "sub_63362": "File_SeekAndWriteViaPagedMemory_63362"
+  },
+  "chosen": "sub_63362",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3ACA4": {
+  "segment": "seg140",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_63434": "File_OpenWithRetry_63434"
+  },
+  "chosen": "sub_63434",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3ACD3": {
+  "segment": "seg140",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_63463": "File_CloseWithRetry_63463"
+  },
+  "chosen": "sub_63463",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3ACF2": {
+  "segment": "seg141",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_63482": "File_SeekWithRetry_63482"
+  },
+  "chosen": "sub_63482",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3AD81": {
+  "segment": "seg142",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_63511": "Handle_ReadWordField_63511"
+  },
+  "chosen": "sub_63511",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3ADA4": {
+  "segment": "seg142",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_63534": "Handle_ReadByteField_63534"
+  },
+  "chosen": "sub_63534",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3ADF0": {
+  "segment": "seg142",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_63580": "Handle_ReadAndOffsetField_63580"
+  },
+  "chosen": "sub_63580",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3AE1E": {
+  "segment": "seg143",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_635AE": "FileStream_Construct_635AE"
+  },
+  "chosen": "sub_635AE",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3AEFE": {
+  "segment": "seg143",
+  "kind": "approchée",
+  "instructions": 71,
+  "candidates": {
+   "sub_6368E": "FileStream_Open_6368E"
+  },
+  "chosen": "sub_6368E",
+  "calls_confirmed": 4,
+  "operand_diffs": 4
+ },
+ "sub_3AFB7": {
+  "segment": "seg143",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_63747": "FileStream_ReadRaw_63747"
+  },
+  "chosen": "sub_63747",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3AFFF": {
+  "segment": "seg143",
+  "kind": "stricte",
+  "instructions": 46,
+  "candidates": {
+   "sub_6378F": "FileStream_ReadBuffered_6378F"
+  },
+  "chosen": "sub_6378F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3B16F": {
+  "segment": "seg144",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_638FF": "StreamReader_Destruct_638FF"
+  },
+  "chosen": "sub_638FF",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_3B1D2": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_63962": "StreamReader_Helper_63962"
+  },
+  "chosen": "sub_63962",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B212": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_639A2": "StreamReader_Helper_639A2"
+  },
+  "chosen": "sub_639A2",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B23D": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_639CD": "StreamReader_Helper_639CD"
+  },
+  "chosen": "sub_639CD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3B261": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_639F1": "StreamReader_ValidateAndDispatch_639F1"
+  },
+  "chosen": "sub_639F1",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B282": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_63A12": "StreamReader_Helper_63A12"
+  },
+  "chosen": "sub_63A12",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B2A9": {
+  "segment": "seg144",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_63A39": "StreamReader_ConstructVariantA_63A39"
+  },
+  "chosen": "sub_63A39",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_3B2F8": {
+  "segment": "seg144",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_63A88": "StreamReader_ConstructVariantB_63A88"
+  },
+  "chosen": "sub_63A88",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_3B343": {
+  "segment": "seg144",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_63AD3": "StreamReader_ConstructVariantC_63AD3"
+  },
+  "chosen": "sub_63AD3",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_3B393": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 58,
+  "candidates": {
+   "sub_63B23": "StreamReader_ConstructAndBind_63B23"
+  },
+  "chosen": "sub_63B23",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B407": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_63B97": "StreamReader_CloseUnderlying_63B97"
+  },
+  "chosen": "sub_63B97",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B445": {
+  "segment": "seg144",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_63BD5": "StreamReader_Close_63BD5"
+  },
+  "chosen": "sub_63BD5",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_3B4A0": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_63C30": "StreamReader_DispatchRead_63C30"
+  },
+  "chosen": "sub_63C30",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3B4D1": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 75,
+  "candidates": {
+   "sub_63C61": "StreamReader_ReadBlock_63C61"
+  },
+  "chosen": "sub_63C61",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B57E": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_63D0E": "StreamReader_ReadDispatch_63D0E"
+  },
+  "chosen": "sub_63D0E",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B59D": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_63D2D": "StreamReader_ReadDispatchB_63D2D"
+  },
+  "chosen": "sub_63D2D",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B5DE": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_63D6E": "StreamReader_CloseHook_63D6E"
+  },
+  "chosen": "sub_63D6E",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3B625": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_63DB5": "StreamReader_ValidateState_63DB5"
+  },
+  "chosen": "sub_63DB5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B64B": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_63DDB": "StreamReader_CheckBufferValid_63DDB"
+  },
+  "chosen": "sub_63DDB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B666": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 53,
+  "candidates": {
+   "sub_63DF6": "StreamReader_SeekVariant_63DF6"
+  },
+  "chosen": "sub_63DF6",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B755": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 45,
+  "candidates": {
+   "sub_63EE5": "StreamReader_RefillBuffer_63EE5"
+  },
+  "chosen": "sub_63EE5",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B7B6": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_63F46": "StreamReader_PrepareForRead_63F46"
+  },
+  "chosen": "sub_63F46",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3B811": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 69,
+  "candidates": {
+   "sub_63FA1": "StreamReader_ReadTyped_63FA1"
+  },
+  "chosen": "sub_63FA1",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_3B8B6": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_3B8BE": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_6404E": "StreamReader_ReportError_6404E"
+  },
+  "chosen": "sub_6404E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3B8D2": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64062": "StreamReader_GetCapacity_64062"
+  },
+  "chosen": "sub_64062",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B8F8": {
+  "segment": "seg144",
+  "kind": "stricte",
+  "instructions": 8,
+  "candidates": {
+   "sub_64088": "StreamReader_ComputeHeaderOffset_64088"
+  },
+  "chosen": "sub_64088",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3B920": {
+  "segment": "seg145",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_640B0": "StreamReader_RegistryAdd_640B0"
+  },
+  "chosen": "sub_640B0",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3B944": {
+  "segment": "seg145",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_640D4": "StreamReader_RegistryRemove_640D4"
+  },
+  "chosen": "sub_640D4",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_3B97E": {
+  "segment": "seg145",
+  "kind": "approchée",
+  "instructions": 48,
+  "candidates": {
+   "sub_6410E": "StreamReader_ParseFormattedValue_6410E"
+  },
+  "chosen": "sub_6410E",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3B9E5": {
+  "segment": "seg145",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_64175": "StreamReader_DispatchWrite_64175"
+  },
+  "chosen": "sub_64175",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_3BA22": {
+  "segment": "seg145",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_641B2": "StreamReader_ParseFormattedValueB_641B2"
+  },
+  "chosen": "sub_641B2",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3BA5B": {
+  "segment": "seg145",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_641EB": "StreamReader_PrepareParse_641EB"
+  },
+  "chosen": "sub_641EB",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3BA87": {
+  "segment": "seg145",
+  "kind": "stricte",
+  "instructions": 99,
+  "candidates": {
+   "sub_64217": "StreamReader_ParseFormattedString_64217"
+  },
+  "chosen": "sub_64217",
+  "calls_confirmed": 6,
+  "operand_diffs": 0
+ },
+ "sub_3BB6F": {
+  "segment": "seg145",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_642FF": "StreamReader_CloseAndUnregister_642FF"
+  },
+  "chosen": "sub_642FF",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3BB91": {
+  "segment": "seg145",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_64321": "StreamReader_OpenAndRegister_64321"
+  },
+  "chosen": "sub_64321",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3BBC3": {
+  "segment": "seg146",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_64353": "FileStream_Method_Read_64353"
+  },
+  "chosen": "sub_64353",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3BC83": {
+  "segment": "seg146",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_64413": "FileStream_Method_Open_64413"
+  },
+  "chosen": "sub_64413",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3BE15": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_645A5": "ResourceRecord_Helper_645A5"
+  },
+  "chosen": "sub_645A5",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3BE3D": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_645CD": "ResourceRecord_InitAndValidate_645CD"
+  },
+  "chosen": "sub_645CD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3BF08": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_64698": "ResourceRecord_ReadHeaderFields_64698"
+  },
+  "chosen": "sub_64698",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3BF4B": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_646DB": "ResourceRecord_ComputeRecordBounds_646DB"
+  },
+  "chosen": "sub_646DB",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3BF7F": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_6470F": "ResourceRecord_ComputeRecordBoundsB_6470F"
+  },
+  "chosen": "sub_6470F",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3BFB3": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_64743": "ResourceRecord_SeekAndRead_64743"
+  },
+  "chosen": "sub_64743",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3C022": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_647B2": "ResourceRecord_SeekAndReadB_647B2"
+  },
+  "chosen": "sub_647B2",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3C09B": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 59,
+  "candidates": {
+   "sub_6482B": "ResourceRecord_SeekAndReadC_6482B"
+  },
+  "chosen": "sub_6482B",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3C10E": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_6489E": "ResourceRecord_Helper_6489E"
+  },
+  "chosen": "sub_6489E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C153": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_648E3": "ResourceRecord_ReadStructured_648E3"
+  },
+  "chosen": "sub_648E3",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3C231": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_649C1": "ResourceRecord_AdvanceByArrayCount_649C1"
+  },
+  "chosen": "sub_649C1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C289": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_64A19": "ResourceRecord_ReadFieldGroupA_64A19"
+  },
+  "chosen": "sub_64A19",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C2C4": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_64A54": "ResourceRecord_ReadFieldGroupB_64A54"
+  },
+  "chosen": "sub_64A54",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C2EE": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_64A7E": "ResourceRecord_ReadFieldGroupC_64A7E"
+  },
+  "chosen": "sub_64A7E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C349": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_64AD9": "ResourceRecord_ReadViaHelper_64AD9"
+  },
+  "chosen": "sub_64AD9",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C36F": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_64AFF": "ResourceRecord_ReadDwordFieldB_64AFF"
+  },
+  "chosen": "sub_64AFF",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C3C1": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_64B51": "ResourceRecord_ReadFinalField_64B51"
+  },
+  "chosen": "sub_64B51",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C40B": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_64B9B": "ResourceRecord_ReadDwordAdvance_64B9B"
+  },
+  "chosen": "sub_64B9B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C431": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_64BC1": "ResourceRecord_ComputeAlignedBounds_64BC1"
+  },
+  "chosen": "sub_64BC1",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3C468": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_64BF8": "ResourceRecord_SeekToStart_64BF8"
+  },
+  "chosen": "sub_64BF8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C491": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_3C513": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_3C595": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_64D25": "ResourceRecord_ReleaseAndClear_64D25"
+  },
+  "chosen": "sub_64D25",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3C5C8": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": "sub_64D58",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C623": {
+  "segment": "seg147",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_64DB3": "ResourceRecord_ReadPayload_64DB3"
+  },
+  "chosen": "sub_64DB3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C68D": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_64E1D": "ResourceRecord_WriteField_64E1D"
+  },
+  "chosen": "sub_64E1D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C6C0": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_64E50": "ResourceRecord_WriteFieldGroupA_64E50"
+  },
+  "chosen": "sub_64E50",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3C730": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 55,
+  "candidates": {
+   "sub_64EC0": "ResourceRecord_WriteFieldGroupB_64EC0"
+  },
+  "chosen": "sub_64EC0",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3C7C6": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_3C848": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_23AE5": "EntityTracker_ClearShortcut",
+   "sub_64FD8": "ResourceRecord_WriteFieldWrapper_64FD8",
+   "sub_AB583": "SoundFX_StopAllEntry_AB583"
+  },
+  "chosen": "sub_64FD8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C857": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_64FE7": "ResourceRecord_SeekAndRelease_64FE7"
+  },
+  "chosen": "sub_64FE7",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3C88E": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_6501E": "ResourceRecord_WriteFieldGroupC_6501E"
+  },
+  "chosen": "sub_6501E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C8E3": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_65073": "ResourceRecord_WriteFieldGroupD_65073"
+  },
+  "chosen": "sub_65073",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3C93E": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 51,
+  "candidates": {
+   "sub_650CE": "ResourceRecord_ReadAndWriteBridge_650CE"
+  },
+  "chosen": "sub_650CE",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3C9C8": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 48,
+  "candidates": {
+   "sub_65158": "ResourceRecord_ReadAndWriteBridgeB_65158"
+  },
+  "chosen": "sub_65158",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3CA4F": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_651DF": "ResourceRecord_BridgeWrapperA_651DF"
+  },
+  "chosen": "sub_651DF",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3CAA2": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_65232": "ResourceRecord_BridgeWrapperB_65232"
+  },
+  "chosen": "sub_65232",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3CAE1": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 45,
+  "candidates": {
+   "sub_65271": "ResourceRecord_FindByTag_65271"
+  },
+  "chosen": "sub_65271",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3CB45": {
+  "segment": "seg148",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_652D5": "ResourceRecord_CopyOrTransform_652D5"
+  },
+  "chosen": "sub_652D5",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3CD": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3FD": "CRT_Fmemcpy"
+  },
+  "chosen": "sub_3FD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3CEB3": {
+  "segment": "seg149",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_65643": "StreamReader_ReleaseBuffer_65643"
+  },
+  "chosen": "sub_65643",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3CEFF": {
+  "segment": "seg149",
+  "kind": "stricte",
+  "instructions": 97,
+  "candidates": {
+   "sub_6568F": "StreamReader_WriteTyped_6568F"
+  },
+  "chosen": "sub_6568F",
+  "calls_confirmed": 6,
+  "operand_diffs": 0
+ },
+ "sub_3D005": {
+  "segment": "seg149",
+  "kind": "stricte",
+  "instructions": 196,
+  "candidates": {
+   "sub_65795": "StreamReader_WriteWithGrowth_65795"
+  },
+  "chosen": "sub_65795",
+  "calls_confirmed": 10,
+  "operand_diffs": 0
+ },
+ "sub_3D231": {
+  "segment": "seg149",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_3CBB7": "WorldObject_IsAlive_3CBB7",
+   "sub_659C1": "StreamReader_DestructWrapper_659C1",
+   "sub_8349F": "HUDSymbol_Helper4_8349F",
+   "sub_85DB3": "UI_PositionListLabelsWrapper_85DB3"
+  },
+  "chosen": "sub_659C1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3D240": {
+  "segment": "seg150",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_659D0": "IndexedRecordReader_Destruct_659D0"
+  },
+  "chosen": "sub_659D0",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3D28A": {
+  "segment": "seg150",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_65A1A": "IndexedRecordReader_ConstructVariantA_65A1A"
+  },
+  "chosen": "sub_65A1A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3D2BA": {
+  "segment": "seg150",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_65A4A": "IndexedRecordReader_ConstructVariantB_65A4A"
+  },
+  "chosen": "sub_65A4A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3D2FA": {
+  "segment": "seg150",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_65A8A": "IndexedRecordReader_ConstructVariantC_65A8A"
+  },
+  "chosen": "sub_65A8A",
+  "calls_confirmed": 3,
+  "operand_diffs": 4
+ },
+ "sub_3D373": {
+  "segment": "seg150",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_65B03": "IndexedRecordReader_InitFields_65B03"
+  },
+  "chosen": "sub_65B03",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3D3E3": {
+  "segment": "seg150",
+  "kind": "approchée",
+  "instructions": 91,
+  "candidates": {
+   "sub_65B73": "IndexedRecordReader_ReadIndexTable_65B73"
+  },
+  "chosen": "sub_65B73",
+  "calls_confirmed": 6,
+  "operand_diffs": 5
+ },
+ "sub_3D4DD": {
+  "segment": "seg150",
+  "kind": "stricte",
+  "instructions": 66,
+  "candidates": {
+   "sub_65C6D": "IndexedRecordReader_SeekToIndex_65C6D"
+  },
+  "chosen": "sub_65C6D",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_3D619": {
+  "segment": "seg150",
+  "kind": "stricte",
+  "instructions": 49,
+  "candidates": {
+   "sub_65DA9": "IndexedRecordReader_ReadEntry_65DA9"
+  },
+  "chosen": "sub_65DA9",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3D69C": {
+  "segment": "seg150",
+  "kind": "stricte",
+  "instructions": 70,
+  "candidates": {
+   "sub_65E2C": "IndexedRecordReader_AdvanceIndex_65E2C"
+  },
+  "chosen": "sub_65E2C",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_3D83E": {
+  "segment": "seg151",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_65FCE": "LZW_ReadCode_65FCE"
+  },
+  "chosen": "sub_65FCE",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3D8D8": {
+  "segment": "seg151",
+  "kind": "approchée",
+  "instructions": 107,
+  "candidates": {
+   "sub_66068": "LZW_Decompress_66068"
+  },
+  "chosen": "sub_66068",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3DA1F": {
+  "segment": "seg152",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_661AF": "TextRenderer_LoadResourceFile_661AF"
+  },
+  "chosen": "sub_661AF",
+  "calls_confirmed": 8,
+  "operand_diffs": 2
+ },
+ "sub_3DBBC": {
+  "segment": "seg153",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_6634C": "Joystick_ReadAxesRaw_6634C"
+  },
+  "chosen": "sub_6634C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3DBFB": {
+  "segment": "seg153",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_6638B": "Joystick_ReadAxesAndButtons_6638B"
+  },
+  "chosen": "sub_6638B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3DC2D": {
+  "segment": "seg153",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_663BD": "Joystick_ReadButtonsOnly_663BD"
+  },
+  "chosen": "sub_663BD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3DC46": {
+  "segment": "seg154",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_663D6": "JoystickCallback_Construct_663D6"
+  },
+  "chosen": "sub_663D6",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_3DC90": {
+  "segment": "seg154",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_33118": "TerrainTile_DestructSimple",
+   "sub_66420": "JoystickCallback_Destruct_66420",
+   "sub_87E8B": "TextScroll_ReleaseFree_87E8B",
+   "sub_A4AED": "PlayerComponent_ReleaseVariant_A4AED"
+  },
+  "chosen": null
+ },
+ "sub_3DCB1": {
+  "segment": "seg154",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66441": "JoystickCallback_SetValueAndEcho_66441"
+  },
+  "chosen": "sub_66441",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3DCD1": {
+  "segment": "seg154",
+  "kind": "stricte",
+  "instructions": 49,
+  "candidates": {
+   "sub_66461": "JoystickCallback_UpdateAndNotifyChain_66461"
+  },
+  "chosen": "sub_66461",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_3DD45": {
+  "segment": "seg154",
+  "kind": "stricte",
+  "instructions": 41,
+  "candidates": {
+   "sub_664D5": "JoystickCallback_RegisterInChain_664D5"
+  },
+  "chosen": "sub_664D5",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_3DDE3": {
+  "segment": "seg154",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_66573": "JoystickCallback_FindOrTraverse_66573"
+  },
+  "chosen": "sub_66573",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3DE6A": {
+  "segment": "seg154",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_665FA": "JoystickManager_Construct_665FA"
+  },
+  "chosen": "sub_665FA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3DF86": {
+  "segment": "seg155",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_66762": "ConfigOption_ConstructFull_66762"
+  },
+  "chosen": "sub_66762",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3E0C6": {
+  "segment": "seg155",
+  "kind": "stricte",
+  "instructions": 41,
+  "candidates": {
+   "sub_668A2": "ConfigOption_FormatValue_668A2"
+  },
+  "chosen": "sub_668A2",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E123": {
+  "segment": "seg155",
+  "kind": "stricte",
+  "instructions": 31,
+  "candidates": {
+   "sub_668FF": "ConfigOption_FormatValueB_668FF"
+  },
+  "chosen": "sub_668FF",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E1B3": {
+  "segment": "seg155",
+  "kind": "approchée",
+  "instructions": 78,
+  "candidates": {
+   "sub_6698F": "ConfigOption_ApplyAndDisplayB_6698F"
+  },
+  "chosen": "sub_6698F",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_3E273": {
+  "segment": "seg155",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_66A4F": "ConfigOption_Dispatch_66A4F"
+  },
+  "chosen": "sub_66A4F",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3E3DE": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_66BBA": "Keyboard_RegisterOrInitHandlerTable_66BBA"
+  },
+  "chosen": "sub_66BBA",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_3E442": {
+  "segment": "seg156",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": "sub_66C1E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3E458": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_66C34": "Keyboard_InitSystem_66C34"
+  },
+  "chosen": "sub_66C34",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E486": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_66C62": "Keyboard_UnregisterHandlerTable_66C62"
+  },
+  "chosen": "sub_66C62",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E4C1": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_66C9D": "Keyboard_PushEventToQueue_66C9D"
+  },
+  "chosen": "sub_66C9D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3E519": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_66CF5": "Keyboard_PeekOrPopEvent_66CF5"
+  },
+  "chosen": "sub_66CF5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3E55D": {
+  "segment": "seg156",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_66D39": "Keyboard_QueryHandlerTable_66D39"
+  },
+  "chosen": "sub_66D39",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3E591": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_66D6D": "Keyboard_Method_ReturnTypeTag_66D6D"
+  },
+  "chosen": "sub_66D6D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E5C7": {
+  "segment": "seg156",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_66DA3": "Keyboard_QueryAndDispatch_66DA3"
+  },
+  "chosen": "sub_66DA3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E5DE": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_66DBA": "InputBinding_Construct_66DBA",
+   "sub_67267": "TextScrollDisplay_Construct_67267"
+  },
+  "chosen": "sub_66DBA",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3E601": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_66DDD": "InputBinding_Destruct_66DDD",
+   "sub_6728A": "TextScrollDisplay_Destruct_6728A"
+  },
+  "chosen": "sub_66DDD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E626": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 91,
+  "candidates": {
+   "sub_66E02": "InputBinding_InitAndRegister_66E02"
+  },
+  "chosen": "sub_66E02",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3E6F9": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": "sub_66ED5",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3E70B": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7"
+  },
+  "chosen": "sub_66EE7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3E718": {
+  "segment": "seg157",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_5A9BA": "Music_Pause_5A9BA",
+   "sub_5A9D0": "Music_Resume_5A9D0",
+   "sub_66EF4": "Keyboard_ReportErrorIfActive_66EF4"
+  },
+  "chosen": null
+ },
+ "sub_3E72D": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_66F09": "Keyboard_AllocateHandlerMask_66F09"
+  },
+  "chosen": "sub_66F09",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E758": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_3E774": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 8,
+  "candidates": {
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": "sub_66F50",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E785": {
+  "segment": "seg157",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_66F61": "Keyboard_ConfigureHandlerMask_66F61"
+  },
+  "chosen": "sub_66F61",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E7E8": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_66FC4": "TextScroll_Construct_66FC4"
+  },
+  "chosen": "sub_66FC4",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3E86C": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_67048": "TextScroll_ComputeParams_67048"
+  },
+  "chosen": "sub_67048",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E8A0": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_6707C": "TextScroll_Helper_6707C"
+  },
+  "chosen": "sub_6707C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3E8C9": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_670A5": "TextScroll_HelperB_670A5"
+  },
+  "chosen": "sub_670A5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3E93C": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_67118": "TextScroll_ApplyHelperA_67118"
+  },
+  "chosen": "sub_67118",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3E958": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_67134": "TextScroll_ApplyHelperB_67134"
+  },
+  "chosen": "sub_67134",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3E9EE": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_671CA": "TextScroll_RegisterHandler_671CA"
+  },
+  "chosen": "sub_671CA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3EA08": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_671E4": "TextScroll_ApplyHelperC_671E4"
+  },
+  "chosen": "sub_671E4",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3EA28": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_67204": "TextScroll_FormatAndApply_67204"
+  },
+  "chosen": "sub_67204",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3EA46": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_67222": "TextScroll_ApplyHelperD_67222"
+  },
+  "chosen": "sub_67222",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3EA8B": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_66DBA": "InputBinding_Construct_66DBA",
+   "sub_67267": "TextScrollDisplay_Construct_67267"
+  },
+  "chosen": "sub_67267",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3EAAE": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_66DDD": "InputBinding_Destruct_66DDD",
+   "sub_6728A": "TextScrollDisplay_Destruct_6728A"
+  },
+  "chosen": "sub_6728A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3EAD3": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_672AF": "TextScrollDisplay_ComputeLayout_672AF"
+  },
+  "chosen": "sub_672AF",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_3EB63": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_6733F": "TextScrollDisplay_InitState_6733F"
+  },
+  "chosen": "sub_6733F",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3EBA8": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_67384": "TextScrollDisplay_Cleanup_67384"
+  },
+  "chosen": "sub_67384",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3EBDD": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_673B9": "TextScrollDisplay_RegisterEntries_673B9"
+  },
+  "chosen": "sub_673B9",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3ECA5": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_67481": "Input_GetCalibratedXValue_67481",
+   "sub_67499": "Input_GetCalibratedYValue_67499"
+  },
+  "chosen": null
+ },
+ "sub_3ECBD": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_67481": "Input_GetCalibratedXValue_67481",
+   "sub_67499": "Input_GetCalibratedYValue_67499"
+  },
+  "chosen": null
+ },
+ "sub_3ED19": {
+  "segment": "seg159",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_674F5": "TextScroll_AllocateState_674F5",
+   "sub_675EF": "Stopwatch_Construct_675EF"
+  },
+  "chosen": null
+ },
+ "sub_3ED3B": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_67517": "HandlerRegistry4Slot_Register_67517"
+  },
+  "chosen": "sub_67517",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_3ED7F": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_6755B": "ResourceHandle_IsValid_6755B"
+  },
+  "chosen": "sub_6755B",
+  "calls_confirmed": 0,
+  "operand_diffs": 6
+ },
+ "sub_3EDD8": {
+  "segment": "seg160",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_675B4": "TextScrollDisplayB_Construct_675B4"
+  },
+  "chosen": "sub_675B4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3EE13": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_674F5": "TextScroll_AllocateState_674F5",
+   "sub_675EF": "Stopwatch_Construct_675EF"
+  },
+  "chosen": null
+ },
+ "sub_3EE35": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_67611": "Stopwatch_RegisterTickModule_67611"
+  },
+  "chosen": "sub_67611",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3EE86": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_67662": "Stopwatch_RegisterTickModuleVariant_67662"
+  },
+  "chosen": "sub_67662",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3EEC3": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_6769F": "Stopwatch_UnregisterTickModule_6769F"
+  },
+  "chosen": "sub_6769F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3EF15": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_676F1": "Stopwatch_StartOrStop_676F1"
+  },
+  "chosen": "sub_676F1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F023": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_677FF": "Stopwatch_Reset_677FF"
+  },
+  "chosen": "sub_677FF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3F059": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 71,
+  "candidates": {
+   "sub_67835": "Joystick_ReadAndScaleAxes_67835"
+  },
+  "chosen": "sub_67835",
+  "calls_confirmed": 4,
+  "operand_diffs": 8
+ },
+ "sub_3F10E": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_3F12A": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_67906": "Joystick_ReadButtonsWrapper_67906"
+  },
+  "chosen": "sub_67906",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F134": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_67910": "Joystick_SampleAxesToTable_67910"
+  },
+  "chosen": "sub_67910",
+  "calls_confirmed": 1,
+  "operand_diffs": 5
+ },
+ "sub_3F171": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_6794D": "Joystick_ApplyDeadzoneAndScale_6794D",
+   "sub_679E2": "Joystick_ApplyDeadzoneAndScaleB_679E2"
+  },
+  "chosen": null
+ },
+ "sub_3F206": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_6794D": "Joystick_ApplyDeadzoneAndScale_6794D",
+   "sub_679E2": "Joystick_ApplyDeadzoneAndScaleB_679E2"
+  },
+  "chosen": null
+ },
+ "sub_3F29B": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_67A77": "Joystick_ComputeCalibratedAxes_67A77"
+  },
+  "chosen": "sub_67A77",
+  "calls_confirmed": 0,
+  "operand_diffs": 4
+ },
+ "sub_3F331": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_67B0D": "Joystick_UpdateCalibration_67B0D"
+  },
+  "chosen": "sub_67B0D",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_3F35E": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_67B3A": "Joystick_FormatCalibrationDisplay_67B3A"
+  },
+  "chosen": "sub_67B3A",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3F390": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_67B6C": "Joystick_TestButtonMasked_67B6C"
+  },
+  "chosen": "sub_67B6C",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3F3A6": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_47095": "FlightControl_InvalidateMomentCache",
+   "sub_67B82": "Joystick_GetButtonRawByte_67B82"
+  },
+  "chosen": null
+ },
+ "sub_3F3B6": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_67B92": "Joystick_InitCalibrationDefaults_67B92"
+  },
+  "chosen": "sub_67B92",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3F3ED": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_67BC9": "Joystick_GetAxisMin_67BC9",
+   "sub_67BD8": "Joystick_GetAxisMax_67BD8"
+  },
+  "chosen": null
+ },
+ "sub_3F3FC": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_67BC9": "Joystick_GetAxisMin_67BC9",
+   "sub_67BD8": "Joystick_GetAxisMax_67BD8"
+  },
+  "chosen": null
+ },
+ "sub_3F427": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_67C03": "Joystick_LoadCalibrationSample_67C03",
+   "sub_67C21": "Joystick_LoadCalibrationExtremes_67C21"
+  },
+  "chosen": null
+ },
+ "sub_3F445": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_67C03": "Joystick_LoadCalibrationSample_67C03",
+   "sub_67C21": "Joystick_LoadCalibrationExtremes_67C21"
+  },
+  "chosen": null
+ },
+ "sub_3F463": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_67C3F": "Joystick_ComputeCalibrationRatio_67C3F"
+  },
+  "chosen": "sub_67C3F",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_3F4DC": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 81,
+  "candidates": {
+   "sub_67CB8": "Joystick_InterpolateCalibrationPercent_67CB8"
+  },
+  "chosen": "sub_67CB8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3F5C8": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_67DA4": "OptionCounter_Construct_67DA4"
+  },
+  "chosen": "sub_67DA4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F5EA": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_3F60E": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_67DEA": "OptionCounter_Set_67DEA"
+  },
+  "chosen": "sub_67DEA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3F619": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_67DF5": "TextScrollDisplayB_ConstructAndReset_67DF5"
+  },
+  "chosen": "sub_67DF5",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3F658": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_67E34": "TextScrollDisplayB_InitAndRegister_67E34"
+  },
+  "chosen": "sub_67E34",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_3F6C0": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_67E9C": "TextScrollDisplayB_ApplyHelperA_67E9C"
+  },
+  "chosen": "sub_67E9C",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3F704": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_67EE0": "TextScrollDisplayB_ApplyHelperB_67EE0"
+  },
+  "chosen": "sub_67EE0",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3F737": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_52D08": "Expr_LookupNamedValue_52D08",
+   "sub_67F13": "TextScrollDisplayB_TickHelper_67F13",
+   "sub_A7C8E": "MissionLoader_LoadChunkA_A7C8E"
+  },
+  "chosen": "sub_67F13",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3F74A": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_67F26": "TextScrollDisplayB_ApplyHelperC_67F26"
+  },
+  "chosen": "sub_67F26",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3F784": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_67F60": "TextScrollDisplayB_ApplyHelperD_67F60"
+  },
+  "chosen": "sub_67F60",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F7AE": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 47,
+  "candidates": {
+   "sub_67F8A": "TextScrollDisplayB_UpdateObjectState_67F8A"
+  },
+  "chosen": "sub_67F8A",
+  "calls_confirmed": 4,
+  "operand_diffs": 2
+ },
+ "sub_3F81C": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_67FF8": "TextScrollDisplayB_UpdateObjectStateB_67FF8"
+  },
+  "chosen": "sub_67FF8",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_3F863": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_6803F": "TextScrollDisplayB_StopAnimation_6803F"
+  },
+  "chosen": "sub_6803F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F89D": {
+  "segment": "seg163",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_68079": "TextScrollDisplayB_StartAnimation_68079"
+  },
+  "chosen": "sub_68079",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3F8CC": {
+  "segment": "seg163",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_3FA5E": {
+  "segment": "seg165",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_6823A": "Keyboard_DrainBufferBIOS_6823A"
+  },
+  "chosen": "sub_6823A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3FA78": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 123,
+  "candidates": {
+   "sub_68254": "VROOMM_OpenAndParseOverlayFile_68254"
+  },
+  "chosen": "sub_68254",
+  "calls_confirmed": 8,
+  "operand_diffs": 3
+ },
+ "sub_3FBA8": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_68384": "VROOMM_InstallIntHandler_68384"
+  },
+  "chosen": "sub_68384",
+  "calls_confirmed": 0,
+  "operand_diffs": 7
+ },
+ "sub_3FC1D": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_683F9": "VROOMM_SearchPathAndOpen_683F9"
+  },
+  "chosen": "sub_683F9",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3FC29": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_68405": "VROOMM_SearchPathEnvAndOpen_68405"
+  },
+  "chosen": "sub_68405",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3FC6E": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 50,
+  "candidates": {
+   "sub_6844A": "VROOMM_MatchPathPrefix_6844A"
+  },
+  "chosen": "sub_6844A",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_3FCCB": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_684A7": "VROOMM_TryOpenFile_684A7"
+  },
+  "chosen": "sub_684A7",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3FCF3": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_684CF": "VROOMM_ReadFileExact_684CF"
+  },
+  "chosen": "sub_684CF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3FD03": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_684DF": "VROOMM_ScanFreeMemoryBlocks_684DF"
+  },
+  "chosen": "sub_684DF",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_3FD83": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 69,
+  "candidates": {
+   "sub_6855F": "VROOMM_ScanMemoryArena_6855F"
+  },
+  "chosen": "sub_6855F",
+  "calls_confirmed": 3,
+  "operand_diffs": 13
+ },
+ "sub_3FE50": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_6862C": "VROOMM_ReadRawSegment_6862C"
+  },
+  "chosen": "sub_6862C",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_3FE89": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_68665": "VROOMM_ApplyRelocationsToBlock_68665"
+  },
+  "chosen": "sub_68665",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3FECE": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 39,
+  "candidates": {
+   "sub_686AA": "VROOMM_PatchFarJumpOpcode_686AA"
+  },
+  "chosen": "sub_686AA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3FFC2": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_6879E": "VROOMM_LoadOnDemandCore_6879E"
+  },
+  "chosen": "sub_6879E",
+  "calls_confirmed": 7,
+  "operand_diffs": 3
+ },
+ "sub_4000C": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_687E8": "VROOMM_DemandLoadDispatch_687E8"
+  },
+  "chosen": "sub_687E8",
+  "calls_confirmed": 6,
+  "operand_diffs": 2
+ },
+ "sub_40087": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 6,
+  "candidates": {
+   "sub_68863": "VROOMM_FinalizeLoadedSegment_68863"
+  },
+  "chosen": "sub_68863",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_4009F": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_6887B": "VROOMM_EvictOldestBlock_6887B"
+  },
+  "chosen": "sub_6887B",
+  "calls_confirmed": 2,
+  "operand_diffs": 8
+ },
+ "sub_400DA": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_688B6": "VROOMM_MaybePatchCallSite_688B6"
+  },
+  "chosen": "sub_688B6",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_400FB": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_688D7": "VROOMM_PatchFarCallStub_688D7"
+  },
+  "chosen": "sub_688D7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_40119": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_688F5": "VROOMM_PatchIntCallStub_688F5"
+  },
+  "chosen": "sub_688F5",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4014C": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_68928": "VROOMM_CopyAndRelocateBlock_68928"
+  },
+  "chosen": "sub_68928",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_4019D": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 12,
+  "candidates": {
+   "sub_68979": "VROOMM_UpdateFreeListOffset_68979"
+  },
+  "chosen": "sub_68979",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_401BB": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_68997": "VROOMM_LookupOrRegisterOffset_68997"
+  },
+  "chosen": "sub_68997",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_401C7": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_689A3": "VROOMM_FindOffsetInTable_689A3"
+  },
+  "chosen": "sub_689A3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_401ED": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_689C9": "VROOMM_ComputeAvailableOffset_689C9"
+  },
+  "chosen": "sub_689C9",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_40209": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_689E5": "VROOMM_ComputeParagraphCount_689E5"
+  },
+  "chosen": "sub_689E5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_40215": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_689F1": "VROOMM_ComputeSegmentSpan_689F1"
+  },
+  "chosen": "sub_689F1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_40F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_419": "CRT_GetVect"
+  },
+  "chosen": "sub_419",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_41E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_428": "CRT_SetVect"
+  },
+  "chosen": "sub_428",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_43E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 81,
+  "candidates": {
+   "sub_448": "CRT_LDiv32"
+  },
+  "chosen": "sub_448",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4B56": {
+  "segment": "seg004",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_4DD": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_4E7": "CRT_ClampMathIndex"
+  },
+  "chosen": "sub_4E7",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_528": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_532": "CRT_IsAtty"
+  },
+  "chosen": "sub_532",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_539": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_543": "CRT_NormalizeSign32"
+  },
+  "chosen": "sub_543",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_561": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 71,
+  "candidates": {
+   "sub_56B": "CRT_Ltoa"
+  },
+  "chosen": "sub_56B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_56B6": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_5CE4B": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_5CE57": {
+  "segment": "ovr191",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_5CEC2": {
+  "segment": "ovr191",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_5CECA": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_5CEDA": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_5CEEA": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_5CEFA": {
+  "segment": "ovr191",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_5EEB0": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_4463D": "Collision_InstallExceptionHandler",
+   "sub_AA810": "AudioQueue_RegisterTickModule_AA810"
+  },
+  "chosen": "sub_AA810",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_5FB": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_605": "CRT_Lseek"
+  },
+  "chosen": "sub_605",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_5FC6C": {
+  "segment": "ovr195",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_AB4BE": "AudioQueue_Helper_AB4BE"
+  },
+  "chosen": "sub_AB4BE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_64E": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_658": "CRT_Malloc16_Retry"
+  },
+  "chosen": "sub_658",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_68A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_694": "CRT_Malloc32_Retry"
+  },
+  "chosen": "sub_694",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_69DF": {
+  "segment": "seg008",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_6DB": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_6E5": "CRT_MulExtended32"
+  },
+  "chosen": "sub_6E5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6F2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_469EC": "FlightControl_InvalidateRollPitchCache",
+   "sub_470B4": "FlightControl_InvalidateCacheB"
+  },
+  "chosen": null
+ },
+ "sub_703": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_70D": "CRT_Rand"
+  },
+  "chosen": "sub_70D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_729": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_733": "CRT_Unlink"
+  },
+  "chosen": "sub_733",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_73F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_D8E": "CRT_SetjmpSave"
+  },
+  "chosen": "sub_D8E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_783A": {
+  "segment": "seg010",
+  "kind": "stricte",
+  "instructions": 42,
+  "candidates": {
+   "sub_59F1D": "Music_ChannelStopSequence_59F1D"
+  },
+  "chosen": "sub_59F1D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_8A7": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_E4B": "CRT_CtypeLookup"
+  },
+  "chosen": "sub_E4B",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_8D3": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 187,
+  "candidates": {
+   "sub_E77": "CRT_Doprnt_Core"
+  },
+  "chosen": "sub_E77",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_AC5": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 252,
+  "candidates": {
+   "sub_2EC9": "CRT_Doscan_Core"
+  },
+  "chosen": "sub_2EC9",
+  "calls_confirmed": 5,
+  "operand_diffs": 0
+ },
+ "sub_BF0B0": {
+  "segment": "ovr213",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_BF0B8": {
+  "segment": "ovr213",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_BF0C0": {
+  "segment": "ovr213",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_BFD41": {
+  "segment": "ovr214",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_2387E": "EntityTracker_AddEntryObj"
+  },
+  "chosen": "sub_2387E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_BFD69": {
+  "segment": "ovr214",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_238A4": "EntityTracker_AddEntryText"
+  },
+  "chosen": "sub_238A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_C04DE": {
+  "segment": "ovr214",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_C0F30": {
+  "segment": "ovr216",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_97540": "MissionText_ApplyDualStyle_97540"
+  },
+  "chosen": "sub_97540",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_C14F9": {
+  "segment": "ovr216",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_97CB7": "MissionText_Helper4_97CB7"
+  },
+  "chosen": "sub_97CB7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_C1512": {
+  "segment": "ovr216",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_97CD0": "MissionText_Helper5_97CD0"
+  },
+  "chosen": "sub_97CD0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_C17B0": {
+  "segment": "ovr216",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_C18C7": {
+  "segment": "ovr217",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_C2578": {
+  "segment": "ovr218",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_9B62B": "Debris_ContainerOpWrapper_9B62B"
+  },
+  "chosen": "sub_9B62B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_C271D": {
+  "segment": "ovr219",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_C2725": {
+  "segment": "ovr219",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_C3080": {
+  "segment": "ovr223",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_A7060": "TextCycler_ReleaseEntry_A7060"
+  },
+  "chosen": "sub_A7060",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_C321D": {
+  "segment": "ovr223",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_A71E5": "TextCycler_ReleaseBuffer_A71E5"
+  },
+  "chosen": "sub_A71E5",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_C39E3": {
+  "segment": "ovr224",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_52D08": "Expr_LookupNamedValue_52D08",
+   "sub_67F13": "TextScrollDisplayB_TickHelper_67F13",
+   "sub_A7C8E": "MissionLoader_LoadChunkA_A7C8E"
+  },
+  "chosen": null
+ },
+ "sub_C3AB8": {
+  "segment": "ovr224",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_A7FD0": "MissionLoader_Helper_A7FD0"
+  },
+  "chosen": null
+ },
+ "sub_C407A": {
+  "segment": "ovr226",
+  "kind": "approchée",
+  "instructions": 65,
+  "candidates": {
+   "sub_58AFA": "Render_DitheredLineSpanVariant_58AFA"
+  },
+  "chosen": "sub_58AFA",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_C6FB0": {
+  "segment": "ovr241",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_144E5": "UI_DrawRect"
+  },
+  "chosen": "sub_144E5",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_C754D": {
+  "segment": "ovr242",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_7FC55": "GlyphObject_MeasureWrapperB_7FC55"
+  },
+  "chosen": "sub_7FC55",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_C758E": {
+  "segment": "ovr242",
+  "kind": "stricte",
+  "instructions": 57,
+  "candidates": {
+   "sub_7FC92": "GlyphObject_ResolveAndMeasureB_7FC92"
+  },
+  "chosen": "sub_7FC92",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_C7D3": {
+  "segment": "seg017",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2AFE0": "String_ConstructFromPtrLen"
+  },
+  "chosen": "sub_2AFE0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_C7F50": {
+  "segment": "ovr244",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_AB860": "AudioQueue_Helper2_AB860"
+  },
+  "chosen": "sub_AB860",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_C8230": {
+  "segment": "ovr245",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_A4570": "InfoWidget_CopyFieldA_A4570",
+   "sub_A459A": "InfoWidget_Helper_A459A"
+  },
+  "chosen": null
+ },
+ "sub_C8242": {
+  "segment": "ovr245",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_A4582": "InfoWidget_CopyFieldB_A4582"
+  },
+  "chosen": "sub_A4582",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_C825A": {
+  "segment": "ovr245",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_A4570": "InfoWidget_CopyFieldA_A4570",
+   "sub_A459A": "InfoWidget_Helper_A459A"
+  },
+  "chosen": null
+ },
+ "sub_C85CB": {
+  "segment": "ovr245",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A4843": "InfoWidget_Method_DispatchField2A_A4843"
+  },
+  "chosen": "sub_A4843",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_D57": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 156,
+  "candidates": {
+   "sub_1069": "CRT_Doprnt_Dispatch"
+  },
+  "chosen": "sub_1069",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_E0B7": {
+  "segment": "seg021",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A3AB5": "GaugeWidget_AllocateRenderBufferWrapper_A3AB5"
+  },
+  "chosen": "sub_A3AB5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_E256": {
+  "segment": "seg021",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_A3C2C": "GaugeWidget_QueryAndFormat_A3C2C"
+  },
+  "chosen": "sub_A3C2C",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_E8FD": {
+  "segment": "seg021",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A31A8": "GaugeWidget_InsertListNodeAtHead_A31A8",
+   "sub_A31C9": "GaugeWidget_InsertListNodeAtTail_A31C9",
+   "sub_A41FA": "GaugeWidget_ReleaseExtraAndNode_A41FA"
+  },
+  "chosen": null
+ },
+ "sub_F19": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_122B": "CRT_EmitHexDigit"
+  },
+  "chosen": "sub_122B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F21": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_1233": "CRT_Sprintf_Full"
+  },
+  "chosen": "sub_1233",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F3B": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 8,
+  "candidates": {
+   "sub_124D": "CRT_Strlen_ScasB"
+  },
+  "chosen": "sub_124D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F51": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_1263": "CRT_FlushSprintfBuf"
+  },
+  "chosen": "sub_1263",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F898": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A127B": "Widget_SetFlagBit0_A127B"
+  },
+  "chosen": "sub_A127B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F8A6": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A1289": "Widget_ClearFlagBit0_A1289"
+  },
+  "chosen": "sub_A1289",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F8B4": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_A1297": "Widget_TranslateBounds_A1297"
+  },
+  "chosen": "sub_A1297",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_F9A4": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 65,
+  "candidates": {
+   "sub_A1375": "PaletteScreen_DrawCurveShape_A1375"
+  },
+  "chosen": "sub_A1375",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_FB0A": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_A14C2": "Palette_ReadAllDACRegisters_A14C2"
+  },
+  "chosen": "sub_A14C2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_FB27": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_A14DF": "Palette_WriteAllDACRegisters_A14DF"
+  },
+  "chosen": "sub_A14DF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_FF96": {
+  "segment": "seg023",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_A1ADF": "Widget_SetFlagBit4AndOffsets_A1ADF"
+  },
+  "chosen": "sub_A1ADF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ }
+}

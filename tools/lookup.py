@@ -22,22 +22,27 @@ lignes, taille, résumé, et la liste des appels sortants (avec leur nom
 attribué si connu) — pratique pour comprendre le contexte d'une fonction
 avant de la lire en détail avec dump_func.py.
 
-Toutes les données viennent de analysis/function_index.json (généré par
-build_function_index.py). Si strike.asm a été modifié depuis, relancer
+Ajouter `--exe optest` pour interroger OPTEST.EXE au lieu de STRIKE.EXE :
+       python3 tools/lookup.py --exe optest --segment ovr191
+
+Toutes les données viennent du function_index.json de l'exécutable (généré
+par build_function_index.py). Si le .asm a été modifié depuis, relancer
 build_function_index.py pour rafraîchir l'index.
 """
 import json
 import os
 import sys
 
+from exe_paths import paths, pop_exe_arg
+
+EXE, ARGS = pop_exe_arg(sys.argv[1:])
+
 
 def find_index():
-    for candidate in ('analysis/function_index.json',
-                       '../analysis/function_index.json',
-                       os.path.join(os.path.dirname(__file__), '..', 'analysis', 'function_index.json')):
-        if os.path.exists(candidate):
-            return candidate
-    print("function_index.json introuvable (attendu dans analysis/).")
+    candidate = paths(EXE)['function_index']
+    if os.path.exists(candidate):
+        return candidate
+    print(f"{candidate} introuvable : lancer build_function_index.py --exe {EXE}.")
     sys.exit(1)
 
 
@@ -69,12 +74,13 @@ def print_entry(addr, info, idx):
         print(f"Appels ({len(calls)}) : {', '.join(calls[:15])}"
               + (' ...' if len(calls) > 15 else ''))
     print(f"\nPour lire le code :")
-    print(f"  python3 tools/dump_func.py {info['start_line']} {info['end_line']}")
+    exe_opt = '' if EXE == 'strike' else f'--exe {EXE} '
+    print(f"  python3 tools/dump_func.py {exe_opt}{info['start_line']} {info['end_line']}")
 
 
 def main():
     idx = load_index()
-    args = sys.argv[1:]
+    args = ARGS
 
     if not args:
         print(__doc__)

@@ -14,17 +14,20 @@ Elle propose les modes « jeu », « entre-deux », « tout éclairé », « SCR
 GL_LIGHTING », les réglages de textures et le brouillard. La planche `data/F-16DES_modes.png`
 compare les rendus « jeu », « entre-deux » et « SCRenderer ».
 
-**Choix retenu pour l'implémentation (2026-10-16) : le mode intermédiaire (« entre-deux »)**,
-c'est-à-dire `COLOUR_HYBRID` de la §6 :
-- les règles d'éclairage du jeu : faces 1, 5, 6 non éclairées ; 4 et 7 par face (normale de face) ;
-  3 et 8 par sommet (normales de sommet) ; lumière directionnelle du `LGHT` ; normale inversée pour
-  une face double vue de dos ;
+**Choix retenu pour l'implémentation (2026-10-16, révisé le même jour par Rémi) : le mode « tout
+éclairé »**, c'est-à-dire `COLOUR_ALL_LIT` de la §6 (mode `all` de la visionneuse) :
+- **toutes les faces éclairées par sommet**, quel que soit leur type : intensité de la normale de
+  sommet ; pour une face double vue de dos, normale de face inversée ; lumière directionnelle du
+  `LGHT` ;
 - la teinte **continue en RVB le long de la gamme RANG** (`shadeAlongRamp`), au lieu de l'index entier ;
-- les textures des types 7 et 8 par-dessus la couleur, en **`GL_MODULATE`** : texel × intensité de la
-  face (type 7) ou du sommet (type 8), donnée par `glColor4f(i, i, i, 1)` ; type 6 non éclairé
-  (`glColor4f(1, 1, 1, 1)`).
+- les textures (types 6, 7, 8) en **`GL_MODULATE`** : texel × intensité du sommet, donnée par
+  `glColor4f(i, i, i, 1)`, **type 6 compris** ; textures coupées : le type 6 prend la couleur de son
+  1er texel, assombrie le long de la gamme comme une face ;
+- type 2 (translucide) : inchangé, passe transparente.
 
-Les modes `COLOUR_GAME` et `COLOUR_ALL_LIT` restent dans le code pour comparer.
+Ce mode n'est pas celui du jeu (qui n'éclaire pas les faces 1, 5, 6 et éclaire 4, 7 par face) : c'est
+un choix de rendu. Les modes `COLOUR_GAME` et `COLOUR_HYBRID` (mode intermédiaire, choisi d'abord)
+restent dans le code pour comparer.
 
 Correspondance des champs avec libRealSpace :
 
@@ -342,8 +345,8 @@ bool faceSeenFromFront(const Vector3D &v0, const Vector3D &v1, const Vector3D &v
 
 `faceVertexColour` regroupe les §2 à §5. Trois modes :
 - `COLOUR_GAME` : les index du jeu, exacts ;
-- `COLOUR_HYBRID` : les règles du jeu, teinte continue (mode « entre-deux » de la visionneuse) — **mode retenu** ;
-- `COLOUR_ALL_LIT` : toutes les faces éclairées par sommet, teinte continue (mode « tout éclairé »).
+- `COLOUR_HYBRID` : les règles du jeu, teinte continue (mode « entre-deux » de la visionneuse) ;
+- `COLOUR_ALL_LIT` : toutes les faces éclairées par sommet, teinte continue (mode « tout éclairé ») — **mode retenu**.
 
 ```cpp
 enum ObjectColourMode {
@@ -416,7 +419,7 @@ shadingCtx.ramps = this->ramps; // lu une fois depuis PALETTE.IFF
 shadingCtx.light = this->objectLight; // makeObjectLight(...) depuis WRLD/LGHT
 shadingCtx.lightLocal = worldDirToObject(MV, V, shadingCtx.light.dirWorld);
 shadingCtx.eyeLocal = eyeInObject(MV);
-shadingCtx.mode = COLOUR_HYBRID; // mode retenu
+shadingCtx.mode = COLOUR_ALL_LIT; // mode retenu
 ```
 
 Dans `drawModelColorPass`, la boucle des 3 sommets devient :
@@ -439,9 +442,10 @@ texel.
 
 Dans la passe texture :
 - **Combinaison retenue : `GL_MODULATE`** (choix du 2026-10-16), comme aujourd'hui dans
-  `drawModelTexturePass`. Par sommet, `glColor4f(i, i, i, 1)` avec l'intensité de la face (type 7),
-  du sommet (type 8) ou 1 (type 6, non éclairé) — au lieu du lambert actuel appliqué à toutes les
-  faces texturées.
+  `drawModelTexturePass`. Par sommet, `glColor4f(i, i, i, 1)` avec, en mode retenu `COLOUR_ALL_LIT`,
+  **l'intensité du sommet pour les types 6, 7 et 8** (normale de face inversée pour une face double
+  vue de dos) — au lieu du lambert actuel. En `COLOUR_HYBRID` : face (type 7), sommet (type 8),
+  1 (type 6, non éclairé).
 - Variante écartée, gardée pour mémoire : **`GL_INTERPOLATE` vers une teinte d'ombre**. On appelle
   `setupTextureInterpolate()`, puis par sommet
   `glColor4f(ombre.x, ombre.y, ombre.z, intensité)`, avec `ombre = textureShadowColour(...)` (1re

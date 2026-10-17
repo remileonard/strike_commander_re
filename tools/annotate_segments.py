@@ -15,20 +15,26 @@ analysis/annotated_segments/, qui couvre les 461 segments avec les noms
 et résumés à jour.
 
 Usage (depuis la racine de l'archive) :
-    python3 tools/annotate_segments.py
+    python3 tools/annotate_segments.py               # STRIKE.EXE
+    python3 tools/annotate_segments.py --exe optest  # OPTEST.EXE
 
-Sortie : un fichier par segment dans analysis/annotated_segments/,
-nommé <segment>_annotated.asm (ex. ovr239_annotated.asm).
+Sortie : un fichier par segment dans le dossier annotated_segments/ de
+l'exécutable (analysis/ ou analysis/optest/, voir exe_paths.py), nommé
+<segment>_annotated.asm (ex. ovr239_annotated.asm).
 """
 import re
 import json
 import os
+import sys
 import textwrap
 
-ROOT = os.path.join(os.path.dirname(__file__), '..')
-STRIKE_ASM = os.path.join(ROOT, 'source', 'strike.asm')
-KNOWN_FUNCTIONS = os.path.join(ROOT, 'analysis', 'known_functions.json')
-OUT_DIR = os.path.join(ROOT, 'analysis', 'annotated_segments')
+from exe_paths import paths, pop_exe_arg
+
+EXE, _ = pop_exe_arg(sys.argv[1:])
+PATHS = paths(EXE)
+STRIKE_ASM = PATHS['asm']
+KNOWN_FUNCTIONS = PATHS['known_functions']
+OUT_DIR = PATHS['annotated_segments']
 
 LABEL_RE = re.compile(r'^(\S+):\s*(?:;\s*(.*))?$')
 PROC_RE = re.compile(r'^(\S+)\s+proc\s+(near|far)')
@@ -119,7 +125,11 @@ def extract_functions(lines, lo, hi, seg_name, force_labels=None):
 # résultat de extract_functions() — si known_functions.json grossit et
 # que build_function_index.py ou ce script signale de nouveaux manques
 # non préfixés par "unnamed_", ajouter les adresses concernées ici.
-FORCE_INCLUDE_LABELS = {
+FORCE_INCLUDE_LABELS_OPTEST = {
+    'loc_9EF8', 'loc_9F2C', 'loc_A548', 'loc_AA17',
+    'loc_B563', 'loc_B6DE', 'loc_B711',
+}
+FORCE_INCLUDE_LABELS = FORCE_INCLUDE_LABELS_OPTEST if EXE == 'optest' else {
     'loc_66AA4', 'loc_5C3C9', 'loc_66D91', 'loc_5C1C9',
     'loc_5C27E', 'loc_6672D', 'loc_65B66', 'loc_5CDD0',
     'loc_1642C',

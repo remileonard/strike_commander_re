@@ -36,6 +36,8 @@ tes résultats sont directement lisibles par Rémi.
   basculer par commodité.
 - Si un segment annoté manque ou semble incomplet : régénérer avec
   `tools/annotate_segments.py`, ne pas contourner.
+- Même règle pour OPTEST.EXE : lire `analysis/optest/annotated_segments/`, pas
+  `source/optest.asm` (outils avec `--exe optest`, voir « OPTEST.EXE » plus bas).
 
 *(Rappel d'incident : une session a mené toute une investigation dans
 `strike.asm` et rendu des résultats en `sub_XXXXX`, obligeant Rémi à
@@ -111,8 +113,9 @@ Conséquences directes :
 
 **Faits établis (ne pas remettre en question sans preuve nouvelle) :**
 - **`STRIKE.EXE` ne contient que la SIMULATION** : aucun écran de briefing ni menu de mission dans
-  ce binaire. Briefings et menus vivent dans un binaire **séparé, `OPTEST.EXE`, jamais exploré**
-  ici (fait donné par Rémi). Une fonction de `STRIKE.EXE` qui ressemble à de l'UI de menu ou de
+  ce binaire. Briefings et menus vivent dans un binaire **séparé, `OPTEST.EXE`** (fait donné par
+  Rémi), désassemblé depuis le 2026-10-17 dans `source/optest.asm` (voir « OPTEST.EXE » plus bas).
+  Une fonction de `STRIKE.EXE` qui ressemble à de l'UI de menu ou de
   briefing est à réinterpréter comme une séquence jouée dans le simulateur (vue d'établissement,
   décollage, mise en formation…).
 - **Le son passe par la bibliothèque AIL 2.0 de Miles Design** : seg161 = `AIL.ASM` compilé
@@ -181,6 +184,46 @@ par ligne. C'est précisément le travail que ce genre de session ciblée
 doit accomplir. Voir `analysis/PRIORITY_TARGETS.md` pour la liste triée
 par taille.
 
+## OPTEST.EXE (hors-vol)
+
+Second exécutable du jeu, ajouté le 2026-10-17 : `source/optest.asm` (358 861 lignes,
+CP437 comme `strike.asm`) et `source/optest.map` (noms IDA seulement, aucun vrai symbole).
+Nom interne `OPTTEST.EXE`, lancé par `SC.EXE`. Même compilateur (Borland C++ 1991) et même
+gestionnaire d'overlays VROOMM que `STRIKE.EXE` : 171 segments `seg`, 63 `ovr`, 63 `stub`,
+1 882 fonctions `proc`.
+
+Contenu repéré par les chaînes et les chunks IFF (fonctions pas encore lues) :
+campagne (`gameflow.iff` : `WNGS`, `WING`, `PILT`, `ORDR`), conversations (`convdata.iff`,
+`faces.iff`), cinématiques `midgames` (les 11 plus grosses fonctions, une par cinématique,
+ovr196 à ovr208), comptabilité (`CASH`), briefings, sauvegarde, options et configuration,
+visionneuse d'objets 3D (`objview.pak`), générique et score final.
+
+- **`optest.asm` vient d'un exécutable modifié par Rémi** (octets édités à la main) : les noms de
+  visage de mid1 (dseg 7900 et 7988) y valent « pri », **« air » à l'origine** (valeur utilisée par
+  `MID_1.IFF` de libRealSpace). Toujours documenter la valeur d'origine ; une valeur lue dans
+  `optest.asm` qui contredit les données du jeu peut venir d'une telle modification.
+- **Les adresses `sub_XXXXX` sont propres à chaque exécutable** : `sub_5AA4E` d'OPTEST n'a rien à
+  voir avec une adresse voisine de STRIKE. Toujours dire de quel exécutable on parle.
+- Analyse dans **`analysis/optest/`** : `known_functions.json`, `function_index.json`,
+  `segment_boundaries.json`, `annotated_segments/`, `strike_matches.json`.
+- Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
+  chemins dans `tools/exe_paths.py`.
+- **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
+  code est identique (412) ou de même suite d'instructions avec des adresses de données
+  différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
+  « Reprise de STRIKE.EXE » : il décrit la fonction de STRIKE ; appelants et contexte sont à
+  revérifier dans OPTEST. Les candidats non tranchés (plusieurs fonctions identiques, ex. familles
+  de destructeurs) et les rejets relus à la main sont dans `strike_matches.json`.
+- **Couverture : 635 fonctions `proc` sur 1 882** (566 reprises + 69 lues), plus 20 labels de
+  tables de méthodes ; `build_function_index.py --exe optest` signale les autres. Les labels de
+  méthodes sans référence externe sur leur propre ligne sont listés dans
+  `FORCE_INCLUDE_LABELS_OPTEST` (`annotate_segments.py`).
+- **Lu (2026-10-17) : moteur des cinématiques** (scène, calques, cadence à 60 Hz, palettes et
+  fondus, touches, canaux son), les 12 types de calques (dont la tête parlante synchronisée sur
+  les lèvres, `TalkingHead_*`) et la cinématique mid1 (`Midgame1_PlayPart1_5FCF0`,
+  `Midgame1_PlayPart2_671C0`). Une entrée écrite à la main n'est jamais
+  écrasée par `match_functions.py` (seules les entrées « Reprise de » sont régénérées).
+
 ## Structure de l'archive
 
 ```
@@ -188,8 +231,13 @@ strike_commander_re/
 ├── CLAUDE.md                        ce fichier
 ├── source/
 │   ├── strike.asm                   désassemblage IDA complet (371 062 lignes)
-│   └── strike.map                   fichier map du linker
+│   ├── strike.map                   fichier map du linker
+│   ├── optest.asm                   désassemblage IDA d'OPTEST.EXE (358 861 lignes)
+│   └── optest.map                   fichier map d'OPTEST.EXE
 ├── analysis/
+│   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
+│   │                                  (known_functions, index, annotated_segments)
+│   │                                  + strike_matches.json — voir « OPTEST.EXE »
 │   ├── known_functions.json         ⭐ la base de connaissance : 3683 entrées
 │   │                                  {adresse: {new_name, segment, summary}}
 │   ├── function_index.json          ⭐ index enrichi et interrogeable :
@@ -226,6 +274,9 @@ strike_commander_re/
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
+│   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
+│   │                                  avec SCAnimationArchive de libRealSpace
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
@@ -246,6 +297,10 @@ strike_commander_re/
 │                                      raisonnement exact d'une décision de
 │                                      nommage passée, sinon secondaire
 └── tools/
+    ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
+    │                                  prennent --exe optest (défaut strike)
+    ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
+    │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné
     ├── dump_func.py                 affiche une plage de lignes de strike.asm
     ├── lookup.py                    ⭐ consultation rapide : cherche une
@@ -304,6 +359,12 @@ python3 tools/dump_func.py 161842 163718
 # (utile si le segment est trop récent pour être dans l'index, ou pour
 # une vérification croisée)
 python3 tools/extract_segment.py ovr239
+
+# Même chose pour OPTEST.EXE : ajouter --exe optest
+less analysis/optest/annotated_segments/ovr191_annotated.asm
+python3 tools/lookup.py --exe optest --segment ovr191
+python3 tools/build_function_index.py --exe optest
+python3 tools/annotate_segments.py --exe optest
 ```
 
 `lookup.py` résout aussi les adresses appelées par une fonction vers leur

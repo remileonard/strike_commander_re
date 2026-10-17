@@ -15,9 +15,12 @@ seg436		segment	para public 'OVERLAY' use16
 ; entiers, << 8) ; uint16 → +0x42 dispersion des obus (aléa Math_RandomScale_54DF4(+0x42)) ;
 ; int32 24.8 → +0x44 cadence (s entre deux tirs : instance +0x57 −= dt) ; uint8 → +0x48 lance-
 ; missiles (≠ 0 : instancie l'arme +0x49, cible à plus de 305 m au-dessus du sol, plafond de
-; missiles par camp) / canon (0 : Effect_SpawnPeriodicAtAttach) ; string[8] → objet arme
-; chargé (+0x49/+0x4B) ; int32 → +0x4D décalage du point de départ (m entiers ; missile :
-; altitude + 2 × valeur).
+; missiles par camp) / canon (0 : Effect_SpawnPeriodicAtAttach) ; entrée d'arme lue par
+; WeaponSys_LoadWeaponEntry_9DF63 (via VROOMM_StubThunk_6C394 →
+; PlayerComponent_ReleaseAndReload_9DFC5), même format qu'une arme de WPNS : uint16 quantité
+; puis string[8] nom → objet arme chargé (+0x49/+0x4B ; corrigé 2026-10-16 : les 2 octets de
+; quantité précèdent le nom) ; int32 → +0x4D décalage du point de départ (m entiers ; missile
+; : altitude + 2 × valeur).
 ; ==============================================================================================
 SwpnModel_LoadDataChunk_A0A00	proc far		; CODE XREF: VROOMM_StubThunk_6C5E0J
 
