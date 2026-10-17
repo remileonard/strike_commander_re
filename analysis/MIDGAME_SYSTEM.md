@@ -45,12 +45,12 @@ s'enchaînent). La fonction enchaîne des **scènes**. Pour chaque scène, elle 
 ```mermaid
 flowchart TD
     A[Menu principal sub_3D2E] --> B[Midgame1_PlayPart1_5FCF0]
-    B --> C[Ouvre les archives<br/>mid1.pak, midgames.pak, mid1voc.pak,<br/>optshps.pak, optpals.pak, police]
-    C --> D[Lit midgames.iff<br/>textes MG01, sous-titres SPOK, volumes VOLU]
-    D --> S1[Scène 1 : ouverture<br/>musique, fondu d'apparition]
+    B --> C["Ouvre mid1.pak, midgames.pak, mid1voc.pak, optshps.pak, optpals.pak, police"]
+    C --> D["Lit midgames.iff : MG01, SPOK, VOLU"]
+    D --> S1["Scène 1 : ouverture, musique, fondu"]
     S1 --> S2[Scène 2 : 4 titres]
     S2 --> S3[Scènes 3 à 8]
-    S3 --> P2[Midgame1_PlayPart2_671C0<br/>scènes 9 à 24]
+    S3 --> P2["Midgame1_PlayPart2_671C0 : scènes 9 à 24"]
     P2 --> F[Ouverture du cadre sur tout l'écran, fin]
     S1 -. Échap .-> X[Libère tout et sort]
     S2 -. Échap .-> X
@@ -121,13 +121,13 @@ avoir fait ses propres modifications.
 
 ```mermaid
 flowchart TD
-    A[Code de la cinématique :<br/>positions, numéros d'image, sons] --> B
+    A["Code de la cinématique : positions, images, sons"] --> B
     subgraph T[Scene_Tick_C652]
-      B[Échap déjà demandé ?<br/>scène marquée terminée] --> C[Mémorise l'heure de début de l'image]
-      C --> D[Dessine chaque calque<br/>dans l'ordre d'ajout]
+      B["Échap déjà demandé : scène terminée"] --> C[Mémorise l'heure de début de l'image]
+      C --> D["Dessine les calques dans l'ordre d'ajout"]
       D --> E[Copie l'image vers l'écran]
       E --> F[Avance : chaque calque, puis compteur d'images + 1]
-      F --> G[Lit le clavier<br/>Échap = arrêt de la cinématique]
+      F --> G["Lit le clavier, Échap arrête tout"]
       G --> H[Attend la fin de la durée de l'image]
     end
     H --> I{Condition de fin ?}
