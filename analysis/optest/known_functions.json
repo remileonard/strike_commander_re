@@ -2842,7 +2842,7 @@
   "sub_671C0": {
     "new_name": "Midgame1_PlayPart2_671C0",
     "segment": "ovr197",
-    "summary": "far, 6 751 lignes, LUE 2026-10-17 ligne à ligne. Seconde moitié de la cinématique mid1 (scènes 9 à 24 de analysis/MIDGAME_SYSTEM.md § 9), 16 scènes, appelée par Midgame1_PlayPart1_5FCF0 qui lui passe 38 arguments : surface, tableaux SPOK et MG01, palette principale, rectangle des sous-titres, police, calques et palettes communs (optshps 116 et 44, midgames 19 et 20, mid1 0, 1, 6, 11, 12, 26 ; palettes optpals 21 et 24, midgames 22, mid1 38, 39, 42, 44, 45, 59, « normal »), image hors écran, archives mid1, midgames et mid1voc, lecteur de voix, effets, canaux d'effets et de musique. Contenu : tête parlante « air » (« pri » dans optest.asm : octets modifiés par Rémi, « air » à l'origine) (scènes 9 et 17), composition avec poursuite (scène 10), animations seules ou enchaînées (11, 12, 13), défilement horizontal à deux vitesses (14), dialogues sur parent tremblant avec bouche par parité du compteur (15, 20, 22) et plans tremblants parlés (21, 23), finale en 4 phases avec arrêt de la musique (AIL_stop_sequence_30C48), sub_28D24 sur rmusic/amusic.pak et 23, attente de 120 tics et ouverture du cadre en 25 étapes (lignes 24 − s à 151 + 2 × s). Sortie anticipée si byte_495FC."
+    "summary": "far, 6 751 lignes, LUE 2026-10-17 ligne à ligne. Seconde moitié de la cinématique mid1 (scènes 9 à 25 de analysis/MIDGAME_SYSTEM.md § 9), 17 scènes, appelée par Midgame1_PlayPart1_5FCF0 qui lui passe 38 arguments : surface, tableaux SPOK et MG01, palette principale, rectangle des sous-titres, police, calques et palettes communs (optshps 116 et 44, midgames 19 et 20, mid1 0, 1, 6, 11, 12, 26 ; palettes optpals 21 et 24, midgames 22, mid1 38, 39, 42, 44, 45, 59, « normal »), image hors écran, archives mid1, midgames et mid1voc, lecteur de voix, effets, canaux d'effets et de musique. Contenu : tête parlante « air » (« pri » dans optest.asm : octets modifiés par Rémi, « air » à l'origine) (scènes 9 et 18), composition avec poursuite (scène 10), animations seules ou enchaînées (11, 12, 13), défilement horizontal à deux vitesses (14), animation 17 et ses animations enfants (15), dialogues sur parent tremblant avec bouche par parité du compteur (16, 21, 23) et plans tremblants parlés (22, 24), finale en 4 phases avec arrêt de la musique (AIL_stop_sequence_30C48), sub_28D24 sur rmusic/amusic.pak et 23, attente de 120 tics et ouverture du cadre en 25 étapes (lignes 24 − s à 151 + 2 × s). Sortie anticipée si byte_495FC."
   },
   "sub_423E0": {
     "new_name": "Stub_Midgame1_PlayPart2_423E0",
@@ -3262,7 +3262,7 @@
   "sub_2CBE5": {
     "new_name": "Primitive_SetRectColorAndDraw_2CBE5",
     "segment": "seg080",
-    "summary": "far, LUE 2026-10-17. Range un rectangle dans un objet primitive (+2, +4, +8, +10 = arg_2, arg_4, arg_6, arg_8), la couleur dans byte_46F42 (arg_A), puis appelle sa méthode virtuelle +20 avec la surface arg_C (non lue). mid1 scène 22 : objet construit directement (tables dseg 4540 à 4604), rectangle du sous-titre, couleur 0."
+    "summary": "far, LUE 2026-10-17. Range un rectangle dans un objet primitive (+2, +4, +8, +10 = arg_2, arg_4, arg_6, arg_8), la couleur dans byte_46F42 (arg_A), puis appelle sa méthode virtuelle +20 avec la surface arg_C (non lue). mid1 scène 23 : objet construit directement (tables dseg 4540 à 4604), rectangle du sous-titre, couleur 0."
   },
   "sub_C3A6": {
     "new_name": "ConvData_LoadNormalOrNight_C3A6",

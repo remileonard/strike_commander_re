@@ -82,9 +82,11 @@ sinon :
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨294303⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨294307⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨294309⟩
+        si = 1                                                                                        ⟨294310⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨294317⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨294321⟩
+            si = si + 1                                                                               ⟨294322⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨294329⟩
         v13 = 1                                                                                       ⟨294331⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨294335⟩
@@ -103,9 +105,11 @@ sinon :
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨294439⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨294443⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨294445⟩
+        si = 1                                                                                        ⟨294446⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨294453⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨294457⟩
+            si = si + 1                                                                               ⟨294458⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨294465⟩
         v13 = 1                                                                                       ⟨294467⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨294471⟩
@@ -116,10 +120,12 @@ sinon :
 loc_9E9B7:                                                                                            ⟨294508⟩
 si v13 != 0 :
     canal_init(canal=canal1, pilote=word_46849)                                                       ⟨294527⟩
+    si = 0                                                                                            ⟨294529⟩
     tant que si < 4 :
         charge(asoundfx v166[si])                                                                     ⟨294546⟩
         canal_enregistre(canal=canal1, ressource=asoundfx v166[si], x=0)                              ⟨294553⟩
         canal_arrête(canal=canal1)                                                                    ⟨294557⟩
+        si = si + 1                                                                                   ⟨294578⟩
     canal_arrête(canal=canal1)                                                                        ⟨294589⟩
 v1334 = 0                                                                                             ⟨294612⟩
 v1329 = 0                                                                                             ⟨294614⟩
@@ -143,10 +149,13 @@ sinon :
     flux1.ouvre(chemin1, 1)                                                                           ⟨294711⟩
     iff_form(flux=flux1, balise='MG20', x=0)                                                          ⟨294717⟩
     iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨294723⟩
+    si = 0                                                                                            ⟨294725⟩
     tant que si < 9 :
         iff_chunk(flux=flux1, balise='TEXT', x=1)                                                     ⟨294734⟩
+        di = 2                                                                                        ⟨294736⟩
         iff_lit(flux=flux1, destination=textes1[0] + (textes1.+0·si), taille=2)                       ⟨294747⟩
         v3491 = v3474                                                                                 ⟨294750⟩
+        si = si + 1                                                                                   ⟨294751⟩
     iff_ferme_form(flux=flux1)                                                                        ⟨294758⟩
     si CRT_Strlen(arg_6) != 0 :
         CRT_Strcat(textes1[0], arg_6)                                                                 ⟨294767⟩
@@ -184,6 +193,7 @@ charge(mid20 10)                                                                
 charge(mid20 11)                                                                                      ⟨295244⟩
 charge(mid20 12)                                                                                      ⟨295256⟩
 c1 = Layer(ressource=mid20 10, x=0, y=-2)                                                             ⟨295263⟩
+di = c1                                                                                               ⟨295265⟩
 c2 = Layer(ressource=mid20 11, x=0, y=-2)                                                             ⟨295271⟩
 c3 = Layer(ressource=mid20 12, x=0, y=-2)                                                             ⟨295279⟩
 
@@ -256,6 +266,7 @@ ajoute c9 à scène1                                                            
 v422 = 0                                                                                              ⟨296055⟩
 v424 = 0                                                                                              ⟨296056⟩
 tant que (scène1.compteur < 98) et (scène1.terminée == 0) :
+    si = scène1.compteur                                                                              ⟨296061⟩
     si scène1.compteur == 30 :
         ajoute c7 à scène1                                                                            ⟨296067⟩
     si scène1.compteur < 43 :
@@ -333,6 +344,7 @@ ajoute c10 à scène2                                                           
 c11 = Layer(ressource=midgames 4, x=0, y=0)                                                           ⟨296891⟩
 ajoute c11 à scène2                                                                                   ⟨296897⟩
 c12 = TalkingHeadOverlay(ressource=convdata type 0 "air", x=160, y=129)                               ⟨296904⟩
+di = c12                                                                                              ⟨296906⟩
 ajoute c12 à scène2                                                                                   ⟨296910⟩
 tête_image_de_base(tête=c12, image=27)                                                                ⟨296914⟩
 charge(midgames 0)                                                                                    ⟨296926⟩
@@ -347,10 +359,19 @@ si v13 != 0 :
     si canal3.+0 != 0 :
         AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨296986⟩
         sub_30C66(canal3.+0→4, v3470, v348, convdata type 2 "normal".+0)                              ⟨296993⟩
+si = 0                                                                                                ⟨296999⟩
 v352 = 1                                                                                              ⟨297000⟩
 tant que (scène2.compteur < 25) et (scène2.terminée == 0) :
     si si == 0 :
         CRT_Rand()                                                                                    ⟨297007⟩
+        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A07DE                                           ⟨297014⟩
+        si = -1                                                                                       ⟨297015⟩
+    sinon :
+        si si == -1 :
+            si = 1                                                                                    ⟨297023⟩
+        sinon :
+            si si == 1 :
+                si = 0                                                                                ⟨297030⟩
     c11.méthode24(0, si)                                                                              ⟨297039⟩
     c12.méthode24(0, si)                                                                              ⟨297045⟩
     c13.méthode24(0, si)                                                                              ⟨297052⟩
@@ -389,14 +410,19 @@ ajoute c18 à scène3                                                           
 c19 = Layer(ressource=mid20 5, x=0, y=0)                                                              ⟨297657⟩
 ajoute c19 à scène3                                                                                   ⟨297663⟩
 c20 = OverlayImageLayer(ressource=mid20 1, x=0, y=0, image=0)                                         ⟨297671⟩
+di = c20                                                                                              ⟨297673⟩
 ajoute c20 à scène3                                                                                   ⟨297677⟩
 c20.image = 1                                                                                         ⟨297679⟩
+si = 0                                                                                                ⟨297680⟩
 tant que (scène3.compteur < 16) et (scène3.terminée == 0) :
     CRT_Rand()                                                                                        ⟨297685⟩
     v360 = ((CRT_Rand()·3) / -32768) + 1                                                              ⟨297692⟩
     c20.image = v360                                                                                  ⟨297694⟩
     v362 = si                                                                                         ⟨297695⟩
+    si = si + 1                                                                                       ⟨297696⟩
     c19.image = v362                                                                                  ⟨297699⟩
+    si si + 1 > 5 :
+        si = 0                                                                                        ⟨297702⟩
     Scene_Tick(scène=scène3)                                                                          ⟨297717⟩
 Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨297805⟩
 si byte_495FC != 0 :
@@ -433,7 +459,9 @@ palette_copie(destination=pal1, source=pal11(mid20 13))                         
 palette_copie(destination=pal1, source=pal10(mid20 17))                                               ⟨298320⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨298332⟩
 v332 = 3                                                                                              ⟨298334⟩
+di = -1                                                                                               ⟨298335⟩
 tant que (scène4.compteur < 40) et (scène4.terminée == 0) :
+    si = scène4.compteur                                                                              ⟨298341⟩
     si scène4.compteur == 1 :
         v336 = midgames 0.+0                                                                          ⟨298345⟩
         c25.image = v336                                                                              ⟨298349⟩
@@ -443,11 +471,33 @@ tant que (scène4.compteur < 40) et (scène4.terminée == 0) :
             c25.image = v338                                                                          ⟨298361⟩
     v332 = v332 + di                                                                                  ⟨298365⟩
     c24.image = v332                                                                                  ⟨298375⟩
+    si scène4.compteur == 2 :
+        di = 1                                                                                        ⟨298378⟩
+    si scène4.compteur == 3 :
+        di = -1                                                                                       ⟨298383⟩
+    si scène4.compteur == 4 :
+        di = 1                                                                                        ⟨298388⟩
+    si scène4.compteur == 5 :
+        di = -1                                                                                       ⟨298393⟩
+    si scène4.compteur == 7 :
+        di = 1                                                                                        ⟨298398⟩
+    si scène4.compteur == 9 :
+        di = -1                                                                                       ⟨298403⟩
+    si scène4.compteur == 10 :
+        di = 1                                                                                        ⟨298408⟩
+    si scène4.compteur == 12 :
+        di = 0                                                                                        ⟨298413⟩
+    si scène4.compteur == 16 :
+        di = 1                                                                                        ⟨298418⟩
+    si scène4.compteur == 20 :
+        di = 0                                                                                        ⟨298423⟩
     Scene_Tick(scène=scène4)                                                                          ⟨298438⟩
 v332 = 6                                                                                              ⟨298464⟩
 v6 = 22                                                                                               ⟨298465⟩
 v2 = scène4.compteur                                                                                  ⟨298467⟩
+di = v2 + ((v6·70) / 100)                                                                             ⟨298476⟩
 tant que (scène4.compteur < v2 + ((v6·70) / 100)) et (scène4.terminée == 0) :
+    si = scène4.compteur                                                                              ⟨298481⟩
     si scène4.compteur & 1 != 0 :
         si midgames 0.+0 < 33 :
             v336 = midgames 0.+0                                                                      ⟨298487⟩
@@ -488,6 +538,7 @@ ajoute c26 à scène5                                                           
 c27 = Layer(ressource=midgames 4, x=0, y=0)                                                           ⟨299136⟩
 ajoute c27 à scène5                                                                                   ⟨299142⟩
 c28 = TalkingHeadOverlay(ressource=convdata type 0 "air", x=160, y=129)                               ⟨299149⟩
+di = c28                                                                                              ⟨299151⟩
 ajoute c28 à scène5                                                                                   ⟨299155⟩
 tête_image_de_base(tête=c28, image=25)                                                                ⟨299159⟩
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨299164⟩
@@ -503,6 +554,7 @@ si v13 != 0 :
     si canal3.+0 != 0 :
         AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨299229⟩
         sub_30C66(canal3.+0→4, v3470, v338, mid20 14.+0)                                              ⟨299236⟩
+si = 0                                                                                                ⟨299242⟩
 v342 = 1                                                                                              ⟨299243⟩
 si v12 != 0 :
     Scene_Tick(scène=scène5)                                                                          ⟨299252⟩
@@ -514,6 +566,14 @@ si v12 != 0 :
     tant que sub_9C64(c28) != 0 :
         si si == 0 :
             CRT_Rand()                                                                                ⟨299292⟩
+            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A2243                                       ⟨299299⟩
+            si = -1                                                                                   ⟨299300⟩
+        sinon :
+            si si == -1 :
+                si = 1                                                                                ⟨299308⟩
+            sinon :
+                si si == 1 :
+                    si = 0                                                                            ⟨299315⟩
         c27.méthode24(0, si)                                                                          ⟨299324⟩
         c28.méthode24(0, si)                                                                          ⟨299330⟩
         c29.méthode24(0, si)                                                                          ⟨299337⟩
@@ -521,6 +581,14 @@ si v12 != 0 :
     tant que v354 < 10 :
         si si == 0 :
             CRT_Rand()                                                                                ⟨299372⟩
+            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A22DE                                       ⟨299379⟩
+            si = -1                                                                                   ⟨299380⟩
+        sinon :
+            si si == -1 :
+                si = 1                                                                                ⟨299388⟩
+            sinon :
+                si si == 1 :
+                    si = 0                                                                            ⟨299395⟩
         c27.méthode24(0, si)                                                                          ⟨299404⟩
         c28.méthode24(0, si)                                                                          ⟨299410⟩
         c29.méthode24(0, si)                                                                          ⟨299417⟩
@@ -534,6 +602,14 @@ sinon :
         v344 = scène5.compteur                                                                        ⟨299483⟩
         si si == 0 :
             CRT_Rand()                                                                                ⟨299486⟩
+            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A23DD                                       ⟨299493⟩
+            si = -1                                                                                   ⟨299494⟩
+        sinon :
+            si si == -1 :
+                si = 1                                                                                ⟨299502⟩
+            sinon :
+                si si == 1 :
+                    si = 0                                                                            ⟨299509⟩
         c27.méthode24(0, si)                                                                          ⟨299518⟩
         c28.méthode24(0, si)                                                                          ⟨299524⟩
         c29.méthode24(0, si)                                                                          ⟨299531⟩
@@ -557,6 +633,14 @@ sinon :
         v344 = scène5.compteur                                                                        ⟨299654⟩
         si si == 0 :
             CRT_Rand()                                                                                ⟨299657⟩
+            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A257D                                       ⟨299664⟩
+            si = -1                                                                                   ⟨299665⟩
+        sinon :
+            si si == -1 :
+                si = 1                                                                                ⟨299673⟩
+            sinon :
+                si si == 1 :
+                    si = 0                                                                            ⟨299680⟩
         c27.méthode24(0, si)                                                                          ⟨299689⟩
         c28.méthode24(0, si)                                                                          ⟨299695⟩
         c29.méthode24(0, si)                                                                          ⟨299702⟩
@@ -618,6 +702,7 @@ c37 = Layer(ressource=mid20 9, x=0, y=-70)                                      
 ajoute c37 à scène6                                                                                   ⟨300586⟩
 c37.image = 0                                                                                         ⟨300589⟩
 c36.image = 0                                                                                         ⟨300591⟩
+di = 0                                                                                                ⟨300592⟩
 Scene_Tick(scène=scène6)                                                                              ⟨300598⟩
 v3470 = -1                                                                                            ⟨300609⟩
 si v13 != 0 :
@@ -634,6 +719,7 @@ si v12 != 0 :
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨300682⟩
 Widget_Method_Dispatch8_314A9(zone1, 212)                                                             ⟨300687⟩
 tant que (scène6.compteur < 186) et (scène6.terminée == 0) :
+    si = scène6.compteur                                                                              ⟨300693⟩
     v378 = v348                                                                                       ⟨300695⟩
     v348 = v348 + 1                                                                                   ⟨300696⟩
     c37.image = v378                                                                                  ⟨300699⟩
@@ -660,6 +746,7 @@ tant que (scène6.compteur < 186) et (scène6.terminée == 0) :
     si scène6.compteur > 0 :
         si scène6.compteur < 5 :
             v380 = di                                                                                 ⟨300786⟩
+            di = di + 1                                                                               ⟨300787⟩
             c36.image = v380                                                                          ⟨300790⟩
     si scène6.compteur > 5 :
         si scène6.compteur < 15 :
@@ -669,25 +756,32 @@ tant que (scène6.compteur < 186) et (scène6.terminée == 0) :
         si scène6.compteur < 51 :
             si scène6.compteur & 1 != 0 :
                 v384 = di                                                                             ⟨300813⟩
+                di = di + 1                                                                           ⟨300814⟩
                 c36.image = v384                                                                      ⟨300817⟩
     si scène6.compteur > 51 :
         si scène6.compteur < 61 :
             si scène6.compteur & 1 != 0 :
                 v386 = di                                                                             ⟨300827⟩
+                di = di - 1                                                                           ⟨300828⟩
                 c36.image = v386                                                                      ⟨300831⟩
     si scène6.compteur > 61 :
         si scène6.compteur < 71 :
             si scène6.compteur & 1 != 0 :
                 v388 = di                                                                             ⟨300841⟩
+                di = di + 1                                                                           ⟨300842⟩
                 c36.image = v388                                                                      ⟨300845⟩
     si scène6.compteur > 45 :
         si scène6.compteur < 55 :
             v390 = mid20voc 0.+0                                                                      ⟨300854⟩
             c35.image = v390                                                                          ⟨300858⟩
+    si scène6.compteur == 87 :
+        di = di - 2                                                                                   ⟨300864⟩
     si scène6.compteur == 110 :
         v392 = di                                                                                     ⟨300869⟩
+        di = di + 1                                                                                   ⟨300870⟩
         c36.image = v392                                                                              ⟨300873⟩
     si scène6.compteur == 141 :
+        di = di - 1                                                                                   ⟨300879⟩
         c36.image = di                                                                                ⟨300882⟩
     aller à loc_A3407                                                                                 ⟨300885⟩
     aller à loc_A3433                                                                                 ⟨300912⟩

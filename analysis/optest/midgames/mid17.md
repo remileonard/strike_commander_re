@@ -44,9 +44,11 @@ sinon :
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨285687⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨285691⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨285693⟩
+        si = 1                                                                                        ⟨285694⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨285701⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨285705⟩
+            si = si + 1                                                                               ⟨285706⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨285713⟩
         v13 = 1                                                                                       ⟨285715⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨285719⟩
@@ -65,9 +67,11 @@ sinon :
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨285823⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨285827⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨285829⟩
+        si = 1                                                                                        ⟨285830⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨285837⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨285841⟩
+            si = si + 1                                                                               ⟨285842⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨285849⟩
         v13 = 1                                                                                       ⟨285851⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨285855⟩
@@ -81,10 +85,12 @@ v46 = word_45570                                                                
 v44 = byte_45572                                                                                      ⟨285899⟩
 si v13 != 0 :
     canal_init(canal=canal1, pilote=word_46849)                                                       ⟨285915⟩
+    si = 0                                                                                            ⟨285917⟩
     tant que si < 5 :
         charge(asoundfx v48[si])                                                                      ⟨285934⟩
         canal_enregistre(canal=canal1, ressource=asoundfx v48[si], x=0)                               ⟨285941⟩
         canal_arrête(canal=canal1)                                                                    ⟨285945⟩
+        si = si + 1                                                                                   ⟨285966⟩
     canal_arrête(canal=canal1)                                                                        ⟨285977⟩
 v1214 = 0                                                                                             ⟨286000⟩
 v1209 = 0                                                                                             ⟨286002⟩
@@ -108,11 +114,13 @@ sinon :
     flux1.ouvre(chemin1, 1)                                                                           ⟨286099⟩
     iff_form(flux=flux1, balise='MG17', x=0)                                                          ⟨286105⟩
     iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨286111⟩
+    si = 0                                                                                            ⟨286113⟩
     tant que si < 10 :
         iff_chunk(flux=flux1, balise='TEXT', x=1)                                                     ⟨286122⟩
         v226 = v3416                                                                                  ⟨286125⟩
         iff_lit(flux=flux1, destination=textes1[0] + (textes1.+0·si), taille=v226)                    ⟨286136⟩
         v3429 = v3412                                                                                 ⟨286139⟩
+        si = si + 1                                                                                   ⟨286140⟩
     iff_ferme_form(flux=flux1)                                                                        ⟨286147⟩
     si CRT_Strlen(arg_10) != 0 :
         CRT_Strcat(textes1[1], arg_10)                                                                ⟨286158⟩
@@ -210,6 +218,7 @@ charge(midgames 17)                                                             
 scène1 = Scene_Create(cadence=9, palette=255, surface=&v470)                                          ⟨287118⟩
 c1 = Layer(ressource=midgames 12, x=0, y=0)                                                           ⟨287125⟩
 c2 = Layer(ressource=midgames 13, x=0, y=0)                                                           ⟨287133⟩
+si = c2                                                                                               ⟨287135⟩
 c3 = Layer(ressource=midgames 14, x=0, y=-23)                                                         ⟨287141⟩
 c4 = Layer(ressource=midgames 15, x=0, y=-23)                                                         ⟨287149⟩
 c5 = Layer(ressource=midgames 16, x=0, y=-23)                                                         ⟨287157⟩
@@ -448,6 +457,7 @@ charge(midgames 18)                                                             
 ──── scène2 ────
 scène2 = Scene_Create(cadence=20, palette=255, surface=&v470)                                         ⟨288948⟩
 c7 = OverlayImageLayer(ressource=midgames 18, x=0, y=0, image=0)                                      ⟨288956⟩
+si = c7                                                                                               ⟨288958⟩
 ajoute c7 à scène2                                                                                    ⟨288962⟩
 palette_copie(destination=pal1, source=pal7(midgames 11))                                             ⟨288975⟩
 palette_copie(destination=pal1, source=pal8(convdata type 2 "normal"))                                ⟨288984⟩
@@ -587,15 +597,18 @@ ajoute c10 à scène3                                                           
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨290194⟩
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨290199⟩
 Widget_Method_Dispatch8_314A9(zone1, 248)                                                             ⟨290204⟩
+si = 3                                                                                                ⟨290207⟩
 tant que (scène3.compteur < 73) et (scène3.terminée == 0) :
     v280 = scène3.compteur                                                                            ⟨290213⟩
     si v280 < 51 :
         v282 = si                                                                                     ⟨290216⟩
+        si = si + 1                                                                                   ⟨290217⟩
         c10.image = v282                                                                              ⟨290220⟩
     sinon :
         v284 = v278                                                                                   ⟨290226⟩
         v278 = v278 + 1                                                                               ⟨290227⟩
         c9.image = v284                                                                               ⟨290230⟩
+        si = si + 1                                                                                   ⟨290232⟩
         c10.image = si                                                                                ⟨290235⟩
     Scene_Tick(scène=scène3)                                                                          ⟨290250⟩
 Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨290280⟩
@@ -650,6 +663,7 @@ retire(parent=scène4, calque=c12)                                              
 ajoute c13 à scène4                                                                                   ⟨291052⟩
 ajoute c15 à scène4                                                                                   ⟨291057⟩
 ajoute c12 à scène4                                                                                   ⟨291062⟩
+si = 0                                                                                                ⟨291064⟩
 v354 = 0                                                                                              ⟨291065⟩
 scène4.compteur = 0                                                                                   ⟨291066⟩
 tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
@@ -664,18 +678,21 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
         Scene_SetFps(scène=scène4, cadence=7)                                                         ⟨291105⟩
     si v356 < 30 :
         v358 = si                                                                                     ⟨291111⟩
+        si = si + 1                                                                                   ⟨291112⟩
         c13.image = v358                                                                              ⟨291115⟩
         v360 = v354                                                                                   ⟨291117⟩
         v354 = v354 + 1                                                                               ⟨291118⟩
         c15.image = v360                                                                              ⟨291121⟩
     sinon :
         si v356 == 30 :
+            si = 0                                                                                    ⟨291132⟩
             retire(parent=scène4, calque=c13)                                                         ⟨291136⟩
             c13.détruit(3)                                                                            ⟨291144⟩
             retire(parent=scène4, calque=c12)                                                         ⟨291152⟩
             ajoute c14 à scène4                                                                       ⟨291157⟩
             ajoute c12 à scène4                                                                       ⟨291162⟩
             v362 = 0                                                                                  ⟨291164⟩
+            si = 1                                                                                    ⟨291165⟩
             c14.image = v362                                                                          ⟨291168⟩
             v364 = v354                                                                               ⟨291170⟩
             v354 = v354 + 1                                                                           ⟨291171⟩
@@ -684,6 +701,7 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
             si v356 > 30 :
                 si v356 >= 50 : aller à loc_9C5BC                                                     ⟨291182⟩
                 v366 = si                                                                             ⟨291183⟩
+                si = si + 1                                                                           ⟨291184⟩
                 c14.image = v366                                                                      ⟨291187⟩
                 v368 = v354                                                                           ⟨291189⟩
                 v354 = v354 + 1                                                                       ⟨291190⟩
@@ -698,14 +716,17 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
                         si canal3.+0 != 0 :
                             AIL_start_sequence(pilote=canal3.+0→4, séquence=v3388)                    ⟨291239⟩
                             sub_30C66(canal3.+0→4, v3388, v370, 0)                                    ⟨291246⟩
+                    si = 0                                                                            ⟨291252⟩
                     Scene_SetFps(scène=scène4, cadence=15)                                            ⟨291256⟩
                     ajoute c16 à scène4                                                               ⟨291261⟩
                     v374 = 0                                                                          ⟨291263⟩
+                    si = 1                                                                            ⟨291264⟩
                     c16.image = v374                                                                  ⟨291267⟩
                 sinon :
                     si v356 < 66 :
                         si v356 & 1 != 0 :
                             v376 = si                                                                 ⟨291276⟩
+                            si = si + 1                                                               ⟨291277⟩
                             c16.image = v376                                                          ⟨291280⟩
     Scene_Tick(scène=scène4)                                                                          ⟨291296⟩
 Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨291401⟩
@@ -726,6 +747,7 @@ scène5 = Scene_Create(cadence=9, palette=255, surface=&v470)                   
 charge_convdata_type0("air", drapeau=3)                                                               ⟨291998⟩
 c17 = Layer(ressource=midgames 4, x=0, y=0)                                                           ⟨292005⟩
 c18 = TalkingHeadOverlay(ressource=convdata type 0 "air", x=160, y=129)                               ⟨292013⟩
+si = c18                                                                                              ⟨292015⟩
 c19 = ImageLayer(ressource=convdata type 0 "air", x=160, y=129, image=51)                             ⟨292022⟩
 c20 = Layer(ressource=optshps 116, x=0, y=-64)                                                        ⟨292030⟩
 palette_copie(destination=pal1, source=pal2(optpals 21))                                              ⟨292040⟩
@@ -773,26 +795,33 @@ Widget_Method_Dispatch8_314A9(zone1, 128)                                       
 c22.image = midgames 14.+0                                                                            ⟨292761⟩
 si v12 != 0 :
     Scene_Tick(scène=scène6)                                                                          ⟨292770⟩
+    si = 0                                                                                            ⟨292772⟩
     tant que si < 4 :
         Scene_Tick(scène=scène6)                                                                      ⟨292779⟩
+        si = si + 1                                                                                   ⟨292781⟩
     charge(mid17voc 1)                                                                                ⟨292796⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 1)                                 ⟨292802⟩
+    si = 0                                                                                            ⟨292804⟩
     tant que si < 4 :
         Scene_Tick(scène=scène6)                                                                      ⟨292811⟩
+        si = si + 1                                                                                   ⟨292813⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨292821⟩
     tant que sub_8500(voix1) != 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨292839⟩
+    si = 0                                                                                            ⟨292851⟩
     tant que si < 17 :
         si si > 4 :
             si si < 13 :
                 v280 = midgames 14.+0                                                                 ⟨292861⟩
                 c22.image = v280                                                                      ⟨292865⟩
         Scene_Tick(scène=scène6)                                                                      ⟨292871⟩
+        si = si + 1                                                                                   ⟨292873⟩
     voix_arrête(voix=voix1)                                                                           ⟨292880⟩
 sinon :
     v6 = 75                                                                                           ⟨292905⟩
     v4 = scène6.compteur                                                                              ⟨292907⟩
     tant que (scène6.compteur < v4 + ((v6·70) / 100)) et (scène6.terminée == 0) :
+        si = scène6.compteur                                                                          ⟨292921⟩
         si v4 + 8 == scène6.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])                              ⟨292934⟩
         si v4 + 24 < scène6.compteur :

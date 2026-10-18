@@ -12,7 +12,7 @@ section liste ce qu'il faudra y chercher.
 **Niveau de lecture.**
 - Le moteur (scène, calques, cadence, palettes, fondus, touches) et les 12 types de calques : lus
   ligne à ligne.
-- mid1 : les 24 scènes des deux fonctions (`Midgame1_PlayPart1_5FCF0`,
+- mid1 : les 25 scènes des deux fonctions (`Midgame1_PlayPart1_5FCF0`,
   `Midgame1_PlayPart2_671C0`) ont été lues ligne à ligne. Les valeurs données ici (numéros
   d'entrée, positions, numéros d'image, durées, déclencheurs) sont celles du code.
 - Aucun fichier de cinématique n'est dans `data/` : on ne sait pas ce que représentent les
@@ -50,7 +50,7 @@ flowchart TD
     D --> S1["Scène 1 : ouverture, musique, fondu"]
     S1 --> S2[Scène 2 : 4 titres]
     S2 --> S3[Scènes 3 à 8]
-    S3 --> P2["Midgame1_PlayPart2_671C0 : scènes 9 à 24"]
+    S3 --> P2["Midgame1_PlayPart2_671C0 : scènes 9 à 25"]
     P2 --> F[Ouverture du cadre sur tout l'écran, fin]
     S1 -. Échap .-> X[Libère tout et sort]
     S2 -. Échap .-> X
@@ -59,7 +59,7 @@ flowchart TD
 ```
 
 > **Avertissement : `source/optest.asm` vient d'un exécutable modifié par Rémi.** Les deux
-> chaînes de nom de visage de mid1 (dseg 7900 et 7988, utilisées par les scènes 9 et 17) valent
+> chaînes de nom de visage de mid1 (dseg 7900 et 7988, utilisées par les scènes 9 et 18) valent
 > « pri » dans le désassemblage parce que Rémi a édité les octets de l'exécutable ; **dans le jeu
 > d'origine, elles valent « air »**, et c'est « air » qu'utilise `MID_1.IFF` de libRealSpace. Ce
 > document donne la valeur d'origine. Toute autre valeur lue dans `optest.asm` qui ne
@@ -99,14 +99,14 @@ pouvoir exprimer.
 
 | Cadence demandée | Durée d'une image | Scènes de mid1 |
 |---|---|---|
-| 10 images/s | 6 tics = 100 ms | 1, 8, 9, 15, 17, 18, 20, 22 |
+| 10 images/s | 6 tics = 100 ms | 1, 8, 9, 16, 18, 19, 21, 23 |
 | 15 images/s | 4 tics ≈ 67 ms | 11 |
-| 20 images/s | 3 tics = 50 ms | 3 (scène 1 repassée à 20), 4, 5, 6, 7, 10, 12, 13, 14, 16, 19, 21, 23, 24 |
+| 20 images/s | 3 tics = 50 ms | 3 (scène 1 repassée à 20), 4, 5, 6, 7, 10, 12, 13, 14, 15, 17, 20, 22, 24, 25 |
 
 - Chaque scène a un **compteur d'images** (champ +29 de la scène), remis à 0 à la création et
   augmenté de 1 à chaque image. La cinématique le compare à des constantes pour déclencher un
   son, changer une animation ou finir la scène ; elle le **remet parfois à 0 elle-même** entre
-  deux phases d'une même scène (scènes 3, 8, 15, 22, 24).
+  deux phases d'une même scène (scènes 3, 8, 16, 23, 25).
 - Les **titres** (scène 2) et l'**ouverture finale** ne passent pas par le moteur de scène : ils
   utilisent directement un chronomètre (début, durée en tics) et `Stopwatch_WaitElapsed_3F023`.
 
@@ -168,10 +168,12 @@ valeur utilisée comme **limite** par les animations. Chaque image est dessinée
 
 **La surface de dessin des cinématiques.** Midgame1 prépare une surface de dessin avec le
 rectangle (0, 24) – (319, 151), soit 128 lignes entre deux bandes, et une image hors écran
-plein écran (0, 0) – (319, 199). Il n'est pas encore établi si ce rectangle n'est qu'une découpe
-(coordonnées d'écran absolues) ou s'il déplace aussi l'origine ; beaucoup de calques plein écran
-ont des y négatifs (-24, -40, -64, -70). À vérifier avant de recopier des positions dans
-libRealSpace (qui a ses propres bandes `CONV_TOP_BAR_HEIGHT` / `CONV_BOTTOM_BAR_HEIGHT`).
+plein écran (0, 0) – (319, 199). **L'origine (0, 0) est le coin haut gauche de l'écran**, comme en
+VGA (fait donné par Rémi) : le rectangle n'est que la zone visible, et les y négatifs des calques
+plein écran (-24, -40, -64, -70) placent l'image au-dessus du haut de l'écran. Les positions se
+recopient telles quelles dans libRealSpace, dont les bandes noires couvrent les lignes 0 à 22
+(`CONV_TOP_BAR_HEIGHT` = 23) et 152 à 199 (`CONV_BOTTOM_BAR_HEIGHT` = 48) : la ligne 23 y est
+visible, elle ne l'est pas dans le jeu.
 
 ### 3.3 Les types de calques
 
@@ -247,15 +249,15 @@ si Échap : sortir de la cinématique
 | Condition | Scènes de mid1 |
 |---|---|
 | compteur d'images atteint une valeur (5, 20, 30, 40, 41, 50) | presque toutes |
-| une animation est arrivée à sa dernière image (`AnimLayer_IsFinished_2E654`) | 1, 3, 6, 11, 13, 24 (phase 3) |
-| la réplique parlée est finie (méthode +0 du lecteur de voix, ou `sub_84CC` dans la scène 8) | dialogues avec voix : 8, 9, 15, 20, 21, 22, 23 |
+| une animation est arrivée à sa dernière image (`AnimLayer_IsFinished_2E654`) | 1, 3, 6, 11, 13, 25 (phase 3) |
+| la réplique parlée est finie (méthode +0 du lecteur de voix, ou `sub_84CC` dans la scène 8) | dialogues avec voix : 8, 9, 16, 21, 22, 23, 24 |
 | un calque a atteint une position (méthode « y absolu ») | 3 |
 | le y de la scène atteint une valeur | 24 (phase 2) |
 | Échap (`byte_495FC`) | toujours |
 
 Une scène peut enchaîner **plusieurs boucles** (phases). Exemples : « attendre 20 images, ajouter
 l'animation, puis boucler jusqu'à la fin de l'animation » (scène 1) ; « réplique jusqu'à sa fin,
-compteur remis à 0, puis 10 images d'attente » (scène 15).
+compteur remis à 0, puis 10 images d'attente » (scène 16).
 
 ### Les événements à une image donnée
 
@@ -265,9 +267,10 @@ Dans la boucle, la cinématique compare le compteur à des constantes pour :
   scène 12 : image 15 ; scène 13 : image 22) ;
 - **remplacer une animation par une autre** : retirer le calque (`LayerGroup_Remove_2DBC1`, qui
   le détruit) et en ajouter un nouveau (`LayerGroup_Add_2DB84`) — scène 12 : 16 → 18 à l'image 20 ;
-  scène 14 : 21 → 29 → 35 aux images 14 et 27 ; scène 24 : 33 → 34 à l'image 10, 9 → 14 à
+  scène 14 : 21 → 29 → 35 aux images 14 et 27 ; scène 15 : 30 → 31 → 32 aux images 50 et
+  65, dans l'animation `mid1` 17 qui les porte ; scène 25 : 33 → 34 à l'image 10, 9 → 14 à
   l'image 20 ;
-- forcer le numéro d'image d'un calque (scène 18 : image 9 dès l'image de scène 9) ;
+- forcer le numéro d'image d'un calque (scène 19 : image 9 dès l'image de scène 9) ;
 - ajouter un calque après un délai (scène 1 : l'animation n'est ajoutée qu'après 20 images).
 
 ---
@@ -425,7 +428,7 @@ Deux compteurs écrits dans la boucle, avec un départ, un pas et un retour :
   4, 5, 4, 3, 4, 5…
 - **Alternance par parité du compteur** (dialogues) : image = `compteur & 1` (0 / 1) ou
   `13 + (compteur & 1)` (13 / 14), à chaque image, pendant que la réplique ou le sous-titre dure.
-  C'est le mouvement de bouche des plans de dialogue de mid1 (scènes 8, 20, 21, 22, 23).
+  C'est le mouvement de bouche des plans de dialogue de mid1 (scènes 8, 21, 22, 23, 24).
 
 ### 6.5 Transition à deux sens
 
@@ -439,7 +442,7 @@ selon l'étape t :
 | 9 à 11, 13 | 13 | t |
 | 12 | 13 | **1** |
 
-Utilisée une fois dans mid1 (scène 17, `midgames` 0, en (160, 128), vers l'avant).
+Utilisée une fois dans mid1 (scène 18, `midgames` 0, en (160, 128), vers l'avant).
 
 ### 6.6 La bouche de la tête parlante
 
@@ -470,7 +473,7 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
   plus). Le remplissage de cette table n'a pas été lu.
 - **Dans mid1** (scène 9), la tête reçoit le texte « Back off, almost got tone. Blah blah blah »
   et le passage en mode voix n'a été vu nulle part : la bouche suit ce texte de remplissage
-  pendant que la vraie réplique est jouée par un autre lecteur de voix. Dans la scène 17, aucun
+  pendant que la vraie réplique est jouée par un autre lecteur de voix. Dans la scène 18, aucun
   texte n'est donné : la bouche n'est pas dessinée. Les chaînes sans voyelles des autres
   cinématiques (`mybeyogttagethlot`, `brakngupizardtodo`…) sont probablement leurs textes de lèvres
   (à vérifier).
@@ -487,8 +490,8 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
 - Palettes chargées une fois et réutilisées par plusieurs scènes : avant la scène 1, `optpals` 21,
   `optpals` 24, `midgames` 22, `mid1` 48, `mid1` 59 et « normal » (élément de type 2 de
   `convdata.iff`, `sub_C3A6` → `sub_C13D`) ; avant la scène 4, `mid1` 42 ; avant la scène 5,
-  `mid1` 44 et 38 ; avant la scène 8, `mid1` 45 et 39 ; scène 9, `mid1` 43 (réutilisée scène 17) ;
-  scène 19, `midgames` 23 (réutilisée scène 24).
+  `mid1` 44 et 38 ; avant la scène 8, `mid1` 45 et 39 ; scène 9, `mid1` 43 (réutilisée scène 18) ;
+  scène 20, `midgames` 23 (réutilisée scène 25).
 - **Fondus.** `Palette_FadeFromColor_2D165` (apparition depuis une couleur unie) et
   `Palette_FadeToColor_2D09C` (disparition vers une couleur unie). Le nombre d'étapes est le plus
   grand écart entre une composante et sa cible ; toutes les composantes arrivent ensemble ; chaque
@@ -502,7 +505,7 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
 
 | Élément | Avec voix numérisée | Sans voix numérisée |
 |---|---|---|
-| Musique | entrée 0 de `rmusic.pak` (Roland) ou `amusic.pak` (AdLib), démarrée à la scène 1 ; arrêtée (`AIL_stop_sequence`) au début de la dernière phase de la scène 24 | idem |
+| Musique | entrée 0 de `rmusic.pak` (Roland) ou `amusic.pak` (AdLib), démarrée à la scène 1 ; arrêtée (`AIL_stop_sequence`) au début de la dernière phase de la scène 25 | idem |
 | Sons d'ambiance | VOC de `mid1voc.pak` | une des 6 séquences d'effets de `rsoundfx.pak` / `asoundfx.pak`, préparées au début (indices 0 à 5) |
 | Répliques des dialogues | VOC de `mid1voc.pak`, la scène attend leur fin | sous-titre `SPOK` affiché un nombre fixe d'images, dans une couleur propre à la scène |
 
@@ -528,18 +531,19 @@ Correspondance des sons de mid1 :
 | 10 | réplique 10 | effet 3 | début |
 | 12 | réplique 11 | effet 4 | image 15 |
 | 13 | réplique 12 | effet 5 | image 22 |
-| 15 | réplique 1 | sous-titre `SPOK` 2, couleur 4, 20 images | début |
-| 20 | réplique 2 | sous-titre `SPOK` 3, couleur 4, 30 images | début |
-| 21 | réplique 5 | sous-titre `SPOK` 4, couleur 114, jusqu'à l'image 40 | après 5 images |
-| 22 | réplique 3 | sous-titre `SPOK` 5, couleur 4, 30 images | début |
-| 23 | réplique 6 | sous-titre `SPOK` 6, couleur 114, jusqu'à l'image 50 | après 5 images |
-| 24 | réplique 13 | effet 5 | début de la 4ᵉ phase |
+| 15 | réplique 13 | effet 5 | image 48 |
+| 16 | réplique 1 | sous-titre `SPOK` 2, couleur 4, 20 images | début |
+| 21 | réplique 2 | sous-titre `SPOK` 3, couleur 4, 30 images | début |
+| 22 | réplique 5 | sous-titre `SPOK` 4, couleur 114, jusqu'à l'image 40 | après 5 images |
+| 23 | réplique 3 | sous-titre `SPOK` 5, couleur 4, 30 images | début |
+| 24 | réplique 6 | sous-titre `SPOK` 6, couleur 114, jusqu'à l'image 50 | après 5 images |
+| 25 | réplique 13 | effet 5 | début de la 4ᵉ phase |
 
 `SPOK` 7 et les 3 textes de `MG01` qui suivent les titres sont chargés mais pas affichés dans mid1.
 
 ---
 
-## 9. Les 24 scènes de mid1, une par une
+## 9. Les 25 scènes de mid1, une par une
 
 Notation des calques : **type**, ressource, (x, y), image. Les calques sont donnés dans l'ordre
 d'ajout (du fond vers le premier plan) ; l'indentation marque un enfant.
@@ -731,7 +735,24 @@ Par-dessus : **animation** `mid1` 21 (0, 0), remplacée par `mid1` 29 à l'image
 `mid1` 35 à l'image 27. En 41 images, les fonds avancent de 41 et 82 pixels : aucun raccord n'est
 nécessaire dans cette scène.
 
-### Scène 15 — dialogue (10 images/s)
+### Scène 15 — animation 17 et ses animations enfants (20 images/s, 81 images)
+
+Pas de composition de palette (celle de la scène 12 reste). Réplique 13 (ou effet 5) chargée au
+début de la scène.
+- simple `optshps` 116 (0, -10)
+  - simple `midgames` 20 (0, 0)
+- **animation** `mid1` 17 (0, 0)
+  - **animation** `mid1` 30 (0, 0), remplacée à l'image 50 par l'**animation** `mid1` 31 (0, 0),
+    elle-même remplacée à l'image 65 par l'**animation** `mid1` 32 (0, 0)
+- image fixe `midgames` 19 (0, 85) image 1
+- image fixe `midgames` 19 (0, 55) image 2
+
+Réplique 13 (ou effet 5) à l'image 48. Fin : 81 images.
+
+Cette scène manquait dans les versions précédentes de ce document (relevée le 2026-10-18 dans le
+rapport de `tools/midgame_extract.py`) ; les scènes suivantes ont été renumérotées.
+
+### Scène 16 — dialogue (10 images/s)
 
 Palette = `mid1` 45 + `mid1` 39.
 - simple `optshps` 116 (0, 0)
@@ -743,7 +764,7 @@ Palette = `mid1` 45 + `mid1` 39.
 Phase 1 : réplique 1 jusqu'à sa fin ; sans voix, sous-titre `SPOK` 2 en couleur 4 pendant 20
 images. Compteur à 0. Phase 2 : 10 images.
 
-### Scène 16 — plan tremblant (20 images/s, 20 images, sans son)
+### Scène 17 — plan tremblant (20 images/s, 20 images, sans son)
 
 Palette = `mid1` 44 + `mid1` 38.
 - simple `optshps` 116 (0, -24)
@@ -752,7 +773,7 @@ Palette = `mid1` 44 + `mid1` 38.
   - image fixe `mid1` 26 (6, 0) image 3
   - **image sur fond** `mid1` 1 (0, 24) image 3
 
-### Scène 17 — « air » et transition (10 images/s, 20 images, sans son)
+### Scène 18 — « air » et transition (10 images/s, 20 images, sans son)
 
 Palette = `mid1` 43 + « normal ». Visage « air » rechargé.
 - simple `optshps` 116 (0, 0)
@@ -760,9 +781,9 @@ Palette = `mid1` 43 + « normal ». Visage « air » rechargé.
 - **tête parlante avec surimpression** « air » (160, 128), image de base 27, **sans texte de lèvres**
 - **transition à deux sens** `midgames` 0 (160, 128), vers l'avant
 
-### Scène 18 — plan (10 images/s, 20 images, sans son)
+### Scène 19 — plan (10 images/s, 20 images, sans son)
 
-Palette = `midgames` 22 + `optpals` 24 + `mid1` 47. `mid1` 25 est chargée ici pour la scène 24.
+Palette = `midgames` 22 + `optpals` 24 + `mid1` 47. `mid1` 25 est chargée ici pour la scène 25.
 - simple `optshps` 116 (0, -64)
   - simple `midgames` 20 (0, 0)
 - simple `optshps` 44 (0, 0)
@@ -771,7 +792,7 @@ Palette = `midgames` 22 + `optpals` 24 + `mid1` 47. `mid1` 25 est chargée ici p
 - **animation sur fond** `mid1` 10 (0, 0), départ 1 ; dès l'image de scène 9, son image est forcée à
   9 à chaque image (elle joue donc 1 à 9 puis reste sur 9)
 
-### Scène 19 — plan (20 images/s, 30 images, sans son)
+### Scène 20 — plan (20 images/s, 30 images, sans son)
 
 Palette = `midgames` 23.
 - simple `optshps` 116 (0, 0)
@@ -780,7 +801,7 @@ Palette = `midgames` 23.
 - **image sur fond** `mid1` 2 (0, -25) image 1
 - **animation** `mid1` 19 (0, -40)
 
-### Scène 20 — dialogue (10 images/s)
+### Scène 21 — dialogue (10 images/s)
 
 Palette = `mid1` 45 + `mid1` 39.
 - simple `optshps` 116 (0, 0)
@@ -792,7 +813,7 @@ Palette = `mid1` 45 + `mid1` 39.
 Réplique 2 jusqu'à sa fin, bouche = 13 + (compteur & 1) ; sans voix, sous-titre `SPOK` 3 en
 couleur 4 pendant 30 images, même bouche.
 
-### Scène 21 — plan tremblant parlé (20 images/s)
+### Scène 22 — plan tremblant parlé (20 images/s)
 
 Palette = `mid1` 44 + `mid1` 38.
 - simple `optshps` 116 (0, -24)
@@ -804,21 +825,21 @@ Palette = `mid1` 44 + `mid1` 38.
 Phase 1 : 5 images. Phase 2 : réplique 5 jusqu'à sa fin, bouche = compteur & 1 ; sans voix,
 sous-titre `SPOK` 4 en couleur 114 jusqu'à l'image 40, même bouche.
 
-### Scène 22 — dialogue (10 images/s)
+### Scène 23 — dialogue (10 images/s)
 
 Palette = `mid1` 45 + `mid1` 39, puis un rectangle de couleur 0 dessiné sur la zone de
 sous-titre (`sub_2CBE5`, objet rectangle construit dans la cinématique, méthode de dessin non lue).
-Calques comme la scène 20 (tremble `mid1` 6 (1, -40) image 3, bouche `mid1` 0 (0, 14) image 13).
+Calques comme la scène 21 (tremble `mid1` 6 (1, -40) image 3, bouche `mid1` 0 (0, 14) image 13).
 Phase 1 : réplique 3 jusqu'à sa fin, bouche = 13 + (compteur & 1) ; sans voix, sous-titre `SPOK` 5
 en couleur 4 pendant 30 images. Bouche fixée à 13, compteur à 0. Phase 2 : 5 images.
 
-### Scène 23 — plan tremblant parlé (20 images/s)
+### Scène 24 — plan tremblant parlé (20 images/s)
 
-Comme la scène 21, avec le tremble `mid1` 6 en (0, -36). Phase 1 : 5 images. Phase 2 : réplique 6
+Comme la scène 22, avec le tremble `mid1` 6 en (0, -36). Phase 1 : 5 images. Phase 2 : réplique 6
 jusqu'à sa fin, bouche = compteur & 1 ; sans voix, sous-titre `SPOK` 6 en couleur 114 jusqu'à
 l'image 50.
 
-### Scène 24 — finale (20 images/s)
+### Scène 25 — finale (20 images/s)
 
 Palette = `midgames` 22 + `optpals` 24 + `midgames` 23. Réplique 13 (ou effet 5) chargée.
 
@@ -908,6 +929,6 @@ le même moteur. Pour figer le format, il faut y relever :
 4. **Les textes de lèvres** passés aux têtes parlantes, et l'éventuel passage en mode voix.
 5. **La seconde table de lettres** (`04302500000340143000353000`, pointeur `word_445AE`) : qui
    l'utilise.
-6. **La surface de dessin** (découpe seule, ou origine déplacée) : décisif pour les y négatifs.
+6. ~~La surface de dessin~~ : tranché, origine en haut à gauche de l'écran (§ 3.2).
 7. **Les éléments chargés par nom** dans `convdata.iff` (« air », « normal », « night » par
    `sub_C13D`).

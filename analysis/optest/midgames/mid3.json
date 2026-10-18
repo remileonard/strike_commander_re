@@ -1469,9 +1469,11 @@
     "        iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨228764⟩",
     "        iff_lit_mot(flux=flux1)                                                                       ⟨228768⟩",
     "        word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨228770⟩",
+    "        si = 1                                                                                        ⟨228771⟩",
     "        tant que si <= 106 :",
     "            iff_lit_mot(flux=flux1)                                                                   ⟨228778⟩",
     "            ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨228782⟩",
+    "            si = si + 1                                                                               ⟨228783⟩",
     "        iff_ferme_form(flux=flux1)                                                                    ⟨228790⟩",
     "        v2 = 1                                                                                        ⟨228792⟩",
     "        iff_ferme_form(flux=flux1)                                                                    ⟨228796⟩",
@@ -1490,9 +1492,11 @@
     "        iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨228900⟩",
     "        iff_lit_mot(flux=flux1)                                                                       ⟨228904⟩",
     "        word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨228906⟩",
+    "        si = 1                                                                                        ⟨228907⟩",
     "        tant que si <= 106 :",
     "            iff_lit_mot(flux=flux1)                                                                   ⟨228914⟩",
     "            ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨228918⟩",
+    "            si = si + 1                                                                               ⟨228919⟩",
     "        iff_ferme_form(flux=flux1)                                                                    ⟨228926⟩",
     "        v2 = 1                                                                                        ⟨228928⟩",
     "        iff_ferme_form(flux=flux1)                                                                    ⟨228932⟩",
@@ -1580,10 +1584,12 @@
     "    canal_enregistre(canal=canal6, ressource=asoundfx 101, x=0)                                       ⟨229335⟩",
     "    canal_arrête(canal=canal6)                                                                        ⟨229339⟩",
     "    canal_init(canal=canal7, pilote=word_46849)                                                       ⟨229350⟩",
+    "    si = 0                                                                                            ⟨229352⟩",
     "    tant que si < 2 :",
     "        charge(asoundfx v210[si])                                                                     ⟨229369⟩",
     "        canal_enregistre(canal=canal7, ressource=asoundfx v210[si], x=0)                              ⟨229376⟩",
     "        canal_arrête(canal=canal7)                                                                    ⟨229380⟩",
+    "        si = si + 1                                                                                   ⟨229401⟩",
     "    canal_arrête(canal=canal7)                                                                        ⟨229412⟩",
     "si byte_495FC != 0 :",
     "    canal_arrête(canal=canal6)                                                                        ⟨229443⟩",
@@ -1603,9 +1609,11 @@
     "scène1 = Scene_Create(cadence=15, palette=255, surface=&v608)                                         ⟨229964⟩",
     "charge(mid3 25)                                                                                       ⟨229976⟩",
     "c1 = OverlayImageLayer(ressource=mid3 25, x=0, y=0, image=0)                                          ⟨229984⟩",
+    "di = c1                                                                                               ⟨229986⟩",
     "palette_copie(destination=pal1, source=pal3(mid3 26))                                                 ⟨229994⟩",
     "palette_envoie(palette=pal1, pas=0)                                                                   ⟨230006⟩",
     "ajoute c1 à scène1                                                                                    ⟨230011⟩",
+    "si = 1                                                                                                ⟨230013⟩",
     "si v2 != 0 :",
     "    canal_enregistre(canal=canal3, ressource=asoundfx 59, x=0)                                        ⟨230021⟩",
     "    v230 = word_48F18                                                                                 ⟨230024⟩",
@@ -1615,6 +1623,7 @@
     "        sub_30C66(canal3.+0→4, v1262, v230, v232)                                                     ⟨230038⟩",
     "tant que (scène1.compteur < 30) et (scène1.terminée == 0) :",
     "    v234 = si                                                                                         ⟨230048⟩",
+    "    si = si + 1                                                                                       ⟨230049⟩",
     "    c1.image = v234                                                                                   ⟨230051⟩",
     "    Scene_Tick(scène=scène1)                                                                          ⟨230054⟩",
     "si v2 != 0 :",
@@ -1649,9 +1658,12 @@
     "palette_envoie(palette=pal1, pas=0)                                                                   ⟨230753⟩",
     "ajoute c2 à scène2                                                                                    ⟨230758⟩",
     "ajoute c3 à scène2                                                                                    ⟨230763⟩",
+    "si = 0                                                                                                ⟨230765⟩",
     "tant que (scène2.compteur < 75) et (scène2.terminée == 0) :",
+    "    di = scène2.compteur                                                                              ⟨230770⟩",
     "    si scène2.compteur < 29 :",
     "        v256 = si                                                                                     ⟨230773⟩",
+    "        si = si + 1                                                                                   ⟨230774⟩",
     "        c3.image = v256                                                                               ⟨230777⟩",
     "    sinon :",
     "        si scène2.compteur == 29 :",
@@ -1659,10 +1671,13 @@
     "            c3.détruit(3)                                                                             ⟨230795⟩",
     "            ajoute c4 à scène2                                                                        ⟨230803⟩",
     "            Scene_SetFps(scène=scène2, cadence=15)                                                    ⟨230808⟩",
+    "            si = 0                                                                                    ⟨230810⟩",
     "            v258 = 0                                                                                  ⟨230811⟩",
+    "            si = 1                                                                                    ⟨230812⟩",
     "            c4.image = v258                                                                           ⟨230815⟩",
     "        sinon :",
     "            v260 = si                                                                                 ⟨230820⟩",
+    "            si = si + 1                                                                               ⟨230821⟩",
     "            c4.image = v260                                                                           ⟨230824⟩",
     "    si scène2.compteur == 50 :",
     "        si v2 != 0 :",
@@ -1737,6 +1752,7 @@
     "",
     "──── scène3 ────",
     "scène3 = Scene_Create(cadence=20, palette=255, surface=&v608)                                         ⟨231824⟩",
+    "di = -10                                                                                              ⟨231826⟩",
     "v366 = 0                                                                                              ⟨231827⟩",
     "v370 = 0                                                                                              ⟨231828⟩",
     "v372 = 0                                                                                              ⟨231829⟩",
@@ -1839,6 +1855,7 @@
     "ajoute v452 à scène3                                                                                  ⟨232456⟩",
     "ajoute v454 à scène3                                                                                  ⟨232461⟩",
     "tant que (scène3.compteur < 189) et (scène3.terminée == 0) :",
+    "    si = scène3.compteur                                                                              ⟨232467⟩",
     "    si scène3.compteur == 9 :",
     "        v368 = 0                                                                                      ⟨232470⟩",
     "    si scène3.compteur > 10 :",
@@ -1866,7 +1883,10 @@
     "        si di != 0 :",
     "            v370 = v370 + 1                                                                           ⟨232591⟩",
     "            si v370 == 5 :",
+    "                di = di + 1                                                                           ⟨232595⟩",
     "                v370 = 0                                                                              ⟨232596⟩",
+    "            si di >= -1 :",
+    "                di = 0                                                                                ⟨232601⟩",
     "            v460 = di / 6                                                                             ⟨232608⟩",
     "            c6.vx = v460                                                                              ⟨232611⟩",
     "            c6.vy = 0                                                                                 ⟨232613⟩",
@@ -2010,6 +2030,7 @@
     "c19 = Layer(ressource=mid3 24, x=0, y=0)                                                              ⟨233905⟩",
     "c20 = Layer(ressource=mid3 13, x=0, y=0)                                                              ⟨233913⟩",
     "c21 = TalkingHeadOverlay(ressource=convdata type 0 \"air\", x=160, y=128)                               ⟨233921⟩",
+    "si = c21                                                                                              ⟨233923⟩",
     "",
     "──── scène4 ────",
     "scène4 = Scene_Create(cadence=10, palette=255, surface=&v608)                                         ⟨233930⟩",
@@ -2032,6 +2053,7 @@
     "        AIL_start_sequence(pilote=canal2.+0→4, séquence=v1248)                                        ⟨234038⟩",
     "        sub_30C66(canal2.+0→4, v1248, v278, v280)                                                     ⟨234045⟩",
     "tant que (scène4.compteur < 45) et (scène4.terminée == 0) :",
+    "    di = scène4.compteur                                                                              ⟨234055⟩",
     "    si scène4.compteur == 10 :",
     "        tête_image_de_base(tête=c21, image=14)                                                        ⟨234060⟩",
     "    si scène4.compteur == 19 :",
@@ -2057,6 +2079,7 @@
     "──── scène5 ────",
     "scène5 = Scene_Create(cadence=15, palette=255, surface=&v608)                                         ⟨234752⟩",
     "c23 = OverlayImageLayer(ressource=mid3 1, x=0, y=0, image=0)                                          ⟨234760⟩",
+    "di = c23                                                                                              ⟨234762⟩",
     "palette_copie(destination=pal1, source=pal8(mid3 18))                                                 ⟨234774⟩",
     "palette_envoie(palette=pal1, pas=0)                                                                   ⟨234782⟩",
     "ajoute c23 à scène5                                                                                   ⟨234787⟩",
@@ -2067,6 +2090,7 @@
     "        AIL_start_sequence(pilote=canal2.+0→4, séquence=v1248)                                        ⟨234807⟩",
     "        sub_30C66(canal2.+0→4, v1248, v230, v232)                                                     ⟨234814⟩",
     "tant que (scène5.compteur < 45) et (scène5.terminée == 0) :",
+    "    si = scène5.compteur                                                                              ⟨234824⟩",
     "    si scène5.compteur & 1 != 0 :",
     "        v234 = ('field', 83, 29)                                                                      ⟨234831⟩",
     "        c23.image = v234                                                                              ⟨234833⟩",
@@ -2080,8 +2104,9489 @@
     "canal_arrête(canal=canal2)                                                                            ⟨234998⟩",
     "canal_arrête(canal=canal1)                                                                            ⟨235308⟩",
     "retour                                                                                                ⟨235394⟩"
+   ],
+   "arbre": [
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "bp"
+     },
+     "valeur": {
+      "glob": "sp",
+      "init": null
+     },
+     "ligne": 228561
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "glob": "byte_495FC"
+     },
+     "valeur": 0,
+     "ligne": 228565
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1"
+     },
+     "valeur": 0,
+     "ligne": 228566
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v2"
+     },
+     "valeur": 0,
+     "ligne": 228567
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v4"
+     },
+     "valeur": {
+      "glob": "word_46F46",
+      "init": 0
+     },
+     "ligne": 228569
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v608"
+     },
+     "valeur": 0,
+     "ligne": 228570
+    },
+    {
+     "t": "appel",
+     "nom": "TextFormat_ApplyStyleAttribute_2E9A4",
+     "args": [
+      {
+       "adresse": "v608"
+      },
+      {
+       "local": "v4"
+      }
+     ],
+     "texte": [
+      "&v608",
+      "v4"
+     ],
+     "ligne": 228575
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v622"
+     },
+     "valeur": 0,
+     "ligne": 228577
+    },
+    {
+     "t": "appel",
+     "nom": "TextRenderer_ApplyFormatChange_2EA21",
+     "args": [
+      {
+       "adresse": "v622"
+      },
+      0
+     ],
+     "texte": [
+      "&v622",
+      "0"
+     ],
+     "ligne": 228586
+    },
+    {
+     "t": "appel",
+     "nom": "SmallObject_RegisterInList_2CB40",
+     "args": [
+      {
+       "adresse": "v8"
+      },
+      {
+       "adresse": "v622"
+      }
+     ],
+     "texte": [
+      "&v8",
+      "&v622"
+     ],
+     "ligne": 228592
+    },
+    {
+     "t": "op",
+     "op": "palette_alloue",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 228598
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v18"
+     },
+     "valeur": 0,
+     "ligne": 228604
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v28"
+     },
+     "valeur": 0,
+     "ligne": 228675
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v23"
+     },
+     "valeur": 0,
+     "ligne": 228677
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v22"
+     },
+     "valeur": 0,
+     "ligne": 228678
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v30"
+     },
+     "valeur": {
+      "glob": "byte_46848",
+      "init": 0
+     },
+     "ligne": 228680
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v30"
+      },
+      "b": 1
+     },
+     "alors": [
+      {
+       "t": "saut_si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "local": "v30"
+        },
+        "b": 2
+       },
+       "cible": "loc_71991",
+       "ligne": 228690
+      }
+     ],
+     "sinon": [
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "résultat": "sub_6734(chemin1)"
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "pak rsoundfx.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 228726
+        },
+        {
+         "t": "op",
+         "op": "flux_iff",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228740
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v1377"
+         },
+         "valeur": 256,
+         "ligne": 228743
+        },
+        {
+         "t": "appel",
+         "nom": "flux1.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 228752
+        },
+        {
+         "t": "op",
+         "op": "iff_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          },
+          "balise": 1431064406,
+          "x": 0
+         },
+         "texte": [
+          "flux=flux1",
+          "balise='VOLU'",
+          "x=0"
+         ],
+         "ligne": 228758
+        },
+        {
+         "t": "op",
+         "op": "iff_chunk",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          },
+          "balise": 842224717,
+          "x": 1
+         },
+         "texte": [
+          "flux=flux1",
+          "balise='MT32'",
+          "x=1"
+         ],
+         "ligne": 228764
+        },
+        {
+         "t": "op",
+         "op": "iff_lit_mot",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228768
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "glob": "word_48F76"
+         },
+         "valeur": {
+          "résultat": "iff_lit_mot(flux=flux1)"
+         },
+         "ligne": 228770
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "si"
+         },
+         "valeur": 1,
+         "ligne": 228771
+        },
+        {
+         "t": "tant_que",
+         "cond": {
+          "cmp": "<=",
+          "a": {
+           "local": "si"
+          },
+          "b": 106
+         },
+         "corps": [
+          {
+           "t": "op",
+           "op": "iff_lit_mot",
+           "args": {
+            "flux": {
+             "objet": "flux1"
+            }
+           },
+           "texte": [
+            "flux=flux1"
+           ],
+           "ligne": 228778
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "ds:24192[si·2]"
+           },
+           "valeur": {
+            "résultat": "iff_lit_mot(flux=flux1)"
+           },
+           "ligne": 228782
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "si"
+            },
+            "b": 1
+           },
+           "ligne": 228783
+          }
+         ],
+         "ligne": 228772
+        },
+        {
+         "t": "op",
+         "op": "iff_ferme_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228790
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v2"
+         },
+         "valeur": 1,
+         "ligne": 228792
+        },
+        {
+         "t": "op",
+         "op": "iff_ferme_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228796
+        }
+       ],
+       "sinon": [],
+       "ligne": 228715
+      },
+      {
+       "t": "label",
+       "nom": "loc_71950"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "résultat": "sub_6734(chemin1)"
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v1"
+         },
+         "valeur": 1,
+         "ligne": 228822
+        },
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "==",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "glob": "word_48F76"
+           },
+           "valeur": 90,
+           "ligne": 228827
+          }
+         ],
+         "sinon": [],
+         "ligne": 228826
+        }
+       ],
+       "sinon": [],
+       "ligne": 228821
+      },
+      {
+       "t": "label",
+       "nom": "loc_7198E"
+      },
+      {
+       "t": "saut",
+       "cible": "loc_71AFC",
+       "ligne": 228831
+      },
+      {
+       "t": "label",
+       "nom": "loc_71991"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "résultat": "sub_6734(chemin1)"
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "pak asoundfx.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 228862
+        },
+        {
+         "t": "op",
+         "op": "flux_iff",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228876
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v1377"
+         },
+         "valeur": 256,
+         "ligne": 228879
+        },
+        {
+         "t": "appel",
+         "nom": "flux1.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 228888
+        },
+        {
+         "t": "op",
+         "op": "iff_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          },
+          "balise": 1431064406,
+          "x": 0
+         },
+         "texte": [
+          "flux=flux1",
+          "balise='VOLU'",
+          "x=0"
+         ],
+         "ligne": 228894
+        },
+        {
+         "t": "op",
+         "op": "iff_chunk",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          },
+          "balise": 1112294465,
+          "x": 1
+         },
+         "texte": [
+          "flux=flux1",
+          "balise='ADLB'",
+          "x=1"
+         ],
+         "ligne": 228900
+        },
+        {
+         "t": "op",
+         "op": "iff_lit_mot",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228904
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "glob": "word_48F76"
+         },
+         "valeur": {
+          "résultat": "iff_lit_mot(flux=flux1)"
+         },
+         "ligne": 228906
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "si"
+         },
+         "valeur": 1,
+         "ligne": 228907
+        },
+        {
+         "t": "tant_que",
+         "cond": {
+          "cmp": "<=",
+          "a": {
+           "local": "si"
+          },
+          "b": 106
+         },
+         "corps": [
+          {
+           "t": "op",
+           "op": "iff_lit_mot",
+           "args": {
+            "flux": {
+             "objet": "flux1"
+            }
+           },
+           "texte": [
+            "flux=flux1"
+           ],
+           "ligne": 228914
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "ds:24192[si·2]"
+           },
+           "valeur": {
+            "résultat": "iff_lit_mot(flux=flux1)"
+           },
+           "ligne": 228918
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "si"
+            },
+            "b": 1
+           },
+           "ligne": 228919
+          }
+         ],
+         "ligne": 228908
+        },
+        {
+         "t": "op",
+         "op": "iff_ferme_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228926
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v2"
+         },
+         "valeur": 1,
+         "ligne": 228928
+        },
+        {
+         "t": "op",
+         "op": "iff_ferme_form",
+         "args": {
+          "flux": {
+           "objet": "flux1"
+          }
+         },
+         "texte": [
+          "flux=flux1"
+         ],
+         "ligne": 228932
+        }
+       ],
+       "sinon": [],
+       "ligne": 228851
+      },
+      {
+       "t": "label",
+       "nom": "loc_71ABC"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "résultat": "sub_6734(chemin1)"
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v1"
+         },
+         "valeur": 1,
+         "ligne": 228958
+        },
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "==",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "glob": "word_48F76"
+           },
+           "valeur": 255,
+           "ligne": 228963
+          }
+         ],
+         "sinon": [],
+         "ligne": 228962
+        }
+       ],
+       "sinon": [],
+       "ligne": 228957
+      },
+      {
+       "t": "label",
+       "nom": "loc_71AFA"
+      }
+     ],
+     "ligne": 228688
+    },
+    {
+     "t": "label",
+     "nom": "loc_71AFC"
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1232"
+     },
+     "valeur": 0,
+     "ligne": 228971
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v1"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "amusic",
+        "entrée": 3,
+        "ressource": {
+         "objet": "r1"
+        }
+       },
+       "texte": [
+        "amusic 3"
+       ],
+       "ligne": 228992
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal1",
+        "pilote=word_46849"
+       ],
+       "ligne": 228997
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        },
+        "ressource": {
+         "objet": "r1"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal1",
+        "ressource=amusic 3",
+        "x=0"
+       ],
+       "ligne": 229004
+      }
+     ],
+     "sinon": [],
+     "ligne": 228978
+    },
+    {
+     "t": "label",
+     "nom": "loc_71B86"
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "optpals",
+      "entrée": 21,
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "optpals 21"
+     ],
+     "ligne": 229023
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal2"
+      },
+      "ressource": {
+       "objet": "r2"
+      }
+     },
+     "texte": [
+      "pal2(optpals 21)"
+     ],
+     "ligne": 229030
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 26,
+      "ressource": {
+       "objet": "r3"
+      }
+     },
+     "texte": [
+      "mid3 26"
+     ],
+     "ligne": 229042
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal3"
+      },
+      "ressource": {
+       "objet": "r3"
+      }
+     },
+     "texte": [
+      "pal3(mid3 26)"
+     ],
+     "ligne": 229049
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 17,
+      "ressource": {
+       "objet": "r4"
+      }
+     },
+     "texte": [
+      "mid3 17"
+     ],
+     "ligne": 229061
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal4"
+      },
+      "ressource": {
+       "objet": "r4"
+      }
+     },
+     "texte": [
+      "pal4(mid3 17)"
+     ],
+     "ligne": 229068
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 19,
+      "ressource": {
+       "objet": "r5"
+      }
+     },
+     "texte": [
+      "mid3 19"
+     ],
+     "ligne": 229080
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal5"
+      },
+      "ressource": {
+       "objet": "r5"
+      }
+     },
+     "texte": [
+      "pal5(mid3 19)"
+     ],
+     "ligne": 229087
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 20,
+      "ressource": {
+       "objet": "r6"
+      }
+     },
+     "texte": [
+      "mid3 20"
+     ],
+     "ligne": 229099
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal6"
+      },
+      "ressource": {
+       "objet": "r6"
+      }
+     },
+     "texte": [
+      "pal6(mid3 20)"
+     ],
+     "ligne": 229106
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 21,
+      "ressource": {
+       "objet": "r7"
+      }
+     },
+     "texte": [
+      "mid3 21"
+     ],
+     "ligne": 229118
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal7"
+      },
+      "ressource": {
+       "objet": "r7"
+      }
+     },
+     "texte": [
+      "pal7(mid3 21)"
+     ],
+     "ligne": 229125
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 18,
+      "ressource": {
+       "objet": "r8"
+      }
+     },
+     "texte": [
+      "mid3 18"
+     ],
+     "ligne": 229137
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal8"
+      },
+      "ressource": {
+       "objet": "r8"
+      }
+     },
+     "texte": [
+      "pal8(mid3 18)"
+     ],
+     "ligne": 229144
+    },
+    {
+     "t": "op",
+     "op": "charge_convdata_type2",
+     "args": {
+      "nom": "normal",
+      "ressource": {
+       "objet": "r9"
+      }
+     },
+     "texte": [
+      "\"normal\""
+     ],
+     "ligne": 229154
+    },
+    {
+     "t": "op",
+     "op": "palette_depuis",
+     "args": {
+      "palette": {
+       "objet": "pal9"
+      },
+      "ressource": {
+       "objet": "r9"
+      }
+     },
+     "texte": [
+      "pal9(convdata type 2 \"normal\")"
+     ],
+     "ligne": 229161
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v168"
+     },
+     "valeur": 0,
+     "ligne": 229163
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v163"
+     },
+     "valeur": 0,
+     "ligne": 229165
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v162"
+     },
+     "valeur": 0,
+     "ligne": 229166
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v178"
+     },
+     "valeur": 0,
+     "ligne": 229167
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v173"
+     },
+     "valeur": 0,
+     "ligne": 229169
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v172"
+     },
+     "valeur": 0,
+     "ligne": 229170
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v188"
+     },
+     "valeur": 0,
+     "ligne": 229171
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v183"
+     },
+     "valeur": 0,
+     "ligne": 229173
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v182"
+     },
+     "valeur": 0,
+     "ligne": 229174
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v198"
+     },
+     "valeur": 0,
+     "ligne": 229175
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v193"
+     },
+     "valeur": 0,
+     "ligne": 229177
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v192"
+     },
+     "valeur": 0,
+     "ligne": 229178
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v208"
+     },
+     "valeur": 0,
+     "ligne": 229179
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v203"
+     },
+     "valeur": 0,
+     "ligne": 229181
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v202"
+     },
+     "valeur": 0,
+     "ligne": 229182
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1246"
+     },
+     "valeur": 0,
+     "ligne": 229183
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1241"
+     },
+     "valeur": 0,
+     "ligne": 229185
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1240"
+     },
+     "valeur": 0,
+     "ligne": 229186
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1250"
+     },
+     "valeur": 0,
+     "ligne": 229187
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1260"
+     },
+     "valeur": 0,
+     "ligne": 229189
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1255"
+     },
+     "valeur": 0,
+     "ligne": 229191
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1254"
+     },
+     "valeur": 0,
+     "ligne": 229192
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1264"
+     },
+     "valeur": 0,
+     "ligne": 229193
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1274"
+     },
+     "valeur": 0,
+     "ligne": 229195
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1269"
+     },
+     "valeur": 0,
+     "ligne": 229197
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1268"
+     },
+     "valeur": 0,
+     "ligne": 229198
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1278"
+     },
+     "valeur": 0,
+     "ligne": 229199
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1288"
+     },
+     "valeur": 0,
+     "ligne": 229201
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1283"
+     },
+     "valeur": 0,
+     "ligne": 229203
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1282"
+     },
+     "valeur": 0,
+     "ligne": 229204
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1292"
+     },
+     "valeur": 0,
+     "ligne": 229205
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1302"
+     },
+     "valeur": 0,
+     "ligne": 229207
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1297"
+     },
+     "valeur": 0,
+     "ligne": 229209
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1296"
+     },
+     "valeur": 0,
+     "ligne": 229210
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1306"
+     },
+     "valeur": 0,
+     "ligne": 229211
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v210"
+     },
+     "valeur": {
+      "glob": "word_44FE6",
+      "init": 5198
+     },
+     "ligne": 229214
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 40,
+        "ressource": {
+         "objet": "r10"
+        }
+       },
+       "texte": [
+        "asoundfx 40"
+       ],
+       "ligne": 229227
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal2",
+        "pilote=word_46849"
+       ],
+       "ligne": 229232
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        },
+        "ressource": {
+         "objet": "r10"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal2",
+        "ressource=asoundfx 40",
+        "x=0"
+       ],
+       "ligne": 229239
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 229243
+      },
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 59,
+        "ressource": {
+         "objet": "r11"
+        }
+       },
+       "texte": [
+        "asoundfx 59"
+       ],
+       "ligne": 229251
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal3",
+        "pilote=word_46849"
+       ],
+       "ligne": 229256
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        },
+        "ressource": {
+         "objet": "r11"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal3",
+        "ressource=asoundfx 59",
+        "x=0"
+       ],
+       "ligne": 229263
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 229267
+      },
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 60,
+        "ressource": {
+         "objet": "r12"
+        }
+       },
+       "texte": [
+        "asoundfx 60"
+       ],
+       "ligne": 229275
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal4",
+        "pilote=word_46849"
+       ],
+       "ligne": 229280
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        },
+        "ressource": {
+         "objet": "r12"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal4",
+        "ressource=asoundfx 60",
+        "x=0"
+       ],
+       "ligne": 229287
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 229291
+      },
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 100,
+        "ressource": {
+         "objet": "r13"
+        }
+       },
+       "texte": [
+        "asoundfx 100"
+       ],
+       "ligne": 229299
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal5",
+        "pilote=word_46849"
+       ],
+       "ligne": 229304
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        },
+        "ressource": {
+         "objet": "r13"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal5",
+        "ressource=asoundfx 100",
+        "x=0"
+       ],
+       "ligne": 229311
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 229315
+      },
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 101,
+        "ressource": {
+         "objet": "r14"
+        }
+       },
+       "texte": [
+        "asoundfx 101"
+       ],
+       "ligne": 229323
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal6",
+        "pilote=word_46849"
+       ],
+       "ligne": 229328
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        },
+        "ressource": {
+         "objet": "r14"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal6",
+        "ressource=asoundfx 101",
+        "x=0"
+       ],
+       "ligne": 229335
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 229339
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal7"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal7",
+        "pilote=word_46849"
+       ],
+       "ligne": 229350
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": 0,
+       "ligne": 229352
+      },
+      {
+       "t": "tant_que",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "local": "si"
+        },
+        "b": 2
+       },
+       "corps": [
+        {
+         "t": "op",
+         "op": "charge",
+         "args": {
+          "pak": "asoundfx",
+          "entrée": {
+           "glob": "v210[si]",
+           "init": null
+          },
+          "ressource": {
+           "objet": "r15"
+          }
+         },
+         "texte": [
+          "asoundfx v210[si]"
+         ],
+         "ligne": 229369
+        },
+        {
+         "t": "op",
+         "op": "canal_enregistre",
+         "args": {
+          "canal": {
+           "objet": "canal7"
+          },
+          "ressource": {
+           "objet": "r15"
+          },
+          "x": 0
+         },
+         "texte": [
+          "canal=canal7",
+          "ressource=asoundfx v210[si]",
+          "x=0"
+         ],
+         "ligne": 229376
+        },
+        {
+         "t": "op",
+         "op": "canal_arrête",
+         "args": {
+          "canal": {
+           "objet": "canal7"
+          }
+         },
+         "texte": [
+          "canal=canal7"
+         ],
+         "ligne": 229380
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "si"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "local": "si"
+          },
+          "b": 1
+         },
+         "ligne": 229401
+        }
+       ],
+       "ligne": 229353
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal7"
+        }
+       },
+       "texte": [
+        "canal=canal7"
+       ],
+       "ligne": 229412
+      }
+     ],
+     "sinon": [],
+     "ligne": 229216
+    },
+    {
+     "t": "label",
+     "nom": "loc_72197"
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "glob": "byte_495FC",
+       "init": 0
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 229443
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 229466
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 229489
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 229512
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 229535
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        }
+       },
+       "texte": [
+        "canal=canal1"
+       ],
+       "ligne": 229845
+      },
+      {
+       "t": "retour",
+       "ligne": 229931
+      }
+     ],
+     "sinon": [],
+     "ligne": 229436
+    },
+    {
+     "t": "label",
+     "nom": "loc_727A1"
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v1"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v212"
+       },
+       "valeur": {
+        "glob": "word_48F76",
+        "init": 0
+       },
+       "ligne": 229938
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal1",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal1",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1234"
+          }
+         },
+         "texte": [
+          "pilote=canal1.+0→4",
+          "séquence=v1234"
+         ],
+         "ligne": 229945
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal1",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1234"
+          },
+          {
+           "local": "v212"
+          },
+          0
+         ],
+         "texte": [
+          "canal1.+0→4",
+          "v1234",
+          "v212",
+          "0"
+         ],
+         "ligne": 229952
+        }
+       ],
+       "sinon": [],
+       "ligne": 229941
+      }
+     ],
+     "sinon": [],
+     "ligne": 229936
+    },
+    {
+     "t": "label",
+     "nom": "loc_727EB"
+    },
+    {
+     "t": "scène",
+     "nom": "scène1",
+     "cadence": "15",
+     "ligne": 229964
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 25,
+      "ressource": {
+       "objet": "r15"
+      }
+     },
+     "texte": [
+      "mid3 25"
+     ],
+     "ligne": 229976
+    },
+    {
+     "t": "calque",
+     "nom": "c1",
+     "type": "OverlayImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r15"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 229984
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": {
+      "objet": "c1"
+     },
+     "ligne": 229986
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal3"
+      },
+      "premier": {
+       "local": "v60"
+      },
+      "nombre": {
+       "champ": [
+        "pal3",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal3(mid3 26)"
+     ],
+     "ligne": 229994
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v12"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 230006
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène1",
+     "calque": "c1",
+     "ligne": 230011
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": 1,
+     "ligne": 230013
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        },
+        "ressource": {
+         "objet": "r11"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal3",
+        "ressource=asoundfx 59",
+        "x=0"
+       ],
+       "ligne": 230021
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v230"
+       },
+       "valeur": {
+        "glob": "word_48F18",
+        "init": 0
+       },
+       "ligne": 230024
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v232"
+       },
+       "valeur": 0,
+       "ligne": 230025
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal3",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal3",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1262"
+          }
+         },
+         "texte": [
+          "pilote=canal3.+0→4",
+          "séquence=v1262"
+         ],
+         "ligne": 230031
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal3",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1262"
+          },
+          {
+           "local": "v230"
+          },
+          {
+           "local": "v232"
+          }
+         ],
+         "texte": [
+          "canal3.+0→4",
+          "v1262",
+          "v230",
+          "v232"
+         ],
+         "ligne": 230038
+        }
+       ],
+       "sinon": [],
+       "ligne": 230027
+      }
+     ],
+     "sinon": [],
+     "ligne": 230015
+    },
+    {
+     "t": "label",
+     "nom": "loc_728F4"
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène1",
+          "compteur"
+         ]
+        },
+        "b": 30
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène1",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v234"
+       },
+       "valeur": {
+        "local": "si"
+       },
+       "ligne": 230048
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "op": "+",
+        "a": {
+         "local": "si"
+        },
+        "b": 1
+       },
+       "ligne": 230049
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "champ": [
+         "c1",
+         "image"
+        ]
+       },
+       "valeur": {
+        "local": "v234"
+       },
+       "ligne": 230051
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène1"
+        }
+       },
+       "texte": [
+        "scène=scène1"
+       ],
+       "ligne": 230054
+      }
+     ],
+     "ligne": 230044
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 230089
+      }
+     ],
+     "sinon": [],
+     "ligne": 230086
+    },
+    {
+     "t": "label",
+     "nom": "loc_7294A"
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène1"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène1",
+      "drapeaux=0"
+     ],
+     "ligne": 230115
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "glob": "byte_495FC",
+       "init": 0
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 230125
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 230148
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 230171
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 230194
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 230217
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        }
+       },
+       "texte": [
+        "canal=canal1"
+       ],
+       "ligne": 230527
+      },
+      {
+       "t": "retour",
+       "ligne": 230613
+      }
+     ],
+     "sinon": [],
+     "ligne": 230118
+    },
+    {
+     "t": "label",
+     "nom": "loc_72FA2"
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        },
+        "ressource": {
+         "objet": "r12"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal4",
+        "ressource=asoundfx 60",
+        "x=0"
+       ],
+       "ligne": 230628
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        },
+        "ressource": {
+         "objet": "r13"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal5",
+        "ressource=asoundfx 100",
+        "x=0"
+       ],
+       "ligne": 230635
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        },
+        "ressource": {
+         "objet": "r14"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal6",
+        "ressource=asoundfx 101",
+        "x=0"
+       ],
+       "ligne": 230642
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v216"
+       },
+       "valeur": {
+        "glob": "word_48F1A",
+        "init": 0
+       },
+       "ligne": 230645
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal4",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal4",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1276"
+          }
+         },
+         "texte": [
+          "pilote=canal4.+0→4",
+          "séquence=v1276"
+         ],
+         "ligne": 230652
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal4",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1276"
+          },
+          {
+           "local": "v216"
+          },
+          0
+         ],
+         "texte": [
+          "canal4.+0→4",
+          "v1276",
+          "v216",
+          "0"
+         ],
+         "ligne": 230659
+        }
+       ],
+       "sinon": [],
+       "ligne": 230648
+      }
+     ],
+     "sinon": [],
+     "ligne": 230618
+    },
+    {
+     "t": "label",
+     "nom": "loc_7302B"
+    },
+    {
+     "t": "scène",
+     "nom": "scène2",
+     "cadence": "20",
+     "ligne": 230671
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 11,
+      "ressource": {
+       "objet": "r15"
+      }
+     },
+     "texte": [
+      "mid3 11"
+     ],
+     "ligne": 230683
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 15,
+      "ressource": {
+       "objet": "r16"
+      }
+     },
+     "texte": [
+      "mid3 15"
+     ],
+     "ligne": 230695
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 16,
+      "ressource": {
+       "objet": "r17"
+      }
+     },
+     "texte": [
+      "mid3 16"
+     ],
+     "ligne": 230707
+    },
+    {
+     "t": "calque",
+     "nom": "c2",
+     "type": "OverlayImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r15"
+      },
+      "x": 0,
+      "y": -26,
+      "image": 0
+     },
+     "ligne": 230715
+    },
+    {
+     "t": "calque",
+     "nom": "c3",
+     "type": "Layer",
+     "args": {
+      "ressource": {
+       "objet": "r16"
+      },
+      "x": 0,
+      "y": -1
+     },
+     "ligne": 230723
+    },
+    {
+     "t": "calque",
+     "nom": "c4",
+     "type": "Layer",
+     "args": {
+      "ressource": {
+       "objet": "r17"
+      },
+      "x": 0,
+      "y": -1
+     },
+     "ligne": 230731
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal4"
+      },
+      "premier": {
+       "local": "v76"
+      },
+      "nombre": {
+       "champ": [
+        "pal4",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal4(mid3 17)"
+     ],
+     "ligne": 230741
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v12"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 230753
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène2",
+     "calque": "c2",
+     "ligne": 230758
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène2",
+     "calque": "c3",
+     "ligne": 230763
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": 0,
+     "ligne": 230765
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 75
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène2",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "di"
+       },
+       "valeur": {
+        "champ": [
+         "scène2",
+         "compteur"
+        ]
+       },
+       "ligne": 230770
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 29
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v256"
+         },
+         "valeur": {
+          "local": "si"
+         },
+         "ligne": 230773
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "si"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "local": "si"
+          },
+          "b": 1
+         },
+         "ligne": 230774
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "champ": [
+           "c3",
+           "image"
+          ]
+         },
+         "valeur": {
+          "local": "v256"
+         },
+         "ligne": 230777
+        }
+       ],
+       "sinon": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "==",
+          "a": {
+           "champ": [
+            "scène2",
+            "compteur"
+           ]
+          },
+          "b": 29
+         },
+         "alors": [
+          {
+           "t": "op",
+           "op": "retire",
+           "args": {
+            "parent": {
+             "objet": "scène2"
+            },
+            "calque": {
+             "objet": "c3"
+            }
+           },
+           "texte": [
+            "parent=scène2",
+            "calque=c3"
+           ],
+           "ligne": 230787
+          },
+          {
+           "t": "appel",
+           "nom": "c3.détruit",
+           "args": [
+            3
+           ],
+           "texte": [
+            "3"
+           ],
+           "ligne": 230795
+          },
+          {
+           "t": "ajoute",
+           "parent": "scène2",
+           "calque": "c4",
+           "ligne": 230803
+          },
+          {
+           "t": "op",
+           "op": "Scene_SetFps",
+           "args": {
+            "scène": {
+             "objet": "scène2"
+            },
+            "cadence": 15
+           },
+           "texte": [
+            "scène=scène2",
+            "cadence=15"
+           ],
+           "ligne": 230808
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": 0,
+           "ligne": 230810
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v258"
+           },
+           "valeur": 0,
+           "ligne": 230811
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": 1,
+           "ligne": 230812
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c4",
+             "image"
+            ]
+           },
+           "valeur": {
+            "local": "v258"
+           },
+           "ligne": 230815
+          }
+         ],
+         "sinon": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v260"
+           },
+           "valeur": {
+            "local": "si"
+           },
+           "ligne": 230820
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "si"
+            },
+            "b": 1
+           },
+           "ligne": 230821
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c4",
+             "image"
+            ]
+           },
+           "valeur": {
+            "local": "v260"
+           },
+           "ligne": 230824
+          }
+         ],
+         "ligne": 230783
+        }
+       ],
+       "ligne": 230772
+      },
+      {
+       "t": "label",
+       "nom": "loc_7320F"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 50
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "op",
+           "op": "canal_enregistre",
+           "args": {
+            "canal": {
+             "objet": "canal5"
+            },
+            "ressource": {
+             "objet": "r13"
+            },
+            "x": 0
+           },
+           "texte": [
+            "canal=canal5",
+            "ressource=asoundfx 100",
+            "x=0"
+           ],
+           "ligne": 230837
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v262"
+           },
+           "valeur": {
+            "glob": "word_48F6A",
+            "init": 0
+           },
+           "ligne": 230840
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v264"
+           },
+           "valeur": 0,
+           "ligne": 230841
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "champ": [
+              "canal5",
+              "+0"
+             ]
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "op",
+             "op": "AIL_start_sequence",
+             "args": {
+              "pilote": {
+               "déréf": {
+                "champ": [
+                 "canal5",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              "séquence": {
+               "local": "v1290"
+              }
+             },
+             "texte": [
+              "pilote=canal5.+0→4",
+              "séquence=v1290"
+             ],
+             "ligne": 230847
+            },
+            {
+             "t": "appel",
+             "nom": "sub_30C66",
+             "args": [
+              {
+               "déréf": {
+                "champ": [
+                 "canal5",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              {
+               "local": "v1290"
+              },
+              {
+               "local": "v262"
+              },
+              {
+               "local": "v264"
+              }
+             ],
+             "texte": [
+              "canal5.+0→4",
+              "v1290",
+              "v262",
+              "v264"
+             ],
+             "ligne": 230854
+            }
+           ],
+           "sinon": [],
+           "ligne": 230843
+          }
+         ],
+         "sinon": [],
+         "ligne": 230831
+        }
+       ],
+       "sinon": [],
+       "ligne": 230829
+      },
+      {
+       "t": "label",
+       "nom": "loc_73272"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 52
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "op",
+           "op": "canal_enregistre",
+           "args": {
+            "canal": {
+             "objet": "canal6"
+            },
+            "ressource": {
+             "objet": "r14"
+            },
+            "x": 0
+           },
+           "texte": [
+            "canal=canal6",
+            "ressource=asoundfx 101",
+            "x=0"
+           ],
+           "ligne": 230869
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v266"
+           },
+           "valeur": {
+            "glob": "word_48F6C",
+            "init": 0
+           },
+           "ligne": 230872
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v268"
+           },
+           "valeur": 0,
+           "ligne": 230873
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "champ": [
+              "canal6",
+              "+0"
+             ]
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "op",
+             "op": "AIL_start_sequence",
+             "args": {
+              "pilote": {
+               "déréf": {
+                "champ": [
+                 "canal6",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              "séquence": {
+               "local": "v1304"
+              }
+             },
+             "texte": [
+              "pilote=canal6.+0→4",
+              "séquence=v1304"
+             ],
+             "ligne": 230879
+            },
+            {
+             "t": "appel",
+             "nom": "sub_30C66",
+             "args": [
+              {
+               "déréf": {
+                "champ": [
+                 "canal6",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              {
+               "local": "v1304"
+              },
+              {
+               "local": "v266"
+              },
+              {
+               "local": "v268"
+              }
+             ],
+             "texte": [
+              "canal6.+0→4",
+              "v1304",
+              "v266",
+              "v268"
+             ],
+             "ligne": 230886
+            }
+           ],
+           "sinon": [],
+           "ligne": 230875
+          }
+         ],
+         "sinon": [],
+         "ligne": 230863
+        }
+       ],
+       "sinon": [],
+       "ligne": 230861
+      },
+      {
+       "t": "label",
+       "nom": "loc_732D5"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène2",
+          "compteur"
+         ]
+        },
+        "b": 59
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v270"
+           },
+           "valeur": {
+            "glob": "word_48F6C",
+            "init": 0
+           },
+           "ligne": 230897
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v272"
+           },
+           "valeur": 0,
+           "ligne": 230898
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "champ": [
+              "canal6",
+              "+0"
+             ]
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "op",
+             "op": "AIL_start_sequence",
+             "args": {
+              "pilote": {
+               "déréf": {
+                "champ": [
+                 "canal6",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              "séquence": {
+               "local": "v1304"
+              }
+             },
+             "texte": [
+              "pilote=canal6.+0→4",
+              "séquence=v1304"
+             ],
+             "ligne": 230904
+            },
+            {
+             "t": "appel",
+             "nom": "sub_30C66",
+             "args": [
+              {
+               "déréf": {
+                "champ": [
+                 "canal6",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              {
+               "local": "v1304"
+              },
+              {
+               "local": "v270"
+              },
+              {
+               "local": "v272"
+              }
+             ],
+             "texte": [
+              "canal6.+0→4",
+              "v1304",
+              "v270",
+              "v272"
+             ],
+             "ligne": 230911
+            }
+           ],
+           "sinon": [],
+           "ligne": 230900
+          }
+         ],
+         "sinon": [],
+         "ligne": 230895
+        }
+       ],
+       "sinon": [],
+       "ligne": 230893
+      },
+      {
+       "t": "label",
+       "nom": "loc_73324"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "inconnu": [
+          "field",
+          42,
+          29
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v274"
+         },
+         "valeur": {
+          "inconnu": [
+           "field",
+           42,
+           29
+          ]
+         },
+         "ligne": 230927
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "champ": [
+           "c2",
+           "image"
+          ]
+         },
+         "valeur": {
+          "local": "v274"
+         },
+         "ligne": 230930
+        }
+       ],
+       "sinon": [],
+       "ligne": 230922
+      },
+      {
+       "t": "label",
+       "nom": "loc_73347"
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène2"
+        }
+       },
+       "texte": [
+        "scène=scène2"
+       ],
+       "ligne": 230945
+      }
+     ],
+     "ligne": 230766
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 230975
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 230979
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 230983
+      }
+     ],
+     "sinon": [],
+     "ligne": 230972
+    },
+    {
+     "t": "label",
+     "nom": "loc_733AC"
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène2"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène2",
+      "drapeaux=0"
+     ],
+     "ligne": 231047
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "glob": "byte_495FC",
+       "init": 0
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 231057
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 231080
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 231103
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 231126
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 231149
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        }
+       },
+       "texte": [
+        "canal=canal1"
+       ],
+       "ligne": 231459
+      },
+      {
+       "t": "retour",
+       "ligne": 231545
+      }
+     ],
+     "sinon": [],
+     "ligne": 231050
+    },
+    {
+     "t": "label",
+     "nom": "loc_73A82"
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1330"
+     },
+     "valeur": 0,
+     "ligne": 231563
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1325"
+     },
+     "valeur": 0,
+     "ligne": 231565
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1324"
+     },
+     "valeur": 0,
+     "ligne": 231566
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1334"
+     },
+     "valeur": 0,
+     "ligne": 231567
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 78,
+        "ressource": {
+         "objet": "r15"
+        }
+       },
+       "texte": [
+        "asoundfx 78"
+       ],
+       "ligne": 231581
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal7"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal7",
+        "pilote=word_46849"
+       ],
+       "ligne": 231586
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal7"
+        },
+        "ressource": {
+         "objet": "r15"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal7",
+        "ressource=asoundfx 78",
+        "x=0"
+       ],
+       "ligne": 231593
+      },
+      {
+       "t": "op",
+       "op": "charge",
+       "args": {
+        "pak": "asoundfx",
+        "entrée": 20,
+        "ressource": {
+         "objet": "r16"
+        }
+       },
+       "texte": [
+        "asoundfx 20"
+       ],
+       "ligne": 231601
+      },
+      {
+       "t": "op",
+       "op": "canal_init",
+       "args": {
+        "canal": {
+         "objet": "canal8"
+        },
+        "pilote": {
+         "glob": "word_46849",
+         "init": 0
+        }
+       },
+       "texte": [
+        "canal=canal8",
+        "pilote=word_46849"
+       ],
+       "ligne": 231606
+      },
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal8"
+        },
+        "ressource": {
+         "objet": "r16"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal8",
+        "ressource=asoundfx 20",
+        "x=0"
+       ],
+       "ligne": 231613
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v240"
+       },
+       "valeur": {
+        "glob": "word_48F3E",
+        "init": 0
+       },
+       "ligne": 231616
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal7",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal7",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1318"
+          }
+         },
+         "texte": [
+          "pilote=canal7.+0→4",
+          "séquence=v1318"
+         ],
+         "ligne": 231623
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal7",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1318"
+          },
+          {
+           "local": "v240"
+          },
+          {
+           "local": "v242"
+          }
+         ],
+         "texte": [
+          "canal7.+0→4",
+          "v1318",
+          "v240",
+          "v242"
+         ],
+         "ligne": 231630
+        }
+       ],
+       "sinon": [],
+       "ligne": 231619
+      }
+     ],
+     "sinon": [],
+     "ligne": 231570
+    },
+    {
+     "t": "label",
+     "nom": "loc_73BCD"
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 9,
+      "ressource": {
+       "objet": "r18"
+      }
+     },
+     "texte": [
+      "mid3 9"
+     ],
+     "ligne": 231646
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 10,
+      "ressource": {
+       "objet": "r19"
+      }
+     },
+     "texte": [
+      "mid3 10"
+     ],
+     "ligne": 231658
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 8,
+      "ressource": {
+       "objet": "r20"
+      }
+     },
+     "texte": [
+      "mid3 8"
+     ],
+     "ligne": 231670
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 12,
+      "ressource": {
+       "objet": "r21"
+      }
+     },
+     "texte": [
+      "mid3 12"
+     ],
+     "ligne": 231682
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 3,
+      "ressource": {
+       "objet": "r22"
+      }
+     },
+     "texte": [
+      "mid3 3"
+     ],
+     "ligne": 231694
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 2,
+      "ressource": {
+       "objet": "r23"
+      }
+     },
+     "texte": [
+      "mid3 2"
+     ],
+     "ligne": 231706
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 4,
+      "ressource": {
+       "objet": "r24"
+      }
+     },
+     "texte": [
+      "mid3 4"
+     ],
+     "ligne": 231718
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 7,
+      "ressource": {
+       "objet": "r25"
+      }
+     },
+     "texte": [
+      "mid3 7"
+     ],
+     "ligne": 231730
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 6,
+      "ressource": {
+       "objet": "r26"
+      }
+     },
+     "texte": [
+      "mid3 6"
+     ],
+     "ligne": 231742
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 5,
+      "ressource": {
+       "objet": "r27"
+      }
+     },
+     "texte": [
+      "mid3 5"
+     ],
+     "ligne": 231754
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 0,
+      "ressource": {
+       "objet": "r28"
+      }
+     },
+     "texte": [
+      "mid3 0"
+     ],
+     "ligne": 231766
+    },
+    {
+     "t": "appel",
+     "nom": "Runtime_StackOverflowCheck_2C319",
+     "args": [
+      256
+     ],
+     "texte": [
+      "256"
+     ],
+     "ligne": 231769
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v354"
+     },
+     "valeur": {
+      "résultat": "Runtime_StackOverflowCheck_2C319(256)"
+     },
+     "ligne": 231771
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 23,
+      "ressource": {
+       "objet": "r29"
+      }
+     },
+     "texte": [
+      "mid3 23"
+     ],
+     "ligne": 231782
+    },
+    {
+     "t": "appel",
+     "nom": "CRT_MemFamily_Extra1",
+     "args": [
+      {
+       "local": "v354"
+      },
+      {
+       "données": {
+        "champ": [
+         "r29",
+         "+0"
+        ]
+       }
+      },
+      256
+     ],
+     "texte": [
+      "v354",
+      "données(mid3 23.+0)",
+      "256"
+     ],
+     "ligne": 231797
+    },
+    {
+     "t": "scène",
+     "nom": "scène3",
+     "cadence": "20",
+     "ligne": 231824
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": -10,
+     "ligne": 231826
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v366"
+     },
+     "valeur": 0,
+     "ligne": 231827
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v370"
+     },
+     "valeur": 0,
+     "ligne": 231828
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v372"
+     },
+     "valeur": 0,
+     "ligne": 231829
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v374"
+     },
+     "valeur": 0,
+     "ligne": 231830
+    },
+    {
+     "t": "calque",
+     "nom": "c5",
+     "type": "OverlayImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r28"
+      },
+      "x": -1,
+      "y": -51,
+      "image": 0
+     },
+     "ligne": 231837
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v380"
+     },
+     "valeur": -1,
+     "ligne": 231844
+    },
+    {
+     "t": "calque",
+     "nom": "c6",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r23"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 231857
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c6",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231864
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c6",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231866
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c6",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v380"
+     },
+     "ligne": 231869
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c6",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231871
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v386"
+     },
+     "valeur": -1,
+     "ligne": 231885
+    },
+    {
+     "t": "calque",
+     "nom": "c7",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r23"
+      },
+      "x": 320,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 231898
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c7",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231905
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c7",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231907
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c7",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v386"
+     },
+     "ligne": 231910
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c7",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231912
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v392"
+     },
+     "valeur": -3,
+     "ligne": 231926
+    },
+    {
+     "t": "calque",
+     "nom": "c8",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r24"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 231939
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c8",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231946
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c8",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231948
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c8",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v392"
+     },
+     "ligne": 231951
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c8",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231953
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v398"
+     },
+     "valeur": -3,
+     "ligne": 231967
+    },
+    {
+     "t": "calque",
+     "nom": "c9",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r24"
+      },
+      "x": 320,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 231980
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c9",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231987
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c9",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231989
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c9",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v398"
+     },
+     "ligne": 231992
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c9",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 231994
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v404"
+     },
+     "valeur": -6,
+     "ligne": 232009
+    },
+    {
+     "t": "calque",
+     "nom": "c10",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r25"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232022
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c10",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232029
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c10",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232031
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c10",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v404"
+     },
+     "ligne": 232034
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c10",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232036
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v410"
+     },
+     "valeur": -6,
+     "ligne": 232051
+    },
+    {
+     "t": "calque",
+     "nom": "c11",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r25"
+      },
+      "x": 320,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232064
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c11",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232071
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c11",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232073
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c11",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v410"
+     },
+     "ligne": 232076
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c11",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232078
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v416"
+     },
+     "valeur": -10,
+     "ligne": 232088
+    },
+    {
+     "t": "calque",
+     "nom": "c12",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r26"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232101
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c12",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232108
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c12",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232110
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c12",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v416"
+     },
+     "ligne": 232113
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c12",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232115
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v422"
+     },
+     "valeur": -10,
+     "ligne": 232125
+    },
+    {
+     "t": "calque",
+     "nom": "c13",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r26"
+      },
+      "x": 320,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232138
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c13",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232145
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c13",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232147
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c13",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v422"
+     },
+     "ligne": 232150
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c13",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232152
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v428"
+     },
+     "valeur": -13,
+     "ligne": 232167
+    },
+    {
+     "t": "calque",
+     "nom": "c14",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r27"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232180
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c14",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232187
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c14",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232189
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c14",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v428"
+     },
+     "ligne": 232192
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c14",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232194
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v434"
+     },
+     "valeur": -13,
+     "ligne": 232209
+    },
+    {
+     "t": "calque",
+     "nom": "c15",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r27"
+      },
+      "x": 320,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232222
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c15",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232229
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c15",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232231
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c15",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v434"
+     },
+     "ligne": 232234
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c15",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232236
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v440"
+     },
+     "valeur": -13,
+     "ligne": 232251
+    },
+    {
+     "t": "calque",
+     "nom": "c16",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r18"
+      },
+      "x": 1233,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232264
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c16",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232271
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c16",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232273
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c16",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v440"
+     },
+     "ligne": 232276
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c16",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232278
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v446"
+     },
+     "valeur": -10,
+     "ligne": 232288
+    },
+    {
+     "t": "calque",
+     "nom": "c17",
+     "type": "MovingLayer",
+     "args": {
+      "ressource": {
+       "objet": "r19"
+      },
+      "x": 950,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 232301
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c17",
+       "vx"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232308
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c17",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232310
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c17",
+       "vx"
+      ]
+     },
+     "valeur": {
+      "local": "v446"
+     },
+     "ligne": 232313
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "champ": [
+       "c17",
+       "vy"
+      ]
+     },
+     "valeur": 0,
+     "ligne": 232315
+    },
+    {
+     "t": "appel",
+     "nom": "sub_A837",
+     "args": [
+      0,
+      {
+       "objet": "r20"
+      },
+      573,
+      0,
+      -6,
+      0,
+      0
+     ],
+     "texte": [
+      "0",
+      "mid3 8",
+      "573",
+      "0",
+      "-6",
+      "0",
+      "0"
+     ],
+     "ligne": 232338
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v450"
+     },
+     "valeur": {
+      "résultat": "sub_A837(0, mid3 8, 573, 0, -6, 0, 0)"
+     },
+     "ligne": 232340
+    },
+    {
+     "t": "appel",
+     "nom": "sub_B995",
+     "args": [
+      0,
+      {
+       "objet": "r21"
+      },
+      -30,
+      -53,
+      {
+       "local": "v366"
+      },
+      0,
+      0
+     ],
+     "texte": [
+      "0",
+      "mid3 12",
+      "-30",
+      "-53",
+      "v366",
+      "0",
+      "0"
+     ],
+     "ligne": 232349
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v452"
+     },
+     "valeur": {
+      "résultat": "sub_B995(0, mid3 12, -30, -53, v366, 0, 0)"
+     },
+     "ligne": 232351
+    },
+    {
+     "t": "appel",
+     "nom": "sub_A837",
+     "args": [
+      0,
+      {
+       "objet": "r22"
+      },
+      -30,
+      -30,
+      {
+       "local": "v366"
+      },
+      0,
+      0
+     ],
+     "texte": [
+      "0",
+      "mid3 3",
+      "-30",
+      "-30",
+      "v366",
+      "0",
+      "0"
+     ],
+     "ligne": 232360
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v454"
+     },
+     "valeur": {
+      "résultat": "sub_A837(0, mid3 3, -30, -30, v366, 0, 0)"
+     },
+     "ligne": 232362
+    },
+    {
+     "t": "appel",
+     "nom": "sub_BA1C",
+     "args": [
+      {
+       "local": "v452"
+      },
+      {
+       "local": "v354"
+      }
+     ],
+     "texte": [
+      "v452",
+      "v354"
+     ],
+     "ligne": 232365
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal6"
+      },
+      "premier": {
+       "local": "v108"
+      },
+      "nombre": {
+       "champ": [
+        "pal6",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal6(mid3 20)"
+     ],
+     "ligne": 232378
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v12"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 232386
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c6",
+     "ligne": 232391
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c7",
+     "ligne": 232396
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c8",
+     "ligne": 232401
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c9",
+     "ligne": 232406
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c10",
+     "ligne": 232411
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c11",
+     "ligne": 232416
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c12",
+     "ligne": 232421
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c13",
+     "ligne": 232426
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c14",
+     "ligne": 232431
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c15",
+     "ligne": 232436
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "v450",
+     "ligne": 232441
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c17",
+     "ligne": 232446
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "c16",
+     "ligne": 232451
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "v452",
+     "ligne": 232456
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène3",
+     "calque": "v454",
+     "ligne": 232461
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 189
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "champ": [
+         "scène3",
+         "compteur"
+        ]
+       },
+       "ligne": 232467
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 9
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v368"
+         },
+         "valeur": 0,
+         "ligne": 232470
+        }
+       ],
+       "sinon": [],
+       "ligne": 232469
+      },
+      {
+       "t": "label",
+       "nom": "loc_7465E"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 10
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "<",
+          "a": {
+           "champ": [
+            "scène3",
+            "compteur"
+           ]
+          },
+          "b": 17
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v366"
+           },
+           "valeur": {
+            "op": "-",
+            "a": {
+             "local": "v366"
+            },
+            "b": 1
+           },
+           "ligne": 232477
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v456"
+           },
+           "valeur": {
+            "local": "v366"
+           },
+           "ligne": 232479
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v452→29"
+           },
+           "valeur": {
+            "local": "v456"
+           },
+           "ligne": 232482
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v452→31"
+           },
+           "valeur": 0,
+           "ligne": 232484
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v458"
+           },
+           "valeur": {
+            "local": "v366"
+           },
+           "ligne": 232486
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v454→29"
+           },
+           "valeur": {
+            "local": "v458"
+           },
+           "ligne": 232489
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v454→31"
+           },
+           "valeur": 0,
+           "ligne": 232491
+          }
+         ],
+         "sinon": [],
+         "ligne": 232476
+        }
+       ],
+       "sinon": [],
+       "ligne": 232474
+      },
+      {
+       "t": "label",
+       "nom": "loc_746A4"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c8.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c8"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c8",
+          "640",
+          "0"
+         ],
+         "ligne": 232505
+        }
+       ],
+       "sinon": [],
+       "ligne": 232501
+      },
+      {
+       "t": "label",
+       "nom": "loc_746CA"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c10.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c10"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c10",
+          "640",
+          "0"
+         ],
+         "ligne": 232519
+        }
+       ],
+       "sinon": [],
+       "ligne": 232515
+      },
+      {
+       "t": "label",
+       "nom": "loc_746F0"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c12.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c12"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c12",
+          "640",
+          "0"
+         ],
+         "ligne": 232533
+        }
+       ],
+       "sinon": [],
+       "ligne": 232529
+      },
+      {
+       "t": "label",
+       "nom": "loc_74716"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c14.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c14"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c14",
+          "640",
+          "0"
+         ],
+         "ligne": 232547
+        }
+       ],
+       "sinon": [],
+       "ligne": 232543
+      },
+      {
+       "t": "label",
+       "nom": "loc_7473C"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c13.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c13"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c13",
+          "640",
+          "0"
+         ],
+         "ligne": 232561
+        }
+       ],
+       "sinon": [],
+       "ligne": 232557
+      },
+      {
+       "t": "label",
+       "nom": "loc_74762"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "résultat": "c15.x_absolu()"
+        },
+        "b": -319
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "sub_2E29E",
+         "args": [
+          {
+           "objet": "c15"
+          },
+          640,
+          0
+         ],
+         "texte": [
+          "c15",
+          "640",
+          "0"
+         ],
+         "ligne": 232575
+        }
+       ],
+       "sinon": [],
+       "ligne": 232571
+      },
+      {
+       "t": "label",
+       "nom": "loc_74788"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 68
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "di"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v370"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v370"
+            },
+            "b": 1
+           },
+           "ligne": 232591
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "==",
+            "a": {
+             "local": "v370"
+            },
+            "b": 5
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "di"
+             },
+             "valeur": {
+              "op": "+",
+              "a": {
+               "local": "di"
+              },
+              "b": 1
+             },
+             "ligne": 232595
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v370"
+             },
+             "valeur": 0,
+             "ligne": 232596
+            }
+           ],
+           "sinon": [],
+           "ligne": 232594
+          },
+          {
+           "t": "label",
+           "nom": "loc_747AB"
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": ">=",
+            "a": {
+             "local": "di"
+            },
+            "b": -1
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "di"
+             },
+             "valeur": 0,
+             "ligne": 232601
+            }
+           ],
+           "sinon": [],
+           "ligne": 232600
+          },
+          {
+           "t": "label",
+           "nom": "loc_747B2"
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v460"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "local": "di"
+            },
+            "b": 6
+           },
+           "ligne": 232608
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c6",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v460"
+           },
+           "ligne": 232611
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c6",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232613
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v462"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "local": "di"
+            },
+            "b": 6
+           },
+           "ligne": 232618
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c7",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v462"
+           },
+           "ligne": 232621
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c7",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232623
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v464"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "local": "di"
+            },
+            "b": 3
+           },
+           "ligne": 232628
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c8",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v464"
+           },
+           "ligne": 232631
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c8",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232633
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v466"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "local": "di"
+            },
+            "b": 3
+           },
+           "ligne": 232638
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c9",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v466"
+           },
+           "ligne": 232641
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c9",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232643
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v468"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 2
+            },
+            "b": 3
+           },
+           "ligne": 232649
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c10",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v468"
+           },
+           "ligne": 232652
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c10",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232654
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v470"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 2
+            },
+            "b": 3
+           },
+           "ligne": 232660
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c11",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v470"
+           },
+           "ligne": 232663
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c11",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232665
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v472"
+           },
+           "valeur": {
+            "local": "di"
+           },
+           "ligne": 232666
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c12",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v472"
+           },
+           "ligne": 232669
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c12",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232671
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v474"
+           },
+           "valeur": {
+            "local": "di"
+           },
+           "ligne": 232672
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c13",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v474"
+           },
+           "ligne": 232675
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c13",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232677
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v476"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 4
+            },
+            "b": 3
+           },
+           "ligne": 232683
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c14",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v476"
+           },
+           "ligne": 232686
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c14",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232688
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v478"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 4
+            },
+            "b": 3
+           },
+           "ligne": 232694
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c15",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v478"
+           },
+           "ligne": 232697
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c15",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232699
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v480"
+           },
+           "valeur": {
+            "local": "di"
+           },
+           "ligne": 232700
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c17",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v480"
+           },
+           "ligne": 232703
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c17",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232705
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v482"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 4
+            },
+            "b": 3
+           },
+           "ligne": 232711
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c16",
+             "vx"
+            ]
+           },
+           "valeur": {
+            "local": "v482"
+           },
+           "ligne": 232714
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "champ": [
+             "c16",
+             "vy"
+            ]
+           },
+           "valeur": 0,
+           "ligne": 232716
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v484"
+           },
+           "valeur": {
+            "op": "/",
+            "a": {
+             "op": "*",
+             "a": {
+              "local": "di"
+             },
+             "b": 2
+            },
+            "b": 3
+           },
+           "ligne": 232722
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v450→29"
+           },
+           "valeur": {
+            "local": "v484"
+           },
+           "ligne": 232725
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v450→31"
+           },
+           "valeur": 0,
+           "ligne": 232727
+          }
+         ],
+         "sinon": [],
+         "ligne": 232586
+        }
+       ],
+       "sinon": [],
+       "ligne": 232580
+      },
+      {
+       "t": "label",
+       "nom": "loc_74949"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 37
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v368"
+         },
+         "valeur": 0,
+         "ligne": 232733
+        }
+       ],
+       "sinon": [],
+       "ligne": 232732
+      },
+      {
+       "t": "label",
+       "nom": "loc_74954"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 38
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "<",
+          "a": {
+           "champ": [
+            "scène3",
+            "compteur"
+           ]
+          },
+          "b": 55
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v368"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v368"
+            },
+            "b": 1
+           },
+           "ligne": 232740
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "==",
+            "a": {
+             "local": "v368"
+            },
+            "b": 5
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v366"
+             },
+             "valeur": {
+              "op": "-",
+              "a": {
+               "local": "v366"
+              },
+              "b": 1
+             },
+             "ligne": 232744
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v486"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232746
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→29"
+             },
+             "valeur": {
+              "local": "v486"
+             },
+             "ligne": 232749
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→31"
+             },
+             "valeur": 0,
+             "ligne": 232751
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v488"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232753
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→29"
+             },
+             "valeur": {
+              "local": "v488"
+             },
+             "ligne": 232756
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→31"
+             },
+             "valeur": 0,
+             "ligne": 232758
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v368"
+             },
+             "valeur": 0,
+             "ligne": 232759
+            }
+           ],
+           "sinon": [],
+           "ligne": 232743
+          }
+         ],
+         "sinon": [],
+         "ligne": 232739
+        }
+       ],
+       "sinon": [],
+       "ligne": 232737
+      },
+      {
+       "t": "label",
+       "nom": "loc_749AD"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 55
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v368"
+         },
+         "valeur": 0,
+         "ligne": 232765
+        }
+       ],
+       "sinon": [],
+       "ligne": 232764
+      },
+      {
+       "t": "label",
+       "nom": "loc_749B8"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 54
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "<",
+          "a": {
+           "champ": [
+            "scène3",
+            "compteur"
+           ]
+          },
+          "b": 132
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v368"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v368"
+            },
+            "b": 1
+           },
+           "ligne": 232772
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "==",
+            "a": {
+             "local": "v368"
+            },
+            "b": 4
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v366"
+             },
+             "valeur": {
+              "op": "+",
+              "a": {
+               "local": "v366"
+              },
+              "b": 1
+             },
+             "ligne": 232776
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v490"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232778
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→29"
+             },
+             "valeur": {
+              "local": "v490"
+             },
+             "ligne": 232781
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→31"
+             },
+             "valeur": 0,
+             "ligne": 232783
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v492"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232785
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→29"
+             },
+             "valeur": {
+              "local": "v492"
+             },
+             "ligne": 232788
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→31"
+             },
+             "valeur": 0,
+             "ligne": 232790
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v368"
+             },
+             "valeur": 0,
+             "ligne": 232791
+            }
+           ],
+           "sinon": [],
+           "ligne": 232775
+          }
+         ],
+         "sinon": [],
+         "ligne": 232771
+        }
+       ],
+       "sinon": [],
+       "ligne": 232769
+      },
+      {
+       "t": "label",
+       "nom": "loc_74A12"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 132
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v368"
+         },
+         "valeur": 0,
+         "ligne": 232797
+        }
+       ],
+       "sinon": [],
+       "ligne": 232796
+      },
+      {
+       "t": "label",
+       "nom": "loc_74A1E"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 131
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v368"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "local": "v368"
+          },
+          "b": 1
+         },
+         "ligne": 232802
+        },
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "==",
+          "a": {
+           "local": "v368"
+          },
+          "b": 3
+         },
+         "alors": [
+          {
+           "t": "si",
+           "cond": {
+            "cmp": ">",
+            "a": {
+             "local": "v366"
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v366"
+             },
+             "valeur": {
+              "op": "-",
+              "a": {
+               "local": "v366"
+              },
+              "b": 1
+             },
+             "ligne": 232808
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v494"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232810
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→29"
+             },
+             "valeur": {
+              "local": "v494"
+             },
+             "ligne": 232813
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v452→31"
+             },
+             "valeur": 0,
+             "ligne": 232815
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v496"
+             },
+             "valeur": {
+              "local": "v366"
+             },
+             "ligne": 232817
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→29"
+             },
+             "valeur": {
+              "local": "v496"
+             },
+             "ligne": 232820
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→31"
+             },
+             "valeur": 0,
+             "ligne": 232822
+            }
+           ],
+           "sinon": [],
+           "ligne": 232807
+          },
+          {
+           "t": "label",
+           "nom": "loc_74A74"
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v368"
+           },
+           "valeur": 0,
+           "ligne": 232825
+          }
+         ],
+         "sinon": [],
+         "ligne": 232805
+        }
+       ],
+       "sinon": [],
+       "ligne": 232801
+      },
+      {
+       "t": "label",
+       "nom": "loc_74A7A"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "ou": [
+         {
+          "cmp": "<",
+          "a": {
+           "champ": [
+            "scène3",
+            "compteur"
+           ]
+          },
+          "b": 50
+         },
+         {
+          "cmp": "!=",
+          "a": {
+           "local": "v366"
+          },
+          "b": 0
+         }
+        ]
+       },
+       "alors": [
+        {
+         "t": "appel",
+         "nom": "CRT_Rand",
+         "args": [],
+         "texte": [],
+         "ligne": 232835
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v498"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "op": "/",
+           "a": {
+            "op": "*",
+            "a": {
+             "résultat": "CRT_Rand()"
+            },
+            "b": 3
+           },
+           "b": -32768
+          },
+          "b": 1
+         },
+         "ligne": 232842
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v452→27"
+         },
+         "valeur": {
+          "local": "v498"
+         },
+         "ligne": 232845
+        }
+       ],
+       "sinon": [],
+       "ligne": 232830
+      },
+      {
+       "t": "label",
+       "nom": "loc_74AAE"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "op": "&",
+         "a": {
+          "champ": [
+           "scène3",
+           "compteur"
+          ]
+         },
+         "b": 1
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v500"
+         },
+         "valeur": {
+          "inconnu": [
+           "field",
+           61,
+           29
+          ]
+         },
+         "ligne": 232854
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v450→27"
+         },
+         "valeur": {
+          "local": "v500"
+         },
+         "ligne": 232857
+        }
+       ],
+       "sinon": [],
+       "ligne": 232849
+      },
+      {
+       "t": "label",
+       "nom": "loc_74ACB"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 21
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v502"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "inconnu": [
+            "field",
+            61,
+            29
+           ]
+          },
+          "b": 1
+         },
+         "ligne": 232867
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v454→27"
+         },
+         "valeur": {
+          "local": "v502"
+         },
+         "ligne": 232870
+        }
+       ],
+       "sinon": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v366"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "op": "&",
+             "a": {
+              "champ": [
+               "scène3",
+               "compteur"
+              ]
+             },
+             "b": 1
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v504"
+             },
+             "valeur": {
+              "op": "+",
+              "a": {
+               "inconnu": [
+                "local",
+                -374
+               ]
+              },
+              "b": 1
+             },
+             "ligne": 232884
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v374"
+             },
+             "valeur": {
+              "op": "+",
+              "a": {
+               "local": "v374"
+              },
+              "b": 1
+             },
+             "ligne": 232885
+            },
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "v454→27"
+             },
+             "valeur": {
+              "local": "v504"
+             },
+             "ligne": 232888
+            }
+           ],
+           "sinon": [],
+           "ligne": 232878
+          }
+         ],
+         "sinon": [],
+         "ligne": 232876
+        }
+       ],
+       "ligne": 232861
+      },
+      {
+       "t": "label",
+       "nom": "loc_74B15"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 160
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "champ": [
+            "canal7",
+            "+0"
+           ]
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "op",
+           "op": "AIL_stop_sequence",
+           "args": {
+            "pilote": {
+             "déréf": {
+              "champ": [
+               "canal7",
+               "+0"
+              ]
+             },
+             "décalage": 4
+            },
+            "séquence": {
+             "local": "v1318"
+            }
+           },
+           "texte": [
+            "pilote=canal7.+0→4",
+            "séquence=v1318"
+           ],
+           "ligne": 232899
+          }
+         ],
+         "sinon": [],
+         "ligne": 232895
+        }
+       ],
+       "sinon": [],
+       "ligne": 232893
+      },
+      {
+       "t": "label",
+       "nom": "loc_74B37"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 161
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v506"
+           },
+           "valeur": {
+            "glob": "word_48ECA",
+            "init": 0
+           },
+           "ligne": 232910
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "champ": [
+              "canal8",
+              "+0"
+             ]
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "op",
+             "op": "AIL_start_sequence",
+             "args": {
+              "pilote": {
+               "déréf": {
+                "champ": [
+                 "canal8",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              "séquence": {
+               "local": "v1332"
+              }
+             },
+             "texte": [
+              "pilote=canal8.+0→4",
+              "séquence=v1332"
+             ],
+             "ligne": 232917
+            },
+            {
+             "t": "appel",
+             "nom": "sub_30C66",
+             "args": [
+              {
+               "déréf": {
+                "champ": [
+                 "canal8",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              {
+               "local": "v1332"
+              },
+              {
+               "local": "v506"
+              },
+              0
+             ],
+             "texte": [
+              "canal8.+0→4",
+              "v1332",
+              "v506",
+              "0"
+             ],
+             "ligne": 232924
+            }
+           ],
+           "sinon": [],
+           "ligne": 232913
+          }
+         ],
+         "sinon": [],
+         "ligne": 232908
+        },
+        {
+         "t": "label",
+         "nom": "loc_74B87"
+        },
+        {
+         "t": "ajoute",
+         "parent": "scène3",
+         "calque": "c5",
+         "ligne": 232933
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v372"
+         },
+         "valeur": 0,
+         "ligne": 232935
+        }
+       ],
+       "sinon": [],
+       "ligne": 232906
+      },
+      {
+       "t": "label",
+       "nom": "loc_74B9E"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": ">",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 161
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": ">",
+          "a": {
+           "local": "v372"
+          },
+          "b": 7
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v372"
+           },
+           "valeur": 7,
+           "ligne": 232942
+          }
+         ],
+         "sinon": [],
+         "ligne": 232941
+        },
+        {
+         "t": "label",
+         "nom": "loc_74BB1"
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v510"
+         },
+         "valeur": {
+          "local": "v372"
+         },
+         "ligne": 232946
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "champ": [
+           "c5",
+           "image"
+          ]
+         },
+         "valeur": {
+          "local": "v510"
+         },
+         "ligne": 232949
+        },
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "op": "&",
+           "a": {
+            "champ": [
+             "scène3",
+             "compteur"
+            ]
+           },
+           "b": 1
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v372"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v372"
+            },
+            "b": 1
+           },
+           "ligne": 232952
+          }
+         ],
+         "sinon": [],
+         "ligne": 232951
+        }
+       ],
+       "sinon": [],
+       "ligne": 232939
+      },
+      {
+       "t": "label",
+       "nom": "loc_74BCE"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène3",
+          "compteur"
+         ]
+        },
+        "b": 163
+       },
+       "alors": [
+        {
+         "t": "si",
+         "cond": {
+          "cmp": "!=",
+          "a": {
+           "local": "v2"
+          },
+          "b": 0
+         },
+         "alors": [
+          {
+           "t": "op",
+           "op": "canal_enregistre",
+           "args": {
+            "canal": {
+             "objet": "canal2"
+            },
+            "ressource": {
+             "objet": "r10"
+            },
+            "x": 0
+           },
+           "texte": [
+            "canal=canal2",
+            "ressource=asoundfx 40",
+            "x=0"
+           ],
+           "ligne": 232965
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v512"
+           },
+           "valeur": {
+            "glob": "word_48EF2",
+            "init": 0
+           },
+           "ligne": 232968
+          },
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "!=",
+            "a": {
+             "champ": [
+              "canal2",
+              "+0"
+             ]
+            },
+            "b": 0
+           },
+           "alors": [
+            {
+             "t": "op",
+             "op": "AIL_start_sequence",
+             "args": {
+              "pilote": {
+               "déréf": {
+                "champ": [
+                 "canal2",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              "séquence": {
+               "local": "v1248"
+              }
+             },
+             "texte": [
+              "pilote=canal2.+0→4",
+              "séquence=v1248"
+             ],
+             "ligne": 232975
+            },
+            {
+             "t": "appel",
+             "nom": "sub_30C66",
+             "args": [
+              {
+               "déréf": {
+                "champ": [
+                 "canal2",
+                 "+0"
+                ]
+               },
+               "décalage": 4
+              },
+              {
+               "local": "v1248"
+              },
+              {
+               "local": "v512"
+              },
+              0
+             ],
+             "texte": [
+              "canal2.+0→4",
+              "v1248",
+              "v512",
+              "0"
+             ],
+             "ligne": 232982
+            }
+           ],
+           "sinon": [],
+           "ligne": 232971
+          }
+         ],
+         "sinon": [],
+         "ligne": 232959
+        }
+       ],
+       "sinon": [],
+       "ligne": 232957
+      },
+      {
+       "t": "label",
+       "nom": "loc_74C32"
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène3"
+        }
+       },
+       "texte": [
+        "scène=scène3"
+       ],
+       "ligne": 233000
+      }
+     ],
+     "ligne": 232463
+    },
+    {
+     "t": "appel",
+     "nom": "Heap_FreeAndCoalesce_2C3FC",
+     "args": [
+      {
+       "local": "v354"
+      }
+     ],
+     "texte": [
+      "v354"
+     ],
+     "ligne": 233027
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène3"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène3",
+      "drapeaux=0"
+     ],
+     "ligne": 233032
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal8"
+      }
+     },
+     "texte": [
+      "canal=canal8"
+     ],
+     "ligne": 233264
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal7"
+      }
+     },
+     "texte": [
+      "canal=canal7"
+     ],
+     "ligne": 233287
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "glob": "byte_495FC",
+       "init": 0
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 233354
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 233377
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 233400
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 233423
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 233446
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        }
+       },
+       "texte": [
+        "canal=canal1"
+       ],
+       "ligne": 233756
+      },
+      {
+       "t": "retour",
+       "ligne": 233842
+      }
+     ],
+     "sinon": [],
+     "ligne": 233347
+    },
+    {
+     "t": "label",
+     "nom": "loc_7569A"
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "optshps",
+      "entrée": 116,
+      "ressource": {
+       "objet": "r15"
+      }
+     },
+     "texte": [
+      "optshps 116"
+     ],
+     "ligne": 233856
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 24,
+      "ressource": {
+       "objet": "r16"
+      }
+     },
+     "texte": [
+      "mid3 24"
+     ],
+     "ligne": 233868
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 13,
+      "ressource": {
+       "objet": "r17"
+      }
+     },
+     "texte": [
+      "mid3 13"
+     ],
+     "ligne": 233880
+    },
+    {
+     "t": "op",
+     "op": "charge_convdata_type0",
+     "args": {
+      "nom": "air",
+      "ressource": {
+       "objet": "r30"
+      }
+     },
+     "texte": [
+      "\"air\"",
+      "drapeau=3"
+     ],
+     "ligne": 233890
+    },
+    {
+     "t": "calque",
+     "nom": "c18",
+     "type": "Layer",
+     "args": {
+      "ressource": {
+       "objet": "r15"
+      },
+      "x": 0,
+      "y": -40
+     },
+     "ligne": 233897
+    },
+    {
+     "t": "calque",
+     "nom": "c19",
+     "type": "Layer",
+     "args": {
+      "ressource": {
+       "objet": "r16"
+      },
+      "x": 0,
+      "y": 0
+     },
+     "ligne": 233905
+    },
+    {
+     "t": "calque",
+     "nom": "c20",
+     "type": "Layer",
+     "args": {
+      "ressource": {
+       "objet": "r17"
+      },
+      "x": 0,
+      "y": 0
+     },
+     "ligne": 233913
+    },
+    {
+     "t": "calque",
+     "nom": "c21",
+     "type": "TalkingHeadOverlay",
+     "args": {
+      "ressource": {
+       "objet": "r30"
+      },
+      "x": 160,
+      "y": 128
+     },
+     "ligne": 233921
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "si"
+     },
+     "valeur": {
+      "objet": "c21"
+     },
+     "ligne": 233923
+    },
+    {
+     "t": "scène",
+     "nom": "scène4",
+     "cadence": "10",
+     "ligne": 233930
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal2"
+      },
+      "premier": {
+       "local": "v44"
+      },
+      "nombre": {
+       "champ": [
+        "pal2",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal2(optpals 21)"
+     ],
+     "ligne": 233943
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal7"
+      },
+      "premier": {
+       "local": "v124"
+      },
+      "nombre": {
+       "champ": [
+        "pal7",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal7(mid3 21)"
+     ],
+     "ligne": 233952
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal9"
+      },
+      "premier": {
+       "local": "v156"
+      },
+      "nombre": {
+       "champ": [
+        "pal9",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal9(convdata type 2 \"normal\")"
+     ],
+     "ligne": 233961
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v12"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 233969
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c18",
+     "ligne": 233974
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c19",
+     "ligne": 233979
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c20",
+     "ligne": 233984
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c21",
+     "ligne": 233989
+    },
+    {
+     "t": "op",
+     "op": "tête_image_de_base",
+     "args": {
+      "tête": {
+       "objet": "c21"
+      },
+      "image": 14
+     },
+     "texte": [
+      "tête=c21",
+      "image=14"
+     ],
+     "ligne": 233993
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "midgames",
+      "entrée": 0,
+      "ressource": {
+       "objet": "r31"
+      }
+     },
+     "texte": [
+      "midgames 0"
+     ],
+     "ligne": 234005
+    },
+    {
+     "t": "calque",
+     "nom": "c22",
+     "type": "ToggleLayer",
+     "args": {
+      "ressource": {
+       "objet": "r31"
+      },
+      "x": 160,
+      "y": 128,
+      "sens": 1
+     },
+     "ligne": 234013
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène4",
+     "calque": "c22",
+     "ligne": 234019
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        },
+        "ressource": {
+         "objet": "r10"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal2",
+        "ressource=asoundfx 40",
+        "x=0"
+       ],
+       "ligne": 234028
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v278"
+       },
+       "valeur": {
+        "glob": "word_48EF2",
+        "init": 0
+       },
+       "ligne": 234031
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal2",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal2",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1248"
+          }
+         },
+         "texte": [
+          "pilote=canal2.+0→4",
+          "séquence=v1248"
+         ],
+         "ligne": 234038
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal2",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1248"
+          },
+          {
+           "local": "v278"
+          },
+          {
+           "local": "v280"
+          }
+         ],
+         "texte": [
+          "canal2.+0→4",
+          "v1248",
+          "v278",
+          "v280"
+         ],
+         "ligne": 234045
+        }
+       ],
+       "sinon": [],
+       "ligne": 234034
+      }
+     ],
+     "sinon": [],
+     "ligne": 234022
+    },
+    {
+     "t": "label",
+     "nom": "loc_75944"
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 45
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "di"
+       },
+       "valeur": {
+        "champ": [
+         "scène4",
+         "compteur"
+        ]
+       },
+       "ligne": 234055
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 10
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "tête_image_de_base",
+         "args": {
+          "tête": {
+           "objet": "c21"
+          },
+          "image": 14
+         },
+         "texte": [
+          "tête=c21",
+          "image=14"
+         ],
+         "ligne": 234060
+        }
+       ],
+       "sinon": [],
+       "ligne": 234057
+      },
+      {
+       "t": "label",
+       "nom": "loc_7595A"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 19
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "tête_image_de_base",
+         "args": {
+          "tête": {
+           "objet": "c21"
+          },
+          "image": 12
+         },
+         "texte": [
+          "tête=c21",
+          "image=12"
+         ],
+         "ligne": 234068
+        }
+       ],
+       "sinon": [],
+       "ligne": 234065
+      },
+      {
+       "t": "label",
+       "nom": "loc_7596A"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 20
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "tête_image_de_base",
+         "args": {
+          "tête": {
+           "objet": "c21"
+          },
+          "image": 14
+         },
+         "texte": [
+          "tête=c21",
+          "image=14"
+         ],
+         "ligne": 234076
+        }
+       ],
+       "sinon": [],
+       "ligne": 234073
+      },
+      {
+       "t": "label",
+       "nom": "loc_7597A"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 32
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "tête_image_de_base",
+         "args": {
+          "tête": {
+           "objet": "c21"
+          },
+          "image": 12
+         },
+         "texte": [
+          "tête=c21",
+          "image=12"
+         ],
+         "ligne": 234084
+        }
+       ],
+       "sinon": [],
+       "ligne": 234081
+      },
+      {
+       "t": "label",
+       "nom": "loc_7598A"
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène4",
+          "compteur"
+         ]
+        },
+        "b": 33
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "tête_image_de_base",
+         "args": {
+          "tête": {
+           "objet": "c21"
+          },
+          "image": 14
+         },
+         "texte": [
+          "tête=c21",
+          "image=14"
+         ],
+         "ligne": 234092
+        }
+       ],
+       "sinon": [],
+       "ligne": 234089
+      },
+      {
+       "t": "label",
+       "nom": "loc_7599A"
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène4"
+        }
+       },
+       "texte": [
+        "scène=scène4"
+       ],
+       "ligne": 234108
+      }
+     ],
+     "ligne": 234051
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène4"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène4",
+      "drapeaux=0"
+     ],
+     "ligne": 234156
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "glob": "byte_495FC",
+       "init": 0
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal6"
+        }
+       },
+       "texte": [
+        "canal=canal6"
+       ],
+       "ligne": 234242
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal5"
+        }
+       },
+       "texte": [
+        "canal=canal5"
+       ],
+       "ligne": 234265
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal4"
+        }
+       },
+       "texte": [
+        "canal=canal4"
+       ],
+       "ligne": 234288
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal3"
+        }
+       },
+       "texte": [
+        "canal=canal3"
+       ],
+       "ligne": 234311
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        }
+       },
+       "texte": [
+        "canal=canal2"
+       ],
+       "ligne": 234334
+      },
+      {
+       "t": "op",
+       "op": "canal_arrête",
+       "args": {
+        "canal": {
+         "objet": "canal1"
+        }
+       },
+       "texte": [
+        "canal=canal1"
+       ],
+       "ligne": 234644
+      },
+      {
+       "t": "retour",
+       "ligne": 234730
+      }
+     ],
+     "sinon": [],
+     "ligne": 234235
+    },
+    {
+     "t": "label",
+     "nom": "loc_76126"
+    },
+    {
+     "t": "op",
+     "op": "charge",
+     "args": {
+      "pak": "mid3",
+      "entrée": 1,
+      "ressource": {
+       "objet": "r15"
+      }
+     },
+     "texte": [
+      "mid3 1"
+     ],
+     "ligne": 234744
+    },
+    {
+     "t": "scène",
+     "nom": "scène5",
+     "cadence": "15",
+     "ligne": 234752
+    },
+    {
+     "t": "calque",
+     "nom": "c23",
+     "type": "OverlayImageLayer",
+     "args": {
+      "ressource": {
+       "objet": "r15"
+      },
+      "x": 0,
+      "y": 0,
+      "image": 0
+     },
+     "ligne": 234760
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "di"
+     },
+     "valeur": {
+      "objet": "c23"
+     },
+     "ligne": 234762
+    },
+    {
+     "t": "op",
+     "op": "palette_copie",
+     "args": {
+      "destination": {
+       "objet": "pal1"
+      },
+      "source": {
+       "objet": "pal8"
+      },
+      "premier": {
+       "local": "v140"
+      },
+      "nombre": {
+       "champ": [
+        "pal8",
+        "+0"
+       ]
+      }
+     },
+     "texte": [
+      "destination=pal1",
+      "source=pal8(mid3 18)"
+     ],
+     "ligne": 234774
+    },
+    {
+     "t": "op",
+     "op": "palette_envoie",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "premier": {
+       "local": "v12"
+      },
+      "nombre": {
+       "champ": [
+        "pal1",
+        "+0"
+       ]
+      },
+      "pas": 0
+     },
+     "texte": [
+      "palette=pal1",
+      "pas=0"
+     ],
+     "ligne": 234782
+    },
+    {
+     "t": "ajoute",
+     "parent": "scène5",
+     "calque": "c23",
+     "ligne": 234787
+    },
+    {
+     "t": "si",
+     "cond": {
+      "cmp": "!=",
+      "a": {
+       "local": "v2"
+      },
+      "b": 0
+     },
+     "alors": [
+      {
+       "t": "op",
+       "op": "canal_enregistre",
+       "args": {
+        "canal": {
+         "objet": "canal2"
+        },
+        "ressource": {
+         "objet": "r10"
+        },
+        "x": 0
+       },
+       "texte": [
+        "canal=canal2",
+        "ressource=asoundfx 40",
+        "x=0"
+       ],
+       "ligne": 234796
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v230"
+       },
+       "valeur": {
+        "op": "-",
+        "a": {
+         "glob": "word_48EF2",
+         "init": 0
+        },
+        "b": 20
+       },
+       "ligne": 234800
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "champ": [
+          "canal2",
+          "+0"
+         ]
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "op",
+         "op": "AIL_start_sequence",
+         "args": {
+          "pilote": {
+           "déréf": {
+            "champ": [
+             "canal2",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          "séquence": {
+           "local": "v1248"
+          }
+         },
+         "texte": [
+          "pilote=canal2.+0→4",
+          "séquence=v1248"
+         ],
+         "ligne": 234807
+        },
+        {
+         "t": "appel",
+         "nom": "sub_30C66",
+         "args": [
+          {
+           "déréf": {
+            "champ": [
+             "canal2",
+             "+0"
+            ]
+           },
+           "décalage": 4
+          },
+          {
+           "local": "v1248"
+          },
+          {
+           "local": "v230"
+          },
+          {
+           "local": "v232"
+          }
+         ],
+         "texte": [
+          "canal2.+0→4",
+          "v1248",
+          "v230",
+          "v232"
+         ],
+         "ligne": 234814
+        }
+       ],
+       "sinon": [],
+       "ligne": 234803
+      }
+     ],
+     "sinon": [],
+     "ligne": 234790
+    },
+    {
+     "t": "label",
+     "nom": "loc_76232"
+    },
+    {
+     "t": "tant_que",
+     "cond": {
+      "et": [
+       {
+        "cmp": "<",
+        "a": {
+         "champ": [
+          "scène5",
+          "compteur"
+         ]
+        },
+        "b": 45
+       },
+       {
+        "cmp": "==",
+        "a": {
+         "champ": [
+          "scène5",
+          "terminée"
+         ]
+        },
+        "b": 0
+       }
+      ]
+     },
+     "corps": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "si"
+       },
+       "valeur": {
+        "champ": [
+         "scène5",
+         "compteur"
+        ]
+       },
+       "ligne": 234824
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "!=",
+        "a": {
+         "op": "&",
+         "a": {
+          "champ": [
+           "scène5",
+           "compteur"
+          ]
+         },
+         "b": 1
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v234"
+         },
+         "valeur": {
+          "inconnu": [
+           "field",
+           83,
+           29
+          ]
+         },
+         "ligne": 234831
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "champ": [
+           "c23",
+           "image"
+          ]
+         },
+         "valeur": {
+          "local": "v234"
+         },
+         "ligne": 234833
+        }
+       ],
+       "sinon": [],
+       "ligne": 234826
+      },
+      {
+       "t": "label",
+       "nom": "loc_76251"
+      },
+      {
+       "t": "op",
+       "op": "Scene_Tick",
+       "args": {
+        "scène": {
+         "objet": "scène5"
+        }
+       },
+       "texte": [
+        "scène=scène5"
+       ],
+       "ligne": 234848
+      }
+     ],
+     "ligne": 234820
+    },
+    {
+     "t": "op",
+     "op": "Scene_Destruct",
+     "args": {
+      "scène": {
+       "objet": "scène5"
+      },
+      "drapeaux": 0
+     },
+     "texte": [
+      "scène=scène5",
+      "drapeaux=0"
+     ],
+     "ligne": 234874
+    },
+    {
+     "t": "op",
+     "op": "fondu_disparition",
+     "args": {
+      "palette": {
+       "objet": "pal1"
+      },
+      "couleur": {
+       "adresse": "v18"
+      },
+      "pas": 2,
+      "premier": 0,
+      "nombre": 256
+     },
+     "texte": [
+      "palette=pal1",
+      "couleur=&v18",
+      "pas=2",
+      "premier=0",
+      "nombre=256"
+     ],
+     "ligne": 234902
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal6"
+      }
+     },
+     "texte": [
+      "canal=canal6"
+     ],
+     "ligne": 234906
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal5"
+      }
+     },
+     "texte": [
+      "canal=canal5"
+     ],
+     "ligne": 234929
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal4"
+      }
+     },
+     "texte": [
+      "canal=canal4"
+     ],
+     "ligne": 234952
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal3"
+      }
+     },
+     "texte": [
+      "canal=canal3"
+     ],
+     "ligne": 234975
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal2"
+      }
+     },
+     "texte": [
+      "canal=canal2"
+     ],
+     "ligne": 234998
+    },
+    {
+     "t": "op",
+     "op": "canal_arrête",
+     "args": {
+      "canal": {
+       "objet": "canal1"
+      }
+     },
+     "texte": [
+      "canal=canal1"
+     ],
+     "ligne": 235308
+    },
+    {
+     "t": "retour",
+     "ligne": 235394
+    }
    ]
   }
  ],
- "tableaux": []
+ "tableaux": [],
+ "objets": {
+  "pal1": {
+   "genre": "palette",
+   "type": null,
+   "contenu": null,
+   "décalage": -14,
+   "pas": null
+  },
+  "chemin1": {
+   "genre": "path",
+   "type": null,
+   "contenu": "..\\..\\data\\midgames\\amusic.pak",
+   "décalage": -594,
+   "pas": null
+  },
+  "pak1": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "mid3",
+   "décalage": -742,
+   "pas": null
+  },
+  "pak2": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "midgames",
+   "décalage": -862,
+   "pas": null
+  },
+  "pak3": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "optshps",
+   "décalage": -982,
+   "pas": null
+  },
+  "pak4": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "optpals",
+   "décalage": -1102,
+   "pas": null
+  },
+  "pak5": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "asoundfx",
+   "décalage": -1222,
+   "pas": null
+  },
+  "flux1": {
+   "genre": "stream",
+   "type": null,
+   "contenu": null,
+   "décalage": -1474,
+   "pas": null
+  },
+  "pak6": {
+   "genre": "pak",
+   "type": null,
+   "contenu": "amusic",
+   "décalage": -1426,
+   "pas": null
+  },
+  "r1": {
+   "genre": "res",
+   "type": null,
+   "contenu": "amusic 3",
+   "décalage": -28,
+   "pas": null
+  },
+  "canal1": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1236,
+   "pas": null
+  },
+  "r2": {
+   "genre": "res",
+   "type": null,
+   "contenu": "optpals 21",
+   "décalage": -40,
+   "pas": null
+  },
+  "pal2": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "optpals 21",
+   "décalage": -46,
+   "pas": null
+  },
+  "r3": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 26",
+   "décalage": -56,
+   "pas": null
+  },
+  "pal3": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 26",
+   "décalage": -62,
+   "pas": null
+  },
+  "r4": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 17",
+   "décalage": -72,
+   "pas": null
+  },
+  "pal4": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 17",
+   "décalage": -78,
+   "pas": null
+  },
+  "r5": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 19",
+   "décalage": -88,
+   "pas": null
+  },
+  "pal5": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 19",
+   "décalage": -94,
+   "pas": null
+  },
+  "r6": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 20",
+   "décalage": -104,
+   "pas": null
+  },
+  "pal6": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 20",
+   "décalage": -110,
+   "pas": null
+  },
+  "r7": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 21",
+   "décalage": -120,
+   "pas": null
+  },
+  "pal7": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 21",
+   "décalage": -126,
+   "pas": null
+  },
+  "r8": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 18",
+   "décalage": -136,
+   "pas": null
+  },
+  "pal8": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "mid3 18",
+   "décalage": -142,
+   "pas": null
+  },
+  "r9": {
+   "genre": "res",
+   "type": null,
+   "contenu": "convdata type 2 \"normal\"",
+   "décalage": -152,
+   "pas": null
+  },
+  "pal9": {
+   "genre": "palette",
+   "type": null,
+   "contenu": "convdata type 2 \"normal\"",
+   "décalage": -158,
+   "pas": null
+  },
+  "r10": {
+   "genre": "res",
+   "type": null,
+   "contenu": "asoundfx 40",
+   "décalage": -168,
+   "pas": null
+  },
+  "canal2": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1250,
+   "pas": null
+  },
+  "r11": {
+   "genre": "res",
+   "type": null,
+   "contenu": "asoundfx 59",
+   "décalage": -178,
+   "pas": null
+  },
+  "canal3": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1264,
+   "pas": null
+  },
+  "r12": {
+   "genre": "res",
+   "type": null,
+   "contenu": "asoundfx 60",
+   "décalage": -188,
+   "pas": null
+  },
+  "canal4": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1278,
+   "pas": null
+  },
+  "r13": {
+   "genre": "res",
+   "type": null,
+   "contenu": "asoundfx 100",
+   "décalage": -198,
+   "pas": null
+  },
+  "canal5": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1292,
+   "pas": null
+  },
+  "r14": {
+   "genre": "res",
+   "type": null,
+   "contenu": "asoundfx 101",
+   "décalage": -208,
+   "pas": null
+  },
+  "canal6": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1306,
+   "pas": null
+  },
+  "canal7": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1320,
+   "pas": null
+  },
+  "r15": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 1",
+   "décalage": -228,
+   "pas": null
+  },
+  "scène1": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "scène2": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "r16": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 24",
+   "décalage": -238,
+   "pas": null
+  },
+  "r17": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 13",
+   "décalage": -248,
+   "pas": null
+  },
+  "canal8": {
+   "genre": "channel",
+   "type": null,
+   "contenu": null,
+   "décalage": -1334,
+   "pas": null
+  },
+  "r18": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 9",
+   "décalage": -252,
+   "pas": null
+  },
+  "r19": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 10",
+   "décalage": -262,
+   "pas": null
+  },
+  "r20": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 8",
+   "décalage": -272,
+   "pas": null
+  },
+  "r21": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 12",
+   "décalage": -282,
+   "pas": null
+  },
+  "r22": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 3",
+   "décalage": -292,
+   "pas": null
+  },
+  "r23": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 2",
+   "décalage": -302,
+   "pas": null
+  },
+  "r24": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 4",
+   "décalage": -312,
+   "pas": null
+  },
+  "r25": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 7",
+   "décalage": -322,
+   "pas": null
+  },
+  "r26": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 6",
+   "décalage": -332,
+   "pas": null
+  },
+  "r27": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 5",
+   "décalage": -342,
+   "pas": null
+  },
+  "r28": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 0",
+   "décalage": -352,
+   "pas": null
+  },
+  "r29": {
+   "genre": "res",
+   "type": null,
+   "contenu": "mid3 23",
+   "décalage": -364,
+   "pas": null
+  },
+  "scène3": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "r30": {
+   "genre": "res",
+   "type": null,
+   "contenu": "convdata type 0 \"air\"",
+   "décalage": -258,
+   "pas": null
+  },
+  "scène4": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "r31": {
+   "genre": "res",
+   "type": null,
+   "contenu": "midgames 0",
+   "décalage": -274,
+   "pas": null
+  },
+  "scène5": {
+   "genre": "scene",
+   "type": null,
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c1": {
+   "genre": "layer",
+   "type": "OverlayImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c2": {
+   "genre": "layer",
+   "type": "OverlayImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c3": {
+   "genre": "layer",
+   "type": "Layer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c4": {
+   "genre": "layer",
+   "type": "Layer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c5": {
+   "genre": "layer",
+   "type": "OverlayImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c6": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c7": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c8": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c9": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c10": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c11": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c12": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c13": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c14": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c15": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c16": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c17": {
+   "genre": "layer",
+   "type": "MovingLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c18": {
+   "genre": "layer",
+   "type": "Layer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c19": {
+   "genre": "layer",
+   "type": "Layer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c20": {
+   "genre": "layer",
+   "type": "Layer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c21": {
+   "genre": "layer",
+   "type": "TalkingHeadOverlay",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c22": {
+   "genre": "layer",
+   "type": "ToggleLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  },
+  "c23": {
+   "genre": "layer",
+   "type": "OverlayImageLayer",
+   "contenu": null,
+   "décalage": null,
+   "pas": null
+  }
+ }
 }

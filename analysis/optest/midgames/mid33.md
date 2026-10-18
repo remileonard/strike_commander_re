@@ -48,9 +48,11 @@ sinon :
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨302064⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨302068⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨302070⟩
+        di = 1                                                                                        ⟨302071⟩
         tant que di <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨302078⟩
             ds:24192[di·2] = iff_lit_mot(flux=flux1)                                                  ⟨302082⟩
+            di = di + 1                                                                               ⟨302083⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨302090⟩
         v21 = 1                                                                                       ⟨302092⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨302096⟩
@@ -69,9 +71,11 @@ sinon :
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨302200⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨302204⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨302206⟩
+        di = 1                                                                                        ⟨302207⟩
         tant que di <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨302214⟩
             ds:24192[di·2] = iff_lit_mot(flux=flux1)                                                  ⟨302218⟩
+            di = di + 1                                                                               ⟨302219⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨302226⟩
         v21 = 1                                                                                       ⟨302228⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨302232⟩
@@ -108,11 +112,13 @@ sinon :
     flux1.ouvre(chemin1, 1)                                                                           ⟨302454⟩
     iff_form(flux=flux1, balise='MG33', x=0)                                                          ⟨302460⟩
     iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨302466⟩
+    di = 0                                                                                            ⟨302468⟩
     tant que di < 18 :
         iff_chunk(flux=flux1, balise='TEXT', x=1)                                                     ⟨302477⟩
         v310 = v3228                                                                                  ⟨302480⟩
         iff_lit(flux=flux1, destination=textes1[0] + (textes1.+0·di), taille=v310)                    ⟨302491⟩
         v3241 = v3224                                                                                 ⟨302494⟩
+        di = di + 1                                                                                   ⟨302495⟩
     iff_ferme_form(flux=flux1)                                                                        ⟨302502⟩
     si CRT_Strlen(arg_10) != 0 :
         CRT_Strcat(textes1[2], arg_10)                                                                ⟨302515⟩
@@ -285,15 +291,19 @@ si v20 != 0 :
     Scene_Tick(scène=scène1)                                                                          ⟨303948⟩
     charge(mid33voc 0)                                                                                ⟨303960⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 0)                                 ⟨303966⟩
+    di = 0                                                                                            ⟨303968⟩
     tant que di < 4 :
         Scene_Tick(scène=scène1)                                                                      ⟨303975⟩
+        di = di + 1                                                                                   ⟨303977⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨303985⟩
     tant que sub_8500(voix1) != 0 :
         si touche_passer() != 0 : aller à loc_A55F7                                                   ⟨303993⟩
         Scene_Tick(scène=scène1)                                                                      ⟨304000⟩
     loc_A55F7:                                                                                        ⟨304011⟩
+    di = 0                                                                                            ⟨304012⟩
     tant que di < 4 :
         Scene_Tick(scène=scène1)                                                                      ⟨304019⟩
+        di = di + 1                                                                                   ⟨304021⟩
     voix_arrête(voix=voix1)                                                                           ⟨304028⟩
 sinon :
     Widget_Method_DispatchC_314CB(zone1, 0)                                                           ⟨304056⟩
@@ -301,6 +311,7 @@ sinon :
     v14 = 53                                                                                          ⟨304063⟩
     v12 = scène1.compteur + ((v14·70) / 100)                                                          ⟨304073⟩
     tant que (scène1.compteur < v12) et (scène1.terminée == 0) :
+        di = scène1.compteur                                                                          ⟨304078⟩
         si scène1.compteur + 3 == scène1.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                              ⟨304086⟩
         si v12 - 1 == scène1.compteur :
@@ -334,6 +345,7 @@ sinon :
     v14 = 61                                                                                          ⟨304676⟩
     v12 = scène1.compteur + ((v14·70) / 100)                                                          ⟨304686⟩
     tant que (scène1.compteur < v12) et (scène1.terminée == 0) :
+        di = scène1.compteur                                                                          ⟨304691⟩
         si scène1.compteur + 1 == scène1.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[1])                              ⟨304701⟩
         si v12 - 1 == scène1.compteur :
@@ -405,8 +417,10 @@ si v20 != 0 :
     Scene_Tick(scène=scène2)                                                                          ⟨305471⟩
     charge(mid33voc 1)                                                                                ⟨305483⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 1)                                 ⟨305489⟩
+    di = 0                                                                                            ⟨305491⟩
     tant que di < 2 :
         Scene_Tick(scène=scène2)                                                                      ⟨305498⟩
+        di = di + 1                                                                                   ⟨305500⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨305508⟩
     tant que sub_8500(voix1) != 0 :
         si touche_passer() != 0 : aller à loc_A67BD                                                   ⟨305516⟩
@@ -424,19 +438,25 @@ si v20 != 0 :
         voix_arrête(voix=voix1)                                                                       ⟨306000⟩
         canal_arrête(canal=canal2)                                                                    ⟨306023⟩
         retour                                                                                        ⟨306104⟩
+    di = 0                                                                                            ⟨306108⟩
     tant que di < 4 :
         Scene_Tick(scène=scène2)                                                                      ⟨306115⟩
+        di = di + 1                                                                                   ⟨306117⟩
     charge(mid33voc 2)                                                                                ⟨306132⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 2)                                 ⟨306138⟩
+    di = 0                                                                                            ⟨306140⟩
     tant que di < 4 :
         Scene_Tick(scène=scène2)                                                                      ⟨306147⟩
+        di = di + 1                                                                                   ⟨306149⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨306157⟩
     tant que sub_8500(voix1) != 0 :
         si touche_passer() != 0 : aller à loc_A6F6A                                                   ⟨306165⟩
         Scene_Tick(scène=scène2)                                                                      ⟨306172⟩
     loc_A6F6A:                                                                                        ⟨306183⟩
+    di = 0                                                                                            ⟨306184⟩
     tant que di < 4 :
         Scene_Tick(scène=scène2)                                                                      ⟨306191⟩
+        di = di + 1                                                                                   ⟨306193⟩
     voix_arrête(voix=voix1)                                                                           ⟨306200⟩
 sinon :
     Widget_Method_DispatchC_314CB(zone1, 0)                                                           ⟨306247⟩
@@ -444,6 +464,7 @@ sinon :
     v14 = 66                                                                                          ⟨306254⟩
     v12 = scène2.compteur + ((v14·70) / 100)                                                          ⟨306264⟩
     tant que (scène2.compteur < v12) et (scène2.terminée == 0) :
+        di = scène2.compteur                                                                          ⟨306269⟩
         si scène2.compteur + 3 == scène2.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[2])                              ⟨306281⟩
         si v12 - 1 == scène2.compteur :
@@ -477,6 +498,7 @@ sinon :
     v14 = 70                                                                                          ⟨306909⟩
     v12 = scène2.compteur + ((v14·70) / 100)                                                          ⟨306919⟩
     tant que (scène2.compteur < v12) et (scène2.terminée == 0) :
+        di = scène2.compteur                                                                          ⟨306924⟩
         si scène2.compteur + 1 == scène2.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[4])                              ⟨306936⟩
         si v12 - 1 == scène2.compteur :
@@ -513,6 +535,7 @@ scène3 = Scene_Create(cadence=9, palette=255, surface=&v584)                   
 c6 = Layer(ressource=midgames 44, x=0, y=0)                                                           ⟨307577⟩
 CRT_Rand()                                                                                            ⟨307581⟩
 c7 = TalkingHead(ressource=convdata type 0 "tex", x=((CRT_Rand()·5) / -32768) + 158, y=128)           ⟨307592⟩
+di = c7                                                                                               ⟨307594⟩
 tête_image_de_base(tête=c7, image=19)                                                                 ⟨307597⟩
 ajoute c6 à scène3                                                                                    ⟨307602⟩
 ajoute c7 à scène3                                                                                    ⟨307607⟩
@@ -708,27 +731,34 @@ si v20 != 0 :
     Scene_Tick(scène=scène4)                                                                          ⟨310422⟩
     charge(mid33voc 4)                                                                                ⟨310434⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 4)                                 ⟨310440⟩
+    di = 0                                                                                            ⟨310442⟩
     tant que di < 8 :
         Scene_Tick(scène=scène4)                                                                      ⟨310449⟩
+        di = di + 1                                                                                   ⟨310451⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨310459⟩
+    di = 0                                                                                            ⟨310461⟩
     tant que sub_8500(voix1) != 0 :
         si di == 7 :
             tête_image_de_base(tête=c9, image=12)                                                     ⟨310470⟩
         si di == 8 :
             tête_image_de_base(tête=c9, image=21)                                                     ⟨310478⟩
+        di = di + 1                                                                                   ⟨310483⟩
         si di == 17 :
             tête_image_de_base(tête=c9, image=12)                                                     ⟨310488⟩
         si touche_passer() != 0 : aller à loc_AA17C                                                   ⟨310494⟩
         Scene_Tick(scène=scène4)                                                                      ⟨310501⟩
     loc_AA17C:                                                                                        ⟨310512⟩
+    di = 0                                                                                            ⟨310513⟩
     tant que di < 12 :
         Scene_Tick(scène=scène4)                                                                      ⟨310520⟩
+        di = di + 1                                                                                   ⟨310522⟩
     voix_arrête(voix=voix1)                                                                           ⟨310529⟩
 sinon :
     v3096→0.méthode8(254)                                                                             ⟨310558⟩
     v14 = 40                                                                                          ⟨310560⟩
     v12 = scène4.compteur + ((v14·70) / 100)                                                          ⟨310570⟩
     tant que (scène4.compteur < v12) et (scène4.terminée == 0) :
+        di = scène4.compteur                                                                          ⟨310575⟩
         si scène4.compteur + 1 == scène4.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[8])                              ⟨310587⟩
         si scène4.compteur + 17 == scène4.compteur :
@@ -776,9 +806,12 @@ si v20 != 0 :
     Scene_Tick(scène=scène5)                                                                          ⟨311284⟩
     charge(mid33voc 5)                                                                                ⟨311296⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 5)                                 ⟨311302⟩
+    di = 0                                                                                            ⟨311304⟩
     tant que di < 4 :
         Scene_Tick(scène=scène5)                                                                      ⟨311311⟩
+        di = di + 1                                                                                   ⟨311313⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨311321⟩
+    di = 0                                                                                            ⟨311323⟩
     tant que sub_8500(voix1) != 0 :
         si di == 7 :
             tête_image_de_base(tête=c12, image=12)                                                    ⟨311332⟩
@@ -794,6 +827,7 @@ si v20 != 0 :
             tête_image_de_base(tête=c11, image=12)                                                    ⟨311372⟩
         si di == 3 :
             tête_image_de_base(tête=c11, image=21)                                                    ⟨311380⟩
+        di = di + 1                                                                                   ⟨311385⟩
         si di == 22 :
             tête_image_de_base(tête=c11, image=12)                                                    ⟨311390⟩
         si touche_passer() != 0 : aller à loc_AAB85                                                   ⟨311396⟩
@@ -811,13 +845,16 @@ si v20 != 0 :
         voix_arrête(voix=voix1)                                                                       ⟨311845⟩
         canal_arrête(canal=canal2)                                                                    ⟨311868⟩
         retour                                                                                        ⟨311949⟩
+    di = 0                                                                                            ⟨311953⟩
     tant que di < 8 :
         Scene_Tick(scène=scène5)                                                                      ⟨311960⟩
+        di = di + 1                                                                                   ⟨311962⟩
 sinon :
     v3096→0.méthode8(254)                                                                             ⟨311994⟩
     v14 = 71                                                                                          ⟨311996⟩
     v12 = scène5.compteur + ((v14·70) / 100)                                                          ⟨312006⟩
     tant que (scène5.compteur < v12) et (scène5.terminée == 0) :
+        di = scène5.compteur                                                                          ⟨312011⟩
         si scène5.compteur + 2 == scène5.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])                              ⟨312024⟩
         si scène5.compteur + 17 == scène5.compteur :
@@ -877,8 +914,10 @@ si v20 != 0 :
     Scene_Tick(scène=scène6)                                                                          ⟨312753⟩
     charge(mid33voc 6)                                                                                ⟨312765⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 6)                                 ⟨312771⟩
+    di = 0                                                                                            ⟨312773⟩
     tant que di < 4 :
         Scene_Tick(scène=scène6)                                                                      ⟨312780⟩
+        di = di + 1                                                                                   ⟨312782⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨312790⟩
     tant que sub_8500(voix1) != 0 :
         si touche_passer() != 0 : aller à loc_ABBC4                                                   ⟨312798⟩
@@ -896,14 +935,17 @@ si v20 != 0 :
         voix_arrête(voix=voix1)                                                                       ⟨313263⟩
         canal_arrête(canal=canal2)                                                                    ⟨313286⟩
         retour                                                                                        ⟨313367⟩
+    di = 0                                                                                            ⟨313371⟩
     tant que di < 8 :
         Scene_Tick(scène=scène6)                                                                      ⟨313378⟩
+        di = di + 1                                                                                   ⟨313380⟩
 sinon :
     Widget_Method_DispatchC_314CB(zone1, 0)                                                           ⟨313411⟩
     Widget_Method_Dispatch8_314A9(zone1, 79)                                                          ⟨313416⟩
     v14 = 56                                                                                          ⟨313418⟩
     v12 = scène6.compteur + ((v14·70) / 100)                                                          ⟨313428⟩
     tant que (scène6.compteur < v12) et (scène6.terminée == 0) :
+        di = scène6.compteur                                                                          ⟨313433⟩
         si scène6.compteur + 3 == scène6.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[10])                             ⟨313446⟩
         si v12 - 1 == scène6.compteur :
@@ -937,6 +979,7 @@ sinon :
     v14 = 60                                                                                          ⟨314055⟩
     v12 = scène6.compteur + ((v14·70) / 100)                                                          ⟨314065⟩
     tant que (scène6.compteur < v12) et (scène6.terminée == 0) :
+        di = scène6.compteur                                                                          ⟨314070⟩
         si scène6.compteur + 1 == scène6.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[11])                             ⟨314083⟩
         si v12 - 1 == scène6.compteur :
@@ -973,6 +1016,7 @@ scène7 = Scene_Create(cadence=9, palette=255, surface=&v584)                   
 c14 = Layer(ressource=midgames 44, x=0, y=0)                                                          ⟨314705⟩
 CRT_Rand()                                                                                            ⟨314709⟩
 c15 = TalkingHead(ressource=convdata type 0 "tex", x=((CRT_Rand()·5) / -32768) + 158, y=128)          ⟨314720⟩
+di = c15                                                                                              ⟨314722⟩
 tête_image_de_base(tête=c15, image=19)                                                                ⟨314725⟩
 ajoute c14 à scène7                                                                                   ⟨314730⟩
 ajoute c15 à scène7                                                                                   ⟨314735⟩
@@ -1144,6 +1188,7 @@ si v20 != 0 :
     charge(mid33voc 8)                                                                                ⟨317031⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid33voc 8)                                 ⟨317037⟩
 tant que (scène8.compteur < v12) et (scène8.terminée == 0) :
+    di = scène8.compteur                                                                              ⟨317045⟩
     si scène8.compteur > 30 :
         si scène8.compteur < 120 :
             v354 = mid33voc 5.+0                                                                      ⟨317051⟩
@@ -1169,7 +1214,7 @@ tant que (scène8.compteur < v12) et (scène8.terminée == 0) :
             voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                           ⟨317151⟩
     si midgames 39.+0 + 27 == scène8.compteur :
         si v20 == 0 :
-            Widget_RenderComplexLayoutWrapper_31A3B(zone1, 9967, 4, 160, textes1[16])                 ⟨317174⟩
+            texte_formaté(zone=zone1, format=9967, a=4, b=160, c=textes1[16])                         ⟨317174⟩
     si midgames 39.+0 + 25 < scène8.compteur :
         si midgames 39.+0 + 30 > scène8.compteur :
             v360 = mid33voc 7.+0 - 1                                                                  ⟨317189⟩
@@ -1235,7 +1280,7 @@ zone_texte(zone=zone3, police=0)                                                
 v340 = word_46F46                                                                                     ⟨317595⟩
 TextFormat_ApplyStyleAttribute_2E9A4(canal3, v340)                                                    ⟨317599⟩
 Widget_ComputeBoundsExtent_31755(zone3, 160, 97)                                                      ⟨317608⟩
-Widget_RenderComplexLayoutWrapper_31A3B(zone3, 10007)                                                 ⟨317613⟩
+texte_formaté(zone=zone3, format=10007)                                                               ⟨317613⟩
 fondu_apparition(palette=pal1, couleur=&v332, pas=2, premier=0, nombre=256)                           ⟨317622⟩
 vide_entrées()                                                                                        ⟨317624⟩
 v344 = booléen                                                                                        ⟨317626⟩

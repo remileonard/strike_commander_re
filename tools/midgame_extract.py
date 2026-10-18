@@ -250,6 +250,8 @@ class Obj:
         self.kind = kind
         self.name = name
         self.type = None
+        self.raw = {}
+        self.offset = None
         self.content = None
         self.info = {}
         self.stride = None
@@ -521,6 +523,7 @@ class FunctionRun:
                             if reg_of(src) == dst:
                                 continue
                             regs.add(dst)
+        self.loop_registers = set().union(*self.loop_variant.values()) if self.loop_variant else set()
 
     def continues_main_path(self, k0):
         """Vrai si, depuis k0, un chemin atteint une nouvelle scène (ou la suite) sans « retour »."""
@@ -781,6 +784,8 @@ class FunctionRun:
             if op[3] == 'ah' and is_const(val) and val[1] == 0:
                 return
             self.regs[op[1]] = val
+            if op[1] in ('si', 'di') and op[3] == op[1] and op[1] in self.loop_registers:
+                self.emit(('assign', op[1], val, line))
             return
         if op[0] != 'mem':
             self.emit(('asm', src_text, line))
@@ -795,6 +800,10 @@ class FunctionRun:
             if op[2] == 4 and val[0] == 'glob':
                 self.store[off] = val
                 self.store[off + 2] = ('glob', val[1] + '+2')
+                return
+            early = self.region_at(off)
+            if early and self.ex.objects[early[1]].kind == 'scene' and str(off - early[0]) in self.ex.engine['fields'].get('scene', {}):
+                self.write_field(early[1], off - early[0], val, line)
                 return
             if is_const(val) and self.in_init_window(off):
                 return
@@ -894,7 +903,7 @@ class FunctionRun:
         self.regs['cx_before_call'] = saved_cx
         if spec is None:
             shown = [ex.render(a) for a in args]
-            self.emit(('call', target, shown, None, line))
+            self.emit(('call', target, shown, list(args), line))
             self.regs['ax'] = ('callres', len(self.stmts) - 1, f'{target}({", ".join(shown)})')
             return
         self.regs_after_call = {}
@@ -929,7 +938,7 @@ class FunctionRun:
         shown = [self.ex.render(a) for a in args[1:]]
         for r in ('ax', 'bx', 'cx', 'dx', 'es'):
             self.regs[r] = unknown()
-        self.emit(('call', f'{label}.{name}', shown, None, line))
+        self.emit(('call', f'{label}.{name}', shown, list(args[1:]), line))
         self.regs['ax'] = ('callres', len(self.stmts) - 1, f'{label}.{name}({", ".join(shown)})')
 
     # --- boucle principale ------------------------------------------------
@@ -1018,6 +1027,11 @@ class FunctionRun:
             if dst[0] == 'reg' and dst[1] == 'ax' and is_const(val) and val[1] == 1:
                 self.emit(('setax', 1, line))
             self.write(dst, val, line, text)
+            nxt = self.instrs[k + 1] if k + 1 < len(self.instrs) else None
+            if (dst[0] == 'reg' and dst[2] == 2 and dst[3] == dst[1] and is_const(val) and val[1] not in (0, 1)
+                    and not (dst[1] in ('si', 'di') and dst[1] in self.loop_registers)
+                    and nxt and (nxt[0] == 'label' or nxt[1] == 'jmp')):
+                self.emit(('assign', dst[1], val, line))
             return
         if mn == 'lea':
             dst = self.operand(parts[0])
@@ -1043,7 +1057,7 @@ class FunctionRun:
                     self.emit(('setax', 0, line))
                     self.regs['ax'] = ('bool',)
                 else:
-                    self.regs[dst[1]] = const(0)
+                    self.write(dst, const(0), line, text)
                 return
             self.write(dst, simplify(('bin', '^', self.value(dst), self.value(src))), line, text)
             return
@@ -1221,7 +1235,7 @@ def apply(self, run, target, spec, args, line):
         entry = self.render(named.get('entrée'))
         if oid:
             self.objects[oid].content = f'{pak_label} {entry}'
-        run.emit(('op', op, [f'{pak_label} {entry}'], None, line))
+        run.emit(('op', op, [f'{pak_label} {entry}'], {'pak': pak_label, 'entrée': named.get('entrée'), 'ressource': ('obj', oid) if oid else None}, line))
         return None
     if special == 'load_name':
         oid = self.ensure_region(run, named.get('ressource'), 'res', 'r', 10)
@@ -1233,7 +1247,7 @@ def apply(self, run, target, spec, args, line):
                 name = f'"{text}"'
         if oid:
             self.objects[oid].content = f'convdata type 0 {name}'
-        run.emit(('op', op, [name, f'drapeau={self.render(named.get("drapeau"))}'], None, line))
+        run.emit(('op', op, [name, f'drapeau={self.render(named.get("drapeau"))}'], {'nom': name.strip('"'), 'ressource': ('obj', oid) if oid else None}, line))
         return None
     if special == 'load_daynight':
         oid = self.ensure_region(run, named.get('ressource'), 'res', 'r', 10)
@@ -1241,14 +1255,14 @@ def apply(self, run, target, spec, args, line):
         label = 'night' if night and is_const(night) and night[1] else 'normal'
         if oid:
             self.objects[oid].content = f'convdata type 2 "{label}"'
-        run.emit(('op', op, [f'"{label}"'], None, line))
+        run.emit(('op', op, [f'"{label}"'], {'nom': label, 'ressource': ('obj', oid) if oid else None}, line))
         return None
     if special == 'palette_load':
         oid = self.ensure_region(run, named.get('palette'), 'palette', 'pal', 5)
         src = named.get('ressource')
         if oid:
             self.objects[oid].content = self.render(src)
-        run.emit(('op', op, [self.render(named.get('palette'))], None, line))
+        run.emit(('op', op, [self.render(named.get('palette'))], dict(named), line))
         return None
     if special == 'scene':
         objv = named.get('objet')
@@ -1291,7 +1305,7 @@ def apply(self, run, target, spec, args, line):
         return None
     if special == 'widget':
         oid = self.ensure_region(run, named.get('zone'), 'widget', 'zone', 40)
-        run.emit(('op', op, [f'zone={self.render(named.get("zone"))}', f'police={self.render(named.get("police"))}'], None, line))
+        run.emit(('op', op, [f'zone={self.render(named.get("zone"))}', f'police={self.render(named.get("police"))}'], dict(named), line))
         return None
     if special == 'objarray':
         size = named.get('taille')
@@ -1331,6 +1345,7 @@ def apply(self, run, target, spec, args, line):
         if obj.name.startswith('h'):
             self.rename_layer(obj)
         obj.info = {r: self.render(a) for r, a in named.items() if r != 'objet'}
+        obj.raw = {r: a for r, a in named.items() if r != 'objet'}
         params = ', '.join(f'{r}={v}' for r, v in obj.info.items())
         run.emit(('layer', obj.name, obj.type, params, line))
         return ('obj', obj.id)
@@ -1367,7 +1382,13 @@ def apply(self, run, target, spec, args, line):
         return None
     if 'show' in spec:
         shown = [f'{role}={self.render(a)}' for role, a in zip(roles, args) if role in spec['show']]
-    run.emit(('op', op, shown, None, line))
+    raw = dict(named)
+    for role, a in named.items():
+        if role in ('nom', 'texte') and is_const(a) and a[1] > 0:
+            text = self.string_at(self.dseg.base + a[1])
+            if text is not None:
+                raw[role] = ('lit', text)
+    run.emit(('op', op, shown, raw, line))
     if spec.get('ret') == 'value':
         return ('callres', len(run.stmts) - 1, f'{op}({", ".join(shown)})')
     return None
@@ -1402,6 +1423,7 @@ def ensure_region(self, run, v, kind, prefix, size):
                 run.found_regions[off].append((max(0, run.k - INIT_WINDOW), size0, oid))
             return oid
     obj = self.new_obj(kind, prefix)
+    obj.offset = off
     run.found_regions.setdefault(off, []).append((max(0, run.k - 24), size, obj.id))
     return obj.id
 
@@ -1506,7 +1528,8 @@ def add_table(self, run, dst, address, nbytes, source, line):
     obj.info = {'source': source, 'adresse': address, 'octets': nbytes, 'mots': words}
     if not any(t['nom'] == obj.name for t in self.tables):
         self.tables.append({'nom': obj.name, 'source': source, 'octets': nbytes, 'mots': words, 'ligne': line})
-    run.emit(('table', obj.name, source, nbytes, line))
+    offset = dst[1] if dst[0] == 'addr' else obj.offset
+    run.emit(('table', obj.name, source, nbytes, words, offset, line))
 
 
 def local_name_for(self, run, off):
@@ -1825,6 +1848,154 @@ def unreferenced_labels(nodes, refs):
             refs.add(n[2])
 
 
+# ---------------------------------------------------------------------------
+# Export JSON de l'arbre (pour tools/midgame_iff.py)
+
+GLOB_RE = re.compile(r'^(byte|word|dword)_([0-9A-F]+)(?:\+(\d+))?$')
+
+
+def glob_init(ex, name):
+    m = GLOB_RE.match(name)
+    if not m:
+        return None
+    address = int(m.group(2), 16) + (int(m.group(3)) if m.group(3) else 0)
+    lo = ex.dseg.bytes.get(address)
+    if lo is None:
+        return None
+    if m.group(1) == 'byte':
+        return lo
+    hi = ex.dseg.bytes.get(address + 1, 0)
+    v = lo | hi << 8
+    return v - 65536 if v >= 32768 else v
+
+
+def jv(ex, v):
+    if v is None:
+        return None
+    if isinstance(v, (int, str)):
+        return v
+    if isinstance(v, dict):
+        return {k: jv(ex, x) for k, x in v.items()}
+    k = v[0]
+    if k == 'const':
+        return v[1]
+    if k == 'obj':
+        return {'objet': ex.objects[v[1]].name}
+    if k == 'field':
+        obj = ex.objects[v[1]]
+        return {'champ': [obj.name, ex.field_name(obj, v[2])]}
+    if k == 'fieldaddr':
+        return {'adresse_champ': [ex.objects[v[1]].name, v[2]]}
+    if k == 'local':
+        return {'local': ex.local_name(v[1])}
+    if k == 'addr':
+        return {'adresse': ex.local_name(v[1])}
+    if k == 'arg':
+        return {'local': ex.arg_names.get(v[1], f'arg_{v[1]}')}
+    if k == 'glob':
+        return {'glob': v[1], 'init': glob_init(ex, v[1])}
+    if k == 'str':
+        text = ex.dseg.strings.get(v[1])
+        return {'chaîne': text if text is not None else v[1]}
+    if k == 'ret':
+        return {'retour': v[1]}
+    if k == 'reg':
+        return {'local': v[1]}
+    if k == 'tab':
+        return {'tab': v[1], 'index': jv(ex, v[2])}
+    if k == 'deref':
+        return {'déréf': jv(ex, v[1]), 'décalage': v[2]}
+    if k == 'bin':
+        return {'op': v[1], 'a': jv(ex, v[2]), 'b': jv(ex, v[3])}
+    if k == 'neg':
+        return {'neg': jv(ex, v[1])}
+    if k == 'callres':
+        return {'résultat': v[2]}
+    if k == 'ptr':
+        return {'données': jv(ex, v[1])}
+    if k == 'temp':
+        return jv(ex, v[1])
+    if k == 'lit':
+        return {'chaîne': v[1]}
+    return {'inconnu': ex.render(v)}
+
+
+def cj(ex, c):
+    k = c[0]
+    if k == 'cmp':
+        return {'cmp': c[1], 'a': jv(ex, c[2]), 'b': jv(ex, c[3])}
+    if k == 'not':
+        return {'non': cj(ex, c[1])}
+    if k == 'or':
+        return {'ou': [cj(ex, c[1]), cj(ex, c[2])]}
+    if k == 'and':
+        return {'et': [cj(ex, c[1]), cj(ex, c[2])]}
+    return {k: True}
+
+
+def target_json(text):
+    if '.' in text:
+        obj, field = text.split('.', 1)
+        if '(' in obj:
+            obj = obj.split('(')[0]
+        return {'champ': [obj, field]}
+    if GLOB_RE.match(text):
+        return {'glob': text}
+    return {'local': text}
+
+
+def tree_json(ex, nodes):
+    out = []
+    for n in nodes:
+        k = n[0]
+        if k in ('while', 'dowhile'):
+            out.append({'t': 'tant_que' if k == 'while' else 'répéter', 'cond': cj(ex, n[1]),
+                        'corps': tree_json(ex, n[2]), 'ligne': n[3]})
+        elif k == 'if':
+            out.append({'t': 'si', 'cond': cj(ex, n[1]), 'alors': tree_json(ex, n[2]),
+                        'sinon': tree_json(ex, n[3]), 'ligne': n[4]})
+        elif k == 'op':
+            out.append({'t': 'op', 'op': n[1], 'args': jv(ex, n[3]) if n[3] is not None else {}, 'texte': n[2],
+                        'ligne': n[-1]})
+        elif k == 'call':
+            out.append({'t': 'appel', 'nom': n[1], 'args': [jv(ex, a) for a in (n[3] or [])], 'texte': n[2],
+                        'ligne': n[-1]})
+        elif k == 'layer':
+            obj = next((o for o in ex.objects.values() if o.name == n[1]), None)
+            out.append({'t': 'calque', 'nom': n[1], 'type': n[2],
+                        'args': jv(ex, obj.raw) if obj is not None else {}, 'ligne': n[-1]})
+        elif k == 'add':
+            out.append({'t': 'ajoute', 'parent': n[1], 'calque': n[2], 'ligne': n[-1]})
+        elif k == 'scene':
+            out.append({'t': 'scène', 'nom': n[1], 'cadence': n[2], 'ligne': n[-1]})
+        elif k == 'assign':
+            out.append({'t': 'affecte', 'cible': target_json(n[1]), 'valeur': jv(ex, n[2]), 'ligne': n[-1]})
+        elif k == 'table':
+            out.append({'t': 'tableau', 'nom': n[1], 'source': n[2], 'octets': n[3], 'mots': n[4],
+                        'décalage': n[5], 'ligne': n[-1]})
+        elif k == 'follow':
+            out.append({'t': 'suite', 'fonction': n[1], 'args': [jv(ex, a) for a in n[2]], 'ligne': n[-1]})
+        elif k == 'goto':
+            out.append({'t': 'saut', 'cible': n[1], 'ligne': n[-1]})
+        elif k == 'cgoto':
+            out.append({'t': 'saut_si', 'cond': cj(ex, n[1]), 'cible': n[2], 'ligne': n[-1]})
+        elif k == 'label':
+            out.append({'t': 'label', 'nom': n[1]})
+        elif k == 'return':
+            out.append({'t': 'retour', 'ligne': n[-1]})
+        elif k == 'asm':
+            out.append({'t': 'asm', 'texte': n[1], 'ligne': n[-1]})
+    return out
+
+
+def objects_json(ex):
+    out = {}
+    for o in ex.objects.values():
+        out[o.name] = {'genre': o.kind, 'type': o.type, 'contenu': o.content, 'décalage': o.offset,
+                       'pas': o.stride}
+    return out
+
+
 def main():
     exe, args = pop_exe_arg(sys.argv[1:])
     if not args:
@@ -1888,7 +2059,8 @@ def main():
         report.append('')
         scenes = scene_summaries(ex, flat, scene_number)
         scene_number += len(scenes)
-        data['parties'].append({'fonction': info['new_name'], 'scènes': scenes, 'pseudo_code': body})
+        data['parties'].append({'fonction': info['new_name'], 'scènes': scenes, 'pseudo_code': body,
+                                'arbre': tree_json(ex, tree)})
         for st in flat:
             if st[0] == 'follow':
                 callee = st[1]
@@ -1906,6 +2078,7 @@ def main():
         for k in range(0, len(words), 20):
             report.append('  `' + ' '.join(str(w) for w in words[k:k + 20]) + '`')
     data['tableaux'] = ex.tables
+    data['objets'] = objects_json(ex)
     open(os.path.join(out_dir, f'{name}.md'), 'w', encoding='utf-8').write('\n'.join(report) + '\n')
     json.dump(data, open(os.path.join(out_dir, f'{name}.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'{scene_number - 1} scènes ; rapport : {os.path.join(out_dir, name + ".md")}')

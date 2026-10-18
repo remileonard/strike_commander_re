@@ -35,9 +35,11 @@ sinon :
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨228764⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨228768⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨228770⟩
+        si = 1                                                                                        ⟨228771⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨228778⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨228782⟩
+            si = si + 1                                                                               ⟨228783⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨228790⟩
         v2 = 1                                                                                        ⟨228792⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨228796⟩
@@ -56,9 +58,11 @@ sinon :
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨228900⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨228904⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨228906⟩
+        si = 1                                                                                        ⟨228907⟩
         tant que si <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨228914⟩
             ds:24192[si·2] = iff_lit_mot(flux=flux1)                                                  ⟨228918⟩
+            si = si + 1                                                                               ⟨228919⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨228926⟩
         v2 = 1                                                                                        ⟨228928⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨228932⟩
@@ -146,10 +150,12 @@ si v2 != 0 :
     canal_enregistre(canal=canal6, ressource=asoundfx 101, x=0)                                       ⟨229335⟩
     canal_arrête(canal=canal6)                                                                        ⟨229339⟩
     canal_init(canal=canal7, pilote=word_46849)                                                       ⟨229350⟩
+    si = 0                                                                                            ⟨229352⟩
     tant que si < 2 :
         charge(asoundfx v210[si])                                                                     ⟨229369⟩
         canal_enregistre(canal=canal7, ressource=asoundfx v210[si], x=0)                              ⟨229376⟩
         canal_arrête(canal=canal7)                                                                    ⟨229380⟩
+        si = si + 1                                                                                   ⟨229401⟩
     canal_arrête(canal=canal7)                                                                        ⟨229412⟩
 si byte_495FC != 0 :
     canal_arrête(canal=canal6)                                                                        ⟨229443⟩
@@ -169,9 +175,11 @@ si v1 != 0 :
 scène1 = Scene_Create(cadence=15, palette=255, surface=&v608)                                         ⟨229964⟩
 charge(mid3 25)                                                                                       ⟨229976⟩
 c1 = OverlayImageLayer(ressource=mid3 25, x=0, y=0, image=0)                                          ⟨229984⟩
+di = c1                                                                                               ⟨229986⟩
 palette_copie(destination=pal1, source=pal3(mid3 26))                                                 ⟨229994⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨230006⟩
 ajoute c1 à scène1                                                                                    ⟨230011⟩
+si = 1                                                                                                ⟨230013⟩
 si v2 != 0 :
     canal_enregistre(canal=canal3, ressource=asoundfx 59, x=0)                                        ⟨230021⟩
     v230 = word_48F18                                                                                 ⟨230024⟩
@@ -181,6 +189,7 @@ si v2 != 0 :
         sub_30C66(canal3.+0→4, v1262, v230, v232)                                                     ⟨230038⟩
 tant que (scène1.compteur < 30) et (scène1.terminée == 0) :
     v234 = si                                                                                         ⟨230048⟩
+    si = si + 1                                                                                       ⟨230049⟩
     c1.image = v234                                                                                   ⟨230051⟩
     Scene_Tick(scène=scène1)                                                                          ⟨230054⟩
 si v2 != 0 :
@@ -215,9 +224,12 @@ palette_copie(destination=pal1, source=pal4(mid3 17))                           
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨230753⟩
 ajoute c2 à scène2                                                                                    ⟨230758⟩
 ajoute c3 à scène2                                                                                    ⟨230763⟩
+si = 0                                                                                                ⟨230765⟩
 tant que (scène2.compteur < 75) et (scène2.terminée == 0) :
+    di = scène2.compteur                                                                              ⟨230770⟩
     si scène2.compteur < 29 :
         v256 = si                                                                                     ⟨230773⟩
+        si = si + 1                                                                                   ⟨230774⟩
         c3.image = v256                                                                               ⟨230777⟩
     sinon :
         si scène2.compteur == 29 :
@@ -225,10 +237,13 @@ tant que (scène2.compteur < 75) et (scène2.terminée == 0) :
             c3.détruit(3)                                                                             ⟨230795⟩
             ajoute c4 à scène2                                                                        ⟨230803⟩
             Scene_SetFps(scène=scène2, cadence=15)                                                    ⟨230808⟩
+            si = 0                                                                                    ⟨230810⟩
             v258 = 0                                                                                  ⟨230811⟩
+            si = 1                                                                                    ⟨230812⟩
             c4.image = v258                                                                           ⟨230815⟩
         sinon :
             v260 = si                                                                                 ⟨230820⟩
+            si = si + 1                                                                               ⟨230821⟩
             c4.image = v260                                                                           ⟨230824⟩
     si scène2.compteur == 50 :
         si v2 != 0 :
@@ -303,6 +318,7 @@ CRT_MemFamily_Extra1(v354, données(mid3 23.+0), 256)                           
 
 ──── scène3 ────
 scène3 = Scene_Create(cadence=20, palette=255, surface=&v608)                                         ⟨231824⟩
+di = -10                                                                                              ⟨231826⟩
 v366 = 0                                                                                              ⟨231827⟩
 v370 = 0                                                                                              ⟨231828⟩
 v372 = 0                                                                                              ⟨231829⟩
@@ -405,6 +421,7 @@ ajoute c16 à scène3                                                           
 ajoute v452 à scène3                                                                                  ⟨232456⟩
 ajoute v454 à scène3                                                                                  ⟨232461⟩
 tant que (scène3.compteur < 189) et (scène3.terminée == 0) :
+    si = scène3.compteur                                                                              ⟨232467⟩
     si scène3.compteur == 9 :
         v368 = 0                                                                                      ⟨232470⟩
     si scène3.compteur > 10 :
@@ -432,7 +449,10 @@ tant que (scène3.compteur < 189) et (scène3.terminée == 0) :
         si di != 0 :
             v370 = v370 + 1                                                                           ⟨232591⟩
             si v370 == 5 :
+                di = di + 1                                                                           ⟨232595⟩
                 v370 = 0                                                                              ⟨232596⟩
+            si di >= -1 :
+                di = 0                                                                                ⟨232601⟩
             v460 = di / 6                                                                             ⟨232608⟩
             c6.vx = v460                                                                              ⟨232611⟩
             c6.vy = 0                                                                                 ⟨232613⟩
@@ -576,6 +596,7 @@ c18 = Layer(ressource=optshps 116, x=0, y=-40)                                  
 c19 = Layer(ressource=mid3 24, x=0, y=0)                                                              ⟨233905⟩
 c20 = Layer(ressource=mid3 13, x=0, y=0)                                                              ⟨233913⟩
 c21 = TalkingHeadOverlay(ressource=convdata type 0 "air", x=160, y=128)                               ⟨233921⟩
+si = c21                                                                                              ⟨233923⟩
 
 ──── scène4 ────
 scène4 = Scene_Create(cadence=10, palette=255, surface=&v608)                                         ⟨233930⟩
@@ -598,6 +619,7 @@ si v2 != 0 :
         AIL_start_sequence(pilote=canal2.+0→4, séquence=v1248)                                        ⟨234038⟩
         sub_30C66(canal2.+0→4, v1248, v278, v280)                                                     ⟨234045⟩
 tant que (scène4.compteur < 45) et (scène4.terminée == 0) :
+    di = scène4.compteur                                                                              ⟨234055⟩
     si scène4.compteur == 10 :
         tête_image_de_base(tête=c21, image=14)                                                        ⟨234060⟩
     si scène4.compteur == 19 :
@@ -623,6 +645,7 @@ charge(mid3 1)                                                                  
 ──── scène5 ────
 scène5 = Scene_Create(cadence=15, palette=255, surface=&v608)                                         ⟨234752⟩
 c23 = OverlayImageLayer(ressource=mid3 1, x=0, y=0, image=0)                                          ⟨234760⟩
+di = c23                                                                                              ⟨234762⟩
 palette_copie(destination=pal1, source=pal8(mid3 18))                                                 ⟨234774⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨234782⟩
 ajoute c23 à scène5                                                                                   ⟨234787⟩
@@ -633,6 +656,7 @@ si v2 != 0 :
         AIL_start_sequence(pilote=canal2.+0→4, séquence=v1248)                                        ⟨234807⟩
         sub_30C66(canal2.+0→4, v1248, v230, v232)                                                     ⟨234814⟩
 tant que (scène5.compteur < 45) et (scène5.terminée == 0) :
+    si = scène5.compteur                                                                              ⟨234824⟩
     si scène5.compteur & 1 != 0 :
         v234 = ('field', 83, 29)                                                                      ⟨234831⟩
         c23.image = v234                                                                              ⟨234833⟩

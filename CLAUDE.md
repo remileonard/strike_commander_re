@@ -277,6 +277,8 @@ strike_commander_re/
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace
+│   ├── MID1_PLANS.md                MID_1.IFF produit par l'outil : plans, règles de conversion,
+│   │                                  hypothèses et limites
 │   ├── MUSIC_SYSTEM.md              ⭐ système musical (AIL/XMIDI, combat.dat/.adl,
 │   │                                  transitions, déclencheurs, effets sonores, voix)
 │   ├── ADLIB_DRIVER.md              pilote AdLib OPL2 (ADLIB.ADV) — registres, tables
@@ -299,6 +301,9 @@ strike_commander_re/
 └── tools/
     ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
     │                                  prennent --exe optest (défaut strike)
+    ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
+    ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
+    │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné

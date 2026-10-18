@@ -56,7 +56,7 @@ loc_2CBC9:				; DATA XREF: dseg:1210o
 ; ==============================================================================================
 ; far, LUE 2026-10-17. Range un rectangle dans un objet primitive (+2, +4, +8, +10 = arg_2,
 ; arg_4, arg_6, arg_8), la couleur dans byte_46F42 (arg_A), puis appelle sa méthode virtuelle
-; +20 avec la surface arg_C (non lue). mid1 scène 22 : objet construit directement (tables
+; +20 avec la surface arg_C (non lue). mid1 scène 23 : objet construit directement (tables
 ; dseg 4540 à 4604), rectangle du sous-titre, couleur 0.
 ; ==============================================================================================
 Primitive_SetRectColorAndDraw_2CBE5	proc far		; CODE XREF: sub_5AA4E+70EP

@@ -43,9 +43,11 @@ sinon :
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨265995⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨265999⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨266001⟩
+        di = 1                                                                                        ⟨266002⟩
         tant que di <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨266009⟩
             ds:24192[di·2] = iff_lit_mot(flux=flux1)                                                  ⟨266013⟩
+            di = di + 1                                                                               ⟨266014⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨266021⟩
         v17 = 1                                                                                       ⟨266023⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨266027⟩
@@ -64,9 +66,11 @@ sinon :
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨266131⟩
         iff_lit_mot(flux=flux1)                                                                       ⟨266135⟩
         word_48F76 = iff_lit_mot(flux=flux1)                                                          ⟨266137⟩
+        di = 1                                                                                        ⟨266138⟩
         tant que di <= 106 :
             iff_lit_mot(flux=flux1)                                                                   ⟨266145⟩
             ds:24192[di·2] = iff_lit_mot(flux=flux1)                                                  ⟨266149⟩
+            di = di + 1                                                                               ⟨266150⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨266157⟩
         v17 = 1                                                                                       ⟨266159⟩
         iff_ferme_form(flux=flux1)                                                                    ⟨266163⟩
@@ -80,10 +84,12 @@ v50 = word_45316                                                                
 v48 = byte_45318                                                                                      ⟨266207⟩
 si v17 != 0 :
     canal_init(canal=canal1, pilote=word_46849)                                                       ⟨266223⟩
+    di = 0                                                                                            ⟨266225⟩
     tant que di < 5 :
         charge(asoundfx v52[di])                                                                      ⟨266242⟩
         canal_enregistre(canal=canal1, ressource=asoundfx v52[di], x=0)                               ⟨266249⟩
         canal_arrête(canal=canal1)                                                                    ⟨266253⟩
+        di = di + 1                                                                                   ⟨266274⟩
     canal_arrête(canal=canal1)                                                                        ⟨266285⟩
 v1216 = 0                                                                                             ⟨266308⟩
 v1211 = 0                                                                                             ⟨266310⟩
@@ -107,11 +113,13 @@ sinon :
     flux1.ouvre(chemin1, 1)                                                                           ⟨266407⟩
     iff_form(flux=flux1, balise='MG15', x=0)                                                          ⟨266413⟩
     iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨266419⟩
+    di = 0                                                                                            ⟨266421⟩
     tant que di < 26 :
         iff_chunk(flux=flux1, balise='TEXT', x=1)                                                     ⟨266430⟩
         v320 = v3446                                                                                  ⟨266433⟩
         iff_lit(flux=flux1, destination=textes1[0] + (textes1.+0·di), taille=v320)                    ⟨266444⟩
         v3459 = v3442                                                                                 ⟨266447⟩
+        di = di + 1                                                                                   ⟨266448⟩
     iff_ferme_form(flux=flux1)                                                                        ⟨266455⟩
     si CRT_Strlen(arg_8) != 0 :
         CRT_Strcat(textes1[0], 8953)                                                                  ⟨266464⟩
@@ -251,6 +259,7 @@ si byte_495FC == 0 :
     ajoute v324 à scène1                                                                              ⟨267214⟩
     ajoute v322 à scène1                                                                              ⟨267219⟩
     tant que (scène1.compteur < 62) et (scène1.terminée == 0) :
+        di = scène1.compteur                                                                          ⟨267225⟩
         v360 = v348                                                                                   ⟨267227⟩
         v324→27 = v360                                                                                ⟨267230⟩
         si scène1.compteur > 0 :
@@ -313,6 +322,7 @@ si byte_495FC == 0 :
         ajoute c3 à scène2                                                                            ⟨267521⟩
         ajoute c4 à scène2                                                                            ⟨267526⟩
         ajoute c5 à scène2                                                                            ⟨267531⟩
+        di = 0                                                                                        ⟨267533⟩
         si v17 != 0 :
             charge(asoundfx 24)                                                                       ⟨267546⟩
             canal_init(canal=canal4, pilote=word_46849)                                               ⟨267551⟩
@@ -333,6 +343,14 @@ si byte_495FC == 0 :
             tant que sub_9C64(c4) != 0 :
                 si di == 0 :
                     CRT_Rand()                                                                        ⟨267629⟩
+                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8CD32                               ⟨267636⟩
+                    di = -1                                                                           ⟨267637⟩
+                sinon :
+                    si di == -1 :
+                        di = 1                                                                        ⟨267645⟩
+                    sinon :
+                        si di == 1 :
+                            di = 0                                                                    ⟨267652⟩
                 c3.méthode24(0, di)                                                                   ⟨267661⟩
                 c4.méthode24(0, di)                                                                   ⟨267668⟩
                 c5.méthode24(0, di)                                                                   ⟨267675⟩
@@ -341,6 +359,14 @@ si byte_495FC == 0 :
             tant que v352 < 8 :
                 si di == 0 :
                     CRT_Rand()                                                                        ⟨267710⟩
+                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8CDD7                               ⟨267717⟩
+                    di = -1                                                                           ⟨267718⟩
+                sinon :
+                    si di == -1 :
+                        di = 1                                                                        ⟨267726⟩
+                    sinon :
+                        si di == 1 :
+                            di = 0                                                                    ⟨267733⟩
                 c3.méthode24(0, di)                                                                   ⟨267742⟩
                 c4.méthode24(0, di)                                                                   ⟨267749⟩
                 c5.méthode24(0, di)                                                                   ⟨267756⟩
@@ -355,6 +381,14 @@ si byte_495FC == 0 :
                 v342 = scène2.compteur                                                                ⟨267831⟩
                 si di == 0 :
                     CRT_Rand()                                                                        ⟨267834⟩
+                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8CEF7                               ⟨267841⟩
+                    di = -1                                                                           ⟨267842⟩
+                sinon :
+                    si di == -1 :
+                        di = 1                                                                        ⟨267850⟩
+                    sinon :
+                        si di == 1 :
+                            di = 0                                                                    ⟨267857⟩
                 si scène2.compteur + 2 == v342 :
                     sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                      ⟨267868⟩
                 si scène2.compteur + 2 == v342 :
@@ -387,6 +421,7 @@ si byte_495FC == 0 :
             ajoute c7 à scène3                                                                        ⟨268095⟩
             ajoute c8 à scène3                                                                        ⟨268100⟩
             ajoute c9 à scène3                                                                        ⟨268105⟩
+            di = 0                                                                                    ⟨268107⟩
             si v17 != 0 :
                 charge(asoundfx 5)                                                                    ⟨268120⟩
                 canal_init(canal=canal5, pilote=word_46849)                                           ⟨268125⟩
@@ -411,6 +446,14 @@ si byte_495FC == 0 :
                         tête_image_de_base(tête=c8, image=33)                                         ⟨268208⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268214⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D319                           ⟨268221⟩
+                        di = -1                                                                       ⟨268222⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268230⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268237⟩
                     c7.méthode24(0, di)                                                               ⟨268246⟩
                     c8.méthode24(0, di)                                                               ⟨268253⟩
                     c9.méthode24(0, di)                                                               ⟨268260⟩
@@ -427,6 +470,14 @@ si byte_495FC == 0 :
                         tête_image_de_base(tête=c8, image=19)                                         ⟨268321⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268327⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D412                           ⟨268334⟩
+                        di = -1                                                                       ⟨268335⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268343⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268350⟩
                     c7.méthode24(0, di)                                                               ⟨268359⟩
                     c8.méthode24(0, di)                                                               ⟨268366⟩
                     c9.méthode24(0, di)                                                               ⟨268373⟩
@@ -441,6 +492,14 @@ si byte_495FC == 0 :
                 tant que sub_9C64(c8) != 0 :
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268437⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D511                           ⟨268444⟩
+                        di = -1                                                                       ⟨268445⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268453⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268460⟩
                     c7.méthode24(0, di)                                                               ⟨268469⟩
                     c8.méthode24(0, di)                                                               ⟨268476⟩
                     c9.méthode24(0, di)                                                               ⟨268483⟩
@@ -455,6 +514,14 @@ si byte_495FC == 0 :
                         tête_image_de_base(tête=c8, image=19)                                         ⟨268536⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268542⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D5F6                           ⟨268549⟩
+                        di = -1                                                                       ⟨268550⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268558⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268565⟩
                     c7.méthode24(0, di)                                                               ⟨268574⟩
                     c8.méthode24(0, di)                                                               ⟨268581⟩
                     c9.méthode24(0, di)                                                               ⟨268588⟩
@@ -465,6 +532,14 @@ si byte_495FC == 0 :
                 tant que sub_9C64(c8) != 0 :
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268638⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D6D5                           ⟨268645⟩
+                        di = -1                                                                       ⟨268646⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268654⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268661⟩
                     c7.méthode24(0, di)                                                               ⟨268670⟩
                     c8.méthode24(0, di)                                                               ⟨268677⟩
                     c9.méthode24(0, di)                                                               ⟨268684⟩
@@ -477,6 +552,14 @@ si byte_495FC == 0 :
                         tête_image_de_base(tête=c8, image=19)                                         ⟨268729⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268735⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D7A5                           ⟨268742⟩
+                        di = -1                                                                       ⟨268743⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268751⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268758⟩
                     c7.méthode24(0, di)                                                               ⟨268767⟩
                     c8.méthode24(0, di)                                                               ⟨268774⟩
                     c9.méthode24(0, di)                                                               ⟨268781⟩
@@ -491,6 +574,14 @@ si byte_495FC == 0 :
                     v342 = scène3.compteur                                                            ⟨268894⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨268897⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8D943                           ⟨268904⟩
+                        di = -1                                                                       ⟨268905⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨268913⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨268920⟩
                     c7.méthode24(0, di)                                                               ⟨268929⟩
                     c8.méthode24(0, di)                                                               ⟨268936⟩
                     c9.méthode24(0, di)                                                               ⟨268943⟩
@@ -526,6 +617,14 @@ si byte_495FC == 0 :
                     v342 = scène3.compteur                                                            ⟨269136⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨269139⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8DB9B                           ⟨269146⟩
+                        di = -1                                                                       ⟨269147⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨269155⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨269162⟩
                     c7.méthode24(0, di)                                                               ⟨269171⟩
                     c8.méthode24(0, di)                                                               ⟨269178⟩
                     c9.méthode24(0, di)                                                               ⟨269185⟩
@@ -553,6 +652,14 @@ si byte_495FC == 0 :
                     v342 = scène3.compteur                                                            ⟨269336⟩
                     si di == 0 :
                         CRT_Rand()                                                                    ⟨269339⟩
+                        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8DD87                           ⟨269346⟩
+                        di = -1                                                                       ⟨269347⟩
+                    sinon :
+                        si di == -1 :
+                            di = 1                                                                    ⟨269355⟩
+                        sinon :
+                            si di == 1 :
+                                di = 0                                                                ⟨269362⟩
                     c7.méthode24(0, di)                                                               ⟨269371⟩
                     c8.méthode24(0, di)                                                               ⟨269378⟩
                     c9.méthode24(0, di)                                                               ⟨269385⟩
@@ -581,6 +688,7 @@ si byte_495FC == 0 :
                 scène4 = Scene_Create(cadence=10, palette=255, surface=&v472)                         ⟨269553⟩
                 c10 = Layer(ressource=optshps 116, x=0, y=-57)                                        ⟨269560⟩
                 c11 = Layer(ressource=mid15 8, x=0, y=-1)                                             ⟨269568⟩
+                di = c11                                                                              ⟨269570⟩
                 c12 = Layer(ressource=mid15 3, x=0, y=-1)                                             ⟨269576⟩
                 c13 = OverlayImageLayer(ressource=mid15 0, x=0, y=-1, image=1)                        ⟨269585⟩
                 palette_copie(destination=pal1, source=pal2(optpals 21))                              ⟨269595⟩
@@ -691,6 +799,7 @@ si byte_495FC == 0 :
                     ajoute c16 à scène5                                                               ⟨270244⟩
                     ajoute c17 à scène5                                                               ⟨270249⟩
                     tête_image_de_base(tête=c16, image=33)                                            ⟨270253⟩
+                    di = 0                                                                            ⟨270255⟩
                     si v17 != 0 :
                         charge(asoundfx 24)                                                           ⟨270268⟩
                         canal_init(canal=canal4, pilote=word_46849)                                   ⟨270273⟩
@@ -710,6 +819,14 @@ si byte_495FC == 0 :
                         tant que sub_9C64(c16) != 0 :
                             si di == 0 :
                                 CRT_Rand()                                                            ⟨270351⟩
+                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8E866                   ⟨270358⟩
+                                di = -1                                                               ⟨270359⟩
+                            sinon :
+                                si di == -1 :
+                                    di = 1                                                            ⟨270367⟩
+                                sinon :
+                                    si di == 1 :
+                                        di = 0                                                        ⟨270374⟩
                             c15.méthode24(0, di)                                                      ⟨270383⟩
                             c16.méthode24(0, di)                                                      ⟨270390⟩
                             c17.méthode24(0, di)                                                      ⟨270397⟩
@@ -718,6 +835,14 @@ si byte_495FC == 0 :
                         tant que v352 < 4 :
                             si di == 0 :
                                 CRT_Rand()                                                            ⟨270432⟩
+                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8E90B                   ⟨270439⟩
+                                di = -1                                                               ⟨270440⟩
+                            sinon :
+                                si di == -1 :
+                                    di = 1                                                            ⟨270448⟩
+                                sinon :
+                                    si di == 1 :
+                                        di = 0                                                        ⟨270455⟩
                             c15.méthode24(0, di)                                                      ⟨270464⟩
                             c16.méthode24(0, di)                                                      ⟨270471⟩
                             c17.méthode24(0, di)                                                      ⟨270478⟩
@@ -732,6 +857,14 @@ si byte_495FC == 0 :
                             v342 = scène5.compteur                                                    ⟨270553⟩
                             si di == 0 :
                                 CRT_Rand()                                                            ⟨270556⟩
+                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8EA2B                   ⟨270563⟩
+                                di = -1                                                               ⟨270564⟩
+                            sinon :
+                                si di == -1 :
+                                    di = 1                                                            ⟨270572⟩
+                                sinon :
+                                    si di == 1 :
+                                        di = 0                                                        ⟨270579⟩
                             c15.méthode24(0, di)                                                      ⟨270588⟩
                             c16.méthode24(0, di)                                                      ⟨270595⟩
                             c17.méthode24(0, di)                                                      ⟨270602⟩
@@ -767,6 +900,7 @@ si byte_495FC == 0 :
                         ajoute c19 à scène6                                                           ⟨270843⟩
                         ajoute c20 à scène6                                                           ⟨270848⟩
                         ajoute c21 à scène6                                                           ⟨270853⟩
+                        di = 0                                                                        ⟨270855⟩
                         si v17 != 0 :
                             charge(asoundfx 5)                                                        ⟨270868⟩
                             canal_init(canal=canal5, pilote=word_46849)                               ⟨270873⟩
@@ -781,6 +915,14 @@ si byte_495FC == 0 :
                             v342 = scène6.compteur                                                    ⟨270919⟩
                             si di == 0 :
                                 CRT_Rand()                                                            ⟨270922⟩
+                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8EE1B                   ⟨270929⟩
+                                di = -1                                                               ⟨270930⟩
+                            sinon :
+                                si di == -1 :
+                                    di = 1                                                            ⟨270938⟩
+                                sinon :
+                                    si di == 1 :
+                                        di = 0                                                        ⟨270945⟩
                             c19.méthode24(0, di)                                                      ⟨270954⟩
                             c20.méthode24(0, di)                                                      ⟨270961⟩
                             c21.méthode24(0, di)                                                      ⟨270968⟩
@@ -811,6 +953,7 @@ si byte_495FC == 0 :
                             c23 = Layer(ressource=mid15 1, x=0, y=-24)                                ⟨271179⟩
                             c24 = Layer(ressource=mid15 5, x=0, y=-24)                                ⟨271187⟩
                             c25 = Layer(ressource=mid15 6, x=0, y=-24)                                ⟨271195⟩
+                            di = c25                                                                  ⟨271197⟩
                             c26 = Layer(ressource=mid15 10, x=0, y=-24)                               ⟨271203⟩
                             palette_copie(destination=pal1, source=pal4(mid15 11))                    ⟨271213⟩
                             palette_copie(destination=pal1, source=pal2(optpals 21))                  ⟨271222⟩
@@ -873,6 +1016,7 @@ si byte_495FC == 0 :
                                 ajoute c29 à scène8                                                   ⟨271639⟩
                                 ajoute c30 à scène8                                                   ⟨271644⟩
                                 tête_image_de_base(tête=c29, image=14)                                ⟨271648⟩
+                                di = 0                                                                ⟨271650⟩
                                 si v17 != 0 :
                                     charge(asoundfx 24)                                               ⟨271663⟩
                                     canal_init(canal=canal4, pilote=word_46849)                       ⟨271668⟩
@@ -890,6 +1034,14 @@ si byte_495FC == 0 :
                                     tant que sub_9C64(c29) != 0 :
                                         si di == 0 :
                                             CRT_Rand()                                                ⟨271746⟩
+                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8F768       ⟨271753⟩
+                                            di = -1                                                   ⟨271754⟩
+                                        sinon :
+                                            si di == -1 :
+                                                di = 1                                                ⟨271762⟩
+                                            sinon :
+                                                si di == 1 :
+                                                    di = 0                                            ⟨271769⟩
                                         c28.méthode24(0, di)                                          ⟨271778⟩
                                         c29.méthode24(0, di)                                          ⟨271785⟩
                                         c30.méthode24(0, di)                                          ⟨271792⟩
@@ -897,6 +1049,14 @@ si byte_495FC == 0 :
                                     tant que mid15 10.+0 < 8 :
                                         si di == 0 :
                                             CRT_Rand()                                                ⟨271827⟩
+                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8F80D       ⟨271834⟩
+                                            di = -1                                                   ⟨271835⟩
+                                        sinon :
+                                            si di == -1 :
+                                                di = 1                                                ⟨271843⟩
+                                            sinon :
+                                                si di == 1 :
+                                                    di = 0                                            ⟨271850⟩
                                         c28.méthode24(0, di)                                          ⟨271859⟩
                                         c29.méthode24(0, di)                                          ⟨271866⟩
                                         c30.méthode24(0, di)                                          ⟨271873⟩
@@ -909,6 +1069,14 @@ si byte_495FC == 0 :
                                     tant que (scène8.compteur < v8) et (scène8.terminée == 0) :
                                         si di == 0 :
                                             CRT_Rand()                                                ⟨271951⟩
+                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8F92D       ⟨271958⟩
+                                            di = -1                                                   ⟨271959⟩
+                                        sinon :
+                                            si di == -1 :
+                                                di = 1                                                ⟨271967⟩
+                                            sinon :
+                                                si di == 1 :
+                                                    di = 0                                            ⟨271974⟩
                                         c28.méthode24(0, di)                                          ⟨271983⟩
                                         c29.méthode24(0, di)                                          ⟨271990⟩
                                         c30.méthode24(0, di)                                          ⟨271997⟩
@@ -929,6 +1097,14 @@ si byte_495FC == 0 :
                                     tant que (scène8.compteur < v8) et (scène8.terminée == 0) :
                                         si di == 0 :
                                             CRT_Rand()                                                ⟨272121⟩
+                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8FACD       ⟨272128⟩
+                                            di = -1                                                   ⟨272129⟩
+                                        sinon :
+                                            si di == -1 :
+                                                di = 1                                                ⟨272137⟩
+                                            sinon :
+                                                si di == 1 :
+                                                    di = 0                                            ⟨272144⟩
                                         c28.méthode24(0, di)                                          ⟨272153⟩
                                         c29.méthode24(0, di)                                          ⟨272160⟩
                                         c30.méthode24(0, di)                                          ⟨272167⟩
@@ -949,6 +1125,14 @@ si byte_495FC == 0 :
                                     tant que (scène8.compteur < v8) et (scène8.terminée == 0) :
                                         si di == 0 :
                                             CRT_Rand()                                                ⟨272290⟩
+                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_8FC6B       ⟨272297⟩
+                                            di = -1                                                   ⟨272298⟩
+                                        sinon :
+                                            si di == -1 :
+                                                di = 1                                                ⟨272306⟩
+                                            sinon :
+                                                si di == 1 :
+                                                    di = 0                                            ⟨272313⟩
                                         si scène8.compteur + 2 == scène8.compteur :
                                             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])  ⟨272329⟩
                                         si scène8.compteur + 2 == scène8.compteur :
@@ -982,6 +1166,7 @@ si byte_495FC == 0 :
                                     ajoute c33 à scène9                                               ⟨272561⟩
                                     ajoute c34 à scène9                                               ⟨272566⟩
                                     tête_image_de_base(tête=c33, image=25)                            ⟨272570⟩
+                                    di = 0                                                            ⟨272572⟩
                                     si v17 != 0 :
                                         charge(asoundfx 5)                                            ⟨272585⟩
                                         canal_init(canal=canal5, pilote=word_46849)                   ⟨272590⟩
@@ -999,6 +1184,14 @@ si byte_495FC == 0 :
                                         tant que sub_9C64(c33) != 0 :
                                             si di == 0 :
                                                 CRT_Rand()                                            ⟨272668⟩
+                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_90085   ⟨272675⟩
+                                                di = -1                                               ⟨272676⟩
+                                            sinon :
+                                                si di == -1 :
+                                                    di = 1                                            ⟨272684⟩
+                                                sinon :
+                                                    si di == 1 :
+                                                        di = 0                                        ⟨272691⟩
                                             c32.méthode24(0, di)                                      ⟨272700⟩
                                             c33.méthode24(0, di)                                      ⟨272707⟩
                                             c34.méthode24(0, di)                                      ⟨272714⟩
@@ -1006,6 +1199,14 @@ si byte_495FC == 0 :
                                         tant que mid15 10.+0 < 8 :
                                             si di == 0 :
                                                 CRT_Rand()                                            ⟨272749⟩
+                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_9012A   ⟨272756⟩
+                                                di = -1                                               ⟨272757⟩
+                                            sinon :
+                                                si di == -1 :
+                                                    di = 1                                            ⟨272765⟩
+                                                sinon :
+                                                    si di == 1 :
+                                                        di = 0                                        ⟨272772⟩
                                             c32.méthode24(0, di)                                      ⟨272781⟩
                                             c33.méthode24(0, di)                                      ⟨272788⟩
                                             c34.méthode24(0, di)                                      ⟨272795⟩
@@ -1018,6 +1219,14 @@ si byte_495FC == 0 :
                                         tant que (scène9.compteur < v8) et (scène9.terminée == 0) :
                                             si di == 0 :
                                                 CRT_Rand()                                            ⟨272873⟩
+                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_9024A   ⟨272880⟩
+                                                di = -1                                               ⟨272881⟩
+                                            sinon :
+                                                si di == -1 :
+                                                    di = 1                                            ⟨272889⟩
+                                                sinon :
+                                                    si di == 1 :
+                                                        di = 0                                        ⟨272896⟩
                                             c32.méthode24(0, di)                                      ⟨272905⟩
                                             c33.méthode24(0, di)                                      ⟨272912⟩
                                             c34.méthode24(0, di)                                      ⟨272919⟩
@@ -1054,6 +1263,7 @@ si byte_495FC == 0 :
                                         ajoute c36 à scène10                                          ⟨273162⟩
                                         ajoute c37 à scène10                                          ⟨273167⟩
                                         ajoute c38 à scène10                                          ⟨273172⟩
+                                        di = 0                                                        ⟨273174⟩
                                         si v17 != 0 :
                                             charge(asoundfx 24)                                       ⟨273187⟩
                                             canal_init(canal=canal4, pilote=word_46849)               ⟨273192⟩
@@ -1071,6 +1281,14 @@ si byte_495FC == 0 :
                                             tant que sub_9C64(c37) != 0 :
                                                 si di == 0 :
                                                     CRT_Rand()                                        ⟨273270⟩
+                                                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_90698  ⟨273277⟩
+                                                    di = -1                                           ⟨273278⟩
+                                                sinon :
+                                                    si di == -1 :
+                                                        di = 1                                        ⟨273286⟩
+                                                    sinon :
+                                                        si di == 1 :
+                                                            di = 0                                    ⟨273293⟩
                                                 c36.méthode24(0, di)                                  ⟨273302⟩
                                                 c37.méthode24(0, di)                                  ⟨273309⟩
                                                 c38.méthode24(0, di)                                  ⟨273316⟩
@@ -1078,6 +1296,14 @@ si byte_495FC == 0 :
                                             tant que mid15 10.+0 < 3 :
                                                 si di == 0 :
                                                     CRT_Rand()                                        ⟨273351⟩
+                                                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_9073D  ⟨273358⟩
+                                                    di = -1                                           ⟨273359⟩
+                                                sinon :
+                                                    si di == -1 :
+                                                        di = 1                                        ⟨273367⟩
+                                                    sinon :
+                                                        si di == 1 :
+                                                            di = 0                                    ⟨273374⟩
                                                 c36.méthode24(0, di)                                  ⟨273383⟩
                                                 c37.méthode24(0, di)                                  ⟨273390⟩
                                                 c38.méthode24(0, di)                                  ⟨273397⟩
@@ -1090,6 +1316,14 @@ si byte_495FC == 0 :
                                             tant que (scène10.compteur < v8) et (scène10.terminée == 0) :
                                                 si di == 0 :
                                                     CRT_Rand()                                        ⟨273475⟩
+                                                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_9085D  ⟨273482⟩
+                                                    di = -1                                           ⟨273483⟩
+                                                sinon :
+                                                    si di == -1 :
+                                                        di = 1                                        ⟨273491⟩
+                                                    sinon :
+                                                        si di == 1 :
+                                                            di = 0                                    ⟨273498⟩
                                                 c36.méthode24(0, di)                                  ⟨273507⟩
                                                 c37.méthode24(0, di)                                  ⟨273514⟩
                                                 c38.méthode24(0, di)                                  ⟨273521⟩
@@ -1110,6 +1344,14 @@ si byte_495FC == 0 :
                                             tant que (scène10.compteur < v8) et (scène10.terminée == 0) :
                                                 si di == 0 :
                                                     CRT_Rand()                                        ⟨273645⟩
+                                                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_909FD  ⟨273652⟩
+                                                    di = -1                                           ⟨273653⟩
+                                                sinon :
+                                                    si di == -1 :
+                                                        di = 1                                        ⟨273661⟩
+                                                    sinon :
+                                                        si di == 1 :
+                                                            di = 0                                    ⟨273668⟩
                                                 c36.méthode24(0, di)                                  ⟨273677⟩
                                                 c37.méthode24(0, di)                                  ⟨273684⟩
                                                 c38.méthode24(0, di)                                  ⟨273691⟩
@@ -1130,6 +1372,14 @@ si byte_495FC == 0 :
                                             tant que (scène10.compteur < v8) et (scène10.terminée == 0) :
                                                 si di == 0 :
                                                     CRT_Rand()                                        ⟨273815⟩
+                                                    si (CRT_Rand()·7) / -32768 != 0 : aller à loc_90B9D  ⟨273822⟩
+                                                    di = -1                                           ⟨273823⟩
+                                                sinon :
+                                                    si di == -1 :
+                                                        di = 1                                        ⟨273831⟩
+                                                    sinon :
+                                                        si di == 1 :
+                                                            di = 0                                    ⟨273838⟩
                                                 c36.méthode24(0, di)                                  ⟨273847⟩
                                                 c37.méthode24(0, di)                                  ⟨273854⟩
                                                 c38.méthode24(0, di)                                  ⟨273861⟩
@@ -1154,6 +1404,7 @@ si byte_495FC == 0 :
                                             scène11 = Scene_Create(cadence=10, palette=255, surface=&v472)  ⟨274010⟩
                                             c39 = Layer(ressource=optshps 116, x=0, y=-47)            ⟨274017⟩
                                             c40 = Layer(ressource=mid15 8, x=0, y=-1)                 ⟨274025⟩
+                                            di = c40                                                  ⟨274027⟩
                                             c41 = Layer(ressource=mid15 3, x=0, y=-1)                 ⟨274033⟩
                                             c42 = OverlayImageLayer(ressource=mid15 0, x=0, y=-1, image=1)  ⟨274042⟩
                                             palette_copie(destination=pal1, source=pal2(optpals 21))  ⟨274052⟩
@@ -1251,6 +1502,7 @@ si byte_495FC == 0 :
                                                 ajoute c45 à scène12                                  ⟨274672⟩
                                                 ajoute c46 à scène12                                  ⟨274677⟩
                                                 tête_image_de_base(tête=c45, image=33)                ⟨274681⟩
+                                                di = 0                                                ⟨274683⟩
                                                 si v17 != 0 :
                                                     charge(asoundfx 5)                                ⟨274696⟩
                                                     canal_init(canal=canal5, pilote=word_46849)       ⟨274701⟩
@@ -1268,6 +1520,14 @@ si byte_495FC == 0 :
                                                     tant que sub_9C64(c45) != 0 :
                                                         si di == 0 :
                                                             CRT_Rand()                                ⟨274779⟩
+                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_915E1  ⟨274786⟩
+                                                            di = -1                                   ⟨274787⟩
+                                                        sinon :
+                                                            si di == -1 :
+                                                                di = 1                                ⟨274795⟩
+                                                            sinon :
+                                                                si di == 1 :
+                                                                    di = 0                            ⟨274802⟩
                                                         c44.méthode24(0, di)                          ⟨274811⟩
                                                         c45.méthode24(0, di)                          ⟨274818⟩
                                                         c46.méthode24(0, di)                          ⟨274825⟩
@@ -1275,6 +1535,14 @@ si byte_495FC == 0 :
                                                     tant que mid15 10.+0 < 8 :
                                                         si di == 0 :
                                                             CRT_Rand()                                ⟨274860⟩
+                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91686  ⟨274867⟩
+                                                            di = -1                                   ⟨274868⟩
+                                                        sinon :
+                                                            si di == -1 :
+                                                                di = 1                                ⟨274876⟩
+                                                            sinon :
+                                                                si di == 1 :
+                                                                    di = 0                            ⟨274883⟩
                                                         c44.méthode24(0, di)                          ⟨274892⟩
                                                         c45.méthode24(0, di)                          ⟨274899⟩
                                                         c46.méthode24(0, di)                          ⟨274906⟩
@@ -1287,6 +1555,14 @@ si byte_495FC == 0 :
                                                     tant que (scène12.compteur < v8) et (scène12.terminée == 0) :
                                                         si di == 0 :
                                                             CRT_Rand()                                ⟨274984⟩
+                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_917A6  ⟨274991⟩
+                                                            di = -1                                   ⟨274992⟩
+                                                        sinon :
+                                                            si di == -1 :
+                                                                di = 1                                ⟨275000⟩
+                                                            sinon :
+                                                                si di == 1 :
+                                                                    di = 0                            ⟨275007⟩
                                                         c44.méthode24(0, di)                          ⟨275016⟩
                                                         c45.méthode24(0, di)                          ⟨275023⟩
                                                         c46.méthode24(0, di)                          ⟨275030⟩
@@ -1322,6 +1598,7 @@ si byte_495FC == 0 :
                                                     ajoute c48 à scène13                              ⟨275271⟩
                                                     ajoute c49 à scène13                              ⟨275276⟩
                                                     ajoute c50 à scène13                              ⟨275281⟩
+                                                    di = 0                                            ⟨275283⟩
                                                     si v17 != 0 :
                                                         charge(asoundfx 24)                           ⟨275296⟩
                                                         canal_init(canal=canal4, pilote=word_46849)   ⟨275301⟩
@@ -1339,6 +1616,14 @@ si byte_495FC == 0 :
                                                         tant que sub_9C64(c49) != 0 :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275379⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91BEB  ⟨275386⟩
+                                                                di = -1                               ⟨275387⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275395⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨275402⟩
                                                             c48.méthode24(0, di)                      ⟨275411⟩
                                                             c49.méthode24(0, di)                      ⟨275418⟩
                                                             c50.méthode24(0, di)                      ⟨275425⟩
@@ -1346,6 +1631,14 @@ si byte_495FC == 0 :
                                                         tant que mid15 10.+0 < 8 :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275460⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91C8F  ⟨275467⟩
+                                                                di = -1                               ⟨275468⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275476⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨275483⟩
                                                             Scene_Tick(scène=scène13)                 ⟨275499⟩
                                                         charge(mid15voc 6)                            ⟨275518⟩
                                                         sub_9CF7(c49, mid15voc 6, 9)                  ⟨275524⟩
@@ -1354,6 +1647,14 @@ si byte_495FC == 0 :
                                                         tant que sub_9C64(c49) != 0 :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275546⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91D52  ⟨275553⟩
+                                                                di = -1                               ⟨275554⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275562⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨275569⟩
                                                             c48.méthode24(0, di)                      ⟨275578⟩
                                                             c49.méthode24(0, di)                      ⟨275585⟩
                                                             c50.méthode24(0, di)                      ⟨275592⟩
@@ -1361,6 +1662,14 @@ si byte_495FC == 0 :
                                                         tant que mid15 10.+0 < 4 :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275627⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91DF7  ⟨275634⟩
+                                                                di = -1                               ⟨275635⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275643⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨275650⟩
                                                             c48.méthode24(0, di)                      ⟨275659⟩
                                                             c49.méthode24(0, di)                      ⟨275666⟩
                                                             c50.méthode24(0, di)                      ⟨275673⟩
@@ -1373,6 +1682,14 @@ si byte_495FC == 0 :
                                                         tant que (scène13.compteur < v8) et (scène13.terminée == 0) :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275770⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_91F56  ⟨275777⟩
+                                                                di = -1                               ⟨275778⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275786⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨275793⟩
                                                             c48.méthode24(0, di)                      ⟨275802⟩
                                                             c49.méthode24(0, di)                      ⟨275809⟩
                                                             c50.méthode24(0, di)                      ⟨275816⟩
@@ -1401,6 +1718,14 @@ si byte_495FC == 0 :
                                                         tant que (scène13.compteur < v8) et (scène13.terminée == 0) :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨275979⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_92158  ⟨275986⟩
+                                                                di = -1                               ⟨275987⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨275995⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨276002⟩
                                                             c48.méthode24(0, di)                      ⟨276011⟩
                                                             c49.méthode24(0, di)                      ⟨276018⟩
                                                             c50.méthode24(0, di)                      ⟨276025⟩
@@ -1423,6 +1748,14 @@ si byte_495FC == 0 :
                                                         tant que (scène13.compteur < v8) et (scène13.terminée == 0) :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨276159⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_92311  ⟨276166⟩
+                                                                di = -1                               ⟨276167⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨276175⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨276182⟩
                                                             c48.méthode24(0, di)                      ⟨276191⟩
                                                             c49.méthode24(0, di)                      ⟨276198⟩
                                                             c50.méthode24(0, di)                      ⟨276205⟩
@@ -1445,6 +1778,14 @@ si byte_495FC == 0 :
                                                         tant que (scène13.compteur < v8) et (scène13.terminée == 0) :
                                                             si di == 0 :
                                                                 CRT_Rand()                            ⟨276339⟩
+                                                                si (CRT_Rand()·7) / -32768 != 0 : aller à loc_924CA  ⟨276346⟩
+                                                                di = -1                               ⟨276347⟩
+                                                            sinon :
+                                                                si di == -1 :
+                                                                    di = 1                            ⟨276355⟩
+                                                                sinon :
+                                                                    si di == 1 :
+                                                                        di = 0                        ⟨276362⟩
                                                             c48.méthode24(0, di)                      ⟨276371⟩
                                                             c49.méthode24(0, di)                      ⟨276378⟩
                                                             c50.méthode24(0, di)                      ⟨276385⟩
@@ -1478,6 +1819,7 @@ si byte_495FC == 0 :
                                                         ajoute c52 à scène14                          ⟨276597⟩
                                                         ajoute c53 à scène14                          ⟨276602⟩
                                                         palette_envoie(palette=pal1, pas=0)           ⟨276614⟩
+                                                        di = 0                                        ⟨276616⟩
                                                         v326 = 3                                      ⟨276617⟩
                                                         si v17 != 0 :
                                                             charge(asoundfx 24)                       ⟨276632⟩
@@ -1500,6 +1842,13 @@ si byte_495FC == 0 :
                                                                     v346 = v346 + 1                   ⟨276724⟩
                                                                     si v346 & 1 != 0 :
                                                                         CRT_Rand()                    ⟨276729⟩
+                                                                    si convdata type 0 "air".+0 < mid15 2.+0 :
+                                                                        di = -1                       ⟨276742⟩
+                                                                    sinon :
+                                                                        si convdata type 0 "air".+0 == mid15 2.+0 :
+                                                                            di = 0                    ⟨276750⟩
+                                                                        sinon :
+                                                                            di = 1                    ⟨276755⟩
                                                                 c52.méthode24(0, di)                  ⟨276764⟩
                                                                 c53.méthode24(0, di)                  ⟨276771⟩
                                                                 CRT_Rand()                            ⟨276774⟩
@@ -1521,6 +1870,13 @@ si byte_495FC == 0 :
                                                                     si v336 & 1 != 0 :
                                                                         v338 = v326                   ⟨276887⟩
                                                                         CRT_Rand()                    ⟨276888⟩
+                                                                    si convdata type 0 "air".+0 < mid15 2.+0 :
+                                                                        di = -1                       ⟨276901⟩
+                                                                    sinon :
+                                                                        si convdata type 0 "air".+0 == mid15 2.+0 :
+                                                                            di = 0                    ⟨276909⟩
+                                                                        sinon :
+                                                                            di = 1                    ⟨276914⟩
                                                                 c52.méthode24(0, di)                  ⟨276923⟩
                                                                 c53.méthode24(0, di)                  ⟨276930⟩
                                                                 si scène14.compteur + 4 == v336 :
@@ -1547,6 +1903,7 @@ si byte_495FC == 0 :
                                                             scène15 = Scene_Create(cadence=10, palette=255, surface=&v472)  ⟨277072⟩
                                                             c54 = Layer(ressource=optshps 116, x=0, y=-47)  ⟨277079⟩
                                                             c55 = Layer(ressource=mid15 8, x=0, y=-1)  ⟨277087⟩
+                                                            di = c55                                  ⟨277089⟩
                                                             c56 = Layer(ressource=mid15 3, x=0, y=-1)  ⟨277095⟩
                                                             c57 = OverlayImageLayer(ressource=mid15 0, x=0, y=-1, image=1)  ⟨277104⟩
                                                             palette_copie(destination=pal1, source=pal2(optpals 21))  ⟨277114⟩
@@ -1687,6 +2044,7 @@ si byte_495FC == 0 :
                                                                 ajoute c60 à scène16                  ⟨277999⟩
                                                                 ajoute c61 à scène16                  ⟨278004⟩
                                                                 tête_image_de_base(tête=c60, image=14)  ⟨278008⟩
+                                                                di = 0                                ⟨278010⟩
                                                                 si v17 != 0 :
                                                                     charge(asoundfx 5)                ⟨278023⟩
                                                                     canal_init(canal=canal5, pilote=word_46849)  ⟨278028⟩
@@ -1704,6 +2062,14 @@ si byte_495FC == 0 :
                                                                     tant que sub_9C64(c60) != 0 :
                                                                         si di == 0 :
                                                                             CRT_Rand()                ⟨278106⟩
+                                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_9379D  ⟨278113⟩
+                                                                            di = -1                   ⟨278114⟩
+                                                                        sinon :
+                                                                            si di == -1 :
+                                                                                di = 1                ⟨278122⟩
+                                                                            sinon :
+                                                                                si di == 1 :
+                                                                                    di = 0            ⟨278129⟩
                                                                         c59.méthode24(0, di)          ⟨278138⟩
                                                                         c60.méthode24(0, di)          ⟨278145⟩
                                                                         c61.méthode24(0, di)          ⟨278152⟩
@@ -1711,6 +2077,14 @@ si byte_495FC == 0 :
                                                                     tant que v364 < 4 :
                                                                         si di == 0 :
                                                                             CRT_Rand()                ⟨278187⟩
+                                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_93842  ⟨278194⟩
+                                                                            di = -1                   ⟨278195⟩
+                                                                        sinon :
+                                                                            si di == -1 :
+                                                                                di = 1                ⟨278203⟩
+                                                                            sinon :
+                                                                                si di == 1 :
+                                                                                    di = 0            ⟨278210⟩
                                                                         c59.méthode24(0, di)          ⟨278219⟩
                                                                         c60.méthode24(0, di)          ⟨278226⟩
                                                                         c61.méthode24(0, di)          ⟨278233⟩
@@ -1725,6 +2099,14 @@ si byte_495FC == 0 :
                                                                         v354 = scène16.compteur       ⟨278308⟩
                                                                         si di == 0 :
                                                                             CRT_Rand()                ⟨278311⟩
+                                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_93962  ⟨278318⟩
+                                                                            di = -1                   ⟨278319⟩
+                                                                        sinon :
+                                                                            si di == -1 :
+                                                                                di = 1                ⟨278327⟩
+                                                                            sinon :
+                                                                                si di == 1 :
+                                                                                    di = 0            ⟨278334⟩
                                                                         c59.méthode24(0, di)          ⟨278343⟩
                                                                         c60.méthode24(0, di)          ⟨278350⟩
                                                                         c61.méthode24(0, di)          ⟨278357⟩
@@ -1746,6 +2128,14 @@ si byte_495FC == 0 :
                                                                         v354 = scène16.compteur       ⟨278478⟩
                                                                         si di == 0 :
                                                                             CRT_Rand()                ⟨278481⟩
+                                                                            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_93B02  ⟨278488⟩
+                                                                            di = -1                   ⟨278489⟩
+                                                                        sinon :
+                                                                            si di == -1 :
+                                                                                di = 1                ⟨278497⟩
+                                                                            sinon :
+                                                                                si di == 1 :
+                                                                                    di = 0            ⟨278504⟩
                                                                         c59.méthode24(0, di)          ⟨278513⟩
                                                                         c60.méthode24(0, di)          ⟨278520⟩
                                                                         c61.méthode24(0, di)          ⟨278527⟩
@@ -1754,6 +2144,7 @@ si byte_495FC == 0 :
                                                                         si scène16.compteur + 2 == v354 :
                                                                             tête_texte_de_lèvres(tête=c60, texte="brakngupizardtodo")  ⟨278551⟩
                                                                         Scene_Tick(scène=scène16)     ⟨278583⟩
+                                                                di = -1                               ⟨278610⟩
                                                                 c59.méthode24(0, -1)                  ⟨278616⟩
                                                                 c60.méthode24(0, -1)                  ⟨278623⟩
                                                                 c62.méthode24(0, -1)                  ⟨278630⟩
@@ -1763,6 +2154,7 @@ si byte_495FC == 0 :
                                                                 c61.détruit(3)                        ⟨278649⟩
                                                                 tant que (scène16.compteur < 15) et (scène16.terminée == 0) :
                                                                     si scène16.compteur == 1 :
+                                                                        di = 1                        ⟨278660⟩
                                                                         c59.méthode24(0, 1)           ⟨278666⟩
                                                                         c60.méthode24(0, 1)           ⟨278673⟩
                                                                         c62.méthode24(0, 1)           ⟨278680⟩
@@ -1784,6 +2176,7 @@ si byte_495FC == 0 :
                                                                     ajoute c63 à scène17              ⟨278840⟩
                                                                     ajoute c64 à scène17              ⟨278845⟩
                                                                     palette_envoie(palette=pal1, pas=0)  ⟨278857⟩
+                                                                    di = 2                            ⟨278859⟩
                                                                     si v17 != 0 :
                                                                         charge(asoundfx 38)           ⟨278883⟩
                                                                         canal_init(canal=canal6, pilote=word_46849)  ⟨278888⟩
@@ -1814,6 +2207,11 @@ si byte_495FC == 0 :
                                                                                 v3452 = 4584          ⟨279001⟩
                                                                                 v3452 = 4604          ⟨279002⟩
                                                                                 Primitive_SetRectColorAndDraw_2CBE5(&v3452, v3339, v3337, v3335, v3333, 0, &v3362)  ⟨279012⟩
+                                                                        si di <= 26 :
+                                                                            di = di + mid15voc 5.+0   ⟨279019⟩
+                                                                        sinon :
+                                                                            si v376 & 1 != 0 :
+                                                                                di = di + mid15voc 5.+0  ⟨279036⟩
                                                                         Scene_Tick(scène=scène17)     ⟨279068⟩
                                                                     voix_arrête(voix=voix1)           ⟨279096⟩
                                                                     canal_arrête(canal=canal6)        ⟨279119⟩

@@ -8,19 +8,20 @@ ovr197		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; far, 6 751 lignes, LUE 2026-10-17 ligne à ligne. Seconde moitié de la cinématique mid1
-; (scènes 9 à 24 de analysis/MIDGAME_SYSTEM.md § 9), 16 scènes, appelée par
+; (scènes 9 à 25 de analysis/MIDGAME_SYSTEM.md § 9), 17 scènes, appelée par
 ; Midgame1_PlayPart1_5FCF0 qui lui passe 38 arguments : surface, tableaux SPOK et MG01,
 ; palette principale, rectangle des sous-titres, police, calques et palettes communs (optshps
 ; 116 et 44, midgames 19 et 20, mid1 0, 1, 6, 11, 12, 26 ; palettes optpals 21 et 24, midgames
 ; 22, mid1 38, 39, 42, 44, 45, 59, « normal »), image hors écran, archives mid1, midgames et
 ; mid1voc, lecteur de voix, effets, canaux d'effets et de musique. Contenu : tête parlante «
 ; air » (« pri » dans optest.asm : octets modifiés par Rémi, « air » à l'origine) (scènes 9 et
-; 17), composition avec poursuite (scène 10), animations seules ou enchaînées (11, 12, 13),
-; défilement horizontal à deux vitesses (14), dialogues sur parent tremblant avec bouche par
-; parité du compteur (15, 20, 22) et plans tremblants parlés (21, 23), finale en 4 phases avec
-; arrêt de la musique (AIL_stop_sequence_30C48), sub_28D24 sur rmusic/amusic.pak et 23,
-; attente de 120 tics et ouverture du cadre en 25 étapes (lignes 24 − s à 151 + 2 × s). Sortie
-; anticipée si byte_495FC.
+; 18), composition avec poursuite (scène 10), animations seules ou enchaînées (11, 12, 13),
+; défilement horizontal à deux vitesses (14), animation 17 et ses animations enfants (15),
+; dialogues sur parent tremblant avec bouche par parité du compteur (16, 21, 23) et plans
+; tremblants parlés (22, 24), finale en 4 phases avec arrêt de la musique
+; (AIL_stop_sequence_30C48), sub_28D24 sur rmusic/amusic.pak et 23, attente de 120 tics et
+; ouverture du cadre en 25 étapes (lignes 24 − s à 151 + 2 × s). Sortie anticipée si
+; byte_495FC.
 ; ==============================================================================================
 Midgame1_PlayPart2_671C0	proc far		; CODE XREF: Stub_Midgame1_PlayPart2_423E0J
 
