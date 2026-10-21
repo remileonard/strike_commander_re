@@ -222,6 +222,8 @@ def simplify(v):
             return const(x * y)
         if op == '/' and y:
             return const(int(x / y))
+        if op == '%' and y:
+            return const(int(x - int(x / y) * y))
         if op == '&':
             return const(x & y)
     if op == '+' and is_const(b) and b[1] == 0:
@@ -1134,7 +1136,10 @@ class FunctionRun:
             return
         if mn in ('div', 'idiv'):
             src = self.value(self.operand(parts[0]))
-            self.regs['ax'] = simplify(('bin', '/', self.regs.get('ax', unknown()), src))
+            num = self.regs.get('ax', unknown())
+            self.regs['ax'] = simplify(('bin', '/', num, src))
+            # Le reste va dans dx (mid3 : image = compteur mod 3).
+            self.regs['dx'] = simplify(('bin', '%', num, src))
             return
         if mn == 'shld' or mn == 'shrd':
             return

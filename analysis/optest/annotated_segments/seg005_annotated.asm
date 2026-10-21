@@ -1482,7 +1482,7 @@ loc_62BD:				; DATA XREF: dseg:135Ao
 loc_62C9:				; DATA XREF: dseg:1356o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_62D5:				; DATA XREF: dseg:134Eo
@@ -1500,7 +1500,7 @@ loc_62E1:				; DATA XREF: dseg:138Ao
 loc_62ED:				; DATA XREF: dseg:1386o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_62F9:				; DATA XREF: dseg:137Eo

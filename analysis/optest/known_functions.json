@@ -3333,5 +3333,40 @@
     "new_name": "TalkingHead_DrawDressed_9E5E",
     "segment": "seg014",
     "summary": "far, LUE 2026-10-21. Méthode +32 (dessin) des tables 182Bh et 1883h (TalkingHead) : TalkingHead_DrawAt_9D47 (tête, image de base, bouche, enfants), puis l'image 1 de la ressource (coiffure) et l'image du champ +848h (toujours 34, posé par TalkingHead_Construct_98F4 : habits), à la même position. mid2 dessine ainsi Tex et Stern habillés ; la tête casquée de mid1 (TalkingHeadOverlay_DrawAt_B28E) n'utilise pas cette méthode."
+  },
+  "sub_A837": {
+    "new_name": "MovingOverlayLayer_Construct_A837",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Calque mobile sur fond (taille 21h, tables de méthodes 17CBh / 17EBh) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_C), vitesse +1Dh = arg_8, +1Fh = arg_A ; avance comme un calque mobile (MovingLayer_Advance_2E2D1), dessin MovingOverlayLayer_Draw_A8BE. mid3 : `mid3` 8 et `mid3` 3."
+  },
+  "loc_A8BE": {
+    "new_name": "MovingOverlayLayer_Draw_A8BE",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Méthode +10h de MovingOverlayLayer : image 0 de la ressource à la position du calque (Render_MeasureOrDrawTextString_32CD8), puis Layer_DrawAtOwnPos_2E202 (image courante)."
+  },
+  "sub_B995": {
+    "new_name": "MovingMaskLayer_Construct_B995",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Calque mobile « masque » (taille 23h, tables 15E7h / 1607h) : mêmes arguments que MovingOverlayLayer_Construct_A837 (ressource, x, y, vx, vy, image) ; +21h = pointeur de la table de 256 couleurs (MovingMaskLayer_SetTable_BA1C). Dessin MovingMaskLayer_Draw_BA2C. mid3 : `mid3` 12, table copiée de `mid3` 23."
+  },
+  "loc_BA2C": {
+    "new_name": "MovingMaskLayer_Draw_BA2C",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Méthode +10h de MovingMaskLayer : Render_DrawShapeAsRemapMask_33B9C avec la table +21h, pour l'image 0 puis pour l'image courante, à la position du calque."
+  },
+  "sub_BA1C": {
+    "new_name": "MovingMaskLayer_SetTable_BA1C",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. +21h = arg_2 (table de 256 couleurs du calque masque)."
+  },
+  "sub_33B9C": {
+    "new_name": "Render_DrawShapeAsRemapMask_33B9C",
+    "segment": "seg129",
+    "summary": "far, LUE 2026-10-21 (boucle de pixels). Comme le dessin d'une image (mêmes lignes, mêmes blocs), mais la couleur de l'image n'est pas utilisée : chaque pixel couvert devient table[couleur déjà à l'écran] (`mov al, es:[di] / xlat / stosb`, DS = segment de données, table = arg_C). Sert d'ombre ou de teinte (mid3)."
+  },
+  "sub_2E29E": {
+    "new_name": "Layer_MoveBy_2E29E",
+    "segment": "seg084",
+    "summary": "far, LUE 2026-10-21. Ajoute (arg_2, arg_4) à la position du calque (+0Ch, +0Eh). mid3 : replace un décor défilant de 640 pixels quand il sort à gauche (x absolu < −319)."
   }
 }

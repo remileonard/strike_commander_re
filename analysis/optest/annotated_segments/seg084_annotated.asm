@@ -1409,7 +1409,11 @@ loc_2E287:				; CODE XREF: seg084:08A5j seg084:08ACj
 
 ; Attributes: bp-based frame
 
-sub_2E29E	proc far		; CODE XREF: seg005:0CA0J seg005:0CC4J ...
+; ==============================================================================================
+; far, LUE 2026-10-21. Ajoute (arg_2, arg_4) à la position du calque (+0Ch, +0Eh). mid3 :
+; replace un décor défilant de 640 pixels quand il sort à gauche (x absolu < −319).
+; ==============================================================================================
+Layer_MoveBy_2E29E	proc far		; CODE XREF: seg005:0CA0J seg005:0CC4J ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1433,7 +1437,7 @@ arg_4		= word ptr  0Ah
 		pop	si
 		leave
 		retf
-sub_2E29E	endp
+Layer_MoveBy_2E29E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2356,7 +2360,7 @@ loc_2E88C:				; DATA XREF: dseg:3F70o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	near ptr sub_2E29E
+		jmp	near ptr Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_2E898:				; DATA XREF: dseg:3F68o
@@ -2380,7 +2384,7 @@ loc_2E8B0:				; DATA XREF: dseg:3FA0o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	near ptr sub_2E29E
+		jmp	near ptr Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_2E8BC:				; DATA XREF: dseg:3F98o
@@ -2404,7 +2408,7 @@ loc_2E8D4:				; DATA XREF: dseg:3FD0o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	near ptr sub_2E29E
+		jmp	near ptr Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_2E8E0:				; DATA XREF: dseg:3FC8o

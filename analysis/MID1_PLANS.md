@@ -206,3 +206,17 @@ Limites :
   est retrouvé dans la branche que la simulation ne prend pas). Le code ne fixe pas leur couleur
   (couleur par défaut de la police, non lue) : 15 est écrit, valeur supposée. Le nom du joueur, que
   le code ajoute au texte 0, n'est pas ajouté.
+
+### mid3
+
+Fonction pas encore nommée `sub_71680` : `--nom mid3`, même suite de commandes que mid2. 6 plans,
+23,5 s, pas de réplique. Mécanismes nouveaux, lus dans le code (2026-10-21) :
+- **calque mobile sur fond** (`MovingOverlayLayer_Construct_A837`) : image 0 dessous, image
+  courante dessus, vitesse donnée au constructeur ;
+- **calque masque** (`MovingMaskLayer_Construct_B995`, table `MovingMaskLayer_SetTable_BA1C`) : la
+  forme de l'image sert de masque, chaque pixel couvert devient table[couleur de l'écran]
+  (`Render_DrawShapeAsRemapMask_33B9C`), table de 256 octets copiée de `mid3` 23 : ombre de l'avion.
+  **Pas exprimé dans le format** : absent de MID_3.IFF, d'où les écarts avec le rendu de référence ;
+- **défilement en boucle** : un décor sorti à gauche (x < −319) est replacé 640 pixels plus loin
+  (`Layer_MoveBy_2E29E`) ;
+- **reste de division** (`idiv`, reste dans `dx`) : image = compteur mod 3 toutes les 8 images.

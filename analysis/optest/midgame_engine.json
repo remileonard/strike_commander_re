@@ -681,6 +681,57 @@
     "tête"
    ],
    "ret": "value"
+  },
+  "MovingOverlayLayer_Construct_A837": {
+   "op": "MovingOverlayLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "vx",
+    "vy",
+    "image"
+   ],
+   "type": "MovingOverlayLayer",
+   "ret": "layer"
+  },
+  "MovingMaskLayer_Construct_B995": {
+   "op": "MovingMaskLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "vx",
+    "vy",
+    "image"
+   ],
+   "type": "MovingMaskLayer",
+   "ret": "layer"
+  },
+  "MovingMaskLayer_SetTable_BA1C": {
+   "op": "calque_table",
+   "args": [
+    "calque",
+    "table"
+   ]
+  },
+  "Layer_MoveBy_2E29E": {
+   "op": "déplace",
+   "args": [
+    "calque",
+    "dx",
+    "dy"
+   ]
+  },
+  "CRT_MemFamily_Extra1": {
+   "op": "copie_mémoire",
+   "args": [
+    "destination",
+    "source",
+    "taille"
+   ]
   }
  },
  "vtables": {
@@ -696,7 +747,9 @@
   "5655": "ToggleLayer",
   "5751": "TalkingHeadOverlay",
   "6275": "TalkingHead",
-  "6794": "scene"
+  "6794": "scene",
+  "6091": "MovingOverlayLayer",
+  "5607": "MovingMaskLayer"
  },
  "secondary_vtables": [
   6551,
@@ -761,6 +814,14 @@
    "6": "haut",
    "8": "droite",
    "10": "bas"
+  },
+  "MovingOverlayLayer": {
+   "29": "vx",
+   "31": "vy"
+  },
+  "MovingMaskLayer": {
+   "29": "vx",
+   "31": "vy"
   }
  },
  "methods": {

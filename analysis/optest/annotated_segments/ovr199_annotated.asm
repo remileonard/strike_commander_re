@@ -4083,7 +4083,7 @@ loc_7449A:				; CODE XREF: sub_71680+2E14j
 		lea	ax, [bp+var_112+2]
 		push	ax
 		push	0
-		call	sub_A837
+		call	MovingOverlayLayer_Construct_A837
 		add	sp, 0Eh
 		mov	[bp+var_1C2], ax
 		push	0
@@ -4094,7 +4094,7 @@ loc_7449A:				; CODE XREF: sub_71680+2E14j
 		lea	ax, [bp+var_11A]
 		push	ax
 		push	0
-		call	sub_B995
+		call	MovingMaskLayer_Construct_B995
 		add	sp, 0Eh
 		mov	[bp+var_1C4], ax
 		push	0
@@ -4105,12 +4105,12 @@ loc_7449A:				; CODE XREF: sub_71680+2E14j
 		lea	ax, [bp+var_124]
 		push	ax
 		push	0
-		call	sub_A837
+		call	MovingOverlayLayer_Construct_A837
 		add	sp, 0Eh
 		mov	[bp+var_1C6], ax
 		push	[bp+var_162]
 		push	[bp+var_1C4]
-		call	sub_BA1C
+		call	MovingMaskLayer_SetTable_BA1C
 		add	sp, 4
 		push	0
 		push	word_46F46
@@ -4250,7 +4250,7 @@ loc_746A4:				; CODE XREF: sub_71680+2FE1j
 		push	0
 		push	280h
 		push	[bp+var_186]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_746CA:				; CODE XREF: sub_71680+3037j
@@ -4264,7 +4264,7 @@ loc_746CA:				; CODE XREF: sub_71680+3037j
 		push	0
 		push	280h
 		push	[bp+var_192]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_746F0:				; CODE XREF: sub_71680+305Dj
@@ -4278,7 +4278,7 @@ loc_746F0:				; CODE XREF: sub_71680+305Dj
 		push	0
 		push	280h
 		push	[bp+var_19E]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_74716:				; CODE XREF: sub_71680+3083j
@@ -4292,7 +4292,7 @@ loc_74716:				; CODE XREF: sub_71680+3083j
 		push	0
 		push	280h
 		push	[bp+var_1AA]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_7473C:				; CODE XREF: sub_71680+30A9j
@@ -4306,7 +4306,7 @@ loc_7473C:				; CODE XREF: sub_71680+30A9j
 		push	0
 		push	280h
 		push	[bp+var_1A4]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_74762:				; CODE XREF: sub_71680+30CFj
@@ -4320,7 +4320,7 @@ loc_74762:				; CODE XREF: sub_71680+30CFj
 		push	0
 		push	280h
 		push	[bp+var_1B0]
-		call	sub_2E29E
+		call	Layer_MoveBy_2E29E
 		add	sp, 6
 
 loc_74788:				; CODE XREF: sub_71680+30F5j

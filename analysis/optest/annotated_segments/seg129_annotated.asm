@@ -7,7 +7,13 @@ seg129		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_33B9C	proc far		; CODE XREF: seg014:26E4P seg014:2713P
+; ==============================================================================================
+; far, LUE 2026-10-21 (boucle de pixels). Comme le dessin d'une image (mêmes lignes, mêmes
+; blocs), mais la couleur de l'image n'est pas utilisée : chaque pixel couvert devient
+; table[couleur déjà à l'écran] (mov al, es:[di] / xlat / stosb, DS = segment de données,
+; table = arg_C). Sert d'ombre ou de teinte (mid3).
+; ==============================================================================================
+Render_DrawShapeAsRemapMask_33B9C	proc far		; CODE XREF: seg014:26E4P seg014:2713P
 					; DATA XREF: ...
 
 var_156		= word ptr -156h
@@ -51,11 +57,11 @@ arg_C		= word ptr  12h
 		jb	short loc_33BCD
 		jnz	short loc_33BD0
 
-loc_33BCD:				; CODE XREF: sub_33B9C+2Dj
+loc_33BCD:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+2Dj
 		jmp	loc_33CB4
 ; ���������������������������������������������������������������������������
 
-loc_33BD0:				; CODE XREF: sub_33B9C+2Fj
+loc_33BD0:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+2Fj
 		mov	ax, ds
 		mov	dx, 0
 		shl	ax, 1
@@ -94,27 +100,27 @@ loc_33BD0:				; CODE XREF: sub_33B9C+2Fj
 		sub	ax, [si+4]
 		cmp	ax, [bp+var_C]
 
-loc_33C28:				; CODE XREF: sub_33B9C+81j
+loc_33C28:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+81j
 		jge	short loc_33C2D
 		jmp	loc_33CBB
 ; ���������������������������������������������������������������������������
 
-loc_33C2D:				; CODE XREF: sub_33B9C:loc_33C28j
+loc_33C2D:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C:loc_33C28j
 		mov	ax, [si+6]
 		add	ax, [bp+arg_4]
 		cmp	ax, [bp+var_8]
 
-loc_33C36:				; CODE XREF: sub_33B9C+76j
+loc_33C36:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+76j
 		jle	short loc_33C3B
 		jmp	loc_33CBB
 ; ���������������������������������������������������������������������������
 
-loc_33C3B:				; CODE XREF: sub_33B9C:loc_33C36j
+loc_33C3B:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C:loc_33C36j
 		mov	dx, ds
 		add	si, 8
 
-loc_33C40:				; CODE XREF: sub_33B9C+D6j
-					; sub_33B9C+FBj ...
+loc_33C40:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+D6j
+					; Render_DrawShapeAsRemapMask_33B9C+FBj ...
 		lodsw
 		or	ax, ax
 		jz	short loc_33CC1
@@ -134,7 +140,7 @@ loc_33C40:				; CODE XREF: sub_33B9C+D6j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33C68:				; CODE XREF: sub_33B9C+D2j
+loc_33C68:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+D2j
 		inc	si
 		mov	al, es:[di]
 		xlat
@@ -144,11 +150,11 @@ loc_33C68:				; CODE XREF: sub_33B9C+D2j
 		jmp	short loc_33C40
 ; ���������������������������������������������������������������������������
 
-loc_33C74:				; CODE XREF: sub_33B9C+C3j
+loc_33C74:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+C3j
 		mov	bx, cx
 
-loc_33C76:				; CODE XREF: sub_33B9C+F9j
-					; sub_33B9C+114j
+loc_33C76:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+F9j
+					; Render_DrawShapeAsRemapMask_33B9C+114j
 		lodsb
 		shr	al, 1
 		cbw
@@ -159,7 +165,7 @@ loc_33C76:				; CODE XREF: sub_33B9C+F9j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33C87:				; CODE XREF: sub_33B9C+F1j
+loc_33C87:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+F1j
 		inc	si
 		mov	al, es:[di]
 		xlat
@@ -173,14 +179,14 @@ loc_33C87:				; CODE XREF: sub_33B9C+F1j
 		jmp	short loc_33C40
 ; ���������������������������������������������������������������������������
 
-loc_33C99:				; CODE XREF: sub_33B9C+E0j
+loc_33C99:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+E0j
 		sub	bx, ax
 		lodsb
 		push	bx
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33CA4:				; CODE XREF: sub_33B9C+10Dj
+loc_33CA4:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+10Dj
 		mov	al, es:[di]
 		xlat
 		stosb
@@ -192,8 +198,8 @@ loc_33CA4:				; CODE XREF: sub_33B9C+10Dj
 		jmp	short loc_33C40
 ; ���������������������������������������������������������������������������
 
-loc_33CB4:				; CODE XREF: sub_33B9C:loc_33BCDj
-					; sub_33B9C:loc_33CC1j
+loc_33CB4:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C:loc_33BCDj
+					; Render_DrawShapeAsRemapMask_33B9C:loc_33CC1j
 		pop	ds
 		pop	di
 		pop	si
@@ -202,23 +208,23 @@ loc_33CB4:				; CODE XREF: sub_33B9C:loc_33BCDj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_33CBB:				; CODE XREF: sub_33B9C+8Ej
-					; sub_33B9C+9Cj
+loc_33CBB:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+8Ej
+					; Render_DrawShapeAsRemapMask_33B9C+9Cj
 		add	si, 8
 
-loc_33CBE:				; CODE XREF: sub_33B9C+191j
-					; sub_33B9C+1A6j ...
+loc_33CBE:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+191j
+					; Render_DrawShapeAsRemapMask_33B9C+1A6j ...
 		lodsw
 		shr	ax, 1
 
-loc_33CC1:				; CODE XREF: sub_33B9C+A7j
+loc_33CC1:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+A7j
 		jz	short loc_33CB4
 		mov	cx, ax
 		jnb	short loc_33CCA
 		jmp	loc_33D4A
 ; ���������������������������������������������������������������������������
 
-loc_33CCA:				; CODE XREF: sub_33B9C+129j
+loc_33CCA:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+129j
 		lodsw
 		add	ax, [bp+arg_2]
 		mov	dx, ax
@@ -252,7 +258,7 @@ loc_33CCA:				; CODE XREF: sub_33B9C+129j
 		add	di, ax
 		add	dx, ax
 
-loc_33D0F:				; CODE XREF: sub_33B9C+169j
+loc_33D0F:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+169j
 		add	dx, cx
 		dec	dx
 		sub	dx, bx
@@ -261,7 +267,7 @@ loc_33D0F:				; CODE XREF: sub_33B9C+169j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33D1F:				; CODE XREF: sub_33B9C+189j
+loc_33D1F:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+189j
 		inc	si
 		mov	al, es:[di]
 		xlat
@@ -272,11 +278,11 @@ loc_33D1F:				; CODE XREF: sub_33B9C+189j
 		jmp	short loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33D2F:				; CODE XREF: sub_33B9C+178j
+loc_33D2F:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+178j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33D36:				; CODE XREF: sub_33B9C+1A0j
+loc_33D36:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+1A0j
 		inc	si
 		mov	al, es:[di]
 		xlat
@@ -286,13 +292,13 @@ loc_33D36:				; CODE XREF: sub_33B9C+1A0j
 		jmp	loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33D45:				; CODE XREF: sub_33B9C+13Bj
-					; sub_33B9C+140j ...
+loc_33D45:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+13Bj
+					; Render_DrawShapeAsRemapMask_33B9C+140j ...
 		add	si, cx
 		jmp	loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33D4A:				; CODE XREF: sub_33B9C+12Bj
+loc_33D4A:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+12Bj
 		lodsw
 		add	ax, [bp+arg_2]
 		mov	dx, ax
@@ -324,8 +330,8 @@ loc_33D4A:				; CODE XREF: sub_33B9C+12Bj
 		jg	short loc_33DE5
 		mov	bx, cx
 
-loc_33D8C:				; CODE XREF: sub_33B9C+211j
-					; sub_33B9C+231j
+loc_33D8C:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+211j
+					; Render_DrawShapeAsRemapMask_33B9C+231j
 		lodsb
 		shr	al, 1
 		cbw
@@ -336,7 +342,7 @@ loc_33D8C:				; CODE XREF: sub_33B9C+211j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33D9D:				; CODE XREF: sub_33B9C+207j
+loc_33D9D:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+207j
 		inc	si
 		mov	al, es:[di]
 		xlat
@@ -350,7 +356,7 @@ loc_33D9D:				; CODE XREF: sub_33B9C+207j
 		jmp	loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33DB2:				; CODE XREF: sub_33B9C+1F6j
+loc_33DB2:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+1F6j
 		sub	bx, ax
 		lodsb
 		mov	ah, al
@@ -358,7 +364,7 @@ loc_33DB2:				; CODE XREF: sub_33B9C+1F6j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33DBF:				; CODE XREF: sub_33B9C+228j
+loc_33DBF:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+228j
 		mov	al, es:[di]
 		xlat
 		stosb
@@ -370,8 +376,8 @@ loc_33DBF:				; CODE XREF: sub_33B9C+228j
 		jmp	loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33DD2:				; CODE XREF: sub_33B9C+1BBj
-					; sub_33B9C+1C0j ...
+loc_33DD2:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+1BBj
+					; Render_DrawShapeAsRemapMask_33B9C+1C0j ...
 		lodsb
 		add	si, 1
 		shr	al, 1
@@ -380,14 +386,14 @@ loc_33DD2:				; CODE XREF: sub_33B9C+1BBj
 		add	si, ax
 		dec	si
 
-loc_33DDE:				; CODE XREF: sub_33B9C+23Dj
+loc_33DDE:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+23Dj
 		sub	cx, ax
 		jnz	short loc_33DD2
 		jmp	loc_33CBE
 ; ���������������������������������������������������������������������������
 
-loc_33DE5:				; CODE XREF: sub_33B9C+1E7j
-					; sub_33B9C+1ECj
+loc_33DE5:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+1E7j
+					; Render_DrawShapeAsRemapMask_33B9C+1ECj
 		mov	[bp+var_2], ax
 		mov	bx, cx
 		push	cx
@@ -397,8 +403,8 @@ loc_33DE5:				; CODE XREF: sub_33B9C+1E7j
 		pop	es
 		lea	di, [bp+var_152]
 
-loc_33DF3:				; CODE XREF: sub_33B9C+278j
-					; sub_33B9C+297j
+loc_33DF3:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+278j
+					; Render_DrawShapeAsRemapMask_33B9C+297j
 		lodsb
 		shr	al, 1
 		cbw
@@ -409,7 +415,7 @@ loc_33DF3:				; CODE XREF: sub_33B9C+278j
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33E04:				; CODE XREF: sub_33B9C+26Ej
+loc_33E04:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+26Ej
 		lodsb
 		mov	al, es:[di]
 		xlat
@@ -423,7 +429,7 @@ loc_33E04:				; CODE XREF: sub_33B9C+26Ej
 		jmp	short loc_33E35
 ; ���������������������������������������������������������������������������
 
-loc_33E18:				; CODE XREF: sub_33B9C+25Dj
+loc_33E18:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+25Dj
 		sub	bx, ax
 		lodsb
 		mov	ah, al
@@ -431,7 +437,7 @@ loc_33E18:				; CODE XREF: sub_33B9C+25Dj
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33E25:				; CODE XREF: sub_33B9C+28Ej
+loc_33E25:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+28Ej
 		mov	al, es:[di]
 		xlat
 		stosb
@@ -441,7 +447,7 @@ loc_33E25:				; CODE XREF: sub_33B9C+28Ej
 		or	bx, bx
 		jnz	short loc_33DF3
 
-loc_33E35:				; CODE XREF: sub_33B9C+27Aj
+loc_33E35:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+27Aj
 		pop	di
 		pop	es
 		pop	cx
@@ -457,19 +463,19 @@ loc_33E35:				; CODE XREF: sub_33B9C+27Aj
 		sub	si, dx
 		sub	di, dx
 
-loc_33E4E:				; CODE XREF: sub_33B9C+2AAj
+loc_33E4E:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+2AAj
 		cmp	[bp+var_2], 0
 		jle	short loc_33E5A
 		sub	cx, [bp+var_2]
 		mov	ax, [bp+var_2]
 
-loc_33E5A:				; CODE XREF: sub_33B9C+2B6j
+loc_33E5A:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+2B6j
 		push	bx
 		push	ax
 		mov	ds, [bp+var_156]
 		mov	bx, [bp+arg_C]
 
-loc_33E63:				; CODE XREF: sub_33B9C+2CDj
+loc_33E63:				; CODE XREF: Render_DrawShapeAsRemapMask_33B9C+2CDj
 		lodsb
 		mov	al, es:[di]
 		xlat
@@ -482,6 +488,6 @@ loc_33E63:				; CODE XREF: sub_33B9C+2CDj
 		pop	si
 		pop	ds
 		jmp	loc_33CBE
-sub_33B9C	endp
+Render_DrawShapeAsRemapMask_33B9C	endp
 
 seg129		ends

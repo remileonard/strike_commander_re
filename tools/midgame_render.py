@@ -325,7 +325,26 @@ def draw_items(screen, items, clip):
         if it.get('clip'):
             l, t, r, b = it['clip']
             c = (max(c[0], l), max(c[1], t), min(c[2], r), min(c[3], b))
+        if 'mask' in it:
+            if it['mask']:
+                table = pak_entry(pak_path(it['mask'][1]), it['mask'][2])
+                draw_mask(screen, shape, it['image'], it['x'], it['y'], c, table)
+            continue
         draw_image(screen, W, H, shape, it['image'], it['x'], it['y'], c)
+
+
+def draw_mask(screen, shape, image, x0, y0, clip, table):
+    """Render_DrawShapeAsRemapMask_33B9C : chaque pixel couvert par l'image devient
+    table[couleur déjà à l'écran]."""
+    from sc_data import image_spans
+    cl, ct, cr, cb = clip
+    for x, y, pix in image_spans(shape, image):
+        x += x0
+        y += y0
+        if y < ct or y > cb:
+            continue
+        for i in range(max(x, cl), min(x + len(pix) - 1, cr) + 1):
+            screen[y * W + i] = table[screen[y * W + i]]
 
 
 if __name__ == '__main__':

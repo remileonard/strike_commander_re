@@ -127,7 +127,7 @@ def extract_functions(lines, lo, hi, seg_name, force_labels=None):
 # non préfixés par "unnamed_", ajouter les adresses concernées ici.
 FORCE_INCLUDE_LABELS_OPTEST = {
     'loc_9EF8', 'loc_9F2C', 'loc_A548', 'loc_AA17',
-    'loc_B563', 'loc_B6DE', 'loc_B711',
+    'loc_B563', 'loc_B6DE', 'loc_B711', 'loc_A8BE', 'loc_BA2C',
 }
 FORCE_INCLUDE_LABELS = FORCE_INCLUDE_LABELS_OPTEST if EXE == 'optest' else {
     'loc_66AA4', 'loc_5C3C9', 'loc_66D91', 'loc_5C1C9',

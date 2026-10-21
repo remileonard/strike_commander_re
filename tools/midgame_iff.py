@@ -368,6 +368,9 @@ class Player:
                 return a * b
             if op == '/':
                 return int(a / b) if b else None
+            if op == '%':
+                # Reste de idiv : du signe du dividende.
+                return a - int(a / b) * b if b else None
             if op == '&':
                 return a & b
             if op == '|':
@@ -657,6 +660,13 @@ class Player:
             layer.image = 0 if layer.sens else 13
         if kind in ('TalkingHead', 'TalkingHeadOverlay'):
             layer.image = None
+        if kind in ('MovingOverlayLayer', 'MovingMaskLayer'):
+            # MovingOverlayLayer_Construct_A837 / MovingMaskLayer_Construct_B995 : vitesse donnée au
+            # constructeur.
+            layer.vx = self.ev(args.get('vx')) or 0
+            layer.vy = self.ev(args.get('vy')) or 0
+            if layer.image is None:
+                layer.image = 0
         self.layers[n['nom']] = layer
 
     # ------------------------------------------------------------------ opérations
@@ -717,6 +727,22 @@ class Player:
             text = self.ev(args['texte'])
             layer.lips = (text[1] if isinstance(text, tuple) else '').lower()
             layer.cursor = 0
+        elif name == 'copie_mémoire':
+            src = args.get('source')
+            dest = args.get('destination')
+            res = self.resource(src) if isinstance(src, dict) else None
+            if res and isinstance(dest, dict) and 'local' in dest:
+                self.env[dest['local']] = ('table', res)
+        elif name == 'calque_table':
+            layer = self.layers.get(args['calque'].get('objet')) if isinstance(args.get('calque'), dict) else None
+            value = self.ev(args.get('table'))
+            if layer is not None and isinstance(value, tuple) and value[0] == 'table':
+                layer.table = value[1]
+        elif name == 'déplace':
+            layer = self.layers.get(args['calque'].get('objet')) if isinstance(args.get('calque'), dict) else None
+            if layer is not None:
+                layer.x += self.ev(args.get('dx')) or 0
+                layer.y += self.ev(args.get('dy')) or 0
         elif name == 'tête_voix':
             layer = self.layers[args['tête']['objet']]
             layer.voice = self.resource(args['ressource'])
@@ -895,9 +921,16 @@ class Player:
         elif t == 'LoopAnimLayer':
             out.append(self.item(n, layer.res, layer.image, ax, ay, auto=not layer.forced, loop=layer.mode == 0,
                                  endrel=-1))
-        elif t == 'OverlayImageLayer':
+        elif t in ('OverlayImageLayer', 'MovingOverlayLayer'):
             out.append(self.item(n + ':fond', layer.res, 0, ax, ay))
             out.append(self.item(n, layer.res, layer.image, ax, ay))
+        elif t == 'MovingMaskLayer':
+            # MovingMaskLayer_Draw_BA2C : images 0 puis courante en masque, chaque pixel couvert devient
+            # table[couleur de l'écran] (Render_DrawShapeAsRemapMask_33B9C).
+            for key, img in ((n + ':fond', 0), (n, layer.image)):
+                it = self.item(key, layer.res, img, ax, ay)
+                it['mask'] = getattr(layer, 'table', None)
+                out.append(it)
         elif t == 'OverlayAnimLayer':
             out.append(self.item(n + ':fond', layer.res, 0, ax, ay))
             out.append(self.item(n, layer.res, layer.image, ax, ay, auto=not layer.forced, endrel=-1))
@@ -941,7 +974,8 @@ class Player:
 
     def advance(self, layer):
         t = layer.type
-        if t in ('MovingLayer', 'ClippedMovingLayer', 'ClippedMovingImageLayer'):
+        if t in ('MovingLayer', 'ClippedMovingLayer', 'ClippedMovingImageLayer', 'MovingOverlayLayer',
+                 'MovingMaskLayer'):
             layer.x += layer.vx
             layer.y += layer.vy
         elif t == 'JitterImageLayer':
@@ -1124,6 +1158,9 @@ def layer_chunks(shot, key, start, stop, depth, layer_id):
         return None, None
     res = first['res']
     if res is None:
+        return None, None
+    if 'mask' in first:
+        # Calque masque (ombre par table de couleurs) : pas exprimé dans le format.
         return None, None
     positions = [(it['x'], it['y']) for it in seq]
     if res[0] == 'face':

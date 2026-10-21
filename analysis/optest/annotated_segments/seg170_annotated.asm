@@ -826,7 +826,7 @@ off_416BE	dd EntryPoint_RuntimeInit		; DATA XREF: VROOMM_OpenAndParseOverlayFile
 		db    0
 		db    1
 		db    0
-		dd sub_33B9C
+		dd Render_DrawShapeAsRemapMask_33B9C
 		db 0E8h	; �
 		db    2
 		db    1

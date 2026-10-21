@@ -8235,7 +8235,7 @@ loc_BD05C:				; CODE XREF: ovr209:6066j
 		lea	ax, [bp-60h]
 		push	ax
 		push	0
-		call	sub_A837
+		call	MovingOverlayLayer_Construct_A837
 		add	sp, 0Eh
 		mov	[bp-198h], ax
 		push	21h ; '!'

@@ -525,7 +525,7 @@ loc_96C9:				; CODE XREF: seg014:0327j
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_A837
+		call	near ptr MovingOverlayLayer_Construct_A837
 		add	sp, 0Eh
 		mov	word ptr [si], 190Fh
 		mov	word ptr [si+0Ah], 1933h
@@ -2729,7 +2729,13 @@ loc_A82F:				; CODE XREF: seg014:1445j
 
 ; Attributes: bp-based frame
 
-sub_A837	proc far		; CODE XREF: seg014:034Ep
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque mobile sur fond (taille 21h, tables de méthodes 17CBh / 17EBh) :
+; ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_C), vitesse +1Dh =
+; arg_8, +1Fh = arg_A ; avance comme un calque mobile (MovingLayer_Advance_2E2D1), dessin
+; MovingOverlayLayer_Draw_A8BE. mid3 : mid3 8 et mid3 3.
+; ==============================================================================================
+MovingOverlayLayer_Construct_A837	proc far		; CODE XREF: seg014:034Ep
 					; sub_71680+2E39P ...
 
 var_C		= word ptr -0Ch
@@ -2760,7 +2766,7 @@ arg_C		= word ptr  12h
 		or	ax, ax
 		jz	short loc_A8B6
 
-loc_A855:				; CODE XREF: sub_A837+Cj
+loc_A855:				; CODE XREF: MovingOverlayLayer_Construct_A837+Cj
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_2], ax
 		mov	ax, [bp+arg_4]
@@ -2791,12 +2797,12 @@ loc_A855:				; CODE XREF: sub_A837+Cj
 		mov	word ptr [si], 17CBh
 		mov	word ptr [si+0Ah], 17EBh
 
-loc_A8B6:				; CODE XREF: sub_A837+1Cj
+loc_A8B6:				; CODE XREF: MovingOverlayLayer_Construct_A837+1Cj
 		mov	ax, si
 		pop	si
 		leave
 		retf
-sub_A837	endp
+MovingOverlayLayer_Construct_A837	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -2804,7 +2810,12 @@ sub_A837	endp
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_A8BE:				; CODE XREF: seg014:2AADj
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +10h de MovingOverlayLayer : image 0 de la ressource à la
+; position du calque (Render_MeasureOrDrawTextString_32CD8), puis Layer_DrawAtOwnPos_2E202
+; (image courante).
+; ==============================================================================================
+MovingOverlayLayer_Draw_A8BE:				; CODE XREF: seg014:2AADj
 					; DATA XREF: dseg:17DBo
 		push	bp
 		mov	bp, sp
@@ -5105,7 +5116,13 @@ loc_B98D:				; CODE XREF: seg014:25A3j
 
 ; Attributes: bp-based frame
 
-sub_B995	proc far		; CODE XREF: sub_71680+2E58P
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque mobile « masque » (taille 23h, tables 15E7h / 1607h) : mêmes
+; arguments que MovingOverlayLayer_Construct_A837 (ressource, x, y, vx, vy, image) ; +21h =
+; pointeur de la table de 256 couleurs (MovingMaskLayer_SetTable_BA1C). Dessin
+; MovingMaskLayer_Draw_BA2C. mid3 : mid3 12, table copiée de mid3 23.
+; ==============================================================================================
+MovingMaskLayer_Construct_B995	proc far		; CODE XREF: sub_71680+2E58P
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -5135,7 +5152,7 @@ arg_C		= word ptr  12h
 		or	ax, ax
 		jz	short loc_BA14
 
-loc_B9B3:				; CODE XREF: sub_B995+Cj
+loc_B9B3:				; CODE XREF: MovingMaskLayer_Construct_B995+Cj
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_2], ax
 		mov	ax, [bp+arg_4]
@@ -5166,12 +5183,12 @@ loc_B9B3:				; CODE XREF: sub_B995+Cj
 		mov	word ptr [si], 15E7h
 		mov	word ptr [si+0Ah], 1607h
 
-loc_BA14:				; CODE XREF: sub_B995+1Cj
+loc_BA14:				; CODE XREF: MovingMaskLayer_Construct_B995+1Cj
 		mov	ax, si
 		pop	si
 		leave
 		retf
-sub_B995	endp
+MovingMaskLayer_Construct_B995	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -5182,7 +5199,10 @@ sub_B995	endp
 
 ; Attributes: bp-based frame
 
-sub_BA1C	proc far		; CODE XREF: sub_71680+2E8BP
+; ==============================================================================================
+; far, LUE 2026-10-21. +21h = arg_2 (table de 256 couleurs du calque masque).
+; ==============================================================================================
+MovingMaskLayer_SetTable_BA1C	proc far		; CODE XREF: sub_71680+2E8BP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5196,11 +5216,15 @@ arg_2		= word ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_BA1C	endp
+MovingMaskLayer_SetTable_BA1C	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_BA2C:				; CODE XREF: seg014:275Dj
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +10h de MovingMaskLayer : Render_DrawShapeAsRemapMask_33B9C
+; avec la table +21h, pour l'image 0 puis pour l'image courante, à la position du calque.
+; ==============================================================================================
+MovingMaskLayer_Draw_BA2C:				; CODE XREF: seg014:275Dj
 					; DATA XREF: dseg:15F7o
 		push	bp
 		mov	bp, sp
@@ -5233,7 +5257,7 @@ loc_BA2C:				; CODE XREF: seg014:275Dj
 		push	word ptr [bp-2]
 		push	di
 		push	word_46F44
-		call	sub_33B9C
+		call	Render_DrawShapeAsRemapMask_33B9C
 		add	sp, 0Eh
 		push	word ptr [si+21h]
 		push	word ptr [si+1Bh]
@@ -5250,7 +5274,7 @@ loc_BA2C:				; CODE XREF: seg014:275Dj
 		push	word ptr [bp-2]
 		push	di
 		push	word_46F44
-		call	sub_33B9C
+		call	Render_DrawShapeAsRemapMask_33B9C
 		add	sp, 0Eh
 		pop	di
 		pop	si
@@ -5298,13 +5322,13 @@ loc_BAE4:				; DATA XREF: dseg:1613o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	loc_BA2C
+		jmp	MovingMaskLayer_Draw_BA2C
 ; ���������������������������������������������������������������������������
 
 loc_BAF0:				; DATA XREF: dseg:160Fo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BAFC:				; DATA XREF: dseg:1607o
@@ -5352,7 +5376,7 @@ loc_BB3E:				; DATA XREF: dseg:1643o
 loc_BB4A:				; DATA XREF: dseg:163Fo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BB56:				; DATA XREF: dseg:1637o
@@ -5409,7 +5433,7 @@ loc_BB97:				; DATA XREF: dseg:1673o
 loc_BBA3:				; DATA XREF: dseg:166Fo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BBAF:				; DATA XREF: dseg:1667o
@@ -5466,7 +5490,7 @@ loc_BBF0:				; DATA XREF: dseg:16A7o
 loc_BBFC:				; DATA XREF: dseg:16A3o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BC08:				; DATA XREF: dseg:169Bo
@@ -5514,7 +5538,7 @@ loc_BC4A:				; DATA XREF: dseg:16D7o
 loc_BC56:				; DATA XREF: dseg:16D3o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BC62:				; DATA XREF: dseg:16CBo
@@ -5567,7 +5591,7 @@ loc_BCA3:				; DATA XREF: dseg:1707o
 loc_BCAF:				; DATA XREF: dseg:1703o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BCBB:				; DATA XREF: dseg:16FBo
@@ -5709,7 +5733,7 @@ loc_BD82:				; DATA XREF: dseg:1797o
 loc_BD8E:				; DATA XREF: dseg:1793o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BD9A:				; DATA XREF: dseg:178Bo
@@ -5764,7 +5788,7 @@ loc_BDDB:				; DATA XREF: dseg:17C7o
 loc_BDE7:				; DATA XREF: dseg:17C3o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BDF3:				; DATA XREF: dseg:17BBo
@@ -5813,13 +5837,13 @@ loc_BE34:				; DATA XREF: dseg:17F7o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	loc_A8BE
+		jmp	MovingOverlayLayer_Draw_A8BE
 ; ���������������������������������������������������������������������������
 
 loc_BE40:				; DATA XREF: dseg:17F3o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BE4C:				; DATA XREF: dseg:17EBo
@@ -5867,7 +5891,7 @@ loc_BE8E:				; DATA XREF: dseg:1827o
 loc_BE9A:				; DATA XREF: dseg:1823o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BEA6:				; DATA XREF: dseg:181Bo
@@ -5924,7 +5948,7 @@ loc_BEE7:				; DATA XREF: dseg:185Bo
 loc_BEF3:				; DATA XREF: dseg:1857o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BEFF:				; DATA XREF: dseg:184Fo
@@ -5946,7 +5970,7 @@ loc_BF0B:				; DATA XREF: dseg:18B3o
 loc_BF17:				; DATA XREF: dseg:18AFo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BF23:				; DATA XREF: dseg:18A7o
@@ -5992,7 +6016,7 @@ loc_BF5E:				; DATA XREF: dseg:190Bo
 loc_BF6A:				; DATA XREF: dseg:1907o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_BF76:				; DATA XREF: dseg:18FFo
@@ -6082,7 +6106,7 @@ loc_BFFD:				; DATA XREF: dseg:193Fo
 loc_C009:				; DATA XREF: dseg:193Bo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_C015:				; DATA XREF: dseg:1933o
@@ -6174,7 +6198,7 @@ loc_C09C:				; DATA XREF: dseg:1973o
 loc_C0A8:				; DATA XREF: dseg:196Fo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_C0B4:				; DATA XREF: dseg:1967o
@@ -6194,7 +6218,7 @@ loc_C0C0:				; DATA XREF: dseg:19A3o
 loc_C0CC:				; DATA XREF: dseg:199Fo
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_C0D8:				; DATA XREF: dseg:1997o
@@ -6249,7 +6273,7 @@ loc_C119:				; DATA XREF: dseg:19D7o
 loc_C125:				; DATA XREF: dseg:19D3o
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFF6h
-		jmp	sub_2E29E
+		jmp	Layer_MoveBy_2E29E
 ; ���������������������������������������������������������������������������
 
 loc_C131:				; DATA XREF: dseg:19CBo
