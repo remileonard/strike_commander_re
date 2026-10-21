@@ -17,7 +17,7 @@ import json
 
 from PIL import Image
 
-from sc_data import GAME, draw_image, pak_entry, palette_block
+from sc_data import GAME, draw_image, pak_entry, palette_block, read
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 spec = importlib.util.spec_from_file_location('mg', f'{REPO}/tools/midgame_iff.py')
@@ -75,7 +75,7 @@ def run(exact=True):
 
 def convdata_lists():
     import struct
-    d = open(os.path.join(GAME, 'GAMEFLOW', 'CONVDATA.IFF'), 'rb').read()
+    d = read(os.path.join(GAME, 'GAMEFLOW', 'CONVDATA.IFF'))
     out = {}
 
     def walk(o, e, form):
@@ -96,7 +96,7 @@ CONV = convdata_lists()
 
 def iff_texts(path):
     import struct
-    d = open(path, 'rb').read()
+    d = read(path)
     out = {}
 
     def walk(o, e, form):

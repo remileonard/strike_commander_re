@@ -1,7 +1,8 @@
 """Lecture des données de Strike Commander (PAK, LZW, palettes, images) pour tools/midgame_render.py.
 
-Aucune donnée du jeu n'est dans le dépôt : le dossier DATA vient de l'archive BIGTRE.TRE du jeu
-(tools/tre_extract.py) et se donne par la variable SC_DATA ou l'option --donnees."""
+Aucune donnée du jeu n'est dans le dépôt. Les données se donnent par la variable SC_DATA ou l'option
+--donnees : soit l'archive BIGTRE.TRE du jeu, lue directement, soit le dossier DATA qu'elle contient
+(extrait par tools/tre_extract.py). Les chemins s'écrivent toujours <SC_DATA>/<DOSSIER>/<FICHIER>."""
 import os
 import struct
 import sys
@@ -12,11 +13,38 @@ from terrain_map import lzw  # noqa: E402
 
 GAME = os.environ.get('SC_DATA', 'DATA')
 _paks = {}
+_tre = None
+
+
+def tre_index(path):
+    """Archive .TRE : uint32 nombre d'entrées, uint32 fin de table, puis 74 octets par entrée
+    (octet 1, chemin de 65 octets terminé par 0, uint32 position, uint32 taille)."""
+    d = open(path, 'rb').read()
+    n = struct.unpack_from('<I', d, 0)[0]
+    index = {}
+    for i in range(n):
+        o = 8 + 74 * i
+        name = d[o + 1:o + 66].split(b'\0')[0].decode('ascii').upper()
+        off, size = struct.unpack_from('<II', d, o + 66)
+        index[name.replace('..\\', '').replace('\\', '/')] = (off, size)
+    return d, index
+
+
+def read(path):
+    """Lit un fichier de données, dans l'archive .TRE si SC_DATA en est une."""
+    global _tre
+    if GAME.upper().endswith('.TRE'):
+        if _tre is None:
+            _tre = tre_index(GAME)
+        rel = os.path.relpath(path, GAME).replace(os.sep, '/').upper()
+        off, size = _tre[1]['DATA/' + rel]
+        return _tre[0][off:off + size]
+    return open(path, 'rb').read()
 
 
 def pak_entries(path):
     if path not in _paks:
-        d = open(path, 'rb').read()
+        d = read(path)
         first = struct.unpack_from('<I', d, 4)[0] & 0x1FFFFFFF
         count = (first - 4) // 4
         raw = [struct.unpack_from('<I', d, 4 + 4 * i)[0] for i in range(count)]

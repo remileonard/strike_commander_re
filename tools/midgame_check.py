@@ -5,7 +5,7 @@ de midgame_iff.py, puis compare chaque image au rendu de référence de tools/mi
 Les règles appliquées ici sont la signification voulue de chaque champ : elles servent de
 spécification pour SCAnimationPlayer. Voir MID1_PLANS.md, « Lecteur de contrôle ».
 
-Usage : python3 tools/midgame_check.py --donnees <DATA> MID_1.IFF [dossier_sortie]
+Usage : python3 tools/midgame_check.py --donnees <BIGTRE.TRE ou DATA> MID_1.IFF [dossier_sortie]
 """
 import os
 import struct
@@ -139,10 +139,6 @@ def apply_palette(pal, archive, entry):
     pal[3 * first:3 * first + 3 * count] = rgb
 
 
-def voice_seconds(archive, entry):
-    return ref.voc_seconds(pak_entry(pak_file(archive), entry))
-
-
 # ---------------------------------------------------------------------- lecture d'un plan
 
 def sprite_last(lay, count):
@@ -182,17 +178,8 @@ def layer_state(lay, f):
 
 
 def shot_length(shot):
-    """Nombre d'images du plan : nbframe ; « attendre les sons » → jusqu'à la fin de la dernière
-    réplique ; end_layer → jusqu'à ce que cette animation atteigne sa dernière image."""
-    if shot['wait']:
-        end = 0.0
-        for archive, entry, frame in shot['sounds']:
-            end = max(end, frame / shot['fps'] + voice_seconds(archive, entry))
-        return max(1, int(-(-end * shot['fps'] // 1)))
-    if shot['end_layer'] >= 0:
-        lay = next(lay for lay in shot['layers'] if lay['id'] == shot['end_layer'])
-        count = len(shape_images(layer_shape(lay)))
-        return lay['start'] + sprite_last(lay, count) - lay['start_image']
+    """Un plan dure nbframe images, à fps images par seconde : aucune autre condition de fin."""
+    assert shot['wait'] == 0 and shot['end_layer'] == -1
     return shot['nbframe']
 
 

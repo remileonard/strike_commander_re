@@ -981,15 +981,13 @@ def shot_chunk(shot, first_shot):
                 sprites += data
             else:
                 bg += data
+    # Un plan = nbframe images à fps images par seconde, rien d'autre : la fin des boucles qui
+    # attendent une animation ou une réplique est calculée avec les données du jeu.
+    if shot['end']:
+        raise RuntimeError(f'plan à durée inconnue ({shot["end"][0]}) : données du jeu nécessaires')
     end_layer = -1
     nbframe = len(frames)
     wait = 0
-    if shot['end'] and shot['end'][0] == 'voix':
-        wait = 1
-        nbframe = 1
-    if shot['end'] and shot['end'][0] == 'animation':
-        end_layer = ids.get(shot['end'][1], -1)
-        nbframe = 1
     code = shot['sounds'][0][0] + 1 if shot['sounds'] else 0
     out = chunk('SHTP', struct.pack('<iBHBBBBhBB', nbframe, shot['music'], code, shot['fps'], wait,
                                     0 if first_shot or shot['clear'] else 1, shot['fade'], end_layer,
@@ -1022,30 +1020,29 @@ def main():
         name, value = args[i + 1].split('=')
         hypotheses[name] = int(value)
         del args[i:i + 2]
-    data_dir = None
-    if '--donnees' in args:
-        i = args.index('--donnees')
-        data_dir = args[i + 1]
-        del args[i:i + 2]
+    if '--donnees' not in args:
+        sys.exit('--donnees <BIGTRE.TRE ou dossier DATA> est obligatoire : nombre d\'images des '
+                 'animations et durée des répliques')
+    i = args.index('--donnees')
+    data_dir = args[i + 1]
+    del args[i:i + 2]
     source, destination = args
     data = json.load(open(source, encoding='utf-8'))
     player = Player(data, replace, hypotheses)
-    if data_dir:
-        # Avec les données du jeu : fin exacte des boucles d'attente (nombre d'images, durée des
-        # répliques), donc état exact au début du plan suivant (voir MID1_PLANS.md).
-        os.environ['SC_DATA'] = data_dir
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        import midgame_render
-        player.image_count = midgame_render.image_count
-        player.voice_seconds = midgame_render.voice_seconds
+    # Fin exacte des boucles d'attente (nombre d'images, durée des répliques), donc état exact au
+    # début du plan suivant (voir MID1_PLANS.md).
+    os.environ['SC_DATA'] = data_dir
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import midgame_render
+    player.image_count = midgame_render.image_count
+    player.voice_seconds = midgame_render.voice_seconds
     player.run(data['parties'][0]['arbre'])
     shots = [s for s in player.shots if s['frames']]
     content = b'ANIM' + chunk('HEAD', struct.pack('<II', len(shots), 2))
     content += b''.join(shot_chunk(s, i == 0) for i, s in enumerate(shots))
     open(destination, 'wb').write(b'FORM' + struct.pack('>I', len(content)) + content)
     for i, s in enumerate(shots):
-        end = s['end'][0] if s['end'] else f'{len(s["frames"])} images'
-        print(f'plan {i}: {s["source"]}, {s["fps"]} images/s, fin {end}, sons {s["sounds"]}, '
+        print(f'plan {i}: {s["source"]}, {s["fps"]} images/s, {len(s["frames"])} images, sons {s["sounds"]}, '
               f'palettes {len(s["palettes"])}, musique {s["music"]}')
     for w in player.warnings:
         print('attention :', w)

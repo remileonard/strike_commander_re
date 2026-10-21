@@ -5,7 +5,7 @@ l'ancienne version du fichier :
 
 ```bash
 python3 tools/midgame_extract.py --exe optest Midgame1_PlayPart1_5FCF0 --name mid1
-python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/resources/MID_1.IFF --remplace pri=air
+python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/resources/MID_1.IFF --remplace pri=air --donnees BIGTRE.TRE
 ```
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -13,55 +13,51 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
    valeurs de départ des variables.
 2. `midgame_iff.py` rejoue cet arbre avec les règles du moteur de scène (`MIDGAME_SYSTEM.md` § 3 à
    § 8) et enregistre chaque image : position à l'écran et image de chaque calque, sons, palettes,
-   textes. Il découpe le tout en plans et écrit le fichier.
+   textes. Il découpe le tout en plans et écrit le fichier. Les données du jeu (`--donnees`,
+   `BIGTRE.TRE` ou son dossier `DATA`, obligatoires) donnent le nombre d'images de chaque animation
+   et la durée de chaque réplique (fichiers VOC) : la fin exacte des boucles d'attente.
 
 `--remplace pri=air` remet le nom de visage d'origine (« pri » dans `optest.asm`, octets modifiés
 par Rémi).
 
 ## Ce que contient le fichier
 
-38 plans. Les numéros de scène sont ceux de `MIDGAME_SYSTEM.md` § 9.
+29 plans, 93,8 s. **Un plan = N images à une cadence donnée, sans autre condition de fin** (choix
+du 2026-10-21) : la fin des boucles qui attendent une animation ou une réplique est calculée avec
+les données du jeu. Les numéros de scène sont ceux de `MIDGAME_SYSTEM.md` § 9, la description de
+chaque scène y est.
 
-| Plan | Scène | Cadence | Fin | Contenu |
-|---|---|---|---|---|
-| 0 | préparation | 60 | 1 image | `optshps` 116 et `midgames` 20 en (0, 24), palette noire, palettes `optpals` 21, `midgames` 22, `optpals` 24, fondu d'apparition (pas 2), musique 0 |
-| 1 | 1, phase 1 | 10 | 20 images | les deux fonds en (0, 0) |
-| 2 | 1, phase 2 | 10 | fin de l'animation `mid1` 3 | réplique 7 aux images 0 et 15 (images 20 et 35 de la scène) |
-| 3 | 2 | 60 | 1 334 images | les 4 titres `MG01` 0 à 3, centrés, y = 74 à l'écran (59 pour le 2ᵉ ; 50 et 35 dans le code), 196 images chacun, pauses de 100 images (250 après le 2ᵉ), palette `mid1` 59 |
-| 4 | 3, phase 1 | 20 | 68 images | montée : vitesses (0, -1) cumulées avec les parents |
-| 5 | 3, phase 2 | 20 | fin de l'animation `mid1` 13 | réplique 8 à l'image 65 |
-| 6 | 4 | 20 | 40 images | composition : suites d'images, trajectoire, rebond, découpes, réplique 9 |
-| 7 | 5 | 20 | 20 images | plan tremblant |
-| 8 | 6 | 20 | fin de l'animation `mid1` 22 | réplique 8 |
-| 9 | 7 | 20 | 40 images | composition, cycles à chaque image, rebond depuis (170, 15), réplique 9 |
-| 10 | 8, phase 1 | 10 | fin de la réplique 0 | bouche par parité du compteur |
-| 11 | 8, phase 2 | 10 | 5 images | bouche à 0 |
-| 12 | 9 | 10 | fin de la réplique 4 | tête parlante « air », texte de lèvres |
-| 13 | 10 | 20 | 40 images | composition avec poursuite, réplique 10 |
-| 14 | 11 | 15 | fin de l'animation `mid1` 24 | — |
-| 15 | 12 | 20 | 41 images | `mid1` 16 puis 18 à l'image 20, réplique 11 à l'image 15 |
-| 16 | 13 | 20 | fin de l'animation `mid1` 15 | réplique 12 à l'image 22 |
-| 17 | 14 | 20 | 41 images | défilement, `mid1` 21 → 29 → 35 |
-| 18 | 15 | 20 | 81 images | `mid1` 17 avec `mid1` 30 → 31 → 32, réplique 13 à l'image 48 |
-| 19 | 16, phase 1 | 10 | fin de la réplique 1 | animation sur fond `mid1` 0 |
-| 20 | 16, phase 2 | 10 | 10 images | — |
-| 21 | 17 | 20 | 20 images | plan tremblant |
-| 22 | 18 | 10 | 20 images | « air » image de base 27 sans lèvres, transition `midgames` 0 |
-| 23 | 19 | 10 | 20 images | animation sur fond `mid1` 10, image forcée à 9 dès l'image 9 |
-| 24 | 20 | 20 | 30 images | — |
-| 25 | 21 | 10 | fin de la réplique 2 | bouche 13 + parité |
-| 26 | 22, phase 1 | 20 | 5 images | — |
-| 27 | 22, phase 2 | 20 | fin de la réplique 5 | bouche par parité |
-| 28 | 23, phase 1 | 10 | fin de la réplique 3 | bouche 13 + parité |
-| 29 | 23, phase 2 | 10 | 5 images | bouche à 13 |
-| 30 | 24, phase 1 | 20 | 5 images | — |
-| 31 | 24, phase 2 | 20 | fin de la réplique 6 | bouche par parité |
-| 32 | 25, phases 1 et 2 | 20 | 46 images | y de la scène de -50 à -25, groupe 19 en (0, 1), `mid1` 33 → 34 à l'image 30 |
-| 33 | 25, phase 3 | 20 | fin de l'animation `mid1` 34 | — |
-| 34 | 25 | 20 | 1 image | après le retrait de `mid1` 34 |
-| 35 | 25, phase 4 | 20 | 31 images | palette `mid1` 46, arrêt de la musique, réplique 13, `mid1` 9 → 14 à l'image 20 |
-| 36 | attente | 60 | 120 images | dernière image figée (120 tics) |
-| 37 | ouverture du cadre | 60 | 1 image | plein écran, sans bandes |
+| Plan | Scène | Cadence | Images | Durée | Répliques (`mid1voc`) | Palettes | Musique |
+|---|---|---|---|---|---|---|---|
+| 0 | préparation | 60 | 1 | 0.02 s | — | 3 | musique 0 |
+| 1 | 1 | 10 | 57 | 5.70 s | 7 à l'image 20, 7 à l'image 35 | 0 |  |
+| 2 | 2 (titres) | 60 | 1334 | 22.23 s | — | 1 |  |
+| 3 | 3 | 20 | 178 | 8.90 s | 8 à l'image 133 | 1 |  |
+| 4 | 4 | 20 | 40 | 2.00 s | 9 à l'image 0 | 2 |  |
+| 5 | 5 | 20 | 20 | 1.00 s | — | 2 |  |
+| 6 | 6 | 20 | 51 | 2.55 s | 8 à l'image 0 | 3 |  |
+| 7 | 7 | 20 | 40 | 2.00 s | 9 à l'image 0 | 2 |  |
+| 8 | 8 | 10 | 25 | 2.50 s | 0 à l'image 0 | 2 |  |
+| 9 | 9 | 10 | 16 | 1.60 s | 4 à l'image 0 | 2 |  |
+| 10 | 10 | 20 | 40 | 2.00 s | 10 à l'image 0 | 3 |  |
+| 11 | 11 | 15 | 6 | 0.40 s | — | 1 |  |
+| 12 | 12 | 20 | 41 | 2.05 s | 11 à l'image 15 | 3 |  |
+| 13 | 13 | 20 | 25 | 1.25 s | 12 à l'image 22 | 0 |  |
+| 14 | 14 | 20 | 41 | 2.05 s | — | 0 |  |
+| 15 | 15 | 20 | 81 | 4.05 s | 13 à l'image 48 | 0 |  |
+| 16 | 16 | 10 | 22 | 2.20 s | 1 à l'image 0 | 2 |  |
+| 17 | 17 | 20 | 20 | 1.00 s | — | 2 |  |
+| 18 | 18 | 10 | 20 | 2.00 s | — | 2 |  |
+| 19 | 19 | 10 | 20 | 2.00 s | — | 3 |  |
+| 20 | 20 | 20 | 30 | 1.50 s | — | 1 |  |
+| 21 | 21 | 10 | 14 | 1.40 s | 2 à l'image 0 | 2 |  |
+| 22 | 22 | 20 | 37 | 1.85 s | 5 à l'image 5 | 2 |  |
+| 23 | 23 | 10 | 20 | 2.00 s | 3 à l'image 0 | 2 |  |
+| 24 | 24 | 20 | 88 | 4.40 s | 6 à l'image 5 | 2 |  |
+| 25 | 25, phases 1 à 3 | 20 | 232 | 11.60 s | — | 3 |  |
+| 26 | 25, phase 4 | 20 | 31 | 1.55 s | 13 à l'image 0 | 1 | arrêt de la musique |
+| 27 | attente | 60 | 120 | 2.00 s | — | 0 |  |
+| 28 | ouverture du cadre | 60 | 1 | 0.02 s | — | 0 |  |
 
 ## Règles de conversion
 
@@ -69,9 +65,9 @@ par Rémi).
   nouvelle palette, pas de boucle d'attente. Une remise à 0 du compteur ne coupe pas le plan
   (scène 25, phases 1 et 2). Les titres, l'attente et l'ouverture du cadre ne passent pas par le
   moteur de scène : plans à 60 images par seconde, une image par tic.
-- **Boucle qui attend la fin d'une réplique** : plan avec « attendre la fin des sons ». **Boucle qui
-  attend la fin d'une animation** : plan qui finit avec cette animation (`end_layer`). L'outil simule
-  ces boucles sur 600 images au plus pour avoir les suites d'images des autres calques.
+- **Boucle qui attend la fin d'une réplique ou d'une animation** : simulée jusqu'à sa vraie fin
+  (durée du VOC × cadence, ou image courante = nombre d'images) ; le plan reçoit ce nombre
+  d'images. `SHTP` est toujours écrit avec « attendre les sons » = 0 et `end_layer` = −1.
 - **Calques** : position à l'écran, soit la position du jeu + 24 en y (la ligne 0 de l'image hors
   écran est copiée à la ligne 24, `MIDGAME_SYSTEM.md` § 3.2), parents et y de la scène compris ; même
   décalage pour les découpes et les titres ; aucun pour ce qui est dessiné directement à l'écran
@@ -99,27 +95,28 @@ par Rémi).
   l'image hors écran de 320 pixels de large (`word_46F44` est la surface de dessin courante, pas un
   rectangle de titres) : centrage sur 320 pixels, y + 24 à l'écran.
 - **Tremblement** : marche aléatoire calculée une fois par l'outil (graine fixe).
-- **Animation qui continue après une boucle d'attente** : son image de départ dans le plan suivant
-  est calculée sur 600 images simulées ; le player la ramène à la dernière image de l'animation.
-  **Dans le jeu, une animation simple arrivée au bout ne dessine plus rien** (`MIDGAME_SYSTEM.md`
-  § 6.1) : garder sa dernière image visible est une différence avec le jeu.
+- **Animation arrivée au bout** : dans le jeu, une animation simple ne dessine plus rien après sa
+  dernière image (`MIDGAME_SYSTEM.md` § 6.1) ; le fichier l'exprime par `end_frame` = 0 (voir
+  « Lecteur de contrôle »).
+- **Sous-titres** : la version produite est celle avec voix, sans sous-titres. Les textes `SPOK`
+  peuvent être ajoutés à la main dans l'éditeur (choix de Rémi : voix et sous-titres ensemble,
+  variante par rapport au jeu).
 
 ## Rendu de référence avec les données du jeu
 
-Les données ne sont pas dans le dépôt. Avec le dossier `DATA` extrait de `BIGTRE.TRE` :
+Les données ne sont pas dans le dépôt. Les outils lisent `BIGTRE.TRE` directement (ou le dossier
+`DATA` extrait par `tools/tre_extract.py`) :
 
 ```bash
-python3 tools/tre_extract.py BIGTRE.TRE jeu/
-python3 tools/midgame_render.py --donnees jeu/DATA --film mid1.gif 2
+python3 tools/midgame_render.py --donnees BIGTRE.TRE --film mid1.gif 2
 ```
 
-`midgame_render.py` rejoue la même simulation que `midgame_iff.py`, mais avec les valeurs lues dans
-les données : nombre d'images de chaque animation (fin exacte des boucles d'attente, au lieu de 600
-images) et durée de chaque réplique (fichiers VOC de `mid1voc.pak`). Il dessine comme le jeu :
+`midgame_render.py` rejoue la même simulation que `midgame_iff.py` (mêmes données : nombre d'images
+des animations, durée des répliques) et dessine chaque image comme le jeu :
 image hors écran copiée à la ligne 24, palettes partielles appliquées à leur plage, fondu
 d'apparition, images des visages (`CONVSHPS.PAK`, numéro donné par le `FORM FACE` de
 `CONVDATA.IFF`), titres translucides (police `mid1` 27, tables `mid1` 60). Résultat pour mid1 :
-29 plans, 95,6 s.
+29 plans, 95,6 s avec le fondu d'apparition.
 
 Hypothèses du rendu, le code de mise en page du texte n'étant pas lu : chasse d'un caractère =
 largeur de son image + 2, espace = 6 pixels, interligne 16, titre centré sur 320 pixels. Le son
@@ -136,8 +133,8 @@ signification voulue des champs écrits par `midgame_iff.py` : la spécification
 `SCAnimationPlayer`.
 
 ```bash
-python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json MID_1.IFF --remplace pri=air [--donnees jeu/DATA]
-python3 tools/midgame_check.py --donnees jeu/DATA MID_1.IFF [dossier_des_écarts]
+python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json MID_1.IFF --remplace pri=air --donnees BIGTRE.TRE
+python3 tools/midgame_check.py --donnees BIGTRE.TRE MID_1.IFF [dossier_des_écarts]
 ```
 
 Règles du lecteur :
@@ -145,9 +142,8 @@ Règles du lecteur :
   dans l'ordre, chacune **sur sa seule plage** (premier indice, nombre). `full_screen` = 0 → seule
   la bande (0, 24) – (319, 151) est visible, et l'écran est effacé à chaque image ; 1 → tout l'écran,
   sans effacement.
-- **Durée d'un plan** : `wait` = 1 → jusqu'à la fin de la dernière réplique de `SOND` (image de
-  départ ÷ cadence + durée du VOC) ; `end_layer` ≥ 0 → jusqu'à ce que cette animation atteigne sa
-  dernière image ; sinon `nbframe` images, à `fps` images par seconde.
+- **Durée d'un plan** : `nbframe` images, à `fps` images par seconde ; rien d'autre (`wait` = 0,
+  `end_layer` = −1). Les répliques de `SOND` partent à leur image et ne changent pas la durée.
 - **Calque (`LAYR`)** : affiché de l'image `start` du plan pendant `nb` images (0 = jusqu'à la fin) ;
   dessiné dans l'ordre de `depth`, découpé par son rectangle s'il en a un ; position = `PATH[k]`
   s'il existe (k = image depuis `start`, la dernière valeur est gardée), sinon (x, y).
@@ -160,13 +156,9 @@ Règles du lecteur :
   `CONVDATA.IFF`), dessinées à la position écrite + (160, 128 + 24).
 - Coordonnées : celles de l'écran 320 × 200, (0, 0) en haut à gauche.
 
-Résultat pour mid1 (2026-10-21) :
-- **avec `--donnees`** : 0 instant différent sur 5 629 (93,8 s) ;
-- **sans les données** : les seuls écarts sont dans les plans qui suivent une attente de réplique
-  (plans 11, 20 et 29). Le convertisseur ne connaît pas la durée de l'attente, la simule sur 600
-  images, et le plan suivant part de l'état de l'image 600 (tremblement, et une animation qui
-  commence à l'image 601). Pour reproduire le jeu, il faut soit produire le fichier avec les données,
-  soit un format qui garde l'état d'un calque d'un plan au suivant.
+Résultat pour mid1 (2026-10-21) : **0 instant différent sur 5 629** (93,8 s). Avant que les données
+soient obligatoires, les plans qui suivaient une attente de réplique différaient : la durée de
+l'attente, inconnue, était simulée sur 600 images et le plan suivant partait d'un mauvais état.
 - **Non comparés** : les titres (le format les affiche d'un bloc, en couleur 15, sans la
   translucidité) et le fondu d'apparition (même champ `fade` des deux côtés, rendu ni d'un côté ni
   de l'autre dans la comparaison).
