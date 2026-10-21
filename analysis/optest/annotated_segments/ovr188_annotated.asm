@@ -2054,7 +2054,7 @@ loc_527ED:				; CODE XREF: sub_52662+154j
 		lea	ax, [bp+var_2F0]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	[bp+var_2E], ax
 		push	0
@@ -2062,7 +2062,7 @@ loc_527ED:				; CODE XREF: sub_52662+154j
 		lea	ax, [bp+var_2F0]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	[bp+var_30], ax
 		push	0
@@ -2070,7 +2070,7 @@ loc_527ED:				; CODE XREF: sub_52662+154j
 		lea	ax, [bp+var_2F0]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	[bp+var_32], ax
 		push	[bp+var_2E]
@@ -2509,7 +2509,7 @@ loc_52D6D:				; CODE XREF: sub_52662+6F9j
 		lea	ax, [bp+var_30A]
 		push	ax
 		push	[bp+var_2E]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_324]
 		push	ax
@@ -2529,7 +2529,7 @@ loc_52D6D:				; CODE XREF: sub_52662+6F9j
 		lea	ax, [bp+var_324]
 		push	ax
 		push	[bp+var_30]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_33E]
 		push	ax
@@ -2549,7 +2549,7 @@ loc_52D6D:				; CODE XREF: sub_52662+6F9j
 		lea	ax, [bp+var_33E]
 		push	ax
 		push	[bp+var_32]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_2BE]
 		push	ax
@@ -3886,7 +3886,7 @@ loc_53A99:				; CODE XREF: sub_53686+4DBj
 		lea	ax, [bp+var_726]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	bx, si
 		shl	bx, 1
@@ -3907,7 +3907,7 @@ loc_53A99:				; CODE XREF: sub_53686+4DBj
 		lea	ax, [bp+var_5F6]
 		add	bx, ax
 		push	word ptr [bx]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		mov	ax, si
 		shl	ax, 1
@@ -3930,7 +3930,7 @@ loc_53A99:				; CODE XREF: sub_53686+4DBj
 		lea	ax, [bp+var_726]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	bx, si
 		shl	bx, 1
@@ -3951,7 +3951,7 @@ loc_53A99:				; CODE XREF: sub_53686+4DBj
 		lea	ax, [bp+var_5F4]
 		add	bx, ax
 		push	word ptr [bx]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		inc	si
 
@@ -3981,7 +3981,7 @@ loc_53B6E:				; CODE XREF: sub_53686+53Dj
 		lea	ax, [bp+var_726]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	bx, di
 		shl	bx, 1
@@ -4003,7 +4003,7 @@ loc_53B6E:				; CODE XREF: sub_53686+53Dj
 		lea	ax, [bp+var_5D6]
 		add	bx, ax
 		push	word ptr [bx]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 
 loc_53BBF:				; CODE XREF: sub_53686+520j

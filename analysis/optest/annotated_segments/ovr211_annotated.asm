@@ -1073,7 +1073,7 @@ loc_BE8AE:				; CODE XREF: sub_BDE10+A6Bj
 		mov	[bx+0Eh], ax
 		push	word ptr [si+9]
 		push	word ptr [bp+var_46+2]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		mov	ax, word ptr [bp+var_46+2]
 		mov	[si+7],	ax

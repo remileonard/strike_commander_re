@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, `MID_33`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -334,4 +334,26 @@ référence. Mécanisme nouveau (2026-10-21) :
 - textes de `MG20` : le code n'affiche que les textes 5, 6 et 8 (répliques 0 = textes 5 et 6,
   1 = texte 8) ; les textes 0 à 4 et 7 ne sont pas affichés par cette fonction ;
 - extracteur : un saut qui suit un saut sans condition (code mort retiré) est supprimé.
+
+### mid33 (générique de fin : enterrement)
+
+Fonction pas encore nommée `sub_A3C30` : `--nom mid33`. 13 plans, 55,0 s (56,8 s avec les fondus) ;
+0 écart avec le rendu de référence. C'est la cinématique de la mort du joueur (enterrement, textes
+de `MG33`). Mécanismes nouveaux (2026-10-21) :
+- **noms du joueur** : la fonction reçoit trois noms (`arg_6`, `arg_8`, `arg_10` : prénom, nom,
+  indicatif d'après leur usage) et compose des textes avec (`CRT_Strcat`). Ils sont pris **vides** :
+  le code prend alors ses textes par défaut (texte 2 + texte 3 « our brave Commander. », texte 16 +
+  texte 17 « Commander. »…). Le lecteur suit la longueur des tampons locaux remplis (`CRT_Strlen`) ;
+- **calque de texte** (`TextLayer_Construct_ACF1`, `TextLayer_SetText_ADB7`) : inscriptions de la
+  croix, scène 2 : ligne 1 = prénom et nom (par défaut « Rest In Peace »), ligne 2 = nom seul si
+  prénom + nom dépassent 21 caractères, ligne 3 = l'indicatif entre apostrophes (par défaut
+  « 'UNLUCKY' »). **Pas exprimé dans le format** (texte libre) : la croix est écrite sans
+  inscription ;
+- **palette passée par valeur** (`Palette_UploadByValue_CBAB`, scène 6) : la palette `pal8`
+  (`midgames` 40) est construite dans la zone d'arguments de la pile ; le lecteur envoie la dernière
+  palette allouée ;
+- **écran de fin « THE END »** : police lue dans un `FORM FONT`, texte littéral (dseg 10007) en
+  (160, 97), palette `midgames` 39 ; attente de 300 tics de 60 Hz **et** de la fin de la musique
+  (état AIL ≠ 2), touche = sortie. Écrit : 5 s de la dernière image (texte non exprimé, fin de
+  musique non comptée) ; que le jeu efface ou non l'écran avant ce texte n'est pas établi.
 

@@ -317,7 +317,15 @@ loc_CB93:				; CODE XREF: seg018:0283j seg018:028Aj
 
 ; Attributes: bp-based frame
 
-sub_CBAB	proc far		; CODE XREF: sub_A3C30+7ED0P
+; ==============================================================================================
+; far, LUE 2026-10-21. Reçoit une palette par valeur (6 octets sur la pile : mot +0, octet +2,
+; …), l'envoie à la carte (Palette_Upload_2CDE1(&arg, octet +2, mot +0, 0)) puis détruit la
+; copie (Palette_Destruct_2D048). Après TextFormat_ReleaseAttribute_2EC80(word_46F46, 0).
+; mid33, scène 6 : l'appelant construit la palette directement dans la zone d'arguments (sub
+; sp, 6 ; Palette_Alloc sur cette zone, var_D4A ; Palette_CopyInto_2CF80 de midgames 40), puis
+; appelle sans autre empilement.
+; ==============================================================================================
+Palette_UploadByValue_CBAB	proc far		; CODE XREF: sub_A3C30+7ED0P
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -343,7 +351,7 @@ arg_2		= byte ptr  8
 		add	sp, 4
 		pop	bp
 		retf
-sub_CBAB	endp
+Palette_UploadByValue_CBAB	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

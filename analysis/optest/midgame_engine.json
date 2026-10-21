@@ -779,6 +779,28 @@
     "calque",
     "échelle"
    ]
+  },
+  "TextLayer_Construct_ACF1": {
+   "op": "TextLayer",
+   "args": [
+    "objet",
+    "zone",
+    "x",
+    "y"
+   ],
+   "type": "TextLayer",
+   "ret": "layer"
+  },
+  "TextLayer_SetText_ADB7": {
+   "op": "texte_calque",
+   "args": [
+    "calque",
+    "texte"
+   ]
+  },
+  "Palette_UploadByValue_CBAB": {
+   "op": "palette_envoie_argument",
+   "args": []
   }
  },
  "vtables": {
@@ -798,7 +820,8 @@
   "6091": "MovingOverlayLayer",
   "5607": "MovingMaskLayer",
   "6467": "ScaledMovingLayer",
-  "6567": "ScaledImageLayer"
+  "6567": "ScaledImageLayer",
+  "5947": "TextLayer"
  },
  "secondary_vtables": [
   6551,
@@ -813,7 +836,8 @@
   4604,
   6239,
   6255,
-  6603
+  6603,
+  5979
  ],
  "fields": {
   "scene": {

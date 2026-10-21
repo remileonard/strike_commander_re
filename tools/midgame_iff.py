@@ -35,6 +35,8 @@ DIRECT_FPS = 60
 
 DIRS = {'opt': 'GAMEFLOW', 'mid': 'MIDGAMES', 'amu': 'MIDGAMES', 'rmu': 'MIDGAMES'}
 NO_IMAGE = 255
+# Attente minimale de l'écran de fin (mid33) : 300 tics de 60 Hz.
+END_WAIT_TICKS = 300
 # Les calques et les dessins hors écran sont faits dans une image de 320 × 200 dont la ligne 0 est
 # recopiée à la ligne 24 de l'écran (Rect_BlitOverlapRegion_31FCA : source à partir de sa ligne du
 # haut, 0, destination à partir de la sienne, 24). Les positions écrites sont des positions d'écran.
@@ -371,6 +373,9 @@ class Player:
         self.subtitles = None
         self.subtitle = None
         self.subtitle_table = None
+        # Palettes autres que pal1 : liste des palettes copiées dedans (palette_envoie_argument).
+        self.palette_lists = {}
+        self.last_allocated = None
         # Facultatif (données du jeu) : texte d'un FORM de MIDGAMES.IFF et silences d'une réplique,
         # pour apparier plusieurs sous-titres à une réplique (pair_subtitles).
         self.text_of = None
@@ -503,6 +508,14 @@ class Player:
             if not hasattr(self, 'crt_rng'):
                 self.crt_rng = random.Random('CRT_Rand')
             return self.crt_rng.randrange(32768)
+        m = re.match(r'^CRT_Strlen\(&(v\d+)\)$', text)
+        if m:
+            return self.env.get('longueur ' + m.group(1), 0)
+        if re.match(r'^CRT_Strlen\(arg_\d+\)$', text):
+            # Noms du joueur passés à la cinématique (indicatif, prénom, nom) : inconnus ici, pris
+            # vides, ce qui fait prendre au code ses textes par défaut (mid33).
+            self.warn('nom du joueur pris vide (CRT_Strlen d\'un argument = 0)')
+            return 0
         m = re.match(r'^tête_parle\(tête=(\w+)\)$', text)
         if m:
             return self.head_speaking(self.layers[m.group(1)])
@@ -720,6 +733,15 @@ class Player:
         return None
 
     def loop(self, n):
+        if n.get('cond') == {'cmp': '==', 'a': {'inconnu': 'booléen'}, 'b': 0} and not self.mentions_tick(n.get('corps')):
+            # Attente sur l'écran figé (mid33, « THE END ») : tant que départ (dword_47ABB) + 300 tics de
+            # 60 Hz n'est pas dépassé, ou que la musique joue (AIL, état ≠ 2) ; touche = sortie. Le
+            # test sur 32 bits n'est pas suivi par l'extracteur : 300 tics, fin de musique non comptée.
+            self.warn(f'attente de fin ligne {n["ligne"]} : {END_WAIT_TICKS} tics de 60 Hz, fin de musique non comptée')
+            frozen = [dict(it, frozen=True) for it in self.last_frame]
+            for _ in range(END_WAIT_TICKS):
+                self.record('direct', DIRECT_FPS, frozen)
+            return None
         count = 0
         do_first = n['t'] == 'répéter'
         opened = None
@@ -749,6 +771,9 @@ class Player:
             self.force_new = True
         return None
 
+    def mentions_tick(self, nodes):
+        return 'Scene_Tick' in json.dumps(nodes or [], ensure_ascii=False)
+
     def make_layer(self, n):
         args = n['args']
         kind = n['type']
@@ -766,6 +791,10 @@ class Player:
             layer.image = None
         if kind == 'ScaledMovingLayer':
             layer.scale = (self.ev(args.get('échelle_x')) or 256, self.ev(args.get('échelle_y')) or 256)
+        if kind == 'TextLayer':
+            # TextLayer_Construct_ACF1 : texte libre dans une zone (noms du joueur, mid33) ; pas exprimé
+            # dans le format, qui ne désigne que des textes de MIDGAMES.IFF.
+            self.warn('calque de texte (TextLayer) non écrit : texte libre')
         if kind == 'ScaledImageLayer':
             # ScaledImageLayer_Construct_9391 : une seule échelle ; angle et octet pris à 0 seulement.
             scale = self.ev(args.get('échelle')) or 256
@@ -807,9 +836,19 @@ class Player:
             if parent is not None and child in parent.children:
                 parent.children.remove(child)
                 child.removed = True
+        elif name == 'palette_alloue':
+            self.palette_lists[args['palette']['objet']] = []
+            self.last_allocated = args['palette']['objet']
         elif name == 'palette_copie':
             if args.get('destination', {}).get('objet') == 'pal1':
                 self.pending_pal.append(self.palette_ref(args['source']['objet']))
+            else:
+                self.palette_lists.setdefault(args['destination']['objet'], []).append(
+                    self.palette_ref(args['source']['objet']))
+        elif name == 'palette_envoie_argument':
+            # Palette_UploadByValue_CBAB : palette construite dans la zone d'arguments de la pile, la
+            # dernière allouée (mid33, scène 6 : pal8 = midgames 40).
+            self.pending['palettes'] += self.palette_lists.get(self.last_allocated, [])
         elif name == 'palette_envoie':
             pal = args['palette']['objet']
             if pal == 'pal1':
@@ -893,6 +932,10 @@ class Player:
                            self.ev(args['y']) + dy)
             it['dy'] = dy
             self.direct_items.append(it)
+        elif name == 'texte_formaté' and 'c' not in args:
+            # Format sans argument : texte littéral du segment de données (mid33 : « THE END »), pas
+            # exprimé dans le format.
+            self.warn(f'texte littéral non écrit (format {self.ev(args.get("format"))})')
         elif name == 'texte_formaté':
             key, index = self.text_ref(args['c'])
             self.direct_items.append({'key': f'txt{len(self.direct_items)}', 'kind': 'text', 'text': (key, index),
@@ -924,6 +967,13 @@ class Player:
         return None
 
     def call(self, name, args, n):
+        if name == 'CRT_Strcat' and len(args) == 2 and isinstance(args[0], dict) and 'adresse' in args[0]:
+            # Tampon de texte local : seule sa longueur est suivie (noms du joueur pris vides, chaîne
+            # du segment de données comptée non vide), pour les tests CRT_Strlen(&tampon) (mid33).
+            src = args[1]
+            added = 0 if isinstance(src, dict) and str(src.get('local', '')).startswith('arg_') else 1
+            key = 'longueur ' + args[0]['adresse']
+            self.env[key] = self.env.get(key, 0) + added
         if name.endswith('.joue'):
             self.play_voice()
         elif name.startswith('UI_ApplyEncodingHelper_2EC65'):

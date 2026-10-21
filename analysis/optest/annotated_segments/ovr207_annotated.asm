@@ -3750,7 +3750,7 @@ loc_A65AD:				; CODE XREF: sub_A3C30+2969j
 		lea	ax, [bp+var_C66]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	word ptr [bp+var_152], ax
 		push	[bp+var_14E]
@@ -3758,7 +3758,7 @@ loc_A65AD:				; CODE XREF: sub_A3C30+2969j
 		lea	ax, [bp+var_C66]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	[bp+var_154], ax
 		push	word ptr [bp+var_152+2]
@@ -3766,7 +3766,7 @@ loc_A65AD:				; CODE XREF: sub_A3C30+2969j
 		lea	ax, [bp+var_C66]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	word ptr [bp+var_158+2], ax
 		push	word ptr [bp+var_14C+2]
@@ -3779,17 +3779,17 @@ loc_A65AD:				; CODE XREF: sub_A3C30+2969j
 		lea	ax, [bp+var_194]
 		push	ax
 		push	word ptr [bp+var_152]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_1BE]
 		push	ax
 		push	[bp+var_154]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_1EA]
 		push	ax
 		push	word ptr [bp+var_158+2]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		push	word ptr [bp+var_152]
 		lea	ax, [bp+var_C88]
@@ -3813,12 +3813,12 @@ loc_A6677:				; CODE XREF: sub_A3C30+29DDj
 		lea	ax, [bp+var_194]
 		push	ax
 		push	word ptr [bp+var_152]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		lea	ax, [bp+var_1EA]
 		push	ax
 		push	[bp+var_154]
-		call	sub_ADB7
+		call	TextLayer_SetText_ADB7
 		add	sp, 4
 		push	word ptr [bp+var_152]
 		lea	ax, [bp+var_C88]
@@ -11138,7 +11138,7 @@ loc_ABA70:				; CODE XREF: sub_A3C30+781Fj
 		push	ax
 		call	Palette_CopyInto_2CF80
 		add	sp, 8
-		call	sub_CBAB
+		call	Palette_UploadByValue_CBAB
 		add	sp, 6
 		push	word ptr [bp+var_140]
 		lea	ax, [bp+var_C88]

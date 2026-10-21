@@ -3363,7 +3363,14 @@ sub_AC84	endp
 
 ; Attributes: bp-based frame
 
-sub_ACF1	proc far		; CODE XREF: sub_52662+311P
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque de texte (15h octets, alloué si nul, tables 173Bh / 175Bh) :
+; zone de texte +11h = arg_2, x +0Ch = arg_4, y +0Eh = arg_6, chaîne +13h = 0. Dessin sub_ADC7
+; : si la chaîne ≠ 0, Widget_RenderComplexLayoutWrapper_31A3B(zone, format dseg 15E0h « X%Y%S
+; », x, y, chaîne), puis les enfants. mid33 : inscriptions de la pierre tombale (noms du
+; joueur).
+; ==============================================================================================
+TextLayer_Construct_ACF1	proc far		; CODE XREF: sub_52662+311P
 					; sub_52662+327P ...
 
 var_4		= word ptr -4
@@ -3387,7 +3394,7 @@ arg_6		= word ptr  0Ch
 		or	ax, ax
 		jz	short loc_AD67
 
-loc_AD0F:				; CODE XREF: sub_ACF1+Cj
+loc_AD0F:				; CODE XREF: TextLayer_Construct_ACF1+Cj
 		mov	word ptr [si], 18BFh
 		mov	word ptr [si+4], 18B7h
 		mov	word ptr [si+6], 0
@@ -3411,12 +3418,12 @@ loc_AD0F:				; CODE XREF: sub_ACF1+Cj
 		mov	[si+0Eh], ax
 		mov	word ptr [si+13h], 0
 
-loc_AD67:				; CODE XREF: sub_ACF1+1Cj
+loc_AD67:				; CODE XREF: TextLayer_Construct_ACF1+1Cj
 		mov	ax, si
 		pop	si
 		leave
 		retf
-sub_ACF1	endp
+TextLayer_Construct_ACF1	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -3477,7 +3484,11 @@ loc_ADAF:				; DATA XREF: dseg:171Fo dseg:174Fo
 
 ; Attributes: bp-based frame
 
-sub_ADB7	proc far		; CODE XREF: sub_52662+742P
+; ==============================================================================================
+; far, LUE 2026-10-21. Pose la chaîne d'un TextLayer : [arg_0 + 13h] = arg_2 (pointeur
+; proche).
+; ==============================================================================================
+TextLayer_SetText_ADB7	proc far		; CODE XREF: sub_52662+742P
 					; sub_52662+781P ...
 
 arg_0		= word ptr  6
@@ -3492,7 +3503,7 @@ arg_2		= word ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_ADB7	endp
+TextLayer_SetText_ADB7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

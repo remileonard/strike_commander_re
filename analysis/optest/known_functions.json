@@ -3418,5 +3418,20 @@
     "new_name": "CRT_Time_85A",
     "segment": "seg000",
     "summary": "far, LUE 2026-10-21. time() du runtime : date (sub_3E9) et heure (sub_3FC) du DOS converties par sub_2899 en secondes (dx:ax), rangées aussi en [arg_0] si arg_0 ≠ 0."
+  },
+  "sub_ACF1": {
+    "new_name": "TextLayer_Construct_ACF1",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Calque de texte (15h octets, alloué si nul, tables 173Bh / 175Bh) : zone de texte +11h = arg_2, x +0Ch = arg_4, y +0Eh = arg_6, chaîne +13h = 0. Dessin sub_ADC7 : si la chaîne ≠ 0, Widget_RenderComplexLayoutWrapper_31A3B(zone, format dseg 15E0h « X%Y%S », x, y, chaîne), puis les enfants. mid33 : inscriptions de la pierre tombale (noms du joueur)."
+  },
+  "sub_ADB7": {
+    "new_name": "TextLayer_SetText_ADB7",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Pose la chaîne d'un TextLayer : [arg_0 + 13h] = arg_2 (pointeur proche)."
+  },
+  "sub_CBAB": {
+    "new_name": "Palette_UploadByValue_CBAB",
+    "segment": "seg018",
+    "summary": "far, LUE 2026-10-21. Reçoit une palette par valeur (6 octets sur la pile : mot +0, octet +2, …), l'envoie à la carte (Palette_Upload_2CDE1(&arg, octet +2, mot +0, 0)) puis détruit la copie (Palette_Destruct_2D048). Après TextFormat_ReleaseAttribute_2EC80(word_46F46, 0). mid33, scène 6 : l'appelant construit la palette directement dans la zone d'arguments (sub sp, 6 ; Palette_Alloc sur cette zone, var_D4A ; Palette_CopyInto_2CF80 de `midgames` 40), puis appelle sans autre empilement."
   }
 }

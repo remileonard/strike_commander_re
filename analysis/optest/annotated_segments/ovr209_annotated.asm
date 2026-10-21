@@ -1434,7 +1434,7 @@ loc_B808F:				; CODE XREF: ovr209:101Dj ovr209:106Dj
 		lea	ax, [bp-0C72h]
 		push	ax
 		push	0
-		call	sub_ACF1
+		call	TextLayer_Construct_ACF1
 		add	sp, 8
 		mov	[bp-172h], ax
 		push	word ptr [bp-16Ah]
