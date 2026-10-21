@@ -57,10 +57,25 @@ def build_renamer(known):
     return subst, pattern
 
 
-def find_function(name, known, index):
+def find_function(name, known, index, lines=None, exe=None):
     for addr, info in index.items():
         if addr == name or info['new_name'] == name:
             return addr, info
+    # Étiquette sans bloc proc (mid36 : loc_B6FF0, tout le segment ovr209, atteint par un saut du
+    # relais sub_42620) : de l'étiquette à la fin de son segment.
+    if lines is not None:
+        label = name
+        for addr, info in known.items():
+            if info.get('new_name') == name:
+                label = addr
+        start = next((i for i, l in enumerate(lines) if re.match(rf'^{re.escape(label)}:', l)), None)
+        if start is not None:
+            bounds = json.load(open(os.path.join(paths(exe)['analysis'], 'segment_boundaries.json'), encoding='utf-8'))
+            items = bounds.items() if isinstance(bounds, dict) else bounds
+            for seg, (lo, hi) in items:
+                if lo <= start + 1 <= hi:
+                    return label, {'new_name': known.get(label, {}).get('new_name', label), 'segment': seg,
+                                   'start_line': start + 1, 'end_line': hi}
     raise SystemExit(f"Fonction '{name}' introuvable dans l'index.")
 
 
@@ -2110,7 +2125,7 @@ def main():
     scene_number = 1
     while queue:
         fname, arg_values = queue.pop(0)
-        addr, info = find_function(fname, known, index)
+        addr, info = find_function(fname, known, index, ex.lines, exe)
         counters_before = dict(ex.counters)
         objects_before = set(ex.objects)
         first = FunctionRun(ex, addr, info, arg_values, {})

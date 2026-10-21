@@ -992,7 +992,8 @@ toutes les tables de méthodes de calques est `Layer_MoveBy_2E29E` ; détail dan
 
 Les 10 autres fonctions (une par cinématique : `sub_6B9C0` mid2, `sub_71680` mid3, `sub_768F0`
 mid5, `sub_81470` mid12, `sub_8B630` mid15, `sub_94A30` mid16, `sub_98210` mid17, `sub_9E080`
-mid20, `sub_A3C30` générique et mid33, `sub_AFB90` mid34 — toutes pas encore nommées) utilisent
+mid20, `sub_A3C30` générique et mid33, `sub_AFB90` mid34 — toutes pas encore nommées ; plus
+mid36, code sans bloc `proc` à l'étiquette `loc_B6FF0`, segment ovr209) utilisent
 le même moteur. Pour figer le format, il faut y relever :
 
 1. **Les tableaux du segment de données** qu'elles copient (`CRT_Fmemcpy` ou `rep movsw` avant une

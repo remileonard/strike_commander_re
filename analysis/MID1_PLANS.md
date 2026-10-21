@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, `MID_33`, `MID_34`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, `MID_33`, `MID_34`, `MID_36`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -365,4 +365,17 @@ Fonction pas encore nommée `sub_AFB90` : `--nom mid34`. 10 plans, 52,7 s (54,5 
 (répliques 7 = textes 7 et 8, 8 = textes 9 et 10). Deux cases de ressource lues dans la dernière
 scène (`var_11C`, `var_11C+2`) sont mises à 0 avant la boucle et jamais modifiées : la valeur 0 prise
 par le lecteur est la bonne (même cas dans mid33, `var_148`).
+
+### mid36 (fin victorieuse)
+
+Code sans bloc `proc` : l'étiquette `loc_B6FF0`, tout le segment ovr209 (lignes 328 570 à 337 854
+d'`optest.asm`), atteinte par un saut du relais d'overlay `sub_42620`. `midgame_extract.py` accepte
+désormais une étiquette : la fonction va de l'étiquette à la fin de son segment
+(`--exe optest loc_B6FF0 --name mid36`). 19 plans, 80,7 s ; 0 écart avec le rendu de référence ;
+aucun mécanisme de dessin nouveau.
+- Textes assemblés avec le nom du joueur, comme mid17 : texte 2 + nom (sinon texte 3 « Commander »)
+  + texte 4 ; texte 10 + nom + texte 11. Non exprimé : le fichier montre « All right, all right. I
+  got to hand it to you, » et « ...but » seuls.
+- Un calque de texte (scène 1, en (160, 160)) n'a jamais de texte posé : il ne dessine rien.
+- Effets sonores préchargés depuis une table de 7 octets (`word_457D6`…) : sans effet sur l'image.
 
