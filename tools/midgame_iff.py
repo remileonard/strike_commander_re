@@ -250,6 +250,10 @@ class Layer:
         self.sens = 0
         self.clip = None
         self.children = []
+        # Retiré puis rajouté (Scene_RemoveLayer, LayerGroup_Add_2DB84) : le calque repasse au-dessus
+        # des autres ; ses images suivantes forment un calque à part dans le fichier (mid20, scène 1).
+        self.removed = False
+        self.generation = 0
         self.forced = False
         self.base = -1
         self.shown = -1
@@ -687,6 +691,9 @@ class Player:
             parent = self.scenes.get(n['parent']) or self.layers.get(n['parent'])
             if parent is not None and child not in parent.children:
                 parent.children.append(child)
+                if child.removed:
+                    child.removed = False
+                    child.generation += 1
             return None
         if t == 'op':
             return self.op(n['op'], n['args'], n)
@@ -799,6 +806,7 @@ class Player:
             child = self.layers.get(args['calque']['objet'])
             if parent is not None and child in parent.children:
                 parent.children.remove(child)
+                child.removed = True
         elif name == 'palette_copie':
             if args.get('destination', {}).get('objet') == 'pal1':
                 self.pending_pal.append(self.palette_ref(args['source']['objet']))
@@ -1066,7 +1074,7 @@ class Player:
         ax = x + layer.x + layer.jx
         ay = y + layer.y + layer.jy
         t = layer.type
-        n = layer.name
+        n = layer.name + (f'#{layer.generation}' if layer.generation else '')
         if t == 'AnimLayer':
             out.append(self.item(n, layer.res, layer.image, ax, ay, auto=not layer.forced))
         elif t == 'LoopAnimLayer':

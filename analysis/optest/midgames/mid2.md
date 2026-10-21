@@ -862,8 +862,8 @@ si byte_495FC == 0 :
                             palette_envoie(palette=pal1, pas=0)                                       ⟨224563⟩
                             v560→0.méthode8(167)                                                      ⟨224569⟩
                             c22.image = 0                                                             ⟨224572⟩
-                            sub_85A(0)                                                                ⟨224574⟩
-                            sub_6F2(sub_85A(0))                                                       ⟨224577⟩
+                            CRT_Time_85A(0)                                                           ⟨224574⟩
+                            CRT_Srand_6F2(CRT_Time_85A(0))                                            ⟨224577⟩
                             v370 = 4                                                                  ⟨224579⟩
                             si v14 != 0 :
                                 Scene_Tick(scène=scène6)                                              ⟨224588⟩

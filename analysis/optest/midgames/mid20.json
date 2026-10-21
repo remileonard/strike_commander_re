@@ -171,7 +171,7 @@
        "ligne": 295405
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal3.+0→4",
         "v3470",
@@ -251,18 +251,20 @@
        "ligne": 295948
       },
       {
-       "op": "c4.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "-1"
+        "calque=c4",
+        "dx=0",
+        "dy=-1"
        ],
        "ligne": 296090
       },
       {
-       "op": "c5.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "-1"
+        "calque=c5",
+        "dx=0",
+        "dy=-1"
        ],
        "ligne": 296104
       },
@@ -298,18 +300,20 @@
        "ligne": 296138
       },
       {
-       "op": "c2.méthode24",
+       "op": "déplace",
        "arguments": [
-        "-1",
-        "0"
+        "calque=c2",
+        "dx=-1",
+        "dy=0"
        ],
        "ligne": 296184
       },
       {
-       "op": "c3.méthode24",
+       "op": "déplace",
        "arguments": [
-        "1",
-        "0"
+        "calque=c3",
+        "dx=1",
+        "dy=0"
        ],
        "ligne": 296191
       },
@@ -322,7 +326,7 @@
        "ligne": 296233
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal4.+0→4",
         "v3484",
@@ -530,12 +534,12 @@
        "ligne": 296986
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal3.+0→4",
         "v3470",
         "v348",
-        "convdata type 2 \"normal\".+0"
+        "v350"
        ],
        "ligne": 296993
       },
@@ -545,26 +549,29 @@
        "ligne": 297007
       },
       {
-       "op": "c11.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c11",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297039
       },
       {
-       "op": "c12.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c12",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297045
       },
       {
-       "op": "c13.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c13",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297052
       },
@@ -1158,7 +1165,7 @@
        "ligne": 299229
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal3.+0→4",
         "v3470",
@@ -1182,11 +1189,11 @@
        "ligne": 299264
       },
       {
-       "op": "sub_9CF7",
+       "op": "tête_voix",
        "arguments": [
-        "c28",
-        "mid20voc 0",
-        "9"
+        "tête=c28",
+        "ressource=mid20voc 0",
+        "cadence=9"
        ],
        "ligne": 299270
       },
@@ -1203,26 +1210,29 @@
        "ligne": 299292
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299324
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299330
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299337
       },
@@ -1239,26 +1249,29 @@
        "ligne": 299372
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299404
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299410
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299417
       },
@@ -1275,26 +1288,29 @@
        "ligne": 299486
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299518
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299524
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299531
       },
@@ -1340,26 +1356,29 @@
        "ligne": 299657
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299689
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299695
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 299702
       },
@@ -1672,7 +1691,7 @@
        "ligne": 300644
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal3.+0→4",
         "v3470",
@@ -1713,18 +1732,20 @@
        "ligne": 300687
       },
       {
-       "op": "c37.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "1"
+        "calque=c37",
+        "dx=0",
+        "dy=1"
        ],
        "ligne": 300707
       },
       {
-       "op": "c37.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "1"
+        "calque=c37",
+        "dx=0",
+        "dy=1"
        ],
        "ligne": 300722
       },
@@ -1847,6 +1868,7 @@
     "v56 = 152                                                                                             ⟨293856⟩",
     "v58 = 319                                                                                             ⟨293858⟩",
     "v60 = 199                                                                                             ⟨293860⟩",
+    "v579 = 0                                                                                              ⟨293862⟩",
     "v577 = v56                                                                                            ⟨293864⟩",
     "v575 = v58                                                                                            ⟨293866⟩",
     "v573 = v60                                                                                            ⟨293868⟩",
@@ -1869,9 +1891,17 @@
     "palette_depuis(pal5(midgames 22))                                                                     ⟨294081⟩",
     "charge_convdata_type2(\"normal\")                                                                       ⟨294091⟩",
     "palette_depuis(pal6(convdata type 2 \"normal\"))                                                        ⟨294097⟩",
+    "v350 = 0                                                                                              ⟨294115⟩",
+    "v344 = 0                                                                                              ⟨294117⟩",
+    "v334 = 0                                                                                              ⟨294136⟩",
+    "v324 = 0                                                                                              ⟨294155⟩",
+    "v315 = 0                                                                                              ⟨294173⟩",
+    "v314 = 0                                                                                              ⟨294174⟩",
     "si v12 != 0 :",
-    "    si sub_6734(chemin1) == 0 : aller à loc_9E696                                                     ⟨294197⟩",
-    "    pak mid20voc.ouvre(chemin1, 1)                                                                    ⟨294204⟩",
+    "    si sub_6734(chemin1) != 0 :",
+    "        pak mid20voc.ouvre(chemin1, 1)                                                                ⟨294204⟩",
+    "    sinon :",
+    "        v12 = 0                                                                                       ⟨294211⟩",
     "sinon :",
     "    v12 = 0                                                                                           ⟨294211⟩",
     "v160 = 0                                                                                              ⟨294214⟩",
@@ -1885,6 +1915,7 @@
     "        pak rsoundfx.ouvre(chemin1, 1)                                                                ⟨294265⟩",
     "        flux_iff(flux=flux1)                                                                          ⟨294279⟩",
     "        v3495 = 256                                                                                   ⟨294282⟩",
+    "        v3499 = 0                                                                                     ⟨294283⟩",
     "        flux1.ouvre(chemin1, 1)                                                                       ⟨294291⟩",
     "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨294297⟩",
     "        iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨294303⟩",
@@ -1908,6 +1939,7 @@
     "        pak asoundfx.ouvre(chemin1, 1)                                                                ⟨294401⟩",
     "        flux_iff(flux=flux1)                                                                          ⟨294415⟩",
     "        v3495 = 256                                                                                   ⟨294418⟩",
+    "        v3499 = 0                                                                                     ⟨294419⟩",
     "        flux1.ouvre(chemin1, 1)                                                                       ⟨294427⟩",
     "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨294433⟩",
     "        iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨294439⟩",
@@ -1930,11 +1962,17 @@
     "    canal_init(canal=canal1, pilote=word_46849)                                                       ⟨294527⟩",
     "    si = 0                                                                                            ⟨294529⟩",
     "    tant que si < 4 :",
+    "        v316 = 2                                                                                      ⟨294535⟩",
+    "        v315 = 0                                                                                      ⟨294536⟩",
+    "        v314 = 0                                                                                      ⟨294537⟩",
     "        charge(asoundfx v166[si])                                                                     ⟨294546⟩",
     "        canal_enregistre(canal=canal1, ressource=asoundfx v166[si], x=0)                              ⟨294553⟩",
     "        canal_arrête(canal=canal1)                                                                    ⟨294557⟩",
+    "        v315 = 0                                                                                      ⟨294576⟩",
+    "        v314 = 0                                                                                      ⟨294577⟩",
     "        si = si + 1                                                                                   ⟨294578⟩",
     "    canal_arrête(canal=canal1)                                                                        ⟨294589⟩",
+    "    v3434 = 0                                                                                         ⟨294607⟩",
     "v1334 = 0                                                                                             ⟨294612⟩",
     "v1329 = 0                                                                                             ⟨294614⟩",
     "v1328 = 0                                                                                             ⟨294615⟩",
@@ -1954,6 +1992,7 @@
     "sinon :",
     "    flux_iff(flux=flux1)                                                                              ⟨294699⟩",
     "    v3495 = 256                                                                                       ⟨294702⟩",
+    "    v3499 = 0                                                                                         ⟨294703⟩",
     "    flux1.ouvre(chemin1, 1)                                                                           ⟨294711⟩",
     "    iff_form(flux=flux1, balise='MG20', x=0)                                                          ⟨294717⟩",
     "    iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨294723⟩",
@@ -1982,7 +2021,27 @@
     "    iff_ferme_form(flux=flux1)                                                                        ⟨294843⟩",
     "si byte_495FC != 0 :",
     "    voix_arrête(voix=voix1)                                                                           ⟨294861⟩",
+    "    v3408 = 0                                                                                         ⟨294879⟩",
+    "    v3403 = 0                                                                                         ⟨294880⟩",
+    "    v3402 = 0                                                                                         ⟨294881⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨294884⟩",
+    "    v1334 = 0                                                                                         ⟨294902⟩",
+    "    v1329 = 0                                                                                         ⟨294903⟩",
+    "    v1328 = 0                                                                                         ⟨294904⟩",
+    "    v155 = 0                                                                                          ⟨294927⟩",
+    "    v154 = 0                                                                                          ⟨294928⟩",
+    "    v115 = 0                                                                                          ⟨294976⟩",
+    "    v114 = 0                                                                                          ⟨294977⟩",
+    "    v105 = 0                                                                                          ⟨294995⟩",
+    "    v104 = 0                                                                                          ⟨294996⟩",
+    "    v95 = 0                                                                                           ⟨295014⟩",
+    "    v94 = 0                                                                                           ⟨295015⟩",
+    "    v85 = 0                                                                                           ⟨295033⟩",
+    "    v84 = 0                                                                                           ⟨295034⟩",
+    "    v75 = 0                                                                                           ⟨295052⟩",
+    "    v74 = 0                                                                                           ⟨295053⟩",
+    "    v65 = 0                                                                                           ⟨295071⟩",
+    "    v64 = 0                                                                                           ⟨295072⟩",
     "    v40 = 0                                                                                           ⟨295118⟩",
     "    v35 = 0                                                                                           ⟨295119⟩",
     "    v34 = 0                                                                                           ⟨295120⟩",
@@ -1991,10 +2050,15 @@
     "    v168 = word_48F76                                                                                 ⟨295154⟩",
     "    si canal2.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal2.+0→4, séquence=v1336)                                        ⟨295161⟩",
-    "        sub_30C66(canal2.+0→4, v1336, v168, 0)                                                        ⟨295168⟩",
+    "        AIL_set_relative_volume_30C66(canal2.+0→4, v1336, v168, 0)                                    ⟨295168⟩",
     "vide_entrées()                                                                                        ⟨295178⟩",
+    "v316 = 2                                                                                              ⟨295180⟩",
+    "v315 = 0                                                                                              ⟨295181⟩",
+    "v314 = 0                                                                                              ⟨295182⟩",
     "charge(mid20 7)                                                                                       ⟨295189⟩",
+    "v324 = 0                                                                                              ⟨295194⟩",
     "charge(mid20 6)                                                                                       ⟨295201⟩",
+    "v334 = 0                                                                                              ⟨295206⟩",
     "charge(mid20 16)                                                                                      ⟨295213⟩",
     "palette_depuis(pal7(mid20 16))                                                                        ⟨295220⟩",
     "charge(mid20 10)                                                                                      ⟨295232⟩",
@@ -2028,8 +2092,10 @@
     "v404 = 0                                                                                              ⟨295361⟩",
     "v399 = 0                                                                                              ⟨295363⟩",
     "v398 = 0                                                                                              ⟨295364⟩",
+    "v3482 = 0                                                                                             ⟨295365⟩",
     "v3477 = 0                                                                                             ⟨295367⟩",
     "v3476 = 0                                                                                             ⟨295368⟩",
+    "v3486 = 0                                                                                             ⟨295369⟩",
     "v3484 = -1                                                                                            ⟨295370⟩",
     "si v13 != 0 :",
     "    charge(asoundfx 42)                                                                               ⟨295383⟩",
@@ -2038,16 +2104,51 @@
     "    v406 = word_48EF6                                                                                 ⟨295398⟩",
     "    si canal3.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨295405⟩",
-    "        sub_30C66(canal3.+0→4, v3470, v406, 0)                                                        ⟨295412⟩",
+    "        AIL_set_relative_volume_30C66(canal3.+0→4, v3470, v406, 0)                                    ⟨295412⟩",
     "    charge(asoundfx 58)                                                                               ⟨295423⟩",
     "    canal_init(canal=canal4, pilote=word_46849)                                                       ⟨295428⟩",
     "    canal_enregistre(canal=canal4, ressource=asoundfx 58, x=0)                                        ⟨295435⟩",
     "si byte_495FC != 0 :",
     "    canal_arrête(canal=canal4)                                                                        ⟨295447⟩",
+    "    v3482 = 0                                                                                         ⟨295465⟩",
+    "    v399 = 0                                                                                          ⟨295485⟩",
+    "    v398 = 0                                                                                          ⟨295486⟩",
     "    canal_arrête(canal=canal3)                                                                        ⟨295489⟩",
+    "    v3468 = 0                                                                                         ⟨295507⟩",
+    "    v3463 = 0                                                                                         ⟨295508⟩",
+    "    v3462 = 0                                                                                         ⟨295509⟩",
+    "    v388 = 0                                                                                          ⟨295528⟩",
     "    Scene_Destruct(scène=scène1, drapeaux=0)                                                          ⟨295532⟩",
+    "    v371 = 0                                                                                          ⟨295551⟩",
+    "    v370 = 0                                                                                          ⟨295552⟩",
+    "    v360 = 0                                                                                          ⟨295571⟩",
+    "    v350 = 0                                                                                          ⟨295590⟩",
+    "    v334 = 0                                                                                          ⟨295614⟩",
+    "    v324 = 0                                                                                          ⟨295633⟩",
+    "    v315 = 0                                                                                          ⟨295651⟩",
+    "    v314 = 0                                                                                          ⟨295652⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨295656⟩",
+    "    v3408 = 0                                                                                         ⟨295674⟩",
+    "    v3403 = 0                                                                                         ⟨295675⟩",
+    "    v3402 = 0                                                                                         ⟨295676⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨295679⟩",
+    "    v1334 = 0                                                                                         ⟨295697⟩",
+    "    v1329 = 0                                                                                         ⟨295698⟩",
+    "    v1328 = 0                                                                                         ⟨295699⟩",
+    "    v155 = 0                                                                                          ⟨295722⟩",
+    "    v154 = 0                                                                                          ⟨295723⟩",
+    "    v115 = 0                                                                                          ⟨295771⟩",
+    "    v114 = 0                                                                                          ⟨295772⟩",
+    "    v105 = 0                                                                                          ⟨295790⟩",
+    "    v104 = 0                                                                                          ⟨295791⟩",
+    "    v95 = 0                                                                                           ⟨295809⟩",
+    "    v94 = 0                                                                                           ⟨295810⟩",
+    "    v85 = 0                                                                                           ⟨295828⟩",
+    "    v84 = 0                                                                                           ⟨295829⟩",
+    "    v75 = 0                                                                                           ⟨295847⟩",
+    "    v74 = 0                                                                                           ⟨295848⟩",
+    "    v65 = 0                                                                                           ⟨295866⟩",
+    "    v64 = 0                                                                                           ⟨295867⟩",
     "    v40 = 0                                                                                           ⟨295913⟩",
     "    v35 = 0                                                                                           ⟨295914⟩",
     "    v34 = 0                                                                                           ⟨295915⟩",
@@ -2083,10 +2184,10 @@
     "    si scène1.compteur > 10 :",
     "        si scène1.compteur < 50 :",
     "            si scène1.compteur & 1 != 0 :",
-    "                c4.méthode24(0, -1)                                                                   ⟨296090⟩",
+    "                déplace(calque=c4, dx=0, dy=-1)                                                       ⟨296090⟩",
     "    si scène1.compteur < 50 :",
     "        si scène1.compteur & 1 != 0 :",
-    "            c5.méthode24(0, -1)                                                                       ⟨296104⟩",
+    "            déplace(calque=c5, dx=0, dy=-1)                                                           ⟨296104⟩",
     "    si scène1.compteur == 54 :",
     "        retire(parent=scène1, calque=c1)                                                              ⟨296118⟩",
     "        c1.détruit(3)                                                                                 ⟨296125⟩",
@@ -2099,16 +2200,18 @@
     "    si scène1.compteur > 16 :",
     "        si scène1.compteur < 54 :",
     "            v428 = v424                                                                               ⟨296167⟩",
+    "            v424_avant = v424                                                                         ⟨296168⟩",
     "            v424 = v424 + 1                                                                           ⟨296168⟩",
     "            c1.image = v428                                                                           ⟨296170⟩",
     "    si scène1.compteur > 54 :",
     "        si v422 > 4 :",
     "            v422 = 0                                                                                  ⟨296178⟩",
-    "            c2.méthode24(-1, 0)                                                                       ⟨296184⟩",
-    "            c3.méthode24(1, 0)                                                                        ⟨296191⟩",
+    "            déplace(calque=c2, dx=-1, dy=0)                                                           ⟨296184⟩",
+    "            déplace(calque=c3, dx=1, dy=0)                                                            ⟨296191⟩",
     "        v430 = v422                                                                                   ⟨296196⟩",
     "        c2.image = v430                                                                               ⟨296199⟩",
     "        v432 = v422                                                                                   ⟨296201⟩",
+    "        v422_avant = v422                                                                             ⟨296202⟩",
     "        v422 = v422 + 1                                                                               ⟨296202⟩",
     "        c3.image = v432                                                                               ⟨296205⟩",
     "    si scène1.compteur > 41 :",
@@ -2120,7 +2223,7 @@
     "            v436 = word_48F16                                                                         ⟨296226⟩",
     "            si canal4.+0 != 0 :",
     "                AIL_start_sequence(pilote=canal4.+0→4, séquence=v3484)                                ⟨296233⟩",
-    "                sub_30C66(canal4.+0→4, v3484, v436, 0)                                                ⟨296240⟩",
+    "                AIL_set_relative_volume_30C66(canal4.+0→4, v3484, v436, 0)                            ⟨296240⟩",
     "    si scène1.compteur == 50 :",
     "        c8.vx = 0                                                                                     ⟨296249⟩",
     "        c8.vy = 0                                                                                     ⟨296251⟩",
@@ -2128,12 +2231,47 @@
     "        c9.vy = 0                                                                                     ⟨296255⟩",
     "    Scene_Tick(scène=scène1)                                                                          ⟨296270⟩",
     "canal_arrête(canal=canal4)                                                                            ⟨296302⟩",
+    "v3482 = 0                                                                                             ⟨296320⟩",
+    "v399 = 0                                                                                              ⟨296340⟩",
+    "v398 = 0                                                                                              ⟨296341⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨296344⟩",
+    "v3468 = 0                                                                                             ⟨296362⟩",
+    "v3463 = 0                                                                                             ⟨296363⟩",
+    "v3462 = 0                                                                                             ⟨296364⟩",
+    "v388 = 0                                                                                              ⟨296383⟩",
     "Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨296387⟩",
+    "v371 = 0                                                                                              ⟨296406⟩",
+    "v370 = 0                                                                                              ⟨296407⟩",
+    "v360 = 0                                                                                              ⟨296426⟩",
+    "v350 = 0                                                                                              ⟨296445⟩",
+    "v334 = 0                                                                                              ⟨296469⟩",
+    "v324 = 0                                                                                              ⟨296488⟩",
+    "v315 = 0                                                                                              ⟨296506⟩",
+    "v314 = 0                                                                                              ⟨296507⟩",
     "vide_entrées()                                                                                        ⟨296508⟩",
     "si byte_495FC != 0 :",
     "    voix_arrête(voix=voix1)                                                                           ⟨296518⟩",
+    "    v3408 = 0                                                                                         ⟨296536⟩",
+    "    v3403 = 0                                                                                         ⟨296537⟩",
+    "    v3402 = 0                                                                                         ⟨296538⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨296541⟩",
+    "    v1334 = 0                                                                                         ⟨296559⟩",
+    "    v1329 = 0                                                                                         ⟨296560⟩",
+    "    v1328 = 0                                                                                         ⟨296561⟩",
+    "    v155 = 0                                                                                          ⟨296584⟩",
+    "    v154 = 0                                                                                          ⟨296585⟩",
+    "    v115 = 0                                                                                          ⟨296633⟩",
+    "    v114 = 0                                                                                          ⟨296634⟩",
+    "    v105 = 0                                                                                          ⟨296652⟩",
+    "    v104 = 0                                                                                          ⟨296653⟩",
+    "    v95 = 0                                                                                           ⟨296671⟩",
+    "    v94 = 0                                                                                           ⟨296672⟩",
+    "    v85 = 0                                                                                           ⟨296690⟩",
+    "    v84 = 0                                                                                           ⟨296691⟩",
+    "    v75 = 0                                                                                           ⟨296709⟩",
+    "    v74 = 0                                                                                           ⟨296710⟩",
+    "    v65 = 0                                                                                           ⟨296728⟩",
+    "    v64 = 0                                                                                           ⟨296729⟩",
     "    v40 = 0                                                                                           ⟨296775⟩",
     "    v35 = 0                                                                                           ⟨296776⟩",
     "    v34 = 0                                                                                           ⟨296777⟩",
@@ -2142,6 +2280,9 @@
     "",
     "──── scène2 ────",
     "scène2 = Scene_Create(cadence=9, palette=255, surface=&v532)                                          ⟨296826⟩",
+    "v316 = 2                                                                                              ⟨296829⟩",
+    "v315 = 0                                                                                              ⟨296830⟩",
+    "v314 = 0                                                                                              ⟨296831⟩",
     "charge_convdata_type0(\"air\", drapeau=3)                                                               ⟨296836⟩",
     "palette_copie(destination=pal1, source=pal3(optpals 21))                                              ⟨296845⟩",
     "palette_copie(destination=pal1, source=pal2(midgames 6))                                              ⟨296854⟩",
@@ -2158,38 +2299,78 @@
     "charge(midgames 0)                                                                                    ⟨296926⟩",
     "c13 = ToggleLayer(ressource=midgames 0, x=160, y=129, sens=1)                                         ⟨296934⟩",
     "ajoute c13 à scène2                                                                                   ⟨296940⟩",
+    "v3468 = 0                                                                                             ⟨296946⟩",
+    "v3464 = 2                                                                                             ⟨296947⟩",
+    "v3463 = 0                                                                                             ⟨296948⟩",
+    "v3462 = 0                                                                                             ⟨296949⟩",
     "v3470 = -1                                                                                            ⟨296951⟩",
     "si v13 != 0 :",
     "    charge(asoundfx 5)                                                                                ⟨296964⟩",
     "    canal_init(canal=canal3, pilote=word_46849)                                                       ⟨296969⟩",
     "    canal_enregistre(canal=canal3, ressource=asoundfx 5, x=0)                                         ⟨296976⟩",
     "    v348 = word_48EAC                                                                                 ⟨296979⟩",
+    "    v350 = 0                                                                                          ⟨296980⟩",
     "    si canal3.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨296986⟩",
-    "        sub_30C66(canal3.+0→4, v3470, v348, convdata type 2 \"normal\".+0)                              ⟨296993⟩",
+    "        AIL_set_relative_volume_30C66(canal3.+0→4, v3470, v348, v350)                                 ⟨296993⟩",
     "si = 0                                                                                                ⟨296999⟩",
     "v352 = 1                                                                                              ⟨297000⟩",
     "tant que (scène2.compteur < 25) et (scène2.terminée == 0) :",
     "    si si == 0 :",
     "        CRT_Rand()                                                                                    ⟨297007⟩",
-    "        si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A07DE                                           ⟨297014⟩",
-    "        si = -1                                                                                       ⟨297015⟩",
+    "        si (CRT_Rand()·7) / 32768 == 0 :",
+    "            si = -1                                                                                   ⟨297015⟩",
+    "        sinon :",
+    "            si si == -1 :",
+    "                si = 1                                                                                ⟨297023⟩",
+    "            sinon :",
+    "                si si == 1 :",
+    "                    si = 0                                                                            ⟨297030⟩",
     "    sinon :",
     "        si si == -1 :",
     "            si = 1                                                                                    ⟨297023⟩",
     "        sinon :",
     "            si si == 1 :",
     "                si = 0                                                                                ⟨297030⟩",
-    "    c11.méthode24(0, si)                                                                              ⟨297039⟩",
-    "    c12.méthode24(0, si)                                                                              ⟨297045⟩",
-    "    c13.méthode24(0, si)                                                                              ⟨297052⟩",
+    "    déplace(calque=c11, dx=0, dy=si)                                                                  ⟨297039⟩",
+    "    déplace(calque=c12, dx=0, dy=si)                                                                  ⟨297045⟩",
+    "    déplace(calque=c13, dx=0, dy=si)                                                                  ⟨297052⟩",
     "    v352 = v352 + si                                                                                  ⟨297054⟩",
     "    Scene_Tick(scène=scène2)                                                                          ⟨297067⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨297095⟩",
+    "v3468 = 0                                                                                             ⟨297113⟩",
+    "v3463 = 0                                                                                             ⟨297114⟩",
+    "v3462 = 0                                                                                             ⟨297115⟩",
+    "v334 = 0                                                                                              ⟨297151⟩",
+    "v328 = 0                                                                                              ⟨297153⟩",
+    "v315 = 0                                                                                              ⟨297171⟩",
+    "v314 = 0                                                                                              ⟨297172⟩",
     "Scene_Destruct(scène=scène2, drapeaux=0)                                                              ⟨297176⟩",
     "si byte_495FC != 0 :",
+    "    v175 = 0                                                                                          ⟨297201⟩",
+    "    v174 = 0                                                                                          ⟨297202⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨297206⟩",
+    "    v3408 = 0                                                                                         ⟨297224⟩",
+    "    v3403 = 0                                                                                         ⟨297225⟩",
+    "    v3402 = 0                                                                                         ⟨297226⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨297229⟩",
+    "    v1334 = 0                                                                                         ⟨297247⟩",
+    "    v1329 = 0                                                                                         ⟨297248⟩",
+    "    v1328 = 0                                                                                         ⟨297249⟩",
+    "    v155 = 0                                                                                          ⟨297272⟩",
+    "    v154 = 0                                                                                          ⟨297273⟩",
+    "    v115 = 0                                                                                          ⟨297321⟩",
+    "    v114 = 0                                                                                          ⟨297322⟩",
+    "    v105 = 0                                                                                          ⟨297340⟩",
+    "    v104 = 0                                                                                          ⟨297341⟩",
+    "    v95 = 0                                                                                           ⟨297359⟩",
+    "    v94 = 0                                                                                           ⟨297360⟩",
+    "    v85 = 0                                                                                           ⟨297378⟩",
+    "    v84 = 0                                                                                           ⟨297379⟩",
+    "    v75 = 0                                                                                           ⟨297397⟩",
+    "    v74 = 0                                                                                           ⟨297398⟩",
+    "    v65 = 0                                                                                           ⟨297416⟩",
+    "    v64 = 0                                                                                           ⟨297417⟩",
     "    v40 = 0                                                                                           ⟨297463⟩",
     "    v35 = 0                                                                                           ⟨297464⟩",
     "    v34 = 0                                                                                           ⟨297465⟩",
@@ -2197,6 +2378,9 @@
     "",
     "──── scène3 ────",
     "scène3 = Scene_Create(cadence=15, palette=255, surface=&v532)                                         ⟨297502⟩",
+    "v316 = 2                                                                                              ⟨297505⟩",
+    "v315 = 0                                                                                              ⟨297506⟩",
+    "v314 = 0                                                                                              ⟨297507⟩",
     "charge(mid20 1)                                                                                       ⟨297514⟩",
     "charge(mid20 5)                                                                                       ⟨297526⟩",
     "charge(mid20 14)                                                                                      ⟨297538⟩",
@@ -2224,7 +2408,7 @@
     "si = 0                                                                                                ⟨297680⟩",
     "tant que (scène3.compteur < 16) et (scène3.terminée == 0) :",
     "    CRT_Rand()                                                                                        ⟨297685⟩",
-    "    v360 = ((CRT_Rand()·3) / -32768) + 1                                                              ⟨297692⟩",
+    "    v360 = ((CRT_Rand()·3) / 32768) + 1                                                               ⟨297692⟩",
     "    c20.image = v360                                                                                  ⟨297694⟩",
     "    v362 = si                                                                                         ⟨297695⟩",
     "    si = si + 1                                                                                       ⟨297696⟩",
@@ -2232,10 +2416,36 @@
     "    si si + 1 > 5 :",
     "        si = 0                                                                                        ⟨297702⟩",
     "    Scene_Tick(scène=scène3)                                                                          ⟨297717⟩",
+    "v334 = 0                                                                                              ⟨297763⟩",
+    "v324 = 0                                                                                              ⟨297782⟩",
+    "v315 = 0                                                                                              ⟨297800⟩",
+    "v314 = 0                                                                                              ⟨297801⟩",
     "Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨297805⟩",
     "si byte_495FC != 0 :",
+    "    v175 = 0                                                                                          ⟨297830⟩",
+    "    v174 = 0                                                                                          ⟨297831⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨297835⟩",
+    "    v3408 = 0                                                                                         ⟨297853⟩",
+    "    v3403 = 0                                                                                         ⟨297854⟩",
+    "    v3402 = 0                                                                                         ⟨297855⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨297858⟩",
+    "    v1334 = 0                                                                                         ⟨297876⟩",
+    "    v1329 = 0                                                                                         ⟨297877⟩",
+    "    v1328 = 0                                                                                         ⟨297878⟩",
+    "    v155 = 0                                                                                          ⟨297901⟩",
+    "    v154 = 0                                                                                          ⟨297902⟩",
+    "    v115 = 0                                                                                          ⟨297950⟩",
+    "    v114 = 0                                                                                          ⟨297951⟩",
+    "    v105 = 0                                                                                          ⟨297969⟩",
+    "    v104 = 0                                                                                          ⟨297970⟩",
+    "    v95 = 0                                                                                           ⟨297988⟩",
+    "    v94 = 0                                                                                           ⟨297989⟩",
+    "    v85 = 0                                                                                           ⟨298007⟩",
+    "    v84 = 0                                                                                           ⟨298008⟩",
+    "    v75 = 0                                                                                           ⟨298026⟩",
+    "    v74 = 0                                                                                           ⟨298027⟩",
+    "    v65 = 0                                                                                           ⟨298045⟩",
+    "    v64 = 0                                                                                           ⟨298046⟩",
     "    v40 = 0                                                                                           ⟨298092⟩",
     "    v35 = 0                                                                                           ⟨298093⟩",
     "    v34 = 0                                                                                           ⟨298094⟩",
@@ -2249,6 +2459,9 @@
     "charge(midgames 24)                                                                                   ⟨298192⟩",
     "charge(mid20 0)                                                                                       ⟨298204⟩",
     "charge(mid20 8)                                                                                       ⟨298216⟩",
+    "v316 = 2                                                                                              ⟨298219⟩",
+    "v315 = 0                                                                                              ⟨298220⟩",
+    "v314 = 0                                                                                              ⟨298221⟩",
     "",
     "──── scène4 ────",
     "scène4 = Scene_Create(cadence=9, palette=255, surface=&v532)                                          ⟨298228⟩",
@@ -2268,16 +2481,23 @@
     "palette_envoie(palette=pal1, pas=0)                                                                   ⟨298332⟩",
     "v332 = 3                                                                                              ⟨298334⟩",
     "di = -1                                                                                               ⟨298335⟩",
+    "v334 = 1                                                                                              ⟨298336⟩",
     "tant que (scène4.compteur < 40) et (scène4.terminée == 0) :",
     "    si = scène4.compteur                                                                              ⟨298341⟩",
     "    si scène4.compteur == 1 :",
-    "        v336 = midgames 0.+0                                                                          ⟨298345⟩",
+    "        v336 = v334                                                                                   ⟨298345⟩",
+    "        v334_avant = v334                                                                             ⟨298346⟩",
+    "        v334 = v334 + 1                                                                               ⟨298346⟩",
     "        c25.image = v336                                                                              ⟨298349⟩",
     "    si scène4.compteur > 10 :",
     "        si scène4.compteur & 1 != 0 :",
-    "            v338 = midgames 0.+0                                                                      ⟨298357⟩",
+    "            v338 = v334                                                                               ⟨298357⟩",
+    "            v334_avant = v334                                                                         ⟨298358⟩",
+    "            v334 = v334 + 1                                                                           ⟨298358⟩",
     "            c25.image = v338                                                                          ⟨298361⟩",
     "    v332 = v332 + di                                                                                  ⟨298365⟩",
+    "    si v332 < 0 :",
+    "        v332 = 0                                                                                      ⟨298368⟩",
     "    c24.image = v332                                                                                  ⟨298375⟩",
     "    si scène4.compteur == 2 :",
     "        di = 1                                                                                        ⟨298378⟩",
@@ -2307,10 +2527,13 @@
     "tant que (scène4.compteur < v2 + ((v6·70) / 100)) et (scène4.terminée == 0) :",
     "    si = scène4.compteur                                                                              ⟨298481⟩",
     "    si scène4.compteur & 1 != 0 :",
-    "        si midgames 0.+0 < 33 :",
-    "            v336 = midgames 0.+0                                                                      ⟨298487⟩",
+    "        si v334 < 33 :",
+    "            v336 = v334                                                                               ⟨298487⟩",
+    "            v334_avant = v334                                                                         ⟨298488⟩",
+    "            v334 = v334 + 1                                                                           ⟨298488⟩",
     "            c25.image = v336                                                                          ⟨298491⟩",
     "    v338 = v332                                                                                       ⟨298496⟩",
+    "    v332_avant = v332                                                                                 ⟨298497⟩",
     "    v332 = v332 + 1                                                                                   ⟨298497⟩",
     "    c24.image = v338                                                                                  ⟨298500⟩",
     "    si v332 > 13 :",
@@ -2326,9 +2549,45 @@
     "si v12 != 0 :",
     "    voix_arrête(voix=voix1)                                                                           ⟨298586⟩",
     "Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨298593⟩",
+    "v315 = 0                                                                                              ⟨298612⟩",
+    "v314 = 0                                                                                              ⟨298613⟩",
     "si byte_495FC != 0 :",
+    "    v253 = 0                                                                                          ⟨298637⟩",
+    "    v252 = 0                                                                                          ⟨298638⟩",
+    "    v243 = 0                                                                                          ⟨298656⟩",
+    "    v242 = 0                                                                                          ⟨298657⟩",
+    "    v233 = 0                                                                                          ⟨298675⟩",
+    "    v232 = 0                                                                                          ⟨298676⟩",
+    "    v217 = 0                                                                                          ⟨298699⟩",
+    "    v216 = 0                                                                                          ⟨298700⟩",
+    "    v201 = 0                                                                                          ⟨298723⟩",
+    "    v200 = 0                                                                                          ⟨298724⟩",
+    "    v185 = 0                                                                                          ⟨298747⟩",
+    "    v184 = 0                                                                                          ⟨298748⟩",
+    "    v175 = 0                                                                                          ⟨298766⟩",
+    "    v174 = 0                                                                                          ⟨298767⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨298771⟩",
+    "    v3408 = 0                                                                                         ⟨298789⟩",
+    "    v3403 = 0                                                                                         ⟨298790⟩",
+    "    v3402 = 0                                                                                         ⟨298791⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨298794⟩",
+    "    v1334 = 0                                                                                         ⟨298812⟩",
+    "    v1329 = 0                                                                                         ⟨298813⟩",
+    "    v1328 = 0                                                                                         ⟨298814⟩",
+    "    v155 = 0                                                                                          ⟨298837⟩",
+    "    v154 = 0                                                                                          ⟨298838⟩",
+    "    v115 = 0                                                                                          ⟨298886⟩",
+    "    v114 = 0                                                                                          ⟨298887⟩",
+    "    v105 = 0                                                                                          ⟨298905⟩",
+    "    v104 = 0                                                                                          ⟨298906⟩",
+    "    v95 = 0                                                                                           ⟨298924⟩",
+    "    v94 = 0                                                                                           ⟨298925⟩",
+    "    v85 = 0                                                                                           ⟨298943⟩",
+    "    v84 = 0                                                                                           ⟨298944⟩",
+    "    v75 = 0                                                                                           ⟨298962⟩",
+    "    v74 = 0                                                                                           ⟨298963⟩",
+    "    v65 = 0                                                                                           ⟨298981⟩",
+    "    v64 = 0                                                                                           ⟨298982⟩",
     "    v40 = 0                                                                                           ⟨299028⟩",
     "    v35 = 0                                                                                           ⟨299029⟩",
     "    v34 = 0                                                                                           ⟨299030⟩",
@@ -2336,6 +2595,9 @@
     "",
     "──── scène5 ────",
     "scène5 = Scene_Create(cadence=9, palette=255, surface=&v532)                                          ⟨299067⟩",
+    "v316 = 2                                                                                              ⟨299070⟩",
+    "v315 = 0                                                                                              ⟨299071⟩",
+    "v314 = 0                                                                                              ⟨299072⟩",
     "charge_convdata_type0(\"air\", drapeau=3)                                                               ⟨299077⟩",
     "palette_copie(destination=pal1, source=pal3(optpals 21))                                              ⟨299086⟩",
     "palette_copie(destination=pal1, source=pal2(midgames 6))                                              ⟨299095⟩",
@@ -2353,6 +2615,10 @@
     "Widget_Method_Dispatch8_314A9(zone1, 127)                                                             ⟨299169⟩",
     "c29 = ImageLayer(ressource=convdata type 0 \"air\", x=160, y=129, image=51)                             ⟨299177⟩",
     "ajoute c29 à scène5                                                                                   ⟨299183⟩",
+    "v3468 = 0                                                                                             ⟨299189⟩",
+    "v3464 = 2                                                                                             ⟨299190⟩",
+    "v3463 = 0                                                                                             ⟨299191⟩",
+    "v3462 = 0                                                                                             ⟨299192⟩",
     "v3470 = -1                                                                                            ⟨299194⟩",
     "si v13 != 0 :",
     "    charge(asoundfx 5)                                                                                ⟨299207⟩",
@@ -2361,47 +2627,63 @@
     "    v338 = word_48EAC                                                                                 ⟨299222⟩",
     "    si canal3.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨299229⟩",
-    "        sub_30C66(canal3.+0→4, v3470, v338, mid20 14.+0)                                              ⟨299236⟩",
+    "        AIL_set_relative_volume_30C66(canal3.+0→4, v3470, v338, mid20 14.+0)                          ⟨299236⟩",
     "si = 0                                                                                                ⟨299242⟩",
     "v342 = 1                                                                                              ⟨299243⟩",
     "si v12 != 0 :",
     "    Scene_Tick(scène=scène5)                                                                          ⟨299252⟩",
     "    charge(mid20voc 0)                                                                                ⟨299264⟩",
-    "    sub_9CF7(c28, mid20voc 0, 9)                                                                      ⟨299270⟩",
+    "    tête_voix(tête=c28, ressource=mid20voc 0, cadence=9)                                              ⟨299270⟩",
+    "    v354 = 0                                                                                          ⟨299272⟩",
     "    tant que v354 < 3 :",
     "        Scene_Tick(scène=scène5)                                                                      ⟨299279⟩",
     "        v354 = v354 + 1                                                                               ⟨299281⟩",
-    "    tant que sub_9C64(c28) != 0 :",
+    "    tant que tête_parle(tête=c28) != 0 :",
     "        si si == 0 :",
     "            CRT_Rand()                                                                                ⟨299292⟩",
-    "            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A2243                                       ⟨299299⟩",
-    "            si = -1                                                                                   ⟨299300⟩",
+    "            si (CRT_Rand()·7) / 32768 == 0 :",
+    "                si = -1                                                                               ⟨299300⟩",
+    "            sinon :",
+    "                si si == -1 :",
+    "                    si = 1                                                                            ⟨299308⟩",
+    "                sinon :",
+    "                    si si == 1 :",
+    "                        si = 0                                                                        ⟨299315⟩",
     "        sinon :",
     "            si si == -1 :",
     "                si = 1                                                                                ⟨299308⟩",
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨299315⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨299324⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨299330⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨299337⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨299324⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨299330⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨299337⟩",
     "        Scene_Tick(scène=scène5)                                                                      ⟨299351⟩",
+    "    v354 = 0                                                                                          ⟨299365⟩",
     "    tant que v354 < 10 :",
     "        si si == 0 :",
     "            CRT_Rand()                                                                                ⟨299372⟩",
-    "            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A22DE                                       ⟨299379⟩",
-    "            si = -1                                                                                   ⟨299380⟩",
+    "            si (CRT_Rand()·7) / 32768 == 0 :",
+    "                si = -1                                                                               ⟨299380⟩",
+    "            sinon :",
+    "                si si == -1 :",
+    "                    si = 1                                                                            ⟨299388⟩",
+    "                sinon :",
+    "                    si si == 1 :",
+    "                        si = 0                                                                        ⟨299395⟩",
     "        sinon :",
     "            si si == -1 :",
     "                si = 1                                                                                ⟨299388⟩",
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨299395⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨299404⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨299410⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨299417⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨299404⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨299410⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨299417⟩",
     "        Scene_Tick(scène=scène5)                                                                      ⟨299431⟩",
     "        v354 = v354 + 1                                                                               ⟨299433⟩",
+    "    v352 = 0                                                                                          ⟨299459⟩",
+    "    pal8(mid20 14).+0 = 0                                                                             ⟨299461⟩",
     "sinon :",
     "    v6 = 58                                                                                           ⟨299466⟩",
     "    v2 = scène5.compteur                                                                              ⟨299468⟩",
@@ -2410,17 +2692,23 @@
     "        v344 = scène5.compteur                                                                        ⟨299483⟩",
     "        si si == 0 :",
     "            CRT_Rand()                                                                                ⟨299486⟩",
-    "            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A23DD                                       ⟨299493⟩",
-    "            si = -1                                                                                   ⟨299494⟩",
+    "            si (CRT_Rand()·7) / 32768 == 0 :",
+    "                si = -1                                                                               ⟨299494⟩",
+    "            sinon :",
+    "                si si == -1 :",
+    "                    si = 1                                                                            ⟨299502⟩",
+    "                sinon :",
+    "                    si si == 1 :",
+    "                        si = 0                                                                        ⟨299509⟩",
     "        sinon :",
     "            si si == -1 :",
     "                si = 1                                                                                ⟨299502⟩",
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨299509⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨299518⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨299524⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨299531⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨299518⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨299524⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨299531⟩",
     "        v342 = v342 + si                                                                              ⟨299533⟩",
     "        si v2 + 6 == v344 :",
     "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[5])                              ⟨299546⟩",
@@ -2441,17 +2729,23 @@
     "        v344 = scène5.compteur                                                                        ⟨299654⟩",
     "        si si == 0 :",
     "            CRT_Rand()                                                                                ⟨299657⟩",
-    "            si (CRT_Rand()·7) / -32768 != 0 : aller à loc_A257D                                       ⟨299664⟩",
-    "            si = -1                                                                                   ⟨299665⟩",
+    "            si (CRT_Rand()·7) / 32768 == 0 :",
+    "                si = -1                                                                               ⟨299665⟩",
+    "            sinon :",
+    "                si si == -1 :",
+    "                    si = 1                                                                            ⟨299673⟩",
+    "                sinon :",
+    "                    si si == 1 :",
+    "                        si = 0                                                                        ⟨299680⟩",
     "        sinon :",
     "            si si == -1 :",
     "                si = 1                                                                                ⟨299673⟩",
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨299680⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨299689⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨299695⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨299702⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨299689⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨299695⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨299702⟩",
     "        v342 = v342 + si                                                                              ⟨299704⟩",
     "        si v2 + 10 == v344 :",
     "            sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[6])                              ⟨299717⟩",
@@ -2468,10 +2762,49 @@
     "            Primitive_SetRectColorAndDraw_2CBE5(&v3484, v579, v577, v575, v573, 0, &v602)             ⟨299759⟩",
     "        Scene_Tick(scène=scène5)                                                                      ⟨299791⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨299820⟩",
+    "v3468 = 0                                                                                             ⟨299838⟩",
+    "v3463 = 0                                                                                             ⟨299839⟩",
+    "v3462 = 0                                                                                             ⟨299840⟩",
+    "v315 = 0                                                                                              ⟨299877⟩",
+    "v314 = 0                                                                                              ⟨299878⟩",
     "Scene_Destruct(scène=scène5, drapeaux=0)                                                              ⟨299882⟩",
     "si byte_495FC != 0 :",
+    "    v253 = 0                                                                                          ⟨299907⟩",
+    "    v252 = 0                                                                                          ⟨299908⟩",
+    "    v243 = 0                                                                                          ⟨299926⟩",
+    "    v242 = 0                                                                                          ⟨299927⟩",
+    "    v233 = 0                                                                                          ⟨299945⟩",
+    "    v232 = 0                                                                                          ⟨299946⟩",
+    "    v217 = 0                                                                                          ⟨299969⟩",
+    "    v216 = 0                                                                                          ⟨299970⟩",
+    "    v201 = 0                                                                                          ⟨299993⟩",
+    "    v200 = 0                                                                                          ⟨299994⟩",
+    "    v185 = 0                                                                                          ⟨300017⟩",
+    "    v184 = 0                                                                                          ⟨300018⟩",
+    "    v175 = 0                                                                                          ⟨300036⟩",
+    "    v174 = 0                                                                                          ⟨300037⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨300041⟩",
+    "    v3408 = 0                                                                                         ⟨300059⟩",
+    "    v3403 = 0                                                                                         ⟨300060⟩",
+    "    v3402 = 0                                                                                         ⟨300061⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨300064⟩",
+    "    v1334 = 0                                                                                         ⟨300082⟩",
+    "    v1329 = 0                                                                                         ⟨300083⟩",
+    "    v1328 = 0                                                                                         ⟨300084⟩",
+    "    v155 = 0                                                                                          ⟨300107⟩",
+    "    v154 = 0                                                                                          ⟨300108⟩",
+    "    v115 = 0                                                                                          ⟨300156⟩",
+    "    v114 = 0                                                                                          ⟨300157⟩",
+    "    v105 = 0                                                                                          ⟨300175⟩",
+    "    v104 = 0                                                                                          ⟨300176⟩",
+    "    v95 = 0                                                                                           ⟨300194⟩",
+    "    v94 = 0                                                                                           ⟨300195⟩",
+    "    v85 = 0                                                                                           ⟨300213⟩",
+    "    v84 = 0                                                                                           ⟨300214⟩",
+    "    v75 = 0                                                                                           ⟨300232⟩",
+    "    v74 = 0                                                                                           ⟨300233⟩",
+    "    v65 = 0                                                                                           ⟨300251⟩",
+    "    v64 = 0                                                                                           ⟨300252⟩",
     "    v40 = 0                                                                                           ⟨300298⟩",
     "    v35 = 0                                                                                           ⟨300299⟩",
     "    v34 = 0                                                                                           ⟨300300⟩",
@@ -2482,6 +2815,9 @@
     "palette_depuis(pal13(mid20 15))                                                                       ⟨300377⟩",
     "charge(mid20 2)                                                                                       ⟨300389⟩",
     "charge(mid20 3)                                                                                       ⟨300401⟩",
+    "v316 = 2                                                                                              ⟨300404⟩",
+    "v315 = 0                                                                                              ⟨300405⟩",
+    "v314 = 0                                                                                              ⟨300406⟩",
     "charge(mid20 4)                                                                                       ⟨300413⟩",
     "",
     "──── scène6 ────",
@@ -2511,7 +2847,14 @@
     "c37.image = 0                                                                                         ⟨300589⟩",
     "c36.image = 0                                                                                         ⟨300591⟩",
     "di = 0                                                                                                ⟨300592⟩",
+    "v348 = 0                                                                                              ⟨300593⟩",
+    "v350 = 0                                                                                              ⟨300594⟩",
+    "v352 = 0                                                                                              ⟨300595⟩",
     "Scene_Tick(scène=scène6)                                                                              ⟨300598⟩",
+    "v3468 = 0                                                                                             ⟨300604⟩",
+    "v3464 = 2                                                                                             ⟨300605⟩",
+    "v3463 = 0                                                                                             ⟨300606⟩",
+    "v3462 = 0                                                                                             ⟨300607⟩",
     "v3470 = -1                                                                                            ⟨300609⟩",
     "si v13 != 0 :",
     "    charge(asoundfx 105)                                                                              ⟨300622⟩",
@@ -2520,7 +2863,10 @@
     "    v364 = word_48F74                                                                                 ⟨300637⟩",
     "    si canal3.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal3.+0→4, séquence=v3470)                                        ⟨300644⟩",
-    "        sub_30C66(canal3.+0→4, v3470, v364, mid20 11.+0)                                              ⟨300651⟩",
+    "        AIL_set_relative_volume_30C66(canal3.+0→4, v3470, v364, mid20 11.+0)                          ⟨300651⟩",
+    "v372 = 2                                                                                              ⟨300658⟩",
+    "v371 = 0                                                                                              ⟨300659⟩",
+    "v370 = 0                                                                                              ⟨300660⟩",
     "si v12 != 0 :",
     "    charge(mid20voc 1)                                                                                ⟨300669⟩",
     "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid20voc 1)                                 ⟨300675⟩",
@@ -2529,14 +2875,15 @@
     "tant que (scène6.compteur < 186) et (scène6.terminée == 0) :",
     "    si = scène6.compteur                                                                              ⟨300693⟩",
     "    v378 = v348                                                                                       ⟨300695⟩",
+    "    v348_avant = v348                                                                                 ⟨300696⟩",
     "    v348 = v348 + 1                                                                                   ⟨300696⟩",
     "    c37.image = v378                                                                                  ⟨300699⟩",
     "    si scène6.compteur < 40 :",
-    "        c37.méthode24(0, 1)                                                                           ⟨300707⟩",
+    "        déplace(calque=c37, dx=0, dy=1)                                                               ⟨300707⟩",
     "    si scène6.compteur > 40 :",
     "        si scène6.compteur < 60 :",
     "            si scène6.compteur & 1 != 0 :",
-    "                c37.méthode24(0, 1)                                                                   ⟨300722⟩",
+    "                déplace(calque=c37, dx=0, dy=1)                                                       ⟨300722⟩",
     "    si scène6.compteur == 20 :",
     "        si v12 != 0 :",
     "            voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                           ⟨300734⟩",
@@ -2558,7 +2905,9 @@
     "            c36.image = v380                                                                          ⟨300790⟩",
     "    si scène6.compteur > 5 :",
     "        si scène6.compteur < 15 :",
-    "            v382 = convdata type 2 \"normal\".+0                                                        ⟨300799⟩",
+    "            v382 = v350                                                                               ⟨300799⟩",
+    "            v350_avant = v350                                                                         ⟨300800⟩",
+    "            v350 = v350 + 1                                                                           ⟨300800⟩",
     "            c35.image = v382                                                                          ⟨300803⟩",
     "    si scène6.compteur > 19 :",
     "        si scène6.compteur < 51 :",
@@ -2580,7 +2929,9 @@
     "                c36.image = v388                                                                      ⟨300845⟩",
     "    si scène6.compteur > 45 :",
     "        si scène6.compteur < 55 :",
-    "            v390 = mid20voc 0.+0                                                                      ⟨300854⟩",
+    "            v390 = v352                                                                               ⟨300854⟩",
+    "            v352_avant = v352                                                                         ⟨300855⟩",
+    "            v352 = v352 + 1                                                                           ⟨300855⟩",
     "            c35.image = v390                                                                          ⟨300858⟩",
     "    si scène6.compteur == 87 :",
     "        di = di - 2                                                                                   ⟨300864⟩",
@@ -2591,19 +2942,66 @@
     "    si scène6.compteur == 141 :",
     "        di = di - 1                                                                                   ⟨300879⟩",
     "        c36.image = di                                                                                ⟨300882⟩",
-    "    aller à loc_A3407                                                                                 ⟨300885⟩",
-    "    aller à loc_A3433                                                                                 ⟨300912⟩",
-    "    loc_A3407:                                                                                        ⟨300915⟩",
     "    Scene_Tick(scène=scène6)                                                                          ⟨300919⟩",
-    "loc_A3433:                                                                                            ⟨300943⟩",
     "si v12 != 0 :",
     "    voix_arrête(voix=voix1)                                                                           ⟨300949⟩",
     "scène6.compteur = 0                                                                                   ⟨300953⟩",
     "fondu_disparition(palette=pal1, couleur=&v30, pas=2, premier=0, nombre=256)                           ⟨300961⟩",
+    "v371 = 0                                                                                              ⟨300980⟩",
+    "v370 = 0                                                                                              ⟨300981⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨300984⟩",
+    "v3468 = 0                                                                                             ⟨301002⟩",
+    "v3463 = 0                                                                                             ⟨301003⟩",
+    "v3462 = 0                                                                                             ⟨301004⟩",
+    "v357 = 0                                                                                              ⟨301022⟩",
+    "v338 = 0                                                                                              ⟨301042⟩",
     "Scene_Destruct(scène=scène6, drapeaux=0)                                                              ⟨301046⟩",
+    "v315 = 0                                                                                              ⟨301065⟩",
+    "v314 = 0                                                                                              ⟨301066⟩",
+    "v305 = 0                                                                                              ⟨301084⟩",
+    "v304 = 0                                                                                              ⟨301085⟩",
+    "v295 = 0                                                                                              ⟨301103⟩",
+    "v294 = 0                                                                                              ⟨301104⟩",
+    "v279 = 0                                                                                              ⟨301127⟩",
+    "v278 = 0                                                                                              ⟨301128⟩",
+    "v263 = 0                                                                                              ⟨301151⟩",
+    "v262 = 0                                                                                              ⟨301152⟩",
+    "v253 = 0                                                                                              ⟨301170⟩",
+    "v252 = 0                                                                                              ⟨301171⟩",
+    "v243 = 0                                                                                              ⟨301189⟩",
+    "v242 = 0                                                                                              ⟨301190⟩",
+    "v233 = 0                                                                                              ⟨301208⟩",
+    "v232 = 0                                                                                              ⟨301209⟩",
+    "v217 = 0                                                                                              ⟨301232⟩",
+    "v216 = 0                                                                                              ⟨301233⟩",
+    "v201 = 0                                                                                              ⟨301256⟩",
+    "v200 = 0                                                                                              ⟨301257⟩",
+    "v185 = 0                                                                                              ⟨301280⟩",
+    "v184 = 0                                                                                              ⟨301281⟩",
+    "v175 = 0                                                                                              ⟨301299⟩",
+    "v174 = 0                                                                                              ⟨301300⟩",
     "voix_arrête(voix=voix1)                                                                               ⟨301304⟩",
+    "v3408 = 0                                                                                             ⟨301322⟩",
+    "v3403 = 0                                                                                             ⟨301323⟩",
+    "v3402 = 0                                                                                             ⟨301324⟩",
     "canal_arrête(canal=canal2)                                                                            ⟨301327⟩",
+    "v1334 = 0                                                                                             ⟨301345⟩",
+    "v1329 = 0                                                                                             ⟨301346⟩",
+    "v1328 = 0                                                                                             ⟨301347⟩",
+    "v155 = 0                                                                                              ⟨301370⟩",
+    "v154 = 0                                                                                              ⟨301371⟩",
+    "v115 = 0                                                                                              ⟨301419⟩",
+    "v114 = 0                                                                                              ⟨301420⟩",
+    "v105 = 0                                                                                              ⟨301438⟩",
+    "v104 = 0                                                                                              ⟨301439⟩",
+    "v95 = 0                                                                                               ⟨301457⟩",
+    "v94 = 0                                                                                               ⟨301458⟩",
+    "v85 = 0                                                                                               ⟨301476⟩",
+    "v84 = 0                                                                                               ⟨301477⟩",
+    "v75 = 0                                                                                               ⟨301495⟩",
+    "v74 = 0                                                                                               ⟨301496⟩",
+    "v65 = 0                                                                                               ⟨301514⟩",
+    "v64 = 0                                                                                               ⟨301515⟩",
     "v40 = 0                                                                                               ⟨301561⟩",
     "v35 = 0                                                                                               ⟨301562⟩",
     "v34 = 0                                                                                               ⟨301563⟩",
@@ -2966,6 +3364,14 @@
     {
      "t": "affecte",
      "cible": {
+      "local": "v579"
+     },
+     "valeur": 0,
+     "ligne": 293862
+    },
+    {
+     "t": "affecte",
+     "cible": {
       "local": "v577"
      },
      "valeur": {
@@ -3262,6 +3668,54 @@
      "ligne": 294097
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v350"
+     },
+     "valeur": 0,
+     "ligne": 294115
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v344"
+     },
+     "valeur": 0,
+     "ligne": 294117
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 0,
+     "ligne": 294136
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v324"
+     },
+     "valeur": 0,
+     "ligne": 294155
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 294173
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 294174
+    },
+    {
      "t": "si",
      "cond": {
       "cmp": "!=",
@@ -3272,31 +3726,42 @@
      },
      "alors": [
       {
-       "t": "saut_si",
+       "t": "si",
        "cond": {
-        "cmp": "==",
+        "cmp": "!=",
         "a": {
          "résultat": "sub_6734(chemin1)"
         },
         "b": 0
        },
-       "cible": "loc_9E696",
-       "ligne": 294197
-      },
-      {
-       "t": "appel",
-       "nom": "pak mid20voc.ouvre",
-       "args": [
+       "alors": [
         {
-         "objet": "chemin1"
-        },
-        1
+         "t": "appel",
+         "nom": "pak mid20voc.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 294204
+        }
        ],
-       "texte": [
-        "chemin1",
-        "1"
+       "sinon": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v12"
+         },
+         "valeur": 0,
+         "ligne": 294211
+        }
        ],
-       "ligne": 294204
+       "ligne": 294197
       }
      ],
      "sinon": [
@@ -3419,6 +3884,14 @@
          },
          "valeur": 256,
          "ligne": 294282
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v3499"
+         },
+         "valeur": 0,
+         "ligne": 294283
         },
         {
          "t": "appel",
@@ -3696,6 +4169,14 @@
          "ligne": 294418
         },
         {
+         "t": "affecte",
+         "cible": {
+          "local": "v3499"
+         },
+         "valeur": 0,
+         "ligne": 294419
+        },
+        {
          "t": "appel",
          "nom": "flux1.ouvre",
          "args": [
@@ -3969,6 +4450,30 @@
        },
        "corps": [
         {
+         "t": "affecte",
+         "cible": {
+          "local": "v316"
+         },
+         "valeur": 2,
+         "ligne": 294535
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v315"
+         },
+         "valeur": 0,
+         "ligne": 294536
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v314"
+         },
+         "valeur": 0,
+         "ligne": 294537
+        },
+        {
          "t": "op",
          "op": "charge",
          "args": {
@@ -4021,6 +4526,22 @@
         {
          "t": "affecte",
          "cible": {
+          "local": "v315"
+         },
+         "valeur": 0,
+         "ligne": 294576
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v314"
+         },
+         "valeur": 0,
+         "ligne": 294577
+        },
+        {
+         "t": "affecte",
+         "cible": {
           "local": "si"
          },
          "valeur": {
@@ -4047,6 +4568,14 @@
         "canal=canal1"
        ],
        "ligne": 294589
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3434"
+       },
+       "valeur": 0,
+       "ligne": 294607
       }
      ],
      "sinon": [],
@@ -4265,6 +4794,14 @@
        },
        "valeur": 256,
        "ligne": 294702
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3499"
+       },
+       "valeur": 0,
+       "ligne": 294703
       },
       {
        "t": "appel",
@@ -4765,6 +5302,30 @@
        "ligne": 294861
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 294879
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 294880
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 294881
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -4776,6 +5337,142 @@
         "canal=canal2"
        ],
        "ligne": 294884
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 294902
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 294903
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 294904
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 294927
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 294928
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 294976
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 294977
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 294995
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 294996
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 295014
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 295015
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 295033
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 295034
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 295052
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 295053
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 295071
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 295072
       },
       {
        "t": "affecte",
@@ -4872,7 +5569,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -4919,6 +5616,30 @@
      "ligne": 295178
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 295180
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 295181
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 295182
+    },
+    {
      "t": "op",
      "op": "charge",
      "args": {
@@ -4934,6 +5655,14 @@
      "ligne": 295189
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v324"
+     },
+     "valeur": 0,
+     "ligne": 295194
+    },
+    {
      "t": "op",
      "op": "charge",
      "args": {
@@ -4947,6 +5676,14 @@
       "mid20 6"
      ],
      "ligne": 295201
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 0,
+     "ligne": 295206
     },
     {
      "t": "op",
@@ -5326,6 +6063,14 @@
     {
      "t": "affecte",
      "cible": {
+      "local": "v3482"
+     },
+     "valeur": 0,
+     "ligne": 295365
+    },
+    {
+     "t": "affecte",
+     "cible": {
       "local": "v3477"
      },
      "valeur": 0,
@@ -5338,6 +6083,14 @@
      },
      "valeur": 0,
      "ligne": 295368
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3486"
+     },
+     "valeur": 0,
+     "ligne": 295369
     },
     {
      "t": "affecte",
@@ -5458,7 +6211,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -5578,6 +6331,30 @@
        "ligne": 295447
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3482"
+       },
+       "valeur": 0,
+       "ligne": 295465
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v399"
+       },
+       "valeur": 0,
+       "ligne": 295485
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v398"
+       },
+       "valeur": 0,
+       "ligne": 295486
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -5589,6 +6366,38 @@
         "canal=canal3"
        ],
        "ligne": 295489
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3468"
+       },
+       "valeur": 0,
+       "ligne": 295507
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3463"
+       },
+       "valeur": 0,
+       "ligne": 295508
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3462"
+       },
+       "valeur": 0,
+       "ligne": 295509
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v388"
+       },
+       "valeur": 0,
+       "ligne": 295528
       },
       {
        "t": "op",
@@ -5606,6 +6415,70 @@
        "ligne": 295532
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v371"
+       },
+       "valeur": 0,
+       "ligne": 295551
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v370"
+       },
+       "valeur": 0,
+       "ligne": 295552
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v360"
+       },
+       "valeur": 0,
+       "ligne": 295571
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v350"
+       },
+       "valeur": 0,
+       "ligne": 295590
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v334"
+       },
+       "valeur": 0,
+       "ligne": 295614
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v324"
+       },
+       "valeur": 0,
+       "ligne": 295633
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v315"
+       },
+       "valeur": 0,
+       "ligne": 295651
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v314"
+       },
+       "valeur": 0,
+       "ligne": 295652
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -5619,6 +6492,30 @@
        "ligne": 295656
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 295674
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 295675
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 295676
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -5630,6 +6527,142 @@
         "canal=canal2"
        ],
        "ligne": 295679
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 295697
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 295698
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 295699
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 295722
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 295723
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 295771
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 295772
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 295790
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 295791
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 295809
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 295810
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 295828
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 295829
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 295847
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 295848
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 295866
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 295867
       },
       {
        "t": "affecte",
@@ -6032,15 +7065,19 @@
            },
            "alors": [
             {
-             "t": "appel",
-             "nom": "c4.méthode24",
-             "args": [
-              0,
-              -1
-             ],
+             "t": "op",
+             "op": "déplace",
+             "args": {
+              "calque": {
+               "objet": "c4"
+              },
+              "dx": 0,
+              "dy": -1
+             },
              "texte": [
-              "0",
-              "-1"
+              "calque=c4",
+              "dx=0",
+              "dy=-1"
              ],
              "ligne": 296090
             }
@@ -6091,15 +7128,19 @@
          },
          "alors": [
           {
-           "t": "appel",
-           "nom": "c5.méthode24",
-           "args": [
-            0,
-            -1
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c5"
+            },
+            "dx": 0,
+            "dy": -1
+           },
            "texte": [
-            "0",
-            "-1"
+            "calque=c5",
+            "dx=0",
+            "dy=-1"
            ],
            "ligne": 296104
           }
@@ -6261,6 +7302,16 @@
           {
            "t": "affecte",
            "cible": {
+            "local": "v424_avant"
+           },
+           "valeur": {
+            "local": "v424"
+           },
+           "ligne": 296168
+          },
+          {
+           "t": "affecte",
+           "cible": {
             "local": "v424"
            },
            "valeur": {
@@ -6329,28 +7380,36 @@
            "ligne": 296178
           },
           {
-           "t": "appel",
-           "nom": "c2.méthode24",
-           "args": [
-            -1,
-            0
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c2"
+            },
+            "dx": -1,
+            "dy": 0
+           },
            "texte": [
-            "-1",
-            "0"
+            "calque=c2",
+            "dx=-1",
+            "dy=0"
            ],
            "ligne": 296184
           },
           {
-           "t": "appel",
-           "nom": "c3.méthode24",
-           "args": [
-            1,
-            0
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c3"
+            },
+            "dx": 1,
+            "dy": 0
+           },
            "texte": [
-            "1",
-            "0"
+            "calque=c3",
+            "dx=1",
+            "dy=0"
            ],
            "ligne": 296191
           }
@@ -6394,6 +7453,16 @@
           "local": "v422"
          },
          "ligne": 296201
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v422_avant"
+         },
+         "valeur": {
+          "local": "v422"
+         },
+         "ligne": 296202
         },
         {
          "t": "affecte",
@@ -6570,7 +7639,7 @@
             },
             {
              "t": "appel",
-             "nom": "sub_30C66",
+             "nom": "AIL_set_relative_volume_30C66",
              "args": [
               {
                "déréf": {
@@ -6708,6 +7777,30 @@
      "ligne": 296302
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v3482"
+     },
+     "valeur": 0,
+     "ligne": 296320
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v399"
+     },
+     "valeur": 0,
+     "ligne": 296340
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v398"
+     },
+     "valeur": 0,
+     "ligne": 296341
+    },
+    {
      "t": "op",
      "op": "canal_arrête",
      "args": {
@@ -6719,6 +7812,38 @@
       "canal=canal3"
      ],
      "ligne": 296344
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 296362
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 296363
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 296364
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v388"
+     },
+     "valeur": 0,
+     "ligne": 296383
     },
     {
      "t": "op",
@@ -6734,6 +7859,70 @@
       "drapeaux=0"
      ],
      "ligne": 296387
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v371"
+     },
+     "valeur": 0,
+     "ligne": 296406
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v370"
+     },
+     "valeur": 0,
+     "ligne": 296407
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v360"
+     },
+     "valeur": 0,
+     "ligne": 296426
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v350"
+     },
+     "valeur": 0,
+     "ligne": 296445
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 0,
+     "ligne": 296469
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v324"
+     },
+     "valeur": 0,
+     "ligne": 296488
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 296506
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 296507
     },
     {
      "t": "op",
@@ -6767,6 +7956,30 @@
        "ligne": 296518
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 296536
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 296537
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 296538
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -6778,6 +7991,142 @@
         "canal=canal2"
        ],
        "ligne": 296541
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 296559
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 296560
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 296561
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 296584
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 296585
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 296633
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 296634
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 296652
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 296653
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 296671
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 296672
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 296690
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 296691
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 296709
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 296710
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 296728
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 296729
       },
       {
        "t": "affecte",
@@ -6835,6 +8184,30 @@
      "nom": "scène2",
      "cadence": "9",
      "ligne": 296826
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 296829
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 296830
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 296831
     },
     {
      "t": "op",
@@ -7073,6 +8446,38 @@
     {
      "t": "affecte",
      "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 296946
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3464"
+     },
+     "valeur": 2,
+     "ligne": 296947
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 296948
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 296949
+    },
+    {
+     "t": "affecte",
+     "cible": {
       "local": "v3470"
      },
      "valeur": -1,
@@ -7152,6 +8557,14 @@
        "ligne": 296979
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v350"
+       },
+       "valeur": 0,
+       "ligne": 296980
+      },
+      {
        "t": "si",
        "cond": {
         "cmp": "!=",
@@ -7189,7 +8602,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -7207,17 +8620,14 @@
            "local": "v348"
           },
           {
-           "champ": [
-            "r10",
-            "+0"
-           ]
+           "local": "v350"
           }
          ],
          "texte": [
           "canal3.+0→4",
           "v3470",
           "v348",
-          "convdata type 2 \"normal\".+0"
+          "v350"
          ],
          "ligne": 296993
         }
@@ -7294,9 +8704,9 @@
          "ligne": 297007
         },
         {
-         "t": "saut_si",
+         "t": "si",
          "cond": {
-          "cmp": "!=",
+          "cmp": "==",
           "a": {
            "op": "/",
            "a": {
@@ -7306,20 +8716,68 @@
             },
             "b": 7
            },
-           "b": -32768
+           "b": 32768
           },
           "b": 0
          },
-         "cible": "loc_A07DE",
+         "alors": [
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "si"
+           },
+           "valeur": -1,
+           "ligne": 297015
+          }
+         ],
+         "sinon": [
+          {
+           "t": "si",
+           "cond": {
+            "cmp": "==",
+            "a": {
+             "local": "si"
+            },
+            "b": -1
+           },
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "si"
+             },
+             "valeur": 1,
+             "ligne": 297023
+            }
+           ],
+           "sinon": [
+            {
+             "t": "si",
+             "cond": {
+              "cmp": "==",
+              "a": {
+               "local": "si"
+              },
+              "b": 1
+             },
+             "alors": [
+              {
+               "t": "affecte",
+               "cible": {
+                "local": "si"
+               },
+               "valeur": 0,
+               "ligne": 297030
+              }
+             ],
+             "sinon": [],
+             "ligne": 297029
+            }
+           ],
+           "ligne": 297022
+          }
+         ],
          "ligne": 297014
-        },
-        {
-         "t": "affecte",
-         "cible": {
-          "local": "si"
-         },
-         "valeur": -1,
-         "ligne": 297015
         }
        ],
        "sinon": [
@@ -7376,47 +8834,59 @@
        "nom": "loc_A07EF"
       },
       {
-       "t": "appel",
-       "nom": "c11.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c11"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c11",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297039
       },
       {
-       "t": "appel",
-       "nom": "c12.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c12"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c12",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297045
       },
       {
-       "t": "appel",
-       "nom": "c13.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c13"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c13",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 297052
       },
@@ -7466,6 +8936,62 @@
      "ligne": 297095
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 297113
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 297114
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 297115
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 0,
+     "ligne": 297151
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v328"
+     },
+     "valeur": 0,
+     "ligne": 297153
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 297171
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 297172
+    },
+    {
      "t": "op",
      "op": "Scene_Destruct",
      "args": {
@@ -7492,6 +9018,22 @@
      },
      "alors": [
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v175"
+       },
+       "valeur": 0,
+       "ligne": 297201
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v174"
+       },
+       "valeur": 0,
+       "ligne": 297202
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -7505,6 +9047,30 @@
        "ligne": 297206
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 297224
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 297225
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 297226
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -7516,6 +9082,142 @@
         "canal=canal2"
        ],
        "ligne": 297229
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 297247
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 297248
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 297249
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 297272
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 297273
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 297321
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 297322
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 297340
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 297341
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 297359
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 297360
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 297378
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 297379
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 297397
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 297398
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 297416
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 297417
       },
       {
        "t": "affecte",
@@ -7558,6 +9260,30 @@
      "nom": "scène3",
      "cadence": "15",
      "ligne": 297502
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 297505
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 297506
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 297507
     },
     {
      "t": "op",
@@ -7937,7 +9663,7 @@
           },
           "b": 3
          },
-         "b": -32768
+         "b": 32768
         },
         "b": 1
        },
@@ -8040,6 +9766,38 @@
      "ligne": 297681
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 0,
+     "ligne": 297763
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v324"
+     },
+     "valeur": 0,
+     "ligne": 297782
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 297800
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 297801
+    },
+    {
      "t": "op",
      "op": "Scene_Destruct",
      "args": {
@@ -8066,6 +9824,22 @@
      },
      "alors": [
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v175"
+       },
+       "valeur": 0,
+       "ligne": 297830
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v174"
+       },
+       "valeur": 0,
+       "ligne": 297831
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -8079,6 +9853,30 @@
        "ligne": 297835
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 297853
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 297854
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 297855
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -8090,6 +9888,142 @@
         "canal=canal2"
        ],
        "ligne": 297858
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 297876
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 297877
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 297878
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 297901
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 297902
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 297950
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 297951
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 297969
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 297970
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 297988
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 297989
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 298007
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 298008
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 298026
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 298027
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 298045
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 298046
       },
       {
        "t": "affecte",
@@ -8264,6 +10198,30 @@
       "mid20 8"
      ],
      "ligne": 298216
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 298219
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 298220
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 298221
     },
     {
      "t": "scène",
@@ -8486,6 +10444,14 @@
      "ligne": 298335
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v334"
+     },
+     "valeur": 1,
+     "ligne": 298336
+    },
+    {
      "t": "tant_que",
      "cond": {
       "et": [
@@ -8544,12 +10510,33 @@
           "local": "v336"
          },
          "valeur": {
-          "champ": [
-           "r18",
-           "+0"
-          ]
+          "local": "v334"
          },
          "ligne": 298345
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v334_avant"
+         },
+         "valeur": {
+          "local": "v334"
+         },
+         "ligne": 298346
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v334"
+         },
+         "valeur": {
+          "op": "+",
+          "a": {
+           "local": "v334"
+          },
+          "b": 1
+         },
+         "ligne": 298346
         },
         {
          "t": "affecte",
@@ -8608,12 +10595,33 @@
             "local": "v338"
            },
            "valeur": {
-            "champ": [
-             "r18",
-             "+0"
-            ]
+            "local": "v334"
            },
            "ligne": 298357
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v334_avant"
+           },
+           "valeur": {
+            "local": "v334"
+           },
+           "ligne": 298358
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v334"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v334"
+            },
+            "b": 1
+           },
+           "ligne": 298358
           },
           {
            "t": "affecte",
@@ -8655,6 +10663,32 @@
         }
        },
        "ligne": 298365
+      },
+      {
+       "t": "si",
+       "cond": {
+        "cmp": "<",
+        "a": {
+         "local": "v332"
+        },
+        "b": 0
+       },
+       "alors": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v332"
+         },
+         "valeur": 0,
+         "ligne": 298368
+        }
+       ],
+       "sinon": [],
+       "ligne": 298367
+      },
+      {
+       "t": "label",
+       "nom": "loc_A17C2"
       },
       {
        "t": "affecte",
@@ -9106,10 +11140,7 @@
          "cond": {
           "cmp": "<",
           "a": {
-           "champ": [
-            "r18",
-            "+0"
-           ]
+           "local": "v334"
           },
           "b": 33
          },
@@ -9120,12 +11151,33 @@
             "local": "v336"
            },
            "valeur": {
-            "champ": [
-             "r18",
-             "+0"
-            ]
+            "local": "v334"
            },
            "ligne": 298487
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v334_avant"
+           },
+           "valeur": {
+            "local": "v334"
+           },
+           "ligne": 298488
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v334"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v334"
+            },
+            "b": 1
+           },
+           "ligne": 298488
           },
           {
            "t": "affecte",
@@ -9161,6 +11213,16 @@
         "local": "v332"
        },
        "ligne": 298496
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v332_avant"
+       },
+       "valeur": {
+        "local": "v332"
+       },
+       "ligne": 298497
       },
       {
        "t": "affecte",
@@ -9394,6 +11456,22 @@
      "ligne": 298593
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 298612
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 298613
+    },
+    {
      "t": "si",
      "cond": {
       "cmp": "!=",
@@ -9404,6 +11482,118 @@
       "b": 0
      },
      "alors": [
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v253"
+       },
+       "valeur": 0,
+       "ligne": 298637
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v252"
+       },
+       "valeur": 0,
+       "ligne": 298638
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v243"
+       },
+       "valeur": 0,
+       "ligne": 298656
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v242"
+       },
+       "valeur": 0,
+       "ligne": 298657
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v233"
+       },
+       "valeur": 0,
+       "ligne": 298675
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v232"
+       },
+       "valeur": 0,
+       "ligne": 298676
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v217"
+       },
+       "valeur": 0,
+       "ligne": 298699
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v216"
+       },
+       "valeur": 0,
+       "ligne": 298700
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v201"
+       },
+       "valeur": 0,
+       "ligne": 298723
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v200"
+       },
+       "valeur": 0,
+       "ligne": 298724
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v185"
+       },
+       "valeur": 0,
+       "ligne": 298747
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v184"
+       },
+       "valeur": 0,
+       "ligne": 298748
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v175"
+       },
+       "valeur": 0,
+       "ligne": 298766
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v174"
+       },
+       "valeur": 0,
+       "ligne": 298767
+      },
       {
        "t": "op",
        "op": "voix_arrête",
@@ -9418,6 +11608,30 @@
        "ligne": 298771
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 298789
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 298790
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 298791
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -9429,6 +11643,142 @@
         "canal=canal2"
        ],
        "ligne": 298794
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 298812
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 298813
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 298814
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 298837
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 298838
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 298886
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 298887
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 298905
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 298906
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 298924
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 298925
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 298943
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 298944
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 298962
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 298963
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 298981
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 298982
       },
       {
        "t": "affecte",
@@ -9471,6 +11821,30 @@
      "nom": "scène5",
      "cadence": "9",
      "ligne": 299067
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 299070
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 299071
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 299072
     },
     {
      "t": "op",
@@ -9724,6 +12098,38 @@
     {
      "t": "affecte",
      "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 299189
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3464"
+     },
+     "valeur": 2,
+     "ligne": 299190
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 299191
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 299192
+    },
+    {
+     "t": "affecte",
+     "cible": {
       "local": "v3470"
      },
      "valeur": -1,
@@ -9840,7 +12246,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -9939,23 +12345,31 @@
        "ligne": 299264
       },
       {
-       "t": "appel",
-       "nom": "sub_9CF7",
-       "args": [
-        {
+       "t": "op",
+       "op": "tête_voix",
+       "args": {
+        "tête": {
          "objet": "c28"
         },
-        {
+        "ressource": {
          "objet": "r27"
         },
-        9
-       ],
+        "cadence": 9
+       },
        "texte": [
-        "c28",
-        "mid20voc 0",
-        "9"
+        "tête=c28",
+        "ressource=mid20voc 0",
+        "cadence=9"
        ],
        "ligne": 299270
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v354"
+       },
+       "valeur": 0,
+       "ligne": 299272
       },
       {
        "t": "tant_que",
@@ -10002,7 +12416,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_9C64(c28)"
+         "résultat": "tête_parle(tête=c28)"
         },
         "b": 0
        },
@@ -10025,9 +12439,9 @@
            "ligne": 299292
           },
           {
-           "t": "saut_si",
+           "t": "si",
            "cond": {
-            "cmp": "!=",
+            "cmp": "==",
             "a": {
              "op": "/",
              "a": {
@@ -10037,20 +12451,68 @@
               },
               "b": 7
              },
-             "b": -32768
+             "b": 32768
             },
             "b": 0
            },
-           "cible": "loc_A2243",
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "si"
+             },
+             "valeur": -1,
+             "ligne": 299300
+            }
+           ],
+           "sinon": [
+            {
+             "t": "si",
+             "cond": {
+              "cmp": "==",
+              "a": {
+               "local": "si"
+              },
+              "b": -1
+             },
+             "alors": [
+              {
+               "t": "affecte",
+               "cible": {
+                "local": "si"
+               },
+               "valeur": 1,
+               "ligne": 299308
+              }
+             ],
+             "sinon": [
+              {
+               "t": "si",
+               "cond": {
+                "cmp": "==",
+                "a": {
+                 "local": "si"
+                },
+                "b": 1
+               },
+               "alors": [
+                {
+                 "t": "affecte",
+                 "cible": {
+                  "local": "si"
+                 },
+                 "valeur": 0,
+                 "ligne": 299315
+                }
+               ],
+               "sinon": [],
+               "ligne": 299314
+              }
+             ],
+             "ligne": 299307
+            }
+           ],
            "ligne": 299299
-          },
-          {
-           "t": "affecte",
-           "cible": {
-            "local": "si"
-           },
-           "valeur": -1,
-           "ligne": 299300
           }
          ],
          "sinon": [
@@ -10107,47 +12569,59 @@
          "nom": "loc_A2254"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299324
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299330
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299337
         },
@@ -10166,6 +12640,14 @@
         }
        ],
        "ligne": 299286
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v354"
+       },
+       "valeur": 0,
+       "ligne": 299365
       },
       {
        "t": "tant_que",
@@ -10195,9 +12677,9 @@
            "ligne": 299372
           },
           {
-           "t": "saut_si",
+           "t": "si",
            "cond": {
-            "cmp": "!=",
+            "cmp": "==",
             "a": {
              "op": "/",
              "a": {
@@ -10207,20 +12689,68 @@
               },
               "b": 7
              },
-             "b": -32768
+             "b": 32768
             },
             "b": 0
            },
-           "cible": "loc_A22DE",
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "si"
+             },
+             "valeur": -1,
+             "ligne": 299380
+            }
+           ],
+           "sinon": [
+            {
+             "t": "si",
+             "cond": {
+              "cmp": "==",
+              "a": {
+               "local": "si"
+              },
+              "b": -1
+             },
+             "alors": [
+              {
+               "t": "affecte",
+               "cible": {
+                "local": "si"
+               },
+               "valeur": 1,
+               "ligne": 299388
+              }
+             ],
+             "sinon": [
+              {
+               "t": "si",
+               "cond": {
+                "cmp": "==",
+                "a": {
+                 "local": "si"
+                },
+                "b": 1
+               },
+               "alors": [
+                {
+                 "t": "affecte",
+                 "cible": {
+                  "local": "si"
+                 },
+                 "valeur": 0,
+                 "ligne": 299395
+                }
+               ],
+               "sinon": [],
+               "ligne": 299394
+              }
+             ],
+             "ligne": 299387
+            }
+           ],
            "ligne": 299379
-          },
-          {
-           "t": "affecte",
-           "cible": {
-            "local": "si"
-           },
-           "valeur": -1,
-           "ligne": 299380
           }
          ],
          "sinon": [
@@ -10277,47 +12807,59 @@
          "nom": "loc_A22EF"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299404
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299410
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299417
         },
@@ -10350,6 +12892,25 @@
         }
        ],
        "ligne": 299366
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v352"
+       },
+       "valeur": 0,
+       "ligne": 299459
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "champ": [
+         "pal8",
+         "+0"
+        ]
+       },
+       "valeur": 0,
+       "ligne": 299461
       }
      ],
      "sinon": [
@@ -10458,9 +13019,9 @@
            "ligne": 299486
           },
           {
-           "t": "saut_si",
+           "t": "si",
            "cond": {
-            "cmp": "!=",
+            "cmp": "==",
             "a": {
              "op": "/",
              "a": {
@@ -10470,20 +13031,68 @@
               },
               "b": 7
              },
-             "b": -32768
+             "b": 32768
             },
             "b": 0
            },
-           "cible": "loc_A23DD",
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "si"
+             },
+             "valeur": -1,
+             "ligne": 299494
+            }
+           ],
+           "sinon": [
+            {
+             "t": "si",
+             "cond": {
+              "cmp": "==",
+              "a": {
+               "local": "si"
+              },
+              "b": -1
+             },
+             "alors": [
+              {
+               "t": "affecte",
+               "cible": {
+                "local": "si"
+               },
+               "valeur": 1,
+               "ligne": 299502
+              }
+             ],
+             "sinon": [
+              {
+               "t": "si",
+               "cond": {
+                "cmp": "==",
+                "a": {
+                 "local": "si"
+                },
+                "b": 1
+               },
+               "alors": [
+                {
+                 "t": "affecte",
+                 "cible": {
+                  "local": "si"
+                 },
+                 "valeur": 0,
+                 "ligne": 299509
+                }
+               ],
+               "sinon": [],
+               "ligne": 299508
+              }
+             ],
+             "ligne": 299501
+            }
+           ],
            "ligne": 299493
-          },
-          {
-           "t": "affecte",
-           "cible": {
-            "local": "si"
-           },
-           "valeur": -1,
-           "ligne": 299494
           }
          ],
          "sinon": [
@@ -10540,47 +13149,59 @@
          "nom": "loc_A23EE"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299518
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299524
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299531
         },
@@ -10918,9 +13539,9 @@
            "ligne": 299657
           },
           {
-           "t": "saut_si",
+           "t": "si",
            "cond": {
-            "cmp": "!=",
+            "cmp": "==",
             "a": {
              "op": "/",
              "a": {
@@ -10930,20 +13551,68 @@
               },
               "b": 7
              },
-             "b": -32768
+             "b": 32768
             },
             "b": 0
            },
-           "cible": "loc_A257D",
+           "alors": [
+            {
+             "t": "affecte",
+             "cible": {
+              "local": "si"
+             },
+             "valeur": -1,
+             "ligne": 299665
+            }
+           ],
+           "sinon": [
+            {
+             "t": "si",
+             "cond": {
+              "cmp": "==",
+              "a": {
+               "local": "si"
+              },
+              "b": -1
+             },
+             "alors": [
+              {
+               "t": "affecte",
+               "cible": {
+                "local": "si"
+               },
+               "valeur": 1,
+               "ligne": 299673
+              }
+             ],
+             "sinon": [
+              {
+               "t": "si",
+               "cond": {
+                "cmp": "==",
+                "a": {
+                 "local": "si"
+                },
+                "b": 1
+               },
+               "alors": [
+                {
+                 "t": "affecte",
+                 "cible": {
+                  "local": "si"
+                 },
+                 "valeur": 0,
+                 "ligne": 299680
+                }
+               ],
+               "sinon": [],
+               "ligne": 299679
+              }
+             ],
+             "ligne": 299672
+            }
+           ],
            "ligne": 299664
-          },
-          {
-           "t": "affecte",
-           "cible": {
-            "local": "si"
-           },
-           "valeur": -1,
-           "ligne": 299665
           }
          ],
          "sinon": [
@@ -11000,47 +13669,59 @@
          "nom": "loc_A258E"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299689
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299695
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 299702
         },
@@ -11333,6 +14014,46 @@
      "ligne": 299820
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 299838
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 299839
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 299840
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 299877
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 299878
+    },
+    {
      "t": "op",
      "op": "Scene_Destruct",
      "args": {
@@ -11359,6 +14080,118 @@
      },
      "alors": [
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v253"
+       },
+       "valeur": 0,
+       "ligne": 299907
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v252"
+       },
+       "valeur": 0,
+       "ligne": 299908
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v243"
+       },
+       "valeur": 0,
+       "ligne": 299926
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v242"
+       },
+       "valeur": 0,
+       "ligne": 299927
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v233"
+       },
+       "valeur": 0,
+       "ligne": 299945
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v232"
+       },
+       "valeur": 0,
+       "ligne": 299946
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v217"
+       },
+       "valeur": 0,
+       "ligne": 299969
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v216"
+       },
+       "valeur": 0,
+       "ligne": 299970
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v201"
+       },
+       "valeur": 0,
+       "ligne": 299993
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v200"
+       },
+       "valeur": 0,
+       "ligne": 299994
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v185"
+       },
+       "valeur": 0,
+       "ligne": 300017
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v184"
+       },
+       "valeur": 0,
+       "ligne": 300018
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v175"
+       },
+       "valeur": 0,
+       "ligne": 300036
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v174"
+       },
+       "valeur": 0,
+       "ligne": 300037
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -11372,6 +14205,30 @@
        "ligne": 300041
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v3408"
+       },
+       "valeur": 0,
+       "ligne": 300059
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3403"
+       },
+       "valeur": 0,
+       "ligne": 300060
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3402"
+       },
+       "valeur": 0,
+       "ligne": 300061
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -11383,6 +14240,142 @@
         "canal=canal2"
        ],
        "ligne": 300064
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1334"
+       },
+       "valeur": 0,
+       "ligne": 300082
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1329"
+       },
+       "valeur": 0,
+       "ligne": 300083
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v1328"
+       },
+       "valeur": 0,
+       "ligne": 300084
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v155"
+       },
+       "valeur": 0,
+       "ligne": 300107
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v154"
+       },
+       "valeur": 0,
+       "ligne": 300108
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v115"
+       },
+       "valeur": 0,
+       "ligne": 300156
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v114"
+       },
+       "valeur": 0,
+       "ligne": 300157
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v105"
+       },
+       "valeur": 0,
+       "ligne": 300175
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v104"
+       },
+       "valeur": 0,
+       "ligne": 300176
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v95"
+       },
+       "valeur": 0,
+       "ligne": 300194
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v94"
+       },
+       "valeur": 0,
+       "ligne": 300195
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v85"
+       },
+       "valeur": 0,
+       "ligne": 300213
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v84"
+       },
+       "valeur": 0,
+       "ligne": 300214
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v75"
+       },
+       "valeur": 0,
+       "ligne": 300232
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v74"
+       },
+       "valeur": 0,
+       "ligne": 300233
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v65"
+       },
+       "valeur": 0,
+       "ligne": 300251
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v64"
+       },
+       "valeur": 0,
+       "ligne": 300252
       },
       {
        "t": "affecte",
@@ -11511,6 +14504,30 @@
       "mid20 3"
      ],
      "ligne": 300401
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v316"
+     },
+     "valeur": 2,
+     "ligne": 300404
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 300405
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 300406
     },
     {
      "t": "op",
@@ -11860,6 +14877,30 @@
      "ligne": 300592
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v348"
+     },
+     "valeur": 0,
+     "ligne": 300593
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v350"
+     },
+     "valeur": 0,
+     "ligne": 300594
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v352"
+     },
+     "valeur": 0,
+     "ligne": 300595
+    },
+    {
      "t": "op",
      "op": "Scene_Tick",
      "args": {
@@ -11871,6 +14912,38 @@
       "scène=scène6"
      ],
      "ligne": 300598
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 300604
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3464"
+     },
+     "valeur": 2,
+     "ligne": 300605
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 300606
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 300607
     },
     {
      "t": "affecte",
@@ -11991,7 +15064,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -12034,6 +15107,30 @@
     {
      "t": "label",
      "nom": "loc_A316C"
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v372"
+     },
+     "valeur": 2,
+     "ligne": 300658
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v371"
+     },
+     "valeur": 0,
+     "ligne": 300659
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v370"
+     },
+     "valeur": 0,
+     "ligne": 300660
     },
     {
      "t": "si",
@@ -12168,6 +15265,16 @@
       {
        "t": "affecte",
        "cible": {
+        "local": "v348_avant"
+       },
+       "valeur": {
+        "local": "v348"
+       },
+       "ligne": 300696
+      },
+      {
+       "t": "affecte",
+       "cible": {
         "local": "v348"
        },
        "valeur": {
@@ -12206,15 +15313,19 @@
        },
        "alors": [
         {
-         "t": "appel",
-         "nom": "c37.méthode24",
-         "args": [
-          0,
-          1
-         ],
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c37"
+          },
+          "dx": 0,
+          "dy": 1
+         },
          "texte": [
-          "0",
-          "1"
+          "calque=c37",
+          "dx=0",
+          "dy=1"
          ],
          "ligne": 300707
         }
@@ -12270,15 +15381,19 @@
            },
            "alors": [
             {
-             "t": "appel",
-             "nom": "c37.méthode24",
-             "args": [
-              0,
-              1
-             ],
+             "t": "op",
+             "op": "déplace",
+             "args": {
+              "calque": {
+               "objet": "c37"
+              },
+              "dx": 0,
+              "dy": 1
+             },
              "texte": [
-              "0",
-              "1"
+              "calque=c37",
+              "dx=0",
+              "dy=1"
              ],
              "ligne": 300722
             }
@@ -12633,12 +15748,33 @@
             "local": "v382"
            },
            "valeur": {
-            "champ": [
-             "r10",
-             "+0"
-            ]
+            "local": "v350"
            },
            "ligne": 300799
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v350_avant"
+           },
+           "valeur": {
+            "local": "v350"
+           },
+           "ligne": 300800
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v350"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v350"
+            },
+            "b": 1
+           },
+           "ligne": 300800
           },
           {
            "t": "affecte",
@@ -12985,12 +16121,33 @@
             "local": "v390"
            },
            "valeur": {
-            "champ": [
-             "r27",
-             "+0"
-            ]
+            "local": "v352"
            },
            "ligne": 300854
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v352_avant"
+           },
+           "valeur": {
+            "local": "v352"
+           },
+           "ligne": 300855
+          },
+          {
+           "t": "affecte",
+           "cible": {
+            "local": "v352"
+           },
+           "valeur": {
+            "op": "+",
+            "a": {
+             "local": "v352"
+            },
+            "b": 1
+           },
+           "ligne": 300855
           },
           {
            "t": "affecte",
@@ -13159,20 +16316,6 @@
        "nom": "loc_A33AF"
       },
       {
-       "t": "saut",
-       "cible": "loc_A3407",
-       "ligne": 300885
-      },
-      {
-       "t": "saut",
-       "cible": "loc_A3433",
-       "ligne": 300912
-      },
-      {
-       "t": "label",
-       "nom": "loc_A3407"
-      },
-      {
        "t": "op",
        "op": "Scene_Tick",
        "args": {
@@ -13187,10 +16330,6 @@
       }
      ],
      "ligne": 300689
-    },
-    {
-     "t": "label",
-     "nom": "loc_A3433"
     },
     {
      "t": "si",
@@ -13258,6 +16397,22 @@
      "ligne": 300961
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v371"
+     },
+     "valeur": 0,
+     "ligne": 300980
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v370"
+     },
+     "valeur": 0,
+     "ligne": 300981
+    },
+    {
      "t": "op",
      "op": "canal_arrête",
      "args": {
@@ -13269,6 +16424,46 @@
       "canal=canal3"
      ],
      "ligne": 300984
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3468"
+     },
+     "valeur": 0,
+     "ligne": 301002
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3463"
+     },
+     "valeur": 0,
+     "ligne": 301003
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3462"
+     },
+     "valeur": 0,
+     "ligne": 301004
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v357"
+     },
+     "valeur": 0,
+     "ligne": 301022
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v338"
+     },
+     "valeur": 0,
+     "ligne": 301042
     },
     {
      "t": "op",
@@ -13286,6 +16481,198 @@
      "ligne": 301046
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v315"
+     },
+     "valeur": 0,
+     "ligne": 301065
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v314"
+     },
+     "valeur": 0,
+     "ligne": 301066
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v305"
+     },
+     "valeur": 0,
+     "ligne": 301084
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v304"
+     },
+     "valeur": 0,
+     "ligne": 301085
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v295"
+     },
+     "valeur": 0,
+     "ligne": 301103
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v294"
+     },
+     "valeur": 0,
+     "ligne": 301104
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v279"
+     },
+     "valeur": 0,
+     "ligne": 301127
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v278"
+     },
+     "valeur": 0,
+     "ligne": 301128
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v263"
+     },
+     "valeur": 0,
+     "ligne": 301151
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v262"
+     },
+     "valeur": 0,
+     "ligne": 301152
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v253"
+     },
+     "valeur": 0,
+     "ligne": 301170
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v252"
+     },
+     "valeur": 0,
+     "ligne": 301171
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v243"
+     },
+     "valeur": 0,
+     "ligne": 301189
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v242"
+     },
+     "valeur": 0,
+     "ligne": 301190
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v233"
+     },
+     "valeur": 0,
+     "ligne": 301208
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v232"
+     },
+     "valeur": 0,
+     "ligne": 301209
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v217"
+     },
+     "valeur": 0,
+     "ligne": 301232
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v216"
+     },
+     "valeur": 0,
+     "ligne": 301233
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v201"
+     },
+     "valeur": 0,
+     "ligne": 301256
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v200"
+     },
+     "valeur": 0,
+     "ligne": 301257
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v185"
+     },
+     "valeur": 0,
+     "ligne": 301280
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v184"
+     },
+     "valeur": 0,
+     "ligne": 301281
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v175"
+     },
+     "valeur": 0,
+     "ligne": 301299
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v174"
+     },
+     "valeur": 0,
+     "ligne": 301300
+    },
+    {
      "t": "op",
      "op": "voix_arrête",
      "args": {
@@ -13299,6 +16686,30 @@
      "ligne": 301304
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v3408"
+     },
+     "valeur": 0,
+     "ligne": 301322
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3403"
+     },
+     "valeur": 0,
+     "ligne": 301323
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3402"
+     },
+     "valeur": 0,
+     "ligne": 301324
+    },
+    {
      "t": "op",
      "op": "canal_arrête",
      "args": {
@@ -13310,6 +16721,142 @@
       "canal=canal2"
      ],
      "ligne": 301327
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1334"
+     },
+     "valeur": 0,
+     "ligne": 301345
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1329"
+     },
+     "valeur": 0,
+     "ligne": 301346
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v1328"
+     },
+     "valeur": 0,
+     "ligne": 301347
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v155"
+     },
+     "valeur": 0,
+     "ligne": 301370
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v154"
+     },
+     "valeur": 0,
+     "ligne": 301371
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v115"
+     },
+     "valeur": 0,
+     "ligne": 301419
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v114"
+     },
+     "valeur": 0,
+     "ligne": 301420
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v105"
+     },
+     "valeur": 0,
+     "ligne": 301438
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v104"
+     },
+     "valeur": 0,
+     "ligne": 301439
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v95"
+     },
+     "valeur": 0,
+     "ligne": 301457
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v94"
+     },
+     "valeur": 0,
+     "ligne": 301458
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v85"
+     },
+     "valeur": 0,
+     "ligne": 301476
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v84"
+     },
+     "valeur": 0,
+     "ligne": 301477
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v75"
+     },
+     "valeur": 0,
+     "ligne": 301495
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v74"
+     },
+     "valeur": 0,
+     "ligne": 301496
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v65"
+     },
+     "valeur": 0,
+     "ligne": 301514
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v64"
+     },
+     "valeur": 0,
+     "ligne": 301515
     },
     {
      "t": "affecte",

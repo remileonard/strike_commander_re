@@ -1735,6 +1735,12 @@ def peephole(stmts):
             elif st[0] == 'cgoto':
                 refs.add(st[2])
         new = [st for st in s if not (st[0] == 'label' and st[1] not in refs) and st[0] != 'setax']
+        # Saut qui suit un saut sans condition (code mort retiré entre les deux, mid20) ; saut vers
+        # l'étiquette qui suit immédiatement.
+        new = [st for i, st in enumerate(new)
+               if not (st[0] == 'goto' and i > 0 and new[i - 1][0] == 'goto')]
+        new = [st for i, st in enumerate(new)
+               if not (st[0] == 'goto' and i + 1 < len(new) and new[i + 1][0] == 'label' and new[i + 1][1] == st[1])]
         if len(new) != len(s):
             s = new
             changed = True

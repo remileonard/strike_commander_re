@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, `MID_16`, `MID_17`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -321,4 +321,17 @@ nouveau ; 0 écart avec le rendu de référence.
   **Pas exprimé dans le format** (un sous-titre désigne un texte de `MIDGAMES.IFF`) : le fichier
   affiche « ...this is » et le texte 4 seul (des espaces). Même limite pour le nom ajouté dans mid2
   (texte 0) et mid12 (texte 22, « Hey, »).
+
+### mid20
+
+Fonction pas encore nommée `sub_9E080` : `--nom mid20`. 6 plans, 33,8 s ; 0 écart avec le rendu de
+référence. Mécanisme nouveau (2026-10-21) :
+- **calque retiré puis rajouté** (`retire` puis `ajoute`) : il repasse au-dessus des autres. Scène 1,
+  image 54 : les arbres (`midgames` 19, c8 et c9) sont retirés puis rajoutés après le parachute (c2,
+  c3), qu'ils cachent ensuite. Le fichier garde un ordre de dessin (`depth`) fixe par calque : les
+  images qui suivent le rajout forment un calque à part, à sa nouvelle profondeur. Change aussi
+  MID_5 et MID_17 (même résultat à l'écran) ;
+- textes de `MG20` : le code n'affiche que les textes 5, 6 et 8 (répliques 0 = textes 5 et 6,
+  1 = texte 8) ; les textes 0 à 4 et 7 ne sont pas affichés par cette fonction ;
+- extracteur : un saut qui suit un saut sans condition (code mort retiré) est supprimé.
 

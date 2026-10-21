@@ -1704,16 +1704,16 @@
        "ligne": 224569
       },
       {
-       "op": "sub_85A",
+       "op": "CRT_Time_85A",
        "arguments": [
         "0"
        ],
        "ligne": 224574
       },
       {
-       "op": "sub_6F2",
+       "op": "CRT_Srand_6F2",
        "arguments": [
-        "sub_85A(0)"
+        "CRT_Time_85A(0)"
        ],
        "ligne": 224577
       },
@@ -4120,8 +4120,8 @@
     "                            palette_envoie(palette=pal1, pas=0)                                       ⟨224563⟩",
     "                            v560→0.méthode8(167)                                                      ⟨224569⟩",
     "                            c22.image = 0                                                             ⟨224572⟩",
-    "                            sub_85A(0)                                                                ⟨224574⟩",
-    "                            sub_6F2(sub_85A(0))                                                       ⟨224577⟩",
+    "                            CRT_Time_85A(0)                                                           ⟨224574⟩",
+    "                            CRT_Srand_6F2(CRT_Time_85A(0))                                            ⟨224577⟩",
     "                            v370 = 4                                                                  ⟨224579⟩",
     "                            si v14 != 0 :",
     "                                Scene_Tick(scène=scène6)                                              ⟨224588⟩",
@@ -16781,7 +16781,7 @@
                   },
                   {
                    "t": "appel",
-                   "nom": "sub_85A",
+                   "nom": "CRT_Time_85A",
                    "args": [
                     0
                    ],
@@ -16792,14 +16792,14 @@
                   },
                   {
                    "t": "appel",
-                   "nom": "sub_6F2",
+                   "nom": "CRT_Srand_6F2",
                    "args": [
                     {
-                     "résultat": "sub_85A(0)"
+                     "résultat": "CRT_Time_85A(0)"
                     }
                    ],
                    "texte": [
-                    "sub_85A(0)"
+                    "CRT_Time_85A(0)"
                    ],
                    "ligne": 224577
                   },
