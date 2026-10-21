@@ -35,6 +35,31 @@ DIRECT_FPS = 60
 DIRS = {'opt': 'GAMEFLOW', 'mid': 'MIDGAMES', 'amu': 'MIDGAMES', 'rmu': 'MIDGAMES'}
 NO_IMAGE = 255
 FACE_ANCHOR = (160, 128)
+# Les calques et les dessins hors écran sont faits dans une image de 320 × 200 dont la ligne 0 est
+# recopiée à la ligne 24 de l'écran (Rect_BlitOverlapRegion_31FCA : source à partir de sa ligne du
+# haut, 0, destination à partir de la sienne, 24). Les positions écrites sont des positions d'écran.
+BAND_TOP = 24
+
+
+def screen_offsets(data):
+    # Surfaces écran : celles qui reçoivent la copie de l'image hors écran (destination de « présente »).
+    found = set()
+
+    def walk(v):
+        if isinstance(v, dict):
+            if v.get('op') == 'présente':
+                for a in v.get('arguments', []):
+                    if a.startswith('destination='):
+                        o = data['objets'].get(a.split('=', 1)[1])
+                        if o:
+                            found.add(o.get('décalage'))
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(data)
+    return found
 
 
 def archive_path(pak):
@@ -118,6 +143,7 @@ class Player:
         self.open_marker = None
         self.warnings = []
         self.rng = random.Random(1)
+        self.screen_offsets = screen_offsets(data)
 
     # ------------------------------------------------------------------ valeurs
     def content(self, objname):
@@ -544,12 +570,16 @@ class Player:
                 self.pending['music'] = 254
         elif name == 'dessine_image':
             res = self.resource(args['données'])
-            self.direct_items.append(self.item(f'img{len(self.direct_items)}', res, self.ev(args['image']),
-                                               self.ev(args['x']), self.ev(args['y'])))
+            dy = self.surface_dy(args['surface'])
+            it = self.item(f'img{len(self.direct_items)}', res, self.ev(args['image']), self.ev(args['x']),
+                           self.ev(args['y']) + dy)
+            it['dy'] = dy
+            self.direct_items.append(it)
         elif name == 'texte_formaté':
             key, index = self.text_ref(args['c'])
             self.direct_items.append({'key': f'txt{len(self.direct_items)}', 'kind': 'text', 'text': (key, index),
-                                      'y': self.ev(args['b']), 'align': self.ev(args['a'])})
+                                      'y': self.ev(args['b']) + BAND_TOP, 'dy': BAND_TOP,
+                                      'align': self.ev(args['a'])})
         elif name == 'présente':
             self.last_frame = list(self.direct_items)
             self.direct_items = []
@@ -581,7 +611,8 @@ class Player:
         elif name.startswith('UI_ApplyEncodingHelper_2EC65'):
             if not self.full_screen:
                 self.full_screen = True
-                self.last_frame = list(self.direct_items)
+                # Ouverture du cadre : source et destination ont la même ligne du haut, pas de décalage.
+                self.last_frame = [dict(it, y=it['y'] - it.get('dy', 0), dy=0) for it in self.direct_items]
                 self.direct_items = []
                 self.record('direct', DIRECT_FPS, self.last_frame)
         return None
@@ -635,6 +666,14 @@ class Player:
                 return r
         return (target.x, target.y)
 
+    def surface_dy(self, v):
+        text = json.dumps(v, ensure_ascii=False)
+        m = re.search(r'"objet": "(\w+)"', text)
+        o = self.objects.get(m.group(1)) if m else None
+        if o and o.get('décalage') in self.screen_offsets:
+            return 0
+        return BAND_TOP
+
     def item(self, key, res, image, x, y, clip=None, auto=False, loop=False, endrel=0):
         return {'key': key, 'kind': 'image', 'res': res, 'image': image, 'x': x, 'y': y, 'clip': clip,
                 'auto': auto, 'loop': loop, 'endrel': endrel}
@@ -676,7 +715,10 @@ class Player:
             return
         elif t in ('ClippedMovingLayer', 'ClippedMovingImageLayer'):
             img = layer.image if layer.image is not None and layer.image >= 0 else None
-            out.append(self.item(n, layer.res, img, ax, ay, clip=layer.clip))
+            clip = layer.clip
+            if clip:
+                clip = (clip[0], clip[1] + BAND_TOP, clip[2], clip[3] + BAND_TOP)
+            out.append(self.item(n, layer.res, img, ax, ay, clip=clip))
             return
         else:
             img = layer.image if layer.image is not None and layer.image >= 0 else None
@@ -748,7 +790,7 @@ class Player:
             return
         items = []
         for layer in scene.children:
-            self.layer_items(layer, scene.x, scene.y, items)
+            self.layer_items(layer, scene.x, scene.y + BAND_TOP, items)
         self.record(scene.name, scene.fps, items)
         self.last_frame = items
         for layer in scene.children:
@@ -834,7 +876,7 @@ def layer_chunks(shot, key, start, stop, depth, layer_id):
         return None, None
     positions = [(it['x'], it['y']) for it in seq]
     if res[0] == 'face':
-        positions = [(x - FACE_ANCHOR[0], y - FACE_ANCHOR[1]) for x, y in positions]
+        positions = [(x - FACE_ANCHOR[0], y - BAND_TOP - FACE_ANCHOR[1]) for x, y in positions]
         archive = 'FACE:' + res[1]
         entry = 0
     else:

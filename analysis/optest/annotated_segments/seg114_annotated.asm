@@ -8,13 +8,16 @@ seg114		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de STRIKE.EXE : code identique instruction par instruction à
-; Rect_BlitOverlapRegion_60FE2 (sub_60FE2 de STRIKE.EXE). Résumé repris de STRIKE.EXE ;
-; appelants et contexte à revérifier ici. — ⚠️ far, 107 lignes, NON DÉTAILLÉE — référencée via
-; vtable (DATA XREF seg216) — calcule la région de recouvrement entre deux rectangles (source
-; si, destination bx) et copie les données correspondantes. Référencée par
-; UI_ApplyEncodingHelper_5E576 et directement depuis seg143 — probable opération de blit/copie
-; de zone à l'écran.
+; far, LUE 2026-10-21 (code identique à Rect_BlitOverlapRegion_60FE2 de STRIKE.EXE). Copie une
+; surface dans une autre. arg_0 = surface source, arg_2 = surface destination (descripteurs de
+; 6 mots : segment, table des lignes, gauche, haut, droite, bas). Copie min(largeur) ×
+; min(hauteur) pixels ; la source part de SA ligne du haut et de SA colonne de gauche, la
+; destination des siennes (mov cx, [si+6] / shl cx, 1 / add cx, di, add si, [bp+var_2] / add
+; di, [bp+var_4]), une ligne par passage (rep movsw puis rep movsb). Les deux rectangles ne
+; sont donc pas superposés en coordonnées communes : dans les cinématiques, la ligne 0 de
+; l'image hors écran (0, 0)–(319, 199) arrive à la ligne 24 de l'écran (rectangle (0,
+; 24)–(319, 151)). Appelée par UI_ApplyEncodingHelper_2EC4A (source, destination) et
+; UI_ApplyEncodingHelper_2EC65 (destination, source), dont Scene_Tick_C652.
 ; ==============================================================================================
 Rect_BlitOverlapRegion_31FCA	proc far		; CODE XREF: UI_ApplyEncodingHelper_2EC4A+10P
 					; UI_ApplyEncodingHelper_2EC65+10P

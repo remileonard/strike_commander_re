@@ -27,7 +27,7 @@ par Rémi).
 | 0 | préparation | 60 | 1 image | `optshps` 116 et `midgames` 20 en (0, 24), palette noire, palettes `optpals` 21, `midgames` 22, `optpals` 24, fondu d'apparition (pas 2), musique 0 |
 | 1 | 1, phase 1 | 10 | 20 images | les deux fonds en (0, 0) |
 | 2 | 1, phase 2 | 10 | fin de l'animation `mid1` 3 | réplique 7 aux images 0 et 15 (images 20 et 35 de la scène) |
-| 3 | 2 | 60 | 1 334 images | les 4 titres `MG01` 0 à 3, centrés, y = 50 (35 pour le 2ᵉ), 196 images chacun, pauses de 100 images (250 après le 2ᵉ), palette `mid1` 59 |
+| 3 | 2 | 60 | 1 334 images | les 4 titres `MG01` 0 à 3, centrés, y = 74 à l'écran (59 pour le 2ᵉ ; 50 et 35 dans le code), 196 images chacun, pauses de 100 images (250 après le 2ᵉ), palette `mid1` 59 |
 | 4 | 3, phase 1 | 20 | 68 images | montée : vitesses (0, -1) cumulées avec les parents |
 | 5 | 3, phase 2 | 20 | fin de l'animation `mid1` 13 | réplique 8 à l'image 65 |
 | 6 | 4 | 20 | 40 images | composition : suites d'images, trajectoire, rebond, découpes, réplique 9 |
@@ -72,15 +72,18 @@ par Rémi).
 - **Boucle qui attend la fin d'une réplique** : plan avec « attendre la fin des sons ». **Boucle qui
   attend la fin d'une animation** : plan qui finit avec cette animation (`end_layer`). L'outil simule
   ces boucles sur 600 images au plus pour avoir les suites d'images des autres calques.
-- **Calques** : position à l'écran (parents et y de la scène compris) ; trajectoire `PATH` si elle
+- **Calques** : position à l'écran, soit la position du jeu + 24 en y (la ligne 0 de l'image hors
+  écran est copiée à la ligne 24, `MIDGAME_SYSTEM.md` § 3.2), parents et y de la scène compris ; même
+  décalage pour les découpes et les titres ; aucun pour ce qui est dessiné directement à l'écran
+  (préparation) et pour l'ouverture du cadre ; trajectoire `PATH` si elle
   change. Images en numéros du jeu (`game_numbering`), le player ajoutant le décalage de
   `RSImageSet`. Les animations (`AnimLayer`, en boucle, sur fond, à déclencher) sont des sprites
   animés par le player ; une image écrite par le code devient une suite d'images `SEQU`. Les
   calques à plusieurs images (image sur fond, transition, tête parlante) sont découpés en un calque
   par image, dans l'ordre de dessin du jeu (`depth`).
 - **Visages** (`convdata`) : ressource `FACE:<nom>`. `ConvAssetManager` place les images de visage
-  en (0, 24) au lieu de leur point d'ancrage ; la position écrite est celle du jeu moins (160, 128),
-  le point où le jeu dessine les têtes. Hypothèse, à vérifier à l'écran.
+  en (0, 24) au lieu de leur point d'ancrage ; la position écrite est celle du jeu (sans le
+  décalage de 24) moins (160, 128), le point où le jeu dessine les têtes. Hypothèse, à vérifier à l'écran.
 - **Palettes** : la liste composée par le code avant chaque envoi, appliquée dans l'ordre (`PALS`),
   par-dessus la palette du plan précédent ; « normal » de `convdata` est `FACEPAL:normal`.
 
@@ -92,14 +95,12 @@ par Rémi).
 - **Titres** : le jeu fait apparaître et disparaître le texte par translucidité, en 16 étapes de 3
   tics : les pixels de couleur 239 à 254 de la police `mid1` 27 sont mélangés au fond par les
   tables de `mid1` 60 (`MIDGAME_SYSTEM.md` § 9, scène 2). Ce n'est pas exprimé : le texte est
-  affiché d'un bloc, en couleur 15 (valeur choisie, pas lue dans le jeu). Le rectangle de la zone des titres
-  (`word_46F44`) n'a pas été lu : le centrage est fait sur 320 pixels et le y est compté depuis le
-  haut de l'écran.
+  affiché d'un bloc, en couleur 15 (valeur choisie, pas lue dans le jeu). Le texte est dessiné dans
+  l'image hors écran de 320 pixels de large (`word_46F44` est la surface de dessin courante, pas un
+  rectangle de titres) : centrage sur 320 pixels, y + 24 à l'écran.
 - **Tremblement** : marche aléatoire calculée une fois par l'outil (graine fixe).
 - **Animation qui continue après une boucle d'attente** : son image de départ dans le plan suivant
   est calculée sur 600 images simulées ; le player la ramène à la dernière image de l'animation.
-- **Préparation** : le code dessine les deux fonds en (0, 24) avant le fondu, puis la scène 1 les
-  dessine en (0, 0). Le fichier reproduit ce décalage de 24 pixels tel quel.
 - Non exportés : `Speech_LoadBank_28D24` (`rmusic.pak` / `amusic.pak`, 23) à la fin de la scène 25,
   rôle non établi ; le rectangle de couleur 0 de la scène 23 (`Primitive_SetRectColorAndDraw_2CBE5`),
   dessiné sur la bande noire du bas.

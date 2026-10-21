@@ -166,14 +166,37 @@ lu dans l'en-tête : `Struct_GetElementCountMinusOne_33352` renvoie `(premier d�
 valeur utilisée comme **limite** par les animations. Chaque image est dessinée par `sub_32CD8`
 (nom repris de STRIKE `Render_MeasureOrDrawTextString_32CD8`, faux ici) en (x, y).
 
-**La surface de dessin des cinématiques.** Midgame1 prépare une surface de dessin avec le
-rectangle (0, 24) – (319, 151), soit 128 lignes entre deux bandes, et une image hors écran
-plein écran (0, 0) – (319, 199). **L'origine (0, 0) est le coin haut gauche de l'écran**, comme en
-VGA (fait donné par Rémi) : le rectangle n'est que la zone visible, et les y négatifs des calques
-plein écran (-24, -40, -64, -70) placent l'image au-dessus du haut de l'écran. Les positions se
-recopient telles quelles dans libRealSpace, dont les bandes noires couvrent les lignes 0 à 22
-(`CONV_TOP_BAR_HEIGHT` = 23) et 152 à 199 (`CONV_BOTTOM_BAR_HEIGHT` = 48) : la ligne 23 y est
-visible, elle ne l'est pas dans le jeu.
+**La surface de dessin des cinématiques (relu le 2026-10-21).** Les calques ne sont pas dessinés
+directement à l'écran. Midgame1 prépare deux descripteurs de surface (6 mots : segment, table des
+lignes, gauche, haut, droite, bas) :
+
+- l'**image hors écran** (`var_1E4`) : rectangle (0, 0) – (319, 199), tampon de 320 × 200 réservé
+  par `TextRenderer_ApplyFormatChange_2EA21`, mise en surface de dessin courante (`word_46F44`) par
+  `SmallObject_RegisterInList_2CB40` ;
+- l'**écran** (`var_1D6`) : copie du descripteur de l'écran (`word_46F46`) dont le rectangle est
+  remplacé par (0, 24) – (319, 151) (`mov [bp+var_1D0], 18h` / `mov [bp+var_1CC], 97h`). C'est la
+  surface passée à `Scene_Create_C55E`.
+
+`Scene_Tick_C652` dessine chaque calque dans l'image hors écran, en (x, y) de la scène, puis la
+recopie à l'écran (`UI_ApplyEncodingHelper_2EC65` → `Rect_BlitOverlapRegion_31FCA`). Cette copie
+part de la **ligne du haut de chaque rectangle** : `mov cx, [si+6] / shl cx, 1 / add cx, di` pour la
+destination (ligne 24), même calcul pour la source (ligne 0) ; largeur et hauteur = la plus petite
+des deux (320 × 128). **La ligne 0 de l'image hors écran arrive à la ligne 24 de l'écran.**
+
+Conséquences :
+- **l'origine (0, 0) des calques est le coin haut gauche de la bande visible, à la ligne 24 de
+  l'écran** ; seules les lignes 0 à 127 de l'image hors écran sont visibles ;
+- les titres (scène 2) suivent la même règle : dessinés hors écran, copiés par
+  `UI_ApplyEncodingHelper_2EC4A`, qui appelle la même copie ;
+- la préparation dessine les deux fonds **directement sur l'écran** (`var_1D6`) en (0, 24) : même
+  place à l'écran que le (0, 0) de la scène 1 qui suit ;
+- l'ouverture finale du cadre donne aux deux rectangles la même ligne du haut (24 − i) : là, une
+  ligne hors écran arrive à la même ligne de l'écran.
+
+**Pour libRealSpace** (origine en haut à gauche de l'écran) : y_libRealSpace = y_calque + 24 ; x
+inchangé ; même chose pour les rectangles de découpe. Les bandes noires de libRealSpace couvrent
+les lignes 0 à 22 (`CONV_TOP_BAR_HEIGHT` = 23) et 152 à 199 (`CONV_BOTTOM_BAR_HEIGHT` = 48) : la
+ligne 23 y est visible, elle ne l'est pas dans le jeu.
 
 ### 3.3 Les types de calques
 
@@ -550,7 +573,9 @@ d'ajout (du fond vers le premier plan) ; l'indentation marque un enfant.
 
 ### Préparation (avant la scène 1)
 
-- Surface de dessin : rectangle (0, 24) – (319, 151) ; image hors écran : (0, 0) – (319, 199).
+- Surface de dessin : rectangle (0, 24) – (319, 151) ; image hors écran : (0, 0) – (319, 199), dont la
+  ligne 0 est recopiée à la ligne 24 de l'écran (§ 3.2). Les positions de ce document sont celles du
+  code, donc relatives à l'image hors écran, sauf mention « à l'écran ».
 - Palette principale : 256 couleurs remplies de noir et envoyées.
 - `optshps` 116 et `midgames` 20 (image 0) dessinés directement en (0, 24) sur la surface.
 - Ressources chargées ici et gardées : `optshps` 116 et 44, `midgames` 19, 20 et 21, `mid1` 27
@@ -939,6 +964,6 @@ le même moteur. Pour figer le format, il faut y relever :
 4. **Les textes de lèvres** passés aux têtes parlantes, et l'éventuel passage en mode voix.
 5. **La seconde table de lettres** (`04302500000340143000353000`, pointeur `word_445AE`) : qui
    l'utilise.
-6. ~~La surface de dessin~~ : tranché, origine en haut à gauche de l'écran (§ 3.2).
+6. ~~La surface de dessin~~ : tranché (2026-10-21), l'origine des calques est la ligne 24 de l'écran (§ 3.2).
 7. **Les éléments chargés par nom** dans `convdata.iff` (« air », « normal », « night » par
    `sub_C13D`).
