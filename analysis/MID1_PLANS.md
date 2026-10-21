@@ -127,3 +127,46 @@ n'est pas rendu.
 - Non exportés : `Speech_LoadBank_28D24` (`rmusic.pak` / `amusic.pak`, 23) à la fin de la scène 25,
   rôle non établi ; le rectangle de couleur 0 de la scène 23 (`Primitive_SetRectColorAndDraw_2CBE5`),
   dessiné sur la bande noire du bas.
+
+## Lecteur de contrôle (`tools/midgame_check.py`)
+
+Il lit **seulement** le `MID_*.IFF` et les données du jeu, rejoue le fichier avec les règles
+ci-dessous et compare chaque instant (pas de 1/60 s) au rendu de référence. Ces règles sont la
+signification voulue des champs écrits par `midgame_iff.py` : la spécification pour
+`SCAnimationPlayer`.
+
+```bash
+python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json MID_1.IFF --remplace pri=air [--donnees jeu/DATA]
+python3 tools/midgame_check.py --donnees jeu/DATA MID_1.IFF [dossier_des_écarts]
+```
+
+Règles du lecteur :
+- **Plan (`SHTP`)** : `clear` = 1 ou `keep` = 0 → palette remise à 0 ; puis les palettes de `PALS`
+  dans l'ordre, chacune **sur sa seule plage** (premier indice, nombre). `full_screen` = 0 → seule
+  la bande (0, 24) – (319, 151) est visible, et l'écran est effacé à chaque image ; 1 → tout l'écran,
+  sans effacement.
+- **Durée d'un plan** : `wait` = 1 → jusqu'à la fin de la dernière réplique de `SOND` (image de
+  départ ÷ cadence + durée du VOC) ; `end_layer` ≥ 0 → jusqu'à ce que cette animation atteigne sa
+  dernière image ; sinon `nbframe` images, à `fps` images par seconde.
+- **Calque (`LAYR`)** : affiché de l'image `start` du plan pendant `nb` images (0 = jusqu'à la fin) ;
+  dessiné dans l'ordre de `depth`, découpé par son rectangle s'il en a un ; position = `PATH[k]`
+  s'il existe (k = image depuis `start`, la dernière valeur est gardée), sinon (x, y).
+- **Image fixe (`BKGD`)** : `SEQU[k]` s'il existe, sinon `image` ; 255 = rien.
+- **Animation (`SPRI`)** : image = `start_image` + k ; en boucle : modulo le nombre d'images ;
+  sinon bornée à la dernière image : `end_frame` ≤ 0 → nombre d'images + `end_frame` (0 = l'image
+  « nombre d'images », qui n'existe pas : **l'animation disparaît**, comme dans le jeu ; -1 =
+  s'arrête sur sa dernière image), `end_frame` > 0 → cette image.
+- **Visages (`FACE:<nom>`)** : images de `CONVSHPS.PAK` (numéro donné par le `FORM FACE` de
+  `CONVDATA.IFF`), dessinées à la position écrite + (160, 128 + 24).
+- Coordonnées : celles de l'écran 320 × 200, (0, 0) en haut à gauche.
+
+Résultat pour mid1 (2026-10-21) :
+- **avec `--donnees`** : 0 instant différent sur 5 629 (93,8 s) ;
+- **sans les données** : les seuls écarts sont dans les plans qui suivent une attente de réplique
+  (plans 11, 20 et 29). Le convertisseur ne connaît pas la durée de l'attente, la simule sur 600
+  images, et le plan suivant part de l'état de l'image 600 (tremblement, et une animation qui
+  commence à l'image 601). Pour reproduire le jeu, il faut soit produire le fichier avec les données,
+  soit un format qui garde l'état d'un calque d'un plan au suivant.
+- **Non comparés** : les titres (le format les affiche d'un bloc, en couleur 15, sans la
+  translucidité) et le fondu d'apparition (même champ `fade` des deux côtés, rendu ni d'un côté ni
+  de l'autre dans la comparaison).

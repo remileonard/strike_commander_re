@@ -53,6 +53,10 @@ def voc_seconds(b):
     return samples / rate
 
 
+def voice_seconds(res):
+    return voc_seconds(pak_entry(pak_path(res[1]), res[2]))
+
+
 def image_count(res):
     from sc_data import shape_images
     shape = face_shape(res[1]) if res[0] == 'face' else pak_entry(pak_path(res[1]), res[2])
@@ -64,7 +68,7 @@ def run(exact=True):
     p = mg.Player(data, {'pri': 'air'}, {})
     if exact:
         p.image_count = image_count
-        p.voice_seconds = lambda k: voc_seconds(pak_entry(os.path.join(GAME, 'MIDGAMES', 'MID1VOC.PAK'), k))
+        p.voice_seconds = voice_seconds
     p.run(data['parties'][0]['arbre'])
     return [s for s in p.shots if s['frames']], p
 

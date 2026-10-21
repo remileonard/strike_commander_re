@@ -13,6 +13,7 @@ la condition de fin d'un plan.
 --hypothèse : valeur d'une variable du jeu (matériel, fichiers présents) ; voir HYPOTHESES.
 """
 import json
+import os
 import random
 import re
 import struct
@@ -142,7 +143,6 @@ class Player:
         self.chunk_count = {}
         self.open_marker = None
         self.warnings = []
-        self.rng = random.Random(1)
         # Facultatif, quand les données du jeu sont disponibles : nombre d'images d'une ressource
         # (Struct_GetElementCountMinusOne_33352) et durée d'une réplique en secondes. Sans elles,
         # les boucles qui attendent une fin sont simulées sur MAX_OPEN_FRAMES images.
@@ -634,7 +634,7 @@ class Player:
         if self.voice_res is not None:
             self.pending['sounds'].append(self.voice_res[2])
             if self.voice_seconds:
-                self.voice_end = self.clock + self.voice_seconds(self.voice_res[2])
+                self.voice_end = self.clock + self.voice_seconds(self.voice_res)
 
     def count_of(self, layer):
         if self.image_count is None or layer.res is None:
@@ -752,10 +752,11 @@ class Player:
             layer.x += layer.vx
             layer.y += layer.vy
         elif t == 'JitterImageLayer':
+            rng = self.layer_rng(layer)
             for axis in ('jy', 'jx'):
-                if self.rng.random() < 0.5:
-                    step = self.rng.randint(0, 1)
-                    setattr(layer, axis, getattr(layer, axis) + (step if self.rng.random() < 0.5 else -step))
+                if rng.random() < 0.5:
+                    step = rng.randint(0, 1)
+                    setattr(layer, axis, getattr(layer, axis) + (step if rng.random() < 0.5 else -step))
         elif t == 'AnimLayer':
             # AnimLayer_Advance_2E607 : avance tant que l'image < nombre d'images ; elle s'arrête
             # donc sur l'image n, qui n'existe pas et n'est pas dessinée.
@@ -786,9 +787,15 @@ class Player:
         for c in layer.children:
             self.advance(c)
 
+    def layer_rng(self, layer):
+        # Un tirage par calque : le résultat ne dépend pas du nombre d'images simulées ailleurs.
+        if not hasattr(layer, 'rng'):
+            layer.rng = random.Random(layer.name)
+        return layer.rng
+
     def advance_head(self, layer):
         layer.mouth = -1
-        if layer.blink and self.rng.randrange(30) == 0 and layer.base <= 20:
+        if layer.blink and self.layer_rng(layer).randrange(30) == 0 and layer.base <= 20:
             layer.shown = 12
         else:
             layer.shown = layer.base
@@ -1015,9 +1022,22 @@ def main():
         name, value = args[i + 1].split('=')
         hypotheses[name] = int(value)
         del args[i:i + 2]
+    data_dir = None
+    if '--donnees' in args:
+        i = args.index('--donnees')
+        data_dir = args[i + 1]
+        del args[i:i + 2]
     source, destination = args
     data = json.load(open(source, encoding='utf-8'))
     player = Player(data, replace, hypotheses)
+    if data_dir:
+        # Avec les données du jeu : fin exacte des boucles d'attente (nombre d'images, durée des
+        # répliques), donc état exact au début du plan suivant (voir MID1_PLANS.md).
+        os.environ['SC_DATA'] = data_dir
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import midgame_render
+        player.image_count = midgame_render.image_count
+        player.voice_seconds = midgame_render.voice_seconds
     player.run(data['parties'][0]['arbre'])
     shots = [s for s in player.shots if s['frames']]
     content = b'ANIM' + chunk('HEAD', struct.pack('<II', len(shots), 2))

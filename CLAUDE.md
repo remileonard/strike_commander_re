@@ -307,6 +307,8 @@ strike_commander_re/
     ├── midgame_render.py            rendu de référence d'une cinématique avec les données du jeu
     │                                  (GIF ; --donnees <DATA>) ; sc_data.py : PAK, LZW, palettes, images
     ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
+    ├── midgame_check.py             lecteur de contrôle d'un MID_*.IFF, comparé au rendu de référence
+    │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné
