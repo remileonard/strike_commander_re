@@ -304,6 +304,9 @@ strike_commander_re/
     ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
     ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
     │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md
+    ├── midgame_render.py            rendu de référence d'une cinématique avec les données du jeu
+    │                                  (GIF ; --donnees <DATA>) ; sc_data.py : PAK, LZW, palettes, images
+    ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné

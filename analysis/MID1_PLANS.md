@@ -101,6 +101,29 @@ par Rémi).
 - **Tremblement** : marche aléatoire calculée une fois par l'outil (graine fixe).
 - **Animation qui continue après une boucle d'attente** : son image de départ dans le plan suivant
   est calculée sur 600 images simulées ; le player la ramène à la dernière image de l'animation.
+  **Dans le jeu, une animation simple arrivée au bout ne dessine plus rien** (`MIDGAME_SYSTEM.md`
+  § 6.1) : garder sa dernière image visible est une différence avec le jeu.
+
+## Rendu de référence avec les données du jeu
+
+Les données ne sont pas dans le dépôt. Avec le dossier `DATA` extrait de `BIGTRE.TRE` :
+
+```bash
+python3 tools/tre_extract.py BIGTRE.TRE jeu/
+python3 tools/midgame_render.py --donnees jeu/DATA --film mid1.gif 2
+```
+
+`midgame_render.py` rejoue la même simulation que `midgame_iff.py`, mais avec les valeurs lues dans
+les données : nombre d'images de chaque animation (fin exacte des boucles d'attente, au lieu de 600
+images) et durée de chaque réplique (fichiers VOC de `mid1voc.pak`). Il dessine comme le jeu :
+image hors écran copiée à la ligne 24, palettes partielles appliquées à leur plage, fondu
+d'apparition, images des visages (`CONVSHPS.PAK`, numéro donné par le `FORM FACE` de
+`CONVDATA.IFF`), titres translucides (police `mid1` 27, tables `mid1` 60). Résultat pour mid1 :
+29 plans, 95,6 s.
+
+Hypothèses du rendu, le code de mise en page du texte n'étant pas lu : chasse d'un caractère =
+largeur de son image + 2, espace = 6 pixels, interligne 16, titre centré sur 320 pixels. Le son
+n'est pas rendu.
 - Non exportés : `Speech_LoadBank_28D24` (`rmusic.pak` / `amusic.pak`, 23) à la fin de la scène 25,
   rôle non établi ; le rectangle de couleur 0 de la scène 23 (`Primitive_SetRectColorAndDraw_2CBE5`),
   dessiné sur la bande noire du bas.

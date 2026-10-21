@@ -143,6 +143,13 @@ class Player:
         self.open_marker = None
         self.warnings = []
         self.rng = random.Random(1)
+        # Facultatif, quand les données du jeu sont disponibles : nombre d'images d'une ressource
+        # (Struct_GetElementCountMinusOne_33352) et durée d'une réplique en secondes. Sans elles,
+        # les boucles qui attendent une fin sont simulées sur MAX_OPEN_FRAMES images.
+        self.image_count = None
+        self.voice_seconds = None
+        self.clock = 0.0
+        self.voice_end = 0.0
         self.screen_offsets = screen_offsets(data)
 
     # ------------------------------------------------------------------ valeurs
@@ -253,8 +260,14 @@ class Player:
     def call_result(self, text):
         m = re.match(r'^animation_finie\(calque=(\w+)\)$', text)
         if m:
+            n = self.count_of(self.layers[m.group(1)]) if m.group(1) in self.layers else None
+            if n is not None:
+                # AnimLayer_IsFinished_2E654 : image courante == nombre d'images.
+                return 1 if self.layers[m.group(1)].image == n else 0
             return Marker('animation', m.group(1))
         if re.match(r'^(voix\d+\.finie\(\)|voix_finie .*)$', text):
+            if self.voice_seconds:
+                return 1 if self.clock >= self.voice_end else 0
             return Marker('voix')
         m = re.match(r'^(\w+)\.y_absolu\(\)$', text)
         if m and m.group(1) in self.layers:
@@ -579,7 +592,7 @@ class Player:
             key, index = self.text_ref(args['c'])
             self.direct_items.append({'key': f'txt{len(self.direct_items)}', 'kind': 'text', 'text': (key, index),
                                       'y': self.ev(args['b']) + BAND_TOP, 'dy': BAND_TOP,
-                                      'align': self.ev(args['a'])})
+                                      'align': self.ev(args['a']), 'step': self.env.get('si')})
         elif name == 'présente':
             self.last_frame = list(self.direct_items)
             self.direct_items = []
@@ -620,6 +633,13 @@ class Player:
     def play_voice(self):
         if self.voice_res is not None:
             self.pending['sounds'].append(self.voice_res[2])
+            if self.voice_seconds:
+                self.voice_end = self.clock + self.voice_seconds(self.voice_res[2])
+
+    def count_of(self, layer):
+        if self.image_count is None or layer.res is None:
+            return None
+        return self.image_count(layer.res)
 
     def channel_of(self, v):
         text = json.dumps(v, ensure_ascii=False)
@@ -737,13 +757,26 @@ class Player:
                     step = self.rng.randint(0, 1)
                     setattr(layer, axis, getattr(layer, axis) + (step if self.rng.random() < 0.5 else -step))
         elif t == 'AnimLayer':
-            layer.image += 1
+            # AnimLayer_Advance_2E607 : avance tant que l'image < nombre d'images ; elle s'arrête
+            # donc sur l'image n, qui n'existe pas et n'est pas dessinée.
+            n = self.count_of(layer)
+            if n is None or layer.image < n:
+                layer.image += 1
         elif t == 'LoopAnimLayer':
-            layer.image += 1 if layer.mode == 0 else -1
+            n = self.count_of(layer)
+            if layer.mode == 0:
+                layer.image += 1
+                if n is not None and layer.image == n:
+                    layer.image = 0
+            else:
+                layer.image -= 1
         elif t == 'OverlayAnimLayer':
-            layer.image += 1
+            n = self.count_of(layer)
+            if n is None or layer.image < n - 1:
+                layer.image += 1
         elif t == 'TriggeredAnimLayer':
-            if layer.lecture:
+            n = self.count_of(layer)
+            if layer.lecture and (n is None or layer.image < n - 1):
                 layer.image += 1
         elif t == 'ToggleLayer':
             layer.image = min(13, layer.image + 1) if layer.sens else max(0, layer.image - 1)
@@ -823,6 +856,7 @@ class Player:
             s['sounds'].append((len(s['frames']), entry))
         p['sounds'] = []
         s['frames'].append(items)
+        self.clock += 1.0 / fps
 
 
 # ---------------------------------------------------------------------- écriture IFF

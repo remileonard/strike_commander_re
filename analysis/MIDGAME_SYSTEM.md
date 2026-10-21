@@ -163,7 +163,8 @@ Chaque calque contient :
 
 **Une ressource d'images** est une table de décalages suivie des images. Le nombre d'images est
 lu dans l'en-tête : `Struct_GetElementCountMinusOne_33352` renvoie `(premier décalage ÷ 4) − 1`,
-valeur utilisée comme **limite** par les animations. Chaque image est dessinée par `sub_32CD8`
+valeur utilisée comme **limite** par les animations. Malgré son nom, c'est le **nombre d'images** : le
+premier décalage vaut 4 + 4 × n (taille, puis table de n décalages), d'où (4 + 4n) ÷ 4 − 1 = n. Chaque image est dessinée par `sub_32CD8`
 (nom repris de STRIKE `Render_MeasureOrDrawTextString_32CD8`, faux ici) en (x, y).
 
 **La surface de dessin des cinématiques (relu le 2026-10-21).** Les calques ne sont pas dessinés
@@ -208,7 +209,7 @@ cinématique les fabrique directement (allocation, calque de base, puis table de
 |---|---|---|
 | Calque simple `Layer_Construct_2DF9B` | image n | rien (avance seulement ses enfants) |
 | Image fixe `ImageLayer_Construct_2E02C` | image n (donnée à la création) | rien |
-| Animation `AnimLayer_Construct_2E5CF` | image n, départ 0 | n + 1 jusqu'à la limite, puis reste dessus |
+| Animation `AnimLayer_Construct_2E5CF` | image n, départ 0 | n + 1 tant que n < limite (`AnimLayer_Advance_2E607`), puis reste sur l'image « limite », qui n'existe pas : **rien n'est dessiné** (voir § 6.1) |
 | **Animation en boucle** (fabriquée dans la cinématique, table de méthodes 4958) | image n, départ 0 | mode 0 : n + 1, et retour à 0 quand n atteint la limite ; mode 1 : n − 1 (`LoopAnimLayer_Advance_2E6D6`) |
 | **Calque mobile** (fabriqué dans la cinématique, table de méthodes 6519) | image n | x += vx, y += vy (`MovingLayer_Advance_2E2D1`) |
 | Image qui tremble `JitterImageLayer_Construct_B12E` | image n | x et y bougent au hasard de 0 ou 1 pixel |
@@ -411,7 +412,13 @@ plans de dialogue : ses enfants tremblent avec elle.
 
 ### 6.1 Animation simple et animation en boucle
 
-L'animation simple avance d'une image par image de scène et **s'arrête sur sa dernière image** ; sa
+L'animation simple avance d'une image par image de scène jusqu'à l'image numéro « nombre d'images »,
+qui n'existe pas (relu le 2026-10-21) : `Render_MeasureOrDrawTextString_32CD8` ne dessine rien quand
+(image + 1) × 4 ≥ premier décalage (`inc bx / shl bx, 1 / shl bx, 1 / cmp [si+4], bx`). Une
+animation laissée dans la scène **disparaît donc après sa dernière image** ; `AnimLayer_IsFinished_2E654`
+est vrai à ce moment-là (image = nombre d'images), et les boucles qui l'attendent sortent avant de
+dessiner cette image vide. Les animations sur fond et à déclencher, elles, s'arrêtent sur l'image
+n − 1, dessinée ; sa
 durée dépend de son nombre d'images et de la cadence. L'animation en boucle (mode 0) revient à
 l'image 0 quand elle atteint la limite. Variantes : départ à 1 avec l'image 0 comme fond permanent
 (animation sur fond), départ seulement quand la cinématique pose le drapeau de lecture (animation
@@ -515,6 +522,12 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
   `convdata.iff`, `sub_C3A6` → `sub_C13D`) ; avant la scène 4, `mid1` 42 ; avant la scène 5,
   `mid1` 44 et 38 ; avant la scène 8, `mid1` 45 et 39 ; scène 9, `mid1` 43 (réutilisée scène 18) ;
   scène 20, `midgames` 23 (réutilisée scène 25).
+- **Constaté dans les données (2026-10-21, `BIGTRE.TRE`)** : aucune palette de mid1 n'a 256 couleurs.
+  Premier indice et nombre : `optpals` 21 = 0 et 48, `midgames` 22 = 48 et 48, `optpals` 24 = 96 et 32,
+  `midgames` 23 = 128 et 128, `mid1` 38 = 205 et 51, `mid1` 39 = 198 et 58, `mid1` 42, 48 et 51 =
+  128 et 128, `mid1` 43 = 48 et 80, `mid1` 44 = 48 et 131, `mid1` 45 = 48 et 144, `mid1` 46 = 137 et
+  119, `mid1` 59 = 239 et 16 (les 16 couleurs translucides des titres), « normal » (`CONVPALS` 46) =
+  128 et 128. `mid1` 60 fait exactement 65 536 octets (16 étapes × 16 niveaux × 256).
 - **Fondus.** `Palette_FadeFromColor_2D165` (apparition depuis une couleur unie) et
   `Palette_FadeToColor_2D09C` (disparition vers une couleur unie). Le nombre d'étapes est le plus
   grand écart entre une composante et sa cible ; toutes les composantes arrivent ensemble ; chaque
