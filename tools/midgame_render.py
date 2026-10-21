@@ -325,12 +325,49 @@ def draw_items(screen, items, clip):
         if it.get('clip'):
             l, t, r, b = it['clip']
             c = (max(c[0], l), max(c[1], t), min(c[2], r), min(c[3], b))
+        if it.get('scale') and it['scale'] != (256, 256):
+            draw_scaled(screen, shape, it['image'], it['x'], it['y'], c, it['scale'])
+            continue
         if 'mask' in it:
             if it['mask']:
                 table = pak_entry(pak_path(it['mask'][1]), it['mask'][2])
                 draw_mask(screen, shape, it['image'], it['x'], it['y'], c, table)
             continue
         draw_image(screen, W, H, shape, it['image'], it['x'], it['y'], c)
+
+
+def draw_scaled(screen, shape, image, x0, y0, clip, scale):
+    """Render_DrawRotatedScaledSprite_33586, approché : échelle en 1/256 autour du point d'origine de
+    l'image (pas de lecture 1000000h / échelle), plus proche voisin ; arrondis du jeu non relus."""
+    from sc_data import image_spans
+    sx, sy = scale
+    if not sx or not sy:
+        return
+    src = {}
+    for x, y, pix in image_spans(shape, image):
+        for i, c in enumerate(pix):
+            src[(x + i, y)] = c
+    if not src:
+        return
+    xs = [p[0] for p in src]
+    ys = [p[1] for p in src]
+    cl, ct, cr, cb = clip
+    x_lo = min(int(min(xs) * sx / 256), int((max(xs) + 1) * sx / 256))
+    x_hi = max(int(min(xs) * sx / 256), int((max(xs) + 1) * sx / 256))
+    y_lo = min(int(min(ys) * sy / 256), int((max(ys) + 1) * sy / 256))
+    y_hi = max(int(min(ys) * sy / 256), int((max(ys) + 1) * sy / 256))
+    for dy in range(y_lo, y_hi + 1):
+        yy = y0 + dy
+        if yy < ct or yy > cb:
+            continue
+        sy_src = int(dy * 256 // sy)
+        for dx in range(x_lo, x_hi + 1):
+            xx = x0 + dx
+            if xx < cl or xx > cr:
+                continue
+            c = src.get((int(dx * 256 // sx), sy_src))
+            if c is not None:
+                screen[yy * W + xx] = c
 
 
 def draw_mask(screen, shape, image, x0, y0, clip, table):

@@ -982,6 +982,8 @@ Mécanismes nouveaux rencontrés : la tête habillée (§ 6.6), la voix testée 
 **mid3 (2026-10-21)** : calques mobiles sur fond, calque masque (ombre par table de couleurs),
 défilement en boucle ; détail dans `MID1_PLANS.md`, « mid3 ».
 
+**mid5 (2026-10-21)** : calque mobile à l'échelle ; détail dans `MID1_PLANS.md`, « mid5 ».
+
 Les 10 autres fonctions (une par cinématique : `sub_6B9C0` mid2, `sub_71680` mid3, `sub_768F0`
 mid5, `sub_81470` mid12, `sub_8B630` mid15, `sub_94A30` mid16, `sub_98210` mid17, `sub_9E080`
 mid20, `sub_A3C30` générique et mid33, `sub_AFB90` mid34 — toutes pas encore nommées) utilisent

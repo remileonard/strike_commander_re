@@ -3368,5 +3368,20 @@
     "new_name": "Layer_MoveBy_2E29E",
     "segment": "seg084",
     "summary": "far, LUE 2026-10-21. Ajoute (arg_2, arg_4) à la position du calque (+0Ch, +0Eh). mid3 : replace un décor défilant de 640 pixels quand il sort à gauche (x absolu < −319)."
+  },
+  "sub_9544": {
+    "new_name": "ScaledMovingLayer_Construct_9544",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Calque mobile à l'échelle (taille 25h, tables 1943h / 1967h) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_10), vitesse +1Dh = arg_C, +1Fh = arg_E, échelles +21h = arg_8 (largeur) et +23h = arg_A (hauteur), en 1/256 (256 = taille d'origine). Dessin : ScaledMovingLayer_DrawImage_C056 par sub_95D7. mid5 : `mid5` 5, échelle 300."
+  },
+  "loc_C056": {
+    "new_name": "ScaledMovingLayer_DrawImage_C056",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Méthode +20h de ScaledMovingLayer : si l'image ≠ −1, Render_DrawRotatedScaledSprite_33586(surface, x, y, forme, image, échelle +21h, échelle +23h)."
+  },
+  "sub_95D7": {
+    "new_name": "ScaledMovingLayer_DrawAt_95D7",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Méthode +20h (image courante +1Bh) en (arg_2, arg_4), puis dessin des enfants. Appelée par loc_962E (position propre) et loc_9661 (position + décalage du parent)."
   }
 }

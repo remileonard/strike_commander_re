@@ -220,3 +220,18 @@ Fonction pas encore nommée `sub_71680` : `--nom mid3`, même suite de commandes
 - **défilement en boucle** : un décor sorti à gauche (x < −319) est replacé 640 pixels plus loin
   (`Layer_MoveBy_2E29E`) ;
 - **reste de division** (`idiv`, reste dans `dx`) : image = compteur mod 3 toutes les 8 images.
+
+### mid5
+
+Fonction pas encore nommée `sub_768F0` : `--nom mid5`. 20 plans, 63,3 s (65,1 s avec le fondu),
+répliques et têtes en mode voix comme mid2. Mécanismes nouveaux (2026-10-21) :
+- **calque mobile à l'échelle** (`ScaledMovingLayer_Construct_9544`, dessin
+  `Render_DrawRotatedScaledSprite_33586`) : deux échelles en 1/256 (pas de lecture du dessin =
+  1000000h / échelle : 256 = taille d'origine, négatif = retourné) ; mid5 : les trois silhouettes qui
+  s'enfuient, à 300 (× 1,17). **Pas exprimé dans le format** : l'image est écrite à sa taille
+  d'origine, d'où 148 instants différents ; sans l'échelle, 0 écart. Le rendu de référence fait
+  l'agrandissement au plus proche voisin autour du point d'origine de l'image ; les arrondis exacts de
+  la fonction du jeu ne sont pas relus ;
+- **compteur d'attente dans la case d'une palette** : la case de pile d'une palette sert de compteur
+  (`var_10C`, attentes de 2 ou 3 images avant une réplique) ; l'extracteur la traite comme variable ;
+- effets sonores tirés dans une petite table (`asoundfx`), non exprimés.

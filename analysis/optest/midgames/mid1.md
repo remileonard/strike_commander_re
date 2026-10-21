@@ -1105,10 +1105,11 @@ v336 = 199                                                                      
 zone_texte(zone=zone3, police=&v980)                                                                  ⟨211318⟩
 v346 = v340                                                                                           ⟨211322⟩
 v348 = v338                                                                                           ⟨211324⟩
+pal13(mid1 54).+0 = v336                                                                              ⟨211326⟩
 v3583 = v342                                                                                          ⟨211328⟩
 v3581 = v346                                                                                          ⟨211330⟩
 v3579 = v348                                                                                          ⟨211332⟩
-v3577 = v336                                                                                          ⟨211334⟩
+v3577 = pal13(mid1 54).+0                                                                             ⟨211334⟩
 palette_copie(destination=pal1, source=pal18(mid1 45))                                                ⟨211342⟩
 palette_copie(destination=pal1, source=pal19(mid1 39))                                                ⟨211351⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨211363⟩
@@ -1860,10 +1861,11 @@ v76 = objet39.+4                                                                
 v74 = objet39.+6                                                                                      ⟨216939⟩
 zone_texte(zone=zone5, police=police1)                                                                ⟨216948⟩
 v86 = v78                                                                                             ⟨216952⟩
+pal22(mid1 47).+0 = v76                                                                               ⟨216954⟩
 v90 = v74                                                                                             ⟨216956⟩
 v285 = v80                                                                                            ⟨216958⟩
 v283 = v86                                                                                            ⟨216960⟩
-v281 = v76                                                                                            ⟨216962⟩
+v281 = pal22(mid1 47).+0                                                                              ⟨216962⟩
 v279 = v90                                                                                            ⟨216964⟩
 
 ──── scène18 ────
@@ -1901,15 +1903,15 @@ scène19 = Scene_Create(cadence=10, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217269⟩
 v80 = objet39.+0                                                                                      ⟨217271⟩
 v78 = objet39.+2                                                                                      ⟨217273⟩
-v76_avant = v76                                                                                       ⟨217275⟩
 v76 = objet39.+4                                                                                      ⟨217275⟩
 v74 = objet39.+6                                                                                      ⟨217277⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217286⟩
 v86 = v78                                                                                             ⟨217290⟩
+pal22(mid1 47).+0 = v76                                                                               ⟨217292⟩
 v90 = v74                                                                                             ⟨217294⟩
 v319 = v80                                                                                            ⟨217296⟩
 v317 = v86                                                                                            ⟨217298⟩
-v315 = v76                                                                                            ⟨217300⟩
+v315 = pal22(mid1 47).+0                                                                              ⟨217300⟩
 v313 = v90                                                                                            ⟨217302⟩
 palette_copie(destination=pal1, source=pal18(mid1 45))                                                ⟨217312⟩
 palette_copie(destination=pal1, source=pal19(mid1 39))                                                ⟨217323⟩
@@ -1956,15 +1958,15 @@ scène20 = Scene_Create(cadence=20, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217627⟩
 v80 = objet39.+0                                                                                      ⟨217629⟩
 v78 = objet39.+2                                                                                      ⟨217631⟩
-v76_avant = v76                                                                                       ⟨217633⟩
 v76 = objet39.+4                                                                                      ⟨217633⟩
 v74 = objet39.+6                                                                                      ⟨217635⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217644⟩
 v86 = v78                                                                                             ⟨217648⟩
+pal22(mid1 47).+0 = v76                                                                               ⟨217650⟩
 v90 = v74                                                                                             ⟨217652⟩
 v319 = v80                                                                                            ⟨217654⟩
 v317 = v86                                                                                            ⟨217656⟩
-v315 = v76                                                                                            ⟨217658⟩
+v315 = pal22(mid1 47).+0                                                                              ⟨217658⟩
 v313 = v90                                                                                            ⟨217660⟩
 palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨217670⟩
 palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨217681⟩
@@ -2005,15 +2007,15 @@ scène21 = Scene_Create(cadence=10, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217929⟩
 v80 = objet39.+0                                                                                      ⟨217931⟩
 v78 = objet39.+2                                                                                      ⟨217933⟩
-v76_avant = v76                                                                                       ⟨217935⟩
 v76 = objet39.+4                                                                                      ⟨217935⟩
 v74 = objet39.+6                                                                                      ⟨217937⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217946⟩
 v86 = v78                                                                                             ⟨217950⟩
+pal22(mid1 47).+0 = v76                                                                               ⟨217952⟩
 v90 = v74                                                                                             ⟨217954⟩
 v319 = v80                                                                                            ⟨217956⟩
 v317 = v86                                                                                            ⟨217958⟩
-v315 = v76                                                                                            ⟨217960⟩
+v315 = pal22(mid1 47).+0                                                                              ⟨217960⟩
 v313 = v90                                                                                            ⟨217962⟩
 palette_copie(destination=pal1, source=pal18(mid1 45))                                                ⟨217972⟩
 palette_copie(destination=pal1, source=pal19(mid1 39))                                                ⟨217983⟩
@@ -2062,15 +2064,15 @@ scène22 = Scene_Create(cadence=20, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨218252⟩
 v80 = objet39.+0                                                                                      ⟨218254⟩
 v78 = objet39.+2                                                                                      ⟨218256⟩
-v76_avant = v76                                                                                       ⟨218258⟩
 v76 = objet39.+4                                                                                      ⟨218258⟩
 v74 = objet39.+6                                                                                      ⟨218260⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨218269⟩
 v86 = v78                                                                                             ⟨218273⟩
+pal22(mid1 47).+0 = v76                                                                               ⟨218275⟩
 v90 = v74                                                                                             ⟨218277⟩
 v319 = v80                                                                                            ⟨218279⟩
 v317 = v86                                                                                            ⟨218281⟩
-v315 = v76                                                                                            ⟨218283⟩
+v315 = pal22(mid1 47).+0                                                                              ⟨218283⟩
 v313 = v90                                                                                            ⟨218285⟩
 palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨218295⟩
 palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨218306⟩
@@ -2123,7 +2125,6 @@ sinon :
     si v31 != 0 :
         canal_arrête(canal=canal3)                                                                    ⟨218669⟩
         canal_enregistre(canal=canal3, ressource=objets1 + 50, x=0)                                   ⟨218676⟩
-v76_avant = v76                                                                                       ⟨218684⟩
 v76 = 0                                                                                               ⟨218684⟩
 charge(mid1 60)                                                                                       ⟨218690⟩
 charge(mid1 46)                                                                                       ⟨218701⟩

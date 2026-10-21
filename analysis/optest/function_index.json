@@ -2908,8 +2908,8 @@
 "sub_64E",
 "sub_2E02C"
 ],
-"new_name": "sub_9544",
-"summary": ""
+"new_name": "ScaledMovingLayer_Construct_9544",
+"summary": "far, LUE 2026-10-21. Calque mobile à l'échelle (taille 25h, tables 1943h / 1967h) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_10), vitesse +1Dh = arg_C, +1Fh = arg_E, échelles +21h = arg_8 (largeur) et +23h = arg_A (hauteur), en 1/256 (256 = taille d'origine). Dessin : ScaledMovingLayer_DrawImage_C056 par sub_95D7. mid5 : `mid5` 5, échelle 300."
 },
 "sub_95D7": {
 "segment": "seg014",
@@ -2920,8 +2920,8 @@
 "calls": [
 "sub_2FC4A"
 ],
-"new_name": "sub_95D7",
-"summary": ""
+"new_name": "ScaledMovingLayer_DrawAt_95D7",
+"summary": "far, LUE 2026-10-21. Méthode +20h (image courante +1Bh) en (arg_2, arg_4), puis dessin des enfants. Appelée par loc_962E (position propre) et loc_9661 (position + décalage du parent)."
 },
 "sub_9701": {
 "segment": "seg014",
@@ -36090,5 +36090,15 @@
 "calls": [],
 "new_name": "MovingMaskLayer_Draw_BA2C",
 "summary": "far, LUE 2026-10-21. Méthode +10h de MovingMaskLayer : Render_DrawShapeAsRemapMask_33B9C avec la table +21h, pour l'image 0 puis pour l'image courante, à la position du calque."
+},
+"loc_C056": {
+"segment": "seg014",
+"start_line": 27554,
+"end_line": 27554,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ScaledMovingLayer_DrawImage_C056",
+"summary": "far, LUE 2026-10-21. Méthode +20h de ScaledMovingLayer : si l'image ≠ −1, Render_DrawRotatedScaledSprite_33586(surface, x, y, forme, image, échelle +21h, échelle +23h)."
 }
 }

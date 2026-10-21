@@ -732,6 +732,22 @@
     "source",
     "taille"
    ]
+  },
+  "ScaledMovingLayer_Construct_9544": {
+   "op": "ScaledMovingLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "échelle_x",
+    "échelle_y",
+    "vx",
+    "vy",
+    "image"
+   ],
+   "type": "ScaledMovingLayer",
+   "ret": "layer"
   }
  },
  "vtables": {
@@ -749,7 +765,8 @@
   "6275": "TalkingHead",
   "6794": "scene",
   "6091": "MovingOverlayLayer",
-  "5607": "MovingMaskLayer"
+  "5607": "MovingMaskLayer",
+  "6467": "ScaledMovingLayer"
  },
  "secondary_vtables": [
   6551,
@@ -822,6 +839,12 @@
   "MovingMaskLayer": {
    "29": "vx",
    "31": "vy"
+  },
+  "ScaledMovingLayer": {
+   "29": "vx",
+   "31": "vy",
+   "33": "échelle_x",
+   "35": "échelle_y"
   }
  },
  "methods": {

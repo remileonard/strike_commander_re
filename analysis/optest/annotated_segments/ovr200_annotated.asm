@@ -11469,7 +11469,7 @@ loc_7EAA0:				; CODE XREF: sub_768F0+7CB5j
 		lea	ax, [bp+var_106]
 		push	ax
 		push	0
-		call	sub_9544
+		call	ScaledMovingLayer_Construct_9544
 		add	sp, 12h
 		mov	word ptr [bp+var_110+2], ax
 		push	2
@@ -11482,7 +11482,7 @@ loc_7EAA0:				; CODE XREF: sub_768F0+7CB5j
 		lea	ax, [bp+var_106]
 		push	ax
 		push	0
-		call	sub_9544
+		call	ScaledMovingLayer_Construct_9544
 		add	sp, 12h
 		mov	word ptr [bp+var_110], ax
 		push	3
@@ -11495,7 +11495,7 @@ loc_7EAA0:				; CODE XREF: sub_768F0+7CB5j
 		lea	ax, [bp+var_106]
 		push	ax
 		push	0
-		call	sub_9544
+		call	ScaledMovingLayer_Construct_9544
 		add	sp, 12h
 		mov	[bp+var_112], ax
 		push	[bp+var_60]

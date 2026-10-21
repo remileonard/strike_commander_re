@@ -1036,7 +1036,7 @@ Layer_Construct_2DF9B	endp
 ; far, LUE 2026-10-17. Comme Layer_Construct_2DF9B, avec le numéro d'image affichée +27 =
 ; arg_8 : image fixe n de la ressource.
 ; ==============================================================================================
-ImageLayer_Construct_2E02C	proc far		; CODE XREF: sub_9391+28P sub_9544+4FP ...
+ImageLayer_Construct_2E02C	proc far		; CODE XREF: sub_9391+28P ScaledMovingLayer_Construct_9544+4FP ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2

@@ -438,10 +438,10 @@ class Player:
         o = self.objects.get(obj)
         if o and o['genre'] == 'channel' and field == '+0':
             return 1 if obj in self.channels else 0
-        if o and o['genre'] == 'res':
-            # Case de pile d'une ressource réutilisée comme variable par la cinématique (mid2 :
-            # compteur var_188 dans la case de mid2voc 9). L'extracteur ne voit pas cette réutilisation :
-            # la valeur écrite est perdue, lue ici comme 0.
+        if o and o['genre'] in ('res', 'palette'):
+            # Case de pile d'une ressource ou d'une palette réutilisée comme variable (mid5 : compteur
+            # var_10C dans la case d'une palette). Sans écriture vue par l'extracteur (mid2, var_188),
+            # la valeur est lue comme 0.
             key = f'{obj}.{field}'
             if key not in self.env:
                 self.warn(f'champ de ressource lu comme variable : {o.get("contenu")} {field}, pris à 0')
@@ -454,6 +454,9 @@ class Player:
             layer = self.layers[obj]
             if field in ('x', 'y', 'vx', 'vy', 'mode', 'lecture', 'sens'):
                 setattr(layer, field, value)
+            elif field in ('échelle_x', 'échelle_y'):
+                sx, sy = getattr(layer, 'scale', (256, 256))
+                layer.scale = (value, sy) if field == 'échelle_x' else (sx, value)
             elif field == 'image':
                 if layer.type in ANIMATED and value != layer.image:
                     layer.forced = True
@@ -474,6 +477,8 @@ class Player:
             return
         o = self.objects.get(obj)
         if o and o['genre'] == 'surface' and field in ('gauche', 'haut', 'droite', 'bas'):
+            self.env[f'{obj}.{field}'] = value
+        if o and o['genre'] in ('res', 'palette'):
             self.env[f'{obj}.{field}'] = value
 
     def cond(self, c):
@@ -660,7 +665,9 @@ class Player:
             layer.image = 0 if layer.sens else 13
         if kind in ('TalkingHead', 'TalkingHeadOverlay'):
             layer.image = None
-        if kind in ('MovingOverlayLayer', 'MovingMaskLayer'):
+        if kind == 'ScaledMovingLayer':
+            layer.scale = (self.ev(args.get('échelle_x')) or 256, self.ev(args.get('échelle_y')) or 256)
+        if kind in ('MovingOverlayLayer', 'MovingMaskLayer', 'ScaledMovingLayer'):
             # MovingOverlayLayer_Construct_A837 / MovingMaskLayer_Construct_B995 : vitesse donnée au
             # constructeur.
             layer.vx = self.ev(args.get('vx')) or 0
@@ -924,6 +931,11 @@ class Player:
         elif t in ('OverlayImageLayer', 'MovingOverlayLayer'):
             out.append(self.item(n + ':fond', layer.res, 0, ax, ay))
             out.append(self.item(n, layer.res, layer.image, ax, ay))
+        elif t == 'ScaledMovingLayer':
+            # ScaledMovingLayer_DrawImage_C056 : image à l'échelle (1/256, 256 = taille d'origine).
+            it = self.item(n, layer.res, layer.image, ax, ay)
+            it['scale'] = layer.scale
+            out.append(it)
         elif t == 'MovingMaskLayer':
             # MovingMaskLayer_Draw_BA2C : images 0 puis courante en masque, chaque pixel couvert devient
             # table[couleur de l'écran] (Render_DrawShapeAsRemapMask_33B9C).
@@ -975,7 +987,7 @@ class Player:
     def advance(self, layer):
         t = layer.type
         if t in ('MovingLayer', 'ClippedMovingLayer', 'ClippedMovingImageLayer', 'MovingOverlayLayer',
-                 'MovingMaskLayer'):
+                 'MovingMaskLayer', 'ScaledMovingLayer'):
             layer.x += layer.vx
             layer.y += layer.vy
         elif t == 'JitterImageLayer':
@@ -1162,6 +1174,7 @@ def layer_chunks(shot, key, start, stop, depth, layer_id):
     if 'mask' in first:
         # Calque masque (ombre par table de couleurs) : pas exprimé dans le format.
         return None, None
+    # Échelle (ScaledMovingLayer) : pas exprimée dans le format, image écrite à sa taille d'origine.
     positions = [(it['x'], it['y']) for it in seq]
     if res[0] == 'face':
         positions = [(x - FACE_ANCHOR[0], y - BAND_TOP - FACE_ANCHOR[1]) for x, y in positions]

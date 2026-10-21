@@ -293,7 +293,14 @@ sub_94F4	endp
 
 ; Attributes: bp-based frame
 
-sub_9544	proc far		; CODE XREF: sub_768F0+828BP
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque mobile à l'échelle (taille 25h, tables 1943h / 1967h) :
+; ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_10), vitesse +1Dh =
+; arg_C, +1Fh = arg_E, échelles +21h = arg_8 (largeur) et +23h = arg_A (hauteur), en 1/256
+; (256 = taille d'origine). Dessin : ScaledMovingLayer_DrawImage_C056 par sub_95D7. mid5 :
+; mid5 5, échelle 300.
+; ==============================================================================================
+ScaledMovingLayer_Construct_9544	proc far		; CODE XREF: sub_768F0+828BP
 					; sub_768F0+82AEP ...
 
 var_C		= word ptr -0Ch
@@ -326,7 +333,7 @@ arg_10		= word ptr  16h
 		or	ax, ax
 		jz	short loc_95CF
 
-loc_9562:				; CODE XREF: sub_9544+Cj
+loc_9562:				; CODE XREF: ScaledMovingLayer_Construct_9544+Cj
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_2], ax
 		mov	ax, [bp+arg_4]
@@ -361,12 +368,12 @@ loc_9562:				; CODE XREF: sub_9544+Cj
 		mov	ax, [bp+arg_A]
 		mov	[si+23h], ax
 
-loc_95CF:				; CODE XREF: sub_9544+1Cj
+loc_95CF:				; CODE XREF: ScaledMovingLayer_Construct_9544+1Cj
 		mov	ax, si
 		pop	si
 		leave
 		retf
-sub_9544	endp
+ScaledMovingLayer_Construct_9544	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -377,7 +384,11 @@ sub_9544	endp
 
 ; Attributes: bp-based frame
 
-sub_95D7	proc far		; CODE XREF: seg014:02C8p seg014:02F5p
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +20h (image courante +1Bh) en (arg_2, arg_4), puis dessin des
+; enfants. Appelée par loc_962E (position propre) et loc_9661 (position + décalage du parent).
+; ==============================================================================================
+ScaledMovingLayer_DrawAt_95D7	proc far		; CODE XREF: seg014:02C8p seg014:02F5p
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -402,7 +413,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_9614
 ; ���������������������������������������������������������������������������
 
-loc_95FC:				; CODE XREF: sub_95D7+51j
+loc_95FC:				; CODE XREF: ScaledMovingLayer_DrawAt_95D7+51j
 		push	[bp+arg_4]
 		push	di
 		mov	bx, [bp+var_2]
@@ -413,7 +424,7 @@ loc_95FC:				; CODE XREF: sub_95D7+51j
 		call	dword ptr [bx+10h]
 		add	sp, 6
 
-loc_9614:				; CODE XREF: sub_95D7+23j
+loc_9614:				; CODE XREF: ScaledMovingLayer_DrawAt_95D7+23j
 		lea	ax, [bp+var_2]
 		push	ax
 		mov	ax, si
@@ -427,7 +438,7 @@ loc_9614:				; CODE XREF: sub_95D7+23j
 		pop	si
 		leave
 		retf
-sub_95D7	endp
+ScaledMovingLayer_DrawAt_95D7	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -452,7 +463,7 @@ loc_962E:				; CODE XREF: seg014:2D2Dj
 		push	word ptr [bp-2]
 		push	si
 		push	cs
-		call	near ptr sub_95D7
+		call	near ptr ScaledMovingLayer_DrawAt_95D7
 		add	sp, 6
 		pop	si
 		leave
@@ -476,7 +487,7 @@ loc_9661:				; CODE XREF: seg014:2D15j
 		push	word ptr [bp-2]
 		push	si
 		push	cs
-		call	near ptr sub_95D7
+		call	near ptr ScaledMovingLayer_DrawAt_95D7
 		add	sp, 6
 		pop	si
 		leave
@@ -6152,7 +6163,12 @@ loc_C04E:				; CODE XREF: seg014:2C9Ej
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_C056:				; DATA XREF: dseg:1963o
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +20h de ScaledMovingLayer : si l'image ≠ −1,
+; Render_DrawRotatedScaledSprite_33586(surface, x, y, forme, image, échelle +21h, échelle
+; +23h).
+; ==============================================================================================
+ScaledMovingLayer_DrawImage_C056:				; DATA XREF: dseg:1963o
 		push	bp
 		mov	bp, sp
 		push	si
