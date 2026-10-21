@@ -786,7 +786,7 @@ CRT_Fmemcpy		endp
 
 ; Attributes: bp-based frame
 
-sub_3E9		proc far		; CODE XREF: sub_85A+10p
+sub_3E9		proc far		; CODE XREF: CRT_Time_85A+10p
 
 arg_0		= word ptr  6
 
@@ -810,7 +810,7 @@ sub_3E9		endp
 
 ; Attributes: bp-based frame
 
-sub_3FC		proc far		; CODE XREF: sub_85A+1Ap
+sub_3FC		proc far		; CODE XREF: CRT_Time_85A+1Ap
 
 arg_0		= word ptr  6
 
@@ -1500,7 +1500,12 @@ CRT_MulExtended32		endp
 
 ; Attributes: bp-based frame
 
-sub_6F2		proc far		; CODE XREF: sub_6B9C0+33BAP
+; ==============================================================================================
+; far, LUE 2026-10-21. srand() du runtime : graine de CRT_Rand (word_487DE = arg_0, word_487E0
+; = 0). Appelée par mid2 (sub_6B9C0) et mid17 (sub_98210) avec CRT_Time_85A(0) : tirages
+; différents à chaque partie.
+; ==============================================================================================
+CRT_Srand_6F2		proc far		; CODE XREF: sub_6B9C0+33BAP
 					; sub_98210+2997P
 
 arg_0		= word ptr  6
@@ -1512,7 +1517,7 @@ arg_0		= word ptr  6
 		mov	word_487DE, ax
 		pop	bp
 		retf
-sub_6F2		endp
+CRT_Srand_6F2		endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1777,7 +1782,11 @@ loc_811:				; CODE XREF: seg000:080Dj
 
 ; Attributes: bp-based frame
 
-sub_85A		proc far		; CODE XREF: sub_6B9C0+33B1P
+; ==============================================================================================
+; far, LUE 2026-10-21. time() du runtime : date (sub_3E9) et heure (sub_3FC) du DOS converties
+; par sub_2899 en secondes (dx:ax), rangées aussi en [arg_0] si arg_0 ≠ 0.
+; ==============================================================================================
+CRT_Time_85A		proc far		; CODE XREF: sub_6B9C0+33B1P
 					; sub_98210+298EP
 
 var_C		= word ptr -0Ch
@@ -1821,14 +1830,14 @@ arg_0		= word ptr  6
 		mov	[si+2],	ax
 		mov	[si], dx
 
-loc_89C:				; CODE XREF: sub_85A+35j
+loc_89C:				; CODE XREF: CRT_Time_85A+35j
 		mov	dx, [bp+var_A]
 		mov	ax, [bp+var_C]
 		pop	si
 		mov	sp, bp
 		pop	bp
 		retf
-sub_85A		endp
+CRT_Time_85A		endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -7826,7 +7835,7 @@ CRT_Strupr	endp
 
 ; Attributes: bp-based frame
 
-sub_2899	proc far		; CODE XREF: sub_85A+28p
+sub_2899	proc far		; CODE XREF: CRT_Time_85A+28p
 
 var_4		= word ptr -4
 var_2		= word ptr -2

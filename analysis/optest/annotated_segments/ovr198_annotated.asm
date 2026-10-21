@@ -4891,10 +4891,10 @@ loc_6ECBC:				; CODE XREF: sub_6B9C0+32F7j
 		mov	bx, [bp+var_170]
 		mov	word ptr [bx+1Bh], 0
 		push	0
-		call	sub_85A
+		call	CRT_Time_85A
 		add	sp, 2
 		push	ax
-		call	sub_6F2
+		call	CRT_Srand_6F2
 		add	sp, 2
 		mov	[bp+var_172], 4
 		cmp	[bp+var_E], 0

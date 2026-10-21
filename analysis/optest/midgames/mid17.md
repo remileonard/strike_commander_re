@@ -24,8 +24,10 @@ SmallObject_RegisterInList_2CB40(&v20, &v484)                                   
 palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨285482⟩
 v30 = 0                                                                                               ⟨285488⟩
 si v12 != 0 :
-    si sub_6734(chemin1) == 0 : aller à loc_983F5                                                     ⟨285581⟩
-    pak mid17voc.ouvre(chemin1, 1)                                                                    ⟨285588⟩
+    si sub_6734(chemin1) != 0 :
+        pak mid17voc.ouvre(chemin1, 1)                                                                ⟨285588⟩
+    sinon :
+        v12 = 0                                                                                       ⟨285595⟩
 sinon :
     v12 = 0                                                                                           ⟨285595⟩
 v40 = 0                                                                                               ⟨285598⟩
@@ -39,6 +41,7 @@ sinon :
         pak rsoundfx.ouvre(chemin1, 1)                                                                ⟨285649⟩
         flux_iff(flux=flux1)                                                                          ⟨285663⟩
         v3433 = 256                                                                                   ⟨285666⟩
+        v3437 = 0                                                                                     ⟨285667⟩
         flux1.ouvre(chemin1, 1)                                                                       ⟨285675⟩
         iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨285681⟩
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨285687⟩
@@ -62,6 +65,7 @@ sinon :
         pak asoundfx.ouvre(chemin1, 1)                                                                ⟨285785⟩
         flux_iff(flux=flux1)                                                                          ⟨285799⟩
         v3433 = 256                                                                                   ⟨285802⟩
+        v3437 = 0                                                                                     ⟨285803⟩
         flux1.ouvre(chemin1, 1)                                                                       ⟨285811⟩
         iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨285817⟩
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨285823⟩
@@ -90,8 +94,10 @@ si v13 != 0 :
         charge(asoundfx v48[si])                                                                      ⟨285934⟩
         canal_enregistre(canal=canal1, ressource=asoundfx v48[si], x=0)                               ⟨285941⟩
         canal_arrête(canal=canal1)                                                                    ⟨285945⟩
+        v228 = 0                                                                                      ⟨285965⟩
         si = si + 1                                                                                   ⟨285966⟩
     canal_arrête(canal=canal1)                                                                        ⟨285977⟩
+    v3372 = 0                                                                                         ⟨285995⟩
 v1214 = 0                                                                                             ⟨286000⟩
 v1209 = 0                                                                                             ⟨286002⟩
 v1208 = 0                                                                                             ⟨286003⟩
@@ -111,6 +117,7 @@ si v12 != 0 :
 sinon :
     flux_iff(flux=flux1)                                                                              ⟨286087⟩
     v3433 = 256                                                                                       ⟨286090⟩
+    v3437 = 0                                                                                         ⟨286091⟩
     flux1.ouvre(chemin1, 1)                                                                           ⟨286099⟩
     iff_form(flux=flux1, balise='MG17', x=0)                                                          ⟨286105⟩
     iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨286111⟩
@@ -174,6 +181,7 @@ zone_texte(zone=zone1, police=&v3328)                                           
 v122 = 152                                                                                            ⟨286464⟩
 v124 = 319                                                                                            ⟨286466⟩
 v126 = 199                                                                                            ⟨286468⟩
+v3337 = 0                                                                                             ⟨286470⟩
 v3335 = v122                                                                                          ⟨286472⟩
 v3333 = v124                                                                                          ⟨286474⟩
 v3331 = v126                                                                                          ⟨286476⟩
@@ -191,17 +199,47 @@ palette_depuis(pal7(midgames 11))                                               
 charge_convdata_type2("normal")                                                                       ⟨286588⟩
 palette_depuis(pal8(convdata type 2 "normal"))                                                        ⟨286595⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨286625⟩
+    v208 = 0                                                                                          ⟨286626⟩
+    v193 = 0                                                                                          ⟨286649⟩
+    v192 = 0                                                                                          ⟨286650⟩
+    v177 = 0                                                                                          ⟨286673⟩
+    v176 = 0                                                                                          ⟨286674⟩
+    v161 = 0                                                                                          ⟨286697⟩
+    v160 = 0                                                                                          ⟨286698⟩
+    v151 = 0                                                                                          ⟨286716⟩
+    v150 = 0                                                                                          ⟨286717⟩
+    v141 = 0                                                                                          ⟨286735⟩
+    v140 = 0                                                                                          ⟨286736⟩
+    v131 = 0                                                                                          ⟨286754⟩
+    v130 = 0                                                                                          ⟨286755⟩
     v106 = 0                                                                                          ⟨286781⟩
     v101 = 0                                                                                          ⟨286782⟩
     v100 = 0                                                                                          ⟨286783⟩
+    v85 = 0                                                                                           ⟨286806⟩
+    v84 = 0                                                                                           ⟨286807⟩
+    v69 = 0                                                                                           ⟨286830⟩
+    v68 = 0                                                                                           ⟨286831⟩
+    v53 = 0                                                                                           ⟨286854⟩
+    v52 = 0                                                                                           ⟨286855⟩
     voix_arrête(voix=voix1)                                                                           ⟨286859⟩
+    v3288 = 0                                                                                         ⟨286877⟩
+    v3283 = 0                                                                                         ⟨286878⟩
+    v3282 = 0                                                                                         ⟨286879⟩
     canal_arrête(canal=canal2)                                                                        ⟨286882⟩
+    v1214 = 0                                                                                         ⟨286900⟩
+    v1209 = 0                                                                                         ⟨286901⟩
+    v1208 = 0                                                                                         ⟨286902⟩
+    v35 = 0                                                                                           ⟨286925⟩
+    v34 = 0                                                                                           ⟨286926⟩
     retour                                                                                            ⟨286978⟩
 si v11 != 0 :
     v222 = word_48F76                                                                                 ⟨286985⟩
     si canal2.+0 != 0 :
         AIL_start_sequence(pilote=canal2.+0→4, séquence=v1216)                                        ⟨286992⟩
-        sub_30C66(canal2.+0→4, v1216, v222, 0)                                                        ⟨286999⟩
+        AIL_set_relative_volume_30C66(canal2.+0→4, v1216, v222, 0)                                    ⟨286999⟩
+v3372 = 0                                                                                             ⟨287010⟩
+v3368 = 2                                                                                             ⟨287011⟩
 v3374 = -1                                                                                            ⟨287015⟩
 si v13 != 0 :
     charge(asoundfx 22)                                                                               ⟨287024⟩
@@ -240,7 +278,7 @@ tant que (scène1.compteur < 16) et (scène1.terminée == 0) :
             v312 = 0                                                                                  ⟨287232⟩
             si canal1.+0 != 0 :
                 AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287238⟩
-                sub_30C66(canal1.+0→4, v3374, v310, v312)                                             ⟨287245⟩
+                AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v310, v312)                         ⟨287245⟩
     si v308 == 8 :
         c2.image = 0                                                                                  ⟨287253⟩
         si v13 != 0 :
@@ -253,7 +291,7 @@ tant que (scène1.compteur < 16) et (scène1.terminée == 0) :
             v316 = 0                                                                                  ⟨287274⟩
             si canal1.+0 != 0 :
                 AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287280⟩
-                sub_30C66(canal1.+0→4, v3374, v314, v316)                                             ⟨287287⟩
+                AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v314, v316)                         ⟨287287⟩
     si v308 == 11 :
         c2.image = 0                                                                                  ⟨287295⟩
         si v13 != 0 :
@@ -266,7 +304,7 @@ tant que (scène1.compteur < 16) et (scène1.terminée == 0) :
             v320 = 0                                                                                  ⟨287316⟩
             si canal1.+0 != 0 :
                 AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                ⟨287322⟩
-                sub_30C66(canal1.+0→4, v3374, v318, v320)                                             ⟨287329⟩
+                AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v318, v320)                         ⟨287329⟩
     si v308 == 15 :
         c2.image = 0                                                                                  ⟨287337⟩
         si v13 != 0 :
@@ -281,29 +319,30 @@ si v12 != 0 :
     v318 = 0                                                                                          ⟨287407⟩
     tant que v318 < 4 :
         CRT_Rand()                                                                                    ⟨287412⟩
-        v320 = (CRT_Rand()·2) / -32768                                                                ⟨287418⟩
+        v320 = (CRT_Rand()·2) / 32768                                                                 ⟨287418⟩
         c2.image = v320                                                                               ⟨287420⟩
         Scene_Tick(scène=scène1)                                                                      ⟨287423⟩
         v318 = v318 + 1                                                                               ⟨287425⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨287433⟩
     v318 = 0                                                                                          ⟨287435⟩
-    tant que sub_8500(voix1) != 0 :
+    tant que voix_en_cours(voix=voix1) != 0 :
         CRT_Rand()                                                                                    ⟨287440⟩
-        v322 = (CRT_Rand()·2) / -32768                                                                ⟨287446⟩
+        v322 = (CRT_Rand()·2) / 32768                                                                 ⟨287446⟩
         c2.image = v322                                                                               ⟨287448⟩
         si v318 == 2 :
             si v13 != 0 :
                 v324 = word_48ECE                                                                     ⟨287454⟩
                 si canal1.+0 != 0 :
                     AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287461⟩
-                    sub_30C66(canal1.+0→4, v3374, v324, 0)                                            ⟨287468⟩
+                    AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v324, 0)                        ⟨287468⟩
         si v318 == 19 :
             retire(parent=scène1, calque=c3)                                                          ⟨287479⟩
             retire(parent=scène1, calque=c4)                                                          ⟨287484⟩
             ajoute c5 à scène1                                                                        ⟨287489⟩
             ajoute c6 à scène1                                                                        ⟨287494⟩
+        v318_avant = v318                                                                             ⟨287499⟩
         v318 = v318 + 1                                                                               ⟨287499⟩
-        si v318 == 10 :
+        si v318_avant == 10 :
             c5.image = 1                                                                              ⟨287503⟩
             c6.image = 1                                                                              ⟨287505⟩
         Scene_Tick(scène=scène1)                                                                      ⟨287520⟩
@@ -322,9 +361,9 @@ si v12 != 0 :
         Scene_Tick(scène=scène1)                                                                      ⟨287588⟩
         v318 = v318 + 1                                                                               ⟨287590⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨287598⟩
-    tant que sub_8500(voix1) != 0 :
+    tant que voix_en_cours(voix=voix1) != 0 :
         CRT_Rand()                                                                                    ⟨287604⟩
-        v338 = ((CRT_Rand()·2) / -32768) + 1                                                          ⟨287611⟩
+        v338 = ((CRT_Rand()·2) / 32768) + 1                                                           ⟨287611⟩
         c6.image = v338                                                                               ⟨287614⟩
         Scene_Tick(scène=scène1)                                                                      ⟨287627⟩
     v318 = 0                                                                                          ⟨287639⟩
@@ -332,6 +371,8 @@ si v12 != 0 :
         Scene_Tick(scène=scène1)                                                                      ⟨287646⟩
         v318 = v318 + 1                                                                               ⟨287648⟩
     voix_arrête(voix=voix1)                                                                           ⟨287655⟩
+    v330 = 0                                                                                          ⟨287675⟩
+    v310 = 0                                                                                          ⟨287694⟩
 sinon :
     v3342→0.méthode8(35)                                                                              ⟨287703⟩
     v6 = 62                                                                                           ⟨287705⟩
@@ -341,9 +382,10 @@ sinon :
         si v4 + 10 == v308 :
             si v13 != 0 :
                 v310 = word_48ECE                                                                     ⟨287730⟩
+                v312 = 0                                                                              ⟨287731⟩
                 si canal1.+0 != 0 :
                     AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287737⟩
-                    sub_30C66(canal1.+0→4, v3374, v310, v312)                                         ⟨287744⟩
+                    AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v310, v312)                     ⟨287744⟩
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                              ⟨287753⟩
             c2.image = 1                                                                              ⟨287755⟩
         si v4 + 14 == v308 :
@@ -371,6 +413,7 @@ sinon :
     c3.détruit(3)                                                                                     ⟨287900⟩
     c4.détruit(3)                                                                                     ⟨287911⟩
     c2.image = 1                                                                                      ⟨287916⟩
+    v6_avant = v4 + ((v6·70) / 100)                                                                   ⟨287917⟩
     v6 = 66                                                                                           ⟨287917⟩
     v4 = scène1.compteur                                                                              ⟨287919⟩
     tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :
@@ -378,9 +421,10 @@ sinon :
         si v4 + 1 == v308 :
             si v13 != 0 :
                 v310 = word_48ECE                                                                     ⟨287942⟩
+                v312 = 0                                                                              ⟨287943⟩
                 si canal1.+0 != 0 :
                     AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨287949⟩
-                    sub_30C66(canal1.+0→4, v3374, v310, v312)                                         ⟨287956⟩
+                    AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v310, v312)                     ⟨287956⟩
         si v4 + 2 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[1])                              ⟨287971⟩
         si (v4 + ((v6·70) / 100)) - 3 < v308 :
@@ -398,13 +442,14 @@ sinon :
                     AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨288015⟩
         Scene_Tick(scène=scène1)                                                                      ⟨288049⟩
     v3342→0.méthode8(15)                                                                              ⟨288079⟩
+    v6_avant = v4 + ((v6·70) / 100)                                                                   ⟨288081⟩
     v6 = 35                                                                                           ⟨288081⟩
     v4 = scène1.compteur                                                                              ⟨288083⟩
     tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :
         v308 = scène1.compteur                                                                        ⟨288098⟩
         si v4 + 6 < v308 :
             CRT_Rand()                                                                                ⟨288103⟩
-            v310 = ((CRT_Rand()·2) / -32768) + 1                                                      ⟨288110⟩
+            v310 = ((CRT_Rand()·2) / 32768) + 1                                                       ⟨288110⟩
             c6.image = v310                                                                           ⟨288113⟩
         si v4 + 6 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[4])                              ⟨288127⟩
@@ -418,13 +463,14 @@ sinon :
         si (v4 + ((v6·70) / 100)) - 6 < v308 :
             c6.image = 1                                                                              ⟨288158⟩
         Scene_Tick(scène=scène1)                                                                      ⟨288189⟩
+    v6_avant = v4 + ((v6·70) / 100)                                                                   ⟨288215⟩
     v6 = 38                                                                                           ⟨288215⟩
     v4 = scène1.compteur                                                                              ⟨288217⟩
     tant que (scène1.compteur < v4 + ((v6·70) / 100)) et (scène1.terminée == 0) :
         v308 = scène1.compteur                                                                        ⟨288232⟩
         si v4 + 6 < v308 :
             CRT_Rand()                                                                                ⟨288237⟩
-            v310 = ((CRT_Rand()·2) / -32768) + 1                                                      ⟨288244⟩
+            v310 = ((CRT_Rand()·2) / 32768) + 1                                                       ⟨288244⟩
             c6.image = v310                                                                           ⟨288247⟩
         si v4 + 6 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[6])                              ⟨288262⟩
@@ -439,14 +485,53 @@ sinon :
             Primitive_SetRectColorAndDraw_2CBE5(&v3422, v3337, v3335, v3333, v3331, 0, &v3360)        ⟨288292⟩
         Scene_Tick(scène=scène1)                                                                      ⟨288324⟩
 Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨288353⟩
+v291 = 0                                                                                              ⟨288372⟩
+v290 = 0                                                                                              ⟨288373⟩
+v280 = 0                                                                                              ⟨288392⟩
+v270 = 0                                                                                              ⟨288411⟩
+v266 = 0                                                                                              ⟨288428⟩
+v246 = 0                                                                                              ⟨288466⟩
 canal_arrête(canal=canal1)                                                                            ⟨288471⟩
+v3372 = 0                                                                                             ⟨288489⟩
+v231 = 0                                                                                              ⟨288509⟩
+v230 = 0                                                                                              ⟨288510⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨288539⟩
+    v208 = 0                                                                                          ⟨288540⟩
+    v193 = 0                                                                                          ⟨288563⟩
+    v192 = 0                                                                                          ⟨288564⟩
+    v177 = 0                                                                                          ⟨288587⟩
+    v176 = 0                                                                                          ⟨288588⟩
+    v161 = 0                                                                                          ⟨288611⟩
+    v160 = 0                                                                                          ⟨288612⟩
+    v151 = 0                                                                                          ⟨288630⟩
+    v150 = 0                                                                                          ⟨288631⟩
+    v141 = 0                                                                                          ⟨288649⟩
+    v140 = 0                                                                                          ⟨288650⟩
+    v131 = 0                                                                                          ⟨288668⟩
+    v130 = 0                                                                                          ⟨288669⟩
     v106 = 0                                                                                          ⟨288695⟩
     v101 = 0                                                                                          ⟨288696⟩
     v100 = 0                                                                                          ⟨288697⟩
+    v85 = 0                                                                                           ⟨288720⟩
+    v84 = 0                                                                                           ⟨288721⟩
+    v69 = 0                                                                                           ⟨288744⟩
+    v68 = 0                                                                                           ⟨288745⟩
+    v53 = 0                                                                                           ⟨288768⟩
+    v52 = 0                                                                                           ⟨288769⟩
     voix_arrête(voix=voix1)                                                                           ⟨288773⟩
+    v3288 = 0                                                                                         ⟨288791⟩
+    v3283 = 0                                                                                         ⟨288792⟩
+    v3282 = 0                                                                                         ⟨288793⟩
     canal_arrête(canal=canal2)                                                                        ⟨288796⟩
+    v1214 = 0                                                                                         ⟨288814⟩
+    v1209 = 0                                                                                         ⟨288815⟩
+    v1208 = 0                                                                                         ⟨288816⟩
+    v35 = 0                                                                                           ⟨288839⟩
+    v34 = 0                                                                                           ⟨288840⟩
     retour                                                                                            ⟨288892⟩
+v3372 = 0                                                                                             ⟨288900⟩
+v3368 = 2                                                                                             ⟨288901⟩
 v3374 = -1                                                                                            ⟨288905⟩
 si v13 != 0 :
     charge(asoundfx 22)                                                                               ⟨288914⟩
@@ -464,42 +549,48 @@ palette_copie(destination=pal1, source=pal8(convdata type 2 "normal"))          
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨288992⟩
 v3342→0.méthode8(224)                                                                                 ⟨288998⟩
 c7.image = 0                                                                                          ⟨289000⟩
-sub_85A(0)                                                                                            ⟨289003⟩
-sub_6F2(sub_85A(0))                                                                                   ⟨289006⟩
+v246 = 0                                                                                              ⟨289001⟩
+CRT_Time_85A(0)                                                                                       ⟨289003⟩
+CRT_Srand_6F2(CRT_Time_85A(0))                                                                        ⟨289006⟩
 v248 = 4                                                                                              ⟨289008⟩
 si v12 != 0 :
     Scene_Tick(scène=scène2)                                                                          ⟨289017⟩
     charge(mid17voc 3)                                                                                ⟨289029⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 3)                                 ⟨289035⟩
+    v260 = 0                                                                                          ⟨289037⟩
     tant que v260 < 4 :
         CRT_Rand()                                                                                    ⟨289042⟩
-        v262 = ((CRT_Rand()·6) / -32768) + 3                                                          ⟨289049⟩
+        v262 = ((CRT_Rand()·6) / 32768) + 3                                                           ⟨289049⟩
         c7.image = v262                                                                               ⟨289051⟩
         Scene_Tick(scène=scène2)                                                                      ⟨289054⟩
         v260 = v260 + 1                                                                               ⟨289056⟩
     si v13 != 0 :
         v264 = word_48EC2                                                                             ⟨289064⟩
+        v266 = 0                                                                                      ⟨289065⟩
         si canal1.+0 != 0 :
             AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                    ⟨289071⟩
-            sub_30C66(canal1.+0→4, v3374, v264, midgames 14.+0)                                       ⟨289078⟩
+            AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v264, v266)                             ⟨289078⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨289087⟩
-    tant que sub_8500(voix1) != 0 :
+    tant que voix_en_cours(voix=voix1) != 0 :
         CRT_Rand()                                                                                    ⟨289093⟩
-        v268 = ((CRT_Rand()·6) / -32768) + 3                                                          ⟨289100⟩
+        v268 = ((CRT_Rand()·6) / 32768) + 3                                                           ⟨289100⟩
         c7.image = v268                                                                               ⟨289102⟩
         Scene_Tick(scène=scène2)                                                                      ⟨289115⟩
     si v13 != 0 :
         si canal1.+0 != 0 :
             AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                                     ⟨289134⟩
+    v260 = 0                                                                                          ⟨289140⟩
     tant que v260 < 5 :
         si v248 < 1 :
             v248 = 1                                                                                  ⟨289147⟩
         v270 = v248                                                                                   ⟨289151⟩
+        v248_avant = v248                                                                             ⟨289152⟩
         v248 = v248 - 1                                                                               ⟨289152⟩
         c7.image = v270                                                                               ⟨289154⟩
         Scene_Tick(scène=scène2)                                                                      ⟨289157⟩
         v260 = v260 + 1                                                                               ⟨289159⟩
     voix_arrête(voix=voix1)                                                                           ⟨289166⟩
+    v252 = 0                                                                                          ⟨289186⟩
 sinon :
     v6 = 70                                                                                           ⟨289191⟩
     v4 = scène2.compteur                                                                              ⟨289193⟩
@@ -507,16 +598,21 @@ sinon :
         v250 = scène2.compteur                                                                        ⟨289208⟩
         si (v4 + ((v6·70) / 100)) - 10 > v250 :
             CRT_Rand()                                                                                ⟨289213⟩
-            v252 = ((CRT_Rand()·6) / -32768) + 3                                                      ⟨289222⟩
+            v246 = ((CRT_Rand()·6) / 32768) + 3                                                       ⟨289220⟩
+            v252 = v246                                                                               ⟨289222⟩
             c7.image = v252                                                                           ⟨289224⟩
         sinon :
-            v254 = midgames 12.+0                                                                     ⟨289237⟩
+            v246 = v246 - 1                                                                           ⟨289229⟩
+            si v246 < 1 :
+                v246_avant = v246                                                                     ⟨289233⟩
+                v246 = 1                                                                              ⟨289233⟩
+            v254 = v246                                                                               ⟨289237⟩
             c7.image = v254                                                                           ⟨289239⟩
         si v4 + 1 == v250 :
             si v13 != 0 :
                 si canal1.+0 != 0 :
                     AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨289256⟩
-                    sub_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)                          ⟨289263⟩
+                    AIL_set_relative_volume_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)      ⟨289263⟩
         si v4 + 2 == v250 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[7])                              ⟨289281⟩
         si (v4 + ((v6·70) / 100)) - 2 == v250 :
@@ -531,22 +627,28 @@ sinon :
                 si canal1.+0 != 0 :
                     AIL_stop_sequence(pilote=canal1.+0→4, séquence=v3374)                             ⟨289318⟩
         Scene_Tick(scène=scène2)                                                                      ⟨289352⟩
+    v6_avant = v4 + ((v6·70) / 100)                                                                   ⟨289378⟩
     v6 = 82                                                                                           ⟨289378⟩
     v4 = scène2.compteur                                                                              ⟨289380⟩
     tant que (scène2.compteur < v4 + ((v6·70) / 100)) et (scène2.terminée == 0) :
         v250 = scène2.compteur                                                                        ⟨289395⟩
         si (v4 + ((v6·70) / 100)) - 10 > v250 :
             CRT_Rand()                                                                                ⟨289400⟩
-            v252 = ((CRT_Rand()·6) / -32768) + 3                                                      ⟨289409⟩
+            v246 = ((CRT_Rand()·6) / 32768) + 3                                                       ⟨289407⟩
+            v252 = v246                                                                               ⟨289409⟩
             c7.image = v252                                                                           ⟨289411⟩
         sinon :
-            v254 = midgames 12.+0                                                                     ⟨289424⟩
+            v246 = v246 - 1                                                                           ⟨289416⟩
+            si v246 < 1 :
+                v246_avant = v246                                                                     ⟨289420⟩
+                v246 = 1                                                                              ⟨289420⟩
+            v254 = v246                                                                               ⟨289424⟩
             c7.image = v254                                                                           ⟨289426⟩
         si v4 + 1 == v250 :
             si v13 != 0 :
                 si canal1.+0 != 0 :
                     AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                            ⟨289443⟩
-                    sub_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)                          ⟨289450⟩
+                    AIL_set_relative_volume_30C66(canal1.+0→4, v3374, word_48ECE, mid17voc 3.+0)      ⟨289450⟩
         si v4 + 2 == v250 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[8])                              ⟨289467⟩
         si (v4 + ((v6·70) / 100)) - 2 == v250 :
@@ -563,22 +665,57 @@ sinon :
         Scene_Tick(scène=scène2)                                                                      ⟨289538⟩
 fondu_disparition(palette=pal1, couleur=&v30, pas=1, premier=0, nombre=256)                           ⟨289571⟩
 Scene_Destruct(scène=scène2, drapeaux=0)                                                              ⟨289576⟩
+v239 = 0                                                                                              ⟨289595⟩
 canal_arrête(canal=canal1)                                                                            ⟨289599⟩
+v3372 = 0                                                                                             ⟨289617⟩
+v228 = 0                                                                                              ⟨289638⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨289667⟩
+    v208 = 0                                                                                          ⟨289668⟩
+    v193 = 0                                                                                          ⟨289691⟩
+    v192 = 0                                                                                          ⟨289692⟩
+    v177 = 0                                                                                          ⟨289715⟩
+    v176 = 0                                                                                          ⟨289716⟩
+    v161 = 0                                                                                          ⟨289739⟩
+    v160 = 0                                                                                          ⟨289740⟩
+    v151 = 0                                                                                          ⟨289758⟩
+    v150 = 0                                                                                          ⟨289759⟩
+    v141 = 0                                                                                          ⟨289777⟩
+    v140 = 0                                                                                          ⟨289778⟩
+    v131 = 0                                                                                          ⟨289796⟩
+    v130 = 0                                                                                          ⟨289797⟩
     v106 = 0                                                                                          ⟨289823⟩
     v101 = 0                                                                                          ⟨289824⟩
     v100 = 0                                                                                          ⟨289825⟩
+    v85 = 0                                                                                           ⟨289848⟩
+    v84 = 0                                                                                           ⟨289849⟩
+    v69 = 0                                                                                           ⟨289872⟩
+    v68 = 0                                                                                           ⟨289873⟩
+    v53 = 0                                                                                           ⟨289896⟩
+    v52 = 0                                                                                           ⟨289897⟩
     voix_arrête(voix=voix1)                                                                           ⟨289901⟩
+    v3288 = 0                                                                                         ⟨289919⟩
+    v3283 = 0                                                                                         ⟨289920⟩
+    v3282 = 0                                                                                         ⟨289921⟩
     canal_arrête(canal=canal2)                                                                        ⟨289924⟩
+    v1214 = 0                                                                                         ⟨289942⟩
+    v1209 = 0                                                                                         ⟨289943⟩
+    v1208 = 0                                                                                         ⟨289944⟩
+    v35 = 0                                                                                           ⟨289967⟩
+    v34 = 0                                                                                           ⟨289968⟩
     retour                                                                                            ⟨290020⟩
+v228 = 0                                                                                              ⟨290027⟩
+v3372 = 0                                                                                             ⟨290028⟩
+v3368 = 2                                                                                             ⟨290029⟩
 v3374 = -1                                                                                            ⟨290033⟩
 si v13 != 0 :
     charge(asoundfx 7)                                                                                ⟨290046⟩
     canal_init(canal=canal1, pilote=word_46849)                                                       ⟨290051⟩
     canal_enregistre(canal=canal1, ressource=asoundfx 7, x=0)                                         ⟨290058⟩
+    v238 = 0                                                                                          ⟨290062⟩
     si canal1.+0 != 0 :
         AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                        ⟨290068⟩
-        sub_30C66(canal1.+0→4, v3374, word_48EB0, v238)                                               ⟨290075⟩
+        AIL_set_relative_volume_30C66(canal1.+0→4, v3374, word_48EB0, v238)                           ⟨290075⟩
 charge(mid17 10)                                                                                      ⟨290091⟩
 palette_depuis(pal9(mid17 10))                                                                        ⟨290098⟩
 charge(mid17 11)                                                                                      ⟨290110⟩
@@ -597,6 +734,7 @@ ajoute c10 à scène3                                                           
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨290194⟩
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨290199⟩
 Widget_Method_Dispatch8_314A9(zone1, 248)                                                             ⟨290204⟩
+v278 = 0                                                                                              ⟨290206⟩
 si = 3                                                                                                ⟨290207⟩
 tant que (scène3.compteur < 73) et (scène3.terminée == 0) :
     v280 = scène3.compteur                                                                            ⟨290213⟩
@@ -606,20 +744,58 @@ tant que (scène3.compteur < 73) et (scène3.terminée == 0) :
         c10.image = v282                                                                              ⟨290220⟩
     sinon :
         v284 = v278                                                                                   ⟨290226⟩
+        v278_avant = v278                                                                             ⟨290227⟩
         v278 = v278 + 1                                                                               ⟨290227⟩
         c9.image = v284                                                                               ⟨290230⟩
         si = si + 1                                                                                   ⟨290232⟩
         c10.image = si                                                                                ⟨290235⟩
     Scene_Tick(scène=scène3)                                                                          ⟨290250⟩
 Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨290280⟩
+v248 = 0                                                                                              ⟨290327⟩
+v242 = 0                                                                                              ⟨290329⟩
 canal_arrête(canal=canal1)                                                                            ⟨290332⟩
+v3372 = 0                                                                                             ⟨290350⟩
+v228 = 0                                                                                              ⟨290371⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨290400⟩
+    v208 = 0                                                                                          ⟨290401⟩
+    v193 = 0                                                                                          ⟨290424⟩
+    v192 = 0                                                                                          ⟨290425⟩
+    v177 = 0                                                                                          ⟨290448⟩
+    v176 = 0                                                                                          ⟨290449⟩
+    v161 = 0                                                                                          ⟨290472⟩
+    v160 = 0                                                                                          ⟨290473⟩
+    v151 = 0                                                                                          ⟨290491⟩
+    v150 = 0                                                                                          ⟨290492⟩
+    v141 = 0                                                                                          ⟨290510⟩
+    v140 = 0                                                                                          ⟨290511⟩
+    v131 = 0                                                                                          ⟨290529⟩
+    v130 = 0                                                                                          ⟨290530⟩
     v106 = 0                                                                                          ⟨290556⟩
     v101 = 0                                                                                          ⟨290557⟩
     v100 = 0                                                                                          ⟨290558⟩
+    v85 = 0                                                                                           ⟨290581⟩
+    v84 = 0                                                                                           ⟨290582⟩
+    v69 = 0                                                                                           ⟨290605⟩
+    v68 = 0                                                                                           ⟨290606⟩
+    v53 = 0                                                                                           ⟨290629⟩
+    v52 = 0                                                                                           ⟨290630⟩
     voix_arrête(voix=voix1)                                                                           ⟨290634⟩
+    v3288 = 0                                                                                         ⟨290652⟩
+    v3283 = 0                                                                                         ⟨290653⟩
+    v3282 = 0                                                                                         ⟨290654⟩
     canal_arrête(canal=canal2)                                                                        ⟨290657⟩
+    v1214 = 0                                                                                         ⟨290675⟩
+    v1209 = 0                                                                                         ⟨290676⟩
+    v1208 = 0                                                                                         ⟨290677⟩
+    v35 = 0                                                                                           ⟨290700⟩
+    v34 = 0                                                                                           ⟨290701⟩
     retour                                                                                            ⟨290753⟩
+v228 = 0                                                                                              ⟨290760⟩
+v240 = 2                                                                                              ⟨290762⟩
+v239 = 0                                                                                              ⟨290763⟩
+v3372 = 0                                                                                             ⟨290765⟩
+v3368 = 2                                                                                             ⟨290766⟩
 v3374 = -1                                                                                            ⟨290770⟩
 v3386 = 0                                                                                             ⟨290771⟩
 v3381 = 0                                                                                             ⟨290773⟩
@@ -629,9 +805,11 @@ si v13 != 0 :
     charge(asoundfx 93)                                                                               ⟨290789⟩
     canal_init(canal=canal1, pilote=word_46849)                                                       ⟨290794⟩
     canal_enregistre(canal=canal1, ressource=asoundfx 93, x=0)                                        ⟨290801⟩
+    v246 = word_48F5C                                                                                 ⟨290804⟩
+    v248 = 0                                                                                          ⟨290805⟩
     si canal1.+0 != 0 :
         AIL_start_sequence(pilote=canal1.+0→4, séquence=v3374)                                        ⟨290811⟩
-        sub_30C66(canal1.+0→4, v3374, word_48F5C, mid17 10.+0)                                        ⟨290818⟩
+        AIL_set_relative_volume_30C66(canal1.+0→4, v3374, v246, v248)                                 ⟨290818⟩
 charge(mid17 1)                                                                                       ⟨290834⟩
 charge(mid17 5)                                                                                       ⟨290846⟩
 charge(midgames 47)                                                                                   ⟨290858⟩
@@ -681,6 +859,7 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
         si = si + 1                                                                                   ⟨291112⟩
         c13.image = v358                                                                              ⟨291115⟩
         v360 = v354                                                                                   ⟨291117⟩
+        v354_avant = v354                                                                             ⟨291118⟩
         v354 = v354 + 1                                                                               ⟨291118⟩
         c15.image = v360                                                                              ⟨291121⟩
     sinon :
@@ -695,17 +874,41 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
             si = 1                                                                                    ⟨291165⟩
             c14.image = v362                                                                          ⟨291168⟩
             v364 = v354                                                                               ⟨291170⟩
+            v354_avant = v354                                                                         ⟨291171⟩
             v354 = v354 + 1                                                                           ⟨291171⟩
             c15.image = v364                                                                          ⟨291174⟩
         sinon :
             si v356 > 30 :
-                si v356 >= 50 : aller à loc_9C5BC                                                     ⟨291182⟩
-                v366 = si                                                                             ⟨291183⟩
-                si = si + 1                                                                           ⟨291184⟩
-                c14.image = v366                                                                      ⟨291187⟩
-                v368 = v354                                                                           ⟨291189⟩
-                v354 = v354 + 1                                                                       ⟨291190⟩
-                c15.image = v368                                                                      ⟨291193⟩
+                si v356 < 50 :
+                    v366 = si                                                                         ⟨291183⟩
+                    si = si + 1                                                                       ⟨291184⟩
+                    c14.image = v366                                                                  ⟨291187⟩
+                    v368 = v354                                                                       ⟨291189⟩
+                    v354_avant = v354                                                                 ⟨291190⟩
+                    v354 = v354 + 1                                                                   ⟨291190⟩
+                    c15.image = v368                                                                  ⟨291193⟩
+                sinon :
+                    si v356 == 50 :
+                        si v13 != 0 :
+                            charge(asoundfx 20)                                                       ⟨291217⟩
+                            canal_init(canal=canal3, pilote=word_46849)                               ⟨291222⟩
+                            canal_enregistre(canal=canal3, ressource=asoundfx 20, x=0)                ⟨291229⟩
+                            v370 = word_48ECA                                                         ⟨291232⟩
+                            si canal3.+0 != 0 :
+                                AIL_start_sequence(pilote=canal3.+0→4, séquence=v3388)                ⟨291239⟩
+                                AIL_set_relative_volume_30C66(canal3.+0→4, v3388, v370, 0)            ⟨291246⟩
+                        si = 0                                                                        ⟨291252⟩
+                        Scene_SetFps(scène=scène4, cadence=15)                                        ⟨291256⟩
+                        ajoute c16 à scène4                                                           ⟨291261⟩
+                        v374 = 0                                                                      ⟨291263⟩
+                        si = 1                                                                        ⟨291264⟩
+                        c16.image = v374                                                              ⟨291267⟩
+                    sinon :
+                        si v356 < 66 :
+                            si v356 & 1 != 0 :
+                                v376 = si                                                             ⟨291276⟩
+                                si = si + 1                                                           ⟨291277⟩
+                                c16.image = v376                                                      ⟨291280⟩
             sinon :
                 si v356 == 50 :
                     si v13 != 0 :
@@ -715,7 +918,7 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
                         v370 = word_48ECA                                                             ⟨291232⟩
                         si canal3.+0 != 0 :
                             AIL_start_sequence(pilote=canal3.+0→4, séquence=v3388)                    ⟨291239⟩
-                            sub_30C66(canal3.+0→4, v3388, v370, 0)                                    ⟨291246⟩
+                            AIL_set_relative_volume_30C66(canal3.+0→4, v3388, v370, 0)                ⟨291246⟩
                     si = 0                                                                            ⟨291252⟩
                     Scene_SetFps(scène=scène4, cadence=15)                                            ⟨291256⟩
                     ajoute c16 à scène4                                                               ⟨291261⟩
@@ -729,17 +932,63 @@ tant que (scène4.compteur < 83) et (scène4.terminée == 0) :
                             si = si + 1                                                               ⟨291277⟩
                             c16.image = v376                                                          ⟨291280⟩
     Scene_Tick(scène=scène4)                                                                          ⟨291296⟩
+v339 = 0                                                                                              ⟨291339⟩
+v338 = 0                                                                                              ⟨291340⟩
+v328 = 0                                                                                              ⟨291359⟩
+v318 = 0                                                                                              ⟨291378⟩
+v308 = 0                                                                                              ⟨291397⟩
 Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨291401⟩
+v288 = 0                                                                                              ⟨291426⟩
+v278 = 0                                                                                              ⟨291448⟩
+v272 = 0                                                                                              ⟨291450⟩
+v262 = 0                                                                                              ⟨291469⟩
+v252 = 0                                                                                              ⟨291488⟩
 canal_arrête(canal=canal3)                                                                            ⟨291491⟩
+v3386 = 0                                                                                             ⟨291509⟩
+v3380 = 0                                                                                             ⟨291511⟩
 canal_arrête(canal=canal1)                                                                            ⟨291514⟩
+v3372 = 0                                                                                             ⟨291532⟩
+v239 = 0                                                                                              ⟨291552⟩
+v228 = 0                                                                                              ⟨291572⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨291601⟩
+    v208 = 0                                                                                          ⟨291602⟩
+    v193 = 0                                                                                          ⟨291625⟩
+    v192 = 0                                                                                          ⟨291626⟩
+    v177 = 0                                                                                          ⟨291649⟩
+    v176 = 0                                                                                          ⟨291650⟩
+    v161 = 0                                                                                          ⟨291673⟩
+    v160 = 0                                                                                          ⟨291674⟩
+    v151 = 0                                                                                          ⟨291692⟩
+    v150 = 0                                                                                          ⟨291693⟩
+    v141 = 0                                                                                          ⟨291711⟩
+    v140 = 0                                                                                          ⟨291712⟩
+    v131 = 0                                                                                          ⟨291730⟩
+    v130 = 0                                                                                          ⟨291731⟩
     v106 = 0                                                                                          ⟨291757⟩
     v101 = 0                                                                                          ⟨291758⟩
     v100 = 0                                                                                          ⟨291759⟩
+    v85 = 0                                                                                           ⟨291782⟩
+    v84 = 0                                                                                           ⟨291783⟩
+    v69 = 0                                                                                           ⟨291806⟩
+    v68 = 0                                                                                           ⟨291807⟩
+    v53 = 0                                                                                           ⟨291830⟩
+    v52 = 0                                                                                           ⟨291831⟩
     voix_arrête(voix=voix1)                                                                           ⟨291835⟩
+    v3288 = 0                                                                                         ⟨291853⟩
+    v3283 = 0                                                                                         ⟨291854⟩
+    v3282 = 0                                                                                         ⟨291855⟩
     canal_arrête(canal=canal2)                                                                        ⟨291858⟩
+    v1214 = 0                                                                                         ⟨291876⟩
+    v1209 = 0                                                                                         ⟨291877⟩
+    v1208 = 0                                                                                         ⟨291878⟩
+    v35 = 0                                                                                           ⟨291901⟩
+    v34 = 0                                                                                           ⟨291902⟩
     retour                                                                                            ⟨291954⟩
+v228 = 0                                                                                              ⟨291961⟩
 charge(optshps 116)                                                                                   ⟨291968⟩
+v240 = 2                                                                                              ⟨291971⟩
+v239 = 0                                                                                              ⟨291972⟩
 charge(midgames 4)                                                                                    ⟨291980⟩
 
 ──── scène5 ────
@@ -769,16 +1018,54 @@ tant que (scène5.compteur < 15) et (scène5.terminée == 0) :
     si v274 == 12 :
         tête_image_de_base(tête=c18, image=18)                                                        ⟨292142⟩
     Scene_Tick(scène=scène5)                                                                          ⟨292158⟩
+v249 = 0                                                                                              ⟨292217⟩
+v248 = 0                                                                                              ⟨292218⟩
 Scene_Destruct(scène=scène5, drapeaux=0)                                                              ⟨292222⟩
+v239 = 0                                                                                              ⟨292241⟩
+v228 = 0                                                                                              ⟨292261⟩
 si byte_495FC != 0 :
+    v209 = 0                                                                                          ⟨292290⟩
+    v208 = 0                                                                                          ⟨292291⟩
+    v193 = 0                                                                                          ⟨292314⟩
+    v192 = 0                                                                                          ⟨292315⟩
+    v177 = 0                                                                                          ⟨292338⟩
+    v176 = 0                                                                                          ⟨292339⟩
+    v161 = 0                                                                                          ⟨292362⟩
+    v160 = 0                                                                                          ⟨292363⟩
+    v151 = 0                                                                                          ⟨292381⟩
+    v150 = 0                                                                                          ⟨292382⟩
+    v141 = 0                                                                                          ⟨292400⟩
+    v140 = 0                                                                                          ⟨292401⟩
+    v131 = 0                                                                                          ⟨292419⟩
+    v130 = 0                                                                                          ⟨292420⟩
     v106 = 0                                                                                          ⟨292446⟩
     v101 = 0                                                                                          ⟨292447⟩
     v100 = 0                                                                                          ⟨292448⟩
+    v85 = 0                                                                                           ⟨292471⟩
+    v84 = 0                                                                                           ⟨292472⟩
+    v69 = 0                                                                                           ⟨292495⟩
+    v68 = 0                                                                                           ⟨292496⟩
+    v53 = 0                                                                                           ⟨292519⟩
+    v52 = 0                                                                                           ⟨292520⟩
     voix_arrête(voix=voix1)                                                                           ⟨292524⟩
+    v3288 = 0                                                                                         ⟨292542⟩
+    v3283 = 0                                                                                         ⟨292543⟩
+    v3282 = 0                                                                                         ⟨292544⟩
     canal_arrête(canal=canal2)                                                                        ⟨292547⟩
+    v1214 = 0                                                                                         ⟨292565⟩
+    v1209 = 0                                                                                         ⟨292566⟩
+    v1208 = 0                                                                                         ⟨292567⟩
+    v35 = 0                                                                                           ⟨292590⟩
+    v34 = 0                                                                                           ⟨292591⟩
     retour                                                                                            ⟨292643⟩
+v228 = 0                                                                                              ⟨292650⟩
 charge(mid17 2)                                                                                       ⟨292657⟩
+v240 = 2                                                                                              ⟨292660⟩
+v239 = 0                                                                                              ⟨292661⟩
 charge(mid17 0)                                                                                       ⟨292669⟩
+v250 = 2                                                                                              ⟨292672⟩
+v249 = 0                                                                                              ⟨292673⟩
+v248 = 0                                                                                              ⟨292674⟩
 charge(mid17 9)                                                                                       ⟨292681⟩
 palette_depuis(pal13(mid17 9))                                                                        ⟨292688⟩
 
@@ -792,13 +1079,16 @@ ajoute c22 à scène6                                                           
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨292744⟩
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨292749⟩
 Widget_Method_Dispatch8_314A9(zone1, 128)                                                             ⟨292754⟩
-c22.image = midgames 14.+0                                                                            ⟨292761⟩
+v266 = 1                                                                                              ⟨292756⟩
+c22.image = v266                                                                                      ⟨292761⟩
 si v12 != 0 :
     Scene_Tick(scène=scène6)                                                                          ⟨292770⟩
     si = 0                                                                                            ⟨292772⟩
     tant que si < 4 :
         Scene_Tick(scène=scène6)                                                                      ⟨292779⟩
         si = si + 1                                                                                   ⟨292781⟩
+    v278 = 0                                                                                          ⟨292786⟩
+    v272 = 0                                                                                          ⟨292789⟩
     charge(mid17voc 1)                                                                                ⟨292796⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid17voc 1)                                 ⟨292802⟩
     si = 0                                                                                            ⟨292804⟩
@@ -806,17 +1096,22 @@ si v12 != 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨292811⟩
         si = si + 1                                                                                   ⟨292813⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨292821⟩
-    tant que sub_8500(voix1) != 0 :
+    tant que voix_en_cours(voix=voix1) != 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨292839⟩
     si = 0                                                                                            ⟨292851⟩
     tant que si < 17 :
         si si > 4 :
             si si < 13 :
-                v280 = midgames 14.+0                                                                 ⟨292861⟩
+                v280 = v266                                                                           ⟨292861⟩
+                v266_avant = v266                                                                     ⟨292862⟩
+                v266_avant = v266                                                                     ⟨292862⟩
+                v266 = v266 + 1                                                                       ⟨292862⟩
                 c22.image = v280                                                                      ⟨292865⟩
         Scene_Tick(scène=scène6)                                                                      ⟨292871⟩
         si = si + 1                                                                                   ⟨292873⟩
     voix_arrête(voix=voix1)                                                                           ⟨292880⟩
+    v278 = 0                                                                                          ⟨292898⟩
+    v272 = 0                                                                                          ⟨292900⟩
 sinon :
     v6 = 75                                                                                           ⟨292905⟩
     v4 = scène6.compteur                                                                              ⟨292907⟩
@@ -826,7 +1121,11 @@ sinon :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])                              ⟨292934⟩
         si v4 + 24 < scène6.compteur :
             si v4 + 33 > scène6.compteur :
-                c22.image = midgames 14.+0                                                            ⟨292951⟩
+                v266_avant = v266                                                                     ⟨292948⟩
+                v266_avant = v266                                                                     ⟨292948⟩
+                v266_avant = v266                                                                     ⟨292948⟩
+                v266 = v266 + 1                                                                       ⟨292948⟩
+                c22.image = v266_avant                                                                ⟨292951⟩
         si (v4 + ((v6·70) / 100)) - 1 == scène6.compteur :
             v3408 = 4540                                                                              ⟨292959⟩
             v3408 = 4552                                                                              ⟨292960⟩
@@ -837,11 +1136,43 @@ sinon :
         Scene_Tick(scène=scène6)                                                                      ⟨293005⟩
 fondu_disparition(palette=pal1, couleur=&v30, pas=2, premier=0, nombre=256)                           ⟨293038⟩
 Scene_Destruct(scène=scène6, drapeaux=0)                                                              ⟨293043⟩
+v249 = 0                                                                                              ⟨293067⟩
+v248 = 0                                                                                              ⟨293068⟩
+v239 = 0                                                                                              ⟨293086⟩
+v228 = 0                                                                                              ⟨293106⟩
+v209 = 0                                                                                              ⟨293129⟩
+v208 = 0                                                                                              ⟨293130⟩
+v193 = 0                                                                                              ⟨293153⟩
+v192 = 0                                                                                              ⟨293154⟩
+v177 = 0                                                                                              ⟨293177⟩
+v176 = 0                                                                                              ⟨293178⟩
+v161 = 0                                                                                              ⟨293201⟩
+v160 = 0                                                                                              ⟨293202⟩
+v151 = 0                                                                                              ⟨293220⟩
+v150 = 0                                                                                              ⟨293221⟩
+v141 = 0                                                                                              ⟨293239⟩
+v140 = 0                                                                                              ⟨293240⟩
+v131 = 0                                                                                              ⟨293258⟩
+v130 = 0                                                                                              ⟨293259⟩
 v106 = 0                                                                                              ⟨293285⟩
 v101 = 0                                                                                              ⟨293286⟩
 v100 = 0                                                                                              ⟨293287⟩
+v85 = 0                                                                                               ⟨293310⟩
+v84 = 0                                                                                               ⟨293311⟩
+v69 = 0                                                                                               ⟨293334⟩
+v68 = 0                                                                                               ⟨293335⟩
+v53 = 0                                                                                               ⟨293358⟩
+v52 = 0                                                                                               ⟨293359⟩
 voix_arrête(voix=voix1)                                                                               ⟨293363⟩
+v3288 = 0                                                                                             ⟨293381⟩
+v3283 = 0                                                                                             ⟨293382⟩
+v3282 = 0                                                                                             ⟨293383⟩
 canal_arrête(canal=canal2)                                                                            ⟨293386⟩
+v1214 = 0                                                                                             ⟨293404⟩
+v1209 = 0                                                                                             ⟨293405⟩
+v1208 = 0                                                                                             ⟨293406⟩
+v35 = 0                                                                                               ⟨293429⟩
+v34 = 0                                                                                               ⟨293430⟩
 retour                                                                                                ⟨293482⟩
 ```
 

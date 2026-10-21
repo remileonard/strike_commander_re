@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, `MID_16`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, `MID_17`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -304,4 +304,18 @@ sous-titre affiché plus loin, dans un « si pas de voix » de la boucle commune
 Effet : 16 sous-titres au lieu de 10 dans mid2, 15 au lieu de 8 dans mid5, 25 au lieu de 11 dans
 mid12, 27 au lieu de 14 dans mid15. C'est une reconstruction d'après les données, pas une règle du
 jeu (avec voix, le jeu n'affiche aucun texte).
+
+### mid17
+
+Fonction pas encore nommée `sub_98210` : `--nom mid17`. 10 plans, 31,1 s, aucun mécanisme de dessin
+nouveau ; 0 écart avec le rendu de référence.
+- **Tirages réinitialisés sur l'heure** : `CRT_Srand_6F2(CRT_Time_85A(0))` (aussi dans mid2) ; les
+  tirages du jeu changent à chaque partie, l'outil garde sa suite fixe.
+- **Textes assemblés par le code** (sans voix) : texte 1 = texte 1 + indicatif du joueur (premier
+  non vide des trois noms passés à la fonction, sinon texte 2 « Strike Leader ») + texte 3 ;
+  texte 4 = texte 4 + nom (sinon texte 5 « Commander ») + « ? » (dseg 9555). Les répliques le
+  confirment : réplique 2 = textes 0 et 1, réplique 0 = textes 4 (« Commander? », pause) et 6.
+  **Pas exprimé dans le format** (un sous-titre désigne un texte de `MIDGAMES.IFF`) : le fichier
+  affiche « ...this is » et le texte 4 seul (des espaces). Même limite pour le nom ajouté dans mid2
+  (texte 0) et mid12 (texte 22, « Hey, »).
 

@@ -3804,10 +3804,10 @@ loc_9AAB9:				; CODE XREF: sub_98210+286Cj
 		mov	word ptr [si+1Bh], 0
 		mov	word ptr [bp+var_F8+2],	0
 		push	0
-		call	sub_85A
+		call	CRT_Time_85A
 		add	sp, 2
 		push	ax
-		call	sub_6F2
+		call	CRT_Srand_6F2
 		add	sp, 2
 		mov	word ptr [bp+var_F8], 4
 		cmp	[bp+var_C], 0

@@ -3408,5 +3408,15 @@
     "new_name": "ScaledImageLayer_SetScale_94F4",
     "segment": "seg014",
     "summary": "far, LUE 2026-10-21. Pose l'échelle d'un ScaledImageLayer : [arg_0 + 1Fh] = arg_2 (1/256, 256 = taille d'origine). mid15 : zoom des deux avions du premier plan, de 32 à 255."
+  },
+  "sub_6F2": {
+    "new_name": "CRT_Srand_6F2",
+    "segment": "seg000",
+    "summary": "far, LUE 2026-10-21. srand() du runtime : graine de CRT_Rand (word_487DE = arg_0, word_487E0 = 0). Appelée par mid2 (sub_6B9C0) et mid17 (sub_98210) avec CRT_Time_85A(0) : tirages différents à chaque partie."
+  },
+  "sub_85A": {
+    "new_name": "CRT_Time_85A",
+    "segment": "seg000",
+    "summary": "far, LUE 2026-10-21. time() du runtime : date (sub_3E9) et heure (sub_3FC) du DOS converties par sub_2899 en secondes (dx:ax), rangées aussi en [arg_0] si arg_0 ≠ 0."
   }
 }

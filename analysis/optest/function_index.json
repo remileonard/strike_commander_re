@@ -323,8 +323,8 @@
 "lines": 13,
 "type": "far",
 "calls": [],
-"new_name": "sub_6F2",
-"summary": ""
+"new_name": "CRT_Srand_6F2",
+"summary": "far, LUE 2026-10-21. srand() du runtime : graine de CRT_Rand (word_487DE = arg_0, word_487E0 = 0). Appelée par mid2 (sub_6B9C0) et mid17 (sub_98210) avec CRT_Time_85A(0) : tirages différents à chaque partie."
 },
 "sub_703": {
 "segment": "seg000",
@@ -391,8 +391,8 @@
 "sub_3FC",
 "sub_2899"
 ],
-"new_name": "sub_85A",
-"summary": ""
+"new_name": "CRT_Time_85A",
+"summary": "far, LUE 2026-10-21. time() du runtime : date (sub_3E9) et heure (sub_3FC) du DOS converties par sub_2899 en secondes (dx:ax), rangées aussi en [arg_0] si arg_0 ≠ 0."
 },
 "sub_8A7": {
 "segment": "seg000",
