@@ -492,6 +492,13 @@ class FunctionRun:
                 if o[0] == 'mem' and o[1][0] == 'bp':
                     src = self.operand(parts[1]) if mn == 'mov' and len(parts) > 1 else None
                     writes.setdefault(o[1][1], []).append(src)
+        # Mots incrémentés ou décrémentés sur place : des compteurs, jamais des champs de poignée.
+        self.counter_words = set()
+        for ins in self.instrs:
+            if ins[0] == 'ins' and ins[1] in ('inc', 'dec') and ins[2].startswith('word ptr'):
+                o = self.operand(ins[2])
+                if o[0] == 'mem' and o[1][0] == 'bp':
+                    self.counter_words.add(o[1][1])
         self.const_locals = {}
         for off, srcs in writes.items():
             if off in taken or len(srcs) != 1 or srcs[0] is None or srcs[0][0] != 'imm' or not is_const(srcs[0][1]):
@@ -815,11 +822,17 @@ class FunctionRun:
             if is_const(val) and val[1] in (0, 2) and op[2] != 2 and self.region_at(off, service=True) and self.ex.objects[self.region_at(off, service=True)[1]].kind in SERVICE:
                 return
             hit = self.region_at(off)
-            if hit and op[2] == 2 and self.ex.objects[hit[1]].kind == 'palette' and not self.in_init_window(off):
+            if hit and op[2] == 2 and not self.in_init_window(off) and (
+                    self.ex.objects[hit[1]].kind == 'palette'
+                    or (self.ex.objects[hit[1]].kind == 'res' and off in self.counter_words)):
                 # Une palette n'est écrite que par les fonctions de palette : un mot écrit directement
                 # dans sa case de pile en fait une variable (mid5 : compteur d'attente var_10C).
+                # Même chose pour un mot incrémenté dans la case d'une ressource (mid5 : compteur
+                # var_13E+2 de la fuite des attaquants, dans la case de mid5voc 11).
                 obj = self.ex.objects[hit[1]]
-                self.emit(('assign', f'{self.ex.obj_label(obj)}.{self.ex.field_name(obj, off - hit[0])}', val, line))
+                # Cible écrite « identifiant(contenu) » : le lecteur retrouve l'objet par son identifiant.
+                label = f'{obj.name}({obj.content})' if obj.kind == 'res' and obj.content else self.ex.obj_label(obj)
+                self.emit(('assign', f'{label}.{self.ex.field_name(obj, off - hit[0])}', val, line))
                 return
             if hit:
                 start, oid = hit

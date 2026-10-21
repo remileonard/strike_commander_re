@@ -229,9 +229,15 @@ répliques et têtes en mode voix comme mid2. Mécanismes nouveaux (2026-10-21) 
   `Render_DrawRotatedScaledSprite_33586`) : deux échelles en 1/256 (pas de lecture du dessin =
   1000000h / échelle : 256 = taille d'origine, négatif = retourné) ; mid5 : les trois silhouettes qui
   s'enfuient, à 300 (× 1,17). **Pas exprimé dans le format** : l'image est écrite à sa taille
-  d'origine, d'où 148 instants différents ; sans l'échelle, 0 écart. Le rendu de référence fait
+  d'origine, d'où 144 instants différents ; sans l'échelle, 0 écart. Le rendu de référence fait
   l'agrandissement au plus proche voisin autour du point d'origine de l'image ; les arrondis exacts de
   la fonction du jeu ne sont pas relus ;
 - **compteur d'attente dans la case d'une palette** : la case de pile d'une palette sert de compteur
   (`var_10C`, attentes de 2 ou 3 images avant une réplique) ; l'extracteur la traite comme variable ;
+- **compteur de la fuite dans la case d'une voix** : la boucle de la fuite des attaquants (scène 11 de
+  l'outil, 60 images) remet à 0 puis incrémente (`inc`) le mot `var_13E+2`, qui est aussi la case de
+  pile de la voix mid5voc 11. Ce compteur choisit l'image de course de chaque silhouette
+  (`(compteur + 1) % 5`, `+ 4`, `+ 5`) et les images de l'explosion. Avant le 2026-10-21 l'extracteur
+  le prenait pour un champ de la poignée et le lisait à 0 : les silhouettes restaient figées. Règle :
+  un mot incrémenté ou décrémenté sur place dans une case de ressource est une variable ;
 - effets sonores tirés dans une petite table (`asoundfx`), non exprimés.
