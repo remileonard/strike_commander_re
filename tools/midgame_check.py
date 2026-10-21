@@ -25,9 +25,6 @@ W = 320
 H = 200
 BAND = (0, 24, 319, 151)
 NO_IMAGE = 255
-# Ancrage des visages (même hypothèse que midgame_iff.py) : position écrite = position du jeu,
-# sans le décalage de 24, moins (160, 128).
-FACE_ANCHOR = (160, 128)
 BAND_TOP = 24
 
 
@@ -171,9 +168,6 @@ def layer_state(lay, f):
         image = lay['image']
     if image == NO_IMAGE:
         return None
-    if lay['archive'].startswith('FACE:'):
-        x += FACE_ANCHOR[0]
-        y += FACE_ANCHOR[1] + BAND_TOP
     return image, x, y
 
 

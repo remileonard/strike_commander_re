@@ -81,9 +81,10 @@ chaque scène y est.
   animés par le player ; une image écrite par le code devient une suite d'images `SEQU`. Les
   calques à plusieurs images (image sur fond, transition, tête parlante) sont découpés en un calque
   par image, dans l'ordre de dessin du jeu (`depth`).
-- **Visages** (`convdata`) : ressource `FACE:<nom>`. `ConvAssetManager` place les images de visage
-  en (0, 24) au lieu de leur point d'ancrage ; la position écrite est celle du jeu (sans le
-  décalage de 24) moins (160, 128), le point où le jeu dessine les têtes. Hypothèse, à vérifier à l'écran.
+- **Visages** (`convdata`) : ressource `FACE:<nom>`, position écrite comme pour les autres calques.
+- **Point d'ancrage** : la position d'un calque est celle du point d'ancrage de l'image (les x, y de
+  ses lignes), pas le coin de son cadre. `SCAnimationPlayer` pose l'image en position −
+  (`GetLeft()`, `GetTop()`) pour les fichiers en version 2.
 - **Palettes** : la liste composée par le code avant chaque envoi, appliquée dans l'ordre (`PALS`),
   par-dessus la palette du plan précédent ; « normal » de `convdata` est `FACEPAL:normal`.
 
@@ -166,7 +167,9 @@ Règles du lecteur :
   « nombre d'images », qui n'existe pas : **l'animation disparaît**, comme dans le jeu ; -1 =
   s'arrête sur sa dernière image), `end_frame` > 0 → cette image.
 - **Visages (`FACE:<nom>`)** : images de `CONVSHPS.PAK` (numéro donné par le `FORM FACE` de
-  `CONVDATA.IFF`), dessinées à la position écrite + (160, 128 + 24).
+  `CONVDATA.IFF`), dessinées à la position écrite comme les autres calques.
+- **Position** : celle du point d'ancrage de l'image : chaque ligne de l'image est dessinée en
+  position + (x, y) de la ligne.
 - Coordonnées : celles de l'écran 320 × 200, (0, 0) en haut à gauche.
 
 Résultat pour mid1 (2026-10-21) : **0 instant différent sur 5 629** (93,8 s). Avant que les données

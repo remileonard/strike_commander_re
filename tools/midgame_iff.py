@@ -35,7 +35,6 @@ DIRECT_FPS = 60
 
 DIRS = {'opt': 'GAMEFLOW', 'mid': 'MIDGAMES', 'amu': 'MIDGAMES', 'rmu': 'MIDGAMES'}
 NO_IMAGE = 255
-FACE_ANCHOR = (160, 128)
 # Les calques et les dessins hors écran sont faits dans une image de 320 × 200 dont la ligne 0 est
 # recopiée à la ligne 24 de l'écran (Rect_BlitOverlapRegion_31FCA : source à partir de sa ligne du
 # haut, 0, destination à partir de la sienne, 24). Les positions écrites sont des positions d'écran.
@@ -1322,7 +1321,6 @@ def layer_chunks(shot, key, start, stop, depth, layer_id):
     # Échelle (ScaledMovingLayer, ScaledImageLayer) : pas exprimée dans le format, image écrite à sa taille d'origine.
     positions = [(it['x'], it['y']) for it in seq]
     if res[0] == 'face':
-        positions = [(x - FACE_ANCHOR[0], y - BAND_TOP - FACE_ANCHOR[1]) for x, y in positions]
         archive = 'FACE:' + res[1]
         entry = 0
     else:
