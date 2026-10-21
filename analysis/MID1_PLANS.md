@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, `MID_33`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, `MID_17`, `MID_20`, `MID_33`, `MID_34`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -356,4 +356,13 @@ de `MG33`). Mécanismes nouveaux (2026-10-21) :
   (160, 97), palette `midgames` 39 ; attente de 300 tics de 60 Hz **et** de la fin de la musique
   (état AIL ≠ 2), touche = sortie. Écrit : 5 s de la dernière image (texte non exprimé, fin de
   musique non comptée) ; que le jeu efface ou non l'écran avant ce texte n'est pas établi.
+
+### mid34 (enterrement de Stern)
+
+Fonction pas encore nommée `sub_AFB90` : `--nom mid34`. 10 plans, 52,7 s (54,5 s avec les fondus) ;
+0 écart avec le rendu de référence ; aucun mécanisme nouveau. Les inscriptions de la croix
+(« CMDR. JAMES R. STERN ») font partie de l'image. Sous-titres : 11 textes pour 9 répliques
+(répliques 7 = textes 7 et 8, 8 = textes 9 et 10). Deux cases de ressource lues dans la dernière
+scène (`var_11C`, `var_11C+2`) sont mises à 0 avant la boucle et jamais modifiées : la valeur 0 prise
+par le lecteur est la bonne (même cas dans mid33, `var_148`).
 
