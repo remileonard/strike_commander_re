@@ -113,7 +113,7 @@ Les données ne sont pas dans le dépôt. Les outils lisent `BIGTRE.TRE` directe
 `DATA` extrait par `tools/tre_extract.py`) :
 
 ```bash
-python3 tools/midgame_render.py --donnees BIGTRE.TRE --film mid1.gif 2
+python3 tools/midgame_render.py --donnees BIGTRE.TRE [--sous-titres] --film mid1.gif 2
 ```
 
 `midgame_render.py` rejoue la même simulation que `midgame_iff.py` (mêmes données : nombre d'images
@@ -122,6 +122,10 @@ image hors écran copiée à la ligne 24, palettes partielles appliquées à leu
 d'apparition, images des visages (`CONVSHPS.PAK`, numéro donné par le `FORM FACE` de
 `CONVDATA.IFF`), titres translucides (police `mid1` 27, tables `mid1` 60). Résultat pour mid1 :
 29 plans, 95,6 s avec le fondu d'apparition.
+
+Avec `--sous-titres`, les textes `SPOK` sont dessinés comme les produit `midgame_iff.py --sous-titres`,
+avec la police `fonts\convfont.shp` (pixels pleins de la couleur relevée dans le code), sur l'écran
+dans la bande du bas : lignes coupées aux espaces à 300 pixels, centrées, interligne 10 (supposé).
 
 Hypothèses du rendu, le code de mise en page du texte n'étant pas lu : chasse d'un caractère =
 largeur de son image + 2, espace = 6 pixels, interligne 16, titre centré sur 320 pixels. Le son

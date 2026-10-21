@@ -3,7 +3,7 @@ moteur de scène lues dans OPTEST.EXE), avec le nombre d'images des animations e
 répliques lus dans les données, et dessine chaque image comme le jeu (image hors écran copiée à la
 ligne 24, palettes partielles, titres translucides). Voir MID1_PLANS.md.
 
-Usage : python3 tools/midgame_render.py --donnees <DATA> --film mid1.gif [échelle]
+Usage : python3 tools/midgame_render.py --donnees <BIGTRE.TRE ou DATA> [--nom mid2] [--sous-titres] --film mid1.gif [échelle]
         python3 tools/midgame_render.py --donnees <DATA> <dossier> [plans...]   (un GIF par plan)"""
 import importlib.util
 import os
@@ -13,6 +13,14 @@ if '--donnees' in sys.argv:
     _i = sys.argv.index('--donnees')
     os.environ['SC_DATA'] = sys.argv[_i + 1]
     del sys.argv[_i:_i + 2]
+OPTIONS = {'nom': 'mid1', 'sous-titres': False}
+if '--nom' in sys.argv:
+    _i = sys.argv.index('--nom')
+    OPTIONS['nom'] = sys.argv[_i + 1]
+    del sys.argv[_i:_i + 2]
+if '--sous-titres' in sys.argv:
+    sys.argv.remove('--sous-titres')
+    OPTIONS['sous-titres'] = True
 import json
 
 from PIL import Image
@@ -63,12 +71,16 @@ def image_count(res):
     return len(shape_images(shape))
 
 
-def run(exact=True):
-    data = json.load(open(f'{REPO}/analysis/optest/midgames/mid1.json', encoding='utf-8'))
+def run(exact=True, name=None, subtitles=None):
+    name = name or OPTIONS['nom']
+    subtitles = OPTIONS['sous-titres'] if subtitles is None else subtitles
+    data = json.load(open(f'{REPO}/analysis/optest/midgames/{name}.json', encoding='utf-8'))
     p = mg.Player(data, {'pri': 'air'}, {})
     if exact:
         p.image_count = image_count
         p.voice_seconds = voice_seconds
+    if subtitles:
+        p.subtitles = mg.subtitle_map(data)
     p.run(data['parties'][0]['arbre'])
     return [s for s in p.shots if s['frames']], p
 
@@ -180,10 +192,7 @@ def render(shots, out_dir, only=None):
                 screen[:] = bytes(W * H)
             for it in items:
                 if it['kind'] == 'text':
-                    if it['text'][0] == 'MG01':
-                        draw_title(screen, it, clip)
-                    else:
-                        missing.add('text')
+                    draw_items(screen, [it], clip)
                     continue
                 if it['res'] is None or it['image'] is None:
                     continue
@@ -253,10 +262,54 @@ def movie(shots, path, scale=1):
     print(path, len(out), 'images', round(sum(durs) / 1000, 1), 's')
 
 
+SUB_ADVANCE_GAP = 1
+SUB_SPACE = 4
+SUB_LINE = 10
+SUB_WIDTH = 300
+
+
+def draw_subtitle(screen, it):
+    """Sous-titre (police fonts\\convfont.shp, pixels pleins de la couleur du code) dessiné sur
+    l'écran, dans la bande du bas. Mise en page supposée (sub_C8F5 non lue) : lignes coupées aux
+    espaces à SUB_WIDTH pixels, centrées, haut de la première ligne à it['y']."""
+    import struct
+    from sc_data import image_spans, read, shape_images
+    font = read(os.path.join(GAME, 'FONTS', 'CONVFONT.SHP'))
+    offs = shape_images(font)
+    form, index = it['text']
+    text = TEXTS[form][index]
+
+    def width(s):
+        return sum(SUB_SPACE if c == ' ' else struct.unpack_from('<h', font, offs[ord(c)])[0] + 1 + SUB_ADVANCE_GAP
+                   for c in s)
+    lines = []
+    for word in text.split():
+        if lines and width(lines[-1] + ' ' + word) <= SUB_WIDTH:
+            lines[-1] += ' ' + word
+        else:
+            lines.append(word)
+    colour = it.get('colour', 15)
+    for li, line in enumerate(lines):
+        x = (W - width(line)) // 2
+        y = it['y'] + 7 + li * SUB_LINE
+        for c in line:
+            if c != ' ' and ord(c) < len(offs):
+                for sx, sy, pix in image_spans(font, ord(c)):
+                    yy = y + sy
+                    if 0 <= yy < H:
+                        for i in range(len(pix)):
+                            xx = x + sx + i
+                            if 0 <= xx < W:
+                                screen[yy * W + xx] = colour
+            x += SUB_SPACE if c == ' ' else struct.unpack_from('<h', font, offs[ord(c)])[0] + 1 + SUB_ADVANCE_GAP
+
+
 def draw_items(screen, items, clip):
     for it in items:
         if it['kind'] == 'text':
-            if it['text'][0] == 'MG01':
+            if it['text'][0] == 'SPOK':
+                draw_subtitle(screen, it)
+            elif it['text'][0] and it['text'][0].startswith('MG'):
                 draw_title(screen, it, clip)
             continue
         res = it['res']
