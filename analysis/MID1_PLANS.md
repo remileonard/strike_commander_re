@@ -5,7 +5,7 @@ l'ancienne version du fichier :
 
 ```bash
 python3 tools/midgame_extract.py --exe optest Midgame1_PlayPart1_5FCF0 --name mid1
-python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/resources/MID_1.IFF --remplace pri=air --donnees BIGTRE.TRE
+python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/resources/MID_1.IFF --remplace pri=air --donnees BIGTRE.TRE [--sous-titres]
 ```
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -98,9 +98,14 @@ chaque scène y est.
 - **Animation arrivée au bout** : dans le jeu, une animation simple ne dessine plus rien après sa
   dernière image (`MIDGAME_SYSTEM.md` § 6.1) ; le fichier l'exprime par `end_frame` = 0 (voir
   « Lecteur de contrôle »).
-- **Sous-titres** : la version produite est celle avec voix, sans sous-titres. Les textes `SPOK`
-  peuvent être ajoutés à la main dans l'éditeur (choix de Rémi : voix et sous-titres ensemble,
-  variante par rapport au jeu).
+- **Sous-titres** (option `--sous-titres`, variante voulue par Rémi : voix **et** texte, alors que
+  le jeu affiche l'un ou l'autre). L'outil relève dans le code chaque « si voix présente : réplique k,
+  sinon : couleur c, sous-titre `textes1[i]` » et affiche le texte `SPOK` i, en couleur c, de
+  l'image où la réplique k part jusqu'à la fin de son VOC. mid1 : répliques 0, 1, 2, 3 → textes 0, 2,
+  3, 5 en couleur 4 ; réplique 4 → texte 1 en couleur 224 ; répliques 5, 6 → textes 4, 6 en couleur
+  114. Les répliques 7 à 13 n'ont pas de sous-titre dans le code. Supposé (mise en page de
+  `sub_C8F5` non lue) : texte centré, haut à y = 158, dans la zone des sous-titres du jeu,
+  (0, 152) – (319, 199) de l'écran. À retoucher dans l'éditeur si besoin.
 
 ## Rendu de référence avec les données du jeu
 

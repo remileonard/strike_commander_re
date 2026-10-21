@@ -40,6 +40,10 @@ FACE_ANCHOR = (160, 128)
 # recopiée à la ligne 24 de l'écran (Rect_BlitOverlapRegion_31FCA : source à partir de sa ligne du
 # haut, 0, destination à partir de la sienne, 24). Les positions écrites sont des positions d'écran.
 BAND_TOP = 24
+# Sous-titres ajoutés à la version avec voix (option --sous-titres, variante par rapport au jeu) :
+# zone des sous-titres du jeu = (0, 152) – (319, 199) de l'écran (bande noire du bas) ; la mise en
+# page de sub_C8F5 n'est pas lue : texte centré, haut de la première ligne à SUBTITLE_Y (supposé).
+SUBTITLE_Y = 158
 
 
 def screen_offsets(data):
@@ -54,6 +58,42 @@ def screen_offsets(data):
                         o = data['objets'].get(a.split('=', 1)[1])
                         if o:
                             found.add(o.get('décalage'))
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(data)
+    return found
+
+
+def subtitle_map(data):
+    """Réplique → sous-titre, d'après le code : dans chaque « si voix présente : réplique k, sinon :
+    couleur c, sous-titre textes[i] », k donne (i, c)."""
+    found = {}
+
+    def ops(nodes):
+        for n in nodes or []:
+            yield n
+            for br in ('alors', 'sinon', 'corps'):
+                if isinstance(n, dict) and br in n:
+                    yield from ops(n[br])
+
+    def walk(v):
+        if isinstance(v, dict):
+            if v.get('t') == 'si' and 'alors' in v and 'sinon' in v:
+                voices = [n['args']['entrée'] for n in ops(v['alors'])
+                          if n.get('op') == 'charge' and n.get('args', {}).get('pak', '').endswith('voc')]
+                texts = [re.search(r'\[(\d+)\]', ' '.join(n['texte'])) for n in ops(v['sinon'])
+                         if str(n.get('op', '')).startswith('sous_titre')]
+                colours = []
+                for n in ops(v['sinon']):
+                    if 'couleur' in str(n.get('op', '')):
+                        colours.append(n['args']['couleur'])
+                    elif str(n.get('nom', '')).endswith('.couleur'):
+                        colours.append(n['args'][0])
+                if voices and texts and texts[0]:
+                    found[voices[0]] = (int(texts[0].group(1)), colours[0] if colours else 15)
             for x in v.values():
                 walk(x)
         elif isinstance(v, list):
@@ -150,6 +190,8 @@ class Player:
         self.voice_seconds = None
         self.clock = 0.0
         self.voice_end = 0.0
+        self.subtitles = None
+        self.subtitle = None
         self.screen_offsets = screen_offsets(data)
 
     # ------------------------------------------------------------------ valeurs
@@ -635,6 +677,9 @@ class Player:
             self.pending['sounds'].append(self.voice_res[2])
             if self.voice_seconds:
                 self.voice_end = self.clock + self.voice_seconds(self.voice_res)
+            if self.subtitles and self.voice_res[2] in self.subtitles:
+                index, colour = self.subtitles[self.voice_res[2]]
+                self.subtitle = (index, colour, self.voice_end)
 
     def count_of(self, layer):
         if self.image_count is None or layer.res is None:
@@ -862,6 +907,10 @@ class Player:
         for entry in p['sounds']:
             s['sounds'].append((len(s['frames']), entry))
         p['sounds'] = []
+        if self.subtitle and self.clock < self.subtitle[2]:
+            index, colour, _ = self.subtitle
+            items = items + [{'key': f'sous-titre{index}', 'kind': 'text', 'text': ('SPOK', index),
+                              'y': SUBTITLE_Y, 'align': 2, 'colour': colour}]
         s['frames'].append(items)
         self.clock += 1.0 / fps
 
@@ -970,7 +1019,8 @@ def shot_chunk(shot, first_shot):
                     continue
                 nb = 0 if stop == len(frames) else stop - start
                 texts += chunk('TEXE', text(tkey) + struct.pack('<bbHhhhhBHB', index, 0, nb, 0, sample['y'], 0, 0,
-                                                               15, start, sample['align'] or 0))
+                                                               sample.get('colour', 15), start,
+                                                               sample['align'] or 0))
                 continue
             kind, data = layer_chunks(shot, key, start, stop, depth, next_id)
             if kind is None:
@@ -1020,6 +1070,9 @@ def main():
         name, value = args[i + 1].split('=')
         hypotheses[name] = int(value)
         del args[i:i + 2]
+    subtitles = '--sous-titres' in args
+    if subtitles:
+        args.remove('--sous-titres')
     if '--donnees' not in args:
         sys.exit('--donnees <BIGTRE.TRE ou dossier DATA> est obligatoire : nombre d\'images des '
                  'animations et durée des répliques')
@@ -1036,6 +1089,9 @@ def main():
     import midgame_render
     player.image_count = midgame_render.image_count
     player.voice_seconds = midgame_render.voice_seconds
+    if subtitles:
+        player.subtitles = subtitle_map(data)
+        print('sous-titres (réplique → texte SPOK, couleur) :', player.subtitles)
     player.run(data['parties'][0]['arbre'])
     shots = [s for s in player.shots if s['frames']]
     content = b'ANIM' + chunk('HEAD', struct.pack('<II', len(shots), 2))
