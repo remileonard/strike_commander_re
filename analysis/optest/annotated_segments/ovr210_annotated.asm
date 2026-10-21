@@ -6,7 +6,20 @@ ovr210		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_BDDC0	proc far		; CODE XREF: sub_42650J
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode de dessin d'un caractère (entrée 1 de la table de méthodes dseg
+; 1DADh) d'une police dérivée de GlyphObject à pixels translucides, utilisée pour les titres
+; de mid1 (police mid1 27). Appelle Render_DrawScaledSprite_32F28 avec l'image du caractère
+; (forme en +2/+4, image arg_4), échelle 256 × 256 (taille d'origine), position (arg_6, arg_8
+; + [si+0Eh]), puis les 4 champs propres à cette police : table de remappage far
+; ([si+17h]:[si+19h]), A = [si+1Bh], B = [si+1Dh]. Dans Render_DrawScaledSprite_32F28, un
+; pixel de couleur c avec A ≤ c < A + B est remplacé par table[(c − A) × 256 + couleur déjà à
+; l'écran] (sub dl, ah / shl dx, 8 / mov al, es:[di] / lds bx, [bp+arg_10] / add bx, dx /
+; xlat) ; les autres pixels sont dessinés tels quels. mid1 (scène 2) y met A = 239, B = 16,
+; table = données de mid1 60 + étape × 4096 (shl bx, 0Ch), étape 0 à 15 à l'apparition, 15 à 0
+; à la disparition.
+; ==============================================================================================
+TranslucentFont_DrawGlyph_BDDC0	proc far		; CODE XREF: sub_42650J
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -47,6 +60,6 @@ arg_8		= word ptr  0Eh
 		pop	si
 		pop	bp
 		retf
-sub_BDDC0	endp
+TranslucentFont_DrawGlyph_BDDC0	endp
 
 ovr210		ends

@@ -15,7 +15,7 @@ stru_42390	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:06DEo
 ; Attributes: thunk
 
 sub_423B0	proc far		; DATA XREF: dseg:1DADo
-		jmp	sub_67184
+		jmp	TranslucentFont_Destruct_67184
 sub_423B0	endp
 
 

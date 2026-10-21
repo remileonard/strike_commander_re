@@ -25,7 +25,7 @@ seg122		segment	byte public 'CODE' use16
 ; mode 2 (A, B = octets +0x19/+0x1A du modèle de fumée ; table = remappage de la teinte
 ; courante).
 ; ==============================================================================================
-Render_DrawScaledSprite_32F28	proc far		; CODE XREF: sub_BDDC0+45P
+Render_DrawScaledSprite_32F28	proc far		; CODE XREF: TranslucentFont_DrawGlyph_BDDC0+45P
 					; DATA XREF: seg170:04A6o
 
 var_2DA		= word ptr -2DAh

@@ -89,9 +89,10 @@ par Rémi).
 - Matériel supposé : voix numérisée présente (`word_4684B` = 1), carte Roland (`byte_46848` = 1),
   Échap jamais pressée. Seule la version avec voix est produite : les sous-titres `SPOK` et les
   effets de remplacement ne sont pas dans le fichier.
-- **Titres** : le jeu remplit le texte d'un motif de `mid1` 60 qui se décale à chaque étape
-  (apparition et disparition en 16 étapes). Ce n'est pas exprimé : le texte est affiché d'un bloc,
-  en couleur 15 (valeur choisie, pas lue dans le jeu). Le rectangle de la zone des titres
+- **Titres** : le jeu fait apparaître et disparaître le texte par translucidité, en 16 étapes de 3
+  tics : les pixels de couleur 239 à 254 de la police `mid1` 27 sont mélangés au fond par les
+  tables de `mid1` 60 (`MIDGAME_SYSTEM.md` § 9, scène 2). Ce n'est pas exprimé : le texte est
+  affiché d'un bloc, en couleur 15 (valeur choisie, pas lue dans le jeu). Le rectangle de la zone des titres
   (`word_46F44`) n'a pas été lu : le centrage est fait sur 320 pixels et le y est compté depuis le
   haut de l'écran.
 - **Tremblement** : marche aléatoire calculée une fois par l'outil (graine fixe).

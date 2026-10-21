@@ -3273,5 +3273,15 @@
     "new_name": "ConvData_LoadByName_C38E",
     "segment": "seg015",
     "summary": "far, LUE 2026-10-17. Charge l'élément de type 0 nommé arg_0 par sub_C13D (pas lue, cherche dans convdata.iff) dans le descripteur arg_2, avec le drapeau arg_4. mid1 : visage « air » (« pri » dans optest.asm : octets modifiés par Rémi, « air » à l'origine) (scènes 9 et 17)."
+  },
+  "sub_BDDC0": {
+    "new_name": "TranslucentFont_DrawGlyph_BDDC0",
+    "segment": "ovr210",
+    "summary": "far, LUE 2026-10-21. Méthode de dessin d'un caractère (entrée 1 de la table de méthodes dseg 1DADh) d'une police dérivée de GlyphObject à pixels translucides, utilisée pour les titres de mid1 (police `mid1` 27). Appelle Render_DrawScaledSprite_32F28 avec l'image du caractère (forme en +2/+4, image arg_4), échelle 256 × 256 (taille d'origine), position (arg_6, arg_8 + [si+0Eh]), puis les 4 champs propres à cette police : table de remappage far ([si+17h]:[si+19h]), A = [si+1Bh], B = [si+1Dh]. Dans Render_DrawScaledSprite_32F28, un pixel de couleur c avec A ≤ c < A + B est remplacé par table[(c − A) × 256 + couleur déjà à l'écran] (`sub dl, ah / shl dx, 8 / mov al, es:[di] / lds bx, [bp+arg_10] / add bx, dx / xlat`) ; les autres pixels sont dessinés tels quels. mid1 (scène 2) y met A = 239, B = 16, table = données de `mid1` 60 + étape × 4096 (`shl bx, 0Ch`), étape 0 à 15 à l'apparition, 15 à 0 à la disparition."
+  },
+  "sub_67184": {
+    "new_name": "TranslucentFont_Destruct_67184",
+    "segment": "ovr196",
+    "summary": "far, LUE 2026-10-21. Destructeur (entrée 0 de la table de méthodes dseg 1DADh) de la police à pixels translucides des titres de mid1 : remet la table de méthodes (`mov word ptr [si], 1DADh`), appelle GlyphObject_ScalarDeletingDtorA_313D6, libère l'objet si le bit 0 de arg_2 est mis."
   }
 }

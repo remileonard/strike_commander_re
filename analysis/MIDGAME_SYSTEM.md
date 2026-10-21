@@ -554,7 +554,7 @@ d'ajout (du fond vers le premier plan) ; l'indentation marque un enfant.
 - Palette principale : 256 couleurs remplies de noir et envoyées.
 - `optshps` 116 et `midgames` 20 (image 0) dessinés directement en (0, 24) sur la surface.
 - Ressources chargées ici et gardées : `optshps` 116 et 44, `midgames` 19, 20 et 21, `mid1` 27
-  (style des titres), `mid1` 60 (motif des titres), `fonts\convfont.shp`, et les palettes de la
+  (police des titres), `mid1` 60 (tables de translucidité des titres), `fonts\convfont.shp`, et les palettes de la
   première ligne du § 7. Les autres entrées de `mid1` sont chargées juste avant la scène qui en a
   besoin : 6, 11, 12, 26 et 42 avant la scène 4 ; 1, 44 et 38 avant la scène 5 ; 0, 45 et 39 avant
   la scène 8.
@@ -582,9 +582,19 @@ Palette `mid1` 59. Pour chacun des 4 premiers textes de `MG01` :
 ```
 
 - À chaque étape : `optshps` 116 et `midgames` 20 (image 0) dessinés en (0, 0) sur l'image hors
-  écran, puis le texte (format `%J%Y%S`, à y = 35 pour le 2ᵉ titre, 50 pour les autres), rempli
-  avec un motif de 239 × 16 pris dans `mid1` 60 et décalé de 4 096 octets à chaque étape (étape 0
-  à 15 à l'apparition, 15 à 0 à la disparition) ; puis copie à l'écran.
+  écran, puis le texte (format `%J%Y%S`, à y = 35 pour le 2ᵉ titre, 50 pour les autres) ; puis
+  copie à l'écran.
+- **Le texte est translucide** (relu le 2026-10-21). La police des titres (`mid1` 27) est d'un type
+  dérivé dont la méthode de dessin, `TranslucentFont_DrawGlyph_BDDC0`, passe trois valeurs à
+  `Render_DrawScaledSprite_32F28` : une table, A = 239 et B = 16. Un pixel du caractère de couleur c
+  est dessiné tel quel si c < 239 ou c ≥ 255 ; si 239 ≤ c ≤ 254, il prend la couleur
+  `table[(c − 239) × 256 + couleur déjà à l'écran]` (`xlat`). Il y a donc 16 niveaux de
+  translucidité (les couleurs 239 à 254 de la police), chacun avec une table de 256 octets qui
+  donne, pour chaque couleur du fond, la couleur mélangée.
+- La table est prise dans `mid1` 60 à l'octet `étape × 4 096` (16 niveaux × 256) : étape 0 à 15 à
+  l'apparition, 15 à 0 à la disparition. `mid1` 60 contient donc au moins 16 × 4 096 = 65 536
+  octets de tables. C'est un fondu du texte sur le fond, pas un motif : le contenu exact des
+  tables (de « invisible » à « opaque ») est à lire dans le fichier, absent de `data/`.
 - `Input_CheckSkip_D24A` : Espace (ou un événement de type 2, rôle non établi) passe toute la
   séquence des titres ; Échap arrête la cinématique.
 

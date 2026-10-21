@@ -10144,7 +10144,13 @@ Midgame1_PlayPart1_5FCF0	endp
 
 ; Attributes: bp-based frame
 
-sub_67184	proc far		; CODE XREF: sub_423B0J
+; ==============================================================================================
+; far, LUE 2026-10-21. Destructeur (entrée 0 de la table de méthodes dseg 1DADh) de la police
+; à pixels translucides des titres de mid1 : remet la table de méthodes (mov word ptr [si],
+; 1DADh), appelle GlyphObject_ScalarDeletingDtorA_313D6, libère l'objet si le bit 0 de arg_2
+; est mis.
+; ==============================================================================================
+TranslucentFont_Destruct_67184	proc far		; CODE XREF: sub_423B0J
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -10168,12 +10174,12 @@ arg_2		= word ptr  8
 		call	sub_308
 		add	sp, 2
 
-loc_671B1:				; CODE XREF: sub_67184+Dj
-					; sub_67184+22j
+loc_671B1:				; CODE XREF: TranslucentFont_Destruct_67184+Dj
+					; TranslucentFont_Destruct_67184+22j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_67184	endp
+TranslucentFont_Destruct_67184	endp
 
 ovr196		ends

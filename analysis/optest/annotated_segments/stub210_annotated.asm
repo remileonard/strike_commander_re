@@ -15,7 +15,7 @@ stru_42630	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:074Eo
 ; Attributes: thunk
 
 sub_42650	proc far		; DATA XREF: dseg:1DB1o
-		jmp	sub_BDDC0
+		jmp	TranslucentFont_DrawGlyph_BDDC0
 sub_42650	endp
 
 stub210		ends
