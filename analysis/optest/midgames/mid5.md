@@ -749,26 +749,26 @@ si v10 != 0 :
     Scene_Tick(scène=scène4)                                                                          ⟨240904⟩
     charge(mid5voc 3)                                                                                 ⟨240916⟩
     tête_voix(tête=c11, ressource=mid5voc 3, cadence=9)                                               ⟨240922⟩
-    pal10(mid5 16).+0 = 0                                                                             ⟨240924⟩
+    v268 = 0                                                                                          ⟨240924⟩
     tant que v268 < 3 :
         Scene_Tick(scène=scène4)                                                                      ⟨240931⟩
-        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨240933⟩
+        v268 = v268 + 1                                                                               ⟨240933⟩
     tant que tête_parle(tête=c11) != 0 :
         Scene_Tick(scène=scène4)                                                                      ⟨240954⟩
     tête_image_de_base(tête=c11, image=14)                                                            ⟨240967⟩
     Scene_Tick(scène=scène4)                                                                          ⟨240971⟩
     charge(mid5voc 4)                                                                                 ⟨240983⟩
     tête_voix(tête=c11, ressource=mid5voc 4, cadence=9)                                               ⟨240989⟩
-    pal10(mid5 16).+0 = 0                                                                             ⟨240991⟩
+    v268 = 0                                                                                          ⟨240991⟩
     tant que v268 < 3 :
         Scene_Tick(scène=scène4)                                                                      ⟨240998⟩
-        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨241000⟩
+        v268 = v268 + 1                                                                               ⟨241000⟩
     tant que tête_parle(tête=c11) != 0 :
         Scene_Tick(scène=scène4)                                                                      ⟨241021⟩
-    pal10(mid5 16).+0 = 0                                                                             ⟨241032⟩
+    v268 = 0                                                                                          ⟨241032⟩
     tant que v268 < 2 :
         Scene_Tick(scène=scène4)                                                                      ⟨241039⟩
-        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨241041⟩
+        v268 = v268 + 1                                                                               ⟨241041⟩
     v260 = 0                                                                                          ⟨241083⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨241092⟩
@@ -969,16 +969,16 @@ si v10 != 0 :
     Scene_Tick(scène=scène6)                                                                          ⟨242676⟩
     charge(mid5voc 5)                                                                                 ⟨242688⟩
     tête_voix(tête=c15, ressource=mid5voc 5, cadence=9)                                               ⟨242694⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨242696⟩
+    v268 = 0                                                                                          ⟨242696⟩
     tant que v268 < 3 :
         Scene_Tick(scène=scène6)                                                                      ⟨242703⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨242705⟩
+        v268 = v268 + 1                                                                               ⟨242705⟩
     tant que tête_parle(tête=c15) != 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨242726⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨242737⟩
+    v268 = 0                                                                                          ⟨242737⟩
     tant que v268 < 2 :
         Scene_Tick(scène=scène6)                                                                      ⟨242744⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨242746⟩
+        v268 = v268 + 1                                                                               ⟨242746⟩
     v260 = 0                                                                                          ⟨242769⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨242778⟩
@@ -1440,7 +1440,7 @@ sinon :
     v4 = 50                                                                                           ⟨246209⟩
     si = scène10.compteur                                                                             ⟨246210⟩
     tant que (scène10.compteur < si + ((v4·70) / 100)) et (scène10.terminée == 0) :
-        pal10(mid5 19).+0 = scène10.compteur                                                          ⟨246225⟩
+        v268 = scène10.compteur                                                                       ⟨246225⟩
         si si + 3 == v268 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[11])                             ⟨246238⟩
         si si + 18 > v268 :
@@ -1690,16 +1690,16 @@ si v10 != 0 :
     Scene_Tick(scène=scène12)                                                                         ⟨248019⟩
     charge(mid5voc 1)                                                                                 ⟨248031⟩
     tête_voix(tête=c38, ressource=mid5voc 1, cadence=9)                                               ⟨248037⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨248039⟩
+    v268 = 0                                                                                          ⟨248039⟩
     tant que v268 < 3 :
         Scene_Tick(scène=scène12)                                                                     ⟨248046⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248048⟩
+        v268 = v268 + 1                                                                               ⟨248048⟩
     tant que tête_parle(tête=c38) != 0 :
         Scene_Tick(scène=scène12)                                                                     ⟨248069⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨248080⟩
+    v268 = 0                                                                                          ⟨248080⟩
     tant que v268 < 2 :
         Scene_Tick(scène=scène12)                                                                     ⟨248087⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248089⟩
+        v268 = v268 + 1                                                                               ⟨248089⟩
     v260 = 0                                                                                          ⟨248112⟩
 sinon :
     v492→0.méthode8(183)                                                                              ⟨248121⟩
@@ -1801,16 +1801,16 @@ si v10 != 0 :
     v260 = 0                                                                                          ⟨248908⟩
     charge(mid5voc 6)                                                                                 ⟨248915⟩
     tête_voix(tête=c40, ressource=mid5voc 6, cadence=9)                                               ⟨248921⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨248923⟩
+    v268 = 0                                                                                          ⟨248923⟩
     tant que v268 < 3 :
         Scene_Tick(scène=scène13)                                                                     ⟨248930⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248932⟩
+        v268 = v268 + 1                                                                               ⟨248932⟩
     tant que tête_parle(tête=c40) != 0 :
         Scene_Tick(scène=scène13)                                                                     ⟨248953⟩
-    pal10(mid5 19).+0 = 0                                                                             ⟨248964⟩
+    v268 = 0                                                                                          ⟨248964⟩
     tant que v268 < 2 :
         Scene_Tick(scène=scène13)                                                                     ⟨248971⟩
-        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248973⟩
+        v268 = v268 + 1                                                                               ⟨248973⟩
     v260 = 0                                                                                          ⟨248996⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨249005⟩

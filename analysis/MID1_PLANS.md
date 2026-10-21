@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, `MID_15`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, `MID_16`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -283,4 +283,25 @@ répliques et têtes en mode voix. Mécanismes nouveaux (2026-10-21) :
   son : une variable ordinaire, en lecture comme en écriture. Généralise la règle de mid5 ; corrige
   le compteur de la scène 2 de mid12 (écrit sous une ressource, relu sous une autre) et la limite
   connue de mid2 (compteur `var_188`, image 10 posée au 4ᵉ tour). MID_2 et MID_12 changent.
+
+### mid16
+
+Fonction pas encore nommée `sub_94A30` : `--nom mid16`. 5 plans, 39,7 s (41,4 s avec le fondu),
+aucun mécanisme de dessin nouveau ; 0 écart avec le rendu de référence.
+
+**Sous-titres : plusieurs textes pour une réplique** (2026-10-21, toutes les cinématiques). Sans
+voix, le code affiche plus de textes qu'il ne joue de répliques avec voix (mid16, scène 2 : 8 textes
+pour 7 répliques ; scène 3 : 3 pour 2). L'appariement se fait sur les données :
+- dans l'ordre, chaque réplique reçoit une suite de textes consécutifs, choisie pour que la longueur
+  des textes suive la durée de la voix (vitesse moyenne du groupe) ; une réplique de k textes doit
+  contenir k − 1 silences (fenêtres de 50 ms sous 8 % du maximum, sur au moins 0,25 s), un silence
+  manquant étant pénalisé ;
+- dans une réplique, le texte suivant commence à la fin du silence le plus proche de sa position
+  (proportion des caractères) ; sans silence, à cette position.
+mid16 : réplique 0 = textes 0 (« Yeah, that damn Mendez... ») et 1 ; réplique 7 = textes 8
+(« Operator? », 0,55 s, puis une pause) et 9 ; les autres, un texte chacune. Le code cherche aussi un
+sous-titre affiché plus loin, dans un « si pas de voix » de la boucle commune (mid15, dernier plan).
+Effet : 16 sous-titres au lieu de 10 dans mid2, 15 au lieu de 8 dans mid5, 25 au lieu de 11 dans
+mid12, 27 au lieu de 14 dans mid15. C'est une reconstruction d'après les données, pas une règle du
+jeu (avec voix, le jeu n'affiche aucun texte).
 

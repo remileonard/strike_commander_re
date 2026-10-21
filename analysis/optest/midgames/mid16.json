@@ -868,7 +868,7 @@
        "ligne": 284150
       },
       {
-       "op": "sub_30C66",
+       "op": "AIL_set_relative_volume_30C66",
        "arguments": [
         "canal3.+0→4",
         "v3038",
@@ -1165,8 +1165,10 @@
     "palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨280030⟩",
     "v30 = 0                                                                                               ⟨280036⟩",
     "si v12 != 0 :",
-    "    si sub_6734(chemin1) == 0 : aller à loc_94BB6                                                     ⟨280095⟩",
-    "    pak mid16voc.ouvre(chemin1, 1)                                                                    ⟨280102⟩",
+    "    si sub_6734(chemin1) != 0 :",
+    "        pak mid16voc.ouvre(chemin1, 1)                                                                ⟨280102⟩",
+    "    sinon :",
+    "        v12 = 0                                                                                       ⟨280109⟩",
     "sinon :",
     "    v12 = 0                                                                                           ⟨280109⟩",
     "v40 = 0                                                                                               ⟨280112⟩",
@@ -1180,6 +1182,7 @@
     "        pak rsoundfx.ouvre(chemin1, 1)                                                                ⟨280163⟩",
     "        flux_iff(flux=flux1)                                                                          ⟨280177⟩",
     "        v3063 = 256                                                                                   ⟨280180⟩",
+    "        v3067 = 0                                                                                     ⟨280181⟩",
     "        flux1.ouvre(chemin1, 1)                                                                       ⟨280189⟩",
     "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨280195⟩",
     "        iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨280201⟩",
@@ -1203,6 +1206,7 @@
     "        pak asoundfx.ouvre(chemin1, 1)                                                                ⟨280299⟩",
     "        flux_iff(flux=flux1)                                                                          ⟨280313⟩",
     "        v3063 = 256                                                                                   ⟨280316⟩",
+    "        v3067 = 0                                                                                     ⟨280317⟩",
     "        flux1.ouvre(chemin1, 1)                                                                       ⟨280325⟩",
     "        iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨280331⟩",
     "        iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨280337⟩",
@@ -1226,7 +1230,9 @@
     "    charge(asoundfx 29)                                                                               ⟨280435⟩",
     "    canal_enregistre(canal=canal1, ressource=asoundfx 29, x=0)                                        ⟨280442⟩",
     "    canal_arrête(canal=canal1)                                                                        ⟨280446⟩",
+    "    v168 = 0                                                                                          ⟨280466⟩",
     "    canal_arrête(canal=canal1)                                                                        ⟨280469⟩",
+    "    v3002 = 0                                                                                         ⟨280487⟩",
     "v844 = 0                                                                                              ⟨280492⟩",
     "v839 = 0                                                                                              ⟨280494⟩",
     "v838 = 0                                                                                              ⟨280495⟩",
@@ -1240,9 +1246,10 @@
     "    canal_init(canal=canal2, pilote=word_46849)                                                       ⟨280534⟩",
     "    canal_enregistre(canal=canal2, ressource=amusic v165, x=0)                                        ⟨280541⟩",
     "    v168 = word_48F76                                                                                 ⟨280544⟩",
+    "    v170 = 0                                                                                          ⟨280545⟩",
     "    si canal2.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal2.+0→4, séquence=v846)                                         ⟨280551⟩",
-    "        sub_30C66(canal2.+0→4, v846, v168, v170)                                                      ⟨280558⟩",
+    "        AIL_set_relative_volume_30C66(canal2.+0→4, v846, v168, v170)                                  ⟨280558⟩",
     "v857 = booléen                                                                                        ⟨280578⟩",
     "v853 = booléen                                                                                        ⟨280579⟩",
     "si v12 != 0 :",
@@ -1250,6 +1257,7 @@
     "sinon :",
     "    flux_iff(flux=flux1)                                                                              ⟨280603⟩",
     "    v3063 = 256                                                                                       ⟨280606⟩",
+    "    v3067 = 0                                                                                         ⟨280607⟩",
     "    flux1.ouvre(chemin1, 1)                                                                           ⟨280615⟩",
     "    iff_form(flux=flux1, balise='MG16', x=0)                                                          ⟨280621⟩",
     "    iff_form(flux=flux1, balise='DATA', x=0)                                                          ⟨280627⟩",
@@ -1289,6 +1297,7 @@
     "v160 = 152                                                                                            ⟨280833⟩",
     "v162 = 319                                                                                            ⟨280835⟩",
     "v164 = 199                                                                                            ⟨280837⟩",
+    "v2967 = 0                                                                                             ⟨280839⟩",
     "v2965 = v160                                                                                          ⟨280841⟩",
     "v2963 = v162                                                                                          ⟨280843⟩",
     "v2961 = v164                                                                                          ⟨280845⟩",
@@ -1298,9 +1307,34 @@
     "    v144 = 0                                                                                          ⟨280887⟩",
     "    v139 = 0                                                                                          ⟨280888⟩",
     "    v138 = 0                                                                                          ⟨280889⟩",
+    "    v123 = 0                                                                                          ⟨280912⟩",
+    "    v122 = 0                                                                                          ⟨280913⟩",
+    "    v107 = 0                                                                                          ⟨280936⟩",
+    "    v106 = 0                                                                                          ⟨280937⟩",
+    "    v97 = 0                                                                                           ⟨280955⟩",
+    "    v96 = 0                                                                                           ⟨280956⟩",
+    "    v87 = 0                                                                                           ⟨280974⟩",
+    "    v86 = 0                                                                                           ⟨280975⟩",
+    "    v77 = 0                                                                                           ⟨280993⟩",
+    "    v76 = 0                                                                                           ⟨280994⟩",
+    "    v67 = 0                                                                                           ⟨281012⟩",
+    "    v66 = 0                                                                                           ⟨281013⟩",
+    "    v57 = 0                                                                                           ⟨281031⟩",
+    "    v56 = 0                                                                                           ⟨281032⟩",
+    "    v47 = 0                                                                                           ⟨281050⟩",
+    "    v46 = 0                                                                                           ⟨281051⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨281055⟩",
+    "    v2918 = 0                                                                                         ⟨281073⟩",
+    "    v2913 = 0                                                                                         ⟨281074⟩",
+    "    v2912 = 0                                                                                         ⟨281075⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨281078⟩",
+    "    v844 = 0                                                                                          ⟨281096⟩",
+    "    v839 = 0                                                                                          ⟨281097⟩",
+    "    v838 = 0                                                                                          ⟨281098⟩",
+    "    v35 = 0                                                                                           ⟨281121⟩",
+    "    v34 = 0                                                                                           ⟨281122⟩",
     "    retour                                                                                            ⟨281164⟩",
+    "v168 = 0                                                                                              ⟨281171⟩",
     "charge(midgames 1)                                                                                    ⟨281178⟩",
     "charge(midgames 2)                                                                                    ⟨281190⟩",
     "palette_depuis(pal4(midgames 2))                                                                      ⟨281197⟩",
@@ -1325,12 +1359,39 @@
     "    Scene_Tick(scène=scène1)                                                                          ⟨281325⟩",
     "fondu_disparition(palette=pal1, couleur=&v30, pas=1, premier=0, nombre=256)                           ⟨281356⟩",
     "Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨281361⟩",
+    "v179 = 0                                                                                              ⟨281385⟩",
+    "v178 = 0                                                                                              ⟨281386⟩",
+    "v168 = 0                                                                                              ⟨281405⟩",
     "si byte_495FC != 0 :",
     "    v144 = 0                                                                                          ⟨281437⟩",
     "    v139 = 0                                                                                          ⟨281438⟩",
     "    v138 = 0                                                                                          ⟨281439⟩",
+    "    v123 = 0                                                                                          ⟨281462⟩",
+    "    v122 = 0                                                                                          ⟨281463⟩",
+    "    v107 = 0                                                                                          ⟨281486⟩",
+    "    v106 = 0                                                                                          ⟨281487⟩",
+    "    v97 = 0                                                                                           ⟨281505⟩",
+    "    v96 = 0                                                                                           ⟨281506⟩",
+    "    v87 = 0                                                                                           ⟨281524⟩",
+    "    v86 = 0                                                                                           ⟨281525⟩",
+    "    v77 = 0                                                                                           ⟨281543⟩",
+    "    v76 = 0                                                                                           ⟨281544⟩",
+    "    v67 = 0                                                                                           ⟨281562⟩",
+    "    v66 = 0                                                                                           ⟨281563⟩",
+    "    v57 = 0                                                                                           ⟨281581⟩",
+    "    v56 = 0                                                                                           ⟨281582⟩",
+    "    v47 = 0                                                                                           ⟨281600⟩",
+    "    v46 = 0                                                                                           ⟨281601⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨281605⟩",
+    "    v2918 = 0                                                                                         ⟨281623⟩",
+    "    v2913 = 0                                                                                         ⟨281624⟩",
+    "    v2912 = 0                                                                                         ⟨281625⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨281628⟩",
+    "    v844 = 0                                                                                          ⟨281646⟩",
+    "    v839 = 0                                                                                          ⟨281647⟩",
+    "    v838 = 0                                                                                          ⟨281648⟩",
+    "    v35 = 0                                                                                           ⟨281671⟩",
+    "    v34 = 0                                                                                           ⟨281672⟩",
     "    retour                                                                                            ⟨281714⟩",
     "",
     "──── scène2 ────",
@@ -1357,7 +1418,7 @@
     "        di = di + 1                                                                                   ⟨281840⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨281848⟩",
     "    di = 0                                                                                            ⟨281850⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di == 4 :",
     "            c3.image = 1                                                                              ⟨281857⟩",
     "        si di == 10 :",
@@ -1378,7 +1439,7 @@
     "        di = di + 1                                                                                   ⟨281933⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨281941⟩",
     "    di = 0                                                                                            ⟨281943⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di == 4 :",
     "            c3.image = 2                                                                              ⟨281950⟩",
     "        si di == 16 :",
@@ -1397,7 +1458,7 @@
     "        di = di + 1                                                                                   ⟨282021⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨282029⟩",
     "    di = 0                                                                                            ⟨282031⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di == 8 :",
     "            c3.image = 2                                                                              ⟨282038⟩",
     "        di = di + 1                                                                                   ⟨282042⟩",
@@ -1412,7 +1473,7 @@
     "        di = di + 1                                                                                   ⟨282100⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨282108⟩",
     "    di = 0                                                                                            ⟨282110⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di == 4 :",
     "            c3.image = 1                                                                              ⟨282117⟩",
     "        si di == 23 :",
@@ -1431,7 +1492,7 @@
     "        di = di + 1                                                                                   ⟨282188⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨282196⟩",
     "    di = 0                                                                                            ⟨282198⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di == 4 :",
     "            c3.image = 1                                                                              ⟨282205⟩",
     "        si di == 14 :",
@@ -1451,7 +1512,7 @@
     "    c4.image = 2                                                                                      ⟨282283⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨282287⟩",
     "    di = 0                                                                                            ⟨282289⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        si di > 6 :",
     "            si di < 12 :",
     "                si di & 1 != 0 :",
@@ -1479,7 +1540,7 @@
     "        Scene_Tick(scène=scène2)                                                                      ⟨282397⟩",
     "        di = di + 1                                                                                   ⟨282399⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨282407⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        Scene_Tick(scène=scène2)                                                                      ⟨282425⟩",
     "    di = 0                                                                                            ⟨282437⟩",
     "    tant que di < 8 :",
@@ -1491,6 +1552,17 @@
     "        Scene_Tick(scène=scène2)                                                                      ⟨282459⟩",
     "        di = di + 1                                                                                   ⟨282461⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨282468⟩",
+    "    v241 = 0                                                                                          ⟨282487⟩",
+    "    v240 = 0                                                                                          ⟨282488⟩",
+    "    v227 = 0                                                                                          ⟨282506⟩",
+    "    v226 = 0                                                                                          ⟨282507⟩",
+    "    v217 = 0                                                                                          ⟨282525⟩",
+    "    v216 = 0                                                                                          ⟨282526⟩",
+    "    v207 = 0                                                                                          ⟨282544⟩",
+    "    v206 = 0                                                                                          ⟨282545⟩",
+    "    v197 = 0                                                                                          ⟨282563⟩",
+    "    v186 = 0                                                                                          ⟨282583⟩",
+    "    v176 = 0                                                                                          ⟨282602⟩",
     "sinon :",
     "    Widget_Method_DispatchC_314CB(zone1, 0)                                                           ⟨282610⟩",
     "    Widget_Method_Dispatch8_314A9(zone1, 1)                                                           ⟨282615⟩",
@@ -1645,6 +1717,8 @@
     "                si scène2.compteur & 1 != 0 :",
     "                    c5.image = v172                                                                   ⟨283491⟩",
     "                    si v172 < 3 :",
+    "                        v172_avant = v172                                                             ⟨283494⟩",
+    "                        v172_avant = v172                                                             ⟨283494⟩",
     "                        v172 = v172 + 1                                                               ⟨283494⟩",
     "        si v2 + 24 < scène2.compteur :",
     "            si scène2.compteur & 1 != 0 :",
@@ -1687,8 +1761,32 @@
     "    v144 = 0                                                                                          ⟨283770⟩",
     "    v139 = 0                                                                                          ⟨283771⟩",
     "    v138 = 0                                                                                          ⟨283772⟩",
+    "    v123 = 0                                                                                          ⟨283795⟩",
+    "    v122 = 0                                                                                          ⟨283796⟩",
+    "    v107 = 0                                                                                          ⟨283819⟩",
+    "    v106 = 0                                                                                          ⟨283820⟩",
+    "    v97 = 0                                                                                           ⟨283838⟩",
+    "    v96 = 0                                                                                           ⟨283839⟩",
+    "    v87 = 0                                                                                           ⟨283857⟩",
+    "    v86 = 0                                                                                           ⟨283858⟩",
+    "    v77 = 0                                                                                           ⟨283876⟩",
+    "    v76 = 0                                                                                           ⟨283877⟩",
+    "    v67 = 0                                                                                           ⟨283895⟩",
+    "    v66 = 0                                                                                           ⟨283896⟩",
+    "    v57 = 0                                                                                           ⟨283914⟩",
+    "    v56 = 0                                                                                           ⟨283915⟩",
+    "    v47 = 0                                                                                           ⟨283933⟩",
+    "    v46 = 0                                                                                           ⟨283934⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨283938⟩",
+    "    v2918 = 0                                                                                         ⟨283956⟩",
+    "    v2913 = 0                                                                                         ⟨283957⟩",
+    "    v2912 = 0                                                                                         ⟨283958⟩",
     "    canal_arrête(canal=canal2)                                                                        ⟨283961⟩",
+    "    v844 = 0                                                                                          ⟨283979⟩",
+    "    v839 = 0                                                                                          ⟨283980⟩",
+    "    v838 = 0                                                                                          ⟨283981⟩",
+    "    v35 = 0                                                                                           ⟨284004⟩",
+    "    v34 = 0                                                                                           ⟨284005⟩",
     "    retour                                                                                            ⟨284047⟩",
     "",
     "──── scène3 ────",
@@ -1705,9 +1803,10 @@
     "    canal_init(canal=canal3, pilote=word_46849)                                                       ⟨284133⟩",
     "    canal_enregistre(canal=canal3, ressource=asoundfx 29, x=0)                                        ⟨284140⟩",
     "    v178 = word_48EDC                                                                                 ⟨284143⟩",
+    "    v180 = 0                                                                                          ⟨284144⟩",
     "    si canal3.+0 != 0 :",
     "        AIL_start_sequence(pilote=canal3.+0→4, séquence=v3038)                                        ⟨284150⟩",
-    "        sub_30C66(canal3.+0→4, v3038, v178, v180)                                                     ⟨284157⟩",
+    "        AIL_set_relative_volume_30C66(canal3.+0→4, v3038, v178, v180)                                 ⟨284157⟩",
     "si v12 != 0 :",
     "    Scene_Tick(scène=scène3)                                                                          ⟨284171⟩",
     "    charge(mid16voc 7)                                                                                ⟨284183⟩",
@@ -1718,11 +1817,13 @@
     "        di = di + 1                                                                                   ⟨284200⟩",
     "    c8.image = 1                                                                                      ⟨284205⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨284209⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        CRT_Rand()                                                                                    ⟨284215⟩",
-    "        c8.image = ((CRT_Rand()·3) / -32768) + 1                                                      ⟨284224⟩",
+    "        c8.image = ((CRT_Rand()·3) / 32768) + 1                                                       ⟨284224⟩",
     "        Scene_Tick(scène=scène3)                                                                      ⟨284237⟩",
     "    c8.image = 0                                                                                      ⟨284249⟩",
+    "    v198 = 2                                                                                          ⟨284251⟩",
+    "    v197 = 0                                                                                          ⟨284252⟩",
     "    charge(mid16voc 8)                                                                                ⟨284260⟩",
     "    voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid16voc 8)                                 ⟨284266⟩",
     "    di = 0                                                                                            ⟨284268⟩",
@@ -1735,9 +1836,9 @@
     "        Scene_Tick(scène=scène3)                                                                      ⟨284290⟩",
     "        di = di + 1                                                                                   ⟨284292⟩",
     "    voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨284300⟩",
-    "    tant que sub_8500(voix1) != 0 :",
+    "    tant que voix_en_cours(voix=voix1) != 0 :",
     "        CRT_Rand()                                                                                    ⟨284306⟩",
-    "        v204 = ((CRT_Rand()·3) / -32768) + 1                                                          ⟨284313⟩",
+    "        v204 = ((CRT_Rand()·3) / 32768) + 1                                                           ⟨284313⟩",
     "        c8.image = v204                                                                               ⟨284315⟩",
     "        Scene_Tick(scène=scène3)                                                                      ⟨284328⟩",
     "    c8.image = 1                                                                                      ⟨284340⟩",
@@ -1746,6 +1847,7 @@
     "        Scene_Tick(scène=scène3)                                                                      ⟨284348⟩",
     "        di = di + 1                                                                                   ⟨284350⟩",
     "    voix_arrête(voix=voix1)                                                                           ⟨284357⟩",
+    "    v197 = 0                                                                                          ⟨284376⟩",
     "sinon :",
     "    Widget_Method_DispatchC_314CB(zone1, 0)                                                           ⟨284404⟩",
     "    Widget_Method_Dispatch8_314A9(zone1, 203)                                                         ⟨284409⟩",
@@ -1761,7 +1863,7 @@
     "        si v2 + 12 < scène3.compteur :",
     "            si v2 + 20 > scène3.compteur :",
     "                CRT_Rand()                                                                            ⟨284458⟩",
-    "                c8.image = ((CRT_Rand()·3) / -32768) + 1                                              ⟨284467⟩",
+    "                c8.image = ((CRT_Rand()·3) / 32768) + 1                                               ⟨284467⟩",
     "        si v4 - 5 < scène3.compteur :",
     "            c8.image = 1                                                                              ⟨284475⟩",
     "        si v4 - 1 == scène3.compteur :",
@@ -1782,7 +1884,7 @@
     "        si v2 + 2 < scène3.compteur :",
     "            si v2 + 65 > scène3.compteur :",
     "                CRT_Rand()                                                                            ⟨284596⟩",
-    "                c8.image = ((CRT_Rand()·3) / -32768) + 1                                              ⟨284605⟩",
+    "                c8.image = ((CRT_Rand()·3) / 32768) + 1                                               ⟨284605⟩",
     "        si v4 - 25 < scène3.compteur :",
     "            c8.image = 0                                                                              ⟨284613⟩",
     "        si v4 - 1 == scène3.compteur :",
@@ -1803,7 +1905,7 @@
     "        si v2 + 6 < scène3.compteur :",
     "            si v2 + 25 > scène3.compteur :",
     "                CRT_Rand()                                                                            ⟨284734⟩",
-    "                c8.image = ((CRT_Rand()·3) / -32768) + 1                                              ⟨284743⟩",
+    "                c8.image = ((CRT_Rand()·3) / 32768) + 1                                               ⟨284743⟩",
     "        si v4 - 10 < scène3.compteur :",
     "            c8.image = 1                                                                              ⟨284751⟩",
     "        si v4 - 1 == scène3.compteur :",
@@ -1816,12 +1918,40 @@
     "        Scene_Tick(scène=scène3)                                                                      ⟨284804⟩",
     "fondu_disparition(palette=pal1, couleur=&v30, pas=2, premier=0, nombre=256)                           ⟨284838⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨284842⟩",
+    "v3036 = 0                                                                                             ⟨284860⟩",
+    "v3031 = 0                                                                                             ⟨284861⟩",
+    "v3030 = 0                                                                                             ⟨284862⟩",
+    "v170 = 0                                                                                              ⟨284881⟩",
     "Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨284885⟩",
     "v144 = 0                                                                                              ⟨284912⟩",
     "v139 = 0                                                                                              ⟨284913⟩",
     "v138 = 0                                                                                              ⟨284914⟩",
+    "v123 = 0                                                                                              ⟨284937⟩",
+    "v122 = 0                                                                                              ⟨284938⟩",
+    "v107 = 0                                                                                              ⟨284961⟩",
+    "v106 = 0                                                                                              ⟨284962⟩",
+    "v97 = 0                                                                                               ⟨284980⟩",
+    "v96 = 0                                                                                               ⟨284981⟩",
+    "v87 = 0                                                                                               ⟨284999⟩",
+    "v86 = 0                                                                                               ⟨285000⟩",
+    "v77 = 0                                                                                               ⟨285018⟩",
+    "v76 = 0                                                                                               ⟨285019⟩",
+    "v67 = 0                                                                                               ⟨285037⟩",
+    "v66 = 0                                                                                               ⟨285038⟩",
+    "v57 = 0                                                                                               ⟨285056⟩",
+    "v56 = 0                                                                                               ⟨285057⟩",
+    "v47 = 0                                                                                               ⟨285075⟩",
+    "v46 = 0                                                                                               ⟨285076⟩",
     "voix_arrête(voix=voix1)                                                                               ⟨285080⟩",
+    "v2918 = 0                                                                                             ⟨285098⟩",
+    "v2913 = 0                                                                                             ⟨285099⟩",
+    "v2912 = 0                                                                                             ⟨285100⟩",
     "canal_arrête(canal=canal2)                                                                            ⟨285103⟩",
+    "v844 = 0                                                                                              ⟨285121⟩",
+    "v839 = 0                                                                                              ⟨285122⟩",
+    "v838 = 0                                                                                              ⟨285123⟩",
+    "v35 = 0                                                                                               ⟨285146⟩",
+    "v34 = 0                                                                                               ⟨285147⟩",
     "retour                                                                                                ⟨285189⟩"
    ],
    "arbre": [
@@ -2024,31 +2154,42 @@
      },
      "alors": [
       {
-       "t": "saut_si",
+       "t": "si",
        "cond": {
-        "cmp": "==",
+        "cmp": "!=",
         "a": {
          "résultat": "sub_6734(chemin1)"
         },
         "b": 0
        },
-       "cible": "loc_94BB6",
-       "ligne": 280095
-      },
-      {
-       "t": "appel",
-       "nom": "pak mid16voc.ouvre",
-       "args": [
+       "alors": [
         {
-         "objet": "chemin1"
-        },
-        1
+         "t": "appel",
+         "nom": "pak mid16voc.ouvre",
+         "args": [
+          {
+           "objet": "chemin1"
+          },
+          1
+         ],
+         "texte": [
+          "chemin1",
+          "1"
+         ],
+         "ligne": 280102
+        }
        ],
-       "texte": [
-        "chemin1",
-        "1"
+       "sinon": [
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v12"
+         },
+         "valeur": 0,
+         "ligne": 280109
+        }
        ],
-       "ligne": 280102
+       "ligne": 280095
       }
      ],
      "sinon": [
@@ -2171,6 +2312,14 @@
          },
          "valeur": 256,
          "ligne": 280180
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v3067"
+         },
+         "valeur": 0,
+         "ligne": 280181
         },
         {
          "t": "appel",
@@ -2446,6 +2595,14 @@
          },
          "valeur": 256,
          "ligne": 280316
+        },
+        {
+         "t": "affecte",
+         "cible": {
+          "local": "v3067"
+         },
+         "valeur": 0,
+         "ligne": 280317
         },
         {
          "t": "appel",
@@ -2750,6 +2907,14 @@
        "ligne": 280446
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v168"
+       },
+       "valeur": 0,
+       "ligne": 280466
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -2761,6 +2926,14 @@
         "canal=canal1"
        ],
        "ligne": 280469
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3002"
+       },
+       "valeur": 0,
+       "ligne": 280487
       }
      ],
      "sinon": [],
@@ -2913,6 +3086,14 @@
        "ligne": 280544
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v170"
+       },
+       "valeur": 0,
+       "ligne": 280545
+      },
+      {
        "t": "si",
        "cond": {
         "cmp": "!=",
@@ -2950,7 +3131,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -3065,6 +3246,14 @@
        },
        "valeur": 256,
        "ligne": 280606
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v3067"
+       },
+       "valeur": 0,
+       "ligne": 280607
       },
       {
        "t": "appel",
@@ -3587,6 +3776,14 @@
     {
      "t": "affecte",
      "cible": {
+      "local": "v2967"
+     },
+     "valeur": 0,
+     "ligne": 280839
+    },
+    {
+     "t": "affecte",
+     "cible": {
       "local": "v2965"
      },
      "valeur": {
@@ -3680,6 +3877,134 @@
        "ligne": 280889
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v123"
+       },
+       "valeur": 0,
+       "ligne": 280912
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v122"
+       },
+       "valeur": 0,
+       "ligne": 280913
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v107"
+       },
+       "valeur": 0,
+       "ligne": 280936
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v106"
+       },
+       "valeur": 0,
+       "ligne": 280937
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v97"
+       },
+       "valeur": 0,
+       "ligne": 280955
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v96"
+       },
+       "valeur": 0,
+       "ligne": 280956
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v87"
+       },
+       "valeur": 0,
+       "ligne": 280974
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v86"
+       },
+       "valeur": 0,
+       "ligne": 280975
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v77"
+       },
+       "valeur": 0,
+       "ligne": 280993
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v76"
+       },
+       "valeur": 0,
+       "ligne": 280994
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v67"
+       },
+       "valeur": 0,
+       "ligne": 281012
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v66"
+       },
+       "valeur": 0,
+       "ligne": 281013
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 0,
+       "ligne": 281031
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v56"
+       },
+       "valeur": 0,
+       "ligne": 281032
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v47"
+       },
+       "valeur": 0,
+       "ligne": 281050
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v46"
+       },
+       "valeur": 0,
+       "ligne": 281051
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -3691,6 +4016,30 @@
         "voix=voix1"
        ],
        "ligne": 281055
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2918"
+       },
+       "valeur": 0,
+       "ligne": 281073
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2913"
+       },
+       "valeur": 0,
+       "ligne": 281074
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2912"
+       },
+       "valeur": 0,
+       "ligne": 281075
       },
       {
        "t": "op",
@@ -3706,6 +4055,46 @@
        "ligne": 281078
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v844"
+       },
+       "valeur": 0,
+       "ligne": 281096
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v839"
+       },
+       "valeur": 0,
+       "ligne": 281097
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v838"
+       },
+       "valeur": 0,
+       "ligne": 281098
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v35"
+       },
+       "valeur": 0,
+       "ligne": 281121
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v34"
+       },
+       "valeur": 0,
+       "ligne": 281122
+      },
+      {
        "t": "retour",
        "ligne": 281164
       }
@@ -3716,6 +4105,14 @@
     {
      "t": "label",
      "nom": "loc_9586A"
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v168"
+     },
+     "valeur": 0,
+     "ligne": 281171
     },
     {
      "t": "op",
@@ -4101,6 +4498,30 @@
      "ligne": 281361
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v179"
+     },
+     "valeur": 0,
+     "ligne": 281385
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v178"
+     },
+     "valeur": 0,
+     "ligne": 281386
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v168"
+     },
+     "valeur": 0,
+     "ligne": 281405
+    },
+    {
      "t": "si",
      "cond": {
       "cmp": "!=",
@@ -4136,6 +4557,134 @@
        "ligne": 281439
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v123"
+       },
+       "valeur": 0,
+       "ligne": 281462
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v122"
+       },
+       "valeur": 0,
+       "ligne": 281463
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v107"
+       },
+       "valeur": 0,
+       "ligne": 281486
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v106"
+       },
+       "valeur": 0,
+       "ligne": 281487
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v97"
+       },
+       "valeur": 0,
+       "ligne": 281505
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v96"
+       },
+       "valeur": 0,
+       "ligne": 281506
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v87"
+       },
+       "valeur": 0,
+       "ligne": 281524
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v86"
+       },
+       "valeur": 0,
+       "ligne": 281525
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v77"
+       },
+       "valeur": 0,
+       "ligne": 281543
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v76"
+       },
+       "valeur": 0,
+       "ligne": 281544
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v67"
+       },
+       "valeur": 0,
+       "ligne": 281562
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v66"
+       },
+       "valeur": 0,
+       "ligne": 281563
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 0,
+       "ligne": 281581
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v56"
+       },
+       "valeur": 0,
+       "ligne": 281582
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v47"
+       },
+       "valeur": 0,
+       "ligne": 281600
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v46"
+       },
+       "valeur": 0,
+       "ligne": 281601
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -4149,6 +4698,30 @@
        "ligne": 281605
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v2918"
+       },
+       "valeur": 0,
+       "ligne": 281623
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2913"
+       },
+       "valeur": 0,
+       "ligne": 281624
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2912"
+       },
+       "valeur": 0,
+       "ligne": 281625
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -4160,6 +4733,46 @@
         "canal=canal2"
        ],
        "ligne": 281628
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v844"
+       },
+       "valeur": 0,
+       "ligne": 281646
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v839"
+       },
+       "valeur": 0,
+       "ligne": 281647
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v838"
+       },
+       "valeur": 0,
+       "ligne": 281648
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v35"
+       },
+       "valeur": 0,
+       "ligne": 281671
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v34"
+       },
+       "valeur": 0,
+       "ligne": 281672
       },
       {
        "t": "retour",
@@ -4457,7 +5070,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -4745,7 +5358,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -5004,7 +5617,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -5205,7 +5818,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -5464,7 +6077,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -5734,7 +6347,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -6116,7 +6729,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -6256,6 +6869,94 @@
         "voix=voix1"
        ],
        "ligne": 282468
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v241"
+       },
+       "valeur": 0,
+       "ligne": 282487
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v240"
+       },
+       "valeur": 0,
+       "ligne": 282488
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v227"
+       },
+       "valeur": 0,
+       "ligne": 282506
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v226"
+       },
+       "valeur": 0,
+       "ligne": 282507
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v217"
+       },
+       "valeur": 0,
+       "ligne": 282525
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v216"
+       },
+       "valeur": 0,
+       "ligne": 282526
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v207"
+       },
+       "valeur": 0,
+       "ligne": 282544
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v206"
+       },
+       "valeur": 0,
+       "ligne": 282545
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v197"
+       },
+       "valeur": 0,
+       "ligne": 282563
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v186"
+       },
+       "valeur": 0,
+       "ligne": 282583
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v176"
+       },
+       "valeur": 0,
+       "ligne": 282602
       }
      ],
      "sinon": [
@@ -9026,6 +9727,26 @@
                 {
                  "t": "affecte",
                  "cible": {
+                  "local": "v172_avant"
+                 },
+                 "valeur": {
+                  "local": "v172"
+                 },
+                 "ligne": 283494
+                },
+                {
+                 "t": "affecte",
+                 "cible": {
+                  "local": "v172_avant"
+                 },
+                 "valeur": {
+                  "local": "v172"
+                 },
+                 "ligne": 283494
+                },
+                {
+                 "t": "affecte",
+                 "cible": {
                   "local": "v172"
                  },
                  "valeur": {
@@ -9734,6 +10455,134 @@
        "ligne": 283772
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v123"
+       },
+       "valeur": 0,
+       "ligne": 283795
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v122"
+       },
+       "valeur": 0,
+       "ligne": 283796
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v107"
+       },
+       "valeur": 0,
+       "ligne": 283819
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v106"
+       },
+       "valeur": 0,
+       "ligne": 283820
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v97"
+       },
+       "valeur": 0,
+       "ligne": 283838
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v96"
+       },
+       "valeur": 0,
+       "ligne": 283839
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v87"
+       },
+       "valeur": 0,
+       "ligne": 283857
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v86"
+       },
+       "valeur": 0,
+       "ligne": 283858
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v77"
+       },
+       "valeur": 0,
+       "ligne": 283876
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v76"
+       },
+       "valeur": 0,
+       "ligne": 283877
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v67"
+       },
+       "valeur": 0,
+       "ligne": 283895
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v66"
+       },
+       "valeur": 0,
+       "ligne": 283896
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v57"
+       },
+       "valeur": 0,
+       "ligne": 283914
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v56"
+       },
+       "valeur": 0,
+       "ligne": 283915
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v47"
+       },
+       "valeur": 0,
+       "ligne": 283933
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v46"
+       },
+       "valeur": 0,
+       "ligne": 283934
+      },
+      {
        "t": "op",
        "op": "voix_arrête",
        "args": {
@@ -9747,6 +10596,30 @@
        "ligne": 283938
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v2918"
+       },
+       "valeur": 0,
+       "ligne": 283956
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2913"
+       },
+       "valeur": 0,
+       "ligne": 283957
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v2912"
+       },
+       "valeur": 0,
+       "ligne": 283958
+      },
+      {
        "t": "op",
        "op": "canal_arrête",
        "args": {
@@ -9758,6 +10631,46 @@
         "canal=canal2"
        ],
        "ligne": 283961
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v844"
+       },
+       "valeur": 0,
+       "ligne": 283979
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v839"
+       },
+       "valeur": 0,
+       "ligne": 283980
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v838"
+       },
+       "valeur": 0,
+       "ligne": 283981
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v35"
+       },
+       "valeur": 0,
+       "ligne": 284004
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v34"
+       },
+       "valeur": 0,
+       "ligne": 284005
       },
       {
        "t": "retour",
@@ -9949,6 +10862,14 @@
        "ligne": 284143
       },
       {
+       "t": "affecte",
+       "cible": {
+        "local": "v180"
+       },
+       "valeur": 0,
+       "ligne": 284144
+      },
+      {
        "t": "si",
        "cond": {
         "cmp": "!=",
@@ -9986,7 +10907,7 @@
         },
         {
          "t": "appel",
-         "nom": "sub_30C66",
+         "nom": "AIL_set_relative_volume_30C66",
          "args": [
           {
            "déréf": {
@@ -10161,7 +11082,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -10192,7 +11113,7 @@
             },
             "b": 3
            },
-           "b": -32768
+           "b": 32768
           },
           "b": 1
          },
@@ -10224,6 +11145,22 @@
        },
        "valeur": 0,
        "ligne": 284249
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v198"
+       },
+       "valeur": 2,
+       "ligne": 284251
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v197"
+       },
+       "valeur": 0,
+       "ligne": 284252
       },
       {
        "t": "op",
@@ -10384,7 +11321,7 @@
        "cond": {
         "cmp": "!=",
         "a": {
-         "résultat": "sub_8500(voix1)"
+         "résultat": "voix_en_cours(voix=voix1)"
         },
         "b": 0
        },
@@ -10412,7 +11349,7 @@
             },
             "b": 3
            },
-           "b": -32768
+           "b": 32768
           },
           "b": 1
          },
@@ -10518,6 +11455,14 @@
         "voix=voix1"
        ],
        "ligne": 284357
+      },
+      {
+       "t": "affecte",
+       "cible": {
+        "local": "v197"
+       },
+       "valeur": 0,
+       "ligne": 284376
       }
      ],
      "sinon": [
@@ -10800,7 +11745,7 @@
                 },
                 "b": 3
                },
-               "b": -32768
+               "b": 32768
               },
               "b": 1
              },
@@ -11185,7 +12130,7 @@
                 },
                 "b": 3
                },
-               "b": -32768
+               "b": 32768
               },
               "b": 1
              },
@@ -11570,7 +12515,7 @@
                 },
                 "b": 3
                },
-               "b": -32768
+               "b": 32768
               },
               "b": 1
              },
@@ -11788,6 +12733,38 @@
      "ligne": 284842
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v3036"
+     },
+     "valeur": 0,
+     "ligne": 284860
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3031"
+     },
+     "valeur": 0,
+     "ligne": 284861
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v3030"
+     },
+     "valeur": 0,
+     "ligne": 284862
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v170"
+     },
+     "valeur": 0,
+     "ligne": 284881
+    },
+    {
      "t": "op",
      "op": "Scene_Destruct",
      "args": {
@@ -11827,6 +12804,134 @@
      "ligne": 284914
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v123"
+     },
+     "valeur": 0,
+     "ligne": 284937
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v122"
+     },
+     "valeur": 0,
+     "ligne": 284938
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v107"
+     },
+     "valeur": 0,
+     "ligne": 284961
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v106"
+     },
+     "valeur": 0,
+     "ligne": 284962
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v97"
+     },
+     "valeur": 0,
+     "ligne": 284980
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v96"
+     },
+     "valeur": 0,
+     "ligne": 284981
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v87"
+     },
+     "valeur": 0,
+     "ligne": 284999
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v86"
+     },
+     "valeur": 0,
+     "ligne": 285000
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v77"
+     },
+     "valeur": 0,
+     "ligne": 285018
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v76"
+     },
+     "valeur": 0,
+     "ligne": 285019
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v67"
+     },
+     "valeur": 0,
+     "ligne": 285037
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v66"
+     },
+     "valeur": 0,
+     "ligne": 285038
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v57"
+     },
+     "valeur": 0,
+     "ligne": 285056
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v56"
+     },
+     "valeur": 0,
+     "ligne": 285057
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v47"
+     },
+     "valeur": 0,
+     "ligne": 285075
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v46"
+     },
+     "valeur": 0,
+     "ligne": 285076
+    },
+    {
      "t": "op",
      "op": "voix_arrête",
      "args": {
@@ -11840,6 +12945,30 @@
      "ligne": 285080
     },
     {
+     "t": "affecte",
+     "cible": {
+      "local": "v2918"
+     },
+     "valeur": 0,
+     "ligne": 285098
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v2913"
+     },
+     "valeur": 0,
+     "ligne": 285099
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v2912"
+     },
+     "valeur": 0,
+     "ligne": 285100
+    },
+    {
      "t": "op",
      "op": "canal_arrête",
      "args": {
@@ -11851,6 +12980,46 @@
       "canal=canal2"
      ],
      "ligne": 285103
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v844"
+     },
+     "valeur": 0,
+     "ligne": 285121
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v839"
+     },
+     "valeur": 0,
+     "ligne": 285122
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v838"
+     },
+     "valeur": 0,
+     "ligne": 285123
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v35"
+     },
+     "valeur": 0,
+     "ligne": 285146
+    },
+    {
+     "t": "affecte",
+     "cible": {
+      "local": "v34"
+     },
+     "valeur": 0,
+     "ligne": 285147
     },
     {
      "t": "retour",

@@ -838,14 +838,14 @@ class FunctionRun:
             if is_const(val) and val[1] in (0, 2) and op[2] != 2 and self.region_at(off, service=True) and self.ex.objects[self.region_at(off, service=True)[1]].kind in SERVICE:
                 return
             hit = self.region_at(off)
+            if op[2] == 2 and self.service_counter(off):
+                hit = None
             if hit and op[2] == 2 and self.ex.objects[hit[1]].kind == 'palette' and not self.in_init_window(off):
                 # Une palette n'est écrite que par les fonctions de palette : un mot écrit directement
                 # dans sa case de pile en fait une variable (mid5 : compteur d'attente var_10C).
                 obj = self.ex.objects[hit[1]]
                 self.emit(('assign', f'{self.ex.obj_label(obj)}.{self.ex.field_name(obj, off - hit[0])}', val, line))
                 return
-            if op[2] == 2 and self.service_counter(off):
-                hit = None
             if hit:
                 start, oid = hit
                 if self.ex.objects[oid].kind in SERVICE:

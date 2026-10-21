@@ -68,9 +68,11 @@ def screen_offsets(data):
 
 
 def subtitle_map(data):
-    """Réplique → sous-titre, d'après le code : dans chaque « si voix présente : réplique k, sinon :
-    couleur c, sous-titre textes[i] », k donne (i, c)."""
-    found = {}
+    """Répliques → sous-titres, d'après le code : dans chaque « si voix présente : répliques, sinon :
+    couleur c, sous-titres », la k-ième réplique chargée et les sous-titres affichés, dans l'ordre.
+    Renvoie une liste de groupes (répliques [(pak, entrée)], textes [(tableau, index)], couleur) ;
+    l'appariement est fait par Player.subtitle_entries (un sous-titre de plus qu'une réplique : mid16)."""
+    found = []
 
     def ops(nodes):
         for n in nodes or []:
@@ -79,28 +81,114 @@ def subtitle_map(data):
                 if isinstance(n, dict) and br in n:
                     yield from ops(n[br])
 
+    def voice_loads(nodes):
+        return [(n['args']['pak'], n['args']['entrée']) for n in ops(nodes)
+                if n.get('op') == 'charge' and n.get('args', {}).get('pak', '').endswith('voc')]
+
+    def subtitle_texts(nodes):
+        found_texts = [re.search(r'(textes\d+)\[(\d+)\]', ' '.join(n['texte'])) for n in ops(nodes)
+                       if str(n.get('op', '')).startswith('sous_titre')]
+        return [(m.group(1), int(m.group(2))) for m in found_texts if m]
+
     def walk(v):
         if isinstance(v, dict):
             if v.get('t') == 'si' and 'alors' in v and 'sinon' in v:
-                voices = [n['args']['entrée'] for n in ops(v['alors'])
-                          if n.get('op') == 'charge' and n.get('args', {}).get('pak', '').endswith('voc')]
-                texts = [re.search(r'(textes\d+)\[(\d+)\]', ' '.join(n['texte'])) for n in ops(v['sinon'])
-                         if str(n.get('op', '')).startswith('sous_titre')]
+                voices = voice_loads(v['alors'])
+                texts = subtitle_texts(v['sinon'])
                 colours = []
                 for n in ops(v['sinon']):
                     if 'couleur' in str(n.get('op', '')):
                         colours.append(n['args']['couleur'])
                     elif str(n.get('nom', '')).endswith('.couleur'):
                         colours.append(n['args'][0])
-                if voices and texts and texts[0]:
-                    found[voices[0]] = ((texts[0].group(1), int(texts[0].group(2))), colours[0] if colours else 15)
             for x in v.values():
                 walk(x)
+            if v.get('t') == 'si' and 'alors' in v and 'sinon' in v and voices and texts:
+                # Groupes imbriqués : le plus intérieur d'abord (voir subtitle_entries).
+                found.append((voices, texts, colours[0] if colours else 15))
         elif isinstance(v, list):
-            for x in v:
+            for i, x in enumerate(v):
                 walk(x)
+                # « si voix : réplique, sinon : rien », puis le sous-titre plus loin, dans un « si pas de
+                # voix » de la boucle commune (mid15, dernier plan) : textes des nœuds suivants, jusqu'à
+                # la réplique suivante.
+                if isinstance(x, dict) and x.get('t') == 'si' and 'alors' in x:
+                    voices = voice_loads(x['alors'])
+                    if voices and not subtitle_texts(x.get('sinon')):
+                        texts = []
+                        for y in v[i + 1:]:
+                            if voice_loads([y]):
+                                break
+                            texts += subtitle_texts([y])
+                        if texts:
+                            found.append((voices, texts, 15))
     walk(data)
     return found
+
+
+SILENCE_PENALTY = 25.0
+# Durée minimale d'un sous-titre placé sans silence (secondes).
+MIN_SUBTITLE = 0.5
+
+
+def pair_subtitles(voices, texts, seconds, lengths, silences):
+    """Textes consécutifs donnés à chaque réplique, dans l'ordre. Autant de textes que de répliques :
+    un par réplique. Davantage de textes : chaque réplique reçoit une suite de textes, choisie pour
+    que la longueur des textes suive la durée de la voix (vitesse moyenne de la scène), une réplique
+    de k textes devant contenir k − 1 silences (données du jeu, mid16 : « Operator? », pause, puis
+    la phrase suivante dans la même réplique ; un silence manquant coûte SILENCE_PENALTY s²). Renvoie {réplique: [(texte, début en s)]},
+    le texte suivant d'une même réplique commençant à la fin du silence le plus proche de sa
+    position (proportion des caractères)."""
+    n = len(voices)
+    m = len(texts)
+    if m <= n:
+        return {voices[i]: [(texts[i], 0.0)] for i in range(m)}
+    rate = sum(lengths) / max(sum(seconds), 1e-6)
+    inf = float('inf')
+    best = [[inf] * (m + 1) for _ in range(n + 1)]
+    back = [[0] * (m + 1) for _ in range(n + 1)]
+    best[0][0] = 0.0
+    for i in range(1, n + 1):
+        for j in range(i, m - (n - i) + 1):
+            for k in range(i - 1, j):
+                if best[i - 1][k] == inf:
+                    continue
+                c = best[i - 1][k] + (seconds[i - 1] - sum(lengths[k:j]) / rate) ** 2
+                # Silence manquant (mid15, réplique 2 : trois textes, un seul silence net) : pénalité.
+                c += SILENCE_PENALTY * max(0, j - k - 1 - len(silences[i - 1]))
+                if c < best[i][j]:
+                    best[i][j] = c
+                    back[i][j] = k
+    cuts = []
+    j = m
+    for i in range(n, 0, -1):
+        k = back[i][j]
+        cuts.append((k, j))
+        j = k
+    cuts.reverse()
+    out = {}
+    for i, (k, j) in enumerate(cuts):
+        group = list(range(k, j))
+        entries = [(texts[group[0]], 0.0)]
+        total = sum(lengths[k:j])
+        used = set()
+        done = 0
+        for g in group[1:]:
+            done += lengths[g - 1]
+            target = seconds[i] * done / total
+            # Silences après le début du texte précédent, en gardant assez de silences pour les textes
+            # suivants ; sans silence : position proportionnelle, après le texte précédent.
+            later = sorted(s for s in silences[i] if s not in used and s[0] > entries[-1][1])
+            left = len(group) - 1 - group.index(g)
+            choices = later[:len(later) - left] if len(later) > left else later
+            if not choices:
+                entries.append((texts[g], max(target, entries[-1][1] + MIN_SUBTITLE)))
+                continue
+            sil = min(choices, key=lambda s: abs(s[0] + s[1] / 2 - target))
+            used.add(sil)
+            entries.append((texts[g], sil[0] + sil[1]))
+        out[voices[i]] = entries
+    return out
 
 
 def text_arrays(data):
@@ -279,6 +367,11 @@ class Player:
         self.voice_end = 0.0
         self.subtitles = None
         self.subtitle = None
+        self.subtitle_table = None
+        # Facultatif (données du jeu) : texte d'un FORM de MIDGAMES.IFF et silences d'une réplique,
+        # pour apparier plusieurs sous-titres à une réplique (pair_subtitles).
+        self.text_of = None
+        self.voice_silences = None
         self.text_arrays = text_arrays(data)
         self.screen_offsets = screen_offsets(data)
 
@@ -842,16 +935,56 @@ class Player:
                 self.voice_end = self.clock + self.voice_seconds(self.voice_res)
             self.start_subtitle(self.voice_res, self.voice_end)
 
+    def text_form(self, ref):
+        form, index = self.text_keys.get(ref, (None, None))
+        if form is None and self.text_arrays.get(ref[0]):
+            form, index = self.text_arrays[ref[0]], ref[1]
+        return form, index
+
+    def subtitle_entries(self):
+        """Réplique (entrée de PAK) → [(texte, couleur, début en s)], d'après subtitle_map et, quand il
+        y a plus de textes que de répliques, les données (pair_subtitles)."""
+        if self.subtitle_table is None:
+            self.subtitle_table = {}
+            taken_texts = set()
+            for voices, texts, colour in self.subtitles:
+                # Un groupe englobant n'apparie que les répliques et textes laissés par les groupes
+                # intérieurs.
+                voices = [v for v in voices if v[1] not in self.subtitle_table]
+                texts = [t for k, t in enumerate(texts) if t not in taken_texts and t not in texts[:k]]
+                if not voices or not texts:
+                    continue
+                lengths = []
+                for ref in texts:
+                    form, index = self.text_form(ref)
+                    text = self.text_of(form, index) if self.text_of and form else None
+                    lengths.append(len(text.strip()) if text else 1)
+                if len(texts) > len(voices) and self.voice_seconds and self.voice_silences:
+                    seconds = [self.voice_seconds(('pak',) + v) for v in voices]
+                    silences = [self.voice_silences(('pak',) + v) for v in voices]
+                    pairs = pair_subtitles(voices, texts, seconds, lengths, silences)
+                else:
+                    pairs = {voices[i]: [(texts[i], 0.0)] for i in range(min(len(voices), len(texts)))}
+                for v, entries in pairs.items():
+                    self.subtitle_table.setdefault(v[1], [(ref, colour, t) for ref, t in entries])
+                    taken_texts.update(ref for ref, _ in entries)
+        return self.subtitle_table
+
     def start_subtitle(self, res, end):
-        if self.subtitles and res[2] in self.subtitles:
-            ref, colour = self.subtitles[res[2]]
-            form, index = self.text_keys.get(ref, (None, None))
-            if form is None and self.text_arrays.get(ref[0]):
-                form, index = self.text_arrays[ref[0]], ref[1]
+        if not self.subtitles:
+            return
+        entries = self.subtitle_entries().get(res[2])
+        if not entries:
+            return
+        shown = []
+        for i, (ref, colour, t) in enumerate(entries):
+            form, index = self.text_form(ref)
             if form is None:
                 self.warn(f'sous-titre {ref} sans texte connu')
-                return
-            self.subtitle = (form, index, colour, end)
+                continue
+            t_end = self.clock + entries[i + 1][2] if i + 1 < len(entries) else end
+            shown.append((form, index, colour, self.clock + t, t_end))
+        self.subtitle = shown
 
     def head_speaking(self, layer):
         """TalkingHead_StartVoiceAndIsSpeaking_9C64 : lance la réplique au premier appel, puis vrai
@@ -1126,10 +1259,10 @@ class Player:
         for entry in p['sounds']:
             s['sounds'].append((len(s['frames']), entry))
         p['sounds'] = []
-        if self.subtitle and self.clock < self.subtitle[3]:
-            form, index, colour, _ = self.subtitle
-            items = items + [{'key': f'sous-titre{form}{index}', 'kind': 'text', 'text': (form, index),
-                              'y': SUBTITLE_Y, 'align': 2, 'colour': colour}]
+        for form, index, colour, t0, t1 in self.subtitle or []:
+            if t0 <= self.clock < t1:
+                items = items + [{'key': f'sous-titre{form}{index}', 'kind': 'text', 'text': (form, index),
+                                  'y': SUBTITLE_Y, 'align': 2, 'colour': colour}]
         s['frames'].append(items)
         self.clock += 1.0 / fps
 
@@ -1315,7 +1448,9 @@ def main():
     player.voice_bytes = midgame_render.voice_bytes
     if subtitles:
         player.subtitles = subtitle_map(data)
-        print('sous-titres (réplique → texte SPOK, couleur) :', player.subtitles)
+        player.text_of = midgame_render.text_of
+        player.voice_silences = midgame_render.voice_silences
+        print('sous-titres (réplique → [(texte, couleur, début en s)]) :', player.subtitle_entries())
     player.run(data['parties'][0]['arbre'])
     shots = [s for s in player.shots if s['frames']]
     content = b'ANIM' + chunk('HEAD', struct.pack('<II', len(shots), 2))

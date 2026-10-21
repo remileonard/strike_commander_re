@@ -69,6 +69,50 @@ def voice_seconds(res):
     return voc_seconds(pak_entry(pak_path(res[1]), res[2]))
 
 
+def voice_silences(res, step=0.05, threshold=0.08, shortest=0.25):
+    """Silences à l'intérieur d'une réplique (fichier VOC, échantillons 8 bits non signés) : fenêtres
+    de step s dont l'écart moyen à 128 est sous threshold × le maximum, sur au moins shortest s,
+    sans compter le silence du début ni celui de la fin. Liste de (début, durée) en secondes."""
+    import struct
+    b = voice_bytes(res)
+    p = struct.unpack_from('<H', b, 0x14)[0]
+    data = bytearray()
+    rate = None
+    while p < len(b) and b[p] != 0:
+        kind = b[p]
+        size = b[p + 1] | (b[p + 2] << 8) | (b[p + 3] << 16)
+        if kind == 1:
+            rate = 1000000 / (256 - b[p + 4])
+            data += b[p + 6:p + 4 + size]
+        elif kind == 2:
+            data += b[p + 4:p + 4 + size]
+        p += 4 + size
+    if not rate or not data:
+        return []
+    win = max(1, int(rate * step))
+    env = [sum(abs(x - 128) for x in data[i:i + win]) / win for i in range(0, len(data) - win, win)]
+    if not env:
+        return []
+    limit = max(env) * threshold
+    out = []
+    run = 0
+    for i, e in enumerate(env):
+        if e < limit:
+            run += 1
+            continue
+        if run * step >= shortest and i - run > 0:
+            out.append((round((i - run) * step, 3), round(run * step, 3)))
+        run = 0
+    return out
+
+
+def text_of(form, index):
+    texts = TEXTS.get(form)
+    if texts and 0 <= index < len(texts):
+        return texts[index]
+    return None
+
+
 def image_count(res):
     from sc_data import shape_images
     shape = face_shape(res[1]) if res[0] == 'face' else pak_entry(pak_path(res[1]), res[2])
@@ -86,6 +130,8 @@ def run(exact=True, name=None, subtitles=None):
         p.voice_bytes = voice_bytes
     if subtitles:
         p.subtitles = mg.subtitle_map(data)
+        p.text_of = text_of
+        p.voice_silences = voice_silences
     p.run(data['parties'][0]['arbre'])
     return [s for s in p.shots if s['frames']], p
 
