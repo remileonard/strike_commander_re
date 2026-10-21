@@ -847,7 +847,7 @@ loc_BE634:				; CODE XREF: sub_BDE10+81Fj
 		add	ax, 0Bh
 		push	ax
 		push	0
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	di, ax
 		mov	ax, word ptr [bp+var_40]

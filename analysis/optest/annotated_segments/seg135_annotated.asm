@@ -1722,7 +1722,16 @@ loc_39A75:				; CODE XREF: seg135:0E57j
 
 ; Attributes: bp-based frame
 
-sub_39A7A	proc far		; CODE XREF: seg014:0091P
+; ==============================================================================================
+; far, LUE en partie 2026-10-21. Dessin d'une image de forme tournée et mise à l'échelle :
+; (surface, x, y, forme far, image, angle arg_C, échelle arg_E, octet arg_10). Si échelle =
+; 100h et angle = octet (cbw) : saut direct vers Render_MeasureOrDrawTextString_32CD8 (dessin
+; sans transformation). Sinon : angle négatif + 168h (360, donc en degrés), deux octets lus
+; dans des tables par degré (ss:418Ah, ss:41E4h), un index = table ss:434Ch + table ss:44B4h
+; XOR octet arg_10, puis saut dans une table de 8 routines (échelle < 100h) ou les 8 suivantes
+; (échelle ≥ 100h). Les routines elles-mêmes ne sont pas lues.
+; ==============================================================================================
+Render_DrawRotatedScaledShape_39A7A	proc far		; CODE XREF: seg014:0091P
 
 arg_0		= word ptr  6
 arg_6		= dword	ptr  0Ch
@@ -1755,8 +1764,8 @@ arg_4626	= dword	ptr  462Ch
 		jmp	Render_MeasureOrDrawTextString_32CD8
 ; ���������������������������������������������������������������������������
 
-loc_39A9B:				; CODE XREF: sub_39A7A+Bj
-					; sub_39A7A+16j
+loc_39A9B:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A+Bj
+					; Render_DrawRotatedScaledShape_39A7A+16j
 		mov	ax, ds
 		mov	es, ax
 		assume es:dseg
@@ -1827,8 +1836,8 @@ loc_39A9B:				; CODE XREF: sub_39A7A+Bj
 		assume es:nothing
 		clc
 
-loc_39B39:				; CODE XREF: sub_39A7A+51j
-					; sub_39A7A+54j
+loc_39B39:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A+51j
+					; Render_DrawRotatedScaledShape_39A7A+54j
 		jnb	short loc_39B40
 		pop	ds
 		pop	di
@@ -1837,13 +1846,13 @@ loc_39B39:				; CODE XREF: sub_39A7A+51j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_39B40:				; CODE XREF: sub_39A7A:loc_39B39j
+loc_39B40:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A:loc_39B39j
 		mov	bx, [bp+arg_C]
 		or	bx, bx
 		jns	short loc_39B4B
 		add	bx, 168h
 
-loc_39B4B:				; CODE XREF: sub_39A7A+CBj
+loc_39B4B:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A+CBj
 		mov	cl, ss:[bx+arg_418A]
 		mov	ss:4716h, cl
 		mov	ch, ss:[bx+arg_41E4]
@@ -1861,10 +1870,10 @@ loc_39B4B:				; CODE XREF: sub_39A7A+CBj
 		jmp	ss:[di+arg_4626]
 ; ���������������������������������������������������������������������������
 
-loc_39B82:				; CODE XREF: sub_39A7A+FFj
+loc_39B82:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A+FFj
 		add	di, 8
 		shl	di, 1
 		jmp	ss:[di+arg_4626]
-sub_39A7A	endp
+Render_DrawRotatedScaledShape_39A7A	endp
 
 seg135		ends

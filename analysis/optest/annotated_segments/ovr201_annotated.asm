@@ -1395,7 +1395,7 @@ loc_8229A:				; CODE XREF: sub_81470+DE4j
 		lea	ax, [bp+var_E6]
 		push	ax
 		push	0
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [bp+var_FA+2],	ax
 		push	word ptr [bp+var_F6]
@@ -1737,7 +1737,7 @@ loc_82678:				; CODE XREF: sub_81470+1203j
 		lea	ax, [bp+var_66]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_EC+2],	ax
 		push	0
@@ -1749,7 +1749,7 @@ loc_82678:				; CODE XREF: sub_81470+1203j
 		lea	ax, [bp+var_E6]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_EC], ax
 		push	[bp+var_A6]
@@ -4072,7 +4072,7 @@ loc_83EE8:				; CODE XREF: sub_81470+2A73j
 		lea	ax, [bp+var_E6]
 		push	ax
 		push	0
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [bp+var_FA+2],	ax
 		push	0
@@ -5324,7 +5324,7 @@ loc_84B92:				; CODE XREF: sub_81470+371Dj
 		lea	ax, [bp+var_66]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E2+2],	ax
 		push	0
@@ -5336,7 +5336,7 @@ loc_84B92:				; CODE XREF: sub_81470+371Dj
 		lea	ax, [bp+var_5C]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E2], ax
 		push	2
@@ -5348,7 +5348,7 @@ loc_84B92:				; CODE XREF: sub_81470+371Dj
 		lea	ax, [bp+var_52]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E6+2],	ax
 		push	[bp+var_DE]
@@ -9060,7 +9060,7 @@ loc_8724C:				; CODE XREF: sub_81470+5DD7j
 		lea	ax, [bp+var_66]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E2+2],	ax
 		push	0
@@ -9072,7 +9072,7 @@ loc_8724C:				; CODE XREF: sub_81470+5DD7j
 		lea	ax, [bp+var_5C]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E2], ax
 		push	0Dh
@@ -9084,7 +9084,7 @@ loc_8724C:				; CODE XREF: sub_81470+5DD7j
 		lea	ax, [bp+var_52]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_E6+2],	ax
 		push	[bp+var_DE]

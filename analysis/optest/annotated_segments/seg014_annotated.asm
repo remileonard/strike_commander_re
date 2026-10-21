@@ -7,7 +7,14 @@ seg014		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_9391	proc far		; CODE XREF: sub_81470+127AP
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque image tourné et mis à l'échelle (taille 23h, tables 19A7h /
+; 19CBh) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_E), puis
+; +1Dh = arg_8 (angle), +1Fh = arg_A (échelle, 256 = taille d'origine), +21h = arg_C (octet
+; passé comme dernier argument du dessin, rôle non établi). Dessin :
+; ScaledImageLayer_Draw_93E4. mid12 : angle 0, échelle 200 ou 160, dernier argument 0.
+; ==============================================================================================
+ScaledImageLayer_Construct_9391	proc far		; CODE XREF: sub_81470+127AP
 					; sub_81470+129AP ...
 
 arg_0		= word ptr  6
@@ -34,7 +41,7 @@ loc_9398:				; DATA XREF: seg170:012Eo
 		or	ax, ax
 		jz	short loc_93DC
 
-loc_93AC:				; CODE XREF: sub_9391+9j
+loc_93AC:				; CODE XREF: ScaledImageLayer_Construct_9391+9j
 		push	[bp+arg_E]
 		push	[bp+arg_6]
 		push	[bp+arg_4]
@@ -51,12 +58,12 @@ loc_93AC:				; CODE XREF: sub_9391+9j
 		mov	ax, [bp+arg_C]
 		mov	[si+21h], ax
 
-loc_93DC:				; CODE XREF: sub_9391+19j
+loc_93DC:				; CODE XREF: ScaledImageLayer_Construct_9391+19j
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_9391	endp
+ScaledImageLayer_Construct_9391	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -64,7 +71,12 @@ sub_9391	endp
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_93E4:				; DATA XREF: dseg:19C7o
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +20h de ScaledImageLayer : si l'image ≠ −1,
+; Render_DrawRotatedScaledShape_39A7A(word_46F44, x, y, forme, image, +1Dh angle, +1Fh
+; échelle, +21h).
+; ==============================================================================================
+ScaledImageLayer_Draw_93E4:				; DATA XREF: dseg:19C7o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -90,7 +102,7 @@ loc_93E4:				; DATA XREF: dseg:19C7o
 		push	word ptr [bp+0Ah]
 		push	word ptr [bp+8]
 		push	word_46F44
-		call	sub_39A7A
+		call	Render_DrawRotatedScaledShape_39A7A
 		add	sp, 12h
 
 loc_9429:				; CODE XREF: seg014:0062j
@@ -2347,7 +2359,7 @@ loc_A4C0:				; CODE XREF: seg014:10D3j
 loc_A4E3:				; CODE XREF: seg014:1141j
 		push	word ptr [bp+8]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 17FBh
 		mov	word ptr [si+0Ah], 181Bh
@@ -2574,7 +2586,7 @@ loc_A6AE:				; CODE XREF: seg014:130Cj
 		mov	[bp-2],	ax
 		push	word ptr [bp-2]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 1977h
 		mov	word ptr [si+0Ah], 1997h
@@ -2928,7 +2940,7 @@ loc_A996:				; CODE XREF: seg014:15AEj
 loc_A9B9:				; CODE XREF: seg014:1617j
 		push	word ptr [bp+8]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 179Bh
 		mov	word ptr [si+0Ah], 17BBh
@@ -3105,7 +3117,7 @@ loc_AAEF:				; CODE XREF: seg014:1707j
 loc_AB12:				; CODE XREF: seg014:1770j
 		push	word ptr [bp+8]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 176Bh
 		mov	word ptr [si+0Ah], 178Bh
@@ -3838,7 +3850,7 @@ loc_B024:				; CODE XREF: seg014:1C38j
 loc_B047:				; CODE XREF: seg014:1CA5j
 		push	word ptr [bp+8]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 16DBh
 		mov	word ptr [si+0Ah], 16FBh
@@ -4348,7 +4360,7 @@ loc_B3C2:				; CODE XREF: seg014:2020j
 		mov	[bp-2],	ax
 		push	word ptr [bp-2]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 1977h
 		mov	word ptr [si+0Ah], 1997h
@@ -4961,7 +4973,7 @@ loc_B80C:				; CODE XREF: seg014:246Aj
 		mov	[bp-2],	ax
 		push	word ptr [bp-2]
 		push	si
-		call	sub_2DE95
+		call	Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 1977h
 		mov	word ptr [si+0Ah], 1997h

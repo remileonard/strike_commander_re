@@ -316,15 +316,16 @@ si byte_495FC == 0 :
     sinon :
         v560→0.méthode8(15)                                                                           ⟨221534⟩
         v8 = 43                                                                                       ⟨221536⟩
-        tant que (scène1.compteur < scène1.compteur + ((v8·70) / 100)) et (scène1.terminée == 0) :
+        si = scène1.compteur                                                                          ⟨221537⟩
+        tant que (scène1.compteur < si + ((v8·70) / 100)) et (scène1.terminée == 0) :
             v382 = scène1.compteur                                                                    ⟨221552⟩
-            si scène1.compteur + 5 < v382 :
+            si si + 5 < v382 :
                 CRT_Rand()                                                                            ⟨221557⟩
                 v384 = (CRT_Rand()·6) / 32768                                                         ⟨221563⟩
                 c6.image = v384                                                                       ⟨221566⟩
-            si scène1.compteur + 5 == v382 :
+            si si + 5 == v382 :
                 sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                          ⟨221576⟩
-            si (scène1.compteur + ((v8·70) / 100)) - 1 == v382 :
+            si (si + ((v8·70) / 100)) - 1 == v382 :
                 c6.image = 0                                                                          ⟨221585⟩
             Scene_Tick(scène=scène1)                                                                  ⟨221616⟩
     si byte_495FC != 0 :
@@ -365,15 +366,16 @@ si byte_495FC == 0 :
         sinon :
             v560→0.méthode8(35)                                                                       ⟨221803⟩
             v8 = 42                                                                                   ⟨221805⟩
-            tant que (scène1.compteur < scène1.compteur + ((v8·70) / 100)) et (scène1.terminée == 0) :
+            si = scène1.compteur                                                                      ⟨221806⟩
+            tant que (scène1.compteur < si + ((v8·70) / 100)) et (scène1.terminée == 0) :
                 v382 = scène1.compteur                                                                ⟨221821⟩
-                si scène1.compteur + 2 < v382 :
-                    si scène1.compteur + 6 > v382 :
+                si si + 2 < v382 :
+                    si si + 6 > v382 :
                         v384 = v378                                                                   ⟨221831⟩
                         v378_avant = v378                                                             ⟨221832⟩
                         v378 = v378 + 1                                                               ⟨221832⟩
                         c4.image = v384                                                               ⟨221835⟩
-                si scène1.compteur + 2 == v382 :
+                si si + 2 == v382 :
                     v3262 = 4540                                                                      ⟨221843⟩
                     v3262 = 4552                                                                      ⟨221844⟩
                     v3262 = 4568                                                                      ⟨221845⟩
@@ -418,13 +420,14 @@ si byte_495FC == 0 :
             sinon :
                 v560→0.méthode8(254)                                                                  ⟨222129⟩
                 v8 = 57                                                                               ⟨222131⟩
-                tant que (scène2.compteur < scène2.compteur + ((v8·70) / 100)) et (scène2.terminée == 0) :
+                si = scène2.compteur                                                                  ⟨222132⟩
+                tant que (scène2.compteur < si + ((v8·70) / 100)) et (scène2.terminée == 0) :
                     v372 = scène2.compteur                                                            ⟨222147⟩
-                    si scène2.compteur + 2 == v372 :
+                    si si + 2 == v372 :
                         sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[2])                  ⟨222159⟩
-                    si scène2.compteur + 2 == v372 :
+                    si si + 2 == v372 :
                         tête_texte_de_lèvres(tête=c8, texte="korzyudontnsfsddelza ")                  ⟨222169⟩
-                    si (scène2.compteur + ((v8·70) / 100)) - 1 == v372 :
+                    si (si + ((v8·70) / 100)) - 1 == v372 :
                         v3262 = 4540                                                                  ⟨222177⟩
                         v3262 = 4552                                                                  ⟨222178⟩
                         v3262 = 4568                                                                  ⟨222179⟩
@@ -476,13 +479,14 @@ si byte_495FC == 0 :
                 sinon :
                     v560→0.méthode8(224)                                                              ⟨222523⟩
                     v8 = 50                                                                           ⟨222525⟩
-                    tant que (scène3.compteur < scène3.compteur + ((v8·70) / 100)) et (scène3.terminée == 0) :
+                    si = scène3.compteur                                                              ⟨222526⟩
+                    tant que (scène3.compteur < si + ((v8·70) / 100)) et (scène3.terminée == 0) :
                         v372 = scène3.compteur                                                        ⟨222541⟩
-                        si scène3.compteur + 2 == v372 :
+                        si si + 2 == v372 :
                             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[3])              ⟨222554⟩
-                        si scène3.compteur + 2 == v372 :
+                        si si + 2 == v372 :
                             tête_texte_de_lèvres(tête=c10, texte="aebelvnthchnfcmndtx")               ⟨222564⟩
-                        si (scène3.compteur + ((v8·70) / 100)) - 1 == v372 :
+                        si (si + ((v8·70) / 100)) - 1 == v372 :
                             v3262 = 4540                                                              ⟨222572⟩
                             v3262 = 4552                                                              ⟨222573⟩
                             v3262 = 4568                                                              ⟨222574⟩
@@ -493,15 +497,16 @@ si byte_495FC == 0 :
                     si byte_495FC != 0 :
                         Scene_Destruct(scène=scène3, drapeaux=0)                                      ⟨222649⟩
                         aller à loc_70D3F                                                             ⟨222651⟩
-                    v8_avant = scène3.compteur + ((v8·70) / 100)                                      ⟨222655⟩
+                    v8_avant = si + ((v8·70) / 100)                                                   ⟨222655⟩
                     v8 = 53                                                                           ⟨222655⟩
-                    tant que (scène3.compteur < scène3.compteur + ((v8·70) / 100)) et (scène3.terminée == 0) :
+                    si = scène3.compteur                                                              ⟨222656⟩
+                    tant que (scène3.compteur < si + ((v8·70) / 100)) et (scène3.terminée == 0) :
                         v372 = scène3.compteur                                                        ⟨222671⟩
-                        si scène3.compteur + 2 == v372 :
+                        si si + 2 == v372 :
                             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[4])              ⟨222683⟩
-                        si scène3.compteur + 2 == v372 :
+                        si si + 2 == v372 :
                             tête_texte_de_lèvres(tête=c10, texte="mybeyogttagethlot")                 ⟨222693⟩
-                        si (scène3.compteur + ((v8·70) / 100)) - 1 == v372 :
+                        si (si + ((v8·70) / 100)) - 1 == v372 :
                             v3262 = 4540                                                              ⟨222701⟩
                             v3262 = 4552                                                              ⟨222702⟩
                             v3262 = 4568                                                              ⟨222703⟩
@@ -600,23 +605,24 @@ si byte_495FC == 0 :
                                 si canal2.+0 != 0 :
                                     AIL_stop_sequence(pilote=canal2.+0→4, séquence=v3172)             ⟨223191⟩
                         v8 = 20                                                                       ⟨223197⟩
-                        tant que (scène4.compteur < scène4.compteur + ((v8·70) / 100)) et (scène4.terminée == 0) :
+                        si = scène4.compteur                                                          ⟨223198⟩
+                        tant que (scène4.compteur < si + ((v8·70) / 100)) et (scène4.terminée == 0) :
                             v382 = scène4.compteur                                                    ⟨223213⟩
-                            si scène4.compteur + 2 == v382 :
+                            si si + 2 == v382 :
                                 sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[5])          ⟨223226⟩
-                            si scène4.compteur + 2 == v382 :
+                            si si + 2 == v382 :
                                 si v15 != 0 :
                                     v386 = 0                                                          ⟨223238⟩
                                     si canal2.+0 != 0 :
                                         AIL_start_sequence(pilote=canal2.+0→4, séquence=v3172)        ⟨223244⟩
                                         AIL_set_relative_volume_30C66(canal2.+0→4, v3172, word_48ECE, v386)  ⟨223251⟩
-                            si scène4.compteur + 2 == v382 :
+                            si si + 2 == v382 :
                                 tête_image_de_base(tête=c12, image=25)                                ⟨223263⟩
-                            si scène4.compteur + 8 == v382 :
+                            si si + 8 == v382 :
                                 tête_image_de_base(tête=c12, image=18)                                ⟨223273⟩
-                            si scène4.compteur + 2 == v382 :
+                            si si + 2 == v382 :
                                 tête_texte_de_lèvres(tête=c12, texte="hdon")                          ⟨223283⟩
-                            si (scène4.compteur + ((v8·70) / 100)) - 1 == v382 :
+                            si (si + ((v8·70) / 100)) - 1 == v382 :
                                 v3262 = 4540                                                          ⟨223291⟩
                                 v3262 = 4552                                                          ⟨223292⟩
                                 v3262 = 4568                                                          ⟨223293⟩
@@ -701,23 +707,24 @@ si byte_495FC == 0 :
                             v394 = 0                                                                  ⟨223775⟩
                         sinon :
                             v8 = 38                                                                   ⟨223780⟩
-                            tant que (scène5.compteur < scène5.compteur + ((v8·70) / 100)) et (scène5.terminée == 0) :
+                            si = scène5.compteur                                                      ⟨223781⟩
+                            tant que (scène5.compteur < si + ((v8·70) / 100)) et (scène5.terminée == 0) :
                                 CRT_Rand()                                                            ⟨223797⟩
                                 v394 = (CRT_Rand()·2) / 32768                                         ⟨223803⟩
                                 c14.image = v394                                                      ⟨223806⟩
-                                si scène5.compteur + 2 == scène5.compteur :
+                                si si + 2 == scène5.compteur :
                                     sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[6])      ⟨223819⟩
-                                si scène5.compteur + 3 == scène5.compteur :
+                                si si + 3 == scène5.compteur :
                                     retire(parent=scène5, calque=c18)                                 ⟨223830⟩
                                     retire(parent=scène5, calque=c19)                                 ⟨223835⟩
                                     c18.détruit(3)                                                    ⟨223843⟩
                                     c19.détruit(3)                                                    ⟨223854⟩
                                     ajoute c20 à scène5                                               ⟨223862⟩
                                     ajoute c21 à scène5                                               ⟨223867⟩
-                                si scène5.compteur + 4 == scène5.compteur :
+                                si si + 4 == scène5.compteur :
                                     c20.image = 1                                                     ⟨223876⟩
                                     c21.image = 1                                                     ⟨223878⟩
-                                si (scène5.compteur + ((v8·70) / 100)) - 5 == scène5.compteur :
+                                si (si + ((v8·70) / 100)) - 5 == scène5.compteur :
                                     v3262 = 4540                                                      ⟨223885⟩
                                     v3262 = 4552                                                      ⟨223886⟩
                                     v3262 = 4568                                                      ⟨223887⟩
@@ -729,13 +736,14 @@ si byte_495FC == 0 :
                                 Scene_Destruct(scène=scène5, drapeaux=0)                              ⟨223962⟩
                                 aller à loc_70D3F                                                     ⟨223964⟩
                             v560→0.méthode8(167)                                                      ⟨223972⟩
-                            v8_avant = scène5.compteur + ((v8·70) / 100)                              ⟨223974⟩
+                            v8_avant = si + ((v8·70) / 100)                                           ⟨223974⟩
                             v8 = 45                                                                   ⟨223974⟩
-                            tant que (scène5.compteur < scène5.compteur + ((v8·70) / 100)) et (scène5.terminée == 0) :
+                            si = scène5.compteur                                                      ⟨223975⟩
+                            tant que (scène5.compteur < si + ((v8·70) / 100)) et (scène5.terminée == 0) :
                                 CRT_Rand()                                                            ⟨223991⟩
                                 v394 = (CRT_Rand()·2) / 32768                                         ⟨223997⟩
                                 c14.image = v394                                                      ⟨224000⟩
-                                si scène5.compteur + 1 == scène5.compteur :
+                                si si + 1 == scène5.compteur :
                                     sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[7])      ⟨224017⟩
                                     si v15 != 0 :
                                         si canal2.+0 != 0 :
@@ -745,7 +753,7 @@ si byte_495FC == 0 :
                                         si canal3.+0 != 0 :
                                             AIL_start_sequence(pilote=canal3.+0→4, séquence=v3186)    ⟨224039⟩
                                             AIL_set_relative_volume_30C66(canal3.+0→4, v3186, v396, v398)  ⟨224046⟩
-                                si (scène5.compteur + ((v8·70) / 100)) - 1 == scène5.compteur :
+                                si (si + ((v8·70) / 100)) - 1 == scène5.compteur :
                                     v3262 = 4540                                                      ⟨224060⟩
                                     v3262 = 4552                                                      ⟨224061⟩
                                     v3262 = 4568                                                      ⟨224062⟩
@@ -801,18 +809,19 @@ si byte_495FC == 0 :
                         sinon :
                             v560→0.méthode8(35)                                                       ⟨224367⟩
                             v8 = 40                                                                   ⟨224369⟩
-                            tant que (scène5.compteur < scène5.compteur + ((v8·70) / 100)) et (scène5.terminée == 0) :
-                                si scène5.compteur + 2 < scène5.compteur :
-                                    si scène5.compteur + 6 > scène5.compteur :
+                            si = scène5.compteur                                                      ⟨224370⟩
+                            tant que (scène5.compteur < si + ((v8·70) / 100)) et (scène5.terminée == 0) :
+                                si si + 2 < scène5.compteur :
+                                    si si + 6 > scène5.compteur :
                                         v394 = v386                                                   ⟨224395⟩
                                         v386_avant = v386                                             ⟨224396⟩
                                         v386 = v386 - 1                                               ⟨224396⟩
                                         c17.image = v394                                              ⟨224399⟩
-                                si scène5.compteur + 5 == scène5.compteur :
+                                si si + 5 == scène5.compteur :
                                     c16.image = 10                                                    ⟨224408⟩
-                                si scène5.compteur + 5 == scène5.compteur :
+                                si si + 5 == scène5.compteur :
                                     sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[8])      ⟨224422⟩
-                                si (scène5.compteur + ((v8·70) / 100)) - 2 == scène5.compteur :
+                                si (si + ((v8·70) / 100)) - 2 == scène5.compteur :
                                     v3262 = 4540                                                      ⟨224430⟩
                                     v3262 = 4552                                                      ⟨224431⟩
                                     v3262 = 4568                                                      ⟨224432⟩
@@ -880,12 +889,13 @@ si byte_495FC == 0 :
                                 v374 = 0                                                              ⟨224790⟩
                             sinon :
                                 v8 = 86                                                               ⟨224795⟩
-                                tant que (scène6.compteur < scène6.compteur + ((v8·70) / 100)) et (scène6.terminée == 0) :
+                                si = scène6.compteur                                                  ⟨224796⟩
+                                tant que (scène6.compteur < si + ((v8·70) / 100)) et (scène6.terminée == 0) :
                                     v372 = scène6.compteur                                            ⟨224811⟩
                                     CRT_Rand()                                                        ⟨224812⟩
                                     v374 = ((CRT_Rand()·6) / 32768) + 3                               ⟨224819⟩
                                     c22.image = v374                                                  ⟨224822⟩
-                                    si scène6.compteur + 12 == v372 :
+                                    si si + 12 == v372 :
                                         sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])  ⟨224839⟩
                                         si v15 != 0 :
                                             si canal2.+0 != 0 :
@@ -895,7 +905,7 @@ si byte_495FC == 0 :
                                             si canal3.+0 != 0 :
                                                 AIL_start_sequence(pilote=canal3.+0→4, séquence=v3186)  ⟨224861⟩
                                                 AIL_set_relative_volume_30C66(canal3.+0→4, v3186, v376, v378)  ⟨224868⟩
-                                    si (scène6.compteur + ((v8·70) / 100)) - 1 == v372 :
+                                    si (si + ((v8·70) / 100)) - 1 == v372 :
                                         v3262 = 4540                                                  ⟨224882⟩
                                         v3262 = 4552                                                  ⟨224883⟩
                                         v3262 = 4568                                                  ⟨224884⟩
@@ -914,14 +924,15 @@ si byte_495FC == 0 :
                                 si byte_495FC != 0 :
                                     Scene_Destruct(scène=scène6, drapeaux=0)                          ⟨224990⟩
                                     aller à loc_70D3F                                                 ⟨224992⟩
-                                v8_avant = scène6.compteur + ((v8·70) / 100)                          ⟨224996⟩
+                                v8_avant = si + ((v8·70) / 100)                                       ⟨224996⟩
                                 v8 = 108                                                              ⟨224996⟩
-                                tant que (scène6.compteur < scène6.compteur + ((v8·70) / 100)) et (scène6.terminée == 0) :
+                                si = scène6.compteur                                                  ⟨224997⟩
+                                tant que (scène6.compteur < si + ((v8·70) / 100)) et (scène6.terminée == 0) :
                                     v372 = scène6.compteur                                            ⟨225012⟩
                                     CRT_Rand()                                                        ⟨225013⟩
                                     v374 = ((CRT_Rand()·6) / 32768) + 3                               ⟨225020⟩
                                     c22.image = v374                                                  ⟨225023⟩
-                                    si scène6.compteur + 3 == v372 :
+                                    si si + 3 == v372 :
                                         sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[10])  ⟨225040⟩
                                         si v15 != 0 :
                                             si canal2.+0 != 0 :
@@ -931,7 +942,7 @@ si byte_495FC == 0 :
                                             si canal3.+0 != 0 :
                                                 AIL_start_sequence(pilote=canal3.+0→4, séquence=v3186)  ⟨225062⟩
                                                 AIL_set_relative_volume_30C66(canal3.+0→4, v3186, v376, v378)  ⟨225069⟩
-                                    si (scène6.compteur + ((v8·70) / 100)) - 1 == v372 :
+                                    si (si + ((v8·70) / 100)) - 1 == v372 :
                                         v3262 = 4540                                                  ⟨225083⟩
                                         v3262 = 4552                                                  ⟨225084⟩
                                         v3262 = 4568                                                  ⟨225085⟩
@@ -1015,9 +1026,10 @@ si byte_495FC == 0 :
                                     r28(mid2voc 4).+0 = 0                                             ⟨225543⟩
                                 sinon :
                                     v8 = 80                                                           ⟨225548⟩
-                                    tant que (scène7.compteur < scène7.compteur + ((v8·70) / 100)) et (scène7.terminée == 0) :
+                                    si = scène7.compteur                                              ⟨225549⟩
+                                    tant que (scène7.compteur < si + ((v8·70) / 100)) et (scène7.terminée == 0) :
                                         v378 = scène7.compteur                                        ⟨225564⟩
-                                        si scène7.compteur + 5 == v378 :
+                                        si si + 5 == v378 :
                                             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[11])  ⟨225581⟩
                                             si v15 != 0 :
                                                 si canal2.+0 != 0 :
@@ -1027,7 +1039,7 @@ si byte_495FC == 0 :
                                                 si canal3.+0 != 0 :
                                                     AIL_start_sequence(pilote=canal3.+0→4, séquence=v3186)  ⟨225603⟩
                                                     AIL_set_relative_volume_30C66(canal3.+0→4, v3186, mid2voc 4.+0, v382)  ⟨225610⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 1 == v378 :
+                                        si (si + ((v8·70) / 100)) - 1 == v378 :
                                             v3262 = 4540                                              ⟨225624⟩
                                             v3262 = 4552                                              ⟨225625⟩
                                             v3262 = 4568                                              ⟨225626⟩
@@ -1041,21 +1053,22 @@ si byte_495FC == 0 :
                                                 si canal2.+0 != 0 :
                                                     AIL_start_sequence(pilote=canal2.+0→4, séquence=v3172)  ⟨225660⟩
                                                     AIL_set_relative_volume_30C66(canal2.+0→4, v3172, word_48ECE, mid2voc 5.+0)  ⟨225667⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 3 > v378 :
+                                        si (si + ((v8·70) / 100)) - 3 > v378 :
                                             CRT_Rand()                                                ⟨225677⟩
                                             v388 = (CRT_Rand()·2) / 32768                             ⟨225683⟩
                                             c24.image = v388                                          ⟨225686⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 3 == v378 :
+                                        si (si + ((v8·70) / 100)) - 3 == v378 :
                                             c24.image = 0                                             ⟨225694⟩
                                         Scene_Tick(scène=scène7)                                      ⟨225727⟩
                                     si byte_495FC != 0 :
                                         Scene_Destruct(scène=scène7, drapeaux=0)                      ⟨225758⟩
                                         aller à loc_70D3F                                             ⟨225760⟩
-                                    v8_avant = scène7.compteur + ((v8·70) / 100)                      ⟨225764⟩
+                                    v8_avant = si + ((v8·70) / 100)                                   ⟨225764⟩
                                     v8 = 40                                                           ⟨225764⟩
-                                    tant que (scène7.compteur < scène7.compteur + ((v8·70) / 100)) et (scène7.terminée == 0) :
+                                    si = scène7.compteur                                              ⟨225765⟩
+                                    tant que (scène7.compteur < si + ((v8·70) / 100)) et (scène7.terminée == 0) :
                                         v378 = scène7.compteur                                        ⟨225780⟩
-                                        si scène7.compteur + 5 == v378 :
+                                        si si + 5 == v378 :
                                             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[12])  ⟨225797⟩
                                             si v15 != 0 :
                                                 si canal2.+0 != 0 :
@@ -1069,7 +1082,7 @@ si byte_495FC == 0 :
                                                 si canal4.+0 != 0 :
                                                     AIL_start_sequence(pilote=canal4.+0→4, séquence=v3200)  ⟨225843⟩
                                                     AIL_set_relative_volume_30C66(canal4.+0→4, v3200, word_48EC4, mid2voc 5.+0)  ⟨225850⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 1 == v378 :
+                                        si (si + ((v8·70) / 100)) - 1 == v378 :
                                             v3262 = 4540                                              ⟨225864⟩
                                             v3262 = 4552                                              ⟨225865⟩
                                             v3262 = 4568                                              ⟨225866⟩
@@ -1085,10 +1098,10 @@ si byte_495FC == 0 :
                                                 si canal2.+0 != 0 :
                                                     AIL_start_sequence(pilote=canal2.+0→4, séquence=v3172)  ⟨225910⟩
                                                     AIL_set_relative_volume_30C66(canal2.+0→4, v3172, v388, mid2voc 7.+0)  ⟨225917⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 3 > v378 :
+                                        si (si + ((v8·70) / 100)) - 3 > v378 :
                                             CRT_Rand()                                                ⟨225927⟩
                                             c24.image = (CRT_Rand()·2) / 32768                        ⟨225936⟩
-                                        si (scène7.compteur + ((v8·70) / 100)) - 3 == v378 :
+                                        si (si + ((v8·70) / 100)) - 3 == v378 :
                                             c24.image = 0                                             ⟨225944⟩
                                         Scene_Tick(scène=scène7)                                      ⟨225977⟩
                                 Scene_Destruct(scène=scène7, drapeaux=0)                              ⟨226006⟩
@@ -1162,14 +1175,15 @@ si byte_495FC == 0 :
                                     sinon :
                                         v560→0.méthode8(167)                                          ⟨226377⟩
                                         v8 = 80                                                       ⟨226379⟩
-                                        tant que (scène8.compteur < scène8.compteur + ((v8·70) / 100)) et (scène8.terminée == 0) :
+                                        si = scène8.compteur                                          ⟨226380⟩
+                                        tant que (scène8.compteur < si + ((v8·70) / 100)) et (scène8.terminée == 0) :
                                             v372 = scène8.compteur                                    ⟨226395⟩
-                                            si scène8.compteur + 7 > v372 :
+                                            si si + 7 > v372 :
                                                 v374 = v370                                           ⟨226401⟩
                                                 v370_avant = v370                                     ⟨226402⟩
                                                 v370 = v370 + 1                                       ⟨226402⟩
                                                 c28.image = v374                                      ⟨226405⟩
-                                            si scène8.compteur + 8 == v372 :
+                                            si si + 8 == v372 :
                                                 sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[13])  ⟨226424⟩
                                                 si v15 != 0 :
                                                     si canal2.+0 != 0 :
@@ -1184,18 +1198,18 @@ si byte_495FC == 0 :
                                                     si canal4.+0 != 0 :
                                                         AIL_start_sequence(pilote=canal4.+0→4, séquence=v3200)  ⟨226471⟩
                                                         AIL_set_relative_volume_30C66(canal4.+0→4, v3200, mid2voc 6.+0, v382)  ⟨226478⟩
-                                            si scène8.compteur + 1 < v372 :
-                                                si (scène8.compteur + ((v8·70) / 100)) - 10 > v372 :
+                                            si si + 1 < v372 :
+                                                si (si + ((v8·70) / 100)) - 10 > v372 :
                                                     CRT_Rand()                                        ⟨226492⟩
                                                     c28.image = ((CRT_Rand()·6) / 32768) + 3          ⟨226502⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 10 <= v372 :
+                                            si (si + ((v8·70) / 100)) - 10 <= v372 :
                                                 si v370 < 1 :
                                                     v370 = 1                                          ⟨226512⟩
                                                 r33(mid2voc 5).+0 = v370                              ⟨226516⟩
                                                 v370_avant = v370                                     ⟨226517⟩
                                                 v370 = v370 - 1                                       ⟨226517⟩
                                                 c28.image = mid2voc 5.+0                              ⟨226520⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 1 == v372 :
+                                            si (si + ((v8·70) / 100)) - 1 == v372 :
                                                 v3262 = 4540                                          ⟨226531⟩
                                                 v3262 = 4552                                          ⟨226532⟩
                                                 v3262 = 4568                                          ⟨226533⟩
@@ -1216,16 +1230,17 @@ si byte_495FC == 0 :
                                             Scene_Destruct(scène=scène8, drapeaux=0)                  ⟨226649⟩
                                             aller à loc_70D3F                                         ⟨226651⟩
                                         v370 = 0                                                      ⟨226655⟩
-                                        v8_avant = scène8.compteur + ((v8·70) / 100)                  ⟨226656⟩
+                                        v8_avant = si + ((v8·70) / 100)                               ⟨226656⟩
                                         v8 = 92                                                       ⟨226656⟩
-                                        tant que (scène8.compteur < scène8.compteur + ((v8·70) / 100)) et (scène8.terminée == 0) :
+                                        si = scène8.compteur                                          ⟨226657⟩
+                                        tant que (scène8.compteur < si + ((v8·70) / 100)) et (scène8.terminée == 0) :
                                             v372 = scène8.compteur                                    ⟨226672⟩
-                                            si scène8.compteur + 7 > v372 :
+                                            si si + 7 > v372 :
                                                 v374 = v370                                           ⟨226678⟩
                                                 v370_avant = v370                                     ⟨226679⟩
                                                 v370 = v370 + 1                                       ⟨226679⟩
                                                 c28.image = v374                                      ⟨226682⟩
-                                            si scène8.compteur + 5 == v372 :
+                                            si si + 5 == v372 :
                                                 sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[14])  ⟨226701⟩
                                                 si v15 != 0 :
                                                     si canal2.+0 != 0 :
@@ -1240,18 +1255,18 @@ si byte_495FC == 0 :
                                                     si canal4.+0 != 0 :
                                                         AIL_start_sequence(pilote=canal4.+0→4, séquence=v3200)  ⟨226748⟩
                                                         AIL_set_relative_volume_30C66(canal4.+0→4, v3200, mid2voc 6.+0, v382)  ⟨226755⟩
-                                            si scène8.compteur + 1 < v372 :
-                                                si (scène8.compteur + ((v8·70) / 100)) - 10 > v372 :
+                                            si si + 1 < v372 :
+                                                si (si + ((v8·70) / 100)) - 10 > v372 :
                                                     CRT_Rand()                                        ⟨226769⟩
                                                     c28.image = ((CRT_Rand()·6) / 32768) + 3          ⟨226779⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 10 <= v372 :
+                                            si (si + ((v8·70) / 100)) - 10 <= v372 :
                                                 si v370 < 1 :
                                                     v370 = 1                                          ⟨226789⟩
                                                 r33(mid2voc 5).+0 = v370                              ⟨226793⟩
                                                 v370_avant = v370                                     ⟨226794⟩
                                                 v370 = v370 - 1                                       ⟨226794⟩
                                                 c28.image = mid2voc 5.+0                              ⟨226797⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 1 == v372 :
+                                            si (si + ((v8·70) / 100)) - 1 == v372 :
                                                 v3262 = 4540                                          ⟨226808⟩
                                                 v3262 = 4552                                          ⟨226809⟩
                                                 v3262 = 4568                                          ⟨226810⟩
@@ -1272,16 +1287,17 @@ si byte_495FC == 0 :
                                             Scene_Destruct(scène=scène8, drapeaux=0)                  ⟨226926⟩
                                             aller à loc_70D3F                                         ⟨226928⟩
                                         v370 = 0                                                      ⟨226932⟩
-                                        v8_avant = scène8.compteur + ((v8·70) / 100)                  ⟨226933⟩
+                                        v8_avant = si + ((v8·70) / 100)                               ⟨226933⟩
                                         v8 = 110                                                      ⟨226933⟩
-                                        tant que (scène8.compteur < scène8.compteur + ((v8·70) / 100)) et (scène8.terminée == 0) :
+                                        si = scène8.compteur                                          ⟨226934⟩
+                                        tant que (scène8.compteur < si + ((v8·70) / 100)) et (scène8.terminée == 0) :
                                             v372 = scène8.compteur                                    ⟨226949⟩
-                                            si scène8.compteur + 7 > v372 :
+                                            si si + 7 > v372 :
                                                 v374 = v370                                           ⟨226955⟩
                                                 v370_avant = v370                                     ⟨226956⟩
                                                 v370 = v370 + 1                                       ⟨226956⟩
                                                 c28.image = v374                                      ⟨226959⟩
-                                            si scène8.compteur + 13 == v372 :
+                                            si si + 13 == v372 :
                                                 sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[15])  ⟨226978⟩
                                                 si v15 != 0 :
                                                     si canal2.+0 != 0 :
@@ -1296,23 +1312,23 @@ si byte_495FC == 0 :
                                                     si canal4.+0 != 0 :
                                                         AIL_start_sequence(pilote=canal4.+0→4, séquence=v3200)  ⟨227025⟩
                                                         AIL_set_relative_volume_30C66(canal4.+0→4, v3200, mid2voc 6.+0, v382)  ⟨227032⟩
-                                            si scène8.compteur + 1 < v372 :
-                                                si (scène8.compteur + ((v8·70) / 100)) - 36 > v372 :
+                                            si si + 1 < v372 :
+                                                si (si + ((v8·70) / 100)) - 36 > v372 :
                                                     CRT_Rand()                                        ⟨227046⟩
                                                     c28.image = ((CRT_Rand()·6) / 32768) + 3          ⟨227056⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 36 < v372 :
-                                                si (scène8.compteur + ((v8·70) / 100)) - 16 > v372 :
+                                            si (si + ((v8·70) / 100)) - 36 < v372 :
+                                                si (si + ((v8·70) / 100)) - 16 > v372 :
                                                     CRT_Rand()                                        ⟨227068⟩
                                                     r33(mid2voc 5).+0 = ((CRT_Rand()·2) / 32768) + 7  ⟨227075⟩
                                                     c28.image = mid2voc 5.+0                          ⟨227078⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 16 <= v372 :
+                                            si (si + ((v8·70) / 100)) - 16 <= v372 :
                                                 si v370 < 1 :
                                                     v370 = 1                                          ⟨227088⟩
                                                 v388 = v370                                           ⟨227092⟩
                                                 v370_avant = v370                                     ⟨227093⟩
                                                 v370 = v370 - 1                                       ⟨227093⟩
                                                 c28.image = v388                                      ⟨227096⟩
-                                            si (scène8.compteur + ((v8·70) / 100)) - 5 == v372 :
+                                            si (si + ((v8·70) / 100)) - 5 == v372 :
                                                 v3262 = 4540                                          ⟨227107⟩
                                                 v3262 = 4552                                          ⟨227108⟩
                                                 v3262 = 4568                                          ⟨227109⟩

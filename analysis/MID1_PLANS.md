@@ -8,6 +8,10 @@ python3 tools/midgame_extract.py --exe optest Midgame1_PlayPart1_5FCF0 --name mi
 python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/resources/MID_1.IFF --remplace pri=air --donnees BIGTRE.TRE [--sous-titres]
 ```
 
+**Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
+`MID_12`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
+
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
    affectations, opérations du moteur avec leurs arguments, tableaux du segment de données et
    valeurs de départ des variables.
@@ -241,3 +245,22 @@ répliques et têtes en mode voix comme mid2. Mécanismes nouveaux (2026-10-21) 
   le prenait pour un champ de la poignée et le lisait à 0 : les silhouettes restaient figées. Règle :
   un mot incrémenté ou décrémenté sur place dans une case de ressource est une variable ;
 - effets sonores tirés dans une petite table (`asoundfx`), non exprimés.
+
+### mid12
+
+Fonction pas encore nommée `sub_81470` : `--nom mid12`. 23 plans, 86,8 s (88,6 s avec le fondu),
+répliques et têtes en mode voix. Mécanismes nouveaux (2026-10-21) :
+- **calque image à l'échelle** (`ScaledImageLayer_Construct_9391`, dessin
+  `ScaledImageLayer_Draw_93E4` → `Render_DrawRotatedScaledShape_39A7A`) : un angle (degrés), une
+  échelle en 1/256 et un octet dont le rôle n'est pas établi. mid12 : les silhouettes et les fûts des
+  plans larges du hangar, angle 0, octet 0, échelle 200 (× 0,78) ou 160 (× 0,625), jamais modifiés
+  ensuite. **Pas exprimé dans le format** : image écrite à sa taille d'origine, d'où 1 503 instants
+  différents ; sans l'échelle, 0 écart. Le rendu de référence réduit au plus proche voisin autour du
+  point d'origine de l'image ; les routines de dessin du jeu ne sont pas lues ;
+- **calque fixe à l'origine** (`Layer_ConstructAtOrigin_2DE95`) : `Layer` en 0, 0 ;
+- **borne de fin figée dans un registre** : la dernière scène calcule `compteur + durée` une fois
+  avant la boucle (`mov di, dx`) ; l'extracteur fige désormais une telle valeur au moment de son
+  calcul (sinon la boucle ne finit jamais). Cela corrige aussi les branches sans voix de mid2 et mid5
+  (non jouées par l'outil ; leurs MID_*.IFF ne changent pas) ;
+- couleur des sous-titres supposée 15, comme mid2 : sur certaines palettes elle sort sombre.
+

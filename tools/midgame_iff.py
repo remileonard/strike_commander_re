@@ -667,6 +667,12 @@ class Player:
             layer.image = None
         if kind == 'ScaledMovingLayer':
             layer.scale = (self.ev(args.get('échelle_x')) or 256, self.ev(args.get('échelle_y')) or 256)
+        if kind == 'ScaledImageLayer':
+            # ScaledImageLayer_Construct_9391 : une seule échelle ; angle et octet pris à 0 seulement.
+            scale = self.ev(args.get('échelle')) or 256
+            layer.scale = (scale, scale)
+            if self.ev(args.get('angle')) or self.ev(args.get('octet')):
+                self.warn('ScaledImageLayer : angle ou octet non nul, non rendu')
         if kind in ('MovingOverlayLayer', 'MovingMaskLayer', 'ScaledMovingLayer'):
             # MovingOverlayLayer_Construct_A837 / MovingMaskLayer_Construct_B995 : vitesse donnée au
             # constructeur.
@@ -931,7 +937,7 @@ class Player:
         elif t in ('OverlayImageLayer', 'MovingOverlayLayer'):
             out.append(self.item(n + ':fond', layer.res, 0, ax, ay))
             out.append(self.item(n, layer.res, layer.image, ax, ay))
-        elif t == 'ScaledMovingLayer':
+        elif t in ('ScaledMovingLayer', 'ScaledImageLayer'):
             # ScaledMovingLayer_DrawImage_C056 : image à l'échelle (1/256, 256 = taille d'origine).
             it = self.item(n, layer.res, layer.image, ax, ay)
             it['scale'] = layer.scale
@@ -1174,7 +1180,7 @@ def layer_chunks(shot, key, start, stop, depth, layer_id):
     if 'mask' in first:
         # Calque masque (ombre par table de couleurs) : pas exprimé dans le format.
         return None, None
-    # Échelle (ScaledMovingLayer) : pas exprimée dans le format, image écrite à sa taille d'origine.
+    # Échelle (ScaledMovingLayer, ScaledImageLayer) : pas exprimée dans le format, image écrite à sa taille d'origine.
     positions = [(it['x'], it['y']) for it in seq]
     if res[0] == 'face':
         positions = [(x - FACE_ANCHOR[0], y - BAND_TOP - FACE_ANCHOR[1]) for x, y in positions]

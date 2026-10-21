@@ -984,6 +984,9 @@ défilement en boucle ; détail dans `MID1_PLANS.md`, « mid3 ».
 
 **mid5 (2026-10-21)** : calque mobile à l'échelle ; détail dans `MID1_PLANS.md`, « mid5 ».
 
+**mid12 (2026-10-21)** : calque image à l'échelle (`ScaledImageLayer_Construct_9391`) et calque
+fixe à l'origine (`Layer_ConstructAtOrigin_2DE95`) ; détail dans `MID1_PLANS.md`, « mid12 ».
+
 Les 10 autres fonctions (une par cinématique : `sub_6B9C0` mid2, `sub_71680` mid3, `sub_768F0`
 mid5, `sub_81470` mid12, `sub_8B630` mid15, `sub_94A30` mid16, `sub_98210` mid17, `sub_9E080`
 mid20, `sub_A3C30` générique et mid33, `sub_AFB90` mid34 — toutes pas encore nommées) utilisent

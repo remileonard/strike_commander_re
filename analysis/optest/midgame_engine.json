@@ -748,6 +748,30 @@
    ],
    "type": "ScaledMovingLayer",
    "ret": "layer"
+  },
+  "ScaledImageLayer_Construct_9391": {
+   "op": "ScaledImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "angle",
+    "échelle",
+    "octet",
+    "image"
+   ],
+   "type": "ScaledImageLayer",
+   "ret": "layer"
+  },
+  "Layer_ConstructAtOrigin_2DE95": {
+   "op": "Layer",
+   "args": [
+    "objet",
+    "ressource"
+   ],
+   "type": "Layer",
+   "ret": "layer"
   }
  },
  "vtables": {
@@ -766,7 +790,8 @@
   "6794": "scene",
   "6091": "MovingOverlayLayer",
   "5607": "MovingMaskLayer",
-  "6467": "ScaledMovingLayer"
+  "6467": "ScaledMovingLayer",
+  "6567": "ScaledImageLayer"
  },
  "secondary_vtables": [
   6551,
@@ -780,7 +805,8 @@
   4584,
   4604,
   6239,
-  6255
+  6255,
+  6603
  ],
  "fields": {
   "scene": {
@@ -845,6 +871,11 @@
    "31": "vy",
    "33": "échelle_x",
    "35": "échelle_y"
+  },
+  "ScaledImageLayer": {
+   "29": "angle",
+   "31": "échelle",
+   "33": "octet"
   }
  },
  "methods": {

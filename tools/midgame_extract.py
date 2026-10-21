@@ -795,6 +795,12 @@ class FunctionRun:
             self.regs[op[1]] = val
             if op[1] in ('si', 'di') and op[3] == op[1] and op[1] in self.loop_registers:
                 self.emit(('assign', op[1], val, line))
+                return
+            # Borne calculée une fois depuis le compteur d'une scène (mov di, compteur + durée), puis
+            # comparée au compteur à chaque tour : elle est figée à l'écriture (mid12, dernière scène).
+            if op[1] in ('si', 'di') and op[3] == op[1] and self.mentions_scene_field(val):
+                self.emit(('assign', op[1], val, line))
+                self.regs[op[1]] = ('reg', op[1])
             return
         if op[0] != 'mem':
             self.emit(('asm', src_text, line))
@@ -870,6 +876,11 @@ class FunctionRun:
             return
         target = self.read_mem(addr, op[2])
         self.emit(('assign', self.ex.render(target), val, line))
+
+    def mentions_scene_field(self, v):
+        if isinstance(v, tuple) and v and v[0] == 'field' and isinstance(v[1], int) and self.ex.objects[v[1]].kind == 'scene':
+            return True
+        return isinstance(v, tuple) and any(self.mentions_scene_field(x) for x in v if isinstance(x, tuple))
 
     def write_field(self, oid, n, val, line):
         obj = self.ex.objects[oid]

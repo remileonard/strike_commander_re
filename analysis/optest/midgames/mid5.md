@@ -629,12 +629,13 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(125)                                                                              ⟨240003⟩
     v4 = 35                                                                                           ⟨240005⟩
-    tant que (scène3.compteur < scène3.compteur + ((v4·70) / 100)) et (scène3.terminée == 0) :
-        si scène3.compteur + 2 == scène3.compteur :
+    si = scène3.compteur                                                                              ⟨240006⟩
+    tant que (scène3.compteur < si + ((v4·70) / 100)) et (scène3.terminée == 0) :
+        si si + 2 == scène3.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[3])                              ⟨240034⟩
-        si scène3.compteur + 2 == scène3.compteur :
+        si si + 2 == scène3.compteur :
             tête_texte_de_lèvres(tête=c9, texte="Jtfrkovtadrkz")                                      ⟨240044⟩
-        si (scène3.compteur + ((v4·70) / 100)) - 1 == scène3.compteur :
+        si (si + ((v4·70) / 100)) - 1 == scène3.compteur :
             v3152 = 4540                                                                              ⟨240052⟩
             v3152 = 4552                                                                              ⟨240053⟩
             v3152 = 4568                                                                              ⟨240054⟩
@@ -642,36 +643,37 @@ sinon :
             v3152 = 4604                                                                              ⟨240056⟩
             Primitive_SetRectColorAndDraw_2CBE5(&v3152, v487, v485, v483, v481, 0, &v510)             ⟨240066⟩
         Scene_Tick(scène=scène3)                                                                      ⟨240098⟩
-    v4_avant = scène3.compteur + ((v4·70) / 100)                                                      ⟨240124⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨240124⟩
     v4 = 76                                                                                           ⟨240124⟩
-    tant que (scène3.compteur < scène3.compteur + ((v4·70) / 100)) et (scène3.terminée == 0) :
-        si scène3.compteur == scène3.compteur :
+    si = scène3.compteur                                                                              ⟨240125⟩
+    tant que (scène3.compteur < si + ((v4·70) / 100)) et (scène3.terminée == 0) :
+        si scène3.compteur == si :
             ajoute c8 à scène3                                                                        ⟨240146⟩
-        si scène3.compteur + 4 > scène3.compteur :
+        si si + 4 > scène3.compteur :
             v280_avant = v280                                                                         ⟨240156⟩
             v280_avant = v280                                                                         ⟨240156⟩
             v280 = v280 + 1                                                                           ⟨240156⟩
             c8.image = v280_avant                                                                     ⟨240159⟩
-        si scène3.compteur + 8 == scène3.compteur :
+        si si + 8 == scène3.compteur :
             si v11 != 0 :
                 v286 = word_48F20                                                                     ⟨240169⟩
                 pal11(mid5 15).+0 = 0                                                                 ⟨240170⟩
                 si canal2.+0 != 0 :
                     AIL_start_sequence(pilote=canal2.+0→4, séquence=v3138)                            ⟨240176⟩
                     AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v286, pal11(mid5 15).+0)        ⟨240183⟩
-        si scène3.compteur + 7 < scène3.compteur :
-            si scène3.compteur + 11 > scène3.compteur :
+        si si + 7 < scène3.compteur :
+            si si + 11 > scène3.compteur :
                 v280_avant = v280                                                                     ⟨240199⟩
                 v280_avant = v280                                                                     ⟨240199⟩
                 v280 = v280 + 1                                                                       ⟨240199⟩
                 c8.image = v280_avant                                                                 ⟨240202⟩
-        si scène3.compteur + 11 == scène3.compteur :
+        si si + 11 == scène3.compteur :
             c8.image = 5                                                                              ⟨240211⟩
-        si scène3.compteur + 18 == scène3.compteur :
+        si si + 18 == scène3.compteur :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[4])                              ⟨240225⟩
-        si scène3.compteur + 18 == scène3.compteur :
+        si si + 18 == scène3.compteur :
             tête_texte_de_lèvres(tête=c9, texte="mabewtchakpwvyerz")                                  ⟨240235⟩
-        si (scène3.compteur + ((v4·70) / 100)) - 1 == scène3.compteur :
+        si (si + ((v4·70) / 100)) - 1 == scène3.compteur :
             v3152 = 4540                                                                              ⟨240243⟩
             v3152 = 4552                                                                              ⟨240244⟩
             v3152 = 4568                                                                              ⟨240245⟩
@@ -769,13 +771,14 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(125)                                                                              ⟨241092⟩
     v4 = 40                                                                                           ⟨241094⟩
-    tant que (scène4.compteur < scène4.compteur + ((v4·70) / 100)) et (scène4.terminée == 0) :
+    si = scène4.compteur                                                                              ⟨241095⟩
+    tant que (scène4.compteur < si + ((v4·70) / 100)) et (scène4.terminée == 0) :
         v258 = scène4.compteur                                                                        ⟨241110⟩
-        si scène4.compteur + 2 == v258 :
+        si si + 2 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[5])                              ⟨241123⟩
-        si scène4.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c11, texte="hwabtakntrofer")                                    ⟨241133⟩
-        si (scène4.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨241141⟩
             v3138 = 4552                                                                              ⟨241142⟩
             v3138 = 4568                                                                              ⟨241143⟩
@@ -784,17 +787,18 @@ sinon :
             Primitive_SetRectColorAndDraw_2CBE5(&v3138, v487, v485, v483, v481, 0, &v510)             ⟨241155⟩
         Scene_Tick(scène=scène4)                                                                      ⟨241187⟩
     tête_image_de_base(tête=c11, image=14)                                                            ⟨241215⟩
-    v4_avant = scène4.compteur + ((v4·70) / 100)                                                      ⟨241217⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨241217⟩
     v4 = 30                                                                                           ⟨241217⟩
-    tant que (scène4.compteur < scène4.compteur + ((v4·70) / 100)) et (scène4.terminée == 0) :
+    si = scène4.compteur                                                                              ⟨241218⟩
+    tant que (scène4.compteur < si + ((v4·70) / 100)) et (scène4.terminée == 0) :
         v258 = scène4.compteur                                                                        ⟨241233⟩
-        si scène4.compteur + 1 == v258 :
+        si si + 1 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[6])                              ⟨241246⟩
-        si scène4.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c11, texte="ilkpmimne")                                         ⟨241256⟩
-        si (scène4.compteur + ((v4·70) / 100)) - 2 == v258 :
+        si (si + ((v4·70) / 100)) - 2 == v258 :
             tête_image_de_base(tête=c11, image=25)                                                    ⟨241266⟩
-        si (scène4.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨241274⟩
             v3138 = 4552                                                                              ⟨241275⟩
             v3138 = 4568                                                                              ⟨241276⟩
@@ -977,13 +981,14 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(125)                                                                              ⟨242778⟩
     v4 = 44                                                                                           ⟨242780⟩
-    tant que (scène6.compteur < scène6.compteur + ((v4·70) / 100)) et (scène6.terminée == 0) :
+    si = scène6.compteur                                                                              ⟨242781⟩
+    tant que (scène6.compteur < si + ((v4·70) / 100)) et (scène6.terminée == 0) :
         v258 = scène6.compteur                                                                        ⟨242796⟩
-        si scène6.compteur + 1 == v258 :
+        si si + 1 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[7])                              ⟨242809⟩
-        si scène6.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c15, texte="ndyulozafwth")                                      ⟨242819⟩
-        si (scène6.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨242827⟩
             v3138 = 4552                                                                              ⟨242828⟩
             v3138 = 4568                                                                              ⟨242829⟩
@@ -1273,21 +1278,22 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(125)                                                                              ⟨245014⟩
     v4 = 39                                                                                           ⟨245016⟩
-    tant que (scène9.compteur < scène9.compteur + ((v4·70) / 100)) et (scène9.terminée == 0) :
+    si = scène9.compteur                                                                              ⟨245017⟩
+    tant que (scène9.compteur < si + ((v4·70) / 100)) et (scène9.terminée == 0) :
         v308 = scène9.compteur                                                                        ⟨245032⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[8])                              ⟨245044⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             tête_texte_de_lèvres(tête=c26, texte="Mrkzralalik")                                       ⟨245054⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             tête_texte_de_lèvres(tête=c28, texte="Mrkzralalik")                                       ⟨245064⟩
-        si scène9.compteur + 6 == v308 :
+        si si + 6 == v308 :
             c27.image = 6                                                                             ⟨245073⟩
-        si scène9.compteur + 11 == v308 :
+        si si + 11 == v308 :
             c27.image = 5                                                                             ⟨245081⟩
-        si scène9.compteur + 14 == v308 :
+        si si + 14 == v308 :
             c27.image = 6                                                                             ⟨245089⟩
-        si (scène9.compteur + ((v4·70) / 100)) - 1 == v308 :
+        si (si + ((v4·70) / 100)) - 1 == v308 :
             v3152 = 4540                                                                              ⟨245096⟩
             v3152 = 4552                                                                              ⟨245097⟩
             v3152 = 4568                                                                              ⟨245098⟩
@@ -1295,21 +1301,22 @@ sinon :
             v3152 = 4604                                                                              ⟨245100⟩
             Primitive_SetRectColorAndDraw_2CBE5(&v3152, v487, v485, v483, v481, 0, &v510)             ⟨245110⟩
         Scene_Tick(scène=scène9)                                                                      ⟨245142⟩
-    v4_avant = scène9.compteur + ((v4·70) / 100)                                                      ⟨245168⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨245168⟩
     v4 = 64                                                                                           ⟨245168⟩
-    tant que (scène9.compteur < scène9.compteur + ((v4·70) / 100)) et (scène9.terminée == 0) :
+    si = scène9.compteur                                                                              ⟨245169⟩
+    tant que (scène9.compteur < si + ((v4·70) / 100)) et (scène9.terminée == 0) :
         v308 = scène9.compteur                                                                        ⟨245184⟩
-        si scène9.compteur + 1 == v308 :
+        si si + 1 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[9])                              ⟨245197⟩
-        si scène9.compteur + 1 == v308 :
+        si si + 1 == v308 :
             tête_texte_de_lèvres(tête=c26, texte="alwzwngtdothnsdrdwa")                               ⟨245207⟩
-        si scène9.compteur + 1 == v308 :
+        si si + 1 == v308 :
             tête_texte_de_lèvres(tête=c28, texte="alwzwngtdothnsdrdwa")                               ⟨245217⟩
-        si scène9.compteur + 13 == v308 :
+        si si + 13 == v308 :
             c27.image = 6                                                                             ⟨245226⟩
-        si scène9.compteur + 16 == v308 :
+        si si + 16 == v308 :
             c27.image = 5                                                                             ⟨245234⟩
-        si (scène9.compteur + ((v4·70) / 100)) - 1 == v308 :
+        si (si + ((v4·70) / 100)) - 1 == v308 :
             v3152 = 4540                                                                              ⟨245241⟩
             v3152 = 4552                                                                              ⟨245242⟩
             v3152 = 4568                                                                              ⟨245243⟩
@@ -1317,35 +1324,36 @@ sinon :
             v3152 = 4604                                                                              ⟨245245⟩
             Primitive_SetRectColorAndDraw_2CBE5(&v3152, v487, v485, v483, v481, 0, &v510)             ⟨245255⟩
         Scene_Tick(scène=scène9)                                                                      ⟨245287⟩
-    v4_avant = scène9.compteur + ((v4·70) / 100)                                                      ⟨245313⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨245313⟩
     v4 = 64                                                                                           ⟨245313⟩
-    tant que (scène9.compteur < scène9.compteur + ((v4·70) / 100)) et (scène9.terminée == 0) :
+    si = scène9.compteur                                                                              ⟨245314⟩
+    tant que (scène9.compteur < si + ((v4·70) / 100)) et (scène9.terminée == 0) :
         v308 = scène9.compteur                                                                        ⟨245329⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             tête_image_de_base(tête=c26, image=-1)                                                    ⟨245336⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             tête_texte_de_lèvres(tête=c26, texte="ilikmrkz")                                          ⟨245346⟩
-        si scène9.compteur + 2 == v308 :
+        si si + 2 == v308 :
             tête_texte_de_lèvres(tête=c28, texte="ilikmrkz")                                          ⟨245356⟩
-        si scène9.compteur + 3 == v308 :
+        si si + 3 == v308 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[10])                             ⟨245372⟩
-        si scène9.compteur + 6 == v308 :
+        si si + 6 == v308 :
             c27.image = 5                                                                             ⟨245381⟩
-        si scène9.compteur + 11 == v308 :
+        si si + 11 == v308 :
             c27.image = 6                                                                             ⟨245389⟩
-        si scène9.compteur + 14 == v308 :
+        si si + 14 == v308 :
             c27.image = 5                                                                             ⟨245397⟩
-        si scène9.compteur + 14 == v308 :
+        si si + 14 == v308 :
             tête_image_de_base(tête=c26, image=28)                                                    ⟨245406⟩
-        si (scène9.compteur + ((v4·70) / 100)) - 10 == v308 :
+        si (si + ((v4·70) / 100)) - 10 == v308 :
             si v11 != 0 :
                 r18(asoundfx (v302 + &v300)→0).+0 = 0                                                 ⟨245418⟩
                 si canal2.+0 != 0 :
                     AIL_start_sequence(pilote=canal2.+0→4, séquence=v3138)                            ⟨245424⟩
                     AIL_set_relative_volume_30C66(canal2.+0→4, v3138, word_48EF8, asoundfx (v302 + &v300)→0.+0)  ⟨245431⟩
-        si (scène9.compteur + ((v4·70) / 100)) - 2 == v308 :
+        si (si + ((v4·70) / 100)) - 2 == v308 :
             tête_image_de_base(tête=c26, image=25)                                                    ⟨245443⟩
-        si (scène9.compteur + ((v4·70) / 100)) - 10 == v308 :
+        si (si + ((v4·70) / 100)) - 10 == v308 :
             v3152 = 4540                                                                              ⟨245451⟩
             v3152 = 4552                                                                              ⟨245452⟩
             v3152 = 4568                                                                              ⟨245453⟩
@@ -1425,17 +1433,18 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(128)                                                                              ⟨246207⟩
     v4 = 50                                                                                           ⟨246209⟩
-    tant que (scène10.compteur < scène10.compteur + ((v4·70) / 100)) et (scène10.terminée == 0) :
+    si = scène10.compteur                                                                             ⟨246210⟩
+    tant que (scène10.compteur < si + ((v4·70) / 100)) et (scène10.terminée == 0) :
         pal10(mid5 19).+0 = scène10.compteur                                                          ⟨246225⟩
-        si scène10.compteur + 3 == pal10(mid5 32).+0 :
+        si si + 3 == pal10(mid5 32).+0 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[11])                             ⟨246238⟩
-        si scène10.compteur + 18 > pal10(mid5 32).+0 :
+        si si + 18 > pal10(mid5 32).+0 :
             CRT_Rand()                                                                                ⟨246246⟩
             v270 = ((CRT_Rand()·4) / 32768) + 1                                                       ⟨246253⟩
             c30.image = v270                                                                          ⟨246256⟩
-        si scène10.compteur + 18 == pal10(mid5 32).+0 :
+        si si + 18 == pal10(mid5 32).+0 :
             c30.image = 1                                                                             ⟨246264⟩
-        si (scène10.compteur + ((v4·70) / 100)) - 1 == pal10(mid5 32).+0 :
+        si (si + ((v4·70) / 100)) - 1 == pal10(mid5 32).+0 :
             v3138 = 4540                                                                              ⟨246271⟩
             v3138 = 4552                                                                              ⟨246272⟩
             v3138 = 4568                                                                              ⟨246273⟩
@@ -1690,15 +1699,16 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(183)                                                                              ⟨248121⟩
     v4 = 35                                                                                           ⟨248123⟩
-    tant que (scène12.compteur < scène12.compteur + ((v4·70) / 100)) et (scène12.terminée == 0) :
+    si = scène12.compteur                                                                             ⟨248124⟩
+    tant que (scène12.compteur < si + ((v4·70) / 100)) et (scène12.terminée == 0) :
         v258 = scène12.compteur                                                                       ⟨248139⟩
-        si scène12.compteur + 7 == v258 :
+        si si + 7 == v258 :
             tête_image_de_base(tête=c38, image=-1)                                                    ⟨248146⟩
-        si scène12.compteur + 8 == v258 :
+        si si + 8 == v258 :
             tête_texte_de_lèvres(tête=c38, texte="zocamndr")                                          ⟨248156⟩
-        si scène12.compteur + 9 == v258 :
+        si si + 9 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[12])                             ⟨248172⟩
-        si (scène12.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨248180⟩
             v3138 = 4552                                                                              ⟨248181⟩
             v3138 = 4568                                                                              ⟨248182⟩
@@ -1707,15 +1717,16 @@ sinon :
             Primitive_SetRectColorAndDraw_2CBE5(&v3138, v487, v485, v483, v481, 0, &v510)             ⟨248194⟩
         Scene_Tick(scène=scène12)                                                                     ⟨248226⟩
     tête_image_de_base(tête=c38, image=33)                                                            ⟨248254⟩
-    v4_avant = scène12.compteur + ((v4·70) / 100)                                                     ⟨248256⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨248256⟩
     v4 = 50                                                                                           ⟨248256⟩
-    tant que (scène12.compteur < scène12.compteur + ((v4·70) / 100)) et (scène12.terminée == 0) :
+    si = scène12.compteur                                                                             ⟨248257⟩
+    tant que (scène12.compteur < si + ((v4·70) / 100)) et (scène12.terminée == 0) :
         v258 = scène12.compteur                                                                       ⟨248272⟩
-        si scène12.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c38, texte="wewrtknbotislvsnz")                                 ⟨248279⟩
-        si scène12.compteur + 2 == v258 :
+        si si + 2 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[14])                             ⟨248295⟩
-        si (scène12.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨248303⟩
             v3138 = 4552                                                                              ⟨248304⟩
             v3138 = 4568                                                                              ⟨248305⟩
@@ -1799,13 +1810,14 @@ si v10 != 0 :
 sinon :
     v492→0.méthode8(125)                                                                              ⟨249005⟩
     v4 = 45                                                                                           ⟨249007⟩
-    tant que (scène13.compteur < scène13.compteur + ((v4·70) / 100)) et (scène13.terminée == 0) :
+    si = scène13.compteur                                                                             ⟨249008⟩
+    tant que (scène13.compteur < si + ((v4·70) / 100)) et (scène13.terminée == 0) :
         v258 = scène13.compteur                                                                       ⟨249023⟩
-        si scène13.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c40, texte="Wewrtknbutvkasns")                                  ⟨249030⟩
-        si scène13.compteur + 3 == v258 :
+        si si + 3 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[15])                             ⟨249046⟩
-        si (scène13.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨249054⟩
             v3138 = 4552                                                                              ⟨249055⟩
             v3138 = 4568                                                                              ⟨249056⟩
@@ -1813,15 +1825,16 @@ sinon :
             v3138 = 4604                                                                              ⟨249058⟩
             Primitive_SetRectColorAndDraw_2CBE5(&v3138, v487, v485, v483, v481, 0, &v510)             ⟨249068⟩
         Scene_Tick(scène=scène13)                                                                     ⟨249100⟩
-    v4_avant = scène13.compteur + ((v4·70) / 100)                                                     ⟨249126⟩
+    v4_avant = si + ((v4·70) / 100)                                                                   ⟨249126⟩
     v4 = 75                                                                                           ⟨249126⟩
-    tant que (scène13.compteur < scène13.compteur + ((v4·70) / 100)) et (scène13.terminée == 0) :
+    si = scène13.compteur                                                                             ⟨249127⟩
+    tant que (scène13.compteur < si + ((v4·70) / 100)) et (scène13.terminée == 0) :
         v258 = scène13.compteur                                                                       ⟨249142⟩
-        si scène13.compteur + 2 == v258 :
+        si si + 2 == v258 :
             tête_texte_de_lèvres(tête=c40, texte="nfyrstlntrsd inoagrplswecngo")                      ⟨249149⟩
-        si scène13.compteur + 2 == v258 :
+        si si + 2 == v258 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[16])                             ⟨249164⟩
-        si (scène13.compteur + ((v4·70) / 100)) - 1 == v258 :
+        si (si + ((v4·70) / 100)) - 1 == v258 :
             v3138 = 4540                                                                              ⟨249172⟩
             v3138 = 4552                                                                              ⟨249173⟩
             v3138 = 4568                                                                              ⟨249174⟩

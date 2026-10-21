@@ -823,7 +823,7 @@ Scene_SetFps_2DE27	endp
 
 ; Attributes: bp-based frame
 
-sub_2DE4F	proc far		; CODE XREF: sub_2DE95+6Bp
+sub_2DE4F	proc far		; CODE XREF: Layer_ConstructAtOrigin_2DE95+6Bp
 					; seg084:05C0p	...
 
 var_5		= byte ptr -5
@@ -862,7 +862,13 @@ sub_2DE4F	endp
 
 ; Attributes: bp-based frame
 
-sub_2DE95	proc far		; CODE XREF: seg014:1157P seg014:1328P ...
+; ==============================================================================================
+; far, LUE 2026-10-21. Calque de base (1Dh octets, alloué si nul), même table de méthodes que
+; Layer_Construct_2DF9B (dseg 18DFh = 6367) : ressource arg_2 attachée par sub_2DE4F, position
+; +0Ch et +0Eh mises à 0. Équivaut à Layer_Construct_2DF9B(objet, ressource, 0, 0). mid12 :
+; mid12 0 et 1.
+; ==============================================================================================
+Layer_ConstructAtOrigin_2DE95	proc far		; CODE XREF: seg014:1157P seg014:1328P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -880,7 +886,7 @@ arg_2		= word ptr  8
 		or	ax, ax
 		jz	short loc_2DF10
 
-loc_2DEAE:				; CODE XREF: sub_2DE95+9j
+loc_2DEAE:				; CODE XREF: Layer_ConstructAtOrigin_2DE95+9j
 		mov	word ptr [si], 18BFh
 		mov	word ptr [si+4], 18B7h
 		mov	word ptr [si+6], 0
@@ -904,12 +910,12 @@ loc_2DEAE:				; CODE XREF: sub_2DE95+9j
 		mov	word ptr [si+0Ch], 0
 		mov	word ptr [si+0Eh], 0
 
-loc_2DF10:				; CODE XREF: sub_2DE95+17j
+loc_2DF10:				; CODE XREF: Layer_ConstructAtOrigin_2DE95+17j
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_2DE95	endp
+Layer_ConstructAtOrigin_2DE95	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -1036,7 +1042,7 @@ Layer_Construct_2DF9B	endp
 ; far, LUE 2026-10-17. Comme Layer_Construct_2DF9B, avec le numéro d'image affichée +27 =
 ; arg_8 : image fixe n de la ressource.
 ; ==============================================================================================
-ImageLayer_Construct_2E02C	proc far		; CODE XREF: sub_9391+28P ScaledMovingLayer_Construct_9544+4FP ...
+ImageLayer_Construct_2E02C	proc far		; CODE XREF: ScaledImageLayer_Construct_9391+28P ScaledMovingLayer_Construct_9544+4FP ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1864,7 +1870,7 @@ loc_2E5B6:				; CODE XREF: seg084:0BE6j
 		push	word ptr [bp+8]
 		push	si
 		push	cs
-		call	near ptr sub_2DE95
+		call	near ptr Layer_ConstructAtOrigin_2DE95
 		add	sp, 4
 		mov	word ptr [si], 3F78h
 		mov	word ptr [si+0Ah], 3F98h

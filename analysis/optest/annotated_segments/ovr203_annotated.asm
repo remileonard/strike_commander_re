@@ -1556,7 +1556,7 @@ loc_8C61A:				; CODE XREF: sub_8B630+FA4j
 		lea	ax, [bp+var_52]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_144+2], ax
 		push	0
@@ -1568,7 +1568,7 @@ loc_8C61A:				; CODE XREF: sub_8B630+FA4j
 		lea	ax, [bp+var_48]
 		push	ax
 		push	0
-		call	sub_9391
+		call	ScaledImageLayer_Construct_9391
 		add	sp, 10h
 		mov	word ptr [bp+var_144], ax
 		push	[bp+var_C8]
