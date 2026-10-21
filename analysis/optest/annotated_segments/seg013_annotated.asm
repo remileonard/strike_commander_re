@@ -778,7 +778,7 @@ loc_9159:				; CODE XREF: sub_9128:loc_9155j
 		push	word_48E79
 		mov	bx, word_48E77
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 

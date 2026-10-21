@@ -477,7 +477,21 @@ sub_7D11	endp
 
 ; Attributes: bp-based frame
 
-sub_7D52	proc far		; CODE XREF: sub_9CF7+25P
+; ==============================================================================================
+; far, LUE 2026-10-21. Charge une réplique (arg_2 = ressource VOC) dans le lecteur de voix et
+; calcule sa table de bouches pour une cadence arg_4 (rangée en +1Ah) : fréquence = 1 000 000
+; / (256 − octet 1Eh du VOC) (mov eax, 0F4240h / idiv), échantillons par image = fréquence /
+; cadence, nombre d'échantillons = (dword 1Ah du VOC >> 8) − 2 (taille du premier bloc),
+; données à partir de l'octet 20h. Pour chaque image k (0 à n, la dernière partielle) :
+; échantillons de k × fréquence / cadence + 20h sur (échantillons par image + 1), valeur =
+; somme × 1000 / nombre − 128 000 (imul eax, 3E8h / div / sub eax, 1F400h), table en +1Ch, 512
+; mots de 4 octets au plus, remplie d'abord de −2. Puis référence = la plus grande des valeurs
+; absolues du maximum et du minimum calculés sans l'entrée maximale et l'entrée minimale
+; (CRT_NormalizeSign32 = valeur absolue 32 bits) ; chaque entrée devient p = (référence −
+; |entrée sur 16 bits|) × 100 / référence (sub_2CD = valeur absolue 16 bits) puis une bouche :
+; p ≥ 95 → −1 (pas de bouche), ≥ 78 → 8, ≥ 65 → 3, ≥ 42 → 2, ≥ 25 → 10, sinon 11.
+; ==============================================================================================
+VoicePlayer_LoadWithLipSync_7D52	proc far		; CODE XREF: TalkingHead_AttachVoice_9CF7+25P
 
 var_49		= byte ptr -49h
 var_48		= dword	ptr -48h
@@ -517,7 +531,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_8252
 ; ���������������������������������������������������������������������������
 
-loc_7D6C:				; CODE XREF: sub_7D52+15j
+loc_7D6C:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+15j
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_44], ax
 		mov	bx, [bp+var_44]
@@ -567,13 +581,13 @@ loc_7D6C:				; CODE XREF: sub_7D52+15j
 		jmp	short loc_7E1D
 ; ���������������������������������������������������������������������������
 
-loc_7E0B:				; CODE XREF: sub_7D52+D3j
+loc_7E0B:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+D3j
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		mov	dword ptr [bx+si+1Ch], 0FFFFFFFEh
 		inc	[bp+var_1C]
 
-loc_7E1D:				; CODE XREF: sub_7D52+B7j
+loc_7E1D:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+B7j
 		cmp	[bp+var_1C], 200h
 		jl	short loc_7E0B
 		les	bx, [bp+var_4]
@@ -594,7 +608,7 @@ loc_7E1D:				; CODE XREF: sub_7D52+B7j
 		jmp	loc_8027
 ; ���������������������������������������������������������������������������
 
-loc_7E68:				; CODE XREF: sub_7D52+2DFj
+loc_7E68:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+2DFj
 		mov	[bp+var_24], 0F423Fh
 		mov	[bp+var_28], 0
 		mov	[bp+var_20], 0
@@ -612,13 +626,13 @@ loc_7E68:				; CODE XREF: sub_7D52+2DFj
 		jmp	loc_7F69
 ; ���������������������������������������������������������������������������
 
-loc_7EB0:				; CODE XREF: sub_7D52+159j
+loc_7EB0:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+159j
 		mov	eax, [bp+var_38]
 		mov	[bp+var_1C], eax
 		jmp	short loc_7F11
 ; ���������������������������������������������������������������������������
 
-loc_7EBA:				; CODE XREF: sub_7D52+1CBj
+loc_7EBA:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+1CBj
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -629,7 +643,7 @@ loc_7EBA:				; CODE XREF: sub_7D52+1CBj
 		movzx	eax, byte ptr es:[bx]
 		mov	[bp+var_28], eax
 
-loc_7EDA:				; CODE XREF: sub_7D52+177j
+loc_7EDA:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+177j
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -640,7 +654,7 @@ loc_7EDA:				; CODE XREF: sub_7D52+177j
 		movzx	eax, byte ptr es:[bx]
 		mov	[bp+var_24], eax
 
-loc_7EFA:				; CODE XREF: sub_7D52+197j
+loc_7EFA:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+197j
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -648,7 +662,7 @@ loc_7EFA:				; CODE XREF: sub_7D52+197j
 		inc	[bp+var_20]
 		inc	[bp+var_1C]
 
-loc_7F11:				; CODE XREF: sub_7D52+166j
+loc_7F11:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+166j
 		mov	eax, [bp+var_38]
 		add	eax, [bp+var_10]
 		cmp	eax, [bp+var_1C]
@@ -666,12 +680,12 @@ loc_7F11:				; CODE XREF: sub_7D52+166j
 		jmp	short loc_7F56
 ; ���������������������������������������������������������������������������
 
-loc_7F49:				; CODE XREF: sub_7D52+1D2j
+loc_7F49:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+1D2j
 		mov	bx, di
 		shl	bx, 2
 		mov	dword ptr [bx+si+1Ch], 0
 
-loc_7F56:				; CODE XREF: sub_7D52+1F5j
+loc_7F56:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+1F5j
 		mov	ax, word ptr [bp+var_28]
 		sub	ax, word ptr [bp+var_24]
 		mov	[bp+var_3E], ax
@@ -679,23 +693,23 @@ loc_7F56:				; CODE XREF: sub_7D52+1F5j
 		jge	short loc_7F66
 		inc	di
 
-loc_7F66:				; CODE XREF: sub_7D52+211j
+loc_7F66:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+211j
 		jmp	loc_8023
 ; ���������������������������������������������������������������������������
 
-loc_7F69:				; CODE XREF: sub_7D52+15Bj
+loc_7F69:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+15Bj
 		cmp	[bp+var_30], 0
 		jg	short loc_7F73
 		jmp	loc_8023
 ; ���������������������������������������������������������������������������
 
-loc_7F73:				; CODE XREF: sub_7D52+21Cj
+loc_7F73:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+21Cj
 		mov	eax, [bp+var_38]
 		mov	[bp+var_1C], eax
 		jmp	short loc_7FD4
 ; ���������������������������������������������������������������������������
 
-loc_7F7D:				; CODE XREF: sub_7D52+28Ej
+loc_7F7D:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+28Ej
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -706,7 +720,7 @@ loc_7F7D:				; CODE XREF: sub_7D52+28Ej
 		movzx	eax, byte ptr es:[bx]
 		mov	[bp+var_28], eax
 
-loc_7F9D:				; CODE XREF: sub_7D52+23Aj
+loc_7F9D:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+23Aj
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -717,7 +731,7 @@ loc_7F9D:				; CODE XREF: sub_7D52+23Aj
 		movzx	eax, byte ptr es:[bx]
 		mov	[bp+var_24], eax
 
-loc_7FBD:				; CODE XREF: sub_7D52+25Aj
+loc_7FBD:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+25Aj
 		les	bx, [bp+var_4]
 		add	bx, word ptr [bp+var_1C]
 		movzx	eax, byte ptr es:[bx]
@@ -725,7 +739,7 @@ loc_7FBD:				; CODE XREF: sub_7D52+25Aj
 		inc	[bp+var_20]
 		inc	[bp+var_1C]
 
-loc_7FD4:				; CODE XREF: sub_7D52+229j
+loc_7FD4:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+229j
 		mov	eax, [bp+var_C]
 		add	eax, 20h ; ' '
 		cmp	eax, [bp+var_1C]
@@ -743,36 +757,36 @@ loc_7FD4:				; CODE XREF: sub_7D52+229j
 		jmp	short loc_8019
 ; ���������������������������������������������������������������������������
 
-loc_800C:				; CODE XREF: sub_7D52+295j
+loc_800C:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+295j
 		mov	bx, di
 		shl	bx, 2
 		mov	dword ptr [bx+si+1Ch], 0
 
-loc_8019:				; CODE XREF: sub_7D52+2B8j
+loc_8019:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+2B8j
 		mov	ax, word ptr [bp+var_28]
 		sub	ax, word ptr [bp+var_24]
 		mov	[bp+var_3E], ax
 		inc	di
 
-loc_8023:				; CODE XREF: sub_7D52:loc_7F66j
-					; sub_7D52+21Ej
+loc_8023:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52:loc_7F66j
+					; VoicePlayer_LoadWithLipSync_7D52+21Ej
 		inc	[bp+var_34]
 
-loc_8027:				; CODE XREF: sub_7D52+113j
+loc_8027:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+113j
 		mov	eax, [bp+var_34]
 		cmp	eax, [bp+var_2C]
 		jg	short loc_8034
 		jmp	loc_7E68
 ; ���������������������������������������������������������������������������
 
-loc_8034:				; CODE XREF: sub_7D52+2DDj
+loc_8034:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+2DDj
 		mov	[bp+var_24], 270Fh
 		mov	[bp+var_28], 0FFFFD8F1h
 		mov	[bp+var_1C], 0
 		jmp	short loc_809A
 ; ���������������������������������������������������������������������������
 
-loc_804E:				; CODE XREF: sub_7D52+350j
+loc_804E:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+350j
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		mov	eax, [bx+si+1Ch]
@@ -785,7 +799,7 @@ loc_804E:				; CODE XREF: sub_7D52+350j
 		mov	ax, word ptr [bp+var_1C]
 		mov	[bp+var_3C], ax
 
-loc_8072:				; CODE XREF: sub_7D52+30Aj
+loc_8072:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+30Aj
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		mov	eax, [bx+si+1Ch]
@@ -798,10 +812,10 @@ loc_8072:				; CODE XREF: sub_7D52+30Aj
 		mov	ax, word ptr [bp+var_1C]
 		mov	[bp+var_3A], ax
 
-loc_8096:				; CODE XREF: sub_7D52+32Ej
+loc_8096:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+32Ej
 		inc	[bp+var_1C]
 
-loc_809A:				; CODE XREF: sub_7D52+2FAj
+loc_809A:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+2FAj
 		movsx	eax, di
 		cmp	eax, [bp+var_1C]
 		jg	short loc_804E
@@ -811,7 +825,7 @@ loc_809A:				; CODE XREF: sub_7D52+2FAj
 		jmp	short loc_8114
 ; ���������������������������������������������������������������������������
 
-loc_80BE:				; CODE XREF: sub_7D52+3CAj
+loc_80BE:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+3CAj
 		movsx	eax, [bp+var_3A]
 		cmp	eax, [bp+var_1C]
 		jz	short loc_8110
@@ -828,7 +842,7 @@ loc_80BE:				; CODE XREF: sub_7D52+3CAj
 		mov	eax, [bx+si+1Ch]
 		mov	[bp+var_28], eax
 
-loc_80F2:				; CODE XREF: sub_7D52+390j
+loc_80F2:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+390j
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		mov	eax, [bx+si+1Ch]
@@ -839,11 +853,11 @@ loc_80F2:				; CODE XREF: sub_7D52+390j
 		mov	eax, [bx+si+1Ch]
 		mov	[bp+var_24], eax
 
-loc_8110:				; CODE XREF: sub_7D52+375j
-					; sub_7D52+380j ...
+loc_8110:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+375j
+					; VoicePlayer_LoadWithLipSync_7D52+380j ...
 		inc	[bp+var_1C]
 
-loc_8114:				; CODE XREF: sub_7D52+36Aj
+loc_8114:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+36Aj
 		movsx	eax, di
 		cmp	eax, [bp+var_1C]
 		jg	short loc_80BE
@@ -870,7 +884,7 @@ loc_8114:				; CODE XREF: sub_7D52+36Aj
 		jmp	short loc_8185
 ; ���������������������������������������������������������������������������
 
-loc_816C:				; CODE XREF: sub_7D52+3FDj
+loc_816C:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+3FDj
 		push	large [bp+var_24]
 		call	CRT_NormalizeSign32
 		shl	eax, 10h
@@ -878,16 +892,16 @@ loc_816C:				; CODE XREF: sub_7D52+3FDj
 		add	sp, 4
 		mov	[bp+var_42], eax
 
-loc_8185:				; CODE XREF: sub_7D52+418j
+loc_8185:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+418j
 		mov	[bp+var_1C], 0
 		jmp	loc_8243
 ; ���������������������������������������������������������������������������
 
-loc_8190:				; CODE XREF: sub_7D52+4FBj
+loc_8190:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+4FBj
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		push	word ptr [bx+si+1Ch]
-		call	sub_2CD
+		call	CRT_Abs16_2CD
 		add	sp, 2
 		movsx	eax, ax
 		push	eax
@@ -906,7 +920,7 @@ loc_8190:				; CODE XREF: sub_7D52+4FBj
 		jmp	short loc_823F
 ; ���������������������������������������������������������������������������
 
-loc_81D5:				; CODE XREF: sub_7D52+471j
+loc_81D5:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+471j
 		cmp	[bp+var_18], 4Eh ; 'N'
 		jl	short loc_81EC
 		mov	bx, word ptr [bp+var_1C]
@@ -915,7 +929,7 @@ loc_81D5:				; CODE XREF: sub_7D52+471j
 		jmp	short loc_823F
 ; ���������������������������������������������������������������������������
 
-loc_81EC:				; CODE XREF: sub_7D52+488j
+loc_81EC:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+488j
 		cmp	[bp+var_18], 41h ; 'A'
 		jl	short loc_8203
 		mov	bx, word ptr [bp+var_1C]
@@ -924,7 +938,7 @@ loc_81EC:				; CODE XREF: sub_7D52+488j
 		jmp	short loc_823F
 ; ���������������������������������������������������������������������������
 
-loc_8203:				; CODE XREF: sub_7D52+49Fj
+loc_8203:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+49Fj
 		cmp	[bp+var_18], 2Ah ; '*'
 		jl	short loc_821A
 		mov	bx, word ptr [bp+var_1C]
@@ -933,7 +947,7 @@ loc_8203:				; CODE XREF: sub_7D52+49Fj
 		jmp	short loc_823F
 ; ���������������������������������������������������������������������������
 
-loc_821A:				; CODE XREF: sub_7D52+4B6j
+loc_821A:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+4B6j
 		cmp	[bp+var_18], 19h
 		jl	short loc_8231
 		mov	bx, word ptr [bp+var_1C]
@@ -942,31 +956,31 @@ loc_821A:				; CODE XREF: sub_7D52+4B6j
 		jmp	short loc_823F
 ; ���������������������������������������������������������������������������
 
-loc_8231:				; CODE XREF: sub_7D52+4CDj
+loc_8231:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+4CDj
 		mov	bx, word ptr [bp+var_1C]
 		shl	bx, 2
 		mov	dword ptr [bx+si+1Ch], 0Bh
 
-loc_823F:				; CODE XREF: sub_7D52+481j
-					; sub_7D52+498j ...
+loc_823F:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+481j
+					; VoicePlayer_LoadWithLipSync_7D52+498j ...
 		inc	[bp+var_1C]
 
-loc_8243:				; CODE XREF: sub_7D52+43Bj
+loc_8243:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+43Bj
 		movsx	eax, di
 		cmp	eax, [bp+var_1C]
 		jle	short loc_8250
 		jmp	loc_8190
 ; ���������������������������������������������������������������������������
 
-loc_8250:				; CODE XREF: sub_7D52+4F9j
+loc_8250:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+4F9j
 		xor	di, di
 
-loc_8252:				; CODE XREF: sub_7D52+17j
+loc_8252:				; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+17j
 		pop	di
 		pop	si
 		leave
 		retf
-sub_7D52	endp
+VoicePlayer_LoadWithLipSync_7D52	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1215,7 +1229,7 @@ sub_83FE	endp
 ; temps écoulé du chronomètre +2076 (sub_3EFDF) × +26 / 60 ; indice < 512 : mot de la table en
 ; +28 + indice × 4 ; sinon -2 (fin). Le remplissage de cette table n'est pas lu.
 ; ==============================================================================================
-VoicePlayer_GetLipFrame_8466	proc far		; CODE XREF: sub_9C64+25P seg014:0C49P
+VoicePlayer_GetLipFrame_8466	proc far		; CODE XREF: TalkingHead_StartVoiceAndIsSpeaking_9C64+25P seg014:0C49P
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -1232,7 +1246,7 @@ arg_0		= word ptr  6
 		mov	ax, si
 		add	ax, 81Ch
 		push	ax
-		call	sub_3EFDF
+		call	Stopwatch_Elapsed_3EFDF
 		shl	eax, 10h
 		shrd	eax, edx, 10h
 		add	sp, 2
@@ -1271,7 +1285,13 @@ VoicePlayer_GetLipFrame_8466	endp
 
 ; Attributes: bp-based frame
 
-sub_84CC	proc far		; CODE XREF: Midgame1_PlayPart1_5FCF0+642EP
+; ==============================================================================================
+; far, LUE 2026-10-21. Vrai quand la réplique du lecteur de voix est finie : sans pilote
+; ([si+2] = 0) renvoie 1 ; sinon appelle sub_30BD0 (fonction 124 du pilote son,
+; AIL_VOC_playback_status, mov ax, 7Ch / jmp AIL_call_driver_3041C) et renvoie 1 si l'état
+; vaut 3 (DAC_DONE d'AIL.INC), 0 sinon (cmp ax, 3).
+; ==============================================================================================
+VoicePlayer_IsDone_84CC	proc far		; CODE XREF: Midgame1_PlayPart1_5FCF0+642EP
 					; DATA XREF: dseg:186Fo
 
 arg_0		= word ptr  6
@@ -1286,7 +1306,7 @@ arg_0		= word ptr  6
 		jz	short loc_84F8
 		mov	bx, [si+2]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		cmp	ax, 3
 		jnz	short loc_84F1
@@ -1294,10 +1314,10 @@ arg_0		= word ptr  6
 		jmp	short loc_84F3
 ; ���������������������������������������������������������������������������
 
-loc_84F1:				; CODE XREF: sub_84CC+1Ej
+loc_84F1:				; CODE XREF: VoicePlayer_IsDone_84CC+1Ej
 		xor	ax, ax
 
-loc_84F3:				; CODE XREF: sub_84CC+23j
+loc_84F3:				; CODE XREF: VoicePlayer_IsDone_84CC+23j
 		pop	si
 		pop	bp
 		retf
@@ -1305,27 +1325,33 @@ loc_84F3:				; CODE XREF: sub_84CC+23j
 		jmp	short loc_84FD
 ; ���������������������������������������������������������������������������
 
-loc_84F8:				; CODE XREF: sub_84CC+Bj
+loc_84F8:				; CODE XREF: VoicePlayer_IsDone_84CC+Bj
 		mov	al, 1
 		pop	si
 		pop	bp
 		retf
-sub_84CC	endp
+VoicePlayer_IsDone_84CC	endp
 
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR sub_84CC
+; START	OF FUNCTION CHUNK FOR VoicePlayer_IsDone_84CC
 
-loc_84FD:				; CODE XREF: sub_84CC+2Aj
+loc_84FD:				; CODE XREF: VoicePlayer_IsDone_84CC+2Aj
 		pop	si
 		pop	bp
 		retf
-; END OF FUNCTION CHUNK	FOR sub_84CC
+; END OF FUNCTION CHUNK	FOR VoicePlayer_IsDone_84CC
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_8500	proc far		; CODE XREF: sub_6B9C0+1308P
+; ==============================================================================================
+; far, LUE 2026-10-21. Vrai pendant la lecture de la réplique : sans pilote ([si+2] = 0)
+; renvoie 0 ; sinon appelle sub_30BD0 (AIL_VOC_playback_status, fonction 124 du pilote son) et
+; renvoie 1 si l'état vaut 2 (DAC_PLAYING d'AIL.INC), 0 sinon (cmp ax, 2). Utilisée par la
+; cinématique mid2 (sub_6B9C0) pour attendre la fin d'une réplique (tant que en cours).
+; ==============================================================================================
+VoicePlayer_IsPlaying_8500	proc far		; CODE XREF: sub_6B9C0+1308P
 					; sub_6B9C0+15C0P ...
 
 arg_0		= word ptr  6
@@ -1340,7 +1366,7 @@ arg_0		= word ptr  6
 		jz	short loc_852C
 		mov	bx, [si+2]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		cmp	ax, 2
 		jnz	short loc_8525
@@ -1348,10 +1374,10 @@ arg_0		= word ptr  6
 		jmp	short loc_8527
 ; ���������������������������������������������������������������������������
 
-loc_8525:				; CODE XREF: sub_8500+1Ej
+loc_8525:				; CODE XREF: VoicePlayer_IsPlaying_8500+1Ej
 		xor	ax, ax
 
-loc_8527:				; CODE XREF: sub_8500+23j
+loc_8527:				; CODE XREF: VoicePlayer_IsPlaying_8500+23j
 		pop	si
 		pop	bp
 		retf
@@ -1359,21 +1385,21 @@ loc_8527:				; CODE XREF: sub_8500+23j
 		jmp	short loc_8531
 ; ���������������������������������������������������������������������������
 
-loc_852C:				; CODE XREF: sub_8500+Bj
+loc_852C:				; CODE XREF: VoicePlayer_IsPlaying_8500+Bj
 		mov	al, 0
 		pop	si
 		pop	bp
 		retf
-sub_8500	endp
+VoicePlayer_IsPlaying_8500	endp
 
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR sub_8500
+; START	OF FUNCTION CHUNK FOR VoicePlayer_IsPlaying_8500
 
-loc_8531:				; CODE XREF: sub_8500+2Aj
+loc_8531:				; CODE XREF: VoicePlayer_IsPlaying_8500+2Aj
 		pop	si
 		pop	bp
 		retf
-; END OF FUNCTION CHUNK	FOR sub_8500
+; END OF FUNCTION CHUNK	FOR VoicePlayer_IsPlaying_8500
 ; ���������������������������������������������������������������������������
 
 loc_8534:				; DATA XREF: dseg:1877o
@@ -1385,7 +1411,7 @@ loc_8534:				; DATA XREF: dseg:1877o
 		jz	short loc_8560
 		mov	bx, [si+2]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		cmp	ax, 1
 		jnz	short loc_8559
@@ -1426,7 +1452,7 @@ loc_8568:				; DATA XREF: dseg:187Bo
 		jz	short loc_8593
 		mov	bx, [si+2]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		or	ax, ax
 		jnz	short loc_858C

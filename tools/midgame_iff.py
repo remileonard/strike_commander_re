@@ -84,7 +84,7 @@ def subtitle_map(data):
             if v.get('t') == 'si' and 'alors' in v and 'sinon' in v:
                 voices = [n['args']['entrée'] for n in ops(v['alors'])
                           if n.get('op') == 'charge' and n.get('args', {}).get('pak', '').endswith('voc')]
-                texts = [re.search(r'\[(\d+)\]', ' '.join(n['texte'])) for n in ops(v['sinon'])
+                texts = [re.search(r'(textes\d+)\[(\d+)\]', ' '.join(n['texte'])) for n in ops(v['sinon'])
                          if str(n.get('op', '')).startswith('sous_titre')]
                 colours = []
                 for n in ops(v['sinon']):
@@ -93,7 +93,7 @@ def subtitle_map(data):
                     elif str(n.get('nom', '')).endswith('.couleur'):
                         colours.append(n['args'][0])
                 if voices and texts and texts[0]:
-                    found[voices[0]] = (int(texts[0].group(1)), colours[0] if colours else 15)
+                    found[voices[0]] = ((texts[0].group(1), int(texts[0].group(2))), colours[0] if colours else 15)
             for x in v.values():
                 walk(x)
         elif isinstance(v, list):
@@ -101,6 +101,35 @@ def subtitle_map(data):
                 walk(x)
     walk(data)
     return found
+
+
+def text_arrays(data):
+    """Tableau de textes → FORM d'où il est lu (`iff_form` puis `iff_lit` dans un tableau), y compris
+    dans les branches que la simulation ne prend pas (textes lus seulement sans voix). L'élément i du
+    tableau est le i-ème TEXT du FORM, quand le tableau est le premier lu dans ce FORM."""
+    arrays = {}
+    seen_forms = set()
+    state = {'form': None}
+
+    def walk(v):
+        if isinstance(v, dict):
+            if v.get('op') == 'iff_form':
+                m = re.search(r"'(\w{4})'", ' '.join(v.get('texte', [])))
+                if m and m.group(1) != 'DATA':
+                    state['form'] = m.group(1)
+            if v.get('op') == 'iff_lit' and state['form']:
+                m = re.search(r'(textes\d+)\[', ' '.join(v.get('texte', [])))
+                if m and m.group(1) not in arrays:
+                    arrays[m.group(1)] = state['form'] if state['form'] not in seen_forms else None
+                    seen_forms.add(state['form'])
+            for k in ('alors', 'sinon', 'corps', 'parties', 'arbre'):
+                if k in v:
+                    walk(v[k])
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(data['parties'])
+    return arrays
 
 
 def archive_path(pak):
@@ -143,6 +172,63 @@ class Layer:
         self.blink = True
         self.jx = 0
         self.jy = 0
+        # Mode voix de la tête parlante (TalkingHead_AttachVoice_9CF7).
+        self.voice = None
+        self.voice_armed = False
+        self.voice_started = False
+        self.voice_calls = 0
+        self.voice_k = 0
+        self.lip_table = None
+
+
+def lip_table(voc, fps):
+    """Table de bouches d'une réplique, comme VoicePlayer_LoadWithLipSync_7D52 : une valeur par
+    image de scène (moyenne des échantillons − 128, × 1000), rapportée à la plus grande valeur
+    absolue hors extrêmes, puis 6 niveaux de bouche (−1 = pas de bouche)."""
+    rate = 1000000 // (256 - voc[0x1E])
+    per = rate // fps
+    total = (struct.unpack_from('<I', voc, 0x1A)[0] >> 8) - 2
+    full = total // per
+    rest = total - full * per
+    table = []
+    for k in range(full + 1):
+        start = k * rate // fps + 0x20
+        if k < full:
+            stop = start + per + 1
+        elif rest > 0:
+            stop = total + 0x20
+        else:
+            continue
+        samples = voc[start:stop]
+        if samples:
+            table.append(sum(samples) * 1000 // len(samples) - 128000)
+        else:
+            table.append(0)
+        if len(table) >= 512:
+            break
+    if not table:
+        return []
+    imax = max(range(len(table)), key=lambda i: table[i])
+    imin = min(range(len(table)), key=lambda i: table[i])
+    rest_values = [v for i, v in enumerate(table) if i not in (imax, imin)] or table
+    ref = max(abs(max(rest_values)), abs(min(rest_values))) or 1
+    out = []
+    for v in table:
+        low = ((v & 0xFFFF) ^ 0x8000) - 0x8000
+        pct = int((ref - abs(low)) * 100 / ref)
+        if pct >= 95:
+            out.append(-1)
+        elif pct >= 78:
+            out.append(8)
+        elif pct >= 65:
+            out.append(3)
+        elif pct >= 42:
+            out.append(2)
+        elif pct >= 25:
+            out.append(10)
+        else:
+            out.append(11)
+    return out
 
 
 class Scene:
@@ -188,10 +274,12 @@ class Player:
         # les boucles qui attendent une fin sont simulées sur MAX_OPEN_FRAMES images.
         self.image_count = None
         self.voice_seconds = None
+        self.voice_bytes = None
         self.clock = 0.0
         self.voice_end = 0.0
         self.subtitles = None
         self.subtitle = None
+        self.text_arrays = text_arrays(data)
         self.screen_offsets = screen_offsets(data)
 
     # ------------------------------------------------------------------ valeurs
@@ -307,9 +395,22 @@ class Player:
                 # AnimLayer_IsFinished_2E654 : image courante == nombre d'images.
                 return 1 if self.layers[m.group(1)].image == n else 0
             return Marker('animation', m.group(1))
-        if re.match(r'^(voix\d+\.finie\(\)|voix_finie .*)$', text):
+        if re.match(r'^(voix\d+\.finie\(\)|voix_finie\b.*)$', text):
             if self.voice_seconds:
                 return 1 if self.clock >= self.voice_end else 0
+            return Marker('voix')
+        if text == 'CRT_Rand()':
+            # Tirage du jeu (0 à 32 767) : suite fixe ici, le jeu tire au hasard à chaque partie.
+            if not hasattr(self, 'crt_rng'):
+                self.crt_rng = random.Random('CRT_Rand')
+            return self.crt_rng.randrange(32768)
+        m = re.match(r'^tête_parle\(tête=(\w+)\)$', text)
+        if m:
+            return self.head_speaking(self.layers[m.group(1)])
+        if re.match(r'^voix_en_cours\b.*$', text):
+            # VoicePlayer_IsPlaying_8500 : vrai tant que la réplique joue.
+            if self.voice_seconds:
+                return 1 if self.clock < self.voice_end else 0
             return Marker('voix')
         m = re.match(r'^(\w+)\.y_absolu\(\)$', text)
         if m and m.group(1) in self.layers:
@@ -334,6 +435,15 @@ class Player:
         o = self.objects.get(obj)
         if o and o['genre'] == 'channel' and field == '+0':
             return 1 if obj in self.channels else 0
+        if o and o['genre'] == 'res':
+            # Case de pile d'une ressource réutilisée comme variable par la cinématique (mid2 :
+            # compteur var_188 dans la case de mid2voc 9). L'extracteur ne voit pas cette réutilisation :
+            # la valeur écrite est perdue, lue ici comme 0.
+            key = f'{obj}.{field}'
+            if key not in self.env:
+                self.warn(f'champ de ressource lu comme variable : {o.get("contenu")} {field}, pris à 0')
+                self.env[key] = 0
+            return self.env[key]
         return None
 
     def set_field(self, obj, field, value):
@@ -607,6 +717,14 @@ class Player:
             text = self.ev(args['texte'])
             layer.lips = (text[1] if isinstance(text, tuple) else '').lower()
             layer.cursor = 0
+        elif name == 'tête_voix':
+            layer = self.layers[args['tête']['objet']]
+            layer.voice = self.resource(args['ressource'])
+            layer.voice_armed = True
+            layer.voice_calls = 0
+            layer.voice_started = False
+            if self.voice_bytes:
+                layer.lip_table = lip_table(self.voice_bytes(layer.voice), self.ev(args['cadence']))
         elif name.startswith('voix_charge'):
             self.voice_res = self.resource(args['ressource'])
         elif name.startswith('voix_joue'):
@@ -674,12 +792,36 @@ class Player:
 
     def play_voice(self):
         if self.voice_res is not None:
-            self.pending['sounds'].append(self.voice_res[2])
+            self.pending['sounds'].append((self.voice_res[1], self.voice_res[2]))
             if self.voice_seconds:
                 self.voice_end = self.clock + self.voice_seconds(self.voice_res)
-            if self.subtitles and self.voice_res[2] in self.subtitles:
-                index, colour = self.subtitles[self.voice_res[2]]
-                self.subtitle = (index, colour, self.voice_end)
+            self.start_subtitle(self.voice_res, self.voice_end)
+
+    def start_subtitle(self, res, end):
+        if self.subtitles and res[2] in self.subtitles:
+            ref, colour = self.subtitles[res[2]]
+            form, index = self.text_keys.get(ref, (None, None))
+            if form is None and self.text_arrays.get(ref[0]):
+                form, index = self.text_arrays[ref[0]], ref[1]
+            if form is None:
+                self.warn(f'sous-titre {ref} sans texte connu')
+                return
+            self.subtitle = (form, index, colour, end)
+
+    def head_speaking(self, layer):
+        """TalkingHead_StartVoiceAndIsSpeaking_9C64 : lance la réplique au premier appel, puis vrai
+        tant que la tête parle (remis à faux par advance_head)."""
+        if layer.lip_table is None:
+            return Marker('voix')
+        if layer.voice_calls == 0 and layer.voice_armed and not layer.voice_started:
+            layer.voice_started = True
+            layer.voice_k = 0
+            layer.voice_len = self.voice_seconds(layer.voice)
+            layer.mouth = layer.lip_table[0] if layer.lip_table else -1
+            self.pending['sounds'].append((layer.voice[1], layer.voice[2]))
+            self.start_subtitle(layer.voice, self.clock + layer.voice_len)
+        layer.voice_calls += 1
+        return 1 if layer.voice_started else 0
 
     def count_of(self, layer):
         if self.image_count is None or layer.res is None:
@@ -844,6 +986,19 @@ class Player:
             layer.shown = 12
         else:
             layer.shown = layer.base
+        if layer.voice_started:
+            # Mode voix (TalkingHead_Advance_9F5A) : bouche = table[temps écoulé × cadence] tant que
+            # la réplique joue ; fin de la réplique ou fin de table (−2) : mode voix coupé.
+            k = layer.voice_k
+            layer.voice_k += 1
+            playing = k / self.shot['fps'] < layer.voice_len if self.shot else True
+            lip = layer.lip_table[k] if k < len(layer.lip_table) else -2
+            if not playing or lip == -2:
+                layer.voice_started = False
+                layer.mouth = -1
+            else:
+                layer.mouth = lip
+            return
         text = layer.lips
         if not text or layer.cursor >= len(text):
             return
@@ -907,9 +1062,9 @@ class Player:
         for entry in p['sounds']:
             s['sounds'].append((len(s['frames']), entry))
         p['sounds'] = []
-        if self.subtitle and self.clock < self.subtitle[2]:
-            index, colour, _ = self.subtitle
-            items = items + [{'key': f'sous-titre{index}', 'kind': 'text', 'text': ('SPOK', index),
+        if self.subtitle and self.clock < self.subtitle[3]:
+            form, index, colour, _ = self.subtitle
+            items = items + [{'key': f'sous-titre{form}{index}', 'kind': 'text', 'text': (form, index),
                               'y': SUBTITLE_Y, 'align': 2, 'colour': colour}]
         s['frames'].append(items)
         self.clock += 1.0 / fps
@@ -1051,8 +1206,8 @@ def shot_chunk(shot, first_shot):
         out += chunk('SPRT', sprites)
     if texts:
         out += chunk('TEXT', texts)
-    for frame, entry in shot['sounds']:
-        out += chunk('SOND', text(archive_path('mid1voc')) + struct.pack('<HH', entry, frame))
+    for frame, (pak, entry) in shot['sounds']:
+        out += chunk('SOND', text(archive_path(pak)) + struct.pack('<HH', entry, frame))
     return chunk('SHOT', out)
 
 
@@ -1089,6 +1244,7 @@ def main():
     import midgame_render
     player.image_count = midgame_render.image_count
     player.voice_seconds = midgame_render.voice_seconds
+    player.voice_bytes = midgame_render.voice_bytes
     if subtitles:
         player.subtitles = subtitle_map(data)
         print('sous-titres (réplique → texte SPOK, couleur) :', player.subtitles)

@@ -498,9 +498,21 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
                     tout autre caractère (espace, ponctuation) → pas de bouche
 ```
 
-- **Bouche en mode voix.** La bouche est lue dans une table du lecteur de voix, indexée par le
-  temps écoulé depuis le début de la réplique (`VoicePlayer_GetLipFrame_8466`, 512 valeurs au
-  plus). Le remplissage de cette table n'a pas été lu.
+- **Bouche en mode voix** (lu le 2026-10-21, utilisé par mid2). `TalkingHead_AttachVoice_9CF7`
+  charge la réplique dans le lecteur de la tête et calcule sa table de bouches
+  (`VoicePlayer_LoadWithLipSync_7D52`), pour la cadence de la scène :
+  1. le son (VOC, premier bloc, octets non signés) est découpé en tranches d'une image de scène :
+     fréquence ÷ cadence échantillons, fréquence = 1 000 000 / (256 − octet 1Eh du VOC) ;
+  2. valeur d'une tranche = moyenne des échantillons − 128, × 1000 ;
+  3. référence = la plus grande valeur absolue, **sans** compter la tranche la plus haute ni la plus
+     basse ; p = (référence − |valeur|) × 100 / référence ;
+  4. bouche : p ≥ 95 → aucune, ≥ 78 → image 8, ≥ 65 → 3, ≥ 42 → 2, ≥ 25 → 10, sinon 11.
+
+  La boucle d'attente de la cinématique est `tant que TalkingHead_StartVoiceAndIsSpeaking_9C64` :
+  le premier appel lance la réplique, puis la fonction reste vraie jusqu'à ce que
+  `TalkingHead_Advance_9F5A` coupe le mode voix (réplique finie, `AIL_VOC_playback_status` ≠ en
+  cours, ou fin de table). À chaque image, la bouche = table[temps écoulé × cadence ÷ 60 tics]
+  (`VoicePlayer_GetLipFrame_8466`), 512 valeurs au plus.
 - **Dans mid1** (scène 9), la tête reçoit le texte « Back off, almost got tone. Blah blah blah »
   et le passage en mode voix n'a été vu nulle part : la bouche suit ce texte de remplissage
   pendant que la vraie réplique est jouée par un autre lecteur de voix. Dans la scène 18, aucun
@@ -958,6 +970,12 @@ numéros d'image.
 ---
 
 ## 11. À chercher dans les autres cinématiques
+
+**mid2 (2026-10-21)** : produite par les mêmes outils (`MID1_PLANS.md`, « Autres cinématiques »).
+Mécanismes nouveaux rencontrés : la voix testée « en cours » (`VoicePlayer_IsPlaying_8500`) et non
+« finie » (`VoicePlayer_IsDone_84CC`), la bouche en mode voix (§ 6.6), des tirages `CRT_Rand`
+(position de la tête, effets sonores au hasard) et des fondus de volume entre ambiances musicales
+(`AIL_set_relative_volume_30C66`, non exprimés dans le format).
 
 Les 10 autres fonctions (une par cinématique : `sub_6B9C0` mid2, `sub_71680` mid3, `sub_768F0`
 mid5, `sub_81470` mid12, `sub_8B630` mid15, `sub_94A30` mid16, `sub_98210` mid17, `sub_9E080`

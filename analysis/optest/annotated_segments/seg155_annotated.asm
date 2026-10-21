@@ -409,7 +409,7 @@ loc_3E1CB:				; CODE XREF: ConfigOption_ApplyAndDisplayB_3E1B3+ADj
 		mov	bx, ax
 		sub	dx, [bx+66DAh]
 		push	dx
-		call	sub_2CD
+		call	CRT_Abs16_2CD
 		pop	cx
 		mov	[bp+var_4], ax
 		mov	al, byte ptr [bp+var_2]
@@ -423,7 +423,7 @@ loc_3E1CB:				; CODE XREF: ConfigOption_ApplyAndDisplayB_3E1B3+ADj
 		mov	bx, ax
 		sub	dx, [bx+66DCh]
 		push	dx
-		call	sub_2CD
+		call	CRT_Abs16_2CD
 		pop	cx
 		mov	[bp+var_6], ax
 		mov	ax, [bp+var_4]

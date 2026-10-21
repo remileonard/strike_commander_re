@@ -367,7 +367,7 @@ arg_2		= byte ptr  8
 		jz	short loc_29E8C
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		mov	[bp+var_4], ax
 		cmp	[bp+var_4], 2
@@ -412,7 +412,7 @@ sub_29E4F	endp
 loc_29EA9:				; CODE XREF: seg064:0324j
 		mov	bx, [si+34h]
 		push	word ptr [bx+4]
-		call	sub_30BD0
+		call	AIL_VOC_playback_status_30BD0
 		add	sp, 2
 		mov	[bp-2],	ax
 		cmp	word ptr [bp-2], 2

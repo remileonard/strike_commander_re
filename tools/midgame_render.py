@@ -61,6 +61,10 @@ def voc_seconds(b):
     return samples / rate
 
 
+def voice_bytes(res):
+    return pak_entry(pak_path(res[1]), res[2])
+
+
 def voice_seconds(res):
     return voc_seconds(pak_entry(pak_path(res[1]), res[2]))
 
@@ -79,6 +83,7 @@ def run(exact=True, name=None, subtitles=None):
     if exact:
         p.image_count = image_count
         p.voice_seconds = voice_seconds
+        p.voice_bytes = voice_bytes
     if subtitles:
         p.subtitles = mg.subtitle_map(data)
     p.run(data['parties'][0]['arbre'])
@@ -307,9 +312,9 @@ def draw_subtitle(screen, it):
 def draw_items(screen, items, clip):
     for it in items:
         if it['kind'] == 'text':
-            if it['text'][0] == 'SPOK':
+            if it['key'].startswith('sous-titre'):
                 draw_subtitle(screen, it)
-            elif it['text'][0] and it['text'][0].startswith('MG'):
+            elif it['text'][0] == 'MG01':
                 draw_title(screen, it, clip)
             continue
         res = it['res']

@@ -746,7 +746,7 @@ loc_95048:				; CODE XREF: sub_94A30+611j
 		push	[bp+var_34E]
 		mov	bx, [bp+var_350]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2088,7 +2088,7 @@ loc_96069:				; CODE XREF: sub_94A30:loc_9605Cj
 loc_96076:				; CODE XREF: sub_94A30+15F5j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_96027
@@ -2176,7 +2176,7 @@ loc_9612D:				; CODE XREF: sub_94A30:loc_96120j
 loc_9613A:				; CODE XREF: sub_94A30+16C3j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_960F5
@@ -2255,7 +2255,7 @@ loc_961E1:				; CODE XREF: sub_94A30:loc_961D4j
 loc_961EE:				; CODE XREF: sub_94A30+1787j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_961B9
@@ -2343,7 +2343,7 @@ loc_962A5:				; CODE XREF: sub_94A30:loc_96298j
 loc_962B2:				; CODE XREF: sub_94A30+183Bj
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_9626D
@@ -2432,7 +2432,7 @@ loc_9636D:				; CODE XREF: sub_94A30:loc_96360j
 loc_9637A:				; CODE XREF: sub_94A30+18FFj
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_96331
@@ -2535,7 +2535,7 @@ loc_96466:				; CODE XREF: sub_94A30+1A29j
 loc_96473:				; CODE XREF: sub_94A30+19D0j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jz	short loc_96487
@@ -2619,7 +2619,7 @@ loc_96520:				; CODE XREF: sub_94A30:loc_96513j
 loc_9652D:				; CODE XREF: sub_94A30+1AE1j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_96513
@@ -4345,7 +4345,7 @@ loc_976AE:				; CODE XREF: sub_94A30+2C79j
 		push	[bp+var_BDE]
 		mov	bx, word ptr [bp+var_BE2+2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -4431,7 +4431,7 @@ loc_977E5:				; CODE XREF: sub_94A30+2DA8j
 loc_977F2:				; CODE XREF: sub_94A30+2D82j
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_977B4
@@ -4522,7 +4522,7 @@ loc_978C1:				; CODE XREF: sub_94A30+2E84j
 loc_978CE:				; CODE XREF: sub_94A30+2E5Ej
 		lea	ax, [bp+var_B76]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_97890

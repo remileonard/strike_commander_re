@@ -1501,10 +1501,15 @@ sub_30BC4	endp
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
-sub_30BD0	proc far		; CODE XREF: sub_84CC+13P sub_8500+13P ...
+; ==============================================================================================
+; far, LUE 2026-10-21. Fonction 124 du pilote son (mov ax, 7Ch / jmp AIL_call_driver_3041C) =
+; AIL_VOC_PB_STAT d'AIL.INC : état de la lecture numérique (DAC_STOPPED 0, DAC_PAUSED 1,
+; DAC_PLAYING 2, DAC_DONE 3).
+; ==============================================================================================
+AIL_VOC_playback_status_30BD0	proc far		; CODE XREF: VoicePlayer_IsDone_84CC+13P VoicePlayer_IsPlaying_8500+13P ...
 		mov	ax, 7Ch	; '|'
 		jmp	near ptr AIL_call_driver_3041C
-sub_30BD0	endp
+AIL_VOC_playback_status_30BD0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1686,10 +1691,16 @@ sub_30C5A	endp
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 
-sub_30C66	proc far		; CODE XREF: sub_8609+C5P sub_8705+9AP ...
+; ==============================================================================================
+; far, LUE 2026-10-21. Fonction 177 du pilote son (mov ax, 0B1h / jmp AIL_call_driver_3041C) =
+; AIL_SET_REL_VOL d'AIL.INC (AIL_set_relative_volume d'AIL.ASM) : volume relatif d'une
+; séquence musicale, atteint en un temps donné (arguments : pilote, séquence, volume, durée).
+; Utilisée par la cinématique mid2 pour fondre les ambiances musicales entre elles.
+; ==============================================================================================
+AIL_set_relative_volume_30C66	proc far		; CODE XREF: sub_8609+C5P sub_8705+9AP ...
 		mov	ax, 0B1h ; '�'
 		jmp	near ptr AIL_call_driver_3041C
-sub_30C66	endp
+AIL_set_relative_volume_30C66	endp
 
 ; ���������������������������������������������������������������������������
 		mov	ax, 0B2h ; '�'

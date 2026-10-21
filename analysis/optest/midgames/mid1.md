@@ -827,7 +827,7 @@ si v29 != 0 :
     charge(mid1voc 0)                                                                                 ⟨211447⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 0)                                  ⟨211453⟩
     voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                                   ⟨211458⟩
-    tant que voix_finie (sub_84CC, non lue)(voix=voix1) == 0 :
+    tant que voix_finie(voix=voix1) == 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨211466⟩
         c54.image = scène6.compteur & 1                                                               ⟨211472⟩
     si v29 != 0 :

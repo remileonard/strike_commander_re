@@ -1347,7 +1347,7 @@ loc_82250:				; CODE XREF: sub_81470+DDBj
 		push	[bp+var_2F2]
 		mov	bx, [bp+var_2F4]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2110,7 +2110,7 @@ loc_82AF4:				; CODE XREF: sub_81470:loc_82AE7j
 loc_82B01:				; CODE XREF: sub_81470+1675j
 		lea	ax, [bp+var_B1A]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_82AE7
@@ -2737,7 +2737,7 @@ loc_831BC:				; CODE XREF: sub_81470+1D47j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_83227
@@ -2774,7 +2774,7 @@ loc_8323D:				; CODE XREF: sub_81470:loc_83230j
 
 loc_8324A:				; CODE XREF: sub_81470+1DBEj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_83230
@@ -2800,7 +2800,7 @@ loc_8325A:				; CODE XREF: sub_81470+1DCBj
 		lea	ax, [bp+var_F6]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_832C6
@@ -2837,7 +2837,7 @@ loc_832DC:				; CODE XREF: sub_81470:loc_832CFj
 
 loc_832E9:				; CODE XREF: sub_81470+1E5Dj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_832CF
@@ -2877,7 +2877,7 @@ loc_83312:				; CODE XREF: sub_81470+1E8Fj
 		lea	ax, [bp+var_100]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_83385
@@ -2914,7 +2914,7 @@ loc_8339B:				; CODE XREF: sub_81470:loc_8338Ej
 
 loc_833A8:				; CODE XREF: sub_81470+1F1Cj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_8338E
@@ -3485,7 +3485,7 @@ loc_83952:				; CODE XREF: sub_81470+24DDj
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_839BD
@@ -3557,7 +3557,7 @@ loc_83A33:				; CODE XREF: sub_81470:loc_83A26j
 
 loc_83A40:				; CODE XREF: sub_81470+255Aj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jz	short loc_83A53
@@ -4168,7 +4168,7 @@ loc_84063:				; CODE XREF: sub_81470+2BEEj
 		lea	ax, [bp+var_106]
 		push	ax
 		push	[bp+var_FC]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_10A+2], 0
 		jmp	short loc_840CE
@@ -4205,7 +4205,7 @@ loc_840E4:				; CODE XREF: sub_81470:loc_840D7j
 
 loc_840F1:				; CODE XREF: sub_81470+2C65j
 		push	[bp+var_FC]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_840D7
@@ -4755,7 +4755,7 @@ loc_8462D:				; CODE XREF: sub_81470+31B9j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_84691
@@ -4808,7 +4808,7 @@ loc_846E9:				; CODE XREF: sub_81470:loc_8469Aj
 
 loc_846F6:				; CODE XREF: sub_81470+3228j
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_8469A
@@ -5476,7 +5476,7 @@ loc_84D61:				; CODE XREF: sub_81470:loc_84D54j
 loc_84D6E:				; CODE XREF: sub_81470+38BCj
 		lea	ax, [bp+var_B1A]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_84D2E
@@ -5541,7 +5541,7 @@ loc_84E01:				; CODE XREF: sub_81470:loc_84DF4j
 loc_84E0E:				; CODE XREF: sub_81470+3982j
 		lea	ax, [bp+var_B1A]
 		push	ax
-		call	sub_8500
+		call	VoicePlayer_IsPlaying_8500
 		add	sp, 2
 		or	al, al
 		jnz	short loc_84DF4
@@ -6626,7 +6626,7 @@ loc_858A9:				; CODE XREF: sub_81470+4434j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_85914
@@ -6663,7 +6663,7 @@ loc_8592A:				; CODE XREF: sub_81470:loc_8591Dj
 
 loc_85937:				; CODE XREF: sub_81470+44ABj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_8591D
@@ -6963,7 +6963,7 @@ loc_85C09:				; CODE XREF: sub_81470+4795j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_85C6D
@@ -7016,7 +7016,7 @@ loc_85CC5:				; CODE XREF: sub_81470:loc_85C76j
 
 loc_85CD2:				; CODE XREF: sub_81470+4804j
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_85C76
@@ -7316,7 +7316,7 @@ loc_85FBC:				; CODE XREF: sub_81470+4B47j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_86027
@@ -7353,7 +7353,7 @@ loc_8603D:				; CODE XREF: sub_81470:loc_86030j
 
 loc_8604A:				; CODE XREF: sub_81470+4BBEj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_86030
@@ -7629,7 +7629,7 @@ loc_862F4:				; CODE XREF: sub_81470+4E7Fj
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_8635F
@@ -7682,7 +7682,7 @@ loc_863B7:				; CODE XREF: sub_81470:loc_86368j
 
 loc_863C4:				; CODE XREF: sub_81470+4EF6j
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_86368
@@ -8091,7 +8091,7 @@ loc_867BD:				; CODE XREF: sub_81470+5348j
 		lea	ax, [bp+var_EC+2]
 		push	ax
 		push	word ptr [bp+var_E2+2]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp+var_EC], 0
 		jmp	short loc_86828
@@ -8128,7 +8128,7 @@ loc_8683E:				; CODE XREF: sub_81470:loc_86831j
 
 loc_8684B:				; CODE XREF: sub_81470+53BFj
 		push	word ptr [bp+var_E2+2]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_86831
@@ -8883,7 +8883,7 @@ loc_87079:				; CODE XREF: sub_81470+5CF6j
 		push	[bp+var_B82]
 		mov	bx, word ptr [bp+var_B86+2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -9200,7 +9200,7 @@ loc_8740C:				; CODE XREF: sub_81470+606Fj
 		push	[bp+var_B82]
 		mov	bx, word ptr [bp+var_B86+2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 

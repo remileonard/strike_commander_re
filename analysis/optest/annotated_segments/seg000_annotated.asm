@@ -511,7 +511,10 @@ word_2C9	dw 0			; DATA XREF: EntryPoint_RuntimeInit+3w EntryPoint_RuntimeInit+C
 
 ; Attributes: bp-based frame
 
-sub_2CD		proc far		; CODE XREF: sub_7D52+447P
+; ==============================================================================================
+; far, LUE 2026-10-21. Valeur absolue d'un entier 16 bits (or ax, ax / jge / neg ax).
+; ==============================================================================================
+CRT_Abs16_2CD		proc far		; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+447P
 					; ConfigOption_ApplyAndDisplayB_3E1B3+34P ...
 
 arg_0		= word ptr  6
@@ -523,10 +526,10 @@ arg_0		= word ptr  6
 		jge	short loc_2D9
 		neg	ax
 
-loc_2D9:				; CODE XREF: sub_2CD+8j
+loc_2D9:				; CODE XREF: CRT_Abs16_2CD+8j
 		pop	bp
 		retf
-sub_2CD		endp
+CRT_Abs16_2CD		endp
 
 ; ���������������������������������������������������������������������������
 		push	bp
@@ -1122,8 +1125,8 @@ CRT_IsAtty		endp
 ; ici. — far — normalise le signe d'une paire dx:ax selon le signe d'un second opérande :
 ; brique de division/modulo signé 32-bit.
 ; ==============================================================================================
-CRT_NormalizeSign32		proc far		; CODE XREF: sub_7D52+3D0P
-					; sub_7D52+3E7P ...
+CRT_NormalizeSign32		proc far		; CODE XREF: VoicePlayer_LoadWithLipSync_7D52+3D0P
+					; VoicePlayer_LoadWithLipSync_7D52+3E7P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

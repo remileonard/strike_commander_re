@@ -1280,7 +1280,7 @@ loc_5F9D2:				; CODE XREF: sub_5F982:loc_5F9CEj
 		push	word_48E79
 		mov	bx, word_48E77
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 

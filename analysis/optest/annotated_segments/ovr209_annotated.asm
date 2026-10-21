@@ -1293,7 +1293,7 @@ loc_B7F79:				; CODE XREF: ovr209:0F84j
 		push	word ptr [bp-410h]
 		mov	bx, [bp-412h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -1349,7 +1349,7 @@ loc_B8010:				; CODE XREF: ovr209:101Bj
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2150,7 +2150,7 @@ loc_B8A33:				; CODE XREF: ovr209:1A3Ej
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2477,7 +2477,7 @@ loc_B8E47:				; CODE XREF: ovr209:1E52j
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2968,7 +2968,7 @@ loc_B944E:				; CODE XREF: ovr209:2459j
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -3415,7 +3415,7 @@ loc_B99B5:				; CODE XREF: ovr209:29C0j
 		push	word ptr [bp-0C8Ch]
 		mov	bx, [bp-0C8Eh]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -4703,7 +4703,7 @@ loc_BA969:				; CODE XREF: ovr209:3974j
 		lea	ax, [bp-14Ch]
 		push	ax
 		push	word ptr [bp-13Eh]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Eh], 0
 		jmp	short loc_BA9D4
@@ -4774,7 +4774,7 @@ loc_BAA4A:				; CODE XREF: ovr209:3A54j ovr209:3A56j
 
 loc_BAA57:				; CODE XREF: ovr209:39F1j
 		push	word ptr [bp-13Eh]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jz	short loc_BAA6A
@@ -4993,7 +4993,7 @@ loc_BAC59:				; CODE XREF: ovr209:3C64j
 		lea	ax, [bp-14Ch]
 		push	ax
 		push	word ptr [bp-140h]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Eh], 0
 		jmp	short loc_BACC4
@@ -5040,7 +5040,7 @@ loc_BACFB:				; CODE XREF: ovr209:3D05j ovr209:3D07j
 
 loc_BAD08:				; CODE XREF: ovr209:3CE1j
 		push	word ptr [bp-140h]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BACD3
@@ -5244,7 +5244,7 @@ loc_BAEDD:				; CODE XREF: ovr209:3EE8j
 		lea	ax, [bp-14Ch]
 		push	ax
 		push	word ptr [bp-13Eh]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Eh], 0
 		jmp	short loc_BAF48
@@ -5307,7 +5307,7 @@ loc_BAFA9:				; CODE XREF: ovr209:3FB3j ovr209:3FB5j
 
 loc_BAFB6:				; CODE XREF: ovr209:3F65j
 		push	word ptr [bp-13Eh]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BAF57
@@ -5801,7 +5801,7 @@ loc_BB49D:				; CODE XREF: ovr209:44A8j
 		lea	ax, [bp-14Ch]
 		push	ax
 		push	word ptr [bp-13Eh]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Eh], 0
 		jmp	short loc_BB508
@@ -5837,7 +5837,7 @@ loc_BB51E:				; CODE XREF: ovr209:4528j ovr209:452Aj
 
 loc_BB52B:				; CODE XREF: ovr209:451Fj
 		push	word ptr [bp-13Eh]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BB511
@@ -6159,7 +6159,7 @@ loc_BB860:				; CODE XREF: ovr209:486Bj
 		lea	ax, [bp-14Ah]
 		push	ax
 		push	word ptr [bp-13Eh]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Ch], 0
 		jmp	short loc_BB904
@@ -6200,7 +6200,7 @@ loc_BB8F7:				; CODE XREF: ovr209:4901j ovr209:4903j
 
 loc_BB904:				; CODE XREF: ovr209:48C8j
 		push	word ptr [bp-13Eh]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BB8BA
@@ -6680,7 +6680,7 @@ loc_BBDD0:				; CODE XREF: ovr209:4DDBj
 		lea	ax, [bp-14Ch]
 		push	ax
 		push	word ptr [bp-140h]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		mov	word ptr [bp-14Eh], 0
 		jmp	short loc_BBE3B
@@ -6716,7 +6716,7 @@ loc_BBE51:				; CODE XREF: ovr209:4E5Bj ovr209:4E5Dj
 
 loc_BBE5E:				; CODE XREF: ovr209:4E52j
 		push	word ptr [bp-140h]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BBE44
@@ -6810,7 +6810,7 @@ loc_BBF13:				; CODE XREF: ovr209:4F05j
 		lea	ax, [bp-158h]
 		push	ax
 		push	word ptr [bp-140h]
-		call	sub_9CF7
+		call	TalkingHead_AttachVoice_9CF7
 		add	sp, 6
 		jmp	short loc_BBF74
 ; ���������������������������������������������������������������������������
@@ -6832,7 +6832,7 @@ loc_BBF67:				; CODE XREF: ovr209:4F71j ovr209:4F73j
 
 loc_BBF74:				; CODE XREF: ovr209:4F68j
 		push	word ptr [bp-140h]
-		call	sub_9C64
+		call	TalkingHead_StartVoiceAndIsSpeaking_9C64
 		add	sp, 2
 		or	al, al
 		jnz	short loc_BBF5A
@@ -7609,7 +7609,7 @@ loc_BC83A:				; CODE XREF: ovr209:5817j ovr209:5821j
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -8514,7 +8514,7 @@ loc_BD3C8:				; CODE XREF: ovr209:63B8j ovr209:63BFj
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -8538,7 +8538,7 @@ loc_BD419:				; CODE XREF: ovr209:63DDj ovr209:63E3j ...
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -8563,7 +8563,7 @@ loc_BD46A:				; CODE XREF: ovr209:642Ej ovr209:6434j ...
 		push	word ptr [bp-0C7Eh]
 		mov	bx, [bp-0C80h]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 

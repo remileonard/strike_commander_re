@@ -417,13 +417,6 @@
     "x"
    ]
   },
-  "sub_84CC": {
-   "op": "voix_finie (sub_84CC, non lue)",
-   "args": [
-    "voix"
-   ],
-   "ret": "value"
-  },
   "sub_C8F5": {
    "op": "sous_titre (sub_C8F5, non lue)",
    "args": [
@@ -659,6 +652,35 @@
     "b",
     "c"
    ]
+  },
+  "VoicePlayer_IsDone_84CC": {
+   "op": "voix_finie",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "VoicePlayer_IsPlaying_8500": {
+   "op": "voix_en_cours",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "TalkingHead_AttachVoice_9CF7": {
+   "op": "tête_voix",
+   "args": [
+    "tête",
+    "ressource",
+    "cadence"
+   ]
+  },
+  "TalkingHead_StartVoiceAndIsSpeaking_9C64": {
+   "op": "tête_parle",
+   "args": [
+    "tête"
+   ],
+   "ret": "value"
   }
  },
  "vtables": {

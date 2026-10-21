@@ -8743,7 +8743,7 @@ loc_660FA:				; CODE XREF: Midgame1_PlayPart1_5FCF0+643Aj
 loc_66119:				; CODE XREF: Midgame1_PlayPart1_5FCF0+6408j
 		lea	ax, [bp+var_DC6]
 		push	ax
-		call	sub_84CC
+		call	VoicePlayer_IsDone_84CC
 		add	sp, 2
 		mov	ah, 0
 		or	ax, ax

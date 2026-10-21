@@ -1167,7 +1167,15 @@ TalkingHead_SetLipText_9C4F	endp
 
 ; Attributes: bp-based frame
 
-sub_9C64	proc far		; CODE XREF: sub_6B9C0+1947P
+; ==============================================================================================
+; far, LUE 2026-10-21. Appelée à chaque tour de la boucle d'attente (« tant que la tête parle
+; »). Au premier appel (compteur +84Eh = 0, réplique prête +850h, pas encore partie +851h) :
+; bouche +84Ah = VoicePlayer_GetLipFrame_8466, lance la réplique (méthode +10h du lecteur,
+; −1), +851h = 1. Puis compteur + 1 ; renvoie +851h (1 tant que la tête parle). +851h est
+; remis à 0 par TalkingHead_Advance_9F5A quand la réplique ne joue plus ou que la table
+; renvoie −2.
+; ==============================================================================================
+TalkingHead_StartVoiceAndIsSpeaking_9C64	proc far		; CODE XREF: sub_6B9C0+1947P
 					; sub_6B9C0+1C8BP ...
 
 arg_0		= word ptr  6
@@ -1201,7 +1209,7 @@ arg_0		= word ptr  6
 		add	sp, 4
 		mov	byte ptr [si+851h], 1
 
-loc_9CAB:				; CODE XREF: sub_9C64+Cj sub_9C64+13j	...
+loc_9CAB:				; CODE XREF: TalkingHead_StartVoiceAndIsSpeaking_9C64+Cj TalkingHead_StartVoiceAndIsSpeaking_9C64+13j	...
 		inc	word ptr [si+84Eh]
 		cmp	byte ptr [si+851h], 0
 		jz	short loc_9CBD
@@ -1213,21 +1221,21 @@ loc_9CAB:				; CODE XREF: sub_9C64+Cj sub_9C64+13j	...
 		jmp	short loc_9CC2
 ; ���������������������������������������������������������������������������
 
-loc_9CBD:				; CODE XREF: sub_9C64+50j
+loc_9CBD:				; CODE XREF: TalkingHead_StartVoiceAndIsSpeaking_9C64+50j
 		mov	al, 0
 		pop	si
 		pop	bp
 		retf
-sub_9C64	endp
+TalkingHead_StartVoiceAndIsSpeaking_9C64	endp
 
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR sub_9C64
+; START	OF FUNCTION CHUNK FOR TalkingHead_StartVoiceAndIsSpeaking_9C64
 
-loc_9CC2:				; CODE XREF: sub_9C64+57j
+loc_9CC2:				; CODE XREF: TalkingHead_StartVoiceAndIsSpeaking_9C64+57j
 		pop	si
 		pop	bp
 		retf
-; END OF FUNCTION CHUNK	FOR sub_9C64
+; END OF FUNCTION CHUNK	FOR TalkingHead_StartVoiceAndIsSpeaking_9C64
 ; ���������������������������������������������������������������������������
 		push	bp
 		mov	bp, sp
@@ -1254,7 +1262,13 @@ loc_9CC2:				; CODE XREF: sub_9C64+57j
 
 ; Attributes: bp-based frame
 
-sub_9CF7	proc far		; CODE XREF: sub_6B9C0+18FFP
+; ==============================================================================================
+; far, LUE 2026-10-21. Met la tête parlante en mode voix : pilote du lecteur intégré (+21h,
+; VoicePlayer_SetDriver_7A3D), charge la réplique arg_2 avec sa table de bouches pour la
+; cadence arg_4 (VoicePlayer_LoadWithLipSync_7D52), +850h = 1 (réplique prête), compteur +84Eh
+; = 0.
+; ==============================================================================================
+TalkingHead_AttachVoice_9CF7	proc far		; CODE XREF: sub_6B9C0+18FFP
 					; sub_6B9C0+1C43P ...
 
 arg_0		= word ptr  6
@@ -1276,14 +1290,14 @@ arg_4		= word ptr  0Ah
 		mov	ax, si
 		add	ax, 21h	; '!'
 		push	ax
-		call	sub_7D52
+		call	VoicePlayer_LoadWithLipSync_7D52
 		add	sp, 6
 		mov	byte ptr [si+850h], 1
 		mov	word ptr [si+84Eh], 0
 		pop	si
 		pop	bp
 		retf
-sub_9CF7	endp
+TalkingHead_AttachVoice_9CF7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

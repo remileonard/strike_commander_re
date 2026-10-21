@@ -171,3 +171,30 @@ l'attente, inconnue, était simulée sur 600 images et le plan suivant partait d
 - **Non comparés** : les titres (le format les affiche d'un bloc, en couleur 15, sans la
   translucidité) et le fondu d'apparition (même champ `fade` des deux côtés, rendu ni d'un côté ni
   de l'autre dans la comparaison).
+
+## Autres cinématiques
+
+Mêmes outils, en changeant le nom (`--nom` pour le rendu et le lecteur de contrôle). Pour mid2
+(fonction pas encore nommée `sub_6B9C0`) :
+
+```bash
+python3 tools/midgame_extract.py --exe optest sub_6B9C0 --name mid2
+python3 tools/midgame_iff.py analysis/optest/midgames/mid2.json ../libRealSpace/resources/MID_2.IFF --donnees BIGTRE.TRE [--sous-titres]
+python3 tools/midgame_render.py --donnees BIGTRE.TRE --nom mid2 --film mid2.gif 2
+python3 tools/midgame_check.py --donnees BIGTRE.TRE --nom mid2 MID_2.IFF
+```
+
+mid2 (2026-10-21) : 9 plans, 41,9 s, **0 instant différent** entre le fichier et le rendu de
+référence (2 513 instants). Limites :
+- les tirages `CRT_Rand` (décalage de la tête de Tex de 0 à 4 pixels, effets sonores au hasard) sont
+  faits une fois par l'outil, suite fixe ; le jeu tire à chaque partie ;
+- les fondus de volume entre ambiances musicales (`AIL_set_relative_volume_30C66`) et les séquences
+  musicales autres que la première ne sont pas exprimés ;
+- dans la scène 5, la case de pile de la ressource `mid2voc` 9 est réutilisée par le code comme
+  compteur (`var_188`, l'image 10 d'un calque est posée au 4ᵉ tour) : l'extracteur ne voit pas
+  cette réutilisation, le compteur est lu comme 0 et l'image 10 n'est pas posée ;
+- un fondu de disparition (fin de mid2) n'est pas exprimé dans le format.
+- sous-titres (`--sous-titres`) : textes de `MG02`, lus par le code seulement sans voix (le tableau
+  est retrouvé dans la branche que la simulation ne prend pas). Le code ne fixe pas leur couleur
+  (couleur par défaut de la police, non lue) : 15 est écrit, valeur supposée. Le nom du joueur, que
+  le code ajoute au texte 0, n'est pas ajouté.

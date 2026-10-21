@@ -352,7 +352,11 @@ loc_3EFDC:				; CODE XREF: seg161:01BBj
 
 ; Attributes: bp-based frame
 
-sub_3EFDF	proc far		; CODE XREF: VoicePlayer_GetLipFrame_8466+1AP
+; ==============================================================================================
+; far, LUE 2026-10-21. Temps écoulé d'un chronomètre, en tics de 60 Hz : en marche ([si] ≠ 0)
+; = cumul [si+5] + dword_47ABB (compteur de tics) − départ [si+1] ; arrêté = cumul [si+5].
+; ==============================================================================================
+Stopwatch_Elapsed_3EFDF	proc far		; CODE XREF: VoicePlayer_GetLipFrame_8466+1AP
 
 arg_0		= word ptr  6
 
@@ -368,15 +372,15 @@ arg_0		= word ptr  6
 		jmp	short loc_3EFFE
 ; ���������������������������������������������������������������������������
 
-loc_3EFFA:				; CODE XREF: sub_3EFDF+Aj
+loc_3EFFA:				; CODE XREF: Stopwatch_Elapsed_3EFDF+Aj
 		mov	eax, [si+5]
 
-loc_3EFFE:				; CODE XREF: sub_3EFDF+19j
+loc_3EFFE:				; CODE XREF: Stopwatch_Elapsed_3EFDF+19j
 		shld	edx, eax, 10h
 		pop	si
 		pop	bp
 		retf
-sub_3EFDF	endp
+Stopwatch_Elapsed_3EFDF	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

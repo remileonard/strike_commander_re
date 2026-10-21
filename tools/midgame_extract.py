@@ -600,7 +600,7 @@ class FunctionRun:
             return ('reg', r, size, t)
         if re.match(r'^-?[0-9][0-9A-Fa-f]*h?$', t):
             n = parse_number(t)
-            if 32768 <= n < 65536:
+            if 32768 <= n < 65536 and not getattr(self, 'wide', False):
                 n -= 65536
             return ('imm', const(n))
         m = re.match(r'^offset\s+(\w+)$', t)
@@ -1003,6 +1003,8 @@ class FunctionRun:
     def step(self, k, mn, ops, line, text):
         ex = self.ex
         parts = [p.strip() for p in DataSegment.split_operands(ops)] if ops else []
+        # Destination sur 32 bits : une constante comme 8000h y vaut +32768, pas −32768.
+        self.wide = bool(parts) and bool(re.match(r'^(e[a-d]x|e[sd]i|e[bs]p|dword ptr|large)\b', parts[0]))
         if mn in ('push',):
             op = self.operand(parts[0])
             v = self.value(op)

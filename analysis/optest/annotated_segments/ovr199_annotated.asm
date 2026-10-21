@@ -1697,7 +1697,7 @@ loc_727A1:				; CODE XREF: sub_71680+B1Ej
 		push	[bp+var_4D2]
 		mov	bx, [bp+var_4D4]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -1783,7 +1783,7 @@ loc_727EB:				; CODE XREF: sub_71680+1125j
 		push	[bp+var_4EE]
 		mov	bx, [bp+var_4F0]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2404,7 +2404,7 @@ loc_72FAB:				; CODE XREF: sub_71680+1926j
 		push	[bp+var_4FC]
 		mov	bx, [bp+var_4FE]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2599,7 +2599,7 @@ loc_7320F:				; CODE XREF: sub_71680+1B19j
 		push	[bp+var_50A]
 		mov	bx, [bp+var_50C]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2631,7 +2631,7 @@ loc_73272:				; CODE XREF: sub_71680+1B92j
 		push	[bp+var_518]
 		mov	bx, [bp+var_51A]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -2656,7 +2656,7 @@ loc_732D5:				; CODE XREF: sub_71680+1BF5j
 		push	[bp+var_518]
 		mov	bx, [bp+var_51A]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -3375,7 +3375,7 @@ loc_73B13:				; CODE XREF: sub_71680+248Ej
 		push	[bp+var_526]
 		mov	bx, [bp+var_528]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -4669,7 +4669,7 @@ loc_74B37:				; CODE XREF: sub_71680+3499j
 		push	[bp+var_534]
 		mov	bx, [bp+var_536]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -4727,7 +4727,7 @@ loc_74BCE:				; CODE XREF: sub_71680+3522j
 		push	[bp+var_4E0]
 		mov	bx, [bp+var_4E2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -5790,7 +5790,7 @@ loc_7569A:				; CODE XREF: sub_71680+3A17j
 		push	[bp+var_4E0]
 		mov	bx, [bp+var_4E2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -6559,7 +6559,7 @@ loc_76126:				; CODE XREF: sub_71680+44A3j
 		push	[bp+var_4E0]
 		mov	bx, [bp+var_4E2]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 

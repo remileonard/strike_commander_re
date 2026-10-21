@@ -90,8 +90,8 @@
 "lines": 16,
 "type": "far",
 "calls": [],
-"new_name": "sub_2CD",
-"summary": ""
+"new_name": "CRT_Abs16_2CD",
+"summary": "far, LUE 2026-10-21. Valeur absolue d'un entier 16 bits (`or ax, ax / jge / neg ax`)."
 },
 "sub_308": {
 "segment": "seg000",
@@ -2611,8 +2611,8 @@
 "sub_539",
 "sub_2CD"
 ],
-"new_name": "sub_7D52",
-"summary": ""
+"new_name": "VoicePlayer_LoadWithLipSync_7D52",
+"summary": "far, LUE 2026-10-21. Charge une réplique (arg_2 = ressource VOC) dans le lecteur de voix et calcule sa table de bouches pour une cadence arg_4 (rangée en +1Ah) : fréquence = 1 000 000 / (256 − octet 1Eh du VOC) (`mov eax, 0F4240h / idiv`), échantillons par image = fréquence / cadence, nombre d'échantillons = (dword 1Ah du VOC >> 8) − 2 (taille du premier bloc), données à partir de l'octet 20h. Pour chaque image k (0 à n, la dernière partielle) : échantillons de k × fréquence / cadence + 20h sur (échantillons par image + 1), valeur = somme × 1000 / nombre − 128 000 (`imul eax, 3E8h / div / sub eax, 1F400h`), table en +1Ch, 512 mots de 4 octets au plus, remplie d'abord de −2. Puis référence = la plus grande des valeurs absolues du maximum et du minimum calculés **sans** l'entrée maximale et l'entrée minimale (CRT_NormalizeSign32 = valeur absolue 32 bits) ; chaque entrée devient p = (référence − |entrée sur 16 bits|) × 100 / référence (sub_2CD = valeur absolue 16 bits) puis une bouche : p ≥ 95 → −1 (pas de bouche), ≥ 78 → 8, ≥ 65 → 3, ≥ 42 → 2, ≥ 25 → 10, sinon 11."
 },
 "sub_8256": {
 "segment": "seg011",
@@ -2666,8 +2666,8 @@
 "calls": [
 "sub_30BD0"
 ],
-"new_name": "sub_84CC",
-"summary": ""
+"new_name": "VoicePlayer_IsDone_84CC",
+"summary": "far, LUE 2026-10-21. Vrai quand la réplique du lecteur de voix est finie : sans pilote ([si+2] = 0) renvoie 1 ; sinon appelle sub_30BD0 (fonction 124 du pilote son, `AIL_VOC_playback_status`, `mov ax, 7Ch / jmp AIL_call_driver_3041C`) et renvoie 1 si l'état vaut 3 (`DAC_DONE` d'AIL.INC), 0 sinon (`cmp ax, 3`)."
 },
 "sub_8500": {
 "segment": "seg011",
@@ -2678,8 +2678,8 @@
 "calls": [
 "sub_30BD0"
 ],
-"new_name": "sub_8500",
-"summary": ""
+"new_name": "VoicePlayer_IsPlaying_8500",
+"summary": "far, LUE 2026-10-21. Vrai pendant la lecture de la réplique : sans pilote ([si+2] = 0) renvoie 0 ; sinon appelle sub_30BD0 (`AIL_VOC_playback_status`, fonction 124 du pilote son) et renvoie 1 si l'état vaut 2 (`DAC_PLAYING` d'AIL.INC), 0 sinon (`cmp ax, 2`). Utilisée par la cinématique mid2 (sub_6B9C0) pour attendre la fin d'une réplique (`tant que en cours`)."
 },
 "sub_859B": {
 "segment": "seg012",
@@ -3031,8 +3031,8 @@
 "calls": [
 "sub_8466"
 ],
-"new_name": "sub_9C64",
-"summary": ""
+"new_name": "TalkingHead_StartVoiceAndIsSpeaking_9C64",
+"summary": "far, LUE 2026-10-21. Appelée à chaque tour de la boucle d'attente (« tant que la tête parle »). Au premier appel (compteur +84Eh = 0, réplique prête +850h, pas encore partie +851h) : bouche +84Ah = VoicePlayer_GetLipFrame_8466, lance la réplique (méthode +10h du lecteur, −1), +851h = 1. Puis compteur + 1 ; renvoie +851h (1 tant que la tête parle). +851h est remis à 0 par TalkingHead_Advance_9F5A quand la réplique ne joue plus ou que la table renvoie −2."
 },
 "sub_9CF7": {
 "segment": "seg014",
@@ -3044,8 +3044,8 @@
 "sub_7A3D",
 "sub_7D52"
 ],
-"new_name": "sub_9CF7",
-"summary": ""
+"new_name": "TalkingHead_AttachVoice_9CF7",
+"summary": "far, LUE 2026-10-21. Met la tête parlante en mode voix : pilote du lecteur intégré (+21h, VoicePlayer_SetDriver_7A3D), charge la réplique arg_2 avec sa table de bouches pour la cadence arg_4 (VoicePlayer_LoadWithLipSync_7D52), +850h = 1 (réplique prête), compteur +84Eh = 0."
 },
 "sub_9D32": {
 "segment": "seg014",
@@ -10847,8 +10847,8 @@
 "lines": 4,
 "type": "far",
 "calls": [],
-"new_name": "sub_30BD0",
-"summary": ""
+"new_name": "AIL_VOC_playback_status_30BD0",
+"summary": "far, LUE 2026-10-21. Fonction 124 du pilote son (`mov ax, 7Ch / jmp AIL_call_driver_3041C`) = AIL_VOC_PB_STAT d'AIL.INC : état de la lecture numérique (DAC_STOPPED 0, DAC_PAUSED 1, DAC_PLAYING 2, DAC_DONE 3)."
 },
 "sub_30BD6": {
 "segment": "seg106",
@@ -11007,8 +11007,8 @@
 "lines": 4,
 "type": "far",
 "calls": [],
-"new_name": "sub_30C66",
-"summary": ""
+"new_name": "AIL_set_relative_volume_30C66",
+"summary": "far, LUE 2026-10-21. Fonction 177 du pilote son (`mov ax, 0B1h / jmp AIL_call_driver_3041C`) = AIL_SET_REL_VOL d'AIL.INC (`AIL_set_relative_volume` d'AIL.ASM) : volume relatif d'une séquence musicale, atteint en un temps donné (arguments : pilote, séquence, volume, durée). Utilisée par la cinématique mid2 pour fondre les ambiances musicales entre elles."
 },
 "sub_30C78": {
 "segment": "seg106",
@@ -14064,8 +14064,8 @@
 "lines": 25,
 "type": "far",
 "calls": [],
-"new_name": "sub_3EFDF",
-"summary": ""
+"new_name": "Stopwatch_Elapsed_3EFDF",
+"summary": "far, LUE 2026-10-21. Temps écoulé d'un chronomètre, en tics de 60 Hz : en marche ([si] ≠ 0) = cumul [si+5] + dword_47ABB (compteur de tics) − départ [si+1] ; arrêté = cumul [si+5]."
 },
 "sub_3F023": {
 "segment": "seg161",

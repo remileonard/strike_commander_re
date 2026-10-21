@@ -190,7 +190,7 @@ loc_868D:				; CODE XREF: sub_8609+7Fj
 		push	word ptr [di+2]
 		mov	bx, [di]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
@@ -304,7 +304,7 @@ loc_877E:				; CODE XREF: sub_8705+74j
 		push	word ptr [di+2]
 		mov	bx, [di]
 		push	word ptr [bx+4]
-		call	sub_30C66
+		call	AIL_set_relative_volume_30C66
 		add	sp, 8
 		jmp	short $+2
 
