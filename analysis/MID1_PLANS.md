@@ -184,8 +184,16 @@ python3 tools/midgame_render.py --donnees BIGTRE.TRE --nom mid2 --film mid2.gif 
 python3 tools/midgame_check.py --donnees BIGTRE.TRE --nom mid2 MID_2.IFF
 ```
 
-mid2 (2026-10-21) : 9 plans, 41,9 s, **0 instant différent** entre le fichier et le rendu de
-référence (2 513 instants). Limites :
+mid2 (2026-10-21) : 9 plans, 45,4 s, **0 instant différent** entre le fichier et le rendu de
+référence (2 724 instants). Corrigé après relecture par Rémi (têtes sans coiffure ni habits,
+personnage qui disparaissait au dernier plan) :
+- têtes : images 1 et 34 ajoutées (`TalkingHead_DrawDressed_9E5E`) ;
+- extracteur : une valeur gardée dans un registre ou une case temporaire est copiée avant que la
+  variable soit modifiée (`image ← compteur` puis `compteur + 1` donnait l'image suivante, au-delà
+  de la dernière : le personnage n'était plus dessiné) ; les remises à 0 d'un compteur sur 2
+  octets dans la case d'une poignée de ressource ne sont plus jetées (attentes de 2 ou 3 images).
+
+Limites :
 - les tirages `CRT_Rand` (décalage de la tête de Tex de 0 à 4 pixels, effets sonores au hasard) sont
   faits une fois par l'outil, suite fixe ; le jeu tire à chaque partie ;
 - les fondus de volume entre ambiances musicales (`AIL_set_relative_volume_30C66`) et les séquences

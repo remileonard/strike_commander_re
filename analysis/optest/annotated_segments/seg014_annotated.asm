@@ -1465,7 +1465,15 @@ TalkingHead_DrawAt_9D47	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_9E5E:				; DATA XREF: dseg:184Bo dseg:18A3o
+; ==============================================================================================
+; far, LUE 2026-10-21. Méthode +32 (dessin) des tables 182Bh et 1883h (TalkingHead) :
+; TalkingHead_DrawAt_9D47 (tête, image de base, bouche, enfants), puis l'image 1 de la
+; ressource (coiffure) et l'image du champ +848h (toujours 34, posé par
+; TalkingHead_Construct_98F4 : habits), à la même position. mid2 dessine ainsi Tex et Stern
+; habillés ; la tête casquée de mid1 (TalkingHeadOverlay_DrawAt_B28E) n'utilise pas cette
+; méthode.
+; ==============================================================================================
+TalkingHead_DrawDressed_9E5E:				; DATA XREF: dseg:184Bo dseg:18A3o
 		push	bp
 		mov	bp, sp
 		sub	sp, 0Ah

@@ -807,7 +807,10 @@ class FunctionRun:
                 return
             if is_const(val) and self.in_init_window(off):
                 return
-            if is_const(val) and val[1] in (0, 2) and self.region_at(off, service=True) and self.ex.objects[self.region_at(off, service=True)[1]].kind in SERVICE:
+            # Remise à 0 ou 2 des octets ou mots doubles d'une poignée (ressource, palette…) : ignorée.
+            # Un mot de 2 octets n'est pas un champ de poignée : c'est une variable dans la même case
+            # de pile (mid2, compteur var_178 remis à 0 dans la case de mid2voc 6).
+            if is_const(val) and val[1] in (0, 2) and op[2] != 2 and self.region_at(off, service=True) and self.ex.objects[self.region_at(off, service=True)[1]].kind in SERVICE:
                 return
             hit = self.region_at(off)
             if hit:
@@ -821,7 +824,20 @@ class FunctionRun:
                 return
             if off in self.const_locals:
                 return
-            self.emit(('assign', self.ex.local_name_for(self, off), val, line))
+            name = self.ex.local_name_for(self, off)
+            # Un registre qui contient encore l'ancienne valeur de la variable (mov ax, [v] / inc [v] /
+            # mov [x], ax) la garde : on la copie avant l'écriture (mid2, image = compteur++).
+            for r, rv in list(self.regs.items()):
+                if mentions(rv, ('local', off)):
+                    keep = f'{name}_avant'
+                    self.emit(('assign', keep, rv, line))
+                    self.regs[r] = ('glob', keep)
+            for o2, sv in list(self.store.items()):
+                if sv[0] == 'temp' and mentions(sv[1], ('local', off)):
+                    keep = f'{name}_avant'
+                    self.emit(('assign', keep, sv[1], line))
+                    self.store[o2] = ('temp', ('glob', keep), sv[2])
+            self.emit(('assign', name, val, line))
             return
         if addr[0] == 'reg':
             base = self.regs.get(addr[1], unknown())
@@ -1933,6 +1949,14 @@ def cj(ex, c):
     if k == 'and':
         return {'et': [cj(ex, c[1]), cj(ex, c[2])]}
     return {k: True}
+
+
+def mentions(v, target):
+    if v == target:
+        return True
+    if isinstance(v, tuple):
+        return any(mentions(x, target) for x in v if isinstance(x, tuple))
+    return False
 
 
 def target_json(text):

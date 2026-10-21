@@ -65,8 +65,14 @@ charge(midgames 22)                                                             
 palette_depuis(pal4(midgames 22))                                                                     ⟨203389⟩
 charge(mid1 59)                                                                                       ⟨203401⟩
 palette_depuis(pal5(mid1 59))                                                                         ⟨203407⟩
+v368 = 0                                                                                              ⟨203427⟩
+v358 = 0                                                                                              ⟨203446⟩
+v348 = 0                                                                                              ⟨203465⟩
+v338 = 0                                                                                              ⟨203484⟩
+v338 = 0                                                                                              ⟨203488⟩
 charge_convdata_type2("normal")                                                                       ⟨203493⟩
 palette_depuis(pal6(convdata type 2 "normal"))                                                        ⟨203499⟩
+v338 = 0                                                                                              ⟨203519⟩
 v158 = byte_46848                                                                                     ⟨203521⟩
 si v29 == 0 :
     si v158 != 1 :
@@ -75,6 +81,7 @@ si v29 == 0 :
         pak rsoundfx.ouvre(chemin1, 1)                                                                ⟨203564⟩
         flux_iff(flux=flux1)                                                                          ⟨203578⟩
         v3611 = 256                                                                                   ⟨203581⟩
+        v3615 = 0                                                                                     ⟨203582⟩
         flux1.ouvre(chemin1, 1)                                                                       ⟨203590⟩
         iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨203596⟩
         iff_chunk(flux=flux1, balise='MT32', x=1)                                                     ⟨203602⟩
@@ -93,6 +100,7 @@ si v29 == 0 :
         pak asoundfx.ouvre(chemin1, 1)                                                                ⟨203661⟩
         flux_iff(flux=flux1)                                                                          ⟨203675⟩
         v3611 = 256                                                                                   ⟨203678⟩
+        v3615 = 0                                                                                     ⟨203679⟩
         flux1.ouvre(chemin1, 1)                                                                       ⟨203687⟩
         iff_form(flux=flux1, balise='VOLU', x=0)                                                      ⟨203693⟩
         iff_chunk(flux=flux1, balise='ADLB', x=1)                                                     ⟨203699⟩
@@ -120,6 +128,7 @@ si v31 != 0 :
         canal_arrête(canal=canal1)                                                                    ⟨203806⟩
         si = si + 1                                                                                   ⟨203808⟩
     canal_arrête(canal=canal1)                                                                        ⟨203815⟩
+    v3550 = 0                                                                                         ⟨203833⟩
 v174 = 0                                                                                              ⟨203838⟩
 v169 = 0                                                                                              ⟨203840⟩
 v168 = 0                                                                                              ⟨203841⟩
@@ -150,6 +159,7 @@ si v31 != 0 :
     canal_init(canal=canal3, pilote=word_46849)                                                       ⟨203945⟩
 flux_iff(flux=flux1)                                                                                  ⟨203961⟩
 v3611 = 256                                                                                           ⟨203964⟩
+v3615 = 0                                                                                             ⟨203965⟩
 flux1.ouvre(chemin1, 1)                                                                               ⟨203973⟩
 iff_form(flux=flux1, balise='MG01', x=0)                                                              ⟨203979⟩
 iff_form(flux=flux1, balise='DATA', x=0)                                                              ⟨203985⟩
@@ -259,16 +269,42 @@ retire(parent=scène1, calque=c3)                                               
 c3.détruit(3)                                                                                         ⟨204559⟩
 si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨204568⟩
+v438 = 0                                                                                              ⟨204590⟩
+v429 = 0                                                                                              ⟨204608⟩
+v428 = 0                                                                                              ⟨204609⟩
 Scene_SetFps(scène=scène1, cadence=20)                                                                ⟨204613⟩
 si byte_495FC != 0 :
     Scene_Destruct(scène=scène1, drapeaux=0)                                                          ⟨204624⟩
     canal_arrête(canal=canal3)                                                                        ⟨204675⟩
+    v3536 = 0                                                                                         ⟨204693⟩
+    v3531 = 0                                                                                         ⟨204694⟩
+    v3530 = 0                                                                                         ⟨204695⟩
     voix_arrête(voix=voix1)                                                                           ⟨204699⟩
+    v3510 = 0                                                                                         ⟨204717⟩
+    v3505 = 0                                                                                         ⟨204718⟩
+    v3504 = 0                                                                                         ⟨204719⟩
     canal_arrête(canal=canal2)                                                                        ⟨204722⟩
+    v1436 = 0                                                                                         ⟨204740⟩
+    v1431 = 0                                                                                         ⟨204741⟩
+    v1430 = 0                                                                                         ⟨204742⟩
+    v169 = 0                                                                                          ⟨204760⟩
+    v168 = 0                                                                                          ⟨204761⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨204769⟩
+    v121 = 0                                                                                          ⟨204828⟩
+    v120 = 0                                                                                          ⟨204829⟩
+    v111 = 0                                                                                          ⟨204847⟩
+    v110 = 0                                                                                          ⟨204848⟩
+    v101 = 0                                                                                          ⟨204866⟩
+    v100 = 0                                                                                          ⟨204867⟩
+    v91 = 0                                                                                           ⟨204885⟩
+    v90 = 0                                                                                           ⟨204886⟩
+    v81 = 0                                                                                           ⟨204904⟩
+    v80 = 0                                                                                           ⟨204905⟩
     v64 = 0                                                                                           ⟨204931⟩
     v59 = 0                                                                                           ⟨204932⟩
     v58 = 0                                                                                           ⟨204933⟩
+    v49 = 0                                                                                           ⟨204956⟩
+    v48 = 0                                                                                           ⟨204957⟩
     retour                                                                                            ⟨205009⟩
 vide_entrées()                                                                                        ⟨205013⟩
 v385 = 0                                                                                              ⟨205014⟩
@@ -281,12 +317,35 @@ tant que di < 4 :
         byte_495FC = 1                                                                                ⟨205048⟩
         Scene_Destruct(scène=scène1, drapeaux=0)                                                      ⟨205052⟩
         canal_arrête(canal=canal3)                                                                    ⟨205103⟩
+        v3536 = 0                                                                                     ⟨205121⟩
+        v3531 = 0                                                                                     ⟨205122⟩
+        v3530 = 0                                                                                     ⟨205123⟩
         voix_arrête(voix=voix1)                                                                       ⟨205127⟩
+        v3510 = 0                                                                                     ⟨205145⟩
+        v3505 = 0                                                                                     ⟨205146⟩
+        v3504 = 0                                                                                     ⟨205147⟩
         canal_arrête(canal=canal2)                                                                    ⟨205150⟩
+        v1436 = 0                                                                                     ⟨205168⟩
+        v1431 = 0                                                                                     ⟨205169⟩
+        v1430 = 0                                                                                     ⟨205170⟩
+        v169 = 0                                                                                      ⟨205188⟩
+        v168 = 0                                                                                      ⟨205189⟩
         CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                        ⟨205197⟩
+        v121 = 0                                                                                      ⟨205256⟩
+        v120 = 0                                                                                      ⟨205257⟩
+        v111 = 0                                                                                      ⟨205275⟩
+        v110 = 0                                                                                      ⟨205276⟩
+        v101 = 0                                                                                      ⟨205294⟩
+        v100 = 0                                                                                      ⟨205295⟩
+        v91 = 0                                                                                       ⟨205313⟩
+        v90 = 0                                                                                       ⟨205314⟩
+        v81 = 0                                                                                       ⟨205332⟩
+        v80 = 0                                                                                       ⟨205333⟩
         v64 = 0                                                                                       ⟨205359⟩
         v59 = 0                                                                                       ⟨205360⟩
         v58 = 0                                                                                       ⟨205361⟩
+        v49 = 0                                                                                       ⟨205384⟩
+        v48 = 0                                                                                       ⟨205385⟩
         retour                                                                                        ⟨205437⟩
     si v385 != 0 : aller à loc_621A4                                                                  ⟨205442⟩
     v432 = booléen                                                                                    ⟨205448⟩
@@ -318,12 +377,35 @@ tant que di < 4 :
         byte_495FC = 1                                                                                ⟨205571⟩
         Scene_Destruct(scène=scène1, drapeaux=0)                                                      ⟨205575⟩
         canal_arrête(canal=canal3)                                                                    ⟨205626⟩
+        v3536 = 0                                                                                     ⟨205644⟩
+        v3531 = 0                                                                                     ⟨205645⟩
+        v3530 = 0                                                                                     ⟨205646⟩
         voix_arrête(voix=voix1)                                                                       ⟨205650⟩
+        v3510 = 0                                                                                     ⟨205668⟩
+        v3505 = 0                                                                                     ⟨205669⟩
+        v3504 = 0                                                                                     ⟨205670⟩
         canal_arrête(canal=canal2)                                                                    ⟨205673⟩
+        v1436 = 0                                                                                     ⟨205691⟩
+        v1431 = 0                                                                                     ⟨205692⟩
+        v1430 = 0                                                                                     ⟨205693⟩
+        v169 = 0                                                                                      ⟨205711⟩
+        v168 = 0                                                                                      ⟨205712⟩
         CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                        ⟨205720⟩
+        v121 = 0                                                                                      ⟨205779⟩
+        v120 = 0                                                                                      ⟨205780⟩
+        v111 = 0                                                                                      ⟨205798⟩
+        v110 = 0                                                                                      ⟨205799⟩
+        v101 = 0                                                                                      ⟨205817⟩
+        v100 = 0                                                                                      ⟨205818⟩
+        v91 = 0                                                                                       ⟨205836⟩
+        v90 = 0                                                                                       ⟨205837⟩
+        v81 = 0                                                                                       ⟨205855⟩
+        v80 = 0                                                                                       ⟨205856⟩
         v64 = 0                                                                                       ⟨205882⟩
         v59 = 0                                                                                       ⟨205883⟩
         v58 = 0                                                                                       ⟨205884⟩
+        v49 = 0                                                                                       ⟨205907⟩
+        v48 = 0                                                                                       ⟨205908⟩
         retour                                                                                        ⟨205960⟩
     si v385 != 0 : aller à loc_621A4                                                                  ⟨205965⟩
     v442 = 100                                                                                        ⟨205970⟩
@@ -367,12 +449,35 @@ loc_621A4:                                                                      
 si byte_495FC != 0 :
     Scene_Destruct(scène=scène1, drapeaux=0)                                                          ⟨206172⟩
     canal_arrête(canal=canal3)                                                                        ⟨206223⟩
+    v3536 = 0                                                                                         ⟨206241⟩
+    v3531 = 0                                                                                         ⟨206242⟩
+    v3530 = 0                                                                                         ⟨206243⟩
     voix_arrête(voix=voix1)                                                                           ⟨206247⟩
+    v3510 = 0                                                                                         ⟨206265⟩
+    v3505 = 0                                                                                         ⟨206266⟩
+    v3504 = 0                                                                                         ⟨206267⟩
     canal_arrête(canal=canal2)                                                                        ⟨206270⟩
+    v1436 = 0                                                                                         ⟨206288⟩
+    v1431 = 0                                                                                         ⟨206289⟩
+    v1430 = 0                                                                                         ⟨206290⟩
+    v169 = 0                                                                                          ⟨206308⟩
+    v168 = 0                                                                                          ⟨206309⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨206317⟩
+    v121 = 0                                                                                          ⟨206376⟩
+    v120 = 0                                                                                          ⟨206377⟩
+    v111 = 0                                                                                          ⟨206395⟩
+    v110 = 0                                                                                          ⟨206396⟩
+    v101 = 0                                                                                          ⟨206414⟩
+    v100 = 0                                                                                          ⟨206415⟩
+    v91 = 0                                                                                           ⟨206433⟩
+    v90 = 0                                                                                           ⟨206434⟩
+    v81 = 0                                                                                           ⟨206452⟩
+    v80 = 0                                                                                           ⟨206453⟩
     v64 = 0                                                                                           ⟨206479⟩
     v59 = 0                                                                                           ⟨206480⟩
     v58 = 0                                                                                           ⟨206481⟩
+    v49 = 0                                                                                           ⟨206504⟩
+    v48 = 0                                                                                           ⟨206505⟩
     retour                                                                                            ⟨206557⟩
 scène1.terminée = 0                                                                                   ⟨206561⟩
 vide_entrées()                                                                                        ⟨206562⟩
@@ -446,16 +551,41 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨206907⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨206915⟩
+v418 = 0                                                                                              ⟨206937⟩
+v406 = 0                                                                                              ⟨206956⟩
 Scene_Destruct(scène=scène1, drapeaux=0)                                                              ⟨206960⟩
 vide_entrées()                                                                                        ⟨207009⟩
 si byte_495FC != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨207018⟩
+    v3536 = 0                                                                                         ⟨207036⟩
+    v3531 = 0                                                                                         ⟨207037⟩
+    v3530 = 0                                                                                         ⟨207038⟩
     voix_arrête(voix=voix1)                                                                           ⟨207042⟩
+    v3510 = 0                                                                                         ⟨207060⟩
+    v3505 = 0                                                                                         ⟨207061⟩
+    v3504 = 0                                                                                         ⟨207062⟩
     canal_arrête(canal=canal2)                                                                        ⟨207065⟩
+    v1436 = 0                                                                                         ⟨207083⟩
+    v1431 = 0                                                                                         ⟨207084⟩
+    v1430 = 0                                                                                         ⟨207085⟩
+    v169 = 0                                                                                          ⟨207103⟩
+    v168 = 0                                                                                          ⟨207104⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨207112⟩
+    v121 = 0                                                                                          ⟨207171⟩
+    v120 = 0                                                                                          ⟨207172⟩
+    v111 = 0                                                                                          ⟨207190⟩
+    v110 = 0                                                                                          ⟨207191⟩
+    v101 = 0                                                                                          ⟨207209⟩
+    v100 = 0                                                                                          ⟨207210⟩
+    v91 = 0                                                                                           ⟨207228⟩
+    v90 = 0                                                                                           ⟨207229⟩
+    v81 = 0                                                                                           ⟨207247⟩
+    v80 = 0                                                                                           ⟨207248⟩
     v64 = 0                                                                                           ⟨207274⟩
     v59 = 0                                                                                           ⟨207275⟩
     v58 = 0                                                                                           ⟨207276⟩
+    v49 = 0                                                                                           ⟨207299⟩
+    v48 = 0                                                                                           ⟨207300⟩
     retour                                                                                            ⟨207352⟩
 charge(mid1 6)                                                                                        ⟨207366⟩
 charge(mid1 26)                                                                                       ⟨207378⟩
@@ -466,6 +596,7 @@ palette_depuis(pal12(mid1 42))                                                  
 
 ──── scène2 ────
 scène2 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨207439⟩
+v338 = 0                                                                                              ⟨207444⟩
 charge(mid1 54)                                                                                       ⟨207451⟩
 palette_depuis(pal13(mid1 54))                                                                        ⟨207458⟩
 c9 = Layer(ressource=optshps 116, x=0, y=-24)                                                         ⟨207465⟩
@@ -534,10 +665,12 @@ tant que (scène2.compteur < 40) et (scène2.terminée == 0) :
     si scène2.compteur & 1 != 0 :
         v394 = v394 + 1                                                                               ⟨207827⟩
         si v394 == 21 :
+            v394_avant = v394                                                                         ⟨207831⟩
             v394 = 16                                                                                 ⟨207831⟩
         c16.image = v394                                                                              ⟨207838⟩
         v396 = v396 - 1                                                                               ⟨207839⟩
         si v396 == 6 :
+            v396_avant = v396                                                                         ⟨207843⟩
             v396 = 15                                                                                 ⟨207843⟩
         v414 = v396                                                                                   ⟨207847⟩
         c15.image = v414                                                                              ⟨207850⟩
@@ -574,15 +707,51 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨207995⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨208003⟩
+v404 = 0                                                                                              ⟨208025⟩
+v356 = 0                                                                                              ⟨208044⟩
+v338 = 0                                                                                              ⟨208068⟩
 Scene_Destruct(scène=scène2, drapeaux=0)                                                              ⟨208072⟩
 si byte_495FC != 0 :
+    v223 = 0                                                                                          ⟨208102⟩
+    v222 = 0                                                                                          ⟨208103⟩
+    v213 = 0                                                                                          ⟨208121⟩
+    v212 = 0                                                                                          ⟨208122⟩
+    v203 = 0                                                                                          ⟨208140⟩
+    v202 = 0                                                                                          ⟨208141⟩
+    v193 = 0                                                                                          ⟨208159⟩
+    v192 = 0                                                                                          ⟨208160⟩
+    v183 = 0                                                                                          ⟨208178⟩
+    v182 = 0                                                                                          ⟨208179⟩
     canal_arrête(canal=canal3)                                                                        ⟨208182⟩
+    v3536 = 0                                                                                         ⟨208200⟩
+    v3531 = 0                                                                                         ⟨208201⟩
+    v3530 = 0                                                                                         ⟨208202⟩
     voix_arrête(voix=voix1)                                                                           ⟨208206⟩
+    v3510 = 0                                                                                         ⟨208224⟩
+    v3505 = 0                                                                                         ⟨208225⟩
+    v3504 = 0                                                                                         ⟨208226⟩
     canal_arrête(canal=canal2)                                                                        ⟨208229⟩
+    v1436 = 0                                                                                         ⟨208247⟩
+    v1431 = 0                                                                                         ⟨208248⟩
+    v1430 = 0                                                                                         ⟨208249⟩
+    v169 = 0                                                                                          ⟨208267⟩
+    v168 = 0                                                                                          ⟨208268⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨208276⟩
+    v121 = 0                                                                                          ⟨208335⟩
+    v120 = 0                                                                                          ⟨208336⟩
+    v111 = 0                                                                                          ⟨208354⟩
+    v110 = 0                                                                                          ⟨208355⟩
+    v101 = 0                                                                                          ⟨208373⟩
+    v100 = 0                                                                                          ⟨208374⟩
+    v91 = 0                                                                                           ⟨208392⟩
+    v90 = 0                                                                                           ⟨208393⟩
+    v81 = 0                                                                                           ⟨208411⟩
+    v80 = 0                                                                                           ⟨208412⟩
     v64 = 0                                                                                           ⟨208438⟩
     v59 = 0                                                                                           ⟨208439⟩
     v58 = 0                                                                                           ⟨208440⟩
+    v49 = 0                                                                                           ⟨208463⟩
+    v48 = 0                                                                                           ⟨208464⟩
     retour                                                                                            ⟨208516⟩
 charge(mid1 1)                                                                                        ⟨208530⟩
 charge(mid1 44)                                                                                       ⟨208542⟩
@@ -610,19 +779,59 @@ tant que (scène3.compteur < 20) et (scène3.terminée == 0) :
     Scene_Tick(scène=scène3)                                                                          ⟨208680⟩
 Scene_Destruct(scène=scène3, drapeaux=0)                                                              ⟨208704⟩
 si byte_495FC != 0 :
+    v265 = 0                                                                                          ⟨208734⟩
+    v264 = 0                                                                                          ⟨208735⟩
+    v249 = 0                                                                                          ⟨208758⟩
+    v248 = 0                                                                                          ⟨208759⟩
+    v239 = 0                                                                                          ⟨208777⟩
+    v238 = 0                                                                                          ⟨208778⟩
+    v223 = 0                                                                                          ⟨208801⟩
+    v222 = 0                                                                                          ⟨208802⟩
+    v213 = 0                                                                                          ⟨208820⟩
+    v212 = 0                                                                                          ⟨208821⟩
+    v203 = 0                                                                                          ⟨208839⟩
+    v202 = 0                                                                                          ⟨208840⟩
+    v193 = 0                                                                                          ⟨208858⟩
+    v192 = 0                                                                                          ⟨208859⟩
+    v183 = 0                                                                                          ⟨208877⟩
+    v182 = 0                                                                                          ⟨208878⟩
     canal_arrête(canal=canal3)                                                                        ⟨208881⟩
+    v3536 = 0                                                                                         ⟨208899⟩
+    v3531 = 0                                                                                         ⟨208900⟩
+    v3530 = 0                                                                                         ⟨208901⟩
     voix_arrête(voix=voix1)                                                                           ⟨208905⟩
+    v3510 = 0                                                                                         ⟨208923⟩
+    v3505 = 0                                                                                         ⟨208924⟩
+    v3504 = 0                                                                                         ⟨208925⟩
     canal_arrête(canal=canal2)                                                                        ⟨208928⟩
+    v1436 = 0                                                                                         ⟨208946⟩
+    v1431 = 0                                                                                         ⟨208947⟩
+    v1430 = 0                                                                                         ⟨208948⟩
+    v169 = 0                                                                                          ⟨208966⟩
+    v168 = 0                                                                                          ⟨208967⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨208975⟩
+    v121 = 0                                                                                          ⟨209034⟩
+    v120 = 0                                                                                          ⟨209035⟩
+    v111 = 0                                                                                          ⟨209053⟩
+    v110 = 0                                                                                          ⟨209054⟩
+    v101 = 0                                                                                          ⟨209072⟩
+    v100 = 0                                                                                          ⟨209073⟩
+    v91 = 0                                                                                           ⟨209091⟩
+    v90 = 0                                                                                           ⟨209092⟩
+    v81 = 0                                                                                           ⟨209110⟩
+    v80 = 0                                                                                           ⟨209111⟩
     v64 = 0                                                                                           ⟨209137⟩
     v59 = 0                                                                                           ⟨209138⟩
     v58 = 0                                                                                           ⟨209139⟩
+    v49 = 0                                                                                           ⟨209162⟩
+    v48 = 0                                                                                           ⟨209163⟩
     retour                                                                                            ⟨209215⟩
 charge(mid1 56)                                                                                       ⟨209229⟩
 palette_depuis(pal16(mid1 56))                                                                        ⟨209236⟩
 
 ──── scène4 ────
 scène4 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨209244⟩
+v338 = 0                                                                                              ⟨209249⟩
 si v29 != 0 :
     charge(mid1voc 8)                                                                                 ⟨209258⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 8)                                  ⟨209264⟩
@@ -648,6 +857,7 @@ c32 = ImageLayer(ressource=midgames 19, x=0, y=90, image=1)                     
 ajoute c32 à scène4                                                                                   ⟨209388⟩
 c33 = ImageLayer(ressource=midgames 19, x=0, y=70, image=2)                                           ⟨209396⟩
 ajoute c33 à scène4                                                                                   ⟨209402⟩
+v356 = 0                                                                                              ⟨209407⟩
 charge(mid1 22)                                                                                       ⟨209414⟩
 c34 = AnimLayer(ressource=mid1 22, x=0, y=0)                                                          ⟨209421⟩
 di = c34                                                                                              ⟨209423⟩
@@ -658,16 +868,60 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨209470⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨209478⟩
+v356 = 0                                                                                              ⟨209500⟩
+v338 = 0                                                                                              ⟨209519⟩
 Scene_Destruct(scène=scène4, drapeaux=0)                                                              ⟨209523⟩
 si byte_495FC != 0 :
+    v281 = 0                                                                                          ⟨209553⟩
+    v280 = 0                                                                                          ⟨209554⟩
+    v265 = 0                                                                                          ⟨209577⟩
+    v264 = 0                                                                                          ⟨209578⟩
+    v249 = 0                                                                                          ⟨209601⟩
+    v248 = 0                                                                                          ⟨209602⟩
+    v239 = 0                                                                                          ⟨209620⟩
+    v238 = 0                                                                                          ⟨209621⟩
+    v223 = 0                                                                                          ⟨209644⟩
+    v222 = 0                                                                                          ⟨209645⟩
+    v213 = 0                                                                                          ⟨209663⟩
+    v212 = 0                                                                                          ⟨209664⟩
+    v203 = 0                                                                                          ⟨209682⟩
+    v202 = 0                                                                                          ⟨209683⟩
+    v193 = 0                                                                                          ⟨209701⟩
+    v192 = 0                                                                                          ⟨209702⟩
+    v183 = 0                                                                                          ⟨209720⟩
+    v182 = 0                                                                                          ⟨209721⟩
     canal_arrête(canal=canal3)                                                                        ⟨209724⟩
+    v3536 = 0                                                                                         ⟨209742⟩
+    v3531 = 0                                                                                         ⟨209743⟩
+    v3530 = 0                                                                                         ⟨209744⟩
     voix_arrête(voix=voix1)                                                                           ⟨209748⟩
+    v3510 = 0                                                                                         ⟨209766⟩
+    v3505 = 0                                                                                         ⟨209767⟩
+    v3504 = 0                                                                                         ⟨209768⟩
     canal_arrête(canal=canal2)                                                                        ⟨209771⟩
+    v1436 = 0                                                                                         ⟨209789⟩
+    v1431 = 0                                                                                         ⟨209790⟩
+    v1430 = 0                                                                                         ⟨209791⟩
+    v169 = 0                                                                                          ⟨209809⟩
+    v168 = 0                                                                                          ⟨209810⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨209818⟩
+    v121 = 0                                                                                          ⟨209877⟩
+    v120 = 0                                                                                          ⟨209878⟩
+    v111 = 0                                                                                          ⟨209896⟩
+    v110 = 0                                                                                          ⟨209897⟩
+    v101 = 0                                                                                          ⟨209915⟩
+    v100 = 0                                                                                          ⟨209916⟩
+    v91 = 0                                                                                           ⟨209934⟩
+    v90 = 0                                                                                           ⟨209935⟩
+    v81 = 0                                                                                           ⟨209953⟩
+    v80 = 0                                                                                           ⟨209954⟩
     v64 = 0                                                                                           ⟨209980⟩
     v59 = 0                                                                                           ⟨209981⟩
     v58 = 0                                                                                           ⟨209982⟩
+    v49 = 0                                                                                           ⟨210005⟩
+    v48 = 0                                                                                           ⟨210006⟩
     retour                                                                                            ⟨210058⟩
+v338 = 0                                                                                              ⟨210065⟩
 si v29 != 0 :
     charge(mid1voc 9)                                                                                 ⟨210074⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 9)                                  ⟨210080⟩
@@ -740,10 +994,12 @@ si v31 != 0 :
 tant que (scène5.compteur < 40) et (scène5.terminée == 0) :
     v404 = v404 - 1                                                                                   ⟨210463⟩
     si v404 == 15 :
+        v404_avant = v404                                                                             ⟨210467⟩
         v404 = 20                                                                                     ⟨210467⟩
     c42.image = v404                                                                                  ⟨210474⟩
     v406 = v406 + 1                                                                                   ⟨210475⟩
     si v406 == 16 :
+        v406_avant = v406                                                                             ⟨210479⟩
         v406 = 7                                                                                      ⟨210479⟩
     v414 = v406                                                                                       ⟨210483⟩
     c41.image = v414                                                                                  ⟨210486⟩
@@ -780,15 +1036,59 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨210629⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨210637⟩
+v366 = 0                                                                                              ⟨210659⟩
 Scene_Destruct(scène=scène5, drapeaux=0)                                                              ⟨210663⟩
+v348 = 0                                                                                              ⟨210688⟩
+v338 = 0                                                                                              ⟨210707⟩
 si byte_495FC != 0 :
+    v281 = 0                                                                                          ⟨210736⟩
+    v280 = 0                                                                                          ⟨210737⟩
+    v265 = 0                                                                                          ⟨210760⟩
+    v264 = 0                                                                                          ⟨210761⟩
+    v249 = 0                                                                                          ⟨210784⟩
+    v248 = 0                                                                                          ⟨210785⟩
+    v239 = 0                                                                                          ⟨210803⟩
+    v238 = 0                                                                                          ⟨210804⟩
+    v223 = 0                                                                                          ⟨210827⟩
+    v222 = 0                                                                                          ⟨210828⟩
+    v213 = 0                                                                                          ⟨210846⟩
+    v212 = 0                                                                                          ⟨210847⟩
+    v203 = 0                                                                                          ⟨210865⟩
+    v202 = 0                                                                                          ⟨210866⟩
+    v193 = 0                                                                                          ⟨210884⟩
+    v192 = 0                                                                                          ⟨210885⟩
+    v183 = 0                                                                                          ⟨210903⟩
+    v182 = 0                                                                                          ⟨210904⟩
     canal_arrête(canal=canal3)                                                                        ⟨210907⟩
+    v3536 = 0                                                                                         ⟨210925⟩
+    v3531 = 0                                                                                         ⟨210926⟩
+    v3530 = 0                                                                                         ⟨210927⟩
     voix_arrête(voix=voix1)                                                                           ⟨210931⟩
+    v3510 = 0                                                                                         ⟨210949⟩
+    v3505 = 0                                                                                         ⟨210950⟩
+    v3504 = 0                                                                                         ⟨210951⟩
     canal_arrête(canal=canal2)                                                                        ⟨210954⟩
+    v1436 = 0                                                                                         ⟨210972⟩
+    v1431 = 0                                                                                         ⟨210973⟩
+    v1430 = 0                                                                                         ⟨210974⟩
+    v169 = 0                                                                                          ⟨210992⟩
+    v168 = 0                                                                                          ⟨210993⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨211001⟩
+    v121 = 0                                                                                          ⟨211060⟩
+    v120 = 0                                                                                          ⟨211061⟩
+    v111 = 0                                                                                          ⟨211079⟩
+    v110 = 0                                                                                          ⟨211080⟩
+    v101 = 0                                                                                          ⟨211098⟩
+    v100 = 0                                                                                          ⟨211099⟩
+    v91 = 0                                                                                           ⟨211117⟩
+    v90 = 0                                                                                           ⟨211118⟩
+    v81 = 0                                                                                           ⟨211136⟩
+    v80 = 0                                                                                           ⟨211137⟩
     v64 = 0                                                                                           ⟨211163⟩
     v59 = 0                                                                                           ⟨211164⟩
     v58 = 0                                                                                           ⟨211165⟩
+    v49 = 0                                                                                           ⟨211188⟩
+    v48 = 0                                                                                           ⟨211189⟩
     retour                                                                                            ⟨211241⟩
 charge(mid1 0)                                                                                        ⟨211255⟩
 charge(mid1 45)                                                                                       ⟨211267⟩
@@ -845,22 +1145,116 @@ tant que (scène6.compteur < 5) et (scène6.terminée == 0) :
     Scene_Tick(scène=scène6)                                                                          ⟨211564⟩
 Scene_Destruct(scène=scène6, drapeaux=0)                                                              ⟨211592⟩
 si byte_495FC != 0 :
+    v323 = 0                                                                                          ⟨211622⟩
+    v322 = 0                                                                                          ⟨211623⟩
+    v307 = 0                                                                                          ⟨211646⟩
+    v306 = 0                                                                                          ⟨211647⟩
+    v297 = 0                                                                                          ⟨211665⟩
+    v296 = 0                                                                                          ⟨211666⟩
+    v281 = 0                                                                                          ⟨211689⟩
+    v280 = 0                                                                                          ⟨211690⟩
+    v265 = 0                                                                                          ⟨211713⟩
+    v264 = 0                                                                                          ⟨211714⟩
+    v249 = 0                                                                                          ⟨211737⟩
+    v248 = 0                                                                                          ⟨211738⟩
+    v239 = 0                                                                                          ⟨211756⟩
+    v238 = 0                                                                                          ⟨211757⟩
+    v223 = 0                                                                                          ⟨211780⟩
+    v222 = 0                                                                                          ⟨211781⟩
+    v213 = 0                                                                                          ⟨211799⟩
+    v212 = 0                                                                                          ⟨211800⟩
+    v203 = 0                                                                                          ⟨211818⟩
+    v202 = 0                                                                                          ⟨211819⟩
+    v193 = 0                                                                                          ⟨211837⟩
+    v192 = 0                                                                                          ⟨211838⟩
+    v183 = 0                                                                                          ⟨211856⟩
+    v182 = 0                                                                                          ⟨211857⟩
     canal_arrête(canal=canal3)                                                                        ⟨211860⟩
+    v3536 = 0                                                                                         ⟨211878⟩
+    v3531 = 0                                                                                         ⟨211879⟩
+    v3530 = 0                                                                                         ⟨211880⟩
     voix_arrête(voix=voix1)                                                                           ⟨211884⟩
+    v3510 = 0                                                                                         ⟨211902⟩
+    v3505 = 0                                                                                         ⟨211903⟩
+    v3504 = 0                                                                                         ⟨211904⟩
     canal_arrête(canal=canal2)                                                                        ⟨211907⟩
+    v1436 = 0                                                                                         ⟨211925⟩
+    v1431 = 0                                                                                         ⟨211926⟩
+    v1430 = 0                                                                                         ⟨211927⟩
+    v169 = 0                                                                                          ⟨211945⟩
+    v168 = 0                                                                                          ⟨211946⟩
     CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                            ⟨211954⟩
+    v121 = 0                                                                                          ⟨212013⟩
+    v120 = 0                                                                                          ⟨212014⟩
+    v111 = 0                                                                                          ⟨212032⟩
+    v110 = 0                                                                                          ⟨212033⟩
+    v101 = 0                                                                                          ⟨212051⟩
+    v100 = 0                                                                                          ⟨212052⟩
+    v91 = 0                                                                                           ⟨212070⟩
+    v90 = 0                                                                                           ⟨212071⟩
+    v81 = 0                                                                                           ⟨212089⟩
+    v80 = 0                                                                                           ⟨212090⟩
     v64 = 0                                                                                           ⟨212116⟩
     v59 = 0                                                                                           ⟨212117⟩
     v58 = 0                                                                                           ⟨212118⟩
+    v49 = 0                                                                                           ⟨212141⟩
+    v48 = 0                                                                                           ⟨212142⟩
     retour                                                                                            ⟨212194⟩
 appel de Midgame1_PlayPart2_671C0 (voir plus bas)                                                     ⟨212274⟩
+v323 = 0                                                                                              ⟨212298⟩
+v322 = 0                                                                                              ⟨212299⟩
+v307 = 0                                                                                              ⟨212322⟩
+v306 = 0                                                                                              ⟨212323⟩
+v297 = 0                                                                                              ⟨212341⟩
+v296 = 0                                                                                              ⟨212342⟩
+v281 = 0                                                                                              ⟨212365⟩
+v280 = 0                                                                                              ⟨212366⟩
+v265 = 0                                                                                              ⟨212389⟩
+v264 = 0                                                                                              ⟨212390⟩
+v249 = 0                                                                                              ⟨212413⟩
+v248 = 0                                                                                              ⟨212414⟩
+v239 = 0                                                                                              ⟨212432⟩
+v238 = 0                                                                                              ⟨212433⟩
+v223 = 0                                                                                              ⟨212456⟩
+v222 = 0                                                                                              ⟨212457⟩
+v213 = 0                                                                                              ⟨212475⟩
+v212 = 0                                                                                              ⟨212476⟩
+v203 = 0                                                                                              ⟨212494⟩
+v202 = 0                                                                                              ⟨212495⟩
+v193 = 0                                                                                              ⟨212513⟩
+v192 = 0                                                                                              ⟨212514⟩
+v183 = 0                                                                                              ⟨212532⟩
+v182 = 0                                                                                              ⟨212533⟩
 canal_arrête(canal=canal3)                                                                            ⟨212536⟩
+v3536 = 0                                                                                             ⟨212554⟩
+v3531 = 0                                                                                             ⟨212555⟩
+v3530 = 0                                                                                             ⟨212556⟩
 voix_arrête(voix=voix1)                                                                               ⟨212560⟩
+v3510 = 0                                                                                             ⟨212578⟩
+v3505 = 0                                                                                             ⟨212579⟩
+v3504 = 0                                                                                             ⟨212580⟩
 canal_arrête(canal=canal2)                                                                            ⟨212583⟩
+v1436 = 0                                                                                             ⟨212601⟩
+v1431 = 0                                                                                             ⟨212602⟩
+v1430 = 0                                                                                             ⟨212603⟩
+v169 = 0                                                                                              ⟨212621⟩
+v168 = 0                                                                                              ⟨212622⟩
 CRT_Doprnt_Core(objets1, 10, 6, 1, Stub_ResourceHandle_Destruct_42090)                                ⟨212630⟩
+v121 = 0                                                                                              ⟨212689⟩
+v120 = 0                                                                                              ⟨212690⟩
+v111 = 0                                                                                              ⟨212708⟩
+v110 = 0                                                                                              ⟨212709⟩
+v101 = 0                                                                                              ⟨212727⟩
+v100 = 0                                                                                              ⟨212728⟩
+v91 = 0                                                                                               ⟨212746⟩
+v90 = 0                                                                                               ⟨212747⟩
+v81 = 0                                                                                               ⟨212765⟩
+v80 = 0                                                                                               ⟨212766⟩
 v64 = 0                                                                                               ⟨212792⟩
 v59 = 0                                                                                               ⟨212793⟩
 v58 = 0                                                                                               ⟨212794⟩
+v49 = 0                                                                                               ⟨212817⟩
+v48 = 0                                                                                               ⟨212818⟩
 retour                                                                                                ⟨212870⟩
 ```
 
@@ -909,6 +1303,7 @@ si v29 != 0 :
     tant que voix1.finie() == 0 :
         Scene_Tick(scène=scène7)                                                                      ⟨213271⟩
     voix_arrête(voix=voix1)                                                                           ⟨213284⟩
+    v114 = 0                                                                                          ⟨213304⟩
 sinon :
     police1.couleur(224)                                                                              ⟨213313⟩
     si = textes1                                                                                      ⟨213316⟩
@@ -916,8 +1311,11 @@ sinon :
     tête_texte_de_lèvres(tête=c57, texte="Back off, almost got tone. Blah blah blah")                 ⟨213326⟩
     tant que (scène7.compteur < 30) et (scène7.terminée == 0) :
         Scene_Tick(scène=scène7)                                                                      ⟨213334⟩
+v94 = 0                                                                                               ⟨213375⟩
 Scene_Destruct(scène=scène7, drapeaux=0)                                                              ⟨213383⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨213409⟩
+    v22 = 0                                                                                           ⟨213410⟩
     retour                                                                                            ⟨213414⟩
 si v29 != 0 :
     charge(mid1voc 10)                                                                                ⟨213429⟩
@@ -989,11 +1387,13 @@ tant que (scène8.compteur < 40) et (scène8.terminée == 0) :
     si scène8.compteur & 1 != 0 :
         v144 = v144 + 1                                                                               ⟨213812⟩
         si v144 == 21 :
+            v144_avant = v144                                                                         ⟨213816⟩
             v144 = 16                                                                                 ⟨213816⟩
         v152 = v144                                                                                   ⟨213820⟩
         c66.image = v152                                                                              ⟨213823⟩
         v146 = v146 + 1                                                                               ⟨213824⟩
         si v146 == 16 :
+            v146_avant = v146                                                                         ⟨213828⟩
             v146 = 7                                                                                  ⟨213828⟩
         v154 = v146                                                                                   ⟨213832⟩
         c65.image = v154                                                                              ⟨213835⟩
@@ -1046,23 +1446,38 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨214038⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨214045⟩
+v106 = 0                                                                                              ⟨214067⟩
+v87 = 0                                                                                               ⟨214090⟩
+v86 = 0                                                                                               ⟨214091⟩
 Scene_Destruct(scène=scène8, drapeaux=0)                                                              ⟨214095⟩
+v76 = 0                                                                                               ⟨214115⟩
 
 ──── scène9 ────
 scène9 = Scene_Create(cadence=15, palette=255, surface=pal9)                                          ⟨214121⟩
+v76 = 0                                                                                               ⟨214126⟩
 charge(mid1 24)                                                                                       ⟨214132⟩
 c74 = AnimLayer(ressource=mid1 24, x=0, y=0)                                                          ⟨214139⟩
 si = c74                                                                                              ⟨214141⟩
 ajoute c74 à scène9                                                                                   ⟨214145⟩
+v88 = 2                                                                                               ⟨214148⟩
+v87 = 0                                                                                               ⟨214149⟩
+v86 = 0                                                                                               ⟨214150⟩
 charge(mid1 58)                                                                                       ⟨214156⟩
+v95 = 0                                                                                               ⟨214158⟩
 palette_depuis(pal21(mid1 58))                                                                        ⟨214163⟩
 palette_copie(destination=pal1, source=pal21(mid1 58))                                                ⟨214171⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨214184⟩
 tant que animation_finie(calque=c74) == 0 :
     Scene_Tick(scène=scène9)                                                                          ⟨214192⟩
+v87 = 0                                                                                               ⟨214224⟩
+v86 = 0                                                                                               ⟨214225⟩
+v76 = 0                                                                                               ⟨214244⟩
 Scene_Destruct(scène=scène9, drapeaux=0)                                                              ⟨214248⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨214274⟩
+    v22 = 0                                                                                           ⟨214275⟩
     retour                                                                                            ⟨214279⟩
+v76 = 0                                                                                               ⟨214286⟩
 si v29 != 0 :
     charge(mid1voc 11)                                                                                ⟨214294⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 11)                                 ⟨214299⟩
@@ -1073,7 +1488,11 @@ sinon :
 
 ──── scène10 ────
 scène10 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨214325⟩
+v88 = 2                                                                                               ⟨214328⟩
+v87 = 0                                                                                               ⟨214329⟩
+v86 = 0                                                                                               ⟨214330⟩
 charge(mid1 49)                                                                                       ⟨214336⟩
+v95 = 0                                                                                               ⟨214338⟩
 palette_depuis(pal21(mid1 49))                                                                        ⟨214343⟩
 di = pal2(optpals 21)                                                                                 ⟨214345⟩
 palette_copie(destination=pal1, source=pal2(optpals 21))                                              ⟨214351⟩
@@ -1082,6 +1501,7 @@ palette_copie(destination=pal1, source=pal21(mid1 49))                          
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨214383⟩
 c75 = Layer(ressource=optshps 116, x=0, y=0)                                                          ⟨214389⟩
 ajoute c75 à scène10                                                                                  ⟨214395⟩
+v106 = 0                                                                                              ⟨214400⟩
 charge(mid1 16)                                                                                       ⟨214406⟩
 charge(mid1 18)                                                                                       ⟨214417⟩
 c76 = AnimLayer(ressource=mid1 16, x=0, y=0)                                                          ⟨214424⟩
@@ -1105,9 +1525,17 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨214528⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨214535⟩
+v116 = 0                                                                                              ⟨214557⟩
+v106 = 0                                                                                              ⟨214576⟩
+v87 = 0                                                                                               ⟨214599⟩
+v86 = 0                                                                                               ⟨214600⟩
 Scene_Destruct(scène=scène10, drapeaux=0)                                                             ⟨214604⟩
+v76 = 0                                                                                               ⟨214624⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨214649⟩
+    v22 = 0                                                                                           ⟨214650⟩
     retour                                                                                            ⟨214654⟩
+v76 = 0                                                                                               ⟨214661⟩
 si v29 != 0 :
     charge(mid1voc 12)                                                                                ⟨214669⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 12)                                 ⟨214674⟩
@@ -1135,11 +1563,15 @@ tant que animation_finie(calque=c79) == 0 :
     Scene_Tick(scène=scène11)                                                                         ⟨214774⟩
 Scene_Destruct(scène=scène11, drapeaux=0)                                                             ⟨214806⟩
 si byte_495FC != 0 :
+    v76 = 0                                                                                           ⟨214832⟩
+    v23 = 0                                                                                           ⟨214855⟩
+    v22 = 0                                                                                           ⟨214856⟩
     retour                                                                                            ⟨214860⟩
 
 ──── scène12 ────
 scène12 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨214869⟩
 charge(mid1 51)                                                                                       ⟨214880⟩
+v95 = 0                                                                                               ⟨214882⟩
 palette_depuis(pal21(mid1 51))                                                                        ⟨214887⟩
 charge(mid1 7)                                                                                        ⟨214898⟩
 charge(midgames 21)                                                                                   ⟨214909⟩
@@ -1199,16 +1631,26 @@ tant que (scène12.compteur < 41) et (scène12.terminée == 0) :
         c87.détruit(3)                                                                                ⟨215251⟩
         ajoute c88 à scène12                                                                          ⟨215259⟩
     Scene_Tick(scène=scène12)                                                                         ⟨215265⟩
+v170 = 0                                                                                              ⟨215308⟩
+v160 = 0                                                                                              ⟨215327⟩
+v150 = 0                                                                                              ⟨215346⟩
+v102 = 0                                                                                              ⟨215384⟩
+v87 = 0                                                                                               ⟨215407⟩
+v86 = 0                                                                                               ⟨215408⟩
 Scene_Destruct(scène=scène12, drapeaux=0)                                                             ⟨215412⟩
 si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨215417⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨215424⟩
+v76 = 0                                                                                               ⟨215446⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨215471⟩
+    v22 = 0                                                                                           ⟨215472⟩
     retour                                                                                            ⟨215476⟩
 
 ──── scène13 ────
 scène13 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨215485⟩
+v76 = 0                                                                                               ⟨215490⟩
 si v29 != 0 :
     charge(mid1voc 13)                                                                                ⟨215498⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid1voc 13)                                 ⟨215503⟩
@@ -1258,8 +1700,12 @@ si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨215768⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨215775⟩
+v90 = 0                                                                                               ⟨215854⟩
+v76 = 0                                                                                               ⟨215873⟩
 Scene_Destruct(scène=scène13, drapeaux=0)                                                             ⟨215877⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨215903⟩
+    v22 = 0                                                                                           ⟨215904⟩
     retour                                                                                            ⟨215908⟩
 
 ──── scène14 ────
@@ -1308,6 +1754,8 @@ tant que (scène14.compteur < 10) et (scène14.terminée == 0) :
     Scene_Tick(scène=scène14)                                                                         ⟨216174⟩
 Scene_Destruct(scène=scène14, drapeaux=0)                                                             ⟨216202⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨216228⟩
+    v22 = 0                                                                                           ⟨216229⟩
     retour                                                                                            ⟨216233⟩
 
 ──── scène15 ────
@@ -1331,10 +1779,13 @@ tant que (scène15.compteur < 20) et (scène15.terminée == 0) :
     Scene_Tick(scène=scène15)                                                                         ⟨216340⟩
 Scene_Destruct(scène=scène15, drapeaux=0)                                                             ⟨216364⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨216390⟩
+    v22 = 0                                                                                           ⟨216391⟩
     retour                                                                                            ⟨216395⟩
 
 ──── scène16 ────
 scène16 = Scene_Create(cadence=10, palette=255, surface=pal9)                                         ⟨216404⟩
+v76 = 0                                                                                               ⟨216409⟩
 charge_convdata_type0("pri", drapeau=3)                                                               ⟨216414⟩
 palette_copie(destination=pal1, source=pal20(mid1 43))                                                ⟨216422⟩
 si = pal6(convdata type 2 "normal")                                                                   ⟨216424⟩
@@ -1348,18 +1799,24 @@ c109 = TalkingHeadOverlay(ressource=convdata type 0 "pri", x=160, y=128)        
 di = c109                                                                                             ⟨216477⟩
 ajoute c109 à scène16                                                                                 ⟨216481⟩
 tête_image_de_base(tête=c109, image=27)                                                               ⟨216485⟩
+v90 = 0                                                                                               ⟨216490⟩
 charge(midgames 0)                                                                                    ⟨216496⟩
 c110 = ToggleLayer(ressource=midgames 0, x=160, y=128, sens=1)                                        ⟨216504⟩
 ajoute c110 à scène16                                                                                 ⟨216510⟩
 tant que (scène16.compteur < 20) et (scène16.terminée == 0) :
     Scene_Tick(scène=scène16)                                                                         ⟨216518⟩
+v90 = 0                                                                                               ⟨216557⟩
+v76 = 0                                                                                               ⟨216576⟩
 Scene_Destruct(scène=scène16, drapeaux=0)                                                             ⟨216580⟩
 si byte_495FC != 0 :
+    v23 = 0                                                                                           ⟨216606⟩
+    v22 = 0                                                                                           ⟨216607⟩
     retour                                                                                            ⟨216611⟩
 charge(mid1 25)                                                                                       ⟨216624⟩
 
 ──── scène17 ────
 scène17 = Scene_Create(cadence=10, palette=255, surface=pal9)                                         ⟨216631⟩
+v76 = 0                                                                                               ⟨216636⟩
 charge(mid1 47)                                                                                       ⟨216642⟩
 palette_depuis(pal22(mid1 47))                                                                        ⟨216649⟩
 di = pal4(midgames 22)                                                                                ⟨216651⟩
@@ -1386,8 +1843,13 @@ tant que (scène17.compteur < 20) et (scène17.terminée == 0) :
     si scène17.compteur > 8 :
         c116.image = 9                                                                                ⟨216783⟩
     Scene_Tick(scène=scène17)                                                                         ⟨216788⟩
+v76 = 0                                                                                               ⟨216851⟩
 Scene_Destruct(scène=scène17, drapeaux=0)                                                             ⟨216855⟩
 si byte_495FC != 0 :
+    v39 = 0                                                                                           ⟨216880⟩
+    v38 = 0                                                                                           ⟨216881⟩
+    v23 = 0                                                                                           ⟨216904⟩
+    v22 = 0                                                                                           ⟨216905⟩
     retour                                                                                            ⟨216909⟩
 charge(midgames 23)                                                                                   ⟨216922⟩
 palette_depuis(pal23(midgames 23))                                                                    ⟨216929⟩
@@ -1426,6 +1888,12 @@ tant que (scène18.compteur < 30) et (scène18.terminée == 0) :
     Scene_Tick(scène=scène18)                                                                         ⟨217095⟩
 Scene_Destruct(scène=scène18, drapeaux=0)                                                             ⟨217176⟩
 si byte_495FC != 0 :
+    v49 = 0                                                                                           ⟨217210⟩
+    v48 = 0                                                                                           ⟨217211⟩
+    v39 = 0                                                                                           ⟨217229⟩
+    v38 = 0                                                                                           ⟨217230⟩
+    v23 = 0                                                                                           ⟨217253⟩
+    v22 = 0                                                                                           ⟨217254⟩
     retour                                                                                            ⟨217258⟩
 
 ──── scène19 ────
@@ -1433,6 +1901,7 @@ scène19 = Scene_Create(cadence=10, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217269⟩
 v80 = objet39.+0                                                                                      ⟨217271⟩
 v78 = objet39.+2                                                                                      ⟨217273⟩
+v76_avant = v76                                                                                       ⟨217275⟩
 v76 = objet39.+4                                                                                      ⟨217275⟩
 v74 = objet39.+6                                                                                      ⟨217277⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217286⟩
@@ -1474,6 +1943,12 @@ sinon :
         c126.image = v104                                                                             ⟨217509⟩
 Scene_Destruct(scène=scène19, drapeaux=0)                                                             ⟨217538⟩
 si byte_495FC != 0 :
+    v49 = 0                                                                                           ⟨217568⟩
+    v48 = 0                                                                                           ⟨217569⟩
+    v39 = 0                                                                                           ⟨217587⟩
+    v38 = 0                                                                                           ⟨217588⟩
+    v23 = 0                                                                                           ⟨217611⟩
+    v22 = 0                                                                                           ⟨217612⟩
     retour                                                                                            ⟨217616⟩
 
 ──── scène20 ────
@@ -1481,6 +1956,7 @@ scène20 = Scene_Create(cadence=20, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217627⟩
 v80 = objet39.+0                                                                                      ⟨217629⟩
 v78 = objet39.+2                                                                                      ⟨217631⟩
+v76_avant = v76                                                                                       ⟨217633⟩
 v76 = objet39.+4                                                                                      ⟨217633⟩
 v74 = objet39.+6                                                                                      ⟨217635⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217644⟩
@@ -1529,6 +2005,7 @@ scène21 = Scene_Create(cadence=10, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨217929⟩
 v80 = objet39.+0                                                                                      ⟨217931⟩
 v78 = objet39.+2                                                                                      ⟨217933⟩
+v76_avant = v76                                                                                       ⟨217935⟩
 v76 = objet39.+4                                                                                      ⟨217935⟩
 v74 = objet39.+6                                                                                      ⟨217937⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨217946⟩
@@ -1585,6 +2062,7 @@ scène22 = Scene_Create(cadence=20, palette=255, surface=pal9)                  
 di = objet39                                                                                          ⟨218252⟩
 v80 = objet39.+0                                                                                      ⟨218254⟩
 v78 = objet39.+2                                                                                      ⟨218256⟩
+v76_avant = v76                                                                                       ⟨218258⟩
 v76 = objet39.+4                                                                                      ⟨218258⟩
 v74 = objet39.+6                                                                                      ⟨218260⟩
 zone_texte(zone=zone6, police=police1)                                                                ⟨218269⟩
@@ -1628,6 +2106,12 @@ sinon :
         c141.image = v104                                                                             ⟨218517⟩
 Scene_Destruct(scène=scène22, drapeaux=0)                                                             ⟨218546⟩
 si byte_495FC != 0 :
+    v49 = 0                                                                                           ⟨218576⟩
+    v48 = 0                                                                                           ⟨218577⟩
+    v39 = 0                                                                                           ⟨218595⟩
+    v38 = 0                                                                                           ⟨218596⟩
+    v23 = 0                                                                                           ⟨218619⟩
+    v22 = 0                                                                                           ⟨218620⟩
     retour                                                                                            ⟨218624⟩
 v61 = 0                                                                                               ⟨218628⟩
 si byte_46848 == 1 ou byte_46848 == 2 :
@@ -1639,6 +2123,8 @@ sinon :
     si v31 != 0 :
         canal_arrête(canal=canal3)                                                                    ⟨218669⟩
         canal_enregistre(canal=canal3, ressource=objets1 + 50, x=0)                                   ⟨218676⟩
+v76_avant = v76                                                                                       ⟨218684⟩
+v76 = 0                                                                                               ⟨218684⟩
 charge(mid1 60)                                                                                       ⟨218690⟩
 charge(mid1 46)                                                                                       ⟨218701⟩
 palette_depuis(pal21(mid1 46))                                                                        ⟨218708⟩
@@ -1738,8 +2224,10 @@ si byte_495FC == 0 :
 dessine_image(surface=pal11, x=0, y=0, données=données(optshps 116.+0), image=0)                      ⟨219340⟩
 dessine_image(surface=pal11, x=0, y=0, données=données(midgames 20.+0), image=0)                      ⟨219358⟩
 dessine_image(surface=pal11, x=0, y=0, données=données(optshps 44.+0), image=0)                       ⟨219376⟩
+v324 = 0                                                                                              ⟨219380⟩
 TextFormat_ApplyStyleAttribute_2E9A4(&v324, pal11)                                                    ⟨219385⟩
 v180 = word_46F46                                                                                     ⟨219388⟩
+v338 = 0                                                                                              ⟨219389⟩
 TextFormat_ApplyStyleAttribute_2E9A4(&v338, v180)                                                     ⟨219394⟩
 si = 0                                                                                                ⟨219396⟩
 tant que si < 25 :
@@ -1753,11 +2241,26 @@ tant que si < 25 :
     v328 = v188                                                                                       ⟨219426⟩
     UI_ApplyEncodingHelper_2EC65(&v338, &v324)                                                        ⟨219431⟩
     si = si + 1                                                                                       ⟨219433⟩
+v167 = 0                                                                                              ⟨219463⟩
+v157 = 0                                                                                              ⟨219482⟩
+v142 = 0                                                                                              ⟨219502⟩
+v132 = 0                                                                                              ⟨219521⟩
 Scene_Destruct(scène=scène23, drapeaux=0)                                                             ⟨219525⟩
+v87 = 0                                                                                               ⟨219549⟩
+v86 = 0                                                                                               ⟨219550⟩
+v76 = 0                                                                                               ⟨219569⟩
 si v29 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨219573⟩
 si v31 != 0 :
     canal_arrête(canal=canal3)                                                                        ⟨219580⟩
+v67 = 0                                                                                               ⟨219601⟩
+v66 = 0                                                                                               ⟨219602⟩
+v49 = 0                                                                                               ⟨219625⟩
+v48 = 0                                                                                               ⟨219626⟩
+v39 = 0                                                                                               ⟨219644⟩
+v38 = 0                                                                                               ⟨219645⟩
+v23 = 0                                                                                               ⟨219668⟩
+v22 = 0                                                                                               ⟨219669⟩
 retour                                                                                                ⟨219673⟩
 ```
 

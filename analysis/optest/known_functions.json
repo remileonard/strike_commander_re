@@ -3328,5 +3328,10 @@
     "new_name": "AIL_set_relative_volume_30C66",
     "segment": "seg106",
     "summary": "far, LUE 2026-10-21. Fonction 177 du pilote son (`mov ax, 0B1h / jmp AIL_call_driver_3041C`) = AIL_SET_REL_VOL d'AIL.INC (`AIL_set_relative_volume` d'AIL.ASM) : volume relatif d'une séquence musicale, atteint en un temps donné (arguments : pilote, séquence, volume, durée). Utilisée par la cinématique mid2 pour fondre les ambiances musicales entre elles."
+  },
+  "loc_9E5E": {
+    "new_name": "TalkingHead_DrawDressed_9E5E",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Méthode +32 (dessin) des tables 182Bh et 1883h (TalkingHead) : TalkingHead_DrawAt_9D47 (tête, image de base, bouche, enfants), puis l'image 1 de la ressource (coiffure) et l'image du champ +848h (toujours 34, posé par TalkingHead_Construct_98F4 : habits), à la même position. mid2 dessine ainsi Tex et Stern habillés ; la tête casquée de mid1 (TalkingHeadOverlay_DrawAt_B28E) n'utilise pas cette méthode."
   }
 }

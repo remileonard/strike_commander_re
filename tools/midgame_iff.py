@@ -917,8 +917,14 @@ class Player:
             for c in layer.children:
                 self.layer_items(c, ax, ay, out)
             if t == 'TalkingHeadOverlay':
+                # TalkingHeadOverlay_DrawAt_B28E : images 35 et 38 (combinaison, casque).
                 out.append(self.item(n + ':35', layer.res, 35, ax, ay))
                 out.append(self.item(n + ':38', layer.res, 38, ax, ay))
+            else:
+                # Méthode de dessin de la table 1883h (loc_9E5E) : image 1 (coiffure), puis l'image du
+                # champ +848h, toujours 34 (habits, TalkingHead_Construct_98F4).
+                out.append(self.item(n + ':1', layer.res, 1, ax, ay))
+                out.append(self.item(n + ':34', layer.res, 34, ax, ay))
             return
         elif t in ('ClippedMovingLayer', 'ClippedMovingImageLayer'):
             img = layer.image if layer.image is not None and layer.image >= 0 else None

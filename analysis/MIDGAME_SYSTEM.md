@@ -477,7 +477,9 @@ Utilisée une fois dans mid1 (scène 18, `midgames` 0, en (160, 128), vers l'ava
 ### 6.6 La bouche de la tête parlante
 
 La tête parlante dessine, dans l'ordre : l'image 0 de sa ressource (la tête), une **image de
-base**, une **image de bouche**.
+base**, une **image de bouche**, ses enfants. La tête simple (table 1883h, mid2) ajoute ensuite
+l'**image 1** (coiffure) et l'**image 34** (habits) : `TalkingHead_DrawDressed_9E5E`, champ +848h
+toujours 34. La tête de mid1 (`TalkingHeadOverlay`) ajoute à la place les images 35 et 38.
 
 - **Image de base.** Fixée par `TalkingHead_SetBaseFrame_9D32` (mid1 : 31 ou 27). Une fois sur 30
   en moyenne, elle est remplacée par l'image 12 (clignement), mais seulement si le clignement est
@@ -972,7 +974,7 @@ numéros d'image.
 ## 11. À chercher dans les autres cinématiques
 
 **mid2 (2026-10-21)** : produite par les mêmes outils (`MID1_PLANS.md`, « Autres cinématiques »).
-Mécanismes nouveaux rencontrés : la voix testée « en cours » (`VoicePlayer_IsPlaying_8500`) et non
+Mécanismes nouveaux rencontrés : la tête habillée (§ 6.6), la voix testée « en cours » (`VoicePlayer_IsPlaying_8500`) et non
 « finie » (`VoicePlayer_IsDone_84CC`), la bouche en mode voix (§ 6.6), des tirages `CRT_Rand`
 (position de la tête, effets sonores au hasard) et des fondus de volume entre ambiances musicales
 (`AIL_set_relative_volume_30C66`, non exprimés dans le format).
