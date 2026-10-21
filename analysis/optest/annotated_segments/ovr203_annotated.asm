@@ -1753,7 +1753,7 @@ loc_8C8C0:				; CODE XREF: sub_8B630+127Cj
 loc_8C8D7:				; CODE XREF: sub_8B630+1293j
 		push	word ptr [bp+var_154]
 		push	word ptr [bp+var_144]
-		call	sub_94F4
+		call	ScaledImageLayer_SetScale_94F4
 		add	sp, 4
 		cmp	di, 33h	; '3'
 		jge	short loc_8C904
@@ -1806,7 +1806,7 @@ loc_8C961:				; CODE XREF: sub_8B630+131Dj
 loc_8C978:				; CODE XREF: sub_8B630+1334j
 		push	word ptr [bp+var_158]
 		push	word ptr [bp+var_144+2]
-		call	sub_94F4
+		call	ScaledImageLayer_SetScale_94F4
 		add	sp, 4
 		cmp	di, 33h	; '3'
 		jge	short loc_8C9A5

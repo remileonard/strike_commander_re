@@ -1,5 +1,5 @@
 {
- "_doc": "Catalogue du moteur des cinématiques pour tools/midgame_extract.py. Clés = noms de known_functions.json. args = rôle de chaque argument dans l'ordre d'appel ; ret = type de l'objet renvoyé ; type = type donné à l'objet passé en 1er argument (constructeurs) ; hide = opération omise du rapport (libérations). Valeurs en décimal.",
+ "_doc": "Catalogue du moteur des cinématiques pour tools/midgame_extract.py. Clés = noms de known_functions.json. args = rôle de chaque argument dans l'ordre d'appel ; ret = type de l'objet renvoyé ; type = type donné à l'objet passé en 1er argument (constructeurs) ; hide = opération omise du rapport (libérations). Valeurs en décimal. method_functions = emplacement de table de méthodes (décimal) appelé indirectement, traité comme un appel direct de la fonction nommée (mid15 : +18h des calques = Layer_MoveBy_2E29E).",
  "dseg_base": 274464,
  "functions": {
   "Path_Build_C82C": {
@@ -772,6 +772,13 @@
    ],
    "type": "Layer",
    "ret": "layer"
+  },
+  "ScaledImageLayer_SetScale_94F4": {
+   "op": "échelle",
+   "args": [
+    "calque",
+    "échelle"
+   ]
   }
  },
  "vtables": {
@@ -900,5 +907,10 @@
  },
  "args_of": {
   "Midgame1_PlayPart2_671C0": "from_caller"
+ },
+ "method_functions": {
+  "layer": {
+   "24": "Layer_MoveBy_2E29E"
+  }
  }
 }

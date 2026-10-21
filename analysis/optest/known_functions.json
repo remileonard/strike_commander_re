@@ -3403,5 +3403,10 @@
     "new_name": "Layer_ConstructAtOrigin_2DE95",
     "segment": "seg084",
     "summary": "far, LUE 2026-10-21. Calque de base (1Dh octets, alloué si nul), même table de méthodes que Layer_Construct_2DF9B (dseg 18DFh = 6367) : ressource arg_2 attachée par sub_2DE4F, position +0Ch et +0Eh mises à 0. Équivaut à Layer_Construct_2DF9B(objet, ressource, 0, 0). mid12 : `mid12` 0 et 1."
+  },
+  "sub_94F4": {
+    "new_name": "ScaledImageLayer_SetScale_94F4",
+    "segment": "seg014",
+    "summary": "far, LUE 2026-10-21. Pose l'échelle d'un ScaledImageLayer : [arg_0 + 1Fh] = arg_2 (1/256, 256 = taille d'origine). mid15 : zoom des deux avions du premier plan, de 32 à 255."
   }
 }

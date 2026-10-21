@@ -234,7 +234,11 @@ loc_94B7:				; CODE XREF: seg014:2D92j
 
 ; Attributes: bp-based frame
 
-sub_94F4	proc far		; CODE XREF: sub_8B630+12AFP
+; ==============================================================================================
+; far, LUE 2026-10-21. Pose l'échelle d'un ScaledImageLayer : [arg_0 + 1Fh] = arg_2 (1/256,
+; 256 = taille d'origine). mid15 : zoom des deux avions du premier plan, de 32 à 255.
+; ==============================================================================================
+ScaledImageLayer_SetScale_94F4	proc far		; CODE XREF: sub_8B630+12AFP
 					; sub_8B630+1350P
 
 arg_0		= word ptr  6
@@ -249,7 +253,7 @@ arg_2		= word ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_94F4	endp
+ScaledImageLayer_SetScale_94F4	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

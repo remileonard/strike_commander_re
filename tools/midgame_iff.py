@@ -751,6 +751,12 @@ class Player:
             value = self.ev(args.get('table'))
             if layer is not None and isinstance(value, tuple) and value[0] == 'table':
                 layer.table = value[1]
+        elif name == 'échelle':
+            # ScaledImageLayer_SetScale_94F4 : [calque + 1Fh] = échelle (1/256).
+            layer = self.layers.get(args['calque'].get('objet')) if isinstance(args.get('calque'), dict) else None
+            if layer is not None:
+                scale = self.ev(args.get('échelle')) or 256
+                layer.scale = (scale, scale)
         elif name == 'déplace':
             layer = self.layers.get(args['calque'].get('objet')) if isinstance(args.get('calque'), dict) else None
             if layer is not None:

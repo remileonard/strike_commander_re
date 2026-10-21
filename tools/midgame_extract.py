@@ -492,12 +492,12 @@ class FunctionRun:
                 if o[0] == 'mem' and o[1][0] == 'bp':
                     src = self.operand(parts[1]) if mn == 'mov' and len(parts) > 1 else None
                     writes.setdefault(o[1][1], []).append(src)
-        # Mots incrémentés ou décrémentés sur place : des compteurs, jamais des champs de poignée.
+        # Mots modifiés sur place (inc, dec, add, sub) : des variables, jamais des champs de poignée.
         self.counter_words = set()
         for ins in self.instrs:
-            if ins[0] == 'ins' and ins[1] in ('inc', 'dec') and ins[2].startswith('word ptr'):
-                o = self.operand(ins[2])
-                if o[0] == 'mem' and o[1][0] == 'bp':
+            if ins[0] == 'ins' and ins[1] in ('inc', 'dec', 'add', 'sub') and ins[2]:
+                o = self.operand(DataSegment.split_operands(ins[2])[0].strip())
+                if o[0] == 'mem' and o[1][0] == 'bp' and o[2] == 2:
                     self.counter_words.add(o[1][1])
         self.const_locals = {}
         for off, srcs in writes.items():
@@ -675,6 +675,14 @@ class FunctionRun:
             return best[1], best[2]
         return None
 
+    def service_counter(self, off):
+        """Mot modifié sur place dans la case de pile d'une ressource, d'un son… : une variable
+        (mid5 : compteur var_13E+2 de la fuite dans la case de mid5voc 11 ; mid15 : var_14E, var_14C+2)."""
+        if off not in self.counter_words:
+            return False
+        hit = self.region_at(off, service=True)
+        return bool(hit) and self.ex.objects[hit[1]].kind in SERVICE
+
     def in_init_window(self, off):
         for start, entries in self.regions.items():
             for when, size, oid in entries:
@@ -711,6 +719,8 @@ class FunctionRun:
                     return v[1]
             if off in self.const_locals and not self.region_at(off, service=True):
                 return self.const_locals[off]
+            if self.service_counter(off):
+                return ('local', off)
             hit = self.region_at(off)
             if hit:
                 start, oid = hit
@@ -828,18 +838,14 @@ class FunctionRun:
             if is_const(val) and val[1] in (0, 2) and op[2] != 2 and self.region_at(off, service=True) and self.ex.objects[self.region_at(off, service=True)[1]].kind in SERVICE:
                 return
             hit = self.region_at(off)
-            if hit and op[2] == 2 and not self.in_init_window(off) and (
-                    self.ex.objects[hit[1]].kind == 'palette'
-                    or (self.ex.objects[hit[1]].kind == 'res' and off in self.counter_words)):
+            if hit and op[2] == 2 and self.ex.objects[hit[1]].kind == 'palette' and not self.in_init_window(off):
                 # Une palette n'est écrite que par les fonctions de palette : un mot écrit directement
                 # dans sa case de pile en fait une variable (mid5 : compteur d'attente var_10C).
-                # Même chose pour un mot incrémenté dans la case d'une ressource (mid5 : compteur
-                # var_13E+2 de la fuite des attaquants, dans la case de mid5voc 11).
                 obj = self.ex.objects[hit[1]]
-                # Cible écrite « identifiant(contenu) » : le lecteur retrouve l'objet par son identifiant.
-                label = f'{obj.name}({obj.content})' if obj.kind == 'res' and obj.content else self.ex.obj_label(obj)
-                self.emit(('assign', f'{label}.{self.ex.field_name(obj, off - hit[0])}', val, line))
+                self.emit(('assign', f'{self.ex.obj_label(obj)}.{self.ex.field_name(obj, off - hit[0])}', val, line))
                 return
+            if op[2] == 2 and self.service_counter(off):
+                hit = None
             if hit:
                 start, oid = hit
                 if self.ex.objects[oid].kind in SERVICE:
@@ -971,6 +977,13 @@ class FunctionRun:
         if base[0] == 'field' and base[2] == 0:
             obj = self.ex.objects[base[1]]
         name = f'méthode{slot}'
+        if obj is not None and obj.kind in ('layer', 'heap'):
+            target = self.ex.engine.get('method_functions', {}).get('layer', {}).get(str(slot))
+            if target and target in self.ex.funcs:
+                for r in ('ax', 'bx', 'cx', 'dx', 'es'):
+                    self.regs[r] = unknown()
+                self.ex.apply(self, target, self.ex.funcs[target], args, line)
+                return
         if obj is not None:
             methods = self.ex.engine['methods']
             kind = {'voice': 'voice', 'layer': 'layer', 'heap': 'layer', 'font': 'font', 'pak': 'pak', 'stream': 'stream'}.get(obj.kind)
@@ -1742,12 +1755,18 @@ def negate_any(c):
     return ('not', c)
 
 
-def structure(s, lo, hi, labels):
-    """Transforme la liste plate en arbre : ('while', cond, corps), ('if', cond, alors, sinon)."""
+def structure(s, lo, hi, labels, else_ctx=None):
+    """Transforme la liste plate en arbre : ('while', cond, corps), ('if', cond, alors, sinon).
+    else_ctx = (étiquette, sinon) : un second saut vers le « sinon » d'un si englobant (si a et b,
+    mid15) devient un si imbriqué qui reprend ce même sinon."""
     out = []
     i = lo
     while i < hi:
         st = s[i]
+        if else_ctx and st[0] == 'cgoto' and st[2] == else_ctx[0]:
+            then_part = structure(s, i + 1, hi, labels, else_ctx)
+            out.append(('if', negate_any(st[1]), then_part, else_ctx[1], st[3]))
+            return out
         if st[0] == 'goto' and i + 1 < hi and s[i + 1][0] == 'label':
             lc = st[1]
             lb = s[i + 1][1]
@@ -1785,7 +1804,8 @@ def structure(s, lo, hi, labels):
                     else_part = structure(s, il + 1, im, labels)
                     then_hi -= 1
                     nxt = im
-            then_part = structure(s, i + 1, then_hi, labels)
+            ctx = (st[2], else_part) if nxt != il else None
+            then_part = structure(s, i + 1, then_hi, labels, ctx)
             out.append(('if', negate_any(st[1]), then_part, else_part, st[3]))
             i = nxt
             continue

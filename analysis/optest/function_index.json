@@ -2895,8 +2895,8 @@
 "lines": 16,
 "type": "far",
 "calls": [],
-"new_name": "sub_94F4",
-"summary": ""
+"new_name": "ScaledImageLayer_SetScale_94F4",
+"summary": "far, LUE 2026-10-21. Pose l'échelle d'un ScaledImageLayer : [arg_0 + 1Fh] = arg_2 (1/256, 256 = taille d'origine). mid15 : zoom des deux avions du premier plan, de 32 à 255."
 },
 "sub_9544": {
 "segment": "seg014",

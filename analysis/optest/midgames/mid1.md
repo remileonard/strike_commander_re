@@ -23,8 +23,10 @@ v484 = 0                                                                        
 TextRenderer_ApplyFormatChange_2EA21(&v484, 0)                                                        ⟨203080⟩
 SmallObject_RegisterInList_2CB40(&v38, &v484)                                                         ⟨203086⟩
 si v29 != 0 :
-    si sub_6734(chemin1) == 0 : aller à loc_5FEA6                                                     ⟨203148⟩
-    pak mid1voc.ouvre(chemin1, 1)                                                                     ⟨203155⟩
+    si sub_6734(chemin1) != 0 :
+        pak mid1voc.ouvre(chemin1, 1)                                                                 ⟨203155⟩
+    sinon :
+        v29 = 0                                                                                       ⟨203162⟩
 sinon :
     v29 = 0                                                                                           ⟨203162⟩
 palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨203169⟩

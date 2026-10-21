@@ -9,7 +9,7 @@ python3 tools/midgame_iff.py analysis/optest/midgames/mid1.json ../libRealSpace/
 ```
 
 **Fichiers produits** (2026-10-21) : `analysis/optest/midgames/iff/MID_1.IFF`, `MID_2`, `MID_3`, `MID_5`,
-`MID_12`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
+`MID_12`, `MID_15`, tous avec `--sous-titres` (voix et sous-titres), `MID_1` avec `--remplace pri=air`. Ils ne
 contiennent que des noms de PAK, des numéros d'entrée et des clés de texte, pas de données du jeu.
 
 1. `midgame_extract.py` écrit dans `mid1.json` l'arbre de la cinématique : boucles, tests,
@@ -203,8 +203,8 @@ Limites :
 - les fondus de volume entre ambiances musicales (`AIL_set_relative_volume_30C66`) et les séquences
   musicales autres que la première ne sont pas exprimés ;
 - dans la scène 5, la case de pile de la ressource `mid2voc` 9 est réutilisée par le code comme
-  compteur (`var_188`, l'image 10 d'un calque est posée au 4ᵉ tour) : l'extracteur ne voit pas
-  cette réutilisation, le compteur est lu comme 0 et l'image 10 n'est pas posée ;
+  compteur (`var_188`, l'image 10 d'un calque est posée au 4ᵉ tour). Lu correctement depuis le
+  2026-10-21 (règle « mot modifié sur place », voir « mid15 ») ;
 - un fondu de disparition (fin de mid2) n'est pas exprimé dans le format.
 - sous-titres (`--sous-titres`) : textes de `MG02`, lus par le code seulement sans voix (le tableau
   est retrouvé dans la branche que la simulation ne prend pas). Le code ne fixe pas leur couleur
@@ -263,4 +263,24 @@ répliques et têtes en mode voix. Mécanismes nouveaux (2026-10-21) :
   calcul (sinon la boucle ne finit jamais). Cela corrige aussi les branches sans voix de mid2 et mid5
   (non jouées par l'outil ; leurs MID_*.IFF ne changent pas) ;
 - couleur des sous-titres supposée 15, comme mid2 : sur certaines palettes elle sort sombre.
+
+### mid15
+
+Fonction pas encore nommée `sub_8B630` : `--nom mid15`. 19 plans, 76,1 s (77,9 s avec le fondu),
+répliques et têtes en mode voix. Mécanismes nouveaux (2026-10-21) :
+- **zoom animé** : `ScaledImageLayer_SetScale_94F4` change l'échelle d'un calque à l'échelle à
+  chaque image. Premier plan : deux avions de 32 à 255 (× 0,125 à × 1), en se déplaçant.
+  **Pas exprimé dans le format** (245 instants différents ; sans l'échelle, 0 écart) : c'est le
+  plan où l'absence d'échelle se voit le plus ;
+- **déplacement par la table de méthodes** : l'emplacement +18h de toutes les tables de calques est
+  `Layer_MoveBy_2E29E` (vérifié sur les 16 tables) ; l'appel indirect est traité comme « déplace ».
+  Tremblement des têtes et des cockpits (−1, 0, +1 pixel). Corrige aussi mid12 (5 déplacements qui
+  étaient ignorés) ;
+- **test « a et b » vers un même sinon** (`si di == 0 et tirage == 0 … sinon si …`) : le second
+  test devient un si imbriqué qui reprend le même sinon ; l'ordre des tirages `CRT_Rand` est gardé.
+  Corrige aussi des tests de mid1, mid2, mid5 et mid12 (sans changer leurs fichiers) ;
+- **mot modifié sur place** (`inc`, `dec`, `add`, `sub`) dans la case de pile d'une ressource ou d'un
+  son : une variable ordinaire, en lecture comme en écriture. Généralise la règle de mid5 ; corrige
+  le compteur de la scène 2 de mid12 (écrit sous une ressource, relu sous une autre) et la limite
+  connue de mid2 (compteur `var_188`, image 10 posée au 4ᵉ tour). MID_2 et MID_12 changent.
 

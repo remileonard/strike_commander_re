@@ -46,8 +46,10 @@ v481 = v54                                                                      
 Widget_Method_DispatchC_314CB(zone1, 0)                                                               ⟨235735⟩
 Widget_Method_Dispatch8_314A9(zone1, 200)                                                             ⟨235740⟩
 si v10 != 0 :
-    si sub_6734(chemin1) == 0 : aller à loc_76B5B                                                     ⟨235798⟩
-    pak mid5voc.ouvre(chemin1, 1)                                                                     ⟨235805⟩
+    si sub_6734(chemin1) != 0 :
+        pak mid5voc.ouvre(chemin1, 1)                                                                 ⟨235805⟩
+    sinon :
+        v10 = 0                                                                                       ⟨235812⟩
 sinon :
     v10 = 0                                                                                           ⟨235812⟩
 v64 = 0                                                                                               ⟨235815⟩
@@ -268,7 +270,7 @@ si v11 != 0 :
         charge(asoundfx (v302 + &v300)→0)                                                             ⟨237237⟩
         canal_enregistre(canal=canal4, ressource=asoundfx (v302 + &v300)→0, x=0)                      ⟨237244⟩
         canal_arrête(canal=canal4)                                                                    ⟨237248⟩
-        r18(asoundfx (v302 + &v300)→0).+0 = 0                                                         ⟨237266⟩
+        v312 = 0                                                                                      ⟨237266⟩
         v306 = 0                                                                                      ⟨237268⟩
         v302 = v302 + 1                                                                               ⟨237269⟩
     canal_arrête(canal=canal4)                                                                        ⟨237280⟩
@@ -279,26 +281,26 @@ si v10 != 0 :
     charge(mid5voc 7)                                                                                 ⟨237323⟩
     voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid5voc 7)                                  ⟨237329⟩
     tant que (scène1.compteur < 30) et (scène1.terminée == 0) :
-        r18(asoundfx (v302 + &v300)→0).+0 = scène1.compteur                                           ⟨237336⟩
-        si asoundfx (v302 + &v300)→0.+0 < 27 :
-            v314 = asoundfx (v302 + &v300)→0.+0                                                       ⟨237344⟩
+        v312 = scène1.compteur                                                                        ⟨237336⟩
+        si v312 < 27 :
+            v314 = v312                                                                               ⟨237344⟩
             c3.image = v314                                                                           ⟨237347⟩
             si v11 != 0 :
-                si asoundfx (v302 + &v300)→0.+0 < 27 :
-                    si asoundfx (v302 + &v300)→0.+0 % 8 == 0 :
+                si v312 < 27 :
+                    si v312 % 8 == 0 :
                         v316 = word_48F4C                                                             ⟨237367⟩
                         v318 = 0                                                                      ⟨237368⟩
                         si canal2.+0 != 0 :
                             AIL_start_sequence(pilote=canal2.+0→4, séquence=v3138)                    ⟨237374⟩
                             AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v316, v318)             ⟨237381⟩
                     sinon :
-                        si asoundfx (v302 + &v300)→0.+0 % 8 == 4 :
+                        si v312 % 8 == 4 :
                             v320 = word_48F22                                                         ⟨237397⟩
                             v322 = 0                                                                  ⟨237398⟩
                             si canal3.+0 != 0 :
                                 AIL_start_sequence(pilote=canal3.+0→4, séquence=v3152)                ⟨237404⟩
                                 AIL_set_relative_volume_30C66(canal3.+0→4, v3152, v320, v322)         ⟨237411⟩
-        si asoundfx (v302 + &v300)→0.+0 == 20 :
+        si v312 == 20 :
             voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                           ⟨237422⟩
         Scene_Tick(scène=scène1)                                                                      ⟨237438⟩
     tant que voix_en_cours(voix=voix1) != 0 :
@@ -321,10 +323,10 @@ sinon :
                         AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v306, v308)                 ⟨237583⟩
                 sinon :
                     si v302 % 8 == 4 :
-                        r18(asoundfx (v302 + &v300)→0).+0 = 0                                         ⟨237600⟩
+                        v312 = 0                                                                      ⟨237600⟩
                         si canal3.+0 != 0 :
                             AIL_start_sequence(pilote=canal3.+0→4, séquence=v3152)                    ⟨237606⟩
-                            AIL_set_relative_volume_30C66(canal3.+0→4, v3152, word_48F22, asoundfx (v302 + &v300)→0.+0)  ⟨237613⟩
+                            AIL_set_relative_volume_30C66(canal3.+0→4, v3152, word_48F22, v312)       ⟨237613⟩
         si v302 == 20 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[0])                              ⟨237624⟩
         Scene_Tick(scène=scène1)                                                                      ⟨237656⟩
@@ -607,10 +609,10 @@ si v10 != 0 :
                     AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v308, mid5voc 7.+0)             ⟨239819⟩
         si scène3.compteur > 7 :
             si si + 11 > scène3.compteur :
-                r18(asoundfx (v302 + &v300)→0).+0 = v280                                              ⟨239832⟩
+                v312 = v280                                                                           ⟨239832⟩
                 v280_avant = v280                                                                     ⟨239833⟩
                 v280 = v280 + 1                                                                       ⟨239833⟩
-                c8.image = asoundfx (v302 + &v300)→0.+0                                               ⟨239836⟩
+                c8.image = v312                                                                       ⟨239836⟩
         si scène3.compteur == 11 :
             c8.image = 5                                                                              ⟨239843⟩
         Scene_Tick(scène=scène3)                                                                      ⟨239858⟩
@@ -748,9 +750,9 @@ si v10 != 0 :
     charge(mid5voc 3)                                                                                 ⟨240916⟩
     tête_voix(tête=c11, ressource=mid5voc 3, cadence=9)                                               ⟨240922⟩
     pal10(mid5 16).+0 = 0                                                                             ⟨240924⟩
-    tant que pal10(mid5 32).+0 < 3 :
+    tant que v268 < 3 :
         Scene_Tick(scène=scène4)                                                                      ⟨240931⟩
-        pal10(mid5 16).+0 = pal10(mid5 32).+0 + 1                                                     ⟨240933⟩
+        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨240933⟩
     tant que tête_parle(tête=c11) != 0 :
         Scene_Tick(scène=scène4)                                                                      ⟨240954⟩
     tête_image_de_base(tête=c11, image=14)                                                            ⟨240967⟩
@@ -758,15 +760,15 @@ si v10 != 0 :
     charge(mid5voc 4)                                                                                 ⟨240983⟩
     tête_voix(tête=c11, ressource=mid5voc 4, cadence=9)                                               ⟨240989⟩
     pal10(mid5 16).+0 = 0                                                                             ⟨240991⟩
-    tant que pal10(mid5 32).+0 < 3 :
+    tant que v268 < 3 :
         Scene_Tick(scène=scène4)                                                                      ⟨240998⟩
-        pal10(mid5 16).+0 = pal10(mid5 32).+0 + 1                                                     ⟨241000⟩
+        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨241000⟩
     tant que tête_parle(tête=c11) != 0 :
         Scene_Tick(scène=scène4)                                                                      ⟨241021⟩
     pal10(mid5 16).+0 = 0                                                                             ⟨241032⟩
-    tant que pal10(mid5 32).+0 < 2 :
+    tant que v268 < 2 :
         Scene_Tick(scène=scène4)                                                                      ⟨241039⟩
-        pal10(mid5 16).+0 = pal10(mid5 32).+0 + 1                                                     ⟨241041⟩
+        pal10(mid5 16).+0 = v268 + 1                                                                  ⟨241041⟩
     v260 = 0                                                                                          ⟨241083⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨241092⟩
@@ -891,14 +893,14 @@ tant que (scène5.compteur < 13) et (scène5.terminée == 0) :
                 AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v298, v300)                         ⟨241981⟩
     si scène5.compteur == 3 :
         si v11 != 0 :
-            r28(mid5voc 10).+0 = word_48F4C + 40                                                      ⟨241993⟩
+            v302 = word_48F4C + 40                                                                    ⟨241993⟩
             si canal3.+0 != 0 :
                 AIL_start_sequence(pilote=canal3.+0→4, séquence=v3152)                                ⟨242000⟩
-                AIL_set_relative_volume_30C66(canal3.+0→4, v3152, mid5voc 10.+0, asoundfx 85.+0)      ⟨242007⟩
+                AIL_set_relative_volume_30C66(canal3.+0→4, v3152, v302, asoundfx 85.+0)               ⟨242007⟩
     Scene_Tick(scène=scène5)                                                                          ⟨242015⟩
 canal_arrête(canal=canal3)                                                                            ⟨242042⟩
 v3150 = 0                                                                                             ⟨242060⟩
-r30(asoundfx 85).+0 = 0                                                                               ⟨242079⟩
+v292 = 0                                                                                              ⟨242079⟩
 v286 = 0                                                                                              ⟨242081⟩
 canal_arrête(canal=canal2)                                                                            ⟨242084⟩
 v3136 = 0                                                                                             ⟨242102⟩
@@ -968,15 +970,15 @@ si v10 != 0 :
     charge(mid5voc 5)                                                                                 ⟨242688⟩
     tête_voix(tête=c15, ressource=mid5voc 5, cadence=9)                                               ⟨242694⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨242696⟩
-    tant que pal10(mid5 32).+0 < 3 :
+    tant que v268 < 3 :
         Scene_Tick(scène=scène6)                                                                      ⟨242703⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨242705⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨242705⟩
     tant que tête_parle(tête=c15) != 0 :
         Scene_Tick(scène=scène6)                                                                      ⟨242726⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨242737⟩
-    tant que pal10(mid5 32).+0 < 2 :
+    tant que v268 < 2 :
         Scene_Tick(scène=scène6)                                                                      ⟨242744⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨242746⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨242746⟩
     v260 = 0                                                                                          ⟨242769⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨242778⟩
@@ -1122,7 +1124,7 @@ charge(mid5 24)                                                                 
 charge(mid5 25)                                                                                       ⟨244054⟩
 v276 = 0                                                                                              ⟨244059⟩
 charge(mid5 26)                                                                                       ⟨244066⟩
-r30(asoundfx 85).+0 = 0                                                                               ⟨244068⟩
+v292 = 0                                                                                              ⟨244068⟩
 v286 = 0                                                                                              ⟨244071⟩
 charge(mid5 21)                                                                                       ⟨244078⟩
 palette_depuis(pal13(mid5 21))                                                                        ⟨244085⟩
@@ -1143,18 +1145,20 @@ ajoute c20 à scène8                                                           
 ajoute c21 à scène8                                                                                   ⟨244190⟩
 ajoute c22 à scène8                                                                                   ⟨244195⟩
 ajoute c23 à scène8                                                                                   ⟨244200⟩
-r18(asoundfx (v302 + &v300)→0).+0 = 1                                                                 ⟨244202⟩
+v312 = 1                                                                                              ⟨244202⟩
 tant que (scène8.compteur < 38) et (scène8.terminée == 0) :
     v316 = scène8.compteur                                                                            ⟨244209⟩
     si v316 > 1 :
         si v316 < 5 :
-            v318 = asoundfx (v302 + &v300)→0.+0                                                       ⟨244215⟩
-            r18(asoundfx (v302 + &v300)→0).+0 = asoundfx (v302 + &v300)→0.+0 + 1                      ⟨244216⟩
+            v318 = v312                                                                               ⟨244215⟩
+            v312_avant = v312                                                                         ⟨244216⟩
+            v312 = v312 + 1                                                                           ⟨244216⟩
             c23.image = v318                                                                          ⟨244219⟩
     si v316 > 13 :
         si v316 < 18 :
-            v320 = asoundfx (v302 + &v300)→0.+0                                                       ⟨244228⟩
-            r18(asoundfx (v302 + &v300)→0).+0 = asoundfx (v302 + &v300)→0.+0 + 1                      ⟨244229⟩
+            v320 = v312                                                                               ⟨244228⟩
+            v312_avant = v312                                                                         ⟨244229⟩
+            v312 = v312 + 1                                                                           ⟨244229⟩
             c23.image = v320                                                                          ⟨244232⟩
     si v316 == 18 :
         retire(parent=scène8, calque=c23)                                                             ⟨244241⟩
@@ -1166,17 +1170,18 @@ tant que (scène8.compteur < 38) et (scène8.terminée == 0) :
         retire(parent=scène8, calque=c24)                                                             ⟨244264⟩
         c24.détruit(3)                                                                                ⟨244272⟩
         ajoute c23 à scène8                                                                           ⟨244280⟩
-        c23.image = asoundfx (v302 + &v300)→0.+0                                                      ⟨244286⟩
+        c23.image = v312                                                                              ⟨244286⟩
     si v316 > 29 :
         si v316 < 31 :
-            v326 = asoundfx (v302 + &v300)→0.+0                                                       ⟨244294⟩
-            r18(asoundfx (v302 + &v300)→0).+0 = asoundfx (v302 + &v300)→0.+0 + 1                      ⟨244295⟩
+            v326 = v312                                                                               ⟨244294⟩
+            v312_avant = v312                                                                         ⟨244295⟩
+            v312 = v312 + 1                                                                           ⟨244295⟩
             c23.image = v326                                                                          ⟨244298⟩
     si v316 == 31 :
         c23.image = 1                                                                                 ⟨244305⟩
     Scene_Tick(scène=scène8)                                                                          ⟨244320⟩
 Scene_Destruct(scène=scène8, drapeaux=0)                                                              ⟨244349⟩
-r30(mid5 21).+0 = 0                                                                                   ⟨244372⟩
+v292 = 0                                                                                              ⟨244372⟩
 v286 = 0                                                                                              ⟨244374⟩
 v276 = 0                                                                                              ⟨244393⟩
 v256 = 0                                                                                              ⟨244431⟩
@@ -1274,7 +1279,7 @@ si v10 != 0 :
     voix_arrête(voix=voix1)                                                                           ⟨244947⟩
     v336 = 0                                                                                          ⟨244967⟩
     v322 = 0                                                                                          ⟨244986⟩
-    r32(mid5voc 11).+0 = 0                                                                            ⟨245003⟩
+    v316 = 0                                                                                          ⟨245003⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨245014⟩
     v4 = 39                                                                                           ⟨245016⟩
@@ -1347,10 +1352,10 @@ sinon :
             tête_image_de_base(tête=c26, image=28)                                                    ⟨245406⟩
         si (si + ((v4·70) / 100)) - 10 == v308 :
             si v11 != 0 :
-                r18(asoundfx (v302 + &v300)→0).+0 = 0                                                 ⟨245418⟩
+                v312 = 0                                                                              ⟨245418⟩
                 si canal2.+0 != 0 :
                     AIL_start_sequence(pilote=canal2.+0→4, séquence=v3138)                            ⟨245424⟩
-                    AIL_set_relative_volume_30C66(canal2.+0→4, v3138, word_48EF8, asoundfx (v302 + &v300)→0.+0)  ⟨245431⟩
+                    AIL_set_relative_volume_30C66(canal2.+0→4, v3138, word_48EF8, v312)               ⟨245431⟩
         si (si + ((v4·70) / 100)) - 2 == v308 :
             tête_image_de_base(tête=c26, image=25)                                                    ⟨245443⟩
         si (si + ((v4·70) / 100)) - 10 == v308 :
@@ -1436,15 +1441,15 @@ sinon :
     si = scène10.compteur                                                                             ⟨246210⟩
     tant que (scène10.compteur < si + ((v4·70) / 100)) et (scène10.terminée == 0) :
         pal10(mid5 19).+0 = scène10.compteur                                                          ⟨246225⟩
-        si si + 3 == pal10(mid5 32).+0 :
+        si si + 3 == v268 :
             sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[11])                             ⟨246238⟩
-        si si + 18 > pal10(mid5 32).+0 :
+        si si + 18 > v268 :
             CRT_Rand()                                                                                ⟨246246⟩
             v270 = ((CRT_Rand()·4) / 32768) + 1                                                       ⟨246253⟩
             c30.image = v270                                                                          ⟨246256⟩
-        si si + 18 == pal10(mid5 32).+0 :
+        si si + 18 == v268 :
             c30.image = 1                                                                             ⟨246264⟩
-        si (si + ((v4·70) / 100)) - 1 == pal10(mid5 32).+0 :
+        si (si + ((v4·70) / 100)) - 1 == v268 :
             v3138 = 4540                                                                              ⟨246271⟩
             v3138 = 4552                                                                              ⟨246272⟩
             v3138 = 4568                                                                              ⟨246273⟩
@@ -1549,10 +1554,10 @@ ajoute c34 à scène11                                                          
 ajoute c35 à scène11                                                                                  ⟨247069⟩
 ajoute c36 à scène11                                                                                  ⟨247074⟩
 ajoute c32 à scène11                                                                                  ⟨247079⟩
-r32(mid5voc 11).+0 = 0                                                                                ⟨247081⟩
+v316 = 0                                                                                              ⟨247081⟩
 tant que (scène11.compteur < 60) et (scène11.terminée == 0) :
-    r32(mid5voc 11).+0 = mid5voc 11.+0 + 1                                                            ⟨247086⟩
-    si mid5voc 11.+0 == 13 :
+    v316 = v316 + 1                                                                                   ⟨247086⟩
+    si v316 == 13 :
         c31.image = 1                                                                                 ⟨247090⟩
         si v11 != 0 :
             v318 = word_48F00                                                                         ⟨247094⟩
@@ -1560,50 +1565,50 @@ tant que (scène11.compteur < 60) et (scène11.terminée == 0) :
             si canal2.+0 != 0 :
                 AIL_start_sequence(pilote=canal2.+0→4, séquence=v3138)                                ⟨247101⟩
                 AIL_set_relative_volume_30C66(canal2.+0→4, v3138, v318, v320)                         ⟨247108⟩
-    si mid5voc 11.+0 == 14 :
+    si v316 == 14 :
         c31.image = 2                                                                                 ⟨247117⟩
-    si mid5voc 11.+0 == 15 :
+    si v316 == 15 :
         c31.image = 1                                                                                 ⟨247123⟩
-    si mid5voc 11.+0 == 16 :
+    si v316 == 16 :
         c31.image = 3                                                                                 ⟨247129⟩
-    si mid5voc 11.+0 == 17 :
+    si v316 == 17 :
         c31.image = 0                                                                                 ⟨247135⟩
-    si mid5voc 11.+0 == 19 :
+    si v316 == 19 :
         si v11 != 0 :
             v322 = word_48F4A                                                                         ⟨247143⟩
             si canal4.+0 != 0 :
                 AIL_start_sequence(pilote=canal4.+0→4, séquence=v3166)                                ⟨247150⟩
                 AIL_set_relative_volume_30C66(canal4.+0→4, v3166, v322, mid5voc 2.+0)                 ⟨247157⟩
-    si mid5voc 11.+0 == 26 :
+    si v316 == 26 :
         c31.image = 1                                                                                 ⟨247166⟩
         si v11 != 0 :
             v326 = word_48F02                                                                         ⟨247170⟩
             si canal3.+0 != 0 :
                 AIL_start_sequence(pilote=canal3.+0→4, séquence=v3152)                                ⟨247177⟩
                 AIL_set_relative_volume_30C66(canal3.+0→4, v3152, v326, mid5voc 12.+0)                ⟨247184⟩
-    si mid5voc 11.+0 == 27 :
+    si v316 == 27 :
         c31.image = 2                                                                                 ⟨247193⟩
-    si mid5voc 11.+0 == 28 :
+    si v316 == 28 :
         c31.image = 1                                                                                 ⟨247199⟩
-    si mid5voc 11.+0 == 29 :
+    si v316 == 29 :
         c31.image = 4                                                                                 ⟨247205⟩
-    si mid5voc 11.+0 == 30 :
+    si v316 == 30 :
         c31.image = 1                                                                                 ⟨247211⟩
-    si mid5voc 11.+0 == 31 :
+    si v316 == 31 :
         c31.image = 5                                                                                 ⟨247217⟩
-    si mid5voc 11.+0 == 32 :
+    si v316 == 32 :
         c31.image = 0                                                                                 ⟨247223⟩
-    si mid5voc 11.+0 == 34 :
+    si v316 == 34 :
         si v11 != 0 :
             v330 = word_48F4A                                                                         ⟨247231⟩
             v332 = 0                                                                                  ⟨247232⟩
             si canal4.+0 != 0 :
                 AIL_start_sequence(pilote=canal4.+0→4, séquence=v3166)                                ⟨247238⟩
                 AIL_set_relative_volume_30C66(canal4.+0→4, v3166, v330, v332)                         ⟨247245⟩
-    c34.image = mid5voc 11.+0 % 5                                                                     ⟨247258⟩
-    v336 = (mid5voc 11.+0 + 3) % 5                                                                    ⟨247264⟩
+    c34.image = v316 % 5                                                                              ⟨247258⟩
+    v336 = (v316 + 3) % 5                                                                             ⟨247264⟩
     c35.image = v336                                                                                  ⟨247267⟩
-    v338 = (mid5voc 11.+0 + 4) % 5                                                                    ⟨247273⟩
+    v338 = (v316 + 4) % 5                                                                             ⟨247273⟩
     c36.image = v338                                                                                  ⟨247276⟩
     Scene_Tick(scène=scène11)                                                                         ⟨247279⟩
 canal_arrête(canal=canal5)                                                                            ⟨247306⟩
@@ -1686,15 +1691,15 @@ si v10 != 0 :
     charge(mid5voc 1)                                                                                 ⟨248031⟩
     tête_voix(tête=c38, ressource=mid5voc 1, cadence=9)                                               ⟨248037⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨248039⟩
-    tant que pal10(mid5 32).+0 < 3 :
+    tant que v268 < 3 :
         Scene_Tick(scène=scène12)                                                                     ⟨248046⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨248048⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248048⟩
     tant que tête_parle(tête=c38) != 0 :
         Scene_Tick(scène=scène12)                                                                     ⟨248069⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨248080⟩
-    tant que pal10(mid5 32).+0 < 2 :
+    tant que v268 < 2 :
         Scene_Tick(scène=scène12)                                                                     ⟨248087⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨248089⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248089⟩
     v260 = 0                                                                                          ⟨248112⟩
 sinon :
     v492→0.méthode8(183)                                                                              ⟨248121⟩
@@ -1797,15 +1802,15 @@ si v10 != 0 :
     charge(mid5voc 6)                                                                                 ⟨248915⟩
     tête_voix(tête=c40, ressource=mid5voc 6, cadence=9)                                               ⟨248921⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨248923⟩
-    tant que pal10(mid5 32).+0 < 3 :
+    tant que v268 < 3 :
         Scene_Tick(scène=scène13)                                                                     ⟨248930⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨248932⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248932⟩
     tant que tête_parle(tête=c40) != 0 :
         Scene_Tick(scène=scène13)                                                                     ⟨248953⟩
     pal10(mid5 19).+0 = 0                                                                             ⟨248964⟩
-    tant que pal10(mid5 32).+0 < 2 :
+    tant que v268 < 2 :
         Scene_Tick(scène=scène13)                                                                     ⟨248971⟩
-        pal10(mid5 19).+0 = pal10(mid5 32).+0 + 1                                                     ⟨248973⟩
+        pal10(mid5 19).+0 = v268 + 1                                                                  ⟨248973⟩
     v260 = 0                                                                                          ⟨248996⟩
 sinon :
     v492→0.méthode8(125)                                                                              ⟨249005⟩

@@ -24,8 +24,10 @@ SmallObject_RegisterInList_2CB40(&v18, &v382)                                   
 palette_alloue(palette=pal1, premier=0, nombre=256)                                                   ⟨250647⟩
 v28 = 0                                                                                               ⟨250653⟩
 si v10 != 0 :
-    si sub_6734(chemin1) == 0 : aller à loc_815CE                                                     ⟨250695⟩
-    pak mid12voc.ouvre(chemin1, 1)                                                                    ⟨250702⟩
+    si sub_6734(chemin1) != 0 :
+        pak mid12voc.ouvre(chemin1, 1)                                                                ⟨250702⟩
+    sinon :
+        v10 = 0                                                                                       ⟨250709⟩
 sinon :
     v10 = 0                                                                                           ⟨250709⟩
 v38 = 0                                                                                               ⟨250712⟩
@@ -245,7 +247,7 @@ si byte_495FC == 0 :
         Scene_Tick(scène=scène1)                                                                      ⟨252025⟩
     fondu_disparition(palette=pal1, couleur=&v28, pas=0, premier=0, nombre=256)                       ⟨252058⟩
     Scene_Destruct(scène=scène1, drapeaux=0)                                                          ⟨252063⟩
-    r16(mid12 18).+0 = 0                                                                              ⟨252086⟩
+    v240 = 0                                                                                          ⟨252086⟩
     v224 = 0                                                                                          ⟨252107⟩
     si byte_495FC == 0 :
         v224 = 0                                                                                      ⟨252117⟩
@@ -263,21 +265,21 @@ si byte_495FC == 0 :
         palette_envoie(palette=pal1, pas=0)                                                           ⟨252200⟩
         v238 = 0                                                                                      ⟨252202⟩
         tant que (scène2.compteur < 42) et (scène2.terminée == 0) :
-            r16(mid12 18).+0 = scène2.compteur                                                        ⟨252208⟩
-            si mid12 10.+0 > 7 :
-                si mid12 10.+0 < 13 :
+            v240 = scène2.compteur                                                                    ⟨252208⟩
+            si v240 > 7 :
+                si v240 < 13 :
                     v242 = v238                                                                       ⟨252214⟩
                     v238_avant = v238                                                                 ⟨252215⟩
                     v238 = v238 + 1                                                                   ⟨252215⟩
                     c4.image = v242                                                                   ⟨252218⟩
-            si mid12 10.+0 > 24 :
-                si mid12 10.+0 < 28 :
+            si v240 > 24 :
+                si v240 < 28 :
                     v238 = v238 - 1                                                                   ⟨252226⟩
                     v244 = v238                                                                       ⟨252228⟩
                     c4.image = v244                                                                   ⟨252231⟩
-            si mid12 10.+0 > 28 :
-                si mid12 10.+0 < 32 :
-                    si mid12 10.+0 & 1 != 0 :
+            si v240 > 28 :
+                si v240 < 32 :
+                    si v240 & 1 != 0 :
                         v238 = v238 - 1                                                               ⟨252241⟩
                         pal6(mid12 18).+0 = v238                                                      ⟨252243⟩
                         c4.image = pal6(mid12 19).+0                                                  ⟨252246⟩
@@ -287,7 +289,7 @@ si byte_495FC == 0 :
         si byte_495FC == 0 :
             v224 = 0                                                                                  ⟨252321⟩
             charge(mid12 15)                                                                          ⟨252328⟩
-            r16(mid12 18).+0 = 0                                                                      ⟨252330⟩
+            v240 = 0                                                                                  ⟨252330⟩
             v234 = 0                                                                                  ⟨252333⟩
             charge(mid12 14)                                                                          ⟨252340⟩
             charge(mid12 24)                                                                          ⟨252352⟩
@@ -312,7 +314,7 @@ si byte_495FC == 0 :
                 tant que v274 < 8 :
                     si v274 > 1 :
                         si v274 < 7 :
-                            c7.méthode24(v274 - 13, 0)                                                ⟨252483⟩
+                            déplace(calque=c7, dx=v274 - 13, dy=0)                                    ⟨252483⟩
                     Scene_Tick(scène=scène3)                                                          ⟨252490⟩
                     v274 = v274 + 1                                                                   ⟨252492⟩
                 voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                       ⟨252500⟩
@@ -329,7 +331,7 @@ si byte_495FC == 0 :
                     v264 = scène3.compteur                                                            ⟨252583⟩
                     si v264 > 1 :
                         si v264 < 7 :
-                            c7.méthode24(v264 - 13, 0)                                                ⟨252595⟩
+                            déplace(calque=c7, dx=v264 - 13, dy=0)                                    ⟨252595⟩
                     si v264 == 8 :
                         sous_titre (sub_C8F5, non lue)(zone=zone1, texte=textes1[2])                  ⟨252609⟩
                     si (si + ((v4·70) / 100)) - 1 == v264 :
@@ -342,13 +344,13 @@ si byte_495FC == 0 :
                     Scene_Tick(scène=scène3)                                                          ⟨252663⟩
             Scene_Destruct(scène=scène3, drapeaux=0)                                                  ⟨252692⟩
             v244 = 0                                                                                  ⟨252717⟩
-            r16(mid12 14).+0 = 0                                                                      ⟨252734⟩
+            v240 = 0                                                                                  ⟨252734⟩
             v234 = 0                                                                                  ⟨252736⟩
             v224 = 0                                                                                  ⟨252755⟩
             si byte_495FC == 0 :
                 v224 = 0                                                                              ⟨252765⟩
                 charge(mid12 2)                                                                       ⟨252772⟩
-                r16(mid12 14).+0 = 0                                                                  ⟨252774⟩
+                v240 = 0                                                                              ⟨252774⟩
                 v234 = 0                                                                              ⟨252777⟩
                 charge(mid12 19)                                                                      ⟨252784⟩
                 palette_depuis(pal6(mid12 19))                                                        ⟨252791⟩
@@ -386,7 +388,7 @@ si byte_495FC == 0 :
                             Primitive_SetRectColorAndDraw_2CBE5(&v2946, v2875, v2873, v2871, v2869, 0, &v2898)  ⟨252942⟩
                         Scene_Tick(scène=scène4)                                                      ⟨252974⟩
                 Scene_Destruct(scène=scène4, drapeaux=0)                                              ⟨253003⟩
-                r16(mid12 19).+0 = 0                                                                  ⟨253026⟩
+                v240 = 0                                                                              ⟨253026⟩
                 v234 = 0                                                                              ⟨253028⟩
                 v224 = 0                                                                              ⟨253047⟩
                 si byte_495FC == 0 :
@@ -437,7 +439,7 @@ si byte_495FC == 0 :
                         tant que v236 < 4 :
                             Scene_Tick(scène=scène5)                                                  ⟨253341⟩
                             v236 = v236 + 1                                                           ⟨253343⟩
-                        r16(mid12 19).+0 = 0                                                          ⟨253385⟩
+                        v240 = 0                                                                      ⟨253385⟩
                         v228 = 0                                                                      ⟨253404⟩
                     sinon :
                         v2880→0.méthode8(224)                                                         ⟨253413⟩
@@ -671,7 +673,7 @@ si byte_495FC == 0 :
                                         Primitive_SetRectColorAndDraw_2CBE5(&v2946, v2875, v2873, v2871, v2869, 0, &v2898)  ⟨254914⟩
                                     Scene_Tick(scène=scène7)                                          ⟨254946⟩
                             Scene_Destruct(scène=scène7, drapeaux=0)                                  ⟨254975⟩
-                            r16(mid12 17).+0 = 0                                                      ⟨254998⟩
+                            v240 = 0                                                                  ⟨254998⟩
                             v224 = 0                                                                  ⟨255019⟩
                             si byte_495FC == 0 :
 
@@ -788,32 +790,33 @@ si byte_495FC == 0 :
                                         Scene_Tick(scène=scène9)                                      ⟨255814⟩
                                         charge(mid12voc 2)                                            ⟨255826⟩
                                         voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid12voc 2)  ⟨255832⟩
-                                        r16(mid12 17).+0 = 0                                          ⟨255834⟩
-                                        tant que mid12 10.+0 < 4 :
+                                        v240 = 0                                                      ⟨255834⟩
+                                        tant que v240 < 4 :
                                             Scene_Tick(scène=scène9)                                  ⟨255841⟩
-                                            r16(mid12 17).+0 = mid12 10.+0 + 1                        ⟨255843⟩
+                                            v240 = v240 + 1                                           ⟨255843⟩
                                         voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)               ⟨255851⟩
-                                        r16(mid12 17).+0 = 0                                          ⟨255853⟩
+                                        v240 = 0                                                      ⟨255853⟩
                                         tant que voix_en_cours(voix=voix1) != 0 :
-                                            si mid12 10.+0 == 8 :
+                                            si v240 == 8 :
                                                 c22.image = 2                                         ⟨255861⟩
-                                            r16(mid12 17).+0 = mid12 10.+0 + 1                        ⟨255865⟩
-                                            si mid12 10.+0 == 12 :
+                                            v240_avant = v240                                         ⟨255865⟩
+                                            v240 = v240 + 1                                           ⟨255865⟩
+                                            si v240_avant == 12 :
                                                 c22.image = 3                                         ⟨255869⟩
                                             Scene_Tick(scène=scène9)                                  ⟨255884⟩
-                                        r16(mid12 17).+0 = 0                                          ⟨255896⟩
-                                        tant que mid12 10.+0 < 4 :
+                                        v240 = 0                                                      ⟨255896⟩
+                                        tant que v240 < 4 :
                                             Scene_Tick(scène=scène9)                                  ⟨255903⟩
-                                            r16(mid12 17).+0 = mid12 10.+0 + 1                        ⟨255905⟩
+                                            v240 = v240 + 1                                           ⟨255905⟩
                                         charge(mid12voc 10)                                           ⟨255920⟩
                                         voix_charge (sub_7D11, non lue)(voix=voix1, ressource=mid12voc 10)  ⟨255926⟩
                                         voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)               ⟨255931⟩
                                         tant que voix_en_cours(voix=voix1) != 0 :
                                             Scene_Tick(scène=scène9)                                  ⟨255949⟩
-                                        r16(mid12 17).+0 = 0                                          ⟨255961⟩
-                                        tant que mid12 10.+0 < 2 :
+                                        v240 = 0                                                      ⟨255961⟩
+                                        tant que v240 < 2 :
                                             Scene_Tick(scène=scène9)                                  ⟨255968⟩
-                                            r16(mid12 17).+0 = mid12 10.+0 + 1                        ⟨255970⟩
+                                            v240 = v240 + 1                                           ⟨255970⟩
                                         voix_arrête(voix=voix1)                                       ⟨255977⟩
                                         v244 = 0                                                      ⟨255997⟩
                                     sinon :
@@ -1232,7 +1235,7 @@ si byte_495FC == 0 :
                                                             ──── scène15 ────
                                                             scène15 = Scene_Create(cadence=10, palette=255, surface=&v368)  ⟨258854⟩
                                                             charge(mid12 12)                          ⟨258866⟩
-                                                            r16(mid12 17).+0 = 0                      ⟨258868⟩
+                                                            v240 = 0                                  ⟨258868⟩
                                                             charge(mid12 10)                          ⟨258878⟩
                                                             v244 = 0                                  ⟨258883⟩
                                                             charge(mid12 11)                          ⟨258890⟩
@@ -1246,19 +1249,19 @@ si byte_495FC == 0 :
                                                             ajoute c35 à scène15                      ⟨258948⟩
                                                             palette_copie(destination=pal1, source=pal9(mid12 23))  ⟨258957⟩
                                                             palette_envoie(palette=pal1, pas=0)       ⟨258969⟩
-                                                            c34.méthode24(0, 10)                      ⟨258976⟩
+                                                            déplace(calque=c34, dx=0, dy=10)          ⟨258976⟩
                                                             tant que (scène15.compteur < 18) et (scène15.terminée == 0) :
                                                                 v274 = scène15.compteur               ⟨258983⟩
                                                                 si v274 < 3 :
-                                                                    c34.méthode24(10, 1)              ⟨258991⟩
+                                                                    déplace(calque=c34, dx=10, dy=1)  ⟨258991⟩
                                                                 si v274 == 4 :
                                                                     Scene_SetFps(scène=scène15, cadence=20)  ⟨259000⟩
                                                                 si v274 > 8 :
-                                                                    c34.méthode24(-12, -1)            ⟨259011⟩
+                                                                    déplace(calque=c34, dx=-12, dy=-1)  ⟨259011⟩
                                                                 Scene_Tick(scène=scène15)             ⟨259027⟩
                                                             v254 = 0                                  ⟨259076⟩
                                                             v244 = 0                                  ⟨259095⟩
-                                                            r16(mid12 10).+0 = 0                      ⟨259112⟩
+                                                            v240 = 0                                  ⟨259112⟩
                                                             v224 = 0                                  ⟨259133⟩
                                                             Scene_Destruct(scène=scène15, drapeaux=0)  ⟨259137⟩
                                                             si byte_495FC == 0 :
@@ -1304,7 +1307,7 @@ si byte_495FC == 0 :
                                                                 v2944 = 0                             ⟨259397⟩
                                                                 v2939 = 0                             ⟨259398⟩
                                                                 v2938 = 0                             ⟨259399⟩
-                                                                r16(mid12 10).+0 = 0                  ⟨259418⟩
+                                                                v240 = 0                              ⟨259418⟩
                                                                 Scene_Destruct(scène=scène16, drapeaux=0)  ⟨259422⟩
                                                                 v224 = 0                              ⟨259442⟩
                                                                 si byte_495FC == 0 :
@@ -1332,7 +1335,7 @@ si byte_495FC == 0 :
                                                                         canal_enregistre(canal=canal3, ressource=asoundfx 90, x=0)  ⟨259572⟩
                                                                     Widget_Method_DispatchC_314CB(zone1, 0)  ⟨259579⟩
                                                                     Widget_Method_Dispatch8_314A9(zone1, 39)  ⟨259584⟩
-                                                                    r16(mid12 10).+0 = 13             ⟨259586⟩
+                                                                    v240 = 13                         ⟨259586⟩
                                                                     c42.image = 0                     ⟨259588⟩
                                                                     tant que (scène17.compteur < 57) et (scène17.terminée == 0) :
                                                                         v242 = scène17.compteur       ⟨259594⟩
@@ -1344,8 +1347,9 @@ si byte_495FC == 0 :
                                                                                     AIL_set_relative_volume_30C66(canal3.+0→4, v2946, v244, asoundfx 45.+0)  ⟨259614⟩
                                                                         si v242 > 0 :
                                                                             si v242 < 44 :
-                                                                                v248 = mid12 10.+0    ⟨259625⟩
-                                                                                r16(mid12 10).+0 = mid12 10.+0 + 1  ⟨259626⟩
+                                                                                v248 = v240           ⟨259625⟩
+                                                                                v240_avant = v240     ⟨259626⟩
+                                                                                v240 = v240 + 1       ⟨259626⟩
                                                                                 c42.image = v248      ⟨259629⟩
                                                                         si v242 == 32 :
                                                                             c40.image = 1             ⟨259636⟩
