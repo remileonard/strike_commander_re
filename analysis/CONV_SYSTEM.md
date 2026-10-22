@@ -311,6 +311,17 @@ comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sa
 
 ### 7.0 Règles générales
 
+- **Architecture à conserver.** libRealSpace lit d'abord tout le script et range chaque réplique
+  dans une structure (`ConvFrame`, liste `conversation_frames`), puis le lecteur
+  (`SCConvPlayer::runFrame`) ne lit que cette structure. Cette séparation est voulue : ne pas
+  la remplacer par un interpréteur à la manière d'OPTEST. Chaque correction ci-dessous se fait soit
+  dans le parseur (lire le bon champ et le ranger dans la structure), soit dans le lecteur (utiliser
+  ce qui est rangé).
+- **Voix : garder la détection actuelle.** L'OPTEST.EXE désassemblé est celui de la version
+  disquette, qui ne lit pas l'identifiant de voix ; libRealSpace, lui, gère la voix
+  (`SetSentenceFromConv` la détecte, `runFrame` joue le VOC). Ce code fonctionne et reste tel
+  quel ; ce document ne dit rien de la façon dont la version avec voix minute les répliques.
+
 - **Numéros d'image.** libRealSpace ajoute une image vide en tête de chaque jeu d'images
   (`RSImageSet`) : **numéro libRealSpace = numéro du jeu + 1** pour les visages (`FACE`) et les
   figures (`FIGR`). Ce document donne toujours les numéros du jeu. Les décors (`ParseBGLayer`) lisent
@@ -323,18 +334,17 @@ comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sa
 - **Cadence.** Le jeu avance la scène à **10 images par seconde** ; toutes les durées ci-dessous
   sont en images de scène. libRealSpace expire une réplique au bout de 5 s ou à la fin de la voix
   (`CheckFrameExpired`).
-- **Voix.** Les données ont un identifiant de voix devant chaque texte ; cet OPTEST.EXE ne le lit
-  pas et ne joue aucune voix. La lecture du VOC par libRealSpace et l'attente de sa fin sont donc
-  un choix du portage, pas un comportement observé ; les lèvres, elles, suivent le texte (§ 7.4).
+- **Lèvres et voix.** Dans cet OPTEST.EXE, les lèvres suivent le texte (§ 7.4) ; les durées
+  données ici sont celles de la version sans voix.
 
 ### 7.1 Lecture du script (`SCConvPlayer::parseConv`, `ConvFrame::parse_*`)
 
-Format exact des enregistrements : § 2 (référence exécutable : `tools/conv_dump.py`). Points faux ou
-fragiles :
+Format exact des enregistrements : § 2 (référence exécutable : `tools/conv_dump.py`). Champs mal
+lus ou pas lus, à corriger dans les `parse_*` existants et à ranger dans `ConvFrame` :
 
 | Commande | libRealSpace | Jeu |
 |---|---|---|
-| 00h | `parse_GROUP_SHOT` avance de 8, saute les 0 puis cherche une commande (`isNextFrameIsConv`) | nom de décor de **9 octets** exactement, puis la commande suivante |
+| 00h | `parse_GROUP_SHOT` avance de 8, saute les 0 puis cherche une commande | nom de décor de 9 octets (8 caractères et un 0 au plus), puis la commande suivante |
 | 01h | `parse_GROUP_SHOT_ADD_CHARACTER` : x, y par `ReadUShortBE` après 8 octets | nom (9), x **mot signé petit-boutiste**, y idem. La lecture actuelle tombe juste par hasard tant que 0 ≤ x < 256 ; `airwing1` est en (0, −20) |
 | 02h | `parse_GROUP_SHOT_CHARACTER_TALK` ne lit pas x, y | nom (9), x (+9), y (+0Bh), mots signés ; couleur +0Dh, puis `[voix]`, texte |
 | 03h | x lu comme un octet à +13h (130/160/190 → `FacePos`) | x, y = mots signés à +13h et +15h (y = 128 dans les données) ; le reste est juste |
@@ -342,22 +352,22 @@ fragiles :
 | 0Ch | `parse_YESNOCHOICE_BRANCH2`, deux octets ignorés | saut sans condition d'**un mot** (fin de la branche « accepter ») |
 | 0Eh | `topOffset`, `first_palette` | octet écran (0 = `s_wing`, sinon `w_wing`), octet numéro de `WING` dans `GAMEFLOW.IFF` ; remplit `$W`, `$L`, `$O` |
 | 10h | non traité | ne fait rien |
-| autre | `do_not_add` | l'octet est sauté. 0xE0 n'est pas une commande |
+| autre | `do_not_add` | l'octet est sauté |
 
-Recommandation : lire le script comme un flux d'enregistrements de longueur connue (§ 2), sans
-recherche de la prochaine commande ni détection de la voix par heuristique
-(`SetSentenceFromConv`) : la chaîne de voix est **toujours** présente devant le texte dans les
-données de `BIGTRE.TRE` (`conv_dump.py` sans `--sans-voix` lit les 241 scripts sans erreur).
+La lecture du texte et de la voix (`SetSentenceFromConv`) reste celle de libRealSpace.
 
 ### 7.2 Scène de groupe (00h, 01h, 02h, 0Ah)
 
 - **État de scène, pas état de figure.** `CharFigure` est partagé (`ConvAssetManager::figures`)
   et reçoit x, y ; tout le script étant lu d'avance (`SetArchive`), la dernière position lue gagne
-  partout (`air1` a 5 positions différentes selon les scripts). Ranger la position dans la scène.
+  partout (`air1` a 5 positions différentes selon les scripts). Le parseur doit ranger la position
+  dans la `ConvFrame` (par exemple une liste de couples figure + position), pas dans `CharFigure`.
 - **Contenu de la scène.** Une 00h ouvre une scène : décor, puis toutes les 01h, puis toutes les
   02h, **dessinés dans cet ordre et tous visibles du début à la fin de la scène** (y compris
-  pendant les 0Ah et les répliques des autres). libRealSpace crée une `ConvFrame` par enregistrement
-  et une 02h n'y met que celui qui parle.
+  pendant les 0Ah et les répliques des autres). Aujourd'hui, la `ConvFrame` d'une 02h ne contient
+  que celui qui parle. Le parseur doit recopier dans chaque `ConvFrame` de la scène (02h et 0Ah)
+  toutes les figures de la scène, avec leur position, et indiquer laquelle parle ; le lecteur
+  dessine la liste.
 - **Dessin.** libRealSpace dessine les images 0 et 1 de chaque figure qui en a plusieurs. Jeu :
   - figurant (01h) : image 0 seule ;
   - personnage qui parle (02h) : image 0, puis sa bouche (§ 7.4) **seulement pendant sa propre
@@ -532,9 +542,11 @@ int closeUpEyeFrame(int baseFrame) {
 
 ### 7.7 Texte (`SCConvPlayer::DrawText`, `SetSentenceFromConv`)
 
-- **Remplacements à l'affichage**, pour **chaque occurrence** (libRealSpace : première occurrence
-  seulement ; `$N` `$S` `$C` à la lecture, `$W` à l'affichage) — `$W` `$L` `$O` peuvent changer
-  pendant la conversation (0Eh, 0Fh) :
+- **Remplacements** pour **chaque occurrence** (libRealSpace : première occurrence seulement).
+  `$N` `$S` `$C` peuvent rester au parseur, comme aujourd'hui. `$W` `$L` `$O` dépendent du choix
+  fait pendant la conversation (0Fh) : ils restent au lecteur (`DrawText`, où est déjà `$W`), ou le
+  parseur range le texte brut dans `ConvFrame` et le lecteur remplace. Le texte de lèvres est le
+  texte brut (§ 7.4) :
 
 | Code | Valeur |
 |---|---|
