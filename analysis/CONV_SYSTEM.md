@@ -993,3 +993,55 @@ d'être rattrapée par chance (cas de E0h).
 - **Sauts 0Bh / 0Ch** : la destination doit être le début d'une commande ou la fin du script (vrai
   pour les 52 sauts des données, § 4).
 
+### 9.3 Architecture proposée : une boucle de premier niveau, un sous-parseur par commande
+
+Proposition de Rémi. Aujourd'hui, `SCConvPlayer::parseConv` traite au même niveau les commandes et
+les sous-commandes (01h, 02h, 04h, 0Ah, 0Bh, 0Ch ont chacune leur `case`), et les `parse_*`
+appellent eux-mêmes le parseur suivant ou cherchent la prochaine commande. C'est ce qui oblige aux
+recherches (`isNextFrameIsConv`) et rend les erreurs invisibles.
+
+Le jeu est construit autrement, dans les deux versions : l'interpréteur (`Conv_PlayScript_5AA4E`,
+et 07A9Fh dans la version CD) n'a qu'une table de commandes de **premier niveau** ; chaque commande
+lit ensuite **elle-même** ses sous-commandes, tant qu'elles se suivent (00h → 01h*, puis 02h / 0Ah* ;
+03h → 04h / 0Ah / 0Bh*). La grammaire est donc :
+
+```
+script     := commande*
+commande   := 00h décor figurant* réplique*          figurant := 01h nom x y
+            | 03h gros_plan suite*                    réplique := 02h nom x y couleur texte
+            | 0Ah couleur texte          (CD)                   | 0Ah couleur texte
+            | 0Ch mot | 0Eh octet octet | 0Fh | 10h | 12h
+gros_plan  := visage image décor x y texte couleur    suite    := 04h texte | 0Ah couleur texte | 0Bh mot
+texte      := [voix] chaîne              ([voix] au format CD seulement, § 9.1)
+```
+
+**Parseur de référence** : `tools/conv_ref/conv_parser.cpp` (C++17, style du dépôt, sans
+dépendance). Une boucle de premier niveau (`ConvScriptParser::parse`) appelle un sous-parseur par
+commande (`parseGroupShot`, `parseCloseUp`, `parseNarration`, `parseJump`, `parseWing`) ; chaque
+sous-parseur lit ses champs et ses sous-commandes, et renvoie faux en cas d'erreur. Le premier
+échec arrête tout et donne la position et la raison (`ConvParseResult` : `ok`, `errorOffset`,
+`error`). Erreurs détectées : octet qui n'est pas une commande, champ ou chaîne qui dépasse la fin
+du script, saut 0Bh / 0Ch qui ne tombe ni sur une commande ni sur la fin (§ 9.2).
+
+Le résultat est une liste plate d'enregistrements (`ConvRecord`, dans l'ordre du script, `level`
+0 ou 1) : c'est la « structure » intermédiaire ; la construction des `ConvFrame` se fait ensuite à
+partir d'elle, sans relire les octets. La séparation parseur / structure / lecteur est conservée
+et même renforcée : plus aucun `parse_*` ne déplace le curseur pour un autre.
+
+**Le même parseur sert de test de format** : format CD si `parse()` réussit avec `ConvFormat::Cd`,
+sinon disquette si `parse()` réussit avec `ConvFormat::Floppy`, sinon erreur. `ConvFormatProbe`
+(§ 9.1) n'est plus nécessaire.
+
+**Essai** (`tools/conv_ref/export_scripts.py` puis `conv_parser`) :
+
+| Données | Bon format | Mauvais format |
+|---|---|---|
+| 241 scripts CD | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
+| 241 scripts disquette reconstruits (voix retirées, sauts recalculés) | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
+
+2 772 = 86 × 00h + 184 × 01h + 70 × 02h + 32 × 0Ah + 1 717 × 03h + 575 × 04h + 26 × 0Bh + 26 × 0Ch +
+28 × 0Eh + 28 × 0Fh, les mêmes comptes que `conv_dump.py` (§ 4).
+
+**Pacific Strike** : un troisième `ConvFormat` se branche à deux endroits seulement, `readText`
+(lecture d'un texte) et, si besoin, les commandes propres à ce jeu dans la boucle de premier niveau.
+
