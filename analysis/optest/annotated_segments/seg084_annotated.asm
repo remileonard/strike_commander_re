@@ -681,8 +681,8 @@ loc_2DD61:				; CODE XREF: seg002:0D39J seg002:0E6DJ ...
 
 ; Attributes: bp-based frame
 
-sub_2DD86	proc far		; CODE XREF: sub_5AA4E+778P
-					; sub_5AA4E+7AEP ...
+sub_2DD86	proc far		; CODE XREF: Conv_PlayScript_5AA4E+778P
+					; Conv_PlayScript_5AA4E+7AEP ...
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -758,7 +758,7 @@ sub_2DD86	endp
 ; (LayerGroup_AdvanceAll_2DC2D) puis incrémente le compteur d'images +29 (comparé par les
 ; cinématiques pour déclencher sons et changements).
 ; ==============================================================================================
-Scene_AdvanceFrame_2DE14	proc far		; CODE XREF: sub_5AA4E+1235P
+Scene_AdvanceFrame_2DE14	proc far		; CODE XREF: Conv_PlayScript_5AA4E+1235P
 					; DATA XREF: dseg:053Eo ...
 
 arg_0		= word ptr  6

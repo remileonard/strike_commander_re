@@ -274,6 +274,8 @@ strike_commander_re/
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
+│   │                                  CONVDATA.IFF, codes $ des textes — lu 2026-10-22
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace
@@ -301,6 +303,7 @@ strike_commander_re/
 └── tools/
     ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
     │                                  prennent --exe optest (défaut strike)
+    ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte
     ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
     ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
     │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md

@@ -59,8 +59,8 @@ loc_2CBC9:				; DATA XREF: dseg:1210o
 ; +20 avec la surface arg_C (non lue). mid1 scène 23 : objet construit directement (tables
 ; dseg 4540 à 4604), rectangle du sous-titre, couleur 0.
 ; ==============================================================================================
-Primitive_SetRectColorAndDraw_2CBE5	proc far		; CODE XREF: sub_5AA4E+70EP
-					; sub_5AA4E+C64P ...
+Primitive_SetRectColorAndDraw_2CBE5	proc far		; CODE XREF: Conv_PlayScript_5AA4E+70EP
+					; Conv_PlayScript_5AA4E+C64P ...
 
 var_5		= byte ptr -5
 var_4		= word ptr -4

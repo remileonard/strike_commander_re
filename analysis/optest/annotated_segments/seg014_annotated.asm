@@ -1170,7 +1170,7 @@ sub_9B09	endp
 ; « Back off, almost got tone. Blah blah blah » (dseg 7904 et 7946).
 ; ==============================================================================================
 TalkingHead_SetLipText_9C4F	proc far		; CODE XREF: seg018:00FEP
-					; sub_5AA4E+6CCP ...
+					; Conv_PlayScript_5AA4E+6CCP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1335,7 +1335,7 @@ TalkingHead_AttachVoice_9CF7	endp
 ; far, LUE 2026-10-17. Image de base +2118 et image affichée +2124 = arg_2.
 ; ==============================================================================================
 TalkingHead_SetBaseFrame_9D32	proc far		; CODE XREF: seg018:00F0P
-					; sub_5AA4E+B44P ...
+					; Conv_PlayScript_5AA4E+B44P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1826,8 +1826,8 @@ loc_A0C8:				; CODE XREF: seg014:loc_A004j
 
 ; Attributes: bp-based frame
 
-sub_A0D5	proc far		; CODE XREF: sub_5AA4E+78CP
-					; sub_5AA4E+DC0P ...
+sub_A0D5	proc far		; CODE XREF: Conv_PlayScript_5AA4E+78CP
+					; Conv_PlayScript_5AA4E+DC0P ...
 
 arg_0		= word ptr  6
 
@@ -2015,7 +2015,7 @@ loc_A1FF:				; CODE XREF: seg014:0E55j
 
 ; Attributes: bp-based frame
 
-sub_A207	proc far		; CODE XREF: sub_5AA4E+414P
+sub_A207	proc far		; CODE XREF: Conv_PlayScript_5AA4E+414P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2969,7 +2969,7 @@ loc_A9CE:				; CODE XREF: seg014:1627j
 ; Layer_Advance_2E2C3.
 ; ==============================================================================================
 OverlayImageLayer_Construct_A9D6	proc far		; CODE XREF: sub_506AA+374P
-					; sub_5AA4E+1ACAP ...
+					; Conv_PlayScript_5AA4E+1ACAP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3163,7 +3163,7 @@ loc_AB63:				; CODE XREF: seg014:1780j seg014:17CDj
 
 ; Attributes: bp-based frame
 
-sub_AB6B	proc far		; CODE XREF: sub_5AA4E+2ABP
+sub_AB6B	proc far		; CODE XREF: Conv_PlayScript_5AA4E+2ABP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

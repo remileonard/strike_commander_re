@@ -2198,8 +2198,8 @@
 "lines": 35,
 "type": "far",
 "calls": [],
-"new_name": "sub_6305",
-"summary": ""
+"new_name": "ConvRec_ReadName_6305",
+"summary": "far, LUE 2026-10-22. Lit un nom de 9 octets du script dans [rec+3] (commande 00h : décor de la scène de groupe)."
 },
 "sub_632E": {
 "segment": "seg006",
@@ -2212,8 +2212,8 @@
 "sub_2C3FC",
 "sub_2C319"
 ],
-"new_name": "sub_632E",
-"summary": ""
+"new_name": "ConvRec_ReadLine_632E",
+"summary": "far, LUE 2026-10-22. Commande 03h/04h. Si l'en-tête n'est pas lu ([rec+1Dh] = 0) : visage (9 octets) +3, octet image de base +0Ch, décor (9 octets) +0Dh, x (mot LE) +16h, y +18h. Puis toujours : texte (chaîne, copiée dans un tampon alloué) +1Ah. Si l'en-tête n'était pas lu : octet couleur +1Ch. Pose [rec+1Dh] = 1 (une 04h ne relit que le texte)."
 },
 "sub_6464": {
 "segment": "seg006",
@@ -2222,8 +2222,8 @@
 "lines": 69,
 "type": "far",
 "calls": [],
-"new_name": "sub_6464",
-"summary": ""
+"new_name": "ConvRec_ReadExtra_6464",
+"summary": "far, LUE 2026-10-22. Commande 01h : nom de figure (9 octets) +3, x (mot LE) +0Ch, y +0Eh."
 },
 "sub_64EE": {
 "segment": "seg006",
@@ -2236,8 +2236,8 @@
 "sub_2C3FC",
 "sub_2C319"
 ],
-"new_name": "sub_64EE",
-"summary": ""
+"new_name": "ConvRec_ReadSpeaker_64EE",
+"summary": "far, LUE 2026-10-22. Commande 02h : nom de figure (9 octets) +3, x +0Ch, y +0Eh, octet couleur +10h, texte (chaîne allouée) +11h."
 },
 "sub_65E8": {
 "segment": "seg006",
@@ -2250,8 +2250,8 @@
 "sub_2C3FC",
 "sub_2C319"
 ],
-"new_name": "sub_65E8",
-"summary": ""
+"new_name": "ConvRec_ReadNarration_65E8",
+"summary": "far, LUE 2026-10-22. Commande 0Ah : octet couleur +3, texte (chaîne allouée) +4."
 },
 "sub_6660": {
 "segment": "seg006",
@@ -2260,8 +2260,8 @@
 "lines": 37,
 "type": "far",
 "calls": [],
-"new_name": "sub_6660",
-"summary": ""
+"new_name": "ConvRec_ReadAcceptSkip_6660",
+"summary": "far, LUE 2026-10-22. Commande 0Bh : mot LE +3 = octets sautés si le joueur choisit « Reject Mission »."
 },
 "sub_66A0": {
 "segment": "seg006",
@@ -2270,8 +2270,8 @@
 "lines": 37,
 "type": "far",
 "calls": [],
-"new_name": "sub_66A0",
-"summary": ""
+"new_name": "ConvRec_ReadJump_66A0",
+"summary": "far, LUE 2026-10-22. Commande 0Ch : mot LE +3, ajouté au curseur du script par Conv_PlayScript_5AA4E."
 },
 "sub_66E0": {
 "segment": "seg006",
@@ -2280,8 +2280,8 @@
 "lines": 27,
 "type": "far",
 "calls": [],
-"new_name": "sub_66E0",
-"summary": ""
+"new_name": "ConvRec_ReadWing_66E0",
+"summary": "far, LUE 2026-10-22. Commande 0Eh : octet écran +3 (0 = décor s_wing pour 0Fh, sinon w_wing), octet escadre +4 (INFO de la FORM WING de GAMEFLOW.IFF)."
 },
 "sub_6734": {
 "segment": "seg007",
@@ -20942,8 +20942,8 @@
 "sub_3B5DE",
 "sub_3D240"
 ],
-"new_name": "sub_59DAA",
-"summary": ""
+"new_name": "Conv_LoadScriptFromPak_59DAA",
+"summary": "far, LUE 2026-10-22. Ouvre ..\\..\\data\\gameflow\\conv.pak, lit l'entrée [arg_0+6Dh] en mémoire telle quelle : [arg_0] = [arg_0+4] = adresse, [arg_0+8] = taille."
 },
 "sub_59E81": {
 "segment": "ovr191",
@@ -21018,8 +21018,8 @@
 "sub_274F",
 "sub_2C3FC"
 ],
-"new_name": "sub_59F54",
-"summary": ""
+"new_name": "Conv_DrawText_59F54",
+"summary": "far, LUE 2026-10-22. Affiche un texte de conversation : remplace $S $N $C (chaînes du joueur [[conv+28h]+0/+2/+4]), $W $L $O (équipiers [conv+2Ah]+1/+15h/+29h), $A $B (table dseg 0ED8h, indices [conv+6Bh]/[conv+6Ch]), $P $T (nombres [[conv+28h]+6/+8] + « plane(s) ») ; coupe aux espaces en lignes de 30 caractères, y = 4 + 15 × ligne, format « %Y%J%S »."
 },
 "sub_5A225": {
 "segment": "ovr191",
@@ -21139,8 +21139,8 @@
 "sub_3BE15",
 "sub_3CEB3"
 ],
-"new_name": "sub_5A4E6",
-"summary": ""
+"new_name": "ConvData_LoadBackground_5A4E6",
+"summary": "far, LUE en partie 2026-10-22. Cherche dans CONVDATA.IFF la FORM BACK dont l'INFO vaut le nom donné ; DATA = éléments de 5 octets (source 0 = convshps/convpals, 1 = optshps/optpals ; image ; palette ; mot y) → tableaux de ressources d'images, de palettes et de positions y ; renvoie le nombre d'éléments."
 },
 "sub_5AA4E": {
 "segment": "ovr191",
@@ -21418,8 +21418,8 @@
 "sub_2CB7A",
 "sub_66A0"
 ],
-"new_name": "sub_5AA4E",
-"summary": ""
+"new_name": "Conv_PlayScript_5AA4E",
+"summary": "far, LUE 2026-10-22 (structure). Interpréteur des scripts de conversation (CONV.PAK) : boucle tant que le curseur [conv+4] < début [conv] + taille [conv+8], lit un octet de commande et saute par la table off_5CE29 (00h scène de groupe, 03h réplique en gros plan avec 04h/0Ah/0Bh qui suivent, 0Ch saut relatif, 0Eh escadre, 0Fh choix d'équipier, 10h rien ; autre = octet sauté). Format complet : analysis/CONV_SYSTEM.md."
 },
 "sub_5CE4B": {
 "segment": "ovr191",

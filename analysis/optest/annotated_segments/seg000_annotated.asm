@@ -7591,7 +7591,7 @@ CRT_Strlwr_2769	endp
 
 ; Attributes: bp-based frame
 
-sub_2789	proc far		; CODE XREF: sub_59F54+39P
+sub_2789	proc far		; CODE XREF: Conv_DrawText_59F54+39P
 					; sub_BF164+8AP
 
 var_2		= word ptr -2
@@ -9026,7 +9026,7 @@ CRT_MemFamily_Extra5	endp
 ; (sub_2E1D de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier
 ; ici. — far — (cluster mémoire/chaînes, à approfondir si besoin).
 ; ==============================================================================================
-CRT_MemFamily_Extra6	proc far		; CODE XREF: sub_632E+C5P sub_64EE+A5P ...
+CRT_MemFamily_Extra6	proc far		; CODE XREF: ConvRec_ReadLine_632E+C5P ConvRec_ReadSpeaker_64EE+A5P ...
 
 arg_0		= dword	ptr  6
 

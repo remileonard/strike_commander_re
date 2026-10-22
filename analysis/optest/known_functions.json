@@ -3433,5 +3433,65 @@
     "new_name": "Palette_UploadByValue_CBAB",
     "segment": "seg018",
     "summary": "far, LUE 2026-10-21. Reçoit une palette par valeur (6 octets sur la pile : mot +0, octet +2, …), l'envoie à la carte (Palette_Upload_2CDE1(&arg, octet +2, mot +0, 0)) puis détruit la copie (Palette_Destruct_2D048). Après TextFormat_ReleaseAttribute_2EC80(word_46F46, 0). mid33, scène 6 : l'appelant construit la palette directement dans la zone d'arguments (sub sp, 6 ; Palette_Alloc sur cette zone, var_D4A ; Palette_CopyInto_2CF80 de `midgames` 40), puis appelle sans autre empilement."
+  },
+  "sub_5AA4E": {
+    "new_name": "Conv_PlayScript_5AA4E",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22 (structure). Interpréteur des scripts de conversation (CONV.PAK) : boucle tant que le curseur [conv+4] < début [conv] + taille [conv+8], lit un octet de commande et saute par la table off_5CE29 (00h scène de groupe, 03h réplique en gros plan avec 04h/0Ah/0Bh qui suivent, 0Ch saut relatif, 0Eh escadre, 0Fh choix d'équipier, 10h rien ; autre = octet sauté). Format complet : analysis/CONV_SYSTEM.md."
+  },
+  "sub_59DAA": {
+    "new_name": "Conv_LoadScriptFromPak_59DAA",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. Ouvre ..\\..\\data\\gameflow\\conv.pak, lit l'entrée [arg_0+6Dh] en mémoire telle quelle : [arg_0] = [arg_0+4] = adresse, [arg_0+8] = taille."
+  },
+  "sub_6305": {
+    "new_name": "ConvRec_ReadName_6305",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Lit un nom de 9 octets du script dans [rec+3] (commande 00h : décor de la scène de groupe)."
+  },
+  "sub_632E": {
+    "new_name": "ConvRec_ReadLine_632E",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 03h/04h. Si l'en-tête n'est pas lu ([rec+1Dh] = 0) : visage (9 octets) +3, octet image de base +0Ch, décor (9 octets) +0Dh, x (mot LE) +16h, y +18h. Puis toujours : texte (chaîne, copiée dans un tampon alloué) +1Ah. Si l'en-tête n'était pas lu : octet couleur +1Ch. Pose [rec+1Dh] = 1 (une 04h ne relit que le texte)."
+  },
+  "sub_6464": {
+    "new_name": "ConvRec_ReadExtra_6464",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 01h : nom de figure (9 octets) +3, x (mot LE) +0Ch, y +0Eh."
+  },
+  "sub_64EE": {
+    "new_name": "ConvRec_ReadSpeaker_64EE",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 02h : nom de figure (9 octets) +3, x +0Ch, y +0Eh, octet couleur +10h, texte (chaîne allouée) +11h."
+  },
+  "sub_65E8": {
+    "new_name": "ConvRec_ReadNarration_65E8",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 0Ah : octet couleur +3, texte (chaîne allouée) +4."
+  },
+  "sub_6660": {
+    "new_name": "ConvRec_ReadAcceptSkip_6660",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 0Bh : mot LE +3 = octets sautés si le joueur choisit « Reject Mission »."
+  },
+  "sub_66A0": {
+    "new_name": "ConvRec_ReadJump_66A0",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 0Ch : mot LE +3, ajouté au curseur du script par Conv_PlayScript_5AA4E."
+  },
+  "sub_66E0": {
+    "new_name": "ConvRec_ReadWing_66E0",
+    "segment": "seg006",
+    "summary": "far, LUE 2026-10-22. Commande 0Eh : octet écran +3 (0 = décor s_wing pour 0Fh, sinon w_wing), octet escadre +4 (INFO de la FORM WING de GAMEFLOW.IFF)."
+  },
+  "sub_59F54": {
+    "new_name": "Conv_DrawText_59F54",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. Affiche un texte de conversation : remplace $S $N $C (chaînes du joueur [[conv+28h]+0/+2/+4]), $W $L $O (équipiers [conv+2Ah]+1/+15h/+29h), $A $B (table dseg 0ED8h, indices [conv+6Bh]/[conv+6Ch]), $P $T (nombres [[conv+28h]+6/+8] + « plane(s) ») ; coupe aux espaces en lignes de 30 caractères, y = 4 + 15 × ligne, format « %Y%J%S »."
+  },
+  "sub_5A4E6": {
+    "new_name": "ConvData_LoadBackground_5A4E6",
+    "segment": "ovr191",
+    "summary": "far, LUE en partie 2026-10-22. Cherche dans CONVDATA.IFF la FORM BACK dont l'INFO vaut le nom donné ; DATA = éléments de 5 octets (source 0 = convshps/convpals, 1 = optshps/optpals ; image ; palette ; mot y) → tableaux de ressources d'images, de palettes et de positions y ; renvoie le nombre d'éléments."
   }
 }

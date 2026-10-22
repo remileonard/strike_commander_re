@@ -33,7 +33,7 @@ Stub_ResourceHandle_Destruct_42090	endp
 ; far, stub VROOMM : jmp ResourceHandle_Construct_53F9F.
 ; ==============================================================================================
 Stub_ResourceHandle_Construct_42095	proc far		; DATA XREF: sub_52662+96o
-					; sub_5A4E6+1BEo ...
+					; ConvData_LoadBackground_5A4E6+1BEo ...
 		jmp	ResourceHandle_Construct_53F9F
 Stub_ResourceHandle_Construct_42095	endp
 

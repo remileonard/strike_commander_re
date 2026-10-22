@@ -177,7 +177,7 @@ sub_421E5	endp
 ; Attributes: thunk
 
 sub_421EA	proc far
-		jmp	sub_59DAA
+		jmp	Conv_LoadScriptFromPak_59DAA
 sub_421EA	endp
 
 
@@ -213,7 +213,7 @@ sub_421F9	endp
 ; Attributes: thunk
 
 sub_421FE	proc far
-		jmp	sub_59F54
+		jmp	Conv_DrawText_59F54
 sub_421FE	endp
 
 
@@ -267,7 +267,7 @@ sub_42217	endp
 ; Attributes: thunk
 
 sub_4221C	proc far
-		jmp	sub_5A4E6
+		jmp	ConvData_LoadBackground_5A4E6
 sub_4221C	endp
 
 
@@ -312,7 +312,7 @@ sub_42230	endp
 ; Attributes: thunk
 
 sub_42235	proc far		; CODE XREF: sub_4AAAB+67P
-		jmp	sub_5AA4E
+		jmp	Conv_PlayScript_5AA4E
 sub_42235	endp
 
 stub191		ends

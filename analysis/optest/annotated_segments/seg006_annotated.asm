@@ -7,7 +7,11 @@ seg006		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_6305	proc far		; CODE XREF: sub_5AA4E+AEP
+; ==============================================================================================
+; far, LUE 2026-10-22. Lit un nom de 9 octets du script dans [rec+3] (commande 00h : décor de
+; la scène de groupe).
+; ==============================================================================================
+ConvRec_ReadName_6305	proc far		; CODE XREF: Conv_PlayScript_5AA4E+AEP
 					; DATA XREF: dseg:125Co
 
 arg_0		= word ptr  6
@@ -25,7 +29,7 @@ loc_630A:				; DATA XREF: seg170:00EEo
 		jmp	short loc_6325
 ; ���������������������������������������������������������������������������
 
-loc_6314:				; CODE XREF: sub_6305+23j
+loc_6314:				; CODE XREF: ConvRec_ReadName_6305+23j
 		les	bx, [di+4]
 		inc	word ptr [di+4]
 		mov	al, es:[bx]
@@ -34,22 +38,28 @@ loc_6314:				; CODE XREF: sub_6305+23j
 		mov	[bx+3],	al
 		inc	cx
 
-loc_6325:				; CODE XREF: sub_6305+Dj
+loc_6325:				; CODE XREF: ConvRec_ReadName_6305+Dj
 		cmp	cx, 9
 		jl	short loc_6314
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_6305	endp
+ConvRec_ReadName_6305	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_632E	proc far		; CODE XREF: sub_5AA4E+9DFP
-					; sub_5AA4E+E3DP
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 03h/04h. Si l'en-tête n'est pas lu ([rec+1Dh] = 0) : visage (9
+; octets) +3, octet image de base +0Ch, décor (9 octets) +0Dh, x (mot LE) +16h, y +18h. Puis
+; toujours : texte (chaîne, copiée dans un tampon alloué) +1Ah. Si l'en-tête n'était pas lu :
+; octet couleur +1Ch. Pose [rec+1Dh] = 1 (une 04h ne relit que le texte).
+; ==============================================================================================
+ConvRec_ReadLine_632E	proc far		; CODE XREF: Conv_PlayScript_5AA4E+9DFP
+					; Conv_PlayScript_5AA4E+E3DP
 					; DATA XREF: ...
 
 var_8		= byte ptr -8
@@ -73,12 +83,12 @@ arg_2		= word ptr  8
 		jmp	loc_63EA
 ; ���������������������������������������������������������������������������
 
-loc_6345:				; CODE XREF: sub_632E+12j
+loc_6345:				; CODE XREF: ConvRec_ReadLine_632E+12j
 		xor	cx, cx
 		jmp	short loc_635B
 ; ���������������������������������������������������������������������������
 
-loc_6349:				; CODE XREF: sub_632E+30j
+loc_6349:				; CODE XREF: ConvRec_ReadLine_632E+30j
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -87,7 +97,7 @@ loc_6349:				; CODE XREF: sub_632E+30j
 		mov	[bx+di+3], al
 		inc	cx
 
-loc_635B:				; CODE XREF: sub_632E+19j
+loc_635B:				; CODE XREF: ConvRec_ReadLine_632E+19j
 		cmp	cx, 9
 		jl	short loc_6349
 		mov	bx, [bp+arg_2]
@@ -99,7 +109,7 @@ loc_635B:				; CODE XREF: sub_632E+19j
 		jmp	short loc_6385
 ; ���������������������������������������������������������������������������
 
-loc_6373:				; CODE XREF: sub_632E+5Aj
+loc_6373:				; CODE XREF: ConvRec_ReadLine_632E+5Aj
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -108,7 +118,7 @@ loc_6373:				; CODE XREF: sub_632E+5Aj
 		mov	[bx+di+0Dh], al
 		inc	cx
 
-loc_6385:				; CODE XREF: sub_632E+43j
+loc_6385:				; CODE XREF: ConvRec_ReadLine_632E+43j
 		cmp	cx, 9
 		jl	short loc_6373
 		mov	bx, [bp+arg_2]
@@ -146,7 +156,7 @@ loc_6385:				; CODE XREF: sub_632E+43j
 		add	ax, dx
 		mov	[di+18h], ax
 
-loc_63EA:				; CODE XREF: sub_632E+14j
+loc_63EA:				; CODE XREF: ConvRec_ReadLine_632E+14j
 		mov	bx, [bp+arg_2]
 		push	word ptr [bx+6]
 		push	word ptr [bx+4]
@@ -167,7 +177,7 @@ loc_63EA:				; CODE XREF: sub_632E+14j
 		jmp	short loc_643C
 ; ���������������������������������������������������������������������������
 
-loc_6425:				; CODE XREF: sub_632E+114j
+loc_6425:				; CODE XREF: ConvRec_ReadLine_632E+114j
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -177,7 +187,7 @@ loc_6425:				; CODE XREF: sub_632E+114j
 		inc	[bp+var_4]
 		inc	[bp+var_6]
 
-loc_643C:				; CODE XREF: sub_632E+F5j
+loc_643C:				; CODE XREF: ConvRec_ReadLine_632E+F5j
 		mov	ax, [bp+var_6]
 		cmp	ax, [bp+var_2]
 		jl	short loc_6425
@@ -191,20 +201,23 @@ loc_643C:				; CODE XREF: sub_632E+F5j
 		mov	al, es:[si]
 		mov	[di+1Ch], al
 
-loc_645C:				; CODE XREF: sub_632E+11Dj
+loc_645C:				; CODE XREF: ConvRec_ReadLine_632E+11Dj
 		mov	byte ptr [di+1Dh], 1
 		pop	di
 		pop	si
 		leave
 		retf
-sub_632E	endp
+ConvRec_ReadLine_632E	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_6464	proc far		; CODE XREF: sub_5AA4E+252P
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 01h : nom de figure (9 octets) +3, x (mot LE) +0Ch, y +0Eh.
+; ==============================================================================================
+ConvRec_ReadExtra_6464	proc far		; CODE XREF: Conv_PlayScript_5AA4E+252P
 					; DATA XREF: dseg:124Co
 
 var_2		= byte ptr -2
@@ -222,7 +235,7 @@ arg_2		= word ptr  8
 		jmp	short loc_6485
 ; ���������������������������������������������������������������������������
 
-loc_6473:				; CODE XREF: sub_6464+24j
+loc_6473:				; CODE XREF: ConvRec_ReadExtra_6464+24j
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -231,7 +244,7 @@ loc_6473:				; CODE XREF: sub_6464+24j
 		mov	[bx+di+3], al
 		inc	cx
 
-loc_6485:				; CODE XREF: sub_6464+Dj
+loc_6485:				; CODE XREF: ConvRec_ReadExtra_6464+Dj
 		cmp	cx, 9
 		jl	short loc_6473
 		mov	bx, [bp+arg_2]
@@ -272,14 +285,18 @@ loc_6485:				; CODE XREF: sub_6464+Dj
 		pop	si
 		leave
 		retf
-sub_6464	endp
+ConvRec_ReadExtra_6464	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_64EE	proc far		; CODE XREF: sub_5AA4E+3C4P
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 02h : nom de figure (9 octets) +3, x +0Ch, y +0Eh, octet
+; couleur +10h, texte (chaîne allouée) +11h.
+; ==============================================================================================
+ConvRec_ReadSpeaker_64EE	proc far		; CODE XREF: Conv_PlayScript_5AA4E+3C4P
 					; DATA XREF: dseg:1244o
 
 var_8		= word ptr -8
@@ -300,7 +317,7 @@ arg_2		= word ptr  8
 		jmp	short loc_6515
 ; ���������������������������������������������������������������������������
 
-loc_6500:				; CODE XREF: sub_64EE+2Bj
+loc_6500:				; CODE XREF: ConvRec_ReadSpeaker_64EE+2Bj
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -309,7 +326,7 @@ loc_6500:				; CODE XREF: sub_64EE+2Bj
 		mov	[bx+di+3], al
 		inc	[bp+var_2]
 
-loc_6515:				; CODE XREF: sub_64EE+10j
+loc_6515:				; CODE XREF: ConvRec_ReadSpeaker_64EE+10j
 		cmp	[bp+var_2], 9
 		jl	short loc_6500
 		mov	bx, [bp+arg_2]
@@ -371,7 +388,7 @@ loc_6515:				; CODE XREF: sub_64EE+10j
 		jmp	short loc_65DC
 ; ���������������������������������������������������������������������������
 
-loc_65C5:				; CODE XREF: sub_64EE+F4j
+loc_65C5:				; CODE XREF: ConvRec_ReadSpeaker_64EE+F4j
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -381,7 +398,7 @@ loc_65C5:				; CODE XREF: sub_64EE+F4j
 		inc	[bp+var_8]
 		inc	[bp+var_2]
 
-loc_65DC:				; CODE XREF: sub_64EE+D5j
+loc_65DC:				; CODE XREF: ConvRec_ReadSpeaker_64EE+D5j
 		mov	ax, [bp+var_2]
 		cmp	ax, [bp+var_6]
 		jl	short loc_65C5
@@ -389,15 +406,18 @@ loc_65DC:				; CODE XREF: sub_64EE+D5j
 		pop	si
 		leave
 		retf
-sub_64EE	endp
+ConvRec_ReadSpeaker_64EE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_65E8	proc far		; CODE XREF: sub_5AA4E+568P
-					; sub_5AA4E+C22P
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 0Ah : octet couleur +3, texte (chaîne allouée) +4.
+; ==============================================================================================
+ConvRec_ReadNarration_65E8	proc far		; CODE XREF: Conv_PlayScript_5AA4E+568P
+					; Conv_PlayScript_5AA4E+C22P
 					; DATA XREF: ...
 
 var_6		= word ptr -6
@@ -437,7 +457,7 @@ arg_2		= word ptr  8
 		jmp	short loc_6654
 ; ���������������������������������������������������������������������������
 
-loc_663D:				; CODE XREF: sub_65E8+72j
+loc_663D:				; CODE XREF: ConvRec_ReadNarration_65E8+72j
 		mov	bx, [bp+arg_2]
 		les	si, [bx+4]
 		inc	word ptr [bx+4]
@@ -447,7 +467,7 @@ loc_663D:				; CODE XREF: sub_65E8+72j
 		inc	[bp+var_4]
 		inc	[bp+var_6]
 
-loc_6654:				; CODE XREF: sub_65E8+53j
+loc_6654:				; CODE XREF: ConvRec_ReadNarration_65E8+53j
 		mov	ax, [bp+var_6]
 		cmp	ax, [bp+var_2]
 		jl	short loc_663D
@@ -455,14 +475,18 @@ loc_6654:				; CODE XREF: sub_65E8+53j
 		pop	si
 		leave
 		retf
-sub_65E8	endp
+ConvRec_ReadNarration_65E8	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_6660	proc far		; CODE XREF: sub_5AA4E+F8DP
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 0Bh : mot LE +3 = octets sautés si le joueur choisit « Reject
+; Mission ».
+; ==============================================================================================
+ConvRec_ReadAcceptSkip_6660	proc far		; CODE XREF: Conv_PlayScript_5AA4E+F8DP
 					; DATA XREF: dseg:11ACo
 
 var_2		= byte ptr -2
@@ -498,14 +522,18 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_6660	endp
+ConvRec_ReadAcceptSkip_6660	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_66A0	proc far		; CODE XREF: sub_5AA4E+238FP
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 0Ch : mot LE +3, ajouté au curseur du script par
+; Conv_PlayScript_5AA4E.
+; ==============================================================================================
+ConvRec_ReadJump_66A0	proc far		; CODE XREF: Conv_PlayScript_5AA4E+238FP
 					; DATA XREF: dseg:119Co
 
 var_2		= byte ptr -2
@@ -541,14 +569,18 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_66A0	endp
+ConvRec_ReadJump_66A0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_66E0	proc far		; CODE XREF: sub_5AA4E+156EP
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 0Eh : octet écran +3 (0 = décor s_wing pour 0Fh, sinon
+; w_wing), octet escadre +4 (INFO de la FORM WING de GAMEFLOW.IFF).
+; ==============================================================================================
+ConvRec_ReadWing_66E0	proc far		; CODE XREF: Conv_PlayScript_5AA4E+156EP
 					; DATA XREF: dseg:11A4o
 
 arg_0		= word ptr  6
@@ -574,7 +606,7 @@ arg_2		= word ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_66E0	endp
+ConvRec_ReadWing_66E0	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

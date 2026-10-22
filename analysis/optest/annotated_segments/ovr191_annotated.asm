@@ -209,7 +209,7 @@ loc_59B85:				; CODE XREF: sub_59B67+9j
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_59DAA
+		call	near ptr Conv_LoadScriptFromPak_59DAA
 		add	sp, 2
 
 loc_59C1C:				; CODE XREF: sub_59B67+1Bj
@@ -405,7 +405,11 @@ sub_59CDE	endp
 
 ; Attributes: bp-based frame
 
-sub_59DAA	proc far		; CODE XREF: sub_421EAJ sub_59B67+AFp
+; ==============================================================================================
+; far, LUE 2026-10-22. Ouvre ..\..\data\gameflow\conv.pak, lit l'entrée [arg_0+6Dh] en mémoire
+; telle quelle : [arg_0] = [arg_0+4] = adresse, [arg_0+8] = taille.
+; ==============================================================================================
+Conv_LoadScriptFromPak_59DAA	proc far		; CODE XREF: sub_421EAJ sub_59B67+AFp
 
 var_D6		= word ptr -0D6h
 var_75		= dword	ptr -75h
@@ -455,10 +459,10 @@ arg_0		= word ptr  6
 		jmp	short loc_59E08
 ; ���������������������������������������������������������������������������
 
-loc_59E04:				; CODE XREF: sub_59DAA+52j
+loc_59E04:				; CODE XREF: Conv_LoadScriptFromPak_59DAA+52j
 		mov	eax, [bp+var_65]
 
-loc_59E08:				; CODE XREF: sub_59DAA+58j
+loc_59E08:				; CODE XREF: Conv_LoadScriptFromPak_59DAA+58j
 		mov	[bp+var_4], eax
 		push	1
 		push	0
@@ -499,7 +503,7 @@ loc_59E08:				; CODE XREF: sub_59DAA+58j
 		pop	si
 		leave
 		retf
-sub_59DAA	endp
+Conv_LoadScriptFromPak_59DAA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -625,7 +629,13 @@ sub_59F42	endp
 
 ; Attributes: bp-based frame
 
-sub_59F54	proc far		; CODE XREF: sub_421FEJ sub_5AA4E+74Cp ...
+; ==============================================================================================
+; far, LUE 2026-10-22. Affiche un texte de conversation : remplace $S $N $C (chaînes du joueur
+; [[conv+28h]+0/+2/+4]), $W $L $O (équipiers [conv+2Ah]+1/+15h/+29h), $A $B (table dseg 0ED8h,
+; indices [conv+6Bh]/[conv+6Ch]), $P $T (nombres [[conv+28h]+6/+8] + « plane(s) ») ; coupe aux
+; espaces en lignes de 30 caractères, y = 4 + 15 × ligne, format « %Y%J%S ».
+; ==============================================================================================
+Conv_DrawText_59F54	proc far		; CODE XREF: sub_421FEJ Conv_PlayScript_5AA4E+74Cp ...
 
 var_1B0		= word ptr -1B0h
 var_19C		= word ptr -19Ch
@@ -656,7 +666,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_5A165
 ; ���������������������������������������������������������������������������
 
-loc_59F7F:				; CODE XREF: sub_59F54+224j
+loc_59F7F:				; CODE XREF: Conv_DrawText_59F54+224j
 		mov	ax, di
 		sub	ax, [bp+var_4]
 		push	ax
@@ -677,7 +687,7 @@ loc_59F7F:				; CODE XREF: sub_59F54+224j
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_59FB3:				; CODE XREF: sub_59F54+45j
+loc_59FB3:				; CODE XREF: Conv_DrawText_59F54+45j
 		cmp	byte ptr [di+1], 4Eh ; 'N'
 		jnz	short loc_59FD2
 		mov	bx, [si+28h]
@@ -690,7 +700,7 @@ loc_59FB3:				; CODE XREF: sub_59F54+45j
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_59FD2:				; CODE XREF: sub_59F54+63j
+loc_59FD2:				; CODE XREF: Conv_DrawText_59F54+63j
 		cmp	byte ptr [di+1], 43h ; 'C'
 		jnz	short loc_59FF1
 		mov	bx, [si+28h]
@@ -703,7 +713,7 @@ loc_59FD2:				; CODE XREF: sub_59F54+63j
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_59FF1:				; CODE XREF: sub_59F54+82j
+loc_59FF1:				; CODE XREF: Conv_DrawText_59F54+82j
 		cmp	byte ptr [di+1], 57h ; 'W'
 		jnz	short loc_5A00F
 		mov	ax, [si+2Ah]
@@ -717,7 +727,7 @@ loc_59FF1:				; CODE XREF: sub_59F54+82j
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A00F:				; CODE XREF: sub_59F54+A1j
+loc_5A00F:				; CODE XREF: Conv_DrawText_59F54+A1j
 		cmp	byte ptr [di+1], 4Ch ; 'L'
 		jnz	short loc_5A02F
 		mov	ax, [si+2Ah]
@@ -731,7 +741,7 @@ loc_5A00F:				; CODE XREF: sub_59F54+A1j
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A02F:				; CODE XREF: sub_59F54+BFj
+loc_5A02F:				; CODE XREF: Conv_DrawText_59F54+BFj
 		cmp	byte ptr [di+1], 4Fh ; 'O'
 		jnz	short loc_5A04F
 		mov	ax, [si+2Ah]
@@ -745,7 +755,7 @@ loc_5A02F:				; CODE XREF: sub_59F54+BFj
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A04F:				; CODE XREF: sub_59F54+DFj
+loc_5A04F:				; CODE XREF: Conv_DrawText_59F54+DFj
 		cmp	byte ptr [di+1], 41h ; 'A'
 		jnz	short loc_5A075
 		mov	al, [si+6Bh]
@@ -761,7 +771,7 @@ loc_5A04F:				; CODE XREF: sub_59F54+DFj
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A075:				; CODE XREF: sub_59F54+FFj
+loc_5A075:				; CODE XREF: Conv_DrawText_59F54+FFj
 		cmp	byte ptr [di+1], 42h ; 'B'
 		jnz	short loc_5A09B
 		mov	al, [si+6Ch]
@@ -777,7 +787,7 @@ loc_5A075:				; CODE XREF: sub_59F54+FFj
 		jmp	loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A09B:				; CODE XREF: sub_59F54+125j
+loc_5A09B:				; CODE XREF: Conv_DrawText_59F54+125j
 		cmp	byte ptr [di+1], 50h ; 'P'
 		jnz	short loc_5A0F6
 		push	0Ah
@@ -801,7 +811,7 @@ loc_5A09B:				; CODE XREF: sub_59F54+125j
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_5A0DF:				; CODE XREF: sub_59F54+179j
+loc_5A0DF:				; CODE XREF: Conv_DrawText_59F54+179j
 		lea	ax, [bp+var_1B0]
 		push	ax
 		lea	ax, [bp+var_19C]
@@ -812,7 +822,7 @@ loc_5A0DF:				; CODE XREF: sub_59F54+179j
 		jmp	short loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A0F6:				; CODE XREF: sub_59F54+14Bj
+loc_5A0F6:				; CODE XREF: Conv_DrawText_59F54+14Bj
 		cmp	byte ptr [di+1], 54h ; 'T'
 		jnz	short loc_5A151
 		push	0Ah
@@ -836,7 +846,7 @@ loc_5A0F6:				; CODE XREF: sub_59F54+14Bj
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_5A13A:				; CODE XREF: sub_59F54+1D4j
+loc_5A13A:				; CODE XREF: Conv_DrawText_59F54+1D4j
 		lea	ax, [bp+var_1B0]
 		push	ax
 		lea	ax, [bp+var_19C]
@@ -847,7 +857,7 @@ loc_5A13A:				; CODE XREF: sub_59F54+1D4j
 		jmp	short loc_5A162
 ; ���������������������������������������������������������������������������
 
-loc_5A151:				; CODE XREF: sub_59F54+1A6j
+loc_5A151:				; CODE XREF: Conv_DrawText_59F54+1A6j
 		inc	di
 		push	0F6Dh
 		lea	ax, [bp+var_19C]
@@ -855,11 +865,11 @@ loc_5A151:				; CODE XREF: sub_59F54+1A6j
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_5A162:				; CODE XREF: sub_59F54+5Cj
-					; sub_59F54+7Bj ...
+loc_5A162:				; CODE XREF: Conv_DrawText_59F54+5Cj
+					; Conv_DrawText_59F54+7Bj ...
 		mov	[bp+var_4], di
 
-loc_5A165:				; CODE XREF: sub_59F54+28j
+loc_5A165:				; CODE XREF: Conv_DrawText_59F54+28j
 		push	24h ; '$'
 		push	[bp+var_4]
 		call	CRT_Strchr_WordAligned
@@ -870,7 +880,7 @@ loc_5A165:				; CODE XREF: sub_59F54+28j
 		jmp	loc_59F7F
 ; ���������������������������������������������������������������������������
 
-loc_5A17B:				; CODE XREF: sub_59F54+222j
+loc_5A17B:				; CODE XREF: Conv_DrawText_59F54+222j
 		push	[bp+var_4]
 		lea	ax, [bp+var_19C]
 		push	ax
@@ -890,17 +900,17 @@ loc_5A17B:				; CODE XREF: sub_59F54+222j
 		jmp	short loc_5A204
 ; ���������������������������������������������������������������������������
 
-loc_5A1B3:				; CODE XREF: sub_59F54+2C0j
+loc_5A1B3:				; CODE XREF: Conv_DrawText_59F54+2C0j
 		cmp	[bp+var_A], 1Eh
 		jle	short loc_5A1D9
 		mov	[bp+var_C], 1Eh
 		jmp	short loc_5A1C3
 ; ���������������������������������������������������������������������������
 
-loc_5A1C0:				; CODE XREF: sub_59F54+278j
+loc_5A1C0:				; CODE XREF: Conv_DrawText_59F54+278j
 		dec	[bp+var_C]
 
-loc_5A1C3:				; CODE XREF: sub_59F54+26Aj
+loc_5A1C3:				; CODE XREF: Conv_DrawText_59F54+26Aj
 		mov	bx, [bp+var_6]
 		add	bx, [bp+var_C]
 		cmp	byte ptr [bx], 20h ; ' '
@@ -911,12 +921,12 @@ loc_5A1C3:				; CODE XREF: sub_59F54+26Aj
 		jmp	short loc_5A1E0
 ; ���������������������������������������������������������������������������
 
-loc_5A1D9:				; CODE XREF: sub_59F54+263j
+loc_5A1D9:				; CODE XREF: Conv_DrawText_59F54+263j
 		mov	ax, [bp+var_A]
 		dec	ax
 		mov	[bp+var_C], ax
 
-loc_5A1E0:				; CODE XREF: sub_59F54+283j
+loc_5A1E0:				; CODE XREF: Conv_DrawText_59F54+283j
 		push	[bp+var_6]
 		push	2
 		push	[bp+var_8]
@@ -930,7 +940,7 @@ loc_5A1E0:				; CODE XREF: sub_59F54+283j
 		inc	ax
 		mov	[bp+var_6], ax
 
-loc_5A204:				; CODE XREF: sub_59F54+25Dj
+loc_5A204:				; CODE XREF: Conv_DrawText_59F54+25Dj
 		push	[bp+var_6]
 		call	CRT_Strlen
 		add	sp, 2
@@ -944,7 +954,7 @@ loc_5A204:				; CODE XREF: sub_59F54+25Dj
 		pop	si
 		leave
 		retf
-sub_59F54	endp
+Conv_DrawText_59F54	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1200,7 +1210,7 @@ sub_5A225	endp
 
 ; Attributes: bp-based frame
 
-sub_5A451	proc far		; CODE XREF: sub_42203J sub_5AA4E+AE4p
+sub_5A451	proc far		; CODE XREF: sub_42203J Conv_PlayScript_5AA4E+AE4p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1230,7 +1240,7 @@ sub_5A451	endp
 
 ; Attributes: bp-based frame
 
-sub_5A46F	proc far		; CODE XREF: sub_42208J sub_5AA4E+B0Cp
+sub_5A46F	proc far		; CODE XREF: sub_42208J Conv_PlayScript_5AA4E+B0Cp
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1280,7 +1290,7 @@ sub_5A46F	endp
 
 ; Attributes: bp-based frame
 
-sub_5A4AA	proc far		; CODE XREF: sub_4220DJ sub_5AA4E+288p ...
+sub_5A4AA	proc far		; CODE XREF: sub_4220DJ Conv_PlayScript_5AA4E+288p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1310,7 +1320,7 @@ sub_5A4AA	endp
 
 ; Attributes: bp-based frame
 
-sub_5A4C8	proc far		; CODE XREF: sub_42212J sub_5AA4E+19Bp ...
+sub_5A4C8	proc far		; CODE XREF: sub_42212J Conv_PlayScript_5AA4E+19Bp ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1339,7 +1349,13 @@ sub_5A4C8	endp
 
 ; Attributes: bp-based frame
 
-sub_5A4E6	proc far		; CODE XREF: sub_4221CJ sub_5AA4E+CEp	...
+; ==============================================================================================
+; far, LUE en partie 2026-10-22. Cherche dans CONVDATA.IFF la FORM BACK dont l'INFO vaut le
+; nom donné ; DATA = éléments de 5 octets (source 0 = convshps/convpals, 1 = optshps/optpals ;
+; image ; palette ; mot y) → tableaux de ressources d'images, de palettes et de positions y ;
+; renvoie le nombre d'éléments.
+; ==============================================================================================
+ConvData_LoadBackground_5A4E6	proc far		; CODE XREF: sub_4221CJ Conv_PlayScript_5AA4E+CEp	...
 
 var_262		= word ptr -262h
 var_212		= word ptr -212h
@@ -1459,7 +1475,7 @@ arg_8		= word ptr  0Eh
 		jmp	short loc_5A63A
 ; ���������������������������������������������������������������������������
 
-loc_5A5C8:				; CODE XREF: sub_5A4E6+16Cj
+loc_5A5C8:				; CODE XREF: ConvData_LoadBackground_5A4E6+16Cj
 		push	0
 		push	large [dword_44001]
 		lea	ax, [bp+var_122]
@@ -1489,16 +1505,16 @@ loc_5A5C8:				; CODE XREF: sub_5A4E6+16Cj
 		jmp	short loc_5A655
 ; ���������������������������������������������������������������������������
 
-loc_5A616:				; CODE XREF: sub_5A4E6+128j
+loc_5A616:				; CODE XREF: ConvData_LoadBackground_5A4E6+128j
 		jmp	short loc_5A623
 ; ���������������������������������������������������������������������������
 
-loc_5A618:				; CODE XREF: sub_5A4E6+F8j
+loc_5A618:				; CODE XREF: ConvData_LoadBackground_5A4E6+F8j
 		push	0FE6h
 		call	sub_310B
 		add	sp, 2
 
-loc_5A623:				; CODE XREF: sub_5A4E6:loc_5A616j
+loc_5A623:				; CODE XREF: ConvData_LoadBackground_5A4E6:loc_5A616j
 		mov	eax, [bp+var_AC]
 		mov	[bp+var_BD], eax
 		lea	ax, [bp+var_122]
@@ -1506,7 +1522,7 @@ loc_5A623:				; CODE XREF: sub_5A4E6:loc_5A616j
 		call	ResourceRecord_ReleaseAndClear_3C595
 		add	sp, 2
 
-loc_5A63A:				; CODE XREF: sub_5A4E6+E0j
+loc_5A63A:				; CODE XREF: ConvData_LoadBackground_5A4E6+E0j
 		push	1
 		push	large [dword_43FFC]
 		lea	ax, [bp+var_122]
@@ -1518,8 +1534,8 @@ loc_5A63A:				; CODE XREF: sub_5A4E6+E0j
 		jmp	loc_5A5C8
 ; ���������������������������������������������������������������������������
 
-loc_5A655:				; CODE XREF: sub_5A4E6+12Ej
-					; sub_5A4E6+16Aj
+loc_5A655:				; CODE XREF: ConvData_LoadBackground_5A4E6+12Ej
+					; ConvData_LoadBackground_5A4E6+16Aj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -1528,7 +1544,7 @@ loc_5A655:				; CODE XREF: sub_5A4E6+12Ej
 		call	sub_310B
 		add	sp, 2
 
-loc_5A669:				; CODE XREF: sub_5A4E6+176j
+loc_5A669:				; CODE XREF: ConvData_LoadBackground_5A4E6+176j
 		mov	eax, [bp+var_AC]
 		mov	[bp+var_BD], eax
 		push	0
@@ -1542,7 +1558,7 @@ loc_5A669:				; CODE XREF: sub_5A4E6+176j
 		jmp	loc_5AA10
 ; ���������������������������������������������������������������������������
 
-loc_5A68E:				; CODE XREF: sub_5A4E6+1A3j
+loc_5A68E:				; CODE XREF: ConvData_LoadBackground_5A4E6+1A3j
 		mov	eax, [bp+var_B0]
 		mov	ebx, 5
 		cdq
@@ -1584,7 +1600,7 @@ loc_5A68E:				; CODE XREF: sub_5A4E6+1A3j
 		jmp	loc_5A9F4
 ; ���������������������������������������������������������������������������
 
-loc_5A6FC:				; CODE XREF: sub_5A4E6+518j
+loc_5A6FC:				; CODE XREF: ConvData_LoadBackground_5A4E6+518j
 		lea	ax, [bp+var_122]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -1605,7 +1621,7 @@ loc_5A6FC:				; CODE XREF: sub_5A4E6+518j
 		jmp	loc_5A87C
 ; ���������������������������������������������������������������������������
 
-loc_5A735:				; CODE XREF: sub_5A4E6+24Aj
+loc_5A735:				; CODE XREF: ConvData_LoadBackground_5A4E6+24Aj
 		mov	al, [bp+var_8]
 		mov	ah, 0
 		push	ax
@@ -1725,13 +1741,13 @@ loc_5A735:				; CODE XREF: sub_5A4E6+24Aj
 		jmp	loc_5A9D6
 ; ���������������������������������������������������������������������������
 
-loc_5A87C:				; CODE XREF: sub_5A4E6+24Cj
+loc_5A87C:				; CODE XREF: ConvData_LoadBackground_5A4E6+24Cj
 		cmp	[bp+var_7], 1
 		jz	short loc_5A885
 		jmp	loc_5A9CB
 ; ���������������������������������������������������������������������������
 
-loc_5A885:				; CODE XREF: sub_5A4E6+39Aj
+loc_5A885:				; CODE XREF: ConvData_LoadBackground_5A4E6+39Aj
 		mov	al, [bp+var_8]
 		mov	ah, 0
 		push	ax
@@ -1851,13 +1867,13 @@ loc_5A885:				; CODE XREF: sub_5A4E6+39Aj
 		jmp	short loc_5A9D6
 ; ���������������������������������������������������������������������������
 
-loc_5A9CB:				; CODE XREF: sub_5A4E6+39Cj
+loc_5A9CB:				; CODE XREF: ConvData_LoadBackground_5A4E6+39Cj
 		push	1033h
 		call	sub_310B
 		add	sp, 2
 
-loc_5A9D6:				; CODE XREF: sub_5A4E6+393j
-					; sub_5A4E6+4E3j
+loc_5A9D6:				; CODE XREF: ConvData_LoadBackground_5A4E6+393j
+					; ConvData_LoadBackground_5A4E6+4E3j
 		lea	ax, [bp+var_122]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -1870,7 +1886,7 @@ loc_5A9D6:				; CODE XREF: sub_5A4E6+393j
 		mov	[bx], ax
 		inc	[bp+var_6]
 
-loc_5A9F4:				; CODE XREF: sub_5A4E6+213j
+loc_5A9F4:				; CODE XREF: ConvData_LoadBackground_5A4E6+213j
 		mov	al, [bp+var_2]
 		mov	ah, 0
 		cmp	ax, [bp+var_6]
@@ -1878,7 +1894,7 @@ loc_5A9F4:				; CODE XREF: sub_5A4E6+213j
 		jmp	loc_5A6FC
 ; ���������������������������������������������������������������������������
 
-loc_5AA01:				; CODE XREF: sub_5A4E6+516j
+loc_5AA01:				; CODE XREF: ConvData_LoadBackground_5A4E6+516j
 		lea	ax, [bp+var_122]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -1886,12 +1902,12 @@ loc_5AA01:				; CODE XREF: sub_5A4E6+516j
 		jmp	short loc_5AA1B
 ; ���������������������������������������������������������������������������
 
-loc_5AA10:				; CODE XREF: sub_5A4E6+1A5j
+loc_5AA10:				; CODE XREF: ConvData_LoadBackground_5A4E6+1A5j
 		push	1054h
 		call	sub_310B
 		add	sp, 2
 
-loc_5AA1B:				; CODE XREF: sub_5A4E6+528j
+loc_5AA1B:				; CODE XREF: ConvData_LoadBackground_5A4E6+528j
 		mov	al, [bp+var_2]
 		mov	[bp+var_3], al
 		mov	[bp+var_122], 56Eh
@@ -1909,7 +1925,7 @@ loc_5AA1B:				; CODE XREF: sub_5A4E6+528j
 		pop	si
 		leave
 		retf
-sub_5A4E6	endp
+ConvData_LoadBackground_5A4E6	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -1921,7 +1937,14 @@ sub_5A4E6	endp
 
 ; Attributes: bp-based frame
 
-sub_5AA4E	proc far		; CODE XREF: sub_42235J
+; ==============================================================================================
+; far, LUE 2026-10-22 (structure). Interpréteur des scripts de conversation (CONV.PAK) :
+; boucle tant que le curseur [conv+4] < début [conv] + taille [conv+8], lit un octet de
+; commande et saute par la table off_5CE29 (00h scène de groupe, 03h réplique en gros plan
+; avec 04h/0Ah/0Bh qui suivent, 0Ch saut relatif, 0Eh escadre, 0Fh choix d'équipier, 10h rien
+; ; autre = octet sauté). Format complet : analysis/CONV_SYSTEM.md.
+; ==============================================================================================
+Conv_PlayScript_5AA4E	proc far		; CODE XREF: sub_42235J
 
 var_22E		= word ptr -22Eh
 var_22C		= byte ptr -22Ch
@@ -2073,7 +2096,7 @@ arg_0		= word ptr  6
 		jmp	loc_5CDF7
 ; ���������������������������������������������������������������������������
 
-loc_5AA78:				; CODE XREF: sub_5AA4E+23C0j
+loc_5AA78:				; CODE XREF: Conv_PlayScript_5AA4E+23C0j
 		mov	[bp+var_26], 0
 		call	Input_Flush_CDDC
 		les	bx, [di+4]
@@ -2086,7 +2109,7 @@ loc_5AA78:				; CODE XREF: sub_5AA4E+23C0j
 		jmp	loc_5CDED	; default
 ; ���������������������������������������������������������������������������
 
-loc_5AA96:				; CODE XREF: sub_5AA4E+43j
+loc_5AA96:				; CODE XREF: Conv_PlayScript_5AA4E+43j
 		shl	bx, 1
 		jmp	cs:off_5CE29[bx] ; switch jump
 
@@ -2094,7 +2117,7 @@ loc_5AA9D:				; DATA XREF: ovr191:off_5CE29o
 		jmp	loc_5CDEF	; case 0x10
 ; ���������������������������������������������������������������������������
 
-loc_5AAA0:				; CODE XREF: sub_5AA4E+4Aj
+loc_5AAA0:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ovr191:off_5CE29o
 		cmp	byte_495FC, 0	; case 0x0
 		jz	short loc_5AAAB
@@ -2104,7 +2127,7 @@ loc_5AAA0:				; CODE XREF: sub_5AA4E+4Aj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_5AAAB:				; CODE XREF: sub_5AA4E+57j
+loc_5AAAB:				; CODE XREF: Conv_PlayScript_5AA4E+57j
 		mov	ax, di
 		add	ax, 1Ah
 		push	ax
@@ -2133,7 +2156,7 @@ loc_5AAAB:				; CODE XREF: sub_5AA4E+57j
 		push	di
 		lea	ax, [bp+var_130]
 		push	ax
-		call	sub_6305
+		call	ConvRec_ReadName_6305
 		add	sp, 4
 		lea	ax, [bp+var_12D]
 		mov	[bp+var_32], ax
@@ -2146,14 +2169,14 @@ loc_5AAAB:				; CODE XREF: sub_5AA4E+57j
 		push	[bp+var_32]
 		push	di
 		push	cs
-		call	near ptr sub_5A4E6
+		call	near ptr ConvData_LoadBackground_5A4E6
 		add	sp, 0Ah
 		mov	[bp+var_39], al
 		mov	[bp+var_3C], 0
 		jmp	short loc_5AB65
 ; ���������������������������������������������������������������������������
 
-loc_5AB2C:				; CODE XREF: sub_5AA4E+11Fj
+loc_5AB2C:				; CODE XREF: Conv_PlayScript_5AA4E+11Fj
 		mov	ax, [bp+var_3C]
 		shl	ax, 1
 		mov	bx, [bp+var_38]
@@ -2177,7 +2200,7 @@ loc_5AB2C:				; CODE XREF: sub_5AA4E+11Fj
 		add	sp, 4
 		inc	[bp+var_3C]
 
-loc_5AB65:				; CODE XREF: sub_5AA4E+DCj
+loc_5AB65:				; CODE XREF: Conv_PlayScript_5AA4E+DCj
 		mov	al, [bp+var_39]
 		mov	ah, 0
 		cmp	ax, [bp+var_3C]
@@ -2186,7 +2209,7 @@ loc_5AB65:				; CODE XREF: sub_5AA4E+DCj
 		jmp	short loc_5ABBF
 ; ���������������������������������������������������������������������������
 
-loc_5AB76:				; CODE XREF: sub_5AA4E+179j
+loc_5AB76:				; CODE XREF: Conv_PlayScript_5AA4E+179j
 		mov	ax, [bp+var_3C]
 		mov	dx, 0Ah
 		imul	dx
@@ -2215,7 +2238,7 @@ loc_5AB76:				; CODE XREF: sub_5AA4E+179j
 		add	sp, 4
 		inc	[bp+var_3C]
 
-loc_5ABBF:				; CODE XREF: sub_5AA4E+126j
+loc_5ABBF:				; CODE XREF: Conv_PlayScript_5AA4E+126j
 		mov	al, [bp+var_39]
 		mov	ah, 0
 		cmp	ax, [bp+var_3C]
@@ -2266,8 +2289,8 @@ loc_5ABBF:				; CODE XREF: sub_5AA4E+126j
 		add	sp, 8
 		jmp	short $+2
 
-loc_5AC4D:				; CODE XREF: sub_5AA4E+1DFj
-					; sub_5AA4E+1E6j
+loc_5AC4D:				; CODE XREF: Conv_PlayScript_5AA4E+1DFj
+					; Conv_PlayScript_5AA4E+1E6j
 		mov	[bp+var_66], 0
 		mov	byte ptr [bp+var_62+1],	0
 		mov	[bp+var_62+2], 0
@@ -2285,7 +2308,7 @@ loc_5AC4D:				; CODE XREF: sub_5AA4E+1DFj
 		jmp	loc_5ADBC
 ; ���������������������������������������������������������������������������
 
-loc_5AC86:				; CODE XREF: sub_5AA4E+377j
+loc_5AC86:				; CODE XREF: Conv_PlayScript_5AA4E+377j
 		inc	word ptr [di+4]
 		mov	[bp+var_22A], 1254h
 		mov	[bp+var_228], 1
@@ -2293,7 +2316,7 @@ loc_5AC86:				; CODE XREF: sub_5AA4E+377j
 		push	di
 		lea	ax, [bp+var_22A]
 		push	ax
-		call	sub_6464
+		call	ConvRec_ReadExtra_6464
 		add	sp, 4
 		lea	ax, [bp+var_227]
 		mov	si, ax
@@ -2340,7 +2363,7 @@ loc_5AC86:				; CODE XREF: sub_5AA4E+377j
 		jmp	loc_5ADBC
 ; ���������������������������������������������������������������������������
 
-loc_5AD1D:				; CODE XREF: sub_5AA4E+2CAj
+loc_5AD1D:				; CODE XREF: Conv_PlayScript_5AA4E+2CAj
 		mov	[bp+var_6A], 0
 		mov	byte ptr [bp+var_66], 2
 		mov	byte ptr [bp+var_66+1],	0
@@ -2390,24 +2413,24 @@ loc_5AD1D:				; CODE XREF: sub_5AA4E+2CAj
 		add	sp, 8
 		jmp	short $+2
 
-loc_5ADA8:				; CODE XREF: sub_5AA4E+33Aj
-					; sub_5AA4E+341j
+loc_5ADA8:				; CODE XREF: Conv_PlayScript_5AA4E+33Aj
+					; Conv_PlayScript_5AA4E+341j
 		mov	[bp+var_6A], 0
 		mov	byte ptr [bp+var_66+1],	0
 		mov	[bp+var_66+2], 0
 
-loc_5ADBC:				; CODE XREF: sub_5AA4E+235j
-					; sub_5AA4E+2CCj
+loc_5ADBC:				; CODE XREF: Conv_PlayScript_5AA4E+235j
+					; Conv_PlayScript_5AA4E+2CCj
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 1
 		jnz	short loc_5ADC8
 		jmp	loc_5AC86
 ; ���������������������������������������������������������������������������
 
-loc_5ADC8:				; CODE XREF: sub_5AA4E+375j
+loc_5ADC8:				; CODE XREF: Conv_PlayScript_5AA4E+375j
 		mov	[bp+var_41], 0
 
-loc_5ADCC:				; CODE XREF: sub_5AA4E:loc_5B016j
+loc_5ADCC:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B016j
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -2416,24 +2439,24 @@ loc_5ADCC:				; CODE XREF: sub_5AA4E:loc_5B016j
 		jmp	short loc_5ADDD
 ; ���������������������������������������������������������������������������
 
-loc_5ADDB:				; CODE XREF: sub_5AA4E+386j
+loc_5ADDB:				; CODE XREF: Conv_PlayScript_5AA4E+386j
 		xor	ax, ax
 
-loc_5ADDD:				; CODE XREF: sub_5AA4E+38Bj
+loc_5ADDD:				; CODE XREF: Conv_PlayScript_5AA4E+38Bj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5ADE6
 		jmp	loc_5AF78
 ; ���������������������������������������������������������������������������
 
-loc_5ADE6:				; CODE XREF: sub_5AA4E+393j
+loc_5ADE6:				; CODE XREF: Conv_PlayScript_5AA4E+393j
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 2
 		jz	short loc_5ADF2
 		jmp	loc_5AF78
 ; ���������������������������������������������������������������������������
 
-loc_5ADF2:				; CODE XREF: sub_5AA4E+39Fj
+loc_5ADF2:				; CODE XREF: Conv_PlayScript_5AA4E+39Fj
 		inc	word ptr [di+4]
 		mov	[bp+var_22E], 1254h
 		mov	[bp+var_22C], 2
@@ -2442,7 +2465,7 @@ loc_5ADF2:				; CODE XREF: sub_5AA4E+39Fj
 		push	di
 		lea	ax, [bp+var_22E]
 		push	ax
-		call	sub_64EE
+		call	ConvRec_ReadSpeaker_64EE
 		add	sp, 4
 		lea	ax, [bp-22Bh]
 		push	ax
@@ -2509,7 +2532,7 @@ loc_5ADF2:				; CODE XREF: sub_5AA4E+39Fj
 		jmp	loc_5AF63
 ; ���������������������������������������������������������������������������
 
-loc_5AEC7:				; CODE XREF: sub_5AA4E+474j
+loc_5AEC7:				; CODE XREF: Conv_PlayScript_5AA4E+474j
 		mov	[bp+var_6A+2], 0
 		mov	byte ptr [bp+var_66+2],	2
 		mov	byte ptr [bp+var_66+3],	0
@@ -2557,13 +2580,13 @@ loc_5AEC7:				; CODE XREF: sub_5AA4E+474j
 		add	sp, 8
 		jmp	short $+2
 
-loc_5AF4F:				; CODE XREF: sub_5AA4E+4E1j
-					; sub_5AA4E+4E8j
+loc_5AF4F:				; CODE XREF: Conv_PlayScript_5AA4E+4E1j
+					; Conv_PlayScript_5AA4E+4E8j
 		mov	[bp+var_6A+2], 0
 		mov	byte ptr [bp+var_66+3],	0
 		mov	[bp+var_62], 0
 
-loc_5AF63:				; CODE XREF: sub_5AA4E+476j
+loc_5AF63:				; CODE XREF: Conv_PlayScript_5AA4E+476j
 		mov	[bp+var_22E], 1244h
 		push	[bp+var_21E+1]
 		call	Heap_FreeAndCoalesce_2C3FC
@@ -2571,8 +2594,8 @@ loc_5AF63:				; CODE XREF: sub_5AA4E+476j
 		jmp	loc_5B016
 ; ���������������������������������������������������������������������������
 
-loc_5AF78:				; CODE XREF: sub_5AA4E+395j
-					; sub_5AA4E+3A1j
+loc_5AF78:				; CODE XREF: Conv_PlayScript_5AA4E+395j
+					; Conv_PlayScript_5AA4E+3A1j
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -2581,17 +2604,17 @@ loc_5AF78:				; CODE XREF: sub_5AA4E+395j
 		jmp	short loc_5AF89
 ; ���������������������������������������������������������������������������
 
-loc_5AF87:				; CODE XREF: sub_5AA4E+532j
+loc_5AF87:				; CODE XREF: Conv_PlayScript_5AA4E+532j
 		xor	ax, ax
 
-loc_5AF89:				; CODE XREF: sub_5AA4E+537j
+loc_5AF89:				; CODE XREF: Conv_PlayScript_5AA4E+537j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5AF92
 		jmp	loc_5B014
 ; ���������������������������������������������������������������������������
 
-loc_5AF92:				; CODE XREF: sub_5AA4E+53Fj
+loc_5AF92:				; CODE XREF: Conv_PlayScript_5AA4E+53Fj
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 0Ah
 		jnz	short loc_5B014
@@ -2603,7 +2626,7 @@ loc_5AF92:				; CODE XREF: sub_5AA4E+53Fj
 		push	di
 		lea	ax, [bp+var_62]
 		push	ax
-		call	sub_65E8
+		call	ConvRec_ReadNarration_65E8
 		add	sp, 4
 		mov	al, [bp+var_41]
 		mov	ah, 0
@@ -2637,17 +2660,17 @@ loc_5AF92:				; CODE XREF: sub_5AA4E+53Fj
 		jmp	short loc_5B016
 ; ���������������������������������������������������������������������������
 
-loc_5B014:				; CODE XREF: sub_5AA4E+541j
-					; sub_5AA4E+54Bj
+loc_5B014:				; CODE XREF: Conv_PlayScript_5AA4E+541j
+					; Conv_PlayScript_5AA4E+54Bj
 		jmp	short loc_5B019
 ; ���������������������������������������������������������������������������
 
-loc_5B016:				; CODE XREF: sub_5AA4E+527j
-					; sub_5AA4E+5C4j
+loc_5B016:				; CODE XREF: Conv_PlayScript_5AA4E+527j
+					; Conv_PlayScript_5AA4E+5C4j
 		jmp	loc_5ADCC
 ; ���������������������������������������������������������������������������
 
-loc_5B019:				; CODE XREF: sub_5AA4E:loc_5B014j
+loc_5B019:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B014j
 		mov	[bp+var_107], 0
 		lea	ax, [bp+var_A]
 		push	ax
@@ -2674,7 +2697,7 @@ loc_5B019:				; CODE XREF: sub_5AA4E:loc_5B014j
 		call	CRT_Strcpy
 		add	sp, 4
 
-loc_5B064:				; CODE XREF: sub_5AA4E+5E2j
+loc_5B064:				; CODE XREF: Conv_PlayScript_5AA4E+5E2j
 		mov	[bp+var_4A], 0
 		mov	[bp+var_48], 98h ; '�'
 		mov	[bp+var_46], 13Fh
@@ -2718,12 +2741,12 @@ loc_5B064:				; CODE XREF: sub_5AA4E+5E2j
 		jmp	loc_5B249
 ; ���������������������������������������������������������������������������
 
-loc_5B0EE:				; CODE XREF: sub_5AA4E+69Bj
+loc_5B0EE:				; CODE XREF: Conv_PlayScript_5AA4E+69Bj
 		xor	si, si
 		jmp	loc_5B219
 ; ���������������������������������������������������������������������������
 
-loc_5B0F3:				; CODE XREF: sub_5AA4E+7D4j
+loc_5B0F3:				; CODE XREF: Conv_PlayScript_5AA4E+7D4j
 		mov	bx, si
 		shl	bx, 1
 		lea	ax, [bp+var_1BC]
@@ -2743,7 +2766,7 @@ loc_5B0F3:				; CODE XREF: sub_5AA4E+7D4j
 		call	TalkingHead_SetLipText_9C4F
 		add	sp, 4
 
-loc_5B122:				; CODE XREF: sub_5AA4E+6B2j
+loc_5B122:				; CODE XREF: Conv_PlayScript_5AA4E+6B2j
 		mov	[bp+var_227+1],	11BCh
 		mov	[bp+var_227+1],	11C8h
 		mov	[bp+var_227+1],	11D8h
@@ -2783,10 +2806,10 @@ loc_5B122:				; CODE XREF: sub_5AA4E+6B2j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_59F54
+		call	near ptr Conv_DrawText_59F54
 		add	sp, 6
 
-loc_5B1A0:				; CODE XREF: sub_5AA4E+737j
+loc_5B1A0:				; CODE XREF: Conv_PlayScript_5AA4E+737j
 		call	Input_Flush_CDDC
 		mov	bx, si
 		shl	bx, 1
@@ -2797,20 +2820,20 @@ loc_5B1A0:				; CODE XREF: sub_5AA4E+737j
 		jmp	short loc_5B1CE
 ; ���������������������������������������������������������������������������
 
-loc_5B1B6:				; CODE XREF: sub_5AA4E+798j
+loc_5B1B6:				; CODE XREF: Conv_PlayScript_5AA4E+798j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B1C1
 		jmp	short loc_5B1E8
 ; ���������������������������������������������������������������������������
 
-loc_5B1C1:				; CODE XREF: sub_5AA4E+76Fj
+loc_5B1C1:				; CODE XREF: Conv_PlayScript_5AA4E+76Fj
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B1CE:				; CODE XREF: sub_5AA4E+766j
+loc_5B1CE:				; CODE XREF: Conv_PlayScript_5AA4E+766j
 		mov	bx, si
 		shl	bx, 1
 		lea	ax, [bp+var_1BC]
@@ -2822,47 +2845,47 @@ loc_5B1CE:				; CODE XREF: sub_5AA4E+766j
 		or	ax, ax
 		jz	short loc_5B1B6
 
-loc_5B1E8:				; CODE XREF: sub_5AA4E+771j
+loc_5B1E8:				; CODE XREF: Conv_PlayScript_5AA4E+771j
 		jmp	short loc_5B218
 ; ���������������������������������������������������������������������������
 
-loc_5B1EA:				; CODE XREF: sub_5AA4E+764j
+loc_5B1EA:				; CODE XREF: Conv_PlayScript_5AA4E+764j
 		jmp	short loc_5B204
 ; ���������������������������������������������������������������������������
 
-loc_5B1EC:				; CODE XREF: sub_5AA4E+7C8j
+loc_5B1EC:				; CODE XREF: Conv_PlayScript_5AA4E+7C8j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B1F7
 		jmp	short loc_5B218
 ; ���������������������������������������������������������������������������
 
-loc_5B1F7:				; CODE XREF: sub_5AA4E+7A5j
+loc_5B1F7:				; CODE XREF: Conv_PlayScript_5AA4E+7A5j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B204:				; CODE XREF: sub_5AA4E:loc_5B1EAj
+loc_5B204:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B1EAj
 		cmp	[bp+var_107], 28h ; '('
 		jb	short loc_5B210
 		mov	ax, 1
 		jmp	short loc_5B212
 ; ���������������������������������������������������������������������������
 
-loc_5B210:				; CODE XREF: sub_5AA4E+7BBj
+loc_5B210:				; CODE XREF: Conv_PlayScript_5AA4E+7BBj
 		xor	ax, ax
 
-loc_5B212:				; CODE XREF: sub_5AA4E+7C0j
+loc_5B212:				; CODE XREF: Conv_PlayScript_5AA4E+7C0j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B1EC
 
-loc_5B218:				; CODE XREF: sub_5AA4E:loc_5B1E8j
-					; sub_5AA4E+7A7j
+loc_5B218:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B1E8j
+					; Conv_PlayScript_5AA4E+7A7j
 		inc	si
 
-loc_5B219:				; CODE XREF: sub_5AA4E+6A2j
+loc_5B219:				; CODE XREF: Conv_PlayScript_5AA4E+6A2j
 		mov	al, [bp+var_41]
 		mov	ah, 0
 		cmp	ax, si
@@ -2870,12 +2893,12 @@ loc_5B219:				; CODE XREF: sub_5AA4E+6A2j
 		jmp	loc_5B0F3
 ; ���������������������������������������������������������������������������
 
-loc_5B225:				; CODE XREF: sub_5AA4E+7D2j
+loc_5B225:				; CODE XREF: Conv_PlayScript_5AA4E+7D2j
 		xor	si, si
 		jmp	short loc_5B23E
 ; ���������������������������������������������������������������������������
 
-loc_5B229:				; CODE XREF: sub_5AA4E+7F7j
+loc_5B229:				; CODE XREF: Conv_PlayScript_5AA4E+7F7j
 		mov	bx, si
 		shl	bx, 1
 		lea	ax, [bp+var_1E4]
@@ -2885,7 +2908,7 @@ loc_5B229:				; CODE XREF: sub_5AA4E+7F7j
 		add	sp, 2
 		inc	si
 
-loc_5B23E:				; CODE XREF: sub_5AA4E+7D9j
+loc_5B23E:				; CODE XREF: Conv_PlayScript_5AA4E+7D9j
 		mov	al, [bp+var_41]
 		mov	ah, 0
 		cmp	ax, si
@@ -2893,7 +2916,7 @@ loc_5B23E:				; CODE XREF: sub_5AA4E+7D9j
 		jmp	short loc_5B2B3
 ; ���������������������������������������������������������������������������
 
-loc_5B249:				; CODE XREF: sub_5AA4E+69Dj
+loc_5B249:				; CODE XREF: Conv_PlayScript_5AA4E+69Dj
 		lea	ax, [bp+var_A]
 		push	ax
 		push	[bp+var_32]
@@ -2915,41 +2938,41 @@ loc_5B249:				; CODE XREF: sub_5AA4E+69Dj
 		call	CRT_Strcpy
 		add	sp, 4
 
-loc_5B280:				; CODE XREF: sub_5AA4E+80Cj
+loc_5B280:				; CODE XREF: Conv_PlayScript_5AA4E+80Cj
 		call	Input_Flush_CDDC
 		jmp	short loc_5B29F
 ; ���������������������������������������������������������������������������
 
-loc_5B287:				; CODE XREF: sub_5AA4E+863j
+loc_5B287:				; CODE XREF: Conv_PlayScript_5AA4E+863j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B292
 		jmp	short loc_5B2B3
 ; ���������������������������������������������������������������������������
 
-loc_5B292:				; CODE XREF: sub_5AA4E+840j
+loc_5B292:				; CODE XREF: Conv_PlayScript_5AA4E+840j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B29F:				; CODE XREF: sub_5AA4E+837j
+loc_5B29F:				; CODE XREF: Conv_PlayScript_5AA4E+837j
 		cmp	[bp+var_107], 14h
 		jb	short loc_5B2AB
 		mov	ax, 1
 		jmp	short loc_5B2AD
 ; ���������������������������������������������������������������������������
 
-loc_5B2AB:				; CODE XREF: sub_5AA4E+856j
+loc_5B2AB:				; CODE XREF: Conv_PlayScript_5AA4E+856j
 		xor	ax, ax
 
-loc_5B2AD:				; CODE XREF: sub_5AA4E+85Bj
+loc_5B2AD:				; CODE XREF: Conv_PlayScript_5AA4E+85Bj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B287
 
-loc_5B2B3:				; CODE XREF: sub_5AA4E+7F9j
-					; sub_5AA4E+842j
+loc_5B2B3:				; CODE XREF: Conv_PlayScript_5AA4E+7F9j
+					; Conv_PlayScript_5AA4E+842j
 		push	seg stub188
 		push	offset Stub_ResourceHandle_Destruct_42090
 		push	19h
@@ -3000,7 +3023,7 @@ loc_5B2B3:				; CODE XREF: sub_5AA4E+7F9j
 		jmp	loc_5CDEF
 ; ���������������������������������������������������������������������������
 
-loc_5B340:				; CODE XREF: sub_5AA4E+4Aj
+loc_5B340:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ovr191:off_5CE29o
 		cmp	byte_495FC, 0	; case 0x3
 		jz	short loc_5B34B
@@ -3010,7 +3033,7 @@ loc_5B340:				; CODE XREF: sub_5AA4E+4Aj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_5B34B:				; CODE XREF: sub_5AA4E+8F7j
+loc_5B34B:				; CODE XREF: Conv_PlayScript_5AA4E+8F7j
 		call	Input_Flush_CDDC
 		mov	ax, di
 		add	ax, 1Ah
@@ -3080,7 +3103,7 @@ loc_5B34B:				; CODE XREF: sub_5AA4E+8F7j
 		push	di
 		lea	ax, [bp+var_164]
 		push	ax
-		call	sub_632E
+		call	ConvRec_ReadLine_632E
 		add	sp, 4
 		lea	ax, [bp+var_158+1]
 		mov	[bp+var_4C], ax
@@ -3093,14 +3116,14 @@ loc_5B34B:				; CODE XREF: sub_5AA4E+8F7j
 		push	[bp+var_4C]
 		push	di
 		push	cs
-		call	near ptr sub_5A4E6
+		call	near ptr ConvData_LoadBackground_5A4E6
 		add	sp, 0Ah
 		mov	byte ptr [bp+var_54+1],	al
 		mov	[bp+var_58], 0
 		jmp	short loc_5B4A4
 ; ���������������������������������������������������������������������������
 
-loc_5B45D:				; CODE XREF: sub_5AA4E+A5Ej
+loc_5B45D:				; CODE XREF: Conv_PlayScript_5AA4E+A5Ej
 		mov	ax, [bp+var_58]
 		shl	ax, 1
 		mov	bx, [bp+var_52]
@@ -3124,7 +3147,7 @@ loc_5B45D:				; CODE XREF: sub_5AA4E+A5Ej
 		jnz	short loc_5B493
 		mov	[bp+var_56], si
 
-loc_5B493:				; CODE XREF: sub_5AA4E+A40j
+loc_5B493:				; CODE XREF: Conv_PlayScript_5AA4E+A40j
 		push	si
 		lea	ax, [bp+var_124]
 		push	ax
@@ -3132,7 +3155,7 @@ loc_5B493:				; CODE XREF: sub_5AA4E+A40j
 		add	sp, 4
 		inc	[bp+var_58]
 
-loc_5B4A4:				; CODE XREF: sub_5AA4E+A0Dj
+loc_5B4A4:				; CODE XREF: Conv_PlayScript_5AA4E+A0Dj
 		mov	al, byte ptr [bp+var_54+1]
 		mov	ah, 0
 		cmp	ax, [bp+var_58]
@@ -3141,7 +3164,7 @@ loc_5B4A4:				; CODE XREF: sub_5AA4E+A0Dj
 		jmp	short loc_5B4FE
 ; ���������������������������������������������������������������������������
 
-loc_5B4B5:				; CODE XREF: sub_5AA4E+AB8j
+loc_5B4B5:				; CODE XREF: Conv_PlayScript_5AA4E+AB8j
 		mov	ax, [bp+var_58]
 		mov	dx, 0Ah
 		imul	dx
@@ -3170,7 +3193,7 @@ loc_5B4B5:				; CODE XREF: sub_5AA4E+AB8j
 		add	sp, 4
 		inc	[bp+var_58]
 
-loc_5B4FE:				; CODE XREF: sub_5AA4E+A65j
+loc_5B4FE:				; CODE XREF: Conv_PlayScript_5AA4E+A65j
 		mov	al, byte ptr [bp+var_54+1]
 		mov	ah, 0
 		cmp	ax, [bp+var_58]
@@ -3251,7 +3274,7 @@ loc_5B4FE:				; CODE XREF: sub_5AA4E+A65j
 		or	ax, ax
 		jz	short loc_5B62F
 
-loc_5B5EC:				; CODE XREF: sub_5AA4E+B89j
+loc_5B5EC:				; CODE XREF: Conv_PlayScript_5AA4E+B89j
 		push	0
 		mov	ax, di
 		add	ax, 0Ch
@@ -3277,7 +3300,7 @@ loc_5B5EC:				; CODE XREF: sub_5AA4E+B89j
 		call	CRT_Strcpy
 		add	sp, 4
 
-loc_5B62F:				; CODE XREF: sub_5AA4E+B9Cj
+loc_5B62F:				; CODE XREF: Conv_PlayScript_5AA4E+B9Cj
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -3286,25 +3309,25 @@ loc_5B62F:				; CODE XREF: sub_5AA4E+B9Cj
 		jmp	short loc_5B640
 ; ���������������������������������������������������������������������������
 
-loc_5B63E:				; CODE XREF: sub_5AA4E+BE9j
+loc_5B63E:				; CODE XREF: Conv_PlayScript_5AA4E+BE9j
 		xor	ax, ax
 
-loc_5B640:				; CODE XREF: sub_5AA4E+BEEj
+loc_5B640:				; CODE XREF: Conv_PlayScript_5AA4E+BEEj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B649
 		jmp	loc_5B75C
 ; ���������������������������������������������������������������������������
 
-loc_5B649:				; CODE XREF: sub_5AA4E+BF6j
+loc_5B649:				; CODE XREF: Conv_PlayScript_5AA4E+BF6j
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 0Ah
 		jz	short loc_5B655
 		jmp	loc_5B75C
 ; ���������������������������������������������������������������������������
 
-loc_5B655:				; CODE XREF: sub_5AA4E+C02j
-					; sub_5AA4E+D08j
+loc_5B655:				; CODE XREF: Conv_PlayScript_5AA4E+C02j
+					; Conv_PlayScript_5AA4E+D08j
 		inc	word ptr [di+4]
 		mov	[bp+var_7D+1], 1254h
 		mov	byte ptr [bp+var_7A], 0Ah
@@ -3313,7 +3336,7 @@ loc_5B655:				; CODE XREF: sub_5AA4E+C02j
 		push	di
 		lea	ax, [bp+var_7D+1]
 		push	ax
-		call	sub_65E8
+		call	ConvRec_ReadNarration_65E8
 		add	sp, 4
 		mov	[bp+var_17C], 11BCh
 		mov	[bp+var_17C], 11C8h
@@ -3351,44 +3374,44 @@ loc_5B655:				; CODE XREF: sub_5AA4E+C02j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_59F54
+		call	near ptr Conv_DrawText_59F54
 		add	sp, 6
 
-loc_5B6ED:				; CODE XREF: sub_5AA4E+C8Fj
+loc_5B6ED:				; CODE XREF: Conv_PlayScript_5AA4E+C8Fj
 		mov	[bp+var_107], 0
 		call	Input_Flush_CDDC
 		jmp	short loc_5B712
 ; ���������������������������������������������������������������������������
 
-loc_5B6FA:				; CODE XREF: sub_5AA4E+CD6j
+loc_5B6FA:				; CODE XREF: Conv_PlayScript_5AA4E+CD6j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B705
 		jmp	short loc_5B726
 ; ���������������������������������������������������������������������������
 
-loc_5B705:				; CODE XREF: sub_5AA4E+CB3j
+loc_5B705:				; CODE XREF: Conv_PlayScript_5AA4E+CB3j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B712:				; CODE XREF: sub_5AA4E+CAAj
+loc_5B712:				; CODE XREF: Conv_PlayScript_5AA4E+CAAj
 		cmp	[bp+var_107], 14h
 		jb	short loc_5B71E
 		mov	ax, 1
 		jmp	short loc_5B720
 ; ���������������������������������������������������������������������������
 
-loc_5B71E:				; CODE XREF: sub_5AA4E+CC9j
+loc_5B71E:				; CODE XREF: Conv_PlayScript_5AA4E+CC9j
 		xor	ax, ax
 
-loc_5B720:				; CODE XREF: sub_5AA4E+CCEj
+loc_5B720:				; CODE XREF: Conv_PlayScript_5AA4E+CCEj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B6FA
 
-loc_5B726:				; CODE XREF: sub_5AA4E+CB5j
+loc_5B726:				; CODE XREF: Conv_PlayScript_5AA4E+CB5j
 		mov	[bp+var_7D+1], 123Ch
 		push	word ptr [bp+var_7A+2]
 		call	Heap_FreeAndCoalesce_2C3FC
@@ -3401,10 +3424,10 @@ loc_5B726:				; CODE XREF: sub_5AA4E+CB5j
 		jmp	short loc_5B747
 ; ���������������������������������������������������������������������������
 
-loc_5B745:				; CODE XREF: sub_5AA4E+CF0j
+loc_5B745:				; CODE XREF: Conv_PlayScript_5AA4E+CF0j
 		xor	ax, ax
 
-loc_5B747:				; CODE XREF: sub_5AA4E+CF5j
+loc_5B747:				; CODE XREF: Conv_PlayScript_5AA4E+CF5j
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_5B759
@@ -3414,13 +3437,13 @@ loc_5B747:				; CODE XREF: sub_5AA4E+CF5j
 		jmp	loc_5B655
 ; ���������������������������������������������������������������������������
 
-loc_5B759:				; CODE XREF: sub_5AA4E+CFDj
-					; sub_5AA4E+D06j
+loc_5B759:				; CODE XREF: Conv_PlayScript_5AA4E+CFDj
+					; Conv_PlayScript_5AA4E+D06j
 		jmp	loc_5BEA5
 ; ���������������������������������������������������������������������������
 
-loc_5B75C:				; CODE XREF: sub_5AA4E+BF8j
-					; sub_5AA4E+C04j
+loc_5B75C:				; CODE XREF: Conv_PlayScript_5AA4E+BF8j
+					; Conv_PlayScript_5AA4E+C04j
 		mov	[bp+var_170], 11BCh
 		mov	[bp+var_170], 11C8h
 		mov	[bp+var_170], 11D8h
@@ -3458,10 +3481,10 @@ loc_5B75C:				; CODE XREF: sub_5AA4E+BF8j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_59F54
+		call	near ptr Conv_DrawText_59F54
 		add	sp, 6
 
-loc_5B7D8:				; CODE XREF: sub_5AA4E+D78j
+loc_5B7D8:				; CODE XREF: Conv_PlayScript_5AA4E+D78j
 		push	word ptr [bp+var_14C+2]
 		push	[bp+var_70]
 		call	TalkingHead_SetLipText_9C4F
@@ -3470,7 +3493,7 @@ loc_5B7D8:				; CODE XREF: sub_5AA4E+D78j
 		jmp	short loc_5B80B
 ; ���������������������������������������������������������������������������
 
-loc_5B7EE:				; CODE XREF: sub_5AA4E+DCCj
+loc_5B7EE:				; CODE XREF: Conv_PlayScript_5AA4E+DCCj
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B7FE
@@ -3480,14 +3503,14 @@ loc_5B7EE:				; CODE XREF: sub_5AA4E+DCCj
 		jmp	short loc_5B80B
 ; ���������������������������������������������������������������������������
 
-loc_5B7FE:				; CODE XREF: sub_5AA4E+DA7j
+loc_5B7FE:				; CODE XREF: Conv_PlayScript_5AA4E+DA7j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B80B:				; CODE XREF: sub_5AA4E+D9Ej
-					; sub_5AA4E+DAEj
+loc_5B80B:				; CODE XREF: Conv_PlayScript_5AA4E+D9Ej
+					; Conv_PlayScript_5AA4E+DAEj
 		push	[bp+var_70]
 		call	sub_A0D5
 		add	sp, 2
@@ -3495,7 +3518,7 @@ loc_5B80B:				; CODE XREF: sub_5AA4E+D9Ej
 		or	ax, ax
 		jz	short loc_5B7EE
 
-loc_5B81C:				; CODE XREF: sub_5AA4E+DACj
+loc_5B81C:				; CODE XREF: Conv_PlayScript_5AA4E+DACj
 		mov	[bp+var_7D+1], 28h ; '('
 		push	word ptr [bp+var_14C+2]
 		call	CRT_Strlen
@@ -3504,7 +3527,7 @@ loc_5B81C:				; CODE XREF: sub_5AA4E+DACj
 		jnz	short loc_5B836
 		mov	[bp+var_7D+1], 0Fh
 
-loc_5B836:				; CODE XREF: sub_5AA4E+DE1j
+loc_5B836:				; CODE XREF: Conv_PlayScript_5AA4E+DE1j
 		mov	al, [bp+var_26]
 		mov	ah, 0
 		or	ax, ax
@@ -3513,7 +3536,7 @@ loc_5B836:				; CODE XREF: sub_5AA4E+DE1j
 		jmp	short loc_5B861
 ; ���������������������������������������������������������������������������
 
-loc_5B847:				; CODE XREF: sub_5AA4E+E27j
+loc_5B847:				; CODE XREF: Conv_PlayScript_5AA4E+E27j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B854
@@ -3522,14 +3545,14 @@ loc_5B847:				; CODE XREF: sub_5AA4E+E27j
 		jmp	short loc_5B861
 ; ���������������������������������������������������������������������������
 
-loc_5B854:				; CODE XREF: sub_5AA4E+E00j
+loc_5B854:				; CODE XREF: Conv_PlayScript_5AA4E+E00j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B861:				; CODE XREF: sub_5AA4E+DF7j
-					; sub_5AA4E+E04j
+loc_5B861:				; CODE XREF: Conv_PlayScript_5AA4E+DF7j
+					; Conv_PlayScript_5AA4E+E04j
 		mov	ax, [bp+var_107]
 		cmp	ax, [bp+var_7D+1]
 		jb	short loc_5B86F
@@ -3537,31 +3560,31 @@ loc_5B861:				; CODE XREF: sub_5AA4E+DF7j
 		jmp	short loc_5B871
 ; ���������������������������������������������������������������������������
 
-loc_5B86F:				; CODE XREF: sub_5AA4E+E1Aj
+loc_5B86F:				; CODE XREF: Conv_PlayScript_5AA4E+E1Aj
 		xor	ax, ax
 
-loc_5B871:				; CODE XREF: sub_5AA4E+E1Fj
+loc_5B871:				; CODE XREF: Conv_PlayScript_5AA4E+E1Fj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B847
 
-loc_5B877:				; CODE XREF: sub_5AA4E+DEFj
-					; sub_5AA4E+E02j
+loc_5B877:				; CODE XREF: Conv_PlayScript_5AA4E+DEFj
+					; Conv_PlayScript_5AA4E+E02j
 		jmp	loc_5BE76
 ; ���������������������������������������������������������������������������
 
-loc_5B87A:				; CODE XREF: sub_5AA4E+1448j
-					; sub_5AA4E+1454j
+loc_5B87A:				; CODE XREF: Conv_PlayScript_5AA4E+1448j
+					; Conv_PlayScript_5AA4E+1454j
 		call	Input_Flush_CDDC
 		jmp	loc_5B974
 ; ���������������������������������������������������������������������������
 
-loc_5B882:				; CODE XREF: sub_5AA4E+F46j
+loc_5B882:				; CODE XREF: Conv_PlayScript_5AA4E+F46j
 		inc	word ptr [di+4]
 		push	di
 		lea	ax, [bp+var_164]
 		push	ax
-		call	sub_632E
+		call	ConvRec_ReadLine_632E
 		add	sp, 4
 		mov	[bp+var_17C], 11BCh
 		mov	[bp+var_17C], 11C8h
@@ -3589,10 +3612,10 @@ loc_5B882:				; CODE XREF: sub_5AA4E+F46j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_59F54
+		call	near ptr Conv_DrawText_59F54
 		add	sp, 6
 
-loc_5B8F0:				; CODE XREF: sub_5AA4E+E92j
+loc_5B8F0:				; CODE XREF: Conv_PlayScript_5AA4E+E92j
 		mov	[bp+var_107], 0
 		push	word ptr [bp+var_14C+2]
 		push	[bp+var_70]
@@ -3601,7 +3624,7 @@ loc_5B8F0:				; CODE XREF: sub_5AA4E+E92j
 		jmp	short loc_5B924
 ; ���������������������������������������������������������������������������
 
-loc_5B907:				; CODE XREF: sub_5AA4E+EE5j
+loc_5B907:				; CODE XREF: Conv_PlayScript_5AA4E+EE5j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B917
@@ -3611,14 +3634,14 @@ loc_5B907:				; CODE XREF: sub_5AA4E+EE5j
 		jmp	short loc_5B924
 ; ���������������������������������������������������������������������������
 
-loc_5B917:				; CODE XREF: sub_5AA4E+EC0j
+loc_5B917:				; CODE XREF: Conv_PlayScript_5AA4E+EC0j
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B924:				; CODE XREF: sub_5AA4E+EB7j
-					; sub_5AA4E+EC7j
+loc_5B924:				; CODE XREF: Conv_PlayScript_5AA4E+EB7j
+					; Conv_PlayScript_5AA4E+EC7j
 		push	[bp+var_70]
 		call	sub_A0D5
 		add	sp, 2
@@ -3626,7 +3649,7 @@ loc_5B924:				; CODE XREF: sub_5AA4E+EB7j
 		or	ax, ax
 		jz	short loc_5B907
 
-loc_5B935:				; CODE XREF: sub_5AA4E+EC5j
+loc_5B935:				; CODE XREF: Conv_PlayScript_5AA4E+EC5j
 		mov	al, [bp+var_26]
 		mov	ah, 0
 		or	ax, ax
@@ -3635,7 +3658,7 @@ loc_5B935:				; CODE XREF: sub_5AA4E+EC5j
 		jmp	short loc_5B960
 ; ���������������������������������������������������������������������������
 
-loc_5B946:				; CODE XREF: sub_5AA4E+F24j
+loc_5B946:				; CODE XREF: Conv_PlayScript_5AA4E+F24j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_5B953
@@ -3644,30 +3667,30 @@ loc_5B946:				; CODE XREF: sub_5AA4E+F24j
 		jmp	short loc_5B960
 ; ���������������������������������������������������������������������������
 
-loc_5B953:				; CODE XREF: sub_5AA4E+EFFj
+loc_5B953:				; CODE XREF: Conv_PlayScript_5AA4E+EFFj
 		lea	ax, [bp+var_124]
 		push	ax
 		call	sub_2DD86
 		add	sp, 2
 
-loc_5B960:				; CODE XREF: sub_5AA4E+EF6j
-					; sub_5AA4E+F03j
+loc_5B960:				; CODE XREF: Conv_PlayScript_5AA4E+EF6j
+					; Conv_PlayScript_5AA4E+F03j
 		cmp	[bp+var_107], 28h ; '('
 		jb	short loc_5B96C
 		mov	ax, 1
 		jmp	short loc_5B96E
 ; ���������������������������������������������������������������������������
 
-loc_5B96C:				; CODE XREF: sub_5AA4E+F17j
+loc_5B96C:				; CODE XREF: Conv_PlayScript_5AA4E+F17j
 		xor	ax, ax
 
-loc_5B96E:				; CODE XREF: sub_5AA4E+F1Cj
+loc_5B96E:				; CODE XREF: Conv_PlayScript_5AA4E+F1Cj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B946
 
-loc_5B974:				; CODE XREF: sub_5AA4E+E31j
-					; sub_5AA4E+EEEj ...
+loc_5B974:				; CODE XREF: Conv_PlayScript_5AA4E+E31j
+					; Conv_PlayScript_5AA4E+EEEj ...
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -3676,10 +3699,10 @@ loc_5B974:				; CODE XREF: sub_5AA4E+E31j
 		jmp	short loc_5B985
 ; ���������������������������������������������������������������������������
 
-loc_5B983:				; CODE XREF: sub_5AA4E+F2Ej
+loc_5B983:				; CODE XREF: Conv_PlayScript_5AA4E+F2Ej
 		xor	ax, ax
 
-loc_5B985:				; CODE XREF: sub_5AA4E+F33j
+loc_5B985:				; CODE XREF: Conv_PlayScript_5AA4E+F33j
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_5B997
@@ -3689,8 +3712,8 @@ loc_5B985:				; CODE XREF: sub_5AA4E+F33j
 		jmp	loc_5B882
 ; ���������������������������������������������������������������������������
 
-loc_5B997:				; CODE XREF: sub_5AA4E+F3Bj
-					; sub_5AA4E+F44j
+loc_5B997:				; CODE XREF: Conv_PlayScript_5AA4E+F3Bj
+					; Conv_PlayScript_5AA4E+F44j
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -3699,24 +3722,24 @@ loc_5B997:				; CODE XREF: sub_5AA4E+F3Bj
 		jmp	short loc_5B9A8
 ; ���������������������������������������������������������������������������
 
-loc_5B9A6:				; CODE XREF: sub_5AA4E+F51j
+loc_5B9A6:				; CODE XREF: Conv_PlayScript_5AA4E+F51j
 		xor	ax, ax
 
-loc_5B9A8:				; CODE XREF: sub_5AA4E+F56j
+loc_5B9A8:				; CODE XREF: Conv_PlayScript_5AA4E+F56j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5B9B1
 		jmp	loc_5BE76
 ; ���������������������������������������������������������������������������
 
-loc_5B9B1:				; CODE XREF: sub_5AA4E+F5Ej
+loc_5B9B1:				; CODE XREF: Conv_PlayScript_5AA4E+F5Ej
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 0Bh
 		jz	short loc_5B9BD
 		jmp	loc_5BE76
 ; ���������������������������������������������������������������������������
 
-loc_5B9BD:				; CODE XREF: sub_5AA4E+F6Aj
+loc_5B9BD:				; CODE XREF: Conv_PlayScript_5AA4E+F6Aj
 		call	Input_Flush_CDDC
 		inc	word ptr [di+4]
 		mov	word ptr [bp+var_82], 1254h
@@ -3725,7 +3748,7 @@ loc_5B9BD:				; CODE XREF: sub_5AA4E+F6Aj
 		push	di
 		lea	ax, [bp+var_82]
 		push	ax
-		call	sub_6660
+		call	ConvRec_ReadAcceptSkip_6660
 		add	sp, 4
 		mov	[bp+var_188], 11BCh
 		mov	[bp+var_188], 11C8h
@@ -3829,7 +3852,7 @@ loc_5B9BD:				; CODE XREF: sub_5AA4E+F6Aj
 		jmp	short loc_5BB9F
 ; ���������������������������������������������������������������������������
 
-loc_5BB2C:				; CODE XREF: sub_5AA4E+1154j
+loc_5BB2C:				; CODE XREF: Conv_PlayScript_5AA4E+1154j
 		mov	ax, 18h
 		sub	ax, si
 		mov	[bp+var_8C], ax
@@ -3864,7 +3887,7 @@ loc_5BB2C:				; CODE XREF: sub_5AA4E+1154j
 		add	sp, 4
 		inc	si
 
-loc_5BB9F:				; CODE XREF: sub_5AA4E+10DCj
+loc_5BB9F:				; CODE XREF: Conv_PlayScript_5AA4E+10DCj
 		cmp	si, 18h
 		jle	short loc_5BB2C
 		call	Input_Flush_CDDC
@@ -3886,7 +3909,7 @@ loc_5BB9F:				; CODE XREF: sub_5AA4E+10DCj
 		mov	eax, dword_47ABB
 		mov	[bp+var_A6], eax
 
-loc_5BBEF:				; CODE XREF: sub_5AA4E:loc_5BD35j
+loc_5BBEF:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5BD35j
 		lea	ax, [bp+var_9A]
 		push	ax
 		call	TextScroll_FormatAndApply_3EA28
@@ -3908,10 +3931,10 @@ loc_5BBEF:				; CODE XREF: sub_5AA4E:loc_5BD35j
 		add	sp, 4
 		jmp	short $+2
 
-loc_5BC2A:				; CODE XREF: sub_5AA4E+11C6j
+loc_5BC2A:				; CODE XREF: Conv_PlayScript_5AA4E+11C6j
 		jmp	short $+2
 
-loc_5BC2C:				; CODE XREF: sub_5AA4E+11B3j
+loc_5BC2C:				; CODE XREF: Conv_PlayScript_5AA4E+11B3j
 		cmp	byte ptr [bp+var_9A], 0
 		jz	short loc_5BC43
 		mov	ax, [bp+var_98]
@@ -3919,13 +3942,13 @@ loc_5BC2C:				; CODE XREF: sub_5AA4E+11B3j
 		mov	ax, [bp+var_96]
 		mov	[bp+var_9E], ax
 
-loc_5BC43:				; CODE XREF: sub_5AA4E+11E3j
+loc_5BC43:				; CODE XREF: Conv_PlayScript_5AA4E+11E3j
 		cmp	byte ptr [bp+var_9A], 2
 		jnz	short loc_5BC4D
 		jmp	loc_5BD38
 ; ���������������������������������������������������������������������������
 
-loc_5BC4D:				; CODE XREF: sub_5AA4E+11FAj
+loc_5BC4D:				; CODE XREF: Conv_PlayScript_5AA4E+11FAj
 		mov	eax, [bp+var_A6]
 		add	eax, [bp+var_A2]
 		cmp	eax, dword_47ABB
@@ -3934,16 +3957,16 @@ loc_5BC4D:				; CODE XREF: sub_5AA4E+11FAj
 		jmp	short loc_5BC65
 ; ���������������������������������������������������������������������������
 
-loc_5BC63:				; CODE XREF: sub_5AA4E+120Ej
+loc_5BC63:				; CODE XREF: Conv_PlayScript_5AA4E+120Ej
 		xor	ax, ax
 
-loc_5BC65:				; CODE XREF: sub_5AA4E+1213j
+loc_5BC65:				; CODE XREF: Conv_PlayScript_5AA4E+1213j
 		or	al, al
 		jnz	short loc_5BC6C
 		jmp	loc_5BD35
 ; ���������������������������������������������������������������������������
 
-loc_5BC6C:				; CODE XREF: sub_5AA4E+1219j
+loc_5BC6C:				; CODE XREF: Conv_PlayScript_5AA4E+1219j
 		mov	[bp+var_A2], 3
 		mov	eax, dword_47ABB
 		mov	[bp+var_A6], eax
@@ -3979,8 +4002,8 @@ loc_5BC6C:				; CODE XREF: sub_5AA4E+1219j
 		jmp	short loc_5BCF3
 ; ���������������������������������������������������������������������������
 
-loc_5BCDD:				; CODE XREF: sub_5AA4E+125Fj
-					; sub_5AA4E+1266j ...
+loc_5BCDD:				; CODE XREF: Conv_PlayScript_5AA4E+125Fj
+					; Conv_PlayScript_5AA4E+1266j ...
 		push	1089h
 		lea	ax, [bp+var_1DC]
 		push	ax
@@ -3989,7 +4012,7 @@ loc_5BCDD:				; CODE XREF: sub_5AA4E+125Fj
 		mov	bx, [di+2Ah]
 		mov	byte ptr [bx], 0
 
-loc_5BCF3:				; CODE XREF: sub_5AA4E+128Dj
+loc_5BCF3:				; CODE XREF: Conv_PlayScript_5AA4E+128Dj
 		lea	ax, [bp+var_1DC]
 		push	ax
 		push	0AFh ; '�'
@@ -4010,11 +4033,11 @@ loc_5BCF3:				; CODE XREF: sub_5AA4E+128Dj
 		call	sub_3F8DE
 		add	sp, 2
 
-loc_5BD35:				; CODE XREF: sub_5AA4E+121Bj
+loc_5BD35:				; CODE XREF: Conv_PlayScript_5AA4E+121Bj
 		jmp	loc_5BBEF
 ; ���������������������������������������������������������������������������
 
-loc_5BD38:				; CODE XREF: sub_5AA4E+11FCj
+loc_5BD38:				; CODE XREF: Conv_PlayScript_5AA4E+11FCj
 		mov	bx, [di+2Ah]
 		mov	al, [bx]
 		mov	ah, 0
@@ -4025,20 +4048,20 @@ loc_5BD38:				; CODE XREF: sub_5AA4E+11FCj
 		mov	ax, [bp+var_AC]
 		add	[di+4],	ax
 
-loc_5BD51:				; CODE XREF: sub_5AA4E+12F3j
+loc_5BD51:				; CODE XREF: Conv_PlayScript_5AA4E+12F3j
 		call	TextScrollDisplayB_ApplyHelperD_3F784
 		xor	si, si
 		jmp	loc_5BE00
 ; ���������������������������������������������������������������������������
 
-loc_5BD5B:				; CODE XREF: sub_5AA4E+13B7j
+loc_5BD5B:				; CODE XREF: Conv_PlayScript_5AA4E+13B7j
 		mov	[bp+var_B4], 0
 		mov	[bp+var_B0], 1
 		mov	eax, dword_47ABB
 		mov	[bp+var_B4], eax
 		jmp	short $+2
 
-loc_5BD78:				; CODE XREF: sub_5AA4E+1346j
+loc_5BD78:				; CODE XREF: Conv_PlayScript_5AA4E+1346j
 		mov	eax, [bp+var_B4]
 		add	eax, [bp+var_B0]
 		cmp	eax, dword_47ABB
@@ -4047,10 +4070,10 @@ loc_5BD78:				; CODE XREF: sub_5AA4E+1346j
 		jmp	short loc_5BD90
 ; ���������������������������������������������������������������������������
 
-loc_5BD8E:				; CODE XREF: sub_5AA4E+1339j
+loc_5BD8E:				; CODE XREF: Conv_PlayScript_5AA4E+1339j
 		xor	ax, ax
 
-loc_5BD90:				; CODE XREF: sub_5AA4E+133Ej
+loc_5BD90:				; CODE XREF: Conv_PlayScript_5AA4E+133Ej
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5BD78
@@ -4102,13 +4125,13 @@ loc_5BD90:				; CODE XREF: sub_5AA4E+133Ej
 		add	sp, 0Ch
 		inc	si
 
-loc_5BE00:				; CODE XREF: sub_5AA4E+130Aj
+loc_5BE00:				; CODE XREF: Conv_PlayScript_5AA4E+130Aj
 		cmp	si, 18h
 		jge	short loc_5BE08
 		jmp	loc_5BD5B
 ; ���������������������������������������������������������������������������
 
-loc_5BE08:				; CODE XREF: sub_5AA4E+13B5j
+loc_5BE08:				; CODE XREF: Conv_PlayScript_5AA4E+13B5j
 		push	0FFE8h
 		push	0
 		push	[bp+var_56]
@@ -4145,8 +4168,8 @@ loc_5BE08:				; CODE XREF: sub_5AA4E+13B5j
 		call	SmallObject_UnregisterFromList_2CB7A
 		add	sp, 4
 
-loc_5BE76:				; CODE XREF: sub_5AA4E:loc_5B877j
-					; sub_5AA4E+F60j ...
+loc_5BE76:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B877j
+					; Conv_PlayScript_5AA4E+F60j ...
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -4155,10 +4178,10 @@ loc_5BE76:				; CODE XREF: sub_5AA4E:loc_5B877j
 		jmp	short loc_5BE87
 ; ���������������������������������������������������������������������������
 
-loc_5BE85:				; CODE XREF: sub_5AA4E+1430j
+loc_5BE85:				; CODE XREF: Conv_PlayScript_5AA4E+1430j
 		xor	ax, ax
 
-loc_5BE87:				; CODE XREF: sub_5AA4E+1435j
+loc_5BE87:				; CODE XREF: Conv_PlayScript_5AA4E+1435j
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_5BEA5
@@ -4168,15 +4191,15 @@ loc_5BE87:				; CODE XREF: sub_5AA4E+1435j
 		jmp	loc_5B87A
 ; ���������������������������������������������������������������������������
 
-loc_5BE99:				; CODE XREF: sub_5AA4E+1446j
+loc_5BE99:				; CODE XREF: Conv_PlayScript_5AA4E+1446j
 		les	bx, [di+4]
 		cmp	byte ptr es:[bx], 0Bh
 		jnz	short loc_5BEA5
 		jmp	loc_5B87A
 ; ���������������������������������������������������������������������������
 
-loc_5BEA5:				; CODE XREF: sub_5AA4E:loc_5B759j
-					; sub_5AA4E+143Dj ...
+loc_5BEA5:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B759j
+					; Conv_PlayScript_5AA4E+143Dj ...
 		push	seg stub188
 		push	offset Stub_ResourceHandle_Destruct_42090
 		push	19h
@@ -4215,8 +4238,8 @@ loc_5BEA5:				; CODE XREF: sub_5AA4E:loc_5B759j
 		add	sp, 8
 		jmp	short $+2
 
-loc_5BF10:				; CODE XREF: sub_5AA4E+14A2j
-					; sub_5AA4E+14A9j
+loc_5BF10:				; CODE XREF: Conv_PlayScript_5AA4E+14A2j
+					; Conv_PlayScript_5AA4E+14A9j
 		mov	[bp+var_6E], 0
 		mov	byte ptr [bp+var_6A+1],	0
 		mov	[bp+var_6A+2], 0
@@ -4234,8 +4257,8 @@ loc_5BF10:				; CODE XREF: sub_5AA4E+14A2j
 		add	sp, 8
 		jmp	short $+2
 
-loc_5BF48:				; CODE XREF: sub_5AA4E+14DAj
-					; sub_5AA4E+14E1j
+loc_5BF48:				; CODE XREF: Conv_PlayScript_5AA4E+14DAj
+					; Conv_PlayScript_5AA4E+14E1j
 		mov	[bp+var_66+2], 0
 		mov	byte ptr [bp+var_62+3],	0
 		mov	[bp+var_5E], 0
@@ -4265,7 +4288,7 @@ loc_5BF48:				; CODE XREF: sub_5AA4E+14DAj
 		jmp	loc_5CDEF
 ; ���������������������������������������������������������������������������
 
-loc_5BFA9:				; CODE XREF: sub_5AA4E+4Aj
+loc_5BFA9:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ovr191:off_5CE29o
 		mov	[bp+var_2C], 1254h ; case 0xE
 		mov	byte ptr [bp+var_2A], 0Eh
@@ -4273,7 +4296,7 @@ loc_5BFA9:				; CODE XREF: sub_5AA4E+4Aj
 		push	di
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	sub_66E0
+		call	ConvRec_ReadWing_66E0
 		add	sp, 4
 		mov	al, byte ptr [bp+var_2A+1]
 		mov	[bp+var_16], al
@@ -4315,12 +4338,12 @@ loc_5BFA9:				; CODE XREF: sub_5AA4E+4Aj
 		call	sub_310B
 		add	sp, 2
 
-loc_5C047:				; CODE XREF: sub_5AA4E+15ECj
+loc_5C047:				; CODE XREF: Conv_PlayScript_5AA4E+15ECj
 		mov	byte ptr [bp+var_2E+1],	0
 		jmp	short loc_5C0A8
 ; ���������������������������������������������������������������������������
 
-loc_5C04D:				; CODE XREF: sub_5AA4E+168Aj
+loc_5C04D:				; CODE XREF: Conv_PlayScript_5AA4E+168Aj
 		push	1
 		push	large [dword_440EA]
 		lea	ax, [bp+var_1AC]
@@ -4345,7 +4368,7 @@ loc_5C04D:				; CODE XREF: sub_5AA4E+168Aj
 		jmp	short loc_5C0DB
 ; ���������������������������������������������������������������������������
 
-loc_5C091:				; CODE XREF: sub_5AA4E+163Bj
+loc_5C091:				; CODE XREF: Conv_PlayScript_5AA4E+163Bj
 		mov	eax, [bp+var_136]
 		mov	dword ptr [bp+var_148+1], eax
 		lea	ax, [bp+var_1AC]
@@ -4353,7 +4376,7 @@ loc_5C091:				; CODE XREF: sub_5AA4E+163Bj
 		call	ResourceRecord_ReleaseAndClear_3C595
 		add	sp, 2
 
-loc_5C0A8:				; CODE XREF: sub_5AA4E+15FDj
+loc_5C0A8:				; CODE XREF: Conv_PlayScript_5AA4E+15FDj
 		cmp	[bp+var_130], 0
 		jnz	short loc_5C0BE
 		lea	ax, [bp+var_1AC]
@@ -4363,7 +4386,7 @@ loc_5C0A8:				; CODE XREF: sub_5AA4E+15FDj
 		jmp	short loc_5C0D4
 ; ���������������������������������������������������������������������������
 
-loc_5C0BE:				; CODE XREF: sub_5AA4E+165Fj
+loc_5C0BE:				; CODE XREF: Conv_PlayScript_5AA4E+165Fj
 		mov	bx, [bp+var_130]
 		mov	eax, [bx+0Fh]
 		cmp	eax, dword ptr [bp+var_148+1]
@@ -4372,18 +4395,18 @@ loc_5C0BE:				; CODE XREF: sub_5AA4E+165Fj
 		jmp	short loc_5C0D4
 ; ���������������������������������������������������������������������������
 
-loc_5C0D2:				; CODE XREF: sub_5AA4E+167Dj
+loc_5C0D2:				; CODE XREF: Conv_PlayScript_5AA4E+167Dj
 		xor	ax, ax
 
-loc_5C0D4:				; CODE XREF: sub_5AA4E+166Ej
-					; sub_5AA4E+1682j
+loc_5C0D4:				; CODE XREF: Conv_PlayScript_5AA4E+166Ej
+					; Conv_PlayScript_5AA4E+1682j
 		or	ax, ax
 		jnz	short loc_5C0DB
 		jmp	loc_5C04D
 ; ���������������������������������������������������������������������������
 
-loc_5C0DB:				; CODE XREF: sub_5AA4E+1641j
-					; sub_5AA4E+1688j
+loc_5C0DB:				; CODE XREF: Conv_PlayScript_5AA4E+1641j
+					; Conv_PlayScript_5AA4E+1688j
 		mov	al, byte ptr [bp+var_2E+1]
 		mov	ah, 0
 		or	ax, ax
@@ -4395,7 +4418,7 @@ loc_5C0DB:				; CODE XREF: sub_5AA4E+1641j
 		call	sub_310B
 		add	sp, 4
 
-loc_5C0F5:				; CODE XREF: sub_5AA4E+1694j
+loc_5C0F5:				; CODE XREF: Conv_PlayScript_5AA4E+1694j
 		lea	ax, [bp+var_1AC]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -4418,11 +4441,11 @@ loc_5C0F5:				; CODE XREF: sub_5AA4E+1694j
 		call	sub_310B
 		add	sp, 4
 
-loc_5C138:				; CODE XREF: sub_5AA4E+16D7j
+loc_5C138:				; CODE XREF: Conv_PlayScript_5AA4E+16D7j
 		jmp	short loc_5C158
 ; ���������������������������������������������������������������������������
 
-loc_5C13A:				; CODE XREF: sub_5AA4E+173Ej
+loc_5C13A:				; CODE XREF: Conv_PlayScript_5AA4E+173Ej
 		mov	al, [bp+var_1D]
 		mov	ah, 0
 		lea	dx, [bp+var_1C]
@@ -4436,7 +4459,7 @@ loc_5C13A:				; CODE XREF: sub_5AA4E+173Ej
 		mov	[bx], al
 		inc	[bp+var_1D]
 
-loc_5C158:				; CODE XREF: sub_5AA4E:loc_5C138j
+loc_5C158:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5C138j
 		test	[bp+var_13A], 1
 		jz	short loc_5C177
 		mov	eax, [bp+var_136]
@@ -4446,10 +4469,10 @@ loc_5C158:				; CODE XREF: sub_5AA4E:loc_5C138j
 		inc	dword ptr [bp+var_148+1]
 		jmp	short $+2
 
-loc_5C175:				; CODE XREF: sub_5AA4E+171Ej
+loc_5C175:				; CODE XREF: Conv_PlayScript_5AA4E+171Ej
 		jmp	short $+2
 
-loc_5C177:				; CODE XREF: sub_5AA4E+1710j
+loc_5C177:				; CODE XREF: Conv_PlayScript_5AA4E+1710j
 		mov	eax, dword ptr [bp+var_148+1]
 		cmp	eax, [bp+var_136]
 		jl	short loc_5C188
@@ -4457,10 +4480,10 @@ loc_5C177:				; CODE XREF: sub_5AA4E+1710j
 		jmp	short loc_5C18A
 ; ���������������������������������������������������������������������������
 
-loc_5C188:				; CODE XREF: sub_5AA4E+1733j
+loc_5C188:				; CODE XREF: Conv_PlayScript_5AA4E+1733j
 		xor	ax, ax
 
-loc_5C18A:				; CODE XREF: sub_5AA4E+1738j
+loc_5C18A:				; CODE XREF: Conv_PlayScript_5AA4E+1738j
 		or	ax, ax
 		jz	short loc_5C13A
 		mov	eax, [bp+var_136]
@@ -4470,7 +4493,7 @@ loc_5C18A:				; CODE XREF: sub_5AA4E+1738j
 		cmp	[bp+var_25], 2
 		jnz	short loc_5C1F1
 
-loc_5C1A4:				; CODE XREF: sub_5AA4E+174Ej
+loc_5C1A4:				; CODE XREF: Conv_PlayScript_5AA4E+174Ej
 		push	0
 		push	large [dword_44143]
 		lea	ax, [bp+var_1AC]
@@ -4486,12 +4509,12 @@ loc_5C1A4:				; CODE XREF: sub_5AA4E+174Ej
 		call	sub_310B
 		add	sp, 4
 
-loc_5C1CD:				; CODE XREF: sub_5AA4E+176Cj
+loc_5C1CD:				; CODE XREF: Conv_PlayScript_5AA4E+176Cj
 		xor	si, si
 		jmp	short loc_5C1E2
 ; ���������������������������������������������������������������������������
 
-loc_5C1D1:				; CODE XREF: sub_5AA4E+1797j
+loc_5C1D1:				; CODE XREF: Conv_PlayScript_5AA4E+1797j
 		lea	ax, [bp+var_1AC]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -4499,13 +4522,13 @@ loc_5C1D1:				; CODE XREF: sub_5AA4E+1797j
 		mov	byte ptr [bp+si+var_24], al
 		inc	si
 
-loc_5C1E2:				; CODE XREF: sub_5AA4E+1781j
+loc_5C1E2:				; CODE XREF: Conv_PlayScript_5AA4E+1781j
 		cmp	si, 5
 		jl	short loc_5C1D1
 		mov	eax, [bp+var_136]
 		mov	dword ptr [bp+var_148+1], eax
 
-loc_5C1F1:				; CODE XREF: sub_5AA4E+1754j
+loc_5C1F1:				; CODE XREF: Conv_PlayScript_5AA4E+1754j
 		lea	ax, [bp+var_1AC]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -4518,7 +4541,7 @@ loc_5C1F1:				; CODE XREF: sub_5AA4E+1754j
 		jmp	loc_5C391	; default
 ; ���������������������������������������������������������������������������
 
-loc_5C20D:				; CODE XREF: sub_5AA4E+17BAj
+loc_5C20D:				; CODE XREF: Conv_PlayScript_5AA4E+17BAj
 		shl	bx, 1
 		jmp	cs:off_5CE21[bx] ; switch jump
 
@@ -4540,7 +4563,7 @@ loc_5C214:				; DATA XREF: ovr191:off_5CE21o
 		jmp	loc_5C393
 ; ���������������������������������������������������������������������������
 
-loc_5C23F:				; CODE XREF: sub_5AA4E+17C1j
+loc_5C23F:				; CODE XREF: Conv_PlayScript_5AA4E+17C1j
 					; DATA XREF: ovr191:off_5CE21o
 		mov	al, byte ptr [bp+var_1C] ; case	0x1
 		mov	ah, 0
@@ -4556,21 +4579,21 @@ loc_5C23F:				; CODE XREF: sub_5AA4E+17C1j
 		jmp	short loc_5C268
 ; ���������������������������������������������������������������������������
 
-loc_5C25D:				; CODE XREF: sub_5AA4E+181Dj
+loc_5C25D:				; CODE XREF: Conv_PlayScript_5AA4E+181Dj
 		mov	al, byte ptr [bp+si+var_24]
 		cmp	al, byte ptr [bp+var_1C]
 		jz	short loc_5C267
 		jmp	short loc_5C26D
 ; ���������������������������������������������������������������������������
 
-loc_5C267:				; CODE XREF: sub_5AA4E+1815j
+loc_5C267:				; CODE XREF: Conv_PlayScript_5AA4E+1815j
 		inc	si
 
-loc_5C268:				; CODE XREF: sub_5AA4E+180Dj
+loc_5C268:				; CODE XREF: Conv_PlayScript_5AA4E+180Dj
 		cmp	si, 5
 		jl	short loc_5C25D
 
-loc_5C26D:				; CODE XREF: sub_5AA4E+1817j
+loc_5C26D:				; CODE XREF: Conv_PlayScript_5AA4E+1817j
 		mov	al, byte ptr [bp+si+var_24]
 		mov	ah, 0
 		shl	ax, 1
@@ -4585,7 +4608,7 @@ loc_5C26D:				; CODE XREF: sub_5AA4E+1817j
 		jmp	short loc_5C2A9
 ; ���������������������������������������������������������������������������
 
-loc_5C290:				; CODE XREF: sub_5AA4E+185Fj
+loc_5C290:				; CODE XREF: Conv_PlayScript_5AA4E+185Fj
 		lea	ax, [bp+var_24]
 		mov	bx, [bp+var_30]
 		add	bx, ax
@@ -4597,15 +4620,15 @@ loc_5C290:				; CODE XREF: sub_5AA4E+185Fj
 		jmp	short loc_5C2AF
 ; ���������������������������������������������������������������������������
 
-loc_5C2A6:				; CODE XREF: sub_5AA4E+184Fj
-					; sub_5AA4E+1854j
+loc_5C2A6:				; CODE XREF: Conv_PlayScript_5AA4E+184Fj
+					; Conv_PlayScript_5AA4E+1854j
 		inc	[bp+var_30]
 
-loc_5C2A9:				; CODE XREF: sub_5AA4E+1840j
+loc_5C2A9:				; CODE XREF: Conv_PlayScript_5AA4E+1840j
 		cmp	[bp+var_30], 5
 		jl	short loc_5C290
 
-loc_5C2AF:				; CODE XREF: sub_5AA4E+1856j
+loc_5C2AF:				; CODE XREF: Conv_PlayScript_5AA4E+1856j
 		lea	ax, [bp+var_24]
 		mov	bx, [bp+var_30]
 		add	bx, ax
@@ -4622,7 +4645,7 @@ loc_5C2AF:				; CODE XREF: sub_5AA4E+1856j
 		jmp	loc_5C393
 ; ���������������������������������������������������������������������������
 
-loc_5C2D5:				; CODE XREF: sub_5AA4E+17C1j
+loc_5C2D5:				; CODE XREF: Conv_PlayScript_5AA4E+17C1j
 					; DATA XREF: ovr191:off_5CE21o
 		mov	al, byte ptr [bp+var_1C] ; case	0x2
 		mov	ah, 0
@@ -4638,21 +4661,21 @@ loc_5C2D5:				; CODE XREF: sub_5AA4E+17C1j
 		jmp	short loc_5C2FE
 ; ���������������������������������������������������������������������������
 
-loc_5C2F3:				; CODE XREF: sub_5AA4E+18B3j
+loc_5C2F3:				; CODE XREF: Conv_PlayScript_5AA4E+18B3j
 		mov	al, byte ptr [bp+si+var_24]
 		cmp	al, byte ptr [bp+var_1C]
 		jz	short loc_5C2FD
 		jmp	short loc_5C303
 ; ���������������������������������������������������������������������������
 
-loc_5C2FD:				; CODE XREF: sub_5AA4E+18ABj
+loc_5C2FD:				; CODE XREF: Conv_PlayScript_5AA4E+18ABj
 		inc	si
 
-loc_5C2FE:				; CODE XREF: sub_5AA4E+18A3j
+loc_5C2FE:				; CODE XREF: Conv_PlayScript_5AA4E+18A3j
 		cmp	si, 5
 		jl	short loc_5C2F3
 
-loc_5C303:				; CODE XREF: sub_5AA4E+18ADj
+loc_5C303:				; CODE XREF: Conv_PlayScript_5AA4E+18ADj
 		mov	al, byte ptr [bp+si+var_24]
 		mov	ah, 0
 		shl	ax, 1
@@ -4676,7 +4699,7 @@ loc_5C303:				; CODE XREF: sub_5AA4E+18ADj
 		jmp	short loc_5C393
 ; ���������������������������������������������������������������������������
 
-loc_5C33D:				; CODE XREF: sub_5AA4E+17C1j
+loc_5C33D:				; CODE XREF: Conv_PlayScript_5AA4E+17C1j
 					; DATA XREF: ovr191:off_5CE21o
 		mov	al, byte ptr [bp+var_1C] ; case	0x3
 		mov	ah, 0
@@ -4711,11 +4734,11 @@ loc_5C33D:				; CODE XREF: sub_5AA4E+17C1j
 		jmp	short loc_5C393
 ; ���������������������������������������������������������������������������
 
-loc_5C391:				; CODE XREF: sub_5AA4E+17BCj
+loc_5C391:				; CODE XREF: Conv_PlayScript_5AA4E+17BCj
 		jmp	short $+2	; default
 
-loc_5C393:				; CODE XREF: sub_5AA4E+17EEj
-					; sub_5AA4E+1884j ...
+loc_5C393:				; CODE XREF: Conv_PlayScript_5AA4E+17EEj
+					; Conv_PlayScript_5AA4E+1884j ...
 		mov	[bp+var_1AC], 56Eh
 		lea	ax, [bp+var_1AC]
 		push	ax
@@ -4729,7 +4752,7 @@ loc_5C393:				; CODE XREF: sub_5AA4E+17EEj
 		jmp	loc_5CDEF
 ; ���������������������������������������������������������������������������
 
-loc_5C3B8:				; CODE XREF: sub_5AA4E+4Aj
+loc_5C3B8:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ovr191:off_5CE29o
 		mov	byte ptr [bp+var_A], 0 ; case 0xF
 		mov	byte ptr [bp+var_14], 0
@@ -4749,7 +4772,7 @@ loc_5C3B8:				; CODE XREF: sub_5AA4E+4Aj
 		jmp	short loc_5C3F8
 ; ���������������������������������������������������������������������������
 
-loc_5C3E8:				; CODE XREF: sub_5AA4E+19B1j
+loc_5C3E8:				; CODE XREF: Conv_PlayScript_5AA4E+19B1j
 		mov	al, byte ptr [bp+si+var_1C]
 		mov	ah, 0
 		lea	dx, [bp+var_32]
@@ -4758,7 +4781,7 @@ loc_5C3E8:				; CODE XREF: sub_5AA4E+19B1j
 		mov	byte ptr [bx], 1
 		inc	si
 
-loc_5C3F8:				; CODE XREF: sub_5AA4E+1998j
+loc_5C3F8:				; CODE XREF: Conv_PlayScript_5AA4E+1998j
 		mov	al, [bp+var_1D]
 		mov	ah, 0
 		cmp	ax, si
@@ -4800,14 +4823,14 @@ loc_5C3F8:				; CODE XREF: sub_5AA4E+1998j
 		push	1141h
 		push	di
 		push	cs
-		call	near ptr sub_5A4E6
+		call	near ptr ConvData_LoadBackground_5A4E6
 		add	sp, 0Ah
 		mov	ah, 0
 		mov	[bp-3Eh], ax
 		jmp	short loc_5C483
 ; ���������������������������������������������������������������������������
 
-loc_5C467:				; CODE XREF: sub_5AA4E+19F9j
+loc_5C467:				; CODE XREF: Conv_PlayScript_5AA4E+19F9j
 		lea	ax, [bp+var_3C]
 		push	ax
 		lea	ax, [bp-3Ah]
@@ -4817,12 +4840,12 @@ loc_5C467:				; CODE XREF: sub_5AA4E+19F9j
 		push	1148h
 		push	di
 		push	cs
-		call	near ptr sub_5A4E6
+		call	near ptr ConvData_LoadBackground_5A4E6
 		add	sp, 0Ah
 		mov	ah, 0
 		mov	[bp-3Eh], ax
 
-loc_5C483:				; CODE XREF: sub_5AA4E+1A17j
+loc_5C483:				; CODE XREF: Conv_PlayScript_5AA4E+1A17j
 		push	0
 		mov	bx, [bp+var_3C]
 		push	word ptr [bx]
@@ -4841,7 +4864,7 @@ loc_5C483:				; CODE XREF: sub_5AA4E+1A17j
 		jmp	short loc_5C4E9
 ; ���������������������������������������������������������������������������
 
-loc_5C4B1:				; CODE XREF: sub_5AA4E+1A9Ej
+loc_5C4B1:				; CODE XREF: Conv_PlayScript_5AA4E+1A9Ej
 		push	0
 		mov	ax, si
 		shl	ax, 1
@@ -4865,7 +4888,7 @@ loc_5C4B1:				; CODE XREF: sub_5AA4E+1A9Ej
 		add	sp, 4
 		inc	si
 
-loc_5C4E9:				; CODE XREF: sub_5AA4E+1A61j
+loc_5C4E9:				; CODE XREF: Conv_PlayScript_5AA4E+1A61j
 		cmp	si, [bp-3Eh]
 		jl	short loc_5C4B1
 		mov	[bp+var_48], 6
@@ -4878,7 +4901,7 @@ loc_5C4E9:				; CODE XREF: sub_5AA4E+1A61j
 		push	114Fh
 		push	di
 		push	cs
-		call	near ptr sub_5A4E6
+		call	near ptr ConvData_LoadBackground_5A4E6
 		add	sp, 0Ah
 		push	0
 		mov	bx, [bp+var_46]
@@ -4897,7 +4920,7 @@ loc_5C4E9:				; CODE XREF: sub_5AA4E+1A61j
 		jmp	short loc_5C588
 ; ���������������������������������������������������������������������������
 
-loc_5C538:				; CODE XREF: sub_5AA4E+1B3Dj
+loc_5C538:				; CODE XREF: Conv_PlayScript_5AA4E+1B3Dj
 		cmp	byte ptr [bp+si+var_32], 0
 		jz	short loc_5C587
 		push	0
@@ -4930,10 +4953,10 @@ loc_5C538:				; CODE XREF: sub_5AA4E+1B3Dj
 		call	LayerGroup_Add_2DB84
 		add	sp, 4
 
-loc_5C587:				; CODE XREF: sub_5AA4E+1AEEj
+loc_5C587:				; CODE XREF: Conv_PlayScript_5AA4E+1AEEj
 		inc	si
 
-loc_5C588:				; CODE XREF: sub_5AA4E+1AE8j
+loc_5C588:				; CODE XREF: Conv_PlayScript_5AA4E+1AE8j
 		cmp	si, 6
 		jl	short loc_5C538
 		push	100h
@@ -4946,7 +4969,7 @@ loc_5C588:				; CODE XREF: sub_5AA4E+1AE8j
 		jmp	short loc_5C5F3
 ; ���������������������������������������������������������������������������
 
-loc_5C5A2:				; CODE XREF: sub_5AA4E+1BA8j
+loc_5C5A2:				; CODE XREF: Conv_PlayScript_5AA4E+1BA8j
 		mov	ax, si
 		mov	dx, 0Ah
 		imul	dx
@@ -4975,7 +4998,7 @@ loc_5C5A2:				; CODE XREF: sub_5AA4E+1BA8j
 		add	sp, 4
 		inc	si
 
-loc_5C5F3:				; CODE XREF: sub_5AA4E+1B52j
+loc_5C5F3:				; CODE XREF: Conv_PlayScript_5AA4E+1B52j
 		cmp	si, [bp-3Eh]
 		jl	short loc_5C5A2
 		mov	ax, [bp+var_44]
@@ -5050,7 +5073,7 @@ loc_5C5F3:				; CODE XREF: sub_5AA4E+1B52j
 		jmp	short loc_5C74B
 ; ���������������������������������������������������������������������������
 
-loc_5C6DA:				; CODE XREF: sub_5AA4E+1D01j
+loc_5C6DA:				; CODE XREF: Conv_PlayScript_5AA4E+1D01j
 		mov	ax, 18h
 		sub	ax, word ptr [bp+var_5E+2]
 		mov	word ptr [bp+var_5E], ax
@@ -5085,7 +5108,7 @@ loc_5C6DA:				; CODE XREF: sub_5AA4E+1D01j
 		add	sp, 4
 		inc	word ptr [bp+var_5E+2]
 
-loc_5C74B:				; CODE XREF: sub_5AA4E+1C8Aj
+loc_5C74B:				; CODE XREF: Conv_PlayScript_5AA4E+1C8Aj
 		cmp	word ptr [bp+var_5E+2],	18h
 		jle	short loc_5C6DA
 		call	Input_Flush_CDDC
@@ -5110,7 +5133,7 @@ loc_5C74B:				; CODE XREF: sub_5AA4E+1C8Aj
 		mov	eax, dword_47ABB
 		mov	[bp+var_7A], eax
 
-loc_5C7A4:				; CODE XREF: sub_5AA4E:loc_5CA44j
+loc_5C7A4:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5CA44j
 		lea	ax, [bp+var_6E+2]
 		push	ax
 		call	TextScroll_FormatAndApply_3EA28
@@ -5132,10 +5155,10 @@ loc_5C7A4:				; CODE XREF: sub_5AA4E:loc_5CA44j
 		add	sp, 4
 		jmp	short $+2
 
-loc_5C7DA:				; CODE XREF: sub_5AA4E+1D78j
+loc_5C7DA:				; CODE XREF: Conv_PlayScript_5AA4E+1D78j
 		jmp	short $+2
 
-loc_5C7DC:				; CODE XREF: sub_5AA4E+1D66j
+loc_5C7DC:				; CODE XREF: Conv_PlayScript_5AA4E+1D66j
 		cmp	byte ptr [bp+var_6E+2],	0
 		jz	short loc_5C7EE
 		mov	ax, word ptr [bp+var_6A]
@@ -5143,7 +5166,7 @@ loc_5C7DC:				; CODE XREF: sub_5AA4E+1D66j
 		mov	ax, word ptr [bp+var_6A+2]
 		mov	[bp+var_70], ax
 
-loc_5C7EE:				; CODE XREF: sub_5AA4E+1D92j
+loc_5C7EE:				; CODE XREF: Conv_PlayScript_5AA4E+1D92j
 		mov	ax, word_49818
 		mov	word ptr [bp+var_82+2],	ax
 		cmp	[bp+var_71], 0
@@ -5154,8 +5177,8 @@ loc_5C7EE:				; CODE XREF: sub_5AA4E+1D92j
 		jmp	short loc_5C822
 ; ���������������������������������������������������������������������������
 
-loc_5C807:				; CODE XREF: sub_5AA4E+1DAAj
-					; sub_5AA4E+1DB0j
+loc_5C807:				; CODE XREF: Conv_PlayScript_5AA4E+1DAAj
+					; Conv_PlayScript_5AA4E+1DB0j
 		mov	al, [bp+var_71]
 		mov	ah, 0
 		or	ax, ax
@@ -5166,12 +5189,12 @@ loc_5C807:				; CODE XREF: sub_5AA4E+1DAAj
 		jmp	short loc_5C822
 ; ���������������������������������������������������������������������������
 
-loc_5C81D:				; CODE XREF: sub_5AA4E+1DC0j
-					; sub_5AA4E+1DC6j
+loc_5C81D:				; CODE XREF: Conv_PlayScript_5AA4E+1DC0j
+					; Conv_PlayScript_5AA4E+1DC6j
 		mov	word ptr [bp+var_82+2],	0FFFFh
 
-loc_5C822:				; CODE XREF: sub_5AA4E+1DB7j
-					; sub_5AA4E+1DCDj
+loc_5C822:				; CODE XREF: Conv_PlayScript_5AA4E+1DB7j
+					; Conv_PlayScript_5AA4E+1DCDj
 		cmp	word ptr [bp+var_82+2],	0FFFFh
 		jz	short loc_5C840
 		call	TextScrollDisplayB_ApplyHelperD_3F784
@@ -5181,7 +5204,7 @@ loc_5C822:				; CODE XREF: sub_5AA4E+1DB7j
 		mov	word_49818, ax
 		call	TextScrollDisplayB_ApplyHelperC_3F74A
 
-loc_5C840:				; CODE XREF: sub_5AA4E+1DD8j
+loc_5C840:				; CODE XREF: Conv_PlayScript_5AA4E+1DD8j
 		cmp	byte ptr [bp+var_6E+2],	2
 		jnz	short loc_5C84F
 		cmp	[bp+var_71], 0
@@ -5189,8 +5212,8 @@ loc_5C840:				; CODE XREF: sub_5AA4E+1DD8j
 		jmp	loc_5CA47
 ; ���������������������������������������������������������������������������
 
-loc_5C84F:				; CODE XREF: sub_5AA4E+1DF6j
-					; sub_5AA4E+1DFCj
+loc_5C84F:				; CODE XREF: Conv_PlayScript_5AA4E+1DF6j
+					; Conv_PlayScript_5AA4E+1DFCj
 		mov	eax, [bp+var_7A]
 		add	eax, [bp-76h]
 		cmp	eax, dword_47ABB
@@ -5199,16 +5222,16 @@ loc_5C84F:				; CODE XREF: sub_5AA4E+1DF6j
 		jmp	short loc_5C865
 ; ���������������������������������������������������������������������������
 
-loc_5C863:				; CODE XREF: sub_5AA4E+1E0Ej
+loc_5C863:				; CODE XREF: Conv_PlayScript_5AA4E+1E0Ej
 		xor	ax, ax
 
-loc_5C865:				; CODE XREF: sub_5AA4E+1E13j
+loc_5C865:				; CODE XREF: Conv_PlayScript_5AA4E+1E13j
 		or	al, al
 		jnz	short loc_5C86C
 		jmp	loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5C86C:				; CODE XREF: sub_5AA4E+1E19j
+loc_5C86C:				; CODE XREF: Conv_PlayScript_5AA4E+1E19j
 		mov	dword ptr [bp-76h], 6
 		mov	eax, dword_47ABB
 		mov	[bp+var_7A], eax
@@ -5240,7 +5263,7 @@ loc_5C86C:				; CODE XREF: sub_5AA4E+1E19j
 		jmp	short loc_5C8E9
 ; ���������������������������������������������������������������������������
 
-loc_5C8D1:				; CODE XREF: sub_5AA4E+1E9Ej
+loc_5C8D1:				; CODE XREF: Conv_PlayScript_5AA4E+1E9Ej
 		cmp	byte ptr [bp+si+var_32], 0
 		jz	short loc_5C8E8
 		mov	bx, si
@@ -5250,10 +5273,10 @@ loc_5C8D1:				; CODE XREF: sub_5AA4E+1E9Ej
 		mov	bx, [bx]
 		mov	word ptr [bx+1Bh], 0
 
-loc_5C8E8:				; CODE XREF: sub_5AA4E+1E87j
+loc_5C8E8:				; CODE XREF: Conv_PlayScript_5AA4E+1E87j
 		inc	si
 
-loc_5C8E9:				; CODE XREF: sub_5AA4E+1E81j
+loc_5C8E9:				; CODE XREF: Conv_PlayScript_5AA4E+1E81j
 		cmp	si, 6
 		jl	short loc_5C8D1
 		cmp	word ptr [bp+var_6E], 1D2h
@@ -5277,8 +5300,8 @@ loc_5C8E9:				; CODE XREF: sub_5AA4E+1E81j
 		jmp	loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5C92F:				; CODE XREF: sub_5AA4E+1EA5j
-					; sub_5AA4E+1EACj ...
+loc_5C92F:				; CODE XREF: Conv_PlayScript_5AA4E+1EA5j
+					; Conv_PlayScript_5AA4E+1EACj ...
 		cmp	word ptr [bp+var_6E], 178h
 		jge	short loc_5C970
 		cmp	word ptr [bp+var_6E], 122h
@@ -5300,8 +5323,8 @@ loc_5C92F:				; CODE XREF: sub_5AA4E+1EA5j
 		jmp	loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5C970:				; CODE XREF: sub_5AA4E+1EE6j
-					; sub_5AA4E+1EEDj ...
+loc_5C970:				; CODE XREF: Conv_PlayScript_5AA4E+1EE6j
+					; Conv_PlayScript_5AA4E+1EEDj ...
 		cmp	word ptr [bp+var_6E], 98h ; '�'
 		jge	short loc_5C9B0
 		cmp	word ptr [bp+var_6E], 3Ah ; ':'
@@ -5323,8 +5346,8 @@ loc_5C970:				; CODE XREF: sub_5AA4E+1EE6j
 		jmp	loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5C9B0:				; CODE XREF: sub_5AA4E+1F27j
-					; sub_5AA4E+1F2Dj ...
+loc_5C9B0:				; CODE XREF: Conv_PlayScript_5AA4E+1F27j
+					; Conv_PlayScript_5AA4E+1F2Dj ...
 		cmp	word ptr [bp+var_6E], 10Ah
 		jge	short loc_5C9F0
 		cmp	word ptr [bp+var_6E], 0A8h ; '�'
@@ -5346,8 +5369,8 @@ loc_5C9B0:				; CODE XREF: sub_5AA4E+1F27j
 		jmp	short loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5C9F0:				; CODE XREF: sub_5AA4E+1F67j
-					; sub_5AA4E+1F6Ej ...
+loc_5C9F0:				; CODE XREF: Conv_PlayScript_5AA4E+1F67j
+					; Conv_PlayScript_5AA4E+1F6Ej ...
 		cmp	word ptr [bp+var_6E], 234h
 		jge	short loc_5CA30
 		cmp	word ptr [bp+var_6E], 1E4h
@@ -5369,8 +5392,8 @@ loc_5C9F0:				; CODE XREF: sub_5AA4E+1F67j
 		jmp	short loc_5CA44
 ; ���������������������������������������������������������������������������
 
-loc_5CA30:				; CODE XREF: sub_5AA4E+1FA7j
-					; sub_5AA4E+1FAEj ...
+loc_5CA30:				; CODE XREF: Conv_PlayScript_5AA4E+1FA7j
+					; Conv_PlayScript_5AA4E+1FAEj ...
 		push	119Bh
 		lea	ax, [bp+var_184]
 		push	ax
@@ -5378,25 +5401,25 @@ loc_5CA30:				; CODE XREF: sub_5AA4E+1FA7j
 		add	sp, 4
 		mov	[bp+var_71], 0
 
-loc_5CA44:				; CODE XREF: sub_5AA4E+1E1Bj
-					; sub_5AA4E+1EDEj ...
+loc_5CA44:				; CODE XREF: Conv_PlayScript_5AA4E+1E1Bj
+					; Conv_PlayScript_5AA4E+1EDEj ...
 		jmp	loc_5C7A4
 ; ���������������������������������������������������������������������������
 
-loc_5CA47:				; CODE XREF: sub_5AA4E+1DFEj
+loc_5CA47:				; CODE XREF: Conv_PlayScript_5AA4E+1DFEj
 		call	TextScrollDisplayB_ApplyHelperD_3F784
 		mov	word ptr [bp+var_5E+2],	0
 		jmp	loc_5CB03
 ; ���������������������������������������������������������������������������
 
-loc_5CA54:				; CODE XREF: sub_5AA4E+20BBj
+loc_5CA54:				; CODE XREF: Conv_PlayScript_5AA4E+20BBj
 		mov	[bp+var_86], 0
 		mov	[bp+var_82], 1
 		mov	eax, dword_47ABB
 		mov	[bp+var_86], eax
 		jmp	short $+2
 
-loc_5CA71:				; CODE XREF: sub_5AA4E+203Fj
+loc_5CA71:				; CODE XREF: Conv_PlayScript_5AA4E+203Fj
 		mov	eax, [bp+var_86]
 		add	eax, [bp+var_82]
 		cmp	eax, dword_47ABB
@@ -5405,10 +5428,10 @@ loc_5CA71:				; CODE XREF: sub_5AA4E+203Fj
 		jmp	short loc_5CA89
 ; ���������������������������������������������������������������������������
 
-loc_5CA87:				; CODE XREF: sub_5AA4E+2032j
+loc_5CA87:				; CODE XREF: Conv_PlayScript_5AA4E+2032j
 		xor	ax, ax
 
-loc_5CA89:				; CODE XREF: sub_5AA4E+2037j
+loc_5CA89:				; CODE XREF: Conv_PlayScript_5AA4E+2037j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_5CA71
@@ -5460,13 +5483,13 @@ loc_5CA89:				; CODE XREF: sub_5AA4E+2037j
 		add	sp, 0Ch
 		inc	word ptr [bp+var_5E+2]
 
-loc_5CB03:				; CODE XREF: sub_5AA4E+2003j
+loc_5CB03:				; CODE XREF: Conv_PlayScript_5AA4E+2003j
 		cmp	word ptr [bp+var_5E+2],	18h
 		jge	short loc_5CB0C
 		jmp	loc_5CA54
 ; ���������������������������������������������������������������������������
 
-loc_5CB0C:				; CODE XREF: sub_5AA4E+20B9j
+loc_5CB0C:				; CODE XREF: Conv_PlayScript_5AA4E+20B9j
 		push	0FFE8h
 		push	0
 		push	[bp+var_40]
@@ -5486,7 +5509,7 @@ loc_5CB0C:				; CODE XREF: sub_5AA4E+20B9j
 		jmp	loc_5CCF6	; default
 ; ���������������������������������������������������������������������������
 
-loc_5CB41:				; CODE XREF: sub_5AA4E+20EEj
+loc_5CB41:				; CODE XREF: Conv_PlayScript_5AA4E+20EEj
 		shl	bx, 1
 		jmp	cs:off_5CE19[bx] ; switch jump
 
@@ -5508,7 +5531,7 @@ loc_5CB48:				; DATA XREF: ovr191:off_5CE19o
 		jmp	loc_5CCF6	; default
 ; ���������������������������������������������������������������������������
 
-loc_5CB73:				; CODE XREF: sub_5AA4E+20F5j
+loc_5CB73:				; CODE XREF: Conv_PlayScript_5AA4E+20F5j
 					; DATA XREF: ovr191:off_5CE19o
 		mov	al, [bp+var_71]	; case 0x1
 		mov	ah, 0
@@ -5524,7 +5547,7 @@ loc_5CB73:				; CODE XREF: sub_5AA4E+20F5j
 		jmp	short loc_5CBA8
 ; ���������������������������������������������������������������������������
 
-loc_5CB94:				; CODE XREF: sub_5AA4E+215Ej
+loc_5CB94:				; CODE XREF: Conv_PlayScript_5AA4E+215Ej
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82+2]
 		add	bx, ax
@@ -5534,14 +5557,14 @@ loc_5CB94:				; CODE XREF: sub_5AA4E+215Ej
 		jmp	short loc_5CBAE
 ; ���������������������������������������������������������������������������
 
-loc_5CBA5:				; CODE XREF: sub_5AA4E+2153j
+loc_5CBA5:				; CODE XREF: Conv_PlayScript_5AA4E+2153j
 		inc	word ptr [bp+var_82+2]
 
-loc_5CBA8:				; CODE XREF: sub_5AA4E+2144j
+loc_5CBA8:				; CODE XREF: Conv_PlayScript_5AA4E+2144j
 		cmp	word ptr [bp+var_82+2],	5
 		jl	short loc_5CB94
 
-loc_5CBAE:				; CODE XREF: sub_5AA4E+2155j
+loc_5CBAE:				; CODE XREF: Conv_PlayScript_5AA4E+2155j
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82+2]
 		add	bx, ax
@@ -5559,7 +5582,7 @@ loc_5CBAE:				; CODE XREF: sub_5AA4E+2155j
 		jmp	short loc_5CBF8
 ; ���������������������������������������������������������������������������
 
-loc_5CBD9:				; CODE XREF: sub_5AA4E+21AFj
+loc_5CBD9:				; CODE XREF: Conv_PlayScript_5AA4E+21AFj
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82]
 		add	bx, ax
@@ -5572,15 +5595,15 @@ loc_5CBD9:				; CODE XREF: sub_5AA4E+21AFj
 		jmp	short loc_5CBFF
 ; ���������������������������������������������������������������������������
 
-loc_5CBF4:				; CODE XREF: sub_5AA4E+2199j
-					; sub_5AA4E+21A2j
+loc_5CBF4:				; CODE XREF: Conv_PlayScript_5AA4E+2199j
+					; Conv_PlayScript_5AA4E+21A2j
 		inc	word ptr [bp+var_82]
 
-loc_5CBF8:				; CODE XREF: sub_5AA4E+2189j
+loc_5CBF8:				; CODE XREF: Conv_PlayScript_5AA4E+2189j
 		cmp	word ptr [bp+var_82], 5
 		jl	short loc_5CBD9
 
-loc_5CBFF:				; CODE XREF: sub_5AA4E+21A4j
+loc_5CBFF:				; CODE XREF: Conv_PlayScript_5AA4E+21A4j
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82]
 		add	bx, ax
@@ -5597,7 +5620,7 @@ loc_5CBFF:				; CODE XREF: sub_5AA4E+21A4j
 		jmp	loc_5CCF6	; default
 ; ���������������������������������������������������������������������������
 
-loc_5CC26:				; CODE XREF: sub_5AA4E+20F5j
+loc_5CC26:				; CODE XREF: Conv_PlayScript_5AA4E+20F5j
 					; DATA XREF: ovr191:off_5CE19o
 		mov	al, [bp+var_71]	; case 0x2
 		mov	ah, 0
@@ -5613,7 +5636,7 @@ loc_5CC26:				; CODE XREF: sub_5AA4E+20F5j
 		jmp	short loc_5CC5B
 ; ���������������������������������������������������������������������������
 
-loc_5CC47:				; CODE XREF: sub_5AA4E+2211j
+loc_5CC47:				; CODE XREF: Conv_PlayScript_5AA4E+2211j
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82+2]
 		add	bx, ax
@@ -5623,14 +5646,14 @@ loc_5CC47:				; CODE XREF: sub_5AA4E+2211j
 		jmp	short loc_5CC61
 ; ���������������������������������������������������������������������������
 
-loc_5CC58:				; CODE XREF: sub_5AA4E+2206j
+loc_5CC58:				; CODE XREF: Conv_PlayScript_5AA4E+2206j
 		inc	word ptr [bp+var_82+2]
 
-loc_5CC5B:				; CODE XREF: sub_5AA4E+21F7j
+loc_5CC5B:				; CODE XREF: Conv_PlayScript_5AA4E+21F7j
 		cmp	word ptr [bp+var_82+2],	5
 		jl	short loc_5CC47
 
-loc_5CC61:				; CODE XREF: sub_5AA4E+2208j
+loc_5CC61:				; CODE XREF: Conv_PlayScript_5AA4E+2208j
 		lea	ax, [bp+var_24]
 		mov	bx, word ptr [bp+var_82+2]
 		add	bx, ax
@@ -5657,7 +5680,7 @@ loc_5CC61:				; CODE XREF: sub_5AA4E+2208j
 		jmp	short loc_5CCF6	; default
 ; ���������������������������������������������������������������������������
 
-loc_5CCA2:				; CODE XREF: sub_5AA4E+20F5j
+loc_5CCA2:				; CODE XREF: Conv_PlayScript_5AA4E+20F5j
 					; DATA XREF: ovr191:off_5CE19o
 		mov	al, [bp+var_71]	; case 0x3
 		mov	ah, 0
@@ -5691,8 +5714,8 @@ loc_5CCA2:				; CODE XREF: sub_5AA4E+20F5j
 		add	sp, 4
 		jmp	short $+2
 
-loc_5CCF6:				; CODE XREF: sub_5AA4E+20F0j
-					; sub_5AA4E+2122j ...
+loc_5CCF6:				; CODE XREF: Conv_PlayScript_5AA4E+20F0j
+					; Conv_PlayScript_5AA4E+2122j ...
 		push	seg stub188	; default
 		push	offset Stub_ResourceHandle_Destruct_42090
 		push	19h
@@ -5766,7 +5789,7 @@ loc_5CCF6:				; CODE XREF: sub_5AA4E+20F0j
 		jmp	short loc_5CDEF
 ; ���������������������������������������������������������������������������
 
-loc_5CDCA:				; CODE XREF: sub_5AA4E+4Aj
+loc_5CDCA:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ovr191:off_5CE29o
 		mov	[bp+var_2C], 1254h ; case 0xC
 		mov	byte ptr [bp+var_2A], 0Ch
@@ -5774,27 +5797,27 @@ loc_5CDCA:				; CODE XREF: sub_5AA4E+4Aj
 		push	di
 		lea	ax, [bp+var_2C]
 		push	ax
-		call	sub_66A0
+		call	ConvRec_ReadJump_66A0
 		add	sp, 4
 		mov	si, [bp+var_2A+1]
 		add	[di+4],	si
 		jmp	short loc_5CDEF
 ; ���������������������������������������������������������������������������
 
-loc_5CDED:				; CODE XREF: sub_5AA4E+45j
-					; sub_5AA4E+4Aj
+loc_5CDED:				; CODE XREF: Conv_PlayScript_5AA4E+45j
+					; Conv_PlayScript_5AA4E+4Aj
 					; DATA XREF: ...
 		jmp	short $+2	; default
 
-loc_5CDEF:				; CODE XREF: sub_5AA4E:loc_5AA9Dj
-					; sub_5AA4E+8EFj ...
+loc_5CDEF:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5AA9Dj
+					; Conv_PlayScript_5AA4E+8EFj ...
 		cmp	[bp+var_15], 0
 		jz	short loc_5CDF7
 		jmp	short loc_5CE11
 ; ���������������������������������������������������������������������������
 
-loc_5CDF7:				; CODE XREF: sub_5AA4E+27j
-					; sub_5AA4E+23A5j
+loc_5CDF7:				; CODE XREF: Conv_PlayScript_5AA4E+27j
+					; Conv_PlayScript_5AA4E+23A5j
 		mov	ax, [di]
 		add	ax, [di+8]
 		cmp	ax, [di+4]
@@ -5803,23 +5826,23 @@ loc_5CDF7:				; CODE XREF: sub_5AA4E+27j
 		jmp	short loc_5CE08
 ; ���������������������������������������������������������������������������
 
-loc_5CE06:				; CODE XREF: sub_5AA4E+23B1j
+loc_5CE06:				; CODE XREF: Conv_PlayScript_5AA4E+23B1j
 		xor	ax, ax
 
-loc_5CE08:				; CODE XREF: sub_5AA4E+23B6j
+loc_5CE08:				; CODE XREF: Conv_PlayScript_5AA4E+23B6j
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_5CE11
 		jmp	loc_5AA78
 ; ���������������������������������������������������������������������������
 
-loc_5CE11:				; CODE XREF: sub_5AA4E+23A7j
-					; sub_5AA4E+23BEj
+loc_5CE11:				; CODE XREF: Conv_PlayScript_5AA4E+23A7j
+					; Conv_PlayScript_5AA4E+23BEj
 		pop	di
 		pop	si
 		leave
 		retf
-sub_5AA4E	endp
+Conv_PlayScript_5AA4E	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -5827,15 +5850,15 @@ sub_5AA4E	endp
 		leave
 		retf
 ; ���������������������������������������������������������������������������
-off_5CE19	dw offset loc_5CB48	; DATA XREF: sub_5AA4E+20F5r
+off_5CE19	dw offset loc_5CB48	; DATA XREF: Conv_PlayScript_5AA4E+20F5r
 		dw offset loc_5CB73	; jump table for switch	statement
 		dw offset loc_5CC26
 		dw offset loc_5CCA2
-off_5CE21	dw offset loc_5C214	; DATA XREF: sub_5AA4E+17C1r
+off_5CE21	dw offset loc_5C214	; DATA XREF: Conv_PlayScript_5AA4E+17C1r
 		dw offset loc_5C23F	; jump table for switch	statement
 		dw offset loc_5C2D5
 		dw offset loc_5C33D
-off_5CE29	dw offset loc_5AAA0	; DATA XREF: sub_5AA4E+4Ar
+off_5CE29	dw offset loc_5AAA0	; DATA XREF: Conv_PlayScript_5AA4E+4Ar
 		dw offset loc_5CDED	; jump table for switch	statement
 		dw offset loc_5CDED
 		dw offset loc_5B340
