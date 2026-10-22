@@ -54,7 +54,7 @@ Machine à états sur l'octet **`[partie+0E8h]`** :
 | Valeur | Posée par | Effet au tour suivant de la boucle |
 |---|---|---|
 | 0 | départ, fin de partie (1Dh) | menu d'accueil (`Gameflow_MainMenu_4F1A7`) |
-| 1 | 03h, 0Eh, écran d'armement (16h) | **départ en vol** : sauvegarde `tmpsav.tmp` (`Gameflow_SaveTmpState_4BBA0`, sauf si `[+0F9h]` = FEh), écriture d'`op2misn.iff` (`Gameflow_WriteMissionOrder_4BBF7`), sortie d'OPTEST pour STRIKE.EXE. Au retour : compte rendu (§ 6) |
+| 1 | 03h, 0Eh, écran d'armement (16h) | **départ en vol** : sauf si `[+0F9h]` = FEh, `Gameflow_SaveTmpState_4BBA0` fait passer à la mission suivante (`[+0FAh]` = `[+0FBh]`, posé par 0Dh ; `[+0FBh]` = FFh), retire de l'argent `[+27Bh]` les frais généraux `[+27Fh]` et les achats du catalogue `[+283h]` (remis à 0), puis sauvegarde `tmpsav.tmp` ; écriture d'`op2misn.iff` (`Gameflow_WriteMissionOrder_4BBF7`), sortie d'OPTEST pour STRIKE.EXE. Au retour : compte rendu (§ 6) |
 | 2 | 0Fh | **mission suivante** : mission courante `[+0FAh]` = `[+0FBh]` (posé par 0Dh), `[+0FBh]` = FFh |
 | 3 | 11h, menu | chargement du fichier choisi (nom en `partie+93h`) |
 | 4 | la boucle elle-même | **dans les scènes** |
@@ -63,8 +63,11 @@ Après le traitement de l'état : `[+0E8h]` = 4, puis
 
 1. lecture du script de la mission courante `[+0FAh]` (`Gameflow_LoadMissionScript_4A440` : `MISS`
    / `INFO`, `EFCT`) et **exécution** (`Gameflow_RunScriptPairs_36CF`) — au début de chaque mission
-   **et au retour de chaque vol** (sauf code de sortie 3, § 6) ; c'est ce qui permet au script de
-   mission de réagir au résultat du vol ;
+   **et au retour de chaque vol** (sauf code de sortie 3, § 6) ; comme le départ a déjà fait passer
+   à la mission désignée par 0Dh, c'est le script de **cette** mission qui lit le résultat du vol :
+   la mission elle-même quand son script fait `0D` vers son propre numéro (MISS 2 : `0D 02`), sinon
+   la suivante (MISS 0 : `0D 01`, le vol de MISN-1a est lu par le script de MISS 1, `20 00`). Après
+   un chargement de partie (état 3) et un code de sortie 3, le script n'est pas joué ;
 2. si `[+0E8h]` vaut alors 4 ou 2 : sauvegarde automatique `gensave.tmp` ;
 3. tant que `[+0E8h]` = 4 : une scène (`Gameflow_PlayScene_3B0B`) ;
 4. si `[+0E8h]` = 1 : départ en vol (ci-dessus).
@@ -375,40 +378,154 @@ compte rendu du vol précédent, puis après chacun de ses vols) :
 | MISS 41 (MISN-12b) | son propre vol (RWYEXT18) | si drapeau 50 et 3ᵉ valeur ≠ 0 : changements 27 (argent remplacé par 0) et 7 (argent − 2000), puis 1Dh : argent < 0 → conversation 255, **fin de partie** |
 | MISS 48 | MISN-15a | si MISN-15a (mission 41 de `MLST`) a réussi : cinématiques 20 et 36 ; sinon plans 15 et 3, puis : 3ᵉ valeur ≠ 0 → changements 27 et 7 et 1Dh ; sinon conversation 236, changements 27 et 7 et 1Dh |
 
-## 7. libRealSpace (`SCGameFlow.cpp`) : ce qui manque ou diffère
+## 7. libRealSpace (`SCGameFlow.cpp`) : écarts et corrections proposées
 
-Comparaison avec `SCGameFlow.cpp` (fourni le 2026-10-22) et le dump `gameflow_parsed.txt`. Les
-valeurs numériques des constantes `EFECT_OPT_*` (fichier d'en-tête non fourni) sont à faire
-correspondre avec le tableau du § 5.2.
+Relu le 2026-10-22 : `SCGameFlow.cpp` (921 lignes, fourni le même jour), comparé aux § 3 à 6 et
+rejoué sur les scripts de `GAMEFLOW.IFF`. `SCGameFlow.h`, `GameState` et les scènes
+(`WeaponLoadoutScene`, `EndMissionScene`, `SCStrike`) n'ont pas été fournis : ce qu'ils font n'est
+pas compté ici.
 
-**Commandes présentes dans les données et non nommées dans le dump** :
+### 7.1 Correspondance des constantes `EFECT_OPT_*` (à confirmer dans `SCGameFlow.h`)
 
-| Cmd | Données | À faire dans libRealSpace |
+Leurs valeurs ne sont pas dans le code fourni. Correspondance déduite des noms du dump
+`gameflow_parsed.txt` et de ce que fait chaque cas :
+
+| Constante | Commande probable | Indice |
 |---|---|---|
-| 04h | 43 | rien (le jeu ne fait rien) |
-| 16h | 42 | écran d'armement, chargement `LOAD` n ; **test** : la suite du script n'est jouée que si le joueur part en vol. libRealSpace ouvre l'écran d'armement après tout script qui contient 0Ch (`flymission`, `WeaponLoadoutScene`) : le chargement par défaut `LOAD` n et le saut de la suite en cas d'annulation sont à vérifier |
-| 18h | 11 | humeur musicale n (probablement `EFECT_OPT_TUNE_MODIFIER` / `GameState.tune_modifier`) |
-| 1Ah | 27 | marques de victoires sur l'avion (`OPTIONS.IFF` `MARK`), si le joueur a eu des victoires et n'est pas mort |
-| 1Bh | 2 | retirer le pilote n du tableau des victoires |
-| 1Dh | 12 | fin de partie : libRealSpace (`EFECT_OPT_CHECK_BALANCE` probable) ne teste que l'argent ; le jeu teste **d'abord plus de 16 avions perdus au total** (conversation 254), puis l'argent < 0 (255), et arrête le script |
-| 24h | 27 | humeur musicale 8 et conversation 253 / 252 si des avions ont été perdus pendant le vol (libRealSpace joue 252 seulement depuis `runFrame`, quand le joueur s'est éjecté) |
-| 25h | 7 | test sur la 3ᵉ valeur de `STAT` du compte rendu ; absent du dump. Il décide de MISN-6b / 6x, 8b / 8x, 10b / 10x, du saut de MISN-9a et d'une fin de partie après MISN-12b (§ 6.1) |
-| 26h | 18 | jouer le morceau n de `gameflow.dat` |
+| `EFECT_OPT_CONV`, `_SCEN`, `_PLAY_MIDGAME`, `_SHOT` | 00h, 01h, 02h, 08h | noms du dump |
+| `EFECT_OPT_SETFLAG_TRUE` / `_FALSE`, `_IF_FLAG`, `_IF_NOT_FLAG` | 06h / 07h, 0Ah, 09h | noms du dump |
+| `EFECT_OPT_FLYM` / `_FLYM2` | 0Ch / 03h | les deux appellent `playFlyMission` |
+| `EFECT_OPT_MIS2` | 0Dh | `GameState.mission_id = n` |
+| `EFECT_OPT_GO` | 0Fh | `next_miss = mission_id` |
+| `EFECT_OPT_SAVE_GAME`, `_LOAD_GAME`, `_SHOW_MAP`, `_LOOK_AT_KILLBOARD` | 10h, 11h, 12h, 13h | noms du dump |
+| `EFECT_OPT_MISS_ACCEPTED` / `_REJECTED` | 14h / 15h | noms du dump |
+| `EFECT_OPT_VIEW_CATALOG`, `_LOOK_AT_LEDGER` | 17h, 19h | noms du dump |
+| `EFECT_OPT_TUNE_MODIFIER` | 18h | `GameState.tune_modifier = n` |
+| `EFECT_OPT_CHECK_BALANCE` | 1Dh | conversation 255 si l'argent est négatif |
+| `EFECT_OPT_MISS_ELSE` / `_ENDIF` | 1Eh / 1Fh | noms du dump |
+| `EFFCT_OPT_IF_MISS_SUCCESS` | 20h | « OTHER IF », `mission_flyed_success[n]` |
+| `EFECT_OPT_APPLY_CHANGE` | 22h | nom du dump |
+| `EFECT_IF_LAST_MISS_SUCCESS` | **25h ?** | test sans argument ; 23h et 25h sont les seuls autres tests, 23h n'est pas dans les données |
+| `EFECT_OPT_END_MISS` | **16h ?** | commentaire « Show weapons selection screen » |
 
-**Différences sur des commandes nommées** :
+Les commandes 04h, 1Ah, 1Bh, 24h et 26h ne correspondent à aucun cas : elles passent par
+`default` (« Unkown opcode »). C'est aussi le sort de 16h et 25h si les deux hypothèses du tableau
+sont fausses.
 
-- **Blocs conditionnels** : libRealSpace ouvre un niveau pour chaque test, réussi ou non ; le jeu
-  n'en compte que pendant un saut (§ 5.1). Le résultat est le même pour des blocs bien formés. Le
-  test 16h n'a pas de 1Fh dans les données : un test qui échoue saute jusqu'à la fin du script.
-  Seuls 09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h, 23h et 25h sont des tests.
-- **22h** : le jeu borne à 0 les retraits d'armes et de victoires (`WEAP`, `PILT`) ; il applique
-  `CASH` directement à l'argent, sans multiplier par 1000 ni passer par un argent « projeté ».
-- **03h** part en vol **sans** écran d'armement ; **0Ch** ne fait que choisir la mission (le vol
-  part de 16h).
-- **20h** (« OTHER IF ») teste le résultat d'une mission de `MLST` (1 = succès, 2 = échec, 0 = pas
-  volée).
-- **Après chaque vol**, le jeu rejoue le **script de la mission** courante : les tests 20h, 23h, 25h
-  et les commandes 1Ah, 1Dh, 24h des scripts de mission sont écrits pour ce moment.
+### 7.2 Ce qui est conforme au jeu
+
+- **Mission après un vol.** `flyMission` pose `next_miss = GameState.mission_id` (valeur du dernier
+  0Dh) et `runFrame` passe à cette mission, dont le script est joué. Le jeu fait la même chose au
+  départ en vol (`Gameflow_SaveTmpState_4BBA0` : mission courante = mission suivante, § 3). Quand la
+  mission courante se désigne elle-même (`0D 02` dans MISS 2, 11 missions sur 41 avec un vol), c'est
+  son propre script qui est rejoué après le vol.
+- **Chargement d'une partie** : le jeu ne rejoue pas le script de la mission (état 3, § 3) ;
+  `loadGame` non plus (`runEffectAfterLoad` ne reprend que 18h).
+- **Blocs conditionnels** : même résultat que le jeu pour les blocs bien formés, tant que chaque
+  test ouvre un niveau (voir 7.3.1 pour les tests manquants). Profondeur maximale dans les données :
+  3 (`MAX_IF_DEPTH` = 10 suffit).
+- **14h / 15h** : la conversation en attente est jouée avant le test, comme dans le jeu. La reprise
+  (`currentOptCode`) repart avec des blocs vides ; sans effet sur les données (les 26 tests 14h / 15h
+  sont tous hors bloc).
+- **01h** construit la scène tout de suite au lieu de la fin du script : sans effet sur les données
+  (01h est toujours la dernière commande de son script).
+- 06h, 07h, 09h, 0Ah, 0Dh, 0Fh, 10h, 11h, 12h, 13h, 17h, 19h, 20h : même effet.
+
+### 7.3 Écarts, du plus visible au moins visible
+
+**1. Test 25h : la 3ᵉ valeur de `STAT`, pas le succès.** Dans le jeu, 25h réussit si la 3ᵉ valeur
+du compte rendu est ≠ 0 ; c'est une variable propre à chaque mission (§ 6.1 : AWACS abattu dans
+MISN-6a et 8a, BRIGC10 détruit dans 9aa…).
+- Si `EFECT_IF_LAST_MISS_SUCCESS` est 25h : il teste le **succès** de la mission. MISN-6a réussie
+  sans abattre l'AWACS → libRealSpace joue MISN-6b, le jeu MISN-6x. Même chose pour 8b / 8x et
+  10b / 10x. MISN-9a est sautée à chaque succès de MISN-9aa, et pas seulement quand le BRIGC10 est
+  détruit.
+- Si 25h n'a pas de cas : la commande qui suit le test est toujours jouée, et le 1Eh suivant
+  bascule le niveau 0. Exemple, MISS 18 (`25 06:214 1E 07:214 1F 0D:19 01:20`) : le drapeau 214 est
+  toujours posé, puis tout le reste du script est sauté, y compris `0D 19` et `01 20`.
+- **Correction** : garder les 8 valeurs de `STAT` du dernier vol dans `GameState` (écrites par le
+  script de la mission, opcode 14h de STRIKE.EXE, `MISSION_SCRIPT_OPCODES.md`) et faire de 25h un
+  test sur la 3ᵉ. Ce test est à corriger **en même temps** que 22h (point 4) : avec un test sur le
+  succès, MISN-12b réussit toujours (sa 1ʳᵉ valeur vaut toujours 1) et MISS 41 mettrait fin à la
+  partie après chaque vol de MISN-12b dès que le drapeau 50 est posé.
+
+**2. Écran d'armement 16h : c'est un test.** Dans le jeu, 0Ch ne fait que choisir la mission ; 16h
+ouvre l'écran d'armement avec le chargement `LOAD` n, et **la suite du script n'est jouée que si
+le joueur part en vol** (§ 5.3). libRealSpace ouvre l'écran d'armement à la fin du script, après
+toute commande 0Ch, sans `LOAD` n, et joue la suite du script avant, même si le joueur annule.
+- 13 des 42 scripts de sprite qui contiennent 16h ont des commandes après lui. Exemple, MISS 2, scène 20 : le sprite 12
+  (`0C 02 00:23 16:05 06:40`) pose le drapeau 40 ; si le joueur annule, 40 est quand même posé et
+  le sprite 18 (« mission suivante », `REQU (1, 40)`, `0D 03 0F`) apparaît sans que la mission ait
+  été volée. MISS 26 : changements 23 et 29 appliqués même sans vol.
+- `flyOrReturnFromScene` part en vol pour tout sprite ≠ 20 ; dans le jeu, seul le sprite 12 fait
+  partir.
+- 03h part en vol **sans** écran d'armement dans le jeu ; `EFECT_OPT_FLYM2` passe par le même
+  chemin que 0Ch (3 occurrences).
+- **Correction** : traiter 16h comme 14h : suspendre le script (`currentOptCode`), ouvrir
+  `WeaponLoadoutScene` avec `LOAD` n ; au départ (sprite 12), reprendre le script après 16h puis
+  partir en vol ; à l'annulation, test échoué : saut jusqu'au 1Eh / 1Fh, ou jusqu'à la fin du script
+  s'il n'y en a pas (cas de toutes les données). `playEndMission`, qui choisit la mission suivante
+  d'après `REQU`, n'a pas d'équivalent dans le jeu (§ 4.5).
+
+**3. Ordre des conversations, plans et cinématiques.** Le jeu joue chaque commande à son tour.
+`runFrame` vide d'abord la file des plans (08h, 12h), puis celle des cinématiques (02h), puis celle
+des conversations (00h). 5 scripts sont joués dans un autre ordre, par exemple :
+- MISS 45, script (`00:221 02:16 18:0 00:222`) : la cinématique 16 passe avant la conversation 221 ;
+- MISS 21, scène 6, sprite 0 (`02:5 08:2 08:5`) : les plans 2 et 5 passent avant la cinématique 5 ;
+- MISS 41, scène 13, sprite 16 (`00:208 … 00:210 02:12`) et MISS 8, scène 20, sprite 18
+  (`08:15 08:3 02:3 … 00:54 02:34`).
+
+Les changements d'humeur musicale (18h) entre deux conversations sont, eux, appliqués tout de suite.
+**Correction** : une seule file d'activités dans l'ordre du script.
+
+**4. Changements `CHNG` (22h).** Le jeu applique la valeur du fichier telle quelle, directement sur
+l'argent, et borne à 0 les retraits d'armes et de victoires (§ 5.4). libRealSpace multiplie `CASH`
+et `OVER` par 1000, les applique à `proj_cash`, et ne recopie `proj_cash` dans `cash` que si `cash`
+vaut 0. Les retraits `WEAP` et `PILT` ne sont pas bornés.
+- Conséquence : la fin de partie de MISS 41 et MISS 48 (changement 27 = argent remplacé par 0,
+  changement 7 = argent − 2000, puis 1Dh) n'a jamais lieu dans libRealSpace, `cash` n'étant pas
+  touché.
+- Dans le jeu, la même unité sert au gain de mission (2ᵉ valeur de `STAT`), au coût des avions
+  perdus (500 par avion, § 6) et aux changements. Si libRealSpace garde un facteur 1000, il est à
+  appliquer aux trois.
+- **Correction** : `tools/gameflow_ref/apply_change.cpp` (compilé, style du dépôt) : `applyChange`
+  et `checkGameOver` d'après le jeu, avec l'essai de MISS 41 (argent −2000 → conversation 255).
+
+**5. Fin de partie 1Dh.** Le jeu teste d'abord **plus de 16 avions perdus au total**
+(conversation 254), puis l'argent < 0 (255) ; dans les deux cas, le script s'arrête et le jeu
+revient au menu. libRealSpace ne teste que l'argent ; `GAMOVER_NO_INSURANCE` (254) est défini mais n'est pas utilisé
+dans `SCGameFlow.cpp`. 12 occurrences. Correction : `checkGameOver` du même fichier.
+
+**6. Avions perdus : 24h (27 scripts de mission).** Dans le jeu, si des avions ont été perdus
+pendant le dernier vol : humeur musicale 8, puis conversation 253 si le joueur est mort
+(`[+0F8h]` = 2), 252 sinon. libRealSpace joue 252 depuis `runFrame`, seulement quand le joueur
+s'est éjecté (`player_ejected`), et `LOST_WINGMAN_PLANE` (253) n'est pas utilisé dans `SCGameFlow.cpp`. Les noms des
+constantes ne correspondent pas au jeu : 252 = des avions perdus, joueur vivant ; 253 = joueur
+mort. Correction : faire de 24h une commande (nombre d'avions perdus au dernier vol, lu dans
+`JETS` de `misn2op.iff`), et retirer le cas `player_ejected` de `runFrame` pour ne pas jouer la
+conversation deux fois.
+
+**7. Commandes sans cas.**
+
+| Cmd | Données | Effet dans le jeu |
+|---|---|---|
+| 1Ah | 27 | marques de victoires peintes sur l'avion (`OPTIONS.IFF` `MARK`), si le joueur a eu des victoires et n'est pas mort |
+| 1Bh | 2 | retire le pilote n du tableau des victoires |
+| 26h | 18 | joue le morceau n de `gameflow.dat` ; gardé dans la partie (sauvegardé). Première commande de 14 des 18 scripts qui l'ont (`26 01` dans MISS 0) |
+| 04h | 43 | rien (le jeu ne fait rien non plus) |
+
+**8. Argent au départ en vol.** `Gameflow_SaveTmpState_4BBA0` retire de l'argent les frais généraux
+(`[+27Fh]`, chunk `OVER`) et les achats faits au catalogue depuis le dernier vol (`[+283h]`, remis à
+0), avant d'écrire `tmpsav.tmp`. Au retour, le coût des avions perdus est retiré (§ 6). Rien de cela
+n'est dans `SCGameFlow.cpp` : à vérifier là où libRealSpace gère l'argent.
+
+### 7.4 Ordre de correction suggéré
+
+1. Vérifier la correspondance des constantes (7.1), en particulier 16h et 25h.
+2. 16h comme test (point 2) : c'est l'écart qui permet de sauter une mission.
+3. 25h avec la 3ᵉ valeur de `STAT` **et** 22h / 1Dh d'après le jeu (points 1, 4, 5), ensemble.
+4. Une seule file d'activités (point 3).
+5. 24h, 1Ah, 1Bh, 26h, argent au départ (points 6 à 8).
 
 ## 8. Version CD-ROM (OPTTEST.EXE du CD)
 

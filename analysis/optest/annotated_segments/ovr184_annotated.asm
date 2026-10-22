@@ -3188,8 +3188,11 @@ Gameflow_ReadMissionResult_4B544	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-10-22. Sauvegarde la partie dans tmpsav.tmp (Gameflow_SaveGameFile_4DAE8)
-; avant un vol.
+; far, LUE 2026-10-22. Départ en vol (appelée par Gameflow_MainLoop_3D2E si [partie+0F9h] ≠
+; FEh) : passe à la mission suivante ([+0FAh] = [+0FBh], posé par la commande 0Dh ; [+0FBh] =
+; FFh), retire de l'argent [+27Bh] les frais généraux [+27Fh] et les achats du catalogue
+; [+283h] (ajoutés par Gameflow_Catalog_52662), remet [+283h] à 0, puis sauvegarde la partie
+; dans tmpsav.tmp (Gameflow_SaveGameFile_4DAE8). GAMEFLOW_SYSTEM.md § 3.
 ; ==============================================================================================
 Gameflow_SaveTmpState_4BBA0	proc far		; CODE XREF: sub_41F51J
 
