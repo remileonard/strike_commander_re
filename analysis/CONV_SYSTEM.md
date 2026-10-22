@@ -787,190 +787,32 @@ disquette ou au format CD.
 
 ### 9.1 Choix retenu : tester le format avant de parser
 
-Décision de Rémi : avant de parser une conversation, déterminer si elle est au format CD ou au format
-disquette ; ensuite le parseur lit la voix si le format est CD, et ne la lit pas sinon. Plus aucune
-devinette texte par texte.
+Décision de Rémi : avant de lire une conversation, déterminer si elle est au format CD ou au format
+disquette ; ensuite la lecture prend la voix si le format est CD, et ne la prend pas sinon. Plus
+aucune devinette texte par texte.
 
-- **Test** (`detectConvFormat`) : lire le script entier en supposant le format CD ; si toutes les
-  commandes sont connues et que la lecture finit exactement à la fin du script → `Cd`. Sinon, même
-  essai au format disquette → `Floppy`. Si aucun ne convient → `Unknown` (à signaler, ne pas
-  parser au hasard).
-- **Parsing** : le format est gardé par le parseur (par exemple un membre de `SCConvPlayer` posé dans
-  `SetArchive`, avant la boucle `ReadNextFrame`) et passé aux `parse_*`. `SetSentenceFromConv` est
-  remplacée par une lecture sans heuristique (`readConvText`) : une chaîne de voix si `Cd`, puis le
-  texte ; la valeur renvoyée est le nombre d'octets lus, qui donne la position exacte du champ
-  suivant (la couleur pour 03h). La séparation parseur / structure / lecteur est inchangée.
-- `isNextFrameIsConv` n'est plus utile pour la voix ; ses autres usages dans le parseur
-  (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) sont à revoir à part (§ 7.1). E0h est à
-  retirer de sa liste dans tous les cas.
-
-**Essai** (C++ ci-dessous, fichier `tools/conv_ref/conv_format.cpp`, compilé, style du dépôt) : 241 / 241 scripts CD reconnus `Cd`, 241 / 241
-scripts disquette (reconstruits) reconnus `Floppy`. Lu dans le mauvais format, chacun des 241 scripts,
-dans les deux sens, contient au moins une commande inconnue : le test ne peut pas se tromper de
-format sur ces données. Un script sans aucun texte se lit pareil dans les deux formats (réponse `Cd`,
-sans conséquence).
-
-**Pacific Strike.** Plutôt qu'une branche de plus dans la lecture de chaque texte, en faire un
-troisième format (`ConvFormat::PacificStrike`) avec son propre lecteur de texte, choisi par le même
-test avant le parsing. Son format n'est pas décrit ici (pas de données ni d'exécutable de *Pacific
-Strike* dans cette archive) : le lecteur et le test sont à écrire d'après ses données.
+- **Test** : sur le premier texte de la conversation seulement (§ 9.4). `Unknown` si aucun format ne
+  convient : erreur, pas de lecture au hasard.
+- **Lecture** : chaque texte est lu sans heuristique — une chaîne de voix si `Cd`, puis le texte ; la
+  position du champ suivant (la couleur pour 03h) est donc toujours exacte. La séparation parseur /
+  structure / lecteur est inchangée.
+- **Utilisation** : le format n'est pas passé au parseur ; c'est `ConvData::parse()` qui le détecte
+  puis lit (§ 9.3) :
 
 ```cpp
-// Lecteur minimal d'un script de conversation, utilisé seulement pour choisir le format.
-class ConvFormatProbe {
-public:
-    ConvFormatProbe(const uint8_t *data, size_t size, bool withVoice)
-        : data(data), size(size), withVoice(withVoice) {
-    }
-
-    // Vrai si tout le script se lit dans ce format : commandes connues, champs complets.
-    bool readsCleanly() {
-        while (pos < size) {
-            uint8_t op = data[pos];
-            pos++;
-            bool ok = false;
-            if (op == 0x00) {
-                ok = groupShot();
-            } else if (op == 0x03) {
-                ok = closeUp();
-            } else if (op == 0x0C) {
-                ok = skip(2);
-            } else if (op == 0x0E) {
-                ok = skip(2);
-            } else if (op == 0x0F || op == 0x10) {
-                ok = true;
-            }
-            if (!ok) {
-                return false;
-            }
-        }
-        return pos == size;
-    }
-
-private:
-    const uint8_t *data;
-    size_t size;
-    bool withVoice;
-    size_t pos{ 0 };
-
-    bool skip(size_t count) {
-        if (pos + count > size) {
-            return false;
-        }
-        pos += count;
-        return true;
-    }
-
-    bool string() {
-        while (pos < size) {
-            if (data[pos] == 0) {
-                pos++;
-                return true;
-            }
-            pos++;
-        }
-        return false;
-    }
-
-    // [voix] puis texte.
-    bool text() {
-        if (withVoice && !string()) {
-            return false;
-        }
-        return string();
-    }
-
-    bool peekIs(uint8_t value) {
-        return pos < size && data[pos] == value;
-    }
-
-    bool groupShot() {
-        if (!skip(9)) {
-            return false;
-        }
-        while (peekIs(0x01)) {
-            if (!skip(1 + 9 + 4)) {
-                return false;
-            }
-        }
-        while (peekIs(0x02) || peekIs(0x0A)) {
-            uint8_t op = data[pos];
-            pos++;
-            size_t fields = 1;
-            if (op == 0x02) {
-                fields = 9 + 4 + 1;
-            }
-            if (!skip(fields) || !text()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool closeUp() {
-        if (!skip(9 + 1 + 9 + 4) || !text() || !skip(1)) {
-            return false;
-        }
-        while (peekIs(0x04) || peekIs(0x0A) || peekIs(0x0B)) {
-            uint8_t op = data[pos];
-            pos++;
-            bool ok = false;
-            if (op == 0x04) {
-                ok = text();
-            } else if (op == 0x0A) {
-                ok = skip(1) && text();
-            } else {
-                ok = skip(2);
-            }
-            if (!ok) {
-                return false;
-            }
-        }
-        return true;
-    }
-};
-
-enum class ConvFormat {
-    Floppy,
-    Cd,
-    Unknown
-};
-
-// Choisi une fois, avant de parser le script.
-ConvFormat detectConvFormat(const uint8_t *data, size_t size) {
-    ConvFormatProbe cd(data, size, true);
-    if (cd.readsCleanly()) {
-        return ConvFormat::Cd;
-    }
-    ConvFormatProbe floppy(data, size, false);
-    if (floppy.readsCleanly()) {
-        return ConvFormat::Floppy;
-    }
-    return ConvFormat::Unknown;
-}
-
-// Lecture d'un texte une fois le format connu : [voix] si Cd, puis texte. Renvoie les octets lus.
-size_t readConvText(const uint8_t *data, size_t avail, ConvFormat format, std::string &voice, std::string &text) {
-    size_t used = 0;
-    voice.clear();
-    if (format == ConvFormat::Cd) {
-        size_t length = strnlen(reinterpret_cast<const char *>(data), avail);
-        voice.assign(reinterpret_cast<const char *>(data), length);
-        used = length + 1;
-    }
-    size_t length = strnlen(reinterpret_cast<const char *>(data + used), avail - used);
-    text.assign(reinterpret_cast<const char *>(data + used), length);
-    used += length + 1;
-    return used;
+ConvData *conv = new ConvData(data, size);
+if (conv->parse() != 0) {
+    printf("erreur");
 }
 ```
 
-Champs sautés par le test (§ 2) : 00h = nom (9) ; 01h = nom (9) + x, y (4) ; 02h = nom (9) + x, y (4)
-+ couleur (1) ; 0Ah = couleur (1) ; 03h = visage (9) + image (1) + décor (9) + x, y (4), texte,
-couleur (1) ; 0Bh, 0Ch = mot (2) ; 0Eh = 2 octets ; 0Fh, 10h = rien.
+- `isNextFrameIsConv` n'est plus utile pour la voix ; ses autres usages dans le parseur
+  (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) disparaissent avec la nouvelle architecture
+  (§ 9.3). E0h est à retirer de sa liste dans tous les cas.
 
-`CONV.PAK` n'existant qu'en un format par version du jeu, le test peut aussi être fait une seule fois
-pour toute l'archive (sur le premier script qui contient un texte).
+Premier essai abandonné (pour mémoire) : lire tout le script au format CD, puis au format disquette
+si la lecture échoue. Juste sur les 241 scripts des deux formats, mais il lit la conversation deux
+fois ; remplacé par le test du § 9.4.
 
 ### 9.2 Octet qui n'est pas une commande : erreur de parsing
 
@@ -988,9 +830,7 @@ d'être rattrapée par chance (cas de E0h).
   données de *Strike Commander* : lus dans le bon format, les 241 scripts n'ont **aucun** octet
   inconnu (§ 4), dans les deux formats.
 - **Fin du script** : la lecture doit finir exactement à la fin de l'entrée du PAK ; un champ ou une
-  chaîne qui dépasse est aussi une erreur. C'est la même règle que le test de format
-  (`ConvFormatProbe::readsCleanly`, § 9.1) : le parseur et le test peuvent partager le même
-  lecteur.
+  chaîne qui dépasse est aussi une erreur.
 - **Sauts 0Bh / 0Ch** : la destination doit être le début d'une commande ou la fin du script (vrai
   pour les 52 sauts des données, § 4).
 
@@ -1017,43 +857,58 @@ texte      := [voix] chaîne              ([voix] au format CD seulement, § 9.1
 ```
 
 **Parseur de référence** : `tools/conv_ref/conv_parser.cpp` (C++17, style du dépôt, sans
-dépendance). Une boucle de premier niveau (`ConvScriptParser::parse`) appelle un sous-parseur par
-commande (`parseGroupShot`, `parseCloseUp`, `parseNarration`, `parseJump`, `parseWing`) ; chaque
-sous-parseur lit ses champs et ses sous-commandes, et renvoie faux en cas d'erreur. Le premier
-échec arrête tout et donne la position et la raison (`ConvParseResult` : `ok`, `errorOffset`,
-`error`). Erreurs détectées : octet qui n'est pas une commande, champ ou chaîne qui dépasse la fin
-du script, saut 0Bh / 0Ch qui ne tombe ni sur une commande ni sur la fin (§ 9.2).
+dépendance), classe **`ConvData`** :
+
+```cpp
+ConvData *conv = new ConvData(data, size);   // données et taille de l'entrée de CONV.PAK
+if (conv->parse() != 0) {                    // 0 = pas d'erreur, sinon un ConvParseError
+    printf("erreur");
+}
+conv->format();         // ConvFormat::Cd ou ConvFormat::Floppy
+conv->records();        // les enregistrements, dans l'ordre du script
+conv->errorOffset();    // en cas d'erreur : position dans le script
+conv->errorMessage();   //                   et raison
+```
+
+`parse()` fait, dans l'ordre :
+1. le **test du format** sur le premier texte (`detectFormat`, § 9.4) ; `Unknown` → code
+   `UnknownFormat`, rien n'est lu ;
+2. la **lecture, une seule fois**, dans ce format : une boucle de premier niveau (un `switch` sur la
+   commande) appelle un sous-parseur par commande (`parseGroupShot`, `parseCloseUp`,
+   `parseNarration`, `parseJump`, `parseWing`) ; chaque sous-parseur lit ses champs et ses
+   sous-commandes, et renvoie faux en cas d'erreur ; le texte est lu par `readText` (voix si `Cd`) ;
+3. le **contrôle des sauts** 0Bh / 0Ch (`checkJumps`).
+
+Codes d'erreur (`ConvParseError`, valeur renvoyée par `parse()`) : 1 `UnknownFormat`, 2
+`NotACommand` (octet qui n'est pas une commande), 3 `PastEnd` (champ au-delà de la fin du script),
+4 `UnterminatedString` (chaîne sans 0 final), 5 `BadJump` (saut qui ne tombe ni sur une commande ni
+sur la fin). Le premier échec arrête tout.
 
 Le résultat est une liste plate d'enregistrements (`ConvRecord`, dans l'ordre du script, `level`
 0 ou 1) : c'est la « structure » intermédiaire ; la construction des `ConvFrame` se fait ensuite à
 partir d'elle, sans relire les octets. La séparation parseur / structure / lecteur est conservée
 et même renforcée : plus aucun `parse_*` ne déplace le curseur pour un autre.
 
-**Test du format avant la lecture** : `parseConvScript(data, size, result)` appelle d'abord
-`detectConvFormat` (§ 9.4), puis lit la conversation **une seule fois** avec le lecteur du format
-trouvé. Format `Unknown` → pas de lecture, `result.error` = « format de conversation non reconnu ».
-`ConvFormatProbe` (§ 9.1) n'est plus nécessaire.
-
 **Essai** (`tools/conv_ref/export_scripts.py` puis `conv_parser`) :
 
-| Données | Bon format | Mauvais format |
+| Données | Format trouvé | Lecture |
 |---|---|---|
-| 241 scripts CD | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
-| 241 scripts disquette reconstruits (voix retirées, sauts recalculés) | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
+| 241 scripts CD | `Cd` pour les 241 | 0 erreur, 2 772 enregistrements |
+| 241 scripts disquette reconstruits (voix retirées, sauts recalculés) | `Floppy` pour les 241 | 0 erreur, 2 772 enregistrements |
 
-Avec `parseConvScript` (test du format puis une seule lecture) : les 241 scripts CD sont reconnus
-`Cd`, les 241 scripts disquette `Floppy`, 2 772 enregistrements chacun.
+Un script invalide donne le code `UnknownFormat`.
 
 2 772 = 86 × 00h + 184 × 01h + 70 × 02h + 32 × 0Ah + 1 717 × 03h + 575 × 04h + 26 × 0Bh + 26 × 0Ch +
 28 × 0Eh + 28 × 0Fh, les mêmes comptes que `conv_dump.py` (§ 4).
 
-**Pacific Strike** : un troisième `ConvFormat` se branche à deux endroits seulement, `readText`
-(lecture d'un texte) et, si besoin, les commandes propres à ce jeu dans la boucle de premier niveau.
+**Pacific Strike** : un troisième `ConvFormat` se branche à trois endroits seulement : son test dans
+`detectFormat`, `readText` (lecture d'un texte) et, si besoin, ses commandes propres dans la boucle
+de premier niveau.
 
-### 9.4 Test du format : regarder le premier texte (`detectConvFormat`)
+### 9.4 Test du format : regarder le premier texte (`ConvData::detectFormat`)
 
 Demande de Rémi : tester chaque conversation **avant** de la lire, pour choisir le lecteur CD ou le
-lecteur disquette, sans la lire en entier. Le test (`ConvFormatDetector`, `tools/conv_ref/conv_parser.cpp`)
+lecteur disquette, sans la lire en entier. Le test (`ConvData::detectFormat`, `tools/conv_ref/conv_parser.cpp`)
 ne regarde que le **premier texte** du script.
 
 1. **Aller au premier texte** en sautant les champs de taille fixe : 03h → 23 octets ; 00h → décor

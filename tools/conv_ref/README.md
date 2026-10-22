@@ -7,8 +7,7 @@ produisent à partir de `BIGTRE.TRE` (ou du dossier `DATA` extrait).
 |---|---|---|
 | `export_scripts.py` | écrit chaque entrée de `CONV.PAK` au format CD (`cd/`) et au format disquette reconstruit (`disquette/` : voix retirées, sauts 0Bh / 0Ch recalculés) | § 9 |
 | `librs_voice_detect.py` | rejoue la détection voix / texte de `SetSentenceFromConv` sur chaque texte et compte les erreurs (`--simplifiee` : sans E0h ni la branche FFh / F4h) | § 9 |
-| `conv_format.cpp` | test du format avant le parsing (`detectConvFormat`) et lecture d'un texte sans heuristique (`readConvText`) | § 9.1 |
-| `conv_parser.cpp` | parseur complet : boucle de premier niveau, sous-parseurs, erreurs ; `detectConvFormat` teste le format sur le premier texte (CD, disquette, inconnu), `parseConvScript` lit ensuite une seule fois | § 9.2 à 9.4 |
+| `conv_parser.cpp` | classe `ConvData` : `parse()` teste le format sur le premier texte (CD, disquette), puis lit le script une seule fois (boucle de premier niveau, sous-parseurs) ; renvoie 0 ou un code d'erreur | § 9.1 à 9.4 |
 | `conv_lips.cpp` | bouche et clignement de la tête parlante, bouche des personnages de groupe | « Yeux et bouches », § 7.4 |
 
 ```bash
