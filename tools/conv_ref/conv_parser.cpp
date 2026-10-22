@@ -317,24 +317,182 @@ private:
     }
 };
 
-// Test du format, fait une fois avant d'utiliser le script : format CD si tout le script se lit
-// avec une chaîne de voix devant chaque texte, sinon format disquette s'il se lit sans, sinon
-// Unknown (script invalide dans les deux formats). Renvoie aussi le résultat du parsing :
-// celui du format trouvé, ou celui de l'essai CD si aucun ne convient (position et raison de
-// l'erreur).
+// Test du format, avant de lire la conversation : on regarde seulement son premier texte.
+//
+// Au format CD, ce premier texte commence par une chaîne de voix : vide, ou un identifiant de 1 à 8
+// lettres ou chiffres (« 3gw009 », « Z1ai020 »), puis vient le texte. Au format disquette, la
+// première chaîne est déjà le texte, qui contient des espaces ou de la ponctuation. Chaque
+// hypothèse est aussi vérifiée sur les octets qui suivent : après le texte, le champ couleur
+// (03h) puis une commande valide, ou la fin du script.
+class ConvFormatDetector {
+public:
+    ConvFormatDetector(const uint8_t *data, size_t size)
+        : data(data), size(size) {
+    }
+
+    ConvFormat detect() {
+        size_t text = 0;
+        uint8_t kind = 0;
+        if (!findFirstText(text, kind)) {
+            return ConvFormat::Unknown;
+        }
+        size_t firstEnd = 0;
+        if (!stringEnd(text, firstEnd)) {
+            return ConvFormat::Unknown;
+        }
+        bool floppy = followsText(firstEnd + 1, kind);
+        bool cd = false;
+        size_t secondEnd = 0;
+        if (looksLikeVoice(text, firstEnd) && stringEnd(firstEnd + 1, secondEnd)) {
+            cd = followsText(secondEnd + 1, kind);
+        }
+        if (cd && !floppy) {
+            return ConvFormat::Cd;
+        }
+        if (floppy && !cd) {
+            return ConvFormat::Floppy;
+        }
+        return ConvFormat::Unknown;
+    }
+
+private:
+    const uint8_t *data;
+    size_t size;
+
+    // Saute les champs de taille fixe jusqu'au premier texte ; kind = commande qui le porte.
+    bool findFirstText(size_t &text, uint8_t &kind) {
+        size_t pos = 0;
+        while (pos < size) {
+            uint8_t op = data[pos];
+            pos++;
+            switch (op) {
+            case 0x03:
+                // visage (9), image (1), décor (9), x, y (4)
+                text = pos + 23;
+                kind = 0x03;
+                return text < size;
+            case 0x0A:
+                // couleur (1)
+                text = pos + 1;
+                kind = 0x0A;
+                return text < size;
+            case 0x00:
+                // décor (9), puis figurants 01h : nom (9), x, y (4)
+                pos += 9;
+                while (pos < size && data[pos] == 0x01) {
+                    pos += 14;
+                }
+                if (pos < size && data[pos] == 0x02) {
+                    // 02h, nom (9), x, y (4), couleur (1)
+                    text = pos + 15;
+                    kind = 0x02;
+                    return text < size;
+                }
+                if (pos < size && data[pos] == 0x0A) {
+                    text = pos + 2;
+                    kind = 0x0A;
+                    return text < size;
+                }
+                break;
+            case 0x0C:
+            case 0x0E:
+                pos += 2;
+                break;
+            case 0x0F:
+            case 0x10:
+            case 0x12:
+                break;
+            default:
+                return false;
+            }
+        }
+        return false;
+    }
+
+    bool stringEnd(size_t start, size_t &end) {
+        for (size_t i = start; i < size; i++) {
+            if (data[i] == 0) {
+                end = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Identifiant de voix : chaîne vide, ou 1 à 8 lettres ou chiffres.
+    bool looksLikeVoice(size_t start, size_t end) {
+        if (end - start > 8) {
+            return false;
+        }
+        for (size_t i = start; i < end; i++) {
+            uint8_t c = data[i];
+            bool digit = c >= '0' && c <= '9';
+            bool letter = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+            if (!digit && !letter) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static bool isTopLevel(uint8_t op) {
+        switch (op) {
+        case 0x00:
+        case 0x03:
+        case 0x0A:
+        case 0x0C:
+        case 0x0E:
+        case 0x0F:
+        case 0x10:
+        case 0x12:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    // Ce qui doit suivre le texte d'une commande kind, à partir de pos.
+    bool followsText(size_t pos, uint8_t kind) {
+        if (kind == 0x03) {
+            // couleur
+            pos++;
+        }
+        if (pos == size) {
+            return true;
+        }
+        if (pos > size) {
+            return false;
+        }
+        uint8_t next = data[pos];
+        if (isTopLevel(next)) {
+            return true;
+        }
+        if (kind == 0x02) {
+            return next == 0x02;
+        }
+        if (kind == 0x03) {
+            return next == 0x04 || next == 0x0B;
+        }
+        return next == 0x02 || next == 0x04 || next == 0x0B;
+    }
+};
+
+ConvFormat detectConvFormat(const uint8_t *data, size_t size) {
+    ConvFormatDetector detector(data, size);
+    return detector.detect();
+}
+
+// Test du format puis lecture, une seule fois, avec le lecteur du format trouvé.
 ConvFormat parseConvScript(const uint8_t *data, size_t size, ConvParseResult &result) {
-    ConvScriptParser cd(data, size, ConvFormat::Cd);
-    result = cd.parse();
-    if (result.ok) {
-        return ConvFormat::Cd;
+    ConvFormat format = detectConvFormat(data, size);
+    if (format == ConvFormat::Unknown) {
+        result = ConvParseResult();
+        result.error = "format de conversation non reconnu";
+        return format;
     }
-    ConvScriptParser floppy(data, size, ConvFormat::Floppy);
-    ConvParseResult floppyResult = floppy.parse();
-    if (floppyResult.ok) {
-        result = floppyResult;
-        return ConvFormat::Floppy;
-    }
-    return ConvFormat::Unknown;
+    ConvScriptParser parser(data, size, format);
+    result = parser.parse();
+    return format;
 }
 
 int main(int argc, char **argv) {
@@ -352,8 +510,8 @@ int main(int argc, char **argv) {
         }
         ConvParseResult result;
         ConvFormat found = parseConvScript(buffer.data(), n, result);
-        if (found == ConvFormat::Unknown) {
-            std::printf("%s : format inconnu, erreur à %zu : %s\n", argv[i], result.errorOffset, result.error.c_str());
+        if (found == ConvFormat::Unknown || !result.ok) {
+            std::printf("%s : erreur à %zu : %s\n", argv[i], result.errorOffset, result.error.c_str());
             errors++;
         } else if (found != expected) {
             std::printf("%s : mauvais format trouvé\n", argv[i]);

@@ -1029,12 +1029,10 @@ Le résultat est une liste plate d'enregistrements (`ConvRecord`, dans l'ordre d
 partir d'elle, sans relire les octets. La séparation parseur / structure / lecteur est conservée
 et même renforcée : plus aucun `parse_*` ne déplace le curseur pour un autre.
 
-**Le même parseur sert de test de format** : `parseConvScript(data, size, result)` lit le script avec
-`ConvFormat::Cd` ; s'il se lit entièrement, le format est `Cd`, sinon il le relit avec
-`ConvFormat::Floppy` → `Floppy` ; si aucun ne convient → `Unknown`, et `result` garde la position et
-la raison de l'erreur de l'essai CD. Elle renvoie le format et, dans `result`, les enregistrements
-lus dans ce format : un seul appel avant de construire les `ConvFrame`. `ConvFormatProbe` (§ 9.1)
-n'est plus nécessaire.
+**Test du format avant la lecture** : `parseConvScript(data, size, result)` appelle d'abord
+`detectConvFormat` (§ 9.4), puis lit la conversation **une seule fois** avec le lecteur du format
+trouvé. Format `Unknown` → pas de lecture, `result.error` = « format de conversation non reconnu ».
+`ConvFormatProbe` (§ 9.1) n'est plus nécessaire.
 
 **Essai** (`tools/conv_ref/export_scripts.py` puis `conv_parser`) :
 
@@ -1043,12 +1041,52 @@ n'est plus nécessaire.
 | 241 scripts CD | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
 | 241 scripts disquette reconstruits (voix retirées, sauts recalculés) | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
 
-Avec `parseConvScript` (test du format puis parsing) : les 241 scripts CD sont reconnus `Cd`, les 241
-scripts disquette `Floppy`, 2 772 enregistrements chacun ; un script invalide donne `Unknown`.
+Avec `parseConvScript` (test du format puis une seule lecture) : les 241 scripts CD sont reconnus
+`Cd`, les 241 scripts disquette `Floppy`, 2 772 enregistrements chacun.
 
 2 772 = 86 × 00h + 184 × 01h + 70 × 02h + 32 × 0Ah + 1 717 × 03h + 575 × 04h + 26 × 0Bh + 26 × 0Ch +
 28 × 0Eh + 28 × 0Fh, les mêmes comptes que `conv_dump.py` (§ 4).
 
 **Pacific Strike** : un troisième `ConvFormat` se branche à deux endroits seulement, `readText`
 (lecture d'un texte) et, si besoin, les commandes propres à ce jeu dans la boucle de premier niveau.
+
+### 9.4 Test du format : regarder le premier texte (`detectConvFormat`)
+
+Demande de Rémi : tester chaque conversation **avant** de la lire, pour choisir le lecteur CD ou le
+lecteur disquette, sans la lire en entier. Le test (`ConvFormatDetector`, `tools/conv_ref/conv_parser.cpp`)
+ne regarde que le **premier texte** du script.
+
+1. **Aller au premier texte** en sautant les champs de taille fixe : 03h → 23 octets ; 00h → décor
+   (9), chaque 01h (14), puis 02h (15 octets jusqu'au texte) ou 0Ah (couleur) ; 0Ah → couleur ;
+   0Ch, 0Eh → 2 octets ; 0Fh, 10h, 12h → rien. Aucune chaîne à lire avant ce premier texte, donc
+   rien qui dépende du format.
+2. **Hypothèse CD** : la première chaîne a la forme d'un identifiant de voix — **vide, ou 1 à 8
+   lettres ou chiffres** — et, après la deuxième chaîne (le texte), on trouve ce qui doit suivre un
+   texte.
+3. **Hypothèse disquette** : après la première chaîne (le texte), on trouve ce qui doit suivre un
+   texte.
+4. « Ce qui doit suivre un texte » : pour 03h, l'octet couleur puis une commande de premier niveau,
+   04h ou 0Bh ; pour 02h, une commande de premier niveau ou 02h ; pour 0Ah, une commande de premier
+   niveau, 02h, 04h ou 0Bh ; ou la fin du script.
+5. Une seule hypothèse vraie → ce format ; les deux ou aucune → `Unknown`.
+
+**Pourquoi les deux critères.** Constaté sur les données :
+- les identifiants de voix ont 7 caractères au plus, uniquement des lettres et des chiffres
+  (`3gw009`, `Z1ai020`, `4VI170`, `2ai300a`…), et **aucun** des 2 394 textes n'a cette forme ;
+- la vérification des octets seule ne suffit pas : sur 187 des 241 scripts disquette, la lecture
+  « CD » retombe par hasard sur une commande valide (la « deuxième chaîne » part de l'octet
+  couleur) ; c'est la forme de la première chaîne qui tranche ;
+- la forme seule ne suffit pas non plus : le premier texte de 11 scripts CD a une voix **vide**, et
+  un script CD (le seul) n'a que des voix vides ; pour eux, c'est la vérification des octets qui
+  tranche (après la voix vide vient un texte, puis la couleur et une commande) ;
+- chercher des « voix » n'importe où dans les octets bruts (un 0, 1 à 8 lettres ou chiffres, un 0,
+  un caractère imprimable) se trompe : 25 scripts disquette en contiennent par hasard, et le script
+  CD sans voix n'en contient pas.
+
+**Essai** : 241 / 241 scripts CD → `Cd`, 241 / 241 scripts disquette (reconstruits) → `Floppy`, puis
+lecture sans erreur. Le test lit au plus les deux premières chaînes du script et quelques octets.
+
+**Limite** : un script disquette dont le **premier** texte serait un seul mot sans ponctuation, de 8
+lettres ou chiffres au plus, et dont les octets suivants formeraient aussi une suite CD valide,
+donnerait `Unknown` ou `Cd`. Aucun texte de ce genre dans les données.
 
