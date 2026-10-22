@@ -3558,5 +3558,35 @@
     "new_name": "ConvFigure_AdvanceSpeaking_A3E1",
     "segment": "seg014",
     "summary": "far, LUE 2026-10-22. Méthode +1Ch du personnage qui parle : lettre suivante du texte de lèvres ; bouche [+84Ah] = chiffre de la table dseg 15B1h pour la lettre (a à z) + 1, −1 sinon ; puis avance des enfants."
+  },
+  "sub_5A225": {
+    "new_name": "ConvData_LookupByName_5A225",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. Cherche un nom dans CONVDATA.IFF : arg_2 = 0 FACE, 1 FIGR, 2 FCPL, 3 FGPL, 4 PFIG (dword_43F96…43FAA) ; numéro = dernier octet du DATA ; ressource dans convshps.pak (FACE, FIGR) ou convpals.pak (les autres), rangée en [arg_6] (6 + 4 octets)."
+  },
+  "sub_5A451": {
+    "new_name": "ConvData_FindFace_5A451",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 0 = FACE, nom, sortie)."
+  },
+  "sub_5A46F": {
+    "new_name": "ConvData_FindFacePalette_5A46F",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 2 = FCPL, « normal » si arg_6 = 0, « night » sinon, sortie)."
+  },
+  "sub_5A4AA": {
+    "new_name": "ConvData_FindFigure_5A4AA",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 1 = FIGR, nom, sortie) : forme d'une figure de scène de groupe."
+  },
+  "sub_5A4C8": {
+    "new_name": "ConvData_FindFigurePalette_5A4C8",
+    "segment": "ovr191",
+    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 3 = FGPL, « normal », sortie)."
+  },
+  "sub_2DD86": {
+    "new_name": "LayerGroup_PlayFrame_2DD86",
+    "segment": "seg084",
+    "summary": "far, LUE 2026-10-22. Joue une image d'un groupe de calques (conversations) : début = dword_47ABB, durée [+10h] ; si [+12h] ≠ 255, sub_2EC80(word_46F44, [+12h]) ; dessine chaque calque (méthode +10h) à la position du groupe ; recopie la surface de dessin vers [+13h] (UI_ApplyEncodingHelper_2EC65) ; avance (méthode +1Ch) ; attend la fin de la durée."
   }
 }

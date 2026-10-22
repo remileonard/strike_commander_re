@@ -303,7 +303,8 @@ strike_commander_re/
 └── tools/
     ├── exe_paths.py                 chemins par exécutable ; tous les outils ci-dessous
     │                                  prennent --exe optest (défaut strike)
-    ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte
+    ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
+    │                                  conv_scene.py : rendu d'une scène de groupe → PNG
     ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
     ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
     │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md

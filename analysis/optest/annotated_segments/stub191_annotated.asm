@@ -222,7 +222,7 @@ sub_421FE	endp
 ; Attributes: thunk
 
 sub_42203	proc far
-		jmp	sub_5A451
+		jmp	ConvData_FindFace_5A451
 sub_42203	endp
 
 
@@ -231,7 +231,7 @@ sub_42203	endp
 ; Attributes: thunk
 
 sub_42208	proc far
-		jmp	sub_5A46F
+		jmp	ConvData_FindFacePalette_5A46F
 sub_42208	endp
 
 
@@ -240,7 +240,7 @@ sub_42208	endp
 ; Attributes: thunk
 
 sub_4220D	proc far
-		jmp	sub_5A4AA
+		jmp	ConvData_FindFigure_5A4AA
 sub_4220D	endp
 
 
@@ -249,7 +249,7 @@ sub_4220D	endp
 ; Attributes: thunk
 
 sub_42212	proc far
-		jmp	sub_5A4C8
+		jmp	ConvData_FindFigurePalette_5A4C8
 sub_42212	endp
 
 
@@ -258,7 +258,7 @@ sub_42212	endp
 ; Attributes: thunk
 
 sub_42217	proc far
-		jmp	sub_5A225
+		jmp	ConvData_LookupByName_5A225
 sub_42217	endp
 
 

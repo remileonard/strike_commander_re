@@ -149,7 +149,7 @@ sub_4436	endp
 
 ; Attributes: bp-based frame
 
-sub_449C	proc far		; CODE XREF: sub_5A225+1C4P
+sub_449C	proc far		; CODE XREF: ConvData_LookupByName_5A225+1C4P
 					; ConvData_LoadBackground_5A4E6+260P ...
 
 var_B4		= word ptr -0B4h

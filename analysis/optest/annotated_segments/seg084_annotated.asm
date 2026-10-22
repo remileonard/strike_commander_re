@@ -681,7 +681,13 @@ loc_2DD61:				; CODE XREF: seg002:0D39J seg002:0E6DJ ...
 
 ; Attributes: bp-based frame
 
-sub_2DD86	proc far		; CODE XREF: Conv_PlayScript_5AA4E+778P
+; ==============================================================================================
+; far, LUE 2026-10-22. Joue une image d'un groupe de calques (conversations) : début =
+; dword_47ABB, durée [+10h] ; si [+12h] ≠ 255, sub_2EC80(word_46F44, [+12h]) ; dessine chaque
+; calque (méthode +10h) à la position du groupe ; recopie la surface de dessin vers [+13h]
+; (UI_ApplyEncodingHelper_2EC65) ; avance (méthode +1Ch) ; attend la fin de la durée.
+; ==============================================================================================
+LayerGroup_PlayFrame_2DD86	proc far		; CODE XREF: Conv_PlayScript_5AA4E+778P
 					; Conv_PlayScript_5AA4E+7AEP ...
 
 var_6		= dword	ptr -6
@@ -709,7 +715,7 @@ arg_0		= word ptr  6
 		jmp	short loc_2DDD9
 ; ���������������������������������������������������������������������������
 
-loc_2DDC2:				; CODE XREF: sub_2DD86+67j
+loc_2DDC2:				; CODE XREF: LayerGroup_PlayFrame_2DD86+67j
 		push	word ptr [si+0Eh]
 		push	word ptr [si+0Ch]
 		mov	bx, [bp+var_2]
@@ -719,8 +725,8 @@ loc_2DDC2:				; CODE XREF: sub_2DD86+67j
 		call	dword ptr [bx+10h]
 		add	sp, 6
 
-loc_2DDD9:				; CODE XREF: sub_2DD86+28j
-					; sub_2DD86+3Aj
+loc_2DDD9:				; CODE XREF: LayerGroup_PlayFrame_2DD86+28j
+					; LayerGroup_PlayFrame_2DD86+3Aj
 		lea	ax, [bp+var_2]
 		push	ax
 		mov	ax, si
@@ -746,7 +752,7 @@ loc_2DDD9:				; CODE XREF: sub_2DD86+28j
 		pop	si
 		leave
 		retf
-sub_2DD86	endp
+LayerGroup_PlayFrame_2DD86	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

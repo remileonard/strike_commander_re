@@ -971,7 +971,12 @@ Conv_DrawText_59F54	endp
 
 ; Attributes: bp-based frame
 
-sub_5A225	proc far		; CODE XREF: sub_42217J sub_5A451+15p	...
+; ==============================================================================================
+; far, LUE 2026-10-22. Cherche un nom dans CONVDATA.IFF : arg_2 = 0 FACE, 1 FIGR, 2 FCPL, 3
+; FGPL, 4 PFIG (dword_43F96…43FAA) ; numéro = dernier octet du DATA ; ressource dans
+; convshps.pak (FACE, FIGR) ou convpals.pak (les autres), rangée en [arg_6] (6 + 4 octets).
+; ==============================================================================================
+ConvData_LookupByName_5A225	proc far		; CODE XREF: sub_42217J ConvData_FindFace_5A451+15p	...
 
 var_10A		= word ptr -10Ah
 var_AD		= dword	ptr -0ADh
@@ -1034,7 +1039,7 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_5A310
 ; ���������������������������������������������������������������������������
 
-loc_5A2A8:				; CODE XREF: sub_5A225+6Bj
+loc_5A2A8:				; CODE XREF: ConvData_LookupByName_5A225+6Bj
 		cmp	[bp+arg_2], 1
 		jnz	short loc_5A2C4
 		push	0
@@ -1046,7 +1051,7 @@ loc_5A2A8:				; CODE XREF: sub_5A225+6Bj
 		jmp	short loc_5A310
 ; ���������������������������������������������������������������������������
 
-loc_5A2C4:				; CODE XREF: sub_5A225+87j
+loc_5A2C4:				; CODE XREF: ConvData_LookupByName_5A225+87j
 		cmp	[bp+arg_2], 2
 		jnz	short loc_5A2E0
 		push	0
@@ -1058,7 +1063,7 @@ loc_5A2C4:				; CODE XREF: sub_5A225+87j
 		jmp	short loc_5A310
 ; ���������������������������������������������������������������������������
 
-loc_5A2E0:				; CODE XREF: sub_5A225+A3j
+loc_5A2E0:				; CODE XREF: ConvData_LookupByName_5A225+A3j
 		cmp	[bp+arg_2], 3
 		jnz	short loc_5A2FC
 		push	0
@@ -1070,7 +1075,7 @@ loc_5A2E0:				; CODE XREF: sub_5A225+A3j
 		jmp	short loc_5A310
 ; ���������������������������������������������������������������������������
 
-loc_5A2FC:				; CODE XREF: sub_5A225+BFj
+loc_5A2FC:				; CODE XREF: ConvData_LookupByName_5A225+BFj
 		push	0
 		push	large [dword_43FAA]
 		lea	ax, [bp+var_10A]
@@ -1078,13 +1083,13 @@ loc_5A2FC:				; CODE XREF: sub_5A225+BFj
 		call	ResourceRecord_SeekAndReadB_3C022
 		add	sp, 8
 
-loc_5A310:				; CODE XREF: sub_5A225+81j
-					; sub_5A225+9Dj ...
+loc_5A310:				; CODE XREF: ConvData_LookupByName_5A225+81j
+					; ConvData_LookupByName_5A225+9Dj ...
 		mov	[bp+var_1], 0
 		jmp	short loc_5A34C
 ; ���������������������������������������������������������������������������
 
-loc_5A316:				; CODE XREF: sub_5A225+13Dj
+loc_5A316:				; CODE XREF: ConvData_LookupByName_5A225+13Dj
 		lea	ax, [bp+var_10A]
 		push	ax
 		lea	ax, [bp+var_12]
@@ -1104,12 +1109,12 @@ loc_5A316:				; CODE XREF: sub_5A225+13Dj
 		jmp	short loc_5A34C
 ; ���������������������������������������������������������������������������
 
-loc_5A342:				; CODE XREF: sub_5A225+113j
+loc_5A342:				; CODE XREF: ConvData_LookupByName_5A225+113j
 		mov	eax, [bp+var_94]
 		mov	[bp+var_A5], eax
 
-loc_5A34C:				; CODE XREF: sub_5A225+EFj
-					; sub_5A225+11Bj
+loc_5A34C:				; CODE XREF: ConvData_LookupByName_5A225+EFj
+					; ConvData_LookupByName_5A225+11Bj
 		push	1
 		push	large [dword_43FAF]
 		lea	ax, [bp+var_10A]
@@ -1119,7 +1124,7 @@ loc_5A34C:				; CODE XREF: sub_5A225+EFj
 		or	ax, ax
 		jnz	short loc_5A316
 
-loc_5A364:				; CODE XREF: sub_5A225+119j
+loc_5A364:				; CODE XREF: ConvData_LookupByName_5A225+119j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		or	ax, ax
@@ -1131,7 +1136,7 @@ loc_5A364:				; CODE XREF: sub_5A225+119j
 		call	sub_310B
 		add	sp, 4
 
-loc_5A37E:				; CODE XREF: sub_5A225+146j
+loc_5A37E:				; CODE XREF: ConvData_LookupByName_5A225+146j
 		lea	ax, [bp+var_10A]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -1146,7 +1151,7 @@ loc_5A37E:				; CODE XREF: sub_5A225+146j
 		cmp	[bp+arg_2], 1
 		jnz	short loc_5A3C1
 
-loc_5A3A7:				; CODE XREF: sub_5A225+17Aj
+loc_5A3A7:				; CODE XREF: ConvData_LookupByName_5A225+17Aj
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1160,7 +1165,7 @@ loc_5A3A7:				; CODE XREF: sub_5A225+17Aj
 		jmp	short loc_5A3D9
 ; ���������������������������������������������������������������������������
 
-loc_5A3C1:				; CODE XREF: sub_5A225+180j
+loc_5A3C1:				; CODE XREF: ConvData_LookupByName_5A225+180j
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1172,7 +1177,7 @@ loc_5A3C1:				; CODE XREF: sub_5A225+180j
 		call	Path_Build_C82C
 		add	sp, 0Eh
 
-loc_5A3D9:				; CODE XREF: sub_5A225+19Aj
+loc_5A3D9:				; CODE XREF: ConvData_LookupByName_5A225+19Aj
 		mov	al, [bp+var_2]
 		mov	ah, 0
 		push	ax
@@ -1213,14 +1218,17 @@ loc_5A3D9:				; CODE XREF: sub_5A225+19Aj
 		pop	si
 		leave
 		retf
-sub_5A225	endp
+ConvData_LookupByName_5A225	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_5A451	proc far		; CODE XREF: sub_42203J Conv_PlayScript_5AA4E+AE4p
+; ==============================================================================================
+; far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 0 = FACE, nom, sortie).
+; ==============================================================================================
+ConvData_FindFace_5A451	proc far		; CODE XREF: sub_42203J Conv_PlayScript_5AA4E+AE4p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1238,19 +1246,23 @@ arg_6		= byte ptr  0Ch
 		push	0
 		push	si
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-sub_5A451	endp
+ConvData_FindFace_5A451	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_5A46F	proc far		; CODE XREF: sub_42208J Conv_PlayScript_5AA4E+B0Cp
+; ==============================================================================================
+; far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 2 = FCPL, « normal » si arg_6 = 0, «
+; night » sinon, sortie).
+; ==============================================================================================
+ConvData_FindFacePalette_5A46F	proc far		; CODE XREF: sub_42208J Conv_PlayScript_5AA4E+B0Cp
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1272,12 +1284,12 @@ arg_6		= byte ptr  0Ch
 		push	2
 		push	si
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 		jmp	short loc_5A4A6
 ; ���������������������������������������������������������������������������
 
-loc_5A494:				; CODE XREF: sub_5A46F+Fj
+loc_5A494:				; CODE XREF: ConvData_FindFacePalette_5A46F+Fj
 		mov	al, [bp+arg_4]
 		push	ax
 		push	di
@@ -1285,22 +1297,26 @@ loc_5A494:				; CODE XREF: sub_5A46F+Fj
 		push	2
 		push	si
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 
-loc_5A4A6:				; CODE XREF: sub_5A46F+23j
+loc_5A4A6:				; CODE XREF: ConvData_FindFacePalette_5A46F+23j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_5A46F	endp
+ConvData_FindFacePalette_5A46F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_5A4AA	proc far		; CODE XREF: sub_4220DJ Conv_PlayScript_5AA4E+288p ...
+; ==============================================================================================
+; far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 1 = FIGR, nom, sortie) : forme d'une
+; figure de scène de groupe.
+; ==============================================================================================
+ConvData_FindFigure_5A4AA	proc far		; CODE XREF: sub_4220DJ Conv_PlayScript_5AA4E+288p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1318,19 +1334,22 @@ arg_6		= byte ptr  0Ch
 		push	1
 		push	si
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-sub_5A4AA	endp
+ConvData_FindFigure_5A4AA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_5A4C8	proc far		; CODE XREF: sub_42212J Conv_PlayScript_5AA4E+19Bp ...
+; ==============================================================================================
+; far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 3 = FGPL, « normal », sortie).
+; ==============================================================================================
+ConvData_FindFigurePalette_5A4C8	proc far		; CODE XREF: sub_42212J Conv_PlayScript_5AA4E+19Bp ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1347,12 +1366,12 @@ arg_4		= byte ptr  0Ah
 		push	3
 		push	si
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 		pop	si
 		pop	bp
 		retf
-sub_5A4C8	endp
+ConvData_FindFigurePalette_5A4C8	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2262,7 +2281,7 @@ loc_5ABBF:				; CODE XREF: Conv_PlayScript_5AA4E+126j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_5A4C8
+		call	near ptr ConvData_FindFigurePalette_5A4C8
 		add	sp, 6
 		mov	word ptr [bp+var_6A+1],	0
 		lea	ax, [bp+var_66]
@@ -2347,7 +2366,7 @@ loc_5AC86:				; CODE XREF: Conv_PlayScript_5AA4E+377j
 		push	si
 		push	di
 		push	cs
-		call	near ptr sub_5A4AA
+		call	near ptr ConvData_FindFigure_5A4AA
 		add	sp, 8
 		mov	al, byte ptr [bp+var_5E+1]
 		push	ax
@@ -2385,7 +2404,7 @@ loc_5AD1D:				; CODE XREF: Conv_PlayScript_5AA4E+2CAj
 		push	4
 		push	di
 		push	cs
-		call	near ptr sub_5A225
+		call	near ptr ConvData_LookupByName_5A225
 		add	sp, 0Ah
 		mov	word ptr [bp-6Dh], 0
 		lea	ax, [bp+var_6A]
@@ -2493,7 +2512,7 @@ loc_5ADF2:				; CODE XREF: Conv_PlayScript_5AA4E+39Fj
 		push	word ptr [bp+var_5E]
 		push	di
 		push	cs
-		call	near ptr sub_5A4AA
+		call	near ptr ConvData_FindFigure_5A4AA
 		add	sp, 8
 		push	[bp+var_220]
 		push	[bp+var_222]
@@ -2552,7 +2571,7 @@ loc_5AEC7:				; CODE XREF: Conv_PlayScript_5AA4E+474j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_5A4C8
+		call	near ptr ConvData_FindFigurePalette_5A4C8
 		add	sp, 6
 		mov	word ptr [bp+var_6E+3],	0
 		lea	ax, [bp+var_6A+2]
@@ -2840,7 +2859,7 @@ loc_5B1B6:				; CODE XREF: Conv_PlayScript_5AA4E+798j
 loc_5B1C1:				; CODE XREF: Conv_PlayScript_5AA4E+76Fj
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B1CE:				; CODE XREF: Conv_PlayScript_5AA4E+766j
@@ -2873,7 +2892,7 @@ loc_5B1EC:				; CODE XREF: Conv_PlayScript_5AA4E+7C8j
 loc_5B1F7:				; CODE XREF: Conv_PlayScript_5AA4E+7A5j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B204:				; CODE XREF: Conv_PlayScript_5AA4E:loc_5B1EAj
@@ -2963,7 +2982,7 @@ loc_5B287:				; CODE XREF: Conv_PlayScript_5AA4E+863j
 loc_5B292:				; CODE XREF: Conv_PlayScript_5AA4E+840j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B29F:				; CODE XREF: Conv_PlayScript_5AA4E+837j
@@ -3220,7 +3239,7 @@ loc_5B4FE:				; CODE XREF: Conv_PlayScript_5AA4E+A65j
 		push	[bp+var_5A]
 		push	di
 		push	cs
-		call	near ptr sub_5A451
+		call	near ptr ConvData_FindFace_5A451
 		add	sp, 8
 		mov	[bp+var_6E], 0
 		mov	byte ptr [bp+var_6A], 2
@@ -3232,7 +3251,7 @@ loc_5B4FE:				; CODE XREF: Conv_PlayScript_5AA4E+A65j
 		push	ax
 		push	di
 		push	cs
-		call	near ptr sub_5A46F
+		call	near ptr ConvData_FindFacePalette_5A46F
 		add	sp, 8
 		push	word ptr [bp+var_14C]
 		push	[bp+var_14E]
@@ -3403,7 +3422,7 @@ loc_5B6FA:				; CODE XREF: Conv_PlayScript_5AA4E+CD6j
 loc_5B705:				; CODE XREF: Conv_PlayScript_5AA4E+CB3j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B712:				; CODE XREF: Conv_PlayScript_5AA4E+CAAj
@@ -3516,7 +3535,7 @@ loc_5B7EE:				; CODE XREF: Conv_PlayScript_5AA4E+DCCj
 loc_5B7FE:				; CODE XREF: Conv_PlayScript_5AA4E+DA7j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B80B:				; CODE XREF: Conv_PlayScript_5AA4E+D9Ej
@@ -3558,7 +3577,7 @@ loc_5B847:				; CODE XREF: Conv_PlayScript_5AA4E+E27j
 loc_5B854:				; CODE XREF: Conv_PlayScript_5AA4E+E00j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B861:				; CODE XREF: Conv_PlayScript_5AA4E+DF7j
@@ -3647,7 +3666,7 @@ loc_5B907:				; CODE XREF: Conv_PlayScript_5AA4E+EE5j
 loc_5B917:				; CODE XREF: Conv_PlayScript_5AA4E+EC0j
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B924:				; CODE XREF: Conv_PlayScript_5AA4E+EB7j
@@ -3680,7 +3699,7 @@ loc_5B946:				; CODE XREF: Conv_PlayScript_5AA4E+F24j
 loc_5B953:				; CODE XREF: Conv_PlayScript_5AA4E+EFFj
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 
 loc_5B960:				; CODE XREF: Conv_PlayScript_5AA4E+EF6j
@@ -3803,7 +3822,7 @@ loc_5B9BD:				; CODE XREF: Conv_PlayScript_5AA4E+F6Aj
 		add	sp, 4
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 		push	0
 		mov	ax, di
@@ -5042,7 +5061,7 @@ loc_5C5F3:				; CODE XREF: Conv_PlayScript_5AA4E+1B52j
 		add	sp, 8
 		lea	ax, [bp+var_124]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 		mov	ax, di
 		add	ax, 1Ah

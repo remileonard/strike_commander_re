@@ -36,6 +36,12 @@ class Script:
         self.p += 2
         return v
 
+    def sword(self):
+        # Position signée (calques : Layer_Construct_2DF9B, TalkingHead_Construct_98F4).
+        v = struct.unpack_from('<h', self.b, self.p)[0]
+        self.p += 2
+        return v
+
     def name(self):
         # Nom de 9 octets, complété par des 0 (ConvRec_ReadName_6305).
         s = self.b[self.p:self.p + 9].split(b'\0')[0].decode('latin-1')
@@ -69,11 +75,11 @@ def parse(data, voice=True):
             while s.peek() == 0x01:
                 at = s.p
                 s.byte()
-                out.append((at, '01 figurant', {'figure': s.name(), 'x': s.word(), 'y': s.word()}))
+                out.append((at, '01 figurant', {'figure': s.name(), 'x': s.sword(), 'y': s.sword()}))
             while s.peek() in (0x02, 0x0A):
                 at = s.p
                 if s.byte() == 0x02:
-                    rec = {'figure': s.name(), 'x': s.word(), 'y': s.word(), 'couleur': s.byte()}
+                    rec = {'figure': s.name(), 'x': s.sword(), 'y': s.sword(), 'couleur': s.byte()}
                     rec['voix'], rec['texte'] = s.text()
                     out.append((at, '02 parle', rec))
                 else:
@@ -81,7 +87,7 @@ def parse(data, voice=True):
                     rec['voix'], rec['texte'] = s.text()
                     out.append((at, '0A narration', rec))
         elif op == 0x03:
-            rec = {'visage': s.name(), 'image': s.byte(), 'décor': s.name(), 'x': s.word(), 'y': s.word()}
+            rec = {'visage': s.name(), 'image': s.byte(), 'décor': s.name(), 'x': s.sword(), 'y': s.sword()}
             rec['voix'], rec['texte'] = s.text()
             rec['couleur'] = s.byte()
             out.append((at, '03 réplique', rec))

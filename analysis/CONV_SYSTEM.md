@@ -87,6 +87,58 @@ attend la fin de son texte de lèvres (`TalkingHead_IsLipTextDone_A0D5`), une 0A
   chiffre de « 04302500000340143000353000 » pour les lettres a à z (dseg 15B1h) + 1, aucune hors des
   minuscules (ConvFigure_AdvanceSpeaking_A3E1).
 
+### Scène de groupe : placement des figures (relu le 2026-10-22)
+
+**Où l'on dessine.** Comme les cinématiques : `Conv_Init_59A20` réserve une image hors écran de
+320 × 200 (`[conv + 1Ah]`, rectangle (0, 0)-(319, 199)), que la commande 00h met en surface de
+dessin ; la scène (`LayerGroup_Construct_2DC66(scène, 10, 0, conv + 0Ch)`) recopie à l'écran
+(`[conv + 0Ch]`, rectangle (0, 24)-(319, 151)) à chaque image (`LayerGroup_PlayFrame_2DD86`).
+Donc : **x, y des figures sont dans l'image hors écran ; sa ligne 0 arrive à la ligne 24 de
+l'écran ; seules les lignes 0 à 127 sont visibles** (la bande du bas, lignes 152 à 199, reçoit
+les textes). La scène tourne à **10 images par seconde** ; « palette » 0 : l'image hors écran est
+remise à la couleur 0 avant chaque image.
+
+**Position.** Le calque est en (x, y) ; l'image y est dessinée avec ses propres décalages (les x, y
+de ses lignes), comme tout calque. x et y sont des mots **signés** (`airwing1` en (0, −20)).
+Les figures des écrans d'équipiers (`red1`, `billy2`, `gwen2`, `lyle2`, `miguel2`, `tex3`) ont
+leurs coordonnées d'écran dans l'image et sont posées en (0, 0).
+
+**Images d'une figure** (`FIGR` → `CONVSHPS.PAK`, relevé sur les données) :
+- 7 images (`air1`, `janet1`, `tex1`, `stern1`, `miguel1`, `gwen1`, `lyle1`, `billy1`, `airwing1`) :
+  image 0 = corps, images 1 à 6 = petites zones à la hauteur de la tête (bouches) ;
+- 1 image (`air2`, `air3`, `tex2`, `stern2`, `virgil1`, `walt1`, `men1`, `tweedly1`, `red1`) ;
+- 2 images (`billy2`, `gwen2`, `lyle2`, `miguel2`, `tex3`, écrans d'équipiers).
+
+**Recherche par nom** (`ConvData_LookupByName_5A225`, nom → dernier octet du `DATA`) :
+`FACE` et `FIGR` donnent une entrée de `CONVSHPS.PAK` ; `FCPL`, `FGPL`, `PFIG` une entrée de
+`CONVPALS.PAK`.
+
+**Ordre de dessin** : éléments du décor dans l'ordre du `BACK`, puis les 01h, puis les 02h, dans
+l'ordre du script (`LayerGroup_Add_2DB84` ajoute en fin de liste). Les 02h sont toutes à l'écran dès
+le début de la scène ; seules leurs lèvres bougent pendant leur réplique.
+
+**Palette** (une seule pour toute la scène, 256 couleurs, composée dans cet ordre) :
+1. la palette de chaque élément du décor ;
+2. `FGPL` « normal » (`CONVPALS` 48) ;
+3. la palette `PFIG` du **premier figurant (01h) seulement** ; sans figurant, rien de plus.
+`PFIG` vaut 48 pour la plupart, 51 pour les figures des écrans d'équipiers : sur `s_wing`,
+`air2` (48 dans `PFIG`) est dessiné avec la palette 51 de `red1`, premier figurant.
+La palette n'est envoyée à la carte que si le décor diffère du précédent (`CRT_Strncmp_Like` sur le
+nom gardé en `var_A`).
+
+**Dessin d'une figure** :
+- figurant (01h) : image 0 ; si la forme a plus d'une image et que le dernier caractère du nom
+  est au-delà de « 3 », aussi une image qui boucle de 1 à n − 1 (aucun nom des données) ;
+- personnage qui parle (02h) : image 0 puis la bouche (images 1 à 6) au même point ; bouche =
+  chiffre de la table de lèvres pour la lettre courante + 1, aucune hors des minuscules.
+
+**Durées** : une 02h dure le temps de son texte, une lettre par image (10 par seconde), sans attente
+après ; une 0Ah dure 40 images. Une touche passe à la réplique suivante.
+
+Contrôle : `tools/conv_scene.py --donnees <BIGTRE.TRE> <entrée> <n° de scène> <sortie.png>` compose
+une scène de groupe selon ces règles (images 0 seulement) ; hangar (entrée 12), briefing
+(`s_brief`, entrée 59) et équipiers (`s_wing`) sortent juste.
+
 ### 0Eh / 0Fh — escadre et équipiers
 
 - **0Eh** (`ConvRec_ReadWing_66E0`) : cherche dans `GAMEFLOW.IFF`, `FORM WNGS`, la `FORM WING`

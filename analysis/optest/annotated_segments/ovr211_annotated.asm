@@ -1262,7 +1262,7 @@ loc_BEA5D:				; CODE XREF: sub_BDE10+BD4j
 loc_BEA6F:				; CODE XREF: sub_BDE10+C59j
 		lea	ax, [bp+var_EA]
 		push	ax
-		call	sub_2DD86
+		call	LayerGroup_PlayFrame_2DD86
 		add	sp, 2
 		cmp	[bp+var_35], 0
 		jnz	short loc_BEA85
