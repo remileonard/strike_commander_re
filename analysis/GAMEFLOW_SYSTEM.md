@@ -76,21 +76,113 @@ sprite est exécuté.
 
 ## 4. Visibilité des sprites (`REQU`, `Gameflow_CheckSpriteRequirements_3604`)
 
-Les drapeaux sont les octets `[partie+0FDh + n]` (posés par 06h, effacés par 07h). Le sprite est
-visible au départ ; chaque paire (condition, n) :
+Relu le 2026-10-22, dans la version disquette et dans la version CD (code identique, 05C4Bh dans
+l'OPTTEST.EXE du CD).
 
-| Condition | Effet | Dans les données |
+### 4.1 Quand et avec quel effet
+
+- `REQU` est évalué **à la construction de la scène** (`Gameflow_BuildScene_4A60B`, seul appel),
+  c'est-à-dire quand la commande 01h a posé `[+0E3h]` (et au début de chaque mission).
+- Un sprite dont les conditions échouent **n'est pas ajouté à la scène** (`sub_34F6` n'est pas
+  appelé) : ni dessiné, ni cliquable. Un sprite sans `REQU` est toujours ajouté.
+- Les drapeaux sont les octets `[partie+0FDh + n]`, posés par 06h, effacés par 07h. Un drapeau
+  changé par le script d'un sprite ne change la visibilité qu'à la reconstruction suivante.
+
+### 4.2 Les conditions
+
+`REQU` = suite de paires (condition, n). Deux variables : `visible` (vrai au départ) et
+`ignorer` (faux au départ).
+
+| Condition | Effet | Données |
 |---|---|---|
-| 0 | caché si le drapeau n est posé | 276 |
-| 1 | caché si le drapeau n n'est pas posé | 158 |
-| 2 | si le drapeau n n'est **pas** posé, la condition suivante est ignorée | 14 |
-| 3 | si le drapeau n est posé, la condition suivante est ignorée | 11 |
-| autre | ignorée | 1 (valeur 9) |
+| 0 | si le drapeau n est posé et que `ignorer` est faux → `visible` = faux ; puis `ignorer` = faux | 276 |
+| 1 | si le drapeau n n'est pas posé et que `ignorer` est faux → `visible` = faux ; puis `ignorer` = faux | 158 |
+| 2 | si le drapeau n n'est **pas** posé → `ignorer` = vrai (sinon inchangé) | 14 |
+| 3 | si le drapeau n est posé → `ignorer` = vrai (sinon inchangé) | 11 |
+| autre | rien | 1 (valeur 9) |
 
-L'évaluation est faite à la construction de la scène (`Gameflow_BuildScene_4A60B`), c'est-à-dire
-quand `[+0E3h]` est posé (commande 01h). Exemple des données : sprite 3 de la scène 11, `EFCT` =
-conversation 12 puis drapeau 102 posé, `REQU` = (0, 102) : le sprite disparaît une fois la
-conversation vue, à la reconstruction suivante de la scène.
+En logique : toutes les conditions 0 / 1 sont liées par **ET** ; une condition 2 ou 3 ajoute un
+**OU** à la condition 0 / 1 qui la suit :
+
+- `(0, n)` = drapeau n non posé ; `(1, n)` = drapeau n posé ;
+- `(2, a), X` = drapeau a non posé **ou** X ; `(3, a), X` = drapeau a posé **ou** X ;
+- plusieurs 2 / 3 de suite s'additionnent : `(2, a), (2, b), X` = a non posé **ou** b non posé
+  **ou** X ;
+- seules les conditions 0 et 1 remettent `ignorer` à faux ; une condition 2 / 3 fausse ne l'efface
+  pas ;
+- une condition 2 / 3 en **dernière** position (ou suivie seulement de valeurs inconnues) n'a aucun
+  effet.
+
+### 4.3 Exemples des données
+
+| Sprite | `REQU` | Visible si |
+|---|---|---|
+| mission 0, scène 11, sprite 3 | (0, 102) | drapeau 102 non posé ; son script pose 102 : il disparaît après la conversation 12 |
+| mission 9, scène 1, sprite 8 | (3, 3) (1, 4) (0, 42) | (3 posé ou 4 posé) et 42 non posé |
+| mission 9, scène 6, sprite 0 | (2, 42) (2, 43) (0, 44) | 42, 43 ou 44 non posé (caché quand les trois sont posés) |
+| mission 12, scène 20, sprite 18 | (1, 42) (2, 43) (0, 44) | 42 posé et (43 non posé ou 44 non posé) |
+| mission 23, scène 20, sprite 12 | (2, 201) (2, 202) (9, 203) | **toujours** : 9 est ignoré, les deux 2 n'ont plus de condition à faire ignorer |
+
+Formes des 215 `REQU` des données (suite des conditions) : `0` × 59, `1` × 26, `1 0` × 24,
+`0 0` × 17, `0 1` × 13, `1 1 1` × 9, `0 0 0 0 0` × 7, `3 1 0` × 6, … ; 2 ou 3 apparaissent dans
+22 d'entre elles.
+
+### 4.4 Code de référence
+
+Fichier `tools/gameflow_ref/requ.cpp` (compilé, style du dépôt, avec un essai sur le sprite 8 de
+la mission 9) :
+
+```cpp
+// Visibilité d'un sprite d'après son chunk REQU (Gameflow_CheckSpriteRequirements_3604).
+// requ : paires (condition, numéro de drapeau) ; flags : drapeaux de la partie (06h / 07h).
+bool spriteIsVisible(const uint8_t *requ, size_t size, const bool *flags) {
+    bool visible = true;
+    bool skipNext = false;
+    for (size_t i = 0; i + 1 < size; i += 2) {
+        uint8_t condition = requ[i];
+        bool flag = flags[requ[i + 1]];
+        switch (condition) {
+        case 0:
+            // caché si le drapeau est posé, sauf si la condition est ignorée
+            if (flag && !skipNext) {
+                visible = false;
+            }
+            skipNext = false;
+            break;
+        case 1:
+            // caché si le drapeau n'est pas posé, sauf si la condition est ignorée
+            if (!flag && !skipNext) {
+                visible = false;
+            }
+            skipNext = false;
+            break;
+        case 2:
+            // drapeau non posé : la prochaine condition 0 ou 1 est ignorée
+            if (!flag) {
+                skipNext = true;
+            }
+            break;
+        case 3:
+            // drapeau posé : la prochaine condition 0 ou 1 est ignorée
+            if (flag) {
+                skipNext = true;
+            }
+            break;
+        default:
+            // valeur inconnue : ignorée
+            break;
+        }
+    }
+    return visible;
+}
+```
+
+**libRealSpace** : la visibilité est testée par `SCZone::isActive(&GameState.requierd_flags)`
+(code non fourni, à comparer avec cette fonction : rôle de 2 / 3 comme « ou », valeur 9 ignorée,
+évaluation seulement à la construction de la scène). `SCGameFlow::playEndMission` décide aussi de
+passer à la mission suivante d'après `REQU` (sprite sans `REQU`, ou avec une condition 1). Dans le
+jeu, le passage à la mission suivante est fait par les commandes 0Dh puis 0Fh du script (§ 5.2) ;
+aucun lien entre `REQU` et ce passage n'a été vu dans le code lu.
 
 ## 5. Interpréteur des scripts (`Gameflow_RunScriptPairs_36CF`)
 

@@ -314,6 +314,7 @@ strike_commander_re/
     ├── conv_ref/                    conversations, code de référence : parseur C++ (boucle de premier niveau,
     │                                  sous-parseurs, erreurs), test de format, lèvres et clignement, rejeu de la
     │                                  détection de libRealSpace, export des deux formats — README.md, CONV_SYSTEM § 9
+    ├── gameflow_ref/                déroulement, code de référence : visibilité des sprites (REQU) — GAMEFLOW_SYSTEM.md § 4
     ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
     ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
     │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md
