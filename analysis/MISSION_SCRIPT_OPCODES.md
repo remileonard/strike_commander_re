@@ -1123,3 +1123,66 @@ GRND en route (`GroundObj_Update_45883`, état 0xA5), **par frame, sans dt** : v
 jusqu'à 12,5 m/s (`GroundObj_AccelerateToCruise_45675`), cap tourné de 1° vers le point
 (`GroundObj_SteerTowardPoint_454A6`). Tout autre état : −0,25 m/s par frame jusqu'à l'arrêt
 (`GroundObj_Decelerate_45797`). Le déplacement suit la pente du sol (`GroundObj_IntegrateMotion_458C8`).
+
+## Instructions de base du bytecode PROG (lu 2026-10-22)
+
+Lu dans `Expr_VM_Interpreter_51106` (seg114), cas par cas. Outil : `tools/mission_prog.py`
+(désassemble un fichier de mission, `--stat` retrouve l'origine des variables de résultat).
+
+**Encodage** (`Expr_VM_ReadNextToken_50F85`) : un octet d'opcode, un octet d'argument n ; si
+l'octet suivant vaut 09h, il est sauté et l'octet d'après est un 2ᵉ argument. Un programme se
+termine par 00h (le n-ième programme du bloc = celui qui suit le n-ième 00h,
+`ProgBuffer_FindSubProgramByIndex_50E94`).
+
+**État d'une exécution** : `acc` (`[instr+0Ch]`), le résultat du dernier ordre natif (`[+0Eh]`),
+les drapeaux de comparaison (`[+16h]` : 1 = inférieur, 2 = égal, 4 = supérieur).
+**FLAG[n]** = mots du chunk `FLAG` de la mission (nombre `mission+48h`, tableau `mission+4Ah`) ;
+lecture hors bornes = 0, écriture hors bornes ignorée. **STAT[n]** = 8 mots à `mission+0A1h`
+(n < 8), écrits dans `misn2op.iff` (`Mission_WriteResultReport_A8F22`, GAMEFLOW_SYSTEM.md § 6).
+
+| Op | Effet | Op | Effet |
+|---|---|---|---|
+| 00h, 01h | retour (fin du programme ou retour d'appel) | 30h | acc /= n |
+| 02h | appel du programme n | 31h | acc /= FLAG[n] |
+| 03h | appel du programme acc | 40h | comparer acc à n |
+| 04h | arrêt du script | 41h | comparer n à acc |
+| 08h | étiquette n (cible des sauts) | 42h | comparer acc à FLAG[n] |
+| 0Fh | code de sortie de la mission = n (`byte_706AF`) | 43h | comparer FLAG[n] à acc |
+| 10h | acc = n | 44h | comparer le résultat natif à n |
+| 11h | acc = FLAG[n] | 45h | comparer FLAG[n] à 1 |
+| 12h | échange acc et FLAG[n] | 46h / 47h | aller à l'étiquette n si le résultat natif ≠ 0 / = 0 |
+| 13h | acc = résultat natif | 48h / 49h | aller à n si égal / différent |
+| 14h | STAT[n] = acc | 4Ah / 4Bh | aller à n si inférieur / supérieur |
+| 15h | acc = hasard 0..n (`CRT_Rand`) | 4Ch / 4Dh | aller à n si inférieur ou égal / supérieur ou égal |
+| 20h | acc += n | 4Eh | aller à n |
+| 21h | acc += FLAG[n] | 4Fh | aller à l'étiquette acc |
+| 22h | FLAG[n] += n | 50h | FLAG[n] = acc |
+| 23h | FLAG[n] += acc | 51h | FLAG[n] = résultat natif |
+| 24h | acc −= n | 52h / 53h | FLAG[n] = 1 / 0 |
+| 25h | acc −= FLAG[n] | 54h | FLAG[n] ^= 1 |
+| 26h | FLAG[n] −= n | 55h / 56h | FLAG[n] += 1 / −= 1 |
+| 27h | FLAG[n] −= acc | 80h–98h | objets de mission (lus en partie : 90h, 91h, plus haut) |
+| 28h / 29h | acc \|= n / FLAG[n] | A0h–C0h | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
+| 2Ah / 2Bh | acc &= n / FLAG[n] | D0h | (non lu ici) |
+| 2Ch / 2Dh | acc ^= n / FLAG[n] | | |
+| 2Eh / 2Fh | acc *= n / FLAG[n] | | |
+
+- Les sauts cherchent l'étiquette **en avant** depuis l'instruction courante
+  (`Expr_VM_FindCaseToken_50FDB`).
+- 22h et 26h ajoutent / retirent **l'argument lui-même** (`add ax, [di+8]` après la lecture de
+  FLAG[n]) ; 23h et 27h utilisent acc.
+- Les opcodes absents de la table de sauts (05h–07h, 09h–0Eh, 16h–1Fh, 32h–3Fh, 57h–7Fh…) ne font
+  rien. 33h, 35h, 38h, 69h et 75h apparaissent pourtant dans des fichiers de mission (moins de
+  7 fois chacun).
+- Les instructions qui écrivent FLAG sont 12h, 22h, 23h, 26h, 27h et 50h à 56h. Le chargeur de
+  mission remplit le tableau depuis le chunk `FLAG` (`MissionScenario_LoadMainRecord_A8331`). Je
+  n'ai pas trouvé d'autre écriture dans ce tableau (recherche : accès à `+48h` / `+4Ah` après une
+  lecture de `word_706A0`, dans tous les segments annotés).
+- ABh (« message radio n ») passe n à la méthode +0x88 de l'objet (`Goal_SetObjective_A307` →
+  `Radio_PlayMessage_CB45` pour un avion IA). Il n'écrit pas FLAG.
+
+**Exemple, MISN-9A** : chaque ABRAMS-G détruit ajoute 2 à FLAG[4] (programme 11), chaque ZSU-23
+ajoute 1 (programme 12) ; les deux appellent le programme 2, qui fait FLAG[3] += 1 une fois FLAG[4]
+≥ 4. Le programme 4 (mise à jour de la scène 0) recopie le tout dans les variables de résultat :
+STAT[0] = FLAG[2] (le BRIGC10 détruit), STAT[1] = (20 + FLAG[4]) × FLAG[2] × 100, STAT[2] =
+FLAG[3], STAT[7] = FLAG[6].

@@ -335,6 +335,46 @@ Le code de sortie décide de la suite dans `Gameflow_MainLoop_3D2E` :
 
 Le sens exact des codes 1, 3, 4 et 5 côté STRIKE.EXE n'est pas établi ici.
 
+### 6.1 Ce que les missions mettent dans `STAT` (lu le 2026-10-22)
+
+Les 8 valeurs sont écrites par le script `PROG` de chaque fichier de mission (opcode 14h ; bytecode :
+MISSION_SCRIPT_OPCODES.md, « Instructions de base du bytecode PROG »), presque toujours dans le
+programme de **mise à jour de la scène 0**, qui recopie des drapeaux `FLAG` de la mission. Outil :
+`python3 tools/mission_prog.py --stat <DATA>/MISSIONS/MISN-*.IFF`.
+
+- **1ʳᵉ valeur (succès)** et **2ᵉ (gain)** : écrites par les 46 fichiers `MISN-*.IFF` ; le gain
+  est un calcul propre à chaque mission (ex. MISN-10A : (15 + FLAG[0] − 9 + FLAG[1]) × FLAG[4] ×
+  100, où FLAG[4] est le succès).
+- **3ᵉ valeur** : écrite par 8 missions seulement ; les autres la laissent à 0.
+
+| Mission | 3ᵉ valeur = | Ce qui pose ce drapeau |
+|---|---|---|
+| MISN-4C | FLAG[5] | +1 à la destruction du LEARJET (objet 11, programme 7) |
+| MISN-6A | FLAG[9] | = 1 à la destruction de l'AWACS (objet 14, programme 18) |
+| MISN-8A | FLAG[2] | +1 à la destruction de l'AWACS (objet 21, programme 15) |
+| MISN-9AA | FLAG[1] | = 1 à la destruction du BRIGC10 (objet 0, programme 14) |
+| MISN-9A | FLAG[3] | +1 à chaque ABRAMS-G ou ZSU-23 détruit, une fois le compteur FLAG[4] ≥ 4 (ABRAMS-G = 2, ZSU-23 = 1 ; programmes 11, 12 → 2) |
+| MISN-10A | FLAG[2] | **aucune instruction du script ne l'écrit** (lu aussi par le programme 6 : s'il vaut 1, les objets 5 à 8 ne sont pas activés) |
+| MISN-12B | FLAG[1] | = 1 à la destruction de RWYEXT18 (objet 0, camp 1, programme 9) ; aussi recopié dans la 8ᵉ valeur |
+| MISN-15A | FLAG[4] | = 1 quand le joueur quitte la scène 0 (programme 13, qui donne aussi le code de sortie 1) |
+
+Le tableau FLAG part des valeurs du chunk `FLAG` (toutes à 0 dans MISN-10A). Je n'ai pas trouvé
+dans STRIKE.EXE d'autre écriture dans ce tableau que les instructions du script : avec ces données,
+la 3ᵉ valeur de MISN-10A reste à 0 (à confronter à ce que montre le jeu).
+
+**Ce que GAMEFLOW.IFF en fait** (test 25h ; le script d'une mission est joué à l'entrée, donc avec le
+compte rendu du vol précédent, puis après chacun de ses vols) :
+
+| Script | Vol lu | Effet |
+|---|---|---|
+| MISS 12 (MISN-4c) | son propre vol (Learjet) | si drapeau 42 : changement 22 ; puis drapeau **71** = 3ᵉ valeur ≠ 0. Sprite 5 de la scène 29 visible si 42 et 71 |
+| MISS 18 (MISN-6b / 6x) | MISN-6a (AWACS) | drapeau **214** ; sprite 12 de la scène 20 : 214 → vole **MISN-6b**, sinon **MISN-6x** ; sprite 2 de la scène 29 de MISS 19 selon 214 |
+| MISS 26 (MISN-8b / 8x) | MISN-8a (AWACS) | drapeau **211** → **MISN-8b**, sinon **MISN-8x** ; sprite 5 de la scène 29 de MISS 27 selon 211 |
+| MISS 30 (MISN-9a) | MISN-9aa (BRIGC10), puis son propre vol | mission suivante = 31 (MISN-9b) ; si la 3ᵉ valeur ≠ 0 : drapeau **215** et **passage immédiat à la mission suivante** (0Fh), MISN-9a n'est pas jouée |
+| MISS 33 (MISN-10b / 10x) | MISN-10a | drapeau **213** → **MISN-10b**, sinon **MISN-10x** ; sprite 19 de la scène 29 de MISS 34 selon 213 |
+| MISS 41 (MISN-12b) | son propre vol (RWYEXT18) | si drapeau 50 et 3ᵉ valeur ≠ 0 : changements 27 (argent remplacé par 0) et 7 (argent − 2000), puis 1Dh : argent < 0 → conversation 255, **fin de partie** |
+| MISS 48 | MISN-15a | si MISN-15a (mission 41 de `MLST`) a réussi : cinématiques 20 et 36 ; sinon plans 15 et 3, puis : 3ᵉ valeur ≠ 0 → changements 27 et 7 et 1Dh ; sinon conversation 236, changements 27 et 7 et 1Dh |
+
 ## 7. libRealSpace (`SCGameFlow.cpp`) : ce qui manque ou diffère
 
 Comparaison avec `SCGameFlow.cpp` (fourni le 2026-10-22) et le dump `gameflow_parsed.txt`. Les
@@ -352,7 +392,7 @@ correspondre avec le tableau du § 5.2.
 | 1Bh | 2 | retirer le pilote n du tableau des victoires |
 | 1Dh | 12 | fin de partie : libRealSpace (`EFECT_OPT_CHECK_BALANCE` probable) ne teste que l'argent ; le jeu teste **d'abord plus de 16 avions perdus au total** (conversation 254), puis l'argent < 0 (255), et arrête le script |
 | 24h | 27 | humeur musicale 8 et conversation 253 / 252 si des avions ont été perdus pendant le vol (libRealSpace joue 252 seulement depuis `runFrame`, quand le joueur s'est éjecté) |
-| 25h | 7 | test sur la 3ᵉ valeur de `STAT` du compte rendu |
+| 25h | 7 | test sur la 3ᵉ valeur de `STAT` du compte rendu ; absent du dump. Il décide de MISN-6b / 6x, 8b / 8x, 10b / 10x, du saut de MISN-9a et d'une fin de partie après MISN-12b (§ 6.1) |
 | 26h | 18 | jouer le morceau n de `gameflow.dat` |
 
 **Différences sur des commandes nommées** :
@@ -396,7 +436,9 @@ disquette).
 - `PRTL` de `MLST` et le contenu exact d'`op2misn.iff` (`Gameflow_WriteMissionOrder_4BBF7`, lu en
   surface).
 - Le menu d'accueil (`Gameflow_MainMenu_4F1A7`, choix 0 à 5) n'est lu qu'en surface.
-- Ce que chaque mission met dans les 8 variables de résultat (opcode 14h de l'interpréteur des
-  missions de STRIKE.EXE) : à lire dans les scripts des fichiers de mission.
+- La 3ᵉ valeur de MISN-10A (FLAG[2]) : aucune instruction du script ne l'écrit (§ 6.1) ; à
+  confronter au jeu (MISN-10b est-elle jouée après MISN-10a ?).
+- MISN-9A, 9AA, 10A : la 8ᵉ valeur recopie un drapeau qu'aucune instruction n'écrit (FLAG[6],
+  FLAG[3], FLAG[3]) ; OPTEST disquette ne lit pas la 8ᵉ valeur.
 - Le rôle des deux compteurs de victoires (`[+29Fh]`, `[+2A1h]`) : air et sol probablement, non
   vérifié dans l'affichage du tableau.

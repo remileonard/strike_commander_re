@@ -325,6 +325,8 @@ strike_commander_re/
     │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
+    ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
+    │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné
@@ -569,7 +571,7 @@ renommage. Exemples : `AI_ThrottleController_6250`,
 | Sous-système | Segments clés | Points d'entrée notables |
 |---|---|---|
 | VROOMM (overlay manager Borland) | seg000, seg212, table de stubs seg216-429 | `VROOMM_MainEntry_68B2F` |
-| VM à bytecode (Expr_VM) | seg114 | `Expr_VM_Interpreter_51106` (209 opcodes, **jamais lu en détail**) |
+| VM à bytecode (Expr_VM) | seg114 | `Expr_VM_Interpreter_51106` (209 opcodes ; 00h–56h lus, MISSION_SCRIPT_OPCODES.md) |
 | Mémoire paginée / EMS | seg127-138 | `MemoryManager` (nom confirmé par chaînes de debug) |
 | Format de ressources IFF + LZW | seg193-197 | `ResourceRecord_*`, `LZW_Decompress_66068` |
 | Bibliothèque son AIL 2.0 (minuteries, pilotes, API) | seg161 | `AIL_API_timer_ISR_5FBBE`, `AIL_call_driver_5FBA6` |
@@ -588,8 +590,8 @@ sections « ⭐ Découverte majeure » de `analysis/README.md`, numérotées de 
 
 ## Questions ouvertes (candidates pour prochaines sessions)
 
-1. `Expr_VM_Interpreter_51106` — jamais lu en détail malgré son rôle
-   transversal central (HUD, IA, UI, mission passent tous par cette VM).
+1. `Expr_VM_Interpreter_51106` — instructions 00h–56h lues (2026-10-22,
+   `MISSION_SCRIPT_OPCODES.md`) ; restent 80h–98h, D0h et le détail des ordres natifs.
 2. `Player_ShotDownSequence_7B035` (3103 lignes, ovr239) — la
    plus grosse fonction du fichier : séquence jouée quand l'avion du joueur est
    détruit (charge `EJECT.PAK`, piste 0x0B ; voir `MUSIC_SYSTEM.md` §5.4). Corps à lire.
