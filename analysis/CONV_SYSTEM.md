@@ -71,8 +71,8 @@ Puis, autant de fois qu'ils se suivent :
 | Commande | Champs | Rôle |
 |---|---|---|
 | 00h | nom du décor (9) | plan large |
-| 01h (répété) | nom de figure (9), x (mot), y (mot) | figurant posé dans le décor (`FORM FIGR`) ; le dernier caractère du nom est passé à la construction du calque (`sub_AB6B`, pas lue) |
-| 02h (répété) | nom de figure (9), x, y, octet couleur, `[voix]`, chaîne | personnage qui parle, calque `sub_A207` (pas lu), lèvres synchronisées sur le texte |
+| 01h (répété) | nom de figure (9), x (mot), y (mot) | figurant posé dans le décor (`FORM FIGR`), calque `ConvFigure_ConstructExtra_AB6B` (voir plus bas) |
+| 02h (répété) | nom de figure (9), x, y, octet couleur, `[voix]`, chaîne | personnage qui parle, calque `ConvFigure_ConstructSpeaking_A207` (voir plus bas), lèvres synchronisées sur le texte |
 | 0Ah (répété, mêlé aux 02h) | octet couleur, `[voix]`, chaîne | texte sans personnage |
 
 Les répliques 02h / 0Ah sont jouées dans l'ordre après la lecture de toute la scène ; une 02h
