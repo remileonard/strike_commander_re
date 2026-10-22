@@ -761,8 +761,20 @@ Effet visible : aucun ici (texte vide), mais c'est un décalage du flux.
 
 **Parties sans effet sur ces données.** La branche FFh / F4h (*Pacific Strike*) ne sert jamais
 avec les données de *Strike Commander* (aucun des deux formats ne l'atteint). Retirer E0h de la liste des commandes et la branche FFh / F4h donne
-exactement les mêmes résultats pour la détection (E0h peut servir ailleurs dans le parseur, à
-vérifier avant de la retirer de `isNextFrameIsConv`).
+exactement les mêmes résultats pour la détection.
+
+**E0h.** Ce n'est pas une commande du jeu (aucune entrée E0h dans les tables de commandes, disquette
+ou CD). Dans les données, E0h est **une couleur de texte** : la couleur la plus fréquente des 03h
+(495 sur 1 717) et celle de 69 des 70 02h. Dans libRealSpace, `isNextFrameIsConv` sert à trois
+endroits : la détection de voix (sans effet, ci-dessus) et les deux boucles de recherche de
+`parse_GROUP_SHOT` et `parse_GROUP_SHOT_ADD_CHARACTER`. Simulées sur les 86 scènes de groupe et
+les 184 figurants des deux formats, ces boucles s'arrêtent toujours sur l'octet qui suit
+immédiatement, une vraie commande : E0h n'y est jamais atteint. Hypothèse pour ces boucles :
+`PeekByte` renvoie l'octet qui suit la position courante, seule lecture pour laquelle le nom du
+figurant tombe juste après `MoveForward(2)` (source de `ByteStream` non lue). Hypothèse sur
+l'origine de E0h : une lecture décalée d'un octet tombait sur une couleur E0h et la prenait pour
+une commande (le cas des 29 répliques vides du § 9 produit exactement ce décalage). Avec le
+format choisi avant le parsing (§ 9.1), E0h n'a plus de rôle.
 
 **Conclusion.** La règle est à la fois trop compliquée (deux branches inutiles) et fragile : elle
 dépend de la valeur des couleurs et du contenu des textes, et se trompe déjà sur 29 répliques du CD.
