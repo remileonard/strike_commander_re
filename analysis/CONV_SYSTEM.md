@@ -3,7 +3,7 @@
 Lu le 2026-10-22 dans `analysis/optest/annotated_segments/ovr191_annotated.asm` (interpréteur) et
 `seg006_annotated.asm` (lecteurs d'enregistrements). Sauf au § 8, les adresses sont celles de
 l'OPTEST.EXE **disquette** (sans voix). Le § 8 décrit l'OPTTEST.EXE du **CD-ROM** (avec voix), lu sans
-IDA, avec ses propres adresses.
+IDA, avec ses propres adresses ; listings dans `analysis/optest_cd/`.
 Outil : `tools/conv_dump.py --donnees <BIGTRE.TRE ou DATA> [entrée ...]` affiche les scripts.
 
 ## 1. Fichiers
@@ -418,7 +418,8 @@ Détail du jeu : « Yeux et bouches » (§ 2). À appliquer :
 - **Palette** : palettes du décor puis `FCPL` « normal » (`CONVPALS` 46), le seul appel vu
   (`ConvData_FindFacePalette_5A46F`) demande « normal » ; envoyée quand le décor change.
 
-Code de référence (compilé, style du dépôt) ; une lecture = une image de scène, numéros du jeu :
+Code de référence (compilé, style du dépôt, fichier `tools/conv_ref/conv_lips.cpp`) ; une lecture = une
+image de scène, numéros du jeu :
 
 ```cpp
 // Numéros d'image du jeu ; libRealSpace ajoute 1 (image vide en tête de chaque jeu d'images).
@@ -571,7 +572,7 @@ int closeUpEyeFrame(int baseFrame) {
 ## 8. Version CD-ROM : la voix (lu le 2026-10-22)
 
 Source : `OPTTEST.EXE` de la version CD-ROM, fourni par Rémi **sans désassemblage IDA**. Lu avec
-`tools/exe_disasm.py` (capstone). Les adresses ci-dessous sont des décalages dans l'image chargée
+`tools/exe_disasm.py` (capstone) ; listings dans `analysis/optest_cd/` (voir son `README.md`). Les adresses ci-dessous sont des décalages dans l'image chargée
 de **cet** exécutable (DGROUP = 4C25h) ; elles n'ont rien à voir avec celles de l'OPTEST.EXE
 disquette. Aucune de ces fonctions n'a de nom : les noms proposés sont entre guillemets.
 
@@ -736,7 +737,7 @@ et le format CD (voix puis texte). Elle décide **à chaque texte** :
    FFh ou F4h → pas de voix, et la fin est placée 4 octets plus loin. Cette branche a été ajoutée
    pour les conversations de *Pacific Strike*, de format voisin (information de Rémi).
 
-**Essai.** La règle a été rejouée en Python sur chaque texte des 241 scripts, aux bonnes positions,
+**Essai** (`tools/conv_ref/librs_voice_detect.py`). La règle a été rejouée en Python sur chaque texte des 241 scripts, aux bonnes positions,
 dans les deux formats. Format CD = `CONV.PAK` de `BIGTRE.TRE`. Format disquette = les mêmes scripts
 **sans les chaînes de voix** (reconstruit, pas un vrai `CONV.PAK` disquette ; à confirmer sur les
 données disquette).
@@ -803,7 +804,7 @@ devinette texte par texte.
   (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) sont à revoir à part (§ 7.1). E0h est à
   retirer de sa liste dans tous les cas.
 
-**Essai** (C++ ci-dessous, compilé, style du dépôt) : 241 / 241 scripts CD reconnus `Cd`, 241 / 241
+**Essai** (C++ ci-dessous, fichier `tools/conv_ref/conv_format.cpp`, compilé, style du dépôt) : 241 / 241 scripts CD reconnus `Cd`, 241 / 241
 scripts disquette (reconstruits) reconnus `Floppy`. Lu dans le mauvais format, chacun des 241 scripts,
 dans les deux sens, contient au moins une commande inconnue : le test ne peut pas se tromper de
 format sur ces données. Un script sans aucun texte se lit pareil dans les deux formats (réponse `Cd`,

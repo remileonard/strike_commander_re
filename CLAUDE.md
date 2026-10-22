@@ -274,6 +274,8 @@ strike_commander_re/
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
+│   │                                  conversations avec voix — CONV_SYSTEM.md § 8
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
 │   │                                  CONVDATA.IFF, codes $ des textes ; voix de la version CD-ROM
 │   │                                  (§ 8) ; consignes et détection voix/texte pour libRealSpace (§ 7, § 9)
@@ -306,9 +308,9 @@ strike_commander_re/
     │                                  prennent --exe optest (défaut strike)
     ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
     │                                  conv_scene.py : rendu d'une scène de groupe → PNG
-    ├── conv_ref/                    parseur C++ de référence des conversations (une boucle de premier
-    │                                  niveau, un sous-parseur par commande, erreurs) + export de test des
-    │                                  deux formats — CONV_SYSTEM.md § 9.3
+    ├── conv_ref/                    conversations, code de référence : parseur C++ (boucle de premier niveau,
+    │                                  sous-parseurs, erreurs), test de format, lèvres et clignement, rejeu de la
+    │                                  détection de libRealSpace, export des deux formats — README.md, CONV_SYSTEM § 9
     ├── midgame_extract.py           cinématiques d'OPTEST : pseudo-code (.md) et arbre (.json)
     ├── midgame_iff.py               rejoue le .json d'une cinématique et écrit le MID_*.IFF
     │                                  (format ANIM version 2 de libRealSpace) — MID1_PLANS.md

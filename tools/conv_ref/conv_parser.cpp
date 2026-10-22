@@ -1,3 +1,6 @@
+// Parseur de référence des scripts de conversation (CONV.PAK) : une boucle de premier niveau,
+// un sous-parseur par commande, erreur au premier octet invalide. CONV_SYSTEM.md § 9.2 et § 9.3.
+// ./conv_parser v <export>/cd/*.bin   ./conv_parser s <export>/disquette/*.bin
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>

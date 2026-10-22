@@ -1,0 +1,2091 @@
+108A0  lodsb al, byte ptr [si]
+108A1  xor al, byte ptr [bp + di + 0x4c4]
+108A5  pop bp
+108A6  retf 
+108A7  push bp
+108A8  mov bp, sp
+108AA  push si
+108AB  mov si, word ptr [bp + 6]
+108AE  or si, si
+108B0  jne 0x108c2
+108B2  push 0x23
+108B4  lcall 0, 0x741  ; -> 00741
+108B9  add sp, 2
+108BC  mov si, ax
+108BE  or ax, ax
+108C0  je 0x108f2
+108C2  push word ptr [bp + 0x14]
+108C5  push word ptr [bp + 0xc]
+108C8  push word ptr [bp + 0xa]
+108CB  push word ptr [bp + 8]
+108CE  push si
+108CF  lcall 0x35ef, 0x670  ; -> 36560
+108D4  add sp, 0xa
+108D7  mov word ptr [si], 0x216f
+108DB  mov word ptr [si + 0xa], 0x2193
+108E0  mov ax, word ptr [bp + 0xe]
+108E3  mov word ptr [si + 0x1d], ax
+108E6  mov ax, word ptr [bp + 0x10]
+108E9  mov word ptr [si + 0x1f], ax
+108EC  mov ax, word ptr [bp + 0x12]
+108EF  mov word ptr [si + 0x21], ax
+108F2  mov ax, si
+108F4  pop si
+108F5  pop bp
+108F6  retf 
+108F7  pop si
+108F8  pop bp
+108F9  retf 
+108FA  push bp
+108FB  mov bp, sp
+108FD  push si
+108FE  push di
+108FF  mov si, word ptr [bp + 6]
+10902  mov di, word ptr [bp + 0xc]
+10905  cmp di, -1
+10908  je 0x1093f
+1090A  push word ptr [si + 0x21]
+1090D  push word ptr [si + 0x1f]
+10910  push word ptr [si + 0x1d]
+10913  push di
+10914  push 0
+10916  mov al, byte ptr [si + 0x15]
+10919  push ax
+1091A  push word ptr [si + 0x13]
+1091D  push word ptr [si + 0x11]
+10920  push 0x6a62
+10923  lcall 0x34ca, 0x1fa  ; -> 34E9A
+10928  add sp, 0xa
+1092B  push dx
+1092C  push ax
+1092D  push word ptr [bp + 0xa]
+10930  push word ptr [bp + 8]
+10933  push word ptr [0x4666]
+10937  lcall 0x4084, 0xece  ; -> 4170E
+1093C  add sp, 0x12
+1093F  pop di
+10940  pop si
+10941  pop bp
+10942  retf 
+10943  push bp
+10944  mov bp, sp
+10946  sub sp, 2
+10949  push si
+1094A  push di
+1094B  mov si, word ptr [bp + 6]
+1094E  mov di, word ptr [bp + 8]
+10951  push word ptr [si + 0x1b]
+10954  push word ptr [bp + 0xa]
+10957  push di
+10958  push si
+10959  mov bx, word ptr [si]
+1095B  lcall [bx + 0x20]
+1095E  add sp, 8
+10961  mov word ptr [bp - 2], 0
+10966  jmp 0x10980
+10968  push word ptr [bp + 0xa]
+1096B  push di
+1096C  mov bx, word ptr [bp - 2]
+1096F  push word ptr [bx + 6]
+10972  mov bx, word ptr [bp - 2]
+10975  mov bx, word ptr [bx + 6]
+10978  mov bx, word ptr [bx]
+1097A  lcall [bx + 0x10]
+1097D  add sp, 6
+10980  lea ax, [bp - 2]
+10983  push ax
+10984  mov ax, si
+10986  add ax, 4
+10989  push ax
+1098A  lcall 0x3878, 0x248  ; -> 389C8
+1098F  add sp, 4
+10992  or ax, ax
+10994  jne 0x10968
+10996  pop di
+10997  pop si
+10998  leave 
+10999  retf 
+1099A  push bp
+1099B  mov bp, sp
+1099D  sub sp, 4
+109A0  push si
+109A1  mov si, word ptr [bp + 6]
+109A4  push si
+109A5  mov bx, word ptr [si]
+109A7  lcall [bx + 4]
+109AA  add sp, 2
+109AD  mov word ptr [bp - 2], ax
+109B0  push si
+109B1  mov bx, word ptr [si]
+109B3  lcall [bx + 8]
+109B6  add sp, 2
+109B9  mov word ptr [bp - 4], ax
+109BC  push word ptr [bp - 4]
+109BF  push word ptr [bp - 2]
+109C2  push si
+109C3  push cs
+109C4  call 0x10943
+109C7  add sp, 6
+109CA  pop si
+109CB  leave 
+109CC  retf 
+109CD  push bp
+109CE  mov bp, sp
+109D0  sub sp, 4
+109D3  push si
+109D4  mov si, word ptr [bp + 6]
+109D7  mov ax, word ptr [si + 0xc]
+109DA  add ax, word ptr [bp + 8]
+109DD  mov word ptr [bp - 2], ax
+109E0  mov ax, word ptr [si + 0xe]
+109E3  add ax, word ptr [bp + 0xa]
+109E6  mov word ptr [bp - 4], ax
+109E9  push word ptr [bp - 4]
+109EC  push word ptr [bp - 2]
+109EF  push si
+109F0  push cs
+109F1  call 0x10943
+109F4  add sp, 6
+109F7  pop si
+109F8  leave 
+109F9  retf 
+109FA  push bp
+109FB  mov bp, sp
+109FD  push si
+109FE  mov si, word ptr [bp + 6]
+10A01  mov ax, word ptr [bp + 8]
+10A04  mov word ptr [si + 0x1d], ax
+10A07  pop si
+10A08  pop bp
+10A09  retf 
+10A0A  push bp
+10A0B  mov bp, sp
+10A0D  push si
+10A0E  mov si, word ptr [bp + 6]
+10A11  mov ax, word ptr [bp + 8]
+10A14  mov word ptr [si + 0x1f], ax
+10A17  pop si
+10A18  pop bp
+10A19  retf 
+10A1A  push bp
+10A1B  mov bp, sp
+10A1D  push si
+10A1E  mov si, word ptr [bp + 6]
+10A21  mov ax, word ptr [bp + 8]
+10A24  mov word ptr [si + 0x21], ax
+10A27  pop si
+10A28  pop bp
+10A29  retf 
+10A2A  push bp
+10A2B  mov bp, sp
+10A2D  push si
+10A2E  mov si, word ptr [bp + 6]
+10A31  mov ax, word ptr [si + 0x1d]
+10A34  pop si
+10A35  pop bp
+10A36  retf 
+10A37  pop si
+10A38  pop bp
+10A39  retf 
+10A3A  push bp
+10A3B  mov bp, sp
+10A3D  push si
+10A3E  mov si, word ptr [bp + 6]
+10A41  mov ax, word ptr [si + 0x1f]
+10A44  pop si
+10A45  pop bp
+10A46  retf 
+10A47  pop si
+10A48  pop bp
+10A49  retf 
+10A4A  push bp
+10A4B  mov bp, sp
+10A4D  push si
+10A4E  mov si, word ptr [bp + 6]
+10A51  mov ax, word ptr [si + 0x21]
+10A54  pop si
+10A55  pop bp
+10A56  retf 
+10A57  pop si
+10A58  pop bp
+10A59  retf 
+10A5A  push bp
+10A5B  mov bp, sp
+10A5D  sub sp, 0xc
+10A60  push si
+10A61  mov si, word ptr [bp + 6]
+10A64  or si, si
+10A66  jne 0x10a78
+10A68  push 0x25
+10A6A  lcall 0, 0x741  ; -> 00741
+10A6F  add sp, 2
+10A72  mov si, ax
+10A74  or ax, ax
+10A76  je 0x10ae5
+10A78  mov ax, word ptr [bp + 8]
+10A7B  mov word ptr [bp - 2], ax
+10A7E  mov ax, word ptr [bp + 0xa]
+10A81  mov word ptr [bp - 4], ax
+10A84  mov ax, word ptr [bp + 0xc]
+10A87  mov word ptr [bp - 6], ax
+10A8A  mov ax, word ptr [bp + 0x12]
+10A8D  mov word ptr [bp - 8], ax
+10A90  mov ax, word ptr [bp + 0x14]
+10A93  mov word ptr [bp - 0xa], ax
+10A96  mov ax, word ptr [bp + 0x16]
+10A99  mov word ptr [bp - 0xc], ax
+10A9C  push word ptr [bp - 0xc]
+10A9F  push word ptr [bp - 6]
+10AA2  push word ptr [bp - 4]
+10AA5  push word ptr [bp - 2]
+10AA8  push si
+10AA9  lcall 0x35ef, 0x670  ; -> 36560
+10AAE  add sp, 0xa
+10AB1  mov word ptr [si], 0x213f
+10AB5  mov word ptr [si + 0xa], 0x215f
+10ABA  mov word ptr [si + 0x1d], 0
+10ABF  mov word ptr [si + 0x1f], 0
+10AC4  mov ax, word ptr [bp - 8]
+10AC7  mov word ptr [si + 0x1d], ax
+10ACA  mov ax, word ptr [bp - 0xa]
+10ACD  mov word ptr [si + 0x1f], ax
+10AD0  mov word ptr [si], 0x210b
+10AD4  mov word ptr [si + 0xa], 0x212f
+10AD9  mov ax, word ptr [bp + 0xe]
+10ADC  mov word ptr [si + 0x21], ax
+10ADF  mov ax, word ptr [bp + 0x10]
+10AE2  mov word ptr [si + 0x23], ax
+10AE5  mov ax, si
+10AE7  pop si
+10AE8  leave 
+10AE9  retf 
+10AEA  pop si
+10AEB  leave 
+10AEC  retf 
+10AED  push bp
+10AEE  mov bp, sp
+10AF0  sub sp, 2
+10AF3  push si
+10AF4  push di
+10AF5  mov si, word ptr [bp + 6]
+10AF8  mov di, word ptr [bp + 8]
+10AFB  push word ptr [si + 0x1b]
+10AFE  push word ptr [bp + 0xa]
+10B01  push di
+10B02  push si
+10B03  mov bx, word ptr [si]
+10B05  lcall [bx + 0x20]
+10B08  add sp, 8
+10B0B  mov word ptr [bp - 2], 0
+10B10  jmp 0x10b2a
+10B12  push word ptr [bp + 0xa]
+10B15  push di
+10B16  mov bx, word ptr [bp - 2]
+10B19  push word ptr [bx + 6]
+10B1C  mov bx, word ptr [bp - 2]
+10B1F  mov bx, word ptr [bx + 6]
+10B22  mov bx, word ptr [bx]
+10B24  lcall [bx + 0x10]
+10B27  add sp, 6
+10B2A  lea ax, [bp - 2]
+10B2D  push ax
+10B2E  mov ax, si
+10B30  add ax, 4
+10B33  push ax
+10B34  lcall 0x3878, 0x248  ; -> 389C8
+10B39  add sp, 4
+10B3C  or ax, ax
+10B3E  jne 0x10b12
+10B40  pop di
+10B41  pop si
+10B42  leave 
+10B43  retf 
+10B44  push bp
+10B45  mov bp, sp
+10B47  sub sp, 4
+10B4A  push si
+10B4B  mov si, word ptr [bp + 6]
+10B4E  push si
+10B4F  mov bx, word ptr [si]
+10B51  lcall [bx + 4]
+10B54  add sp, 2
+10B57  mov word ptr [bp - 2], ax
+10B5A  push si
+10B5B  mov bx, word ptr [si]
+10B5D  lcall [bx + 8]
+10B60  add sp, 2
+10B63  mov word ptr [bp - 4], ax
+10B66  push word ptr [bp - 4]
+10B69  push word ptr [bp - 2]
+10B6C  push si
+10B6D  push cs
+10B6E  call 0x10aed
+10B71  add sp, 6
+10B74  pop si
+10B75  leave 
+10B76  retf 
+10B77  push bp
+10B78  mov bp, sp
+10B7A  sub sp, 4
+10B7D  push si
+10B7E  mov si, word ptr [bp + 6]
+10B81  mov ax, word ptr [si + 0xc]
+10B84  add ax, word ptr [bp + 8]
+10B87  mov word ptr [bp - 2], ax
+10B8A  mov ax, word ptr [si + 0xe]
+10B8D  add ax, word ptr [bp + 0xa]
+10B90  mov word ptr [bp - 4], ax
+10B93  push word ptr [bp - 4]
+10B96  push word ptr [bp - 2]
+10B99  push si
+10B9A  push cs
+10B9B  call 0x10aed
+10B9E  add sp, 6
+10BA1  pop si
+10BA2  leave 
+10BA3  retf 
+10BA4  push bp
+10BA5  mov bp, sp
+10BA7  push si
+10BA8  mov si, word ptr [bp + 6]
+10BAB  mov ax, word ptr [bp + 8]
+10BAE  mov word ptr [si + 0x21], ax
+10BB1  pop si
+10BB2  pop bp
+10BB3  retf 
+10BB4  push bp
+10BB5  mov bp, sp
+10BB7  push si
+10BB8  mov si, word ptr [bp + 6]
+10BBB  mov ax, word ptr [bp + 8]
+10BBE  mov word ptr [si + 0x23], ax
+10BC1  pop si
+10BC2  pop bp
+10BC3  retf 
+10BC4  push bp
+10BC5  mov bp, sp
+10BC7  push si
+10BC8  mov si, word ptr [bp + 6]
+10BCB  or si, si
+10BCD  jne 0x10bdf
+10BCF  push 0x25
+10BD1  lcall 0, 0x741  ; -> 00741
+10BD6  add sp, 2
+10BD9  mov si, ax
+10BDB  or ax, ax
+10BDD  je 0x10c0f
+10BDF  push word ptr [bp + 0x16]
+10BE2  push word ptr [bp + 0x14]
+10BE5  push word ptr [bp + 0x12]
+10BE8  push word ptr [bp + 0xc]
+10BEB  push word ptr [bp + 0xa]
+10BEE  push word ptr [bp + 8]
+10BF1  push si
+10BF2  nop 
+10BF3  push cs
+10BF4  call 0x11d87
+10BF7  add sp, 0xe
+10BFA  mov word ptr [si], 0x20d7
+10BFE  mov word ptr [si + 0xa], 0x20fb
+10C03  mov ax, word ptr [bp + 0xe]
+10C06  mov word ptr [si + 0x21], ax
+10C09  mov ax, word ptr [bp + 0x10]
+10C0C  mov word ptr [si + 0x23], ax
+10C0F  mov ax, si
+10C11  pop si
+10C12  pop bp
+10C13  retf 
+10C14  pop si
+10C15  pop bp
+10C16  retf 
+10C17  push bp
+10C18  mov bp, sp
+10C1A  sub sp, 2
+10C1D  push si
+10C1E  push di
+10C1F  mov si, word ptr [bp + 6]
+10C22  mov di, word ptr [bp + 8]
+10C25  push word ptr [si + 0x1b]
+10C28  push word ptr [bp + 0xa]
+10C2B  push di
+10C2C  push si
+10C2D  mov bx, word ptr [si]
+10C2F  lcall [bx + 0x20]
+10C32  add sp, 8
+10C35  mov word ptr [bp - 2], 0
+10C3A  jmp 0x10c54
+10C3C  push word ptr [bp + 0xa]
+10C3F  push di
+10C40  mov bx, word ptr [bp - 2]
+10C43  push word ptr [bx + 6]
+10C46  mov bx, word ptr [bp - 2]
+10C49  mov bx, word ptr [bx + 6]
+10C4C  mov bx, word ptr [bx]
+10C4E  lcall [bx + 0x10]
+10C51  add sp, 6
+10C54  lea ax, [bp - 2]
+10C57  push ax
+10C58  mov ax, si
+10C5A  add ax, 4
+10C5D  push ax
+10C5E  lcall 0x3878, 0x248  ; -> 389C8
+10C63  add sp, 4
+10C66  or ax, ax
+10C68  jne 0x10c3c
+10C6A  pop di
+10C6B  pop si
+10C6C  leave 
+10C6D  retf 
+10C6E  push bp
+10C6F  mov bp, sp
+10C71  sub sp, 4
+10C74  push si
+10C75  mov si, word ptr [bp + 6]
+10C78  push si
+10C79  mov bx, word ptr [si]
+10C7B  lcall [bx + 4]
+10C7E  add sp, 2
+10C81  mov word ptr [bp - 2], ax
+10C84  push si
+10C85  mov bx, word ptr [si]
+10C87  lcall [bx + 8]
+10C8A  add sp, 2
+10C8D  mov word ptr [bp - 4], ax
+10C90  push word ptr [bp - 4]
+10C93  push word ptr [bp - 2]
+10C96  push si
+10C97  push cs
+10C98  call 0x10c17
+10C9B  add sp, 6
+10C9E  pop si
+10C9F  leave 
+10CA0  retf 
+10CA1  push bp
+10CA2  mov bp, sp
+10CA4  sub sp, 4
+10CA7  push si
+10CA8  mov si, word ptr [bp + 6]
+10CAB  mov ax, word ptr [si + 0xc]
+10CAE  add ax, word ptr [bp + 8]
+10CB1  mov word ptr [bp - 2], ax
+10CB4  mov ax, word ptr [si + 0xe]
+10CB7  add ax, word ptr [bp + 0xa]
+10CBA  mov word ptr [bp - 4], ax
+10CBD  push word ptr [bp - 4]
+10CC0  push word ptr [bp - 2]
+10CC3  push si
+10CC4  push cs
+10CC5  call 0x10c17
+10CC8  add sp, 6
+10CCB  pop si
+10CCC  leave 
+10CCD  retf 
+10CCE  push bp
+10CCF  mov bp, sp
+10CD1  push si
+10CD2  mov si, word ptr [bp + 6]
+10CD5  mov ax, word ptr [bp + 8]
+10CD8  mov word ptr [si + 0x21], ax
+10CDB  pop si
+10CDC  pop bp
+10CDD  retf 
+10CDE  push bp
+10CDF  mov bp, sp
+10CE1  push si
+10CE2  mov si, word ptr [bp + 6]
+10CE5  mov ax, word ptr [bp + 8]
+10CE8  mov word ptr [si + 0x23], ax
+10CEB  pop si
+10CEC  pop bp
+10CED  retf 
+10CEE  push bp
+10CEF  mov bp, sp
+10CF1  push si
+10CF2  mov si, word ptr [bp + 6]
+10CF5  push word ptr [si + 0x1d]
+10CF8  lcall 0x3539, 0x240  ; -> 355D0
+10CFD  add sp, 2
+10D00  mov word ptr [si + 0x1d], 0
+10D05  push word ptr [bp + 8]
+10D08  lcall 0, 0x2e91  ; -> 02E91
+10D0D  add sp, 2
+10D10  mov word ptr [si + 0x1d], ax
+10D13  push word ptr [si + 0x1d]
+10D16  lcall 0, 0x2f23  ; -> 02F23
+10D1B  add sp, 2
+10D1E  mov ax, word ptr [si + 0x1d]
+10D21  mov word ptr [si + 0x1f], ax
+10D24  pop si
+10D25  pop bp
+10D26  retf 
+10D27  push bp
+10D28  mov bp, sp
+10D2A  push si
+10D2B  mov si, word ptr [bp + 6]
+10D2E  or si, si
+10D30  jne 0x10d46
+10D32  push 0x855
+10D35  lcall 0, 0x741  ; -> 00741
+10D3A  add sp, 2
+10D3D  mov si, ax
+10D3F  or ax, ax
+10D41  jne 0x10d46
+10D43  jmp 0x10dff
+10D46  mov word ptr [si], 0x2087
+10D4A  mov word ptr [si + 4], 0x207f
+10D4F  mov word ptr [si + 6], 0
+10D54  mov word ptr [si + 8], 0
+10D59  mov word ptr [si + 4], 0x2083
+10D5E  mov word ptr [si + 2], 0
+10D63  mov word ptr [si + 0xa], 0x2053
+10D68  mov word ptr [si + 0xa], 0x205f
+10D6D  mov word ptr [si + 0xa], 0x206f
+10D72  mov word ptr [si], 0x20a7
+10D76  mov word ptr [si + 0xa], 0x20c7
+10D7B  mov dword ptr [si + 0x11], 0
+10D83  mov byte ptr [si + 0x15], 2
+10D87  mov byte ptr [si + 0x16], 0
+10D8B  mov dword ptr [si + 0x17], 0
+10D93  mov word ptr [si], 0x201f
+10D97  mov word ptr [si + 0xa], 0x2043
+10D9C  mov word ptr [si + 0x30], 0x18f0
+10DA1  mov dword ptr [si + 0x40], 0
+10DA9  mov byte ptr [si + 0x44], 2
+10DAD  mov byte ptr [si + 0x45], 0
+10DB1  mov dword ptr [si + 0x46], 0
+10DB9  mov word ptr [si + 0x32], 0
+10DBE  mov word ptr [si + 0x30], 0x200b
+10DC3  xor eax, eax
+10DC6  mov dword ptr [si + 0x84d], eax
+10DCB  mov dword ptr [si + 0x851], eax
+10DD0  xor ax, ax
+10DD2  mov word ptr [si + 0x1d], ax
+10DD5  mov word ptr [si + 0x1f], ax
+10DD8  mov ax, 0xffff
+10DDB  mov word ptr [si + 0x21], ax
+10DDE  mov word ptr [si + 0x29], ax
+10DE1  mov word ptr [si + 0x25], ax
+10DE4  mov word ptr [si + 0x2b], 0
+10DE9  mov word ptr [si + 0x23], 0x22
+10DEE  mov byte ptr [si + 0x2d], 0
+10DF2  mov byte ptr [si + 0x2e], 0
+10DF6  mov byte ptr [si + 0x2f], 1
+10DFA  mov word ptr [si + 0x27], 0xffff
+10DFF  mov ax, si
+10E01  pop si
+10E02  pop bp
+10E03  retf 
+10E04  pop si
+10E05  pop bp
+10E06  retf 
+10E07  push bp
+10E08  mov bp, sp
+10E0A  push si
+10E0B  mov si, word ptr [bp + 6]
+10E0E  or si, si
+10E10  jne 0x10e23
+10E12  push 0x855
+10E15  lcall 0, 0x741  ; -> 00741
+10E1A  add sp, 2
+10E1D  mov si, ax
+10E1F  or ax, ax
+10E21  je 0x10ea1
+10E23  push word ptr [bp + 0xc]
+10E26  push word ptr [bp + 0xa]
+10E29  push word ptr [bp + 8]
+10E2C  push si
+10E2D  lcall 0x35ef, 0x5df  ; -> 364CF
+10E32  add sp, 8
+10E35  mov word ptr [si], 0x201f
+10E39  mov word ptr [si + 0xa], 0x2043
+10E3E  mov word ptr [si + 0x30], 0x18f0
+10E43  mov dword ptr [si + 0x40], 0
+10E4B  mov byte ptr [si + 0x44], 2
+10E4F  mov byte ptr [si + 0x45], 0
+10E53  mov dword ptr [si + 0x46], 0
+10E5B  mov word ptr [si + 0x32], 0
+10E60  mov word ptr [si + 0x30], 0x200b
+10E65  xor eax, eax
+10E68  mov dword ptr [si + 0x84d], eax
+10E6D  mov dword ptr [si + 0x851], eax
+10E72  xor ax, ax
+10E74  mov word ptr [si + 0x1d], ax
+10E77  mov word ptr [si + 0x1f], ax
+10E7A  mov ax, 0xffff
+10E7D  mov word ptr [si + 0x21], ax
+10E80  mov word ptr [si + 0x29], ax
+10E83  mov word ptr [si + 0x25], ax
+10E86  mov word ptr [si + 0x2b], 0
+10E8B  mov word ptr [si + 0x23], 0x22
+10E90  mov byte ptr [si + 0x2d], 0
+10E94  mov byte ptr [si + 0x2e], 0
+10E98  mov byte ptr [si + 0x2f], 1
+10E9C  mov word ptr [si + 0x27], 0xffff
+10EA1  mov ax, si
+10EA3  pop si
+10EA4  pop bp
+10EA5  retf 
+10EA6  pop si
+10EA7  pop bp
+10EA8  retf 
+10EA9  push bp
+10EAA  mov bp, sp
+10EAC  push si
+10EAD  mov si, word ptr [bp + 6]
+10EB0  or si, si
+10EB2  jne 0x10ec8
+10EB4  push 0x855
+10EB7  lcall 0, 0x741  ; -> 00741
+10EBC  add sp, 2
+10EBF  mov si, ax
+10EC1  or ax, ax
+10EC3  jne 0x10ec8
+10EC5  jmp 0x10f8d
+10EC8  mov word ptr [si], 0x2087
+10ECC  mov word ptr [si + 4], 0x207f
+10ED1  mov word ptr [si + 6], 0
+10ED6  mov word ptr [si + 8], 0
+10EDB  mov word ptr [si + 4], 0x2083
+10EE0  mov word ptr [si + 2], 0
+10EE5  mov word ptr [si + 0xa], 0x2053
+10EEA  mov word ptr [si + 0xa], 0x205f
+10EEF  mov word ptr [si + 0xa], 0x206f
+10EF4  mov word ptr [si], 0x20a7
+10EF8  mov word ptr [si + 0xa], 0x20c7
+10EFD  mov dword ptr [si + 0x11], 0
+10F05  mov byte ptr [si + 0x15], 2
+10F09  mov byte ptr [si + 0x16], 0
+10F0D  mov dword ptr [si + 0x17], 0
+10F15  mov word ptr [si], 0x201f
+10F19  mov word ptr [si + 0xa], 0x2043
+10F1E  mov word ptr [si + 0x30], 0x18f0
+10F23  mov dword ptr [si + 0x40], 0
+10F2B  mov byte ptr [si + 0x44], 2
+10F2F  mov byte ptr [si + 0x45], 0
+10F33  mov dword ptr [si + 0x46], 0
+10F3B  mov word ptr [si + 0x32], 0
+10F40  mov word ptr [si + 0x30], 0x200b
+10F45  xor eax, eax
+10F48  mov dword ptr [si + 0x84d], eax
+10F4D  mov dword ptr [si + 0x851], eax
+10F52  xor ax, ax
+10F54  mov word ptr [si + 0x1d], ax
+10F57  mov word ptr [si + 0x1f], ax
+10F5A  mov ax, 0xffff
+10F5D  mov word ptr [si + 0x21], ax
+10F60  mov word ptr [si + 0x29], ax
+10F63  mov word ptr [si + 0x25], ax
+10F66  mov word ptr [si + 0x2b], 0
+10F6B  mov word ptr [si + 0x23], 0x22
+10F70  mov byte ptr [si + 0x2d], 0
+10F74  mov byte ptr [si + 0x2e], 0
+10F78  mov byte ptr [si + 0x2f], 1
+10F7C  mov word ptr [si + 0x27], 0xffff
+10F81  push word ptr [bp + 8]
+10F84  push si
+10F85  nop 
+10F86  push cs
+10F87  call 0x11013
+10F8A  add sp, 4
+10F8D  mov ax, si
+10F8F  pop si
+10F90  pop bp
+10F91  retf 
+10F92  pop si
+10F93  pop bp
+10F94  retf 
+10F95  push bp
+10F96  mov bp, sp
+10F98  push si
+10F99  mov si, word ptr [bp + 6]
+10F9C  or si, si
+10F9E  jne 0x10fb1
+10FA0  push 0x855
+10FA3  lcall 0, 0x741  ; -> 00741
+10FA8  add sp, 2
+10FAB  mov si, ax
+10FAD  or ax, ax
+10FAF  je 0x1100b
+10FB1  push word ptr [bp + 0xe]
+10FB4  push word ptr [bp + 0xc]
+10FB7  push word ptr [bp + 8]
+10FBA  push si
+10FBB  lcall 0x35ef, 0x5df  ; -> 364CF
+10FC0  add sp, 8
+10FC3  mov word ptr [si], 0x201f
+10FC7  mov word ptr [si + 0xa], 0x2043
+10FCC  mov word ptr [si + 0x30], 0x18f0
+10FD1  mov dword ptr [si + 0x40], 0
+10FD9  mov byte ptr [si + 0x44], 2
+10FDD  mov byte ptr [si + 0x45], 0
+10FE1  mov dword ptr [si + 0x46], 0
+10FE9  mov word ptr [si + 0x32], 0
+10FEE  mov word ptr [si + 0x30], 0x200b
+10FF3  xor eax, eax
+10FF6  mov dword ptr [si + 0x84d], eax
+10FFB  mov dword ptr [si + 0x851], eax
+11000  push word ptr [bp + 0xa]
+11003  push si
+11004  push cs
+11005  call 0x10cee
+11008  add sp, 4
+1100B  mov ax, si
+1100D  pop si
+1100E  pop bp
+1100F  retf 
+11010  pop si
+11011  pop bp
+11012  retf 
+11013  push bp
+11014  mov bp, sp
+11016  sub sp, 0xba
+1101A  push si
+1101B  push di
+1101C  mov si, word ptr [bp + 6]
+1101F  mov di, word ptr [bp + 8]
+11022  lea ax, [bp - 0xba]
+11026  push ax
+11027  lcall 0x431f, 0x140  ; -> 43330
+1102C  add sp, 2
+1102F  mov word ptr [bp - 0xba], 0xc28
+11035  mov dword ptr [bp - 0x59], 0x100
+1103D  mov dword ptr [bp - 0x5d], 0
+11045  mov word ptr [bp - 0xba], 0xc40
+1104B  push 1
+1104D  push 0x1d78  ; "faces.iff"
+11050  lea ax, [bp - 0xba]
+11054  push ax
+11055  mov bx, word ptr [bp - 0xba]
+11059  lcall [bx + 0x14]
+1105C  add sp, 6
+1105F  lea ax, [bp - 0xba]
+11063  push ax
+11064  lcall 0x4497, 0x720  ; -> 45090
+11069  add sp, 2
+1106C  push 0
+1106E  push dword ptr [0x1d82]
+11073  lea ax, [bp - 0xba]
+11077  push ax
+11078  lcall 0x4497, 0x242  ; -> 44BB2
+1107D  add sp, 8
+11080  jmp 0x110bf
+11082  lea ax, [bp - 0xba]
+11086  push ax
+11087  lea ax, [bp - 0x12]
+1108A  push ax
+1108B  lcall 0x13d4, 0x63  ; -> 13DA3
+11090  add sp, 4
+11093  push di
+11094  lea ax, [bp - 0x12]
+11097  push ax
+11098  lcall 0, 0x2e40  ; -> 02E40
+1109D  add sp, 4
+110A0  or ax, ax
+110A2  je 0x110bd
+110A4  mov eax, dword ptr [bp - 0x44]
+110A8  mov dword ptr [bp - 0x55], eax
+110AC  lea ax, [bp - 0xba]
+110B0  push ax
+110B1  lcall 0x4497, 0x6c0  ; -> 45030
+110B6  add sp, 2
+110B9  jmp 0x110bf
+110BB  jmp 0x110bf
+110BD  jmp 0x110ca
+110BF  mov eax, dword ptr [bp - 0x4d]
+110C3  cmp eax, dword ptr [0x1d87]
+110C8  je 0x11082
+110CA  mov eax, dword ptr [bp - 0x48]
+110CE  mov dword ptr [bp - 4], eax
+110D2  push 1
+110D4  push 0
+110D6  push 2
+110D8  push dword ptr [bp - 4]
+110DC  push 0x6a62
+110DF  lcall 0x34ca, 0xba  ; -> 34D5A
+110E4  add sp, 0xc
+110E7  mov word ptr [bp - 6], dx
+110EA  mov word ptr [bp - 8], ax
+110ED  mov eax, dword ptr [bp - 8]
+110F1  mov dword ptr [si + 0x11], eax
+110F5  mov byte ptr [si + 0x15], 2
+110F9  mov byte ptr [si + 0x16], 1
+110FD  mov dword ptr [si + 0x17], 0
+11105  mov eax, dword ptr [bp - 4]
+11109  mov dword ptr [si + 0x17], eax
+1110D  push 0
+1110F  mov al, byte ptr [si + 0x15]
+11112  push ax
+11113  push word ptr [si + 0x13]
+11116  push word ptr [si + 0x11]
+11119  push 0x6a62
+1111C  lcall 0x34ca, 0x1fa  ; -> 34E9A
+11121  add sp, 0xa
+11124  push dx
+11125  push ax
+11126  lea ax, [bp - 0xba]
+1112A  push ax
+1112B  lcall 0x4497, 0x5fe  ; -> 44F6E
+11130  add sp, 6
+11133  mov word ptr [bp - 0xba], 0xc40
+11139  lea ax, [bp - 0xba]
+1113D  push ax
+1113E  lcall 0x4497, 0xa4  ; -> 44A14
+11143  add sp, 2
+11146  push 0
+11148  lea ax, [bp - 0xba]
+1114C  push ax
+1114D  lcall 0x4528, 0x121  ; -> 453A1
+11152  add sp, 4
+11155  pop di
+11156  pop si
+11157  leave 
+11158  retf 
+11159  push bp
+1115A  mov bp, sp
+1115C  push si
+1115D  mov si, word ptr [bp + 6]
+11160  push word ptr [bp + 8]
+11163  push si
+11164  push cs
+11165  call 0x10cee
+11168  add sp, 4
+1116B  pop si
+1116C  pop bp
+1116D  retf 
+1116E  push bp
+1116F  mov bp, sp
+11171  push si
+11172  mov si, word ptr [bp + 6]
+11175  mov ax, si
+11177  add ax, 0x30
+1117A  push ax
+1117B  lcall 0xe67, 0xe31  ; -> 0F4A1
+11180  add sp, 2
+11183  mov word ptr [si + 0x25], ax
+11186  cmp word ptr [si + 0x25], 0xb
+1118A  je 0x11192
+1118C  cmp word ptr [si + 0x25], 0xa
+11190  jne 0x111a3
+11192  cmp word ptr [si + 0x27], 0xb
+11196  je 0x1119e
+11198  cmp word ptr [si + 0x27], 0xa
+1119C  jne 0x111a3
+1119E  mov word ptr [si + 0x25], 0xffff
+111A3  mov ax, word ptr [si + 0x25]
+111A6  mov word ptr [si + 0x27], ax
+111A9  pop si
+111AA  pop bp
+111AB  retf 
+111AC  push bp
+111AD  mov bp, sp
+111AF  push si
+111B0  mov si, word ptr [bp + 6]
+111B3  cmp word ptr [si + 0x2b], 0
+111B7  jne 0x111eb
+111B9  cmp byte ptr [si + 0x2d], 0
+111BD  je 0x111eb
+111BF  mov al, byte ptr [si + 0x2e]
+111C2  mov ah, 0
+111C4  or ax, ax
+111C6  jne 0x111eb
+111C8  push si
+111C9  push cs
+111CA  call 0x1116e
+111CD  add sp, 2
+111D0  mov ax, word ptr [si + 0x25]
+111D3  mov word ptr [si + 0x27], ax
+111D6  push -1
+111D8  mov ax, si
+111DA  add ax, 0x30
+111DD  push ax
+111DE  mov bx, word ptr [si + 0x30]
+111E1  lcall [bx + 0x10]
+111E4  add sp, 4
+111E7  mov byte ptr [si + 0x2e], 1
+111EB  inc word ptr [si + 0x2b]
+111EE  cmp byte ptr [si + 0x2e], 0
+111F2  je 0x111fb
+111F4  mov al, 1
+111F6  pop si
+111F7  pop bp
+111F8  retf 
+111F9  jmp 0x11200
+111FB  mov al, 0
+111FD  pop si
+111FE  pop bp
+111FF  retf 
+11200  pop si
+11201  pop bp
+11202  retf 
+11203  push bp
+11204  mov bp, sp
+11206  push si
+11207  mov si, word ptr [bp + 6]
+1120A  push word ptr [0x4031]
+1120E  mov ax, si
+11210  add ax, 0x30
+11213  push ax
+11214  lcall 0xe67, 7  ; -> 0E677
+11219  add sp, 4
+1121C  push word ptr [bp + 8]
+1121F  mov ax, si
+11221  add ax, 0x30
+11224  push ax
+11225  lcall 0xe67, 0x925  ; -> 0EF95
+1122A  add sp, 4
+1122D  mov byte ptr [si + 0x2d], 1
+11231  pop si
+11232  pop bp
+11233  retf 
+11234  push bp
+11235  mov bp, sp
+11237  push si
+11238  mov si, word ptr [bp + 6]
+1123B  push word ptr [0x4031]
+1123F  mov ax, si
+11241  add ax, 0x30
+11244  push ax
+11245  lcall 0xe67, 7  ; -> 0E677
+1124A  add sp, 4
+1124D  push word ptr [bp + 0xa]
+11250  push word ptr [bp + 8]
+11253  mov ax, si
+11255  add ax, 0x30
+11258  push ax
+11259  lcall 0xe67, 0x3be  ; -> 0EA2E
+1125E  add sp, 6
+11261  mov byte ptr [si + 0x2d], 1
+11265  mov word ptr [si + 0x2b], 0
+1126A  pop si
+1126B  pop bp
+1126C  retf 
+1126D  push bp
+1126E  mov bp, sp
+11270  push si
+11271  mov si, word ptr [bp + 6]
+11274  mov ax, word ptr [bp + 8]
+11277  mov word ptr [si + 0x21], ax
+1127A  mov word ptr [si + 0x29], ax
+1127D  pop si
+1127E  pop bp
+1127F  retf 
+11280  push bp
+11281  mov bp, sp
+11283  sub sp, 0x12
+11286  push si
+11287  push di
+11288  mov si, word ptr [bp + 6]
+1128B  mov di, word ptr [bp + 8]
+1128E  mov word ptr [bp - 2], di
+11291  mov ax, word ptr [bp + 0xa]
+11294  mov word ptr [bp - 4], ax
+11297  push 0
+11299  push 0
+1129B  mov al, byte ptr [si + 0x15]
+1129E  push ax
+1129F  push word ptr [si + 0x13]
+112A2  push word ptr [si + 0x11]
+112A5  push 0x6a62
+112A8  lcall 0x34ca, 0x1fa  ; -> 34E9A
+112AD  add sp, 0xa
+112B0  push dx
+112B1  push ax
+112B2  push word ptr [bp - 4]
+112B5  push word ptr [bp - 2]
+112B8  push word ptr [0x4666]
+112BC  lcall 0x3a97, 0  ; -> 3A970
+112C1  add sp, 0xc
+112C4  cmp word ptr [si + 0x29], -1
+112C8  je 0x1130f
+112CA  mov word ptr [bp - 6], di
+112CD  mov ax, word ptr [bp + 0xa]
+112D0  mov word ptr [bp - 8], ax
+112D3  mov ax, word ptr [si + 0x29]
+112D6  mov word ptr [bp - 0xa], ax
+112D9  cmp word ptr [bp - 0xa], -1
+112DD  je 0x1130f
+112DF  push word ptr [bp - 0xa]
+112E2  push 0
+112E4  mov al, byte ptr [si + 0x15]
+112E7  push ax
+112E8  push word ptr [si + 0x13]
+112EB  push word ptr [si + 0x11]
+112EE  push 0x6a62
+112F1  lcall 0x34ca, 0x1fa  ; -> 34E9A
+112F6  add sp, 0xa
+112F9  push dx
+112FA  push ax
+112FB  push word ptr [bp - 8]
+112FE  push word ptr [bp - 6]
+11301  push word ptr [0x4666]
+11305  lcall 0x3a97, 0  ; -> 3A970
+1130A  add sp, 0xc
+1130D  jmp 0x1130f
+1130F  cmp word ptr [si + 0x25], -1
+11313  je 0x1135a
+11315  mov word ptr [bp - 0xc], di
+11318  mov ax, word ptr [bp + 0xa]
+1131B  mov word ptr [bp - 0xe], ax
+1131E  mov ax, word ptr [si + 0x25]
+11321  mov word ptr [bp - 0x10], ax
+11324  cmp word ptr [bp - 0x10], -1
+11328  je 0x1135a
+1132A  push word ptr [bp - 0x10]
+1132D  push 0
+1132F  mov al, byte ptr [si + 0x15]
+11332  push ax
+11333  push word ptr [si + 0x13]
+11336  push word ptr [si + 0x11]
+11339  push 0x6a62
+1133C  lcall 0x34ca, 0x1fa  ; -> 34E9A
+11341  add sp, 0xa
+11344  push dx
+11345  push ax
+11346  push word ptr [bp - 0xe]
+11349  push word ptr [bp - 0xc]
+1134C  push word ptr [0x4666]
+11350  lcall 0x3a97, 0  ; -> 3A970
+11355  add sp, 0xc
+11358  jmp 0x1135a
+1135A  mov word ptr [bp - 0x12], 0
+1135F  jmp 0x11379
+11361  push word ptr [bp + 0xa]
+11364  push di
+11365  mov bx, word ptr [bp - 0x12]
+11368  push word ptr [bx + 6]
+1136B  mov bx, word ptr [bp - 0x12]
+1136E  mov bx, word ptr [bx + 6]
+11371  mov bx, word ptr [bx]
+11373  lcall [bx + 0x10]
+11376  add sp, 6
+11379  lea ax, [bp - 0x12]
+1137C  push ax
+1137D  mov ax, si
+1137F  add ax, 4
+11382  push ax
+11383  lcall 0x3878, 0x248  ; -> 389C8
+11388  add sp, 4
+1138B  or ax, ax
+1138D  jne 0x11361
+1138F  pop di
+11390  pop si
+11391  leave 
+11392  retf 
+11393  push bp
+11394  mov bp, sp
+11396  sub sp, 0xa
+11399  push si
+1139A  push di
+1139B  mov si, word ptr [bp + 6]
+1139E  mov di, word ptr [bp + 8]
+113A1  push word ptr [bp + 0xa]
+113A4  push di
+113A5  push si
+113A6  push cs
+113A7  call 0x11280
+113AA  add sp, 6
+113AD  mov word ptr [bp - 2], di
+113B0  mov ax, word ptr [bp + 0xa]
+113B3  mov word ptr [bp - 4], ax
+113B6  push 1
+113B8  push 0
+113BA  mov al, byte ptr [si + 0x15]
+113BD  push ax
+113BE  push word ptr [si + 0x13]
+113C1  push word ptr [si + 0x11]
+113C4  push 0x6a62
+113C7  lcall 0x34ca, 0x1fa  ; -> 34E9A
+113CC  add sp, 0xa
+113CF  push dx
+113D0  push ax
+113D1  push word ptr [bp - 4]
+113D4  push word ptr [bp - 2]
+113D7  push word ptr [0x4666]
+113DB  lcall 0x3a97, 0  ; -> 3A970
+113E0  add sp, 0xc
+113E3  mov word ptr [bp - 6], di
+113E6  mov ax, word ptr [bp + 0xa]
+113E9  mov word ptr [bp - 8], ax
+113EC  mov ax, word ptr [si + 0x23]
+113EF  mov word ptr [bp - 0xa], ax
+113F2  cmp word ptr [bp - 0xa], -1
+113F6  je 0x11428
+113F8  push word ptr [bp - 0xa]
+113FB  push 0
+113FD  mov al, byte ptr [si + 0x15]
+11400  push ax
+11401  push word ptr [si + 0x13]
+11404  push word ptr [si + 0x11]
+11407  push 0x6a62
+1140A  lcall 0x34ca, 0x1fa  ; -> 34E9A
+1140F  add sp, 0xa
+11412  push dx
+11413  push ax
+11414  push word ptr [bp - 8]
+11417  push word ptr [bp - 6]
+1141A  push word ptr [0x4666]
+1141E  lcall 0x3a97, 0  ; -> 3A970
+11423  add sp, 0xc
+11426  jmp 0x11428
+11428  pop di
+11429  pop si
+1142A  leave 
+1142B  retf 
+1142C  push bp
+1142D  mov bp, sp
+1142F  sub sp, 4
+11432  push si
+11433  mov si, word ptr [bp + 6]
+11436  push si
+11437  mov bx, word ptr [si]
+11439  lcall [bx + 4]
+1143C  add sp, 2
+1143F  mov word ptr [bp - 2], ax
+11442  push si
+11443  mov bx, word ptr [si]
+11445  lcall [bx + 8]
+11448  add sp, 2
+1144B  mov word ptr [bp - 4], ax
+1144E  push word ptr [bp - 4]
+11451  push word ptr [bp - 2]
+11454  push si
+11455  mov bx, word ptr [si]
+11457  lcall [bx + 0x20]
+1145A  add sp, 6
+1145D  pop si
+1145E  leave 
+1145F  retf 
+11460  push bp
+11461  mov bp, sp
+11463  sub sp, 4
+11466  push si
+11467  mov si, word ptr [bp + 6]
+1146A  mov ax, word ptr [si + 0xc]
+1146D  add ax, word ptr [bp + 8]
+11470  mov word ptr [bp - 2], ax
+11473  mov ax, word ptr [si + 0xe]
+11476  add ax, word ptr [bp + 0xa]
+11479  mov word ptr [bp - 4], ax
+1147C  push word ptr [bp - 4]
+1147F  push word ptr [bp - 2]
+11482  push si
+11483  mov bx, word ptr [si]
+11485  lcall [bx + 0x20]
+11488  add sp, 6
+1148B  pop si
+1148C  leave 
+1148D  retf 
+1148E  push bp
+1148F  mov bp, sp
+11491  sub sp, 4
+11494  push si
+11495  push di
+11496  mov di, word ptr [bp + 6]
+11499  mov ax, word ptr [0x1d3c]
+1149C  mov word ptr [bp - 4], ax
+1149F  mov al, byte ptr [0x1d3e]
+114A2  mov byte ptr [bp - 2], al
+114A5  mov word ptr [di + 0x25], 0xffff
+114AA  lcall 0, 0x7f6  ; -> 007F6
+114AF  movsx eax, ax
+114B3  imul eax, eax, 0x1e
+114B7  mov ebx, 0x8000
+114BD  cdq 
+114BF  idiv ebx
+114C2  or ax, ax
+114C4  jne 0x114d3
+114C6  cmp byte ptr [di + 0x2f], 0
+114CA  je 0x114d3
+114CC  mov word ptr [di + 0x29], 0xc
+114D1  jmp 0x114d9
+114D3  mov ax, word ptr [di + 0x21]
+114D6  mov word ptr [di + 0x29], ax
+114D9  cmp word ptr [di + 0x21], 0x14
+114DD  jle 0x114e5
+114DF  mov ax, word ptr [di + 0x21]
+114E2  mov word ptr [di + 0x29], ax
+114E5  cmp byte ptr [di + 0x2e], 0
+114E9  je 0x1152b
+114EB  mov ax, di
+114ED  add ax, 0x30
+114F0  push ax
+114F1  mov bx, word ptr [di + 0x30]
+114F4  lcall [bx + 4]
+114F7  add sp, 2
+114FA  or al, al
+114FC  je 0x11508
+114FE  push di
+114FF  push cs
+11500  call 0x1116e
+11503  add sp, 2
+11506  jmp 0x11515
+11508  mov ax, 0xffff
+1150B  mov word ptr [di + 0x27], ax
+1150E  mov word ptr [di + 0x25], ax
+11511  mov byte ptr [di + 0x2e], 0
+11515  cmp word ptr [di + 0x25], -2
+11519  jne 0x11528
+1151B  mov byte ptr [di + 0x2e], 0
+1151F  mov ax, 0xffff
+11522  mov word ptr [di + 0x27], ax
+11525  mov word ptr [di + 0x25], ax
+11528  jmp 0x115e6
+1152B  cmp word ptr [di + 0x1d], 0
+1152F  jne 0x11534
+11531  jmp 0x115e6
+11534  mov bx, word ptr [di + 0x1f]
+11537  mov al, byte ptr [bx]
+11539  mov byte ptr [bp - 4], al
+1153C  or al, al
+1153E  jne 0x11543
+11540  jmp 0x115e6
+11543  inc word ptr [di + 0x1f]
+11546  mov al, byte ptr [bp - 4]
+11549  cwde 
+1154A  cmp ax, 0x68
+1154D  je 0x11593
+1154F  jg 0x1155d
+11551  cmp ax, 0x63
+11554  je 0x115aa
+11556  cmp ax, 0x65
+11559  je 0x11564
+1155B  jmp 0x115bc
+1155D  cmp ax, 0x74
+11560  je 0x11598
+11562  jmp 0x115bc
+11564  mov bx, word ptr [di + 0x1f]
+11567  cmp byte ptr [bx], 0x7a
+1156A  jg 0x11574
+1156C  mov bx, word ptr [di + 0x1f]
+1156F  cmp byte ptr [bx], 0x61
+11572  jge 0x11581
+11574  mov bx, word ptr [di + 0x1f]
+11577  inc word ptr [di + 0x1f]
+1157A  mov al, byte ptr [bx]
+1157C  mov byte ptr [bp - 4], al
+1157F  jmp 0x11591
+11581  mov bx, word ptr [di + 0x1f]
+11584  cmp byte ptr [bx], 0x72
+11587  jne 0x11591
+11589  mov word ptr [di + 0x25], 6
+1158E  inc word ptr [di + 0x1f]
+11591  jmp 0x115bc
+11593  inc word ptr [di + 0x1f]
+11596  jmp 0x115bc
+11598  mov bx, word ptr [di + 0x1f]
+1159B  cmp byte ptr [bx], 0x68
+1159E  jne 0x115a8
+115A0  mov word ptr [di + 0x25], 9
+115A5  inc word ptr [di + 0x1f]
+115A8  jmp 0x115bc
+115AA  mov bx, word ptr [di + 0x1f]
+115AD  cmp byte ptr [bx], 0x68
+115B0  jne 0x115ba
+115B2  mov word ptr [di + 0x25], 6
+115B7  inc word ptr [di + 0x1f]
+115BA  jmp 0x115bc
+115BC  cmp word ptr [di + 0x25], -1
+115C0  jne 0x115e6
+115C2  cmp byte ptr [bp - 4], 0x61
+115C6  jl 0x115e6
+115C8  cmp byte ptr [bp - 4], 0x7a
+115CC  jg 0x115e6
+115CE  mov al, byte ptr [bp - 4]
+115D1  cwde 
+115D2  add ax, word ptr [0x1d38]
+115D6  mov bx, ax
+115D8  mov al, byte ptr [bx - 0x61]
+115DB  cwde 
+115DC  add ax, 0xffd0
+115DF  mov word ptr [di + 0x25], ax
+115E2  add word ptr [di + 0x25], 2
+115E6  push di
+115E7  lcall 0x35ef, 0x271  ; -> 36161
+115EC  add sp, 2
+115EF  pop di
+115F0  pop si
+115F1  leave 
+115F2  retf 
+115F3  push bp
+115F4  mov bp, sp
+115F6  push si
+115F7  mov si, word ptr [bp + 6]
+115FA  cmp word ptr [si + 0x1d], 0
+115FE  je 0x1160d
+11600  mov bx, word ptr [si + 0x1f]
+11603  cmp byte ptr [bx], 0
+11606  je 0x1160d
+11608  mov al, 0
+1160A  pop si
+1160B  pop bp
+1160C  retf 
+1160D  mov al, 1
+1160F  pop si
+11610  pop bp
+11611  retf 
+11612  pop si
+11613  pop bp
+11614  retf 
+11615  push bp
+11616  mov bp, sp
+11618  push si
+11619  push di
+1161A  mov si, word ptr [bp + 6]
+1161D  mov di, word ptr [bp + 8]
+11620  or si, si
+11622  jne 0x11627
+11624  jmp 0x116a7
+11627  mov word ptr [si], 0x201f
+1162B  mov word ptr [si + 0xa], 0x2043
+11630  push word ptr [si + 0x1d]
+11633  lcall 0x3539, 0x240  ; -> 355D0
+11638  add sp, 2
+1163B  mov word ptr [si + 0x1d], 0
+11640  mov word ptr [si + 0x30], 0x18f0
+11645  mov ax, si
+11647  add ax, 0x30
+1164A  push ax
+1164B  lcall 0xe67, 0x15e  ; -> 0E7CE
+11650  add sp, 2
+11653  cmp byte ptr [si + 0x45], 0
+11657  je 0x11679
+11659  cmp dword ptr [si + 0x40], 0
+1165E  je 0x11679
+11660  push 0
+11662  mov al, byte ptr [si + 0x44]
+11665  push ax
+11666  mov ax, si
+11668  add ax, 0x40
+1166B  push ax
+1166C  push 0x6a62
+1166F  lcall 0x34ca, 0x17d  ; -> 34E1D
+11674  add sp, 8
+11677  jmp 0x11679
+11679  mov dword ptr [si + 0x40], 0
+11681  mov byte ptr [si + 0x45], 0
+11685  mov dword ptr [si + 0x46], 0
+1168D  push 0
+1168F  push si
+11690  lcall 0x35ef, 0x707  ; -> 365F7
+11695  add sp, 4
+11698  test di, 1
+1169C  je 0x116a7
+1169E  push si
+1169F  lcall 0, 0x39c  ; -> 0039C
+116A4  add sp, 2
+116A7  pop di
+116A8  pop si
+116A9  pop bp
+116AA  retf 
+116AB  push bp
+116AC  mov bp, sp
+116AE  push si
+116AF  mov si, word ptr [bp + 6]
+116B2  or si, si
+116B4  jne 0x116c7
+116B6  push 0x857
+116B9  lcall 0, 0x741  ; -> 00741
+116BE  add sp, 2
+116C1  mov si, ax
+116C3  or ax, ax
+116C5  je 0x116d8
+116C7  push si
+116C8  push cs
+116C9  call 0x10d27
+116CC  add sp, 2
+116CF  mov word ptr [si], 0x1fd7
+116D3  mov word ptr [si + 0xa], 0x1ffb
+116D8  mov ax, si
+116DA  pop si
+116DB  pop bp
+116DC  retf 
+116DD  pop si
+116DE  pop bp
+116DF  retf 
+116E0  push bp
+116E1  mov bp, sp
+116E3  push si
+116E4  mov si, word ptr [bp + 6]
+116E7  or si, si
+116E9  jne 0x116fc
+116EB  push 0x857
+116EE  lcall 0, 0x741  ; -> 00741
+116F3  add sp, 2
+116F6  mov si, ax
+116F8  or ax, ax
+116FA  je 0x11714
+116FC  push 0
+116FE  push 0
+11700  push word ptr [bp + 8]
+11703  push si
+11704  push cs
+11705  call 0x10e07
+11708  add sp, 8
+1170B  mov word ptr [si], 0x1fd7
+1170F  mov word ptr [si + 0xa], 0x1ffb
+11714  mov ax, si
+11716  pop si
+11717  pop bp
+11718  retf 
+11719  pop si
+1171A  pop bp
+1171B  retf 
+1171C  push bp
+1171D  mov bp, sp
+1171F  push si
+11720  mov si, word ptr [bp + 6]
+11723  or si, si
+11725  jne 0x11738
+11727  push 0x857
+1172A  lcall 0, 0x741  ; -> 00741
+1172F  add sp, 2
+11732  mov si, ax
+11734  or ax, ax
+11736  je 0x11752
+11738  push word ptr [bp + 0xc]
+1173B  push word ptr [bp + 0xa]
+1173E  push word ptr [bp + 8]
+11741  push si
+11742  push cs
+11743  call 0x10e07
+11746  add sp, 8
+11749  mov word ptr [si], 0x1fd7
+1174D  mov word ptr [si + 0xa], 0x1ffb
+11752  mov ax, si
+11754  pop si
+11755  pop bp
+11756  retf 
+11757  pop si
+11758  pop bp
+11759  retf 
+1175A  push bp
+1175B  mov bp, sp
+1175D  push si
+1175E  mov si, word ptr [bp + 6]
+11761  or si, si
+11763  jne 0x11776
+11765  push 0x857
+11768  lcall 0, 0x741  ; -> 00741
+1176D  add sp, 2
+11770  mov si, ax
+11772  or ax, ax
+11774  je 0x117c1
+11776  push si
+11777  push cs
+11778  call 0x10d27
+1177B  add sp, 2
+1177E  mov word ptr [si], 0x1fd7
+11782  mov word ptr [si + 0xa], 0x1ffb
+11787  xor ax, ax
+11789  mov word ptr [si + 0x1d], ax
+1178C  mov word ptr [si + 0x1f], ax
+1178F  mov ax, 0xffff
+11792  mov word ptr [si + 0x21], ax
+11795  mov word ptr [si + 0x29], ax
+11798  mov word ptr [si + 0x25], ax
+1179B  mov word ptr [si + 0x2b], 0
+117A0  mov word ptr [si + 0x23], 0x22
+117A5  mov byte ptr [si + 0x2d], 0
+117A9  mov byte ptr [si + 0x2e], 0
+117AD  mov byte ptr [si + 0x2f], 1
+117B1  mov word ptr [si + 0x27], 0xffff
+117B6  push word ptr [bp + 8]
+117B9  push si
+117BA  push cs
+117BB  call 0x11013
+117BE  add sp, 4
+117C1  mov ax, si
+117C3  pop si
+117C4  pop bp
+117C5  retf 
+117C6  pop si
+117C7  pop bp
+117C8  retf 
+117C9  push bp
+117CA  mov bp, sp
+117CC  sub sp, 0xc
+117CF  push si
+117D0  push di
+117D1  mov si, word ptr [bp + 6]
+117D4  mov di, word ptr [bp + 8]
+117D7  mov word ptr [bp - 2], di
+117DA  mov ax, word ptr [bp + 0xa]
+117DD  mov word ptr [bp - 4], ax
+117E0  push 0
+117E2  push 0
+117E4  mov al, byte ptr [si + 0x15]
+117E7  push ax
+117E8  push word ptr [si + 0x13]
+117EB  push word ptr [si + 0x11]
+117EE  push 0x6a62
+117F1  lcall 0x34ca, 0x1fa  ; -> 34E9A
+117F6  add sp, 0xa
+117F9  push dx
+117FA  push ax
+117FB  push word ptr [bp - 4]
+117FE  push word ptr [bp - 2]
+11801  push word ptr [0x4666]
+11805  lcall 0x3a97, 0  ; -> 3A970
+1180A  add sp, 0xc
+1180D  cmp word ptr [si + 0x25], -1
+11811  je 0x11858
+11813  mov word ptr [bp - 6], di
+11816  mov ax, word ptr [bp + 0xa]
+11819  mov word ptr [bp - 8], ax
+1181C  mov ax, word ptr [si + 0x25]
+1181F  mov word ptr [bp - 0xa], ax
+11822  cmp word ptr [bp - 0xa], -1
+11826  je 0x11858
+11828  push word ptr [bp - 0xa]
+1182B  push 0
+1182D  mov al, byte ptr [si + 0x15]
+11830  push ax
+11831  push word ptr [si + 0x13]
+11834  push word ptr [si + 0x11]
+11837  push 0x6a62
+1183A  lcall 0x34ca, 0x1fa  ; -> 34E9A
+1183F  add sp, 0xa
+11842  push dx
+11843  push ax
+11844  push word ptr [bp - 8]
+11847  push word ptr [bp - 6]
+1184A  push word ptr [0x4666]
+1184E  lcall 0x3a97, 0  ; -> 3A970
+11853  add sp, 0xc
+11856  jmp 0x11858
+11858  mov word ptr [bp - 0xc], 0
+1185D  jmp 0x11877
+1185F  push word ptr [bp + 0xa]
+11862  push di
+11863  mov bx, word ptr [bp - 0xc]
+11866  push word ptr [bx + 6]
+11869  mov bx, word ptr [bp - 0xc]
+1186C  mov bx, word ptr [bx + 6]
+1186F  mov bx, word ptr [bx]
+11871  lcall [bx + 0x10]
+11874  add sp, 6
+11877  lea ax, [bp - 0xc]
+1187A  push ax
+1187B  mov ax, si
+1187D  add ax, 4
+11880  push ax
+11881  lcall 0x3878, 0x248  ; -> 389C8
+11886  add sp, 4
+11889  or ax, ax
+1188B  jne 0x1185f
+1188D  pop di
+1188E  pop si
+1188F  leave 
+11890  retf 
+11891  push bp
+11892  mov bp, sp
+11894  sub sp, 4
+11897  push si
+11898  mov si, word ptr [bp + 6]
+1189B  push si
+1189C  mov bx, word ptr [si]
+1189E  lcall [bx + 4]
+118A1  add sp, 2
+118A4  mov word ptr [bp - 2], ax
+118A7  push si
+118A8  mov bx, word ptr [si]
+118AA  lcall [bx + 8]
+118AD  add sp, 2
+118B0  mov word ptr [bp - 4], ax
+118B3  push word ptr [bp - 4]
+118B6  push word ptr [bp - 2]
+118B9  push si
+118BA  push cs
+118BB  call 0x117c9
+118BE  add sp, 6
+118C1  pop si
+118C2  leave 
+118C3  retf 
+118C4  push bp
+118C5  mov bp, sp
+118C7  sub sp, 4
+118CA  push si
+118CB  mov si, word ptr [bp + 6]
+118CE  mov ax, word ptr [si + 0xc]
+118D1  add ax, word ptr [bp + 8]
+118D4  mov word ptr [bp - 2], ax
+118D7  mov ax, word ptr [si + 0xe]
+118DA  add ax, word ptr [bp + 0xa]
+118DD  mov word ptr [bp - 4], ax
+118E0  push word ptr [bp - 4]
+118E3  push word ptr [bp - 2]
+118E6  push si
+118E7  push cs
+118E8  call 0x117c9
+118EB  add sp, 6
+118EE  pop si
+118EF  leave 
+118F0  retf 
+118F1  push bp
+118F2  mov bp, sp
+118F4  sub sp, 4
+118F7  push si
+118F8  mov si, word ptr [bp + 6]
+118FB  mov ax, word ptr [0x1d3f]
+118FE  mov word ptr [bp - 4], ax
+11901  mov al, byte ptr [0x1d41]
+11904  mov byte ptr [bp - 2], al
+11907  mov word ptr [si + 0x25], 0xffff
+1190C  cmp byte ptr [si + 0x2e], 0
+11910  je 0x11952
+11912  mov ax, si
+11914  add ax, 0x30
+11917  push ax
+11918  mov bx, word ptr [si + 0x30]
+1191B  lcall [bx + 4]
+1191E  add sp, 2
+11921  or al, al
+11923  je 0x11938
+11925  mov ax, si
+11927  add ax, 0x30
+1192A  push ax
+1192B  lcall 0xe67, 0xe31  ; -> 0F4A1
+11930  add sp, 2
+11933  mov word ptr [si + 0x25], ax
+11936  jmp 0x11941
+11938  mov word ptr [si + 0x25], 0xffff
+1193D  mov byte ptr [si + 0x2e], 0
+11941  cmp word ptr [si + 0x25], -2
+11945  jne 0x11950
+11947  mov byte ptr [si + 0x2e], 0
+1194B  mov word ptr [si + 0x25], 0xffff
+11950  jmp 0x1198e
+11952  cmp word ptr [si + 0x1d], 0
+11956  je 0x1198e
+11958  mov bx, word ptr [si + 0x1f]
+1195B  mov al, byte ptr [bx]
+1195D  cmp al, byte ptr [bp - 4]
+11960  jne 0x1198e
+11962  inc word ptr [si + 0x1f]
+11965  cmp word ptr [si + 0x25], -1
+11969  jne 0x1198e
+1196B  cmp byte ptr [bp - 4], 0x61
+1196F  jl 0x1198e
+11971  cmp byte ptr [bp - 4], 0x7a
+11975  jg 0x1198e
+11977  mov al, byte ptr [bp - 4]
+1197A  cwde 
+1197B  add ax, word ptr [0x1d3a]
+1197F  mov bx, ax
+11981  mov al, byte ptr [bx - 0x61]
+11984  cwde 
+11985  add ax, 0xffd0
+11988  mov word ptr [si + 0x25], ax
+1198B  inc word ptr [si + 0x25]
+1198E  push si
+1198F  lcall 0x35ef, 0x271  ; -> 36161
+11994  add sp, 2
+11997  pop si
+11998  leave 
+11999  retf 
+1199A  push bp
+1199B  mov bp, sp
+1199D  push si
+1199E  mov si, word ptr [bp + 6]
+119A1  or si, si
+119A3  jne 0x119b5
+119A5  push 0x1d
+119A7  lcall 0, 0x741  ; -> 00741
+119AC  add sp, 2
+119AF  mov si, ax
+119B1  or ax, ax
+119B3  je 0x11a10
+119B5  mov word ptr [si], 0x2087
+119B9  mov word ptr [si + 4], 0x207f
+119BE  mov word ptr [si + 6], 0
+119C3  mov word ptr [si + 8], 0
+119C8  mov word ptr [si + 4], 0x2083
+119CD  mov word ptr [si + 2], 0
+119D2  mov word ptr [si + 0xa], 0x2053
+119D7  mov word ptr [si + 0xa], 0x205f
+119DC  mov word ptr [si + 0xa], 0x206f
+119E1  mov word ptr [si], 0x20a7
+119E5  mov word ptr [si + 0xa], 0x20c7
+119EA  mov dword ptr [si + 0x11], 0
+119F2  mov byte ptr [si + 0x15], 2
+119F6  mov byte ptr [si + 0x16], 0
+119FA  mov dword ptr [si + 0x17], 0
+11A02  mov word ptr [si], 0x1fa7
+11A06  mov word ptr [si + 0xa], 0x1fc7
+11A0B  mov word ptr [si + 0x1b], 1
+11A10  mov ax, si
+11A12  pop si
+11A13  pop bp
+11A14  retf 
+11A15  pop si
+11A16  pop bp
+11A17  retf 
+11A18  push bp
+11A19  mov bp, sp
+11A1B  push si
+11A1C  mov si, word ptr [bp + 6]
+11A1F  or si, si
+11A21  jne 0x11a33
+11A23  push 0x1d
+11A25  lcall 0, 0x741  ; -> 00741
+11A2A  add sp, 2
+11A2D  mov si, ax
+11A2F  or ax, ax
+11A31  je 0x11a4d
+11A33  push word ptr [bp + 8]
+11A36  push si
+11A37  lcall 0x35ef, 0x4d9  ; -> 363C9
+11A3C  add sp, 4
+11A3F  mov word ptr [si], 0x1fa7
+11A43  mov word ptr [si + 0xa], 0x1fc7
+11A48  mov word ptr [si + 0x1b], 1
+11A4D  mov ax, si
+11A4F  pop si
+11A50  pop bp
+11A51  retf 
+11A52  pop si
+11A53  pop bp
+11A54  retf 
+11A55  push bp
+11A56  mov bp, sp
+11A58  push si
+11A59  mov si, word ptr [bp + 6]
+11A5C  or si, si
+11A5E  jne 0x11a70
+11A60  push 0x1d
+11A62  lcall 0, 0x741  ; -> 00741
+11A67  add sp, 2
+11A6A  mov si, ax
+11A6C  or ax, ax
+11A6E  je 0x11a90
+11A70  push word ptr [bp + 0xc]
+11A73  push word ptr [bp + 0xa]
+11A76  push word ptr [bp + 8]
+11A79  push si
+11A7A  lcall 0x35ef, 0x5df  ; -> 364CF
+11A7F  add sp, 8
+11A82  mov word ptr [si], 0x1fa7
+11A86  mov word ptr [si + 0xa], 0x1fc7
+11A8B  mov word ptr [si + 0x1b], 1
+11A90  mov ax, si
+11A92  pop si
+11A93  pop bp
+11A94  retf 
+11A95  pop si
+11A96  pop bp
+11A97  retf 
+11A98  push bp
+11A99  mov bp, sp
+11A9B  sub sp, 8
+11A9E  push si
+11A9F  mov si, word ptr [bp + 6]
+11AA2  push si
+11AA3  mov bx, word ptr [si]
+11AA5  lcall [bx + 4]
+11AA8  add sp, 2
+11AAB  mov word ptr [bp - 2], ax
+11AAE  push si
+11AAF  mov bx, word ptr [si]
+11AB1  lcall [bx + 8]
+11AB4  add sp, 2
+11AB7  mov word ptr [bp - 4], ax
+11ABA  mov ax, word ptr [bp - 2]
+11ABD  mov word ptr [bp - 6], ax
+11AC0  mov ax, word ptr [bp - 4]
+11AC3  mov word ptr [bp - 8], ax
+11AC6  push 0
+11AC8  push 0
+11ACA  mov al, byte ptr [si + 0x15]
+11ACD  push ax
+11ACE  push word ptr [si + 0x13]
+11AD1  push word ptr [si + 0x11]
+11AD4  push 0x6a62
+11AD7  lcall 0x34ca, 0x1fa  ; -> 34E9A
+11ADC  add sp, 0xa
+11ADF  push dx
+11AE0  push ax
+11AE1  push word ptr [bp - 8]
+11AE4  push word ptr [bp - 6]
+11AE7  push word ptr [0x4666]
+11AEB  lcall 0x3a97, 0  ; -> 3A970
+11AF0  add sp, 0xc
+11AF3  push si
+11AF4  lcall 0x35ef, 0x846  ; -> 36736
+11AF9  add sp, 2
+11AFC  pop si
+11AFD  leave 
+11AFE  retf 
+11AFF  push bp
+11B00  mov bp, sp
+11B02  push si
+11B03  mov si, word ptr [bp + 6]
+11B06  push 0
+11B08  mov al, byte ptr [si + 0x15]
+11B0B  push ax
+11B0C  push word ptr [si + 0x13]
+11B0F  push word ptr [si + 0x11]
+11B12  push 0x6a62
+11B15  lcall 0x34ca, 0x1fa  ; -> 34E9A
+11B1A  add sp, 0xa
+11B1D  or ax, dx
+11B1F  je 0x11b48
+11B21  push 0
+11B23  mov al, byte ptr [si + 0x15]
+11B26  push ax
+11B27  push word ptr [si + 0x13]
+11B2A  push word ptr [si + 0x11]
+11B2D  push 0x6a62
+11B30  lcall 0x34ca, 0x1fa  ; -> 34E9A
+11B35  add sp, 0xa
+11B38  push dx
+11B39  push ax
+11B3A  lcall 0x3afe, 8  ; -> 3AFE8
+11B3F  dec ax
+11B40  cmp ax, word ptr [si + 0x1b]
+11B43  jbe 0x11b48
+11B45  inc word ptr [si + 0x1b]
+11B48  push si
+11B49  lcall 0x35ef, 0x271  ; -> 36161
+11B4E  add sp, 2
+11B51  pop si
+11B52  pop bp
+11B53  retf 
+11B54  push bp
+11B55  mov bp, sp
+11B57  push si
+11B58  mov si, word ptr [bp + 6]
+11B5B  or si, si
+11B5D  jne 0x11b6f
+11B5F  push 0x21
+11B61  lcall 0, 0x741  ; -> 00741
+11B66  add sp, 2
+11B69  mov si, ax
+11B6B  or ax, ax
+11B6D  je 0x11bd8
+11B6F  mov word ptr [si], 0x2087
+11B73  mov word ptr [si + 4], 0x207f
+11B78  mov word ptr [si + 6], 0
+11B7D  mov word ptr [si + 8], 0
+11B82  mov word ptr [si + 4], 0x2083
+11B87  mov word ptr [si + 2], 0
+11B8C  mov word ptr [si + 0xa], 0x2053
+11B91  mov word ptr [si + 0xa], 0x205f
+11B96  mov word ptr [si + 0xa], 0x206f
+11B9B  mov word ptr [si], 0x20a7
+11B9F  mov word ptr [si + 0xa], 0x20c7
+11BA4  mov dword ptr [si + 0x11], 0
+11BAC  mov byte ptr [si + 0x15], 2
+11BB0  mov byte ptr [si + 0x16], 0
+11BB4  mov dword ptr [si + 0x17], 0
+11BBC  mov word ptr [si], 0x213f
+11BC0  mov word ptr [si + 0xa], 0x215f
+11BC5  mov word ptr [si + 0x1d], 0
+11BCA  mov word ptr [si + 0x1f], 0
+11BCF  mov word ptr [si], 0x1f77
+11BD3  mov word ptr [si + 0xa], 0x1f97
+11BD8  mov ax, si
+11BDA  pop si
+11BDB  pop bp
+11BDC  retf 
+11BDD  pop si
+11BDE  pop bp
+11BDF  retf 
+11BE0  push bp
+11BE1  mov bp, sp
+11BE3  sub sp, 2
+11BE6  push si
+11BE7  mov si, word ptr [bp + 6]
+11BEA  or si, si
+11BEC  jne 0x11bfe
+11BEE  push 0x21
+11BF0  lcall 0, 0x741  ; -> 00741
+11BF5  add sp, 2
+11BF8  mov si, ax
+11BFA  or ax, ax
+11BFC  je 0x11c2c
+11BFE  mov ax, word ptr [bp + 8]
+11C01  mov word ptr [bp - 2], ax
+11C04  push word ptr [bp - 2]
+11C07  push si
+11C08  lcall 0x35ef, 0x4d9  ; -> 363C9
+11C0D  add sp, 4
+11C10  mov word ptr [si], 0x213f
+11C14  mov word ptr [si + 0xa], 0x215f
+11C19  mov word ptr [si + 0x1d], 0
+11C1E  mov word ptr [si + 0x1f], 0
+11C23  mov word ptr [si], 0x1f77
+11C27  mov word ptr [si + 0xa], 0x1f97
+11C2C  mov ax, si
+11C2E  pop si
+11C2F  leave 
+11C30  retf 
+11C31  pop si
+11C32  leave 
+11C33  retf 
+11C34  push bp
+11C35  mov bp, sp
+11C37  sub sp, 6
+11C3A  push si
+11C3B  mov si, word ptr [bp + 6]
+11C3E  or si, si
+11C40  jne 0x11c52
+11C42  push 0x21
+11C44  lcall 0, 0x741  ; -> 00741
+11C49  add sp, 2
+11C4C  mov si, ax
+11C4E  or ax, ax
+11C50  je 0x11c92
+11C52  mov ax, word ptr [bp + 8]
+11C55  mov word ptr [bp - 2], ax
+11C58  mov ax, word ptr [bp + 0xa]
+11C5B  mov word ptr [bp - 4], ax
+11C5E  mov ax, word ptr [bp + 0xc]
+11C61  mov word ptr [bp - 6], ax
+11C64  push word ptr [bp - 6]
+11C67  push word ptr [bp - 4]
+11C6A  push word ptr [bp - 2]
+11C6D  push si
+11C6E  lcall 0x35ef, 0x5df  ; -> 364CF
+11C73  add sp, 8
+11C76  mov word ptr [si], 0x213f
+11C7A  mov word ptr [si + 0xa], 0x215f
+11C7F  mov word ptr [si + 0x1d], 0
+11C84  mov word ptr [si + 0x1f], 0
+11C89  mov word ptr [si], 0x1f77
+11C8D  mov word ptr [si + 0xa], 0x1f97
+11C92  mov ax, si
+11C94  pop si
+11C95  leave 
+11C96  retf 
+11C97  pop si
+11C98  leave 
+11C99  retf 
+11C9A  push bp
+11C9B  mov bp, sp
+11C9D  sub sp, 8
+11CA0  push si
+11CA1  mov si, word ptr [bp + 6]
+11CA4  or si, si
+11CA6  jne 0x11cb8
+11CA8  push 0x21
+11CAA  lcall 0, 0x741  ; -> 00741
+11CAF  add sp, 2
+11CB2  mov si, ax
+11CB4  or ax, ax
+11CB6  je 0x11d01
+11CB8  mov ax, word ptr [bp + 8]
+11CBB  mov word ptr [bp - 2], ax
+11CBE  mov ax, word ptr [bp + 0xa]
+11CC1  mov word ptr [bp - 4], ax
+11CC4  mov ax, word ptr [bp + 0xc]
+11CC7  mov word ptr [bp - 6], ax
+11CCA  mov ax, word ptr [bp + 0xe]
+11CCD  mov word ptr [bp - 8], ax
+11CD0  push word ptr [bp - 8]
+11CD3  push word ptr [bp - 6]
+11CD6  push word ptr [bp - 4]
+11CD9  push word ptr [bp - 2]
+11CDC  push si
+11CDD  lcall 0x35ef, 0x670  ; -> 36560
+11CE2  add sp, 0xa
+11CE5  mov word ptr [si], 0x213f
+11CE9  mov word ptr [si + 0xa], 0x215f
+11CEE  mov word ptr [si + 0x1d], 0
+11CF3  mov word ptr [si + 0x1f], 0
+11CF8  mov word ptr [si], 0x1f77
+11CFC  mov word ptr [si + 0xa], 0x1f97
+11D01  mov ax, si
+11D03  pop si
+11D04  leave 
+11D05  retf 
+11D06  pop si
+11D07  leave 
+11D08  retf 
+11D09  push bp
+11D0A  mov bp, sp
+11D0C  sub sp, 0xa
+11D0F  push si
+11D10  mov si, word ptr [bp + 6]
+11D13  or si, si
+11D15  jne 0x11d27
+11D17  push 0x21
+11D19  lcall 0, 0x741  ; -> 00741
+11D1E  add sp, 2
+11D21  mov si, ax
+11D23  or ax, ax
+11D25  je 0x11d7f
+11D27  mov ax, word ptr [bp + 8]
+11D2A  mov word ptr [bp - 2], ax
+11D2D  mov ax, word ptr [bp + 0xa]
+11D30  mov word ptr [bp - 4], ax
+11D33  mov ax, word ptr [bp + 0xc]
+11D36  mov word ptr [bp - 6], ax
+11D39  mov ax, word ptr [bp + 0xe]
+11D3C  mov word ptr [bp - 8], ax
+11D3F  mov ax, word ptr [bp + 0x10]
+11D42  mov word ptr [bp - 0xa], ax
+11D45  push word ptr [bp - 6]
+11D48  push word ptr [bp - 4]
+11D4B  push word ptr [bp - 2]
+11D4E  push si
+11D4F  lcall 0x35ef, 0x5df  ; -> 364CF
+11D54  add sp, 8
+11D57  mov word ptr [si], 0x213f
+11D5B  mov word ptr [si + 0xa], 0x215f
+11D60  mov word ptr [si + 0x1d], 0
+11D65  mov word ptr [si + 0x1f], 0
+11D6A  mov ax, word ptr [bp - 8]
+11D6D  mov word ptr [si + 0x1d], ax
+11D70  mov ax, word ptr [bp - 0xa]
+11D73  mov word ptr [si + 0x1f], ax
+11D76  mov word ptr [si], 0x1f77
+11D7A  mov word ptr [si + 0xa], 0x1f97
+11D7F  mov ax, si
+11D81  pop si
+11D82  leave 
+11D83  retf 
+11D84  pop si
+11D85  leave 
+11D86  retf 
+11D87  push bp
+11D88  mov bp, sp
+11D8A  sub sp, 0xc
+11D8D  push si
+11D8E  mov si, word ptr [bp + 6]
+11D91  or si, si
+11D93  jne 0x11da5
+11D95  push 0x21
+11D97  lcall 0, 0x741  ; -> 00741
+11D9C  add sp, 2
+11D9F  mov si, ax
+11DA1  or ax, ax
+11DA3  je 0x11e06
+11DA5  mov ax, word ptr [bp + 8]
+11DA8  mov word ptr [bp - 2], ax
+11DAB  mov ax, word ptr [bp + 0xa]
+11DAE  mov word ptr [bp - 4], ax
+11DB1  mov ax, word ptr [bp + 0xc]
+11DB4  mov word ptr [bp - 6], ax
+11DB7  mov ax, word ptr [bp + 0xe]
+11DBA  mov word ptr [bp - 8], ax
+11DBD  mov ax, word ptr [bp + 0x10]
+11DC0  mov word ptr [bp - 0xa], ax
+11DC3  mov ax, word ptr [bp + 0x12]
+11DC6  mov word ptr [bp - 0xc], ax
+11DC9  push word ptr [bp - 0xc]
+11DCC  push word ptr [bp - 6]
+11DCF  push word ptr [bp - 4]
+11DD2  push word ptr [bp - 2]
+11DD5  push si
+11DD6  lcall 0x35ef, 0x670  ; -> 36560
+11DDB  add sp, 0xa
+11DDE  mov word ptr [si], 0x213f
+11DE2  mov word ptr [si + 0xa], 0x215f
+11DE7  mov word ptr [si + 0x1d], 0
+11DEC  mov word ptr [si + 0x1f], 0
+11DF1  mov ax, word ptr [bp - 8]
+11DF4  mov word ptr [si + 0x1d], ax
+11DF7  mov ax, word ptr [bp - 0xa]
+11DFA  mov word ptr [si + 0x1f], ax
+11DFD  .byte 0xc7
+11DFE  add al, 0x77
