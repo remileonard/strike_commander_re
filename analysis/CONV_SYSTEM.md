@@ -202,10 +202,17 @@ proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) →
     partie + 0F8h = 2, **252** sinon (Miguel : « we lost $P that mission »).
 - La réponse à 0Bh est rangée dans le premier octet du tampon `[conv + 2Ah]` (partie + 35Bh) :
   1 = « Accept Mission », 0 = refus.
+- Le script de partie a des **blocs conditionnels** : une commande de test qui échoue fait sauter
+  les commandes suivantes jusqu'à 1Eh (« sinon », bascule) ou 1Fh (fin de bloc), en comptant les
+  tests imbriqués. Commandes de test relevées dans le code : 09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h,
+  23h, 25h. **14h** : bloc joué si la mission a été acceptée (partie + 35Bh ≠ 0) ; **15h** : bloc
+  joué si elle a été refusée. C'est ainsi que la réponse à 0Bh choisit la suite (conversations,
+  missions) dans le script de partie. 20h teste un drapeau (partie + 1FDh + argument) ; les autres
+  tests ne sont pas lus.
 
 ## 6. Points ouverts
 
-- Les 37 autres commandes du script de partie (`Gameflow_RunScriptPairs_36CF`) et le chunk de
+- Les autres commandes du script de partie (`Gameflow_RunScriptPairs_36CF`) et le chunk de
   `GAMEFLOW.IFF` qui les contient.
 - Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
 - Version du code qui lit `[voix]` : pas dans cet OPTEST.EXE.

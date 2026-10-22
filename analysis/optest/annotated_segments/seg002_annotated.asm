@@ -326,9 +326,13 @@ off_36C7	dw offset loc_363F	; DATA XREF: sub_3604+36r
 
 ; ==============================================================================================
 ; far, LUE en partie 2026-10-22. Parcourt une suite de paires d'octets (commande, argument) ;
-; 39 commandes (table off_3ABD). Commande 0 : Gameflow_PlayConversation_4AAAB(argument).
-; Commande 24h : si [partie+0EAh] ≠ 0, conversation 253 si [partie+0F8h] = 2, 252 sinon.
-; Autres commandes pas lues.
+; 39 commandes (table off_3ABD). Blocs conditionnels : un test qui échoue pose var_1, les
+; commandes suivantes sont sautées jusqu'à 1Eh (bascule, « sinon ») ou 1Fh (fin), les tests
+; imbriqués (09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h, 23h, 25h) étant comptés dans var_4. Commande 0
+; : Gameflow_PlayConversation_4AAAB(argument). 14h : bloc joué si [partie+35Bh] ≠ 0 (mission
+; acceptée dans la conversation), 15h : si = 0. 20h : bloc joué si [partie+1FDh+argument] = 1.
+; 1Dh : Gameflow_CheckLossConversations_50645. 24h : si [partie+0EAh] ≠ 0, conversation 253 si
+; [partie+0F8h] = 2, 252 sinon. Autres commandes pas lues.
 ; ==============================================================================================
 Gameflow_RunScriptPairs_36CF	proc far		; CODE XREF: sub_3B0B+204p
 					; sub_3D2E+299p
