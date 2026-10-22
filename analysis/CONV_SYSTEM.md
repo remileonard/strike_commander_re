@@ -640,19 +640,67 @@ avec voix, le texte n'est pas dessiné (l'appel au dessin du texte, 06FA5h, est 
   11 et que la précédente valait aussi 10 ou 11, elle devient −1 (bouche fermée). Le clignement et
   la lecture du texte sans voix sont ceux de la version disquette (avance 1148Eh, même table
   « 06891599… »).
-- **Personnage de groupe** (avance 118F1h) : la valeur du son est prise telle quelle, sans ce
-  filtre. Ses images de bouche sont 1 à 6 : ce que donnent 8, 10 et 11 au dessin n'a pas été vérifié.
+- **Personnage de groupe** (avance 118F1h, méthode +1Ch de sa table 1FD7h) : la valeur du son est
+  prise telle quelle, sans ce filtre. Son dessin (117C9h) fait l'image 0 puis l'image de la bouche
+  si elle ≠ −1, sans contrôle de plage ; ses images de bouche sont 1 à 6, ce que donnent 8, 10 et
+  11 au dessin n'a pas été vérifié.
+- **Personnage de groupe sans voix : la bouche ne bouge pas** dans la version CD. L'avance en mode
+  texte ne passe au caractère suivant que si le caractère courant **vaut 0**
+  (`8A 07 3A 46 FC 75 2C` : `mov al, [bx]` / `cmp al, [bp−4]` / `jne`, avec `[bp−4]` = 0, copié de
+  DGROUP:1D3Fh), alors que la version disquette range ce caractère (`mov [bp−4], al`). Le texte
+  n'avance donc jamais et aucune bouche n'est choisie ; la scène ne l'attend pas (pause fixe de
+  50 images, § 8.4).
 - **En numéros libRealSpace** (+ 1) : bouches 9, 4, 3, 11, 12.
 
-### 8.6 Autres différences vues
+### 8.6 Scène de groupe (relue le 2026-10-22, 07EA8h à 087DEh)
 
-- La table des commandes de premier niveau va de 00h à 12h (cs:39F9h) : 00h, 03h, 0Ch, 0Eh, 0Fh
-  comme la disquette, **0Ah** = texte seul avec voix (07B72h) ; 12h ne fait rien ; 10h est sautée
-  comme une commande inconnue.
-- Scène de groupe : chaque 02h est lue, sa figure construite et ajoutée à la scène **au moment de sa
-  réplique** (boucle 08337h–08705h), et non toutes au début comme dans la version disquette. Le
-  retrait d'une figure après sa réplique n'a pas été vu ; la relecture complète de cette boucle
-  reste à faire.
+Table des commandes de premier niveau (cs:39F9h, 00h à 12h) : 00h, 03h, 0Ch, 0Eh, 0Fh comme la
+disquette ; **0Ah** = texte seul, avec voix (07B72h) ; 12h ne fait rien ; 10h est sautée comme une
+commande inconnue.
+
+Déroulement de la commande 00h :
+1. Si Échap a été pressé (DGROUP:69D4h), fin de la conversation.
+2. Scène à 10 images par seconde (3619Ah, même appel que `LayerGroup_Construct_2DC66`), zone de
+   texte (0, 152)-(319, 199).
+3. Lecture du nom de décor (0C8C8h), éléments du décor construits et ajoutés dans l'ordre de `BACK`
+   (07537h puis 364CFh, `Layer_Construct` avec le y de l'élément), palette = palettes du décor puis
+   `FGPL` « normal ».
+4. **Toutes les 01h** qui suivent (08153h–08293h) : lecture (0CA81h : nom, x, y), figurant construit
+   (120BBh, avec le dernier caractère du nom comme dans la disquette) et ajouté ; la `PFIG` du
+   **premier** figurant s'ajoute à la palette.
+5. **Pas de 02h** derrière les 01h : le décor et les figurants sont affichés (palette envoyée), puis
+   7 attentes de 10 tics de l'horloge DGROUP:510Fh (une touche les coupe) ; fin de la commande.
+6. **Chaque 02h, l'une après l'autre** (boucle 08337h–08705h, tant que l'octet suivant vaut 02h) :
+   - lecture (0CB0Bh : nom, x, y, couleur, voix, texte) ;
+   - **construction du personnage et ajout à la scène à ce moment-là** (1171Ch puis 360B8h) : il
+     apparaît à sa première réplique et **reste affiché** jusqu'à la fin de la scène (aucun retrait
+     dans la boucle ; la scène entière est détruite à la fin, 087B4h). Un même nom en deux 02h
+     donne deux calques ;
+   - s'il n'y avait aucun figurant, `FGPL` « normal » est recopiée à nouveau (pas de `PFIG`) ;
+   - si le nom du décor diffère du précédent : zone de texte effacée, palette envoyée ;
+   - une image de scène ; avant la **première** réplique seulement, 7 attentes de 10 tics ;
+   - avec voix (§ 8.2) : la voix est chargée dans ce personnage et jouée, une image de scène par
+     tour jusqu'à la fin du son ; **pas de texte** ;
+   - sans voix : texte de lèvres posé (sans effet, § 8.5), couleur, **texte dessiné**, pause de
+     50 images (8 si le texte est vide) ;
+   - une touche coupe la réplique.
+7. Après la dernière 02h (ou s'il n'y en a aucune, à l'étape 5) : libération des figures, du décor et
+   de la scène. L'image reste à l'écran (rien ne l'efface).
+
+Une 0Ah qui suit une scène de groupe n'est donc pas traitée par la scène : elle passe par la commande
+0Ah de premier niveau (texte ou voix seuls) après la destruction de la scène.
+
+Différences avec la version disquette (§ 2) :
+
+| | Disquette | CD-ROM |
+|---|---|---|
+| personnages 02h | tous construits avant la première réplique, visibles dès le début | construits un par un, visibles à partir de leur réplique |
+| bouche d'un 02h | lettre par lettre du texte | du son ; sans voix, immobile |
+| durée d'une 02h | fin du texte de lèvres | fin du son ; sans voix 50 images (8 si vide) |
+| 0Ah après les 02h | dans la scène, 40 images | commande de premier niveau, après la scène |
+| attente au début | aucune | 7 × 10 tics avant la première réplique |
+
+La cadence de l'horloge DGROUP:510Fh n'a pas été lue (les 10 tics ne sont pas convertis en secondes).
 
 ### 8.7 Pour libRealSpace
 
@@ -661,7 +709,11 @@ avec voix, le texte n'est pas dessiné (l'appel au dessin du texte, 06FA5h, est 
 - Avec voix : **pas de texte affiché** ; fin de réplique = fin du son. Sans voix : texte, 5 s
   (0,8 s si le texte est vide).
 - Lèvres avec voix : calcul du son de `MIDGAME_SYSTEM.md` § 6.6 à la cadence 10, plus le filtre
-  10/11 du gros plan. Sans voix : § 7.4.
+  10/11 du gros plan. Sans voix : gros plan comme § 7.4 ; personnage de groupe immobile dans la
+  version CD (§ 8.5), lettre par lettre dans la version disquette — choix à faire pour le portage.
+- Scène de groupe de la version CD : chaque personnage 02h apparaît à sa première réplique et
+  reste (§ 8.6) ; la structure de libRealSpace doit alors donner, pour chaque `ConvFrame`, les
+  figures déjà apparues, pas toutes celles de la scène.
 - `VOCLIST.IFF` sert au jeu de test de présence des voix (condition 3 du § 8.2) et au
   préchargement ; libRealSpace peut s'en passer pour charger les fichiers, l'équivalent du test
   étant « le fichier de voix existe ».
