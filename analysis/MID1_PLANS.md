@@ -96,9 +96,12 @@ chaque scène y est.
 - **Titres** : le jeu fait apparaître et disparaître le texte par translucidité, en 16 étapes de 3
   tics : les pixels de couleur 239 à 254 de la police `mid1` 27 sont mélangés au fond par les
   tables de `mid1` 60 (`MIDGAME_SYSTEM.md` § 9, scène 2). Ce n'est pas exprimé : le texte est
-  affiché d'un bloc, en couleur 15 (valeur choisie, pas lue dans le jeu). Le texte est dessiné dans
-  l'image hors écran de 320 pixels de large (`word_46F44` est la surface de dessin courante, pas un
-  rectangle de titres) : centrage sur 320 pixels, y + 24 à l'écran.
+  affiché d'un bloc, avec les couleurs propres de la police (police 0 du player, couleur écrite 0 =
+  aucun décalage ajouté aux pixels 239 à 254). Le texte est dessiné dans l'image hors écran de 320
+  pixels de large (`word_46F44` est la surface de dessin courante, pas un rectangle de titres) : chaque
+  ligne (texte coupé aux retours à la ligne) est centrée sur 320 pixels, y + 24 à l'écran.
+- **Polices** (`font_id` de `TEXE`, index dans la liste de `SCAnimationPlayer`) : 0 = `mid1` 27 pour
+  les titres, 1 = `convfont` pour les sous-titres, avec la couleur relevée dans le code.
 - **Tremblement** : marche aléatoire calculée une fois par l'outil (graine fixe).
 - **Animation arrivée au bout** : dans le jeu, une animation simple ne dessine plus rien après sa
   dernière image (`MIDGAME_SYSTEM.md` § 6.1) ; le fichier l'exprime par `end_frame` = 0 (voir
@@ -175,8 +178,7 @@ Règles du lecteur :
 Résultat pour mid1 (2026-10-21) : **0 instant différent sur 5 629** (93,8 s). Avant que les données
 soient obligatoires, les plans qui suivaient une attente de réplique différaient : la durée de
 l'attente, inconnue, était simulée sur 600 images et le plan suivant partait d'un mauvais état.
-- **Non comparés** : les titres (le format les affiche d'un bloc, en couleur 15, sans la
-  translucidité) et le fondu d'apparition (même champ `fade` des deux côtés, rendu ni d'un côté ni
+- **Non comparés** : les titres (le format les affiche d'un bloc, sans la translucidité) et le fondu d'apparition (même champ `fade` des deux côtés, rendu ni d'un côté ni
   de l'autre dans la comparaison).
 
 ## Autres cinématiques

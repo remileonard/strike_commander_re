@@ -1430,9 +1430,16 @@ def shot_chunk(shot, first_shot):
                 if tkey is None:
                     continue
                 nb = 0 if stop == len(frames) else stop - start
-                texts += chunk('TEXE', text(tkey) + struct.pack('<bbHhhhhBHB', index, 0, nb, 0, sample['y'], 0, 0,
-                                                               sample.get('colour', 15), start,
-                                                               sample['align'] or 0))
+                # Polices de SCAnimationPlayer : 0 = mid1 27 (titres, couleurs propres 239 à 254, couleur
+                # écrite = décalage 0), 1 = convfont (sous-titres, couleur du code).
+                if key.startswith('sous-titre'):
+                    font = 1
+                    colour = sample.get('colour', 15)
+                else:
+                    font = 0
+                    colour = 0
+                texts += chunk('TEXE', text(tkey) + struct.pack('<bbHhhhhBHB', index, font, nb, 0, sample['y'], 0, 0,
+                                                               colour, start, sample['align'] or 0))
                 continue
             kind, data = layer_chunks(shot, key, start, stop, depth, next_id)
             if kind is None:
