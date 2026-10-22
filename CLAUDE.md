@@ -313,6 +313,8 @@ strike_commander_re/
     ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
     ├── midgame_check.py             lecteur de contrôle d'un MID_*.IFF, comparé au rendu de référence
     │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
+    ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
+    │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné

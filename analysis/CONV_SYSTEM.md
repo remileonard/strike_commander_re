@@ -301,7 +301,7 @@ proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) →
 ## 6. Points ouverts
 
 - Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
-- Version du code qui lit `[voix]` : pas dans cet OPTEST.EXE.
+- Version du code qui lit `[voix]` : trouvée dans l'OPTTEST.EXE du CD-ROM, voir § 8.
 
 ## 7. Corriger libRealSpace (consignes pour un agent)
 
@@ -320,7 +320,7 @@ comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sa
 - **Voix : garder la détection actuelle.** L'OPTEST.EXE désassemblé est celui de la version
   disquette, qui ne lit pas l'identifiant de voix ; libRealSpace, lui, gère la voix
   (`SetSentenceFromConv` la détecte, `runFrame` joue le VOC). Ce code fonctionne et reste tel
-  quel ; ce document ne dit rien de la façon dont la version avec voix minute les répliques.
+  quel. Le comportement de la version avec voix (lecture, minutage, lèvres, texte) est au § 8.
 
 - **Numéros d'image.** libRealSpace ajoute une image vide en tête de chaque jeu d'images
   (`RSImageSet`) : **numéro libRealSpace = numéro du jeu + 1** pour les visages (`FACE`) et les
@@ -334,8 +334,8 @@ comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sa
 - **Cadence.** Le jeu avance la scène à **10 images par seconde** ; toutes les durées ci-dessous
   sont en images de scène. libRealSpace expire une réplique au bout de 5 s ou à la fin de la voix
   (`CheckFrameExpired`).
-- **Lèvres et voix.** Dans cet OPTEST.EXE, les lèvres suivent le texte (§ 7.4) ; les durées
-  données ici sont celles de la version sans voix.
+- **Lèvres et voix.** Les §§ 7.1 à 7.7 décrivent la version disquette (lèvres sur le texte). La
+  version CD-ROM, avec voix, est au § 8 : pour la voix, elle fait foi.
 
 ### 7.1 Lecture du script (`SCConvPlayer::parseConv`, `ConvFrame::parse_*`)
 
@@ -561,3 +561,108 @@ int closeUpEyeFrame(int baseFrame) {
   en pixels de la police) ; lignes à l'écran **y = 156 + 15 × n** (libRealSpace : 165 + 13 × n). La
   position horizontale du jeu (format « %Y%J%S ») n'a pas été lue : garder le centrage de
   libRealSpace en attendant.
+
+## 8. Version CD-ROM : la voix (lu le 2026-10-22)
+
+Source : `OPTTEST.EXE` de la version CD-ROM, fourni par Rémi **sans désassemblage IDA**. Lu avec
+`tools/exe_disasm.py` (capstone). Les adresses ci-dessous sont des décalages dans l'image chargée
+de **cet** exécutable (DGROUP = 4C25h) ; elles n'ont rien à voir avec celles de l'OPTEST.EXE
+disquette. Aucune de ces fonctions n'a de nom : les noms proposés sont entre guillemets.
+
+### 8.1 Lecture du script : pas de détection
+
+Les lecteurs d'enregistrement de la version CD lisent **toujours** deux chaînes, la voix puis le
+texte :
+- 0Ah (lecteur en 0CC5Fh, « ConvRec_ReadNarration ») : octet couleur, chaîne → voix, chaîne → texte ;
+- 03h (0C8F1h, « ConvRec_ReadLine ») : …, x, y, chaîne → voix, chaîne → texte, octet couleur ;
+- 02h (0CB0Bh, « ConvRec_ReadTalk ») : nom, x, y, octet couleur, chaîne → voix, chaîne → texte.
+
+Une voix « absente » est une **chaîne vide**. Dans les données : 56 textes ont une voix vide
+(38 × 03h, 4 × 04h, 14 × 0Ah), les 2 338 autres en ont une (2 259 identifiants différents).
+
+### 8.2 Quand la voix est jouée
+
+Pour chaque réplique, l'interpréteur (« Conv_PlayScript », 07A9Fh) teste, dans cet ordre :
+1. la chaîne de voix n'est pas vide (`strlen`) ;
+2. un pilote de son numérisé est chargé (mot DGROUP:4031h ≠ 0 ; ce mot est remis à 0 quand les
+   pilotes sont libérés, en 30747h et 30759h) ;
+3. au début de la conversation, `VOCLIST.IFF` a été lu **et le premier fichier qu'il nomme
+   existe** (résultat gardé en `[bp−28h]`). C'est le test de présence des voix : « VocList_Open »
+   (04FC4h) renvoie le résultat de « File_Exists » (0CE05h) sur le premier nom de la liste, qui
+   appelle 43055h (non lue) puis, si elle échoue, 02187h(nom, 0) (vraisemblablement `access`
+   de la bibliothèque C) ; vrai si l'un des deux trouve le fichier.
+
+Si les trois sont vrais : **voix**. Sinon : **texte**. Les deux ne sont jamais affichés ensemble :
+avec voix, le texte n'est pas dessiné (l'appel au dessin du texte, 06FA5h, est sauté). Vu pour la
+0Ah de premier niveau, la 02h (scène de groupe) et la 03h / 04h (gros plan).
+
+### 8.3 Chargement du fichier
+
+- **Nom du fichier** : `"f:"` + identifiant + `".voc"` (concaténation 13DFCh). Le `f:` fait partie du
+  nom ; les noms de `VOCLIST.IFF` ont la même forme (`f:2ai431.voc`).
+- **`VOCLIST.IFF`** (`FORM LIST`) : chunk `SIZE` = mot petit-boutiste, taille d'un nom (20 ; refusé
+  au-delà de 80), puis chunk `LIST` = noms de cette taille, complétés par des 0 (2 438 noms,
+  2 302 différents). Lecteur : « VocList_Open » (04FC4h).
+- **Préchargement** (« speech double buffer ») : après avoir lancé une voix, le jeu avance dans
+  `VOCLIST.IFF` jusqu'à ce nom, prend le nom suivant (« VocList_SeekAfter », 0509Fh) et le charge en
+  mémoire par une tâche de fond (« VocList_StartPreload », 051A8h → 051F1h). À la voix suivante,
+  si son nom est celui qui a été préchargé et que le chargement est fini (« VocList_IsPreloaded »,
+  05334h), elle est jouée depuis la mémoire ; sinon le fichier est chargé directement. 15 voix des
+  scripts ne sont pas dans `VOCLIST.IFF` : elles sont simplement chargées sans préchargement.
+- **Lecture** : la voix est chargée dans le lecteur de voix de la tête ou de la figure (« Talking-
+  Head_LoadVoice », 11203h, puis « TalkingHead_AttachVoiceLipSync », 11234h, cadence **10**), puis
+  lancée (« TalkingHead_StartVoiceAndIsSpeaking », 111ACh, même rôle que
+  `TalkingHead_StartVoiceAndIsSpeaking_9C64` de la version disquette).
+
+### 8.4 Minutage et touches
+
+| Cas | Durée de la réplique |
+|---|---|
+| avec voix | **jusqu'à la fin du son** (boucle tant que 111ACh est vrai) ; une image de scène par tour |
+| sans voix, texte non vide | **50 images** de scène (5 s à 10 images par seconde) |
+| sans voix, texte vide | 8 images |
+
+- Espace (code 39h) ou Échap (code 01h) pendant la voix : le son est coupé et la réplique finit
+  (« Input_CheckSkip », 148B7h). Sans voix, une touche termine la pause de 50 images.
+- Échap pose en plus le drapeau DGROUP:69D4h : le texte n'est plus dessiné et la commande 0Ah de
+  premier niveau termine la conversation (07B72h).
+- Ces durées remplacent, dans la version CD, celles de la version disquette (§ 2 : fin des lèvres
+  puis 40 images). La règle actuelle de libRealSpace (5 s sans voix, fin du son avec voix)
+  correspond à la version CD.
+
+### 8.5 Lèvres avec voix
+
+- La bouche vient **du son**, avec le même calcul que la version disquette
+  (`VoicePlayer_LoadWithLipSync_7D52`, `MIDGAME_SYSTEM.md` § 6.6) : mêmes seuils 95, 78, 65, 42, 25
+  (0EEFDh à 0EF59h), mêmes bouches −1, 8, 3, 2, 10, 11, table de 512 valeurs au plus, une valeur par
+  image de scène (cadence 10).
+- **Gros plan** : filtre nouveau (« TalkingHead_GetVoiceMouth », 1116Eh) — si la bouche vaut 10 ou
+  11 et que la précédente valait aussi 10 ou 11, elle devient −1 (bouche fermée). Le clignement et
+  la lecture du texte sans voix sont ceux de la version disquette (avance 1148Eh, même table
+  « 06891599… »).
+- **Personnage de groupe** (avance 118F1h) : la valeur du son est prise telle quelle, sans ce
+  filtre. Ses images de bouche sont 1 à 6 : ce que donnent 8, 10 et 11 au dessin n'a pas été vérifié.
+- **En numéros libRealSpace** (+ 1) : bouches 9, 4, 3, 11, 12.
+
+### 8.6 Autres différences vues
+
+- La table des commandes de premier niveau va de 00h à 12h (cs:39F9h) : 00h, 03h, 0Ch, 0Eh, 0Fh
+  comme la disquette, **0Ah** = texte seul avec voix (07B72h) ; 12h ne fait rien ; 10h est sautée
+  comme une commande inconnue.
+- Scène de groupe : chaque 02h est lue, sa figure construite et ajoutée à la scène **au moment de sa
+  réplique** (boucle 08337h–08705h), et non toutes au début comme dans la version disquette. Le
+  retrait d'une figure après sa réplique n'a pas été vu ; la relecture complète de cette boucle
+  reste à faire.
+
+### 8.7 Pour libRealSpace
+
+- La détection actuelle (`SetSentenceFromConv`) reste ; le jeu, lui, lit toujours la chaîne de voix,
+  vide quand il n'y a pas de voix (§ 8.1).
+- Avec voix : **pas de texte affiché** ; fin de réplique = fin du son. Sans voix : texte, 5 s
+  (0,8 s si le texte est vide).
+- Lèvres avec voix : calcul du son de `MIDGAME_SYSTEM.md` § 6.6 à la cadence 10, plus le filtre
+  10/11 du gros plan. Sans voix : § 7.4.
+- `VOCLIST.IFF` sert au jeu de test de présence des voix (condition 3 du § 8.2) et au
+  préchargement ; libRealSpace peut s'en passer pour charger les fichiers, l'équivalent du test
+  étant « le fichier de voix existe ».
+
