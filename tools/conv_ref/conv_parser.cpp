@@ -10,7 +10,8 @@
 
 enum class ConvFormat {
     Floppy,
-    Cd
+    Cd,
+    Unknown
 };
 
 // Un enregistrement du script, dans l'ordre de lecture. level 0 = commande de premier niveau,
@@ -316,6 +317,26 @@ private:
     }
 };
 
+// Test du format, fait une fois avant d'utiliser le script : format CD si tout le script se lit
+// avec une chaîne de voix devant chaque texte, sinon format disquette s'il se lit sans, sinon
+// Unknown (script invalide dans les deux formats). Renvoie aussi le résultat du parsing :
+// celui du format trouvé, ou celui de l'essai CD si aucun ne convient (position et raison de
+// l'erreur).
+ConvFormat parseConvScript(const uint8_t *data, size_t size, ConvParseResult &result) {
+    ConvScriptParser cd(data, size, ConvFormat::Cd);
+    result = cd.parse();
+    if (result.ok) {
+        return ConvFormat::Cd;
+    }
+    ConvScriptParser floppy(data, size, ConvFormat::Floppy);
+    ConvParseResult floppyResult = floppy.parse();
+    if (floppyResult.ok) {
+        result = floppyResult;
+        return ConvFormat::Floppy;
+    }
+    return ConvFormat::Unknown;
+}
+
 int main(int argc, char **argv) {
     // argv[1] : v = fichiers au format CD, s = format disquette.
     int errors = 0;
@@ -325,25 +346,20 @@ int main(int argc, char **argv) {
         std::vector<uint8_t> buffer(1 << 16);
         size_t n = std::fread(buffer.data(), 1, buffer.size(), f);
         std::fclose(f);
-        ConvFormat right = ConvFormat::Floppy;
-        ConvFormat wrong = ConvFormat::Cd;
+        ConvFormat expected = ConvFormat::Floppy;
         if (argv[1][0] == 'v') {
-            right = ConvFormat::Cd;
-            wrong = ConvFormat::Floppy;
+            expected = ConvFormat::Cd;
         }
-        ConvScriptParser good(buffer.data(), n, right);
-        ConvParseResult r = good.parse();
-        if (!r.ok) {
-            std::printf("%s : erreur à %zu : %s\n", argv[i], r.errorOffset, r.error.c_str());
+        ConvParseResult result;
+        ConvFormat found = parseConvScript(buffer.data(), n, result);
+        if (found == ConvFormat::Unknown) {
+            std::printf("%s : format inconnu, erreur à %zu : %s\n", argv[i], result.errorOffset, result.error.c_str());
+            errors++;
+        } else if (found != expected) {
+            std::printf("%s : mauvais format trouvé\n", argv[i]);
             errors++;
         }
-        records += static_cast<int>(r.records.size());
-        ConvScriptParser bad(buffer.data(), n, wrong);
-        ConvParseResult w = bad.parse();
-        if (w.ok) {
-            std::printf("%s : lu sans erreur dans le mauvais format\n", argv[i]);
-            errors++;
-        }
+        records += static_cast<int>(result.records.size());
     }
     std::printf("%d erreur(s), %d enregistrements, %d scripts\n", errors, records, argc - 2);
     return errors;

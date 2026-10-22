@@ -1029,9 +1029,12 @@ Le résultat est une liste plate d'enregistrements (`ConvRecord`, dans l'ordre d
 partir d'elle, sans relire les octets. La séparation parseur / structure / lecteur est conservée
 et même renforcée : plus aucun `parse_*` ne déplace le curseur pour un autre.
 
-**Le même parseur sert de test de format** : format CD si `parse()` réussit avec `ConvFormat::Cd`,
-sinon disquette si `parse()` réussit avec `ConvFormat::Floppy`, sinon erreur. `ConvFormatProbe`
-(§ 9.1) n'est plus nécessaire.
+**Le même parseur sert de test de format** : `parseConvScript(data, size, result)` lit le script avec
+`ConvFormat::Cd` ; s'il se lit entièrement, le format est `Cd`, sinon il le relit avec
+`ConvFormat::Floppy` → `Floppy` ; si aucun ne convient → `Unknown`, et `result` garde la position et
+la raison de l'erreur de l'essai CD. Elle renvoie le format et, dans `result`, les enregistrements
+lus dans ce format : un seul appel avant de construire les `ConvFrame`. `ConvFormatProbe` (§ 9.1)
+n'est plus nécessaire.
 
 **Essai** (`tools/conv_ref/export_scripts.py` puis `conv_parser`) :
 
@@ -1039,6 +1042,9 @@ sinon disquette si `parse()` réussit avec `ConvFormat::Floppy`, sinon erreur. `
 |---|---|---|
 | 241 scripts CD | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
 | 241 scripts disquette reconstruits (voix retirées, sauts recalculés) | 0 erreur, 2 772 enregistrements | erreur pour les 241 |
+
+Avec `parseConvScript` (test du format puis parsing) : les 241 scripts CD sont reconnus `Cd`, les 241
+scripts disquette `Floppy`, 2 772 enregistrements chacun ; un script invalide donne `Unknown`.
 
 2 772 = 86 × 00h + 184 × 01h + 70 × 02h + 32 × 0Ah + 1 717 × 03h + 575 × 04h + 26 × 0Bh + 26 × 0Ch +
 28 × 0Eh + 28 × 0Fh, les mêmes comptes que `conv_dump.py` (§ 4).
