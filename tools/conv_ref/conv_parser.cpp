@@ -52,20 +52,35 @@ public:
             uint8_t op = data[pos];
             pos++;
             bool ok = false;
-            if (op == 0x00) {
+            switch (op) {
+            case 0x00:
                 ok = parseGroupShot(at);
-            } else if (op == 0x03) {
+                break;
+            case 0x03:
                 ok = parseCloseUp(at);
-            } else if (op == 0x0A && format == ConvFormat::Cd) {
-                ok = parseNarration(at, 0);
-            } else if (op == 0x0C) {
+                break;
+            case 0x0A:
+                // Commande de premier niveau seulement dans la version CD (§ 8.6).
+                if (format == ConvFormat::Cd) {
+                    ok = parseNarration(at, 0);
+                } else {
+                    ok = fail(at, "octet qui n'est pas une commande");
+                }
+                break;
+            case 0x0C:
                 ok = parseJump(at, op, 0);
-            } else if (op == 0x0E) {
+                break;
+            case 0x0E:
                 ok = parseWing(at);
-            } else if (op == 0x0F || op == 0x10 || op == 0x12) {
+                break;
+            case 0x0F:
+            case 0x10:
+            case 0x12:
                 ok = addSimple(at, op);
-            } else {
+                break;
+            default:
                 ok = fail(at, "octet qui n'est pas une commande");
+                break;
             }
             if (!ok) {
                 return result;
