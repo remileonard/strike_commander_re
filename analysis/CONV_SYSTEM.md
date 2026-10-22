@@ -357,7 +357,7 @@ lus ou pas lus, à corriger dans les `parse_*` existants et à ranger dans `Conv
 | 0Ch | `parse_YESNOCHOICE_BRANCH2`, deux octets ignorés | saut sans condition d'**un mot** (fin de la branche « accepter ») |
 | 0Eh | `topOffset`, `first_palette` | octet écran (0 = `s_wing`, sinon `w_wing`), octet numéro de `WING` dans `GAMEFLOW.IFF` ; remplit `$W`, `$L`, `$O` |
 | 10h | non traité | ne fait rien |
-| autre | `do_not_add` | l'octet est sauté |
+| autre | `do_not_add` | l'octet est sauté par le jeu ; aucun octet de ce genre dans les données des deux formats. **Choix pour libRealSpace : erreur de parsing** (§ 9.2). E0h n'est pas une commande |
 
 La lecture du texte et de la voix : format déterminé avant le parsing, puis lecture sans heuristique
 (§ 9.1, qui remplace la détection de `SetSentenceFromConv`).
@@ -771,10 +771,13 @@ endroits : la détection de voix (sans effet, ci-dessus) et les deux boucles de 
 les 184 figurants des deux formats, ces boucles s'arrêtent toujours sur l'octet qui suit
 immédiatement, une vraie commande : E0h n'y est jamais atteint. Hypothèse pour ces boucles :
 `PeekByte` renvoie l'octet qui suit la position courante, seule lecture pour laquelle le nom du
-figurant tombe juste après `MoveForward(2)` (source de `ByteStream` non lue). Hypothèse sur
-l'origine de E0h : une lecture décalée d'un octet tombait sur une couleur E0h et la prenait pour
-une commande (le cas des 29 répliques vides du § 9 produit exactement ce décalage). Avec le
-format choisi avant le parsing (§ 9.1), E0h n'a plus de rôle.
+figurant tombe juste après `MoveForward(2)` (source de `ByteStream` non lue).
+
+**Conclusion (avec Rémi) : E0h est un symptôme, pas une commande.** C'est la trace du décalage de
+lecture causé par la détection voix / texte : sur une réplique dont la voix et le texte sont vides,
+la lecture s'arrête un octet trop tôt et l'octet couleur qui suit — souvent E0h — est lu comme une
+commande. E0h ne doit être traité comme une commande nulle part (à retirer de `isNextFrameIsConv`).
+La cause se corrige par le format choisi avant le parsing (§ 9.1).
 
 **Conclusion.** La règle est à la fois trop compliquée (deux branches inutiles) et fragile : elle
 dépend de la valeur des couleurs et du contenu des textes, et se trompe déjà sur 29 répliques du CD.
@@ -797,7 +800,8 @@ devinette texte par texte.
   texte ; la valeur renvoyée est le nombre d'octets lus, qui donne la position exacte du champ
   suivant (la couleur pour 03h). La séparation parseur / structure / lecteur est inchangée.
 - `isNextFrameIsConv` n'est plus utile pour la voix ; ses autres usages dans le parseur
-  (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) sont à revoir à part (§ 7.1).
+  (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) sont à revoir à part (§ 7.1). E0h est à
+  retirer de sa liste dans tous les cas.
 
 **Essai** (C++ ci-dessous, compilé, style du dépôt) : 241 / 241 scripts CD reconnus `Cd`, 241 / 241
 scripts disquette (reconstruits) reconnus `Floppy`. Lu dans le mauvais format, chacun des 241 scripts,
@@ -966,3 +970,26 @@ couleur (1) ; 0Bh, 0Ch = mot (2) ; 0Eh = 2 octets ; 0Fh, 10h = rien.
 
 `CONV.PAK` n'existant qu'en un format par version du jeu, le test peut aussi être fait une seule fois
 pour toute l'archive (sur le premier script qui contient un texte).
+
+### 9.2 Octet qui n'est pas une commande : erreur de parsing
+
+Choix de Rémi : le parseur de libRealSpace s'arrête **en erreur** quand il lit, à la place d'une
+commande, un octet qui n'en est pas une. Une lecture décalée se voit alors tout de suite, au lieu
+d'être rattrapée par chance (cas de E0h).
+
+- **Commandes valides de premier niveau** : 00h, 03h, 0Ch, 0Eh, 0Fh, et les deux commandes qui ne
+  font rien, **10h** (disquette, table `off_5CE29`) et **12h** (CD, § 8.6). **0Ah** est aussi une
+  commande de premier niveau dans la version CD (texte seul, 07B72h) ; aucune n'apparaît à ce niveau
+  dans les données. Les sous-commandes (01h, 02h, 0Ah après 00h ; 04h, 0Ah, 0Bh après 03h) ne sont
+  valides qu'à leur place (§ 2).
+- **Écart avec le jeu, assumé** : les deux versions du jeu sautent un octet inconnu sans rien dire
+  (branche par défaut de la table des commandes). Le choix d'une erreur ne change rien sur les
+  données de *Strike Commander* : lus dans le bon format, les 241 scripts n'ont **aucun** octet
+  inconnu (§ 4), dans les deux formats.
+- **Fin du script** : la lecture doit finir exactement à la fin de l'entrée du PAK ; un champ ou une
+  chaîne qui dépasse est aussi une erreur. C'est la même règle que le test de format
+  (`ConvFormatProbe::readsCleanly`, § 9.1) : le parseur et le test peuvent partager le même
+  lecteur.
+- **Sauts 0Bh / 0Ch** : la destination doit être le début d'une commande ou la fin du script (vrai
+  pour les 52 sauts des données, § 4).
+
