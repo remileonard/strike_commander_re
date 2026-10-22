@@ -20,7 +20,7 @@ stru_42070	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:069Eo
 ; de STRIKE).
 ; ==============================================================================================
 Stub_ResourceHandle_Destruct_42090	proc far		; DATA XREF: sub_28EDF+40o
-					; sub_52662+F0Co ...
+					; Gameflow_Catalog_52662+F0Co ...
 		jmp	ResourceHandle_Destruct_53FD9
 Stub_ResourceHandle_Destruct_42090	endp
 
@@ -32,7 +32,7 @@ Stub_ResourceHandle_Destruct_42090	endp
 ; ==============================================================================================
 ; far, stub VROOMM : jmp ResourceHandle_Construct_53F9F.
 ; ==============================================================================================
-Stub_ResourceHandle_Construct_42095	proc far		; DATA XREF: sub_52662+96o
+Stub_ResourceHandle_Construct_42095	proc far		; DATA XREF: Gameflow_Catalog_52662+96o
 					; ConvData_LoadBackground_5A4E6+1BEo ...
 		jmp	ResourceHandle_Construct_53F9F
 Stub_ResourceHandle_Construct_42095	endp
@@ -42,7 +42,7 @@ Stub_ResourceHandle_Construct_42095	endp
 
 ; Attributes: thunk
 
-sub_4209A	proc far		; DATA XREF: sub_52662+4Fo
+sub_4209A	proc far		; DATA XREF: Gameflow_Catalog_52662+4Fo
 		jmp	sub_53F6F
 sub_4209A	endp
 
@@ -52,7 +52,7 @@ sub_4209A	endp
 ; Attributes: thunk
 
 sub_4209F	proc far
-		jmp	sub_51830
+		jmp	Gameflow_ApplyDefaultLoadout_51830
 sub_4209F	endp
 
 
@@ -62,7 +62,7 @@ sub_4209F	endp
 
 sub_420A4	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2B1P
 					; sub_597B2+BBP
-		jmp	sub_51AB3
+		jmp	Gameflow_WeaponLoadout_51AB3
 sub_420A4	endp
 
 
@@ -80,7 +80,7 @@ sub_420A9	endp
 ; Attributes: thunk
 
 sub_420AE	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2CBP
-		jmp	sub_52662
+		jmp	Gameflow_Catalog_52662
 sub_420AE	endp
 
 
@@ -89,7 +89,7 @@ sub_420AE	endp
 ; Attributes: thunk
 
 sub_420B3	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2F0P
-		jmp	sub_53686
+		jmp	Gameflow_Ledger_53686
 sub_420B3	endp
 
 stub188		ends

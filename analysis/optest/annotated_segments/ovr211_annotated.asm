@@ -387,7 +387,7 @@ loc_BE1CC:				; CODE XREF: sub_BDE10+3B7j
 
 loc_BE1F0:				; CODE XREF: sub_BDE10+265j
 		push	2974h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_BE1FB:				; CODE XREF: sub_BDE10+3DEj
@@ -554,7 +554,7 @@ loc_BE393:				; CODE XREF: sub_BDE10+57Ej
 
 loc_BE3A2:				; CODE XREF: sub_BDE10+404j
 		push	297Fh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_BE3AD:				; CODE XREF: sub_BDE10+590j

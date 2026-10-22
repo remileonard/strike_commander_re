@@ -18,7 +18,7 @@ seg115		segment	byte public 'CODE' use16
 ; Candidat pour session dédiée si la précision géométrique doit être vérifiée.
 ; ==============================================================================================
 Render_DrawFilledEllipse_32056	proc far		; CODE XREF: seg045:066BP
-					; sub_542AC+A98P ...
+					; Gameflow_ShowMap_542AC+A98P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

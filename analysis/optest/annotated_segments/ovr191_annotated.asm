@@ -1133,7 +1133,7 @@ loc_5A364:				; CODE XREF: ConvData_LookupByName_5A225+119j
 		mov	ah, 0
 		push	ax
 		push	0F94h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_5A37E:				; CODE XREF: ConvData_LookupByName_5A225+146j
@@ -1541,7 +1541,7 @@ loc_5A616:				; CODE XREF: ConvData_LoadBackground_5A4E6+128j
 
 loc_5A618:				; CODE XREF: ConvData_LoadBackground_5A4E6+F8j
 		push	0FE6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_5A623:				; CODE XREF: ConvData_LoadBackground_5A4E6:loc_5A616j
@@ -1571,7 +1571,7 @@ loc_5A655:				; CODE XREF: ConvData_LoadBackground_5A4E6+12Ej
 		or	ax, ax
 		jnz	short loc_5A669
 		push	1008h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_5A669:				; CODE XREF: ConvData_LoadBackground_5A4E6+176j
@@ -1899,7 +1899,7 @@ loc_5A885:				; CODE XREF: ConvData_LoadBackground_5A4E6+39Aj
 
 loc_5A9CB:				; CODE XREF: ConvData_LoadBackground_5A4E6+39Cj
 		push	1033h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_5A9D6:				; CODE XREF: ConvData_LoadBackground_5A4E6+393j
@@ -1934,7 +1934,7 @@ loc_5AA01:				; CODE XREF: ConvData_LoadBackground_5A4E6+516j
 
 loc_5AA10:				; CODE XREF: ConvData_LoadBackground_5A4E6+1A5j
 		push	1054h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_5AA1B:				; CODE XREF: ConvData_LoadBackground_5A4E6+528j
@@ -4365,7 +4365,7 @@ loc_5BFA9:				; CODE XREF: Conv_PlayScript_5AA4E+4Aj
 		or	ax, ax
 		jnz	short loc_5C047
 		push	10ADh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_5C047:				; CODE XREF: Conv_PlayScript_5AA4E+15ECj
@@ -4445,7 +4445,7 @@ loc_5C0DB:				; CODE XREF: Conv_PlayScript_5AA4E+1641j
 		mov	ah, 0
 		push	ax
 		push	10D4h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_5C0F5:				; CODE XREF: Conv_PlayScript_5AA4E+1694j
@@ -4468,7 +4468,7 @@ loc_5C0F5:				; CODE XREF: Conv_PlayScript_5AA4E+1694j
 		mov	ah, 0
 		push	ax
 		push	1101h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_5C138:				; CODE XREF: Conv_PlayScript_5AA4E+16D7j
@@ -4536,7 +4536,7 @@ loc_5C1A4:				; CODE XREF: Conv_PlayScript_5AA4E+174Ej
 		mov	ah, 0
 		push	ax
 		push	1128h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_5C1CD:				; CODE XREF: Conv_PlayScript_5AA4E+176Cj

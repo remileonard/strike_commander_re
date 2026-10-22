@@ -123,7 +123,7 @@ ResourceRecord_WriteFieldGroupA_3C6C0	endp
 ; ResourceRecord_WriteField_64E1D.
 ; ==============================================================================================
 ResourceRecord_WriteFieldGroupB_3C730	proc far		; CODE XREF: ResourceRecord_CopyOrTransform_3CB45+28p
-					; sub_4BBF7+22FP ...
+					; Gameflow_WriteMissionOrder_4BBF7+22FP ...
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -188,8 +188,8 @@ ResourceRecord_WriteFieldGroupB_3C730	endp
 
 ; Attributes: bp-based frame
 
-sub_3C7C6	proc far		; CODE XREF: sub_4BBF7+23CP
-					; sub_4BBF7+33BP ...
+sub_3C7C6	proc far		; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+23CP
+					; Gameflow_WriteMissionOrder_4BBF7+33BP ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -266,8 +266,8 @@ sub_3C7C6	endp
 ; STRIKE.EXE ; appelants et contexte à revérifier ici. — far, enveloppe appelant sub_6501E.
 ; Référencée par sub_A8F22.
 ; ==============================================================================================
-ResourceRecord_WriteFieldWrapper_3C848	proc far		; CODE XREF: sub_4BBF7+27EP
-					; sub_4BBF7+30FP ...
+ResourceRecord_WriteFieldWrapper_3C848	proc far		; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+27EP
+					; Gameflow_WriteMissionOrder_4BBF7+30FP ...
 
 arg_0		= word ptr  6
 
@@ -295,7 +295,7 @@ ResourceRecord_WriteFieldWrapper_3C848	endp
 ; ResourceRecord_ReleaseAndClear_64D25.
 ; ==============================================================================================
 ResourceRecord_SeekAndRelease_3C857	proc far		; CODE XREF: sub_3C86F+Bp
-					; sub_4BBF7+52AP ...
+					; Gameflow_WriteMissionOrder_4BBF7+52AP ...
 
 arg_0		= word ptr  6
 
@@ -321,7 +321,7 @@ ResourceRecord_SeekAndRelease_3C857	endp
 
 ; Attributes: bp-based frame
 
-sub_3C86F	proc far		; CODE XREF: sub_4BBF7+7A7P
+sub_3C86F	proc far		; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+7A7P
 
 arg_0		= word ptr  6
 

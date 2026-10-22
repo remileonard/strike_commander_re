@@ -78,7 +78,7 @@ loc_3BDCE:				; DATA XREF: dseg:0576o dseg:058Eo ...
 ; appelants et contexte à revérifier ici. — far, dispatch vtable [bx+0x14] et sub_64C21.
 ; Appelée par sub_645CD.
 ; ==============================================================================================
-ResourceRecord_Helper_3BE15	proc far		; CODE XREF: sub_3B0B+1C8P
+ResourceRecord_Helper_3BE15	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+1C8P
 					; seg002:0D5EP	...
 
 arg_0		= word ptr  6
@@ -1098,7 +1098,7 @@ ResourceRecord_ReadFieldGroupC_3C2EE	endp
 ; appelants et contexte à revérifier ici. — far, appelle ResourceRecord_ReadFinalField_64B51.
 ; Référencée par sub_8DF49.
 ; ==============================================================================================
-ResourceRecord_ReadViaHelper_3C349	proc far		; CODE XREF: sub_542AC+19DP
+ResourceRecord_ReadViaHelper_3C349	proc far		; CODE XREF: Gameflow_ShowMap_542AC+19DP
 					; sub_BDE10+A0EP
 
 arg_0		= word ptr  6

@@ -144,7 +144,7 @@ loc_3CEAE:				; CODE XREF: seg149:00D4j
 ; (valeur residuelle de AL) - suggere un emplacement vestigial jamais concu comme un vrai type
 ; de comportement MVRS.
 ; ==============================================================================================
-StreamReader_ReleaseBuffer_3CEB3	proc far		; CODE XREF: sub_3B0B+1D7P
+StreamReader_ReleaseBuffer_3CEB3	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+1D7P
 					; seg002:0D69P	...
 
 arg_0		= word ptr  6

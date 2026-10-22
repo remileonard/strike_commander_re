@@ -584,7 +584,7 @@ loc_47D3:				; CODE XREF: sub_449C+331j
 loc_4895:				; CODE XREF: sub_449C+3AEj
 		push	0
 		push	1268h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_48A2:				; CODE XREF: sub_449C+3F7j
@@ -619,7 +619,7 @@ loc_48C2:				; CODE XREF: sub_449C:loc_48A2j
 loc_48D3:				; CODE XREF: sub_449C+53j
 		push	1
 		push	1268h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_48E0:				; CODE XREF: sub_449C+4Aj
@@ -675,7 +675,7 @@ loc_48F8:				; CODE XREF: sub_48E4+59j
 loc_492B:				; CODE XREF: sub_48E4+18j
 		push	2
 		push	1268h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_4938:				; CODE XREF: sub_48E4+12j sub_48E4+45j

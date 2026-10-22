@@ -6,7 +6,7 @@ ovr189		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_54030	proc far		; CODE XREF: sub_420E5J sub_542AC+9C5p ...
+sub_54030	proc far		; CODE XREF: sub_420E5J Gameflow_ShowMap_542AC+9C5p ...
 
 var_1E		= word ptr -1Eh
 var_1C		= word ptr -1Ch
@@ -357,7 +357,11 @@ loc_542A8:				; CODE XREF: sub_54030+158j
 
 ; Attributes: bp-based frame
 
-sub_542AC	proc far		; CODE XREF: sub_420EAJ
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 12h : carte animée (GAMEFLOW WRLD / MAPS : INFO,
+; SPED, DATA ; police mapfont).
+; ==============================================================================================
+Gameflow_ShowMap_542AC	proc far		; CODE XREF: sub_420EAJ
 
 var_4D2		= word ptr -4D2h
 var_4D0		= word ptr -4D0h
@@ -521,7 +525,7 @@ arg_2		= byte ptr  8
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_542C3:				; CODE XREF: sub_542AC+11j
+loc_542C3:				; CODE XREF: Gameflow_ShowMap_542AC+11j
 		push	seg stub189
 		push	offset sub_420E0
 		push	1
@@ -566,11 +570,11 @@ loc_542C3:				; CODE XREF: sub_542AC+11j
 		jmp	loc_544AA
 ; ���������������������������������������������������������������������������
 
-loc_5435B:				; CODE XREF: sub_542AC+AAj
+loc_5435B:				; CODE XREF: Gameflow_ShowMap_542AC+AAj
 		jmp	short loc_5439B
 ; ���������������������������������������������������������������������������
 
-loc_5435D:				; CODE XREF: sub_542AC+106j
+loc_5435D:				; CODE XREF: Gameflow_ShowMap_542AC+106j
 		push	0
 		push	large 4F464E49h
 		lea	ax, [bp+var_280]
@@ -589,13 +593,13 @@ loc_5435D:				; CODE XREF: sub_542AC+106j
 		jmp	short loc_543B4
 ; ���������������������������������������������������������������������������
 
-loc_5438E:				; CODE XREF: sub_542AC+DAj
+loc_5438E:				; CODE XREF: Gameflow_ShowMap_542AC+DAj
 		lea	ax, [bp+var_280]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
 		add	sp, 2
 
-loc_5439B:				; CODE XREF: sub_542AC:loc_5435Bj
+loc_5439B:				; CODE XREF: Gameflow_ShowMap_542AC:loc_5435Bj
 		push	1
 		push	large 5350414Dh
 		lea	ax, [bp+var_280]
@@ -605,13 +609,13 @@ loc_5439B:				; CODE XREF: sub_542AC:loc_5435Bj
 		or	ax, ax
 		jnz	short loc_5435D
 
-loc_543B4:				; CODE XREF: sub_542AC+E0j
+loc_543B4:				; CODE XREF: Gameflow_ShowMap_542AC+E0j
 		cmp	[bp+var_7], 0
 		jnz	short loc_543BD
 		jmp	loc_5449B
 ; ���������������������������������������������������������������������������
 
-loc_543BD:				; CODE XREF: sub_542AC+10Cj
+loc_543BD:				; CODE XREF: Gameflow_ShowMap_542AC+10Cj
 		push	0
 		push	large 41544144h
 		lea	ax, [bp+var_280]
@@ -627,7 +631,7 @@ loc_543BD:				; CODE XREF: sub_542AC+10Cj
 		jmp	short loc_54454
 ; ���������������������������������������������������������������������������
 
-loc_543E8:				; CODE XREF: sub_542AC+1AEj
+loc_543E8:				; CODE XREF: Gameflow_ShowMap_542AC+1AEj
 		lea	ax, [bp+var_280]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -672,7 +676,7 @@ loc_543E8:				; CODE XREF: sub_542AC+1AEj
 		add	sp, 6
 		inc	byte ptr [bp+var_7E+3]
 
-loc_54454:				; CODE XREF: sub_542AC+13Aj
+loc_54454:				; CODE XREF: Gameflow_ShowMap_542AC+13Aj
 		mov	al, byte ptr [bp+var_7E+3]
 		cmp	al, [bp+var_1]
 		jb	short loc_543E8
@@ -694,27 +698,27 @@ loc_54454:				; CODE XREF: sub_542AC+13Aj
 		add	sp, 2
 		mov	[bp+var_6], eax
 
-loc_54499:				; CODE XREF: sub_542AC+1D1j
+loc_54499:				; CODE XREF: Gameflow_ShowMap_542AC+1D1j
 		jmp	short loc_544A8
 ; ���������������������������������������������������������������������������
 
-loc_5449B:				; CODE XREF: sub_542AC+10Ej
+loc_5449B:				; CODE XREF: Gameflow_ShowMap_542AC+10Ej
 		push	13h
 		push	0A7Ah
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_544A8:				; CODE XREF: sub_542AC:loc_54499j
+loc_544A8:				; CODE XREF: Gameflow_ShowMap_542AC:loc_54499j
 		jmp	short loc_544B7
 ; ���������������������������������������������������������������������������
 
-loc_544AA:				; CODE XREF: sub_542AC+ACj
+loc_544AA:				; CODE XREF: Gameflow_ShowMap_542AC+ACj
 		push	14h
 		push	0A7Ah
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_544B7:				; CODE XREF: sub_542AC:loc_544A8j
+loc_544B7:				; CODE XREF: Gameflow_ShowMap_542AC:loc_544A8j
 		lea	ax, [bp+var_280]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -1006,7 +1010,7 @@ loc_544B7:				; CODE XREF: sub_542AC:loc_544A8j
 		jmp	loc_54F5E
 ; ���������������������������������������������������������������������������
 
-loc_54863:				; CODE XREF: sub_542AC+CBDj
+loc_54863:				; CODE XREF: Gameflow_ShowMap_542AC+CBDj
 		mov	[bp+var_83], 0
 		mov	[bp+var_84], 0
 		mov	ax, [bp+var_76]
@@ -1070,7 +1074,7 @@ loc_54863:				; CODE XREF: sub_542AC+CBDj
 		mov	eax, [bp+var_98]
 		mov	[bp+var_94], eax
 
-loc_5492E:				; CODE XREF: sub_542AC+662j
+loc_5492E:				; CODE XREF: Gameflow_ShowMap_542AC+662j
 		mov	eax, [bp+var_94]
 		imul	eax, 0Bh
 		sar	eax, 5
@@ -1094,7 +1098,7 @@ loc_5492E:				; CODE XREF: sub_542AC+662j
 		mov	[bp+var_B4], eax
 		mov	[bp+var_B8], eax
 
-loc_5498C:				; CODE XREF: sub_542AC+BD4j
+loc_5498C:				; CODE XREF: Gameflow_ShowMap_542AC+BD4j
 		mov	[bp+var_B4], 3
 		mov	eax, dword_47ABB
 		mov	[bp+var_B8], eax
@@ -1104,35 +1108,35 @@ loc_5498C:				; CODE XREF: sub_542AC+BD4j
 		jle	short loc_549BC
 		mov	[bp+var_A4], 1000h
 
-loc_549BC:				; CODE XREF: sub_542AC+705j
+loc_549BC:				; CODE XREF: Gameflow_ShowMap_542AC+705j
 		cmp	[bp+var_72], 0
 		jle	short loc_549C7
 		mov	[bp+var_72], 0
 
-loc_549C7:				; CODE XREF: sub_542AC+714j
+loc_549C7:				; CODE XREF: Gameflow_ShowMap_542AC+714j
 		cmp	[bp+var_72], 0FE0Fh
 		jge	short loc_549D3
 		mov	[bp+var_72], 0FE0Fh
 
-loc_549D3:				; CODE XREF: sub_542AC+720j
+loc_549D3:				; CODE XREF: Gameflow_ShowMap_542AC+720j
 		cmp	[bp+var_74], 0
 		jle	short loc_549DE
 		mov	[bp+var_74], 0
 
-loc_549DE:				; CODE XREF: sub_542AC+72Bj
+loc_549DE:				; CODE XREF: Gameflow_ShowMap_542AC+72Bj
 		cmp	[bp+var_74], 0FF13h
 		jge	short loc_549EA
 		mov	[bp+var_74], 0FF13h
 
-loc_549EA:				; CODE XREF: sub_542AC+737j
+loc_549EA:				; CODE XREF: Gameflow_ShowMap_542AC+737j
 		cmp	[bp+var_72], 0FF49h
 		jge	short loc_549FC
 		cmp	[bp+var_74], 0FFDBh
 		jle	short loc_549FC
 		mov	[bp+var_74], 0FFDBh
 
-loc_549FC:				; CODE XREF: sub_542AC+743j
-					; sub_542AC+749j
+loc_549FC:				; CODE XREF: Gameflow_ShowMap_542AC+743j
+					; Gameflow_ShowMap_542AC+749j
 		cmp	[bp+var_72], 0FEC0h
 		jle	short loc_54A4A
 		cmp	[bp+var_74], 0FF38h
@@ -1158,8 +1162,8 @@ loc_549FC:				; CODE XREF: sub_542AC+743j
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54A4A:				; CODE XREF: sub_542AC+755j
-					; sub_542AC+75Cj
+loc_54A4A:				; CODE XREF: Gameflow_ShowMap_542AC+755j
+					; Gameflow_ShowMap_542AC+75Cj
 		cmp	[bp+var_72], 0FE0Fh
 		jle	short loc_54A9E
 		cmp	[bp+var_74], 0FF13h
@@ -1187,8 +1191,8 @@ loc_54A4A:				; CODE XREF: sub_542AC+755j
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54A9E:				; CODE XREF: sub_542AC+7A3j
-					; sub_542AC+7AAj
+loc_54A9E:				; CODE XREF: Gameflow_ShowMap_542AC+7A3j
+					; Gameflow_ShowMap_542AC+7AAj
 		cmp	[bp+var_72], 0FE0Fh
 		jle	short loc_54AF1
 		cmp	[bp+var_74], 0FFDBh
@@ -1216,8 +1220,8 @@ loc_54A9E:				; CODE XREF: sub_542AC+7A3j
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54AF1:				; CODE XREF: sub_542AC+7F7j
-					; sub_542AC+7FDj
+loc_54AF1:				; CODE XREF: Gameflow_ShowMap_542AC+7F7j
+					; Gameflow_ShowMap_542AC+7FDj
 		cmp	[bp+var_72], 0FF4Fh
 		jge	short loc_54B45
 		cmp	[bp+var_74], 0FF13h
@@ -1245,8 +1249,8 @@ loc_54AF1:				; CODE XREF: sub_542AC+7F7j
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54B45:				; CODE XREF: sub_542AC+84Aj
-					; sub_542AC+851j
+loc_54B45:				; CODE XREF: Gameflow_ShowMap_542AC+84Aj
+					; Gameflow_ShowMap_542AC+851j
 		cmp	[bp+var_72], 0FF4Fh
 		jge	short loc_54B98
 		cmp	[bp+var_74], 0FFDBh
@@ -1274,8 +1278,8 @@ loc_54B45:				; CODE XREF: sub_542AC+84Aj
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54B98:				; CODE XREF: sub_542AC+89Ej
-					; sub_542AC+8A4j
+loc_54B98:				; CODE XREF: Gameflow_ShowMap_542AC+89Ej
+					; Gameflow_ShowMap_542AC+8A4j
 		cmp	[bp+var_72], 0FE0Fh
 		jle	short loc_54BE8
 		cmp	[bp+var_74], 0
@@ -1302,8 +1306,8 @@ loc_54B98:				; CODE XREF: sub_542AC+89Ej
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54BE8:				; CODE XREF: sub_542AC+8F1j
-					; sub_542AC+8F7j
+loc_54BE8:				; CODE XREF: Gameflow_ShowMap_542AC+8F1j
+					; Gameflow_ShowMap_542AC+8F7j
 		cmp	[bp+var_74], 0FF13h
 		jle	short loc_54C32
 		mov	ax, [bp+var_72]
@@ -1328,7 +1332,7 @@ loc_54BE8:				; CODE XREF: sub_542AC+8F1j
 		call	Render_MeasureOrDrawTextString_32CD8
 		add	sp, 0Ch
 
-loc_54C32:				; CODE XREF: sub_542AC+941j
+loc_54C32:				; CODE XREF: Gameflow_ShowMap_542AC+941j
 		mov	eax, [bp+var_A8]
 		mov	[bp+var_B0], eax
 		push	0F6h ; '�'
@@ -1365,7 +1369,7 @@ loc_54C32:				; CODE XREF: sub_542AC+941j
 		jmp	short loc_54D05
 ; ���������������������������������������������������������������������������
 
-loc_54C93:				; CODE XREF: sub_542AC+A5Cj
+loc_54C93:				; CODE XREF: Gameflow_ShowMap_542AC+A5Cj
 		push	0F6h ; '�'
 		mov	al, byte ptr [bp+var_88]
 		push	ax
@@ -1416,14 +1420,14 @@ loc_54C93:				; CODE XREF: sub_542AC+A5Cj
 		add	sp, 16h
 		inc	di
 
-loc_54D05:				; CODE XREF: sub_542AC+9E5j
+loc_54D05:				; CODE XREF: Gameflow_ShowMap_542AC+9E5j
 		cmp	di, [bp+var_76]
 		jl	short loc_54C93
 		xor	di, di
 		jmp	loc_54DA2
 ; ���������������������������������������������������������������������������
 
-loc_54D0F:				; CODE XREF: sub_542AC+AFBj
+loc_54D0F:				; CODE XREF: Gameflow_ShowMap_542AC+AFBj
 		push	0F6h ; '�'
 		push	2
 		push	2
@@ -1483,13 +1487,13 @@ loc_54D0F:				; CODE XREF: sub_542AC+AFBj
 		add	sp, 4
 		inc	di
 
-loc_54DA2:				; CODE XREF: sub_542AC+A60j
+loc_54DA2:				; CODE XREF: Gameflow_ShowMap_542AC+A60j
 		cmp	di, [bp+var_76]
 		jg	short loc_54DAA
 		jmp	loc_54D0F
 ; ���������������������������������������������������������������������������
 
-loc_54DAA:				; CODE XREF: sub_542AC+AF9j
+loc_54DAA:				; CODE XREF: Gameflow_ShowMap_542AC+AF9j
 		mov	ax, word ptr [bp+var_A8]
 		sub	ax, word ptr [bp+var_B0]
 		mov	[bp+var_E6], ax
@@ -1505,7 +1509,7 @@ loc_54DAA:				; CODE XREF: sub_542AC+AF9j
 		cmp	[bp+var_E6], 0
 		jl	short loc_54DF7
 
-loc_54DDF:				; CODE XREF: sub_542AC+B2Aj
+loc_54DDF:				; CODE XREF: Gameflow_ShowMap_542AC+B2Aj
 		mov	ax, word ptr [bp+var_A8]
 		add	ax, [bp+var_72]
 		cmp	ax, 0FAh ; '�'
@@ -1513,11 +1517,11 @@ loc_54DDF:				; CODE XREF: sub_542AC+B2Aj
 		cmp	[bp+var_E6], 0
 		jg	short loc_54DF7
 
-loc_54DF2:				; CODE XREF: sub_542AC+B3Dj
+loc_54DF2:				; CODE XREF: Gameflow_ShowMap_542AC+B3Dj
 		mov	[bp+var_83], 0
 
-loc_54DF7:				; CODE XREF: sub_542AC+B31j
-					; sub_542AC+B44j
+loc_54DF7:				; CODE XREF: Gameflow_ShowMap_542AC+B31j
+					; Gameflow_ShowMap_542AC+B44j
 		mov	ax, word ptr [bp+var_A8+2]
 		add	ax, [bp+var_74]
 		cmp	ax, 3Ch	; '<'
@@ -1525,7 +1529,7 @@ loc_54DF7:				; CODE XREF: sub_542AC+B31j
 		cmp	[bp+var_E8], 0
 		jl	short loc_54E22
 
-loc_54E0A:				; CODE XREF: sub_542AC+B55j
+loc_54E0A:				; CODE XREF: Gameflow_ShowMap_542AC+B55j
 		mov	ax, word ptr [bp+var_A8+2]
 		add	ax, [bp+var_74]
 		cmp	ax, 8Ch	; '�'
@@ -1533,11 +1537,11 @@ loc_54E0A:				; CODE XREF: sub_542AC+B55j
 		cmp	[bp+var_E8], 0
 		jg	short loc_54E22
 
-loc_54E1D:				; CODE XREF: sub_542AC+B68j
+loc_54E1D:				; CODE XREF: Gameflow_ShowMap_542AC+B68j
 		mov	[bp+var_84], 0
 
-loc_54E22:				; CODE XREF: sub_542AC+B5Cj
-					; sub_542AC+B6Fj
+loc_54E22:				; CODE XREF: Gameflow_ShowMap_542AC+B5Cj
+					; Gameflow_ShowMap_542AC+B6Fj
 		cmp	[bp+var_A4], 1000h
 		jge	short loc_54E49
 		cmp	[bp+var_83], 0
@@ -1545,14 +1549,14 @@ loc_54E22:				; CODE XREF: sub_542AC+B5Cj
 		mov	ax, [bp+var_E6]
 		sub	[bp+var_72], ax
 
-loc_54E3B:				; CODE XREF: sub_542AC+B86j
+loc_54E3B:				; CODE XREF: Gameflow_ShowMap_542AC+B86j
 		cmp	[bp+var_84], 0
 		jz	short loc_54E49
 		mov	ax, [bp+var_E8]
 		sub	[bp+var_74], ax
 
-loc_54E49:				; CODE XREF: sub_542AC+B7Fj
-					; sub_542AC+B94j
+loc_54E49:				; CODE XREF: Gameflow_ShowMap_542AC+B7Fj
+					; Gameflow_ShowMap_542AC+B94j
 		push	word_46F44
 		push	word_46F46
 		call	UI_ApplyEncodingHelper_2EC65
@@ -1564,7 +1568,7 @@ loc_54E49:				; CODE XREF: sub_542AC+B7Fj
 		jmp	short loc_54E83
 ; ���������������������������������������������������������������������������
 
-loc_54E68:				; CODE XREF: sub_542AC+BB4j
+loc_54E68:				; CODE XREF: Gameflow_ShowMap_542AC+BB4j
 		lea	ax, [bp+var_B8]
 		push	ax
 		call	Stopwatch_WaitElapsed_3F023
@@ -1574,14 +1578,14 @@ loc_54E68:				; CODE XREF: sub_542AC+BB4j
 		jmp	loc_5498C
 ; ���������������������������������������������������������������������������
 
-loc_54E83:				; CODE XREF: sub_542AC+BBAj
-					; sub_542AC+BD2j
+loc_54E83:				; CODE XREF: Gameflow_ShowMap_542AC+BBAj
+					; Gameflow_ShowMap_542AC+BD2j
 		cmp	[bp+var_8], 0
 		jz	short loc_54E8C
 		jmp	loc_54F6C
 ; ���������������������������������������������������������������������������
 
-loc_54E8C:				; CODE XREF: sub_542AC+BDBj
+loc_54E8C:				; CODE XREF: Gameflow_ShowMap_542AC+BDBj
 		push	0F6h ; '�'
 		push	2
 		push	2
@@ -1653,7 +1657,7 @@ loc_54E8C:				; CODE XREF: sub_542AC+BDBj
 		add	sp, 2
 		inc	[bp+var_76]
 
-loc_54F5E:				; CODE XREF: sub_542AC+5B4j
+loc_54F5E:				; CODE XREF: Gameflow_ShowMap_542AC+5B4j
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		dec	ax
@@ -1662,8 +1666,8 @@ loc_54F5E:				; CODE XREF: sub_542AC+5B4j
 		jmp	loc_54863
 ; ���������������������������������������������������������������������������
 
-loc_54F6C:				; CODE XREF: sub_542AC+BDDj
-					; sub_542AC+CBBj
+loc_54F6C:				; CODE XREF: Gameflow_ShowMap_542AC+BDDj
+					; Gameflow_ShowMap_542AC+CBBj
 		mov	al, [bp+var_8]
 		mov	ah, 0
 		or	ax, ax
@@ -1675,7 +1679,7 @@ loc_54F6C:				; CODE XREF: sub_542AC+BDDj
 		jmp	short loc_54FA8
 ; ���������������������������������������������������������������������������
 
-loc_54F91:				; CODE XREF: sub_542AC+D17j
+loc_54F91:				; CODE XREF: Gameflow_ShowMap_542AC+D17j
 		push	0FFh
 		lea	ax, [bp+var_7A]
 		push	ax
@@ -1686,8 +1690,8 @@ loc_54F91:				; CODE XREF: sub_542AC+D17j
 		jmp	short loc_54FC5
 ; ���������������������������������������������������������������������������
 
-loc_54FA8:				; CODE XREF: sub_542AC+CE3j
-					; sub_542AC+CF8j
+loc_54FA8:				; CODE XREF: Gameflow_ShowMap_542AC+CE3j
+					; Gameflow_ShowMap_542AC+CF8j
 		mov	eax, [bp+var_82]
 		add	eax, [bp+var_7E]
 		cmp	eax, dword_47ABB
@@ -1696,16 +1700,16 @@ loc_54FA8:				; CODE XREF: sub_542AC+CE3j
 		jmp	short loc_54FBF
 ; ���������������������������������������������������������������������������
 
-loc_54FBD:				; CODE XREF: sub_542AC+D0Aj
+loc_54FBD:				; CODE XREF: Gameflow_ShowMap_542AC+D0Aj
 		xor	ax, ax
 
-loc_54FBF:				; CODE XREF: sub_542AC+D0Fj
+loc_54FBF:				; CODE XREF: Gameflow_ShowMap_542AC+D0Fj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_54F91
 
-loc_54FC5:				; CODE XREF: sub_542AC+CC7j
-					; sub_542AC+CFAj
+loc_54FC5:				; CODE XREF: Gameflow_ShowMap_542AC+CC7j
+					; Gameflow_ShowMap_542AC+CFAj
 		push	2
 		lea	ax, [bp+var_70]
 		push	ax
@@ -1778,8 +1782,8 @@ loc_54FC5:				; CODE XREF: sub_542AC+CC7j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55097:				; CODE XREF: sub_542AC+DCBj
-					; sub_542AC+DD2j
+loc_55097:				; CODE XREF: Gameflow_ShowMap_542AC+DCBj
+					; Gameflow_ShowMap_542AC+DD2j
 		mov	[bp+var_62], 0
 		mov	[bp+var_5D], 0
 		mov	[bp+var_5C], 0
@@ -1797,8 +1801,8 @@ loc_55097:				; CODE XREF: sub_542AC+DCBj
 		add	sp, 8
 		jmp	short $+2
 
-loc_550CF:				; CODE XREF: sub_542AC+E03j
-					; sub_542AC+E0Aj
+loc_550CF:				; CODE XREF: Gameflow_ShowMap_542AC+E03j
+					; Gameflow_ShowMap_542AC+E0Aj
 		mov	[bp+var_58], 0
 		mov	[bp+var_53], 0
 		mov	[bp+var_52], 0
@@ -1816,8 +1820,8 @@ loc_550CF:				; CODE XREF: sub_542AC+E03j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55107:				; CODE XREF: sub_542AC+E3Bj
-					; sub_542AC+E42j
+loc_55107:				; CODE XREF: Gameflow_ShowMap_542AC+E3Bj
+					; Gameflow_ShowMap_542AC+E42j
 		mov	[bp+var_4E], 0
 		mov	[bp+var_49], 0
 		mov	[bp+var_48], 0
@@ -1835,8 +1839,8 @@ loc_55107:				; CODE XREF: sub_542AC+E3Bj
 		add	sp, 8
 		jmp	short $+2
 
-loc_5513F:				; CODE XREF: sub_542AC+E73j
-					; sub_542AC+E7Aj
+loc_5513F:				; CODE XREF: Gameflow_ShowMap_542AC+E73j
+					; Gameflow_ShowMap_542AC+E7Aj
 		mov	[bp+var_44], 0
 		mov	[bp+var_3F], 0
 		mov	[bp+var_3E], 0
@@ -1854,8 +1858,8 @@ loc_5513F:				; CODE XREF: sub_542AC+E73j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55177:				; CODE XREF: sub_542AC+EABj
-					; sub_542AC+EB2j
+loc_55177:				; CODE XREF: Gameflow_ShowMap_542AC+EABj
+					; Gameflow_ShowMap_542AC+EB2j
 		mov	[bp+var_3A], 0
 		mov	[bp+var_35], 0
 		mov	[bp+var_34], 0
@@ -1873,8 +1877,8 @@ loc_55177:				; CODE XREF: sub_542AC+EABj
 		add	sp, 8
 		jmp	short $+2
 
-loc_551AF:				; CODE XREF: sub_542AC+EE3j
-					; sub_542AC+EEAj
+loc_551AF:				; CODE XREF: Gameflow_ShowMap_542AC+EE3j
+					; Gameflow_ShowMap_542AC+EEAj
 		mov	[bp+var_30], 0
 		mov	[bp+var_2B], 0
 		mov	[bp+var_2A], 0
@@ -1892,8 +1896,8 @@ loc_551AF:				; CODE XREF: sub_542AC+EE3j
 		add	sp, 8
 		jmp	short $+2
 
-loc_551E7:				; CODE XREF: sub_542AC+F1Bj
-					; sub_542AC+F22j
+loc_551E7:				; CODE XREF: Gameflow_ShowMap_542AC+F1Bj
+					; Gameflow_ShowMap_542AC+F22j
 		mov	[bp+var_26], 0
 		mov	[bp+var_21], 0
 		mov	[bp+var_20], 0
@@ -1911,8 +1915,8 @@ loc_551E7:				; CODE XREF: sub_542AC+F1Bj
 		add	sp, 8
 		jmp	short $+2
 
-loc_5521F:				; CODE XREF: sub_542AC+F53j
-					; sub_542AC+F5Aj
+loc_5521F:				; CODE XREF: Gameflow_ShowMap_542AC+F53j
+					; Gameflow_ShowMap_542AC+F5Aj
 		mov	[bp+var_1C], 0
 		mov	[bp+var_17], 0
 		mov	[bp+var_16], 0
@@ -1930,8 +1934,8 @@ loc_5521F:				; CODE XREF: sub_542AC+F53j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55257:				; CODE XREF: sub_542AC+F8Bj
-					; sub_542AC+F92j
+loc_55257:				; CODE XREF: Gameflow_ShowMap_542AC+F8Bj
+					; Gameflow_ShowMap_542AC+F92j
 		mov	[bp+var_12], 0
 		mov	[bp+var_D], 0
 		mov	[bp+var_C], 0
@@ -1959,7 +1963,7 @@ loc_55257:				; CODE XREF: sub_542AC+F8Bj
 		pop	si
 		leave
 		retf
-sub_542AC	endp
+Gameflow_ShowMap_542AC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -1268,7 +1268,7 @@ loc_60911:				; CODE XREF: Midgame1_PlayPart1_5FCF0+C77j
 		cmp	di, 3Ch	; '<'
 		jle	short loc_6093A
 		push	1D3Dh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_6093A:				; CODE XREF: Midgame1_PlayPart1_5FCF0+C3Dj
@@ -1306,7 +1306,7 @@ loc_6096D:				; CODE XREF: Midgame1_PlayPart1_5FCF0+CD3j
 		cmp	di, 3Ch	; '<'
 		jle	short loc_60996
 		push	1D5Eh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_60996:				; CODE XREF: Midgame1_PlayPart1_5FCF0+C99j
@@ -1366,7 +1366,7 @@ loc_60A04:				; CODE XREF: Midgame1_PlayPart1_5FCF0+D73j
 		cmp	word ptr [bp+var_152+2], 12Ch
 		jle	short loc_60A34
 		push	1D7Fh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_60A34:				; CODE XREF: Midgame1_PlayPart1_5FCF0+D37j

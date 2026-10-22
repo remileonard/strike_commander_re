@@ -11,7 +11,7 @@ seg082		segment	byte public 'CODE' use16
 ; far, LUE 2026-10-17. Palette {+0 nombre de couleurs (arg_4), +2 premier indice (arg_2), +3
 ; tableau RVB de 3 octets par couleur alloué par sub_D57}.
 ; ==============================================================================================
-Palette_Alloc_2CC76	proc far		; CODE XREF: sub_3B0B+C1P sub_3D2E+1DP ...
+Palette_Alloc_2CC76	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+C1P Gameflow_MainLoop_3D2E+1DP ...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -247,7 +247,7 @@ sub_2CDC3	endp
 ; palette. Avec un pas non nul, découpe l'envoi en morceaux de nombre / pas couleurs, chacun
 ; après une attente de balayage (sub_2F050).
 ; ==============================================================================================
-Palette_Upload_2CDE1	proc far		; CODE XREF: sub_3D2E+55P sub_6162+A0P ...
+Palette_Upload_2CDE1	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+55P sub_6162+A0P ...
 
 var_6		= word ptr -6
 var_3		= byte ptr -3
@@ -427,7 +427,7 @@ loc_2CF04:				; CODE XREF: seg082:024Fj
 ; far, LUE 2026-10-17. Remplit une plage (premier indice, nombre) de la palette avec une seule
 ; couleur RVB (pointeur arg_2).
 ; ==============================================================================================
-Palette_FillRange_2CF08	proc far		; CODE XREF: sub_3D2E+40P
+Palette_FillRange_2CF08	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+40P
 					; Palette_FadeFromColor_2D165+47p ...
 
 arg_0		= word ptr  6
@@ -652,8 +652,8 @@ Palette_FadeStep_2D013	endp
 ; ==============================================================================================
 ; far, LUE 2026-10-17. Libère le tableau RVB, puis l'objet si bit 1 de l'argument.
 ; ==============================================================================================
-Palette_Destruct_2D048	proc far		; CODE XREF: sub_3B0B+149P
-					; sub_3D2E+71P	...
+Palette_Destruct_2D048	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+149P
+					; Gameflow_MainLoop_3D2E+71P	...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -696,7 +696,7 @@ Palette_Destruct_2D048	endp
 ; far, LUE 2026-10-17. Palette_LoadFromResource_2CCE5 puis Palette_Upload_2CDE1 sans
 ; découpage.
 ; ==============================================================================================
-Palette_LoadAndUpload_2D077	proc far		; CODE XREF: sub_51049+1C4P
+Palette_LoadAndUpload_2D077	proc far		; CODE XREF: Gameflow_KillBoard_51049+1C4P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -733,7 +733,7 @@ Palette_LoadAndUpload_2D077	endp
 ; la plage, puis répète Palette_FadeStep_2D013 de la palette courante vers elle et
 ; Palette_Upload_2CDE1 (pas arg_4) jusqu'à la fin.
 ; ==============================================================================================
-Palette_FadeToColor_2D09C	proc far		; CODE XREF: sub_4AD86+712P
+Palette_FadeToColor_2D09C	proc far		; CODE XREF: Gameflow_PlayShot_4AD86+712P
 					; sub_6B9C0+5377P ...
 
 var_10		= word ptr -10h
@@ -856,7 +856,7 @@ Palette_FadeToColor_2D09C	endp
 ; plage (premier indice, nombre) avec une couleur unie (arg_2, noir dans mid1), puis répète
 ; Palette_FadeStep_2D013 vers la copie et Palette_Upload_2CDE1 (pas arg_4) jusqu'à la fin.
 ; ==============================================================================================
-Palette_FadeFromColor_2D165	proc far		; CODE XREF: sub_4AD86+68BP
+Palette_FadeFromColor_2D165	proc far		; CODE XREF: Gameflow_PlayShot_4AD86+68BP
 					; Midgame1_PlayPart1_5FCF0+FD3P ...
 
 var_C		= word ptr -0Ch

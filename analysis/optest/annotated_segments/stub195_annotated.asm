@@ -77,7 +77,7 @@ sub_4235E	endp
 
 ; Attributes: thunk
 
-sub_42363	proc far		; CODE XREF: sub_28CFC+1EP
+sub_42363	proc far		; CODE XREF: Music_PlayGameflowTune_28CFC+1EP
 		jmp	sub_5EEE6
 sub_42363	endp
 

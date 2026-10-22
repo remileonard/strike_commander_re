@@ -15,7 +15,7 @@ seg016		segment	byte public 'CODE' use16
 ; Input_Flush_CDDC).
 ; ==============================================================================================
 Scene_Create_C55E	proc far		; CODE XREF: seg018:009DP
-					; sub_4AD86+1C9P ...
+					; Gameflow_PlayShot_4AD86+1C9P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -177,7 +177,7 @@ Scene_PollKeys_C5AF	endp
 ; (Scene_PollKeys_C5AF) ; attend la fin de la durée (Stopwatch_WaitElapsed_3F023).
 ; ==============================================================================================
 Scene_Tick_C652	proc far		; CODE XREF: seg018:0208P
-					; sub_4AD86+674P ...
+					; Gameflow_PlayShot_4AD86+674P ...
 
 var_8		= dword	ptr -8
 var_3		= byte ptr -3

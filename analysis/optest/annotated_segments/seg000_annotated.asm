@@ -5579,7 +5579,7 @@ Stdio_Fflush	endp
 ; Attributes: bp-based frame
 
 sub_1DD6	proc far		; CODE XREF: sub_4C58B+24P
-					; sub_4F1A7+43P ...
+					; Gameflow_MainMenu_4F1A7+43P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5635,7 +5635,7 @@ sub_1DD6	endp
 ; Attributes: bp-based frame
 
 sub_1E09	proc far		; CODE XREF: sub_4C58B+82P
-					; sub_4F1A7+188P
+					; Gameflow_MainMenu_4F1A7+188P
 
 arg_0		= word ptr  6
 
@@ -6142,7 +6142,7 @@ sub_2064	endp ; sp =  2
 ; ici. — far — wrapper sprintf %d signé base10 via sub_56B (itoa signé).
 ; ==============================================================================================
 CRT_Itoa_Signed10	proc far		; CODE XREF: Widget_RenderComplexLayout_31810+77P
-					; sub_51049+4DFP ...
+					; Gameflow_KillBoard_51049+4DFP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -6221,7 +6221,7 @@ CRT_Itoa_Unsigned	endp
 ; ici. — far — wrapper itoa base variable, signé uniquement si base=10.
 ; ==============================================================================================
 CRT_Itoa_BaseVariant	proc far		; CODE XREF: Widget_RenderComplexLayout_31810+B4P
-					; sub_52662+68FP ...
+					; Gameflow_Catalog_52662+68FP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -6462,7 +6462,7 @@ sub_215B	endp
 ; format fixe (pointeurs 2474h/aNullPointerAss+45h) : probable message runtime 'Null pointer
 ; assignment'.
 ; ==============================================================================================
-CRT_Msg_NullPtrAssign	proc far		; CODE XREF: sub_30D3+15P sub_310B+46P ...
+CRT_Msg_NullPtrAssign	proc far		; CODE XREF: sub_30D3+15P Fatal_Error_310B+46P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -7188,7 +7188,7 @@ CRT_Msg_Sprintf1	endp ; sp = -8
 ; arguments passés différemment (sprintf format 291Dh) : sibling wrapper de génération de
 ; message.
 ; ==============================================================================================
-CRT_Msg_Sprintf2	proc far		; CODE XREF: sub_310B+31P seg024:01ADP ...
+CRT_Msg_Sprintf2	proc far		; CODE XREF: Fatal_Error_310B+31P seg024:01ADP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -7647,7 +7647,7 @@ sub_2789	endp
 
 ; Attributes: bp-based frame
 
-sub_27D3	proc far		; CODE XREF: sub_4B544+388P
+sub_27D3	proc far		; CODE XREF: Gameflow_ReadMissionResult_4B544+388P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -7735,7 +7735,7 @@ CRT_Strncpy_Pad	endp
 
 ; Attributes: bp-based frame
 
-sub_2836	proc far		; CODE XREF: sub_4B544+47FP
+sub_2836	proc far		; CODE XREF: Gameflow_ReadMissionResult_4B544+47FP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

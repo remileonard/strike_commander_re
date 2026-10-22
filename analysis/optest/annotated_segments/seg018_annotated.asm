@@ -226,7 +226,7 @@ loc_CAD3:				; CODE XREF: seg018:01CBj
 		cmp	byte ptr [bp-0Fh], 10h
 		jnz	short loc_CAEC
 		push	1ACFh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_CAEC:				; CODE XREF: seg018:01EFj

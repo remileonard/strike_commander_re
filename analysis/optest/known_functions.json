@@ -3537,7 +3537,7 @@
   "sub_36CF": {
     "new_name": "Gameflow_RunScriptPairs_36CF",
     "segment": "seg002",
-    "summary": "far, LUE en partie 2026-10-22. Parcourt une suite de paires d'octets (commande, argument) ; 39 commandes (table off_3ABD). Blocs conditionnels : un test qui échoue pose var_1, les commandes suivantes sont sautées jusqu'à 1Eh (bascule, « sinon ») ou 1Fh (fin), les tests imbriqués (09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h, 23h, 25h) étant comptés dans var_4. Commande 0 : Gameflow_PlayConversation_4AAAB(argument). 14h : bloc joué si [partie+35Bh] ≠ 0 (mission acceptée dans la conversation), 15h : si = 0. 20h : bloc joué si [partie+1FDh+argument] = 1. 1Dh : Gameflow_CheckLossConversations_50645. 24h : si [partie+0EAh] ≠ 0, conversation 253 si [partie+0F8h] = 2, 252 sinon. Autres commandes pas lues."
+    "summary": "far, LUE 2026-10-22. Interpréteur des scripts EFCT de GAMEFLOW.IFF : suite de paires d'octets (commande, argument), 39 commandes (table off_3ABD, 00h à 26h). Blocs conditionnels : un test qui échoue pose var_1 ; les commandes suivantes sont sautées jusqu'à 1Eh (« sinon », bascule) ou 1Fh (fin), les tests rencontrés pendant le saut (09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h, 23h, 25h) étant comptés dans var_4. 21h n : les tests suivants sont évalués même pendant un saut (erreur « Faulty OR structure in gameflow file » si une autre commande s'y trouve). 1Dh peut arrêter le script (var_3). Détail de chaque commande : GAMEFLOW_SYSTEM.md § 5."
   },
   "sub_4ABE0": {
     "new_name": "Gameflow_PlayMidgame_4ABE0",
@@ -3588,5 +3588,140 @@
     "new_name": "LayerGroup_PlayFrame_2DD86",
     "segment": "seg084",
     "summary": "far, LUE 2026-10-22. Joue une image d'un groupe de calques (conversations) : début = dword_47ABB, durée [+10h] ; si [+12h] ≠ 255, sub_2EC80(word_46F44, [+12h]) ; dessine chaque calque (méthode +10h) à la position du groupe ; recopie la surface de dessin vers [+13h] (UI_ApplyEncodingHelper_2EC65) ; avance (méthode +1Ch) ; attend la fin de la durée."
+  },
+  "sub_3D2E": {
+    "new_name": "Gameflow_MainLoop_3D2E",
+    "segment": "seg002",
+    "summary": "far, LUE 2026-10-22. Boucle principale du déroulement (machine à états sur [partie+0E8h]) : 1 = retour de vol (Gameflow_ReadMissionResult_4B544 → code de sortie [partie+0F8h] : 2 → cinématique 33, 3 → recharge gensave.tmp, 4 → menu) ; 0 = menu d'accueil (Gameflow_MainMenu_4F1A7) ; 2 = mission suivante ([+0FAh] = [+0FBh], [+0FBh] = FFh) ; 3 = chargement de [partie+93h]. Puis [+0E8h] = 4, [+0E3h] = 1, script de la mission (Gameflow_LoadMissionScript_4A440, Gameflow_RunScriptPairs_36CF sur partie+7, longueur [partie+6]), sauvegarde gensave.tmp si [+0E8h] = 4 ou 2, scènes (Gameflow_PlayScene_3B0B) tant que [+0E8h] = 4. [+0E8h] = 1 : si [+0F9h] ≠ FEh Gameflow_SaveTmpState_4BBA0, puis Gameflow_WriteMissionOrder_4BBF7 et retour (vol dans STRIKE.EXE). GAMEFLOW_SYSTEM.md § 3."
+  },
+  "sub_3B0B": {
+    "new_name": "Gameflow_PlayScene_3B0B",
+    "segment": "seg002",
+    "summary": "far, LUE 2026-10-22. Une scène : si [partie+0E3h], la reconstruit (sub_358C, Gameflow_BuildScene_4A60B) ; affiche la scène [partie+0FCh] avec ses sprites visibles, musique [partie+0E9h] (Music_SetGameflowMood_28C73), attend le choix (sub_6162 → numéro de sprite), puis exécute le script EFCT de ce sprite (Gameflow_FindSprite_35C9 : +5 = paires, +7 = longueur) par Gameflow_RunScriptPairs_36CF."
+  },
+  "sub_35C9": {
+    "new_name": "Gameflow_FindSprite_35C9",
+    "segment": "seg002",
+    "summary": "far, LUE 2026-10-22. Cherche dans la liste des sprites de la scène celui dont l'octet +4 vaut arg_2 ; renvoie son enregistrement (+5 = script EFCT, +7 = longueur) ou 0."
+  },
+  "sub_3604": {
+    "new_name": "Gameflow_CheckSpriteRequirements_3604",
+    "segment": "seg002",
+    "summary": "far, LUE 2026-10-22. Évalue un chunk REQU (paires condition, drapeau [partie+0FDh+n]) : visible au départ ; 0 n → caché si le drapeau n est posé ; 1 n → caché s'il ne l'est pas ; 2 n → si le drapeau n n'est pas posé, la condition suivante est ignorée ; 3 n → si le drapeau n est posé, la condition suivante est ignorée ; autre valeur ignorée. Appelée par Gameflow_BuildScene_4A60B. GAMEFLOW_SYSTEM.md § 4."
+  },
+  "sub_4B544": {
+    "new_name": "Gameflow_ReadMissionResult_4B544",
+    "segment": "ovr184",
+    "summary": "far, LUE 2026-10-22. Si [partie+0ECh] : lit misn2op.iff (compte rendu écrit par STRIKE.EXE) : EXIT (code de sortie, renvoyé ; 5 = rien d'autre), recharge tmpsav.tmp, INFO (nom de mission), WPNS (armes restantes → [+261h]), JETS (avions perdus → [+0EAh], total [+3D4h], coût ×500 → [+287h]), STAT (succès, gain ajouté à l'argent [+27Bh], 3e valeur → [+3D6h]), KILL (par pilote, deux compteurs → [+29Fh]/[+2A1h] du pilote ; [+0EDh] = 1 si le joueur en a), DIED (noms de la table dseg 0ED8h → drapeau dseg 0EE6h = 0), SCOR (ajouté à [+3D8h]) ; puis dans GAMEFLOW MLST/DATA l'index de la mission → [+1FDh+index] = 1 si succès, 2 sinon ; argent −= coût des avions. [+0F9h] = FFh. GAMEFLOW_SYSTEM.md § 6."
+  },
+  "sub_4BBA0": {
+    "new_name": "Gameflow_SaveTmpState_4BBA0",
+    "segment": "ovr184",
+    "summary": "far, LUE 2026-10-22. Sauvegarde la partie dans tmpsav.tmp (Gameflow_SaveGameFile_4DAE8) avant un vol."
+  },
+  "sub_4BBF7": {
+    "new_name": "Gameflow_WriteMissionOrder_4BBF7",
+    "segment": "ovr184",
+    "summary": "far, LUE en surface 2026-10-22. Écrit op2misn.iff pour STRIKE.EXE (chunks MLST, DATA, PRTL ; mission [partie+0F9h], équipiers, armement)."
+  },
+  "sub_4A440": {
+    "new_name": "Gameflow_LoadMissionScript_4A440",
+    "segment": "ovr184",
+    "summary": "far, LUE en surface 2026-10-22. Lit dans GAMEFLOW.IFF la FORM MISS de la mission [partie+0FAh] (INFO, EFCT) : script en partie+7, longueur partie+6."
+  },
+  "sub_4A60B": {
+    "new_name": "Gameflow_BuildScene_4A60B",
+    "segment": "ovr184",
+    "summary": "far, LUE en surface 2026-10-22. Construit la scène [partie+0FCh] de la mission [partie+0FAh] : FORM SCEN (INFO), sprites SPRT (INFO, EFCT, REQU), visibilité par Gameflow_CheckSpriteRequirements_3604."
+  },
+  "sub_4AD86": {
+    "new_name": "Gameflow_PlayShot_4AD86",
+    "segment": "ovr184",
+    "summary": "far, LUE en surface 2026-10-22. Commande 08h : joue le plan fixe numéro arg dans OPTIONS.IFF (FORM ESTB / SHOT : SHPS, PALS, TUNE)."
+  },
+  "sub_542AC": {
+    "new_name": "Gameflow_ShowMap_542AC",
+    "segment": "ovr189",
+    "summary": "far, LUE en surface 2026-10-22. Commande 12h : carte animée (GAMEFLOW WRLD / MAPS : INFO, SPED, DATA ; police mapfont)."
+  },
+  "sub_51049": {
+    "new_name": "Gameflow_KillBoard_51049",
+    "segment": "ovr187",
+    "summary": "far, LUE en surface 2026-10-22. Commande 13h : tableau des victoires (police boardfnt), pilotes de la table [partie+28Bh] (8 × 1Ah) dont [+2A3h] ≠ 0."
+  },
+  "sub_51AB3": {
+    "new_name": "Gameflow_WeaponLoadout_51AB3",
+    "segment": "ovr188",
+    "summary": "far, LUE 2026-10-22. Commande 16h : écran d'armement (« Add %s (%d) », « Remove %s (%d) ») ; chargement par défaut = chunk LOAD numéro arg (Gameflow_ApplyDefaultLoadout_51830). Renvoie 1 si le joueur choisit le sprite 0Ch (vol : [partie+0E8h] = 1, [+0EEh] = 1), 0 sinon : le test 16h échoue alors."
+  },
+  "sub_51830": {
+    "new_name": "Gameflow_ApplyDefaultLoadout_51830",
+    "segment": "ovr188",
+    "summary": "far, LUE 2026-10-22. Cherche dans FORM LOAD le chunk LOAD dont le 1er octet vaut arg_4, puis lit des paires (arme, nombre) : nombre borné par le stock [partie+261h+2×arme], rendu pair, réparti par paires sur les points d'emport [partie+273h] (arme) / [+274h] (nombre par côté) selon le type d'arme (0, 1 : emports 0–1, 1 par côté ; 6 : emport 2 ; 8 : emport 1, 2 par côté ; 4, 5 : emport 2, 6 par côté ; 7 : 2 par côté ; autres : 3 par côté)."
+  },
+  "sub_52662": {
+    "new_name": "Gameflow_Catalog_52662",
+    "segment": "ovr188",
+    "summary": "far, LUE en surface 2026-10-22. Commande 17h : catalogue d'achat d'armes (police calcfont), stock [partie+261h], argent [partie+27Bh]."
+  },
+  "sub_53686": {
+    "new_name": "Gameflow_Ledger_53686",
+    "segment": "ovr188",
+    "summary": "far, LUE en surface 2026-10-22. Commande 19h : livre de comptes (police ledgfont), [partie+27Bh], [+27Fh], [+283h], [+287h]."
+  },
+  "sub_506AA": {
+    "new_name": "Gameflow_ShowKillMarks_506AA",
+    "segment": "ovr187",
+    "summary": "far, LUE en surface 2026-10-22. Commande 1Ah (si [partie+0EDh] et [partie+0F8h] ≠ 2) : écran des marques de victoires peintes sur l'avion, OPTIONS.IFF FORM MARK (KILL, DATA = positions)."
+  },
+  "sub_50160": {
+    "new_name": "Gameflow_ApplyChange_50160",
+    "segment": "ovr187",
+    "summary": "far, LUE 2026-10-22. Commande 22h : applique la FORM CHNG de STAT dont l'INFO vaut arg : CASH (op, dword) et OVER (op, dword) sur [partie+27Bh] et [+27Fh] ; WEAP (op, arme, mot) sur le stock [+261h] ; PILT (op, pilote, compteur 0 ou 1, mot) sur [+29Fh] ou [+2A1h] du pilote. op 0 = ajouter, 1 = retirer (borné à 0 pour WEAP et PILT, pas pour CASH ni OVER), 2 = remplacer."
+  },
+  "sub_28C73": {
+    "new_name": "Music_SetGameflowMood_28C73",
+    "segment": "seg062",
+    "summary": "far, LUE 2026-10-22. Si la musique est active : humeur musicale du déroulement word_4458B = arg si arg < word_4457E ; sinon erreur « Invalid tune requested » (sauf FFh). Commandes 18h et 24h (8)."
+  },
+  "sub_28CFC": {
+    "new_name": "Music_PlayGameflowTune_28CFC",
+    "segment": "seg062",
+    "summary": "far, LUE 2026-10-22. Si la musique est active : joue le morceau arg de SOUND\\gameflow.dat (sub_42363 → sub_5EEE6). Commande 26h."
+  },
+  "sub_4DF4B": {
+    "new_name": "Gameflow_LoadGameFile_4DF4B",
+    "segment": "ovr185",
+    "summary": "far, LUE en surface 2026-10-22. Lit un fichier de partie (gensave.tmp, tmpsav.tmp, *.sav) dans la structure de partie."
+  },
+  "sub_4DAE8": {
+    "new_name": "Gameflow_SaveGameFile_4DAE8",
+    "segment": "ovr185",
+    "summary": "far, LUE en surface 2026-10-22. Écrit la structure de partie dans un fichier (gensave.tmp, tmpsav.tmp, *.sav)."
+  },
+  "sub_4D984": {
+    "new_name": "Gameflow_SaveRequester_4D984",
+    "segment": "ovr185",
+    "summary": "far, LUE en surface 2026-10-22. Commande 10h : choix du fichier de sauvegarde ; nom rendu dans le tampon arg."
+  },
+  "sub_4DDDC": {
+    "new_name": "Gameflow_LoadRequester_4DDDC",
+    "segment": "ovr185",
+    "summary": "far, LUE en surface 2026-10-22. Commande 11h : choix du fichier à charger (nom en partie+93h) ; si choisi, [partie+0E8h] = 3."
+  },
+  "sub_4A140": {
+    "new_name": "Gameflow_InitNewGame_4A140",
+    "segment": "ovr184",
+    "summary": "far, LUE en surface 2026-10-22. Remet la partie à zéro (argent, pertes, pilotes [+2A3h] = 1, drapeaux [+1FDh] = 0, [+0EDh] = [+0EEh] = 0…)."
+  },
+  "sub_4F1A7": {
+    "new_name": "Gameflow_MainMenu_4F1A7",
+    "segment": "ovr186",
+    "summary": "far, LUE en surface 2026-10-22. Menu d'accueil (mainmenu.pak, *.sav, gensave.tmp) ; renvoie le choix 0 à 5 traité par Gameflow_MainLoop_3D2E."
+  },
+  "sub_310B": {
+    "new_name": "Fatal_Error_310B",
+    "segment": "seg001",
+    "summary": "far, LUE 2026-10-22. Affiche un message d'erreur (CRT_Msg_Sprintf2) et quitte le programme (CRT_Exit)."
   }
 }

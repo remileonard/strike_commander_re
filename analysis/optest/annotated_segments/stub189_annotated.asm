@@ -14,7 +14,7 @@ stru_420C0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:06A6o
 
 ; Attributes: thunk
 
-sub_420E0	proc far		; DATA XREF: sub_542AC+1Ao
+sub_420E0	proc far		; DATA XREF: Gameflow_ShowMap_542AC+1Ao
 		jmp	sub_552AF
 sub_420E0	endp
 
@@ -33,7 +33,7 @@ sub_420E5	endp
 ; Attributes: thunk
 
 sub_420EA	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+276P
-		jmp	sub_542AC
+		jmp	Gameflow_ShowMap_542AC
 sub_420EA	endp
 
 stub189		ends

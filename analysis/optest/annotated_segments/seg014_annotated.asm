@@ -2988,7 +2988,7 @@ loc_A9CE:				; CODE XREF: seg014:1627j
 ; ImageLayer_Construct_2E02C, vtable dseg 6043, dessin OverlayLayer_Draw_AA17, avance de base
 ; Layer_Advance_2E2C3.
 ; ==============================================================================================
-OverlayImageLayer_Construct_A9D6	proc far		; CODE XREF: sub_506AA+374P
+OverlayImageLayer_Construct_A9D6	proc far		; CODE XREF: Gameflow_ShowKillMarks_506AA+374P
 					; Conv_PlayScript_5AA4E+1ACAP ...
 
 arg_0		= word ptr  6
@@ -3405,8 +3405,8 @@ sub_AC84	endp
 ; », x, y, chaîne), puis les enfants. mid33 : inscriptions de la pierre tombale (noms du
 ; joueur).
 ; ==============================================================================================
-TextLayer_Construct_ACF1	proc far		; CODE XREF: sub_52662+311P
-					; sub_52662+327P ...
+TextLayer_Construct_ACF1	proc far		; CODE XREF: Gameflow_Catalog_52662+311P
+					; Gameflow_Catalog_52662+327P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -3523,8 +3523,8 @@ loc_ADAF:				; DATA XREF: dseg:171Fo dseg:174Fo
 ; far, LUE 2026-10-21. Pose la chaîne d'un TextLayer : [arg_0 + 13h] = arg_2 (pointeur
 ; proche).
 ; ==============================================================================================
-TextLayer_SetText_ADB7	proc far		; CODE XREF: sub_52662+742P
-					; sub_52662+781P ...
+TextLayer_SetText_ADB7	proc far		; CODE XREF: Gameflow_Catalog_52662+742P
+					; Gameflow_Catalog_52662+781P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3925,7 +3925,7 @@ loc_B060:				; CODE XREF: seg014:1CB5j
 ; arg_8), vtable dseg 5851, drapeau de lecture +29 = 0. L'appelant pose +29 pour lancer
 ; l'animation.
 ; ==============================================================================================
-TriggeredAnimLayer_Construct_B068	proc far		; CODE XREF: sub_4AD86+3AAP
+TriggeredAnimLayer_Construct_B068	proc far		; CODE XREF: Gameflow_PlayShot_4AD86+3AAP
 					; Midgame1_PlayPart2_671C0+3FD6P ...
 
 arg_0		= word ptr  6
@@ -4014,7 +4014,7 @@ loc_B0EA:				; CODE XREF: seg014:1D2Bj seg014:1D55j
 
 ; Attributes: bp-based frame
 
-sub_B0F6	proc far		; CODE XREF: sub_4AD86+6B8P
+sub_B0F6	proc far		; CODE XREF: Gameflow_PlayShot_4AD86+6B8P
 
 arg_0		= word ptr  6
 

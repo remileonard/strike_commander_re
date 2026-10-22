@@ -42,8 +42,8 @@ sub_41F1A	endp
 
 ; Attributes: thunk
 
-sub_41F1F	proc far		; CODE XREF: sub_3D2E+1C5P
-		jmp	sub_4A140
+sub_41F1F	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+1C5P
+		jmp	Gameflow_InitNewGame_4A140
 sub_41F1F	endp
 
 
@@ -60,8 +60,8 @@ sub_41F24	endp
 
 ; Attributes: thunk
 
-sub_41F29	proc far		; CODE XREF: sub_3D2E+285P
-		jmp	sub_4A440
+sub_41F29	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+285P
+		jmp	Gameflow_LoadMissionScript_4A440
 sub_41F29	endp
 
 
@@ -69,8 +69,8 @@ sub_41F29	endp
 
 ; Attributes: thunk
 
-sub_41F2E	proc far		; CODE XREF: sub_3B0B+2DP
-		jmp	sub_4A60B
+sub_41F2E	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+2DP
+		jmp	Gameflow_BuildScene_4A60B
 sub_41F2E	endp
 
 
@@ -89,7 +89,7 @@ sub_41F33	endp
 ; Attributes: thunk
 
 sub_41F38	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+163P
-					; sub_3D2E+C3P
+					; Gameflow_MainLoop_3D2E+C3P
 		jmp	Gameflow_PlayMidgame_4ABE0
 sub_41F38	endp
 
@@ -98,8 +98,8 @@ sub_41F38	endp
 
 ; Attributes: thunk
 
-sub_41F3D	proc far		; CODE XREF: sub_4DF4B+58P
-					; sub_4F1A7+9AP ...
+sub_41F3D	proc far		; CODE XREF: Gameflow_LoadGameFile_4DF4B+58P
+					; Gameflow_MainMenu_4F1A7+9AP ...
 		jmp	sub_4AB39
 sub_41F3D	endp
 
@@ -118,7 +118,7 @@ sub_41F42	endp
 ; Attributes: thunk
 
 sub_41F47	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+1ADP
-		jmp	sub_4AD86
+		jmp	Gameflow_PlayShot_4AD86
 sub_41F47	endp
 
 
@@ -126,8 +126,8 @@ sub_41F47	endp
 
 ; Attributes: thunk
 
-sub_41F4C	proc far		; CODE XREF: sub_3D2E+9DP
-		jmp	sub_4B544
+sub_41F4C	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+9DP
+		jmp	Gameflow_ReadMissionResult_4B544
 sub_41F4C	endp
 
 
@@ -135,8 +135,8 @@ sub_41F4C	endp
 
 ; Attributes: thunk
 
-sub_41F51	proc far		; CODE XREF: sub_3D2E+2F5P
-		jmp	sub_4BBA0
+sub_41F51	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+2F5P
+		jmp	Gameflow_SaveTmpState_4BBA0
 sub_41F51	endp
 
 
@@ -144,8 +144,8 @@ sub_41F51	endp
 
 ; Attributes: thunk
 
-sub_41F56	proc far		; CODE XREF: sub_3D2E+2FEP
-		jmp	sub_4BBF7
+sub_41F56	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+2FEP
+		jmp	Gameflow_WriteMissionOrder_4BBF7
 sub_41F56	endp
 
 stub184		ends

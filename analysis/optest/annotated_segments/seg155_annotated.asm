@@ -78,7 +78,7 @@ arg_6		= word ptr  0Ch
 		cmp	word_47A2E, 0FFFFh
 		jnz	short loc_3DFD9
 		push	4A13h
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 
 loc_3DFD9:				; CODE XREF: ConfigOption_ConstructFull_3DF86+14j

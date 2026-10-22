@@ -6,7 +6,11 @@ ovr184		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_4A140	proc far		; CODE XREF: sub_41F1FJ sub_4A239+Dp
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Remet la partie à zéro (argent, pertes, pilotes [+2A3h] = 1,
+; drapeaux [+1FDh] = 0, [+0EDh] = [+0EEh] = 0…).
+; ==============================================================================================
+Gameflow_InitNewGame_4A140	proc far		; CODE XREF: sub_41F1FJ sub_4A239+Dp
 
 arg_0		= word ptr  6
 
@@ -23,7 +27,7 @@ arg_0		= word ptr  6
 		jmp	short loc_4A190
 ; ���������������������������������������������������������������������������
 
-loc_4A160:				; CODE XREF: sub_4A140+53j
+loc_4A160:				; CODE XREF: Gameflow_InitNewGame_4A140+53j
 		mov	bx, di
 		shl	bx, 1
 		push	word ptr [bx+2EEh]
@@ -43,7 +47,7 @@ loc_4A160:				; CODE XREF: sub_4A140+53j
 		mov	word ptr [bx+si+2A3h], 1
 		inc	di
 
-loc_4A190:				; CODE XREF: sub_4A140+1Ej
+loc_4A190:				; CODE XREF: Gameflow_InitNewGame_4A140+1Ej
 		cmp	di, 8
 		jl	short loc_4A160
 		mov	byte ptr [si+0FAh], 0
@@ -54,44 +58,44 @@ loc_4A190:				; CODE XREF: sub_4A140+1Ej
 		jmp	short loc_4A1B5
 ; ���������������������������������������������������������������������������
 
-loc_4A1AD:				; CODE XREF: sub_4A140+79j
+loc_4A1AD:				; CODE XREF: Gameflow_InitNewGame_4A140+79j
 		mov	bx, di
 		mov	byte ptr [bx+si+0FDh], 0
 		inc	di
 
-loc_4A1B5:				; CODE XREF: sub_4A140+6Bj
+loc_4A1B5:				; CODE XREF: Gameflow_InitNewGame_4A140+6Bj
 		cmp	di, 0FFh
 		jl	short loc_4A1AD
 		xor	di, di
 		jmp	short loc_4A1C7
 ; ���������������������������������������������������������������������������
 
-loc_4A1BF:				; CODE XREF: sub_4A140+8Aj
+loc_4A1BF:				; CODE XREF: Gameflow_InitNewGame_4A140+8Aj
 		mov	bx, di
 		mov	byte ptr [bx+si+1FDh], 0
 		inc	di
 
-loc_4A1C7:				; CODE XREF: sub_4A140+7Dj
+loc_4A1C7:				; CODE XREF: Gameflow_InitNewGame_4A140+7Dj
 		cmp	di, 64h	; 'd'
 		jl	short loc_4A1BF
 		xor	di, di
 		jmp	short loc_4A1DB
 ; ���������������������������������������������������������������������������
 
-loc_4A1D0:				; CODE XREF: sub_4A140+9Ej
+loc_4A1D0:				; CODE XREF: Gameflow_InitNewGame_4A140+9Ej
 		mov	bx, di
 		shl	bx, 1
 		mov	word ptr [bx+si+261h], 0
 		inc	di
 
-loc_4A1DB:				; CODE XREF: sub_4A140+8Ej
+loc_4A1DB:				; CODE XREF: Gameflow_InitNewGame_4A140+8Ej
 		cmp	di, 9
 		jl	short loc_4A1D0
 		xor	di, di
 		jmp	short loc_4A1F7
 ; ���������������������������������������������������������������������������
 
-loc_4A1E4:				; CODE XREF: sub_4A140+BAj
+loc_4A1E4:				; CODE XREF: Gameflow_InitNewGame_4A140+BAj
 		mov	bx, di
 		shl	bx, 1
 		mov	byte ptr [bx+si+274h], 0
@@ -100,7 +104,7 @@ loc_4A1E4:				; CODE XREF: sub_4A140+BAj
 		mov	byte ptr [bx+si+273h], 0FFh
 		inc	di
 
-loc_4A1F7:				; CODE XREF: sub_4A140+A2j
+loc_4A1F7:				; CODE XREF: Gameflow_InitNewGame_4A140+A2j
 		cmp	di, 4
 		jl	short loc_4A1E4
 		mov	dword ptr [si+27Bh], 0
@@ -114,7 +118,7 @@ loc_4A1F7:				; CODE XREF: sub_4A140+A2j
 		pop	si
 		pop	bp
 		retf
-sub_4A140	endp
+Gameflow_InitNewGame_4A140	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -143,7 +147,7 @@ arg_8		= byte ptr  0Eh
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr sub_4A140
+		call	near ptr Gameflow_InitNewGame_4A140
 		add	sp, 2
 		mov	ax, [bp+arg_2]
 		mov	[si+0E4h], ax
@@ -401,7 +405,11 @@ off_4A418	dw offset loc_4A3B4	; DATA XREF: sub_4A239+E6r
 
 ; Attributes: bp-based frame
 
-sub_4A440	proc far		; CODE XREF: sub_41F29J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Lit dans GAMEFLOW.IFF la FORM MISS de la mission
+; [partie+0FAh] (INFO, EFCT) : script en partie+7, longueur partie+6.
+; ==============================================================================================
+Gameflow_LoadMissionScript_4A440	proc far		; CODE XREF: sub_41F29J
 
 var_AA		= word ptr -0AAh
 var_4D		= dword	ptr -4Dh
@@ -451,7 +459,7 @@ arg_0		= word ptr  6
 		jmp	loc_4A5A8
 ; ���������������������������������������������������������������������������
 
-loc_4A4B2:				; CODE XREF: sub_4A440+195j
+loc_4A4B2:				; CODE XREF: Gameflow_LoadMissionScript_4A440+195j
 		lea	ax, [bp+var_AA]
 		push	ax
 		call	ResourceRecord_ComputeRecordBounds_3BF4B
@@ -461,7 +469,7 @@ loc_4A4B2:				; CODE XREF: sub_4A440+195j
 		jmp	loc_4A59B
 ; ���������������������������������������������������������������������������
 
-loc_4A4C6:				; CODE XREF: sub_4A440+81j
+loc_4A4C6:				; CODE XREF: Gameflow_LoadMissionScript_4A440+81j
 		mov	eax, [bp+var_3D]
 		cmp	eax, dword_4362C
 		jnz	short loc_4A4D6
@@ -469,16 +477,16 @@ loc_4A4C6:				; CODE XREF: sub_4A440+81j
 		jmp	short loc_4A4D8
 ; ���������������������������������������������������������������������������
 
-loc_4A4D6:				; CODE XREF: sub_4A440+8Fj
+loc_4A4D6:				; CODE XREF: Gameflow_LoadMissionScript_4A440+8Fj
 		xor	ax, ax
 
-loc_4A4D8:				; CODE XREF: sub_4A440+94j
+loc_4A4D8:				; CODE XREF: Gameflow_LoadMissionScript_4A440+94j
 		or	ax, ax
 		jnz	short loc_4A4DF
 		jmp	loc_4A59B
 ; ���������������������������������������������������������������������������
 
-loc_4A4DF:				; CODE XREF: sub_4A440+9Aj
+loc_4A4DF:				; CODE XREF: Gameflow_LoadMissionScript_4A440+9Aj
 		lea	ax, [bp+var_AA]
 		push	ax
 		call	sub_3C491
@@ -515,12 +523,12 @@ loc_4A4DF:				; CODE XREF: sub_4A440+9Aj
 		jbe	short loc_4A54D
 		mov	byte ptr [si+6], 3Ch ; '<'
 
-loc_4A54D:				; CODE XREF: sub_4A440+107j
+loc_4A54D:				; CODE XREF: Gameflow_LoadMissionScript_4A440+107j
 		xor	di, di
 		jmp	short loc_4A564
 ; ���������������������������������������������������������������������������
 
-loc_4A551:				; CODE XREF: sub_4A440+12Bj
+loc_4A551:				; CODE XREF: Gameflow_LoadMissionScript_4A440+12Bj
 		lea	ax, [bp+var_AA]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -529,31 +537,31 @@ loc_4A551:				; CODE XREF: sub_4A440+12Bj
 		mov	[bx+si+7], al
 		inc	di
 
-loc_4A564:				; CODE XREF: sub_4A440+10Fj
+loc_4A564:				; CODE XREF: Gameflow_LoadMissionScript_4A440+10Fj
 		mov	al, [si+6]
 		mov	ah, 0
 		cmp	ax, di
 		jg	short loc_4A551
 		jmp	short $+2
 
-loc_4A56F:				; CODE XREF: sub_4A440+FBj
+loc_4A56F:				; CODE XREF: Gameflow_LoadMissionScript_4A440+FBj
 		mov	[bp+var_1], 1
 		jmp	short loc_4A5D8
 ; ���������������������������������������������������������������������������
 
-loc_4A575:				; CODE XREF: sub_4A440+DAj
+loc_4A575:				; CODE XREF: Gameflow_LoadMissionScript_4A440+DAj
 		mov	eax, [bp+var_34]
 		mov	[bp+var_45], eax
 		jmp	short loc_4A58C
 ; ���������������������������������������������������������������������������
 
-loc_4A57F:				; CODE XREF: sub_4A440+C3j
+loc_4A57F:				; CODE XREF: Gameflow_LoadMissionScript_4A440+C3j
 		push	2
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A58C:				; CODE XREF: sub_4A440+13Dj
+loc_4A58C:				; CODE XREF: Gameflow_LoadMissionScript_4A440+13Dj
 		lea	ax, [bp+var_AA]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -561,15 +569,15 @@ loc_4A58C:				; CODE XREF: sub_4A440+13Dj
 		jmp	short loc_4A5A8
 ; ���������������������������������������������������������������������������
 
-loc_4A59B:				; CODE XREF: sub_4A440+83j
-					; sub_4A440+9Cj
+loc_4A59B:				; CODE XREF: Gameflow_LoadMissionScript_4A440+83j
+					; Gameflow_LoadMissionScript_4A440+9Cj
 		push	3
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A5A8:				; CODE XREF: sub_4A440+6Fj
-					; sub_4A440+159j
+loc_4A5A8:				; CODE XREF: Gameflow_LoadMissionScript_4A440+6Fj
+					; Gameflow_LoadMissionScript_4A440+159j
 		cmp	[bp+var_2E], 0
 		jnz	short loc_4A5BD
 		lea	ax, [bp+var_AA]
@@ -579,7 +587,7 @@ loc_4A5A8:				; CODE XREF: sub_4A440+6Fj
 		jmp	short loc_4A5D1
 ; ���������������������������������������������������������������������������
 
-loc_4A5BD:				; CODE XREF: sub_4A440+16Cj
+loc_4A5BD:				; CODE XREF: Gameflow_LoadMissionScript_4A440+16Cj
 		mov	bx, [bp+var_2E]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_45]
@@ -588,18 +596,18 @@ loc_4A5BD:				; CODE XREF: sub_4A440+16Cj
 		jmp	short loc_4A5D1
 ; ���������������������������������������������������������������������������
 
-loc_4A5CF:				; CODE XREF: sub_4A440+188j
+loc_4A5CF:				; CODE XREF: Gameflow_LoadMissionScript_4A440+188j
 		xor	ax, ax
 
-loc_4A5D1:				; CODE XREF: sub_4A440+17Bj
-					; sub_4A440+18Dj
+loc_4A5D1:				; CODE XREF: Gameflow_LoadMissionScript_4A440+17Bj
+					; Gameflow_LoadMissionScript_4A440+18Dj
 		or	ax, ax
 		jnz	short loc_4A5D8
 		jmp	loc_4A4B2
 ; ���������������������������������������������������������������������������
 
-loc_4A5D8:				; CODE XREF: sub_4A440+133j
-					; sub_4A440+193j
+loc_4A5D8:				; CODE XREF: Gameflow_LoadMissionScript_4A440+133j
+					; Gameflow_LoadMissionScript_4A440+193j
 		lea	ax, [bp+var_AA]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -618,14 +626,19 @@ loc_4A5D8:				; CODE XREF: sub_4A440+133j
 		pop	si
 		leave
 		retf
-sub_4A440	endp
+Gameflow_LoadMissionScript_4A440	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4A60B	proc far		; CODE XREF: sub_41F2EJ
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Construit la scène [partie+0FCh] de la mission [partie+0FAh]
+; : FORM SCEN (INFO), sprites SPRT (INFO, EFCT, REQU), visibilité par
+; Gameflow_CheckSpriteRequirements_3604.
+; ==============================================================================================
+Gameflow_BuildScene_4A60B	proc far		; CODE XREF: sub_41F2EJ
 
 var_B0		= word ptr -0B0h
 var_53		= dword	ptr -53h
@@ -684,7 +697,7 @@ arg_0		= word ptr  6
 		jmp	loc_4A733
 ; ���������������������������������������������������������������������������
 
-loc_4A68B:				; CODE XREF: sub_4A60B+155j
+loc_4A68B:				; CODE XREF: Gameflow_BuildScene_4A60B+155j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ComputeRecordBounds_3BF4B
@@ -694,7 +707,7 @@ loc_4A68B:				; CODE XREF: sub_4A60B+155j
 		jmp	loc_4A726
 ; ���������������������������������������������������������������������������
 
-loc_4A69F:				; CODE XREF: sub_4A60B+8Fj
+loc_4A69F:				; CODE XREF: Gameflow_BuildScene_4A60B+8Fj
 		mov	eax, [bp+var_43]
 		cmp	eax, dword_43631
 		jnz	short loc_4A6AF
@@ -702,10 +715,10 @@ loc_4A69F:				; CODE XREF: sub_4A60B+8Fj
 		jmp	short loc_4A6B1
 ; ���������������������������������������������������������������������������
 
-loc_4A6AF:				; CODE XREF: sub_4A60B+9Dj
+loc_4A6AF:				; CODE XREF: Gameflow_BuildScene_4A60B+9Dj
 		xor	ax, ax
 
-loc_4A6B1:				; CODE XREF: sub_4A60B+A2j
+loc_4A6B1:				; CODE XREF: Gameflow_BuildScene_4A60B+A2j
 		or	ax, ax
 		jz	short loc_4A726
 		lea	ax, [bp+var_B0]
@@ -734,19 +747,19 @@ loc_4A6B1:				; CODE XREF: sub_4A60B+A2j
 		jmp	short loc_4A763
 ; ���������������������������������������������������������������������������
 
-loc_4A700:				; CODE XREF: sub_4A60B+E5j
+loc_4A700:				; CODE XREF: Gameflow_BuildScene_4A60B+E5j
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_4B], eax
 		jmp	short loc_4A717
 ; ���������������������������������������������������������������������������
 
-loc_4A70A:				; CODE XREF: sub_4A60B+CEj
+loc_4A70A:				; CODE XREF: Gameflow_BuildScene_4A60B+CEj
 		push	5
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A717:				; CODE XREF: sub_4A60B+FDj
+loc_4A717:				; CODE XREF: Gameflow_BuildScene_4A60B+FDj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -754,15 +767,15 @@ loc_4A717:				; CODE XREF: sub_4A60B+FDj
 		jmp	short loc_4A733
 ; ���������������������������������������������������������������������������
 
-loc_4A726:				; CODE XREF: sub_4A60B+91j
-					; sub_4A60B+A8j
+loc_4A726:				; CODE XREF: Gameflow_BuildScene_4A60B+91j
+					; Gameflow_BuildScene_4A60B+A8j
 		push	6
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A733:				; CODE XREF: sub_4A60B+7Dj
-					; sub_4A60B+119j
+loc_4A733:				; CODE XREF: Gameflow_BuildScene_4A60B+7Dj
+					; Gameflow_BuildScene_4A60B+119j
 		cmp	[bp+var_34], 0
 		jnz	short loc_4A748
 		lea	ax, [bp+var_B0]
@@ -772,7 +785,7 @@ loc_4A733:				; CODE XREF: sub_4A60B+7Dj
 		jmp	short loc_4A75C
 ; ���������������������������������������������������������������������������
 
-loc_4A748:				; CODE XREF: sub_4A60B+12Cj
+loc_4A748:				; CODE XREF: Gameflow_BuildScene_4A60B+12Cj
 		mov	bx, [bp+var_34]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_4B]
@@ -781,29 +794,29 @@ loc_4A748:				; CODE XREF: sub_4A60B+12Cj
 		jmp	short loc_4A75C
 ; ���������������������������������������������������������������������������
 
-loc_4A75A:				; CODE XREF: sub_4A60B+148j
+loc_4A75A:				; CODE XREF: Gameflow_BuildScene_4A60B+148j
 		xor	ax, ax
 
-loc_4A75C:				; CODE XREF: sub_4A60B+13Bj
-					; sub_4A60B+14Dj
+loc_4A75C:				; CODE XREF: Gameflow_BuildScene_4A60B+13Bj
+					; Gameflow_BuildScene_4A60B+14Dj
 		or	ax, ax
 		jnz	short loc_4A763
 		jmp	loc_4A68B
 ; ���������������������������������������������������������������������������
 
-loc_4A763:				; CODE XREF: sub_4A60B+F3j
-					; sub_4A60B+153j
+loc_4A763:				; CODE XREF: Gameflow_BuildScene_4A60B+F3j
+					; Gameflow_BuildScene_4A60B+153j
 		cmp	[bp+var_1], 0
 		jnz	short loc_4A76C
 		jmp	loc_4AA78
 ; ���������������������������������������������������������������������������
 
-loc_4A76C:				; CODE XREF: sub_4A60B+15Cj
+loc_4A76C:				; CODE XREF: Gameflow_BuildScene_4A60B+15Cj
 		mov	[bp+var_2], 0
 		jmp	loc_4A816
 ; ���������������������������������������������������������������������������
 
-loc_4A773:				; CODE XREF: sub_4A60B+238j
+loc_4A773:				; CODE XREF: Gameflow_BuildScene_4A60B+238j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ComputeRecordBounds_3BF4B
@@ -813,7 +826,7 @@ loc_4A773:				; CODE XREF: sub_4A60B+238j
 		jmp	loc_4A80E
 ; ���������������������������������������������������������������������������
 
-loc_4A787:				; CODE XREF: sub_4A60B+177j
+loc_4A787:				; CODE XREF: Gameflow_BuildScene_4A60B+177j
 		mov	eax, [bp+var_43]
 		cmp	eax, dword_43636
 		jnz	short loc_4A797
@@ -821,10 +834,10 @@ loc_4A787:				; CODE XREF: sub_4A60B+177j
 		jmp	short loc_4A799
 ; ���������������������������������������������������������������������������
 
-loc_4A797:				; CODE XREF: sub_4A60B+185j
+loc_4A797:				; CODE XREF: Gameflow_BuildScene_4A60B+185j
 		xor	ax, ax
 
-loc_4A799:				; CODE XREF: sub_4A60B+18Aj
+loc_4A799:				; CODE XREF: Gameflow_BuildScene_4A60B+18Aj
 		or	ax, ax
 		jz	short loc_4A80E
 		lea	ax, [bp+var_B0]
@@ -853,19 +866,19 @@ loc_4A799:				; CODE XREF: sub_4A60B+18Aj
 		jmp	short loc_4A846
 ; ���������������������������������������������������������������������������
 
-loc_4A7E8:				; CODE XREF: sub_4A60B+1CDj
+loc_4A7E8:				; CODE XREF: Gameflow_BuildScene_4A60B+1CDj
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_4B], eax
 		jmp	short loc_4A7FF
 ; ���������������������������������������������������������������������������
 
-loc_4A7F2:				; CODE XREF: sub_4A60B+1B6j
+loc_4A7F2:				; CODE XREF: Gameflow_BuildScene_4A60B+1B6j
 		push	7
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A7FF:				; CODE XREF: sub_4A60B+1E5j
+loc_4A7FF:				; CODE XREF: Gameflow_BuildScene_4A60B+1E5j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -873,13 +886,13 @@ loc_4A7FF:				; CODE XREF: sub_4A60B+1E5j
 		jmp	short loc_4A816
 ; ���������������������������������������������������������������������������
 
-loc_4A80E:				; CODE XREF: sub_4A60B+179j
-					; sub_4A60B+190j
+loc_4A80E:				; CODE XREF: Gameflow_BuildScene_4A60B+179j
+					; Gameflow_BuildScene_4A60B+190j
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_4B], eax
 
-loc_4A816:				; CODE XREF: sub_4A60B+165j
-					; sub_4A60B+201j
+loc_4A816:				; CODE XREF: Gameflow_BuildScene_4A60B+165j
+					; Gameflow_BuildScene_4A60B+201j
 		cmp	[bp+var_34], 0
 		jnz	short loc_4A82B
 		lea	ax, [bp+var_B0]
@@ -889,7 +902,7 @@ loc_4A816:				; CODE XREF: sub_4A60B+165j
 		jmp	short loc_4A83F
 ; ���������������������������������������������������������������������������
 
-loc_4A82B:				; CODE XREF: sub_4A60B+20Fj
+loc_4A82B:				; CODE XREF: Gameflow_BuildScene_4A60B+20Fj
 		mov	bx, [bp+var_34]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_4B]
@@ -898,28 +911,28 @@ loc_4A82B:				; CODE XREF: sub_4A60B+20Fj
 		jmp	short loc_4A83F
 ; ���������������������������������������������������������������������������
 
-loc_4A83D:				; CODE XREF: sub_4A60B+22Bj
+loc_4A83D:				; CODE XREF: Gameflow_BuildScene_4A60B+22Bj
 		xor	ax, ax
 
-loc_4A83F:				; CODE XREF: sub_4A60B+21Ej
-					; sub_4A60B+230j
+loc_4A83F:				; CODE XREF: Gameflow_BuildScene_4A60B+21Ej
+					; Gameflow_BuildScene_4A60B+230j
 		or	ax, ax
 		jnz	short loc_4A846
 		jmp	loc_4A773
 ; ���������������������������������������������������������������������������
 
-loc_4A846:				; CODE XREF: sub_4A60B+1DBj
-					; sub_4A60B+236j
+loc_4A846:				; CODE XREF: Gameflow_BuildScene_4A60B+1DBj
+					; Gameflow_BuildScene_4A60B+236j
 		cmp	[bp+var_2], 0
 		jnz	short loc_4A84F
 		jmp	loc_4AA78
 ; ���������������������������������������������������������������������������
 
-loc_4A84F:				; CODE XREF: sub_4A60B+23Fj
+loc_4A84F:				; CODE XREF: Gameflow_BuildScene_4A60B+23Fj
 		jmp	loc_4AA48
 ; ���������������������������������������������������������������������������
 
-loc_4A852:				; CODE XREF: sub_4A60B+46Aj
+loc_4A852:				; CODE XREF: Gameflow_BuildScene_4A60B+46Aj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ComputeRecordBounds_3BF4B
@@ -929,7 +942,7 @@ loc_4A852:				; CODE XREF: sub_4A60B+46Aj
 		jmp	loc_4AA0A
 ; ���������������������������������������������������������������������������
 
-loc_4A866:				; CODE XREF: sub_4A60B+256j
+loc_4A866:				; CODE XREF: Gameflow_BuildScene_4A60B+256j
 		mov	eax, [bp+var_43]
 		cmp	eax, dword_4363B
 		jnz	short loc_4A876
@@ -937,16 +950,16 @@ loc_4A866:				; CODE XREF: sub_4A60B+256j
 		jmp	short loc_4A878
 ; ���������������������������������������������������������������������������
 
-loc_4A876:				; CODE XREF: sub_4A60B+264j
+loc_4A876:				; CODE XREF: Gameflow_BuildScene_4A60B+264j
 		xor	ax, ax
 
-loc_4A878:				; CODE XREF: sub_4A60B+269j
+loc_4A878:				; CODE XREF: Gameflow_BuildScene_4A60B+269j
 		or	ax, ax
 		jnz	short loc_4A87F
 		jmp	loc_4AA0A
 ; ���������������������������������������������������������������������������
 
-loc_4A87F:				; CODE XREF: sub_4A60B+26Fj
+loc_4A87F:				; CODE XREF: Gameflow_BuildScene_4A60B+26Fj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	sub_3C491
@@ -970,13 +983,13 @@ loc_4A87F:				; CODE XREF: sub_4A60B+26Fj
 		jmp	short loc_4A8D0
 ; ���������������������������������������������������������������������������
 
-loc_4A8C3:				; CODE XREF: sub_4A60B+29Cj
+loc_4A8C3:				; CODE XREF: Gameflow_BuildScene_4A60B+29Cj
 		push	8
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A8D0:				; CODE XREF: sub_4A60B+2B6j
+loc_4A8D0:				; CODE XREF: Gameflow_BuildScene_4A60B+2B6j
 		push	0
 		push	large 55514552h
 		lea	ax, [bp+var_B0]
@@ -997,7 +1010,7 @@ loc_4A8D0:				; CODE XREF: sub_4A60B+2B6j
 		jmp	short loc_4A919
 ; ���������������������������������������������������������������������������
 
-loc_4A904:				; CODE XREF: sub_4A60B+315j
+loc_4A904:				; CODE XREF: Gameflow_BuildScene_4A60B+315j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -1007,7 +1020,7 @@ loc_4A904:				; CODE XREF: sub_4A60B+315j
 		mov	[bx], al
 		inc	di
 
-loc_4A919:				; CODE XREF: sub_4A60B+2F7j
+loc_4A919:				; CODE XREF: Gameflow_BuildScene_4A60B+2F7j
 		mov	al, [bp+var_5]
 		mov	ah, 0
 		cmp	ax, di
@@ -1016,7 +1029,7 @@ loc_4A919:				; CODE XREF: sub_4A60B+2F7j
 		mov	al, [bp+var_5]
 		push	ax
 		push	si
-		call	sub_3604
+		call	Gameflow_CheckSpriteRequirements_3604
 		add	sp, 6
 		or	al, al
 		jz	short loc_4A947
@@ -1027,7 +1040,7 @@ loc_4A919:				; CODE XREF: sub_4A60B+2F7j
 		add	sp, 4
 		mov	[bp+var_4], 1
 
-loc_4A947:				; CODE XREF: sub_4A60B+329j
+loc_4A947:				; CODE XREF: Gameflow_BuildScene_4A60B+329j
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_4B], eax
 		push	[bp+var_8]
@@ -1036,7 +1049,7 @@ loc_4A947:				; CODE XREF: sub_4A60B+329j
 		jmp	short loc_4A96D
 ; ���������������������������������������������������������������������������
 
-loc_4A95C:				; CODE XREF: sub_4A60B+2DCj
+loc_4A95C:				; CODE XREF: Gameflow_BuildScene_4A60B+2DCj
 		mov	al, [bp+var_3]
 		push	ax
 		push	si
@@ -1044,13 +1057,13 @@ loc_4A95C:				; CODE XREF: sub_4A60B+2DCj
 		add	sp, 4
 		mov	[bp+var_4], 1
 
-loc_4A96D:				; CODE XREF: sub_4A60B+34Fj
+loc_4A96D:				; CODE XREF: Gameflow_BuildScene_4A60B+34Fj
 		cmp	[bp+var_4], 0
 		jnz	short loc_4A976
 		jmp	loc_4A9FB
 ; ���������������������������������������������������������������������������
 
-loc_4A976:				; CODE XREF: sub_4A60B+366j
+loc_4A976:				; CODE XREF: Gameflow_BuildScene_4A60B+366j
 		push	0
 		push	large 54434645h
 		lea	ax, [bp+var_B0]
@@ -1062,7 +1075,7 @@ loc_4A976:				; CODE XREF: sub_4A60B+366j
 		mov	al, [bp+var_3]
 		push	ax
 		push	si
-		call	sub_35C9
+		call	Gameflow_FindSprite_35C9
 		add	sp, 4
 		mov	[bp-6],	ax
 		mov	bx, [bp-6]
@@ -1080,7 +1093,7 @@ loc_4A976:				; CODE XREF: sub_4A60B+366j
 		jmp	short loc_4A9DB
 ; ���������������������������������������������������������������������������
 
-loc_4A9C3:				; CODE XREF: sub_4A60B+3D7j
+loc_4A9C3:				; CODE XREF: Gameflow_BuildScene_4A60B+3D7j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -1091,7 +1104,7 @@ loc_4A9C3:				; CODE XREF: sub_4A60B+3D7j
 		mov	[bx], al
 		inc	di
 
-loc_4A9DB:				; CODE XREF: sub_4A60B+3B6j
+loc_4A9DB:				; CODE XREF: Gameflow_BuildScene_4A60B+3B6j
 		mov	al, byte ptr [bp+var_8+1]
 		mov	ah, 0
 		cmp	ax, di
@@ -1101,14 +1114,14 @@ loc_4A9DB:				; CODE XREF: sub_4A60B+3B6j
 		jmp	short loc_4A9FB
 ; ���������������������������������������������������������������������������
 
-loc_4A9EE:				; CODE XREF: sub_4A60B+382j
+loc_4A9EE:				; CODE XREF: Gameflow_BuildScene_4A60B+382j
 		push	9
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4A9FB:				; CODE XREF: sub_4A60B+368j
-					; sub_4A60B+3E1j
+loc_4A9FB:				; CODE XREF: Gameflow_BuildScene_4A60B+368j
+					; Gameflow_BuildScene_4A60B+3E1j
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -1116,8 +1129,8 @@ loc_4A9FB:				; CODE XREF: sub_4A60B+368j
 		jmp	short loc_4AA48
 ; ���������������������������������������������������������������������������
 
-loc_4AA0A:				; CODE XREF: sub_4A60B+258j
-					; sub_4A60B+271j
+loc_4AA0A:				; CODE XREF: Gameflow_BuildScene_4A60B+258j
+					; Gameflow_BuildScene_4A60B+271j
 		mov	eax, [bp+var_43]
 		cmp	eax, dword_43640
 		jnz	short loc_4AA1A
@@ -1125,10 +1138,10 @@ loc_4AA0A:				; CODE XREF: sub_4A60B+258j
 		jmp	short loc_4AA1C
 ; ���������������������������������������������������������������������������
 
-loc_4AA1A:				; CODE XREF: sub_4A60B+408j
+loc_4AA1A:				; CODE XREF: Gameflow_BuildScene_4A60B+408j
 		xor	ax, ax
 
-loc_4AA1C:				; CODE XREF: sub_4A60B+40Dj
+loc_4AA1C:				; CODE XREF: Gameflow_BuildScene_4A60B+40Dj
 		or	ax, ax
 		jz	short loc_4AA3B
 		lea	ax, [bp+var_B0]
@@ -1141,14 +1154,14 @@ loc_4AA1C:				; CODE XREF: sub_4A60B+40Dj
 		jmp	short loc_4AA48
 ; ���������������������������������������������������������������������������
 
-loc_4AA3B:				; CODE XREF: sub_4A60B+413j
+loc_4AA3B:				; CODE XREF: Gameflow_BuildScene_4A60B+413j
 		push	0Ah
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4AA48:				; CODE XREF: sub_4A60B:loc_4A84Fj
-					; sub_4A60B+3FDj ...
+loc_4AA48:				; CODE XREF: Gameflow_BuildScene_4A60B:loc_4A84Fj
+					; Gameflow_BuildScene_4A60B+3FDj ...
 		cmp	[bp+var_34], 0
 		jnz	short loc_4AA5D
 		lea	ax, [bp+var_B0]
@@ -1158,7 +1171,7 @@ loc_4AA48:				; CODE XREF: sub_4A60B:loc_4A84Fj
 		jmp	short loc_4AA71
 ; ���������������������������������������������������������������������������
 
-loc_4AA5D:				; CODE XREF: sub_4A60B+441j
+loc_4AA5D:				; CODE XREF: Gameflow_BuildScene_4A60B+441j
 		mov	bx, [bp+var_34]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_4B]
@@ -1167,18 +1180,18 @@ loc_4AA5D:				; CODE XREF: sub_4A60B+441j
 		jmp	short loc_4AA71
 ; ���������������������������������������������������������������������������
 
-loc_4AA6F:				; CODE XREF: sub_4A60B+45Dj
+loc_4AA6F:				; CODE XREF: Gameflow_BuildScene_4A60B+45Dj
 		xor	ax, ax
 
-loc_4AA71:				; CODE XREF: sub_4A60B+450j
-					; sub_4A60B+462j
+loc_4AA71:				; CODE XREF: Gameflow_BuildScene_4A60B+450j
+					; Gameflow_BuildScene_4A60B+462j
 		or	ax, ax
 		jnz	short loc_4AA78
 		jmp	loc_4A852
 ; ���������������������������������������������������������������������������
 
-loc_4AA78:				; CODE XREF: sub_4A60B+15Ej
-					; sub_4A60B+241j ...
+loc_4AA78:				; CODE XREF: Gameflow_BuildScene_4A60B+15Ej
+					; Gameflow_BuildScene_4A60B+241j ...
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -1197,7 +1210,7 @@ loc_4AA78:				; CODE XREF: sub_4A60B+15Ej
 		pop	si
 		leave
 		retf
-sub_4A60B	endp
+Gameflow_BuildScene_4A60B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1644,7 +1657,11 @@ off_4AD3E	dw offset loc_4AC08	; DATA XREF: Gameflow_PlayMidgame_4ABE0+23r
 
 ; Attributes: bp-based frame
 
-sub_4AD86	proc far		; CODE XREF: sub_41F47J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 08h : joue le plan fixe numéro arg dans OPTIONS.IFF
+; (FORM ESTB / SHOT : SHPS, PALS, TUNE).
+; ==============================================================================================
+Gameflow_PlayShot_4AD86	proc far		; CODE XREF: sub_41F47J
 
 var_254		= word ptr -254h
 var_252		= word ptr -252h
@@ -1707,7 +1724,7 @@ arg_2		= byte ptr  8
 		jmp	loc_4B532
 ; ���������������������������������������������������������������������������
 
-loc_4AD9E:				; CODE XREF: sub_4AD86+13j
+loc_4AD9E:				; CODE XREF: Gameflow_PlayShot_4AD86+13j
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1796,7 +1813,7 @@ loc_4AD9E:				; CODE XREF: sub_4AD86+13j
 		jmp	short loc_4AEF8
 ; ���������������������������������������������������������������������������
 
-loc_4AEB6:				; CODE XREF: sub_4AD86+189j
+loc_4AEB6:				; CODE XREF: Gameflow_PlayShot_4AD86+189j
 		push	0
 		push	large 4F464E49h
 		lea	ax, [bp+var_224]
@@ -1817,14 +1834,14 @@ loc_4AEB6:				; CODE XREF: sub_4AD86+189j
 		jmp	short loc_4AEF8
 ; ���������������������������������������������������������������������������
 
-loc_4AEEB:				; CODE XREF: sub_4AD86+15Bj
+loc_4AEEB:				; CODE XREF: Gameflow_PlayShot_4AD86+15Bj
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
 		add	sp, 2
 
-loc_4AEF8:				; CODE XREF: sub_4AD86+12Ej
-					; sub_4AD86+163j
+loc_4AEF8:				; CODE XREF: Gameflow_PlayShot_4AD86+12Ej
+					; Gameflow_PlayShot_4AD86+163j
 		push	1
 		push	large 544F4853h
 		lea	ax, [bp+var_224]
@@ -1834,17 +1851,17 @@ loc_4AEF8:				; CODE XREF: sub_4AD86+12Ej
 		or	ax, ax
 		jnz	short loc_4AEB6
 
-loc_4AF11:				; CODE XREF: sub_4AD86+161j
+loc_4AF11:				; CODE XREF: Gameflow_PlayShot_4AD86+161j
 		mov	al, [bp+var_B]
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_4AF27
 		push	64h ; 'd'
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4AF27:				; CODE XREF: sub_4AD86+192j
+loc_4AF27:				; CODE XREF: Gameflow_PlayShot_4AD86+192j
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -1877,12 +1894,12 @@ loc_4AF27:				; CODE XREF: sub_4AD86+192j
 		mov	al, [si+0E9h]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 		mov	eax, [bp+var_1AE]
 		mov	[bp+var_1BF], eax
 
-loc_4AF9F:				; CODE XREF: sub_4AD86+1EDj
+loc_4AF9F:				; CODE XREF: Gameflow_PlayShot_4AD86+1EDj
 		push	0
 		push	large 53504853h
 		lea	ax, [bp+var_224]
@@ -1894,11 +1911,11 @@ loc_4AF9F:				; CODE XREF: sub_4AD86+1EDj
 		jmp	loc_4B1CE
 ; ���������������������������������������������������������������������������
 
-loc_4AFBB:				; CODE XREF: sub_4AD86+230j
+loc_4AFBB:				; CODE XREF: Gameflow_PlayShot_4AD86+230j
 		jmp	loc_4B199
 ; ���������������������������������������������������������������������������
 
-loc_4AFBE:				; CODE XREF: sub_4AD86+443j
+loc_4AFBE:				; CODE XREF: Gameflow_PlayShot_4AD86+443j
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ComputeAlignedBounds_3C431
@@ -1910,16 +1927,16 @@ loc_4AFBE:				; CODE XREF: sub_4AD86+443j
 		jmp	short loc_4AFDE
 ; ���������������������������������������������������������������������������
 
-loc_4AFDC:				; CODE XREF: sub_4AD86+24Fj
+loc_4AFDC:				; CODE XREF: Gameflow_PlayShot_4AD86+24Fj
 		xor	ax, ax
 
-loc_4AFDE:				; CODE XREF: sub_4AD86+254j
+loc_4AFDE:				; CODE XREF: Gameflow_PlayShot_4AD86+254j
 		or	ax, ax
 		jnz	short loc_4AFE5
 		jmp	loc_4B0AA
 ; ���������������������������������������������������������������������������
 
-loc_4AFE5:				; CODE XREF: sub_4AD86+25Aj
+loc_4AFE5:				; CODE XREF: Gameflow_PlayShot_4AD86+25Aj
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -1978,15 +1995,15 @@ loc_4B01D:				; DATA XREF: Render_MeshPrimitive_283D0+729o
 		add	sp, 8
 		jmp	short $+2
 
-loc_4B093:				; CODE XREF: sub_4AD86+2EDj
-					; sub_4AD86+2F4j
+loc_4B093:				; CODE XREF: Gameflow_PlayShot_4AD86+2EDj
+					; Gameflow_PlayShot_4AD86+2F4j
 		mov	[bp+var_2B+3], 0
 		mov	[bp+var_23], 0
 		mov	[bp+var_22], 0
 		jmp	loc_4B18F
 ; ���������������������������������������������������������������������������
 
-loc_4B0AA:				; CODE XREF: sub_4AD86+25Cj
+loc_4B0AA:				; CODE XREF: Gameflow_PlayShot_4AD86+25Cj
 		mov	eax, [bp+var_1B7]
 		cmp	eax, dword_4364A
 		jnz	short loc_4B0BB
@@ -1994,16 +2011,16 @@ loc_4B0AA:				; CODE XREF: sub_4AD86+25Cj
 		jmp	short loc_4B0BD
 ; ���������������������������������������������������������������������������
 
-loc_4B0BB:				; CODE XREF: sub_4AD86+32Ej
+loc_4B0BB:				; CODE XREF: Gameflow_PlayShot_4AD86+32Ej
 		xor	ax, ax
 
-loc_4B0BD:				; CODE XREF: sub_4AD86+333j
+loc_4B0BD:				; CODE XREF: Gameflow_PlayShot_4AD86+333j
 		or	ax, ax
 		jnz	short loc_4B0C4
 		jmp	loc_4B18F
 ; ���������������������������������������������������������������������������
 
-loc_4B0C4:				; CODE XREF: sub_4AD86+339j
+loc_4B0C4:				; CODE XREF: Gameflow_PlayShot_4AD86+339j
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -2063,18 +2080,18 @@ loc_4B0C4:				; CODE XREF: sub_4AD86+339j
 		add	sp, 8
 		jmp	short $+2
 
-loc_4B17B:				; CODE XREF: sub_4AD86+3D5j
-					; sub_4AD86+3DCj
+loc_4B17B:				; CODE XREF: Gameflow_PlayShot_4AD86+3D5j
+					; Gameflow_PlayShot_4AD86+3DCj
 		mov	[bp+var_2B+3], 0
 		mov	[bp+var_23], 0
 		mov	[bp+var_22], 0
 
-loc_4B18F:				; CODE XREF: sub_4AD86+321j
-					; sub_4AD86+33Bj
+loc_4B18F:				; CODE XREF: Gameflow_PlayShot_4AD86+321j
+					; Gameflow_PlayShot_4AD86+33Bj
 		mov	eax, [bp+var_1AE]
 		mov	[bp+var_1BF], eax
 
-loc_4B199:				; CODE XREF: sub_4AD86:loc_4AFBBj
+loc_4B199:				; CODE XREF: Gameflow_PlayShot_4AD86:loc_4AFBBj
 		cmp	[bp+var_1A8], 0
 		jnz	short loc_4B1AF
 		lea	ax, [bp+var_224]
@@ -2084,7 +2101,7 @@ loc_4B199:				; CODE XREF: sub_4AD86:loc_4AFBBj
 		jmp	short loc_4B1C5
 ; ���������������������������������������������������������������������������
 
-loc_4B1AF:				; CODE XREF: sub_4AD86+418j
+loc_4B1AF:				; CODE XREF: Gameflow_PlayShot_4AD86+418j
 		mov	bx, [bp+var_1A8]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_1BF]
@@ -2093,27 +2110,27 @@ loc_4B1AF:				; CODE XREF: sub_4AD86+418j
 		jmp	short loc_4B1C5
 ; ���������������������������������������������������������������������������
 
-loc_4B1C3:				; CODE XREF: sub_4AD86+436j
+loc_4B1C3:				; CODE XREF: Gameflow_PlayShot_4AD86+436j
 		xor	ax, ax
 
-loc_4B1C5:				; CODE XREF: sub_4AD86+427j
-					; sub_4AD86+43Bj
+loc_4B1C5:				; CODE XREF: Gameflow_PlayShot_4AD86+427j
+					; Gameflow_PlayShot_4AD86+43Bj
 		or	ax, ax
 		jnz	short loc_4B1CC
 		jmp	loc_4AFBE
 ; ���������������������������������������������������������������������������
 
-loc_4B1CC:				; CODE XREF: sub_4AD86+441j
+loc_4B1CC:				; CODE XREF: Gameflow_PlayShot_4AD86+441j
 		jmp	short loc_4B1DB
 ; ���������������������������������������������������������������������������
 
-loc_4B1CE:				; CODE XREF: sub_4AD86+232j
+loc_4B1CE:				; CODE XREF: Gameflow_PlayShot_4AD86+232j
 		push	0Eh
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4B1DB:				; CODE XREF: sub_4AD86:loc_4B1CCj
+loc_4B1DB:				; CODE XREF: Gameflow_PlayShot_4AD86:loc_4B1CCj
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -2159,11 +2176,11 @@ loc_4B1DB:				; CODE XREF: sub_4AD86:loc_4B1CCj
 		jmp	loc_4B383
 ; ���������������������������������������������������������������������������
 
-loc_4B25B:				; CODE XREF: sub_4AD86+4D0j
+loc_4B25B:				; CODE XREF: Gameflow_PlayShot_4AD86+4D0j
 		jmp	loc_4B34E
 ; ���������������������������������������������������������������������������
 
-loc_4B25E:				; CODE XREF: sub_4AD86+5F8j
+loc_4B25E:				; CODE XREF: Gameflow_PlayShot_4AD86+5F8j
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ComputeAlignedBounds_3C431
@@ -2175,16 +2192,16 @@ loc_4B25E:				; CODE XREF: sub_4AD86+5F8j
 		jmp	short loc_4B27E
 ; ���������������������������������������������������������������������������
 
-loc_4B27C:				; CODE XREF: sub_4AD86+4EFj
+loc_4B27C:				; CODE XREF: Gameflow_PlayShot_4AD86+4EFj
 		xor	ax, ax
 
-loc_4B27E:				; CODE XREF: sub_4AD86+4F4j
+loc_4B27E:				; CODE XREF: Gameflow_PlayShot_4AD86+4F4j
 		or	ax, ax
 		jnz	short loc_4B285
 		jmp	loc_4B337
 ; ���������������������������������������������������������������������������
 
-loc_4B285:				; CODE XREF: sub_4AD86+4FAj
+loc_4B285:				; CODE XREF: Gameflow_PlayShot_4AD86+4FAj
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -2237,25 +2254,25 @@ loc_4B285:				; CODE XREF: sub_4AD86+4FAj
 		add	sp, 8
 		jmp	short $+2
 
-loc_4B321:				; CODE XREF: sub_4AD86+57Bj
-					; sub_4AD86+582j
+loc_4B321:				; CODE XREF: Gameflow_PlayShot_4AD86+57Bj
+					; Gameflow_PlayShot_4AD86+582j
 		mov	[bp+var_2B+3], 0
 		mov	[bp+var_23], 0
 		mov	[bp+var_22], 0
 		jmp	short loc_4B344
 ; ���������������������������������������������������������������������������
 
-loc_4B337:				; CODE XREF: sub_4AD86+4FCj
+loc_4B337:				; CODE XREF: Gameflow_PlayShot_4AD86+4FCj
 		push	0Fh
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4B344:				; CODE XREF: sub_4AD86+5AFj
+loc_4B344:				; CODE XREF: Gameflow_PlayShot_4AD86+5AFj
 		mov	eax, [bp+var_1AE]
 		mov	[bp+var_1BF], eax
 
-loc_4B34E:				; CODE XREF: sub_4AD86:loc_4B25Bj
+loc_4B34E:				; CODE XREF: Gameflow_PlayShot_4AD86:loc_4B25Bj
 		cmp	[bp+var_1A8], 0
 		jnz	short loc_4B364
 		lea	ax, [bp+var_224]
@@ -2265,7 +2282,7 @@ loc_4B34E:				; CODE XREF: sub_4AD86:loc_4B25Bj
 		jmp	short loc_4B37A
 ; ���������������������������������������������������������������������������
 
-loc_4B364:				; CODE XREF: sub_4AD86+5CDj
+loc_4B364:				; CODE XREF: Gameflow_PlayShot_4AD86+5CDj
 		mov	bx, [bp+var_1A8]
 		mov	eax, [bx+0Fh]
 		cmp	eax, [bp+var_1BF]
@@ -2274,27 +2291,27 @@ loc_4B364:				; CODE XREF: sub_4AD86+5CDj
 		jmp	short loc_4B37A
 ; ���������������������������������������������������������������������������
 
-loc_4B378:				; CODE XREF: sub_4AD86+5EBj
+loc_4B378:				; CODE XREF: Gameflow_PlayShot_4AD86+5EBj
 		xor	ax, ax
 
-loc_4B37A:				; CODE XREF: sub_4AD86+5DCj
-					; sub_4AD86+5F0j
+loc_4B37A:				; CODE XREF: Gameflow_PlayShot_4AD86+5DCj
+					; Gameflow_PlayShot_4AD86+5F0j
 		or	ax, ax
 		jnz	short loc_4B381
 		jmp	loc_4B25E
 ; ���������������������������������������������������������������������������
 
-loc_4B381:				; CODE XREF: sub_4AD86+5F6j
+loc_4B381:				; CODE XREF: Gameflow_PlayShot_4AD86+5F6j
 		jmp	short loc_4B390
 ; ���������������������������������������������������������������������������
 
-loc_4B383:				; CODE XREF: sub_4AD86+4D2j
+loc_4B383:				; CODE XREF: Gameflow_PlayShot_4AD86+4D2j
 		push	10h
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4B390:				; CODE XREF: sub_4AD86:loc_4B381j
+loc_4B390:				; CODE XREF: Gameflow_PlayShot_4AD86:loc_4B381j
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -2339,7 +2356,7 @@ loc_4B390:				; CODE XREF: sub_4AD86:loc_4B381j
 		jmp	short loc_4B43B
 ; ���������������������������������������������������������������������������
 
-loc_4B41F:				; CODE XREF: sub_4AD86+6C4j
+loc_4B41F:				; CODE XREF: Gameflow_PlayShot_4AD86+6C4j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_4B42E
@@ -2347,13 +2364,13 @@ loc_4B41F:				; CODE XREF: sub_4AD86+6C4j
 		jmp	short loc_4B44C
 ; ���������������������������������������������������������������������������
 
-loc_4B42E:				; CODE XREF: sub_4AD86+6A0j
+loc_4B42E:				; CODE XREF: Gameflow_PlayShot_4AD86+6A0j
 		lea	ax, [bp+var_246]
 		push	ax
 		call	Scene_Tick_C652
 		add	sp, 2
 
-loc_4B43B:				; CODE XREF: sub_4AD86+697j
+loc_4B43B:				; CODE XREF: Gameflow_PlayShot_4AD86+697j
 		push	[bp+var_E]
 		call	sub_B0F6
 		add	sp, 2
@@ -2361,7 +2378,7 @@ loc_4B43B:				; CODE XREF: sub_4AD86+697j
 		or	ax, ax
 		jz	short loc_4B41F
 
-loc_4B44C:				; CODE XREF: sub_4AD86+6A6j
+loc_4B44C:				; CODE XREF: Gameflow_PlayShot_4AD86+6A6j
 		mov	al, [bp+var_1D]
 		mov	ah, 0
 		or	ax, ax
@@ -2391,7 +2408,7 @@ loc_4B44C:				; CODE XREF: sub_4AD86+6A6j
 		call	Palette_FadeToColor_2D09C
 		add	sp, 0Ah
 
-loc_4B4A0:				; CODE XREF: sub_4AD86+6CDj
+loc_4B4A0:				; CODE XREF: Gameflow_PlayShot_4AD86+6CDj
 		lea	ax, [bp+var_224]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -2440,7 +2457,7 @@ loc_4B4A0:				; CODE XREF: sub_4AD86+6CDj
 		call	IndexedRecordReader_Destruct_3D240
 		add	sp, 4
 
-loc_4B532:				; CODE XREF: sub_4AD86+15j
+loc_4B532:				; CODE XREF: Gameflow_PlayShot_4AD86+15j
 		push	0
 		push	word_46F46
 		call	TextFormat_ReleaseAttribute_2EC80
@@ -2449,14 +2466,24 @@ loc_4B532:				; CODE XREF: sub_4AD86+15j
 		pop	si
 		leave
 		retf
-sub_4AD86	endp
+Gameflow_PlayShot_4AD86	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4B544	proc far		; CODE XREF: sub_41F4CJ
+; ==============================================================================================
+; far, LUE 2026-10-22. Si [partie+0ECh] : lit misn2op.iff (compte rendu écrit par STRIKE.EXE)
+; : EXIT (code de sortie, renvoyé ; 5 = rien d'autre), recharge tmpsav.tmp, INFO (nom de
+; mission), WPNS (armes restantes → [+261h]), JETS (avions perdus → [+0EAh], total [+3D4h],
+; coût ×500 → [+287h]), STAT (succès, gain ajouté à l'argent [+27Bh], 3e valeur → [+3D6h]),
+; KILL (par pilote, deux compteurs → [+29Fh]/[+2A1h] du pilote ; [+0EDh] = 1 si le joueur en
+; a), DIED (noms de la table dseg 0ED8h → drapeau dseg 0EE6h = 0), SCOR (ajouté à [+3D8h]) ;
+; puis dans GAMEFLOW MLST/DATA l'index de la mission → [+1FDh+index] = 1 si succès, 2 sinon ;
+; argent −= coût des avions. [+0F9h] = FFh. GAMEFLOW_SYSTEM.md § 6.
+; ==============================================================================================
+Gameflow_ReadMissionResult_4B544	proc far		; CODE XREF: sub_41F4CJ
 
 var_132		= word ptr -132h
 var_D5		= dword	ptr -0D5h
@@ -2503,7 +2530,7 @@ arg_0		= word ptr  6
 		jmp	loc_4BB8A
 ; ���������������������������������������������������������������������������
 
-loc_4B57B:				; CODE XREF: sub_4B544+32j
+loc_4B57B:				; CODE XREF: Gameflow_ReadMissionResult_4B544+32j
 		lea	ax, [bp+var_132]
 		push	ax
 		call	StreamReader_ConstructVariantA_3B2A9
@@ -2561,13 +2588,13 @@ loc_4B57B:				; CODE XREF: sub_4B544+32j
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B63F:				; CODE XREF: sub_4B544+DFj
+loc_4B63F:				; CODE XREF: Gameflow_ReadMissionResult_4B544+DFj
 		cmp	[bp+var_2], 5
 		jnz	short loc_4B648
 		jmp	loc_4BB68
 ; ���������������������������������������������������������������������������
 
-loc_4B648:				; CODE XREF: sub_4B544+FFj
+loc_4B648:				; CODE XREF: Gameflow_ReadMissionResult_4B544+FFj
 		push	ds
 		push	offset a_tmp	; ".tmp"
 		push	ds
@@ -2604,18 +2631,18 @@ loc_4B648:				; CODE XREF: sub_4B544+FFj
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B6AF:				; CODE XREF: sub_4B544+142j
+loc_4B6AF:				; CODE XREF: Gameflow_ReadMissionResult_4B544+142j
 		mov	[bp+var_20], 0
 		jmp	short loc_4B6C4
 ; ���������������������������������������������������������������������������
 
-loc_4B6B6:				; CODE XREF: sub_4B544+184j
+loc_4B6B6:				; CODE XREF: Gameflow_ReadMissionResult_4B544+184j
 		mov	bx, [bp+var_20]
 		shl	bx, 1
 		mov	word ptr [bx+si+261h], 0
 		inc	[bp+var_20]
 
-loc_4B6C4:				; CODE XREF: sub_4B544+170j
+loc_4B6C4:				; CODE XREF: Gameflow_ReadMissionResult_4B544+170j
 		cmp	[bp+var_20], 9
 		jl	short loc_4B6B6
 		push	0
@@ -2629,11 +2656,11 @@ loc_4B6C4:				; CODE XREF: sub_4B544+170j
 		jmp	loc_4B789
 ; ���������������������������������������������������������������������������
 
-loc_4B6E6:				; CODE XREF: sub_4B544+19Dj
+loc_4B6E6:				; CODE XREF: Gameflow_ReadMissionResult_4B544+19Dj
 		jmp	short loc_4B746
 ; ���������������������������������������������������������������������������
 
-loc_4B6E8:				; CODE XREF: sub_4B544+238j
+loc_4B6E8:				; CODE XREF: Gameflow_ReadMissionResult_4B544+238j
 		lea	ax, [bp+var_132]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -2650,7 +2677,7 @@ loc_4B6E8:				; CODE XREF: sub_4B544+238j
 		jmp	short loc_4B730
 ; ���������������������������������������������������������������������������
 
-loc_4B711:				; CODE XREF: sub_4B544+1EFj
+loc_4B711:				; CODE XREF: Gameflow_ReadMissionResult_4B544+1EFj
 		mov	bx, di
 		shl	bx, 1
 		push	word ptr [bx+2C8h]
@@ -2664,14 +2691,14 @@ loc_4B711:				; CODE XREF: sub_4B544+1EFj
 		jmp	short loc_4B735
 ; ���������������������������������������������������������������������������
 
-loc_4B72F:				; CODE XREF: sub_4B544+1E3j
+loc_4B72F:				; CODE XREF: Gameflow_ReadMissionResult_4B544+1E3j
 		inc	di
 
-loc_4B730:				; CODE XREF: sub_4B544+1CBj
+loc_4B730:				; CODE XREF: Gameflow_ReadMissionResult_4B544+1CBj
 		cmp	di, 9
 		jl	short loc_4B711
 
-loc_4B735:				; CODE XREF: sub_4B544+1E9j
+loc_4B735:				; CODE XREF: Gameflow_ReadMissionResult_4B544+1E9j
 		cmp	[bp+var_2F], 0
 		jz	short loc_4B746
 		mov	bx, di
@@ -2679,8 +2706,8 @@ loc_4B735:				; CODE XREF: sub_4B544+1E9j
 		mov	ax, [bp+var_2E]
 		mov	[bx+si+261h], ax
 
-loc_4B746:				; CODE XREF: sub_4B544:loc_4B6E6j
-					; sub_4B544+1F5j
+loc_4B746:				; CODE XREF: Gameflow_ReadMissionResult_4B544:loc_4B6E6j
+					; Gameflow_ReadMissionResult_4B544+1F5j
 		test	word ptr [bp+var_C0], 1
 		jz	short loc_4B765
 		mov	eax, [bp+var_BC]
@@ -2690,10 +2717,10 @@ loc_4B746:				; CODE XREF: sub_4B544:loc_4B6E6j
 		inc	[bp+var_CD]
 		jmp	short $+2
 
-loc_4B763:				; CODE XREF: sub_4B544+216j
+loc_4B763:				; CODE XREF: Gameflow_ReadMissionResult_4B544+216j
 		jmp	short $+2
 
-loc_4B765:				; CODE XREF: sub_4B544+208j
+loc_4B765:				; CODE XREF: Gameflow_ReadMissionResult_4B544+208j
 		mov	eax, [bp+var_CD]
 		cmp	eax, [bp+var_BC]
 		jl	short loc_4B776
@@ -2701,20 +2728,20 @@ loc_4B765:				; CODE XREF: sub_4B544+208j
 		jmp	short loc_4B778
 ; ���������������������������������������������������������������������������
 
-loc_4B776:				; CODE XREF: sub_4B544+22Bj
+loc_4B776:				; CODE XREF: Gameflow_ReadMissionResult_4B544+22Bj
 		xor	ax, ax
 
-loc_4B778:				; CODE XREF: sub_4B544+230j
+loc_4B778:				; CODE XREF: Gameflow_ReadMissionResult_4B544+230j
 		or	ax, ax
 		jnz	short loc_4B77F
 		jmp	loc_4B6E8
 ; ���������������������������������������������������������������������������
 
-loc_4B77F:				; CODE XREF: sub_4B544+236j
+loc_4B77F:				; CODE XREF: Gameflow_ReadMissionResult_4B544+236j
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B789:				; CODE XREF: sub_4B544+19Fj
+loc_4B789:				; CODE XREF: Gameflow_ReadMissionResult_4B544+19Fj
 		mov	word ptr [si+0EAh], 0
 		push	0
 		push	large 5354454Ah
@@ -2739,7 +2766,7 @@ loc_4B789:				; CODE XREF: sub_4B544+19Fj
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B7DD:				; CODE XREF: sub_4B544+262j
+loc_4B7DD:				; CODE XREF: Gameflow_ReadMissionResult_4B544+262j
 		push	0
 		push	large 54415453h
 		lea	ax, [bp+var_132]
@@ -2768,13 +2795,13 @@ loc_4B7DD:				; CODE XREF: sub_4B544+262j
 		jmp	short loc_4B840
 ; ���������������������������������������������������������������������������
 
-loc_4B833:				; CODE XREF: sub_4B544+2B0j
+loc_4B833:				; CODE XREF: Gameflow_ReadMissionResult_4B544+2B0j
 		push	1Ch
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4B840:				; CODE XREF: sub_4B544+2EDj
+loc_4B840:				; CODE XREF: Gameflow_ReadMissionResult_4B544+2EDj
 		movzx	eax, [bp+var_1C]
 		add	[si+27Bh], eax
 		push	0
@@ -2788,11 +2815,11 @@ loc_4B840:				; CODE XREF: sub_4B544+2EDj
 		jmp	loc_4B958
 ; ���������������������������������������������������������������������������
 
-loc_4B866:				; CODE XREF: sub_4B544+31Dj
+loc_4B866:				; CODE XREF: Gameflow_ReadMissionResult_4B544+31Dj
 		jmp	loc_4B915
 ; ���������������������������������������������������������������������������
 
-loc_4B869:				; CODE XREF: sub_4B544+407j
+loc_4B869:				; CODE XREF: Gameflow_ReadMissionResult_4B544+407j
 		lea	ax, [bp+var_132]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -2821,7 +2848,7 @@ loc_4B869:				; CODE XREF: sub_4B544+407j
 		jmp	short loc_4B910
 ; ���������������������������������������������������������������������������
 
-loc_4B8B6:				; CODE XREF: sub_4B544+3CFj
+loc_4B8B6:				; CODE XREF: Gameflow_ReadMissionResult_4B544+3CFj
 		push	8
 		mov	ax, di
 		mov	dx, 1Ah
@@ -2843,11 +2870,11 @@ loc_4B8B6:				; CODE XREF: sub_4B544+3CFj
 		cmp	word ptr [bp-30h], 0
 		jz	short loc_4B8ED
 
-loc_4B8E8:				; CODE XREF: sub_4B544+39Cj
+loc_4B8E8:				; CODE XREF: Gameflow_ReadMissionResult_4B544+39Cj
 		mov	byte ptr [si+0EDh], 1
 
-loc_4B8ED:				; CODE XREF: sub_4B544+396j
-					; sub_4B544+3A2j
+loc_4B8ED:				; CODE XREF: Gameflow_ReadMissionResult_4B544+396j
+					; Gameflow_ReadMissionResult_4B544+3A2j
 		mov	ax, di
 		mov	dx, 1Ah
 		imul	dx
@@ -2863,15 +2890,15 @@ loc_4B8ED:				; CODE XREF: sub_4B544+396j
 		jmp	short loc_4B915
 ; ���������������������������������������������������������������������������
 
-loc_4B90F:				; CODE XREF: sub_4B544+392j
+loc_4B90F:				; CODE XREF: Gameflow_ReadMissionResult_4B544+392j
 		inc	di
 
-loc_4B910:				; CODE XREF: sub_4B544+370j
+loc_4B910:				; CODE XREF: Gameflow_ReadMissionResult_4B544+370j
 		cmp	di, 8
 		jl	short loc_4B8B6
 
-loc_4B915:				; CODE XREF: sub_4B544:loc_4B866j
-					; sub_4B544+3C9j
+loc_4B915:				; CODE XREF: Gameflow_ReadMissionResult_4B544:loc_4B866j
+					; Gameflow_ReadMissionResult_4B544+3C9j
 		test	word ptr [bp+var_C0], 1
 		jz	short loc_4B934
 		mov	eax, [bp+var_BC]
@@ -2881,10 +2908,10 @@ loc_4B915:				; CODE XREF: sub_4B544:loc_4B866j
 		inc	[bp+var_CD]
 		jmp	short $+2
 
-loc_4B932:				; CODE XREF: sub_4B544+3E5j
+loc_4B932:				; CODE XREF: Gameflow_ReadMissionResult_4B544+3E5j
 		jmp	short $+2
 
-loc_4B934:				; CODE XREF: sub_4B544+3D7j
+loc_4B934:				; CODE XREF: Gameflow_ReadMissionResult_4B544+3D7j
 		mov	eax, [bp+var_CD]
 		cmp	eax, [bp+var_BC]
 		jl	short loc_4B945
@@ -2892,20 +2919,20 @@ loc_4B934:				; CODE XREF: sub_4B544+3D7j
 		jmp	short loc_4B947
 ; ���������������������������������������������������������������������������
 
-loc_4B945:				; CODE XREF: sub_4B544+3FAj
+loc_4B945:				; CODE XREF: Gameflow_ReadMissionResult_4B544+3FAj
 		xor	ax, ax
 
-loc_4B947:				; CODE XREF: sub_4B544+3FFj
+loc_4B947:				; CODE XREF: Gameflow_ReadMissionResult_4B544+3FFj
 		or	ax, ax
 		jnz	short loc_4B94E
 		jmp	loc_4B869
 ; ���������������������������������������������������������������������������
 
-loc_4B94E:				; CODE XREF: sub_4B544+405j
+loc_4B94E:				; CODE XREF: Gameflow_ReadMissionResult_4B544+405j
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B958:				; CODE XREF: sub_4B544+31Fj
+loc_4B958:				; CODE XREF: Gameflow_ReadMissionResult_4B544+31Fj
 		push	634h
 		mov	ax, si
 		add	ax, 0EFh ; '�'
@@ -2929,7 +2956,7 @@ loc_4B958:				; CODE XREF: sub_4B544+31Fj
 		jmp	short loc_4B9DF
 ; ���������������������������������������������������������������������������
 
-loc_4B99C:				; CODE XREF: sub_4B544+4A3j
+loc_4B99C:				; CODE XREF: Gameflow_ReadMissionResult_4B544+4A3j
 		lea	ax, [bp+var_132]
 		push	ax
 		mov	ax, si
@@ -2941,7 +2968,7 @@ loc_4B99C:				; CODE XREF: sub_4B544+4A3j
 		jmp	short loc_4B9D7
 ; ���������������������������������������������������������������������������
 
-loc_4B9B3:				; CODE XREF: sub_4B544+496j
+loc_4B9B3:				; CODE XREF: Gameflow_ReadMissionResult_4B544+496j
 		push	8
 		mov	bx, di
 		shl	bx, 1
@@ -2957,17 +2984,17 @@ loc_4B9B3:				; CODE XREF: sub_4B544+496j
 		jmp	short loc_4B9DC
 ; ���������������������������������������������������������������������������
 
-loc_4B9D6:				; CODE XREF: sub_4B544+489j
+loc_4B9D6:				; CODE XREF: Gameflow_ReadMissionResult_4B544+489j
 		inc	di
 
-loc_4B9D7:				; CODE XREF: sub_4B544+46Dj
+loc_4B9D7:				; CODE XREF: Gameflow_ReadMissionResult_4B544+46Dj
 		cmp	di, 7
 		jl	short loc_4B9B3
 
-loc_4B9DC:				; CODE XREF: sub_4B544+490j
+loc_4B9DC:				; CODE XREF: Gameflow_ReadMissionResult_4B544+490j
 		inc	word ptr [bp-30h]
 
-loc_4B9DF:				; CODE XREF: sub_4B544+456j
+loc_4B9DF:				; CODE XREF: Gameflow_ReadMissionResult_4B544+456j
 		mov	al, byte ptr [bp+var_2E+1]
 		mov	ah, 0
 		cmp	ax, [bp-30h]
@@ -2975,7 +3002,7 @@ loc_4B9DF:				; CODE XREF: sub_4B544+456j
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4B9F3:				; CODE XREF: sub_4B544+43Cj
+loc_4B9F3:				; CODE XREF: Gameflow_ReadMissionResult_4B544+43Cj
 		push	0
 		push	large 524F4353h
 		lea	ax, [bp+var_132]
@@ -2994,7 +3021,7 @@ loc_4B9F3:				; CODE XREF: sub_4B544+43Cj
 		mov	eax, [bp+var_BC]
 		mov	[bp+var_CD], eax
 
-loc_4BA31:				; CODE XREF: sub_4B544+4C6j
+loc_4BA31:				; CODE XREF: Gameflow_ReadMissionResult_4B544+4C6j
 		lea	ax, [bp+var_132]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -3018,10 +3045,10 @@ loc_4BA31:				; CODE XREF: sub_4B544+4C6j
 		jnz	short loc_4BA7B
 		push	1Fh
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4BA7B:				; CODE XREF: sub_4B544+528j
+loc_4BA7B:				; CODE XREF: Gameflow_ReadMissionResult_4B544+528j
 		push	0
 		push	large 41544144h
 		lea	ax, [bp+var_132]
@@ -3032,10 +3059,10 @@ loc_4BA7B:				; CODE XREF: sub_4B544+528j
 		jnz	short loc_4BAA1
 		push	20h ; ' '
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4BAA1:				; CODE XREF: sub_4B544+54Ej
+loc_4BAA1:				; CODE XREF: Gameflow_ReadMissionResult_4B544+54Ej
 		lea	ax, [bp+var_2A]
 		push	ax
 		call	sub_C7A3
@@ -3044,7 +3071,7 @@ loc_4BAA1:				; CODE XREF: sub_4B544+54Ej
 		jmp	short loc_4BAF0
 ; ���������������������������������������������������������������������������
 
-loc_4BAB4:				; CODE XREF: sub_4B544+5E0j
+loc_4BAB4:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5E0j
 		lea	ax, [bp+var_132]
 		push	ax
 		lea	ax, [bp+var_2A]
@@ -3068,10 +3095,10 @@ loc_4BAB4:				; CODE XREF: sub_4B544+5E0j
 		jmp	short loc_4BB26
 ; ���������������������������������������������������������������������������
 
-loc_4BAED:				; CODE XREF: sub_4B544+59Fj
+loc_4BAED:				; CODE XREF: Gameflow_ReadMissionResult_4B544+59Fj
 		inc	[bp+var_2C]
 
-loc_4BAF0:				; CODE XREF: sub_4B544+56Ej
+loc_4BAF0:				; CODE XREF: Gameflow_ReadMissionResult_4B544+56Ej
 		test	word ptr [bp+var_C0], 1
 		jz	short loc_4BB0F
 		mov	eax, [bp+var_BC]
@@ -3081,10 +3108,10 @@ loc_4BAF0:				; CODE XREF: sub_4B544+56Ej
 		inc	[bp+var_CD]
 		jmp	short $+2
 
-loc_4BB0D:				; CODE XREF: sub_4B544+5C0j
+loc_4BB0D:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5C0j
 		jmp	short $+2
 
-loc_4BB0F:				; CODE XREF: sub_4B544+5B2j
+loc_4BB0F:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5B2j
 		mov	eax, [bp+var_CD]
 		cmp	eax, [bp+var_BC]
 		jl	short loc_4BB20
@@ -3092,14 +3119,14 @@ loc_4BB0F:				; CODE XREF: sub_4B544+5B2j
 		jmp	short loc_4BB22
 ; ���������������������������������������������������������������������������
 
-loc_4BB20:				; CODE XREF: sub_4B544+5D5j
+loc_4BB20:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5D5j
 		xor	ax, ax
 
-loc_4BB22:				; CODE XREF: sub_4B544+5DAj
+loc_4BB22:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5DAj
 		or	ax, ax
 		jz	short loc_4BAB4
 
-loc_4BB26:				; CODE XREF: sub_4B544+5A7j
+loc_4BB26:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5A7j
 		lea	ax, [bp+var_132]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -3108,10 +3135,10 @@ loc_4BB26:				; CODE XREF: sub_4B544+5A7j
 		jnz	short loc_4BB46
 		push	21h ; '!'
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4BB46:				; CODE XREF: sub_4B544+5F3j
+loc_4BB46:				; CODE XREF: Gameflow_ReadMissionResult_4B544+5F3j
 		cmp	[bp+var_18], 0
 		jz	short loc_4BB56
 		mov	bx, [bp+var_1A]
@@ -3119,15 +3146,15 @@ loc_4BB46:				; CODE XREF: sub_4B544+5F3j
 		jmp	short loc_4BB5E
 ; ���������������������������������������������������������������������������
 
-loc_4BB56:				; CODE XREF: sub_4B544+606j
+loc_4BB56:				; CODE XREF: Gameflow_ReadMissionResult_4B544+606j
 		mov	bx, [bp+var_1A]
 		mov	byte ptr [bx+si+1FDh], 2
 
-loc_4BB5E:				; CODE XREF: sub_4B544+610j
+loc_4BB5E:				; CODE XREF: Gameflow_ReadMissionResult_4B544+610j
 		mov	eax, [si+287h]
 		sub	[si+27Bh], eax
 
-loc_4BB68:				; CODE XREF: sub_4B544+101j
+loc_4BB68:				; CODE XREF: Gameflow_ReadMissionResult_4B544+101j
 		mov	[bp+var_132], 56Eh
 		lea	ax, [bp+var_132]
 		push	ax
@@ -3139,7 +3166,7 @@ loc_4BB68:				; CODE XREF: sub_4B544+101j
 		call	StreamReader_ReleaseBuffer_3CEB3
 		add	sp, 4
 
-loc_4BB8A:				; CODE XREF: sub_4B544+34j
+loc_4BB8A:				; CODE XREF: Gameflow_ReadMissionResult_4B544+34j
 		mov	byte ptr [si+0F9h], 0FFh
 		mov	al, [bp+var_2]
 		mov	[bp+var_1E], al
@@ -3148,7 +3175,7 @@ loc_4BB8A:				; CODE XREF: sub_4B544+34j
 		pop	si
 		leave
 		retf
-sub_4B544	endp
+Gameflow_ReadMissionResult_4B544	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -3160,7 +3187,11 @@ sub_4B544	endp
 
 ; Attributes: bp-based frame
 
-sub_4BBA0	proc far		; CODE XREF: sub_41F51J
+; ==============================================================================================
+; far, LUE 2026-10-22. Sauvegarde la partie dans tmpsav.tmp (Gameflow_SaveGameFile_4DAE8)
+; avant un vol.
+; ==============================================================================================
+Gameflow_SaveTmpState_4BBA0	proc far		; CODE XREF: sub_41F51J
 
 var_50		= word ptr -50h
 arg_0		= word ptr  6
@@ -3195,14 +3226,18 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-sub_4BBA0	endp
+Gameflow_SaveTmpState_4BBA0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4BBF7	proc far		; CODE XREF: sub_41F56J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Écrit op2misn.iff pour STRIKE.EXE (chunks MLST, DATA, PRTL ;
+; mission [partie+0F9h], équipiers, armement).
+; ==============================================================================================
+Gameflow_WriteMissionOrder_4BBF7	proc far		; CODE XREF: sub_41F56J
 
 var_1EC		= word ptr -1ECh
 var_18F		= dword	ptr -18Fh
@@ -3261,7 +3296,7 @@ arg_0		= word ptr  6
 		jmp	loc_4BD7E
 ; ���������������������������������������������������������������������������
 
-loc_4BC11:				; CODE XREF: sub_4BBF7+15j
+loc_4BC11:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+15j
 		lea	ax, [bp+var_1EC]
 		push	ax
 		call	StreamReader_ConstructVariantA_3B2A9
@@ -3294,10 +3329,10 @@ loc_4BC11:				; CODE XREF: sub_4BBF7+15j
 		jnz	short loc_4BC8E
 		push	22h ; '"'
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4BC8E:				; CODE XREF: sub_4BBF7+88j
+loc_4BC8E:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+88j
 		push	0
 		push	large 41544144h
 		lea	ax, [bp+var_1EC]
@@ -3308,15 +3343,15 @@ loc_4BC8E:				; CODE XREF: sub_4BBF7+88j
 		jnz	short loc_4BCB4
 		push	23h ; '#'
 		push	5D6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4BCB4:				; CODE XREF: sub_4BBF7+AEj
+loc_4BCB4:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+AEj
 		mov	[bp+var_36], 0
 		jmp	short loc_4BCD3
 ; ���������������������������������������������������������������������������
 
-loc_4BCBB:				; CODE XREF: sub_4BBF7+E5j
+loc_4BCBB:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+E5j
 		push	large 8
 		push	ss
 		lea	ax, [bp+var_C]
@@ -3327,7 +3362,7 @@ loc_4BCBB:				; CODE XREF: sub_4BBF7+E5j
 		add	sp, 0Ah
 		inc	[bp+var_36]
 
-loc_4BCD3:				; CODE XREF: sub_4BBF7+C2j
+loc_4BCD3:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+C2j
 		mov	al, [si+0F9h]
 		mov	ah, 0
 		cmp	ax, [bp+var_36]
@@ -3347,7 +3382,7 @@ loc_4BCD3:				; CODE XREF: sub_4BBF7+C2j
 		jmp	short loc_4BD34
 ; ���������������������������������������������������������������������������
 
-loc_4BD0C:				; CODE XREF: sub_4BBF7+146j
+loc_4BD0C:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+146j
 		push	large 8
 		push	ss
 		lea	ax, [bp+var_16]
@@ -3363,7 +3398,7 @@ loc_4BD0C:				; CODE XREF: sub_4BBF7+146j
 		mov	[bp+var_1], al
 		inc	[bp+var_36]
 
-loc_4BD34:				; CODE XREF: sub_4BBF7+113j
+loc_4BD34:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+113j
 		mov	al, [si+0F9h]
 		mov	ah, 0
 		cmp	ax, [bp+var_36]
@@ -3372,7 +3407,7 @@ loc_4BD34:				; CODE XREF: sub_4BBF7+113j
 		mov	eax, [bp+var_176]
 		mov	[bp+var_187], eax
 
-loc_4BD4D:				; CODE XREF: sub_4BBF7+108j
+loc_4BD4D:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+108j
 		lea	ax, [bp+var_1EC]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -3390,7 +3425,7 @@ loc_4BD4D:				; CODE XREF: sub_4BBF7+108j
 		jmp	short loc_4BDA4
 ; ���������������������������������������������������������������������������
 
-loc_4BD7E:				; CODE XREF: sub_4BBF7+17j
+loc_4BD7E:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+17j
 		push	635h
 		lea	ax, [bp+var_C]
 		push	ax
@@ -3404,7 +3439,7 @@ loc_4BD7E:				; CODE XREF: sub_4BBF7+17j
 		add	sp, 4
 		mov	[bp+var_1], 15h
 
-loc_4BDA4:				; CODE XREF: sub_4BBF7+185j
+loc_4BDA4:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+185j
 		push	ds
 		push	offset a_iff	; ".iff"
 		push	ds
@@ -3477,7 +3512,7 @@ loc_4BDA4:				; CODE XREF: sub_4BBF7+185j
 		jmp	short loc_4BEFC
 ; ���������������������������������������������������������������������������
 
-loc_4BE96:				; CODE XREF: sub_4BBF7+308j
+loc_4BE96:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+308j
 		mov	bx, di
 		shl	bx, 1
 		cmp	word ptr [bx+si+261h], 0
@@ -3511,10 +3546,10 @@ loc_4BE96:				; CODE XREF: sub_4BBF7+308j
 		add	sp, 0Eh
 		add	[bp+var_DF], 8
 
-loc_4BEFB:				; CODE XREF: sub_4BBF7+2A8j
+loc_4BEFB:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+2A8j
 		inc	di
 
-loc_4BEFC:				; CODE XREF: sub_4BBF7+29Dj
+loc_4BEFC:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+29Dj
 		cmp	di, 9
 		jl	short loc_4BE96
 		lea	ax, [bp+var_144]
@@ -3526,7 +3561,7 @@ loc_4BEFC:				; CODE XREF: sub_4BBF7+29Dj
 		jmp	loc_4C136
 ; ���������������������������������������������������������������������������
 
-loc_4BF18:				; CODE XREF: sub_4BBF7+31Cj
+loc_4BF18:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+31Cj
 		push	large 0
 		push	large [dword_43672]
 		lea	ax, [bp+var_144]
@@ -3557,18 +3592,18 @@ loc_4BF18:				; CODE XREF: sub_4BBF7+31Cj
 		jmp	short loc_4BF7A
 ; ���������������������������������������������������������������������������
 
-loc_4BF75:				; CODE XREF: sub_4BBF7+386j
+loc_4BF75:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+386j
 		mov	byte ptr [bp+di+var_38], 0
 		inc	di
 
-loc_4BF7A:				; CODE XREF: sub_4BBF7+37Cj
+loc_4BF7A:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+37Cj
 		cmp	di, 4
 		jl	short loc_4BF75
 		xor	di, di
 		jmp	loc_4C04C
 ; ���������������������������������������������������������������������������
 
-loc_4BF84:				; CODE XREF: sub_4BBF7+45Aj
+loc_4BF84:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+45Aj
 		mov	bx, di
 		shl	bx, 1
 		cmp	byte ptr [bx+si+273h], 0FFh
@@ -3576,7 +3611,7 @@ loc_4BF84:				; CODE XREF: sub_4BBF7+45Aj
 		jmp	loc_4C04B
 ; ���������������������������������������������������������������������������
 
-loc_4BF92:				; CODE XREF: sub_4BBF7+396j
+loc_4BF92:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+396j
 		mov	al, byte ptr [bp+di+var_38]
 		mov	ah, 0
 		or	ax, ax
@@ -3584,7 +3619,7 @@ loc_4BF92:				; CODE XREF: sub_4BBF7+396j
 		jmp	loc_4C04B
 ; ���������������������������������������������������������������������������
 
-loc_4BF9E:				; CODE XREF: sub_4BBF7+3A2j
+loc_4BF9E:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+3A2j
 		mov	bx, di
 		shl	bx, 1
 		mov	al, [bx+si+274h]
@@ -3597,7 +3632,7 @@ loc_4BF9E:				; CODE XREF: sub_4BBF7+3A2j
 		jmp	short loc_4BFE6
 ; ���������������������������������������������������������������������������
 
-loc_4BFB5:				; CODE XREF: sub_4BBF7+3F3j
+loc_4BFB5:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+3F3j
 		mov	bx, di
 		shl	bx, 1
 		mov	al, [bx+si+273h]
@@ -3616,10 +3651,10 @@ loc_4BFB5:				; CODE XREF: sub_4BBF7+3F3j
 		add	bx, ax
 		mov	byte ptr [bx], 1
 
-loc_4BFE3:				; CODE XREF: sub_4BBF7+3CFj
+loc_4BFE3:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+3CFj
 		inc	[bp+var_46]
 
-loc_4BFE6:				; CODE XREF: sub_4BBF7+3BCj
+loc_4BFE6:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+3BCj
 		cmp	[bp+var_46], 4
 		jl	short loc_4BFB5
 		mov	ax, [bp+var_44]
@@ -3653,17 +3688,17 @@ loc_4BFE6:				; CODE XREF: sub_4BBF7+3BCj
 		add	sp, 0Eh
 		add	[bp+var_DF], 8
 
-loc_4C04B:				; CODE XREF: sub_4BBF7+398j
-					; sub_4BBF7+3A4j
+loc_4C04B:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+398j
+					; Gameflow_WriteMissionOrder_4BBF7+3A4j
 		inc	di
 
-loc_4C04C:				; CODE XREF: sub_4BBF7+38Aj
+loc_4C04C:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+38Aj
 		cmp	di, 4
 		jge	short loc_4C054
 		jmp	loc_4BF84
 ; ���������������������������������������������������������������������������
 
-loc_4C054:				; CODE XREF: sub_4BBF7+458j
+loc_4C054:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+458j
 		mov	[bp+var_3A], 3E8h
 		push	large [bp+var_DF]
 		push	large 2
@@ -3732,7 +3767,7 @@ loc_4C054:				; CODE XREF: sub_4BBF7+458j
 		call	ResourceRecord_SeekAndRelease_3C857
 		add	sp, 2
 
-loc_4C136:				; CODE XREF: sub_4BBF7+31Ej
+loc_4C136:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+31Ej
 		push	large 0
 		push	large [dword_43686]
 		lea	ax, [bp+var_144]
@@ -3859,7 +3894,7 @@ loc_4C136:				; CODE XREF: sub_4BBF7+31Ej
 		add	sp, 0Eh
 		add	[bp+var_DF], 8
 
-loc_4C2D7:				; CODE XREF: sub_4BBF7+691j
+loc_4C2D7:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+691j
 		cmp	byte ptr [si+370h], 0
 		jz	short loc_4C32B
 		mov	ax, si
@@ -3887,7 +3922,7 @@ loc_4C2D7:				; CODE XREF: sub_4BBF7+691j
 		add	sp, 0Eh
 		add	[bp+var_DF], 8
 
-loc_4C32B:				; CODE XREF: sub_4BBF7+6E5j
+loc_4C32B:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+6E5j
 		cmp	byte ptr [si+384h], 0
 		jz	short loc_4C37F
 		mov	ax, si
@@ -3915,7 +3950,7 @@ loc_4C32B:				; CODE XREF: sub_4BBF7+6E5j
 		add	sp, 0Eh
 		add	[bp+var_DF], 8
 
-loc_4C37F:				; CODE XREF: sub_4BBF7+739j
+loc_4C37F:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+739j
 		lea	ax, [bp+var_144]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_3C848
@@ -3955,8 +3990,8 @@ loc_4C37F:				; CODE XREF: sub_4BBF7+739j
 		call	PagedResourceC_RefreshAndFinalize_2FD7D
 		add	sp, 2
 
-loc_4C3E8:				; CODE XREF: sub_4BBF7+7B3j
-					; sub_4BBF7+7E1j
+loc_4C3E8:				; CODE XREF: Gameflow_WriteMissionOrder_4BBF7+7B3j
+					; Gameflow_WriteMissionOrder_4BBF7+7E1j
 		mov	[bp+var_144], 56Eh
 		lea	ax, [bp+var_144]
 		push	ax
@@ -3971,7 +4006,7 @@ loc_4C3E8:				; CODE XREF: sub_4BBF7+7B3j
 		pop	si
 		leave
 		retf
-sub_4BBF7	endp
+Gameflow_WriteMissionOrder_4BBF7	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

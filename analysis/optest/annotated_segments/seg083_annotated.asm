@@ -58,7 +58,7 @@ CachedObject_Allocate_2D201	endp
 
 ; Attributes: bp-based frame
 
-sub_2D260	proc far		; CODE XREF: sub_51049+17DP
+sub_2D260	proc far		; CODE XREF: Gameflow_KillBoard_51049+17DP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -254,7 +254,7 @@ loc_2D43B:				; CODE XREF: seg083:01D0j
 ; (sub_338). Référencée depuis seg209.
 ; ==============================================================================================
 CachedObject_Destruct_2D440	proc far		; CODE XREF: seg163:02F6P
-					; sub_51049+75EP
+					; Gameflow_KillBoard_51049+75EP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -755,7 +755,7 @@ CachedObject_AllocateAndInit_2D777	endp
 
 ; Attributes: bp-based frame
 
-sub_2D7AD	proc far		; CODE XREF: sub_51049+3FDP
+sub_2D7AD	proc far		; CODE XREF: Gameflow_KillBoard_51049+3FDP
 					; DATA XREF: dseg:3F28o
 
 arg_0		= word ptr  6

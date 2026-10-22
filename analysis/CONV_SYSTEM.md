@@ -299,12 +299,13 @@ proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) →
   23h, 25h. **14h** : bloc joué si la mission a été acceptée (partie + 35Bh ≠ 0) ; **15h** : bloc
   joué si elle a été refusée. C'est ainsi que la réponse à 0Bh choisit la suite (conversations,
   missions) dans le script de partie. 20h teste un drapeau (partie + 1FDh + argument). Les autres
-  commandes du script de partie relèvent du déroulement de la campagne (GAMEFLOW), pas des
-  conversations.
+  commandes du script de partie relèvent du déroulement de la campagne : `GAMEFLOW_SYSTEM.md`.
 
 ## 6. Points ouverts
 
-- Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
+- Drapeaux dseg 0EE6h (choix de `$A`, `$B`) : le compte rendu de vol (`misn2op.iff`, chunk `DIED`)
+  remet à 0 celui de chaque personnage mort (`GAMEFLOW_SYSTEM.md` § 6) ; ce qui les pose à 1 et le
+  choix fait par `$A` / `$B` restent à lire.
 - Version du code qui lit `[voix]` : trouvée dans l'OPTTEST.EXE du CD-ROM, voir § 8.
 
 ## 7. Corriger libRealSpace (consignes pour un agent)

@@ -33,7 +33,7 @@ loc_30FC:				; CODE XREF: sub_30D3+Bj
 		push	4035h
 		nop
 		push	cs
-		call	near ptr sub_310B
+		call	near ptr Fatal_Error_310B
 		add	sp, 4
 
 loc_3108:				; CODE XREF: sub_30D3+27j
@@ -47,7 +47,11 @@ sub_30D3	endp
 
 ; Attributes: bp-based frame
 
-sub_310B	proc far		; CODE XREF: sub_30D3+2Fp Gameflow_RunScriptPairs_36CF+80P ...
+; ==============================================================================================
+; far, LUE 2026-10-22. Affiche un message d'erreur (CRT_Msg_Sprintf2) et quitte le programme
+; (CRT_Exit).
+; ==============================================================================================
+Fatal_Error_310B	proc far		; CODE XREF: sub_30D3+2Fp Gameflow_RunScriptPairs_36CF+80P ...
 
 var_102		= word ptr -102h
 var_2		= word ptr -2
@@ -66,7 +70,7 @@ arg_2		= word ptr  8
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_3120:				; CODE XREF: sub_310B+10j
+loc_3120:				; CODE XREF: Fatal_Error_310B+10j
 		mov	byte_47080, 1
 		lea	ax, [bp+var_102]
 		cmp	ax, si
@@ -80,7 +84,7 @@ loc_3120:				; CODE XREF: sub_310B+10j
 		call	CRT_Msg_Sprintf2
 		add	sp, 6
 
-loc_3144:				; CODE XREF: sub_310B+20j
+loc_3144:				; CODE XREF: Fatal_Error_310B+20j
 		call	PagedResourceC_RefreshAllInstances_2FD55
 		lea	ax, [bp+var_102]
 		push	ax
@@ -93,7 +97,7 @@ loc_3144:				; CODE XREF: sub_310B+20j
 		pop	si
 		leave
 		retf
-sub_310B	endp
+Fatal_Error_310B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -260,7 +264,7 @@ loc_31F1:				; CODE XREF: sub_3166+68j
 		call	sub_41F24
 		add	sp, 0Ah
 		push	5A21h
-		call	sub_3D2E
+		call	Gameflow_MainLoop_3D2E
 		add	sp, 2
 		mov	al, byte_48E43
 		mov	byte_48E42, al

@@ -7,7 +7,7 @@ seg004		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_49BC	proc far		; CODE XREF: sub_3B0B+19BP
+sub_49BC	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+19BP
 					; seg002:0CEAP	...
 
 var_2		= word ptr -2
@@ -349,8 +349,8 @@ loc_4C13:				; CODE XREF: seg004:01CFj seg004:0204j ...
 
 ; Attributes: bp-based frame
 
-sub_4C1F	proc far		; CODE XREF: sub_3B0B+8EP
-					; sub_51AB3+259P ...
+sub_4C1F	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+8EP
+					; Gameflow_WeaponLoadout_51AB3+259P ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -709,7 +709,7 @@ loc_4ECB:				; CODE XREF: sub_4EA1+13j sub_4EA1+1Ej
 		jnz	short loc_4EB6
 		push	0
 		push	word_4429C
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 		pop	di
 		pop	si
@@ -1285,7 +1285,7 @@ loc_52E3:				; CODE XREF: sub_502B+2B4j
 		mov	al, [bp+var_11]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 
 loc_5325:				; CODE XREF: sub_502B+2EAj
@@ -1300,7 +1300,7 @@ loc_5327:				; CODE XREF: sub_502B+2D4j
 		mov	al, [bp+var_11]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 
 loc_5340:				; CODE XREF: sub_502B+305j

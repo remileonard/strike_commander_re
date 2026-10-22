@@ -8,7 +8,7 @@ seg007		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 sub_6734	proc far		; CODE XREF: sub_29C6B+9BP
-					; sub_4BBF7+7D5P ...
+					; Gameflow_WriteMissionOrder_4BBF7+7D5P ...
 
 var_50		= word ptr -50h
 arg_0		= word ptr  6

@@ -7,8 +7,8 @@ seg142		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_3AD2A	proc far		; CODE XREF: sub_4DAE8+10FP
-					; sub_4DAE8+1BFP ...
+sub_3AD2A	proc far		; CODE XREF: Gameflow_SaveGameFile_4DAE8+10FP
+					; Gameflow_SaveGameFile_4DAE8+1BFP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -34,8 +34,8 @@ sub_3AD2A	endp
 
 ; Attributes: bp-based frame
 
-sub_3AD47	proc far		; CODE XREF: sub_4DAE8+77P
-					; sub_4DAE8+8BP ...
+sub_3AD47	proc far		; CODE XREF: Gameflow_SaveGameFile_4DAE8+77P
+					; Gameflow_SaveGameFile_4DAE8+8BP ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -61,8 +61,8 @@ sub_3AD47	endp
 
 ; Attributes: bp-based frame
 
-sub_3AD64	proc far		; CODE XREF: sub_4DAE8+163P
-					; sub_4DAE8+177P ...
+sub_3AD64	proc far		; CODE XREF: Gameflow_SaveGameFile_4DAE8+163P
+					; Gameflow_SaveGameFile_4DAE8+177P ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -95,7 +95,7 @@ sub_3AD64	endp
 ; sub_63FA1. Référencée par Music_LoadTimbreFromLibrary_5A577 (seg124).
 ; ==============================================================================================
 Handle_ReadWordField_3AD81	proc far		; CODE XREF: sub_74F1+58P
-					; sub_4DF4B+10BP ...
+					; Gameflow_LoadGameFile_4DF4B+10BP ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -129,8 +129,8 @@ Handle_ReadWordField_3AD81	endp
 ; appelants et contexte à revérifier ici. — far, lit un champ 8 bits typé (tag 1) via
 ; sub_63FA1. Référencée par sub_AA84E.
 ; ==============================================================================================
-Handle_ReadByteField_3ADA4	proc far		; CODE XREF: sub_4DF4B+7CP
-					; sub_4DF4B+8FP ...
+Handle_ReadByteField_3ADA4	proc far		; CODE XREF: Gameflow_LoadGameFile_4DF4B+7CP
+					; Gameflow_LoadGameFile_4DF4B+8FP ...
 
 var_1		= byte ptr -1
 arg_0		= word ptr  6
@@ -158,8 +158,8 @@ Handle_ReadByteField_3ADA4	endp
 
 ; Attributes: bp-based frame
 
-sub_3ADC7	proc far		; CODE XREF: sub_4DF4B+160P
-					; sub_4DF4B+17DP ...
+sub_3ADC7	proc far		; CODE XREF: Gameflow_LoadGameFile_4DF4B+160P
+					; Gameflow_LoadGameFile_4DF4B+17DP ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6

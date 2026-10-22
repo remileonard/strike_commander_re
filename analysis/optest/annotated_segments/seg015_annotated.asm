@@ -58,7 +58,7 @@ arg_6		= byte ptr  0Ch
 		cmp	[bp+arg_0], 4
 		jbe	short loc_C1B1
 		push	19F6h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_C1B1:				; CODE XREF: sub_C13D+67j
@@ -166,7 +166,7 @@ loc_C287:				; CODE XREF: sub_C13D+124j
 		mov	ah, 0
 		push	ax
 		push	1A3Bh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_C2A1:				; CODE XREF: sub_C13D+151j
@@ -431,7 +431,7 @@ loc_C439:				; CODE XREF: Pak_LoadEntry_C40A+29j
 		cmp	[bp+var_4], 0
 		jnz	short loc_C44F
 		push	1A7Eh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_C44F:				; CODE XREF: Pak_LoadEntry_C40A+38j

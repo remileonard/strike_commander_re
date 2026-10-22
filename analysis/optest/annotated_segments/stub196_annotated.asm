@@ -23,8 +23,8 @@ sub_423B0	endp
 
 ; Attributes: thunk
 
-sub_423B5	proc far		; CODE XREF: sub_3D2E+10EP
-					; sub_3D2E:loc_3F83P ...
+sub_423B5	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+10EP
+					; Gameflow_MainLoop_3D2E:loc_3F83P ...
 		jmp	Midgame1_PlayPart1_5FCF0
 sub_423B5	endp
 

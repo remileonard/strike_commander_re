@@ -267,7 +267,7 @@ sub_3E718	proc far		; CODE XREF: seg156:02D8P Keyboard_QueryAndDispatch_3E5C7+3
 		cmp	word_480F8, 0
 		jz	short loc_3E72B
 		push	4A50h
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 
 loc_3E72B:				; CODE XREF: sub_3E718+8j

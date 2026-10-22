@@ -7,8 +7,8 @@ seg005		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_563B	proc far		; CODE XREF: sub_3B0B+F1P
-					; sub_51AB3+332P ...
+sub_563B	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+F1P
+					; Gameflow_WeaponLoadout_51AB3+332P ...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -104,8 +104,8 @@ sub_5658	endp
 
 ; Attributes: bp-based frame
 
-sub_56B6	proc far		; CODE XREF: sub_51AB3+323P
-					; sub_52662+DD5P ...
+sub_56B6	proc far		; CODE XREF: Gameflow_WeaponLoadout_51AB3+323P
+					; Gameflow_Catalog_52662+DD5P ...
 
 arg_0		= word ptr  6
 
@@ -124,8 +124,8 @@ sub_56B6	endp
 
 ; Attributes: bp-based frame
 
-sub_56C5	proc far		; CODE XREF: sub_51AB3+35AP
-					; sub_51AB3+463P
+sub_56C5	proc far		; CODE XREF: Gameflow_WeaponLoadout_51AB3+35AP
+					; Gameflow_WeaponLoadout_51AB3+463P
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -216,7 +216,7 @@ loc_573D:				; CODE XREF: seg005:00C1j seg005:00EBj
 
 ; Attributes: bp-based frame
 
-sub_574F	proc far		; CODE XREF: sub_51AB3+2F2P
+sub_574F	proc far		; CODE XREF: Gameflow_WeaponLoadout_51AB3+2F2P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -271,8 +271,8 @@ sub_574F	endp
 
 ; Attributes: bp-based frame
 
-sub_579A	proc far		; CODE XREF: sub_51AB3+3E1P
-					; sub_51AB3+4FCP ...
+sub_579A	proc far		; CODE XREF: Gameflow_WeaponLoadout_51AB3+3E1P
+					; Gameflow_WeaponLoadout_51AB3+4FCP ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -334,8 +334,8 @@ sub_579A	endp
 
 ; Attributes: bp-based frame
 
-sub_5803	proc far		; CODE XREF: sub_3B0B+10FP
-					; sub_51AB3+2BBP ...
+sub_5803	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+10FP
+					; Gameflow_WeaponLoadout_51AB3+2BBP ...
 
 var_290		= word ptr -290h
 var_190		= word ptr -190h
@@ -1291,8 +1291,8 @@ sub_5803	endp
 
 ; Attributes: bp-based frame
 
-sub_6162	proc far		; CODE XREF: sub_3B0B+138P
-					; sub_51AB3+52BP ...
+sub_6162	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+138P
+					; Gameflow_WeaponLoadout_51AB3+52BP ...
 
 var_6		= word ptr -6
 var_3		= byte ptr -3

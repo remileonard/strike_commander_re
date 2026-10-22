@@ -404,7 +404,7 @@ sub_3ECA5	proc far		; CODE XREF: sub_6162+B9P sub_69B8+15P ...
 		cmp	word_47CEE, 0
 		jz	short loc_3ECB8
 		push	4A7Eh
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 
 loc_3ECB8:				; CODE XREF: sub_3ECA5+8j
@@ -424,7 +424,7 @@ sub_3ECBD	proc far		; CODE XREF: sub_6162+C1P sub_69B8+1DP ...
 		cmp	word_47CEE, 0
 		jz	short loc_3ECD0
 		push	4A7Eh
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 
 loc_3ECD0:				; CODE XREF: sub_3ECBD+8j

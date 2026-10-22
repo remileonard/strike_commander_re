@@ -14,8 +14,8 @@ stru_42030	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:0696o
 
 ; Attributes: thunk
 
-sub_42050	proc far		; DATA XREF: sub_506AA+8Co
-					; sub_506AA+A5o
+sub_42050	proc far		; DATA XREF: Gameflow_ShowKillMarks_506AA+8Co
+					; Gameflow_ShowKillMarks_506AA+A5o
 		jmp	sub_51809
 sub_42050	endp
 
@@ -25,7 +25,7 @@ sub_42050	endp
 ; Attributes: thunk
 
 sub_42055	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+363P
-		jmp	sub_50160
+		jmp	Gameflow_ApplyChange_50160
 sub_42055	endp
 
 
@@ -43,7 +43,7 @@ sub_4205A	endp
 ; Attributes: thunk
 
 sub_4205F	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+30AP
-		jmp	sub_506AA
+		jmp	Gameflow_ShowKillMarks_506AA
 sub_4205F	endp
 
 
@@ -52,7 +52,7 @@ sub_4205F	endp
 ; Attributes: thunk
 
 sub_42064	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+282P
-		jmp	sub_51049
+		jmp	Gameflow_KillBoard_51049
 sub_42064	endp
 
 stub187		ends

@@ -116,7 +116,12 @@ loc_28C71:				; CODE XREF: seg062:00E5j seg062:00ECj
 
 ; Attributes: bp-based frame
 
-sub_28C73	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2E4P
+; ==============================================================================================
+; far, LUE 2026-10-22. Si la musique est active : humeur musicale du déroulement word_4458B =
+; arg si arg < word_4457E ; sinon erreur « Invalid tune requested » (sauf FFh). Commandes 18h
+; et 24h (8).
+; ==============================================================================================
+Music_SetGameflowMood_28C73	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2E4P
 					; Gameflow_RunScriptPairs_36CF+38DP ...
 
 arg_0		= word ptr  6
@@ -135,21 +140,21 @@ arg_0		= word ptr  6
 		jmp	short loc_28CA8
 ; ���������������������������������������������������������������������������
 
-loc_28C94:				; CODE XREF: sub_28C73+19j
+loc_28C94:				; CODE XREF: Music_SetGameflowMood_28C73+19j
 		cmp	si, 0FFh
 		jz	short loc_28CA8
 		push	si
 		push	3834h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 		jmp	short $+2
 
-loc_28CA8:				; CODE XREF: sub_28C73+9j
-					; sub_28C73+10j ...
+loc_28CA8:				; CODE XREF: Music_SetGameflowMood_28C73+9j
+					; Music_SetGameflowMood_28C73+10j ...
 		pop	si
 		pop	bp
 		retf
-sub_28C73	endp
+Music_SetGameflowMood_28C73	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -236,8 +241,12 @@ sub_28CF7	endp
 
 ; Attributes: bp-based frame
 
-sub_28CFC	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+3CFP
-					; sub_4DF4B+30DP
+; ==============================================================================================
+; far, LUE 2026-10-22. Si la musique est active : joue le morceau arg de SOUND\gameflow.dat
+; (sub_42363 → sub_5EEE6). Commande 26h.
+; ==============================================================================================
+Music_PlayGameflowTune_28CFC	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+3CFP
+					; Gameflow_LoadGameFile_4DF4B+30DP
 
 arg_0		= byte ptr  6
 
@@ -255,10 +264,10 @@ arg_0		= byte ptr  6
 		call	sub_42363
 		add	sp, 6
 
-loc_28D22:				; CODE XREF: sub_28CFC+8j sub_28CFC+Fj
+loc_28D22:				; CODE XREF: Music_PlayGameflowTune_28CFC+8j Music_PlayGameflowTune_28CFC+Fj
 		pop	bp
 		retf
-sub_28CFC	endp
+Music_PlayGameflowTune_28CFC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -322,7 +331,7 @@ sub_28D49	endp
 
 ; Attributes: bp-based frame
 
-sub_28D68	proc far		; CODE XREF: sub_4F1A7:loc_4FDF3P
+sub_28D68	proc far		; CODE XREF: Gameflow_MainMenu_4F1A7:loc_4FDF3P
 
 var_1		= byte ptr -1
 

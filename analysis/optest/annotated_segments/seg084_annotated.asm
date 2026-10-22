@@ -576,7 +576,7 @@ LayerGroup_Construct_2DC66	endp
 ; far, LUE 2026-10-17. Destructeur de groupe de calques / scène : vide la liste (sub_2DB51),
 ; libère l'objet si bit 1 de l'argument.
 ; ==============================================================================================
-Scene_Destruct_2DCFC	proc far		; CODE XREF: sub_3B0B+1B5P
+Scene_Destruct_2DCFC	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+1B5P
 					; seg002:0D03P	...
 
 arg_0		= word ptr  6

@@ -237,7 +237,7 @@ loc_D3F0:				; CODE XREF: sub_D3CD+10j
 		or	ax, ax
 		jg	short loc_D414
 		push	29EEh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_D414:				; CODE XREF: sub_D3CD+8j sub_D3CD+3Aj
@@ -2379,7 +2379,7 @@ loc_E229:				; CODE XREF: sub_E1FF+1Cj
 
 loc_E22B:				; CODE XREF: sub_E1FF+Dj
 		push	2A11h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_E236:				; CODE XREF: sub_E1FF:loc_E229j
@@ -2477,7 +2477,7 @@ GaugeWidget_QueryAndFormat_E256	endp
 
 ; Attributes: bp-based frame
 
-sub_E2B2	proc far		; CODE XREF: sub_4F1A7+CA2P
+sub_E2B2	proc far		; CODE XREF: Gameflow_MainMenu_4F1A7+CA2P
 					; DATA XREF: dseg:072Co ...
 
 var_8		= word ptr -8

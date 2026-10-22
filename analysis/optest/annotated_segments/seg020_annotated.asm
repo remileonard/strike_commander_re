@@ -549,7 +549,7 @@ sub_D221	endp
 ; de type 2 renvoyé par sub_3EA28 (rôle non établi). Appelle d'abord sub_D157 (pas lue).
 ; ==============================================================================================
 Input_CheckSkip_D24A	proc far		; CODE XREF: seg018:loc_CAA9P
-					; sub_4AD86:loc_4B41FP	...
+					; Gameflow_PlayShot_4AD86:loc_4B41FP	...
 
 var_C		= word ptr -0Ch
 var_4		= word ptr -4

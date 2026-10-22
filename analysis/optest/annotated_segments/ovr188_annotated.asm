@@ -6,7 +6,14 @@ ovr188		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_51830	proc far		; CODE XREF: sub_4209FJ sub_51AB3+61p
+; ==============================================================================================
+; far, LUE 2026-10-22. Cherche dans FORM LOAD le chunk LOAD dont le 1er octet vaut arg_4, puis
+; lit des paires (arme, nombre) : nombre borné par le stock [partie+261h+2×arme], rendu pair,
+; réparti par paires sur les points d'emport [partie+273h] (arme) / [+274h] (nombre par côté)
+; selon le type d'arme (0, 1 : emports 0–1, 1 par côté ; 6 : emport 2 ; 8 : emport 1, 2 par
+; côté ; 4, 5 : emport 2, 6 par côté ; 7 : 2 par côté ; autres : 3 par côté).
+; ==============================================================================================
+Gameflow_ApplyDefaultLoadout_51830	proc far		; CODE XREF: sub_4209FJ Gameflow_WeaponLoadout_51AB3+61p
 
 var_B0		= word ptr -0B0h
 var_53		= dword	ptr -53h
@@ -37,7 +44,7 @@ arg_4		= byte ptr  0Ah
 		jmp	loc_51AB0
 ; ���������������������������������������������������������������������������
 
-loc_51844:				; CODE XREF: sub_51830+Fj
+loc_51844:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+Fj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	StreamReader_ConstructVariantA_3B2A9
@@ -68,15 +75,15 @@ loc_51844:				; CODE XREF: sub_51830+Fj
 		jnz	short loc_518B9
 		push	16h
 		push	9AAh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_518B9:				; CODE XREF: sub_51830+7Aj
+loc_518B9:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+7Aj
 		mov	[bp+var_6], 0
 		jmp	short loc_518E5
 ; ���������������������������������������������������������������������������
 
-loc_518BF:				; CODE XREF: sub_51830+CCj
+loc_518BF:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+CCj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -89,11 +96,11 @@ loc_518BF:				; CODE XREF: sub_51830+CCj
 		jmp	short loc_518FE
 ; ���������������������������������������������������������������������������
 
-loc_518DD:				; CODE XREF: sub_51830+A5j
+loc_518DD:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+A5j
 		mov	eax, [bp+var_3A]
 		mov	[bp+var_4B], eax
 
-loc_518E5:				; CODE XREF: sub_51830+8Dj
+loc_518E5:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+8Dj
 		push	1
 		push	large 44414F4Ch
 		lea	ax, [bp+var_B0]
@@ -103,21 +110,21 @@ loc_518E5:				; CODE XREF: sub_51830+8Dj
 		or	ax, ax
 		jnz	short loc_518BF
 
-loc_518FE:				; CODE XREF: sub_51830+ABj
+loc_518FE:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+ABj
 		mov	al, [bp+var_6]
 		mov	ah, 0
 		or	ax, ax
 		jnz	short loc_51914
 		push	17h
 		push	9AAh
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_51914:				; CODE XREF: sub_51830+D5j
+loc_51914:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+D5j
 		jmp	loc_51A4E
 ; ���������������������������������������������������������������������������
 
-loc_51917:				; CODE XREF: sub_51830+24Ej
+loc_51917:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+24Ej
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_ReadFinalField_3C3C1
@@ -133,14 +140,14 @@ loc_51917:				; CODE XREF: sub_51830+24Ej
 		cmp	[bp+var_4], 1
 		jnz	short loc_51951
 
-loc_51943:				; CODE XREF: sub_51830+10Bj
+loc_51943:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+10Bj
 		mov	[bp+var_1], 0
 		mov	[bp+var_2], 2
 		mov	[bp+var_3], 1
 		jmp	short loc_519B3
 ; ���������������������������������������������������������������������������
 
-loc_51951:				; CODE XREF: sub_51830+111j
+loc_51951:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+111j
 		cmp	[bp+var_4], 6
 		jnz	short loc_51965
 		mov	[bp+var_1], 2
@@ -149,7 +156,7 @@ loc_51951:				; CODE XREF: sub_51830+111j
 		jmp	short loc_519B3
 ; ���������������������������������������������������������������������������
 
-loc_51965:				; CODE XREF: sub_51830+125j
+loc_51965:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+125j
 		cmp	[bp+var_4], 8
 		jnz	short loc_51979
 		mov	[bp+var_1], 1
@@ -158,20 +165,20 @@ loc_51965:				; CODE XREF: sub_51830+125j
 		jmp	short loc_519B3
 ; ���������������������������������������������������������������������������
 
-loc_51979:				; CODE XREF: sub_51830+139j
+loc_51979:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+139j
 		cmp	[bp+var_4], 5
 		jz	short loc_51985
 		cmp	[bp+var_4], 4
 		jnz	short loc_51993
 
-loc_51985:				; CODE XREF: sub_51830+14Dj
+loc_51985:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+14Dj
 		mov	[bp+var_1], 2
 		mov	[bp+var_2], 3
 		mov	[bp+var_3], 6
 		jmp	short loc_519B3
 ; ���������������������������������������������������������������������������
 
-loc_51993:				; CODE XREF: sub_51830+153j
+loc_51993:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+153j
 		cmp	[bp+var_4], 7
 		jnz	short loc_519A7
 		mov	[bp+var_1], 2
@@ -180,13 +187,13 @@ loc_51993:				; CODE XREF: sub_51830+153j
 		jmp	short loc_519B3
 ; ���������������������������������������������������������������������������
 
-loc_519A7:				; CODE XREF: sub_51830+167j
+loc_519A7:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+167j
 		mov	[bp+var_1], 2
 		mov	[bp+var_2], 3
 		mov	[bp+var_3], 3
 
-loc_519B3:				; CODE XREF: sub_51830+11Fj
-					; sub_51830+133j ...
+loc_519B3:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+11Fj
+					; Gameflow_ApplyDefaultLoadout_51830+133j ...
 		mov	al, [bp+var_5]
 		mov	ah, 0
 		mov	dl, [bp+var_4]
@@ -202,25 +209,25 @@ loc_519B3:				; CODE XREF: sub_51830+11Fj
 		mov	al, [bx+si+261h]
 		mov	[bp+var_5], al
 
-loc_519D7:				; CODE XREF: sub_51830+195j
+loc_519D7:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+195j
 		test	[bp+var_5], 1
 		jz	short loc_519E0
 		dec	[bp+var_5]
 
-loc_519E0:				; CODE XREF: sub_51830+1ABj
+loc_519E0:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+1ABj
 		mov	al, [bp+var_1]
 		mov	ah, 0
 		mov	cx, ax
 		jmp	short loc_51A45
 ; ���������������������������������������������������������������������������
 
-loc_519E9:				; CODE XREF: sub_51830+21Cj
+loc_519E9:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+21Cj
 		cmp	[bp+var_5], 0
 		jnz	short loc_519F1
 		jmp	short loc_51A4E
 ; ���������������������������������������������������������������������������
 
-loc_519F1:				; CODE XREF: sub_51830+1BDj
+loc_519F1:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+1BDj
 		mov	bx, cx
 		shl	bx, 1
 		cmp	byte ptr [bx+si+273h], 0FFh
@@ -248,7 +255,7 @@ loc_519F1:				; CODE XREF: sub_51830+1BDj
 		jmp	short loc_51A44
 ; ���������������������������������������������������������������������������
 
-loc_51A31:				; CODE XREF: sub_51830+1E5j
+loc_51A31:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+1E5j
 		mov	al, [bp+var_5]
 		mov	ah, 0
 		sar	ax, 1
@@ -257,18 +264,18 @@ loc_51A31:				; CODE XREF: sub_51830+1E5j
 		mov	[bx+si+274h], al
 		mov	[bp+var_5], 0
 
-loc_51A44:				; CODE XREF: sub_51830+1CAj
-					; sub_51830+1FFj
+loc_51A44:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+1CAj
+					; Gameflow_ApplyDefaultLoadout_51830+1FFj
 		inc	cx
 
-loc_51A45:				; CODE XREF: sub_51830+1B7j
+loc_51A45:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+1B7j
 		mov	al, [bp+var_2]
 		mov	ah, 0
 		cmp	ax, cx
 		jge	short loc_519E9
 
-loc_51A4E:				; CODE XREF: sub_51830:loc_51914j
-					; sub_51830+1BFj
+loc_51A4E:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830:loc_51914j
+					; Gameflow_ApplyDefaultLoadout_51830+1BFj
 		test	[bp+var_3E], 1
 		jz	short loc_51A69
 		mov	eax, [bp+var_3A]
@@ -278,10 +285,10 @@ loc_51A4E:				; CODE XREF: sub_51830:loc_51914j
 		inc	[bp+var_4B]
 		jmp	short $+2
 
-loc_51A67:				; CODE XREF: sub_51830+22Fj
+loc_51A67:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+22Fj
 		jmp	short $+2
 
-loc_51A69:				; CODE XREF: sub_51830+223j
+loc_51A69:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+223j
 		mov	eax, [bp+var_4B]
 		cmp	eax, [bp+var_3A]
 		jl	short loc_51A78
@@ -289,16 +296,16 @@ loc_51A69:				; CODE XREF: sub_51830+223j
 		jmp	short loc_51A7A
 ; ���������������������������������������������������������������������������
 
-loc_51A78:				; CODE XREF: sub_51830+241j
+loc_51A78:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+241j
 		xor	ax, ax
 
-loc_51A7A:				; CODE XREF: sub_51830+246j
+loc_51A7A:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+246j
 		or	ax, ax
 		jnz	short loc_51A81
 		jmp	loc_51917
 ; ���������������������������������������������������������������������������
 
-loc_51A81:				; CODE XREF: sub_51830+24Cj
+loc_51A81:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+24Cj
 		lea	ax, [bp+var_B0]
 		push	ax
 		call	ResourceRecord_Helper_3BE15
@@ -314,18 +321,24 @@ loc_51A81:				; CODE XREF: sub_51830+24Cj
 		call	StreamReader_ReleaseBuffer_3CEB3
 		add	sp, 4
 
-loc_51AB0:				; CODE XREF: sub_51830+11j
+loc_51AB0:				; CODE XREF: Gameflow_ApplyDefaultLoadout_51830+11j
 		pop	si
 		leave
 		retf
-sub_51830	endp
+Gameflow_ApplyDefaultLoadout_51830	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_51AB3	proc far		; CODE XREF: sub_420A4J
+; ==============================================================================================
+; far, LUE 2026-10-22. Commande 16h : écran d'armement (« Add %s (%d) », « Remove %s (%d) ») ;
+; chargement par défaut = chunk LOAD numéro arg (Gameflow_ApplyDefaultLoadout_51830). Renvoie
+; 1 si le joueur choisit le sprite 0Ch (vol : [partie+0E8h] = 1, [+0EEh] = 1), 0 sinon : le
+; test 16h échoue alors.
+; ==============================================================================================
+Gameflow_WeaponLoadout_51AB3	proc far		; CODE XREF: sub_420A4J
 
 var_35C		= word ptr -35Ch
 var_32A		= word ptr -32Ah
@@ -428,7 +441,7 @@ arg_2		= byte ptr  8
 		jmp	short loc_51AFF
 ; ���������������������������������������������������������������������������
 
-loc_51ADE:				; CODE XREF: sub_51AB3+50j
+loc_51ADE:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+50j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -441,7 +454,7 @@ loc_51ADE:				; CODE XREF: sub_51AB3+50j
 		mov	byte ptr [bx+274h], 0
 		inc	[bp+var_2]
 
-loc_51AFF:				; CODE XREF: sub_51AB3+29j
+loc_51AFF:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+29j
 		cmp	[bp+var_2], 4
 		jl	short loc_51ADE
 		mov	al, [bp+arg_2]
@@ -451,13 +464,13 @@ loc_51AFF:				; CODE XREF: sub_51AB3+29j
 		push	ax
 		push	[bp+arg_0]
 		push	cs
-		call	near ptr sub_51830
+		call	near ptr Gameflow_ApplyDefaultLoadout_51830
 		add	sp, 6
 		mov	[bp+var_2], 0
 		jmp	short loc_51B62
 ; ���������������������������������������������������������������������������
 
-loc_51B21:				; CODE XREF: sub_51AB3+B3j
+loc_51B21:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+B3j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -483,17 +496,17 @@ loc_51B21:				; CODE XREF: sub_51AB3+B3j
 		mov	bx, dx
 		add	[bx], ax
 
-loc_51B5F:				; CODE XREF: sub_51AB3+7Dj
+loc_51B5F:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7Dj
 		inc	[bp+var_2]
 
-loc_51B62:				; CODE XREF: sub_51AB3+6Cj
+loc_51B62:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6Cj
 		cmp	[bp+var_2], 4
 		jl	short loc_51B21
 		mov	[bp+var_2], 0
 		jmp	short loc_51B98
 ; ���������������������������������������������������������������������������
 
-loc_51B6F:				; CODE XREF: sub_51AB3+E9j
+loc_51B6F:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+E9j
 		mov	bx, [bp+var_2]
 		shl	bx, 1
 		lea	ax, [bp+var_30]
@@ -511,14 +524,14 @@ loc_51B6F:				; CODE XREF: sub_51AB3+E9j
 		mov	[bx], ax
 		inc	[bp+var_2]
 
-loc_51B98:				; CODE XREF: sub_51AB3+BAj
+loc_51B98:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+BAj
 		cmp	[bp+var_2], 9
 		jl	short loc_51B6F
 		mov	[bp+var_2], 0
 		jmp	short loc_51BB7
 ; ���������������������������������������������������������������������������
 
-loc_51BA5:				; CODE XREF: sub_51AB3+108j
+loc_51BA5:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+108j
 		mov	al, byte ptr [bp+var_2]
 		add	al, 1Dh
 		lea	dx, [bp+var_E]
@@ -527,7 +540,7 @@ loc_51BA5:				; CODE XREF: sub_51AB3+108j
 		mov	[bx], al
 		inc	[bp+var_2]
 
-loc_51BB7:				; CODE XREF: sub_51AB3+F0j
+loc_51BB7:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+F0j
 		cmp	[bp+var_2], 8
 		jl	short loc_51BA5
 		mov	[bp+var_6], 74h	; 't'
@@ -535,7 +548,7 @@ loc_51BB7:				; CODE XREF: sub_51AB3+F0j
 		jmp	short loc_51BDA
 ; ���������������������������������������������������������������������������
 
-loc_51BC8:				; CODE XREF: sub_51AB3+12Bj
+loc_51BC8:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+12Bj
 		mov	al, byte ptr [bp+var_2]
 		add	al, 75h	; 'u'
 		lea	dx, [bp+var_16]
@@ -544,7 +557,7 @@ loc_51BC8:				; CODE XREF: sub_51AB3+12Bj
 		mov	[bx], al
 		inc	[bp+var_2]
 
-loc_51BDA:				; CODE XREF: sub_51AB3+113j
+loc_51BDA:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+113j
 		cmp	[bp+var_2], 8
 		jl	short loc_51BC8
 		mov	[bp+var_213], 25h ; '%'
@@ -644,15 +657,15 @@ loc_51BDA:				; CODE XREF: sub_51AB3+113j
 		mov	al, [bp+var_215]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 
-loc_51D8E:				; CODE XREF: sub_51AB3+2CAj
+loc_51D8E:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+2CAj
 		mov	[bp+var_2], 0
 		jmp	short loc_51DC8
 ; ���������������������������������������������������������������������������
 
-loc_51D95:				; CODE XREF: sub_51AB3+319j
+loc_51D95:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+319j
 		lea	ax, [bp+var_E]
 		mov	bx, [bp+var_2]
 		add	bx, ax
@@ -673,13 +686,13 @@ loc_51D95:				; CODE XREF: sub_51AB3+319j
 		add	sp, 4
 		inc	[bp+var_2]
 
-loc_51DC8:				; CODE XREF: sub_51AB3+2E0j
+loc_51DC8:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+2E0j
 		cmp	[bp+var_2], 9
 		jl	short loc_51D95
 		jmp	loc_52256
 ; ���������������������������������������������������������������������������
 
-loc_51DD1:				; CODE XREF: sub_51AB3+7AFj
+loc_51DD1:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7AFj
 		lea	ax, [bp+var_32A]
 		push	ax
 		call	sub_56B6
@@ -705,19 +718,19 @@ loc_51DD1:				; CODE XREF: sub_51AB3+7AFj
 		jmp	short loc_51E26
 ; ���������������������������������������������������������������������������
 
-loc_51E17:				; CODE XREF: sub_51AB3+342j
+loc_51E17:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+342j
 		push	0Bh
 		lea	ax, [bp+var_32A]
 		push	ax
 		call	sub_563B
 		add	sp, 4
 
-loc_51E26:				; CODE XREF: sub_51AB3+362j
+loc_51E26:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+362j
 		mov	[bp+var_2], 0
 		jmp	short loc_51E9F
 ; ���������������������������������������������������������������������������
 
-loc_51E2D:				; CODE XREF: sub_51AB3+3F0j
+loc_51E2D:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+3F0j
 		mov	bx, [bp+var_2]
 		shl	bx, 1
 		lea	ax, [bp+var_42]
@@ -761,17 +774,17 @@ loc_51E2D:				; CODE XREF: sub_51AB3+3F0j
 		call	sub_579A
 		add	sp, 6
 
-loc_51E9C:				; CODE XREF: sub_51AB3+387j
+loc_51E9C:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+387j
 		inc	[bp+var_2]
 
-loc_51E9F:				; CODE XREF: sub_51AB3+378j
+loc_51E9F:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+378j
 		cmp	[bp+var_2], 9
 		jl	short loc_51E2D
 		mov	[bp+var_2], 0
 		jmp	loc_51FD0
 ; ���������������������������������������������������������������������������
 
-loc_51EAD:				; CODE XREF: sub_51AB3+523j
+loc_51EAD:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+523j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -781,7 +794,7 @@ loc_51EAD:				; CODE XREF: sub_51AB3+523j
 		jmp	loc_51FCD
 ; ���������������������������������������������������������������������������
 
-loc_51EC1:				; CODE XREF: sub_51AB3+409j
+loc_51EC1:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+409j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -792,7 +805,7 @@ loc_51EC1:				; CODE XREF: sub_51AB3+409j
 		jbe	short loc_51EDC
 		mov	[bp+var_1C], 3
 
-loc_51EDC:				; CODE XREF: sub_51AB3+423j
+loc_51EDC:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+423j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -884,16 +897,16 @@ loc_51EDC:				; CODE XREF: sub_51AB3+423j
 		call	sub_579A
 		add	sp, 6
 
-loc_51FCD:				; CODE XREF: sub_51AB3+40Bj
+loc_51FCD:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+40Bj
 		inc	[bp+var_2]
 
-loc_51FD0:				; CODE XREF: sub_51AB3+3F7j
+loc_51FD0:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+3F7j
 		cmp	[bp+var_2], 4
 		jge	short loc_51FD9
 		jmp	loc_51EAD
 ; ���������������������������������������������������������������������������
 
-loc_51FD9:				; CODE XREF: sub_51AB3+521j
+loc_51FD9:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+521j
 		lea	ax, [bp+var_32A]
 		push	ax
 		call	sub_6162
@@ -906,7 +919,7 @@ loc_51FD9:				; CODE XREF: sub_51AB3+521j
 		jmp	short loc_5201A
 ; ���������������������������������������������������������������������������
 
-loc_51FFC:				; CODE XREF: sub_51AB3+56Bj
+loc_51FFC:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+56Bj
 		lea	ax, [bp+var_E]
 		mov	bx, [bp+var_2]
 		add	bx, ax
@@ -919,19 +932,19 @@ loc_51FFC:				; CODE XREF: sub_51AB3+56Bj
 		jmp	short loc_52020
 ; ���������������������������������������������������������������������������
 
-loc_52017:				; CODE XREF: sub_51AB3+556j
+loc_52017:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+556j
 		inc	[bp+var_2]
 
-loc_5201A:				; CODE XREF: sub_51AB3+547j
+loc_5201A:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+547j
 		cmp	[bp+var_2], 9
 		jl	short loc_51FFC
 
-loc_52020:				; CODE XREF: sub_51AB3+562j
+loc_52020:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+562j
 		mov	[bp+var_2], 0
 		jmp	short loc_52059
 ; ���������������������������������������������������������������������������
 
-loc_52027:				; CODE XREF: sub_51AB3+5AAj
+loc_52027:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5AAj
 		lea	ax, [bp+var_16]
 		mov	bx, [bp+var_2]
 		add	bx, ax
@@ -952,14 +965,14 @@ loc_52027:				; CODE XREF: sub_51AB3+5AAj
 		jmp	short loc_5205F
 ; ���������������������������������������������������������������������������
 
-loc_52056:				; CODE XREF: sub_51AB3+581j
+loc_52056:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+581j
 		inc	[bp+var_2]
 
-loc_52059:				; CODE XREF: sub_51AB3+572j
+loc_52059:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+572j
 		cmp	[bp+var_2], 8
 		jl	short loc_52027
 
-loc_5205F:				; CODE XREF: sub_51AB3+5A1j
+loc_5205F:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5A1j
 		mov	al, [bp+var_1B]
 		mov	ah, 0
 		or	ax, ax
@@ -967,7 +980,7 @@ loc_5205F:				; CODE XREF: sub_51AB3+5A1j
 		jmp	loc_52265
 ; ���������������������������������������������������������������������������
 
-loc_5206B:				; CODE XREF: sub_51AB3+5B3j
+loc_5206B:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5B3j
 		cmp	[bp+var_252], 0
 		jnz	short loc_5207B
 		cmp	[bp+var_1C], 0
@@ -975,13 +988,13 @@ loc_5206B:				; CODE XREF: sub_51AB3+5B3j
 		jmp	loc_5210C
 ; ���������������������������������������������������������������������������
 
-loc_5207B:				; CODE XREF: sub_51AB3+5BDj
-					; sub_51AB3+5C3j
+loc_5207B:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5BDj
+					; Gameflow_WeaponLoadout_51AB3+5C3j
 		mov	[bp+var_2], 3
 		jmp	short loc_52100
 ; ���������������������������������������������������������������������������
 
-loc_52082:				; CODE XREF: sub_51AB3+653j
+loc_52082:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+653j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -1028,38 +1041,38 @@ loc_52082:				; CODE XREF: sub_51AB3+653j
 		add	bx, ax
 		mov	byte ptr [bx+273h], 0FFh
 
-loc_520FB:				; CODE XREF: sub_51AB3+637j
+loc_520FB:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+637j
 		jmp	short loc_52109
 ; ���������������������������������������������������������������������������
 
-loc_520FD:				; CODE XREF: sub_51AB3+5E0j
+loc_520FD:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5E0j
 		dec	[bp+var_2]
 
-loc_52100:				; CODE XREF: sub_51AB3+5CDj
+loc_52100:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5CDj
 		cmp	[bp+var_2], 0
 		jl	short loc_52109
 		jmp	loc_52082
 ; ���������������������������������������������������������������������������
 
-loc_52109:				; CODE XREF: sub_51AB3:loc_520FBj
-					; sub_51AB3+651j
+loc_52109:				; CODE XREF: Gameflow_WeaponLoadout_51AB3:loc_520FBj
+					; Gameflow_WeaponLoadout_51AB3+651j
 		jmp	loc_52256
 ; ���������������������������������������������������������������������������
 
-loc_5210C:				; CODE XREF: sub_51AB3+5C5j
+loc_5210C:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5C5j
 		cmp	[bp+var_4], 0
 		jz	short loc_52118
 		cmp	[bp+var_4], 1
 		jnz	short loc_52124
 
-loc_52118:				; CODE XREF: sub_51AB3+65Dj
+loc_52118:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+65Dj
 		mov	[bp+var_1D], 0
 		mov	cl, 2
 		mov	[bp+var_1E], 1
 		jmp	short loc_5217C
 ; ���������������������������������������������������������������������������
 
-loc_52124:				; CODE XREF: sub_51AB3+663j
+loc_52124:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+663j
 		cmp	[bp+var_4], 6
 		jnz	short loc_52136
 		mov	[bp+var_1D], 2
@@ -1068,7 +1081,7 @@ loc_52124:				; CODE XREF: sub_51AB3+663j
 		jmp	short loc_5217C
 ; ���������������������������������������������������������������������������
 
-loc_52136:				; CODE XREF: sub_51AB3+675j
+loc_52136:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+675j
 		cmp	[bp+var_4], 8
 		jnz	short loc_52148
 		mov	[bp+var_1D], 1
@@ -1077,20 +1090,20 @@ loc_52136:				; CODE XREF: sub_51AB3+675j
 		jmp	short loc_5217C
 ; ���������������������������������������������������������������������������
 
-loc_52148:				; CODE XREF: sub_51AB3+687j
+loc_52148:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+687j
 		cmp	[bp+var_4], 5
 		jz	short loc_52154
 		cmp	[bp+var_4], 4
 		jnz	short loc_52160
 
-loc_52154:				; CODE XREF: sub_51AB3+699j
+loc_52154:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+699j
 		mov	[bp+var_1D], 2
 		mov	cl, 3
 		mov	[bp+var_1E], 6
 		jmp	short loc_5217C
 ; ���������������������������������������������������������������������������
 
-loc_52160:				; CODE XREF: sub_51AB3+69Fj
+loc_52160:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+69Fj
 		cmp	[bp+var_4], 7
 		jnz	short loc_52172
 		mov	[bp+var_1D], 2
@@ -1099,20 +1112,20 @@ loc_52160:				; CODE XREF: sub_51AB3+69Fj
 		jmp	short loc_5217C
 ; ���������������������������������������������������������������������������
 
-loc_52172:				; CODE XREF: sub_51AB3+6B1j
+loc_52172:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6B1j
 		mov	[bp+var_1D], 2
 		mov	cl, 3
 		mov	[bp+var_1E], 3
 
-loc_5217C:				; CODE XREF: sub_51AB3+66Fj
-					; sub_51AB3+681j ...
+loc_5217C:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+66Fj
+					; Gameflow_WeaponLoadout_51AB3+681j ...
 		mov	al, [bp+var_1D]
 		mov	ah, 0
 		mov	[bp+var_2], ax
 		jmp	loc_5224A
 ; ���������������������������������������������������������������������������
 
-loc_52187:				; CODE XREF: sub_51AB3+7A0j
+loc_52187:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7A0j
 		mov	al, [bp+var_4]
 		mov	ah, 0
 		shl	ax, 1
@@ -1124,7 +1137,7 @@ loc_52187:				; CODE XREF: sub_51AB3+7A0j
 		jmp	loc_52247
 ; ���������������������������������������������������������������������������
 
-loc_5219D:				; CODE XREF: sub_51AB3+6E5j
+loc_5219D:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6E5j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -1141,7 +1154,7 @@ loc_5219D:				; CODE XREF: sub_51AB3+6E5j
 		jmp	loc_52247
 ; ���������������������������������������������������������������������������
 
-loc_521C4:				; CODE XREF: sub_51AB3+70Cj
+loc_521C4:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+70Cj
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -1158,8 +1171,8 @@ loc_521C4:				; CODE XREF: sub_51AB3+70Cj
 		cmp	[bp+var_2], 1
 		jz	short loc_52247
 
-loc_521EE:				; CODE XREF: sub_51AB3+6F9j
-					; sub_51AB3+733j
+loc_521EE:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6F9j
+					; Gameflow_WeaponLoadout_51AB3+733j
 		mov	ax, [bp+var_2]
 		shl	ax, 1
 		mov	bx, [bp+arg_0]
@@ -1196,11 +1209,11 @@ loc_521EE:				; CODE XREF: sub_51AB3+6F9j
 		jmp	short loc_52256
 ; ���������������������������������������������������������������������������
 
-loc_52247:				; CODE XREF: sub_51AB3+6E7j
-					; sub_51AB3+70Ej ...
+loc_52247:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6E7j
+					; Gameflow_WeaponLoadout_51AB3+70Ej ...
 		inc	[bp+var_2]
 
-loc_5224A:				; CODE XREF: sub_51AB3+6D1j
+loc_5224A:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+6D1j
 		mov	al, cl
 		mov	ah, 0
 		cmp	ax, [bp+var_2]
@@ -1208,8 +1221,8 @@ loc_5224A:				; CODE XREF: sub_51AB3+6D1j
 		jmp	loc_52187
 ; ���������������������������������������������������������������������������
 
-loc_52256:				; CODE XREF: sub_51AB3+31Bj
-					; sub_51AB3:loc_52109j	...
+loc_52256:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+31Bj
+					; Gameflow_WeaponLoadout_51AB3:loc_52109j	...
 		cmp	[bp+var_17], 0Bh
 		jz	short loc_52265
 		cmp	[bp+var_17], 0Ch
@@ -1217,8 +1230,8 @@ loc_52256:				; CODE XREF: sub_51AB3+31Bj
 		jmp	loc_51DD1
 ; ���������������������������������������������������������������������������
 
-loc_52265:				; CODE XREF: sub_51AB3+5B5j
-					; sub_51AB3+7A7j ...
+loc_52265:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+5B5j
+					; Gameflow_WeaponLoadout_51AB3+7A7j ...
 		cmp	[bp+var_17], 0Ch
 		jnz	short loc_5227D
 		mov	bx, [bp+arg_0]
@@ -1228,19 +1241,19 @@ loc_52265:				; CODE XREF: sub_51AB3+5B5j
 		jmp	short loc_5228B
 ; ���������������������������������������������������������������������������
 
-loc_5227D:				; CODE XREF: sub_51AB3+7B6j
+loc_5227D:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7B6j
 		push	0
 		push	word_46F46
 		call	TextFormat_ReleaseAttribute_2EC80
 		add	sp, 4
 
-loc_5228B:				; CODE XREF: sub_51AB3+7C8j
+loc_5228B:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7C8j
 		cmp	[bp+var_17], 0Ch
 		jz	short loc_52294
 		jmp	loc_52343
 ; ���������������������������������������������������������������������������
 
-loc_52294:				; CODE XREF: sub_51AB3+7DCj
+loc_52294:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7DCj
 		push	0
 		lea	ax, [bp+var_21A]
 		push	ax
@@ -1267,7 +1280,7 @@ loc_52294:				; CODE XREF: sub_51AB3+7DCj
 		add	sp, 2
 		jmp	short $+2
 
-loc_522ED:				; CODE XREF: sub_51AB3+81Aj
+loc_522ED:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+81Aj
 		push	2
 		lea	ax, [bp+var_249]
 		push	ax
@@ -1301,7 +1314,7 @@ loc_522ED:				; CODE XREF: sub_51AB3+81Aj
 		jmp	loc_523EF
 ; ���������������������������������������������������������������������������
 
-loc_52343:				; CODE XREF: sub_51AB3+7DEj
+loc_52343:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+7DEj
 		push	0
 		lea	ax, [bp+var_21A]
 		push	ax
@@ -1328,7 +1341,7 @@ loc_52343:				; CODE XREF: sub_51AB3+7DEj
 		add	sp, 2
 		jmp	short $+2
 
-loc_5239C:				; CODE XREF: sub_51AB3+8C9j
+loc_5239C:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+8C9j
 		push	2
 		lea	ax, [bp+var_249]
 		push	ax
@@ -1358,23 +1371,23 @@ loc_5239C:				; CODE XREF: sub_51AB3+8C9j
 		pop	si
 		leave
 		retf
-sub_51AB3	endp
+Gameflow_WeaponLoadout_51AB3	endp
 
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR sub_51AB3
+; START	OF FUNCTION CHUNK FOR Gameflow_WeaponLoadout_51AB3
 
-loc_523EF:				; CODE XREF: sub_51AB3+88Dj
+loc_523EF:				; CODE XREF: Gameflow_WeaponLoadout_51AB3+88Dj
 		pop	di
 		pop	si
 		leave
 		retf
-; END OF FUNCTION CHUNK	FOR sub_51AB3
+; END OF FUNCTION CHUNK	FOR Gameflow_WeaponLoadout_51AB3
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_523F3	proc far		; CODE XREF: sub_420A9J sub_52662+B58p ...
+sub_523F3	proc far		; CODE XREF: sub_420A9J Gameflow_Catalog_52662+B58p ...
 
 var_E		= word ptr -0Eh
 var_C		= word ptr -0Ch
@@ -1702,7 +1715,11 @@ off_52650	dw offset loc_5244D	; DATA XREF: sub_523F3+55r
 
 ; Attributes: bp-based frame
 
-sub_52662	proc far		; CODE XREF: sub_420AEJ
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 17h : catalogue d'achat d'armes (police calcfont),
+; stock [partie+261h], argent [partie+27Bh].
+; ==============================================================================================
+Gameflow_Catalog_52662	proc far		; CODE XREF: sub_420AEJ
 
 var_33E		= word ptr -33Eh
 var_324		= word ptr -324h
@@ -1829,7 +1846,7 @@ arg_2		= byte ptr  8
 		jmp	short loc_526EF
 ; ���������������������������������������������������������������������������
 
-loc_526CE:				; CODE XREF: sub_52662+91j
+loc_526CE:				; CODE XREF: Gameflow_Catalog_52662+91j
 		mov	ax, [bp+var_16]
 		mov	dx, 9
 		imul	dx
@@ -1842,7 +1859,7 @@ loc_526CE:				; CODE XREF: sub_52662+91j
 		mov	[bx], edx
 		inc	[bp+var_16]
 
-loc_526EF:				; CODE XREF: sub_52662+6Aj
+loc_526EF:				; CODE XREF: Gameflow_Catalog_52662+6Aj
 		cmp	[bp+var_16], 0Eh
 		jl	short loc_526CE
 		push	seg stub188
@@ -1918,7 +1935,7 @@ loc_526EF:				; CODE XREF: sub_52662+6Aj
 		jmp	short loc_527E8
 ; ���������������������������������������������������������������������������
 
-loc_527BC:				; CODE XREF: sub_52662+189j
+loc_527BC:				; CODE XREF: Gameflow_Catalog_52662+189j
 		mov	ax, cx
 		mov	dx, 9
 		imul	dx
@@ -1938,11 +1955,11 @@ loc_527BC:				; CODE XREF: sub_52662+189j
 		mov	[bx], eax
 		inc	cx
 
-loc_527E8:				; CODE XREF: sub_52662+158j
+loc_527E8:				; CODE XREF: Gameflow_Catalog_52662+158j
 		cmp	cx, 0Eh
 		jl	short loc_527BC
 
-loc_527ED:				; CODE XREF: sub_52662+154j
+loc_527ED:				; CODE XREF: Gameflow_Catalog_52662+154j
 		mov	[bp+var_17], 1
 		mov	ax, [si+0E4h]
 		mov	[bp+var_1A], ax
@@ -2095,12 +2112,12 @@ loc_527ED:				; CODE XREF: sub_52662+154j
 		jmp	loc_5343F
 ; ���������������������������������������������������������������������������
 
-loc_529EB:				; CODE XREF: sub_52662+DE6j
+loc_529EB:				; CODE XREF: Gameflow_Catalog_52662+DE6j
 		xor	di, di
 		jmp	loc_52B99
 ; ���������������������������������������������������������������������������
 
-loc_529F0:				; CODE XREF: sub_52662+53Cj
+loc_529F0:				; CODE XREF: Gameflow_Catalog_52662+53Cj
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -2117,7 +2134,7 @@ loc_529F0:				; CODE XREF: sub_52662+53Cj
 		mov	bx, ax
 		mov	byte ptr [bx], 0
 
-loc_52A16:				; CODE XREF: sub_52662+3A0j
+loc_52A16:				; CODE XREF: Gameflow_Catalog_52662+3A0j
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -2134,7 +2151,7 @@ loc_52A16:				; CODE XREF: sub_52662+3A0j
 		mov	bx, ax
 		mov	byte ptr [bx], 63h ; 'c'
 
-loc_52A3C:				; CODE XREF: sub_52662+3C6j
+loc_52A3C:				; CODE XREF: Gameflow_Catalog_52662+3C6j
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -2146,7 +2163,7 @@ loc_52A3C:				; CODE XREF: sub_52662+3C6j
 		jmp	loc_52B98
 ; ���������������������������������������������������������������������������
 
-loc_52A53:				; CODE XREF: sub_52662+3ECj
+loc_52A53:				; CODE XREF: Gameflow_Catalog_52662+3ECj
 		mov	al, [di+30Eh]
 		push	ax
 		lea	ax, [bp+var_2BE]
@@ -2157,7 +2174,7 @@ loc_52A53:				; CODE XREF: sub_52662+3ECj
 		jmp	loc_52B80
 ; ���������������������������������������������������������������������������
 
-loc_52A6D:				; CODE XREF: sub_52662+533j
+loc_52A6D:				; CODE XREF: Gameflow_Catalog_52662+533j
 		mov	bx, [bp+var_44]
 		mov	al, [bx+6]
 		cmp	al, [di+30Eh]
@@ -2165,7 +2182,7 @@ loc_52A6D:				; CODE XREF: sub_52662+533j
 		jmp	loc_52B80
 ; ���������������������������������������������������������������������������
 
-loc_52A7C:				; CODE XREF: sub_52662+415j
+loc_52A7C:				; CODE XREF: Gameflow_Catalog_52662+415j
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -2223,7 +2240,7 @@ loc_52A7C:				; CODE XREF: sub_52662+415j
 		call	LayerGroup_Add_2DB84
 		add	sp, 4
 
-loc_52B07:				; CODE XREF: sub_52662+42Cj
+loc_52B07:				; CODE XREF: Gameflow_Catalog_52662+42Cj
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -2275,8 +2292,8 @@ loc_52B07:				; CODE XREF: sub_52662+42Cj
 		jmp	short loc_52B98
 ; ���������������������������������������������������������������������������
 
-loc_52B80:				; CODE XREF: sub_52662+408j
-					; sub_52662+417j
+loc_52B80:				; CODE XREF: Gameflow_Catalog_52662+408j
+					; Gameflow_Catalog_52662+417j
 		lea	ax, [bp+var_44]
 		push	ax
 		lea	ax, [bp+var_1DD]
@@ -2288,17 +2305,17 @@ loc_52B80:				; CODE XREF: sub_52662+408j
 		jmp	loc_52A6D
 ; ���������������������������������������������������������������������������
 
-loc_52B98:				; CODE XREF: sub_52662+3EEj
-					; sub_52662+51Cj ...
+loc_52B98:				; CODE XREF: Gameflow_Catalog_52662+3EEj
+					; Gameflow_Catalog_52662+51Cj ...
 		inc	di
 
-loc_52B99:				; CODE XREF: sub_52662+38Bj
+loc_52B99:				; CODE XREF: Gameflow_Catalog_52662+38Bj
 		cmp	di, 0Eh
 		jge	short loc_52BA1
 		jmp	loc_529F0
 ; ���������������������������������������������������������������������������
 
-loc_52BA1:				; CODE XREF: sub_52662+53Aj
+loc_52BA1:				; CODE XREF: Gameflow_Catalog_52662+53Aj
 		cmp	byte ptr [si+0FCh], 0Dh
 		jnz	short loc_52BB9
 		push	0Dh
@@ -2309,14 +2326,14 @@ loc_52BA1:				; CODE XREF: sub_52662+53Aj
 		jmp	short loc_52BC8
 ; ���������������������������������������������������������������������������
 
-loc_52BB9:				; CODE XREF: sub_52662+544j
+loc_52BB9:				; CODE XREF: Gameflow_Catalog_52662+544j
 		push	1Dh
 		lea	ax, [bp+var_2BE]
 		push	ax
 		call	sub_563B
 		add	sp, 4
 
-loc_52BC8:				; CODE XREF: sub_52662+555j
+loc_52BC8:				; CODE XREF: Gameflow_Catalog_52662+555j
 		cmp	[bp+var_17], 1
 		jz	short loc_52BDD
 		push	57h ; 'W'
@@ -2325,7 +2342,7 @@ loc_52BC8:				; CODE XREF: sub_52662+555j
 		call	sub_563B
 		add	sp, 4
 
-loc_52BDD:				; CODE XREF: sub_52662+56Aj
+loc_52BDD:				; CODE XREF: Gameflow_Catalog_52662+56Aj
 		cmp	[bp+var_17], 9
 		jz	short loc_52BF2
 		push	58h ; 'X'
@@ -2334,7 +2351,7 @@ loc_52BDD:				; CODE XREF: sub_52662+56Aj
 		call	sub_563B
 		add	sp, 4
 
-loc_52BF2:				; CODE XREF: sub_52662+57Fj
+loc_52BF2:				; CODE XREF: Gameflow_Catalog_52662+57Fj
 		mov	al, [bp+var_17]
 		mov	ah, 0
 		dec	ax
@@ -2344,7 +2361,7 @@ loc_52BF2:				; CODE XREF: sub_52662+57Fj
 		jmp	loc_52CE6	; default
 ; ���������������������������������������������������������������������������
 
-loc_52C02:				; CODE XREF: sub_52662+59Bj
+loc_52C02:				; CODE XREF: Gameflow_Catalog_52662+59Bj
 		shl	bx, 1
 		jmp	cs:off_53674[bx] ; switch jump
 
@@ -2372,7 +2389,7 @@ loc_52C09:				; DATA XREF: ovr188:off_53674o
 		jmp	loc_52CE6	; default
 ; ���������������������������������������������������������������������������
 
-loc_52C48:				; CODE XREF: sub_52662+5A2j
+loc_52C48:				; CODE XREF: Gameflow_Catalog_52662+5A2j
 					; DATA XREF: ovr188:off_53674o
 		push	4Dh ; 'M'       ; case 0x2
 		lea	ax, [bp+var_2BE]
@@ -2397,7 +2414,7 @@ loc_52C48:				; CODE XREF: sub_52662+5A2j
 		jmp	short loc_52CE6	; default
 ; ���������������������������������������������������������������������������
 
-loc_52C86:				; CODE XREF: sub_52662+5A2j
+loc_52C86:				; CODE XREF: Gameflow_Catalog_52662+5A2j
 					; DATA XREF: ovr188:off_53674o
 		push	51h ; 'Q'       ; case 0x4
 		lea	ax, [bp+var_2BE]
@@ -2412,7 +2429,7 @@ loc_52C86:				; CODE XREF: sub_52662+5A2j
 		jmp	short loc_52CE6	; default
 ; ���������������������������������������������������������������������������
 
-loc_52CA6:				; CODE XREF: sub_52662+5A2j
+loc_52CA6:				; CODE XREF: Gameflow_Catalog_52662+5A2j
 					; DATA XREF: ovr188:off_53674o
 		push	53h ; 'S'       ; case 0x6
 		lea	ax, [bp+var_2BE]
@@ -2427,7 +2444,7 @@ loc_52CA6:				; CODE XREF: sub_52662+5A2j
 		jmp	short loc_52CE6	; default
 ; ���������������������������������������������������������������������������
 
-loc_52CC6:				; CODE XREF: sub_52662+5A2j
+loc_52CC6:				; CODE XREF: Gameflow_Catalog_52662+5A2j
 					; DATA XREF: ovr188:off_53674o
 		push	55h ; 'U'       ; case 0x8
 		lea	ax, [bp+var_2BE]
@@ -2441,8 +2458,8 @@ loc_52CC6:				; CODE XREF: sub_52662+5A2j
 		add	sp, 4
 		jmp	short $+2
 
-loc_52CE6:				; CODE XREF: sub_52662+59Dj
-					; sub_52662+5A2j ...
+loc_52CE6:				; CODE XREF: Gameflow_Catalog_52662+59Dj
+					; Gameflow_Catalog_52662+5A2j ...
 		push	0Ah		; default
 		lea	ax, [bp+var_30A]
 		push	ax
@@ -2471,7 +2488,7 @@ loc_52CE6:				; CODE XREF: sub_52662+59Dj
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_52D3C:				; CODE XREF: sub_52662+6C8j
+loc_52D3C:				; CODE XREF: Gameflow_Catalog_52662+6C8j
 		cmp	[bp+var_12], 0
 		jz	short loc_52D53
 		push	9FCh
@@ -2480,7 +2497,7 @@ loc_52D3C:				; CODE XREF: sub_52662+6C8j
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_52D53:				; CODE XREF: sub_52662+6DFj
+loc_52D53:				; CODE XREF: Gameflow_Catalog_52662+6DFj
 		mov	eax, [bp+var_E]
 		sub	eax, [bp+var_12]
 		jz	short loc_52D6D
@@ -2490,7 +2507,7 @@ loc_52D53:				; CODE XREF: sub_52662+6DFj
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_52D6D:				; CODE XREF: sub_52662+6F9j
+loc_52D6D:				; CODE XREF: Gameflow_Catalog_52662+6F9j
 		lea	ax, [bp+var_30A]
 		push	ax
 		lea	ax, [bp+var_2F0]
@@ -2571,7 +2588,7 @@ loc_52D6D:				; CODE XREF: sub_52662+6F9j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52E65:				; CODE XREF: sub_52662+7FEj
+loc_52E65:				; CODE XREF: Gameflow_Catalog_52662+7FEj
 		shl	bx, 1
 		jmp	cs:off_535C0[bx] ; switch jump
 
@@ -2580,13 +2597,13 @@ loc_52E6C:				; DATA XREF: ovr188:off_535C0o
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52E73:				; CODE XREF: sub_52662+805j
+loc_52E73:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		mov	[bp+var_13], 1	; case 0x10
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52E7A:				; CODE XREF: sub_52662+805j
+loc_52E7A:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x3C
 		jz	short loc_52E9A
@@ -2597,11 +2614,11 @@ loc_52E7A:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+261h]
 
-loc_52E98:				; CODE XREF: sub_52662+823j
+loc_52E98:				; CODE XREF: Gameflow_Catalog_52662+823j
 		jmp	short loc_52EB6
 ; ���������������������������������������������������������������������������
 
-loc_52E9A:				; CODE XREF: sub_52662+81Cj
+loc_52E9A:				; CODE XREF: Gameflow_Catalog_52662+81Cj
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_C2+1]
 		jl	short loc_52EB6
@@ -2610,12 +2627,12 @@ loc_52E9A:				; CODE XREF: sub_52662+81Cj
 		add	[bp+var_12], eax
 		inc	word ptr [si+261h]
 
-loc_52EB6:				; CODE XREF: sub_52662:loc_52E98j
-					; sub_52662+841j
+loc_52EB6:				; CODE XREF: Gameflow_Catalog_52662:loc_52E98j
+					; Gameflow_Catalog_52662+841j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52EB9:				; CODE XREF: sub_52662+805j
+loc_52EB9:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x3D
 		jz	short loc_52ED9
@@ -2626,11 +2643,11 @@ loc_52EB9:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+263h]
 
-loc_52ED7:				; CODE XREF: sub_52662+862j
+loc_52ED7:				; CODE XREF: Gameflow_Catalog_52662+862j
 		jmp	short loc_52EF5
 ; ���������������������������������������������������������������������������
 
-loc_52ED9:				; CODE XREF: sub_52662+85Bj
+loc_52ED9:				; CODE XREF: Gameflow_Catalog_52662+85Bj
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_B8]
 		jl	short loc_52EF5
@@ -2639,12 +2656,12 @@ loc_52ED9:				; CODE XREF: sub_52662+85Bj
 		add	[bp+var_12], eax
 		inc	word ptr [si+263h]
 
-loc_52EF5:				; CODE XREF: sub_52662:loc_52ED7j
-					; sub_52662+880j
+loc_52EF5:				; CODE XREF: Gameflow_Catalog_52662:loc_52ED7j
+					; Gameflow_Catalog_52662+880j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52EF8:				; CODE XREF: sub_52662+805j
+loc_52EF8:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x3E
 		jz	short loc_52F18
@@ -2655,11 +2672,11 @@ loc_52EF8:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+271h]
 
-loc_52F16:				; CODE XREF: sub_52662+8A1j
+loc_52F16:				; CODE XREF: Gameflow_Catalog_52662+8A1j
 		jmp	short loc_52F34
 ; ���������������������������������������������������������������������������
 
-loc_52F18:				; CODE XREF: sub_52662+89Aj
+loc_52F18:				; CODE XREF: Gameflow_Catalog_52662+89Aj
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_AF]
 		jl	short loc_52F34
@@ -2668,12 +2685,12 @@ loc_52F18:				; CODE XREF: sub_52662+89Aj
 		add	[bp+var_12], eax
 		inc	word ptr [si+271h]
 
-loc_52F34:				; CODE XREF: sub_52662:loc_52F16j
-					; sub_52662+8BFj
+loc_52F34:				; CODE XREF: Gameflow_Catalog_52662:loc_52F16j
+					; Gameflow_Catalog_52662+8BFj
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52F37:				; CODE XREF: sub_52662+805j
+loc_52F37:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x3F
 		jz	short loc_52F57
@@ -2684,11 +2701,11 @@ loc_52F37:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+26Fh]
 
-loc_52F55:				; CODE XREF: sub_52662+8E0j
+loc_52F55:				; CODE XREF: Gameflow_Catalog_52662+8E0j
 		jmp	short loc_52F73
 ; ���������������������������������������������������������������������������
 
-loc_52F57:				; CODE XREF: sub_52662+8D9j
+loc_52F57:				; CODE XREF: Gameflow_Catalog_52662+8D9j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_9D]
 		jl	short loc_52F73
@@ -2697,12 +2714,12 @@ loc_52F57:				; CODE XREF: sub_52662+8D9j
 		add	[bp+var_12], eax
 		inc	word ptr [si+26Fh]
 
-loc_52F73:				; CODE XREF: sub_52662:loc_52F55j
-					; sub_52662+8FEj
+loc_52F73:				; CODE XREF: Gameflow_Catalog_52662:loc_52F55j
+					; Gameflow_Catalog_52662+8FEj
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52F76:				; CODE XREF: sub_52662+805j
+loc_52F76:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x40
 		jz	short loc_52F96
@@ -2713,11 +2730,11 @@ loc_52F76:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+265h]
 
-loc_52F94:				; CODE XREF: sub_52662+91Fj
+loc_52F94:				; CODE XREF: Gameflow_Catalog_52662+91Fj
 		jmp	short loc_52FB2
 ; ���������������������������������������������������������������������������
 
-loc_52F96:				; CODE XREF: sub_52662+918j
+loc_52F96:				; CODE XREF: Gameflow_Catalog_52662+918j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_A6]
 		jl	short loc_52FB2
@@ -2726,12 +2743,12 @@ loc_52F96:				; CODE XREF: sub_52662+918j
 		add	[bp+var_12], eax
 		inc	word ptr [si+265h]
 
-loc_52FB2:				; CODE XREF: sub_52662:loc_52F94j
-					; sub_52662+93Dj
+loc_52FB2:				; CODE XREF: Gameflow_Catalog_52662:loc_52F94j
+					; Gameflow_Catalog_52662+93Dj
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52FB5:				; CODE XREF: sub_52662+805j
+loc_52FB5:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x41
 		jz	short loc_52FD2
@@ -2742,11 +2759,11 @@ loc_52FB5:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+26Dh]
 
-loc_52FD0:				; CODE XREF: sub_52662+95Dj
+loc_52FD0:				; CODE XREF: Gameflow_Catalog_52662+95Dj
 		jmp	short loc_52FEB
 ; ���������������������������������������������������������������������������
 
-loc_52FD2:				; CODE XREF: sub_52662+957j
+loc_52FD2:				; CODE XREF: Gameflow_Catalog_52662+957j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_79]
 		jl	short loc_52FEB
@@ -2755,12 +2772,12 @@ loc_52FD2:				; CODE XREF: sub_52662+957j
 		add	[bp+var_12], eax
 		inc	word ptr [si+26Dh]
 
-loc_52FEB:				; CODE XREF: sub_52662:loc_52FD0j
-					; sub_52662+978j
+loc_52FEB:				; CODE XREF: Gameflow_Catalog_52662:loc_52FD0j
+					; Gameflow_Catalog_52662+978j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_52FEE:				; CODE XREF: sub_52662+805j
+loc_52FEE:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x42
 		jz	short loc_5300E
@@ -2771,11 +2788,11 @@ loc_52FEE:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+269h]
 
-loc_5300C:				; CODE XREF: sub_52662+997j
+loc_5300C:				; CODE XREF: Gameflow_Catalog_52662+997j
 		jmp	short loc_5302A
 ; ���������������������������������������������������������������������������
 
-loc_5300E:				; CODE XREF: sub_52662+990j
+loc_5300E:				; CODE XREF: Gameflow_Catalog_52662+990j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_94]
 		jl	short loc_5302A
@@ -2784,12 +2801,12 @@ loc_5300E:				; CODE XREF: sub_52662+990j
 		add	[bp+var_12], eax
 		inc	word ptr [si+269h]
 
-loc_5302A:				; CODE XREF: sub_52662:loc_5300Cj
-					; sub_52662+9B5j
+loc_5302A:				; CODE XREF: Gameflow_Catalog_52662:loc_5300Cj
+					; Gameflow_Catalog_52662+9B5j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_5302D:				; CODE XREF: sub_52662+805j
+loc_5302D:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x43
 		jz	short loc_5304D
@@ -2800,11 +2817,11 @@ loc_5302D:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+26Bh]
 
-loc_5304B:				; CODE XREF: sub_52662+9D6j
+loc_5304B:				; CODE XREF: Gameflow_Catalog_52662+9D6j
 		jmp	short loc_53069
 ; ���������������������������������������������������������������������������
 
-loc_5304D:				; CODE XREF: sub_52662+9CFj
+loc_5304D:				; CODE XREF: Gameflow_Catalog_52662+9CFj
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_8B]
 		jl	short loc_53069
@@ -2813,12 +2830,12 @@ loc_5304D:				; CODE XREF: sub_52662+9CFj
 		add	[bp+var_12], eax
 		inc	word ptr [si+26Bh]
 
-loc_53069:				; CODE XREF: sub_52662:loc_5304Bj
-					; sub_52662+9F4j
+loc_53069:				; CODE XREF: Gameflow_Catalog_52662:loc_5304Bj
+					; Gameflow_Catalog_52662+9F4j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_5306C:				; CODE XREF: sub_52662+805j
+loc_5306C:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x44
 		jz	short loc_5308C
@@ -2829,11 +2846,11 @@ loc_5306C:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		dec	word ptr [si+267h]
 
-loc_5308A:				; CODE XREF: sub_52662+A15j
+loc_5308A:				; CODE XREF: Gameflow_Catalog_52662+A15j
 		jmp	short loc_530A8
 ; ���������������������������������������������������������������������������
 
-loc_5308C:				; CODE XREF: sub_52662+A0Ej
+loc_5308C:				; CODE XREF: Gameflow_Catalog_52662+A0Ej
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_82]
 		jl	short loc_530A8
@@ -2842,12 +2859,12 @@ loc_5308C:				; CODE XREF: sub_52662+A0Ej
 		add	[bp+var_12], eax
 		inc	word ptr [si+267h]
 
-loc_530A8:				; CODE XREF: sub_52662:loc_5308Aj
-					; sub_52662+A33j
+loc_530A8:				; CODE XREF: Gameflow_Catalog_52662:loc_5308Aj
+					; Gameflow_Catalog_52662+A33j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_530AB:				; CODE XREF: sub_52662+805j
+loc_530AB:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x46
 		jz	short loc_530CE
@@ -2859,11 +2876,11 @@ loc_530AB:				; CODE XREF: sub_52662+805j
 		sub	word ptr [si+26Dh], 2
 		sub	word ptr [si+26Bh], 18h
 
-loc_530CC:				; CODE XREF: sub_52662+A53j
+loc_530CC:				; CODE XREF: Gameflow_Catalog_52662+A53j
 		jmp	short loc_530ED
 ; ���������������������������������������������������������������������������
 
-loc_530CE:				; CODE XREF: sub_52662+A4Dj
+loc_530CE:				; CODE XREF: Gameflow_Catalog_52662+A4Dj
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_67]
 		jl	short loc_530ED
@@ -2873,12 +2890,12 @@ loc_530CE:				; CODE XREF: sub_52662+A4Dj
 		add	word ptr [si+26Dh], 2
 		add	word ptr [si+26Bh], 18h
 
-loc_530ED:				; CODE XREF: sub_52662:loc_530CCj
-					; sub_52662+A74j
+loc_530ED:				; CODE XREF: Gameflow_Catalog_52662:loc_530CCj
+					; Gameflow_Catalog_52662+A74j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_530F0:				; CODE XREF: sub_52662+805j
+loc_530F0:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x47
 		jz	short loc_53113
@@ -2890,11 +2907,11 @@ loc_530F0:				; CODE XREF: sub_52662+805j
 		sub	word ptr [si+261h], 6
 		sub	word ptr [si+263h], 6
 
-loc_53111:				; CODE XREF: sub_52662+A98j
+loc_53111:				; CODE XREF: Gameflow_Catalog_52662+A98j
 		jmp	short loc_53132
 ; ���������������������������������������������������������������������������
 
-loc_53113:				; CODE XREF: sub_52662+A92j
+loc_53113:				; CODE XREF: Gameflow_Catalog_52662+A92j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_5E]
 		jl	short loc_53132
@@ -2904,12 +2921,12 @@ loc_53113:				; CODE XREF: sub_52662+A92j
 		add	word ptr [si+261h], 6
 		add	word ptr [si+263h], 6
 
-loc_53132:				; CODE XREF: sub_52662:loc_53111j
-					; sub_52662+AB9j
+loc_53132:				; CODE XREF: Gameflow_Catalog_52662:loc_53111j
+					; Gameflow_Catalog_52662+AB9j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53135:				; CODE XREF: sub_52662+805j
+loc_53135:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x48
 		jz	short loc_53153
@@ -2920,11 +2937,11 @@ loc_53135:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		sub	word ptr [si+265h], 0Ah
 
-loc_53151:				; CODE XREF: sub_52662+ADDj
+loc_53151:				; CODE XREF: Gameflow_Catalog_52662+ADDj
 		jmp	short loc_5316D
 ; ���������������������������������������������������������������������������
 
-loc_53153:				; CODE XREF: sub_52662+AD7j
+loc_53153:				; CODE XREF: Gameflow_Catalog_52662+AD7j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_55]
 		jl	short loc_5316D
@@ -2933,12 +2950,12 @@ loc_53153:				; CODE XREF: sub_52662+AD7j
 		add	[bp+var_12], eax
 		add	word ptr [si+265h], 0Ah
 
-loc_5316D:				; CODE XREF: sub_52662:loc_53151j
-					; sub_52662+AF9j
+loc_5316D:				; CODE XREF: Gameflow_Catalog_52662:loc_53151j
+					; Gameflow_Catalog_52662+AF9j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53170:				; CODE XREF: sub_52662+805j
+loc_53170:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		cmp	[bp+var_3E], 0	; case 0x49
 		jz	short loc_5318E
@@ -2949,11 +2966,11 @@ loc_53170:				; CODE XREF: sub_52662+805j
 		sub	[bp+var_12], eax
 		sub	word ptr [si+261h], 0Ch
 
-loc_5318C:				; CODE XREF: sub_52662+B18j
+loc_5318C:				; CODE XREF: Gameflow_Catalog_52662+B18j
 		jmp	short loc_531A8
 ; ���������������������������������������������������������������������������
 
-loc_5318E:				; CODE XREF: sub_52662+B12j
+loc_5318E:				; CODE XREF: Gameflow_Catalog_52662+B12j
 		mov	eax, [bp+var_42]
 		cmp	eax, [bp+var_4C]
 		jl	short loc_531A8
@@ -2962,12 +2979,12 @@ loc_5318E:				; CODE XREF: sub_52662+B12j
 		add	[bp+var_12], eax
 		add	word ptr [si+261h], 0Ch
 
-loc_531A8:				; CODE XREF: sub_52662:loc_5318Cj
-					; sub_52662+B34j
+loc_531A8:				; CODE XREF: Gameflow_Catalog_52662:loc_5318Cj
+					; Gameflow_Catalog_52662+B34j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_531AB:				; CODE XREF: sub_52662+805j
+loc_531AB:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		lea	ax, [bp+var_A]	; case 0x4A
 		push	ax
@@ -2985,7 +3002,7 @@ loc_531AB:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_531CB:				; CODE XREF: sub_52662+805j
+loc_531CB:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		lea	ax, [bp+var_A]	; case 0x4B
 		push	ax
@@ -3003,7 +3020,7 @@ loc_531CB:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_531EB:				; CODE XREF: sub_52662+805j
+loc_531EB:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	byte ptr [bp+var_C2] ; case 0x4C
 		mov	eax, [bp+var_C2+1]
@@ -3012,7 +3029,7 @@ loc_531EB:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_531FF:				; CODE XREF: sub_52662+805j
+loc_531FF:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_B9]	; case 0x4D
 		mov	eax, [bp+var_B8]
@@ -3021,7 +3038,7 @@ loc_531FF:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53213:				; CODE XREF: sub_52662+805j
+loc_53213:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_B0]	; case 0x4E
 		mov	eax, [bp+var_AF]
@@ -3030,7 +3047,7 @@ loc_53213:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53227:				; CODE XREF: sub_52662+805j
+loc_53227:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_A7]	; case 0x4F
 		mov	eax, [bp+var_A6]
@@ -3039,7 +3056,7 @@ loc_53227:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_5323B:				; CODE XREF: sub_52662+805j
+loc_5323B:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_9E]	; case 0x50
 		mov	eax, [bp+var_9D]
@@ -3048,7 +3065,7 @@ loc_5323B:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_5324F:				; CODE XREF: sub_52662+805j
+loc_5324F:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_95]	; case 0x51
 		mov	eax, [bp+var_94]
@@ -3057,7 +3074,7 @@ loc_5324F:				; CODE XREF: sub_52662+805j
 		jmp	loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53263:				; CODE XREF: sub_52662+805j
+loc_53263:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_8C]	; case 0x52
 		mov	eax, [bp+var_8B]
@@ -3066,7 +3083,7 @@ loc_53263:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53276:				; CODE XREF: sub_52662+805j
+loc_53276:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_83]	; case 0x53
 		mov	eax, [bp+var_82]
@@ -3075,7 +3092,7 @@ loc_53276:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_53289:				; CODE XREF: sub_52662+805j
+loc_53289:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_7A]	; case 0x54
 		mov	eax, [bp+var_79]
@@ -3084,7 +3101,7 @@ loc_53289:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_5329A:				; CODE XREF: sub_52662+805j
+loc_5329A:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_68]	; case 0x56
 		mov	eax, [bp+var_67]
@@ -3094,7 +3111,7 @@ loc_5329A:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_532B1:				; CODE XREF: sub_52662+805j
+loc_532B1:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_5F]	; case 0x57
 		mov	eax, [bp+var_5E]
@@ -3104,7 +3121,7 @@ loc_532B1:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_532C8:				; CODE XREF: sub_52662+805j
+loc_532C8:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_56]	; case 0x58
 		mov	eax, [bp+var_55]
@@ -3113,7 +3130,7 @@ loc_532C8:				; CODE XREF: sub_52662+805j
 		jmp	short loc_532EC	; default
 ; ���������������������������������������������������������������������������
 
-loc_532DA:				; CODE XREF: sub_52662+805j
+loc_532DA:				; CODE XREF: Gameflow_Catalog_52662+805j
 					; DATA XREF: ovr188:off_535C0o
 		dec	[bp+var_4D]	; case 0x59
 		mov	eax, [bp+var_4C]
@@ -3121,18 +3138,18 @@ loc_532DA:				; CODE XREF: sub_52662+805j
 		sub	word ptr [si+261h], 0Ch
 		jmp	short $+2
 
-loc_532EC:				; CODE XREF: sub_52662+800j
-					; sub_52662+805j ...
+loc_532EC:				; CODE XREF: Gameflow_Catalog_52662+800j
+					; Gameflow_Catalog_52662+805j ...
 		xor	di, di		; default
 		jmp	loc_5342A
 ; ���������������������������������������������������������������������������
 
-loc_532F1:				; CODE XREF: sub_52662+DCDj
+loc_532F1:				; CODE XREF: Gameflow_Catalog_52662+DCDj
 		mov	[bp+var_44], 0
 		jmp	short loc_53306
 ; ���������������������������������������������������������������������������
 
-loc_532F8:				; CODE XREF: sub_52662+CB7j
+loc_532F8:				; CODE XREF: Gameflow_Catalog_52662+CB7j
 		mov	bx, [bp+var_44]
 		mov	al, [bx+6]
 		cmp	al, [di+30Eh]
@@ -3140,8 +3157,8 @@ loc_532F8:				; CODE XREF: sub_52662+CB7j
 		jmp	short loc_5331B
 ; ���������������������������������������������������������������������������
 
-loc_53306:				; CODE XREF: sub_52662+C94j
-					; sub_52662+CA0j
+loc_53306:				; CODE XREF: Gameflow_Catalog_52662+C94j
+					; Gameflow_Catalog_52662+CA0j
 		lea	ax, [bp+var_44]
 		push	ax
 		lea	ax, [bp+var_1DD]
@@ -3151,7 +3168,7 @@ loc_53306:				; CODE XREF: sub_52662+C94j
 		or	ax, ax
 		jnz	short loc_532F8
 
-loc_5331B:				; CODE XREF: sub_52662+CA2j
+loc_5331B:				; CODE XREF: Gameflow_Catalog_52662+CA2j
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -3199,7 +3216,7 @@ loc_5331B:				; CODE XREF: sub_52662+CA2j
 		add	sp, 4
 		jmp	short $+2
 
-loc_5338F:				; CODE XREF: sub_52662+CFEj
+loc_5338F:				; CODE XREF: Gameflow_Catalog_52662+CFEj
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -3208,7 +3225,7 @@ loc_5338F:				; CODE XREF: sub_52662+CFEj
 		mov	bx, ax
 		mov	word ptr [bx], 0
 
-loc_533A2:				; CODE XREF: sub_52662+CCBj
+loc_533A2:				; CODE XREF: Gameflow_Catalog_52662+CCBj
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -3256,7 +3273,7 @@ loc_533A2:				; CODE XREF: sub_52662+CCBj
 		add	sp, 4
 		jmp	short $+2
 
-loc_53416:				; CODE XREF: sub_52662+D85j
+loc_53416:				; CODE XREF: Gameflow_Catalog_52662+D85j
 		mov	ax, di
 		mov	dx, 9
 		imul	dx
@@ -3265,22 +3282,22 @@ loc_53416:				; CODE XREF: sub_52662+D85j
 		mov	bx, ax
 		mov	word ptr [bx], 0
 
-loc_53429:				; CODE XREF: sub_52662+D52j
+loc_53429:				; CODE XREF: Gameflow_Catalog_52662+D52j
 		inc	di
 
-loc_5342A:				; CODE XREF: sub_52662+C8Cj
+loc_5342A:				; CODE XREF: Gameflow_Catalog_52662+C8Cj
 		cmp	di, 0Eh
 		jge	short loc_53432
 		jmp	loc_532F1
 ; ���������������������������������������������������������������������������
 
-loc_53432:				; CODE XREF: sub_52662+DCBj
+loc_53432:				; CODE XREF: Gameflow_Catalog_52662+DCBj
 		lea	ax, [bp+var_2BE]
 		push	ax
 		call	sub_56B6
 		add	sp, 2
 
-loc_5343F:				; CODE XREF: sub_52662+386j
+loc_5343F:				; CODE XREF: Gameflow_Catalog_52662+386j
 		mov	al, [bp+var_13]
 		mov	ah, 0
 		or	ax, ax
@@ -3288,7 +3305,7 @@ loc_5343F:				; CODE XREF: sub_52662+386j
 		jmp	loc_529EB
 ; ���������������������������������������������������������������������������
 
-loc_5344B:				; CODE XREF: sub_52662+DE4j
+loc_5344B:				; CODE XREF: Gameflow_Catalog_52662+DE4j
 		mov	eax, [bp+var_12]
 		add	[si+283h], eax
 		push	0
@@ -3318,8 +3335,8 @@ loc_5344B:				; CODE XREF: sub_52662+DE4j
 		add	sp, 8
 		jmp	short $+2
 
-loc_534A2:				; CODE XREF: sub_52662+E20j
-					; sub_52662+E27j
+loc_534A2:				; CODE XREF: Gameflow_Catalog_52662+E20j
+					; Gameflow_Catalog_52662+E27j
 		mov	[bp+var_26], 0
 		mov	[bp+var_21], 0
 		mov	[bp+var_20], 0
@@ -3349,7 +3366,7 @@ loc_534A2:				; CODE XREF: sub_52662+E20j
 		add	sp, 2
 		jmp	short $+2
 
-loc_5350F:				; CODE XREF: sub_52662+E8Dj
+loc_5350F:				; CODE XREF: Gameflow_Catalog_52662+E8Dj
 		push	2
 		lea	ax, [bp+var_1DD]
 		push	ax
@@ -3402,8 +3419,8 @@ loc_5350F:				; CODE XREF: sub_52662+E8Dj
 		add	sp, 8
 		jmp	short $+2
 
-loc_535A8:				; CODE XREF: sub_52662+F26j
-					; sub_52662+F2Dj
+loc_535A8:				; CODE XREF: Gameflow_Catalog_52662+F26j
+					; Gameflow_Catalog_52662+F2Dj
 		mov	[bp+var_A], 0
 		mov	[bp+var_5], 0
 		mov	[bp+var_4], 0
@@ -3411,11 +3428,11 @@ loc_535A8:				; CODE XREF: sub_52662+F26j
 		pop	si
 		leave
 		retf
-sub_52662	endp
+Gameflow_Catalog_52662	endp
 
 ; ���������������������������������������������������������������������������
 off_535C0	dw offset loc_52E6C, offset loc_532EC, offset loc_532EC
-					; DATA XREF: sub_52662+805r
+					; DATA XREF: Gameflow_Catalog_52662+805r
 		dw offset loc_532EC, offset loc_532EC, offset loc_532EC	; jump table for switch	statement
 		dw offset loc_532EC, offset loc_532EC, offset loc_532EC
 		dw offset loc_532EC, offset loc_532EC, offset loc_532EC
@@ -3445,7 +3462,7 @@ off_535C0	dw offset loc_52E6C, offset loc_532EC, offset loc_532EC
 		dw offset loc_5324F, offset loc_53263, offset loc_53276
 		dw offset loc_53289, offset loc_532EC, offset loc_5329A
 		dw offset loc_532B1, offset loc_532C8, offset loc_532DA
-off_53674	dw offset loc_52C09	; DATA XREF: sub_52662+5A2r
+off_53674	dw offset loc_52C09	; DATA XREF: Gameflow_Catalog_52662+5A2r
 		dw offset loc_52CE6	; jump table for switch	statement
 		dw offset loc_52C48
 		dw offset loc_52CE6
@@ -3459,7 +3476,11 @@ off_53674	dw offset loc_52C09	; DATA XREF: sub_52662+5A2r
 
 ; Attributes: bp-based frame
 
-sub_53686	proc far		; CODE XREF: sub_420B3J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 19h : livre de comptes (police ledgfont),
+; [partie+27Bh], [+27Fh], [+283h], [+287h].
+; ==============================================================================================
+Gameflow_Ledger_53686	proc far		; CODE XREF: sub_420B3J
 
 var_726		= word ptr -726h
 var_724		= word ptr -724h
@@ -3697,7 +3718,7 @@ arg_0		= word ptr  6
 		jmp	loc_53DF9
 ; ���������������������������������������������������������������������������
 
-loc_538A5:				; CODE XREF: sub_53686+77Cj
+loc_538A5:				; CODE XREF: Gameflow_Ledger_53686+77Cj
 		mov	bx, [bp+arg_0]
 		cmp	byte ptr [bx+0FCh], 0Dh
 		jnz	short loc_538C0
@@ -3709,20 +3730,20 @@ loc_538A5:				; CODE XREF: sub_53686+77Cj
 		jmp	short loc_538CF
 ; ���������������������������������������������������������������������������
 
-loc_538C0:				; CODE XREF: sub_53686+227j
+loc_538C0:				; CODE XREF: Gameflow_Ledger_53686+227j
 		push	1Dh
 		lea	ax, [bp+var_70C]
 		push	ax
 		call	sub_563B
 		add	sp, 4
 
-loc_538CF:				; CODE XREF: sub_53686+238j
+loc_538CF:				; CODE XREF: Gameflow_Ledger_53686+238j
 		cmp	[bp+var_B], 2
 		jz	short loc_538D8
 		jmp	loc_53A17
 ; ���������������������������������������������������������������������������
 
-loc_538D8:				; CODE XREF: sub_53686+24Dj
+loc_538D8:				; CODE XREF: Gameflow_Ledger_53686+24Dj
 		push	7Eh ; '~'
 		lea	ax, [bp+var_70C]
 		push	ax
@@ -3819,7 +3840,7 @@ loc_538D8:				; CODE XREF: sub_53686+24Dj
 		jmp	short loc_53A94
 ; ���������������������������������������������������������������������������
 
-loc_53A17:				; CODE XREF: sub_53686+24Fj
+loc_53A17:				; CODE XREF: Gameflow_Ledger_53686+24Fj
 		push	7Fh ; ''
 		lea	ax, [bp+var_70C]
 		push	ax
@@ -3830,7 +3851,7 @@ loc_53A17:				; CODE XREF: sub_53686+24Fj
 		jmp	short loc_53A8F
 ; ���������������������������������������������������������������������������
 
-loc_53A2E:				; CODE XREF: sub_53686+40Cj
+loc_53A2E:				; CODE XREF: Gameflow_Ledger_53686+40Cj
 		mov	bx, si
 		shl	bx, 1
 		push	word ptr [bx+2DCh]
@@ -3869,16 +3890,16 @@ loc_53A2E:				; CODE XREF: sub_53686+40Cj
 		add	sp, 6
 		inc	si
 
-loc_53A8F:				; CODE XREF: sub_53686+3A6j
+loc_53A8F:				; CODE XREF: Gameflow_Ledger_53686+3A6j
 		cmp	si, 9
 		jl	short loc_53A2E
 
-loc_53A94:				; CODE XREF: sub_53686+38Fj
+loc_53A94:				; CODE XREF: Gameflow_Ledger_53686+38Fj
 		xor	si, si
 		jmp	loc_53B53
 ; ���������������������������������������������������������������������������
 
-loc_53A99:				; CODE XREF: sub_53686+4DBj
+loc_53A99:				; CODE XREF: Gameflow_Ledger_53686+4DBj
 		mov	al, byte ptr [bp+si+var_A]
 		mov	ah, 0
 		push	ax
@@ -3955,7 +3976,7 @@ loc_53A99:				; CODE XREF: sub_53686+4DBj
 		add	sp, 4
 		inc	si
 
-loc_53B53:				; CODE XREF: sub_53686+410j
+loc_53B53:				; CODE XREF: Gameflow_Ledger_53686+410j
 		mov	al, [bp+var_29]
 		mov	ah, 0
 		cwd
@@ -3966,14 +3987,14 @@ loc_53B53:				; CODE XREF: sub_53686+410j
 		jmp	loc_53A99
 ; ���������������������������������������������������������������������������
 
-loc_53B64:				; CODE XREF: sub_53686+4D9j
+loc_53B64:				; CODE XREF: Gameflow_Ledger_53686+4D9j
 		cmp	[bp+var_B], 2
 		jnz	short loc_53BC5
 		xor	di, di
 		jmp	short loc_53BC0
 ; ���������������������������������������������������������������������������
 
-loc_53B6E:				; CODE XREF: sub_53686+53Dj
+loc_53B6E:				; CODE XREF: Gameflow_Ledger_53686+53Dj
 		mov	al, byte ptr [bp+di+var_A]
 		mov	ah, 0
 		push	ax
@@ -4006,19 +4027,19 @@ loc_53B6E:				; CODE XREF: sub_53686+53Dj
 		call	TextLayer_SetText_ADB7
 		add	sp, 4
 
-loc_53BBF:				; CODE XREF: sub_53686+520j
+loc_53BBF:				; CODE XREF: Gameflow_Ledger_53686+520j
 		inc	di
 
-loc_53BC0:				; CODE XREF: sub_53686+4E6j
+loc_53BC0:				; CODE XREF: Gameflow_Ledger_53686+4E6j
 		cmp	di, 8
 		jl	short loc_53B6E
 
-loc_53BC5:				; CODE XREF: sub_53686+4E2j
+loc_53BC5:				; CODE XREF: Gameflow_Ledger_53686+4E2j
 		xor	si, si
 		jmp	short loc_53BE3
 ; ���������������������������������������������������������������������������
 
-loc_53BC9:				; CODE XREF: sub_53686+564j
+loc_53BC9:				; CODE XREF: Gameflow_Ledger_53686+564j
 		mov	bx, si
 		shl	bx, 1
 		lea	ax, [bp+var_5F6]
@@ -4030,7 +4051,7 @@ loc_53BC9:				; CODE XREF: sub_53686+564j
 		add	sp, 4
 		inc	si
 
-loc_53BE3:				; CODE XREF: sub_53686+541j
+loc_53BE3:				; CODE XREF: Gameflow_Ledger_53686+541j
 		mov	al, [bp+var_29]
 		mov	ah, 0
 		cmp	ax, si
@@ -4040,13 +4061,13 @@ loc_53BE3:				; CODE XREF: sub_53686+541j
 		jmp	loc_53C9B
 ; ���������������������������������������������������������������������������
 
-loc_53BF5:				; CODE XREF: sub_53686+56Aj
+loc_53BF5:				; CODE XREF: Gameflow_Ledger_53686+56Aj
 		cmp	[bp+var_B], 1
 		jz	short loc_53BFE
 		jmp	loc_53C9B
 ; ���������������������������������������������������������������������������
 
-loc_53BFE:				; CODE XREF: sub_53686+573j
+loc_53BFE:				; CODE XREF: Gameflow_Ledger_53686+573j
 		lea	ax, [bp+var_645]
 		push	ax
 		lea	ax, [bp+var_32]
@@ -4062,7 +4083,7 @@ loc_53BFE:				; CODE XREF: sub_53686+573j
 		jmp	short loc_53C74
 ; ���������������������������������������������������������������������������
 
-loc_53C23:				; CODE XREF: sub_53686+5F1j
+loc_53C23:				; CODE XREF: Gameflow_Ledger_53686+5F1j
 		mov	[bp+var_34], di
 		mov	bx, [bp+var_28]
 		mov	ax, [bp+var_34]
@@ -4071,7 +4092,7 @@ loc_53C23:				; CODE XREF: sub_53686+5F1j
 		jmp	short loc_53C4E
 ; ���������������������������������������������������������������������������
 
-loc_53C36:				; CODE XREF: sub_53686+5DBj
+loc_53C36:				; CODE XREF: Gameflow_Ledger_53686+5DBj
 		push	0
 		push	0
 		mov	bx, [bp+var_36]
@@ -4082,7 +4103,7 @@ loc_53C36:				; CODE XREF: sub_53686+5DBj
 		call	dword ptr [bx+10h]
 		add	sp, 6
 
-loc_53C4E:				; CODE XREF: sub_53686+5AEj
+loc_53C4E:				; CODE XREF: Gameflow_Ledger_53686+5AEj
 		lea	ax, [bp+var_36]
 		push	ax
 		lea	ax, [bp+var_660]
@@ -4097,7 +4118,7 @@ loc_53C4E:				; CODE XREF: sub_53686+5AEj
 		add	sp, 4
 		inc	di
 
-loc_53C74:				; CODE XREF: sub_53686+59Bj
+loc_53C74:				; CODE XREF: Gameflow_Ledger_53686+59Bj
 		cmp	di, 5
 		jl	short loc_53C23
 		push	[bp+var_28]
@@ -4112,8 +4133,8 @@ loc_53C74:				; CODE XREF: sub_53686+59Bj
 		call	SmallObject_UnregisterFromList_2CB7A
 		add	sp, 4
 
-loc_53C9B:				; CODE XREF: sub_53686+56Cj
-					; sub_53686+575j
+loc_53C9B:				; CODE XREF: Gameflow_Ledger_53686+56Cj
+					; Gameflow_Ledger_53686+575j
 		lea	ax, [bp+var_70C]
 		push	ax
 		call	sub_6162
@@ -4131,43 +4152,43 @@ loc_53C9B:				; CODE XREF: sub_53686+56Cj
 		jmp	short loc_53CE4
 ; ���������������������������������������������������������������������������
 
-loc_53CC3:				; CODE XREF: sub_53686+62Fj
+loc_53CC3:				; CODE XREF: Gameflow_Ledger_53686+62Fj
 		cmp	ax, 7Fh	; ''
 		jz	short loc_53CD4
 		jmp	short loc_53CE4
 ; ���������������������������������������������������������������������������
 
-loc_53CCA:				; CODE XREF: sub_53686+62Dj
+loc_53CCA:				; CODE XREF: Gameflow_Ledger_53686+62Dj
 		mov	[bp+var_B], 1
 		mov	[bp+var_D], 1
 		jmp	short loc_53CE4
 ; ���������������������������������������������������������������������������
 
-loc_53CD4:				; CODE XREF: sub_53686+640j
+loc_53CD4:				; CODE XREF: Gameflow_Ledger_53686+640j
 		mov	[bp+var_B], 2
 		mov	[bp+var_D], 1
 		jmp	short loc_53CE4
 ; ���������������������������������������������������������������������������
 
-loc_53CDE:				; CODE XREF: sub_53686+634j
-					; sub_53686+639j
+loc_53CDE:				; CODE XREF: Gameflow_Ledger_53686+634j
+					; Gameflow_Ledger_53686+639j
 		mov	[bp+var_C], 1
 		jmp	short $+2
 
-loc_53CE4:				; CODE XREF: sub_53686+63Bj
-					; sub_53686+642j ...
+loc_53CE4:				; CODE XREF: Gameflow_Ledger_53686+63Bj
+					; Gameflow_Ledger_53686+642j ...
 		cmp	[bp+var_D], 0
 		jnz	short loc_53CED
 		jmp	loc_53D93
 ; ���������������������������������������������������������������������������
 
-loc_53CED:				; CODE XREF: sub_53686+662j
+loc_53CED:				; CODE XREF: Gameflow_Ledger_53686+662j
 		cmp	[bp+var_B], 2
 		jz	short loc_53CF6
 		jmp	loc_53D93
 ; ���������������������������������������������������������������������������
 
-loc_53CF6:				; CODE XREF: sub_53686+66Bj
+loc_53CF6:				; CODE XREF: Gameflow_Ledger_53686+66Bj
 		lea	ax, [bp+var_645]
 		push	ax
 		lea	ax, [bp+var_32]
@@ -4183,7 +4204,7 @@ loc_53CF6:				; CODE XREF: sub_53686+66Bj
 		jmp	short loc_53D6D
 ; ���������������������������������������������������������������������������
 
-loc_53D1C:				; CODE XREF: sub_53686+6E9j
+loc_53D1C:				; CODE XREF: Gameflow_Ledger_53686+6E9j
 		mov	[bp+var_34], di
 		mov	bx, [bp+var_28]
 		mov	ax, [bp+var_34]
@@ -4192,7 +4213,7 @@ loc_53D1C:				; CODE XREF: sub_53686+6E9j
 		jmp	short loc_53D47
 ; ���������������������������������������������������������������������������
 
-loc_53D2F:				; CODE XREF: sub_53686+6D4j
+loc_53D2F:				; CODE XREF: Gameflow_Ledger_53686+6D4j
 		push	0
 		push	0
 		mov	bx, [bp+var_36]
@@ -4203,7 +4224,7 @@ loc_53D2F:				; CODE XREF: sub_53686+6D4j
 		call	dword ptr [bx+10h]
 		add	sp, 6
 
-loc_53D47:				; CODE XREF: sub_53686+6A7j
+loc_53D47:				; CODE XREF: Gameflow_Ledger_53686+6A7j
 		lea	ax, [bp+var_36]
 		push	ax
 		lea	ax, [bp+var_660]
@@ -4218,7 +4239,7 @@ loc_53D47:				; CODE XREF: sub_53686+6A7j
 		add	sp, 4
 		dec	di
 
-loc_53D6D:				; CODE XREF: sub_53686+694j
+loc_53D6D:				; CODE XREF: Gameflow_Ledger_53686+694j
 		or	di, di
 		jge	short loc_53D1C
 		push	[bp+var_28]
@@ -4233,13 +4254,13 @@ loc_53D6D:				; CODE XREF: sub_53686+694j
 		call	SmallObject_UnregisterFromList_2CB7A
 		add	sp, 4
 
-loc_53D93:				; CODE XREF: sub_53686+664j
-					; sub_53686+66Dj
+loc_53D93:				; CODE XREF: Gameflow_Ledger_53686+664j
+					; Gameflow_Ledger_53686+66Dj
 		xor	si, si
 		jmp	short loc_53DE3
 ; ���������������������������������������������������������������������������
 
-loc_53D97:				; CODE XREF: sub_53686+764j
+loc_53D97:				; CODE XREF: Gameflow_Ledger_53686+764j
 		mov	bx, si
 		shl	bx, 1
 		lea	ax, [bp+var_5F6]
@@ -4271,10 +4292,10 @@ loc_53D97:				; CODE XREF: sub_53686+764j
 		add	sp, 4
 		jmp	short $+2
 
-loc_53DE2:				; CODE XREF: sub_53686+737j
+loc_53DE2:				; CODE XREF: Gameflow_Ledger_53686+737j
 		inc	si
 
-loc_53DE3:				; CODE XREF: sub_53686+70Fj
+loc_53DE3:				; CODE XREF: Gameflow_Ledger_53686+70Fj
 		mov	al, [bp+var_29]
 		mov	ah, 0
 		cmp	ax, si
@@ -4284,7 +4305,7 @@ loc_53DE3:				; CODE XREF: sub_53686+70Fj
 		call	sub_56B6
 		add	sp, 2
 
-loc_53DF9:				; CODE XREF: sub_53686+21Cj
+loc_53DF9:				; CODE XREF: Gameflow_Ledger_53686+21Cj
 		mov	al, [bp+var_C]
 		mov	ah, 0
 		or	ax, ax
@@ -4292,7 +4313,7 @@ loc_53DF9:				; CODE XREF: sub_53686+21Cj
 		jmp	loc_538A5
 ; ���������������������������������������������������������������������������
 
-loc_53E05:				; CODE XREF: sub_53686+77Aj
+loc_53E05:				; CODE XREF: Gameflow_Ledger_53686+77Aj
 		cmp	[bp+var_28], 0
 		jz	short loc_53E1C
 		push	3
@@ -4303,7 +4324,7 @@ loc_53E05:				; CODE XREF: sub_53686+77Aj
 		add	sp, 4
 		jmp	short $+2
 
-loc_53E1C:				; CODE XREF: sub_53686+783j
+loc_53E1C:				; CODE XREF: Gameflow_Ledger_53686+783j
 		push	0
 		push	word_46F46
 		call	TextFormat_ReleaseAttribute_2EC80
@@ -4338,7 +4359,7 @@ loc_53E1C:				; CODE XREF: sub_53686+783j
 		add	sp, 2
 		jmp	short $+2
 
-loc_53E90:				; CODE XREF: sub_53686+7EAj
+loc_53E90:				; CODE XREF: Gameflow_Ledger_53686+7EAj
 		push	2
 		lea	ax, [bp+var_62B]
 		push	ax
@@ -4382,8 +4403,8 @@ loc_53E90:				; CODE XREF: sub_53686+7EAj
 		add	sp, 8
 		jmp	short $+2
 
-loc_53F10:				; CODE XREF: sub_53686+86Aj
-					; sub_53686+871j
+loc_53F10:				; CODE XREF: Gameflow_Ledger_53686+86Aj
+					; Gameflow_Ledger_53686+871j
 		mov	[bp+var_26], 0
 		mov	[bp+var_21], 0
 		mov	[bp+var_20], 0
@@ -4406,8 +4427,8 @@ loc_53F10:				; CODE XREF: sub_53686+86Aj
 		add	sp, 8
 		jmp	short $+2
 
-loc_53F57:				; CODE XREF: sub_53686+8B1j
-					; sub_53686+8B8j
+loc_53F57:				; CODE XREF: Gameflow_Ledger_53686+8B1j
+					; Gameflow_Ledger_53686+8B8j
 		mov	[bp+var_18], 0
 		mov	[bp+var_13], 0
 		mov	[bp+var_12], 0
@@ -4415,7 +4436,7 @@ loc_53F57:				; CODE XREF: sub_53686+8B1j
 		pop	si
 		leave
 		retf
-sub_53686	endp
+Gameflow_Ledger_53686	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

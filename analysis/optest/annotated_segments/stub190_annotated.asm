@@ -41,7 +41,7 @@ sub_4211A	endp
 
 ; Attributes: thunk
 
-sub_4211F	proc far		; CODE XREF: sub_3D2E+224P
+sub_4211F	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+224P
 		jmp	sub_597B2
 sub_4211F	endp
 

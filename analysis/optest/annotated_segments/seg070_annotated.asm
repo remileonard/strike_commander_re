@@ -689,7 +689,7 @@ loc_2BADA:				; CODE XREF: Memory_AllocatorTableConstructor_2BAC1+9j
 		cmp	byte_46CCC, 0
 		jz	short loc_2BAFB
 		push	3CECh
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 
 loc_2BAFB:				; CODE XREF: Memory_AllocatorTableConstructor_2BAC1+2Fj

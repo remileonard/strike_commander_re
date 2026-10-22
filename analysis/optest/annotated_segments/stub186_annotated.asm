@@ -14,7 +14,7 @@ stru_42000	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:068Eo
 
 ; Attributes: thunk
 
-sub_42020	proc far		; CODE XREF: sub_3D2E+1D5P
+sub_42020	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+1D5P
 		jmp	sub_4E660
 sub_42020	endp
 
@@ -23,8 +23,8 @@ sub_42020	endp
 
 ; Attributes: thunk
 
-sub_42025	proc far		; CODE XREF: sub_3D2E+1A3P
-		jmp	sub_4F1A7
+sub_42025	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+1A3P
+		jmp	Gameflow_MainMenu_4F1A7
 sub_42025	endp
 
 stub186		ends

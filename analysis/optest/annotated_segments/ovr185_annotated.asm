@@ -243,7 +243,7 @@ sub_4C58B	endp
 
 ; Attributes: bp-based frame
 
-sub_4C62A	proc far		; CODE XREF: sub_41FDFJ sub_4D984+C4p	...
+sub_4C62A	proc far		; CODE XREF: sub_41FDFJ Gameflow_SaveRequester_4D984+C4p	...
 
 var_B4		= word ptr -0B4h
 var_63		= byte ptr -63h
@@ -1165,7 +1165,7 @@ sub_4CF58	endp
 
 ; Attributes: bp-based frame
 
-sub_4CF75	proc far		; CODE XREF: sub_41FEEJ sub_4D984+DDp	...
+sub_4CF75	proc far		; CODE XREF: sub_41FEEJ Gameflow_SaveRequester_4D984+DDp	...
 
 var_9E		= word ptr -9Eh
 var_69		= word ptr -69h
@@ -2238,7 +2238,11 @@ sub_4D96F	endp
 
 ; Attributes: bp-based frame
 
-sub_4D984	proc far		; CODE XREF: sub_41FC1J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 10h : choix du fichier de sauvegarde ; nom rendu
+; dans le tampon arg.
+; ==============================================================================================
+Gameflow_SaveRequester_4D984	proc far		; CODE XREF: sub_41FC1J
 
 var_D2		= word ptr -0D2h
 var_C4		= word ptr -0C4h
@@ -2282,7 +2286,7 @@ arg_2		= word ptr  8
 		jnz	short loc_4D99C
 		mov	di, 15h
 
-loc_4D99C:				; CODE XREF: sub_4D984+13j
+loc_4D99C:				; CODE XREF: Gameflow_SaveRequester_4D984+13j
 		push	96h ; '�'
 		push	8Ch ; '�'
 		push	1Eh
@@ -2371,8 +2375,8 @@ loc_4D99C:				; CODE XREF: sub_4D984+13j
 		add	sp, 8
 		jmp	short $+2
 
-loc_4DAC1:				; CODE XREF: sub_4D984+11Dj
-					; sub_4D984+124j
+loc_4DAC1:				; CODE XREF: Gameflow_SaveRequester_4D984+11Dj
+					; Gameflow_SaveRequester_4D984+124j
 		mov	[bp+var_39], 0
 		mov	[bp+var_34], 0
 		mov	[bp+var_33], 0
@@ -2385,14 +2389,18 @@ loc_4DAC1:				; CODE XREF: sub_4D984+11Dj
 		pop	si
 		leave
 		retf
-sub_4D984	endp
+Gameflow_SaveRequester_4D984	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4DAE8	proc far		; CODE XREF: sub_41FB7J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Écrit la structure de partie dans un fichier (gensave.tmp,
+; tmpsav.tmp, *.sav).
+; ==============================================================================================
+Gameflow_SaveGameFile_4DAE8	proc far		; CODE XREF: sub_41FB7J
 
 var_68		= word ptr -68h
 var_B		= dword	ptr -0Bh
@@ -2413,7 +2421,7 @@ arg_2		= word ptr  8
 		jmp	loc_4DDD8
 ; ���������������������������������������������������������������������������
 
-loc_4DAFE:				; CODE XREF: sub_4DAE8+11j
+loc_4DAFE:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+11j
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_2], ax
 		lea	ax, [bp+var_68]
@@ -2471,7 +2479,7 @@ loc_4DAFE:				; CODE XREF: sub_4DAE8+11j
 		jmp	short loc_4DBBE
 ; ���������������������������������������������������������������������������
 
-loc_4DBA7:				; CODE XREF: sub_4DAE8+DAj
+loc_4DBA7:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+DAj
 		push	large 0FFFFFFFFh
 		mov	bx, di
 		mov	al, [bx+si+0FDh]
@@ -2482,14 +2490,14 @@ loc_4DBA7:				; CODE XREF: sub_4DAE8+DAj
 		add	sp, 8
 		inc	di
 
-loc_4DBBE:				; CODE XREF: sub_4DAE8+BDj
+loc_4DBBE:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+BDj
 		cmp	di, 100h
 		jl	short loc_4DBA7
 		xor	di, di
 		jmp	short loc_4DBDF
 ; ���������������������������������������������������������������������������
 
-loc_4DBC8:				; CODE XREF: sub_4DAE8+FAj
+loc_4DBC8:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+FAj
 		push	large 0FFFFFFFFh
 		mov	bx, di
 		mov	al, [bx+si+1FDh]
@@ -2500,14 +2508,14 @@ loc_4DBC8:				; CODE XREF: sub_4DAE8+FAj
 		add	sp, 8
 		inc	di
 
-loc_4DBDF:				; CODE XREF: sub_4DAE8+DEj
+loc_4DBDF:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+DEj
 		cmp	di, 64h	; 'd'
 		jl	short loc_4DBC8
 		xor	di, di
 		jmp	short loc_4DC00
 ; ���������������������������������������������������������������������������
 
-loc_4DBE8:				; CODE XREF: sub_4DAE8+11Bj
+loc_4DBE8:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+11Bj
 		push	large 0FFFFFFFFh
 		mov	bx, di
 		shl	bx, 1
@@ -2518,14 +2526,14 @@ loc_4DBE8:				; CODE XREF: sub_4DAE8+11Bj
 		add	sp, 8
 		inc	di
 
-loc_4DC00:				; CODE XREF: sub_4DAE8+FEj
+loc_4DC00:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+FEj
 		cmp	di, 9
 		jl	short loc_4DBE8
 		xor	di, di
 		jmp	short loc_4DC3A
 ; ���������������������������������������������������������������������������
 
-loc_4DC09:				; CODE XREF: sub_4DAE8+155j
+loc_4DC09:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+155j
 		push	large 0FFFFFFFFh
 		mov	bx, di
 		shl	bx, 1
@@ -2546,7 +2554,7 @@ loc_4DC09:				; CODE XREF: sub_4DAE8+155j
 		add	sp, 8
 		inc	di
 
-loc_4DC3A:				; CODE XREF: sub_4DAE8+11Fj
+loc_4DC3A:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+11Fj
 		cmp	di, 4
 		jl	short loc_4DC09
 		push	large 0FFFFFFFFh
@@ -2577,7 +2585,7 @@ loc_4DC3A:				; CODE XREF: sub_4DAE8+11Fj
 		jmp	short loc_4DCE8
 ; ���������������������������������������������������������������������������
 
-loc_4DC93:				; CODE XREF: sub_4DAE8+203j
+loc_4DC93:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+203j
 		push	large 0FFFFFFFFh
 		mov	ax, di
 		mov	dx, 1Ah
@@ -2610,7 +2618,7 @@ loc_4DC93:				; CODE XREF: sub_4DAE8+203j
 		add	sp, 8
 		inc	di
 
-loc_4DCE8:				; CODE XREF: sub_4DAE8+1A9j
+loc_4DCE8:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+1A9j
 		cmp	di, 8
 		jl	short loc_4DC93
 		push	large 0FFFFFFFFh
@@ -2663,7 +2671,7 @@ loc_4DCE8:				; CODE XREF: sub_4DAE8+1A9j
 		jmp	short loc_4DD7D
 ; ���������������������������������������������������������������������������
 
-loc_4DD68:				; CODE XREF: sub_4DAE8+298j
+loc_4DD68:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+298j
 		push	large 0FFFFFFFFh
 		mov	al, [di+0EE6h]
 		push	ax
@@ -2673,7 +2681,7 @@ loc_4DD68:				; CODE XREF: sub_4DAE8+298j
 		add	sp, 8
 		inc	di
 
-loc_4DD7D:				; CODE XREF: sub_4DAE8+27Ej
+loc_4DD7D:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+27Ej
 		cmp	di, 7
 		jl	short loc_4DD68
 		push	large 0FFFFFFFFh
@@ -2706,19 +2714,23 @@ loc_4DD7D:				; CODE XREF: sub_4DAE8+27Ej
 		call	StreamReader_ReleaseBuffer_3CEB3
 		add	sp, 4
 
-loc_4DDD8:				; CODE XREF: sub_4DAE8+13j
+loc_4DDD8:				; CODE XREF: Gameflow_SaveGameFile_4DAE8+13j
 		pop	di
 		pop	si
 		leave
 		retf
-sub_4DAE8	endp
+Gameflow_SaveGameFile_4DAE8	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4DDDC	proc far		; CODE XREF: sub_41FC6J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Commande 11h : choix du fichier à charger (nom en
+; partie+93h) ; si choisi, [partie+0E8h] = 3.
+; ==============================================================================================
+Gameflow_LoadRequester_4DDDC	proc far		; CODE XREF: sub_41FC6J
 
 var_D2		= word ptr -0D2h
 var_C4		= word ptr -0C4h
@@ -2762,12 +2774,12 @@ arg_2		= word ptr  8
 		jnz	short loc_4DDF4
 		mov	di, 15h
 
-loc_4DDF4:				; CODE XREF: sub_4DDDC+13j
+loc_4DDF4:				; CODE XREF: Gameflow_LoadRequester_4DDDC+13j
 		cmp	[bp+arg_2], 1
 		jnz	short loc_4DDFD
 		mov	di, 2Ah	; '*'
 
-loc_4DDFD:				; CODE XREF: sub_4DDDC+1Cj
+loc_4DDFD:				; CODE XREF: Gameflow_LoadRequester_4DDDC+1Cj
 		push	96h ; '�'
 		push	8Ch ; '�'
 		push	1Eh
@@ -2857,8 +2869,8 @@ loc_4DDFD:				; CODE XREF: sub_4DDDC+1Cj
 		add	sp, 8
 		jmp	short $+2
 
-loc_4DF24:				; CODE XREF: sub_4DDDC+128j
-					; sub_4DDDC+12Fj
+loc_4DF24:				; CODE XREF: Gameflow_LoadRequester_4DDDC+128j
+					; Gameflow_LoadRequester_4DDDC+12Fj
 		mov	[bp+var_39], 0
 		mov	[bp+var_34], 0
 		mov	[bp+var_33], 0
@@ -2871,14 +2883,18 @@ loc_4DF24:				; CODE XREF: sub_4DDDC+128j
 		pop	si
 		leave
 		retf
-sub_4DDDC	endp
+Gameflow_LoadRequester_4DDDC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_4DF4B	proc far		; CODE XREF: sub_41FB2J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Lit un fichier de partie (gensave.tmp, tmpsav.tmp, *.sav)
+; dans la structure de partie.
+; ==============================================================================================
+Gameflow_LoadGameFile_4DF4B	proc far		; CODE XREF: sub_41FB2J
 
 var_68		= word ptr -68h
 var_B		= dword	ptr -0Bh
@@ -2899,7 +2915,7 @@ arg_2		= word ptr  8
 		jmp	loc_4E27A
 ; ���������������������������������������������������������������������������
 
-loc_4DF61:				; CODE XREF: sub_4DF4B+11j
+loc_4DF61:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+11j
 		mov	ax, [bp+arg_2]
 		mov	[bp+var_2], ax
 		lea	ax, [bp+var_68]
@@ -2926,10 +2942,10 @@ loc_4DF61:				; CODE XREF: sub_4DF4B+11j
 		jnz	short loc_4DFC0
 		push	word_433F2
 		push	6D8h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
-loc_4DFC0:				; CODE XREF: sub_4DF4B+64j
+loc_4DFC0:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+64j
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -2958,7 +2974,7 @@ loc_4DFC0:				; CODE XREF: sub_4DF4B+64j
 		jmp	short loc_4E026
 ; ���������������������������������������������������������������������������
 
-loc_4E010:				; CODE XREF: sub_4DF4B+DFj
+loc_4E010:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+DFj
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -2968,14 +2984,14 @@ loc_4E010:				; CODE XREF: sub_4DF4B+DFj
 		mov	[bx+si+0FDh], al
 		inc	di
 
-loc_4E026:				; CODE XREF: sub_4DF4B+C3j
+loc_4E026:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+C3j
 		cmp	di, 100h
 		jl	short loc_4E010
 		xor	di, di
 		jmp	short loc_4E046
 ; ���������������������������������������������������������������������������
 
-loc_4E030:				; CODE XREF: sub_4DF4B+FEj
+loc_4E030:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+FEj
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -2985,14 +3001,14 @@ loc_4E030:				; CODE XREF: sub_4DF4B+FEj
 		mov	[bx+si+1FDh], al
 		inc	di
 
-loc_4E046:				; CODE XREF: sub_4DF4B+E3j
+loc_4E046:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+E3j
 		cmp	di, 64h	; 'd'
 		jl	short loc_4E030
 		xor	di, di
 		jmp	short loc_4E067
 ; ���������������������������������������������������������������������������
 
-loc_4E04F:				; CODE XREF: sub_4DF4B+11Fj
+loc_4E04F:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+11Fj
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -3003,14 +3019,14 @@ loc_4E04F:				; CODE XREF: sub_4DF4B+11Fj
 		mov	[bx+si+261h], ax
 		inc	di
 
-loc_4E067:				; CODE XREF: sub_4DF4B+102j
+loc_4E067:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+102j
 		cmp	di, 9
 		jl	short loc_4E04F
 		xor	di, di
 		jmp	short loc_4E09F
 ; ���������������������������������������������������������������������������
 
-loc_4E070:				; CODE XREF: sub_4DF4B+157j
+loc_4E070:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+157j
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -3029,7 +3045,7 @@ loc_4E070:				; CODE XREF: sub_4DF4B+157j
 		mov	[bx+si+274h], al
 		inc	di
 
-loc_4E09F:				; CODE XREF: sub_4DF4B+123j
+loc_4E09F:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+123j
 		cmp	di, 4
 		jl	short loc_4E070
 		push	large 0FFFFFFFFh
@@ -3068,7 +3084,7 @@ loc_4E09F:				; CODE XREF: sub_4DF4B+123j
 		jmp	short loc_4E177
 ; ���������������������������������������������������������������������������
 
-loc_4E11C:				; CODE XREF: sub_4DF4B+22Fj
+loc_4E11C:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+22Fj
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -3107,7 +3123,7 @@ loc_4E11C:				; CODE XREF: sub_4DF4B+22Fj
 		mov	[bx+si+2A3h], ax
 		inc	di
 
-loc_4E177:				; CODE XREF: sub_4DF4B+1CFj
+loc_4E177:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+1CFj
 		cmp	di, 8
 		jl	short loc_4E11C
 		push	large 0FFFFFFFFh
@@ -3160,7 +3176,7 @@ loc_4E177:				; CODE XREF: sub_4DF4B+1CFj
 		jmp	short loc_4E20B
 ; ���������������������������������������������������������������������������
 
-loc_4E1F7:				; CODE XREF: sub_4DF4B+2C3j
+loc_4E1F7:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+2C3j
 		push	large 0FFFFFFFFh
 		lea	ax, [bp+var_68]
 		push	ax
@@ -3169,7 +3185,7 @@ loc_4E1F7:				; CODE XREF: sub_4DF4B+2C3j
 		mov	[di+0EE6h], al
 		inc	di
 
-loc_4E20B:				; CODE XREF: sub_4DF4B+2AAj
+loc_4E20B:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+2AAj
 		cmp	di, 7
 		jl	short loc_4E1F7
 		push	large 0FFFFFFFFh
@@ -3194,7 +3210,7 @@ loc_4E20B:				; CODE XREF: sub_4DF4B+2AAj
 		mov	[si+3D8h], eax
 		mov	al, [si+3D7h]
 		push	ax
-		call	sub_28CFC
+		call	Music_PlayGameflowTune_28CFC
 		add	sp, 2
 		lea	ax, [bp+var_68]
 		push	ax
@@ -3206,12 +3222,12 @@ loc_4E20B:				; CODE XREF: sub_4DF4B+2AAj
 		call	StreamReader_ReleaseBuffer_3CEB3
 		add	sp, 4
 
-loc_4E27A:				; CODE XREF: sub_4DF4B+13j
+loc_4E27A:				; CODE XREF: Gameflow_LoadGameFile_4DF4B+13j
 		pop	di
 		pop	si
 		leave
 		retf
-sub_4DF4B	endp
+Gameflow_LoadGameFile_4DF4B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

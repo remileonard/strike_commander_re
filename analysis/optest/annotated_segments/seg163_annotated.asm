@@ -126,7 +126,7 @@ TextScrollDisplayB_InitAndRegister_3F658	endp
 ; ; appelants et contexte à revérifier ici. — far, combine sub_67F60 et sub_67F26.
 ; ==============================================================================================
 TextScrollDisplayB_ApplyHelperA_3F6C0	proc far		; CODE XREF: sub_502B+23P
-					; sub_51049+2BAP ...
+					; Gameflow_KillBoard_51049+2BAP ...
 
 var_1		= byte ptr -1
 arg_0		= word ptr  6
@@ -289,7 +289,7 @@ TextScrollDisplayB_ApplyHelperC_3F74A	endp
 ; TextScrollDisplayB_ApplyHelperD_67F60 (sub_67F60 de STRIKE.EXE). Résumé repris de STRIKE.EXE
 ; ; appelants et contexte à revérifier ici. — far, combine sub_67FF8.
 ; ==============================================================================================
-TextScrollDisplayB_ApplyHelperD_3F784	proc far		; CODE XREF: sub_3B0B+169P
+TextScrollDisplayB_ApplyHelperD_3F784	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+169P
 					; seg002:0CB6P	...
 
 var_2		= byte ptr -2
@@ -519,7 +519,7 @@ TextScrollDisplayB_StartAnimation_3F89D	endp
 ; Attributes: bp-based frame
 
 sub_3F8CC	proc far		; CODE XREF: sub_502B+1A1P
-					; sub_51049+5A0P ...
+					; Gameflow_KillBoard_51049+5A0P ...
 
 arg_0		= word ptr  6
 
@@ -540,7 +540,7 @@ sub_3F8CC	endp
 ; Attributes: bp-based frame
 
 sub_3F8DE	proc far		; CODE XREF: sub_502B+1BCP
-					; sub_51049+5BDP ...
+					; Gameflow_KillBoard_51049+5BDP ...
 
 arg_0		= word ptr  6
 

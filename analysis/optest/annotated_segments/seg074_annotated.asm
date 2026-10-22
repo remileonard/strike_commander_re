@@ -59,7 +59,7 @@ loc_2BF26:				; CODE XREF: seg074:0094j
 loc_2BF86:				; CODE XREF: seg074:0084j
 		lea	ax, [bp-20Ah]
 		push	ax
-		call	sub_310B
+		call	Fatal_Error_310B
 		pop	cx
 		pop	si
 		leave

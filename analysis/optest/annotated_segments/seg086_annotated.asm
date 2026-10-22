@@ -116,7 +116,7 @@ TextFormat_ApplyStyleAttributeB_2E9FD	endp
 ; ×2, sub_5E4C8. Référencée directement par TextRenderer_Main (sub_27477, seg048).
 ; ==============================================================================================
 TextRenderer_ApplyFormatChange_2EA21	proc far		; CODE XREF: sub_4C1F+7DP
-					; sub_4AD86+642P ...
+					; Gameflow_PlayShot_4AD86+642P ...
 
 var_C		= dword	ptr -0Ch
 var_8		= word ptr -8
@@ -429,8 +429,8 @@ TextFormat_ResolveStyleEntry_2EB9C	endp
 ; libère une liste d'attributs de style (sub_338, Memory_TypedFree_5C7B6). Référencée depuis
 ; seg025.
 ; ==============================================================================================
-TextFormat_ReleaseStyleList_2EBFA	proc far		; CODE XREF: sub_3B0B+180P
-					; sub_3B0B+1A7P ...
+TextFormat_ReleaseStyleList_2EBFA	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+180P
+					; Gameflow_PlayScene_3B0B+1A7P ...
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -551,8 +551,8 @@ UI_ApplyEncodingHelper_2EC65	endp
 ; appelants et contexte à revérifier ici. — far, appelle sub_60F94. Référencée par sub_1C5D8
 ; (proche de SmallObject_RegisterInList_5D999, seg139).
 ; ==============================================================================================
-TextFormat_ReleaseAttribute_2EC80	proc far		; CODE XREF: sub_3B0B+217P
-					; sub_3D2E+63P	...
+TextFormat_ReleaseAttribute_2EC80	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+217P
+					; Gameflow_MainLoop_3D2E+63P	...
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8

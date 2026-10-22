@@ -290,7 +290,7 @@ StreamReader_Helper_3B282	endp
 ; alloue (sub_658) et initialise (StreamReader_Helper_63A12). Référencée directement depuis
 ; seg009 (cœur du jeu/boucle principale).
 ; ==============================================================================================
-StreamReader_ConstructVariantA_3B2A9	proc far		; CODE XREF: sub_3B0B+45P seg009:063CP ...
+StreamReader_ConstructVariantA_3B2A9	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+45P seg009:063CP ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6

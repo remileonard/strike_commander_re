@@ -1244,7 +1244,11 @@ sub_4E660	endp
 
 ; Attributes: bp-based frame
 
-sub_4F1A7	proc far		; CODE XREF: sub_42025J
+; ==============================================================================================
+; far, LUE en surface 2026-10-22. Menu d'accueil (mainmenu.pak, *.sav, gensave.tmp) ; renvoie
+; le choix 0 à 5 traité par Gameflow_MainLoop_3D2E.
+; ==============================================================================================
+Gameflow_MainMenu_4F1A7	proc far		; CODE XREF: sub_42025J
 
 var_4CA		= word ptr -4CAh
 var_47A		= word ptr -47Ah
@@ -1419,14 +1423,14 @@ arg_2		= byte ptr  8
 		jz	short loc_4F251
 		mov	[bp+var_1], 1
 
-loc_4F251:				; CODE XREF: sub_4F1A7+A4j
+loc_4F251:				; CODE XREF: Gameflow_MainMenu_4F1A7+A4j
 		push	0
 		lea	ax, [bp+var_47A]
 		push	ax
 		call	StreamReader_ReleaseBuffer_3CEB3
 		add	sp, 4
 
-loc_4F260:				; CODE XREF: sub_4F1A7+52j
+loc_4F260:				; CODE XREF: Gameflow_MainMenu_4F1A7+52j
 		push	ds
 		push	offset unk_43921
 		push	ds
@@ -1450,8 +1454,8 @@ loc_4F260:				; CODE XREF: sub_4F1A7+52j
 		jmp	loc_4F33E
 ; ���������������������������������������������������������������������������
 
-loc_4F299:				; CODE XREF: sub_4F1A7+EDj
-					; sub_4F1A7+194j
+loc_4F299:				; CODE XREF: Gameflow_MainMenu_4F1A7+EDj
+					; Gameflow_MainMenu_4F1A7+194j
 		push	ds
 		push	offset unk_43922
 		push	ss
@@ -1494,7 +1498,7 @@ loc_4F299:				; CODE XREF: sub_4F1A7+EDj
 		jmp	short loc_4F33E
 ; ���������������������������������������������������������������������������
 
-loc_4F31B:				; CODE XREF: sub_4F1A7+15Dj
+loc_4F31B:				; CODE XREF: Gameflow_MainMenu_4F1A7+15Dj
 		push	0
 		lea	ax, [bp+var_4CA]
 		push	ax
@@ -1509,8 +1513,8 @@ loc_4F31B:				; CODE XREF: sub_4F1A7+15Dj
 		jmp	loc_4F299
 ; ���������������������������������������������������������������������������
 
-loc_4F33E:				; CODE XREF: sub_4F1A7+EFj
-					; sub_4F1A7+172j ...
+loc_4F33E:				; CODE XREF: Gameflow_MainMenu_4F1A7+EFj
+					; Gameflow_MainMenu_4F1A7+172j ...
 		mov	al, [bp+arg_2]
 		mov	ah, 0
 		or	ax, ax
@@ -1525,7 +1529,7 @@ loc_4F33E:				; CODE XREF: sub_4F1A7+EFj
 		jmp	short loc_4F393
 ; ���������������������������������������������������������������������������
 
-loc_4F35D:				; CODE XREF: sub_4F1A7+1ADj
+loc_4F35D:				; CODE XREF: Gameflow_MainMenu_4F1A7+1ADj
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1539,7 +1543,7 @@ loc_4F35D:				; CODE XREF: sub_4F1A7+1ADj
 		jmp	short loc_4F393
 ; ���������������������������������������������������������������������������
 
-loc_4F378:				; CODE XREF: sub_4F1A7+1B2j
+loc_4F378:				; CODE XREF: Gameflow_MainMenu_4F1A7+1B2j
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1552,15 +1556,15 @@ loc_4F378:				; CODE XREF: sub_4F1A7+1B2j
 		add	sp, 0Eh
 		jmp	short $+2
 
-loc_4F393:				; CODE XREF: sub_4F1A7+1B4j
-					; sub_4F1A7+1CFj
+loc_4F393:				; CODE XREF: Gameflow_MainMenu_4F1A7+1B4j
+					; Gameflow_MainMenu_4F1A7+1CFj
 		push	17h
 		lea	ax, [bp+var_464]
 		push	ax
 		call	Speech_LoadBank_28D24
 		add	sp, 4
 
-loc_4F3A2:				; CODE XREF: sub_4F1A7+19Ej
+loc_4F3A2:				; CODE XREF: Gameflow_MainMenu_4F1A7+19Ej
 		push	100h
 		push	0
 		lea	ax, [bp+var_A]
@@ -1834,7 +1838,7 @@ loc_4F3A2:				; CODE XREF: sub_4F1A7+19Ej
 		jmp	loc_4F7DD
 ; ���������������������������������������������������������������������������
 
-loc_4F731:				; CODE XREF: sub_4F1A7+585j
+loc_4F731:				; CODE XREF: Gameflow_MainMenu_4F1A7+585j
 		push	2Eh ; '.'
 		push	30h ; '0'
 		call	CRT_Malloc16_Retry
@@ -1845,7 +1849,7 @@ loc_4F731:				; CODE XREF: sub_4F1A7+585j
 		jmp	loc_4F7CD
 ; ���������������������������������������������������������������������������
 
-loc_4F746:				; CODE XREF: sub_4F1A7+59Aj
+loc_4F746:				; CODE XREF: Gameflow_MainMenu_4F1A7+59Aj
 		push	0Eh
 		push	0D2h ; '�'
 		push	0Ah
@@ -1881,23 +1885,23 @@ loc_4F746:				; CODE XREF: sub_4F1A7+59Aj
 		jmp	short loc_4F7CF
 ; ���������������������������������������������������������������������������
 
-loc_4F7CD:				; CODE XREF: sub_4F1A7+59Cj
+loc_4F7CD:				; CODE XREF: Gameflow_MainMenu_4F1A7+59Cj
 		mov	ax, di
 
-loc_4F7CF:				; CODE XREF: sub_4F1A7+624j
+loc_4F7CF:				; CODE XREF: Gameflow_MainMenu_4F1A7+624j
 		push	ax
 		lea	ax, [bp+var_39C]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_4F7DD:				; CODE XREF: sub_4F1A7+587j
+loc_4F7DD:				; CODE XREF: Gameflow_MainMenu_4F1A7+587j
 		cmp	[bp+var_2], 0
 		jnz	short loc_4F7E6
 		jmp	loc_4F8DB
 ; ���������������������������������������������������������������������������
 
-loc_4F7E6:				; CODE XREF: sub_4F1A7+63Aj
+loc_4F7E6:				; CODE XREF: Gameflow_MainMenu_4F1A7+63Aj
 		push	26h ; '&'
 		push	30h ; '0'
 		call	CRT_Malloc16_Retry
@@ -1908,7 +1912,7 @@ loc_4F7E6:				; CODE XREF: sub_4F1A7+63Aj
 		jmp	loc_4F8C9
 ; ���������������������������������������������������������������������������
 
-loc_4F7FD:				; CODE XREF: sub_4F1A7+651j
+loc_4F7FD:				; CODE XREF: Gameflow_MainMenu_4F1A7+651j
 		push	0Eh
 		push	0D2h ; '�'
 		push	1Bh
@@ -1960,17 +1964,17 @@ loc_4F7FD:				; CODE XREF: sub_4F1A7+651j
 		jmp	short loc_4F8CD
 ; ���������������������������������������������������������������������������
 
-loc_4F8C9:				; CODE XREF: sub_4F1A7+653j
+loc_4F8C9:				; CODE XREF: Gameflow_MainMenu_4F1A7+653j
 		mov	ax, [bp+var_90]
 
-loc_4F8CD:				; CODE XREF: sub_4F1A7+720j
+loc_4F8CD:				; CODE XREF: Gameflow_MainMenu_4F1A7+720j
 		push	ax
 		lea	ax, [bp+var_39C]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_4F8DB:				; CODE XREF: sub_4F1A7+63Cj
+loc_4F8DB:				; CODE XREF: Gameflow_MainMenu_4F1A7+63Cj
 		push	1Fh
 		push	30h ; '0'
 		call	CRT_Malloc16_Retry
@@ -1981,7 +1985,7 @@ loc_4F8DB:				; CODE XREF: sub_4F1A7+63Cj
 		jmp	loc_4F9BE
 ; ���������������������������������������������������������������������������
 
-loc_4F8F2:				; CODE XREF: sub_4F1A7+746j
+loc_4F8F2:				; CODE XREF: Gameflow_MainMenu_4F1A7+746j
 		push	0Eh
 		push	0D2h ; '�'
 		push	2Ch ; ','
@@ -2033,10 +2037,10 @@ loc_4F8F2:				; CODE XREF: sub_4F1A7+746j
 		jmp	short loc_4F9C2
 ; ���������������������������������������������������������������������������
 
-loc_4F9BE:				; CODE XREF: sub_4F1A7+748j
+loc_4F9BE:				; CODE XREF: Gameflow_MainMenu_4F1A7+748j
 		mov	ax, [bp+var_98]
 
-loc_4F9C2:				; CODE XREF: sub_4F1A7+815j
+loc_4F9C2:				; CODE XREF: Gameflow_MainMenu_4F1A7+815j
 		push	ax
 		lea	ax, [bp+var_39C]
 		push	ax
@@ -2052,7 +2056,7 @@ loc_4F9C2:				; CODE XREF: sub_4F1A7+815j
 		jmp	loc_4FAB3
 ; ���������������������������������������������������������������������������
 
-loc_4F9E7:				; CODE XREF: sub_4F1A7+83Bj
+loc_4F9E7:				; CODE XREF: Gameflow_MainMenu_4F1A7+83Bj
 		push	0Eh
 		push	0D2h ; '�'
 		push	3Dh ; '='
@@ -2104,10 +2108,10 @@ loc_4F9E7:				; CODE XREF: sub_4F1A7+83Bj
 		jmp	short loc_4FAB7
 ; ���������������������������������������������������������������������������
 
-loc_4FAB3:				; CODE XREF: sub_4F1A7+83Dj
+loc_4FAB3:				; CODE XREF: Gameflow_MainMenu_4F1A7+83Dj
 		mov	ax, [bp+var_A0]
 
-loc_4FAB7:				; CODE XREF: sub_4F1A7+90Aj
+loc_4FAB7:				; CODE XREF: Gameflow_MainMenu_4F1A7+90Aj
 		push	ax
 		lea	ax, [bp+var_39C]
 		push	ax
@@ -2123,7 +2127,7 @@ loc_4FAB7:				; CODE XREF: sub_4F1A7+90Aj
 		jmp	loc_4FBA8
 ; ���������������������������������������������������������������������������
 
-loc_4FADC:				; CODE XREF: sub_4F1A7+930j
+loc_4FADC:				; CODE XREF: Gameflow_MainMenu_4F1A7+930j
 		push	0Eh
 		push	0D2h ; '�'
 		push	4Eh ; 'N'
@@ -2175,10 +2179,10 @@ loc_4FADC:				; CODE XREF: sub_4F1A7+930j
 		jmp	short loc_4FBAC
 ; ���������������������������������������������������������������������������
 
-loc_4FBA8:				; CODE XREF: sub_4F1A7+932j
+loc_4FBA8:				; CODE XREF: Gameflow_MainMenu_4F1A7+932j
 		mov	ax, [bp+var_A8]
 
-loc_4FBAC:				; CODE XREF: sub_4F1A7+9FFj
+loc_4FBAC:				; CODE XREF: Gameflow_MainMenu_4F1A7+9FFj
 		push	ax
 		lea	ax, [bp+var_39C]
 		push	ax
@@ -2192,7 +2196,7 @@ loc_4FBAC:				; CODE XREF: sub_4F1A7+9FFj
 		jmp	loc_4FC53
 ; ���������������������������������������������������������������������������
 
-loc_4FBD2:				; CODE XREF: sub_4F1A7+A26j
+loc_4FBD2:				; CODE XREF: Gameflow_MainMenu_4F1A7+A26j
 		push	[bp+var_2E]
 		mov	al, [bp+var_2C]
 		push	ax
@@ -2244,7 +2248,7 @@ loc_4FBD2:				; CODE XREF: sub_4F1A7+A26j
 		jmp	loc_4FD9C
 ; ���������������������������������������������������������������������������
 
-loc_4FC53:				; CODE XREF: sub_4F1A7+A28j
+loc_4FC53:				; CODE XREF: Gameflow_MainMenu_4F1A7+A28j
 		push	0
 		push	word_46F46
 		call	TextFormat_ReleaseAttribute_2EC80
@@ -2366,7 +2370,7 @@ loc_4FC53:				; CODE XREF: sub_4F1A7+A28j
 		call	Palette_Upload_2CDE1
 		add	sp, 8
 
-loc_4FD9C:				; CODE XREF: sub_4F1A7+AA9j
+loc_4FD9C:				; CODE XREF: Gameflow_MainMenu_4F1A7+AA9j
 		xor	eax, eax
 		mov	[bp+var_B8], eax
 		mov	[bp+var_BC], eax
@@ -2379,11 +2383,11 @@ loc_4FD9C:				; CODE XREF: sub_4F1A7+AA9j
 		mov	eax, dword_47ABB
 		mov	[bp+var_BC], eax
 
-loc_4FDC5:				; CODE XREF: sub_4F1A7+C0Ej
+loc_4FDC5:				; CODE XREF: Gameflow_MainMenu_4F1A7+C0Ej
 		jmp	loc_4FE51
 ; ���������������������������������������������������������������������������
 
-loc_4FDC8:				; CODE XREF: sub_4F1A7+CB1j
+loc_4FDC8:				; CODE XREF: Gameflow_MainMenu_4F1A7+CB1j
 		call	sub_D157
 		cmp	[bp+var_BD], 0
 		jz	short loc_4FDF3
@@ -2397,11 +2401,11 @@ loc_4FDC8:				; CODE XREF: sub_4F1A7+CB1j
 		jmp	short loc_4FE5B
 ; ���������������������������������������������������������������������������
 
-loc_4FDF1:				; CODE XREF: sub_4F1A7+C46j
+loc_4FDF1:				; CODE XREF: Gameflow_MainMenu_4F1A7+C46j
 		jmp	short loc_4FE00
 ; ���������������������������������������������������������������������������
 
-loc_4FDF3:				; CODE XREF: sub_4F1A7+C2Bj
+loc_4FDF3:				; CODE XREF: Gameflow_MainMenu_4F1A7+C2Bj
 		call	sub_28D68
 		mov	ah, 0
 		or	ax, ax
@@ -2409,8 +2413,8 @@ loc_4FDF3:				; CODE XREF: sub_4F1A7+C2Bj
 		jmp	short loc_4FE5B
 ; ���������������������������������������������������������������������������
 
-loc_4FE00:				; CODE XREF: sub_4F1A7:loc_4FDF1j
-					; sub_4F1A7+C55j
+loc_4FE00:				; CODE XREF: Gameflow_MainMenu_4F1A7:loc_4FDF1j
+					; Gameflow_MainMenu_4F1A7+C55j
 		push	0
 		push	1
 		lea	ax, [bp+var_39C]
@@ -2425,7 +2429,7 @@ loc_4FE00:				; CODE XREF: sub_4F1A7:loc_4FDF1j
 		cmp	[bp+var_330], 0
 		jz	short loc_4FE51
 
-loc_4FE2A:				; CODE XREF: sub_4F1A7+C7Aj
+loc_4FE2A:				; CODE XREF: Gameflow_MainMenu_4F1A7+C7Aj
 		push	[bp+var_330]
 		push	[bp+var_332]
 		mov	ax, [bp+var_334]
@@ -2439,15 +2443,15 @@ loc_4FE2A:				; CODE XREF: sub_4F1A7+C7Aj
 		call	sub_E2B2
 		add	sp, 0Ah
 
-loc_4FE51:				; CODE XREF: sub_4F1A7:loc_4FDC5j
-					; sub_4F1A7+C73j ...
+loc_4FE51:				; CODE XREF: Gameflow_MainMenu_4F1A7:loc_4FDC5j
+					; Gameflow_MainMenu_4F1A7+C73j ...
 		cmp	[bp+var_88], 5
 		jnz	short loc_4FE5B
 		jmp	loc_4FDC8
 ; ���������������������������������������������������������������������������
 
-loc_4FE5B:				; CODE XREF: sub_4F1A7+C48j
-					; sub_4F1A7+C57j ...
+loc_4FE5B:				; CODE XREF: Gameflow_MainMenu_4F1A7+C48j
+					; Gameflow_MainMenu_4F1A7+C57j ...
 		cmp	[bp+var_88], 2
 		jnz	short loc_4FE6D
 		push	1
@@ -2455,7 +2459,7 @@ loc_4FE5B:				; CODE XREF: sub_4F1A7+C48j
 		call	sub_41FC6
 		add	sp, 4
 
-loc_4FE6D:				; CODE XREF: sub_4F1A7+CB9j
+loc_4FE6D:				; CODE XREF: Gameflow_MainMenu_4F1A7+CB9j
 		lea	ax, [bp+var_39C]
 		push	ax
 		call	sub_DFCA
@@ -2487,8 +2491,8 @@ loc_4FE6D:				; CODE XREF: sub_4F1A7+CB9j
 		add	sp, 8
 		jmp	short $+2
 
-loc_4FECC:				; CODE XREF: sub_4F1A7+D05j
-					; sub_4F1A7+D0Cj
+loc_4FECC:				; CODE XREF: Gameflow_MainMenu_4F1A7+D05j
+					; Gameflow_MainMenu_4F1A7+D0Cj
 		mov	[bp+var_7A], 0
 		mov	[bp+var_75], 0
 		mov	[bp+var_74], 0
@@ -2506,8 +2510,8 @@ loc_4FECC:				; CODE XREF: sub_4F1A7+D05j
 		add	sp, 8
 		jmp	short $+2
 
-loc_4FF04:				; CODE XREF: sub_4F1A7+D3Dj
-					; sub_4F1A7+D44j
+loc_4FF04:				; CODE XREF: Gameflow_MainMenu_4F1A7+D3Dj
+					; Gameflow_MainMenu_4F1A7+D44j
 		mov	[bp+var_70], 0
 		mov	[bp+var_6B], 0
 		mov	[bp+var_6A], 0
@@ -2525,8 +2529,8 @@ loc_4FF04:				; CODE XREF: sub_4F1A7+D3Dj
 		add	sp, 8
 		jmp	short $+2
 
-loc_4FF3C:				; CODE XREF: sub_4F1A7+D75j
-					; sub_4F1A7+D7Cj
+loc_4FF3C:				; CODE XREF: Gameflow_MainMenu_4F1A7+D75j
+					; Gameflow_MainMenu_4F1A7+D7Cj
 		mov	[bp+var_66], 0
 		mov	[bp+var_61], 0
 		mov	[bp+var_60], 0
@@ -2554,8 +2558,8 @@ loc_4FF3C:				; CODE XREF: sub_4F1A7+D75j
 		add	sp, 8
 		jmp	short $+2
 
-loc_4FF92:				; CODE XREF: sub_4F1A7+DCBj
-					; sub_4F1A7+DD2j
+loc_4FF92:				; CODE XREF: Gameflow_MainMenu_4F1A7+DCBj
+					; Gameflow_MainMenu_4F1A7+DD2j
 		mov	[bp+var_5C], 0
 		mov	[bp+var_57], 0
 		mov	[bp+var_56], 0
@@ -2573,8 +2577,8 @@ loc_4FF92:				; CODE XREF: sub_4F1A7+DCBj
 		add	sp, 8
 		jmp	short $+2
 
-loc_4FFCA:				; CODE XREF: sub_4F1A7+E03j
-					; sub_4F1A7+E0Aj
+loc_4FFCA:				; CODE XREF: Gameflow_MainMenu_4F1A7+E03j
+					; Gameflow_MainMenu_4F1A7+E0Aj
 		mov	[bp+var_52], 0
 		mov	[bp+var_4D], 0
 		mov	[bp+var_4C], 0
@@ -2592,8 +2596,8 @@ loc_4FFCA:				; CODE XREF: sub_4F1A7+E03j
 		add	sp, 8
 		jmp	short $+2
 
-loc_50002:				; CODE XREF: sub_4F1A7+E3Bj
-					; sub_4F1A7+E42j
+loc_50002:				; CODE XREF: Gameflow_MainMenu_4F1A7+E3Bj
+					; Gameflow_MainMenu_4F1A7+E42j
 		mov	[bp+var_48], 0
 		mov	[bp+var_43], 0
 		mov	[bp+var_42], 0
@@ -2655,8 +2659,8 @@ loc_50002:				; CODE XREF: sub_4F1A7+E3Bj
 		add	sp, 8
 		jmp	short $+2
 
-loc_500BB:				; CODE XREF: sub_4F1A7+EF4j
-					; sub_4F1A7+EFBj
+loc_500BB:				; CODE XREF: Gameflow_MainMenu_4F1A7+EF4j
+					; Gameflow_MainMenu_4F1A7+EFBj
 		mov	[bp+var_28], 0
 		mov	[bp+var_23], 0
 		mov	[bp+var_22], 0
@@ -2674,8 +2678,8 @@ loc_500BB:				; CODE XREF: sub_4F1A7+EF4j
 		add	sp, 8
 		jmp	short $+2
 
-loc_500F3:				; CODE XREF: sub_4F1A7+F2Cj
-					; sub_4F1A7+F33j
+loc_500F3:				; CODE XREF: Gameflow_MainMenu_4F1A7+F2Cj
+					; Gameflow_MainMenu_4F1A7+F33j
 		mov	[bp+var_1E], 0
 		mov	[bp+var_19], 0
 		mov	[bp+var_18], 0
@@ -2693,8 +2697,8 @@ loc_500F3:				; CODE XREF: sub_4F1A7+F2Cj
 		add	sp, 8
 		jmp	short $+2
 
-loc_5012B:				; CODE XREF: sub_4F1A7+F64j
-					; sub_4F1A7+F6Bj
+loc_5012B:				; CODE XREF: Gameflow_MainMenu_4F1A7+F64j
+					; Gameflow_MainMenu_4F1A7+F6Bj
 		mov	[bp+var_14], 0
 		mov	[bp+var_F], 0
 		mov	[bp+var_E], 0
@@ -2708,7 +2712,7 @@ loc_5012B:				; CODE XREF: sub_4F1A7+F64j
 		pop	si
 		leave
 		retf
-sub_4F1A7	endp
+Gameflow_MainMenu_4F1A7	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di

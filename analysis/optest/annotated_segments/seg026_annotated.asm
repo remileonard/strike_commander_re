@@ -525,7 +525,7 @@ loc_12351:				; CODE XREF: sub_1220C+CDj
 loc_12362:				; CODE XREF: sub_1220C+14Aj
 		push	1
 		push	2C32h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 
 loc_1236F:				; CODE XREF: sub_1220C+154j
@@ -2321,7 +2321,7 @@ off_137E2	dw offset loc_1338D	; DATA XREF: seg026:1428r
 
 ; Attributes: bp-based frame
 
-sub_137FA	proc far		; CODE XREF: sub_3D2E+247P
+sub_137FA	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+247P
 
 var_124		= word ptr -124h
 var_120		= word ptr -120h

@@ -7,8 +7,8 @@ seg002		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_34F6	proc far		; CODE XREF: sub_4A60B+330P
-					; sub_4A60B+356P
+sub_34F6	proc far		; CODE XREF: Gameflow_BuildScene_4A60B+330P
+					; Gameflow_BuildScene_4A60B+356P
 
 var_3		= byte ptr -3
 var_2		= word ptr -2
@@ -135,8 +135,12 @@ sub_358C	endp
 
 ; Attributes: bp-based frame
 
-sub_35C9	proc far		; CODE XREF: sub_3B0B+1E5p
-					; sub_3B0B+1F6p ...
+; ==============================================================================================
+; far, LUE 2026-10-22. Cherche dans la liste des sprites de la scène celui dont l'octet +4
+; vaut arg_2 ; renvoie son enregistrement (+5 = script EFCT, +7 = longueur) ou 0.
+; ==============================================================================================
+Gameflow_FindSprite_35C9	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+1E5p
+					; Gameflow_PlayScene_3B0B+1F6p ...
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -151,7 +155,7 @@ arg_2		= byte ptr  8
 		jmp	short loc_35EB
 ; ���������������������������������������������������������������������������
 
-loc_35DA:				; CODE XREF: sub_35C9+31j
+loc_35DA:				; CODE XREF: Gameflow_FindSprite_35C9+31j
 		mov	bx, [bp+var_2]
 		mov	al, [bx+4]
 		cmp	al, [bp+arg_2]
@@ -162,7 +166,7 @@ loc_35DA:				; CODE XREF: sub_35C9+31j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_35EB:				; CODE XREF: sub_35C9+Fj sub_35C9+1Aj
+loc_35EB:				; CODE XREF: Gameflow_FindSprite_35C9+Fj Gameflow_FindSprite_35C9+1Aj
 		lea	ax, [bp+var_2]
 		push	ax
 		push	si
@@ -174,7 +178,7 @@ loc_35EB:				; CODE XREF: sub_35C9+Fj sub_35C9+1Aj
 		pop	si
 		leave
 		retf
-sub_35C9	endp
+Gameflow_FindSprite_35C9	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -185,7 +189,14 @@ sub_35C9	endp
 
 ; Attributes: bp-based frame
 
-sub_3604	proc far		; CODE XREF: sub_4A60B+31FP
+; ==============================================================================================
+; far, LUE 2026-10-22. Évalue un chunk REQU (paires condition, drapeau [partie+0FDh+n]) :
+; visible au départ ; 0 n → caché si le drapeau n est posé ; 1 n → caché s'il ne l'est pas ; 2
+; n → si le drapeau n n'est pas posé, la condition suivante est ignorée ; 3 n → si le drapeau
+; n est posé, la condition suivante est ignorée ; autre valeur ignorée. Appelée par
+; Gameflow_BuildScene_4A60B. GAMEFLOW_SYSTEM.md § 4.
+; ==============================================================================================
+Gameflow_CheckSpriteRequirements_3604	proc far		; CODE XREF: Gameflow_BuildScene_4A60B+31FP
 
 var_3		= byte ptr -3
 var_2		= byte ptr -2
@@ -207,7 +218,7 @@ arg_4		= word ptr  0Ah
 		jmp	loc_36B0
 ; ���������������������������������������������������������������������������
 
-loc_361D:				; CODE XREF: sub_3604+B5j
+loc_361D:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+B5j
 		mov	bx, si
 		mov	al, [bx+di]
 		mov	[bp+var_2], al
@@ -235,12 +246,12 @@ loc_363F:				; DATA XREF: seg002:off_36C7o
 		jnz	short loc_365B
 		mov	[bp+var_1], 0
 
-loc_365B:				; CODE XREF: sub_3604+49j sub_3604+51j
+loc_365B:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+49j Gameflow_CheckSpriteRequirements_3604+51j
 		mov	cl, 0
 		jmp	short loc_36AD	; default
 ; ���������������������������������������������������������������������������
 
-loc_365F:				; CODE XREF: sub_3604+36j
+loc_365F:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+36j
 					; DATA XREF: seg002:off_36C7o
 		mov	al, [bp+var_3]	; case 0x1
 		mov	ah, 0
@@ -256,12 +267,12 @@ loc_365F:				; CODE XREF: sub_3604+36j
 		jnz	short loc_367E
 		mov	[bp+var_1], 0
 
-loc_367E:				; CODE XREF: sub_3604+6Cj sub_3604+74j
+loc_367E:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+6Cj Gameflow_CheckSpriteRequirements_3604+74j
 		mov	cl, 0
 		jmp	short loc_36AD	; default
 ; ���������������������������������������������������������������������������
 
-loc_3682:				; CODE XREF: sub_3604+36j
+loc_3682:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+36j
 					; DATA XREF: seg002:off_36C7o
 		mov	al, [bp+var_3]	; case 0x2
 		mov	ah, 0
@@ -273,11 +284,11 @@ loc_3682:				; CODE XREF: sub_3604+36j
 		jnz	short loc_3697
 		mov	cl, 1
 
-loc_3697:				; CODE XREF: sub_3604+8Fj
+loc_3697:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+8Fj
 		jmp	short loc_36AD	; default
 ; ���������������������������������������������������������������������������
 
-loc_3699:				; CODE XREF: sub_3604+36j
+loc_3699:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+36j
 					; DATA XREF: seg002:off_36C7o
 		mov	al, [bp+var_3]	; case 0x3
 		mov	ah, 0
@@ -287,13 +298,13 @@ loc_3699:				; CODE XREF: sub_3604+36j
 		jz	short loc_36AB
 		mov	cl, 1
 
-loc_36AB:				; CODE XREF: sub_3604+A3j
+loc_36AB:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+A3j
 		jmp	short $+2
 
-loc_36AD:				; CODE XREF: sub_3604+32j sub_3604+59j ...
+loc_36AD:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+32j Gameflow_CheckSpriteRequirements_3604+59j ...
 		add	si, 2		; default
 
-loc_36B0:				; CODE XREF: sub_3604+16j
+loc_36B0:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+16j
 		mov	al, [bp+arg_2]
 		mov	ah, 0
 		cmp	ax, si
@@ -301,13 +312,13 @@ loc_36B0:				; CODE XREF: sub_3604+16j
 		jmp	loc_361D
 ; ���������������������������������������������������������������������������
 
-loc_36BC:				; CODE XREF: sub_3604+B3j
+loc_36BC:				; CODE XREF: Gameflow_CheckSpriteRequirements_3604+B3j
 		mov	al, [bp+var_1]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_3604	endp
+Gameflow_CheckSpriteRequirements_3604	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -315,7 +326,7 @@ sub_3604	endp
 		leave
 		retf
 ; ���������������������������������������������������������������������������
-off_36C7	dw offset loc_363F	; DATA XREF: sub_3604+36r
+off_36C7	dw offset loc_363F	; DATA XREF: Gameflow_CheckSpriteRequirements_3604+36r
 		dw offset loc_365F	; jump table for switch	statement
 		dw offset loc_3682
 		dw offset loc_3699
@@ -325,17 +336,17 @@ off_36C7	dw offset loc_363F	; DATA XREF: sub_3604+36r
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE en partie 2026-10-22. Parcourt une suite de paires d'octets (commande, argument) ;
-; 39 commandes (table off_3ABD). Blocs conditionnels : un test qui échoue pose var_1, les
-; commandes suivantes sont sautées jusqu'à 1Eh (bascule, « sinon ») ou 1Fh (fin), les tests
-; imbriqués (09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h, 23h, 25h) étant comptés dans var_4. Commande 0
-; : Gameflow_PlayConversation_4AAAB(argument). 14h : bloc joué si [partie+35Bh] ≠ 0 (mission
-; acceptée dans la conversation), 15h : si = 0. 20h : bloc joué si [partie+1FDh+argument] = 1.
-; 1Dh : Gameflow_CheckLossConversations_50645. 24h : si [partie+0EAh] ≠ 0, conversation 253 si
-; [partie+0F8h] = 2, 252 sinon. Autres commandes pas lues.
+; far, LUE 2026-10-22. Interpréteur des scripts EFCT de GAMEFLOW.IFF : suite de paires
+; d'octets (commande, argument), 39 commandes (table off_3ABD, 00h à 26h). Blocs conditionnels
+; : un test qui échoue pose var_1 ; les commandes suivantes sont sautées jusqu'à 1Eh (« sinon
+; », bascule) ou 1Fh (fin), les tests rencontrés pendant le saut (09h, 0Ah, 14h, 15h, 16h,
+; 1Ch, 20h, 23h, 25h) étant comptés dans var_4. 21h n : les tests suivants sont évalués même
+; pendant un saut (erreur « Faulty OR structure in gameflow file » si une autre commande s'y
+; trouve). 1Dh peut arrêter le script (var_3). Détail de chaque commande : GAMEFLOW_SYSTEM.md
+; § 5.
 ; ==============================================================================================
-Gameflow_RunScriptPairs_36CF	proc far		; CODE XREF: sub_3B0B+204p
-					; sub_3D2E+299p
+Gameflow_RunScriptPairs_36CF	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+204p
+					; Gameflow_MainLoop_3D2E+299p
 
 var_A8		= word ptr -0A8h
 var_58		= word ptr -58h
@@ -401,7 +412,7 @@ loc_36FD:				; CODE XREF: Gameflow_RunScriptPairs_36CF+29j
 		cmp	[bp+var_6], 25h	; '%'
 		jz	short loc_3757
 		push	4F7h
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 2
 
 loc_3757:				; CODE XREF: Gameflow_RunScriptPairs_36CF+4Bj Gameflow_RunScriptPairs_36CF+51j ...
@@ -756,7 +767,7 @@ loc_39A5:				; CODE XREF: Gameflow_RunScriptPairs_36CF+13Aj
 		mov	al, [si+0E9h]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 		jmp	loc_3AAA
 ; ���������������������������������������������������������������������������
@@ -861,7 +872,7 @@ loc_3A49:				; CODE XREF: Gameflow_RunScriptPairs_36CF+13Aj
 		mov	al, [si+0E9h]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 		mov	[bp+var_8], 0FDh ; '�'
 		cmp	byte ptr [si+0F8h], 2
@@ -897,7 +908,7 @@ loc_3A92:				; CODE XREF: Gameflow_RunScriptPairs_36CF+13Aj
 		mov	[si+3D7h], al
 		mov	al, [si+3D7h]
 		push	ax
-		call	sub_28CFC
+		call	Music_PlayGameflowTune_28CFC
 		add	sp, 2
 		jmp	short loc_3AAA
 ; ���������������������������������������������������������������������������
@@ -972,7 +983,14 @@ off_3ABD	dw offset loc_380E	; DATA XREF: Gameflow_RunScriptPairs_36CF+13Ar
 
 ; Attributes: bp-based frame
 
-sub_3B0B	proc far		; CODE XREF: sub_3D2E+2D6p
+; ==============================================================================================
+; far, LUE 2026-10-22. Une scène : si [partie+0E3h], la reconstruit (sub_358C,
+; Gameflow_BuildScene_4A60B) ; affiche la scène [partie+0FCh] avec ses sprites visibles,
+; musique [partie+0E9h] (Music_SetGameflowMood_28C73), attend le choix (sub_6162 → numéro de
+; sprite), puis exécute le script EFCT de ce sprite (Gameflow_FindSprite_35C9 : +5 = paires,
+; +7 = longueur) par Gameflow_RunScriptPairs_36CF.
+; ==============================================================================================
+Gameflow_PlayScene_3B0B	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+2D6p
 
 var_11A		= word ptr -11Ah
 var_BD		= dword	ptr -0BDh
@@ -1019,7 +1037,7 @@ arg_0		= word ptr  6
 		call	sub_41F2E
 		add	sp, 2
 
-loc_3B40:				; CODE XREF: sub_3B0B+1Dj
+loc_3B40:				; CODE XREF: Gameflow_PlayScene_3B0B+1Dj
 		mov	al, [si+0FCh]
 		mov	[bp+var_2], al
 		mov	di, [si+0E4h]
@@ -1068,7 +1086,7 @@ loc_3B40:				; CODE XREF: sub_3B0B+1Dj
 		jmp	short loc_3C04
 ; ���������������������������������������������������������������������������
 
-loc_3BF0:				; CODE XREF: sub_3B0B+108j
+loc_3BF0:				; CODE XREF: Gameflow_PlayScene_3B0B+108j
 		mov	bx, [bp+var_4]
 		mov	al, [bx+4]
 		push	ax
@@ -1077,7 +1095,7 @@ loc_3BF0:				; CODE XREF: sub_3B0B+108j
 		call	sub_563B
 		add	sp, 4
 
-loc_3C04:				; CODE XREF: sub_3B0B+E3j
+loc_3C04:				; CODE XREF: Gameflow_PlayScene_3B0B+E3j
 		lea	ax, [bp+var_4]
 		push	ax
 		push	si
@@ -1094,11 +1112,11 @@ loc_3C04:				; CODE XREF: sub_3B0B+E3j
 		mov	al, [bp+var_5]
 		mov	[si+0E9h], al
 
-loc_3C2F:				; CODE XREF: sub_3B0B+11Bj
+loc_3C2F:				; CODE XREF: Gameflow_PlayScene_3B0B+11Bj
 		mov	al, [si+0E9h]
 		mov	ah, 0
 		push	ax
-		call	sub_28C73
+		call	Music_SetGameflowMood_28C73
 		add	sp, 2
 		lea	ax, [bp+var_11A]
 		push	ax
@@ -1133,7 +1151,7 @@ loc_3C2F:				; CODE XREF: sub_3B0B+11Bj
 		add	sp, 2
 		jmp	short $+2
 
-loc_3CA0:				; CODE XREF: sub_3B0B+177j
+loc_3CA0:				; CODE XREF: Gameflow_PlayScene_3B0B+177j
 		push	2
 		lea	ax, [bp+var_39]
 		push	ax
@@ -1162,7 +1180,7 @@ loc_3CA0:				; CODE XREF: sub_3B0B+177j
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_35C9
+		call	near ptr Gameflow_FindSprite_35C9
 		add	sp, 4
 		mov	bx, ax
 		push	word ptr [bx+5]
@@ -1170,7 +1188,7 @@ loc_3CA0:				; CODE XREF: sub_3B0B+177j
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_35C9
+		call	near ptr Gameflow_FindSprite_35C9
 		add	sp, 4
 		mov	bx, ax
 		mov	al, [bx+7]
@@ -1186,19 +1204,30 @@ loc_3CA0:				; CODE XREF: sub_3B0B+177j
 		call	TextFormat_ReleaseAttribute_2EC80
 		add	sp, 4
 
-loc_3D2A:				; CODE XREF: sub_3B0B+20Fj
+loc_3D2A:				; CODE XREF: Gameflow_PlayScene_3B0B+20Fj
 		pop	di
 		pop	si
 		leave
 		retf
-sub_3B0B	endp
+Gameflow_PlayScene_3B0B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_3D2E	proc far		; CODE XREF: sub_3166+19DP
+; ==============================================================================================
+; far, LUE 2026-10-22. Boucle principale du déroulement (machine à états sur [partie+0E8h]) :
+; 1 = retour de vol (Gameflow_ReadMissionResult_4B544 → code de sortie [partie+0F8h] : 2 →
+; cinématique 33, 3 → recharge gensave.tmp, 4 → menu) ; 0 = menu d'accueil
+; (Gameflow_MainMenu_4F1A7) ; 2 = mission suivante ([+0FAh] = [+0FBh], [+0FBh] = FFh) ; 3 =
+; chargement de [partie+93h]. Puis [+0E8h] = 4, [+0E3h] = 1, script de la mission
+; (Gameflow_LoadMissionScript_4A440, Gameflow_RunScriptPairs_36CF sur partie+7, longueur
+; [partie+6]), sauvegarde gensave.tmp si [+0E8h] = 4 ou 2, scènes (Gameflow_PlayScene_3B0B)
+; tant que [+0E8h] = 4. [+0E8h] = 1 : si [+0F9h] ≠ FEh Gameflow_SaveTmpState_4BBA0, puis
+; Gameflow_WriteMissionOrder_4BBF7 et retour (vol dans STRIKE.EXE). GAMEFLOW_SYSTEM.md § 3.
+; ==============================================================================================
+Gameflow_MainLoop_3D2E	proc far		; CODE XREF: sub_3166+19DP
 
 var_5A		= word ptr -5Ah
 var_A		= word ptr -0Ah
@@ -1253,7 +1282,7 @@ arg_0		= word ptr  6
 		call	Palette_Destruct_2D048
 		add	sp, 4
 
-loc_3DA7:				; CODE XREF: sub_3D2E+2EAj
+loc_3DA7:				; CODE XREF: Gameflow_MainLoop_3D2E+2EAj
 		mov	[bp+var_1], 1
 		mov	[bp+var_2], 0
 		mov	[bp+var_3], 0
@@ -1265,7 +1294,7 @@ loc_3DA7:				; CODE XREF: sub_3D2E+2EAj
 		jmp	loc_3E9D	; default
 ; ���������������������������������������������������������������������������
 
-loc_3DC3:				; CODE XREF: sub_3D2E+90j
+loc_3DC3:				; CODE XREF: Gameflow_MainLoop_3D2E+90j
 		shl	bx, 1
 		jmp	cs:off_404D[bx]	; switch jump
 
@@ -1287,7 +1316,7 @@ loc_3DEC:				; DATA XREF: seg002:off_4043o
 		jmp	short loc_3E33	; case 0x0
 ; ���������������������������������������������������������������������������
 
-loc_3DEE:				; CODE XREF: sub_3D2E+B9j
+loc_3DEE:				; CODE XREF: Gameflow_MainLoop_3D2E+B9j
 					; DATA XREF: seg002:off_4043o
 		push	21h ; '!'       ; case 0x2
 		push	si
@@ -1297,7 +1326,7 @@ loc_3DEE:				; CODE XREF: sub_3D2E+B9j
 		jmp	short loc_3E33	; default
 ; ���������������������������������������������������������������������������
 
-loc_3DFF:				; CODE XREF: sub_3D2E+B9j
+loc_3DFF:				; CODE XREF: Gameflow_MainLoop_3D2E+B9j
 					; DATA XREF: seg002:off_4043o
 		push	ds		; case 0x3
 		push	offset a_tmp	; ".tmp"
@@ -1318,17 +1347,17 @@ loc_3DFF:				; CODE XREF: sub_3D2E+B9j
 		jmp	short loc_3E33	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E2A:				; CODE XREF: sub_3D2E+B9j
+loc_3E2A:				; CODE XREF: Gameflow_MainLoop_3D2E+B9j
 					; DATA XREF: seg002:off_4043o
 		mov	byte ptr [si+0E7h], 2 ;	case 0x4
 		mov	[bp+var_2], 1
 
-loc_3E33:				; CODE XREF: sub_3D2E+B5j
-					; sub_3D2E:loc_3DECj ...
+loc_3E33:				; CODE XREF: Gameflow_MainLoop_3D2E+B5j
+					; Gameflow_MainLoop_3D2E:loc_3DECj ...
 		jmp	short loc_3EAD	; default
 ; ���������������������������������������������������������������������������
 
-loc_3E35:				; CODE XREF: sub_3D2E+97j
+loc_3E35:				; CODE XREF: Gameflow_MainLoop_3D2E+97j
 					; DATA XREF: seg002:off_404Do
 		cmp	byte ptr [si+0E7h], 0 ;	case 0x0
 		jnz	short loc_3E4E
@@ -1340,12 +1369,12 @@ loc_3E35:				; CODE XREF: sub_3D2E+97j
 		inc	ax
 		mov	[bp+var_3], al
 
-loc_3E4E:				; CODE XREF: sub_3D2E+10Cj
+loc_3E4E:				; CODE XREF: Gameflow_MainLoop_3D2E+10Cj
 		mov	[bp+var_2], 1
 		jmp	short loc_3EAD
 ; ���������������������������������������������������������������������������
 
-loc_3E54:				; CODE XREF: sub_3D2E+97j
+loc_3E54:				; CODE XREF: Gameflow_MainLoop_3D2E+97j
 					; DATA XREF: seg002:off_404Do
 		mov	al, [si+0FBh]	; case 0x2
 		mov	[si+0FAh], al
@@ -1353,7 +1382,7 @@ loc_3E54:				; CODE XREF: sub_3D2E+97j
 		jmp	short loc_3EAD
 ; ���������������������������������������������������������������������������
 
-loc_3E63:				; CODE XREF: sub_3D2E+97j
+loc_3E63:				; CODE XREF: Gameflow_MainLoop_3D2E+97j
 					; DATA XREF: seg002:off_404Do
 		mov	ax, si		; case 0x3
 		add	ax, 93h	; '�'
@@ -1380,23 +1409,23 @@ loc_3E63:				; CODE XREF: sub_3D2E+97j
 		jmp	short loc_3EAD
 ; ���������������������������������������������������������������������������
 
-loc_3E9D:				; CODE XREF: sub_3D2E+92j
+loc_3E9D:				; CODE XREF: Gameflow_MainLoop_3D2E+92j
 		push	25h ; '%'       ; default
 		push	word_432E6
-		call	sub_310B
+		call	Fatal_Error_310B
 		add	sp, 4
 		jmp	short $+2
 
-loc_3EAD:				; CODE XREF: sub_3D2E:loc_3E33j
-					; sub_3D2E+124j ...
+loc_3EAD:				; CODE XREF: Gameflow_MainLoop_3D2E:loc_3E33j
+					; Gameflow_MainLoop_3D2E+124j ...
 		mov	byte ptr [si+0E8h], 4
 		cmp	[bp+var_2], 0
 		jnz	short loc_3EBB
 		jmp	loc_3FA7
 ; ���������������������������������������������������������������������������
 
-loc_3EBB:				; CODE XREF: sub_3D2E+188j
-					; sub_3D2E+276j
+loc_3EBB:				; CODE XREF: Gameflow_MainLoop_3D2E+188j
+					; Gameflow_MainLoop_3D2E+276j
 		mov	[bp+var_4], 1
 		cmp	byte ptr [si+0E7h], 1
 		jnz	short loc_3ECC
@@ -1404,7 +1433,7 @@ loc_3EBB:				; CODE XREF: sub_3D2E+188j
 		jmp	short loc_3EDC
 ; ���������������������������������������������������������������������������
 
-loc_3ECC:				; CODE XREF: sub_3D2E+196j
+loc_3ECC:				; CODE XREF: Gameflow_MainLoop_3D2E+196j
 		mov	al, [bp+var_3]
 		push	ax
 		push	si
@@ -1412,7 +1441,7 @@ loc_3ECC:				; CODE XREF: sub_3D2E+196j
 		add	sp, 4
 		mov	byte ptr [bp+var_6], al
 
-loc_3EDC:				; CODE XREF: sub_3D2E+19Cj
+loc_3EDC:				; CODE XREF: Gameflow_MainLoop_3D2E+19Cj
 		mov	al, byte ptr [bp+var_6]
 		mov	ah, 0
 		mov	bx, ax
@@ -1421,7 +1450,7 @@ loc_3EDC:				; CODE XREF: sub_3D2E+19Cj
 		jmp	loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3EEB:				; CODE XREF: sub_3D2E+1B8j
+loc_3EEB:				; CODE XREF: Gameflow_MainLoop_3D2E+1B8j
 		shl	bx, 1
 		jmp	cs:off_4037[bx]	; switch jump
 
@@ -1435,11 +1464,11 @@ loc_3EF2:				; DATA XREF: seg002:off_4037o
 		call	sub_42020
 		add	sp, 2
 
-loc_3F0B:				; CODE XREF: sub_3D2E+1D2j
+loc_3F0B:				; CODE XREF: Gameflow_MainLoop_3D2E+1D2j
 		jmp	loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F0E:				; CODE XREF: sub_3D2E+1BFj
+loc_3F0E:				; CODE XREF: Gameflow_MainLoop_3D2E+1BFj
 					; DATA XREF: seg002:off_4037o
 		push	ds		; case 0x1
 		push	offset a_tmp	; ".tmp"
@@ -1460,7 +1489,7 @@ loc_3F0E:				; CODE XREF: sub_3D2E+1BFj
 		jmp	short loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F39:				; CODE XREF: sub_3D2E+1BFj
+loc_3F39:				; CODE XREF: Gameflow_MainLoop_3D2E+1BFj
 					; DATA XREF: seg002:off_4037o
 		cmp	byte ptr [si+93h], 0 ; case 0x2
 		jz	short loc_3F4B
@@ -1469,14 +1498,14 @@ loc_3F39:				; CODE XREF: sub_3D2E+1BFj
 		jmp	short loc_3F4F
 ; ���������������������������������������������������������������������������
 
-loc_3F4B:				; CODE XREF: sub_3D2E+210j
+loc_3F4B:				; CODE XREF: Gameflow_MainLoop_3D2E+210j
 		mov	[bp+var_4], 0
 
-loc_3F4F:				; CODE XREF: sub_3D2E+21Bj
+loc_3F4F:				; CODE XREF: Gameflow_MainLoop_3D2E+21Bj
 		jmp	short loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F51:				; CODE XREF: sub_3D2E+1BFj
+loc_3F51:				; CODE XREF: Gameflow_MainLoop_3D2E+1BFj
 					; DATA XREF: seg002:off_4037o
 		push	si		; case 0x3
 		call	sub_4211F
@@ -1489,14 +1518,14 @@ loc_3F51:				; CODE XREF: sub_3D2E+1BFj
 		jmp	short loc_3F72
 ; ���������������������������������������������������������������������������
 
-loc_3F6E:				; CODE XREF: sub_3D2E+22Ej
+loc_3F6E:				; CODE XREF: Gameflow_MainLoop_3D2E+22Ej
 		mov	[bp+var_4], 0
 
-loc_3F72:				; CODE XREF: sub_3D2E+23Ej
+loc_3F72:				; CODE XREF: Gameflow_MainLoop_3D2E+23Ej
 		jmp	short loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F74:				; CODE XREF: sub_3D2E+1BFj
+loc_3F74:				; CODE XREF: Gameflow_MainLoop_3D2E+1BFj
 					; DATA XREF: seg002:off_4037o
 		push	si		; case 0x4
 		call	sub_137FA
@@ -1505,7 +1534,7 @@ loc_3F74:				; CODE XREF: sub_3D2E+1BFj
 		jmp	short loc_3F9B	; default
 ; ���������������������������������������������������������������������������
 
-loc_3F83:				; CODE XREF: sub_3D2E+1BFj
+loc_3F83:				; CODE XREF: Gameflow_MainLoop_3D2E+1BFj
 					; DATA XREF: seg002:off_4037o
 		call	sub_423B5	; case 0x5
 		mov	al, byte_495FC
@@ -1517,8 +1546,8 @@ loc_3F83:				; CODE XREF: sub_3D2E+1BFj
 		mov	[bp+var_4], 0
 		jmp	short $+2
 
-loc_3F9B:				; CODE XREF: sub_3D2E+1BAj
-					; sub_3D2E:loc_3F0Bj ...
+loc_3F9B:				; CODE XREF: Gameflow_MainLoop_3D2E+1BAj
+					; Gameflow_MainLoop_3D2E:loc_3F0Bj ...
 		mov	al, [bp+var_4]	; default
 		mov	ah, 0
 		or	ax, ax
@@ -1526,8 +1555,8 @@ loc_3F9B:				; CODE XREF: sub_3D2E+1BAj
 		jmp	loc_3EBB
 ; ���������������������������������������������������������������������������
 
-loc_3FA7:				; CODE XREF: sub_3D2E+18Aj
-					; sub_3D2E+274j
+loc_3FA7:				; CODE XREF: Gameflow_MainLoop_3D2E+18Aj
+					; Gameflow_MainLoop_3D2E+274j
 		mov	byte ptr [si+0E3h], 1
 		cmp	[bp+var_1], 0
 		jz	short loc_4000
@@ -1548,7 +1577,7 @@ loc_3FA7:				; CODE XREF: sub_3D2E+18Aj
 		cmp	byte ptr [si+0E8h], 2
 		jnz	short loc_4000
 
-loc_3FDB:				; CODE XREF: sub_3D2E+2A4j
+loc_3FDB:				; CODE XREF: Gameflow_MainLoop_3D2E+2A4j
 		push	ds
 		push	offset a_tmp	; ".tmp"
 		push	ds
@@ -1565,18 +1594,18 @@ loc_3FDB:				; CODE XREF: sub_3D2E+2A4j
 		call	sub_41FB7
 		add	sp, 4
 
-loc_4000:				; CODE XREF: sub_3D2E+282j
-					; sub_3D2E+2ABj
+loc_4000:				; CODE XREF: Gameflow_MainLoop_3D2E+282j
+					; Gameflow_MainLoop_3D2E+2ABj
 		jmp	short loc_400A
 ; ���������������������������������������������������������������������������
 
-loc_4002:				; CODE XREF: sub_3D2E+2E1j
+loc_4002:				; CODE XREF: Gameflow_MainLoop_3D2E+2E1j
 		push	si
 		push	cs
-		call	near ptr sub_3B0B
+		call	near ptr Gameflow_PlayScene_3B0B
 		add	sp, 2
 
-loc_400A:				; CODE XREF: sub_3D2E:loc_4000j
+loc_400A:				; CODE XREF: Gameflow_MainLoop_3D2E:loc_4000j
 		cmp	byte ptr [si+0E8h], 4
 		jz	short loc_4002
 		cmp	byte ptr [si+0E8h], 1
@@ -1584,35 +1613,35 @@ loc_400A:				; CODE XREF: sub_3D2E:loc_4000j
 		jmp	loc_3DA7
 ; ���������������������������������������������������������������������������
 
-loc_401B:				; CODE XREF: sub_3D2E+2E8j
+loc_401B:				; CODE XREF: Gameflow_MainLoop_3D2E+2E8j
 		cmp	byte ptr [si+0F9h], 0FEh ; '�'
 		jz	short loc_402B
 		push	si
 		call	sub_41F51
 		add	sp, 2
 
-loc_402B:				; CODE XREF: sub_3D2E+2F2j
+loc_402B:				; CODE XREF: Gameflow_MainLoop_3D2E+2F2j
 		push	si
 		call	sub_41F56
 		add	sp, 2
 		pop	si
 		leave
 		retf
-sub_3D2E	endp
+Gameflow_MainLoop_3D2E	endp
 
 ; ���������������������������������������������������������������������������
-off_4037	dw offset loc_3EF2	; DATA XREF: sub_3D2E+1BFr
+off_4037	dw offset loc_3EF2	; DATA XREF: Gameflow_MainLoop_3D2E+1BFr
 		dw offset loc_3F0E	; jump table for switch	statement
 		dw offset loc_3F39
 		dw offset loc_3F51
 		dw offset loc_3F74
 		dw offset loc_3F83
-off_4043	dw offset loc_3DEC	; DATA XREF: sub_3D2E+B9r
+off_4043	dw offset loc_3DEC	; DATA XREF: Gameflow_MainLoop_3D2E+B9r
 		dw offset loc_3DEC	; jump table for switch	statement
 		dw offset loc_3DEE
 		dw offset loc_3DFF
 		dw offset loc_3E2A
-off_404D	dw offset loc_3E35	; DATA XREF: sub_3D2E+97r
+off_404D	dw offset loc_3E35	; DATA XREF: Gameflow_MainLoop_3D2E+97r
 		dw offset loc_3DCA	; jump table for switch	statement
 		dw offset loc_3E54
 		dw offset loc_3E63
@@ -1735,7 +1764,7 @@ sub_409A	endp
 
 ; Attributes: bp-based frame
 
-sub_40F3	proc far		; CODE XREF: sub_3B0B+159p
+sub_40F3	proc far		; CODE XREF: Gameflow_PlayScene_3B0B+159p
 					; seg002:0DC0p	...
 
 var_2		= word ptr -2

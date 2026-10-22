@@ -82,7 +82,7 @@ arg_0		= word ptr  6
 
 loc_3EE75:				; CODE XREF: Stopwatch_RegisterTickModule_3EE35+28j
 		push	4A9Fh
-		call	sub_310B
+		call	Fatal_Error_310B
 
 loc_3EE7D:				; CODE XREF: Stopwatch_RegisterTickModule_3EE35+3Ej
 		pop	cx
