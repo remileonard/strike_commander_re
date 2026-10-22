@@ -607,7 +607,12 @@ sub_50160	endp
 
 ; Attributes: bp-based frame
 
-sub_50645	proc far		; CODE XREF: sub_4205AJ
+; ==============================================================================================
+; far, LUE en partie 2026-10-22. Si [partie+3D4h] (avions perdus au total) > 16 : conversation
+; 254 (assurance perdue) ; sinon si [partie+27Bh] (dword) < 0 : conversation 255. Puis
+; sub_4268A(1), [+0E8h] = 0, [+0E7h] = 2.
+; ==============================================================================================
+Gameflow_CheckLossConversations_50645	proc far		; CODE XREF: sub_4205AJ
 
 var_3		= byte ptr -3
 var_2		= byte ptr -2
@@ -627,13 +632,13 @@ arg_0		= word ptr  6
 		jmp	short loc_50670
 ; ���������������������������������������������������������������������������
 
-loc_50664:				; CODE XREF: sub_50645+17j
+loc_50664:				; CODE XREF: Gameflow_CheckLossConversations_50645+17j
 		cmp	dword ptr [si+27Bh], 0
 		jge	short loc_50670
 		mov	[bp+var_2], 0FFh
 
-loc_50670:				; CODE XREF: sub_50645+1Dj
-					; sub_50645+25j
+loc_50670:				; CODE XREF: Gameflow_CheckLossConversations_50645+1Dj
+					; Gameflow_CheckLossConversations_50645+25j
 		cmp	[bp+var_2], 0
 		jz	short loc_5069B
 		mov	[bp+var_1], 1
@@ -648,14 +653,14 @@ loc_50670:				; CODE XREF: sub_50645+1Dj
 		mov	byte ptr [si+0E8h], 0
 		mov	byte ptr [si+0E7h], 2
 
-loc_5069B:				; CODE XREF: sub_50645+2Fj
+loc_5069B:				; CODE XREF: Gameflow_CheckLossConversations_50645+2Fj
 		mov	al, [bp+var_1]
 		mov	[bp+var_3], al
 		mov	al, [bp+var_3]
 		pop	si
 		leave
 		retf
-sub_50645	endp
+Gameflow_CheckLossConversations_50645	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si

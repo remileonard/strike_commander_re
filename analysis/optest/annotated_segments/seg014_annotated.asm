@@ -823,7 +823,7 @@ sub_9811	endp
 ; ; image de base +2118 = image affichée +2124 = -1 ; bouche +2122 = -1 ; +2120 = 34 ; +2126 =
 ; 0 ; mode voix +2129 = 0 ; clignement permis +2130 = 1.
 ; ==============================================================================================
-TalkingHead_Construct_98F4	proc far		; CODE XREF: seg014:0E60p sub_A207+27p ...
+TalkingHead_Construct_98F4	proc far		; CODE XREF: seg014:0E60p ConvFigure_ConstructSpeaking_A207+27p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1826,7 +1826,12 @@ loc_A0C8:				; CODE XREF: seg014:loc_A004j
 
 ; Attributes: bp-based frame
 
-sub_A0D5	proc far		; CODE XREF: Conv_PlayScript_5AA4E+78CP
+; ==============================================================================================
+; far, LUE 2026-10-22. Vrai (1) si la tête n'a pas de texte de lèvres ([+1Dh] = 0) ou si le
+; curseur [+1Fh] est sur la fin de la chaîne ; faux sinon. Les conversations attendent ainsi
+; la fin d'une réplique.
+; ==============================================================================================
+TalkingHead_IsLipTextDone_A0D5	proc far		; CODE XREF: Conv_PlayScript_5AA4E+78CP
 					; Conv_PlayScript_5AA4E+DC0P ...
 
 arg_0		= word ptr  6
@@ -1847,7 +1852,7 @@ arg_0		= word ptr  6
 		jmp	short loc_A0FD
 ; ���������������������������������������������������������������������������
 
-loc_A0E9:				; CODE XREF: sub_A0D5+Bj
+loc_A0E9:				; CODE XREF: TalkingHead_IsLipTextDone_A0D5+Bj
 		mov	bx, [si+1Fh]
 		cmp	byte ptr [bx], 0
 		jz	short loc_A0F8
@@ -1859,21 +1864,21 @@ loc_A0E9:				; CODE XREF: sub_A0D5+Bj
 		jmp	short loc_A0FD
 ; ���������������������������������������������������������������������������
 
-loc_A0F8:				; CODE XREF: sub_A0D5+1Aj
+loc_A0F8:				; CODE XREF: TalkingHead_IsLipTextDone_A0D5+1Aj
 		mov	al, 1
 		pop	si
 		pop	bp
 		retf
-sub_A0D5	endp
+TalkingHead_IsLipTextDone_A0D5	endp
 
 ; ���������������������������������������������������������������������������
-; START	OF FUNCTION CHUNK FOR sub_A0D5
+; START	OF FUNCTION CHUNK FOR TalkingHead_IsLipTextDone_A0D5
 
-loc_A0FD:				; CODE XREF: sub_A0D5+12j sub_A0D5+21j
+loc_A0FD:				; CODE XREF: TalkingHead_IsLipTextDone_A0D5+12j TalkingHead_IsLipTextDone_A0D5+21j
 		pop	si
 		pop	bp
 		retf
-; END OF FUNCTION CHUNK	FOR sub_A0D5
+; END OF FUNCTION CHUNK	FOR TalkingHead_IsLipTextDone_A0D5
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
@@ -2015,7 +2020,13 @@ loc_A1FF:				; CODE XREF: seg014:0E55j
 
 ; Attributes: bp-based frame
 
-sub_A207	proc far		; CODE XREF: Conv_PlayScript_5AA4E+414P
+; ==============================================================================================
+; far, LUE 2026-10-22. Personnage qui parle d'une scène de groupe (commande 02h) :
+; TalkingHead_Construct_98F4 (855h octets), tables 182Bh / 184Fh. Avance (loc_A3E1) : une
+; lettre du texte de lèvres par image, bouche [+84Ah] = table « 04302500000340143000353000 »
+; (dseg 15B1h, lettres a à z) + 1, −1 hors minuscule. Dessin ConvFigure_DrawSpeaking_A2B7.
+; ==============================================================================================
+ConvFigure_ConstructSpeaking_A207	proc far		; CODE XREF: Conv_PlayScript_5AA4E+414P
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -2035,7 +2046,7 @@ arg_6		= word ptr  0Ch
 		or	ax, ax
 		jz	short loc_A23D
 
-loc_A223:				; CODE XREF: sub_A207+9j
+loc_A223:				; CODE XREF: ConvFigure_ConstructSpeaking_A207+9j
 		push	[bp+arg_6]
 		push	[bp+arg_4]
 		push	[bp+arg_2]
@@ -2046,12 +2057,12 @@ loc_A223:				; CODE XREF: sub_A207+9j
 		mov	word ptr [si], 182Bh
 		mov	word ptr [si+0Ah], 184Fh
 
-loc_A23D:				; CODE XREF: sub_A207+1Aj
+loc_A23D:				; CODE XREF: ConvFigure_ConstructSpeaking_A207+1Aj
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_A207	endp
+ConvFigure_ConstructSpeaking_A207	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -2110,7 +2121,11 @@ loc_A2AF:				; CODE XREF: seg014:0ECFj
 
 ; Attributes: bp-based frame
 
-sub_A2B7	proc far		; CODE XREF: seg014:101Bp seg014:1048p
+; ==============================================================================================
+; far, LUE 2026-10-22. Dessine le personnage qui parle : image 0 de sa forme (corps) en (x,
+; y), puis l'image [+84Ah] (bouche) au même point si ≠ −1, puis les enfants (méthode +10h).
+; ==============================================================================================
+ConvFigure_DrawSpeaking_A2B7	proc far		; CODE XREF: seg014:101Bp seg014:1048p
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -2175,12 +2190,12 @@ arg_4		= word ptr  0Ah
 		add	sp, 0Ch
 		jmp	short $+2
 
-loc_A348:				; CODE XREF: sub_A2B7+49j sub_A2B7+5Fj
+loc_A348:				; CODE XREF: ConvFigure_DrawSpeaking_A2B7+49j ConvFigure_DrawSpeaking_A2B7+5Fj
 		mov	[bp+var_C], 0
 		jmp	short loc_A367
 ; ���������������������������������������������������������������������������
 
-loc_A34F:				; CODE XREF: sub_A2B7+C4j
+loc_A34F:				; CODE XREF: ConvFigure_DrawSpeaking_A2B7+C4j
 		push	[bp+arg_4]
 		push	di
 		mov	bx, [bp+var_C]
@@ -2191,7 +2206,7 @@ loc_A34F:				; CODE XREF: sub_A2B7+C4j
 		call	dword ptr [bx+10h]
 		add	sp, 6
 
-loc_A367:				; CODE XREF: sub_A2B7+96j
+loc_A367:				; CODE XREF: ConvFigure_DrawSpeaking_A2B7+96j
 		lea	ax, [bp+var_C]
 		push	ax
 		mov	ax, si
@@ -2205,7 +2220,7 @@ loc_A367:				; CODE XREF: sub_A2B7+96j
 		pop	si
 		leave
 		retf
-sub_A2B7	endp
+ConvFigure_DrawSpeaking_A2B7	endp
 
 ; ���������������������������������������������������������������������������
 
@@ -2230,7 +2245,7 @@ loc_A381:				; CODE XREF: seg014:2B78j
 		push	word ptr [bp-2]
 		push	si
 		push	cs
-		call	near ptr sub_A2B7
+		call	near ptr ConvFigure_DrawSpeaking_A2B7
 		add	sp, 6
 		pop	si
 		leave
@@ -2254,14 +2269,19 @@ loc_A3B4:				; CODE XREF: seg014:2B60j
 		push	word ptr [bp-2]
 		push	si
 		push	cs
-		call	near ptr sub_A2B7
+		call	near ptr ConvFigure_DrawSpeaking_A2B7
 		add	sp, 6
 		pop	si
 		leave
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_A3E1:				; DATA XREF: dseg:1847o
+; ==============================================================================================
+; far, LUE 2026-10-22. Méthode +1Ch du personnage qui parle : lettre suivante du texte de
+; lèvres ; bouche [+84Ah] = chiffre de la table dseg 15B1h pour la lettre (a à z) + 1, −1
+; sinon ; puis avance des enfants.
+; ==============================================================================================
+ConvFigure_AdvanceSpeaking_A3E1:				; DATA XREF: dseg:1847o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -3163,7 +3183,14 @@ loc_AB63:				; CODE XREF: seg014:1780j seg014:17CDj
 
 ; Attributes: bp-based frame
 
-sub_AB6B	proc far		; CODE XREF: Conv_PlayScript_5AA4E+2ABP
+; ==============================================================================================
+; far, LUE 2026-10-22. Figurant d'une scène de groupe (commande 01h) : Layer_Construct_2DF9B
+; (21h octets), tables 176Bh / 178Bh ; [+20h] = dernier caractère du nom de figure. Si la
+; forme a plus d'une image et que ce caractère est > « 3 », mode animé ([+1Dh] = 1, image
+; [+1Bh] = 1). Dessin loc_ABEB : image 0, puis en mode animé l'image courante ; avance
+; loc_AC58 : image 1 à n − 1 en boucle.
+; ==============================================================================================
+ConvFigure_ConstructExtra_AB6B	proc far		; CODE XREF: Conv_PlayScript_5AA4E+2ABP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -3184,7 +3211,7 @@ arg_8		= byte ptr  0Eh
 		or	ax, ax
 		jz	short loc_ABE3
 
-loc_AB86:				; CODE XREF: sub_AB6B+9j
+loc_AB86:				; CODE XREF: ConvFigure_ConstructExtra_AB6B+9j
 		push	[bp+arg_6]
 		push	[bp+arg_4]
 		push	[bp+arg_2]
@@ -3216,15 +3243,15 @@ loc_AB86:				; CODE XREF: sub_AB6B+9j
 		jmp	short loc_ABE3
 ; ���������������������������������������������������������������������������
 
-loc_ABDF:				; CODE XREF: sub_AB6B+61j sub_AB6B+67j
+loc_ABDF:				; CODE XREF: ConvFigure_ConstructExtra_AB6B+61j ConvFigure_ConstructExtra_AB6B+67j
 		mov	byte ptr [si+1Dh], 0
 
-loc_ABE3:				; CODE XREF: sub_AB6B+19j sub_AB6B+72j
+loc_ABE3:				; CODE XREF: ConvFigure_ConstructExtra_AB6B+19j ConvFigure_ConstructExtra_AB6B+72j
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_AB6B	endp
+ConvFigure_ConstructExtra_AB6B	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -3232,7 +3259,11 @@ sub_AB6B	endp
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_ABEB:				; CODE XREF: seg014:29FBj
+; ==============================================================================================
+; far, LUE 2026-10-22. Méthode +10h du figurant : image 0 de sa forme en (x, y) ; puis, en
+; mode animé ([+1Dh] ≠ 0), l'image courante [+1Bh] (Layer_DrawAtOwnPos_2E202).
+; ==============================================================================================
+ConvFigure_DrawExtra_ABEB:				; CODE XREF: seg014:29FBj
 					; DATA XREF: dseg:177Bo
 		push	bp
 		mov	bp, sp
@@ -3281,7 +3312,11 @@ loc_AC55:				; CODE XREF: seg014:18BAj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_AC58:				; DATA XREF: dseg:1787o
+; ==============================================================================================
+; far, LUE 2026-10-22. Méthode +1Ch du figurant : en mode animé, image +1 jusqu'à n − 1 puis
+; retour à 1 ; puis avance des enfants.
+; ==============================================================================================
+ConvFigure_AdvanceExtra_AC58:				; DATA XREF: dseg:1787o
 		push	bp
 		mov	bp, sp
 		push	si
@@ -5765,7 +5800,7 @@ loc_BD82:				; DATA XREF: dseg:1797o
 		add	word ptr ss:[bx+4], 0FFF6h
 		nop
 		nop
-		jmp	loc_ABEB
+		jmp	ConvFigure_DrawExtra_ABEB
 ; ���������������������������������������������������������������������������
 
 loc_BD8E:				; DATA XREF: dseg:1793o

@@ -114,8 +114,8 @@ sub_41FB2	endp
 
 ; Attributes: thunk
 
-sub_41FB7	proc far		; CODE XREF: sub_36CF+227P
-					; sub_36CF+24CP ...
+sub_41FB7	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+227P
+					; Gameflow_RunScriptPairs_36CF+24CP ...
 		jmp	sub_4DAE8
 sub_41FB7	endp
 
@@ -133,7 +133,7 @@ sub_41FBC	endp
 
 ; Attributes: thunk
 
-sub_41FC1	proc far		; CODE XREF: sub_36CF+212P
+sub_41FC1	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+212P
 		jmp	sub_4D984
 sub_41FC1	endp
 
@@ -142,7 +142,7 @@ sub_41FC1	endp
 
 ; Attributes: thunk
 
-sub_41FC6	proc far		; CODE XREF: sub_36CF+25AP
+sub_41FC6	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+25AP
 					; sub_4F1A7+CBEP
 		jmp	sub_4DDDC
 sub_41FC6	endp

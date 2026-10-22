@@ -14,7 +14,7 @@ stru_42600	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:0746o
 
 ; Attributes: thunk
 
-sub_42620	proc near		; CODE XREF: sub_4ABE0+12DP
+sub_42620	proc near		; CODE XREF: Gameflow_PlayMidgame_4ABE0+12DP
 		jmp	far ptr	loc_B6FF0
 sub_42620	endp
 

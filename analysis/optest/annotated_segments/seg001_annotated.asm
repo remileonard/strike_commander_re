@@ -47,7 +47,7 @@ sub_30D3	endp
 
 ; Attributes: bp-based frame
 
-sub_310B	proc far		; CODE XREF: sub_30D3+2Fp sub_36CF+80P ...
+sub_310B	proc far		; CODE XREF: sub_30D3+2Fp Gameflow_RunScriptPairs_36CF+80P ...
 
 var_102		= word ptr -102h
 var_2		= word ptr -2

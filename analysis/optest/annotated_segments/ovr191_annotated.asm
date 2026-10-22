@@ -6,7 +6,12 @@ ovr191		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_59A20	proc far		; CODE XREF: sub_42221J sub_59B67+94p	...
+; ==============================================================================================
+; far, LUE 2026-10-22. [+6Bh] = dernier indice i (0 à 6) dont le drapeau dseg 0EE6h+i ≠ 0,
+; [+6Ch] = dernier autre ; indices des noms $A/$B (table 0ED8h). Zone de texte (0, 24)-(319,
+; 151), écran (0, 0)-(319, 199) ; police ..\..\data\fonts\convfont.shp.
+; ==============================================================================================
+Conv_Init_59A20	proc far		; CODE XREF: sub_42221J Conv_Construct_59B67+94p	...
 
 var_60		= word ptr -60h
 var_10		= dword	ptr -10h
@@ -26,24 +31,24 @@ arg_0		= word ptr  6
 		jmp	short loc_59A44
 ; ���������������������������������������������������������������������������
 
-loc_59A31:				; CODE XREF: sub_59A20+28j
+loc_59A31:				; CODE XREF: Conv_Init_59A20+28j
 		mov	bx, [bp+var_2]
 		cmp	byte ptr [bx+0EE6h], 0
 		jz	short loc_59A41
 		mov	al, byte ptr [bp+var_2]
 		mov	[si+6Bh], al
 
-loc_59A41:				; CODE XREF: sub_59A20+19j
+loc_59A41:				; CODE XREF: Conv_Init_59A20+19j
 		inc	[bp+var_2]
 
-loc_59A44:				; CODE XREF: sub_59A20+Fj
+loc_59A44:				; CODE XREF: Conv_Init_59A20+Fj
 		cmp	[bp+var_2], 7
 		jl	short loc_59A31
 		mov	[bp+var_2], 0
 		jmp	short loc_59A6E
 ; ���������������������������������������������������������������������������
 
-loc_59A51:				; CODE XREF: sub_59A20+52j
+loc_59A51:				; CODE XREF: Conv_Init_59A20+52j
 		mov	bx, [bp+var_2]
 		cmp	byte ptr [bx+0EE6h], 0
 		jz	short loc_59A6B
@@ -54,11 +59,11 @@ loc_59A51:				; CODE XREF: sub_59A20+52j
 		mov	al, byte ptr [bp+var_2]
 		mov	[si+6Ch], al
 
-loc_59A6B:				; CODE XREF: sub_59A20+39j
-					; sub_59A20+43j
+loc_59A6B:				; CODE XREF: Conv_Init_59A20+39j
+					; Conv_Init_59A20+43j
 		inc	[bp+var_2]
 
-loc_59A6E:				; CODE XREF: sub_59A20+2Fj
+loc_59A6E:				; CODE XREF: Conv_Init_59A20+2Fj
 		cmp	[bp+var_2], 7
 		jl	short loc_59A51
 		push	word_46F44
@@ -128,22 +133,27 @@ loc_59A6E:				; CODE XREF: sub_59A20+2Fj
 		add	sp, 8
 		jmp	short $+2
 
-loc_59B50:				; CODE XREF: sub_59A20+110j
-					; sub_59A20+117j
+loc_59B50:				; CODE XREF: Conv_Init_59A20+110j
+					; Conv_Init_59A20+117j
 		mov	[bp+var_C], 0
 		mov	[bp+var_7], 0
 		mov	[bp+var_6], 0
 		pop	si
 		leave
 		retf
-sub_59A20	endp
+Conv_Init_59A20	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_59B67	proc far		; CODE XREF: sub_4222BJ
+; ==============================================================================================
+; far, LUE 2026-10-22. Objet conversation (6Eh octets, alloué si nul) : Conv_Init_59A20,
+; chaînes du joueur [+28h] = arg_4, tampon des équipiers et réponse [+2Ah] = arg_6, entrée du
+; PAK [+6Dh] = arg_2, puis Conv_LoadScriptFromPak_59DAA.
+; ==============================================================================================
+Conv_Construct_59B67	proc far		; CODE XREF: sub_4222BJ
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -165,8 +175,8 @@ arg_6		= word ptr  0Ch
 		jmp	loc_59C1C
 ; ���������������������������������������������������������������������������
 
-loc_59B85:				; CODE XREF: sub_59B67+9j
-					; sub_59B67+19j
+loc_59B85:				; CODE XREF: Conv_Construct_59B67+9j
+					; Conv_Construct_59B67+19j
 		xor	eax, eax
 		mov	[si+4],	eax
 		mov	[si], eax
@@ -198,7 +208,7 @@ loc_59B85:				; CODE XREF: sub_59B67+9j
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_59A20
+		call	near ptr Conv_Init_59A20
 		add	sp, 2
 		mov	ax, [bp+arg_4]
 		mov	[si+28h], ax
@@ -212,12 +222,12 @@ loc_59B85:				; CODE XREF: sub_59B67+9j
 		call	near ptr Conv_LoadScriptFromPak_59DAA
 		add	sp, 2
 
-loc_59C1C:				; CODE XREF: sub_59B67+1Bj
+loc_59C1C:				; CODE XREF: Conv_Construct_59B67+1Bj
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_59B67	endp
+Conv_Construct_59B67	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -283,7 +293,7 @@ loc_59C42:				; CODE XREF: sub_59C24+9j
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_59A20
+		call	near ptr Conv_Init_59A20
 		add	sp, 2
 		mov	ax, [bp+arg_4]
 		mov	[si+28h], ax
@@ -409,7 +419,7 @@ sub_59CDE	endp
 ; far, LUE 2026-10-22. Ouvre ..\..\data\gameflow\conv.pak, lit l'entrée [arg_0+6Dh] en mémoire
 ; telle quelle : [arg_0] = [arg_0+4] = adresse, [arg_0+8] = taille.
 ; ==============================================================================================
-Conv_LoadScriptFromPak_59DAA	proc far		; CODE XREF: sub_421EAJ sub_59B67+AFp
+Conv_LoadScriptFromPak_59DAA	proc far		; CODE XREF: sub_421EAJ Conv_Construct_59B67+AFp
 
 var_D6		= word ptr -0D6h
 var_75		= dword	ptr -75h
@@ -2350,7 +2360,7 @@ loc_5AC86:				; CODE XREF: Conv_PlayScript_5AA4E+377j
 		add	ax, dx
 		push	ax
 		push	0
-		call	sub_AB6B
+		call	ConvFigure_ConstructExtra_AB6B
 		add	sp, 0Ah
 		mov	word ptr [bp+var_62+2],	ax
 		push	word ptr [bp+var_62+2]
@@ -2494,7 +2504,7 @@ loc_5ADF2:				; CODE XREF: Conv_PlayScript_5AA4E+39Fj
 		add	ax, dx
 		push	ax
 		push	0
-		call	sub_A207
+		call	ConvFigure_ConstructSpeaking_A207
 		add	sp, 8
 		mov	si, ax
 		mov	al, [bp+var_41]
@@ -2839,7 +2849,7 @@ loc_5B1CE:				; CODE XREF: Conv_PlayScript_5AA4E+766j
 		lea	ax, [bp+var_1BC]
 		add	bx, ax
 		push	word ptr [bx]
-		call	sub_A0D5
+		call	TalkingHead_IsLipTextDone_A0D5
 		add	sp, 2
 		mov	ah, 0
 		or	ax, ax
@@ -3512,7 +3522,7 @@ loc_5B7FE:				; CODE XREF: Conv_PlayScript_5AA4E+DA7j
 loc_5B80B:				; CODE XREF: Conv_PlayScript_5AA4E+D9Ej
 					; Conv_PlayScript_5AA4E+DAEj
 		push	[bp+var_70]
-		call	sub_A0D5
+		call	TalkingHead_IsLipTextDone_A0D5
 		add	sp, 2
 		mov	ah, 0
 		or	ax, ax
@@ -3643,7 +3653,7 @@ loc_5B917:				; CODE XREF: Conv_PlayScript_5AA4E+EC0j
 loc_5B924:				; CODE XREF: Conv_PlayScript_5AA4E+EB7j
 					; Conv_PlayScript_5AA4E+EC7j
 		push	[bp+var_70]
-		call	sub_A0D5
+		call	TalkingHead_IsLipTextDone_A0D5
 		add	sp, 2
 		mov	ah, 0
 		or	ax, ax

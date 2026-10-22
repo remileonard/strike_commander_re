@@ -75,8 +75,17 @@ Puis, autant de fois qu'ils se suivent :
 | 02h (répété) | nom de figure (9), x, y, octet couleur, `[voix]`, chaîne | personnage qui parle, calque `sub_A207` (pas lu), lèvres synchronisées sur le texte |
 | 0Ah (répété, mêlé aux 02h) | octet couleur, `[voix]`, chaîne | texte sans personnage |
 
-Les répliques 02h / 0Ah sont jouées dans l'ordre après la lecture de toute la scène ; chacune
-attend la fin des lèvres (`sub_A0D5`, pas lue) ou 40 images.
+Les répliques 02h / 0Ah sont jouées dans l'ordre après la lecture de toute la scène ; une 02h
+attend la fin de son texte de lèvres (`TalkingHead_IsLipTextDone_A0D5`), une 0Ah attend 40 images.
+
+- **Figurant** (`ConvFigure_ConstructExtra_AB6B`) : image 0 de sa forme (`FIGR`) en (x, y). Si la
+  forme a plus d'une image et que le dernier caractère du nom est au-delà de « 3 », il dessine en
+  plus une image qui boucle de 1 à n − 1 (une image par image de scène). Les noms des données
+  finissent tous par 1, 2 ou 3 : figurants fixes.
+- **Personnage qui parle** (`ConvFigure_ConstructSpeaking_A207`, tête parlante à table 182Bh) :
+  image 0 = corps, puis la bouche au même point. À chaque image, lettre suivante du texte ; bouche =
+  chiffre de « 04302500000340143000353000 » pour les lettres a à z (dseg 15B1h) + 1, aucune hors des
+  minuscules (ConvFigure_AdvanceSpeaking_A3E1).
 
 ### 0Eh / 0Fh — escadre et équipiers
 
@@ -93,11 +102,18 @@ attend la fin des lèvres (`sub_A0D5`, pas lue) ou 40 images.
 
 | Code | Remplacé par |
 |---|---|
-| `$S`, `$N`, `$C` | trois chaînes du joueur (`[[conv + 28h] + 0]`, `+2`, `+4` ; sens non établi) |
+| `$S` | nom de famille du joueur (partie + 398h) |
+| `$N` | prénom (partie + 3ACh) |
+| `$C` | indicatif (partie + 3C0h) |
 | `$W`, `$L`, `$O` | équipiers posés par 0Eh / 0Fh |
 | `$A`, `$B` | table 0ED8h, indices `[conv + 6Bh]`, `[conv + 6Ch]` |
-| `$P`, `$T` | nombre (`[[conv + 28h] + 6]`, `+8`) suivi de « plane », « planes » si ≠ 1 |
+| `$P` | avions perdus pendant la mission (partie + 0EAh), suivi de « plane » / « planes » |
+| `$T` | avions perdus au total (partie + 3D4h), même suffixe |
 | `$` + autre | « $ » gardé |
+
+Sens de `$S`, `$N`, `$C` : les trois chaînes sont passées aux cinématiques dans l'ordre prénom,
+nom, indicatif (`Gameflow_PlayMidgame_4ABE0`), et mid33 grave « prénom nom » puis « 'indicatif' » sur
+la croix (`MID1_PLANS.md`, mid33). Sens de `$P`, `$T` : conversations 252 à 255 ci-dessous.
 
 Puis le texte est coupé aux espaces en lignes de 30 caractères au plus, dessinées à y = 4, 19, 34…
 de la zone de texte (format « %Y%J%S »).
@@ -121,9 +137,23 @@ de la zone de texte (format « %Y%J%S »).
 proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) → branche « Good… » → 0Ch
 (+78, jusqu'à la fin) → branche du refus « All right, but I'd reconsider… ».
 
-## 5. Points ouverts
+## 5. Lancement d'une conversation
 
-- Rôle exact de `$S`, `$N`, `$C` (chaînes du joueur) et de `$P`, `$T` (deux compteurs d'avions).
-- Calques `sub_AB6B` (figurant) et `sub_A207` (personnage qui parle), attente `sub_A0D5` : pas lus.
-- Qui choisit l'entrée `[conv + 6Dh]` du PAK (appelant de `Conv_LoadScriptFromPak_59DAA`).
+- Script de partie (`Gameflow_RunScriptPairs_36CF`, seg002) : suite de paires d'octets (commande,
+  argument) ; **commande 0 = conversation numéro `argument`** (entrée de `CONV.PAK`), jouée par
+  `Gameflow_PlayConversation_4AAAB` → `Conv_Construct_59B67` → `Conv_PlayScript_5AA4E`.
+- Conversations lancées par le code :
+  - **254** si les avions perdus au total dépassent 16 (« The insurance company has dropped our
+    policy »), **255** si l'argent (dword partie + 27Bh) devient négatif
+    (`Gameflow_CheckLossConversations_50645`) ;
+  - commande 24h du script de partie, si des avions ont été perdus pendant la mission : **253** si
+    partie + 0F8h = 2, **252** sinon (Miguel : « we lost $P that mission »).
+- La réponse à 0Bh est rangée dans le premier octet du tampon `[conv + 2Ah]` (partie + 35Bh) :
+  1 = « Accept Mission », 0 = refus.
+
+## 6. Points ouverts
+
+- Les 37 autres commandes du script de partie (`Gameflow_RunScriptPairs_36CF`) et le chunk de
+  `GAMEFLOW.IFF` qui les contient.
+- Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
 - Version du code qui lit `[voix]` : pas dans cet OPTEST.EXE.

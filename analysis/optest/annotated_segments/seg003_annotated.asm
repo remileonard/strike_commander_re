@@ -7,7 +7,7 @@ seg003		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_43D8	proc far		; CODE XREF: sub_59B67+8AP
+sub_43D8	proc far		; CODE XREF: Conv_Construct_59B67+8AP
 					; sub_59C24+8AP
 
 arg_0		= word ptr  6

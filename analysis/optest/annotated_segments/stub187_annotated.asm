@@ -24,7 +24,7 @@ sub_42050	endp
 
 ; Attributes: thunk
 
-sub_42055	proc far		; CODE XREF: sub_36CF+363P
+sub_42055	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+363P
 		jmp	sub_50160
 sub_42055	endp
 
@@ -33,8 +33,8 @@ sub_42055	endp
 
 ; Attributes: thunk
 
-sub_4205A	proc far		; CODE XREF: sub_36CF+331P
-		jmp	sub_50645
+sub_4205A	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+331P
+		jmp	Gameflow_CheckLossConversations_50645
 sub_4205A	endp
 
 
@@ -42,7 +42,7 @@ sub_4205A	endp
 
 ; Attributes: thunk
 
-sub_4205F	proc far		; CODE XREF: sub_36CF+30AP
+sub_4205F	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+30AP
 		jmp	sub_506AA
 sub_4205F	endp
 
@@ -51,7 +51,7 @@ sub_4205F	endp
 
 ; Attributes: thunk
 
-sub_42064	proc far		; CODE XREF: sub_36CF+282P
+sub_42064	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+282P
 		jmp	sub_51049
 sub_42064	endp
 

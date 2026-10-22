@@ -331,7 +331,7 @@ loc_4A3C0:				; CODE XREF: sub_4A239+E6j
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_4ABE0
+		call	near ptr Gameflow_PlayMidgame_4ABE0
 		add	sp, 4
 		jmp	short loc_4A400	; default
 ; ���������������������������������������������������������������������������
@@ -348,7 +348,7 @@ loc_4A3E0:				; CODE XREF: sub_4A239+E6j
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_4AAAB
+		call	near ptr Gameflow_PlayConversation_4AAAB
 		add	sp, 4
 		jmp	short $+2
 
@@ -1204,7 +1204,12 @@ sub_4A60B	endp
 
 ; Attributes: bp-based frame
 
-sub_4AAAB	proc far		; CODE XREF: sub_41F33J sub_4A239+1BFp
+; ==============================================================================================
+; far, LUE 2026-10-22. Joue la conversation numéro arg_2 (entrée de CONV.PAK) : bloc de 5 mots
+; = (partie+398h nom, +3ACh prénom, +3C0h indicatif, [+0EAh] avions perdus pendant la mission,
+; [+3D4h] total perdu), tampon partie+35Bh ; Conv_Construct_59B67 puis Conv_PlayScript_5AA4E.
+; ==============================================================================================
+Gameflow_PlayConversation_4AAAB	proc far		; CODE XREF: sub_41F33J sub_4A239+1BFp
 
 var_78		= word ptr -78h
 var_A		= word ptr -0Ah
@@ -1267,7 +1272,7 @@ arg_2		= byte ptr  8
 		pop	si
 		leave
 		retf
-sub_4AAAB	endp
+Gameflow_PlayConversation_4AAAB	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1379,7 +1384,12 @@ sub_4AB79	endp
 
 ; Attributes: bp-based frame
 
-sub_4ABE0	proc far		; CODE XREF: sub_41F38J sub_4A239+19Fp
+; ==============================================================================================
+; far, LUE en partie 2026-10-22. Aiguillage des cinématiques (36 cas) : appelle la fonction de
+; cinématique avec (partie+3ACh prénom, +398h nom, +3C0h indicatif), ses arg_6 / arg_8 /
+; arg_10.
+; ==============================================================================================
+Gameflow_PlayMidgame_4ABE0	proc far		; CODE XREF: sub_41F38J sub_4A239+19Fp
 
 arg_0		= word ptr  6
 arg_2		= byte ptr  8
@@ -1400,7 +1410,7 @@ arg_2		= byte ptr  8
 		jmp	loc_4AD2B	; default
 ; ���������������������������������������������������������������������������
 
-loc_4AC01:				; CODE XREF: sub_4ABE0+1Cj
+loc_4AC01:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+1Cj
 		shl	bx, 1
 		jmp	cs:off_4AD3E[bx] ; switch jump
 
@@ -1409,7 +1419,7 @@ loc_4AC08:				; DATA XREF: ovr184:off_4AD3Eo
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC10:				; CODE XREF: sub_4ABE0+23j
+loc_4AC10:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x1
 		add	ax, 3C0h
@@ -1425,13 +1435,13 @@ loc_4AC10:				; CODE XREF: sub_4ABE0+23j
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC2D:				; CODE XREF: sub_4ABE0+23j
+loc_4AC2D:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		call	sub_42440	; case 0x2
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC35:				; CODE XREF: sub_4ABE0+23j
+loc_4AC35:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x4
 		add	ax, 3C0h
@@ -1447,7 +1457,7 @@ loc_4AC35:				; CODE XREF: sub_4ABE0+23j
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC52:				; CODE XREF: sub_4ABE0+23j
+loc_4AC52:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0xB
 		add	ax, 3C0h
@@ -1463,13 +1473,13 @@ loc_4AC52:				; CODE XREF: sub_4ABE0+23j
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC6F:				; CODE XREF: sub_4ABE0+23j
+loc_4AC6F:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		call	sub_424D0	; case 0xD
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC77:				; CODE XREF: sub_4ABE0+23j
+loc_4AC77:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0xE
 		add	ax, 3C0h
@@ -1485,13 +1495,13 @@ loc_4AC77:				; CODE XREF: sub_4ABE0+23j
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC94:				; CODE XREF: sub_4ABE0+23j
+loc_4AC94:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		call	sub_42530	; case 0xF
 		jmp	loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AC9C:				; CODE XREF: sub_4ABE0+23j
+loc_4AC9C:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x10
 		add	ax, 3C0h
@@ -1507,7 +1517,7 @@ loc_4AC9C:				; CODE XREF: sub_4ABE0+23j
 		jmp	short loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4ACB8:				; CODE XREF: sub_4ABE0+23j
+loc_4ACB8:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x13
 		add	ax, 3C0h
@@ -1523,17 +1533,17 @@ loc_4ACB8:				; CODE XREF: sub_4ABE0+23j
 		jmp	short loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4ACD4:				; CODE XREF: sub_4ABE0+23j
+loc_4ACD4:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		jmp	short loc_4AD2D	; case 0x14
 ; ���������������������������������������������������������������������������
 
-loc_4ACD6:				; CODE XREF: sub_4ABE0+23j
+loc_4ACD6:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		jmp	short loc_4AD2D	; case 0x1E
 ; ���������������������������������������������������������������������������
 
-loc_4ACD8:				; CODE XREF: sub_4ABE0+23j
+loc_4ACD8:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x20
 		add	ax, 3C0h
@@ -1549,13 +1559,13 @@ loc_4ACD8:				; CODE XREF: sub_4ABE0+23j
 		jmp	short loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4ACF4:				; CODE XREF: sub_4ABE0+23j
+loc_4ACF4:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		call	sub_425F0	; case 0x21
 		jmp	short loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4ACFB:				; CODE XREF: sub_4ABE0+23j
+loc_4ACFB:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ovr184:off_4AD3Eo
 		mov	ax, si		; case 0x23
 		add	ax, 3C0h
@@ -1576,13 +1586,13 @@ loc_4ACFB:				; CODE XREF: sub_4ABE0+23j
 		jmp	short loc_4AD2D
 ; ���������������������������������������������������������������������������
 
-loc_4AD2B:				; CODE XREF: sub_4ABE0+1Ej
-					; sub_4ABE0+23j
+loc_4AD2B:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+1Ej
+					; Gameflow_PlayMidgame_4ABE0+23j
 					; DATA XREF: ...
 		jmp	short $+2	; default
 
-loc_4AD2D:				; CODE XREF: sub_4ABE0+2Dj
-					; sub_4ABE0+4Aj ...
+loc_4AD2D:				; CODE XREF: Gameflow_PlayMidgame_4ABE0+2Dj
+					; Gameflow_PlayMidgame_4ABE0+4Aj ...
 		push	0
 		push	word_46F46
 		call	TextFormat_ReleaseAttribute_2EC80
@@ -1590,10 +1600,10 @@ loc_4AD2D:				; CODE XREF: sub_4ABE0+2Dj
 		pop	si
 		pop	bp
 		retf
-sub_4ABE0	endp
+Gameflow_PlayMidgame_4ABE0	endp
 
 ; ���������������������������������������������������������������������������
-off_4AD3E	dw offset loc_4AC08	; DATA XREF: sub_4ABE0+23r
+off_4AD3E	dw offset loc_4AC08	; DATA XREF: Gameflow_PlayMidgame_4ABE0+23r
 		dw offset loc_4AC10	; jump table for switch	statement
 		dw offset loc_4AC2D
 		dw offset loc_4AD2B

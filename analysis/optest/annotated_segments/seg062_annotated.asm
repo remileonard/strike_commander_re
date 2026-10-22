@@ -116,8 +116,8 @@ loc_28C71:				; CODE XREF: seg062:00E5j seg062:00ECj
 
 ; Attributes: bp-based frame
 
-sub_28C73	proc far		; CODE XREF: sub_36CF+2E4P
-					; sub_36CF+38DP ...
+sub_28C73	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2E4P
+					; Gameflow_RunScriptPairs_36CF+38DP ...
 
 arg_0		= word ptr  6
 
@@ -200,7 +200,7 @@ sub_28CC3	endp
 ; ici. — Ex-'Widget_Helper_5A9E6'. far. LUE 2026-10-06. Facade (appelee par
 ; STRIKE_EXE_MAIN_LOOP) : Music_StopWithFade_AB1EF(fondu = argument).
 ; ==============================================================================================
-Music_Stop_28CDB	proc far		; CODE XREF: seg063:0309P sub_4ABE0+9P
+Music_Stop_28CDB	proc far		; CODE XREF: seg063:0309P Gameflow_PlayMidgame_4ABE0+9P
 
 arg_0		= byte ptr  6
 
@@ -236,7 +236,7 @@ sub_28CF7	endp
 
 ; Attributes: bp-based frame
 
-sub_28CFC	proc far		; CODE XREF: sub_36CF+3CFP
+sub_28CFC	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+3CFP
 					; sub_4DF4B+30DP
 
 arg_0		= byte ptr  6

@@ -33,7 +33,7 @@ sub_42685	endp
 ; Attributes: thunk
 
 sub_4268A	proc far		; CODE XREF: sub_4A239+17DP
-					; sub_4ABE0+137P ...
+					; Gameflow_PlayMidgame_4ABE0+137P ...
 		jmp	sub_BDE10
 sub_4268A	endp
 

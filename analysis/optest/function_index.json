@@ -1590,8 +1590,8 @@
 "sub_41F33",
 "sub_28CFC"
 ],
-"new_name": "sub_36CF",
-"summary": ""
+"new_name": "Gameflow_RunScriptPairs_36CF",
+"summary": "far, LUE en partie 2026-10-22. Parcourt une suite de paires d'octets (commande, argument) ; 39 commandes (table off_3ABD). Commande 0 : Gameflow_PlayConversation_4AAAB(argument). Commande 24h : si [partie+0EAh] ≠ 0, conversation 253 si [partie+0F8h] = 2, 252 sinon. Autres commandes pas lues."
 },
 "sub_3B0B": {
 "segment": "seg002",
@@ -3082,8 +3082,8 @@
 "lines": 39,
 "type": "far",
 "calls": [],
-"new_name": "sub_A0D5",
-"summary": ""
+"new_name": "TalkingHead_IsLipTextDone_A0D5",
+"summary": "far, LUE 2026-10-22. Vrai (1) si la tête n'a pas de texte de lèvres ([+1Dh] = 0) ou si le curseur [+1Fh] est sur la fin de la chaîne ; faux sinon. Les conversations attendent ainsi la fin d'une réplique."
 },
 "sub_A100": {
 "segment": "seg014",
@@ -3111,8 +3111,8 @@
 "sub_64E",
 "sub_98F4"
 ],
-"new_name": "sub_A207",
-"summary": ""
+"new_name": "ConvFigure_ConstructSpeaking_A207",
+"summary": "far, LUE 2026-10-22. Personnage qui parle d'une scène de groupe (commande 02h) : TalkingHead_Construct_98F4 (855h octets), tables 182Bh / 184Fh. Avance (loc_A3E1) : une lettre du texte de lèvres par image, bouche [+84Ah] = table « 04302500000340143000353000 » (dseg 15B1h, lettres a à z) + 1, −1 hors minuscule. Dessin ConvFigure_DrawSpeaking_A2B7."
 },
 "sub_A2B7": {
 "segment": "seg014",
@@ -3127,8 +3127,8 @@
 "sub_32CD8",
 "sub_2FC4A"
 ],
-"new_name": "sub_A2B7",
-"summary": ""
+"new_name": "ConvFigure_DrawSpeaking_A2B7",
+"summary": "far, LUE 2026-10-22. Dessine le personnage qui parle : image 0 de sa forme (corps) en (x, y), puis l'image [+84Ah] (bouche) au même point si ≠ −1, puis les enfants (méthode +10h)."
 },
 "sub_A505": {
 "segment": "seg014",
@@ -3181,8 +3181,8 @@
 "sub_2B920",
 "sub_33352"
 ],
-"new_name": "sub_AB6B",
-"summary": ""
+"new_name": "ConvFigure_ConstructExtra_AB6B",
+"summary": "far, LUE 2026-10-22. Figurant d'une scène de groupe (commande 01h) : Layer_Construct_2DF9B (21h octets), tables 176Bh / 178Bh ; [+20h] = dernier caractère du nom de figure. Si la forme a plus d'une image et que ce caractère est > « 3 », mode animé ([+1Dh] = 1, image [+1Bh] = 1). Dessin loc_ABEB : image 0, puis en mode animé l'image courante ; avance loc_AC58 : image 1 à n − 1 en boucle."
 },
 "sub_AC84": {
 "segment": "seg014",
@@ -18577,8 +18577,8 @@
 "sub_2EC80",
 "sub_42230"
 ],
-"new_name": "sub_4AAAB",
-"summary": ""
+"new_name": "Gameflow_PlayConversation_4AAAB",
+"summary": "far, LUE 2026-10-22. Joue la conversation numéro arg_2 (entrée de CONV.PAK) : bloc de 5 mots = (partie+398h nom, +3ACh prénom, +3C0h indicatif, [+0EAh] avions perdus pendant la mission, [+3D4h] total perdu), tampon partie+35Bh ; Conv_Construct_59B67 puis Conv_PlayScript_5AA4E."
 },
 "sub_4AB39": {
 "segment": "ovr184",
@@ -18631,8 +18631,8 @@
 "sub_4268A",
 "sub_2EC80"
 ],
-"new_name": "sub_4ABE0",
-"summary": ""
+"new_name": "Gameflow_PlayMidgame_4ABE0",
+"summary": "far, LUE en partie 2026-10-22. Aiguillage des cinématiques (36 cas) : appelle la fonction de cinématique avec (partie+3ACh prénom, +398h nom, +3C0h indicatif), ses arg_6 / arg_8 / arg_10."
 },
 "sub_4AD86": {
 "segment": "ovr184",
@@ -19670,8 +19670,8 @@
 "sub_41F33",
 "sub_4268A"
 ],
-"new_name": "sub_50645",
-"summary": ""
+"new_name": "Gameflow_CheckLossConversations_50645",
+"summary": "far, LUE en partie 2026-10-22. Si [partie+3D4h] (avions perdus au total) > 16 : conversation 254 (assurance perdue) ; sinon si [partie+27Bh] (dword) < 0 : conversation 255. Puis sub_4268A(1), [+0E8h] = 0, [+0E7h] = 2."
 },
 "sub_506AA": {
 "segment": "ovr187",
@@ -20873,8 +20873,8 @@
 "sub_3111E",
 "sub_2B8A4"
 ],
-"new_name": "sub_59A20",
-"summary": ""
+"new_name": "Conv_Init_59A20",
+"summary": "far, LUE 2026-10-22. [+6Bh] = dernier indice i (0 à 6) dont le drapeau dseg 0EE6h+i ≠ 0, [+6Ch] = dernier autre ; indices des noms $A/$B (table 0ED8h). Zone de texte (0, 24)-(319, 151), écran (0, 0)-(319, 199) ; police ..\\..\\data\\fonts\\convfont.shp."
 },
 "sub_59B67": {
 "segment": "ovr191",
@@ -20889,8 +20889,8 @@
 "sub_59A20",
 "sub_59DAA"
 ],
-"new_name": "sub_59B67",
-"summary": ""
+"new_name": "Conv_Construct_59B67",
+"summary": "far, LUE 2026-10-22. Objet conversation (6Eh octets, alloué si nul) : Conv_Init_59A20, chaînes du joueur [+28h] = arg_4, tampon des équipiers et réponse [+2Ah] = arg_6, entrée du PAK [+6Dh] = arg_2, puis Conv_LoadScriptFromPak_59DAA."
 },
 "sub_59C24": {
 "segment": "ovr191",
@@ -36110,5 +36110,35 @@
 "calls": [],
 "new_name": "ScaledImageLayer_Draw_93E4",
 "summary": "far, LUE 2026-10-21. Méthode +20h de ScaledImageLayer : si l'image ≠ −1, Render_DrawRotatedScaledShape_39A7A(word_46F44, x, y, forme, image, +1Dh angle, +1Fh échelle, +21h)."
+},
+"loc_ABEB": {
+"segment": "seg014",
+"start_line": 24690,
+"end_line": 24690,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConvFigure_DrawExtra_ABEB",
+"summary": "far, LUE 2026-10-22. Méthode +10h du figurant : image 0 de sa forme en (x, y) ; puis, en mode animé ([+1Dh] ≠ 0), l'image courante [+1Bh] (Layer_DrawAtOwnPos_2E202)."
+},
+"loc_AC58": {
+"segment": "seg014",
+"start_line": 24739,
+"end_line": 24739,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConvFigure_AdvanceExtra_AC58",
+"summary": "far, LUE 2026-10-22. Méthode +1Ch du figurant : en mode animé, image +1 jusqu'à n − 1 puis retour à 1 ; puis avance des enfants."
+},
+"loc_A3E1": {
+"segment": "seg014",
+"start_line": 23753,
+"end_line": 23753,
+"lines": 1,
+"type": "label",
+"calls": [],
+"new_name": "ConvFigure_AdvanceSpeaking_A3E1",
+"summary": "far, LUE 2026-10-22. Méthode +1Ch du personnage qui parle : lettre suivante du texte de lèvres ; bouche [+84Ah] = chiffre de la table dseg 15B1h pour la lettre (a à z) + 1, −1 sinon ; puis avance des enfants."
 }
 }

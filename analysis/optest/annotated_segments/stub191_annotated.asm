@@ -276,7 +276,7 @@ sub_4221C	endp
 ; Attributes: thunk
 
 sub_42221	proc far
-		jmp	sub_59A20
+		jmp	Conv_Init_59A20
 sub_42221	endp
 
 
@@ -293,8 +293,8 @@ sub_42226	endp
 
 ; Attributes: thunk
 
-sub_4222B	proc far		; CODE XREF: sub_4AAAB+48P
-		jmp	sub_59B67
+sub_4222B	proc far		; CODE XREF: Gameflow_PlayConversation_4AAAB+48P
+		jmp	Conv_Construct_59B67
 sub_4222B	endp
 
 
@@ -302,7 +302,7 @@ sub_4222B	endp
 
 ; Attributes: thunk
 
-sub_42230	proc far		; CODE XREF: sub_4AAAB+83P
+sub_42230	proc far		; CODE XREF: Gameflow_PlayConversation_4AAAB+83P
 		jmp	sub_59CDE
 sub_42230	endp
 
@@ -311,7 +311,7 @@ sub_42230	endp
 
 ; Attributes: thunk
 
-sub_42235	proc far		; CODE XREF: sub_4AAAB+67P
+sub_42235	proc far		; CODE XREF: Gameflow_PlayConversation_4AAAB+67P
 		jmp	Conv_PlayScript_5AA4E
 sub_42235	endp
 

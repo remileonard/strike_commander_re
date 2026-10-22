@@ -32,7 +32,7 @@ sub_420E5	endp
 
 ; Attributes: thunk
 
-sub_420EA	proc far		; CODE XREF: sub_36CF+276P
+sub_420EA	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+276P
 		jmp	sub_542AC
 sub_420EA	endp
 

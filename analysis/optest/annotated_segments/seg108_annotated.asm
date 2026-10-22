@@ -76,7 +76,7 @@ GlyphObject_ComputeMetrics_3111E	endp
 ; alloue (sub_658). Référencée par sub_60507.
 ; ==============================================================================================
 GlyphObject_AllocateBuffer_31191	proc far		; CODE XREF: seg001:02CFP
-					; sub_59B67+52P ...
+					; Conv_Construct_59B67+52P ...
 
 arg_0		= word ptr  6
 
