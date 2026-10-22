@@ -8855,9 +8855,9 @@
     "summary": "far, 80 lignes, entre sub_670A5 et sub_67118. ⚠️ Adresse exacte non résolue."
   },
   "sub_A8F22": {
-    "new_name": "MissionScenario_ResolveAndBindExpressions_A8F22",
+    "new_name": "Mission_WriteResultReport_A8F22",
     "segment": "seg456",
-    "summary": "far,492L — pont mission->campagne (ÉCRITURE). Écrit DATA\\MISN2OP.IFF, FORM racine 'INVN', via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped, AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par participant : u16 +0x3E, u16 +0x40, descripteur 8o via Mission_GetCastName_52C5F) EXIT(1o de byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34)) SCOR(score). Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md §6.6a."
+    "summary": "far, LUE 2026-10-22 (ex-MissionScenario_ResolveAndBindExpressions_A8F22). Écrit le compte rendu de vol DATA\\MISN2OP.IFF lu par OPTEST (Gameflow_ReadMissionResult_4B544 d'OPTEST.EXE) : FORM 'INVN', chunks INFO (8 octets depuis si : nom de la mission), STAT (8 × u16 recopiés de [si+0A1h + 2i] : variables de résultat posées par le script de mission, opcode 14h d'Expr_VM_Interpreter_51106, remises à 0 par MissionScenario_ReleaseAndStoreField_A82B0), JETS (nombre de participants dont le nœud a le bit +39h et dont le type vaut 'F-16'), KILL (par participant : u16 +3Eh, u16 +40h, nom par Mission_GetCastName_52C5F), EXIT (1 octet, byte_706AF), DIED (par équipe), SCOR. Voir GAMEFLOW_SYSTEM.md § 6 et DATA_MODEL.md §6.6a."
   },
   "sub_6AAEE": {
     "new_name": "VROOMM_StubThunk_6AAEE",

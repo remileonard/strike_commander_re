@@ -3646,11 +3646,11 @@ dword_70718	dd 54534E49h		; DATA XREF: HUD_ResolveNodePosition_547B1+Ar
 dword_7071C	dd 544E41h		; DATA XREF: HUD_ResolveNodePosition_547B1:loc_547C6r
 					; MissionScenario_LoadMainRecord_A8331:loc_A8380r	...
 unk_70720	db  2Eh	; .		; DATA XREF: MissionScenario_LoadFromIFF_A8C44+2Co
-					; MissionScenario_ResolveAndBindExpressions_A8F22+27o
+					; Mission_WriteResultReport_A8F22+27o
 		db  5Ch	; \
 		db    0
 aOp2misn	db 'OP2MISN',0          ; DATA XREF: MissionScenario_LoadFromIFF_A8C44+28o
-aMisn2op	db 'MISN2OP',0          ; DATA XREF: MissionScenario_ResolveAndBindExpressions_A8F22+23o
+aMisn2op	db 'MISN2OP',0          ; DATA XREF: Mission_WriteResultReport_A8F22+23o
 a_		db '.\',0               ; DATA XREF: MissionScenario_LoadMainRecord_A8331+68o
 a_iff_0		db '.iff',0             ; DATA XREF: MissionScenario_LoadMainRecord_A8331+62o
 aPlayer_2	db 'PLAYER',0

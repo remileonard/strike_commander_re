@@ -415,7 +415,7 @@ VROOMM_StubThunk_6CF21	endp
 ; far, thunk fixe VROOMM (jmp sub_AA04B) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF26	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+20BP
+VROOMM_StubThunk_6CF26	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+20BP
 		jmp	MissionScenario_DispatchDecodeB_AA04B
 VROOMM_StubThunk_6CF26	endp
 
@@ -613,7 +613,7 @@ VROOMM_StubThunk_6CF6C	endp
 ; far, thunk fixe VROOMM (jmp sub_A9D66) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=38100h, codesize=13BAh, nentries=46.
 ; ==============================================================================================
-VROOMM_StubThunk_6CF71	proc far		; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+224P
+VROOMM_StubThunk_6CF71	proc far		; CODE XREF: Mission_WriteResultReport_A8F22+224P
 		jmp	ExprSlot_WriteFieldGroup_A9D66
 VROOMM_StubThunk_6CF71	endp
 

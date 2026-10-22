@@ -315,7 +315,7 @@ Lu au retour de STRIKE.EXE (état 1). Chunks, dans l'ordre de lecture :
 | `INFO` | nom de la mission volée |
 | `WPNS` | armes restantes : paires (nombre, nom) → stock `[+261h]` (9 armes, noms de la table dseg 2C8h) |
 | `JETS` | avions perdus pendant le vol → `[+0EAh]` ; total `[+3D4h]` += ; coût `[+287h]` = perdus × 500 |
-| `STAT` | 1ʳᵉ valeur = **succès** ; 2ᵉ = gain, ajouté à l'argent `[+27Bh]` ; 3ᵉ → `[+3D6h]` (test 25h) |
+| `STAT` | 8 mots écrits par STRIKE.EXE (`Mission_WriteResultReport_A8F22`) : les 8 **variables de résultat du script de la mission** (opcode 14h d'`Expr_VM_Interpreter_51106` dans STRIKE.EXE, remises à 0 au début de la mission). OPTEST disquette en lit 3 : 1ʳᵉ = **succès** ; 2ᵉ = gain, ajouté à l'argent `[+27Bh]` ; 3ᵉ → `[+3D6h]` (test 25h). La version CD en lit 6 (§ 8). Leur sens dépend donc de chaque mission |
 | `KILL` | par pilote (nom) : deux compteurs ajoutés à `[+29Fh]` et `[+2A1h]` ; `[+0EDh]` = 1 si le joueur en a (commande 1Ah) |
 | `DIED` | noms de personnages : ceux de la table dseg 0ED8h (DiBianca, Templeman, Isaac, Roberts, Baldwin, Yenawine, Savage) ont leur drapeau dseg 0EE6h remis à 0 (codes `$A`, `$B` des conversations) |
 | `SCOR` | ajouté au score `[+3D8h]` |
@@ -385,8 +385,8 @@ La structure de partie a 4 octets de plus à partir de `+3D6h` :
 | 29h | test : `[+3DAh]` ≠ 0 (6ᵉ valeur de `STAT`) |
 | 2Ah | test : `[+3D6h]` ≠ 0 (rangé par le chargement d'une partie ; rôle non établi) |
 
-Dans le compte rendu de la version CD, `STAT` a **six** valeurs : succès, gain, puis quatre octets
-rangés en `[+3D7h]` à `[+3DAh]`. Les commandes 27h à 2Ah n'apparaissent pas dans `GAMEFLOW.IFF` de
+La version CD lit **six** des huit valeurs de `STAT` (STRIKE.EXE en écrit toujours huit) : succès,
+gain, puis quatre valeurs gardées sur un octet en `[+3D7h]` à `[+3DAh]`. Les commandes 27h à 2Ah n'apparaissent pas dans `GAMEFLOW.IFF` de
 `BIGTRE.TRE` ; elles ne sont pas dans la liste des tests comptés pendant un saut (même liste que la
 disquette).
 
@@ -396,5 +396,7 @@ disquette).
 - `PRTL` de `MLST` et le contenu exact d'`op2misn.iff` (`Gameflow_WriteMissionOrder_4BBF7`, lu en
   surface).
 - Le menu d'accueil (`Gameflow_MainMenu_4F1A7`, choix 0 à 5) n'est lu qu'en surface.
+- Ce que chaque mission met dans les 8 variables de résultat (opcode 14h de l'interpréteur des
+  missions de STRIKE.EXE) : à lire dans les scripts des fichiers de mission.
 - Le rôle des deux compteurs de victoires (`[+29Fh]`, `[+2A1h]`) : air et sol probablement, non
   vérifié dans l'affichage du tableau.

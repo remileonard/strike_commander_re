@@ -2071,15 +2071,16 @@ MissionScenario_LoadFromIFF_A8C44	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,492L — pont mission->campagne (ÉCRITURE). Écrit DATA\MISN2OP.IFF, FORM racine 'INVN',
-; via les primitives d'écriture ResourceRecord (WriteFieldGroupA/B, StreamReader_WriteTyped,
-; AllocateAndDecodeVariant). Chunks écrits : INFO(8o de si) STAT(8×u16 de si+0xA1) JETS(par
-; participant : marqueur si nœud +0x39 bit ET type +0x00=='F-16' 0x36312D46) KILL(par
-; participant : u16 +0x3E, u16 +0x40, descripteur 8o via Mission_GetCastName_52C5F) EXIT(1o de
-; byte_706AF) DIED(par équipe : Expr_Node_LookupAndConvert_52D69(si+0x34)) SCOR(score).
-; Sauvegarde du résultat de mission pour la campagne. Détail : DATA_MODEL.md §6.6a.
+; far, LUE 2026-10-22 (ex-MissionScenario_ResolveAndBindExpressions_A8F22). Écrit le compte
+; rendu de vol DATA\MISN2OP.IFF lu par OPTEST (Gameflow_ReadMissionResult_4B544 d'OPTEST.EXE)
+; : FORM 'INVN', chunks INFO (8 octets depuis si : nom de la mission), STAT (8 × u16 recopiés
+; de [si+0A1h + 2i] : variables de résultat posées par le script de mission, opcode 14h
+; d'Expr_VM_Interpreter_51106, remises à 0 par MissionScenario_ReleaseAndStoreField_A82B0),
+; JETS (nombre de participants dont le nœud a le bit +39h et dont le type vaut 'F-16'), KILL
+; (par participant : u16 +3Eh, u16 +40h, nom par Mission_GetCastName_52C5F), EXIT (1 octet,
+; byte_706AF), DIED (par équipe), SCOR. Voir GAMEFLOW_SYSTEM.md § 6 et DATA_MODEL.md §6.6a.
 ; ==============================================================================================
-MissionScenario_ResolveAndBindExpressions_A8F22	proc far		; CODE XREF: VROOMM_StubThunk_6CE56J MissionScenario_RecomputeFields_A9382+4Cp
+Mission_WriteResultReport_A8F22	proc far		; CODE XREF: VROOMM_StubThunk_6CE56J MissionScenario_RecomputeFields_A9382+4Cp
 
 var_12C		= word ptr -12Ch
 var_CF		= dword	ptr -0CFh
@@ -2205,7 +2206,7 @@ loc_A8FC4:
 		jmp	short loc_A906E
 ; ���������������������������������������������������������������������������
 
-loc_A9042:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+14Fj
+loc_A9042:				; CODE XREF: Mission_WriteResultReport_A8F22+14Fj
 		mov	bx, di
 		shl	bx, 1
 		mov	ax, [bx+si+0A1h]
@@ -2234,7 +2235,7 @@ loc_A9067:
 		add	[bp+var_C7], 2
 		inc	di
 
-loc_A906E:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+11Ej
+loc_A906E:				; CODE XREF: Mission_WriteResultReport_A8F22+11Ej
 		cmp	di, 8
 		jl	short loc_A9042
 		lea	ax, [bp+var_12C]
@@ -2252,7 +2253,7 @@ loc_A906E:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+11Ej
 		jmp	short loc_A90DF
 ; ���������������������������������������������������������������������������
 
-loc_A909D:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1C0j
+loc_A909D:				; CODE XREF: Mission_WriteResultReport_A8F22+1C0j
 		mov	bx, di
 		shl	bx, 2
 		lea	ax, [bp+var_84]
@@ -2282,11 +2283,11 @@ loc_A90C0:
 		jnz	short loc_A90DE
 		inc	[bp+var_8]
 
-loc_A90DE:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1AAj
-					; MissionScenario_ResolveAndBindExpressions_A8F22+1B7j
+loc_A90DE:				; CODE XREF: Mission_WriteResultReport_A8F22+1AAj
+					; Mission_WriteResultReport_A8F22+1B7j
 		inc	di
 
-loc_A90DF:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+179j
+loc_A90DF:				; CODE XREF: Mission_WriteResultReport_A8F22+179j
 		cmp	di, [bp+var_2]
 		jl	short loc_A909D
 		mov	ax, [bp+var_8]
@@ -2309,7 +2310,7 @@ loc_A90DF:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+179j
 		jmp	short loc_A9136
 ; ���������������������������������������������������������������������������
 
-loc_A9119:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+217j
+loc_A9119:				; CODE XREF: Mission_WriteResultReport_A8F22+217j
 		mov	ax, si
 		add	ax, 0B1h ; '�'
 		push	ax
@@ -2322,7 +2323,7 @@ loc_A9119:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+217j
 		add	sp, 6
 		inc	di
 
-loc_A9136:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+1F5j
+loc_A9136:				; CODE XREF: Mission_WriteResultReport_A8F22+1F5j
 		cmp	di, [bp+var_2]
 		jl	short loc_A9119
 		lea	ax, [bp+var_12C]
@@ -2348,7 +2349,7 @@ loc_A9161:
 		jmp	loc_A9203
 ; ���������������������������������������������������������������������������
 
-loc_A9169:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+2E6j
+loc_A9169:				; CODE XREF: Mission_WriteResultReport_A8F22+2E6j
 		mov	bx, di
 		shl	bx, 2
 		lea	ax, [bp+var_84]
@@ -2409,13 +2410,13 @@ loc_A91C4:
 		add	[bp+var_C7], 8
 		inc	di
 
-loc_A9203:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+244j
+loc_A9203:				; CODE XREF: Mission_WriteResultReport_A8F22+244j
 		cmp	di, [bp+var_2]
 		jge	short loc_A920B
 		jmp	loc_A9169
 ; ���������������������������������������������������������������������������
 
-loc_A920B:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+2E4j
+loc_A920B:				; CODE XREF: Mission_WriteResultReport_A8F22+2E4j
 		lea	ax, [bp+var_12C]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_64FD8
@@ -2458,7 +2459,7 @@ loc_A9274:
 		jmp	short loc_A92DD
 ; ���������������������������������������������������������������������������
 
-loc_A9276:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+3BEj
+loc_A9276:				; CODE XREF: Mission_WriteResultReport_A8F22+3BEj
 		mov	ax, di
 		imul	ax, 9
 		mov	dx, si
@@ -2501,11 +2502,11 @@ loc_A92C8:
 		add	sp, 0Eh
 		add	[bp+var_C7], 8
 
-loc_A92DC:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+37Fj
-					; MissionScenario_ResolveAndBindExpressions_A8F22+390j
+loc_A92DC:				; CODE XREF: Mission_WriteResultReport_A8F22+37Fj
+					; Mission_WriteResultReport_A8F22+390j
 		inc	di
 
-loc_A92DD:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22:loc_A9274j
+loc_A92DD:				; CODE XREF: Mission_WriteResultReport_A8F22:loc_A9274j
 		cmp	di, 3
 		jl	short loc_A9276
 		lea	ax, [bp+var_12C]
@@ -2522,7 +2523,7 @@ loc_A92DD:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22:loc_A
 		jge	short loc_A9314
 		mov	dword_706AB, 0
 
-loc_A9314:				; CODE XREF: MissionScenario_ResolveAndBindExpressions_A8F22+3E7j
+loc_A9314:				; CODE XREF: Mission_WriteResultReport_A8F22+3E7j
 		mov	eax, dword_706AB
 		mov	[bp-0Ch], eax
 		sar	eax, 8
@@ -2570,7 +2571,7 @@ loc_A9369:
 		pop	si
 		leave
 		retf
-MissionScenario_ResolveAndBindExpressions_A8F22	endp
+Mission_WriteResultReport_A8F22	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2641,7 +2642,7 @@ loc_A93C3:				; CODE XREF: MissionScenario_RecomputeFields_A9382+3Dj
 loc_A93CC:				; CODE XREF: MissionScenario_RecomputeFields_A9382+43j
 		push	si
 		push	cs
-		call	near ptr MissionScenario_ResolveAndBindExpressions_A8F22
+		call	near ptr Mission_WriteResultReport_A8F22
 		pop	cx
 		push	si
 		push	cs

@@ -201,7 +201,7 @@ form-type (4 o, copié via `sub_2B6D`) · `+0x0F` **offset de fin du conteneur**
 
 Contrepartie en écriture (seg194) : `WriteField_64E1D`, `WriteFieldGroupA/B/C/D`,
 `ReadAndWriteBridge` — le format est **relisible/réinscriptible** (utilisé par
-`sc.cfg`, l'éditeur de scénario `MissionScenario_ResolveAndBindExpressions_A8F22`,
+`sc.cfg`, le compte rendu de vol `Mission_WriteResultReport_A8F22` (MISN2OP.IFF),
 `TextRenderer_SaveResourceFile`).
 
 ### 5.4 Packs compressés — `IndexedRecordReader` (seg196) + `LZW` (seg197)
@@ -1326,7 +1326,7 @@ Campagne  ──►  MissionScenario_LoadFromIFF_A8C44   (lit  DATA\OP2MISN.IFF,
                      │            + câblage Expr VM (nœud PLAYER  si+0x3A)
                      └─ bind des enregistrements PLYR  →  nœuds participants
 
-Fin de mission  ──►  MissionScenario_ResolveAndBindExpressions_A8F22
+Fin de mission  ──►  Mission_WriteResultReport_A8F22
                           └─ ÉCRIT  DATA\MISN2OP.IFF  (FORM INVN : INFO/STAT/JETS/KILL/EXIT/DIED/SCOR)
 ```
 
@@ -1676,7 +1676,7 @@ par script.
 | `+0x68` | scratch tokens / formatage (Lexer) |
 | `+0x74` | tableau `TEAM` (dwords, ≤8) |
 | `+0x84` | nombre d'équipes (word) |
-| `+0xA1` | (par MISN2OP) 8× u16 de stats par équipe |
+| `+0xA1` | 8× u16 : variables de résultat posées par le script de mission (opcode 14h d'`Expr_VM_Interpreter_51106`), remises à 0 en début de mission, écrites dans `STAT` de MISN2OP |
 | `+0xB1` | tableau d'objets joueur `PLYR` (lié par OP2MISN) |
 
 ##### `DATA\OP2MISN.IFF` — FORM `INVN` (par `LoadFromIFF_A8C44`) — pont campagne → mission
@@ -1702,7 +1702,7 @@ Utilise les primitives **d'écriture** (`WriteFieldGroupA/B`, `WriteTyped`,
 | FourCC | Contenu écrit |
 |---|---|
 | `INFO` | 8 o depuis `si` |
-| `STAT` | 8× u16 depuis `si+0xA1` (stats par équipe) |
+| `STAT` | 8× u16 depuis `si+0xA1` (variables de résultat du script de mission) |
 | `JETS` | par participant : marqueur si nœud `+0x39` bit posé **et** type `+0x00` == `"F-16"` (`0x36312D46`) |
 | `KILL` | par participant : u16 `+0x3E`, u16 `+0x40`, descripteur 8 o via `Mission_GetCastName_52C5F` |
 | `EXIT` | 1 o depuis `byte_706AF` |

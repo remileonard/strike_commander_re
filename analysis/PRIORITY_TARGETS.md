@@ -48,7 +48,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 516 | `sub_94D40` | `AircraftComponent_LoadWithDwordFields_94D40` | ovr272 |
 | 496 | `sub_61CD2` | `Render_DrawTextString_61CD2` | seg173 |
 | 493 | `sub_5A0F3` | `Sound_LoadDriverAndTimbreCache_5A0F3` | seg124 |
-| 492 | `sub_A8F22` | `MissionScenario_ResolveAndBindExpressions_A8F22` | seg456 |
+| 492 | `sub_A8F22` | `Mission_WriteResultReport_A8F22` (lue 2026-10-22) | seg456 |
 | 482 | `sub_7E1B4` | `Font_LoadDefinitionFromIFF_7E1B4` | ovr241 |
 | 481 | `sub_6106E` | `Render_DrawFilledEllipse_6106E` | seg167 |
 | 477 | `sub_92E60` | `ResourceFile_LoadTypeD_92E60` | ovr269 |

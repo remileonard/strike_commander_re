@@ -4556,7 +4556,7 @@ Expr_LookupTableEntry85B_52D45	endp
 ; conversion/formatage d'une valeur de fonction native.
 ; ==============================================================================================
 Expr_Node_LookupAndConvert_52D69	proc far		; CODE XREF: MissionScenario_ConvertFieldValue_A8B8F+10P
-					; MissionScenario_ResolveAndBindExpressions_A8F22+36CP
+					; Mission_WriteResultReport_A8F22+36CP
 
 var_10		= dword	ptr -10h
 var_C		= dword	ptr -0Ch

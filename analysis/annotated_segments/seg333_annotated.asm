@@ -202,7 +202,7 @@ VROOMM_StubThunk_6CE51	endp
 ; d'overlay actuellement charge en memoire. fileoff=36B30h, codesize=1460h, nentries=18.
 ; ==============================================================================================
 VROOMM_StubThunk_6CE56	proc far
-		jmp	MissionScenario_ResolveAndBindExpressions_A8F22
+		jmp	Mission_WriteResultReport_A8F22
 VROOMM_StubThunk_6CE56	endp
 
 
