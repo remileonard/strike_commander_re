@@ -177,12 +177,46 @@ bool spriteIsVisible(const uint8_t *requ, size_t size, const bool *flags) {
 }
 ```
 
-**libRealSpace** : la visibilité est testée par `SCZone::isActive(&GameState.requierd_flags)`
-(code non fourni, à comparer avec cette fonction : rôle de 2 / 3 comme « ou », valeur 9 ignorée,
-évaluation seulement à la construction de la scène). `SCGameFlow::playEndMission` décide aussi de
-passer à la mission suivante d'après `REQU` (sprite sans `REQU`, ou avec une condition 1). Dans le
-jeu, le passage à la mission suivante est fait par les commandes 0Dh puis 0Fh du script (§ 5.2) ;
-aucun lien entre `REQU` et ce passage n'a été vu dans le code lu.
+### 4.5 Comparaison avec `SCZone::isActive` de libRealSpace (fourni le 2026-10-22)
+
+Les deux règles ont été rejouées sur les 215 `REQU` des données, pour toutes les combinaisons des
+drapeaux de chaque sprite.
+
+| Cas | Sprites |
+|---|---|
+| même résultat dans tous les cas | 87 |
+| même résultat si tous les drapeaux sont présents dans `requierd_flags`, différent sinon | 127 |
+| différent même avec tous les drapeaux présents | 1 |
+
+1. **Drapeau absent de `requierd_flags`.** `isActive` saute la condition quand le drapeau n'est
+   pas dans la map (`find(...) == end()`). Dans le jeu, un drapeau jamais posé vaut 0, donc
+   « non posé ». Exemple : sprite 12 de la scène 11 de la mission 4, `REQU` = (1, 0), visible
+   seulement quand le drapeau 0 est posé ; tant que le drapeau 0 n'a jamais été posé ni effacé,
+   libRealSpace l'affiche et le jeu le cache. C'est la différence des 127 sprites ; elle disparaît
+   si la map contient tous les drapeaux dès le début de la partie (non vérifié dans le code de
+   libRealSpace fourni).
+2. **Les « ou ».** `isActive` combine les termes de gauche à droite (`(P et ¬a) ou X` pour
+   `P, (2, a), X`) alors que le jeu calcule `P et (¬a ou X)`. Grâce à l'arrêt anticipé
+   (`if (!isActive && !nextOpIsOr) break;`), le résultat est le même sur toutes les données.
+3. **Valeur inconnue après un 2 / 3.** Le seul cas des données : sprite 12 de la scène 20 de la
+   mission 23, (2, 201) (2, 202) (9, 203). Le jeu l'affiche toujours ; `isActive` calcule
+   « 201 non posé ou 202 non posé » et le **cache quand 201 et 202 sont posés** (le « ou » reste
+   ouvert, le 9 est ignoré). Ce sprite porte le départ en vol de la mission 23 (`0C 20`,
+   conversation 127, armement `16 12`).
+4. **Moment de l'évaluation.** Dans le jeu, la visibilité n'est calculée qu'à la construction de
+   la scène (§ 4.1). Où `isActive` est appelé dans libRealSpace n'est pas dans le code fourni :
+   s'il l'est à chaque image, un sprite peut disparaître juste après son clic, alors que le jeu le
+   garde jusqu'à la reconstruction de la scène.
+
+**Correction proposée** : `tools/gameflow_ref/sczone_isactive.cpp` — la méthode
+`SCZone::isActive` réécrite sur la règle du jeu (drapeau absent = non posé, 2 / 3 = « ignorer la
+condition 0 / 1 suivante », valeur inconnue ignorée), même signature ; compilée avec des types
+simulés et testée sur (1, 0).
+
+`SCGameFlow::playEndMission` décide aussi de passer à la mission suivante d'après `REQU` (sprite
+sans `REQU`, ou avec une condition 1). Dans le jeu, le passage à la mission suivante est fait par
+les commandes 0Dh puis 0Fh du script (§ 5.2) ; aucun lien entre `REQU` et ce passage n'a été vu
+dans le code lu.
 
 ## 5. Interpréteur des scripts (`Gameflow_RunScriptPairs_36CF`)
 
