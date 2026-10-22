@@ -294,12 +294,11 @@ proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) →
   tests imbriqués. Commandes de test relevées dans le code : 09h, 0Ah, 14h, 15h, 16h, 1Ch, 20h,
   23h, 25h. **14h** : bloc joué si la mission a été acceptée (partie + 35Bh ≠ 0) ; **15h** : bloc
   joué si elle a été refusée. C'est ainsi que la réponse à 0Bh choisit la suite (conversations,
-  missions) dans le script de partie. 20h teste un drapeau (partie + 1FDh + argument) ; les autres
-  tests ne sont pas lus.
+  missions) dans le script de partie. 20h teste un drapeau (partie + 1FDh + argument). Les autres
+  commandes du script de partie relèvent du déroulement de la campagne (GAMEFLOW), pas des
+  conversations.
 
 ## 6. Points ouverts
 
-- Les autres commandes du script de partie (`Gameflow_RunScriptPairs_36CF`) et le chunk de
-  `GAMEFLOW.IFF` qui les contient.
 - Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
 - Version du code qui lit `[voix]` : pas dans cet OPTEST.EXE.
