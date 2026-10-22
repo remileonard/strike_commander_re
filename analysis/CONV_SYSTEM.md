@@ -321,10 +321,11 @@ comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sa
   la remplacer par un interpréteur à la manière d'OPTEST. Chaque correction ci-dessous se fait soit
   dans le parseur (lire le bon champ et le ranger dans la structure), soit dans le lecteur (utiliser
   ce qui est rangé).
-- **Voix : garder la détection actuelle.** L'OPTEST.EXE désassemblé est celui de la version
-  disquette, qui ne lit pas l'identifiant de voix ; libRealSpace, lui, gère la voix
-  (`SetSentenceFromConv` la détecte, `runFrame` joue le VOC). Ce code fonctionne et reste tel
-  quel. Le comportement de la version avec voix (lecture, minutage, lèvres, texte) est au § 8.
+- **Voix : deux formats de données à lire.** libRealSpace gère la voix (`runFrame` joue le VOC) et
+  doit lire les données disquette (sans voix) comme celles du CD (avec voix). Choix retenu :
+  déterminer le format du script **avant** de le parser, puis lire la voix seulement au format CD
+  (§ 9.1) ; la détection texte par texte de `SetSentenceFromConv` est remplacée. Le comportement de
+  la version avec voix (lecture, minutage, lèvres, texte) est au § 8.
 
 - **Numéros d'image.** libRealSpace ajoute une image vide en tête de chaque jeu d'images
   (`RSImageSet`) : **numéro libRealSpace = numéro du jeu + 1** pour les visages (`FACE`) et les
@@ -358,8 +359,8 @@ lus ou pas lus, à corriger dans les `parse_*` existants et à ranger dans `Conv
 | 10h | non traité | ne fait rien |
 | autre | `do_not_add` | l'octet est sauté |
 
-La lecture du texte et de la voix (`SetSentenceFromConv`) reste celle de libRealSpace ; son essai sur
-les données et une variante plus sûre sont au § 9.
+La lecture du texte et de la voix : format déterminé avant le parsing, puis lecture sans heuristique
+(§ 9.1, qui remplace la détection de `SetSentenceFromConv`).
 
 ### 7.2 Scène de groupe (00h, 01h, 02h, 0Ah)
 
@@ -709,8 +710,8 @@ La cadence de l'horloge DGROUP:510Fh n'a pas été lue (les 10 tics ne sont pas 
 
 ### 8.7 Pour libRealSpace
 
-- La détection actuelle (`SetSentenceFromConv`) reste ; le jeu, lui, lit toujours la chaîne de voix,
-  vide quand il n'y a pas de voix (§ 8.1).
+- Format déterminé avant le parsing (§ 9.1) ; au format CD, le jeu lit toujours la chaîne de voix,
+  vide quand il n'y a pas de voix (§ 8.1) : une voix vide = réplique en texte.
 - Avec voix : **pas de texte affiché** ; fin de réplique = fin du son. Sans voix : texte, 5 s
   (0,8 s si le texte est vide).
 - Lèvres avec voix : calcul du son de `MIDGAME_SYSTEM.md` § 6.6 à la cadence 10, plus le filtre
@@ -732,7 +733,8 @@ et le format CD (voix puis texte). Elle décide **à chaque texte** :
 3. si cet octet est une valeur de commande (`isNextFrameIsConv` : 00, 01, 02, 03, 04, 0A, 0B, 0C,
    0F, E0) → pas de voix, la première chaîne est le texte ;
 4. sinon, s'il ne vaut ni FFh ni F4h → la première chaîne est la voix, la seconde le texte ; s'il vaut
-   FFh ou F4h → pas de voix, et la fin est placée 4 octets plus loin.
+   FFh ou F4h → pas de voix, et la fin est placée 4 octets plus loin. Cette branche a été ajoutée
+   pour les conversations de *Pacific Strike*, de format voisin (information de Rémi).
 
 **Essai.** La règle a été rejouée en Python sur chaque texte des 241 scripts, aux bonnes positions,
 dans les deux formats. Format CD = `CONV.PAK` de `BIGTRE.TRE`. Format disquette = les mêmes scripts
@@ -757,8 +759,8 @@ texte, et la lecture s'arrête un octet trop tôt. La couleur lue vaut alors 0, 
 est lu comme une commande inconnue, puis sauté (`do_not_add`) : la lecture se recale par chance.
 Effet visible : aucun ici (texte vide), mais c'est un décalage du flux.
 
-**Parties sans effet sur ces données.** La branche FFh / F4h ne sert jamais (aucun des deux
-formats ne l'atteint). Retirer E0h de la liste des commandes et la branche FFh / F4h donne
+**Parties sans effet sur ces données.** La branche FFh / F4h (*Pacific Strike*) ne sert jamais
+avec les données de *Strike Commander* (aucun des deux formats ne l'atteint). Retirer E0h de la liste des commandes et la branche FFh / F4h donne
 exactement les mêmes résultats pour la détection (E0h peut servir ailleurs dans le parseur, à
 vérifier avant de la retirer de `isNextFrameIsConv`).
 
@@ -767,24 +769,41 @@ dépend de la valeur des couleurs et du contenu des textes, et se trompe déjà 
 Le format ne change pourtant pas d'un texte à l'autre : c'est **tout le script** qui est au format
 disquette ou au format CD.
 
-### 9.1 Variante proposée : décider une fois par script
+### 9.1 Choix retenu : tester le format avant de parser
 
-Lire le script entier en supposant le format CD ; si toutes les commandes sont connues et que la
-lecture finit exactement à la fin du script, c'est le format CD, sinon le format disquette. Ensuite,
-`SetSentenceFromConv` lit une ou deux chaînes **sans deviner**. La décision se prend dans le parseur
-(avant `ReadNextFrame`) : la séparation parseur / structure / lecteur est inchangée.
+Décision de Rémi : avant de parser une conversation, déterminer si elle est au format CD ou au format
+disquette ; ensuite le parseur lit la voix si le format est CD, et ne la lit pas sinon. Plus aucune
+devinette texte par texte.
 
-Essai (C++ ci-dessous, compilé et passé sur les fichiers extraits) : **241 / 241** scripts CD reconnus
-CD, **241 / 241** scripts disquette (reconstruits) reconnus disquette. Essai complémentaire en Python :
-lu dans le mauvais format, chacun des 241 scripts, dans les deux sens, contient au moins une
-commande inconnue. Un script sans aucun texte se lit pareil dans les deux formats (réponse « CD »,
+- **Test** (`detectConvFormat`) : lire le script entier en supposant le format CD ; si toutes les
+  commandes sont connues et que la lecture finit exactement à la fin du script → `Cd`. Sinon, même
+  essai au format disquette → `Floppy`. Si aucun ne convient → `Unknown` (à signaler, ne pas
+  parser au hasard).
+- **Parsing** : le format est gardé par le parseur (par exemple un membre de `SCConvPlayer` posé dans
+  `SetArchive`, avant la boucle `ReadNextFrame`) et passé aux `parse_*`. `SetSentenceFromConv` est
+  remplacée par une lecture sans heuristique (`readConvText`) : une chaîne de voix si `Cd`, puis le
+  texte ; la valeur renvoyée est le nombre d'octets lus, qui donne la position exacte du champ
+  suivant (la couleur pour 03h). La séparation parseur / structure / lecteur est inchangée.
+- `isNextFrameIsConv` n'est plus utile pour la voix ; ses autres usages dans le parseur
+  (`parse_GROUP_SHOT`, `parse_GROUP_SHOT_ADD_CHARACTER`) sont à revoir à part (§ 7.1).
+
+**Essai** (C++ ci-dessous, compilé, style du dépôt) : 241 / 241 scripts CD reconnus `Cd`, 241 / 241
+scripts disquette (reconstruits) reconnus `Floppy`. Lu dans le mauvais format, chacun des 241 scripts,
+dans les deux sens, contient au moins une commande inconnue : le test ne peut pas se tromper de
+format sur ces données. Un script sans aucun texte se lit pareil dans les deux formats (réponse `Cd`,
 sans conséquence).
+
+**Pacific Strike.** Plutôt qu'une branche de plus dans la lecture de chaque texte, en faire un
+troisième format (`ConvFormat::PacificStrike`) avec son propre lecteur de texte, choisi par le même
+test avant le parsing. Son format n'est pas décrit ici (pas de données ni d'exécutable de *Pacific
+Strike* dans cette archive) : le lecteur et le test sont à écrire d'après ses données.
 
 ```cpp
 // Lecteur minimal d'un script de conversation, utilisé seulement pour choisir le format.
 class ConvFormatProbe {
-  public:
-    ConvFormatProbe(const uint8_t *data, size_t size, bool withVoice) : data(data), size(size), withVoice(withVoice) {
+public:
+    ConvFormatProbe(const uint8_t *data, size_t size, bool withVoice)
+        : data(data), size(size), withVoice(withVoice) {
     }
 
     // Vrai si tout le script se lit dans ce format : commandes connues, champs complets.
@@ -811,7 +830,7 @@ class ConvFormatProbe {
         return pos == size;
     }
 
-  private:
+private:
     const uint8_t *data;
     size_t size;
     bool withVoice;
@@ -894,17 +913,44 @@ class ConvFormatProbe {
     }
 };
 
-// Format du script : vrai = chaque texte est précédé de son identifiant de voix (version CD-ROM).
-bool convScriptHasVoice(const uint8_t *data, size_t size) {
-    ConvFormatProbe probe(data, size, true);
-    return probe.readsCleanly();
+enum class ConvFormat {
+    Floppy,
+    Cd,
+    Unknown
+};
+
+// Choisi une fois, avant de parser le script.
+ConvFormat detectConvFormat(const uint8_t *data, size_t size) {
+    ConvFormatProbe cd(data, size, true);
+    if (cd.readsCleanly()) {
+        return ConvFormat::Cd;
+    }
+    ConvFormatProbe floppy(data, size, false);
+    if (floppy.readsCleanly()) {
+        return ConvFormat::Floppy;
+    }
+    return ConvFormat::Unknown;
+}
+
+// Lecture d'un texte une fois le format connu : [voix] si Cd, puis texte. Renvoie les octets lus.
+size_t readConvText(const uint8_t *data, size_t avail, ConvFormat format, std::string &voice, std::string &text) {
+    size_t used = 0;
+    voice.clear();
+    if (format == ConvFormat::Cd) {
+        size_t length = strnlen(reinterpret_cast<const char *>(data), avail);
+        voice.assign(reinterpret_cast<const char *>(data), length);
+        used = length + 1;
+    }
+    size_t length = strnlen(reinterpret_cast<const char *>(data + used), avail - used);
+    text.assign(reinterpret_cast<const char *>(data + used), length);
+    used += length + 1;
+    return used;
 }
 ```
 
-Champs sautés (§ 2) : 00h = nom (9) ; 01h = nom (9) + x, y (4) ; 02h = nom (9) + x, y (4) + couleur
-(1) ; 0Ah = couleur (1) ; 03h = visage (9) + image (1) + décor (9) + x, y (4), texte, couleur (1) ;
-0Bh, 0Ch = mot (2) ; 0Eh = 2 octets ; 0Fh, 10h = rien.
+Champs sautés par le test (§ 2) : 00h = nom (9) ; 01h = nom (9) + x, y (4) ; 02h = nom (9) + x, y (4)
++ couleur (1) ; 0Ah = couleur (1) ; 03h = visage (9) + image (1) + décor (9) + x, y (4), texte,
+couleur (1) ; 0Bh, 0Ch = mot (2) ; 0Eh = 2 octets ; 0Fh, 10h = rien.
 
-Autre possibilité, encore plus simple : un seul choix pour toute l'archive (par exemple d'après le
-premier script non vide), puisque `CONV.PAK` n'existe qu'en un format par version du jeu.
-
+`CONV.PAK` n'existant qu'en un format par version du jeu, le test peut aussi être fait une seule fois
+pour toute l'archive (sur le premier script qui contient un texte).
