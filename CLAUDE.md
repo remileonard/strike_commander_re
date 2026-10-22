@@ -275,7 +275,8 @@ strike_commander_re/
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
-│   │                                  CONVDATA.IFF, codes $ des textes — lu 2026-10-22
+│   │                                  CONVDATA.IFF, codes $ des textes ; voix de la version CD-ROM
+│   │                                  (§ 8) ; consignes et détection voix/texte pour libRealSpace (§ 7, § 9)
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace

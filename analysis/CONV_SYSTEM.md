@@ -1,7 +1,9 @@
 # Conversations (OPTEST.EXE)
 
 Lu le 2026-10-22 dans `analysis/optest/annotated_segments/ovr191_annotated.asm` (interpréteur) et
-`seg006_annotated.asm` (lecteurs d'enregistrements). Toutes les adresses sont celles d'OPTEST.EXE.
+`seg006_annotated.asm` (lecteurs d'enregistrements). Sauf au § 8, les adresses sont celles de
+l'OPTEST.EXE **disquette** (sans voix). Le § 8 décrit l'OPTTEST.EXE du **CD-ROM** (avec voix), lu sans
+IDA, avec ses propres adresses.
 Outil : `tools/conv_dump.py --donnees <BIGTRE.TRE ou DATA> [entrée ...]` affiche les scripts.
 
 ## 1. Fichiers
@@ -13,6 +15,8 @@ Outil : `tools/conv_dump.py --donnees <BIGTRE.TRE ou DATA> [entrée ...]` affich
 | `GAMEFLOW\CONVSHPS.PAK`, `CONVPALS.PAK` | images et palettes des visages, figurants et décors |
 | `GAMEFLOW\OPTSHPS.PAK`, `OPTPALS.PAK` | images et palettes partagées avec les menus (ciel, `optshps` 116) |
 | `GAMEFLOW\GAMEFLOW.IFF` | escadres (`WNGS` / `WING` : `INFO`, `PILT`, `ORDR`), lues par la commande 0Eh |
+| `VOCLIST.IFF` (version CD) | liste des fichiers de voix (`FORM LIST` : `SIZE`, `LIST`), test de présence des voix et préchargement (§ 8.3) |
+| `f:<identifiant>.voc` (version CD) | une réplique parlée ; identifiant = la chaîne `[voix]` du script (§ 8.3) |
 
 Chargement d'un script : `Conv_LoadScriptFromPak_59DAA` ouvre `..\..\data\gameflow\conv.pak`, lit
 l'entrée numéro `[conv + 6Dh]` en mémoire telle quelle (aucune transformation) ; début `[conv]`,
@@ -23,13 +27,13 @@ curseur `[conv + 4]`, taille `[conv + 8]`.
 Suite de commandes. Chaque commande = 1 octet, puis ses champs. Entiers en petit-boutiste (LE).
 « nom » = 9 octets, texte complété par des 0. « chaîne » = texte terminé par un 0.
 
-**Écart entre le code et les données.** Le code d'OPTEST.EXE (cette version) lit un seul texte par
-réplique. Les données de `BIGTRE.TRE` ont, devant **chaque** texte, une chaîne de plus : un
-identifiant de voix (`3gw009`, `1ai021`… ; chaîne vide quand la réplique est vide). Avec cette
-chaîne, les 241 scripts se lisent sans reste et toutes les commandes trouvées sont connues ; sans
-elle, 241 échouent. Les tableaux ci-dessous notent `[voix]` : présent dans les données, absent du
-code lu. Cet OPTEST ne contient d'ailleurs aucun nom de fichier de voix de conversation (seuls les
-`midNvoc` des cinématiques).
+**Deux formats : disquette et CD-ROM.** Le code de l'OPTEST.EXE disquette lit un seul texte par
+réplique. Les données de `BIGTRE.TRE` (version CD) ont, devant **chaque** texte, une chaîne de plus :
+l'identifiant de voix (`3gw009`, `1ai021`… ; chaîne vide quand la réplique n'a pas de voix, 56 fois).
+L'OPTTEST.EXE du CD-ROM lit toujours cette chaîne (§ 8.1). Avec elle, les 241 scripts se lisent
+sans reste et toutes les commandes trouvées sont connues ; sans elle, les 241 échouent. Les tableaux
+ci-dessous notent `[voix]` : présent dans le format CD, absent du format disquette. Le reste du
+format est identique dans les deux versions.
 
 ### Commandes de premier niveau (table `off_5CE29`, octets 00h à 10h)
 
@@ -354,7 +358,8 @@ lus ou pas lus, à corriger dans les `parse_*` existants et à ranger dans `Conv
 | 10h | non traité | ne fait rien |
 | autre | `do_not_add` | l'octet est sauté |
 
-La lecture du texte et de la voix (`SetSentenceFromConv`) reste celle de libRealSpace.
+La lecture du texte et de la voix (`SetSentenceFromConv`) reste celle de libRealSpace ; son essai sur
+les données et une variante plus sûre sont au § 9.
 
 ### 7.2 Scène de groupe (00h, 01h, 02h, 0Ah)
 
@@ -717,4 +722,189 @@ La cadence de l'horloge DGROUP:510Fh n'a pas été lue (les 10 tics ne sont pas 
 - `VOCLIST.IFF` sert au jeu de test de présence des voix (condition 3 du § 8.2) et au
   préchargement ; libRealSpace peut s'en passer pour charger les fichiers, l'équivalent du test
   étant « le fichier de voix existe ».
+
+## 9. Détection voix / texte de libRealSpace : essai sur les données (2026-10-22)
+
+`ConvFrame::SetSentenceFromConv` doit lire les deux formats (§ 2) : le format disquette (un texte)
+et le format CD (voix puis texte). Elle décide **à chaque texte** :
+1. lire une première chaîne ;
+2. si l'octet qui suit vaut 80h ou plus, regarder l'octet d'après (« décalage 2 ») ;
+3. si cet octet est une valeur de commande (`isNextFrameIsConv` : 00, 01, 02, 03, 04, 0A, 0B, 0C,
+   0F, E0) → pas de voix, la première chaîne est le texte ;
+4. sinon, s'il ne vaut ni FFh ni F4h → la première chaîne est la voix, la seconde le texte ; s'il vaut
+   FFh ou F4h → pas de voix, et la fin est placée 4 octets plus loin.
+
+**Essai.** La règle a été rejouée en Python sur chaque texte des 241 scripts, aux bonnes positions,
+dans les deux formats. Format CD = `CONV.PAK` de `BIGTRE.TRE`. Format disquette = les mêmes scripts
+**sans les chaînes de voix** (reconstruit, pas un vrai `CONV.PAK` disquette ; à confirmer sur les
+données disquette).
+
+| Format | Textes justes | Textes faux |
+|---|---|---|
+| disquette (reconstruit) | 2 394 / 2 394 | 0 |
+| CD | 2 365 / 2 394 | **29** |
+
+**Pourquoi elle marche sur la disquette.** Seulement grâce aux données :
+- un texte de 02h, 04h ou 0Ah est toujours suivi d'une commande (pas de voix → juste) ;
+- un texte de 03h est suivi de son **octet couleur**, qui n'est pas une commande ; la règle ne tombe
+  juste que parce que **toutes** les couleurs de 03h des données valent 80h ou plus (branche
+  « décalage 2 », 1 717 fois). Une couleur de 03h inférieure à 80h ferait prendre le texte pour une
+  voix et décalerait toute la suite.
+
+**Les 29 erreurs du format CD.** Toujours des 03h dont la voix **et** le texte sont vides (`00 00`
+puis la couleur) : le 0 qui suit la voix vide est pris pour la commande 00h, la voix vide devient le
+texte, et la lecture s'arrête un octet trop tôt. La couleur lue vaut alors 0, et l'octet couleur réel
+est lu comme une commande inconnue, puis sauté (`do_not_add`) : la lecture se recale par chance.
+Effet visible : aucun ici (texte vide), mais c'est un décalage du flux.
+
+**Parties sans effet sur ces données.** La branche FFh / F4h ne sert jamais (aucun des deux
+formats ne l'atteint). Retirer E0h de la liste des commandes et la branche FFh / F4h donne
+exactement les mêmes résultats pour la détection (E0h peut servir ailleurs dans le parseur, à
+vérifier avant de la retirer de `isNextFrameIsConv`).
+
+**Conclusion.** La règle est à la fois trop compliquée (deux branches inutiles) et fragile : elle
+dépend de la valeur des couleurs et du contenu des textes, et se trompe déjà sur 29 répliques du CD.
+Le format ne change pourtant pas d'un texte à l'autre : c'est **tout le script** qui est au format
+disquette ou au format CD.
+
+### 9.1 Variante proposée : décider une fois par script
+
+Lire le script entier en supposant le format CD ; si toutes les commandes sont connues et que la
+lecture finit exactement à la fin du script, c'est le format CD, sinon le format disquette. Ensuite,
+`SetSentenceFromConv` lit une ou deux chaînes **sans deviner**. La décision se prend dans le parseur
+(avant `ReadNextFrame`) : la séparation parseur / structure / lecteur est inchangée.
+
+Essai (C++ ci-dessous, compilé et passé sur les fichiers extraits) : **241 / 241** scripts CD reconnus
+CD, **241 / 241** scripts disquette (reconstruits) reconnus disquette. Essai complémentaire en Python :
+lu dans le mauvais format, chacun des 241 scripts, dans les deux sens, contient au moins une
+commande inconnue. Un script sans aucun texte se lit pareil dans les deux formats (réponse « CD »,
+sans conséquence).
+
+```cpp
+// Lecteur minimal d'un script de conversation, utilisé seulement pour choisir le format.
+class ConvFormatProbe {
+  public:
+    ConvFormatProbe(const uint8_t *data, size_t size, bool withVoice) : data(data), size(size), withVoice(withVoice) {
+    }
+
+    // Vrai si tout le script se lit dans ce format : commandes connues, champs complets.
+    bool readsCleanly() {
+        while (pos < size) {
+            uint8_t op = data[pos];
+            pos++;
+            bool ok = false;
+            if (op == 0x00) {
+                ok = groupShot();
+            } else if (op == 0x03) {
+                ok = closeUp();
+            } else if (op == 0x0C) {
+                ok = skip(2);
+            } else if (op == 0x0E) {
+                ok = skip(2);
+            } else if (op == 0x0F || op == 0x10) {
+                ok = true;
+            }
+            if (!ok) {
+                return false;
+            }
+        }
+        return pos == size;
+    }
+
+  private:
+    const uint8_t *data;
+    size_t size;
+    bool withVoice;
+    size_t pos{ 0 };
+
+    bool skip(size_t count) {
+        if (pos + count > size) {
+            return false;
+        }
+        pos += count;
+        return true;
+    }
+
+    bool string() {
+        while (pos < size) {
+            if (data[pos] == 0) {
+                pos++;
+                return true;
+            }
+            pos++;
+        }
+        return false;
+    }
+
+    // [voix] puis texte.
+    bool text() {
+        if (withVoice && !string()) {
+            return false;
+        }
+        return string();
+    }
+
+    bool peekIs(uint8_t value) {
+        return pos < size && data[pos] == value;
+    }
+
+    bool groupShot() {
+        if (!skip(9)) {
+            return false;
+        }
+        while (peekIs(0x01)) {
+            if (!skip(1 + 9 + 4)) {
+                return false;
+            }
+        }
+        while (peekIs(0x02) || peekIs(0x0A)) {
+            uint8_t op = data[pos];
+            pos++;
+            size_t fields = 1;
+            if (op == 0x02) {
+                fields = 9 + 4 + 1;
+            }
+            if (!skip(fields) || !text()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool closeUp() {
+        if (!skip(9 + 1 + 9 + 4) || !text() || !skip(1)) {
+            return false;
+        }
+        while (peekIs(0x04) || peekIs(0x0A) || peekIs(0x0B)) {
+            uint8_t op = data[pos];
+            pos++;
+            bool ok = false;
+            if (op == 0x04) {
+                ok = text();
+            } else if (op == 0x0A) {
+                ok = skip(1) && text();
+            } else {
+                ok = skip(2);
+            }
+            if (!ok) {
+                return false;
+            }
+        }
+        return true;
+    }
+};
+
+// Format du script : vrai = chaque texte est précédé de son identifiant de voix (version CD-ROM).
+bool convScriptHasVoice(const uint8_t *data, size_t size) {
+    ConvFormatProbe probe(data, size, true);
+    return probe.readsCleanly();
+}
+```
+
+Champs sautés (§ 2) : 00h = nom (9) ; 01h = nom (9) + x, y (4) ; 02h = nom (9) + x, y (4) + couleur
+(1) ; 0Ah = couleur (1) ; 03h = visage (9) + image (1) + décor (9) + x, y (4), texte, couleur (1) ;
+0Bh, 0Ch = mot (2) ; 0Eh = 2 octets ; 0Fh, 10h = rien.
+
+Autre possibilité, encore plus simple : un seul choix pour toute l'archive (par exemple d'après le
+premier script non vide), puisque `CONV.PAK` n'existe qu'en un format par version du jeu.
 
