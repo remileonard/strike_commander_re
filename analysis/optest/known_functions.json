@@ -3572,7 +3572,7 @@
   "sub_5A46F": {
     "new_name": "ConvData_FindFacePalette_5A46F",
     "segment": "ovr191",
-    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 2 = FCPL, « normal » si arg_6 = 0, « night » sinon, sortie)."
+    "summary": "far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 2 = FCPL, « normal » si arg_6 = 0, « night » sinon, sortie). Seul appel vu : Conv_PlayScript_5AA4E, avec arg_6 = 0 (push 0) → les conversations prennent toujours la palette de visage « normal »."
   },
   "sub_5A4AA": {
     "new_name": "ConvData_FindFigure_5A4AA",

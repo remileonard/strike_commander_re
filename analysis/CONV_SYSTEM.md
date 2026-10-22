@@ -139,6 +139,93 @@ Contrôle : `tools/conv_scene.py --donnees <BIGTRE.TRE> <entrée> <n° de scène
 une scène de groupe selon ces règles (images 0 seulement) ; hangar (entrée 12), briefing
 (`s_brief`, entrée 59) et équipiers (`s_wing`) sortent juste.
 
+### Yeux et bouches (relu le 2026-10-22)
+
+Deux mécanismes distincts : la **tête du gros plan** (03h) cligne des yeux et lit le texte avec des
+règles de prononciation ; le **personnage qui parle d'une scène de groupe** (02h) ne cligne pas et
+lit le texte lettre par lettre. Dans les deux cas, la bouche suit **le texte**, pas la voix : le
+mode voix de la tête parlante (`TalkingHead_AttachVoice_9CF7`, utilisé par mid2) n'est appelé nulle
+part dans `Conv_PlayScript_5AA4E`. La scène tourne à 10 images par seconde : une lettre = 0,1 s.
+
+**Texte lu par les lèvres.** C'est le texte du script tel quel : `Conv_PlayScript_5AA4E` passe le
+même pointeur à `Conv_DrawText_59F54` et à `TalkingHead_SetLipText_9C4F`, et `Conv_DrawText_59F54`
+fait les remplacements sur une copie (`CRT_Strdup`). Les codes `$S`, `$N`… ne sont donc pas
+remplacés pour les lèvres : « $S » donne une image sans bouche (« $ ») puis la bouche de « s ».
+`TalkingHead_CopyLipText_97D8` met le texte en minuscules : les majuscules comptent comme des
+lettres.
+
+#### Gros plan (03h) : `TalkingHead_Construct_98F4`, avance `TalkingHead_Advance_9F5A`
+
+**Dessin** (table de méthodes 1883h, `TalkingHead_DrawDressed_9E5E`), dans l'ordre, toutes à la
+position de la tête :
+1. image 0 du visage (la tête) ;
+2. l'**image des yeux** : l'image de base, ou l'image 12 pendant un clignement ; rien si elle vaut −1 ;
+3. la **bouche**, rien si elle vaut −1 ;
+4. image 1 (coiffure), puis image 34 (habits ; valeur fixée à la construction, aucun autre
+   écrivain vu).
+
+**Image de base** = l'octet « image » de la 03h (`TalkingHead_SetBaseFrame_9D32`) ; 255 devient −1
+(`cbw`) : pas d'image des yeux hors clignement. Pendant la question « Accept / Reject » (0Bh),
+l'image de base passe à 53 (35h) et le texte de lèvres est une chaîne vide (dseg 1079h, juste avant
+« Accept Mission ») : bouche fermée.
+
+**Clignement**, tiré à chaque image de scène :
+```
+image des yeux = 12           si rand() × 30 / 32768 = 0 (une fois sur 30)
+                                 et clignement permis (toujours 1 en conversation)
+               = image de base sinon
+si image de base > 20 : image des yeux = image de base (jamais de clignement)
+```
+Le tirage est refait à chaque image : un clignement dure en général une image (0,1 s), en moyenne
+toutes les 3 s. Dans les données (1 717 × 03h), l'image de base vaut 13, 14, 16 à 20 ou 255 dans
+774 répliques (clignement possible) et 21 à 31 dans les autres (yeux fixes).
+
+**Bouche**, une lecture par image de scène, le curseur avance d'un caractère puis :
+```
+« e » + caractère qui n'est pas a..z : ce caractère est consommé aussi → pas de bouche
+« e » + « r »   → bouche 6, « r » consommé
+« t » + « h »   → bouche 9, « h » consommé
+« c » + « h »   → bouche 6, « h » consommé
+« h »           → le caractère suivant est consommé ; bouche de « h » (table)
+autre a..z      → bouche = table (ci-dessous)
+autre caractère → pas de bouche (−1)
+fin du texte    → pas de bouche ; TalkingHead_IsLipTextDone_A0D5 devient vrai
+```
+La fin est testée par « caractère sous le curseur = 0 » (`TalkingHead_IsLipTextDone_A0D5`). Un
+texte qui finirait par « e » ou « h » ferait sauter le 0 final ; aucun des 2 362 textes 02h / 03h /
+04h des données ne finit ainsi.
+
+Table (`word_445AC`, « 06891599098769362999252999 », chiffre + 2) :
+
+| a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 2 | 8 | 10 | 11 | 3 | 7 | 11 | 11 | 2 | 11 | 10 | 9 | 8 | 11 | 5 | 8 | 4 | 11 | 11 | 11 | 4 | 7 | 4 | 11 | 11 | 11 |
+
+Les images de bouche d'un visage sont donc 2 à 11.
+
+**Durée d'une réplique** : une image par lecture jusqu'à la fin du texte (les caractères consommés
+par paire ne coûtent pas d'image), puis **40 images** (15 si le texte est vide) ; une 0Ah qui suit
+un gros plan : 20 images, sans mouvement des lèvres. Une touche (`Input_CheckSkip_D24A`) coupe
+l'attente.
+
+#### Personnage qui parle (02h) : `ConvFigure_ConstructSpeaking_A207`, avance `ConvFigure_AdvanceSpeaking_A3E1`
+
+- **Pas de clignement** : la méthode d'avance de cette figure n'a pas de tirage, et le dessin
+  (`ConvFigure_DrawSpeaking_A2B7`) ne fait que l'image 0 (corps) puis la bouche.
+- **Pas de règle de prononciation** : un caractère par image ; une lettre a..z donne
+  bouche = chiffre de « 04302500000340143000353000 » (dseg 15B1h) + 1, tout autre caractère rien.
+
+| a | b | c | d | e | f | g | h | i | j | k | l | m | n | o | p | q | r | s | t | u | v | w | x | y | z |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 5 | 4 | 1 | 3 | 6 | 1 | 1 | 1 | 1 | 1 | 4 | 5 | 1 | 2 | 5 | 4 | 1 | 1 | 1 | 4 | 6 | 4 | 1 | 1 | 1 |
+
+- Une 02h dure une image par caractère du texte, sans attente après. Les autres personnages
+  qui parlent de la scène restent affichés, image 0 seule.
+
+**Palette du visage** : le seul appel de `ConvData_FindFacePalette_5A46F` (dans
+`Conv_PlayScript_5AA4E`) passe 0 → toujours `FCPL` « normal » (`CONVPALS` 46) en conversation ;
+« night » n'est pas demandé par ce code.
+
 ### 0Eh / 0Fh — escadre et équipiers
 
 - **0Eh** (`ConvRec_ReadWing_66E0`) : cherche dans `GAMEFLOW.IFF`, `FORM WNGS`, la `FORM WING`

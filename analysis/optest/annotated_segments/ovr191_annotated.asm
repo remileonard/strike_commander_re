@@ -1260,7 +1260,8 @@ ConvData_FindFace_5A451	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-10-22. ConvData_LookupByName_5A225(conv, 2 = FCPL, « normal » si arg_6 = 0, «
-; night » sinon, sortie).
+; night » sinon, sortie). Seul appel vu : Conv_PlayScript_5AA4E, avec arg_6 = 0 (push 0) → les
+; conversations prennent toujours la palette de visage « normal ».
 ; ==============================================================================================
 ConvData_FindFacePalette_5A46F	proc far		; CODE XREF: sub_42208J Conv_PlayScript_5AA4E+B0Cp
 
