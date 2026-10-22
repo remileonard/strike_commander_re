@@ -302,3 +302,250 @@ proposition de mission) : « Do you accept? » → 0Bh (refus : +159 octets) →
 
 - Ce qui pose les drapeaux dseg 0EE6h (choix de `$A`, `$B`).
 - Version du code qui lit `[voix]` : pas dans cet OPTEST.EXE.
+
+## 7. Corriger libRealSpace (consignes pour un agent)
+
+Comparaison faite le 2026-10-22 avec `ConvAssetManager.cpp/.h` et `SCConvPlayer.cpp/.h` de
+libRealSpace. Chaque point donne : où, ce que fait libRealSpace, ce que fait le jeu. Le détail du
+comportement du jeu est dans les sections 2 à 5 ci-dessus ; ne rien corriger sans le relire.
+
+### 7.0 Règles générales
+
+- **Numéros d'image.** libRealSpace ajoute une image vide en tête de chaque jeu d'images
+  (`RSImageSet`) : **numéro libRealSpace = numéro du jeu + 1** pour les visages (`FACE`) et les
+  figures (`FIGR`). Ce document donne toujours les numéros du jeu. Les décors (`ParseBGLayer`) lisent
+  l'image directement (`RLEShape`), sans ce décalage.
+- **Repère d'écran.** Le jeu dessine décor, figures et visages dans une image hors écran de
+  320 × 200 dont la ligne 0 arrive à la ligne **24** de l'écran ; seules les lignes 0 à 127 sont
+  visibles (écran 24 à 151). Une position (x, y) lue dans un script ou dans `BACK` est donc à
+  l'écran (x, y + 24), l'image gardant ses propres décalages. Les bandes noires 0–23 et 152–199 de
+  libRealSpace correspondent.
+- **Cadence.** Le jeu avance la scène à **10 images par seconde** ; toutes les durées ci-dessous
+  sont en images de scène. libRealSpace expire une réplique au bout de 5 s ou à la fin de la voix
+  (`CheckFrameExpired`).
+- **Voix.** Les données ont un identifiant de voix devant chaque texte ; cet OPTEST.EXE ne le lit
+  pas et ne joue aucune voix. La lecture du VOC par libRealSpace et l'attente de sa fin sont donc
+  un choix du portage, pas un comportement observé ; les lèvres, elles, suivent le texte (§ 7.4).
+
+### 7.1 Lecture du script (`SCConvPlayer::parseConv`, `ConvFrame::parse_*`)
+
+Format exact des enregistrements : § 2 (référence exécutable : `tools/conv_dump.py`). Points faux ou
+fragiles :
+
+| Commande | libRealSpace | Jeu |
+|---|---|---|
+| 00h | `parse_GROUP_SHOT` avance de 8, saute les 0 puis cherche une commande (`isNextFrameIsConv`) | nom de décor de **9 octets** exactement, puis la commande suivante |
+| 01h | `parse_GROUP_SHOT_ADD_CHARACTER` : x, y par `ReadUShortBE` après 8 octets | nom (9), x **mot signé petit-boutiste**, y idem. La lecture actuelle tombe juste par hasard tant que 0 ≤ x < 256 ; `airwing1` est en (0, −20) |
+| 02h | `parse_GROUP_SHOT_CHARACTER_TALK` ne lit pas x, y | nom (9), x (+9), y (+0Bh), mots signés ; couleur +0Dh, puis `[voix]`, texte |
+| 03h | x lu comme un octet à +13h (130/160/190 → `FacePos`) | x, y = mots signés à +13h et +15h (y = 128 dans les données) ; le reste est juste |
+| 0Bh | deux octets `noOffset`, `yesOffset` | **un mot** = octets à sauter si refus, compté depuis la fin du mot. Les 26 0Bh des données ont un saut < 256 et arrivent juste après un 0Ch : le découpage branche 1 / branche 2 actuel tombe juste |
+| 0Ch | `parse_YESNOCHOICE_BRANCH2`, deux octets ignorés | saut sans condition d'**un mot** (fin de la branche « accepter ») |
+| 0Eh | `topOffset`, `first_palette` | octet écran (0 = `s_wing`, sinon `w_wing`), octet numéro de `WING` dans `GAMEFLOW.IFF` ; remplit `$W`, `$L`, `$O` |
+| 10h | non traité | ne fait rien |
+| autre | `do_not_add` | l'octet est sauté. 0xE0 n'est pas une commande |
+
+Recommandation : lire le script comme un flux d'enregistrements de longueur connue (§ 2), sans
+recherche de la prochaine commande ni détection de la voix par heuristique
+(`SetSentenceFromConv`) : la chaîne de voix est **toujours** présente devant le texte dans les
+données de `BIGTRE.TRE` (`conv_dump.py` sans `--sans-voix` lit les 241 scripts sans erreur).
+
+### 7.2 Scène de groupe (00h, 01h, 02h, 0Ah)
+
+- **État de scène, pas état de figure.** `CharFigure` est partagé (`ConvAssetManager::figures`)
+  et reçoit x, y ; tout le script étant lu d'avance (`SetArchive`), la dernière position lue gagne
+  partout (`air1` a 5 positions différentes selon les scripts). Ranger la position dans la scène.
+- **Contenu de la scène.** Une 00h ouvre une scène : décor, puis toutes les 01h, puis toutes les
+  02h, **dessinés dans cet ordre et tous visibles du début à la fin de la scène** (y compris
+  pendant les 0Ah et les répliques des autres). libRealSpace crée une `ConvFrame` par enregistrement
+  et une 02h n'y met que celui qui parle.
+- **Dessin.** libRealSpace dessine les images 0 et 1 de chaque figure qui en a plusieurs. Jeu :
+  - figurant (01h) : image 0 seule ;
+  - personnage qui parle (02h) : image 0, puis sa bouche (§ 7.4) **seulement pendant sa propre
+    réplique** ; sinon image 0 seule ;
+  - écran d'équipiers : figures posées en (0, 0), coordonnées dans l'image.
+- **Palette** : palettes du décor, puis `FGPL` « normal » (`CONVPALS` 48, `parseFGPL_DATA` est
+  vide dans libRealSpace), puis `PFIG` du **premier 01h** seulement. Envoyée à la carte seulement
+  quand le nom du décor change.
+- **Durées** : une 02h dure une image par caractère de son texte (fin du texte de lèvres), sans
+  attente après ; une 0Ah dans une scène de groupe dure 40 images. Une touche passe à la suite.
+
+### 7.3 Décor (`ConvAssetManager::ParseBGLayer`)
+
+Chaque élément de `BACK DATA` fait 5 octets ; libRealSpace n'en lit que 3 et remplace la position
+par la règle « y = 24 si la hauteur est inférieure à 199 ». Lire le 4ᵉ et le 5ᵉ octet comme un
+**mot signé y** : l'élément est à l'écran en (0, y + 24), avec les décalages propres de l'image
+(exemple : ciel `optshps` 116 de `str_s_ex`, y = −24 → haut de l'écran). Même chose pour les visages
+(`parseFACE_DATA`, règle « hauteur inférieure à 198 ») : la position vient de la 03h, (x, y + 24).
+
+### 7.4 Gros plan (03h, 04h, 0Ah) : dessin, yeux, bouche
+
+Détail du jeu : « Yeux et bouches » (§ 2). À appliquer :
+
+- **Dessin**, dans cet ordre, à la position de la 03h : image 0 (tête), image des yeux (si ≠ −1),
+  bouche (si ≠ −1), image 1 (coiffure), image 34 (habits). En numéros libRealSpace : 1, yeux + 1,
+  bouche + 1, 2, 35. Le jeu dessine **une seule** image des yeux : l'octet de la 03h (255 →
+  aucune). Comparé à `faces_shape` (image des yeux attendue en numéro libRealSpace = octet + 1) :
+  13, 16, 17, 18, 22, 23, 24, 25, 32 sont conformes ; à corriger : 14 (attendu 15, libRealSpace
+  dessine 21 et 28), 19 (attendu 20, aucune), 20 (attendu 21, plus 28 en trop), 21 (attendu 22),
+  26 (27), 27 (28), 28 (29), 29 (30), 31 (32). Valeurs présentes dans les données : 13, 14, 16 à
+  25, 27, 28, 31 et 255.
+- **Clignement** : remplacer l'image des yeux par l'image 12 (libRealSpace 13) une fois sur 30 à
+  chaque image de scène, si l'octet de la 03h vaut 20 au plus ou 255. Absent des fichiers de
+  libRealSpace lus.
+- **Bouche** : libRealSpace fait tourner les images 3 à 12 sur l'horloge (`3 + (SDL_GetTicks() /
+  100) % 10`). Jeu : une lecture du texte par image de scène, avec les règles « er », « th », « ch »,
+  « h », « e » final ; bouches 2 à 11 (libRealSpace 3 à 12). Texte lu = texte brut du script, codes
+  `$` non remplacés, en minuscules.
+- **04h** garde visage, décor, couleur et image de base ; nouveau texte de lèvres.
+- **Durées** : fin du texte de lèvres, puis 40 images (15 si le texte est vide). Une 0Ah après un
+  gros plan : 20 images, texte affiché sans mouvement des lèvres.
+- **Palette** : palettes du décor puis `FCPL` « normal » (`CONVPALS` 46), le seul appel vu
+  (`ConvData_FindFacePalette_5A46F`) demande « normal » ; envoyée quand le décor change.
+
+Code de référence (compilé, style du dépôt) ; une lecture = une image de scène, numéros du jeu :
+
+```cpp
+// Numéros d'image du jeu ; libRealSpace ajoute 1 (image vide en tête de chaque jeu d'images).
+static const char *kCloseUpLipTable = "06891599098769362999252999";
+static const char *kGroupLipTable = "04302500000340143000353000";
+
+struct LipReader {
+    std::string text;
+    size_t cursor{ 0 };
+};
+
+// Texte de lèvres : texte brut du script (codes $ non remplacés), mis en minuscules.
+void setLipText(LipReader &reader, const std::string &scriptText) {
+    reader.text = scriptText;
+    for (auto &c : reader.text) {
+        if (c >= 'A' && c <= 'Z') {
+            c = static_cast<char>(c - 'A' + 'a');
+        }
+    }
+    reader.cursor = 0;
+}
+
+bool isLipTextDone(const LipReader &reader) {
+    return reader.cursor >= reader.text.size();
+}
+
+static char charAt(const LipReader &reader, size_t index) {
+    if (index < reader.text.size()) {
+        return reader.text[index];
+    }
+    return '\0';
+}
+
+// Gros plan (03h) : une lecture par image de scène (10 par seconde). Renvoie -1 = pas de bouche.
+int advanceCloseUpMouth(LipReader &reader) {
+    int mouth = -1;
+    char c = charAt(reader, reader.cursor);
+    if (c == '\0') {
+        return -1;
+    }
+    reader.cursor++;
+    char next = charAt(reader, reader.cursor);
+    if (c == 'e') {
+        if (next < 'a' || next > 'z') {
+            c = next;
+            reader.cursor++;
+        } else if (next == 'r') {
+            mouth = 6;
+            reader.cursor++;
+        }
+    } else if (c == 'h') {
+        reader.cursor++;
+    } else if (c == 't') {
+        if (next == 'h') {
+            mouth = 9;
+            reader.cursor++;
+        }
+    } else if (c == 'c') {
+        if (next == 'h') {
+            mouth = 6;
+            reader.cursor++;
+        }
+    }
+    if (mouth == -1 && c >= 'a' && c <= 'z') {
+        mouth = kCloseUpLipTable[c - 'a'] - '0' + 2;
+    }
+    return mouth;
+}
+
+// Personnage qui parle d'une scène de groupe (02h) : un caractère par image, sans règle.
+int advanceGroupMouth(LipReader &reader) {
+    char c = charAt(reader, reader.cursor);
+    if (c == '\0') {
+        return -1;
+    }
+    reader.cursor++;
+    if (c < 'a' || c > 'z') {
+        return -1;
+    }
+    return kGroupLipTable[c - 'a'] - '0' + 1;
+}
+
+// Image des yeux du gros plan, tirée à chaque image de scène. baseFrame = -1 si l'octet vaut 255.
+int closeUpEyeFrame(int baseFrame) {
+    if (baseFrame > 20) {
+        return baseFrame;
+    }
+    if (std::rand() % 30 == 0) {
+        return 12;
+    }
+    return baseFrame;
+}
+```
+
+`std::rand() % 30 == 0` reproduit la probabilité du jeu (`CRT_Rand × 30 / 32768 = 0`, soit
+1 093 / 32 768). Le jeu teste la fin par « caractère courant = 0 » ; un texte finissant par « e » ou
+« h » ferait sauter ce 0 dans le jeu, aucun texte des données n'est dans ce cas.
+
+### 7.5 Question « Accept / Reject » (0Bh)
+
+- **Visage** : image de base fixée à **53** (libRealSpace 54, valeur déjà dessinée par
+  `CONV_CONTRACT_CHOICE`, mais par-dessus la liste `faces_shape` : le jeu remplace l'image des
+  yeux, il n'en ajoute pas une) ; texte de lèvres vide → pas de bouche ; le clignement ne joue pas
+  (53 > 20).
+- **Ouverture** : la tête et le dernier élément du décor (`var_56`) sont descendus de 24 lignes
+  (méthode +18h, déplacement (0, 24)) et la scène passe en plein écran (0, 0)-(319, 199) ; les bandes noires s'ouvrent en 24 pas (haut : une ligne par pas, bas :
+  deux lignes par pas). L'image reste au même endroit à l'écran ; elle est seulement découverte.
+  Les bandes se referment de la même façon après la réponse.
+- **Zone** : la souris dans **x 118 à 279, y 113 à 199** (écran) → « Accept Mission », partout
+  ailleurs → « Reject Mission ». libRealSpace a deux zones, gauche (x 0–120) et droite
+  (x 200–320). Le libellé correspondant est réécrit à **y = 175** à chaque tour de la boucle
+  d'attente (tous les 3 tics de l'horloge `dword_47ABB`) ; la boucle s'arrête sur un événement
+  d'entrée de type 2 (type non identifié dans ce code).
+- **Effet** : réponse rangée pour la partie (`GameState.mission_accepted`, partie + 35Bh dans le
+  jeu) ; si refus, le curseur du script avance du mot de la 0Bh. Le script de partie choisit la
+  suite par ses tests 14h / 15h (§ 5).
+
+### 7.6 Choix de l'équipier (0Eh, 0Fh)
+
+- Décor `s_wing` ou `w_wing` selon l'octet écran de la 0Eh précédente ; libRealSpace prend
+  toujours `s_wing`.
+- Ne proposer que les pilotes de la liste `PILT` de la `WING` donnée par la 0Eh (libRealSpace
+  propose toujours les 5). Libellés du jeu : « Select Billy », « Select Gwen », « Select Lyle »,
+  « Select Miguel », « Select Tex ».
+- L'ordre gauche → droite des zones de libRealSpace (Lyle, Miguel, Gwen, Billy, Tex) n'a pas été
+  comparé aux positions des figures dans les images : à vérifier sur l'écran.
+
+### 7.7 Texte (`SCConvPlayer::DrawText`, `SetSentenceFromConv`)
+
+- **Remplacements à l'affichage**, pour **chaque occurrence** (libRealSpace : première occurrence
+  seulement ; `$N` `$S` `$C` à la lecture, `$W` à l'affichage) — `$W` `$L` `$O` peuvent changer
+  pendant la conversation (0Eh, 0Fh) :
+
+| Code | Valeur |
+|---|---|
+| `$S` / `$N` / `$C` | nom / prénom / indicatif du joueur |
+| `$W`, `$L`, `$O` | les trois équipiers posés par 0Eh / 0Fh (§ 2) — `$L` et `$O` absents de libRealSpace |
+| `$A`, `$B` | un nom de la table DiBianca, Templeman, Isaac, Roberts, Baldwin, Yenawine, Savage (choix : point ouvert) |
+| `$P` | avions perdus pendant la mission, en décimal, + « plane », + « s » si la valeur ≠ 1 |
+| `$T` | avions perdus au total, même forme |
+| `$` + autre | « $ » gardé |
+
+- **Mise en page** : lignes de **30 caractères au plus**, coupées aux espaces (libRealSpace : largeur
+  en pixels de la police) ; lignes à l'écran **y = 156 + 15 × n** (libRealSpace : 165 + 13 × n). La
+  position horizontale du jeu (format « %Y%J%S ») n'a pas été lue : garder le centrage de
+  libRealSpace en attendant.
