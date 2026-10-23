@@ -10,6 +10,8 @@ Usage :
   python3 tools/conv_faces.py --donnees <BIGTRE.TRE ou DATA> <visage> <préfixe>
       <préfixe>_images.png : les 62 images du visage, une par case
       <préfixe>_compose.png : la composition du jeu pour chaque valeur « image » des scripts
+  python3 tools/conv_faces.py --donnees <BIGTRE.TRE ou DATA> --compare <visage> <sortie.png>
+      en haut le jeu, en bas la table faces_shape de libRealSpace (SCConvPlayer.cpp), sans bouche
 """
 import collections
 import os
@@ -80,6 +82,43 @@ def sheet(cells, columns):
     return out
 
 
+# faces_shape de SCConvPlayer.cpp (numéros libRealSpace = numéro du jeu + 1)
+LIBREALSPACE_FACES_SHAPE = {
+    13: [1, 14, 2, 35],
+    14: [1, 21, 28, 2, 35],
+    16: [1, 17, 2, 35],
+    17: [1, 18, 2, 35],
+    18: [1, 19, 2, 35],
+    19: [1, 2, 35],
+    20: [1, 21, 28, 2, 35],
+    21: [1, 21, 28, 2, 35],
+    22: [1, 23, 2, 35],
+    23: [1, 24, 2, 35],
+    24: [1, 25, 2, 35],
+    25: [1, 26, 2, 35],
+    26: [1, 26, 2, 35],
+    27: [1, 27, 2, 35],
+    28: [1, 28, 2, 35],
+    29: [1, 29, 2, 35],
+    31: [1, 31, 2, 35],
+    32: [1, 33, 2, 35],
+    255: [1, 2, 35],
+}
+
+
+def write_compare(face, out):
+    shape = face_shape(face)
+    pal = palette()
+    values = [v for v in sorted(used_values()[face]) if v != 255]
+    cells = []
+    for value in values:
+        cells.append((f'{value} jeu', cell(shape, [0, value, 1, 34], pal)))
+    for value in values:
+        images = [i - 1 for i in LIBREALSPACE_FACES_SHAPE.get(value, [])]
+        cells.append((f'{value} libRS', cell(shape, images, pal)))
+    sheet(cells, len(values)).save(out)
+
+
 def write_sheets(face, prefix):
     shape = face_shape(face)
     pal = palette()
@@ -109,6 +148,8 @@ def main():
     args = sys.argv[1:]
     if args == ['--table']:
         print_table()
+    elif len(args) == 3 and args[0] == '--compare':
+        write_compare(args[1], args[2])
     elif len(args) == 2:
         write_sheets(args[0], args[1])
     else:

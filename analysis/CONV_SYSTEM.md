@@ -477,14 +477,45 @@ par la règle « y = 24 si la hauteur est inférieure à 199 ». Lire le 4ᵉ et
 
 Détail du jeu : « Yeux et bouches » (§ 2). À appliquer :
 
-- **Dessin**, dans cet ordre, à la position de la commande `CLOSEUP` : image 0 (tête), image des yeux (si ≠ −1),
-  bouche (si ≠ −1), image 1 (coiffure), image 34 (habits). En numéros libRealSpace : 1, yeux + 1,
-  bouche + 1, 2, 35. Le jeu dessine **une seule** image des yeux : l'octet de la commande `CLOSEUP` (255 →
-  aucune). Comparé à `faces_shape` (image des yeux attendue en numéro libRealSpace = octet + 1) :
-  13, 16, 17, 18, 22, 23, 24, 25, 32 sont conformes ; à corriger : 14 (attendu 15, libRealSpace
-  dessine 21 et 28), 19 (attendu 20, aucune), 20 (attendu 21, plus 28 en trop), 21 (attendu 22),
-  26 (27), 27 (28), 28 (29), 29 (30), 31 (32). Valeurs présentes dans les données : 13, 14, 16 à
-  25, 27, 28, 31 et 255.
+- **Dessin**, dans cet ordre, à la position de la commande `CLOSEUP` : image 0 (tête), image de
+  base (l'octet « image », 255 → aucune), bouche (si ≠ −1), image 1 (coiffure), image 34 (habits).
+  En numéros libRealSpace (+ 1, image vide en tête de chaque jeu d'images) : 1, octet + 1,
+  bouche + 1, 2, 35. Tête, coiffure et habits ne dépendent pas de l'octet (§ 2, « Images d'un
+  visage ») : la table `faces_shape` de `SCConvPlayer.cpp` peut être remplacée par une seule
+  image, octet + 1.
+- **Ordre des couches** : libRealSpace dessine la liste `faces_shape` (tête, expression, coiffure,
+  habits), puis la bouche **par-dessus** les habits. Dans le jeu, la bouche passe **avant** la
+  coiffure et les habits : là où ils se recouvrent (le menton : chez Billy, les zones des bouches
+  descendent jusqu'à la ligne −12, celle des habits commence à −47), les habits cachent le bas de la bouche.
+- **Comparaison de `faces_shape` avec le jeu** (relu le 2026-10-23 ; planche jeu / libRealSpace
+  pour un visage : `tools/conv_faces.py --compare`). Numéros du jeu dans les deux colonnes d'images ;
+  « répliques » = nombre de `CLOSEUP` des données qui ont cette valeur (1 717 en tout) :
+
+| Octet | Image du jeu | Images de libRealSpace | À l'écran | Répliques |
+|---|---|---|---|---|
+| 13 | 13 (yeux) | 13 | conforme | 32 |
+| 14 | 14 (yeux) | 20 (yeux) et 27 (sourire) | libRealSpace ajoute un sourire et change le regard | 87 |
+| 16 | 16 (yeux) | 16 | conforme | 19 |
+| 17 | 17 (yeux) | 17 | conforme | 21 |
+| 18 | 18 (yeux) | 18 | conforme | 21 |
+| 19 | 19 (yeux) | aucune | libRealSpace montre le visage neutre | 80 |
+| 20 | 20 (yeux) | 20 et 27 (sourire) | libRealSpace ajoute un sourire | 14 |
+| 21 | 21 (yeux) | 20 et 27 (sourire) | autre regard, et un sourire en trop | 16 |
+| 22 | 22 (sourcils) | 22 | conforme | 296 |
+| 23 | 23 (sourcil) | 23 | conforme | 66 |
+| 24 | 24 (sourcil) | 24 | conforme | 75 |
+| 25 | 25 (sourcils froncés) | 25 | conforme | 431 |
+| 27 | 27 (sourire) | 26 (bouche) | une autre bouche, sans le sourire | 16 |
+| 28 | 28 (grand sourire) | 27 (sourire) | sourire au lieu du grand sourire | 1 |
+| 31 | 31 (sourcils et bouche) | 30 | une autre expression | 42 |
+| 255 | aucune | aucune | conforme | 500 |
+
+  En tout, 256 répliques sur 1 717 n'ont pas la même expression que dans le jeu. Les entrées 26,
+  29 et 32 de `faces_shape` ne servent pas (valeurs absentes des données) ; 26 et 29 sont décalées
+  de 1, 32 est juste.
+- **Visages incomplets** (§ 2) : pour une valeur dont l'image est vide (par exemple `far` 22), le
+  jeu ne dessine rien de plus que la tête. Ce n'est pas un écart : avec l'image octet + 1,
+  libRealSpace doit simplement ne rien dessiner pour une image vide.
 - **Clignement** : remplacer l'image des yeux par l'image 12 (libRealSpace 13) une fois sur 30 à
   chaque image de scène, si l'octet de la commande `CLOSEUP` vaut 20 au plus ou 255. Absent des fichiers de
   libRealSpace lus.
