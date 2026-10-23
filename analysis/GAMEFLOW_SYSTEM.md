@@ -307,7 +307,9 @@ dans le code lu.
 
 « Nom » = nom utilisé dans ce document, d'après l'effet dans le jeu (la constante de libRealSpace
 est au § 7.1). « Données » = nombre d'occurrences dans `GAMEFLOW.IFF` (MISS = script de mission,
-SPRT = script de sprite).
+SPRT = script de sprite) ; « code seulement » = la commande existe dans l'interpréteur mais
+n'apparaît dans aucun script des données. Les quatre dernières lignes n'existent que dans
+l'OPTTEST.EXE du CD-ROM (§ 8).
 
 | Valeur | Nom | Données | Effet dans le jeu |
 |---|---|---|---|
@@ -316,16 +318,16 @@ SPRT = script de sprite).
 | 2 | `PLAY_MIDGAME` | 12 | cinématique n (`Gameflow_PlayMidgame_4ABE0`) |
 | 3 | `FLY_MISSION_NOW` | 3 | mission à voler `[+249]` = n et **départ en vol** (`[+232]` = 1), sans écran d'armement |
 | 4 | `NOP_4` | 43 (SPRT) | **rien** (dans les deux versions) |
-| 5 | `SELECT_MISSION_ALT` | 0 | `[+249]` = n (comme `SELECT_MISSION`) |
+| 5 | `SELECT_MISSION_ALT` | 0, code seulement | `[+249]` = n (comme `SELECT_MISSION`) |
 | 6 | `SET_FLAG` | 204 | drapeau n posé |
 | 7 | `CLEAR_FLAG` | 93 | drapeau n effacé |
 | 8 | `PLAY_SHOT` | 118 | plan fixe n d'`OPTIONS.IFF` (`ESTB` / `SHOT`, `Gameflow_PlayShot_4AD86`) |
 | 9 | `IF_NOT_FLAG` | 17 | test : réussit si le drapeau n n'est pas posé |
 | 10 | `IF_FLAG` | 47 | test : réussit si le drapeau n est posé |
-| 11 | `NOP_11` | 0 | rien |
+| 11 | `NOP_11` | 0, code seulement | rien |
 | 12 | `SELECT_MISSION` | 48 (SPRT) | mission à voler `[+249]` = n (le vol part de l'écran d'armement, `WEAPON_LOADOUT`) |
 | 13 | `SET_NEXT_MISSION` | 93 | mission suivante `[+251]` = n |
-| 14 | `START_FLIGHT` | 0 | départ en vol (`[+232]` = 1) |
+| 14 | `START_FLIGHT` | 0, code seulement | départ en vol (`[+232]` = 1) |
 | 15 | `GOTO_NEXT_MISSION` | 29 | passage à la mission suivante (`[+232]` = 2) |
 | 16 | `SAVE_GAME` | 54 | choix d'un fichier (`Gameflow_SaveRequester_4D984`) ; s'il est donné, sauvegarde dans ce fichier puis dans `gensave.tmp` |
 | 17 | `LOAD_GAME` | 54 | choix d'un fichier (`Gameflow_LoadRequester_4DDDC`) ; s'il est donné, `[+232]` = 3 |
@@ -339,19 +341,27 @@ SPRT = script de sprite).
 | 25 | `LOOK_AT_LEDGER` | 54 | livre de comptes (`Gameflow_Ledger_53686`) |
 | 26 | `SHOW_KILL_MARKS` | 27 (MISS) | si le joueur a eu des victoires pendant le vol (`[+237]`, § 6) et n'est pas mort (`[+248]` ≠ 2) : **marques de victoires peintes sur l'avion** (`OPTIONS.IFF` `MARK`, `Gameflow_ShowKillMarks_506AA`) |
 | 27 | `REMOVE_PILOT` | 2 (MISS) | **retire le pilote n** du tableau des victoires (`[+675 + n × 26]` = 0 ; n < 8) ; données : 6, 7 |
-| 28 | `IF_TRUE` | 0 | test qui réussit toujours (compté comme test pendant un saut, sans effet) |
+| 28 | `IF_TRUE` | 0, code seulement | test qui réussit toujours (compté comme test pendant un saut, sans effet) |
 | 29 | `CHECK_GAME_OVER` | 12 (MISS) | **fin de partie** (`Gameflow_CheckLossConversations_50645`) : plus de 16 avions perdus au total → conversation 254 ; sinon argent < 0 → conversation 255 ; dans les deux cas retour au menu (`[+232]` = 0) et arrêt du script |
 | 30 | `ELSE` | 117 | sinon (§ 5.1) |
 | 31 | `ENDIF` | 159 | fin de bloc (§ 5.1) |
 | 32 | `IF_MISSION_SUCCESS` | 62 | test : réussit si la mission n de `MLST` a été volée **avec succès** (`[+509 + n]` = 1, § 6) |
-| 33 | `OR_GROUP` | 0 | groupe de tests (§ 5.1) |
+| 33 | `OR_GROUP` | 0, code seulement | groupe de tests (§ 5.1) |
 | 34 | `APPLY_CHANGE` | 94 | applique le changement `CHNG` n (§ 5.4, `Gameflow_ApplyChange_50160`) |
-| 35 | `IF_PLANES_LOST` | 0 | test : réussit si des avions ont été perdus pendant le dernier vol (`[+234]` ≠ 0) |
+| 35 | `IF_PLANES_LOST` | 0, code seulement | test : réussit si des avions ont été perdus pendant le dernier vol (`[+234]` ≠ 0) |
 | 36 | `PLANES_LOST_CONV` | 27 (MISS) | si des avions ont été perdus pendant le dernier vol : humeur musicale 8, puis conversation **253** si le joueur est mort (`[+248]` = 2), **252** sinon |
 | 37 | `IF_RESULT_3` | 7 (MISS) | test : réussit si la 3ᵉ valeur de `STAT` du compte rendu (`[+982]`, § 6) ≠ 0 |
 | 38 | `PLAY_GAMEFLOW_TUNE` | 18 (MISS) | **joue le morceau n** de `SOUND\gameflow.dat` (`Music_PlayGameflowTune_28CFC`), gardé en `[+983]` (sauvegardé) ; données : 1 à 5 |
+| 39 | `IF_RESULT_4` | 0, code seulement (CD) | test : réussit si la 4ᵉ valeur de `STAT` du compte rendu (`[+984]` dans la partie du CD) ≠ 0 |
+| 40 | `IF_RESULT_5` | 0, code seulement (CD) | test : réussit si la 5ᵉ valeur de `STAT` (`[+985]`) ≠ 0 |
+| 41 | `IF_RESULT_6` | 0, code seulement (CD) | test : réussit si la 6ᵉ valeur de `STAT` (`[+986]`) ≠ 0 |
+| 42 | `IF_LOADED_FLAG` | 0, code seulement (CD) | test : réussit si `[+982]` ≠ 0 (octet rangé par le chargement d'une partie ; rôle non établi) |
 
-Valeurs au-delà de 38 : rien (disquette). Version CD : quatre commandes de plus, § 8.
+Valeurs au-delà de 38 : rien dans la version disquette. Au-delà de 42 : rien dans la version CD.
+Dans la version CD, la partie a 4 octets de plus à partir de `+982` : `IF_RESULT_3` y lit `[+983]`
+et `PLAY_GAMEFLOW_TUNE` garde le morceau en `[+987]` (§ 8). `IF_RESULT_4`, `IF_RESULT_5`,
+`IF_RESULT_6` et `IF_LOADED_FLAG` ne sont pas dans la liste des tests comptés pendant un saut
+(§ 5.1, même liste que la disquette).
 
 ### 5.3 Écran d'armement (`WEAPON_LOADOUT`, `Gameflow_WeaponLoadout_51AB3`)
 
@@ -548,7 +558,10 @@ Tous les nombres de ce chapitre sont en décimal, comme dans `SCenums.h` et le d
 | `PLANES_LOST_CONV` (36) | `EFECT_OPT_U14` | pas de cas (point 6) |
 | `IF_RESULT_3` (37) | `EFECT_IF_LAST_MISS_SUCCESS` | non : le jeu teste la 3ᵉ valeur de `STAT` (point 1) |
 | `PLAY_GAMEFLOW_TUNE` (38) | `EFECT_OPT_TUNE_MODIFIER` | en partie (point 7) |
+| `IF_RESULT_4` (39, CD seulement) | — | absent des données (§ 8) |
 | `IF_RESULT_5` (40, CD seulement) | `EFFCT_OPT_U19` | absent des données (§ 8) |
+| `IF_RESULT_6` (41, CD seulement) | — | absent des données (§ 8) |
+| `IF_LOADED_FLAG` (42, CD seulement) | — | absent des données (§ 8) |
 
 ### 7.2 Ce qui est conforme au jeu
 
