@@ -6,11 +6,46 @@ du décor puis FCPL « normal ». Image hors écran 320 × 200, lignes 0 à 127 
 ligne 24. Bouche et clignement : règles de « Yeux et bouches » (TalkingHead_Advance_9F5A).
 Le texte du bas est écrit avec la police de PIL : la police du jeu n'est pas reproduite.
 
-Usage : python3 tools/conv_doc_images.py --donnees <BIGTRE.TRE ou DATA> <dossier de sortie>
+Usage :
+  python3 tools/conv_doc_images.py --donnees <BIGTRE.TRE ou DATA> <dossier de sortie>
+      écrit les images dans le dossier
+  python3 tools/conv_doc_images.py --embarquer <page.html>
+      met dans la page chaque image désignée par data-file (src = data:…base64), pour que la page
+      s'affiche seule, sans serveur ni dossier d'images à côté
 """
+import base64
 import os
 import random
+import re
 import sys
+
+def embed(page):
+    """Remplace le src de chaque <img data-file="…"> par l'image elle-même, en base64."""
+    folder = os.path.dirname(page)
+    kinds = {
+        '.png': 'image/png',
+        '.gif': 'image/gif',
+    }
+
+    def inline(match):
+        tag = match.group(0)
+        name = re.search(r'data-file="([^"]+)"', tag).group(1)
+        with open(os.path.join(folder, name), 'rb') as f:
+            data = base64.b64encode(f.read()).decode()
+        uri = f'data:{kinds[os.path.splitext(name)[1]]};base64,{data}'
+        return re.sub(r'src="[^"]*"', f'src="{uri}"', tag)
+
+    with open(page, encoding='utf-8') as f:
+        html = f.read()
+    html = re.sub(r'<img [^>]*data-file="[^"]+"[^>]*>', inline, html)
+    with open(page, 'w', encoding='utf-8') as f:
+        f.write(html)
+
+
+if len(sys.argv) == 3 and sys.argv[1] == '--embarquer':
+    # Pas besoin des données du jeu : sortie avant les imports qui les lisent.
+    embed(sys.argv[2])
+    sys.exit(0)
 
 if '--donnees' in sys.argv:
     _i = sys.argv.index('--donnees')
@@ -232,6 +267,7 @@ def write_all(out):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 2:
+        write_all(sys.argv[1])
+    else:
         raise SystemExit(__doc__)
-    write_all(sys.argv[1])
