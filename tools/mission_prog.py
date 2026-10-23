@@ -83,6 +83,92 @@ OPS = {
     0xB9: 'n\'accompagne plus le joueur',
 }
 
+# Noms des instructions : enum prog_op de libRealSpace (SCenums.h), et noms proposés dans le même
+# style pour les autres (MISSION_SCRIPT_OPCODES.md).
+NAMES = {
+    0: 'OP_NOOP',
+    1: 'OP_EXIT_PROG',
+    2: 'OP_EXEC_SUB_PROG',
+    3: 'OP_EXEC_SUB_PROG_WORK',
+    4: 'OP_STOP_SCRIPT',
+    8: 'OP_SET_LABEL',
+    15: 'OP_SET_EXIT_CODE',
+    16: 'OP_MOVE_VALUE_TO_WORK_REGISTER',
+    17: 'OP_MOVE_FLAG_TO_WORK_REGISTER',
+    18: 'OP_SWAP_WORK_AND_FLAG',
+    19: 'OP_MOVE_RESULT_TO_WORK',
+    20: 'OP_SAVE_VALUE_TO_GAMFLOW_REGISTER',
+    21: 'OP_RANDOM_TO_WORK',
+    32: 'OP_ADD_VALUE_TO_WORK',
+    33: 'OP_ADD_FLAG_TO_WORK',
+    34: 'OP_ADD_VALUE_TO_FLAG',
+    35: 'OP_ADD_WORK_REGISTER_TO_FLAG',
+    36: 'OP_SUB_VALUE_FROM_WORK',
+    37: 'OP_SUB_FLAG_FROM_WORK',
+    38: 'OP_SUB_VALUE_FROM_FLAG',
+    39: 'OP_SUB_WORK_FROM_FLAG',
+    40: 'OP_OR_VALUE_WITH_WORK',
+    41: 'OP_OR_FLAG_WITH_WORK',
+    42: 'OP_AND_VALUE_WITH_WORK',
+    43: 'OP_AND_FLAG_WITH_WORK',
+    44: 'OP_XOR_VALUE_WITH_WORK',
+    45: 'OP_XOR_FLAG_WITH_WORK',
+    46: 'OP_MUL_VALUE_WITH_WORK',
+    47: 'OP_MUL_FLAG_WITH_WORK',
+    48: 'OP_DIV_WORK_BY_VALUE',
+    49: 'OP_DIV_WORK_BY_FLAG',
+    64: 'OP_CMP_WORK_WITH_VALUE',
+    65: 'OP_CMP_VALUE_WITH_WORK',
+    66: 'OP_CMP_WORK_WITH_FLAG',
+    67: 'OP_CMP_FLAG_WITH_WORK',
+    68: 'OP_CMP_RESULT_WITH_VALUE',
+    69: 'OP_TEST_FLAG',
+    70: 'OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS',
+    71: 'OP_GOTO_IF_CURRENT_COMMAND_DONE',
+    72: 'OP_BRANCH_IF_EQUAL',
+    73: 'OP_BRANCH_IF_NOT_EQUAL',
+    74: 'OP_BRANCH_IF_LESS',
+    75: 'OP_BRANCH_IF_GREATER',
+    76: 'OP_BRANCH_IF_LESS_EQUAL',
+    77: 'OP_BRANCH_IF_GREATER_EQUAL',
+    78: 'OP_BRANCH',
+    79: 'OP_EXECUTE_CALL',
+    80: 'OP_MOVE_WORK_REGISTER_TO_FLAG',
+    81: 'OP_MOVE_RESULT_TO_FLAG',
+    82: 'OP_SET_FLAG_TO_TRUE',
+    83: 'OP_SET_FLAG_TO_FALSE',
+    84: 'OP_TOGGLE_FLAG',
+    85: 'OP_ADD_1_TO_FLAG',
+    86: 'OP_REMOVE_1_TO_FLAG',
+    128: 'OP_ACTIVATE_SCENE',
+    129: 'OP_DEACTIVATE_SCENE',
+    144: 'OP_ACTIVATE_OBJ',
+    145: 'OP_DEACTIVATE_OBJ',
+    146: 'OP_IF_TARGET_IN_AREA',
+    147: 'OP_IS_TARGET_ALIVE',
+    148: 'OP_INSTANT_DESTROY_TARGET',
+    149: 'OP_DIST_TO_TARGET',
+    151: 'OP_DIST_TO_SPOT',
+    152: 'OP_IS_TARGET_ACTIVE',
+    160: 'OP_SET_WAIT_FOR_SECONDS',
+    161: 'OP_SET_OBJ_TAKE_OFF',
+    162: 'OP_SET_OBJ_LAND',
+    165: 'OP_SET_OBJ_FLY_TO_WP',
+    166: 'OP_SET_OBJ_FLY_TO_AREA',
+    167: 'OP_SET_OBJ_DESTROY_TARGET',
+    168: 'OP_SET_OBJ_DEFEND_TARGET',
+    169: 'OP_SET_OBJ_DEFEND_AREA',
+    170: 'OP_SET_OBJ_FOLLOW_ALLY',
+    171: 'OP_SET_MESSAGE',
+    182: 'OP_SHOW_ON_NAV_MAP',
+    183: 'OP_HIDE_FROM_NAV_MAP',
+    184: 'OP_JOIN_PLAYER_TEAM',
+    185: 'OP_LEAVE_PLAYER_TEAM',
+    190: 'OP_PACIFY_TARGET',
+    191: 'OP_SET_OBJ_PATROL_POSITION',
+    208: 'OP_SELECT_FLAG_208',
+}
+
 # Instructions qui écrivent FLAG[n] (toutes celles de l'interpréteur).
 FLAG_WRITERS = {
     0x12,
@@ -205,7 +291,8 @@ def dump(path):
             where = hooks.get(number, []) + [f'appel depuis le programme {c}' for c in sorted(callers.get(number, []))]
             where = '; '.join(where) or '—'
             print(f'-- programme {number} (déclenché par : {where})')
-        print(f'   {at:5d}  {op:3d} {arg:3d}   {describe(op, arg, arg2)}')
+        name = NAMES.get(op, str(op))
+        print(f'   {at:5d}  {name:<40} {arg:3d}   {describe(op, arg, arg2)}')
 
 
 def stat_report(path):

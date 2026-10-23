@@ -88,10 +88,17 @@ réponses ni dans les documents.
 Dans les documents et les réponses, tout nombre destiné à Rémi s'écrit en **base 10** : numéros de
 commande et d'opcode (comme `SCenums.h` et le dump `gameflow_parsed.txt` de libRealSpace),
 arguments, champs (`[partie+250]`, `+82`), tailles, valeurs lues dans les fichiers. Pas de `25h`
-ni de `0x25`. Un numéro de commande seul s'écrit « la commande 37 », pas « une 37 ». Les suites de
-script s'écrivent en paires décimales (commande, argument) : (13, 2) (15, 0). Seules exceptions :
-le suffixe d'adresse des noms de fonctions (`Gameflow_MainLoop_3D2E`) et une citation exacte
-d'instruction d'assembleur.
+ni de `0x25`. Seules exceptions : le suffixe d'adresse des noms de fonctions
+(`Gameflow_MainLoop_3D2E`) et une citation exacte d'instruction d'assembleur.
+
+**9. Les instructions par leur nom, pas par leur valeur.**
+Une commande ou une instruction de script (déroulement, conversation, script de mission) se
+désigne par son **nom** dans tout le texte : `SET_NEXT_MISSION`, `CLOSEUP`, `OP_ADD_1_TO_FLAG`.
+Sa valeur n'apparaît que dans la table de référence qui définit les noms. Une suite de script
+s'écrit avec les noms : `PLAY_CONV 221`, `PLAY_MIDGAME 16`, `GOTO_NEXT_MISSION` — jamais
+« (0, 221) (2, 16) ». Noms : ceux de libRealSpace (`SCenums.h`, `SCConvPlayer.cpp`) quand ils
+existent, sinon les noms proposés des tables de référence (`GAMEFLOW_SYSTEM.md` § 5.2,
+`CONV_SYSTEM.md` § 2, `MISSION_SCRIPT_OPCODES.md`, conditions `REQU` au § 4.2 de GAMEFLOW).
 
 ## Contexte du projet
 

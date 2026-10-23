@@ -5,6 +5,14 @@
 #include <unordered_map>
 #include <vector>
 
+// Conditions du chunk REQU (GAMEFLOW_SYSTEM.md § 4.2)
+enum RequCondition {
+    REQUIRE_NOT_SET = 0,
+    REQUIRE_SET = 1,
+    OR_NOT_SET = 2,
+    OR_SET = 3
+};
+
 struct REQU {
     uint8_t op;
     uint8_t value;
@@ -35,24 +43,24 @@ bool SCZone::isActive(std::unordered_map<uint8_t, bool> *requierd_flags) {
             flag = found->second;
         }
         switch (requ_flag->op) {
-        case 0:
+        case REQUIRE_NOT_SET:
             if (flag && !skipNext) {
                 visible = false;
             }
             skipNext = false;
             break;
-        case 1:
+        case REQUIRE_SET:
             if (!flag && !skipNext) {
                 visible = false;
             }
             skipNext = false;
             break;
-        case 2:
+        case OR_NOT_SET:
             if (!flag) {
                 skipNext = true;
             }
             break;
-        case 3:
+        case OR_SET:
             if (flag) {
                 skipNext = true;
             }

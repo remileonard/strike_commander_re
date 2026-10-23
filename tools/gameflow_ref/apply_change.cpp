@@ -1,4 +1,4 @@
-// Commande 22h (CHNG) et contrôle de fin de partie 1Dh d'après le jeu (Gameflow_ApplyChange_50160,
+// APPLY_CHANGE (CHNG) et contrôle de fin de partie CHECK_GAME_OVER d'après le jeu (Gameflow_ApplyChange_50160,
 // Gameflow_CheckLossConversations_50645), GAMEFLOW_SYSTEM.md § 5.4 et § 7.
 // Les types ci-dessous ne servent qu'à compiler cet essai ; dans libRealSpace, seules les fonctions sont à reprendre.
 #include <cstdint>
@@ -62,8 +62,9 @@ static int32_t applyOp(int32_t current, uint8_t op, int32_t value, bool clampAtZ
     }
 }
 
-// Le jeu applique la valeur du fichier telle quelle, directement sur l'argent : la même unité que le
-// gain de mission (2e valeur de STAT) et que le coût des avions perdus (500 par avion).
+// Le jeu applique la valeur du fichier directement sur l'argent. Les montants sont en milliers, comme
+// le gain de mission (2e valeur de STAT) et le coût des avions perdus (500 par avion) : le ×1000 de
+// libRealSpace, qui donne les vrais montants, s'applique de la même façon aux trois.
 void applyChange(GameStateLike *state, const CHNG *chng) {
     if (chng->cash != nullptr) {
         state->cash = applyOp(state->cash, chng->cash->op, chng->cash->value, false);
@@ -85,7 +86,7 @@ void applyChange(GameStateLike *state, const CHNG *chng) {
     }
 }
 
-// Commande 1Dh : renvoie la conversation de fin de partie (254, 255) ou 0 si la partie continue.
+// CHECK_GAME_OVER : renvoie la conversation de fin de partie (254, 255) ou 0 si la partie continue.
 // Dans le jeu, une fin de partie arrête aussi le script et ramène au menu.
 uint8_t checkGameOver(const GameStateLike *state) {
     if (state->planes_lost_total > 16) {
@@ -98,7 +99,8 @@ uint8_t checkGameOver(const GameStateLike *state) {
 }
 
 int main() {
-    // MISS 41 après MISN-12b (piste détruite) : changements 27 (argent remplacé par 0) puis 7 (argent − 2000).
+    // MISS 41 après MISN-12b (piste détruite) : APPLY_CHANGE 27 (argent remplacé par 0), puis APPLY_CHANGE 7
+    // (argent − 2000 milliers), puis CHECK_GAME_OVER. Montants en milliers.
     GameStateLike state;
     state.cash = 150000;
     ChangeValue replaceByZero;
@@ -113,6 +115,6 @@ int main() {
     change7.cash = &remove2000;
     applyChange(&state, &change27);
     applyChange(&state, &change7);
-    printf("argent %d, conversation de fin %d (attendu -2000, 255)\n", state.cash, checkGameOver(&state));
+    printf("argent %d milliers, conversation de fin %d (attendu -2000, 255)\n", state.cash, checkGameOver(&state));
     return 0;
 }

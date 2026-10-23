@@ -1,7 +1,10 @@
 # Conversations (OPTEST.EXE)
 
-> **Nombres en décimal** (opcodes, arguments, champs `+n`). Les adresses de code citées sont aussi
-> en décimal ; les fichiers annotés les écrivent en hexadécimal.
+> **Nombres en décimal** (arguments, champs `+n`). Les adresses de code citées sont aussi en
+> décimal ; les fichiers annotés les écrivent en hexadécimal. Les commandes des scripts de
+> conversation sont désignées par leur **nom** : celui de `SCConvPlayer.cpp` de libRealSpace quand
+> il existe, sinon un nom proposé marqué \* (table du § 2, qui donne aussi les valeurs). Les
+> commandes du script de partie portent les noms de `GAMEFLOW_SYSTEM.md` § 5.2.
 
 Lu le 2026-10-22 dans `analysis/optest/annotated_segments/ovr191_annotated.asm` (interpréteur) et
 `seg006_annotated.asm` (lecteurs d'enregistrements). Sauf au § 8, les adresses sont celles de
@@ -17,7 +20,7 @@ Outil : `tools/conv_dump.py --donnees <BIGTRE.TRE ou DATA> [entrée ...]` affich
 | `GAMEFLOW\CONVDATA.IFF` | noms → images et palettes : décors (`BCKS`/`BACK`), visages (`FACE`), figurants (`FIGR`, `PFIG`), palettes (`FCPL`, `FGPL`) |
 | `GAMEFLOW\CONVSHPS.PAK`, `CONVPALS.PAK` | images et palettes des visages, figurants et décors |
 | `GAMEFLOW\OPTSHPS.PAK`, `OPTPALS.PAK` | images et palettes partagées avec les menus (ciel, `optshps` 116) |
-| `GAMEFLOW\GAMEFLOW.IFF` | escadres (`WNGS` / `WING` : `INFO`, `PILT`, `ORDR`), lues par la commande 14 |
+| `GAMEFLOW\GAMEFLOW.IFF` | escadres (`WNGS` / `WING` : `INFO`, `PILT`, `ORDR`), lues par `SELECT_WING` |
 | `VOCLIST.IFF` (version CD) | liste des fichiers de voix (`FORM LIST` : `SIZE`, `LIST`), test de présence des voix et préchargement (§ 8.3) |
 | `f:<identifiant>.voc` (version CD) | une réplique parlée ; identifiant = la chaîne `[voix]` du script (§ 8.3) |
 
@@ -40,19 +43,24 @@ format est identique dans les deux versions.
 
 ### Commandes de premier niveau (table `off_5CE29`, octets 0 à 16)
 
-| Octet | Commande | Champs |
-|---|---|---|
-| 0 | scène de groupe | nom du décor ; puis des commandes 1 ; puis des commandes 2 / 10 |
-| 3 | réplique en gros plan | voir ci-dessous ; puis des commandes 10, 4, 11 |
-| 12 | saut | mot : nombre d'octets sautés, compté depuis la fin du mot |
-| 14 | escadre | octet `écran` ; octet `escadre` |
-| 15 | choix d'un équipier | aucun |
-| 16 | (rien) | aucun |
-| autre | sautée | l'octet seul est consommé (branche par défaut) |
+| Valeur | Nom | Commande | Champs |
+|---|---|---|---|
+| 0 | `GROUP_SHOT` | scène de groupe | nom du décor ; puis des `GROUP_SHOT_ADD_CHARACTER` ; puis des `GROUP_SHOT_CHARACTER_TALK` / `SHOW_TEXT` |
+| 3 | `CLOSEUP` | réplique en gros plan | voir ci-dessous ; puis des `SHOW_TEXT`, `CLOSEUP_CONTINUATION`, `YESNOCHOICE_BRANCH1` |
+| 12 | `YESNOCHOICE_BRANCH2` | saut | mot : nombre d'octets sautés, compté depuis la fin du mot |
+| 14 | `SELECT_WING`\* (`UNKNOWN` dans libRealSpace) | escadre | octet `écran` ; octet `escadre` |
+| 15 | `CHOOSE_WINGMAN` | choix d'un équipier | aucun |
+| 16 | `NOP_16`\* | (rien) | aucun |
+| autre | — | sautée | l'octet seul est consommé (branche par défaut) |
+
+Sous-commandes, lues par la commande qui les précède : `GROUP_SHOT_ADD_CHARACTER` (1),
+`GROUP_SHOT_CHARACTER_TALK` (2), `CLOSEUP_CONTINUATION` (4), `SHOW_TEXT` (10),
+`YESNOCHOICE_BRANCH1` (11). Version CD : `SHOW_TEXT` aussi au premier niveau, et `NOP_18`\* (18),
+qui ne fait rien (§ 8.6).
 
 Le script se lit jusqu'à la fin de l'entrée (pointeur ≥ début + taille).
 
-### 3 — réplique en gros plan (`ConvRec_ReadLine_632E`)
+### `CLOSEUP` — réplique en gros plan (`ConvRec_ReadLine_632E`)
 
 | Champ | Taille | Rôle (d'après l'usage) |
 |---|---|---|
@@ -66,24 +74,24 @@ Le script se lit jusqu'à la fin de l'entrée (pointeur ≥ début + taille).
 | couleur | 1 | couleur du texte (méthode +16 de la police) |
 
 Puis, autant de fois qu'ils se suivent :
-- **10** : octet couleur, `[voix]`, chaîne — texte affiché sans mouvement des lèvres, attente de
+- **`SHOW_TEXT`** : octet couleur, `[voix]`, chaîne — texte affiché sans mouvement des lèvres, attente de
   20 images (lu par `ConvRec_ReadNarration_65E8`) ;
-- **4** : `[voix]`, chaîne — suite de la même réplique (même visage, même décor, même couleur ;
+- **`CLOSEUP_CONTINUATION`** : `[voix]`, chaîne — suite de la même réplique (même visage, même décor, même couleur ;
   `ConvRec_ReadLine_632E` ne relit que le texte quand l'en-tête est déjà lu) ;
-- **11** : mot — question « Accept Mission » / « Reject Mission » (`ConvRec_ReadAcceptSkip_6660`) :
+- **`YESNOCHOICE_BRANCH1`** : mot — question « Accept Mission » / « Reject Mission » (`ConvRec_ReadAcceptSkip_6660`) :
   si le joueur refuse, le mot est ajouté au pointeur (la branche « accepter » est sautée).
 
-### 0 — scène de groupe (`ConvRec_ReadName_6305`)
+### `GROUP_SHOT` — scène de groupe (`ConvRec_ReadName_6305`)
 
 | Commande | Champs | Rôle |
 |---|---|---|
-| 0 | nom du décor (9) | plan large |
-| 1 (répété) | nom de figure (9), x (mot), y (mot) | figurant posé dans le décor (`FORM FIGR`), calque `ConvFigure_ConstructExtra_AB6B` (voir plus bas) |
-| 2 (répété) | nom de figure (9), x, y, octet couleur, `[voix]`, chaîne | personnage qui parle, calque `ConvFigure_ConstructSpeaking_A207` (voir plus bas), lèvres synchronisées sur le texte |
-| 10 (répété, mêlé aux 2) | octet couleur, `[voix]`, chaîne | texte sans personnage |
+| `GROUP_SHOT` | nom du décor (9) | plan large |
+| `GROUP_SHOT_ADD_CHARACTER` (répété) | nom de figure (9), x (mot), y (mot) | figurant posé dans le décor (`FORM FIGR`), calque `ConvFigure_ConstructExtra_AB6B` (voir plus bas) |
+| `GROUP_SHOT_CHARACTER_TALK` (répété) | nom de figure (9), x, y, octet couleur, `[voix]`, chaîne | personnage qui parle, calque `ConvFigure_ConstructSpeaking_A207` (voir plus bas), lèvres synchronisées sur le texte |
+| `SHOW_TEXT` (répété, mêlé aux `GROUP_SHOT_CHARACTER_TALK`) | octet couleur, `[voix]`, chaîne | texte sans personnage |
 
-Les répliques 2 / 10 sont jouées dans l'ordre après la lecture de toute la scène ; une commande 2
-attend la fin de son texte de lèvres (`TalkingHead_IsLipTextDone_A0D5`), une commande 10 attend 40 images.
+Les répliques `GROUP_SHOT_CHARACTER_TALK` / `SHOW_TEXT` sont jouées dans l'ordre après la lecture de toute la scène ; une commande `GROUP_SHOT_CHARACTER_TALK`
+attend la fin de son texte de lèvres (`TalkingHead_IsLipTextDone_A0D5`), une commande `SHOW_TEXT` attend 40 images.
 
 - **Figurant** (`ConvFigure_ConstructExtra_AB6B`) : image 0 de sa forme (`FIGR`) en (x, y). Si la
   forme a plus d'une image et que le dernier caractère du nom est au-delà de « 3 », il dessine en
@@ -97,7 +105,7 @@ attend la fin de son texte de lèvres (`TalkingHead_IsLipTextDone_A0D5`), une co
 ### Scène de groupe : placement des figures (relu le 2026-10-22)
 
 **Où l'on dessine.** Comme les cinématiques : `Conv_Init_59A20` réserve une image hors écran de
-320 × 200 (`[conv + 26]`, rectangle (0, 0)-(319, 199)), que la commande 0 met en surface de
+320 × 200 (`[conv + 26]`, rectangle (0, 0)-(319, 199)), que la commande `GROUP_SHOT` met en surface de
 dessin ; la scène (`LayerGroup_Construct_2DC66(scène, 10, 0, conv + 12)`) recopie à l'écran
 (`[conv + 12]`, rectangle (0, 24)-(319, 151)) à chaque image (`LayerGroup_PlayFrame_2DD86`).
 Donc : **x, y des figures sont dans l'image hors écran ; sa ligne 0 arrive à la ligne 24 de
@@ -120,27 +128,27 @@ leurs coordonnées d'écran dans l'image et sont posées en (0, 0).
 `FACE` et `FIGR` donnent une entrée de `CONVSHPS.PAK` ; `FCPL`, `FGPL`, `PFIG` une entrée de
 `CONVPALS.PAK`.
 
-**Ordre de dessin** : éléments du décor dans l'ordre du `BACK`, puis les commandes 1, puis les commandes 2, dans
-l'ordre du script (`LayerGroup_Add_2DB84` ajoute en fin de liste). Les commandes 2 sont toutes à l'écran dès
+**Ordre de dessin** : éléments du décor dans l'ordre du `BACK`, puis les commandes `GROUP_SHOT_ADD_CHARACTER`, puis les commandes `GROUP_SHOT_CHARACTER_TALK`, dans
+l'ordre du script (`LayerGroup_Add_2DB84` ajoute en fin de liste). Les commandes `GROUP_SHOT_CHARACTER_TALK` sont toutes à l'écran dès
 le début de la scène ; seules leurs lèvres bougent pendant leur réplique.
 
 **Palette** (une seule pour toute la scène, 256 couleurs, composée dans cet ordre) :
 1. la palette de chaque élément du décor ;
 2. `FGPL` « normal » (`CONVPALS` 48) ;
-3. la palette `PFIG` du **premier figurant (1) seulement** ; sans figurant, rien de plus.
+3. la palette `PFIG` du **premier figurant (`GROUP_SHOT_ADD_CHARACTER`) seulement** ; sans figurant, rien de plus.
 `PFIG` vaut 48 pour la plupart, 51 pour les figures des écrans d'équipiers : sur `s_wing`,
 `air2` (48 dans `PFIG`) est dessiné avec la palette 51 de `red1`, premier figurant.
 La palette n'est envoyée à la carte que si le décor diffère du précédent (`CRT_Strncmp_Like` sur le
 nom gardé en `var_A`).
 
 **Dessin d'une figure** :
-- figurant (1) : image 0 ; si la forme a plus d'une image et que le dernier caractère du nom
+- figurant (`GROUP_SHOT_ADD_CHARACTER`) : image 0 ; si la forme a plus d'une image et que le dernier caractère du nom
   est au-delà de « 3 », aussi une image qui boucle de 1 à n − 1 (aucun nom des données) ;
-- personnage qui parle (2) : image 0 puis la bouche (images 1 à 6) au même point ; bouche =
+- personnage qui parle (`GROUP_SHOT_CHARACTER_TALK`) : image 0 puis la bouche (images 1 à 6) au même point ; bouche =
   chiffre de la table de lèvres pour la lettre courante + 1, aucune hors des minuscules.
 
-**Durées** : une commande 2 dure le temps de son texte, une lettre par image (10 par seconde), sans attente
-après ; une commande 10 dure 40 images. Une touche passe à la réplique suivante.
+**Durées** : une commande `GROUP_SHOT_CHARACTER_TALK` dure le temps de son texte, une lettre par image (10 par seconde), sans attente
+après ; une commande `SHOW_TEXT` dure 40 images. Une touche passe à la réplique suivante.
 
 Contrôle : `tools/conv_scene.py --donnees <BIGTRE.TRE> <entrée> <n° de scène> <sortie.png>` compose
 une scène de groupe selon ces règles (images 0 seulement) ; hangar (entrée 12), briefing
@@ -161,7 +169,7 @@ remplacés pour les lèvres : « $S » donne une image sans bouche (« $ ») pui
 `TalkingHead_CopyLipText_97D8` met le texte en minuscules : les majuscules comptent comme des
 lettres.
 
-#### Gros plan (3) : `TalkingHead_Construct_98F4`, avance `TalkingHead_Advance_9F5A`
+#### Gros plan (`CLOSEUP`) : `TalkingHead_Construct_98F4`, avance `TalkingHead_Advance_9F5A`
 
 **Dessin** (table de méthodes 6275, `TalkingHead_DrawDressed_9E5E`), dans l'ordre, toutes à la
 position de la tête :
@@ -171,7 +179,7 @@ position de la tête :
 4. image 1 (coiffure), puis image 34 (habits ; valeur fixée à la construction, aucun autre
    écrivain vu).
 
-**Image de base** = l'octet « image » de la commande 3 (`TalkingHead_SetBaseFrame_9D32`) ; 255 devient −1
+**Image de base** = l'octet « image » de la commande `CLOSEUP` (`TalkingHead_SetBaseFrame_9D32`) ; 255 devient −1
 (`cbw`) : pas d'image des yeux hors clignement. Pendant la question « Accept / Reject » (11),
 l'image de base passe à 53 et le texte de lèvres est une chaîne vide (dseg 4217, juste avant
 « Accept Mission ») : bouche fermée.
@@ -184,7 +192,7 @@ image des yeux = 12           si rand() × 30 / 32768 = 0 (une fois sur 30)
 si image de base > 20 : image des yeux = image de base (jamais de clignement)
 ```
 Le tirage est refait à chaque image : un clignement dure en général une image (0,1 s), en moyenne
-toutes les 3 s. Dans les données (1 717 × 3), l'image de base vaut 13, 14, 16 à 20 ou 255 dans
+toutes les 3 s. Dans les données (1 717 `CLOSEUP`), l'image de base vaut 13, 14, 16 à 20 ou 255 dans
 774 répliques (clignement possible) et 21 à 31 dans les autres (yeux fixes).
 
 **Bouche**, une lecture par image de scène, le curseur avance d'un caractère puis :
@@ -199,8 +207,8 @@ autre caractère → pas de bouche (−1)
 fin du texte    → pas de bouche ; TalkingHead_IsLipTextDone_A0D5 devient vrai
 ```
 La fin est testée par « caractère sous le curseur = 0 » (`TalkingHead_IsLipTextDone_A0D5`). Un
-texte qui finirait par « e » ou « h » ferait sauter le 0 final ; aucun des 2 362 textes 2 / 3 /
-4 des données ne finit ainsi.
+texte qui finirait par « e » ou « h » ferait sauter le 0 final ; aucun des 2 362 textes `GROUP_SHOT_CHARACTER_TALK` / `CLOSEUP` /
+`CLOSEUP_CONTINUATION` des données ne finit ainsi.
 
 Table (`word_445AC`, « 06891599098769362999252999 », chiffre + 2) :
 
@@ -211,11 +219,11 @@ Table (`word_445AC`, « 06891599098769362999252999 », chiffre + 2) :
 Les images de bouche d'un visage sont donc 2 à 11.
 
 **Durée d'une réplique** : une image par lecture jusqu'à la fin du texte (les caractères consommés
-par paire ne coûtent pas d'image), puis **40 images** (15 si le texte est vide) ; une commande 10 qui suit
+par paire ne coûtent pas d'image), puis **40 images** (15 si le texte est vide) ; une commande `SHOW_TEXT` qui suit
 un gros plan : 20 images, sans mouvement des lèvres. Une touche (`Input_CheckSkip_D24A`) coupe
 l'attente.
 
-#### Personnage qui parle (2) : `ConvFigure_ConstructSpeaking_A207`, avance `ConvFigure_AdvanceSpeaking_A3E1`
+#### Personnage qui parle (`GROUP_SHOT_CHARACTER_TALK`) : `ConvFigure_ConstructSpeaking_A207`, avance `ConvFigure_AdvanceSpeaking_A3E1`
 
 - **Pas de clignement** : la méthode d'avance de cette figure n'a pas de tirage, et le dessin
   (`ConvFigure_DrawSpeaking_A2B7`) ne fait que l'image 0 (corps) puis la bouche.
@@ -226,23 +234,23 @@ l'attente.
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | 5 | 4 | 1 | 3 | 6 | 1 | 1 | 1 | 1 | 1 | 4 | 5 | 1 | 2 | 5 | 4 | 1 | 1 | 1 | 4 | 6 | 4 | 1 | 1 | 1 |
 
-- Une commande 2 dure une image par caractère du texte, sans attente après. Les autres personnages
+- Une commande `GROUP_SHOT_CHARACTER_TALK` dure une image par caractère du texte, sans attente après. Les autres personnages
   qui parlent de la scène restent affichés, image 0 seule.
 
 **Palette du visage** : le seul appel de `ConvData_FindFacePalette_5A46F` (dans
 `Conv_PlayScript_5AA4E`) passe 0 → toujours `FCPL` « normal » (`CONVPALS` 46) en conversation ;
 « night » n'est pas demandé par ce code.
 
-### 14 / 15 — escadre et équipiers
+### `SELECT_WING` / `CHOOSE_WINGMAN` — escadre et équipiers
 
-- **14** (`ConvRec_ReadWing_66E0`) : cherche dans `GAMEFLOW.IFF`, `FORM WNGS`, la `FORM WING`
+- **`SELECT_WING`** (`ConvRec_ReadWing_66E0`) : cherche dans `GAMEFLOW.IFF`, `FORM WNGS`, la `FORM WING`
   dont l'`INFO` vaut `escadre` ; lit un type (0 à 3), la liste `PILT` (pilotes) et, pour les types
   1 et 2, `ORDR` (5 octets). Remplit les trois noms d'équipiers `$W`, `$L`, `$O` (table des noms
   dseg 3788 : « », Billy, Gwen, Lyle, Miguel, Tex ; table 3800 : DiBianca, Templeman, Isaac,
-  Roberts, Baldwin, Yenawine, Savage, utilisée par `$A`, `$B`). L'octet `écran` est gardé pour 15.
-- **15** : écran de choix d'un équipier : décor `s_wing` (`écran` = 0) ou `w_wing` (sinon), puis
+  Roberts, Baldwin, Yenawine, Savage, utilisée par `$A`, `$B`). L'octet `écran` est gardé pour `CHOOSE_WINGMAN`.
+- **`CHOOSE_WINGMAN`** : écran de choix d'un équipier : décor `s_wing` (`écran` = 0) ou `w_wing` (sinon), puis
   `p_wing` ; zones « Select Billy / Gwen / Lyle / Miguel / Tex » pour les pilotes de `PILT` ; le
-  pilote choisi remplit `$W`, `$L`, `$O` comme 14.
+  pilote choisi remplit `$W`, `$L`, `$O` comme `SELECT_WING`.
 
 ### Codes dans les textes (`Conv_DrawText_59F54`)
 
@@ -251,7 +259,7 @@ l'attente.
 | `$S` | nom de famille du joueur (partie + 920) |
 | `$N` | prénom (partie + 940) |
 | `$C` | indicatif (partie + 960) |
-| `$W`, `$L`, `$O` | équipiers posés par 14 / 15 |
+| `$W`, `$L`, `$O` | équipiers posés par `SELECT_WING` / `CHOOSE_WINGMAN` |
 | `$A`, `$B` | table 3800, indices `[conv + 107]`, `[conv + 108]` |
 | `$P` | avions perdus pendant la mission (partie + 234), suivi de « plane » / « planes » |
 | `$T` | avions perdus au total (partie + 980), même suffixe |
@@ -278,30 +286,34 @@ de la zone de texte (format « %Y%J%S »).
 ## 4. Vérification sur les données
 
 `tools/conv_dump.py` sur `BIGTRE.TRE` : 241 scripts non vides, 0 commande inconnue ;
-1 717 × 3, 575 × 4, 86 × 0, 184 × 1, 70 × 2, 32 × 10, 26 × 11, 26 × 12, 28 × 14,
-28 × 15. Les 52 sauts (11 et 12) tombent tous sur le début d'une commande. Exemple (entrée 62,
-proposition de mission) : « Do you accept? » → 11 (refus : +159 octets) → branche « Good… » → 12
+1 717 `CLOSEUP`, 575 `CLOSEUP_CONTINUATION`, 86 `GROUP_SHOT`, 184 `GROUP_SHOT_ADD_CHARACTER`,
+70 `GROUP_SHOT_CHARACTER_TALK`, 32 `SHOW_TEXT`, 26 `YESNOCHOICE_BRANCH1`, 26 `YESNOCHOICE_BRANCH2`,
+28 `SELECT_WING`, 28 `CHOOSE_WINGMAN`. Les 52 sauts (`YESNOCHOICE_BRANCH1` et `YESNOCHOICE_BRANCH2`)
+tombent tous sur le début d'une commande. Exemple (entrée 62, proposition de mission) : « Do you
+accept? » → `YESNOCHOICE_BRANCH1` (refus : +159 octets) → branche « Good… » → `YESNOCHOICE_BRANCH2`
 (+78, jusqu'à la fin) → branche du refus « All right, but I'd reconsider… ».
 
 ## 5. Lancement d'une conversation
 
 - Script de partie (`Gameflow_RunScriptPairs_36CF`, seg002) : suite de paires d'octets (commande,
-  argument) ; **commande 0 = conversation numéro `argument`** (entrée de `CONV.PAK`), jouée par
+  argument) ; **`PLAY_CONV` n = conversation numéro n** (entrée de `CONV.PAK`), jouée par
   `Gameflow_PlayConversation_4AAAB` → `Conv_Construct_59B67` → `Conv_PlayScript_5AA4E`.
 - Conversations lancées par le code :
   - **254** si les avions perdus au total dépassent 16 (« The insurance company has dropped our
     policy »), **255** si l'argent (dword partie + 635) devient négatif
     (`Gameflow_CheckLossConversations_50645`) ;
-  - commande 36 du script de partie, si des avions ont été perdus pendant la mission : **253** si
+  - `PLANES_LOST_CONV` du script de partie, si des avions ont été perdus pendant la mission : **253** si
     partie + 248 = 2, **252** sinon (Miguel : « we lost $P that mission »).
-- La réponse à 11 est rangée dans le premier octet du tampon `[conv + 42]` (partie + 859) :
+- La réponse à `YESNOCHOICE_BRANCH1` est rangée dans le premier octet du tampon `[conv + 42]` (partie + 859) :
   1 = « Accept Mission », 0 = refus.
 - Le script de partie a des **blocs conditionnels** : une commande de test qui échoue fait sauter
-  les commandes suivantes jusqu'à 30 (« sinon », bascule) ou 31 (fin de bloc), en comptant les
-  tests imbriqués. Commandes de test relevées dans le code : 9, 10, 20, 21, 22, 28, 32,
-  35, 37. **20** : bloc joué si la mission a été acceptée (partie + 859 ≠ 0) ; **21** : bloc
-  joué si elle a été refusée. C'est ainsi que la réponse à la commande 11 choisit la suite (conversations,
-  missions) dans le script de partie. 32 teste un drapeau (partie + 509 + argument). Les autres
+  les commandes suivantes jusqu'à `ELSE` (bascule) ou `ENDIF` (fin de bloc), en comptant les
+  tests imbriqués. Commandes de test relevées dans le code : `IF_NOT_FLAG`, `IF_FLAG`,
+  `IF_MISSION_ACCEPTED`, `IF_MISSION_REFUSED`, `WEAPON_LOADOUT`, `IF_TRUE`, `IF_MISSION_SUCCESS`,
+  `IF_PLANES_LOST`, `IF_RESULT_3`. **`IF_MISSION_ACCEPTED`** : bloc joué si la mission a été
+  acceptée (partie + 859 ≠ 0) ; **`IF_MISSION_REFUSED`** : bloc joué si elle a été refusée. C'est
+  ainsi que la réponse à `YESNOCHOICE_BRANCH1` choisit la suite (conversations, missions) dans le
+  script de partie. `IF_MISSION_SUCCESS` teste un drapeau (partie + 509 + argument). Les autres
   commandes du script de partie relèvent du déroulement de la campagne : `GAMEFLOW_SYSTEM.md`.
 
 ## 6. Points ouverts
@@ -353,41 +365,41 @@ lus ou pas lus, à corriger dans les `parse_*` existants et à ranger dans `Conv
 
 | Commande | libRealSpace | Jeu |
 |---|---|---|
-| 0 | `parse_GROUP_SHOT` avance de 8, saute les 0 puis cherche une commande | nom de décor de 9 octets (8 caractères et un 0 au plus), puis la commande suivante |
-| 1 | `parse_GROUP_SHOT_ADD_CHARACTER` : x, y par `ReadUShortBE` après 8 octets | nom (9), x **mot signé petit-boutiste**, y idem. La lecture actuelle tombe juste par hasard tant que 0 ≤ x < 256 ; `airwing1` est en (0, −20) |
-| 2 | `parse_GROUP_SHOT_CHARACTER_TALK` ne lit pas x, y | nom (9), x (+9), y (+11), mots signés ; couleur +13, puis `[voix]`, texte |
-| 3 | x lu comme un octet à +19 (130/160/190 → `FacePos`) | x, y = mots signés à +19 et +21 (y = 128 dans les données) ; le reste est juste |
-| 11 | deux octets `noOffset`, `yesOffset` | **un mot** = octets à sauter si refus, compté depuis la fin du mot. Les 26 commandes 11 des données ont un saut < 256 et arrivent juste après une commande 12 : le découpage branche 1 / branche 2 actuel tombe juste |
-| 12 | `parse_YESNOCHOICE_BRANCH2`, deux octets ignorés | saut sans condition d'**un mot** (fin de la branche « accepter ») |
-| 14 | `topOffset`, `first_palette` | octet écran (0 = `s_wing`, sinon `w_wing`), octet numéro de `WING` dans `GAMEFLOW.IFF` ; remplit `$W`, `$L`, `$O` |
-| 16 | non traité | ne fait rien |
+| `GROUP_SHOT` | `parse_GROUP_SHOT` avance de 8, saute les 0 puis cherche une commande | nom de décor de 9 octets (8 caractères et un 0 au plus), puis la commande suivante |
+| `GROUP_SHOT_ADD_CHARACTER` | `parse_GROUP_SHOT_ADD_CHARACTER` : x, y par `ReadUShortBE` après 8 octets | nom (9), x **mot signé petit-boutiste**, y idem. La lecture actuelle tombe juste par hasard tant que 0 ≤ x < 256 ; `airwing1` est en (0, −20) |
+| `GROUP_SHOT_CHARACTER_TALK` | `parse_GROUP_SHOT_CHARACTER_TALK` ne lit pas x, y | nom (9), x (+9), y (+11), mots signés ; couleur +13, puis `[voix]`, texte |
+| `CLOSEUP` | x lu comme un octet à +19 (130/160/190 → `FacePos`) | x, y = mots signés à +19 et +21 (y = 128 dans les données) ; le reste est juste |
+| `YESNOCHOICE_BRANCH1` | deux octets `noOffset`, `yesOffset` | **un mot** = octets à sauter si refus, compté depuis la fin du mot. Les 26 commandes `YESNOCHOICE_BRANCH1` des données ont un saut < 256 et arrivent juste après une commande `YESNOCHOICE_BRANCH2` : le découpage branche 1 / branche 2 actuel tombe juste |
+| `YESNOCHOICE_BRANCH2` | `parse_YESNOCHOICE_BRANCH2`, deux octets ignorés | saut sans condition d'**un mot** (fin de la branche « accepter ») |
+| `SELECT_WING` | `topOffset`, `first_palette` | octet écran (0 = `s_wing`, sinon `w_wing`), octet numéro de `WING` dans `GAMEFLOW.IFF` ; remplit `$W`, `$L`, `$O` |
+| `NOP_16` | non traité | ne fait rien |
 | autre | `do_not_add` | l'octet est sauté par le jeu ; aucun octet de ce genre dans les données des deux formats. **Choix pour libRealSpace : erreur de parsing** (§ 9.2). 224 n'est pas une commande |
 
 La lecture du texte et de la voix : format déterminé avant le parsing, puis lecture sans heuristique
 (§ 9.1, qui remplace la détection de `SetSentenceFromConv`).
 
-### 7.2 Scène de groupe (0, 1, 2, 10)
+### 7.2 Scène de groupe (`GROUP_SHOT` et ses sous-commandes)
 
 - **État de scène, pas état de figure.** `CharFigure` est partagé (`ConvAssetManager::figures`)
   et reçoit x, y ; tout le script étant lu d'avance (`SetArchive`), la dernière position lue gagne
   partout (`air1` a 5 positions différentes selon les scripts). Le parseur doit ranger la position
   dans la `ConvFrame` (par exemple une liste de couples figure + position), pas dans `CharFigure`.
-- **Contenu de la scène.** Une commande 0 ouvre une scène : décor, puis toutes les commandes 1, puis toutes les
-  commandes 2, **dessinés dans cet ordre et tous visibles du début à la fin de la scène** (y compris
-  pendant les commandes 10 et les répliques des autres). Aujourd'hui, la `ConvFrame` d'une commande 2 ne contient
+- **Contenu de la scène.** Une commande `GROUP_SHOT` ouvre une scène : décor, puis toutes les commandes `GROUP_SHOT_ADD_CHARACTER`, puis toutes les
+  commandes `GROUP_SHOT_CHARACTER_TALK`, **dessinés dans cet ordre et tous visibles du début à la fin de la scène** (y compris
+  pendant les commandes `SHOW_TEXT` et les répliques des autres). Aujourd'hui, la `ConvFrame` d'une commande `GROUP_SHOT_CHARACTER_TALK` ne contient
   que celui qui parle. Le parseur doit recopier dans chaque `ConvFrame` de la scène (2 et 10)
   toutes les figures de la scène, avec leur position, et indiquer laquelle parle ; le lecteur
   dessine la liste.
 - **Dessin.** libRealSpace dessine les images 0 et 1 de chaque figure qui en a plusieurs. Jeu :
-  - figurant (1) : image 0 seule ;
-  - personnage qui parle (2) : image 0, puis sa bouche (§ 7.4) **seulement pendant sa propre
+  - figurant (`GROUP_SHOT_ADD_CHARACTER`) : image 0 seule ;
+  - personnage qui parle (`GROUP_SHOT_CHARACTER_TALK`) : image 0, puis sa bouche (§ 7.4) **seulement pendant sa propre
     réplique** ; sinon image 0 seule ;
   - écran d'équipiers : figures posées en (0, 0), coordonnées dans l'image.
 - **Palette** : palettes du décor, puis `FGPL` « normal » (`CONVPALS` 48, `parseFGPL_DATA` est
   vide dans libRealSpace), puis `PFIG` du **premier 1** seulement. Envoyée à la carte seulement
   quand le nom du décor change.
-- **Durées** : une commande 2 dure une image par caractère de son texte (fin du texte de lèvres), sans
-  attente après ; une commande 10 dans une scène de groupe dure 40 images. Une touche passe à la suite.
+- **Durées** : une commande `GROUP_SHOT_CHARACTER_TALK` dure une image par caractère de son texte (fin du texte de lèvres), sans
+  attente après ; une commande `SHOW_TEXT` dans une scène de groupe dure 40 images. Une touche passe à la suite.
 
 ### 7.3 Décor (`ConvAssetManager::ParseBGLayer`)
 
@@ -395,29 +407,29 @@ Chaque élément de `BACK DATA` fait 5 octets ; libRealSpace n'en lit que 3 et r
 par la règle « y = 24 si la hauteur est inférieure à 199 ». Lire le 4ᵉ et le 5ᵉ octet comme un
 **mot signé y** : l'élément est à l'écran en (0, y + 24), avec les décalages propres de l'image
 (exemple : ciel `optshps` 116 de `str_s_ex`, y = −24 → haut de l'écran). Même chose pour les visages
-(`parseFACE_DATA`, règle « hauteur inférieure à 198 ») : la position vient de la commande 3, (x, y + 24).
+(`parseFACE_DATA`, règle « hauteur inférieure à 198 ») : la position vient de la commande `CLOSEUP`, (x, y + 24).
 
-### 7.4 Gros plan (3, 4, 10) : dessin, yeux, bouche
+### 7.4 Gros plan (`CLOSEUP`, `CLOSEUP_CONTINUATION`, `SHOW_TEXT`) : dessin, yeux, bouche
 
 Détail du jeu : « Yeux et bouches » (§ 2). À appliquer :
 
-- **Dessin**, dans cet ordre, à la position de la commande 3 : image 0 (tête), image des yeux (si ≠ −1),
+- **Dessin**, dans cet ordre, à la position de la commande `CLOSEUP` : image 0 (tête), image des yeux (si ≠ −1),
   bouche (si ≠ −1), image 1 (coiffure), image 34 (habits). En numéros libRealSpace : 1, yeux + 1,
-  bouche + 1, 2, 35. Le jeu dessine **une seule** image des yeux : l'octet de la commande 3 (255 →
+  bouche + 1, 2, 35. Le jeu dessine **une seule** image des yeux : l'octet de la commande `CLOSEUP` (255 →
   aucune). Comparé à `faces_shape` (image des yeux attendue en numéro libRealSpace = octet + 1) :
   13, 16, 17, 18, 22, 23, 24, 25, 32 sont conformes ; à corriger : 14 (attendu 15, libRealSpace
   dessine 21 et 28), 19 (attendu 20, aucune), 20 (attendu 21, plus 28 en trop), 21 (attendu 22),
   26 (27), 27 (28), 28 (29), 29 (30), 31 (32). Valeurs présentes dans les données : 13, 14, 16 à
   25, 27, 28, 31 et 255.
 - **Clignement** : remplacer l'image des yeux par l'image 12 (libRealSpace 13) une fois sur 30 à
-  chaque image de scène, si l'octet de la commande 3 vaut 20 au plus ou 255. Absent des fichiers de
+  chaque image de scène, si l'octet de la commande `CLOSEUP` vaut 20 au plus ou 255. Absent des fichiers de
   libRealSpace lus.
 - **Bouche** : libRealSpace fait tourner les images 3 à 12 sur l'horloge (`3 + (SDL_GetTicks() /
   100) % 10`). Jeu : une lecture du texte par image de scène, avec les règles « er », « th », « ch »,
   « h », « e » final ; bouches 2 à 11 (libRealSpace 3 à 12). Texte lu = texte brut du script, codes
   `$` non remplacés, en minuscules.
-- **4** garde visage, décor, couleur et image de base ; nouveau texte de lèvres.
-- **Durées** : fin du texte de lèvres, puis 40 images (15 si le texte est vide). Une commande 10 après un
+- **`CLOSEUP_CONTINUATION`** garde visage, décor, couleur et image de base ; nouveau texte de lèvres.
+- **Durées** : fin du texte de lèvres, puis 40 images (15 si le texte est vide). Une commande `SHOW_TEXT` après un
   gros plan : 20 images, texte affiché sans mouvement des lèvres.
 - **Palette** : palettes du décor puis `FCPL` « normal » (`CONVPALS` 46), le seul appel vu
   (`ConvData_FindFacePalette_5A46F`) demande « normal » ; envoyée quand le décor change.
@@ -522,7 +534,7 @@ int closeUpEyeFrame(int baseFrame) {
 1 093 / 32 768). Le jeu teste la fin par « caractère courant = 0 » ; un texte finissant par « e » ou
 « h » ferait sauter ce 0 dans le jeu, aucun texte des données n'est dans ce cas.
 
-### 7.5 Question « Accept / Reject » (11)
+### 7.5 Question « Accept / Reject » (`YESNOCHOICE_BRANCH1`)
 
 - **Visage** : image de base fixée à **53** (libRealSpace 54, valeur déjà dessinée par
   `CONV_CONTRACT_CHOICE`, mais par-dessus la liste `faces_shape` : le jeu remplace l'image des
@@ -538,14 +550,14 @@ int closeUpEyeFrame(int baseFrame) {
   d'attente (tous les 3 tics de l'horloge `dword_47ABB`) ; la boucle s'arrête sur un événement
   d'entrée de type 2 (type non identifié dans ce code).
 - **Effet** : réponse rangée pour la partie (`GameState.mission_accepted`, partie + 859 dans le
-  jeu) ; si refus, le curseur du script avance du mot de la commande 11. Le script de partie choisit la
-  suite par ses tests 20 / 21 (§ 5).
+  jeu) ; si refus, le curseur du script avance du mot de la commande `YESNOCHOICE_BRANCH1`. Le script de partie choisit la
+  suite par ses tests `IF_MISSION_ACCEPTED` / `IF_MISSION_REFUSED` (§ 5).
 
-### 7.6 Choix de l'équipier (14, 15)
+### 7.6 Choix de l'équipier (`SELECT_WING`, `CHOOSE_WINGMAN`)
 
-- Décor `s_wing` ou `w_wing` selon l'octet écran de la commande 14 précédente ; libRealSpace prend
+- Décor `s_wing` ou `w_wing` selon l'octet écran de la commande `SELECT_WING` précédente ; libRealSpace prend
   toujours `s_wing`.
-- Ne proposer que les pilotes de la liste `PILT` de la `WING` donnée par la commande 14 (libRealSpace
+- Ne proposer que les pilotes de la liste `PILT` de la `WING` donnée par la commande `SELECT_WING` (libRealSpace
   propose toujours les 5). Libellés du jeu : « Select Billy », « Select Gwen », « Select Lyle »,
   « Select Miguel », « Select Tex ».
 - L'ordre gauche → droite des zones de libRealSpace (Lyle, Miguel, Gwen, Billy, Tex) n'a pas été
@@ -562,7 +574,7 @@ int closeUpEyeFrame(int baseFrame) {
 | Code | Valeur |
 |---|---|
 | `$S` / `$N` / `$C` | nom / prénom / indicatif du joueur |
-| `$W`, `$L`, `$O` | les trois équipiers posés par 14 / 15 (§ 2) — `$L` et `$O` absents de libRealSpace |
+| `$W`, `$L`, `$O` | les trois équipiers posés par `SELECT_WING` / `CHOOSE_WINGMAN` (§ 2) — `$L` et `$O` absents de libRealSpace |
 | `$A`, `$B` | un nom de la table DiBianca, Templeman, Isaac, Roberts, Baldwin, Yenawine, Savage (choix : point ouvert) |
 | `$P` | avions perdus pendant la mission, en décimal, + « plane », + « s » si la valeur ≠ 1 |
 | `$T` | avions perdus au total, même forme |
@@ -589,7 +601,7 @@ texte :
 - 2 (51979, « ConvRec_ReadTalk ») : nom, x, y, octet couleur, chaîne → voix, chaîne → texte.
 
 Une voix « absente » est une **chaîne vide**. Dans les données : 56 textes ont une voix vide
-(38 × 3, 4 × 4, 14 × 10), les 2 338 autres en ont une (2 259 identifiants différents).
+(38 `CLOSEUP`, 4 `CLOSEUP_CONTINUATION`, 14 `SHOW_TEXT`), les 2 338 autres en ont une (2 259 identifiants différents).
 
 ### 8.2 Quand la voix est jouée
 
@@ -605,7 +617,7 @@ Pour chaque réplique, l'interpréteur (« Conv_PlayScript », 31391) teste, dan
 
 Si les trois sont vrais : **voix**. Sinon : **texte**. Les deux ne sont jamais affichés ensemble :
 avec voix, le texte n'est pas dessiné (l'appel au dessin du texte, 28581, est sauté). Vu pour la
-commande 10 de premier niveau, la commande 2 (scène de groupe) et la commande 3 / 4 (gros plan).
+commande `SHOW_TEXT` de premier niveau, la commande `GROUP_SHOT_CHARACTER_TALK` (scène de groupe) et la commande `CLOSEUP` / `CLOSEUP_CONTINUATION` (gros plan).
 
 ### 8.3 Chargement du fichier
 
@@ -635,7 +647,7 @@ commande 10 de premier niveau, la commande 2 (scène de groupe) et la commande 3
 
 - Espace (code 57) ou Échap (code 1) pendant la voix : le son est coupé et la réplique finit
   (« Input_CheckSkip », 84151). Sans voix, une touche termine la pause de 50 images.
-- Échap pose en plus le drapeau DGROUP:27092 : le texte n'est plus dessiné et la commande 10 de
+- Échap pose en plus le drapeau DGROUP:27092 : le texte n'est plus dessiné et la commande `SHOW_TEXT` de
   premier niveau termine la conversation (31602).
 - Ces durées remplacent, dans la version CD, celles de la version disquette (§ 2 : fin des lèvres
   puis 40 images). La règle actuelle de libRealSpace (5 s sans voix, fin du son avec voix)
@@ -665,27 +677,28 @@ commande 10 de premier niveau, la commande 2 (scène de groupe) et la commande 3
 
 ### 8.6 Scène de groupe (relue le 2026-10-22, 32424 à 34782)
 
-Table des commandes de premier niveau (cs:14841, 0 à 18) : 0, 3, 12, 14, 15 comme la
-disquette ; **10** = texte seul, avec voix (31602) ; 18 ne fait rien ; 16 est sautée comme une
-commande inconnue.
+Table des commandes de premier niveau (cs:14841, valeurs 0 à 18) : `GROUP_SHOT`, `CLOSEUP`,
+`YESNOCHOICE_BRANCH2`, `SELECT_WING`, `CHOOSE_WINGMAN` comme la disquette ; **`SHOW_TEXT`** = texte
+seul, avec voix (31602) ; `NOP_18` ne fait rien ; la valeur 16 est sautée comme une commande
+inconnue.
 
-Déroulement de la commande 0 :
+Déroulement de la commande `GROUP_SHOT` :
 1. Si Échap a été pressé (DGROUP:27092), fin de la conversation.
 2. Scène à 10 images par seconde (221594, même appel que `LayerGroup_Construct_2DC66`), zone de
    texte (0, 152)-(319, 199).
 3. Lecture du nom de décor (51400), éléments du décor construits et ajoutés dans l'ordre de `BACK`
    (30007 puis 222415, `Layer_Construct` avec le y de l'élément), palette = palettes du décor puis
    `FGPL` « normal ».
-4. **Toutes les commandes 1** qui suivent (33107–33427) : lecture (51841 : nom, x, y), figurant construit
+4. **Toutes les commandes `GROUP_SHOT_ADD_CHARACTER`** qui suivent (33107–33427) : lecture (51841 : nom, x, y), figurant construit
    (73915, avec le dernier caractère du nom comme dans la disquette) et ajouté ; la `PFIG` du
    **premier** figurant s'ajoute à la palette.
-5. **Pas de commande 2** derrière les commandes 1 : le décor et les figurants sont affichés (palette envoyée), puis
+5. **Pas de commande `GROUP_SHOT_CHARACTER_TALK`** derrière les commandes `GROUP_SHOT_ADD_CHARACTER` : le décor et les figurants sont affichés (palette envoyée), puis
    7 attentes de 10 tics de l'horloge DGROUP:20751 (une touche les coupe) ; fin de la commande.
-6. **Chaque commande 2, l'une après l'autre** (boucle 33591–34565, tant que l'octet suivant vaut 2) :
+6. **Chaque commande `GROUP_SHOT_CHARACTER_TALK`, l'une après l'autre** (boucle 33591–34565, tant que l'octet suivant est un `GROUP_SHOT_CHARACTER_TALK`) :
    - lecture (51979 : nom, x, y, couleur, voix, texte) ;
    - **construction du personnage et ajout à la scène à ce moment-là** (71452 puis 221368) : il
      apparaît à sa première réplique et **reste affiché** jusqu'à la fin de la scène (aucun retrait
-     dans la boucle ; la scène entière est détruite à la fin, 34740). Un même nom dans deux commandes 2
+     dans la boucle ; la scène entière est détruite à la fin, 34740). Un même nom dans deux commandes `GROUP_SHOT_CHARACTER_TALK`
      donne deux calques ;
    - s'il n'y avait aucun figurant, `FGPL` « normal » est recopiée à nouveau (pas de `PFIG`) ;
    - si le nom du décor diffère du précédent : zone de texte effacée, palette envoyée ;
@@ -695,20 +708,20 @@ Déroulement de la commande 0 :
    - sans voix : texte de lèvres posé (sans effet, § 8.5), couleur, **texte dessiné**, pause de
      50 images (8 si le texte est vide) ;
    - une touche coupe la réplique.
-7. Après la dernière commande 2 (ou s'il n'y en a aucune, à l'étape 5) : libération des figures, du décor et
+7. Après la dernière commande `GROUP_SHOT_CHARACTER_TALK` (ou s'il n'y en a aucune, à l'étape 5) : libération des figures, du décor et
    de la scène. L'image reste à l'écran (rien ne l'efface).
 
-Une commande 10 qui suit une scène de groupe n'est donc pas traitée par la scène : elle passe par la commande
+Une commande `SHOW_TEXT` qui suit une scène de groupe n'est donc pas traitée par la scène : elle passe par la commande
 10 de premier niveau (texte ou voix seuls) après la destruction de la scène.
 
 Différences avec la version disquette (§ 2) :
 
 | | Disquette | CD-ROM |
 |---|---|---|
-| personnages 2 | tous construits avant la première réplique, visibles dès le début | construits un par un, visibles à partir de leur réplique |
-| bouche d'une commande 2 | lettre par lettre du texte | du son ; sans voix, immobile |
-| durée d'une commande 2 | fin du texte de lèvres | fin du son ; sans voix 50 images (8 si vide) |
-| commande 10 après les commandes 2 | dans la scène, 40 images | commande de premier niveau, après la scène |
+| personnages (`GROUP_SHOT_CHARACTER_TALK`) | tous construits avant la première réplique, visibles dès le début | construits un par un, visibles à partir de leur réplique |
+| bouche d'une commande `GROUP_SHOT_CHARACTER_TALK` | lettre par lettre du texte | du son ; sans voix, immobile |
+| durée d'une commande `GROUP_SHOT_CHARACTER_TALK` | fin du texte de lèvres | fin du son ; sans voix 50 images (8 si vide) |
+| commande `SHOW_TEXT` après les commandes `GROUP_SHOT_CHARACTER_TALK` | dans la scène, 40 images | commande de premier niveau, après la scène |
 | attente au début | aucune | 7 × 10 tics avant la première réplique |
 
 La cadence de l'horloge DGROUP:20751 n'a pas été lue (les 10 tics ne sont pas convertis en secondes).
@@ -722,7 +735,7 @@ La cadence de l'horloge DGROUP:20751 n'a pas été lue (les 10 tics ne sont pas 
 - Lèvres avec voix : calcul du son de `MIDGAME_SYSTEM.md` § 6.6 à la cadence 10, plus le filtre
   10/11 du gros plan. Sans voix : gros plan comme § 7.4 ; personnage de groupe immobile dans la
   version CD (§ 8.5), lettre par lettre dans la version disquette — choix à faire pour le portage.
-- Scène de groupe de la version CD : chaque personnage 2 apparaît à sa première réplique et
+- Scène de groupe de la version CD : chaque personnage (`GROUP_SHOT_CHARACTER_TALK`) apparaît à sa première réplique et
   reste (§ 8.6) ; la structure de libRealSpace doit alors donner, pour chaque `ConvFrame`, les
   figures déjà apparues, pas toutes celles de la scène.
 - `VOCLIST.IFF` sert au jeu de test de présence des voix (condition 3 du § 8.2) et au
@@ -753,13 +766,13 @@ données disquette).
 
 **Pourquoi elle marche sur la disquette.** Seulement grâce aux données :
 - un texte de 2, 4 ou 10 est toujours suivi d'une commande (pas de voix → juste) ;
-- un texte de 3 est suivi de son **octet couleur**, qui n'est pas une commande ; la règle ne tombe
-  juste que parce que **toutes** les couleurs des commandes 3 des données valent 128 ou plus (branche
-  « décalage 2 », 1 717 fois). Une couleur de commande 3 inférieure à 128 ferait prendre le texte pour une
+- un texte de `CLOSEUP` est suivi de son **octet couleur**, qui n'est pas une commande ; la règle ne tombe
+  juste que parce que **toutes** les couleurs des commandes `CLOSEUP` des données valent 128 ou plus (branche
+  « décalage 2 », 1 717 fois). Une couleur de commande `CLOSEUP` inférieure à 128 ferait prendre le texte pour une
   voix et décalerait toute la suite.
 
-**Les 29 erreurs du format CD.** Toujours des commandes 3 dont la voix **et** le texte sont vides (`00 00`
-puis la couleur) : le 0 qui suit la voix vide est pris pour la commande 0, la voix vide devient le
+**Les 29 erreurs du format CD.** Toujours des commandes `CLOSEUP` dont la voix **et** le texte sont vides (`00 00`
+puis la couleur) : le 0 qui suit la voix vide est pris pour la commande `GROUP_SHOT`, la voix vide devient le
 texte, et la lecture s'arrête un octet trop tôt. La couleur lue vaut alors 0, et l'octet couleur réel
 est lu comme une commande inconnue, puis sauté (`do_not_add`) : la lecture se recale par chance.
 Effet visible : aucun ici (texte vide), mais c'est un décalage du flux.
@@ -769,8 +782,8 @@ avec les données de *Strike Commander* (aucun des deux formats ne l'atteint). R
 exactement les mêmes résultats pour la détection.
 
 **224.** Ce n'est pas une commande du jeu (aucune entrée 224 dans les tables de commandes, disquette
-ou CD). Dans les données, 224 est **une couleur de texte** : la couleur la plus fréquente des commandes 3
-(495 sur 1 717) et celle de 69 des 70 2. Dans libRealSpace, `isNextFrameIsConv` sert à trois
+ou CD). Dans les données, 224 est **une couleur de texte** : la couleur la plus fréquente des commandes `CLOSEUP`
+(495 sur 1 717) et celle de 69 des 70 `GROUP_SHOT_CHARACTER_TALK`. Dans libRealSpace, `isNextFrameIsConv` sert à trois
 endroits : la détection de voix (sans effet, ci-dessus) et les deux boucles de recherche de
 `parse_GROUP_SHOT` et `parse_GROUP_SHOT_ADD_CHARACTER`. Simulées sur les 86 scènes de groupe et
 les 184 figurants des deux formats, ces boucles s'arrêtent toujours sur l'octet qui suit
@@ -824,10 +837,12 @@ Choix de Rémi : le parseur de libRealSpace s'arrête **en erreur** quand il lit
 commande, un octet qui n'en est pas une. Une lecture décalée se voit alors tout de suite, au lieu
 d'être rattrapée par chance (cas de 224).
 
-- **Commandes valides de premier niveau** : 0, 3, 12, 14, 15, et les deux commandes qui ne
-  font rien, **16** (disquette, table `off_5CE29`) et **18** (CD, § 8.6). **10** est aussi une
-  commande de premier niveau dans la version CD (texte seul, 31602) ; aucune n'apparaît à ce niveau
-  dans les données. Les sous-commandes (1, 2, 10 après 0 ; 4, 10, 11 après 3) ne sont
+- **Commandes valides de premier niveau** : `GROUP_SHOT`, `CLOSEUP`, `YESNOCHOICE_BRANCH2`,
+  `SELECT_WING`, `CHOOSE_WINGMAN`, et les deux commandes qui ne font rien, **`NOP_16`** (disquette,
+  table `off_5CE29`) et **`NOP_18`** (CD, § 8.6). **`SHOW_TEXT`** est aussi une commande de premier
+  niveau dans la version CD (texte seul, 31602) ; aucune n'apparaît à ce niveau dans les données.
+  Les sous-commandes (`GROUP_SHOT_ADD_CHARACTER`, `GROUP_SHOT_CHARACTER_TALK`, `SHOW_TEXT` après
+  `GROUP_SHOT` ; `CLOSEUP_CONTINUATION`, `SHOW_TEXT`, `YESNOCHOICE_BRANCH1` après `CLOSEUP`) ne sont
   valides qu'à leur place (§ 2).
 - **Écart avec le jeu, assumé** : les deux versions du jeu sautent un octet inconnu sans rien dire
   (branche par défaut de la table des commandes). Le choix d'une erreur ne change rien sur les
@@ -835,28 +850,36 @@ d'être rattrapée par chance (cas de 224).
   inconnu (§ 4), dans les deux formats.
 - **Fin du script** : la lecture doit finir exactement à la fin de l'entrée du PAK ; un champ ou une
   chaîne qui dépasse est aussi une erreur.
-- **Sauts 11 / 12** : la destination doit être le début d'une commande ou la fin du script (vrai
+- **Sauts `YESNOCHOICE_BRANCH1` / `YESNOCHOICE_BRANCH2`** : la destination doit être le début d'une commande ou la fin du script (vrai
   pour les 52 sauts des données, § 4).
 
 ### 9.3 Architecture proposée : une boucle de premier niveau, un sous-parseur par commande
 
 Proposition de Rémi. Aujourd'hui, `SCConvPlayer::parseConv` traite au même niveau les commandes et
-les sous-commandes (1, 2, 4, 10, 11, 12 ont chacune leur `case`), et les `parse_*`
+les sous-commandes (`GROUP_SHOT_ADD_CHARACTER`, `GROUP_SHOT_CHARACTER_TALK`, `CLOSEUP_CONTINUATION`,
+`SHOW_TEXT`, `YESNOCHOICE_BRANCH1`, `YESNOCHOICE_BRANCH2` ont chacune leur `case`), et les `parse_*`
 appellent eux-mêmes le parseur suivant ou cherchent la prochaine commande. C'est ce qui oblige aux
 recherches (`isNextFrameIsConv`) et rend les erreurs invisibles.
 
 Le jeu est construit autrement, dans les deux versions : l'interpréteur (`Conv_PlayScript_5AA4E`,
 et 31391 dans la version CD) n'a qu'une table de commandes de **premier niveau** ; chaque commande
-lit ensuite **elle-même** ses sous-commandes, tant qu'elles se suivent (0 → 1*, puis 2 / 10* ;
-3 → 4 / 10 / 11*). La grammaire est donc :
+lit ensuite **elle-même** ses sous-commandes, tant qu'elles se suivent (`GROUP_SHOT` → des
+`GROUP_SHOT_ADD_CHARACTER`, puis des `GROUP_SHOT_CHARACTER_TALK` / `SHOW_TEXT` ; `CLOSEUP` → des
+`CLOSEUP_CONTINUATION` / `SHOW_TEXT` / `YESNOCHOICE_BRANCH1`). La grammaire est donc :
 
 ```
 script     := commande*
-commande   := 0 décor figurant* réplique*          figurant := 1 nom x y
-            | 3 gros_plan suite*                    réplique := 2 nom x y couleur texte
-            | 10 couleur texte          (CD)                   | 10 couleur texte
-            | 12 mot | 14 octet octet | 15 | 16 | 18
-gros_plan  := visage image décor x y texte couleur    suite    := 4 texte | 10 couleur texte | 11 mot
+commande   := GROUP_SHOT décor figurant* réplique*
+            | CLOSEUP gros_plan suite*
+            | SHOW_TEXT couleur texte                          (CD)
+            | YESNOCHOICE_BRANCH2 mot
+            | SELECT_WING octet octet
+            | CHOOSE_WINGMAN | NOP_16 | NOP_18
+figurant   := GROUP_SHOT_ADD_CHARACTER nom x y
+réplique   := GROUP_SHOT_CHARACTER_TALK nom x y couleur texte
+            | SHOW_TEXT couleur texte
+gros_plan  := visage image décor x y texte couleur
+suite      := CLOSEUP_CONTINUATION texte | SHOW_TEXT couleur texte | YESNOCHOICE_BRANCH1 mot
 texte      := [voix] chaîne              ([voix] au format CD seulement, § 9.1)
 ```
 
@@ -881,7 +904,7 @@ conv->errorMessage();   //                   et raison
    commande) appelle un sous-parseur par commande (`parseGroupShot`, `parseCloseUp`,
    `parseNarration`, `parseJump`, `parseWing`) ; chaque sous-parseur lit ses champs et ses
    sous-commandes, et renvoie faux en cas d'erreur ; le texte est lu par `readText` (voix si `Cd`) ;
-3. le **contrôle des sauts** 11 / 12 (`checkJumps`).
+3. le **contrôle des sauts** `YESNOCHOICE_BRANCH1` / `YESNOCHOICE_BRANCH2` (`checkJumps`).
 
 Codes d'erreur (`ConvParseError`, valeur renvoyée par `parse()`) : 1 `UnknownFormat`, 2
 `NotACommand` (octet qui n'est pas une commande), 3 `PastEnd` (champ au-delà de la fin du script),
@@ -902,8 +925,7 @@ et même renforcée : plus aucun `parse_*` ne déplace le curseur pour un autre.
 
 Un script invalide donne le code `UnknownFormat`.
 
-2 772 = 86 × 0 + 184 × 1 + 70 × 2 + 32 × 10 + 1 717 × 3 + 575 × 4 + 26 × 11 + 26 × 12 +
-28 × 14 + 28 × 15, les mêmes comptes que `conv_dump.py` (§ 4).
+2 772 enregistrements = la somme des comptes par commande du § 4, les mêmes que `conv_dump.py`.
 
 **Pacific Strike** : un troisième `ConvFormat` se branche à trois endroits seulement : son test dans
 `detectFormat`, `readText` (lecture d'un texte) et, si besoin, ses commandes propres dans la boucle
@@ -915,9 +937,11 @@ Demande de Rémi : tester chaque conversation **avant** de la lire, pour choisir
 lecteur disquette, sans la lire en entier. Le test (`ConvData::detectFormat`, `tools/conv_ref/conv_parser.cpp`)
 ne regarde que le **premier texte** du script.
 
-1. **Aller au premier texte** en sautant les champs de taille fixe : 3 → 23 octets ; 0 → décor
-   (9), chaque commande 1 (14), puis 2 (15 octets jusqu'au texte) ou 10 (couleur) ; 10 → couleur ;
-   12, 14 → 2 octets ; 15, 16, 18 → rien. Aucune chaîne à lire avant ce premier texte, donc
+1. **Aller au premier texte** en sautant les champs de taille fixe : `CLOSEUP` → 23 octets ;
+   `GROUP_SHOT` → décor (9), chaque `GROUP_SHOT_ADD_CHARACTER` (14), puis
+   `GROUP_SHOT_CHARACTER_TALK` (15 octets jusqu'au texte) ou `SHOW_TEXT` (couleur) ; `SHOW_TEXT` →
+   couleur ; `YESNOCHOICE_BRANCH2`, `SELECT_WING` → 2 octets ; `CHOOSE_WINGMAN`, `NOP_16`, `NOP_18`
+   → rien. Aucune chaîne à lire avant ce premier texte, donc
    rien qui dépende du format.
 2. **Hypothèse CD** : la première chaîne a la forme d'un identifiant de voix — **vide, ou 1 à 8
    lettres ou chiffres** — et, après la deuxième chaîne (le texte), on trouve ce qui doit suivre un

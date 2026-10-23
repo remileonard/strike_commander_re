@@ -1132,102 +1132,128 @@ jusqu'à 12,5 m/s (`GroundObj_AccelerateToCruise_45675`), cap tourné de 1° ver
 Lu dans `Expr_VM_Interpreter_51106` (seg114), cas par cas. Outil : `tools/mission_prog.py`
 (désassemble un fichier de mission, `--stat` retrouve l'origine des variables de résultat).
 
-**Encodage** (`Expr_VM_ReadNextToken_50F85`) : un octet d'opcode, un octet d'argument n ; si
-l'octet suivant vaut 9, il est sauté et l'octet d'après est un 2ᵉ argument. Un programme se
-termine par 0 (le n-ième programme du bloc = celui qui suit le n-ième 0,
+**Encodage** (`Expr_VM_ReadNextToken_50F85`) : un octet d'instruction, un octet d'argument n ; si
+l'octet suivant vaut 9, il est sauté et l'octet d'après est un 2ᵉ argument. Un programme se termine
+par `OP_NOOP` (le n-ième programme du bloc = celui qui suit le n-ième `OP_NOOP`,
 `ProgBuffer_FindSubProgramByIndex_50E94`).
 
-**État d'une exécution** : `acc` (`[instr+12]`), le résultat du dernier ordre natif (`[+14]`),
-les drapeaux de comparaison (`[+22]` : 1 = inférieur, 2 = égal, 4 = supérieur).
+**État d'une exécution** : le registre de travail `acc` (`[instr+12]`), le résultat du dernier ordre
+natif (`[+14]`), le résultat de la dernière comparaison (`[+22]` : inférieur, égal ou supérieur).
 **FLAG[n]** = mots du chunk `FLAG` de la mission (nombre `mission+72`, tableau `mission+74`) ;
 lecture hors bornes = 0, écriture hors bornes ignorée. **STAT[n]** = 8 mots à `mission+161`
 (n < 8), écrits dans `misn2op.iff` (`Mission_WriteResultReport_A8F22`, GAMEFLOW_SYSTEM.md § 6).
 
-| Op | Effet | Op | Effet |
-|---|---|---|---|
-| 0, 1 | retour (fin du programme ou retour d'appel) | 48 | acc /= n |
-| 2 | appel du programme n | 49 | acc /= FLAG[n] |
-| 3 | appel du programme acc | 64 | comparer acc à n |
-| 4 | arrêt du script | 65 | comparer n à acc |
-| 8 | étiquette n (cible des sauts) | 66 | comparer acc à FLAG[n] |
-| 15 | code de sortie de la mission = n (`byte_706AF`) | 67 | comparer FLAG[n] à acc |
-| 16 | acc = n | 68 | comparer le résultat natif à n |
-| 17 | acc = FLAG[n] | 69 | comparer FLAG[n] à 1 |
-| 18 | échange acc et FLAG[n] | 70 / 71 | aller à l'étiquette n si le résultat natif ≠ 0 / = 0 |
-| 19 | acc = résultat natif | 72 / 73 | aller à n si égal / différent |
-| 20 | STAT[n] = acc | 74 / 75 | aller à n si inférieur / supérieur |
-| 21 | acc = hasard 0..n (`CRT_Rand`) | 76 / 77 | aller à n si inférieur ou égal / supérieur ou égal |
-| 32 | acc += n | 78 | aller à n |
-| 33 | acc += FLAG[n] | 79 | aller à l'étiquette acc |
-| 34 | FLAG[n] += n | 80 | FLAG[n] = acc |
-| 35 | FLAG[n] += acc | 81 | FLAG[n] = résultat natif |
-| 36 | acc −= n | 82 / 83 | FLAG[n] = 1 / 0 |
-| 37 | acc −= FLAG[n] | 84 | FLAG[n] ^= 1 |
-| 38 | FLAG[n] −= n | 85 / 86 | FLAG[n] += 1 / −= 1 |
-| 39 | FLAG[n] −= acc | 128–152 | objets de mission (lus en partie : 144, 145, plus haut) |
-| 40 / 41 | acc \|= n / FLAG[n] | 160–192 | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
-| 42 / 43 | acc &= n / FLAG[n] | 208 | (non lu ici) |
-| 44 / 45 | acc ^= n / FLAG[n] | | |
-| 46 / 47 | acc *= n / FLAG[n] | | |
+**Noms.** Ceux de l'enum `prog_op` de libRealSpace (`SCenums.h`, fourni le 2026-10-23) ; les
+instructions absentes de l'enum ont un nom proposé dans le même style, marqué \*.
+
+| Valeur | Nom | Effet dans le jeu |
+|---|---|---|
+| 0, 1 | `OP_NOOP`, `OP_EXIT_PROG` | retour : fin du programme, ou retour d'appel (même code pour les deux) |
+| 2 | `OP_EXEC_SUB_PROG` | appel du programme n |
+| 3 | `OP_EXEC_SUB_PROG_WORK`\* | appel du programme numéro acc |
+| 4 | `OP_STOP_SCRIPT`\* | arrêt du script |
+| 8 | `OP_SET_LABEL` | étiquette n (cible des sauts) |
+| 15 | `OP_SET_EXIT_CODE`\* | code de sortie de la mission = n (chunk `EXIT` de `misn2op.iff`) |
+| 16 | `OP_MOVE_VALUE_TO_WORK_REGISTER` | acc = n |
+| 17 | `OP_MOVE_FLAG_TO_WORK_REGISTER` | acc = FLAG[n] |
+| 18 | `OP_SWAP_WORK_AND_FLAG`\* | échange acc et FLAG[n] |
+| 19 | `OP_MOVE_RESULT_TO_WORK`\* | acc = résultat du dernier ordre natif |
+| 20 | `OP_SAVE_VALUE_TO_GAMFLOW_REGISTER` | STAT[n] = acc |
+| 21 | `OP_RANDOM_TO_WORK`\* | acc = hasard 0..n (`CRT_Rand`) |
+| 32 | `OP_ADD_VALUE_TO_WORK`\* | acc += n |
+| 33 | `OP_ADD_FLAG_TO_WORK`\* | acc += FLAG[n] |
+| 34 | `OP_ADD_VALUE_TO_FLAG`\* | FLAG[n] += n (l'argument lui-même : `add ax, [di+8]`) |
+| 35 | `OP_ADD_WORK_REGISTER_TO_FLAG` | FLAG[n] += acc |
+| 36 | `OP_SUB_VALUE_FROM_WORK`\* | acc −= n |
+| 37 | `OP_SUB_FLAG_FROM_WORK`\* | acc −= FLAG[n] |
+| 38 | `OP_SUB_VALUE_FROM_FLAG`\* | FLAG[n] −= n (l'argument lui-même) |
+| 39 | `OP_SUB_WORK_FROM_FLAG`\* | FLAG[n] −= acc |
+| 40 / 41 | `OP_OR_VALUE_WITH_WORK`\* / `OP_OR_FLAG_WITH_WORK`\* | acc \|= n / FLAG[n] |
+| 42 / 43 | `OP_AND_VALUE_WITH_WORK`\* / `OP_AND_FLAG_WITH_WORK`\* | acc &= n / FLAG[n] |
+| 44 / 45 | `OP_XOR_VALUE_WITH_WORK`\* / `OP_XOR_FLAG_WITH_WORK`\* | acc ^= n / FLAG[n] |
+| 46 / 47 | `OP_MUL_VALUE_WITH_WORK` / `OP_MUL_FLAG_WITH_WORK`\* | acc ×= n / FLAG[n] |
+| 48 / 49 | `OP_DIV_WORK_BY_VALUE`\* / `OP_DIV_WORK_BY_FLAG`\* | acc /= n / FLAG[n] |
+| 64 | `OP_CMP_WORK_WITH_VALUE` | comparer acc à n |
+| 65 | `OP_CMP_VALUE_WITH_WORK` | comparer n à acc |
+| 66 | `OP_CMP_WORK_WITH_FLAG`\* | comparer acc à FLAG[n] |
+| 67 | `OP_CMP_FLAG_WITH_WORK`\* | comparer FLAG[n] à acc |
+| 68 | `OP_CMP_RESULT_WITH_VALUE`\* | comparer le résultat natif à n |
+| 69 | `OP_TEST_FLAG` | comparer FLAG[n] à 1 |
+| 70 | `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` | aller à l'étiquette n si le résultat natif ≠ 0 |
+| 71 | `OP_GOTO_IF_CURRENT_COMMAND_DONE`\* | aller à l'étiquette n si le résultat natif = 0 |
+| 72 / 73 | `OP_BRANCH_IF_EQUAL` / `OP_BRANCH_IF_NOT_EQUAL` | aller à n si égal / différent |
+| 74 / 75 | `OP_BRANCH_IF_LESS` / `OP_BRANCH_IF_GREATER` | aller à n si inférieur / supérieur |
+| 76 / 77 | `OP_BRANCH_IF_LESS_EQUAL`\* / `OP_BRANCH_IF_GREATER_EQUAL`\* | aller à n si inférieur ou égal / supérieur ou égal |
+| 78 | `OP_BRANCH`\* | aller à n |
+| 79 | `OP_EXECUTE_CALL` | aller à l'étiquette numéro acc (un **saut**, pas un appel) |
+| 80 | `OP_MOVE_WORK_REGISTER_TO_FLAG` | FLAG[n] = acc |
+| 81 | `OP_MOVE_RESULT_TO_FLAG`\* | FLAG[n] = résultat natif |
+| 82 / 83 | `OP_SET_FLAG_TO_TRUE` / `OP_SET_FLAG_TO_FALSE` | FLAG[n] = 1 / 0 |
+| 84 | `OP_TOGGLE_FLAG`\* | FLAG[n] ^= 1 |
+| 85 / 86 | `OP_ADD_1_TO_FLAG` / `OP_REMOVE_1_TO_FLAG` | FLAG[n] += 1 / −= 1 |
+| 128–152 | `OP_ACTIVATE_SCENE` … `OP_IS_TARGET_ACTIVE` | objets et scènes de mission (lus en partie : `OP_ACTIVATE_OBJ`, `OP_DEACTIVATE_OBJ`, plus haut) |
+| 160–191 | `OP_SET_WAIT_FOR_SECONDS` … `OP_SET_OBJ_PATROL_POSITION` | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
+| 208 | `OP_SELECT_FLAG_208` | non lu ici |
 
 - Les sauts cherchent l'étiquette **en avant** depuis l'instruction courante
   (`Expr_VM_FindCaseToken_50FDB`).
-- 34 et 38 ajoutent / retirent **l'argument lui-même** (`add ax, [di+8]` après la lecture de
-  FLAG[n]) ; 35 et 39 utilisent acc.
-- Les opcodes absents de la table de sauts (5–7, 9–14, 22–31, 50–63, 87–127…) ne font
-  rien. 51, 53, 56, 105 et 117 apparaissent pourtant dans des fichiers de mission (moins de
-  7 fois chacun).
-- Les instructions qui écrivent FLAG sont 18, 34, 35, 38, 39 et 80 à 86. Le chargeur de
-  mission remplit le tableau depuis le chunk `FLAG` (`MissionScenario_LoadMainRecord_A8331`). Je
-  n'ai pas trouvé d'autre écriture dans ce tableau (recherche : accès à `+72` / `+74` après une
-  lecture de `word_706A0`, dans tous les segments annotés).
-- 171 (« message radio n ») passe n à la méthode +136 de l'objet (`Goal_SetObjective_A307` →
+- Les valeurs absentes de la table de sauts du jeu (5–7, 9–14, 22–31, 50–63, 87–127…) ne font rien.
+  51, 53, 56, 105 et 117 apparaissent pourtant dans des fichiers de mission (moins de 7 fois
+  chacune).
+- Les instructions qui écrivent FLAG : `OP_SWAP_WORK_AND_FLAG`, `OP_ADD_VALUE_TO_FLAG`,
+  `OP_ADD_WORK_REGISTER_TO_FLAG`, `OP_SUB_VALUE_FROM_FLAG`, `OP_SUB_WORK_FROM_FLAG`, et de
+  `OP_MOVE_WORK_REGISTER_TO_FLAG` à `OP_REMOVE_1_TO_FLAG`. Le chargeur de mission remplit le tableau
+  depuis le chunk `FLAG` (`MissionScenario_LoadMainRecord_A8331`). Je n'ai pas trouvé d'autre
+  écriture dans ce tableau (recherche : accès à `+72` / `+74` après une lecture de `word_706A0`,
+  dans tous les segments annotés).
+- `OP_SET_MESSAGE` (message radio n) passe n à la méthode +136 de l'objet (`Goal_SetObjective_A307` →
   `Radio_PlayMessage_CB45` pour un avion IA). Il n'écrit pas FLAG.
 
-**Exemple, MISN-9A** : chaque ABRAMS-G détruit ajoute 2 à FLAG[4] (programme 11), chaque ZSU-23
-ajoute 1 (programme 12) ; les deux appellent le programme 2, qui fait FLAG[3] += 1 une fois FLAG[4]
-≥ 4. Le programme 4 (mise à jour de la scène 0) recopie le tout dans les variables de résultat :
-STAT[0] = FLAG[2] (le BRIGC10 détruit), STAT[1] = (20 + FLAG[4]) × FLAG[2] × 100, STAT[2] =
-FLAG[3], STAT[7] = FLAG[6].
+**Exemple, MISN-9A** : chaque ABRAMS-G détruit ajoute 2 à FLAG[4] (programme 11, deux
+`OP_ADD_1_TO_FLAG`), chaque ZSU-23 ajoute 1 (programme 12) ; les deux appellent le programme 2
+(`OP_EXEC_SUB_PROG`), qui fait `OP_ADD_1_TO_FLAG 3` une fois FLAG[4] ≥ 4. Le programme 4 (mise à jour
+de la scène 0) recopie le tout dans les variables de résultat : STAT[0] = FLAG[2] (le BRIGC10
+détruit), STAT[1] = (20 + FLAG[4]) × FLAG[2] × 100, STAT[2] = FLAG[3], STAT[7] = FLAG[6].
 
 ## Comparaison avec l'enum `prog_op` de libRealSpace (`SCenums.h`, fourni le 2026-10-23)
 
-Nombres en décimal. Seuls les noms et les valeurs de l'enum ont été vus, pas l'interpréteur de
-libRealSpace : « absent de l'enum » ne dit pas comment libRealSpace traite l'opcode.
+Seuls les noms et les valeurs de l'enum ont été vus, pas l'interpréteur de libRealSpace : « absent
+de l'enum » ne dit pas comment libRealSpace traite l'instruction.
 
-**Opcodes des fichiers de mission absents de l'enum** (comptés dans les 72 fichiers de
+**Instructions des fichiers de mission absentes de l'enum** (comptées dans les 72 fichiers de
 `MISSIONS`) :
 
-| Op | Effet dans le jeu | Emplois | Fichiers (exemples) |
-|---|---|---|---|
-| 33 | acc += FLAG[n] | 24 | 21 fichiers, dont MISN-10A, 10B, 10X |
-| 47 | acc ×= FLAG[n] | 18 | 18 fichiers, dont MISN-10A, 10B, 10X, 11A |
-| 36 | acc −= n | 11 | 10 fichiers, dont MISN-10A, 11B, 11X, 4B |
-| 15 | code de sortie de la mission = n (chunk `EXIT` de `misn2op.iff`) | 2 | MISN-14B, 15A |
-| 37 | acc −= FLAG[n] | 2 | MISN-6D, 7A |
-| 78 | aller à l'étiquette n | 3 | MISN-13B, 6D |
-| 43 | acc &= FLAG[n] | 1 | MISN-15A |
-| 21 | acc = hasard 0..n | 1 | MISN-15A |
-| 32 | acc += n | 1 | MISN-5C |
-| 39 | FLAG[n] −= acc | 1 | TEMPLATE |
-| 66 | comparer acc à FLAG[n] | 1 | LAND |
-| 51, 53, 56, 105, 117 | rien (hors de la table du jeu) | 16 | MISSION, BASIC |
-| 153, 163, 164, 172, 177, 178, 179, 181 | ordres natifs (non lus en détail) | 32 | 181 : MISN-1A, 1B, 1C ; 177 / 178 : MISN-6X, 10D ; 172 : MISN-6D ; 164 : ARENAMIS, GAME |
+| Instruction | Emplois | Fichiers (exemples) |
+|---|---|---|
+| `OP_ADD_FLAG_TO_WORK`\* | 24 | 21 fichiers, dont MISN-10A, 10B, 10X |
+| `OP_MUL_FLAG_WITH_WORK`\* | 18 | 18 fichiers, dont MISN-10A, 10B, 10X, 11A |
+| `OP_SUB_VALUE_FROM_WORK`\* | 11 | 10 fichiers, dont MISN-10A, 11B, 11X, 4B |
+| `OP_SET_EXIT_CODE`\* | 2 | MISN-14B, 15A |
+| `OP_BRANCH`\* | 3 | MISN-13B, 6D |
+| `OP_SUB_FLAG_FROM_WORK`\* | 2 | MISN-6D, 7A |
+| `OP_AND_FLAG_WITH_WORK`\* | 1 | MISN-15A |
+| `OP_RANDOM_TO_WORK`\* | 1 | MISN-15A |
+| `OP_ADD_VALUE_TO_WORK`\* | 1 | MISN-5C |
+| `OP_SUB_WORK_FROM_FLAG`\* | 1 | TEMPLATE |
+| `OP_CMP_WORK_WITH_FLAG`\* | 1 | LAND |
+| valeurs 51, 53, 56, 105, 117 (sans effet dans le jeu) | 16 | MISSION, BASIC |
+| ordres natifs 153, 163, 164, 172, 177, 178, 179, 181 (non lus en détail) | 32 | 181 : MISN-1A, 1B, 1C ; 177 / 178 : MISN-6X, 10D ; 172 : MISN-6D ; 164 : ARENAMIS, GAME |
 
-Les trois premiers servent surtout à **calculer le gain** (2ᵉ valeur de `STAT`) dans le programme
+Les trois premières servent surtout à **calculer le gain** (2ᵉ valeur de `STAT`) dans le programme
 de fin de mission. Exemple, MISN-10A : gain = (15 + FLAG[0] − 9 + FLAG[1]) × FLAG[4] × 100, écrit
-avec 16, 33, 36, 33, 47 et 46. Si l'un d'eux est ignoré, le gain renvoyé au déroulement est faux.
-Dans MISN-15A, la 1ʳᵉ valeur (succès) est calculée avec 43.
+`OP_MOVE_VALUE_TO_WORK_REGISTER 15`, `OP_ADD_FLAG_TO_WORK 0`, `OP_SUB_VALUE_FROM_WORK 9`,
+`OP_ADD_FLAG_TO_WORK 1`, `OP_MUL_FLAG_WITH_WORK 4`, `OP_MUL_VALUE_WITH_WORK 100`. Si l'une d'elles est
+ignorée, le gain renvoyé au déroulement est faux. Dans MISN-15A, la 1ʳᵉ valeur (succès) est calculée
+avec `OP_AND_FLAG_WITH_WORK`.
 
 **Noms de l'enum à rapprocher du jeu :**
 
-- `OP_NOOP` (0) : dans le jeu, 0 est le **retour** (même code que 1, `OP_EXIT_PROG`) et sépare les
+- `OP_NOOP` : dans le jeu, c'est le **retour** (même code qu'`OP_EXIT_PROG`), et il sépare les
   programmes du chunk `PROG`.
-- `OP_SPOT_DATA` (9) : dans le jeu, 9 n'est pas une instruction ; c'est la marque d'un 2ᵉ argument,
-  lue avec l'instruction qui la précède (`Expr_VM_ReadNextToken_50F85`).
-- `OP_EXECUTE_CALL` (79) : dans le jeu, c'est un **saut** vers l'étiquette dont le numéro est
-  l'accumulateur, pas un appel (`Expr_VM_FindCaseToken_50FDB`, sans retour). Les appels de
-  programme sont 2 (`OP_EXEC_SUB_PROG`) et 3 (programme numéro acc, absent de l'enum et des
-  données).
-- `OP_TEST_FLAG` (69) compare FLAG[n] à 1 ; `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` (70) saute si
-  le résultat du dernier ordre natif ≠ 0 : conformes.
+- `OP_SPOT_DATA` : dans le jeu, ce n'est pas une instruction ; c'est la marque d'un 2ᵉ argument, lue
+  avec l'instruction qui la précède (`Expr_VM_ReadNextToken_50F85`).
+- `OP_EXECUTE_CALL` : dans le jeu, c'est un **saut** vers l'étiquette dont le numéro est acc, pas un
+  appel (`Expr_VM_FindCaseToken_50FDB`, sans retour). Les appels de programme sont
+  `OP_EXEC_SUB_PROG` et `OP_EXEC_SUB_PROG_WORK`\* (absent de l'enum et des données).
+- `OP_TEST_FLAG` compare FLAG[n] à 1 ; `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` saute si le résultat
+  du dernier ordre natif ≠ 0 : conformes.
