@@ -9,6 +9,7 @@ produisent à partir de `BIGTRE.TRE` (ou du dossier `DATA` extrait).
 | `librs_voice_detect.py` | rejoue la détection voix / texte de `SetSentenceFromConv` sur chaque texte et compte les erreurs (`--simplifiee` : sans E0h ni la branche FFh / F4h) | § 9 |
 | `conv_parser.cpp` | classe `ConvData` : `parse()` teste le format sur le premier texte (CD, disquette), puis lit le script une seule fois (boucle de premier niveau, sous-parseurs) ; renvoie 0 ou un code d'erreur | § 9.1 à 9.4 |
 | `conv_lips.cpp` | bouche et clignement de la tête parlante, bouche des personnages de groupe | « Yeux et bouches », § 7.4 |
+| `faces_shape.cpp` | table `faces_shape` corrigée (images du gros plan pour chaque octet « image », place de la bouche) et boucle de dessin | « Images d'un visage », § 7.4 |
 
 ```bash
 python3 tools/conv_ref/export_scripts.py --donnees <BIGTRE.TRE ou DATA> <sortie>

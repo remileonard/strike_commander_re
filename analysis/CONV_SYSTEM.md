@@ -481,38 +481,42 @@ Détail du jeu : « Yeux et bouches » (§ 2). À appliquer :
   base (l'octet « image », 255 → aucune), bouche (si ≠ −1), image 1 (coiffure), image 34 (habits).
   En numéros libRealSpace (+ 1, image vide en tête de chaque jeu d'images) : 1, octet + 1,
   bouche + 1, 2, 35. Tête, coiffure et habits ne dépendent pas de l'octet (§ 2, « Images d'un
-  visage ») : la table `faces_shape` de `SCConvPlayer.cpp` peut être remplacée par une seule
-  image, octet + 1.
+  visage »). La table `faces_shape` de `SCConvPlayer.cpp` est **gardée** (elle permet d'autres jeux
+  aux numéros d'images différents) ; ses valeurs sont à corriger, colonne « Entrée corrigée »
+  ci-dessous et `tools/conv_ref/faces_shape.cpp` (table complète pour les valeurs 13 à 33 et 255,
+  compilée, style du dépôt).
 - **Ordre des couches** : libRealSpace dessine la liste `faces_shape` (tête, expression, coiffure,
-  habits), puis la bouche **par-dessus** les habits. Dans le jeu, la bouche passe **avant** la
+  habits), puis la bouche **par-dessus** les habits. La table corrigée marque la place de la bouche
+  dans chaque liste (`kFaceMouthSlot`), entre l'expression et la coiffure. Dans le jeu, la bouche passe **avant** la
   coiffure et les habits : là où ils se recouvrent (le menton : chez Billy, les zones des bouches
   descendent jusqu'à la ligne −12, celle des habits commence à −47), les habits cachent le bas de la bouche.
 - **Comparaison de `faces_shape` avec le jeu** (relu le 2026-10-23 ; planche jeu / libRealSpace
   pour un visage : `tools/conv_faces.py --compare`). Numéros du jeu dans les deux colonnes d'images ;
   « répliques » = nombre de `CLOSEUP` des données qui ont cette valeur (1 717 en tout) :
 
-| Octet | Image du jeu | Images de libRealSpace | À l'écran | Répliques |
-|---|---|---|---|---|
-| 13 | 13 (yeux) | 13 | conforme | 32 |
-| 14 | 14 (yeux) | 20 (yeux) et 27 (sourire) | libRealSpace ajoute un sourire et change le regard | 87 |
-| 16 | 16 (yeux) | 16 | conforme | 19 |
-| 17 | 17 (yeux) | 17 | conforme | 21 |
-| 18 | 18 (yeux) | 18 | conforme | 21 |
-| 19 | 19 (yeux) | aucune | libRealSpace montre le visage neutre | 80 |
-| 20 | 20 (yeux) | 20 et 27 (sourire) | libRealSpace ajoute un sourire | 14 |
-| 21 | 21 (yeux) | 20 et 27 (sourire) | autre regard, et un sourire en trop | 16 |
-| 22 | 22 (sourcils) | 22 | conforme | 296 |
-| 23 | 23 (sourcil) | 23 | conforme | 66 |
-| 24 | 24 (sourcil) | 24 | conforme | 75 |
-| 25 | 25 (sourcils froncés) | 25 | conforme | 431 |
-| 27 | 27 (sourire) | 26 (bouche) | une autre bouche, sans le sourire | 16 |
-| 28 | 28 (grand sourire) | 27 (sourire) | sourire au lieu du grand sourire | 1 |
-| 31 | 31 (sourcils et bouche) | 30 | une autre expression | 42 |
-| 255 | aucune | aucune | conforme | 500 |
+| Octet | Image du jeu | Images de libRealSpace | À l'écran | Répliques | Entrée corrigée (numéros libRealSpace) |
+|---|---|---|---|---|---|
+| 13 | 13 (yeux) | 13 | conforme | 32 | 1, 14, bouche, 2, 35 |
+| 14 | 14 (yeux) | 20 (yeux) et 27 (sourire) | libRealSpace ajoute un sourire et change le regard | 87 | 1, 15, bouche, 2, 35 |
+| 16 | 16 (yeux) | 16 | conforme | 19 | 1, 17, bouche, 2, 35 |
+| 17 | 17 (yeux) | 17 | conforme | 21 | 1, 18, bouche, 2, 35 |
+| 18 | 18 (yeux) | 18 | conforme | 21 | 1, 19, bouche, 2, 35 |
+| 19 | 19 (yeux) | aucune | libRealSpace montre le visage neutre | 80 | 1, 20, bouche, 2, 35 |
+| 20 | 20 (yeux) | 20 et 27 (sourire) | libRealSpace ajoute un sourire | 14 | 1, 21, bouche, 2, 35 |
+| 21 | 21 (yeux) | 20 et 27 (sourire) | autre regard, et un sourire en trop | 16 | 1, 22, bouche, 2, 35 |
+| 22 | 22 (sourcils) | 22 | conforme | 296 | 1, 23, bouche, 2, 35 |
+| 23 | 23 (sourcil) | 23 | conforme | 66 | 1, 24, bouche, 2, 35 |
+| 24 | 24 (sourcil) | 24 | conforme | 75 | 1, 25, bouche, 2, 35 |
+| 25 | 25 (sourcils froncés) | 25 | conforme | 431 | 1, 26, bouche, 2, 35 |
+| 27 | 27 (sourire) | 26 (bouche) | une autre bouche, sans le sourire | 16 | 1, 28, bouche, 2, 35 |
+| 28 | 28 (grand sourire) | 27 (sourire) | sourire au lieu du grand sourire | 1 | 1, 29, bouche, 2, 35 |
+| 31 | 31 (sourcils et bouche) | 30 | une autre expression | 42 | 1, 32, bouche, 2, 35 |
+| 255 | aucune | aucune | conforme | 500 | 1, bouche, 2, 35 |
 
   En tout, 256 répliques sur 1 717 n'ont pas la même expression que dans le jeu. Les entrées 26,
   29 et 32 de `faces_shape` ne servent pas (valeurs absentes des données) ; 26 et 29 sont décalées
-  de 1, 32 est juste.
+  de 1, 32 est juste. La table corrigée couvre aussi 15, 26, 29, 30, 32 et 33 (même règle) pour
+  les valeurs que le jeu accepte sans que les données les emploient.
 - **Visages incomplets** (§ 2) : pour une valeur dont l'image est vide (par exemple `far` 22), le
   jeu ne dessine rien de plus que la tête. Ce n'est pas un écart : avec l'image octet + 1,
   libRealSpace doit simplement ne rien dessiner pour une image vide.
