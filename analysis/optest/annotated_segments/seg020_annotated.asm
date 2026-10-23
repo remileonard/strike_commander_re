@@ -545,8 +545,8 @@ sub_D221	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-10-17. Renvoie 1 si la séquence en cours doit être passée : byte_495FC déjà
-; posé ; touche Échap (code 1, pose byte_495FC = 1) ; touche Espace (code 57) ; ou événement
-; de type 2 renvoyé par sub_3EA28 (rôle non établi). Appelle d'abord sub_D157 (pas lue).
+; posé ; touche Échap (code 1, pose byte_495FC = 1) ; touche Espace (code 57) ; ou clic
+; (événement de type 2 renvoyé par sub_3EA28). Appelle d'abord sub_D157 (pas lue).
 ; ==============================================================================================
 Input_CheckSkip_D24A	proc far		; CODE XREF: seg018:loc_CAA9P
 					; Gameflow_PlayShot_4AD86:loc_4B41FP	...

@@ -370,8 +370,8 @@ vides ; octet écran = 0 dans 27 conversations, 1 dans l'entrée 200.
    et seulement si le pilote est proposé : libellé « Select … », champ + 27 du pilote = 1 (son
    **image 1**, une petite image sur les yeux, est dessinée par-dessus), pilote survolé = n. Hors
    des zones : libellé vide, pilote survolé = 0.
-7. **Fin** : sur un événement d'entrée de type 2 (le même que pour « Accept / Reject », type non
-   identifié dans ce code) **avec un pilote survolé** ; hors des zones, il est sans effet. Un mot
+7. **Fin** : sur un **clic** (événement d'entrée de type 2, le même que pour « Accept / Reject »)
+   **avec un pilote survolé** ; hors des zones, il est sans effet. Un mot
    global (`word_49818`) passe à 0 quand la souris est sur un pilote et à 1 sinon : il sert à
    afficher le visage alternatif du pilote survolé (information de Rémi).
 8. **Fermeture** : les bandes se referment en 24 pas (une image par tic : ligne n en haut, lignes
@@ -743,8 +743,8 @@ int closeUpEyeFrame(int baseFrame) {
 - **Zone** : la souris dans **x 118 à 279, y 113 à 199** (écran) → « Accept Mission », partout
   ailleurs → « Reject Mission ». libRealSpace a deux zones, gauche (x 0–120) et droite
   (x 200–320). Le libellé correspondant est réécrit à **y = 175** à chaque tour de la boucle
-  d'attente (tous les 3 tics de l'horloge `dword_47ABB`) ; la boucle s'arrête sur un événement
-  d'entrée de type 2 (type non identifié dans ce code).
+  d'attente (tous les 3 tics de l'horloge `dword_47ABB`) ; la boucle s'arrête sur un **clic**
+  (événement d'entrée de type 2).
 - **Effet** : réponse rangée pour la partie (`GameState.mission_accepted`, partie + 859 dans le
   jeu) ; si refus, le curseur du script avance du mot de la commande `YESNOCHOICE_BRANCH1`. Le script de partie choisit la
   suite par ses tests `IF_MISSION_ACCEPTED` / `IF_MISSION_REFUSED` (§ 5).
