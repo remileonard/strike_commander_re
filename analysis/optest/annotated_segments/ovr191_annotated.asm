@@ -1979,9 +1979,10 @@ ConvData_LoadBackground_5A4E6	endp
 ; s_wing (octet écran 0) ou w_wing puis p_wing (élément n = pilote n, seulement s'il est dans
 ; PILT), plein écran comme la question Accept / Reject, zones de souris en x 0 à 639 (Billy
 ; 374 à 465, Gwen 290 à 375, Lyle 58 à 151, Miguel 168 à 265, Tex 484 à 563), image 1 du
-; pilote survolé et libellé 'Select …' à y = 175, fin sur un événement de type 2 avec un
-; pilote survolé, puis mêmes noms que SELECT_WING avec le pilote choisi. Détail :
-; CONV_SYSTEM.md § 2.
+; pilote survolé et word_49818 = 0 (1 hors des zones : sert à afficher le visage alternatif du
+; pilote survolé, information de Rémi) et libellé 'Select …' à y = 175, fin sur un événement
+; de type 2 avec un pilote survolé, puis mêmes noms que SELECT_WING avec le pilote choisi.
+; Détail : CONV_SYSTEM.md § 2.
 ; ==============================================================================================
 Conv_PlayScript_5AA4E	proc far		; CODE XREF: sub_42235J
 

@@ -551,7 +551,8 @@ fin du texte    → pas de bouche ; la réplique passe à l'attente</pre>
     zones, dans l'ordre Billy, Gwen, Lyle, Miguel, Tex ; la première qui convient gagne, si le pilote est proposé :
     libellé « Select … » et image 1 du pilote. Hors des zones : libellé vide.</span></li>
     <li><span><b>Fin</b> sur un clic (événement d'entrée de type 2) <b>avec un pilote sous la souris</b> ; ailleurs, le
-    clic ne fait rien.</span></li>
+    clic ne fait rien. Un mot global (<code>word_49818</code>) passe à 0 quand la souris est sur un pilote et à 1
+    sinon : il sert à afficher le visage alternatif du pilote survolé.</span></li>
     <li><span><b>Fermeture</b> des bandes en 24 pas, retour à la scène (0, 24)-(319, 151).</span></li>
     <li><span><b>Noms</b> : même tableau que <code>SELECT_WING</code>, avec pilote = <b>le pilote choisi</b>. Avec les
     données : <code>$W</code> = le pilote choisi.</span></li>

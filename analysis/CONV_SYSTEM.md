@@ -372,7 +372,8 @@ vides ; octet écran = 0 dans 27 conversations, 1 dans l'entrée 200.
    des zones : libellé vide, pilote survolé = 0.
 7. **Fin** : sur un événement d'entrée de type 2 (le même que pour « Accept / Reject », type non
    identifié dans ce code) **avec un pilote survolé** ; hors des zones, il est sans effet. Un mot
-   global (`word_49818`) passe à 0 quand la souris est sur un pilote et à 1 sinon ; rôle non établi.
+   global (`word_49818`) passe à 0 quand la souris est sur un pilote et à 1 sinon : il sert à
+   afficher le visage alternatif du pilote survolé (information de Rémi).
 8. **Fermeture** : les bandes se referment en 24 pas (une image par tic : ligne n en haut, lignes
    199 − 2n et 198 − 2n en bas, remplies de 0), le calque remonte de 24 lignes, la scène revient à
    (0, 24)-(319, 151).
