@@ -330,6 +330,8 @@ strike_commander_re/
     │                                  prennent --exe optest (défaut strike)
     ├── conv_dump.py                 lecteur des scripts de conversation (CONV.PAK) → texte ;
     │                                  conv_scene.py : rendu d'une scène de groupe → PNG
+    ├── conv_faces.py                visages des conversations : planche des 62 images, composition du gros plan
+    │                                  pour chaque valeur « image », tableau des images présentes (--table)
     ├── conv_ref/                    conversations, code de référence : parseur C++ (boucle de premier niveau,
     │                                  sous-parseurs, erreurs), test de format, lèvres et clignement, rejeu de la
     │                                  détection de libRealSpace, export des deux formats — README.md, CONV_SYSTEM § 9

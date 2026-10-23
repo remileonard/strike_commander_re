@@ -191,6 +191,57 @@ position de la tête :
 l'image de base passe à 53 et le texte de lèvres est une chaîne vide (dseg 4217, juste avant
 « Accept Mission ») : bouche fermée.
 
+**Images d'un visage** (relu le 2026-10-23 ; planches : `tools/conv_faces.py`). Chaque `FACE` de
+`CONVDATA.IFF` désigne une forme de `CONVSHPS.PAK` de 62 images. Côté code, l'octet « image » ne
+sert qu'à choisir l'image de base :
+
+- `Conv_PlayScript_5AA4E` : `mov al, byte ptr [bp+var_158]` / `cbw` / `call TalkingHead_SetBaseFrame_9D32` ;
+  `TalkingHead_SetBaseFrame_9D32` range la valeur dans l'image de base et l'image affichée
+  (`mov [si+846h], ax` / `mov [si+84Ch], ax`). Aucun autre usage de cet octet.
+- La tête, la coiffure et les habits sont **fixes** : `TalkingHead_DrawAt_9D47` dessine l'image 0,
+  `TalkingHead_DrawDressed_9E5E` l'image 1 (`push 1`) puis l'image du champ +2120, mis à 34 par
+  `TalkingHead_Construct_98F4` (`mov word ptr [si+848h], 22h`). La composition du personnage ne
+  dépend donc pas de l'octet « image ».
+
+Contenu des images, relevé dans les données (dessin de chaque image et zone qu'elle couvre) :
+
+| Images | Contenu |
+|---|---|
+| 0 | la tête (avec le haut du corps) |
+| 1 | la coiffure ; présente pour `air`, `janet`, `lyle`, `men`, `pri`, `stern`, `tex` seulement |
+| 2 à 11 | les bouches (table des lèvres ci-dessous) |
+| 12 | les yeux fermés (clignement) |
+| 13 à 21 | les yeux : regards différents |
+| 22 à 25 | les sourcils et le haut des yeux : 22 et 25 sur toute la largeur (25 froncés), 23 sur la moitié gauche de l'image, 24 sur la moitié droite |
+| 26 | une bouche de plus |
+| 27 à 33 | des expressions qui couvrent les yeux et la bouche (27 sourire, 28 grand sourire, 31 sourcils et bouche…) |
+| 34 | les habits, dessinés à chaque image du gros plan |
+| 35, 36 | d'autres habits (non dessinés en conversation) |
+| 37 | des lunettes de soleil (non dessinées en conversation) |
+| 38, 39, 51 | casque, visière et un détail de visière ; `air`, `janet`, `lyle`, `men`, `pri`, `tex` |
+| 53 | l'image de la question « Accept / Reject » (image de base fixée à 53) ; `beto`, `far`, `muh`, `walt`, `tweedly` |
+| 59 à 61 | trois expressions de `far` seulement |
+
+Les scripts n'utilisent que les yeux (13 à 21), les sourcils (22 à 25), trois expressions (27, 28,
+31) et 255 (pas d'image). La règle du clignement va avec ce rangement : au-delà de 20, l'image de
+base couvre les yeux, et l'image 12 l'effacerait.
+
+**Visages incomplets.** Les scripts emploient les mêmes valeurs pour tous les visages, mais cinq
+visages n'ont qu'une partie des images. Pour une valeur dont l'image est vide, le jeu ne dessine
+rien de plus que la tête : le visage reste neutre, comme avec 255.
+
+| Visage | Valeurs des scripts qui désignent une image vide |
+|---|---|
+| `far` | 17, 18, 19, 21, 22, 25, 31 |
+| `muh` | 19, 21, 22, 24, 25 |
+| `tweedly` | 14, 22, 23, 25 |
+| `beto` | 21, 22, 24, 27 |
+| `janet`, `pri` | 23 |
+| `men`, `walt` | 24 |
+
+Habits : l'image 34 est vide pour `beto`, `far`, `muh`, `virgil`, `walt`, `tweedly` et `goon`, dont
+l'image 0 porte déjà les vêtements.
+
 **Clignement**, tiré à chaque image de scène :
 ```
 image des yeux = 12           si rand() × 30 / 32768 = 0 (une fois sur 30)
