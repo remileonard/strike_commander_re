@@ -295,7 +295,7 @@ loc_312DF:				; CODE XREF: GlyphObject_ResolveAndCache_31296+12j
 		push	ax
 		push	[bp+arg_6]
 		push	di
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_3130E:				; CODE XREF: GlyphObject_ResolveAndCache_31296+47j

@@ -1738,7 +1738,7 @@ loc_5E009:				; CODE XREF: sub_5DD30+2D5j
 		push	87h ; '�'
 		push	5
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		lea	ax, [bp+var_9A]
 		push	ax

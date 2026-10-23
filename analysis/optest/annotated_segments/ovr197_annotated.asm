@@ -6440,7 +6440,7 @@ loc_6B587:				; CODE XREF: Midgame1_PlayPart2_671C0+4399j
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -6458,7 +6458,7 @@ loc_6B587:				; CODE XREF: Midgame1_PlayPart2_671C0+4399j
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -6476,7 +6476,7 @@ loc_6B587:				; CODE XREF: Midgame1_PlayPart2_671C0+4399j
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2E]
 		mov	[bp+var_B2], ax

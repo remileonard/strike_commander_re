@@ -1338,7 +1338,7 @@ loc_374F7:				; CODE XREF: Picking_ComputeDetailed+281j
 		push	word ptr [bp+var_32]
 		push	word ptr [bp+var_18]
 		push	[bp+arg_2]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_3753D
 ; ���������������������������������������������������������������������������
@@ -1355,7 +1355,7 @@ loc_3751B:				; CODE XREF: Picking_ComputeDetailed+497j
 		push	word ptr [bp+var_32]
 		push	word ptr [bp+var_18]
 		push	[bp+arg_2]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_3753D:				; CODE XREF: Picking_ComputeDetailed+1Aj

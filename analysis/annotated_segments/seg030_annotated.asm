@@ -1285,7 +1285,7 @@ loc_1DAF1:
 		push	ax
 		push	large dword ptr	[bp-16h]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp-12h]
 		sub	[bp-0Ah], ax
@@ -1601,7 +1601,7 @@ loc_1DF2B:				; CODE XREF: seg030:0B87j
 		push	ax
 		push	large dword ptr	[bp-0Ah]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_1DF61:				; CODE XREF: seg030:1019j
 		add	sp, 0Ch
@@ -1710,7 +1710,7 @@ loc_1E014:				; CODE XREF: seg030:112Fj seg030:1139j ...
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_1E05D
 ; ���������������������������������������������������������������������������
@@ -1763,7 +1763,7 @@ loc_1E065:				; CODE XREF: seg030:10E7j
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [di+4], 0
 		jz	short loc_1E0BE
@@ -1781,7 +1781,7 @@ loc_1E093:				; CODE XREF: seg030:1153j
 		push	word ptr [di+2]
 		push	word ptr [di]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1E0BE:				; CODE XREF: seg030:1151j seg030:1181j
@@ -1914,7 +1914,7 @@ loc_1E1CF:
 		push	word ptr [si+3Dh]
 		push	word ptr [si+3Bh]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_1E1F3
 ; ���������������������������������������������������������������������������
@@ -2256,7 +2256,7 @@ loc_1E494:				; CODE XREF: seg030:1581j
 		push	large dword ptr	[bp-0Ch]
 		push	large dword ptr	[bp-8]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1E4A8:
@@ -2820,7 +2820,7 @@ loc_1E9FC:				; CODE XREF: seg030:1AD6j seg030:1ADBj ...
 		push	word ptr [bp-6Eh]
 		push	word ptr [bp-5Eh]
 		push	word ptr [bp-4]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_1EA0F:				; CODE XREF: seg030:1A9Fj
 		add	sp, 0Ch

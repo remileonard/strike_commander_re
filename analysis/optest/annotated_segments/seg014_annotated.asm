@@ -1401,7 +1401,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		cmp	word ptr [si+84Ch], 0FFFFh
 		jz	short loc_9DD8
@@ -1426,7 +1426,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 
@@ -1454,7 +1454,7 @@ loc_9DD8:				; CODE XREF: TalkingHead_DrawAt_9D47+49j TalkingHead_DrawAt_9D47+5
 		push	[bp+var_E]
 		push	[bp+var_C]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 
@@ -1531,7 +1531,7 @@ TalkingHead_DrawDressed_9E5E:				; DATA XREF: dseg:184Bo dseg:18A3o
 		push	word ptr [bp-4]
 		push	word ptr [bp-2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	[bp-6],	di
 		mov	ax, [bp+0Ah]
@@ -1554,7 +1554,7 @@ TalkingHead_DrawDressed_9E5E:				; DATA XREF: dseg:184Bo dseg:18A3o
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 
@@ -2161,7 +2161,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		cmp	word ptr [si+84Ah], 0FFFFh
 		jz	short loc_A348
@@ -2186,7 +2186,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 
@@ -2491,7 +2491,7 @@ OverlayAnimLayer_Draw_A548:				; CODE XREF: seg014:2B07j
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_2E202
@@ -2859,8 +2859,7 @@ MovingOverlayLayer_Construct_A837	endp
 
 ; ==============================================================================================
 ; far, LUE 2026-10-21. Méthode +10h de MovingOverlayLayer : image 0 de la ressource à la
-; position du calque (Render_MeasureOrDrawTextString_32CD8), puis Layer_DrawAtOwnPos_2E202
-; (image courante).
+; position du calque (Shape_DrawSpans_32CD8), puis Layer_DrawAtOwnPos_2E202 (image courante).
 ; ==============================================================================================
 MovingOverlayLayer_Draw_A8BE:				; CODE XREF: seg014:2AADj
 					; DATA XREF: dseg:17DBo
@@ -2897,7 +2896,7 @@ MovingOverlayLayer_Draw_A8BE:				; CODE XREF: seg014:2AADj
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_2E202
@@ -3074,7 +3073,7 @@ OverlayLayer_Draw_AA17:				; CODE XREF: seg014:2A54j
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_2E202
@@ -3298,7 +3297,7 @@ ConvFigure_DrawExtra_ABEB:				; CODE XREF: seg014:29FBj
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		cmp	byte ptr [si+1Dh], 0
 		jz	short loc_AC55
@@ -4319,7 +4318,7 @@ TalkingHeadOverlay_DrawAt_B28E:				; DATA XREF: dseg:1697o
 		push	word ptr [bp-4]
 		push	word ptr [bp-2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	[bp-6],	di
 		mov	ax, [bp+0Ah]
@@ -4338,7 +4337,7 @@ TalkingHeadOverlay_DrawAt_B28E:				; DATA XREF: dseg:1697o
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		pop	di
 		pop	si
@@ -4638,7 +4637,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_2]
 		lea	ax, [bp+var_18]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		lea	ax, [bp+var_18]
 		push	ax
@@ -4782,7 +4781,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_B61B:				; CODE XREF: ToggleLayer_DrawAt_B5D1+12j
@@ -4805,7 +4804,7 @@ loc_B61B:				; CODE XREF: ToggleLayer_DrawAt_B5D1+12j
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_B657:				; CODE XREF: ToggleLayer_DrawAt_B5D1+4Ej
@@ -4828,7 +4827,7 @@ loc_B657:				; CODE XREF: ToggleLayer_DrawAt_B5D1+4Ej
 		push	[bp+var_C]
 		push	[bp+var_A]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_B6DA
 ; ���������������������������������������������������������������������������
@@ -4855,7 +4854,7 @@ loc_B695:				; CODE XREF: ToggleLayer_DrawAt_B5D1+8Aj
 		push	[bp+var_10]
 		push	[bp+var_E]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 

@@ -430,7 +430,7 @@ loc_556A3:				; CODE XREF: sub_5547D+60Cj
 		push	0
 		push	0
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -446,7 +446,7 @@ loc_556A3:				; CODE XREF: sub_5547D+60Cj
 		push	3
 		push	4
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word_46F46
 		push	word_46F44

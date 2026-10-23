@@ -57,7 +57,6 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 463 | `sub_9A566` | `TerrainSector_AllocateArray_9A566` | ovr295 |
 | 461 | `sub_8A5E0` | `MissionRecord_LoadWithDwordFieldsC_8A5E0` | ovr254 |
 | 460 | `sub_843B5` | `HUDSymbol_ProcessJoystickAndFilter_843B5` | ovr244 |
-| 457 | `sub_61F52` | `Render_MeasureOrDrawTextString_61F52` | seg174 |
 | 454 | `sub_61612` | `Render_DrawEllipseOutline_61612` | seg169 |
 | 440 | `sub_73B4F` | `AircraftDamageModel_LoadComponents_73B4F` | ovr228 |
 | 439 | `sub_509EE` | `UIScreen_RenderGraphVGA_509EE` | seg113 |

@@ -1240,9 +1240,8 @@ loc_2E17E:				; CODE XREF: seg084:07B9j
 
 ; ==============================================================================================
 ; far, LUE 2026-10-17. Si l'image +27 n'est pas -1 : dessine l'image +27 de la ressource +17
-; en (x, y) sur la surface word_46F44 (sub_32CD8, reprise sous le nom
-; Render_MeasureOrDrawTextString_32CD8) ; puis dessine les enfants (méthode +16) à cette
-; position.
+; en (x, y) sur la surface word_46F44 (sub_32CD8, reprise sous le nom Shape_DrawSpans_32CD8) ;
+; puis dessine les enfants (méthode +16) à cette position.
 ; ==============================================================================================
 Layer_DrawAt_2E181	proc far		; CODE XREF: Layer_DrawAtOwnPos_2E202+24p
 					; seg084:0891p
@@ -1280,7 +1279,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short $+2
 

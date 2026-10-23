@@ -1042,7 +1042,7 @@ off_6A3EE	dd 61610000h
 		db    2
 		db    1
 		db    0
-		dd Render_MeasureOrDrawTextString_61F52
+		dd Shape_DrawSpans_61F52
 		db  52h	; R
 		db    2
 		db    1

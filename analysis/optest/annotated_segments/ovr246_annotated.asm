@@ -195,7 +195,7 @@ loc_C892B:				; CODE XREF: sub_C890E+147j
 		add	ax, [di]
 		push	ax
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_C89B0
 ; ���������������������������������������������������������������������������
@@ -219,7 +219,7 @@ loc_C897B:				; CODE XREF: sub_C890E+34j
 		add	ax, [di]
 		push	ax
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_C89B0:				; CODE XREF: sub_C890E+6Bj

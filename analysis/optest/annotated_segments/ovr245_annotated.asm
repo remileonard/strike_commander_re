@@ -110,7 +110,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_C82E7
 ; ���������������������������������������������������������������������������
@@ -130,7 +130,7 @@ loc_C82B9:				; CODE XREF: sub_C826C+1Bj
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_C82E7:				; CODE XREF: sub_C826C+4Bj
@@ -203,7 +203,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_C838E
 ; ���������������������������������������������������������������������������
@@ -223,7 +223,7 @@ loc_C8360:				; CODE XREF: sub_C8313+1Bj
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_C838E:				; CODE XREF: sub_C8313+4Bj
@@ -383,7 +383,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_C84DE
 ; ���������������������������������������������������������������������������
@@ -403,7 +403,7 @@ loc_C84B0:				; CODE XREF: sub_C83EB+93j
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_C84DE:				; CODE XREF: sub_C83EB+C3j
@@ -824,7 +824,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_C87A2
 ; ���������������������������������������������������������������������������
@@ -844,7 +844,7 @@ loc_C8774:				; CODE XREF: sub_C872C+16j
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_C87A2:				; CODE XREF: sub_C872C+46j

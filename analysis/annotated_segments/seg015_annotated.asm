@@ -18,18 +18,17 @@ seg015		segment	byte public 'CODE' use16
 ; prendre pour acquis tant que non trace. si=objet controleur (memes offsets que
 ; Camera_ExternalView_VtSlotC_14FD7, l appelant), di=&si+2 (buffer texte embarque). (1) si
 ; si[+0x135]==0 -> rien, sortie immediate. (2) sinon resout la ressource texte si[+0x135] via
-; Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via
-; Render_MeasureOrDrawTextString_61F52 (meme couple d appels que le moteur de rendu des
-; messages journal/kneeboard). (3) si si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si
-; si[+0x21E] : choisit une 2e source de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C],
-; sinon -> si[+0x212]/[+0x216]), meme resolution+rendu si la source est non nulle. (5)
-; si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF (fige l affichage). PRECISION (2026-09-12, Remi) :
-; Betty (cf. Cockpit_LoadBettyPack) est une banque SON pour les avertissements, sans rapport
-; avec ce widget texte -- toute mention anterieure de Betty ici etait un lien errone. RESTE
-; OUVERT : lien exact entre si[+0x135] et word_72A94, si le widget sert aussi aux messages
-; radio, semantique exacte de si[+0x140] et si[+0x21E]/[+0x21F]. Lu ligne a ligne le
-; 2026-09-12 sur demande de Remi (le nom precedent "DrawPilotPortrait" etait faux, aucun
-; portrait n existe dans la simulation).
+; Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via Shape_DrawSpans_61F52 (meme
+; couple d appels que le moteur de rendu des messages journal/kneeboard). (3) si
+; si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si si[+0x21E] : choisit une 2e source
+; de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C], sinon -> si[+0x212]/[+0x216]), meme
+; resolution+rendu si la source est non nulle. (5) si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF
+; (fige l affichage). PRECISION (2026-09-12, Remi) : Betty (cf. Cockpit_LoadBettyPack) est une
+; banque SON pour les avertissements, sans rapport avec ce widget texte -- toute mention
+; anterieure de Betty ici etait un lien errone. RESTE OUVERT : lien exact entre si[+0x135] et
+; word_72A94, si le widget sert aussi aux messages radio, semantique exacte de si[+0x140] et
+; si[+0x21E]/[+0x21F]. Lu ligne a ligne le 2026-09-12 sur demande de Remi (le nom precedent
+; "DrawPilotPortrait" etait faux, aucun portrait n existe dans la simulation).
 ; ==============================================================================================
 Cockpit_CaptionTextRenderStep_14EFA	proc far		; CODE XREF: seg015:014Dp
 
@@ -69,7 +68,7 @@ loc_14F1B:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+1Cj
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+21Ch], 0FFh
 		jnz	short loc_14F4B
@@ -132,7 +131,7 @@ loc_14FA7:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+85j
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_14FC0:				; CODE XREF: Cockpit_CaptionTextRenderStep_14EFA+56j

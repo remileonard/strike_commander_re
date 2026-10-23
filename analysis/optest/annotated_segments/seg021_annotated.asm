@@ -1622,7 +1622,7 @@ loc_DDA0:				; CODE XREF: seg021:0ADCj
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_DDD2:				; CODE XREF: seg021:0AE2j

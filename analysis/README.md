@@ -1169,7 +1169,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Joystick_ApplyDeadzoneAndScaleB_679E2` | 136 | seg208 | Application de zone morte/échelle (axe B) |
 | `ConfigOption_ApplyAndDisplayB_6698F` | 131 | seg201 | Affichage d'option de configuration |
 | `Render_DrawTextString_61CD2` | 496 | seg173 | Rendu de chaîne de texte complète |
-| `Render_MeasureOrDrawTextString_61F52` | 457 | seg174 | Mesure/rendu de chaîne de texte (variante) |
+| `Shape_DrawSpans_61F52` | 457 | seg174 | dessin d'une image (segments de ligne, copie directe ; lu 2026-10-23) |
 | `Render_DrawHorizontalLineClipped_61B8E` | 201 | seg172 | Tracé de ligne horizontale clippée |
 | `PaletteScreen_BuildCustomGradient_A1626` | 537 | seg442 | Construction d'un dégradé de couleur personnalisé (22 entrées + courbe) |
 | `PaletteScreen_UpdateWidgetMain_A21AF` | 419 | seg442 | Point d'entrée principal de mise à jour du widget palette |

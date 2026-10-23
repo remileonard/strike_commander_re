@@ -186,6 +186,12 @@ position de la tête :
 4. image 1 (coiffure), puis image 34 (habits ; valeur fixée à la construction, aucun autre
    écrivain vu).
 
+Chaque image est dessinée par `Shape_DrawSpans_32CD8` : seuls les pixels de ses segments de ligne
+sont écrits, copiés tels quels dans l'écran (`rep movsw`, `rep stosw`), sans XOR ni couleur
+transparente. Une image recouvre donc les précédentes là où leurs segments se chevauchent : la
+bouche remplace la bouche de la tête, et la coiffure et les habits, dessinés en dernier,
+recouvrent la bouche s'ils la touchent.
+
 **Image de base** = l'octet « image » de la commande `CLOSEUP` (`TalkingHead_SetBaseFrame_9D32`) ; 255 devient −1
 (`cbw`) : pas d'image des yeux hors clignement. Pendant la question « Accept / Reject » (11),
 l'image de base passe à 53 et le texte de lèvres est une chaîne vide (dseg 4217, juste avant

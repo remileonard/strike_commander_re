@@ -198,7 +198,7 @@ loc_1E529:				; CODE XREF: seg046:015Aj
 		push	ax
 		push	0
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_1E55D:				; CODE XREF: seg046:0177j

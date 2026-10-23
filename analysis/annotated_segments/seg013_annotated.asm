@@ -225,7 +225,7 @@ loc_1462F:				; CODE XREF: UI_RenderFormattedText+11Cj
 		push	[bp+var_24]
 		push	[bp+var_22]
 		push	[bp+var_20]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	large [bp+arg_8]
 		push	[bp+var_A]
@@ -424,7 +424,7 @@ loc_147B7:				; CODE XREF: Text_TypewriterFrame+1Dj
 		push	[bp+var_6]
 		push	[bp+var_4]
 		push	[bp+var_2]
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	bx, word_70E62
 		mov	ax, [bx+8]

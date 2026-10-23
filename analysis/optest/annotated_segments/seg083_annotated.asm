@@ -743,7 +743,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		pop	si
 		pop	bp

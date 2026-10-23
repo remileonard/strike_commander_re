@@ -212,7 +212,7 @@ loc_4AEF:				; CODE XREF: seg005:0C94J
 		push	word ptr [bp-8]
 		push	word ptr [bp-6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_2E202

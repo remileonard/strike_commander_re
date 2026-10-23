@@ -259,7 +259,7 @@ arg_0		= word ptr  6
 loc_17423:
 		add	ax, 12h
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1742F:				; CODE XREF: UI_DrawWidgetLabel+Bj

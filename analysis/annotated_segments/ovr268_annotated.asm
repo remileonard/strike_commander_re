@@ -8,7 +8,7 @@ ovr268		segment	para public 'OVERLAY' use16
 
 ; ==============================================================================================
 ; ⚠️ far, 227 lignes, NON DÉTAILLÉE — combine TextRenderer_ApplyFormatChange_5E34D (seg143),
-; Render_MeasureOrDrawTextString_61F52 (×2).
+; Shape_DrawSpans_61F52 (×2).
 ; ==============================================================================================
 Cockpit_ApplyFormatAndDraw_91B70	proc far		; CODE XREF: VROOMM_StubThunk_6B830J ResourceFile_LoadTypeB_91D29+91Cp
 
@@ -89,7 +89,7 @@ loc_91BEE:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+7Aj
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+56h], 0
 		jz	short loc_91C1C
@@ -98,7 +98,7 @@ loc_91BEE:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+7Aj
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_91C1C:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+95j
@@ -109,7 +109,7 @@ loc_91C1C:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+95j
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_91C37:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+B0j
@@ -120,7 +120,7 @@ loc_91C37:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+B0j
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_91C52:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+CBj
@@ -131,7 +131,7 @@ loc_91C52:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+CBj
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_91C6D:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+E6j
@@ -144,7 +144,7 @@ loc_91C71:
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_91C88:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70:loc_91C71j
@@ -162,7 +162,7 @@ loc_91C94:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+120j
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+51h], 0
 		jz	short loc_91CB1
@@ -178,7 +178,7 @@ loc_91CB3:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+13Fj
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+52h], 0
 		jz	short loc_91CE5
@@ -193,7 +193,7 @@ loc_91CD5:
 		push	ax
 
 loc_91CD9:
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_91CDE:
 		add	sp, 0Ch
@@ -213,7 +213,7 @@ loc_91CE7:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70:loc_91CE3j
 		push	large 0
 		lea	ax, [bp+var_10]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		lea	ax, [bp+var_1E]
 		push	ax
@@ -1972,7 +1972,7 @@ loc_92C16:				; CODE XREF: ResourceFile_LoadTypeC_9277C:loc_92C12j
 		push	ax
 		push	large 370122h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	[bp+var_32]
 

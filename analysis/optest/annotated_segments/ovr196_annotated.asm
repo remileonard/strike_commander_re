@@ -1443,7 +1443,7 @@ loc_60A65:				; CODE XREF: Midgame1_PlayPart1_5FCF0+CF9j
 		push	0
 		lea	ax, [bp+var_1D6]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -1460,7 +1460,7 @@ loc_60A65:				; CODE XREF: Midgame1_PlayPart1_5FCF0+CF9j
 		push	0
 		lea	ax, [bp+var_1D6]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		call	Input_Flush_CDDC
 		mov	ax, [bp+var_4C]
@@ -2747,7 +2747,7 @@ loc_619CD:				; CODE XREF: Midgame1_PlayPart1_5FCF0+1CD3j
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2764,7 +2764,7 @@ loc_619CD:				; CODE XREF: Midgame1_PlayPart1_5FCF0+1CD3j
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		mov	al, byte ptr [bp+var_164]
@@ -3278,7 +3278,7 @@ loc_61FE8:				; CODE XREF: Midgame1_PlayPart1_5FCF0+22EEj
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -3295,7 +3295,7 @@ loc_61FE8:				; CODE XREF: Midgame1_PlayPart1_5FCF0+22EEj
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		mov	al, byte ptr [bp+var_164]
@@ -3378,7 +3378,7 @@ loc_620F5:				; CODE XREF: Midgame1_PlayPart1_5FCF0+2400j
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -3395,7 +3395,7 @@ loc_620F5:				; CODE XREF: Midgame1_PlayPart1_5FCF0+2400j
 		push	0
 		lea	ax, [bp+var_1E4]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		lea	ax, [bp+var_1D6]
 		push	ax

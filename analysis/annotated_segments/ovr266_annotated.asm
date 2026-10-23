@@ -419,7 +419,7 @@ Cockpit_ReadControlsFrameB_8F900	endp
 
 ; ==============================================================================================
 ; ⚠️ far, 118 lignes, NON DÉTAILLÉE — combine UI_ApplyEncodingHelper_5E576 (seg143),
-; Render_MeasureOrDrawTextString_61F52 (seg174, ×2).
+; Shape_DrawSpans_61F52 (seg174, ×2).
 ; ==============================================================================================
 Cockpit_DrawEncodedText_8FA4C	proc far		; CODE XREF: VROOMM_StubThunk_6B785J ResourceFile_LoadTypeA_90097+77Fp
 
@@ -490,7 +490,7 @@ loc_8FAB2:
 loc_8FAB8:
 		push	large 40005h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_8FACA:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+64j
@@ -498,7 +498,7 @@ loc_8FACA:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+64j
 		push	large [bp+arg_4]
 		push	large 270005h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte_721F0, 2
 		jnz	short loc_8FAEF
@@ -931,7 +931,7 @@ Config_ReadSettingsFieldWithMessage_8FD2A	endp
 ; ==============================================================================================
 ; ⚠️ far, 322 lignes, NON DÉTAILLÉE — combine Music_Stop_5A9E6 (seg125), StreamReader,
 ; Joystick_GetButtonRawByte_67B82/InitCalibrationDefaults_67B92 (seg208),
-; Render_MeasureOrDrawTextString_61F52.
+; Shape_DrawSpans_61F52.
 ; ==============================================================================================
 Cockpit_LoadAndDrawCalibration_8FDC0	proc far		; CODE XREF: VROOMM_StubThunk_6B7B7J ResourceFile_LoadTypeA_90097+7C8p
 
@@ -984,7 +984,7 @@ loc_8FE12:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+2ABj
 		push	large [bp+arg_0]
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp+var_2]
 		imul	ax, 3
@@ -993,7 +993,7 @@ loc_8FE12:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+2ABj
 		push	large [bp+arg_0]
 		push	large 0A20032h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8FE5E
 ; ���������������������������������������������������������������������������
@@ -1047,7 +1047,7 @@ loc_8FE9B:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+D4j
 		push	word_70E62
 
 loc_8FEBD:
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_8FEC2:
 		add	sp, 0Ch
@@ -1060,7 +1060,7 @@ loc_8FEC8:
 		push	large [bp+arg_0]
 		push	large 0A2002Dh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8FEEC
 ; ���������������������������������������������������������������������������
@@ -1098,7 +1098,7 @@ loc_8FF10:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+149j
 		push	large [bp+arg_0]
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp+var_2]
 		imul	ax, 3
@@ -1107,7 +1107,7 @@ loc_8FF10:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+149j
 		push	large [bp+arg_0]
 		push	large 0A2003Bh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8FF61
 ; ���������������������������������������������������������������������������
@@ -1194,13 +1194,13 @@ loc_90004:				; CODE XREF: Cockpit_LoadAndDrawCalibration_8FDC0+20Ej
 		push	large [bp+arg_0]
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	31h ; '1'
 		push	large [bp+arg_0]
 		push	large 0A2001Fh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn
@@ -2007,7 +2007,7 @@ loc_90825:				; CODE XREF: ResourceFile_LoadTypeA_90097+835j
 		push	ax
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		call	TextScrollDisplayB_ApplyHelperC_67F26
 

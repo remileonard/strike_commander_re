@@ -1388,7 +1388,7 @@ loc_12E1D:				; CODE XREF: sub_1220C+C0Bj
 		push	0
 		push	0
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	274h
 		push	0Ah

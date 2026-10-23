@@ -281,7 +281,7 @@ loc_5E432:				; CODE XREF: sub_5E1A1+5C1j
 		push	87h ; '�'
 		push	5
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	8
 		push	0
@@ -297,7 +297,7 @@ loc_5E432:				; CODE XREF: sub_5E1A1+5C1j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -317,7 +317,7 @@ loc_5E432:				; CODE XREF: sub_5E1A1+5C1j
 		push	0A2h ; '�'
 		push	32h ; '2'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_5E4CA
 ; ���������������������������������������������������������������������������
@@ -379,7 +379,7 @@ loc_5E509:				; CODE XREF: sub_5E1A1+361j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -399,7 +399,7 @@ loc_5E509:				; CODE XREF: sub_5E1A1+361j
 		push	0A2h ; '�'
 		push	2Dh ; '-'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_5E584
 ; ���������������������������������������������������������������������������
@@ -447,7 +447,7 @@ loc_5E5AA:				; CODE XREF: sub_5E1A1+402j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -467,7 +467,7 @@ loc_5E5AA:				; CODE XREF: sub_5E1A1+402j
 		push	0A2h ; '�'
 		push	3Bh ; ';'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_5E625
 ; ���������������������������������������������������������������������������
@@ -559,7 +559,7 @@ loc_5E6CF:				; CODE XREF: sub_5E1A1+4F1j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	7
 		push	0
@@ -575,7 +575,7 @@ loc_5E6CF:				; CODE XREF: sub_5E1A1+4F1j
 		push	0A2h ; '�'
 		push	1Fh
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn

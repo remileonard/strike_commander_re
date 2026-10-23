@@ -59,7 +59,7 @@ sub_291FC	endp
 		push	4
 		push	5
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_29245:				; CODE XREF: seg063:003Bj
@@ -69,7 +69,7 @@ loc_29245:				; CODE XREF: seg063:003Bj
 		push	27h ; '''
 		push	5
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	di
 		call	sub_F878
@@ -420,7 +420,7 @@ loc_29549:				; CODE XREF: seg063:05CAj
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp-2]
 		shl	ax, 1
@@ -432,7 +432,7 @@ loc_29549:				; CODE XREF: seg063:05CAj
 		push	0A2h ; '�'
 		push	32h ; '2'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_29599
 ; ���������������������������������������������������������������������������
@@ -486,7 +486,7 @@ loc_295D8:				; CODE XREF: seg063:03E1j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp-2]
 		shl	ax, 1
@@ -498,7 +498,7 @@ loc_295D8:				; CODE XREF: seg063:03E1j
 		push	0A2h ; '�'
 		push	2Dh ; '-'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_2962D
 ; ���������������������������������������������������������������������������
@@ -538,7 +538,7 @@ loc_29653:				; CODE XREF: seg063:045Cj
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	ax, [bp-2]
 		shl	ax, 1
@@ -550,7 +550,7 @@ loc_29653:				; CODE XREF: seg063:045Cj
 		push	0A2h ; '�'
 		push	3Bh ; ';'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		jmp	short loc_296A8
 ; ���������������������������������������������������������������������������
@@ -633,7 +633,7 @@ loc_2974D:				; CODE XREF: seg063:0525j
 		push	9Fh ; '�'
 		push	11h
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	31h ; '1'
 		push	word ptr [bp+8]
@@ -641,7 +641,7 @@ loc_2974D:				; CODE XREF: seg063:0525j
 		push	0A2h ; '�'
 		push	1Fh
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn

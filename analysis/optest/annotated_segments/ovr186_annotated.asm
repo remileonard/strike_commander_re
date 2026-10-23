@@ -388,7 +388,7 @@ loc_4E9D3:				; CODE XREF: sub_4E660+893j
 		push	0
 		lea	ax, [bp+var_1FE]
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		or	di, di
 		jnz	short loc_4EA56
@@ -2323,7 +2323,7 @@ loc_4FC53:				; CODE XREF: Gameflow_MainMenu_4F1A7+A28j
 		push	0
 		push	0
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2339,7 +2339,7 @@ loc_4FC53:				; CODE XREF: Gameflow_MainMenu_4F1A7+A28j
 		push	0
 		push	0
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2355,7 +2355,7 @@ loc_4FC53:				; CODE XREF: Gameflow_MainMenu_4F1A7+A28j
 		push	0
 		push	0
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		lea	ax, [bp+var_39C]
 		push	ax

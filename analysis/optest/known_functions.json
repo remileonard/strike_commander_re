@@ -1475,9 +1475,9 @@
     "summary": "Reprise de STRIKE.EXE : code identique instruction par instruction à `Render_DrawTextString_61CD2` (sub_61CD2 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — ⚠️ far, 496 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), gros buffer local (0x158 octets), copie un descripteur de contexte (6 mots) et prend un pointeur far vers une chaîne (arg_6) et une couleur (arg_C). Référencée par `GlyphObject_ResolveAndCache_605CE` (seg162) et depuis seg034 — probable rendu d'une chaîne de caractères complète avec clipping (rasterisation de texte). Candidat pour session dédiée."
   },
   "sub_32CD8": {
-    "new_name": "Render_MeasureOrDrawTextString_32CD8",
+    "new_name": "Shape_DrawSpans_32CD8",
     "segment": "seg121",
-    "summary": "Reprise de STRIKE.EXE : code identique instruction par instruction à `Render_MeasureOrDrawTextString_61F52` (sub_61F52 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — ⚠️ far, 457 lignes, NON DÉTAILLÉE — même motif que Render_DrawTextString_61CD2 (seg173) : copie un descripteur de contexte (6 mots) et prend un pointeur far vers une chaîne (arg_6), avec vérification de capacité de buffer (comparaison contre [si+4]). Référencée par sub_1450B, sub_14795 et Widget_ConstructWithBuffer/GlyphObject_ConstructWithBuffer (seg162). Probable variante mesure-sans-dessiner ou dessin avec contrôle de capacité — identité exacte vis-à-vis de Render_DrawTextString_61CD2 non vérifiée. Candidat pour session dédiée."
+    "summary": "Reprise de STRIKE.EXE : code identique instruction par instruction à `Shape_DrawSpans_61F52` (sub_61F52 de STRIKE.EXE). far. DESSIN D'UNE IMAGE (forme RealSpace, format des segments de ligne) à la position (arg_2, arg_4), avec découpe sur le rectangle de la fenêtre. Pour chaque segment : `lodsw` = n (0 = fin de l'image), `lodsw` = x, `lodsw` = y (ajoutés à la position) ; n pair : n/2 pixels recopiés tels quels (`shr cx, 1` / `rep movsw` / `rep movsb`) ; n impair : blocs de n/2 pixels en tout, chaque bloc commence par un octet c (`lodsb` / `shr al, 1`) : c pair → c/2 pixels recopiés (`rep movsw` / `rep movsb`), c impair → c/2 fois l'octet suivant (`rep stosw` / `rep stosb`). Écriture directe dans la mémoire d'écran : ni XOR ni couleur transparente testée ; la transparence vient du format (seuls les pixels des segments sont écrits), et une image dessinée après une autre la recouvre là où leurs segments se chevauchent. Ex-'Render_MeasureOrDrawTextString' (nom faux), renommée 2026-10-23 après lecture de la boucle de pixels (boucle relue ici, dans OPTEST). Lecteur Python équivalent : tools/sc_data.py image_spans/draw_image."
   },
   "sub_32F28": {
     "new_name": "Render_DrawScaledSprite_32F28",
@@ -1492,7 +1492,7 @@
   "sub_33368": {
     "new_name": "Render_DrawOrMeasureTextVariant_33368",
     "segment": "seg124",
-    "summary": "Reprise de STRIKE.EXE : code identique instruction par instruction à `Render_DrawOrMeasureTextVariant_625E2` (sub_625E2 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — ⚠️ far, 215 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), même motif de vérification de capacité de buffer que Render_MeasureOrDrawTextString_61F52 (comparaison (index+1)×4 contre le champ +4 d'une structure far). Référencée par `CachedObject_BuildVariant_5E12A` (seg141) — probable variante de rendu/mesure de texte pour le cluster d'objets mis en cache. Candidat pour session dédiée."
+    "summary": "Reprise de STRIKE.EXE : code identique instruction par instruction à `Render_DrawOrMeasureTextVariant_625E2` (sub_625E2 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — ⚠️ far, 215 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), même motif de vérification de capacité de buffer que Shape_DrawSpans_61F52 (comparaison (index+1)×4 contre le champ +4 d'une structure far). Référencée par `CachedObject_BuildVariant_5E12A` (seg141) — probable variante de rendu/mesure de texte pour le cluster d'objets mis en cache. Candidat pour session dédiée."
   },
   "sub_334A0": {
     "new_name": "Render_BlitClippedRegion_334A0",
@@ -2987,7 +2987,7 @@
   "sub_2E181": {
     "new_name": "Layer_DrawAt_2E181",
     "segment": "seg084",
-    "summary": "far, LUE 2026-10-17. Si l'image +27 n'est pas -1 : dessine l'image +27 de la ressource +17 en (x, y) sur la surface word_46F44 (sub_32CD8, reprise sous le nom Render_MeasureOrDrawTextString_32CD8) ; puis dessine les enfants (méthode +16) à cette position."
+    "summary": "far, LUE 2026-10-17. Si l'image +27 n'est pas -1 : dessine l'image +27 de la ressource +17 en (x, y) sur la surface word_46F44 (sub_32CD8, reprise sous le nom Shape_DrawSpans_32CD8) ; puis dessine les enfants (méthode +16) à cette position."
   },
   "sub_2E202": {
     "new_name": "Layer_DrawAtOwnPos_2E202",
@@ -3342,7 +3342,7 @@
   "loc_A8BE": {
     "new_name": "MovingOverlayLayer_Draw_A8BE",
     "segment": "seg014",
-    "summary": "far, LUE 2026-10-21. Méthode +10h de MovingOverlayLayer : image 0 de la ressource à la position du calque (Render_MeasureOrDrawTextString_32CD8), puis Layer_DrawAtOwnPos_2E202 (image courante)."
+    "summary": "far, LUE 2026-10-21. Méthode +10h de MovingOverlayLayer : image 0 de la ressource à la position du calque (Shape_DrawSpans_32CD8), puis Layer_DrawAtOwnPos_2E202 (image courante)."
   },
   "sub_B995": {
     "new_name": "MovingMaskLayer_Construct_B995",
@@ -3397,7 +3397,7 @@
   "sub_39A7A": {
     "new_name": "Render_DrawRotatedScaledShape_39A7A",
     "segment": "seg135",
-    "summary": "far, LUE en partie 2026-10-21. Dessin d'une image de forme tournée et mise à l'échelle : (surface, x, y, forme far, image, angle arg_C, échelle arg_E, octet arg_10). Si échelle = 100h et angle = octet (cbw) : saut direct vers Render_MeasureOrDrawTextString_32CD8 (dessin sans transformation). Sinon : angle négatif + 168h (360, donc en degrés), deux octets lus dans des tables par degré (ss:418Ah, ss:41E4h), un index = table ss:434Ch + table ss:44B4h XOR octet arg_10, puis saut dans une table de 8 routines (échelle < 100h) ou les 8 suivantes (échelle ≥ 100h). Les routines elles-mêmes ne sont pas lues."
+    "summary": "far, LUE en partie 2026-10-21. Dessin d'une image de forme tournée et mise à l'échelle : (surface, x, y, forme far, image, angle arg_C, échelle arg_E, octet arg_10). Si échelle = 100h et angle = octet (cbw) : saut direct vers Shape_DrawSpans_32CD8 (dessin sans transformation). Sinon : angle négatif + 168h (360, donc en degrés), deux octets lus dans des tables par degré (ss:418Ah, ss:41E4h), un index = table ss:434Ch + table ss:44B4h XOR octet arg_10, puis saut dans une table de 8 routines (échelle < 100h) ou les 8 suivantes (échelle ≥ 100h). Les routines elles-mêmes ne sont pas lues."
   },
   "sub_2DE95": {
     "new_name": "Layer_ConstructAtOrigin_2DE95",

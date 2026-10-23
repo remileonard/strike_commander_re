@@ -78,7 +78,7 @@ loc_86243:				; CODE XREF: Camera_UpdateAndNotifyB_861E0+5Cj
 		push	word ptr [si+0Ah]
 		push	word ptr [si+8]
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	2
 		lea	ax, [bp+var_4]

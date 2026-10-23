@@ -2011,7 +2011,7 @@ loc_28296:				; CODE XREF: Input_CalibrationHandler+2F4j
 		push	ax
 		push	large 870005h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		lea	ax, [bp+var_9A]
 		push	ax

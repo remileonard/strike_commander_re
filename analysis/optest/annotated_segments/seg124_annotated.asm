@@ -12,10 +12,9 @@ seg124		segment	byte public 'CODE' use16
 ; Render_DrawOrMeasureTextVariant_625E2 (sub_625E2 de STRIKE.EXE). Résumé repris de STRIKE.EXE
 ; ; appelants et contexte à revérifier ici. — ⚠️ far, 215 lignes, NON DÉTAILLÉE — référencée
 ; via vtable (DATA XREF seg216), même motif de vérification de capacité de buffer que
-; Render_MeasureOrDrawTextString_61F52 (comparaison (index+1)×4 contre le champ +4 d'une
-; structure far). Référencée par CachedObject_BuildVariant_5E12A (seg141) — probable variante
-; de rendu/mesure de texte pour le cluster d'objets mis en cache. Candidat pour session
-; dédiée.
+; Shape_DrawSpans_61F52 (comparaison (index+1)×4 contre le champ +4 d'une structure far).
+; Référencée par CachedObject_BuildVariant_5E12A (seg141) — probable variante de rendu/mesure
+; de texte pour le cluster d'objets mis en cache. Candidat pour session dédiée.
 ; ==============================================================================================
 Render_DrawOrMeasureTextVariant_33368	proc far		; CODE XREF: CachedObject_BuildVariant_2D8E3+54P
 

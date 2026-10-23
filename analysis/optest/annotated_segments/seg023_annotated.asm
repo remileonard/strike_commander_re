@@ -3236,7 +3236,7 @@ loc_10F8B:				; DATA XREF: dseg:07C0o dseg:07F4o
 		push	word ptr [bp-4]
 		push	word ptr [bp-2]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	si
 		push	cs
@@ -3315,7 +3315,7 @@ loc_11001:				; DATA XREF: dseg:2CE5o
 		push	word ptr [bp-4]
 		push	word ptr [bp-2]
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word_45B54
 		push	0FFh

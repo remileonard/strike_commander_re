@@ -1725,10 +1725,10 @@ loc_39A75:				; CODE XREF: seg135:0E57j
 ; ==============================================================================================
 ; far, LUE en partie 2026-10-21. Dessin d'une image de forme tournée et mise à l'échelle :
 ; (surface, x, y, forme far, image, angle arg_C, échelle arg_E, octet arg_10). Si échelle =
-; 100h et angle = octet (cbw) : saut direct vers Render_MeasureOrDrawTextString_32CD8 (dessin
-; sans transformation). Sinon : angle négatif + 168h (360, donc en degrés), deux octets lus
-; dans des tables par degré (ss:418Ah, ss:41E4h), un index = table ss:434Ch + table ss:44B4h
-; XOR octet arg_10, puis saut dans une table de 8 routines (échelle < 100h) ou les 8 suivantes
+; 100h et angle = octet (cbw) : saut direct vers Shape_DrawSpans_32CD8 (dessin sans
+; transformation). Sinon : angle négatif + 168h (360, donc en degrés), deux octets lus dans
+; des tables par degré (ss:418Ah, ss:41E4h), un index = table ss:434Ch + table ss:44B4h XOR
+; octet arg_10, puis saut dans une table de 8 routines (échelle < 100h) ou les 8 suivantes
 ; (échelle ≥ 100h). Les routines elles-mêmes ne sont pas lues.
 ; ==============================================================================================
 Render_DrawRotatedScaledShape_39A7A	proc far		; CODE XREF: seg014:0091P
@@ -1761,7 +1761,7 @@ arg_4626	= dword	ptr  462Ch
 		pop	di
 		pop	si
 		pop	bp
-		jmp	Render_MeasureOrDrawTextString_32CD8
+		jmp	Shape_DrawSpans_32CD8
 ; ���������������������������������������������������������������������������
 
 loc_39A9B:				; CODE XREF: Render_DrawRotatedScaledShape_39A7A+Bj

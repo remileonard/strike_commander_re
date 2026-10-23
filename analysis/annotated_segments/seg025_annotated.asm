@@ -250,7 +250,7 @@ loc_1AA71:				; CODE XREF: seg025:01CAj
 		push	large dword ptr	[bp-14h]
 		lea	ax, [bp-32h]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp-14h]
 		sub	ax, [bp-2]
@@ -590,7 +590,7 @@ loc_1ACD8:
 		push	large dword ptr	[bp-10h]
 		lea	ax, [bp-2Eh]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1AD02:				; CODE XREF: seg025:0453j
@@ -637,7 +637,7 @@ loc_1AD06:				; CODE XREF: seg025:04F4j
 		push	ax
 		lea	ax, [bp-2Eh]
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1AD6C:				; CODE XREF: seg025:0498j

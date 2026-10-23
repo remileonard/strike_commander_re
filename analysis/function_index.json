@@ -2981,7 +2981,7 @@
 "sub_61F52"
 ],
 "new_name": "Cockpit_CaptionTextRenderStep_14EFA",
-"summary": "far,120L — PAS un portrait (aucune image/blit) malgre l ancien nom : affiche une LEGENDE TEXTE a l ecran en 1 ou 2 lignes, une etape par appel (typewriter). VERIFIE (2026-09-12, trace ASM directe) : ce widget est lie au LIBELLE DE VUE (\"Chase Plane\"/\"External View\"/\"Target View\" -- ces chaines sont ecrites dans word_72A94 par Mission_TriggerEvaluator via GlyphObject_Helper9_80467 au moment de l activation F2/F6/F7, seg040) -- lien exact entre word_72A94 et si[+0x135] pas encore trace. PISTE NON VERIFIEE (suggeree par Remi, a confirmer par trace ASM) : le meme widget afficherait aussi les messages radio -- ne pas prendre pour acquis tant que non trace. si=objet controleur (memes offsets que Camera_ExternalView_VtSlotC_14FD7, l appelant), di=&si+2 (buffer texte embarque). (1) si si[+0x135]==0 -> rien, sortie immediate. (2) sinon resout la ressource texte si[+0x135] via Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via Render_MeasureOrDrawTextString_61F52 (meme couple d appels que le moteur de rendu des messages journal/kneeboard). (3) si si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si si[+0x21E] : choisit une 2e source de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C], sinon -> si[+0x212]/[+0x216]), meme resolution+rendu si la source est non nulle. (5) si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF (fige l affichage). PRECISION (2026-09-12, Remi) : Betty (cf. Cockpit_LoadBettyPack) est une banque SON pour les avertissements, sans rapport avec ce widget texte -- toute mention anterieure de Betty ici etait un lien errone. RESTE OUVERT : lien exact entre si[+0x135] et word_72A94, si le widget sert aussi aux messages radio, semantique exacte de si[+0x140] et si[+0x21E]/[+0x21F]. Lu ligne a ligne le 2026-09-12 sur demande de Remi (le nom precedent \"DrawPilotPortrait\" etait faux, aucun portrait n existe dans la simulation)."
+"summary": "far,120L — PAS un portrait (aucune image/blit) malgre l ancien nom : affiche une LEGENDE TEXTE a l ecran en 1 ou 2 lignes, une etape par appel (typewriter). VERIFIE (2026-09-12, trace ASM directe) : ce widget est lie au LIBELLE DE VUE (\"Chase Plane\"/\"External View\"/\"Target View\" -- ces chaines sont ecrites dans word_72A94 par Mission_TriggerEvaluator via GlyphObject_Helper9_80467 au moment de l activation F2/F6/F7, seg040) -- lien exact entre word_72A94 et si[+0x135] pas encore trace. PISTE NON VERIFIEE (suggeree par Remi, a confirmer par trace ASM) : le meme widget afficherait aussi les messages radio -- ne pas prendre pour acquis tant que non trace. si=objet controleur (memes offsets que Camera_ExternalView_VtSlotC_14FD7, l appelant), di=&si+2 (buffer texte embarque). (1) si si[+0x135]==0 -> rien, sortie immediate. (2) sinon resout la ressource texte si[+0x135] via Memory_TypedAllocDispatchB_5C832(5C44h) puis rend/mesure via Shape_DrawSpans_61F52 (meme couple d appels que le moteur de rendu des messages journal/kneeboard). (3) si si[+0x21C]==0xFF (sentinelle termine) -> sortie. (4) si si[+0x21E] : choisit une 2e source de chaine selon si[+0x140] (0 -> si[+0x208]/[+0x20C], sinon -> si[+0x212]/[+0x216]), meme resolution+rendu si la source est non nulle. (5) si[+0x21C]++ ; si >=2 -> si[+0x21C]=0xFF (fige l affichage). PRECISION (2026-09-12, Remi) : Betty (cf. Cockpit_LoadBettyPack) est une banque SON pour les avertissements, sans rapport avec ce widget texte -- toute mention anterieure de Betty ici etait un lien errone. RESTE OUVERT : lien exact entre si[+0x135] et word_72A94, si le widget sert aussi aux messages radio, semantique exacte de si[+0x140] et si[+0x21E]/[+0x21F]. Lu ligne a ligne le 2026-09-12 sur demande de Remi (le nom precedent \"DrawPilotPortrait\" etait faux, aucun portrait n existe dans la simulation)."
 },
 "sub_15138": {
 "segment": "seg015",
@@ -4115,7 +4115,7 @@
 "sub_5F6A9"
 ],
 "new_name": "Rwr_DrawContacts_1F51C",
-"summary": "far, 40L, LU 2026-10-15. Ex-'UIList_DrawAllMarkers'. DESSINE LES CONTACTS DU RWR : pour chaque contact de la liste, Render_MeasureOrDrawTextString_61F52(word_70E60, x, y, jeu de symboles arg_2, numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit (Cockpit_RwrDraw_1FA28)."
+"summary": "far, 40L, LU 2026-10-15. Ex-'UIList_DrawAllMarkers'. DESSINE LES CONTACTS DU RWR : pour chaque contact de la liste, Shape_DrawSpans_61F52(word_70E60, x, y, jeu de symboles arg_2, numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit (Cockpit_RwrDraw_1FA28)."
 },
 "sub_20610": {
 "segment": "seg035",
@@ -16002,8 +16002,8 @@
 "lines": 457,
 "type": "far",
 "calls": [],
-"new_name": "Render_MeasureOrDrawTextString_61F52",
-"summary": "⚠️ far, 457 lignes, NON DÉTAILLÉE — même motif que Render_DrawTextString_61CD2 (seg173) : copie un descripteur de contexte (6 mots) et prend un pointeur far vers une chaîne (arg_6), avec vérification de capacité de buffer (comparaison contre [si+4]). Référencée par sub_1450B, sub_14795 et Widget_ConstructWithBuffer/GlyphObject_ConstructWithBuffer (seg162). Probable variante mesure-sans-dessiner ou dessin avec contrôle de capacité — identité exacte vis-à-vis de Render_DrawTextString_61CD2 non vérifiée. Candidat pour session dédiée."
+"new_name": "Shape_DrawSpans_61F52",
+"summary": "far. DESSIN D'UNE IMAGE (forme RealSpace, format des segments de ligne) à la position (arg_2, arg_4), avec découpe sur le rectangle de la fenêtre. Pour chaque segment : `lodsw` = n (0 = fin de l'image), `lodsw` = x, `lodsw` = y (ajoutés à la position) ; n pair : n/2 pixels recopiés tels quels (`shr cx, 1` / `rep movsw` / `rep movsb`) ; n impair : blocs de n/2 pixels en tout, chaque bloc commence par un octet c (`lodsb` / `shr al, 1`) : c pair → c/2 pixels recopiés (`rep movsw` / `rep movsb`), c impair → c/2 fois l'octet suivant (`rep stosw` / `rep stosb`). Écriture directe dans la mémoire d'écran : ni XOR ni couleur transparente testée ; la transparence vient du format (seuls les pixels des segments sont écrits), et une image dessinée après une autre la recouvre là où leurs segments se chevauchent. Ex-'Render_MeasureOrDrawTextString' (nom faux), renommée 2026-10-23 après lecture de la boucle de pixels (version OPTEST, code identique). Lecteur Python équivalent : tools/sc_data.py image_spans/draw_image."
 },
 "sub_621A2": {
 "segment": "seg175",
@@ -16033,7 +16033,7 @@
 "type": "far",
 "calls": [],
 "new_name": "Render_DrawOrMeasureTextVariant_625E2",
-"summary": "⚠️ far, 215 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), même motif de vérification de capacité de buffer que Render_MeasureOrDrawTextString_61F52 (comparaison (index+1)×4 contre le champ +4 d'une structure far). Référencée par `CachedObject_BuildVariant_5E12A` (seg141) — probable variante de rendu/mesure de texte pour le cluster d'objets mis en cache. Candidat pour session dédiée."
+"summary": "⚠️ far, 215 lignes, NON DÉTAILLÉE — référencée via vtable (DATA XREF seg216), même motif de vérification de capacité de buffer que Shape_DrawSpans_61F52 (comparaison (index+1)×4 contre le champ +4 d'une structure far). Référencée par `CachedObject_BuildVariant_5E12A` (seg141) — probable variante de rendu/mesure de texte pour le cluster d'objets mis en cache. Candidat pour session dédiée."
 },
 "sub_6271A": {
 "segment": "seg178",
@@ -30912,7 +30912,7 @@
 "sub_5E5AC"
 ],
 "new_name": "GlyphObject_MeasureAndRelease_7E7CC",
-"summary": "far, combine allocateur typé, `Render_MeasureOrDrawTextString_61F52` (seg174), `TextFormat_ReleaseAttribute_5E5AC` (seg143)."
+"summary": "far, combine allocateur typé, `Shape_DrawSpans_61F52` (seg174), `TextFormat_ReleaseAttribute_5E5AC` (seg143)."
 },
 "sub_7E81D": {
 "segment": "ovr241",
@@ -31059,7 +31059,7 @@
 "sub_7E81D"
 ],
 "new_name": "GlyphObject_MeasureAndDraw_7F587",
-"summary": "far, combine allocateur typé et `Render_MeasureOrDrawTextString_61F52`."
+"summary": "far, combine allocateur typé et `Shape_DrawSpans_61F52`."
 },
 "sub_7F5D5": {
 "segment": "ovr241",
@@ -35560,7 +35560,7 @@
 "sub_6C7BC"
 ],
 "new_name": "Cockpit_DrawEncodedText_8FA4C",
-"summary": "⚠️ far, 118 lignes, NON DÉTAILLÉE — combine `UI_ApplyEncodingHelper_5E576` (seg143), `Render_MeasureOrDrawTextString_61F52` (seg174, ×2)."
+"summary": "⚠️ far, 118 lignes, NON DÉTAILLÉE — combine `UI_ApplyEncodingHelper_5E576` (seg143), `Shape_DrawSpans_61F52` (seg174, ×2)."
 },
 "sub_8FB2A": {
 "segment": "ovr266",
@@ -35705,7 +35705,7 @@
 "sub_65643"
 ],
 "new_name": "Cockpit_LoadAndDrawCalibration_8FDC0",
-"summary": "⚠️ far, 322 lignes, NON DÉTAILLÉE — combine `Music_Stop_5A9E6` (seg125), StreamReader, `Joystick_GetButtonRawByte_67B82`/`InitCalibrationDefaults_67B92` (seg208), `Render_MeasureOrDrawTextString_61F52`."
+"summary": "⚠️ far, 322 lignes, NON DÉTAILLÉE — combine `Music_Stop_5A9E6` (seg125), StreamReader, `Joystick_GetButtonRawByte_67B82`/`InitCalibrationDefaults_67B92` (seg208), `Shape_DrawSpans_61F52`."
 },
 "sub_90097": {
 "segment": "ovr266",
@@ -35956,7 +35956,7 @@
 "sub_5E526"
 ],
 "new_name": "Cockpit_ApplyFormatAndDraw_91B70",
-"summary": "⚠️ far, 227 lignes, NON DÉTAILLÉE — combine `TextRenderer_ApplyFormatChange_5E34D` (seg143), `Render_MeasureOrDrawTextString_61F52` (×2)."
+"summary": "⚠️ far, 227 lignes, NON DÉTAILLÉE — combine `TextRenderer_ApplyFormatChange_5E34D` (seg143), `Shape_DrawSpans_61F52` (×2)."
 },
 "sub_91D29": {
 "segment": "ovr268",
@@ -41185,7 +41185,7 @@
 "sub_A125D"
 ],
 "new_name": "PaletteScreen_MeasureAndDrawBorder_A29B4",
-"summary": "far, combine PaletteScreen_DrawWidgetBorderWrapper_A21A1, Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52 (seg174)."
+"summary": "far, combine PaletteScreen_DrawWidgetBorderWrapper_A21A1, Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174)."
 },
 "sub_A2A22": {
 "segment": "seg442",
@@ -41733,7 +41733,7 @@
 "sub_6C7BC"
 ],
 "new_name": "GaugeWidget_MeasureAndDraw_A377D",
-"summary": "far, encadré par le verrou d'ownership (seg442), combine Rect_ComputeIntersection_60F02 (seg164), sub_A3A40, Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52 (seg174)."
+"summary": "far, encadré par le verrou d'ownership (seg442), combine Rect_ComputeIntersection_60F02 (seg164), sub_A3A40, Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174)."
 },
 "sub_A3802": {
 "segment": "seg444",
@@ -42100,7 +42100,7 @@
 "sub_6C7BC"
 ],
 "new_name": "GaugeWidget_DrawWithLabel_A4388",
-"summary": "⚠️ far, 155 lignes, NON DÉTAILLÉE — combine le verrou d'ownership (seg442), Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52 (seg174), TextFormat_ApplyStyleAttribute_5E2D0 (×3), TextFormat_ReleaseStyleList_5E526 — dessin du widget avec étiquette de texte."
+"summary": "⚠️ far, 155 lignes, NON DÉTAILLÉE — combine le verrou d'ownership (seg442), Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174), TextFormat_ApplyStyleAttribute_5E2D0 (×3), TextFormat_ReleaseStyleList_5E526 — dessin du widget avec étiquette de texte."
 },
 "sub_A449F": {
 "segment": "seg445",
@@ -42170,7 +42170,7 @@
 "sub_6C7BC"
 ],
 "new_name": "InfoWidget_MeasureAndDrawA_A45AC",
-"summary": "far, encadré par le verrou d'ownership (seg442), combine Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52 (seg174) — mesure/rendu de texte du widget."
+"summary": "far, encadré par le verrou d'ownership (seg442), combine Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52 (seg174) — mesure/rendu de texte du widget."
 },
 "sub_A4602": {
 "segment": "seg446",
@@ -42235,7 +42235,7 @@
 "sub_5E526"
 ],
 "new_name": "InfoWidget_MeasureAndDrawStyled_A46C1",
-"summary": "⚠️ far, 110 lignes, NON DÉTAILLÉE — combine TextFormat_ApplyStyleAttribute_5E2D0 (×2), le verrou d'ownership, Memory_TypedAllocDispatchB_5C832, Render_MeasureOrDrawTextString_61F52, TextFormat_ReleaseStyleList_5E526."
+"summary": "⚠️ far, 110 lignes, NON DÉTAILLÉE — combine TextFormat_ApplyStyleAttribute_5E2D0 (×2), le verrou d'ownership, Memory_TypedAllocDispatchB_5C832, Shape_DrawSpans_61F52, TextFormat_ReleaseStyleList_5E526."
 },
 "sub_A47AE": {
 "segment": "seg446",

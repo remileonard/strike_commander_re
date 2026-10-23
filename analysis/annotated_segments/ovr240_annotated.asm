@@ -430,7 +430,7 @@ loc_7D615:
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	[bp+var_48]
 		push	0
@@ -444,7 +444,7 @@ loc_7D615:
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	5130h
 		call	Resource_AccessUnified

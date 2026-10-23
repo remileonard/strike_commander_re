@@ -82,8 +82,8 @@ Rwr_AddContact_1F4BB	endp
 
 ; ==============================================================================================
 ; far, 40L, LU 2026-10-15. Ex-'UIList_DrawAllMarkers'. DESSINE LES CONTACTS DU RWR : pour
-; chaque contact de la liste, Render_MeasureOrDrawTextString_61F52(word_70E60, x, y, jeu de
-; symboles arg_2, numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit
+; chaque contact de la liste, Shape_DrawSpans_61F52(word_70E60, x, y, jeu de symboles arg_2,
+; numero de symbole + arg_6). arg_6 = 0 ou 18 selon la disposition du cockpit
 ; (Cockpit_RwrDraw_1FA28).
 ; ==============================================================================================
 Rwr_DrawContacts_1F51C	proc far		; CODE XREF: seg032:071Dp
@@ -111,7 +111,7 @@ loc_1F52D:				; CODE XREF: Rwr_DrawContacts_1F51C+40j
 		push	word ptr [bx+6]
 		push	word ptr [bx+4]
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1F54D:				; CODE XREF: Rwr_DrawContacts_1F51C+Fj

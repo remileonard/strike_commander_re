@@ -757,7 +757,7 @@ loc_7B370:				; CODE XREF: Player_ShotDownSequence_7B035+493j
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	bx, [bp+var_4]
 		shl	bx, 1
@@ -780,7 +780,7 @@ loc_7B370:				; CODE XREF: Player_ShotDownSequence_7B035+493j
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_7B41B:				; CODE XREF: Player_ShotDownSequence_7B035+3B5j
@@ -807,7 +807,7 @@ loc_7B44A:
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_7B45A:				; CODE XREF: Player_ShotDownSequence_7B035+3F4j
@@ -1214,7 +1214,7 @@ loc_7B7BF:				; CODE XREF: Player_ShotDownSequence_7B035+8FBj
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	[bp+var_4]
 		push	0
@@ -1240,7 +1240,7 @@ loc_7B852:
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	5130h
 		call	Resource_AccessUnified
@@ -2099,7 +2099,7 @@ loc_7C23E:
 		push	word_70E60
 
 loc_7C242:
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_7C247:
 		add	sp, 0Ch
@@ -2123,7 +2123,7 @@ loc_7C253:
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_7C27A:				; CODE XREF: Player_ShotDownSequence_7B035+11ECj
@@ -2147,7 +2147,7 @@ loc_7C27A:				; CODE XREF: Player_ShotDownSequence_7B035+11ECj
 		push	ax
 		push	large 0
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	5130h
 		call	Resource_AccessUnified

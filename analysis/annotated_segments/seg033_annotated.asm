@@ -325,7 +325,7 @@ loc_1FF06:
 		mov	ax, si
 		add	ax, 12h
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		cmp	byte ptr [si+40h], 0
 		jz	short loc_1FF54
@@ -348,7 +348,7 @@ loc_1FF06:
 		mov	ax, si
 		add	ax, 12h
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_1FF54:				; CODE XREF: seg033:029Dj seg033:02A3j
@@ -373,7 +373,7 @@ loc_1FF54:				; CODE XREF: seg033:029Dj seg033:02A3j
 		mov	ax, si
 		add	ax, 12h
 		push	ax
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 
 loc_1FF8E:
 		add	sp, 0Ch

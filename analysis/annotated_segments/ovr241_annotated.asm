@@ -1293,7 +1293,7 @@ GlyphObject_Helper3_7E72B	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocateur typé, Render_MeasureOrDrawTextString_61F52 (seg174),
+; far, combine allocateur typé, Shape_DrawSpans_61F52 (seg174),
 ; TextFormat_ReleaseAttribute_5E5AC (seg143).
 ; ==============================================================================================
 GlyphObject_MeasureAndRelease_7E7CC	proc far		; CODE XREF: VROOMM_StubThunk_6AE61J GlyphObject_MeasureAndDraw_7F587+Ep
@@ -1325,7 +1325,7 @@ arg_2		= word ptr  8
 		push	ax
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_7E819
 ; ���������������������������������������������������������������������������
@@ -3403,7 +3403,7 @@ NavMap_DrawMissionObjects_7EDCA	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocateur typé et Render_MeasureOrDrawTextString_61F52.
+; far, combine allocateur typé et Shape_DrawSpans_61F52.
 ; ==============================================================================================
 GlyphObject_MeasureAndDraw_7F587	proc far		; CODE XREF: VROOMM_StubThunk_6AE75J Cockpit_ProcessInputFrame_7F6EE+38p	...
 
@@ -3443,7 +3443,7 @@ loc_7F5B7:
 loc_7F5BC:
 		push	large 0
 		push	di
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	di
 		push	si

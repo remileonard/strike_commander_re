@@ -246,7 +246,7 @@ loc_8F09B:				; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8F3B7j
 		push	ax
 		push	large 870005h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	large 80000h
 		mov	al, [bp+var_6]
@@ -259,7 +259,7 @@ loc_8F09B:				; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8F3B7j
 		push	ax
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		imul	ax, 3
@@ -276,7 +276,7 @@ loc_8F09B:				; CODE XREF: Config_LoadAndApplySettings_8EEBC:loc_8F3B7j
 		push	ax
 		push	large 0A20032h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8F12F
 ; ���������������������������������������������������������������������������
@@ -337,7 +337,7 @@ loc_8F194:
 		push	ax
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		imul	ax, 3
@@ -354,7 +354,7 @@ loc_8F194:
 		push	ax
 		push	large 0A2002Dh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8F1E5
 ; ���������������������������������������������������������������������������
@@ -399,7 +399,7 @@ loc_8F209:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+346j
 		push	ax
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		imul	ax, 3
@@ -416,7 +416,7 @@ loc_8F209:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+346j
 		push	ax
 		push	large 0A2003Bh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		jmp	short loc_8F282
 ; ���������������������������������������������������������������������������
@@ -514,7 +514,7 @@ loc_8F326:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+433j
 		push	ax
 		push	large 9F0011h
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	large 70000h
 		mov	al, [bp+var_6]
@@ -527,7 +527,7 @@ loc_8F326:				; CODE XREF: Config_LoadAndApplySettings_8EEBC+433j
 		push	ax
 		push	large 0A2001Fh
 		push	word_70E62
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn

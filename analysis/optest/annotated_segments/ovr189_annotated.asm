@@ -1159,7 +1159,7 @@ loc_549FC:				; CODE XREF: Gameflow_ShowMap_542AC+743j
 		push	[bp+var_BC]
 		push	[bp+var_BA]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54A4A:				; CODE XREF: Gameflow_ShowMap_542AC+755j
@@ -1188,7 +1188,7 @@ loc_54A4A:				; CODE XREF: Gameflow_ShowMap_542AC+755j
 		push	[bp+var_C0]
 		push	[bp+var_BE]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54A9E:				; CODE XREF: Gameflow_ShowMap_542AC+7A3j
@@ -1217,7 +1217,7 @@ loc_54A9E:				; CODE XREF: Gameflow_ShowMap_542AC+7A3j
 		push	[bp+var_C4]
 		push	[bp+var_C2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54AF1:				; CODE XREF: Gameflow_ShowMap_542AC+7F7j
@@ -1246,7 +1246,7 @@ loc_54AF1:				; CODE XREF: Gameflow_ShowMap_542AC+7F7j
 		push	[bp+var_C8]
 		push	[bp+var_C6]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54B45:				; CODE XREF: Gameflow_ShowMap_542AC+84Aj
@@ -1275,7 +1275,7 @@ loc_54B45:				; CODE XREF: Gameflow_ShowMap_542AC+84Aj
 		push	[bp+var_CC]
 		push	[bp+var_CA]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54B98:				; CODE XREF: Gameflow_ShowMap_542AC+89Ej
@@ -1303,7 +1303,7 @@ loc_54B98:				; CODE XREF: Gameflow_ShowMap_542AC+89Ej
 		push	[bp+var_D0]
 		push	[bp+var_CE]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54BE8:				; CODE XREF: Gameflow_ShowMap_542AC+8F1j
@@ -1329,7 +1329,7 @@ loc_54BE8:				; CODE XREF: Gameflow_ShowMap_542AC+8F1j
 		push	[bp+var_D4]
 		push	[bp+var_D2]
 		push	word_46F44
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_54C32:				; CODE XREF: Gameflow_ShowMap_542AC+941j

@@ -250,7 +250,7 @@ loc_C7137:				; CODE XREF: sub_C6FD6+152j
 		push	[bp+var_26]
 		push	[bp+var_24]
 		push	[bp+var_22]
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	[bp+arg_A]
 		push	[bp+arg_8]
@@ -458,7 +458,7 @@ loc_C7309:				; CODE XREF: sub_C72E4+20j
 		push	[bp+var_6]
 		push	[bp+var_4]
 		push	[bp+var_2]
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	bx, word_46F46
 		mov	ax, [bx+8]

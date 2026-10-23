@@ -968,7 +968,7 @@ loc_4CDD0:				; CODE XREF: sub_4CDB9+12j
 		mov	ax, si
 		add	ax, 0BFh ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	[bp+var_2], 52h	; 'R'
 		cmp	word ptr [si+79h], 0
@@ -997,7 +997,7 @@ loc_4CE1C:				; CODE XREF: sub_4CDB9+52j
 		push	[bp+var_2]
 		push	5Dh ; ']'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_4CE51:				; CODE XREF: sub_4CDB9+14j
@@ -1035,7 +1035,7 @@ loc_4CE77:				; CODE XREF: sub_4CDB9+B0j
 		mov	ax, si
 		add	ax, 0A3h ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word_45B54
 		push	0
@@ -1080,7 +1080,7 @@ loc_4CEE0:				; CODE XREF: sub_4CDB9+11Fj
 		mov	ax, si
 		add	ax, 0B1h ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word ptr [si+97h]
 		mov	bx, [si+97h]
@@ -1230,7 +1230,7 @@ loc_4CF84:				; CODE XREF: sub_4CF75+9DEj
 		mov	ax, si
 		add	ax, 0BFh ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		mov	di, 52h	; 'R'
 		cmp	word ptr [si+79h], 0
@@ -1259,7 +1259,7 @@ loc_4CFDF:				; CODE XREF: sub_4CF75+5Aj
 		push	di
 		push	5Dh ; ']'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_4D012:				; CODE XREF: sub_4CF75+1Fj
@@ -1283,7 +1283,7 @@ loc_4D012:				; CODE XREF: sub_4CF75+1Fj
 		push	24h ; '$'
 		push	72h ; 'r'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_4D04D:				; CODE XREF: sub_4CF75+A4j
@@ -1321,7 +1321,7 @@ loc_4D078:				; CODE XREF: sub_4CF75+F3j
 		mov	ax, si
 		add	ax, 0A3h ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word_45B54
 		push	0
@@ -1366,7 +1366,7 @@ loc_4D0E4:				; CODE XREF: sub_4CF75+167j
 		mov	ax, si
 		add	ax, 0B1h ; '�'
 		push	ax
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 		push	word ptr [si+97h]
 		mov	bx, [si+97h]
@@ -1801,7 +1801,7 @@ loc_4D51B:				; CODE XREF: sub_4CF75+5A1j
 		push	60h ; '`'
 		push	77h ; 'w'
 		push	word_46F46
-		call	Render_MeasureOrDrawTextString_32CD8
+		call	Shape_DrawSpans_32CD8
 		add	sp, 0Ch
 
 loc_4D56A:				; CODE XREF: sub_4CF75+608j

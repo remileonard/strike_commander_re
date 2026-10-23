@@ -29,7 +29,7 @@ loc_2DD90:
 		push	word ptr es:[bx+0Ah]
 		push	word ptr es:[bx+8]
 		push	word_70E60
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 		pop	bp
 		retf

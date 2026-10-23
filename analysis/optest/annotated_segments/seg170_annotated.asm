@@ -786,7 +786,7 @@ off_416BE	dd EntryPoint_RuntimeInit		; DATA XREF: VROOMM_OpenAndParseOverlayFile
 		db    2
 		db    1
 		db    0
-		dd Render_MeasureOrDrawTextString_32CD8
+		dd Shape_DrawSpans_32CD8
 		db  58h	; X
 		db    2
 		db    1

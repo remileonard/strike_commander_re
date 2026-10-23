@@ -342,7 +342,7 @@ loc_6063A:
 		push	di
 
 loc_6063E:
-		call	Render_MeasureOrDrawTextString_61F52
+		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
 loc_60646:				; CODE XREF: GlyphObject_ResolveAndCache_605CE+47j

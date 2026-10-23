@@ -165,7 +165,7 @@ Chaque calque contient :
 lu dans l'en-tête : `Struct_GetElementCountMinusOne_33352` renvoie `(premier décalage ÷ 4) − 1`,
 valeur utilisée comme **limite** par les animations. Malgré son nom, c'est le **nombre d'images** : le
 premier décalage vaut 4 + 4 × n (taille, puis table de n décalages), d'où (4 + 4n) ÷ 4 − 1 = n. Chaque image est dessinée par `sub_32CD8`
-(nom repris de STRIKE `Render_MeasureOrDrawTextString_32CD8`, faux ici) en (x, y).
+(`Shape_DrawSpans_32CD8`, ex-`Render_MeasureOrDrawTextString`) en (x, y).
 
 **La surface de dessin des cinématiques (relu le 2026-10-21).** Les calques ne sont pas dessinés
 directement à l'écran. Midgame1 prépare deux descripteurs de surface (6 mots : segment, table des
@@ -413,7 +413,7 @@ plans de dialogue : ses enfants tremblent avec elle.
 ### 6.1 Animation simple et animation en boucle
 
 L'animation simple avance d'une image par image de scène jusqu'à l'image numéro « nombre d'images »,
-qui n'existe pas (relu le 2026-10-21) : `Render_MeasureOrDrawTextString_32CD8` ne dessine rien quand
+qui n'existe pas (relu le 2026-10-21) : `Shape_DrawSpans_32CD8` ne dessine rien quand
 (image + 1) × 4 ≥ premier décalage (`inc bx / shl bx, 1 / shl bx, 1 / cmp [si+4], bx`). Une
 animation laissée dans la scène **disparaît donc après sa dernière image** ; `AnimLayer_IsFinished_2E654`
 est vrai à ce moment-là (image = nombre d'images), et les boucles qui l'attendent sortent avant de
