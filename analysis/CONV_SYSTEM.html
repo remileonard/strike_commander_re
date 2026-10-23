@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Conversations de Strike Commander</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Même mise en page que MVRS_MANOEUVRES.html : sommaire latéral, une carte par sujet */
+:root {
+  --bg: #eef2f1;
+  --panel: #ffffff;
+  --fg: #18211f;
+  --muted: #56645f;
+  --rule: #cfd8d5;
+  --accent: #0a6b70;
+  --accent-soft: #d6ecec;
+  --target: #b3262e;
+  --mark: #a86a0c;
+  --mark-soft: #f6e8cf;
+  --font-display: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+    --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1413; --panel: #151d1c; --fg: #e2eae8; --muted: #93a39f; --rule: #2b3836;
+  --accent: #52c4c9; --accent-soft: #173638; --target: #f07a80; --mark: #e8b54d; --mark-soft: #3a2e14;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; font-size: 13px; }
+nav.toc h2 { font-family: var(--font-display); font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { color: var(--fg); text-decoration: none; display: grid; grid-template-columns: 28px 1fr; padding: 3px 6px; border-radius: 4px; }
+nav.toc a:hover, nav.toc a:focus-visible { background: var(--accent-soft); outline: none; }
+nav.toc a span:first-child { font-family: var(--font-mono); color: var(--accent); }
+main { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+main > * { min-width: 0; }
+header.top h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 4vw, 44px); line-height: 1.05; margin: 0 0 10px; text-wrap: balance; }
+header.top p { max-width: 72ch; margin: 0 0 10px; }
+.eyebrow { font-family: var(--font-display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h3 { font-family: var(--font-display); font-size: 19px; margin: 20px 0 6px; }
+p, li { max-width: 74ch; }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: 0 4px; border-radius: 3px; }
+.note { border-left: 3px solid var(--mark); background: var(--mark-soft); padding: 10px 14px; border-radius: 0 6px 6px 0; max-width: 80ch; margin: 12px 0; }
+.note p { margin: 4px 0; }
+.tablewrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--font-display); font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.num { font-family: var(--font-mono); color: var(--accent); white-space: nowrap; }
+td.ok { color: var(--accent); }
+td.diff { color: var(--target); }
+table.lips th, table.lips td { text-align: center; padding: 4px 6px; font-family: var(--font-mono); }
+article.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 22px 22px; scroll-margin-top: 16px; }
+article.card > header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; border-bottom: 1px solid var(--rule); padding-bottom: 10px; margin-bottom: 12px; }
+article.card > header .id { font-family: var(--font-mono); font-size: 15px; color: var(--accent); }
+article.card > header h2 { font-family: var(--font-display); font-size: 25px; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; padding: 0; list-style: none; }
+.chips li { font-size: 12.5px; border: 1px solid var(--rule); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.chips li b { color: var(--fg); font-weight: 600; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 26px; align-items: start; }
+.grid2 > * { min-width: 0; }
+figure { margin: 12px 0; }
+figure img { display: block; max-width: 100%; height: auto; image-rendering: pixelated; border: 1px solid var(--rule); border-radius: 6px; background: #000; }
+figure .scroll { overflow-x: auto; border-radius: 6px; }
+figure .scroll img { max-width: none; }
+figcaption { font-size: 12.5px; color: var(--muted); margin-top: 6px; max-width: 80ch; }
+pre.tpl { background: var(--bg); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: 13px; line-height: 1.5; margin: 8px 0; }
+ol.steps { margin: 6px 0; padding-left: 0; list-style: none; display: grid; gap: 6px; counter-reset: s; }
+ol.steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; counter-increment: s; }
+ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-weight: 500; color: var(--mark); background: var(--mark-soft); border-radius: 4px; text-align: center; height: 22px; line-height: 22px; font-size: 12.5px; }
+.bug { color: var(--target); font-weight: 600; }
+@media (max-width: 860px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .grid2 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="toc" aria-label="Sommaire">
+  <h2>Sommaire</h2>
+  <ol>
+    <li><a href="#fichiers"><span>1</span><span>Fichiers</span></a></li>
+    <li><a href="#format"><span>2</span><span>Format d'un script</span></a></li>
+    <li><a href="#groupe"><span>3</span><span>Scène de groupe</span></a></li>
+    <li><a href="#grosplan"><span>4</span><span>Gros plan</span></a></li>
+    <li><a href="#visage"><span>5</span><span>Images d'un visage</span></a></li>
+    <li><a href="#levres"><span>6</span><span>Yeux et bouche</span></a></li>
+    <li><a href="#question"><span>7</span><span>Accept / Reject</span></a></li>
+    <li><a href="#equipier"><span>8</span><span>Escadre, équipier</span></a></li>
+    <li><a href="#codes"><span>9</span><span>Codes $</span></a></li>
+    <li><a href="#voix"><span>10</span><span>Version CD : la voix</span></a></li>
+    <li><a href="#librs"><span>11</span><span>libRealSpace</span></a></li>
+    <li><a href="#outils"><span>—</span><span>Outils</span></a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="top">
+  <div class="eyebrow">OPTEST.EXE · conversations</div>
+  <h1>Les conversations de Strike Commander</h1>
+  <p>Comment le jeu joue une conversation : le script de <code>CONV.PAK</code>, les scènes de groupe,
+  le gros plan avec sa tête parlante, les yeux et la bouche, la question « Accept / Reject », puis la
+  voix de la version CD-ROM et les corrections à porter dans libRealSpace.</p>
+  <p>Toutes les images de cette page sont composées avec les données du jeu, selon les règles lues dans
+  le code (outil <code>tools/conv_doc_images.py</code>). La référence complète, avec les citations
+  d'assembleur, est <code>analysis/CONV_SYSTEM.md</code>.</p>
+  <ul class="chips">
+    <li><b>241</b> scripts non vides</li>
+    <li><b>1 717</b> <code>CLOSEUP</code></li>
+    <li><b>86</b> scènes de groupe</li>
+    <li><b>62</b> images par visage</li>
+    <li><b>10</b> images de scène par seconde</li>
+  </ul>
+</header>
+
+<!-- 1 -->
+<article class="card" id="fichiers">
+  <header><span class="id">1</span><h2>Fichiers</h2></header>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Fichier</th><th>Rôle</th></tr></thead>
+    <tbody>
+      <tr><td><code>GAMEFLOW\CONV.PAK</code></td><td>les scripts : une entrée du PAK = une conversation (256 entrées, 15 vides)</td></tr>
+      <tr><td><code>GAMEFLOW\CONVDATA.IFF</code></td><td>noms → images et palettes : décors (<code>BCKS</code> / <code>BACK</code>), visages (<code>FACE</code>), figurants (<code>FIGR</code>, <code>PFIG</code>), palettes (<code>FCPL</code>, <code>FGPL</code>)</td></tr>
+      <tr><td><code>GAMEFLOW\CONVSHPS.PAK</code>, <code>CONVPALS.PAK</code></td><td>images et palettes des visages, figurants et décors</td></tr>
+      <tr><td><code>GAMEFLOW\OPTSHPS.PAK</code>, <code>OPTPALS.PAK</code></td><td>images et palettes partagées avec les menus (le ciel, par exemple)</td></tr>
+      <tr><td><code>GAMEFLOW\GAMEFLOW.IFF</code></td><td>escadres (<code>WNGS</code> / <code>WING</code>), lues par <code>SELECT_WING</code></td></tr>
+      <tr><td><code>VOCLIST.IFF</code> (CD)</td><td>liste des fichiers de voix : test de présence des voix et préchargement</td></tr>
+      <tr><td><code>f:&lt;identifiant&gt;.voc</code> (CD)</td><td>une réplique parlée ; identifiant = la chaîne de voix du script</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Lancement</h3>
+  <p>Le script de partie lance une conversation par <code>PLAY_CONV</code> n (entrée n de
+  <code>CONV.PAK</code>), jouée par <code>Gameflow_PlayConversation_4AAAB</code> →
+  <code>Conv_Construct_59B67</code> → <code>Conv_PlayScript_5AA4E</code>. Le code en lance aussi
+  quatre lui-même :</p>
+  <ul>
+    <li><b>254</b> si les avions perdus au total dépassent 16 (« The insurance company has dropped our policy ») ;</li>
+    <li><b>255</b> si l'argent devient négatif (<code>Gameflow_CheckLossConversations_50645</code>) ;</li>
+    <li><b>252</b> ou <b>253</b> par <code>PLANES_LOST_CONV</code>, si des avions ont été perdus pendant la mission.</li>
+  </ul>
+  <h3>CONVDATA.IFF</h3>
+  <ul>
+    <li><code>FORM BACK</code> : <code>INFO</code> = nom (8 octets) ; <code>DATA</code> = suite d'éléments de 5 octets, dessinés dans l'ordre :
+      octet source (0 = <code>CONVSHPS</code> / <code>CONVPALS</code>, 1 = <code>OPTSHPS</code> / <code>OPTPALS</code>), octet image, octet palette,
+      mot signé = position verticale de l'élément.</li>
+    <li><code>FORM FACE</code>, <code>FIGR</code>, <code>PFIG</code>, <code>FCPL</code>, <code>FGPL</code> : nom (8 octets) + un octet, numéro d'image ou de palette.</li>
+  </ul>
+</article>
+
+<!-- 2 -->
+<article class="card" id="format">
+  <header><span class="id">2</span><h2>Format d'un script</h2></header>
+  <p>Une suite de commandes. Chaque commande = 1 octet, puis ses champs. Entiers petit-boutistes.
+  « nom » = 9 octets complétés par des 0 ; « chaîne » = texte terminé par un 0.</p>
+  <div class="note">
+    <p><b>Deux formats.</b> Le format CD (données de <code>BIGTRE.TRE</code>) a, devant chaque texte,
+    une chaîne de plus : l'identifiant de voix (<code>3gw009</code>, <code>1ai021</code>… ; chaîne vide quand
+    la réplique n'a pas de voix). Le format disquette ne l'a pas. Le reste est identique. Les tableaux
+    notent ce champ <code>[voix]</code>.</p>
+  </div>
+  <h3>Commandes de premier niveau</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Valeur</th><th>Nom</th><th>Rôle</th><th>Champs</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td><code>GROUP_SHOT</code></td><td>scène de groupe</td><td>nom du décor, puis ses sous-commandes</td></tr>
+      <tr><td class="num">3</td><td><code>CLOSEUP</code></td><td>réplique en gros plan</td><td>voir ci-dessous, puis ses sous-commandes</td></tr>
+      <tr><td class="num">10</td><td><code>SHOW_TEXT</code></td><td>texte seul (CD seulement à ce niveau)</td><td>octet couleur, <code>[voix]</code>, chaîne</td></tr>
+      <tr><td class="num">12</td><td><code>YESNOCHOICE_BRANCH2</code></td><td>saut</td><td>mot : octets sautés, comptés depuis la fin du mot</td></tr>
+      <tr><td class="num">14</td><td><code>SELECT_WING</code>*</td><td>escadre</td><td>octet écran, octet escadre</td></tr>
+      <tr><td class="num">15</td><td><code>CHOOSE_WINGMAN</code></td><td>choix d'un équipier</td><td>aucun</td></tr>
+      <tr><td class="num">16</td><td><code>NOP_16</code>*</td><td>rien (disquette)</td><td>aucun</td></tr>
+      <tr><td class="num">18</td><td><code>NOP_18</code>*</td><td>rien (CD)</td><td>aucun</td></tr>
+    </tbody>
+  </table></div>
+  <p class="mono" style="font-size:12.5px;color:var(--muted)">* nom proposé (<code>SELECT_WING</code> s'appelle <code>UNKNOWN</code> dans libRealSpace).</p>
+  <h3>Sous-commandes, lues par la commande qui les précède</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Valeur</th><th>Nom</th><th>Lue par</th><th>Champs</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><code>GROUP_SHOT_ADD_CHARACTER</code></td><td><code>GROUP_SHOT</code></td><td>nom de figure, x (mot signé), y (mot signé)</td></tr>
+      <tr><td class="num">2</td><td><code>GROUP_SHOT_CHARACTER_TALK</code></td><td><code>GROUP_SHOT</code></td><td>nom de figure, x, y, octet couleur, <code>[voix]</code>, chaîne</td></tr>
+      <tr><td class="num">4</td><td><code>CLOSEUP_CONTINUATION</code></td><td><code>CLOSEUP</code></td><td><code>[voix]</code>, chaîne</td></tr>
+      <tr><td class="num">10</td><td><code>SHOW_TEXT</code></td><td><code>GROUP_SHOT</code> et <code>CLOSEUP</code></td><td>octet couleur, <code>[voix]</code>, chaîne</td></tr>
+      <tr><td class="num">11</td><td><code>YESNOCHOICE_BRANCH1</code></td><td><code>CLOSEUP</code></td><td>mot : octets sautés si le joueur refuse</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Champs de <code>CLOSEUP</code></h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Taille</th><th>Rôle</th></tr></thead>
+    <tbody>
+      <tr><td>visage</td><td class="num">9</td><td><code>FORM FACE</code> de <code>CONVDATA.IFF</code></td></tr>
+      <tr><td>image</td><td class="num">1</td><td>image de base de la tête (yeux, sourcils ou expression) ; 255 = aucune</td></tr>
+      <tr><td>décor</td><td class="num">9</td><td><code>FORM BACK</code> de <code>CONVDATA.IFF</code></td></tr>
+      <tr><td>x</td><td class="num">2</td><td>position de la tête (130, 160 ou 190 dans les données), mot signé</td></tr>
+      <tr><td>y</td><td class="num">2</td><td>position de la tête (128 dans les données), mot signé</td></tr>
+      <tr><td>[voix]</td><td>chaîne</td><td>identifiant de voix (format CD)</td></tr>
+      <tr><td>texte</td><td>chaîne</td><td>sous-titre, et texte lu par les lèvres</td></tr>
+      <tr><td>couleur</td><td class="num">1</td><td>couleur du texte</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Grammaire</h3>
+  <pre class="tpl">script     := commande*
+commande   := GROUP_SHOT décor figurant* réplique*
+            | CLOSEUP gros_plan suite*
+            | SHOW_TEXT couleur texte                 (CD)
+            | YESNOCHOICE_BRANCH2 mot
+            | SELECT_WING octet octet
+            | CHOOSE_WINGMAN | NOP_16 | NOP_18
+figurant   := GROUP_SHOT_ADD_CHARACTER nom x y
+réplique   := GROUP_SHOT_CHARACTER_TALK nom x y couleur texte
+            | SHOW_TEXT couleur texte
+gros_plan  := visage image décor x y texte couleur
+suite      := CLOSEUP_CONTINUATION texte
+            | SHOW_TEXT couleur texte
+            | YESNOCHOICE_BRANCH1 mot
+texte      := [voix] chaîne</pre>
+  <h3>Exemple : proposition de mission (entrée 62)</h3>
+  <p>Farnsworth propose le contrat ; <code>YESNOCHOICE_BRANCH1</code> pose la question. Si le joueur refuse,
+  le curseur saute la branche « accepter ».</p>
+  <pre class="tpl">CLOSEUP              far, image 22, mp1_cu   « Eight million dollars, with bonuses.  Do you accept? »
+YESNOCHOICE_BRANCH1  159                      refus : saute 159 octets
+CLOSEUP              far, image 255, mp1_cu  « Good.  I'll contact Virgil to close later.  Watch your back... »
+CLOSEUP              far, image 14, mp1_cu   « ...it's dangerous out there. »
+YESNOCHOICE_BRANCH2  78                       fin de la branche « accepter » : saute 78 octets
+CLOSEUP              far, image 25, mp1_cu   « All right, but I'd reconsider, if I were you. »</pre>
+  <p>Les 52 sauts des données tombent tous sur le début d'une commande. La réponse est rangée pour la
+  partie ; le script de partie choisit la suite par <code>IF_MISSION_ACCEPTED</code> et
+  <code>IF_MISSION_REFUSED</code>.</p>
+</article>
+
+<!-- 3 -->
+<article class="card" id="groupe">
+  <header><span class="id">3</span><h2>Scène de groupe (<code>GROUP_SHOT</code>)</h2></header>
+  <figure>
+    <img src="conv_images/scene_hangar.png" width="640" height="400" alt="Hangar : Virgil, le joueur de dos et Miguel devant les avions">
+    <figcaption>Entrée 12, première scène : décor <code>han_int</code>, puis les figurants
+    <code>virgil1</code> (70, 43), <code>miguel1</code> (210, 22) et <code>air3</code> (130, 16), dans l'ordre du script.</figcaption>
+  </figure>
+  <div class="grid2">
+    <figure>
+      <img src="conv_images/scene_hangar_stern.png" width="640" height="400" alt="Même hangar, Stern arrive à droite">
+      <figcaption>Entrée 12, deuxième scène : même décor, <code>stern2</code> ajouté en (220, 18),
+      dessiné après les autres, donc devant.</figcaption>
+    </figure>
+    <figure>
+      <img src="conv_images/scene_brief.png" width="640" height="400" alt="Briefing devant un F-16 et une carte">
+      <figcaption>Entrée 59 : décor <code>s_brief</code> et un personnage qui parle,
+      <code>airwing1</code> en (0, −20) : x et y sont des mots signés.</figcaption>
+    </figure>
+  </div>
+  <h3>Où l'on dessine</h3>
+  <p>Dans une image hors écran de 320 × 200. Sa ligne 0 arrive à la ligne <b>24</b> de l'écran et seules
+  les lignes 0 à 127 sont visibles (écran 24 à 151) ; la bande du bas (152 à 199) reçoit le texte. Une
+  position (x, y) du script est donc à l'écran en (x, y + 24), l'image gardant ses propres décalages.</p>
+  <h3>Ordre de dessin</h3>
+  <ol class="steps">
+    <li><span>les éléments du décor, dans l'ordre du <code>BACK</code>, chacun en (0, y) ;</span></li>
+    <li><span>les figurants (<code>GROUP_SHOT_ADD_CHARACTER</code>), image 0, dans l'ordre du script ;</span></li>
+    <li><span>les personnages qui parlent (<code>GROUP_SHOT_CHARACTER_TALK</code>), image 0 puis la bouche pendant leur réplique.</span></li>
+  </ol>
+  <p>Chaque image recouvre les précédentes là où ses segments de ligne passent (pas de XOR, pas de
+  couleur transparente) : c'est l'ordre du script qui décide qui est devant.</p>
+  <h3>Palette (une seule pour la scène)</h3>
+  <ol class="steps">
+    <li><span>la palette de chaque élément du décor ;</span></li>
+    <li><span><code>FGPL</code> « normal » (<code>CONVPALS</code> 48) ;</span></li>
+    <li><span>la palette <code>PFIG</code> du <b>premier figurant seulement</b> ; sans figurant, rien de plus.</span></li>
+  </ol>
+  <h3>Durées (disquette)</h3>
+  <ul>
+    <li>la scène tourne à <b>10 images par seconde</b> ;</li>
+    <li><code>GROUP_SHOT_CHARACTER_TALK</code> : une image par caractère du texte, sans attente après ;</li>
+    <li><code>SHOW_TEXT</code> dans la scène : 40 images ;</li>
+    <li>une touche passe à la réplique suivante.</li>
+  </ul>
+  <h3>Bouche d'un personnage qui parle</h3>
+  <p>Un caractère par image, sans règle de prononciation ni clignement. Bouche = chiffre de
+  « 04302500000340143000353000 » + 1 pour les lettres a à z, aucune pour le reste. Images de bouche 1 à 6 :</p>
+  <div class="tablewrap"><table class="lips">
+    <thead><tr><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>i</th><th>j</th><th>k</th><th>l</th><th>m</th><th>n</th><th>o</th><th>p</th><th>q</th><th>r</th><th>s</th><th>t</th><th>u</th><th>v</th><th>w</th><th>x</th><th>y</th><th>z</th></tr></thead>
+    <tbody><tr><td>1</td><td>5</td><td>4</td><td>1</td><td>3</td><td>6</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>4</td><td>5</td><td>1</td><td>2</td><td>5</td><td>4</td><td>1</td><td>1</td><td>1</td><td>4</td><td>6</td><td>4</td><td>1</td><td>1</td><td>1</td></tr></tbody>
+  </table></div>
+  <p>Figures à 7 images (<code>air1</code>, <code>stern1</code>, <code>airwing1</code>…) : image 0 = corps,
+  1 à 6 = bouches. Les figures à 1 image (<code>air3</code>, <code>stern2</code>, <code>virgil1</code>…) ne
+  peuvent servir que de figurants.</p>
+</article>
+
+<!-- 4 -->
+<article class="card" id="grosplan">
+  <header><span class="id">4</span><h2>Gros plan (<code>CLOSEUP</code>)</h2></header>
+  <div class="grid2">
+    <figure>
+      <img src="conv_images/closeup_miguel.gif" width="320" height="200" style="width:100%" alt="Miguel parle, animation de la bouche">
+      <figcaption>Entrée 12 : <code>CLOSEUP</code> miguel, image 25, décor <code>ha1_cu</code>, x = 190,
+      y = 128. Une lecture du texte par image (10 par seconde), puis 40 images d'attente.</figcaption>
+    </figure>
+    <figure>
+      <img src="conv_images/closeup_air.png" width="640" height="400" alt="Gros plan du joueur">
+      <figcaption>Entrée 12 : <code>CLOSEUP</code> air, image 255 (aucune image de base), décor
+      <code>ha1_cu</code>, x = 130.</figcaption>
+    </figure>
+    <figure>
+      <img src="conv_images/closeup_virgil.png" width="640" height="400" alt="Gros plan de Virgil">
+      <figcaption>Entrée 12 : virgil, image 31 (expression qui couvre les yeux et la bouche).</figcaption>
+    </figure>
+    <figure>
+      <img src="conv_images/closeup_far.png" width="640" height="400" alt="Gros plan de Farnsworth">
+      <figcaption>Entrée 62 : far, image 14, décor <code>mp1_cu</code>, x = 160.</figcaption>
+    </figure>
+  </div>
+  <div class="note"><p>Le texte de ces images est écrit avec une police quelconque, centré : la police
+  du jeu n'est pas reproduite et sa position horizontale n'a pas été lue. Lignes de 30 caractères au plus,
+  coupées aux espaces, à y = 156 + 15 × n sur l'écran.</p></div>
+  <h3>Ordre de dessin, à la position de la commande</h3>
+  <ol class="steps">
+    <li><span>les éléments du décor (<code>BACK</code>) ;</span></li>
+    <li><span>image 0 du visage : la tête et le haut du corps ;</span></li>
+    <li><span>l'image des yeux : l'image de base (l'octet « image »), ou 12 pendant un clignement ; rien pour 255 ;</span></li>
+    <li><span>la bouche, rien si elle vaut −1 ;</span></li>
+    <li><span>image 1 : la coiffure ;</span></li>
+    <li><span>image 34 : les habits.</span></li>
+  </ol>
+  <figure>
+    <div class="scroll"><img src="conv_images/layers_air.png" width="1440" height="278" alt="Les couches du visage du joueur, une par une"></div>
+    <figcaption>Visage <code>air</code> : chaque couche seule, puis l'ensemble. La coiffure (image 1) et les
+    habits (image 34) passent après la bouche et la recouvrent là où ils la touchent.</figcaption>
+  </figure>
+  <figure>
+    <div class="scroll"><img src="conv_images/layers_billy.png" width="1200" height="278" alt="Visage de Billy construit couche par couche"></div>
+    <figcaption>Visage <code>billy</code>, couches ajoutées une à une. Billy n'a pas d'image 1 (l'étape
+    ne change rien) : seuls <code>air</code>, <code>janet</code>, <code>lyle</code>, <code>men</code>,
+    <code>pri</code>, <code>stern</code> et <code>tex</code> en ont une.</figcaption>
+  </figure>
+  <h3>Palette</h3>
+  <p>Palettes du décor, puis <code>FCPL</code> « normal » (<code>CONVPALS</code> 46). Le seul appel vu demande
+  « normal » ; « night » n'est pas demandé en conversation.</p>
+  <h3>Sous-commandes du gros plan</h3>
+  <ul>
+    <li><code>CLOSEUP_CONTINUATION</code> : même visage, décor, couleur et image de base ; nouveau texte.</li>
+    <li><code>SHOW_TEXT</code> : texte affiché 20 images, sans mouvement des lèvres.</li>
+    <li><code>YESNOCHOICE_BRANCH1</code> : question « Accept / Reject » (§ 7).</li>
+  </ul>
+  <h3>Durée (disquette)</h3>
+  <p>Une image par lecture jusqu'à la fin du texte, puis <b>40 images</b> (15 si le texte est vide). Une
+  touche coupe l'attente. La version CD a ses propres durées (§ 10).</p>
+</article>
+
+<!-- 5 -->
+<article class="card" id="visage">
+  <header><span class="id">5</span><h2>Images d'un visage</h2></header>
+  <p>Chaque <code>FACE</code> désigne une forme de <code>CONVSHPS.PAK</code> de <b>62 images</b>. L'octet
+  « image » de <code>CLOSEUP</code> ne choisit que l'image de base : tête, coiffure et habits sont
+  fixes (images 0, 1 et 34).</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Images</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>la tête, avec le haut du corps</td></tr>
+      <tr><td class="num">1</td><td>la coiffure (7 visages seulement)</td></tr>
+      <tr><td class="num">2 à 11</td><td>les bouches</td></tr>
+      <tr><td class="num">12</td><td>les yeux fermés (clignement)</td></tr>
+      <tr><td class="num">13 à 21</td><td>les yeux : regards différents</td></tr>
+      <tr><td class="num">22 à 25</td><td>sourcils et haut des yeux (25 froncés ; 23 moitié gauche, 24 moitié droite)</td></tr>
+      <tr><td class="num">26</td><td>une bouche de plus</td></tr>
+      <tr><td class="num">27 à 33</td><td>expressions qui couvrent les yeux et la bouche (27 sourire, 28 grand sourire, 31 sourcils et bouche…)</td></tr>
+      <tr><td class="num">34</td><td>les habits, dessinés à chaque image</td></tr>
+      <tr><td class="num">35, 36</td><td>d'autres habits (non dessinés en conversation)</td></tr>
+      <tr><td class="num">37</td><td>lunettes de soleil (non dessinées en conversation)</td></tr>
+      <tr><td class="num">38, 39, 51</td><td>casque, visière, détail de visière</td></tr>
+      <tr><td class="num">53</td><td>l'image de la question « Accept / Reject »</td></tr>
+      <tr><td class="num">59 à 61</td><td>trois expressions de <code>far</code> seulement</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <div class="scroll"><img src="conv_images/billy_images.png" width="960" height="1136" style="max-width:100%" alt="Les 62 images du visage de Billy"></div>
+    <figcaption>Les 62 images de <code>billy</code>, chacune seule, au même point d'origine. Les cases vides
+    sont des images vides pour ce visage.</figcaption>
+  </figure>
+  <h3>Les valeurs employées par les scripts</h3>
+  <p>Yeux (13 à 21), sourcils (22 à 25), trois expressions (27, 28, 31) et 255. Chaque image ci-dessous
+  est dessinée par-dessus la tête, avec la coiffure et les habits :</p>
+  <figure>
+    <div class="scroll"><img src="conv_images/eyes_billy.png" width="2160" height="278" style="max-width:100%" alt="Yeux de Billy, images 12 à 21"></div>
+    <figcaption>Image 12 (clignement) et les regards employés par les scripts : 13, 14, 16 à 21.</figcaption>
+  </figure>
+  <figure>
+    <div class="scroll"><img src="conv_images/brows_billy.png" width="1680" height="278" style="max-width:100%" alt="Sourcils et expressions de Billy"></div>
+    <figcaption>Sourcils 22 à 25 et expressions 27, 28, 31.</figcaption>
+  </figure>
+  <h3>Visages incomplets</h3>
+  <p>Les scripts emploient les mêmes valeurs pour tous les visages, mais cinq visages n'ont qu'une partie
+  des images. Pour une valeur dont l'image est vide, le jeu ne dessine rien de plus que la tête : le
+  visage reste neutre, comme avec 255.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Visage</th><th>Valeurs des scripts qui désignent une image vide</th></tr></thead>
+    <tbody>
+      <tr><td><code>far</code></td><td>17, 18, 19, 21, 22, 25, 31</td></tr>
+      <tr><td><code>muh</code></td><td>19, 21, 22, 24, 25</td></tr>
+      <tr><td><code>tweedly</code></td><td>14, 22, 23, 25</td></tr>
+      <tr><td><code>beto</code></td><td>21, 22, 24, 27</td></tr>
+      <tr><td><code>janet</code>, <code>pri</code></td><td>23</td></tr>
+      <tr><td><code>men</code>, <code>walt</code></td><td>24</td></tr>
+    </tbody>
+  </table></div>
+  <figure>
+    <img src="conv_images/far_compose.png" width="960" height="284" alt="Farnsworth pour chaque valeur image des scripts">
+    <figcaption>La composition du jeu pour chaque valeur « image » employée avec <code>far</code> : les
+    valeurs 17, 18, 19, 21, 22, 25 et 31 donnent le visage neutre. L'image 34 de <code>far</code> est vide :
+    son image 0 porte déjà les vêtements.</figcaption>
+  </figure>
+</article>
+
+<!-- 6 -->
+<article class="card" id="levres">
+  <header><span class="id">6</span><h2>Yeux et bouche du gros plan</h2></header>
+  <p>Disquette : la bouche suit <b>le texte</b>, pas la voix. Le texte lu est celui du script tel quel
+  (codes <code>$</code> non remplacés), mis en minuscules.</p>
+  <h3>Clignement, tiré à chaque image de scène</h3>
+  <pre class="tpl">image des yeux = 12              si rand() × 30 / 32768 = 0 (une fois sur 30)
+               = image de base  sinon
+si image de base > 20 : image des yeux = image de base (jamais de clignement)</pre>
+  <p>Un clignement dure en général une image (0,1 s), en moyenne toutes les 3 s. Au-delà de 20, l'image
+  de base couvre les yeux, et l'image 12 l'effacerait. Dans les données, 774 répliques peuvent cligner
+  (13 à 20 ou 255), les autres ont les yeux fixes.</p>
+  <h3>Bouche : une lecture par image</h3>
+  <pre class="tpl">« e » + caractère qui n'est pas a..z : consommé aussi → pas de bouche
+« e » + « r »   → bouche 6, « r » consommé
+« t » + « h »   → bouche 9, « h » consommé
+« c » + « h »   → bouche 6, « h » consommé
+« h »           → caractère suivant consommé ; bouche de « h » (table)
+autre a..z      → bouche = table
+autre caractère → pas de bouche
+fin du texte    → pas de bouche ; la réplique passe à l'attente</pre>
+  <p>Table « 06891599098769362999252999 », chiffre + 2 :</p>
+  <div class="tablewrap"><table class="lips">
+    <thead><tr><th>a</th><th>b</th><th>c</th><th>d</th><th>e</th><th>f</th><th>g</th><th>h</th><th>i</th><th>j</th><th>k</th><th>l</th><th>m</th><th>n</th><th>o</th><th>p</th><th>q</th><th>r</th><th>s</th><th>t</th><th>u</th><th>v</th><th>w</th><th>x</th><th>y</th><th>z</th></tr></thead>
+    <tbody><tr><td>2</td><td>8</td><td>10</td><td>11</td><td>3</td><td>7</td><td>11</td><td>11</td><td>2</td><td>11</td><td>10</td><td>9</td><td>8</td><td>11</td><td>5</td><td>8</td><td>4</td><td>11</td><td>11</td><td>11</td><td>4</td><td>7</td><td>4</td><td>11</td><td>11</td><td>11</td></tr></tbody>
+  </table></div>
+  <figure>
+    <div class="scroll"><img src="conv_images/mouths_billy.png" width="2400" height="278" style="max-width:100%" alt="Les dix bouches de Billy"></div>
+    <figcaption>Les bouches 2 à 11 de <code>billy</code>.</figcaption>
+  </figure>
+  <h3>Exemple : « Danger is our business. »</h3>
+  <figure>
+    <img src="conv_images/lips_word.png" width="1120" height="474" alt="Bouche de Virgil pour chaque lecture de la phrase">
+    <figcaption>Virgil (entrée 12), une case par image de scène : 22 images pour 23 caractères.
+    « er » consomme deux caractères en une image ; l'espace (␣) et le point ne donnent pas de
+    bouche ; « e » suivi d'une lettre autre que « r » prend la bouche 3 de la table.</figcaption>
+  </figure>
+</article>
+
+<!-- 7 -->
+<article class="card" id="question">
+  <header><span class="id">7</span><h2>Question « Accept / Reject » (<code>YESNOCHOICE_BRANCH1</code>)</h2></header>
+  <div class="grid2">
+    <figure>
+      <img src="conv_images/closeup_accept.png" width="640" height="400" alt="Farnsworth tend la main, plein écran">
+      <figcaption><code>far</code>, image de base 53, plein écran : la tête et le dernier élément du décor
+      descendus de 24 lignes. Les libellés « Accept Mission » / « Reject Mission » ne sont pas dessinés ici.</figcaption>
+    </figure>
+    <div>
+      <ul>
+        <li><b>Visage</b> : image de base fixée à <b>53</b> (elle remplace l'image des yeux) ; texte de lèvres
+        vide, donc bouche fermée ; pas de clignement (53 &gt; 20).</li>
+        <li><b>Ouverture</b> : la scène passe en plein écran (0, 0)-(319, 199) ; les bandes noires s'ouvrent
+        en 24 pas (haut : une ligne par pas, bas : deux). L'image ne bouge pas à l'écran : elle est
+        découverte. Les bandes se referment après la réponse.</li>
+        <li><b>Zone</b> : souris dans x 118 à 279, y 113 à 199 → « Accept Mission », partout ailleurs →
+        « Reject Mission ». Libellé réécrit à y = 175.</li>
+        <li><b>Effet</b> : réponse rangée pour la partie ; si refus, le curseur avance du mot de la commande.</li>
+      </ul>
+      <p>L'image 53 n'est présente que pour <code>beto</code>, <code>far</code>, <code>muh</code>,
+      <code>walt</code> et <code>tweedly</code>.</p>
+    </div>
+  </div>
+</article>
+
+<!-- 8 -->
+<article class="card" id="equipier">
+  <header><span class="id">8</span><h2>Escadre et équipier</h2></header>
+  <ul>
+    <li><b><code>SELECT_WING</code></b> : cherche dans <code>GAMEFLOW.IFF</code> la <code>WING</code> dont
+    l'<code>INFO</code> vaut l'octet escadre ; lit son type, la liste <code>PILT</code> (pilotes) et, pour
+    les types 1 et 2, <code>ORDR</code>. Remplit les noms d'équipiers <code>$W</code>, <code>$L</code>,
+    <code>$O</code>. L'octet écran est gardé pour <code>CHOOSE_WINGMAN</code>.</li>
+    <li><b><code>CHOOSE_WINGMAN</code></b> : écran de choix, décor <code>s_wing</code> (écran = 0) ou
+    <code>w_wing</code> (sinon), puis <code>p_wing</code> ; une zone « Select Billy / Gwen / Lyle / Miguel / Tex »
+    pour chaque pilote de <code>PILT</code> ; le pilote choisi remplit <code>$W</code>, <code>$L</code>, <code>$O</code>.</li>
+  </ul>
+  <p>Extrait de l'entrée 59 (briefing ; quelques répliques omises) :</p>
+  <pre class="tpl">SELECT_WING     écran 0, escadre 0
+CLOSEUP         air, image 22   « All right, Wildcats. »
+GROUP_SHOT      s_brief
+GROUP_SHOT_CHARACTER_TALK  airwing1 (0, −20)  « We'll patrol those same routes... »
+CLOSEUP         air, image 255  « I'll be flying with... »
+CHOOSE_WINGMAN
+CLOSEUP         air, image 255  « ...$W, west of the city. »</pre>
+</article>
+
+<!-- 9 -->
+<article class="card" id="codes">
+  <header><span class="id">9</span><h2>Codes dans les textes</h2></header>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Code</th><th>Remplacé par</th></tr></thead>
+    <tbody>
+      <tr><td><code>$S</code></td><td>nom de famille du joueur</td></tr>
+      <tr><td><code>$N</code></td><td>prénom</td></tr>
+      <tr><td><code>$C</code></td><td>indicatif</td></tr>
+      <tr><td><code>$W</code>, <code>$L</code>, <code>$O</code></td><td>équipiers posés par <code>SELECT_WING</code> / <code>CHOOSE_WINGMAN</code> (Billy, Gwen, Lyle, Miguel, Tex)</td></tr>
+      <tr><td><code>$A</code>, <code>$B</code></td><td>un nom de la table DiBianca, Templeman, Isaac, Roberts, Baldwin, Yenawine, Savage (choix : point ouvert)</td></tr>
+      <tr><td><code>$P</code></td><td>avions perdus pendant la mission, suivi de « plane » / « planes »</td></tr>
+      <tr><td><code>$T</code></td><td>avions perdus au total, même suffixe</td></tr>
+      <tr><td><code>$</code> + autre</td><td>« $ » gardé</td></tr>
+    </tbody>
+  </table></div>
+  <p>Chaque occurrence est remplacée, sur une copie du texte : les lèvres lisent le texte brut
+  (« $S » donne une image sans bouche, puis la bouche de « s »).</p>
+</article>
+
+<!-- 10 -->
+<article class="card" id="voix">
+  <header><span class="id">10</span><h2>Version CD-ROM : la voix</h2></header>
+  <p>Lu dans l'<code>OPTTEST.EXE</code> du CD-ROM (sans IDA, listings dans <code>analysis/optest_cd/</code>).</p>
+  <h3>Quand la voix est jouée</h3>
+  <p>Le lecteur lit toujours la chaîne de voix ; une voix absente est une chaîne vide (56 textes). La voix
+  est jouée si les trois conditions sont vraies, sinon le texte est affiché :</p>
+  <ol class="steps">
+    <li><span>la chaîne de voix n'est pas vide ;</span></li>
+    <li><span>un pilote de son numérisé est chargé ;</span></li>
+    <li><span><code>VOCLIST.IFF</code> a été lu et le premier fichier qu'il nomme existe.</span></li>
+  </ol>
+  <p>Voix et texte ne sont jamais affichés ensemble : avec voix, le texte n'est pas dessiné. Le fichier
+  est <code>"f:" + identifiant + ".voc"</code> ; la voix suivante de <code>VOCLIST.IFF</code> est
+  préchargée par une tâche de fond.</p>
+  <h3>Durées</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Cas</th><th>Durée de la réplique</th></tr></thead>
+    <tbody>
+      <tr><td>avec voix</td><td>jusqu'à la fin du son</td></tr>
+      <tr><td>sans voix, texte non vide</td><td>50 images (5 s)</td></tr>
+      <tr><td>sans voix, texte vide</td><td>8 images</td></tr>
+    </tbody>
+  </table></div>
+  <p>Espace ou Échap coupe la réplique ; Échap termine aussi la conversation à la commande
+  <code>SHOW_TEXT</code> de premier niveau suivante.</p>
+  <h3>Lèvres avec voix</h3>
+  <ul>
+    <li>La bouche vient <b>du son</b> (même calcul que les cinématiques, <code>MIDGAME_SYSTEM.md</code> § 6.6) :
+    seuils 95, 78, 65, 42, 25 ; bouches −1, 8, 3, 2, 10, 11 ; une valeur par image de scène.</li>
+    <li>Gros plan : une bouche 10 ou 11 qui suit une bouche 10 ou 11 devient −1 (bouche fermée). Clignement
+    inchangé.</li>
+    <li>Personnage de groupe sans voix : la bouche ne bouge pas dans la version CD (le texte n'avance jamais).</li>
+  </ul>
+  <h3>Scène de groupe : différences</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th>Disquette</th><th>CD-ROM</th></tr></thead>
+    <tbody>
+      <tr><td>personnages qui parlent</td><td>tous construits avant la première réplique, visibles dès le début</td><td>construits un par un, visibles à partir de leur réplique, jusqu'à la fin de la scène</td></tr>
+      <tr><td>bouche</td><td>lettre par lettre du texte</td><td>du son ; sans voix, immobile</td></tr>
+      <tr><td>durée d'une réplique</td><td>fin du texte</td><td>fin du son ; sans voix 50 images (8 si vide)</td></tr>
+      <tr><td><code>SHOW_TEXT</code> après les répliques</td><td>dans la scène, 40 images</td><td>commande de premier niveau, après la scène</td></tr>
+      <tr><td>attente au début</td><td>aucune</td><td>7 × 10 tics avant la première réplique</td></tr>
+    </tbody>
+  </table></div>
+</article>
+
+<!-- 11 -->
+<article class="card" id="librs">
+  <header><span class="id">11</span><h2>Corrections pour libRealSpace</h2></header>
+  <div class="note"><p><b>Numéros d'image</b> : libRealSpace ajoute une image vide en tête de chaque jeu
+  d'images ; numéro libRealSpace = numéro du jeu + 1 pour les visages et les figures. Cette page donne
+  les numéros du jeu, sauf la colonne « Entrée corrigée ».</p></div>
+  <h3>Table <code>faces_shape</code> : le jeu et libRealSpace</h3>
+  <p>La table est gardée (elle permet d'autres jeux aux numéros d'images différents) ; ses valeurs sont
+  à corriger. Comparaison sur <code>billy</code>, sans bouche :</p>
+  <figure>
+    <div class="scroll"><img src="conv_images/billy_jeu_librs.png" width="1440" height="284" style="max-width:100%" alt="Billy : composition du jeu en haut, de libRealSpace en bas"></div>
+    <figcaption>En haut le jeu, en bas la table actuelle de <code>SCConvPlayer.cpp</code>, pour chaque
+    valeur employée avec <code>billy</code>. Écarts visibles à 14, 19, 20, 27 et 31.</figcaption>
+  </figure>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Octet</th><th>Image du jeu</th><th>Images de libRealSpace</th><th>À l'écran</th><th>Répliques</th><th>Entrée corrigée</th></tr></thead>
+    <tbody>
+      <tr><td class="num">13</td><td>13 (yeux)</td><td>13</td><td class="ok">conforme</td><td class="num">32</td><td class="mono">1, 14, bouche, 2, 35</td></tr>
+      <tr><td class="num">14</td><td>14 (yeux)</td><td>20 et 27 (sourire)</td><td class="diff">sourire en trop, autre regard</td><td class="num">87</td><td class="mono">1, 15, bouche, 2, 35</td></tr>
+      <tr><td class="num">16</td><td>16 (yeux)</td><td>16</td><td class="ok">conforme</td><td class="num">19</td><td class="mono">1, 17, bouche, 2, 35</td></tr>
+      <tr><td class="num">17</td><td>17 (yeux)</td><td>17</td><td class="ok">conforme</td><td class="num">21</td><td class="mono">1, 18, bouche, 2, 35</td></tr>
+      <tr><td class="num">18</td><td>18 (yeux)</td><td>18</td><td class="ok">conforme</td><td class="num">21</td><td class="mono">1, 19, bouche, 2, 35</td></tr>
+      <tr><td class="num">19</td><td>19 (yeux)</td><td>aucune</td><td class="diff">visage neutre</td><td class="num">80</td><td class="mono">1, 20, bouche, 2, 35</td></tr>
+      <tr><td class="num">20</td><td>20 (yeux)</td><td>20 et 27 (sourire)</td><td class="diff">sourire en trop</td><td class="num">14</td><td class="mono">1, 21, bouche, 2, 35</td></tr>
+      <tr><td class="num">21</td><td>21 (yeux)</td><td>20 et 27 (sourire)</td><td class="diff">autre regard, sourire en trop</td><td class="num">16</td><td class="mono">1, 22, bouche, 2, 35</td></tr>
+      <tr><td class="num">22</td><td>22 (sourcils)</td><td>22</td><td class="ok">conforme</td><td class="num">296</td><td class="mono">1, 23, bouche, 2, 35</td></tr>
+      <tr><td class="num">23</td><td>23 (sourcil)</td><td>23</td><td class="ok">conforme</td><td class="num">66</td><td class="mono">1, 24, bouche, 2, 35</td></tr>
+      <tr><td class="num">24</td><td>24 (sourcil)</td><td>24</td><td class="ok">conforme</td><td class="num">75</td><td class="mono">1, 25, bouche, 2, 35</td></tr>
+      <tr><td class="num">25</td><td>25 (froncés)</td><td>25</td><td class="ok">conforme</td><td class="num">431</td><td class="mono">1, 26, bouche, 2, 35</td></tr>
+      <tr><td class="num">27</td><td>27 (sourire)</td><td>26 (bouche)</td><td class="diff">autre bouche, sans sourire</td><td class="num">16</td><td class="mono">1, 28, bouche, 2, 35</td></tr>
+      <tr><td class="num">28</td><td>28 (grand sourire)</td><td>27 (sourire)</td><td class="diff">sourire au lieu du grand sourire</td><td class="num">1</td><td class="mono">1, 29, bouche, 2, 35</td></tr>
+      <tr><td class="num">31</td><td>31 (sourcils et bouche)</td><td>30</td><td class="diff">autre expression</td><td class="num">42</td><td class="mono">1, 32, bouche, 2, 35</td></tr>
+      <tr><td class="num">255</td><td>aucune</td><td>aucune</td><td class="ok">conforme</td><td class="num">500</td><td class="mono">1, bouche, 2, 35</td></tr>
+    </tbody>
+  </table></div>
+  <p>En tout, <b>256 répliques sur 1 717</b> n'ont pas la même expression que dans le jeu. Table complète
+  corrigée, compilée : <code>tools/conv_ref/faces_shape.cpp</code> (la bouche a sa place,
+  <code>kFaceMouthSlot</code>, entre l'expression et la coiffure).</p>
+  <h3>Autres points, gros plan</h3>
+  <ul>
+    <li><b>Ordre des couches</b> : libRealSpace dessine la bouche par-dessus les habits ; dans le jeu elle
+    passe avant la coiffure et les habits.</li>
+    <li><b>Clignement</b> : image 12 une fois sur 30 à chaque image de scène si l'octet vaut 20 au plus ou 255 ; absent de libRealSpace.</li>
+    <li><b>Bouche</b> : libRealSpace fait tourner les bouches sur l'horloge ; le jeu lit le texte avec les règles
+    du § 6 (code de référence <code>tools/conv_ref/conv_lips.cpp</code>).</li>
+    <li><b>Image vide</b> (visages incomplets) : ne rien dessiner, ce n'est pas un écart.</li>
+    <li><b>Accept / Reject</b> : l'image 53 remplace l'image des yeux au lieu d'être ajoutée ; une seule zone
+    « Accept » (x 118 à 279, y 113 à 199).</li>
+  </ul>
+  <h3>Lecture du script</h3>
+  <ul>
+    <li><b>Format testé avant de parser</b> (<code>ConvData::detectFormat</code>) : sur le premier texte, une
+    première chaîne en forme d'identifiant de voix (vide, ou 1 à 8 lettres ou chiffres) et une suite d'octets valide
+    → CD ; sinon disquette. 241 / 241 justes dans chaque format, au lieu des 29 erreurs de la détection texte
+    par texte sur le CD.</li>
+    <li><b>Une boucle de premier niveau, un sous-parseur par commande</b> (<code>tools/conv_ref/conv_parser.cpp</code>) ;
+    un octet qui n'est pas une commande est une erreur de parsing. 224 n'est pas une commande : c'est une
+    couleur de texte, lue à la place d'une commande après un décalage.</li>
+    <li><b>Champs</b> : x, y de <code>GROUP_SHOT_ADD_CHARACTER</code> et de <code>CLOSEUP</code> sont des mots signés
+    petit-boutistes ; <code>YESNOCHOICE_BRANCH1</code> et <code>YESNOCHOICE_BRANCH2</code> ont un mot.</li>
+    <li><b>Décor</b> : 5 octets par élément de <code>BACK</code>, le mot signé y donne la position (0, y + 24).</li>
+  </ul>
+  <h3>Scène de groupe</h3>
+  <ul>
+    <li>Les positions des figures appartiennent à la scène (la même figure a plusieurs positions selon les scripts).</li>
+    <li>Toutes les figures de la scène restent dessinées pendant toutes ses répliques (disquette) ; dans la
+    version CD, chaque personnage qui parle apparaît à sa première réplique.</li>
+    <li>Figurant : image 0 seule ; palette <code>PFIG</code> du premier figurant seulement.</li>
+  </ul>
+  <h3>Texte</h3>
+  <ul>
+    <li>Remplacer chaque occurrence des codes <code>$</code> ; ajouter <code>$L</code>, <code>$O</code>, <code>$A</code>, <code>$B</code>, <code>$P</code>, <code>$T</code>.</li>
+    <li>Lignes de 30 caractères au plus, coupées aux espaces, à y = 156 + 15 × n.</li>
+  </ul>
+</article>
+
+<!-- outils -->
+<article class="card" id="outils">
+  <header><span class="id">—</span><h2>Outils</h2></header>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Outil</th><th>Rôle</th></tr></thead>
+    <tbody>
+      <tr><td><code>tools/conv_dump.py</code></td><td>affiche les scripts de <code>CONV.PAK</code></td></tr>
+      <tr><td><code>tools/conv_scene.py</code></td><td>compose une scène de groupe → PNG</td></tr>
+      <tr><td><code>tools/conv_faces.py</code></td><td>planche des 62 images d'un visage, compositions, comparaison avec <code>faces_shape</code>, tableau des images présentes</td></tr>
+      <tr><td><code>tools/conv_doc_images.py</code></td><td>toutes les images de cette page</td></tr>
+      <tr><td><code>tools/conv_ref/</code></td><td>code de référence C++ : parseur, lèvres et clignement, <code>faces_shape</code> corrigée</td></tr>
+    </tbody>
+  </table></div>
+  <pre class="tpl">python3 tools/conv_doc_images.py --donnees &lt;BIGTRE.TRE ou DATA&gt; analysis/conv_images</pre>
+</article>
+</main>
+</div>
+</body>
+</html>

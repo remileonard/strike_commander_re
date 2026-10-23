@@ -298,6 +298,9 @@ strike_commander_re/
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
 │   │                                  CONVDATA.IFF, codes $ des textes ; voix de la version CD-ROM
 │   │                                  (§ 8) ; consignes et détection voix/texte pour libRealSpace (§ 7, § 9)
+│   ├── CONV_SYSTEM.html             version illustrée (HTML) des conversations : format, scènes, gros plan,
+│   │                                  images d'un visage, lèvres, voix, corrections ; images dans conv_images/
+│   │                                  (tools/conv_doc_images.py)
 │   ├── GAMEFLOW_SYSTEM.md           déroulement de la campagne (OPTEST) : GAMEFLOW.IFF, boucle principale,
 │   │                                  scènes et REQU, les 39 commandes des scripts EFCT (43 sur CD), compte rendu
 │   │                                  de vol misn2op.iff, écarts avec SCGameFlow de libRealSpace
