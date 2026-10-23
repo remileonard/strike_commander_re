@@ -18872,7 +18872,7 @@
 "sub_3CEB3"
 ],
 "new_name": "Gameflow_WriteMissionOrder_4BBF7",
-"summary": "far, LUE en surface 2026-10-22. Écrit op2misn.iff pour STRIKE.EXE (chunks MLST, DATA, PRTL ; mission [partie+0F9h], équipiers, armement)."
+"summary": "far, LUE en surface 2026-10-22. Écrit op2misn.iff pour STRIKE.EXE (chunks MLST, DATA, PRTL ; mission [partie+0F9h], équipiers, armement). Chunk TEAM (tag dword_43695) : les noms d'équipiers non vides de partie+860, +880, +900 ($W, $L, $O posés par SELECT_WING / CHOOSE_WINGMAN), 8 octets chacun complétés par des 0 (CRT_Strncpy_Pad 8) ; STRIKE.EXE les met à la place des noms TEAMn de la liste CAST (PLAY_LoadCASTTeamNames_A9956). Chunks SNAM, CALL, NAME à côté (tags dword_4368B, dword_43690, dword_43686)."
 },
 "sub_4C40E": {
 "segment": "ovr184",
@@ -21419,7 +21419,7 @@
 "sub_66A0"
 ],
 "new_name": "Conv_PlayScript_5AA4E",
-"summary": "far, LUE 2026-10-22 (structure). Interpréteur des scripts de conversation (CONV.PAK) : boucle tant que le curseur [conv+4] < début [conv] + taille [conv+8], lit un octet de commande et saute par la table off_5CE29 (00h scène de groupe, 03h réplique en gros plan avec 04h/0Ah/0Bh qui suivent, 0Ch saut relatif, 0Eh escadre, 0Fh choix d'équipier, 10h rien ; autre = octet sauté). Format complet : analysis/CONV_SYSTEM.md."
+"summary": "far, LUE 2026-10-22 (structure). Interpréteur des scripts de conversation (CONV.PAK) : boucle tant que le curseur [conv+4] < début [conv] + taille [conv+8], lit un octet de commande et saute par la table off_5CE29 (00h scène de groupe, 03h réplique en gros plan avec 04h/0Ah/0Bh qui suivent, 0Ch saut relatif, 0Eh escadre, 0Fh choix d'équipier, 10h rien ; autre = octet sauté). Format complet : analysis/CONV_SYSTEM.md. Commandes SELECT_WING (14) et CHOOSE_WINGMAN (15) lues le 2026-10-23 : SELECT_WING cherche la FORM WING de gameflow.iff (INFO octet 1 = escadre, octet 2 = type 0 à 3), lit PILT et, pour les types 1 et 2, ORDR (5 octets), et range trois noms ($W à [conv+42]+1, $L à +21, $O à +41) ; CHOOSE_WINGMAN affiche s_wing (octet écran 0) ou w_wing puis p_wing (élément n = pilote n, seulement s'il est dans PILT), plein écran comme la question Accept / Reject, zones de souris en x 0 à 639 (Billy 374 à 465, Gwen 290 à 375, Lyle 58 à 151, Miguel 168 à 265, Tex 484 à 563), image 1 du pilote survolé et libellé 'Select …' à y = 175, fin sur un événement de type 2 avec un pilote survolé, puis mêmes noms que SELECT_WING avec le pilote choisi. Détail : CONV_SYSTEM.md § 2."
 },
 "sub_5CE4B": {
 "segment": "ovr191",

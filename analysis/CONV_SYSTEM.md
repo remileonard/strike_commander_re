@@ -305,16 +305,106 @@ l'attente.
 `Conv_PlayScript_5AA4E`) passe 0 → toujours `FCPL` « normal » (`CONVPALS` 46) en conversation ;
 « night » n'est pas demandé par ce code.
 
-### `SELECT_WING` / `CHOOSE_WINGMAN` — escadre et équipiers
+### `SELECT_WING` / `CHOOSE_WINGMAN` — escadre et équipiers (relu le 2026-10-23)
 
-- **`SELECT_WING`** (`ConvRec_ReadWing_66E0`) : cherche dans `GAMEFLOW.IFF`, `FORM WNGS`, la `FORM WING`
-  dont l'`INFO` vaut `escadre` ; lit un type (0 à 3), la liste `PILT` (pilotes) et, pour les types
-  1 et 2, `ORDR` (5 octets). Remplit les trois noms d'équipiers `$W`, `$L`, `$O` (table des noms
-  dseg 3788 : « », Billy, Gwen, Lyle, Miguel, Tex ; table 3800 : DiBianca, Templeman, Isaac,
-  Roberts, Baldwin, Yenawine, Savage, utilisée par `$A`, `$B`). L'octet `écran` est gardé pour `CHOOSE_WINGMAN`.
-- **`CHOOSE_WINGMAN`** : écran de choix d'un équipier : décor `s_wing` (`écran` = 0) ou `w_wing` (sinon), puis
-  `p_wing` ; zones « Select Billy / Gwen / Lyle / Miguel / Tex » pour les pilotes de `PILT` ; le
-  pilote choisi remplit `$W`, `$L`, `$O` comme `SELECT_WING`.
+Lu dans `Conv_PlayScript_5AA4E` (branches 14 et 15 de la table des commandes). Les deux commandes
+partagent des variables locales de l'interpréteur : `CHOOSE_WINGMAN` utilise l'escadre lue par la
+commande `SELECT_WING` qui la précède **dans la même conversation**. Dans les données, les 28
+commandes `SELECT_WING` sont toutes suivies d'une commande `CHOOSE_WINGMAN`.
+
+**`SELECT_WING`** (champs lus par `ConvRec_ReadWing_66E0` : octet écran, octet escadre) :
+1. ouvre `..\..\data\gameflow\gameflow.iff`, `FORM WNGS`, et parcourt les `FORM WING` jusqu'à
+   celle dont le 1er octet de l'`INFO` vaut l'octet escadre (sinon erreur fatale) ;
+2. 2ᵉ octet de l'`INFO` = **type** de l'escadre (0 à 3) ;
+3. chunk `PILT` : liste des pilotes, un octet chacun, lue jusqu'à la fin du chunk (erreur fatale
+   « no PILT chunk… » s'il manque) ;
+4. types 1 et 2 seulement : chunk `ORDR`, 5 octets (erreur fatale « No ORDR chunk… » s'il manque) ;
+5. remplit les trois noms d'équipiers selon le type (tableau ci-dessous, avec pilote = **1er octet de
+   `PILT`**).
+
+Numéros de pilote (table des prénoms, dseg 3788) : 1 Billy, 2 Gwen, 3 Lyle, 4 Miguel, 5 Tex ; 0 =
+chaîne vide. Les trois noms sont rangés dans le tampon de partie (`[conv + 42]`, partie + 859) :
+`$W` à + 1, `$L` à + 21, `$O` à + 41 (`Conv_DrawText_59F54` lit ces trois positions pour les codes
+`$W`, `$L`, `$O`).
+
+| Type | `$W` | `$L` | `$O` |
+|---|---|---|---|
+| 0 | le pilote | vide | vide |
+| 1 | le pilote | 1er pilote d'`ORDR` différent du pilote | pilote suivant d'`ORDR` différent des deux |
+| 2 | le pilote | 1er pilote d'`ORDR` différent du pilote | nom de la table 3800, indice `[conv + 107]` (comme `$A`) |
+| 3 | le pilote | nom de la table 3800, indice `[conv + 107]` | nom de la table 3800, indice `[conv + 108]` |
+
+**Données** (`GAMEFLOW.IFF`) : 5 escadres, toutes de **type 0**, sans `ORDR` ; `PILT` contient les
+cinq pilotes, celui de l'escadre en tête :
+
+| Escadre | `PILT` | 1er pilote |
+|---|---|---|
+| 0 | 1, 2, 3, 4, 5 | Billy |
+| 1 | 2, 1, 3, 4, 5 | Gwen |
+| 2 | 3, 1, 2, 4, 5 | Lyle |
+| 3 | 4, 1, 2, 3, 5 | Miguel |
+| 4 | 5, 1, 2, 3, 4 | Tex |
+
+Avec les données, `SELECT_WING` pose donc `$W` = l'équipier proposé par défaut, et `$L`, `$O`
+vides ; octet écran = 0 dans 27 conversations, 1 dans l'entrée 200.
+
+**`CHOOSE_WINGMAN`** : écran de choix de l'équipier.
+1. **Pilotes proposés** : un tableau de 6 octets mis à 0, puis 1 pour chaque pilote de `PILT`
+   (`mov byte ptr [bx], 1` avec `bx` = numéro du pilote) : tous ceux de la liste, le 1er compris.
+2. **Décor** : `s_wing` si l'octet écran vaut 0, sinon `w_wing` (`ConvData_LoadBackground_5A4E6`).
+   Le 1er élément du décor est un calque d'image ; les autres éléments sont ajoutés **comme enfants
+   de ce calque**, à leur y du `BACK`.
+3. **Pilotes** : décor `p_wing`, 6 éléments, ajoutés eux aussi comme enfants du 1er calque du
+   décor (`OverlayImageLayer_Construct_A9D6`) : l'élément 0 (les pilotes du fond) toujours,
+   l'élément n (1 à 5) **seulement si le pilote n est proposé**. Chaque élément dessine son image 0
+   puis l'image de son champ + 27, 0 au départ.
+4. **Palette** : palettes des éléments du décor, puis celle du 1er élément de `p_wing`
+   (`CONVPALS` 51) ; envoyée une fois.
+5. **Ouverture** : comme pour la question « Accept / Reject » (§ 7.5) : le 1er calque est descendu
+   de 24 lignes (méthode + 24, (0, 24)), la scène passe en plein écran (0, 0)-(319, 199), les bandes
+   noires s'ouvrent en 24 pas. Les éléments `p_wing` ont leurs coordonnées d'écran dans l'image
+   (y du `BACK` = 0).
+6. **Boucle**, redessinée tous les 6 tics de l'horloge `dword_47ABB` : calque redessiné, libellé
+   écrit à **y = 175** (format « %J%S%Y »), champ + 27 de chaque pilote proposé remis à 0, puis
+   test de la souris dans les zones ci-dessous, **dans cet ordre**, la première qui convient gagne,
+   et seulement si le pilote est proposé : libellé « Select … », champ + 27 du pilote = 1 (son
+   **image 1**, une petite image sur les yeux, est dessinée par-dessus), pilote survolé = n. Hors
+   des zones : libellé vide, pilote survolé = 0.
+7. **Fin** : sur un événement d'entrée de type 2 (le même que pour « Accept / Reject », type non
+   identifié dans ce code) **avec un pilote survolé** ; hors des zones, il est sans effet. Un mot
+   global (`word_49818`) passe à 0 quand la souris est sur un pilote et à 1 sinon ; rôle non établi.
+8. **Fermeture** : les bandes se referment en 24 pas (une image par tic : ligne n en haut, lignes
+   199 − 2n et 198 − 2n en bas, remplies de 0), le calque remonte de 24 lignes, la scène revient à
+   (0, 24)-(319, 151).
+9. **Noms** : même tableau que `SELECT_WING`, avec pilote = **le pilote choisi** à la place du 1er
+   de `PILT`. Avec les données (type 0) : `$W` = le pilote choisi, `$L` et `$O` vides.
+
+Zones de la souris. Les bornes en x ne tombent sur les pilotes qu'une fois divisées par 2 : la
+souris est comptée de 0 à 639 en x (déduit de cette correspondance) et en pixels d'écran en y ;
+colonne « x à l'écran » = x ÷ 2. Ainsi lues, elles recouvrent l'image 0 de l'élément `p_wing` du
+pilote :
+
+| Pilote | Libellé | x de la souris | x à l'écran | y | Élément `p_wing` (image 0 : x, y) |
+|---|---|---|---|---|---|
+| 1 | Select Billy | 374 à 465 | 187 à 232 | 72 à 191 | `CONVSHPS` 82 : 183 à 237, 71 à 192 |
+| 2 | Select Gwen | 290 à 375 | 145 à 187 | 75 à 197 | `CONVSHPS` 83 : 134 à 188, 74 à 192 |
+| 3 | Select Lyle | 58 à 151 | 29 à 75 | 68 à 195 | `CONVSHPS` 84 : 17 à 80, 68 à 195 |
+| 4 | Select Miguel | 168 à 265 | 84 à 132 | 72 à 193 | `CONVSHPS` 85 : 73 à 141, 71 à 194 |
+| 5 | Select Tex | 484 à 563 | 242 à 281 | 70 à 282 | `CONVSHPS` 86 : 229 à 289, 69 à 193 |
+
+Comparaisons du code (bornes exclues ou incluses) : Billy `x < 466`, `x ≥ 374`, `y > 71`,
+`y ≤ 191` ; Gwen `x < 376`, `x ≥ 290`, `y > 74`, `y ≤ 197` ; Lyle `x < 152`, `x ≥ 58`, `y > 67`,
+`y ≤ 195` ; Miguel `x < 266`, `x ≥ 168`, `y > 71`, `y ≤ 193` ; Tex `x < 564`, `x ≥ 484`, `y > 69`,
+`y ≤ 282`. Billy et Gwen se touchent (x de la souris 374 et 375) : Billy, testé d'abord, l'emporte.
+
+**Effet sur la mission** : les noms d'équipiers partent dans `OP2MISN.IFF`, le fichier de mission
+écrit pour `STRIKE.EXE` par `Gameflow_WriteMissionOrder_4BBF7` : chunk **`TEAM`**, chacun des trois
+noms **non vides** (`cmp byte ptr [si+35Ch], 0`, puis + 880 et + 900) sur 8 octets complétés par des
+0 (`CRT_Strncpy_Pad` 8). Côté `STRIKE.EXE`, `MissionScenario_LoadFromIFF_A8C44` lit ce chunk, et
+`PLAY_LoadCASTTeamNames_A9956` remplace dans la liste `CAST` de la mission chaque nom `TEAMn` par le
+n-ième nom de `TEAM` (n < 3 ; `BILLY` si la mission est chargée hors campagne). Ce nom désigne le
+profil de l'avion IA, `INTEL\<nom>.IFF` (`BILLY.IFF`, …). Dans les données, les missions n'emploient
+que `TEAM0` : l'équipier de la mission est **le pilote choisi**.
 
 ### Codes dans les textes (`Conv_DrawText_59F54`)
 
@@ -660,13 +750,28 @@ int closeUpEyeFrame(int baseFrame) {
 
 ### 7.6 Choix de l'équipier (`SELECT_WING`, `CHOOSE_WINGMAN`)
 
-- Décor `s_wing` ou `w_wing` selon l'octet écran de la commande `SELECT_WING` précédente ; libRealSpace prend
-  toujours `s_wing`.
-- Ne proposer que les pilotes de la liste `PILT` de la `WING` donnée par la commande `SELECT_WING` (libRealSpace
-  propose toujours les 5). Libellés du jeu : « Select Billy », « Select Gwen », « Select Lyle »,
-  « Select Miguel », « Select Tex ».
-- L'ordre gauche → droite des zones de libRealSpace (Lyle, Miguel, Gwen, Billy, Tex) n'a pas été
-  comparé aux positions des figures dans les images : à vérifier sur l'écran.
+Détail du jeu : § 2, « `SELECT_WING` / `CHOOSE_WINGMAN` ».
+
+- **Décor** : `s_wing` si l'octet écran de la commande `SELECT_WING` précédente vaut 0, sinon
+  `w_wing` (entrée 200) ; libRealSpace prend toujours `s_wing`. Puis les éléments de `p_wing` :
+  l'élément 0 toujours, l'élément n seulement si le pilote n est dans `PILT`.
+- **Pilotes proposés** : ceux de la liste `PILT` de la `WING` de la commande `SELECT_WING`
+  (libRealSpace propose toujours les 5). Avec les données, les 5 escadres ont les 5 pilotes : la
+  différence ne se voit pas.
+- **Zones** (pixels d'écran, tests dans l'ordre Billy, Gwen, Lyle, Miguel, Tex, la première gagne) :
+  Billy x 187 à 232, y 72 à 191 ; Gwen x 145 à 187, y 75 à 197 ; Lyle x 29 à 75, y 68 à 195 ;
+  Miguel x 84 à 132, y 72 à 193 ; Tex x 242 à 281, y 70 à 199. L'ordre gauche → droite de
+  libRealSpace (Lyle, Miguel, Gwen, Billy, Tex) est celui du jeu.
+- **Survol** : libellé « Select Billy »… à y = 175, vide hors des zones ; l'image 1 de l'élément
+  `p_wing` du pilote survolé est dessinée par-dessus son image 0.
+- **Choix** : seulement sur un pilote ; un clic hors des zones ne fait rien.
+- **Effet** : `$W` = le pilote choisi (escadres de type 0, les seules des données ; types 1 à 3 :
+  tableau du § 2). Le jeu écrit ces noms dans le chunk `TEAM` de `OP2MISN.IFF` ; `STRIKE.EXE`
+  remplace `TEAM0` de la liste `CAST` de la mission par ce nom, qui choisit le profil
+  `INTEL\<nom>.IFF` de l'ailier. libRealSpace doit donc garder le pilote choisi pour la mission
+  (ailier de `CAST` nommé `TEAM0`), pas seulement pour le texte.
+- **Avant le choix** : `SELECT_WING` pose déjà `$W` = 1er pilote de `PILT` (l'équipier de
+  l'escadre).
 
 ### 7.7 Texte (`SCConvPlayer::DrawText`, `SetSentenceFromConv`)
 

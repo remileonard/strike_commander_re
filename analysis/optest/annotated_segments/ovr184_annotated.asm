@@ -3238,7 +3238,11 @@ Gameflow_SaveTmpState_4BBA0	endp
 
 ; ==============================================================================================
 ; far, LUE en surface 2026-10-22. Écrit op2misn.iff pour STRIKE.EXE (chunks MLST, DATA, PRTL ;
-; mission [partie+0F9h], équipiers, armement).
+; mission [partie+0F9h], équipiers, armement). Chunk TEAM (tag dword_43695) : les noms
+; d'équipiers non vides de partie+860, +880, +900 ($W, $L, $O posés par SELECT_WING /
+; CHOOSE_WINGMAN), 8 octets chacun complétés par des 0 (CRT_Strncpy_Pad 8) ; STRIKE.EXE les
+; met à la place des noms TEAMn de la liste CAST (PLAY_LoadCASTTeamNames_A9956). Chunks SNAM,
+; CALL, NAME à côté (tags dword_4368B, dword_43690, dword_43686).
 ; ==============================================================================================
 Gameflow_WriteMissionOrder_4BBF7	proc far		; CODE XREF: sub_41F56J
 

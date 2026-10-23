@@ -195,6 +195,76 @@ def face_cell(face, images, pal):
     return cf.cell(cf.face_shape(face), images, pal)
 
 
+# Zones de la souris de CHOOSE_WINGMAN, en pixels d'écran (x souris ÷ 2), dans l'ordre des tests :
+# pilote (numéro PILT), libellé, x premier, x dernier, y premier, y dernier.
+WING_ZONES = [
+    (1, 'Select Billy', 187, 232, 72, 191),
+    (2, 'Select Gwen', 145, 187, 75, 197),
+    (3, 'Select Lyle', 29, 75, 68, 195),
+    (4, 'Select Miguel', 84, 132, 72, 193),
+    (5, 'Select Tex', 242, 281, 70, 199),
+]
+
+
+def wing_screen(screen_back, hovered):
+    """Écran de CHOOSE_WINGMAN en plein écran : décor s_wing ou w_wing, puis p_wing.
+
+    Le premier élément du décor est le calque parent (y du BACK + 24 après le déplacement de
+    l'ouverture) ; les autres éléments et ceux de p_wing sont ses enfants, à leur y du BACK.
+    Élément n de p_wing (pilote n) : image 0, puis image 1 si la souris est sur ce pilote."""
+    pal = [0] * 768
+    offscreen = bytearray(320 * 200)
+    for k, (source, image, palette, y) in enumerate(cs.BACKS[screen_back]):
+        shapes, palettes = ('OPTSHPS', 'OPTPALS') if source == 1 else ('CONVSHPS', 'CONVPALS')
+        cs.apply_palette(pal, d.pak_entry(cs.pak(palettes), palette))
+        if k == 0:
+            y += 24
+        d.draw_image(offscreen, 320, 200, d.pak_entry(cs.pak(shapes), image), 0, 0, y, WHOLE)
+    pilots = cs.BACKS['p_wing']
+    cs.apply_palette(pal, d.pak_entry(cs.pak('CONVPALS'), pilots[0][2]))
+    for k, (_, image, _, y) in enumerate(pilots):
+        shape = d.pak_entry(cs.pak('CONVSHPS'), image)
+        d.draw_image(offscreen, 320, 200, shape, 0, 0, y, WHOLE)
+        d.draw_image(offscreen, 320, 200, shape, 1 if k == hovered else 0, 0, y, WHOLE)
+    rgb = bytes(min(255, v * 255 // 63) for v in pal)
+    im = Image.frombytes('P', (320, 200), bytes(offscreen))
+    im.putpalette(rgb)
+    return im.convert('RGB')
+
+
+def write_wing(out):
+    join = os.path.join
+    im = wing_screen('s_wing', 1)
+    draw = ImageDraw.Draw(im)
+    width = draw.textlength('Select Billy', font=font(11))
+    draw.text(((320 - width) / 2, 175), 'Select Billy', fill=(255, 255, 255), font=font(11))
+    x2(im).save(join(out, 'wing_choice.png'))
+    zones = x2(wing_screen('s_wing', -1))
+    draw = ImageDraw.Draw(zones)
+    colours = [
+        (255, 210, 60),
+        (90, 220, 230),
+        (255, 120, 120),
+        (140, 240, 120),
+        (220, 150, 255),
+    ]
+    for (pilot, label, x0, x1, y0, y1), colour in zip(WING_ZONES, colours):
+        draw.rectangle((2 * x0, 2 * y0, 2 * x1 + 1, 2 * y1 + 1), outline=colour, width=3)
+        text = f'{pilot} {label[7:]}'
+        box = draw.textbbox((2 * x0 + 6, 2 * y0 + 6), text, font=font(14))
+        draw.rectangle((box[0] - 3, box[1] - 2, box[2] + 3, box[3] + 2), fill=(0, 0, 0))
+        draw.text((2 * x0 + 6, 2 * y0 + 6), text, fill=colour, font=font(14))
+    zones.save(join(out, 'wing_zones.png'))
+    x2(wing_screen('w_wing', -1)).save(join(out, 'wing_w.png'))
+    # Image 1 d'un pilote (Billy) : sans et avec, agrandi.
+    pal_im = wing_screen('s_wing', -1)
+    hover = wing_screen('s_wing', 1)
+    pair = Image.new('RGB', (480, 180))
+    pair.paste(pal_im.crop((192, 70, 232, 100)).resize((240, 180), Image.NEAREST), (0, 0))
+    pair.paste(hover.crop((192, 70, 232, 100)).resize((240, 180), Image.NEAREST), (240, 0))
+    pair.save(join(out, 'wing_hover.png'))
+
+
 def write_all(out):
     os.makedirs(out, exist_ok=True)
     join = os.path.join
@@ -253,6 +323,7 @@ def write_all(out):
     cf.write_sheets('billy', join(out, 'billy'))
     cf.write_sheets('far', join(out, 'far'))
     cf.write_compare('billy', join(out, 'billy_jeu_librs.png'))
+    write_wing(out)
     # Animation d'une réplique (Miguel, entrée 12) : une image par lecture, 10 par seconde, clignement
     # tiré à chaque image (graine fixe), puis 40 images d'attente.
     rec = hangar[1]
