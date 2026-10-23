@@ -1148,7 +1148,8 @@ instructions absentes de l'enum ont un nom proposé dans le même style, marqué
 
 | Valeur | Nom | Effet dans le jeu |
 |---|---|---|
-| 0, 1 | `OP_NOOP`, `OP_EXIT_PROG` | retour : fin du programme, ou retour d'appel (même code pour les deux) |
+| 0 | `OP_NOOP` | retour : fin du programme, ou retour d'appel (même code qu'`OP_EXIT_PROG`) |
+| 1 | `OP_EXIT_PROG` | retour (même code qu'`OP_NOOP`) |
 | 2 | `OP_EXEC_SUB_PROG` | appel du programme n |
 | 3 | `OP_EXEC_SUB_PROG_WORK`\* | appel du programme numéro acc |
 | 4 | `OP_STOP_SCRIPT`\* | arrêt du script |
@@ -1168,11 +1169,16 @@ instructions absentes de l'enum ont un nom proposé dans le même style, marqué
 | 37 | `OP_SUB_FLAG_FROM_WORK`\* | acc −= FLAG[n] |
 | 38 | `OP_SUB_VALUE_FROM_FLAG`\* | FLAG[n] −= n (l'argument lui-même) |
 | 39 | `OP_SUB_WORK_FROM_FLAG`\* | FLAG[n] −= acc |
-| 40 / 41 | `OP_OR_VALUE_WITH_WORK`\* / `OP_OR_FLAG_WITH_WORK`\* | acc \|= n / FLAG[n] |
-| 42 / 43 | `OP_AND_VALUE_WITH_WORK`\* / `OP_AND_FLAG_WITH_WORK`\* | acc &= n / FLAG[n] |
-| 44 / 45 | `OP_XOR_VALUE_WITH_WORK`\* / `OP_XOR_FLAG_WITH_WORK`\* | acc ^= n / FLAG[n] |
-| 46 / 47 | `OP_MUL_VALUE_WITH_WORK` / `OP_MUL_FLAG_WITH_WORK`\* | acc ×= n / FLAG[n] |
-| 48 / 49 | `OP_DIV_WORK_BY_VALUE`\* / `OP_DIV_WORK_BY_FLAG`\* | acc /= n / FLAG[n] |
+| 40 | `OP_OR_VALUE_WITH_WORK`\* | acc \|= n |
+| 41 | `OP_OR_FLAG_WITH_WORK`\* | acc \|= FLAG[n] |
+| 42 | `OP_AND_VALUE_WITH_WORK`\* | acc &= n |
+| 43 | `OP_AND_FLAG_WITH_WORK`\* | acc &= FLAG[n] |
+| 44 | `OP_XOR_VALUE_WITH_WORK`\* | acc ^= n |
+| 45 | `OP_XOR_FLAG_WITH_WORK`\* | acc ^= FLAG[n] |
+| 46 | `OP_MUL_VALUE_WITH_WORK` | acc ×= n |
+| 47 | `OP_MUL_FLAG_WITH_WORK`\* | acc ×= FLAG[n] |
+| 48 | `OP_DIV_WORK_BY_VALUE`\* | acc /= n |
+| 49 | `OP_DIV_WORK_BY_FLAG`\* | acc /= FLAG[n] |
 | 64 | `OP_CMP_WORK_WITH_VALUE` | comparer acc à n |
 | 65 | `OP_CMP_VALUE_WITH_WORK` | comparer n à acc |
 | 66 | `OP_CMP_WORK_WITH_FLAG`\* | comparer acc à FLAG[n] |
@@ -1181,18 +1187,47 @@ instructions absentes de l'enum ont un nom proposé dans le même style, marqué
 | 69 | `OP_TEST_FLAG` | comparer FLAG[n] à 1 |
 | 70 | `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` | aller à l'étiquette n si le résultat natif ≠ 0 |
 | 71 | `OP_GOTO_IF_CURRENT_COMMAND_DONE`\* | aller à l'étiquette n si le résultat natif = 0 |
-| 72 / 73 | `OP_BRANCH_IF_EQUAL` / `OP_BRANCH_IF_NOT_EQUAL` | aller à n si égal / différent |
-| 74 / 75 | `OP_BRANCH_IF_LESS` / `OP_BRANCH_IF_GREATER` | aller à n si inférieur / supérieur |
-| 76 / 77 | `OP_BRANCH_IF_LESS_EQUAL`\* / `OP_BRANCH_IF_GREATER_EQUAL`\* | aller à n si inférieur ou égal / supérieur ou égal |
+| 72 | `OP_BRANCH_IF_EQUAL` | aller à l'étiquette n si égal |
+| 73 | `OP_BRANCH_IF_NOT_EQUAL` | aller à l'étiquette n si différent |
+| 74 | `OP_BRANCH_IF_LESS` | aller à l'étiquette n si inférieur |
+| 75 | `OP_BRANCH_IF_GREATER` | aller à l'étiquette n si supérieur |
+| 76 | `OP_BRANCH_IF_LESS_EQUAL`\* | aller à l'étiquette n si inférieur ou égal |
+| 77 | `OP_BRANCH_IF_GREATER_EQUAL`\* | aller à l'étiquette n si supérieur ou égal |
 | 78 | `OP_BRANCH`\* | aller à n |
 | 79 | `OP_EXECUTE_CALL` | aller à l'étiquette numéro acc (un **saut**, pas un appel) |
 | 80 | `OP_MOVE_WORK_REGISTER_TO_FLAG` | FLAG[n] = acc |
 | 81 | `OP_MOVE_RESULT_TO_FLAG`\* | FLAG[n] = résultat natif |
-| 82 / 83 | `OP_SET_FLAG_TO_TRUE` / `OP_SET_FLAG_TO_FALSE` | FLAG[n] = 1 / 0 |
+| 82 | `OP_SET_FLAG_TO_TRUE` | FLAG[n] = 1 |
+| 83 | `OP_SET_FLAG_TO_FALSE` | FLAG[n] = 0 |
 | 84 | `OP_TOGGLE_FLAG`\* | FLAG[n] ^= 1 |
-| 85 / 86 | `OP_ADD_1_TO_FLAG` / `OP_REMOVE_1_TO_FLAG` | FLAG[n] += 1 / −= 1 |
-| 128–152 | `OP_ACTIVATE_SCENE` … `OP_IS_TARGET_ACTIVE` | objets et scènes de mission (lus en partie : `OP_ACTIVATE_OBJ`, `OP_DEACTIVATE_OBJ`, plus haut) |
-| 160–191 | `OP_SET_WAIT_FOR_SECONDS` … `OP_SET_OBJ_PATROL_POSITION` | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
+| 85 | `OP_ADD_1_TO_FLAG` | FLAG[n] += 1 |
+| 86 | `OP_REMOVE_1_TO_FLAG` | FLAG[n] −= 1 |
+| 128 | `OP_ACTIVATE_SCENE` | objet ou scène de mission ; non relu ici |
+| 129 | `OP_DEACTIVATE_SCENE` | objet ou scène de mission ; non relu ici |
+| 144 | `OP_ACTIVATE_OBJ` | activation de l'objet de mission n (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`, plus haut) |
+| 145 | `OP_DEACTIVATE_OBJ` | désactivation de l'objet n (`PartEntry_Deactivate_5242A`, plus haut) |
+| 146 | `OP_IF_TARGET_IN_AREA` | objet ou scène de mission ; non relu ici |
+| 147 | `OP_IS_TARGET_ALIVE` | objet ou scène de mission ; non relu ici |
+| 148 | `OP_INSTANT_DESTROY_TARGET` | objet ou scène de mission ; non relu ici |
+| 149 | `OP_DIST_TO_TARGET` | objet ou scène de mission ; non relu ici |
+| 151 | `OP_DIST_TO_SPOT` | objet ou scène de mission ; non relu ici |
+| 152 | `OP_IS_TARGET_ACTIVE` | objet ou scène de mission ; non relu ici |
+| 160 | `OP_SET_WAIT_FOR_SECONDS` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 161 | `OP_SET_OBJ_TAKE_OFF` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 162 | `OP_SET_OBJ_LAND` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 165 | `OP_SET_OBJ_FLY_TO_WP` | aller au SPOT (plus haut, selon la classe) |
+| 166 | `OP_SET_OBJ_FLY_TO_AREA` | selon la classe (plus haut) |
+| 167 | `OP_SET_OBJ_DESTROY_TARGET` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 168 | `OP_SET_OBJ_DEFEND_TARGET` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 169 | `OP_SET_OBJ_DEFEND_AREA` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 170 | `OP_SET_OBJ_FOLLOW_ALLY` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
+| 171 | `OP_SET_MESSAGE` | message radio n (`Radio_PlayMessage_CB45` pour un avion IA) |
+| 182 | `OP_SHOW_ON_NAV_MAP` | pose le bit « visible sur la carte de navigation » (plus haut) |
+| 183 | `OP_HIDE_FROM_NAV_MAP` | efface ce bit (plus haut) |
+| 184 | `OP_JOIN_PLAYER_TEAM` | pose le bit « accompagne le joueur » (plus haut) |
+| 185 | `OP_LEAVE_PLAYER_TEAM` | efface ce bit (plus haut) |
+| 190 | `OP_PACIFY_TARGET` | ordre transmis à l'objet, objectif par défaut (plus haut) |
+| 191 | `OP_SET_OBJ_PATROL_POSITION` | ordre natif (`MissionScript_CallNativeHandler_52513`) ; non relu en détail ici |
 | 208 | `OP_SELECT_FLAG_208` | non lu ici |
 
 - Les sauts cherchent l'étiquette **en avant** depuis l'instruction courante
@@ -1236,14 +1271,34 @@ de l'enum » ne dit pas comment libRealSpace traite l'instruction.
 | `OP_ADD_VALUE_TO_WORK`\* | 1 | MISN-5C |
 | `OP_SUB_WORK_FROM_FLAG`\* | 1 | TEMPLATE |
 | `OP_CMP_WORK_WITH_FLAG`\* | 1 | LAND |
-| valeurs 51, 53, 56, 105, 117 (sans effet dans le jeu) | 16 | MISSION, BASIC |
-| ordres natifs 153, 163, 164, 172, 177, 178, 179, 181 (non lus en détail) | 32 | 181 : MISN-1A, 1B, 1C ; 177 / 178 : MISN-6X, 10D ; 172 : MISN-6D ; 164 : ARENAMIS, GAME |
+| valeur 51 (sans effet dans le jeu) | 2 | MISSION |
+| valeur 53 (sans effet dans le jeu) | 6 | BASIC |
+| valeur 56 (sans effet dans le jeu) | 6 | BASIC |
+| valeur 105 (sans effet dans le jeu) | 1 | MISSION |
+| valeur 117 (sans effet dans le jeu) | 1 | MISSION |
+| ordre natif 153 (non lu en détail) | 6 | GAUNTLET |
+| ordre natif 163 (non lu en détail) | 6 | BASIC |
+| ordre natif 164 (non lu en détail) | 16 | ARENAMIS, GAME |
+| ordre natif 172 (non lu en détail) | 2 | MISN-6D |
+| ordre natif 177 (non lu en détail) | 1 | MISN-6X |
+| ordre natif 178 (non lu en détail) | 2 | MISN-10D, 6X |
+| ordre natif 179 (non lu en détail) | 1 | BASIC |
+| ordre natif 181 (non lu en détail) | 3 | MISN-1A, 1B, 1C |
 
 Les trois premières servent surtout à **calculer le gain** (2ᵉ valeur de `STAT`) dans le programme
 de fin de mission. Exemple, MISN-10A : gain = (15 + FLAG[0] − 9 + FLAG[1]) × FLAG[4] × 100, écrit
-`OP_MOVE_VALUE_TO_WORK_REGISTER 15`, `OP_ADD_FLAG_TO_WORK 0`, `OP_SUB_VALUE_FROM_WORK 9`,
-`OP_ADD_FLAG_TO_WORK 1`, `OP_MUL_FLAG_WITH_WORK 4`, `OP_MUL_VALUE_WITH_WORK 100`. Si l'une d'elles est
-ignorée, le gain renvoyé au déroulement est faux. Dans MISN-15A, la 1ʳᵉ valeur (succès) est calculée
+
+```
+OP_MOVE_VALUE_TO_WORK_REGISTER 15
+OP_ADD_FLAG_TO_WORK 0
+OP_SUB_VALUE_FROM_WORK 9
+OP_ADD_FLAG_TO_WORK 1
+OP_MUL_FLAG_WITH_WORK 4
+OP_MUL_VALUE_WITH_WORK 100
+OP_SAVE_VALUE_TO_GAMFLOW_REGISTER 1
+```
+
+Si l'une d'elles est ignorée, le gain renvoyé au déroulement est faux. Dans MISN-15A, la 1ʳᵉ valeur (succès) est calculée
 avec `OP_AND_FLAG_WITH_WORK`.
 
 **Noms de l'enum à rapprocher du jeu :**

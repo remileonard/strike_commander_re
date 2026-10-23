@@ -45,18 +45,25 @@ format est identique dans les deux versions.
 
 | Valeur | Nom | Commande | Champs |
 |---|---|---|---|
-| 0 | `GROUP_SHOT` | scène de groupe | nom du décor ; puis des `GROUP_SHOT_ADD_CHARACTER` ; puis des `GROUP_SHOT_CHARACTER_TALK` / `SHOW_TEXT` |
-| 3 | `CLOSEUP` | réplique en gros plan | voir ci-dessous ; puis des `SHOW_TEXT`, `CLOSEUP_CONTINUATION`, `YESNOCHOICE_BRANCH1` |
+| 0 | `GROUP_SHOT` | scène de groupe | nom du décor ; puis ses sous-commandes (figurants, puis répliques) |
+| 3 | `CLOSEUP` | réplique en gros plan | voir ci-dessous ; puis ses sous-commandes |
 | 12 | `YESNOCHOICE_BRANCH2` | saut | mot : nombre d'octets sautés, compté depuis la fin du mot |
 | 14 | `SELECT_WING`\* (`UNKNOWN` dans libRealSpace) | escadre | octet `écran` ; octet `escadre` |
 | 15 | `CHOOSE_WINGMAN` | choix d'un équipier | aucun |
 | 16 | `NOP_16`\* | (rien) | aucun |
 | autre | — | sautée | l'octet seul est consommé (branche par défaut) |
 
-Sous-commandes, lues par la commande qui les précède : `GROUP_SHOT_ADD_CHARACTER` (1),
-`GROUP_SHOT_CHARACTER_TALK` (2), `CLOSEUP_CONTINUATION` (4), `SHOW_TEXT` (10),
-`YESNOCHOICE_BRANCH1` (11). Version CD : `SHOW_TEXT` aussi au premier niveau, et `NOP_18`\* (18),
-qui ne fait rien (§ 8.6).
+Sous-commandes, lues par la commande qui les précède :
+
+| Valeur | Nom | Lue par |
+|---|---|---|
+| 1 | `GROUP_SHOT_ADD_CHARACTER` | `GROUP_SHOT` (figurant) |
+| 2 | `GROUP_SHOT_CHARACTER_TALK` | `GROUP_SHOT` (personnage qui parle) |
+| 4 | `CLOSEUP_CONTINUATION` | `CLOSEUP` |
+| 10 | `SHOW_TEXT` | `GROUP_SHOT` et `CLOSEUP` ; aussi au premier niveau dans la version CD |
+| 11 | `YESNOCHOICE_BRANCH1` | `CLOSEUP` |
+
+Version CD seulement : `NOP_18`\* (18), au premier niveau, ne fait rien (§ 8.6).
 
 Le script se lit jusqu'à la fin de l'entrée (pointeur ≥ début + taille).
 
@@ -289,9 +296,15 @@ de la zone de texte (format « %Y%J%S »).
 1 717 `CLOSEUP`, 575 `CLOSEUP_CONTINUATION`, 86 `GROUP_SHOT`, 184 `GROUP_SHOT_ADD_CHARACTER`,
 70 `GROUP_SHOT_CHARACTER_TALK`, 32 `SHOW_TEXT`, 26 `YESNOCHOICE_BRANCH1`, 26 `YESNOCHOICE_BRANCH2`,
 28 `SELECT_WING`, 28 `CHOOSE_WINGMAN`. Les 52 sauts (`YESNOCHOICE_BRANCH1` et `YESNOCHOICE_BRANCH2`)
-tombent tous sur le début d'une commande. Exemple (entrée 62, proposition de mission) : « Do you
-accept? » → `YESNOCHOICE_BRANCH1` (refus : +159 octets) → branche « Good… » → `YESNOCHOICE_BRANCH2`
-(+78, jusqu'à la fin) → branche du refus « All right, but I'd reconsider… ».
+tombent tous sur le début d'une commande. Exemple (entrée 62, proposition de mission) :
+
+```
+YESNOCHOICE_BRANCH1 159    après « Do you accept? » ; refus : saute 159 octets
+CLOSEUP                    branche « accepter » : « Good.  I'll contact Virgil… »
+                           (suite de la branche « accepter »)
+YESNOCHOICE_BRANCH2 78     saute 78 octets, jusqu'à la fin
+CLOSEUP                    branche du refus : « All right, but I'd reconsider… »
+```
 
 ## 5. Lancement d'une conversation
 

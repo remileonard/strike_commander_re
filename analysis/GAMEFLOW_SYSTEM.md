@@ -3,7 +3,7 @@
 > **Nombres en décimal** (arguments, champs `+n`). Les adresses de code citées sont aussi en
 > décimal ; les fichiers annotés les écrivent en hexadécimal. Les commandes des scripts sont
 > désignées par leur **nom** (table du § 5.2, qui donne aussi leur valeur) ; une suite de script
-> s'écrit `SET_NEXT_MISSION 3`, `GOTO_NEXT_MISSION`.
+> s'écrit une instruction par ligne, avec son argument.
 
 Lu le 2026-10-22 dans `analysis/optest/annotated_segments/` (seg002 : boucle et interpréteur ;
 ovr184 à ovr189 : fonctions des commandes). Adresses de l'OPTEST.EXE **disquette**, sauf au § 8
@@ -126,13 +126,46 @@ un **OU** à la condition `REQUIRE_*` qui la suit :
 
 ### 4.3 Exemples des données
 
-| Sprite | `REQU` | Visible si |
-|---|---|---|
-| mission 0, scène 11, sprite 3 | `REQUIRE_NOT_SET 102` | drapeau 102 non posé ; son script pose 102 : il disparaît après la conversation 12 |
-| mission 9, scène 1, sprite 8 | `OR_SET 3`, `REQUIRE_SET 4`, `REQUIRE_NOT_SET 42` | (3 posé ou 4 posé) et 42 non posé |
-| mission 9, scène 6, sprite 0 | `OR_NOT_SET 42`, `OR_NOT_SET 43`, `REQUIRE_NOT_SET 44` | 42, 43 ou 44 non posé (caché quand les trois sont posés) |
-| mission 12, scène 20, sprite 18 | `REQUIRE_SET 42`, `OR_NOT_SET 43`, `REQUIRE_NOT_SET 44` | 42 posé et (43 non posé ou 44 non posé) |
-| mission 23, scène 20, sprite 12 | `OR_NOT_SET 201`, `OR_NOT_SET 202`, valeur 9 (203) | **toujours** : la valeur 9 est ignorée, les deux `OR_NOT_SET` n'ont plus de condition à faire ignorer |
+- **Mission 0, scène 11, sprite 3** : visible si le drapeau 102 n'est pas posé ; son script pose
+  102, il disparaît donc après la conversation 12.
+
+  ```
+  REQUIRE_NOT_SET 102
+  ```
+
+- **Mission 9, scène 1, sprite 8** : visible si (3 posé ou 4 posé) et 42 non posé.
+
+  ```
+  OR_SET 3
+  REQUIRE_SET 4
+  REQUIRE_NOT_SET 42
+  ```
+
+- **Mission 9, scène 6, sprite 0** : visible si 42, 43 ou 44 n'est pas posé (caché quand les
+  trois sont posés).
+
+  ```
+  OR_NOT_SET 42
+  OR_NOT_SET 43
+  REQUIRE_NOT_SET 44
+  ```
+
+- **Mission 12, scène 20, sprite 18** : visible si 42 est posé et (43 non posé ou 44 non posé).
+
+  ```
+  REQUIRE_SET 42
+  OR_NOT_SET 43
+  REQUIRE_NOT_SET 44
+  ```
+
+- **Mission 23, scène 20, sprite 12** : **toujours** visible : la valeur 9 est ignorée, les deux
+  `OR_NOT_SET` n'ont plus de condition à faire ignorer.
+
+  ```
+  OR_NOT_SET 201
+  OR_NOT_SET 202
+  (valeur 9) 203
+  ```
 
 Formes des 215 `REQU` des données (suite des conditions) : `REQUIRE_NOT_SET` seul × 59,
 `REQUIRE_SET` seul × 26, `REQUIRE_SET` + `REQUIRE_NOT_SET` × 24, deux `REQUIRE_NOT_SET` × 17,
@@ -220,10 +253,23 @@ drapeaux de chaque sprite.
    P, `OR_NOT_SET a`, X) alors que le jeu calcule `P et (¬a ou X)`. Grâce à l'arrêt anticipé
    (`if (!isActive && !nextOpIsOr) break;`), le résultat est le même sur toutes les données.
 3. **Valeur inconnue après un `OR_*`.** Le seul cas des données : sprite 12 de la scène 20 de la
-   mission 23, `OR_NOT_SET 201`, `OR_NOT_SET 202`, valeur 9 (203). Le jeu l'affiche toujours ;
-   `isActive` calcule « 201 non posé ou 202 non posé » et le **cache quand 201 et 202 sont posés**
-   (le « ou » reste ouvert, la valeur 9 est ignorée). Ce sprite porte le départ en vol de la mission 23 (`SELECT_MISSION 20`,
-   `PLAY_CONV 127`, `WEAPON_LOADOUT 12`).
+   mission 23, dont le `REQU` est :
+
+   ```
+   OR_NOT_SET 201
+   OR_NOT_SET 202
+   (valeur 9) 203
+   ```
+
+   Le jeu l'affiche toujours ; `isActive` calcule « 201 non posé ou 202 non posé » et le **cache
+   quand 201 et 202 sont posés** (le « ou » reste ouvert, la valeur 9 est ignorée). Ce sprite porte
+   le départ en vol de la mission 23 :
+
+   ```
+   SELECT_MISSION 20
+   PLAY_CONV 127
+   WEAPON_LOADOUT 12
+   ```
 4. **Moment de l'évaluation.** Dans le jeu, la visibilité n'est calculée qu'à la construction de
    la scène (§ 4.1). Où `isActive` est appelé dans libRealSpace n'est pas dans le code fourni :
    s'il l'est à chaque image, un sprite peut disparaître juste après son clic, alors que le jeu le
@@ -316,8 +362,14 @@ Valeurs au-delà de 38 : rien (disquette). Version CD : quatre commandes de plus
 - Le joueur ajoute ou retire des armes (« Add %s (%d) », « Remove %s (%d) »).
 - **Sprite 12 cliqué → départ en vol** : `[+232]` = 1, `[+238]` = 1, le test réussit et la
   suite du script est jouée. Autre sortie → le test échoue, la suite du script est sautée.
-- Dans les données, `WEAPON_LOADOUT` suit toujours un `SELECT_MISSION`, par exemple :
-  `SELECT_MISSION 0`, `PLAY_CONV 11`, `WEAPON_LOADOUT 1` (chargement 1).
+- Dans les données, `WEAPON_LOADOUT` suit toujours un `SELECT_MISSION`, par exemple (mission 0,
+  scène 20, sprite 12 ; chargement 1) :
+
+  ```
+  SELECT_MISSION 0
+  PLAY_CONV 11
+  WEAPON_LOADOUT 1
+  ```
 
 ### 5.4 Changements `CHNG` (`APPLY_CHANGE`)
 
@@ -396,8 +448,53 @@ compte rendu du vol précédent, puis après chacun de ses vols) :
 | MISS 26 (MISN-8b / 8x) | MISN-8a (AWACS) | drapeau **211** → **MISN-8b**, sinon **MISN-8x** ; sprite 5 de la scène 29 de MISS 27 selon 211 |
 | MISS 30 (MISN-9a) | MISN-9aa (BRIGC10), puis son propre vol | mission suivante = 31 (MISN-9b) ; si la 3ᵉ valeur ≠ 0 : drapeau **215** et **passage immédiat à la mission suivante** (`GOTO_NEXT_MISSION`), MISN-9a n'est pas jouée |
 | MISS 33 (MISN-10b / 10x) | MISN-10a | drapeau **213** → **MISN-10b**, sinon **MISN-10x** ; sprite 19 de la scène 29 de MISS 34 selon 213 |
-| MISS 41 (MISN-12b) | son propre vol (RWYEXT18) | si drapeau 50 et 3ᵉ valeur ≠ 0 : `APPLY_CHANGE 27` (argent remplacé par 0) et `APPLY_CHANGE 7` (argent − 2 000 milliers), puis `CHECK_GAME_OVER` : argent < 0 → conversation 255, **fin de partie** |
-| MISS 48 | MISN-15a | si MISN-15a (mission 41 de `MLST`) a réussi : cinématiques 20 et 36 ; sinon plans 15 et 3, puis : 3ᵉ valeur ≠ 0 → `APPLY_CHANGE 27`, `APPLY_CHANGE 7`, `CHECK_GAME_OVER` ; sinon conversation 236, puis les mêmes trois commandes |
+| MISS 41 (MISN-12b) | son propre vol (RWYEXT18) | si drapeau 50 et 3ᵉ valeur ≠ 0 : argent remplacé par 0, puis − 2 000 milliers, puis **fin de partie** (conversation 255) ; script ci-dessous |
+| MISS 48 | MISN-15a | si MISN-15a a réussi : cinématiques 20 et 36 ; sinon plans 15 et 3, puis la même fin de partie, précédée de la conversation 236 si la 3ᵉ valeur vaut 0 ; script ci-dessous |
+
+Script de MISS 41 :
+
+```
+SHOW_KILL_MARKS
+PLANES_LOST_CONV
+IF_NOT_FLAG 200
+    SET_FLAG 200
+    APPLY_CHANGE 23
+ENDIF
+IF_MISSION_SUCCESS 35
+    SET_FLAG 68
+ENDIF
+IF_FLAG 50
+    IF_RESULT_3
+        APPLY_CHANGE 27        argent remplacé par 0
+        APPLY_CHANGE 7         argent − 2 000 milliers
+        CHECK_GAME_OVER        argent < 0 → conversation 255, fin de partie
+    ENDIF
+ENDIF
+SET_NEXT_MISSION 41
+PLAY_SCENE 11
+```
+
+Script de MISS 48 :
+
+```
+IF_MISSION_SUCCESS 41    MISN-15a réussie
+    PLAY_MIDGAME 20
+    PLAY_MIDGAME 36
+ELSE
+    PLAY_SHOT 15
+    PLAY_SHOT 3
+    IF_RESULT_3
+        APPLY_CHANGE 27
+        APPLY_CHANGE 7
+        CHECK_GAME_OVER
+    ELSE
+        PLAY_CONV 236
+        APPLY_CHANGE 27
+        APPLY_CHANGE 7
+        CHECK_GAME_OVER
+    ENDIF
+ENDIF
+```
 
 ## 7. libRealSpace (`SCGameFlow.cpp`) : écarts et corrections proposées
 
@@ -418,27 +515,32 @@ Tous les nombres de ce chapitre sont en décimal, comme dans `SCenums.h` et le d
 | `PLAY_MIDGAME` (2) | `EFECT_OPT_PLAY_MIDGAME` | oui |
 | `FLY_MISSION_NOW` (3) | `EFECT_OPT_FLYM2` | non : le jeu part en vol **sans** écran d'armement (point 2) |
 | `NOP_4` (4) | `EFECT_OPT_U2` | oui (pas de cas, rien à faire) |
-| `SET_FLAG` / `CLEAR_FLAG` (6 / 7) | `EFECT_OPT_SETFLAG_TRUE` / `_FALSE` | oui |
+| `SET_FLAG` (6) | `EFECT_OPT_SETFLAG_TRUE` | oui |
+| `CLEAR_FLAG` (7) | `EFECT_OPT_SETFLAG_FALSE` | oui |
 | `PLAY_SHOT` (8) | `EFECT_OPT_SHOT` | oui |
-| `IF_NOT_FLAG` / `IF_FLAG` (9 / 10) | `EFECT_OPT_IF_NOT_FLAG` / `_IF_FLAG` | oui |
+| `IF_NOT_FLAG` (9) | `EFECT_OPT_IF_NOT_FLAG` | oui |
+| `IF_FLAG` (10) | `EFECT_OPT_IF_FLAG` | oui |
 | `NOP_11` (11) | `EFFCT_OPT_U18` | oui (absent des données) |
 | `SELECT_MISSION` (12) | `EFECT_OPT_FLYM` | en partie : le jeu ne fait que choisir la mission (point 2) |
 | `SET_NEXT_MISSION` (13) | `EFECT_OPT_MIS2` | oui |
 | `START_FLIGHT` (14) | `EFFCT_OPT_U20` | pas de cas (absent des données) |
 | `GOTO_NEXT_MISSION` (15) | `EFECT_OPT_GO` | oui |
-| `SAVE_GAME` / `LOAD_GAME` (16 / 17) | `EFECT_OPT_SAVE_GAME` / `_LOAD_GAME` | oui |
+| `SAVE_GAME` (16) | `EFECT_OPT_SAVE_GAME` | oui |
+| `LOAD_GAME` (17) | `EFECT_OPT_LOAD_GAME` | oui |
 | `SHOW_MAP` (18) | `EFFCT_OPT_SHOW_MAP` | oui |
 | `LOOK_AT_KILLBOARD` (19) | `EFECT_OPT_LOOK_AT_KILLBOARD` | oui |
-| `IF_MISSION_ACCEPTED` / `IF_MISSION_REFUSED` (20 / 21) | `EFECT_OPT_MISS_ACCEPTED` / `_REJECTED` | oui |
+| `IF_MISSION_ACCEPTED` (20) | `EFECT_OPT_MISS_ACCEPTED` | oui |
+| `IF_MISSION_REFUSED` (21) | `EFECT_OPT_MISS_REJECTED` | oui |
 | `WEAPON_LOADOUT` (22) | `EFECT_OPT_END_MISS` | non : écran d'armement **et test** (point 2) |
 | `VIEW_CATALOG` (23) | `EFECT_OPT_VIEW_CATALOG` | oui |
 | `SET_MUSIC_MOOD` (24) | `EFECT_OPT_U8` | pas de cas (point 7) |
 | `LOOK_AT_LEDGER` (25) | `EFECT_OPT_LOOK_AT_LEDGER` | oui |
 | `SHOW_KILL_MARKS` (26) | `EFECT_OPT_U10` | pas de cas (point 7) |
-| `REMOVE_PILOT` (27) | `EFECT_OPT_U11` et `EFECT_OPT_U16` | pas de cas (point 7) ; deux constantes pour la même valeur |
+| `REMOVE_PILOT` (27) | `EFECT_OPT_U11` (et `EFECT_OPT_U16`, même valeur) | pas de cas (point 7) |
 | `IF_TRUE` (28) | — | absent des données |
 | `CHECK_GAME_OVER` (29) | `EFECT_OPT_CHECK_BALANCE` | en partie (point 5) |
-| `ELSE` / `ENDIF` (30 / 31) | `EFECT_OPT_MISS_ELSE` / `_ENDIF` | oui |
+| `ELSE` (30) | `EFECT_OPT_MISS_ELSE` | oui |
+| `ENDIF` (31) | `EFECT_OPT_MISS_ENDIF` | oui |
 | `IF_MISSION_SUCCESS` (32) | `EFFCT_OPT_IF_MISS_SUCCESS` | oui |
 | `OR_GROUP` (33) | — | absent des données |
 | `APPLY_CHANGE` (34) | `EFECT_OPT_APPLY_CHANGE` | en partie (point 4) |
@@ -492,11 +594,27 @@ n'est jouée que si le joueur part en vol** (§ 5.3). libRealSpace ouvre l'écra
 du script, après tout `SELECT_MISSION`, sans `LOAD` n, et joue la suite du script avant, même si le
 joueur annule.
 - 13 des 42 scripts de sprite qui contiennent `WEAPON_LOADOUT` ont des commandes après lui.
-  Exemple, MISS 2, scène 20, sprite 12 : `SELECT_MISSION 2`, `PLAY_CONV 23`, `WEAPON_LOADOUT 5`,
-  `SET_FLAG 40`. Si le joueur annule, le drapeau 40 est quand même posé, et le sprite 18 (visible
-  quand 40 est posé ; script `PLAY_SHOT 13`, `PLAY_SHOT 3`, `SET_NEXT_MISSION 3`,
-  `GOTO_NEXT_MISSION`) apparaît sans que la mission ait été volée. MISS 26 : `APPLY_CHANGE 23` et
-  `APPLY_CHANGE 29` sont appliqués même sans vol.
+  Exemple, MISS 2, scène 20, sprite 12 :
+
+  ```
+  SELECT_MISSION 2
+  PLAY_CONV 23
+  WEAPON_LOADOUT 5
+  SET_FLAG 40
+  ```
+
+  Si le joueur annule, le drapeau 40 est quand même posé, et le sprite 18 (`REQU` :
+  `REQUIRE_SET 40`) apparaît sans que la mission ait été volée. Son script :
+
+  ```
+  PLAY_SHOT 13
+  PLAY_SHOT 3
+  SET_NEXT_MISSION 3
+  GOTO_NEXT_MISSION
+  ```
+
+  MISS 26 : `APPLY_CHANGE 23` et `APPLY_CHANGE 29`, placés après `WEAPON_LOADOUT`, sont appliqués
+  même sans vol.
 - `flyOrReturnFromScene` part en vol pour tout sprite ≠ 20 ; dans le jeu, seul le sprite 12 fait
   partir.
 - `FLY_MISSION_NOW` part en vol **sans** écran d'armement dans le jeu ; `EFECT_OPT_FLYM2` passe par
@@ -514,13 +632,60 @@ joueur annule.
 `runFrame` vide d'abord la file des plans (`PLAY_SHOT`, `SHOW_MAP`), puis celle des cinématiques
 (`PLAY_MIDGAME`), puis celle des conversations (`PLAY_CONV`). 5 scripts sont joués dans un autre
 ordre, par exemple :
-- MISS 45, script : `PLAY_CONV 221`, `PLAY_MIDGAME 16`, `SET_MUSIC_MOOD 0`, `PLAY_CONV 222` → dans
-  libRealSpace, la cinématique 16 passe avant la conversation 221 ;
-- MISS 21, scène 6, sprite 0 : `PLAY_MIDGAME 5`, `PLAY_SHOT 2`, `PLAY_SHOT 5` → les plans 2 et 5
-  passent avant la cinématique 5 ;
-- MISS 41, scène 13, sprite 16 (`PLAY_CONV 208` … `PLAY_CONV 210`, `PLAY_MIDGAME 12`) et MISS 8,
-  scène 20, sprite 18 (`PLAY_SHOT 15`, `PLAY_SHOT 3`, `PLAY_MIDGAME 3` … `PLAY_CONV 54`,
-  `PLAY_MIDGAME 34`).
+- MISS 45, script de la mission ; dans libRealSpace, la cinématique 16 passe avant la conversation
+  221 :
+
+  ```
+  PLAY_GAMEFLOW_TUNE 2
+  SET_MUSIC_MOOD 0
+  PLAY_CONV 221
+  PLAY_MIDGAME 16
+  SET_MUSIC_MOOD 0
+  PLAY_CONV 222
+  SET_NEXT_MISSION 46
+  APPLY_CHANGE 20
+  PLAY_SCENE 11
+  ```
+
+- MISS 21, scène 6, sprite 0 ; les plans 2 et 5 passent avant la cinématique 5 :
+
+  ```
+  PLAY_MIDGAME 5
+  PLAY_SHOT 2
+  PLAY_SHOT 5
+  SET_FLAG 85
+  PLAY_SCENE 11
+  ```
+
+- MISS 41, scène 13, sprite 16 ; la cinématique 12 passe avant les conversations 208 à 210 :
+
+  ```
+  IF_MISSION_SUCCESS 36
+      PLAY_CONV 208
+  ELSE
+      PLAY_CONV 209
+  ENDIF
+  PLAY_CONV 210
+  PLAY_MIDGAME 12
+  SET_NEXT_MISSION 42
+  APPLY_CHANGE 4
+  APPLY_CHANGE 5
+  GOTO_NEXT_MISSION
+  ```
+
+- MISS 8, scène 20, sprite 18 ; la cinématique 34 passe avant la conversation 54 :
+
+  ```
+  PLAY_SHOT 15
+  PLAY_SHOT 3
+  PLAY_MIDGAME 3
+  SET_MUSIC_MOOD 8
+  APPLY_CHANGE 7
+  APPLY_CHANGE 24
+  PLAY_CONV 54
+  PLAY_MIDGAME 34
+  GOTO_NEXT_MISSION
+  ```
 
 **Correction** : une seule file d'activités dans l'ordre du script.
 
@@ -560,7 +725,7 @@ la conversation deux fois.
 |---|---|---|---|
 | `SET_MUSIC_MOOD` | 11 | humeur musicale du déroulement = n (`Music_SetGameflowMood_28C73`) ; valeurs 0, 6 et 8 | `EFECT_OPT_U8`, pas de cas |
 | `SHOW_KILL_MARKS` | 27 | marques de victoires peintes sur l'avion (`OPTIONS.IFF` `MARK`), si le joueur a eu des victoires et n'est pas mort | `EFECT_OPT_U10`, pas de cas |
-| `REMOVE_PILOT` | 2 | retire le pilote n du tableau des victoires | `EFECT_OPT_U11` / `U16`, pas de cas |
+| `REMOVE_PILOT` | 2 | retire le pilote n du tableau des victoires | `EFECT_OPT_U11`, pas de cas |
 | `PLAY_GAMEFLOW_TUNE` | 18 | joue tout de suite le morceau n (1 à 5) de `gameflow.dat` (`Music_PlayGameflowTune_28CFC`) et le garde dans la partie (sauvegardé) ; première commande de 14 des 18 scripts qui l'ont (`PLAY_GAMEFLOW_TUNE 1` dans MISS 0) | `GameState.tune_modifier = n` : ne joue rien, choisit la série de morceaux joués au clic d'un sprite (`clicked`) |
 
 Pour `PLAY_GAMEFLOW_TUNE`, le jeu joue le morceau au moment de la commande ; la façon dont il choisit

@@ -94,9 +94,12 @@ ni de `0x25`. Seules exceptions : le suffixe d'adresse des noms de fonctions
 **9. Les instructions par leur nom, pas par leur valeur.**
 Une commande ou une instruction de script (déroulement, conversation, script de mission) se
 désigne par son **nom** dans tout le texte : `SET_NEXT_MISSION`, `CLOSEUP`, `OP_ADD_1_TO_FLAG`.
-Sa valeur n'apparaît que dans la table de référence qui définit les noms. Une suite de script
-s'écrit avec les noms : `PLAY_CONV 221`, `PLAY_MIDGAME 16`, `GOTO_NEXT_MISSION` — jamais
-« (0, 221) (2, 16) ». Noms : ceux de libRealSpace (`SCenums.h`, `SCConvPlayer.cpp`) quand ils
+Sa valeur n'apparaît que dans la table de référence qui définit les noms. **Une instruction = une
+ligne** : une suite de script s'écrit dans un bloc de code, une instruction par ligne avec son
+argument (jamais « (0, 221) (2, 16) », ni plusieurs instructions sur une ligne de texte) ; dans un
+tableau d'instructions, une instruction par ligne de tableau (pas de « 6 / 7 », « 40 / 41 » ni de
+plage « 128–152 »). Pas de `<br>` dans les fichiers `.md` : si une cellule de tableau devrait
+contenir un script, le script va dans un bloc sous le tableau. Noms : ceux de libRealSpace (`SCenums.h`, `SCConvPlayer.cpp`) quand ils
 existent, sinon les noms proposés des tables de référence (`GAMEFLOW_SYSTEM.md` § 5.2,
 `CONV_SYSTEM.md` § 2, `MISSION_SCRIPT_OPCODES.md`, conditions `REQU` au § 4.2 de GAMEFLOW).
 
