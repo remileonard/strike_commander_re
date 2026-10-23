@@ -175,7 +175,7 @@ lignes, gauche, haut, droite, bas) :
   par `TextRenderer_ApplyFormatChange_2EA21`, mise en surface de dessin courante (`word_46F44`) par
   `SmallObject_RegisterInList_2CB40` ;
 - l'**écran** (`var_1D6`) : copie du descripteur de l'écran (`word_46F46`) dont le rectangle est
-  remplacé par (0, 24) – (319, 151) (`mov [bp+var_1D0], 18h` / `mov [bp+var_1CC], 97h`). C'est la
+  remplacé par (0, 24) – (319, 151) (`mov [bp+var_1D0], 24` / `mov [bp+var_1CC], 151`). C'est la
   surface passée à `Scene_Create_C55E`.
 
 `Scene_Tick_C652` dessine chaque calque dans l'image hors écran, en (x, y) de la scène, puis la
@@ -477,8 +477,8 @@ Utilisée une fois dans mid1 (scène 18, `midgames` 0, en (160, 128), vers l'ava
 ### 6.6 La bouche de la tête parlante
 
 La tête parlante dessine, dans l'ordre : l'image 0 de sa ressource (la tête), une **image de
-base**, une **image de bouche**, ses enfants. La tête simple (table 1883h, mid2) ajoute ensuite
-l'**image 1** (coiffure) et l'**image 34** (habits) : `TalkingHead_DrawDressed_9E5E`, champ +848h
+base**, une **image de bouche**, ses enfants. La tête simple (table 6275, mid2) ajoute ensuite
+l'**image 1** (coiffure) et l'**image 34** (habits) : `TalkingHead_DrawDressed_9E5E`, champ +2120
 toujours 34. La tête de mid1 (`TalkingHeadOverlay`) ajoute à la place les images 35 et 38.
 
 - **Image de base.** Fixée par `TalkingHead_SetBaseFrame_9D32` (mid1 : 31 ou 27). Une fois sur 30
@@ -504,7 +504,7 @@ cas particuliers :  "er" → bouche 6 ;  "th" → bouche 9 ;  "ch" → bouche 6 
   charge la réplique dans le lecteur de la tête et calcule sa table de bouches
   (`VoicePlayer_LoadWithLipSync_7D52`), pour la cadence de la scène :
   1. le son (VOC, premier bloc, octets non signés) est découpé en tranches d'une image de scène :
-     fréquence ÷ cadence échantillons, fréquence = 1 000 000 / (256 − octet 1Eh du VOC) ;
+     fréquence ÷ cadence échantillons, fréquence = 1 000 000 / (256 − octet 30 du VOC) ;
   2. valeur d'une tranche = moyenne des échantillons − 128, × 1000 ;
   3. référence = la plus grande valeur absolue, **sans** compter la tranche la plus haute ni la plus
      basse ; p = (référence − |valeur|) × 100 / référence ;
@@ -987,7 +987,7 @@ défilement en boucle ; détail dans `MID1_PLANS.md`, « mid3 ».
 **mid12 (2026-10-21)** : calque image à l'échelle (`ScaledImageLayer_Construct_9391`) et calque
 fixe à l'origine (`Layer_ConstructAtOrigin_2DE95`) ; détail dans `MID1_PLANS.md`, « mid12 ».
 
-**mid15 (2026-10-21)** : zoom animé (`ScaledImageLayer_SetScale_94F4`) ; l'emplacement +18h de
+**mid15 (2026-10-21)** : zoom animé (`ScaledImageLayer_SetScale_94F4`) ; l'emplacement +24 de
 toutes les tables de méthodes de calques est `Layer_MoveBy_2E29E` ; détail dans `MID1_PLANS.md`, « mid15 ».
 
 Les 10 autres fonctions (une par cinématique : `sub_6B9C0` mid2, `sub_71680` mid3, `sub_768F0`

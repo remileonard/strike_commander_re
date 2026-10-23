@@ -236,7 +236,7 @@ Fonction pas encore nommée `sub_768F0` : `--nom mid5`. 20 plans, 63,3 s (65,1 s
 répliques et têtes en mode voix comme mid2. Mécanismes nouveaux (2026-10-21) :
 - **calque mobile à l'échelle** (`ScaledMovingLayer_Construct_9544`, dessin
   `Render_DrawRotatedScaledSprite_33586`) : deux échelles en 1/256 (pas de lecture du dessin =
-  1000000h / échelle : 256 = taille d'origine, négatif = retourné) ; mid5 : les trois silhouettes qui
+  16777216 / échelle : 256 = taille d'origine, négatif = retourné) ; mid5 : les trois silhouettes qui
   s'enfuient, à 300 (× 1,17). **Pas exprimé dans le format** : l'image est écrite à sa taille
   d'origine, d'où 144 instants différents ; sans l'échelle, 0 écart. Le rendu de référence fait
   l'agrandissement au plus proche voisin autour du point d'origine de l'image ; les arrondis exacts de
@@ -277,7 +277,7 @@ répliques et têtes en mode voix. Mécanismes nouveaux (2026-10-21) :
   chaque image. Premier plan : deux avions de 32 à 255 (× 0,125 à × 1), en se déplaçant.
   **Pas exprimé dans le format** (245 instants différents ; sans l'échelle, 0 écart) : c'est le
   plan où l'absence d'échelle se voit le plus ;
-- **déplacement par la table de méthodes** : l'emplacement +18h de toutes les tables de calques est
+- **déplacement par la table de méthodes** : l'emplacement +24 de toutes les tables de calques est
   `Layer_MoveBy_2E29E` (vérifié sur les 16 tables) ; l'appel indirect est traité comme « déplace ».
   Tremblement des têtes et des cockpits (−1, 0, +1 pixel). Corrige aussi mid12 (5 déplacements qui
   étaient ignorés) ;

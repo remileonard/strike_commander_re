@@ -1,5 +1,8 @@
 # Ordres de mission — comment le script les exécute réellement
 
+> **Nombres en décimal** (opcodes, arguments, champs `+n`). Les adresses de code citées sont aussi
+> en décimal ; les fichiers annotés les écrivent en hexadécimal.
+
 *Convention adoptée pour ce document : pseudocode C, pas d'assembleur
 brut. Chaque fonction est désignée par son nom sémantique (voir
 `known_functions.json`), jamais par sa seule adresse (`sub_XXXXX`) —
@@ -32,25 +35,25 @@ flowchart TD
     UpdateProp --> Adapter["Expr_VM_ExecuteSingleInstruction"]
     CockpitKey --> MainGameTick["CombatTarget_WeaponActionSubsystem<br/>(645 lignes — combat/cible/physique,<br/>UN sous-systeme parmi d'autres)"]
     CockpitKey --> SelChange["Scene_DetectAndActivateChange<br/>(appel direct verifie, ligne 167463)"]
-    CockpitKey --> LeavingEvt["Scene_TriggerLeavingEvent<br/>(+0xC on_leaving)"]
-    SelChange -->|"scene changee (garantie suppl.)"| MissionUpdEvt["Scene_TriggerMissionUpdateEvent<br/>(+0x10 — en realite appelee CHAQUE FRAME<br/>via Recompute, sans garde)"]
+    CockpitKey --> LeavingEvt["Scene_TriggerLeavingEvent<br/>(+12 on_leaving)"]
+    SelChange -->|"scene changee (garantie suppl.)"| MissionUpdEvt["Scene_TriggerMissionUpdateEvent<br/>(+16 — en realite appelee CHAQUE FRAME<br/>via Recompute, sans garde)"]
     LeavingEvt --> Adapter
     MissionUpdEvt --> Adapter
     Adapter --> Interp["MissionScript_ExecutePROG<br/>(interprete, 209 cas)"]
 
     Interp -->|"~130 cas"| Plumb["Plomberie generique VM"]
     Interp -->|"ordre de mission"| Relay["MissionScript_DispatchOrderToNative"]
-    Interp -->|"appel direct +0x6FB"| Formation["PartEntry_ResolveSpawnPositionAndActivate"]
+    Interp -->|"appel direct +1787"| Formation["PartEntry_ResolveSpawnPositionAndActivate"]
 
     Relay --> Native["MissionScript_CallNativeHandler"]
     Native -->|"garde echouee"| Fail(["retour 0"])
     Native -->|"garde OK"| Switch{"switch 31 cas<br/>par ordre"}
     Switch --> OrderImpl["Implementation de l'ordre<br/>(resout position/cible)"]
-    OrderImpl --> Controller["controleur generique<br/>+0x52 -&gt; vtable+0x88<br/>ExecuteFlightCommand"]
+    OrderImpl --> Controller["controleur generique<br/>+82 -&gt; vtable+136<br/>ExecuteFlightCommand"]
 
     Formation -->|"rappel interne"| Trigger["Shared_TriggerExprInstruction"]
     Trigger --> Adapter
-    Formation -->|"si +0x52 NUL"| Spawn["AIAircraft_SpawnAndConditionalLoadProfile"]
+    Formation -->|"si +82 NUL"| Spawn["AIAircraft_SpawnAndConditionalLoadProfile"]
     Spawn -->|"PilotProfile_LoadFromPROF"| Profile["Profil MVRS/GOAL/ATRB<br/>(voir AI_SYSTEM.md)"]
     Spawn --> Controller
 
@@ -62,19 +65,19 @@ flowchart TD
     MainLoopTop -.->|"boucle : jmp au sommet<br/>tant que byte_706AF != 6"| MainLoopTop
 
     Alloc["PartEntry_AllocateArray<br/>(construction mission, UNE FOIS)"] --> Load["PartEntry_LoadAndResolveNames"]
-    Load --> Reset["PartEntry_ResetState<br/>+0x52 = NUL au depart"]
+    Load --> Reset["PartEntry_ResetState<br/>+82 = NUL au depart"]
 
     MainGameTick --> WPeriodic["WorldObjects_UpdateFrame_ResetCounters<br/>(sub_221C2, appelee par CombatTarget_WeaponActionSubsystem)"]
-    WPeriodic --> WUpdAll["WorldObjects_UpdateAllAndRemoveDead<br/>(sub_221F2 : parcourt la liste 0x59C3,<br/>slot +0x10 de chaque noeud, retire les morts)"]
-    WUpdAll -->|"slot +0x10 de la classe<br/>de vtable 0x2618"| WUpdAI["WorldObject_UpdateWithAIEntity<br/>(sub_3D9FB)"]
-    WUpdAI -->|"byte_6D558 = 0<br/>entite lue a +0x55, slot +0xC"| MasterTick["AIEntity_MasterTick<br/>(tick par frame ; prepare l'etat puis aiguille ;<br/>voir AI_TICK_CALL_GRAPH.md)"]
+    WPeriodic --> WUpdAll["WorldObjects_UpdateAllAndRemoveDead<br/>(sub_221F2 : parcourt la liste 22979,<br/>slot +16 de chaque noeud, retire les morts)"]
+    WUpdAll -->|"slot +16 de la classe<br/>de vtable 9752"| WUpdAI["WorldObject_UpdateWithAIEntity<br/>(sub_3D9FB)"]
+    WUpdAI -->|"byte_6D558 = 0<br/>entite lue a +85, slot +12"| MasterTick["AIEntity_MasterTick<br/>(tick par frame ; prepare l'etat puis aiguille ;<br/>voir AI_TICK_CALL_GRAPH.md)"]
     Autopilot["byte_6D558 = 1<br/>(pilotage automatique,<br/>UIScript_ParseAndEvaluate)"] -.->|"suspend le tick IA"| WUpdAI
-    Spawn -->|"WorldObjects_AddToList<br/>(liste 0x59C3)"| WUpdAll
-    Spawn -.->|"objet monde +0x55 = entite IA<br/>(probable : WorldObject_ConstructWithAIEntity)"| WUpdAI
+    Spawn -->|"WorldObjects_AddToList<br/>(liste 22979)"| WUpdAll
+    Spawn -.->|"objet monde +85 = entite IA<br/>(probable : WorldObject_ConstructWithAIEntity)"| WUpdAI
     MasterTick --> TriggerBU["AI_TriggerBehaviorUpdate"]
     TriggerBU --> TopThink["AI_TopLevelThink"]
     TopThink --> React["réactions prioritaires<br/>(menace, escorte, dégâts)"]
-    React -->|"aucune réaction"| ActiveObj["objet à entité+0x0D<br/>(nature inconnue)"]
+    React -->|"aucune réaction"| ActiveObj["objet à entité+13<br/>(nature inconnue)"]
     ActiveObj -->|"nul, avion au sol"| GoalExec["Goal_ExecuteAction"]
     ActiveObj -->|"nul, avion en vol"| GoalSlots["emplacements GOAL du fichier<br/>(un gestionnaire par octet)"]
     GoalSlots -->|"2"| GoalExec
@@ -83,9 +86,9 @@ flowchart TD
     GoalSlots -->|"5"| ActiveWingman["Goal_MoraleReaction_878F (GOAL=5)"]
 
     Profile -.->|"ecrit une fois,<br/>relu en boucle par l'autre arbre"| MasterTick
-    Formation -.->|"entite+0x11D = 0xAA/0xA5<br/>(LIEN REEL, bidirectionnel)"| ActiveWingman
-    ActiveWingman -.->|"peut aussi ECRIRE<br/>entite+0x11D elle-meme"| Formation
-    ActiveWingman -->|"execute via le meme<br/>noeud ID=21 (entite+0xD1)"| Controller
+    Formation -.->|"entite+285 = 170/165<br/>(LIEN REEL, bidirectionnel)"| ActiveWingman
+    ActiveWingman -.->|"peut aussi ECRIRE<br/>entite+285 elle-meme"| Formation
+    ActiveWingman -->|"execute via le meme<br/>noeud ID=21 (entite+209)"| Controller
 
     classDef construction fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b
     classDef dispatch fill:#f3e8ff,stroke:#a855f7,stroke-width:2px,color:#1e293b
@@ -114,13 +117,13 @@ n'est plus un « arbre séparé » sans parent.** Son appelant est maintenant
 tracé depuis `MAIN_GAME_TICK` (nouvelles flèches vertes du graphe) :
 `CombatTarget_WeaponActionSubsystem` → `WorldObjects_UpdateFrame_ResetCounters`
 → `WorldObjects_UpdateAllAndRemoveDead` (parcourt la liste chaînée de tag
-0x59C3, slot +0x10 de chaque nœud) → `WorldObject_UpdateWithAIEntity` (l'objet
-monde lit l'entité IA à +0x55) → `AIEntity_MasterTick` (slot +0xC de la
+22979, slot +16 de chaque nœud) → `WorldObject_UpdateWithAIEntity` (l'objet
+monde lit l'entité IA à +85) → `AIEntity_MasterTick` (slot +12 de la
 vtable de l'entité, uniquement si `byte_6D558`, le drapeau de pilotage
 automatique, vaut 0). Le détail, les noms modifiés et ce qui reste non
 résolu sont dans `AI_TICK_CALL_GRAPH.md`. Le lien avec la branche « spawn »
 est le même objet : `AIAircraft_SpawnAndConditionalLoadProfile` ajoute
-l'objet créé à la liste 0x59C3 (`WorldObjects_AddToList`, ancien nom
+l'objet créé à la liste 22979 (`WorldObjects_AddToList`, ancien nom
 `Expr_Node_RegisterListener`, qui n'enregistre aucun écouteur `Expr_VM`).
 Les liens `AI_TriggerBehaviorUpdate` → `AI_TopLevelThink` → `Goal_ExecuteAction`
 ci-dessous viennent des sessions précédentes et n'ont pas été relus lors de
@@ -132,7 +135,7 @@ GOAL ni MVRS, il prépare l'état puis aiguille vers `Goal_FollowAllyExec` ou
 chaîne `AI_TopLevelThink` → `Goal_ExecuteAction` → tournoi →
 `Goal_MoraleReaction_878F` dessinée ici auparavant était inexacte. Le
 graphe ci-dessus montre maintenant la structure lue : réactions
-prioritaires, puis l'objet à `entité+0x0D`, puis `Goal_ExecuteAction`
+prioritaires, puis l'objet à `entité+13`, puis `Goal_ExecuteAction`
 direct si l'avion est au sol, sinon les gestionnaires du tableau `GOAL`
 (2, 3, 4, 5). Détail et citations dans `AI_TICK_CALL_GRAPH.md`.
 
@@ -170,9 +173,9 @@ même passage.*
 ```c
 void MissionScenario_RecomputeFields(MissionScenario *scenario)
 {
-    if (scenario->currentScene != 0)   // +0x50
+    if (scenario->currentScene != 0)   // +80
         Scene_TriggerMissionUpdateEvent(scenario->currentScene);
-    if (scenario->pendingScene != 0)    // +0x4E
+    if (scenario->pendingScene != 0)    // +78
         Scene_TriggerMissionUpdateEvent(scenario->pendingScene);
 
     if (PositionMatchesGlobalCheckpoint()) {
@@ -187,10 +190,10 @@ void MissionScenario_RecomputeFields(MissionScenario *scenario)
 
 **Deux découvertes majeures** :
 
-1. **`+0x4E` et `+0x50` sur `MissionScenario` sont des pointeurs de
+1. **`+78` et `+80` sur `MissionScenario` sont des pointeurs de
    `SceneRecord`** — corrige une documentation antérieure de
    `DATA_MODEL.md` qui les décrivait comme un "handle de nœud" et un
-   "flag HOME". `+0x50` correspond exactement au champ rempli par
+   "flag HOME". `+80` correspond exactement au champ rempli par
    `Scene_DetectAndActivateChange`.
 2. **Cette fonction manipule directement `byte_706AF`** — l'octet qui
    contrôle la sortie de la boucle principale du jeu
@@ -220,8 +223,8 @@ MAIN_GAME_TICK (chaque frame)
     Scene_DetectAndActivateChange (chaque frame)
         Scene_FindMatchingByAreaContainment -> resout la scene active courante
         si elle a change depuis le dernier appel :
-            si une ancienne scene existait : declenche son +0x10 (on_mission_update)
-            si une nouvelle scene existe :   Scene_TriggerActivation -> +0x08 (on_is_activated)
+            si une ancienne scene existait : declenche son +16 (on_mission_update)
+            si une nouvelle scene existe :   Scene_TriggerActivation -> +8 (on_is_activated)
                                               + fait apparaitre ses unites (Scene_EnsureUnitsSpawned)
         sinon (scene inchangee) : rien ne se declenche
 ```
@@ -232,7 +235,7 @@ depuis `Scene_DetectAndActivateChange` (uniquement sur changement de
 scène), on aurait pu croire que c'était un événement ponctuel. Mais
 **`Scene_TriggerMissionUpdateEvent_53211` elle-même n'a aucune
 garde** — c'est **`MissionScenario_RecomputeFields_A9382`**, appelée
-sans condition à chaque frame, qui la déclenche tant que `+0x50`
+sans condition à chaque frame, qui la déclenche tant que `+80`
 (la scène active courante) reste non nul. **`on_mission_update` d'une
 scène tourne donc bien en continu, une fois par frame, exactement
 comme celui de `PART`** (voir `PartEntry_DispatchMissionUpdateTick`).
@@ -240,10 +243,10 @@ comme celui de `PART`** (voir `PartEntry_DispatchMissionUpdateTick`).
 L'appel depuis `Scene_DetectAndActivateChange` (uniquement quand la
 scène change) est une **garantie supplémentaire** — s'assurer que
 l'ancienne scène reçoit un dernier appel avec sa propre référence,
-juste avant que `+0x50` ne soit remplacé par la nouvelle — pas le
+juste avant que `+80` ne soit remplacé par la nouvelle — pas le
 mécanisme principal.
 
-Un troisième champ, `+0x0C` (`on_leaving`), est déclenché séparément
+Un troisième champ, `+12` (`on_leaving`), est déclenché séparément
 par `Scene_TriggerLeavingEvent_531F2` — appelé directement depuis `MAIN_GAME_TICK`, pas
 depuis `Scene_DetectAndActivateChange`.
 
@@ -252,7 +255,7 @@ depuis `Scene_DetectAndActivateChange`.
 *Erreur de nommage identifiée en cherchant qui parcourt la liste des
 `SCNE` (scènes de mission).*
 
-En cherchant une boucle au pas `0x27` (39 octets, taille exacte d'un
+En cherchant une boucle au pas `39` (39 octets, taille exacte d'un
 enregistrement `SCNE`), on retrouve `Scene_FindMatchingByAreaContainment`
 (`sub_53236`) :
 
@@ -260,7 +263,7 @@ enregistrement `SCNE`), on retrouve `Scene_FindMatchingByAreaContainment`
 SceneRecord *Scene_FindMatchingByAreaContainment(PlayObject *play, uint16_t param)
 {
     for (uint16_t i = 0; i < play->sceneCount; i++) {
-        SceneRecord *scene = play->sceneArray + i * 0x27;
+        SceneRecord *scene = play->sceneArray + i * 39;
         if (scene->is_active && scene->areaHandle) {
             bool matches = (scene->areaHandle == 0)
                 ? true
@@ -285,7 +288,7 @@ de "formation" ou de "groupe" : le "groupe" détecté et activé, c'était
 
 `Scene_EnsureUnitsSpawned` (`sub_530FF`) prend maintenant tout son
 sens : son paramètre est très probablement **la scène elle-même**, et
-`+0x14`/`+0x16` correspondent à la **liste d'unités** documentée en
+`+20`/`+22` correspondent à la **liste d'unités** documentée en
 queue du chunk `SCNE` (`DATA_MODEL.md` — liste de `u16`, index dans
 `PART`) — elle s'assure que toutes les unités associées à la scène
 existent bel et bien au moment où celle-ci s'active.
@@ -304,19 +307,19 @@ fonction ?*
 
 Deux preuves convergentes permettent de trancher avec confiance :
 
-1. **Le pas de la boucle est exactement `0x55` (85 octets)** — la
+1. **Le pas de la boucle est exactement `85` (85 octets)** — la
    taille exacte confirmée de `PartEntry` (`PartEntry_AllocateArray`)
-2. **Le bit testé est le bit 0 de `+0x39`** — le même champ de statut
+2. **Le bit testé est le bit 0 de `+57`** — le même champ de statut
    manipulé par `PartEntry_ResetState`
 
 ```c
 void PartEntry_DispatchMissionUpdateTick(PartEntry *partTable, uint16_t count)
 {
     for (uint16_t i = 0; i < count; i++) {
-        if (partTable[i].statusFlags & 0x01) {   // bit "on_mission_update actif"
+        if (partTable[i].statusFlags & 1) {   // bit "on_mission_update actif"
             Expr_Node_UpdateAndPropagate(&partTable[i]);
         }
-        partTable += 1;   // += 0x55 octets
+        partTable += 1;   // += 85 octets
     }
 }
 ```
@@ -326,7 +329,7 @@ void PartEntry_DispatchMissionUpdateTick(PartEntry *partTable, uint16_t count)
 correspondant est actif — le point d'entrée de toute la chaîne qui
 suit (`Expr_Node_UpdateAndPropagate` → `Expr_VM_ExecuteSingleInstruction`
 → `MissionScript_ExecutePROG`) et qui finit par exécuter le script
-`on_mission_update` de ce participant (`PartEntry+0x46/0x48`).
+`on_mission_update` de ce participant (`PartEntry+70/72`).
 
 
 (vérifiée en entier, 289 lignes) charge la police, configure la
@@ -367,7 +370,7 @@ l'une par `PartEntry_DispatchMissionUpdateTick` (script de mission, spawn),
 l'autre par `CombatTarget_WeaponActionSubsystem` →
 `WorldObjects_UpdateFrame_ResetCounters` → `WorldObjects_UpdateAllAndRemoveDead`
 → `WorldObject_UpdateWithAIEntity` → `AIEntity_MasterTick`. Elles communiquent
-par l'objet monde et la liste 0x59C3, pas par un appel direct. Voir
+par l'objet monde et la liste 22979, pas par un appel direct. Voir
 `AI_TICK_CALL_GRAPH.md`.*
 
 ## Découverte architecturale : ce n'est pas un système de mission, c'est
@@ -389,9 +392,9 @@ rapport entre eux :
 | `Expr_Node_EvaluateVisibility` | Graphe de nœuds générique |
 | `STRIKE_EXE_MAIN_LOOP` | **Boucle principale du jeu** (corrigé — pas une simple interface) |
 | `Weapon_HUDBox_UpdateAndRender` | HUD d'armement |
-| `Landing_Phase3_TouchdownRoll_765B2` (ex-`AITargeting_ComputeOrientationExtended`) | Fin de l'atterrissage du joueur (entrée +0x40 du script, voir `MUSIC_SYSTEM.md` §5.4) |
+| `Landing_Phase3_TouchdownRoll_765B2` (ex-`AITargeting_ComputeOrientationExtended`) | Fin de l'atterrissage du joueur (entrée +64 du script, voir `MUSIC_SYSTEM.md` §5.4) |
 | `UIScript_ParseAndEvaluate` | Script d'interface |
-| `Collision_OnTerrainContact_9D910` (ex-`Gauge_ComputeAndRenderNeedle`) | Contact au sol accepté du joueur (entrée +0x40 du script) |
+| `Collision_OnTerrainContact_9D910` (ex-`Gauge_ComputeAndRenderNeedle`) | Contact au sol accepté du joueur (entrée +64 du script) |
 | `PartEntry_ResolveSpawnPositionAndActivate` | Mission (celui qu'on a tracé) |
 
 **Conclusion** : `MissionScript_ExecutePROG` (l'interprète à 209 cas)
@@ -423,10 +426,10 @@ générique.
 
 ```c
 int16_t MissionScript_CallNativeHandler(
-    PartEntry *missionObject,  // arg_0 (dword) — objet reference par [instruction+0x12]
+    PartEntry *missionObject,  // arg_0 (dword) — objet reference par [instruction+18]
     uint16_t opcode,                 // arg_4 (word)  — le code d'ordre, ex. ORDER_TAKE_OFF
     uint16_t param1,                 // arg_6 (word)  — [instruction+8]
-    uint16_t param2                  // arg_8 (word)  — [instruction+0xA]
+    uint16_t param2                  // arg_8 (word)  — [instruction+10]
 );
 ```
 
@@ -436,7 +439,7 @@ int16_t MissionScript_CallNativeHandler(
 |---|---|
 | `resolvedPosition` | Position 3D calculée par le cas de l'ordre (x,y,z, virgule fixe 24.8) |
 | `resolvedTargetObject` | Pointeur vers l'objet cible/allié résolu, si l'ordre en implique un |
-| `skillValue` | Valeur de "compétence" transmise au contrôleur générique — copiée depuis `resolvedTargetObject->performanceStat` (le champ `+0x52` scalaire, issu du sous-chunk `TOFF`) si un objet a été résolu |
+| `skillValue` | Valeur de "compétence" transmise au contrôleur générique — copiée depuis `resolvedTargetObject->performanceStat` (le champ `+82` scalaire, issu du sous-chunk `TOFF`) si un objet a été résolu |
 
 ### Pseudocode
 
@@ -454,7 +457,7 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
         return 0;   // objet indisponible -> echec immediat, quel que soit l'ordre
     }
 
-    missionObject->completionFlag = 0xFF;   // pose l'etat "ordre en cours"
+    missionObject->completionFlag = 255;   // pose l'etat "ordre en cours"
 
     Vec3 resolvedPosition = {0};
     PartEntry *resolvedTargetObject = NULL;
@@ -470,7 +473,7 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
             break;
 
         case ORDER_FLY_TO_MISSION_POINT:
-        case ORDER_FLY_TO_RELATIVE_POINT:      // partage le meme code (0xAC)
+        case ORDER_FLY_TO_RELATIVE_POINT:      // partage le meme code (172)
             // resout DEUX positions successives (depart + arrivee ?)
             Vec3 posA = LookupNamedWaypoint(g_waypointTable, param2);
             Vec3 posB = LookupNamedWaypoint(g_waypointTable, missionObject->localPositionRef);
@@ -495,7 +498,7 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
             break;
 
         case ORDER_FOLLOW_ALLY: {
-            uint16_t allyId = (param1 == 0xFF) ? missionObject->defaultAllyId : param1;
+            uint16_t allyId = (param1 == 255) ? missionObject->defaultAllyId : param1;
             resolvedTargetObject = ResolveObjectById(g_objectTable, allyId);
             if (resolvedTargetObject != NULL) {
                 resolvedPosition = resolvedTargetObject->rawPosition;  // lecture directe, pas GetCurrentPosition
@@ -503,7 +506,7 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
             break;
         }
 
-        // 0xA3, 0xAB, 0xB1-0xB5 : mecanismes proches (resolution d'objet
+        // 163, 171, 177-181 : mecanismes proches (resolution d'objet
         // ou table de positions) mais nature tactique precise non
         // confirmee empiriquement — voir table plus bas
 
@@ -512,16 +515,16 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
     }
 
     if (resolvedTargetObject != NULL) {
-        skillValue = resolvedTargetObject->performanceStat;   // champ +0x52 scalaire (TOFF)
+        skillValue = resolvedTargetObject->performanceStat;   // champ +82 scalaire (TOFF)
     }
 
     // --- Sortie commune : delegation a l'execution tactique reelle ---
     // AUCUN calcul de poursuite/tir ne vit ici ni dans aucun cas ci-dessus
     return missionObject->controller->vtable->ExecuteFlightCommand(
         resolvedPosition, skillValue, opcode, param2 /* duree ? */
-    );   // [controller->vtable+0x88] — methode generique, PAS specifique au vol
+    );   // [controller->vtable+136] — methode generique, PAS specifique au vol
           // (le meme slot est aussi appele par PartEntry_ResolveSpawnPositionAndActivate
-          // avec un opcode different, 0xB3 — confirme un dispatcheur
+          // avec un opcode different, 179 — confirme un dispatcheur
           // multi-usage, pas un controleur de vol dedie)
 }
 ```
@@ -538,19 +541,19 @@ int16_t MissionScript_CallNativeHandler(PartEntry *missionObject,
 
 ### Ce qui reste incertain
 
-- **`ExecuteFlightCommand`** (`[vtable+0x88]`) — **RÉSOLU le 2026-09-19** : ce
-  n'est pas une exécution tactique. Sur la classe d'objet monde `0x27BC` elle
-  transmet l'ordre à l'entité IA (`[si+55h]`, slot `+0x10`), c'est-à-dire à
-  `Goal_SetObjective_A307`, qui pose l'objectif (`entité+0x11D`, cibles,
-  positions) ; sur les classes `0x26A4`, `0x2618`, `0x2730` c'est un no-op qui
+- **`ExecuteFlightCommand`** (`[vtable+136]`) — **RÉSOLU le 2026-09-19** : ce
+  n'est pas une exécution tactique. Sur la classe d'objet monde `10172` elle
+  transmet l'ordre à l'entité IA (`[si+85]`, slot `+16`), c'est-à-dire à
+  `Goal_SetObjective_A307`, qui pose l'objectif (`entité+285`, cibles,
+  positions) ; sur les classes `9892`, `9752`, `10032` c'est un no-op qui
   renvoie 0. Détail dans `AI_TICK_CALL_GRAPH.md`. *Ancien texte :* la méthode
   réellement responsable de l'exécution tactique n'avait pas été identifiée. Elle
   est générique (utilisée aussi par un système de rendu/géométrie
   sans rapport, avec un opcode différent), donc probablement un
   "bus de commande" d'entité plutôt qu'un contrôleur de vol dédié.
-- Le champ `controller` (`+0x52` comme pointeur) — aucun site de
+- Le champ `controller` (`+82` comme pointeur) — aucun site de
   construction retrouvé par recherche textuelle à ce stade.
-- **Piège à ne pas refaire** : ce même décalage `+0x52` est aussi un
+- **Piège à ne pas refaire** : ce même décalage `+82` est aussi un
   champ **scalaire** (`performanceStat`, issu du sous-chunk `TOFF`)
   sur un objet totalement différent (la définition d'avion chargée
   au parsing `JETP`) — deux structures distinctes, même décalage.
@@ -570,12 +573,12 @@ l'instruction elle-même.
 void MissionScript_DispatchOrderToNative(ScriptInstruction *instr)
 {
     instr->taskState = MissionScript_CallNativeHandler(
-        instr->missionObjectRef,   // [instr+0x12]
+        instr->missionObjectRef,   // [instr+18]
         instr->opcode,               // [instr+6]
         instr->param1,                // [instr+8]
-        instr->param2                 // [instr+0xA]
+        instr->param2                 // [instr+10]
     );
-    // instr->taskState ([instr+0xE]) devient l'etat "ordre en cours"
+    // instr->taskState ([instr+14]) devient l'etat "ordre en cours"
     // -> relu par IsOrderActive/IsOrderComplete (voir plus bas)
 }
 ```
@@ -592,25 +595,25 @@ void MissionScript_DispatchOrderToNative(ScriptInstruction *instr)
 | **Destroy target** | Résolution d'objet | Position de la cible relue à jour à chaque appel |
 | **Defend target** | Résolution d'objet (double) | Cible à défendre + une seconde résolution non élucidée |
 | **Defend area** | Table de positions | Coordonnée fixe, pas d'objet suivi |
-| **Follow ally** | Résolution d'objet + lecture directe | `0xFF` = allié par défaut ; lit la position brute, pas via résolution différée |
+| **Follow ally** | Résolution d'objet + lecture directe | `255` = allié par défaut ; lit la position brute, pas via résolution différée |
 
 ### Ordres non identifiés dans la table externe de Rémi
 
 | Code | Mécanisme | Hypothèse |
 |---|---|---|
-| `0xA3` | Résolution d'objet + relecture d'une position "Take off" | Possible "escorter X puis continuer" |
-| `0xAB` | Copie directe de `completionFlag`, pas de résolution | Possible "vérifier si l'ordre précédent est terminé" |
-| `0xB1` | Table indexée, écrit un axe (Y ?) | Possible "définir l'altitude depuis une liste" |
-| `0xB2` | Même table, axe différent | Complément de `0xB1` |
-| `0xB3` | Résolution d'objet | Variante de ciblage non déterminée |
-| `0xB4` | Table de positions | Variante de positionnement non déterminée |
-| `0xB5` | Résolution d'objet | Variante de ciblage non déterminée |
+| `163` | Résolution d'objet + relecture d'une position "Take off" | Possible "escorter X puis continuer" |
+| `171` | Copie directe de `completionFlag`, pas de résolution | Possible "vérifier si l'ordre précédent est terminé" |
+| `177` | Table indexée, écrit un axe (Y ?) | Possible "définir l'altitude depuis une liste" |
+| `178` | Même table, axe différent | Complément de `177` |
+| `179` | Résolution d'objet | Variante de ciblage non déterminée |
+| `180` | Table de positions | Variante de positionnement non déterminée |
+| `181` | Résolution d'objet | Variante de ciblage non déterminée |
 
 ---
 
 ## Le mécanisme de suivi "ordre en cours / ordre terminé"
 
-`ScriptInstruction->taskState` (`[instr+0xE]`) — un champ sur
+`ScriptInstruction->taskState` (`[instr+14]`) — un champ sur
 l'**instruction elle-même**, pas une variable globale — porte cet
 état. Deux opcodes dédiés le consultent :
 
@@ -637,11 +640,11 @@ entre eux.
 
 | Champ | Rôle |
 |---|---|
-| `entité+0x11D` | Code de l'ordre en cours (consulté par `GOAL`/`Goal_ExecuteAction`) |
-| `entité+0x54` | Drapeau d'état/achèvement (`completionFlag`, `0xFF` = posé) |
-| `entité+0x11` | Nœud construit à la demande (même mécanisme que `MVRS`) |
-| `entité+0x137` | Référence de cible (ordres type "détruire/défendre") |
-| `entité+0x11F`/`+0x12B` | Coordonnées de point de mission, partagées script/`GOAL` |
+| `entité+285` | Code de l'ordre en cours (consulté par `GOAL`/`Goal_ExecuteAction`) |
+| `entité+84` | Drapeau d'état/achèvement (`completionFlag`, `255` = posé) |
+| `entité+17` | Nœud construit à la demande (même mécanisme que `MVRS`) |
+| `entité+311` | Référence de cible (ordres type "détruire/défendre") |
+| `entité+287`/`+299` | Coordonnées de point de mission, partagées script/`GOAL` |
 
 Si deux ordres s'enchaînent sans test explicite, le second **écrase**
 l'état du premier dans ces mêmes champs.
@@ -654,7 +657,7 @@ et de tir est déléguée à `ExecuteFlightCommand` — un point unique et
 générique, identique pour tous les ordres, non encore identifié
 précisément.
 
-## RÉSOLU : le contrôleur `+0x52` est une entité avion/pilote IA
+## RÉSOLU : le contrôleur `+82` est une entité avion/pilote IA
 complète — le même objet que toute la documentation `MVRS`
 
 *Trouvaille majeure qui referme la question ouverte, et relie
@@ -678,7 +681,7 @@ AircraftEntity *spawned = AIAircraft_SpawnAndConditionalLoadProfile(
     g_waypointTable, partEntry->localRef, spawnPosition
 );
 
-SetReference(&partEntry->controller, spawned);   // +0x52 assigne ICI
+SetReference(&partEntry->controller, spawned);   // +82 assigne ICI
 ```
 
 **`AIAircraft_SpawnAndConditionalLoadProfile` (`sub_53363`) est la
@@ -696,7 +699,7 @@ laquelle repose toute la documentation `MVRS`/`ATRB`/`GOAL`
   interprète à 209 cas documenté ici) **avant** le chargement du
   profil
 
-**Conséquence directe** : `[+0x52 → vtable+0x88]`
+**Conséquence directe** : `[+82 → vtable+136]`
 (`ExecuteFlightCommand`) est une méthode de **cette même classe
 d'entité avion/pilote** — pas un système séparé et mystérieux. Que ce
 soit un ordre de script direct ou l'activation d'une scène, le
@@ -713,7 +716,7 @@ graphe `Expr_VM` plutôt qu'à de simples champs C indépendants. Non
 vérifié — candidat pour une prochaine session, avec un lien direct
 vers `AI_SYSTEM.md`.
 
-## RÉSOLU : le lien entre script et `GOAL` — `entité+0x11D` est un canal
+## RÉSOLU : le lien entre script et `GOAL` — `entité+285` est un canal
 bidirectionnel, pas un drapeau à sens unique
 
 *Question empirique posée par Rémi : avec seulement `GOAL=1`, son
@@ -730,7 +733,7 @@ précédente ("le script délègue directement, sans passer par `GOAL`")
 > retournement contre le joueur, rattachement au joueur), pas l'exécution du suivi. Voir
 > `AI_SYSTEM.md` §4.4. Avec `GOAL = 5, 1`, l'avion décolle (ordre exécuté au sol par
 > `Goal_ExecuteAction_A8AC`) puis ne fait plus rien en vol : le seul gestionnaire,
-> `Goal_MoraleReaction_878F`, n'agit que sur le moral. Le suivi (`0xAA`) demande la valeur `2`.
+> `Goal_MoraleReaction_878F`, n'agit que sur le moral. Le suivi (`170`) demande la valeur `2`.
 
 En lisant intégralement `Goal_MoraleReaction_878F` (l'option
 de tournoi liée à `GOAL=5`) :
@@ -741,20 +744,20 @@ void Goal_MoraleReaction_878F(Entity *self, Context *ctx)
 {
     // ... conditions de garde (portee, delai anti-spam byte_6E4CD) ...
 
-    if (self->currentOrder == ORDER_FOLLOW_ALLY) {   // entite+0x11D == 0xAA
+    if (self->currentOrder == ORDER_FOLLOW_ALLY) {   // entite+285 == 170
         // execute le suivi actif, continu, image par image
         RadioAnnounce(self, ...);
-        self->flags_28B |= 0x20;
-        currentOrder->vtable->ExecuteViaID21(self);   // entite+0xD1 -> vtable+8
+        self->flags_28B |= 32;
+        currentOrder->vtable->ExecuteViaID21(self);   // entite+209 -> vtable+8
     }
     else if (/* cible verrouillee correspond a self->allyRef */) {
         // PEUT ELLE-MEME poser l'ordre :
-        self->currentOrder = ORDER_FOLLOW_ALLY;         // entite+0x11D = 0xAA
-        SetReference(&self->allyRef, word_722E6);        // entite+0x145
+        self->currentOrder = ORDER_FOLLOW_ALLY;         // entite+285 = 170
+        SetReference(&self->allyRef, word_722E6);        // entite+325
         currentOrder->vtable->ExecuteViaID21(self);
     }
     else if (/* autre condition */) {
-        self->currentOrder = ORDER_FLY_TO_MISSION_POINT;  // entite+0x11D = 0xA5
+        self->currentOrder = ORDER_FLY_TO_MISSION_POINT;  // entite+285 = 165
         currentOrder->vtable->ExecuteViaID21(self);
     }
 }
@@ -762,15 +765,15 @@ void Goal_MoraleReaction_878F(Entity *self, Context *ctx)
 
 **Deux découvertes en une** :
 
-1. **`entité+0x11D` est un canal à double sens** : le script peut le
+1. **`entité+285` est un canal à double sens** : le script peut le
    poser (via `Goal_SetObjective`), et `Goal_MoraleReaction_878F`
    (`GOAL=5`) le **lit** pour décider d'agir — mais elle peut **aussi
-   l'écrire elle-même**, avec le même vocabulaire de codes (`0xAA`,
-   `0xA5`), selon ses propres observations (correspondance avec
+   l'écrire elle-même**, avec le même vocabulaire de codes (`170`,
+   `165`), selon ses propres observations (correspondance avec
    `word_722E6`, la cible/leader couramment sélectionné).
 
 2. **Les deux chemins (script direct, et `GOAL=5`) convergent vers la
-   même exécution finale** : l'appel à `entité+0xD1 → vtable+8` — le
+   même exécution finale** : l'appel à `entité+209 → vtable+8` — le
    nœud `MVRS` `ID=21` qu'on avait déjà identifié comme exécuteur de
    navigation caché, utilisé aussi bien par
    `PartEntry_ResolveSpawnPositionAndActivate` (côté script) que par cette
@@ -778,25 +781,25 @@ void Goal_MoraleReaction_878F(Entity *self, Context *ctx)
 
 **CORRIGÉ (2026-09-19, lecture de `AI_TopLevelThink`, voir
 `AI_TICK_CALL_GRAPH.md`)** — l'explication initiale de ce paragraphe
-(« aucune option du tournoi ne consulte `entité+0x11D` ») était inexacte.
+(« aucune option du tournoi ne consulte `entité+285` ») était inexacte.
 Ce qui explique l'observation :
 
 1. **Le décollage s'exécute parce que l'avion est au sol.**
    `AI_TopLevelThink` appelle `Goal_ExecuteAction_A8AC` **directement**
-   quand l'octet `+0x20` du sous-objet de l'avion (le drapeau « au sol »
+   quand l'octet `+32` du sous-objet de l'avion (le drapeau « au sol »
    posé par `PhysicsTicks`) est non nul, sans consulter le tableau `GOAL`.
-   Le script pose l'ordre `0xA1` (décollage) et `Goal_ExecuteAction_A8AC`
+   Le script pose l'ordre `161` (décollage) et `Goal_ExecuteAction_A8AC`
    l'exécute, même avec `GOAL=1` seul.
 2. **La valeur `1` du fichier `GOAL` est abandonnée au chargement**
    (`cmp [bp+var_8], 1 / jz` dans `PilotProfile_LoadFromPROF`) : le
    tableau est vide, aucun gestionnaire n'est associé.
 3. **Une fois en vol**, `AI_TopLevelThink` ne parcourt plus que les
    emplacements du fichier. Avec un tableau vide rien ne s'exécute : le
-   suivi (`Follow Ally`, `0xAA`) n'est jamais traité, l'avion garde son
+   suivi (`Follow Ally`, `170`) n'est jamais traité, l'avion garde son
    dernier état. Avec `5`, `Goal_MoraleReaction_878F` est appelé
-   et lit `entité+0x11D`.
+   et lit `entité+285`.
 
-Le canal `entité+0x11D` reste bidirectionnel (le script le pose,
+Le canal `entité+285` reste bidirectionnel (le script le pose,
 `Goal_MoraleReaction_878F` le lit et peut l'écrire), mais le
 choix entre « exécuté » et « ignoré » dépend d'abord du drapeau au sol
 et du tableau `GOAL`, pas d'un test des options du tournoi.
@@ -805,9 +808,9 @@ et du tableau `GOAL`, pas d'un test des options du tournoi.
 choisis par l'octet du fichier, pas des étapes qui s'enchaînent.
 
 
-- Confirmer `0xA3`, `0xAB`, `0xB1`-`0xB5` par observation empirique.
+- Confirmer `163`, `171`, `177`-`181` par observation empirique.
 - Le mécanisme précis reliant le script à `Goal_SetObjective` (système
-  à nœuds séparé, tag `0x120`) — jugé secondaire, le résultat
+  à nœuds séparé, tag `288`) — jugé secondaire, le résultat
   fonctionnel (champs partagés) étant déjà confirmé.
 - Les ~130 cas de plomberie générique du premier switch — hors
   périmètre "ordres de mission" sauf indication contraire.
@@ -848,14 +851,14 @@ elle-même**, en interne, via `Shared_TriggerExprInstruction_5247D`
 supposait à tort un lien avec la géométrie sur la seule foi du nom de
 son appelante). **Ce n'est pas un second système sans rapport qui
 converge par coïncidence** — `PartEntry_ResolveSpawnPositionAndActivate`
-est elle-même appelée par l'interprète (`+0x6FB`), et rappelle
+est elle-même appelée par l'interprète (`+1787`), et rappelle
 l'interprète en interne pour une sous-évaluation, sur la **même**
-structure à 85 octets (`+0x39`, `+0x3A`). C'est un appel récursif
+structure à 85 octets (`+57`, `+58`). C'est un appel récursif
 contrôlé, pas une convergence entre deux systèmes distincts.
 
 **Conséquence** : la structure à 85 octets qu'on a tracée
 (`PartEntry_AllocateArray_AA23D`) et son champ de statut
-(`+0x39`/`+0x3A`/`+0x52`/`+0x54`) forment probablement un patron
+(`+57`/`+58`/`+82`/`+84`) forment probablement un patron
 **générique de "nœud exécutable"**, réutilisé par plusieurs systèmes
 du moteur (mission ET géométrie), pas une structure conçue
 uniquement pour les ordres de mission — cohérent avec tout ce qu'on a
@@ -870,11 +873,11 @@ chargement, un enregistrement de 85 octets par objet.
 ```c
 void PartEntry_AllocateArray(ScriptHeader *header, PartEntry **outArray)
 {
-    int count = header->totalScriptBytes / 0x3E;
+    int count = header->totalScriptBytes / 62;
     // (verification de coherence omise ici, presente dans le code reel)
 
     PartEntry *array = (PartEntry *)AllocateTyped(
-        TAG_MISSION_OBJECT, count * sizeof(PartEntry) /* 0x55 = 85 octets/element */
+        TAG_MISSION_OBJECT, count * sizeof(PartEntry) /* 85 = 85 octets/element */
     );
     *outArray = array;
 
@@ -895,38 +898,38 @@ Rémi) sont résolus en pointeurs directs vers le `PROG` réel.
 ```c
 void PartEntry_LoadAndResolveNames(MissionScenario *scenario, PartEntry *part)
 {
-    PartEntry_ResetState(part);   // +0x32, +0x39, +0x3A, +0x52, +0x54
+    PartEntry_ResetState(part);   // +50, +57, +58, +82, +84
 
     uint8_t rawData[62];
     ReadFieldGroupA(chunk, rawData, 62);   // lecture brute du chunk PART
-    part->flagA = rawData[0];                // +0x1B
+    part->flagA = rawData[0];                // +27
 
-    part->nameA = ResolveNameAt(part, +9);    // +0x8  (role precis non elucide)
-    part->nameB = ResolveNameAt(part, +0x12); // +0x11 (role precis non elucide)
-    part->nameC = ResolveNameAt(part, +0x1A); // +0x1A (role precis non elucide)
+    part->nameA = ResolveNameAt(part, +9);    // +8  (role precis non elucide)
+    part->nameB = ResolveNameAt(part, +18); // +17 (role precis non elucide)
+    part->nameC = ResolveNameAt(part, +26); // +26 (role precis non elucide)
 
     part->position = LookupNamedWaypoint(scenario->areaTable, rawData[...]);
-    // ecrit +0x1C a +0x37 (position + metadonnees associees, roles
+    // ecrit +28 a +55 (position + metadonnees associees, roles
     // precis de chaque sous-champ non tous elucides)
 
     // --- LES 4 progs_id, resolus en pointeurs directs vers PROG ---
-    part->on_is_activated  = Expr_LookupNamedValue(scenario->progTable, rawData_id0); // +0x42/+0x44
-    part->on_mission_update = Expr_LookupNamedValue(scenario->progTable, rawData_id1); // +0x46/+0x48
-    part->on_is_destroyed   = Expr_LookupNamedValue(scenario->progTable, rawData_id2); // +0x4A/+0x4C
-    part->on_missions_init  = Expr_LookupNamedValue(scenario->progTable, rawData_id3); // +0x4E/+0x50
+    part->on_is_activated  = Expr_LookupNamedValue(scenario->progTable, rawData_id0); // +66/+68
+    part->on_mission_update = Expr_LookupNamedValue(scenario->progTable, rawData_id1); // +70/+72
+    part->on_is_destroyed   = Expr_LookupNamedValue(scenario->progTable, rawData_id2); // +74/+76
+    part->on_missions_init  = Expr_LookupNamedValue(scenario->progTable, rawData_id3); // +78/+80
 
     part->field_0x3E = 0;
     part->field_0x40 = 0;
-    // part->controller (+0x52) reste NUL — jamais assigne ici
+    // part->controller (+82) reste NUL — jamais assigne ici
 }
 ```
 
 **Correspondance confirmée avec l'implémentation de Rémi** :
 ```c
-prt->on_is_activated   = prt->progs_id[0];   // -> PartEntry+0x42
-prt->on_mission_update = prt->progs_id[1];   // -> PartEntry+0x46
-prt->on_is_destroyed   = prt->progs_id[2];   // -> PartEntry+0x4A
-prt->on_missions_init  = prt->progs_id[3];   // -> PartEntry+0x4E
+prt->on_is_activated   = prt->progs_id[0];   // -> PartEntry+66
+prt->on_mission_update = prt->progs_id[1];   // -> PartEntry+70
+prt->on_is_destroyed   = prt->progs_id[2];   // -> PartEntry+74
+prt->on_missions_init  = prt->progs_id[3];   // -> PartEntry+78
 ```
 
 Chaque champ est un **pointeur lointain déjà résolu** vers le script
@@ -934,11 +937,11 @@ réel dans `PROG` — pas l'identifiant brut conservé tel quel. La
 résolution se fait **une fois**, au chargement de la mission, pas à
 chaque déclenchement de l'événement.
 
-**Point ouvert** : `+0x3E`/`+0x40`, remis à zéro juste après les 4
+**Point ouvert** : `+62`/`+64`, remis à zéro juste après les 4
 `progs_id`, sont des candidats plausibles pour l'état d'exécution
 courant (quel script actif, quelle instruction) — distinct de
-`entité+0x11D` qu'on avait tracé côté `GOAL`/entité complète. Le lien
-exact entre ces deux champs (`PartEntry+0x3E/0x40` vs `entité+0x11D`)
+`entité+285` qu'on avait tracé côté `GOAL`/entité complète. Le lien
+exact entre ces deux champs (`PartEntry+62/64` vs `entité+285`)
 reste à établir.
 
 ## Fonction : `PartEntry_ResetState` (`sub_A9DFD`, `seg457`)
@@ -948,11 +951,11 @@ reste à établir.
 ```c
 void PartEntry_ResetState(PartEntry *obj)
 {
-    obj->aspectBits = 0xFF;         // +0x32
-    obj->extraData = 0;               // +0x3A (dword)
-    obj->statusFlags &= ~0x3F;        // +0x39, efface 6 bits (dont le bit "occupe")
-    obj->controller = NULL;            // +0x52
-    obj->completionFlag = 0xFF;         // +0x54
+    obj->aspectBits = 255;         // +50
+    obj->extraData = 0;               // +58 (dword)
+    obj->statusFlags &= ~63;        // +57, efface 6 bits (dont le bit "occupe")
+    obj->controller = NULL;            // +82
+    obj->completionFlag = 255;         // +84
 }
 ```
 
@@ -967,14 +970,14 @@ Réponse, par lecture complète de `ProgBuffer_LoadRawAndCountMarkers`
 ```c
 // ProgBuffer_ResetState (sub_AA2F4)
 void ProgBuffer_ResetState(ProgBuffer *buf) {
-    buf->markerCount = 0;   // +0x00
-    buf->chunkSize = 0;      // +0x06
+    buf->markerCount = 0;   // +0
+    buf->chunkSize = 0;      // +6
 }
 
 // ProgBuffer_ResetAndSetSize (sub_AA307)
 void ProgBuffer_ResetAndSetSize(ProgBuffer *buf, uint16_t size) {
     ProgBuffer_ResetState(buf);
-    buf->chunkSize = size;   // +0x06
+    buf->chunkSize = size;   // +6
 }
 
 // ProgBuffer_LoadRawAndCountMarkers (sub_AA31D) — LE VRAI LECTEUR
@@ -998,7 +1001,7 @@ void ProgBuffer_LoadRawAndCountMarkers(ProgBuffer *buf, uint16_t chunkSize,
 **`PROG` n'est pas découpé en instructions à ce stade** — c'est chargé
 comme **un seul bloc brut**, avec juste un comptage préliminaire des
 octets nuls à positions paires. Le vrai découpage en instructions
-(opcode, paramètres, état `[instr+0xE]`) n'a lieu qu'à l'exécution,
+(opcode, paramètres, état `[instr+14]`) n'a lieu qu'à l'exécution,
 dans `MissionScript_ExecutePROG`.
 
 **Confirmé** (voir section suivante) : ces mots nuls sont bien des
@@ -1011,9 +1014,9 @@ séquentiels** dans cette liste (pas des offsets), résolus par
 
 | Offset | Champ |
 |---|---|
-| `+0x00` | compteur de marqueurs (word) |
-| `+0x02`/`+0x04` | pointeur lointain vers le tampon brut |
-| `+0x06` | taille du chunk (word) |
+| `+0` | compteur de marqueurs (word) |
+| `+2`/`+4` | pointeur lointain vers le tampon brut |
+| `+6` | taille du chunk (word) |
 
 ## Comment les `progs_id` retrouvent leur script — le vrai découpage du bloc `PROG`
 
@@ -1044,7 +1047,7 @@ void far *ProgBuffer_FindSubProgramByIndex(void far *bufferBase, uint16_t index)
 ```
 
 **Le bloc `PROG` est une séquence de mini-programmes consécutifs,
-chacun terminé par un mot nul (`0x0000`, 2 octets)** — un format
+chacun terminé par un mot nul (`0`, 2 octets)** — un format
 classique d'enregistrements empaquetés à la suite, avec un séparateur
 à taille fixe plutôt qu'un octet. Pour retrouver le script `#N`, on
 saute par-dessus les `N` premiers séparateurs depuis le début du bloc.
@@ -1052,74 +1055,74 @@ saute par-dessus les `N` premiers séparateurs depuis le début du bloc.
 **Ça confirme et remplace l'hypothèse précédente** ("offset différent
 à l'intérieur du bloc") : ce sont bien des **index séquentiels dans la
 liste des mini-programmes**, pas des offsets bruts. Le compteur posé
-par `ProgBuffer_LoadRawAndCountMarkers` (`+0x00`) est donc le **nombre
+par `ProgBuffer_LoadRawAndCountMarkers` (`+0`) est donc le **nombre
 total de mini-programmes empaquetés** dans le bloc `PROG` d'une
 mission.
 
 ## Ce qui reste ouvert
- (`vtable+0x88`) — reste non identifiée
+ (`vtable+136`) — reste non identifiée
   précisément, mais on sait maintenant qu'elle coexiste avec le
-  mécanisme `entité+0x11D`/`GOAL=5` plutôt que de le remplacer ; les
-  deux chemins convergent vers le nœud `ID=21` (`entité+0xD1`).
-- Confirmer `0xA3`, `0xAB`, `0xB1`-`0xB5` par observation empirique.
+  mécanisme `entité+285`/`GOAL=5` plutôt que de le remplacer ; les
+  deux chemins convergent vers le nœud `ID=21` (`entité+209`).
+- Confirmer `163`, `171`, `177`-`181` par observation empirique.
 - Vérifier si **d'autres options du tournoi** (pas seulement `GOAL=5`)
-  lisent/écrivent `entité+0x11D` pour d'autres ordres du script
+  lisent/écrivent `entité+285` pour d'autres ordres du script
   (`Destroy target`, `Defend target`, etc.) — probable vu le motif
   confirmé sur `Follow Ally`.
 - Vérifier l'hypothèse "identifiants `MVRS` = nœuds `Expr_VM`" notée
-  plus haut, à la lumière de la découverte du canal `entité+0x11D`.
+  plus haut, à la lumière de la découverte du canal `entité+285`.
 - Les ~130 cas de plomberie générique du premier switch — hors
   périmètre "ordres de mission" sauf indication contraire.
 
-## Opcodes 0x90 / 0x91 / 0xBE (2026-10-03)
+## Opcodes 144 / 145 / 190 (2026-10-03)
 
-- `0x90` (144) : activation d'un objet de mission (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`).
-- `0x91` (145) : **désactivation** (`PartEntry_Deactivate_5242A` : bit actif +0x39 effacé, compteurs
-  d'objets actifs par camp décrémentés si le bit 1 de +0x39 est nul ; relu 2026-10-15 : l'instance est
+- `144` : activation d'un objet de mission (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`).
+- `145` : **désactivation** (`PartEntry_Deactivate_5242A` : bit actif +57 effacé, compteurs
+  d'objets actifs par camp décrémentés si le bit 1 de +57 est nul ; relu 2026-10-15 : l'instance est
   **retirée du monde et détruite** par `MissionObject_RemoveInstanceFromWorld_53337` →
   `WorldObjects_RemoveAndDelete_223C5`, sans explosion ni débris). Utilisé 56 fois dans MISSIONS.TRE ; ex. MISN-1A, le C-130
-  (PROG 5) se désactive après son atterrissage (`SET_LABEL(52)` puis `0x91(8)`).
-- `0xBE` (190) : **opcode de PROG** transmis à l'instance (slot +0x88), pas une désactivation. `Expr_VM_Interpreter_51106` vérifie que l'objet est
-  actif puis passe par `MissionScript_CallNativeHandler_52513` (entrée 0x1D de la table : sortie commune)
-  jusqu'à `Goal_SetObjective_A307`, cas par défaut : objectif 0xBF, position de repli = la sienne.
+  (PROG 5) se désactive après son atterrissage (`SET_LABEL(52)` puis `145(8)`).
+- `190` : **opcode de PROG** transmis à l'instance (slot +136), pas une désactivation. `Expr_VM_Interpreter_51106` vérifie que l'objet est
+  actif puis passe par `MissionScript_CallNativeHandler_52513` (entrée 29 de la table : sortie commune)
+  jusqu'à `Goal_SetObjective_A307`, cas par défaut : objectif 191, position de repli = la sienne.
   Utilisé 37 fois. libRealSpace l'appelait à tort `OP_DEACTIVATE_OBJ` (corrigé : `OP_SET_OBJ_BE`).
 
-## Opcodes 0xB6 à 0xB9 : bits 4 et 5 de l'objet de mission (+0x39) (2026-10-03)
+## Opcodes 182 à 185 : bits 4 et 5 de l'objet de mission (+57) (2026-10-03)
 
-- `0xB6` (182) pose le bit 4, `0xB7` (183) l'efface. Bit 4 = **visible sur la carte de navigation** :
+- `182` pose le bit 4, `183` l'efface. Bit 4 = **visible sur la carte de navigation** :
   seul lecteur `NavMap_DrawMissionObjects_7EDCA` (ex-`Render_DrawComplexShape`), qui ne trace que les objets
-  ayant ce bit (couleur 0xE6 camp ennemi, 0xC7 joueur, 0x1F sinon). Le chargeur de mission le pose sur le
-  joueur. MISN-1A : Stern `0xB6(255)`, C-130 `0xB6(255)` ; les MiG n'apparaissent pas. libRealSpace :
+  ayant ce bit (couleur 230 camp ennemi, 199 joueur, 31 sinon). Le chargeur de mission le pose sur le
+  joueur. MISN-1A : Stern `182(255)`, C-130 `182(255)` ; les MiG n'apparaissent pas. libRealSpace :
   `on_nav_map` (`OP_SHOW_ON_NAV_MAP` / `OP_HIDE_FROM_NAV_MAP`), lu par `SCNavMap`.
-- `0xB8` (184) pose le bit 5, `0xB9` (185) l'efface. Argument 255 = l'objet qui exécute le script.
+- `184` pose le bit 5, `185` l'efface. Argument 255 = l'objet qui exécute le script.
   Bit 5 = **accompagne le joueur au pilote automatique** : `Autopilot_JumpSequence_7A054` (ex-
   `UIScript_ParseAndEvaluate`) désactive, quand la zone change, tout objet de mission sans ce bit
   (`MissionScenario_QueryFieldWrapper_A7FF0` puis `PartEntry_Deactivate_5242A`). Le chargeur de mission
-  le pose sur l'objet du joueur. MISN-1A : Stern `0xB8(255)` et C-130 `0xB8(8)` à l'activation, puis
-  C-130 `0xB9(255)` (PROG 5).
-- Le chunk `TEAM` correspond presque toujours au joueur + les objets marqués `0xB8`. libRealSpace :
-  `friendlies` (initialisé depuis `TEAM`) ; `0xB8` ajoute, `0xB9` retire (`OP_JOIN_PLAYER_TEAM`,
+  le pose sur l'objet du joueur. MISN-1A : Stern `184(255)` et C-130 `184(8)` à l'activation, puis
+  C-130 `185(255)` (PROG 5).
+- Le chunk `TEAM` correspond presque toujours au joueur + les objets marqués `184`. libRealSpace :
+  `friendlies` (initialisé depuis `TEAM`) ; `184` ajoute, `185` retire (`OP_JOIN_PLAYER_TEAM`,
   `OP_LEAVE_PLAYER_TEAM`). Les affichages (radar, carte, radio) bouclent aussi sur `friendlies` ; la
   façon dont le radar de l'original choisit ses contacts n'a pas été lue.
 
-## Opcodes 0xA5 (165) et 0xA6 (166) selon la classe de l'objet (lu 2026-10-15)
+## Opcodes 165 et 166 selon la classe de l'objet (lu 2026-10-15)
 
-`MissionScript_CallNativeHandler_52513` : 0xA5 partage le cas de 0xA4 (`loc_5265A`) : deux SPOT
-résolus (`Mission_GetSpotWorldPosition_5305A`), SPOT[1er paramètre] et SPOT[2e paramètre] ; 0xA6 va
-directement à la sortie commune (aucune position, aucun objet). Puis slot +0x88 de l'instance, dont
+`MissionScript_CallNativeHandler_52513` : 165 partage le cas de 164 (`loc_5265A`) : deux SPOT
+résolus (`Mission_GetSpotWorldPosition_5305A`), SPOT[1er paramètre] et SPOT[2e paramètre] ; 166 va
+directement à la sortie commune (aucune position, aucun objet). Puis slot +136 de l'instance, dont
 la valeur de retour devient l'état « en cours » de l'instruction (0 = terminé).
 
-Slot +0x88 par classe (relevé dans les vtables de seg339, entrée qui suit les dégâts de collision) :
+Slot +136 par classe (relevé dans les vtables de seg339, entrée qui suit les dégâts de collision) :
 
-| Classe | +0x88 | 0xA5 | 0xA6 |
+| Classe | +136 | 165 | 166 |
 |---|---|---|---|
-| avion IA (0x27BC) | `loc_3E419` → `Goal_SetObjective_A307` | objectif 0xA5 : aller au SPOT ; terminé à moins de 500 m à l'horizontale | défaut : objectif 0xBF, errance autour de sa position, jamais terminé |
-| GRND (véhicule au sol) | `GroundObj_OnScriptOpcode_453E3` | rouler vers SPOT[1er param.] ; terminé (renvoie 0) à moins de 100 m à l'horizontale | état 0xA6 rangé : le véhicule freine jusqu'à l'arrêt ; renvoie 1 |
-| XMIT (émetteur, 0x15) | `Xmit_OnScriptOpcode_45B76` | rien ; renvoie 1 | rien ; renvoie 1 |
+| avion IA (10172) | `loc_3E419` → `Goal_SetObjective_A307` | objectif 165 : aller au SPOT ; terminé à moins de 500 m à l'horizontale | défaut : objectif 191, errance autour de sa position, jamais terminé |
+| GRND (véhicule au sol) | `GroundObj_OnScriptOpcode_453E3` | rouler vers SPOT[1er param.] ; terminé (renvoie 0) à moins de 100 m à l'horizontale | état 166 rangé : le véhicule freine jusqu'à l'arrêt ; renvoie 1 |
+| XMIT (émetteur, 21) | `Xmit_OnScriptOpcode_45B76` | rien ; renvoie 1 | rien ; renvoie 1 |
 | SWPN | `SwpnInstance_OnOrder_43CBB` | rien ; renvoie 0 | rien ; renvoie 0 |
 | autres (missile, bombe, objets…) | `loc_38342` (`xor ax,ax`) | rien ; renvoie 0 | rien ; renvoie 0 |
 
-GRND en route (`GroundObj_Update_45883`, état 0xA5), **par frame, sans dt** : vitesse +0,25 m/s
+GRND en route (`GroundObj_Update_45883`, état 165), **par frame, sans dt** : vitesse +0,25 m/s
 jusqu'à 12,5 m/s (`GroundObj_AccelerateToCruise_45675`), cap tourné de 1° vers le point
 (`GroundObj_SteerTowardPoint_454A6`). Tout autre état : −0,25 m/s par frame jusqu'à l'arrêt
 (`GroundObj_Decelerate_45797`). Le déplacement suit la pente du sol (`GroundObj_IntegrateMotion_458C8`).
@@ -1130,55 +1133,55 @@ Lu dans `Expr_VM_Interpreter_51106` (seg114), cas par cas. Outil : `tools/missio
 (désassemble un fichier de mission, `--stat` retrouve l'origine des variables de résultat).
 
 **Encodage** (`Expr_VM_ReadNextToken_50F85`) : un octet d'opcode, un octet d'argument n ; si
-l'octet suivant vaut 09h, il est sauté et l'octet d'après est un 2ᵉ argument. Un programme se
-termine par 00h (le n-ième programme du bloc = celui qui suit le n-ième 00h,
+l'octet suivant vaut 9, il est sauté et l'octet d'après est un 2ᵉ argument. Un programme se
+termine par 0 (le n-ième programme du bloc = celui qui suit le n-ième 0,
 `ProgBuffer_FindSubProgramByIndex_50E94`).
 
-**État d'une exécution** : `acc` (`[instr+0Ch]`), le résultat du dernier ordre natif (`[+0Eh]`),
-les drapeaux de comparaison (`[+16h]` : 1 = inférieur, 2 = égal, 4 = supérieur).
-**FLAG[n]** = mots du chunk `FLAG` de la mission (nombre `mission+48h`, tableau `mission+4Ah`) ;
-lecture hors bornes = 0, écriture hors bornes ignorée. **STAT[n]** = 8 mots à `mission+0A1h`
+**État d'une exécution** : `acc` (`[instr+12]`), le résultat du dernier ordre natif (`[+14]`),
+les drapeaux de comparaison (`[+22]` : 1 = inférieur, 2 = égal, 4 = supérieur).
+**FLAG[n]** = mots du chunk `FLAG` de la mission (nombre `mission+72`, tableau `mission+74`) ;
+lecture hors bornes = 0, écriture hors bornes ignorée. **STAT[n]** = 8 mots à `mission+161`
 (n < 8), écrits dans `misn2op.iff` (`Mission_WriteResultReport_A8F22`, GAMEFLOW_SYSTEM.md § 6).
 
 | Op | Effet | Op | Effet |
 |---|---|---|---|
-| 00h, 01h | retour (fin du programme ou retour d'appel) | 30h | acc /= n |
-| 02h | appel du programme n | 31h | acc /= FLAG[n] |
-| 03h | appel du programme acc | 40h | comparer acc à n |
-| 04h | arrêt du script | 41h | comparer n à acc |
-| 08h | étiquette n (cible des sauts) | 42h | comparer acc à FLAG[n] |
-| 0Fh | code de sortie de la mission = n (`byte_706AF`) | 43h | comparer FLAG[n] à acc |
-| 10h | acc = n | 44h | comparer le résultat natif à n |
-| 11h | acc = FLAG[n] | 45h | comparer FLAG[n] à 1 |
-| 12h | échange acc et FLAG[n] | 46h / 47h | aller à l'étiquette n si le résultat natif ≠ 0 / = 0 |
-| 13h | acc = résultat natif | 48h / 49h | aller à n si égal / différent |
-| 14h | STAT[n] = acc | 4Ah / 4Bh | aller à n si inférieur / supérieur |
-| 15h | acc = hasard 0..n (`CRT_Rand`) | 4Ch / 4Dh | aller à n si inférieur ou égal / supérieur ou égal |
-| 20h | acc += n | 4Eh | aller à n |
-| 21h | acc += FLAG[n] | 4Fh | aller à l'étiquette acc |
-| 22h | FLAG[n] += n | 50h | FLAG[n] = acc |
-| 23h | FLAG[n] += acc | 51h | FLAG[n] = résultat natif |
-| 24h | acc −= n | 52h / 53h | FLAG[n] = 1 / 0 |
-| 25h | acc −= FLAG[n] | 54h | FLAG[n] ^= 1 |
-| 26h | FLAG[n] −= n | 55h / 56h | FLAG[n] += 1 / −= 1 |
-| 27h | FLAG[n] −= acc | 80h–98h | objets de mission (lus en partie : 90h, 91h, plus haut) |
-| 28h / 29h | acc \|= n / FLAG[n] | A0h–C0h | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
-| 2Ah / 2Bh | acc &= n / FLAG[n] | D0h | (non lu ici) |
-| 2Ch / 2Dh | acc ^= n / FLAG[n] | | |
-| 2Eh / 2Fh | acc *= n / FLAG[n] | | |
+| 0, 1 | retour (fin du programme ou retour d'appel) | 48 | acc /= n |
+| 2 | appel du programme n | 49 | acc /= FLAG[n] |
+| 3 | appel du programme acc | 64 | comparer acc à n |
+| 4 | arrêt du script | 65 | comparer n à acc |
+| 8 | étiquette n (cible des sauts) | 66 | comparer acc à FLAG[n] |
+| 15 | code de sortie de la mission = n (`byte_706AF`) | 67 | comparer FLAG[n] à acc |
+| 16 | acc = n | 68 | comparer le résultat natif à n |
+| 17 | acc = FLAG[n] | 69 | comparer FLAG[n] à 1 |
+| 18 | échange acc et FLAG[n] | 70 / 71 | aller à l'étiquette n si le résultat natif ≠ 0 / = 0 |
+| 19 | acc = résultat natif | 72 / 73 | aller à n si égal / différent |
+| 20 | STAT[n] = acc | 74 / 75 | aller à n si inférieur / supérieur |
+| 21 | acc = hasard 0..n (`CRT_Rand`) | 76 / 77 | aller à n si inférieur ou égal / supérieur ou égal |
+| 32 | acc += n | 78 | aller à n |
+| 33 | acc += FLAG[n] | 79 | aller à l'étiquette acc |
+| 34 | FLAG[n] += n | 80 | FLAG[n] = acc |
+| 35 | FLAG[n] += acc | 81 | FLAG[n] = résultat natif |
+| 36 | acc −= n | 82 / 83 | FLAG[n] = 1 / 0 |
+| 37 | acc −= FLAG[n] | 84 | FLAG[n] ^= 1 |
+| 38 | FLAG[n] −= n | 85 / 86 | FLAG[n] += 1 / −= 1 |
+| 39 | FLAG[n] −= acc | 128–152 | objets de mission (lus en partie : 144, 145, plus haut) |
+| 40 / 41 | acc \|= n / FLAG[n] | 160–192 | ordres natifs (`MissionScript_CallNativeHandler_52513`) |
+| 42 / 43 | acc &= n / FLAG[n] | 208 | (non lu ici) |
+| 44 / 45 | acc ^= n / FLAG[n] | | |
+| 46 / 47 | acc *= n / FLAG[n] | | |
 
 - Les sauts cherchent l'étiquette **en avant** depuis l'instruction courante
   (`Expr_VM_FindCaseToken_50FDB`).
-- 22h et 26h ajoutent / retirent **l'argument lui-même** (`add ax, [di+8]` après la lecture de
-  FLAG[n]) ; 23h et 27h utilisent acc.
-- Les opcodes absents de la table de sauts (05h–07h, 09h–0Eh, 16h–1Fh, 32h–3Fh, 57h–7Fh…) ne font
-  rien. 33h, 35h, 38h, 69h et 75h apparaissent pourtant dans des fichiers de mission (moins de
+- 34 et 38 ajoutent / retirent **l'argument lui-même** (`add ax, [di+8]` après la lecture de
+  FLAG[n]) ; 35 et 39 utilisent acc.
+- Les opcodes absents de la table de sauts (5–7, 9–14, 22–31, 50–63, 87–127…) ne font
+  rien. 51, 53, 56, 105 et 117 apparaissent pourtant dans des fichiers de mission (moins de
   7 fois chacun).
-- Les instructions qui écrivent FLAG sont 12h, 22h, 23h, 26h, 27h et 50h à 56h. Le chargeur de
+- Les instructions qui écrivent FLAG sont 18, 34, 35, 38, 39 et 80 à 86. Le chargeur de
   mission remplit le tableau depuis le chunk `FLAG` (`MissionScenario_LoadMainRecord_A8331`). Je
-  n'ai pas trouvé d'autre écriture dans ce tableau (recherche : accès à `+48h` / `+4Ah` après une
+  n'ai pas trouvé d'autre écriture dans ce tableau (recherche : accès à `+72` / `+74` après une
   lecture de `word_706A0`, dans tous les segments annotés).
-- ABh (« message radio n ») passe n à la méthode +0x88 de l'objet (`Goal_SetObjective_A307` →
+- 171 (« message radio n ») passe n à la méthode +136 de l'objet (`Goal_SetObjective_A307` →
   `Radio_PlayMessage_CB45` pour un avion IA). Il n'écrit pas FLAG.
 
 **Exemple, MISN-9A** : chaque ABRAMS-G détruit ajoute 2 à FLAG[4] (programme 11), chaque ZSU-23
@@ -1186,3 +1189,45 @@ ajoute 1 (programme 12) ; les deux appellent le programme 2, qui fait FLAG[3] +=
 ≥ 4. Le programme 4 (mise à jour de la scène 0) recopie le tout dans les variables de résultat :
 STAT[0] = FLAG[2] (le BRIGC10 détruit), STAT[1] = (20 + FLAG[4]) × FLAG[2] × 100, STAT[2] =
 FLAG[3], STAT[7] = FLAG[6].
+
+## Comparaison avec l'enum `prog_op` de libRealSpace (`SCenums.h`, fourni le 2026-10-23)
+
+Nombres en décimal. Seuls les noms et les valeurs de l'enum ont été vus, pas l'interpréteur de
+libRealSpace : « absent de l'enum » ne dit pas comment libRealSpace traite l'opcode.
+
+**Opcodes des fichiers de mission absents de l'enum** (comptés dans les 72 fichiers de
+`MISSIONS`) :
+
+| Op | Effet dans le jeu | Emplois | Fichiers (exemples) |
+|---|---|---|---|
+| 33 | acc += FLAG[n] | 24 | 21 fichiers, dont MISN-10A, 10B, 10X |
+| 47 | acc ×= FLAG[n] | 18 | 18 fichiers, dont MISN-10A, 10B, 10X, 11A |
+| 36 | acc −= n | 11 | 10 fichiers, dont MISN-10A, 11B, 11X, 4B |
+| 15 | code de sortie de la mission = n (chunk `EXIT` de `misn2op.iff`) | 2 | MISN-14B, 15A |
+| 37 | acc −= FLAG[n] | 2 | MISN-6D, 7A |
+| 78 | aller à l'étiquette n | 3 | MISN-13B, 6D |
+| 43 | acc &= FLAG[n] | 1 | MISN-15A |
+| 21 | acc = hasard 0..n | 1 | MISN-15A |
+| 32 | acc += n | 1 | MISN-5C |
+| 39 | FLAG[n] −= acc | 1 | TEMPLATE |
+| 66 | comparer acc à FLAG[n] | 1 | LAND |
+| 51, 53, 56, 105, 117 | rien (hors de la table du jeu) | 16 | MISSION, BASIC |
+| 153, 163, 164, 172, 177, 178, 179, 181 | ordres natifs (non lus en détail) | 32 | 181 : MISN-1A, 1B, 1C ; 177 / 178 : MISN-6X, 10D ; 172 : MISN-6D ; 164 : ARENAMIS, GAME |
+
+Les trois premiers servent surtout à **calculer le gain** (2ᵉ valeur de `STAT`) dans le programme
+de fin de mission. Exemple, MISN-10A : gain = (15 + FLAG[0] − 9 + FLAG[1]) × FLAG[4] × 100, écrit
+avec 16, 33, 36, 33, 47 et 46. Si l'un d'eux est ignoré, le gain renvoyé au déroulement est faux.
+Dans MISN-15A, la 1ʳᵉ valeur (succès) est calculée avec 43.
+
+**Noms de l'enum à rapprocher du jeu :**
+
+- `OP_NOOP` (0) : dans le jeu, 0 est le **retour** (même code que 1, `OP_EXIT_PROG`) et sépare les
+  programmes du chunk `PROG`.
+- `OP_SPOT_DATA` (9) : dans le jeu, 9 n'est pas une instruction ; c'est la marque d'un 2ᵉ argument,
+  lue avec l'instruction qui la précède (`Expr_VM_ReadNextToken_50F85`).
+- `OP_EXECUTE_CALL` (79) : dans le jeu, c'est un **saut** vers l'étiquette dont le numéro est
+  l'accumulateur, pas un appel (`Expr_VM_FindCaseToken_50FDB`, sans retour). Les appels de
+  programme sont 2 (`OP_EXEC_SUB_PROG`) et 3 (programme numéro acc, absent de l'enum et des
+  données).
+- `OP_TEST_FLAG` (69) compare FLAG[n] à 1 ; `OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS` (70) saute si
+  le résultat du dernier ordre natif ≠ 0 : conformes.

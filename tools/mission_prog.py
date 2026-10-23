@@ -171,7 +171,7 @@ def callers_of(instrs):
 
 
 def describe(op, arg, arg2):
-    text = OPS.get(op, f'natif {op:02X}h' if op >= 0x80 else f'{op:02X}h (sans effet lu)')
+    text = OPS.get(op, f'natif {op}' if op >= 128 else f'{op} (sans effet lu)')
     text = text.replace('{n}', str(arg)) if '{n}' in text else f'{text} ({arg})'
     if arg2 is not None:
         text += f', {arg2}'
@@ -205,7 +205,7 @@ def dump(path):
             where = hooks.get(number, []) + [f'appel depuis le programme {c}' for c in sorted(callers.get(number, []))]
             where = '; '.join(where) or '—'
             print(f'-- programme {number} (déclenché par : {where})')
-        print(f'   {at:5d}  {op:02X} {arg:3d}   {describe(op, arg, arg2)}')
+        print(f'   {at:5d}  {op:3d} {arg:3d}   {describe(op, arg, arg2)}')
 
 
 def stat_report(path):

@@ -84,6 +84,15 @@ Dire « libRealSpace », « le portage », « `SCRenderer` », « le code de lib
 « ton code », « ton portage », « ton renderer », « ta fonction », « tes passes », ni dans les
 réponses ni dans les documents.
 
+**8. Les nombres en décimal.**
+Dans les documents et les réponses, tout nombre destiné à Rémi s'écrit en **base 10** : numéros de
+commande et d'opcode (comme `SCenums.h` et le dump `gameflow_parsed.txt` de libRealSpace),
+arguments, champs (`[partie+250]`, `+82`), tailles, valeurs lues dans les fichiers. Pas de `25h`
+ni de `0x25`. Un numéro de commande seul s'écrit « la commande 37 », pas « une 37 ». Les suites de
+script s'écrivent en paires décimales (commande, argument) : (13, 2) (15, 0). Seules exceptions :
+le suffixe d'adresse des noms de fonctions (`Gameflow_MainLoop_3D2E`) et une citation exacte
+d'instruction d'assembleur.
+
 ## Contexte du projet
 
 Rémi rétro-ingénierie *Strike Commander* (1993, Origin Systems, simulateur
