@@ -7,11 +7,17 @@ ovr188		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE 2026-10-22. Cherche dans FORM LOAD le chunk LOAD dont le 1er octet vaut arg_4, puis
-; lit des paires (arme, nombre) : nombre borné par le stock [partie+261h+2×arme], rendu pair,
-; réparti par paires sur les points d'emport [partie+273h] (arme) / [+274h] (nombre par côté)
-; selon le type d'arme (0, 1 : emports 0–1, 1 par côté ; 6 : emport 2 ; 8 : emport 1, 2 par
-; côté ; 4, 5 : emport 2, 6 par côté ; 7 : 2 par côté ; autres : 3 par côté).
+; far, LUE 2026-10-22, relue 2026-10-25. Chargement d'armes par défaut de l'écran d'armement
+; (appelée par Gameflow_WeaponLoadout_51AB3, qui vide avant les 4 points d'emport
+; [partie+273h+2i] = 0FFh / [+274h+2i] = 0). Argument 255 : rien. Sinon cherche dans FORM LOAD
+; le chunk LOAD dont le 1er octet vaut l'argument (absent : Fatal_Error_310B), puis lit des
+; paires (arme, nombre) jusqu'à la fin du chunk : nombre borné par le stock
+; [partie+261h+2×arme] (cmp ax, [bx+si+261h] / jbe), rendu pair (test 1 / dec), puis posé sur
+; les points d'emport libres (cmp byte ptr [bx+si+273h], 0FFh) de la plage de l'arme, bornes
+; incluses (cmp ax(var_2), cx / jge) : au plus « max » par côté ([+274h] = max et nombre −=
+; 2·max, sinon nombre/2 et fin). Plages et max (var_1, var_2, var_3) : armes 0 et 1 → 0 à 2, 1
+; ; 6 → 2 à 3, 1 ; 8 → 1 à 2, 2 ; 4 et 5 → 2 à 3, 6 ; 7 → 2 à 3, 2 ; autres → 2 à 3, 3.
+; GAMEFLOW_SYSTEM.md § 5.3.
 ; ==============================================================================================
 Gameflow_ApplyDefaultLoadout_51830	proc far		; CODE XREF: sub_4209FJ Gameflow_WeaponLoadout_51AB3+61p
 

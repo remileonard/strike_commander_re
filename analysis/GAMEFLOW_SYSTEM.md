@@ -366,9 +366,26 @@ et `PLAY_GAMEFLOW_TUNE` garde le morceau en `[+987]` (§ 8). `IF_RESULT_4`, `IF_
 ### 5.3 Écran d'armement (`WEAPON_LOADOUT`, `Gameflow_WeaponLoadout_51AB3`)
 
 - Chargement par défaut : le chunk `LOAD` dont le 1er octet vaut l'argument
-  (`Gameflow_ApplyDefaultLoadout_51830`). Chaque paire (arme, nombre) : nombre borné par le stock,
-  rendu pair, posé par paires (un par aile) sur les points d'emport, avec un maximum par côté selon
-  l'arme : armes 0 et 1 → 1 ; 8 → 2 ; 7 → 2 ; 4 et 5 → 6 ; 6 → emport central ; autres → 3.
+  (`Gameflow_ApplyDefaultLoadout_51830` ; argument 255 → rien ; chunk absent → erreur fatale). Avant
+  l'appel, les 4 points d'emport `[+627 + 2i]` (arme, nombre par côté) sont vidés (255, 0). Chaque
+  paire (arme, nombre) : nombre borné par le stock `[+609 + 2 × arme]`, rendu pair (−1 s'il est
+  impair), puis posé sur les points d'emport libres de la plage de l'arme, au plus « maximum » par
+  côté sur chacun, jusqu'à épuisement :
+
+  | Arme (numéro OPTEST) | Points d'emport | Maximum par côté |
+  |---|---|---|
+  | 0 AIM-9J | 0 à 2 | 1 |
+  | 1 AIM-9M | 0 à 2 | 1 |
+  | 2 AGM-65D | 2 à 3 | 3 |
+  | 3 Durandal | 2 à 3 | 3 |
+  | 4 MK-20 | 2 à 3 | 6 |
+  | 5 MK-82 | 2 à 3 | 6 |
+  | 6 GBU-15 | 2 à 3 | 1 |
+  | 7 LAU-3 | 2 à 3 | 2 |
+  | 8 AIM-120 | 1 à 2 | 2 |
+
+  Numéros d'armes : ordre du stock de la sauvegarde (`SCState::Load` de libRealSpace). Les 17
+  chunks `LOAD` de `GAMEFLOW.IFF` (numéros 0 à 16, le 0 est vide) ne contiennent jamais d'AIM-120.
 - Le joueur ajoute ou retire des armes (« Add %s (%d) », « Remove %s (%d) »).
 - **Sprite 12 cliqué → départ en vol** : `[+232]` = 1, `[+238]` = 1, le test réussit et la
   suite du script est jouée. Autre sortie → le test échoue, la suite du script est sautée.

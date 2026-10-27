@@ -19193,7 +19193,7 @@
 "sub_3CEB3"
 ],
 "new_name": "Gameflow_SaveGameFile_4DAE8",
-"summary": "far, LUE en surface 2026-10-22. Écrit la structure de partie dans un fichier (gensave.tmp, tmpsav.tmp, *.sav)."
+"summary": "far, LUE 2026-10-25. Écrit la structure de partie dans un fichier (gensave.tmp, tmpsav.tmp, *.sav), champ par champ (sub_3AD47 = 1 octet, sub_3AD2A = 1 mot, sub_3AD64 = 1 dword, StreamReader_WriteTyped_3CEFF = n octets). Octets du fichier : 0 en-tête 7 octets (word_433F2) ; 7 [+249] ; 8 [+250] ; 9 [+251] ; 10 [+252] ; 11 256 drapeaux [+253] ; 267 100 octets [+509] (résultat des missions) ; 367 9 mots stock d'armes [+609] ; 385 4 × (arme [+627+2i], nombre [+628+2i]) points d'emport ; 393 dword argent [+635] ; 397 dword frais généraux [+639] ; 401 dword achats du catalogue [+643] ; 405 dword coût des avions perdus [+647] ; 409 8 pilotes × 3 mots [+671+26i], [+673+26i], [+675+26i] (table de 26 octets par pilote : mov dx, 1Ah / imul dx) ; 457 20 octets [+920] ; 477 20 octets [+940] ; 497 20 octets [+960] ; 517 mot total des avions perdus [+980] (testé par Gameflow_CheckLossConversations_50645) ; 519 61 octets [+859] ; 580 7 octets dseg 0EE6h (drapeaux des personnages, DIED) ; 587 octet [+982] (3e valeur STAT) ; 588 octet [+983] (morceau PLAY_GAMEFLOW_TUNE) ; 589 dword score [+984]. Taille 593 octets."
 },
 "sub_4DDDC": {
 "segment": "ovr185",
@@ -19868,7 +19868,7 @@
 "sub_3CEB3"
 ],
 "new_name": "Gameflow_ApplyDefaultLoadout_51830",
-"summary": "far, LUE 2026-10-22. Cherche dans FORM LOAD le chunk LOAD dont le 1er octet vaut arg_4, puis lit des paires (arme, nombre) : nombre borné par le stock [partie+261h+2×arme], rendu pair, réparti par paires sur les points d'emport [partie+273h] (arme) / [+274h] (nombre par côté) selon le type d'arme (0, 1 : emports 0–1, 1 par côté ; 6 : emport 2 ; 8 : emport 1, 2 par côté ; 4, 5 : emport 2, 6 par côté ; 7 : 2 par côté ; autres : 3 par côté)."
+"summary": "far, LUE 2026-10-22, relue 2026-10-25. Chargement d'armes par défaut de l'écran d'armement (appelée par Gameflow_WeaponLoadout_51AB3, qui vide avant les 4 points d'emport [partie+273h+2i] = 0FFh / [+274h+2i] = 0). Argument 255 : rien. Sinon cherche dans FORM LOAD le chunk LOAD dont le 1er octet vaut l'argument (absent : Fatal_Error_310B), puis lit des paires (arme, nombre) jusqu'à la fin du chunk : nombre borné par le stock [partie+261h+2×arme] (cmp ax, [bx+si+261h] / jbe), rendu pair (test 1 / dec), puis posé sur les points d'emport libres (cmp byte ptr [bx+si+273h], 0FFh) de la plage de l'arme, bornes incluses (cmp ax(var_2), cx / jge) : au plus « max » par côté ([+274h] = max et nombre −= 2·max, sinon nombre/2 et fin). Plages et max (var_1, var_2, var_3) : armes 0 et 1 → 0 à 2, 1 ; 6 → 2 à 3, 1 ; 8 → 1 à 2, 2 ; 4 et 5 → 2 à 3, 6 ; 7 → 2 à 3, 2 ; autres → 2 à 3, 3. GAMEFLOW_SYSTEM.md § 5.3."
 },
 "sub_51AB3": {
 "segment": "ovr188",

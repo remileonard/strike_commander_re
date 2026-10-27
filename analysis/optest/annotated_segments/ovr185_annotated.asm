@@ -2397,8 +2397,19 @@ Gameflow_SaveRequester_4D984	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, LUE en surface 2026-10-22. Écrit la structure de partie dans un fichier (gensave.tmp,
-; tmpsav.tmp, *.sav).
+; far, LUE 2026-10-25. Écrit la structure de partie dans un fichier (gensave.tmp, tmpsav.tmp,
+; *.sav), champ par champ (sub_3AD47 = 1 octet, sub_3AD2A = 1 mot, sub_3AD64 = 1 dword,
+; StreamReader_WriteTyped_3CEFF = n octets). Octets du fichier : 0 en-tête 7 octets
+; (word_433F2) ; 7 [+249] ; 8 [+250] ; 9 [+251] ; 10 [+252] ; 11 256 drapeaux [+253] ; 267 100
+; octets [+509] (résultat des missions) ; 367 9 mots stock d'armes [+609] ; 385 4 × (arme
+; [+627+2i], nombre [+628+2i]) points d'emport ; 393 dword argent [+635] ; 397 dword frais
+; généraux [+639] ; 401 dword achats du catalogue [+643] ; 405 dword coût des avions perdus
+; [+647] ; 409 8 pilotes × 3 mots [+671+26i], [+673+26i], [+675+26i] (table de 26 octets par
+; pilote : mov dx, 1Ah / imul dx) ; 457 20 octets [+920] ; 477 20 octets [+940] ; 497 20
+; octets [+960] ; 517 mot total des avions perdus [+980] (testé par
+; Gameflow_CheckLossConversations_50645) ; 519 61 octets [+859] ; 580 7 octets dseg 0EE6h
+; (drapeaux des personnages, DIED) ; 587 octet [+982] (3e valeur STAT) ; 588 octet [+983]
+; (morceau PLAY_GAMEFLOW_TUNE) ; 589 dword score [+984]. Taille 593 octets.
 ; ==============================================================================================
 Gameflow_SaveGameFile_4DAE8	proc far		; CODE XREF: sub_41FB7J
 

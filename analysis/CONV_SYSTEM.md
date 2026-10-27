@@ -740,8 +740,11 @@ int closeUpEyeFrame(int baseFrame) {
   (méthode +24, déplacement (0, 24)) et la scène passe en plein écran (0, 0)-(319, 199) ; les bandes noires s'ouvrent en 24 pas (haut : une ligne par pas, bas :
   deux lignes par pas). L'image reste au même endroit à l'écran ; elle est seulement découverte.
   Les bandes se referment de la même façon après la réponse.
-- **Zone** : la souris dans **x 118 à 279, y 113 à 199** (écran) → « Accept Mission », partout
-  ailleurs → « Reject Mission ». libRealSpace a deux zones, gauche (x 0–120) et droite
+- **Zone** : la souris dans **x 118 à 279, y 113 à 199** → « Accept Mission », partout ailleurs →
+  « Reject Mission ». Comme pour les pilotes (§ 2, `CHOOSE_WINGMAN`), x est en unités de souris (0 à
+  639) : à l'écran **x 59 à 139**, sur la **main** tendue de l'image 53 (vérifié par Rémi en jeu : on
+  clique sur la main pour accepter ; rendu de la conversation 62 : main vers x 45 à 120, y 135 à
+  199). Ces bornes avaient d'abord été prises pour des pixels d'écran (x 118 à 279, sur le torse). libRealSpace a deux zones, gauche (x 0–120) et droite
   (x 200–320). Le libellé correspondant est réécrit à **y = 175** à chaque tour de la boucle
   d'attente (tous les 3 tics de l'horloge `dword_47ABB`) ; la boucle s'arrête sur un **clic**
   (événement d'entrée de type 2).
@@ -791,10 +794,24 @@ Détail du jeu : § 2, « `SELECT_WING` / `CHOOSE_WINGMAN` ».
 | `$T` | avions perdus au total, même forme |
 | `$` + autre | « $ » gardé |
 
-- **Mise en page** : lignes de **30 caractères au plus**, coupées aux espaces (libRealSpace : largeur
-  en pixels de la police) ; lignes à l'écran **y = 156 + 15 × n** (libRealSpace : 165 + 13 × n). La
-  position horizontale du jeu (format « %Y%J%S ») n'a pas été lue : garder le centrage de
-  libRealSpace en attendant.
+- **Mise en page** : lignes de **30 caractères au plus**, coupées à l'espace précédent (libRealSpace : largeur
+  en pixels de la police) ; lignes à l'écran **y = 156 + 15 × n** (libRealSpace : 165 + 13 × n), chacune
+  **centrée** sur 320 pixels.
+- **Moteur de texte** (lu le 2026-10-24) : `Widget_RenderComplexLayoutWrapper_31A3B` →
+  `Widget_RenderComplexLayout_31810`, formatage à la `printf` dans une zone de texte : `%X` / `%Y` = position
+  relative à l'origine de la zone, `%J` = justification (0 et 3 gauche, 1 droite, 2 centré :
+  `GlyphObject_LayoutAndRenderAll_31ACA`), `%S` = chaîne, `%F` / `%B` = deux octets de la zone, `%Z` = changement de
+  police. Largeur d'un texte (`GlyphObject_RenderToWidget_31A68`) = somme des largeurs + espacement × (n − 1).
+  Police (`GlyphObject_ComputeMetrics_3111E`) : espacement 2, couleur 255 au départ ; largeur d'un caractère
+  (`GlyphObject_MeasureChar_31312`) = étendue à droite de son point d'ancrage + 1 (1er mot de l'en-tête + 1),
+  l'espace prend celle du tiret ; chaque caractère au-dessus de 31 est posé par son point d'ancrage à
+  y + (étendue de « A » au-dessus de son point d'ancrage) + 1 (`GlyphObject_ResolveAndCache_31296` ; valeur de deux
+  méthodes voisines de la table de la police, table elle-même non lue) ; couleur 255 = couleurs propres de
+  l'image, sinon chaque segment est rempli de la couleur (`Render_DrawTextString_32A58`). La couleur est
+  posée avant chaque réplique avec l'octet couleur du script (méthode +16 de la police).
+- **Libellés de la question et des équipiers** : même police que les répliques (`convfont.shp`, `conv + 44`,
+  par `Widget_ApplyStyleAndAllocate_3144B`), centrés (`%J` = 2) sur l'écran à y = 175, sans couleur propre :
+  celle de la dernière réplique.
 
 ## 8. Version CD-ROM : la voix (lu le 2026-10-22)
 
@@ -935,7 +952,11 @@ Différences avec la version disquette (§ 2) :
 | commande `SHOW_TEXT` après les commandes `GROUP_SHOT_CHARACTER_TALK` | dans la scène, 40 images | commande de premier niveau, après la scène |
 | attente au début | aucune | 7 × 10 tics avant la première réplique |
 
-La cadence de l'horloge DGROUP:20751 n'a pas été lue (les 10 tics ne sont pas convertis en secondes).
+L'horloge DGROUP:20751 est le compteur de tics à 60 Hz (rôle de `dword_47ABB` dans la version disquette) :
+l'attente range départ = compteur et durée = 10 puis appelle la fonction d'attente (47 27Dh), même structure
+que `Stopwatch_WaitElapsed_3F023` ; le lecteur de voix part du même compteur pour l'indice de bouche
+(temps écoulé × cadence ÷ 60). Les 7 attentes font donc 70 tics, environ 1,17 s ; chaque tour teste la touche
+pour passer (« Input_CheckSkip », 148B7).
 
 ### 8.7 Pour libRealSpace
 
