@@ -100,12 +100,13 @@ Chunk **`SCRI`** (facultatif) : n octets (n = taille du chunk) = ordre des image
 > (`mov ax, si` / `add ax, 25h` / `push ax` avant `ResourceRecord_ReadFieldGroupA_64A19`), pas le
 > tampon. Les octets de `SCRI` remplacent donc le pointeur et les champs qui suivent (forme A, chance,
 > forme B), et débordent sur le modèle suivant au-delà de 5 octets. Le dessin lit ensuite +37 comme
-> pointeur vers la table d'images. Effet sur les données non vérifié : à regarder dans `SMOKESET.IFF`
-> (y a-t-il des chunks `SCRI` ?). Pour libRealSpace, lire `SCRI` comme une table d'images ordinaire.
+> pointeur vers la table d'images. **Sans effet sur les données** : `SMOKESET.IFF` n'a aucun chunk
+> `SCRI` (§ 2.6). Pour libRealSpace, lire `SCRI` comme une table d'images ordinaire s'il en existe un.
 
 ### 2.4 Forme (`FORM SHAP` dans `FORM TYPE`)
 
-Chunk **`SHAP`** obligatoire (sinon erreur `B005h`, 45061) : copié tel quel = une forme RealSpace
+Chunk **`SHAP`** obligatoire (sinon erreur `B005h`, 45061). Le STRIKE.EXE lu ici (version disquette) le
+copie tel quel : c'est une forme RealSpace
 (même format que les images de `CONVSHPS.PAK` : un `uint32`, puis la table des décalages d'images à
 partir de l'octet 4, chaque image commençant par 4 `int16` d'étendue). Nombre d'images = 1er décalage
 ÷ 4 − 1 (`Shape_GetImageCount_625CC`).
@@ -113,6 +114,13 @@ partir de l'octet 4, chaque image commençant par 4 `int16` d'étendue). Nombre 
 Le chargeur calcule une **demi-taille** de la forme : (plus grande hauteur + plus grande largeur des
 images) ÷ 4 (`Text_ComputeMaxLineHeight_5E706`, `Text_ComputeMaxLineWidth_5E6BF`, `sar ax, 2`). Elle
 sert à l'échelle du sprite (§ 5.3).
+
+**Formes compressées (données de la version CD).** Dans le `SMOKESET.IFF` de `BIGTRE.TRE` (CD-ROM), les 5
+chunks `SHAP` sont compressés : `LZ` (2 octets), `uint32` petit-boutiste = taille décompressée, puis
+des données LZW (le même LZW que les entrées des PAK ; `tools/terrain_map.py`, fonction `lzw`, les
+décompresse à la taille annoncée). Le STRIKE.EXE disquette ne connaît pas ce cas (information de Rémi) :
+le décodage est celui de la version CD, non lue ici. Pour libRealSpace : si le chunk commence par `LZ`,
+décompresser, sinon prendre le chunk tel quel.
 
 ### 2.5 Structures pour libRealSpace (en flottants)
 
@@ -142,6 +150,33 @@ struct SmokeShape {
     int halfSize;               // pixels : (hauteur max + largeur max) / 4
 };
 ```
+
+### 2.6 Le jeu de fumées des données (`OBJECTS\SMOKESET.IFF`, version CD)
+
+`INFO` : 9 modèles, 5 formes, 120 particules au plus. Aucun `SCRI`. Les 9 modèles sont en mode 2
+(sprite translucide), avec A = 0 : les couleurs translucides d'une forme sont 0 à B − 1.
+
+| Modèle | Espacement (m) | Taille début (m) | Taille fin (m) | Vie (s) | Dispersion (m) | Teinte début | Teinte fin | B | Forme A | Chance A (%) | Forme B | Animation | Images/s |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | 5 | 4 | 5 | 0,656 | 0,297 | 6 | 0 | 3 | 1 | 60 | 2 | `T` | 20 |
+| 1 | 8 | 4 | 4 | 0,656 | 0,297 | 22 | 16 | 3 | 4 | 100 | 0 | `T` | 20 |
+| 2 | 4 | 2 | 2 | 0,297 | 0,098 | 21 | 16 | 3 | 1 | 60 | 2 | `T` | 20 |
+| 3 | 4 | 4 | 6 | 1 | 1,398 | 24 | 16 | 5 | 1 | 60 | 2 | `T` | 15 |
+| 4 | 10 | 4 | 12 | 4,199 | 0,699 | 29 | 18 | 3 | 0 | 100 | 0 | `W` | 5 |
+| 5 | 10 | 3 | 5 | 2,5 | 1,5 | 32 | 40 | 3 | 0 | 100 | 0 | `W` | 5 |
+| 6 | 8 | 6 | 8 | 1,598 | 1,398 | 22 | 16 | 5 | 4 | 75 | 3 | `T` | 15 |
+| 7 | 4 | 4 | 8 | 4,199 | 0,699 | 29 | 18 | 3 | 1 | 60 | 2 | `T` | 20 |
+| 8 | 2 | 1 | 2 | 0,297 | 0,199 | 5 | 0 | 3 | 1 | 60 | 2 | `T` | 20 |
+
+Pas d'animation = 1 pour tous. Formes (taille décompressée, nombre d'images) :
+
+| Forme | Octets | Images |
+|---|---|---|
+| 0 | 2 919 | 3 |
+| 1 | 30 765 | 12 |
+| 2 | 24 632 | 10 |
+| 3 | 17 079 | 11 |
+| 4 | 42 809 | 11 |
 
 ## 3. Émission
 
@@ -298,7 +333,7 @@ non lus par le chargeur de palette lu ici (ovr288 : `INFO`, `PALT`, `SKYC`, `BLW
 ## 7. Points ouverts
 
 - Origine des tables de remappage `dword_72528` (§ 5.4).
-- Effet de la lecture de `SCRI` (§ 2.3) : dépend des données de `SMOKESET.IFF`.
+- Décodage des formes `LZ` par l'exécutable de la version CD (§ 2.4), non lu.
 - Ordre, dans l'image, des méthodes +16 (mise à jour) et +20 (mouvement) par rapport à la projection :
   appelants non lus.
 - Rôle de `ChaseCamera_ComputeGeometryHelper_5525B`, appelé avec l'aléa et la vitesse dans les deux
