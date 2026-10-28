@@ -502,9 +502,15 @@ TextLabel_AllocateBuffer_A6188	endp
 ; taille) → +0x20 n, +0x25 tableau = ordre des images. | PRÉCISÉ 2026-10-12 : +0x19 (dessin A)
 ; = première couleur translucide du sprite, +0x1A (dessin B) = nombre de couleurs translucides
 ; (Render_DrawScaledSprite_621A2). Mode de rendu : 0 = disque ombré
-; (Render_PlotPixelClippedColorMap, table de la teinte), 1 = sprite opaque
+; (Render_FillEllipseRemapped_258A8, table de la teinte), 1 = sprite opaque
 ; (Render_DrawRotatedScaledSprite_62800), 2 = sprite avec couleurs translucides A..A+B−1
-; (Render_DrawScaledSprite_621A2) ; autre valeur : rien n'est dessiné.
+; (Render_DrawScaledSprite_621A2) ; autre valeur : rien n'est dessiné. | ⚠️ 2026-10-28 : SCRI
+; est alloué (CRT_Malloc16_Retry(n) → +0x25) mais lu par
+; ResourceRecord_ReadFieldGroupA_64A19(di, ds:si+25h, n) : la destination est l'ADRESSE du
+; champ +0x25 (mov ax, si / add ax, 25h / push ax), pas le tampon ; les n octets de SCRI
+; écrasent le modèle à partir de +0x25 (pointeur, forme A, chance, forme B…), et au-delà de 5
+; octets le modèle suivant. Le dessin lit ensuite [+0x25] comme pointeur de table. Effet sur
+; les données : à vérifier sur SMOKESET.IFF.
 ; ==============================================================================================
 SmokeSet_LoadSmokeModel_A61D0	proc far		; CODE XREF: VROOMM_StubThunk_6CC38J SmokeSet_LoadFromIFF_A636C+260p
 

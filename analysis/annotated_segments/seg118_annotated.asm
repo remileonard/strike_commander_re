@@ -8,12 +8,14 @@ seg118		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 123 lignes, NON DÉTAILLÉE — référencée par sub_2AE7C. Construit une table de 16
-; entrées via des pointeurs fs:/lfs et un index à 4 bits (masque 0Fh) extrait par décalage
-; variable — probable table de hachage/dispatch pour un parseur ou une table de symboles.
-; Candidat pour lecture approfondie si le contexte de sub_2AE7C le justifie.
+; far, LUE 2026-10-28 (ex-Parser_BuildHashIndex_588E8). TRI PAR BASE (radix sort) de la liste
+; de primitives sur la clé dword à +2 de chaque élément (profondeur) : 8 passes de 4 bits (shr
+; eax, cl / and ax, 0Fh, cl = 0, 4 … 28), 16 paniers de 1024 places dans le tampon (un panier
+; plein déborde dans le suivant : cmp dx, 400h), rassemblés du panier 15 au panier 0 (mov cx,
+; 0Fh … dec cx) : ordre DÉCROISSANT, du plus loin au plus proche, stable. Clé comparée sans
+; signe.
 ; ==============================================================================================
-Parser_BuildHashIndex_588E8	proc far		; CODE XREF: Widget_RefreshTextConditional+29P
+RenderList_RadixSortDescending_588E8	proc far		; CODE XREF: RenderList_SortByDepth_2AE7C+29P
 
 var_26		= word ptr -26h
 var_22		= byte ptr -22h
@@ -30,7 +32,7 @@ arg_2		= dword	ptr  8
 		mov	di, [bp+arg_0]
 		mov	[bp+var_22], 0
 
-loc_588F9:				; CODE XREF: Parser_BuildHashIndex_588E8+C0j
+loc_588F9:				; CODE XREF: RenderList_RadixSortDescending_588E8+C0j
 		mov	si, di
 		push	ss
 		pop	es
@@ -43,7 +45,7 @@ loc_588F9:				; CODE XREF: Parser_BuildHashIndex_588E8+C0j
 		mov	[bp+var_26], ax
 		lds	si, ss:[di+4]
 
-loc_58914:				; CODE XREF: Parser_BuildHashIndex_588E8+7Cj
+loc_58914:				; CODE XREF: RenderList_RadixSortDescending_588E8+7Cj
 		lfs	bx, [si]
 		push	bx
 		mov	eax, fs:[bx+2]
@@ -60,8 +62,8 @@ loc_58926:
 loc_5892B:
 		add	bx, ax
 
-loc_5892D:				; CODE XREF: Parser_BuildHashIndex_588E8+55j
-					; Parser_BuildHashIndex_588E8+5Cj
+loc_5892D:				; CODE XREF: RenderList_RadixSortDescending_588E8+55j
+					; RenderList_RadixSortDescending_588E8+5Cj
 		mov	dx, ss:[bx]
 
 loc_58930:
@@ -80,7 +82,7 @@ loc_58936:
 		jmp	short loc_5892D
 ; ���������������������������������������������������������������������������
 
-loc_58946:				; CODE XREF: Parser_BuildHashIndex_588E8:loc_58934j
+loc_58946:				; CODE XREF: RenderList_RadixSortDescending_588E8:loc_58934j
 		shl	al, 2
 		add	dh, al
 		inc	word ptr ss:[bx]
@@ -96,12 +98,12 @@ loc_58946:				; CODE XREF: Parser_BuildHashIndex_588E8:loc_58934j
 		mov	es, word ptr ss:[di+arg_2+2]
 		mov	cx, 0Fh
 
-loc_58971:				; CODE XREF: Parser_BuildHashIndex_588E8+B4j
+loc_58971:				; CODE XREF: RenderList_RadixSortDescending_588E8+B4j
 		mov	dx, 0FFFFh
 		jmp	short loc_5898E
 ; ���������������������������������������������������������������������������
 
-loc_58976:				; CODE XREF: Parser_BuildHashIndex_588E8+B1j
+loc_58976:				; CODE XREF: RenderList_RadixSortDescending_588E8+B1j
 		mov	bx, cx
 		shl	bx, 0Ah
 		add	bx, dx
@@ -111,7 +113,7 @@ loc_58976:				; CODE XREF: Parser_BuildHashIndex_588E8+B1j
 		mov	[si], eax
 		add	si, 4
 
-loc_5898E:				; CODE XREF: Parser_BuildHashIndex_588E8+8Cj
+loc_5898E:				; CODE XREF: RenderList_RadixSortDescending_588E8+8Cj
 		inc	dx
 		lea	bx, [bp+var_20]
 		add	bx, cx
@@ -126,7 +128,7 @@ loc_5898E:				; CODE XREF: Parser_BuildHashIndex_588E8+8Cj
 		jmp	loc_588F9
 ; ���������������������������������������������������������������������������
 
-loc_589AB:				; CODE XREF: Parser_BuildHashIndex_588E8+BEj
+loc_589AB:				; CODE XREF: RenderList_RadixSortDescending_588E8+BEj
 		pop	fs
 		pop	ds
 		pop	di
@@ -135,6 +137,6 @@ loc_589AB:				; CODE XREF: Parser_BuildHashIndex_588E8+BEj
 locret_589B0:
 		leave
 		retf
-Parser_BuildHashIndex_588E8	endp
+RenderList_RadixSortDescending_588E8	endp
 
 seg118		ends

@@ -8,12 +8,12 @@ seg176		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, lit le champ +4 (taille en octets) d'une structure via pointeur far, le divise par 4 et
-; soustrait 1 — retourne l'index du dernier élément d'un tableau de dwords. Référencée par
-; ParticleEmitter_PeriodicUpdate_4C413 (seg106) et CachedObject_BuildAndTransform_5DEC9
-; (seg141).
+; far (ex-Struct_GetElementCountMinusOne_625CC). Nombre d'images d'une forme (sprite
+; RealSpace) : 1er décalage de la table d'images (mot à +4) ÷ 4 − 1 (shr ax, 1 ×2 / dec ax),
+; la table commençant à +4. Particle_UpdateLifeSizeShadeFrame_4C413 retire encore 1 pour le
+; numéro de la dernière image.
 ; ==============================================================================================
-Struct_GetElementCountMinusOne_625CC	proc far		; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+145P
+Shape_GetImageCount_625CC	proc far		; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+145P
 					; CachedObject_BuildAndTransform_5DEC9+3FP ...
 
 arg_0		= dword	ptr  6
@@ -37,6 +37,6 @@ loc_625D4:
 
 locret_625DF:
 		retf	4
-Struct_GetElementCountMinusOne_625CC	endp
+Shape_GetImageCount_625CC	endp
 
 seg176		ends

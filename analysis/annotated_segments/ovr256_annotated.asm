@@ -579,7 +579,7 @@ UISublist_ReleaseSimple_8CCE8	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine allocateurs typés et Struct_GetElementCountMinusOne_625CC (seg176).
+; far, combine allocateurs typés et Shape_GetImageCount_625CC (seg176).
 ; ==============================================================================================
 UISublist_ReleaseAndCount_8CD2C	proc far		; CODE XREF: VROOMM_StubThunk_6B4F3J
 
@@ -642,7 +642,7 @@ loc_8CD84:
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 
 loc_8CD9F:
 		les	bx, [bp+arg_0]

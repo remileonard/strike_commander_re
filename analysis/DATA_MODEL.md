@@ -426,6 +426,8 @@ forme dans l'ordre.
 **Forme (`FORM SHAP`)** : chunk `SHAP` obligatoire (erreur `B005h`), copié brut = image(s) de sprite ;
 le jeu en déduit une demi-taille moyenne ((hauteur + largeur) ÷ 4).
 
+Comportement complet (émission, vie, projection, tri, dessin) : `SMOKE_SYSTEM.md`.
+
 **Vie d'une particule** (`Particle_InitFromSmokeModel_4C168`, `Particle_UpdateLifeSizeShadeFrame_4C413`) :
 créée avec la taille et la teinte de début, position + aléa ±dispersion ; à chaque image, durée −= dt
 (≤ 0 → supprimée), taille et teinte interpolées **linéairement** de début à fin sur la durée de vie,

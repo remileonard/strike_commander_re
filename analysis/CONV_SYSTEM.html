@@ -482,8 +482,9 @@ fin du texte    → pas de bouche ; la réplique passe à l'attente</pre>
         <li><b>Ouverture</b> : la scène passe en plein écran (0, 0)-(319, 199) ; les bandes noires s'ouvrent
         en 24 pas (haut : une ligne par pas, bas : deux). L'image ne bouge pas à l'écran : elle est
         découverte. Les bandes se referment après la réponse.</li>
-        <li><b>Zone</b> : souris dans x 118 à 279, y 113 à 199 → « Accept Mission », partout ailleurs →
-        « Reject Mission ». Libellé réécrit à y = 175.</li>
+        <li><b>Zone</b> : souris dans x 118 à 279 (unités de souris, 0 à 639), y 113 à 199 → « Accept
+        Mission », partout ailleurs → « Reject Mission ». À l'écran : <b>x 59 à 139</b>, sur la main tendue de
+        l'image 53 (vérifié en jeu : on clique sur la main pour accepter). Libellé réécrit à y = 175.</li>
         <li><b>Effet</b> : réponse rangée pour la partie ; si refus, le curseur avance du mot de la commande.</li>
       </ul>
       <p>L'image 53 n'est présente que pour <code>beto</code>, <code>far</code>, <code>muh</code>,
@@ -733,7 +734,7 @@ CLOSEUP         air, image 255  « ...$W, west of the city. »</pre>
     du § 6 (code de référence <code>tools/conv_ref/conv_lips.cpp</code>).</li>
     <li><b>Image vide</b> (visages incomplets) : ne rien dessiner, ce n'est pas un écart.</li>
     <li><b>Accept / Reject</b> : l'image 53 remplace l'image des yeux au lieu d'être ajoutée ; une seule zone
-    « Accept » (x 118 à 279, y 113 à 199).</li>
+    « Accept », sur la main : écran x 59 à 139, y 113 à 199.</li>
   </ul>
   <h3>Lecture du script</h3>
   <ul>

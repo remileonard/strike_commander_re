@@ -8,10 +8,14 @@ seg056		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,36L — parcourt un tableau de pointeurs (+4, compteur +2), appelle vtable[0] sur chacun :
-; notification en masse (destruction/reset) des éléments d'une collection.
+; far, LUE 2026-10-28 (ex-Collection_NotifyAllDestroy). Dessin de la liste de primitives
+; 0x53FA : pour chaque pointeur du tableau +4 (nombre +2), dans l'ordre, appelle la méthode 0
+; de l'élément (call dword ptr [bx]) avec l'élément en argument : faces des objets
+; (Render_DispatchFlatOrPerspective…), terrain, particules de fumée (Particle_Draw_4C7ED).
+; Après RenderList_SortByDepth_2AE7C : dessin du plus loin au plus proche (algorithme du
+; peintre).
 ; ==============================================================================================
-Collection_NotifyAllDestroy	proc far		; CODE XREF: seg065:0197P
+RenderList_DrawAll_2AD65	proc far		; CODE XREF: seg065:0197P
 					; Camera_UpdateAndNotify_7AFCA+54P ...
 
 var_4		= dword	ptr -4
@@ -29,7 +33,7 @@ arg_0		= word ptr  6
 		jmp	short loc_2AD93
 ; ���������������������������������������������������������������������������
 
-loc_2AD7C:				; CODE XREF: Collection_NotifyAllDestroy+31j
+loc_2AD7C:				; CODE XREF: RenderList_DrawAll_2AD65+31j
 		les	bx, [bp+var_4]
 		push	large dword ptr	es:[bx]
 		les	bx, es:[bx]
@@ -39,14 +43,14 @@ loc_2AD7C:				; CODE XREF: Collection_NotifyAllDestroy+31j
 		add	word ptr [bp+var_4], 4
 		inc	di
 
-loc_2AD93:				; CODE XREF: Collection_NotifyAllDestroy+15j
+loc_2AD93:				; CODE XREF: RenderList_DrawAll_2AD65+15j
 		cmp	[si+2],	di
 		jg	short loc_2AD7C
 		pop	di
 		pop	si
 		leave
 		retf
-Collection_NotifyAllDestroy	endp
+RenderList_DrawAll_2AD65	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -163,10 +167,13 @@ ListItem_ConstructNumberedLabel	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,29L — si actif (+2), résout le texte (sub_5C832) et notifie l'affichage (sub_588E8) :
-; rafraîchissement conditionnel du texte d'un widget.
+; far, LUE 2026-10-28 (ex-Widget_RefreshTextConditional : aucun rapport avec du texte). Tri de
+; la liste de primitives 0x53FA (= word_724AA : +0 capacité, +2 nombre, +4 tableau de
+; pointeurs dword_724AE, +8 tampon de travail +0x16/+0x1A) : si le nombre ≠ 0,
+; RenderList_RadixSortDescending_588E8. Appelée chaque image par TrackedObject_FrameStep_2DF0D
+; (et dans ovr239, ovr248), juste avant RenderList_DrawAll_2AD65.
 ; ==============================================================================================
-Widget_RefreshTextConditional	proc far		; CODE XREF: seg065:loc_2DF81P
+RenderList_SortByDepth_2AE7C	proc far		; CODE XREF: seg065:loc_2DF81P
 					; Camera_UpdateAndNotify_7AFCA+4BP ...
 
 arg_0		= word ptr  6
@@ -187,14 +194,14 @@ arg_0		= word ptr  6
 		mov	[si+0Ah], dx
 		mov	[si+8],	ax
 		push	si
-		call	Parser_BuildHashIndex_588E8
+		call	RenderList_RadixSortDescending_588E8
 		pop	cx
 
-loc_2AEAB:				; CODE XREF: Widget_RefreshTextConditional+Bj
+loc_2AEAB:				; CODE XREF: RenderList_SortByDepth_2AE7C+Bj
 		pop	si
 		pop	bp
 		retf
-Widget_RefreshTextConditional	endp
+RenderList_SortByDepth_2AE7C	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

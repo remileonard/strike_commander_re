@@ -63,8 +63,10 @@ est cherchée à la préparation. Une gamme couvre les index `première` à `pre
    - **clé de tri** = la plus grande profondeur de ses 3 sommets (`FaceElement_DepthKey_2962D`),
      plus un décalage de ±4 m pour certains objets (objets à porteur, non détaillé) ;
    - la face entre dans la **file de primitives commune** (`dword_724AE`), partagée avec le terrain.
-     Le tri de cette file n'a pas été lu dans cette session : l'outil dessine de la clé la plus
-     grande à la plus petite (peintre).
+     Tri (lu le 2026-10-28, `SMOKE_SYSTEM.md` § 5.2) : `RenderList_SortByDepth_2AE7C` →
+     `RenderList_RadixSortDescending_588E8`, tri par base sur la clé, de la plus grande à la plus
+     petite (du plus loin au plus proche, ordre stable), puis `RenderList_DrawAll_2AD65` dessine dans
+     cet ordre (peintre). Les particules de fumée entrent dans la même file.
 
 ## 3. Intensité et teinte
 
@@ -163,7 +165,6 @@ Le guide de portage détaillé, avec le C++, est `IMPL_OBJECT_RENDER.md`.
 
 ## Non établi
 
-- Sens du tri de la file `dword_724AE` (supposé du plus loin au plus proche).
 - Tables `FADE` (fichier « palfade ») et tables de translucidité `dword_72528` : absentes.
 - Valeur de l'échelle de projection `dword_72202` en vol (l'outil prend 277 pixels).
 - Type 9, `FORM LINS`/`VLIN`, `FORM SPRS`/`VSPR`, `TXMA`, animation de texture (`AINF`).

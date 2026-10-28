@@ -711,7 +711,7 @@ loc_5DF03:
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	[bp+var_E], ax
 		xor	di, di
 		jmp	short loc_5DF58

@@ -28,7 +28,7 @@ arg_0		= dword	ptr  6
 		push	di
 		xor	di, di
 		push	large [bp+arg_0]
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	[bp+var_2], ax
 		xor	si, si
 		jmp	short loc_5E6F9

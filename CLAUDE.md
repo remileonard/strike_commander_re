@@ -291,6 +291,9 @@ strike_commander_re/
 │   ├── IMPL_TERRAIN_SKIRTS.md       à porter : jupes du terrain hors carte (cellule du bord répétée)
 │   ├── OBJECT_RENDER.md             rendu des objets 3D (FORM POLY) : niveaux de détail, rejet, tri,
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
+│   ├── SMOKE_SYSTEM.md              fumées : jeu de fumées (WRLD/SMOK → OBJECTS\SMOKESET.IFF), émetteurs SMKG et
+│   │                                  traînées, vie des particules, projection, tri commun des primitives, dessin
+│   │                                  (disque, sprites, tables de remappage) — lu 2026-10-28
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des

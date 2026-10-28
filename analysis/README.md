@@ -1046,7 +1046,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `TextRenderer_Main_27477` | 1158 | seg048 | **Moteur de rendu de texte principal (la plus grosse fonction à ce jour)** |
 | `Cinematic_SplineCompute_242AE` | 940 | seg042 | Calcul de trajectoire/interpolation caméra scriptée |
 | `Render_TriangleRasterizer_26A60` | 570 | seg046 | Point d'entrée du rasterizer de triangle |
-| `Render_PlotPixelClippedColorMap_258A8` | 443 | seg044 | Primitive de dessin avec table de couleurs |
+| `Render_FillEllipseRemapped_258A8` | 443 | seg044 | Ellipse pleine, chaque pixel remplacé par table[pixel de l'écran] (disque des fumées, SMOKE_SYSTEM.md) |
 | `Kneeboard_RenderEntry_23593` | 265 | seg041 | Rendu à 20 cas des entrées du journal de mission |
 | `Cinematic_LoadCameraDef_23E7D` | 338 | seg041 | Chargement de définition de caméra scriptée |
 | `Mission_TriggerEvaluator_22F53` | 381 | seg040 | Évaluateur de déclencheur d'événement de mission |
@@ -1103,7 +1103,7 @@ pas toutes été vérifiées byte-pour-byte individuellement, seul un
 | `Targeting_ComputeBearingElevation_55B1A` | 134 | seg116 | Gisement/élévation vers une cible |
 | `Matrix_RollAngle_57C67` | 143 | seg116 | Solution géométrique IA (cœur seg002) |
 | `GeomHelper_QuadrantComputeLoop_UNRESOLVED` | 348 | seg116 | Calcul répété sur 4 quadrants/coins (adresse non résolue) |
-| `Parser_BuildHashIndex_588E8` | 123 | seg118 | Construction de table de hachage/dispatch |
+| `RenderList_RadixSortDescending_588E8` | 123 | seg118 | Tri par base de la liste de primitives, du plus loin au plus proche (SMOKE_SYSTEM.md § 5.2) |
 | `Render_DitheredLineMain_58B97` | 298 | seg119 | Tracé de ligne pointillée/dégradée (rendu 3D) |
 | `Music_SequencerTickDispatch_59436` | 234 | seg121 | Dispatch de l'ISR minuteur matériel (4 cas) |
 | `Music_TuneTransitionResolve_595C2` | 208 | seg121 | Cas du séquenceur piloté par le minuteur |

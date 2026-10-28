@@ -759,7 +759,7 @@ loc_2BC2D:
 		push	word ptr es:[bx+3]
 		push	word ptr es:[bx+1]
 		push	word_70E60
-		call	Render_PlotPixelClippedColorMap
+		call	Render_FillEllipseRemapped_258A8
 		add	sp, 0Eh
 		leave
 		retf

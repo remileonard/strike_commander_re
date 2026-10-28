@@ -172,9 +172,9 @@ loc_2DF03:				; DATA XREF: seg339:0498o
 ; liste 0x59CD. Séquence lue : PIT_ReadHighPrecision (jalons de profilage
 ; dword_72B7A/7E/82/86/8A/8E), Camera_CopyState(objet,0x5146), Camera_UpdateViewportClip,
 ; WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3, objet),
-; Widget_RefreshTextConditional(0x53FA), Collection_NotifyAllDestroy(0x53FA), slot +0x20 puis
-; slot +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement
-; View_RenderFrame ('rendre cette vue' : non prouvé, nom neutralisé).
+; RenderList_SortByDepth_2AE7C(0x53FA), RenderList_DrawAll_2AD65(0x53FA), slot +0x20 puis slot
+; +0x14 du sous-vtable à +0x50, puis slot +4 de l'objet à +0x5C. Anciennement View_RenderFrame
+; ('rendre cette vue' : non prouvé, nom neutralisé).
 ; ==============================================================================================
 TrackedObject_FrameStep_2DF0D:				; DATA XREF: seg339:0478o seg339:049Co ...
 		push	bp
@@ -246,7 +246,7 @@ loc_2DF7E:
 		push	53FAh
 
 loc_2DF81:
-		call	Widget_RefreshTextConditional
+		call	RenderList_SortByDepth_2AE7C
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx
@@ -254,7 +254,7 @@ loc_2DF81:
 		pop	eax
 		mov	dword_72B86, eax
 		push	53FAh
-		call	Collection_NotifyAllDestroy
+		call	RenderList_DrawAll_2AD65
 		pop	cx
 		call	PIT_ReadHighPrecision
 		push	dx

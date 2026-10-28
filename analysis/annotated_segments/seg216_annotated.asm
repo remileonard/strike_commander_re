@@ -452,7 +452,7 @@ off_6A05E	dd 2AD60002h
 unk_6A063	db    0
 unk_6A064	db    1
 		db    0
-off_6A066	dd Collection_NotifyAllDestroy
+off_6A066	dd RenderList_DrawAll_2AD65
 		db  29h	; )
 		db    2
 unk_6A06C	db    1

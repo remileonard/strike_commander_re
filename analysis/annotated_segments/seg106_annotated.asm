@@ -226,12 +226,17 @@ Particle_InitFromSmokeModel_4C168	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,241L — compare la position d'un émetteur à la position caméra (dword_7220A/E/212, mêmes
-; globals que le pipeline de rendu principal), déclenche un son (0x5166, sub_58768) si en
-; portée : test de proximité caméra→émetteur avec déclenchement audio, gestion de flag d'état
-; (bit1 du champ +0x2C).
+; far, LUE 2026-10-28 (ex-ParticleEmitter_ProximityTest : aucun son, aucun test de proximité).
+; PROJECTION D'UNE PARTICULE : +0x2C bit 1 effacé ; position +0x0A/+0x0E/+0x12 − caméra
+; (dword_7220A/E/212), puis Matrix_WorldToLocal_58768(matrice 5166h) → (c0 latéral, c1
+; profondeur, c2 haut). Visible si profondeur > dword_721F6 (plan proche), profondeur ≤
+; dword_72540 << 8 (lointain) et taille +0x20 × focale dword_72202 ÷ profondeur > 153/256
+; pixel (mov [bp+var_22], 99h). Alors x écran +0x16 = word_721FE + c0 × focale ÷ profondeur et
+; y écran +0x18 = word_72200 − c2 × dword_72206 ÷ profondeur, chacun borné à ±32000.
+; Profondeur rangée en +0x02 dans tous les cas (clé de tri de la liste de primitives). Renvoie
+; 1 si visible.
 ; ==============================================================================================
-ParticleEmitter_ProximityTest	proc far		; CODE XREF: seg106:0DBEp
+Particle_ProjectToScreen_4C1EE	proc far		; CODE XREF: seg106:0DBEp
 
 var_6A		= dword	ptr -6Ah
 var_66		= dword	ptr -66h
@@ -304,16 +309,16 @@ loc_4C20D:
 		jmp	short loc_4C266
 ; ���������������������������������������������������������������������������
 
-loc_4C264:				; CODE XREF: ParticleEmitter_ProximityTest+6Fj
+loc_4C264:				; CODE XREF: Particle_ProjectToScreen_4C1EE+6Fj
 		xor	ax, ax
 
-loc_4C266:				; CODE XREF: ParticleEmitter_ProximityTest+74j
+loc_4C266:				; CODE XREF: Particle_ProjectToScreen_4C1EE+74j
 		or	al, al
 		jnz	short loc_4C26D
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C26D:				; CODE XREF: ParticleEmitter_ProximityTest+7Aj
+loc_4C26D:				; CODE XREF: Particle_ProjectToScreen_4C1EE+7Aj
 		mov	eax, dword_72540
 		mov	[bp+var_A], eax
 		shl	eax, 8
@@ -323,16 +328,16 @@ loc_4C26D:				; CODE XREF: ParticleEmitter_ProximityTest+7Aj
 		jmp	short loc_4C286
 ; ���������������������������������������������������������������������������
 
-loc_4C284:				; CODE XREF: ParticleEmitter_ProximityTest+8Fj
+loc_4C284:				; CODE XREF: Particle_ProjectToScreen_4C1EE+8Fj
 		xor	ax, ax
 
-loc_4C286:				; CODE XREF: ParticleEmitter_ProximityTest+94j
+loc_4C286:				; CODE XREF: Particle_ProjectToScreen_4C1EE+94j
 		or	al, al
 		jnz	short loc_4C28D
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C28D:				; CODE XREF: ParticleEmitter_ProximityTest+9Aj
+loc_4C28D:				; CODE XREF: Particle_ProjectToScreen_4C1EE+9Aj
 		mov	ax, word ptr [bp+arg_0+2]
 		mov	dx, word ptr [bp+arg_0]
 		add	dx, 20h	; ' '
@@ -360,16 +365,16 @@ loc_4C2A3:
 		jmp	short loc_4C2DB
 ; ���������������������������������������������������������������������������
 
-loc_4C2D9:				; CODE XREF: ParticleEmitter_ProximityTest+E4j
+loc_4C2D9:				; CODE XREF: Particle_ProjectToScreen_4C1EE+E4j
 		xor	ax, ax
 
-loc_4C2DB:				; CODE XREF: ParticleEmitter_ProximityTest+E9j
+loc_4C2DB:				; CODE XREF: Particle_ProjectToScreen_4C1EE+E9j
 		or	al, al
 		jnz	short loc_4C2E2
 		jmp	loc_4C3F9
 ; ���������������������������������������������������������������������������
 
-loc_4C2E2:				; CODE XREF: ParticleEmitter_ProximityTest+EFj
+loc_4C2E2:				; CODE XREF: Particle_ProjectToScreen_4C1EE+EFj
 		mov	eax, [bp+var_6A]
 		mov	[bp+var_26], eax
 		mov	eax, [bp+var_66]
@@ -405,14 +410,14 @@ loc_4C30C:
 		jmp	short loc_4C365
 ; ���������������������������������������������������������������������������
 
-loc_4C351:				; CODE XREF: ParticleEmitter_ProximityTest+157j
+loc_4C351:				; CODE XREF: Particle_ProjectToScreen_4C1EE+157j
 		cmp	[bp+var_40], 0FFFF8300h
 		jge	short loc_4C365
 		mov	[bp+var_40], 0FFFF8300h
 		jmp	short $+2
 
-loc_4C365:				; CODE XREF: ParticleEmitter_ProximityTest+161j
-					; ParticleEmitter_ProximityTest+16Bj
+loc_4C365:				; CODE XREF: Particle_ProjectToScreen_4C1EE+161j
+					; Particle_ProjectToScreen_4C1EE+16Bj
 		mov	ax, word ptr [bp+var_40]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+16h], ax
@@ -445,21 +450,21 @@ loc_4C365:				; CODE XREF: ParticleEmitter_ProximityTest+161j
 		jmp	short loc_4C3EB
 ; ���������������������������������������������������������������������������
 
-loc_4C3D7:				; CODE XREF: ParticleEmitter_ProximityTest+1DDj
+loc_4C3D7:				; CODE XREF: Particle_ProjectToScreen_4C1EE+1DDj
 		cmp	[bp+var_5E], 0FFFF8300h
 		jge	short loc_4C3EB
 		mov	[bp+var_5E], 0FFFF8300h
 		jmp	short $+2
 
-loc_4C3EB:				; CODE XREF: ParticleEmitter_ProximityTest+1E7j
-					; ParticleEmitter_ProximityTest+1F1j
+loc_4C3EB:				; CODE XREF: Particle_ProjectToScreen_4C1EE+1E7j
+					; Particle_ProjectToScreen_4C1EE+1F1j
 		mov	ax, word ptr [bp+var_5E]
 		les	bx, [bp+arg_0]
 		mov	es:[bx+18h], ax
 		mov	[bp+var_1], 1
 
-loc_4C3F9:				; CODE XREF: ParticleEmitter_ProximityTest+7Cj
-					; ParticleEmitter_ProximityTest+9Cj ...
+loc_4C3F9:				; CODE XREF: Particle_ProjectToScreen_4C1EE+7Cj
+					; Particle_ProjectToScreen_4C1EE+9Cj ...
 		mov	eax, [bp+var_66]
 		mov	[bp+var_E], eax
 		mov	eax, [bp+var_E]
@@ -471,7 +476,7 @@ loc_4C408:
 		pop	si
 		leave
 		retf
-ParticleEmitter_ProximityTest	endp
+Particle_ProjectToScreen_4C1EE	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -488,7 +493,13 @@ ParticleEmitter_ProximityTest	endp
 ; 'W' boucle. Puis taille +0x20 += modèle +0x09 × dt et teinte +0x28 += modèle +0x11 × dt
 ; (interpolation linéaire début → fin sur la durée de vie). Le rendu (seg106) projette la
 ; taille (× dword_72202 ÷ profondeur) et utilise la teinte (>> 8) comme index d'une table de
-; remappage de palette de 256 o (dword_72528).
+; remappage de palette de 256 o (dword_72528). | PRÉCISÉ 2026-10-28 : avant tout, bit 1 de
+; +0x2C (posé par Particle_Draw_4C7ED quand la particule a été dessinée) → compteur +0x2D = 2
+; ; sinon compteur −1, et à 0 la particule est supprimée : une particule qui n'est pas
+; dessinée pendant 2 mises à jour disparaît. Avance de l'image : accumulateur +0x2F (1/256
+; d'image) += images/s × dt ; une seule image de plus par mise à jour, quand la somme dépasse
+; 256 (cmp eax, 100h / jle). Dernière image = nombre de SCRI − 1, sinon
+; Shape_GetImageCount_625CC − 1.
 ; ==============================================================================================
 Particle_UpdateLifeSizeShadeFrame_4C413	proc far		; CODE XREF: seg106:0D71p
 
@@ -663,7 +674,7 @@ loc_4C534:				; CODE XREF: Particle_UpdateLifeSizeShadeFrame_4C413+10Ej
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		dec	ax
 		mov	cx, ax
 
@@ -855,8 +866,10 @@ off_4C70E	dw offset loc_4C5D8	; DATA XREF: Particle_UpdateLifeSizeShadeFrame_4C4
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,75L — si un vecteur de vitesse (+0x1A/1C/1E) est non nul, l'intègre (delta-temps
-; dword_7045E) dans la position : intégration de la vitesse d'une particule/débris émis.
+; far, LUE 2026-10-28. Si la vitesse (+0x1A/+0x1C/+0x1E, trois int16 en 1/256 m/s, movsx eax,
+; word ptr) n'est pas nulle : position (+0x0A/+0x0E/+0x12) += vitesse × dt (dword_7045E).
+; Vitesse posée par Particle_SpawnWithColor (mots bas du vecteur passé) ; nulle pour les
+; particules d'une traînée.
 ; ==============================================================================================
 Particle_IntegrateVelocity	proc far		; CODE XREF: seg106:0E2Cp
 
@@ -936,7 +949,25 @@ Particle_IntegrateVelocity	endp
 
 ; ���������������������������������������������������������������������������
 
-loc_4C7ED:				; DATA XREF: seg339:off_70166o
+; ==============================================================================================
+; far, LUE 2026-10-28. DESSIN D'UNE PARTICULE DE FUMÉE : méthode 0 de la table des particules
+; (seg339:off_70166, table 30B6h), appelée par RenderList_DrawAll_2AD65 dans l'ordre de la
+; liste de primitives triée. Selon le mode de rendu du modèle (octet +0 du modèle, mov al,
+; [bx]) : 0 = DISQUE : r = taille +0x20 × focale dword_72202 ÷ profondeur +0x02 (imul edx /
+; shrd eax, edx, 8 / idiv ecx), partie entière en pixels ; rejet si le carré (x ± r, y ± r)
+; sort de la fenêtre (word_7223E, word_72242, word_72240, word_72244) ; sinon +0x2C |= 2
+; (dessinée), table = dword_72528 + teinte (+0x28 >> 8) × 256 (shl bx, 8), aucune table si
+; teinte < 0, puis Render_FillEllipseRemapped_258A8(surface word_70E60, x +0x16, y +0x18, r, r
+; × dword_6E9AA (213/256 = 0,832) >> 8, table). 1 = SPRITE OPAQUE : échelle = taille × focale
+; ÷ (profondeur × demi-taille de la forme +0x0A) (Math_FixedMulDiv_5804C), bornée à 4..8192
+; (1/256 : 0,016 à 32) ; rayon projeté = échelle × demi-taille >> 8 pour le rejet ; image =
+; SCRI[image +0x2E] si le modèle a une table +0x25, sinon image +0x2E ;
+; Render_DrawRotatedScaledSprite_62800(surface, x, y, forme, image, échelle, échelle). 2 =
+; SPRITE TRANSLUCIDE : même calcul, puis Render_DrawScaledSprite_621A2(surface, x, y, forme,
+; image, échelle, échelle, table de la teinte, A = modèle +0x19, B = modèle +0x1A). Autre mode
+; : rien. Voir SMOKE_SYSTEM.md § 5.
+; ==============================================================================================
+Particle_Draw_4C7ED:				; DATA XREF: seg339:off_70166o
 		push	bp
 		mov	bp, sp
 		sub	sp, 80h
@@ -1079,7 +1110,7 @@ loc_4C90B:
 		push	word ptr es:[bx+18h]
 		push	word ptr es:[bx+16h]
 		push	word_70E60
-		call	Render_PlotPixelClippedColorMap
+		call	Render_FillEllipseRemapped_258A8
 		add	sp, 0Eh
 		jmp	loc_4CC88
 ; ���������������������������������������������������������������������������
@@ -1595,7 +1626,12 @@ loc_4CD9C:				; CODE XREF: seg106:0D3Ej
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CD9F:				; DATA XREF: seg339:off_7017Ao
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +16 du jeu de fumées (table 30BAh, seg339:off_7017A). Si le jeu
+; est prêt (+0x0A) : Particle_UpdateLifeSizeShadeFrame_4C413 sur chaque particule active ;
+; résultat 0 → ParticlePool_RemoveElement (le dernier pointeur du tableau prend sa place).
+; ==============================================================================================
+SmokeSet_UpdateParticles_4CD9F:				; DATA XREF: seg339:off_7017Ao
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -1640,7 +1676,17 @@ loc_4CDE7:				; CODE XREF: seg106:0D5Dj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CDEC:				; DATA XREF: seg339:off_7016Eo
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +4 du jeu de fumées (table 30BAh, seg339:off_7016E), appelée
+; chaque image par WorldObjects_CallSlot4OnAllThenRecompute_2214F(0x59C3) depuis
+; TrackedObject_FrameStep_2DF0D (le jeu de fumées est ajouté à la liste 0x59C3 par
+; World_LoadSmokeSet_A7CA1). Si le jeu est prêt (+0x0A) : pour chaque particule active
+; (tableau de pointeurs +0x29 .. +0x2D), Particle_ProjectToScreen_4C1EE ; si visible et s'il
+; reste de la place (word_724AC < word_724AA), ajoute le pointeur à la liste de primitives
+; dword_724AE (celle des faces des objets et du terrain), triée ensuite par
+; RenderList_SortByDepth_2AE7C et dessinée par RenderList_DrawAll_2AD65.
+; ==============================================================================================
+SmokeSet_CollectVisibleParticles_4CDEC:				; DATA XREF: seg339:off_7016Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 8
@@ -1659,7 +1705,7 @@ loc_4CE06:				; CODE XREF: seg106:0E05j
 loc_4CE09:
 		push	large dword ptr	es:[bx]
 		push	cs
-		call	near ptr ParticleEmitter_ProximityTest
+		call	near ptr Particle_ProjectToScreen_4C1EE
 
 loc_4CE11:
 		add	sp, 4
@@ -1696,7 +1742,11 @@ loc_4CE57:				; CODE XREF: seg106:0DAAj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CE5A:				; DATA XREF: seg339:off_7017Eo
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +20 du jeu de fumées (table 30BAh, seg339:off_7017E) :
+; Particle_IntegrateVelocity sur chaque particule active.
+; ==============================================================================================
+SmokeSet_IntegrateParticles_4CE5A:				; DATA XREF: seg339:off_7017Eo
 		push	bp
 		mov	bp, sp
 		sub	sp, 4
@@ -1728,7 +1778,13 @@ loc_4CE8E:				; CODE XREF: seg106:0E18j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_4CE91:				; DATA XREF: seg339:off_70182o
+; ==============================================================================================
+; far, LUE 2026-10-28. Méthode +24 du jeu de fumées (table 30BAh, seg339:off_70182) :
+; destructeur ; libère le tableau des modèles (+0x0D), les formes (+0x11, 12 octets chacune),
+; le tableau de pointeurs (+0x29) et la réserve de particules (+0x15), puis Handle_Destructor
+; ; libère l'objet si bit 0 de l'argument.
+; ==============================================================================================
+SmokeSet_Destruct_4CE91:				; DATA XREF: seg339:off_70182o
 		push	bp
 		mov	bp, sp
 		sub	sp, 4

@@ -3327,14 +3327,14 @@ off_70156	dd WorldObject_GetSignatureByte0_381E5
 off_7015A	dd VROOMM_StubThunk_6BFB0
 off_7015E	dd Explosion_DamageAtDistance_4BE51
 off_70162	dd loc_38342
-off_70166	dd loc_4C7ED
+off_70166	dd Particle_Draw_4C7ED
 off_7016A	dd loc_21E2C
-off_7016E	dd loc_4CDEC
+off_7016E	dd SmokeSet_CollectVisibleParticles_4CDEC
 off_70172	dd loc_21E40
 off_70176	dd loc_21E48
-off_7017A	dd loc_4CD9F
-off_7017E	dd loc_4CE5A
-off_70182	dd loc_4CE91
+off_7017A	dd SmokeSet_UpdateParticles_4CD9F
+off_7017E	dd SmokeSet_IntegrateParticles_4CE5A
+off_70182	dd SmokeSet_Destruct_4CE91
 off_70186	dd loc_21E88
 aSmokeman	db 'SMOKEMAN',0
 aSmokeslots	db 'SmokeSlots',0
@@ -7995,7 +7995,7 @@ word_721F3	dw 0			; DATA XREF: seg036:loc_2080Aw
 					; Cockpit_DrawEncodedText_8FA4C+31r ...
 		align 2
 dword_721F6	dd 0			; DATA XREF: seg042:0BB2r
-					; ParticleEmitter_ProximityTest+6Ar ...
+					; Particle_ProjectToScreen_4C1EE+6Ar ...
 		db    0
 		db    0
 		db    0

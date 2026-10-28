@@ -8,13 +8,14 @@ seg044		segment	byte public 'CODE' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,443L — primitive de tracé graphique bas niveau : plot d'un pixel avec clipping (bornes
-; min/max x/y) et remappage de couleur via table de correspondance (instruction xlat, segment
-; FS) ; variante en boucle pour remplissage de zone : primitive de dessin/remplissage avec
-; table de couleurs (probable effet de transparence/ombrage du moteur de rendu logiciel, même
-; famille que seg037).
+; far, 443 L, LUE EN PARTIE 2026-10-28 (ex-Render_PlotPixelClippedColorMap). Ellipse pleine
+; dont chaque pixel couvert est remplacé par table[pixel de l'écran] (xlat byte ptr fs:[bx]),
+; découpée à la fenêtre de la surface. Arguments : surface, x, y, rayon horizontal, rayon
+; vertical (pixels), table far de 256 octets. Rayon horizontal ou vertical nul : un seul
+; pixel. Algorithme du point milieu (carrés des rayons). Appelée par Particle_Draw_4C7ED (mode
+; 0 des fumées) et seg059.
 ; ==============================================================================================
-Render_PlotPixelClippedColorMap	proc far		; CODE XREF: seg059:0649P seg106:08EBP
+Render_FillEllipseRemapped_258A8	proc far		; CODE XREF: seg059:0649P seg106:08EBP
 
 var_36		= word ptr -36h
 var_34		= word ptr -34h
@@ -85,7 +86,7 @@ loc_258D3:
 		cmp	ax, 0
 		jnz	short loc_2590D
 
-loc_258DE:				; CODE XREF: Render_PlotPixelClippedColorMap+2Fj
+loc_258DE:				; CODE XREF: Render_FillEllipseRemapped_258A8+2Fj
 		mov	ax, [bp+arg_4]
 		cmp	ax, [bp+var_A]
 		jg	short loc_25909
@@ -104,15 +105,15 @@ loc_258DE:				; CODE XREF: Render_PlotPixelClippedColorMap+2Fj
 		xlat	byte ptr fs:[bx]
 		mov	es:[di], al
 
-loc_25909:				; CODE XREF: Render_PlotPixelClippedColorMap+3Cj
-					; Render_PlotPixelClippedColorMap+41j ...
+loc_25909:				; CODE XREF: Render_FillEllipseRemapped_258A8+3Cj
+					; Render_FillEllipseRemapped_258A8+41j ...
 		pop	di
 		pop	si
 		leave
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_2590D:				; CODE XREF: Render_PlotPixelClippedColorMap+34j
+loc_2590D:				; CODE XREF: Render_FillEllipseRemapped_258A8+34j
 		mov	[bp+var_2], 0
 		mov	ax, [bp+arg_8]
 		shl	ax, 1
@@ -173,7 +174,7 @@ loc_2594E:
 		sub	[bp+var_30], ax
 		sbb	[bp+var_2E], dx
 
-loc_259A1:				; CODE XREF: Render_PlotPixelClippedColorMap+1F3j
+loc_259A1:				; CODE XREF: Render_FillEllipseRemapped_258A8+1F3j
 		mov	ax, [bp+var_28]
 		mov	dx, [bp+var_26]
 		sub	ax, [bp+var_2C]
@@ -184,7 +185,7 @@ loc_259AF:
 		jmp	loc_25A9E
 ; ���������������������������������������������������������������������������
 
-loc_259B2:				; CODE XREF: Render_PlotPixelClippedColorMap+105j
+loc_259B2:				; CODE XREF: Render_FillEllipseRemapped_258A8+105j
 		cmp	[bp+var_36], 1
 		jnz	short loc_259CB
 		mov	ax, [bp+arg_2]
@@ -193,16 +194,16 @@ loc_259B2:				; CODE XREF: Render_PlotPixelClippedColorMap+105j
 		jle	short loc_259C6
 		mov	ax, [bp+var_C]
 
-loc_259C6:				; CODE XREF: Render_PlotPixelClippedColorMap+119j
+loc_259C6:				; CODE XREF: Render_FillEllipseRemapped_258A8+119j
 		cmp	ax, [bp+var_10]
 		jge	short loc_259CD
 
-loc_259CB:				; CODE XREF: Render_PlotPixelClippedColorMap+10Ej
-					; Render_PlotPixelClippedColorMap+139j ...
+loc_259CB:				; CODE XREF: Render_FillEllipseRemapped_258A8+10Ej
+					; Render_FillEllipseRemapped_258A8+139j ...
 		jmp	short loc_25A40
 ; ���������������������������������������������������������������������������
 
-loc_259CD:				; CODE XREF: Render_PlotPixelClippedColorMap+121j
+loc_259CD:				; CODE XREF: Render_FillEllipseRemapped_258A8+121j
 		mov	[bp+var_8], ax
 		mov	ax, [bp+arg_2]
 		sub	ax, [bp+var_2]
@@ -210,7 +211,7 @@ loc_259CD:				; CODE XREF: Render_PlotPixelClippedColorMap+121j
 		jge	short loc_259DE
 		mov	ax, [bp+var_10]
 
-loc_259DE:				; CODE XREF: Render_PlotPixelClippedColorMap+131j
+loc_259DE:				; CODE XREF: Render_FillEllipseRemapped_258A8+131j
 		cmp	ax, [bp+var_C]
 		jg	short loc_259CB
 		mov	[bp+var_6], ax
@@ -228,13 +229,13 @@ loc_259DE:				; CODE XREF: Render_PlotPixelClippedColorMap+131j
 		mov	di, [di]
 		add	di, [bp+var_6]
 
-loc_25A07:				; CODE XREF: Render_PlotPixelClippedColorMap+165j
+loc_25A07:				; CODE XREF: Render_FillEllipseRemapped_258A8+165j
 		mov	al, es:[di]
 		xlat	byte ptr fs:[bx]
 		stosb
 		loop	loc_25A07
 
-loc_25A0F:				; CODE XREF: Render_PlotPixelClippedColorMap+14Cj
+loc_25A0F:				; CODE XREF: Render_FillEllipseRemapped_258A8+14Cj
 		mov	ax, [bp+var_4]
 		or	ax, ax
 		jz	short loc_25A40
@@ -253,14 +254,14 @@ loc_25A0F:				; CODE XREF: Render_PlotPixelClippedColorMap+14Cj
 		mov	di, [di]
 		add	di, [bp+var_6]
 
-loc_25A38:				; CODE XREF: Render_PlotPixelClippedColorMap+196j
+loc_25A38:				; CODE XREF: Render_FillEllipseRemapped_258A8+196j
 		mov	al, es:[di]
 		xlat	byte ptr fs:[bx]
 		stosb
 		loop	loc_25A38
 
-loc_25A40:				; CODE XREF: Render_PlotPixelClippedColorMap:loc_259CBj
-					; Render_PlotPixelClippedColorMap+16Cj ...
+loc_25A40:				; CODE XREF: Render_FillEllipseRemapped_258A8:loc_259CBj
+					; Render_FillEllipseRemapped_258A8+16Cj ...
 		mov	cx, 0
 		cmp	[bp+var_2E], 0
 		js	short loc_25A6B
@@ -280,7 +281,7 @@ loc_25A62:
 		sub	[bp+var_30], ax
 		sbb	[bp+var_2E], dx
 
-loc_25A6B:				; CODE XREF: Render_PlotPixelClippedColorMap+19Fj
+loc_25A6B:				; CODE XREF: Render_FillEllipseRemapped_258A8+19Fj
 		mov	[bp+var_36], cx
 		inc	[bp+var_2]
 		mov	ax, [bp+var_28]
@@ -312,7 +313,7 @@ loc_25A92:
 		jmp	loc_259A1
 ; ���������������������������������������������������������������������������
 
-loc_25A9E:				; CODE XREF: Render_PlotPixelClippedColorMap:loc_259AFj
+loc_25A9E:				; CODE XREF: Render_FillEllipseRemapped_258A8:loc_259AFj
 		mov	ax, [bp+var_18]
 		mov	dx, [bp+var_16]
 		sub	ax, [bp+var_20]
@@ -338,23 +339,23 @@ loc_25AC4:
 		add	[bp+var_30], ax
 		adc	[bp+var_2E], dx
 
-loc_25ACE:				; CODE XREF: Render_PlotPixelClippedColorMap+2F4j
+loc_25ACE:				; CODE XREF: Render_FillEllipseRemapped_258A8+2F4j
 		mov	ax, [bp+arg_2]
 		add	ax, [bp+var_2]
 		cmp	ax, [bp+var_C]
 		jle	short loc_25ADC
 		mov	ax, [bp+var_C]
 
-loc_25ADC:				; CODE XREF: Render_PlotPixelClippedColorMap+22Fj
+loc_25ADC:				; CODE XREF: Render_FillEllipseRemapped_258A8+22Fj
 		cmp	ax, [bp+var_10]
 		jge	short loc_25AE3
 
-loc_25AE1:				; CODE XREF: Render_PlotPixelClippedColorMap+24Fj
-					; Render_PlotPixelClippedColorMap+25Dj
+loc_25AE1:				; CODE XREF: Render_FillEllipseRemapped_258A8+24Fj
+					; Render_FillEllipseRemapped_258A8+25Dj
 		jmp	short loc_25B54
 ; ���������������������������������������������������������������������������
 
-loc_25AE3:				; CODE XREF: Render_PlotPixelClippedColorMap+237j
+loc_25AE3:				; CODE XREF: Render_FillEllipseRemapped_258A8+237j
 		mov	[bp+var_8], ax
 		mov	ax, [bp+arg_2]
 		sub	ax, [bp+var_2]
@@ -362,7 +363,7 @@ loc_25AE3:				; CODE XREF: Render_PlotPixelClippedColorMap+237j
 		jge	short loc_25AF4
 		mov	ax, [bp+var_10]
 
-loc_25AF4:				; CODE XREF: Render_PlotPixelClippedColorMap+247j
+loc_25AF4:				; CODE XREF: Render_FillEllipseRemapped_258A8+247j
 		cmp	ax, [bp+var_C]
 		jg	short loc_25AE1
 		mov	[bp+var_6], ax
@@ -380,13 +381,13 @@ loc_25AF4:				; CODE XREF: Render_PlotPixelClippedColorMap+247j
 		mov	di, [di]
 		add	di, [bp+var_6]
 
-loc_25B1D:				; CODE XREF: Render_PlotPixelClippedColorMap+27Bj
+loc_25B1D:				; CODE XREF: Render_FillEllipseRemapped_258A8+27Bj
 		mov	al, es:[di]
 		xlat	byte ptr fs:[bx]
 		stosb
 		loop	loc_25B1D
 
-loc_25B25:				; CODE XREF: Render_PlotPixelClippedColorMap+262j
+loc_25B25:				; CODE XREF: Render_FillEllipseRemapped_258A8+262j
 		mov	ax, [bp+var_4]
 		or	ax, ax
 		jz	short loc_25B54
@@ -404,14 +405,14 @@ loc_25B25:				; CODE XREF: Render_PlotPixelClippedColorMap+262j
 		mov	di, [di]
 		add	di, [bp+var_6]
 
-loc_25B4C:				; CODE XREF: Render_PlotPixelClippedColorMap+2AAj
+loc_25B4C:				; CODE XREF: Render_FillEllipseRemapped_258A8+2AAj
 		mov	al, es:[di]
 		xlat	byte ptr fs:[bx]
 		stosb
 		loop	loc_25B4C
 
-loc_25B54:				; CODE XREF: Render_PlotPixelClippedColorMap:loc_25AE1j
-					; Render_PlotPixelClippedColorMap+282j ...
+loc_25B54:				; CODE XREF: Render_FillEllipseRemapped_258A8:loc_25AE1j
+					; Render_FillEllipseRemapped_258A8+282j ...
 		cmp	[bp+var_2E], 0
 
 loc_25B58:
@@ -430,7 +431,7 @@ loc_25B63:
 		add	[bp+var_30], ax
 		adc	[bp+var_2E], dx
 
-loc_25B75:				; CODE XREF: Render_PlotPixelClippedColorMap:loc_25B58j
+loc_25B75:				; CODE XREF: Render_FillEllipseRemapped_258A8:loc_25B58j
 		sub	[bp+var_4], 2
 		mov	ax, [bp+var_2C]
 		mov	dx, [bp+var_2A]
@@ -449,13 +450,13 @@ loc_25B7F:
 		jmp	loc_25ACE
 ; ���������������������������������������������������������������������������
 
-loc_25B9F:				; CODE XREF: Render_PlotPixelClippedColorMap+2F2j
+loc_25B9F:				; CODE XREF: Render_FillEllipseRemapped_258A8+2F2j
 		pop	di
 
 loc_25BA0:
 		pop	si
 		leave
 		retf
-Render_PlotPixelClippedColorMap	endp
+Render_FillEllipseRemapped_258A8	endp
 
 seg044		ends

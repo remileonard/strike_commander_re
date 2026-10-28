@@ -31,7 +31,7 @@ loc_5E70E:				; DATA XREF: seg216:055Eo
 		push	large [bp+arg_0]
 
 loc_5E714:
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	[bp+var_2], ax
 		xor	si, si
 		jmp	short loc_5E740

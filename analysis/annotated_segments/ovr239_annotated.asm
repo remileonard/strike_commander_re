@@ -160,8 +160,8 @@ EntityTracker_RegisterAndSelect	endp
 
 ; ==============================================================================================
 ; far, combine Camera_CopyState, SmallObject_RegisterInList_5D999 (seg139),
-; Camera_UpdateViewportClip, Container_FindAndTouch, Widget_RefreshTextConditional,
-; Collection_NotifyAllDestroy — mise à jour de caméra avec notification de destruction de
+; Camera_UpdateViewportClip, Container_FindAndTouch, RenderList_SortByDepth_2AE7C,
+; RenderList_DrawAll_2AD65 — mise à jour de caméra avec notification de destruction de
 ; collection.
 ; ==============================================================================================
 Camera_UpdateAndNotify_7AFCA	proc far		; CODE XREF: VROOMM_StubThunk_6ADB9J
@@ -196,10 +196,10 @@ arg_0		= word ptr  6
 		call	WorldObjects_CallSlot4OnAllThenRecompute_2214F
 		add	sp, 4
 		push	53FAh
-		call	Widget_RefreshTextConditional
+		call	RenderList_SortByDepth_2AE7C
 		pop	cx
 		push	53FAh
-		call	Collection_NotifyAllDestroy
+		call	RenderList_DrawAll_2AD65
 		pop	cx
 		push	2
 		lea	ax, [bp+var_4]
@@ -1145,7 +1145,7 @@ loc_7B741:
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	word ptr [bp+var_48], ax
 
 loc_7B781:				; CODE XREF: Player_ShotDownSequence_7B035+715j
@@ -1285,7 +1285,7 @@ loc_7B899:				; CODE XREF: Player_ShotDownSequence_7B035+860j
 		add	sp, 0Ah
 		push	dx
 		push	ax
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	word ptr [bp+var_48], ax
 
 loc_7B8ED:				; CODE XREF: Player_ShotDownSequence_7B035+871j

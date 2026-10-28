@@ -983,7 +983,7 @@ loc_8B78E:				; CODE XREF: MissionRecord_LoadFieldGroupMix_8B5A7+1BFj
 		les	bx, [bp+var_3A]
 		mov	word ptr es:[bx+2Ah], 0
 		push	large [bp+var_36]
-		call	Struct_GetElementCountMinusOne_625CC
+		call	Shape_GetImageCount_625CC
 		mov	[bp+var_40], ax
 		mov	si, 1
 		jmp	short loc_8B7C1

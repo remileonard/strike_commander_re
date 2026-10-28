@@ -60,10 +60,10 @@ loc_86243:				; CODE XREF: Camera_UpdateAndNotifyB_861E0+5Cj
 		add	sp, 4
 		mov	byte_6EB46, 1
 		push	53FAh
-		call	Widget_RefreshTextConditional
+		call	RenderList_SortByDepth_2AE7C
 		pop	cx
 		push	53FAh
-		call	Collection_NotifyAllDestroy
+		call	RenderList_DrawAll_2AD65
 		pop	cx
 		push	large 0
 		mov	bx, [si+80h]
