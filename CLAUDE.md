@@ -292,8 +292,9 @@ strike_commander_re/
 │   ├── OBJECT_RENDER.md             rendu des objets 3D (FORM POLY) : niveaux de détail, rejet, tri,
 │   │                                  éclairage par type de face, textures — lu 2026-10-16
 │   ├── SMOKE_SYSTEM.md              fumées : jeu de fumées (WRLD/SMOK → OBJECTS\SMOKESET.IFF), émetteurs SMKG et
-│   │                                  traînées, vie des particules, projection, tri commun des primitives, dessin
-│   │                                  (disque, sprites, tables de remappage) — lu 2026-10-28
+│   │                                  traînées (SMOK, chute JINF), vie des particules, projection, tri commun des
+│   │                                  primitives (tri par base), dessin, tables FADE de PALFADE.IFF — lu 2026-10-28
+│   ├── SMOKE_SYSTEM.html            version illustrée (HTML, images intégrées) ; images dans smoke_images/
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
@@ -376,7 +377,10 @@ strike_commander_re/
     │                                  vue 3D WebGL <nom>_3d.html générée avec la visionneuse ;
     │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
     ├── object_render.py             rendu logiciel d'un objet .IFF comme le jeu (OBJECT_RENDER.md) → PNG
-    ├── object_viewer.py (+ .html)   même rendu en WebGL : page autonome <objet>_viewer.html (orbite, LOD, options)
+    ├── object_viewer.py (+ .html)   même rendu en WebGL : page autonome <objet>_viewer.html (orbite, LOD, options) ;
+    │                                  avec --donnees <DATA> : traînée de fumée en vol (SMOK, JINF, tables FADE)
+    ├── smoke_render.py              fumées : planches des formes, des modèles, des tables FADE ; colonne SMOKEGEN (GIF)
+    ├── smoke_trail.py               fumées : traînée d'un avion en vol, --chute = modèle du JINF (GIF) — SMOKE_SYSTEM.md
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer

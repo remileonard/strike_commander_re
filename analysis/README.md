@@ -1251,3 +1251,27 @@ Tous renommés d'après les noms officiels (`AIL_register_sequence_60396`, `AIL_
   missile) ; ponctuations `0x10/0x11/0x12` quand le joueur détruit un objet, selon sa catégorie ;
   intensité de combat probablement liée aux dégâts du joueur (`word_722E6`).
 
+
+## ⭐⭐ Découverte majeure : les fumées, et la liste de primitives commune triée par base (2026-10-28)
+
+Détail : `SMOKE_SYSTEM.md` (version illustrée `SMOKE_SYSTEM.html`).
+
+- **Jeu de fumées** : le chunk `SMOK` du `FORM WRLD` nomme `OBJECTS\SMOKESET.IFF` (`World_LoadSmokeSet_A7CA1`
+  → `SmokeSet_LoadFromIFF_A636C`) : 9 modèles (chunks `INFO` de 25 octets, `ANIM`), 5 formes RealSpace, 120
+  particules au plus. Le « type de fumée » d'un objet est le rang d'un modèle dans `FORM TYPE`.
+- **Liste de primitives commune.** `ParticleEmitter_ProximityTest` était en fait la projection d'une
+  particule (`Particle_ProjectToScreen_4C1EE`) ; les particules visibles entrent dans la liste
+  `dword_724AE`, la même que les faces des objets et le terrain. Les noms `Widget_RefreshTextConditional`,
+  `Parser_BuildHashIndex_588E8` et `Collection_NotifyAllDestroy` étaient faux : le paramètre `53FAh` est
+  l'adresse de cette liste (`0x6D0B0 + 0x53FA = word_724AA`). `RenderList_RadixSortDescending_588E8`
+  trie par base la clé à +2 (profondeur), 8 passes de 4 bits (`shr eax, cl` / `and ax, 0Fh`), paniers
+  rassemblés de 15 à 0 (`mov cx, 0Fh` … `dec cx`) : du plus loin au plus proche ; `RenderList_DrawAll_2AD65`
+  appelle la méthode 0 de chaque élément (`call dword ptr [bx]`) : algorithme du peintre pour tout le décor.
+- **Tables de teinte** = chunk `FADE` de `PALETTE\PALFADE.IFF` (44 tables de 256 octets) : l'objet palette
+  global commence à `word_724CA`, et ses champs +94 / +98, remplis par `Palette_LoadFadeTables_989B8`, sont
+  `dword_72528` / `byte_7252C`, lus par `Particle_Draw_4C7ED`.
+- **Traînée de chute** : `Aircraft_OnDestroyed_9D770` recopie le 8e champ du chunk `JINF` (modèle +0x58,
+  `mov al, es:[bx+58h]` / `mov [si+54h], al`) dans le type de fumée de la traînée avant de l'allumer :
+  modèle 6 (fumée noire et boules de feu) au lieu du modèle 3 du chunk `SMOK`.
+- **Données CD** : chunks `SHAP` et texture `TXMA` compressés (`LZ`, `uint32` taille, LZW des PAK) ; même
+  contenu que la disquette une fois décompressé. Le STRIKE.EXE disquette lu ici ne les décompresse pas.

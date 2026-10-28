@@ -336,6 +336,45 @@ def draw_scaled(screen, w, h, sh, frame, cx, cy, scale, tables, shade, first, co
                 screen[at] = c
 
 
+def model_sheet(models, shapes, out, samples=8, metres_px=4.0):
+    """Chaque modèle sur le ciel, à 8 instants de sa vie (taille, teinte, image), 4 pixels par mètre."""
+    rgb = palette_rgb()
+    tables = fade_tables()
+    sky = nearest(rgb, (109, 145, 182))
+    cell = 120
+    w = 150 + cell * samples
+    h = cell * len(models) + 24
+    screen = bytearray([sky]) * (w * h)
+    labels = []
+    for mi, m in enumerate(models):
+        y = 24 + mi * cell + cell // 2
+        labels.append((mi, y))
+        if m['shapeA'] == 255:
+            continue
+        for k in range(samples):
+            t = m['life'] * k / samples
+            size = m['size0'] + (m['size1'] - m['size0']) * t / m['life']
+            shade = int(m['shade0'] + (m['shade1'] - m['shade0']) * t / m['life'])
+            shape = m['shapeA'] if k % 2 == 0 or m['chance'] == 100 else m['shapeB']
+            sh = shapes[shape]
+            count = len(d.shape_images(sh))
+            frame = min(count - 1, int(t * m['fps'])) if m['mode'] == 'T' else int(t * m['fps']) % count
+            scale = size * metres_px / shape_half_size(sh)
+            draw_scaled(screen, w, h, sh, frame, 150 + k * cell + cell // 2, y, scale, tables, shade,
+                        m['first'], m['count'])
+    im = to_rgb(screen, w, h, rgb)
+    draw = ImageDraw.Draw(im)
+    for k in range(samples):
+        draw.text((150 + k * cell + 4, 4), f't = {k}/{samples} vie', fill=(255, 255, 255), font=font(12))
+    for mi, y in labels:
+        m = models[mi]
+        shapes_txt = 'forme ' + str(m['shapeA']) if m['chance'] == 100 else f"formes {m['shapeA']}/{m['shapeB']}"
+        draw.text((6, y - 16), f'modèle {mi}', fill=(255, 255, 255), font=font(13))
+        draw.text((6, y + 2), shapes_txt, fill=(230, 230, 230), font=font(11))
+        draw.text((6, y + 16), f"teinte {m['shade0']}→{m['shade1']}", fill=(230, 230, 230), font=font(11))
+    im.save(out)
+
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit(__doc__)
@@ -346,6 +385,7 @@ def main():
     print(gen)
     shape_sheet(shapes, os.path.join(out, 'smoke_shapes.png'))
     fade_sheet(os.path.join(out, 'fade_tables.png'))
+    model_sheet(models, shapes, os.path.join(out, 'smoke_models.png'))
     render_column(models, shapes, gen, os.path.join(out, 'smokegen_column'))
 
 

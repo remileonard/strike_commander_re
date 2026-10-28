@@ -4,6 +4,8 @@
 > (particules), seg056 et seg118 (liste de primitives), seg044 (ellipse). Nombres en décimal ; repère
 > de libRealSpace (Y = altitude) ; distances en mètres, durées en secondes. Le format des chunks est
 > aussi dans `DATA_MODEL.md` (« Jeu de fumées ») ; ce document décrit ce que le programme en fait.
+> Données vérifiées sur `SMOKESET.IFF`, `SMOKEGEN.IFF`, `PALETTE.IFF`, `PALFADE.IFF` et les objets des
+> versions disquette et CD. Version illustrée : `SMOKE_SYSTEM.html`.
 
 ## 1. Vue d'ensemble
 
@@ -151,9 +153,10 @@ struct SmokeShape {
 };
 ```
 
-### 2.6 Le jeu de fumées des données (`OBJECTS\SMOKESET.IFF`, version CD)
+### 2.6 Le jeu de fumées des données (`OBJECTS\SMOKESET.IFF`)
 
-`INFO` : 9 modèles, 5 formes, 120 particules au plus. Aucun `SCRI`. Les 9 modèles sont en mode 2
+Fichier disquette (118 904 octets, formes non compressées) et fichier CD (64 437 octets, formes `LZ`) :
+même contenu une fois les formes décompressées. `INFO` : 9 modèles, 5 formes, 120 particules au plus. Aucun `SCRI`. Les 9 modèles sont en mode 2
 (sprite translucide), avec A = 0 : les couleurs translucides d'une forme sont 0 à B − 1.
 
 | Modèle | Espacement (m) | Taille début (m) | Taille fin (m) | Vie (s) | Dispersion (m) | Teinte début | Teinte fin | B | Forme A | Chance A (%) | Forme B | Animation | Images/s |
@@ -168,7 +171,26 @@ struct SmokeShape {
 | 7 | 4 | 4 | 8 | 4,199 | 0,699 | 29 | 18 | 3 | 1 | 60 | 2 | `T` | 20 |
 | 8 | 2 | 1 | 2 | 0,297 | 0,199 | 5 | 0 | 3 | 1 | 60 | 2 | `T` | 20 |
 
-Pas d'animation = 1 pour tous. Formes (taille décompressée, nombre d'images) :
+Pas d'animation = 1 pour tous.
+
+Qui emploie quel modèle (chunks `SMOK`, `SMKG` et `JINF` des objets des données) :
+
+| Modèle | Employé par |
+|---|---|
+| 0 | traînée des missiles (`AGM-65D`, `AMRAAM`, `SWINDERJ`, `SWINDERM`) ; générateur de l'épave `DABRMS-G` |
+| 1 | aucun objet des données |
+| 2 | aucun objet des données |
+| 3 | traînée des 20 avions (chasseurs, `A-10`, `C130`, `747`, `AWACS`, `LEARJET`, `TU-20`) |
+| 4 | générateurs des épaves de navires et de pétrolier (`DBOAT`, `DCARRIER`, `DDESTROY`, `DOILTANK`) et `SMOKEGEN` |
+| 5 | aucun objet des données |
+| 6 | traînée de chute des 20 avions (`JINF`) |
+| 7 | générateurs des épaves de véhicules (`DBMP-2`, `DJEEP`, `DT-72`, `DTRUCK2`, `DZSU-23`, `DMOBSAM`, `DSPGUN`, `D40MMAA`) |
+| 8 | traînée de `M261` |
+
+Les objets `D…` sont les épaves posées à la destruction (chunk `DEST`). Un modèle qu'aucun objet ne nomme
+peut être demandé directement par le code (appelant de seg104 non lu, § 8).
+
+Formes (taille décompressée, nombre d'images) :
 
 | Forme | Octets | Images |
 |---|---|---|
@@ -257,6 +279,25 @@ les formes 1 et 2 (fumée grise) ; le **modèle 6** mêle la forme 4 (fumée noi
 (boule de feu qui devient fumée) : c'est la traînée d'un avion abattu.
 
 ## 4. Vie d'une particule
+
+### 4.0 Une particule en mémoire (48 octets)
+
+| Octets | Contenu |
+|---|---|
+| 0 | table de méthodes (méthode 0 = `Particle_Draw_4C7ED`) |
+| 2 | profondeur dans le repère de la caméra (clé de tri, § 5.1) |
+| 6 | modèle de fumée |
+| 8 | forme |
+| 10, 14, 18 | position, 3 `int32` 24.8 (repère du jeu ; libRealSpace `x = c0`, `y = c2`, `z = −c1`) |
+| 22, 24 | x, y à l'écran |
+| 26, 28, 30 | vitesse, 3 `int16` en 1/256 m/s |
+| 32 | taille (24.8) |
+| 36 | vie restante (24.8, s) |
+| 40 | teinte (24.8 ; partie entière = numéro de table) |
+| 44 | drapeaux : bit 0 en service, bit 1 dessinée depuis la dernière mise à jour |
+| 45 | compteur de visibilité (2 au départ) |
+| 46 | image d'animation |
+| 47 | accumulateur d'animation (1/256 d'image) |
 
 ### 4.1 Mise à jour (`Particle_UpdateLifeSizeShadeFrame_4C413`)
 
@@ -386,8 +427,11 @@ teinte, teinte + 1, teinte + 2) ; la forme 3 a en plus des couleurs opaques 235 
 - `tools/object_viewer.py <objet.IFF> --donnees <DATA>` : la visionneuse WebGL embarque les fumées
   (section « Fumée » : traînée `SMOK`, chute `JINF` ou n'importe quel modèle ; vitesse, virage, cadence) ;
   composition en index de palette avec les tables `FADE`. `data/F-16DES_viewer.html` est générée ainsi.
-- Images : `analysis/smoke_images/` (`smoke_shapes.png`, `fade_tables.png`, `smokegen_txma.png`,
-  `smokegen_column.gif`, `f16_trail.gif` modèle 3, `f16_chute.gif` modèle 6).
+- Images : `analysis/smoke_images/` (`smoke_shapes.png`, `smoke_models.png` chaque modèle au fil de sa
+  vie sur un ciel, `fade_tables.png`, `smokegen_txma.png`, `smokegen_column.gif`, `f16_trail.gif`
+  modèle 3, `f16_chute.gif` modèle 6). `SMOKE_SYSTEM.html` les embarque.
+- Sur l'index de ciel 240, les tables d'assombrissement passent par la rampe de l'eau (160 à 175) avant
+  le gris : les reflets cyan des images viennent des tables, pas des outils.
 
 Ces rendus sont des illustrations : mise à l'échelle des sprites au plus proche voisin
 (`Render_DrawScaledSprite_621A2` non lue en détail), particules triées avec l'avion entier et non avec
