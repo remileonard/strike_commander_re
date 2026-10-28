@@ -21,6 +21,8 @@
   canvas { background: #000; width: 100%; height: auto; max-height: 100vh; aspect-ratio: 16 / 10;
     touch-action: none; cursor: grab; }
   canvas.pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
+  #view { position: relative; }
+  #smokeCanvas { position: absolute; pointer-events: none; display: none; background: none; aspect-ratio: auto; }
   aside { width: 310px; flex: none; background: var(--panel); border-left: 1px solid var(--line);
     padding: 14px 16px; overflow-y: auto; max-height: 100vh; }
   h1 { font-size: 15px; margin: 0 0 2px; }
@@ -47,7 +49,7 @@
 </style>
 </head>
 <body>
-<div id="view"><canvas id="c" width="320" height="200" class="pixel"></canvas></div>
+<div id="view"><canvas id="c" width="320" height="200" class="pixel"></canvas><canvas id="smokeCanvas" width="320" height="200" class="pixel"></canvas></div>
 <aside>
   <h1>__TITLE__</h1>
   <p class="sub">Pipeline fixe à la manière de SCRenderer (glBegin / glColor / glTexCoord, GL_MODULATE,
@@ -138,6 +140,26 @@
   <label class="range">Ambiante <input id="amb" type="range" min="0" max="10" step="1" value="3"><output></output></label>
   <label class="range">Lumière <input id="lw" type="range" min="0" max="10" step="1" value="5"><output></output></label>
 
+  <div id="smokePanel" style="display:none">
+  <h2>Fumée (SMOKE_SYSTEM.md)</h2>
+  <label><input id="smokeOn" type="checkbox"> traînée en vol</label>
+  <label>Modèle <select id="smokeModel"></select></label>
+  <label class="range">Vitesse m/s <input id="smokeSpeed" type="range" min="0" max="400" step="5" value="150"><output></output></label>
+  <label class="range">Virage °/s <input id="smokeTurn" type="range" min="-40" max="40" step="1" value="0"><output></output></label>
+  <label class="range">Images/s <input id="smokeRate" type="range" min="5" max="30" step="1" value="15"><output></output></label>
+  <div class="row"><button id="smokeClear">effacer les particules</button></div>
+  <p class="note">L'objet reste au centre ; le monde défile derrière lui (vitesse le long du nez, virage autour
+  de la verticale de l'objet). Chaque image, comme SmokeTrail_Tick_3D57E et Particles_SpawnAlongSegment_4D1C9 :
+  particules réparties de P (point du chunk SMOK) à sa position à l'image précédente, une tous les
+  « espacement » m, vieillies le long du segment ; vie, taille, teinte, image d'animation
+  (Particle_UpdateLifeSizeShadeFrame_4C413) ; suppression après 2 images sans dessin. Dessin
+  (Particle_Draw_4C7ED) sur l'image repassée en index de palette : mode 2, couleur c de la forme dans
+  A … A + B − 1 → FADE[teinte + c − A][fond], tables FADE de PALFADE.IFF. Particules plus lointaines que le
+  centre de l'objet : sur le fond seulement ; plus proches : par-dessus (le jeu trie chaque face avec
+  les particules). Mise à l'échelle au plus proche voisin. Modes RVB : couleurs ramenées à l'index le
+  plus proche avant la teinte.</p>
+  </div>
+
   <h2>État</h2>
   <div id="info"></div>
   <p class="note">Différences avec le jeu dues au pipeline fixe : dégradé interpolé en RVB (le jeu interpole
@@ -148,6 +170,11 @@
 <script>
 "use strict";
 const D = /*DATA*/null;
+// Dernière vue dessinée (fumées) : matrice MODELVIEW, échelle de projection, couleur du fond.
+let lastMV = null;
+let lastFocal = 277;
+let lastSky = [0, 0, 0];
+let smokeReady = false;       // posé par setupSmoke, une fois les données de fumée prêtes
 
 // =====================================================================================
 // Couche « pipeline fixe » : glBegin / glColor4f / glTexCoord2f / glVertex3f / glEnd,
@@ -784,6 +811,16 @@ function chooseLevel(depth, focal) {    // Poly_SelectDetailLevel_2BCA4 (byte_6E
 }
 
 function drawModel() {
+  drawModelGL();
+  if (!smokeReady) { return; }
+  if (ui.smokeOn.checked) {
+    renderSmoke();
+  } else {
+    smokeCanvas.style.display = "none";
+  }
+}
+
+function drawModelGL() {
   const focal = +ui.focal.value;
   const yaw = ui.yaw.value * Math.PI / 180;
   const pitch = ui.pitch.value * Math.PI / 180;
@@ -809,6 +846,8 @@ function drawModel() {
   const fovy = 2 * Math.atan((200 / 2) / focal) * 180 / Math.PI;
   const P = perspective(fovy, 320 / 200, 0.5, 20000);
   glLoadMatrices(P, MV);
+  lastMV = MV;
+  lastFocal = focal;
 
   // Lumière du LGHT (repère jeu) tournée autour de la verticale, convertie en libRS.
   const L = D.light.dir;
@@ -828,6 +867,7 @@ function drawModel() {
   gl.viewport(0, 0, canvas.width, canvas.height);
   const sky = ui.fogOn.checked && ui.fogSky.checked ? FOG_RGB : bg;
   gl.clearColor(sky[0], sky[1], sky[2], 1);
+  lastSky = sky;
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
   const depthC = -transformPoint(MV, centre)[2];
@@ -991,7 +1031,298 @@ $("oreset").addEventListener("click", () => {
     ui[id].dispatchEvent(new Event("input"));
   }
 });
-function tick() {
+
+// =====================================================================================
+// Fumées (analysis/SMOKE_SYSTEM.md). Particules dans le repère de l'objet (libRealSpace : nez vers −Z) ;
+// le monde défile derrière l'objet. Composition en index de palette avec les tables FADE du jeu.
+// =====================================================================================
+const smoke = D.smoke;
+const smokeCanvas = $("smokeCanvas");
+const smokeCtx = smokeCanvas.getContext("2d");
+const fade = smoke ? Uint8Array.from(atob(smoke.fade), (c) => c.charCodeAt(0)) : null;
+const fadeCount = fade ? fade.length / 256 : 0;
+const smokeShapes = smoke ? smoke.shapes.map((sh) => ({
+  half: sh.half,
+  images: sh.images.map(([w, h, x0, y0, pix, mask]) => ({
+    w, h, x0, y0,
+    pix: Uint8Array.from(atob(pix), (c) => c.charCodeAt(0)),
+    mask: Uint8Array.from(atob(mask), (c) => c.charCodeAt(0)),
+  })),
+})) : [];
+let particles = [];
+let modelStep = [];        // pas d'animation par modèle : les modes R et S le changent pour tout le modèle
+let simTime = null;
+let simAcc = 0;
+const rgbToIndex = new Map();
+
+function nearestIndex(r, g, b) {
+  const key = (r << 16) | (g << 8) | b;
+  let c = rgbToIndex.get(key);
+  if (c !== undefined) { return c; }
+  let best = 1e9;
+  c = 0;
+  for (let i = 0; i < 256; i++) {
+    const dr = pal[3 * i] - r;
+    const dg = pal[3 * i + 1] - g;
+    const db = pal[3 * i + 2] - b;
+    const dd = dr * dr + dg * dg + db * db;
+    if (dd < best) { best = dd; c = i; }
+  }
+  rgbToIndex.set(key, c);
+  return c;
+}
+
+function smokeModelIndex() {
+  const v = ui.smokeModel.value;
+  if (v === "smok") { return smoke.smok ? smoke.smok.type : 0; }
+  if (v === "fall") { return smoke.fall; }
+  return +v;
+}
+function emissionPoint() { return smoke.smok ? smoke.smok.point : [0, 0, 0]; }
+
+function pickShape(m) {          // Particle_SpawnWithColor : A avec la chance du modèle, sinon B
+  if (m.shapeA === 255) { return null; }
+  if (m.chance === 100 || Math.random() * 100 < m.chance) { return m.shapeA; }
+  return m.shapeB;
+}
+const jit = (a) => (Math.random() * 2 - 1) * a;
+
+function moveWorld(p, dt) {      // le monde tourne autour de l'objet (virage), puis recule le long du nez
+  const a = +ui.smokeTurn.value * Math.PI / 180 * dt;
+  const x = p[0] - centre[0];
+  const z = p[2] - centre[2];
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  return [centre[0] + x * c + z * s, p[1], centre[2] - x * s + z * c + +ui.smokeSpeed.value * dt];
+}
+
+function spawnAlong(m, P, Q, dt) {   // Particles_SpawnAlongSegment_4D1C9
+  const seg = sub(Q, P);
+  const len = Math.hypot(seg[0], seg[1], seg[2]);
+  let n = Math.floor(len / m.spacing);
+  if (n === 0 && len > 0) { n = 1; }
+  const step = [seg[0] / n, seg[1] / n, seg[2] / n];
+  const pos = [P[0], P[1], P[2]];
+  const sizeRate = (m.size1 - m.size0) / m.life;
+  const shadeRate = (m.shade1 - m.shade0) / m.life;
+  for (let k = 0; k < n; k++) {
+    const life = m.life - dt - k * dt / n;
+    if (life <= 0) { return; }
+    particles.push({ p: [pos[0], pos[1], pos[2]], life, size: m.size0 + k * sizeRate * dt / n,
+      shade: m.shade0 + k * shadeRate * dt / n, frame: Math.floor(k * m.fps * dt / n), acc: 0,
+      seen: 2, drawn: false, shape: pickShape(m) });
+    for (let a = 0; a < 3; a++) {
+      pos[a] += step[a];
+      if (k > 0 && k < n - 1) { pos[a] += jit(m.jitter); }
+    }
+  }
+}
+
+function lastFrame(m, q) {
+  if (m.order.length) { return m.order.length - 1; }
+  return q.shape === null ? 0 : smokeShapes[q.shape].images.length - 1;
+}
+
+function updateParticles(m, mi, dt) {   // Particle_UpdateLifeSizeShadeFrame_4C413
+  const out = [];
+  for (const q of particles) {
+    q.life -= dt;
+    if (q.life <= 0) { continue; }
+    if (q.drawn) { q.seen = 2; } else { q.seen--; if (q.seen === 0) { continue; } }
+    q.drawn = false;
+    const step = modelStep[mi];
+    if ((m.render === 1 || m.render === 2) && step !== 0) {
+      q.acc += m.fps * dt;
+      if (q.acc > 1) {
+        q.acc -= 1;
+        const last = lastFrame(m, q);
+        const next = q.frame + step;
+        if (m.mode === "R") {
+          q.frame = next;
+          if (q.frame >= last) { modelStep[mi] = -1; q.frame = last; }
+          if (q.frame <= 0) { modelStep[mi] = 1; q.frame = 0; }
+        } else if (m.mode === "S") {
+          if (next > last) { modelStep[mi] = 0; } else { q.frame = next; }
+        } else if (m.mode === "T") {
+          if (next > last || next < 0) { continue; }
+          q.frame = next;
+        } else if (m.mode === "W") {
+          q.frame = next > last ? 0 : next < 0 ? last : next;
+        }
+      }
+    }
+    q.size += (m.size1 - m.size0) / m.life * dt;
+    q.shade += (m.shade1 - m.shade0) / m.life * dt;
+    q.p = moveWorld(q.p, dt);
+    out.push(q);
+  }
+  particles = out;
+}
+
+function stepSmoke(now) {
+  const dt = 1 / +ui.smokeRate.value;
+  if (simTime === null) { simTime = now; }
+  simAcc += Math.min(0.5, (now - simTime) / 1000);
+  simTime = now;
+  const mi = smokeModelIndex();
+  const m = smoke.models[mi];
+  while (simAcc >= dt) {
+    simAcc -= dt;
+    const P = emissionPoint();
+    const Q = moveWorld(P, dt);
+    updateParticles(m, mi, dt);
+    spawnAlong(m, P, Q, dt);
+  }
+}
+
+function placeOverlay() {
+  smokeCanvas.style.left = canvas.offsetLeft + "px";
+  smokeCanvas.style.top = canvas.offsetTop + "px";
+  smokeCanvas.style.width = canvas.offsetWidth + "px";
+  smokeCanvas.style.height = canvas.offsetHeight + "px";
+  smokeCanvas.classList.toggle("pixel", canvas.classList.contains("pixel"));
+}
+
+function renderSmoke() {
+  const W = canvas.width;
+  const H = canvas.height;
+  const rgba = new Uint8Array(W * H * 4);
+  gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
+  const idx = new Uint8Array(W * H);
+  const isBg = new Uint8Array(W * H);
+  const sr = Math.round(lastSky[0] * 255);
+  const sg = Math.round(lastSky[1] * 255);
+  const sb = Math.round(lastSky[2] * 255);
+  for (let y = 0; y < H; y++) {
+    const src = (H - 1 - y) * W * 4;
+    for (let x = 0; x < W; x++) {
+      const o = src + 4 * x;
+      const r = rgba[o];
+      const g = rgba[o + 1];
+      const b = rgba[o + 2];
+      idx[y * W + x] = nearestIndex(r, g, b);
+      isBg[y * W + x] = Math.abs(r - sr) <= 1 && Math.abs(g - sg) <= 1 && Math.abs(b - sb) <= 1 ? 1 : 0;
+    }
+  }
+  const mi = smokeModelIndex();
+  const m = smoke.models[mi];
+  const fpx = lastFocal * H / 200;
+  const k = H / 200;
+  const depthC = -transformPoint(lastMV, centre)[2];
+  const list = [];
+  for (const q of particles) {         // Particle_ProjectToScreen_4C1EE
+    const e = transformPoint(lastMV, q.p);
+    const depth = -e[2];
+    if (depth <= 0.5) { continue; }
+    if (q.size * lastFocal / depth <= 153 / 256) { continue; }
+    list.push([depth, W / 2 + e[0] * fpx / depth, H / 2 - e[1] * fpx / depth, q]);
+  }
+  list.sort((a, b) => b[0] - a[0]);     // RenderList_RadixSortDescending_588E8 : du plus loin au plus proche
+  let shown = 0;
+  for (const [depth, sx, sy, q] of list) {
+    const behind = depth > depthC;
+    if (drawParticle(m, q, depth, sx, sy, fpx, k, idx, isBg, behind, W, H)) { q.drawn = true; shown++; }
+  }
+  const img = smokeCtx.createImageData(W, H);
+  for (let i = 0; i < W * H; i++) {
+    const c = idx[i];
+    img.data[4 * i] = pal[3 * c];
+    img.data[4 * i + 1] = pal[3 * c + 1];
+    img.data[4 * i + 2] = pal[3 * c + 2];
+    img.data[4 * i + 3] = 255;
+  }
+  if (smokeCanvas.width !== W || smokeCanvas.height !== H) { smokeCanvas.width = W; smokeCanvas.height = H; }
+  smokeCtx.putImageData(img, 0, 0);
+  placeOverlay();
+  smokeCanvas.style.display = "block";
+  $("info").textContent += "\nfumée       modèle " + mi + ", " + particles.length + " particules, " + shown + " dessinées";
+}
+
+function drawParticle(m, q, depth, sx, sy, fpx, k, idx, isBg, behind, W, H) {   // Particle_Draw_4C7ED
+  const put = (at, c) => { if (!behind || isBg[at]) { idx[at] = c; } };
+  const shadeT = Math.floor(q.shade);
+  if (m.render === 0) {                 // disque : ellipse, rayon vertical × 213/256
+    const r = Math.floor(q.size * fpx / depth);
+    if (sx + r < 0 || sx - r >= W || sy + r < 0 || sy - r >= H) { return false; }
+    if (shadeT < 0 || shadeT >= fadeCount) { return true; }
+    const ry = r * 213 / 256;
+    for (let y = Math.max(0, Math.ceil(sy - ry)); y <= Math.min(H - 1, Math.floor(sy + ry)); y++) {
+      const dy = ry ? (y - sy) / ry : 0;
+      const half = r * Math.sqrt(Math.max(0, 1 - dy * dy));
+      for (let x = Math.max(0, Math.ceil(sx - half)); x <= Math.min(W - 1, Math.floor(sx + half)); x++) {
+        const at = y * W + x;
+        put(at, fade[256 * shadeT + idx[at]]);
+      }
+    }
+    return true;
+  }
+  if (q.shape === null) { return false; }
+  const sh = smokeShapes[q.shape];
+  let frame = q.frame;
+  if (m.order.length) { frame = m.order[Math.min(frame, m.order.length - 1)]; }
+  const im = sh.images[Math.min(frame, sh.images.length - 1)];
+  if (!im.w) { return false; }
+  // Échelle du jeu (1/256 : 4 à 8192), puis pixels de la toile.
+  const gameScale = Math.min(32, Math.max(4 / 256, q.size * lastFocal / (depth * sh.half)));
+  const scale = gameScale * k;
+  const r = gameScale * sh.half * k;
+  if (sx + r < 0 || sx - r >= W || sy + r < 0 || sy - r >= H) { return false; }
+  const xa = Math.max(0, Math.floor(sx + im.x0 * scale));
+  const xb = Math.min(W - 1, Math.ceil(sx + (im.x0 + im.w) * scale));
+  const ya = Math.max(0, Math.floor(sy + im.y0 * scale));
+  const yb = Math.min(H - 1, Math.ceil(sy + (im.y0 + im.h) * scale));
+  for (let y = ya; y <= yb; y++) {
+    const v = Math.floor((y + 0.5 - sy) / scale) - im.y0;
+    if (v < 0 || v >= im.h) { continue; }
+    for (let x = xa; x <= xb; x++) {
+      const u = Math.floor((x + 0.5 - sx) / scale) - im.x0;
+      if (u < 0 || u >= im.w || !im.mask[v * im.w + u]) { continue; }
+      const c = im.pix[v * im.w + u];
+      const at = y * W + x;
+      if (m.render === 2 && c >= m.first && c < m.first + m.count) {
+        const t = shadeT + c - m.first;
+        if (t >= 0 && t < fadeCount) { put(at, fade[256 * t + idx[at]]); }
+      } else {
+        put(at, c);
+      }
+    }
+  }
+  return true;
+}
+
+function setupSmoke() {
+  if (!smoke) { return; }
+  $("smokePanel").style.display = "";
+  for (const id of ["smokeOn", "smokeModel", "smokeSpeed", "smokeTurn", "smokeRate"]) { ui[id] = $(id); }
+  if (smoke.smok) { ui.smokeModel.add(new Option("traînée : chunk SMOK, modèle " + smoke.smok.type, "smok")); }
+  ui.smokeModel.add(new Option("chute : JINF, modèle " + smoke.fall, "fall"));
+  smoke.models.forEach((m, i) => ui.smokeModel.add(new Option("modèle " + i + " — formes " +
+    (m.shapeA === 255 ? "aucune" : m.shapeA + (m.chance < 100 ? " (" + m.chance + " %) / " + m.shapeB : "")) +
+    ", " + m.life.toFixed(2) + " s", String(i))));
+  for (const id of ["smokeSpeed", "smokeTurn", "smokeRate"]) {
+    const out = ui[id].parentElement.querySelector("output");
+    const upd = () => { out.textContent = ui[id].value; };
+    ui[id].addEventListener("input", upd);
+    upd();
+  }
+  const reset = () => {
+    particles = [];
+    modelStep = smoke.models.map((m) => m.step);
+    simTime = null;
+    simAcc = 0;
+  };
+  reset();
+  ui.smokeModel.addEventListener("change", reset);
+  $("smokeClear").addEventListener("click", reset);
+  ui.smokeOn.addEventListener("change", () => { reset(); drawModel(); });
+  smokeReady = true;
+}
+
+function tick(now) {
+  if (smokeReady && ui.smokeOn.checked) {
+    stepSmoke(now);
+    drawModel();
+  }
   if (ui.ospin.checked) {
     let y = +ui.oyaw.value + 0.6;
     if (y > 180) { y -= 360; }
@@ -1021,6 +1352,7 @@ function updateColourNote() {
 }
 ui.colour.addEventListener("change", updateColourNote);
 updateColourNote();
+setupSmoke();
 setFiltering();
 resize();
 drawModel();

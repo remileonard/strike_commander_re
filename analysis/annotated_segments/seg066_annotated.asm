@@ -201,7 +201,7 @@ Palette_ShadeTableFor_2E8CD	endp
 ; far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Adresse d'une table FADE de 256 o
 ; (ex-Text_ResolveTruncated). n° 0 → 0 ; n° > 0 → base [+5Eh] + (min(n°, N) − 1) × 256 ; n° <
 ; 0 → base + [+50h] (= N × 256) + (min(|n°|, N) − 1) × 256. Les tables viennent du chunk FADE
-; du FORM FTBL du fichier nommé par TABL (TextureLoader_LoadWithDwordFieldsD_989B8).
+; du FORM FTBL du fichier nommé par TABL (Palette_LoadFadeTables_989B8).
 ; ==============================================================================================
 Palette_FadeTablePtr_2E8F1	proc far		; CODE XREF: Keyframe_InitWithEasing:loc_24BB2P
 					; Palette_FogRemapColour_29194+23P ...

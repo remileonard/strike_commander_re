@@ -1736,7 +1736,7 @@ dword_6E9BE	dd 0FFFFFFFFh		; DATA XREF: Texture_ResolveMipCached+37r
 dword_6E9C2	dd 0			; DATA XREF: Texture_ResolveMipCached:loc_2EB52w
 					; Texture_ResolveMipCached:loc_2EC36r	...
 aPalette	db 'PALETTE',0          ; DATA XREF: TextureLoader_OpenAndDecode_9800A+16o
-					; TextureLoader_OpenAndLoadSubrecord_98670+16o
+					; Palette_LoadFadeFile_98670+16o
 aNoMemForFadePa	db 'No mem for fade palettes.',0Ah,0
 		align 2
 		dd Render_DispatchFlatOrPerspective

@@ -110,7 +110,7 @@ VROOMM_StubThunk_6BC7E	endp
 ; d'overlay actuellement charge en memoire. fileoff=25F30h, codesize=0B18h, nentries=16.
 ; ==============================================================================================
 VROOMM_StubThunk_6BC83	proc far
-		jmp	TextureLoader_OpenAndLoadSubrecord_98670
+		jmp	Palette_LoadFadeFile_98670
 VROOMM_StubThunk_6BC83	endp
 
 
@@ -136,7 +136,7 @@ VROOMM_StubThunk_6BC88	endp
 ; d'overlay actuellement charge en memoire. fileoff=25F30h, codesize=0B18h, nentries=16.
 ; ==============================================================================================
 VROOMM_StubThunk_6BC8D	proc far
-		jmp	TextureLoader_LoadWithDwordFieldsD_989B8
+		jmp	Palette_LoadFadeTables_989B8
 VROOMM_StubThunk_6BC8D	endp
 
 

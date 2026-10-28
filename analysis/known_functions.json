@@ -1280,9 +1280,9 @@
     "summary": "far,27L — efface le flag associé (+0x2C bit0), retire l'élément du tableau circulaire (+0x2D) en compactant : **retrait d'un élément du pool circulaire d'émetteur.**"
   },
   "sub_989B8": {
-    "new_name": "TextureLoader_LoadWithDwordFieldsD_989B8",
+    "new_name": "Palette_LoadFadeTables_989B8",
     "segment": "ovr288",
-    "summary": "far, combine `Memory_TypedFreeWrapperB_5C774` (seg132), allocateur, ReadDwordFieldB_64AFF."
+    "summary": "far, LUE 2026-10-28 (ex-TextureLoader_LoadWithDwordFieldsD_989B8). Chunk FADE de PALFADE.IFF : bloc de la taille du chunk (type 2) rangé en objet palette +0x5E (pointeur) / +0x62 (type) / +0x64 (taille), nombre de tables +0x5C = taille >> 8 (`shr ax, 8`), puis lecture brute du chunk. Pour l'objet palette global (word_724CA), +0x5E et +0x62 sont dword_72528 et byte_7252C : les tables de 256 octets lues par Particle_Draw_4C7ED (teinte des fumées) et les faces translucides. Données : 44 tables (11 264 octets) ; 0 à 15 éclaircissent, 16 à 31 assombrissent, 32 à 43 teintent (SMOKE_SYSTEM.md § 5.4)."
   },
   "sub_4E041": {
     "new_name": "ParticleEmitter_Reset",
@@ -4962,7 +4962,7 @@
   "sub_98956": {
     "new_name": "TextureLoader_LoadWithDwordFieldsC_98956",
     "segment": "ovr288",
-    "summary": "far, LUE 2026-10-14. LIT LE TABLEAU DES SEUILS DE BROUILLARD de la palette : contrôle que la taille vaut lignes [+46h] << [+4Eh] × 4 (sinon erreur 900Ah), alloue et lit les dword dans palette+42h. Appelée par TextureLoader_OpenAndLoadSubrecord_98670 (fichier nommé par TABL, « palfade »)."
+    "summary": "far, LUE 2026-10-14. LIT LE TABLEAU DES SEUILS DE BROUILLARD de la palette : contrôle que la taille vaut lignes [+46h] << [+4Eh] × 4 (sinon erreur 900Ah), alloue et lit les dword dans palette+42h. Appelée par Palette_LoadFadeFile_98670 (fichier nommé par TABL, « palfade »)."
   },
   "sub_1DF3": {
     "new_name": "Heap_ErrHandler2",
@@ -8905,9 +8905,9 @@
     "summary": "⭐ far, enregistre le module auprès du minuteur matériel : référence explicitement `Music_SequencerTickISR_5940B` (seg121) via `Stopwatch_RegisterTickModuleVariant_67662` (seg207, tag 5DC2h, cadence 0x14). Confirme le lien direct entre ce cluster et le registre de modules à créneaux temporisés (seg161) découvert plusieurs lots auparavant."
   },
   "sub_98670": {
-    "new_name": "TextureLoader_OpenAndLoadSubrecord_98670",
+    "new_name": "Palette_LoadFadeFile_98670",
     "segment": "ovr288",
-    "summary": "far, combine `Path_ResolveDataFile`, StreamReader, ResourceRecord_SeekAndReadB_647B2 (123 lignes)."
+    "summary": "far, LUE 2026-10-28 (ex-TextureLoader_OpenAndLoadSubrecord_98670). Ouvre PALETTE\\<nom>.IFF, nom donné par le chunk TABL de PALETTE.IFF (« palfade » : PALFADE.IFF) ; racine FORM FTBL obligatoire (erreur 9005h, fichier absent 9006h) ; chunk D_HZ → TextureLoader_LoadWithDwordFieldsC_98956 ; chunk FADE → Palette_LoadFadeTables_989B8. Appelée par TextureLoader_SelectMipLevel_980F0 quand PALETTE.IFF a un chunk TABL."
   },
   "sub_A12DF": {
     "new_name": "Widget_Method_PassThroughC_A12DF",
@@ -10902,7 +10902,7 @@
   "sub_2E8F1": {
     "new_name": "Palette_FadeTablePtr_2E8F1",
     "segment": "seg066",
-    "summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Adresse d'une table FADE de 256 o (ex-Text_ResolveTruncated). n° 0 → 0 ; n° > 0 → base [+5Eh] + (min(n°, N) − 1) × 256 ; n° < 0 → base + [+50h] (= N × 256) + (min(|n°|, N) − 1) × 256. Les tables viennent du chunk FADE du FORM FTBL du fichier nommé par TABL (TextureLoader_LoadWithDwordFieldsD_989B8)."
+    "summary": "far, LUE 2026-10-16 (rendu des objets, OBJECT_RENDER.md). Adresse d'une table FADE de 256 o (ex-Text_ResolveTruncated). n° 0 → 0 ; n° > 0 → base [+5Eh] + (min(n°, N) − 1) × 256 ; n° < 0 → base + [+50h] (= N × 256) + (min(|n°|, N) − 1) × 256. Les tables viennent du chunk FADE du FORM FTBL du fichier nommé par TABL (Palette_LoadFadeTables_989B8)."
   },
   "sub_580ED": {
     "new_name": "Math_Tan_Raw_580ED",

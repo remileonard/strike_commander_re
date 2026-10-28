@@ -335,7 +335,7 @@ FORM REAL
 | `FORM TRIS` / `VTRI` | 8 o par face, tableau ci-dessous |
 | `FORM TRIS` / `FORM TXMS` / `INFO` | `uint16` nombre de `TXMP`, puis (si le chunk fait plus de 2 o) `uint16` nombre de `TXMA` |
 | `FORM TXMS` / `TXMP` | `char[8]` nom, `uint16` largeur, `uint16` hauteur, puis largeur × hauteur octets (index de palette, ligne après ligne ; `0xFF` = transparent) |
-| `FORM TXMS` / `TXMA` | texture animée : en-tête de 14 o lu, suite non détaillée |
+| `FORM TXMS` / `TXMA` | texture animée : en-tête de 14 o (8 o, `uint16` largeur, `uint16` hauteur, `uint16` nombre d'images), puis les images, largeur × hauteur octets chacune (relevé sur `SMOKEGEN.IFF` : 67 × 25, 10 images ; lecteur non lu). Version CD : la suite de l'en-tête est compressée (`LZ`, `uint32` taille, LZW) |
 | `FORM TRIS` / `UVXY` | 8 o : `uint8` numéro de face, `uint8` numéro de texture (≥ nombre de `TXMP` → `TXMA` n° − nombre de `TXMP`), puis 3 × (`uint8` u = colonne, `uint8` v = ligne) dans l'ordre des sommets de la face |
 | `FORM LINS` / `VLIN` | 7 o par ligne (contenu non lu) |
 | `FORM SPRS` / `VSPR` | 8 o par sprite (contenu non lu) |
@@ -385,7 +385,7 @@ Lecteurs de classe, chacun reprenant celui de sa base (« communs » = `Object_L
 
 **`JETP` · `EJEC`** (facultatif) : chaîne → `+0x5A` = nom de l'objet siège éjectable (`+0x63 = 1`).
 **`JETP` · `JINF`** (facultatif) : uint8 `+0x53`, uint16 `+0x54`, uint16 `+0x56`, uint8 `+0x52` (classe de
-combat, ≥ 9 chasseurs), uint16 `+0x64`, uint8 `+0x59`, uint16 `+0x66`, uint8 `+0x58`, uint16 `+0x68` ; absent →
+combat, ≥ 9 chasseurs), uint16 `+0x64`, uint8 `+0x59`, uint16 `+0x66`, uint8 `+0x58` (type de fumée de la traînée d'un avion abattu, `SMOKE_SYSTEM.md` § 3.3), uint16 `+0x68` ; absent →
 `+0x53 = 0`, `+0x52 = 2`, `+0x64 = 5`, `+0x59 = 0`, `+0x58 = 6`, `+0x68 = 30`.
 
 **Jeu de fumées — `SmokeSet_LoadFromIFF_A636C`** (seg450, lu 2026-10-12). Le chunk `WRLD/SMOK` d'un

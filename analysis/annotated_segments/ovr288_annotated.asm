@@ -328,7 +328,7 @@ arg_2		= word ptr  8
 		push	si
 		nop
 		push	cs
-		call	near ptr TextureLoader_OpenAndLoadSubrecord_98670
+		call	near ptr Palette_LoadFadeFile_98670
 		add	sp, 4
 
 loc_98141:				; CODE XREF: TextureLoader_SelectMipLevel_980F0+35j
@@ -964,10 +964,13 @@ TextureLoader_FormatAndLoad_985F6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Path_ResolveDataFile, StreamReader, ResourceRecord_SeekAndReadB_647B2 (123
-; lignes).
+; far, LUE 2026-10-28 (ex-TextureLoader_OpenAndLoadSubrecord_98670). Ouvre PALETTE\<nom>.IFF,
+; nom donné par le chunk TABL de PALETTE.IFF (« palfade » : PALFADE.IFF) ; racine FORM FTBL
+; obligatoire (erreur 9005h, fichier absent 9006h) ; chunk D_HZ →
+; TextureLoader_LoadWithDwordFieldsC_98956 ; chunk FADE → Palette_LoadFadeTables_989B8.
+; Appelée par TextureLoader_SelectMipLevel_980F0 quand PALETTE.IFF a un chunk TABL.
 ; ==============================================================================================
-TextureLoader_OpenAndLoadSubrecord_98670	proc far		; CODE XREF: VROOMM_StubThunk_6BC83J TextureLoader_SelectMipLevel_980F0+4Bp
+Palette_LoadFadeFile_98670	proc far		; CODE XREF: VROOMM_StubThunk_6BC83J TextureLoader_SelectMipLevel_980F0+4Bp
 
 var_F8		= word ptr -0F8h
 var_9B		= dword	ptr -9Bh
@@ -1043,7 +1046,7 @@ loc_986A0:
 		call	near ptr TextureLoader_LoadWithDwordFieldsC_98956
 		add	sp, 4
 
-loc_9872A:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+AAj
+loc_9872A:				; CODE XREF: Palette_LoadFadeFile_98670+AAj
 		push	0
 		push	large 45444146h
 		lea	ax, [bp+var_F8]
@@ -1057,25 +1060,25 @@ loc_9872A:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+AAj
 		push	si
 		nop
 		push	cs
-		call	near ptr TextureLoader_LoadWithDwordFieldsD_989B8
+		call	near ptr Palette_LoadFadeTables_989B8
 		add	sp, 4
 		jmp	short loc_98761
 ; ���������������������������������������������������������������������������
 
-loc_98753:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+91j
+loc_98753:				; CODE XREF: Palette_LoadFadeFile_98670+91j
 		push	9005h
 		jmp	short loc_9875B
 ; ���������������������������������������������������������������������������
 
-loc_98758:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+78j
+loc_98758:				; CODE XREF: Palette_LoadFadeFile_98670+78j
 		push	9006h
 
-loc_9875B:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+E6j
+loc_9875B:				; CODE XREF: Palette_LoadFadeFile_98670+E6j
 		call	VROOMM_StubThunk_6B70F
 		pop	cx
 
-loc_98761:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+D1j
-					; TextureLoader_OpenAndLoadSubrecord_98670+E1j
+loc_98761:				; CODE XREF: Palette_LoadFadeFile_98670+D1j
+					; Palette_LoadFadeFile_98670+E1j
 		mov	[bp+var_F8], 2E0h
 		lea	ax, [bp+var_F8]
 		push	ax
@@ -1089,7 +1092,7 @@ loc_98761:				; CODE XREF: TextureLoader_OpenAndLoadSubrecord_98670+D1j
 		pop	si
 		leave
 		retf
-TextureLoader_OpenAndLoadSubrecord_98670	endp
+Palette_LoadFadeFile_98670	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1319,10 +1322,9 @@ TextureLoader_LoadWithDwordFieldsB_988BD	endp
 ; ==============================================================================================
 ; far, LUE 2026-10-14. LIT LE TABLEAU DES SEUILS DE BROUILLARD de la palette : contrôle que la
 ; taille vaut lignes [+46h] << [+4Eh] × 4 (sinon erreur 900Ah), alloue et lit les dword dans
-; palette+42h. Appelée par TextureLoader_OpenAndLoadSubrecord_98670 (fichier nommé par TABL, «
-; palfade »).
+; palette+42h. Appelée par Palette_LoadFadeFile_98670 (fichier nommé par TABL, « palfade »).
 ; ==============================================================================================
-TextureLoader_LoadWithDwordFieldsC_98956	proc far		; CODE XREF: VROOMM_StubThunk_6BC88J TextureLoader_OpenAndLoadSubrecord_98670+B4p
+TextureLoader_LoadWithDwordFieldsC_98956	proc far		; CODE XREF: VROOMM_StubThunk_6BC88J Palette_LoadFadeFile_98670+B4p
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1381,9 +1383,15 @@ TextureLoader_LoadWithDwordFieldsC_98956	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine Memory_TypedFreeWrapperB_5C774 (seg132), allocateur, ReadDwordFieldB_64AFF.
+; far, LUE 2026-10-28 (ex-TextureLoader_LoadWithDwordFieldsD_989B8). Chunk FADE de PALFADE.IFF
+; : bloc de la taille du chunk (type 2) rangé en objet palette +0x5E (pointeur) / +0x62 (type)
+; / +0x64 (taille), nombre de tables +0x5C = taille >> 8 (shr ax, 8), puis lecture brute du
+; chunk. Pour l'objet palette global (word_724CA), +0x5E et +0x62 sont dword_72528 et
+; byte_7252C : les tables de 256 octets lues par Particle_Draw_4C7ED (teinte des fumées) et
+; les faces translucides. Données : 44 tables (11 264 octets) ; 0 à 15 éclaircissent, 16 à 31
+; assombrissent, 32 à 43 teintent (SMOKE_SYSTEM.md § 5.4).
 ; ==============================================================================================
-TextureLoader_LoadWithDwordFieldsD_989B8	proc far		; CODE XREF: VROOMM_StubThunk_6BC8DJ TextureLoader_OpenAndLoadSubrecord_98670+DBp
+Palette_LoadFadeTables_989B8	proc far		; CODE XREF: VROOMM_StubThunk_6BC8DJ Palette_LoadFadeFile_98670+DBp
 
 var_8		= dword	ptr -8
 var_4		= dword	ptr -4
@@ -1437,7 +1445,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-TextureLoader_LoadWithDwordFieldsD_989B8	endp
+Palette_LoadFadeTables_989B8	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

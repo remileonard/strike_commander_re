@@ -165,7 +165,7 @@ Le guide de portage détaillé, avec le C++, est `IMPL_OBJECT_RENDER.md`.
 
 ## Non établi
 
-- Tables `FADE` (fichier « palfade ») et tables de translucidité `dword_72528` : absentes.
+- Tables `FADE` : 44 tables de 256 octets du chunk `FADE` de `PALETTE\PALFADE.IFF` (`dword_72528` = objet palette + 94, `Palette_LoadFadeTables_989B8`, `SMOKE_SYSTEM.md` § 5.4) ; les outils de rendu d'objet utilisent encore une approximation.
 - Valeur de l'échelle de projection `dword_72202` en vol (l'outil prend 277 pixels).
 - Type 9, `FORM LINS`/`VLIN`, `FORM SPRS`/`VSPR`, `TXMA`, animation de texture (`AINF`).
 - Octet 5 bit 0 et octet 6 de `VTRI` (1, 2, 4, 8 observés sur le F-16).

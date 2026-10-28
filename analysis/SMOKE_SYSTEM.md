@@ -178,6 +178,21 @@ Pas d'animation = 1 pour tous. Formes (taille décompressée, nombre d'images) :
 | 3 | 17 079 | 11 |
 | 4 | 42 809 | 11 |
 
+### 2.7 Le générateur de l'objet `SMOKEGEN.IFF`
+
+Objet de classe `SMKG` (même contenu dans les données disquette et CD, la texture compressée en `LZ` dans
+la version CD) :
+- `INFO` : modèle de fumée 4, durée d'émission 60 s, montée 14 m/s, une particule toutes les 0,297 s,
+  chance 100, l'objet se supprime à la fin ;
+- `DAMG` 200 ; apparence 3D : 24 sommets, 20 faces de type 6 (texture non éclairée), un cercle d'environ
+  20 m de large et 12 m de haut ;
+- texture animée `TXMA` : en-tête de 14 octets (8 octets nuls, `uint16` largeur 67, `uint16` hauteur 25,
+  `uint16` 10 images), puis 10 images de 67 × 25 octets (16 750 octets, la taille du chunk moins
+  l'en-tête) : un rideau de flammes. Le lecteur de `TXMA` n'a pas été lu ; ce découpage vient des
+  tailles des données.
+
+C'est donc un feu au sol (flammes animées) surmonté d'une colonne de fumée noire.
+
 ## 3. Émission
 
 ### 3.1 Générateur posé (`SMKG`)
@@ -221,6 +236,25 @@ position à l'image précédente Q, puis appelle `Particles_SpawnAlongSegment_4D
 
 La traînée est donc continue quelle que soit la vitesse de l'objet, et les particules sont
 « vieillies » le long du segment parcouru pendant l'image.
+
+### 3.3 Quel modèle pour quelle traînée
+
+Le type de fumée de la traînée est rangé dans l'instance de l'objet ; il dépend de ce qui l'allume :
+
+| Cas | Fonction | Type de fumée |
+|---|---|---|
+| création de l'objet | `Camera_InitAttachedWithTarget_3DC3D` | celui du chunk `SMOK` de l'objet (la traînée reste éteinte) |
+| choc (contact) | `Aircraft_OnCollision_9D910` | inchangé : celui du chunk `SMOK` |
+| missile lancé | `SmokeTrail_EnableIfModelHasSmok_3D566` après `Missile_InitFlightTimer_A0455` | celui du chunk `SMOK` |
+| avion IA abattu qui tombe | `Aircraft_OnDestroyed_9D770` | **8e champ du chunk `JINF`** (octet 11 ; 6 sans `JINF`), recopié avant d'allumer la traînée |
+
+Avion IA abattu (`Aircraft_OnDestroyed_9D770`) : explosion immédiate avec la chance du 5e champ du `JINF`
+(F-16 : 3 %), sinon chute avec la traînée du `JINF`.
+
+Dans les données : chasseurs (F-16, F-15, F-18, MiG-29, Mirage…) chunk `SMOK` = modèle 3, point 14 m
+derrière le centre ; missiles = modèle 0 ; le `JINF` de tous les avions regardés donne 6. Le modèle 3 mêle
+les formes 1 et 2 (fumée grise) ; le **modèle 6** mêle la forme 4 (fumée noire, 75 %) et la forme 3
+(boule de feu qui devient fumée) : c'est la traînée d'un avion abattu.
 
 ## 4. Vie d'une particule
 
@@ -307,10 +341,23 @@ déjà à l'écran, la couleur qui la remplace : c'est le même jeu de tables qu
 objets (type de face 2, `OBJECT_RENDER.md`). La teinte d'une particule choisit la table (partie entière
 de la teinte).
 
-Origine de ces tables : **non tracée** dans cette session. Dans `data/PALETTE.IFF`, deux candidats
-restent à vérifier : le chunk `TABL` (« palfade ») et le `FORM BILD` (`INFO`, `TABL` de 46 octets),
-non lus par le chargeur de palette lu ici (ovr288 : `INFO`, `PALT`, `SKYC`, `BLWH`, `RANG`, `TABL`,
-`FTBL`, `D_HZ`, `FADE`).
+**Origine : le chunk `FADE` de `PALETTE\PALFADE.IFF`** (tracé le 2026-10-28). Le chunk `TABL` de
+`PALETTE.IFF` nomme le fichier (« palfade ») ; `Palette_LoadFadeFile_98670` l'ouvre (`FORM FTBL`) et
+`Palette_LoadFadeTables_989B8` range `FADE` dans l'objet palette, en +94 (bloc) et +98 (type) ; pour
+l'objet palette global (`word_724CA`), ces champs sont `dword_72528` et `byte_7252C`, ceux que lit
+`Particle_Draw_4C7ED`. Nombre de tables = taille ÷ 256.
+
+Dans les données : 11 264 octets, **44 tables**. Effet de chaque table sur la palette :
+- 0 à 15 : éclaircissent le fond, de presque rien (0) au gris clair (15) ;
+- 16 à 31 : l'assombrissent, de presque rien (16) au presque noir (31) ;
+- 32 à 41 : le teintent vers un gris-brun, de plus en plus fort ;
+- 42 et 43 : teintes vers le jaune et vers le vert.
+
+Les dix entrées du `FORM BILD` de `PALETTE.IFF` (couleur (50, 44, 33) de 0 à 63, de 9 % à 90 %) et la onzième
+((63, 63, 0), 50 %) correspondent aux tables 32 à 42 ; aucune lecture de `BILD` n'a été vue dans STRIKE.EXE.
+Les modèles de fumée vont de la teinte 0 à 40, plus le niveau 0 à 4 de la forme : de quoi rester dans les
+44 tables. Les formes 0, 1, 2 et 4 n'ont que les couleurs 0, 1 et 2 (trois niveaux de densité : table
+teinte, teinte + 1, teinte + 2) ; la forme 3 a en plus des couleurs opaques 235 à 239 (le feu).
 
 ## 6. Pour libRealSpace
 
@@ -330,9 +377,24 @@ non lus par le chargeur de palette lu ici (ovr288 : `INFO`, `PALT`, `SKYC`, `BLW
   pour avoir les mêmes traînées.
 - **Mode `R` et `S`** : le pas est partagé par toutes les particules d'un modèle.
 
-## 7. Points ouverts
+## 7. Outils et images
 
-- Origine des tables de remappage `dword_72528` (§ 5.4).
+- `tools/smoke_render.py --donnees <DATA> <dossier>` : planche des formes (niveaux de densité en gris),
+  planche des 44 tables `FADE`, colonne de fumée de `SMOKEGEN.IFF` (GIF). Pillow : `python3.13`.
+- `tools/smoke_trail.py --donnees <DATA> [--chute] <objet.IFF> <sortie>` : traînée d'un avion en virage,
+  modèle du chunk `SMOK` ou, avec `--chute`, celui du `JINF` (GIF).
+- `tools/object_viewer.py <objet.IFF> --donnees <DATA>` : la visionneuse WebGL embarque les fumées
+  (section « Fumée » : traînée `SMOK`, chute `JINF` ou n'importe quel modèle ; vitesse, virage, cadence) ;
+  composition en index de palette avec les tables `FADE`. `data/F-16DES_viewer.html` est générée ainsi.
+- Images : `analysis/smoke_images/` (`smoke_shapes.png`, `fade_tables.png`, `smokegen_txma.png`,
+  `smokegen_column.gif`, `f16_trail.gif` modèle 3, `f16_chute.gif` modèle 6).
+
+Ces rendus sont des illustrations : mise à l'échelle des sprites au plus proche voisin
+(`Render_DrawScaledSprite_621A2` non lue en détail), particules triées avec l'avion entier et non avec
+chacune de ses faces.
+
+## 8. Points ouverts
+
 - Décodage des formes `LZ` par l'exécutable de la version CD (§ 2.4), non lu.
 - Ordre, dans l'image, des méthodes +16 (mise à jour) et +20 (mouvement) par rapport à la projection :
   appelants non lus.
