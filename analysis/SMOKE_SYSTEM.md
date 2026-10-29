@@ -402,6 +402,9 @@ teinte, teinte + 1, teinte + 2) ; la forme 3 a en plus des couleurs opaques 235 
 
 ## 6. Pour libRealSpace
 
+Proposition d'implémentation complète, avec le code C++ de référence compilé contre libRealSpace :
+`IMPL_SMOKE.md` (`tools/smoke_ref/`).
+
 - **Chargement** : un jeu par monde, d'après le nom du chunk `WRLD/SMOK` ; modèles et formes numérotés
   par leur rang dans `FORM TYPE` ; valeurs converties comme au § 2.3. Le numéro de « type de fumée » des
   objets (`SMKG`, chunk `SMOK` des objets) est un numéro de modèle.
@@ -509,6 +512,8 @@ l'eau traversée par les tables.
   sans carte graphique). `data/F-16DES_viewer.html` est générée ainsi.
 - `tools/smoke_fade_fit.py --donnees <DATA>` : couleur et alpha de chaque table `FADE` (§ 6.1) ;
   `tools/smoke_ref/smoke_alpha.cpp` : le même calcul et la construction des textures RGBA, en C++.
+- `tools/smoke_ref/` : code de référence pour libRealSpace (lecture, particules, textures, dessin OpenGL),
+  `build.sh` et deux essais sur les données (`IMPL_SMOKE.md` § 7).
 - Images : `analysis/smoke_images/` (`smoke_shapes.png`, `smoke_models.png` et `smoke_models_alpha.png`
   chaque modèle au fil de sa vie, tables du jeu puis mélange alpha, `fade_tables.png`, `smokegen_txma.png`, `smokegen_column.gif`, `f16_trail.gif`
   modèle 3, `f16_chute.gif` modèle 6). `SMOKE_SYSTEM.html` les embarque.

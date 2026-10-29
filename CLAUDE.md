@@ -295,6 +295,8 @@ strike_commander_re/
 │   │                                  traînées (SMOK, chute JINF), vie des particules, projection, tri commun des
 │   │                                  primitives (tri par base), dessin, tables FADE de PALFADE.IFF — lu 2026-10-28
 │   ├── SMOKE_SYSTEM.html            version illustrée (HTML, images intégrées) ; images dans smoke_images/
+│   ├── IMPL_SMOKE.md                à porter : fumées (RSSmokeSet complet, particules, textures précalculées, dessin
+│   │                                  OpenGL, branchement SCPlane / missiles / SCStrike) — code tools/smoke_ref/
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
@@ -383,7 +385,8 @@ strike_commander_re/
     ├── smoke_render.py              fumées : planches des formes, des modèles, des tables FADE ; colonne SMOKEGEN (GIF)
     ├── smoke_trail.py               fumées : traînée d'un avion en vol, --chute = modèle du JINF (GIF) — SMOKE_SYSTEM.md
     ├── smoke_fade_fit.py            fumées : couleur + alpha qui approchent chaque table FADE (précalcul pour OpenGL) ;
-    │                                  smoke_ref/smoke_alpha.cpp : même calcul et textures RGBA, C++ — SMOKE_SYSTEM.md § 6.1
+    │                                  smoke_ref/ : code C++ de référence des fumées, compilé contre libRealSpace
+    │                                  (build.sh, essais sur les données, rendu OSMesa) — IMPL_SMOKE.md
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer
