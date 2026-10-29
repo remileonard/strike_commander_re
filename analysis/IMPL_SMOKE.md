@@ -135,9 +135,6 @@ Quel modèle pour quel émetteur (`SMOKE_SYSTEM.md` § 3.3) :
 | avion IA abattu qui tombe (`Aircraft_OnDestroyed_9D770`) | `entity->fall_smoke` (6) ; explosion immédiate avec la chance du 5e champ du `JINF` (F-16 : 3 %) |
 | générateur `SMKG` (épaves, `SMOKEGEN`) | type de son `INFO` (4 navires et pétrolier, 7 véhicules, 0 `DABRMS-G`) |
 
-Le cas de l'avion du joueur abattu passe par `Player_ShotDownSequence_7B035`, dont le corps n'est pas lu :
-son type de fumée n'est pas établi.
-
 ## 4. Dessin (`SCSmokeRenderer`)
 
 **Au chargement** (`init`, sans OpenGL), puis `upload` (contexte actif) :
