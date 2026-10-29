@@ -8,8 +8,8 @@
 
 #include "RLEShape.h"
 #include "RSSmokeSet.h"
-#include "SCSmokeParticles.h"
-#include "SCSmokeRenderer.h"
+#include "SCSmokeEmitter.h"
+#include "SCSmokeSet.h"
 #include "smoke_alpha.h"
 
 static std::vector<uint8_t> readFile(const char *path) {
@@ -27,19 +27,24 @@ static std::vector<uint8_t> readFile(const char *path) {
     return data;
 }
 
-// Palette du chunk PALT de PALETTE.IFF : 4 octets, puis 256 × 3 valeurs de 0 à 63.
-static std::vector<uint8_t> readPalette(const std::vector<uint8_t> &iff) {
-    std::vector<uint8_t> rgb(768, 0);
+// Palette du chunk PALT de PALETTE.IFF : 4 octets, puis 256 × 3 valeurs de 0 à 63 (convertFrom6To8 de libRealSpace
+// donne v × 255 / 63 à l'arrondi près).
+static VGAPalette readPalette(const std::vector<uint8_t> &iff) {
+    VGAPalette palette;
     for (size_t i = 12; i + 8 + 4 + 768 <= iff.size(); i++) {
         if (memcmp(&iff[i], "PALT", 4) == 0) {
-            for (int c = 0; c < 768; c++) {
-                int v = iff[i + 12 + c] * 255 / 63;
-                rgb[c] = static_cast<uint8_t>(v > 255 ? 255 : v);
+            for (int c = 0; c < 256; c++) {
+                Texel t;
+                t.r = static_cast<uint8_t>(iff[i + 12 + 3 * c] * 255 / 63);
+                t.g = static_cast<uint8_t>(iff[i + 12 + 3 * c + 1] * 255 / 63);
+                t.b = static_cast<uint8_t>(iff[i + 12 + 3 * c + 2] * 255 / 63);
+                t.a = 255;
+                palette.SetColor(static_cast<uint8_t>(c), t);
             }
             break;
         }
     }
-    return rgb;
+    return palette;
 }
 
 static void alphaSelfTest() {
@@ -74,8 +79,9 @@ static bool findChunk(std::vector<uint8_t> &file, const char *name, uint8_t **da
     return false;
 }
 
-static void simulate(SCSmokeParticles &smoke, int model, const char *label) {
-    smoke.clear();
+static void simulate(const RSSmokeSet &set, SCSmokeSet &smokeSet, int model, const char *label) {
+    SCSmokeEmitter smoke;
+    smoke.init(&set, model, 5);
     const float dt = 1.0f / 15.0f;
     const float speed = 150.0f;
     // Avion en palier vers −Z (nord), traînée au point du chunk SMOK du F-16 : 14 m derrière le centre.
@@ -93,16 +99,17 @@ static void simulate(SCSmokeParticles &smoke, int model, const char *label) {
     for (int frame = 0; frame < 45; frame++) {
         position = position + velocity * dt;
         Vector3D emission = position + Vector3D(0.0f, 0.0f, 14.0f);
-        smoke.emitTrail(model, emission, velocity, dt);
-        for (auto &p : smoke.particles()) {
-            p.drawn = true; // toutes à l'écran pour l'essai
-        }
+        smoke.emitTrail(emission, velocity, dt);
         smoke.update(dt);
         if (frame % 5 == 4) {
-            printf(" %zu", smoke.particles().size());
+            printf(" %zu", smoke.getParticles().size());
         }
     }
-    printf(" particules\n");
+    std::vector<SCSmokeSprite> sprites;
+    smoke.sprites(smokeSet, position + Vector3D(70.0f, 0.0f, 0.0f), sprites);
+    printf(" particules ; %zu sprites, du plus loin (%.0f m, côté %.1f m) au plus proche (%.0f m, côté %.1f m)\n",
+           sprites.size(), sprites.front().distance, sprites.front().size, sprites.back().distance,
+           sprites.back().size);
 }
 
 int main(int argc, char **argv) {
@@ -151,11 +158,11 @@ int main(int argc, char **argv) {
         printf("forme %zu : %zu octets, %zu images, demi-taille %d, %zu pixels\n", i, s.data.size(), s.images.size(),
                s.halfSize, present);
     }
-    std::vector<uint8_t> palette = readPalette(paletteFile);
-    std::vector<uint8_t> fade = loadFadeTables(fadeFile.data(), fadeFile.size());
-    SCSmokeRenderer renderer;
-    renderer.init(set, palette.data(), fade);
-    const std::vector<FadeBlend> &blends = renderer.fadeBlends();
+    SCSmokeSet smokeSet;
+    smokeSet.smoke_set = &set;
+    smokeSet.palette = readPalette(paletteFile);
+    smokeSet.initFadeTextures(fadeFile.data(), fadeFile.size());
+    const std::vector<FadeBlend> &blends = smokeSet.fade_blends;
     printf("%zu tables FADE\n", blends.size());
     int shown[4] = {
         0,
@@ -169,11 +176,10 @@ int main(int argc, char **argv) {
                    blends[t].b);
         }
     }
-    printf("%zu textures précalculées, %zu Ko\n", renderer.textureCount(), renderer.memoryBytes() / 1024);
-    SCSmokeParticles smoke;
-    smoke.init(&set, 5);
-    simulate(smoke, 3, "traînée en vol");
-    simulate(smoke, 6, "chute");
+    printf("%zu textures précalculées\n", smokeSet.textureCount());
+    simulate(set, smokeSet, 3, "traînée en vol");
+    simulate(set, smokeSet, 6, "chute");
+    simulate(set, smokeSet, 0, "missile");
     Vector3D local = {
         -14.0f,
         0.0f,
@@ -222,7 +228,8 @@ int main(int argc, char **argv) {
             RSSmokeGeneratorInfo info = readSmokeGeneratorInfo(chunk, size);
             printf("SMKG : modèle %d, durée %.1f s, montée %.1f m/s, intervalle %.3f s, chance %d, suppression %d\n",
                    info.type, info.duration, info.rise, info.interval, info.chance, info.removeAtEnd);
-            smoke.clear();
+            SCSmokeEmitter smoke;
+            smoke.init(&set, info.type, 5);
             SCSmokeGenerator generator;
             generator.init(info, true);
             Vector3D ground = {
@@ -234,15 +241,12 @@ int main(int argc, char **argv) {
             float top = 0.0f;
             for (int frame = 0; frame < 150; frame++) {
                 generator.tick(smoke, ground, dt);
-                for (auto &p : smoke.particles()) {
-                    p.drawn = true;
-                }
                 smoke.update(dt);
             }
-            for (auto &p : smoke.particles()) {
+            for (const auto &p : smoke.getParticles()) {
                 top = (std::max)(top, p.position.y);
             }
-            printf("SMKG après 10 s : %zu particules, la plus haute à %.0f m\n", smoke.particles().size(), top);
+            printf("SMKG après 10 s : %zu particules, la plus haute à %.0f m\n", smoke.getParticles().size(), top);
         }
     }
     return 0;

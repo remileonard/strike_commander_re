@@ -40,22 +40,6 @@ void RSSmokeSet::InitFromRam(uint8_t *data, size_t size) {
     IFFHandlers handlers;
     handlers["SMOK"] = std::bind(&RSSmokeSet::parseSMOK, this, std::placeholders::_1, std::placeholders::_2);
     lexer.InitFromRAM(data, size, handlers);
-
-    // Images après la lecture : les PakArchive et RLEShape gardent un pointeur dans shape.data.
-    for (auto &shape : shapes) {
-        PakArchive pak;
-        pak.InitFromRAM("SHAPE", shape.data.data(), shape.data.size());
-        for (size_t i = 0; i < static_cast<size_t>(pak.GetNumEntries()); i++) {
-            RLEShape *image = new RLEShape();
-            image->init(pak.GetEntry(i)->data, pak.GetEntry(i)->size);
-            Point2D origin = {
-                0,
-                0
-            };
-            image->SetPosition(&origin);
-            shape.images.push_back(image);
-        }
-    }
 }
 
 void RSSmokeSet::parseSMOK(uint8_t *data, size_t size) {
@@ -190,6 +174,21 @@ void RSSmokeSet::parseSMOK_TYPE_SHAP_SHAP(uint8_t *data, size_t size) {
     }
     shape.halfSize = (std::max)(1, (maxHeight + maxWidth) / 4);
     shapes.push_back(std::move(shape));
+    // Images : PakArchive et RLEShape gardent un pointeur dans data. Ce tampon ne bouge pas quand le tableau
+    // shapes s'agrandit (le std::vector de chaque forme est déplacé, pas recopié).
+    RSSmokeShape &stored = shapes.back();
+    PakArchive pak;
+    pak.InitFromRAM("SHAPE", stored.data.data(), stored.data.size());
+    for (size_t i = 0; i < pak.GetNumEntries(); i++) {
+        RLEShape *image = new RLEShape();
+        image->init(pak.GetEntry(i)->data, pak.GetEntry(i)->size);
+        Point2D origin = {
+            0,
+            0
+        };
+        image->SetPosition(&origin);
+        stored.images.push_back(image);
+    }
 }
 
 // uint8 type, puis 3 int32 24.8 : c0, c1 (axe du nez), c2 (repère du jeu, Z vers le haut).

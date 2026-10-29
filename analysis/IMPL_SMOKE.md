@@ -1,22 +1,22 @@
 # Fumées : proposition d'implémentation dans libRealSpace
 
-Rédigé le 2026-10-29. Repère de libRealSpace (Y = altitude), mètres, secondes, nombres en décimal.
-Ce que fait le jeu, fonction par fonction : `SMOKE_SYSTEM.md`. Ici : **quoi écrire dans libRealSpace**,
-avec un code de référence complet dans `tools/smoke_ref/`.
+Rédigé le 2026-10-29, revu le même jour avec Rémi. Repère de libRealSpace (Y = altitude), mètres, secondes,
+nombres en décimal. Ce que fait le jeu, fonction par fonction : `SMOKE_SYSTEM.md`. Ici : un module fumée qui
+**emploie les données du jeu** (modèles, formes, tables `FADE`) sans reprendre la mécanique d'origine (réserve
+commune de particules, tri commun avec les faces) ; son intégration dans le jeu reste libre.
 
-Le code de référence est **compilé contre les sources de libRealSpace** (dépôt `remileonard/libRealSpace`,
-commit `c5fa505` du 2026-10-27) : il emploie les vraies classes `ByteStream`, `IFFSaxLexer`, `LZBuffer`,
-`PakArchive`, `RLEShape`, `Vector3D` et `Matrix`. Il est au style du projet (`clang-format`,
-`tools/sc_player/tools/style_check.py`) et compile sans avertissement avec `g++ -Wall -Wextra`.
-Deux essais tournent sur les données du jeu (§ 7), dont un rendu OpenGL hors écran.
+Le code de référence (`tools/smoke_ref/`) est **compilé contre les sources de libRealSpace** (dépôt
+`remileonard/libRealSpace`, commit `c5fa505` du 2026-10-27) : `ByteStream`, `IFFSaxLexer`, `LZBuffer`,
+`PakArchive`, `RLEShape`, `Vector3D`, `Matrix`, `Texture`, `VGAPalette`. Il est au style du projet
+(`clang-format`, `tools/sc_player/tools/style_check.py`) et compile sans avertissement avec `g++ -Wall -Wextra`.
 
 | Fichier | Rôle | Place proposée dans libRealSpace |
 |---|---|---|
 | `RSSmokeSet.h`, `RSSmokeSet.cpp` | lecture de `SMOKESET.IFF`, de `PALFADE.IFF` et des chunks `SMOK`, `JINF`, `SMKG` des objets | remplace `src/realspace/RSSmokeSet.*` |
-| `SCSmokeParticles.h`, `SCSmokeParticles.cpp` | particules : création, vie, animation, mouvement ; générateur posé `SMKG` ; point d'émission | nouveau, `src/strike_commander/` |
-| `smoke_alpha.h`, `smoke_alpha.cpp` | tables `FADE` approchées par couleur + alpha, textures RVBA | nouveau, `src/strike_commander/` |
-| `SCSmokeRenderer.h`, `SCSmokeRenderer.cpp` | textures précalculées, dessin OpenGL (pipeline fixe, comme `SCRenderer`) | nouveau, `src/engine/` ou `src/strike_commander/` |
-| `smoke_test.cpp`, `smoke_render_test.cpp`, `build.sh` | essais sur les données | reste dans ce dépôt |
+| `SCSmokeSet.h`, `SCSmokeSet.cpp` | textures teintées par les tables `FADE`, prêtes pour `drawBillboard` | à ajouter à `SCSmokeSet` |
+| `smoke_alpha.h`, `smoke_alpha.cpp` | table `FADE` approchée par couleur + alpha, texture RVBA d'une image | nouveau, `src/strike_commander/` |
+| `SCSmokeEmitter.h`, `SCSmokeEmitter.cpp` | émetteur porté par un objet : ses particules, l'image et la teinte de chacune ; générateur `SMKG` ; point d'émission | nouveau, `src/strike_commander/` |
+| `smoke_test.cpp`, `smoke_render_test.cpp`, `texture_stub.cpp`, `build.sh` | essais sur les données | reste dans ce dépôt |
 
 ---
 
@@ -96,174 +96,99 @@ this->fall_smoke = readJinfFallSmoke(data, size);
 Pour `SMKG`, `parseREAL_OBJT_SMKG` reçoit le `FORM SMKG` : son chunk `INFO` se lit avec
 `readSmokeGeneratorInfo` (sous-lecteur `IFFSaxLexer` avec `handlers["INFO"]`, comme les autres classes).
 
-## 3. Particules (`SCSmokeParticles`)
+## 3. Teintes et textures (`SCSmokeSet`)
 
-Une réserve de `maxParticles` particules (120), partagée par tous les émetteurs, comme dans le jeu. Quand
-elle est pleine, une demande de particule est ignorée.
+`SCSmokeSet` donne déjà satisfaction pour les couleurs, sauf pour les missiles (d'où
+`generateMissileSmokeTextures`). Il lui manque la teinte de la table `FADE`. Ajouts proposés :
 
 ```cpp
-void spawn(int model, Vector3D position, Vector3D velocity);              // Particle_SpawnWithColor
-void spawnAlongSegment(int model, Vector3D p, Vector3D q, float dt);      // Particles_SpawnAlongSegment_4D1C9
-void emitTrail(int model, Vector3D emissionPoint, Vector3D objectVelocity, float dt);  // Q = P − vitesse × dt
-void update(float dt);                                                    // vie, visibilité, image, taille, teinte, position
+std::vector<FadeBlend> fade_blends;                         // une couleur + alpha par table FADE
+void initFadeTextures(uint8_t *palfade, size_t size);       // après le chargement de smoke_set et de palette
+Texture *getTexture(int model, int shape, int image, int shade);
 ```
 
-- **Traînée** (`SmokeTrail_Tick_3D57E`) : point d'émission P de l'image, Q = P − vitesse de l'objet × dt ;
-  N = longueur ÷ espacement (au moins 1) ; particule k vieillie de dt + k × dt ÷ N, taille et teinte avancées
-  d'autant, image = partie entière de k × images/s × dt ÷ N ; dispersion cumulée à partir de la 3e particule.
-- **Générateur posé** (`SCSmokeGenerator`, `SmokeGen_Tick_4C057`) : une particule toutes les « intervalle »
-  secondes, vitesse (0, montée, 0), pendant « durée » secondes ; `tick` renvoie `false` quand l'objet doit être
-  supprimé.
-- **Mise à jour** : vie −= dt ; compteur de visibilité (2 au départ, remis à 2 si la particule a été dessinée,
-  sinon −1, supprimée à 0) ; image d'animation d'un pas au plus par mise à jour, modes `R`, `S`, `T`, `W`, le pas
-  des modes `R` et `S` **partagé par toutes les particules du modèle** ; taille et teinte linéaires ;
-  position += vitesse × dt.
-- **Une mise à jour par image dessinée.** Le compteur de visibilité compte des mises à jour entre deux
-  dessins : si la simulation fait plusieurs pas entre deux images, toutes les particules disparaissent au
-  2e pas sans dessin. `update(dt)` est donc appelé une fois par image, avec la durée de l'image.
+`initFadeTextures` :
+1. lit les 44 tables de `PALETTE\PALFADE.IFF` et approche chacune par une couleur et un alpha (`fitFadeTables`,
+   `SMOKE_SYSTEM.md` § 6.1) ;
+2. pour chaque modèle à formes, ses formes A et B, chaque image et chaque teinte entière de sa vie, construit
+   un `Texture` RVBA (`buildSmokeTexture`) : couleur hors de A … A + B − 1 opaque (le feu de la forme 3),
+   couleur dans la plage = couleur et alpha de la table teinte + c − A, pas de pixel = transparent.
+   **1 195 textures** avec `SMOKESET.IFF` ;
+3. chaque texture est **carrée et centrée sur le point d'accroche de l'image** (le point de la particule),
+   lignes rangées de bas en haut, pour `SCRenderer::drawBillboard` tel qu'il est : son carré a
+   `glTexCoord2f(0, 0)` en bas à gauche, donc la 1re ligne de `data` en bas.
 
-`smokeEmissionPoint(position, orientation, point)` donne le point d'émission dans le monde avec **la même
-matrice que `SCRenderer::drawModel` et `drawModelWithChilds`** (translation, puis rotations autour de Y, Z, X,
-`Matrix::translateM` et `Matrix::rotateM`).
+La palette est celle que `SCSmokeSet::init` charge déjà (`VGAPalette`). La traînée des missiles (modèle 0,
+teintes 6 à 0 : tables qui éclaircissent) sort alors des données, comme les autres.
 
-Quel modèle pour quel émetteur (`SMOKE_SYSTEM.md` § 3.3) :
+## 4. Émetteur porté par l'objet (`SCSmokeEmitter`)
 
-| Émetteur | Modèle |
-|---|---|
-| missile en vol | `entity->smoke.type` (0 pour `AGM-65D`, `AMRAAM`, `SWINDERJ`, `SWINDERM` ; 8 pour `M261`) |
-| avion touché par un choc (`Aircraft_OnCollision_9D910`) | `entity->smoke.type` (3 pour les 20 avions) |
-| avion IA abattu qui tombe (`Aircraft_OnDestroyed_9D770`) | `entity->fall_smoke` (6) ; explosion immédiate avec la chance du 5e champ du `JINF` (F-16 : 3 %) |
-| générateur `SMKG` (épaves, `SMOKEGEN`) | type de son `INFO` (4 navires et pétrolier, 7 véhicules, 0 `DABRMS-G`) |
-
-## 4. Dessin (`SCSmokeRenderer`)
-
-**Au chargement** (`init`, sans OpenGL), puis `upload` (contexte actif) :
-1. les 44 tables `FADE` sont approchées par une couleur et un alpha (`fitFadeTables`, `SMOKE_SYSTEM.md` § 6.1) ;
-2. chaque image de forme est décodée par `RLEShape::Expand` dans un tampon largeur × hauteur (octet 255 = pas
-   de pixel), point d'accroche en (gauche, haut) de l'image ;
-3. pour chaque modèle à formes : formes A et B, chaque image, chaque teinte entière de la vie du modèle → une
-   texture RVBA (`buildSmokeTexture`) : couleur hors de A … A + B − 1 opaque, couleur dans la plage = cible et
-   alpha de la table teinte + c − A. Avec `SMOKESET.IFF` : **960 textures, 12 Mo**.
-
-**Chaque image** (`render`), après les objets opaques, avec les matrices de la caméra chargées :
-- matrices lues dans OpenGL (`GL_MODELVIEW_MATRIX`, `GL_PROJECTION_MATRIX`, `GL_VIEWPORT`) : pas de
-  dépendance à `Camera` ;
-- projection comme `Particle_ProjectToScreen_4C1EE` : profondeur au-delà du plan proche et en deçà de
-  `maxDistance`, rayon à l'écran > 0,6 pixel d'un écran de 200 lignes (focale du jeu = `projection[5] × 100`) ;
-- tri du plus loin au plus proche, ordre stable (`RenderList_RadixSortDescending_588E8`) ;
-- rejet hors de la fenêtre sur r = échelle × demi-taille ; sinon la particule est marquée dessinée ;
-- sprite : carré face à la caméra en repère œil, **un pixel d'image = échelle × profondeur ÷ focale mètres**,
-  échelle = taille × focale ÷ (profondeur × demi-taille), bornée de 4/256 à 32 comme le jeu ; texture de
-  (forme, image, partie entière de la teinte) ;
-- état : `GL_BLEND` en `GL_SRC_ALPHA`, `GL_ONE_MINUS_SRC_ALPHA` ; test de profondeur sans écriture
-  (`glDepthMask(GL_FALSE)`) ; pas de test alpha ni d'éclairage ; `GL_NEAREST`.
-
-Le test de profondeur sans écriture est l'équivalent, avec un tampon de profondeur, du tri commun du jeu où les
-particules et les faces sont dans la même liste (`SMOKE_SYSTEM.md` § 5.2) : une particule passe derrière ce
-qui est plus proche qu'elle et devant le reste.
-
-## 5. Branchement dans libRealSpace (proposition, non compilée)
-
-**Un seul jeu de fumées.** `SCSmokeSet` (le singleton `getInstance()` existe déjà) devient le propriétaire :
+Chaque objet porte un `SCSmokeEmitter` et ses particules, **sans limite de nombre** (pas de réserve commune).
 
 ```cpp
-class SCSmokeSet {
-    // …
-public:
-    RSSmokeSet set;
-    SCSmokeParticles particles;
-    SCSmokeRenderer renderer;
-    void init();
-};
+void init(const RSSmokeSet *smokeSet, int smokeModel, uint32_t seed);
+void setModel(int smokeModel);                                    // ex. fumée de chute du JINF
+void spawn(Vector3D position, Vector3D velocity);                 // une particule (générateur SMKG)
+void spawnAlongSegment(Vector3D p, Vector3D q, float dt);         // traînée de P vers Q
+void emitTrail(Vector3D emissionPoint, Vector3D objectVelocity, float dt);  // Q = P − vitesse × dt
+void update(float dt);
+void sprites(SCSmokeSet &smokeSet, Vector3D camera, std::vector<SCSmokeSprite> &out) const;
+```
 
-void SCSmokeSet::init() {
-    // OBJECTS\SMOKESET.IFF (nom du chunk WRLD/SMOK quand RSWorld le lira), PALETTE\PALETTE.IFF, PALETTE\PALFADE.IFF
-    TreEntry *smk = Assets.GetEntryByName("..\\..\\DATA\\OBJECTS\\SMOKESET.IFF");
-    set.InitFromRam(smk->data, smk->size);
-    TreEntry *fadeEntry = Assets.GetEntryByName("..\\..\\DATA\\PALETTE\\PALFADE.IFF");
-    std::vector<uint8_t> fade = loadFadeTables(fadeEntry->data, fadeEntry->size);
-    std::vector<uint8_t> rgb;
-    for (int i = 0; i < 256; i++) {
-        Texel *t = this->palette.GetRGBColor(i);
-        rgb.push_back(t->r);
-        rgb.push_back(t->g);
-        rgb.push_back(t->b);
-    }
-    renderer.init(set, rgb.data(), fade);
-    particles.init(&set, 1993);
+Ce qui vient des données et du jeu :
+- **traînée** répartie le long du segment parcouru pendant l'image : N = longueur ÷ espacement (au moins 1),
+  particule k vieillie de dt + k × dt ÷ N, taille et teinte avancées d'autant, image = partie entière de
+  k × images/s × dt ÷ N, dispersion cumulée à partir de la 3e particule. La traînée reste continue à toute
+  vitesse ;
+- **choix de la forme** : A avec la chance du modèle, sinon B ;
+- **vie** : taille et teinte linéaires du début à la fin ; image d'animation d'un pas au plus par mise à jour,
+  modes `R`, `S`, `T` (particule supprimée après la dernière image), `W` ; position += vitesse × dt ;
+- **taille à l'écran** : un pixel d'image = taille ÷ demi-taille de la forme mètres ; `SCSmokeSprite.size` =
+  côté de la texture × taille ÷ demi-taille.
+
+`sprites` remplit, pour chaque particule qui a une texture, la position, la texture et la taille, triées de la
+plus loin à la plus proche de la caméra. Le dessin est celui de libRealSpace :
+
+```cpp
+std::vector<SCSmokeSprite> sprites;
+emitter.sprites(SCSmokeSet::getInstance(), camera->getPosition(), sprites);
+for (const auto &s : sprites) {
+    Renderer.drawBillboard(s.position, s.texture, s.size);
 }
 ```
 
-`renderer.upload()` est appelé une fois le contexte OpenGL prêt (avant la première image de vol), et
-`renderer.release()` à la fermeture.
+Aussi dans `SCSmokeEmitter.h` : `SCSmokeGenerator` (générateur `SMKG` : une particule toutes les « intervalle »
+secondes, vitesse (0, montée, 0), pendant « durée » secondes) et `smokeEmissionPoint(position, orientation,
+point)`, qui place le point du chunk `SMOK` avec la même matrice que `SCRenderer::drawModel`.
 
-**Avion** (`SCPlane::Simulate`, à la place de `smoke_positions`) : vitesse = déplacement de la dernière mise à
-jour × `tps` ; orientation = celle de `SCPlane::Render`.
+Modèles nommés par les données (`SMOKE_SYSTEM.md` § 2.6) : chunk `SMOK` des missiles 0 (`M261` : 8), des
+avions 3 ; `JINF` des avions 6 (chute) ; `SMKG` 4 (navires, pétrolier, `SMOKEGEN`), 7 (véhicules), 0 (`DABRMS-G`).
 
-```cpp
-if (this->smoke_on) {
-    Vector3D pos = {
-        this->x,
-        this->y,
-        this->z
-    };
-    Vector3D orientation = {
-        tenthOfDegreeToRad(this->yaw + 900),
-        tenthOfDegreeToRad(this->pitch),
-        -tenthOfDegreeToRad(this->roll)
-    };
-    RSObjectSmoke &smk = this->object->entity->smoke;
-    Vector3D local = {
-        smk.x,
-        smk.y,
-        smk.z
-    };
-    Vector3D velocity = {
-        (this->x - this->last_px) * this->tps,
-        (this->y - this->last_py) * this->tps,
-        (this->z - this->last_pz) * this->tps
-    };
-    Vector3D emission = smokeEmissionPoint(pos, orientation, local);
-    SCSmokeSet::getInstance().particles.emitTrail(this->smoke_type, emission, velocity, 1.0f / this->tps);
-}
-```
+## 5. Ce que `drawBillboard` change au rendu
 
-`smoke_on` et `smoke_type` sont deux champs à ajouter : `smoke_type = entity->smoke.type` à la création,
-remplacé par `entity->fall_smoke` quand l'avion IA abattu tombe ; `smoke_on` posé au choc et à la chute.
+Constaté dans `SCRenderer::drawBillboard` (commit `c5fa505`) ; à garder ou à régler selon le rendu voulu :
+- `glAlphaFunc(GL_GREATER, 0.1f)` : les pixels d'alpha ≤ 0,1 sont jetés. Tables concernées : 0 à 2 et 16 à 17
+  (alpha 0,022 à 0,089), c'est-à-dire la fin de vie des traînées de missile et la densité la plus faible des
+  autres. Le jeu les dessine (effet très léger) ;
+- `GL_LINEAR` : les pixels transparents de la texture ont une couleur noire (0, 0, 0, 0) ; au bord des taches
+  le filtre mélange vers le noir. Le jeu agrandit au plus proche voisin ;
+- le test de profondeur est actif et `glDepthMask` n'est pas coupé : chaque carré écrit la profondeur. Le tri
+  de `sprites` règle l'ordre à l'intérieur d'un émetteur ; entre deux émetteurs, ou avec des faces
+  transparentes dessinées après, l'ordre de dessin compte ;
+- le carré est tourné vers la position de la caméra (pas vers son plan) ; le jeu dessine ses sprites à plat
+  sur l'écran.
 
-**Missile** (`SCSimulatedObject::Simulate`, à la place de `smoke_positions`) : même appel avec
-`obj->smoke.type`, la position `x, y, z`, l'orientation `{azimuthf, elevationf, 0}` de `SCSimulatedObject::Render`
-et la vitesse `vx, vy, vz` × `tps`, tant que le moteur pousse (`no_thrust == false`).
+## 6. Écarts avec le jeu
 
-**Générateurs `SMKG`** : un `SCSmokeGenerator` par objet de la mission dont l'entité est un `SMKG`, `tick`
-à chaque image avec la position de l'objet.
-
-**Image** (`SCStrike::runFrame`) : après les objets, les armes et les explosions, avant le cockpit :
-
-```cpp
-SCSmokeSet &smoke = SCSmokeSet::getInstance();
-smoke.particles.update(frameSeconds);
-smoke.renderer.render(smoke.particles, RENDER_DISTANCE);
-```
-
-`SCPlane::RenderSmoke`, `smoke_positions`, `smoke_anim_counters`, `generateMissileSmokeTextures` et l'appel
-de `drawBillboard` pour la fumée ne servent plus.
-
-## 6. Choix et écarts avec le jeu
-
-- **Teinte** : mélange alpha au lieu de la table `FADE` appliquée au fond (choix de Rémi, précalcul plutôt que
-  calcul par image). Les tables qui assombrissent (16 à 31, traînées 3 et 6) sont bien approchées ; celles qui
-  éclaircissent (5 à 12, missiles) le moins (`SMOKE_SYSTEM.md` § 6.1).
-- **Forme carrée** : le carré fait la même taille en mètres sur les deux axes. Le jeu met à l'échelle en pixels
-  d'un écran 320 × 200, dont les pixels ne sont pas carrés à l'affichage ; ce rapport n'est pas reproduit pour
-  les sprites. Pour le disque (mode 0, aucun modèle des données), le rayon vertical × 213/256 est gardé.
-- **Distance maximale** : le jeu la lit dans `dword_72540`, valeur non relevée ; `render` la prend en
-  paramètre.
-- **Plan proche** : celui de la projection de libRealSpace (le jeu : `dword_721F6`).
-- **Tirages** : `std::mt19937` au lieu du générateur du jeu ; mêmes lois (uniforme sur ± dispersion, chance
-  sur 100).
-- **Ordre dans l'image** : émissions (dans la simulation des objets), mise à jour, dessin. L'ordre exact des
-  trois dans la boucle du jeu n'est pas relu (`SMOKE_SYSTEM.md` § 8).
+- **Teinte** : mélange alpha au lieu de la table `FADE` appliquée au fond (précalcul plutôt que calcul par
+  image). Tables qui assombrissent (16 à 31) bien approchées ; celles qui éclaircissent (5 à 12) le moins
+  (`SMOKE_SYSTEM.md` § 6.1).
+- **Pas de réserve commune ni de compteur de visibilité** : chaque objet garde ses particules jusqu'à la fin de
+  leur vie (le jeu en a 120 au plus pour tout le monde, et supprime celles qui ne sont pas dessinées pendant 2
+  images).
+- **Pas de tri commun avec les faces** : `drawBillboard` et le tampon de profondeur.
+- **Tirages** : `std::mt19937` ; mêmes lois (uniforme sur ± dispersion, chance sur 100).
+- **Mode 0 (disque)** : pas de texture, rien n'est dessiné ; aucun modèle des données ne l'emploie.
 
 ## 7. Essais
 
@@ -281,11 +206,13 @@ disquette (formes non compressées), identiques :
   `RLEShape` égal à celui du décodeur Python (`tools/sc_data.py`) : 5 004, 12 319, 14 787, 11 522, 30 669 ;
 - tables : 44, alpha et cible égaux à `smoke_fade_fit.py` (table 0 : 0,022 et (255, 255, 249) ; table 31 :
   0,832 et (22, 20, 13)) ;
-- 960 textures, 12 055 Ko (même nombre que la visionneuse `object_viewer.html`) ;
-- F-16 à 150 m/s, 15 images/s : traînée (modèle 3) stable à 22 particules, chute (modèle 6) à 11 ;
+- 1 195 textures (une série par modèle) ;
+- F-16 à 150 m/s, 15 images/s : traînée (modèle 3) stable à 22 particules, chute (modèle 6) à 11, missile
+  (modèle 0) à 16 ; vue de côté à 70 m, côté des carrés de 3 m (particule neuve) à 12,8 m (modèle 3) ;
 - chunk `SMOK` du F-16 : modèle 3, point x = −14 ; `JINF` : modèle 6 ;
 - `SMOKEGEN.IFF` : modèle 4, 60 s, 14 m/s, 0,297 s, suppression à la fin ; après 10 s, 13 particules, la plus
-  haute à 57 m.
+  haute à 56 m.
 
-Rendus OpenGL de `smoke_render_test` (640 × 400, avion à 100 m/s vu de côté, fond ciel) :
-`analysis/smoke_images/gl_chute.png` (modèle 6) et `gl_trainee.png` (modèle 3).
+`smoke_render_test` dessine avec une copie de `SCRenderer::drawBillboard` (mêmes états : test alpha à 0,1,
+`GL_LINEAR`, profondeur) : `analysis/smoke_images/billboard_trails.png`, avion à 100 m/s vu de côté, fond ciel,
+de haut en bas modèle 6 (chute), 3 (traînée), 0 (missile).

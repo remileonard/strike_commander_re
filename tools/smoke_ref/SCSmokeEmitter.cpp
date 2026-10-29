@@ -1,48 +1,48 @@
-// Particules de fumée. analysis/SMOKE_SYSTEM.md § 3 et § 4.
-#include "SCSmokeParticles.h"
+// Émetteur de fumée porté par un objet. analysis/SMOKE_SYSTEM.md § 3 et § 4.
+#include "SCSmokeEmitter.h"
 
+#include <algorithm>
 #include <cmath>
 
-void SCSmokeParticles::init(const RSSmokeSet *smokeSet, uint32_t seed) {
+#include "SCSmokeSet.h"
+
+void SCSmokeEmitter::init(const RSSmokeSet *smokeSet, int smokeModel, uint32_t seed) {
     set = smokeSet;
-    capacity = set->maxParticles;
-    active.clear();
-    active.reserve(capacity);
-    modelStep.clear();
-    for (const auto &m : set->models) {
-        modelStep.push_back(m.frameStep);
-    }
+    particles.clear();
     rng.seed(seed);
+    setModel(smokeModel);
 }
 
-void SCSmokeParticles::clear() {
-    active.clear();
-    modelStep.clear();
-    for (const auto &m : set->models) {
-        modelStep.push_back(m.frameStep);
+void SCSmokeEmitter::setModel(int smokeModel) {
+    model = smokeModel;
+    if (model < 0 || model >= static_cast<int>(set->models.size())) {
+        model = 0;
     }
+    step = set->models[model].frameStep;
 }
 
-std::vector<SCSmokeParticle> &SCSmokeParticles::particles() {
-    return active;
+int SCSmokeEmitter::getModel() const {
+    return model;
 }
 
-const RSSmokeModel &SCSmokeParticles::model(int index) const {
-    return set->models[index];
+const std::vector<SCSmokeParticle> &SCSmokeEmitter::getParticles() const {
+    return particles;
 }
 
-const RSSmokeShape &SCSmokeParticles::shape(int index) const {
-    return set->shapes[index];
+void SCSmokeEmitter::clear() {
+    particles.clear();
+    step = set->models[model].frameStep;
 }
 
 // Math_RandomJitter_54E1C : aléa dans [−amount, +amount].
-float SCSmokeParticles::jitter(float amount) {
+float SCSmokeEmitter::jitter(float amount) {
     std::uniform_real_distribution<float> d(-amount, amount);
     return d(rng);
 }
 
 // Forme : aucune si A = 255 ; A si la chance vaut 100 ; sinon A avec la chance (Math_RandomChance_54E4F), B autrement.
-int SCSmokeParticles::pickShape(const RSSmokeModel &m) {
+int SCSmokeEmitter::pickShape() {
+    const RSSmokeModel &m = set->models[model];
     if (m.shapeA == 255) {
         return -1;
     }
@@ -59,8 +59,8 @@ int SCSmokeParticles::pickShape(const RSSmokeModel &m) {
     return chosen;
 }
 
-int SCSmokeParticles::lastFrame(const SCSmokeParticle &p) const {
-    const RSSmokeModel &m = set->models[p.model];
+int SCSmokeEmitter::lastFrame(const SCSmokeParticle &p) const {
+    const RSSmokeModel &m = set->models[model];
     if (!m.frameOrder.empty()) {
         return static_cast<int>(m.frameOrder.size()) - 1;
     }
@@ -70,8 +70,8 @@ int SCSmokeParticles::lastFrame(const SCSmokeParticle &p) const {
     return static_cast<int>(set->shapes[p.shape].images.size()) - 1;
 }
 
-int SCSmokeParticles::imageOf(const SCSmokeParticle &p) const {
-    const RSSmokeModel &m = set->models[p.model];
+int SCSmokeEmitter::imageOf(const SCSmokeParticle &p) const {
+    const RSSmokeModel &m = set->models[model];
     int frame = p.frame;
     if (!m.frameOrder.empty()) {
         frame = m.frameOrder[(std::min)(frame, static_cast<int>(m.frameOrder.size()) - 1)];
@@ -79,47 +79,29 @@ int SCSmokeParticles::imageOf(const SCSmokeParticle &p) const {
     return frame;
 }
 
-// ParticlePool_AllocElement_4CFA0 puis Particle_InitFromSmokeModel_4C168 : rien si la réserve est pleine.
-SCSmokeParticle *SCSmokeParticles::allocate(int model) {
-    if (model < 0 || model >= static_cast<int>(set->models.size())) {
-        return nullptr;
-    }
-    if (active.size() >= capacity) {
-        return nullptr;
-    }
+// Particle_InitFromSmokeModel_4C168 : taille, vie et teinte du début, vitesse nulle, image 0.
+SCSmokeParticle SCSmokeEmitter::create() {
     const RSSmokeModel &m = set->models[model];
     SCSmokeParticle p;
-    p.model = model;
     p.size = m.sizeStart;
     p.life = m.life;
     p.shade = m.shadeStart;
-    p.velocity = {
-        0.0f,
-        0.0f,
-        0.0f
-    };
-    active.push_back(p);
-    return &active.back();
+    p.velocity = Vector3D(0.0f, 0.0f, 0.0f);
+    p.shape = pickShape();
+    return p;
 }
 
-void SCSmokeParticles::spawn(int model, Vector3D position, Vector3D velocity) {
-    SCSmokeParticle *p = allocate(model);
-    if (p == nullptr) {
-        return;
-    }
+void SCSmokeEmitter::spawn(Vector3D position, Vector3D velocity) {
     const RSSmokeModel &m = set->models[model];
-    p->position.x = position.x + jitter(m.jitter);
-    p->position.y = position.y + jitter(m.jitter);
-    p->position.z = position.z + jitter(m.jitter);
-    // Vitesse gardée en int16 de 1/256 m/s par le jeu : au plus 127,99 m/s par axe.
-    p->velocity = velocity;
-    p->shape = pickShape(m);
+    SCSmokeParticle p = create();
+    p.position.x = position.x + jitter(m.jitter);
+    p.position.y = position.y + jitter(m.jitter);
+    p.position.z = position.z + jitter(m.jitter);
+    p.velocity = velocity;
+    particles.push_back(p);
 }
 
-void SCSmokeParticles::spawnAlongSegment(int model, Vector3D p, Vector3D q, float dt) {
-    if (model < 0 || model >= static_cast<int>(set->models.size())) {
-        return;
-    }
+void SCSmokeEmitter::spawnAlongSegment(Vector3D p, Vector3D q, float dt) {
     const RSSmokeModel &m = set->models[model];
     Vector3D segment = q - p;
     float length = segment.Length();
@@ -130,24 +112,21 @@ void SCSmokeParticles::spawnAlongSegment(int model, Vector3D p, Vector3D q, floa
     if (n == 0) {
         return;
     }
-    Vector3D step = segment * (1.0f / n);
+    Vector3D delta = segment * (1.0f / n);
     Vector3D position = p;
     for (int k = 0; k < n; k++) {
         float life = m.life - dt - k * dt / n;
         if (life <= 0.0f) {
             return;
         }
-        SCSmokeParticle *particle = allocate(model);
-        if (particle == nullptr) {
-            return;
-        }
-        particle->position = position;
-        particle->life = life;
-        particle->size = m.sizeStart + k * m.sizeRate() * dt / n;
-        particle->shade = m.shadeStart + k * m.shadeRate() * dt / n;
-        particle->frame = static_cast<int>(k * m.framesPerSecond * dt / n);
-        particle->shape = pickShape(m);
-        position = position + step;
+        SCSmokeParticle particle = create();
+        particle.position = position;
+        particle.life = life;
+        particle.size = m.sizeStart + k * m.sizeRate() * dt / n;
+        particle.shade = m.shadeStart + k * m.shadeRate() * dt / n;
+        particle.frame = static_cast<int>(k * m.framesPerSecond * dt / n);
+        particles.push_back(particle);
+        position = position + delta;
         // Aléa cumulé à partir de la 3e particule (pas d'aléa entre la 1re et la 2e).
         if (k > 0 && k < n - 1) {
             position.x += jitter(m.jitter);
@@ -157,31 +136,20 @@ void SCSmokeParticles::spawnAlongSegment(int model, Vector3D p, Vector3D q, floa
     }
 }
 
-void SCSmokeParticles::emitTrail(int model, Vector3D emissionPoint, Vector3D objectVelocity, float dt) {
+void SCSmokeEmitter::emitTrail(Vector3D emissionPoint, Vector3D objectVelocity, float dt) {
     Vector3D previous = emissionPoint - objectVelocity * dt;
-    spawnAlongSegment(model, emissionPoint, previous, dt);
+    spawnAlongSegment(emissionPoint, previous, dt);
 }
 
-// Particle_UpdateLifeSizeShadeFrame_4C413 puis Particle_IntegrateVelocity.
-void SCSmokeParticles::update(float dt) {
+void SCSmokeEmitter::update(float dt) {
+    const RSSmokeModel &m = set->models[model];
     size_t kept = 0;
-    for (size_t i = 0; i < active.size(); i++) {
-        SCSmokeParticle &p = active[i];
-        const RSSmokeModel &m = set->models[p.model];
+    for (size_t i = 0; i < particles.size(); i++) {
+        SCSmokeParticle &p = particles[i];
         p.life -= dt;
         if (p.life <= 0.0f) {
             continue;
         }
-        if (p.drawn) {
-            p.visibility = 2;
-        } else {
-            p.visibility--;
-            if (p.visibility == 0) {
-                continue;
-            }
-        }
-        p.drawn = false;
-        int &step = modelStep[p.model];
         bool removed = false;
         if ((m.renderMode == 1 || m.renderMode == 2) && step != 0) {
             p.frameAccumulator += m.framesPerSecond * dt;
@@ -229,10 +197,41 @@ void SCSmokeParticles::update(float dt) {
         p.size += m.sizeRate() * dt;
         p.shade += m.shadeRate() * dt;
         p.position = p.position + p.velocity * dt;
-        active[kept] = p;
+        particles[kept] = p;
         kept++;
     }
-    active.resize(kept);
+    particles.resize(kept);
+}
+
+// Côté du carré : la texture fait « côté » pixels d'image ; un pixel d'image = taille ÷ demi-taille de la forme
+// mètres (échelle des sprites du jeu, SMOKE_SYSTEM.md § 5.3).
+void SCSmokeEmitter::sprites(SCSmokeSet &smokeSet, Vector3D camera, std::vector<SCSmokeSprite> &out) const {
+    size_t first = out.size();
+    for (const auto &p : particles) {
+        if (p.shape < 0) {
+            continue;
+        }
+        const RSSmokeShape &shape = set->shapes[p.shape];
+        int image = imageOf(p);
+        if (image < 0 || image >= static_cast<int>(shape.images.size())) {
+            continue;
+        }
+        int shade = static_cast<int>(std::floor(p.shade));
+        Texture *tex = smokeSet.getTexture(model, p.shape, image, shade);
+        if (tex == nullptr) {
+            continue;
+        }
+        SCSmokeSprite s;
+        s.position = p.position;
+        s.texture = tex;
+        s.size = static_cast<float>(tex->width) * p.size / shape.halfSize;
+        s.distance = (p.position - camera).Length();
+        out.push_back(s);
+    }
+    std::stable_sort(out.begin() + static_cast<long>(first), out.end(),
+                     [](const SCSmokeSprite &a, const SCSmokeSprite &b) {
+                         return a.distance > b.distance;
+                     });
 }
 
 void SCSmokeGenerator::init(const RSSmokeGeneratorInfo &generatorInfo, bool startsActive) {
@@ -242,7 +241,7 @@ void SCSmokeGenerator::init(const RSSmokeGeneratorInfo &generatorInfo, bool star
     active = startsActive;
 }
 
-bool SCSmokeGenerator::tick(SCSmokeParticles &smoke, Vector3D position, float dt) {
+bool SCSmokeGenerator::tick(SCSmokeEmitter &emitter, Vector3D position, float dt) {
     if (!active) {
         return true;
     }
@@ -259,7 +258,7 @@ bool SCSmokeGenerator::tick(SCSmokeParticles &smoke, Vector3D position, float dt
             info.rise,
             0.0f
         };
-        smoke.spawn(info.type, position, velocity);
+        emitter.spawn(position, velocity);
     }
     return true;
 }

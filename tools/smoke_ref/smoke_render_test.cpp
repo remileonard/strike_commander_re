@@ -1,4 +1,5 @@
-// Essai du dessin OpenGL des fumées, hors écran (OSMesa) : traînée d'un avion vue de côté, image PPM.
+// Essai du dessin des fumées, hors écran (OSMesa) : émetteur, textures de SCSmokeSet et dessin par une copie de
+// SCRenderer::drawBillboard. Traînée d'un avion vue de côté, image PPM.
 // Usage : smoke_render_test SMOKESET.IFF PALETTE.IFF PALFADE.IFF modèle sortie.ppm
 #include <GL/gl.h>
 #include <GL/osmesa.h>
@@ -10,8 +11,8 @@
 #include <vector>
 
 #include "RSSmokeSet.h"
-#include "SCSmokeParticles.h"
-#include "SCSmokeRenderer.h"
+#include "SCSmokeEmitter.h"
+#include "SCSmokeSet.h"
 
 static std::vector<uint8_t> readFile(const char *path) {
     std::vector<uint8_t> data;
@@ -28,18 +29,79 @@ static std::vector<uint8_t> readFile(const char *path) {
     return data;
 }
 
-static std::vector<uint8_t> readPalette(const std::vector<uint8_t> &iff) {
-    std::vector<uint8_t> rgb(768, 0);
+static VGAPalette readPalette(const std::vector<uint8_t> &iff) {
+    VGAPalette palette;
     for (size_t i = 12; i + 8 + 4 + 768 <= iff.size(); i++) {
         if (memcmp(&iff[i], "PALT", 4) == 0) {
-            for (int c = 0; c < 768; c++) {
-                int v = iff[i + 12 + c] * 255 / 63;
-                rgb[c] = static_cast<uint8_t>(v > 255 ? 255 : v);
+            for (int c = 0; c < 256; c++) {
+                Texel t;
+                t.r = static_cast<uint8_t>(iff[i + 12 + 3 * c] * 255 / 63);
+                t.g = static_cast<uint8_t>(iff[i + 12 + 3 * c + 1] * 255 / 63);
+                t.b = static_cast<uint8_t>(iff[i + 12 + 3 * c + 2] * 255 / 63);
+                t.a = 255;
+                palette.SetColor(static_cast<uint8_t>(c), t);
             }
             break;
         }
     }
-    return rgb;
+    return palette;
+}
+
+// Copie de SCRenderer::drawBillboard de libRealSpace (commit c5fa505), la position de la caméra en paramètre.
+static void drawBillboard(Vector3D cameraPos, Vector3D pos, Texture *tex, float size, float alpha) {
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_TEXTURE_2D);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable(GL_BLEND);
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.1f);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    if (!tex->initialized) {
+        GLuint id = 0;
+        glGenTextures(1, &id);
+        tex->id = id;
+        glBindTexture(GL_TEXTURE_2D, tex->id);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(tex->width), static_cast<GLsizei>(tex->height), 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, tex->data);
+        tex->initialized = true;
+    } else {
+        glBindTexture(GL_TEXTURE_2D, tex->id);
+    }
+    Vector3D look = cameraPos - pos;
+    look.Normalize();
+    Vector3D globalUp = {
+        0.0f,
+        1.0f,
+        0.0f
+    };
+    Vector3D right = globalUp.CrossProduct(&look);
+    right.Normalize();
+    Vector3D up = look.CrossProduct(&right);
+    float half = size * 0.5f;
+    Vector3D bottomLeft = pos - right * half - up * half;
+    Vector3D bottomRight = pos + right * half - up * half;
+    Vector3D topRight = pos + right * half + up * half;
+    Vector3D topLeft = pos - right * half + up * half;
+    glBegin(GL_QUADS);
+    glColor4f(1.0f, 1.0f, 1.0f, alpha);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(bottomLeft.x, bottomLeft.y, bottomLeft.z);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(bottomRight.x, bottomRight.y, bottomRight.z);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(topRight.x, topRight.y, topRight.z);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(topLeft.x, topLeft.y, topLeft.z);
+    glEnd();
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_CULL_FACE);
 }
 
 // Matrice de vue (comme gluLookAt), chargée dans GL_MODELVIEW.
@@ -91,16 +153,16 @@ int main(int argc, char **argv) {
         return 1;
     }
     std::vector<uint8_t> smokeFile = readFile(argv[1]);
-    std::vector<uint8_t> palette = readPalette(readFile(argv[2]));
     std::vector<uint8_t> fadeFile = readFile(argv[3]);
     int model = atoi(argv[4]);
     RSSmokeSet set;
     set.InitFromRam(smokeFile.data(), smokeFile.size());
-    SCSmokeRenderer renderer;
-    renderer.init(set, palette.data(), loadFadeTables(fadeFile.data(), fadeFile.size()));
-    renderer.upload();
-    SCSmokeParticles smoke;
-    smoke.init(&set, 5);
+    SCSmokeSet smokeSet;
+    smokeSet.smoke_set = &set;
+    smokeSet.palette = readPalette(readFile(argv[2]));
+    smokeSet.initFadeTextures(fadeFile.data(), fadeFile.size());
+    SCSmokeEmitter emitter;
+    emitter.init(&set, model, 5);
 
     // Focale du jeu 277 pixels sur 200 lignes : fovy = 2 × atan(100 / 277).
     glViewport(0, 0, width, height);
@@ -122,20 +184,26 @@ int main(int argc, char **argv) {
         0.0f,
         -100.0f
     };
-    int drawn = 0;
+    size_t drawn = 0;
     for (int frame = 0; frame < 40; frame++) {
         position = position + velocity * dt;
         Vector3D emission = position + Vector3D(0.0f, 0.0f, 14.0f);
-        smoke.emitTrail(model, emission, velocity, dt);
-        smoke.update(dt);
+        emitter.emitTrail(emission, velocity, dt);
+        emitter.update(dt);
         glClearColor(0.42f, 0.55f, 0.70f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // Caméra de côté, un peu au-dessus, qui suit l'avion.
-        loadLookAt(position + Vector3D(70.0f, 12.0f, 10.0f), position + Vector3D(0.0f, 0.0f, 40.0f));
-        drawn = renderer.render(smoke, 20000.0f);
+        Vector3D camera = position + Vector3D(70.0f, 12.0f, 10.0f);
+        loadLookAt(camera, position + Vector3D(0.0f, 0.0f, 40.0f));
+        std::vector<SCSmokeSprite> sprites;
+        emitter.sprites(smokeSet, camera, sprites);
+        for (const auto &sprite : sprites) {
+            drawBillboard(camera, sprite.position, sprite.texture, sprite.size, 1.0f);
+        }
+        drawn = sprites.size();
     }
     glFinish();
-    printf("%zu particules, %d dessinées, %zu textures\n", smoke.particles().size(), drawn, renderer.textureCount());
+    printf("%zu particules, %zu dessinées, %zu textures\n", emitter.getParticles().size(), drawn, smokeSet.textureCount());
     FILE *out = fopen(argv[5], "wb");
     fprintf(out, "P6\n%d %d\n255\n", width, height);
     for (int y = height - 1; y >= 0; y--) {
@@ -144,7 +212,6 @@ int main(int argc, char **argv) {
         }
     }
     fclose(out);
-    renderer.release();
     OSMesaDestroyContext(context);
     return 0;
 }
