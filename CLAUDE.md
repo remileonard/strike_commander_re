@@ -381,6 +381,8 @@ strike_commander_re/
     │                                  avec --donnees <DATA> : traînée de fumée en vol (SMOK, JINF, tables FADE)
     ├── smoke_render.py              fumées : planches des formes, des modèles, des tables FADE ; colonne SMOKEGEN (GIF)
     ├── smoke_trail.py               fumées : traînée d'un avion en vol, --chute = modèle du JINF (GIF) — SMOKE_SYSTEM.md
+    ├── smoke_fade_fit.py            fumées : couleur + alpha qui approchent chaque table FADE (précalcul pour OpenGL) ;
+    │                                  smoke_ref/smoke_alpha.cpp : même calcul et textures RGBA, C++ — SMOKE_SYSTEM.md § 6.1
     └── annotate_segments.py         ⭐ régénère analysis/annotated_segments/
                                        à partir de strike.asm +
                                        known_functions.json — à relancer

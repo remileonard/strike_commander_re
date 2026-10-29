@@ -336,15 +336,60 @@ def draw_scaled(screen, w, h, sh, frame, cx, cy, scale, tables, shade, first, co
                 screen[at] = c
 
 
-def model_sheet(models, shapes, out, samples=8, metres_px=4.0):
-    """Chaque modèle sur le ciel, à 8 instants de sa vie (taille, teinte, image), 4 pixels par mètre."""
+def draw_scaled_rgb(screen, w, h, sh, frame, cx, cy, scale, rgb, blends, shade, first, count):
+    """Même dessin que draw_scaled sur une image RVB : niveau c → mélange alpha (couleur, alpha) de la table."""
+    spans = list(d.image_spans(sh, frame))
+    if not spans:
+        return
+    pixels = {}
+    for x, y, pix in spans:
+        for k, c in enumerate(pix):
+            pixels[(x + k, y)] = c
+    xs = [p[0] for p in pixels]
+    ys = [p[1] for p in pixels]
+    x0 = int(min(xs) * scale + cx)
+    x1 = int(max(xs) * scale + cx) + 1
+    y0 = int(min(ys) * scale + cy)
+    y1 = int(max(ys) * scale + cy) + 1
+    for py in range(max(0, y0), min(h, y1)):
+        sy = int((py - cy) / scale) if scale else 0
+        for px in range(max(0, x0), min(w, x1)):
+            sx = int((px - cx) / scale) if scale else 0
+            c = pixels.get((sx, sy))
+            if c is None:
+                continue
+            at = py * w + px
+            if first <= c < first + count:
+                table = shade + c - first
+                if 0 <= table < len(blends):
+                    a, target = blends[table]
+                    screen[at] = tuple((1 - a) * screen[at][k] + a * target[k] for k in range(3))
+            else:
+                screen[at] = tuple(rgb[3 * c:3 * c + 3])
+
+
+def model_sheet(models, shapes, out, samples=8, metres_px=4.0, method='fade'):
+    """Chaque modèle à 8 instants de sa vie (taille, teinte, image), 4 pixels par mètre, sur un fond moitié
+    ciel, moitié sol. method = 'fade' : tables FADE du jeu ; 'alpha' : mélange alpha précalculé
+    (tools/smoke_fade_fit.py)."""
     rgb = palette_rgb()
     tables = fade_tables()
     sky = nearest(rgb, (109, 145, 182))
+    ground = nearest(rgb, (110, 100, 60))
     cell = 120
     w = 150 + cell * samples
     h = cell * len(models) + 24
-    screen = bytearray([sky]) * (w * h)
+    screen = bytearray(w * h)
+    for y in range(h):
+        row = sky if y < 24 or (y - 24) % cell < cell // 2 else ground
+        screen[y * w:(y + 1) * w] = bytes([row]) * w
+    if method == 'alpha':
+        import smoke_fade_fit as fit
+        blends = []
+        for k in range(len(tables) // 256):
+            a, target, _, _ = fit.fit(list(rgb), tables[256 * k:256 * k + 256])
+            blends.append((max(0.0, min(1.0, a)), [max(0, min(255, v)) for v in target]))
+        image = [tuple(rgb[3 * c:3 * c + 3]) for c in screen]
     labels = []
     for mi, m in enumerate(models):
         y = 24 + mi * cell + cell // 2
@@ -360,10 +405,19 @@ def model_sheet(models, shapes, out, samples=8, metres_px=4.0):
             count = len(d.shape_images(sh))
             frame = min(count - 1, int(t * m['fps'])) if m['mode'] == 'T' else int(t * m['fps']) % count
             scale = size * metres_px / shape_half_size(sh)
-            draw_scaled(screen, w, h, sh, frame, 150 + k * cell + cell // 2, y, scale, tables, shade,
-                        m['first'], m['count'])
-    im = to_rgb(screen, w, h, rgb)
+            cx = 150 + k * cell + cell // 2
+            if method == 'alpha':
+                draw_scaled_rgb(image, w, h, sh, frame, cx, y, scale, rgb, blends, shade, m['first'], m['count'])
+            else:
+                draw_scaled(screen, w, h, sh, frame, cx, y, scale, tables, shade, m['first'], m['count'])
+    if method == 'alpha':
+        im = Image.new('RGB', (w, h))
+        im.putdata([tuple(int(round(v)) for v in px) for px in image])
+    else:
+        im = to_rgb(screen, w, h, rgb)
     draw = ImageDraw.Draw(im)
+    title = 'tables FADE du jeu' if method == 'fade' else 'mélange alpha précalculé'
+    draw.text((6, 4), title, fill=(255, 255, 255), font=font(12))
     for k in range(samples):
         draw.text((150 + k * cell + 4, 4), f't = {k}/{samples} vie', fill=(255, 255, 255), font=font(12))
     for mi, y in labels:
@@ -386,6 +440,7 @@ def main():
     shape_sheet(shapes, os.path.join(out, 'smoke_shapes.png'))
     fade_sheet(os.path.join(out, 'fade_tables.png'))
     model_sheet(models, shapes, os.path.join(out, 'smoke_models.png'))
+    model_sheet(models, shapes, os.path.join(out, 'smoke_models_alpha.png'), method='alpha')
     render_column(models, shapes, gen, os.path.join(out, 'smokegen_column'))
 
 

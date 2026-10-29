@@ -410,13 +410,87 @@ teinte, teinte + 1, teinte + 2) ; la forme 3 a en plus des couleurs opaques 235 
 - **Ordre de dessin** : le jeu dessine les particules **dans le même tri** que les faces (§ 5.2). Avec un
   tampon de profondeur, l'équivalent est de dessiner les particules après les objets opaques, triées du
   plus loin au plus proche, en testant la profondeur sans l'écrire.
-- **Teinte** : le jeu ne mélange pas des couleurs, il remplace chaque pixel du fond par une table. En
-  OpenGL, il faut soit reproduire la table (rendu en indices de palette, ou texture de 256 × n tables
-  appliquée au fond), soit l'approcher par un mélange : choix pour le portage.
+- **Teinte** : une table `FADE` est une palette de remplacement exprimée en indices, appliquée à la couleur
+  déjà à l'écran : c'est de la transparence émulée sur 256 couleurs. Pour OpenGL, on la précalcule en
+  couleur + alpha (§ 6.1) : aucun calcul par image, le mélange alpha de la carte fait le travail.
 - **Disque** : ellipse, pas cercle (rayon vertical × 0,832) si l'image est en 320 × 200.
 - **Compteur de visibilité** (§ 4.1) : une particule hors champ disparaît après 2 images ; à reproduire
   pour avoir les mêmes traînées.
 - **Mode `R` et `S`** : le pas est partagé par toutes les particules d'un modèle.
+
+### 6.1 Précalcul pour OpenGL : une couleur et un alpha par table
+
+Chaque table k est approchée par un mélange : `palette[FADE[k][c]] ≈ (1 − alpha) × palette[c] + alpha ×
+cible`, alpha et cible choisis par moindres carrés sur les 256 couleurs (`tools/smoke_fade_fit.py`, code
+de référence C++ `tools/smoke_ref/smoke_alpha.cpp`, fonction `fitFadeTable`). Le théâtre du canyon a la
+même palette et les mêmes tables (`CANYNPAL.IFF`, `CANYNFAD.IFF`) : une seule table suffit.
+
+Au chargement, pour chaque forme, chaque image et chaque teinte entière employée par un modèle, on
+construit une texture RGBA (`buildSmokeTexture`) :
+- pixel absent de l'image : transparent ;
+- couleur c hors de A … A + B − 1 : couleur de la palette, opaque (le feu de la forme 3) ;
+- couleur c dans A … A + B − 1 : cible et alpha de la table teinte + c − A ; table hors des 44 : transparent.
+
+Mémoire : 5 formes, 47 images au plus de 60 × 60 pixels environ, une dizaine de teintes par modèle :
+quelques mégaoctets. À chaque image, chaque particule choisit sa texture (forme, image, partie entière de
+la teinte) et se dessine en `GL_SRC_ALPHA`, `GL_ONE_MINUS_SRC_ALPHA`, sur un carré face à la caméra de
+côté (largeur de l'image en pixels) × taille ÷ demi-taille de la forme, en mètres.
+
+Résultat sur `PALETTE.IFF` et `PALFADE.IFF` (écarts en niveaux de 0 à 255, sur les 256 couleurs) :
+
+| Table | Alpha | Couleur cible (R, V, B) | Écart moyen | Écart maximal |
+|---|---|---|---|---|
+| 0 | 0,022 | 255, 255, 249 | 3,5 | 12,4 |
+| 1 | 0,047 | 255, 255, 254 | 6,2 | 23,0 |
+| 2 | 0,069 | 255, 255, 255 | 8,4 | 33,6 |
+| 3 | 0,112 | 255, 255, 241 | 10,9 | 43,3 |
+| 4 | 0,156 | 255, 255, 233 | 13,5 | 48,7 |
+| 5 | 0,199 | 246, 255, 228 | 15,4 | 62,1 |
+| 6 | 0,239 | 244, 253, 224 | 17,2 | 71,8 |
+| 7 | 0,289 | 242, 248, 224 | 18,7 | 80,4 |
+| 8 | 0,332 | 238, 243, 219 | 19,5 | 88,4 |
+| 9 | 0,397 | 230, 234, 213 | 19,7 | 96,9 |
+| 10 | 0,472 | 222, 225, 208 | 19,4 | 104,9 |
+| 11 | 0,561 | 215, 218, 205 | 16,9 | 98,8 |
+| 12 | 0,652 | 208, 211, 201 | 13,9 | 89,1 |
+| 13 | 0,757 | 203, 204, 198 | 10,4 | 61,5 |
+| 14 | 0,860 | 199, 199, 197 | 6,8 | 54,4 |
+| 15 | 0,977 | 195, 195, 194 | 2,8 | 37,7 |
+| 16 | 0,036 | 0, 0, 0 | 5,2 | 33,5 |
+| 17 | 0,089 | 4, 0, 0 | 7,9 | 57,7 |
+| 18 | 0,134 | 7, 3, 0 | 9,5 | 79,4 |
+| 19 | 0,193 | 15, 10, 0 | 10,4 | 97,7 |
+| 20 | 0,243 | 19, 12, 0 | 10,5 | 92,5 |
+| 21 | 0,313 | 25, 17, 3 | 10,3 | 84,2 |
+| 22 | 0,374 | 25, 20, 9 | 10,1 | 79,6 |
+| 23 | 0,429 | 23, 19, 9 | 9,7 | 72,2 |
+| 24 | 0,477 | 23, 20, 11 | 9,6 | 71,8 |
+| 25 | 0,528 | 23, 20, 12 | 9,5 | 61,2 |
+| 26 | 0,578 | 23, 20, 12 | 9,4 | 56,7 |
+| 27 | 0,628 | 22, 20, 12 | 9,4 | 50,9 |
+| 28 | 0,679 | 22, 20, 13 | 9,5 | 46,5 |
+| 29 | 0,733 | 22, 20, 13 | 9,5 | 41,8 |
+| 30 | 0,778 | 21, 20, 13 | 9,3 | 36,2 |
+| 31 | 0,832 | 22, 20, 13 | 9,2 | 38,0 |
+| 32 | 0,074 | 194, 182, 142 | 3,3 | 10,4 |
+| 33 | 0,159 | 203, 187, 142 | 5,0 | 20,3 |
+| 34 | 0,249 | 206, 186, 134 | 6,2 | 22,6 |
+| 35 | 0,350 | 206, 179, 133 | 6,7 | 24,5 |
+| 36 | 0,460 | 197, 174, 133 | 7,1 | 25,5 |
+| 37 | 0,555 | 195, 172, 138 | 7,1 | 21,3 |
+| 38 | 0,639 | 196, 173, 139 | 7,6 | 19,1 |
+| 39 | 0,716 | 197, 176, 139 | 8,5 | 17,8 |
+| 40 | 0,803 | 202, 181, 136 | 9,4 | 16,0 |
+| 41 | 0,956 | 206, 178, 131 | 2,9 | 19,5 |
+| 42 | 0,515 | 255, 219, 39 | 23,5 | 36,9 |
+| 43 | 0,449 | 36, 142, 29 | 20,9 | 78,3 |
+
+Les tables qui assombrissent (16 à 31) et celles qui teintent en brun (32 à 41) sont bien approchées. Les
+tables qui éclaircissent (5 à 12) le sont moins (écart moyen de 15 à 20) : la table du jeu ne suit pas une
+seule couleur cible pour toutes les couleurs. Comparaison visuelle :
+`analysis/smoke_images/smoke_models.png` (tables du jeu) et `smoke_models_alpha.png` (mélange), sur un fond
+moitié ciel, moitié sol ; le mélange fait disparaître les reflets cyan, qui venaient de la rampe de
+l'eau traversée par les tables.
 
 ## 7. Outils et images
 
@@ -427,8 +501,10 @@ teinte, teinte + 1, teinte + 2) ; la forme 3 a en plus des couleurs opaques 235 
 - `tools/object_viewer.py <objet.IFF> --donnees <DATA>` : la visionneuse WebGL embarque les fumées
   (section « Fumée » : traînée `SMOK`, chute `JINF` ou n'importe quel modèle ; vitesse, virage, cadence) ;
   composition en index de palette avec les tables `FADE`. `data/F-16DES_viewer.html` est générée ainsi.
-- Images : `analysis/smoke_images/` (`smoke_shapes.png`, `smoke_models.png` chaque modèle au fil de sa
-  vie sur un ciel, `fade_tables.png`, `smokegen_txma.png`, `smokegen_column.gif`, `f16_trail.gif`
+- `tools/smoke_fade_fit.py --donnees <DATA>` : couleur et alpha de chaque table `FADE` (§ 6.1) ;
+  `tools/smoke_ref/smoke_alpha.cpp` : le même calcul et la construction des textures RGBA, en C++.
+- Images : `analysis/smoke_images/` (`smoke_shapes.png`, `smoke_models.png` et `smoke_models_alpha.png`
+  chaque modèle au fil de sa vie, tables du jeu puis mélange alpha, `fade_tables.png`, `smokegen_txma.png`, `smokegen_column.gif`, `f16_trail.gif`
   modèle 3, `f16_chute.gif` modèle 6). `SMOKE_SYSTEM.html` les embarque.
 - Sur l'index de ciel 240, les tables d'assombrissement passent par la rampe de l'eau (160 à 175) avant
   le gris : les reflets cyan des images viennent des tables, pas des outils.
