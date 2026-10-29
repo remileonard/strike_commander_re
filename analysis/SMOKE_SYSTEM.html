@@ -370,7 +370,9 @@ liste de primitives (faces des objets, terrain, particules)
   </div>
   <div class="note"><p>Rendus d'illustration : sprites agrandis au plus proche voisin, particules triées avec l'avion entier
   (le jeu les trie avec chacune de ses faces). La visionneuse <code>data/F-16DES_viewer.html</code> (section « Fumée »)
-  permet de les voir en 3D, avec la vitesse et le virage réglables.</p></div>
+  permet de les voir en 3D, avec la vitesse et le virage réglables, dessinées soit par les textures précalculées
+  et le mélange alpha (section 9), soit par les tables <code>FADE</code> exactes ; un compteur d'images
+  par seconde compare les deux.</p></div>
 </article>
 
 <article class="card" id="librs">

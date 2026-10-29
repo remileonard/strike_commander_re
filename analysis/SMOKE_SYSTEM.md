@@ -499,8 +499,14 @@ l'eau traversée par les tables.
 - `tools/smoke_trail.py --donnees <DATA> [--chute] <objet.IFF> <sortie>` : traînée d'un avion en virage,
   modèle du chunk `SMOK` ou, avec `--chute`, celui du `JINF` (GIF).
 - `tools/object_viewer.py <objet.IFF> --donnees <DATA>` : la visionneuse WebGL embarque les fumées
-  (section « Fumée » : traînée `SMOK`, chute `JINF` ou n'importe quel modèle ; vitesse, virage, cadence) ;
-  composition en index de palette avec les tables `FADE`. `data/F-16DES_viewer.html` est générée ainsi.
+  (section « Fumée » : traînée `SMOK`, chute `JINF` ou n'importe quel modèle ; vitesse, virage, cadence).
+  Deux dessins au choix : **textures précalculées** (par défaut, méthode du § 6.1 : textures RVBA construites
+  au chargement pour chaque forme, image et teinte entière parcourue par les modèles, puis un carré face à
+  la caméra par particule, mélange `GL_SRC_ALPHA` / `GL_ONE_MINUS_SRC_ALPHA`, du plus loin au plus proche),
+  ou **tables `FADE` exactes** (image relue et repassée en index de palette, comme le jeu ; lent).
+  Compteur d'images en haut à gauche de la vue : images par seconde et durée moyenne d'un dessin. Sur le
+  F-16 : 960 textures (12 Mo), dessin d'environ 0,5 ms contre 4 à 5 ms avec les tables exactes (Chromium
+  sans carte graphique). `data/F-16DES_viewer.html` est générée ainsi.
 - `tools/smoke_fade_fit.py --donnees <DATA>` : couleur et alpha de chaque table `FADE` (§ 6.1) ;
   `tools/smoke_ref/smoke_alpha.cpp` : le même calcul et la construction des textures RGBA, en C++.
 - Images : `analysis/smoke_images/` (`smoke_shapes.png`, `smoke_models.png` et `smoke_models_alpha.png`

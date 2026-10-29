@@ -22,6 +22,8 @@
     touch-action: none; cursor: grab; }
   canvas.pixel { image-rendering: pixelated; image-rendering: crisp-edges; }
   #view { position: relative; }
+  #fps { position: absolute; left: 6px; top: 6px; padding: 2px 6px; font: 12px monospace; color: #fff;
+         background: rgba(0, 0, 0, 0.55); border-radius: 3px; pointer-events: none; white-space: pre; }
   #smokeCanvas { position: absolute; pointer-events: none; display: none; background: none; aspect-ratio: auto; }
   aside { width: 310px; flex: none; background: var(--panel); border-left: 1px solid var(--line);
     padding: 14px 16px; overflow-y: auto; max-height: 100vh; }
@@ -49,7 +51,7 @@
 </style>
 </head>
 <body>
-<div id="view"><canvas id="c" width="320" height="200" class="pixel"></canvas><canvas id="smokeCanvas" width="320" height="200" class="pixel"></canvas></div>
+<div id="view"><canvas id="c" width="320" height="200" class="pixel"></canvas><canvas id="smokeCanvas" width="320" height="200" class="pixel"></canvas><div id="fps"></div></div>
 <aside>
   <h1>__TITLE__</h1>
   <p class="sub">Pipeline fixe à la manière de SCRenderer (glBegin / glColor / glTexCoord, GL_MODULATE,
@@ -144,6 +146,10 @@
   <h2>Fumée (SMOKE_SYSTEM.md)</h2>
   <label><input id="smokeOn" type="checkbox"> traînée en vol</label>
   <label>Modèle <select id="smokeModel"></select></label>
+  <label>Dessin <select id="smokeMethod">
+    <option value="alpha" selected>textures précalculées + mélange alpha (portage)</option>
+    <option value="fade">tables FADE exactes sur l'image en index (lent)</option>
+  </select></label>
   <label class="range">Vitesse m/s <input id="smokeSpeed" type="range" min="0" max="400" step="5" value="150"><output></output></label>
   <label class="range">Virage °/s <input id="smokeTurn" type="range" min="-40" max="40" step="1" value="0"><output></output></label>
   <label class="range">Images/s <input id="smokeRate" type="range" min="5" max="30" step="1" value="15"><output></output></label>
@@ -153,11 +159,14 @@
   particules réparties de P (point du chunk SMOK) à sa position à l'image précédente, une tous les
   « espacement » m, vieillies le long du segment ; vie, taille, teinte, image d'animation
   (Particle_UpdateLifeSizeShadeFrame_4C413) ; suppression après 2 images sans dessin. Dessin
-  (Particle_Draw_4C7ED) sur l'image repassée en index de palette : mode 2, couleur c de la forme dans
-  A … A + B − 1 → FADE[teinte + c − A][fond], tables FADE de PALFADE.IFF. Particules plus lointaines que le
-  centre de l'objet : sur le fond seulement ; plus proches : par-dessus (le jeu trie chaque face avec
-  les particules). Mise à l'échelle au plus proche voisin. Modes RVB : couleurs ramenées à l'index le
-  plus proche avant la teinte.</p>
+  (Particle_Draw_4C7ED). « Textures précalculées » (SMOKE_SYSTEM.md § 6.1, smoke_ref/smoke_alpha.cpp) : au
+  chargement, une texture RVBA par forme, image et teinte entière ; couleur c dans A … A + B − 1 → couleur
+  cible et alpha de la table teinte + c − A (approximation de la table FADE par un mélange), autres couleurs
+  opaques. À chaque image : un carré face à la caméra par particule, GL_SRC_ALPHA / GL_ONE_MINUS_SRC_ALPHA,
+  du plus loin au plus proche ; ordre « tri » : particules plus lointaines que le centre de l'objet avant
+  lui, les autres après ; ordre « profondeur » : test de profondeur sans écriture, avant les faces
+  transparentes. « Tables FADE exactes » : l'image est relue (readPixels), repassée en index de palette,
+  et chaque pixel de niveau c remplacé par FADE[teinte + c − A][fond], comme le jeu.</p>
   </div>
 
   <h2>État</h2>
@@ -175,6 +184,10 @@ let lastMV = null;
 let lastFocal = 277;
 let lastSky = [0, 0, 0];
 let smokeReady = false;       // posé par setupSmoke, une fois les données de fumée prêtes
+let smokeInfo = "";           // ligne « fumée » ajoutée à l'état après le dessin
+let smokeShown = 0;           // particules dessinées dans la dernière image
+// Compteur d'images : dessins par seconde et durée moyenne d'un dessin, sur une demi-seconde.
+const fpsStat = { start: null, frames: 0, busy: 0, drew: false };
 
 // =====================================================================================
 // Couche « pipeline fixe » : glBegin / glColor4f / glTexCoord2f / glVertex3f / glEnd,
@@ -257,6 +270,7 @@ void main() {
 }`;
 
 const GL_TRIANGLES = gl.TRIANGLES;
+const IDENTITY4 = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
 const GL_LINES = gl.LINES;
 const fixed = (() => {
   function compile(type, src) {
@@ -811,14 +825,26 @@ function chooseLevel(depth, focal) {    // Poly_SelectDetailLevel_2BCA4 (byte_6E
 }
 
 function drawModel() {
+  const t0 = performance.now();
+  smokeInfo = "";
+  smokeShown = 0;
   drawModelGL();
-  if (!smokeReady) { return; }
-  if (ui.smokeOn.checked) {
-    renderSmoke();
-  } else {
-    smokeCanvas.style.display = "none";
+  if (smokeOnGL()) {
+    smokeInfo = "fumée       modèle " + smokeModelIndex() + ", " + particles.length + " particules, " + smokeShown +
+      " dessinées\ntextures    " + smokeTex.size + " précalculées (" + Math.round(smokeTexBytes / 1024) + " Ko)";
   }
+  if (smokeReady) {
+    if (ui.smokeOn.checked && ui.smokeMethod.value === "fade") {
+      renderSmoke();
+    } else {
+      smokeCanvas.style.display = "none";
+    }
+  }
+  if (smokeInfo) { $("info").textContent += "\n" + smokeInfo; }
+  fpsStat.drew = true;
+  fpsStat.busy += performance.now() - t0;
 }
+function smokeOnGL() { return smokeReady && ui.smokeOn.checked && ui.smokeMethod.value === "alpha"; }
 
 function drawModelGL() {
   const focal = +ui.focal.value;
@@ -910,6 +936,8 @@ function drawModelGL() {
     // Comme le jeu : faces triées du plus loin au plus proche (clé = sommet le plus lointain),
     // sans tampon de profondeur ; chaque face dessine sa couleur puis sa texture.
     gl.disable(gl.DEPTH_TEST);
+    const smokeItems = smokeOnGL() ? smokeProject(MV) : [];
+    drawSmokeGL(smokeItems.filter((it) => it[0] > depthC), P);   // plus loin que le centre : avant l'objet
     const queue = list.map((fi) => {
       const f = faces[fi];
       const d = Math.max(...[f[1], f[2], f[3]].map((v) => -transformPoint(MV, vertices[v])[2]));
@@ -924,6 +952,8 @@ function drawModelGL() {
       drawFaceTexture(fi, fs);
       drawFaceTransparent(fi);
     }
+    drawSmokeGL(smokeItems.filter((it) => it[0] <= depthC), P);  // plus près : après l'objet
+    glLoadMatrices(P, MV);
   } else {
     // Comme SCRenderer::drawModel : tampon de profondeur, 3 passes.
     gl.enable(gl.DEPTH_TEST);
@@ -943,6 +973,10 @@ function drawModelGL() {
     }
     gl.depthFunc(gl.LESS);
     gl.depthMask(false);
+    if (smokeOnGL()) {                   // fumées : test de profondeur sans écriture, du plus loin au plus proche
+      drawSmokeGL(smokeProject(MV), P);
+      glLoadMatrices(P, MV);
+    }
     for (const fi of list) {             // passe 3 : transparentes
       setCull(fi);
       drawFaceTransparent(fi);
@@ -1235,7 +1269,7 @@ function renderSmoke() {
   smokeCtx.putImageData(img, 0, 0);
   placeOverlay();
   smokeCanvas.style.display = "block";
-  $("info").textContent += "\nfumée       modèle " + mi + ", " + particles.length + " particules, " + shown + " dessinées";
+  smokeInfo = "fumée       modèle " + mi + ", " + particles.length + " particules, " + shown + " dessinées (FADE exact)";
 }
 
 function drawParticle(m, q, depth, sx, sy, fpx, k, idx, isBg, behind, W, H) {   // Particle_Draw_4C7ED
@@ -1290,10 +1324,165 @@ function drawParticle(m, q, depth, sx, sy, fpx, k, idx, isBg, behind, W, H) {   
   return true;
 }
 
+// ----- Dessin par textures précalculées (SMOKE_SYSTEM.md § 6.1, smoke_ref/smoke_alpha.cpp) -----
+const blends = smoke ? smoke.blends : [];   // par table FADE : [alpha, R, V, B] (smoke_fade_fit.py)
+const smokeTex = new Map();                 // « forme:image:teinte:A:B » → { id, w, h }
+let smokeTexBytes = 0;
+
+function smokeTexKey(m, shape, image, shade) {
+  return m.render === 1 ? shape + ":" + image + ":o" : shape + ":" + image + ":" + shade + ":" + m.first + ":" + m.count;
+}
+// buildSmokeTexture : pixel absent → transparent ; couleur hors de A … A + B − 1 (ou mode 1) → opaque ;
+// sinon couleur cible et alpha de la table teinte + c − A, transparent hors des tables.
+function buildSmokeTexture(m, im, shade) {
+  const rgba = new Uint8Array(im.w * im.h * 4);
+  for (let i = 0; i < im.w * im.h; i++) {
+    if (!im.mask[i]) { continue; }
+    const c = im.pix[i];
+    if (m.render === 1 || c < m.first || c >= m.first + m.count) {
+      rgba[4 * i] = pal[3 * c];
+      rgba[4 * i + 1] = pal[3 * c + 1];
+      rgba[4 * i + 2] = pal[3 * c + 2];
+      rgba[4 * i + 3] = 255;
+      continue;
+    }
+    const t = shade + c - m.first;
+    if (t < 0 || t >= blends.length) { continue; }
+    const b = blends[t];
+    rgba[4 * i] = Math.round(b[1]);
+    rgba[4 * i + 1] = Math.round(b[2]);
+    rgba[4 * i + 2] = Math.round(b[3]);
+    rgba[4 * i + 3] = Math.round(b[0] * 255);
+  }
+  const id = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, id);
+  gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, im.w, im.h, 0, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
+  // Taille quelconque (WebGL 1) : bords bloqués, sans mipmap ; au plus proche comme le jeu.
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  smokeTexBytes += rgba.length;
+  return { id, w: im.w, h: im.h };
+}
+// Toutes les textures au chargement : pour chaque modèle à formes, ses formes A et B, chaque image,
+// chaque teinte entière parcourue pendant la vie (de teinte 0 à teinte 1).
+function buildSmokeTextures() {
+  for (const m of smoke.models) {
+    if (m.render === 0 || m.shapeA === 255) { continue; }
+    const lo = Math.floor(Math.min(m.shade0, m.shade1));
+    const hi = Math.floor(Math.max(m.shade0, m.shade1));
+    for (const shape of new Set([m.shapeA, m.shapeB])) {
+      if (shape === 255 || !smokeShapes[shape]) { continue; }
+      smokeShapes[shape].images.forEach((im, image) => {
+        if (!im.w) { return; }
+        for (let shade = lo; shade <= hi; shade++) {
+          const key = smokeTexKey(m, shape, image, shade);
+          if (!smokeTex.has(key)) { smokeTex.set(key, buildSmokeTexture(m, im, shade)); }
+        }
+      });
+    }
+  }
+}
+
+// Particle_ProjectToScreen_4C1EE : particules devant l'œil et assez grandes, triées du plus loin au plus
+// proche (RenderList_RadixSortDescending_588E8). Élément : [profondeur, x écran, y écran, particule, œil].
+function smokeProject(MV) {
+  const W = canvas.width;
+  const H = canvas.height;
+  const fpx = lastFocal * H / 200;
+  const list = [];
+  for (const q of particles) {
+    const e = transformPoint(MV, q.p);
+    const depth = -e[2];
+    if (depth <= 0.5) { continue; }
+    if (q.size * lastFocal / depth <= 153 / 256) { continue; }
+    list.push([depth, W / 2 + e[0] * fpx / depth, H / 2 - e[1] * fpx / depth, q, e]);
+  }
+  list.sort((a, b) => b[0] - a[0]);
+  return list;
+}
+
+// Un carré face à la caméra par particule, en repère œil (MODELVIEW = identité). Une image de forme de
+// l'échelle du jeu g (pixels d'écran par pixel d'image) couvre g × profondeur ÷ focale mètres par pixel.
+function drawSmokeGL(items, P) {
+  if (!items.length) { return; }
+  const mi = smokeModelIndex();
+  const m = smoke.models[mi];
+  const W = canvas.width;
+  const H = canvas.height;
+  const fpx = lastFocal * H / 200;
+  const k = H / 200;
+  glLoadMatrices(P, IDENTITY4);
+  gl.disable(gl.CULL_FACE);
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  glAlphaTest(false, 0);
+  glEnableFog(false);
+  glEnableLighting(false);
+  glTexEnvInterpolate(false);
+  for (const [depth, sx, sy, q, e] of items) {
+    const shadeT = Math.floor(q.shade);
+    if (m.render === 0) {                  // disque : ellipse de rayon « taille » m, vertical × 213/256
+      const r = q.size * fpx / depth;
+      if (sx + r < 0 || sx - r >= W || sy + r < 0 || sy - r >= H) { continue; }
+      q.drawn = true;
+      smokeShown++;
+      if (shadeT < 0 || shadeT >= blends.length) { continue; }
+      const b = blends[shadeT];
+      glEnableTexture2D(false);
+      glColor4f(b[1] / 255, b[2] / 255, b[3] / 255, b[0]);
+      glBegin(gl.TRIANGLE_FAN);
+      glVertex3f(e[0], e[1], e[2]);
+      for (let i = 0; i <= 24; i++) {
+        const a = i * Math.PI / 12;
+        glVertex3f(e[0] + q.size * Math.cos(a), e[1] + q.size * 213 / 256 * Math.sin(a), e[2]);
+      }
+      glEnd();
+      continue;
+    }
+    if (q.shape === null) { continue; }
+    const sh = smokeShapes[q.shape];
+    let frame = q.frame;
+    if (m.order.length) { frame = m.order[Math.min(frame, m.order.length - 1)]; }
+    frame = Math.min(frame, sh.images.length - 1);
+    const im = sh.images[frame];
+    if (!im.w) { continue; }
+    const gameScale = Math.min(32, Math.max(4 / 256, q.size * lastFocal / (depth * sh.half)));
+    const r = gameScale * sh.half * k;
+    if (sx + r < 0 || sx - r >= W || sy + r < 0 || sy - r >= H) { continue; }
+    q.drawn = true;
+    smokeShown++;
+    const tex = smokeTex.get(smokeTexKey(m, q.shape, frame, shadeT));
+    if (!tex) { continue; }                // teinte hors de la plage précalculée : rien à dessiner
+    const px = gameScale * depth / lastFocal;
+    const x0 = e[0] + im.x0 * px;
+    const x1 = e[0] + (im.x0 + im.w) * px;
+    const y0 = e[1] - im.y0 * px;          // ligne 0 de l'image en haut
+    const y1 = e[1] - (im.y0 + im.h) * px;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, tex.id);
+    glEnableTexture2D(true);
+    glColor4f(1, 1, 1, 1);
+    glBegin(GL_TRIANGLES);
+    const corner = (u, v) => { glTexCoord2f(u, v); glVertex3f(u ? x1 : x0, v ? y1 : y0, e[2]); };
+    corner(0, 0);
+    corner(1, 0);
+    corner(1, 1);
+    corner(0, 0);
+    corner(1, 1);
+    corner(0, 1);
+    glEnd();
+  }
+  glEnableTexture2D(false);
+}
+
 function setupSmoke() {
   if (!smoke) { return; }
   $("smokePanel").style.display = "";
-  for (const id of ["smokeOn", "smokeModel", "smokeSpeed", "smokeTurn", "smokeRate"]) { ui[id] = $(id); }
+  for (const id of ["smokeOn", "smokeModel", "smokeMethod", "smokeSpeed", "smokeTurn", "smokeRate"]) { ui[id] = $(id); }
+  buildSmokeTextures();
   if (smoke.smok) { ui.smokeModel.add(new Option("traînée : chunk SMOK, modèle " + smoke.smok.type, "smok")); }
   ui.smokeModel.add(new Option("chute : JINF, modèle " + smoke.fall, "fall"));
   smoke.models.forEach((m, i) => ui.smokeModel.add(new Option("modèle " + i + " — formes " +
@@ -1313,9 +1502,24 @@ function setupSmoke() {
   };
   reset();
   ui.smokeModel.addEventListener("change", reset);
+  ui.smokeMethod.addEventListener("change", drawModel);
   $("smokeClear").addEventListener("click", reset);
   ui.smokeOn.addEventListener("change", () => { reset(); drawModel(); });
   smokeReady = true;
+}
+
+function showFps(now) {
+  if (fpsStat.drew) { fpsStat.frames++; }   // images affichées : au moins un dessin dans ce tour
+  fpsStat.drew = false;
+  if (fpsStat.start === null) { fpsStat.start = now; }
+  const span = now - fpsStat.start;
+  if (span < 500) { return; }
+  const fps = fpsStat.frames * 1000 / span;
+  const ms = fpsStat.frames ? fpsStat.busy / fpsStat.frames : 0;
+  $("fps").textContent = fps.toFixed(0) + " images/s" + (fpsStat.frames ? " · dessin " + ms.toFixed(1) + " ms" : "");
+  fpsStat.start = now;
+  fpsStat.frames = 0;
+  fpsStat.busy = 0;
 }
 
 function tick(now) {
@@ -1337,6 +1541,7 @@ function tick(now) {
     ui.yaw.parentElement.querySelector("output").textContent = Math.round(y);
     drawModel();
   }
+  showFps(now);
   requestAnimationFrame(tick);
 }
 const COLOUR_NOTES = {

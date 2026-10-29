@@ -378,7 +378,8 @@ strike_commander_re/
     │                                  données d'essai dans data/ (ALASKA.PAK, ALASKA.TRI…)
     ├── object_render.py             rendu logiciel d'un objet .IFF comme le jeu (OBJECT_RENDER.md) → PNG
     ├── object_viewer.py (+ .html)   même rendu en WebGL : page autonome <objet>_viewer.html (orbite, LOD, options) ;
-    │                                  avec --donnees <DATA> : traînée de fumée en vol (SMOK, JINF, tables FADE)
+    │                                  avec --donnees <DATA> : traînée de fumée en vol (SMOK, JINF), textures précalculées
+    │                                  + alpha ou tables FADE exactes ; compteur d'images/s
     ├── smoke_render.py              fumées : planches des formes, des modèles, des tables FADE ; colonne SMOKEGEN (GIF)
     ├── smoke_trail.py               fumées : traînée d'un avion en vol, --chute = modèle du JINF (GIF) — SMOKE_SYSTEM.md
     ├── smoke_fade_fit.py            fumées : couleur + alpha qui approchent chaque table FADE (précalcul pour OpenGL) ;

@@ -91,10 +91,18 @@ def smoke_data(iff):
             images.append([w, h, x0, y0, b64(pix), b64(mask)])
         out_shapes.append({"half": sr.shape_half_size(sh), "images": images})
     smok = sr.smok_chunk(iff)
+    # Tables FADE approchées par un mélange alpha (smoke_fade_fit.py) : [alpha, R, V, B] par table.
+    import smoke_fade_fit as ff
+    rgb, fade = ff.load("PALETTE.IFF", "PALFADE.IFF")
+    blends = []
+    for k in range(len(fade) // 256):
+        a, t, _, _ = ff.fit(rgb, fade[256 * k:256 * k + 256])
+        blends.append([round(max(0.0, min(1.0, a)), 4)] + [round(max(0.0, min(255.0, v)), 1) for v in t])
     return {
         "models": models,
         "shapes": out_shapes,
         "fade": b64(sr.fade_tables()),
+        "blends": blends,
         "smok": None if smok is None else {"type": smok[0], "point": [smok[1][0], smok[1][2], -smok[1][1]]},
         "fall": sr.jinf_smoke_type(iff),
     }
