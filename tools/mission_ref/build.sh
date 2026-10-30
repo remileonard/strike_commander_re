@@ -1,18 +1,29 @@
 #!/bin/sh
-# Compile le code de référence des zones et scènes de mission contre les sources de libRealSpace, et l'essai.
+# Compile l'essai mission_areas_test contre libRealSpace (branche ou patch appliqué : librealspace_zones_scenes.patch).
+# Demande SDL2, SDL2_ttf, SDL2_mixer, OpenGL, GLU et les en-têtes imgui et SimpleIni (paquets Debian ou Ubuntu).
+# SDL_mixer_ext n'existe pas en paquet : un en-tête de substitution inclut SDL_mixer (vérification seulement).
 # Usage : tools/mission_ref/build.sh <dossier libRealSpace> [dossier de sortie]
 set -e
 LIBRS="$1/src"
 OUT="${2:-/tmp/mission_ref_build}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-mkdir -p "$OUT"
-FLAGS="-std=c++17 -O1 -Wall -Wextra -I$LIBRS/realspace -I$LIBRS/commons"
-for f in commons/ByteStream commons/IFFSaxLexer commons/Math commons/Matrix realspace/Base; do
-    g++ -std=c++17 -O1 -w -c "$LIBRS/$f.cpp" -o "$OUT/$(basename $f).o"
+mkdir -p "$OUT/shim/SDL2"
+echo '#include <SDL2/SDL_mixer.h>' > "$OUT/shim/SDL2/SDL_mixer_ext.h"
+INC="-I$LIBRS -I$LIBRS/strike_commander -I$LIBRS/realspace -I$LIBRS/engine -I$LIBRS/commons -I$LIBRS/commons/Nuked-OPL3"
+INC="$INC -I/usr/include/SDL2 -I/usr/include/imgui -I/usr/include/imgui/backends -I$OUT/shim"
+FLAGS="-std=c++17 -O0 -w -DSI_NO_CONVERSION $INC"
+# Vérification de compilation de tout le jeu (sans édition de liens).
+for f in "$LIBRS"/strike_commander/*.cpp "$LIBRS"/executables/debugger/DebugStrike.cpp; do
+    g++ $FLAGS -fsyntax-only "$f"
 done
-for f in RSMissionAreas SCMissionScenes; do
-    g++ $FLAGS -c "$HERE/$f.cpp" -o "$OUT/$f.o"
+# Objets de realspace, commons et engine pour l'essai.
+for f in "$LIBRS"/realspace/*.cpp "$LIBRS"/commons/*.cpp "$LIBRS"/engine/*.cpp; do
+    g++ $FLAGS -c "$f" -o "$OUT/$(basename "$(dirname "$f")")_$(basename "$f" .cpp).o"
 done
-g++ $FLAGS "$HERE/mission_test.cpp" "$OUT"/ByteStream.o "$OUT"/IFFSaxLexer.o "$OUT"/Math.o "$OUT"/Matrix.o \
-    "$OUT"/Base.o "$OUT"/RSMissionAreas.o "$OUT"/SCMissionScenes.o -o "$OUT/mission_test"
-echo "$OUT/mission_test"
+for f in "$LIBRS"/commons/pklib/*.c "$LIBRS"/commons/Nuked-OPL3/*.c; do
+    gcc -w $INC -c "$f" -o "$OUT/c_$(basename "$f" .c).o"
+done
+# Symboles de l'interface (SimpleIni, imgui, SCState) non résolus : l'essai n'appelle que RSMission.
+g++ $FLAGS "$HERE/mission_areas_test.cpp" "$OUT"/*.o -lGL -lGLU -lSDL2 -lSDL2_ttf -lSDL2_mixer \
+    -Wl,--unresolved-symbols=ignore-all -o "$OUT/mission_areas_test"
+echo "$OUT/mission_areas_test"
