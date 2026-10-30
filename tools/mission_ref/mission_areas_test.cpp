@@ -1,5 +1,5 @@
 // Essai de la lecture des zones et des scènes par RSMission de libRealSpace (version modifiée,
-// patch tools/mission_ref/librealspace_zones_scenes.patch) sur les fichiers de mission du jeu.
+// fichiers de tools/mission_ref/librealspace/src) sur les fichiers de mission du jeu.
 // Usage : mission_areas_test MISSIONS/*.IFF
 #include <cstdio>
 #include <cstring>

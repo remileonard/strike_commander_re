@@ -1,5 +1,5 @@
 #!/bin/sh
-# Compile l'essai mission_areas_test contre libRealSpace (branche ou patch appliqué : librealspace_zones_scenes.patch).
+# Compile l'essai mission_areas_test contre libRealSpace (avec les fichiers de tools/mission_ref/librealspace/src copiés par-dessus).
 # Demande SDL2, SDL2_ttf, SDL2_mixer, OpenGL, GLU et les en-têtes imgui et SimpleIni (paquets Debian ou Ubuntu).
 # SDL_mixer_ext n'existe pas en paquet : un en-tête de substitution inclut SDL_mixer (vérification seulement).
 # Usage : tools/mission_ref/build.sh <dossier libRealSpace> [dossier de sortie]

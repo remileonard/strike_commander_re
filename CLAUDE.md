@@ -109,11 +109,14 @@ qui existent déjà** (`RSMission::parseMISN_AREA`, `SCMission::getAreaID`, `SCS
 leurs noms et leurs champs, et en n'ajoutant que ce qui manque. Lire le code de libRealSpace concerné
 **avant** d'écrire quoi que ce soit. Ne pas créer de classes parallèles (« tracker », « emitter »,
 structures de remplacement) pour la commodité d'un essai : un essai isolé peut exister, mais il appelle
-le code modifié de libRealSpace, il ne le remplace pas. Livrable : un patch (`git diff`) sur le dépôt
-libRealSpace, compilé quand c'est possible, et un document qui explique chaque changement.
+le code modifié de libRealSpace, il ne le remplace pas. Livrable : **les fichiers de libRealSpace complets,
+déjà modifiés**, rangés sous leur chemin d'origine (ex. `tools/mission_ref/librealspace/src/realspace/RSMission.cpp`),
+compilés quand c'est possible, et un document qui donne **le code entier de chaque fonction changée** avec
+l'explication. **Jamais de patch (`git diff`) comme livrable** : Rémi ne le lit pas.
 *(Incident 2026-10-30 : zones et scènes de mission proposées dans des classes neuves `readAreas`,
 `SCSceneTracker` au lieu de corriger `RSMission`, `SCMission` et `SCMissionScene` — Rémi :
-« pourquoi recréer des classes quand elles existent déjà ? ».)*
+« pourquoi recréer des classes quand elles existent déjà ? » ; puis livrées en patch — « je ne peux pas le
+lire ».)*
 
 ## Contexte du projet
 
@@ -310,7 +313,7 @@ strike_commander_re/
 │   ├── IMPL_SMOKE.md                à porter : fumées (RSSmokeSet = données + textures teintées FADE, SCSmokeSet =
 │   │                                  acteur porté par l'objet : émission, mise à jour, drawBillboard) — tools/smoke_ref/
 │   ├── IMPL_MISSION_AREAS.md        à porter : zones AREA (formes, test d'appartenance) et scènes SCNE (scène globale,
-│   │                                  scène courante, ordre des 3 scripts) — patch sur RSMission / SCMission / SCMissionScene
+│   │                                  scène courante, ordre des 3 scripts) — fichiers RSMission / SCMission / SCMissionScene modifiés
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
@@ -370,7 +373,7 @@ strike_commander_re/
     │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
-    ├── mission_ref/                 missions : patch libRealSpace (zones et scènes), build.sh (compile le jeu, lie l'essai),
+    ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
     │                                  mission_areas_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
     │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
