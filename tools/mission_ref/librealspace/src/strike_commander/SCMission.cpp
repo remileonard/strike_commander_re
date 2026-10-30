@@ -292,9 +292,10 @@ void SCMission::loadMission() {
                             actor->plane->system_health[sys.first][subsys.first] = subsys.second;
                         }
                     }
+                    // Cap en dixièmes de degré, comme SCStrike : le placement dans le repère du joueur le lit dès startScenes
+                    // (l'ancienne 2e affectation, en radians, l'écrasait).
                     actor->plane->yaw = (360 - part->azymuth) * 10.0f;
                     actor->plane->simple_simulation = false;
-                    actor->plane->yaw = (360 - part->azymuth) * (float) M_PI / 180.0f;
                     // PartEntry_ResolveSpawnPositionAndActivate_51EDC : PART +0x12 non vide = emport imposé
                     // (WeaponSys_LoadFromFile_9EFBE), pour le joueur comme pour les autres avions.
                     part->weapon_load.shrink_to_fit();
@@ -928,6 +929,61 @@ SCMissionScene *SCMission::findSceneAt(Vector3D position) {
 }
 // MissionScenario_LoadMainRecord_A8331 : la scène globale (Scene_FindByArea_532AD avec une zone nulle) est
 // activée, puis la scène où se trouve le joueur.
+// Objet de mode de placement non nul (PartEntry_ResolveSpawnPositionAndActivate_51EDC, cmp byte ptr es:[bx+1Ch], 0) :
+// le décalage du fichier est exprimé dans le repère de l'avion du joueur. Le jeu ajoute à la position du joueur
+// côté × aile droite + avant × nez + haut × dessus de l'avion (les trois lignes de sa matrice d'orientation), et le cap
+// de l'objet vaut le cap du nez du joueur (Math_HeadingAngle_553CF) + le cap du fichier. L'objet reste à plat.
+// Dans libRealSpace, le décalage lu (x = côté, y = haut, z = -avant) s'applique tel quel aux lignes de la matrice de
+// l'avion (ligne 0 = droite, ligne 1 = haut, ligne 2 = arrière), construite comme SCJetpPlane la construit.
+void SCMission::placeRelativeToPlayer(SCMissionActors *actor) {
+    if (this->player == nullptr || this->player->plane == nullptr) {
+        return;
+    }
+    SCPlane *player_plane = this->player->plane;
+    MISN_PART *part = actor->object;
+    Matrix orientation;
+    orientation.Identity();
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->yaw), 0, 1, 0);
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->pitch), 1, 0, 0);
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->roll), 0, 0, 1);
+    Vector3D offset = part->relative_position;
+    Vector3D position = {
+        player_plane->x,
+        player_plane->y,
+        player_plane->z
+    };
+    position.x += offset.x * orientation.v[0][0] + offset.y * orientation.v[1][0] + offset.z * orientation.v[2][0];
+    position.y += offset.x * orientation.v[0][1] + offset.y * orientation.v[1][1] + offset.z * orientation.v[2][1];
+    position.z += offset.x * orientation.v[0][2] + offset.y * orientation.v[1][2] + offset.z * orientation.v[2][2];
+    part->position = position;
+
+    // Cap du nez du joueur dans la convention des fichiers (degrés, depuis le nord vers l'est) : atan2(x, -z) du nez.
+    float nose_x = -orientation.v[2][0];
+    float nose_z = -orientation.v[2][2];
+    float heading = radToDegree(atan2f(nose_x, -nose_z)) + (float) part->relative_azymuth;
+    heading = fmodf(heading, 360.0f);
+    if (heading < 0.0f) {
+        heading += 360.0f;
+    }
+    part->azymuth = (uint16_t) roundf(heading) % 360;
+
+    if (actor->plane != nullptr) {
+        actor->plane->x = position.x;
+        actor->plane->y = position.y;
+        actor->plane->z = position.z;
+        actor->plane->yaw = norm3600((360.0f - heading) * 10.0f);
+        // Vitesse initiale le long du nouveau nez (AIAircraft_SpawnAndConditionalLoadProfile_53363).
+        if (part->speed != 0) {
+            float spawn_yaw = tenthOfDegreeToRad(actor->plane->yaw);
+            float spawn_speed = (float) part->speed;
+            actor->plane->velocity = Vector3D(-sinf(spawn_yaw) * spawn_speed, 0.0f, -cosf(spawn_yaw) * spawn_speed);
+        }
+        if (actor->pilot != nullptr) {
+            actor->pilot->target_azimut = actor->plane->yaw / 10.0f;
+        }
+    }
+}
+
 void SCMission::startScenes() {
     std::vector<AREA *> &areas = this->mission->mission_data.areas;
     this->global_scene = nullptr;

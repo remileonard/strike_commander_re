@@ -211,7 +211,10 @@ bool SCMissionActors::activateTarget(uint8_t arg) {
             actor->is_active = true;
             actor->is_hidden = false;
             Vector3D correction = {0.0f, 0.0f, 0.0f};
-            if (actor->object->area_id != 255 && actor->object->unknown2 == 0) {
+            if (actor->object->placement != 0) {
+                // Repère de l'avion du joueur : décalage tourné, cap = cap du joueur + cap du fichier.
+                this->mission->placeRelativeToPlayer(actor);
+            } else if (actor->object->area_id != 255) {
                 bool spot_found = false;
                 for (auto spot: this->mission->mission->mission_data.spots) {
                     if (spot->area_id == actor->object->area_id) {
@@ -223,14 +226,6 @@ bool SCMissionActors::activateTarget(uint8_t arg) {
                 if (!spot_found) {
                     correction = this->mission->mission->mission_data.areas[actor->object->area_id]->position;
                 }
-            } else {
-                correction = {
-                    this->mission->player->plane->x,
-                    this->mission->player->plane->y,
-                    this->mission->player->plane->z
-                };
-            }
-            if ((actor->object->area_id != 255) || (actor->object->area_id == 255 && actor->object->unknown2 == 1)) {
                 actor->object->position += correction;
             }
             float ground_y = this->mission->area->getY(actor->object->position.x, actor->object->position.z);

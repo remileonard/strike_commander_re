@@ -114,6 +114,7 @@ public:
     uint8_t getAreaID(Vector3D position);
     SCMissionScene *findSceneAt(Vector3D position);
     void startScenes();
+    void placeRelativeToPlayer(SCMissionActors *actor);
     void finishScenes();
     RSEntity * LoadEntity(std::string name);
     void applyDifficulty();

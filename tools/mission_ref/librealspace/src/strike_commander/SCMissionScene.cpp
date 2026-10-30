@@ -44,19 +44,13 @@ void SCMissionScene::activate() {
                     if (actor->actor_id == part->id && actor->is_active == false) {
                         actor->is_active = true;
                         actor->is_hidden = false;
-                        if (scene->area_id != -1) {
-                            Vector3D correction;
-                            if (actor->object->unknown2 == 0) {
-                                correction = sc_mission->mission->mission_data.areas[scene->area_id]->position;
-                            } else if (actor->object->unknown2 == 1) {
-                                correction = {
-                                    sc_mission->player->plane->x,
-                                    sc_mission->player->plane->y,
-                                    sc_mission->player->plane->z
-                                };
-                            }
-                            if (actor->object->area_id != 255) {
-                                actor->object->position += correction;
+                        // Le mode de placement ne dépend ni de la zone de l'objet ni de celle de la scène.
+                        if (scene->area_id != -1 || actor->object->placement != 0) {
+                            if (actor->object->placement != 0) {
+                                // Repère de l'avion du joueur : décalage tourné, cap = cap du joueur + cap du fichier.
+                                sc_mission->placeRelativeToPlayer(actor);
+                            } else if (actor->object->area_id != 255) {
+                                actor->object->position += sc_mission->mission->mission_data.areas[scene->area_id]->position;
                             }
                             float ground_y = sc_mission->area->getY(actor->object->position.x, actor->object->position.z);
                             

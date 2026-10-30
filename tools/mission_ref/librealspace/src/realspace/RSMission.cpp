@@ -344,6 +344,8 @@ void RSMission::parseMISN_PART(uint8_t *data, size_t size) {
         prt->unknown3 = (uint8_t) ((uint32_t) raw_c2 >> 24);
         prt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
         prt->azymuth = stream.ReadUShort();
+        prt->relative_position = prt->position;
+        prt->relative_azymuth = prt->azymuth;
 
         // unknown_bytes : les octets 43 à 53, gardés tels quels pour les lecteurs actuels.
         for (int k = 0; k < 11; k++) {

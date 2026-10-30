@@ -1,5 +1,5 @@
 #!/bin/sh
-# Compile les essais mission_areas_test et mission_part_test contre libRealSpace (avec les fichiers de tools/mission_ref/librealspace/src copiés par-dessus).
+# Compile les essais mission_areas_test, mission_part_test et mission_relative_test contre libRealSpace (avec les fichiers de tools/mission_ref/librealspace/src copiés par-dessus).
 # Demande SDL2, SDL2_ttf, SDL2_mixer, OpenGL, GLU et les en-têtes imgui et SimpleIni (paquets Debian ou Ubuntu).
 # SDL_mixer_ext n'existe pas en paquet : un en-tête de substitution inclut SDL_mixer (vérification seulement).
 # Usage : tools/mission_ref/build.sh <dossier libRealSpace> [dossier de sortie]
@@ -28,5 +28,13 @@ g++ $FLAGS "$HERE/mission_areas_test.cpp" "$OUT"/*.o -lGL -lGLU -lSDL2 -lSDL2_tt
     -Wl,--unresolved-symbols=ignore-all -o "$OUT/mission_areas_test"
 g++ $FLAGS "$HERE/mission_part_test.cpp" "$OUT"/*.o -lGL -lGLU -lSDL2 -lSDL2_ttf -lSDL2_mixer \
     -Wl,--unresolved-symbols=ignore-all -o "$OUT/mission_part_test"
+# Placement dans le repère du joueur : SCMission::placeRelativeToPlayer, avec les objets de SCMission, SCMissionActors et SCPlane.
+mkdir -p "$OUT/rel"
+for f in SCMission SCMissionActors SCPlane; do
+    g++ $FLAGS -c "$LIBRS/strike_commander/$f.cpp" -o "$OUT/rel/$f.o"
+done
+g++ $FLAGS "$HERE/mission_relative_test.cpp" "$OUT"/rel/*.o "$OUT"/*.o -lGL -lGLU -lSDL2 -lSDL2_ttf \
+    -lSDL2_mixer -Wl,--unresolved-symbols=ignore-all -o "$OUT/mission_relative_test"
 echo "$OUT/mission_areas_test"
 echo "$OUT/mission_part_test"
+echo "$OUT/mission_relative_test"

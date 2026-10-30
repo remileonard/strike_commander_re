@@ -71,16 +71,19 @@ donne le même allié que le jeu. Rien n'est donc ajouté à l'activation pour l
 
 | Fichier | Changement |
 |---|---|
-| `realspace/RSMission.h` | champs nommés dans `MISN_PART` |
+| `realspace/RSMission.h` | champs nommés dans `MISN_PART`, décalage et cap tels que lus (`relative_position`, `relative_azymuth`) |
 | `realspace/RSMission.cpp` | `parseMISN_PART` : lecture exacte, champs nommés |
-| `strike_commander/SCMission.cpp` | `loadMission` : camp lu dans `team`, vitesse initiale et départ au sol |
-| `strike_commander/SCMissionScene.cpp` | `activate` : départ au sol d'après la vitesse |
-| `strike_commander/SCMissionActors.cpp` | `activateTarget` : départ au sol d'après la vitesse |
+| `strike_commander/SCMission.h` | déclaration de `placeRelativeToPlayer` |
+| `strike_commander/SCMission.cpp` | `loadMission` : camp lu dans `team`, vitesse initiale et départ au sol, cap du joueur en dixièmes de degré ; nouvelle `placeRelativeToPlayer` |
+| `strike_commander/SCMissionScene.cpp` | `activate` : départ au sol d'après la vitesse, placement dans le repère du joueur |
+| `strike_commander/SCMissionActors.cpp` | `activateTarget` : départ au sol d'après la vitesse, placement dans le repère du joueur |
 | `strike_commander/SCProg.cpp` | `OP_SET_OBJ_FOLLOW_ALLY` : allié par défaut et poste lus dans les champs nommés |
 
 ### 2.1 `RSMission.h` — `MISN_PART`
 
 Les anciens champs restent (le débogueur `DebugStrike` les affiche) ; les champs nommés s'ajoutent.
+`relative_position` et `relative_azymuth` gardent le décalage et le cap du fichier : `position` et `azymuth` sont
+réécrits à l'activation, et le placement dans le repère du joueur doit repartir des valeurs du fichier à chaque fois.
 
 ```cpp
 struct MISN_PART {
@@ -111,6 +114,9 @@ struct MISN_PART {
     int16_t formation_side{0};  // octets 48-49 : poste en formation, m
     int16_t formation_ahead{0}; // octets 50-51
     int16_t formation_up{0};    // octets 52-53
+    // Décalage et cap tels que lus, jamais modifiés : le placement dans le repère du joueur repart d'eux à chaque activation.
+    Vector3D relative_position;
+    uint16_t relative_azymuth{0};
 
     std::vector<uint8_t> unknown_bytes;
     RSEntity *entity{nullptr};
@@ -166,6 +172,8 @@ void RSMission::parseMISN_PART(uint8_t *data, size_t size) {
         prt->unknown3 = (uint8_t) ((uint32_t) raw_c2 >> 24);
         prt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
         prt->azymuth = stream.ReadUShort();
+        prt->relative_position = prt->position;
+        prt->relative_azymuth = prt->azymuth;
 
         // unknown_bytes : les octets 43 à 53, gardés tels quels pour les lecteurs actuels.
         for (int k = 0; k < 11; k++) {
@@ -246,7 +254,10 @@ actor->pilot->plane = actor->plane;
 ### 2.4 `SCMissionScene.cpp` — `activate`
 
 Même règle quand la scène fait apparaître l'objet : `on_ground` vient de la vitesse, plus de la distance au
-terrain (le recalage à moins de 10 m reste).
+terrain (le recalage à moins de 10 m reste). Un objet de mode de placement non nul est placé par
+`placeRelativeToPlayer` (§ 2.7), même dans la scène globale (sans zone) et même sans zone propre : le jeu teste le
+mode avant tout (`cmp byte ptr es:[bx+1Ch], 0`). Avant, la position du joueur était ajoutée sans rotation, et
+seulement si l'objet avait une zone.
 
 ```cpp
 void SCMissionScene::activate() {
@@ -264,19 +275,13 @@ void SCMissionScene::activate() {
                     if (actor->actor_id == part->id && actor->is_active == false) {
                         actor->is_active = true;
                         actor->is_hidden = false;
-                        if (scene->area_id != -1) {
-                            Vector3D correction;
-                            if (actor->object->unknown2 == 0) {
-                                correction = sc_mission->mission->mission_data.areas[scene->area_id]->position;
-                            } else if (actor->object->unknown2 == 1) {
-                                correction = {
-                                    sc_mission->player->plane->x,
-                                    sc_mission->player->plane->y,
-                                    sc_mission->player->plane->z
-                                };
-                            }
-                            if (actor->object->area_id != 255) {
-                                actor->object->position += correction;
+                        // Le mode de placement ne dépend ni de la zone de l'objet ni de celle de la scène.
+                        if (scene->area_id != -1 || actor->object->placement != 0) {
+                            if (actor->object->placement != 0) {
+                                // Repère de l'avion du joueur : décalage tourné, cap = cap du joueur + cap du fichier.
+                                sc_mission->placeRelativeToPlayer(actor);
+                            } else if (actor->object->area_id != 255) {
+                                actor->object->position += sc_mission->mission->mission_data.areas[scene->area_id]->position;
                             }
                             float ground_y = sc_mission->area->getY(actor->object->position.x, actor->object->position.z);
                             
@@ -357,7 +362,8 @@ void SCMissionScene::activate() {
 ### 2.5 `SCMissionActors.cpp` — `activateTarget`
 
 Même règle pour `OP_ACTIVATE_OBJ` : un avion de vitesse nulle reste au sol (ni consigne de montée ni `vz`),
-train sorti.
+train sorti. Mode de placement non nul : `placeRelativeToPlayer` (§ 2.7) au lieu de l'ajout de la position du
+joueur ; mode 0 : la zone (ou le `SPOT` de la zone) comme avant.
 
 ```cpp
 bool SCMissionActors::activateTarget(uint8_t arg) {
@@ -366,7 +372,10 @@ bool SCMissionActors::activateTarget(uint8_t arg) {
             actor->is_active = true;
             actor->is_hidden = false;
             Vector3D correction = {0.0f, 0.0f, 0.0f};
-            if (actor->object->area_id != 255 && actor->object->unknown2 == 0) {
+            if (actor->object->placement != 0) {
+                // Repère de l'avion du joueur : décalage tourné, cap = cap du joueur + cap du fichier.
+                this->mission->placeRelativeToPlayer(actor);
+            } else if (actor->object->area_id != 255) {
                 bool spot_found = false;
                 for (auto spot: this->mission->mission->mission_data.spots) {
                     if (spot->area_id == actor->object->area_id) {
@@ -378,14 +387,6 @@ bool SCMissionActors::activateTarget(uint8_t arg) {
                 if (!spot_found) {
                     correction = this->mission->mission->mission_data.areas[actor->object->area_id]->position;
                 }
-            } else {
-                correction = {
-                    this->mission->player->plane->x,
-                    this->mission->player->plane->y,
-                    this->mission->player->plane->z
-                };
-            }
-            if ((actor->object->area_id != 255) || (actor->object->area_id == 255 && actor->object->unknown2 == 1)) {
                 actor->object->position += correction;
             }
             float ground_y = this->mission->area->getY(actor->object->position.x, actor->object->position.z);
@@ -488,6 +489,122 @@ case OP_SET_OBJ_FOLLOW_ALLY: {
 break;
 ```
 
+### 2.7 `SCMission` — placement dans le repère du joueur
+
+Ce que fait le jeu (`PartEntry_ResolveSpawnPositionAndActivate_51EDC`), quand le mode de placement n'est pas nul :
+
+1. il copie la matrice d'orientation de l'avion du joueur (`Expr_Node_GetFocusedNode_543BA`, méthode `+0x3C`, copie
+   par `AI_ComputeGeometryHelper_56E29`) ;
+2. cap de l'objet = cap du nez du joueur + cap du fichier :
+   ```
+   call    Math_HeadingAngle_553CF   ; cap de la 2e ligne de la matrice (le nez)
+   mov     ax, es:[bx+2Dh]           ; cap du fichier
+   shl     eax, 8
+   add     edx, eax
+   ```
+3. position = position du joueur (`Expr_Node_GetFocusedNode_543BA` `+0x12`) + chaque composante du décalage
+   multipliée par une ligne de la matrice, trois fois de suite :
+   ```
+   mov     eax, es:[bx]          ; 1re composante du décalage (+0x21)
+   mov     [bp+var_30], eax
+   mov     eax, [bp+var_E8]      ; 1re ligne de la matrice, 1re composante
+   mov     edx, [bp+var_30]
+   imul    edx
+   shrd    eax, edx, 8
+   ...                           ; idem avec [bp+var_E4] et [bp+var_E0]
+   add     [bp+var_94], eax      ; ajouté à la position du joueur (var_90, var_8C pour les deux autres)
+   ```
+   puis la 2e composante (`+0x25`) avec la 2e ligne (`var_DC`), la 3e (`+0x29`) avec la 3e ligne (`var_D0`).
+
+Les lignes de la matrice du jeu sont les axes de l'avion : aile droite, nez, dessus (`PHYSICS.md` : « `c0` =
+envergure (aile droite), `c1` = axe longitudinal »). Le décalage du fichier se lit donc : 1er int32 = vers l'aile
+droite, 2e = vers le nez, 3e = vers le dessus de l'avion. Il suit le tangage et le roulis du joueur, pas seulement son
+cap. L'objet, lui, apparaît à plat, avec le cap calculé.
+
+Dans libRealSpace, la lecture du fichier donne déjà `x` = droite, `y` = dessus, `z` = −nez. Les lignes de la matrice
+d'orientation d'un avion (`ptw`, construite par `SCJetpPlane` avec `yaw`, `pitch`, `roll`) sont droite, dessus et
+arrière : le décalage lu s'applique donc tel quel, sans changement de signe. La matrice est reconstruite à partir de
+`yaw`, `pitch` et `roll` du joueur, de la même façon que `SCJetpPlane` la construit, pour que le résultat soit juste
+avant le premier tic de vol aussi (scènes activées par `startScenes` à la fin de `loadMission`).
+
+Pour un avion, la fonction règle aussi `yaw` (`yaw = 360 − cap`, en dixièmes de degré) et refait la vitesse
+initiale le long du nouveau nez.
+
+Déclaration ajoutée dans `SCMission.h`, à côté de `startScenes` :
+
+```cpp
+void placeRelativeToPlayer(SCMissionActors *actor);
+```
+
+```cpp
+// Objet de mode de placement non nul (PartEntry_ResolveSpawnPositionAndActivate_51EDC, cmp byte ptr es:[bx+1Ch], 0) :
+// le décalage du fichier est exprimé dans le repère de l'avion du joueur. Le jeu ajoute à la position du joueur
+// côté × aile droite + avant × nez + haut × dessus de l'avion (les trois lignes de sa matrice d'orientation), et le cap
+// de l'objet vaut le cap du nez du joueur (Math_HeadingAngle_553CF) + le cap du fichier. L'objet reste à plat.
+// Dans libRealSpace, le décalage lu (x = côté, y = haut, z = -avant) s'applique tel quel aux lignes de la matrice de
+// l'avion (ligne 0 = droite, ligne 1 = haut, ligne 2 = arrière), construite comme SCJetpPlane la construit.
+void SCMission::placeRelativeToPlayer(SCMissionActors *actor) {
+    if (this->player == nullptr || this->player->plane == nullptr) {
+        return;
+    }
+    SCPlane *player_plane = this->player->plane;
+    MISN_PART *part = actor->object;
+    Matrix orientation;
+    orientation.Identity();
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->yaw), 0, 1, 0);
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->pitch), 1, 0, 0);
+    orientation.rotateM(tenthOfDegreeToRad(player_plane->roll), 0, 0, 1);
+    Vector3D offset = part->relative_position;
+    Vector3D position = {
+        player_plane->x,
+        player_plane->y,
+        player_plane->z
+    };
+    position.x += offset.x * orientation.v[0][0] + offset.y * orientation.v[1][0] + offset.z * orientation.v[2][0];
+    position.y += offset.x * orientation.v[0][1] + offset.y * orientation.v[1][1] + offset.z * orientation.v[2][1];
+    position.z += offset.x * orientation.v[0][2] + offset.y * orientation.v[1][2] + offset.z * orientation.v[2][2];
+    part->position = position;
+
+    // Cap du nez du joueur dans la convention des fichiers (degrés, depuis le nord vers l'est) : atan2(x, -z) du nez.
+    float nose_x = -orientation.v[2][0];
+    float nose_z = -orientation.v[2][2];
+    float heading = radToDegree(atan2f(nose_x, -nose_z)) + (float) part->relative_azymuth;
+    heading = fmodf(heading, 360.0f);
+    if (heading < 0.0f) {
+        heading += 360.0f;
+    }
+    part->azymuth = (uint16_t) roundf(heading) % 360;
+
+    if (actor->plane != nullptr) {
+        actor->plane->x = position.x;
+        actor->plane->y = position.y;
+        actor->plane->z = position.z;
+        actor->plane->yaw = norm3600((360.0f - heading) * 10.0f);
+        // Vitesse initiale le long du nouveau nez (AIAircraft_SpawnAndConditionalLoadProfile_53363).
+        if (part->speed != 0) {
+            float spawn_yaw = tenthOfDegreeToRad(actor->plane->yaw);
+            float spawn_speed = (float) part->speed;
+            actor->plane->velocity = Vector3D(-sinf(spawn_yaw) * spawn_speed, 0.0f, -cosf(spawn_yaw) * spawn_speed);
+        }
+        if (actor->pilot != nullptr) {
+            actor->pilot->target_azimut = actor->plane->yaw / 10.0f;
+        }
+    }
+}
+```
+
+**Cap du joueur au chargement.** Dans `loadMission`, la création de l'avion du joueur écrivait deux fois `yaw` :
+d'abord en dixièmes de degré, puis en radians. La 2e affectation est retirée. `SCStrike` réécrit ensuite `yaw` en
+dixièmes de degré, avec la même valeur. Sans ce retrait, les objets placés dans le repère du joueur par les scènes
+du début de mission auraient pris un cap faux.
+
+```cpp
+                    // Cap en dixièmes de degré, comme SCStrike : le placement dans le repère du joueur le lit dès startScenes
+                    // (l'ancienne 2e affectation, en radians, l'écrasait).
+                    actor->plane->yaw = (360 - part->azymuth) * 10.0f;
+                    actor->plane->simple_simulation = false;
+```
+
 ## 3. Essai
 
 `tools/mission_ref/mission_part_test.cpp` (compilé par `tools/mission_ref/build.sh`) lit chaque mission avec
@@ -509,15 +626,30 @@ chunk PART n'a pas la mise en page de 62 octets (noms comme `16grayNO`, valeurs 
 missions : aucun écart. Tous les fichiers de `strike_commander/` et le débogueur compilent ; l'essai des zones
 (`mission_areas_test`) donne toujours 245 zones sur 245.
 
+`tools/mission_ref/mission_relative_test.cpp` appelle `SCMission::placeRelativeToPlayer` avec un joueur à
+(1000, 2000, 3000) :
+
+```
+cap nord, 500 m devant                       position (1000.00, 2000.00, 2500.00), cap 0 : ok
+cap est, 500 m devant                        position (1500.00, 2000.00, 3000.00), cap 90 : ok
+cap est, 200 m à droite                      position (1000.00, 2000.00, 3200.00), cap 90 : ok
+cap sud, 300 m derrière, cap fichier 90      position (1000.00, 2000.00, 2700.00), cap 270 : ok
+cap nord, tangage 45, 100 m devant           position (1000.00, 2070.71, 2929.29), cap 0 : ok
+cap nord, roulis 90, 100 m au-dessus         position (900.00, 2000.00, 3000.00), cap 0 : ok
+0 échec(s)
+```
+
+(Le roulis positif de libRealSpace penche le dessus de l'avion vers l'ouest quand il va au nord.)
+
 Exemples : les `F-16DES` de MISN-10A sont à vitesse nulle à 1 625 m d'altitude, à côté de `STRIBASE`
 (1 620 m) : au sol sur la base. Les `F-18` de MISN-10A et MISN-11A sont en repère du joueur, décalage nul en
 altitude, à 300 m/s.
 
 ## 4. Points ouverts
 
-- **Rotation en repère du joueur** : avec le mode 1, le jeu tourne le décalage selon le cap du joueur, et le cap
-  de l'objet devient cap du joueur + cap du fichier. libRealSpace ajoute la position du joueur sans rotation.
-  Pas modifié ici.
+- **Nez du joueur vertical** : le cap n'est alors pas défini ; `Math_HeadingAngle_553CF` renvoie la valeur
+  spéciale 720. Ce que le jeu en fait ensuite n'a pas été lu ; `placeRelativeToPlayer` prend le cap donné par
+  `atan2f`.
 - **Train d'un avion en vol** : le jeu sort le train pour une vitesse nulle ; ce qu'il fait du train pour un avion
   qui part en vol n'a pas été lu. `SCPlane` sort le train à la création (`wheels = 1`) ; ce n'est pas modifié.
 - **Ordre des axes du poste en formation** : `follow_slot` est construit (côté, avant, haut) comme avant ; l'usage

@@ -69,6 +69,9 @@ struct MISN_PART {
     int16_t formation_side{0};  // octets 48-49 : poste en formation, m
     int16_t formation_ahead{0}; // octets 50-51
     int16_t formation_up{0};    // octets 52-53
+    // Décalage et cap tels que lus, jamais modifiés : le placement dans le repère du joueur repart d'eux à chaque activation.
+    Vector3D relative_position;
+    uint16_t relative_azymuth{0};
 
     std::vector<uint8_t> unknown_bytes;
     RSEntity *entity{nullptr};
