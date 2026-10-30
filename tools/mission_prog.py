@@ -192,10 +192,11 @@ PART_HOOKS = (
     (0x3A, 'détruit'),
     (0x3C, 'init'),
 )
+# Scripts d'une scène, nommés d'après leur appel dans STRIKE.EXE (IMPL_MISSION_AREAS.md § 4).
 SCNE_HOOKS = (
     (3, 'scène activée'),
-    (5, 'scène quittée'),
-    (7, 'scène mise à jour'),
+    (5, 'scène, à chaque image'),
+    (7, 'scène quittée ou fin de mission'),
 )
 
 

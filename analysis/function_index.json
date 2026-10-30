@@ -11364,8 +11364,8 @@
 "calls": [
 "sub_52D45"
 ],
-"new_name": "Expr_Node_GetCachedValueB_5317A",
-"summary": "far, variante d'accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45)."
+"new_name": "Scene_LeaveMarkUnits_5317A",
+"summary": "far, lue intégralement. Pour chaque objet de la scène (liste du chunk SCNE, Expr_LookupTableEntry85B_52D45) dont le 4e script PART (+0x4E) existe : bit 3 de +0x39 posé (or byte ptr es:[bx+39h], 8). Puis record+1 = 0 (record+1 = 1 posé par Scene_EnsureUnitsSpawned_530FF : la scène est la scène courante). Rôle du bit 3 non établi ; Scene_EnsureUnitsSpawned_530FF l'efface sur les objets déjà présents. Ex-'Expr_Node_GetCachedValueB' (corrigé 2026-10-30)."
 },
 "sub_531CD": {
 "segment": "seg114",
@@ -11389,8 +11389,8 @@
 "calls": [
 "sub_51E7E"
 ],
-"new_name": "Scene_TriggerLeavingEvent_531F2",
-"summary": "far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide."
+"new_name": "Scene_RunUpdateScript_531F2",
+"summary": "far, 20 lignes, lue intégralement. Lance le champ +12 d'un record de scène (octets 5 et 6 du chunk SCNE : 2e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée deux fois à CHAQUE image par MAIN_GAME_TICK : sur la scène globale (MissionScenario+78, avant la détection de scène) puis sur la scène courante (MissionScenario+80, après Scene_DetectAndActivateChange_532EA). C'est donc le script de mise à jour de la scène. Ex-'Scene_TriggerLeavingEvent' (nom erroné, corrigé 2026-10-30 ; IMPL_MISSION_AREAS.md)."
 },
 "sub_53211": {
 "segment": "seg114",
@@ -11402,8 +11402,8 @@
 "sub_5317A",
 "sub_51E7E"
 ],
-"new_name": "Scene_TriggerMissionUpdateEvent_53211",
-"summary": "far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change -- garantie supplementaire sur l'ancienne scene) ET depuis MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par frame tant que la scene reste active -- exactement comme celui de PART (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement suppose."
+"new_name": "Scene_RunLeavingScript_53211",
+"summary": "far, 24 lignes, lue intégralement. Appelle Scene_LeaveMarkUnits_5317A (record+1 = 0, drapeau bit 3 sur les objets de la scène), puis lance le champ +16 du record de scène (octets 7 et 8 du chunk SCNE : 3e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée par Scene_DetectAndActivateChange_532EA sur l'ANCIENNE scène quand la scène courante change, et par MissionScenario_RecomputeFields_A9382 (une seule fois, en fin de mission) sur la scène courante puis la scène globale. STRIKE_EXE_MAIN_LOOP lance aussi ce champ de la scène globale en sortie de boucle. Dans MISN-1A, ce script de la scène globale écrit les variables de résultat (STAT). C'est donc le script de sortie de scène et de fin de mission. Ex-'Scene_TriggerMissionUpdateEvent' (nom erroné, corrigé 2026-10-30 ; IMPL_MISSION_AREAS.md)."
 },
 "sub_53236": {
 "segment": "seg114",
@@ -11422,8 +11422,8 @@
 "lines": 55,
 "type": "far",
 "calls": [],
-"new_name": "Expr_Node_Accessor_532AD",
-"summary": "far, accesseur générique de champ de nœud (rôle exact non détaillé)."
+"new_name": "Scene_FindByArea_532AD",
+"summary": "far, lue intégralement. Renvoie le premier record de scène (pas de 39 octets) dont le pointeur de zone (+4) est égal à la zone donnée, ou 0. Appelée avec une zone nulle par MissionScenario_LoadMainRecord_A8331 pour trouver la scène globale (rangée en MissionScenario+78, erreur 36889 si absente), et par les opcodes 0x80, 0x81 et 0x82 avec la zone d'un index AREA. Ex-'Expr_Node_Accessor' (corrigé 2026-10-30)."
 },
 "sub_532EA": {
 "segment": "seg114",
@@ -11438,7 +11438,7 @@
 "sub_544DC"
 ],
 "new_name": "Scene_DetectAndActivateChange_532EA",
-"summary": "far, 55 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active courante ; si elle a change depuis le dernier appel (different du parametre previousScene), desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52)."
+"summary": "far, 55 lignes, LUE INTEGRALEMENT. RENOMMEE (ancien nom 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active courante ; si elle a change depuis le dernier appel (different du parametre previousScene), lance le script de sortie de l'ancienne (Scene_RunLeavingScript_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52)."
 },
 "sub_53337": {
 "segment": "seg114",
@@ -44171,7 +44171,7 @@
 "sub_6CDBE"
 ],
 "new_name": "MissionScenario_RecomputeFields_A9382",
-"summary": "far, 58 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Appelee CHAQUE FRAME directement depuis Simulator_MainLoop_53896 (via VROOMM_StubThunk_6CE5B) — chemin SEPARE et PARALLELE a MAIN_GAME_TICK_536F7, pas decouvert avant. \n\nDeclenche Scene_TriggerMissionUpdateEvent_53211 sur DEUX pointeurs de SceneRecord stockes sur MissionScenario : +0x50 et +0x4E. CORRIGE DATA_MODEL.md : ces deux champs ne sont PAS 'handle de noeud Expr'/'flag HOME depuis noeud' comme documente precedemment — ce sont des pointeurs de SceneRecord (+0x50 correspond exactement au champ rempli par Scene_DetectAndActivateChange_532EA). \n\nVerifie ensuite une condition de fin de mission (position comparee a dword_70718/dword_7071C, une cible/checkpoint global) — si atteinte, POSE byte_706AF = 5 -- LE MEME OCTET QUI CONTROLE LA BOUCLE PRINCIPALE DE Simulator_MainLoop (condition de sortie == 6). Lien direct entre logique de scenario et controle du jeu a ce niveau. \n\nAppelle enfin MissionScenario_ResolveAndBindExpressions_A8F22 (ecrit MISN2OP.IFF, resultats de fin de mission) — a chaque frame, sans garde visible ici (garde probablement interne a A8F22, non verifiee). Appelle aussi sub_A8124 et sub_6CDBE, non identifiees."
+"summary": "far, 58 lignes, lue intégralement. Appelée UNE SEULE FOIS, en fin de mission : par STRIKE_EXE_MAIN_LOOP après la sortie de la boucle de jeu (VROOMM_StubThunk_6CE5B, juste avant Music_Stop_5A9E6), et non à chaque image (corrigé 2026-10-30). Lance Scene_RunLeavingScript_53211 sur la scène courante (MissionScenario+80) puis sur la scène globale (+78). Vérifie ensuite une position comparée à dword_70718/dword_7071C et pose byte_706AF = 5 si elle est atteinte, puis appelle MissionScenario_ResolveAndBindExpressions_A8F22 (écrit MISN2OP.IFF). Appelle aussi sub_A8124 et sub_6CDBE, non identifiées."
 },
 "sub_A93E0": {
 "segment": "seg456",

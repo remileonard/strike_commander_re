@@ -165,6 +165,17 @@ EntryPoint_RuntimeInit
 ## Autre vérification dans la même séquence, découverte par Rémi :
 `MissionScenario_RecomputeFields`, appelée depuis `STRIKE_EXE_MAIN_LOOP`
 
+> **Correction (2026-10-30, `IMPL_MISSION_AREAS.md` § 4).** L'appel est bien dans `STRIKE_EXE_MAIN_LOOP`, mais
+> **après la sortie de la boucle de jeu**, pas à chaque itération. La boucle appelle `MAIN_GAME_TICK` puis revient
+> à son début tant que `byte_706AF` vaut 0 (`call near ptr MAIN_GAME_TICK` … `cmp byte_706AF, 0` / `jnz short
+> loc_539AB` / `jmp loc_538BA`). L'appel de `MissionScenario_RecomputeFields_A9382` (`call VROOMM_StubThunk_6CE5B`)
+> se trouve après `loc_539AB`, juste avant `Music_Stop_5A9E6` et le retour : il n'a lieu qu'une fois, en fin de
+> mission. Le champ +16 d'une scène (3e script du chunk `SCNE`) est donc lancé quand la scène cesse d'être courante
+> et en fin de mission. Le script qui tourne à chaque image est le champ +12 (2e script), par `MAIN_GAME_TICK`
+> (`Scene_RunUpdateScript_531F2`, ex-`Scene_TriggerLeavingEvent`). Noms corrigés :
+> `Scene_RunLeavingScript_53211` (ex-`Scene_TriggerMissionUpdateEvent`), `Scene_FindByArea_532AD`,
+> `Scene_LeaveMarkUnits_5317A`. Le texte ci-dessous est gardé tel qu'il avait été écrit.
+
 *Trouvaille de Rémi : un second déclencheur de `Scene_TriggerMissionUpdateEvent`,
 appelé juste après `MAIN_GAME_TICK` dans la même itération de la boucle
 principale — pas une chaîne séparée, une vérification supplémentaire au
@@ -233,7 +244,7 @@ MAIN_GAME_TICK (chaque frame)
 mal caractérisée, puis corrigée par Rémi : en ne regardant que l'appel
 depuis `Scene_DetectAndActivateChange` (uniquement sur changement de
 scène), on aurait pu croire que c'était un événement ponctuel. Mais
-**`Scene_TriggerMissionUpdateEvent_53211` elle-même n'a aucune
+**`Scene_RunLeavingScript_53211` elle-même n'a aucune
 garde** — c'est **`MissionScenario_RecomputeFields_A9382`**, appelée
 sans condition à chaque frame, qui la déclenche tant que `+80`
 (la scène active courante) reste non nul. **`on_mission_update` d'une
@@ -247,7 +258,7 @@ juste avant que `+80` ne soit remplacé par la nouvelle — pas le
 mécanisme principal.
 
 Un troisième champ, `+12` (`on_leaving`), est déclenché séparément
-par `Scene_TriggerLeavingEvent_531F2` — appelé directement depuis `MAIN_GAME_TICK`, pas
+par `Scene_RunUpdateScript_531F2` — appelé directement depuis `MAIN_GAME_TICK`, pas
 depuis `Scene_DetectAndActivateChange`.
 
 

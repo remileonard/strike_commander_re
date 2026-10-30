@@ -1369,7 +1369,7 @@ pour la passe de liaison `ExprSlot` :
 > (script), qui contient une suite de `SCNE` = **scènes**. `PROG` = programme /
 > didascalies. Ce ne sont pas des données « joueur ».
 
-Puis câblage Expr sur `si+0x3A` (l'objet PLAY) : `Expr_Node_Accessor_532AD(si+0x3A)`
+Puis câblage Expr sur `si+0x3A` (l'objet PLAY) : `Scene_FindByArea_532AD(si+0x3A)`
 → nœud `si+0x4E` (erreur `9019h` si nul) ; `Expr_Node_RecomputeFieldA_531CD` ;
 `ConvertFieldValue_A8B8F` → objet résolu `si+0x54` (far ptr) ; on pose sur cet
 objet les flags `+0x39 |= 0x10|0x20`, on lit son id `+0x52`, `SetReference16`
@@ -1485,7 +1485,7 @@ comptage). L'**index d'une zone = son rang dans le chunk** (à partir de 0) ;
 - `PART` : `PartEntry_LoadAndResolveNames_A9E3C` convertit un index de zone en pointeur (entrée `+0x1D`) ;
 - `HOME` : index de la zone de la base de départ (`si+0x58`) ;
 - opcodes de script `0x80` / `0x81` / `0x82` (`Expr_VM_Interpreter_51106`) : prennent un index
-  de zone et retrouvent la scène rattachée (`Expr_Node_Accessor_532AD`) ; `0x80` met son
+  de zone et retrouvent la scène rattachée (`Scene_FindByArea_532AD`) ; `0x80` met son
   `is_active` à 1, `0x82` le teste, `0x81` non détaillé.
 
 ##### `SPOT` → points rattachés à une zone — `Mission_LoadSpotList_AA6C9` (seg457)
@@ -1613,15 +1613,15 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 | Off. disque | Taille | Champ | Résolution moteur | → record (0x27 o) |
 |---|---|---|---|---|
 | `0x00` | u8 | `is_active` | copié tel quel | `+0x00` |
-| `0x01` | u16 | `area_id` (index dans `AREA`, `-1` = scène globale) | `PtrList_GetAt_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
-| `0x03` | i16 | `on_is_activated` (ref `PROG`, `-1` = aucun) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
-| `0x05` | i16 | `on_leaving` | idem | `+0x0C` |
-| `0x07` | i16 | `on_mission_update` | idem | `+0x10` |
-| `0x09` | u8 | `has_own_coord` (1 = position explicite ci-dessous ; 0 = déclenche sur le volume de l'aire) | — | `+0x18` |
-| `0x0A` | u16 | `heading` — **candidat : cap en degrés** (0–359). Dans MISN-1A : `180` pour les scènes ancrées à une aire, `0` pour celles à `pos` explicite. Rôle non tracé dans le code ; à confirmer sur d'autres missions (valeurs ≠ 0/180 attendues si c'est bien un cap). | — | `+0x19` |
-| `0x0C` | i32 | `pos_x` — fixed-point ÷256 | — | `+0x1B` |
-| `0x10` | i32 | `pos_y` — fixed-point ÷256 | — | `+0x1F` |
-| `0x14` | i32 | `pos_z` — fixed-point ÷256 (**Z = altitude**, mètres) | — | `+0x23` |
+| `0x01` | u16 | `area_id` (index dans `AREA` ; `-1` ou hors liste = pas de zone : la 1re telle scène est la scène globale) | `PtrList_GetAt_53034(ctx+0x1A, area_id)` | `+0x04` (handle 32 b) |
+| `0x03` | i16 | 1er script : quand la scène devient courante, après l'apparition de ses objets (ref `PROG`, `-1` = aucun ; `Scene_TriggerActivation_531CD`) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
+| `0x05` | i16 | 2e script : **à chaque image**, pour la scène globale et la scène courante (`MAIN_GAME_TICK` → `Scene_RunUpdateScript_531F2`) | idem | `+0x0C` |
+| `0x07` | i16 | 3e script : **quand la scène cesse d'être courante, et en fin de mission** (`Scene_RunLeavingScript_53211`) | idem | `+0x10` |
+| `0x09` | u8 | rôle non établi (valeurs des données : 0 ou 1) | — | `+0x18` |
+| `0x0A` | u16 | rôle non établi (valeurs des données : 0, 90, 135, 180, 270) | — | `+0x19` |
+| `0x0C` | i32 | c0 ÷ 256 → libRealSpace **X** ; rôle non établi | — | `+0x1B` |
+| `0x10` | i32 | c1 ÷ 256 → libRealSpace **Z** = −c1 ; rôle non établi | — | `+0x1F` |
+| `0x14` | i32 | c2 ÷ 256 → libRealSpace **Y** (altitude) ; rôle non établi | — | `+0x23` |
 | `0x18…` | u16 × `(taille−24)/2` | **liste d'unités** de la scène | `malloc` + copie brute | `+0x14` count, `+0x16` ptr |
 
 Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, = `arg`).

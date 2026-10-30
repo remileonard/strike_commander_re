@@ -1680,7 +1680,7 @@ loc_51733:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		cmp	byte ptr [si], 0
@@ -1711,7 +1711,7 @@ loc_51772:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		or	si, si
@@ -1745,7 +1745,7 @@ loc_517AA:				; CODE XREF: Expr_VM_Interpreter_51106+28j
 		push	ax
 		nop
 		push	cs
-		call	near ptr Expr_Node_Accessor_532AD
+		call	near ptr Scene_FindByArea_532AD
 		add	sp, 6
 		mov	si, ax
 		or	si, si
@@ -4533,7 +4533,7 @@ Expr_Node_HasChildError_52D1D	endp
 ; d'enregistrement par index.
 ; ==============================================================================================
 Expr_LookupTableEntry85B_52D45	proc far		; CODE XREF: Scene_EnsureUnitsSpawned_530FF+26p
-					; Expr_Node_GetCachedValueB_5317A+22p ...
+					; Scene_LeaveMarkUnits_5317A+22p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -5300,9 +5300,14 @@ Scene_EnsureUnitsSpawned_530FF	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, variante d'accesseur de valeur mise en cache (via Expr_LookupTableEntry85B_52D45).
+; far, lue intégralement. Pour chaque objet de la scène (liste du chunk SCNE,
+; Expr_LookupTableEntry85B_52D45) dont le 4e script PART (+0x4E) existe : bit 3 de +0x39 posé
+; (or byte ptr es:[bx+39h], 8). Puis record+1 = 0 (record+1 = 1 posé par
+; Scene_EnsureUnitsSpawned_530FF : la scène est la scène courante). Rôle du bit 3 non établi ;
+; Scene_EnsureUnitsSpawned_530FF l'efface sur les objets déjà présents.
+; Ex-'Expr_Node_GetCachedValueB' (corrigé 2026-10-30).
 ; ==============================================================================================
-Expr_Node_GetCachedValueB_5317A	proc far		; CODE XREF: Scene_TriggerMissionUpdateEvent_53211+9p
+Scene_LeaveMarkUnits_5317A	proc far		; CODE XREF: Scene_RunLeavingScript_53211+9p
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -5317,7 +5322,7 @@ arg_0		= word ptr  6
 		jmp	short loc_531C0
 ; ���������������������������������������������������������������������������
 
-loc_53189:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+49j
+loc_53189:				; CODE XREF: Scene_LeaveMarkUnits_5317A+49j
 		mov	ax, di
 		shl	ax, 1
 		mov	bx, [si+16h]
@@ -5338,11 +5343,11 @@ loc_53189:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+49j
 		jz	short loc_531BF
 		or	byte ptr es:[bx+39h], 8
 
-loc_531BF:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+33j
-					; Expr_Node_GetCachedValueB_5317A+3Ej
+loc_531BF:				; CODE XREF: Scene_LeaveMarkUnits_5317A+33j
+					; Scene_LeaveMarkUnits_5317A+3Ej
 		inc	di
 
-loc_531C0:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+Dj
+loc_531C0:				; CODE XREF: Scene_LeaveMarkUnits_5317A+Dj
 		cmp	[si+14h], di
 		jg	short loc_53189
 		mov	byte ptr [si+1], 0
@@ -5350,7 +5355,7 @@ loc_531C0:				; CODE XREF: Expr_Node_GetCachedValueB_5317A+Dj
 		pop	si
 		leave
 		retf
-Expr_Node_GetCachedValueB_5317A	endp
+Scene_LeaveMarkUnits_5317A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5399,13 +5404,14 @@ Scene_TriggerActivation_531CD	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 20 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
-; +0xC d'une SceneRecord (on_leaving, confirme via DATA_MODEL.md) via
-; Expr_VM_ExecuteSingleInstruction. Appelee directement depuis MAIN_GAME_TICK_536F7 (pas
-; depuis Scene_DetectAndActivateChange), sur si->field_4E et si->field_50 -- contexte exact de
-; ces deux appels (avant/apres resolution de scene ?) pas encore completement elucide.
+; far, 20 lignes, lue intégralement. Lance le champ +12 d'un record de scène (octets 5 et 6 du
+; chunk SCNE : 2e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée deux fois à
+; CHAQUE image par MAIN_GAME_TICK : sur la scène globale (MissionScenario+78, avant la
+; détection de scène) puis sur la scène courante (MissionScenario+80, après
+; Scene_DetectAndActivateChange_532EA). C'est donc le script de mise à jour de la scène.
+; Ex-'Scene_TriggerLeavingEvent' (nom erroné, corrigé 2026-10-30 ; IMPL_MISSION_AREAS.md).
 ; ==============================================================================================
-Scene_TriggerLeavingEvent_531F2	proc far		; CODE XREF: MAIN_GAME_TICK+104p
+Scene_RunUpdateScript_531F2	proc far		; CODE XREF: MAIN_GAME_TICK+104p
 					; MAIN_GAME_TICK+164p
 
 arg_0		= word ptr  6
@@ -5425,7 +5431,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Scene_TriggerLeavingEvent_531F2	endp
+Scene_RunUpdateScript_531F2	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5433,18 +5439,18 @@ Scene_TriggerLeavingEvent_531F2	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, 24 lignes, LUE INTEGRALEMENT (session ordres de mission avec Remi). Declenche le champ
-; +0x10 d'une SceneRecord (on_mission_update, confirme via DATA_MODEL.md) via
-; Expr_VM_ExecuteSingleInstruction — SANS AUCUNE GARDE interne. CORRIGE : appelee a la fois
-; depuis Scene_DetectAndActivateChange_532EA (uniquement si la scene active a change --
-; garantie supplementaire sur l'ancienne scene) ET depuis
-; MissionScenario_RecomputeFields_A9382 (SANS CONDITION, a CHAQUE FRAME, tant que +0x50 reste
-; non nul). CONSEQUENCE : 'on_mission_update' d'une scene tourne bien EN CONTINU, une fois par
-; frame tant que la scene reste active -- exactement comme celui de PART
-; (PartEntry_DispatchMissionUpdateTick_52E51), pas un evenement ponctuel comme initialement
-; suppose.
+; far, 24 lignes, lue intégralement. Appelle Scene_LeaveMarkUnits_5317A (record+1 = 0, drapeau
+; bit 3 sur les objets de la scène), puis lance le champ +16 du record de scène (octets 7 et 8
+; du chunk SCNE : 3e script) par Expr_VM_ExecuteSingleInstruction_51E7E. Appelée par
+; Scene_DetectAndActivateChange_532EA sur l'ANCIENNE scène quand la scène courante change, et
+; par MissionScenario_RecomputeFields_A9382 (une seule fois, en fin de mission) sur la scène
+; courante puis la scène globale. STRIKE_EXE_MAIN_LOOP lance aussi ce champ de la scène
+; globale en sortie de boucle. Dans MISN-1A, ce script de la scène globale écrit les variables
+; de résultat (STAT). C'est donc le script de sortie de scène et de fin de mission.
+; Ex-'Scene_TriggerMissionUpdateEvent' (nom erroné, corrigé 2026-10-30 ;
+; IMPL_MISSION_AREAS.md).
 ; ==============================================================================================
-Scene_TriggerMissionUpdateEvent_53211	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+22p
+Scene_RunLeavingScript_53211	proc far		; CODE XREF: Scene_DetectAndActivateChange_532EA+22p
 					; MissionScenario_RecomputeFields_A9382+10P ...
 
 arg_0		= word ptr  6
@@ -5455,7 +5461,7 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr Expr_Node_GetCachedValueB_5317A
+		call	near ptr Scene_LeaveMarkUnits_5317A
 		pop	cx
 		push	large 0
 		push	large dword ptr	[si+10h]
@@ -5468,7 +5474,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Scene_TriggerMissionUpdateEvent_53211	endp
+Scene_RunLeavingScript_53211	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5571,9 +5577,13 @@ Scene_FindMatchingByAreaContainment_53236	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, accesseur générique de champ de nœud (rôle exact non détaillé).
+; far, lue intégralement. Renvoie le premier record de scène (pas de 39 octets) dont le
+; pointeur de zone (+4) est égal à la zone donnée, ou 0. Appelée avec une zone nulle par
+; MissionScenario_LoadMainRecord_A8331 pour trouver la scène globale (rangée en
+; MissionScenario+78, erreur 36889 si absente), et par les opcodes 0x80, 0x81 et 0x82 avec la
+; zone d'un index AREA. Ex-'Expr_Node_Accessor' (corrigé 2026-10-30).
 ; ==============================================================================================
-Expr_Node_Accessor_532AD	proc far		; CODE XREF: Expr_VM_Interpreter_51106+659p
+Scene_FindByArea_532AD	proc far		; CODE XREF: Expr_VM_Interpreter_51106+659p
 					; Expr_VM_Interpreter_51106+68Fp ...
 
 arg_0		= word ptr  6
@@ -5588,7 +5598,7 @@ arg_4		= word ptr  0Ah
 		jmp	short loc_532E1
 ; ���������������������������������������������������������������������������
 
-loc_532B8:				; CODE XREF: Expr_Node_Accessor_532AD+36j
+loc_532B8:				; CODE XREF: Scene_FindByArea_532AD+36j
 		mov	ax, cx
 		imul	ax, 27h
 		mov	bx, [si+2]
@@ -5612,22 +5622,22 @@ loc_532D8:
 		jmp	short loc_532E7
 ; ���������������������������������������������������������������������������
 
-loc_532E0:				; CODE XREF: Expr_Node_Accessor_532AD+1Ej
-					; Expr_Node_Accessor_532AD+23j
+loc_532E0:				; CODE XREF: Scene_FindByArea_532AD+1Ej
+					; Scene_FindByArea_532AD+23j
 		inc	cx
 
-loc_532E1:				; CODE XREF: Expr_Node_Accessor_532AD+9j
+loc_532E1:				; CODE XREF: Scene_FindByArea_532AD+9j
 		cmp	[si], cx
 		jg	short loc_532B8
 
 loc_532E5:
 		xor	ax, ax
 
-loc_532E7:				; CODE XREF: Expr_Node_Accessor_532AD+31j
+loc_532E7:				; CODE XREF: Scene_FindByArea_532AD+31j
 		pop	si
 		pop	bp
 		retf
-Expr_Node_Accessor_532AD	endp
+Scene_FindByArea_532AD	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -5639,8 +5649,9 @@ Expr_Node_Accessor_532AD	endp
 ; 'MissionFormation_HandleGroupSelectionChange' etait errone — aucun rapport avec une
 ; formation). Appelle Scene_FindMatchingByAreaContainment_53236 pour resoudre la scene active
 ; courante ; si elle a change depuis le dernier appel (different du parametre previousScene),
-; desactive l'ancienne (sub_53211) et active la nouvelle via Scene_TriggerActivation_531CD, en
-; mettant a jour un traqueur global de 'scene courante' (word_706A0+0x52).
+; lance le script de sortie de l'ancienne (Scene_RunLeavingScript_53211) et active la nouvelle
+; via Scene_TriggerActivation_531CD, en mettant a jour un traqueur global de 'scene courante'
+; (word_706A0+0x52).
 ; ==============================================================================================
 Scene_DetectAndActivateChange_532EA	proc far		; CODE XREF: MAIN_GAME_TICK+151p
 					; MissionScenario_LoadMainRecord_A8331+69AP
@@ -5667,7 +5678,7 @@ arg_4		= word ptr  0Ah
 		jz	short loc_53310
 		push	di
 		push	cs
-		call	near ptr Scene_TriggerMissionUpdateEvent_53211
+		call	near ptr Scene_RunLeavingScript_53211
 		pop	cx
 
 loc_53310:				; CODE XREF: Scene_DetectAndActivateChange_532EA+1Ej
@@ -6459,7 +6470,7 @@ loc_537F7:
 
 loc_537FA:
 		push	cs
-		call	near ptr Scene_TriggerLeavingEvent_531F2
+		call	near ptr Scene_RunUpdateScript_531F2
 		pop	cx
 
 loc_537FF:				; CODE XREF: MAIN_GAME_TICK+FEj
@@ -6506,7 +6517,7 @@ loc_5383D:				; CODE XREF: MAIN_GAME_TICK+127j
 		jz	short loc_5385F
 		push	word ptr [si+50h]
 		push	cs
-		call	near ptr Scene_TriggerLeavingEvent_531F2
+		call	near ptr Scene_RunUpdateScript_531F2
 		pop	cx
 
 loc_5385F:				; CODE XREF: MAIN_GAME_TICK+15Ej
