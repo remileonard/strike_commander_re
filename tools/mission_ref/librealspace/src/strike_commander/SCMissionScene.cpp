@@ -67,9 +67,13 @@ void SCMissionScene::activate() {
                                 actor->plane->z = actor->object->position.z;
                                 if (abs(ground_y - actor->object->position.y) <= 10 ) {
                                     actor->object->position.y = ground_y;
-                                    actor->plane->on_ground = true;
-                                } else {
-                                    actor->plane->on_ground = false;
+                                }
+                                // Vitesse initiale nulle : au sol, train sorti (PartEntry_ResolveSpawnPositionAndActivate_51EDC).
+                                actor->plane->on_ground = actor->object->speed == 0;
+                                if (actor->plane->on_ground) {
+                                    if (actor->plane->GetWheel() == 0) {
+                                        actor->plane->SetWheel();
+                                    }
                                 }
                                 if (actor->object->position.y < ground_y) {
                                     actor->plane->position.y += ground_y;

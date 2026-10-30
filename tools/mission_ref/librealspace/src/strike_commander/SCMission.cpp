@@ -157,7 +157,7 @@ void SCMission::loadMission() {
                 if (cast->actor == "TEAM0") {
                     cast->actor = GameState.wingman;
                 }
-                actor->team_id = part->unknown_bytes[2];
+                actor->team_id = part->team;
                 actor->actor_name = cast->actor;
                 actor->actor_id = part->id;
                 actor->object = part;
@@ -229,21 +229,27 @@ void SCMission::loadMission() {
                         actor->plane->object = part;
                         actor->plane->InitLoadout();
                         actor->plane->pilot = actor;
+                        // Vitesse initiale PART (octets 43-44, m/s) : un avion à 0 commence au sol, train sorti
+                        // (PartEntry_ResolveSpawnPositionAndActivate_51EDC : catégorie 6 et vitesse nulle -> au sol, JDYN +0x75 |= 4).
                         if (abs(this->area->getY(part->position.x, part->position.z)-part->position.y) <= 10 ) {
                             part->position.y = this->area->getY(part->position.x, part->position.z);
-                            actor->plane->on_ground = true;
-                        } else {
-                            actor->plane->on_ground = false;
                         }
+                        actor->plane->on_ground = part->speed == 0;
                         if (part->position.y < this->area->getY(part->position.x, part->position.z)) {
                             actor->plane->on_ground = true;
+                        }
+                        if (actor->plane->on_ground) {
+                            if (actor->plane->GetWheel() == 0) {
+                                actor->plane->SetWheel();
+                            }
                         }
                         if (!actor->plane->on_ground) {
                             actor->plane->SetThrottle(100);
                             actor->pilot->target_climb = (int) (part->position.y);
                             actor->plane->vz = -20;
+                            // Vitesse le long du nez (AIAircraft_SpawnAndConditionalLoadProfile_53363 : nez × vitesse).
                             float spawn_yaw = tenthOfDegreeToRad(actor->plane->yaw);
-                            float spawn_speed = (float) actor->object->entity->jdyn->ai_speed_cruise;
+                            float spawn_speed = (float) part->speed;
                             actor->plane->velocity = Vector3D(-sinf(spawn_yaw) * spawn_speed, 0.0f, -cosf(spawn_yaw) * spawn_speed);
                             actor->pilot->target_azimut = actor->plane->azimuthf / 10.0f;
                             actor->pilot->target_speed = -20;

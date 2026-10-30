@@ -1550,10 +1550,10 @@ lecture brute des 62 o (`push large 3Eh` / `ResourceRecord_ReadFieldGroupA_64A19
 | `0x21` | i32 | décalage **Z** (profondeur) | `+0x25` |
 | `0x25` | i32 | décalage **Y** (altitude) | `+0x29` |
 | `0x29` | i16 | **cap** en degrés (entier tel quel : `movsx` puis `shl eax, 8`) | `+0x2D` |
-| `0x2B` | i16 | **vitesse initiale** (0 = à l'arrêt) — unité non prouvée (m/s probable) | `+0x2F` |
-| `0x2D` | u8 | **camp** : 1 = allié, 0xFF = ennemi, autre = neutre | `+0x31` |
-| `0x2E` | u8 | **allié à suivre par défaut** (index `PART`, 0xFF = aucun) | `+0x32` |
-| `0x2F` | u8 | inutilisé (jamais copié) | — |
+| `0x2B` | i16 | **vitesse initiale** en m/s le long du nez (0 = à l'arrêt) : `AIAircraft_SpawnAndConditionalLoadProfile_53363` multiplie par le pas de temps, la méthode `+0x48` par son inverse | `+0x2F` |
+| `0x2D` | u8 | **camp** : 1 = allié, 255 = ennemi | `+0x31` |
+| `0x2E` | u8 | **allié par défaut** (index `PART`, 255 = aucun) : devient le chef de l'objet à l'activation ; c'est l'allié que désigne `OP_SET_OBJ_FOLLOW_ALLY` avec 255 | `+0x32` |
+| `0x2F` | u8 | pas recopié par le chargeur ; rôle non établi | — |
 | `0x30` / `0x32` / `0x34` | i16 ×3 | **poste en formation** de l'ordre « suivre » : côté (X), avant (Z), haut (Y), mètres, entiers (session 2026-09-27, non relu ici) | `+0x33` / `+0x35` / `+0x37` |
 | `0x36` / `0x38` / `0x3A` / `0x3C` | u16 ×4 | scripts `PROG` : `on_is_activated`, `on_mission_update`, `on_is_destroyed`, `on_missions_init` (`Expr_LookupNamedValue_51E4A(scénario+0x40, id)`) | `+0x42` / `+0x46` / `+0x4A` / `+0x4E` (far ptr résolus) |
 
@@ -1586,8 +1586,11 @@ activé) ; `+0x32` vaut 0xFF puis l'allié lu ; `+0x54` = 0xFF.
 4. **Avion à vitesse nulle** (catégorie 6 et `+0x2F == 0`) : posé **au sol, train sorti**
    (`mov [bx+20h], al` = indicateur « au sol » ; `or byte ptr [bx+75h], 4` = bit 2 de `flags_75`).
 5. **Si l'objet n'est pas détruit** : nom `+0x12` chargé (si non vide), camp `+0x31` copié dans
-   l'entité (`+0x50`), ordre `0xB3` (suivre) vers l'allié `+0x32` s'il existe
-   (`Expr_LookupNamedValue_52DDB(scénario+0x34, …)` puis appel vtable `+0x88`), compteur d'objets
+   l'entité (`+0x50`), ordre natif 179 vers l'allié `+0x32` s'il existe
+   (`Expr_LookupNamedValue_52DDB(scénario+0x34, …)` puis appel vtable `+0x88`, `push 0B3h`) :
+   `Goal_SetObjective_A307` (cas 179) range l'allié comme **chef** (`SetReference` sur `+0x145`, même
+   champ que `OP_SET_OBJ_FOLLOW_ALLY`) **sans changer l'ordre en cours** (`+0x11D` pas écrit) ni le poste
+   en formation (`+0x14A`…`+0x152`) — corrigé 2026-10-30, ce n'est pas un ordre de suivre ; compteur d'objets
    actifs du camp incrémenté (`word_706A3` camp 1, `word_706A7` camp 0xFF — lus par l'ordre
    « défendre la zone »). Enfin `Shared_TriggerExprInstruction_5247D`.
 

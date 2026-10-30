@@ -2649,7 +2649,13 @@ Expr_VM_ExecuteSingleInstruction_51E7E	endp
 ; WeaponSys_LoadFromFile_9EFBE(système d'armes de l'instance +0x5A, nom) = EMPORT IMPOSÉ :
 ; OBJECTS\<nom>.IFF dont la racine est un FORM WEAP. CAMP (+0x31) → instance +0x50 (écrase
 ; l'ALGN du modèle). Avion de vitesse nulle : dynamique +0x20 = 1 (au sol) et JDYN +0x75 |= 4
-; (train sorti).
+; (train sorti). | 2026-10-30 : ALLIE PAR DEFAUT (+0x32, octet 46 du PART) :
+; Expr_LookupNamedValue_52DDB puis ordre natif 179 (push 0B3h / call dword ptr [bx+88h]) ;
+; dans Goal_SetObjective_A307, le cas 179 range l'allie comme chef (SetReference sur +0x145,
+; meme champ que OP_SET_OBJ_FOLLOW_ALLY) et efface +0x149, sans ecrire l'ordre en cours +0x11D
+; ni le poste +0x14A..+0x152 : l'objet n'est pas mis a suivre son allie a l'activation. Puis
+; compteurs de camp (word_706A7 camp 255, word_706A3 camp 1) et
+; Shared_TriggerExprInstruction_5247D.
 ; ==============================================================================================
 PartEntry_ResolveSpawnPositionAndActivate_51EDC	proc far		; CODE XREF: Expr_VM_Interpreter_51106+6FBp
 					; Scene_EnsureUnitsSpawned_530FF+6Bp

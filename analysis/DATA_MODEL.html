@@ -1077,13 +1077,13 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>armement imposé</td><td>string[8]</td><td class="num">8</td><td>vide = armement du modèle ; sinon fichier <code>OBJECTS\&lt;nom&gt;.IFF</code> dont la racine est un <a href="#armes">FORM WEAP</a>, chargé à la place</td></tr>
       <tr><td>zone</td><td>uint16</td><td class="num">2</td><td>index dans <code>AREA</code></td></tr>
       <tr><td>mode de placement</td><td>uint8</td><td class="num">1</td><td>0 = relatif à la zone ; autre = relatif au joueur</td></tr>
-      <tr><td>décalage X</td><td>float</td><td class="num">4</td><td>mètres</td></tr>
-      <tr><td>décalage Z</td><td>float</td><td class="num">4</td><td>mètres (profondeur)</td></tr>
-      <tr><td>décalage Y</td><td>float</td><td class="num">4</td><td>mètres (altitude)</td></tr>
+      <tr><td>décalage X</td><td>int32</td><td class="num">4</td><td>24.8 : ÷ 256 = mètres ; <code>libRS.x = valeur</code></td></tr>
+      <tr><td>décalage Z</td><td>int32</td><td class="num">4</td><td>24.8 : ÷ 256 = mètres (profondeur) ; <code>libRS.z = −valeur</code></td></tr>
+      <tr><td>décalage Y</td><td>int32</td><td class="num">4</td><td>24.8 : ÷ 256 = mètres (altitude) ; <code>libRS.y = valeur</code></td></tr>
       <tr><td>cap</td><td>int16</td><td class="num">2</td><td>degrés (absolu, ou ajouté au cap du joueur)</td></tr>
       <tr><td>vitesse initiale</td><td>int16</td><td class="num">2</td><td>m/s le long du nez ; 0 = à l'arrêt</td></tr>
-      <tr><td>camp</td><td>uint8</td><td class="num">1</td><td>1 = allié, 255 = ennemi, autre = neutre ; remplace le camp <code>ALGN</code> du modèle</td></tr>
-      <tr><td>allié à suivre</td><td>uint8</td><td class="num">1</td><td>index dans <code>PART</code> (255 = aucun)</td></tr>
+      <tr><td>camp</td><td>uint8</td><td class="num">1</td><td>1 = allié, 255 = ennemi ; remplace le camp <code>ALGN</code> du modèle</td></tr>
+      <tr><td>allié par défaut</td><td>uint8</td><td class="num">1</td><td>index dans <code>PART</code> (255 = aucun) ; c'est l'allié que désigne <code>OP_SET_OBJ_FOLLOW_ALLY</code> avec 255</td></tr>
       <tr><td>réservé</td><td>uint8</td><td class="num">1</td><td>rôle non établi</td></tr>
       <tr><td>poste en formation, côté</td><td>int16</td><td class="num">2</td><td>mètres, sur X, derrière l'allié suivi</td></tr>
       <tr><td>poste en formation, avant</td><td>int16</td><td class="num">2</td><td>mètres, sur Z</td></tr>
@@ -1102,7 +1102,7 @@ position = décalage                         sinon (coordonnées absolues)</pre>
         <li><span>2</span><div><b>Position</b> : mode 0, référence de la zone + décalage (comme un <code>SPOT</code>), cap absolu. Autre mode : décalage exprimé dans le repère de l'avion du joueur (X sur le côté, Z vers le nez, Y vers le haut de l'avion), cap = cap du joueur + cap du fichier.</div></li>
         <li><span>3</span><div>L'objet apparaît <b>à plat</b> (seulement tourné autour de la verticale), avec sa vitesse initiale le long du nez.</div></li>
         <li><span>4</span><div>Un <b>avion à vitesse nulle</b> est posé <b>au sol, train sorti</b>.</div></li>
-        <li><span>5</span><div>Camp copié, ordre « suivre » donné vers l'allié, compteur d'objets actifs du camp augmenté.</div></li>
+        <li><span>5</span><div>Camp copié ; l'allié par défaut devient le <b>chef</b> de l'objet, sans ordre de le suivre (l'ordre en cours et le poste en formation ne changent pas) ; compteur d'objets actifs du camp augmenté.</div></li>
       </ol>
     </div>
     <figure>

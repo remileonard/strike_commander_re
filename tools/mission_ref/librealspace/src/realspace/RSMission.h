@@ -61,6 +61,15 @@ struct MISN_PART {
     uint8_t on_is_destroyed{255};
     uint8_t on_missions_init{255};
 
+    // Champs nommés (PartEntry_LoadAndResolveNames_A9E3C) ; unknown2 et unknown_bytes gardent les mêmes octets.
+    uint8_t placement{0};       // octet 28 : 0 = décalage depuis la zone, 1 = repère de l'avion du joueur
+    int16_t speed{0};           // octets 43-44 : vitesse initiale le long du nez, 0 = à l'arrêt
+    uint8_t team{0};            // octet 45 : camp, 1 = allié, 255 = ennemi
+    uint8_t follow_ally{255};   // octet 46 : allié par défaut (index PART), 255 = aucun ; OP_SET_OBJ_FOLLOW_ALLY 255 le désigne
+    int16_t formation_side{0};  // octets 48-49 : poste en formation, m
+    int16_t formation_ahead{0}; // octets 50-51
+    int16_t formation_up{0};    // octets 52-53
+
     std::vector<uint8_t> unknown_bytes;
     RSEntity *entity{nullptr};
     bool alive{true};

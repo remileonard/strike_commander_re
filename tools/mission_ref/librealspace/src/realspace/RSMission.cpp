@@ -309,42 +309,54 @@ void RSMission::paseMissionScript(uint8_t *data, size_t size) {
 void RSMission::parseMISN_PROG(uint8_t *data, size_t size) {
     this->paseMissionScript(data, size);
 }
+// Chunk PART (PartEntry_AllocateArray_AA23D, PartEntry_LoadAndResolveNames_A9E3C) : enregistrements de 62 octets.
+//   0  uint16  index CAST              26  uint16  index AREA (65535 = aucune)   45  uint8   camp
+//   2  char[8] type d'objet            28  uint8   mode de placement             46  uint8   allié suivi
+//  10  char[8] type une fois détruit   29  3 int32 24.8 : décalage X, Z, Y       47  uint8   non recopié
+//  18  char[8] emport                  41  int16   cap (degrés)                  48  3 int16 poste en formation
+//                                      43  int16   vitesse initiale              54  4 uint16 scripts PROG
 void RSMission::parseMISN_PART(uint8_t *data, size_t size) {
-    ByteStream stream(data, size);
     size_t numParts = size / 62;
-    for (int i = 0; i < numParts; i++) {
+    for (size_t i = 0; i < numParts; i++) {
+        ByteStream stream(data + i * 62, 62);
         MISN_PART *prt = new MISN_PART();
-        prt->id = 0;
-        prt->id |= stream.ReadByte() << 0;
-        prt->id |= stream.ReadByte() << 8;
+        prt->id = (uint8_t) stream.ReadUShort();
         prt->member_name = stream.ReadString(8);
         std::transform(prt->member_name.begin(), prt->member_name.end(), prt->member_name.begin(), ::toupper);
         prt->member_name_destroyed = stream.ReadString(8);
         std::transform(prt->member_name_destroyed.begin(), prt->member_name_destroyed.end(), prt->member_name_destroyed.begin(), ::toupper);
         prt->weapon_load = stream.ReadString(8);
         std::transform(prt->weapon_load.begin(), prt->weapon_load.end(), prt->weapon_load.begin(), ::toupper);
-        
-        prt->area_id = stream.ReadByte();
-        prt->unknown1 = stream.ReadByte();
-        prt->unknown2 = 0;
-        prt->unknown2 |= stream.ReadByte() << 0;
-        prt->unknown2 |= stream.ReadByte() << 8;
-        int32_t x, z;
-        int16_t y;
-        x = stream.ReadInt24LE();
-        z = stream.ReadInt24LE();
-        y = 0;
-        y |= stream.ReadByte() << 0;
-        y |= stream.ReadByte() << 8;
-        prt->position = Vector3D(x * BLOCK_COORD_SCALE, y * HEIGH_MAP_SCALE, -z * BLOCK_COORD_SCALE);
 
-        prt->unknown3 = stream.ReadByte();
-        prt->azymuth = 0;
-        prt->azymuth |= stream.ReadByte() << 0;
-        prt->azymuth |= stream.ReadByte() << 8;
+        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 255 = aucune, comme avant.
+        uint16_t area_index = stream.ReadUShort();
+        prt->area_id = area_index >= 255 ? 255 : (uint8_t) area_index;
+        prt->unknown1 = (uint8_t) (area_index >> 8);
+        // Mode de placement : 0 = zone, toute autre valeur = repère du joueur (cmp byte ptr es:[bx+1Ch], 0).
+        prt->placement = stream.ReadByte() != 0 ? 1 : 0;
+        prt->unknown2 = prt->placement;
+        // Décalage : 3 int32 24.8 (÷ 256 = mètres), dans l'ordre c0, c1, c2 ; libRealSpace x = c0, y = c2, z = -c1.
+        // Division en double : un int32 converti en float perd ses derniers bits au-delà de 65 km.
+        float c0 = (float) (stream.ReadInt32LE() / 256.0);
+        float c1 = (float) (stream.ReadInt32LE() / 256.0);
+        int32_t raw_c2 = stream.ReadInt32LE();
+        float c2 = (float) (raw_c2 / 256.0);
+        prt->unknown3 = (uint8_t) ((uint32_t) raw_c2 >> 24);
+        prt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
+        prt->azymuth = stream.ReadUShort();
+
+        // unknown_bytes : les octets 43 à 53, gardés tels quels pour les lecteurs actuels.
         for (int k = 0; k < 11; k++) {
-            prt->unknown_bytes.push_back(stream.ReadByte());
+            prt->unknown_bytes.push_back(data[i * 62 + 43 + k]);
         }
+        prt->speed = stream.ReadShort();
+        prt->team = stream.ReadByte();
+        prt->follow_ally = stream.ReadByte();
+        stream.ReadByte();
+        prt->formation_side = stream.ReadShort();
+        prt->formation_ahead = stream.ReadShort();
+        prt->formation_up = stream.ReadShort();
+
         for (int k = 0; k < 4; k++) {
             prt->progs_id.push_back(stream.ReadByte());
             stream.ReadByte();
