@@ -412,7 +412,8 @@ void SCMission::loadMission() {
     }
     for (auto spot: this->mission->mission_data.spots) {
         spot->origin = {spot->position.x, spot->position.y, spot->position.z};
-        if (spot->area_id != -1) {
+        // AreaRelPos_ToWorld_50EEB : zone absente ou hors liste -> décalage absolu.
+        if (spot->area_id >= 0 && (size_t) spot->area_id < this->mission->mission_data.areas.size()) {
             AREA *ar = this->mission->mission_data.areas[spot->area_id];
             spot->position += ar->position;
         }

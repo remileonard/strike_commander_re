@@ -2381,8 +2381,6 @@ void DebugStrike::renderMenu() {
                     ImGui::Text("Spot area_id %d", spot->area_id);
                     ImGui::Text("Spot x %.0f y %.0f z %.0f", spot->position.x, spot->position.y, spot->position.z);
                     ImGui::Text("Spot from file x %.0f y %.0f z %.0f", spot->origin.x, spot->origin.y, spot->origin.z);
-                    ImGui::Text("u1 %d", spot->unknown1);
-                    ImGui::Text("u2 %d", spot->unknown2);
                     ImGui::TreePop();
                 }
             }
@@ -2610,8 +2608,6 @@ void DebugStrike::renderUI() {
                     ImGui::Text("Origin: (%.0f, %.0f, %.0f)", this->debug_spot->origin.x, this->debug_spot->origin.y,
                                 this->debug_spot->origin.z);
                     ImGui::Text("Area ID: %d", this->debug_spot->area_id);
-                    ImGui::Text("Unknown1: %d", this->debug_spot->unknown1);
-                    ImGui::Text("Unknown2: %d", this->debug_spot->unknown2);
                 } else {
                     ImGui::Text("No spot selected");
                 }

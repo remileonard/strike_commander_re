@@ -1,4 +1,4 @@
-# Objets de mission (chunk `PART`) : correction proposée pour libRealSpace
+# Objets de mission (chunks `PART`, `LOAD`, `CACH`, `SPOT`) : correction proposée pour libRealSpace
 
 Ce document accompagne les fichiers de libRealSpace modifiés, rangés sous leur chemin d'origine dans
 `tools/mission_ref/librealspace/src/` (avec les modifications des zones et des scènes, `IMPL_MISSION_AREAS.md`).
@@ -81,7 +81,8 @@ donne le même allié que le jeu. Rien n'est donc ajouté à l'activation pour l
 | `strike_commander/SCProg.cpp` | `OP_SET_OBJ_FOLLOW_ALLY` : allié par défaut et poste lus dans les champs nommés |
 | `pacific_strike/PSMission.cpp` | `placement` et `team` au lieu de `unknown2` et `unknown_bytes[2]` (§ 2.8) |
 | `executables/debugger/DebugStrike.cpp` | affichage des champs nommés au lieu des `unknown` (§ 2.8) |
-| `realspace/RSMission.h`, `RSMission.cpp` | chunks `LOAD` et `CACH` (§ 5) |
+| `realspace/RSMission.h`, `RSMission.cpp` | chunks `LOAD` et `CACH` (§ 5), `SPOT` (§ 6) |
+| `SCMission.cpp`, `PSMission.cpp`, `DebugStrike.cpp` | points `SPOT` : zone hors de la liste, affichage sans `unknown` (§ 6) |
 
 ### 2.1 `RSMission.h` — `MISN_PART`
 
@@ -761,4 +762,79 @@ Essai (`tools/mission_ref/mission_load_test.cpp`, chaque enregistrement comparé
 ```
 1163 enregistrements LOAD, 1816 enregistrements CACH, 0 erreurs
 ```
+
+## 6. Chunk `SPOT`
+
+Points rattachés à une zone, utilisés comme destinations par les ordres de mission. Lus par
+`Mission_LoadSpotList_AA6C9` : 14 octets lus d'un bloc (`push large 0Eh` /
+`call ResourceRecord_ReadFieldGroupA_64A19`), le mot de tête passé à `PtrList_GetAt_53034` (index de zone), puis
+trois dwords (`var_1E`, `var_1A`, `var_16`) recopiés dans un enregistrement de 16 octets
+(`add word ptr [bp+var_4], 10h`).
+
+| Octets | Type | Contenu | Champ libRealSpace |
+|---|---|---|---|
+| 0-1 | uint16 | index de zone `AREA`, 65535 = aucune | `area_id` (−1 = aucune) |
+| 2-13 | 3 × int32 24.8 | décalage, composantes c0, c1, c2 (÷ 256 = m) | `position` : x = c0, y = c2, z = −c1 |
+
+Même défaut que l'ancienne lecture de `PART` : un octet de retard. `unknown1` prenait l'octet 2 (partie
+fractionnaire de c0), `ReadInt24LE` donnait la partie entière des mètres, `unknown2` prenait l'octet 13 (poids fort
+de l'altitude). Les deux `unknown` sont supprimés, ainsi que leur affichage dans `DebugStrike.cpp` (fiche d'un
+point et liste des points).
+
+Position dans le monde (`AreaRelPos_ToWorld_50EEB`) : décalage + point de référence de la zone si la zone existe,
+décalage seul sinon (65535 **ou index hors de la liste**, `PtrList_GetAt_53034` rendant alors un pointeur nul).
+`SCMission::loadMission` (et la même boucle dans `PSMission.cpp`) ne testait que −1 ; elle teste maintenant aussi
+la taille de la liste. Le seul cas dans les fichiers est `MISSION.IFF`, gabarit mal formé : point sur la zone 0, sans
+aucune zone dans le fichier (l'ancienne boucle lisait `areas[0]` dans une liste vide).
+
+```cpp
+// Chunk SPOT : enregistrements de 14 octets (Mission_LoadSpotList_AA6C9).
+struct SPOT {
+    int id;
+    short area_id;     // octets 0-1 : index de la zone AREA ; -1 (65535) = aucune, le décalage est alors absolu
+    Vector3D position; // octets 2-13 : décalage depuis le point de référence de la zone (3 int32 24.8), m
+    Vector3D origin;
+};
+```
+
+```cpp
+void RSMission::parseMISN_SPOT(uint8_t *data, size_t size) {
+    size_t numSpots = size / 14;
+    for (size_t i = 0; i < numSpots; i++) {
+        ByteStream stream(data + i * 14, 14);
+        SPOT *spt = new SPOT();
+        spt->id = (int) i;
+        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 65535 donne -1.
+        spt->area_id = (short) stream.ReadUShort();
+        // Décalage : 3 int32 24.8 (÷ 256 = mètres), dans l'ordre c0, c1, c2 ; libRealSpace x = c0, y = c2, z = -c1.
+        float c0 = (float) (stream.ReadInt32LE() / 256.0);
+        float c1 = (float) (stream.ReadInt32LE() / 256.0);
+        float c2 = (float) (stream.ReadInt32LE() / 256.0);
+        spt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
+        this->mission_data.spots.push_back(spt);
+    }
+}
+```
+
+`SCMission::loadMission`, position des points dans le monde :
+
+```cpp
+for (auto spot: this->mission->mission_data.spots) {
+    spot->origin = {spot->position.x, spot->position.y, spot->position.z};
+    // AreaRelPos_ToWorld_50EEB : zone absente ou hors liste -> décalage absolu.
+    if (spot->area_id >= 0 && (size_t) spot->area_id < this->mission->mission_data.areas.size()) {
+        AREA *ar = this->mission->mission_data.areas[spot->area_id];
+        spot->position += ar->position;
+    }
+}
+```
+
+Essai (`tools/mission_ref/mission_spot_test.cpp`) :
+
+```
+MISSION.IFF SPOT 0 : zone 0 hors de la liste (0 zones)
+519 points SPOT, 0 erreurs ; 0 écarts d'au moins 1 m avec l'ancienne lecture ; 102 sans zone
+```
+
+Les 102 points sans zone : 101 à 65535, plus celui de `MISSION.IFF`.
 

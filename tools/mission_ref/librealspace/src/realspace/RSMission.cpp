@@ -203,29 +203,19 @@ int32_t ReadInt24LE_fromVec(std::vector<uint8_t>data, int offset) {
     return i;
 }
 void RSMission::parseMISN_SPOT(uint8_t *data, size_t size) {
-    size_t numParts = size / 14;
-    ByteStream stream(data, size);
-    for (int i = 0; i < numParts; i++) {
+    size_t numSpots = size / 14;
+    for (size_t i = 0; i < numSpots; i++) {
+        ByteStream stream(data + i * 14, 14);
         SPOT *spt = new SPOT();
-        if (spt != NULL) {
-            spt->id = i;
-            spt->area_id = 0;
-            spt->area_id |= stream.ReadByte() << 0;
-            spt->area_id |= stream.ReadByte() << 8;
-
-            spt->unknown1 = stream.ReadByte();
-            int32_t x, z;
-            int16_t y;
-            x = stream.ReadInt24LE();
-            z = stream.ReadInt24LE();
-            y = 0;
-            y |= stream.ReadByte() << 0;
-            y |= stream.ReadByte() << 8;
-            spt->position = Vector3D(x * BLOCK_COORD_SCALE, y * HEIGH_MAP_SCALE, -z * BLOCK_COORD_SCALE);
-            
-            spt->unknown2 = stream.ReadByte();
-            this->mission_data.spots.push_back(spt);
-        }
+        spt->id = (int) i;
+        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 65535 donne -1.
+        spt->area_id = (short) stream.ReadUShort();
+        // Décalage : 3 int32 24.8 (÷ 256 = mètres), dans l'ordre c0, c1, c2 ; libRealSpace x = c0, y = c2, z = -c1.
+        float c0 = (float) (stream.ReadInt32LE() / 256.0);
+        float c1 = (float) (stream.ReadInt32LE() / 256.0);
+        float c2 = (float) (stream.ReadInt32LE() / 256.0);
+        spt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
+        this->mission_data.spots.push_back(spt);
     }
 }
 void RSMission::parseMISN_NUMS(uint8_t *data, size_t size) {

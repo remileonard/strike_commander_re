@@ -74,13 +74,12 @@ struct MISN_PART {
     bool alive{true};
 };
 
+// Chunk SPOT : enregistrements de 14 octets (Mission_LoadSpotList_AA6C9).
 struct SPOT {
     int id;
-    short area_id;
-    Vector3D position;
+    short area_id;     // octets 0-1 : index de la zone AREA ; -1 (65535) = aucune, le décalage est alors absolu
+    Vector3D position; // octets 2-13 : décalage depuis le point de référence de la zone (3 int32 24.8), m
     Vector3D origin;
-    uint8_t unknown1;
-    uint8_t unknown2;
 };
 struct MSGS {
     char message[255];
