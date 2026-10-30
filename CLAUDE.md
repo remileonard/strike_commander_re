@@ -315,7 +315,7 @@ strike_commander_re/
 │   ├── IMPL_MISSION_AREAS.md        à porter : zones AREA (formes, test d'appartenance) et scènes SCNE (scène globale,
 │   │                                  scène courante, ordre des 3 scripts) — fichiers RSMission / SCMission / SCMissionScene modifiés
 │   ├── IMPL_MISSION_PART.md         à porter : objets de mission PART (champs nommés, lecture exacte, vitesse initiale et départ
-│   │                                  au sol, camp, allié par défaut = chef, poste en formation) — RSMission, SCMission, SCProg…
+│   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD et CACH) — RSMission, SCMission, SCProg…
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
@@ -376,7 +376,7 @@ strike_commander_re/
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
     ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
-    │                                  mission_areas_test.cpp, mission_part_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
+    │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
     │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à

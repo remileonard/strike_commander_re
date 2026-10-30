@@ -1361,8 +1361,9 @@ pour la passe de liaison `ExprSlot` :
 | 12 | `PART` | `sub_6CF35` → `PartEntry_AllocateArray_AA23D` | `si+0x34` | objets de la mission (type, pilote, placement, camp, scripts) — format ci-dessous |
 | 13 | `TEAM` | count = `size/2` (≤8) ; `ReadDwordFieldB` | `si+0x84` count, `si+0x74` tableau | équipes (dwords) |
 | 14 | `PLAY` | `enter_form('PLAY')` → `sub_6CF58` → `MissionPlay_LoadScenes_AA595(si+0x3A)` → `pop` | `si+0x3A` | **la « pièce » : FORM contenant N chunks `SCNE`** (voir plus bas) |
-| 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | emport (loadout) |
+| 15 | `LOAD` | `MissionScenario_LoadFieldGroup_A8225` | — | modèles chargés d'avance : enregistrements de 9 octets (char[8] nom, uint8 rangé dans le modèle à `+2`, rôle non établi), chacun passé à `IFF_LoadModelMain` (leurres, explosions, débris, avion) |
 | 16 | `HOME` | `ReadFieldGroupB` u16 → `PtrList_GetAt_53034(si+0x1A)` → `si+0x58` ; puis 3× `ReadFieldGroupC` u32 → `si+0x5C/0x60/0x64` | `si+0x58`, `si+0x5C/60/64` | base de départ : index dans la liste `AREA` + **vecteur position** (X, Y, Z ; Z = altitude, fixed-point) |
+| — | `CACH` | lecteur pas trouvé (tag absent du chargeur de mission) | — | enregistrements de 10 octets lus dans les fichiers : char[8] nom d'un modèle d'`OBJECTS` (véhicules, versions détruites, bâtiments, obus), uint16 (1 ou 0) ; rôle non établi |
 
 > **Modèle « théâtre »** : la narration scriptée d'une mission est structurée comme
 > une pièce de théâtre. `CAST` = distribution (personnages), `PLAY` = la pièce

@@ -143,7 +143,7 @@ void SCMission::loadMission() {
                 SCMissionActors *actor = new SCMissionActors();
                 if (cast->actor == "PLAYER") {
                     actor = new SCMissionActorsPlayer();
-                    if (part->area_id != 255 && part->unknown2 == 0) {
+                    if (part->area_id != 255 && part->placement == 0) {
                         Vector3D correction = this->mission->mission_data.areas[part->area_id]->position;
                         part->position.x += correction.x;
                         part->position.y += correction.y;

@@ -91,7 +91,6 @@ int main(int argc, char **argv) {
             ok = ok && p->formation_side == readLE16(&r[48]);
             ok = ok && p->formation_ahead == readLE16(&r[50]);
             ok = ok && p->formation_up == readLE16(&r[52]);
-            ok = ok && p->unknown_bytes.size() == 11 && memcmp(p->unknown_bytes.data(), &r[43], 11) == 0;
             ok = ok && p->on_is_activated == r[54] && p->on_missions_init == r[60];
             // Position : libRealSpace x = c0, y = c2, z = -c1, en mètres (÷ 256).
             float c0 = static_cast<float>(readLE32(&r[29]) / 256.0);

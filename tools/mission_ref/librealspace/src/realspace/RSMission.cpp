@@ -328,32 +328,25 @@ void RSMission::parseMISN_PART(uint8_t *data, size_t size) {
         prt->weapon_load = stream.ReadString(8);
         std::transform(prt->weapon_load.begin(), prt->weapon_load.end(), prt->weapon_load.begin(), ::toupper);
 
-        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 255 = aucune, comme avant.
+        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 65535 dans le fichier, 255 ici = aucune.
         uint16_t area_index = stream.ReadUShort();
         prt->area_id = area_index >= 255 ? 255 : (uint8_t) area_index;
-        prt->unknown1 = (uint8_t) (area_index >> 8);
         // Mode de placement : 0 = zone, toute autre valeur = repère du joueur (cmp byte ptr es:[bx+1Ch], 0).
         prt->placement = stream.ReadByte() != 0 ? 1 : 0;
-        prt->unknown2 = prt->placement;
         // Décalage : 3 int32 24.8 (÷ 256 = mètres), dans l'ordre c0, c1, c2 ; libRealSpace x = c0, y = c2, z = -c1.
         // Division en double : un int32 converti en float perd ses derniers bits au-delà de 65 km.
         float c0 = (float) (stream.ReadInt32LE() / 256.0);
         float c1 = (float) (stream.ReadInt32LE() / 256.0);
-        int32_t raw_c2 = stream.ReadInt32LE();
-        float c2 = (float) (raw_c2 / 256.0);
-        prt->unknown3 = (uint8_t) ((uint32_t) raw_c2 >> 24);
+        float c2 = (float) (stream.ReadInt32LE() / 256.0);
         prt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
         prt->azymuth = stream.ReadUShort();
         prt->relative_position = prt->position;
         prt->relative_azymuth = prt->azymuth;
 
-        // unknown_bytes : les octets 43 à 53, gardés tels quels pour les lecteurs actuels.
-        for (int k = 0; k < 11; k++) {
-            prt->unknown_bytes.push_back(data[i * 62 + 43 + k]);
-        }
         prt->speed = stream.ReadShort();
         prt->team = stream.ReadByte();
         prt->follow_ally = stream.ReadByte();
+        // Octet 47 : pas recopié par le chargeur, rôle non établi.
         stream.ReadByte();
         prt->formation_side = stream.ReadShort();
         prt->formation_ahead = stream.ReadShort();
@@ -415,8 +408,26 @@ void RSMission::parseMISN_PLAY_SCEN(uint8_t *data, size_t size) {
     this->mission_data.scenes.push_back(scen);
 }
 void RSMission::parseMISN_LOAD(uint8_t *data, size_t size) {
-    
+    // Enregistrements de 9 octets ; des octets en trop à la fin (MISSION.IFF : 16 octets) sont ignorés.
+    size_t count = size / 9;
+    for (size_t i = 0; i < count; i++) {
+        ByteStream stream(data + i * 9, 9);
+        MISN_LOAD *load = new MISN_LOAD();
+        load->name = stream.ReadString(8);
+        std::transform(load->name.begin(), load->name.end(), load->name.begin(), ::toupper);
+        load->flag = stream.ReadByte();
+        this->mission_data.load.push_back(load);
+    }
 }
 void RSMission::parseMISN_CACH(uint8_t *data, size_t size) {
-    
+    // Enregistrements de 10 octets.
+    size_t count = size / 10;
+    for (size_t i = 0; i < count; i++) {
+        ByteStream stream(data + i * 10, 10);
+        MISN_CACH *cache = new MISN_CACH();
+        cache->name = stream.ReadString(8);
+        std::transform(cache->name.begin(), cache->name.end(), cache->name.begin(), ::toupper);
+        cache->count = stream.ReadUShort();
+        this->mission_data.cache.push_back(cache);
+    }
 }

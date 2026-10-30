@@ -17,9 +17,9 @@ l'activation par `PartEntry_ResolveSpawnPositionAndActivate_51EDC`.
 | 2-9 | char[8] | type d'objet | `member_name` |
 | 10-17 | char[8] | type une fois détruit | `member_name_destroyed` |
 | 18-25 | char[8] | emport imposé (`OBJECTS\<nom>.IFF`, FORM WEAP) | `weapon_load` |
-| 26-27 | uint16 | index de zone AREA, 65535 = aucune | `area_id` (255 = aucune) ; octet 27 dans `unknown1` |
-| 28 | uint8 | mode de placement : 0 = décalage depuis la zone, autre = repère de l'avion du joueur | **`placement`** (0 ou 1) ; `unknown2` garde la même valeur |
-| 29-40 | 3 × int32 24.8 | décalage, composantes c0, c1, c2 (÷ 256 = m) | `position` : x = c0, y = c2, z = −c1 ; octet 40 dans `unknown3` |
+| 26-27 | uint16 | index de zone AREA, 65535 = aucune | `area_id` (255 = aucune) |
+| 28 | uint8 | mode de placement : 0 = décalage depuis la zone, autre = repère de l'avion du joueur | **`placement`** (0 ou 1) |
+| 29-40 | 3 × int32 24.8 | décalage, composantes c0, c1, c2 (÷ 256 = m) | `position` : x = c0, y = c2, z = −c1 |
 | 41-42 | int16 | cap (degrés) | `azymuth` |
 | 43-44 | int16 | **vitesse initiale**, m/s, le long du nez ; 0 = à l'arrêt | **`speed`** |
 | 45 | uint8 | **camp** : 1 = allié, 255 = ennemi | **`team`** |
@@ -28,7 +28,8 @@ l'activation par `PartEntry_ResolveSpawnPositionAndActivate_51EDC`.
 | 48-53 | 3 × int16 | **poste en formation** (côté, avant, haut), m | **`formation_side`**, **`formation_ahead`**, **`formation_up`** |
 | 54-61 | 4 × uint16 | scripts PROG : activation, mise à jour, destruction, début de mission | `on_is_activated` … `on_missions_init` |
 
-`unknown_bytes` garde les octets 43 à 53 tels quels : aucun lecteur actuel ne change.
+Les anciens champs `unknown1`, `unknown2`, `unknown3` et `unknown_bytes` sont supprimés : chacun n'était qu'un
+morceau mal découpé d'un champ maintenant nommé (§ 2.1). Leurs lecteurs lisent les champs nommés (§ 2.8).
 
 ### 1.1 Ce que le jeu fait de ces champs à l'activation
 
@@ -78,10 +79,15 @@ donne le même allié que le jeu. Rien n'est donc ajouté à l'activation pour l
 | `strike_commander/SCMissionScene.cpp` | `activate` : départ au sol d'après la vitesse, placement dans le repère du joueur |
 | `strike_commander/SCMissionActors.cpp` | `activateTarget` : départ au sol d'après la vitesse, placement dans le repère du joueur |
 | `strike_commander/SCProg.cpp` | `OP_SET_OBJ_FOLLOW_ALLY` : allié par défaut et poste lus dans les champs nommés |
+| `pacific_strike/PSMission.cpp` | `placement` et `team` au lieu de `unknown2` et `unknown_bytes[2]` (§ 2.8) |
+| `executables/debugger/DebugStrike.cpp` | affichage des champs nommés au lieu des `unknown` (§ 2.8) |
+| `realspace/RSMission.h`, `RSMission.cpp` | chunks `LOAD` et `CACH` (§ 5) |
 
 ### 2.1 `RSMission.h` — `MISN_PART`
 
-Les anciens champs restent (le débogueur `DebugStrike` les affiche) ; les champs nommés s'ajoutent.
+Les champs `unknown1` (octet 27, partie haute de l'index de zone), `unknown2` (mode de placement, lu avec le
+1er octet du décalage), `unknown3` (octet 40, octet de poids fort du décalage en altitude) et `unknown_bytes`
+(octets 43 à 53) sont supprimés et remplacés par les champs nommés.
 `relative_position` et `relative_azymuth` gardent le décalage et le cap du fichier : `position` et `azymuth` sont
 réécrits à l'activation, et le placement dans le repère du joueur doit repartir des valeurs du fichier à chaque fois.
 
@@ -92,10 +98,7 @@ struct MISN_PART {
 	std::string member_name_destroyed;
 	std::string weapon_load;
 	uint8_t area_id{0};      
-    uint8_t unknown1{0};
-    int16_t unknown2{0};
     Vector3D position{0, 0, 0};
-    uint8_t unknown3{0};
     uint16_t azymuth{0};
     uint16_t roll{0};
     uint16_t pitch{0};
@@ -106,19 +109,18 @@ struct MISN_PART {
     uint8_t on_is_destroyed{255};
     uint8_t on_missions_init{255};
 
-    // Champs nommés (PartEntry_LoadAndResolveNames_A9E3C) ; unknown2 et unknown_bytes gardent les mêmes octets.
+    // Champs lus par PartEntry_LoadAndResolveNames_A9E3C.
     uint8_t placement{0};       // octet 28 : 0 = décalage depuis la zone, 1 = repère de l'avion du joueur
     int16_t speed{0};           // octets 43-44 : vitesse initiale le long du nez, 0 = à l'arrêt
     uint8_t team{0};            // octet 45 : camp, 1 = allié, 255 = ennemi
     uint8_t follow_ally{255};   // octet 46 : allié par défaut (index PART), 255 = aucun ; OP_SET_OBJ_FOLLOW_ALLY 255 le désigne
     int16_t formation_side{0};  // octets 48-49 : poste en formation, m
     int16_t formation_ahead{0}; // octets 50-51
-    int16_t formation_up{0};    // octets 52-53
+    int16_t formation_up{0};    // octets 52-53 ; l'octet 47 n'est pas recopié par le chargeur, rôle non établi
     // Décalage et cap tels que lus, jamais modifiés : le placement dans le repère du joueur repart d'eux à chaque activation.
     Vector3D relative_position;
     uint16_t relative_azymuth{0};
 
-    std::vector<uint8_t> unknown_bytes;
     RSEntity *entity{nullptr};
     bool alive{true};
 };
@@ -129,11 +131,11 @@ struct MISN_PART {
 Ce qui change par rapport à l'ancienne lecture :
 - chaque enregistrement est lu dans son propre `ByteStream` de 62 octets ;
 - l'index de zone est lu sur 16 bits (65535 → 255, comme avant) ;
-- le décalage est lu en 3 × int32 ÷ 256. L'ancienne lecture commençait un octet trop loin (`unknown2` prenait
-  l'octet 29, premier octet de c0) et `ReadInt24LE` gardait les 3 octets suivants : elle donnait la partie
+- le décalage est lu en 3 × int32 ÷ 256. L'ancienne lecture commençait un octet trop loin (l'ancien `unknown2`
+  prenait l'octet 29, premier octet de c0) et `ReadInt24LE` gardait les 3 octets suivants : elle donnait la partie
   entière des mètres pour x et z, et pour l'altitude les 16 bits bas de la partie entière. Sur les 72 missions,
   les deux lectures donnent les mêmes mètres entiers (essai, § 3) ; la nouvelle garde les fractions de mètre ;
-- `unknown2` vaut 0 ou 1 : le jeu traite toute valeur non nulle de l'octet 28 comme « repère du joueur »
+- `placement` vaut 0 ou 1 : le jeu traite toute valeur non nulle de l'octet 28 comme « repère du joueur »
   (`cmp byte ptr es:[bx+1Ch], 0`).
 
 ```cpp
@@ -156,32 +158,25 @@ void RSMission::parseMISN_PART(uint8_t *data, size_t size) {
         prt->weapon_load = stream.ReadString(8);
         std::transform(prt->weapon_load.begin(), prt->weapon_load.end(), prt->weapon_load.begin(), ::toupper);
 
-        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 255 = aucune, comme avant.
+        // Index de zone sur 16 bits (PtrList_GetAt_53034) ; 65535 dans le fichier, 255 ici = aucune.
         uint16_t area_index = stream.ReadUShort();
         prt->area_id = area_index >= 255 ? 255 : (uint8_t) area_index;
-        prt->unknown1 = (uint8_t) (area_index >> 8);
         // Mode de placement : 0 = zone, toute autre valeur = repère du joueur (cmp byte ptr es:[bx+1Ch], 0).
         prt->placement = stream.ReadByte() != 0 ? 1 : 0;
-        prt->unknown2 = prt->placement;
         // Décalage : 3 int32 24.8 (÷ 256 = mètres), dans l'ordre c0, c1, c2 ; libRealSpace x = c0, y = c2, z = -c1.
         // Division en double : un int32 converti en float perd ses derniers bits au-delà de 65 km.
         float c0 = (float) (stream.ReadInt32LE() / 256.0);
         float c1 = (float) (stream.ReadInt32LE() / 256.0);
-        int32_t raw_c2 = stream.ReadInt32LE();
-        float c2 = (float) (raw_c2 / 256.0);
-        prt->unknown3 = (uint8_t) ((uint32_t) raw_c2 >> 24);
+        float c2 = (float) (stream.ReadInt32LE() / 256.0);
         prt->position = Vector3D(c0 * BLOCK_COORD_SCALE, c2 * HEIGH_MAP_SCALE, -c1 * BLOCK_COORD_SCALE);
         prt->azymuth = stream.ReadUShort();
         prt->relative_position = prt->position;
         prt->relative_azymuth = prt->azymuth;
 
-        // unknown_bytes : les octets 43 à 53, gardés tels quels pour les lecteurs actuels.
-        for (int k = 0; k < 11; k++) {
-            prt->unknown_bytes.push_back(data[i * 62 + 43 + k]);
-        }
         prt->speed = stream.ReadShort();
         prt->team = stream.ReadByte();
         prt->follow_ally = stream.ReadByte();
+        // Octet 47 : pas recopié par le chargeur, rôle non établi.
         stream.ReadByte();
         prt->formation_side = stream.ReadShort();
         prt->formation_ahead = stream.ReadShort();
@@ -468,8 +463,8 @@ bool SCMissionActors::activateTarget(uint8_t arg) {
 
 ### 2.6 `SCProg.cpp` — `OP_SET_OBJ_FOLLOW_ALLY`
 
-Seul ce cas de `SCProg::execute` change : il lit les champs nommés au lieu de `unknown_bytes[3]` et
-`unknown_bytes[5..10]`. Le comportement est le même.
+Seul ce cas de `SCProg::execute` change : il lit les champs nommés au lieu des octets 46 et 48 à 53 de l'ancien
+`unknown_bytes`. Le comportement est le même.
 
 ```cpp
 case OP_SET_OBJ_FOLLOW_ALLY: {
@@ -605,6 +600,34 @@ du début de mission auraient pris un cap faux.
                     actor->plane->simple_simulation = false;
 ```
 
+### 2.8 Lecteurs des anciens champs `unknown`
+
+`SCMission::loadMission`, position de l'avion du joueur (et la même ligne dans `PSMission.cpp` de Pacific Strike) :
+
+```cpp
+if (part->area_id != 255 && part->placement == 0) {
+```
+
+`PSMission.cpp`, camp :
+
+```cpp
+actor->team_id = part->team;
+```
+
+`DebugStrike.cpp`, fiche d'un objet de mission : les lignes `u1`, `u2`, `u3` et la liste `ub` sont remplacées par
+
+```cpp
+                    ImGui::Text("placement %d", part->placement);
+                    ImGui::Text("x %.0f y %.0f z %.0f", part->position.x, part->position.y, part->position.z);
+                    ImGui::Text("azymuth %d", part->azymuth);
+                    ImGui::Text("Name %s", part->member_name.c_str());
+                    ImGui::Text("Destroyed %s", part->member_name_destroyed.c_str());
+                    ImGui::Text("speed %d", part->speed);
+                    ImGui::Text("team %d", part->team);
+                    ImGui::Text("follow ally %d", part->follow_ally);
+                    ImGui::Text("formation %d %d %d", part->formation_side, part->formation_ahead, part->formation_up);
+```
+
 ## 3. Essai
 
 `tools/mission_ref/mission_part_test.cpp` (compilé par `tools/mission_ref/build.sh`) lit chaque mission avec
@@ -655,3 +678,87 @@ altitude, à 300 m/s.
 - **Ordre des axes du poste en formation** : `follow_slot` est construit (côté, avant, haut) comme avant ; l'usage
   de chaque composante dans le suivi n'a pas été revérifié.
 - **Octet 47** : pas recopié par le chargeur, rôle non établi.
+
+## 5. Chunks `LOAD` et `CACH`
+
+Les deux fonctions de lecture étaient vides. Elles rangent maintenant les données dans `MISN` (`load`, `cache`) ;
+rien ne les utilise encore.
+
+**`LOAD`** — lu par `MissionScenario_LoadFieldGroup_A8225`, appelé par `MissionScenario_LoadMainRecord_A8331`
+juste après `PLAY` (`push large 44414F4Ch`). Boucle jusqu'à la fin du chunk sur des enregistrements de 9 octets :
+
+```
+push    large 8
+call    ResourceRecord_ReadFieldGroupA_64A19   ; nom, 8 octets
+call    ResourceRecord_ReadFinalField_64B51    ; 1 octet
+push    ax
+...
+call    IFF_LoadModelMain                      ; charge OBJECTS\<nom>.IFF
+```
+
+`IFF_LoadModelMain` range l'octet dans le modèle chargé (`mov al, [bp+arg_6]` / `mov es:[bx+2], al`) ; son rôle
+n'est pas établi. Dans les fichiers : 0 dans 1 156 enregistrements ; 1 pour un F-16 dans `ARENAMIS`, `BASIC`,
+`GAME`, `GAUNTLET`, `LAND` et `TEMPLATE` ; 83 dans `MISSION.IFF`, dont le `LOAD` de 16 octets est mal formé
+(2e enregistrement tronqué : l'octet 83 est le « S » de `SWINDERJ`). Les noms sont des modèles chargés d'avance :
+leurres (`FLARE`, `CHAFF`), explosions (`FUELEXP1`, `EXPLODE1`…), étincelles et débris (`GUNSPARK`, `GENDEB1`…).
+
+**`CACH`** — format lu dans les fichiers seulement : le tag (`push large 48434143h`) n'apparaît dans aucun des deux
+exécutables, ni le chunk dans le chargeur de mission ; le lecteur reste à trouver. Enregistrements de 10 octets :
+nom de 8 octets, puis un uint16 (1 dans 1 801 enregistrements, 0 dans 15). Les noms sont des modèles d'`OBJECTS` :
+véhicules et défenses (`T-72`, `ZSU-23`, `MOBSAMLN`…), leurs versions détruites (`DT-72`, `DZSU-23`…), bâtiments
+(`HANGAR3`, `HANGAR3D`), avions et débris (`MIG29`, `DEBSU27`), obus (`23MM`, `30MMGAU`…).
+
+| Chunk | Octets | Type | Champ |
+|---|---|---|---|
+| `LOAD` | 0-7 | char[8] | `MISN_LOAD::name` |
+| `LOAD` | 8 | uint8 | `MISN_LOAD::flag` |
+| `CACH` | 0-7 | char[8] | `MISN_CACH::name` |
+| `CACH` | 8-9 | uint16 | `MISN_CACH::count` |
+
+```cpp
+// Chunk LOAD : enregistrements de 9 octets, lus jusqu'à la fin du chunk (MissionScenario_LoadFieldGroup_A8225).
+// Chaque nom est chargé comme modèle (IFF_LoadModelMain : OBJECTS\<nom>.IFF) au chargement de la mission.
+struct MISN_LOAD {
+    std::string name; // octets 0-7 : nom du modèle
+    uint8_t flag{0};  // octet 8 : rangé dans le modèle chargé (+2) ; rôle non établi (0 partout, sauf un F-16 à 1 dans 6 fichiers hors campagne)
+};
+// Chunk CACH : enregistrements de 10 octets. Format lu dans les fichiers ; aucun lecteur trouvé dans le jeu.
+struct MISN_CACH {
+    std::string name;   // octets 0-7 : nom d'un modèle d'OBJECTS
+    uint16_t count{0};  // octets 8-9 : 1 (1 801 enregistrements) ou 0 (15) dans les missions ; rôle non établi
+};
+```
+
+```cpp
+void RSMission::parseMISN_LOAD(uint8_t *data, size_t size) {
+    // Enregistrements de 9 octets ; des octets en trop à la fin (MISSION.IFF : 16 octets) sont ignorés.
+    size_t count = size / 9;
+    for (size_t i = 0; i < count; i++) {
+        ByteStream stream(data + i * 9, 9);
+        MISN_LOAD *load = new MISN_LOAD();
+        load->name = stream.ReadString(8);
+        std::transform(load->name.begin(), load->name.end(), load->name.begin(), ::toupper);
+        load->flag = stream.ReadByte();
+        this->mission_data.load.push_back(load);
+    }
+}
+void RSMission::parseMISN_CACH(uint8_t *data, size_t size) {
+    // Enregistrements de 10 octets.
+    size_t count = size / 10;
+    for (size_t i = 0; i < count; i++) {
+        ByteStream stream(data + i * 10, 10);
+        MISN_CACH *cache = new MISN_CACH();
+        cache->name = stream.ReadString(8);
+        std::transform(cache->name.begin(), cache->name.end(), cache->name.begin(), ::toupper);
+        cache->count = stream.ReadUShort();
+        this->mission_data.cache.push_back(cache);
+    }
+}
+```
+
+Essai (`tools/mission_ref/mission_load_test.cpp`, chaque enregistrement comparé aux octets du fichier) :
+
+```
+1163 enregistrements LOAD, 1816 enregistrements CACH, 0 erreurs
+```
+
