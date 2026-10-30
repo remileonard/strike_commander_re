@@ -14,12 +14,12 @@ done
 for f in explode crc32; do
     gcc -O1 -w -c "$LIBRS/commons/pklib/$f.c" -o "$OUT/$f.o"
 done
-for f in RSSmokeSet SCSmokeSet SCSmokeEmitter smoke_alpha texture_stub; do
+for f in RSSmokeSet SCSmokeSet smoke_alpha texture_stub; do
     g++ $FLAGS -c "$HERE/$f.cpp" -o "$OUT/$f.o"
 done
 OBJS="$OUT/ByteStream.o $OUT/IFFSaxLexer.o $OUT/LZBuffer.o $OUT/md5.o $OUT/Math.o $OUT/Matrix.o \
       $OUT/PKWareDecompressor.o $OUT/Base.o $OUT/PakArchive.o $OUT/RLEShape.o $OUT/explode.o $OUT/crc32.o \
-      $OUT/RSSmokeSet.o $OUT/SCSmokeSet.o $OUT/SCSmokeEmitter.o $OUT/smoke_alpha.o $OUT/texture_stub.o"
+      $OUT/RSSmokeSet.o $OUT/SCSmokeSet.o $OUT/smoke_alpha.o $OUT/texture_stub.o"
 g++ $FLAGS "$HERE/smoke_test.cpp" $OBJS -o "$OUT/smoke_test"
 echo "$OUT/smoke_test"
 # Essai du dessin, hors écran : demande OSMesa (paquet libosmesa6-dev sous Debian ou Ubuntu).

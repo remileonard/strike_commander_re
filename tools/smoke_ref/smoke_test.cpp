@@ -8,7 +8,6 @@
 
 #include "RLEShape.h"
 #include "RSSmokeSet.h"
-#include "SCSmokeEmitter.h"
 #include "SCSmokeSet.h"
 #include "smoke_alpha.h"
 
@@ -79,8 +78,17 @@ static bool findChunk(std::vector<uint8_t> &file, const char *name, uint8_t **da
     return false;
 }
 
-static void simulate(const RSSmokeSet &set, SCSmokeSet &smokeSet, int model, const char *label) {
-    SCSmokeEmitter smoke;
+// Dessin compté seulement (pas de contexte OpenGL dans cet essai).
+static int billboards = 0;
+void drawSmokeBillboard(Vector3D position, Texture *texture, float size) {
+    (void)position;
+    (void)texture;
+    (void)size;
+    billboards++;
+}
+
+static void simulate(RSSmokeSet &set, int model, const char *label) {
+    SCSmokeSet smoke;
     smoke.init(&set, model, 5);
     const float dt = 1.0f / 15.0f;
     const float speed = 150.0f;
@@ -106,10 +114,14 @@ static void simulate(const RSSmokeSet &set, SCSmokeSet &smokeSet, int model, con
         }
     }
     std::vector<SCSmokeSprite> sprites;
-    smoke.sprites(smokeSet, position + Vector3D(70.0f, 0.0f, 0.0f), sprites);
+    Vector3D camera = position + Vector3D(70.0f, 0.0f, 0.0f);
+    smoke.sprites(camera, sprites);
+    billboards = 0;
+    smoke.render(camera);
     printf(" particules ; %zu sprites, du plus loin (%.0f m, côté %.1f m) au plus proche (%.0f m, côté %.1f m)\n",
            sprites.size(), sprites.front().distance, sprites.front().size, sprites.back().distance,
            sprites.back().size);
+    printf("  render : %d appels de drawSmokeBillboard\n", billboards);
 }
 
 int main(int argc, char **argv) {
@@ -158,11 +170,9 @@ int main(int argc, char **argv) {
         printf("forme %zu : %zu octets, %zu images, demi-taille %d, %zu pixels\n", i, s.data.size(), s.images.size(),
                s.halfSize, present);
     }
-    SCSmokeSet smokeSet;
-    smokeSet.smoke_set = &set;
-    smokeSet.palette = readPalette(paletteFile);
-    smokeSet.initFadeTextures(fadeFile.data(), fadeFile.size());
-    const std::vector<FadeBlend> &blends = smokeSet.fade_blends;
+    VGAPalette palette = readPalette(paletteFile);
+    set.buildTextures(&palette, fadeFile.data(), fadeFile.size());
+    const std::vector<FadeBlend> &blends = set.fade_blends;
     printf("%zu tables FADE\n", blends.size());
     int shown[4] = {
         0,
@@ -176,10 +186,10 @@ int main(int argc, char **argv) {
                    blends[t].b);
         }
     }
-    printf("%zu textures précalculées\n", smokeSet.textureCount());
-    simulate(set, smokeSet, 3, "traînée en vol");
-    simulate(set, smokeSet, 6, "chute");
-    simulate(set, smokeSet, 0, "missile");
+    printf("%zu textures précalculées\n", set.textureCount());
+    simulate(set, 3, "traînée en vol");
+    simulate(set, 6, "chute");
+    simulate(set, 0, "missile");
     Vector3D local = {
         -14.0f,
         0.0f,
@@ -228,10 +238,9 @@ int main(int argc, char **argv) {
             RSSmokeGeneratorInfo info = readSmokeGeneratorInfo(chunk, size);
             printf("SMKG : modèle %d, durée %.1f s, montée %.1f m/s, intervalle %.3f s, chance %d, suppression %d\n",
                    info.type, info.duration, info.rise, info.interval, info.chance, info.removeAtEnd);
-            SCSmokeEmitter smoke;
+            SCSmokeSet smoke;
             smoke.init(&set, info.type, 5);
-            SCSmokeGenerator generator;
-            generator.init(info, true);
+            smoke.startGenerator(info, true);
             Vector3D ground = {
                 0.0f,
                 0.0f,
@@ -240,7 +249,7 @@ int main(int argc, char **argv) {
             const float dt = 1.0f / 15.0f;
             float top = 0.0f;
             for (int frame = 0; frame < 150; frame++) {
-                generator.tick(smoke, ground, dt);
+                smoke.emitGenerator(ground, dt);
                 smoke.update(dt);
             }
             for (const auto &p : smoke.getParticles()) {

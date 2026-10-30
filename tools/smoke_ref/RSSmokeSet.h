@@ -1,9 +1,14 @@
-// Jeu de fumées (OBJECTS\SMOKESET.IFF) : lecture complète. Proposition pour remplacer
-// src/realspace/RSSmokeSet.h de libRealSpace. analysis/SMOKE_SYSTEM.md § 2, analysis/IMPL_SMOKE.md § 2.
+// Jeu de fumées (OBJECTS\SMOKESET.IFF) : lecture complète et textures teintées par les tables FADE, comme RSEntity
+// porte ses textures. Proposition pour remplacer src/realspace/RSSmokeSet.h de libRealSpace.
+// analysis/SMOKE_SYSTEM.md § 2 et § 6.1, analysis/IMPL_SMOKE.md § 2 et § 3.
 #pragma once
 #include <cstddef>
 #include <cstdint>
+#include <unordered_map>
 #include <vector>
+
+#include "../engine/Texture.h"
+#include "smoke_alpha.h"
 
 class RLEShape;
 
@@ -50,6 +55,12 @@ class RSSmokeSet {
     void parseSMOK_TYPE_SHAP(uint8_t *data, size_t size);
     void parseSMOK_TYPE_SHAP_SHAP(uint8_t *data, size_t size);
 
+    std::unordered_map<uint64_t, Texture *> fade_textures; // clé : modèle, forme, image, teinte
+    std::vector<uint8_t> palette_rgb;                      // 768 octets RVB de 0 à 255
+
+    static uint64_t textureKey(int model, int shape, int image, int shade);
+    Texture *buildTexture(const RSSmokeModel &m, RLEShape *rle, int shade);
+
 public:
     RSSmokeSet();
     ~RSSmokeSet();
@@ -59,8 +70,16 @@ public:
     uint16_t declaredModels{ 0 };
     uint16_t declaredShapes{ 0 };
     uint16_t maxParticles{ 0 };
-    std::vector<RSSmokeModel> models; // numéro de modèle = rang parmi les FORM SMOK de FORM TYPE
-    std::vector<RSSmokeShape> shapes; // numéro de forme = rang parmi les FORM SHAP de FORM TYPE
+    std::vector<RSSmokeModel> models;   // numéro de modèle = rang parmi les FORM SMOK de FORM TYPE
+    std::vector<RSSmokeShape> shapes;   // numéro de forme = rang parmi les FORM SHAP de FORM TYPE
+    std::vector<FadeBlend> fade_blends; // une couleur + alpha par table FADE
+
+    // Après InitFromRam : palette du monde et contenu de PALETTE\PALFADE.IFF. Construit, pour chaque modèle à
+    // formes, une texture par forme (A et B), image et teinte entière de sa vie.
+    void buildTextures(VGAPalette *palette, uint8_t *palfade, size_t size);
+    // Texture d'une particule : nullptr si elle n'existe pas (pas de forme, teinte hors de la plage du modèle).
+    Texture *getTexture(int model, int shape, int image, int shade);
+    size_t textureCount() const;
 };
 
 // Chunk SMOK d'un objet (MISS, JETP, OMOB…) : traînée de fumée (MobileObject_LoadDynamicsAndSmoke_9D189).

@@ -1,4 +1,4 @@
-// Essai du dessin des fumées, hors écran (OSMesa) : émetteur, textures de SCSmokeSet et dessin par une copie de
+// Essai du dessin des fumées, hors écran (OSMesa) : SCSmokeSet, textures de RSSmokeSet et dessin par une copie de
 // SCRenderer::drawBillboard. Traînée d'un avion vue de côté, image PPM.
 // Usage : smoke_render_test SMOKESET.IFF PALETTE.IFF PALFADE.IFF modèle sortie.ppm
 #include <GL/gl.h>
@@ -11,7 +11,6 @@
 #include <vector>
 
 #include "RSSmokeSet.h"
-#include "SCSmokeEmitter.h"
 #include "SCSmokeSet.h"
 
 static std::vector<uint8_t> readFile(const char *path) {
@@ -104,6 +103,12 @@ static void drawBillboard(Vector3D cameraPos, Vector3D pos, Texture *tex, float 
     glEnable(GL_CULL_FACE);
 }
 
+// drawSmokeBillboard : comme Renderer.drawBillboard, qui prend la position de la caméra dans SCRenderer.
+static Vector3D currentCamera;
+void drawSmokeBillboard(Vector3D position, Texture *texture, float size) {
+    drawBillboard(currentCamera, position, texture, size, 1.0f);
+}
+
 // Matrice de vue (comme gluLookAt), chargée dans GL_MODELVIEW.
 static void loadLookAt(Vector3D eye, Vector3D target) {
     Vector3D f = target - eye;
@@ -157,12 +162,10 @@ int main(int argc, char **argv) {
     int model = atoi(argv[4]);
     RSSmokeSet set;
     set.InitFromRam(smokeFile.data(), smokeFile.size());
-    SCSmokeSet smokeSet;
-    smokeSet.smoke_set = &set;
-    smokeSet.palette = readPalette(readFile(argv[2]));
-    smokeSet.initFadeTextures(fadeFile.data(), fadeFile.size());
-    SCSmokeEmitter emitter;
-    emitter.init(&set, model, 5);
+    VGAPalette palette = readPalette(readFile(argv[2]));
+    set.buildTextures(&palette, fadeFile.data(), fadeFile.size());
+    SCSmokeSet smoke;
+    smoke.init(&set, model, 5);
 
     // Focale du jeu 277 pixels sur 200 lignes : fovy = 2 × atan(100 / 277).
     glViewport(0, 0, width, height);
@@ -188,22 +191,21 @@ int main(int argc, char **argv) {
     for (int frame = 0; frame < 40; frame++) {
         position = position + velocity * dt;
         Vector3D emission = position + Vector3D(0.0f, 0.0f, 14.0f);
-        emitter.emitTrail(emission, velocity, dt);
-        emitter.update(dt);
+        smoke.emitTrail(emission, velocity, dt);
+        smoke.update(dt);
         glClearColor(0.42f, 0.55f, 0.70f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // Caméra de côté, un peu au-dessus, qui suit l'avion.
         Vector3D camera = position + Vector3D(70.0f, 12.0f, 10.0f);
         loadLookAt(camera, position + Vector3D(0.0f, 0.0f, 40.0f));
+        currentCamera = camera;
+        smoke.render(camera);
         std::vector<SCSmokeSprite> sprites;
-        emitter.sprites(smokeSet, camera, sprites);
-        for (const auto &sprite : sprites) {
-            drawBillboard(camera, sprite.position, sprite.texture, sprite.size, 1.0f);
-        }
+        smoke.sprites(camera, sprites);
         drawn = sprites.size();
     }
     glFinish();
-    printf("%zu particules, %zu dessinées, %zu textures\n", emitter.getParticles().size(), drawn, smokeSet.textureCount());
+    printf("%zu particules, %zu dessinées, %zu textures\n", smoke.getParticles().size(), drawn, set.textureCount());
     FILE *out = fopen(argv[5], "wb");
     fprintf(out, "P6\n%d %d\n255\n", width, height);
     for (int y = height - 1; y >= 0; y--) {

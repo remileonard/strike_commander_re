@@ -295,8 +295,8 @@ strike_commander_re/
 │   │                                  traînées (SMOK, chute JINF), vie des particules, projection, tri commun des
 │   │                                  primitives (tri par base), dessin, tables FADE de PALFADE.IFF — lu 2026-10-28
 │   ├── SMOKE_SYSTEM.html            version illustrée (HTML, images intégrées) ; images dans smoke_images/
-│   ├── IMPL_SMOKE.md                à porter : fumées (RSSmokeSet complet, textures teintées FADE dans SCSmokeSet,
-│   │                                  émetteur porté par l'objet, dessin par drawBillboard) — code tools/smoke_ref/
+│   ├── IMPL_SMOKE.md                à porter : fumées (RSSmokeSet = données + textures teintées FADE, SCSmokeSet =
+│   │                                  acteur porté par l'objet : émission, mise à jour, drawBillboard) — tools/smoke_ref/
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
