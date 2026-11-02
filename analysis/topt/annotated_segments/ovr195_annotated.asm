@@ -1955,7 +1955,19 @@ sub_61893		endp
 
 ; Attributes: bp-based frame
 
-sub_61E1C		proc far
+; ==============================================================================================
+; far, LU 2026-11-02 (table et commandes 14 à 17). Interpréteur des conversations, même
+; structure que celui de l'OPTTEST.EXE du CD (pile de 962 octets, liste de voix ouverte au
+; début, 19 commandes cmp bx, 12h, table off_65D39) ; liste de voix « tovoclst.iff » au lieu
+; de « voclist.iff ». Commandes de premier niveau : 0, 3, 10, 12, 14, 15 comme le CD ; 16 et
+; 17 = deux nouvelles variantes de l'écran de choix d'équipier (le CD saute 16) ; 18 ne fait
+; rien. 14 (SELECT_WING) lit gameflo2.iff. 15, 16, 17 : même code, données différentes — 15 :
+; tableau de 7 pilotes, élément 3 de p_wing jamais dessiné, éléments 4 à 6 dessinés si le
+; pilote 3 à 5 est proposé, zone de Lyle → « Select Ari » (pilote 6) ; 16 : tableau de 6, le
+; 6e pilote de PILT et Lyle (3) retirés, éléments 1 à 5 ; 17 : tableau de 6, éléments 1 à 5,
+; pas de retrait. analysis/topt/README.md § 7.
+; ==============================================================================================
+Conv_PlayScript_61E1C		proc far
 
 var_3D2		= word ptr -3D2h
 var_3D0		= word ptr -3D0h
@@ -2252,7 +2264,7 @@ loc_61F5B:
 		push	di
 		lea	ax, [bp+var_3A]
 		push	ax
-		call	sub_9796
+		call	ConvRec_ReadNarration_9796
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_282]
@@ -2904,7 +2916,7 @@ loc_626AB:
 		push	di
 		lea	ax, [bp+var_3C2]
 		push	ax
-		call	sub_9642
+		call	ConvRec_ReadSpeaker_9642
 		add	sp, 4
 		push	3
 		mov	ax, word ptr [bp+var_62+2]
@@ -3456,7 +3468,7 @@ loc_62BBE:
 		push	di
 		lea	ax, [bp+var_35C]
 		push	ax
-		call	sub_9428
+		call	ConvRec_ReadLine_9428
 		add	sp, 4
 		lea	ax, [bp+var_34F]
 		mov	[bp+var_50], ax
@@ -3881,7 +3893,7 @@ loc_63077:
 		push	di
 		lea	ax, [bp+var_35C]
 		push	ax
-		call	sub_9428
+		call	ConvRec_ReadLine_9428
 		add	sp, 4
 		push	0
 		lea	ax, word ptr [bp+var_33D+1]
@@ -4135,7 +4147,7 @@ loc_63295:
 		push	di
 		lea	ax, [bp+var_82]
 		push	ax
-		call	sub_9868
+		call	ConvRec_ReadAcceptSkip_9868
 		add	sp, 4
 		push	0
 		lea	ax, word ptr [bp+var_33D+1]
@@ -8147,7 +8159,7 @@ loc_65C69:
 		push	di
 		lea	ax, word ptr [bp+var_40]
 		push	ax
-		call	sub_98A8
+		call	ConvRec_ReadJump_98A8
 		add	sp, 4
 		mov	si, [bp+var_3D]
 		add	[di+4], si
@@ -8211,9 +8223,9 @@ loc_65CD8:
 		pop	si
 		leave
 		retf
-sub_61E1C		endp
+Conv_PlayScript_61E1C		endp
 
-; START OF FUNCTION CHUNK FOR sub_61E1C
+; START OF FUNCTION CHUNK FOR Conv_PlayScript_61E1C
 		pop	di
 		pop	si
 		leave
@@ -8253,7 +8265,7 @@ off_65D39	dw offset loc_6221C
 		dw offset loc_64779
 		dw offset loc_6520C
 		dw offset loc_61EEC
-; END OF FUNCTION CHUNK FOR sub_61E1C
+; END OF FUNCTION CHUNK FOR Conv_PlayScript_61E1C
 
 ; ----------------------------------------------------------------------
 

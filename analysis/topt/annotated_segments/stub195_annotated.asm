@@ -175,7 +175,7 @@ sub_47B4F	endp
 ; Attributes: thunk
 
 sub_47B54	proc far
-		jmp	sub_61E1C
+		jmp	Conv_PlayScript_61E1C
 sub_47B54	endp
 		db 0, 0, 0, 0, 0, 0, 0
 stub195		ends

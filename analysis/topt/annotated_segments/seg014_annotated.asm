@@ -49,7 +49,13 @@ ConvRec_ReadName_93FF		endp
 
 ; Attributes: bp-based frame
 
-sub_9428		proc far
+; ==============================================================================================
+; far. Lecteur d'une réplique CLOSEUP (comme ConvRec_ReadLine_632E d'OPTEST) : visage (9),
+; image, décor (9), x, y, puis chaîne de voix → [rec+28], texte → [rec+26], couleur → [rec+30]
+; ; lit en plus, avant le texte, la chaîne de voix (même format que l'OPTTEST.EXE du CD,
+; CONV_SYSTEM.md § 8.1).
+; ==============================================================================================
+ConvRec_ReadLine_9428		proc far
 
 var_8		= byte ptr -8
 var_7		= byte ptr -7
@@ -225,7 +231,7 @@ loc_95B0:
 		pop	si
 		leave
 		retf
-sub_9428		endp
+ConvRec_ReadLine_9428		endp
 
 ; ----------------------------------------------------------------------
 
@@ -309,7 +315,12 @@ ConvRec_ReadExtra_95B8		endp
 
 ; Attributes: bp-based frame
 
-sub_9642		proc far
+; ==============================================================================================
+; far. Lecteur d'une réplique GROUP_SHOT_CHARACTER_TALK (comme ConvRec_ReadSpeaker_64EE
+; d'OPTEST) : chaîne de voix → [rec+19] ; lit en plus, avant le texte, la chaîne de voix (même
+; format que l'OPTTEST.EXE du CD, CONV_SYSTEM.md § 8.1).
+; ==============================================================================================
+ConvRec_ReadSpeaker_9642		proc far
 
 var_8		= byte ptr -8
 var_7		= byte ptr -7
@@ -449,13 +460,18 @@ loc_978A:
 		pop	si
 		leave
 		retf
-sub_9642		endp
+ConvRec_ReadSpeaker_9642		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_9796		proc far
+; ==============================================================================================
+; far. Lecteur de SHOW_TEXT (comme ConvRec_ReadNarration_65E8 d'OPTEST) : chaîne de voix →
+; [rec+6] ; lit en plus, avant le texte, la chaîne de voix (même format que l'OPTTEST.EXE du
+; CD, CONV_SYSTEM.md § 8.1).
+; ==============================================================================================
+ConvRec_ReadNarration_9796		proc far
 
 var_6		= word ptr -6
 var_4		= word ptr -4
@@ -544,13 +560,17 @@ loc_985C:
 		pop	si
 		leave
 		retf
-sub_9796		endp
+ConvRec_ReadNarration_9796		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_9868		proc far
+; ==============================================================================================
+; far. Identique (suite d'instructions) à ConvRec_ReadAcceptSkip_6660 d'OPTEST : mot de saut
+; de YESNOCHOICE_BRANCH1.
+; ==============================================================================================
+ConvRec_ReadAcceptSkip_9868		proc far
 
 var_2		= byte ptr -2
 var_1		= byte ptr -1
@@ -585,13 +605,17 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_9868		endp
+ConvRec_ReadAcceptSkip_9868		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_98A8		proc far
+; ==============================================================================================
+; far. Identique (suite d'instructions) à ConvRec_ReadJump_66A0 d'OPTEST : mot de saut de
+; YESNOCHOICE_BRANCH2.
+; ==============================================================================================
+ConvRec_ReadJump_98A8		proc far
 
 var_2		= byte ptr -2
 var_1		= byte ptr -1
@@ -626,7 +650,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_98A8		endp
+ConvRec_ReadJump_98A8		endp
 
 ; ----------------------------------------------------------------------
 

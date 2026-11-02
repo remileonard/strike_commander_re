@@ -110,8 +110,8 @@ presque noir de `to1mid1`. Ne s'applique à aucune cinématique reprise de Strik
 
 ## 6. Commandes des scripts de déroulement (`Gameflow_RunScriptPairs_63B9`)
 
-Interpréteur des scripts `EFCT` de `GAMEFLOW.IFF` et `GAMEFLO2.IFF` (la campagne de Tactical
-Operations). Comparé à `Gameflow_RunScriptPairs_36CF` d'OPTEST (`GAMEFLOW_SYSTEM.md` § 5.2 et § 8) :
+Interpréteur des scripts `EFCT`. La campagne de Tactical Operations est `GAMEFLO2.IFF` (fait donné
+par Rémi) ; `GAMEFLOW.IFF` est celui de Strike Commander. Comparé à `Gameflow_RunScriptPairs_36CF` d'OPTEST (`GAMEFLOW_SYSTEM.md` § 5.2 et § 8) :
 **46 commandes** (`cmp bx, 2Dh`), contre 39 sur la disquette de Strike Commander et 43 sur le CD.
 
 - **Les commandes de `PLAY_CONV` à `PLAY_GAMEFLOW_TUNE` font la même chose** que sur la disquette (relu
@@ -143,8 +143,8 @@ Operations). Comparé à `Gameflow_RunScriptPairs_36CF` d'OPTEST (`GAMEFLOW_SYST
 | 44 | `RESTORE_PILOT` (nom proposé) | 2 | remet le pilote n au tableau des victoires (`[+676 + n × 26]` = 1, n < 8) : inverse de `REMOVE_PILOT` |
 | 45 | `SHOW_KILL_MARKS_ALT` (nom proposé) | 16 | **second écran des marques de victoires** (`Gameflow_ShowKillMarksAlt_56D57`), même condition que `SHOW_KILL_MARKS` |
 
-`GAMEFLOW.IFF` de Tactical Operations est identique à celui de Strike Commander (aucune commande
-au-delà de 38). Les commandes 39 à 45 ne servent que dans `GAMEFLO2.IFF`.
+`GAMEFLOW.IFF` des données de Tactical Operations est identique à celui de Strike Commander (aucune
+commande au-delà de 38). Les commandes 39 à 45 servent dans `GAMEFLO2.IFF`.
 
 **Second écran d'armement (`WEAPON_LOADOUT_ALT`).** Même code que `WEAPON_LOADOUT`
 (`Gameflow_WeaponLoadout_584A6`), avec ses propres plages de points d'emport
@@ -183,7 +183,65 @@ ENDIF 0
 **Second écran des marques (`SHOW_KILL_MARKS_ALT`).** Même code que `Gameflow_ShowKillMarks_5638A`,
 avec en plus `GAMEFLOW\OPTSHPS2.PAK` et `GAMEFLOW\OPTPALS2.PAK` et d'autres entrées d'images.
 
-## 7. Outils et commandes
+## 7. Conversations (`Conv_PlayScript_61E1C`)
+
+Fichiers de la campagne : `CONV2.PAK`, `CONVDAT2.IFF`, `CONVSHP2.PAK` (noms dans l'exécutable : `conv2`,
+`convdat2`, `convshp2`). Référence de comparaison : **l'OPTTEST.EXE du CD** (`CONV_SYSTEM.md` § 8),
+pas la disquette.
+
+**Format des scripts : celui du CD.** Les lecteurs de répliques lisent une chaîne de voix avant
+chaque texte, toujours : `ConvRec_ReadLine_9428` (`CLOSEUP` et `CLOSEUP_CONTINUATION`),
+`ConvRec_ReadSpeaker_9642` (`GROUP_SHOT_CHARACTER_TALK`), `ConvRec_ReadNarration_9796` (`SHOW_TEXT`).
+`ConvRec_ReadAcceptSkip_9868` et `ConvRec_ReadJump_98A8` ne changent pas. `conv_dump.py` lit les 256
+entrées de `CONV2.PAK` sans erreur avec la voix.
+
+**Interpréteur** : même structure que celui du CD (pile de 962 octets, liste des voix ouverte au
+début, 19 commandes, `cmp bx, 12h`). Liste des voix : **`tovoclst.iff`** (CD : `voclist.iff`).
+
+| Valeur | Commande | Tactical Operations | `CONV2.PAK` |
+|---|---|---|---|
+| 14 | `SELECT_WING` | lit les escadres dans **`gameflo2.iff`** | 27 |
+| 15 | `CHOOSE_WINGMAN` | choix de l'équipier, **Ari à la place de Lyle** | 19 |
+| 16 | `CHOOSE_WINGMAN_NO_LYLE` (nom proposé) | choix de l'équipier **sans Lyle** (CD : sautée) | 2 (entrées 17, 18) |
+| 17 | `CHOOSE_WINGMAN_ORIGINAL` (nom proposé) | choix parmi les **cinq pilotes d'origine** (CD : n'existe pas) | 2 (entrées 5, 8) |
+| 18 | `NOP_18` | rien | 0 |
+
+Les autres commandes (0, 3, 10, 12) n'ont pas été comparées instruction par instruction : l'exécutable
+du CD n'est plus disponible, seulement ses listings partiels.
+
+**Pilotes** : la table des prénoms a un 6ᵉ nom, **Ari** (1 Billy, 2 Gwen, 3 Lyle, 4 Miguel, 5 Tex,
+6 Ari). `GAMEFLO2.IFF` a 6 escadres (1 à 6), et chaque `PILT` contient les 6 pilotes, celui de
+l'escadre en tête, par exemple escadre 1 = 1, 2, 4, 5, 6, 3. `p_wing` de `CONVDAT2.IFF` a un 7ᵉ élément,
+image 95 (`CONVSHP2.PAK`, dessinée à x 15 à 81, y 69 à 195 : l'emplacement de Lyle, image 84).
+
+**Les trois écrans de choix** ont le même code (zones de la souris, ouverture, fermeture : `CONV_SYSTEM.md`
+§ 2) ; seuls changent le tableau des pilotes proposés et les éléments de `p_wing` dessinés :
+
+| Commande | Pilotes proposés | Éléments de `p_wing` dessinés | Zone à l'emplacement de Lyle |
+|---|---|---|---|
+| 15 | ceux de `PILT` (tableau de 7) | 1 et 2 si pilote 1, 2 proposé ; **3 jamais** ; 4, 5, 6 si pilote 3, 4, 5 proposé | « Select Ari », pilote **6** |
+| 16 | ceux de `PILT` (tableau de 6), puis retrait du 6ᵉ pilote de `PILT` et de Lyle (3) | 1 à 5 si proposé | « Select Lyle » (jamais proposé) |
+| 17 | ceux de `PILT` (tableau de 6) | 1 à 5 si proposé | « Select Lyle », pilote 3 |
+
+Code de la commande 15 (éléments 4 à 6 : test du pilote `si − 1`) :
+
+```
+cmp si, 3
+jl  short loc_63E07
+mov si, 4
+...
+cmp byte ptr [bp+si+var_4A+1], 0      ; [bp+si-49h] : pilote si - 1
+```
+
+Avec les données, chaque escadre propose les 6 pilotes : la commande 15 dessine Billy, Gwen, Miguel,
+Tex et Ari (à la place de Lyle) ; la commande 16 dessine Billy, Gwen, Miguel et Tex ; la commande 17
+Billy, Gwen, Lyle, Miguel et Tex. Le pilote choisi donne le nom `$W` (6 → « Ari »).
+
+Dans les données : la commande 16 suit la mort de Lyle (entrée 17 : « We are going to have to postpone
+the funeral services for Lyle. ») ; la commande 17 sert dans les entrées 5 (« The vacation is over »,
+Lyle parmi les figurants) et 8.
+
+## 8. Outils et commandes
 
 ```
 python3 tools/vroomm_listing.py TOPTTST1.EXE source/topttst1.asm
