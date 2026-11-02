@@ -27,6 +27,8 @@ sont propres à ce listing.
 
 Une par overlay, 14 overlays consécutifs (`mid1` en deux parties). Fichiers : pseudo-code
 `midgames/<nom>.md`, arbre `midgames/<nom>.json`, fichier ANIM `midgames/iff/`.
+Rendus de référence (GIF, `midgame_render.py`) des cinématiques nouvelles et de `mid14` :
+`midgames/renders/`.
 
 | Cinématique | Fonction | Segment | Scènes | Fichier IFF | Comparaison avec OPTEST |
 |---|---|---|---|---|---|
