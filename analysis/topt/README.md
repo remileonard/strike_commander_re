@@ -237,6 +237,11 @@ Avec les données, chaque escadre propose les 6 pilotes : la commande 15 dessine
 Tex et Ari (à la place de Lyle) ; la commande 16 dessine Billy, Gwen, Miguel et Tex ; la commande 17
 Billy, Gwen, Lyle, Miguel et Tex. Le pilote choisi donne le nom `$W` (6 → « Ari »).
 
+Images : `conv_images/to_wing_15.png`, `to_wing_16.png`, `to_wing_17.png` (écran sans pilote survolé,
+puis chaque pilote survolé), produites par `tools/conv_wing_to.py --donnees <DATA> <dossier>`. Une image
+de numéro supérieur à 92 est lue dans `CONVSHP2.PAK`, les autres dans `CONVSHPS.PAK` (`cmp [bp+var_2],
+5Ch` puis `jbe`) : l'image 95 d'Ari n'est que dans `CONVSHP2.PAK`.
+
 Dans les données : la commande 16 suit la mort de Lyle (entrée 17 : « We are going to have to postpone
 the funeral services for Lyle. ») ; la commande 17 sert dans les entrées 5 (« The vacation is over »,
 Lyle parmi les figurants) et 8.
