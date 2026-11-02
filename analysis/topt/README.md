@@ -30,9 +30,9 @@ Une par overlay, 14 overlays consécutifs (`mid1` en deux parties). Fichiers : p
 
 | Cinématique | Fonction | Segment | Scènes | Fichier IFF | Comparaison avec OPTEST |
 |---|---|---|---|---|---|
-| `mid1` | `Midgame1_PlayPart1_69270` puis `Midgame1_PlayPart2_70290` | `ovr200`, `ovr201` | 23 | `MID_1.IFF`, 40 912 octets | identique |
-| `to1mid1` | `MidgameTO1_Play_74C00` | `ovr202` | 12 | `TO1MID1.IFF`, 7 402 octets | nouvelle |
-| `to1mid2` | `MidgameTO2_Play_7ACD0` | `ovr203` | 4 | pas de fichier (§ 4) | nouvelle |
+| `mid1` | `Midgame1_PlayPart1_69270` puis `Midgame1_PlayPart2_70290` | `ovr200`, `ovr201` | 23 | `MID_1.IFF`, 68 998 octets | identique |
+| `to1mid1` | `MidgameTO1_Play_74C00` | `ovr202` | 12 | `TO1MID1.IFF`, 13 014 octets | nouvelle |
+| `to1mid2` | `MidgameTO2_Play_7ACD0` | `ovr203` | 4 | `TO1MID2.IFF`, 7 952 octets | nouvelle (§ 4) |
 | `to1mid3` | `MidgameTO3_Play_7C1D0` | `ovr204` | 1 | `TO1MID3.IFF`, 1 008 octets | nouvelle |
 | `mid12` | `Midgame12_Play_7CCD0` | `ovr205` | 19 | `MID_12.IFF`, 11 840 octets | identique |
 | `mid14` | `Midgame14_Play_829F0` | `ovr206` | 5 | `MID_14.IFF`, 6 272 octets | pas extraite d'OPTEST |
@@ -48,7 +48,13 @@ Une par overlay, 14 overlays consécutifs (`mid1` en deux parties). Fichiers : p
 produit depuis OPTEST.EXE (mêmes données, données de Tactical Operations par-dessus celles de Strike
 Commander). Le contenu de ces cinématiques n'a donc pas changé ; leur code, si (§ 3). Pour `mid1`,
 OPTEST demandait `--remplace pri=air` (exécutable modifié à la main) : `TOPTTST1.EXE` contient
-directement « air ».
+directement « air ». `MID_1.IFF` n'est plus identique octet pour octet depuis la correction faite pour
+`to1mid2` (un calque dont la ressource change est coupé en deux) : 0 instant différent sur 5 629 au
+contrôle, avec l'ancien comme avec le nouveau fichier.
+
+Contrôle par `tools/midgame_check.py` (fichier relu avec les règles du lecteur de libRealSpace, comparé
+au rendu de référence) : 0 instant différent pour `to1mid1`, `to1mid2` (741 instants), `to1mid3`,
+`mid14` et `mid1`.
 
 `mid2`, `mid3` et `mid5` ne sont pas dans cet exécutable.
 
@@ -65,23 +71,44 @@ pseudo-codes :
 - `VoicePlayer_IsPlaying` existe en deux copies identiques (`VoicePlayer_IsPlaying_C83C` et
   `VoicePlayer_IsPlaying_CEB0`) ; `to1mid1` utilise la seconde.
 
-## 4. Points ouverts
+## 4. `to1mid2` : images lues à la main dans `OBJECTS\EJECT.PAK`
 
-- **`to1mid2`** (générique de fin, « THE END », `credits`) : la cinématique ouvre elle-même
-  `OBJECTS\EJECT.PAK`, se place sur une entrée (`IndexedRecordReader_AdvanceIndex_436B6`), alloue un
-  tampon et y lit l'image (`sub_43519`), sans passer par la fonction de ressources du moteur.
-  L'extracteur ne sait pas quelles images sont dessinées (`données(v48)`) : pas de fichier IFF. Ordre
-  lu dans le pseudo-code : entrée 2 en plein écran, puis entrées 0 à 4 avec une attente entre chaque,
-  puis entrées 5 à 7.
-- **`to1mid1`** : aucune réplique n'est jouée dans le rejeu, alors que le jeu a un `TOMIDVOC.PAK` ;
-  les premières images du rendu sont presque noires. À vérifier.
+Déroulement : avion au-dessus des collines (`to1mid2 0`), éclair et collines rougeoyantes
+(`to1mid2 2`), premier diaporama d'`EJECT.PAK` sur le fond `to1mid2 6` (entrées 5, 6, 7 : verrière,
+mains du pilote sur les poignées d'éjection), second diaporama sur le fond `to1mid2 7` (entrée 2,
+casque du pilote, puis entrées 0 à 4), chute et explosion de l'avion (`to1mid2 4`), écran du générique.
+
+Les images d'`EJECT.PAK` ne passent pas par la fonction de ressources du moteur :
+`Path_BuildWithFolder_11166` (« OBJECTS », « EJECT », « .PAK »), ouverture du PAK, allocation d'un
+tampon, puis `IndexedRecordReader_ReadEntryInto_43519` (lecteur, entrée, tampon). `midgame_iff.py`
+relève le dossier et le nom du PAK, puis l'entrée lue dans chaque tampon ; le fichier ANIM désigne ces
+images par `..\..\DATA\OBJECTS\EJECT.PAK`. Entre deux images du premier diaporama,
+`Surface_SaveRect_392F6` et `Surface_RestoreRect_38CDA` remettent le fond (sens déduit de l'ordre des
+appels).
+
+Entrées 0 à 4 d'`EJECT.PAK` : l'octet de poids fort des positions d'images vaut 193.
+`Shape_DrawSpans_38514` ne compare que le mot bas (`cmp [si+4], bx`) : cet octet est ignoré
+(`sc_data.py`).
+
+**Animations par différences** (`to1mid2 0`, `to1mid2 2`, `to1mid1 2`) : image 0 complète, images
+suivantes réduites aux pixels qui changent. Le moteur n'efface pas l'image hors écran entre deux pas de
+scène ; le format ANIM, si. Pour une telle animation dessinée en premier dans sa scène,
+`midgame_iff.py` écrit à l'image k les images 0 à k dans l'ordre. C'est ce qui corrige aussi le début
+presque noir de `to1mid1`. Ne s'applique à aucune cinématique reprise de Strike Commander.
+
+## 5. Points ouverts
+
+- **Générique de `to1mid2`** : texte littéral du segment de données pas écrit dans le fichier (comme
+  « THE END » de `mid33`) ; écran tenu 300 tics de 60 Hz.
+- **`to1mid1`** : aucune réplique n'est jouée dans le rejeu, alors que le jeu a un `TOMIDVOC.PAK`. À
+  vérifier.
 - **`mid14`** : un test d'état de séquence sonore (effets sonores seuls) est pris « séquence terminée »
   par `midgame_iff.py`, faute de son simulé.
 - 3 fonctions du catalogue du moteur ne sont pas portées (`CRT_MemFamily_Extra1`,
   `MovingMaskLayer_Construct_B995`, `Struct_GetElementCountMinusOne_33352`) : aucun appel aligné, elles
   ne servent pas dans les cinématiques ci-dessus.
 
-## 5. Outils et commandes
+## 6. Outils et commandes
 
 ```
 python3 tools/vroomm_listing.py TOPTTST1.EXE source/topttst1.asm
@@ -115,7 +142,11 @@ python3 tools/midgame_render.py --donnees <DATA> --exe topt --nom to1mid1 --film
   `byte_4F55C` ; `sub_6734` → `sub_993C` : fichier présent).
 - `tools/midgame_extract.py` : un `switch` par table devient une suite de sauts conditionnels.
 - `tools/midgame_iff.py` : PAK de musiques `mmusic` ; état de séquence sonore inconnu pris terminé
-  (`mid14`) ; état de lecture d'un PAK pris sans erreur (`to1mid2`).
+  (`mid14`) ; pour `to1mid2` : état de lecture d'un PAK pris sans erreur, PAK et entrées lus à la main,
+  sauvegarde et restauration de l'écran, dessins directs visibles pendant une attente ; animations par
+  différences ; calque coupé quand sa ressource change ; nom unique d'un dessin direct déjà affiché.
+- `tools/midgame_extract.py` (suite) : une scène dont la zone de pile chevauche une autre est reprise
+  de la 1re passe (`to1mid2`, scène 4).
 - `tools/midgame_render.py` : option `--exe`.
 
 Correction au passage dans le catalogue d'OPTEST : `Render_MeasureOrDrawTextString_32CD8` y portait

@@ -1307,7 +1307,7 @@ loc_C43E:
 		push	di
 		lea	ax, [bp+var_80]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	2
 		lea	ax, [bp+var_80]
@@ -2172,7 +2172,7 @@ loc_CB26:
 		push	di
 		lea	ax, [bp+var_80]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	2
 		lea	ax, [bp+var_80]

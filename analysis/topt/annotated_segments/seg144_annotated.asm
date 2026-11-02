@@ -7,7 +7,15 @@ seg144		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_392F6		proc far
+; ==============================================================================================
+; far, lue en partie 2026-11-02. Arguments : surface (to1mid2 : word_4D36E), tampon lointain,
+; rectangle (4 mots : gauche, haut, droite, bas, lus mov cx, [si] / mov ax, [si+4] …). Calcule
+; largeur et hauteur du rectangle, le borne à la surface ([bx+4], [bx+6], [bx+8], [bx+0Ah]) et
+; copie entre la surface et le tampon. Sens (surface -> tampon) déduit de l'ordre des appels
+; dans to1mid2 : appelée une fois avant le premier dessin, Surface_RestoreRect_38CDA entre
+; deux dessins.
+; ==============================================================================================
+Surface_SaveRect_392F6		proc far
 
 var_12		= word ptr -12h
 var_10		= word ptr -10h
@@ -127,5 +135,5 @@ loc_393B0:
 
 loc_393CF:
 		pop	ds
-sub_392F6		endp
+Surface_SaveRect_392F6		endp
 seg144		ends

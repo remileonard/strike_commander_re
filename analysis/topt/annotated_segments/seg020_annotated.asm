@@ -85,7 +85,7 @@ arg_C		= byte ptr  12h
 		push	offset aSOUND
 		lea	ax, [bp+var_116]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		and	byte ptr [si+79h], 0FDh
 		mov	al, [bp+arg_C]
@@ -159,7 +159,7 @@ loc_AEA8:
 		push	0
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	[bp+var_E]
 		push	[bp+var_10]
@@ -355,7 +355,7 @@ loc_B096:
 		push	offset aSOUND
 		lea	ax, [bp+var_166]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_166]
@@ -436,7 +436,7 @@ loc_B131:
 		push	1
 		lea	ax, [bp+var_B8]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		mov	[bp+var_170], 1B4h
 		mov	ax, word_4D392

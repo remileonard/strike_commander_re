@@ -116,7 +116,7 @@ loc_5C655:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		mov	ax, [bp+var_6]
 		jmp	short loc_5C76E
@@ -166,7 +166,7 @@ arg_0		= word ptr  6
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		push	0
 		push	word ptr [si+2]

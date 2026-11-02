@@ -127,7 +127,7 @@ loc_684DF:
 		push	offset aSOUND
 		lea	ax, [bp+var_6E]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_6E]
@@ -230,7 +230,7 @@ loc_685F1:
 		push	offset aSOUND
 		lea	ax, [bp+var_6E]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_6E]
@@ -709,7 +709,7 @@ loc_68A7A:
 		push	ax
 		push	[bp+var_4]
 		push	[bp+arg_4]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	0
 		push	di
@@ -867,7 +867,7 @@ loc_68BF0:
 		push	ax
 		push	[bp+var_4]
 		push	[bp+arg_4]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	0
 		push	di
@@ -1057,7 +1057,7 @@ loc_68DB6:
 		push	[bp+var_A]
 		lea	ax, [bp+var_8E]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		push	0
 		push	di

@@ -41,7 +41,7 @@ arg_0		= word ptr  6
 		push	offset aMISSIONS
 		lea	ax, [bp+var_F8]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	large 444C5257h
 		lea	ax, [bp+var_F8]

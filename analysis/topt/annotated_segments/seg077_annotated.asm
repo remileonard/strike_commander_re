@@ -121,7 +121,7 @@ loc_2E798:
 		push	ax
 		push	[bp+arg_4]
 		push	di
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 
 loc_2E7C8:

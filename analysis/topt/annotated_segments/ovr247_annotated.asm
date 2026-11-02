@@ -383,7 +383,7 @@ arg_2		= word ptr  8
 		push	offset aCOCKPITS
 		lea	ax, [bp+var_54]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_FC]
 		push	ax

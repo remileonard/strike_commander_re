@@ -184,7 +184,7 @@ arg_2		= word ptr  8
 		push	offset aPALETTE
 		lea	ax, [bp+var_50]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_F8]
 		push	ax
@@ -919,7 +919,7 @@ arg_2		= word ptr  8
 		push	offset aPALETTE
 		lea	ax, [bp+var_50]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_F8]
 		push	ax

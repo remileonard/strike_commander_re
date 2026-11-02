@@ -402,7 +402,7 @@ loc_7453:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B4]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4
@@ -466,7 +466,7 @@ loc_7505:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B4]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4
@@ -542,7 +542,7 @@ loc_75B8:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_B4]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		mov	ax, di
 		add	ax, 4

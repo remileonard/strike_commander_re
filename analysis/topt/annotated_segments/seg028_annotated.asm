@@ -201,7 +201,12 @@ Path_Build_11125		endp
 
 ; Attributes: bp-based frame
 
-sub_11166		proc far
+; ==============================================================================================
+; far, cinématique to1mid2 : construit un chemin à partir d'un dossier, d'un nom et d'une
+; extension (to1mid2 : "OBJECTS", "EJECT", ".PAK"), avant l'ouverture du PAK par la méthode
+; +20 du lecteur. Corps non lu en détail.
+; ==============================================================================================
+Path_BuildWithFolder_11166		proc far
 
 var_42		= word ptr -42h
 arg_0		= word ptr  6
@@ -262,9 +267,9 @@ loc_111D2:
 		push	[bp+arg_8]
 		push	[bp+arg_6]
 		push	ss
-sub_11166		endp
+Path_BuildWithFolder_11166		endp
 
-; START OF FUNCTION CHUNK FOR sub_11166
+; START OF FUNCTION CHUNK FOR Path_BuildWithFolder_11166
 		db 8Dh
-; END OF FUNCTION CHUNK FOR sub_11166
+; END OF FUNCTION CHUNK FOR Path_BuildWithFolder_11166
 seg028		ends

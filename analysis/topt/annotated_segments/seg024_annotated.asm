@@ -713,7 +713,7 @@ loc_D8A9:
 		push	[bp+arg_4]
 		lea	ax, [bp+var_86]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 
 loc_D931:

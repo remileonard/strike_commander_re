@@ -3164,7 +3164,7 @@ loc_12FCA:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		jmp	short loc_12FF6
 
@@ -3227,7 +3227,7 @@ loc_1306A:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		jmp	short loc_13096
 
@@ -3331,7 +3331,7 @@ loc_1311C:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		cmp	byte ptr [si+4Ah], 0
 		jz	short loc_13168
@@ -3385,7 +3385,7 @@ loc_131B6:
 		push	word ptr [bp+var_4+2]
 		push	word ptr [bp+var_4]
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		cmp	byte ptr [si+4Ah], 0
 		jz	short loc_131EF

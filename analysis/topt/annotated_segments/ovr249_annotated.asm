@@ -177,7 +177,7 @@ loc_BFC4E:
 		push	ax
 		push	[bp+var_6]
 		push	[bp+arg_2]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		jmp	short loc_BFCCF
 

@@ -567,6 +567,6 @@ loc_10E2F:
 		push	ax
 		push	[bp+arg_2]
 		push	di
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 Pak_LoadEntry_10D03		endp
 seg026		ends

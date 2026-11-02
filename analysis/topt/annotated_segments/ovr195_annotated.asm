@@ -484,7 +484,7 @@ loc_61195:
 		push	ax
 		lea	ax, [bp+var_D6]
 		push	ax
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		mov	eax, [bp+var_8]
 		mov	[bp+var_C], eax

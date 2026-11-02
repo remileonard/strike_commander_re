@@ -89,7 +89,7 @@ loc_BA515:
 		push	offset aOBJECTS_3
 		lea	ax, [bp+var_11E]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_11E]

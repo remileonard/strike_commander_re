@@ -540,7 +540,7 @@ loc_7B1BB:
 		push	ds
 		push	offset aOBJECTS
 		push	word ptr [bp+var_30+2]
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		push	word ptr [bp+var_30+2]
@@ -675,7 +675,7 @@ loc_7B2F6:
 		add	ax, 5
 		push	ax
 		push	[bp+var_2C]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		inc	di
 
@@ -747,7 +747,7 @@ loc_7B345:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		push	0
 		push	0
@@ -786,7 +786,7 @@ loc_7B345:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		push	0
 		push	0
@@ -825,7 +825,7 @@ loc_7B345:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		push	0
 		push	0
@@ -970,7 +970,7 @@ loc_7B69C:
 		push	ds
 		push	offset aOBJECTS_1
 		push	[bp+var_16]
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		push	[bp+var_16]
@@ -1000,7 +1000,7 @@ loc_7B6E2:
 		push	ds
 		push	offset aOBJECTS_2
 		push	word ptr [bp+var_1A]
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		push	word ptr [bp+var_1A]
@@ -1074,7 +1074,7 @@ loc_7B77F:
 		push	ax
 		push	2
 		push	word ptr [bp+var_14+2]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 
 loc_7B7EB:
@@ -1204,7 +1204,7 @@ loc_7B8E9:
 		push	ax
 		push	di
 		push	word ptr [bp+var_14]
-		call	sub_43519
+		call	IndexedRecordReader_ReadEntryInto_43519
 		add	sp, 8
 		inc	di
 

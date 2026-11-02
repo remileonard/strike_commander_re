@@ -2098,7 +2098,7 @@ var_4		= dword ptr -4
 		push	offset aFONTS
 		lea	ax, [bp+var_EA]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_150]
 		push	ax

@@ -780,7 +780,7 @@ loc_BADF9:
 		push	offset aTXM_1
 		lea	ax, [bp+var_52]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		push	1
 		lea	ax, [bp+var_52]

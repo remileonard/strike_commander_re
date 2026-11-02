@@ -336,7 +336,7 @@ loc_118B4:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		push	0
 		push	[bp+var_C]
@@ -394,7 +394,7 @@ loc_11A0F:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		mov	al, [bp+var_3]
 		push	ax

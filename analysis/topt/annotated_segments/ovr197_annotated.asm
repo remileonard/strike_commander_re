@@ -179,7 +179,7 @@ loc_6766D:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_392F6
+		call	Surface_SaveRect_392F6
 		add	sp, 8
 		push	0
 		push	word_4D36E
@@ -200,7 +200,7 @@ loc_6766D:
 		push	offset aFONTS
 		lea	ax, [bp+var_10E]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_174]
 		push	ax
@@ -630,7 +630,7 @@ loc_67B9A:
 		push	dx
 		push	ax
 		push	word_4D36E
-		call	sub_38CDA
+		call	Surface_RestoreRect_38CDA
 		add	sp, 8
 		call	sub_2D9AA
 		cmp	[bp+var_1F], 0
@@ -807,7 +807,7 @@ loc_67D34:
 		push	0
 		lea	ax, [bp+var_76]
 		push	ax
-		call	sub_11166
+		call	Path_BuildWithFolder_11166
 		add	sp, 0Eh
 		lea	ax, [bp+var_DC]
 		push	ax

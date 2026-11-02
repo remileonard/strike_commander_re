@@ -10,7 +10,13 @@ loc_38CD4:
 
 ; Attributes: bp-based frame
 
-sub_38CDA		proc far
+; ==============================================================================================
+; far, lue en partie 2026-11-02. Mêmes arguments que Surface_SaveRect_392F6 (surface, tampon
+; lointain, rectangle). Sens (tampon -> surface) déduit de l'ordre des appels dans to1mid2 :
+; appelée entre deux images du diaporama, après Surface_SaveRect_392F6, pour remettre le fond
+; avant l'image suivante.
+; ==============================================================================================
+Surface_RestoreRect_38CDA		proc far
 
 var_12		= word ptr -12h
 var_10		= word ptr -10h
@@ -137,9 +143,9 @@ loc_38DBA:
 		pop	si
 		leave
 		retf
-sub_38CDA		endp
+Surface_RestoreRect_38CDA		endp
 
-; START OF FUNCTION CHUNK FOR sub_38CDA
+; START OF FUNCTION CHUNK FOR Surface_RestoreRect_38CDA
 		db 0
-; END OF FUNCTION CHUNK FOR sub_38CDA
+; END OF FUNCTION CHUNK FOR Surface_RestoreRect_38CDA
 seg141		ends

@@ -393,7 +393,16 @@ sub_43468		endp
 
 ; Attributes: bp-based frame
 
-sub_43519		proc far
+; ==============================================================================================
+; far, lue 2026-11-02 (cinématique to1mid2). Arguments : lecteur de PAK, numéro d'entrée,
+; tampon (pointeur lointain). Tampon nul : erreur 1D01h (sub_300C1). Numéro différent de 65535
+; : se place sur l'entrée (call near ptr sub_436B6 = IndexedRecordReader_AdvanceIndex_436B6),
+; arrêt si échec. Puis selon les bits 64 et 128 du champ +109 du lecteur (mov ax, [si+6Dh] /
+; and ax, 0C0h) : 0 -> lecture directe (sub_43468, taille [si+65h] + 4) ; 192 -> sub_4148D
+; (taille [si+65h], [si+61h]) ; autre valeur -> erreur 1D00h. Utilisée par to1mid2 pour lire
+; les images de OBJECTS\EJECT.PAK dans des tampons alloués par la cinématique.
+; ==============================================================================================
+IndexedRecordReader_ReadEntryInto_43519		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -461,7 +470,7 @@ loc_43594:
 		pop	si
 		pop	bp
 		retf
-sub_43519		endp
+IndexedRecordReader_ReadEntryInto_43519		endp
 
 ; ----------------------------------------------------------------------
 
