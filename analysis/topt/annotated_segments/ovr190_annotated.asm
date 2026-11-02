@@ -419,7 +419,7 @@ loc_54645:
 		push	0
 		lea	ax, [bp+var_1FE]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		or	di, di
 		jnz	short loc_546C8
@@ -2298,7 +2298,7 @@ loc_558FA:
 		push	0
 		push	0
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2314,7 +2314,7 @@ loc_558FA:
 		push	0
 		push	0
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2330,7 +2330,7 @@ loc_558FA:
 		push	0
 		push	0
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		lea	ax, [bp+var_39E]
 		push	ax

@@ -507,7 +507,7 @@ loc_7B0BB:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		call	IndexedRecordReader_ConstructVariantA_4331C
@@ -758,7 +758,7 @@ loc_7B345:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_5E], 8
 		mov	eax, dword_4DE15
@@ -797,7 +797,7 @@ loc_7B345:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_5E], 8
 		mov	eax, dword_4DE15
@@ -836,7 +836,7 @@ loc_7B345:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_5E], 2Dh
 		mov	eax, dword_4DE15
@@ -1226,7 +1226,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -1243,7 +1243,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 6
 		mov	eax, dword_4DE15
@@ -1267,7 +1267,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 6
 		mov	eax, dword_4DE15
@@ -1291,7 +1291,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 6
 		mov	eax, dword_4DE15
@@ -1315,7 +1315,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 6
 		mov	eax, dword_4DE15
@@ -1339,7 +1339,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 6
 		mov	eax, dword_4DE15
@@ -1363,7 +1363,7 @@ loc_7B933:
 		push	0
 		lea	ax, [bp+var_74]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_46], 23h
 		mov	eax, dword_4DE15

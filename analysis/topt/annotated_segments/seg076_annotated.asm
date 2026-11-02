@@ -67,7 +67,7 @@ arg_A		= byte ptr  10h
 		push	4
 		push	5
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_2DD4A:
@@ -77,7 +77,7 @@ loc_2DD4A:
 		push	27h
 		push	5
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	di
 		call	sub_143FC
@@ -458,7 +458,7 @@ loc_2E03E:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+var_2]
 		shl	ax, 1
@@ -470,7 +470,7 @@ loc_2E03E:
 		push	0A2h
 		push	32h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_2E08E
 
@@ -521,7 +521,7 @@ loc_2E0CD:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+var_2]
 		shl	ax, 1
@@ -533,7 +533,7 @@ loc_2E0CD:
 		push	0A2h
 		push	2Dh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_2E122
 
@@ -571,7 +571,7 @@ loc_2E148:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+var_2]
 		shl	ax, 1
@@ -583,7 +583,7 @@ loc_2E148:
 		push	0A2h
 		push	3Bh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_2E19D
 
@@ -663,7 +663,7 @@ loc_2E242:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	31h
 		push	[bp+arg_2]
@@ -671,7 +671,7 @@ loc_2E242:
 		push	0A2h
 		push	1Fh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn

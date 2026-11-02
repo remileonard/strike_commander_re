@@ -1687,7 +1687,7 @@ arg_10		= byte ptr  16h
 		pop	di
 		pop	si
 		pop	bp
-		jmp	sub_38514
+		jmp	Shape_DrawSpans_38514
 
 loc_3F2D3:
 		mov	ax, ds

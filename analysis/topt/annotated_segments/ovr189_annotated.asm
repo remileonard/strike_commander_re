@@ -1051,7 +1051,7 @@ loc_527CE:
 		mov	ax, si
 		add	ax, 0BFh
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_2], 52h
 		cmp	word ptr [si+79h], 0
@@ -1080,7 +1080,7 @@ loc_5281A:
 		push	[bp+var_2]
 		push	5Dh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5284F:
@@ -1118,7 +1118,7 @@ loc_52875:
 		mov	ax, si
 		add	ax, 0A3h
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	word_4BD04
 		push	0
@@ -1163,7 +1163,7 @@ loc_528DE:
 		mov	ax, si
 		add	ax, 0B1h
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	word ptr [si+97h]
 		mov	bx, [si+97h]
@@ -1309,7 +1309,7 @@ loc_52982:
 		mov	ax, si
 		add	ax, 0BFh
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	di, 52h
 		cmp	word ptr [si+79h], 0
@@ -1338,7 +1338,7 @@ loc_529DD:
 		push	di
 		push	5Dh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_52A10:
@@ -1362,7 +1362,7 @@ loc_52A10:
 		push	24h
 		push	72h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_52A4B:
@@ -1400,7 +1400,7 @@ loc_52A76:
 		mov	ax, si
 		add	ax, 0A3h
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	word_4BD04
 		push	0
@@ -1445,7 +1445,7 @@ loc_52AE2:
 		mov	ax, si
 		add	ax, 0B1h
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	word ptr [si+97h]
 		mov	bx, [si+97h]
@@ -1862,7 +1862,7 @@ loc_52F19:
 		push	60h
 		push	77h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_52F68:

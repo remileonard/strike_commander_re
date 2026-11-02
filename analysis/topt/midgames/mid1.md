@@ -220,8 +220,8 @@ iff_ferme_form(flux=flux1)                                                      
 v178 = 0                                                                                              ⟨204393⟩
 palette_remplit(palette=pal1, couleur=&v178, premier=0, nombre=256)                                   ⟨204402⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨204410⟩
-sub_38514(&v454, 0, 24, données(optshps 116.+0), 0)                                                   ⟨204427⟩
-sub_38514(&v454, 0, 24, données(midgames 20.+0), 0)                                                   ⟨204444⟩
+dessine_image(surface=surface1, x=0, y=24, données=données(optshps 116.+0), image=0)                  ⟨204427⟩
+dessine_image(surface=surface1, x=0, y=24, données=données(midgames 20.+0), image=0)                  ⟨204444⟩
 vide_entrées()                                                                                        ⟨204446⟩
 v3820 = v76                                                                                           ⟨204452⟩
 v3818 = 152                                                                                           ⟨204454⟩
@@ -235,7 +235,7 @@ charge(mid1 48)                                                                 
 palette_depuis(pal7(mid1 48))                                                                         ⟨204492⟩
 
 ──── scène1 ────
-scène1 = Scene_Create(cadence=10, palette=255, surface=&v454)                                         ⟨204500⟩
+scène1 = Scene_Create(cadence=10, palette=255, surface=surface1)                                      ⟨204500⟩
 si v30 != 0 :
     si canal2.+0 != 0 :
         AIL_start_sequence(pilote=canal2.+0→4, séquence=v1422)                                        ⟨204509⟩
@@ -365,8 +365,8 @@ tant que di < 4 :
             v369 = 1                                                                                  ⟨205577⟩
             aller à loc_6AFE6                                                                         ⟨205578⟩
         v416 = 3                                                                                      ⟨205581⟩
-        sub_38514(&v468, 0, 0, données(optshps 116.+0), 0)                                            ⟨205599⟩
-        sub_38514(&v468, 0, 0, données(midgames 20.+0), 0)                                            ⟨205616⟩
+        dessine_image(surface=surface2, x=0, y=0, données=données(optshps 116.+0), image=0)           ⟨205599⟩
+        dessine_image(surface=surface2, x=0, y=0, données=données(midgames 20.+0), image=0)           ⟨205616⟩
         v424 = données(mid1voc 9.+0) + (si·4096)                                                      ⟨205630⟩
         v917 = v424                                                                                   ⟨205632⟩
         v913 = 239                                                                                    ⟨205633⟩
@@ -425,8 +425,8 @@ tant que di < 4 :
             v369 = 1                                                                                  ⟨206053⟩
             aller à loc_6B591                                                                         ⟨206054⟩
         v416 = 3                                                                                      ⟨206057⟩
-        sub_38514(pal8, 0, 0, données(optshps 116.+0), 0)                                             ⟨206075⟩
-        sub_38514(pal8, 0, 0, données(midgames 20.+0), 0)                                             ⟨206092⟩
+        dessine_image(surface=surface3, x=0, y=0, données=données(optshps 116.+0), image=0)           ⟨206075⟩
+        dessine_image(surface=surface3, x=0, y=0, données=données(midgames 20.+0), image=0)           ⟨206092⟩
         v434 = données(mid1voc 9.+0) + (si·4096)                                                      ⟨206106⟩
         v917 = v434                                                                                   ⟨206108⟩
         v913 = 239                                                                                    ⟨206109⟩
@@ -437,14 +437,14 @@ tant que di < 4 :
             ax = 50                                                                                   ⟨206117⟩
         v440 = ax                                                                                     ⟨206120⟩
         texte_formaté(zone=zone1, format=9474, a=2, b=v440, c=textes2[0] + (textes2.+0·di))           ⟨206131⟩
-        présente(source=pal8, destination=pal9)                                                       ⟨206137⟩
+        présente(source=pal10, destination=pal9)                                                      ⟨206137⟩
         attend(chronomètre=objet2)                                                                    ⟨206141⟩
         si = si - 1                                                                                   ⟨206143⟩
     loc_6B591:                                                                                        ⟨206150⟩
     si v369 != 0 : aller à loc_6B64A                                                                  ⟨206152⟩
-    sub_38514(pal8, 0, 0, données(optshps 116.+0), 0)                                                 ⟨206171⟩
-    sub_38514(pal8, 0, 0, données(midgames 20.+0), 0)                                                 ⟨206188⟩
-    présente(source=pal8, destination=pal9)                                                           ⟨206194⟩
+    dessine_image(surface=surface4, x=0, y=0, données=données(optshps 116.+0), image=0)               ⟨206171⟩
+    dessine_image(surface=pal11, x=0, y=0, données=données(midgames 20.+0), image=0)                  ⟨206188⟩
+    présente(source=pal11, destination=pal9)                                                          ⟨206194⟩
     v426 = 100                                                                                        ⟨206196⟩
     si di == 1 :
         v426 = 250                                                                                    ⟨206199⟩
@@ -596,13 +596,13 @@ charge(mid1 26)                                                                 
 charge(mid1 11)                                                                                       ⟨207337⟩
 charge(mid1 12)                                                                                       ⟨207349⟩
 charge(mid1 42)                                                                                       ⟨207361⟩
-palette_depuis(pal10(mid1 42))                                                                        ⟨207368⟩
+palette_depuis(pal12(mid1 42))                                                                        ⟨207368⟩
 
 ──── scène2 ────
 scène2 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨207386⟩
 v338 = 0                                                                                              ⟨207391⟩
 charge(mid1 54)                                                                                       ⟨207398⟩
-palette_depuis(pal11(mid1 54))                                                                        ⟨207405⟩
+palette_depuis(pal13(mid1 54))                                                                        ⟨207405⟩
 c9 = Layer(ressource=optshps 116, x=0, y=-24)                                                         ⟨207412⟩
 ajoute c9 à scène2                                                                                    ⟨207418⟩
 charge(mid1 20)                                                                                       ⟨207430⟩
@@ -647,8 +647,8 @@ c22 = ImageLayer(ressource=mid1 11, x=140, y=63, image=27)                      
 ajoute c22 à scène2                                                                                   ⟨207651⟩
 c23 = ImageLayer(ressource=mid1 11, x=178, y=63, image=28)                                            ⟨207659⟩
 ajoute c23 à scène2                                                                                   ⟨207665⟩
-palette_copie(destination=pal1, source=pal11(mid1 54))                                                ⟨207678⟩
-palette_copie(destination=pal1, source=pal10(mid1 42))                                                ⟨207687⟩
+palette_copie(destination=pal1, source=pal13(mid1 54))                                                ⟨207678⟩
+palette_copie(destination=pal1, source=pal12(mid1 42))                                                ⟨207687⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨207695⟩
 v394 = 16                                                                                             ⟨207697⟩
 v396 = 7                                                                                              ⟨207698⟩
@@ -753,14 +753,14 @@ si byte_4F55C != 0 :
     retour                                                                                            ⟨208399⟩
 charge(mid1 1)                                                                                        ⟨208412⟩
 charge(mid1 44)                                                                                       ⟨208424⟩
-palette_depuis(pal12(mid1 44))                                                                        ⟨208431⟩
+palette_depuis(pal14(mid1 44))                                                                        ⟨208431⟩
 charge(mid1 38)                                                                                       ⟨208443⟩
-palette_depuis(pal13(mid1 38))                                                                        ⟨208450⟩
+palette_depuis(pal15(mid1 38))                                                                        ⟨208450⟩
 
 ──── scène3 ────
 scène3 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨208458⟩
-palette_copie(destination=pal1, source=pal12(mid1 44))                                                ⟨208467⟩
-palette_copie(destination=pal1, source=pal13(mid1 38))                                                ⟨208476⟩
+palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨208467⟩
+palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨208476⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨208488⟩
 c24 = Layer(ressource=optshps 116, x=0, y=-24)                                                        ⟨208495⟩
 ajoute c24 à scène3                                                                                   ⟨208501⟩
@@ -821,7 +821,7 @@ si byte_4F55C != 0 :
     v48 = 0                                                                                           ⟨208989⟩
     retour                                                                                            ⟨209039⟩
 charge(mid1 56)                                                                                       ⟨209052⟩
-palette_depuis(pal14(mid1 56))                                                                        ⟨209059⟩
+palette_depuis(pal16(mid1 56))                                                                        ⟨209059⟩
 
 ──── scène4 ────
 scène4 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨209067⟩
@@ -836,7 +836,7 @@ sinon :
         canal_enregistre(canal=canal3, ressource=objets1[1], x=0)                                     ⟨209108⟩
         si canal3.+0 != 0 :
             AIL_start_sequence(pilote=canal3.+0→4, séquence=v3522)                                    ⟨209115⟩
-palette_copie(destination=pal1, source=pal14(mid1 56))                                                ⟨209131⟩
+palette_copie(destination=pal1, source=pal16(mid1 56))                                                ⟨209131⟩
 palette_copie(destination=pal1, source=pal3(optpals 24))                                              ⟨209140⟩
 palette_copie(destination=pal1, source=pal4(midgames 22))                                             ⟨209149⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨209157⟩
@@ -925,7 +925,7 @@ palette_depuis(pal7(mid1 57))                                                   
 ──── scène5 ────
 scène5 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨209880⟩
 palette_copie(destination=pal1, source=pal7(mid1 57))                                                 ⟨209893⟩
-palette_copie(destination=pal1, source=pal10(mid1 42))                                                ⟨209902⟩
+palette_copie(destination=pal1, source=pal12(mid1 42))                                                ⟨209902⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨209910⟩
 c35 = Layer(ressource=optshps 116, x=0, y=-24)                                                        ⟨209917⟩
 ajoute c35 à scène5                                                                                   ⟨209923⟩
@@ -1076,9 +1076,9 @@ si byte_4F55C != 0 :
     retour                                                                                            ⟨210924⟩
 charge(mid1 0)                                                                                        ⟨210937⟩
 charge(mid1 45)                                                                                       ⟨210949⟩
-palette_depuis(pal15(mid1 45))                                                                        ⟨210956⟩
+palette_depuis(pal17(mid1 45))                                                                        ⟨210956⟩
 charge(mid1 39)                                                                                       ⟨210968⟩
-palette_depuis(pal16(mid1 39))                                                                        ⟨210975⟩
+palette_depuis(pal18(mid1 39))                                                                        ⟨210975⟩
 
 ──── scène6 ────
 scène6 = Scene_Create(cadence=10, palette=255, surface=pal9)                                          ⟨210983⟩
@@ -1087,8 +1087,8 @@ v3818 = 152                                                                     
 v3816 = 319                                                                                           ⟨210994⟩
 v3814 = 199                                                                                           ⟨210996⟩
 sub_30A1D(&v3592, word_4D36E, &v964)                                                                  ⟨210999⟩
-palette_copie(destination=pal1, source=pal15(mid1 45))                                                ⟨211008⟩
-palette_copie(destination=pal1, source=pal16(mid1 39))                                                ⟨211017⟩
+palette_copie(destination=pal1, source=pal17(mid1 45))                                                ⟨211008⟩
+palette_copie(destination=pal1, source=pal18(mid1 39))                                                ⟨211017⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨211029⟩
 c50 = Layer(ressource=optshps 116, x=0, y=0)                                                          ⟨211036⟩
 ajoute c50 à scène6                                                                                   ⟨211042⟩
@@ -1238,7 +1238,7 @@ v5 = 0                                                                          
 v4 = 0                                                                                                ⟨212620⟩
 v12 = byte_4CA58                                                                                      ⟨212622⟩
 charge(mid1 43)                                                                                       ⟨212640⟩
-palette_depuis(pal17(mid1 43))                                                                        ⟨212647⟩
+palette_depuis(pal19(mid1 43))                                                                        ⟨212647⟩
 
 ──── scène7 ────
 scène7 = Scene_Create(cadence=10, palette=255, surface=pal9)                                          ⟨212654⟩
@@ -1249,7 +1249,7 @@ v578 = objet39.+4                                                               
 v576 = objet39.+6                                                                                     ⟨212667⟩
 sub_30A1D(&v354, word_4D36E, police1, di, si, bp)                                                     ⟨212670⟩
 charge_convdata_type0("air", drapeau=3)                                                               ⟨212676⟩
-palette_copie(destination=pal1, source=pal17(mid1 43))                                                ⟨212684⟩
+palette_copie(destination=pal1, source=pal19(mid1 43))                                                ⟨212684⟩
 palette_copie(destination=pal1, source=pal6(convdata type 2 "normal"))                                ⟨212695⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨212708⟩
 c55 = Layer(ressource=optshps 116, x=0, y=0)                                                          ⟨212714⟩
@@ -1296,9 +1296,9 @@ sinon :
 scène8 = Scene_Create(cadence=20, palette=255, surface=pal9)                                          ⟨212984⟩
 v96 = 0                                                                                               ⟨212989⟩
 charge(mid1 54)                                                                                       ⟨212995⟩
-palette_depuis(pal18(mid1 54))                                                                        ⟨213002⟩
-palette_copie(destination=pal1, source=pal18(mid1 54))                                                ⟨213010⟩
-palette_copie(destination=pal1, source=pal10(mid1 42))                                                ⟨213021⟩
+palette_depuis(pal20(mid1 54))                                                                        ⟨213002⟩
+palette_copie(destination=pal1, source=pal20(mid1 54))                                                ⟨213010⟩
+palette_copie(destination=pal1, source=pal12(mid1 42))                                                ⟨213021⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨213034⟩
 c59 = Layer(ressource=optshps 116, x=0, y=-24)                                                        ⟨213040⟩
 ajoute c59 à scène8                                                                                   ⟨213046⟩
@@ -1340,7 +1340,7 @@ c72 = ImageLayer(ressource=mid1 11, x=140, y=63, image=27)                      
 ajoute c72 à scène8                                                                                   ⟨213258⟩
 c73 = ImageLayer(ressource=mid1 11, x=178, y=63, image=28)                                            ⟨213265⟩
 ajoute c73 à scène8                                                                                   ⟨213271⟩
-palette_envoie(palette=pal10(mid1 42), pas=0)                                                         ⟨213284⟩
+palette_envoie(palette=pal12(mid1 42), pas=0)                                                         ⟨213284⟩
 v154 = 16                                                                                             ⟨213286⟩
 v156 = 7                                                                                              ⟨213287⟩
 T3 = tableau de 164 octets copié depuis unk_4AF18                                                     ⟨213294⟩
@@ -1429,8 +1429,8 @@ ajoute c74 à scène9                                                           
 v96 = 0                                                                                               ⟨213658⟩
 charge(mid1 58)                                                                                       ⟨213664⟩
 v105 = 0                                                                                              ⟨213666⟩
-palette_depuis(pal18(mid1 58))                                                                        ⟨213671⟩
-palette_copie(destination=pal1, source=pal18(mid1 58))                                                ⟨213679⟩
+palette_depuis(pal20(mid1 58))                                                                        ⟨213671⟩
+palette_copie(destination=pal1, source=pal20(mid1 58))                                                ⟨213679⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨213692⟩
 tant que animation_finie(calque=c74) == 0 :
     Scene_Tick(scène=scène9)                                                                          ⟨213699⟩
@@ -1457,11 +1457,11 @@ scène10 = Scene_Create(cadence=20, palette=255, surface=pal9)                  
 v96 = 0                                                                                               ⟨213850⟩
 charge(mid1 49)                                                                                       ⟨213856⟩
 v105 = 0                                                                                              ⟨213858⟩
-palette_depuis(pal18(mid1 49))                                                                        ⟨213863⟩
+palette_depuis(pal20(mid1 49))                                                                        ⟨213863⟩
 di = pal2(optpals 21)                                                                                 ⟨213865⟩
 palette_copie(destination=pal1, source=pal2(optpals 21))                                              ⟨213871⟩
 palette_copie(destination=pal1, source=pal4(midgames 22))                                             ⟨213882⟩
-palette_copie(destination=pal1, source=pal18(mid1 49))                                                ⟨213890⟩
+palette_copie(destination=pal1, source=pal20(mid1 49))                                                ⟨213890⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨213903⟩
 c75 = Layer(ressource=optshps 116, x=0, y=0)                                                          ⟨213909⟩
 ajoute c75 à scène10                                                                                  ⟨213915⟩
@@ -1540,7 +1540,7 @@ si byte_4F55C != 0 :
 scène12 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨214404⟩
 charge(mid1 51)                                                                                       ⟨214415⟩
 v105 = 0                                                                                              ⟨214417⟩
-palette_depuis(pal18(mid1 51))                                                                        ⟨214422⟩
+palette_depuis(pal20(mid1 51))                                                                        ⟨214422⟩
 charge(mid1 7)                                                                                        ⟨214433⟩
 charge(midgames 21)                                                                                   ⟨214444⟩
 c80 = MovingLayer(ressource=optshps 116, x=0, y=-40)                                                  ⟨214458⟩
@@ -1690,9 +1690,9 @@ v580 = objet39.+2                                                               
 v578 = objet39.+4                                                                                     ⟨215474⟩
 v576 = objet39.+6                                                                                     ⟨215476⟩
 sub_30A1D(objet41, word_4D36E, police1)                                                               ⟨215479⟩
-di = pal15(mid1 45)                                                                                   ⟨215481⟩
-palette_copie(destination=pal1, source=pal15(mid1 45))                                                ⟨215487⟩
-palette_copie(destination=pal1, source=pal16(mid1 39))                                                ⟨215498⟩
+di = pal17(mid1 45)                                                                                   ⟨215481⟩
+palette_copie(destination=pal1, source=pal17(mid1 45))                                                ⟨215487⟩
+palette_copie(destination=pal1, source=pal18(mid1 39))                                                ⟨215498⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨215511⟩
 c97 = Layer(ressource=optshps 116, x=0, y=0)                                                          ⟨215517⟩
 ajoute c97 à scène14                                                                                  ⟨215523⟩
@@ -1730,10 +1730,10 @@ si byte_4F55C != 0 :
 
 ──── scène15 ────
 scène15 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨215776⟩
-si = pal12(mid1 44)                                                                                   ⟨215778⟩
-palette_copie(destination=pal1, source=pal12(mid1 44))                                                ⟨215784⟩
-di = pal13(mid1 38)                                                                                   ⟨215786⟩
-palette_copie(destination=pal1, source=pal13(mid1 38))                                                ⟨215792⟩
+si = pal14(mid1 44)                                                                                   ⟨215778⟩
+palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨215784⟩
+di = pal15(mid1 38)                                                                                   ⟨215786⟩
+palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨215792⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨215805⟩
 c102 = Layer(ressource=optshps 116, x=0, y=-24)                                                       ⟨215811⟩
 ajoute c102 à scène15                                                                                 ⟨215817⟩
@@ -1757,7 +1757,7 @@ si byte_4F55C != 0 :
 
 ──── scène16 ────
 scène16 = Scene_Create(cadence=10, palette=255, surface=pal9)                                         ⟨215954⟩
-palette_copie(destination=pal1, source=pal17(mid1 43))                                                ⟨215962⟩
+palette_copie(destination=pal1, source=pal19(mid1 43))                                                ⟨215962⟩
 si = pal6(convdata type 2 "normal")                                                                   ⟨215964⟩
 palette_copie(destination=pal1, source=pal6(convdata type 2 "normal"))                                ⟨215970⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨215983⟩
@@ -1789,11 +1789,11 @@ charge(mid1 25)                                                                 
 ──── scène17 ────
 scène17 = Scene_Create(cadence=10, palette=255, surface=pal9)                                         ⟨216185⟩
 charge(mid1 47)                                                                                       ⟨216196⟩
-palette_depuis(pal19(mid1 47))                                                                        ⟨216203⟩
+palette_depuis(pal21(mid1 47))                                                                        ⟨216203⟩
 di = pal4(midgames 22)                                                                                ⟨216205⟩
 palette_copie(destination=pal1, source=pal4(midgames 22))                                             ⟨216211⟩
 palette_copie(destination=pal1, source=pal3(optpals 24))                                              ⟨216222⟩
-palette_copie(destination=pal1, source=pal19(mid1 47))                                                ⟨216230⟩
+palette_copie(destination=pal1, source=pal21(mid1 47))                                                ⟨216230⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨216243⟩
 charge(mid1 10)                                                                                       ⟨216254⟩
 c111 = Layer(ressource=optshps 116, x=0, y=-64)                                                       ⟨216260⟩
@@ -1825,7 +1825,7 @@ si byte_4F55C != 0 :
     v4 = 0                                                                                            ⟨216468⟩
     retour                                                                                            ⟨216472⟩
 charge(midgames 23)                                                                                   ⟨216484⟩
-palette_depuis(pal20(midgames 23))                                                                    ⟨216491⟩
+palette_depuis(pal22(midgames 23))                                                                    ⟨216491⟩
 si = objet39                                                                                          ⟨216496⟩
 v582 = objet39.+0                                                                                     ⟨216498⟩
 v580 = objet39.+2                                                                                     ⟨216500⟩
@@ -1849,7 +1849,7 @@ ajoute c120 à scène18                                                         
 charge(mid1 19)                                                                                       ⟨216597⟩
 c121 = AnimLayer(ressource=mid1 19, x=0, y=-40)                                                       ⟨216604⟩
 ajoute c121 à scène18                                                                                 ⟨216610⟩
-palette_copie(destination=pal1, source=pal20(midgames 23))                                            ⟨216618⟩
+palette_copie(destination=pal1, source=pal22(midgames 23))                                            ⟨216618⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨216631⟩
 tant que (scène18.compteur < 30) et (scène18.terminée == 0) :
     Scene_Tick(scène=scène18)                                                                         ⟨216638⟩
@@ -1876,8 +1876,8 @@ v580 = objet39.+2                                                               
 v578 = objet39.+4                                                                                     ⟨216828⟩
 v576 = objet39.+6                                                                                     ⟨216830⟩
 sub_30A1D(&v354, word_4D36E, police1)                                                                 ⟨216833⟩
-palette_copie(destination=pal1, source=pal15(mid1 45))                                                ⟨216844⟩
-palette_copie(destination=pal1, source=pal16(mid1 39))                                                ⟨216855⟩
+palette_copie(destination=pal1, source=pal17(mid1 45))                                                ⟨216844⟩
+palette_copie(destination=pal1, source=pal18(mid1 39))                                                ⟨216855⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨216868⟩
 c122 = Layer(ressource=optshps 116, x=0, y=0)                                                         ⟨216874⟩
 ajoute c122 à scène19                                                                                 ⟨216880⟩
@@ -1898,8 +1898,8 @@ si v29 != 0 :
     voix1.joue(-1)                                                                                    ⟨216957⟩
     tant que voix1.finie() == 0 :
         Scene_Tick(scène=scène19)                                                                     ⟨216964⟩
-        pal18(mid1 51).+0 = (scène19.compteur & 1) + 13                                               ⟨216969⟩
-        c126.image = pal18(mid1 46).+0                                                                ⟨216971⟩
+        pal20(mid1 51).+0 = (scène19.compteur & 1) + 13                                               ⟨216969⟩
+        c126.image = pal20(mid1 46).+0                                                                ⟨216971⟩
     voix_arrête(voix=voix1)                                                                           ⟨216983⟩
     v100 = 0                                                                                          ⟨217002⟩
 sinon :
@@ -1928,8 +1928,8 @@ v580 = objet39.+2                                                               
 v578 = objet39.+4                                                                                     ⟨217173⟩
 v576 = objet39.+6                                                                                     ⟨217175⟩
 sub_30A1D(&v354, word_4D36E, police1)                                                                 ⟨217178⟩
-palette_copie(destination=pal1, source=pal12(mid1 44))                                                ⟨217189⟩
-palette_copie(destination=pal1, source=pal13(mid1 38))                                                ⟨217200⟩
+palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨217189⟩
+palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨217200⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨217213⟩
 c127 = Layer(ressource=optshps 116, x=0, y=-24)                                                       ⟨217219⟩
 ajoute c127 à scène20                                                                                 ⟨217225⟩
@@ -1952,8 +1952,8 @@ si v29 != 0 :
     voix1.joue(-1)                                                                                    ⟨217327⟩
     tant que voix1.finie() == 0 :
         Scene_Tick(scène=scène20)                                                                     ⟨217334⟩
-        pal18(mid1 51).+0 = scène20.compteur & 1                                                      ⟨217338⟩
-        c131.image = pal18(mid1 46).+0                                                                ⟨217340⟩
+        pal20(mid1 51).+0 = scène20.compteur & 1                                                      ⟨217338⟩
+        c131.image = pal20(mid1 46).+0                                                                ⟨217340⟩
     voix_arrête(voix=voix1)                                                                           ⟨217352⟩
     v100 = 0                                                                                          ⟨217371⟩
 sinon :
@@ -1972,8 +1972,8 @@ v580 = objet39.+2                                                               
 v578 = objet39.+4                                                                                     ⟨217449⟩
 v576 = objet39.+6                                                                                     ⟨217451⟩
 sub_30A1D(&v354, word_4D36E, police1)                                                                 ⟨217454⟩
-palette_copie(destination=pal1, source=pal15(mid1 45))                                                ⟨217465⟩
-palette_copie(destination=pal1, source=pal16(mid1 39))                                                ⟨217476⟩
+palette_copie(destination=pal1, source=pal17(mid1 45))                                                ⟨217465⟩
+palette_copie(destination=pal1, source=pal18(mid1 39))                                                ⟨217476⟩
 sub_30AD0(&v354, 0)                                                                                   ⟨217485⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨217494⟩
 c132 = Layer(ressource=optshps 116, x=0, y=0)                                                         ⟨217500⟩
@@ -1995,8 +1995,8 @@ si v29 != 0 :
     voix1.joue(-1)                                                                                    ⟨217583⟩
     tant que voix1.finie() == 0 :
         Scene_Tick(scène=scène21)                                                                     ⟨217590⟩
-        pal18(mid1 51).+0 = (scène21.compteur & 1) + 13                                               ⟨217595⟩
-        c136.image = pal18(mid1 46).+0                                                                ⟨217597⟩
+        pal20(mid1 51).+0 = (scène21.compteur & 1) + 13                                               ⟨217595⟩
+        c136.image = pal20(mid1 46).+0                                                                ⟨217597⟩
     voix_arrête(voix=voix1)                                                                           ⟨217609⟩
     v100 = 0                                                                                          ⟨217628⟩
 sinon :
@@ -2019,8 +2019,8 @@ v580 = objet39.+2                                                               
 v578 = objet39.+4                                                                                     ⟨217735⟩
 v576 = objet39.+6                                                                                     ⟨217737⟩
 sub_30A1D(&v354, word_4D36E, police1)                                                                 ⟨217740⟩
-palette_copie(destination=pal1, source=pal12(mid1 44))                                                ⟨217751⟩
-palette_copie(destination=pal1, source=pal13(mid1 38))                                                ⟨217762⟩
+palette_copie(destination=pal1, source=pal14(mid1 44))                                                ⟨217751⟩
+palette_copie(destination=pal1, source=pal15(mid1 38))                                                ⟨217762⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨217775⟩
 c137 = Layer(ressource=optshps 116, x=0, y=-24)                                                       ⟨217781⟩
 ajoute c137 à scène22                                                                                 ⟨217787⟩
@@ -2043,8 +2043,8 @@ si v29 != 0 :
     voix1.joue(-1)                                                                                    ⟨217889⟩
     tant que voix1.finie() == 0 :
         Scene_Tick(scène=scène22)                                                                     ⟨217896⟩
-        pal18(mid1 51).+0 = scène22.compteur & 1                                                      ⟨217900⟩
-        c141.image = pal18(mid1 46).+0                                                                ⟨217902⟩
+        pal20(mid1 51).+0 = scène22.compteur & 1                                                      ⟨217900⟩
+        c141.image = pal20(mid1 46).+0                                                                ⟨217902⟩
     voix_arrête(voix=voix1)                                                                           ⟨217914⟩
     v100 = 0                                                                                          ⟨217933⟩
 sinon :
@@ -2076,14 +2076,14 @@ sinon :
         canal_enregistre(canal=canal3, ressource=objets1 + 50, x=0)                                   ⟨218133⟩
 charge(mid1 60)                                                                                       ⟨218146⟩
 charge(mid1 46)                                                                                       ⟨218157⟩
-palette_depuis(pal18(mid1 46))                                                                        ⟨218164⟩
+palette_depuis(pal20(mid1 46))                                                                        ⟨218164⟩
 
 ──── scène23 ────
 scène23 = Scene_Create(cadence=20, palette=255, surface=pal9)                                         ⟨218171⟩
 scène23.y = -50                                                                                       ⟨218173⟩
 palette_copie(destination=pal1, source=pal4(midgames 22))                                             ⟨218183⟩
 palette_copie(destination=pal1, source=pal3(optpals 24))                                              ⟨218194⟩
-palette_copie(destination=pal1, source=pal20(midgames 23))                                            ⟨218202⟩
+palette_copie(destination=pal1, source=pal22(midgames 23))                                            ⟨218202⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨218215⟩
 c142 = MovingLayer(ressource=optshps 116, x=0, y=0)                                                   ⟨218229⟩
 c142.vx = 0                                                                                           ⟨218236⟩
@@ -2147,7 +2147,7 @@ charge(mid1 14)                                                                 
 c150 = AnimLayer(ressource=mid1 9, x=0, y=0)                                                          ⟨218575⟩
 c151 = AnimLayer(ressource=mid1 14, x=0, y=0)                                                         ⟨218583⟩
 ajoute c150 à c142                                                                                    ⟨218588⟩
-palette_copie(destination=pal1, source=pal18(mid1 46))                                                ⟨218596⟩
+palette_copie(destination=pal1, source=pal20(mid1 46))                                                ⟨218596⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨218605⟩
 si v71 != 0 :
     si canal2.+0 != 0 :
@@ -2182,11 +2182,11 @@ si byte_4F55C == 0 :
     v202 = booléen                                                                                    ⟨218760⟩
     v202 = 120                                                                                        ⟨218762⟩
     attend(chronomètre=objet42)                                                                       ⟨218767⟩
-sub_38514(pal8, 0, 0, données(optshps 116.+0), 0)                                                     ⟨218795⟩
-sub_38514(pal8, 0, 0, données(midgames 20.+0), 0)                                                     ⟨218813⟩
-sub_38514(pal8, 0, 0, données(optshps 44.+0), 0)                                                      ⟨218831⟩
+dessine_image(surface=pal11, x=0, y=0, données=données(optshps 116.+0), image=0)                      ⟨218795⟩
+dessine_image(surface=pal11, x=0, y=0, données=données(midgames 20.+0), image=0)                      ⟨218813⟩
+dessine_image(surface=pal11, x=0, y=0, données=données(optshps 44.+0), image=0)                       ⟨218831⟩
 v334 = 0                                                                                              ⟨218835⟩
-TextFormat_ApplyStyleAttribute_357D1(&v334, pal8)                                                     ⟨218840⟩
+TextFormat_ApplyStyleAttribute_357D1(&v334, pal11)                                                    ⟨218840⟩
 v190 = word_4D36E                                                                                     ⟨218843⟩
 v348 = 0                                                                                              ⟨218844⟩
 TextFormat_ApplyStyleAttribute_357D1(&v348, v190)                                                     ⟨218849⟩

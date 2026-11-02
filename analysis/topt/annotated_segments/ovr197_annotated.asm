@@ -287,7 +287,7 @@ loc_67867:
 		push	87h
 		push	5
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	8
 		push	0
@@ -303,7 +303,7 @@ loc_67867:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -323,7 +323,7 @@ loc_67867:
 		push	0A2h
 		push	32h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_678FF
 
@@ -382,7 +382,7 @@ loc_6793E:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -402,7 +402,7 @@ loc_6793E:
 		push	0A2h
 		push	2Dh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_679B9
 
@@ -448,7 +448,7 @@ loc_679DF:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2]
 		shl	ax, 1
@@ -468,7 +468,7 @@ loc_679DF:
 		push	0A2h
 		push	3Bh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_67A5A
 
@@ -556,7 +556,7 @@ loc_67B04:
 		push	9Fh
 		push	11h
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	7
 		push	0
@@ -572,7 +572,7 @@ loc_67B04:
 		push	0A2h
 		push	1Fh
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	3E8h
 		call	PC_SoundOn

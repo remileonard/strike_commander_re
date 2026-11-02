@@ -6355,7 +6355,7 @@ loc_74781:
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -6373,7 +6373,7 @@ loc_74781:
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -6391,7 +6391,7 @@ loc_74781:
 		push	0
 		push	0
 		push	[bp+arg_2E]
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	ax, [bp+arg_2E]
 		mov	[bp+var_BC], ax

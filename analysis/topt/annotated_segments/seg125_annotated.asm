@@ -317,7 +317,7 @@ loc_36E66:
 		push	ax
 		push	[bp+arg_6]
 		push	di
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_36E95:

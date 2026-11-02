@@ -89,12 +89,32 @@ def main():
     src_index = json.load(open(sp['function_index'], encoding='utf-8'))
     src_rev = {v['new_name']: k for k, v in src_known.items()}
 
+    def src_key(name):
+        """Adresse source d'un nom du catalogue ; à défaut d'entrée, le suffixe d'adresse du nom."""
+        if name in src_rev:
+            return src_rev[name]
+        m = re.search(r'_([0-9A-F]{3,6})$', name)
+        if m and 'sub_' + m.group(1) in src_index:
+            return 'sub_' + m.group(1)
+        return name
+
     src_seg = segment_instructions(sp['asm'])
     dst_seg = segment_instructions(dp['asm'])
     src_procs = parse_procs(sp['asm'])
     dst_procs = parse_procs(dp['asm'])
     src_thunks = thunk_targets(src_procs)
     dst_thunks = thunk_targets(dst_procs)
+
+    def label_segment(label):
+        """Segment d'une étiquette sans bloc proc (mid36 d'OPTEST : loc_B6FF0)."""
+        seg = None
+        for line in open(sp['asm'], encoding='cp437', errors='replace'):
+            m = SEG_RE.match(line)
+            if m:
+                seg = m.group(1)
+            elif line.startswith(label + ':'):
+                return seg
+        return None
 
     # Segments de cinématique de la source : ceux des cinématiques déjà extraites.
     midgame_dir = os.path.join(sp['analysis'], 'midgames')
@@ -106,11 +126,11 @@ def main():
         function = data.get('function') or data.get('fonction')
         if function:
             key = src_rev.get(function, function)
-            seg = src_index.get(key, {}).get('segment')
+            seg = src_index.get(key, {}).get('segment') or label_segment(key)
             if seg and seg not in src_segments:
                 src_segments.append(seg)
     for name in engine.get('args_of', {}):
-        key = src_rev.get(name, name)
+        key = src_key(name)
         seg = src_index.get(key, {}).get('segment')
         if seg and seg not in src_segments:
             src_segments.append(seg)
@@ -144,9 +164,13 @@ def main():
         b = dst_seg[t]
         sm = difflib.SequenceMatcher(None, [m for m, _ in a], [m for m, _ in b], autojunk=False)
         for tag, i1, i2, j1, j2 in sm.get_opcodes():
-            if tag != 'equal':
+            # Passages identiques, et passages remplacés de même longueur (arguments empilés autrement) :
+            # instructions appariées par position quand leur mnémonique est le même.
+            if tag != 'equal' and not (tag == 'replace' and i2 - i1 == j2 - j1):
                 continue
             for (ma, oa), (mb, ob) in zip(a[i1:i2], b[j1:j2]):
+                if ma != mb:
+                    continue
                 if ma == 'call':
                     ca = CALL_TARGET_RE.match(oa)
                     cb = CALL_TARGET_RE.match(ob)
@@ -174,14 +198,23 @@ def main():
     for k, v in dst_known.items():
         dst_by_base[base_name(v['new_name'])].append(k)
 
+    matches_path = os.path.join(dp['analysis'], '%s_matches.json' % src_exe)
+    matched = {}
+    if os.path.exists(matches_path):
+        matched = {k: v.get('chosen') for k, v in json.load(open(matches_path, encoding='utf-8')).items()}
+
     def port_function(name):
         """(adresse cible, méthode) ou (None, raison)."""
-        key = resolve(src_rev.get(name, name), src_thunks)
+        key = resolve(src_key(name), src_thunks)
         known_name = src_known.get(key, {}).get('new_name')
         if known_name and not known_name.startswith('sub_'):
             cands = dst_by_base.get(base_name(known_name), [])
             if len(cands) == 1:
                 return cands[0], 'nom repris'
+            # Plusieurs copies identiques : celle que match_functions.py a appariée à cette fonction.
+            chosen = sorted(c for c in cands if matched.get(c) == key)
+            if chosen:
+                return chosen[0], 'nom repris (%d copies)' % len(cands)
         votes = call_votes.get(key)
         if votes:
             best, count = votes.most_common(1)[0]
@@ -207,7 +240,7 @@ def main():
             ported[name] = dst_known[target]['new_name']
             continue
         if how.startswith('position'):
-            key = resolve(src_rev.get(name, name), src_thunks)
+            key = resolve(src_key(name), src_thunks)
             src_name = src_known.get(key, {}).get('new_name', key)
             base = base_name(src_name) if not src_name.startswith('sub_') else 'MidgameEngine_' + key[4:]
             new_name = '%s_%s' % (base, target.split('_', 1)[1])
@@ -225,7 +258,7 @@ def main():
 
     # Tables de méthodes écrites par les fonctions portées (constructeurs) : mêmes votes, fonction par fonction.
     for name, dst_name in ported.items():
-        key = resolve(src_rev.get(name, name), src_thunks)
+        key = resolve(src_key(name), src_thunks)
         target = next((k for k, v in dst_known.items() if v['new_name'] == dst_name), None)
         if key not in src_procs or target not in dst_procs:
             continue
@@ -250,7 +283,7 @@ def main():
     # Nom de relais VROOMM dans la source (Stub_…) : il désigne le relais de la cible qui saute à la fonction
     # portée, pas la fonction elle-même (le script appelle le relais).
     for name in sorted(names):
-        key = src_rev.get(name, name)
+        key = src_key(name)
         if key not in src_thunks or name not in ported:
             continue
         real = next((k for k, v in dst_known.items() if v['new_name'] == ported[name]), None)
@@ -293,7 +326,7 @@ def main():
             if entry.get('chosen') and dst_name in dst_known:
                 copies[entry['chosen']].append(dst_known[dst_name]['new_name'])
     for n, spec in engine['functions'].items():
-        key = resolve(src_rev.get(n, n), src_thunks)
+        key = resolve(src_key(n), src_thunks)
         for copy in copies.get(key, []):
             if copy not in out['functions']:
                 out['functions'][copy] = spec

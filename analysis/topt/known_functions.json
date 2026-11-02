@@ -2567,11 +2567,21 @@
   "sub_111EE": {
     "new_name": "MidgameEngine_C8F5_111EE",
     "segment": "seg029",
-    "summary": "Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (109 sur 109), à `sub_C8F5` (sub_C8F5 de OPTEST.EXE). Code non comparé instruction par instruction. — "
+    "summary": "Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (118 sur 118), à `sub_C8F5` (sub_C8F5 de OPTEST.EXE). Code non comparé instruction par instruction. — "
   },
   "sub_47D10": {
     "new_name": "Stub_Midgame1_PlayPart2_47D10",
     "segment": "stub201",
     "summary": "Reprise de OPTEST.EXE : relais VROOMM de `Midgame1_PlayPart2_70290`, comme `Stub_Midgame1_PlayPart2_423E0` de OPTEST.EXE."
+  },
+  "sub_38514": {
+    "new_name": "Shape_DrawSpans_38514",
+    "segment": "seg137",
+    "summary": "Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (11 sur 11), à `Shape_DrawSpans_32CD8` (sub_32CD8 de OPTEST.EXE). Code non comparé instruction par instruction. — Reprise de STRIKE.EXE : code identique instruction par instruction à `Shape_DrawSpans_61F52` (sub_61F52 de STRIKE.EXE). far. DESSIN D'UNE IMAGE (forme RealSpace, format des segments de ligne) à la position (arg_2, arg_4), avec découpe sur le rectangle de la fenêtre. Pour chaque segment : `lodsw` = n (0 = fin de l'image), `lodsw` = x, `lodsw` = y (ajoutés à la position) ; n pair : n/2 pixels recopiés tels quels (`shr cx, 1` / `rep movsw` / `rep movsb`) ; n impair : blocs de n/2 pixels en tout, chaque bloc commence par un octet c (`lodsb` / `shr al, 1`) : c pair → c/2 pixels recopiés (`rep movsw` / `rep movsb`), c impair → c/2 fois l'octet suivant (`rep stosw` / `rep stosb`). Écriture directe dans la mémoire d'écran : ni XOR ni couleur transparente testée ; la transparence vient du format (seuls les pixels des segments sont écrits), et une image dessinée après une autre la recouvre là où leurs segments se chevauchent. Ex-'Render_MeasureOrDrawTextString' (nom faux), renommée 2026-10-23 après lecture de la boucle de pixels (boucle relue ici, dans OPTEST). Lecteur Python équivalent : tools/sc_data.py image_spans/draw_image."
+  },
+  "sub_F088": {
+    "new_name": "MovingOverlayLayer_Construct_F088",
+    "segment": "seg025",
+    "summary": "Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (1 sur 1), à `MovingOverlayLayer_Construct_A837` (sub_A837 de OPTEST.EXE). Code non comparé instruction par instruction. — far, LUE 2026-10-21. Calque mobile sur fond (taille 21h, tables de méthodes 17CBh / 17EBh) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y arg_6, image arg_C), vitesse +1Dh = arg_8, +1Fh = arg_A ; avance comme un calque mobile (MovingLayer_Advance_2E2D1), dessin MovingOverlayLayer_Draw_A8BE. mid3 : `mid3` 8 et `mid3` 3."
   }
 }

@@ -287,7 +287,7 @@ si byte_4F55C == 0 :
                     v338 = -2                                                                         ⟨246034⟩
                 échelle(calque=c3, échelle=v324)                                                      ⟨246039⟩
                 si scène1.compteur < 51 :
-                    c3.méthode24(v336, v338)                                                          ⟨246048⟩
+                    déplace(calque=c3, dx=v336, dy=v338)                                              ⟨246048⟩
                 v324 = v324 + v326                                                                    ⟨246053⟩
                 si v324 > 255 :
                     v324 = 255                                                                        ⟨246056⟩
@@ -309,7 +309,7 @@ si byte_4F55C == 0 :
                     v342 = -2                                                                         ⟨246086⟩
                 échelle(calque=c2, échelle=v328)                                                      ⟨246091⟩
                 si scène1.compteur < 51 :
-                    c2.méthode24(v340, v342)                                                          ⟨246100⟩
+                    déplace(calque=c2, dx=v340, dy=v342)                                              ⟨246100⟩
                 v328 = v328 + v330                                                                    ⟨246105⟩
                 si v328 > 255 :
                     v328 = 255                                                                        ⟨246108⟩
@@ -375,9 +375,9 @@ si byte_4F55C == 0 :
                     sinon :
                         si di == 1 :
                             di = 0                                                                    ⟨246408⟩
-                c5.méthode24(0, di)                                                                   ⟨246416⟩
-                c6.méthode24(0, di)                                                                   ⟨246423⟩
-                c7.méthode24(0, di)                                                                   ⟨246430⟩
+                déplace(calque=c5, dx=0, dy=di)                                                       ⟨246416⟩
+                déplace(calque=c6, dx=0, dy=di)                                                       ⟨246423⟩
+                déplace(calque=c7, dx=0, dy=di)                                                       ⟨246430⟩
                 Scene_Tick(scène=scène2)                                                              ⟨246441⟩
             v336 = 0                                                                                  ⟨246453⟩
             tant que v336 < 8 :
@@ -397,9 +397,9 @@ si byte_4F55C == 0 :
                     sinon :
                         si di == 1 :
                             di = 0                                                                    ⟨246479⟩
-                c5.méthode24(0, di)                                                                   ⟨246487⟩
-                c6.méthode24(0, di)                                                                   ⟨246494⟩
-                c7.méthode24(0, di)                                                                   ⟨246501⟩
+                déplace(calque=c5, dx=0, dy=di)                                                       ⟨246487⟩
+                déplace(calque=c6, dx=0, dy=di)                                                       ⟨246494⟩
+                déplace(calque=c7, dx=0, dy=di)                                                       ⟨246501⟩
                 Scene_Tick(scène=scène2)                                                              ⟨246512⟩
                 v336 = v336 + 1                                                                       ⟨246514⟩
             v334 = 0                                                                                  ⟨246537⟩
@@ -501,9 +501,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨246932⟩
-                    c9.méthode24(0, di)                                                               ⟨246940⟩
-                    c10.méthode24(0, di)                                                              ⟨246947⟩
-                    c11.méthode24(0, di)                                                              ⟨246954⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨246940⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨246947⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨246954⟩
                     Scene_Tick(scène=scène3)                                                          ⟨246965⟩
                 v336 = 0                                                                              ⟨246977⟩
                 tant que v336 < 8 :
@@ -531,9 +531,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247035⟩
-                    c9.méthode24(0, di)                                                               ⟨247043⟩
-                    c10.méthode24(0, di)                                                              ⟨247050⟩
-                    c11.méthode24(0, di)                                                              ⟨247057⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247043⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247050⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247057⟩
                     Scene_Tick(scène=scène3)                                                          ⟨247068⟩
                     v336 = v336 + 1                                                                   ⟨247070⟩
                 v336 = 0                                                                              ⟨247078⟩
@@ -559,9 +559,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247134⟩
-                    c9.méthode24(0, di)                                                               ⟨247142⟩
-                    c10.méthode24(0, di)                                                              ⟨247149⟩
-                    c11.méthode24(0, di)                                                              ⟨247156⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247142⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247149⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247156⟩
                     Scene_Tick(scène=scène3)                                                          ⟨247167⟩
                 v336 = 0                                                                              ⟨247179⟩
                 tant que v336 < 10 :
@@ -587,9 +587,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247229⟩
-                    c9.méthode24(0, di)                                                               ⟨247237⟩
-                    c10.méthode24(0, di)                                                              ⟨247244⟩
-                    c11.méthode24(0, di)                                                              ⟨247251⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247237⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247244⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247251⟩
                     Scene_Tick(scène=scène3)                                                          ⟨247262⟩
                     v336 = v336 + 1                                                                   ⟨247264⟩
                 charge(mid15voc 10)                                                                   ⟨247282⟩
@@ -611,9 +611,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247315⟩
-                    c9.méthode24(0, di)                                                               ⟨247323⟩
-                    c10.méthode24(0, di)                                                              ⟨247330⟩
-                    c11.méthode24(0, di)                                                              ⟨247337⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247323⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247330⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247337⟩
                     Scene_Tick(scène=scène3)                                                          ⟨247348⟩
                 v336 = 0                                                                              ⟨247360⟩
                 tant que v336 < 8 :
@@ -637,9 +637,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247402⟩
-                    c9.méthode24(0, di)                                                               ⟨247410⟩
-                    c10.méthode24(0, di)                                                              ⟨247417⟩
-                    c11.méthode24(0, di)                                                              ⟨247424⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247410⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247417⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247424⟩
                     Scene_Tick(scène=scène3)                                                          ⟨247435⟩
                     v336 = v336 + 1                                                                   ⟨247437⟩
                 v350 = 0                                                                              ⟨247462⟩
@@ -671,9 +671,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247550⟩
-                    c9.méthode24(0, di)                                                               ⟨247558⟩
-                    c10.méthode24(0, di)                                                              ⟨247565⟩
-                    c11.méthode24(0, di)                                                              ⟨247572⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247558⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247565⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247572⟩
                     si si + 2 == v326 :
                         sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[1])                 ⟨247583⟩
                     si si + 2 == v326 :
@@ -716,9 +716,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247759⟩
-                    c9.méthode24(0, di)                                                               ⟨247767⟩
-                    c10.méthode24(0, di)                                                              ⟨247774⟩
-                    c11.méthode24(0, di)                                                              ⟨247781⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247767⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247774⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247781⟩
                     si si + 6 == v326 :
                         tête_image_de_base(tête=c10, image=19)                                        ⟨247789⟩
                     si si + 8 == v326 :
@@ -753,9 +753,9 @@ si byte_4F55C == 0 :
                         sinon :
                             si di == 1 :
                                 di = 0                                                                ⟨247926⟩
-                    c9.méthode24(0, di)                                                               ⟨247934⟩
-                    c10.méthode24(0, di)                                                              ⟨247941⟩
-                    c11.méthode24(0, di)                                                              ⟨247948⟩
+                    déplace(calque=c9, dx=0, dy=di)                                                   ⟨247934⟩
+                    déplace(calque=c10, dx=0, dy=di)                                                  ⟨247941⟩
+                    déplace(calque=c11, dx=0, dy=di)                                                  ⟨247948⟩
                     si si + 5 == v326 :
                         tête_image_de_base(tête=c10, image=128)                                       ⟨247956⟩
                     si si + 6 == v326 :
@@ -829,14 +829,14 @@ si byte_4F55C == 0 :
                                     v310 = 0                                                          ⟨248310⟩
                                 sinon :
                                     v310 = 1                                                          ⟨248314⟩
-                        c14.méthode24(0, v310)                                                        ⟨248322⟩
-                        c15.méthode24(0, v310)                                                        ⟨248329⟩
+                        déplace(calque=c14, dx=0, dy=v310)                                            ⟨248322⟩
+                        déplace(calque=c15, dx=0, dy=v310)                                            ⟨248329⟩
                         v318_avant = v318                                                             ⟨248332⟩
                         v318 = v318 + 1                                                               ⟨248332⟩
                         si v318_avant == 1 :
-                            c13.méthode24(-1, 0)                                                      ⟨248339⟩
+                            déplace(calque=c13, dx=-1, dy=0)                                          ⟨248339⟩
                         si v318 == 5 :
-                            c13.méthode24(0, 1)                                                       ⟨248349⟩
+                            déplace(calque=c13, dx=0, dy=1)                                           ⟨248349⟩
                         si v318 == 8 :
                             v318 = 0                                                                  ⟨248355⟩
                         v314 = v314 + v310                                                            ⟨248359⟩
@@ -870,14 +870,14 @@ si byte_4F55C == 0 :
                                     v310 = 0                                                          ⟨248475⟩
                                 sinon :
                                     v310 = 1                                                          ⟨248479⟩
-                        c14.méthode24(0, v310)                                                        ⟨248487⟩
-                        c15.méthode24(0, v310)                                                        ⟨248494⟩
+                        déplace(calque=c14, dx=0, dy=v310)                                            ⟨248487⟩
+                        déplace(calque=c15, dx=0, dy=v310)                                            ⟨248494⟩
                         v318_avant = v318                                                             ⟨248497⟩
                         v318 = v318 + 1                                                               ⟨248497⟩
                         si v318_avant == 1 :
-                            c13.méthode24(-1, 0)                                                      ⟨248504⟩
+                            déplace(calque=c13, dx=-1, dy=0)                                          ⟨248504⟩
                         si v318 == 5 :
-                            c13.méthode24(0, 1)                                                       ⟨248514⟩
+                            déplace(calque=c13, dx=0, dy=1)                                           ⟨248514⟩
                         si v318 == 8 :
                             v318 = 0                                                                  ⟨248520⟩
                         v314 = v314 + v310                                                            ⟨248524⟩
@@ -952,9 +952,9 @@ si byte_4F55C == 0 :
                                 sinon :
                                     si di == 1 :
                                         di = 0                                                        ⟨248849⟩
-                            c17.méthode24(0, di)                                                      ⟨248857⟩
-                            c18.méthode24(0, di)                                                      ⟨248864⟩
-                            c19.méthode24(0, di)                                                      ⟨248871⟩
+                            déplace(calque=c17, dx=0, dy=di)                                          ⟨248857⟩
+                            déplace(calque=c18, dx=0, dy=di)                                          ⟨248864⟩
+                            déplace(calque=c19, dx=0, dy=di)                                          ⟨248871⟩
                             Scene_Tick(scène=scène5)                                                  ⟨248882⟩
                         v336 = 0                                                                      ⟨248894⟩
                         tant que v336 < 4 :
@@ -974,9 +974,9 @@ si byte_4F55C == 0 :
                                 sinon :
                                     si di == 1 :
                                         di = 0                                                        ⟨248920⟩
-                            c17.méthode24(0, di)                                                      ⟨248928⟩
-                            c18.méthode24(0, di)                                                      ⟨248935⟩
-                            c19.méthode24(0, di)                                                      ⟨248942⟩
+                            déplace(calque=c17, dx=0, dy=di)                                          ⟨248928⟩
+                            déplace(calque=c18, dx=0, dy=di)                                          ⟨248935⟩
+                            déplace(calque=c19, dx=0, dy=di)                                          ⟨248942⟩
                             Scene_Tick(scène=scène5)                                                  ⟨248953⟩
                             v336 = v336 + 1                                                           ⟨248955⟩
                         v334 = 0                                                                      ⟨248978⟩
@@ -1005,9 +1005,9 @@ si byte_4F55C == 0 :
                                 sinon :
                                     si di == 1 :
                                         di = 0                                                        ⟨249032⟩
-                            c17.méthode24(0, di)                                                      ⟨249040⟩
-                            c18.méthode24(0, di)                                                      ⟨249047⟩
-                            c19.méthode24(0, di)                                                      ⟨249054⟩
+                            déplace(calque=c17, dx=0, dy=di)                                          ⟨249040⟩
+                            déplace(calque=c18, dx=0, dy=di)                                          ⟨249047⟩
+                            déplace(calque=c19, dx=0, dy=di)                                          ⟨249054⟩
                             si si + 4 == v326 :
                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[6])         ⟨249068⟩
                             si si + 4 == v326 :
@@ -1070,9 +1070,9 @@ si byte_4F55C == 0 :
                                 sinon :
                                     si di == 1 :
                                         di = 0                                                        ⟨249361⟩
-                            c21.méthode24(0, di)                                                      ⟨249369⟩
-                            c22.méthode24(0, di)                                                      ⟨249376⟩
-                            c23.méthode24(0, di)                                                      ⟨249383⟩
+                            déplace(calque=c21, dx=0, dy=di)                                          ⟨249369⟩
+                            déplace(calque=c22, dx=0, dy=di)                                          ⟨249376⟩
+                            déplace(calque=c23, dx=0, dy=di)                                          ⟨249383⟩
                             si si + 5 == v326 :
                                 tête_image_de_base(tête=c22, image=18)                                ⟨249391⟩
                             si si + 9 == v326 :
@@ -1144,7 +1144,7 @@ si byte_4F55C == 0 :
                                 si v8 - 35 < v354 :
                                     v350 = v350 + 1                                                   ⟨249728⟩
                                     si v350 > 27 :
-                                        c27.méthode24(-1, 0)                                          ⟨249736⟩
+                                        déplace(calque=c27, dx=-1, dy=0)                              ⟨249736⟩
                                         v350 = 27                                                     ⟨249738⟩
                                     v360 = v350                                                       ⟨249742⟩
                                     c27.image = v360                                                  ⟨249744⟩
@@ -1152,7 +1152,7 @@ si byte_4F55C == 0 :
                                     v352 = v352 + 1                                                   ⟨249751⟩
                                     si v352 > 15 :
                                         si v354 & 1 != 0 :
-                                            c28.méthode24(1, 0)                                       ⟨249762⟩
+                                            déplace(calque=c28, dx=1, dy=0)                           ⟨249762⟩
                                         v352 = 15                                                     ⟨249766⟩
                                     v362 = v352                                                       ⟨249770⟩
                                     c28.image = v362                                                  ⟨249773⟩
@@ -1222,9 +1222,9 @@ si byte_4F55C == 0 :
                                             sinon :
                                                 si di == 1 :
                                                     di = 0                                            ⟨250123⟩
-                                        c30.méthode24(0, di)                                          ⟨250131⟩
-                                        c31.méthode24(0, di)                                          ⟨250138⟩
-                                        c32.méthode24(0, di)                                          ⟨250145⟩
+                                        déplace(calque=c30, dx=0, dy=di)                              ⟨250131⟩
+                                        déplace(calque=c31, dx=0, dy=di)                              ⟨250138⟩
+                                        déplace(calque=c32, dx=0, dy=di)                              ⟨250145⟩
                                         Scene_Tick(scène=scène8)                                      ⟨250156⟩
                                     v336 = 0                                                          ⟨250168⟩
                                     tant que v336 < 8 :
@@ -1244,9 +1244,9 @@ si byte_4F55C == 0 :
                                             sinon :
                                                 si di == 1 :
                                                     di = 0                                            ⟨250194⟩
-                                        c30.méthode24(0, di)                                          ⟨250202⟩
-                                        c31.méthode24(0, di)                                          ⟨250209⟩
-                                        c32.méthode24(0, di)                                          ⟨250216⟩
+                                        déplace(calque=c30, dx=0, dy=di)                              ⟨250202⟩
+                                        déplace(calque=c31, dx=0, dy=di)                              ⟨250209⟩
+                                        déplace(calque=c32, dx=0, dy=di)                              ⟨250216⟩
                                         Scene_Tick(scène=scène8)                                      ⟨250227⟩
                                         v336 = v336 + 1                                               ⟨250229⟩
                                     v334 = 0                                                          ⟨250252⟩
@@ -1274,9 +1274,9 @@ si byte_4F55C == 0 :
                                             sinon :
                                                 si di == 1 :
                                                     di = 0                                            ⟨250306⟩
-                                        c30.méthode24(0, di)                                          ⟨250314⟩
-                                        c31.méthode24(0, di)                                          ⟨250321⟩
-                                        c32.méthode24(0, di)                                          ⟨250328⟩
+                                        déplace(calque=c30, dx=0, dy=di)                              ⟨250314⟩
+                                        déplace(calque=c31, dx=0, dy=di)                              ⟨250321⟩
+                                        déplace(calque=c32, dx=0, dy=di)                              ⟨250328⟩
                                         si si + 6 == scène8.compteur :
                                             sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[7])  ⟨250342⟩
                                         si si + 2 == scène8.compteur :
@@ -1304,9 +1304,9 @@ si byte_4F55C == 0 :
                                             sinon :
                                                 si di == 1 :
                                                     di = 0                                            ⟨250443⟩
-                                        c30.méthode24(0, di)                                          ⟨250451⟩
-                                        c31.méthode24(0, di)                                          ⟨250458⟩
-                                        c32.méthode24(0, di)                                          ⟨250465⟩
+                                        déplace(calque=c30, dx=0, dy=di)                              ⟨250451⟩
+                                        déplace(calque=c31, dx=0, dy=di)                              ⟨250458⟩
+                                        déplace(calque=c32, dx=0, dy=di)                              ⟨250465⟩
                                         si si + 2 == scène8.compteur :
                                             sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[8])  ⟨250478⟩
                                         si si + 2 == scène8.compteur :
@@ -1403,9 +1403,9 @@ si byte_4F55C == 0 :
                                                 sinon :
                                                     si di == 1 :
                                                         di = 0                                        ⟨250918⟩
-                                            c34.méthode24(0, di)                                      ⟨250926⟩
-                                            c35.méthode24(0, di)                                      ⟨250933⟩
-                                            c36.méthode24(0, di)                                      ⟨250940⟩
+                                            déplace(calque=c34, dx=0, dy=di)                          ⟨250926⟩
+                                            déplace(calque=c35, dx=0, dy=di)                          ⟨250933⟩
+                                            déplace(calque=c36, dx=0, dy=di)                          ⟨250940⟩
                                             Scene_Tick(scène=scène9)                                  ⟨250951⟩
                                         v336 = 0                                                      ⟨250963⟩
                                         tant que v336 < 8 :
@@ -1425,9 +1425,9 @@ si byte_4F55C == 0 :
                                                 sinon :
                                                     si di == 1 :
                                                         di = 0                                        ⟨250989⟩
-                                            c34.méthode24(0, di)                                      ⟨250997⟩
-                                            c35.méthode24(0, di)                                      ⟨251004⟩
-                                            c36.méthode24(0, di)                                      ⟨251011⟩
+                                            déplace(calque=c34, dx=0, dy=di)                          ⟨250997⟩
+                                            déplace(calque=c35, dx=0, dy=di)                          ⟨251004⟩
+                                            déplace(calque=c36, dx=0, dy=di)                          ⟨251011⟩
                                             Scene_Tick(scène=scène9)                                  ⟨251022⟩
                                             v336 = v336 + 1                                           ⟨251024⟩
                                         v334 = 0                                                      ⟨251047⟩
@@ -1455,9 +1455,9 @@ si byte_4F55C == 0 :
                                                 sinon :
                                                     si di == 1 :
                                                         di = 0                                        ⟨251101⟩
-                                            c34.méthode24(0, di)                                      ⟨251109⟩
-                                            c35.méthode24(0, di)                                      ⟨251116⟩
-                                            c36.méthode24(0, di)                                      ⟨251123⟩
+                                            déplace(calque=c34, dx=0, dy=di)                          ⟨251109⟩
+                                            déplace(calque=c35, dx=0, dy=di)                          ⟨251116⟩
+                                            déplace(calque=c36, dx=0, dy=di)                          ⟨251123⟩
                                             si si + 2 == scène9.compteur :
                                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[10])  ⟨251137⟩
                                             si si + 2 == scène9.compteur :
@@ -1527,9 +1527,9 @@ si byte_4F55C == 0 :
                                                     sinon :
                                                         si di == 1 :
                                                             di = 0                                    ⟨251459⟩
-                                                c38.méthode24(0, di)                                  ⟨251467⟩
-                                                c39.méthode24(0, di)                                  ⟨251474⟩
-                                                c40.méthode24(0, di)                                  ⟨251481⟩
+                                                déplace(calque=c38, dx=0, dy=di)                      ⟨251467⟩
+                                                déplace(calque=c39, dx=0, dy=di)                      ⟨251474⟩
+                                                déplace(calque=c40, dx=0, dy=di)                      ⟨251481⟩
                                                 Scene_Tick(scène=scène10)                             ⟨251492⟩
                                             v336 = 0                                                  ⟨251504⟩
                                             tant que v336 < 3 :
@@ -1549,9 +1549,9 @@ si byte_4F55C == 0 :
                                                     sinon :
                                                         si di == 1 :
                                                             di = 0                                    ⟨251530⟩
-                                                c38.méthode24(0, di)                                  ⟨251538⟩
-                                                c39.méthode24(0, di)                                  ⟨251545⟩
-                                                c40.méthode24(0, di)                                  ⟨251552⟩
+                                                déplace(calque=c38, dx=0, dy=di)                      ⟨251538⟩
+                                                déplace(calque=c39, dx=0, dy=di)                      ⟨251545⟩
+                                                déplace(calque=c40, dx=0, dy=di)                      ⟨251552⟩
                                                 Scene_Tick(scène=scène10)                             ⟨251563⟩
                                                 v336 = v336 + 1                                       ⟨251565⟩
                                             v334 = 0                                                  ⟨251588⟩
@@ -1579,9 +1579,9 @@ si byte_4F55C == 0 :
                                                     sinon :
                                                         si di == 1 :
                                                             di = 0                                    ⟨251642⟩
-                                                c38.méthode24(0, di)                                  ⟨251650⟩
-                                                c39.méthode24(0, di)                                  ⟨251657⟩
-                                                c40.méthode24(0, di)                                  ⟨251664⟩
+                                                déplace(calque=c38, dx=0, dy=di)                      ⟨251650⟩
+                                                déplace(calque=c39, dx=0, dy=di)                      ⟨251657⟩
+                                                déplace(calque=c40, dx=0, dy=di)                      ⟨251664⟩
                                                 si si + 2 == scène10.compteur :
                                                     sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[11])  ⟨251678⟩
                                                 si si + 2 == scène10.compteur :
@@ -1609,9 +1609,9 @@ si byte_4F55C == 0 :
                                                     sinon :
                                                         si di == 1 :
                                                             di = 0                                    ⟨251779⟩
-                                                c38.méthode24(0, di)                                  ⟨251787⟩
-                                                c39.méthode24(0, di)                                  ⟨251794⟩
-                                                c40.méthode24(0, di)                                  ⟨251801⟩
+                                                déplace(calque=c38, dx=0, dy=di)                      ⟨251787⟩
+                                                déplace(calque=c39, dx=0, dy=di)                      ⟨251794⟩
+                                                déplace(calque=c40, dx=0, dy=di)                      ⟨251801⟩
                                                 si si + 2 == scène10.compteur :
                                                     sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[12])  ⟨251815⟩
                                                 si si + 2 == scène10.compteur :
@@ -1639,9 +1639,9 @@ si byte_4F55C == 0 :
                                                     sinon :
                                                         si di == 1 :
                                                             di = 0                                    ⟨251916⟩
-                                                c38.méthode24(0, di)                                  ⟨251924⟩
-                                                c39.méthode24(0, di)                                  ⟨251931⟩
-                                                c40.méthode24(0, di)                                  ⟨251938⟩
+                                                déplace(calque=c38, dx=0, dy=di)                      ⟨251924⟩
+                                                déplace(calque=c39, dx=0, dy=di)                      ⟨251931⟩
+                                                déplace(calque=c40, dx=0, dy=di)                      ⟨251938⟩
                                                 si si + 2 == scène10.compteur :
                                                     sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[13])  ⟨251952⟩
                                                 si si + 2 == scène10.compteur :
@@ -1709,14 +1709,14 @@ si byte_4F55C == 0 :
                                                                 v310 = 0                              ⟨252271⟩
                                                             sinon :
                                                                 v310 = 1                              ⟨252275⟩
-                                                    c43.méthode24(0, v310)                            ⟨252283⟩
-                                                    c44.méthode24(0, v310)                            ⟨252290⟩
+                                                    déplace(calque=c43, dx=0, dy=v310)                ⟨252283⟩
+                                                    déplace(calque=c44, dx=0, dy=v310)                ⟨252290⟩
                                                     v318_avant = v318                                 ⟨252293⟩
                                                     v318 = v318 + 1                                   ⟨252293⟩
                                                     si v318_avant == 1 :
-                                                        c42.méthode24(-1, 0)                          ⟨252300⟩
+                                                        déplace(calque=c42, dx=-1, dy=0)              ⟨252300⟩
                                                     si v318 == 5 :
-                                                        c42.méthode24(0, 1)                           ⟨252310⟩
+                                                        déplace(calque=c42, dx=0, dy=1)               ⟨252310⟩
                                                     si v318 == 8 :
                                                         v318 = 0                                      ⟨252316⟩
                                                     v314 = v314 + v310                                ⟨252320⟩
@@ -1746,14 +1746,14 @@ si byte_4F55C == 0 :
                                                                 v310 = 0                              ⟨252434⟩
                                                             sinon :
                                                                 v310 = 1                              ⟨252438⟩
-                                                    c43.méthode24(0, v310)                            ⟨252446⟩
-                                                    c44.méthode24(0, v310)                            ⟨252453⟩
+                                                    déplace(calque=c43, dx=0, dy=v310)                ⟨252446⟩
+                                                    déplace(calque=c44, dx=0, dy=v310)                ⟨252453⟩
                                                     v318_avant = v318                                 ⟨252456⟩
                                                     v318 = v318 + 1                                   ⟨252456⟩
                                                     si v318_avant == 1 :
-                                                        c42.méthode24(-1, 0)                          ⟨252463⟩
+                                                        déplace(calque=c42, dx=-1, dy=0)              ⟨252463⟩
                                                     si v318 == 5 :
-                                                        c42.méthode24(0, 1)                           ⟨252473⟩
+                                                        déplace(calque=c42, dx=0, dy=1)               ⟨252473⟩
                                                     si v318 == 8 :
                                                         v318 = 0                                      ⟨252479⟩
                                                     v314 = v314 + v310                                ⟨252483⟩
@@ -1822,9 +1822,9 @@ si byte_4F55C == 0 :
                                                             sinon :
                                                                 si di == 1 :
                                                                     di = 0                            ⟨252792⟩
-                                                        c46.méthode24(0, di)                          ⟨252800⟩
-                                                        c47.méthode24(0, di)                          ⟨252807⟩
-                                                        c48.méthode24(0, di)                          ⟨252814⟩
+                                                        déplace(calque=c46, dx=0, dy=di)              ⟨252800⟩
+                                                        déplace(calque=c47, dx=0, dy=di)              ⟨252807⟩
+                                                        déplace(calque=c48, dx=0, dy=di)              ⟨252814⟩
                                                         Scene_Tick(scène=scène12)                     ⟨252825⟩
                                                     v336 = 0                                          ⟨252837⟩
                                                     tant que v336 < 8 :
@@ -1844,9 +1844,9 @@ si byte_4F55C == 0 :
                                                             sinon :
                                                                 si di == 1 :
                                                                     di = 0                            ⟨252863⟩
-                                                        c46.méthode24(0, di)                          ⟨252871⟩
-                                                        c47.méthode24(0, di)                          ⟨252878⟩
-                                                        c48.méthode24(0, di)                          ⟨252885⟩
+                                                        déplace(calque=c46, dx=0, dy=di)              ⟨252871⟩
+                                                        déplace(calque=c47, dx=0, dy=di)              ⟨252878⟩
+                                                        déplace(calque=c48, dx=0, dy=di)              ⟨252885⟩
                                                         Scene_Tick(scène=scène12)                     ⟨252896⟩
                                                         v336 = v336 + 1                               ⟨252898⟩
                                                     v334 = 0                                          ⟨252921⟩
@@ -1874,9 +1874,9 @@ si byte_4F55C == 0 :
                                                             sinon :
                                                                 si di == 1 :
                                                                     di = 0                            ⟨252975⟩
-                                                        c46.méthode24(0, di)                          ⟨252983⟩
-                                                        c47.méthode24(0, di)                          ⟨252990⟩
-                                                        c48.méthode24(0, di)                          ⟨252997⟩
+                                                        déplace(calque=c46, dx=0, dy=di)              ⟨252983⟩
+                                                        déplace(calque=c47, dx=0, dy=di)              ⟨252990⟩
+                                                        déplace(calque=c48, dx=0, dy=di)              ⟨252997⟩
                                                         si si + 3 == scène12.compteur :
                                                             sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[15])  ⟨253011⟩
                                                         si si + 3 == scène12.compteur :
@@ -1945,9 +1945,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨253331⟩
-                                                            c50.méthode24(0, di)                      ⟨253339⟩
-                                                            c51.méthode24(0, di)                      ⟨253346⟩
-                                                            c52.méthode24(0, di)                      ⟨253353⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨253339⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨253346⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨253353⟩
                                                             Scene_Tick(scène=scène13)                 ⟨253364⟩
                                                         v336 = 0                                      ⟨253376⟩
                                                         tant que v336 < 8 :
@@ -1994,9 +1994,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨253479⟩
-                                                            c50.méthode24(0, di)                      ⟨253487⟩
-                                                            c51.méthode24(0, di)                      ⟨253494⟩
-                                                            c52.méthode24(0, di)                      ⟨253501⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨253487⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨253494⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨253501⟩
                                                             Scene_Tick(scène=scène13)                 ⟨253512⟩
                                                         v336 = 0                                      ⟨253524⟩
                                                         tant que v336 < 4 :
@@ -2016,9 +2016,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨253550⟩
-                                                            c50.méthode24(0, di)                      ⟨253558⟩
-                                                            c51.méthode24(0, di)                      ⟨253565⟩
-                                                            c52.méthode24(0, di)                      ⟨253572⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨253558⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨253565⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨253572⟩
                                                             Scene_Tick(scène=scène13)                 ⟨253583⟩
                                                             v336 = v336 + 1                           ⟨253585⟩
                                                         v346 = 0                                      ⟨253608⟩
@@ -2048,9 +2048,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨253680⟩
-                                                            c50.méthode24(0, di)                      ⟨253688⟩
-                                                            c51.méthode24(0, di)                      ⟨253695⟩
-                                                            c52.méthode24(0, di)                      ⟨253702⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨253688⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨253695⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨253702⟩
                                                             si si + 2 == scène13.compteur :
                                                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[16])  ⟨253715⟩
                                                             si si + 2 == scène13.compteur :
@@ -2086,9 +2086,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨253856⟩
-                                                            c50.méthode24(0, di)                      ⟨253864⟩
-                                                            c51.méthode24(0, di)                      ⟨253871⟩
-                                                            c52.méthode24(0, di)                      ⟨253878⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨253864⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨253871⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨253878⟩
                                                             si si + 2 == scène13.compteur :
                                                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[17])  ⟨253892⟩
                                                             si si + 2 == scène13.compteur :
@@ -2118,9 +2118,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨254003⟩
-                                                            c50.méthode24(0, di)                      ⟨254011⟩
-                                                            c51.méthode24(0, di)                      ⟨254018⟩
-                                                            c52.méthode24(0, di)                      ⟨254025⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨254011⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨254018⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨254025⟩
                                                             si si + 2 == scène13.compteur :
                                                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[18])  ⟨254039⟩
                                                             si si + 2 == scène13.compteur :
@@ -2150,9 +2150,9 @@ si byte_4F55C == 0 :
                                                                 sinon :
                                                                     si di == 1 :
                                                                         di = 0                        ⟨254150⟩
-                                                            c50.méthode24(0, di)                      ⟨254158⟩
-                                                            c51.méthode24(0, di)                      ⟨254165⟩
-                                                            c52.méthode24(0, di)                      ⟨254172⟩
+                                                            déplace(calque=c50, dx=0, dy=di)          ⟨254158⟩
+                                                            déplace(calque=c51, dx=0, dy=di)          ⟨254165⟩
+                                                            déplace(calque=c52, dx=0, dy=di)          ⟨254172⟩
                                                             si si + 2 == scène13.compteur :
                                                                 sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[19])  ⟨254186⟩
                                                             si si + 2 == scène13.compteur :
@@ -2218,8 +2218,8 @@ si byte_4F55C == 0 :
                                                                             di = 0                    ⟨254501⟩
                                                                         sinon :
                                                                             di = 1                    ⟨254505⟩
-                                                                c54.méthode24(0, di)                  ⟨254513⟩
-                                                                c55.méthode24(0, di)                  ⟨254520⟩
+                                                                déplace(calque=c54, dx=0, dy=di)      ⟨254513⟩
+                                                                déplace(calque=c55, dx=0, dy=di)      ⟨254520⟩
                                                                 v312 = v312 + di                      ⟨254522⟩
                                                                 CRT_Rand()                            ⟨254523⟩
                                                                 v334 = (CRT_Rand()·3) / 32768         ⟨254529⟩
@@ -2253,8 +2253,8 @@ si byte_4F55C == 0 :
                                                                             di = 0                    ⟨254648⟩
                                                                         sinon :
                                                                             di = 1                    ⟨254652⟩
-                                                                c54.méthode24(0, di)                  ⟨254660⟩
-                                                                c55.méthode24(0, di)                  ⟨254667⟩
+                                                                déplace(calque=c54, dx=0, dy=di)      ⟨254660⟩
+                                                                déplace(calque=c55, dx=0, dy=di)      ⟨254667⟩
                                                                 v312 = v312 + di                      ⟨254669⟩
                                                                 si si + 4 == v320 :
                                                                     sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[20])  ⟨254682⟩
@@ -2325,14 +2325,14 @@ si byte_4F55C == 0 :
                                                                                 v310 = 0              ⟨254993⟩
                                                                             sinon :
                                                                                 v310 = 1              ⟨254997⟩
-                                                                    c58.méthode24(0, v310)            ⟨255005⟩
-                                                                    c59.méthode24(0, v310)            ⟨255012⟩
+                                                                    déplace(calque=c58, dx=0, dy=v310)  ⟨255005⟩
+                                                                    déplace(calque=c59, dx=0, dy=v310)  ⟨255012⟩
                                                                     v318_avant = v318                 ⟨255015⟩
                                                                     v318 = v318 + 1                   ⟨255015⟩
                                                                     si v318_avant == 1 :
-                                                                        c57.méthode24(-1, 0)          ⟨255022⟩
+                                                                        déplace(calque=c57, dx=-1, dy=0)  ⟨255022⟩
                                                                     si v318 == 5 :
-                                                                        c57.méthode24(0, 1)           ⟨255032⟩
+                                                                        déplace(calque=c57, dx=0, dy=1)  ⟨255032⟩
                                                                     si v318 == 8 :
                                                                         v318 = 0                      ⟨255038⟩
                                                                     v314 = v314 + v310                ⟨255042⟩
@@ -2366,14 +2366,14 @@ si byte_4F55C == 0 :
                                                                                 v310 = 0              ⟨255168⟩
                                                                             sinon :
                                                                                 v310 = 1              ⟨255172⟩
-                                                                    c58.méthode24(0, v310)            ⟨255180⟩
-                                                                    c59.méthode24(0, v310)            ⟨255187⟩
+                                                                    déplace(calque=c58, dx=0, dy=v310)  ⟨255180⟩
+                                                                    déplace(calque=c59, dx=0, dy=v310)  ⟨255187⟩
                                                                     v318_avant = v318                 ⟨255190⟩
                                                                     v318 = v318 + 1                   ⟨255190⟩
                                                                     si v318_avant == 1 :
-                                                                        c57.méthode24(-1, 0)          ⟨255197⟩
+                                                                        déplace(calque=c57, dx=-1, dy=0)  ⟨255197⟩
                                                                     si v318 == 5 :
-                                                                        c57.méthode24(0, 1)           ⟨255207⟩
+                                                                        déplace(calque=c57, dx=0, dy=1)  ⟨255207⟩
                                                                     si v318 == 8 :
                                                                         v318 = 0                      ⟨255213⟩
                                                                     v314 = v314 + v310                ⟨255217⟩
@@ -2403,14 +2403,14 @@ si byte_4F55C == 0 :
                                                                                 v310 = 0              ⟨255346⟩
                                                                             sinon :
                                                                                 v310 = 1              ⟨255350⟩
-                                                                    c58.méthode24(0, v310)            ⟨255358⟩
-                                                                    c59.méthode24(0, v310)            ⟨255365⟩
+                                                                    déplace(calque=c58, dx=0, dy=v310)  ⟨255358⟩
+                                                                    déplace(calque=c59, dx=0, dy=v310)  ⟨255365⟩
                                                                     v318_avant = v318                 ⟨255368⟩
                                                                     v318 = v318 + 1                   ⟨255368⟩
                                                                     si v318_avant == 1 :
-                                                                        c57.méthode24(1, 0)           ⟨255375⟩
+                                                                        déplace(calque=c57, dx=1, dy=0)  ⟨255375⟩
                                                                     si v318 == 5 :
-                                                                        c57.méthode24(0, -1)          ⟨255385⟩
+                                                                        déplace(calque=c57, dx=0, dy=-1)  ⟨255385⟩
                                                                     si v318 == 8 :
                                                                         v318 = 0                      ⟨255391⟩
                                                                     v314 = v314 + v310                ⟨255395⟩
@@ -2486,9 +2486,9 @@ si byte_4F55C == 0 :
                                                                             sinon :
                                                                                 si di == 1 :
                                                                                     di = 0            ⟨255745⟩
-                                                                        c61.méthode24(0, di)          ⟨255753⟩
-                                                                        c62.méthode24(0, di)          ⟨255760⟩
-                                                                        c63.méthode24(0, di)          ⟨255767⟩
+                                                                        déplace(calque=c61, dx=0, dy=di)  ⟨255753⟩
+                                                                        déplace(calque=c62, dx=0, dy=di)  ⟨255760⟩
+                                                                        déplace(calque=c63, dx=0, dy=di)  ⟨255767⟩
                                                                         Scene_Tick(scène=scène16)     ⟨255778⟩
                                                                     v348 = 0                          ⟨255790⟩
                                                                     tant que v348 < 4 :
@@ -2508,9 +2508,9 @@ si byte_4F55C == 0 :
                                                                             sinon :
                                                                                 si di == 1 :
                                                                                     di = 0            ⟨255816⟩
-                                                                        c61.méthode24(0, di)          ⟨255824⟩
-                                                                        c62.méthode24(0, di)          ⟨255831⟩
-                                                                        c63.méthode24(0, di)          ⟨255838⟩
+                                                                        déplace(calque=c61, dx=0, dy=di)  ⟨255824⟩
+                                                                        déplace(calque=c62, dx=0, dy=di)  ⟨255831⟩
+                                                                        déplace(calque=c63, dx=0, dy=di)  ⟨255838⟩
                                                                         Scene_Tick(scène=scène16)     ⟨255849⟩
                                                                         v348 = v348 + 1               ⟨255851⟩
                                                                     v346 = 0                          ⟨255874⟩
@@ -2539,9 +2539,9 @@ si byte_4F55C == 0 :
                                                                             sinon :
                                                                                 si di == 1 :
                                                                                     di = 0            ⟨255928⟩
-                                                                        c61.méthode24(0, di)          ⟨255936⟩
-                                                                        c62.méthode24(0, di)          ⟨255943⟩
-                                                                        c63.méthode24(0, di)          ⟨255950⟩
+                                                                        déplace(calque=c61, dx=0, dy=di)  ⟨255936⟩
+                                                                        déplace(calque=c62, dx=0, dy=di)  ⟨255943⟩
+                                                                        déplace(calque=c63, dx=0, dy=di)  ⟨255950⟩
                                                                         si si + 2 == v338 :
                                                                             sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[23])  ⟨255964⟩
                                                                         si si + 2 == v338 :
@@ -2570,18 +2570,18 @@ si byte_4F55C == 0 :
                                                                             sinon :
                                                                                 si di == 1 :
                                                                                     di = 0            ⟨256065⟩
-                                                                        c61.méthode24(0, di)          ⟨256073⟩
-                                                                        c62.méthode24(0, di)          ⟨256080⟩
-                                                                        c63.méthode24(0, di)          ⟨256087⟩
+                                                                        déplace(calque=c61, dx=0, dy=di)  ⟨256073⟩
+                                                                        déplace(calque=c62, dx=0, dy=di)  ⟨256080⟩
+                                                                        déplace(calque=c63, dx=0, dy=di)  ⟨256087⟩
                                                                         si si + 2 == v338 :
                                                                             sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[24])  ⟨256101⟩
                                                                         si si + 2 == v338 :
                                                                             tête_texte_de_lèvres(tête=c62, texte="brakngupizardtodo")  ⟨256111⟩
                                                                         Scene_Tick(scène=scène16)     ⟨256129⟩
                                                                 di = -1                               ⟨256153⟩
-                                                                c61.méthode24(0, -1)                  ⟨256159⟩
-                                                                c62.méthode24(0, -1)                  ⟨256166⟩
-                                                                c64.méthode24(0, -1)                  ⟨256173⟩
+                                                                déplace(calque=c61, dx=0, dy=-1)      ⟨256159⟩
+                                                                déplace(calque=c62, dx=0, dy=-1)      ⟨256166⟩
+                                                                déplace(calque=c64, dx=0, dy=-1)      ⟨256173⟩
                                                                 scène16.compteur = 0                  ⟨256175⟩
                                                                 ajoute c64 à scène16                  ⟨256179⟩
                                                                 retire(parent=scène16, calque=c63)    ⟨256184⟩
@@ -2589,9 +2589,9 @@ si byte_4F55C == 0 :
                                                                 tant que (scène16.compteur < 15) et (scène16.terminée == 0) :
                                                                     si scène16.compteur == 1 :
                                                                         di = 1                        ⟨256202⟩
-                                                                        c61.méthode24(0, 1)           ⟨256208⟩
-                                                                        c62.méthode24(0, 1)           ⟨256215⟩
-                                                                        c64.méthode24(0, 1)           ⟨256222⟩
+                                                                        déplace(calque=c61, dx=0, dy=1)  ⟨256208⟩
+                                                                        déplace(calque=c62, dx=0, dy=1)  ⟨256215⟩
+                                                                        déplace(calque=c64, dx=0, dy=1)  ⟨256222⟩
                                                                     Scene_Tick(scène=scène16)         ⟨256228⟩
                                                                 si v17 != 0 :
                                                                     canal_arrête(canal=canal5)        ⟨256252⟩

@@ -8067,7 +8067,7 @@ loc_B4A01:
 		lea	ax, word ptr [bp+var_60]
 		push	ax
 		push	0
-		call	sub_F088
+		call	MovingOverlayLayer_Construct_F088
 		add	sp, 0Eh
 		mov	[bp+var_188], ax
 		push	21h

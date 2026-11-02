@@ -33,7 +33,7 @@ CALL_RESULTS = {
 MAX_OPEN_FRAMES = 600
 DIRECT_FPS = 60
 
-DIRS = {'opt': 'GAMEFLOW', 'mid': 'MIDGAMES', 'amu': 'MIDGAMES', 'rmu': 'MIDGAMES'}
+DIRS = {'opt': 'GAMEFLOW', 'mid': 'MIDGAMES', 'amu': 'MIDGAMES', 'rmu': 'MIDGAMES', 'mmu': 'MIDGAMES'}
 NO_IMAGE = 255
 # Attente minimale de l'écran de fin (mid33) : 300 tics de 60 Hz.
 END_WAIT_TICKS = 300
@@ -930,12 +930,12 @@ class Player:
         elif name == 'AIL_start_sequence':
             channel = self.channel_of(args['pilote'])
             res = self.channels.get(channel)
-            if res and res[1] in ('amusic', 'rmusic'):
+            if res and res[1] in ('amusic', 'rmusic', 'mmusic'):
                 self.pending['music'] = res[2]
         elif name == 'AIL_stop_sequence':
             channel = self.channel_of(args['pilote'])
             res = self.channels.get(channel)
-            if res and res[1] in ('amusic', 'rmusic'):
+            if res and res[1] in ('amusic', 'rmusic', 'mmusic'):
                 self.pending['music'] = 254
         elif name == 'dessine_image':
             res = self.resource(args['données'])

@@ -402,7 +402,7 @@ si byte_4F55C == 0 :
                 Widget_Method_Dispatch8_37030(&v3170, 0)                                              ⟨304807⟩
                 c17.image = 3                                                                         ⟨304810⟩
                 tant que (scène4.compteur < 10) et (scène4.terminée == 0) :
-                    c17.méthode24(-4, 1)                                                              ⟨304819⟩
+                    déplace(calque=c17, dx=-4, dy=1)                                                  ⟨304819⟩
                     Scene_Tick(scène=scène4)                                                          ⟨304830⟩
                 retire(parent=scène4, calque=c17)                                                     ⟨304855⟩
                 c17.détruit(3)                                                                        ⟨304863⟩
@@ -1302,13 +1302,12 @@ si byte_4F55C == 0 :
                                                             c73.vy = 0                                ⟨309999⟩
                                                             c73.vx = 0                                ⟨310001⟩
                                                             c73.vy = 0                                ⟨310003⟩
-                                                            sub_F088(0, mid36 3, 0, 0, 0, 0, 2)       ⟨310020⟩
-                                                            v392 = sub_F088(0, mid36 3, 0, 0, 0, 0, 2)  ⟨310022⟩
-                                                            c74 = MovingLayer(ressource=mid36 10, x=0, y=0)  ⟨310034⟩
-                                                            c74.vx = 0                                ⟨310041⟩
-                                                            c74.vy = 0                                ⟨310043⟩
-                                                            c74.vx = 0                                ⟨310045⟩
-                                                            c74.vy = 0                                ⟨310047⟩
+                                                            c74 = MovingOverlayLayer(ressource=mid36 3, x=0, y=0, vx=0, vy=0, image=2)  ⟨310020⟩
+                                                            c75 = MovingLayer(ressource=mid36 10, x=0, y=0)  ⟨310034⟩
+                                                            c75.vx = 0                                ⟨310041⟩
+                                                            c75.vy = 0                                ⟨310043⟩
+                                                            c75.vx = 0                                ⟨310045⟩
+                                                            c75.vy = 0                                ⟨310047⟩
                                                             palette_copie(destination=pal1, source=pal2(midgames 43))  ⟨310063⟩
                                                             palette_copie(destination=pal1, source=pal6(mid36 30))  ⟨310072⟩
                                                             palette_copie(destination=pal1, source=pal7(midgames 47))  ⟨310081⟩
@@ -1317,8 +1316,8 @@ si byte_4F55C == 0 :
                                                             ajoute c71 à scène13                      ⟨310096⟩
                                                             ajoute c72 à scène13                      ⟨310101⟩
                                                             ajoute c73 à scène13                      ⟨310106⟩
-                                                            ajoute v392 à scène13                     ⟨310111⟩
-                                                            ajoute c74 à scène13                      ⟨310116⟩
+                                                            ajoute c74 à scène13                      ⟨310111⟩
+                                                            ajoute c75 à scène13                      ⟨310116⟩
                                                             ajoute c70 à scène13                      ⟨310121⟩
                                                             palette_envoie(palette=pal1, pas=0)       ⟨310133⟩
                                                             v398 = 0                                  ⟨310135⟩
@@ -1344,10 +1343,10 @@ si byte_4F55C == 0 :
                                                                     c72.vy = 3                        ⟨310178⟩
                                                                     c73.vx = 0                        ⟨310180⟩
                                                                     c73.vy = 3                        ⟨310182⟩
-                                                                    v392→29 = 0                       ⟨310184⟩
-                                                                    v392→31 = 3                       ⟨310186⟩
-                                                                    c74.vx = 0                        ⟨310188⟩
-                                                                    c74.vy = 4                        ⟨310190⟩
+                                                                    c74.vx = 0                        ⟨310184⟩
+                                                                    c74.vy = 3                        ⟨310186⟩
+                                                                    c75.vx = 0                        ⟨310188⟩
+                                                                    c75.vy = 4                        ⟨310190⟩
                                                                 si v402 == 100 :
                                                                     c68.vx = 0                        ⟨310196⟩
                                                                     c68.vy = 0                        ⟨310198⟩
@@ -1363,10 +1362,10 @@ si byte_4F55C == 0 :
                                                                     c73.vx = 0                        ⟨310220⟩
                                                                     c73.vy = 0                        ⟨310222⟩
                                                                 si v402 == 60 :
-                                                                    v392→29 = 0                       ⟨310228⟩
-                                                                    v392→31 = 0                       ⟨310230⟩
-                                                                    c74.vx = 0                        ⟨310232⟩
-                                                                    c74.vy = 0                        ⟨310234⟩
+                                                                    c74.vx = 0                        ⟨310228⟩
+                                                                    c74.vy = 0                        ⟨310230⟩
+                                                                    c75.vx = 0                        ⟨310232⟩
+                                                                    c75.vy = 0                        ⟨310234⟩
                                                                 si v398 == 82 :
                                                                     v398 = v398 + 1                   ⟨310239⟩
                                                                     retire(parent=scène13, calque=c70)  ⟨310243⟩

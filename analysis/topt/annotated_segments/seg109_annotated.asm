@@ -884,7 +884,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		pop	si
 		pop	bp

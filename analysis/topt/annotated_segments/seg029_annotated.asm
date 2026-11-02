@@ -11,8 +11,8 @@ loc_111EB:
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (109 sur
-; 109), à sub_C8F5 (sub_C8F5 de OPTEST.EXE). Code non comparé instruction par instruction. —
+; Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (118 sur
+; 118), à sub_C8F5 (sub_C8F5 de OPTEST.EXE). Code non comparé instruction par instruction. —
 ; ==============================================================================================
 MidgameEngine_C8F5_111EE		proc far
 

@@ -1325,7 +1325,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_34218
 

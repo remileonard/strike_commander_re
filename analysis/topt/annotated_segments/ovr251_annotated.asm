@@ -192,7 +192,7 @@ loc_C05AB:
 		add	ax, [di]
 		push	ax
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_C0630
 
@@ -215,7 +215,7 @@ loc_C05FB:
 		add	ax, [di]
 		push	ax
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_C0630:

@@ -275,18 +275,20 @@
        "ligne": 272122
       },
       {
-       "op": "c4.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "-1"
+        "calque=c4",
+        "dx=0",
+        "dy=-1"
        ],
        "ligne": 272261
       },
       {
-       "op": "c5.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "-1"
+        "calque=c5",
+        "dx=0",
+        "dy=-1"
        ],
        "ligne": 272274
       },
@@ -322,18 +324,20 @@
        "ligne": 272306
       },
       {
-       "op": "c2.méthode24",
+       "op": "déplace",
        "arguments": [
-        "-1",
-        "0"
+        "calque=c2",
+        "dx=-1",
+        "dy=0"
        ],
        "ligne": 272351
       },
       {
-       "op": "c3.méthode24",
+       "op": "déplace",
        "arguments": [
-        "1",
-        "0"
+        "calque=c3",
+        "dx=1",
+        "dy=0"
        ],
        "ligne": 272358
       },
@@ -593,26 +597,29 @@
        "ligne": 273098
       },
       {
-       "op": "c11.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c11",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273126
       },
       {
-       "op": "c12.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c12",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273132
       },
       {
-       "op": "c13.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c13",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273139
       },
@@ -1278,26 +1285,29 @@
        "ligne": 275199
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275227
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275233
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275240
       },
@@ -1314,26 +1324,29 @@
        "ligne": 275269
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275297
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275303
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275310
       },
@@ -1350,26 +1363,29 @@
        "ligne": 275371
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275399
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275405
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275412
       },
@@ -1410,26 +1426,29 @@
        "ligne": 275509
       },
       {
-       "op": "c27.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c27",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275537
       },
       {
-       "op": "c28.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c28",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275543
       },
       {
-       "op": "c29.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "si"
+        "calque=c29",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 275550
       },
@@ -1794,18 +1813,20 @@
        "ligne": 276451
       },
       {
-       "op": "c37.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "1"
+        "calque=c37",
+        "dx=0",
+        "dy=1"
        ],
        "ligne": 276470
       },
       {
-       "op": "c37.méthode24",
+       "op": "déplace",
        "arguments": [
-        "0",
-        "1"
+        "calque=c37",
+        "dx=0",
+        "dy=1"
        ],
        "ligne": 276485
       },
@@ -2251,10 +2272,10 @@
     "    si scène1.compteur > 10 :",
     "        si scène1.compteur < 50 :",
     "            si scène1.compteur & 1 != 0 :",
-    "                c4.méthode24(0, -1)                                                                   ⟨272261⟩",
+    "                déplace(calque=c4, dx=0, dy=-1)                                                       ⟨272261⟩",
     "    si scène1.compteur < 50 :",
     "        si scène1.compteur & 1 != 0 :",
-    "            c5.méthode24(0, -1)                                                                       ⟨272274⟩",
+    "            déplace(calque=c5, dx=0, dy=-1)                                                           ⟨272274⟩",
     "    si scène1.compteur == 54 :",
     "        retire(parent=scène1, calque=c1)                                                              ⟨272286⟩",
     "        c1.détruit(3)                                                                                 ⟨272293⟩",
@@ -2273,8 +2294,8 @@
     "    si scène1.compteur > 54 :",
     "        si v406 > 4 :",
     "            v406 = 0                                                                                  ⟨272345⟩",
-    "            c2.méthode24(-1, 0)                                                                       ⟨272351⟩",
-    "            c3.méthode24(1, 0)                                                                        ⟨272358⟩",
+    "            déplace(calque=c2, dx=-1, dy=0)                                                           ⟨272351⟩",
+    "            déplace(calque=c3, dx=1, dy=0)                                                            ⟨272358⟩",
     "        v414 = v406                                                                                   ⟨272363⟩",
     "        c2.image = v414                                                                               ⟨272366⟩",
     "        v416 = v406                                                                                   ⟨272368⟩",
@@ -2397,9 +2418,9 @@
     "        sinon :",
     "            si si == 1 :",
     "                si = 0                                                                                ⟨273118⟩",
-    "    c11.méthode24(0, si)                                                                              ⟨273126⟩",
-    "    c12.méthode24(0, si)                                                                              ⟨273132⟩",
-    "    c13.méthode24(0, si)                                                                              ⟨273139⟩",
+    "    déplace(calque=c11, dx=0, dy=si)                                                                  ⟨273126⟩",
+    "    déplace(calque=c12, dx=0, dy=si)                                                                  ⟨273132⟩",
+    "    déplace(calque=c13, dx=0, dy=si)                                                                  ⟨273139⟩",
     "    v336 = v336 + si                                                                                  ⟨273141⟩",
     "    Scene_Tick(scène=scène2)                                                                          ⟨273151⟩",
     "canal_arrête(canal=canal3)                                                                            ⟨273176⟩",
@@ -2709,9 +2730,9 @@
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨275219⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨275227⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨275233⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨275240⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨275227⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨275233⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨275240⟩",
     "        Scene_Tick(scène=scène5)                                                                      ⟨275251⟩",
     "    v338 = 0                                                                                          ⟨275263⟩",
     "    tant que v338 < 10 :",
@@ -2731,9 +2752,9 @@
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨275289⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨275297⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨275303⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨275310⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨275297⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨275303⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨275310⟩",
     "        Scene_Tick(scène=scène5)                                                                      ⟨275321⟩",
     "        v338 = v338 + 1                                                                               ⟨275323⟩",
     "    v336 = 0                                                                                          ⟨275346⟩",
@@ -2760,9 +2781,9 @@
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨275391⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨275399⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨275405⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨275412⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨275399⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨275405⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨275412⟩",
     "        v326 = v326 + si                                                                              ⟨275414⟩",
     "        si v2 + 6 == v328 :",
     "            sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[5])                             ⟨275427⟩",
@@ -2792,9 +2813,9 @@
     "            sinon :",
     "                si si == 1 :",
     "                    si = 0                                                                            ⟨275529⟩",
-    "        c27.méthode24(0, si)                                                                          ⟨275537⟩",
-    "        c28.méthode24(0, si)                                                                          ⟨275543⟩",
-    "        c29.méthode24(0, si)                                                                          ⟨275550⟩",
+    "        déplace(calque=c27, dx=0, dy=si)                                                              ⟨275537⟩",
+    "        déplace(calque=c28, dx=0, dy=si)                                                              ⟨275543⟩",
+    "        déplace(calque=c29, dx=0, dy=si)                                                              ⟨275550⟩",
     "        v326 = v326 + si                                                                              ⟨275552⟩",
     "        si v2 + 10 == v328 :",
     "            sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[6])                             ⟨275565⟩",
@@ -2921,11 +2942,11 @@
     "    v332 = v332 + 1                                                                                   ⟨276459⟩",
     "    c37.image = v362                                                                                  ⟨276462⟩",
     "    si scène6.compteur < 40 :",
-    "        c37.méthode24(0, 1)                                                                           ⟨276470⟩",
+    "        déplace(calque=c37, dx=0, dy=1)                                                               ⟨276470⟩",
     "    si scène6.compteur > 40 :",
     "        si scène6.compteur < 60 :",
     "            si scène6.compteur & 1 != 0 :",
-    "                c37.méthode24(0, 1)                                                                   ⟨276485⟩",
+    "                déplace(calque=c37, dx=0, dy=1)                                                       ⟨276485⟩",
     "    si scène6.compteur == 20 :",
     "        si v12 != 0 :",
     "            voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                           ⟨276496⟩",
@@ -7263,15 +7284,19 @@
            },
            "alors": [
             {
-             "t": "appel",
-             "nom": "c4.méthode24",
-             "args": [
-              0,
-              -1
-             ],
+             "t": "op",
+             "op": "déplace",
+             "args": {
+              "calque": {
+               "objet": "c4"
+              },
+              "dx": 0,
+              "dy": -1
+             },
              "texte": [
-              "0",
-              "-1"
+              "calque=c4",
+              "dx=0",
+              "dy=-1"
              ],
              "ligne": 272261
             }
@@ -7322,15 +7347,19 @@
          },
          "alors": [
           {
-           "t": "appel",
-           "nom": "c5.méthode24",
-           "args": [
-            0,
-            -1
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c5"
+            },
+            "dx": 0,
+            "dy": -1
+           },
            "texte": [
-            "0",
-            "-1"
+            "calque=c5",
+            "dx=0",
+            "dy=-1"
            ],
            "ligne": 272274
           }
@@ -7570,28 +7599,36 @@
            "ligne": 272345
           },
           {
-           "t": "appel",
-           "nom": "c2.méthode24",
-           "args": [
-            -1,
-            0
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c2"
+            },
+            "dx": -1,
+            "dy": 0
+           },
            "texte": [
-            "-1",
-            "0"
+            "calque=c2",
+            "dx=-1",
+            "dy=0"
            ],
            "ligne": 272351
           },
           {
-           "t": "appel",
-           "nom": "c3.méthode24",
-           "args": [
-            1,
-            0
-           ],
+           "t": "op",
+           "op": "déplace",
+           "args": {
+            "calque": {
+             "objet": "c3"
+            },
+            "dx": 1,
+            "dy": 0
+           },
            "texte": [
-            "1",
-            "0"
+            "calque=c3",
+            "dx=1",
+            "dy=0"
            ],
            "ligne": 272358
           }
@@ -9026,47 +9063,59 @@
        "nom": "loc_99B19"
       },
       {
-       "t": "appel",
-       "nom": "c11.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c11"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c11",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273126
       },
       {
-       "t": "appel",
-       "nom": "c12.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c12"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c12",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273132
       },
       {
-       "t": "appel",
-       "nom": "c13.méthode24",
-       "args": [
-        0,
-        {
+       "t": "op",
+       "op": "déplace",
+       "args": {
+        "calque": {
+         "objet": "c13"
+        },
+        "dx": 0,
+        "dy": {
          "local": "si"
         }
-       ],
+       },
        "texte": [
-        "0",
-        "si"
+        "calque=c13",
+        "dx=0",
+        "dy=si"
        ],
        "ligne": 273139
       },
@@ -12674,47 +12723,59 @@
          "nom": "loc_9B420"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275227
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275233
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275240
         },
@@ -12900,47 +12961,59 @@
          "nom": "loc_9B4BB"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275297
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275303
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275310
         },
@@ -13230,47 +13303,59 @@
          "nom": "loc_9B5BA"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275399
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275405
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275412
         },
@@ -13678,47 +13763,59 @@
          "nom": "loc_9B6F4"
         },
         {
-         "t": "appel",
-         "nom": "c27.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c27"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c27",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275537
         },
         {
-         "t": "appel",
-         "nom": "c28.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c28"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c28",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275543
         },
         {
-         "t": "appel",
-         "nom": "c29.méthode24",
-         "args": [
-          0,
-          {
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c29"
+          },
+          "dx": 0,
+          "dy": {
            "local": "si"
           }
-         ],
+         },
          "texte": [
-          "0",
-          "si"
+          "calque=c29",
+          "dx=0",
+          "dy=si"
          ],
          "ligne": 275550
         },
@@ -15253,15 +15350,19 @@
        },
        "alors": [
         {
-         "t": "appel",
-         "nom": "c37.méthode24",
-         "args": [
-          0,
-          1
-         ],
+         "t": "op",
+         "op": "déplace",
+         "args": {
+          "calque": {
+           "objet": "c37"
+          },
+          "dx": 0,
+          "dy": 1
+         },
          "texte": [
-          "0",
-          "1"
+          "calque=c37",
+          "dx=0",
+          "dy=1"
          ],
          "ligne": 276470
         }
@@ -15317,15 +15418,19 @@
            },
            "alors": [
             {
-             "t": "appel",
-             "nom": "c37.méthode24",
-             "args": [
-              0,
-              1
-             ],
+             "t": "op",
+             "op": "déplace",
+             "args": {
+              "calque": {
+               "objet": "c37"
+              },
+              "dx": 0,
+              "dy": 1
+             },
              "texte": [
-              "0",
-              "1"
+              "calque=c37",
+              "dx=0",
+              "dy=1"
              ],
              "ligne": 276485
             }

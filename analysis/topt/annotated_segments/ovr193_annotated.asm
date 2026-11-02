@@ -1125,7 +1125,7 @@ loc_5BD5C:
 		push	[bp+var_BC]
 		push	[bp+var_BA]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BDAA:
@@ -1153,7 +1153,7 @@ loc_5BDAA:
 		push	[bp+var_C0]
 		push	[bp+var_BE]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BDFE:
@@ -1181,7 +1181,7 @@ loc_5BDFE:
 		push	[bp+var_C4]
 		push	[bp+var_C2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BE51:
@@ -1209,7 +1209,7 @@ loc_5BE51:
 		push	[bp+var_C8]
 		push	[bp+var_C6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BEA5:
@@ -1237,7 +1237,7 @@ loc_5BEA5:
 		push	[bp+var_CC]
 		push	[bp+var_CA]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BEF8:
@@ -1264,7 +1264,7 @@ loc_5BEF8:
 		push	[bp+var_D0]
 		push	[bp+var_CE]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BF48:
@@ -1289,7 +1289,7 @@ loc_5BF48:
 		push	[bp+var_D4]
 		push	[bp+var_D2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_5BF92:

@@ -7,7 +7,24 @@ seg137		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_38514		proc far
+; ==============================================================================================
+; Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (11 sur
+; 11), à Shape_DrawSpans_32CD8 (sub_32CD8 de OPTEST.EXE). Code non comparé instruction par
+; instruction. — Reprise de STRIKE.EXE : code identique instruction par instruction à
+; Shape_DrawSpans_61F52 (sub_61F52 de STRIKE.EXE). far. DESSIN D'UNE IMAGE (forme RealSpace,
+; format des segments de ligne) à la position (arg_2, arg_4), avec découpe sur le rectangle de
+; la fenêtre. Pour chaque segment : lodsw = n (0 = fin de l'image), lodsw = x, lodsw = y
+; (ajoutés à la position) ; n pair : n/2 pixels recopiés tels quels (shr cx, 1 / rep movsw /
+; rep movsb) ; n impair : blocs de n/2 pixels en tout, chaque bloc commence par un octet c
+; (lodsb / shr al, 1) : c pair → c/2 pixels recopiés (rep movsw / rep movsb), c impair → c/2
+; fois l'octet suivant (rep stosw / rep stosb). Écriture directe dans la mémoire d'écran : ni
+; XOR ni couleur transparente testée ; la transparence vient du format (seuls les pixels des
+; segments sont écrits), et une image dessinée après une autre la recouvre là où leurs
+; segments se chevauchent. Ex-'Render_MeasureOrDrawTextString' (nom faux), renommée 2026-10-23
+; après lecture de la boucle de pixels (boucle relue ici, dans OPTEST). Lecteur Python
+; équivalent : tools/sc_data.py image_spans/draw_image.
+; ==============================================================================================
+Shape_DrawSpans_38514		proc far
 
 var_152		= word ptr -152h
 var_12		= word ptr -12h
@@ -362,9 +379,9 @@ loc_38753:
 		add	si, ax
 		pop	si
 		pop	ds
-sub_38514		endp
+Shape_DrawSpans_38514		endp
 
-; START OF FUNCTION CHUNK FOR sub_38514
+; START OF FUNCTION CHUNK FOR Shape_DrawSpans_38514
 		db 0E9h
-; END OF FUNCTION CHUNK FOR sub_38514
+; END OF FUNCTION CHUNK FOR Shape_DrawSpans_38514
 seg137		ends

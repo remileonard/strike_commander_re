@@ -1794,7 +1794,7 @@ loc_126E6:
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_12718:

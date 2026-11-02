@@ -303,7 +303,7 @@ si byte_4F55C == 0 :
                 tant que v258 < 8 :
                     si v258 > 1 :
                         si v258 < 7 :
-                            c7.méthode24(v258 - 13, 0)                                                ⟨232650⟩
+                            déplace(calque=c7, dx=v258 - 13, dy=0)                                    ⟨232650⟩
                     Scene_Tick(scène=scène3)                                                          ⟨232656⟩
                     v258 = v258 + 1                                                                   ⟨232658⟩
                 voix_joue (sub_83FE, non lue)(voix=voix1, x=-1)                                       ⟨232666⟩
@@ -320,7 +320,7 @@ si byte_4F55C == 0 :
                     v248 = scène3.compteur                                                            ⟨232742⟩
                     si v248 > 1 :
                         si v248 < 7 :
-                            c7.méthode24(v248 - 13, 0)                                                ⟨232754⟩
+                            déplace(calque=c7, dx=v248 - 13, dy=0)                                    ⟨232754⟩
                     si v248 == 8 :
                         sous_titre (sub_C8F5, non lue)(zone=objet1, texte=textes1[2])                 ⟨232767⟩
                     si (si + ((v4·70) / 100)) - 1 == v248 :
@@ -1109,15 +1109,15 @@ si byte_4F55C == 0 :
                                                             ajoute c35 à scène15                      ⟨238163⟩
                                                             palette_copie(destination=pal1, source=pal9(mid12 23))  ⟨238172⟩
                                                             palette_envoie(palette=pal1, pas=0)       ⟨238184⟩
-                                                            c34.méthode24(0, 10)                      ⟨238191⟩
+                                                            déplace(calque=c34, dx=0, dy=10)          ⟨238191⟩
                                                             tant que (scène15.compteur < 18) et (scène15.terminée == 0) :
                                                                 v258 = scène15.compteur               ⟨238197⟩
                                                                 si v258 < 3 :
-                                                                    c34.méthode24(10, 1)              ⟨238205⟩
+                                                                    déplace(calque=c34, dx=10, dy=1)  ⟨238205⟩
                                                                 si v258 == 4 :
                                                                     Scene_SetFps(scène=scène15, cadence=20)  ⟨238214⟩
                                                                 si v258 > 8 :
-                                                                    c34.méthode24(-12, -1)            ⟨238225⟩
+                                                                    déplace(calque=c34, dx=-12, dy=-1)  ⟨238225⟩
                                                                 Scene_Tick(scène=scène15)             ⟨238238⟩
                                                             v238 = 0                                  ⟨238282⟩
                                                             v228 = 0                                  ⟨238300⟩

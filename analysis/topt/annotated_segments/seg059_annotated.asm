@@ -231,7 +231,7 @@ loc_23240:
 		push	ax
 		push	0
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_23274:

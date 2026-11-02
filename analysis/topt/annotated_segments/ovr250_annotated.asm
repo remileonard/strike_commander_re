@@ -109,7 +109,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_BFF67
 
@@ -128,7 +128,7 @@ loc_BFF39:
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_BFF67:
@@ -199,7 +199,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_C000E
 
@@ -218,7 +218,7 @@ loc_BFFE0:
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_C000E:
@@ -374,7 +374,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_C015E
 
@@ -393,7 +393,7 @@ loc_C0130:
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_C015E:
@@ -801,7 +801,7 @@ arg_0		= word ptr  6
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_C0422
 
@@ -820,7 +820,7 @@ loc_C03F4:
 		push	word ptr [si+6]
 		push	word ptr [si+4]
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_C0422:

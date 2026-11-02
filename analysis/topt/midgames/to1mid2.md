@@ -67,7 +67,7 @@ v39 = 0                                                                         
 palette_depuis(pal2(to1mid2 8))                                                                       ⟨228091⟩
 palette_copie(destination=pal1, source=pal2(to1mid2 8))                                               ⟨228100⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨228108⟩
-sub_38514(&v116, 0, 27, données(to1mid2 6.+0), 0)                                                     ⟨228125⟩
+dessine_image(surface=surface1, x=0, y=27, données=données(to1mid2 6.+0), image=0)                    ⟨228125⟩
 sub_11166(h1, "OBJECTS", "EJECT", ".PAK")                                                             ⟨228152⟩
 pak_vide()→0.méthode20(h1, 1)                                                                         ⟨228159⟩
 tableau_objets(objets1 : 3 objets de 10 octets)                                                       ⟨228168⟩
@@ -98,7 +98,7 @@ tant que di < 3 :
 loc_7B345:                                                                                            ⟨228296⟩
 
 ──── scène3 ────
-scène3 = Scene_Create(cadence=20, palette=255, surface=&v116)                                         ⟨228303⟩
+scène3 = Scene_Create(cadence=20, palette=255, surface=surface1)                                      ⟨228303⟩
 c3 = ImageLayer(ressource=objets1, x=0, y=0, image=0)                                                 ⟨228311⟩
 ajoute c3 à scène3                                                                                    ⟨228317⟩
 v80 = 0                                                                                               ⟨228320⟩
@@ -118,15 +118,15 @@ v85 = 1                                                                         
 v84 = 0                                                                                               ⟨228344⟩
 v84 = -1536                                                                                           ⟨228345⟩
 sub_392F6(word_4D36E, données(v90), &v80)                                                             ⟨228359⟩
-sub_38514(&v116, 0, 0, données(objets1.+0), 0)                                                        ⟨228376⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+0), image=0)                       ⟨228376⟩
 v94 = 8                                                                                               ⟨228378⟩
 attend(chronomètre=objet1)                                                                            ⟨228383⟩
 sub_38CDA(word_4D36E, données(v90), &v80)                                                             ⟨228398⟩
-sub_38514(&v116, 0, 0, données(objets1.+10), 0)                                                       ⟨228415⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+10), image=0)                      ⟨228415⟩
 v94 = 8                                                                                               ⟨228417⟩
 attend(chronomètre=objet1)                                                                            ⟨228422⟩
 sub_38CDA(word_4D36E, données(v90), &v80)                                                             ⟨228437⟩
-sub_38514(&v116, 0, 0, données(objets1.+20), 0)                                                       ⟨228454⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+20), image=0)                      ⟨228454⟩
 v94 = 45                                                                                              ⟨228456⟩
 attend(chronomètre=objet1)                                                                            ⟨228461⟩
 v90 = 0                                                                                               ⟨228478⟩
@@ -186,23 +186,23 @@ tant que di < 5 :
 loc_7B933:                                                                                            ⟨228825⟩
 v70 = booléen                                                                                         ⟨228827⟩
 v74 = booléen                                                                                         ⟨228828⟩
-sub_38514(&v116, 0, 27, données(to1mid2 7.+0), 0)                                                     ⟨228844⟩
-sub_38514(&v116, 0, 0, données(v48), 0)                                                               ⟨228861⟩
+dessine_image(surface=surface1, x=0, y=27, données=données(to1mid2 7.+0), image=0)                    ⟨228844⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(v48), image=0)                              ⟨228861⟩
 v70 = 6                                                                                               ⟨228863⟩
 attend(chronomètre=objet2)                                                                            ⟨228868⟩
-sub_38514(&v116, 0, 0, données(objets2.+0), 0)                                                        ⟨228885⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+0), image=0)                       ⟨228885⟩
 v70 = 6                                                                                               ⟨228887⟩
 attend(chronomètre=objet2)                                                                            ⟨228892⟩
-sub_38514(&v116, 0, 0, données(objets2.+10), 0)                                                       ⟨228909⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+10), image=0)                      ⟨228909⟩
 v70 = 6                                                                                               ⟨228911⟩
 attend(chronomètre=objet2)                                                                            ⟨228916⟩
-sub_38514(&v116, 0, 0, données(objets2.+20), 0)                                                       ⟨228933⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+20), image=0)                      ⟨228933⟩
 v70 = 6                                                                                               ⟨228935⟩
 attend(chronomètre=objet2)                                                                            ⟨228940⟩
-sub_38514(&v116, 0, 0, données(objets2.+30), 0)                                                       ⟨228957⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+30), image=0)                      ⟨228957⟩
 v70 = 6                                                                                               ⟨228959⟩
 attend(chronomètre=objet2)                                                                            ⟨228964⟩
-sub_38514(&v116, 0, 0, données(objets2.+40), 0)                                                       ⟨228981⟩
+dessine_image(surface=surface1, x=0, y=0, données=données(objets2.+40), image=0)                      ⟨228981⟩
 v70 = 35                                                                                              ⟨228983⟩
 attend(chronomètre=objet2)                                                                            ⟨228988⟩
 CRT_Doprnt_Core(objets2, 10, 5, 1, sub_479E0)                                                         ⟨228997⟩
@@ -216,7 +216,7 @@ v39 = 0                                                                         
 palette_depuis(pal2(to1mid2 5))                                                                       ⟨229064⟩
 
 ──── &objets2+16 ────
-&objets2+16 = Scene_Create(cadence=20, palette=255, surface=&v116)                                    ⟨229072⟩
+&objets2+16 = Scene_Create(cadence=20, palette=255, surface=surface1)                                 ⟨229072⟩
 c4 = OverlayImageLayer(ressource=to1mid2 4, x=0, y=-27, image=0)                                      ⟨229080⟩
 di = c4                                                                                               ⟨229082⟩
 palette_copie(destination=pal1, source=pal2(to1mid2 5))                                               ⟨229090⟩

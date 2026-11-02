@@ -1477,7 +1477,7 @@ loc_6A09D:
 		push	0
 		lea	ax, [bp+var_1C6]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -1494,7 +1494,7 @@ loc_6A09D:
 		push	0
 		lea	ax, [bp+var_1C6]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		call	Input_Flush_116D1
 		lea	ax, [bp+var_3C4]
@@ -2649,7 +2649,7 @@ loc_6AEE3:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -2666,7 +2666,7 @@ loc_6AEE3:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		mov	al, byte ptr [bp+var_154]
@@ -3125,7 +3125,7 @@ loc_6B48E:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -3142,7 +3142,7 @@ loc_6B48E:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		mov	al, byte ptr [bp+var_154]
@@ -3221,7 +3221,7 @@ loc_6B59B:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -3238,7 +3238,7 @@ loc_6B59B:
 		push	0
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		lea	ax, [bp+var_1C6]
 		push	ax

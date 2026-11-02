@@ -2333,7 +2333,7 @@ loc_67386:
 		push	87h
 		push	5
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		lea	ax, [bp+var_9A]
 		push	ax

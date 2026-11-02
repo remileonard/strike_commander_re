@@ -238,7 +238,7 @@ arg_0		= word ptr  6
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_3424E

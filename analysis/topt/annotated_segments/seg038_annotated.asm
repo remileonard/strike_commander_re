@@ -1364,7 +1364,7 @@ loc_17A1B:
 		push	0
 		push	0
 		push	word_4D36E
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	274h
 		push	0Ah

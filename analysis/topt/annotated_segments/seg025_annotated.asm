@@ -691,7 +691,7 @@ loc_DEE0:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_F088
+		call	near ptr MovingOverlayLayer_Construct_F088
 		add	sp, 0Eh
 		mov	word ptr [si], 2071h
 		mov	word ptr [si+0Ah], 2095h
@@ -1642,7 +1642,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		cmp	word ptr [si+29h], 0FFFFh
 		jz	short loc_E610
@@ -1667,7 +1667,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_E610
 
@@ -1695,7 +1695,7 @@ loc_E610:
 		push	[bp+var_E]
 		push	[bp+var_C]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_E65B
 
@@ -1775,7 +1775,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_6], di
 		mov	ax, [bp+arg_4]
@@ -1798,7 +1798,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_E729
 
@@ -2404,7 +2404,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		cmp	word ptr [si+25h], 0FFFFh
 		jz	short loc_EB59
@@ -2429,7 +2429,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_EB59
 
@@ -2816,7 +2816,7 @@ arg_0		= word ptr  6
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_3424E
@@ -3201,7 +3201,15 @@ sub_F00A		endp
 
 ; Attributes: bp-based frame
 
-sub_F088		proc far
+; ==============================================================================================
+; Reprise de OPTEST.EXE par position d'appel dans les cinématiques : position d'appel (1 sur
+; 1), à MovingOverlayLayer_Construct_A837 (sub_A837 de OPTEST.EXE). Code non comparé
+; instruction par instruction. — far, LUE 2026-10-21. Calque mobile sur fond (taille 21h,
+; tables de méthodes 17CBh / 17EBh) : ImageLayer_Construct_2E02C(ressource arg_2, x arg_4, y
+; arg_6, image arg_C), vitesse +1Dh = arg_8, +1Fh = arg_A ; avance comme un calque mobile
+; (MovingLayer_Advance_2E2D1), dessin MovingOverlayLayer_Draw_A8BE. mid3 : mid3 8 et mid3 3.
+; ==============================================================================================
+MovingOverlayLayer_Construct_F088		proc far
 
 var_C		= word ptr -0Ch
 var_A		= word ptr -0Ah
@@ -3267,13 +3275,13 @@ loc_F107:
 		pop	si
 		leave
 		retf
-sub_F088		endp
+MovingOverlayLayer_Construct_F088		endp
 
-; START OF FUNCTION CHUNK FOR sub_F088
+; START OF FUNCTION CHUNK FOR MovingOverlayLayer_Construct_F088
 		pop	si
 		leave
 		retf
-; END OF FUNCTION CHUNK FOR sub_F088
+; END OF FUNCTION CHUNK FOR MovingOverlayLayer_Construct_F088
 
 ; ----------------------------------------------------------------------
 
@@ -3320,7 +3328,7 @@ arg_0		= word ptr  6
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_3424E
@@ -3527,7 +3535,7 @@ arg_0		= word ptr  6
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	si
 		call	Layer_DrawAtOwnPos_3424E
@@ -3782,7 +3790,7 @@ arg_0		= word ptr  6
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		cmp	byte ptr [si+1Dh], 0
 		jz	short loc_F4A6
@@ -4939,7 +4947,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	[bp+var_6], di
 		mov	ax, [bp+arg_4]
@@ -4958,7 +4966,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		pop	di
 		pop	si
@@ -5291,7 +5299,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+arg_2]
 		lea	ax, [bp+var_18]
 		push	ax
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		lea	ax, [bp+var_18]
 		push	ax
@@ -5441,7 +5449,7 @@ arg_4		= word ptr  0Ah
 		push	[bp+var_4]
 		push	[bp+var_2]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_FE6C:
@@ -5464,7 +5472,7 @@ loc_FE6C:
 		push	[bp+var_8]
 		push	[bp+var_6]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 
 loc_FEA8:
@@ -5487,7 +5495,7 @@ loc_FEA8:
 		push	[bp+var_C]
 		push	[bp+var_A]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_FF2B
 
@@ -5513,7 +5521,7 @@ loc_FEE6:
 		push	[bp+var_10]
 		push	[bp+var_E]
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		jmp	short loc_FF2B
 

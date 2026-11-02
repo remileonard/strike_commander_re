@@ -200,11 +200,11 @@ tant que (scène1.compteur < 33) et (scène1.terminée == 0) :
         v206 = v206 - 1                                                                               ⟨241026⟩
         Scene_SetFps(scène=scène1, cadence=v206)                                                      ⟨241031⟩
     si scène1.compteur == 29 :
-        c3.méthode24(28, 1)                                                                           ⟨241041⟩
+        déplace(calque=c3, dx=28, dy=1)                                                               ⟨241041⟩
     si scène1.compteur == 30 :
-        c3.méthode24(35, 2)                                                                           ⟨241051⟩
+        déplace(calque=c3, dx=35, dy=2)                                                               ⟨241051⟩
     si scène1.compteur == 31 :
-        c3.méthode24(45, 3)                                                                           ⟨241061⟩
+        déplace(calque=c3, dx=45, dy=3)                                                               ⟨241061⟩
     si scène1.compteur == 32 :
         retire(parent=scène1, calque=c3)                                                              ⟨241070⟩
         c3.détruit(3)                                                                                 ⟨241077⟩

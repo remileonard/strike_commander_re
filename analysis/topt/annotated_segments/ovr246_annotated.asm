@@ -241,7 +241,7 @@ loc_BED47:
 		push	[bp+var_26]
 		push	[bp+var_24]
 		push	[bp+var_22]
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	[bp+arg_A]
 		push	[bp+arg_8]
@@ -443,7 +443,7 @@ loc_BEF19:
 		push	[bp+var_6]
 		push	[bp+var_4]
 		push	[bp+var_2]
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		mov	bx, word_4D36E
 		mov	ax, [bx+8]

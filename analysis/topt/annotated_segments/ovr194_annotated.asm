@@ -426,7 +426,7 @@ loc_5C9F3:
 		push	0
 		push	0
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	0
 		push	0
@@ -442,7 +442,7 @@ loc_5C9F3:
 		push	3
 		push	4
 		push	word_4D36C
-		call	sub_38514
+		call	Shape_DrawSpans_38514
 		add	sp, 0Ch
 		push	word_4D36E
 		push	word_4D36C

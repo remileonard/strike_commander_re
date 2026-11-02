@@ -32,6 +32,10 @@
    "ovr212",
    0.968
   ],
+  "ovr209": [
+   "ovr213",
+   0.974
+  ],
   "ovr197": [
    "ovr201",
    0.956
@@ -40,11 +44,11 @@
  "functions": {
   "AIL_start_sequence_30C42": {
    "cible": "sub_50D1",
-   "méthode": "position d'appel (58 sur 58)"
+   "méthode": "nom repris"
   },
   "AIL_stop_sequence_30C48": {
    "cible": "sub_50D7",
-   "méthode": "position d'appel (10 sur 10)"
+   "méthode": "nom repris"
   },
   "AnimLayer_Construct_2E5CF": {
    "cible": "sub_3461B",
@@ -71,16 +75,16 @@
    "méthode": "aucun appel aligné"
   },
   "ClippedMovingImageLayer_Construct_B45E": {
-   "cible": "sub_FCAF",
-   "méthode": "position d'appel (6 sur 6)"
+   "cible": "sub_100F9",
+   "méthode": "nom repris (3 copies)"
   },
   "ClippedMovingLayer_Construct_B3F8": {
-   "cible": "sub_FC49",
-   "méthode": "position d'appel (2 sur 2)"
+   "cible": "sub_10093",
+   "méthode": "nom repris (3 copies)"
   },
   "ConvData_LoadByName_C38E": {
    "cible": "sub_10C87",
-   "méthode": "position d'appel (25 sur 26)"
+   "méthode": "nom repris (2 copies)"
   },
   "ConvData_LoadNormalOrNight_C3A6": {
    "cible": "sub_10C9F",
@@ -88,7 +92,7 @@
   },
   "GlyphObject_ScalarDeletingDtorA_313D6": {
    "cible": "sub_36F5D",
-   "méthode": "position d'appel (97 sur 97)"
+   "méthode": "nom repris"
   },
   "ImageLayer_Construct_2E02C": {
    "cible": "sub_34078",
@@ -116,11 +120,11 @@
   },
   "JitterImageLayer_Construct_B12E": {
    "cible": "sub_F97F",
-   "méthode": "position d'appel (8 sur 8)"
+   "méthode": "nom repris"
   },
   "Keyboard_QueryAndDispatch_3E5C7": {
    "cible": "sub_443C0",
-   "méthode": "position d'appel (2 sur 2)"
+   "méthode": "nom repris"
   },
   "LayerGroup_Add_2DB84": {
    "cible": "sub_33BD0",
@@ -128,7 +132,7 @@
   },
   "LayerGroup_Remove_2DBC1": {
    "cible": "sub_33C0D",
-   "méthode": "position d'appel (22 sur 22)"
+   "méthode": "nom repris"
   },
   "Layer_ConstructAtOrigin_2DE95": {
    "cible": "sub_33EE1",
@@ -139,8 +143,8 @@
    "méthode": "nom repris"
   },
   "Layer_MoveBy_2E29E": {
-   "cible": null,
-   "méthode": "aucun appel aligné"
+   "cible": "sub_33DAD",
+   "méthode": "nom repris (2 copies)"
   },
   "Memory_TypedAllocDispatchB_2B920": {
    "cible": "sub_329B1",
@@ -152,27 +156,27 @@
   },
   "Midgame1_PlayPart2_671C0": {
    "cible": "sub_70290",
-   "méthode": "position d'appel (1 sur 1)"
+   "méthode": "nom repris"
   },
   "MovingMaskLayer_Construct_B995": {
    "cible": null,
    "méthode": "aucun appel aligné"
   },
   "MovingMaskLayer_SetTable_BA1C": {
-   "cible": null,
-   "méthode": "aucun appel aligné"
+   "cible": "sub_1026D",
+   "méthode": "nom repris (4 copies)"
   },
   "MovingOverlayLayer_Construct_A837": {
-   "cible": null,
-   "méthode": "aucun appel aligné"
+   "cible": "sub_F088",
+   "méthode": "position d'appel (1 sur 1)"
   },
   "MusicChannel_Init_78A4": {
    "cible": "sub_B75B",
-   "méthode": "position d'appel (49 sur 49)"
+   "méthode": "nom repris"
   },
   "MusicChannel_RegisterSequence_7918": {
    "cible": "sub_B7A2",
-   "méthode": "position d'appel (58 sur 58)"
+   "méthode": "nom repris"
   },
   "Music_ChannelStopSequence_783A": {
    "cible": "sub_B6F1",
@@ -184,11 +188,11 @@
   },
   "OverlayImageLayer_Construct_A9D6": {
    "cible": "sub_F227",
-   "méthode": "position d'appel (18 sur 18)"
+   "méthode": "nom repris"
   },
   "Pak_LoadEntry_C40A": {
    "cible": "sub_10D03",
-   "méthode": "position d'appel (339 sur 339)"
+   "méthode": "nom repris"
   },
   "Palette_Alloc_2CC76": {
    "cible": "sub_34A1A",
@@ -200,15 +204,15 @@
   },
   "Palette_Destruct_2D048": {
    "cible": "sub_34DEC",
-   "méthode": "position d'appel (483 sur 487)"
+   "méthode": "nom repris"
   },
   "Palette_FadeFromColor_2D165": {
    "cible": "sub_34EEE",
-   "méthode": "position d'appel (7 sur 7)"
+   "méthode": "nom repris"
   },
   "Palette_FadeToColor_2D09C": {
    "cible": "sub_34E29",
-   "méthode": "position d'appel (16 sur 16)"
+   "méthode": "nom repris"
   },
   "Palette_FillRange_2CF08": {
    "cible": "sub_34CAC",
@@ -220,7 +224,7 @@
   },
   "Palette_UploadByValue_CBAB": {
    "cible": "sub_114A2",
-   "méthode": "position d'appel (1 sur 1)"
+   "méthode": "nom repris"
   },
   "Palette_Upload_2CDE1": {
    "cible": "sub_34B85",
@@ -230,13 +234,9 @@
    "cible": "sub_11125",
    "méthode": "nom repris"
   },
-  "Render_MeasureOrDrawTextString_32CD8": {
-   "cible": null,
-   "méthode": "aucun appel aligné"
-  },
   "ResourceRecord_Helper_3BE15": {
    "cible": "sub_425B8",
-   "méthode": "position d'appel (52 sur 52)"
+   "méthode": "nom repris (2 copies)"
   },
   "ResourceRecord_ReadFieldGroupA_3C289": {
    "cible": "sub_42A2C",
@@ -276,7 +276,7 @@
   },
   "Scene_Destruct_2DCFC": {
    "cible": "sub_33D48",
-   "méthode": "position d'appel (108 sur 108)"
+   "méthode": "nom repris (4 copies)"
   },
   "Scene_SetFps_2DE27": {
    "cible": "sub_33E73",
@@ -284,11 +284,15 @@
   },
   "Scene_Tick_C652": {
    "cible": "sub_10F4B",
-   "méthode": "position d'appel (392 sur 392)"
+   "méthode": "nom repris"
+  },
+  "Shape_DrawSpans_32CD8": {
+   "cible": "sub_38514",
+   "méthode": "nom repris"
   },
   "SmallObject_UnregisterFromList_2CB7A": {
    "cible": "sub_349C1",
-   "méthode": "position d'appel (64 sur 64)"
+   "méthode": "nom repris"
   },
   "Stopwatch_WaitElapsed_3F023": {
    "cible": "sub_44E21",
@@ -299,8 +303,8 @@
    "méthode": "nom repris"
   },
   "StreamReader_ReleaseBuffer_3CEB3": {
-   "cible": "sub_42F45",
-   "méthode": "position d'appel (26 sur 26)"
+   "cible": "sub_405D2",
+   "méthode": "nom repris (2 copies)"
   },
   "Struct_GetElementCountMinusOne_33352": {
    "cible": null,
@@ -308,11 +312,11 @@
   },
   "Stub_Midgame1_PlayPart2_423E0": {
    "cible": "sub_47D10",
-   "méthode": "position d'appel (1 sur 1)"
+   "méthode": "nom repris"
   },
   "TalkingHeadOverlay_Construct_B20F": {
    "cible": "sub_FA60",
-   "méthode": "position d'appel (15 sur 15)"
+   "méthode": "nom repris"
   },
   "TalkingHead_AttachVoice_9CF7": {
    "cible": "sub_E535",
@@ -320,11 +324,11 @@
   },
   "TalkingHead_Construct_98F4": {
    "cible": "sub_E108",
-   "méthode": "position d'appel (21 sur 21)"
+   "méthode": "nom repris"
   },
   "TalkingHead_SetBaseFrame_9D32": {
-   "cible": "sub_E56E",
-   "méthode": "position d'appel (184 sur 184)"
+   "cible": "sub_78AA",
+   "méthode": "nom repris (2 copies)"
   },
   "TalkingHead_SetLipText_9C4F": {
    "cible": "sub_E45A",
@@ -332,11 +336,11 @@
   },
   "TalkingHead_StartVoiceAndIsSpeaking_9C64": {
    "cible": "sub_E4AD",
-   "méthode": "position d'appel (28 sur 28)"
+   "méthode": "nom repris"
   },
   "TextArray_Destruct_CC03": {
    "cible": "sub_114F8",
-   "méthode": "position d'appel (86 sur 86)"
+   "méthode": "nom repris"
   },
   "TextArray_Init_CBE1": {
    "cible": "sub_114D6",
@@ -368,15 +372,15 @@
   },
   "UI_ApplyEncodingHelper_2EC4A": {
    "cible": "sub_35A77",
-   "méthode": "position d'appel (3 sur 3)"
+   "méthode": "nom repris (2 copies)"
   },
   "VoicePlayer_IsDone_84CC": {
    "cible": "sub_C808",
-   "méthode": "position d'appel (1 sur 1)"
+   "méthode": "nom repris (2 copies)"
   },
   "VoicePlayer_IsPlaying_8500": {
    "cible": "sub_C83C",
-   "méthode": "position d'appel (32 sur 32)"
+   "méthode": "nom repris (2 copies)"
   },
   "VoicePlayer_SetDriver_7A3D": {
    "cible": "sub_B978",
@@ -408,7 +412,7 @@
   },
   "sub_C8F5": {
    "cible": "sub_111EE",
-   "méthode": "position d'appel (109 sur 109)"
+   "méthode": "position d'appel (118 sur 118)"
   }
  },
  "vtables": {
@@ -417,7 +421,7 @@
   "4958": 5084,
   "16248": 18676,
   "5803": 7665,
-  "5703": 7565,
+  "5703": 7469,
   "6043": 7905,
   "6139": 8001,
   "5851": 7713,
@@ -425,7 +429,7 @@
   "5751": 7613,
   "6275": 8121,
   "6794": 8684,
-  "6091": null,
+  "6091": 7953,
   "5607": null,
   "6467": 8357,
   "6567": 8457,
