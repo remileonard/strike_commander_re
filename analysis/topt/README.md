@@ -108,7 +108,82 @@ presque noir de `to1mid1`. Ne s'applique à aucune cinématique reprise de Strik
   `MovingMaskLayer_Construct_B995`, `Struct_GetElementCountMinusOne_33352`) : aucun appel aligné, elles
   ne servent pas dans les cinématiques ci-dessus.
 
-## 6. Outils et commandes
+## 6. Commandes des scripts de déroulement (`Gameflow_RunScriptPairs_63B9`)
+
+Interpréteur des scripts `EFCT` de `GAMEFLOW.IFF` et `GAMEFLO2.IFF` (la campagne de Tactical
+Operations). Comparé à `Gameflow_RunScriptPairs_36CF` d'OPTEST (`GAMEFLOW_SYSTEM.md` § 5.2 et § 8) :
+**46 commandes** (`cmp bx, 2Dh`), contre 39 sur la disquette de Strike Commander et 43 sur le CD.
+
+- **Les commandes de `PLAY_CONV` à `PLAY_GAMEFLOW_TUNE` font la même chose** que sur la disquette (relu
+  cas par cas). Tous les champs de la partie sont décalés d'un octet (`[+252]` → `[+253]`, drapeau n :
+  `[+253 + n]` → `[+254 + n]`, etc.). Même liste de tests comptés pendant un saut, même `OR_GROUP`.
+- **`IF_MISSION_SUCCESS`** fait une chose de plus : si le code de sortie du vol vaut 2 (`[+249]`) et que
+  le drapeau 88 est posé (`[+342]`), la 7ᵉ valeur de `STAT` (`[+983]`) est mise à 1 :
+
+  ```
+  cmp byte ptr [si+0F9h], 2
+  jnz short loc_6728
+  cmp byte ptr [si+156h], 1
+  jnz short loc_6728
+  mov byte ptr [si+3D7h], 1
+  ```
+- **`SAVE_GAME`** sauvegarde ensuite dans `gensave.tm1` (et non `gensave.tmp`).
+- **Compte rendu de vol** (`Gameflow_ReadMissionResult_50D85`) : 7 valeurs de `STAT` lues — succès,
+  gain, puis 3ᵉ à 6ᵉ dans `[+984]` à `[+987]`, 7ᵉ dans `[+983]`.
+
+| Valeur | Nom | `GAMEFLO2.IFF` | Effet dans Tactical Operations |
+|---|---|---|---|
+| 37 | `IF_RESULT_3` | 6 | test : `[+984]` ≠ 0 (3ᵉ valeur de `STAT`) |
+| 38 | `PLAY_GAMEFLOW_TUNE` | 8 | morceau n de `gameflow.dat`, gardé en `[+988]` |
+| 39 | `IF_RESULT_4` | 1 | test : `[+985]` ≠ 0 (4ᵉ valeur de `STAT`) |
+| 40 | `IF_RESULT_5` | 0 | test : `[+986]` ≠ 0 (5ᵉ valeur de `STAT`) |
+| 41 | `IF_RESULT_6` | 0 | test : `[+987]` ≠ 0 (6ᵉ valeur de `STAT`) |
+| 42 | `IF_RESULT_7` (CD : `IF_LOADED_FLAG`) | 6 | test : `[+983]` ≠ 0 (7ᵉ valeur de `STAT`, ou 1 posé par `IF_MISSION_SUCCESS`) |
+| 43 | `WEAPON_LOADOUT_ALT` (nom proposé) | 6 | **second écran d'armement** (`Gameflow_WeaponLoadoutAlt_58DEB`) ; test comme `WEAPON_LOADOUT` |
+| 44 | `RESTORE_PILOT` (nom proposé) | 2 | remet le pilote n au tableau des victoires (`[+676 + n × 26]` = 1, n < 8) : inverse de `REMOVE_PILOT` |
+| 45 | `SHOW_KILL_MARKS_ALT` (nom proposé) | 16 | **second écran des marques de victoires** (`Gameflow_ShowKillMarksAlt_56D57`), même condition que `SHOW_KILL_MARKS` |
+
+`GAMEFLOW.IFF` de Tactical Operations est identique à celui de Strike Commander (aucune commande
+au-delà de 38). Les commandes 39 à 45 ne servent que dans `GAMEFLO2.IFF`.
+
+**Second écran d'armement (`WEAPON_LOADOUT_ALT`).** Même code que `WEAPON_LOADOUT`
+(`Gameflow_WeaponLoadout_584A6`), avec ses propres plages de points d'emport
+(`Gameflow_ApplyDefaultLoadoutAlt_58223`) :
+
+| Arme | Points d'emport | Maximum par côté |
+|---|---|---|
+| 0 AIM-9J, 1 AIM-9M | 0 | 1 |
+| 8 AIM-120 | 1 | 1 |
+| autres | début 0, fin 255 | 0 |
+
+Au départ en vol, l'écran d'armement ordinaire pose `[+6]` = 0 et le second `[+6]` = 1 (champ nouveau
+par rapport à OPTEST ; son lecteur n'a pas été cherché). Dans `GAMEFLO2.IFF`, `WEAPON_LOADOUT_ALT` a
+toujours l'argument 0 : chunk `LOAD` 0 = AIM-9M × 2, AIM-120 × 2. Les données l'emploient ainsi (mission
+0) :
+
+```
+SELECT_MISSION 0
+PLAY_CONV 5
+WEAPON_LOADOUT_ALT 0
+SET_FLAG 45
+SET_FLAG 88
+```
+
+et la mission ordinaire voisine pose `CLEAR_FLAG 88` après `WEAPON_LOADOUT`. Au retour, le script de
+mission choisit l'écran des marques d'après ce drapeau :
+
+```
+IF_NOT_FLAG 88
+SHOW_KILL_MARKS 0
+ELSE 0
+SHOW_KILL_MARKS_ALT 0
+ENDIF 0
+```
+
+**Second écran des marques (`SHOW_KILL_MARKS_ALT`).** Même code que `Gameflow_ShowKillMarks_5638A`,
+avec en plus `GAMEFLOW\OPTSHPS2.PAK` et `GAMEFLOW\OPTPALS2.PAK` et d'autres entrées d'images.
+
+## 7. Outils et commandes
 
 ```
 python3 tools/vroomm_listing.py TOPTTST1.EXE source/topttst1.asm

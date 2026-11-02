@@ -2668,5 +2668,45 @@
     "new_name": "Path_BuildWithFolder_11166",
     "segment": "seg028",
     "summary": "far, cinématique to1mid2 : construit un chemin à partir d'un dossier, d'un nom et d'une extension (to1mid2 : \"OBJECTS\", \"EJECT\", \".PAK\"), avant l'ouverture du PAK par la méthode +20 du lecteur. Corps non lu en détail."
+  },
+  "sub_63B9": {
+    "new_name": "Gameflow_RunScriptPairs_63B9",
+    "segment": "seg010",
+    "summary": "far, LUE 2026-11-02. Interpréteur des scripts EFCT de GAMEFLOW.IFF / GAMEFLO2.IFF, même structure que Gameflow_RunScriptPairs_36CF d'OPTEST (blocs conditionnels, OR_GROUP, liste des tests comptés pendant un saut inchangée : 9, 10, 20, 21, 22, 28, 32, 35, 37). 46 commandes (`cmp bx, 2Dh`, table off_684C) au lieu de 39 : 0 à 38 comme OPTEST disquette, champs de la partie décalés de +1 ; 39 à 42 comme le CD (IF_RESULT_4 à 6 : [+985] à [+987] ; 42 teste [+983], 7e valeur de STAT) ; 43 = second écran d'armement (Gameflow_WeaponLoadoutAlt_58DEB, test comme 22) ; 44 n = remet le pilote n (n < 8) au tableau ([+676 + n × 26] = 1, inverse de REMOVE_PILOT) ; 45 = second écran des marques de victoires (Gameflow_ShowKillMarksAlt_56D57, même condition que 26). Commande 32 (IF_MISSION_SUCCESS) : en plus, si code de sortie [+249] = 2 et drapeau 88 ([+342]) = 1 → [+983] = 1. Commande 16 : fichier gensave.tm1 au lieu de gensave.tmp. analysis/topt/README.md § 6."
+  },
+  "sub_584A6": {
+    "new_name": "Gameflow_WeaponLoadout_584A6",
+    "segment": "ovr192",
+    "summary": "far. Écran d'armement de la commande 22 (WEAPON_LOADOUT), même code que Gameflow_WeaponLoadout_51AB3 d'OPTEST (comparaison des suites d'instructions : seules les variables de pile diffèrent) sauf : au départ en vol (sprite 12), `mov byte ptr [bx+6], 0` (partie +6 = 0) en plus de [+233] = 1 et [+239] = 1. Chargement par défaut : Gameflow_ApplyDefaultLoadout_57FA0."
+  },
+  "sub_58DEB": {
+    "new_name": "Gameflow_WeaponLoadoutAlt_58DEB",
+    "segment": "ovr192",
+    "summary": "far, LU 2026-11-02 (par comparaison avec Gameflow_WeaponLoadout_584A6, 997 lignes contre 989). Écran d'armement de la commande 43 (Tactical Operations). Différences : chargement par défaut Gameflow_ApplyDefaultLoadoutAlt_58223 ; plages de points d'emport (AIM-9J/M : point 0, 1 par côté ; AIM-120 : point 1, 1 par côté ; autres armes : début 0, fin 255, 0 par côté) ; au départ en vol `mov byte ptr [bx+6], 1` (partie +6 = 1) ; textes « %s (%d) » / « Remove %s (%d) » pris en dseg 2471 et 2479 (mêmes chaînes) ; quelques constantes d'affichage différentes (`[bp+var_244]` = 32 au lieu de 15, `push 1` au lieu de `push 0` avant sub_870B) et liste d'armes construite sans la boucle sur 9 armes — rôle de ces différences d'affichage non établi."
+  },
+  "sub_57FA0": {
+    "new_name": "Gameflow_ApplyDefaultLoadout_57FA0",
+    "segment": "ovr192",
+    "summary": "far. Chargement par défaut de l'écran d'armement (chunk LOAD dont le 1er octet = argument), code identique (suite d'instructions) à Gameflow_ApplyDefaultLoadout_51830 d'OPTEST : mêmes plages de points d'emport (GAMEFLOW_SYSTEM.md § 5.3)."
+  },
+  "sub_58223": {
+    "new_name": "Gameflow_ApplyDefaultLoadoutAlt_58223",
+    "segment": "ovr192",
+    "summary": "far. Chargement par défaut du second écran d'armement (commande 43) : même code que Gameflow_ApplyDefaultLoadout_57FA0, seules les plages de points d'emport changent (premier, dernier, maximum par côté) : armes 0 et 1 (AIM-9J, AIM-9M) 0, 0, 1 ; arme 8 (AIM-120) 1, 1, 1 ; armes 4 à 7 et autres 0, 255, 0 (`mov [bp+var_2], 0FFh`)."
+  },
+  "sub_5638A": {
+    "new_name": "Gameflow_ShowKillMarks_5638A",
+    "segment": "ovr191",
+    "summary": "far. Marques de victoires peintes sur l'avion (commande 26, SHOW_KILL_MARKS), chunk MARK d'OPTIONS ; même suite d'instructions que Gameflow_ShowKillMarks_506AA d'OPTEST, avec en plus le switch sur la carte son (byte_4CA58) et le PAK mmusic."
+  },
+  "sub_56D57": {
+    "new_name": "Gameflow_ShowKillMarksAlt_56D57",
+    "segment": "ovr191",
+    "summary": "far. Second écran des marques de victoires (commande 45, Tactical Operations) : même code que Gameflow_ShowKillMarks_5638A, mais charge en plus GAMEFLOW\\\\OPTSHPS2.PAK et GAMEFLOW\\\\OPTPALS2.PAK et prend d'autres entrées d'images (13 au lieu de 143, 1 au lieu de 20)."
+  },
+  "sub_50D85": {
+    "new_name": "Gameflow_ReadMissionResult_50D85",
+    "segment": "ovr188",
+    "summary": "far. Lecture du compte rendu misn2op.iff (comme Gameflow_ReadMissionResult_4B544 d'OPTEST). STAT : 7 valeurs lues — succès, gain, puis 3e à 6e → [+984] à [+987] (`mov [si+3D8h], al` … `mov [si+3DBh], al`), 7e → [+983] (`mov [si+3D7h], al`)."
   }
 }

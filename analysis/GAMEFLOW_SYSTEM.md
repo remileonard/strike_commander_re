@@ -348,7 +348,7 @@ l'OPTTEST.EXE du CD-ROM (§ 8).
 | 32 | `IF_MISSION_SUCCESS` | 62 | test : réussit si la mission n de `MLST` a été volée **avec succès** (`[+509 + n]` = 1, § 6) |
 | 33 | `OR_GROUP` | 0, code seulement | groupe de tests (§ 5.1) |
 | 34 | `APPLY_CHANGE` | 94 | applique le changement `CHNG` n (§ 5.4, `Gameflow_ApplyChange_50160`) |
-| 35 | `IF_PLANES_LOST` | 0, code seulement | test : réussit si des avions ont été perdus pendant le dernier vol (`[+234]` ≠ 0) |
+| 35 | `IF_PLANES_LOST` | 0, code seulement | test qui **échoue toujours** : `cmp word ptr [si+0EAh], 0` puis `jnz short $+2`, qui saute à l'instruction suivante, `mov [bp+var_1], 1` (même code dans Tactical Operations) ; le nom vient du champ comparé, avions perdus pendant le dernier vol (`[+234]`) |
 | 36 | `PLANES_LOST_CONV` | 27 (MISS) | si des avions ont été perdus pendant le dernier vol : humeur musicale 8, puis conversation **253** si le joueur est mort (`[+248]` = 2), **252** sinon |
 | 37 | `IF_RESULT_3` | 7 (MISS) | test : réussit si la 3ᵉ valeur de `STAT` du compte rendu (`[+982]`, § 6) ≠ 0 |
 | 38 | `PLAY_GAMEFLOW_TUNE` | 18 (MISS) | **joue le morceau n** de `SOUND\gameflow.dat` (`Music_PlayGameflowTune_28CFC`), gardé en `[+983]` (sauvegardé) ; données : 1 à 5 |
@@ -358,6 +358,7 @@ l'OPTTEST.EXE du CD-ROM (§ 8).
 | 42 | `IF_LOADED_FLAG` | 0, code seulement (CD) | test : réussit si `[+982]` ≠ 0 (octet rangé par le chargement d'une partie ; rôle non établi) |
 
 Valeurs au-delà de 38 : rien dans la version disquette. Au-delà de 42 : rien dans la version CD.
+Tactical Operations (`TOPTTST1.EXE`) a 46 commandes : `analysis/topt/README.md` § 6.
 Dans la version CD, la partie a 4 octets de plus à partir de `+982` : `IF_RESULT_3` y lit `[+983]`
 et `PLAY_GAMEFLOW_TUNE` garde le morceau en `[+987]` (§ 8). `IF_RESULT_4`, `IF_RESULT_5`,
 `IF_RESULT_6` et `IF_LOADED_FLAG` ne sont pas dans la liste des tests comptés pendant un saut

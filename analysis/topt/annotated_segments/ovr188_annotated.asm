@@ -2330,7 +2330,12 @@ sub_50554		endp
 
 ; Attributes: bp-based frame
 
-sub_50D85		proc far
+; ==============================================================================================
+; far. Lecture du compte rendu misn2op.iff (comme Gameflow_ReadMissionResult_4B544 d'OPTEST).
+; STAT : 7 valeurs lues — succès, gain, puis 3e à 6e → [+984] à [+987] (mov [si+3D8h], al …
+; mov [si+3DBh], al), 7e → [+983] (mov [si+3D7h], al).
+; ==============================================================================================
+Gameflow_ReadMissionResult_50D85		proc far
 
 var_132		= word ptr -132h
 var_D5		= dword ptr -0D5h
@@ -2697,7 +2702,7 @@ loc_510F1:
 		lea	ax, [bp+var_3A]
 		push	ax
 		call	CRT_Strupr_2E71
-sub_50D85		endp
+Gameflow_ReadMissionResult_50D85		endp
 
 ; ----------------------------------------------------------------------
 

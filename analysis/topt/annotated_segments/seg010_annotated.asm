@@ -329,7 +329,21 @@ off_63B1	dw offset loc_6329
 
 ; Attributes: bp-based frame
 
-sub_63B9		proc far
+; ==============================================================================================
+; far, LUE 2026-11-02. Interpréteur des scripts EFCT de GAMEFLOW.IFF / GAMEFLO2.IFF, même
+; structure que Gameflow_RunScriptPairs_36CF d'OPTEST (blocs conditionnels, OR_GROUP, liste
+; des tests comptés pendant un saut inchangée : 9, 10, 20, 21, 22, 28, 32, 35, 37). 46
+; commandes (cmp bx, 2Dh, table off_684C) au lieu de 39 : 0 à 38 comme OPTEST disquette,
+; champs de la partie décalés de +1 ; 39 à 42 comme le CD (IF_RESULT_4 à 6 : [+985] à [+987] ;
+; 42 teste [+983], 7e valeur de STAT) ; 43 = second écran d'armement
+; (Gameflow_WeaponLoadoutAlt_58DEB, test comme 22) ; 44 n = remet le pilote n (n < 8) au
+; tableau ([+676 + n × 26] = 1, inverse de REMOVE_PILOT) ; 45 = second écran des marques de
+; victoires (Gameflow_ShowKillMarksAlt_56D57, même condition que 26). Commande 32
+; (IF_MISSION_SUCCESS) : en plus, si code de sortie [+249] = 2 et drapeau 88 ([+342]) = 1 →
+; [+983] = 1. Commande 16 : fichier gensave.tm1 au lieu de gensave.tmp.
+; analysis/topt/README.md § 6.
+; ==============================================================================================
+Gameflow_RunScriptPairs_63B9		proc far
 
 var_A8		= word ptr -0A8h
 var_58		= word ptr -58h
@@ -919,9 +933,9 @@ loc_6848:
 		pop	si
 		leave
 		retf
-sub_63B9		endp
+Gameflow_RunScriptPairs_63B9		endp
 
-; START OF FUNCTION CHUNK FOR sub_63B9
+; START OF FUNCTION CHUNK FOR Gameflow_RunScriptPairs_63B9
 off_684C	dw offset loc_64F8
 		dw offset loc_6508
 		dw offset loc_6517
@@ -968,7 +982,7 @@ off_684C	dw offset loc_64F8
 		dw offset loc_67EB
 		dw offset loc_6804
 		dw offset loc_681E
-; END OF FUNCTION CHUNK FOR sub_63B9
+; END OF FUNCTION CHUNK FOR Gameflow_RunScriptPairs_63B9
 
 ; ----------------------------------------------------------------------
 
@@ -1178,7 +1192,7 @@ loc_6A3D:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_63B9
+		call	near ptr Gameflow_RunScriptPairs_63B9
 		add	sp, 6
 		cmp	byte ptr [si+0E4h], 0
 		jz	short loc_6AC7
@@ -1536,7 +1550,7 @@ loc_6D8D:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_63B9
+		call	near ptr Gameflow_RunScriptPairs_63B9
 		add	sp, 6
 		cmp	byte ptr [si+0E9h], 4
 		jz	short loc_6DC1

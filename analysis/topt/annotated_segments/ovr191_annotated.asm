@@ -657,7 +657,12 @@ Gameflow_CheckLossConversations_56325		endp
 
 ; Attributes: bp-based frame
 
-sub_5638A		proc far
+; ==============================================================================================
+; far. Marques de victoires peintes sur l'avion (commande 26, SHOW_KILL_MARKS), chunk MARK
+; d'OPTIONS ; même suite d'instructions que Gameflow_ShowKillMarks_506AA d'OPTEST, avec en
+; plus le switch sur la carte son (byte_4CA58) et le PAK mmusic.
+; ==============================================================================================
+Gameflow_ShowKillMarks_5638A		proc far
 
 var_314		= word ptr -314h
 var_29C		= word ptr -29Ch
@@ -1657,21 +1662,27 @@ loc_56CCD:
 		pop	si
 		leave
 		retf
-sub_5638A		endp
+Gameflow_ShowKillMarks_5638A		endp
 
-; START OF FUNCTION CHUNK FOR sub_5638A
+; START OF FUNCTION CHUNK FOR Gameflow_ShowKillMarks_5638A
 off_56D4D	dw offset loc_563DF
 		dw offset loc_56415
 		dw offset loc_563FA
 		dw offset loc_56415
 		dw offset loc_56415
-; END OF FUNCTION CHUNK FOR sub_5638A
+; END OF FUNCTION CHUNK FOR Gameflow_ShowKillMarks_5638A
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_56D57		proc far
+; ==============================================================================================
+; far. Second écran des marques de victoires (commande 45, Tactical Operations) : même code
+; que Gameflow_ShowKillMarks_5638A, mais charge en plus GAMEFLOW\\OPTSHPS2.PAK et
+; GAMEFLOW\\OPTPALS2.PAK et prend d'autres entrées d'images (13 au lieu de 143, 1 au lieu de
+; 20).
+; ==============================================================================================
+Gameflow_ShowKillMarksAlt_56D57		proc far
 
 var_404		= word ptr -404h
 var_38C		= word ptr -38Ch
@@ -2717,15 +2728,15 @@ loc_576F3:
 		pop	si
 		leave
 		retf
-sub_56D57		endp
+Gameflow_ShowKillMarksAlt_56D57		endp
 
-; START OF FUNCTION CHUNK FOR sub_56D57
+; START OF FUNCTION CHUNK FOR Gameflow_ShowKillMarksAlt_56D57
 off_57791	dw offset loc_56DAC
 		dw offset loc_56DE2
 		dw offset loc_56DC7
 		dw offset loc_56DE2
 		dw offset loc_56DE2
-; END OF FUNCTION CHUNK FOR sub_56D57
+; END OF FUNCTION CHUNK FOR Gameflow_ShowKillMarksAlt_56D57
 
 ; ----------------------------------------------------------------------
 

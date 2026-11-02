@@ -39,7 +39,7 @@ sub_479EA	endp
 ; Attributes: thunk
 
 sub_479EF	proc far
-		jmp	sub_57FA0
+		jmp	Gameflow_ApplyDefaultLoadout_57FA0
 sub_479EF	endp
 
 ; ----------------------------------------------------------------------
@@ -47,7 +47,7 @@ sub_479EF	endp
 ; Attributes: thunk
 
 sub_479F4	proc far
-		jmp	sub_584A6
+		jmp	Gameflow_WeaponLoadout_584A6
 sub_479F4	endp
 
 ; ----------------------------------------------------------------------
@@ -55,7 +55,7 @@ sub_479F4	endp
 ; Attributes: thunk
 
 sub_479F9	proc far
-		jmp	sub_58223
+		jmp	Gameflow_ApplyDefaultLoadoutAlt_58223
 sub_479F9	endp
 
 ; ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ sub_479F9	endp
 ; Attributes: thunk
 
 sub_479FE	proc far
-		jmp	sub_58DEB
+		jmp	Gameflow_WeaponLoadoutAlt_58DEB
 sub_479FE	endp
 
 ; ----------------------------------------------------------------------

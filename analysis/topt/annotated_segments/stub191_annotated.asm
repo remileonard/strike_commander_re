@@ -39,7 +39,7 @@ sub_479AA	endp
 ; Attributes: thunk
 
 sub_479AF	proc far
-		jmp	sub_5638A
+		jmp	Gameflow_ShowKillMarks_5638A
 sub_479AF	endp
 
 ; ----------------------------------------------------------------------
@@ -47,7 +47,7 @@ sub_479AF	endp
 ; Attributes: thunk
 
 sub_479B4	proc far
-		jmp	sub_56D57
+		jmp	Gameflow_ShowKillMarksAlt_56D57
 sub_479B4	endp
 
 ; ----------------------------------------------------------------------

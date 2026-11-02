@@ -6,7 +6,12 @@ ovr192		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_57FA0		proc far
+; ==============================================================================================
+; far. Chargement par défaut de l'écran d'armement (chunk LOAD dont le 1er octet = argument),
+; code identique (suite d'instructions) à Gameflow_ApplyDefaultLoadout_51830 d'OPTEST : mêmes
+; plages de points d'emport (GAMEFLOW_SYSTEM.md § 5.3).
+; ==============================================================================================
+Gameflow_ApplyDefaultLoadout_57FA0		proc far
 
 var_B0		= word ptr -0B0h
 var_53		= dword ptr -53h
@@ -301,13 +306,19 @@ loc_58220:
 		pop	si
 		leave
 		retf
-sub_57FA0		endp
+Gameflow_ApplyDefaultLoadout_57FA0		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_58223		proc far
+; ==============================================================================================
+; far. Chargement par défaut du second écran d'armement (commande 43) : même code que
+; Gameflow_ApplyDefaultLoadout_57FA0, seules les plages de points d'emport changent (premier,
+; dernier, maximum par côté) : armes 0 et 1 (AIM-9J, AIM-9M) 0, 0, 1 ; arme 8 (AIM-120) 1, 1,
+; 1 ; armes 4 à 7 et autres 0, 255, 0 (mov [bp+var_2], 0FFh).
+; ==============================================================================================
+Gameflow_ApplyDefaultLoadoutAlt_58223		proc far
 
 var_B0		= word ptr -0B0h
 var_53		= dword ptr -53h
@@ -602,13 +613,20 @@ loc_584A3:
 		pop	si
 		leave
 		retf
-sub_58223		endp
+Gameflow_ApplyDefaultLoadoutAlt_58223		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_584A6		proc far
+; ==============================================================================================
+; far. Écran d'armement de la commande 22 (WEAPON_LOADOUT), même code que
+; Gameflow_WeaponLoadout_51AB3 d'OPTEST (comparaison des suites d'instructions : seules les
+; variables de pile diffèrent) sauf : au départ en vol (sprite 12), mov byte ptr [bx+6], 0
+; (partie +6 = 0) en plus de [+233] = 1 et [+239] = 1. Chargement par défaut :
+; Gameflow_ApplyDefaultLoadout_57FA0.
+; ==============================================================================================
+Gameflow_WeaponLoadout_584A6		proc far
 
 var_35E		= word ptr -35Eh
 var_32C		= word ptr -32Ch
@@ -732,7 +750,7 @@ loc_584F2:
 		push	ax
 		push	[bp+arg_0]
 		push	cs
-		call	near ptr sub_57FA0
+		call	near ptr Gameflow_ApplyDefaultLoadout_57FA0
 		add	sp, 6
 		mov	[bp+var_2], 0
 		jmp	short loc_58555
@@ -1597,22 +1615,33 @@ loc_58D94:
 		pop	si
 		leave
 		retf
-sub_584A6		endp
+Gameflow_WeaponLoadout_584A6		endp
 
-; START OF FUNCTION CHUNK FOR sub_584A6
+; START OF FUNCTION CHUNK FOR Gameflow_WeaponLoadout_584A6
 
 loc_58DE7:
 		pop	di
 		pop	si
 		leave
 		retf
-; END OF FUNCTION CHUNK FOR sub_584A6
+; END OF FUNCTION CHUNK FOR Gameflow_WeaponLoadout_584A6
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_58DEB		proc far
+; ==============================================================================================
+; far, LU 2026-11-02 (par comparaison avec Gameflow_WeaponLoadout_584A6, 997 lignes contre
+; 989). Écran d'armement de la commande 43 (Tactical Operations). Différences : chargement par
+; défaut Gameflow_ApplyDefaultLoadoutAlt_58223 ; plages de points d'emport (AIM-9J/M : point
+; 0, 1 par côté ; AIM-120 : point 1, 1 par côté ; autres armes : début 0, fin 255, 0 par côté)
+; ; au départ en vol mov byte ptr [bx+6], 1 (partie +6 = 1) ; textes « %s (%d) » / « Remove %s
+; (%d) » pris en dseg 2471 et 2479 (mêmes chaînes) ; quelques constantes d'affichage
+; différentes ([bp+var_244] = 32 au lieu de 15, push 1 au lieu de push 0 avant sub_870B) et
+; liste d'armes construite sans la boucle sur 9 armes — rôle de ces différences d'affichage
+; non établi.
+; ==============================================================================================
+Gameflow_WeaponLoadoutAlt_58DEB		proc far
 
 var_35E		= word ptr -35Eh
 var_32C		= word ptr -32Ch
@@ -1738,7 +1767,7 @@ loc_58E37:
 		push	ax
 		push	[bp+arg_0]
 		push	cs
-		call	near ptr sub_58223
+		call	near ptr Gameflow_ApplyDefaultLoadoutAlt_58223
 		add	sp, 6
 		mov	[bp+var_2], 0
 		jmp	short loc_58E9A
@@ -2609,16 +2638,16 @@ loc_596F5:
 		pop	si
 		leave
 		retf
-sub_58DEB		endp
+Gameflow_WeaponLoadoutAlt_58DEB		endp
 
-; START OF FUNCTION CHUNK FOR sub_58DEB
+; START OF FUNCTION CHUNK FOR Gameflow_WeaponLoadoutAlt_58DEB
 
 loc_59748:
 		pop	di
 		pop	si
 		leave
 		retf
-; END OF FUNCTION CHUNK FOR sub_58DEB
+; END OF FUNCTION CHUNK FOR Gameflow_WeaponLoadoutAlt_58DEB
 
 ; ----------------------------------------------------------------------
 

@@ -111,7 +111,7 @@ sub_47897	endp
 ; Attributes: thunk
 
 sub_4789C	proc far
-		jmp	sub_50D85
+		jmp	Gameflow_ReadMissionResult_50D85
 sub_4789C	endp
 
 ; ----------------------------------------------------------------------
