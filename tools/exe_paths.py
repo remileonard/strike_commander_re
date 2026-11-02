@@ -5,6 +5,8 @@ L'archive couvre deux exécutables du jeu :
   - strike : STRIKE.EXE, la simulation (source/strike.asm, analysis/)
   - optest : OPTEST.EXE, tout le hors-vol — campagne, conversations,
              cinématiques, briefings, options (source/optest.asm, analysis/optest/)
+  - topt   : TOPTTST1.EXE, le hors-vol de Tactical Operations (extension) ; sans base IDA,
+             listing reconstruit par tools/vroomm_listing.py (source/topttst1.asm, analysis/topt/)
 
 Chaque outil accepte `--exe <nom>` (défaut : strike). Les adresses IDA
 (`sub_XXXXX`) sont propres à chaque exécutable : une même adresse ne désigne
@@ -22,6 +24,10 @@ EXES = {
     'optest': {
         'asm': os.path.join(ROOT, 'source', 'optest.asm'),
         'analysis': os.path.join(ROOT, 'analysis', 'optest'),
+    },
+    'topt': {
+        'asm': os.path.join(ROOT, 'source', 'topttst1.asm'),
+        'analysis': os.path.join(ROOT, 'analysis', 'topt'),
     },
 }
 
@@ -48,7 +54,7 @@ def pop_exe_arg(argv):
     if '--exe' in args:
         i = args.index('--exe')
         if i + 1 >= len(args):
-            raise SystemExit("--exe attend un nom d'exécutable (strike, optest).")
+            raise SystemExit("--exe attend un nom d'exécutable (strike, optest, topt).")
         exe = args[i + 1]
         del args[i:i + 2]
     return exe, args

@@ -292,6 +292,22 @@ class Extractor:
         self.local_names = {}
         self.arg_names = {}
 
+    def switch_table(self, label):
+        """Cibles d'une table de switch : « label dw offset loc_A » puis « dw offset loc_B »…"""
+        if not hasattr(self, '_switch_tables'):
+            self._switch_tables = {}
+        if label not in self._switch_tables:
+            targets = []
+            start = next((i for i, l in enumerate(self.lines) if re.match(rf'^{label}\s+dw\s', l)), None)
+            if start is not None:
+                for line in self.lines[start:]:
+                    m = re.match(r'^(?:' + re.escape(label) + r')?\s+dw\s+offset\s+(\w+)', line)
+                    if not m:
+                        break
+                    targets.append(m.group(1))
+            self._switch_tables[label] = targets
+        return self._switch_tables[label]
+
     # --- objets -----------------------------------------------------------
     def new_obj(self, kind, prefix):
         self.counters[prefix] = self.counters.get(prefix, 0) + 1
@@ -1215,6 +1231,18 @@ class FunctionRun:
                 self.method_call(self.regs.get('bx', unknown()), slot, k, line)
                 return
             self.call(t, k, line)
+            return
+        if mn == 'jmp' and re.match(r'^cs:off_[0-9A-F]+\[bx\]', ops.strip()):
+            # Switch par table (listing reconstruit de TOPTTST1.EXE) : un saut conditionnel par cas,
+            # bx = 2 × numéro du cas ; la borne a été testée juste avant (ja vers le cas par défaut).
+            table = re.match(r'^cs:(off_[0-9A-F]+)', ops.strip()).group(1)
+            index = self.regs.get('bx', unknown())
+            for case, target in enumerate(self.ex.switch_table(table)):
+                if target in self.label_index and self.label_index[target] > k:
+                    self.open_conditions.add(target)
+                self.pending.setdefault(target, []).append(self.snapshot())
+                self.emit(('cgoto', ('cmp', '==', index, const(2 * case)), target, line))
+            self.dead = True
             return
         if mn == 'jmp':
             target = self.jump_target(ops)

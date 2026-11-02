@@ -1,0 +1,21 @@
+stub212		segment	para public 'CODE' use16
+		assume cs:stub212
+		assume es:nothing, ss:nothing, ds:dseg, fs:nothing, gs:nothing
+stru_47F00	db 0CDh, 3Fh		; int_code
+		dw 0			; memswap
+		dd 5DB50h		; fileoff
+		dw 6D6Eh		; codesize
+		dw 684h		; relsize
+		dw 1			; nentries
+		dw 0		; prevstub
+		db 10h dup(0)		; workarea
+
+; ----------------------------------------------------------------------
+
+; Attributes: thunk
+
+sub_47F20	proc far
+		jmp	sub_A8070
+sub_47F20	endp
+		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+stub212		ends

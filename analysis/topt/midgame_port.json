@@ -1,0 +1,448 @@
+{
+ "pairs": {
+  "ovr196": [
+   "ovr200",
+   0.971
+  ],
+  "ovr201": [
+   "ovr205",
+   0.949
+  ],
+  "ovr203": [
+   "ovr207",
+   0.965
+  ],
+  "ovr204": [
+   "ovr208",
+   0.952
+  ],
+  "ovr205": [
+   "ovr209",
+   0.947
+  ],
+  "ovr206": [
+   "ovr210",
+   0.965
+  ],
+  "ovr207": [
+   "ovr211",
+   0.971
+  ],
+  "ovr208": [
+   "ovr212",
+   0.968
+  ],
+  "ovr197": [
+   "ovr201",
+   0.956
+  ]
+ },
+ "functions": {
+  "AIL_start_sequence_30C42": {
+   "cible": "sub_50D1",
+   "méthode": "position d'appel (58 sur 58)"
+  },
+  "AIL_stop_sequence_30C48": {
+   "cible": "sub_50D7",
+   "méthode": "position d'appel (10 sur 10)"
+  },
+  "AnimLayer_Construct_2E5CF": {
+   "cible": "sub_3461B",
+   "méthode": "nom repris"
+  },
+  "AnimLayer_IsFinished_2E654": {
+   "cible": "sub_346A0",
+   "méthode": "nom repris"
+  },
+  "CRT_Doprnt_Dispatch": {
+   "cible": "sub_1706",
+   "méthode": "nom repris"
+  },
+  "CRT_Fmemcpy": {
+   "cible": "sub_48B",
+   "méthode": "nom repris"
+  },
+  "CRT_Malloc16_Retry": {
+   "cible": "sub_741",
+   "méthode": "nom repris"
+  },
+  "CRT_MemFamily_Extra1": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "ClippedMovingImageLayer_Construct_B45E": {
+   "cible": "sub_FCAF",
+   "méthode": "position d'appel (6 sur 6)"
+  },
+  "ClippedMovingLayer_Construct_B3F8": {
+   "cible": "sub_FC49",
+   "méthode": "position d'appel (2 sur 2)"
+  },
+  "ConvData_LoadByName_C38E": {
+   "cible": "sub_10C87",
+   "méthode": "position d'appel (25 sur 26)"
+  },
+  "ConvData_LoadNormalOrNight_C3A6": {
+   "cible": "sub_10C9F",
+   "méthode": "nom repris"
+  },
+  "GlyphObject_ScalarDeletingDtorA_313D6": {
+   "cible": "sub_36F5D",
+   "méthode": "position d'appel (97 sur 97)"
+  },
+  "ImageLayer_Construct_2E02C": {
+   "cible": "sub_34078",
+   "méthode": "nom repris"
+  },
+  "IndexedRecordReader_ConstructVariantA_3D28A": {
+   "cible": "sub_4331C",
+   "méthode": "nom repris"
+  },
+  "IndexedRecordReader_ConstructVariantB_3D2BA": {
+   "cible": "sub_4334C",
+   "méthode": "nom repris"
+  },
+  "IndexedRecordReader_Destruct_3D240": {
+   "cible": "sub_432D2",
+   "méthode": "nom repris"
+  },
+  "Input_CheckSkip_D24A": {
+   "cible": "sub_11B90",
+   "méthode": "nom repris"
+  },
+  "Input_Flush_CDDC": {
+   "cible": "sub_116D1",
+   "méthode": "nom repris"
+  },
+  "JitterImageLayer_Construct_B12E": {
+   "cible": "sub_F97F",
+   "méthode": "position d'appel (8 sur 8)"
+  },
+  "Keyboard_QueryAndDispatch_3E5C7": {
+   "cible": "sub_443C0",
+   "méthode": "position d'appel (2 sur 2)"
+  },
+  "LayerGroup_Add_2DB84": {
+   "cible": "sub_33BD0",
+   "méthode": "nom repris"
+  },
+  "LayerGroup_Remove_2DBC1": {
+   "cible": "sub_33C0D",
+   "méthode": "position d'appel (22 sur 22)"
+  },
+  "Layer_ConstructAtOrigin_2DE95": {
+   "cible": "sub_33EE1",
+   "méthode": "nom repris"
+  },
+  "Layer_Construct_2DF9B": {
+   "cible": "sub_33FE7",
+   "méthode": "nom repris"
+  },
+  "Layer_MoveBy_2E29E": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "Memory_TypedAllocDispatchB_2B920": {
+   "cible": "sub_329B1",
+   "méthode": "nom repris"
+  },
+  "Memory_TypedFree_2B8A4": {
+   "cible": "sub_32934",
+   "méthode": "nom repris"
+  },
+  "Midgame1_PlayPart2_671C0": {
+   "cible": "sub_70290",
+   "méthode": "position d'appel (1 sur 1)"
+  },
+  "MovingMaskLayer_Construct_B995": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "MovingMaskLayer_SetTable_BA1C": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "MovingOverlayLayer_Construct_A837": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "MusicChannel_Init_78A4": {
+   "cible": "sub_B75B",
+   "méthode": "position d'appel (49 sur 49)"
+  },
+  "MusicChannel_RegisterSequence_7918": {
+   "cible": "sub_B7A2",
+   "méthode": "position d'appel (58 sur 58)"
+  },
+  "Music_ChannelStopSequence_783A": {
+   "cible": "sub_B6F1",
+   "méthode": "nom repris"
+  },
+  "OverlayAnimLayer_Construct_A505": {
+   "cible": "sub_ED56",
+   "méthode": "nom repris"
+  },
+  "OverlayImageLayer_Construct_A9D6": {
+   "cible": "sub_F227",
+   "méthode": "position d'appel (18 sur 18)"
+  },
+  "Pak_LoadEntry_C40A": {
+   "cible": "sub_10D03",
+   "méthode": "position d'appel (339 sur 339)"
+  },
+  "Palette_Alloc_2CC76": {
+   "cible": "sub_34A1A",
+   "méthode": "nom repris"
+  },
+  "Palette_CopyInto_2CF80": {
+   "cible": "sub_34D24",
+   "méthode": "nom repris"
+  },
+  "Palette_Destruct_2D048": {
+   "cible": "sub_34DEC",
+   "méthode": "position d'appel (483 sur 487)"
+  },
+  "Palette_FadeFromColor_2D165": {
+   "cible": "sub_34EEE",
+   "méthode": "position d'appel (7 sur 7)"
+  },
+  "Palette_FadeToColor_2D09C": {
+   "cible": "sub_34E29",
+   "méthode": "position d'appel (16 sur 16)"
+  },
+  "Palette_FillRange_2CF08": {
+   "cible": "sub_34CAC",
+   "méthode": "nom repris"
+  },
+  "Palette_LoadFromResource_2CCE5": {
+   "cible": "sub_34A89",
+   "méthode": "nom repris"
+  },
+  "Palette_UploadByValue_CBAB": {
+   "cible": "sub_114A2",
+   "méthode": "position d'appel (1 sur 1)"
+  },
+  "Palette_Upload_2CDE1": {
+   "cible": "sub_34B85",
+   "méthode": "nom repris"
+  },
+  "Path_Build_C82C": {
+   "cible": "sub_11125",
+   "méthode": "nom repris"
+  },
+  "Render_MeasureOrDrawTextString_32CD8": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "ResourceRecord_Helper_3BE15": {
+   "cible": "sub_425B8",
+   "méthode": "position d'appel (52 sur 52)"
+  },
+  "ResourceRecord_ReadFieldGroupA_3C289": {
+   "cible": "sub_42A2C",
+   "méthode": "nom repris"
+  },
+  "ResourceRecord_ReadFieldGroupB_3C2C4": {
+   "cible": "sub_42A67",
+   "méthode": "nom repris"
+  },
+  "ResourceRecord_ReleaseAndClear_3C595": {
+   "cible": "sub_42D38",
+   "méthode": "nom repris"
+  },
+  "ResourceRecord_SeekAndReadB_3C022": {
+   "cible": "sub_427C5",
+   "méthode": "nom repris"
+  },
+  "ResourceRecord_SeekAndRead_3BFB3": {
+   "cible": "sub_42756",
+   "méthode": "nom repris"
+  },
+  "ScaledImageLayer_Construct_9391": {
+   "cible": "sub_DBA8",
+   "méthode": "nom repris"
+  },
+  "ScaledImageLayer_SetScale_94F4": {
+   "cible": "sub_DD0B",
+   "méthode": "nom repris"
+  },
+  "ScaledMovingLayer_Construct_9544": {
+   "cible": "sub_DD5B",
+   "méthode": "nom repris"
+  },
+  "Scene_Create_C55E": {
+   "cible": "sub_10E57",
+   "méthode": "nom repris"
+  },
+  "Scene_Destruct_2DCFC": {
+   "cible": "sub_33D48",
+   "méthode": "position d'appel (108 sur 108)"
+  },
+  "Scene_SetFps_2DE27": {
+   "cible": "sub_33E73",
+   "méthode": "nom repris"
+  },
+  "Scene_Tick_C652": {
+   "cible": "sub_10F4B",
+   "méthode": "position d'appel (392 sur 392)"
+  },
+  "SmallObject_UnregisterFromList_2CB7A": {
+   "cible": "sub_349C1",
+   "méthode": "position d'appel (64 sur 64)"
+  },
+  "Stopwatch_WaitElapsed_3F023": {
+   "cible": "sub_44E21",
+   "méthode": "nom repris"
+  },
+  "StreamReader_ConstructVariantA_3B2A9": {
+   "cible": "sub_40ED4",
+   "méthode": "nom repris"
+  },
+  "StreamReader_ReleaseBuffer_3CEB3": {
+   "cible": "sub_42F45",
+   "méthode": "position d'appel (26 sur 26)"
+  },
+  "Struct_GetElementCountMinusOne_33352": {
+   "cible": null,
+   "méthode": "aucun appel aligné"
+  },
+  "Stub_Midgame1_PlayPart2_423E0": {
+   "cible": "sub_47D10",
+   "méthode": "position d'appel (1 sur 1)"
+  },
+  "TalkingHeadOverlay_Construct_B20F": {
+   "cible": "sub_FA60",
+   "méthode": "position d'appel (15 sur 15)"
+  },
+  "TalkingHead_AttachVoice_9CF7": {
+   "cible": "sub_E535",
+   "méthode": "nom repris"
+  },
+  "TalkingHead_Construct_98F4": {
+   "cible": "sub_E108",
+   "méthode": "position d'appel (21 sur 21)"
+  },
+  "TalkingHead_SetBaseFrame_9D32": {
+   "cible": "sub_E56E",
+   "méthode": "position d'appel (184 sur 184)"
+  },
+  "TalkingHead_SetLipText_9C4F": {
+   "cible": "sub_E45A",
+   "méthode": "nom repris"
+  },
+  "TalkingHead_StartVoiceAndIsSpeaking_9C64": {
+   "cible": "sub_E4AD",
+   "méthode": "position d'appel (28 sur 28)"
+  },
+  "TextArray_Destruct_CC03": {
+   "cible": "sub_114F8",
+   "méthode": "position d'appel (86 sur 86)"
+  },
+  "TextArray_Init_CBE1": {
+   "cible": "sub_114D6",
+   "méthode": "nom repris"
+  },
+  "TextFormat_ReleaseAttribute_2EC80": {
+   "cible": "sub_35AAD",
+   "méthode": "nom repris"
+  },
+  "TextFormat_ReleaseStyleList_2EBFA": {
+   "cible": "sub_35A27",
+   "méthode": "nom repris"
+  },
+  "TextLayer_Construct_ACF1": {
+   "cible": "sub_F542",
+   "méthode": "nom repris"
+  },
+  "TextLayer_SetText_ADB7": {
+   "cible": "sub_F608",
+   "méthode": "nom repris"
+  },
+  "ToggleLayer_Construct_B57B": {
+   "cible": "sub_FDCC",
+   "méthode": "nom repris"
+  },
+  "TriggeredAnimLayer_Construct_B068": {
+   "cible": "sub_F8B9",
+   "méthode": "nom repris"
+  },
+  "UI_ApplyEncodingHelper_2EC4A": {
+   "cible": "sub_35A77",
+   "méthode": "position d'appel (3 sur 3)"
+  },
+  "VoicePlayer_IsDone_84CC": {
+   "cible": "sub_C808",
+   "méthode": "position d'appel (1 sur 1)"
+  },
+  "VoicePlayer_IsPlaying_8500": {
+   "cible": "sub_C83C",
+   "méthode": "position d'appel (32 sur 32)"
+  },
+  "VoicePlayer_SetDriver_7A3D": {
+   "cible": "sub_B978",
+   "méthode": "nom repris"
+  },
+  "VoicePlayer_Stop_7B5A": {
+   "cible": "sub_BACF",
+   "méthode": "nom repris"
+  },
+  "Widget_ApplyStyleAndAllocate_3144B": {
+   "cible": "sub_36FD2",
+   "méthode": "nom repris"
+  },
+  "Widget_RenderComplexLayoutWrapper_31A3B": {
+   "cible": "sub_375C2",
+   "méthode": "nom repris"
+  },
+  "sub_3139A": {
+   "cible": "sub_36F21",
+   "méthode": "position d'appel (1 sur 1)"
+  },
+  "sub_7D11": {
+   "cible": "sub_BC88",
+   "méthode": "position d'appel (53 sur 53)"
+  },
+  "sub_83FE": {
+   "cible": "sub_C4B5",
+   "méthode": "position d'appel (43 sur 43)"
+  },
+  "sub_C8F5": {
+   "cible": "sub_111EE",
+   "méthode": "position d'appel (109 sur 109)"
+  }
+ },
+ "vtables": {
+  "6367": 8257,
+  "6519": 8409,
+  "4958": 5084,
+  "16248": 18676,
+  "5803": 7665,
+  "5703": 7565,
+  "6043": 7905,
+  "6139": 8001,
+  "5851": 7713,
+  "5655": 7517,
+  "5751": 7613,
+  "6275": 8121,
+  "6794": 8684,
+  "6091": null,
+  "5607": null,
+  "6467": 8357,
+  "6567": 8457,
+  "5947": 7809,
+  "6551": 8441,
+  "4990": 5116,
+  "6399": 8289,
+  "16280": 18708,
+  "6826": 8716,
+  "4540": 8173,
+  "4552": 8185,
+  "4568": 8201,
+  "4584": null,
+  "4604": null,
+  "6239": 4767,
+  "6255": 8101,
+  "6603": 8493,
+  "5979": 7841
+ }
+}

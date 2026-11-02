@@ -344,6 +344,18 @@ class Player:
         self.contents = {}
         self.replace = replace
         self.env = dict(HYPOTHESES)
+        # Autre exécutable que celui des hypothèses (OPTEST) : noms traduits par le catalogue porté
+        # (tools/midgame_engine_port.py, clé equivalents).
+        self.call_results = dict(CALL_RESULTS)
+        self.equivalents = {}
+        exe = data.get('exécutable', 'optest')
+        if exe != 'optest':
+            engine_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'analysis', exe,
+                                       'midgame_engine.json')
+            equivalents = json.load(open(engine_path, encoding='utf-8')).get('equivalents', {})
+            self.equivalents = equivalents
+            self.env = {equivalents.get(k, k): v for k, v in HYPOTHESES.items()}
+            self.call_results = {equivalents.get(k, k): v for k, v in CALL_RESULTS.items()}
         self.env.update(hypotheses)
         self.layers = {}
         self.scenes = {}
@@ -531,8 +543,8 @@ class Player:
         if m and m.group(1) in self.layers:
             return self.absolute(self.layers[m.group(1)])[0]
         name = re.match(r'^([\w ]+?)\s*\(', text)
-        if name and name.group(1).strip() in CALL_RESULTS:
-            return CALL_RESULTS[name.group(1).strip()]
+        if name and name.group(1).strip() in self.call_results:
+            return self.call_results[name.group(1).strip()]
         self.warn(f'résultat d\'appel inconnu : {text}')
         return None
 
@@ -976,7 +988,7 @@ class Player:
             self.env[key] = self.env.get(key, 0) + added
         if name.endswith('.joue'):
             self.play_voice()
-        elif name.startswith('UI_ApplyEncodingHelper_2EC65'):
+        elif name.startswith(self.equivalents.get('UI_ApplyEncodingHelper_2EC65', 'UI_ApplyEncodingHelper_2EC65')):
             if not self.full_screen:
                 self.full_screen = True
                 # Ouverture du cadre : source et destination ont la même ligne du haut, pas de décalage.

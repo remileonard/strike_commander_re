@@ -1,0 +1,7559 @@
+{
+ "sub_1054D": {
+  "segment": "seg025",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_10780": {
+  "segment": "seg025",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_107EB": {
+  "segment": "seg025",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_110CC": {
+  "segment": "seg028",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2AFE0": "String_ConstructFromPtrLen"
+  },
+  "chosen": "sub_2AFE0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_1203F": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A31A8": "GaugeWidget_InsertListNodeAtHead_A31A8",
+   "sub_A31C9": "GaugeWidget_InsertListNodeAtTail_A31C9",
+   "sub_A41FA": "GaugeWidget_ReleaseExtraAndNode_A41FA"
+  },
+  "chosen": null
+ },
+ "sub_12060": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A31A8": "GaugeWidget_InsertListNodeAtHead_A31A8",
+   "sub_A31C9": "GaugeWidget_InsertListNodeAtTail_A31C9",
+   "sub_A41FA": "GaugeWidget_ReleaseExtraAndNode_A41FA"
+  },
+  "chosen": null
+ },
+ "sub_12081": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_A31EA": "GaugeWidget_Method_SetField_A31EA"
+  },
+  "chosen": "sub_A31EA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_12315": {
+  "segment": "seg032",
+  "kind": "approchée",
+  "instructions": 46,
+  "candidates": {
+   "sub_A3436": "GaugeWidget_ComputeRange_A3436"
+  },
+  "chosen": "sub_A3436",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_1282": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 187,
+  "candidates": {
+   "sub_E77": "CRT_Doprnt_Core"
+  },
+  "chosen": "sub_E77",
+  "calls_confirmed": 0,
+  "operand_diffs": 9
+ },
+ "sub_129FD": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A3AB5": "GaugeWidget_AllocateRenderBufferWrapper_A3AB5"
+  },
+  "chosen": "sub_A3AB5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_12B9C": {
+  "segment": "seg032",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_A3C2C": "GaugeWidget_QueryAndFormat_A3C2C"
+  },
+  "chosen": "sub_A3C2C",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_13243": {
+  "segment": "seg032",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_A31A8": "GaugeWidget_InsertListNodeAtHead_A31A8",
+   "sub_A31C9": "GaugeWidget_InsertListNodeAtTail_A31C9",
+   "sub_A41FA": "GaugeWidget_ReleaseExtraAndNode_A41FA"
+  },
+  "chosen": null
+ },
+ "sub_1441C": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A127B": "Widget_SetFlagBit0_A127B"
+  },
+  "chosen": "sub_A127B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1442A": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A1289": "Widget_ClearFlagBit0_A1289"
+  },
+  "chosen": "sub_A1289",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_14438": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_A1297": "Widget_TranslateBounds_A1297"
+  },
+  "chosen": "sub_A1297",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_14454": {
+  "segment": "seg035",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_14460": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_14468": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_14484": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_14490": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_1449C": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_14528": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 65,
+  "candidates": {
+   "sub_A1375": "PaletteScreen_DrawCurveShape_A1375"
+  },
+  "chosen": "sub_A1375",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_145B2": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_A13FF": "Palette_SetDACRegister_A13FF"
+  },
+  "chosen": "sub_A13FF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_145C8": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_A1415": "Palette_GetDACRegister_A1415"
+  },
+  "chosen": "sub_A1415",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1468E": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_A14C2": "Palette_ReadAllDACRegisters_A14C2"
+  },
+  "chosen": "sub_A14C2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_146AB": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_A14DF": "Palette_WriteAllDACRegisters_A14DF"
+  },
+  "chosen": "sub_A14DF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_14B0C": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A1AD1": "Widget_SetFlagBit3_A1AD1"
+  },
+  "chosen": "sub_A1AD1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_14B1A": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_A1ADF": "Widget_SetFlagBit4AndOffsets_A1ADF"
+  },
+  "chosen": "sub_A1ADF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_15D7A": {
+  "segment": "seg035",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_15E87": {
+  "segment": "seg036",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_A2CEC": "PaletteScreen_LookupByteTable_A2CEC"
+  },
+  "chosen": "sub_A2CEC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_15E99": {
+  "segment": "seg036",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_A2CFC": "PaletteScreen_DispatchWidgetLayoutA_A2CFC"
+  },
+  "chosen": "sub_A2CFC",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_15EE7": {
+  "segment": "seg036",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_A2D4A": "PaletteScreen_DispatchWidgetLayoutB_A2D4A"
+  },
+  "chosen": "sub_A2D4A",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_162DD": {
+  "segment": "seg037",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_164C2": {
+  "segment": "seg037",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_16DE7": {
+  "segment": "seg038",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_8D266": "UIWidget_Helper_8D266",
+   "sub_A9737": "ExprSlot_ResetFields_A9737",
+   "sub_AA0F7": "ExprSlot_Helper2_AA0F7",
+   "sub_AA1AB": "ExprSlot_Helper3_AA1AB",
+   "sub_AA227": "ExprSlot_Helper4_AA227",
+   "sub_AA2F4": "ProgBuffer_ResetState_AA2F4",
+   "sub_AA56C": "ExprSlot_Helper7_AA56C",
+   "sub_AA6B3": "ExprSlot_Helper9_AA6B3"
+  },
+  "chosen": null
+ },
+ "sub_1706": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 156,
+  "candidates": {
+   "sub_1069": "CRT_Doprnt_Dispatch"
+  },
+  "chosen": "sub_1069",
+  "calls_confirmed": 1,
+  "operand_diffs": 14
+ },
+ "sub_1892B": {
+  "segment": "seg039",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_18933": {
+  "segment": "seg039",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_18ABB": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_18EA2": {
+  "segment": "seg040",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_18FDE": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1912D": {
+  "segment": "seg040",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_197D5": {
+  "segment": "seg041",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1985E": {
+  "segment": "seg041",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_19C34": {
+  "segment": "seg041",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_398CB": "Effect_BBoxClipTest"
+  },
+  "chosen": "sub_398CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 6
+ },
+ "sub_1BF": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_163": "Ovl_CopyStubTable"
+  },
+  "chosen": "sub_163",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_1D2": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_176": "Ovl_ChecksumStub"
+  },
+  "chosen": "sub_176",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_1DDE": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 46,
+  "candidates": {
+   "sub_17B0": "PIT_DelayLoop"
+  },
+  "chosen": "sub_17B0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1E3F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_1811": "CRT_InstallProtectedHandler"
+  },
+  "chosen": "sub_1811",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_1E615": {
+  "segment": "seg048",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1E628": {
+  "segment": "seg048",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_1E631": {
+  "segment": "seg048",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1E63A": {
+  "segment": "seg048",
+  "kind": "approchée",
+  "instructions": 6,
+  "candidates": {
+   "sub_84DDB": "HUDSymbol_Helper10_84DDB",
+   "sub_A7FD0": "MissionLoader_Helper_A7FD0"
+  },
+  "chosen": null
+ },
+ "sub_1E646": {
+  "segment": "seg048",
+  "kind": "approchée",
+  "instructions": 6,
+  "candidates": {
+   "sub_84DDB": "HUDSymbol_Helper10_84DDB",
+   "sub_A7FD0": "MissionLoader_Helper_A7FD0"
+  },
+  "chosen": null
+ },
+ "sub_1E652": {
+  "segment": "seg048",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_1E931": {
+  "segment": "seg051",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1E93A": {
+  "segment": "seg051",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_1EB0F": {
+  "segment": "seg051",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_50654": "UIScreen_SetWidgetValue_50654"
+  },
+  "chosen": "sub_50654",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_1F5CD": {
+  "segment": "seg051",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_1FD6F": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_1FF30": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_2010D": {
+  "segment": "seg054",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_202D3": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_206A8": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_20B3B": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_20E0E": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_21189": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_212D": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_1F18": "PC_SoundOn"
+  },
+  "chosen": "sub_1F18",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2160": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_1F4B": "CRT_Write_TextMode"
+  },
+  "chosen": "sub_1F4B",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2172C": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_21BB2": {
+  "segment": "seg054",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_2210": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_1F7E": "CRT_SetFileAttr"
+  },
+  "chosen": "sub_1F7E",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_222B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 60,
+  "candidates": {
+   "sub_1F99": "Stdio_Fflush"
+  },
+  "chosen": "sub_1F99",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_224D3": {
+  "segment": "seg055",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_84DDB": "HUDSymbol_Helper10_84DDB"
+  },
+  "chosen": null
+ },
+ "sub_224E7": {
+  "segment": "seg055",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": null
+ },
+ "sub_22545": {
+  "segment": "seg056",
+  "kind": "approchée",
+  "instructions": 13,
+  "candidates": {
+   "sub_D8E": "CRT_SetjmpSave",
+   "sub_AB4BE": "AudioQueue_Helper_AB4BE"
+  },
+  "chosen": null
+ },
+ "sub_2274B": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_227FA": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_2B191": "LightSet_Init_2B191"
+  },
+  "chosen": "sub_2B191",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_22899": {
+  "segment": "seg057",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2B228": "LightSet_SetIntensityPercent_2B228"
+  },
+  "chosen": "sub_2B228",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_22BEF": {
+  "segment": "seg057",
+  "kind": "stricte",
+  "instructions": 60,
+  "candidates": {
+   "sub_2B54A": "LightSet_FaceIntensity_2B54A"
+  },
+  "chosen": "sub_2B54A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_22CAC": {
+  "segment": "seg058",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_2B5F9": "Render_EdgeSetup"
+  },
+  "chosen": "sub_2B5F9",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_22D5F": {
+  "segment": "seg058",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_23002": {
+  "segment": "seg058",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_23016": {
+  "segment": "seg058",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_230B3": {
+  "segment": "seg058",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_231C8": {
+  "segment": "seg059",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_2346": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_2070": "CRT_Strrchr_Like"
+  },
+  "chosen": "sub_2070",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_237A8": {
+  "segment": "seg059",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E6CB": "Camera_UpdateViewportClip"
+  },
+  "chosen": "sub_2E6CB",
+  "calls_confirmed": 0,
+  "operand_diffs": 8
+ },
+ "sub_238CF": {
+  "segment": "seg060",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2E8A6": "Palette_DestructResource"
+  },
+  "chosen": "sub_2E8A6",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_238F6": {
+  "segment": "seg060",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2E8CD": "Palette_ShadeTableFor_2E8CD"
+  },
+  "chosen": "sub_2E8CD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_23DC": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_2106": "Stdio_WriteTextMode"
+  },
+  "chosen": "sub_2106",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_2415A": {
+  "segment": "seg060",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2F064": "Cockpit_PanAzimuthUpdate"
+  },
+  "chosen": "sub_2F064",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24183": {
+  "segment": "seg060",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_2F08D": "Cockpit_PanElevationUpdate"
+  },
+  "chosen": "sub_2F08D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2459A": {
+  "segment": "seg061",
+  "kind": "stricte",
+  "instructions": 119,
+  "candidates": {
+   "sub_2F404": "Palette_FogTableIndex_2F404"
+  },
+  "chosen": "sub_2F404",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24A4E": {
+  "segment": "seg062",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_21E90": "Container_Construct"
+  },
+  "chosen": "sub_21E90",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_24A70": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_21EB2": "Container_ConstructTyped"
+  },
+  "chosen": "sub_21EB2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24BCE": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_21FC6": "Container_UnlinkNode"
+  },
+  "chosen": "sub_21FC6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_24BFD": {
+  "segment": "seg062",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_21FF5": "Container_FindAndRemove"
+  },
+  "chosen": "sub_21FF5",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_24CE2": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_220BF": "Container_Append"
+  },
+  "chosen": "sub_220BF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_256A": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_2235": "CRT_Itoa_Signed10"
+  },
+  "chosen": "sub_2235",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2592": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_225D": "CRT_Itoa_Unsigned"
+  },
+  "chosen": "sub_225D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25970": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_22C23": "List_AppendTail_22C23"
+  },
+  "chosen": "sub_22C23",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_259A7": {
+  "segment": "seg062",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_22C56": "Container_RemoveNode"
+  },
+  "chosen": "sub_22C56",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25AC": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2277": "CRT_Itoa_BaseVariant"
+  },
+  "chosen": "sub_2277",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_1F3": "CRT_RestoreIntVectors"
+  },
+  "chosen": "sub_1F3",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_25B17": {
+  "segment": "seg062",
+  "kind": "approchée",
+  "instructions": 30,
+  "candidates": {
+   "sub_22DAB": "Container_Op_22DAB"
+  },
+  "chosen": "sub_22DAB",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_25CAE": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_37C4C": "Debris_BodyReset"
+  },
+  "chosen": "sub_37C4C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25D1": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_229C": "CRT_Memmove"
+  },
+  "chosen": "sub_229C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_25D63": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_47095": "FlightControl_InvalidateMomentCache",
+   "sub_67B82": "Joystick_GetButtonRawByte_67B82"
+  },
+  "chosen": null
+ },
+ "sub_25F0": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_22BB": "CRT_Memset"
+  },
+  "chosen": "sub_22BB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_26084": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_26142": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2614A": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_26152": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2615A": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_2616": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_22E1": "CRT_Memset_Public"
+  },
+  "chosen": "sub_22E1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_26185": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_26192": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_262D7": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_262DF": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_262E7": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_262EF": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_262F7": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_262FF": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_2630B": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_2631B": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_381F2": "Debris_GetSubpartAttrib"
+  },
+  "chosen": "sub_381F2",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_2632E": {
+  "segment": "seg063",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag"
+  },
+  "chosen": "sub_38203",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2648B": {
+  "segment": "seg063",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_264C2": {
+  "segment": "seg064",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_2694": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_22FC": "CRT_Msg_NullPtrAssign"
+  },
+  "chosen": "sub_22FC",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_26A55": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8"
+  },
+  "chosen": null
+ },
+ "sub_26AB": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_2313": "Stdio_Ungetc"
+  },
+  "chosen": "sub_2313",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_26C1A": {
+  "segment": "seg065",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_26C4": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 134,
+  "candidates": {
+   "sub_232C": "Stdio_Putc"
+  },
+  "chosen": "sub_232C",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_26C87": {
+  "segment": "seg065",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_64088": "StreamReader_ComputeHeaderOffset_64088"
+  },
+  "chosen": null
+ },
+ "sub_26D94": {
+  "segment": "seg065",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_26FA5": {
+  "segment": "seg066",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_3A3EC": "WeakRef_InvalidateIfSet"
+  },
+  "chosen": "sub_3A3EC",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2830E": {
+  "segment": "seg069",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_54E1C": "Math_RandomJitter_54E1C"
+  },
+  "chosen": "sub_54E1C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_285C4": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5505B": "Math_DotProduct3D_5505B"
+  },
+  "chosen": "sub_5505B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_28FB2": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 47,
+  "candidates": {
+   "sub_559BB": "Vector_Normalize3D_559BB"
+  },
+  "chosen": "sub_559BB",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_29031": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_55A37": "Utility_Helper_55A37"
+  },
+  "chosen": "sub_55A37",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2905F": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_55A62": "Utility_Helper_55A62"
+  },
+  "chosen": "sub_55A62",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2941A": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 39,
+  "candidates": {
+   "sub_55DB4": "Utility_Helper_55DB4"
+  },
+  "chosen": "sub_55DB4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_294D7": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_55E65": "Utility_Helper_55E65"
+  },
+  "chosen": "sub_55E65",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_298E5": {
+  "segment": "seg070",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_56215": "UI_ComputeScaledVectorHelper_56215"
+  },
+  "chosen": "sub_56215",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_29B4": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 83,
+  "candidates": {
+   "sub_261C": "Stdio_SetupFileStruct"
+  },
+  "chosen": "sub_261C",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_29BBE": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5647A": "Damage_ComputeHelperA_5647A"
+  },
+  "chosen": "sub_5647A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2A535": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_56D72": "Matrix_BuildFromAngle_56D72"
+  },
+  "chosen": "sub_56D72",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2A682": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_56E8A": "WorldObject_BuildOrientationMatrix_56E8A"
+  },
+  "chosen": "sub_56E8A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2AB4": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2945": "CRT_Msg_Sprintf1"
+  },
+  "chosen": "sub_2945",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2AD1": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_2962": "CRT_Msg_Sprintf2"
+  },
+  "chosen": "sub_2962",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2AE2E": {
+  "segment": "seg070",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_575B2": "Matrix_BuildFullOrientation_575B2"
+  },
+  "chosen": "sub_575B2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B18": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_29A9": "CRT_Msg_Sprintf3"
+  },
+  "chosen": "sub_29A9",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_2B53": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_29E4": "CRT_Strcat"
+  },
+  "chosen": "sub_29E4",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_2B786": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_58034": "Math_FixedMultiply_58034"
+  },
+  "chosen": "sub_58034",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B79E": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5804C": "Math_FixedMulDiv_5804C"
+  },
+  "chosen": "sub_5804C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B7FB": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_580A7": "Math_CosRaw_580A7"
+  },
+  "chosen": "sub_580A7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B841": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_580ED": "Math_Tan_Raw_580ED"
+  },
+  "chosen": "sub_580ED",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B8C": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 31,
+  "candidates": {
+   "sub_2A1D": "CRT_Strchr_WordAligned"
+  },
+  "chosen": "sub_2A1D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B8F4": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_581A0": "Math_AsinRaw_581A0"
+  },
+  "chosen": "sub_581A0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2B937": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_581E3": "Math_AcosRaw_581E3"
+  },
+  "chosen": "sub_581E3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BAB3": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 48,
+  "candidates": {
+   "sub_58344": "Math_ComputeSinCosPair_58344"
+  },
+  "chosen": "sub_58344",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2BB12": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 68,
+  "candidates": {
+   "sub_583A3": "Math_Helper_583A3"
+  },
+  "chosen": "sub_583A3",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BBE5": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 204,
+  "candidates": {
+   "sub_58476": "Math_VectorTransformByMatrix3x3_58476"
+  },
+  "chosen": "sub_58476",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BC2": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_2A53": "CRT_Strncmp_Like"
+  },
+  "chosen": "sub_2A53",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BED7": {
+  "segment": "seg071",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_58768": "Matrix_WorldToLocal_58768"
+  },
+  "chosen": "sub_58768",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2BF1": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_2A82": "CRT_Strcpy"
+  },
+  "chosen": "sub_2A82",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C13": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_2AA4": "CRT_Strdup"
+  },
+  "chosen": "sub_2AA4",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2C4B": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 37,
+  "candidates": {
+   "sub_2ADC": "CRT_Stricmp"
+  },
+  "chosen": "sub_2ADC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2C8B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_2B1C": "CRT_Strlen"
+  },
+  "chosen": "sub_2B1C",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2CA5": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2B99": "CRT_Strupr"
+  },
+  "chosen": "sub_2B99",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_2D46": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_2B6D": "CRT_Strncpy_Pad"
+  },
+  "chosen": "sub_2B6D",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2D706": {
+  "segment": "seg074",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2D70E": {
+  "segment": "seg074",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2D716": {
+  "segment": "seg074",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2D71E": {
+  "segment": "seg074",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_2D72A": {
+  "segment": "seg074",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2D9C2": {
+  "segment": "seg075",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_5A9E6": "Music_Stop_5A9E6"
+  },
+  "chosen": "sub_5A9E6",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2DA0B": {
+  "segment": "seg075",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5AAB2": "Speech_LoadBank_5AAB2"
+  },
+  "chosen": "sub_5AAB2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2DCF9": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2DD01": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2E30A": {
+  "segment": "seg076",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2E4AB": {
+  "segment": "seg076",
+  "kind": "approchée",
+  "instructions": 124,
+  "candidates": {
+   "sub_90AD6": "ResourceFile_ReleaseMultipleBlocks_90AD6"
+  },
+  "chosen": "sub_90AD6",
+  "calls_confirmed": 8,
+  "operand_diffs": 24
+ },
+ "sub_2E71": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_2B99": "CRT_Strupr"
+  },
+  "chosen": "sub_2B99",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2EE54": {
+  "segment": "seg078",
+  "kind": "approchée",
+  "instructions": 54,
+  "candidates": {
+   "sub_5CA9E": "TextRenderer_ReleaseCachedGlyph_5CA9E"
+  },
+  "chosen": "sub_5CA9E",
+  "calls_confirmed": 5,
+  "operand_diffs": 4
+ },
+ "sub_2EEE6": {
+  "segment": "seg078",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5CB30": "Memory_AllocatorSlot_Helper_5CB30"
+  },
+  "chosen": "sub_5CB30",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F5AC": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 58,
+  "candidates": {
+   "sub_5E819": "DisplaySurface_Construct_5E819"
+  },
+  "chosen": "sub_5E819",
+  "calls_confirmed": 6,
+  "operand_diffs": 0
+ },
+ "sub_2F631": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_5E89E": "DisplaySurface_CloneOrResize_5E89E"
+  },
+  "chosen": "sub_5E89E",
+  "calls_confirmed": 7,
+  "operand_diffs": 0
+ },
+ "sub_2F6ED": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5E95A": "CachedObject_DestructSubobjects_5E95A"
+  },
+  "chosen": "sub_5E95A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2F70A": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5E977": "DisplaySurface_Helper_5E977"
+  },
+  "chosen": "sub_5E977",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F73C": {
+  "segment": "seg087",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_5E9A9": "DisplaySurface_ConstructWithMode_5E9A9"
+  },
+  "chosen": "sub_5E9A9",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_2F796": {
+  "segment": "seg088",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5EA03": "Member_ClearAndFree_5EA03"
+  },
+  "chosen": "sub_5EA03",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F7B6": {
+  "segment": "seg088",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_5EA23": "Member_AllocateAndCopy_5EA23"
+  },
+  "chosen": "sub_5EA23",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_2F7F8": {
+  "segment": "seg088",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_5EA65": "Member_CopyRaw_5EA65"
+  },
+  "chosen": "sub_5EA65",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_2F847": {
+  "segment": "seg088",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_5EAB4": "Member_NullTerminateIfSet_5EAB4"
+  },
+  "chosen": "sub_5EAB4",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_2F880": {
+  "segment": "seg089",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5EFD3": "Video_PrintString_5EFD3"
+  },
+  "chosen": "sub_5EFD3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_2FEAE": {
+  "segment": "seg091",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_2FEB8": {
+  "segment": "seg091",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_2FF00": {
+  "segment": "seg091",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_30070": {
+  "segment": "seg092",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_30078": {
+  "segment": "seg092",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5F460": "DisplayContext_CommitFrame_5F460"
+  },
+  "chosen": "sub_5F460",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_300C1": {
+  "segment": "seg092",
+  "kind": "approchée",
+  "instructions": 13,
+  "candidates": {
+   "sub_5F4A9": "DisplayContext_CommitFrameWithTag_5F4A9"
+  },
+  "chosen": "sub_5F4A9",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_300F0": {
+  "segment": "seg093",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_64E1D": "ResourceRecord_WriteField_64E1D"
+  },
+  "chosen": "sub_64E1D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_30123": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_64E50": "ResourceRecord_WriteFieldGroupA_64E50"
+  },
+  "chosen": "sub_64E50",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_30193": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 55,
+  "candidates": {
+   "sub_64EC0": "ResourceRecord_WriteFieldGroupB_64EC0"
+  },
+  "chosen": "sub_64EC0",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_30229": {
+  "segment": "seg093",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_302AB": {
+  "segment": "seg093",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_23AE5": "EntityTracker_ClearShortcut",
+   "sub_64FD8": "ResourceRecord_WriteFieldWrapper_64FD8",
+   "sub_AB583": "SoundFX_StopAllEntry_AB583"
+  },
+  "chosen": "sub_64FD8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_302BA": {
+  "segment": "seg093",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_64FE7": "ResourceRecord_SeekAndRelease_64FE7"
+  },
+  "chosen": "sub_64FE7",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_302F1": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_6501E": "ResourceRecord_WriteFieldGroupC_6501E"
+  },
+  "chosen": "sub_6501E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_30346": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_65073": "ResourceRecord_WriteFieldGroupD_65073"
+  },
+  "chosen": "sub_65073",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_303A1": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 51,
+  "candidates": {
+   "sub_650CE": "ResourceRecord_ReadAndWriteBridge_650CE"
+  },
+  "chosen": "sub_650CE",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_3042B": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 48,
+  "candidates": {
+   "sub_65158": "ResourceRecord_ReadAndWriteBridgeB_65158"
+  },
+  "chosen": "sub_65158",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_304B2": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_651DF": "ResourceRecord_BridgeWrapperA_651DF"
+  },
+  "chosen": "sub_651DF",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_30505": {
+  "segment": "seg093",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_65232": "ResourceRecord_BridgeWrapperB_65232"
+  },
+  "chosen": "sub_65232",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_305A8": {
+  "segment": "seg093",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_652D5": "ResourceRecord_CopyOrTransform_652D5"
+  },
+  "chosen": "sub_652D5",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_309E9": {
+  "segment": "seg095",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_309F6": {
+  "segment": "seg095",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_30A03": {
+  "segment": "seg095",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_30A10": {
+  "segment": "seg095",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_30BB4": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5B7F1": "PagedMemory_DetectDriverSignatureA_5B7F1"
+  },
+  "chosen": "sub_5B7F1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_30BC5": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5B802": "PagedMemory_DetectDriverSignatureB_5B802"
+  },
+  "chosen": "sub_5B802",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_30BD6": {
+  "segment": "seg096",
+  "kind": "approchée",
+  "instructions": 56,
+  "candidates": {
+   "sub_5B813": "PagedMemory_LoadPage_5B813"
+  },
+  "chosen": "sub_5B813",
+  "calls_confirmed": 0,
+  "operand_diffs": 4
+ },
+ "sub_30CBB": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_5B89D": "PagedMemory_InitDriver_5B89D"
+  },
+  "chosen": "sub_5B89D",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_30D62": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_5B944": "PagedMemory_CheckDriverPresent_5B944"
+  },
+  "chosen": "sub_5B944",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_31364": {
+  "segment": "seg096",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_5BD14": "PagedMemory_WriteByte_5BD14"
+  },
+  "chosen": "sub_5BD14",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_32412": {
+  "segment": "seg098",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_3241D": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_32425": {
+  "segment": "seg098",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_5C14E": "PagedMemory_ReadTextResource_5C14E"
+  },
+  "chosen": null
+ },
+ "sub_324EE": {
+  "segment": "seg098",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_327C3": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_5C643": "Memory_TypedFreeVariant_5C643"
+  },
+  "chosen": "sub_5C643",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_32871": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_5C6F3": "Memory_TypedFreeWrapper_5C6F3"
+  },
+  "chosen": "sub_5C6F3",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_328B0": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_5C774": "Memory_TypedFreeWrapperB_5C774"
+  },
+  "chosen": "sub_5C774",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_328F2": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_5C774": "Memory_TypedFreeWrapperB_5C774"
+  },
+  "chosen": "sub_5C774",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_32934": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5C7B6": "Memory_TypedFree_5C7B6"
+  },
+  "chosen": "sub_5C7B6",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_3296E": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_5C7F0": "Memory_TypedAllocDispatch_5C7F0"
+  },
+  "chosen": "sub_5C7F0",
+  "calls_confirmed": 1,
+  "operand_diffs": 5
+ },
+ "sub_329B1": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5C832": "Memory_TypedAllocDispatchB_5C832"
+  },
+  "chosen": "sub_5C832",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_329EC": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_5C86D": "Memory_TypedAllocDispatchC_5C86D"
+  },
+  "chosen": "sub_5C86D",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_32A60": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_5C86D": "Memory_TypedAllocDispatchC_5C86D"
+  },
+  "chosen": "sub_5C86D",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_32A95": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_5C916": "Memory_TypedAllocDispatchE_5C916"
+  },
+  "chosen": "sub_5C916",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_32B25": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_5C9A6": "Memory_ValidateAllocatorIndex_5C9A6"
+  },
+  "chosen": "sub_5C9A6",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_32B52": {
+  "segment": "seg100",
+  "kind": "approchée",
+  "instructions": 52,
+  "candidates": {
+   "sub_5C9D3": "Memory_AllocatorTableConstructor_5C9D3"
+  },
+  "chosen": "sub_5C9D3",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_32BCE": {
+  "segment": "seg100",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_5CA4F": "Memory_AllocatorTable_ConstructSubobject_5CA4F"
+  },
+  "chosen": "sub_5CA4F",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_32C9A": {
+  "segment": "seg101",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_32CA5": {
+  "segment": "seg101",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_5CD3A": "PagedResourceC_Construct_5CD3A"
+  },
+  "chosen": "sub_5CD3A",
+  "calls_confirmed": 2,
+  "operand_diffs": 8
+ },
+ "sub_32D60": {
+  "segment": "seg101",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_32D6A": {
+  "segment": "seg101",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_3325F": {
+  "segment": "seg103",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5D43F": "DisplayCache_ComputeChecksum_5D43F"
+  },
+  "chosen": "sub_5D43F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_337CC": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_5D76B": "DisplayCache_Helper_5D76B"
+  },
+  "chosen": "sub_5D76B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_338CA": {
+  "segment": "seg104",
+  "kind": "stricte",
+  "instructions": 48,
+  "candidates": {
+   "sub_5D859": "PagedResourceB_Helper_5D859"
+  },
+  "chosen": "sub_5D859",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_33B68": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_23E48": "EntityTracker_Destruct",
+   "sub_2B1F3": "Collection_Destruct",
+   "sub_331D7": "TerrainTile_ListDestruct"
+  },
+  "chosen": null
+ },
+ "sub_33C6A": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_33D7B": {
+  "segment": "seg105",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_33D83": {
+  "segment": "seg105",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_33D8B": {
+  "segment": "seg105",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_33D93": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_33DA": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 126,
+  "candidates": {
+   "sub_2BB9": "Stdio_WriteLowLevel"
+  },
+  "chosen": "sub_2BB9",
+  "calls_confirmed": 4,
+  "operand_diffs": 3
+ },
+ "sub_33DA0": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_3430F": {
+  "segment": "seg105",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_3495C": {
+  "segment": "seg105",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_33118": "TerrainTile_DestructSimple",
+   "sub_66420": "JoystickCallback_Destruct_66420",
+   "sub_87E8B": "TextScroll_ReleaseFree_87E8B",
+   "sub_A4AED": "PlayerComponent_ReleaseVariant_A4AED"
+  },
+  "chosen": null
+ },
+ "sub_34E8": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_2CC7": "Stdio_ErrorHandler"
+  },
+  "chosen": "sub_2CC7",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_34F6C": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5DA48": "CachedObject_Allocate_5DA48"
+  },
+  "chosen": "sub_5DA48",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_35031": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_5DB0D": "CachedObject_ConstructVariantB_5DB0D"
+  },
+  "chosen": "sub_5DB0D",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_351AB": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 60,
+  "candidates": {
+   "sub_5DC87": "CachedObject_Destruct_5DC87"
+  },
+  "chosen": "sub_5DC87",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_3524D": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_5DD29": "CachedObject_ReleaseFields_5DD29"
+  },
+  "chosen": "sub_5DD29",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_352CB": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_5DDA7": "CachedObject_DestructCore_5DDA7"
+  },
+  "chosen": "sub_5DDA7",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_35358": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_5DE34": "CachedObject_DestructHelper_5DE34"
+  },
+  "chosen": "sub_5DE34",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_353AA": {
+  "segment": "seg109",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_5DE86": "CachedObject_DestructHelper_5DE86"
+  },
+  "chosen": "sub_5DE86",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3544B": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 94,
+  "candidates": {
+   "sub_5DEC9": "CachedObject_BuildAndTransform_5DEC9"
+  },
+  "chosen": "sub_5DEC9",
+  "calls_confirmed": 3,
+  "operand_diffs": 5
+ },
+ "sub_35581": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_5DFBE": "CachedObject_AllocateAndInit_5DFBE"
+  },
+  "chosen": "sub_5DFBE",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_355CF": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 56,
+  "candidates": {
+   "sub_5E00C": "CachedObject_BuildComposite_5E00C"
+  },
+  "chosen": "sub_5E00C",
+  "calls_confirmed": 4,
+  "operand_diffs": 6
+ },
+ "sub_356ED": {
+  "segment": "seg109",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_5E12A": "CachedObject_BuildVariant_5E12A"
+  },
+  "chosen": "sub_5E12A",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_357D1": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 44,
+  "candidates": {
+   "sub_5E2D0": "TextFormat_ApplyStyleAttribute_5E2D0"
+  },
+  "chosen": "sub_5E2D0",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3582A": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5E329": "TextFormat_ApplyStyleAttributeB_5E329"
+  },
+  "chosen": "sub_5E329",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_3584E": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 81,
+  "candidates": {
+   "sub_5E34D": "TextRenderer_ApplyFormatChange_5E34D"
+  },
+  "chosen": "sub_5E34D",
+  "calls_confirmed": 4,
+  "operand_diffs": 5
+ },
+ "sub_3591E": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_5E41D": "TextFormat_SetAttribute_5E41D"
+  },
+  "chosen": "sub_5E41D",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_3595E": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 61,
+  "candidates": {
+   "sub_5E45D": "TextFormat_InitAttributeTable_5E45D"
+  },
+  "chosen": "sub_5E45D",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_359C9": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 43,
+  "candidates": {
+   "sub_5E4C8": "TextFormat_ResolveStyleEntry_5E4C8"
+  },
+  "chosen": "sub_5E4C8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_35A27": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_5E526": "TextFormat_ReleaseStyleList_5E526"
+  },
+  "chosen": "sub_5E526",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_35A77": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_5E576": "UI_ApplyEncodingHelper_5E576"
+  },
+  "chosen": "sub_5E576",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_35A92": {
+  "segment": "seg110",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_36FD9": "Picking_ResolveSymbol",
+   "sub_5E576": "UI_ApplyEncodingHelper_5E576",
+   "sub_9B62B": "Debris_ContainerOpWrapper_9B62B"
+  },
+  "chosen": "sub_5E576",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_35AAD": {
+  "segment": "seg110",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_5E5AC": "TextFormat_ReleaseAttribute_5E5AC"
+  },
+  "chosen": "sub_5E5AC",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_35AC": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 39,
+  "candidates": {
+   "sub_2D48": "CRT_MemFamily_Extra2"
+  },
+  "chosen": "sub_2D48",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_35DE3": {
+  "segment": "seg118",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_35E0F": {
+  "segment": "seg118",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_5F508": "PagedResourceC_RefreshAndFinalize_5F508"
+  },
+  "chosen": "sub_5F508",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_35E5E": {
+  "segment": "seg119",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_5EAED": "FontStyle_ClearFlag_5EAED"
+  },
+  "chosen": "sub_5EAED",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_35E89": {
+  "segment": "seg119",
+  "kind": "stricte",
+  "instructions": 50,
+  "candidates": {
+   "sub_5EB18": "FontStyle_Construct_5EB18"
+  },
+  "chosen": "sub_5EB18",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_35EB": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 36,
+  "candidates": {
+   "sub_2D87": "CRT_MemFamily_Extra3"
+  },
+  "chosen": "sub_2D87",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3614B": {
+  "segment": "seg119",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_5EDEC": "FontStyle_ApplyVariantB_5EDEC"
+  },
+  "chosen": "sub_5EDEC",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_36332": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5F19C": "LinkedList_InsertAtHead_5F19C"
+  },
+  "chosen": "sub_5F19C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_36360": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_5F1CA": "LinkedList_InsertAtTail_5F1CA"
+  },
+  "chosen": "sub_5F1CA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3638E": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5F1F8": "LinkedList_InsertAfter_5F1F8"
+  },
+  "chosen": "sub_5F1F8",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_363DB": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 38,
+  "candidates": {
+   "sub_5F245": "LinkedList_InsertBefore_5F245"
+  },
+  "chosen": "sub_5F245",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_364BA": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 35,
+  "candidates": {
+   "sub_5F324": "LinkedList_Remove_5F324"
+  },
+  "chosen": "sub_5F324",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3652D": {
+  "segment": "seg121",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F397": "LinkedList_RemoveAllAndDestroy_5F397",
+   "sub_5F66B": "LinkedListB_Helper_5F66B"
+  },
+  "chosen": null
+ },
+ "sub_3656B": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F3D5": "LinkedList_Helper_5F3D5",
+   "sub_5F6A9": "LinkedListB_Helper_5F6A9"
+  },
+  "chosen": null
+ },
+ "sub_36597": {
+  "segment": "seg121",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F401": "LinkedList_Helper_5F401"
+  },
+  "chosen": "sub_5F401",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_36616": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_5F57F": "LinkedListB_InsertAtTail_5F57F"
+  },
+  "chosen": "sub_5F57F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3663B": {
+  "segment": "seg122",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_5F5A4": "LinkedListB_FindAndDispatch_5F5A4"
+  },
+  "chosen": "sub_5F5A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_3669B": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 47,
+  "candidates": {
+   "sub_5F604": "LinkedListB_FindByKey_5F604"
+  },
+  "chosen": "sub_5F604",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3670": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_2E3C": "CRT_MemFamily_Extra7"
+  },
+  "chosen": "sub_2E3C",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_36702": {
+  "segment": "seg122",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_5F397": "LinkedList_RemoveAllAndDestroy_5F397",
+   "sub_5F66B": "LinkedListB_Helper_5F66B"
+  },
+  "chosen": null
+ },
+ "sub_36740": {
+  "segment": "seg122",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_5F3D5": "LinkedList_Helper_5F3D5",
+   "sub_5F6A9": "LinkedListB_Helper_5F6A9"
+  },
+  "chosen": null
+ },
+ "sub_36797": {
+  "segment": "seg123",
+  "kind": "approchée",
+  "instructions": 58,
+  "candidates": {
+   "sub_5F700": "Runtime_FatalErrorHandler_5F700"
+  },
+  "chosen": "sub_5F700",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_36A0E": {
+  "segment": "seg124",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_381F2": "Debris_GetSubpartAttrib"
+  },
+  "chosen": "sub_381F2",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_36D18": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_604C9": "GlyphObject_AllocateBuffer_604C9"
+  },
+  "chosen": "sub_604C9",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_36D56": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_60507": "GlyphObject_ConstructWithBuffer_60507"
+  },
+  "chosen": "sub_60507",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_36E1D": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 59,
+  "candidates": {
+   "sub_605CE": "GlyphObject_ResolveAndCache_605CE"
+  },
+  "chosen": "sub_605CE",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_36E99": {
+  "segment": "seg125",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_6064A": "GlyphObject_MeasureChar_6064A"
+  },
+  "chosen": "sub_6064A",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_36F33": {
+  "segment": "seg125",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_36F53": {
+  "segment": "seg125",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_36FD2": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 40,
+  "candidates": {
+   "sub_607E1": "Widget_ApplyStyleAndAllocate_607E1"
+  },
+  "chosen": "sub_607E1",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_37030": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_6083F": "Widget_Method_Dispatch8_6083F"
+  },
+  "chosen": "sub_6083F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_37052": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_60861": "Widget_Method_DispatchC_60861"
+  },
+  "chosen": "sub_60861",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_37074": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 39,
+  "candidates": {
+   "sub_60883": "Widget_ComputeAndStoreBounds_60883"
+  },
+  "chosen": "sub_60883",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_37124": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 69,
+  "candidates": {
+   "sub_60933": "Widget_RenderWithAttributes_60933"
+  },
+  "chosen": "sub_60933",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_37275": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 50,
+  "candidates": {
+   "sub_60A84": "Widget_Method_DispatchChain_60A84"
+  },
+  "chosen": "sub_60A84",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_372DC": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_60AEB": "Widget_ComputeBoundsExtent_60AEB"
+  },
+  "chosen": "sub_60AEB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_3730E": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 74,
+  "candidates": {
+   "sub_60B1D": "Widget_UpdateLayoutAndBounds_60B1D"
+  },
+  "chosen": "sub_60B1D",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_37397": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 189,
+  "candidates": {
+   "sub_60BA6": "Widget_RenderComplexLayout_60BA6"
+  },
+  "chosen": "sub_60BA6",
+  "calls_confirmed": 11,
+  "operand_diffs": 3
+ },
+ "sub_375C2": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_60DD1": "Widget_RenderComplexLayoutWrapper_60DD1"
+  },
+  "chosen": "sub_60DD1",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_375E7": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_37656": {
+  "segment": "seg126",
+  "kind": "stricte",
+  "instructions": 88,
+  "candidates": {
+   "sub_60E60": "GlyphObject_LayoutAndRenderAll_60E60"
+  },
+  "chosen": "sub_60E60",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_376F7": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_37704": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_37711": {
+  "segment": "seg126",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_37B54": {
+  "segment": "seg131",
+  "kind": "approchée",
+  "instructions": 70,
+  "candidates": {
+   "sub_60FE2": "Rect_BlitOverlapRegion_60FE2"
+  },
+  "chosen": "sub_60FE2",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_3811A": {
+  "segment": "seg134",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_61B58": "Render_SetPixelClipped_61B58"
+  },
+  "chosen": "sub_61B58",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_388D": {
+  "segment": "seg001",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_68384": "VROOMM_InstallIntHandler_68384"
+  },
+  "chosen": "sub_68384",
+  "calls_confirmed": 0,
+  "operand_diffs": 10
+ },
+ "sub_40354": {
+  "segment": "seg155",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_630BA": "File_CreateWithRetry_630BA"
+  },
+  "chosen": "sub_630BA",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_40380": {
+  "segment": "seg156",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_63434": "File_OpenWithRetry_63434"
+  },
+  "chosen": "sub_63434",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_4046A": {
+  "segment": "seg158",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_63511": "Handle_ReadWordField_63511"
+  },
+  "chosen": "sub_63511",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4048D": {
+  "segment": "seg158",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_63534": "Handle_ReadByteField_63534"
+  },
+  "chosen": "sub_63534",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_40507": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_635AE": "FileStream_Construct_635AE"
+  },
+  "chosen": "sub_635AE",
+  "calls_confirmed": 1,
+  "operand_diffs": 9
+ },
+ "sub_405D2": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_65643": "StreamReader_ReleaseBuffer_65643"
+  },
+  "chosen": "sub_65643",
+  "calls_confirmed": 1,
+  "operand_diffs": 5
+ },
+ "sub_408E0": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 46,
+  "candidates": {
+   "sub_6378F": "FileStream_ReadBuffered_6378F"
+  },
+  "chosen": "sub_6378F",
+  "calls_confirmed": 0,
+  "operand_diffs": 7
+ },
+ "sub_40A54": {
+  "segment": "seg159",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_64062": "StreamReader_GetCapacity_64062",
+   "sub_64075": "StreamReader_GetPosition_64075"
+  },
+  "chosen": null
+ },
+ "sub_40AAC": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_6404E": "StreamReader_ReportError_6404E"
+  },
+  "chosen": null
+ },
+ "sub_40AC4": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_640B0": "StreamReader_RegistryAdd_640B0"
+  },
+  "chosen": "sub_640B0",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_40AE8": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_640D4": "StreamReader_RegistryRemove_640D4"
+  },
+  "chosen": "sub_640D4",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_40BBC": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 28,
+  "candidates": {
+   "sub_64175": "StreamReader_DispatchWrite_64175"
+  },
+  "chosen": "sub_64175",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_40BF9": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_641B2": "StreamReader_ParseFormattedValueB_641B2"
+  },
+  "chosen": "sub_641B2",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_40C32": {
+  "segment": "seg160",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_641EB": "StreamReader_PrepareParse_641EB"
+  },
+  "chosen": "sub_641EB",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_40C5E": {
+  "segment": "seg160",
+  "kind": "approchée",
+  "instructions": 99,
+  "candidates": {
+   "sub_64217": "StreamReader_ParseFormattedString_64217"
+  },
+  "chosen": "sub_64217",
+  "calls_confirmed": 6,
+  "operand_diffs": 1
+ },
+ "sub_40D46": {
+  "segment": "seg160",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_642FF": "StreamReader_CloseAndUnregister_642FF"
+  },
+  "chosen": "sub_642FF",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_40D9A": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_638FF": "StreamReader_Destruct_638FF"
+  },
+  "chosen": "sub_638FF",
+  "calls_confirmed": 3,
+  "operand_diffs": 4
+ },
+ "sub_40DFD": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 34,
+  "candidates": {
+   "sub_63962": "StreamReader_Helper_63962"
+  },
+  "chosen": "sub_63962",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_40E3D": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_639A2": "StreamReader_Helper_639A2"
+  },
+  "chosen": "sub_639A2",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_40E68": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_639CD": "StreamReader_Helper_639CD"
+  },
+  "chosen": "sub_639CD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_40E8C": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_639F1": "StreamReader_ValidateAndDispatch_639F1"
+  },
+  "chosen": "sub_639F1",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_40EAD": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_63A12": "StreamReader_Helper_63A12"
+  },
+  "chosen": "sub_63A12",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_40ED4": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 32,
+  "candidates": {
+   "sub_63A39": "StreamReader_ConstructVariantA_63A39"
+  },
+  "chosen": "sub_63A39",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_40F23": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_63A88": "StreamReader_ConstructVariantB_63A88"
+  },
+  "chosen": "sub_63A88",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_40F6E": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_63AD3": "StreamReader_ConstructVariantC_63AD3"
+  },
+  "chosen": "sub_63AD3",
+  "calls_confirmed": 3,
+  "operand_diffs": 3
+ },
+ "sub_410AA": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_63BD5": "StreamReader_Close_63BD5"
+  },
+  "chosen": "sub_63BD5",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_41105": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_63C30": "StreamReader_DispatchRead_63C30"
+  },
+  "chosen": "sub_63C30",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_411DE": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_63D0E": "StreamReader_ReadDispatch_63D0E"
+  },
+  "chosen": "sub_63D0E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_411FD": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 30,
+  "candidates": {
+   "sub_63D2D": "StreamReader_ReadDispatchB_63D2D"
+  },
+  "chosen": "sub_63D2D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_412A1": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_63DB5": "StreamReader_ValidateState_63DB5"
+  },
+  "chosen": "sub_63DB5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_412C7": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_63DDB": "StreamReader_CheckBufferValid_63DDB"
+  },
+  "chosen": "sub_63DDB",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_412E2": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_63DF6": "StreamReader_SeekVariant_63DF6"
+  },
+  "chosen": "sub_63DF6",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_413D1": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 45,
+  "candidates": {
+   "sub_63EE5": "StreamReader_RefillBuffer_63EE5"
+  },
+  "chosen": "sub_63EE5",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_41432": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 43,
+  "candidates": {
+   "sub_63F46": "StreamReader_PrepareForRead_63F46"
+  },
+  "chosen": "sub_63F46",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_4148D": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 69,
+  "candidates": {
+   "sub_63FA1": "StreamReader_ReadTyped_63FA1"
+  },
+  "chosen": "sub_63FA1",
+  "calls_confirmed": 5,
+  "operand_diffs": 1
+ },
+ "sub_41528": {
+  "segment": "seg161",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_41532": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_4153A": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_6404E": "StreamReader_ReportError_6404E"
+  },
+  "chosen": "sub_6404E",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4154E": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64062": "StreamReader_GetCapacity_64062"
+  },
+  "chosen": "sub_64062",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_41561": {
+  "segment": "seg161",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64075": "StreamReader_GetPosition_64075"
+  },
+  "chosen": "sub_64075",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_41581": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_4158F": {
+  "segment": "seg162",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_64353": "FileStream_Method_Read_64353"
+  },
+  "chosen": "sub_64353",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_416E2": {
+  "segment": "seg162",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_33118": "TerrainTile_DestructSimple",
+   "sub_66420": "JoystickCallback_Destruct_66420",
+   "sub_87E8B": "TextScroll_ReleaseFree_87E8B",
+   "sub_A4AED": "PlayerComponent_ReleaseVariant_A4AED"
+  },
+  "chosen": null
+ },
+ "sub_425B8": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_645A5": "ResourceRecord_Helper_645A5"
+  },
+  "chosen": "sub_645A5",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_425E0": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_645CD": "ResourceRecord_InitAndValidate_645CD"
+  },
+  "chosen": "sub_645CD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_426AB": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_64698": "ResourceRecord_ReadHeaderFields_64698"
+  },
+  "chosen": "sub_64698",
+  "calls_confirmed": 1,
+  "operand_diffs": 4
+ },
+ "sub_426EE": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_646DB": "ResourceRecord_ComputeRecordBounds_646DB"
+  },
+  "chosen": "sub_646DB",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_42722": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 28,
+  "candidates": {
+   "sub_6470F": "ResourceRecord_ComputeRecordBoundsB_6470F"
+  },
+  "chosen": "sub_6470F",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_42756": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_64743": "ResourceRecord_SeekAndRead_64743"
+  },
+  "chosen": "sub_64743",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_427C5": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_647B2": "ResourceRecord_SeekAndReadB_647B2"
+  },
+  "chosen": "sub_647B2",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_4283E": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 59,
+  "candidates": {
+   "sub_6482B": "ResourceRecord_SeekAndReadC_6482B"
+  },
+  "chosen": "sub_6482B",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_428B1": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_6489E": "ResourceRecord_Helper_6489E"
+  },
+  "chosen": "sub_6489E",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_428F6": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 56,
+  "candidates": {
+   "sub_648E3": "ResourceRecord_ReadStructured_648E3"
+  },
+  "chosen": "sub_648E3",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_429D4": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_649C1": "ResourceRecord_AdvanceByArrayCount_649C1"
+  },
+  "chosen": "sub_649C1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_42A2C": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_64A19": "ResourceRecord_ReadFieldGroupA_64A19"
+  },
+  "chosen": "sub_64A19",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_42A67": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_64A54": "ResourceRecord_ReadFieldGroupB_64A54"
+  },
+  "chosen": "sub_64A54",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_42A91": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_64A7E": "ResourceRecord_ReadFieldGroupC_64A7E"
+  },
+  "chosen": "sub_64A7E",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_42AC1": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 20,
+  "candidates": {
+   "sub_64AAE": "ResourceRecord_ReadDwordField_64AAE"
+  },
+  "chosen": "sub_64AAE",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_42AEC": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_64AD9": "ResourceRecord_ReadViaHelper_64AD9"
+  },
+  "chosen": "sub_64AD9",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_42B12": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 33,
+  "candidates": {
+   "sub_64AFF": "ResourceRecord_ReadDwordFieldB_64AFF"
+  },
+  "chosen": "sub_64AFF",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_42B64": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_64B51": "ResourceRecord_ReadFinalField_64B51"
+  },
+  "chosen": "sub_64B51",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_42BAE": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_64B9B": "ResourceRecord_ReadDwordAdvance_64B9B"
+  },
+  "chosen": "sub_64B9B",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_42BD4": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 25,
+  "candidates": {
+   "sub_64BC1": "ResourceRecord_ComputeAlignedBounds_64BC1"
+  },
+  "chosen": "sub_64BC1",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_42C0B": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_64BF8": "ResourceRecord_SeekToStart_64BF8"
+  },
+  "chosen": "sub_64BF8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_42C34": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_42CB6": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 54,
+  "candidates": {
+   "sub_64C21": "ResourceRecord_AllocateAndDecode_64C21",
+   "sub_64CA3": "ResourceRecord_AllocateAndDecodeB_64CA3",
+   "sub_64F56": "ResourceRecord_AllocateAndDecodeVariant_64F56"
+  },
+  "chosen": null
+ },
+ "sub_42D38": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_64D25": "ResourceRecord_ReleaseAndClear_64D25"
+  },
+  "chosen": "sub_64D25",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_42D6B": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": "sub_64D58",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_42DC6": {
+  "segment": "seg164",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_64DB3": "ResourceRecord_ReadPayload_64DB3"
+  },
+  "chosen": "sub_64DB3",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_42E18": {
+  "segment": "seg164",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_6404E": "StreamReader_ReportError_6404E"
+  },
+  "chosen": null
+ },
+ "sub_42F45": {
+  "segment": "seg165",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_65643": "StreamReader_ReleaseBuffer_65643"
+  },
+  "chosen": "sub_65643",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_42F91": {
+  "segment": "seg165",
+  "kind": "approchée",
+  "instructions": 97,
+  "candidates": {
+   "sub_6568F": "StreamReader_WriteTyped_6568F"
+  },
+  "chosen": "sub_6568F",
+  "calls_confirmed": 6,
+  "operand_diffs": 3
+ },
+ "sub_43097": {
+  "segment": "seg165",
+  "kind": "approchée",
+  "instructions": 196,
+  "candidates": {
+   "sub_65795": "StreamReader_WriteWithGrowth_65795"
+  },
+  "chosen": "sub_65795",
+  "calls_confirmed": 10,
+  "operand_diffs": 6
+ },
+ "sub_432D2": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_659D0": "IndexedRecordReader_Destruct_659D0"
+  },
+  "chosen": "sub_659D0",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_4331C": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_65A1A": "IndexedRecordReader_ConstructVariantA_65A1A"
+  },
+  "chosen": "sub_65A1A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_4334C": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 35,
+  "candidates": {
+   "sub_65A4A": "IndexedRecordReader_ConstructVariantB_65A4A"
+  },
+  "chosen": "sub_65A4A",
+  "calls_confirmed": 3,
+  "operand_diffs": 1
+ },
+ "sub_4338C": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 53,
+  "candidates": {
+   "sub_65A8A": "IndexedRecordReader_ConstructVariantC_65A8A"
+  },
+  "chosen": "sub_65A8A",
+  "calls_confirmed": 2,
+  "operand_diffs": 4
+ },
+ "sub_43405": {
+  "segment": "seg166",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_65B03": "IndexedRecordReader_InitFields_65B03"
+  },
+  "chosen": "sub_65B03",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_43633": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 49,
+  "candidates": {
+   "sub_65DA9": "IndexedRecordReader_ReadEntry_65DA9"
+  },
+  "chosen": "sub_65DA9",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_436B6": {
+  "segment": "seg166",
+  "kind": "approchée",
+  "instructions": 70,
+  "candidates": {
+   "sub_65E2C": "IndexedRecordReader_AdvanceIndex_65E2C"
+  },
+  "chosen": "sub_65E2C",
+  "calls_confirmed": 5,
+  "operand_diffs": 1
+ },
+ "sub_437A9": {
+  "segment": "seg167",
+  "kind": "approchée",
+  "instructions": 72,
+  "candidates": {
+   "sub_661AF": "TextRenderer_LoadResourceFile_661AF"
+  },
+  "chosen": "sub_661AF",
+  "calls_confirmed": 8,
+  "operand_diffs": 2
+ },
+ "sub_43985": {
+  "segment": "seg168",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_6638B": "Joystick_ReadAxesAndButtons_6638B"
+  },
+  "chosen": "sub_6638B",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_439B7": {
+  "segment": "seg168",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_663BD": "Joystick_ReadButtonsOnly_663BD"
+  },
+  "chosen": "sub_663BD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_43A16": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_663D6": "JoystickCallback_Construct_663D6"
+  },
+  "chosen": "sub_663D6",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_43A60": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 18,
+  "candidates": {
+   "sub_33118": "TerrainTile_DestructSimple",
+   "sub_66420": "JoystickCallback_Destruct_66420",
+   "sub_87E8B": "TextScroll_ReleaseFree_87E8B",
+   "sub_A4AED": "PlayerComponent_ReleaseVariant_A4AED"
+  },
+  "chosen": null
+ },
+ "sub_43A81": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66441": "JoystickCallback_SetValueAndEcho_66441"
+  },
+  "chosen": "sub_66441",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_43AA1": {
+  "segment": "seg169",
+  "kind": "approchée",
+  "instructions": 49,
+  "candidates": {
+   "sub_66461": "JoystickCallback_UpdateAndNotifyChain_66461"
+  },
+  "chosen": "sub_66461",
+  "calls_confirmed": 5,
+  "operand_diffs": 2
+ },
+ "sub_43B15": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 41,
+  "candidates": {
+   "sub_664D5": "JoystickCallback_RegisterInChain_664D5"
+  },
+  "chosen": "sub_664D5",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_43BB3": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 33,
+  "candidates": {
+   "sub_66573": "JoystickCallback_FindOrTraverse_66573"
+  },
+  "chosen": "sub_66573",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_43C3A": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_665FA": "JoystickManager_Construct_665FA"
+  },
+  "chosen": "sub_665FA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_43C6F": {
+  "segment": "seg169",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_43D7F": {
+  "segment": "seg170",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_66762": "ConfigOption_ConstructFull_66762"
+  },
+  "chosen": "sub_66762",
+  "calls_confirmed": 3,
+  "operand_diffs": 2
+ },
+ "sub_43F6A": {
+  "segment": "seg170",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_9B451": "TerrainTile_ConstructDescriptor_9B451"
+  },
+  "chosen": "sub_9B451",
+  "calls_confirmed": 1,
+  "operand_diffs": 2
+ },
+ "sub_4406C": {
+  "segment": "seg170",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_66A4F": "ConfigOption_Dispatch_66A4F"
+  },
+  "chosen": "sub_66A4F",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_440C1": {
+  "segment": "seg170",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_441D7": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_66BBA": "Keyboard_RegisterOrInitHandlerTable_66BBA"
+  },
+  "chosen": "sub_66BBA",
+  "calls_confirmed": 4,
+  "operand_diffs": 0
+ },
+ "sub_4423B": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": "sub_66C1E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_44251": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_66C34": "Keyboard_InitSystem_66C34"
+  },
+  "chosen": "sub_66C34",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4427F": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_66C62": "Keyboard_UnregisterHandlerTable_66C62"
+  },
+  "chosen": "sub_66C62",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_442BA": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 37,
+  "candidates": {
+   "sub_66C9D": "Keyboard_PushEventToQueue_66C9D"
+  },
+  "chosen": "sub_66C9D",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_44312": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_66CF5": "Keyboard_PeekOrPopEvent_66CF5"
+  },
+  "chosen": "sub_66CF5",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_44356": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_66D39": "Keyboard_QueryHandlerTable_66D39"
+  },
+  "chosen": "sub_66D39",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_4438A": {
+  "segment": "seg171",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_66D6D": "Keyboard_Method_ReturnTypeTag_66D6D"
+  },
+  "chosen": "sub_66D6D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_443A6": {
+  "segment": "seg171",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_443D7": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_66DBA": "InputBinding_Construct_66DBA",
+   "sub_67267": "TextScrollDisplay_Construct_67267"
+  },
+  "chosen": null
+ },
+ "sub_443FA": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_66DDD": "InputBinding_Destruct_66DDD",
+   "sub_6728A": "TextScrollDisplay_Destruct_6728A"
+  },
+  "chosen": "sub_66DDD",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_444F2": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": "sub_66ED5",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_44504": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_44511": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_5A9BA": "Music_Pause_5A9BA",
+   "sub_5A9D0": "Music_Resume_5A9D0",
+   "sub_66EF4": "Keyboard_ReportErrorIfActive_66EF4"
+  },
+  "chosen": "sub_66EF4",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_44526": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_66F09": "Keyboard_AllocateHandlerMask_66F09"
+  },
+  "chosen": "sub_66F09",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_44551": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_4456D": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_66C1E": "Keyboard_ClearHandlerTable_66C1E",
+   "sub_66ED5": "InputBinding_ReleaseJoystickCallback_66ED5",
+   "sub_66F50": "Keyboard_InstallHandlerMask_66F50"
+  },
+  "chosen": null
+ },
+ "sub_4457E": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_66F61": "Keyboard_ConfigureHandlerMask_66F61"
+  },
+  "chosen": "sub_66F61",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44595": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 6,
+  "candidates": {
+   "sub_84DDB": "HUDSymbol_Helper10_84DDB",
+   "sub_A7FD0": "MissionLoader_Helper_A7FD0"
+  },
+  "chosen": null
+ },
+ "sub_445A1": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_445AE": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_445B6": {
+  "segment": "seg172",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_67DEA": "OptionCounter_Set_67DEA"
+  },
+  "chosen": null
+ },
+ "sub_445C1": {
+  "segment": "seg172",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_338": "CRT_FreeNear_Wrap"
+  },
+  "chosen": null
+ },
+ "sub_445E1": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 29,
+  "candidates": {
+   "sub_66FC4": "TextScroll_Construct_66FC4"
+  },
+  "chosen": "sub_66FC4",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_44665": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_67048": "TextScroll_ComputeParams_67048"
+  },
+  "chosen": "sub_67048",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_44699": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_6707C": "TextScroll_Helper_6707C"
+  },
+  "chosen": "sub_6707C",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_446C2": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_670A5": "TextScroll_HelperB_670A5"
+  },
+  "chosen": "sub_670A5",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44753": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_67134": "TextScroll_ApplyHelperB_67134"
+  },
+  "chosen": "sub_67134",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_447EC": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_671CA": "TextScroll_RegisterHandler_671CA"
+  },
+  "chosen": "sub_671CA",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_44806": {
+  "segment": "seg173",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_671E4": "TextScroll_ApplyHelperC_671E4"
+  },
+  "chosen": "sub_671E4",
+  "calls_confirmed": 2,
+  "operand_diffs": 2
+ },
+ "sub_44826": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_67204": "TextScroll_FormatAndApply_67204"
+  },
+  "chosen": "sub_67204",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_44844": {
+  "segment": "seg173",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_67222": "TextScroll_ApplyHelperD_67222"
+  },
+  "chosen": "sub_67222",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44889": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 20,
+  "candidates": {
+   "sub_66DBA": "InputBinding_Construct_66DBA",
+   "sub_67267": "TextScrollDisplay_Construct_67267"
+  },
+  "chosen": "sub_67267",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_448AC": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 22,
+  "candidates": {
+   "sub_66DDD": "InputBinding_Destruct_66DDD",
+   "sub_6728A": "TextScrollDisplay_Destruct_6728A"
+  },
+  "chosen": "sub_6728A",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_448D1": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_672AF": "TextScrollDisplay_ComputeLayout_672AF"
+  },
+  "chosen": "sub_672AF",
+  "calls_confirmed": 4,
+  "operand_diffs": 2
+ },
+ "sub_44961": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_6733F": "TextScrollDisplay_InitState_6733F"
+  },
+  "chosen": "sub_6733F",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_449A6": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_67384": "TextScrollDisplay_Cleanup_67384"
+  },
+  "chosen": "sub_67384",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_449DB": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_673B9": "TextScrollDisplay_RegisterEntries_673B9"
+  },
+  "chosen": "sub_673B9",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44AA3": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_67481": "Input_GetCalibratedXValue_67481",
+   "sub_67499": "Input_GetCalibratedYValue_67499"
+  },
+  "chosen": null
+ },
+ "sub_44ABB": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_67481": "Input_GetCalibratedXValue_67481",
+   "sub_67499": "Input_GetCalibratedYValue_67499"
+  },
+  "chosen": null
+ },
+ "sub_44B17": {
+  "segment": "seg174",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_674F5": "TextScroll_AllocateState_674F5",
+   "sub_675EF": "Stopwatch_Construct_675EF"
+  },
+  "chosen": null
+ },
+ "sub_44B39": {
+  "segment": "seg174",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_67517": "HandlerRegistry4Slot_Register_67517"
+  },
+  "chosen": "sub_67517",
+  "calls_confirmed": 1,
+  "operand_diffs": 3
+ },
+ "sub_44C11": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 18,
+  "candidates": {
+   "sub_674F5": "TextScroll_AllocateState_674F5",
+   "sub_675EF": "Stopwatch_Construct_675EF"
+  },
+  "chosen": null
+ },
+ "sub_44C33": {
+  "segment": "seg176",
+  "kind": "approchée",
+  "instructions": 31,
+  "candidates": {
+   "sub_67611": "Stopwatch_RegisterTickModule_67611"
+  },
+  "chosen": "sub_67611",
+  "calls_confirmed": 2,
+  "operand_diffs": 1
+ },
+ "sub_44C84": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 27,
+  "candidates": {
+   "sub_67662": "Stopwatch_RegisterTickModuleVariant_67662"
+  },
+  "chosen": "sub_67662",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44CC1": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_6769F": "Stopwatch_UnregisterTickModule_6769F"
+  },
+  "chosen": "sub_6769F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44CD9": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_6769F": "Stopwatch_UnregisterTickModule_6769F"
+  },
+  "chosen": "sub_6769F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44CF1": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_6769F": "Stopwatch_UnregisterTickModule_6769F"
+  },
+  "chosen": "sub_6769F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44D13": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 79,
+  "candidates": {
+   "sub_676F1": "Stopwatch_StartOrStop_676F1"
+  },
+  "chosen": "sub_676F1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44E21": {
+  "segment": "seg176",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_677FF": "Stopwatch_Reset_677FF"
+  },
+  "chosen": "sub_677FF",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_44F0C": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_44F28": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_67906": "Joystick_ReadButtonsWrapper_67906"
+  },
+  "chosen": "sub_67906",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_44F32": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_6794D": "Joystick_ApplyDeadzoneAndScale_6794D",
+   "sub_679E2": "Joystick_ApplyDeadzoneAndScaleB_679E2"
+  },
+  "chosen": null
+ },
+ "sub_44FC7": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 62,
+  "candidates": {
+   "sub_6794D": "Joystick_ApplyDeadzoneAndScale_6794D",
+   "sub_679E2": "Joystick_ApplyDeadzoneAndScaleB_679E2"
+  },
+  "chosen": null
+ },
+ "sub_450": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 10,
+  "candidates": {
+   "sub_3C2": "CRT_Exit"
+  },
+  "chosen": "sub_3C2",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45120": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_67B3A": "Joystick_FormatCalibrationDisplay_67B3A"
+  },
+  "chosen": "sub_67B3A",
+  "calls_confirmed": 2,
+  "operand_diffs": 3
+ },
+ "sub_45168": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_47095": "FlightControl_InvalidateMomentCache",
+   "sub_67B82": "Joystick_GetButtonRawByte_67B82"
+  },
+  "chosen": null
+ },
+ "sub_45178": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_67B92": "Joystick_InitCalibrationDefaults_67B92"
+  },
+  "chosen": "sub_67B92",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_451E9": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_67C03": "Joystick_LoadCalibrationSample_67C03",
+   "sub_67C21": "Joystick_LoadCalibrationExtremes_67C21"
+  },
+  "chosen": null
+ },
+ "sub_45207": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 14,
+  "candidates": {
+   "sub_67C03": "Joystick_LoadCalibrationSample_67C03",
+   "sub_67C21": "Joystick_LoadCalibrationExtremes_67C21"
+  },
+  "chosen": null
+ },
+ "sub_45225": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_67C3F": "Joystick_ComputeCalibrationRatio_67C3F"
+  },
+  "chosen": "sub_67C3F",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_4529E": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 81,
+  "candidates": {
+   "sub_67CB8": "Joystick_InterpolateCalibrationPercent_67CB8"
+  },
+  "chosen": "sub_67CB8",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4538A": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 16,
+  "candidates": {
+   "sub_67DA4": "OptionCounter_Construct_67DA4"
+  },
+  "chosen": "sub_67DA4",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_453AC": {
+  "segment": "seg177",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_66F34": "Keyboard_ReleaseHandlerMaskIfSet_66F34",
+   "sub_678EA": "Joystick_ReleaseCalibration_678EA",
+   "sub_67DC6": "OptionCounter_Destruct_67DC6",
+   "sub_99A76": "Terrain_ReleaseFree_99A76",
+   "sub_9ADC9": "Terrain_ReleaseFreeB_9ADC9"
+  },
+  "chosen": null
+ },
+ "sub_453C8": {
+  "segment": "seg177",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_453D0": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 7,
+  "candidates": {
+   "sub_67DEA": "OptionCounter_Set_67DEA"
+  },
+  "chosen": "sub_67DEA",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_453DB": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 26,
+  "candidates": {
+   "sub_67DF5": "TextScrollDisplayB_ConstructAndReset_67DF5"
+  },
+  "chosen": "sub_67DF5",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4541A": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 40,
+  "candidates": {
+   "sub_67E34": "TextScrollDisplayB_InitAndRegister_67E34"
+  },
+  "chosen": "sub_67E34",
+  "calls_confirmed": 3,
+  "operand_diffs": 0
+ },
+ "sub_45482": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_67E9C": "TextScrollDisplayB_ApplyHelperA_67E9C"
+  },
+  "chosen": "sub_67E9C",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_454C6": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_67EE0": "TextScrollDisplayB_ApplyHelperB_67EE0"
+  },
+  "chosen": "sub_67EE0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_454F9": {
+  "segment": "seg178",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_52D08": "Expr_LookupNamedValue_52D08",
+   "sub_67F13": "TextScrollDisplayB_TickHelper_67F13",
+   "sub_A7C8E": "MissionLoader_LoadChunkA_A7C8E"
+  },
+  "chosen": "sub_67F13",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_4550C": {
+  "segment": "seg178",
+  "kind": "approchée",
+  "instructions": 11,
+  "candidates": {
+   "sub_50654": "UIScreen_SetWidgetValue_50654"
+  },
+  "chosen": "sub_50654",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_45522": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_67F26": "TextScrollDisplayB_ApplyHelperC_67F26"
+  },
+  "chosen": "sub_67F26",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4555C": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_67F60": "TextScrollDisplayB_ApplyHelperD_67F60"
+  },
+  "chosen": "sub_67F60",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4562C": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 24,
+  "candidates": {
+   "sub_6803F": "TextScrollDisplayB_StopAnimation_6803F"
+  },
+  "chosen": "sub_6803F",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45666": {
+  "segment": "seg178",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_68079": "TextScrollDisplayB_StartAnimation_68079"
+  },
+  "chosen": "sub_68079",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45695": {
+  "segment": "seg178",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_64D58": "ResourceRecord_ResetIfSet_64D58",
+   "sub_A0090": "PlayerComponent_SubHelperF_A0090",
+   "sub_A02CC": "PlayerComponent_SubHelperL_A02CC",
+   "sub_A0673": "PlayerComponent_SubHelperT_A0673",
+   "sub_A21A1": "PaletteScreen_DrawWidgetBorderWrapper_A21A1",
+   "sub_A4B98": "PlayerComponent_ResetFieldsB_A4B98"
+  },
+  "chosen": null
+ },
+ "sub_456B9": {
+  "segment": "seg178",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_338": "CRT_FreeNear_Wrap"
+  },
+  "chosen": null
+ },
+ "sub_45C38": {
+  "segment": "seg180",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_6823A": "Keyboard_DrainBufferBIOS_6823A"
+  },
+  "chosen": "sub_6823A",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_45F": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_3D1": "CRT_Abort"
+  },
+  "chosen": "sub_3D1",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4819": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FB6E": "AIL_find_proc_5FB6E"
+  },
+  "chosen": "sub_5FB6E",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_48B": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_3FD": "CRT_Fmemcpy"
+  },
+  "chosen": "sub_3FD",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4992": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_5FC8D": "AIL_init_DDA_arrays_5FC8D"
+  },
+  "chosen": "sub_5FC8D",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_49CF": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 26,
+  "candidates": {
+   "sub_5FCCA": "AIL_hook_timer_process_5FCCA"
+  },
+  "chosen": "sub_5FCCA",
+  "calls_confirmed": 0,
+  "operand_diffs": 10
+ },
+ "sub_4A15": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 17,
+  "candidates": {
+   "sub_5FD10": "AIL_unhook_timer_process_5FD10"
+  },
+  "chosen": "sub_5FD10",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_4A3F": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FD3A": "AIL_set_PIT_divisor_5FD3A"
+  },
+  "chosen": "sub_5FD3A",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_4A62": {
+  "segment": "seg003",
+  "kind": "stricte",
+  "instructions": 23,
+  "candidates": {
+   "sub_5FD5D": "AIL_set_PIT_period_5FD5D"
+  },
+  "chosen": "sub_5FD5D",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_4A8C": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 44,
+  "candidates": {
+   "sub_5FD87": "AIL_ul_divide_5FD87"
+  },
+  "chosen": "sub_5FD87",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_4AD7": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 50,
+  "candidates": {
+   "sub_5FDD2": "AIL_program_timers_5FDD2"
+  },
+  "chosen": "sub_5FDD2",
+  "calls_confirmed": 1,
+  "operand_diffs": 17
+ },
+ "sub_4B66": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 27,
+  "candidates": {
+   "sub_5FE61": "AIL_startup_5FE61"
+  },
+  "chosen": "sub_5FE61",
+  "calls_confirmed": 0,
+  "operand_diffs": 5
+ },
+ "sub_4D05": {
+  "segment": "seg003",
+  "kind": "stricte",
+  "instructions": 17,
+  "candidates": {
+   "sub_60000": "AIL_release_all_timers_60000"
+  },
+  "chosen": "sub_60000",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_4D1D": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60018": "AIL_start_timer_60018",
+   "sub_60052": "AIL_stop_timer_60052"
+  },
+  "chosen": null
+ },
+ "sub_4D57": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60018": "AIL_start_timer_60018",
+   "sub_60052": "AIL_stop_timer_60052"
+  },
+  "chosen": null
+ },
+ "sub_4D91": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 34,
+  "candidates": {
+   "sub_6008C": "AIL_set_timer_period_6008C"
+  },
+  "chosen": "sub_6008C",
+  "calls_confirmed": 1,
+  "operand_diffs": 7
+ },
+ "sub_4E5F": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 65,
+  "candidates": {
+   "sub_6015A": "AIL_register_driver_6015A"
+  },
+  "chosen": "sub_6015A",
+  "calls_confirmed": 0,
+  "operand_diffs": 13
+ },
+ "sub_4F05": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_60200": "AIL_release_driver_handle_60200"
+  },
+  "chosen": "sub_60200",
+  "calls_confirmed": 0,
+  "operand_diffs": 2
+ },
+ "sub_5008": {
+  "segment": "seg003",
+  "kind": "approchée",
+  "instructions": 19,
+  "candidates": {
+   "sub_60303": "AIL_shutdown_driver_60303"
+  },
+  "chosen": "sub_60303",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_502": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_419": "CRT_GetVect"
+  },
+  "chosen": "sub_419",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_511": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 12,
+  "candidates": {
+   "sub_428": "CRT_SetVect"
+  },
+  "chosen": "sub_428",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_5181": {
+  "segment": "seg005",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_67906": "Joystick_ReadButtonsWrapper_67906"
+  },
+  "chosen": null
+ },
+ "sub_51FB": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_52B0": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_52BB": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_52D8": {
+  "segment": "seg005",
+  "kind": "approchée",
+  "instructions": 41,
+  "candidates": {
+   "sub_5C14E": "PagedMemory_ReadTextResource_5C14E"
+  },
+  "chosen": "sub_5C14E",
+  "calls_confirmed": 2,
+  "operand_diffs": 7
+ },
+ "sub_57C3": {
+  "segment": "seg006",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_67906": "Joystick_ReadButtonsWrapper_67906"
+  },
+  "chosen": null
+ },
+ "sub_580C": {
+  "segment": "seg006",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_5C2BF": "PagedResourceB_Method_ReadDefault_5C2BF"
+  },
+  "chosen": null
+ },
+ "sub_612CF": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_381F2": "Debris_GetSubpartAttrib"
+  },
+  "chosen": "sub_381F2",
+  "calls_confirmed": 0,
+  "operand_diffs": 4
+ },
+ "sub_61B": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 10,
+  "candidates": {
+   "sub_532": "CRT_IsAtty"
+  },
+  "chosen": "sub_532",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_62C": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 19,
+  "candidates": {
+   "sub_543": "CRT_NormalizeSign32"
+  },
+  "chosen": "sub_543",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_65D5F": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_65D6B": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_64088": "StreamReader_ComputeHeaderOffset_64088"
+  },
+  "chosen": null
+ },
+ "sub_65D7A": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_64088": "StreamReader_ComputeHeaderOffset_64088"
+  },
+  "chosen": null
+ },
+ "sub_65D89": {
+  "segment": "ovr195",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_64088": "StreamReader_ComputeHeaderOffset_64088"
+  },
+  "chosen": null
+ },
+ "sub_68480": {
+  "segment": "ovr199",
+  "kind": "approchée",
+  "instructions": 15,
+  "candidates": {
+   "sub_4463D": "Collision_InstallExceptionHandler",
+   "sub_AA810": "AudioQueue_RegisterTickModule_AA810"
+  },
+  "chosen": "sub_AA810",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_691E9": {
+  "segment": "ovr199",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_AB4BE": "AudioQueue_Helper_AB4BE"
+  },
+  "chosen": "sub_AB4BE",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_6EE": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 22,
+  "candidates": {
+   "sub_605": "CRT_Lseek"
+  },
+  "chosen": "sub_605",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_6FF5": {
+  "segment": "seg010",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_741": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 29,
+  "candidates": {
+   "sub_658": "CRT_Malloc16_Retry"
+  },
+  "chosen": "sub_658",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_77D": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_694": "CRT_Malloc32_Retry"
+  },
+  "chosen": "sub_694",
+  "calls_confirmed": 0,
+  "operand_diffs": 3
+ },
+ "sub_793B": {
+  "segment": "seg012",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_7949": {
+  "segment": "seg012",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_7E5": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 8,
+  "candidates": {
+   "sub_469EC": "FlightControl_InvalidateRollPitchCache",
+   "sub_470B4": "FlightControl_InvalidateCacheB"
+  },
+  "chosen": null
+ },
+ "sub_7F6": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_70D": "CRT_Rand"
+  },
+  "chosen": "sub_70D",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_81C": {
+  "segment": "seg000",
+  "kind": "stricte",
+  "instructions": 13,
+  "candidates": {
+   "sub_733": "CRT_Unlink"
+  },
+  "chosen": "sub_733",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_82F7": {
+  "segment": "seg012",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_84E7": {
+  "segment": "seg012",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_85BE": {
+  "segment": "seg013",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_8648": {
+  "segment": "seg013",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_998D": {
+  "segment": "seg015",
+  "kind": "stricte",
+  "instructions": 5,
+  "candidates": {
+   "sub_67906": "Joystick_ReadButtonsWrapper_67906"
+  },
+  "chosen": null
+ },
+ "sub_A051": {
+  "segment": "seg016",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_A720": {
+  "segment": "seg019",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B6A00": {
+  "segment": "ovr217",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B6A08": {
+  "segment": "ovr217",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B6A10": {
+  "segment": "ovr217",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B6F1": {
+  "segment": "seg021",
+  "kind": "approchée",
+  "instructions": 42,
+  "candidates": {
+   "sub_59F1D": "Music_ChannelStopSequence_59F1D"
+  },
+  "chosen": "sub_59F1D",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ },
+ "sub_B7691": {
+  "segment": "ovr218",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_2387E": "EntityTracker_AddEntryObj"
+  },
+  "chosen": "sub_2387E",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_B76B9": {
+  "segment": "ovr218",
+  "kind": "approchée",
+  "instructions": 24,
+  "candidates": {
+   "sub_238A4": "EntityTracker_AddEntryText"
+  },
+  "chosen": "sub_238A4",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_B7E2E": {
+  "segment": "ovr218",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_79D88": "AI_ManeuverHelper3_79D88",
+   "sub_A12B3": "Widget_Method_ReturnZeroA_A12B3"
+  },
+  "chosen": null
+ },
+ "sub_B8800": {
+  "segment": "ovr220",
+  "kind": "stricte",
+  "instructions": 63,
+  "candidates": {
+   "sub_97540": "MissionText_ApplyDualStyle_97540"
+  },
+  "chosen": "sub_97540",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_B8DC9": {
+  "segment": "ovr220",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_97CB7": "MissionText_Helper4_97CB7"
+  },
+  "chosen": "sub_97CB7",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_B8DE2": {
+  "segment": "ovr220",
+  "kind": "stricte",
+  "instructions": 21,
+  "candidates": {
+   "sub_97CD0": "MissionText_Helper5_97CD0"
+  },
+  "chosen": "sub_97CD0",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_B9080": {
+  "segment": "ovr220",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B9197": {
+  "segment": "ovr221",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B9E38": {
+  "segment": "ovr222",
+  "kind": "stricte",
+  "instructions": 15,
+  "candidates": {
+   "sub_9B62B": "Debris_ContainerOpWrapper_9B62B"
+  },
+  "chosen": "sub_9B62B",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_B9FDD": {
+  "segment": "ovr223",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_B9FE5": {
+  "segment": "ovr223",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_BA940": {
+  "segment": "ovr227",
+  "kind": "approchée",
+  "instructions": 36,
+  "candidates": {
+   "sub_A7060": "TextCycler_ReleaseEntry_A7060"
+  },
+  "chosen": "sub_A7060",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_BAB64": {
+  "segment": "ovr227",
+  "kind": "approchée",
+  "instructions": 25,
+  "candidates": {
+   "sub_A71E5": "TextCycler_ReleaseBuffer_A71E5"
+  },
+  "chosen": "sub_A71E5",
+  "calls_confirmed": 1,
+  "operand_diffs": 1
+ },
+ "sub_BAE92": {
+  "segment": "ovr227",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_5C2BF": "PagedResourceB_Method_ReadDefault_5C2BF"
+  },
+  "chosen": null
+ },
+ "sub_BB940": {
+  "segment": "ovr228",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_52D08": "Expr_LookupNamedValue_52D08",
+   "sub_67F13": "TextScrollDisplayB_TickHelper_67F13",
+   "sub_A7C8E": "MissionLoader_LoadChunkA_A7C8E"
+  },
+  "chosen": null
+ },
+ "sub_BBA19": {
+  "segment": "ovr228",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_A7FD0": "MissionLoader_Helper_A7FD0"
+  },
+  "chosen": null
+ },
+ "sub_BBA30": {
+  "segment": "ovr228",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_BBA39": {
+  "segment": "ovr228",
+  "kind": "approchée",
+  "instructions": 5,
+  "candidates": {
+   "sub_738E8": "WorldObjectA_Method_ReturnTrue_738E8",
+   "sub_74F84": "AircraftDamageComponent_Method_NoOp_74F84",
+   "sub_A2BF5": "PaletteScreen_ResetGlobalFlag_A2BF5"
+  },
+  "chosen": null
+ },
+ "sub_BBDA5": {
+  "segment": "ovr229",
+  "kind": "approchée",
+  "instructions": 16,
+  "candidates": {
+   "sub_7AFA8": "EntityTracker_RegisterAndSelect"
+  },
+  "chosen": "sub_7AFA8",
+  "calls_confirmed": 0,
+  "operand_diffs": 4
+ },
+ "sub_BE9BC": {
+  "segment": "ovr245",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_BEAE0": {
+  "segment": "ovr245",
+  "kind": "approchée",
+  "instructions": 7,
+  "candidates": {
+   "sub_477D0": "FlightControl_InvalidateCacheC",
+   "sub_478C5": "FlightControl_InvalidateMainCache",
+   "sub_66EE7": "Keyboard_SetHandlerPointer_66EE7",
+   "sub_67DEA": "OptionCounter_Set_67DEA",
+   "sub_78184": "AIManeuver_Helper2_78184",
+   "sub_7AF9E": "AIManeuver_Helper5_7AF9E",
+   "sub_7D310": "MissionRecord_Helper2_7D310",
+   "sub_82850": "HUDSymbol_Helper3_82850",
+   "sub_834AE": "HUDSymbol_Helper5_834AE",
+   "sub_83B7B": "HUDSymbol_Helper6_83B7B",
+   "sub_84749": "HUDSymbol_Helper8_84749",
+   "sub_84DD1": "HUDSymbol_Helper9_84DD1",
+   "sub_8693E": "AITargeting_Helper3_8693E",
+   "sub_9B7C8": "Debris_Helper2_9B7C8",
+   "sub_A12DF": "Widget_Method_PassThroughC_A12DF",
+   "sub_A12E9": "Widget_Method_PassThroughD_A12E9"
+  },
+  "chosen": null
+ },
+ "sub_BF15D": {
+  "segment": "ovr247",
+  "kind": "stricte",
+  "instructions": 32,
+  "candidates": {
+   "sub_7FC55": "GlyphObject_MeasureWrapperB_7FC55"
+  },
+  "chosen": "sub_7FC55",
+  "calls_confirmed": 1,
+  "operand_diffs": 0
+ },
+ "sub_BF19E": {
+  "segment": "ovr247",
+  "kind": "stricte",
+  "instructions": 57,
+  "candidates": {
+   "sub_7FC92": "GlyphObject_ResolveAndMeasureB_7FC92"
+  },
+  "chosen": "sub_7FC92",
+  "calls_confirmed": 2,
+  "operand_diffs": 0
+ },
+ "sub_BFEB0": {
+  "segment": "ovr250",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_A4570": "InfoWidget_CopyFieldA_A4570",
+   "sub_A459A": "InfoWidget_Helper_A459A"
+  },
+  "chosen": null
+ },
+ "sub_BFEC2": {
+  "segment": "ovr250",
+  "kind": "stricte",
+  "instructions": 14,
+  "candidates": {
+   "sub_A4582": "InfoWidget_CopyFieldB_A4582"
+  },
+  "chosen": "sub_A4582",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_BFEDA": {
+  "segment": "ovr250",
+  "kind": "stricte",
+  "instructions": 11,
+  "candidates": {
+   "sub_A4570": "InfoWidget_CopyFieldA_A4570",
+   "sub_A459A": "InfoWidget_Helper_A459A"
+  },
+  "chosen": null
+ },
+ "sub_C024B": {
+  "segment": "ovr250",
+  "kind": "stricte",
+  "instructions": 9,
+  "candidates": {
+   "sub_A4843": "InfoWidget_Method_DispatchField2A_A4843"
+  },
+  "chosen": "sub_A4843",
+  "calls_confirmed": 0,
+  "operand_diffs": 0
+ },
+ "sub_D322": {
+  "segment": "seg024",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_DD2B": {
+  "segment": "seg025",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_DD3B": {
+  "segment": "seg025",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_DD4B": {
+  "segment": "seg025",
+  "kind": "approchée",
+  "instructions": 9,
+  "candidates": {
+   "sub_38203": "Debris_GetStateFlag",
+   "sub_79D7A": "AI_ManeuverHelper2_79D7A",
+   "sub_7EB0D": "GlyphObject_Helper4_7EB0D",
+   "sub_A9A7B": "ExprSlot_ResetFieldsB_A9A7B"
+  },
+  "chosen": null
+ },
+ "sub_F600": {
+  "segment": "seg025",
+  "kind": "stricte",
+  "instructions": 6,
+  "candidates": {
+   "sub_286BA": "Input_IdAccessor",
+   "sub_2B0EA": "Value_IdAccessor",
+   "sub_3DE7D": "Camera_GetHandle",
+   "sub_4AED0": "FlightControl_IdentityAccessor",
+   "sub_4F20B": "Config_IdentityAccessor",
+   "sub_5F458": "DisplayContext_Method_PassThrough_5F458",
+   "sub_60DF6": "Widget_Method_Dispatch18_60DF6",
+   "sub_64046": "StreamReader_Method_PassThrough_64046",
+   "sub_79CF7": "AI_ManeuverHelper_79CF7",
+   "sub_85DC2": "HUDSymbol_Helper15_85DC2",
+   "sub_8D27C": "UIWidget_Helper2_8D27C",
+   "sub_98002": "TextureLoader_Helper_98002",
+   "sub_9B48F": "TerrainTile_Helper2_9B48F",
+   "sub_9B497": "TerrainTile_Helper3_9B497",
+   "sub_9B7C0": "Debris_Helper_9B7C0",
+   "sub_9DE50": "TimedTrigger_PassThroughArg_9DE50",
+   "sub_A0C78": "PlayerComponent_SubHelperBB_A0C78",
+   "sub_A12BD": "Widget_Method_PassThroughA_A12BD",
+   "sub_A12C5": "Widget_Method_PassThroughB_A12C5",
+   "sub_A12F3": "Widget_Method_PassThroughE_A12F3",
+   "sub_A5F16": "PlayerComponent_Helper_A5F16"
+  },
+  "chosen": null
+ },
+ "sub_FDF": {
+  "segment": "seg000",
+  "kind": "approchée",
+  "instructions": 21,
+  "candidates": {
+   "sub_E4B": "CRT_CtypeLookup"
+  },
+  "chosen": "sub_E4B",
+  "calls_confirmed": 0,
+  "operand_diffs": 1
+ }
+}

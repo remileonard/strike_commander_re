@@ -1,0 +1,1638 @@
+{
+ "_doc": "Catalogue du moteur des cinématiques pour tools/midgame_extract.py. Clés = noms de known_functions.json. args = rôle de chaque argument dans l'ordre d'appel ; ret = type de l'objet renvoyé ; type = type donné à l'objet passé en 1er argument (constructeurs) ; hide = opération omise du rapport (libérations). Valeurs en décimal. method_functions = emplacement de table de méthodes (décimal) appelé indirectement, traité comme un appel direct de la fonction nommée (mid15 : +18h des calques = Layer_MoveBy_2E29E). Porté de optest par tools/midgame_engine_port.py (noms et tables de méthodes de topt ; champs et méthodes repris tels quels).",
+ "dseg_base": 297440,
+ "functions": {
+  "Path_Build_11125": {
+   "op": "chemin",
+   "args": [
+    "dest",
+    "dossier",
+    "nom",
+    "extension"
+   ],
+   "special": "path"
+  },
+  "IndexedRecordReader_ConstructVariantB_4334C": {
+   "op": "ouvre_pak",
+   "args": [
+    "pak",
+    "chemin",
+    "mode"
+   ],
+   "special": "pak_open"
+  },
+  "IndexedRecordReader_ConstructVariantA_4331C": {
+   "op": "pak_vide",
+   "args": [
+    "pak"
+   ],
+   "special": "pak_new"
+  },
+  "IndexedRecordReader_Destruct_432D2": {
+   "op": "ferme_pak",
+   "args": [
+    "pak",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "Pak_LoadEntry_10D03": {
+   "op": "charge",
+   "args": [
+    "pak",
+    "entrée",
+    "ressource",
+    "mémoire"
+   ],
+   "special": "load"
+  },
+  "ConvData_LoadByName_10C87": {
+   "op": "charge_convdata_type0",
+   "args": [
+    "nom",
+    "ressource",
+    "drapeau"
+   ],
+   "special": "load_name"
+  },
+  "ConvData_LoadNormalOrNight_10C9F": {
+   "op": "charge_convdata_type2",
+   "args": [
+    "ressource",
+    "type",
+    "nuit"
+   ],
+   "special": "load_daynight"
+  },
+  "Palette_LoadFromResource_34A89": {
+   "op": "palette_depuis",
+   "args": [
+    "palette",
+    "ressource"
+   ],
+   "special": "palette_load"
+  },
+  "Palette_Alloc_34A1A": {
+   "op": "palette_alloue",
+   "args": [
+    "palette",
+    "premier",
+    "nombre"
+   ]
+  },
+  "Palette_CopyInto_34D24": {
+   "op": "palette_copie",
+   "args": [
+    "destination",
+    "source",
+    "premier",
+    "nombre"
+   ],
+   "show": [
+    "destination",
+    "source"
+   ]
+  },
+  "Palette_Upload_34B85": {
+   "op": "palette_envoie",
+   "args": [
+    "palette",
+    "premier",
+    "nombre",
+    "pas"
+   ],
+   "show": [
+    "palette",
+    "pas"
+   ]
+  },
+  "Palette_FillRange_34CAC": {
+   "op": "palette_remplit",
+   "args": [
+    "palette",
+    "couleur",
+    "premier",
+    "nombre"
+   ],
+   "show": [
+    "palette",
+    "couleur",
+    "premier",
+    "nombre"
+   ]
+  },
+  "Palette_FadeFromColor_34EEE": {
+   "op": "fondu_apparition",
+   "args": [
+    "palette",
+    "couleur",
+    "pas",
+    "premier",
+    "nombre"
+   ]
+  },
+  "Palette_FadeToColor_34E29": {
+   "op": "fondu_disparition",
+   "args": [
+    "palette",
+    "couleur",
+    "pas",
+    "premier",
+    "nombre"
+   ]
+  },
+  "Palette_Destruct_34DEC": {
+   "op": "libère_palette",
+   "args": [
+    "palette",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "Scene_Create_10E57": {
+   "op": "Scene_Create",
+   "args": [
+    "objet",
+    "cadence",
+    "palette",
+    "surface"
+   ],
+   "type": "scene",
+   "special": "scene"
+  },
+  "Scene_SetFps_33E73": {
+   "op": "Scene_SetFps",
+   "args": [
+    "scène",
+    "cadence"
+   ]
+  },
+  "Scene_Tick_10F4B": {
+   "op": "Scene_Tick",
+   "args": [
+    "scène"
+   ]
+  },
+  "Scene_Destruct_33D48": {
+   "op": "Scene_Destruct",
+   "args": [
+    "scène",
+    "drapeaux"
+   ],
+   "ends": true
+  },
+  "LayerGroup_Add_33BD0": {
+   "op": "ajoute",
+   "args": [
+    "parent",
+    "calque"
+   ],
+   "special": "add"
+  },
+  "LayerGroup_Remove_33C0D": {
+   "op": "retire",
+   "args": [
+    "parent",
+    "calque"
+   ]
+  },
+  "Layer_Construct_33FE7": {
+   "op": "Layer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "Layer",
+   "ret": "layer"
+  },
+  "ImageLayer_Construct_34078": {
+   "op": "ImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "ImageLayer",
+   "ret": "layer"
+  },
+  "AnimLayer_Construct_3461B": {
+   "op": "AnimLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "AnimLayer",
+   "ret": "layer"
+  },
+  "JitterImageLayer_Construct_F97F": {
+   "op": "JitterImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "JitterImageLayer",
+   "ret": "layer"
+  },
+  "ClippedMovingLayer_Construct_FC49": {
+   "op": "ClippedMovingLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "ClippedMovingLayer",
+   "ret": "layer"
+  },
+  "ClippedMovingImageLayer_Construct_FCAF": {
+   "op": "ClippedMovingImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "ClippedMovingImageLayer",
+   "ret": "layer"
+  },
+  "OverlayImageLayer_Construct_F227": {
+   "op": "OverlayImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "OverlayImageLayer",
+   "ret": "layer"
+  },
+  "OverlayAnimLayer_Construct_ED56": {
+   "op": "OverlayAnimLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "OverlayAnimLayer",
+   "ret": "layer"
+  },
+  "TriggeredAnimLayer_Construct_F8B9": {
+   "op": "TriggeredAnimLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "TriggeredAnimLayer",
+   "ret": "layer"
+  },
+  "ToggleLayer_Construct_FDCC": {
+   "op": "ToggleLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "sens"
+   ],
+   "type": "ToggleLayer",
+   "ret": "layer"
+  },
+  "TalkingHeadOverlay_Construct_FA60": {
+   "op": "TalkingHeadOverlay",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "TalkingHeadOverlay",
+   "ret": "layer"
+  },
+  "TalkingHead_Construct_E108": {
+   "op": "TalkingHead",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "TalkingHead",
+   "ret": "layer"
+  },
+  "TalkingHead_SetBaseFrame_E56E": {
+   "op": "tête_image_de_base",
+   "args": [
+    "tête",
+    "image"
+   ]
+  },
+  "TalkingHead_SetLipText_E45A": {
+   "op": "tête_texte_de_lèvres",
+   "args": [
+    "tête",
+    "texte"
+   ]
+  },
+  "AnimLayer_IsFinished_346A0": {
+   "op": "animation_finie",
+   "args": [
+    "calque"
+   ],
+   "ret": "value"
+  },
+  "MusicChannel_Init_B75B": {
+   "op": "canal_init",
+   "args": [
+    "canal",
+    "pilote"
+   ]
+  },
+  "MusicChannel_RegisterSequence_B7A2": {
+   "op": "canal_enregistre",
+   "args": [
+    "canal",
+    "ressource",
+    "x"
+   ]
+  },
+  "Music_ChannelStopSequence_B6F1": {
+   "op": "canal_arrête",
+   "args": [
+    "canal"
+   ]
+  },
+  "AIL_start_sequence_50D1": {
+   "op": "AIL_start_sequence",
+   "args": [
+    "pilote",
+    "séquence"
+   ]
+  },
+  "AIL_stop_sequence_50D7": {
+   "op": "AIL_stop_sequence",
+   "args": [
+    "pilote",
+    "séquence"
+   ]
+  },
+  "VoicePlayer_SetDriver_B978": {
+   "op": "voix_pilote",
+   "args": [
+    "voix",
+    "pilote"
+   ]
+  },
+  "VoicePlayer_Stop_BACF": {
+   "op": "voix_arrête",
+   "args": [
+    "voix"
+   ]
+  },
+  "MidgameEngine_7D11_BC88": {
+   "op": "voix_charge (sub_7D11, non lue)",
+   "args": [
+    "voix",
+    "ressource"
+   ]
+  },
+  "MidgameEngine_83FE_C4B5": {
+   "op": "voix_joue (sub_83FE, non lue)",
+   "args": [
+    "voix",
+    "x"
+   ]
+  },
+  "MidgameEngine_C8F5_111EE": {
+   "op": "sous_titre (sub_C8F5, non lue)",
+   "args": [
+    "zone",
+    "texte"
+   ]
+  },
+  "MidgameEngine_3139A_36F21": {
+   "op": "police_couleur (sub_3139A, non lue)",
+   "args": [
+    "police",
+    "couleur"
+   ]
+  },
+  "Input_Flush_116D1": {
+   "op": "vide_entrées",
+   "args": []
+  },
+  "Input_CheckSkip_11B90": {
+   "op": "touche_passer",
+   "args": [],
+   "ret": "value"
+  },
+  "Keyboard_QueryAndDispatch_443C0": {
+   "op": "lit_touche",
+   "args": [
+    "événement",
+    "x"
+   ]
+  },
+  "Stopwatch_WaitElapsed_44E21": {
+   "op": "attend",
+   "args": [
+    "chronomètre"
+   ]
+  },
+  "Memory_TypedAllocDispatchB_329B1": {
+   "op": "verrouille",
+   "args": [
+    "tag",
+    "bloc",
+    "x",
+    "y"
+   ],
+   "ret": "pointer",
+   "special": "lock"
+  },
+  "Memory_TypedFree_32934": {
+   "op": "libère_bloc",
+   "args": [
+    "tag",
+    "bloc",
+    "type",
+    "x"
+   ],
+   "hide": true
+  },
+  "TextArray_Init_114D6": {
+   "op": "tableau_textes",
+   "args": [
+    "tableau",
+    "nombre",
+    "longueur"
+   ]
+  },
+  "TextArray_Destruct_114F8": {
+   "op": "libère_textes",
+   "args": [
+    "tableau",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "CRT_Malloc16_Retry": {
+   "op": "alloue",
+   "args": [
+    "taille"
+   ],
+   "ret": "heap"
+  },
+  "CRT_Fmemcpy": {
+   "op": "copie_mémoire",
+   "args": [
+    "source",
+    "destination"
+   ],
+   "special": "memcpy",
+   "callee_words": 4
+  },
+  "Stub_Midgame1_PlayPart2_47D10": {
+   "op": "suite",
+   "special": "follow",
+   "target": "Midgame1_PlayPart2_70290"
+  },
+  "GlyphObject_ScalarDeletingDtorA_36F5D": {
+   "op": "libère_police",
+   "args": [
+    "objet",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "TextFormat_ReleaseStyleList_35A27": {
+   "op": "libère_style",
+   "args": [
+    "objet"
+   ],
+   "hide": true
+  },
+  "TextFormat_ReleaseAttribute_35AAD": {
+   "op": "réinitialise_style",
+   "args": [
+    "x",
+    "y"
+   ],
+   "hide": true
+  },
+  "SmallObject_UnregisterFromList_349C1": {
+   "op": "désenregistre",
+   "args": [
+    "objet",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "StreamReader_ReleaseBuffer_42F45": {
+   "op": "libère_flux",
+   "args": [
+    "flux",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "ResourceRecord_Helper_425B8": {
+   "op": "iff_ferme_form",
+   "args": [
+    "flux"
+   ]
+  },
+  "ResourceRecord_ReleaseAndClear_42D38": {
+   "op": "iff_ferme",
+   "args": [
+    "flux"
+   ]
+  },
+  "ResourceRecord_SeekAndRead_42756": {
+   "op": "iff_chunk",
+   "args": [
+    "flux",
+    "balise",
+    "x"
+   ]
+  },
+  "ResourceRecord_SeekAndReadB_427C5": {
+   "op": "iff_form",
+   "args": [
+    "flux",
+    "balise",
+    "x"
+   ]
+  },
+  "ResourceRecord_ReadFieldGroupA_42A2C": {
+   "op": "iff_lit",
+   "args": [
+    "flux",
+    "destination",
+    "taille"
+   ]
+  },
+  "ResourceRecord_ReadFieldGroupB_42A67": {
+   "op": "iff_lit_mot",
+   "args": [
+    "flux"
+   ],
+   "ret": "value"
+  },
+  "StreamReader_ConstructVariantA_40ED4": {
+   "op": "flux_iff",
+   "args": [
+    "flux"
+   ]
+  },
+  "CRT_Doprnt_Dispatch": {
+   "op": "tableau_objets",
+   "args": [
+    "tableau",
+    "taille",
+    "nombre",
+    "x"
+   ],
+   "special": "objarray"
+  },
+  "Widget_ApplyStyleAndAllocate_36FD2": {
+   "op": "zone_texte",
+   "args": [
+    "zone",
+    "style",
+    "police"
+   ],
+   "special": "widget"
+  },
+  "UI_ApplyEncodingHelper_35A77": {
+   "op": "présente",
+   "args": [
+    "source",
+    "destination"
+   ]
+  },
+  "Widget_RenderComplexLayoutWrapper_375C2": {
+   "op": "texte_formaté",
+   "args": [
+    "zone",
+    "format",
+    "a",
+    "b",
+    "c"
+   ]
+  },
+  "VoicePlayer_IsDone_C808": {
+   "op": "voix_finie",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "VoicePlayer_IsPlaying_C83C": {
+   "op": "voix_en_cours",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "TalkingHead_AttachVoice_E535": {
+   "op": "tête_voix",
+   "args": [
+    "tête",
+    "ressource",
+    "cadence"
+   ]
+  },
+  "TalkingHead_StartVoiceAndIsSpeaking_E4AD": {
+   "op": "tête_parle",
+   "args": [
+    "tête"
+   ],
+   "ret": "value"
+  },
+  "ScaledMovingLayer_Construct_DD5B": {
+   "op": "ScaledMovingLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "échelle_x",
+    "échelle_y",
+    "vx",
+    "vy",
+    "image"
+   ],
+   "type": "ScaledMovingLayer",
+   "ret": "layer"
+  },
+  "ScaledImageLayer_Construct_DBA8": {
+   "op": "ScaledImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "angle",
+    "échelle",
+    "octet",
+    "image"
+   ],
+   "type": "ScaledImageLayer",
+   "ret": "layer"
+  },
+  "Layer_ConstructAtOrigin_33EE1": {
+   "op": "Layer",
+   "args": [
+    "objet",
+    "ressource"
+   ],
+   "type": "Layer",
+   "ret": "layer"
+  },
+  "ScaledImageLayer_SetScale_DD0B": {
+   "op": "échelle",
+   "args": [
+    "calque",
+    "échelle"
+   ]
+  },
+  "TextLayer_Construct_F542": {
+   "op": "TextLayer",
+   "args": [
+    "objet",
+    "zone",
+    "x",
+    "y"
+   ],
+   "type": "TextLayer",
+   "ret": "layer"
+  },
+  "TextLayer_SetText_F608": {
+   "op": "texte_calque",
+   "args": [
+    "calque",
+    "texte"
+   ]
+  },
+  "Palette_UploadByValue_114A2": {
+   "op": "palette_envoie_argument",
+   "args": []
+  },
+  "ConvData_LoadByName_10CD3": {
+   "op": "charge_convdata_type0",
+   "args": [
+    "nom",
+    "ressource",
+    "drapeau"
+   ],
+   "special": "load_name"
+  },
+  "Scene_Destruct_34348": {
+   "op": "Scene_Destruct",
+   "args": [
+    "scène",
+    "drapeaux"
+   ],
+   "ends": true
+  },
+  "Scene_Destruct_346EF": {
+   "op": "Scene_Destruct",
+   "args": [
+    "scène",
+    "drapeaux"
+   ],
+   "ends": true
+  },
+  "Scene_Destruct_347A2": {
+   "op": "Scene_Destruct",
+   "args": [
+    "scène",
+    "drapeaux"
+   ],
+   "ends": true
+  },
+  "ClippedMovingLayer_Construct_10093": {
+   "op": "ClippedMovingLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "ClippedMovingLayer",
+   "ret": "layer"
+  },
+  "ClippedMovingLayer_Construct_EF35": {
+   "op": "ClippedMovingLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y"
+   ],
+   "type": "ClippedMovingLayer",
+   "ret": "layer"
+  },
+  "ClippedMovingImageLayer_Construct_100F9": {
+   "op": "ClippedMovingImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "ClippedMovingImageLayer",
+   "ret": "layer"
+  },
+  "ClippedMovingImageLayer_Construct_EF9B": {
+   "op": "ClippedMovingImageLayer",
+   "args": [
+    "objet",
+    "ressource",
+    "x",
+    "y",
+    "image"
+   ],
+   "type": "ClippedMovingImageLayer",
+   "ret": "layer"
+  },
+  "TalkingHead_SetBaseFrame_78AA": {
+   "op": "tête_image_de_base",
+   "args": [
+    "tête",
+    "image"
+   ]
+  },
+  "StreamReader_ReleaseBuffer_405D2": {
+   "op": "libère_flux",
+   "args": [
+    "flux",
+    "drapeaux"
+   ],
+   "hide": true
+  },
+  "VoicePlayer_IsDone_CE7C": {
+   "op": "voix_finie",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "VoicePlayer_IsPlaying_CEB0": {
+   "op": "voix_en_cours",
+   "args": [
+    "voix"
+   ],
+   "ret": "value"
+  },
+  "MovingMaskLayer_SetTable_1026D": {
+   "op": "calque_table",
+   "args": [
+    "calque",
+    "table"
+   ]
+  },
+  "MovingMaskLayer_SetTable_DD1B": {
+   "op": "calque_table",
+   "args": [
+    "calque",
+    "table"
+   ]
+  },
+  "MovingMaskLayer_SetTable_DEA5": {
+   "op": "calque_table",
+   "args": [
+    "calque",
+    "table"
+   ]
+  },
+  "MovingMaskLayer_SetTable_DFCF": {
+   "op": "calque_table",
+   "args": [
+    "calque",
+    "table"
+   ]
+  },
+  "Layer_MoveBy_33DAD": {
+   "op": "déplace",
+   "args": [
+    "calque",
+    "dx",
+    "dy"
+   ]
+  },
+  "Layer_MoveBy_342EA": {
+   "op": "déplace",
+   "args": [
+    "calque",
+    "dx",
+    "dy"
+   ]
+  }
+ },
+ "vtables": {
+  "8257": "Layer",
+  "8409": "MovingLayer",
+  "5084": "LoopAnimLayer",
+  "18676": "AnimLayer",
+  "7665": "JitterImageLayer",
+  "7565": "ClippedMovingLayer",
+  "7905": "OverlayImageLayer",
+  "8001": "OverlayAnimLayer",
+  "7713": "TriggeredAnimLayer",
+  "7517": "ToggleLayer",
+  "7613": "TalkingHeadOverlay",
+  "8121": "TalkingHead",
+  "8684": "scene",
+  "8357": "ScaledMovingLayer",
+  "8457": "ScaledImageLayer",
+  "7809": "TextLayer"
+ },
+ "secondary_vtables": [
+  4767,
+  5116,
+  7841,
+  8101,
+  8173,
+  8185,
+  8201,
+  8289,
+  8441,
+  8493,
+  8716,
+  18708
+ ],
+ "fields": {
+  "scene": {
+   "12": "x",
+   "14": "y",
+   "16": "durée_image",
+   "29": "compteur",
+   "31": "terminée",
+   "32": "drapeau_S"
+  },
+  "layer": {
+   "2": "parent",
+   "12": "x",
+   "14": "y",
+   "27": "image"
+  },
+  "MovingLayer": {
+   "29": "vx",
+   "31": "vy"
+  },
+  "ClippedMovingLayer": {
+   "29": "vx",
+   "31": "vy",
+   "33": "découpe_gauche",
+   "35": "découpe_haut",
+   "37": "découpe_droite",
+   "39": "découpe_bas"
+  },
+  "ClippedMovingImageLayer": {
+   "29": "vx",
+   "31": "vy",
+   "33": "découpe_gauche",
+   "35": "découpe_haut",
+   "37": "découpe_droite",
+   "39": "découpe_bas"
+  },
+  "LoopAnimLayer": {
+   "29": "mode"
+  },
+  "TriggeredAnimLayer": {
+   "29": "lecture"
+  },
+  "ToggleLayer": {
+   "29": "sens"
+  },
+  "surface": {
+   "4": "gauche",
+   "6": "haut",
+   "8": "droite",
+   "10": "bas"
+  },
+  "MovingOverlayLayer": {
+   "29": "vx",
+   "31": "vy"
+  },
+  "MovingMaskLayer": {
+   "29": "vx",
+   "31": "vy"
+  },
+  "ScaledMovingLayer": {
+   "29": "vx",
+   "31": "vy",
+   "33": "échelle_x",
+   "35": "échelle_y"
+  },
+  "ScaledImageLayer": {
+   "29": "angle",
+   "31": "échelle",
+   "33": "octet"
+  }
+ },
+ "methods": {
+  "voice": {
+   "0": "finie",
+   "16": "joue"
+  },
+  "layer": {
+   "0": "détruit",
+   "4": "x_absolu",
+   "8": "y_absolu"
+  },
+  "font": {
+   "8": "couleur"
+  },
+  "pak": {
+   "20": "ouvre"
+  },
+  "stream": {
+   "20": "ouvre"
+  }
+ },
+ "args_of": {
+  "Midgame1_PlayPart2_70290": "from_caller"
+ },
+ "method_functions": {
+  "layer": {}
+ },
+ "equivalents": {
+  "byte_45318": "byte_4B300",
+  "byte_45572": "byte_4B55A",
+  "byte_46848": "byte_4CA58",
+  "byte_495FC": "byte_4F55C",
+  "dword_44BA6": "dword_4ACC8",
+  "dword_44CAC": "dword_4ADCE",
+  "dword_44E9A": "dword_4AFBC",
+  "dword_455CA": "dword_4B5B2",
+  "dword_4571E": "dword_4B706",
+  "dword_45723": "dword_4B70B",
+  "dword_45728": "dword_4B710",
+  "dword_4572D": "dword_4B715",
+  "dword_45732": "dword_4B71A",
+  "dword_47ABB": "dword_4DE15",
+  "word_44AFC": "word_4AC1E",
+  "word_44AFE": "word_4AC20",
+  "word_44B00": "word_4AC22",
+  "word_44BFC": "word_4AD1E",
+  "word_44BFE": "word_4AD20",
+  "word_44C00": "word_4AD22",
+  "word_44C02": "word_4AD24",
+  "word_44C04": "word_4AD26",
+  "word_44C06": "word_4AD28",
+  "word_44D02": "word_4AE24",
+  "word_44D04": "word_4AE26",
+  "word_44D06": "word_4AE28",
+  "word_44D08": "word_4AE2A",
+  "word_44D0A": "word_4AE2C",
+  "word_44D0C": "word_4AE2E",
+  "word_44EF0": "word_4B012",
+  "word_44EF2": "word_4B014",
+  "word_44EF4": "word_4B016",
+  "word_44EF6": "word_4B018",
+  "word_44EF8": "word_4B01A",
+  "word_44EFA": "word_4B01C",
+  "word_45174": "word_4B15C",
+  "word_45314": "word_4B2FC",
+  "word_45316": "word_4B2FE",
+  "word_4556E": "word_4B556",
+  "word_45570": "word_4B558",
+  "word_46849": "word_4CA5D",
+  "word_4684B": "word_4CA5B",
+  "word_46F44": "word_4D36C",
+  "word_46F46": "word_4D36E",
+  "word_48EAC": "word_4EF7E",
+  "word_48EB0": "word_4EF82",
+  "word_48EC2": "word_4EF94",
+  "word_48ECA": "word_4EF9C",
+  "word_48ECE": "word_4EFA0",
+  "word_48ED2": "word_4EFA4",
+  "word_48EDC": "word_4EFAE",
+  "word_48EEE": "word_4EFC0",
+  "word_48EF6": "word_4EFC8",
+  "word_48EFC": "word_4EFCE",
+  "word_48F16": "word_4EFE8",
+  "word_48F1C": "word_4EFEE",
+  "word_48F3A": "word_4F00C",
+  "word_48F56": "word_4F028",
+  "word_48F5C": "word_4F02E",
+  "word_48F64": "word_4F036",
+  "word_48F74": "word_4F046",
+  "word_48F76": "word_4F048",
+  "sub_2617": "CRT_Strcat",
+  "sub_26B5": "CRT_Strcpy",
+  "sub_274F": "CRT_Strlen",
+  "sub_28D24": "Speech_LoadBank_2DA0B",
+  "sub_2B7E1": "Memory_TypedFreeWrapper_32871",
+  "sub_2B8A4": "Memory_TypedFree_32934",
+  "sub_2B920": "Memory_TypedAllocDispatchB_329B1",
+  "sub_2CB40": "sub_3499B",
+  "sub_2CB7A": "SmallObject_UnregisterFromList_349C1",
+  "sub_2CBE5": "sub_30AD0",
+  "sub_2CC76": "Palette_Alloc_34A1A",
+  "sub_2CCE5": "Palette_LoadFromResource_34A89",
+  "sub_2CDE1": "Palette_Upload_34B85",
+  "sub_2CF08": "Palette_FillRange_34CAC",
+  "sub_2CF80": "Palette_CopyInto_34D24",
+  "sub_2D048": "Palette_Destruct_34DEC",
+  "sub_2D09C": "Palette_FadeToColor_34E29",
+  "sub_2D165": "Palette_FadeFromColor_34EEE",
+  "sub_2DB84": "LayerGroup_Add_33BD0",
+  "sub_2DBC1": "LayerGroup_Remove_33C0D",
+  "sub_2DCFC": "Scene_Destruct_33D48",
+  "sub_2DE27": "Scene_SetFps_33E73",
+  "sub_2DE95": "Layer_ConstructAtOrigin_33EE1",
+  "sub_2DF9B": "Layer_Construct_33FE7",
+  "sub_2E02C": "ImageLayer_Construct_34078",
+  "sub_2E5CF": "AnimLayer_Construct_3461B",
+  "sub_2E654": "AnimLayer_IsFinished_346A0",
+  "sub_2E9A4": "TextFormat_ApplyStyleAttribute_357D1",
+  "sub_2EA21": "TextRenderer_ApplyFormatChange_3584E",
+  "sub_2EBFA": "TextFormat_ReleaseStyleList_35A27",
+  "sub_2EC4A": "UI_ApplyEncodingHelper_35A77",
+  "sub_2EC65": "UI_ApplyEncodingHelper_35A92",
+  "sub_2EC80": "TextFormat_ReleaseAttribute_35AAD",
+  "sub_308": "sub_39C",
+  "sub_30C42": "AIL_start_sequence_50D1",
+  "sub_30C48": "AIL_stop_sequence_50D7",
+  "sub_30C54": "sub_50E3",
+  "sub_30C66": "sub_50F5",
+  "sub_310B": "Runtime_FatalErrorHandler_36797",
+  "sub_311CF": "GlyphObject_ConstructWithBuffer_36D56",
+  "sub_3139A": "MidgameEngine_3139A_36F21",
+  "sub_313D6": "GlyphObject_ScalarDeletingDtorA_36F5D",
+  "sub_3144B": "sub_30A1D",
+  "sub_314A9": "Widget_Method_Dispatch8_37030",
+  "sub_314CB": "Widget_Method_DispatchC_37052",
+  "sub_31755": "Widget_ComputeBoundsExtent_372DC",
+  "sub_31A3B": "Widget_RenderComplexLayoutWrapper_375C2",
+  "sub_32CD8": "sub_38514",
+  "sub_3B2A9": "StreamReader_ConstructVariantA_40ED4",
+  "sub_3BE15": "ResourceRecord_Helper_425B8",
+  "sub_3BFB3": "ResourceRecord_SeekAndRead_42756",
+  "sub_3C022": "ResourceRecord_SeekAndReadB_427C5",
+  "sub_3C289": "ResourceRecord_ReadFieldGroupA_42A2C",
+  "sub_3C2C4": "ResourceRecord_ReadFieldGroupB_42A67",
+  "sub_3C36F": "ResourceRecord_ReadDwordFieldB_42B12",
+  "sub_3C595": "ResourceRecord_ReleaseAndClear_42D38",
+  "sub_3CD": "CRT_Fmemcpy",
+  "sub_3CEB3": "StreamReader_ReleaseBuffer_42F45",
+  "sub_3D240": "IndexedRecordReader_Destruct_432D2",
+  "sub_3D28A": "IndexedRecordReader_ConstructVariantA_4331C",
+  "sub_3DA1F": "TextRenderer_LoadResourceFile_437A9",
+  "sub_3E5C7": "Keyboard_QueryAndDispatch_443C0",
+  "sub_3F023": "Stopwatch_WaitElapsed_44E21",
+  "sub_64E": "CRT_Malloc16_Retry",
+  "sub_671C0": "Midgame1_PlayPart2_70290",
+  "sub_6734": "sub_993C",
+  "sub_6F2": "CRT_Srand_7E5",
+  "sub_703": "CRT_Rand",
+  "sub_783A": "Music_ChannelStopSequence_B6F1",
+  "sub_78A4": "MusicChannel_Init_B75B",
+  "sub_7918": "MusicChannel_RegisterSequence_B7A2",
+  "sub_7A3D": "VoicePlayer_SetDriver_B978",
+  "sub_7B5A": "VoicePlayer_Stop_BACF",
+  "sub_7D11": "MidgameEngine_7D11_BC88",
+  "sub_83FE": "MidgameEngine_83FE_C4B5",
+  "sub_84CC": "VoicePlayer_IsDone_C808",
+  "sub_8500": "VoicePlayer_IsPlaying_C83C",
+  "sub_85A": "CRT_Time_F92",
+  "sub_8D3": "CRT_Doprnt_Core",
+  "sub_9391": "ScaledImageLayer_Construct_DBA8",
+  "sub_94F4": "ScaledImageLayer_SetScale_DD0B",
+  "sub_98F4": "TalkingHead_Construct_E108",
+  "sub_9C4F": "TalkingHead_SetLipText_E45A",
+  "sub_9C64": "TalkingHead_StartVoiceAndIsSpeaking_E4AD",
+  "sub_9CF7": "TalkingHead_AttachVoice_E535",
+  "sub_9D32": "TalkingHead_SetBaseFrame_E56E",
+  "sub_A505": "OverlayAnimLayer_Construct_ED56",
+  "sub_A9D6": "OverlayImageLayer_Construct_F227",
+  "sub_ACF1": "TextLayer_Construct_F542",
+  "sub_ADB7": "TextLayer_SetText_F608",
+  "sub_B068": "TriggeredAnimLayer_Construct_F8B9",
+  "sub_B12E": "JitterImageLayer_Construct_F97F",
+  "sub_B20F": "TalkingHeadOverlay_Construct_FA60",
+  "sub_B3F8": "ClippedMovingLayer_Construct_FC49",
+  "sub_B45E": "ClippedMovingImageLayer_Construct_FCAF",
+  "sub_B57B": "ToggleLayer_Construct_FDCC",
+  "sub_C38E": "ConvData_LoadByName_10C87",
+  "sub_C3A6": "ConvData_LoadNormalOrNight_10C9F",
+  "sub_C40A": "Pak_LoadEntry_10D03",
+  "sub_C55E": "Scene_Create_10E57",
+  "sub_C652": "Scene_Tick_10F4B",
+  "sub_C82C": "Path_Build_11125",
+  "sub_C8F5": "MidgameEngine_C8F5_111EE",
+  "sub_CBAB": "Palette_UploadByValue_114A2",
+  "sub_CBE1": "TextArray_Init_114D6",
+  "sub_CC03": "TextArray_Destruct_114F8",
+  "sub_CDDC": "Input_Flush_116D1",
+  "sub_D24A": "Input_CheckSkip_11B90",
+  "sub_D57": "CRT_Doprnt_Dispatch",
+  "AIL_start_sequence_30C42": "AIL_start_sequence_50D1",
+  "AIL_stop_sequence_30C48": "AIL_stop_sequence_50D7",
+  "AnimLayer_Construct_2E5CF": "AnimLayer_Construct_3461B",
+  "AnimLayer_IsFinished_2E654": "AnimLayer_IsFinished_346A0",
+  "CRT_Doprnt_Dispatch": "CRT_Doprnt_Dispatch",
+  "CRT_Fmemcpy": "CRT_Fmemcpy",
+  "CRT_Malloc16_Retry": "CRT_Malloc16_Retry",
+  "ClippedMovingImageLayer_Construct_B45E": "ClippedMovingImageLayer_Construct_FCAF",
+  "ClippedMovingLayer_Construct_B3F8": "ClippedMovingLayer_Construct_FC49",
+  "ConvData_LoadByName_C38E": "ConvData_LoadByName_10C87",
+  "ConvData_LoadNormalOrNight_C3A6": "ConvData_LoadNormalOrNight_10C9F",
+  "GlyphObject_ScalarDeletingDtorA_313D6": "GlyphObject_ScalarDeletingDtorA_36F5D",
+  "ImageLayer_Construct_2E02C": "ImageLayer_Construct_34078",
+  "IndexedRecordReader_ConstructVariantA_3D28A": "IndexedRecordReader_ConstructVariantA_4331C",
+  "IndexedRecordReader_ConstructVariantB_3D2BA": "IndexedRecordReader_ConstructVariantB_4334C",
+  "IndexedRecordReader_Destruct_3D240": "IndexedRecordReader_Destruct_432D2",
+  "Input_CheckSkip_D24A": "Input_CheckSkip_11B90",
+  "Input_Flush_CDDC": "Input_Flush_116D1",
+  "JitterImageLayer_Construct_B12E": "JitterImageLayer_Construct_F97F",
+  "Keyboard_QueryAndDispatch_3E5C7": "Keyboard_QueryAndDispatch_443C0",
+  "LayerGroup_Add_2DB84": "LayerGroup_Add_33BD0",
+  "LayerGroup_Remove_2DBC1": "LayerGroup_Remove_33C0D",
+  "Layer_ConstructAtOrigin_2DE95": "Layer_ConstructAtOrigin_33EE1",
+  "Layer_Construct_2DF9B": "Layer_Construct_33FE7",
+  "Memory_TypedAllocDispatchB_2B920": "Memory_TypedAllocDispatchB_329B1",
+  "Memory_TypedFree_2B8A4": "Memory_TypedFree_32934",
+  "Midgame1_PlayPart2_671C0": "Midgame1_PlayPart2_70290",
+  "MusicChannel_Init_78A4": "MusicChannel_Init_B75B",
+  "MusicChannel_RegisterSequence_7918": "MusicChannel_RegisterSequence_B7A2",
+  "Music_ChannelStopSequence_783A": "Music_ChannelStopSequence_B6F1",
+  "OverlayAnimLayer_Construct_A505": "OverlayAnimLayer_Construct_ED56",
+  "OverlayImageLayer_Construct_A9D6": "OverlayImageLayer_Construct_F227",
+  "Pak_LoadEntry_C40A": "Pak_LoadEntry_10D03",
+  "Palette_Alloc_2CC76": "Palette_Alloc_34A1A",
+  "Palette_CopyInto_2CF80": "Palette_CopyInto_34D24",
+  "Palette_Destruct_2D048": "Palette_Destruct_34DEC",
+  "Palette_FadeFromColor_2D165": "Palette_FadeFromColor_34EEE",
+  "Palette_FadeToColor_2D09C": "Palette_FadeToColor_34E29",
+  "Palette_FillRange_2CF08": "Palette_FillRange_34CAC",
+  "Palette_LoadFromResource_2CCE5": "Palette_LoadFromResource_34A89",
+  "Palette_UploadByValue_CBAB": "Palette_UploadByValue_114A2",
+  "Palette_Upload_2CDE1": "Palette_Upload_34B85",
+  "Path_Build_C82C": "Path_Build_11125",
+  "ResourceRecord_Helper_3BE15": "ResourceRecord_Helper_425B8",
+  "ResourceRecord_ReadFieldGroupA_3C289": "ResourceRecord_ReadFieldGroupA_42A2C",
+  "ResourceRecord_ReadFieldGroupB_3C2C4": "ResourceRecord_ReadFieldGroupB_42A67",
+  "ResourceRecord_ReleaseAndClear_3C595": "ResourceRecord_ReleaseAndClear_42D38",
+  "ResourceRecord_SeekAndReadB_3C022": "ResourceRecord_SeekAndReadB_427C5",
+  "ResourceRecord_SeekAndRead_3BFB3": "ResourceRecord_SeekAndRead_42756",
+  "ScaledImageLayer_Construct_9391": "ScaledImageLayer_Construct_DBA8",
+  "ScaledImageLayer_SetScale_94F4": "ScaledImageLayer_SetScale_DD0B",
+  "ScaledMovingLayer_Construct_9544": "ScaledMovingLayer_Construct_DD5B",
+  "Scene_Create_C55E": "Scene_Create_10E57",
+  "Scene_Destruct_2DCFC": "Scene_Destruct_33D48",
+  "Scene_SetFps_2DE27": "Scene_SetFps_33E73",
+  "Scene_Tick_C652": "Scene_Tick_10F4B",
+  "SmallObject_UnregisterFromList_2CB7A": "SmallObject_UnregisterFromList_349C1",
+  "Stopwatch_WaitElapsed_3F023": "Stopwatch_WaitElapsed_44E21",
+  "StreamReader_ConstructVariantA_3B2A9": "StreamReader_ConstructVariantA_40ED4",
+  "StreamReader_ReleaseBuffer_3CEB3": "StreamReader_ReleaseBuffer_42F45",
+  "Stub_Midgame1_PlayPart2_423E0": "Stub_Midgame1_PlayPart2_47D10",
+  "TalkingHeadOverlay_Construct_B20F": "TalkingHeadOverlay_Construct_FA60",
+  "TalkingHead_AttachVoice_9CF7": "TalkingHead_AttachVoice_E535",
+  "TalkingHead_Construct_98F4": "TalkingHead_Construct_E108",
+  "TalkingHead_SetBaseFrame_9D32": "TalkingHead_SetBaseFrame_E56E",
+  "TalkingHead_SetLipText_9C4F": "TalkingHead_SetLipText_E45A",
+  "TalkingHead_StartVoiceAndIsSpeaking_9C64": "TalkingHead_StartVoiceAndIsSpeaking_E4AD",
+  "TextArray_Destruct_CC03": "TextArray_Destruct_114F8",
+  "TextArray_Init_CBE1": "TextArray_Init_114D6",
+  "TextFormat_ReleaseAttribute_2EC80": "TextFormat_ReleaseAttribute_35AAD",
+  "TextFormat_ReleaseStyleList_2EBFA": "TextFormat_ReleaseStyleList_35A27",
+  "TextLayer_Construct_ACF1": "TextLayer_Construct_F542",
+  "TextLayer_SetText_ADB7": "TextLayer_SetText_F608",
+  "ToggleLayer_Construct_B57B": "ToggleLayer_Construct_FDCC",
+  "TriggeredAnimLayer_Construct_B068": "TriggeredAnimLayer_Construct_F8B9",
+  "UI_ApplyEncodingHelper_2EC4A": "UI_ApplyEncodingHelper_35A77",
+  "VoicePlayer_IsDone_84CC": "VoicePlayer_IsDone_C808",
+  "VoicePlayer_IsPlaying_8500": "VoicePlayer_IsPlaying_C83C",
+  "VoicePlayer_SetDriver_7A3D": "VoicePlayer_SetDriver_B978",
+  "VoicePlayer_Stop_7B5A": "VoicePlayer_Stop_BACF",
+  "Widget_ApplyStyleAndAllocate_3144B": "Widget_ApplyStyleAndAllocate_36FD2",
+  "Widget_RenderComplexLayoutWrapper_31A3B": "Widget_RenderComplexLayoutWrapper_375C2",
+  "MovingMaskLayer_SetTable_BA1C": "MovingMaskLayer_SetTable_1026D",
+  "Scene_PollKeys_C5AF": "Scene_PollKeys_10EA8",
+  "String_ConstructFromPtrLen": "String_ConstructFromPtrLen",
+  "CRT_Doprnt_Core": "CRT_Doprnt_Core",
+  "GaugeWidget_AllocateRenderBufferWrapper_E0B7": "GaugeWidget_AllocateRenderBufferWrapper_129FD",
+  "GaugeWidget_QueryAndFormat_E256": "GaugeWidget_QueryAndFormat_12B9C",
+  "Widget_SetFlagBit0_F898": "Widget_SetFlagBit0_1441C",
+  "Widget_ClearFlagBit0_F8A6": "Widget_ClearFlagBit0_1442A",
+  "Widget_TranslateBounds_F8B4": "Widget_TranslateBounds_14438",
+  "PaletteScreen_DrawCurveShape_F9A4": "PaletteScreen_DrawCurveShape_14528",
+  "Palette_ReadAllDACRegisters_FB0A": "Palette_ReadAllDACRegisters_1468E",
+  "Palette_WriteAllDACRegisters_FB27": "Palette_WriteAllDACRegisters_146AB",
+  "Widget_SetFlagBit4AndOffsets_FF96": "Widget_SetFlagBit4AndOffsets_14B1A",
+  "PaletteScreen_LookupByteTable_11303": "PaletteScreen_LookupByteTable_15E87",
+  "PaletteScreen_DispatchWidgetLayoutB_11363": "PaletteScreen_DispatchWidgetLayoutB_15EE7",
+  "Effect_BBoxClipTest": "Effect_BBoxClipTest",
+  "Ovl_CopyStubTable": "Ovl_CopyStubTable",
+  "PIT_DelayLoop": "PIT_DelayLoop",
+  "CRT_InstallProtectedHandler": "CRT_InstallProtectedHandler",
+  "PC_SoundOn": "PC_SoundOn",
+  "CRT_Write_TextMode": "CRT_Write_TextMode",
+  "CRT_SetFileAttr": "CRT_SetFileAttr",
+  "Stdio_Fflush": "Stdio_Fflush",
+  "LightSet_Init_1D72E": "LightSet_Init_227FA",
+  "LightSet_SetIntensityPercent_1D7CD": "LightSet_SetIntensityPercent_22899",
+  "LightSet_FaceIntensity_1DB23": "LightSet_FaceIntensity_22BEF",
+  "Render_EdgeSetup": "Render_EdgeSetup",
+  "CRT_Strrchr_Like": "CRT_Strrchr_Like",
+  "Camera_UpdateViewportClip": "Camera_UpdateViewportClip",
+  "Palette_DestructResource": "Palette_DestructResource",
+  "Palette_ShadeTableFor_1ECD2": "Palette_ShadeTableFor_238F6",
+  "Stdio_WriteTextMode": "Stdio_WriteTextMode",
+  "Cockpit_PanAzimuthUpdate": "Cockpit_PanAzimuthUpdate_2415A",
+  "Palette_FogTableIndex_1F908": "Palette_FogTableIndex_2459A",
+  "Container_Construct": "Container_Construct",
+  "Container_ConstructTyped": "Container_ConstructTyped",
+  "Container_UnlinkNode": "Container_UnlinkNode",
+  "Container_FindAndRemove": "Container_FindAndRemove",
+  "Container_Append": "Container_Append",
+  "CRT_Itoa_Signed10": "CRT_Itoa_Signed10",
+  "CRT_Itoa_Unsigned": "CRT_Itoa_Unsigned",
+  "List_AppendTail_20D45": "List_AppendTail_25970",
+  "Container_RemoveNode": "Container_RemoveNode",
+  "CRT_Itoa_BaseVariant": "CRT_Itoa_BaseVariant",
+  "CRT_RestoreIntVectors": "CRT_RestoreIntVectors",
+  "Container_Op_20EEC": "Container_Op_25B17",
+  "Debris_BodyReset": "Debris_BodyReset",
+  "CRT_Memmove": "CRT_Memmove",
+  "CRT_Memset": "CRT_Memset",
+  "CRT_Memset_Public": "CRT_Memset_Public",
+  "CRT_Msg_NullPtrAssign": "CRT_Msg_NullPtrAssign",
+  "Stdio_Ungetc": "Stdio_Ungetc",
+  "TranslucentFont_Destruct_67184": "TranslucentFont_Destruct_26BE9",
+  "Stdio_Putc": "Stdio_Putc",
+  "WeakRef_InvalidateIfSet": "WeakRef_InvalidateIfSet",
+  "Math_DotProduct3D_2375C": "Math_DotProduct3D_285C4",
+  "Vector_Normalize3D_241B4": "Vector_Normalize3D_28FB2",
+  "Utility_Helper_24233": "Utility_Helper_29031",
+  "Utility_Helper_246F0": "Utility_Helper_294D7",
+  "UI_ComputeScaledVectorHelper_24AFE": "UI_ComputeScaledVectorHelper_298E5",
+  "Stdio_SetupFileStruct": "Stdio_SetupFileStruct",
+  "Damage_ComputeHelperA_24DD7": "Damage_ComputeHelperA_29BBE",
+  "Matrix_BuildFromAngle_2574E": "Matrix_BuildFromAngle_2A535",
+  "WorldObject_BuildOrientationMatrix_2589B": "WorldObject_BuildOrientationMatrix_2A682",
+  "CRT_Msg_Sprintf1": "CRT_Msg_Sprintf1",
+  "CRT_Msg_Sprintf2": "CRT_Msg_Sprintf2",
+  "Matrix_BuildFullOrientation_26047": "Matrix_BuildFullOrientation_2AE2E",
+  "CRT_Strcat": "CRT_Strcat",
+  "Math_FixedMulDiv_26BB4": "Math_FixedMulDiv_2B79E",
+  "Math_CosRaw_26C11": "Math_CosRaw_2B7FB",
+  "Math_Tan_Raw_26C57": "Math_Tan_Raw_2B841",
+  "CRT_Strchr_WordAligned": "CRT_Strchr_WordAligned",
+  "Math_AsinRaw_26D0A": "Math_AsinRaw_2B8F4",
+  "Math_AcosRaw_26D4D": "Math_AcosRaw_2B937",
+  "Math_Helper_26F0E": "Math_Helper_2BB12",
+  "Math_VectorTransformByMatrix3x3_26FE1": "Math_VectorTransformByMatrix3x3_2BBE5",
+  "CRT_Strncmp_Like": "CRT_Strncmp_Like",
+  "Matrix_WorldToLocal_272D3": "Matrix_WorldToLocal_2BED7",
+  "CRT_Strcpy": "CRT_Strcpy",
+  "CRT_Strdup": "CRT_Strdup",
+  "CRT_Stricmp": "CRT_Stricmp",
+  "CRT_Strlen": "CRT_Strlen",
+  "CRT_Strncpy_Pad": "CRT_Strncpy_Pad",
+  "Music_Stop_28CDB": "Music_Stop_2D9C2",
+  "Music_PlayGameflowTune_28CFC": "Music_PlayGameflowTune_2D9E3",
+  "Speech_LoadBank_28D24": "Speech_LoadBank_2DA0B",
+  "TextRenderer_ReleaseCachedGlyph_2BB8C": "TextRenderer_ReleaseCachedGlyph_2EE54",
+  "Memory_AllocatorSlot_Helper_2BC1E": "Memory_AllocatorSlot_Helper_2EEE6",
+  "DisplaySurface_Construct_2F08E": "DisplaySurface_Construct_2F5AC",
+  "DisplaySurface_CloneOrResize_2F113": "DisplaySurface_CloneOrResize_2F631",
+  "CachedObject_DestructSubobjects_2F1CF": "CachedObject_DestructSubobjects_2F6ED",
+  "DisplaySurface_Helper_2F1EC": "DisplaySurface_Helper_2F70A",
+  "DisplaySurface_ConstructWithMode_2F21E": "DisplaySurface_ConstructWithMode_2F73C",
+  "Member_ClearAndFree_2F278": "Member_ClearAndFree_2F796",
+  "Member_AllocateAndCopy_2F298": "Member_AllocateAndCopy_2F7B6",
+  "Member_CopyRaw_2F2DA": "Member_CopyRaw_2F7F8",
+  "Member_NullTerminateIfSet_2F329": "Member_NullTerminateIfSet_2F847",
+  "Video_PrintString_2F848": "Video_PrintString_2F880",
+  "DisplayContext_CommitFrame_2FCD5": "DisplayContext_CommitFrame_30078",
+  "DisplayContext_CommitFrameWithTag_2FD1E": "DisplayContext_CommitFrameWithTag_300C1",
+  "ResourceRecord_WriteField_3C68D": "ResourceRecord_WriteField_300F0",
+  "ResourceRecord_WriteFieldGroupA_3C6C0": "ResourceRecord_WriteFieldGroupA_30123",
+  "ResourceRecord_WriteFieldGroupB_3C730": "ResourceRecord_WriteFieldGroupB_30193",
+  "ResourceRecord_WriteFieldWrapper_3C848": "ResourceRecord_WriteFieldWrapper_302AB",
+  "ResourceRecord_SeekAndRelease_3C857": "ResourceRecord_SeekAndRelease_302BA",
+  "ResourceRecord_WriteFieldGroupC_3C88E": "ResourceRecord_WriteFieldGroupC_302F1",
+  "ResourceRecord_WriteFieldGroupD_3C8E3": "ResourceRecord_WriteFieldGroupD_30346",
+  "ResourceRecord_ReadAndWriteBridge_3C93E": "ResourceRecord_ReadAndWriteBridge_303A1",
+  "ResourceRecord_ReadAndWriteBridgeB_3C9C8": "ResourceRecord_ReadAndWriteBridgeB_3042B",
+  "ResourceRecord_BridgeWrapperA_3CA4F": "ResourceRecord_BridgeWrapperA_304B2",
+  "ResourceRecord_BridgeWrapperB_3CAA2": "ResourceRecord_BridgeWrapperB_30505",
+  "ResourceRecord_CopyOrTransform_3CB45": "ResourceRecord_CopyOrTransform_305A8",
+  "PagedMemory_DetectDriverSignatureA_2A8DF": "PagedMemory_DetectDriverSignatureA_30BB4",
+  "PagedMemory_DetectDriverSignatureB_2A8F0": "PagedMemory_DetectDriverSignatureB_30BC5",
+  "PagedMemory_LoadPage_2A901": "PagedMemory_LoadPage_30BD6",
+  "PagedMemory_InitDriver_2A98B": "PagedMemory_InitDriver_30CBB",
+  "PagedMemory_CheckDriverPresent_2AA32": "PagedMemory_CheckDriverPresent_30D62",
+  "PagedMemory_WriteByte_2AE02": "PagedMemory_WriteByte_31364",
+  "Memory_TypedFreeVariant_2B731": "Memory_TypedFreeVariant_327C3",
+  "Memory_TypedFreeWrapper_2B7E1": "Memory_TypedFreeWrapper_32871",
+  "Memory_TypedFreeWrapperB_2B862": "Memory_TypedFreeWrapperB_328B0",
+  "Memory_TypedAllocDispatch_2B8DE": "Memory_TypedAllocDispatch_3296E",
+  "Memory_TypedAllocDispatchC_2B95B": "Memory_TypedAllocDispatchC_329EC",
+  "Memory_TypedAllocDispatchE_2BA04": "Memory_TypedAllocDispatchE_32A95",
+  "Memory_ValidateAllocatorIndex_2BA94": "Memory_ValidateAllocatorIndex_32B25",
+  "Memory_AllocatorTable_ConstructSubobject_2BB3D": "Memory_AllocatorTable_ConstructSubobject_32BCE",
+  "PagedResourceC_Construct_2BE28": "PagedResourceC_Construct_32CA5",
+  "DisplayCache_ComputeChecksum_2C52D": "DisplayCache_ComputeChecksum_3325F",
+  "DisplayCache_Helper_2C859": "DisplayCache_Helper_337CC",
+  "LayerGroup_Construct_2DC66": "LayerGroup_Construct_33CB2",
+  "Stdio_WriteLowLevel": "Stdio_WriteLowLevel",
+  "Layer_MoveBy_2E29E": "Layer_MoveBy_33DAD",
+  "Scene_AdvanceFrame_2DE14": "Scene_AdvanceFrame_33E60",
+  "Layer_DrawAtOwnPos_2E202": "Layer_DrawAtOwnPos_3424E",
+  "LoopAnimLayer_Advance_2E6D6": "LoopAnimLayer_Advance_34722",
+  "Palette_FadeStep_2D013": "Palette_FadeStep_34DB7",
+  "Palette_LoadAndUpload_2D077": "Palette_LoadAndUpload_34E04",
+  "Stdio_ErrorHandler": "Stdio_ErrorHandler",
+  "CachedObject_Allocate_2D201": "CachedObject_Allocate_34F6C",
+  "CachedObject_Destruct_2D440": "CachedObject_Destruct_351AB",
+  "CachedObject_ReleaseFields_2D4E2": "CachedObject_ReleaseFields_3524D",
+  "CachedObject_DestructCore_2D560": "CachedObject_DestructCore_352CB",
+  "CachedObject_DestructHelper_2D5ED": "CachedObject_DestructHelper_35358",
+  "CachedObject_DestructHelper_2D63F": "CachedObject_DestructHelper_353AA",
+  "CachedObject_BuildAndTransform_2D682": "CachedObject_BuildAndTransform_3544B",
+  "CachedObject_AllocateAndInit_2D777": "CachedObject_AllocateAndInit_35581",
+  "CachedObject_BuildComposite_2D7C5": "CachedObject_BuildComposite_355CF",
+  "CachedObject_BuildVariant_2D8E3": "CachedObject_BuildVariant_356ED",
+  "TextFormat_ApplyStyleAttribute_2E9A4": "TextFormat_ApplyStyleAttribute_357D1",
+  "TextFormat_ApplyStyleAttributeB_2E9FD": "TextFormat_ApplyStyleAttributeB_3582A",
+  "TextRenderer_ApplyFormatChange_2EA21": "TextRenderer_ApplyFormatChange_3584E",
+  "TextFormat_SetAttribute_2EAF1": "TextFormat_SetAttribute_3591E",
+  "TextFormat_InitAttributeTable_2EB31": "TextFormat_InitAttributeTable_3595E",
+  "TextFormat_ResolveStyleEntry_2EB9C": "TextFormat_ResolveStyleEntry_359C9",
+  "UI_ApplyEncodingHelper_2EC65": "UI_ApplyEncodingHelper_35A92",
+  "CRT_MemFamily_Extra2": "CRT_MemFamily_Extra2",
+  "PagedResourceC_RefreshAndFinalize_2FD7D": "PagedResourceC_RefreshAndFinalize_35E0F",
+  "FontStyle_ClearFlag_2F362": "FontStyle_ClearFlag_35E5E",
+  "FontStyle_Construct_2F38D": "FontStyle_Construct_35E89",
+  "CRT_MemFamily_Extra3": "CRT_MemFamily_Extra3",
+  "CRT_Abs16_2CD": "CRT_Abs16_361",
+  "FontStyle_ApplyVariantB_2F661": "FontStyle_ApplyVariantB_3614B",
+  "LinkedList_InsertAtHead_2FA11": "LinkedList_InsertAtHead_36332",
+  "LinkedList_InsertAtTail_2FA3F": "LinkedList_InsertAtTail_36360",
+  "LinkedList_InsertAfter_2FA6D": "LinkedList_InsertAfter_3638E",
+  "LinkedList_InsertBefore_2FABA": "LinkedList_InsertBefore_363DB",
+  "LinkedList_Remove_2FB99": "LinkedList_Remove_364BA",
+  "LinkedList_Helper_2FC76": "LinkedList_Helper_3656B",
+  "LinkedListB_InsertAtTail_2FDF4": "LinkedListB_InsertAtTail_36616",
+  "LinkedListB_FindAndDispatch_2FE19": "LinkedListB_FindAndDispatch_3663B",
+  "LinkedListB_FindByKey_2FE79": "LinkedListB_FindByKey_3669B",
+  "CRT_MemFamily_Extra7": "CRT_MemFamily_Extra7",
+  "Runtime_FatalErrorHandler_2FF75": "Runtime_FatalErrorHandler_36797",
+  "GlyphObject_AllocateBuffer_31191": "GlyphObject_AllocateBuffer_36D18",
+  "GlyphObject_ConstructWithBuffer_311CF": "GlyphObject_ConstructWithBuffer_36D56",
+  "GlyphObject_ResolveAndCache_31296": "GlyphObject_ResolveAndCache_36E1D",
+  "GlyphObject_MeasureChar_31312": "GlyphObject_MeasureChar_36E99",
+  "Widget_Method_Dispatch8_314A9": "Widget_Method_Dispatch8_37030",
+  "Widget_Method_DispatchC_314CB": "Widget_Method_DispatchC_37052",
+  "Widget_RenderWithAttributes_3159D": "Widget_RenderWithAttributes_37124",
+  "Widget_Method_DispatchChain_316EE": "Widget_Method_DispatchChain_37275",
+  "Widget_ComputeBoundsExtent_31755": "Widget_ComputeBoundsExtent_372DC",
+  "Widget_UpdateLayoutAndBounds_31787": "Widget_UpdateLayoutAndBounds_3730E",
+  "Widget_RenderComplexLayout_31810": "Widget_RenderComplexLayout_37397",
+  "GlyphObject_LayoutAndRenderAll_31ACA": "GlyphObject_LayoutAndRenderAll_37656",
+  "Rect_BlitOverlapRegion_31FCA": "Rect_BlitOverlapRegion_37B54",
+  "Render_SetPixelClipped_328DE": "Render_SetPixelClipped_3811A",
+  "VROOMM_InstallIntHandler_3FBA8": "VROOMM_InstallIntHandler_388D",
+  "File_CreateWithRetry_3A92A": "File_CreateWithRetry_40354",
+  "File_OpenWithRetry_3ACA4": "File_OpenWithRetry_40380",
+  "Handle_ReadWordField_3AD81": "Handle_ReadWordField_4046A",
+  "Handle_ReadByteField_3ADA4": "Handle_ReadByteField_4048D",
+  "FileStream_Construct_3AE1E": "FileStream_Construct_40507",
+  "FileStream_ReadBuffered_3AFFF": "FileStream_ReadBuffered_408E0",
+  "StreamReader_GetCapacity_3B8D2": "StreamReader_GetCapacity_40A54",
+  "StreamReader_RegistryAdd_3B920": "StreamReader_RegistryAdd_40AC4",
+  "StreamReader_RegistryRemove_3B944": "StreamReader_RegistryRemove_40AE8",
+  "StreamReader_DispatchWrite_3B9E5": "StreamReader_DispatchWrite_40BBC",
+  "StreamReader_ParseFormattedValueB_3BA22": "StreamReader_ParseFormattedValueB_40BF9",
+  "StreamReader_PrepareParse_3BA5B": "StreamReader_PrepareParse_40C32",
+  "StreamReader_ParseFormattedString_3BA87": "StreamReader_ParseFormattedString_40C5E",
+  "StreamReader_CloseAndUnregister_3BB6F": "StreamReader_CloseAndUnregister_40D46",
+  "StreamReader_Destruct_3B16F": "StreamReader_Destruct_40D9A",
+  "StreamReader_Helper_3B1D2": "StreamReader_Helper_40DFD",
+  "StreamReader_Helper_3B212": "StreamReader_Helper_40E3D",
+  "StreamReader_Helper_3B23D": "StreamReader_Helper_40E68",
+  "StreamReader_ValidateAndDispatch_3B261": "StreamReader_ValidateAndDispatch_40E8C",
+  "StreamReader_Helper_3B282": "StreamReader_Helper_40EAD",
+  "StreamReader_ConstructVariantB_3B2F8": "StreamReader_ConstructVariantB_40F23",
+  "StreamReader_ConstructVariantC_3B343": "StreamReader_ConstructVariantC_40F6E",
+  "StreamReader_Close_3B445": "StreamReader_Close_410AA",
+  "StreamReader_DispatchRead_3B4A0": "StreamReader_DispatchRead_41105",
+  "StreamReader_ReadDispatch_3B57E": "StreamReader_ReadDispatch_411DE",
+  "StreamReader_ReadDispatchB_3B59D": "StreamReader_ReadDispatchB_411FD",
+  "StreamReader_ValidateState_3B625": "StreamReader_ValidateState_412A1",
+  "StreamReader_CheckBufferValid_3B64B": "StreamReader_CheckBufferValid_412C7",
+  "StreamReader_SeekVariant_3B666": "StreamReader_SeekVariant_412E2",
+  "StreamReader_RefillBuffer_3B755": "StreamReader_RefillBuffer_413D1",
+  "StreamReader_PrepareForRead_3B7B6": "StreamReader_PrepareForRead_41432",
+  "StreamReader_ReadTyped_3B811": "StreamReader_ReadTyped_4148D",
+  "StreamReader_ReportError_3B8BE": "StreamReader_ReportError_4153A",
+  "FileStream_Method_Read_3BBC3": "FileStream_Method_Read_4158F",
+  "ResourceRecord_InitAndValidate_3BE3D": "ResourceRecord_InitAndValidate_425E0",
+  "ResourceRecord_ReadHeaderFields_3BF08": "ResourceRecord_ReadHeaderFields_426AB",
+  "ResourceRecord_ComputeRecordBounds_3BF4B": "ResourceRecord_ComputeRecordBounds_426EE",
+  "ResourceRecord_ComputeRecordBoundsB_3BF7F": "ResourceRecord_ComputeRecordBoundsB_42722",
+  "ResourceRecord_SeekAndReadC_3C09B": "ResourceRecord_SeekAndReadC_4283E",
+  "ResourceRecord_Helper_3C10E": "ResourceRecord_Helper_428B1",
+  "ResourceRecord_ReadStructured_3C153": "ResourceRecord_ReadStructured_428F6",
+  "ResourceRecord_AdvanceByArrayCount_3C231": "ResourceRecord_AdvanceByArrayCount_429D4",
+  "ResourceRecord_ReadFieldGroupC_3C2EE": "ResourceRecord_ReadFieldGroupC_42A91",
+  "ResourceRecord_ReadViaHelper_3C349": "ResourceRecord_ReadViaHelper_42AEC",
+  "ResourceRecord_ReadDwordFieldB_3C36F": "ResourceRecord_ReadDwordFieldB_42B12",
+  "ResourceRecord_ReadFinalField_3C3C1": "ResourceRecord_ReadFinalField_42B64",
+  "ResourceRecord_ReadDwordAdvance_3C40B": "ResourceRecord_ReadDwordAdvance_42BAE",
+  "ResourceRecord_ComputeAlignedBounds_3C431": "ResourceRecord_ComputeAlignedBounds_42BD4",
+  "ResourceRecord_SeekToStart_3C468": "ResourceRecord_SeekToStart_42C0B",
+  "ResourceRecord_ResetIfSet_3C5C8": "ResourceRecord_ResetIfSet_42D6B",
+  "ResourceRecord_ReadPayload_3C623": "ResourceRecord_ReadPayload_42DC6",
+  "StreamReader_WriteTyped_3CEFF": "StreamReader_WriteTyped_42F91",
+  "StreamReader_WriteWithGrowth_3D005": "StreamReader_WriteWithGrowth_43097",
+  "IndexedRecordReader_ConstructVariantC_3D2FA": "IndexedRecordReader_ConstructVariantC_4338C",
+  "IndexedRecordReader_InitFields_3D373": "IndexedRecordReader_InitFields_43405",
+  "IndexedRecordReader_ReadEntry_3D619": "IndexedRecordReader_ReadEntry_43633",
+  "IndexedRecordReader_AdvanceIndex_3D69C": "IndexedRecordReader_AdvanceIndex_436B6",
+  "TextRenderer_LoadResourceFile_3DA1F": "TextRenderer_LoadResourceFile_437A9",
+  "Joystick_ReadAxesAndButtons_3DBFB": "Joystick_ReadAxesAndButtons_43985",
+  "Joystick_ReadButtonsOnly_3DC2D": "Joystick_ReadButtonsOnly_439B7",
+  "JoystickCallback_Construct_3DC46": "JoystickCallback_Construct_43A16",
+  "JoystickCallback_SetValueAndEcho_3DCB1": "JoystickCallback_SetValueAndEcho_43A81",
+  "JoystickCallback_UpdateAndNotifyChain_3DCD1": "JoystickCallback_UpdateAndNotifyChain_43AA1",
+  "JoystickCallback_RegisterInChain_3DD45": "JoystickCallback_RegisterInChain_43B15",
+  "ConfigOption_Dispatch_3E273": "ConfigOption_Dispatch_4406C",
+  "Keyboard_RegisterOrInitHandlerTable_3E3DE": "Keyboard_RegisterOrInitHandlerTable_441D7",
+  "Keyboard_ClearHandlerTable_3E442": "Keyboard_ClearHandlerTable_4423B",
+  "Keyboard_InitSystem_3E458": "Keyboard_InitSystem_44251",
+  "Keyboard_UnregisterHandlerTable_3E486": "Keyboard_UnregisterHandlerTable_4427F",
+  "Keyboard_PushEventToQueue_3E4C1": "Keyboard_PushEventToQueue_442BA",
+  "Keyboard_PeekOrPopEvent_3E519": "Keyboard_PeekOrPopEvent_44312",
+  "Keyboard_QueryHandlerTable_3E55D": "Keyboard_QueryHandlerTable_44356",
+  "Keyboard_Method_ReturnTypeTag_3E591": "Keyboard_Method_ReturnTypeTag_4438A",
+  "Keyboard_AllocateHandlerMask_3E72D": "Keyboard_AllocateHandlerMask_44526",
+  "Keyboard_ConfigureHandlerMask_3E785": "Keyboard_ConfigureHandlerMask_4457E",
+  "TextScroll_Construct_3E7E8": "TextScroll_Construct_445E1",
+  "TextScroll_ComputeParams_3E86C": "TextScroll_ComputeParams_44665",
+  "TextScroll_Helper_3E8A0": "TextScroll_Helper_44699",
+  "TextScroll_HelperB_3E8C9": "TextScroll_HelperB_446C2",
+  "TextScroll_ApplyHelperB_3E958": "TextScroll_ApplyHelperB_44753",
+  "TextScroll_RegisterHandler_3E9EE": "TextScroll_RegisterHandler_447EC",
+  "TextScroll_ApplyHelperC_3EA08": "TextScroll_ApplyHelperC_44806",
+  "TextScroll_FormatAndApply_3EA28": "TextScroll_FormatAndApply_44826",
+  "TextScroll_ApplyHelperD_3EA46": "TextScroll_ApplyHelperD_44844",
+  "TextScrollDisplay_Construct_3EA8B": "TextScrollDisplay_Construct_44889",
+  "TextScrollDisplay_Destruct_3EAAE": "TextScrollDisplay_Destruct_448AC",
+  "TextScrollDisplay_ComputeLayout_3EAD3": "TextScrollDisplay_ComputeLayout_448D1",
+  "TextScrollDisplay_InitState_3EB63": "TextScrollDisplay_InitState_44961",
+  "TextScrollDisplay_Cleanup_3EBA8": "TextScrollDisplay_Cleanup_449A6",
+  "TextScrollDisplay_RegisterEntries_3EBDD": "TextScrollDisplay_RegisterEntries_449DB",
+  "HandlerRegistry4Slot_Register_3ED3B": "HandlerRegistry4Slot_Register_44B39",
+  "Stopwatch_RegisterTickModuleVariant_3EE86": "Stopwatch_RegisterTickModuleVariant_44C84",
+  "Stopwatch_UnregisterTickModule_3EEC3": "Stopwatch_UnregisterTickModule_44CC1",
+  "Stopwatch_StartOrStop_3EF15": "Stopwatch_StartOrStop_44D13",
+  "Stopwatch_Elapsed_3EFDF": "Stopwatch_Elapsed_44DDD",
+  "Joystick_ReadButtonsWrapper_3F12A": "Joystick_ReadButtonsWrapper_44F28",
+  "CRT_Exit": "CRT_Exit",
+  "Joystick_FormatCalibrationDisplay_3F35E": "Joystick_FormatCalibrationDisplay_45120",
+  "Joystick_InitCalibrationDefaults_3F3B6": "Joystick_InitCalibrationDefaults_45178",
+  "Joystick_ComputeCalibrationRatio_3F463": "Joystick_ComputeCalibrationRatio_45225",
+  "Joystick_InterpolateCalibrationPercent_3F4DC": "Joystick_InterpolateCalibrationPercent_4529E",
+  "OptionCounter_Construct_3F5C8": "OptionCounter_Construct_4538A",
+  "OptionCounter_Set_3F60E": "OptionCounter_Set_453D0",
+  "TextScrollDisplayB_ConstructAndReset_3F619": "TextScrollDisplayB_ConstructAndReset_453DB",
+  "TextScrollDisplayB_InitAndRegister_3F658": "TextScrollDisplayB_InitAndRegister_4541A",
+  "TextScrollDisplayB_ApplyHelperA_3F6C0": "TextScrollDisplayB_ApplyHelperA_45482",
+  "TextScrollDisplayB_ApplyHelperB_3F704": "TextScrollDisplayB_ApplyHelperB_454C6",
+  "TextScrollDisplayB_TickHelper_3F737": "TextScrollDisplayB_TickHelper_454F9",
+  "TextScrollDisplayB_ApplyHelperC_3F74A": "TextScrollDisplayB_ApplyHelperC_45522",
+  "TextScrollDisplayB_ApplyHelperD_3F784": "TextScrollDisplayB_ApplyHelperD_4555C",
+  "TextScrollDisplayB_StopAnimation_3F863": "TextScrollDisplayB_StopAnimation_4562C",
+  "TextScrollDisplayB_StartAnimation_3F89D": "TextScrollDisplayB_StartAnimation_45666",
+  "Keyboard_DrainBufferBIOS_3FA5E": "Keyboard_DrainBufferBIOS_45C38",
+  "CRT_Abort": "CRT_Abort",
+  "AIL_find_proc_303E4": "AIL_find_proc_4819",
+  "AIL_init_DDA_arrays_30503": "AIL_init_DDA_arrays_4992",
+  "AIL_hook_timer_process_30540": "AIL_hook_timer_process_49CF",
+  "AIL_unhook_timer_process_30586": "AIL_unhook_timer_process_4A15",
+  "AIL_set_PIT_divisor_305B0": "AIL_set_PIT_divisor_4A3F",
+  "AIL_set_PIT_period_305D3": "AIL_set_PIT_period_4A62",
+  "AIL_ul_divide_305FD": "AIL_ul_divide_4A8C",
+  "AIL_program_timers_30648": "AIL_program_timers_4AD7",
+  "AIL_startup_306D7": "AIL_startup_4B66",
+  "AIL_release_all_timers_30876": "AIL_release_all_timers_4D05",
+  "AIL_set_timer_period_30902": "AIL_set_timer_period_4D91",
+  "AIL_register_driver_309D0": "AIL_register_driver_4E5F",
+  "AIL_release_driver_handle_30A76": "AIL_release_driver_handle_4F05",
+  "Gameflow_InitNewGame_4A140": "Gameflow_InitNewGame_4F900",
+  "AIL_shutdown_driver_30B79": "AIL_shutdown_driver_5008",
+  "CRT_GetVect": "CRT_GetVect",
+  "CRT_SetVect": "CRT_SetVect",
+  "Gameflow_SaveTmpState_4BBA0": "Gameflow_SaveTmpState_5140A",
+  "PagedMemory_ReadTextResource_2B23C": "PagedMemory_ReadTextResource_52D8",
+  "Gameflow_SaveRequester_4D984": "Gameflow_SaveRequester_5341B",
+  "Gameflow_LoadRequester_4DDDC": "Gameflow_LoadRequester_53893",
+  "Gameflow_CheckLossConversations_50645": "Gameflow_CheckLossConversations_56325",
+  "ResourceHandle_Construct_53F9F": "ResourceHandle_Construct_5B2F7",
+  "ResourceHandle_Destruct_53FD9": "ResourceHandle_Destruct_5B331",
+  "Conv_Init_59A20": "Conv_Init_60DA0",
+  "Conv_Construct_59B67": "Conv_Construct_60EE7",
+  "Conv_DrawText_59F54": "Conv_DrawText_612E1",
+  "ConvData_FindFace_5A451": "ConvData_FindFace_617FE",
+  "ConvData_FindFacePalette_5A46F": "ConvData_FindFacePalette_6181C",
+  "ConvData_FindFigure_5A4AA": "ConvData_FindFigure_61857",
+  "ConvData_FindFigurePalette_5A4C8": "ConvData_FindFigurePalette_61875",
+  "CRT_IsAtty": "CRT_IsAtty",
+  "CRT_NormalizeSign32": "CRT_NormalizeSign32",
+  "Gameflow_CheckSpriteRequirements_3604": "Gameflow_CheckSpriteRequirements_62EE",
+  "AudioQueue_RegisterTickModule_5EEB0": "AudioQueue_RegisterTickModule_68480",
+  "AudioQueue_Helper_5FC6C": "AudioQueue_Helper_691E9",
+  "CRT_Lseek": "CRT_Lseek",
+  "CRT_Malloc32_Retry": "CRT_Malloc32_Retry",
+  "CRT_Srand_6F2": "CRT_Srand_7E5",
+  "CRT_Rand": "CRT_Rand",
+  "CRT_Unlink": "CRT_Unlink",
+  "ConvRec_ReadName_6305": "ConvRec_ReadName_93FF",
+  "ConvRec_ReadExtra_6464": "ConvRec_ReadExtra_95B8",
+  "ConvRec_ReadWing_66E0": "ConvRec_ReadWing_98E8",
+  "TranslucentFont_DrawGlyph_BDDC0": "TranslucentFont_DrawGlyph_B5700",
+  "EntityTracker_AddEntryObj": "EntityTracker_AddEntryObj",
+  "EntityTracker_AddEntryText": "EntityTracker_AddEntryText",
+  "MissionText_ApplyDualStyle_C0F30": "MissionText_ApplyDualStyle_B8800",
+  "MissionText_Helper4_C14F9": "MissionText_Helper4_B8DC9",
+  "MissionText_Helper5_C1512": "MissionText_Helper5_B8DE2",
+  "Debris_ContainerOpWrapper_C2578": "Debris_ContainerOpWrapper_B9E38",
+  "TextCycler_ReleaseEntry_C3080": "TextCycler_ReleaseEntry_BA940",
+  "TextCycler_ReleaseBuffer_C321D": "TextCycler_ReleaseBuffer_BAB64",
+  "GlyphObject_MeasureWrapperB_C754D": "GlyphObject_MeasureWrapperB_BF15D",
+  "GlyphObject_ResolveAndMeasureB_C758E": "GlyphObject_ResolveAndMeasureB_BF19E",
+  "InfoWidget_CopyFieldB_C8242": "InfoWidget_CopyFieldB_BFEC2",
+  "InfoWidget_Method_DispatchField2A_C85CB": "InfoWidget_Method_DispatchField2A_C024B",
+  "VoicePlayer_GetLipFrame_8466": "VoicePlayer_GetLipFrame_C7A2",
+  "TalkingHead_CopyLipText_97D8": "TalkingHead_CopyLipText_DFEF",
+  "ConvFigure_ConstructExtra_AB6B": "ConvFigure_ConstructExtra_F3BC",
+  "CRT_Time_85A": "CRT_Time_F92",
+  "ClippedLayer_DrawAt_B4CD": "ClippedLayer_DrawAt_FD1E",
+  "CRT_CtypeLookup": "CRT_CtypeLookup",
+  "ToggleLayer_DrawAt_B5D1": "ToggleLayer_DrawAt_FE22"
+ }
+}
