@@ -6,7 +6,13 @@ ovr211		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_9CBE0		proc far
+; ==============================================================================================
+; far, cinématique mid33 de Tactical Operations (2026-11-02) : script extrait par
+; tools/midgame_extract.py dans analysis/topt/midgames/mid33.md et .json, fichier
+; analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée
+; ligne à ligne.
+; ==============================================================================================
+Midgame33_Play_9CBE0		proc far
 
 var_D32		= word ptr -0D32h
 var_D30		= word ptr -0D30h
@@ -15254,13 +15260,13 @@ loc_A7FEF:
 		pop	si
 		leave
 		retf
-sub_9CBE0		endp
+Midgame33_Play_9CBE0		endp
 
-; START OF FUNCTION CHUNK FOR sub_9CBE0
+; START OF FUNCTION CHUNK FOR Midgame33_Play_9CBE0
 off_A8065	dw offset loc_9CDE1
 		dw offset loc_9CF5A
 		dw offset loc_9CF5A
 		dw offset loc_9CF5A
 		dw offset loc_9CF5A
-; END OF FUNCTION CHUNK FOR sub_9CBE0
+; END OF FUNCTION CHUNK FOR Midgame33_Play_9CBE0
 ovr211		ends

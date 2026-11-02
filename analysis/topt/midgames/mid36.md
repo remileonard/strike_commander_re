@@ -1,10 +1,10 @@
-# Script extrait de `sub_AEDE0` (topt)
+# Script extrait de `Midgame36_Play_AEDE0` (topt)
 
 Généré par `tools/midgame_extract.py` : pseudo-code obtenu par exécution symbolique de la fonction.
 Valeurs de l'exécutable, sans correction. ⟨n⟩ = ligne de `source/topttst1.asm`.
 Lignes « asm: » = instructions non traduites.
 
-## sub_AEDE0
+## Midgame36_Play_AEDE0
 
 ```
 bp = sp                                                                                               ⟨302208⟩

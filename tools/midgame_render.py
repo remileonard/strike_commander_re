@@ -3,7 +3,7 @@ moteur de scène lues dans OPTEST.EXE), avec le nombre d'images des animations e
 répliques lus dans les données, et dessine chaque image comme le jeu (image hors écran copiée à la
 ligne 24, palettes partielles, titres translucides). Voir MID1_PLANS.md.
 
-Usage : python3 tools/midgame_render.py --donnees <BIGTRE.TRE ou DATA> [--nom mid2] [--sous-titres] --film mid1.gif [échelle]
+Usage : python3 tools/midgame_render.py --donnees <BIGTRE.TRE ou DATA> [--exe topt] [--nom mid2] [--sous-titres] --film mid1.gif [échelle]
         python3 tools/midgame_render.py --donnees <DATA> <dossier> [plans...]   (un GIF par plan)"""
 import importlib.util
 import os
@@ -13,7 +13,11 @@ if '--donnees' in sys.argv:
     _i = sys.argv.index('--donnees')
     os.environ['SC_DATA'] = sys.argv[_i + 1]
     del sys.argv[_i:_i + 2]
-OPTIONS = {'nom': 'mid1', 'sous-titres': False}
+OPTIONS = {'nom': 'mid1', 'sous-titres': False, 'exe': 'optest'}
+if '--exe' in sys.argv:
+    _i = sys.argv.index('--exe')
+    OPTIONS['exe'] = sys.argv[_i + 1]
+    del sys.argv[_i:_i + 2]
 if '--nom' in sys.argv:
     _i = sys.argv.index('--nom')
     OPTIONS['nom'] = sys.argv[_i + 1]
@@ -25,6 +29,7 @@ import json
 
 from PIL import Image
 
+from exe_paths import paths
 from sc_data import GAME, draw_image, pak_entry, palette_block, read
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -122,7 +127,7 @@ def image_count(res):
 def run(exact=True, name=None, subtitles=None):
     name = name or OPTIONS['nom']
     subtitles = OPTIONS['sous-titres'] if subtitles is None else subtitles
-    data = json.load(open(f'{REPO}/analysis/optest/midgames/{name}.json', encoding='utf-8'))
+    data = json.load(open(os.path.join(paths(OPTIONS['exe'])['analysis'], 'midgames', f'{name}.json'), encoding='utf-8'))
     p = mg.Player(data, {'pri': 'air'}, {})
     if exact:
         p.image_count = image_count

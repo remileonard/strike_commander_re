@@ -15,7 +15,7 @@ stru_47F00	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_47F20	proc far
-		jmp	sub_A8070
+		jmp	Midgame34_Play_A8070
 sub_47F20	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub212		ends

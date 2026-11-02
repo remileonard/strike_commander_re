@@ -6,7 +6,13 @@ ovr207		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_85FE0		proc far
+; ==============================================================================================
+; far, cinématique mid15 de Tactical Operations (2026-11-02) : script extrait par
+; tools/midgame_extract.py dans analysis/topt/midgames/mid15.md et .json, fichier
+; analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée
+; ligne à ligne.
+; ==============================================================================================
+Midgame15_Play_85FE0		proc far
 
 var_DE8		= word ptr -0DE8h
 var_DE6		= word ptr -0DE6h
@@ -12944,13 +12950,13 @@ loc_8E857:
 		pop	si
 		leave
 		retf
-sub_85FE0		endp
+Midgame15_Play_85FE0		endp
 
-; START OF FUNCTION CHUNK FOR sub_85FE0
+; START OF FUNCTION CHUNK FOR Midgame15_Play_85FE0
 off_8E8FA	dw offset loc_86251
 		dw offset loc_863CA
 		dw offset loc_863CA
 		dw offset loc_863CA
 		dw offset loc_863CA
-; END OF FUNCTION CHUNK FOR sub_85FE0
+; END OF FUNCTION CHUNK FOR Midgame15_Play_85FE0
 ovr207		ends

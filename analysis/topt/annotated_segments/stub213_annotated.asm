@@ -15,7 +15,7 @@ stru_47F30	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_47F50	proc far
-		jmp	sub_AEDE0
+		jmp	Midgame36_Play_AEDE0
 sub_47F50	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub213		ends

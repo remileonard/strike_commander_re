@@ -23,7 +23,7 @@ sub_47CE0	endp
 ; Attributes: thunk
 
 sub_47CE5	proc far
-		jmp	sub_69270
+		jmp	Midgame1_PlayPart1_69270
 sub_47CE5	endp
 		db 0, 0, 0, 0, 0, 0
 stub200		ends

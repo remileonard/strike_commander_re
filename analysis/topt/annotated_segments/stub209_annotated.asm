@@ -15,7 +15,7 @@ stru_47E70	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_47E90	proc far
-		jmp	sub_91BB0
+		jmp	Midgame17_Play_91BB0
 sub_47E90	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub209		ends

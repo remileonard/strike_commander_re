@@ -1,10 +1,10 @@
-# Script extrait de `sub_A8070` (topt)
+# Script extrait de `Midgame34_Play_A8070` (topt)
 
 Généré par `tools/midgame_extract.py` : pseudo-code obtenu par exécution symbolique de la fonction.
 Valeurs de l'exécutable, sans correction. ⟨n⟩ = ligne de `source/topttst1.asm`.
 Lignes « asm: » = instructions non traduites.
 
-## sub_A8070
+## Midgame34_Play_A8070
 
 ```
 bp = sp                                                                                               ⟨292731⟩

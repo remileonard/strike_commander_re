@@ -1,10 +1,10 @@
-# Script extrait de `sub_9CBE0` (topt)
+# Script extrait de `Midgame33_Play_9CBE0` (topt)
 
 Généré par `tools/midgame_extract.py` : pseudo-code obtenu par exécution symbolique de la fonction.
 Valeurs de l'exécutable, sans correction. ⟨n⟩ = ligne de `source/topttst1.asm`.
 Lignes « asm: » = instructions non traduites.
 
-## sub_9CBE0
+## Midgame33_Play_9CBE0
 
 ```
 bp = sp                                                                                               ⟨277492⟩

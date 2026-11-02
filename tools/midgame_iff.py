@@ -30,6 +30,13 @@ CALL_RESULTS = {
     'sub_6734': 1,
     'touche_passer': 0,
 }
+# Conditions sur un état de séquence sonore que l'extracteur ne sait que fusionner en « booléen ».
+UNKNOWN_SOUND_STATUS = (
+    {'cmp': '==', 'a': {'inconnu': 'booléen'}, 'b': 0},
+    {'cmp': '!=', 'a': {'inconnu': 'booléen'}, 'b': 0},
+)
+# Champ d'état d'un PAK ouvert dont les bits 64 et 128 signalent une erreur de lecture.
+PAK_STATUS_FIELD = 109
 MAX_OPEN_FRAMES = 600
 DIRECT_FPS = 60
 
@@ -456,6 +463,10 @@ class Player:
             base = self.ev(v['déréf'])
             if isinstance(base, tuple) and base[0] == 'addr':
                 return self.read_stack(base[1] + v['décalage'])
+            if v['déréf'] == {'retour': 'pak_vide'} and v['décalage'] == PAK_STATUS_FIELD:
+                # État de lecture du PAK (bits d'erreur 64 et 128, to1mid2 de TOPTTST1.EXE) : lecture réussie.
+                self.warn('état de lecture du PAK pris sans erreur')
+                return 0
             return None
         if 'tab' in v:
             index = self.ev(v['index'])
@@ -688,6 +699,11 @@ class Player:
         t = n['t']
         if t == 'si':
             r = self.cond(n['cond'])
+            if r is None and n['cond'] in UNKNOWN_SOUND_STATUS:
+                # Test fusionné de l'état d'une séquence sonore (canal vide -> 0, sinon état == 1 = joue) :
+                # sans son simulé, la séquence est prise terminée (mid14 de TOPTTST1.EXE, effets sonores seuls).
+                self.warn(f'état de séquence sonore inconnu ligne {n["ligne"]} : pris terminé')
+                r = self.cond({'cmp': n['cond']['cmp'], 'a': 0, 'b': n['cond']['b']})
             if r is None:
                 raise RuntimeError(f'condition indécidable ligne {n["ligne"]} : {json.dumps(n["cond"], ensure_ascii=False)}')
             return self.run(n['alors'] if r else n['sinon'])

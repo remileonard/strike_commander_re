@@ -37883,8 +37883,8 @@
 "sub_114F8",
 "sub_114F8"
 ],
-"new_name": "sub_69270",
-"summary": ""
+"new_name": "Midgame1_PlayPart1_69270",
+"summary": "far, cinématique mid1 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid1.md et .json, fichier analysis/topt/midgames/iff. 1re partie ; la 2e est Midgame1_PlayPart2_70290. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_70254": {
 "segment": "ovr200",
@@ -39279,8 +39279,8 @@
 "sub_35A27",
 "sub_35A27"
 ],
-"new_name": "sub_74C00",
-"summary": ""
+"new_name": "MidgameTO1_Play_74C00",
+"summary": "far, cinématique to1mid1 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/to1mid1.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_7ACD0": {
 "segment": "ovr203",
@@ -39461,8 +39461,8 @@
 "sub_35A27",
 "sub_35A27"
 ],
-"new_name": "sub_7ACD0",
-"summary": ""
+"new_name": "MidgameTO2_Play_7ACD0",
+"summary": "far, cinématique to1mid2 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/to1mid2.md et .json, fichier analysis/topt/midgames/iff. générique de fin, images de OBJECTS\\EJECT.PAK lues directement. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_7C1D0": {
 "segment": "ovr204",
@@ -39564,8 +39564,8 @@
 "sub_432D2",
 "sub_32934"
 ],
-"new_name": "sub_7C1D0",
-"summary": ""
+"new_name": "MidgameTO3_Play_7C1D0",
+"summary": "far, cinématique to1mid3 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/to1mid3.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_7CCD0": {
 "segment": "ovr205",
@@ -40360,8 +40360,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_7CCD0",
-"summary": ""
+"new_name": "Midgame12_Play_7CCD0",
+"summary": "far, cinématique mid12 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid12.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_829F0": {
 "segment": "ovr206",
@@ -40784,8 +40784,8 @@
 "sub_35A27",
 "sub_35A27"
 ],
-"new_name": "sub_829F0",
-"summary": ""
+"new_name": "Midgame14_Play_829F0",
+"summary": "far, cinématique mid14 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid14.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_85FE0": {
 "segment": "ovr207",
@@ -41813,8 +41813,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_85FE0",
-"summary": ""
+"new_name": "Midgame15_Play_85FE0",
+"summary": "far, cinématique mid15 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid15.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_8E910": {
 "segment": "ovr208",
@@ -42219,8 +42219,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_8E910",
-"summary": ""
+"new_name": "Midgame16_Play_8E910",
+"summary": "far, cinématique mid16 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid16.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_91BB0": {
 "segment": "ovr209",
@@ -42932,8 +42932,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_91BB0",
-"summary": ""
+"new_name": "Midgame17_Play_91BB0",
+"summary": "far, cinématique mid17 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid17.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_974D0": {
 "segment": "ovr210",
@@ -43624,8 +43624,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_974D0",
-"summary": ""
+"new_name": "Midgame20_Play_974D0",
+"summary": "far, cinématique mid20 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid20.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_9CBE0": {
 "segment": "ovr211",
@@ -45025,8 +45025,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_9CBE0",
-"summary": ""
+"new_name": "Midgame33_Play_9CBE0",
+"summary": "far, cinématique mid33 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid33.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_A8070": {
 "segment": "ovr212",
@@ -45870,8 +45870,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_A8070",
-"summary": ""
+"new_name": "Midgame34_Play_A8070",
+"summary": "far, cinématique mid34 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid34.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_AEDE0": {
 "segment": "ovr213",
@@ -46679,8 +46679,8 @@
 "sub_35A27",
 "sub_114F8"
 ],
-"new_name": "sub_AEDE0",
-"summary": ""
+"new_name": "Midgame36_Play_AEDE0",
+"summary": "far, cinématique mid36 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid36.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
 },
 "sub_B5700": {
 "segment": "ovr214",

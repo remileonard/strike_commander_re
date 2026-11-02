@@ -6,7 +6,13 @@ ovr204		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_7C1D0		proc far
+; ==============================================================================================
+; far, cinématique to1mid3 de Tactical Operations (2026-11-02) : script extrait par
+; tools/midgame_extract.py dans analysis/topt/midgames/to1mid3.md et .json, fichier
+; analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée
+; ligne à ligne.
+; ==============================================================================================
+MidgameTO3_Play_7C1D0		proc far
 
 var_2F8		= word ptr -2F8h
 var_2C8		= word ptr -2C8h
@@ -1090,13 +1096,13 @@ loc_7CCAD:
 		pop	si
 		leave
 		retf
-sub_7C1D0		endp
+MidgameTO3_Play_7C1D0		endp
 
-; START OF FUNCTION CHUNK FOR sub_7C1D0
+; START OF FUNCTION CHUNK FOR MidgameTO3_Play_7C1D0
 off_7CCC5	dw offset loc_7C227
 		dw offset loc_7C393
 		dw offset loc_7C393
 		dw offset loc_7C393
 		dw offset loc_7C393
-; END OF FUNCTION CHUNK FOR sub_7C1D0
+; END OF FUNCTION CHUNK FOR MidgameTO3_Play_7C1D0
 ovr204		ends

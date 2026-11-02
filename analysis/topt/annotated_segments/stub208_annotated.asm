@@ -15,7 +15,7 @@ stru_47E40	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_47E60	proc far
-		jmp	sub_8E910
+		jmp	Midgame16_Play_8E910
 sub_47E60	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub208		ends

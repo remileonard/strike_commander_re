@@ -241,7 +241,8 @@ visionneuse d'objets 3D (`objview.pak`), générique et score final.
 - Analyse dans **`analysis/optest/`** : `known_functions.json`, `function_index.json`,
   `segment_boundaries.json`, `annotated_segments/`, `strike_matches.json`.
 - Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
-  chemins dans `tools/exe_paths.py`.
+  chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
+  Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`).
 - **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
   code est identique (412) ou de même suite d'instructions avec des adresses de données
   différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
@@ -267,8 +268,12 @@ strike_commander_re/
 │   ├── strike.asm                   désassemblage IDA complet (371 062 lignes)
 │   ├── strike.map                   fichier map du linker
 │   ├── optest.asm                   désassemblage IDA d'OPTEST.EXE (358 861 lignes)
-│   └── optest.map                   fichier map d'OPTEST.EXE
+│   ├── optest.map                   fichier map d'OPTEST.EXE
+│   └── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
+│                                      par tools/vroomm_listing.py — analysis/topt/README.md
 ├── analysis/
+│   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
+│   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
 │   │                                  (known_functions, index, annotated_segments)
 │   │                                  + strike_matches.json — voir « OPTEST.EXE »
@@ -373,6 +378,9 @@ strike_commander_re/
     ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
     ├── midgame_check.py             lecteur de contrôle d'un MID_*.IFF, comparé au rendu de référence
     │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
+    ├── vroomm_listing.py            listing au format IDA d'un EXE Borland à overlays VROOMM (capstone) :
+    │                                  source/topttst1.asm ; midgame_engine_port.py : porte le catalogue du
+    │                                  moteur des cinématiques d'un exécutable à l'autre (analysis/topt/README.md)
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
     ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
