@@ -228,9 +228,14 @@ def text_arrays(data):
     return arrays
 
 
+# PAK ouverts par la cinématique elle-même, hors des dossiers des cinématiques : nom -> dossier
+# (to1mid2 de TOPTTST1.EXE : OBJECTS\EJECT.PAK), relevé dans l'appel qui construit leur chemin.
+PAK_FOLDERS = {}
+
+
 def archive_path(pak):
     name = pak.upper()
-    folder = 'GAMEFLOW' if name.startswith('OPT') else 'MIDGAMES'
+    folder = PAK_FOLDERS.get(name) or ('GAMEFLOW' if name.startswith('OPT') else 'MIDGAMES')
     return f'..\\..\\DATA\\{folder}\\{name}.PAK'
 
 
@@ -375,6 +380,11 @@ class Player:
         self.force_new = False
         self.direct_items = []
         self.last_frame = []
+        # Images lues à la main dans des tampons : clé du tampon -> ('pak', nom, entrée) ; PAK ouvert ;
+        # écran sauvegardé (Surface_SaveRect).
+        self.buffers = {}
+        self.opened_pak = None
+        self.saved_screen = None
         self.full_screen = False
         self.text_keys = {}
         self.form = None
@@ -385,6 +395,7 @@ class Player:
         # (Struct_GetElementCountMinusOne_33352) et durée d'une réplique en secondes. Sans elles,
         # les boucles qui attendent une fin sont simulées sur MAX_OPEN_FRAMES images.
         self.image_count = None
+        self.delta_animation = None
         self.voice_seconds = None
         self.voice_bytes = None
         self.clock = 0.0
@@ -413,7 +424,32 @@ class Player:
                 text = text.replace(f'"{old}"', f'"{new}"')
         return text
 
+    def buffer_key(self, v):
+        """Clé d'un tampon désigné par données(…) : variable locale, ou champ d'un tableau d'objets."""
+        if not isinstance(v, dict) or 'données' not in v:
+            return None
+        inner = v['données']
+        if not isinstance(inner, dict):
+            return None
+        if 'local' in inner:
+            return ('local', inner['local'])
+        if 'champ' in inner:
+            m = re.match(r'^\+(\d+)$', inner['champ'][1])
+            return ('champ', inner['champ'][0], int(m.group(1))) if m else None
+        if 'déréf' in inner and isinstance(inner['déréf'], dict) and inner['déréf'].get('op') == '+':
+            a = inner['déréf']['a']
+            b = inner['déréf']['b']
+            obj = a if 'objet' in a else b if 'objet' in b else None
+            other = b if obj is a else a
+            offset = self.ev(other)
+            if obj is not None and isinstance(offset, int):
+                return ('champ', obj['objet'], offset + inner.get('décalage', 0))
+        return None
+
     def resource(self, v):
+        key = self.buffer_key(v)
+        if key in self.buffers:
+            return self.buffers[key]
         if isinstance(v, dict) and 'objet' in v:
             return self.res_of_text(self.content(v['objet']))
         if isinstance(v, dict) and 'données' in v:
@@ -554,6 +590,9 @@ class Player:
         if m and m.group(1) in self.layers:
             return self.absolute(self.layers[m.group(1)])[0]
         name = re.match(r'^([\w ]+?)\s*\(', text)
+        if name and name.group(1).strip().startswith('Memory_TypedFreeWrapper_') and text.count(',') == 4:
+            # Allocation d'un tampon par la cinématique (to1mid2 : images lues à la main) : réussie.
+            return 1
         if name and name.group(1).strip() in self.call_results:
             return self.call_results[name.group(1).strip()]
         self.warn(f'résultat d\'appel inconnu : {text}')
@@ -956,7 +995,7 @@ class Player:
         elif name == 'dessine_image':
             res = self.resource(args['données'])
             dy = self.surface_dy(args['surface'])
-            it = self.item(f'img{len(self.direct_items)}', res, self.ev(args['image']), self.ev(args['x']),
+            it = self.item(self.direct_key('img'), res, self.ev(args['image']), self.ev(args['x']),
                            self.ev(args['y']) + dy)
             it['dy'] = dy
             self.direct_items.append(it)
@@ -966,13 +1005,15 @@ class Player:
             self.warn(f'texte littéral non écrit (format {self.ev(args.get("format"))})')
         elif name == 'texte_formaté':
             key, index = self.text_ref(args['c'])
-            self.direct_items.append({'key': f'txt{len(self.direct_items)}', 'kind': 'text', 'text': (key, index),
+            self.direct_items.append({'key': self.direct_key('txt'), 'kind': 'text', 'text': (key, index),
                                       'y': self.ev(args['b']) + BAND_TOP, 'dy': BAND_TOP,
                                       'align': self.ev(args['a']), 'step': self.env.get('si')})
         elif name == 'présente':
             self.last_frame = list(self.direct_items)
             self.direct_items = []
         elif name == 'attend':
+            # Dessins faits directement avant l'attente (to1mid2) : visibles pendant l'attente.
+            self.commit_direct()
             chrono = self.objects[args['chronomètre']['objet']]
             duration = self.env.get(f'v{-(chrono["décalage"] + 4)}')
             if not isinstance(duration, int):
@@ -994,7 +1035,40 @@ class Player:
                 self.text_keys[(array, index)] = (self.form, self.chunk_count[self.form] - 1)
         return None
 
+    def direct_key(self, prefix):
+        """Nom d'un dessin direct : rang dans la liste en cours, suffixé s'il est déjà pris par un élément
+        encore affiché (to1mid2 : second fond dessiné par-dessus le premier, sans présente entre les deux)."""
+        key = f'{prefix}{len(self.direct_items)}'
+        shown = {it.get('key') for it in self.last_frame}
+        k = 1
+        base = key
+        while key in shown:
+            key = f'{base}_{k}'
+            k += 1
+        return key
+
+    def commit_direct(self):
+        if self.direct_items:
+            self.last_frame = self.last_frame + self.direct_items
+            self.direct_items = []
+
     def call(self, name, args, n):
+        strings = [a.get('chaîne') for a in args if isinstance(a, dict) and 'chaîne' in a]
+        if len(strings) == 3 and strings[2].upper() == '.PAK':
+            # Chemin d'un PAK ouvert à la main : dossier, nom, extension (Path_BuildWithFolder_11166).
+            PAK_FOLDERS[strings[1].upper()] = strings[0].upper()
+            self.opened_pak = strings[1].lower()
+        if name.startswith('IndexedRecordReader_ReadEntryInto') and len(args) == 3:
+            entry = self.ev(args[1])
+            key = self.buffer_key(args[2])
+            if key is not None and isinstance(entry, int) and self.opened_pak:
+                self.buffers[key] = ('pak', self.opened_pak, entry)
+        elif name.startswith('Surface_SaveRect'):
+            self.commit_direct()
+            self.saved_screen = list(self.last_frame)
+        elif name.startswith('Surface_RestoreRect') and self.saved_screen is not None:
+            self.last_frame = list(self.saved_screen)
+            self.direct_items = []
         if name == 'CRT_Strcat' and len(args) == 2 and isinstance(args[0], dict) and 'adresse' in args[0]:
             # Tampon de texte local : seule sa longueur est suivie (noms du joueur pris vides, chaîne
             # du segment de données comptée non vide), pour les tests CRT_Strlen(&tampon) (mid33).
@@ -1086,6 +1160,9 @@ class Player:
         layer.voice_calls += 1
         return 1 if layer.voice_started else 0
 
+    def is_delta(self, res):
+        return self.delta_animation is not None and res is not None and self.delta_animation(res)
+
     def count_of(self, layer):
         if self.image_count is None or layer.res is None:
             return None
@@ -1148,7 +1225,7 @@ class Player:
         return {'key': key, 'kind': 'image', 'res': res, 'image': image, 'x': x, 'y': y, 'clip': clip,
                 'auto': auto, 'loop': loop, 'endrel': endrel}
 
-    def layer_items(self, layer, x, y, out):
+    def layer_items(self, layer, x, y, out, bottom=False):
         ax = x + layer.x + layer.jx
         ay = y + layer.y + layer.jy
         t = layer.type
@@ -1210,6 +1287,12 @@ class Player:
             return
         else:
             img = layer.image if layer.image is not None and layer.image >= 0 else None
+            if bottom and isinstance(img, int) and img > 0 and self.is_delta(layer.res):
+                # Animation par différences dessinée en premier dans sa scène (rien dessous ne la recouvre) :
+                # le jeu n'efface pas l'image hors écran (MIDGAME_SYSTEM.md § 3.1), le format si ; les
+                # images 0 à img - 1 sont redessinées dessous, dans l'ordre (to1mid1, to1mid2).
+                for k in range(img):
+                    out.append(self.item(f'{n}:{k}', layer.res, k, ax, ay))
             out.append(self.item(n, layer.res, img, ax, ay))
         for c in layer.children:
             self.layer_items(c, ax, ay, out)
@@ -1311,8 +1394,8 @@ class Player:
         if scene.terminated:
             return
         items = []
-        for layer in scene.children:
-            self.layer_items(layer, scene.x, scene.y + BAND_TOP, items)
+        for i, layer in enumerate(scene.children):
+            self.layer_items(layer, scene.x, scene.y + BAND_TOP, items, bottom=i == 0)
         self.record(scene.name, scene.fps, items)
         self.last_frame = items
         for layer in scene.children:
@@ -1379,12 +1462,20 @@ def merged_order(frames):
 
 
 def runs(frames, key):
+    """Suites d'images où le nom est présent ; une suite est coupée quand la ressource change (un calque n'a
+    qu'une ressource : to1mid2, image suivante d'un diaporama dessinée sous le même nom après restauration)."""
     out = []
     start = None
+    res = None
     for i, items in enumerate(frames):
-        present = any(it['key'] == key for it in items)
+        it = next((x for x in items if x['key'] == key), None)
+        present = it is not None
+        if present and start is not None and it.get('res') != res:
+            out.append((start, i))
+            start = None
         if present and start is None:
             start = i
+            res = it.get('res')
         if not present and start is not None:
             out.append((start, i))
             start = None
@@ -1535,6 +1626,7 @@ def main():
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import midgame_render
     player.image_count = midgame_render.image_count
+    player.delta_animation = midgame_render.is_delta_animation
     player.voice_seconds = midgame_render.voice_seconds
     player.voice_bytes = midgame_render.voice_bytes
     if subtitles:

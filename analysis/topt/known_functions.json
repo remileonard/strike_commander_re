@@ -2648,5 +2648,25 @@
     "new_name": "Midgame36_Play_AEDE0",
     "segment": "ovr213",
     "summary": "far, cinématique mid36 de Tactical Operations (2026-11-02) : script extrait par tools/midgame_extract.py dans analysis/topt/midgames/mid36.md et .json, fichier analysis/topt/midgames/iff. Fonction entière lue par exécution symbolique, pas commentée ligne à ligne."
+  },
+  "sub_43519": {
+    "new_name": "IndexedRecordReader_ReadEntryInto_43519",
+    "segment": "seg166",
+    "summary": "far, lue 2026-11-02 (cinématique to1mid2). Arguments : lecteur de PAK, numéro d'entrée, tampon (pointeur lointain). Tampon nul : erreur 1D01h (sub_300C1). Numéro différent de 65535 : se place sur l'entrée (`call near ptr sub_436B6` = IndexedRecordReader_AdvanceIndex_436B6), arrêt si échec. Puis selon les bits 64 et 128 du champ +109 du lecteur (`mov ax, [si+6Dh]` / `and ax, 0C0h`) : 0 -> lecture directe (sub_43468, taille [si+65h] + 4) ; 192 -> sub_4148D (taille [si+65h], [si+61h]) ; autre valeur -> erreur 1D00h. Utilisée par to1mid2 pour lire les images de OBJECTS\\EJECT.PAK dans des tampons alloués par la cinématique."
+  },
+  "sub_392F6": {
+    "new_name": "Surface_SaveRect_392F6",
+    "segment": "seg144",
+    "summary": "far, lue en partie 2026-11-02. Arguments : surface (to1mid2 : word_4D36E), tampon lointain, rectangle (4 mots : gauche, haut, droite, bas, lus `mov cx, [si]` / `mov ax, [si+4]` …). Calcule largeur et hauteur du rectangle, le borne à la surface ([bx+4], [bx+6], [bx+8], [bx+0Ah]) et copie entre la surface et le tampon. Sens (surface -> tampon) déduit de l'ordre des appels dans to1mid2 : appelée une fois avant le premier dessin, Surface_RestoreRect_38CDA entre deux dessins."
+  },
+  "sub_38CDA": {
+    "new_name": "Surface_RestoreRect_38CDA",
+    "segment": "seg141",
+    "summary": "far, lue en partie 2026-11-02. Mêmes arguments que Surface_SaveRect_392F6 (surface, tampon lointain, rectangle). Sens (tampon -> surface) déduit de l'ordre des appels dans to1mid2 : appelée entre deux images du diaporama, après Surface_SaveRect_392F6, pour remettre le fond avant l'image suivante."
+  },
+  "sub_11166": {
+    "new_name": "Path_BuildWithFolder_11166",
+    "segment": "seg028",
+    "summary": "far, cinématique to1mid2 : construit un chemin à partir d'un dossier, d'un nom et d'une extension (to1mid2 : \"OBJECTS\", \"EJECT\", \".PAK\"), avant l'ouverture du PAK par la méthode +20 du lecteur. Corps non lu en détail."
   }
 }

@@ -81,10 +81,13 @@ def palette_block(b):
 
 
 def shape_images(b):
-    """Forme RealSpace : uint32 taille, puis table de uint32 (décalages des images)."""
-    first = struct.unpack_from('<I', b, 4)[0]
+    """Forme RealSpace : uint32 taille, puis table de uint32 (décalages des images). L'octet de poids fort
+    d'un décalage est ignoré (193 dans les entrées 0 à 4 de OBJECTS\\EJECT.PAK) : Shape_DrawSpans_38514
+    de TOPTTST1.EXE ne compare que le mot bas du premier décalage (`cmp [si+4], bx`) et calcule le
+    segment sur 16 bits, où cet octet ne tombe pas."""
+    first = struct.unpack_from('<I', b, 4)[0] & 0xFFFFFF
     n = first // 4 - 1
-    return [struct.unpack_from('<I', b, 4 + 4 * i)[0] for i in range(n)]
+    return [struct.unpack_from('<I', b, 4 + 4 * i)[0] & 0xFFFFFF for i in range(n)]
 
 
 @functools.lru_cache(maxsize=None)

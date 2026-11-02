@@ -25,6 +25,7 @@ if '--nom' in sys.argv:
 if '--sous-titres' in sys.argv:
     sys.argv.remove('--sous-titres')
     OPTIONS['sous-titres'] = True
+import functools
 import json
 
 from PIL import Image
@@ -43,7 +44,7 @@ BAND = (0, 24, 319, 151)
 
 
 def pak_path(name):
-    folder = 'GAMEFLOW' if name.upper().startswith('OPT') else 'MIDGAMES'
+    folder = mg.PAK_FOLDERS.get(name.upper()) or ('GAMEFLOW' if name.upper().startswith('OPT') else 'MIDGAMES')
     return os.path.join(GAME, folder, name.upper() + '.PAK')
 
 
@@ -118,6 +119,23 @@ def text_of(form, index):
     return None
 
 
+@functools.lru_cache(maxsize=None)
+def is_delta_animation(res):
+    """Animation par différences : image 0 complète, images suivantes réduites aux pixels qui changent
+    (TO1MID2.PAK de Tactical Operations : 31 329 octets puis 10). Le moteur n'efface pas l'image hors
+    écran entre deux pas de scène (MIDGAME_SYSTEM.md § 3.1) : chaque image se dessine sur la précédente."""
+    from sc_data import shape_images
+    if res is None or res[0] != 'pak':
+        return False
+    shape = pak_entry(pak_path(res[1]), res[2])
+    offs = shape_images(shape) + [len(shape)]
+    sizes = [offs[i + 1] - offs[i] for i in range(len(offs) - 1)]
+    if len(sizes) < 3:
+        return False
+    others = sorted(sizes[1:])
+    return others[len(others) // 2] * 2 < sizes[0]
+
+
 def image_count(res):
     from sc_data import shape_images
     shape = face_shape(res[1]) if res[0] == 'face' else pak_entry(pak_path(res[1]), res[2])
@@ -131,6 +149,7 @@ def run(exact=True, name=None, subtitles=None):
     p = mg.Player(data, {'pri': 'air'}, {})
     if exact:
         p.image_count = image_count
+        p.delta_animation = is_delta_animation
         p.voice_seconds = voice_seconds
         p.voice_bytes = voice_bytes
     if subtitles:

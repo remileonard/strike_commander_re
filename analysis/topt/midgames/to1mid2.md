@@ -68,7 +68,7 @@ palette_depuis(pal2(to1mid2 8))                                                 
 palette_copie(destination=pal1, source=pal2(to1mid2 8))                                               ⟨228100⟩
 palette_envoie(palette=pal1, pas=0)                                                                   ⟨228108⟩
 dessine_image(surface=surface1, x=0, y=27, données=données(to1mid2 6.+0), image=0)                    ⟨228125⟩
-sub_11166(h1, "OBJECTS", "EJECT", ".PAK")                                                             ⟨228152⟩
+Path_BuildWithFolder_11166(h1, "OBJECTS", "EJECT", ".PAK")                                            ⟨228152⟩
 pak_vide()→0.méthode20(h1, 1)                                                                         ⟨228159⟩
 tableau_objets(objets1 : 3 objets de 10 octets)                                                       ⟨228168⟩
 v58 = 0                                                                                               ⟨228170⟩
@@ -93,7 +93,7 @@ tant que di < 3 :
     si pak_vide()→109 & 192 == 192 :
         v59 = 0                                                                                       ⟨228257⟩
         aller à loc_7B345                                                                             ⟨228258⟩
-    sub_43519(pak_vide(), di + 5, données(objets1[di]→0))                                             ⟨228287⟩
+    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), di + 5, données(objets1[di]→0))               ⟨228287⟩
     di = di + 1                                                                                       ⟨228289⟩
 loc_7B345:                                                                                            ⟨228296⟩
 
@@ -117,15 +117,15 @@ v86 = 3                                                                         
 v85 = 1                                                                                               ⟨228343⟩
 v84 = 0                                                                                               ⟨228344⟩
 v84 = -1536                                                                                           ⟨228345⟩
-sub_392F6(word_4D36E, données(v90), &v80)                                                             ⟨228359⟩
+Surface_SaveRect_392F6(word_4D36E, données(v90), &v80)                                                ⟨228359⟩
 dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+0), image=0)                       ⟨228376⟩
 v94 = 8                                                                                               ⟨228378⟩
 attend(chronomètre=objet1)                                                                            ⟨228383⟩
-sub_38CDA(word_4D36E, données(v90), &v80)                                                             ⟨228398⟩
+Surface_RestoreRect_38CDA(word_4D36E, données(v90), &v80)                                             ⟨228398⟩
 dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+10), image=0)                      ⟨228415⟩
 v94 = 8                                                                                               ⟨228417⟩
 attend(chronomètre=objet1)                                                                            ⟨228422⟩
-sub_38CDA(word_4D36E, données(v90), &v80)                                                             ⟨228437⟩
+Surface_RestoreRect_38CDA(word_4D36E, données(v90), &v80)                                             ⟨228437⟩
 dessine_image(surface=surface1, x=0, y=0, données=données(objets1.+20), image=0)                      ⟨228454⟩
 v94 = 45                                                                                              ⟨228456⟩
 attend(chronomètre=objet1)                                                                            ⟨228461⟩
@@ -139,9 +139,9 @@ v52 = 0                                                                         
 CRT_Doprnt_Core(objets1, 10, 3, 1, sub_479E0)                                                         ⟨228511⟩
 v30 = 0                                                                                               ⟨228534⟩
 v20 = 0                                                                                               ⟨228552⟩
-sub_11166(h2, "OBJECTS", "EJECT", ".PAK")                                                             ⟨228582⟩
+Path_BuildWithFolder_11166(h2, "OBJECTS", "EJECT", ".PAK")                                            ⟨228582⟩
 pak_vide()→0.méthode20(h2, 1)                                                                         ⟨228589⟩
-sub_11166(h3, "OBJECTS", "EJECT", ".PAK")                                                             ⟨228612⟩
+Path_BuildWithFolder_11166(h3, "OBJECTS", "EJECT", ".PAK")                                            ⟨228612⟩
 pak_vide()→0.méthode20(h3, 1)                                                                         ⟨228619⟩
 charge(to1mid2 7)                                                                                     ⟨228631⟩
 v48 = 0                                                                                               ⟨228633⟩
@@ -158,7 +158,7 @@ v44 = 3                                                                         
 v43 = 1                                                                                               ⟨228668⟩
 pal2(to1mid2 8).+0 = 0                                                                                ⟨228669⟩
 si v48 != 0 :
-    sub_43519(pak_vide(), 2, données(v48))                                                            ⟨228686⟩
+    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), 2, données(v48))                              ⟨228686⟩
 si v48 != 0 :
     v57 = 1                                                                                           ⟨228692⟩
 sinon :
@@ -181,7 +181,7 @@ tant que di < 5 :
     si pak_vide()→109 & 192 == 192 :
         v57 = 0                                                                                       ⟨228788⟩
         aller à loc_7B933                                                                             ⟨228789⟩
-    sub_43519(pak_vide(), di, données(objets2[di]→0))                                                 ⟨228816⟩
+    IndexedRecordReader_ReadEntryInto_43519(pak_vide(), di, données(objets2[di]→0))                   ⟨228816⟩
     di = di + 1                                                                                       ⟨228818⟩
 loc_7B933:                                                                                            ⟨228825⟩
 v70 = booléen                                                                                         ⟨228827⟩
@@ -215,8 +215,8 @@ charge(to1mid2 5)                                                               
 v39 = 0                                                                                               ⟨229059⟩
 palette_depuis(pal2(to1mid2 5))                                                                       ⟨229064⟩
 
-──── &objets2+16 ────
-&objets2+16 = Scene_Create(cadence=20, palette=255, surface=surface1)                                 ⟨229072⟩
+──── scène4 ────
+scène4 = Scene_Create(cadence=20, palette=255, surface=surface1)                                      ⟨229072⟩
 c4 = OverlayImageLayer(ressource=to1mid2 4, x=0, y=-27, image=0)                                      ⟨229080⟩
 di = c4                                                                                               ⟨229082⟩
 palette_copie(destination=pal1, source=pal2(to1mid2 5))                                               ⟨229090⟩

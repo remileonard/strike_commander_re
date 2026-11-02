@@ -289,6 +289,7 @@ class Extractor:
         self.objects = {}
         self.counters = {}
         self.tables = []
+        self.scene_at = {}
         self.local_names = {}
         self.arg_names = {}
 
@@ -1388,6 +1389,7 @@ def apply(self, run, target, spec, args, line):
                     obj = self.new_obj('scene', 'scène')
                     run.found_regions.setdefault(off, []).append((run.k, 33, obj.id))
                     oid = obj.id
+                    self.scene_at[(run.addr, run.k)] = obj
             else:
                 if off is None:
                     for start, entries in run.regions.items():
@@ -1397,6 +1399,12 @@ def apply(self, run, target, spec, args, line):
                 hit = run.region_at(off) if off is not None else None
                 if hit and hit[0] == off:
                     oid = hit[1]
+        if not oid and run.pass_no != 1 and (run.addr, run.k) in self.scene_at:
+            # Zone de la scène retirée en 2e passe parce qu'elle chevauche une autre (to1mid2 : la scène prend
+            # la place du tableau objets2, lue comme objets2+16) : la scène créée par cette instruction en 1re passe.
+            obj = self.scene_at[(run.addr, run.k)]
+            self.objects[obj.id] = obj
+            oid = obj.id
         if oid:
             objv = ('obj', oid)
         run.emit(('scene', self.render(objv), self.render(named.get('cadence')), self.render(named.get('palette')), self.render(named.get('surface')), line))
