@@ -9,14 +9,14 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 3103 | `sub_7B035` | `Player_ShotDownSequence_7B035` | ovr239 |
 | 2373 | `sub_781D0` | `AI_ManeuverSolutionMain_781D0` | ovr232 |
 | 1877 | `sub_51106` | `Expr_VM_Interpreter_51106` | seg114 |
-| 1390 | `sub_90D20` | `Cockpit_LoadAndInitFull_90D20` | ovr267 |
+| 1390 | `sub_90D20` | `Options_ConfigurationScreen_90D20` | ovr267 |
 | 1081 | `sub_7D31A` | `Player_EjectSequence_7D31A` | ovr240 |
 | 1080 | `sub_7EDCA` | `NavMap_DrawMissionObjects_7EDCA` | ovr241 |
-| 1023 | `sub_93295` | `ResourceFile_LoadTypeE_93295` | ovr269 |
-| 1017 | `sub_91D29` | `ResourceFile_LoadTypeB_91D29` | ovr268 |
-| 832 | `sub_9277C` | `ResourceFile_LoadTypeC_9277C` | ovr268 |
+| 1023 | `sub_93295` | `Options_CockpitScreen_93295` | ovr269 |
+| 1017 | `sub_91D29` | `Options_DetailScreen_91D29` | ovr268 |
+| 832 | `sub_9277C` | `Options_ExitGameScreen_9277C` | ovr268 |
 | 816 | `sub_86B53` | `MissionRecord_LoadFullDatabase_86B53` | ovr249 |
-| 809 | `sub_90097` | `ResourceFile_LoadTypeA_90097` | ovr266 |
+| 809 | `sub_90097` | `Options_FlightScreen_90097` | ovr266 |
 | 807 | `sub_742FC` | `AircraftDamageModel_ReleaseComponentArray_742FC` | ovr228 |
 | 796 | `sub_7A054` | `Autopilot_JumpSequence_7A054` | ovr233 |
 | 775 | `sub_A8331` | `MissionScenario_LoadMainRecord_A8331` | seg456 |
@@ -30,14 +30,14 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 685 | `sub_52513` | `Expr_VM_CallNativeFunction_52513` | seg114 |
 | 675 | `sub_621A2` | `Render_DrawScaledSprite_621A2` | seg175 |
 | 666 | `sub_95800` | `AircraftComponent_LoadFieldSequence_95800` | ovr275 |
-| 650 | `sub_93BA5` | `ResourceFile_LoadTypeF_93BA5` | ovr269 |
+| 650 | `sub_93BA5` | `Options_CamerasScreen_93BA5` | ovr269 |
 | 645 | `sub_4FBF1` | `UIScreen_StateMachineMain_4FBF1` | seg112 |
 | 628 | `sub_862A5` | `AITargeting_ComputeFullSolution_862A5` | ovr248 |
 | 619 | `sub_82DEB` | `HUDSymbol_RenderWithClipTestD_82DEB` | ovr244 |
 | 610 | `sub_8EEBC` | `Config_LoadAndApplySettings_8EEBC` | ovr265 |
 | 599 | `sub_99120` | `IndexedRecordReader_ScanAndReadTyped_99120` | ovr291 |
 | 594 | `sub_765B2` | `Landing_Phase3_TouchdownRoll_765B2` | ovr230 |
-| 580 | `sub_9416A` | `ResourceFile_LoadTypeG_9416A` | ovr269 |
+| 580 | `sub_9416A` | `Options_AudioScreen_9416A` | ovr269 |
 | 577 | `sub_9D910` | `Collision_OnTerrainContact_9D910` | ovr316 |
 | 558 | `sub_75D51` | `Landing_Phase1_SetupApproach_75D51` | ovr230 |
 | 552 | `sub_AA84E` | `AudioQueue_ProcessMain_AA84E` | seg458 |
@@ -51,7 +51,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 492 | `sub_A8F22` | `Mission_WriteResultReport_A8F22` (lue 2026-10-22) | seg456 |
 | 482 | `sub_7E1B4` | `Font_LoadDefinitionFromIFF_7E1B4` | ovr241 |
 | 481 | `sub_6106E` | `Render_DrawFilledEllipse_6106E` | seg167 |
-| 477 | `sub_92E60` | `ResourceFile_LoadTypeD_92E60` | ovr269 |
+| 477 | `sub_92E60` | `Options_GameplayScreen_92E60` | ovr269 |
 | 476 | `sub_53A94` | `UIScreen_BuildWidgetTree_53A94` | seg114 |
 | 474 | `sub_82181` | `HUDSymbol_RenderWithLOSCheckB_82181` | ovr243 |
 | 463 | `sub_9A566` | `TerrainSector_AllocateArray_9A566` | ovr295 |

@@ -1662,7 +1662,7 @@ EntityTracker_ApplySelection	endp
 ; (vtable[0x14]==4), déclenche sub_6BC03 sur un champ (+0x60) sinon : traitement de l'entrée
 ; sélectionnée du journal (probable action 'centrer la carte sur cet objectif').
 ; ==============================================================================================
-Kneeboard_ProcessSelected	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+D7CP
+Kneeboard_ProcessSelected	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+D7CP
 
 var_8		= dword	ptr -8
 arg_0		= word ptr  6

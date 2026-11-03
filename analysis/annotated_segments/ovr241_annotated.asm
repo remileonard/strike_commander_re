@@ -3756,7 +3756,7 @@ loc_7F77B:				; CODE XREF: Cockpit_ProcessInputFrame_7F6EE+88j
 		mov	eax, dword_711CD
 		mov	[bp+var_E], eax
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		mov	[bp+var_F], al
 		cmp	word_72350, 4

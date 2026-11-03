@@ -418,10 +418,15 @@ Cockpit_ReadControlsFrameB_8F900	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 118 lignes, NON DÉTAILLÉE — combine UI_ApplyEncodingHelper_5E576 (seg143),
-; Shape_DrawSpans_61F52 (seg174, ×2).
+; far, LUE 2026-11-03. Dessin d'un panneau d'options (ex-nom « Cockpit_DrawEncodedText_8FA4C
+; »). Arguments : structure de configuration, fenêtre, images (SHP), numéro de l'image du bas,
+; drapeau. VROOMM_StubThunk_6C7B7 ; si byte_721F0 ≠ 2 : UI_ApplyEncodingHelper_5E576(5196h,
+; word_70E62) (recopie du tampon de l'écran du vol, sens déduit) ; si drapeau : image 0 en (5,
+; 4) (push large 40005h, Shape_DrawSpans_61F52) ; image demandée en (5, 39) (push large
+; 270005h) ; VROOMM_StubThunk_6C7BC. Appelée par Options_ConfigurationScreen_90D20 (image 1,
+; drapeau 1) et Options_FlightScreen_90097.
 ; ==============================================================================================
-Cockpit_DrawEncodedText_8FA4C	proc far		; CODE XREF: VROOMM_StubThunk_6B785J ResourceFile_LoadTypeA_90097+77Fp
+Options_DrawPanel_8FA4C	proc far		; CODE XREF: VROOMM_StubThunk_6B785J Options_FlightScreen_90097+77Fp
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -443,10 +448,10 @@ arg_A		= byte ptr  10h
 		jmp	short loc_8FA6B
 ; ���������������������������������������������������������������������������
 
-loc_8FA69:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+16j
+loc_8FA69:				; CODE XREF: Options_DrawPanel_8FA4C+16j
 		xor	ax, ax
 
-loc_8FA6B:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+1Bj
+loc_8FA6B:				; CODE XREF: Options_DrawPanel_8FA4C+1Bj
 		or	ax, ax
 		jz	short loc_8FA9D
 		xor	dx, dx
@@ -468,18 +473,18 @@ loc_8FA6B:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+1Bj
 		jmp	short loc_8FAAC
 ; ���������������������������������������������������������������������������
 
-loc_8FA9B:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+42j
+loc_8FA9B:				; CODE XREF: Options_DrawPanel_8FA4C+42j
 		jmp	short loc_8FAAC
 ; ���������������������������������������������������������������������������
 
-loc_8FA9D:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+21j
+loc_8FA9D:				; CODE XREF: Options_DrawPanel_8FA4C+21j
 		push	word_70E62
 		push	5196h
 		call	UI_ApplyEncodingHelper_5E576
 		add	sp, 4
 
-loc_8FAAC:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+4Dj
-					; Cockpit_DrawEncodedText_8FA4C:loc_8FA9Bj
+loc_8FAAC:				; CODE XREF: Options_DrawPanel_8FA4C+4Dj
+					; Options_DrawPanel_8FA4C:loc_8FA9Bj
 		cmp	[bp+arg_A], 0
 		jz	short loc_8FACA
 
@@ -493,7 +498,7 @@ loc_8FAB8:
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_8FACA:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+64j
+loc_8FACA:				; CODE XREF: Options_DrawPanel_8FA4C+64j
 		push	[bp+arg_8]
 		push	large [bp+arg_4]
 		push	large 270005h
@@ -506,10 +511,10 @@ loc_8FACA:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+64j
 		jmp	short loc_8FAF1
 ; ���������������������������������������������������������������������������
 
-loc_8FAEF:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+9Cj
+loc_8FAEF:				; CODE XREF: Options_DrawPanel_8FA4C+9Cj
 		xor	ax, ax
 
-loc_8FAF1:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+A1j
+loc_8FAF1:				; CODE XREF: Options_DrawPanel_8FA4C+A1j
 		or	ax, ax
 		jz	short loc_8FB20
 		xor	dx, dx
@@ -530,15 +535,15 @@ loc_8FAF1:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+A1j
 		pop	cx
 		jmp	short $+2
 
-loc_8FB20:				; CODE XREF: Cockpit_DrawEncodedText_8FA4C+A7j
-					; Cockpit_DrawEncodedText_8FA4C+C7j
+loc_8FB20:				; CODE XREF: Options_DrawPanel_8FA4C+A7j
+					; Options_DrawPanel_8FA4C+C7j
 		push	si
 		call	VROOMM_StubThunk_6C7BC
 		pop	cx
 		pop	si
 		pop	bp
 		retf
-Cockpit_DrawEncodedText_8FA4C	endp
+Options_DrawPanel_8FA4C	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -601,10 +606,10 @@ Cockpit_ApplyEncodingWrapper_8FB2A	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, construit un StreamReader et écrit un champ typé (StreamReader_WriteTyped_6568F,
-; seg195).
+; far. Bouton SAVE : écrit la structure de configuration dans OPTIONS.CFG (nom en DGROUP 5210
+; = push 145Ah, StreamReader_WriteTyped_6568F). Ex-nom « Config_WriteSettingsField_8FB73 ».
 ; ==============================================================================================
-Config_WriteSettingsField_8FB73	proc far		; CODE XREF: VROOMM_StubThunk_6B78FJ
+Options_SaveConfig_8FB73	proc far		; CODE XREF: VROOMM_StubThunk_6B78FJ
 
 var_66		= word ptr -66h
 var_9		= dword	ptr -9
@@ -653,7 +658,7 @@ arg_0		= word ptr  6
 		pop	si
 		leave
 		retf
-Config_WriteSettingsField_8FB73	endp
+Options_SaveConfig_8FB73	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -766,7 +771,7 @@ loc_8FC94:				; CODE XREF: CRT_DisplayCalibrationMessage_8FC61+19j
 		push	si
 		nop
 		push	cs
-		call	near ptr Config_ReadSettingsFieldWithMessage_8FD2A
+		call	near ptr Options_LoadDefaults_8FD2A
 		jmp	short loc_8FCB2
 ; ���������������������������������������������������������������������������
 
@@ -847,9 +852,12 @@ Config_WriteSettingsFieldB_8FCB6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, combine CRT_Write_TextMode et lecture de champ typé.
+; far. Bouton DEFAULT : CRT_Write_TextMode, lit OPTDFLT.CFG (nom en DGROUP 5222 = push 1466h,
+; StreamReader_ReadTyped_63FA1) dans la structure de configuration,
+; VROOMM_StubThunk_6B70F(9025h), puis Cockpit_ReadControlsFrame_8F720 (applique les réglages).
+; Ex-nom « Config_ReadSettingsFieldWithMessage_8FD2A ».
 ; ==============================================================================================
-Config_ReadSettingsFieldWithMessage_8FD2A	proc far		; CODE XREF: VROOMM_StubThunk_6B79EJ CRT_DisplayCalibrationMessage_8FC61+47p
+Options_LoadDefaults_8FD2A	proc far		; CODE XREF: VROOMM_StubThunk_6B79EJ CRT_DisplayCalibrationMessage_8FC61+47p
 
 var_66		= word ptr -66h
 var_9		= dword	ptr -9
@@ -904,7 +912,7 @@ arg_0		= word ptr  6
 		jmp	short loc_8FDB7
 ; ���������������������������������������������������������������������������
 
-loc_8FDAE:				; CODE XREF: Config_ReadSettingsFieldWithMessage_8FD2A+19j
+loc_8FDAE:				; CODE XREF: Options_LoadDefaults_8FD2A+19j
 		push	9025h
 
 loc_8FDB1:
@@ -913,7 +921,7 @@ loc_8FDB1:
 loc_8FDB6:
 		pop	cx
 
-loc_8FDB7:				; CODE XREF: Config_ReadSettingsFieldWithMessage_8FD2A+82j
+loc_8FDB7:				; CODE XREF: Options_LoadDefaults_8FD2A+82j
 		push	si
 		push	cs
 		call	near ptr Cockpit_ReadControlsFrame_8F720
@@ -921,7 +929,7 @@ loc_8FDB7:				; CODE XREF: Config_ReadSettingsFieldWithMessage_8FD2A+82j
 		pop	si
 		leave
 		retf
-Config_ReadSettingsFieldWithMessage_8FD2A	endp
+Options_LoadDefaults_8FD2A	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -933,7 +941,7 @@ Config_ReadSettingsFieldWithMessage_8FD2A	endp
 ; Joystick_GetButtonRawByte_67B82/InitCalibrationDefaults_67B92 (seg208),
 ; Shape_DrawSpans_61F52.
 ; ==============================================================================================
-Cockpit_LoadAndDrawCalibration_8FDC0	proc far		; CODE XREF: VROOMM_StubThunk_6B7B7J ResourceFile_LoadTypeA_90097+7C8p
+Cockpit_LoadAndDrawCalibration_8FDC0	proc far		; CODE XREF: VROOMM_StubThunk_6B7B7J Options_FlightScreen_90097+7C8p
 
 var_6A		= word ptr -6Ah
 var_D		= dword	ptr -0Dh
@@ -1262,12 +1270,13 @@ Cockpit_LoadAndDrawCalibration_8FDC0	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 809 lignes, NON DÉTAILLÉE — premier d'une famille de grosses fonctions de
-; chargement de fichier ressource quasi identiques dans leur ouverture (Path_ResolveDataFile,
-; StreamReader_ConstructVariantA_63A39, GetCapacity_64062) — voir aussi ovr267-269. Candidat
-; pour session dédiée.
+; ⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « FLIGHT » du panneau CONFIGURATION
+; (Options_ConfigurationScreen_90D20) : charge FONTS\\FLITOPT.SHP (chaînes « flitopt » et «
+; .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056,
+; contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-ResourceFile_LoadTypeA_90097	proc far		; CODE XREF: VROOMM_StubThunk_6B7B2J
+Options_FlightScreen_90097	proc far		; CODE XREF: VROOMM_StubThunk_6B7B2J
 
 var_19A		= word ptr -19Ah
 var_13D		= dword	ptr -13Dh
@@ -1455,7 +1464,7 @@ loc_901C0:
 		mov	[bp+var_6], ax
 		mov	di, ax
 
-loc_90216:				; CODE XREF: ResourceFile_LoadTypeA_90097+16Cj
+loc_90216:				; CODE XREF: Options_FlightScreen_90097+16Cj
 		push	0
 		call	Joystick_GetButtonRawByte_67B82
 		pop	cx
@@ -1484,7 +1493,7 @@ loc_90216:				; CODE XREF: ResourceFile_LoadTypeA_90097+16Cj
 		mov	[bp+var_1E], ax
 		mov	[bp+var_1C], ax
 
-loc_90263:				; CODE XREF: ResourceFile_LoadTypeA_90097+18Bj
+loc_90263:				; CODE XREF: Options_FlightScreen_90097+18Bj
 		push	large 0C7013Fh
 		push	large 0
 		lea	ax, [bp+var_E4]
@@ -1496,7 +1505,7 @@ loc_90263:				; CODE XREF: ResourceFile_LoadTypeA_90097+18Bj
 		mov	[bp+var_95], 0
 		jmp	short $+2
 
-loc_90287:				; CODE XREF: ResourceFile_LoadTypeA_90097+1E7j
+loc_90287:				; CODE XREF: Options_FlightScreen_90097+1E7j
 		push	large 0
 		push	[bp+var_E]
 		push	[bp+var_C]
@@ -1581,10 +1590,10 @@ loc_90287:				; CODE XREF: ResourceFile_LoadTypeA_90097+1E7j
 		jmp	short loc_903B2
 ; ���������������������������������������������������������������������������
 
-loc_903B0:				; CODE XREF: ResourceFile_LoadTypeA_90097+29Fj
+loc_903B0:				; CODE XREF: Options_FlightScreen_90097+29Fj
 		mov	ax, di
 
-loc_903B2:				; CODE XREF: ResourceFile_LoadTypeA_90097+317j
+loc_903B2:				; CODE XREF: Options_FlightScreen_90097+317j
 		push	ax
 
 loc_903B3:
@@ -1644,10 +1653,10 @@ loc_903C4:
 		jmp	short loc_9045A
 ; ���������������������������������������������������������������������������
 
-loc_90458:				; CODE XREF: ResourceFile_LoadTypeA_90097+347j
+loc_90458:				; CODE XREF: Options_FlightScreen_90097+347j
 		mov	ax, di
 
-loc_9045A:				; CODE XREF: ResourceFile_LoadTypeA_90097+3BFj
+loc_9045A:				; CODE XREF: Options_FlightScreen_90097+3BFj
 		push	ax
 		lea	ax, [bp+var_E4]
 		push	ax
@@ -1699,10 +1708,10 @@ loc_904AE:
 		jmp	short loc_90502
 ; ���������������������������������������������������������������������������
 
-loc_90500:				; CODE XREF: ResourceFile_LoadTypeA_90097+3EFj
+loc_90500:				; CODE XREF: Options_FlightScreen_90097+3EFj
 		mov	ax, di
 
-loc_90502:				; CODE XREF: ResourceFile_LoadTypeA_90097+467j
+loc_90502:				; CODE XREF: Options_FlightScreen_90097+467j
 		push	ax
 		lea	ax, [bp+var_E4]
 		push	ax
@@ -1725,7 +1734,7 @@ loc_90502:				; CODE XREF: ResourceFile_LoadTypeA_90097+467j
 		jmp	loc_905C0
 ; ���������������������������������������������������������������������������
 
-loc_90537:				; CODE XREF: ResourceFile_LoadTypeA_90097+49Bj
+loc_90537:				; CODE XREF: Options_FlightScreen_90097+49Bj
 		push	large 0B0088h
 		push	large 92005Dh
 		push	ax
@@ -1764,10 +1773,10 @@ loc_905B1:
 		jmp	short loc_905C2
 ; ���������������������������������������������������������������������������
 
-loc_905C0:				; CODE XREF: ResourceFile_LoadTypeA_90097+49Dj
+loc_905C0:				; CODE XREF: Options_FlightScreen_90097+49Dj
 		mov	ax, di
 
-loc_905C2:				; CODE XREF: ResourceFile_LoadTypeA_90097+527j
+loc_905C2:				; CODE XREF: Options_FlightScreen_90097+527j
 		push	ax
 
 loc_905C3:
@@ -1825,10 +1834,10 @@ loc_905C3:
 		jmp	short loc_90678
 ; ���������������������������������������������������������������������������
 
-loc_90676:				; CODE XREF: ResourceFile_LoadTypeA_90097+563j
+loc_90676:				; CODE XREF: Options_FlightScreen_90097+563j
 		mov	ax, di
 
-loc_90678:				; CODE XREF: ResourceFile_LoadTypeA_90097+5DDj
+loc_90678:				; CODE XREF: Options_FlightScreen_90097+5DDj
 		push	ax
 		lea	ax, [bp+var_E4]
 		push	ax
@@ -1899,7 +1908,7 @@ loc_906C3:
 		jmp	loc_907CF
 ; ���������������������������������������������������������������������������
 
-loc_90748:				; CODE XREF: ResourceFile_LoadTypeA_90097+6ACj
+loc_90748:				; CODE XREF: Options_FlightScreen_90097+6ACj
 		push	large 0B003Bh
 		push	large 0B00083h
 		push	ax
@@ -1934,10 +1943,10 @@ loc_90748:				; CODE XREF: ResourceFile_LoadTypeA_90097+6ACj
 		jmp	short loc_907D1
 ; ���������������������������������������������������������������������������
 
-loc_907CF:				; CODE XREF: ResourceFile_LoadTypeA_90097+6AEj
+loc_907CF:				; CODE XREF: Options_FlightScreen_90097+6AEj
 		mov	ax, di
 
-loc_907D1:				; CODE XREF: ResourceFile_LoadTypeA_90097+736j
+loc_907D1:				; CODE XREF: Options_FlightScreen_90097+736j
 		push	ax
 		lea	ax, [bp+var_E4]
 		push	ax
@@ -1963,14 +1972,14 @@ loc_907D1:				; CODE XREF: ResourceFile_LoadTypeA_90097+736j
 		push	di
 		push	si
 		push	cs
-		call	near ptr Cockpit_DrawEncodedText_8FA4C
+		call	near ptr Options_DrawPanel_8FA4C
 		add	sp, 0Ch
 		push	di
 		call	VROOMM_StubThunk_6C996
 		jmp	loc_908C5
 ; ���������������������������������������������������������������������������
 
-loc_90825:				; CODE XREF: ResourceFile_LoadTypeA_90097+835j
+loc_90825:				; CODE XREF: Options_FlightScreen_90097+835j
 		push	0
 		push	di
 		call	VROOMM_StubThunk_6C9B4
@@ -2011,38 +2020,38 @@ loc_90825:				; CODE XREF: ResourceFile_LoadTypeA_90097+835j
 		add	sp, 0Ch
 		call	TextScrollDisplayB_ApplyHelperC_67F26
 
-loc_9089C:				; CODE XREF: ResourceFile_LoadTypeA_90097+79Dj
-					; ResourceFile_LoadTypeA_90097+7A9j
+loc_9089C:				; CODE XREF: Options_FlightScreen_90097+79Dj
+					; Options_FlightScreen_90097+7A9j
 		cmp	word ptr [si+62h], 1
 		jnz	short loc_908AD
 		cmp	word ptr [si+60h], 1
 		jnz	short loc_908AD
 		mov	word ptr [si+62h], 0
 
-loc_908AD:				; CODE XREF: ResourceFile_LoadTypeA_90097+809j
-					; ResourceFile_LoadTypeA_90097+80Fj
+loc_908AD:				; CODE XREF: Options_FlightScreen_90097+809j
+					; Options_FlightScreen_90097+80Fj
 		cmp	word ptr [si+62h], 0
 		jnz	short loc_908BE
 		cmp	word ptr [si+60h], 0
 		jnz	short loc_908BE
 		mov	word ptr [si+62h], 5
 
-loc_908BE:				; CODE XREF: ResourceFile_LoadTypeA_90097+81Aj
-					; ResourceFile_LoadTypeA_90097+820j
+loc_908BE:				; CODE XREF: Options_FlightScreen_90097+81Aj
+					; Options_FlightScreen_90097+820j
 		push	di
 		mov	bx, [di+0Eh]
 
 loc_908C2:
 		call	dword ptr [bx+18h]
 
-loc_908C5:				; CODE XREF: ResourceFile_LoadTypeA_90097+78Bj
+loc_908C5:				; CODE XREF: Options_FlightScreen_90097+78Bj
 		pop	cx
 		cmp	[bp+var_2], 0
 		jnz	short loc_908CF
 		jmp	loc_90825
 ; ���������������������������������������������������������������������������
 
-loc_908CF:				; CODE XREF: ResourceFile_LoadTypeA_90097+833j
+loc_908CF:				; CODE XREF: Options_FlightScreen_90097+833j
 		push	di
 		call	VROOMM_StubThunk_6C9BE
 		pop	cx
@@ -2061,8 +2070,8 @@ loc_908CF:				; CODE XREF: ResourceFile_LoadTypeA_90097+833j
 		add	sp, 8
 		jmp	short $+2
 
-loc_908FC:				; CODE XREF: ResourceFile_LoadTypeA_90097+843j
-					; ResourceFile_LoadTypeA_90097+84Aj
+loc_908FC:				; CODE XREF: Options_FlightScreen_90097+843j
+					; Options_FlightScreen_90097+84Aj
 		mov	dword ptr [si+14h], 0
 		mov	byte ptr [si+19h], 0
 		mov	dword ptr [si+1Ah], 0
@@ -2075,7 +2084,7 @@ loc_908FC:				; CODE XREF: ResourceFile_LoadTypeA_90097+843j
 		pop	si
 		leave
 		retf
-ResourceFile_LoadTypeA_90097	endp
+Options_FlightScreen_90097	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������

@@ -164,7 +164,7 @@ Mouse_QueryReset	endp
 ; selon sub_67B82 (souris présente?) : dispatcher de configuration du périphérique de pointage
 ; actif.
 ; ==============================================================================================
-Input_PointerConfigDispatch	proc far		; CODE XREF: Config_ReadCalibration+1CP
+Input_PointerConfigDispatch	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+1CP
 
 arg_0		= word ptr  6
 

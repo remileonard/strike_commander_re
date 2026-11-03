@@ -792,7 +792,7 @@ Joystick_TestButtonMasked_67B6C	endp
 ; far, lit un octet brut de bouton (table 0x5DD0). Référencée par sub_26F7E et
 ; TextRenderer_Main (sub_27477).
 ; ==============================================================================================
-Joystick_GetButtonRawByte_67B82	proc far		; CODE XREF: Config_ReadCalibration+10AP
+Joystick_GetButtonRawByte_67B82	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+10AP
 					; TextRenderer_Main+7D1P ...
 
 arg_0		= byte ptr  6

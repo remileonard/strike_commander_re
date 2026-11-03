@@ -2478,16 +2478,16 @@ Lecteur : `World_LoadLGHTChunk_A7A10` objet jeu de lumières `5A9Ah` (fonctions 
 
 - `Config_LoadOrCreate_26F2B` (seg047) + `Config_LoadAndApplySettings_8EEBC`
   (610 L, ovr265) : fichier **`sc.cfg`** (confirmé seg339) via StreamReader typé ;
-  `Config_ReadCalibration_26F7E` = calibration joystick selon le mode
-  (`byte_722D0/D1/D3`). `Config_ReadSettingsField_8FBE7` /
-  `WriteSettingsField_8FB73` = champ typé r/w.
+  ~~`Config_ReadCalibration_26F7E`~~ : ce sont les **touches ALT du vol**, renommé
+  `Input_AltKeyCommands_26F7E` (2026-11-03, `OPTIONS_SCREEN.md`). `Config_ReadSettingsField_8FBE7` ;
+  `Options_SaveConfig_8FB73` écrit `OPTIONS.CFG`.
 - `SaveGame_ReadFile_A1173` / `WriteFile_A10C0` (seg441) : bascule mode vidéo →
   `File_Open/Create` → `File_Read/WriteOrDelegateToPaged` (support gros fichier via
   mémoire paginée) → `Close`. **Pas de format IFF** : blob binaire direct.
-- `Cockpit_LoadAndInitFull_90D20` (1390 L, ovr267) : `COCKPITS\*` + `EMS_MapPage`
-  (le cockpit vit en mémoire paginée) + `UI_ApplyEncodingHelper` + StreamReader.
-  Écrans d'options `.shp` (seg339) : `joycalib`, `mouse`, `flitopt`, `mainopt`,
-  `detlopt`, `restart`, `gameopt`, `cockopt`, `camropt`, `audiopt`.
+- ~~`Cockpit_LoadAndInitFull_90D20`~~ : c'est le **panneau CONFIGURATION** (ALT+O), renommé
+  `Options_ConfigurationScreen_90D20` ; il charge `FONTS\MAINOPT.SHP`, pas `COCKPITS`. Écrans
+  d'options `.shp` (seg339) : `joycalib`, `mouse`, `flitopt`, `mainopt`, `detlopt`, `restart`,
+  `gameopt`, `cockopt`, `camropt`, `audiopt` — voir `OPTIONS_SCREEN.md` (2026-11-03).
 
 ### 6.10 Textes / dialogues / audio
 
@@ -2510,10 +2510,9 @@ Lecteur : `World_LoadLGHTChunk_A7A10` objet jeu de lumières `5A9Ah` (fonctions 
 - `UIWidget_LoadDefinitionFromIFF_8D66C` (394 L, ovr258) /
   `UIWidget_LoadFieldsFromIFF_8DB90` (ovr259) : définitions de widgets (IFF,
   `ReadFinalField` répété).
-- `ResourceFile_LoadTypeA…G` (ovr266-269) : **7 grosses fonctions quasi
-  identiques** (470–1400 L), même ouverture (`Path_ResolveDataFile` +
-  `StreamReader_ConstructVariantA` + `GetCapacity`) — à quels 7 types de fichiers
-  elles correspondent reste à établir.
+- ~~`ResourceFile_LoadTypeA…G`~~ (ovr266-269) : ce sont les **sous-écrans du panneau CONFIGURATION**
+  (FLIGHT, DETAIL, EXIT GAME, GAMEPLAY, COCKPIT, CAMERAS, AUDIO), renommés `Options_*Screen_*`
+  (2026-11-03, `OPTIONS_SCREEN.md`) ; leur ouverture commune est le chargement de leur `.SHP`.
 
 ---
 
@@ -2648,8 +2647,8 @@ Fichier .IFF
    `A9956`/`A974A`/`AA6C9`/… seg457), le contenu du chunk `PROG` (bytecode Expr VM),
    le rôle exact de `SCNE.heading` (`+0x0A`, candidat cap), et
    `Player_ShotDownSequence_7B035` (3103 L, séquence « avion du joueur détruit », corps à lire).
-4. **`ResourceFile_LoadTypeA…G`** (ovr266-269, 7 fonctions 470–1400 L quasi
-   identiques) — identifier les 7 types de fichiers correspondants.
+4. ~~**`ResourceFile_LoadTypeA…G`**~~ : identifiés (sous-écrans d'options, `OPTIONS_SCREEN.md`) ;
+   leurs corps restent à lire.
 5. **LZW** — la table de dictionnaire n'a pas été tracée (seul le paramétrage
    9 → 12 bits, clear `0x100`, EOD `0x101` est confirmé).
 6. **Format `.shp`** des écrans d'options — non analysé.

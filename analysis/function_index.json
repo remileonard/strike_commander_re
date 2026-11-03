@@ -5324,8 +5324,8 @@
 "sub_5AA73",
 "sub_5AB79"
 ],
-"new_name": "Config_ReadCalibration",
-"summary": "far,292L — vérifie l'état d'initialisation (byte_6E345), lit une valeur de config (sub_286D2, byte_722D1) selon plusieurs flags de mode (byte_722D0/D3) : **lecture de paramètres de configuration/calibration selon le mode d'affichage/contrôleur actif.**"
+"new_name": "Input_AltKeyCommands_26F7E",
+"summary": "far, LUE 2026-11-03. Touches ALT du vol (ex-nom « Config_ReadCalibration », faux). Si byte_6E345 = 0 : lit l'événement clavier (Input_PointerConfigDispatch), code de touche byte_722D1 ; exige ALT enfoncé (byte_722D3 & 0C0h, ou byte_72E00 / byte_72E21) et ni MAJ (byte_722D3 & 0Ch, ou byte_72DF2 / byte_72DFE) ni CTRL (byte_722D3 & 30h, ou byte_72DE5 / byte_72E1D) ; puis aiguillage sur le code de touche (table word_27130) : 24 (O) → coupe les effets (SoundFX_StopAll_5AA95) et ouvre le panneau CONFIGURATION (`push 5240h` / VROOMM_StubThunk_6B7F0 → Options_ConfigurationScreen_90D20), puis relance (Music_SelectStartTune_5AA02) ou arrête (Music_Stop_5A9E6) la musique si son interrupteur byte_7236B a changé ; 31 (S) → bascule les effets sonores byte_7236C (SoundFX_Disable_5AA73 quand ils étaient actifs) ; 36 (J) → pour chaque manette 0 et 1 présente (Joystick_GetButtonRawByte_67B82), VROOMM_StubThunk_6B745(arg+5, n, 1) ; 45 (X) → Input_CalibrationHandler, s'il rend vrai : [arg+36] = 1 et byte_6E345 = 1 ; 50 (M) → bascule la musique byte_7236B (Music_Stop_5A9E6 ou Music_SelectStartTune_5AA02). Fin : Sound_FrameUpdate_5AB79(5C06h), rend 1 (0 si byte_6E345 était posé). Appelée par CombatTarget_WeaponActionSubsystem et les boucles de vol (ovr233, ovr241, seg112). analysis/OPTIONS_SCREEN.md."
 },
 "sub_27144": {
 "segment": "seg047",
@@ -35559,8 +35559,8 @@
 "sub_6B70F",
 "sub_6C7BC"
 ],
-"new_name": "Cockpit_DrawEncodedText_8FA4C",
-"summary": "⚠️ far, 118 lignes, NON DÉTAILLÉE — combine `UI_ApplyEncodingHelper_5E576` (seg143), `Shape_DrawSpans_61F52` (seg174, ×2)."
+"new_name": "Options_DrawPanel_8FA4C",
+"summary": "far, LUE 2026-11-03. Dessin d'un panneau d'options (ex-nom « Cockpit_DrawEncodedText_8FA4C »). Arguments : structure de configuration, fenêtre, images (SHP), numéro de l'image du bas, drapeau. VROOMM_StubThunk_6C7B7 ; si byte_721F0 ≠ 2 : UI_ApplyEncodingHelper_5E576(5196h, word_70E62) (recopie du tampon de l'écran du vol, sens déduit) ; si drapeau : image 0 en (5, 4) (`push large 40005h`, Shape_DrawSpans_61F52) ; image demandée en (5, 39) (`push large 270005h`) ; VROOMM_StubThunk_6C7BC. Appelée par Options_ConfigurationScreen_90D20 (image 1, drapeau 1) et Options_FlightScreen_90097."
 },
 "sub_8FB2A": {
 "segment": "ovr266",
@@ -35586,8 +35586,8 @@
 "sub_63D6E",
 "sub_65643"
 ],
-"new_name": "Config_WriteSettingsField_8FB73",
-"summary": "far, construit un StreamReader et écrit un champ typé (`StreamReader_WriteTyped_6568F`, seg195)."
+"new_name": "Options_SaveConfig_8FB73",
+"summary": "far. Bouton SAVE : écrit la structure de configuration dans OPTIONS.CFG (nom en DGROUP 5210 = `push 145Ah`, StreamReader_WriteTyped_6568F). Ex-nom « Config_WriteSettingsField_8FB73 »."
 },
 "sub_8FBE7": {
 "segment": "ovr266",
@@ -35653,8 +35653,8 @@
 "sub_6B70F",
 "sub_8F720"
 ],
-"new_name": "Config_ReadSettingsFieldWithMessage_8FD2A",
-"summary": "far, combine `CRT_Write_TextMode` et lecture de champ typé."
+"new_name": "Options_LoadDefaults_8FD2A",
+"summary": "far. Bouton DEFAULT : CRT_Write_TextMode, lit OPTDFLT.CFG (nom en DGROUP 5222 = `push 1466h`, StreamReader_ReadTyped_63FA1) dans la structure de configuration, VROOMM_StubThunk_6B70F(9025h), puis Cockpit_ReadControlsFrame_8F720 (applique les réglages). Ex-nom « Config_ReadSettingsFieldWithMessage_8FD2A »."
 },
 "sub_8FDC0": {
 "segment": "ovr266",
@@ -35762,8 +35762,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeA_90097",
-"summary": "⭐⚠️ far, 809 lignes, NON DÉTAILLÉE — premier d'une famille de grosses fonctions de chargement de fichier ressource quasi identiques dans leur ouverture (`Path_ResolveDataFile`, StreamReader_ConstructVariantA_63A39, GetCapacity_64062) — voir aussi ovr267-269. Candidat pour session dédiée."
+"new_name": "Options_FlightScreen_90097",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « FLIGHT » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\FLITOPT.SHP (chaînes « flitopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_90923": {
 "segment": "ovr266",
@@ -35897,8 +35897,8 @@
 "sub_2075B",
 "sub_23D8F"
 ],
-"new_name": "Cockpit_LoadAndInitFull_90D20",
-"summary": "⭐⚠️ far, 1390 lignes, NON DÉTAILLÉE — combine `Cockpit_PanAzimuthUpdate`, `EMS_MapPage` (accès mémoire étendue, seg127), `UI_ApplyEncodingHelper_5E576`, `Path_ResolveDataFile`, StreamReader — chargement et initialisation complète du cockpit avec accès à la mémoire paginée. Candidat prioritaire pour session dédiée."
+"new_name": "Options_ConfigurationScreen_90D20",
+"summary": "far, LUE 2026-11-03 (structure). Panneau CONFIGURATION ouvert par ALT+O (Input_AltKeyCommands_26F7E, argument = structure de configuration DGROUP 21056). Ouverture : Cockpit_PanAzimuthUpdate(541Ah, &256) ; si byte_721F0 ≠ 2, UI_ApplyEncodingHelper_5E576(word_70E62, 5196h) (copie de l'écran du vol dans un tampon, sens déduit de l'ordre des arguments, fonction non lue), sinon EMS_MapPage et int 15h AX=1209h. Boucle : charge FONTS\\\\MAINOPT.SHP (28 images), fenêtre (0,0)-(319,199) (VROOMM_StubThunk_6C969), 13 boutons de 48 à 66 × 11 pixels (VROOMM_StubThunk_6C76C ; image normale, image enfoncée, variable mise à 1 au clic) : DETAIL (36,61) → Options_DetailScreen_91D29 ; FLIGHT (106,61) → Options_FlightScreen_90097 ; GAMEPLAY (36,74) → Options_GameplayScreen_92E60 ; COCKPIT (106,74) → Options_CockpitScreen_93295 ; CAMERAS (36,87) → Options_CamerasScreen_93BA5 ; AUDIO (106,87) → Options_AudioScreen_9416A ; ROOKIE (211,61), VETERAN (211,74), ACE (211,87) → Options_PresetRookie_91B2C, Options_PresetVeteran_91AE9, Options_PresetAce_91AA6 (sans fermer) ; SAVE (18,114) → Options_SaveConfig_8FB73 ; DEFAULT (73,114) → Options_LoadDefaults_8FD2A ; EXIT (139,114) → fermeture ; EXIT GAME (211,114) → Options_ExitGameScreen_9277C(arg, 0), son résultat décide la fermeture. Souris : Input_GetCalibratedXValue_67481 / 2 et Input_GetCalibratedYValue_67499 → word_711C6/711C8 et word_72EB0/72EB2. Dessin : Options_DrawPanel_8FA4C (fond restauré, images 0 et 1). Un clic sur un sous-menu ferme le panneau, joue le sous-écran puis rouvre le panneau (MAINOPT.SHP rechargé). Fermeture : Cockpit_ReadControlsFrame_8F720 (applique les réglages), TextScrollDisplayB_ApplyHelperD_67F60, Cockpit_ApplyEncodingWrapper_8FB2A, Kneeboard_ProcessSelected(59CDh). Ex-nom « Cockpit_LoadAndInitFull_90D20 » (faux : rien ne vient de COCKPITS). analysis/OPTIONS_SCREEN.md."
 },
 "sub_91AA6": {
 "segment": "ovr267",
@@ -35907,8 +35907,8 @@
 "lines": 26,
 "type": "far",
 "calls": [],
-"new_name": "Cockpit_Helper_91AA6",
-"summary": "far, aucun appel externe visible (26 lignes)."
+"new_name": "Options_PresetAce_91AA6",
+"summary": "far, LUE 2026-11-03. Bouton ACE : [+100]=1, [+101]=0, [+102]=1, [+104]=0, [+105]=0, [+106]=0, [+109]=0, [+107]=0, [+108]=0, [+110]=0, mot [+111]=0, [+115]=0, [+116]=1, [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper_91AA6 »."
 },
 "sub_91AE9": {
 "segment": "ovr267",
@@ -35917,8 +35917,8 @@
 "lines": 26,
 "type": "far",
 "calls": [],
-"new_name": "Cockpit_Helper2_91AE9",
-"summary": "far, aucun appel externe visible (26 lignes)."
+"new_name": "Options_PresetVeteran_91AE9",
+"summary": "far, LUE 2026-11-03. Bouton VETERAN : [+100]=1, [+101]=1, [+102]=1, [+104]=0, [+105]=1, [+106]=1, [+109]=1, [+107]=0, [+108]=0, [+110]=0, mot [+111]=1, [+115]=1, [+116]=1, [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper2_91AE9 »."
 },
 "sub_91B2C": {
 "segment": "ovr267",
@@ -35927,8 +35927,8 @@
 "lines": 33,
 "type": "far",
 "calls": [],
-"new_name": "Cockpit_Helper3_91B2C",
-"summary": "far, aucun appel externe visible (33 lignes)."
+"new_name": "Options_PresetRookie_91B2C",
+"summary": "far, LUE 2026-11-03. Bouton ROOKIE du panneau CONFIGURATION : écrit dans la structure de configuration [+100]=0, [+101]=1, [+102]=0, [+104]=1, [+105]=1, [+106]=1, [+109]=1, [+107]=1, [+108]=1, [+110]=1, mot [+111]=2, [+115]=1, [+116]=0, [+117]=0. Rôle des champs non établi. Ex-nom « Cockpit_Helper3_91B2C »."
 },
 "sub_91B70": {
 "segment": "ovr268",
@@ -36019,8 +36019,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeB_91D29",
-"summary": "⭐⚠️ far, 1017 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097. Candidat pour session dédiée."
+"new_name": "Options_DetailScreen_91D29",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « DETAIL » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\DETLOPT.SHP (chaînes « detlopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_926A5": {
 "segment": "ovr268",
@@ -36094,8 +36094,8 @@
 "sub_6C978",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeC_9277C",
-"summary": "⭐⚠️ far, 832 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+"new_name": "Options_ExitGameScreen_9277C",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — écran du bouton EXIT GAME du panneau CONFIGURATION : charge FONTS\\\\RESTART.SHP ; chaînes voisines « do you want to: », « EXIT GAME », « YOU HAVE EJECTED. », « YOU HAVE DIED. », « YOU HAVE LANDED. ». Appelé avec (structure de configuration, 0) ; son résultat décide la fermeture du panneau. Ex-nom « ResourceFile_LoadTypeC_9277C »."
 },
 "sub_92E60": {
 "segment": "ovr269",
@@ -36133,8 +36133,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeD_92E60",
-"summary": "⚠️ far, 477 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+"new_name": "Options_GameplayScreen_92E60",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « GAMEPLAY » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\GAMEOPT.SHP (chaînes « gameopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_93295": {
 "segment": "ovr269",
@@ -36194,8 +36194,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeE_93295",
-"summary": "⭐⚠️ far, 1023 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+"new_name": "Options_CockpitScreen_93295",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « COCKPIT » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\COCKOPT.SHP (chaînes « cockopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_93BA5": {
 "segment": "ovr269",
@@ -36240,8 +36240,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeF_93BA5",
-"summary": "⭐⚠️ far, 650 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+"new_name": "Options_CamerasScreen_93BA5",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « CAMERAS » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\CAMROPT.SHP (chaînes « camropt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_9416A": {
 "segment": "ovr269",
@@ -36283,8 +36283,8 @@
 "sub_5C7B6",
 "sub_6C978"
 ],
-"new_name": "ResourceFile_LoadTypeG_9416A",
-"summary": "⭐⚠️ far, 580 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+"new_name": "Options_AudioScreen_9416A",
+"summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « AUDIO » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\AUDIOPT.SHP (chaînes « audiopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
 },
 "sub_94710": {
 "segment": "ovr270",

@@ -41,7 +41,7 @@ loc_4FBF4:				; DATA XREF: seg216:0446o
 		sub	sp, 34h
 		mov	[bp+var_1], 0
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		or	al, al
 		jnz	short loc_4FC0B
@@ -369,7 +369,7 @@ loc_4FE44:
 		push	51E2h
 
 loc_4FE47:
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		mov	al, byte_722D1
 		mov	ah, 0
@@ -384,7 +384,7 @@ loc_4FE59:				; CODE XREF: CombatTarget_WeaponActionSubsystem:loc_4FE16j
 		or	ax, ax
 		jz	short loc_4FE18
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		cmp	byte_721F0, 2
 		jnz	short loc_4FEAE

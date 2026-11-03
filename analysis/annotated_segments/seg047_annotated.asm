@@ -79,11 +79,24 @@ loc_26F74:				; DATA XREF: TextRenderer_Main+976o
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,292L — vérifie l'état d'initialisation (byte_6E345), lit une valeur de config
-; (sub_286D2, byte_722D1) selon plusieurs flags de mode (byte_722D0/D3) : lecture de
-; paramètres de configuration/calibration selon le mode d'affichage/contrôleur actif.
+; far, LUE 2026-11-03. Touches ALT du vol (ex-nom « Config_ReadCalibration », faux). Si
+; byte_6E345 = 0 : lit l'événement clavier (Input_PointerConfigDispatch), code de touche
+; byte_722D1 ; exige ALT enfoncé (byte_722D3 & 0C0h, ou byte_72E00 / byte_72E21) et ni MAJ
+; (byte_722D3 & 0Ch, ou byte_72DF2 / byte_72DFE) ni CTRL (byte_722D3 & 30h, ou byte_72DE5 /
+; byte_72E1D) ; puis aiguillage sur le code de touche (table word_27130) : 24 (O) → coupe les
+; effets (SoundFX_StopAll_5AA95) et ouvre le panneau CONFIGURATION (push 5240h /
+; VROOMM_StubThunk_6B7F0 → Options_ConfigurationScreen_90D20), puis relance
+; (Music_SelectStartTune_5AA02) ou arrête (Music_Stop_5A9E6) la musique si son interrupteur
+; byte_7236B a changé ; 31 (S) → bascule les effets sonores byte_7236C (SoundFX_Disable_5AA73
+; quand ils étaient actifs) ; 36 (J) → pour chaque manette 0 et 1 présente
+; (Joystick_GetButtonRawByte_67B82), VROOMM_StubThunk_6B745(arg+5, n, 1) ; 45 (X) →
+; Input_CalibrationHandler, s'il rend vrai : [arg+36] = 1 et byte_6E345 = 1 ; 50 (M) → bascule
+; la musique byte_7236B (Music_Stop_5A9E6 ou Music_SelectStartTune_5AA02). Fin :
+; Sound_FrameUpdate_5AB79(5C06h), rend 1 (0 si byte_6E345 était posé). Appelée par
+; CombatTarget_WeaponActionSubsystem et les boucles de vol (ovr233, ovr241, seg112).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-Config_ReadCalibration	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+DP
+Input_AltKeyCommands_26F7E	proc far		; CODE XREF: CombatTarget_WeaponActionSubsystem+DP
 					; CombatTarget_WeaponActionSubsystem:loc_4FE47P	...
 
 var_7		= byte ptr -7
@@ -100,12 +113,12 @@ arg_0		= word ptr  6
 		cmp	byte_6E345, 0
 		jz	short loc_26F94
 
-loc_26F8F:				; CODE XREF: Config_ReadCalibration+FCj
+loc_26F8F:				; CODE XREF: Input_AltKeyCommands_26F7E+FCj
 		mov	al, 0
 		jmp	loc_2712D
 ; ���������������������������������������������������������������������������
 
-loc_26F94:				; CODE XREF: Config_ReadCalibration+Fj
+loc_26F94:				; CODE XREF: Input_AltKeyCommands_26F7E+Fj
 		mov	ax, si
 		add	ax, 5
 		push	ax
@@ -122,35 +135,35 @@ loc_26F94:				; CODE XREF: Config_ReadCalibration+Fj
 		jmp	short loc_26FBD
 ; ���������������������������������������������������������������������������
 
-loc_26FBB:				; CODE XREF: Config_ReadCalibration+36j
+loc_26FBB:				; CODE XREF: Input_AltKeyCommands_26F7E+36j
 		xor	ax, ax
 
-loc_26FBD:				; CODE XREF: Config_ReadCalibration+3Bj
+loc_26FBD:				; CODE XREF: Input_AltKeyCommands_26F7E+3Bj
 		jmp	short loc_26FD4
 ; ���������������������������������������������������������������������������
 
-loc_26FBF:				; CODE XREF: Config_ReadCalibration+2Fj
+loc_26FBF:				; CODE XREF: Input_AltKeyCommands_26F7E+2Fj
 		cmp	byte_72E00, 1
 		jz	short loc_26FCD
 		cmp	byte_72E21, 1
 		jnz	short loc_26FD2
 
-loc_26FCD:				; CODE XREF: Config_ReadCalibration+46j
+loc_26FCD:				; CODE XREF: Input_AltKeyCommands_26F7E+46j
 		mov	ax, 1
 		jmp	short loc_26FD4
 ; ���������������������������������������������������������������������������
 
-loc_26FD2:				; CODE XREF: Config_ReadCalibration+4Dj
+loc_26FD2:				; CODE XREF: Input_AltKeyCommands_26F7E+4Dj
 		xor	ax, ax
 
-loc_26FD4:				; CODE XREF: Config_ReadCalibration:loc_26FBDj
-					; Config_ReadCalibration+52j
+loc_26FD4:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_26FBDj
+					; Input_AltKeyCommands_26F7E+52j
 		or	al, al
 		jnz	short loc_26FDB
 		jmp	loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_26FDB:				; CODE XREF: Config_ReadCalibration+58j
+loc_26FDB:				; CODE XREF: Input_AltKeyCommands_26F7E+58j
 		cmp	byte_722D0, 1
 		jnz	short loc_26FF2
 		test	byte_722D3, 0Ch
@@ -159,36 +172,36 @@ loc_26FDB:				; CODE XREF: Config_ReadCalibration+58j
 		jmp	short loc_26FF0
 ; ���������������������������������������������������������������������������
 
-loc_26FEE:				; CODE XREF: Config_ReadCalibration+69j
+loc_26FEE:				; CODE XREF: Input_AltKeyCommands_26F7E+69j
 		xor	ax, ax
 
-loc_26FF0:				; CODE XREF: Config_ReadCalibration+6Ej
+loc_26FF0:				; CODE XREF: Input_AltKeyCommands_26F7E+6Ej
 		jmp	short loc_27007
 ; ���������������������������������������������������������������������������
 
-loc_26FF2:				; CODE XREF: Config_ReadCalibration+62j
+loc_26FF2:				; CODE XREF: Input_AltKeyCommands_26F7E+62j
 		cmp	byte_72DF2, 1
 		jz	short loc_27000
 		cmp	byte_72DFE, 1
 		jnz	short loc_27005
 
-loc_27000:				; CODE XREF: Config_ReadCalibration+79j
+loc_27000:				; CODE XREF: Input_AltKeyCommands_26F7E+79j
 		mov	ax, 1
 		jmp	short loc_27007
 ; ���������������������������������������������������������������������������
 
-loc_27005:				; CODE XREF: Config_ReadCalibration+80j
+loc_27005:				; CODE XREF: Input_AltKeyCommands_26F7E+80j
 		xor	ax, ax
 
-loc_27007:				; CODE XREF: Config_ReadCalibration:loc_26FF0j
-					; Config_ReadCalibration+85j
+loc_27007:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_26FF0j
+					; Input_AltKeyCommands_26F7E+85j
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_27010
 		jmp	loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_27010:				; CODE XREF: Config_ReadCalibration+8Dj
+loc_27010:				; CODE XREF: Input_AltKeyCommands_26F7E+8Dj
 		cmp	byte_722D0, 1
 		jnz	short loc_27027
 		test	byte_722D3, 30h
@@ -197,42 +210,42 @@ loc_27010:				; CODE XREF: Config_ReadCalibration+8Dj
 		jmp	short loc_27025
 ; ���������������������������������������������������������������������������
 
-loc_27023:				; CODE XREF: Config_ReadCalibration+9Ej
+loc_27023:				; CODE XREF: Input_AltKeyCommands_26F7E+9Ej
 		xor	ax, ax
 
-loc_27025:				; CODE XREF: Config_ReadCalibration+A3j
+loc_27025:				; CODE XREF: Input_AltKeyCommands_26F7E+A3j
 		jmp	short loc_2703C
 ; ���������������������������������������������������������������������������
 
-loc_27027:				; CODE XREF: Config_ReadCalibration+97j
+loc_27027:				; CODE XREF: Input_AltKeyCommands_26F7E+97j
 		cmp	byte_72DE5, 1
 		jz	short loc_27035
 		cmp	byte_72E1D, 1
 		jnz	short loc_2703A
 
-loc_27035:				; CODE XREF: Config_ReadCalibration+AEj
+loc_27035:				; CODE XREF: Input_AltKeyCommands_26F7E+AEj
 		mov	ax, 1
 		jmp	short loc_2703C
 ; ���������������������������������������������������������������������������
 
-loc_2703A:				; CODE XREF: Config_ReadCalibration+B5j
+loc_2703A:				; CODE XREF: Input_AltKeyCommands_26F7E+B5j
 		xor	ax, ax
 
-loc_2703C:				; CODE XREF: Config_ReadCalibration:loc_27025j
-					; Config_ReadCalibration+BAj
+loc_2703C:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_27025j
+					; Input_AltKeyCommands_26F7E+BAj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_27045
 		jmp	loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_27045:				; CODE XREF: Config_ReadCalibration+C2j
+loc_27045:				; CODE XREF: Input_AltKeyCommands_26F7E+C2j
 		mov	ax, [bp+var_2]
 		mov	[bp+var_4], ax
 		mov	cx, 5		; switch 5 cases
 		mov	bx, offset word_27130
 
-loc_27051:				; CODE XREF: Config_ReadCalibration:loc_2705Cj
+loc_27051:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_2705Cj
 		mov	ax, cs:[bx]
 
 loc_27054:
@@ -247,7 +260,7 @@ loc_2705E:				; default
 		jmp	loc_27122
 ; ���������������������������������������������������������������������������
 
-loc_27061:				; CODE XREF: Config_ReadCalibration+D9j
+loc_27061:				; CODE XREF: Input_AltKeyCommands_26F7E+D9j
 		jmp	word ptr cs:[bx+0Ah] ; switch jump
 
 loc_27065:				; DATA XREF: seg047:021Ao
@@ -259,19 +272,19 @@ loc_2706E:				; default
 		jmp	loc_27122
 ; ���������������������������������������������������������������������������
 
-loc_27071:				; CODE XREF: Config_ReadCalibration+EEj
+loc_27071:				; CODE XREF: Input_AltKeyCommands_26F7E+EEj
 		mov	byte ptr [si+24h], 1
 		mov	byte_6E345, 1
 		jmp	loc_26F8F
 ; ���������������������������������������������������������������������������
 
-loc_2707D:				; CODE XREF: Config_ReadCalibration:loc_27061j
+loc_2707D:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_27061j
 					; DATA XREF: seg047:021Ao
 		mov	[bp+var_6], 0	; case 0x24
 		jmp	short loc_270A8
 ; ���������������������������������������������������������������������������
 
-loc_27084:				; CODE XREF: Config_ReadCalibration+12Ej
+loc_27084:				; CODE XREF: Input_AltKeyCommands_26F7E+12Ej
 		mov	al, byte ptr [bp+var_6]
 		push	ax
 		call	Joystick_GetButtonRawByte_67B82
@@ -286,16 +299,16 @@ loc_27084:				; CODE XREF: Config_ReadCalibration+12Ej
 		call	VROOMM_StubThunk_6B745
 		add	sp, 6
 
-loc_270A5:				; CODE XREF: Config_ReadCalibration+112j
+loc_270A5:				; CODE XREF: Input_AltKeyCommands_26F7E+112j
 		inc	[bp+var_6]
 
-loc_270A8:				; CODE XREF: Config_ReadCalibration+104j
+loc_270A8:				; CODE XREF: Input_AltKeyCommands_26F7E+104j
 		cmp	[bp+var_6], 2
 		jl	short loc_27084
 		jmp	short loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_270B0:				; CODE XREF: Config_ReadCalibration:loc_27061j
+loc_270B0:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_27061j
 					; DATA XREF: seg047:021Ao
 		mov	al, byte_7236B	; case 0x18
 		mov	[bp+var_7], al
@@ -315,13 +328,13 @@ loc_270D1:				; default
 loc_270D3:
 		push	1
 
-loc_270D5:				; CODE XREF: Config_ReadCalibration+180j
+loc_270D5:				; CODE XREF: Input_AltKeyCommands_26F7E+180j
 		call	Music_Stop_5A9E6
 		pop	cx
 		jmp	short loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_270DD:				; CODE XREF: Config_ReadCalibration+14Aj
+loc_270DD:				; CODE XREF: Input_AltKeyCommands_26F7E+14Aj
 		cmp	byte_7236B, 0
 		jz	short loc_27122	; default
 
@@ -329,7 +342,7 @@ loc_270E4:
 		jmp	short loc_27100
 ; ���������������������������������������������������������������������������
 
-loc_270E6:				; CODE XREF: Config_ReadCalibration:loc_27061j
+loc_270E6:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_27061j
 					; DATA XREF: seg047:021Ao
 		mov	al, byte_7236B	; case 0x32
 		mov	[bp+var_7], al
@@ -344,13 +357,13 @@ loc_270E6:				; CODE XREF: Config_ReadCalibration:loc_27061j
 		jmp	short loc_270D5
 ; ���������������������������������������������������������������������������
 
-loc_27100:				; CODE XREF: Config_ReadCalibration:loc_270E4j
-					; Config_ReadCalibration+17Cj
+loc_27100:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_270E4j
+					; Input_AltKeyCommands_26F7E+17Cj
 		call	Music_SelectStartTune_5AA02
 		jmp	short loc_27122	; default
 ; ���������������������������������������������������������������������������
 
-loc_27107:				; CODE XREF: Config_ReadCalibration:loc_27061j
+loc_27107:				; CODE XREF: Input_AltKeyCommands_26F7E:loc_27061j
 					; DATA XREF: seg047:021Ao
 		mov	al, byte_7236C	; case 0x1F
 		mov	[bp+var_7], al
@@ -363,21 +376,21 @@ loc_27107:				; CODE XREF: Config_ReadCalibration:loc_27061j
 		jz	short loc_27122	; default
 		call	SoundFX_Disable_5AA73
 
-loc_27122:				; CODE XREF: Config_ReadCalibration+5Aj
-					; Config_ReadCalibration+8Fj ...
+loc_27122:				; CODE XREF: Input_AltKeyCommands_26F7E+5Aj
+					; Input_AltKeyCommands_26F7E+8Fj ...
 		push	5C06h		; default
 		call	Sound_FrameUpdate_5AB79
 		pop	cx
 		mov	al, 1
 
-loc_2712D:				; CODE XREF: Config_ReadCalibration+13j
+loc_2712D:				; CODE XREF: Input_AltKeyCommands_26F7E+13j
 		pop	si
 		leave
 		retf
-Config_ReadCalibration	endp
+Input_AltKeyCommands_26F7E	endp
 
 ; ���������������������������������������������������������������������������
-word_27130	dw    18h,   1Fh,   24h,   2Dh ; DATA XREF: Config_ReadCalibration+D0o
+word_27130	dw    18h,   1Fh,   24h,   2Dh ; DATA XREF: Input_AltKeyCommands_26F7E+D0o
 		dw    32h		; value	table for switch statement
 		dw offset loc_270B0	; jump table for switch	statement
 		dw offset loc_27107

@@ -31,9 +31,9 @@ VROOMM_StubThunk_6B780	endp
 ; far, thunk fixe VROOMM (jmp sub_8FA4C) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B785	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+B2CP
-					; Cockpit_LoadAndInitFull_90D20+CAAP ...
-		jmp	Cockpit_DrawEncodedText_8FA4C
+VROOMM_StubThunk_6B785	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+B2CP
+					; Options_ConfigurationScreen_90D20+CAAP ...
+		jmp	Options_DrawPanel_8FA4C
 VROOMM_StubThunk_6B785	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6B785	endp
 ; far, thunk fixe VROOMM (jmp sub_8FB2A) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B78A	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+D20P
+VROOMM_StubThunk_6B78A	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+D20P
 					; Cockpit_LoadAndApplyEncoding_926A5+7BP
 		jmp	Cockpit_ApplyEncodingWrapper_8FB2A
 VROOMM_StubThunk_6B78A	endp
@@ -59,8 +59,8 @@ VROOMM_StubThunk_6B78A	endp
 ; far, thunk fixe VROOMM (jmp sub_8FB73) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B78F	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C65P
-		jmp	Config_WriteSettingsField_8FB73
+VROOMM_StubThunk_6B78F	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C65P
+		jmp	Options_SaveConfig_8FB73
 VROOMM_StubThunk_6B78F	endp
 
 
@@ -98,8 +98,8 @@ VROOMM_StubThunk_6B799	endp
 ; far, thunk fixe VROOMM (jmp sub_8FD2A) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B79E	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C77P
-		jmp	Config_ReadSettingsFieldWithMessage_8FD2A
+VROOMM_StubThunk_6B79E	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C77P
+		jmp	Options_LoadDefaults_8FD2A
 VROOMM_StubThunk_6B79E	endp
 
 
@@ -137,7 +137,7 @@ VROOMM_StubThunk_6B7A8	endp
 ; far, thunk fixe VROOMM (jmp sub_8F720) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B7AD	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+D14P
+VROOMM_StubThunk_6B7AD	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+D14P
 		jmp	Cockpit_ReadControlsFrame_8F720
 VROOMM_StubThunk_6B7AD	endp
 
@@ -150,8 +150,8 @@ VROOMM_StubThunk_6B7AD	endp
 ; far, thunk fixe VROOMM (jmp sub_90097) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1D0D0h, codesize=15FEh, nentries=14.
 ; ==============================================================================================
-VROOMM_StubThunk_6B7B2	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+BFEP
-		jmp	ResourceFile_LoadTypeA_90097
+VROOMM_StubThunk_6B7B2	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+BFEP
+		jmp	Options_FlightScreen_90097
 VROOMM_StubThunk_6B7B2	endp
 
 

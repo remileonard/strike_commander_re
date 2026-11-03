@@ -1221,7 +1221,7 @@ word_6E341	dw 0			; DATA XREF: TextRenderer_Main+748w
 word_6E343	dw 0			; DATA XREF: seg030:1054r
 					; seg030:loc_1E1F7r ...
 byte_6E345	db 0			; DATA XREF: Program_InitVideoFontArgs+232r
-					; Config_ReadCalibration+Ar	...
+					; Input_AltKeyCommands_26F7E+Ar	...
 		dd TextRenderer_EncodeCharIfFlagged_5E61C
 		dd loc_272DC
 		dd PagedResourceC_Method_PassThrough_5F4D8
@@ -1456,8 +1456,8 @@ unk_6E511	db  2Eh	; .
 		db  66h	; f
 		db  67h	; g
 unk_6E521	db    0
-aFlitopt	db 'flitopt',0          ; DATA XREF: ResourceFile_LoadTypeA_90097+11o
-a_shp_4		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeA_90097+Do
+aFlitopt	db 'flitopt',0          ; DATA XREF: Options_FlightScreen_90097+11o
+a_shp_4		db '.shp',0             ; DATA XREF: Options_FlightScreen_90097+Do
 		dd VROOMM_StubThunk_6C73F
 		dd VROOMM_StubThunk_6C744
 		dd VROOMM_StubThunk_6C749
@@ -1472,26 +1472,26 @@ a_shp_4		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeA_90097+Do
 		dd VROOMM_StubThunk_6CA8F
 		dd VROOMM_StubThunk_6B780
 		align 2
-aMainopt	db 'mainopt',0          ; DATA XREF: Cockpit_LoadAndInitFull_90D20+77o
-a_shp_5		db '.shp',0             ; DATA XREF: Cockpit_LoadAndInitFull_90D20+73o
+aMainopt	db 'mainopt',0          ; DATA XREF: Options_ConfigurationScreen_90D20+77o
+a_shp_5		db '.shp',0             ; DATA XREF: Options_ConfigurationScreen_90D20+73o
 		align 2
-aDetlopt	db 'detlopt',0          ; DATA XREF: ResourceFile_LoadTypeB_91D29+11o
-a_shp_6		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeB_91D29+Do
-aRestart	db 'restart',0          ; DATA XREF: ResourceFile_LoadTypeC_9277C+11o
-a_shp_7		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeC_9277C+Do
+aDetlopt	db 'detlopt',0          ; DATA XREF: Options_DetailScreen_91D29+11o
+a_shp_6		db '.shp',0             ; DATA XREF: Options_DetailScreen_91D29+Do
+aRestart	db 'restart',0          ; DATA XREF: Options_ExitGameScreen_9277C+11o
+a_shp_7		db '.shp',0             ; DATA XREF: Options_ExitGameScreen_9277C+Do
 aDoYouWantTo	db 'do you want to:',0
 aExitGame	db 'EXIT GAME',0
 aYouHaveEjected	db 'YOU HAVE EJECTED.',0
 aYouHaveDied_	db 'YOU HAVE DIED.',0
 aYouHaveLanded_	db 'YOU HAVE LANDED.',0
-aGameopt	db 'gameopt',0          ; DATA XREF: ResourceFile_LoadTypeD_92E60+11o
-a_shp_8		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeD_92E60+Do
-aCockopt	db 'cockopt',0          ; DATA XREF: ResourceFile_LoadTypeE_93295+11o
-a_shp_9		db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeE_93295:loc_932A2o
-aCamropt	db 'camropt',0          ; DATA XREF: ResourceFile_LoadTypeF_93BA5+11o
-a_shp_10	db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeF_93BA5+Do
-aAudiopt	db 'audiopt',0          ; DATA XREF: ResourceFile_LoadTypeG_9416A+11o
-a_shp_11	db '.shp',0             ; DATA XREF: ResourceFile_LoadTypeG_9416A+Do
+aGameopt	db 'gameopt',0          ; DATA XREF: Options_GameplayScreen_92E60+11o
+a_shp_8		db '.shp',0             ; DATA XREF: Options_GameplayScreen_92E60+Do
+aCockopt	db 'cockopt',0          ; DATA XREF: Options_CockpitScreen_93295+11o
+a_shp_9		db '.shp',0             ; DATA XREF: Options_CockpitScreen_93295:loc_932A2o
+aCamropt	db 'camropt',0          ; DATA XREF: Options_CamerasScreen_93BA5+11o
+a_shp_10	db '.shp',0             ; DATA XREF: Options_CamerasScreen_93BA5+Do
+aAudiopt	db 'audiopt',0          ; DATA XREF: Options_AudioScreen_9416A+11o
+a_shp_11	db '.shp',0             ; DATA XREF: Options_AudioScreen_9416A+Do
 		dd loc_290D8
 off_6E610	dd loc_290DD
 		dd loc_290E2
@@ -7992,7 +7992,7 @@ byte_721F0	db 0			; DATA XREF: seg015:010Fr
 word_721F1	dw 0			; DATA XREF: seg036:0194w
 					; MissionText_DrawTypewriterSynced_975CC+F8r ...
 word_721F3	dw 0			; DATA XREF: seg036:loc_2080Aw
-					; Cockpit_DrawEncodedText_8FA4C+31r ...
+					; Options_DrawPanel_8FA4C+31r ...
 		align 2
 dword_721F6	dd 0			; DATA XREF: seg042:0BB2r
 					; Particle_ProjectToScreen_4C1EE+6Ar ...
@@ -8312,10 +8312,10 @@ byte_72369	db 0			; DATA XREF: Camera_UpdateAndNotifyB_861E0+3Ar
 					; ResourceFile_Helper_90923+193w
 byte_7236A	db 0			; DATA XREF: Mission_TriggerEvaluator+15r
 					; ResourceFile_Helper_90923+198w ...
-byte_7236B	db 0			; DATA XREF: Config_ReadCalibration:loc_270B0r
-					; Config_ReadCalibration+14Cr ...
-byte_7236C	db 0			; DATA XREF: Config_ReadCalibration:loc_27107r
-					; Config_ReadCalibration+196w ...
+byte_7236B	db 0			; DATA XREF: Input_AltKeyCommands_26F7E:loc_270B0r
+					; Input_AltKeyCommands_26F7E+14Cr ...
+byte_7236C	db 0			; DATA XREF: Input_AltKeyCommands_26F7E:loc_27107r
+					; Input_AltKeyCommands_26F7E+196w ...
 byte_7236D	db 0			; DATA XREF: TextRenderer_Main+701w
 					; TextRenderer_Main:loc_27D6Ar	...
 byte_7236E	db 0			; DATA XREF: ResourceFile_Helper_90923+1ACw
@@ -10847,9 +10847,9 @@ word_72EA4	dw 0			; DATA XREF: Joystick_ReadAndScaleAxes_67835:loc_6787Ar
 					; Joystick_ReadAndScaleAxes_67835+83r ...
 		align 10h
 word_72EB0	dw 0			; DATA XREF: TextScrollDisplayB_UpdateObjectState_67F8A+35w
-					; Cockpit_LoadAndInitFull_90D20+B00w
+					; Options_ConfigurationScreen_90D20+B00w
 word_72EB2	dw 0			; DATA XREF: TextScrollDisplayB_UpdateObjectState_67F8A+3Bw
-					; Cockpit_LoadAndInitFull_90D20+B07w
+					; Options_ConfigurationScreen_90D20+B07w
 		db    0
 		db    0
 		db    0

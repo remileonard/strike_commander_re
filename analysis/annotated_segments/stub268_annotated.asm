@@ -45,8 +45,8 @@ VROOMM_StubThunk_6B835	endp
 ; far, thunk fixe VROOMM (jmp sub_91D29) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1F6F0h, codesize=12EEh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B83A	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+BECP
-		jmp	ResourceFile_LoadTypeB_91D29
+VROOMM_StubThunk_6B83A	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+BECP
+		jmp	Options_DetailScreen_91D29
 VROOMM_StubThunk_6B83A	endp
 
 
@@ -58,8 +58,8 @@ VROOMM_StubThunk_6B83A	endp
 ; far, thunk fixe VROOMM (jmp sub_9277C) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1F6F0h, codesize=12EEh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B83F	proc far		; CODE XREF: Cockpit_LoadAndInitFull_90D20+C48P
-		jmp	ResourceFile_LoadTypeC_9277C
+VROOMM_StubThunk_6B83F	proc far		; CODE XREF: Options_ConfigurationScreen_90D20+C48P
+		jmp	Options_ExitGameScreen_9277C
 VROOMM_StubThunk_6B83F	endp
 
 stub268		ends
