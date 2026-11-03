@@ -9,7 +9,8 @@
 Lu le 2026-10-22 dans `analysis/optest/annotated_segments/ovr191_annotated.asm` (interpréteur) et
 `seg006_annotated.asm` (lecteurs d'enregistrements). Sauf au § 8, les adresses sont celles de
 l'OPTEST.EXE **disquette** (sans voix). Le § 8 décrit l'OPTTEST.EXE du **CD-ROM** (avec voix), lu sans
-IDA, avec ses propres adresses ; listings dans `analysis/optest_cd/`.
+IDA, avec ses propres adresses ; listings dans `analysis/optest_cd/`. Le § 10 décrit les différences
+de Tactical Operations (`TOPTTST1.EXE`), dont la commande 16 (choix de l'équipier sans Lyle) et la 17.
 Outil : `tools/conv_dump.py --donnees <BIGTRE.TRE ou DATA> [entrée ...]` affiche les scripts.
 
 ## 1. Fichiers
@@ -51,6 +52,7 @@ format est identique dans les deux versions.
 | 14 | `SELECT_WING`\* (`UNKNOWN` dans libRealSpace) | escadre | octet `écran` ; octet `escadre` |
 | 15 | `CHOOSE_WINGMAN` | choix d'un équipier | aucun |
 | 16 | `NOP_16`\* | (rien) | aucun |
+| 17 | `CHOOSE_WINGMAN_ORIGINAL`\* | Tactical Operations seulement : choix de l'équipier (§ 10) | aucun |
 | autre | — | sautée | l'octet seul est consommé (branche par défaut) |
 
 Sous-commandes, lues par la commande qui les précède :
@@ -1205,3 +1207,83 @@ lecture sans erreur. Le test lit au plus les deux premières chaînes du script 
 lettres ou chiffres au plus, et dont les octets suivants formeraient aussi une suite CD valide,
 donnerait `Unknown` ou `Cd`. Aucun texte de ce genre dans les données.
 
+
+## 10. Tactical Operations (`TOPTTST1.EXE`, lu le 2026-11-02)
+
+Différences de l'extension avec Strike Commander. Référence de comparaison : **l'OPTTEST.EXE du CD**
+(§ 8), pas la disquette. Détail : `analysis/topt/README.md` § 7 ; version illustrée :
+`CONV_SYSTEM.html` § 12.
+
+### 10.1 Fichiers
+
+| Strike Commander | Tactical Operations | Remarque |
+|---|---|---|
+| `CONV.PAK` | `CONV2.PAK` | scripts de la campagne |
+| `CONVDATA.IFF` | `CONVDAT2.IFF` | `p_wing` a un 7ᵉ élément (Ari) |
+| `CONVSHPS.PAK` | `CONVSHPS.PAK` et `CONVSHP2.PAK` | image de décor > 92 lue dans `CONVSHP2.PAK`, sinon dans `CONVSHPS.PAK` |
+| `GAMEFLOW.IFF` | `GAMEFLO2.IFF` | escadres lues par `SELECT_WING` |
+| `VOCLIST.IFF` (CD) | `TOVOCLST.IFF` | liste des voix ; chaînes `f:` et `.voc` comme le CD |
+
+Choix du fichier d'images (`TOPTTST1.EXE`) :
+
+```
+cmp [bp+var_2], 5Ch      ; numéro d'image comparé à 92
+jbe short loc_61754      ; 92 ou moins : convshps.pak, sinon convshp2.pak
+```
+
+`CONVSHP2.PAK` : 96 entrées, toutes vides sauf 0, 93, 94 et 95.
+
+### 10.2 Format et interpréteur
+
+- Format des scripts : **celui du CD**, chaîne de voix devant chaque texte. Lecteurs :
+  `ConvRec_ReadLine_9428`, `ConvRec_ReadSpeaker_9642`, `ConvRec_ReadNarration_9796` (voix lue en
+  plus) ; `ConvRec_ReadAcceptSkip_9868`, `ConvRec_ReadJump_98A8` inchangés. `conv_dump.py` lit les 256
+  entrées de `CONV2.PAK` sans erreur.
+- Interpréteur `Conv_PlayScript_61E1C` : même structure que celui du CD (19 commandes, `cmp bx, 12h`).
+  Les commandes 0 et 3 n'ont pas été comparées instruction par instruction (exécutable du CD absent).
+
+| Valeur | Nom | Tactical Operations | `CONV2.PAK` |
+|---|---|---|---|
+| 14 | `SELECT_WING` | escadres lues dans `GAMEFLO2.IFF` | 27 |
+| 15 | `CHOOSE_WINGMAN` | choix de l'équipier, Ari à la place de Lyle | 19 |
+| 16 | `CHOOSE_WINGMAN_NO_LYLE`\* | choix de l'équipier sans Lyle (CD : sautée) | 2 |
+| 17 | `CHOOSE_WINGMAN_ORIGINAL`\* | choix parmi les cinq pilotes d'origine (absente du CD) | 2 |
+| 18 | `NOP_18`\* | rien | 0 |
+
+\* nom proposé.
+
+### 10.3 Pilotes et escadres
+
+Table des prénoms : 1 Billy, 2 Gwen, 3 Lyle, 4 Miguel, 5 Tex, **6 Ari**. `GAMEFLO2.IFF` : 6 escadres
+(1 à 6), toutes de type 0, chaque `PILT` contient les 6 pilotes, celui de l'escadre en tête :
+
+| Escadre | `PILT` |
+|---|---|
+| 1 | 1, 2, 4, 5, 6, 3 |
+| 2 | 2, 1, 4, 5, 6, 3 |
+| 3 | 3, 2, 1, 4, 5, 6 |
+| 4 | 4, 2, 1, 5, 6, 3 |
+| 5 | 5, 2, 1, 4, 6, 3 |
+| 6 | 6, 2, 1, 4, 5, 3 |
+
+`p_wing` de `CONVDAT2.IFF` : les 6 éléments de Strike Commander (images 81 à 86) et un élément 6, image
+95 de `CONVSHP2.PAK`, dessinée à x 15 à 81, y 69 à 195 (emplacement de Lyle, image 84).
+
+### 10.4 Les trois écrans de choix
+
+Même code que `CHOOSE_WINGMAN` de Strike Commander (§ 2, `SELECT_WING` / `CHOOSE_WINGMAN`) ; seuls
+changent :
+
+| Commande | Pilotes proposés | Éléments de `p_wing` dessinés | Zone de Lyle |
+|---|---|---|---|
+| 15 | ceux de `PILT` (tableau de 7) | 0 ; 1 et 2 si le pilote 1, 2 est proposé ; 3 jamais ; 4, 5, 6 si le pilote 3, 4, 5 est proposé | « Select Ari », pilote 6, élément 6 mis en évidence |
+| 16 | ceux de `PILT` (tableau de 6), puis retrait du 6ᵉ pilote de `PILT` et de Lyle | 0 ; 1 à 5 si proposé | « Select Lyle », jamais active |
+| 17 | ceux de `PILT` (tableau de 6) | 0 ; 1 à 5 si proposé | « Select Lyle », pilote 3 |
+
+Autres zones, dans les trois écrans : Billy 1, Gwen 2, Miguel 4, Tex 5. Commande 15 : les éléments 4 à 6
+sont dessinés d'après le pilote `si − 1` (`cmp byte ptr [bp+si-49h], 0`) alors que les zones testent le
+pilote 3, 4, 5 ; sans effet avec les données (tous les pilotes sont dans chaque `PILT`).
+
+Emploi : `CHOOSE_WINGMAN` dans 19 entrées de `CONV2.PAK` ; `CHOOSE_WINGMAN_NO_LYLE` dans les entrées
+17 et 18 ; `CHOOSE_WINGMAN_ORIGINAL` dans les entrées 5 et 8. Images : `analysis/topt/conv_images/`
+(`tools/conv_wing_to.py`).
