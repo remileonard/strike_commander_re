@@ -323,6 +323,7 @@ strike_commander_re/
 │   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD, CACH et SPOT) — RSMission, SCMission, SCProg…
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── menu_cd/                     MENU.EXE du CD-ROM : intro THEFLIC.FLX puis menu Strike Commander / Tactical Operations (code de sortie 10 / 11)
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
 │   │                                  conversations avec voix — CONV_SYSTEM.md § 8
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
