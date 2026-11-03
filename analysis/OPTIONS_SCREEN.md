@@ -149,3 +149,37 @@ pas été établi (l'écran GAMEPLAY, qui les montre sans doute, n'est pas lu).
 - Classe des boutons et de la fenêtre (relais `VROOMM_StubThunk_6C76C`, `6C969`, `6C95A`…) : les noms
   actuels de leurs cibles (`PaletteScreen_*`, `GaugeWidget_*`) viennent d'un inventaire rapide et ne
   correspondent pas à cet usage.
+
+## 4. Sous-écran DETAIL : `Options_DetailScreen_91D29`
+
+Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d'images
+`FONTS\DETLOPT.SHP` (52 images). Image composée avec les images aux positions du code, sur fond noir :
+`options_images/detlopt.png`.
+
+![Sous-écran DETAIL](options_images/detlopt.png)
+
+- **Titres et libellés des colonnes** (DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR) : dans
+  l'image 1 ; le rendu, sans police, les montre.
+- **Boutons** (paires normale / enfoncée) :
+
+| Bouton | Position | Taille | Images |
+|---|---|---|---|
+| GOURAUD (terrain) | (22, 67) | 73 × 11 | 2, 3 |
+| TRANSITION | (22, 80) | 73 × 11 | 4, 5 |
+| INTEREST | (22, 93) | 73 × 11 | 6, 7 |
+| RIVERS | (22, 106) | 73 × 11 | 8, 9 |
+| FIELDS | (22, 119) | 73 × 11 | 10, 11 |
+| CITIES | (22, 132) | 73 × 11 | 12, 13 |
+| RUNWAYS | (22, 145) | 73 × 11 | 14, 15 |
+| GOURAUD (objets) | (226, 67) | 73 × 11 | 26, 27 |
+| TEXTURE | (226, 80) | 73 × 11 | 28, 29 |
+| EXIT | (244, 132) | 38 × 11 | 24, 25 |
+
+- **Cases** : les images 16 à 25 font 13 × 12 ; elles servent aux cases HI, LO (3 cases) et HAZING
+  (5 cases, entre FAR et NEAR). Le code qui choisit quelle image de la paire montrer n'est pas lu.
+- **Jauges** : deux widgets de jauge (`GaugeWidgetVariantD_ConstructAndInit_A4270`) aux positions
+  (243, 93) et (127, 159). Leur rôle n'est pas établi.
+- **Zone noire au centre** : sur le rendu, c'est l'emplacement de l'aperçu ; elle n'est pas une image
+  du fichier. Le code qui la dessine n'est pas lu.
+- **Dessin** : `Cockpit_ApplyFormatAndDraw_91B70` (nom actuel, non lu) appelle `TextRenderer_ApplyFormatChange_5E34D`,
+  donc du texte peut être dessiné avec la police à cet endroit. Ce qu'elle écrit n'est pas établi.
