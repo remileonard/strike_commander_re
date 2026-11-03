@@ -324,6 +324,8 @@ strike_commander_re/
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
 │   ├── menu_cd/                     MENU.EXE du CD-ROM : intro THEFLIC.FLX puis menu Strike Commander / Tactical Operations (code de sortie 10 / 11)
+│   │                                  ; FLX_FORMAT.md : format de THEFLIC.FLX (palettes, images LZW, blocs 4 × 4, images par lignes)
+│   ├── IMPL_FLIC_INTRO.md           à porter : intro du CD (RSFlic + SCFlicPlayer, RSMusic::GetMidgamesPak, main.cpp) — tools/flic_ref/
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
 │   │                                  conversations avec voix — CONV_SYSTEM.md § 8
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
@@ -384,6 +386,8 @@ strike_commander_re/
     │                                  moteur des cinématiques d'un exécutable à l'autre (analysis/topt/README.md)
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
+    ├── flx_render.py                intro du CD THEFLIC.FLX : rendu de référence (GIF, planche, --empreintes) — menu_cd/FLX_FORMAT.md ;
+    │                                  flic_ref/ : RSFlic et SCFlicPlayer pour libRealSpace, build.sh, flic_test (943 images identiques)
     ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
     │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_spot_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
