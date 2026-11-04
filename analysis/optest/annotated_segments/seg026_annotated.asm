@@ -34,7 +34,7 @@ loc_11F7D:				; CODE XREF: sub_11F61+9j
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	si
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	word ptr [si+0Eh], 2D69h
 		mov	ax, si
@@ -738,7 +738,7 @@ loc_12623:				; CODE XREF: sub_1220C+412j
 		push	0AAh ; '�'
 		push	0Eh
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 2CCDh
 		mov	dword ptr [di+1Eh], 0
@@ -807,7 +807,7 @@ loc_126FA:				; CODE XREF: sub_1220C+4E9j
 		push	0A1h ; '�'
 		push	0CAh ; '�'
 		push	[bp+var_54]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_54]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -893,7 +893,7 @@ loc_12805:				; CODE XREF: sub_1220C+5F4j
 		push	0B3h ; '�'
 		push	0CAh ; '�'
 		push	[bp+var_60]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_60]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -979,7 +979,7 @@ loc_12910:				; CODE XREF: sub_1220C+6FFj
 		push	0A7h ; '�'
 		push	0B2h ; '�'
 		push	[bp+var_6C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_6C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1065,7 +1065,7 @@ loc_12A1B:				; CODE XREF: sub_1220C+80Aj
 		push	0A7h ; '�'
 		push	0ECh ; '�'
 		push	[bp+var_78]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_78]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1153,7 +1153,7 @@ loc_12B2C:				; CODE XREF: sub_1220C+91Bj
 		push	0AAh ; '�'
 		push	110h
 		push	[bp+var_84]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_84]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1230,7 +1230,7 @@ loc_12C34:				; CODE XREF: sub_1220C+A23j
 		push	0A2h ; '�'
 		push	7Dh ; '}'
 		push	[bp+var_90]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_90]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1312,7 +1312,7 @@ loc_12D4B:				; CODE XREF: sub_1220C+B3Aj
 		push	0B4h ; '�'
 		push	7Eh ; '~'
 		push	[bp+var_9C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_9C]
 		mov	word ptr [bx+0Eh], 7A8h

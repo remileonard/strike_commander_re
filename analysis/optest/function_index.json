@@ -3912,8 +3912,8 @@
 "sub_D2CC",
 "sub_DA2B"
 ],
-"new_name": "sub_DAEB",
-"summary": ""
+"new_name": "WidgetPanel_Construct_DAEB",
+"summary": "far, LUE 2026-11-04 (en-tête). Constructeur d'un panneau qui contient des boutons (114 octets, par sub_D2CC → Widget_ConstructRect_FED6) : arguments x, y, largeur, hauteur. Dans TRAINING MISSION, l'image du panneau (TM.SHP) est posée dans l'objet et les positions des boutons sont relatives au coin du panneau (vérifié par rendu)."
 },
 "sub_DC89": {
 "segment": "seg021",
@@ -4475,8 +4475,8 @@
 "sub_64E",
 "sub_2E9A4"
 ],
-"new_name": "sub_FED6",
-"summary": ""
+"new_name": "Widget_ConstructRect_FED6",
+"summary": "far, LUE 2026-11-04 (champs). Constructeur de base d'un élément d'écran (alloué si nul, 30 octets) : arguments x, y, largeur, hauteur → +4 x, +6 y, +26 largeur, +28 hauteur, +8 x + largeur − 1, +10 y + hauteur − 1. Les boutons d'OPTEST mettent ensuite l'image normale en +40, la valeur en +44 (écrite dans le mot pointé par +42) et l'image enfoncée en +46."
 },
 "sub_FF96": {
 "segment": "seg023",
@@ -12809,8 +12809,8 @@
 "lines": 21,
 "type": "far",
 "calls": [],
-"new_name": "sub_3C5D6",
-"summary": ""
+"new_name": "ResourceRecord_RecordCount_3C5D6",
+"summary": "far, LUE 2026-11-04. Nombre d'enregistrements du chunk courant : taille du chunk ([si+72h]) / taille d'un enregistrement (argument dword), rangée en [si+7Eh] et renvoyée."
 },
 "sub_3C623": {
 "segment": "seg147",
@@ -13028,8 +13028,8 @@
 "sub_3CAE1",
 "sub_3C623"
 ],
-"new_name": "sub_3CBF6",
-"summary": ""
+"new_name": "ResourceRecord_CopyChunksUntilTag_3CBF6",
+"summary": "far, LUE 2026-11-04 (structure). Recopie du fichier lu (3e argument) vers le fichier écrit (1er argument) les chunks et FORM qui suivent, jusqu'au premier chunk du tag donné (2e argument, dword), non compris. Appelée par Training_BuildInstantMission_58EEA."
 },
 "sub_3CEB3": {
 "segment": "seg149",
@@ -20315,8 +20315,8 @@
 "sub_33ABC",
 "sub_2FDCC"
 ],
-"new_name": "sub_552E0",
-"summary": ""
+"new_name": "Training_SaveRegion_552E0",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Sauvegarde un rectangle de l'écran (x0, y0, x1, y1) dans un tampon et l'ajoute à une liste (Render_BlitClippedRegionVariant_33ABC)."
 },
 "sub_55431": {
 "segment": "ovr190",
@@ -20329,8 +20329,8 @@
 "sub_334A0",
 "sub_2FE19"
 ],
-"new_name": "sub_55431",
-"summary": ""
+"new_name": "Training_RestoreRegion_55431",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Recopie à l'écran le dernier rectangle sauvegardé de la liste (Render_BlitClippedRegion_334A0) et le retire de la liste."
 },
 "sub_5547D": {
 "segment": "ovr190",
@@ -20389,8 +20389,8 @@
 "sub_2EBFA",
 "sub_3D240"
 ],
-"new_name": "sub_5547D",
-"summary": ""
+"new_name": "Training_TypeScreen_5547D",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Premier écran de TRAINING MISSION. Charge ..\\\\..\\\\data\\\\gameflow\\\\objview.pak (entrée 7 = palette, 6 = image de fond plein écran dessinée en (0,0), 1 = bandeau « TRAINING MISSION » en (4,3)), gameflow\\\\tm.shp (images des panneaux et boutons, gardées en réglages +30) et gameflow\\\\bwfont.shp. Panneau en (6,153) de 308 × 42, image 0 de TM.SHP ; boutons (position relative au panneau, 136 × 12 ou 65 × 12) : SEARCH AND DESTROY (16,9) images 1/2 valeur 2, DOGFIGHT (155,9) images 3/4 valeur 1, CANCEL (155,24) images 5/6 valeur −1. Valeur 1 → Training_DogfightBriefing_58E2A, 2 → Training_SearchBriefing_58E74, rangée en réglages +40. Retour 0 d'un sous-écran (BACKUP) : l'écran est redessiné ; renvoie 1 si le sous-écran a renvoyé 2 (ACCEPT), 0 sinon."
 },
 "sub_55BDC": {
 "segment": "ovr190",
@@ -20403,8 +20403,8 @@
 "sub_552E0",
 "sub_11363"
 ],
-"new_name": "sub_55BDC",
-"summary": ""
+"new_name": "Training_PrintText_55BDC",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit un texte (arguments : réglages, x, y, chaîne) : sauvegarde la zone d'écran sous le texte (Training_SaveRegion_552E0, liste en réglages +24), puis PaletteScreen_DispatchWidgetLayoutB_11363 (couleur 255)."
 },
 "sub_55C7B": {
 "segment": "ovr190",
@@ -20415,8 +20415,8 @@
 "calls": [
 "sub_55431"
 ],
-"new_name": "sub_55C7B",
-"summary": ""
+"new_name": "Training_EraseLastText_55C7B",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Efface le dernier texte écrit : Training_RestoreRegion_55431 sur la liste des réglages +24 (appelée par les boutons BACKUP)."
 },
 "sub_55C92": {
 "segment": "ovr190",
@@ -20458,8 +20458,8 @@
 "sub_584BD",
 "sub_DC89"
 ],
-"new_name": "sub_55C92",
-"summary": ""
+"new_name": "Training_AltitudeScreen_55C92",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Altitude : écrit « Altitude: » en (5,103) ; panneau (6,153) image 68 ; 5,000 (19,9) images 69/70, 15,000 (87,9) 71/72, 25,000 (155,9) 73/74, 35,000 (223,9) 75/76, BACKUP (87,24) 77/78, CANCEL (155,24) 79/80. Choix n : réglages +0 = n × 10000 − 5000 (`imul eax, 2710h` / `add eax, 0FFFFEC78h`), « %ld feet. » écrit derrière « Altitude: », puis Training_PilotLevelScreen_584BD."
 },
 "sub_56366": {
 "segment": "ovr190",
@@ -20501,8 +20501,8 @@
 "sub_56B04",
 "sub_DC89"
 ],
-"new_name": "sub_56366",
-"summary": ""
+"new_name": "Training_GroupCountScreen_56366",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Nombre d'avions du groupe courant (réglages +22). Panneau (6,153) image 7 ; boutons 14 × 12 : 1 à 5 en (113,9), (130,9), (147,9), (164,9), (181,9), images 8/9, 10/11, 12/13, 14/15, 16/17 ; BACKUP (87,24) images 18/19 (−1) ; CANCEL (155,24) images 20/21 (−2). Choix n : nombre du groupe = n, total +20 += n, « %d » écrit en (20, 67 + 12 × groupe), puis Training_AircraftScreen_56B04. BACKUP : efface le dernier texte, groupe −1 (si > 0), renvoie 0 ; CANCEL renvoie 1."
 },
 "sub_56B04": {
 "segment": "ovr190",
@@ -20580,8 +20580,8 @@
 "sub_55C92",
 "sub_DC89"
 ],
-"new_name": "sub_56B04",
-"summary": ""
+"new_name": "Training_AircraftScreen_56B04",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Type d'avion du groupe courant. Panneau (6,116) de 308 × 79, image 22 ; 16 boutons 65 × 12 en colonnes x = 9, 77, 145, 235 et lignes y = 7, 20, 33, 46 (images 23/24 à 53/54, valeurs 1 à 16 : F-15, F-16, F/A-18, C-130, F-22, YF-23, A-10, E-3, Tornado, Mirage 2000, Lear Jet, 747, MiG-21, MiG-29, Su-27, TU-95) ; BACKUP (87,61) 55/56, CANCEL (155,61) 57/58. Choix n : type du groupe (+6 + 2 × groupe) = n − 1, nom (table DGROUP 2708 + 15 × n, mot 0) écrit en (30, 67 + 12 × groupe), suivi de « . » au 3e groupe ; puis Training_MoreEnoughScreen_57FDA (groupes 1 et 2) ou Training_AltitudeScreen_55C92 (3e groupe). BACKUP : retire le nombre du groupe du total, le remet à 0, efface le dernier texte, renvoie 0."
 },
 "sub_57FDA": {
 "segment": "ovr190",
@@ -20616,8 +20616,8 @@
 "sub_55C92",
 "sub_DC89"
 ],
-"new_name": "sub_57FDA",
-"summary": ""
+"new_name": "Training_MoreEnoughScreen_57FDA",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Après un groupe : panneau (6,153) image 59 ; MORE (87,9) images 60/61, ENOUGH (155,9) 62/63, BACKUP (87,24) 64/65, CANCEL (155,24) 66/67. MORE : écrit « , » (après le 1er groupe) ou « , and » (après le 2e) derrière le nom, groupe +1, Training_GroupCountScreen_56366 ; ENOUGH : écrit « . », Training_AltitudeScreen_55C92."
 },
 "sub_584BD": {
 "segment": "ovr190",
@@ -20657,8 +20657,8 @@
 "sub_58A9D",
 "sub_DC89"
 ],
-"new_name": "sub_584BD",
-"summary": ""
+"new_name": "Training_PilotLevelScreen_584BD",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Niveau des pilotes : écrit « Intelligence reports indicate » en (5,115) ; panneau (6,153) image 81 ; ROOKIE (54,9) images 82/83, VETERAN (122,9) 84/85, ACE (190,9) 86/87, BACKUP (87,24) 88/89, CANCEL (155,24) 90/91. Choix n : réglages +18 = n − 1, « %s pilots. » avec rookie / veteran / ace (table DGROUP 2948), puis Training_AcceptScreen_58A9D."
 },
 "sub_58A9D": {
 "segment": "ovr190",
@@ -20686,8 +20686,8 @@
 "sub_DC89",
 "sub_DC89"
 ],
-"new_name": "sub_58A9D",
-"summary": ""
+"new_name": "Training_AcceptScreen_58A9D",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Dernier écran : panneau (6,153) image 92 ; ACCEPT (121,9) images 93/94 (renvoie 2), BACKUP (87,24) 95/96 (efface 2 textes, renvoie 0), CANCEL (155,24) 97/98 (renvoie 1)."
 },
 "sub_58E2A": {
 "segment": "ovr190",
@@ -20700,8 +20700,8 @@
 "sub_11363",
 "sub_56366"
 ],
-"new_name": "sub_58E2A",
-"summary": ""
+"new_name": "Training_DogfightBriefing_58E2A",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit « Mission Briefing: Air Superiority » en (5,43) et « Intercept and engage inbound bogeys: » en (5,55) (PaletteScreen_DispatchWidgetLayoutB_11363, couleur 255), puis Training_GroupCountScreen_56366."
 },
 "sub_58E74": {
 "segment": "ovr190",
@@ -20716,8 +20716,8 @@
 "sub_11363",
 "sub_58A9D"
 ],
-"new_name": "sub_58E74",
-"summary": ""
+"new_name": "Training_SearchBriefing_58E74",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit les 4 lignes du briefing d'attaque au sol en (5,43), (5,55), (5,67), (5,79) : « Mission Briefing: Ground Attack », « Search and destroy enemy targets at », « pilot's discretion.  Refer to area », « map for enemy positions. », puis Training_AcceptScreen_58A9D (aucun autre réglage)."
 },
 "sub_58EEA": {
 "segment": "ovr190",
@@ -20794,8 +20794,8 @@
 "sub_3BE15",
 "sub_3CEB3"
 ],
-"new_name": "sub_58EEA",
-"summary": ""
+"new_name": "Training_BuildInstantMission_58EEA",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit instant.iff (répertoire courant) à partir de ..\\\\..\\\\data\\\\missions\\\\template.iff. FORM MISN ; chunks du modèle recopiés jusqu'à AREA (ResourceRecord_CopyChunksUntilTag_3CBF6) ; AREA du modèle + (dogfight) zone sphère « Destroy bogeys » de 49 octets, c0 = −66000, c1 = 128000, c2 = altitude en pieds telle quelle (`shl eax, 8`), rayon 45000 ; recopie jusqu'à FLAG ; FLAG du modèle + un mot = nombre total d'avions (réglages +20, 0 en SEARCH AND DESTROY) ; CAST du modèle + (dogfight) un nom de 9 octets par avion : rookie / veteran / ace si le drapeau de l'avion (table + 14) est posé, « target » sinon ; PART : 1er objet du modèle (le joueur) replacé en c0 = −73000, c1 = 128000, c2 = pieds × 256 / 839 (dword_46456), cap 90, les autres recopiés, puis (dogfight) un objet de 62 octets par avion (CAST = nombre de CAST du modèle + rang, fichier et emport de la table, zone 65535, c0 = −59000 + 500 × groupe, c1 = 128000 + 300 × rang, même altitude que le joueur, cap 270, vitesse 200 si drapeau sinon 100, camp 255, scripts PROG 65535 / 1 si drapeau sinon 2 / 3 / 65535) ; PROG, TEAM recopiés ; FORM PLAY recopiée + (dogfight) un SCNE de 24 octets (active 1, zone = nombre de zones du modèle, scripts 65535) suivi des index PART des avions ajoutés ; LOAD recopié. Reproduit par tools/instant_mission.py."
 },
 "sub_597B2": {
 "segment": "ovr190",
@@ -20817,8 +20817,8 @@
 "sub_2FEE0",
 "sub_2FEE0"
 ],
-"new_name": "sub_597B2",
-"summary": ""
+"new_name": "Training_Run_597B2",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Point d'entrée de TRAINING MISSION, choix 3 du menu d'accueil (Gameflow_MainLoop_3D2E → stub sub_4211F). byte_43BAA = 1 pendant l'entraînement (Gameflow_WeaponLoadout_51AB3 ne change alors pas l'ambiance musicale). Charge la banque ..\\\\..\\\\data\\\\midgames\\\\rmusic.pak (amusic.pak si byte_46848 = 2) par Speech_LoadBank_28D24 (argument 28). Réglages sur la pile (42 octets, Training_InitSettings_598FC), écran Training_TypeScreen_5547D. Si accepté : stock d'armes de la partie [+609..+625] = 6, 6, 12, 12, 24, 24, 4, 8, 6 (SWINDERJ, SWINDERM, AGM-65D, DURANDAL, MK20, MK82, GBU-15G, POD, AMRAAM, table DGROUP 712), [partie+252] = 11, écran d'armement (stub sub_420A4 → Gameflow_WeaponLoadout_51AB3, argument 0) ; s'il est validé, Training_BuildInstantMission_58EEA écrit instant.iff. Renvoie 1 si le vol part : Gameflow_MainLoop_3D2E pose alors [partie+249] = 254 et [partie+232] = 1 (départ en vol ; Gameflow_SaveTmpState_4BBA0 sauté, Gameflow_WriteMissionOrder_4BBF7 écrit le nom « instant », « arena » et 21)."
 },
 "sub_598FC": {
 "segment": "ovr190",
@@ -20829,8 +20829,8 @@
 "calls": [
 "sub_64E"
 ],
-"new_name": "sub_598FC",
-"summary": ""
+"new_name": "Training_InitSettings_598FC",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Initialise les réglages de l'entraînement (42 octets ; alloués si argument nul) : +0 dword altitude en pieds = 5000 ; +4 = 0 ; +6/+8/+10 type d'avion des groupes 0 à 2 ; +12/+14/+16 nombre d'avions des groupes 0 à 2 (= 0) ; +18 niveau des pilotes (0 rookie, 1 veteran, 2 ace) ; +20 nombre total d'avions ; +22 groupe courant ; +24 liste des zones d'écran sauvegardées sous les textes ; +30 image TM.SHP (dword), +34/+35 propriété ; +40 type de mission (1 DOGFIGHT, 2 SEARCH AND DESTROY)."
 },
 "sub_5997F": {
 "segment": "ovr190",
@@ -20843,8 +20843,8 @@
 "sub_2FEE0",
 "sub_308"
 ],
-"new_name": "sub_5997F",
-"summary": ""
+"new_name": "Training_TextRegionList_Destruct_5997F",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Destructeur de la liste des zones d'écran sauvegardées sous les textes (réglages +24) ; libère l'objet si bit 0 de l'argument."
 },
 "sub_599BB": {
 "segment": "ovr190",
@@ -20856,8 +20856,8 @@
 "sub_2B8A4",
 "sub_308"
 ],
-"new_name": "sub_599BB",
-"summary": ""
+"new_name": "Training_SavedRegion_Destruct_599BB",
+"summary": "far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Destructeur d'une zone d'écran sauvegardée : libère le tampon (+4) s'il est possédé (+9), libère l'objet si bit 0 de l'argument."
 },
 "sub_59A20": {
 "segment": "ovr191",

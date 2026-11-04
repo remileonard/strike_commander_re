@@ -803,7 +803,8 @@ disquette).
 - Les codes de sortie 1, 3, 4 et 5 de `misn2op.iff`, vus du côté de STRIKE.EXE.
 - `PRTL` de `MLST` et le contenu exact d'`op2misn.iff` (`Gameflow_WriteMissionOrder_4BBF7`, lu en
   surface).
-- Le menu d'accueil (`Gameflow_MainMenu_4F1A7`, choix 0 à 5) n'est lu qu'en surface.
+- Le menu d'accueil (`Gameflow_MainMenu_4F1A7`, choix 0 à 5) n'est lu qu'en surface. Choix 3 : TRAINING MISSION
+  (`Training_Run_597B2`), lu en entier : `TRAINING_MISSION.md`.
 - La 3ᵉ valeur de MISN-10A (FLAG[2]) : aucune instruction du script ne l'écrit (§ 6.1) ; à
   confronter au jeu (MISN-10b est-elle jouée après MISN-10a ?).
 - MISN-9A, 9AA, 10A : la 8ᵉ valeur recopie un drapeau qu'aucune instruction n'écrit (FLAG[6],

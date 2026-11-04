@@ -339,6 +339,9 @@ strike_commander_re/
 │   ├── GAMEFLOW_SYSTEM.md           déroulement de la campagne (OPTEST) : GAMEFLOW.IFF, boucle principale,
 │   │                                  scènes et REQU, les 39 commandes des scripts EFCT (43 sur CD), compte rendu
 │   │                                  de vol misn2op.iff, écarts avec SCGameFlow de libRealSpace
+│   ├── TRAINING_MISSION.md          TRAINING MISSION d'OPTEST (choix 3 du menu, ovr190) : 7 écrans (TM.SHP, OBJVIEW.PAK),
+│   │                                  réglages, table des 16 avions, construction d'instant.iff depuis TEMPLATE.IFF,
+│   │                                  op2misn.iff ; rendus dans training_images/
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace
@@ -394,6 +397,8 @@ strike_commander_re/
     │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_spot_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
     │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
+    ├── instant_mission.py           mission d'entraînement : reproduit instant.iff (DOGFIGHT / SEARCH AND DESTROY)
+    │                                  depuis MISSIONS\TEMPLATE.IFF, --lire un fichier produit — TRAINING_MISSION.md
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné

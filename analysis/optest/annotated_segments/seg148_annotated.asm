@@ -606,7 +606,7 @@ ResourceRecord_ReadAndWriteBridgeB_3C9C8	endp
 ; ResourceRecord_ReadAndWriteBridgeB_65158. Appelée par sub_652D5.
 ; ==============================================================================================
 ResourceRecord_BridgeWrapperA_3CA4F	proc far		; CODE XREF: ResourceRecord_FindByTag_3CAE1+36p
-					; sub_58EEA+134P ...
+					; Training_BuildInstantMission_58EEA+134P ...
 
 var_4		= dword	ptr -4
 arg_0		= word ptr  6
@@ -664,7 +664,7 @@ ResourceRecord_BridgeWrapperA_3CA4F	endp
 ; ResourceRecord_ReadAndWriteBridgeB_65158. Appelée par sub_652D5.
 ; ==============================================================================================
 ResourceRecord_BridgeWrapperB_3CAA2	proc far		; CODE XREF: ResourceRecord_CopyOrTransform_3CB45+31p
-					; sub_58EEA+6FCP
+					; Training_BuildInstantMission_58EEA+6FCP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -716,7 +716,7 @@ ResourceRecord_BridgeWrapperB_3CAA2	endp
 ; de segment.
 ; ==============================================================================================
 ResourceRecord_FindByTag_3CAE1	proc far		; CODE XREF: seg148:0523p
-					; sub_3CBF6+35p ...
+					; ResourceRecord_CopyChunksUntilTag_3CBF6+35p ...
 
 var_7		= word ptr -7
 var_2		= word ptr -2
@@ -781,7 +781,7 @@ ResourceRecord_FindByTag_3CAE1	endp
 ; transformation d'un enregistrement vers un autre format.
 ; ==============================================================================================
 ResourceRecord_CopyOrTransform_3CB45	proc far		; CODE XREF: seg148:0535p
-					; sub_3CBF6+23p
+					; ResourceRecord_CopyChunksUntilTag_3CBF6+23p
 
 var_6		= dword	ptr -6
 var_2		= word ptr -2
@@ -898,8 +898,13 @@ loc_3CBEF:				; CODE XREF: seg148:0546j
 
 ; Attributes: bp-based frame
 
-sub_3CBF6	proc far		; CODE XREF: sub_58EEA+F9P
-					; sub_58EEA+1F3P
+; ==============================================================================================
+; far, LUE 2026-11-04 (structure). Recopie du fichier lu (3e argument) vers le fichier écrit
+; (1er argument) les chunks et FORM qui suivent, jusqu'au premier chunk du tag donné (2e
+; argument, dword), non compris. Appelée par Training_BuildInstantMission_58EEA.
+; ==============================================================================================
+ResourceRecord_CopyChunksUntilTag_3CBF6	proc far		; CODE XREF: Training_BuildInstantMission_58EEA+F9P
+					; Training_BuildInstantMission_58EEA+1F3P
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -917,7 +922,7 @@ arg_6		= word ptr  0Ch
 		jmp	short loc_3CC38
 ; ���������������������������������������������������������������������������
 
-loc_3CC0B:				; CODE XREF: sub_3CBF6+6Dj
+loc_3CC0B:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+6Dj
 		push	di
 		call	ResourceRecord_ComputeRecordBounds_3BF4B
 		pop	cx
@@ -930,7 +935,7 @@ loc_3CC0B:				; CODE XREF: sub_3CBF6+6Dj
 		jmp	short loc_3CC2E
 ; ���������������������������������������������������������������������������
 
-loc_3CC1E:				; CODE XREF: sub_3CBF6+1Ej
+loc_3CC1E:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+1Ej
 		mov	eax, [di+6Dh]
 		cmp	eax, [bp+arg_2]
 		jz	short loc_3CC33
@@ -939,16 +944,16 @@ loc_3CC1E:				; CODE XREF: sub_3CBF6+1Ej
 		push	cs
 		call	near ptr ResourceRecord_FindByTag_3CAE1
 
-loc_3CC2E:				; CODE XREF: sub_3CBF6+26j
+loc_3CC2E:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+26j
 		add	sp, 4
 		jmp	short loc_3CC38
 ; ���������������������������������������������������������������������������
 
-loc_3CC33:				; CODE XREF: sub_3CBF6+30j
+loc_3CC33:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+30j
 		mov	[bp+var_2], 1
 
-loc_3CC38:				; CODE XREF: sub_3CBF6+13j
-					; sub_3CBF6+3Bj
+loc_3CC38:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+13j
+					; ResourceRecord_CopyChunksUntilTag_3CBF6+3Bj
 		cmp	[bp+var_2], 0
 		jnz	short loc_3CC65
 		cmp	word ptr [di+7Ch], 0
@@ -959,7 +964,7 @@ loc_3CC38:				; CODE XREF: sub_3CBF6+13j
 		jmp	short loc_3CC61
 ; ���������������������������������������������������������������������������
 
-loc_3CC4D:				; CODE XREF: sub_3CBF6+4Cj
+loc_3CC4D:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+4Cj
 		mov	eax, [di+65h]
 		mov	bx, [di+7Ch]
 		cmp	eax, [bx+0Fh]
@@ -968,21 +973,21 @@ loc_3CC4D:				; CODE XREF: sub_3CBF6+4Cj
 		jmp	short loc_3CC61
 ; ���������������������������������������������������������������������������
 
-loc_3CC5F:				; CODE XREF: sub_3CBF6+62j
+loc_3CC5F:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+62j
 		xor	ax, ax
 
-loc_3CC61:				; CODE XREF: sub_3CBF6+55j
-					; sub_3CBF6+67j
+loc_3CC61:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+55j
+					; ResourceRecord_CopyChunksUntilTag_3CBF6+67j
 		or	ax, ax
 		jz	short loc_3CC0B
 
-loc_3CC65:				; CODE XREF: sub_3CBF6+46j
+loc_3CC65:				; CODE XREF: ResourceRecord_CopyChunksUntilTag_3CBF6+46j
 		mov	ax, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_3CBF6	endp
+ResourceRecord_CopyChunksUntilTag_3CBF6	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

@@ -356,7 +356,7 @@ loc_4C6D7:				; CODE XREF: sub_4C62A+A8j
 		push	2Bh ; '+'
 		push	21h ; '!'
 		push	[bp+var_A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_A]
 		mov	word ptr [bx+0Eh], 848h
@@ -483,7 +483,7 @@ loc_4C853:				; CODE XREF: sub_4C62A+224j
 		push	61h ; 'a'
 		push	36h ; '6'
 		push	[bp+var_20]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_20]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -570,7 +570,7 @@ loc_4C958:				; CODE XREF: sub_4C62A+329j
 		push	70h ; 'p'
 		push	0Ah
 		push	[bp+var_30]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_30]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -657,7 +657,7 @@ loc_4CA5D:				; CODE XREF: sub_4C62A+42Ej
 		push	70h ; 'p'
 		push	5Eh ; '^'
 		push	[bp+var_40]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_40]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -744,7 +744,7 @@ loc_4CB61:				; CODE XREF: sub_4C62A+532j
 		push	29h ; ')'
 		push	9
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -821,7 +821,7 @@ loc_4CC46:				; CODE XREF: sub_4C62A+617j
 		push	53h ; 'S'
 		push	9
 		push	[bp+var_5E]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_5E]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1595,7 +1595,7 @@ loc_4D2DC:				; CODE XREF: sub_4CF75+35Ej
 		push	65h ; 'e'
 		lea	ax, [bp+var_9E]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		cmp	[bp+var_69], 0
 		jnz	short loc_4D307
@@ -1652,7 +1652,7 @@ loc_4D38D:				; CODE XREF: sub_4CF75+413j
 		push	19h
 		push	12h
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -1721,7 +1721,7 @@ loc_4D45A:				; CODE XREF: sub_4CF75+4E0j
 		push	19h
 		push	45h ; 'E'
 		push	[bp+var_26]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_26]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1949,7 +1949,7 @@ loc_4D6A3:				; CODE XREF: sub_4CF75+6E3j
 		push	65h ; 'e'
 		lea	ax, [bp+var_9E]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		cmp	[bp+var_69], 0
 		jnz	short loc_4D6C5
@@ -2006,7 +2006,7 @@ loc_4D74B:				; CODE XREF: sub_4CF75+7D1j
 		push	19h
 		push	12h
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -2075,7 +2075,7 @@ loc_4D818:				; CODE XREF: sub_4CF75+89Ej
 		push	19h
 		push	45h ; 'E'
 		push	[bp+var_24]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_24]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2293,7 +2293,7 @@ loc_4D99C:				; CODE XREF: Gameflow_SaveRequester_4D984+13j
 		push	50h ; 'P'
 		lea	ax, [bp+var_D2]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	[bp+var_C4], 704h
 		mov	[bp+var_39], 0
@@ -2797,7 +2797,7 @@ loc_4DDFD:				; CODE XREF: Gameflow_LoadRequester_4DDDC+1Cj
 		push	50h ; 'P'
 		lea	ax, [bp+var_D2]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	[bp+var_C4], 704h
 		mov	[bp+var_39], 0

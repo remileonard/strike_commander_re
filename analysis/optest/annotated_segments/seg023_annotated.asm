@@ -988,7 +988,13 @@ sub_FBE7	endp
 
 ; Attributes: bp-based frame
 
-sub_FED6	proc far		; CODE XREF: sub_D2CC+28P seg025:06ADP ...
+; ==============================================================================================
+; far, LUE 2026-11-04 (champs). Constructeur de base d'un élément d'écran (alloué si nul, 30
+; octets) : arguments x, y, largeur, hauteur → +4 x, +6 y, +26 largeur, +28 hauteur, +8 x +
+; largeur − 1, +10 y + hauteur − 1. Les boutons d'OPTEST mettent ensuite l'image normale en
+; +40, la valeur en +44 (écrite dans le mot pointé par +42) et l'image enfoncée en +46.
+; ==============================================================================================
+Widget_ConstructRect_FED6	proc far		; CODE XREF: sub_D2CC+28P seg025:06ADP ...
 
 var_8		= word ptr -8
 var_6		= word ptr -6
@@ -1016,7 +1022,7 @@ arg_8		= word ptr  0Eh
 		jmp	loc_FF80
 ; ���������������������������������������������������������������������������
 
-loc_FEF7:				; CODE XREF: sub_FED6+Cj sub_FED6+1Cj
+loc_FEF7:				; CODE XREF: Widget_ConstructRect_FED6+Cj Widget_ConstructRect_FED6+1Cj
 		mov	word ptr [si], 0
 		mov	word ptr [si+2], 0
 		mov	byte ptr [si+0Dh], 0
@@ -1059,12 +1065,12 @@ loc_FEF7:				; CODE XREF: sub_FED6+Cj sub_FED6+1Cj
 		mov	word ptr [si+16h], 1
 		mov	word ptr [si+18h], 1
 
-loc_FF80:				; CODE XREF: sub_FED6+1Ej
+loc_FF80:				; CODE XREF: Widget_ConstructRect_FED6+1Ej
 		mov	ax, si
 		pop	si
 		leave
 		retf
-sub_FED6	endp
+Widget_ConstructRect_FED6	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si

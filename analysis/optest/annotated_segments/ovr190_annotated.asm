@@ -6,7 +6,11 @@ ovr190		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_552E0	proc far		; CODE XREF: sub_42124J sub_55BDC+7Fp
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Sauvegarde un rectangle de l'écran (x0,
+; y0, x1, y1) dans un tampon et l'ajoute à une liste (Render_BlitClippedRegionVariant_33ABC).
+; ==============================================================================================
+Training_SaveRegion_552E0	proc far		; CODE XREF: sub_42124J Training_PrintText_55BDC+7Fp
 
 var_12		= dword	ptr -12h
 var_E		= dword	ptr -0Eh
@@ -34,7 +38,7 @@ arg_2		= word ptr  8
 		jmp	loc_5541B
 ; ���������������������������������������������������������������������������
 
-loc_55305:				; CODE XREF: sub_552E0+20j
+loc_55305:				; CODE XREF: Training_SaveRegion_552E0+20j
 		mov	bx, [bp+var_6]
 		mov	word ptr [bx], 5CEh
 		mov	bx, [bp+var_6]
@@ -123,10 +127,10 @@ loc_55305:				; CODE XREF: sub_552E0+20j
 		jmp	short loc_5541E
 ; ���������������������������������������������������������������������������
 
-loc_5541B:				; CODE XREF: sub_552E0+22j
+loc_5541B:				; CODE XREF: Training_SaveRegion_552E0+22j
 		mov	ax, [bp+var_6]
 
-loc_5541E:				; CODE XREF: sub_552E0+139j
+loc_5541E:				; CODE XREF: Training_SaveRegion_552E0+139j
 		mov	[bp+var_2], ax
 		push	[bp+var_2]
 		push	di
@@ -136,14 +140,18 @@ loc_5541E:				; CODE XREF: sub_552E0+139j
 		pop	si
 		leave
 		retf
-sub_552E0	endp
+Training_SaveRegion_552E0	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_55431	proc far		; CODE XREF: sub_42129J sub_55C7B+Ep
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Recopie à l'écran le dernier rectangle
+; sauvegardé de la liste (Render_BlitClippedRegion_334A0) et le retire de la liste.
+; ==============================================================================================
+Training_RestoreRegion_55431	proc far		; CODE XREF: sub_42129J Training_EraseLastText_55C7B+Ep
 
 arg_0		= word ptr  6
 
@@ -177,19 +185,30 @@ arg_0		= word ptr  6
 		call	LinkedListB_FindAndDispatch_2FE19
 		add	sp, 6
 
-loc_55479:				; CODE XREF: sub_55431+Dj
+loc_55479:				; CODE XREF: Training_RestoreRegion_55431+Dj
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_55431	endp
+Training_RestoreRegion_55431	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_5547D	proc far		; CODE XREF: sub_42160J sub_597B2+69p
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Premier écran de TRAINING MISSION. Charge
+; ..\\..\\data\\gameflow\\objview.pak (entrée 7 = palette, 6 = image de fond plein écran
+; dessinée en (0,0), 1 = bandeau « TRAINING MISSION » en (4,3)), gameflow\\tm.shp (images des
+; panneaux et boutons, gardées en réglages +30) et gameflow\\bwfont.shp. Panneau en (6,153) de
+; 308 × 42, image 0 de TM.SHP ; boutons (position relative au panneau, 136 × 12 ou 65 × 12) :
+; SEARCH AND DESTROY (16,9) images 1/2 valeur 2, DOGFIGHT (155,9) images 3/4 valeur 1, CANCEL
+; (155,24) images 5/6 valeur −1. Valeur 1 → Training_DogfightBriefing_58E2A, 2 →
+; Training_SearchBriefing_58E74, rangée en réglages +40. Retour 0 d'un sous-écran (BACKUP) :
+; l'écran est redessiné ; renvoie 1 si le sous-écran a renvoyé 2 (ACCEPT), 0 sinon.
+; ==============================================================================================
+Training_TypeScreen_5547D	proc far		; CODE XREF: sub_42160J Training_Run_597B2+69p
 
 var_1CA		= word ptr -1CAh
 var_17A		= dword	ptr -17Ah
@@ -415,7 +434,7 @@ arg_0		= word ptr  6
 		add	sp, 4
 		mov	word ptr [si+28h], 0
 
-loc_556A3:				; CODE XREF: sub_5547D+60Cj
+loc_556A3:				; CODE XREF: Training_TypeScreen_5547D+60Cj
 		push	0
 		push	0
 		mov	al, [bp+var_20]
@@ -458,7 +477,7 @@ loc_556A3:				; CODE XREF: sub_5547D+60Cj
 		push	6
 		lea	ax, [bp+var_1CA]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -493,13 +512,13 @@ loc_556A3:				; CODE XREF: sub_5547D+60Cj
 		jmp	loc_55817
 ; ���������������������������������������������������������������������������
 
-loc_5578D:				; CODE XREF: sub_5547D+30Bj
+loc_5578D:				; CODE XREF: Training_TypeScreen_5547D+30Bj
 		push	0Ch
 		push	88h ; '�'
 		push	9
 		push	10h
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -532,10 +551,10 @@ loc_5578D:				; CODE XREF: sub_5547D+30Bj
 		jmp	short loc_55819
 ; ���������������������������������������������������������������������������
 
-loc_55817:				; CODE XREF: sub_5547D+30Dj
+loc_55817:				; CODE XREF: Training_TypeScreen_5547D+30Dj
 		mov	ax, di
 
-loc_55819:				; CODE XREF: sub_5547D+398j
+loc_55819:				; CODE XREF: Training_TypeScreen_5547D+398j
 		push	ax
 		lea	ax, [bp+var_1CA]
 		push	ax
@@ -554,13 +573,13 @@ loc_55819:				; CODE XREF: sub_5547D+398j
 		jmp	loc_55903
 ; ���������������������������������������������������������������������������
 
-loc_55845:				; CODE XREF: sub_5547D+3C3j
+loc_55845:				; CODE XREF: Training_TypeScreen_5547D+3C3j
 		push	0Ch
 		push	88h ; '�'
 		push	9
 		push	9Bh ; '�'
 		push	[bp+var_5A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_5A]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -609,10 +628,10 @@ loc_55845:				; CODE XREF: sub_5547D+3C3j
 		jmp	short loc_55906
 ; ���������������������������������������������������������������������������
 
-loc_55903:				; CODE XREF: sub_5547D+3C5j
+loc_55903:				; CODE XREF: Training_TypeScreen_5547D+3C5j
 		mov	ax, [bp+var_5A]
 
-loc_55906:				; CODE XREF: sub_5547D+484j
+loc_55906:				; CODE XREF: Training_TypeScreen_5547D+484j
 		push	ax
 		lea	ax, [bp+var_1CA]
 		push	ax
@@ -631,13 +650,13 @@ loc_55906:				; CODE XREF: sub_5547D+484j
 		jmp	loc_559EF
 ; ���������������������������������������������������������������������������
 
-loc_55932:				; CODE XREF: sub_5547D+4B0j
+loc_55932:				; CODE XREF: Training_TypeScreen_5547D+4B0j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_64]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_64]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -686,10 +705,10 @@ loc_55932:				; CODE XREF: sub_5547D+4B0j
 		jmp	short loc_559F2
 ; ���������������������������������������������������������������������������
 
-loc_559EF:				; CODE XREF: sub_5547D+4B2j
+loc_559EF:				; CODE XREF: Training_TypeScreen_5547D+4B2j
 		mov	ax, [bp+var_64]
 
-loc_559F2:				; CODE XREF: sub_5547D+570j
+loc_559F2:				; CODE XREF: Training_TypeScreen_5547D+570j
 		push	ax
 		lea	ax, [bp+var_1CA]
 		push	ax
@@ -702,14 +721,14 @@ loc_559F2:				; CODE XREF: sub_5547D+570j
 		jmp	short loc_55A1E
 ; ���������������������������������������������������������������������������
 
-loc_55A0F:				; CODE XREF: sub_5547D+5A5j
+loc_55A0F:				; CODE XREF: Training_TypeScreen_5547D+5A5j
 		push	1
 		lea	ax, [bp+var_1CA]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_55A1E:				; CODE XREF: sub_5547D+590j
+loc_55A1E:				; CODE XREF: Training_TypeScreen_5547D+590j
 		cmp	[bp+var_4E], 0
 		jz	short loc_55A0F
 		lea	ax, [bp+var_1CA]
@@ -729,7 +748,7 @@ loc_55A1E:				; CODE XREF: sub_5547D+590j
 		jmp	short loc_55A74
 ; ���������������������������������������������������������������������������
 
-loc_55A4E:				; CODE XREF: sub_5547D+5B8j
+loc_55A4E:				; CODE XREF: Training_TypeScreen_5547D+5B8j
 		mov	ax, [bp+var_4E]
 		mov	[si+28h], ax
 		cmp	word ptr [si+28h], 1
@@ -737,22 +756,22 @@ loc_55A4E:				; CODE XREF: sub_5547D+5B8j
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_58E2A
+		call	near ptr Training_DogfightBriefing_58E2A
 		add	sp, 2
 		mov	[bp+var_42], al
 		jmp	short loc_55A74
 ; ���������������������������������������������������������������������������
 
-loc_55A68:				; CODE XREF: sub_5547D+5DBj
+loc_55A68:				; CODE XREF: Training_TypeScreen_5547D+5DBj
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_58E74
+		call	near ptr Training_SearchBriefing_58E74
 		add	sp, 2
 		mov	[bp+var_42], al
 
-loc_55A74:				; CODE XREF: sub_5547D+5CFj
-					; sub_5547D+5E9j
+loc_55A74:				; CODE XREF: Training_TypeScreen_5547D+5CFj
+					; Training_TypeScreen_5547D+5E9j
 		push	2
 		lea	ax, [bp+var_1CA]
 		push	ax
@@ -763,18 +782,18 @@ loc_55A74:				; CODE XREF: sub_5547D+5CFj
 		jmp	loc_556A3
 ; ���������������������������������������������������������������������������
 
-loc_55A8C:				; CODE XREF: sub_5547D+5CDj
-					; sub_5547D+60Aj
+loc_55A8C:				; CODE XREF: Training_TypeScreen_5547D+5CDj
+					; Training_TypeScreen_5547D+60Aj
 		cmp	[bp+var_42], 2
 		jnz	short loc_55A97
 		mov	ax, 1
 		jmp	short loc_55A99
 ; ���������������������������������������������������������������������������
 
-loc_55A97:				; CODE XREF: sub_5547D+613j
+loc_55A97:				; CODE XREF: Training_TypeScreen_5547D+613j
 		xor	ax, ax
 
-loc_55A99:				; CODE XREF: sub_5547D+618j
+loc_55A99:				; CODE XREF: Training_TypeScreen_5547D+618j
 		mov	[bp+var_43], al
 		push	2
 		lea	ax, [bp+var_158]
@@ -795,8 +814,8 @@ loc_55A99:				; CODE XREF: sub_5547D+618j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55ACF:				; CODE XREF: sub_5547D+632j
-					; sub_5547D+639j
+loc_55ACF:				; CODE XREF: Training_TypeScreen_5547D+632j
+					; Training_TypeScreen_5547D+639j
 		mov	[bp+var_3C], 0
 		mov	[bp+var_37], 0
 		mov	[bp+var_36], 0
@@ -814,8 +833,8 @@ loc_55ACF:				; CODE XREF: sub_5547D+632j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55B07:				; CODE XREF: sub_5547D+66Aj
-					; sub_5547D+671j
+loc_55B07:				; CODE XREF: Training_TypeScreen_5547D+66Aj
+					; Training_TypeScreen_5547D+671j
 		mov	[bp+var_2E], 0
 		mov	[bp+var_29], 0
 		mov	[bp+var_28], 0
@@ -833,8 +852,8 @@ loc_55B07:				; CODE XREF: sub_5547D+66Aj
 		add	sp, 8
 		jmp	short $+2
 
-loc_55B3F:				; CODE XREF: sub_5547D+6A2j
-					; sub_5547D+6A9j
+loc_55B3F:				; CODE XREF: Training_TypeScreen_5547D+6A2j
+					; Training_TypeScreen_5547D+6A9j
 		mov	[bp+var_24], 0
 		mov	[bp+var_1F], 0
 		mov	[bp+var_1E], 0
@@ -862,8 +881,8 @@ loc_55B3F:				; CODE XREF: sub_5547D+6A2j
 		add	sp, 8
 		jmp	short $+2
 
-loc_55B93:				; CODE XREF: sub_5547D+6F6j
-					; sub_5547D+6FDj
+loc_55B93:				; CODE XREF: Training_TypeScreen_5547D+6F6j
+					; Training_TypeScreen_5547D+6FDj
 		mov	[bp+var_E], 0
 		mov	[bp+var_9], 0
 		mov	[bp+var_8], 0
@@ -886,7 +905,7 @@ loc_55B93:				; CODE XREF: sub_5547D+6F6j
 		pop	si
 		leave
 		retf
-sub_5547D	endp
+Training_TypeScreen_5547D	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -898,7 +917,12 @@ sub_5547D	endp
 
 ; Attributes: bp-based frame
 
-sub_55BDC	proc far		; CODE XREF: sub_42156J sub_55C92+21p	...
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit un texte (arguments : réglages, x,
+; y, chaîne) : sauvegarde la zone d'écran sous le texte (Training_SaveRegion_552E0, liste en
+; réglages +24), puis PaletteScreen_DispatchWidgetLayoutB_11363 (couleur 255).
+; ==============================================================================================
+Training_PrintText_55BDC	proc far		; CODE XREF: sub_42156J Training_AltitudeScreen_55C92+21p	...
 
 var_18		= word ptr -18h
 var_16		= word ptr -16h
@@ -964,7 +988,7 @@ arg_6		= word ptr  0Ch
 		add	ax, 18h
 		push	ax
 		push	cs
-		call	near ptr sub_552E0
+		call	near ptr Training_SaveRegion_552E0
 		add	sp, 4
 		push	word_45B54
 		push	0FFh
@@ -977,14 +1001,18 @@ arg_6		= word ptr  0Ch
 		pop	si
 		leave
 		retf
-sub_55BDC	endp
+Training_PrintText_55BDC	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_55C7B	proc far		; CODE XREF: sub_4215BJ sub_55C92+632p ...
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Efface le dernier texte écrit :
+; Training_RestoreRegion_55431 sur la liste des réglages +24 (appelée par les boutons BACKUP).
+; ==============================================================================================
+Training_EraseLastText_55C7B	proc far		; CODE XREF: sub_4215BJ Training_AltitudeScreen_55C92+632p ...
 
 arg_0		= word ptr  6
 
@@ -996,20 +1024,27 @@ arg_0		= word ptr  6
 		add	ax, 18h
 		push	ax
 		push	cs
-		call	near ptr sub_55431
+		call	near ptr Training_RestoreRegion_55431
 		add	sp, 2
 		pop	si
 		pop	bp
 		retf
-sub_55C7B	endp
+Training_EraseLastText_55C7B	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_55C92	proc far		; CODE XREF: sub_42147J
-					; sub_56B04+14AAp ...
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Altitude : écrit « Altitude: » en (5,103)
+; ; panneau (6,153) image 68 ; 5,000 (19,9) images 69/70, 15,000 (87,9) 71/72, 25,000 (155,9)
+; 73/74, 35,000 (223,9) 75/76, BACKUP (87,24) 77/78, CANCEL (155,24) 79/80. Choix n : réglages
+; +0 = n × 10000 − 5000 (imul eax, 2710h / add eax, 0FFFFEC78h), « %ld feet. » écrit derrière
+; « Altitude: », puis Training_PilotLevelScreen_584BD.
+; ==============================================================================================
+Training_AltitudeScreen_55C92	proc far		; CODE XREF: sub_42147J
+					; Training_AircraftScreen_56B04+14AAp ...
 
 var_C6		= word ptr -0C6h
 var_76		= dword	ptr -76h
@@ -1059,7 +1094,7 @@ arg_0		= word ptr  6
 		push	di
 		mov	si, [bp+arg_0]
 
-loc_55C9E:				; CODE XREF: sub_55C92+6C6j
+loc_55C9E:				; CODE XREF: Training_AltitudeScreen_55C92+6C6j
 		mov	[bp+var_4], 5
 		mov	[bp+var_6], 67h	; 'g'
 		push	0CF5h
@@ -1067,7 +1102,7 @@ loc_55C9E:				; CODE XREF: sub_55C92+6C6j
 		push	[bp+var_4]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		push	0D00h
 		call	sub_112C4
@@ -1079,7 +1114,7 @@ loc_55C9E:				; CODE XREF: sub_55C92+6C6j
 		push	6
 		lea	ax, [bp+var_C6]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -1116,13 +1151,13 @@ loc_55C9E:				; CODE XREF: sub_55C92+6C6j
 		jmp	loc_55DD8
 ; ���������������������������������������������������������������������������
 
-loc_55D4F:				; CODE XREF: sub_55C92+B8j
+loc_55D4F:				; CODE XREF: Training_AltitudeScreen_55C92+B8j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	13h
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -1155,10 +1190,10 @@ loc_55D4F:				; CODE XREF: sub_55C92+B8j
 		jmp	short loc_55DDA
 ; ���������������������������������������������������������������������������
 
-loc_55DD8:				; CODE XREF: sub_55C92+BAj
+loc_55DD8:				; CODE XREF: Training_AltitudeScreen_55C92+BAj
 		mov	ax, di
 
-loc_55DDA:				; CODE XREF: sub_55C92+144j
+loc_55DDA:				; CODE XREF: Training_AltitudeScreen_55C92+144j
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1177,13 +1212,13 @@ loc_55DDA:				; CODE XREF: sub_55C92+144j
 		jmp	loc_55EC2
 ; ���������������������������������������������������������������������������
 
-loc_55E06:				; CODE XREF: sub_55C92+16Fj
+loc_55E06:				; CODE XREF: Training_AltitudeScreen_55C92+16Fj
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	57h ; 'W'
 		push	[bp+var_1C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_1C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1232,10 +1267,10 @@ loc_55E06:				; CODE XREF: sub_55C92+16Fj
 		jmp	short loc_55EC5
 ; ���������������������������������������������������������������������������
 
-loc_55EC2:				; CODE XREF: sub_55C92+171j
+loc_55EC2:				; CODE XREF: Training_AltitudeScreen_55C92+171j
 		mov	ax, [bp+var_1C]
 
-loc_55EC5:				; CODE XREF: sub_55C92+22Ej
+loc_55EC5:				; CODE XREF: Training_AltitudeScreen_55C92+22Ej
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1254,13 +1289,13 @@ loc_55EC5:				; CODE XREF: sub_55C92+22Ej
 		jmp	loc_55FAE
 ; ���������������������������������������������������������������������������
 
-loc_55EF1:				; CODE XREF: sub_55C92+25Aj
+loc_55EF1:				; CODE XREF: Training_AltitudeScreen_55C92+25Aj
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	9Bh ; '�'
 		push	[bp+var_26]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_26]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1309,10 +1344,10 @@ loc_55EF1:				; CODE XREF: sub_55C92+25Aj
 		jmp	short loc_55FB1
 ; ���������������������������������������������������������������������������
 
-loc_55FAE:				; CODE XREF: sub_55C92+25Cj
+loc_55FAE:				; CODE XREF: Training_AltitudeScreen_55C92+25Cj
 		mov	ax, [bp+var_26]
 
-loc_55FB1:				; CODE XREF: sub_55C92+31Aj
+loc_55FB1:				; CODE XREF: Training_AltitudeScreen_55C92+31Aj
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1331,13 +1366,13 @@ loc_55FB1:				; CODE XREF: sub_55C92+31Aj
 		jmp	loc_5609A
 ; ���������������������������������������������������������������������������
 
-loc_55FDD:				; CODE XREF: sub_55C92+346j
+loc_55FDD:				; CODE XREF: Training_AltitudeScreen_55C92+346j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	0DFh ; '�'
 		push	[bp+var_30]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_30]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1386,10 +1421,10 @@ loc_55FDD:				; CODE XREF: sub_55C92+346j
 		jmp	short loc_5609D
 ; ���������������������������������������������������������������������������
 
-loc_5609A:				; CODE XREF: sub_55C92+348j
+loc_5609A:				; CODE XREF: Training_AltitudeScreen_55C92+348j
 		mov	ax, [bp+var_30]
 
-loc_5609D:				; CODE XREF: sub_55C92+406j
+loc_5609D:				; CODE XREF: Training_AltitudeScreen_55C92+406j
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1408,13 +1443,13 @@ loc_5609D:				; CODE XREF: sub_55C92+406j
 		jmp	loc_56185
 ; ���������������������������������������������������������������������������
 
-loc_560C9:				; CODE XREF: sub_55C92+432j
+loc_560C9:				; CODE XREF: Training_AltitudeScreen_55C92+432j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	57h ; 'W'
 		push	[bp+var_3A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_3A]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1463,10 +1498,10 @@ loc_560C9:				; CODE XREF: sub_55C92+432j
 		jmp	short loc_56188
 ; ���������������������������������������������������������������������������
 
-loc_56185:				; CODE XREF: sub_55C92+434j
+loc_56185:				; CODE XREF: Training_AltitudeScreen_55C92+434j
 		mov	ax, [bp+var_3A]
 
-loc_56188:				; CODE XREF: sub_55C92+4F1j
+loc_56188:				; CODE XREF: Training_AltitudeScreen_55C92+4F1j
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1485,13 +1520,13 @@ loc_56188:				; CODE XREF: sub_55C92+4F1j
 		jmp	loc_56271
 ; ���������������������������������������������������������������������������
 
-loc_561B4:				; CODE XREF: sub_55C92+51Dj
+loc_561B4:				; CODE XREF: Training_AltitudeScreen_55C92+51Dj
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_44]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_44]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1540,10 +1575,10 @@ loc_561B4:				; CODE XREF: sub_55C92+51Dj
 		jmp	short loc_56274
 ; ���������������������������������������������������������������������������
 
-loc_56271:				; CODE XREF: sub_55C92+51Fj
+loc_56271:				; CODE XREF: Training_AltitudeScreen_55C92+51Fj
 		mov	ax, [bp+var_44]
 
-loc_56274:				; CODE XREF: sub_55C92+5DDj
+loc_56274:				; CODE XREF: Training_AltitudeScreen_55C92+5DDj
 		push	ax
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1556,14 +1591,14 @@ loc_56274:				; CODE XREF: sub_55C92+5DDj
 		jmp	short loc_562A0
 ; ���������������������������������������������������������������������������
 
-loc_56291:				; CODE XREF: sub_55C92+612j
+loc_56291:				; CODE XREF: Training_AltitudeScreen_55C92+612j
 		push	1
 		lea	ax, [bp+var_C6]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_562A0:				; CODE XREF: sub_55C92+5FDj
+loc_562A0:				; CODE XREF: Training_AltitudeScreen_55C92+5FDj
 		cmp	[bp+var_10], 0
 		jz	short loc_56291
 		lea	ax, [bp+var_C6]
@@ -1578,14 +1613,14 @@ loc_562A0:				; CODE XREF: sub_55C92+5FDj
 		jmp	short loc_562FC
 ; ���������������������������������������������������������������������������
 
-loc_562C2:				; CODE XREF: sub_55C92+62Cj
+loc_562C2:				; CODE XREF: Training_AltitudeScreen_55C92+62Cj
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	2
 		lea	ax, [bp+var_C6]
@@ -1599,7 +1634,7 @@ loc_562C2:				; CODE XREF: sub_55C92+62Cj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_562E7:				; CODE XREF: sub_55C92+627j
+loc_562E7:				; CODE XREF: Training_AltitudeScreen_55C92+627j
 		push	2
 		lea	ax, [bp+var_C6]
 		push	ax
@@ -1612,7 +1647,7 @@ loc_562E7:				; CODE XREF: sub_55C92+627j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_562FC:				; CODE XREF: sub_55C92+62Ej
+loc_562FC:				; CODE XREF: Training_AltitudeScreen_55C92+62Ej
 		movsx	eax, [bp+var_10]
 		imul	eax, 2710h
 		add	eax, 0FFFFEC78h
@@ -1629,13 +1664,13 @@ loc_562FC:				; CODE XREF: sub_55C92+62Ej
 		push	[bp+var_4]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		jmp	short $+2
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_584BD
+		call	near ptr Training_PilotLevelScreen_584BD
 		add	sp, 2
 		mov	[bp+var_2], al
 		push	2
@@ -1648,13 +1683,13 @@ loc_562FC:				; CODE XREF: sub_55C92+62Ej
 		jmp	loc_55C9E
 ; ���������������������������������������������������������������������������
 
-loc_5635B:				; CODE XREF: sub_55C92+6C4j
+loc_5635B:				; CODE XREF: Training_AltitudeScreen_55C92+6C4j
 		mov	al, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_55C92	endp
+Training_AltitudeScreen_55C92	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -1666,7 +1701,15 @@ sub_55C92	endp
 
 ; Attributes: bp-based frame
 
-sub_56366	proc far		; CODE XREF: sub_42138J sub_57FDA+48Dp ...
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Nombre d'avions du groupe courant
+; (réglages +22). Panneau (6,153) image 7 ; boutons 14 × 12 : 1 à 5 en (113,9), (130,9),
+; (147,9), (164,9), (181,9), images 8/9, 10/11, 12/13, 14/15, 16/17 ; BACKUP (87,24) images
+; 18/19 (−1) ; CANCEL (155,24) images 20/21 (−2). Choix n : nombre du groupe = n, total +20 +=
+; n, « %d » écrit en (20, 67 + 12 × groupe), puis Training_AircraftScreen_56B04. BACKUP :
+; efface le dernier texte, groupe −1 (si > 0), renvoie 0 ; CANCEL renvoie 1.
+; ==============================================================================================
+Training_GroupCountScreen_56366	proc far		; CODE XREF: sub_42138J Training_MoreEnoughScreen_57FDA+48Dp ...
 
 var_D0		= word ptr -0D0h
 var_80		= dword	ptr -80h
@@ -1718,14 +1761,14 @@ arg_0		= word ptr  6
 		push	di
 		mov	si, [bp+arg_0]
 
-loc_56372:				; CODE XREF: sub_56366+790j
+loc_56372:				; CODE XREF: Training_GroupCountScreen_56366+790j
 		push	2Ah ; '*'
 		push	134h
 		push	99h ; '�'
 		push	6
 		lea	ax, [bp+var_D0]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -1760,13 +1803,13 @@ loc_56372:				; CODE XREF: sub_56366+790j
 		jmp	loc_56479
 ; ���������������������������������������������������������������������������
 
-loc_563F0:				; CODE XREF: sub_56366+85j
+loc_563F0:				; CODE XREF: Training_GroupCountScreen_56366+85j
 		push	0Ch
 		push	0Eh
 		push	9
 		push	71h ; 'q'
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -1799,10 +1842,10 @@ loc_563F0:				; CODE XREF: sub_56366+85j
 		jmp	short loc_5647B
 ; ���������������������������������������������������������������������������
 
-loc_56479:				; CODE XREF: sub_56366+87j
+loc_56479:				; CODE XREF: Training_GroupCountScreen_56366+87j
 		mov	ax, di
 
-loc_5647B:				; CODE XREF: sub_56366+111j
+loc_5647B:				; CODE XREF: Training_GroupCountScreen_56366+111j
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -1821,13 +1864,13 @@ loc_5647B:				; CODE XREF: sub_56366+111j
 		jmp	loc_56564
 ; ���������������������������������������������������������������������������
 
-loc_564A7:				; CODE XREF: sub_56366+13Cj
+loc_564A7:				; CODE XREF: Training_GroupCountScreen_56366+13Cj
 		push	0Ch
 		push	0Eh
 		push	9
 		push	82h ; '�'
 		push	[bp+var_18]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_18]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1876,10 +1919,10 @@ loc_564A7:				; CODE XREF: sub_56366+13Cj
 		jmp	short loc_56567
 ; ���������������������������������������������������������������������������
 
-loc_56564:				; CODE XREF: sub_56366+13Ej
+loc_56564:				; CODE XREF: Training_GroupCountScreen_56366+13Ej
 		mov	ax, [bp+var_18]
 
-loc_56567:				; CODE XREF: sub_56366+1FCj
+loc_56567:				; CODE XREF: Training_GroupCountScreen_56366+1FCj
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -1898,13 +1941,13 @@ loc_56567:				; CODE XREF: sub_56366+1FCj
 		jmp	loc_56650
 ; ���������������������������������������������������������������������������
 
-loc_56593:				; CODE XREF: sub_56366+228j
+loc_56593:				; CODE XREF: Training_GroupCountScreen_56366+228j
 		push	0Ch
 		push	0Eh
 		push	9
 		push	93h ; '�'
 		push	[bp+var_22]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_22]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1953,10 +1996,10 @@ loc_56593:				; CODE XREF: sub_56366+228j
 		jmp	short loc_56653
 ; ���������������������������������������������������������������������������
 
-loc_56650:				; CODE XREF: sub_56366+22Aj
+loc_56650:				; CODE XREF: Training_GroupCountScreen_56366+22Aj
 		mov	ax, [bp+var_22]
 
-loc_56653:				; CODE XREF: sub_56366+2E8j
+loc_56653:				; CODE XREF: Training_GroupCountScreen_56366+2E8j
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -1975,13 +2018,13 @@ loc_56653:				; CODE XREF: sub_56366+2E8j
 		jmp	loc_5673C
 ; ���������������������������������������������������������������������������
 
-loc_5667F:				; CODE XREF: sub_56366+314j
+loc_5667F:				; CODE XREF: Training_GroupCountScreen_56366+314j
 		push	0Ch
 		push	0Eh
 		push	9
 		push	0A4h ; '�'
 		push	[bp+var_2C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_2C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2030,10 +2073,10 @@ loc_5667F:				; CODE XREF: sub_56366+314j
 		jmp	short loc_5673F
 ; ���������������������������������������������������������������������������
 
-loc_5673C:				; CODE XREF: sub_56366+316j
+loc_5673C:				; CODE XREF: Training_GroupCountScreen_56366+316j
 		mov	ax, [bp+var_2C]
 
-loc_5673F:				; CODE XREF: sub_56366+3D4j
+loc_5673F:				; CODE XREF: Training_GroupCountScreen_56366+3D4j
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2052,13 +2095,13 @@ loc_5673F:				; CODE XREF: sub_56366+3D4j
 		jmp	loc_56828
 ; ���������������������������������������������������������������������������
 
-loc_5676B:				; CODE XREF: sub_56366+400j
+loc_5676B:				; CODE XREF: Training_GroupCountScreen_56366+400j
 		push	0Ch
 		push	0Eh
 		push	9
 		push	0B5h ; '�'
 		push	[bp+var_36]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_36]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2107,10 +2150,10 @@ loc_5676B:				; CODE XREF: sub_56366+400j
 		jmp	short loc_5682B
 ; ���������������������������������������������������������������������������
 
-loc_56828:				; CODE XREF: sub_56366+402j
+loc_56828:				; CODE XREF: Training_GroupCountScreen_56366+402j
 		mov	ax, [bp+var_36]
 
-loc_5682B:				; CODE XREF: sub_56366+4C0j
+loc_5682B:				; CODE XREF: Training_GroupCountScreen_56366+4C0j
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2129,13 +2172,13 @@ loc_5682B:				; CODE XREF: sub_56366+4C0j
 		jmp	loc_56913
 ; ���������������������������������������������������������������������������
 
-loc_56857:				; CODE XREF: sub_56366+4ECj
+loc_56857:				; CODE XREF: Training_GroupCountScreen_56366+4ECj
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	57h ; 'W'
 		push	[bp+var_40]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_40]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2184,10 +2227,10 @@ loc_56857:				; CODE XREF: sub_56366+4ECj
 		jmp	short loc_56916
 ; ���������������������������������������������������������������������������
 
-loc_56913:				; CODE XREF: sub_56366+4EEj
+loc_56913:				; CODE XREF: Training_GroupCountScreen_56366+4EEj
 		mov	ax, [bp+var_40]
 
-loc_56916:				; CODE XREF: sub_56366+5ABj
+loc_56916:				; CODE XREF: Training_GroupCountScreen_56366+5ABj
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2206,13 +2249,13 @@ loc_56916:				; CODE XREF: sub_56366+5ABj
 		jmp	loc_569FF
 ; ���������������������������������������������������������������������������
 
-loc_56942:				; CODE XREF: sub_56366+5D7j
+loc_56942:				; CODE XREF: Training_GroupCountScreen_56366+5D7j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_4A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_4A]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2261,10 +2304,10 @@ loc_56942:				; CODE XREF: sub_56366+5D7j
 		jmp	short loc_56A02
 ; ���������������������������������������������������������������������������
 
-loc_569FF:				; CODE XREF: sub_56366+5D9j
+loc_569FF:				; CODE XREF: Training_GroupCountScreen_56366+5D9j
 		mov	ax, [bp+var_4A]
 
-loc_56A02:				; CODE XREF: sub_56366+697j
+loc_56A02:				; CODE XREF: Training_GroupCountScreen_56366+697j
 		push	ax
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2277,14 +2320,14 @@ loc_56A02:				; CODE XREF: sub_56366+697j
 		jmp	short loc_56A2E
 ; ���������������������������������������������������������������������������
 
-loc_56A1F:				; CODE XREF: sub_56366+6CCj
+loc_56A1F:				; CODE XREF: Training_GroupCountScreen_56366+6CCj
 		push	1
 		lea	ax, [bp+var_D0]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_56A2E:				; CODE XREF: sub_56366+6B7j
+loc_56A2E:				; CODE XREF: Training_GroupCountScreen_56366+6B7j
 		cmp	[bp+var_C], 0
 		jz	short loc_56A1F
 		lea	ax, [bp+var_D0]
@@ -2299,16 +2342,16 @@ loc_56A2E:				; CODE XREF: sub_56366+6B7j
 		jmp	short loc_56A8B
 ; ���������������������������������������������������������������������������
 
-loc_56A50:				; CODE XREF: sub_56366+6E6j
+loc_56A50:				; CODE XREF: Training_GroupCountScreen_56366+6E6j
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		cmp	word ptr [si+16h], 0
 		jz	short loc_56A61
 		dec	word ptr [si+16h]
 
-loc_56A61:				; CODE XREF: sub_56366+6F6j
+loc_56A61:				; CODE XREF: Training_GroupCountScreen_56366+6F6j
 		push	2
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2321,7 +2364,7 @@ loc_56A61:				; CODE XREF: sub_56366+6F6j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_56A76:				; CODE XREF: sub_56366+6E1j
+loc_56A76:				; CODE XREF: Training_GroupCountScreen_56366+6E1j
 		push	2
 		lea	ax, [bp+var_D0]
 		push	ax
@@ -2334,7 +2377,7 @@ loc_56A76:				; CODE XREF: sub_56366+6E1j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_56A8B:				; CODE XREF: sub_56366+6E8j
+loc_56A8B:				; CODE XREF: Training_GroupCountScreen_56366+6E8j
 		mov	bx, [si+16h]
 		shl	bx, 1
 		mov	ax, [bp+var_C]
@@ -2359,13 +2402,13 @@ loc_56A8B:				; CODE XREF: sub_56366+6E8j
 		push	[bp+var_5C]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		jmp	short $+2
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_56B04
+		call	near ptr Training_AircraftScreen_56B04
 		add	sp, 2
 		mov	[bp+var_2], al
 		push	2
@@ -2378,13 +2421,13 @@ loc_56A8B:				; CODE XREF: sub_56366+6E8j
 		jmp	loc_56372
 ; ���������������������������������������������������������������������������
 
-loc_56AF9:				; CODE XREF: sub_56366+78Ej
+loc_56AF9:				; CODE XREF: Training_GroupCountScreen_56366+78Ej
 		mov	al, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_56366	endp
+Training_GroupCountScreen_56366	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -2396,7 +2439,18 @@ sub_56366	endp
 
 ; Attributes: bp-based frame
 
-sub_56B04	proc far		; CODE XREF: sub_4213DJ sub_56366+772p
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Type d'avion du groupe courant. Panneau
+; (6,116) de 308 × 79, image 22 ; 16 boutons 65 × 12 en colonnes x = 9, 77, 145, 235 et lignes
+; y = 7, 20, 33, 46 (images 23/24 à 53/54, valeurs 1 à 16 : F-15, F-16, F/A-18, C-130, F-22,
+; YF-23, A-10, E-3, Tornado, Mirage 2000, Lear Jet, 747, MiG-21, MiG-29, Su-27, TU-95) ;
+; BACKUP (87,61) 55/56, CANCEL (155,61) 57/58. Choix n : type du groupe (+6 + 2 × groupe) = n
+; − 1, nom (table DGROUP 2708 + 15 × n, mot 0) écrit en (30, 67 + 12 × groupe), suivi de « . »
+; au 3e groupe ; puis Training_MoreEnoughScreen_57FDA (groupes 1 et 2) ou
+; Training_AltitudeScreen_55C92 (3e groupe). BACKUP : retire le nombre du groupe du total, le
+; remet à 0, efface le dernier texte, renvoie 0.
+; ==============================================================================================
+Training_AircraftScreen_56B04	proc far		; CODE XREF: sub_4213DJ Training_GroupCountScreen_56366+772p
 
 var_16E		= word ptr -16Eh
 var_15A		= word ptr -15Ah
@@ -2512,14 +2566,14 @@ arg_0		= word ptr  6
 		jmp	short loc_56B26
 ; ���������������������������������������������������������������������������
 
-loc_56B17:				; CODE XREF: sub_56B04+26j
+loc_56B17:				; CODE XREF: Training_AircraftScreen_56B04+26j
 		lea	ax, [bp+var_E8]
 		mov	bx, [bp+var_4]
 		add	bx, ax
 		mov	byte ptr [bx], 0
 		inc	[bp+var_4]
 
-loc_56B26:				; CODE XREF: sub_56B04+11j
+loc_56B26:				; CODE XREF: Training_AircraftScreen_56B04+11j
 		cmp	[bp+var_4], 10h
 		jl	short loc_56B17
 		mov	[bp+var_8], 186A0h
@@ -2527,7 +2581,7 @@ loc_56B26:				; CODE XREF: sub_56B04+11j
 		jmp	short loc_56BB9
 ; ���������������������������������������������������������������������������
 
-loc_56B3B:				; CODE XREF: sub_56B04+BDj
+loc_56B3B:				; CODE XREF: Training_AircraftScreen_56B04+BDj
 		mov	bx, [bp+var_4]
 		shl	bx, 1
 		mov	cx, [bx+si+0Ch]
@@ -2551,7 +2605,7 @@ loc_56B3B:				; CODE XREF: sub_56B04+BDj
 		jmp	short loc_56BAC
 ; ���������������������������������������������������������������������������
 
-loc_56B76:				; CODE XREF: sub_56B04+50j
+loc_56B76:				; CODE XREF: Training_AircraftScreen_56B04+50j
 		mov	ax, cx
 		dec	ax
 		movsx	eax, ax
@@ -2573,27 +2627,27 @@ loc_56B76:				; CODE XREF: sub_56B04+50j
 		add	eax, edx
 		sub	[bp+var_8], eax
 
-loc_56BAC:				; CODE XREF: sub_56B04+70j
+loc_56BAC:				; CODE XREF: Training_AircraftScreen_56B04+70j
 		mov	al, byte ptr [bp+di+var_E8]
 		add	al, cl
 		mov	byte ptr [bp+di+var_E8], al
 
-loc_56BB6:				; CODE XREF: sub_56B04+49j
+loc_56BB6:				; CODE XREF: Training_AircraftScreen_56B04+49j
 		inc	[bp+var_4]
 
-loc_56BB9:				; CODE XREF: sub_56B04+35j
+loc_56BB9:				; CODE XREF: Training_AircraftScreen_56B04+35j
 		mov	ax, [si+16h]
 		cmp	ax, [bp+var_4]
 		jle	short loc_56BC4
 		jmp	loc_56B3B
 ; ���������������������������������������������������������������������������
 
-loc_56BC4:				; CODE XREF: sub_56B04+BBj
+loc_56BC4:				; CODE XREF: Training_AircraftScreen_56B04+BBj
 		mov	[bp+var_4], 0
 		jmp	loc_56C66
 ; ���������������������������������������������������������������������������
 
-loc_56BCC:				; CODE XREF: sub_56B04+168j
+loc_56BCC:				; CODE XREF: Training_AircraftScreen_56B04+168j
 		lea	ax, [bp+var_E8]
 		mov	bx, [bp+var_4]
 		add	bx, ax
@@ -2614,7 +2668,7 @@ loc_56BCC:				; CODE XREF: sub_56B04+168j
 		jmp	short loc_56C3F
 ; ���������������������������������������������������������������������������
 
-loc_56C01:				; CODE XREF: sub_56B04+D4j
+loc_56C01:				; CODE XREF: Training_AircraftScreen_56B04+D4j
 		mov	bx, [si+16h]
 		shl	bx, 1
 		mov	ax, [bx+si+0Ch]
@@ -2638,7 +2692,7 @@ loc_56C01:				; CODE XREF: sub_56B04+D4j
 		add	eax, edx
 		mov	[bp+var_C], eax
 
-loc_56C3F:				; CODE XREF: sub_56B04+FBj
+loc_56C3F:				; CODE XREF: Training_AircraftScreen_56B04+FBj
 		mov	eax, [bp+var_C]
 		cmp	eax, [bp+var_8]
 		jge	short loc_56C57
@@ -2649,30 +2703,30 @@ loc_56C3F:				; CODE XREF: sub_56B04+FBj
 		jmp	short loc_56C63
 ; ���������������������������������������������������������������������������
 
-loc_56C57:				; CODE XREF: sub_56B04+143j
+loc_56C57:				; CODE XREF: Training_AircraftScreen_56B04+143j
 		lea	ax, [bp+var_D8]
 		mov	bx, [bp+var_4]
 		add	bx, ax
 		mov	byte ptr [bx], 0
 
-loc_56C63:				; CODE XREF: sub_56B04+151j
+loc_56C63:				; CODE XREF: Training_AircraftScreen_56B04+151j
 		inc	[bp+var_4]
 
-loc_56C66:				; CODE XREF: sub_56B04+C5j
+loc_56C66:				; CODE XREF: Training_AircraftScreen_56B04+C5j
 		cmp	[bp+var_4], 10h
 		jge	short loc_56C6F
 		jmp	loc_56BCC
 ; ���������������������������������������������������������������������������
 
-loc_56C6F:				; CODE XREF: sub_56B04+166j
-					; sub_56B04+14C8j
+loc_56C6F:				; CODE XREF: Training_AircraftScreen_56B04+166j
+					; Training_AircraftScreen_56B04+14C8j
 		push	4Fh ; 'O'
 		push	134h
 		push	74h ; 't'
 		push	6
 		lea	ax, [bp+var_15A]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -2699,7 +2753,7 @@ loc_56C6F:				; CODE XREF: sub_56B04+166j
 		jmp	loc_56D95
 ; ���������������������������������������������������������������������������
 
-loc_56CDF:				; CODE XREF: sub_56B04+1D6j
+loc_56CDF:				; CODE XREF: Training_AircraftScreen_56B04+1D6j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -2713,13 +2767,13 @@ loc_56CDF:				; CODE XREF: sub_56B04+1D6j
 		jmp	loc_56D85
 ; ���������������������������������������������������������������������������
 
-loc_56CFC:				; CODE XREF: sub_56B04+1F3j
+loc_56CFC:				; CODE XREF: Training_AircraftScreen_56B04+1F3j
 		push	0Ch
 		push	41h ; 'A'
 		push	7
 		push	9
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -2752,23 +2806,23 @@ loc_56CFC:				; CODE XREF: sub_56B04+1F3j
 		jmp	short loc_56D87
 ; ���������������������������������������������������������������������������
 
-loc_56D85:				; CODE XREF: sub_56B04+1F5j
+loc_56D85:				; CODE XREF: Training_AircraftScreen_56B04+1F5j
 		mov	ax, di
 
-loc_56D87:				; CODE XREF: sub_56B04+27Fj
+loc_56D87:				; CODE XREF: Training_AircraftScreen_56B04+27Fj
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_56D95:				; CODE XREF: sub_56B04+1D8j
+loc_56D95:				; CODE XREF: Training_AircraftScreen_56B04+1D8j
 		cmp	byte ptr [bp+var_D8+1],	0
 		jnz	short loc_56D9F
 		jmp	loc_56E8A
 ; ���������������������������������������������������������������������������
 
-loc_56D9F:				; CODE XREF: sub_56B04+296j
+loc_56D9F:				; CODE XREF: Training_AircraftScreen_56B04+296j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -2782,13 +2836,13 @@ loc_56D9F:				; CODE XREF: sub_56B04+296j
 		jmp	loc_56E79
 ; ���������������������������������������������������������������������������
 
-loc_56DBD:				; CODE XREF: sub_56B04+2B4j
+loc_56DBD:				; CODE XREF: Training_AircraftScreen_56B04+2B4j
 		push	0Ch
 		push	41h ; 'A'
 		push	14h
 		push	9
 		push	[bp+var_1E]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_1E]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2837,23 +2891,23 @@ loc_56DBD:				; CODE XREF: sub_56B04+2B4j
 		jmp	short loc_56E7C
 ; ���������������������������������������������������������������������������
 
-loc_56E79:				; CODE XREF: sub_56B04+2B6j
+loc_56E79:				; CODE XREF: Training_AircraftScreen_56B04+2B6j
 		mov	ax, [bp+var_1E]
 
-loc_56E7C:				; CODE XREF: sub_56B04+373j
+loc_56E7C:				; CODE XREF: Training_AircraftScreen_56B04+373j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_56E8A:				; CODE XREF: sub_56B04+298j
+loc_56E8A:				; CODE XREF: Training_AircraftScreen_56B04+298j
 		cmp	[bp+var_D6], 0
 		jnz	short loc_56E94
 		jmp	loc_56F7F
 ; ���������������������������������������������������������������������������
 
-loc_56E94:				; CODE XREF: sub_56B04+38Bj
+loc_56E94:				; CODE XREF: Training_AircraftScreen_56B04+38Bj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -2867,13 +2921,13 @@ loc_56E94:				; CODE XREF: sub_56B04+38Bj
 		jmp	loc_56F6E
 ; ���������������������������������������������������������������������������
 
-loc_56EB2:				; CODE XREF: sub_56B04+3A9j
+loc_56EB2:				; CODE XREF: Training_AircraftScreen_56B04+3A9j
 		push	0Ch
 		push	41h ; 'A'
 		push	21h ; '!'
 		push	9
 		push	[bp+var_28]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_28]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2922,23 +2976,23 @@ loc_56EB2:				; CODE XREF: sub_56B04+3A9j
 		jmp	short loc_56F71
 ; ���������������������������������������������������������������������������
 
-loc_56F6E:				; CODE XREF: sub_56B04+3ABj
+loc_56F6E:				; CODE XREF: Training_AircraftScreen_56B04+3ABj
 		mov	ax, [bp+var_28]
 
-loc_56F71:				; CODE XREF: sub_56B04+468j
+loc_56F71:				; CODE XREF: Training_AircraftScreen_56B04+468j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_56F7F:				; CODE XREF: sub_56B04+38Dj
+loc_56F7F:				; CODE XREF: Training_AircraftScreen_56B04+38Dj
 		cmp	[bp+var_D5], 0
 		jnz	short loc_56F89
 		jmp	loc_57074
 ; ���������������������������������������������������������������������������
 
-loc_56F89:				; CODE XREF: sub_56B04+480j
+loc_56F89:				; CODE XREF: Training_AircraftScreen_56B04+480j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -2952,13 +3006,13 @@ loc_56F89:				; CODE XREF: sub_56B04+480j
 		jmp	loc_57063
 ; ���������������������������������������������������������������������������
 
-loc_56FA7:				; CODE XREF: sub_56B04+49Ej
+loc_56FA7:				; CODE XREF: Training_AircraftScreen_56B04+49Ej
 		push	0Ch
 		push	41h ; 'A'
 		push	2Eh ; '.'
 		push	9
 		push	[bp+var_32]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_32]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3007,23 +3061,23 @@ loc_56FA7:				; CODE XREF: sub_56B04+49Ej
 		jmp	short loc_57066
 ; ���������������������������������������������������������������������������
 
-loc_57063:				; CODE XREF: sub_56B04+4A0j
+loc_57063:				; CODE XREF: Training_AircraftScreen_56B04+4A0j
 		mov	ax, [bp+var_32]
 
-loc_57066:				; CODE XREF: sub_56B04+55Dj
+loc_57066:				; CODE XREF: Training_AircraftScreen_56B04+55Dj
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57074:				; CODE XREF: sub_56B04+482j
+loc_57074:				; CODE XREF: Training_AircraftScreen_56B04+482j
 		cmp	[bp+var_D4], 0
 		jnz	short loc_5707E
 		jmp	loc_57169
 ; ���������������������������������������������������������������������������
 
-loc_5707E:				; CODE XREF: sub_56B04+575j
+loc_5707E:				; CODE XREF: Training_AircraftScreen_56B04+575j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3037,13 +3091,13 @@ loc_5707E:				; CODE XREF: sub_56B04+575j
 		jmp	loc_57158
 ; ���������������������������������������������������������������������������
 
-loc_5709C:				; CODE XREF: sub_56B04+593j
+loc_5709C:				; CODE XREF: Training_AircraftScreen_56B04+593j
 		push	0Ch
 		push	41h ; 'A'
 		push	7
 		push	4Dh ; 'M'
 		push	[bp+var_3C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_3C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3092,23 +3146,23 @@ loc_5709C:				; CODE XREF: sub_56B04+593j
 		jmp	short loc_5715B
 ; ���������������������������������������������������������������������������
 
-loc_57158:				; CODE XREF: sub_56B04+595j
+loc_57158:				; CODE XREF: Training_AircraftScreen_56B04+595j
 		mov	ax, [bp+var_3C]
 
-loc_5715B:				; CODE XREF: sub_56B04+652j
+loc_5715B:				; CODE XREF: Training_AircraftScreen_56B04+652j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57169:				; CODE XREF: sub_56B04+577j
+loc_57169:				; CODE XREF: Training_AircraftScreen_56B04+577j
 		cmp	[bp+var_D3], 0
 		jnz	short loc_57173
 		jmp	loc_5725E
 ; ���������������������������������������������������������������������������
 
-loc_57173:				; CODE XREF: sub_56B04+66Aj
+loc_57173:				; CODE XREF: Training_AircraftScreen_56B04+66Aj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3122,13 +3176,13 @@ loc_57173:				; CODE XREF: sub_56B04+66Aj
 		jmp	loc_5724D
 ; ���������������������������������������������������������������������������
 
-loc_57191:				; CODE XREF: sub_56B04+688j
+loc_57191:				; CODE XREF: Training_AircraftScreen_56B04+688j
 		push	0Ch
 		push	41h ; 'A'
 		push	14h
 		push	4Dh ; 'M'
 		push	[bp+var_46]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_46]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3177,23 +3231,23 @@ loc_57191:				; CODE XREF: sub_56B04+688j
 		jmp	short loc_57250
 ; ���������������������������������������������������������������������������
 
-loc_5724D:				; CODE XREF: sub_56B04+68Aj
+loc_5724D:				; CODE XREF: Training_AircraftScreen_56B04+68Aj
 		mov	ax, [bp+var_46]
 
-loc_57250:				; CODE XREF: sub_56B04+747j
+loc_57250:				; CODE XREF: Training_AircraftScreen_56B04+747j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_5725E:				; CODE XREF: sub_56B04+66Cj
+loc_5725E:				; CODE XREF: Training_AircraftScreen_56B04+66Cj
 		cmp	[bp+var_D2], 0
 		jnz	short loc_57268
 		jmp	loc_57353
 ; ���������������������������������������������������������������������������
 
-loc_57268:				; CODE XREF: sub_56B04+75Fj
+loc_57268:				; CODE XREF: Training_AircraftScreen_56B04+75Fj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3207,13 +3261,13 @@ loc_57268:				; CODE XREF: sub_56B04+75Fj
 		jmp	loc_57342
 ; ���������������������������������������������������������������������������
 
-loc_57286:				; CODE XREF: sub_56B04+77Dj
+loc_57286:				; CODE XREF: Training_AircraftScreen_56B04+77Dj
 		push	0Ch
 		push	41h ; 'A'
 		push	21h ; '!'
 		push	4Dh ; 'M'
 		push	[bp+var_50]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_50]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3262,23 +3316,23 @@ loc_57286:				; CODE XREF: sub_56B04+77Dj
 		jmp	short loc_57345
 ; ���������������������������������������������������������������������������
 
-loc_57342:				; CODE XREF: sub_56B04+77Fj
+loc_57342:				; CODE XREF: Training_AircraftScreen_56B04+77Fj
 		mov	ax, [bp+var_50]
 
-loc_57345:				; CODE XREF: sub_56B04+83Cj
+loc_57345:				; CODE XREF: Training_AircraftScreen_56B04+83Cj
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57353:				; CODE XREF: sub_56B04+761j
+loc_57353:				; CODE XREF: Training_AircraftScreen_56B04+761j
 		cmp	[bp+var_D1], 0
 		jnz	short loc_5735D
 		jmp	loc_57448
 ; ���������������������������������������������������������������������������
 
-loc_5735D:				; CODE XREF: sub_56B04+854j
+loc_5735D:				; CODE XREF: Training_AircraftScreen_56B04+854j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3292,13 +3346,13 @@ loc_5735D:				; CODE XREF: sub_56B04+854j
 		jmp	loc_57437
 ; ���������������������������������������������������������������������������
 
-loc_5737B:				; CODE XREF: sub_56B04+872j
+loc_5737B:				; CODE XREF: Training_AircraftScreen_56B04+872j
 		push	0Ch
 		push	41h ; 'A'
 		push	2Eh ; '.'
 		push	4Dh ; 'M'
 		push	[bp+var_5A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_5A]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3347,23 +3401,23 @@ loc_5737B:				; CODE XREF: sub_56B04+872j
 		jmp	short loc_5743A
 ; ���������������������������������������������������������������������������
 
-loc_57437:				; CODE XREF: sub_56B04+874j
+loc_57437:				; CODE XREF: Training_AircraftScreen_56B04+874j
 		mov	ax, [bp+var_5A]
 
-loc_5743A:				; CODE XREF: sub_56B04+931j
+loc_5743A:				; CODE XREF: Training_AircraftScreen_56B04+931j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57448:				; CODE XREF: sub_56B04+856j
+loc_57448:				; CODE XREF: Training_AircraftScreen_56B04+856j
 		cmp	[bp+var_D0], 0
 		jnz	short loc_57452
 		jmp	loc_5753E
 ; ���������������������������������������������������������������������������
 
-loc_57452:				; CODE XREF: sub_56B04+949j
+loc_57452:				; CODE XREF: Training_AircraftScreen_56B04+949j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3377,13 +3431,13 @@ loc_57452:				; CODE XREF: sub_56B04+949j
 		jmp	loc_5752D
 ; ���������������������������������������������������������������������������
 
-loc_57470:				; CODE XREF: sub_56B04+967j
+loc_57470:				; CODE XREF: Training_AircraftScreen_56B04+967j
 		push	0Ch
 		push	41h ; 'A'
 		push	7
 		push	91h ; '�'
 		push	[bp+var_64]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_64]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3432,23 +3486,23 @@ loc_57470:				; CODE XREF: sub_56B04+967j
 		jmp	short loc_57530
 ; ���������������������������������������������������������������������������
 
-loc_5752D:				; CODE XREF: sub_56B04+969j
+loc_5752D:				; CODE XREF: Training_AircraftScreen_56B04+969j
 		mov	ax, [bp+var_64]
 
-loc_57530:				; CODE XREF: sub_56B04+A27j
+loc_57530:				; CODE XREF: Training_AircraftScreen_56B04+A27j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_5753E:				; CODE XREF: sub_56B04+94Bj
+loc_5753E:				; CODE XREF: Training_AircraftScreen_56B04+94Bj
 		cmp	[bp+var_CF], 0
 		jnz	short loc_57548
 		jmp	loc_57634
 ; ���������������������������������������������������������������������������
 
-loc_57548:				; CODE XREF: sub_56B04+A3Fj
+loc_57548:				; CODE XREF: Training_AircraftScreen_56B04+A3Fj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3462,13 +3516,13 @@ loc_57548:				; CODE XREF: sub_56B04+A3Fj
 		jmp	loc_57623
 ; ���������������������������������������������������������������������������
 
-loc_57566:				; CODE XREF: sub_56B04+A5Dj
+loc_57566:				; CODE XREF: Training_AircraftScreen_56B04+A5Dj
 		push	0Ch
 		push	41h ; 'A'
 		push	14h
 		push	91h ; '�'
 		push	[bp+var_6E]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_6E]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3517,23 +3571,23 @@ loc_57566:				; CODE XREF: sub_56B04+A5Dj
 		jmp	short loc_57626
 ; ���������������������������������������������������������������������������
 
-loc_57623:				; CODE XREF: sub_56B04+A5Fj
+loc_57623:				; CODE XREF: Training_AircraftScreen_56B04+A5Fj
 		mov	ax, [bp+var_6E]
 
-loc_57626:				; CODE XREF: sub_56B04+B1Dj
+loc_57626:				; CODE XREF: Training_AircraftScreen_56B04+B1Dj
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57634:				; CODE XREF: sub_56B04+A41j
+loc_57634:				; CODE XREF: Training_AircraftScreen_56B04+A41j
 		cmp	[bp+var_CE], 0
 		jnz	short loc_5763E
 		jmp	loc_5772A
 ; ���������������������������������������������������������������������������
 
-loc_5763E:				; CODE XREF: sub_56B04+B35j
+loc_5763E:				; CODE XREF: Training_AircraftScreen_56B04+B35j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3547,13 +3601,13 @@ loc_5763E:				; CODE XREF: sub_56B04+B35j
 		jmp	loc_57719
 ; ���������������������������������������������������������������������������
 
-loc_5765C:				; CODE XREF: sub_56B04+B53j
+loc_5765C:				; CODE XREF: Training_AircraftScreen_56B04+B53j
 		push	0Ch
 		push	41h ; 'A'
 		push	21h ; '!'
 		push	91h ; '�'
 		push	[bp+var_78]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_78]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3602,23 +3656,23 @@ loc_5765C:				; CODE XREF: sub_56B04+B53j
 		jmp	short loc_5771C
 ; ���������������������������������������������������������������������������
 
-loc_57719:				; CODE XREF: sub_56B04+B55j
+loc_57719:				; CODE XREF: Training_AircraftScreen_56B04+B55j
 		mov	ax, [bp+var_78]
 
-loc_5771C:				; CODE XREF: sub_56B04+C13j
+loc_5771C:				; CODE XREF: Training_AircraftScreen_56B04+C13j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_5772A:				; CODE XREF: sub_56B04+B37j
+loc_5772A:				; CODE XREF: Training_AircraftScreen_56B04+B37j
 		cmp	[bp+var_CD], 0
 		jnz	short loc_57734
 		jmp	loc_57838
 ; ���������������������������������������������������������������������������
 
-loc_57734:				; CODE XREF: sub_56B04+C2Bj
+loc_57734:				; CODE XREF: Training_AircraftScreen_56B04+C2Bj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3632,13 +3686,13 @@ loc_57734:				; CODE XREF: sub_56B04+C2Bj
 		jmp	loc_57826
 ; ���������������������������������������������������������������������������
 
-loc_57753:				; CODE XREF: sub_56B04+C4Aj
+loc_57753:				; CODE XREF: Training_AircraftScreen_56B04+C4Aj
 		push	0Ch
 		push	41h ; 'A'
 		push	2Eh ; '.'
 		push	91h ; '�'
 		push	[bp+var_82]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_82]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3687,23 +3741,23 @@ loc_57753:				; CODE XREF: sub_56B04+C4Aj
 		jmp	short loc_5782A
 ; ���������������������������������������������������������������������������
 
-loc_57826:				; CODE XREF: sub_56B04+C4Cj
+loc_57826:				; CODE XREF: Training_AircraftScreen_56B04+C4Cj
 		mov	ax, [bp+var_82]
 
-loc_5782A:				; CODE XREF: sub_56B04+D20j
+loc_5782A:				; CODE XREF: Training_AircraftScreen_56B04+D20j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57838:				; CODE XREF: sub_56B04+C2Dj
+loc_57838:				; CODE XREF: Training_AircraftScreen_56B04+C2Dj
 		cmp	[bp+var_CC], 0
 		jnz	short loc_57842
 		jmp	loc_5794A
 ; ���������������������������������������������������������������������������
 
-loc_57842:				; CODE XREF: sub_56B04+D39j
+loc_57842:				; CODE XREF: Training_AircraftScreen_56B04+D39j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3717,13 +3771,13 @@ loc_57842:				; CODE XREF: sub_56B04+D39j
 		jmp	loc_57938
 ; ���������������������������������������������������������������������������
 
-loc_57862:				; CODE XREF: sub_56B04+D59j
+loc_57862:				; CODE XREF: Training_AircraftScreen_56B04+D59j
 		push	0Ch
 		push	41h ; 'A'
 		push	7
 		push	0EBh ; '�'
 		push	[bp+var_8C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_8C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3772,23 +3826,23 @@ loc_57862:				; CODE XREF: sub_56B04+D59j
 		jmp	short loc_5793C
 ; ���������������������������������������������������������������������������
 
-loc_57938:				; CODE XREF: sub_56B04+D5Bj
+loc_57938:				; CODE XREF: Training_AircraftScreen_56B04+D5Bj
 		mov	ax, [bp+var_8C]
 
-loc_5793C:				; CODE XREF: sub_56B04+E32j
+loc_5793C:				; CODE XREF: Training_AircraftScreen_56B04+E32j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_5794A:				; CODE XREF: sub_56B04+D3Bj
+loc_5794A:				; CODE XREF: Training_AircraftScreen_56B04+D3Bj
 		cmp	[bp+var_CB], 0
 		jnz	short loc_57954
 		jmp	loc_57A5C
 ; ���������������������������������������������������������������������������
 
-loc_57954:				; CODE XREF: sub_56B04+E4Bj
+loc_57954:				; CODE XREF: Training_AircraftScreen_56B04+E4Bj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3802,13 +3856,13 @@ loc_57954:				; CODE XREF: sub_56B04+E4Bj
 		jmp	loc_57A4A
 ; ���������������������������������������������������������������������������
 
-loc_57974:				; CODE XREF: sub_56B04+E6Bj
+loc_57974:				; CODE XREF: Training_AircraftScreen_56B04+E6Bj
 		push	0Ch
 		push	41h ; 'A'
 		push	14h
 		push	0EBh ; '�'
 		push	[bp+var_96]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_96]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3857,23 +3911,23 @@ loc_57974:				; CODE XREF: sub_56B04+E6Bj
 		jmp	short loc_57A4E
 ; ���������������������������������������������������������������������������
 
-loc_57A4A:				; CODE XREF: sub_56B04+E6Dj
+loc_57A4A:				; CODE XREF: Training_AircraftScreen_56B04+E6Dj
 		mov	ax, [bp+var_96]
 
-loc_57A4E:				; CODE XREF: sub_56B04+F44j
+loc_57A4E:				; CODE XREF: Training_AircraftScreen_56B04+F44j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57A5C:				; CODE XREF: sub_56B04+E4Dj
+loc_57A5C:				; CODE XREF: Training_AircraftScreen_56B04+E4Dj
 		cmp	[bp+var_CA], 0
 		jnz	short loc_57A66
 		jmp	loc_57B6E
 ; ���������������������������������������������������������������������������
 
-loc_57A66:				; CODE XREF: sub_56B04+F5Dj
+loc_57A66:				; CODE XREF: Training_AircraftScreen_56B04+F5Dj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3887,13 +3941,13 @@ loc_57A66:				; CODE XREF: sub_56B04+F5Dj
 		jmp	loc_57B5C
 ; ���������������������������������������������������������������������������
 
-loc_57A86:				; CODE XREF: sub_56B04+F7Dj
+loc_57A86:				; CODE XREF: Training_AircraftScreen_56B04+F7Dj
 		push	0Ch
 		push	41h ; 'A'
 		push	21h ; '!'
 		push	0EBh ; '�'
 		push	[bp+var_A0]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_A0]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -3942,23 +3996,23 @@ loc_57A86:				; CODE XREF: sub_56B04+F7Dj
 		jmp	short loc_57B60
 ; ���������������������������������������������������������������������������
 
-loc_57B5C:				; CODE XREF: sub_56B04+F7Fj
+loc_57B5C:				; CODE XREF: Training_AircraftScreen_56B04+F7Fj
 		mov	ax, [bp+var_A0]
 
-loc_57B60:				; CODE XREF: sub_56B04+1056j
+loc_57B60:				; CODE XREF: Training_AircraftScreen_56B04+1056j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57B6E:				; CODE XREF: sub_56B04+F5Fj
+loc_57B6E:				; CODE XREF: Training_AircraftScreen_56B04+F5Fj
 		cmp	[bp+var_C9], 0
 		jnz	short loc_57B78
 		jmp	loc_57C80
 ; ���������������������������������������������������������������������������
 
-loc_57B78:				; CODE XREF: sub_56B04+106Fj
+loc_57B78:				; CODE XREF: Training_AircraftScreen_56B04+106Fj
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -3972,13 +4026,13 @@ loc_57B78:				; CODE XREF: sub_56B04+106Fj
 		jmp	loc_57C6E
 ; ���������������������������������������������������������������������������
 
-loc_57B98:				; CODE XREF: sub_56B04+108Fj
+loc_57B98:				; CODE XREF: Training_AircraftScreen_56B04+108Fj
 		push	0Ch
 		push	41h ; 'A'
 		push	2Eh ; '.'
 		push	0EBh ; '�'
 		push	[bp+var_AA]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_AA]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4027,17 +4081,17 @@ loc_57B98:				; CODE XREF: sub_56B04+108Fj
 		jmp	short loc_57C72
 ; ���������������������������������������������������������������������������
 
-loc_57C6E:				; CODE XREF: sub_56B04+1091j
+loc_57C6E:				; CODE XREF: Training_AircraftScreen_56B04+1091j
 		mov	ax, [bp+var_AA]
 
-loc_57C72:				; CODE XREF: sub_56B04+1168j
+loc_57C72:				; CODE XREF: Training_AircraftScreen_56B04+1168j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	sub_E1FF
 		add	sp, 6
 
-loc_57C80:				; CODE XREF: sub_56B04+1071j
+loc_57C80:				; CODE XREF: Training_AircraftScreen_56B04+1071j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -4051,13 +4105,13 @@ loc_57C80:				; CODE XREF: sub_56B04+1071j
 		jmp	loc_57D75
 ; ���������������������������������������������������������������������������
 
-loc_57CA0:				; CODE XREF: sub_56B04+1197j
+loc_57CA0:				; CODE XREF: Training_AircraftScreen_56B04+1197j
 		push	0Ch
 		push	41h ; 'A'
 		push	3Dh ; '='
 		push	57h ; 'W'
 		push	[bp+var_B4]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_B4]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4106,10 +4160,10 @@ loc_57CA0:				; CODE XREF: sub_56B04+1197j
 		jmp	short loc_57D79
 ; ���������������������������������������������������������������������������
 
-loc_57D75:				; CODE XREF: sub_56B04+1199j
+loc_57D75:				; CODE XREF: Training_AircraftScreen_56B04+1199j
 		mov	ax, [bp+var_B4]
 
-loc_57D79:				; CODE XREF: sub_56B04+126Fj
+loc_57D79:				; CODE XREF: Training_AircraftScreen_56B04+126Fj
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
@@ -4128,13 +4182,13 @@ loc_57D79:				; CODE XREF: sub_56B04+126Fj
 		jmp	loc_57E7D
 ; ���������������������������������������������������������������������������
 
-loc_57DA7:				; CODE XREF: sub_56B04+129Ej
+loc_57DA7:				; CODE XREF: Training_AircraftScreen_56B04+129Ej
 		push	0Ch
 		push	41h ; 'A'
 		push	3Dh ; '='
 		push	9Bh ; '�'
 		push	[bp+var_BE]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_BE]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4183,10 +4237,10 @@ loc_57DA7:				; CODE XREF: sub_56B04+129Ej
 		jmp	short loc_57E81
 ; ���������������������������������������������������������������������������
 
-loc_57E7D:				; CODE XREF: sub_56B04+12A0j
+loc_57E7D:				; CODE XREF: Training_AircraftScreen_56B04+12A0j
 		mov	ax, [bp+var_BE]
 
-loc_57E81:				; CODE XREF: sub_56B04+1377j
+loc_57E81:				; CODE XREF: Training_AircraftScreen_56B04+1377j
 		push	ax
 		lea	ax, [bp+var_15A]
 		push	ax
@@ -4199,14 +4253,14 @@ loc_57E81:				; CODE XREF: sub_56B04+1377j
 		jmp	short loc_57EAD
 ; ���������������������������������������������������������������������������
 
-loc_57E9E:				; CODE XREF: sub_56B04+13ADj
+loc_57E9E:				; CODE XREF: Training_AircraftScreen_56B04+13ADj
 		push	1
 		lea	ax, [bp+var_15A]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_57EAD:				; CODE XREF: sub_56B04+1398j
+loc_57EAD:				; CODE XREF: Training_AircraftScreen_56B04+1398j
 		cmp	[bp+var_12], 0
 		jz	short loc_57E9E
 		lea	ax, [bp+var_15A]
@@ -4221,7 +4275,7 @@ loc_57EAD:				; CODE XREF: sub_56B04+1398j
 		jmp	short loc_57F16
 ; ���������������������������������������������������������������������������
 
-loc_57ECF:				; CODE XREF: sub_56B04+13C7j
+loc_57ECF:				; CODE XREF: Training_AircraftScreen_56B04+13C7j
 		mov	bx, [si+16h]
 		shl	bx, 1
 		mov	ax, [bx+si+0Ch]
@@ -4231,7 +4285,7 @@ loc_57ECF:				; CODE XREF: sub_56B04+13C7j
 		mov	word ptr [bx+si+0Ch], 0
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	2
 		lea	ax, [bp+var_15A]
@@ -4245,7 +4299,7 @@ loc_57ECF:				; CODE XREF: sub_56B04+13C7j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_57F01:				; CODE XREF: sub_56B04+13C2j
+loc_57F01:				; CODE XREF: Training_AircraftScreen_56B04+13C2j
 		push	2
 		lea	ax, [bp+var_15A]
 		push	ax
@@ -4258,7 +4312,7 @@ loc_57F01:				; CODE XREF: sub_56B04+13C2j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_57F16:				; CODE XREF: sub_56B04+13C9j
+loc_57F16:				; CODE XREF: Training_AircraftScreen_56B04+13C9j
 		mov	bx, [si+16h]
 		shl	bx, 1
 		mov	ax, [bp+var_12]
@@ -4281,7 +4335,7 @@ loc_57F16:				; CODE XREF: sub_56B04+13C9j
 		call	CRT_Strcat
 		add	sp, 4
 
-loc_57F53:				; CODE XREF: sub_56B04+143Dj
+loc_57F53:				; CODE XREF: Training_AircraftScreen_56B04+143Dj
 		mov	[bp+var_C6], 1Eh
 		mov	ax, [si+16h]
 		mov	dx, 0Ch
@@ -4294,7 +4348,7 @@ loc_57F53:				; CODE XREF: sub_56B04+143Dj
 		push	[bp+var_C6]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		lea	ax, [bp+var_16E]
 		push	ax
@@ -4309,20 +4363,20 @@ loc_57F53:				; CODE XREF: sub_56B04+143Dj
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_57FDA
+		call	near ptr Training_MoreEnoughScreen_57FDA
 		add	sp, 6
 		mov	[bp+var_2], al
 		jmp	short loc_57FB7
 ; ���������������������������������������������������������������������������
 
-loc_57FAC:				; CODE XREF: sub_56B04+1490j
+loc_57FAC:				; CODE XREF: Training_AircraftScreen_56B04+1490j
 		push	si
 		push	cs
-		call	near ptr sub_55C92
+		call	near ptr Training_AltitudeScreen_55C92
 		add	sp, 2
 		mov	[bp+var_2], al
 
-loc_57FB7:				; CODE XREF: sub_56B04+14A6j
+loc_57FB7:				; CODE XREF: Training_AircraftScreen_56B04+14A6j
 		push	2
 		lea	ax, [bp+var_15A]
 		push	ax
@@ -4333,13 +4387,13 @@ loc_57FB7:				; CODE XREF: sub_56B04+14A6j
 		jmp	loc_56C6F
 ; ���������������������������������������������������������������������������
 
-loc_57FCF:				; CODE XREF: sub_56B04+14C6j
+loc_57FCF:				; CODE XREF: Training_AircraftScreen_56B04+14C6j
 		mov	al, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_56B04	endp
+Training_AircraftScreen_56B04	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -4351,8 +4405,15 @@ sub_56B04	endp
 
 ; Attributes: bp-based frame
 
-sub_57FDA	proc far		; CODE XREF: sub_42142J
-					; sub_56B04+149Dp
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Après un groupe : panneau (6,153) image
+; 59 ; MORE (87,9) images 60/61, ENOUGH (155,9) 62/63, BACKUP (87,24) 64/65, CANCEL (155,24)
+; 66/67. MORE : écrit « , » (après le 1er groupe) ou « , and » (après le 2e) derrière le nom,
+; groupe +1, Training_GroupCountScreen_56366 ; ENOUGH : écrit « . »,
+; Training_AltitudeScreen_55C92.
+; ==============================================================================================
+Training_MoreEnoughScreen_57FDA	proc far		; CODE XREF: sub_42142J
+					; Training_AircraftScreen_56B04+149Dp
 
 var_A4		= word ptr -0A4h
 var_54		= dword	ptr -54h
@@ -4391,14 +4452,14 @@ arg_4		= word ptr  0Ah
 		push	di
 		mov	si, [bp+arg_0]
 
-loc_57FE6:				; CODE XREF: sub_57FDA+4CBj
+loc_57FE6:				; CODE XREF: Training_MoreEnoughScreen_57FDA+4CBj
 		push	2Ah ; '*'
 		push	134h
 		push	99h ; '�'
 		push	6
 		lea	ax, [bp+var_A4]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -4433,13 +4494,13 @@ loc_57FE6:				; CODE XREF: sub_57FDA+4CBj
 		jmp	loc_580ED
 ; ���������������������������������������������������������������������������
 
-loc_58064:				; CODE XREF: sub_57FDA+85j
+loc_58064:				; CODE XREF: Training_MoreEnoughScreen_57FDA+85j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	57h ; 'W'
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -4472,10 +4533,10 @@ loc_58064:				; CODE XREF: sub_57FDA+85j
 		jmp	short loc_580EF
 ; ���������������������������������������������������������������������������
 
-loc_580ED:				; CODE XREF: sub_57FDA+87j
+loc_580ED:				; CODE XREF: Training_MoreEnoughScreen_57FDA+87j
 		mov	ax, di
 
-loc_580EF:				; CODE XREF: sub_57FDA+111j
+loc_580EF:				; CODE XREF: Training_MoreEnoughScreen_57FDA+111j
 		push	ax
 		lea	ax, [bp+var_A4]
 		push	ax
@@ -4494,13 +4555,13 @@ loc_580EF:				; CODE XREF: sub_57FDA+111j
 		jmp	loc_581D8
 ; ���������������������������������������������������������������������������
 
-loc_5811B:				; CODE XREF: sub_57FDA+13Cj
+loc_5811B:				; CODE XREF: Training_MoreEnoughScreen_57FDA+13Cj
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	9Bh ; '�'
 		push	[bp+var_18]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_18]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4549,10 +4610,10 @@ loc_5811B:				; CODE XREF: sub_57FDA+13Cj
 		jmp	short loc_581DB
 ; ���������������������������������������������������������������������������
 
-loc_581D8:				; CODE XREF: sub_57FDA+13Ej
+loc_581D8:				; CODE XREF: Training_MoreEnoughScreen_57FDA+13Ej
 		mov	ax, [bp+var_18]
 
-loc_581DB:				; CODE XREF: sub_57FDA+1FCj
+loc_581DB:				; CODE XREF: Training_MoreEnoughScreen_57FDA+1FCj
 		push	ax
 		lea	ax, [bp+var_A4]
 		push	ax
@@ -4571,13 +4632,13 @@ loc_581DB:				; CODE XREF: sub_57FDA+1FCj
 		jmp	loc_582C3
 ; ���������������������������������������������������������������������������
 
-loc_58207:				; CODE XREF: sub_57FDA+228j
+loc_58207:				; CODE XREF: Training_MoreEnoughScreen_57FDA+228j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	57h ; 'W'
 		push	[bp+var_22]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_22]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4626,10 +4687,10 @@ loc_58207:				; CODE XREF: sub_57FDA+228j
 		jmp	short loc_582C6
 ; ���������������������������������������������������������������������������
 
-loc_582C3:				; CODE XREF: sub_57FDA+22Aj
+loc_582C3:				; CODE XREF: Training_MoreEnoughScreen_57FDA+22Aj
 		mov	ax, [bp+var_22]
 
-loc_582C6:				; CODE XREF: sub_57FDA+2E7j
+loc_582C6:				; CODE XREF: Training_MoreEnoughScreen_57FDA+2E7j
 		push	ax
 		lea	ax, [bp+var_A4]
 		push	ax
@@ -4648,13 +4709,13 @@ loc_582C6:				; CODE XREF: sub_57FDA+2E7j
 		jmp	loc_583AF
 ; ���������������������������������������������������������������������������
 
-loc_582F2:				; CODE XREF: sub_57FDA+313j
+loc_582F2:				; CODE XREF: Training_MoreEnoughScreen_57FDA+313j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_2C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_2C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -4703,10 +4764,10 @@ loc_582F2:				; CODE XREF: sub_57FDA+313j
 		jmp	short loc_583B2
 ; ���������������������������������������������������������������������������
 
-loc_583AF:				; CODE XREF: sub_57FDA+315j
+loc_583AF:				; CODE XREF: Training_MoreEnoughScreen_57FDA+315j
 		mov	ax, [bp+var_2C]
 
-loc_583B2:				; CODE XREF: sub_57FDA+3D3j
+loc_583B2:				; CODE XREF: Training_MoreEnoughScreen_57FDA+3D3j
 		push	ax
 		lea	ax, [bp+var_A4]
 		push	ax
@@ -4719,14 +4780,14 @@ loc_583B2:				; CODE XREF: sub_57FDA+3D3j
 		jmp	short loc_583DE
 ; ���������������������������������������������������������������������������
 
-loc_583CF:				; CODE XREF: sub_57FDA+408j
+loc_583CF:				; CODE XREF: Training_MoreEnoughScreen_57FDA+408j
 		push	1
 		lea	ax, [bp+var_A4]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_583DE:				; CODE XREF: sub_57FDA+3F3j
+loc_583DE:				; CODE XREF: Training_MoreEnoughScreen_57FDA+3F3j
 		cmp	[bp+var_C], 0
 		jz	short loc_583CF
 		lea	ax, [bp+var_A4]
@@ -4740,14 +4801,14 @@ loc_583DE:				; CODE XREF: sub_57FDA+3F3j
 		jmp	loc_58490	; default
 ; ���������������������������������������������������������������������������
 
-loc_583FF:				; CODE XREF: sub_57FDA+420j
+loc_583FF:				; CODE XREF: Training_MoreEnoughScreen_57FDA+420j
 		shl	bx, 1
 		jmp	cs:off_584B3[bx] ; switch jump
 
 loc_58406:				; DATA XREF: ovr190:off_584B3o
 		push	si		; case -0x1
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	2
 		lea	ax, [bp+var_A4]
@@ -4761,7 +4822,7 @@ loc_58406:				; DATA XREF: ovr190:off_584B3o
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58423:				; CODE XREF: sub_57FDA+427j
+loc_58423:				; CODE XREF: Training_MoreEnoughScreen_57FDA+427j
 					; DATA XREF: ovr190:off_584B3o
 		push	2		; case -0x2
 		lea	ax, [bp+var_A4]
@@ -4775,7 +4836,7 @@ loc_58423:				; CODE XREF: sub_57FDA+427j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58438:				; CODE XREF: sub_57FDA+427j
+loc_58438:				; CODE XREF: Training_MoreEnoughScreen_57FDA+427j
 					; DATA XREF: ovr190:off_584B3o
 		cmp	word ptr [si+16h], 1 ; case 0x1
 		jnz	short loc_58451
@@ -4784,48 +4845,48 @@ loc_58438:				; CODE XREF: sub_57FDA+427j
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		jmp	short loc_58462
 ; ���������������������������������������������������������������������������
 
-loc_58451:				; CODE XREF: sub_57FDA+462j
+loc_58451:				; CODE XREF: Training_MoreEnoughScreen_57FDA+462j
 		push	0D20h
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 
-loc_58462:				; CODE XREF: sub_57FDA+475j
+loc_58462:				; CODE XREF: Training_MoreEnoughScreen_57FDA+475j
 		inc	word ptr [si+16h]
 		push	si
 		push	cs
-		call	near ptr sub_56366
+		call	near ptr Training_GroupCountScreen_56366
 		add	sp, 2
 		mov	[bp+var_2], al
 		jmp	short loc_58490	; default
 ; ���������������������������������������������������������������������������
 
-loc_58472:				; CODE XREF: sub_57FDA+427j
+loc_58472:				; CODE XREF: Training_MoreEnoughScreen_57FDA+427j
 					; DATA XREF: ovr190:off_584B3o
 		push	0D22h		; case 0x2
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		push	si
 		push	cs
-		call	near ptr sub_55C92
+		call	near ptr Training_AltitudeScreen_55C92
 		add	sp, 2
 		mov	[bp+var_2], al
 		jmp	short $+2
 
-loc_58490:				; CODE XREF: sub_57FDA+422j
-					; sub_57FDA+427j ...
+loc_58490:				; CODE XREF: Training_MoreEnoughScreen_57FDA+422j
+					; Training_MoreEnoughScreen_57FDA+427j ...
 		push	2		; default
 		lea	ax, [bp+var_A4]
 		push	ax
@@ -4836,13 +4897,13 @@ loc_58490:				; CODE XREF: sub_57FDA+422j
 		jmp	loc_57FE6
 ; ���������������������������������������������������������������������������
 
-loc_584A8:				; CODE XREF: sub_57FDA+4C9j
+loc_584A8:				; CODE XREF: Training_MoreEnoughScreen_57FDA+4C9j
 		mov	al, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_57FDA	endp
+Training_MoreEnoughScreen_57FDA	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -4850,7 +4911,7 @@ sub_57FDA	endp
 		leave
 		retf
 ; ���������������������������������������������������������������������������
-off_584B3	dw offset loc_58423	; DATA XREF: sub_57FDA+427r
+off_584B3	dw offset loc_58423	; DATA XREF: Training_MoreEnoughScreen_57FDA+427r
 		dw offset loc_58406	; jump table for switch	statement
 		dw offset loc_58490
 		dw offset loc_58438
@@ -4860,7 +4921,14 @@ off_584B3	dw offset loc_58423	; DATA XREF: sub_57FDA+427r
 
 ; Attributes: bp-based frame
 
-sub_584BD	proc far		; CODE XREF: sub_4214CJ sub_55C92+6A8p
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Niveau des pilotes : écrit « Intelligence
+; reports indicate » en (5,115) ; panneau (6,153) image 81 ; ROOKIE (54,9) images 82/83,
+; VETERAN (122,9) 84/85, ACE (190,9) 86/87, BACKUP (87,24) 88/89, CANCEL (155,24) 90/91. Choix
+; n : réglages +18 = n − 1, « %s pilots. » avec rookie / veteran / ace (table DGROUP 2948),
+; puis Training_AcceptScreen_58A9D.
+; ==============================================================================================
+Training_PilotLevelScreen_584BD	proc far		; CODE XREF: sub_4214CJ Training_AltitudeScreen_55C92+6A8p
 
 var_C6		= word ptr -0C6h
 var_B2		= word ptr -0B2h
@@ -4904,7 +4972,7 @@ arg_0		= word ptr  6
 		push	di
 		mov	si, [bp+arg_0]
 
-loc_584C9:				; CODE XREF: sub_584BD+5D2j
+loc_584C9:				; CODE XREF: Training_PilotLevelScreen_584BD+5D2j
 		mov	[bp+var_4], 5
 		mov	[bp+var_6], 73h	; 's'
 		push	0D24h
@@ -4912,7 +4980,7 @@ loc_584C9:				; CODE XREF: sub_584BD+5D2j
 		push	[bp+var_4]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		push	0D43h
 		call	sub_112C4
@@ -4924,7 +4992,7 @@ loc_584C9:				; CODE XREF: sub_584BD+5D2j
 		push	6
 		lea	ax, [bp+var_B2]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -4959,13 +5027,13 @@ loc_584C9:				; CODE XREF: sub_584BD+5D2j
 		jmp	loc_585F9
 ; ���������������������������������������������������������������������������
 
-loc_58570:				; CODE XREF: sub_584BD+AEj
+loc_58570:				; CODE XREF: Training_PilotLevelScreen_584BD+AEj
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	36h ; '6'
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -4998,10 +5066,10 @@ loc_58570:				; CODE XREF: sub_584BD+AEj
 		jmp	short loc_585FB
 ; ���������������������������������������������������������������������������
 
-loc_585F9:				; CODE XREF: sub_584BD+B0j
+loc_585F9:				; CODE XREF: Training_PilotLevelScreen_584BD+B0j
 		mov	ax, di
 
-loc_585FB:				; CODE XREF: sub_584BD+13Aj
+loc_585FB:				; CODE XREF: Training_PilotLevelScreen_584BD+13Aj
 		push	ax
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5020,13 +5088,13 @@ loc_585FB:				; CODE XREF: sub_584BD+13Aj
 		jmp	loc_586E3
 ; ���������������������������������������������������������������������������
 
-loc_58627:				; CODE XREF: sub_584BD+165j
+loc_58627:				; CODE XREF: Training_PilotLevelScreen_584BD+165j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	7Ah ; 'z'
 		push	[bp+var_1C]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_1C]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5075,10 +5143,10 @@ loc_58627:				; CODE XREF: sub_584BD+165j
 		jmp	short loc_586E6
 ; ���������������������������������������������������������������������������
 
-loc_586E3:				; CODE XREF: sub_584BD+167j
+loc_586E3:				; CODE XREF: Training_PilotLevelScreen_584BD+167j
 		mov	ax, [bp+var_1C]
 
-loc_586E6:				; CODE XREF: sub_584BD+224j
+loc_586E6:				; CODE XREF: Training_PilotLevelScreen_584BD+224j
 		push	ax
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5097,13 +5165,13 @@ loc_586E6:				; CODE XREF: sub_584BD+224j
 		jmp	loc_587CF
 ; ���������������������������������������������������������������������������
 
-loc_58712:				; CODE XREF: sub_584BD+250j
+loc_58712:				; CODE XREF: Training_PilotLevelScreen_584BD+250j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	0BEh ; '�'
 		push	[bp+var_26]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_26]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5152,10 +5220,10 @@ loc_58712:				; CODE XREF: sub_584BD+250j
 		jmp	short loc_587D2
 ; ���������������������������������������������������������������������������
 
-loc_587CF:				; CODE XREF: sub_584BD+252j
+loc_587CF:				; CODE XREF: Training_PilotLevelScreen_584BD+252j
 		mov	ax, [bp+var_26]
 
-loc_587D2:				; CODE XREF: sub_584BD+310j
+loc_587D2:				; CODE XREF: Training_PilotLevelScreen_584BD+310j
 		push	ax
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5174,13 +5242,13 @@ loc_587D2:				; CODE XREF: sub_584BD+310j
 		jmp	loc_588BA
 ; ���������������������������������������������������������������������������
 
-loc_587FE:				; CODE XREF: sub_584BD+33Cj
+loc_587FE:				; CODE XREF: Training_PilotLevelScreen_584BD+33Cj
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	57h ; 'W'
 		push	[bp+var_30]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_30]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5229,10 +5297,10 @@ loc_587FE:				; CODE XREF: sub_584BD+33Cj
 		jmp	short loc_588BD
 ; ���������������������������������������������������������������������������
 
-loc_588BA:				; CODE XREF: sub_584BD+33Ej
+loc_588BA:				; CODE XREF: Training_PilotLevelScreen_584BD+33Ej
 		mov	ax, [bp+var_30]
 
-loc_588BD:				; CODE XREF: sub_584BD+3FBj
+loc_588BD:				; CODE XREF: Training_PilotLevelScreen_584BD+3FBj
 		push	ax
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5251,13 +5319,13 @@ loc_588BD:				; CODE XREF: sub_584BD+3FBj
 		jmp	loc_589A6
 ; ���������������������������������������������������������������������������
 
-loc_588E9:				; CODE XREF: sub_584BD+427j
+loc_588E9:				; CODE XREF: Training_PilotLevelScreen_584BD+427j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_3A]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_3A]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5306,10 +5374,10 @@ loc_588E9:				; CODE XREF: sub_584BD+427j
 		jmp	short loc_589A9
 ; ���������������������������������������������������������������������������
 
-loc_589A6:				; CODE XREF: sub_584BD+429j
+loc_589A6:				; CODE XREF: Training_PilotLevelScreen_584BD+429j
 		mov	ax, [bp+var_3A]
 
-loc_589A9:				; CODE XREF: sub_584BD+4E7j
+loc_589A9:				; CODE XREF: Training_PilotLevelScreen_584BD+4E7j
 		push	ax
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5322,14 +5390,14 @@ loc_589A9:				; CODE XREF: sub_584BD+4E7j
 		jmp	short loc_589D5
 ; ���������������������������������������������������������������������������
 
-loc_589C6:				; CODE XREF: sub_584BD+51Cj
+loc_589C6:				; CODE XREF: Training_PilotLevelScreen_584BD+51Cj
 		push	1
 		lea	ax, [bp+var_B2]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_589D5:				; CODE XREF: sub_584BD+507j
+loc_589D5:				; CODE XREF: Training_PilotLevelScreen_584BD+507j
 		cmp	[bp+var_10], 0
 		jz	short loc_589C6
 		lea	ax, [bp+var_B2]
@@ -5344,18 +5412,18 @@ loc_589D5:				; CODE XREF: sub_584BD+507j
 		jmp	short loc_58A39
 ; ���������������������������������������������������������������������������
 
-loc_589F7:				; CODE XREF: sub_584BD+536j
+loc_589F7:				; CODE XREF: Training_PilotLevelScreen_584BD+536j
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	2
 		lea	ax, [bp+var_B2]
@@ -5369,7 +5437,7 @@ loc_589F7:				; CODE XREF: sub_584BD+536j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58A24:				; CODE XREF: sub_584BD+531j
+loc_58A24:				; CODE XREF: Training_PilotLevelScreen_584BD+531j
 		push	2
 		lea	ax, [bp+var_B2]
 		push	ax
@@ -5382,7 +5450,7 @@ loc_58A24:				; CODE XREF: sub_584BD+531j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58A39:				; CODE XREF: sub_584BD+538j
+loc_58A39:				; CODE XREF: Training_PilotLevelScreen_584BD+538j
 		mov	ax, [bp+var_10]
 		dec	ax
 		mov	[si+12h], ax
@@ -5400,13 +5468,13 @@ loc_58A39:				; CODE XREF: sub_584BD+538j
 		push	[bp+var_4]
 		push	si
 		push	cs
-		call	near ptr sub_55BDC
+		call	near ptr Training_PrintText_55BDC
 		add	sp, 8
 		jmp	short $+2
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_58A9D
+		call	near ptr Training_AcceptScreen_58A9D
 		add	sp, 2
 		mov	[bp+var_2], al
 		push	2
@@ -5419,13 +5487,13 @@ loc_58A39:				; CODE XREF: sub_584BD+538j
 		jmp	loc_584C9
 ; ���������������������������������������������������������������������������
 
-loc_58A92:				; CODE XREF: sub_584BD+5D0j
+loc_58A92:				; CODE XREF: Training_PilotLevelScreen_584BD+5D0j
 		mov	al, [bp+var_2]
 		pop	di
 		pop	si
 		leave
 		retf
-sub_584BD	endp
+Training_PilotLevelScreen_584BD	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -5437,7 +5505,12 @@ sub_584BD	endp
 
 ; Attributes: bp-based frame
 
-sub_58A9D	proc far		; CODE XREF: sub_42151J sub_584BD+5B4p ...
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Dernier écran : panneau (6,153) image 92
+; ; ACCEPT (121,9) images 93/94 (renvoie 2), BACKUP (87,24) 95/96 (efface 2 textes, renvoie
+; 0), CANCEL (155,24) 97/98 (renvoie 1).
+; ==============================================================================================
+Training_AcceptScreen_58A9D	proc far		; CODE XREF: sub_42151J Training_PilotLevelScreen_584BD+5B4p ...
 
 var_98		= word ptr -98h
 var_48		= dword	ptr -48h
@@ -5474,7 +5547,7 @@ arg_0		= word ptr  6
 		push	6
 		lea	ax, [bp+var_98]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	ax, si
 		add	ax, 1Eh
@@ -5509,13 +5582,13 @@ arg_0		= word ptr  6
 		jmp	loc_58BB0
 ; ���������������������������������������������������������������������������
 
-loc_58B27:				; CODE XREF: sub_58A9D+85j
+loc_58B27:				; CODE XREF: Training_AcceptScreen_58A9D+85j
 		push	0Ch
 		push	41h ; 'A'
 		push	9
 		push	79h ; 'y'
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -5548,10 +5621,10 @@ loc_58B27:				; CODE XREF: sub_58A9D+85j
 		jmp	short loc_58BB2
 ; ���������������������������������������������������������������������������
 
-loc_58BB0:				; CODE XREF: sub_58A9D+87j
+loc_58BB0:				; CODE XREF: Training_AcceptScreen_58A9D+87j
 		mov	ax, di
 
-loc_58BB2:				; CODE XREF: sub_58A9D+111j
+loc_58BB2:				; CODE XREF: Training_AcceptScreen_58A9D+111j
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -5570,13 +5643,13 @@ loc_58BB2:				; CODE XREF: sub_58A9D+111j
 		jmp	loc_58C9A
 ; ���������������������������������������������������������������������������
 
-loc_58BDE:				; CODE XREF: sub_58A9D+13Cj
+loc_58BDE:				; CODE XREF: Training_AcceptScreen_58A9D+13Cj
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	57h ; 'W'
 		push	[bp+var_16]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_16]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5625,10 +5698,10 @@ loc_58BDE:				; CODE XREF: sub_58A9D+13Cj
 		jmp	short loc_58C9D
 ; ���������������������������������������������������������������������������
 
-loc_58C9A:				; CODE XREF: sub_58A9D+13Ej
+loc_58C9A:				; CODE XREF: Training_AcceptScreen_58A9D+13Ej
 		mov	ax, [bp+var_16]
 
-loc_58C9D:				; CODE XREF: sub_58A9D+1FBj
+loc_58C9D:				; CODE XREF: Training_AcceptScreen_58A9D+1FBj
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -5647,13 +5720,13 @@ loc_58C9D:				; CODE XREF: sub_58A9D+1FBj
 		jmp	loc_58D86
 ; ���������������������������������������������������������������������������
 
-loc_58CC9:				; CODE XREF: sub_58A9D+227j
+loc_58CC9:				; CODE XREF: Training_AcceptScreen_58A9D+227j
 		push	0Ch
 		push	41h ; 'A'
 		push	18h
 		push	9Bh ; '�'
 		push	[bp+var_20]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_20]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -5702,10 +5775,10 @@ loc_58CC9:				; CODE XREF: sub_58A9D+227j
 		jmp	short loc_58D89
 ; ���������������������������������������������������������������������������
 
-loc_58D86:				; CODE XREF: sub_58A9D+229j
+loc_58D86:				; CODE XREF: Training_AcceptScreen_58A9D+229j
 		mov	ax, [bp+var_20]
 
-loc_58D89:				; CODE XREF: sub_58A9D+2E7j
+loc_58D89:				; CODE XREF: Training_AcceptScreen_58A9D+2E7j
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -5718,14 +5791,14 @@ loc_58D89:				; CODE XREF: sub_58A9D+2E7j
 		jmp	short loc_58DB5
 ; ���������������������������������������������������������������������������
 
-loc_58DA6:				; CODE XREF: sub_58A9D+31Cj
+loc_58DA6:				; CODE XREF: Training_AcceptScreen_58A9D+31Cj
 		push	1
 		lea	ax, [bp+var_98]
 		push	ax
 		call	GaugeWidget_QueryAndFormat_E256
 		add	sp, 4
 
-loc_58DB5:				; CODE XREF: sub_58A9D+307j
+loc_58DB5:				; CODE XREF: Training_AcceptScreen_58A9D+307j
 		cmp	[bp+var_A], 0
 		jz	short loc_58DA6
 		lea	ax, [bp+var_98]
@@ -5740,14 +5813,14 @@ loc_58DB5:				; CODE XREF: sub_58A9D+307j
 		jmp	short loc_58E11
 ; ���������������������������������������������������������������������������
 
-loc_58DD7:				; CODE XREF: sub_58A9D+336j
+loc_58DD7:				; CODE XREF: Training_AcceptScreen_58A9D+336j
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	si
 		push	cs
-		call	near ptr sub_55C7B
+		call	near ptr Training_EraseLastText_55C7B
 		add	sp, 2
 		push	2
 		lea	ax, [bp+var_98]
@@ -5761,7 +5834,7 @@ loc_58DD7:				; CODE XREF: sub_58A9D+336j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58DFC:				; CODE XREF: sub_58A9D+331j
+loc_58DFC:				; CODE XREF: Training_AcceptScreen_58A9D+331j
 		push	2
 		lea	ax, [bp+var_98]
 		push	ax
@@ -5774,7 +5847,7 @@ loc_58DFC:				; CODE XREF: sub_58A9D+331j
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_58E11:				; CODE XREF: sub_58A9D+338j
+loc_58E11:				; CODE XREF: Training_AcceptScreen_58A9D+338j
 		push	2
 		lea	ax, [bp+var_98]
 		push	ax
@@ -5785,7 +5858,7 @@ loc_58E11:				; CODE XREF: sub_58A9D+338j
 		pop	si
 		leave
 		retf
-sub_58A9D	endp
+Training_AcceptScreen_58A9D	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -5797,7 +5870,13 @@ sub_58A9D	endp
 
 ; Attributes: bp-based frame
 
-sub_58E2A	proc far		; CODE XREF: sub_42133J sub_5547D+5E0p
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit « Mission Briefing: Air Superiority
+; » en (5,43) et « Intercept and engage inbound bogeys: » en (5,55)
+; (PaletteScreen_DispatchWidgetLayoutB_11363, couleur 255), puis
+; Training_GroupCountScreen_56366.
+; ==============================================================================================
+Training_DogfightBriefing_58E2A	proc far		; CODE XREF: sub_42133J Training_TypeScreen_5547D+5E0p
 
 var_2		= byte ptr -2
 arg_0		= word ptr  6
@@ -5823,14 +5902,14 @@ arg_0		= word ptr  6
 		add	sp, 0Ah
 		push	si
 		push	cs
-		call	near ptr sub_56366
+		call	near ptr Training_GroupCountScreen_56366
 		add	sp, 2
 		mov	[bp+var_2], al
 		mov	al, [bp+var_2]
 		pop	si
 		leave
 		retf
-sub_58E2A	endp
+Training_DogfightBriefing_58E2A	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -5841,7 +5920,13 @@ sub_58E2A	endp
 
 ; Attributes: bp-based frame
 
-sub_58E74	proc far		; CODE XREF: sub_4212EJ sub_5547D+5EEp
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit les 4 lignes du briefing d'attaque
+; au sol en (5,43), (5,55), (5,67), (5,79) : « Mission Briefing: Ground Attack », « Search and
+; destroy enemy targets at », « pilot's discretion.  Refer to area », « map for enemy
+; positions. », puis Training_AcceptScreen_58A9D (aucun autre réglage).
+; ==============================================================================================
+Training_SearchBriefing_58E74	proc far		; CODE XREF: sub_4212EJ Training_TypeScreen_5547D+5EEp
 
 var_2		= byte ptr -2
 arg_0		= word ptr  6
@@ -5881,14 +5966,14 @@ arg_0		= word ptr  6
 		add	sp, 0Ah
 		push	si
 		push	cs
-		call	near ptr sub_58A9D
+		call	near ptr Training_AcceptScreen_58A9D
 		add	sp, 2
 		mov	[bp+var_2], al
 		mov	al, [bp+var_2]
 		pop	si
 		leave
 		retf
-sub_58E74	endp
+Training_SearchBriefing_58E74	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -5899,7 +5984,25 @@ sub_58E74	endp
 
 ; Attributes: bp-based frame
 
-sub_58EEA	proc far		; CODE XREF: sub_42165J sub_597B2+D1p
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Écrit instant.iff (répertoire courant) à
+; partir de ..\\..\\data\\missions\\template.iff. FORM MISN ; chunks du modèle recopiés
+; jusqu'à AREA (ResourceRecord_CopyChunksUntilTag_3CBF6) ; AREA du modèle + (dogfight) zone
+; sphère « Destroy bogeys » de 49 octets, c0 = −66000, c1 = 128000, c2 = altitude en pieds
+; telle quelle (shl eax, 8), rayon 45000 ; recopie jusqu'à FLAG ; FLAG du modèle + un mot =
+; nombre total d'avions (réglages +20, 0 en SEARCH AND DESTROY) ; CAST du modèle + (dogfight)
+; un nom de 9 octets par avion : rookie / veteran / ace si le drapeau de l'avion (table + 14)
+; est posé, « target » sinon ; PART : 1er objet du modèle (le joueur) replacé en c0 = −73000,
+; c1 = 128000, c2 = pieds × 256 / 839 (dword_46456), cap 90, les autres recopiés, puis
+; (dogfight) un objet de 62 octets par avion (CAST = nombre de CAST du modèle + rang, fichier
+; et emport de la table, zone 65535, c0 = −59000 + 500 × groupe, c1 = 128000 + 300 × rang,
+; même altitude que le joueur, cap 270, vitesse 200 si drapeau sinon 100, camp 255, scripts
+; PROG 65535 / 1 si drapeau sinon 2 / 3 / 65535) ; PROG, TEAM recopiés ; FORM PLAY recopiée +
+; (dogfight) un SCNE de 24 octets (active 1, zone = nombre de zones du modèle, scripts 65535)
+; suivi des index PART des avions ajoutés ; LOAD recopié. Reproduit par
+; tools/instant_mission.py.
+; ==============================================================================================
+Training_BuildInstantMission_58EEA	proc far		; CODE XREF: sub_42165J Training_Run_597B2+D1p
 
 var_250		= word ptr -250h
 var_24E		= word ptr -24Eh
@@ -6024,7 +6127,7 @@ arg_0		= word ptr  6
 		push	large [dword_43E6E]
 		lea	ax, [bp+var_DC]
 		push	ax
-		call	sub_3CBF6
+		call	ResourceRecord_CopyChunksUntilTag_3CBF6
 		add	sp, 8
 		push	large 0
 		push	large [dword_43E73]
@@ -6049,7 +6152,7 @@ arg_0		= word ptr  6
 		jmp	loc_590B2
 ; ���������������������������������������������������������������������������
 
-loc_5902F:				; CODE XREF: sub_58EEA+140j
+loc_5902F:				; CODE XREF: Training_BuildInstantMission_58EEA+140j
 		mov	byte ptr [bp+var_244], 53h ; 'S'
 		push	0E5Dh
 		lea	ax, [bp+var_244+1]
@@ -6083,7 +6186,7 @@ loc_5902F:				; CODE XREF: sub_58EEA+140j
 		add	sp, 0Eh
 		add	[bp+var_77], 31h ; '1'
 
-loc_590B2:				; CODE XREF: sub_58EEA+142j
+loc_590B2:				; CODE XREF: Training_BuildInstantMission_58EEA+142j
 		lea	ax, [bp+var_DC]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_3C848
@@ -6096,7 +6199,7 @@ loc_590B2:				; CODE XREF: sub_58EEA+142j
 		push	large [dword_43E8C]
 		lea	ax, [bp+var_DC]
 		push	ax
-		call	sub_3CBF6
+		call	ResourceRecord_CopyChunksUntilTag_3CBF6
 		add	sp, 8
 		push	large 0
 		push	large [dword_43E91]
@@ -6150,7 +6253,7 @@ loc_590B2:				; CODE XREF: sub_58EEA+142j
 		push	large 9
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_3C5D6
+		call	ResourceRecord_RecordCount_3C5D6
 		add	sp, 6
 		mov	[bp+var_4], ax
 		lea	ax, [bp+var_1D4]
@@ -6164,12 +6267,12 @@ loc_590B2:				; CODE XREF: sub_58EEA+142j
 		jmp	loc_59236
 ; ���������������������������������������������������������������������������
 
-loc_591B7:				; CODE XREF: sub_58EEA+2C8j
+loc_591B7:				; CODE XREF: Training_BuildInstantMission_58EEA+2C8j
 		mov	word ptr [bp+var_24+2],	0
 		jmp	short loc_59230
 ; ���������������������������������������������������������������������������
 
-loc_591BE:				; CODE XREF: sub_58EEA+34Aj
+loc_591BE:				; CODE XREF: Training_BuildInstantMission_58EEA+34Aj
 		mov	bx, word ptr [bp+var_24+2]
 		shl	bx, 1
 		mov	ax, [bx+si+6]
@@ -6178,7 +6281,7 @@ loc_591BE:				; CODE XREF: sub_58EEA+34Aj
 		jmp	short loc_59223
 ; ���������������������������������������������������������������������������
 
-loc_591CD:				; CODE XREF: sub_58EEA+341j
+loc_591CD:				; CODE XREF: Training_BuildInstantMission_58EEA+341j
 		mov	ax, word ptr [bp+var_24]
 		mov	dx, 0Fh
 		imul	dx
@@ -6195,14 +6298,14 @@ loc_591CD:				; CODE XREF: sub_58EEA+341j
 		jmp	short loc_59204
 ; ���������������������������������������������������������������������������
 
-loc_591F5:				; CODE XREF: sub_58EEA+2F2j
+loc_591F5:				; CODE XREF: Training_BuildInstantMission_58EEA+2F2j
 		push	0E85h
 		lea	ax, [bp+var_30+2]
 		push	ax
 		call	CRT_Strcpy
 		add	sp, 4
 
-loc_59204:				; CODE XREF: sub_58EEA+309j
+loc_59204:				; CODE XREF: Training_BuildInstantMission_58EEA+309j
 		push	large [bp+var_77]
 		push	large 9
 		push	ss
@@ -6215,18 +6318,18 @@ loc_59204:				; CODE XREF: sub_58EEA+309j
 		add	[bp+var_77], 9
 		inc	di
 
-loc_59223:				; CODE XREF: sub_58EEA+2E1j
+loc_59223:				; CODE XREF: Training_BuildInstantMission_58EEA+2E1j
 		mov	bx, word ptr [bp+var_24+2]
 		shl	bx, 1
 		cmp	[bx+si+0Ch], di
 		jg	short loc_591CD
 		inc	word ptr [bp+var_24+2]
 
-loc_59230:				; CODE XREF: sub_58EEA+2D2j
+loc_59230:				; CODE XREF: Training_BuildInstantMission_58EEA+2D2j
 		cmp	word ptr [bp+var_24+2],	3
 		jl	short loc_591BE
 
-loc_59236:				; CODE XREF: sub_58EEA+2CAj
+loc_59236:				; CODE XREF: Training_BuildInstantMission_58EEA+2CAj
 		lea	ax, [bp+var_DC]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_3C848
@@ -6249,7 +6352,7 @@ loc_59236:				; CODE XREF: sub_58EEA+2CAj
 		push	large 3Eh ; '>'
 		lea	ax, [bp+var_1D4]
 		push	ax
-		call	sub_3C5D6
+		call	ResourceRecord_RecordCount_3C5D6
 		add	sp, 6
 		mov	[bp+var_6], ax
 		push	large 3Eh ; '>'
@@ -6297,7 +6400,7 @@ loc_59236:				; CODE XREF: sub_58EEA+2CAj
 		jmp	short loc_59369
 ; ���������������������������������������������������������������������������
 
-loc_59331:				; CODE XREF: sub_58EEA+485j
+loc_59331:				; CODE XREF: Training_BuildInstantMission_58EEA+485j
 		push	large 3Eh ; '>'
 		push	ss
 		lea	ax, [bp+var_212]
@@ -6318,7 +6421,7 @@ loc_59331:				; CODE XREF: sub_58EEA+485j
 		add	[bp+var_77], 3Eh ; '>'
 		inc	[bp+var_20]
 
-loc_59369:				; CODE XREF: sub_58EEA+445j
+loc_59369:				; CODE XREF: Training_BuildInstantMission_58EEA+445j
 		mov	ax, [bp+var_20]
 		cmp	ax, [bp+var_6]
 		jl	short loc_59331
@@ -6327,7 +6430,7 @@ loc_59369:				; CODE XREF: sub_58EEA+445j
 		jmp	loc_594DC
 ; ���������������������������������������������������������������������������
 
-loc_5937A:				; CODE XREF: sub_58EEA+48Bj
+loc_5937A:				; CODE XREF: Training_BuildInstantMission_58EEA+48Bj
 		mov	ax, [bp+var_4]
 		mov	word ptr [bp+var_24+2],	ax
 		mov	[bp+var_28+2], 0FF198800h
@@ -6338,12 +6441,12 @@ loc_5937A:				; CODE XREF: sub_58EEA+48Bj
 		jmp	loc_594D3
 ; ���������������������������������������������������������������������������
 
-loc_593A0:				; CODE XREF: sub_58EEA+5EFj
+loc_593A0:				; CODE XREF: Training_BuildInstantMission_58EEA+5EFj
 		mov	word ptr [bp+var_34+2],	0
 		jmp	loc_594B8
 ; ���������������������������������������������������������������������������
 
-loc_593A8:				; CODE XREF: sub_58EEA+5DBj
+loc_593A8:				; CODE XREF: Training_BuildInstantMission_58EEA+5DBj
 		mov	bx, word ptr [bp+var_30]
 		shl	bx, 1
 		mov	di, [bx+si+6]
@@ -6389,10 +6492,10 @@ loc_593A8:				; CODE XREF: sub_58EEA+5DBj
 		jmp	short loc_5943E
 ; ���������������������������������������������������������������������������
 
-loc_59438:				; CODE XREF: sub_58EEA+544j
+loc_59438:				; CODE XREF: Training_BuildInstantMission_58EEA+544j
 		mov	[bp+var_225], 64h ; 'd'
 
-loc_5943E:				; CODE XREF: sub_58EEA+54Cj
+loc_5943E:				; CODE XREF: Training_BuildInstantMission_58EEA+54Cj
 		mov	byte ptr [bp+var_223], 0FFh
 		mov	word ptr [bp+var_223+1], 0FFFFh
 		mov	word ptr [bp+var_223+3], 0
@@ -6409,10 +6512,10 @@ loc_5943E:				; CODE XREF: sub_58EEA+54Cj
 		jmp	short loc_5947F
 ; ���������������������������������������������������������������������������
 
-loc_59479:				; CODE XREF: sub_58EEA+585j
+loc_59479:				; CODE XREF: Training_BuildInstantMission_58EEA+585j
 		mov	word ptr [bp+var_21B+3], 2
 
-loc_5947F:				; CODE XREF: sub_58EEA+58Dj
+loc_5947F:				; CODE XREF: Training_BuildInstantMission_58EEA+58Dj
 		mov	word ptr [bp+var_217+1], 3
 		mov	word ptr [bp+var_217+3], 0FFFFh
 		push	large [bp+var_77]
@@ -6429,7 +6532,7 @@ loc_5947F:				; CODE XREF: sub_58EEA+58Dj
 		inc	word ptr [bp+var_24+2]
 		inc	word ptr [bp+var_34+2]
 
-loc_594B8:				; CODE XREF: sub_58EEA+4BBj
+loc_594B8:				; CODE XREF: Training_BuildInstantMission_58EEA+4BBj
 		mov	bx, word ptr [bp+var_30]
 		shl	bx, 1
 		mov	ax, [bx+si+0Ch]
@@ -6438,18 +6541,18 @@ loc_594B8:				; CODE XREF: sub_58EEA+4BBj
 		jmp	loc_593A8
 ; ���������������������������������������������������������������������������
 
-loc_594C8:				; CODE XREF: sub_58EEA+5D9j
+loc_594C8:				; CODE XREF: Training_BuildInstantMission_58EEA+5D9j
 		add	[bp+var_28+2], 1F400h
 		inc	word ptr [bp+var_30]
 
-loc_594D3:				; CODE XREF: sub_58EEA+4B3j
+loc_594D3:				; CODE XREF: Training_BuildInstantMission_58EEA+4B3j
 		cmp	word ptr [bp+var_30], 3
 		jge	short loc_594DC
 		jmp	loc_593A0
 ; ���������������������������������������������������������������������������
 
-loc_594DC:				; CODE XREF: sub_58EEA+48Dj
-					; sub_58EEA+5EDj
+loc_594DC:				; CODE XREF: Training_BuildInstantMission_58EEA+48Dj
+					; Training_BuildInstantMission_58EEA+5EDj
 		lea	ax, [bp+var_DC]
 		push	ax
 		call	ResourceRecord_WriteFieldWrapper_3C848
@@ -6534,7 +6637,7 @@ loc_594DC:				; CODE XREF: sub_58EEA+48Dj
 		jmp	loc_596DF
 ; ���������������������������������������������������������������������������
 
-loc_595F7:				; CODE XREF: sub_58EEA+708j
+loc_595F7:				; CODE XREF: Training_BuildInstantMission_58EEA+708j
 		push	large 0
 		push	large [dword_43ED4]
 		lea	ax, [bp+var_DC]
@@ -6573,12 +6676,12 @@ loc_595F7:				; CODE XREF: sub_58EEA+708j
 		jmp	short loc_596CC
 ; ���������������������������������������������������������������������������
 
-loc_59693:				; CODE XREF: sub_58EEA+7E6j
+loc_59693:				; CODE XREF: Training_BuildInstantMission_58EEA+7E6j
 		xor	di, di
 		jmp	short loc_596BF
 ; ���������������������������������������������������������������������������
 
-loc_59697:				; CODE XREF: sub_58EEA+7DDj
+loc_59697:				; CODE XREF: Training_BuildInstantMission_58EEA+7DDj
 		mov	ax, word ptr [bp+var_30+2]
 		mov	word ptr [bp+var_34+2],	ax
 		inc	word ptr [bp+var_30+2]
@@ -6594,14 +6697,14 @@ loc_59697:				; CODE XREF: sub_58EEA+7DDj
 		add	[bp+var_77], 2
 		inc	di
 
-loc_596BF:				; CODE XREF: sub_58EEA+7ABj
+loc_596BF:				; CODE XREF: Training_BuildInstantMission_58EEA+7ABj
 		mov	bx, word ptr [bp+var_30]
 		shl	bx, 1
 		cmp	[bx+si+0Ch], di
 		jg	short loc_59697
 		inc	word ptr [bp+var_30]
 
-loc_596CC:				; CODE XREF: sub_58EEA+7A7j
+loc_596CC:				; CODE XREF: Training_BuildInstantMission_58EEA+7A7j
 		cmp	word ptr [bp+var_30], 3
 		jl	short loc_59693
 		lea	ax, [bp+var_DC]
@@ -6609,7 +6712,7 @@ loc_596CC:				; CODE XREF: sub_58EEA+7A7j
 		call	ResourceRecord_WriteFieldWrapper_3C848
 		add	sp, 2
 
-loc_596DF:				; CODE XREF: sub_58EEA+70Aj
+loc_596DF:				; CODE XREF: Training_BuildInstantMission_58EEA+70Aj
 		lea	ax, [bp+var_DC]
 		push	ax
 		call	ResourceRecord_SeekAndRelease_3C857
@@ -6675,14 +6778,29 @@ loc_596DF:				; CODE XREF: sub_58EEA+70Aj
 		pop	si
 		leave
 		retf
-sub_58EEA	endp
+Training_BuildInstantMission_58EEA	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_597B2	proc far		; CODE XREF: sub_4211FJ
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Point d'entrée de TRAINING MISSION, choix
+; 3 du menu d'accueil (Gameflow_MainLoop_3D2E → stub sub_4211F). byte_43BAA = 1 pendant
+; l'entraînement (Gameflow_WeaponLoadout_51AB3 ne change alors pas l'ambiance musicale).
+; Charge la banque ..\\..\\data\\midgames\\rmusic.pak (amusic.pak si byte_46848 = 2) par
+; Speech_LoadBank_28D24 (argument 28). Réglages sur la pile (42 octets,
+; Training_InitSettings_598FC), écran Training_TypeScreen_5547D. Si accepté : stock d'armes de
+; la partie [+609..+625] = 6, 6, 12, 12, 24, 24, 4, 8, 6 (SWINDERJ, SWINDERM, AGM-65D,
+; DURANDAL, MK20, MK82, GBU-15G, POD, AMRAAM, table DGROUP 712), [partie+252] = 11, écran
+; d'armement (stub sub_420A4 → Gameflow_WeaponLoadout_51AB3, argument 0) ; s'il est validé,
+; Training_BuildInstantMission_58EEA écrit instant.iff. Renvoie 1 si le vol part :
+; Gameflow_MainLoop_3D2E pose alors [partie+249] = 254 et [partie+232] = 1 (départ en vol ;
+; Gameflow_SaveTmpState_4BBA0 sauté, Gameflow_WriteMissionOrder_4BBF7 écrit le nom « instant
+; », « arena » et 21).
+; ==============================================================================================
+Training_Run_597B2	proc far		; CODE XREF: sub_4211FJ
 
 var_7C		= word ptr -7Ch
 var_64		= word ptr -64h
@@ -6724,7 +6842,7 @@ arg_0		= word ptr  6
 		call	Path_Build_C82C
 		add	sp, 0Eh
 
-loc_597F8:				; CODE XREF: sub_597B2+2Cj
+loc_597F8:				; CODE XREF: Training_Run_597B2+2Cj
 		push	1Ch
 		lea	ax, [bp+var_52]
 		push	ax
@@ -6735,12 +6853,12 @@ loc_597F8:				; CODE XREF: sub_597B2+2Cj
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_598FC
+		call	near ptr Training_InitSettings_598FC
 		add	sp, 2
 		lea	ax, [bp+var_7C]
 		push	ax
 		push	cs
-		call	near ptr sub_5547D
+		call	near ptr Training_TypeScreen_5547D
 		add	sp, 2
 		mov	[bp+var_1], al
 		call	TextScrollDisplayB_ApplyHelperD_3F784
@@ -6766,11 +6884,11 @@ loc_597F8:				; CODE XREF: sub_597B2+2Cj
 		lea	ax, [bp+var_7C]
 		push	ax
 		push	cs
-		call	near ptr sub_58EEA
+		call	near ptr Training_BuildInstantMission_58EEA
 		add	sp, 2
 
-loc_59889:				; CODE XREF: sub_597B2+7Bj
-					; sub_597B2+CAj
+loc_59889:				; CODE XREF: Training_Run_597B2+7Bj
+					; Training_Run_597B2+CAj
 		mov	byte_43BAA, 0
 		call	sub_28D49
 		mov	al, [bp+var_1]
@@ -6789,8 +6907,8 @@ loc_59889:				; CODE XREF: sub_597B2+7Bj
 		add	sp, 8
 		jmp	short $+2
 
-loc_598BD:				; CODE XREF: sub_597B2+EBj
-					; sub_597B2+F2j
+loc_598BD:				; CODE XREF: Training_Run_597B2+EBj
+					; Training_Run_597B2+F2j
 		mov	[bp+var_5E], 0
 		mov	[bp+var_59], 0
 		mov	[bp+var_58], 0
@@ -6808,7 +6926,7 @@ loc_598BD:				; CODE XREF: sub_597B2+EBj
 		pop	si
 		leave
 		retf
-sub_597B2	endp
+Training_Run_597B2	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si
@@ -6819,7 +6937,15 @@ sub_597B2	endp
 
 ; Attributes: bp-based frame
 
-sub_598FC	proc far		; CODE XREF: sub_4211AJ sub_597B2+5Ep
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Initialise les réglages de l'entraînement
+; (42 octets ; alloués si argument nul) : +0 dword altitude en pieds = 5000 ; +4 = 0 ;
+; +6/+8/+10 type d'avion des groupes 0 à 2 ; +12/+14/+16 nombre d'avions des groupes 0 à 2 (=
+; 0) ; +18 niveau des pilotes (0 rookie, 1 veteran, 2 ace) ; +20 nombre total d'avions ; +22
+; groupe courant ; +24 liste des zones d'écran sauvegardées sous les textes ; +30 image TM.SHP
+; (dword), +34/+35 propriété ; +40 type de mission (1 DOGFIGHT, 2 SEARCH AND DESTROY).
+; ==============================================================================================
+Training_InitSettings_598FC	proc far		; CODE XREF: sub_4211AJ Training_Run_597B2+5Ep
 
 arg_0		= word ptr  6
 
@@ -6837,7 +6963,7 @@ arg_0		= word ptr  6
 		or	ax, ax
 		jz	short loc_59975
 
-loc_59918:				; CODE XREF: sub_598FC+Aj
+loc_59918:				; CODE XREF: Training_InitSettings_598FC+Aj
 		mov	word ptr [si+18h], 2BDh
 		xor	ax, ax
 		mov	[si+1Ch], ax
@@ -6857,23 +6983,23 @@ loc_59918:				; CODE XREF: sub_598FC+Aj
 		jmp	short loc_59970
 ; ���������������������������������������������������������������������������
 
-loc_59966:				; CODE XREF: sub_598FC+77j
+loc_59966:				; CODE XREF: Training_InitSettings_598FC+77j
 		mov	bx, di
 		shl	bx, 1
 		mov	word ptr [bx+si+0Ch], 0
 		inc	di
 
-loc_59970:				; CODE XREF: sub_598FC+68j
+loc_59970:				; CODE XREF: Training_InitSettings_598FC+68j
 		cmp	di, 3
 		jl	short loc_59966
 
-loc_59975:				; CODE XREF: sub_598FC+1Aj
+loc_59975:				; CODE XREF: Training_InitSettings_598FC+1Aj
 		mov	ax, si
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_598FC	endp
+Training_InitSettings_598FC	endp
 
 ; ���������������������������������������������������������������������������
 		pop	di
@@ -6885,7 +7011,11 @@ sub_598FC	endp
 
 ; Attributes: bp-based frame
 
-sub_5997F	proc far		; CODE XREF: sub_42115J
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Destructeur de la liste des zones d'écran
+; sauvegardées sous les textes (réglages +24) ; libère l'objet si bit 0 de l'argument.
+; ==============================================================================================
+Training_TextRegionList_Destruct_5997F	proc far		; CODE XREF: sub_42115J
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -6912,20 +7042,25 @@ arg_2		= word ptr  8
 		call	sub_308
 		add	sp, 2
 
-loc_599B7:				; CODE XREF: sub_5997F+Dj
-					; sub_5997F+2Dj
+loc_599B7:				; CODE XREF: Training_TextRegionList_Destruct_5997F+Dj
+					; Training_TextRegionList_Destruct_5997F+2Dj
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_5997F	endp
+Training_TextRegionList_Destruct_5997F	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
 
 ; Attributes: bp-based frame
 
-sub_599BB	proc far		; CODE XREF: sub_42110J
+; ==============================================================================================
+; far, LUE 2026-11-04. analysis/TRAINING_MISSION.md. Destructeur d'une zone d'écran
+; sauvegardée : libère le tampon (+4) s'il est possédé (+9), libère l'objet si bit 0 de
+; l'argument.
+; ==============================================================================================
+Training_SavedRegion_Destruct_599BB	proc far		; CODE XREF: sub_42110J
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -6954,8 +7089,8 @@ arg_2		= word ptr  8
 		add	sp, 8
 		jmp	short $+2
 
-loc_599F4:				; CODE XREF: sub_599BB+17j
-					; sub_599BB+1Ej
+loc_599F4:				; CODE XREF: Training_SavedRegion_Destruct_599BB+17j
+					; Training_SavedRegion_Destruct_599BB+1Ej
 		mov	dword ptr [si+4], 0
 		mov	byte ptr [si+9], 0
 		mov	dword ptr [si+0Ah], 0
@@ -6965,12 +7100,12 @@ loc_599F4:				; CODE XREF: sub_599BB+17j
 		call	sub_308
 		add	sp, 2
 
-loc_59A17:				; CODE XREF: sub_599BB+Dj
-					; sub_599BB+51j
+loc_59A17:				; CODE XREF: Training_SavedRegion_Destruct_599BB+Dj
+					; Training_SavedRegion_Destruct_599BB+51j
 		pop	di
 		pop	si
 		pop	bp
 		retf
-sub_599BB	endp
+Training_SavedRegion_Destruct_599BB	endp
 
 ovr190		ends

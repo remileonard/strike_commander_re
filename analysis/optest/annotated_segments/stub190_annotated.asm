@@ -15,7 +15,7 @@ stru_420F0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:06AEo
 ; Attributes: thunk
 
 sub_42110	proc far		; DATA XREF: dseg:0EC7o
-		jmp	sub_599BB
+		jmp	Training_SavedRegion_Destruct_599BB
 sub_42110	endp
 
 
@@ -24,7 +24,7 @@ sub_42110	endp
 ; Attributes: thunk
 
 sub_42115	proc far		; DATA XREF: dseg:0EC3o
-		jmp	sub_5997F
+		jmp	Training_TextRegionList_Destruct_5997F
 sub_42115	endp
 
 
@@ -33,7 +33,7 @@ sub_42115	endp
 ; Attributes: thunk
 
 sub_4211A	proc far
-		jmp	sub_598FC
+		jmp	Training_InitSettings_598FC
 sub_4211A	endp
 
 
@@ -42,7 +42,7 @@ sub_4211A	endp
 ; Attributes: thunk
 
 sub_4211F	proc far		; CODE XREF: Gameflow_MainLoop_3D2E+224P
-		jmp	sub_597B2
+		jmp	Training_Run_597B2
 sub_4211F	endp
 
 
@@ -51,7 +51,7 @@ sub_4211F	endp
 ; Attributes: thunk
 
 sub_42124	proc far
-		jmp	sub_552E0
+		jmp	Training_SaveRegion_552E0
 sub_42124	endp
 
 
@@ -60,7 +60,7 @@ sub_42124	endp
 ; Attributes: thunk
 
 sub_42129	proc far
-		jmp	sub_55431
+		jmp	Training_RestoreRegion_55431
 sub_42129	endp
 
 
@@ -69,7 +69,7 @@ sub_42129	endp
 ; Attributes: thunk
 
 sub_4212E	proc far
-		jmp	sub_58E74
+		jmp	Training_SearchBriefing_58E74
 sub_4212E	endp
 
 
@@ -78,7 +78,7 @@ sub_4212E	endp
 ; Attributes: thunk
 
 sub_42133	proc far
-		jmp	sub_58E2A
+		jmp	Training_DogfightBriefing_58E2A
 sub_42133	endp
 
 
@@ -87,7 +87,7 @@ sub_42133	endp
 ; Attributes: thunk
 
 sub_42138	proc far
-		jmp	sub_56366
+		jmp	Training_GroupCountScreen_56366
 sub_42138	endp
 
 
@@ -96,7 +96,7 @@ sub_42138	endp
 ; Attributes: thunk
 
 sub_4213D	proc far
-		jmp	sub_56B04
+		jmp	Training_AircraftScreen_56B04
 sub_4213D	endp
 
 
@@ -105,7 +105,7 @@ sub_4213D	endp
 ; Attributes: thunk
 
 sub_42142	proc far
-		jmp	sub_57FDA
+		jmp	Training_MoreEnoughScreen_57FDA
 sub_42142	endp
 
 
@@ -114,7 +114,7 @@ sub_42142	endp
 ; Attributes: thunk
 
 sub_42147	proc far
-		jmp	sub_55C92
+		jmp	Training_AltitudeScreen_55C92
 sub_42147	endp
 
 
@@ -123,7 +123,7 @@ sub_42147	endp
 ; Attributes: thunk
 
 sub_4214C	proc far
-		jmp	sub_584BD
+		jmp	Training_PilotLevelScreen_584BD
 sub_4214C	endp
 
 
@@ -132,7 +132,7 @@ sub_4214C	endp
 ; Attributes: thunk
 
 sub_42151	proc far
-		jmp	sub_58A9D
+		jmp	Training_AcceptScreen_58A9D
 sub_42151	endp
 
 
@@ -141,7 +141,7 @@ sub_42151	endp
 ; Attributes: thunk
 
 sub_42156	proc far
-		jmp	sub_55BDC
+		jmp	Training_PrintText_55BDC
 sub_42156	endp
 
 
@@ -150,7 +150,7 @@ sub_42156	endp
 ; Attributes: thunk
 
 sub_4215B	proc far
-		jmp	sub_55C7B
+		jmp	Training_EraseLastText_55C7B
 sub_4215B	endp
 
 
@@ -159,7 +159,7 @@ sub_4215B	endp
 ; Attributes: thunk
 
 sub_42160	proc far
-		jmp	sub_5547D
+		jmp	Training_TypeScreen_5547D
 sub_42160	endp
 
 
@@ -168,7 +168,7 @@ sub_42160	endp
 ; Attributes: thunk
 
 sub_42165	proc far
-		jmp	sub_58EEA
+		jmp	Training_BuildInstantMission_58EEA
 sub_42165	endp
 
 stub190		ends
