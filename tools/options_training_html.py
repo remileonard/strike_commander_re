@@ -361,22 +361,300 @@ P2.append(card('trn-avions', '16', 'Table des avions', table(
     'vitesse 200. À 0 : pilote « target », programme 2 (aller au point 18), vitesse 100. Deux dwords de la table '
     '(octets 6 à 13) ne sont pas lus par ce segment.</p>\n'))
 
-P2.append(card('trn-mission', '17', 'La mission produite : instant.iff', f'''
-<p><code>Training_BuildInstantMission_58EEA</code> recopie <code>MISSIONS\\TEMPLATE.IFF</code> (théâtre ARENA, 13 zones,
-3 objets, 14 scènes) chunk par chunk dans <code>instant.iff</code> (répertoire courant), avec des ajouts.
-Repère de libRealSpace, mètres.</p>
-{_X15}
-<p>Altitudes : 5000 pieds → 1525,6 m ; 15000 → 4576,9 m ; 25000 → 7628,1 m ; 35000 → 10679,4 m. Le premier avion
-est à 14000 m du joueur sur l'axe x, cap opposé (libRealSpace : <code>yaw = 360 − cap</code>).</p>
-<p>Programme 3 du modèle, joué à chaque destruction :</p>
-{_X16}
-<p>Stock d'armes posé avant l'écran d'armement : SWINDERJ 6, SWINDERM 6, AGM-65D 12, DURANDAL 12, MK20 24, MK82 24,
-GBU-15G 4, POD 8, AMRAAM 6. <code>op2misn.iff</code> reçoit le nom de mission « instant » (et « arena », 21 à la place
-des valeurs de <code>GAMEFLOW.IFF</code>).</p>
-<p>Contrôle : <code>tools/instant_mission.py</code> reproduit la construction ; les fichiers produits sont lus sans
-erreur par <code>RSMission</code> (version modifiée de <code>tools/mission_ref</code>). Référence complète :
-<code>analysis/TRAINING_MISSION.md</code>.</p>
+# ---------------------------------------------------------------- instant.iff : construction
+ZONES = [
+    ('Strike Base', 152000, 2925, 144000, 20000), ('Halverston', -26000, 315, -66000, 12000),
+    ('Roberts Pass', -79000, 5775, 121000, 30000), ('Wipeout Rock', 58000, 60, -159000, 25000),
+    ('Mayday Canyon', -112000, 2980, 16000, 15000), ('Yenawine River', -112000, 70, -64000, 4000),
+    ('Biggs River', 34000, 70, 2000, 4000), ("Templeman's Cut", -162000, 2070, 66000, 4000),
+    ('Savage Falls', 10000, 2070, 160000, 4000), ("Art's Reach", -128000, 137, -100000, 4000),
+    ('Isaac Bay', -4000, 0, -19000, 15000), ('Steed Zone', 130000, 766, -106000, 15000),
+    ('Lemons Crevasse', 86000, 2070, 80000, 4000),
+]
+
+
+def svg_overview():
+    """Plan X / Z (libRealSpace, nord vers −Z en haut) : zones du modèle, zone ajoutée, joueur."""
+    size = 560
+    span = 215000.0
+    half = 240
+
+    def px(x):
+        return size / 2 + x / span * half
+
+    def pz(z):
+        return size / 2 - 20 + z / span * half
+    out = [f'<svg viewBox="0 0 {size} {size}" width="100%" style="max-width:{size}px" role="img" '
+           'aria-label="Plan des zones" xmlns="http://www.w3.org/2000/svg">',
+           f'<rect x="0" y="0" width="{size}" height="{size}" fill="var(--panel)" stroke="var(--rule)"/>',
+           f'<line x1="{size / 2}" y1="0" x2="{size / 2}" y2="{size}" stroke="var(--rule)"/>',
+           f'<line x1="0" y1="{size / 2}" x2="{size}" y2="{size / 2}" stroke="var(--rule)"/>']
+    for name, x, y, z, r in ZONES:
+        rr = r / span * half
+        out.append(f'<circle cx="{px(x):.1f}" cy="{pz(z):.1f}" r="{max(rr, 2):.1f}" fill="none" stroke="var(--muted)"/>')
+        out.append(f'<text x="{px(x) + max(rr, 2) + 2:.1f}" y="{pz(z) + 4:.1f}" font-size="10" fill="var(--muted)">{html.escape(name)}</text>')
+    rr = 45000 / span * half
+    out.append(f'<circle cx="{px(-66000):.1f}" cy="{pz(-128000):.1f}" r="{rr:.1f}" fill="var(--accent-soft)" fill-opacity="0.6" stroke="var(--accent)" stroke-width="2"/>')
+    out.append(f'<text x="{px(-66000) - 40:.1f}" y="{pz(-128000) - rr - 4:.1f}" font-size="11" fill="var(--accent)">Destroy bogeys (zone 13)</text>')
+    out.append(f'<circle cx="{px(-73000):.1f}" cy="{pz(-128000):.1f}" r="3" fill="var(--target)"/>')
+    out.append(f'<text x="8" y="{size - 24}" font-size="11" fill="var(--fg)">x de −200 000 à 200 000 m (vers la droite) ;</text>')
+    out.append(f'<text x="8" y="{size - 10}" font-size="11" fill="var(--fg)">z de −200 000 (en haut, nord) à 200 000 m ; point rouge : joueur</text>')
+    out.append('</svg>')
+    return '<figure>' + ''.join(out) + '<figcaption>Plan des zones du modèle (cercles gris) et de la zone ajoutée, '\
+        'vues de dessus dans le repère de libRealSpace.</figcaption></figure>\n'
+
+
+def svg_detail():
+    """Joueur et avions ajoutés : 3 groupes de 5 au plus, autour de x = −66000, z = −128000."""
+    w = 560
+    h = 260
+    x0 = -75000.0
+    x1 = -57000.0
+    z0 = -133000.0
+    z1 = -127000.0
+
+    def px(x):
+        return 30 + (x - x0) / (x1 - x0) * (w - 60)
+
+    def pz(z):
+        return 20 + (z - z0) / (z1 - z0) * (h - 60)
+    out = [f'<svg viewBox="0 0 {w} {h}" width="100%" style="max-width:{w}px" role="img" aria-label="Placement des avions" xmlns="http://www.w3.org/2000/svg">',
+           f'<rect x="0" y="0" width="{w}" height="{h}" fill="var(--panel)" stroke="var(--rule)"/>']
+    out.append(f'<circle cx="{px(-73000):.1f}" cy="{pz(-128000):.1f}" r="5" fill="var(--target)"/>')
+    out.append(f'<text x="{px(-73000) - 30:.1f}" y="{pz(-128000) + 20:.1f}" font-size="11" fill="var(--fg)">joueur, cap 90</text>')
+    rank = 0
+    for g in range(3):
+        for k in range(5):
+            x = -59000 + 500 * g
+            z = -(128000 + 300 * rank)
+            out.append(f'<circle cx="{px(x):.1f}" cy="{pz(z):.1f}" r="3.5" fill="var(--accent)"/>')
+            rank += 1
+        zg = -(128000 + 300 * (rank - 5))
+        out.append(f'<text x="{px(-59000 + 500 * g) + 8:.1f}" y="{pz(zg) + 4:.1f}" font-size="10" fill="var(--accent)">g{g}</text>')
+    out.append(f'<line x1="{px(-73000):.1f}" y1="{h - 22}" x2="{px(-59000):.1f}" y2="{h - 22}" stroke="var(--fg)"/>')
+    out.append(f'<text x="{(px(-73000) + px(-59000)) / 2 - 30:.1f}" y="{h - 8}" font-size="11" fill="var(--fg)">14 000 m sur x</text>')
+    out.append('</svg>')
+    return '<figure>' + ''.join(out) + '<figcaption>Cas le plus chargé : 3 groupes de 5 avions (g0, g1, g2), cap 270. '\
+        'Le rang continue d\'un groupe à l\'autre : chaque avion est 300 m plus au nord (z décroissant) que le précédent, '\
+        'chaque groupe 500 m plus à l\'est (x croissant). Échelle de z agrandie par rapport à x.</figcaption></figure>\n'
+
+
+_M1 = code("""FORM MISN
+  VERS                recopié
+  INFO   "arena"      recopié
+  TUNE   3            recopié
+  FORM WRLD / FILE    recopié (ARENA)
+  AREA                13 zones du modèle  + "Destroy bogeys"            (DOGFIGHT)
+  SPOT                recopié
+  NUMS                recopié
+  MSGS                recopié
+  FLAG                FLAG[0] du modèle   + FLAG[1] = nombre d'avions   (les deux)
+  CAST                3 noms du modèle    + un nom par avion            (DOGFIGHT)
+  PART                joueur replacé, 2 objets recopiés + un par avion  (DOGFIGHT)
+  PROG                recopié
+  TEAM                recopié
+  FORM PLAY           14 SCNE du modèle   + 1 SCNE                      (DOGFIGHT)
+  LOAD                recopié""")
+
+_M2 = table(['Chunk', 'Contenu du modèle'], [
+    ['<code>VERS</code>, <code>INFO</code>, <code>TUNE</code>', 'version ; « arena » ; 3'],
+    ['<code>FORM WRLD</code> / <code>FILE</code>', '<code>ARENA</code> (théâtre)'],
+    ['<code>AREA</code>', '13 sphères (tableau ci-dessous)'],
+    ['<code>SPOT</code>', '22 points'],
+    ['<code>NUMS</code>, <code>MSGS</code>', '13 messages radio (« Go Down Town! », « Surf\'s Up »… « Land Here »)'],
+    ['<code>FLAG</code>', '1 drapeau, FLAG[0] = 0'],
+    ['<code>CAST</code>', 'PLAYER, STRIBASE, NULL'],
+    ['<code>PROG</code>', '5 programmes, 98 octets'],
+    ['<code>PART</code>', '0 : <code>f-16des</code> (joueur, vitesse 180, programme de début 0) ; 1 : <code>STRIBASE</code> (mise à jour 4) ; 2 : <code>RWYEXT18</code> (zone 0)'],
+    ['<code>TEAM</code>', '1 mot, 0'],
+    ['<code>FORM PLAY</code>', '14 scènes : la scène 0 sans zone (objets 0 et 1), puis une scène par zone 0 à 12'],
+    ['<code>LOAD</code>', '21 noms (F-16des, explosions, débris)'],
+])
+
+_M3 = table(['N°', 'Zone', 'x', 'y (altitude)', 'z', 'Rayon'],
+            [[str(k), html.escape(n), f'{x}', f'{y}', f'{z}', f'{r}'] for k, (n, x, y, z, r) in enumerate(ZONES)]
+            + [['13', '<b>Destroy bogeys</b> (ajoutée)', '−66000', 'pieds choisis', '−128000', '45000']],
+            num=(0, 2, 3, 4, 5))
+
+_M4 = table(['Octets', 'Contenu', 'Valeur écrite', 'Lecture libRealSpace'], [
+    ['0', 'forme', '<code>S</code> (sphère)', '—'],
+    ['1-32', 'nom', '« Destroy bogeys », complété par des 0', '—'],
+    ['33-36', 'c0, int32 24.8', '−66000 × 256', 'x = −66000'],
+    ['37-40', 'c1, int32 24.8', '128000 × 256', 'z = −128000'],
+    ['41-44', 'c2, int32 24.8', 'pieds × 256 (<code>shl eax, 8</code>)', 'y = 5000, 15000, 25000 ou 35000'],
+    ['45-48', 'rayon, int32 24.8', '45000 × 256', '45000'],
+])
+
+_M5 = table(['Avion', 'Nom CAST ajouté'], [
+    ['drapeau à 1 : F-15, F-16, F/A-18, F-22, YF-23, A-10, Tornado, Mirage 2000, MiG-21, MiG-29, Su-27', 'rookie, veteran ou ace (niveau choisi)'],
+    ['drapeau à 0 : C-130, E-3, Lear Jet, 747, TU-95', 'target'],
+])
+
+_M6 = table(['Champ', 'Joueur (PART 0 du modèle)', 'Avion ajouté'], [
+    ['index CAST (0-1)', '0 (gardé)', '3 + rang'],
+    ['type d\'objet (2-9)', '<code>f-16des</code> (gardé)', 'fichier objet de la table'],
+    ['type détruit (10-17)', 'gardé', 'chaîne vide'],
+    ['emport (18-25)', 'gardé', 'emport de la table (vide pour C-130, A-10, E-3, Lear Jet, 747)'],
+    ['zone (26-27)', '65535 (gardé)', '65535'],
+    ['placement (28)', '0 (gardé)', '0'],
+    ['x (c0)', '<b>−73000</b>', '−59000 + 500 × groupe'],
+    ['z (−c1)', '<b>−128000</b>', '−(128000 + 300 × rang)'],
+    ['y (c2)', '<b>pieds × 256 / 839</b>', 'la même'],
+    ['cap (41-42)', '<b>90</b> (yaw 270)', '270 (yaw 90)'],
+    ['vitesse (43-44)', '180 (gardé)', '200 si drapeau, 100 sinon'],
+    ['camp (45)', '1 (gardé)', '255 (ennemi)'],
+    ['allié, octet 47', '255, 255 (gardés)', '255, 255'],
+    ['formation (48-53)', '0, 0, 0 (gardés)', '0, 0, 0'],
+    ['scripts (54-61)', '65535, 65535, 65535, 0 (gardés)', '65535 ; 1 si drapeau, 2 sinon ; 3 ; 65535'],
+])
+
+_M7 = table(['Pieds affichés', 'Altitude des avions (m)', 'Centre de la zone 13 (y)'], [
+    ['5000', '1525,6', '5000'], ['15000', '4576,9', '15000'], ['25000', '7628,1', '25000'], ['35000', '10679,4', '35000'],
+], num=(0, 1, 2))
+
+_M8 = table(['Octets', 'Champ de <code>MISN_SCEN</code>', 'Valeur'], [
+    ['0', 'active', '1'],
+    ['1-2', 'zone', '13 (nombre de zones du modèle : la zone ajoutée)'],
+    ['3-4', 'script à l\'activation', '65535'],
+    ['5-6', '2e script', '65535'],
+    ['7-8', '3e script', '65535'],
+    ['9', 'octet 9', '0'],
+    ['10-23', 'mot + 3 dwords', '0'],
+    ['24…', 'objets de la scène', 'index PART des avions ajoutés : 3, 4, 5…'],
+])
+
+_M9 = code("""OP_SET_OBJ_DESTROY_TARGET 0""")
+_M10 = code("""OP_SET_OBJ_FLY_TO_WP 18""")
+_M11 = code("""OP_MOVE_VALUE_TO_WORK_REGISTER 1
+OP_SUB_WORK_FROM_FLAG 1
+OP_MOVE_FLAG_TO_WORK_REGISTER 1
+OP_CMP_WORK_WITH_VALUE 0
+OP_BRANCH_IF_NOT_EQUAL 78
+OP_SET_FLAG_TO_TRUE 0
+OP_SET_LABEL 78""")
+_M12 = code("""OP_TEST_FLAG 0
+OP_BRANCH_IF_NOT_EQUAL 78
+OP_SET_MESSAGE 20
+OP_SET_FLAG_TO_FALSE 0
+OP_SET_LABEL 78""")
+
+with open(os.path.join(ROOT, 'training_images', 'exemple_instant.txt'), encoding='utf-8') as _f:
+    _M13 = code(_f.read())
+
+_M14 = table(['Arme', 'Stock'], [
+    ['SWINDERJ', '6'], ['SWINDERM', '6'], ['AGM-65D', '12'], ['DURANDAL', '12'], ['MK20', '24'],
+    ['MK82', '24'], ['GBU-15G', '4'], ['POD', '8'], ['AMRAAM', '6'],
+], num=(1,))
+
+_M15 = code("""python3 tools/instant_mission.py --donnees <DATA> --sortie INSTANT.IFF dogfight --groupe 2 mig-29 --groupe 1 tu-95 --altitude 15000 --niveau ace
+python3 tools/instant_mission.py --donnees <DATA> --sortie INSTANT.IFF search
+python3 tools/instant_mission.py --lire INSTANT.IFF""")
+
+P2.append(card('trn-mission', '17', 'Création d\'instant.iff : principe et ordre d\'écriture', '''
+<p><code>Training_BuildInstantMission_58EEA</code> est appelée par <code>Training_Run_597B2</code> une fois l'armement
+validé. Elle ouvre en lecture <code>..\\..\\data\\missions\\template.iff</code> et en écriture <code>instant.iff</code>,
+sans chemin (répertoire courant). Le fichier produit est <b>une copie du modèle, chunk par chunk</b>, à laquelle
+s'ajoutent les objets choisis aux écrans. La fonction n'ouvre que ces deux fichiers.</p>
+<ol class="steps">
+<li>Ouverture de <code>FORM MISN</code>.</li>
+<li>Recopie des chunks du modèle <b>jusqu'au premier <code>AREA</code></b> (<code>ResourceRecord_CopyChunksUntilTag_3CBF6</code>).</li>
+<li><code>AREA</code> : le contenu du modèle, puis l'ajout du § 19.</li>
+<li>Recopie jusqu'au premier <code>FLAG</code>.</li>
+<li><code>FLAG</code>, <code>CAST</code>, <code>PART</code> : le modèle puis les ajouts. Chaque chunk est cherché par son tag
+dans le modèle, d'où l'ordre du fichier produit : <code>PART</code> avant <code>PROG</code>, à l'inverse du modèle.</li>
+<li><code>PROG</code>, <code>TEAM</code> recopiés.</li>
+<li><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout du § 21.</li>
+<li><code>LOAD</code> recopié ; fermeture de <code>FORM MISN</code>.</li>
+</ol>
+<p>Le nombre d'enregistrements déjà présents est relevé au passage (<code>ResourceRecord_RecordCount_3C5D6</code> : taille
+du chunk ÷ taille d'un enregistrement) : 13 zones, 3 noms CAST, 3 objets PART. Les index écrits dans les ajouts
+partent de ces nombres.</p>
+''' + _M1 + '''
+<p>SEARCH AND DESTROY passe par les mêmes étapes, sans aucun ajout sauf le joueur replacé et le mot de <code>FLAG</code>
+(valeur 0) : les cibles sont celles du modèle et du monde ARENA.</p>
 '''))
+
+P2.append(card('trn-modele', '18', 'Le modèle TEMPLATE.IFF', _M2 + '''
+<h3>Les zones (repère de libRealSpace, m)</h3>
+''' + _M3 + svg_overview() + '''
+<h3>Les 5 programmes</h3>
+<p>Programme 0 (début de mission du joueur) : décollage, puis tour des points 3 à 14 avec un message radio à chacun,
+retour au point 2 et atterrissage. <code>tools/mission_prog.py</code> ne trouve aucun objet ni scène du modèle qui déclenche les programmes 1 à 3 :
+ce sont ceux que les avions ajoutés emploient. Programme 1 :</p>
+''' + _M9 + '<p>Programme 2 :</p>' + _M10 + '<p>Programme 3 :</p>' + _M11 + '<p>Programme 4 (mise à jour de STRIBASE) :</p>' + _M12 + '''
+<p>Désassemblage complet : <code>python3 tools/mission_prog.py &lt;DATA&gt;/MISSIONS/TEMPLATE.IFF</code>.</p>
+'''))
+
+P2.append(card('trn-area', '19', 'Ajouts aux chunks AREA, FLAG et CAST', '''
+<h3>AREA : la zone « Destroy bogeys » (DOGFIGHT)</h3>
+<p>Un enregistrement de sphère de 49 octets, placé après les 13 zones du modèle : c'est la zone 13.</p>
+''' + _M4 + '''
+<p class="note">L'altitude du centre est le <b>nombre de pieds recopié sans conversion</b>, alors que l'altitude des avions
+est convertie (§ 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
+contient de toute façon le joueur et tous les avions.</p>
+<h3>FLAG : le compteur d'avions (les deux types)</h3>
+<p>Un mot ajouté après FLAG[0] du modèle : <b>FLAG[1] = nombre total d'avions</b> (réglage +20 : somme des groupes ;
+0 en SEARCH AND DESTROY). Le programme 3 le décompte (§ 21).</p>
+<h3>CAST : un pilote par avion (DOGFIGHT)</h3>
+<p>Un nom de 9 octets par avion, groupe après groupe, dans le même ordre que les objets PART. Ce sont des profils de
+pilote du dossier <code>INTEL</code> (<code>ROOKIE.IFF</code>, <code>VETERAN.IFF</code>, <code>ACE.IFF</code>,
+<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table du § 16) :</p>
+''' + _M5))
+
+P2.append(card('trn-part', '20', 'Le joueur et les avions : chunk PART', '''
+<p>Le 1er objet du modèle (le joueur) est relu, sa position et son cap remplacés, puis réécrit ; les 2 autres objets du
+modèle sont recopiés. En DOGFIGHT, un objet de 62 octets est ajouté par avion. Champs : <code>IMPL_MISSION_PART.md</code> § 1 ;
+lecture libRealSpace : <code>x = c0</code>, <code>y = c2</code>, <code>z = −c1</code>, <code>yaw = 360 − cap</code>.</p>
+''' + _M6 + '''
+<p><b>groupe</b> = 0, 1 ou 2 ; <b>rang</b> = numéro de l'avion parmi tous les avions ajoutés (0, 1, 2…, sans revenir à 0 à
+chaque groupe).</p>
+<h3>Altitude</h3>
+<p>Le réglage est en pieds ; l'altitude écrite pour les avions est <code>(pieds &lt;&lt; 16) / 839</code> en 24.8, soit
+pieds × 256 / 839 mètres (<code>dword_46456</code> = 839 / 256 ≈ 3,28 pieds par mètre, posé au démarrage d'OPTEST).</p>
+''' + _M7 + svg_detail()))
+
+P2.append(card('trn-scne', '21', 'La scène ajoutée et le déroulement du combat', '''
+<p>En DOGFIGHT, un chunk <code>SCNE</code> est ajouté à la fin de <code>FORM PLAY</code> : c'est la 15e scène (n° 14).
+24 octets, puis un mot par avion ajouté.</p>
+''' + _M8 + '''
+<h3>Ce que font les scripts une fois en vol</h3>
+<ul>
+<li>Chaque avion armé joue le programme 1 en mise à jour : <code>OP_SET_OBJ_DESTROY_TARGET 0</code>, attaquer l'objet 0, le
+joueur.</li>
+<li>Chaque avion non armé joue le programme 2 : <code>OP_SET_OBJ_FLY_TO_WP 18</code>, aller au point 18 (SPOT 18 : sans
+zone, altitude 9000).</li>
+<li>À la destruction de chaque avion, le programme 3 retire 1 à FLAG[1] ; à 0, FLAG[0] passe à 1.</li>
+<li>Le programme 4, mise à jour de STRIBASE, voit FLAG[0] à 1 : message radio 20, puis FLAG[0] remis à 0.</li>
+</ul>
+<p class="note">Le message 20 n'est pas dans les 13 messages de <code>MSGS</code> du modèle (0 à 12) : ce qu'il affiche
+n'est pas établi.</p>
+'''))
+
+P2.append(card('trn-exemple', '22', 'Exemple : 2 MiG-29 et 1 TU-95, 15000 pieds, ace', '''
+<p>Fichier produit par <code>tools/instant_mission.py</code> (même construction que le jeu), relu avec
+<code>--lire</code>. Positions en mètres, repère de libRealSpace.</p>
+''' + _M13 + '''
+<p>Les fichiers DOGFIGHT et SEARCH AND DESTROY ainsi produits ont été lus sans erreur par <code>RSMission</code> de
+libRealSpace (version modifiée de <code>tools/mission_ref</code> : essais <code>mission_part_test</code>,
+<code>mission_areas_test</code>, <code>mission_load_test</code>).</p>
+''' + _M15))
+
+P2.append(card('trn-strike', '23', 'Ce que reçoit STRIKE.EXE', '''
+<ul>
+<li><b><code>instant.iff</code></b> : la mission ci-dessus, dans le répertoire courant.</li>
+<li><b>Stock d'armes</b>, posé par <code>Training_Run_597B2</code> avant l'écran d'armement (<code>[partie+609 + 2 × arme]</code>) :</li>
+</ul>
+''' + _M14 + '''
+<ul>
+<li><b><code>op2misn.iff</code></b> (<code>Gameflow_WriteMissionOrder_4BBF7</code>) : avec <code>[partie+249]</code> = 254, le nom de
+mission habituellement lu dans <code>GAMEFLOW.IFF</code> (<code>MLST</code> / <code>DATA</code>) est remplacé par
+« instant », écrit dans le chunk <code>INFO</code> ; les valeurs de <code>PRTL</code> sont remplacées par « arena » et 21
+(leur écriture dans le fichier n'est pas relue) ; les armes restantes vont dans <code>WPNS</code>.</li>
+</ul>
+<p>Points ouverts : rôle des deux dwords de la table des avions ; ce que fait la boucle principale au retour d'un vol
+d'entraînement ; lecture d'<code>instant.iff</code> par STRIKE.EXE. Référence complète : <code>analysis/TRAINING_MISSION.md</code>.</p>
+'''))
+
 
 TOC = [('alt-ouverture', '1', 'ALT+O'), ('alt-methode', '2', 'Méthode de dessin'), ('alt-principal', '3', 'Panneau principal'),
        ('alt-detail', '4', 'DETAIL'), ('alt-flight', '5', 'FLIGHT'), ('alt-gameplay', '6', 'GAMEPLAY'),
@@ -384,7 +662,9 @@ TOC = [('alt-ouverture', '1', 'ALT+O'), ('alt-methode', '2', 'Méthode de dessin
        ('alt-exit', '10', 'EXIT GAME'), ('alt-jauges', '11', 'Jauges, points ouverts'),
        ('trn-ensemble', '12', 'Training : enchaînement'), ('trn-fichiers', '13', 'Fichiers'),
        ('trn-ecrans', '14', 'Les écrans'), ('trn-detail', '15', 'Écran par écran'),
-       ('trn-avions', '16', 'Table des avions'), ('trn-mission', '17', 'instant.iff')]
+       ('trn-avions', '16', 'Table des avions'), ('trn-mission', '17', 'instant.iff : principe'),
+       ('trn-modele', '18', 'Le modèle'), ('trn-area', '19', 'AREA, FLAG, CAST'), ('trn-part', '20', 'PART'),
+       ('trn-scne', '21', 'Scène et scripts'), ('trn-exemple', '22', 'Exemple'), ('trn-strike', '23', 'Vers STRIKE.EXE')]
 
 
 def main():

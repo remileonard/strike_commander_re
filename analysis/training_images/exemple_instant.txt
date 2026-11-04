@@ -1,0 +1,37 @@
+VERS 2 octets
+INFO 6 octets
+TUNE 1 octets
+FORM WRLD 1 chunks
+AREA 686 octets
+  zone 0 S Strike Base : x 152000 y 2925 z 144000 taille 20000
+  zone 1 S Halverston : x -26000 y 315 z -66000 taille 12000
+  zone 2 S Roberts Pass : x -79000 y 5775 z 121000 taille 30000
+  zone 3 S Wipeout Rock : x 58000 y 60 z -159000 taille 25000
+  zone 4 S Mayday Canyon : x -112000 y 2980 z 16000 taille 15000
+  zone 5 S Yenawine River : x -112000 y 70 z -64000 taille 4000
+  zone 6 S Biggs River : x 34000 y 70 z 2000 taille 4000
+  zone 7 S Templeman's Cut : x -162000 y 2070 z 66000 taille 4000
+  zone 8 S Savage Falls : x 10000 y 2070 z 160000 taille 4000
+  zone 9 S Art's Reach : x -128000 y 137 z -100000 taille 4000
+  zone 10 S Isaac Bay : x -4000 y 0 z -19000 taille 15000
+  zone 11 S Steed Zone : x 130000 y 766 z -106000 taille 15000
+  zone 12 S Lemons Crevasse : x 86000 y 2070 z 80000 taille 4000
+  zone 13 S Destroy bogeys : x -66000 y 15000 z -128000 taille 45000
+SPOT 308 octets
+NUMS 4 octets
+MSGS 196 octets
+FLAG 4 octets
+   [0, 3]
+CAST 54 octets
+   ['PLAYER', 'STRIBASE', 'NULL', 'ace', 'ace', 'target']
+PART 372 octets
+  objet 0 f-16des : x -73000 y 4576.88 z -128000 cap 90 vitesse 180 camp 1 scripts (65535, 65535, 65535, 0)
+  objet 1 STRIBASE : x 0 y 0 z 0 cap 0 vitesse 0 camp 1 scripts (65535, 4, 65535, 65535)
+  objet 2 RWYEXT18 : x -452 y 0 z 1319 cap 0 vitesse 0 camp 1 scripts (65535, 65535, 65535, 65535)
+  objet 3 mig29 : x -59000 y 4576.88 z -128000 cap 270 vitesse 200 camp 255 scripts (65535, 1, 3, 65535)
+  objet 4 mig29 : x -59000 y 4576.88 z -128300 cap 270 vitesse 200 camp 255 scripts (65535, 1, 3, 65535)
+  objet 5 tu-20 : x -58500 y 4576.88 z -128600 cap 270 vitesse 100 camp 255 scripts (65535, 2, 3, 65535)
+PROG 98 octets
+TEAM 2 octets
+FORM PLAY 15 chunks
+LOAD 189 octets

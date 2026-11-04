@@ -111,7 +111,13 @@ ol.steps li::before { content: counter(s); font-family: var(--font-mono); font-w
     <li><a href="#trn-ecrans"><span>14</span><span>Les écrans</span></a></li>
     <li><a href="#trn-detail"><span>15</span><span>Écran par écran</span></a></li>
     <li><a href="#trn-avions"><span>16</span><span>Table des avions</span></a></li>
-    <li><a href="#trn-mission"><span>17</span><span>instant.iff</span></a></li>
+    <li><a href="#trn-mission"><span>17</span><span>instant.iff : principe</span></a></li>
+    <li><a href="#trn-modele"><span>18</span><span>Le modèle</span></a></li>
+    <li><a href="#trn-area"><span>19</span><span>AREA, FLAG, CAST</span></a></li>
+    <li><a href="#trn-part"><span>20</span><span>PART</span></a></li>
+    <li><a href="#trn-scne"><span>21</span><span>Scène et scripts</span></a></li>
+    <li><a href="#trn-exemple"><span>22</span><span>Exemple</span></a></li>
+    <li><a href="#trn-strike"><span>23</span><span>Vers STRIKE.EXE</span></a></li>
   </ol>
 </nav>
 <main>
@@ -319,30 +325,197 @@ map for enemy positions.</pre>
 <p>Drapeau à 1 : pilote CAST au niveau choisi, programme de mise à jour 1 (attaquer le joueur), vitesse 200. À 0 : pilote « target », programme 2 (aller au point 18), vitesse 100. Deux dwords de la table (octets 6 à 13) ne sont pas lus par ce segment.</p>
 </article>
 <article class="card" id="trn-mission">
-  <header><span class="id">17</span><h2>La mission produite : instant.iff</h2></header>
+  <header><span class="id">17</span><h2>Création d'instant.iff : principe et ordre d'écriture</h2></header>
 
-<p><code>Training_BuildInstantMission_58EEA</code> recopie <code>MISSIONS\TEMPLATE.IFF</code> (théâtre ARENA, 13 zones,
-3 objets, 14 scènes) chunk par chunk dans <code>instant.iff</code> (répertoire courant), avec des ajouts.
-Repère de libRealSpace, mètres.</p>
-<div class="tablewrap"><table><thead><tr><th>Chunk</th><th>Ajout</th><th>Type</th></tr></thead><tbody><tr><td><code>AREA</code></td><td>sphère « Destroy bogeys » (zone 13) : x = −66000, z = −128000, y = nombre de pieds recopié tel quel, rayon 45000</td><td>DOGFIGHT</td></tr><tr><td><code>FLAG</code></td><td>un mot = nombre total d'avions (FLAG[1])</td><td>les deux</td></tr><tr><td><code>CAST</code></td><td>un nom par avion : rookie / veteran / ace, ou target</td><td>DOGFIGHT</td></tr><tr><td><code>PART</code> 0</td><td>joueur replacé : x = −73000, z = −128000, y = pieds × 256 / 839, cap 90</td><td>les deux</td></tr><tr><td><code>PART</code></td><td>un objet par avion : x = −59000 + 500 × groupe, z = −(128000 + 300 × rang), même altitude, cap 270, camp 255, scripts mise à jour 1 ou 2, destruction 3</td><td>DOGFIGHT</td></tr><tr><td><code>FORM PLAY</code></td><td>scène 14 : active, zone 13, objets = les avions ajoutés</td><td>DOGFIGHT</td></tr></tbody></table></div>
+<p><code>Training_BuildInstantMission_58EEA</code> est appelée par <code>Training_Run_597B2</code> une fois l'armement
+validé. Elle ouvre en lecture <code>..\..\data\missions\template.iff</code> et en écriture <code>instant.iff</code>,
+sans chemin (répertoire courant). Le fichier produit est <b>une copie du modèle, chunk par chunk</b>, à laquelle
+s'ajoutent les objets choisis aux écrans. La fonction n'ouvre que ces deux fichiers.</p>
+<ol class="steps">
+<li>Ouverture de <code>FORM MISN</code>.</li>
+<li>Recopie des chunks du modèle <b>jusqu'au premier <code>AREA</code></b> (<code>ResourceRecord_CopyChunksUntilTag_3CBF6</code>).</li>
+<li><code>AREA</code> : le contenu du modèle, puis l'ajout du § 19.</li>
+<li>Recopie jusqu'au premier <code>FLAG</code>.</li>
+<li><code>FLAG</code>, <code>CAST</code>, <code>PART</code> : le modèle puis les ajouts. Chaque chunk est cherché par son tag
+dans le modèle, d'où l'ordre du fichier produit : <code>PART</code> avant <code>PROG</code>, à l'inverse du modèle.</li>
+<li><code>PROG</code>, <code>TEAM</code> recopiés.</li>
+<li><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout du § 21.</li>
+<li><code>LOAD</code> recopié ; fermeture de <code>FORM MISN</code>.</li>
+</ol>
+<p>Le nombre d'enregistrements déjà présents est relevé au passage (<code>ResourceRecord_RecordCount_3C5D6</code> : taille
+du chunk ÷ taille d'un enregistrement) : 13 zones, 3 noms CAST, 3 objets PART. Les index écrits dans les ajouts
+partent de ces nombres.</p>
+<pre class="tpl">FORM MISN
+  VERS                recopié
+  INFO   &quot;arena&quot;      recopié
+  TUNE   3            recopié
+  FORM WRLD / FILE    recopié (ARENA)
+  AREA                13 zones du modèle  + &quot;Destroy bogeys&quot;            (DOGFIGHT)
+  SPOT                recopié
+  NUMS                recopié
+  MSGS                recopié
+  FLAG                FLAG[0] du modèle   + FLAG[1] = nombre d&#x27;avions   (les deux)
+  CAST                3 noms du modèle    + un nom par avion            (DOGFIGHT)
+  PART                joueur replacé, 2 objets recopiés + un par avion  (DOGFIGHT)
+  PROG                recopié
+  TEAM                recopié
+  FORM PLAY           14 SCNE du modèle   + 1 SCNE                      (DOGFIGHT)
+  LOAD                recopié</pre>
 
-<p>Altitudes : 5000 pieds → 1525,6 m ; 15000 → 4576,9 m ; 25000 → 7628,1 m ; 35000 → 10679,4 m. Le premier avion
-est à 14000 m du joueur sur l'axe x, cap opposé (libRealSpace : <code>yaw = 360 − cap</code>).</p>
-<p>Programme 3 du modèle, joué à chaque destruction :</p>
-<pre class="tpl">OP_MOVE_VALUE_TO_WORK_REGISTER 1
+<p>SEARCH AND DESTROY passe par les mêmes étapes, sans aucun ajout sauf le joueur replacé et le mot de <code>FLAG</code>
+(valeur 0) : les cibles sont celles du modèle et du monde ARENA.</p>
+</article>
+<article class="card" id="trn-modele">
+  <header><span class="id">18</span><h2>Le modèle TEMPLATE.IFF</h2></header>
+<div class="tablewrap"><table><thead><tr><th>Chunk</th><th>Contenu du modèle</th></tr></thead><tbody><tr><td><code>VERS</code>, <code>INFO</code>, <code>TUNE</code></td><td>version ; « arena » ; 3</td></tr><tr><td><code>FORM WRLD</code> / <code>FILE</code></td><td><code>ARENA</code> (théâtre)</td></tr><tr><td><code>AREA</code></td><td>13 sphères (tableau ci-dessous)</td></tr><tr><td><code>SPOT</code></td><td>22 points</td></tr><tr><td><code>NUMS</code>, <code>MSGS</code></td><td>13 messages radio (« Go Down Town! », « Surf's Up »… « Land Here »)</td></tr><tr><td><code>FLAG</code></td><td>1 drapeau, FLAG[0] = 0</td></tr><tr><td><code>CAST</code></td><td>PLAYER, STRIBASE, NULL</td></tr><tr><td><code>PROG</code></td><td>5 programmes, 98 octets</td></tr><tr><td><code>PART</code></td><td>0 : <code>f-16des</code> (joueur, vitesse 180, programme de début 0) ; 1 : <code>STRIBASE</code> (mise à jour 4) ; 2 : <code>RWYEXT18</code> (zone 0)</td></tr><tr><td><code>TEAM</code></td><td>1 mot, 0</td></tr><tr><td><code>FORM PLAY</code></td><td>14 scènes : la scène 0 sans zone (objets 0 et 1), puis une scène par zone 0 à 12</td></tr><tr><td><code>LOAD</code></td><td>21 noms (F-16des, explosions, débris)</td></tr></tbody></table></div>
+
+<h3>Les zones (repère de libRealSpace, m)</h3>
+<div class="tablewrap"><table><thead><tr><th>N°</th><th>Zone</th><th>x</th><th>y (altitude)</th><th>z</th><th>Rayon</th></tr></thead><tbody><tr><td class="num">0</td><td>Strike Base</td><td class="num">152000</td><td class="num">2925</td><td class="num">144000</td><td class="num">20000</td></tr><tr><td class="num">1</td><td>Halverston</td><td class="num">-26000</td><td class="num">315</td><td class="num">-66000</td><td class="num">12000</td></tr><tr><td class="num">2</td><td>Roberts Pass</td><td class="num">-79000</td><td class="num">5775</td><td class="num">121000</td><td class="num">30000</td></tr><tr><td class="num">3</td><td>Wipeout Rock</td><td class="num">58000</td><td class="num">60</td><td class="num">-159000</td><td class="num">25000</td></tr><tr><td class="num">4</td><td>Mayday Canyon</td><td class="num">-112000</td><td class="num">2980</td><td class="num">16000</td><td class="num">15000</td></tr><tr><td class="num">5</td><td>Yenawine River</td><td class="num">-112000</td><td class="num">70</td><td class="num">-64000</td><td class="num">4000</td></tr><tr><td class="num">6</td><td>Biggs River</td><td class="num">34000</td><td class="num">70</td><td class="num">2000</td><td class="num">4000</td></tr><tr><td class="num">7</td><td>Templeman&#x27;s Cut</td><td class="num">-162000</td><td class="num">2070</td><td class="num">66000</td><td class="num">4000</td></tr><tr><td class="num">8</td><td>Savage Falls</td><td class="num">10000</td><td class="num">2070</td><td class="num">160000</td><td class="num">4000</td></tr><tr><td class="num">9</td><td>Art&#x27;s Reach</td><td class="num">-128000</td><td class="num">137</td><td class="num">-100000</td><td class="num">4000</td></tr><tr><td class="num">10</td><td>Isaac Bay</td><td class="num">-4000</td><td class="num">0</td><td class="num">-19000</td><td class="num">15000</td></tr><tr><td class="num">11</td><td>Steed Zone</td><td class="num">130000</td><td class="num">766</td><td class="num">-106000</td><td class="num">15000</td></tr><tr><td class="num">12</td><td>Lemons Crevasse</td><td class="num">86000</td><td class="num">2070</td><td class="num">80000</td><td class="num">4000</td></tr><tr><td class="num">13</td><td><b>Destroy bogeys</b> (ajoutée)</td><td class="num">−66000</td><td class="num">pieds choisis</td><td class="num">−128000</td><td class="num">45000</td></tr></tbody></table></div>
+<figure><svg viewBox="0 0 560 560" width="100%" style="max-width:560px" role="img" aria-label="Plan des zones" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="560" height="560" fill="var(--panel)" stroke="var(--rule)"/><line x1="280.0" y1="0" x2="280.0" y2="560" stroke="var(--rule)"/><line x1="0" y1="280.0" x2="560" y2="280.0" stroke="var(--rule)"/><circle cx="449.7" cy="420.7" r="22.3" fill="none" stroke="var(--muted)"/><text x="474.0" y="424.7" font-size="10" fill="var(--muted)">Strike Base</text><circle cx="251.0" cy="186.3" r="13.4" fill="none" stroke="var(--muted)"/><text x="266.4" y="190.3" font-size="10" fill="var(--muted)">Halverston</text><circle cx="191.8" cy="395.1" r="33.5" fill="none" stroke="var(--muted)"/><text x="227.3" y="399.1" font-size="10" fill="var(--muted)">Roberts Pass</text><circle cx="344.7" cy="82.5" r="27.9" fill="none" stroke="var(--muted)"/><text x="374.7" y="86.5" font-size="10" fill="var(--muted)">Wipeout Rock</text><circle cx="155.0" cy="277.9" r="16.7" fill="none" stroke="var(--muted)"/><text x="173.7" y="281.9" font-size="10" fill="var(--muted)">Mayday Canyon</text><circle cx="155.0" cy="188.6" r="4.5" fill="none" stroke="var(--muted)"/><text x="161.4" y="192.6" font-size="10" fill="var(--muted)">Yenawine River</text><circle cx="318.0" cy="262.2" r="4.5" fill="none" stroke="var(--muted)"/><text x="324.4" y="266.2" font-size="10" fill="var(--muted)">Biggs River</text><circle cx="99.2" cy="333.7" r="4.5" fill="none" stroke="var(--muted)"/><text x="105.6" y="337.7" font-size="10" fill="var(--muted)">Templeman&#x27;s Cut</text><circle cx="291.2" cy="438.6" r="4.5" fill="none" stroke="var(--muted)"/><text x="297.6" y="442.6" font-size="10" fill="var(--muted)">Savage Falls</text><circle cx="137.1" cy="148.4" r="4.5" fill="none" stroke="var(--muted)"/><text x="143.6" y="152.4" font-size="10" fill="var(--muted)">Art&#x27;s Reach</text><circle cx="275.5" cy="238.8" r="16.7" fill="none" stroke="var(--muted)"/><text x="294.3" y="242.8" font-size="10" fill="var(--muted)">Isaac Bay</text><circle cx="425.1" cy="141.7" r="16.7" fill="none" stroke="var(--muted)"/><text x="443.9" y="145.7" font-size="10" fill="var(--muted)">Steed Zone</text><circle cx="376.0" cy="349.3" r="4.5" fill="none" stroke="var(--muted)"/><text x="382.5" y="353.3" font-size="10" fill="var(--muted)">Lemons Crevasse</text><circle cx="206.3" cy="117.1" r="50.2" fill="var(--accent-soft)" fill-opacity="0.6" stroke="var(--accent)" stroke-width="2"/><text x="166.3" y="62.9" font-size="11" fill="var(--accent)">Destroy bogeys (zone 13)</text><circle cx="198.5" cy="117.1" r="3" fill="var(--target)"/><text x="8" y="536" font-size="11" fill="var(--fg)">x de −200 000 à 200 000 m (vers la droite) ;</text><text x="8" y="550" font-size="11" fill="var(--fg)">z de −200 000 (en haut, nord) à 200 000 m ; point rouge : joueur</text></svg><figcaption>Plan des zones du modèle (cercles gris) et de la zone ajoutée, vues de dessus dans le repère de libRealSpace.</figcaption></figure>
+
+<h3>Les 5 programmes</h3>
+<p>Programme 0 (début de mission du joueur) : décollage, puis tour des points 3 à 14 avec un message radio à chacun,
+retour au point 2 et atterrissage. <code>tools/mission_prog.py</code> ne trouve aucun objet ni scène du modèle qui déclenche les programmes 1 à 3 :
+ce sont ceux que les avions ajoutés emploient. Programme 1 :</p>
+<pre class="tpl">OP_SET_OBJ_DESTROY_TARGET 0</pre>
+<p>Programme 2 :</p><pre class="tpl">OP_SET_OBJ_FLY_TO_WP 18</pre>
+<p>Programme 3 :</p><pre class="tpl">OP_MOVE_VALUE_TO_WORK_REGISTER 1
 OP_SUB_WORK_FROM_FLAG 1
 OP_MOVE_FLAG_TO_WORK_REGISTER 1
 OP_CMP_WORK_WITH_VALUE 0
 OP_BRANCH_IF_NOT_EQUAL 78
 OP_SET_FLAG_TO_TRUE 0
 OP_SET_LABEL 78</pre>
+<p>Programme 4 (mise à jour de STRIBASE) :</p><pre class="tpl">OP_TEST_FLAG 0
+OP_BRANCH_IF_NOT_EQUAL 78
+OP_SET_MESSAGE 20
+OP_SET_FLAG_TO_FALSE 0
+OP_SET_LABEL 78</pre>
 
-<p>Stock d'armes posé avant l'écran d'armement : SWINDERJ 6, SWINDERM 6, AGM-65D 12, DURANDAL 12, MK20 24, MK82 24,
-GBU-15G 4, POD 8, AMRAAM 6. <code>op2misn.iff</code> reçoit le nom de mission « instant » (et « arena », 21 à la place
-des valeurs de <code>GAMEFLOW.IFF</code>).</p>
-<p>Contrôle : <code>tools/instant_mission.py</code> reproduit la construction ; les fichiers produits sont lus sans
-erreur par <code>RSMission</code> (version modifiée de <code>tools/mission_ref</code>). Référence complète :
-<code>analysis/TRAINING_MISSION.md</code>.</p>
+<p>Désassemblage complet : <code>python3 tools/mission_prog.py &lt;DATA&gt;/MISSIONS/TEMPLATE.IFF</code>.</p>
+</article>
+<article class="card" id="trn-area">
+  <header><span class="id">19</span><h2>Ajouts aux chunks AREA, FLAG et CAST</h2></header>
+
+<h3>AREA : la zone « Destroy bogeys » (DOGFIGHT)</h3>
+<p>Un enregistrement de sphère de 49 octets, placé après les 13 zones du modèle : c'est la zone 13.</p>
+<div class="tablewrap"><table><thead><tr><th>Octets</th><th>Contenu</th><th>Valeur écrite</th><th>Lecture libRealSpace</th></tr></thead><tbody><tr><td>0</td><td>forme</td><td><code>S</code> (sphère)</td><td>—</td></tr><tr><td>1-32</td><td>nom</td><td>« Destroy bogeys », complété par des 0</td><td>—</td></tr><tr><td>33-36</td><td>c0, int32 24.8</td><td>−66000 × 256</td><td>x = −66000</td></tr><tr><td>37-40</td><td>c1, int32 24.8</td><td>128000 × 256</td><td>z = −128000</td></tr><tr><td>41-44</td><td>c2, int32 24.8</td><td>pieds × 256 (<code>shl eax, 8</code>)</td><td>y = 5000, 15000, 25000 ou 35000</td></tr><tr><td>45-48</td><td>rayon, int32 24.8</td><td>45000 × 256</td><td>45000</td></tr></tbody></table></div>
+
+<p class="note">L'altitude du centre est le <b>nombre de pieds recopié sans conversion</b>, alors que l'altitude des avions
+est convertie (§ 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
+contient de toute façon le joueur et tous les avions.</p>
+<h3>FLAG : le compteur d'avions (les deux types)</h3>
+<p>Un mot ajouté après FLAG[0] du modèle : <b>FLAG[1] = nombre total d'avions</b> (réglage +20 : somme des groupes ;
+0 en SEARCH AND DESTROY). Le programme 3 le décompte (§ 21).</p>
+<h3>CAST : un pilote par avion (DOGFIGHT)</h3>
+<p>Un nom de 9 octets par avion, groupe après groupe, dans le même ordre que les objets PART. Ce sont des profils de
+pilote du dossier <code>INTEL</code> (<code>ROOKIE.IFF</code>, <code>VETERAN.IFF</code>, <code>ACE.IFF</code>,
+<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table du § 16) :</p>
+<div class="tablewrap"><table><thead><tr><th>Avion</th><th>Nom CAST ajouté</th></tr></thead><tbody><tr><td>drapeau à 1 : F-15, F-16, F/A-18, F-22, YF-23, A-10, Tornado, Mirage 2000, MiG-21, MiG-29, Su-27</td><td>rookie, veteran ou ace (niveau choisi)</td></tr><tr><td>drapeau à 0 : C-130, E-3, Lear Jet, 747, TU-95</td><td>target</td></tr></tbody></table></div>
+</article>
+<article class="card" id="trn-part">
+  <header><span class="id">20</span><h2>Le joueur et les avions : chunk PART</h2></header>
+
+<p>Le 1er objet du modèle (le joueur) est relu, sa position et son cap remplacés, puis réécrit ; les 2 autres objets du
+modèle sont recopiés. En DOGFIGHT, un objet de 62 octets est ajouté par avion. Champs : <code>IMPL_MISSION_PART.md</code> § 1 ;
+lecture libRealSpace : <code>x = c0</code>, <code>y = c2</code>, <code>z = −c1</code>, <code>yaw = 360 − cap</code>.</p>
+<div class="tablewrap"><table><thead><tr><th>Champ</th><th>Joueur (PART 0 du modèle)</th><th>Avion ajouté</th></tr></thead><tbody><tr><td>index CAST (0-1)</td><td>0 (gardé)</td><td>3 + rang</td></tr><tr><td>type d'objet (2-9)</td><td><code>f-16des</code> (gardé)</td><td>fichier objet de la table</td></tr><tr><td>type détruit (10-17)</td><td>gardé</td><td>chaîne vide</td></tr><tr><td>emport (18-25)</td><td>gardé</td><td>emport de la table (vide pour C-130, A-10, E-3, Lear Jet, 747)</td></tr><tr><td>zone (26-27)</td><td>65535 (gardé)</td><td>65535</td></tr><tr><td>placement (28)</td><td>0 (gardé)</td><td>0</td></tr><tr><td>x (c0)</td><td><b>−73000</b></td><td>−59000 + 500 × groupe</td></tr><tr><td>z (−c1)</td><td><b>−128000</b></td><td>−(128000 + 300 × rang)</td></tr><tr><td>y (c2)</td><td><b>pieds × 256 / 839</b></td><td>la même</td></tr><tr><td>cap (41-42)</td><td><b>90</b> (yaw 270)</td><td>270 (yaw 90)</td></tr><tr><td>vitesse (43-44)</td><td>180 (gardé)</td><td>200 si drapeau, 100 sinon</td></tr><tr><td>camp (45)</td><td>1 (gardé)</td><td>255 (ennemi)</td></tr><tr><td>allié, octet 47</td><td>255, 255 (gardés)</td><td>255, 255</td></tr><tr><td>formation (48-53)</td><td>0, 0, 0 (gardés)</td><td>0, 0, 0</td></tr><tr><td>scripts (54-61)</td><td>65535, 65535, 65535, 0 (gardés)</td><td>65535 ; 1 si drapeau, 2 sinon ; 3 ; 65535</td></tr></tbody></table></div>
+
+<p><b>groupe</b> = 0, 1 ou 2 ; <b>rang</b> = numéro de l'avion parmi tous les avions ajoutés (0, 1, 2…, sans revenir à 0 à
+chaque groupe).</p>
+<h3>Altitude</h3>
+<p>Le réglage est en pieds ; l'altitude écrite pour les avions est <code>(pieds &lt;&lt; 16) / 839</code> en 24.8, soit
+pieds × 256 / 839 mètres (<code>dword_46456</code> = 839 / 256 ≈ 3,28 pieds par mètre, posé au démarrage d'OPTEST).</p>
+<div class="tablewrap"><table><thead><tr><th>Pieds affichés</th><th>Altitude des avions (m)</th><th>Centre de la zone 13 (y)</th></tr></thead><tbody><tr><td class="num">5000</td><td class="num">1525,6</td><td class="num">5000</td></tr><tr><td class="num">15000</td><td class="num">4576,9</td><td class="num">15000</td></tr><tr><td class="num">25000</td><td class="num">7628,1</td><td class="num">25000</td></tr><tr><td class="num">35000</td><td class="num">10679,4</td><td class="num">35000</td></tr></tbody></table></div>
+<figure><svg viewBox="0 0 560 260" width="100%" style="max-width:560px" role="img" aria-label="Placement des avions" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="560" height="260" fill="var(--panel)" stroke="var(--rule)"/><circle cx="85.6" cy="186.7" r="5" fill="var(--target)"/><text x="55.6" y="206.7" font-size="11" fill="var(--fg)">joueur, cap 90</text><circle cx="474.4" cy="186.7" r="3.5" fill="var(--accent)"/><circle cx="474.4" cy="176.7" r="3.5" fill="var(--accent)"/><circle cx="474.4" cy="166.7" r="3.5" fill="var(--accent)"/><circle cx="474.4" cy="156.7" r="3.5" fill="var(--accent)"/><circle cx="474.4" cy="146.7" r="3.5" fill="var(--accent)"/><text x="482.4" y="190.7" font-size="10" fill="var(--accent)">g0</text><circle cx="488.3" cy="136.7" r="3.5" fill="var(--accent)"/><circle cx="488.3" cy="126.7" r="3.5" fill="var(--accent)"/><circle cx="488.3" cy="116.7" r="3.5" fill="var(--accent)"/><circle cx="488.3" cy="106.7" r="3.5" fill="var(--accent)"/><circle cx="488.3" cy="96.7" r="3.5" fill="var(--accent)"/><text x="496.3" y="140.7" font-size="10" fill="var(--accent)">g1</text><circle cx="502.2" cy="86.7" r="3.5" fill="var(--accent)"/><circle cx="502.2" cy="76.7" r="3.5" fill="var(--accent)"/><circle cx="502.2" cy="66.7" r="3.5" fill="var(--accent)"/><circle cx="502.2" cy="56.7" r="3.5" fill="var(--accent)"/><circle cx="502.2" cy="46.7" r="3.5" fill="var(--accent)"/><text x="510.2" y="90.7" font-size="10" fill="var(--accent)">g2</text><line x1="85.6" y1="238" x2="474.4" y2="238" stroke="var(--fg)"/><text x="250.0" y="252" font-size="11" fill="var(--fg)">14 000 m sur x</text></svg><figcaption>Cas le plus chargé : 3 groupes de 5 avions (g0, g1, g2), cap 270. Le rang continue d'un groupe à l'autre : chaque avion est 300 m plus au nord (z décroissant) que le précédent, chaque groupe 500 m plus à l'est (x croissant). Échelle de z agrandie par rapport à x.</figcaption></figure>
+</article>
+<article class="card" id="trn-scne">
+  <header><span class="id">21</span><h2>La scène ajoutée et le déroulement du combat</h2></header>
+
+<p>En DOGFIGHT, un chunk <code>SCNE</code> est ajouté à la fin de <code>FORM PLAY</code> : c'est la 15e scène (n° 14).
+24 octets, puis un mot par avion ajouté.</p>
+<div class="tablewrap"><table><thead><tr><th>Octets</th><th>Champ de <code>MISN_SCEN</code></th><th>Valeur</th></tr></thead><tbody><tr><td>0</td><td>active</td><td>1</td></tr><tr><td>1-2</td><td>zone</td><td>13 (nombre de zones du modèle : la zone ajoutée)</td></tr><tr><td>3-4</td><td>script à l'activation</td><td>65535</td></tr><tr><td>5-6</td><td>2e script</td><td>65535</td></tr><tr><td>7-8</td><td>3e script</td><td>65535</td></tr><tr><td>9</td><td>octet 9</td><td>0</td></tr><tr><td>10-23</td><td>mot + 3 dwords</td><td>0</td></tr><tr><td>24…</td><td>objets de la scène</td><td>index PART des avions ajoutés : 3, 4, 5…</td></tr></tbody></table></div>
+
+<h3>Ce que font les scripts une fois en vol</h3>
+<ul>
+<li>Chaque avion armé joue le programme 1 en mise à jour : <code>OP_SET_OBJ_DESTROY_TARGET 0</code>, attaquer l'objet 0, le
+joueur.</li>
+<li>Chaque avion non armé joue le programme 2 : <code>OP_SET_OBJ_FLY_TO_WP 18</code>, aller au point 18 (SPOT 18 : sans
+zone, altitude 9000).</li>
+<li>À la destruction de chaque avion, le programme 3 retire 1 à FLAG[1] ; à 0, FLAG[0] passe à 1.</li>
+<li>Le programme 4, mise à jour de STRIBASE, voit FLAG[0] à 1 : message radio 20, puis FLAG[0] remis à 0.</li>
+</ul>
+<p class="note">Le message 20 n'est pas dans les 13 messages de <code>MSGS</code> du modèle (0 à 12) : ce qu'il affiche
+n'est pas établi.</p>
+</article>
+<article class="card" id="trn-exemple">
+  <header><span class="id">22</span><h2>Exemple : 2 MiG-29 et 1 TU-95, 15000 pieds, ace</h2></header>
+
+<p>Fichier produit par <code>tools/instant_mission.py</code> (même construction que le jeu), relu avec
+<code>--lire</code>. Positions en mètres, repère de libRealSpace.</p>
+<pre class="tpl">VERS 2 octets
+INFO 6 octets
+TUNE 1 octets
+FORM WRLD 1 chunks
+AREA 686 octets
+  zone 0 S Strike Base : x 152000 y 2925 z 144000 taille 20000
+  zone 1 S Halverston : x -26000 y 315 z -66000 taille 12000
+  zone 2 S Roberts Pass : x -79000 y 5775 z 121000 taille 30000
+  zone 3 S Wipeout Rock : x 58000 y 60 z -159000 taille 25000
+  zone 4 S Mayday Canyon : x -112000 y 2980 z 16000 taille 15000
+  zone 5 S Yenawine River : x -112000 y 70 z -64000 taille 4000
+  zone 6 S Biggs River : x 34000 y 70 z 2000 taille 4000
+  zone 7 S Templeman&#x27;s Cut : x -162000 y 2070 z 66000 taille 4000
+  zone 8 S Savage Falls : x 10000 y 2070 z 160000 taille 4000
+  zone 9 S Art&#x27;s Reach : x -128000 y 137 z -100000 taille 4000
+  zone 10 S Isaac Bay : x -4000 y 0 z -19000 taille 15000
+  zone 11 S Steed Zone : x 130000 y 766 z -106000 taille 15000
+  zone 12 S Lemons Crevasse : x 86000 y 2070 z 80000 taille 4000
+  zone 13 S Destroy bogeys : x -66000 y 15000 z -128000 taille 45000
+SPOT 308 octets
+NUMS 4 octets
+MSGS 196 octets
+FLAG 4 octets
+   [0, 3]
+CAST 54 octets
+   [&#x27;PLAYER&#x27;, &#x27;STRIBASE&#x27;, &#x27;NULL&#x27;, &#x27;ace&#x27;, &#x27;ace&#x27;, &#x27;target&#x27;]
+PART 372 octets
+  objet 0 f-16des : x -73000 y 4576.88 z -128000 cap 90 vitesse 180 camp 1 scripts (65535, 65535, 65535, 0)
+  objet 1 STRIBASE : x 0 y 0 z 0 cap 0 vitesse 0 camp 1 scripts (65535, 4, 65535, 65535)
+  objet 2 RWYEXT18 : x -452 y 0 z 1319 cap 0 vitesse 0 camp 1 scripts (65535, 65535, 65535, 65535)
+  objet 3 mig29 : x -59000 y 4576.88 z -128000 cap 270 vitesse 200 camp 255 scripts (65535, 1, 3, 65535)
+  objet 4 mig29 : x -59000 y 4576.88 z -128300 cap 270 vitesse 200 camp 255 scripts (65535, 1, 3, 65535)
+  objet 5 tu-20 : x -58500 y 4576.88 z -128600 cap 270 vitesse 100 camp 255 scripts (65535, 2, 3, 65535)
+PROG 98 octets
+TEAM 2 octets
+FORM PLAY 15 chunks
+LOAD 189 octets
+</pre>
+
+<p>Les fichiers DOGFIGHT et SEARCH AND DESTROY ainsi produits ont été lus sans erreur par <code>RSMission</code> de
+libRealSpace (version modifiée de <code>tools/mission_ref</code> : essais <code>mission_part_test</code>,
+<code>mission_areas_test</code>, <code>mission_load_test</code>).</p>
+<pre class="tpl">python3 tools/instant_mission.py --donnees &lt;DATA&gt; --sortie INSTANT.IFF dogfight --groupe 2 mig-29 --groupe 1 tu-95 --altitude 15000 --niveau ace
+python3 tools/instant_mission.py --donnees &lt;DATA&gt; --sortie INSTANT.IFF search
+python3 tools/instant_mission.py --lire INSTANT.IFF</pre>
+</article>
+<article class="card" id="trn-strike">
+  <header><span class="id">23</span><h2>Ce que reçoit STRIKE.EXE</h2></header>
+
+<ul>
+<li><b><code>instant.iff</code></b> : la mission ci-dessus, dans le répertoire courant.</li>
+<li><b>Stock d'armes</b>, posé par <code>Training_Run_597B2</code> avant l'écran d'armement (<code>[partie+609 + 2 × arme]</code>) :</li>
+</ul>
+<div class="tablewrap"><table><thead><tr><th>Arme</th><th>Stock</th></tr></thead><tbody><tr><td>SWINDERJ</td><td class="num">6</td></tr><tr><td>SWINDERM</td><td class="num">6</td></tr><tr><td>AGM-65D</td><td class="num">12</td></tr><tr><td>DURANDAL</td><td class="num">12</td></tr><tr><td>MK20</td><td class="num">24</td></tr><tr><td>MK82</td><td class="num">24</td></tr><tr><td>GBU-15G</td><td class="num">4</td></tr><tr><td>POD</td><td class="num">8</td></tr><tr><td>AMRAAM</td><td class="num">6</td></tr></tbody></table></div>
+
+<ul>
+<li><b><code>op2misn.iff</code></b> (<code>Gameflow_WriteMissionOrder_4BBF7</code>) : avec <code>[partie+249]</code> = 254, le nom de
+mission habituellement lu dans <code>GAMEFLOW.IFF</code> (<code>MLST</code> / <code>DATA</code>) est remplacé par
+« instant », écrit dans le chunk <code>INFO</code> ; les valeurs de <code>PRTL</code> sont remplacées par « arena » et 21
+(leur écriture dans le fichier n'est pas relue) ; les armes restantes vont dans <code>WPNS</code>.</li>
+</ul>
+<p>Points ouverts : rôle des deux dwords de la table des avions ; ce que fait la boucle principale au retour d'un vol
+d'entraînement ; lecture d'<code>instant.iff</code> par STRIKE.EXE. Référence complète : <code>analysis/TRAINING_MISSION.md</code>.</p>
 </article>
 </main>
 </div>
