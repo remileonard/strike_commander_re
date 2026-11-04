@@ -46,7 +46,7 @@ def code(text):
 
 def style():
     s = open(os.path.join(ROOT, 'SMOKE_SYSTEM.html'), encoding='utf-8').read()
-    return s[s.index('<style>') + 7:s.index('</style>')]
+    return s[s.index('<style>') + 7:s.index('</style>')] + '\np code, li code, td code { overflow-wrap: anywhere; }\n'
 
 
 def btn(rows):
