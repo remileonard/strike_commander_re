@@ -1,0 +1,696 @@
+[
+  {
+    "fonction": "Options_ConfigurationScreen_90D20",
+    "ecran": "CONFIGURATION (panneau principal)",
+    "fichier_images": "FONTS\\MAINOPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 258,
+        "x": 36,
+        "y": 61,
+        "w": 66,
+        "h": 11,
+        "image_normale": 2,
+        "image_enfoncee": 3,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 317,
+        "x": 106,
+        "y": 61,
+        "w": 66,
+        "h": 11,
+        "image_normale": 8,
+        "image_enfoncee": 9,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 374,
+        "x": 36,
+        "y": 74,
+        "w": 66,
+        "h": 11,
+        "image_normale": 4,
+        "image_enfoncee": 5,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 429,
+        "x": 106,
+        "y": 74,
+        "w": 66,
+        "h": 11,
+        "image_normale": 10,
+        "image_enfoncee": 11,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 488,
+        "x": 36,
+        "y": 87,
+        "w": 66,
+        "h": 11,
+        "image_normale": 6,
+        "image_enfoncee": 7,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 559,
+        "x": 106,
+        "y": 87,
+        "w": 66,
+        "h": 11,
+        "image_normale": 12,
+        "image_enfoncee": 13,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 620,
+        "x": 211,
+        "y": 61,
+        "w": 66,
+        "h": 11,
+        "image_normale": 14,
+        "image_enfoncee": 15,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 687,
+        "x": 211,
+        "y": 74,
+        "w": 66,
+        "h": 11,
+        "image_normale": 16,
+        "image_enfoncee": 17,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 750,
+        "x": 211,
+        "y": 87,
+        "w": 66,
+        "h": 11,
+        "image_normale": 18,
+        "image_enfoncee": 19,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 807,
+        "x": 73,
+        "y": 114,
+        "w": 59,
+        "h": 11,
+        "image_normale": 22,
+        "image_enfoncee": 23,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 870,
+        "x": 18,
+        "y": 114,
+        "w": 48,
+        "h": 11,
+        "image_normale": 20,
+        "image_enfoncee": 21,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 939,
+        "x": 139,
+        "y": 114,
+        "w": 49,
+        "h": 11,
+        "image_normale": 24,
+        "image_enfoncee": 25,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 1004,
+        "x": 211,
+        "y": 114,
+        "w": 66,
+        "h": 11,
+        "image_normale": 26,
+        "image_enfoncee": 27,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_DetailScreen_91D29",
+    "ecran": "DETAIL",
+    "fichier_images": "FONTS\\DETLOPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 192,
+        "x": 226,
+        "y": 67,
+        "w": 73,
+        "h": 11,
+        "image_normale": 26,
+        "image_enfoncee": 27
+      },
+      {
+        "type": "bouton",
+        "ligne": 259,
+        "x": 226,
+        "y": 80,
+        "w": 73,
+        "h": 11,
+        "image_normale": 28,
+        "image_enfoncee": 29
+      },
+      {
+        "type": "bouton",
+        "ligne": 318,
+        "x": 22,
+        "y": 67,
+        "w": 73,
+        "h": 11,
+        "image_normale": 2,
+        "image_enfoncee": 3
+      },
+      {
+        "type": "bouton",
+        "ligne": 397,
+        "x": 22,
+        "y": 93,
+        "w": 73,
+        "h": 11,
+        "image_normale": 6,
+        "image_enfoncee": 7
+      },
+      {
+        "type": "bouton",
+        "ligne": 468,
+        "x": 22,
+        "y": 80,
+        "w": 73,
+        "h": 11,
+        "image_normale": 4,
+        "image_enfoncee": 5
+      },
+      {
+        "type": "bouton",
+        "ligne": 529,
+        "x": 22,
+        "y": 132,
+        "w": 73,
+        "h": 11,
+        "image_normale": 12,
+        "image_enfoncee": 13
+      },
+      {
+        "type": "bouton",
+        "ligne": 592,
+        "x": 22,
+        "y": 106,
+        "w": 73,
+        "h": 11,
+        "image_normale": 8,
+        "image_enfoncee": 9
+      },
+      {
+        "type": "bouton",
+        "ligne": 661,
+        "x": 22,
+        "y": 119,
+        "w": 73,
+        "h": 11,
+        "image_normale": 10,
+        "image_enfoncee": 11
+      },
+      {
+        "type": "bouton",
+        "ligne": 714,
+        "x": 22,
+        "y": 145,
+        "w": 73,
+        "h": 11,
+        "image_normale": 14,
+        "image_enfoncee": 15
+      },
+      {
+        "type": "jauge",
+        "ligne": 794,
+        "x": 243,
+        "y": 93,
+        "w": 40,
+        "h": 11,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "jauge",
+        "ligne": 843,
+        "x": 127,
+        "y": 159,
+        "w": 68,
+        "h": 11,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "bouton",
+        "ligne": 869,
+        "x": 244,
+        "y": 132,
+        "w": 38,
+        "h": 11,
+        "image_normale": 36,
+        "image_enfoncee": 37,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_FlightScreen_90097",
+    "ecran": "FLIGHT",
+    "fichier_images": "FONTS\\FLITOPT.SHP",
+    "widgets": [
+      {
+        "type": "jauge",
+        "ligne": 264,
+        "x": 17,
+        "y": 66,
+        "w": 89,
+        "h": 65,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "bouton",
+        "ligne": 287,
+        "x": 121,
+        "y": 119,
+        "w": 76,
+        "h": 11,
+        "image_normale": 36,
+        "image_enfoncee": 37
+      },
+      {
+        "type": "bouton",
+        "ligne": 350,
+        "x": 121,
+        "y": 81,
+        "w": 76,
+        "h": 17,
+        "image_normale": 31,
+        "image_enfoncee": 32
+      },
+      {
+        "type": "bouton",
+        "ligne": 403,
+        "x": 121,
+        "y": 62,
+        "w": 76,
+        "h": 17,
+        "image_normale": 29,
+        "image_enfoncee": 30
+      },
+      {
+        "type": "bouton",
+        "ligne": 463,
+        "x": 93,
+        "y": 146,
+        "w": 136,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "bouton",
+        "ligne": 529,
+        "x": 121,
+        "y": 100,
+        "w": 76,
+        "h": 17,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "jauge",
+        "ligne": 613,
+        "x": 212,
+        "y": 66,
+        "w": 89,
+        "h": 78,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "bouton",
+        "ligne": 637,
+        "x": 131,
+        "y": 176,
+        "w": 59,
+        "h": 11,
+        "image_normale": 38,
+        "image_enfoncee": 39,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_GameplayScreen_92E60",
+    "ecran": "GAMEPLAY",
+    "fichier_images": "FONTS\\GAMEOPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 156,
+        "x": 48,
+        "y": 70,
+        "w": 73,
+        "h": 17,
+        "image_normale": 2,
+        "image_enfoncee": 3
+      },
+      {
+        "type": "bouton",
+        "ligne": 227,
+        "x": 48,
+        "y": 90,
+        "w": 73,
+        "h": 17,
+        "image_normale": 4,
+        "image_enfoncee": 5
+      },
+      {
+        "type": "jauge",
+        "ligne": 325,
+        "x": 197,
+        "y": 74,
+        "w": 66,
+        "h": 39,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "bouton",
+        "ligne": 349,
+        "x": 129,
+        "y": 122,
+        "w": 59,
+        "h": 11,
+        "image_normale": 12,
+        "image_enfoncee": 13,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_CockpitScreen_93295",
+    "ecran": "COCKPIT",
+    "fichier_images": "FONTS\\COCKOPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 206,
+        "x": 45,
+        "y": 62,
+        "w": 111,
+        "h": 11,
+        "image_normale": 2,
+        "image_enfoncee": 3
+      },
+      {
+        "type": "bouton",
+        "ligne": 271,
+        "x": 45,
+        "y": 75,
+        "w": 111,
+        "h": 11,
+        "image_normale": 4,
+        "image_enfoncee": 5
+      },
+      {
+        "type": "bouton",
+        "ligne": 342,
+        "x": 45,
+        "y": 88,
+        "w": 111,
+        "h": 11,
+        "image_normale": 6,
+        "image_enfoncee": 7
+      },
+      {
+        "type": "bouton",
+        "ligne": 407,
+        "x": 162,
+        "y": 75,
+        "w": 111,
+        "h": 11,
+        "image_normale": 14,
+        "image_enfoncee": 15
+      },
+      {
+        "type": "bouton",
+        "ligne": 474,
+        "x": 162,
+        "y": 62,
+        "w": 111,
+        "h": 11,
+        "image_normale": 12,
+        "image_enfoncee": 13
+      },
+      {
+        "type": "bouton",
+        "ligne": 549,
+        "x": 45,
+        "y": 114,
+        "w": 111,
+        "h": 11,
+        "image_normale": 10,
+        "image_enfoncee": 11
+      },
+      {
+        "type": "bouton",
+        "ligne": 614,
+        "x": 162,
+        "y": 114,
+        "w": 111,
+        "h": 11,
+        "image_normale": 20,
+        "image_enfoncee": 21
+      },
+      {
+        "type": "bouton",
+        "ligne": 683,
+        "x": 45,
+        "y": 101,
+        "w": 111,
+        "h": 11,
+        "image_normale": 8,
+        "image_enfoncee": 9
+      },
+      {
+        "type": "bouton",
+        "ligne": 750,
+        "x": 162,
+        "y": 101,
+        "w": 111,
+        "h": 11,
+        "image_normale": 18,
+        "image_enfoncee": 19
+      },
+      {
+        "type": "bouton",
+        "ligne": 823,
+        "x": 162,
+        "y": 88,
+        "w": 111,
+        "h": 11,
+        "image_normale": 16,
+        "image_enfoncee": 17
+      },
+      {
+        "type": "bouton",
+        "ligne": 883,
+        "x": 129,
+        "y": 142,
+        "w": 59,
+        "h": 11,
+        "image_normale": 22,
+        "image_enfoncee": 23,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_CamerasScreen_93BA5",
+    "ecran": "CAMERAS",
+    "fichier_images": "FONTS\\CAMROPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 219,
+        "x": 164,
+        "y": 60,
+        "w": 136,
+        "h": 11,
+        "image_normale": 4,
+        "image_enfoncee": 5
+      },
+      {
+        "type": "bouton",
+        "ligne": 288,
+        "x": 22,
+        "y": 73,
+        "w": 136,
+        "h": 11,
+        "image_normale": 6,
+        "image_enfoncee": 7
+      },
+      {
+        "type": "bouton",
+        "ligne": 351,
+        "x": 22,
+        "y": 60,
+        "w": 136,
+        "h": 11,
+        "image_normale": 2,
+        "image_enfoncee": 3
+      },
+      {
+        "type": "bouton",
+        "ligne": 424,
+        "x": 164,
+        "y": 73,
+        "w": 136,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "jauge",
+        "ligne": 492,
+        "x": 53,
+        "y": 102,
+        "w": 210,
+        "h": 11,
+        "valeur_initiale": "0"
+      },
+      {
+        "type": "bouton",
+        "ligne": 518,
+        "x": 129,
+        "y": 124,
+        "w": 59,
+        "h": 11,
+        "image_normale": 17,
+        "image_enfoncee": 18,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_AudioScreen_9416A",
+    "ecran": "AUDIO",
+    "fichier_images": "FONTS\\AUDIOPT.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 203,
+        "x": 88,
+        "y": 63,
+        "w": 72,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "bouton",
+        "ligne": 266,
+        "x": 88,
+        "y": 76,
+        "w": 72,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "bouton",
+        "ligne": 337,
+        "x": 165,
+        "y": 63,
+        "w": 72,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "bouton",
+        "ligne": 398,
+        "x": 165,
+        "y": 76,
+        "w": 72,
+        "h": 11,
+        "image": "dynamique (registre)"
+      },
+      {
+        "type": "bouton",
+        "ligne": 460,
+        "x": 129,
+        "y": 101,
+        "w": 59,
+        "h": 11,
+        "image_normale": 14,
+        "image_enfoncee": 15,
+        "valeur": 1
+      }
+    ]
+  },
+  {
+    "fonction": "Options_ExitGameScreen_9277C",
+    "ecran": "EXIT GAME",
+    "fichier_images": "FONTS\\RESTART.SHP",
+    "widgets": [
+      {
+        "type": "bouton",
+        "ligne": 199,
+        "x": 54,
+        "y": 80,
+        "w": 66,
+        "h": 11,
+        "image_normale": 2,
+        "image_enfoncee": 3,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 282,
+        "x": 126,
+        "y": 80,
+        "w": 66,
+        "h": 11,
+        "image_normale": 4,
+        "image_enfoncee": 5,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 357,
+        "x": 198,
+        "y": 80,
+        "w": 69,
+        "h": 11,
+        "image_normale": 6,
+        "image_enfoncee": 7,
+        "valeur": 1
+      },
+      {
+        "type": "bouton",
+        "ligne": 454,
+        "x": 290,
+        "y": 55,
+        "w": 11,
+        "h": 29,
+        "image": "dynamique (registre)"
+      }
+    ]
+  }
+]

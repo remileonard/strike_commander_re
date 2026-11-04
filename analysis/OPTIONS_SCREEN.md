@@ -183,3 +183,118 @@ Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d
   du fichier. Le code qui la dessine n'est pas lu.
 - **Dessin** : `Cockpit_ApplyFormatAndDraw_91B70` (nom actuel, non lu) appelle `TextRenderer_ApplyFormatChange_5E34D`,
   donc du texte peut être dessiné avec la police à cet endroit. Ce qu'elle écrit n'est pas établi.
+
+## 5. Tous les menus ouverts par ALT+O
+
+Inventaire relevé par `tools/options_layout.py` (lit `analysis/annotated_segments/`, écrit
+`analysis/options_layout.json`). Images composées avec les fichiers `FONTS\*.SHP` aux positions du code
+(`options_images/menu_*.png`, planche `options_images/menus_alt_o.png`).
+
+### 5.1 Méthode de dessin, vérifiée par rendu
+
+1. Image 0 du fichier de l'écran, en (5, 4) : bandeau « CONFIGURATION » (310 × 31).
+2. Image 1, en (5, 39) : fond du panneau. **Elle contient déjà tous les libellés** (boutons, titres,
+   listes), dans leur aspect neutre. Un rendu avec la seule image 1 les montre tous.
+3. Boutons : image normale, puis une image enfoncée au clic. Chaque image de bouton porte aussi son
+   libellé (image 2 : GOURAUD relevé, image 3 : le même enfoncé ; image 36 : EXIT).
+4. Jauges et images dynamiques : voir § 5.3 et § 5.4.
+
+Tous les écrans sont dessinés à partir de la même palette (`PALETTE\PALETTE.IFF` pour les rendus ; le
+jeu envoie la palette du vol, voir § 2.1).
+
+### 5.2 Boutons par écran
+
+Coordonnées (x, y), taille en pixels, images normale / enfoncée. Les noms viennent du rendu : la place
+d'un libellé dans la fiche est celle de sa position à l'écran.
+
+Panneau principal (`MAINOPT.SHP`) :
+
+| Libellé | Position | Taille | Images | Sous-écran |
+|---|---|---|---|---|
+| DETAIL | (36, 61) | 66 × 11 | 2, 3 | Options_DetailScreen_91D29 |
+| FLIGHT | (106, 61) | 66 × 11 | 8, 9 | Options_FlightScreen_90097 |
+| GAMEPLAY | (36, 74) | 66 × 11 | 4, 5 | Options_GameplayScreen_92E60 |
+| COCKPIT | (106, 74) | 66 × 11 | 10, 11 | Options_CockpitScreen_93295 |
+| CAMERAS | (36, 87) | 66 × 11 | 6, 7 | Options_CamerasScreen_93BA5 |
+| AUDIO | (106, 87) | 66 × 11 | 12, 13 | Options_AudioScreen_9416A |
+| ROOKIE | (211, 61) | 66 × 11 | 14, 15 | Options_PresetRookie_91B2C |
+| VETERAN | (211, 74) | 66 × 11 | 16, 17 | Options_PresetVeteran_91AE9 |
+| ACE | (211, 87) | 66 × 11 | 18, 19 | Options_PresetAce_91AA6 |
+| SAVE | (18, 114) | 48 × 11 | 20, 21 | Options_SaveConfig_8FB73 |
+| DEFAULT | (73, 114) | 59 × 11 | 22, 23 | Options_LoadDefaults_8FD2A |
+| EXIT | (139, 114) | 49 × 11 | 24, 25 | fermeture |
+| EXIT GAME | (211, 114) | 66 × 11 | 26, 27 | Options_ExitGameScreen_9277C |
+
+DETAIL (`DETLOPT.SHP`) : TERRAIN GOURAUD (22, 67) 2/3, TRANSITION (22, 80) 4/5, INTEREST (22, 93) 6/7,
+RIVERS (22, 106) 8/9, FIELDS (22, 119) 10/11, CITIES (22, 132) 12/13, RUNWAYS (22, 145) 14/15 ;
+OBJECTS GOURAUD (226, 67) 26/27, TEXTURE (226, 80) 28/29 ; EXIT (244, 132) 36/37.
+
+FLIGHT (`FLITOPT.SHP`) : MIDAIR COLLISIONS (121, 62) 29/30, EASY LANDINGS (121, 81) 31/32, STALLS (121, 119)
+36/37, EXIT (131, 176) 38/39. SHOW WEAPONS (121, 100) et CALIBRATE JOYSTICK (93, 146) : images dynamiques (§ 5.4).
+
+GAMEPLAY (`GAMEOPT.SHP`) : UNLIMITED AMMO (48, 70) 2/3, EASY GUN HITS (48, 90) 4/5, EXIT (129, 122) 12/13.
+
+COCKPIT (`COCKOPT.SHP`) : à gauche (45, y) avec y = 62, 75, 88, 101, 114 : images 2/3, 4/5, 6/7, 8/9, 10/11 ;
+à droite (162, y) avec les mêmes y : 12/13, 14/15, 16/17, 18/19, 20/21 ; EXIT (129, 142) 22/23.
+Libellés d'après le rendu : gauche LADDER, TAPES, AUTO TARGET, 360 TARGET LOCK, SMART TARGETING ;
+droite SUN GLARE, G EFFECTS, SMART RADAR, 360 AA RADAR, SMART RAW SCOPE.
+
+CAMERAS (`CAMROPT.SHP`) : AUTO SWITCHING (22, 60) 2/3, VICTIM VIEW (164, 60) 4/5, WEAPON CAMERA (22, 73) 6/7 ;
+TERRAIN IN GUN CAMERA (164, 73) dynamique (§ 5.4) ; EXIT (129, 124) 17/18.
+
+AUDIO (`AUDIOPT.SHP`) : MUSIC (88, 63), SOUND FX (88, 76), SPEECH (165, 63), DIGITAL FX (165, 76) :
+toutes dynamiques (§ 5.4) ; EXIT (129, 101) 14/15.
+
+EXIT GAME (`RESTART.SHP`) : RESTART (54, 80) 2/3, ABORT (126, 80) 4/5, CONTINUE (198, 80) 6/7 ;
+un élément vertical à droite (290, 55), 11 × 29, dynamique, rôle non établi.
+
+Chaque bouton écrit la valeur 1 au clic (champ `[di+44]`), sauf les boutons à image dynamique dont la
+valeur n'est pas relevée.
+
+### 5.3 Jauges : les listes à choix
+
+Un widget jauge (`GaugeWidgetVariantD_ConstructAndInit_A4270`, dessin `GaugeWidget_DrawByMode_A39DC`) n'a
+pas de paire d'images dans le code de construction. D'après le rendu, les jauges correspondent aux listes
+de choix sans bouton propre :
+
+| Écran | Position | Taille | Liste visible (d'après le rendu) |
+|---|---|---|---|
+| FLIGHT | (17, 66) | 89 × 65 | FLIGHT CONTROL : KEYBOARD, MOUSE, JOYSTICK, F's PRO, THRUSTMASTER |
+| FLIGHT | (212, 66) | 89 × 78 | PANNING CONTROL : KEYBOARD, MOUSE, JOYSTICK, F's PRO, THRUSTMASTER, NONE |
+| GAMEPLAY | (197, 74) | 66 × 39 | ENEMY INTELLIGENCE : ROOKIE, VETERAN, ACE |
+| CAMERAS | (53, 102) | 210 × 11 | WINDOW SIZE : SMALL, MEDIUM, LARGE |
+| DETAIL | (243, 93) | 40 × 11 | probablement la ligne HI / LO (hypothèse) |
+| DETAIL | (127, 159) | 68 × 11 | probablement la ligne HAZING, FAR / NEAR (hypothèse) |
+
+Les jauges de DETAIL sont des hypothèses : leur valeur initiale est 0, et le code de dessin n'a pas été lu.
+Le rendu ne montre pas la mise en évidence de l'élément choisi : elle est dessinée par la jauge, non lue.
+
+### 5.4 Images dynamiques (choisies à l'exécution)
+
+**AUDIO, résolu.** Les quatre boutons prennent leur paire d'images dans des variables locales préparées
+en début de fonction. Deux drapeaux de la configuration (`byte_70996` et `word_70999`, rôle non établi)
+les modifient :
+
+| Bouton | Paire par défaut | Si `byte_70996` = 0 | Si `word_70999` = 0 |
+|---|---|---|---|
+| MUSIC (88, 63) | 2, 3 | 4, 4 | — |
+| SOUND FX (88, 76) | 8, 9 | 10, 10 | — |
+| SPEECH (165, 63) | 5, 6 | — | 7, 7 |
+| DIGITAL FX (165, 76) | 11, 12 | — | 13, 13 |
+
+Une paire dont les deux images sont identiques (4, 4 ; 10, 10 ; 7, 7 ; 13, 13) est sans doute l'état
+désactivé, mais l'aspect de ces images n'a pas été vérifié. Quelle paire correspond à « activé » dépend
+du sens des drapeaux, non établi.
+
+**FLIGHT, CAMERAS, EXIT GAME : non résolus.** Les paires sont calculées à partir de variables locales
+(FLIGHT : SHOW WEAPONS par défaut 33 / 34, CALIBRATE JOYSTICK par défaut 40 / 41, puis remplacées selon
+un état ; CAMERAS : TERRAIN IN GUN CAMERA = base + décalage ; EXIT GAME, élément vertical = base + 70).
+Il reste à remonter ces variables jusqu'aux champs de la configuration.
+
+### 5.5 Points ouverts pour l'implémentation
+
+- Lire `GaugeWidget_DrawByMode_A39DC` : mise en évidence de l'élément choisi, et images utilisées.
+- Résoudre les paires dynamiques de FLIGHT, CAMERAS et EXIT GAME (§ 5.4).
+- Identifier les drapeaux `byte_70996` et `word_70999`, et le sens des paires « activé » / « désactivé ».
+- Rôle des champs écrits par ROOKIE, VETERAN, ACE (§ 2.4).
+- Vérifier chaque libellé d'après le rendu (les noms de § 5.2 ne sont pas lus dans le code).

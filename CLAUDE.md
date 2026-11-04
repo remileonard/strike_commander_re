@@ -323,7 +323,7 @@ strike_commander_re/
 │   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD, CACH et SPOT) — RSMission, SCMission, SCProg…
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
-│   ├── OPTIONS_SCREEN.md            panneau CONFIGURATION du vol (ALT+O), § 4 : sous-écran DETAIL (DETLOPT.SHP) : touches ALT (Input_AltKeyCommands_26F7E), MAINOPT.SHP,
+│   ├── OPTIONS_SCREEN.md            panneau CONFIGURATION du vol (ALT+O) : § 5 = tous les menus (images, boutons, jauges, paires dynamiques) ; options_layout.json (tools/options_layout.py) : touches ALT (Input_AltKeyCommands_26F7E), MAINOPT.SHP,
 │   │                                  13 boutons, sous-écrans Options_*Screen_*, OPTIONS.CFG / OPTDFLT.CFG ; image dans options_images/
 │   ├── menu_cd/                     MENU.EXE du CD-ROM : intro THEFLIC.FLX puis menu Strike Commander / Tactical Operations (code de sortie 10 / 11)
 │   │                                  ; FLX_FORMAT.md : format de THEFLIC.FLX (palettes, images LZW, blocs 4 × 4, images par lignes)
