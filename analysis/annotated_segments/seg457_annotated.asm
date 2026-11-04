@@ -2612,16 +2612,17 @@ ExprSlot_ReleaseSingleE_AA37D	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par
-; MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8
-; active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ;
-; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à
-; l'activation / en quittant / à chaque image (-1 = aucun ;
-; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ;
-; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. Rôle des
-; champs record+0x18 à +0x26 (drapeau, « cap », position) non établi. Puis (taille − 24)/2 u16
-; = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur
-; MISSIONS/MISN-1A.IFF.
+; far,123L, relue 2026-10-31 — parse un chunk 'SCNE' (scène) en un record de 0x27 octets
+; (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (push large 18h /
+; ResourceRecord_ReadFieldGroupA_64A19) : +0x00 u8 active au départ ; +0x01 u16 zone (index
+; AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07
+; 3× i16 scripts PROG : à l'activation, à chaque image, en quittant (-1 = aucun ;
+; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 =
+; point d'arrivée du pilote automatique défini ; +0x0A i16 → record+0x19 = cap d'arrivée en
+; degrés (-1 = aucun) ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23 = position
+; d'arrivée absolue. Ces champs d'arrivée sont lus par Autopilot_JumpSequence_7A054. Puis
+; (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16
+; tableau. IMPL_MISSION_AREAS.md § 4.1.
 ; ==============================================================================================
 MissionScene_ParseRecord_AA3A5	proc far		; CODE XREF: VROOMM_StubThunk_6CF3FJ MissionPlay_LoadScenes_AA595+DFp
 

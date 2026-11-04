@@ -63,8 +63,8 @@ leur chemin d'origine : il suffit de les copier par-dessus ceux de libRealSpace 
 
 | Fichier | Ce qui change |
 |---|---|
-| `realspace/RSMission.h` | `AREA` : tailles exactes et `contains` ; `MISN_SCEN` : commentaires des scripts |
-| `realspace/RSMission.cpp` | `parseMISN_AREA` réécrite ; `AREA::contains` ajoutée ; `parseMISN_PLAY_SCEN` : ordre des scripts |
+| `realspace/RSMission.h` | `AREA` : tailles exactes et `contains` ; `MISN_SCEN` : commentaires des scripts, point d'arrivée du pilote automatique (§ 4.1) |
+| `realspace/RSMission.cpp` | `parseMISN_AREA` réécrite ; `AREA::contains` ajoutée ; `parseMISN_PLAY_SCEN` : ordre des scripts, point d'arrivée, objets en `uint16` |
 | `strike_commander/SCMissionScene.h` | `activate`, `runMissionUpdate`, `runLeaving`, `runProg` ; plus d'abonnement au bus de messages |
 | `strike_commander/SCMissionScene.cpp` | les mêmes |
 | `strike_commander/SCMission.h` | `global_scene`, `current_scene`, `findSceneAt`, `startScenes`, `finishScenes` |
@@ -100,7 +100,10 @@ struct AREA {
 };
 ```
 
-`MISN_SCEN` : mêmes champs, les commentaires disent quand chaque script tourne.
+`MISN_SCEN` : les commentaires disent quand chaque script tourne ; `is_coord_on_area` et `unknown_bytes`
+(octets 9 à 23) deviennent le point d'arrivée du pilote automatique (§ 4.1) ; `cast` passe en `uint16`, comme dans
+le fichier. Les affichages de `DebugStrike.cpp` montrent les trois nouveaux champs. Appliqué dans libRealSpace le
+2026-10-31.
 
 ```cpp
 struct MISN_SCEN {
@@ -111,9 +114,10 @@ struct MISN_SCEN {
     int16_t on_is_activated {-1};   // octets 3-4 : quand la scène devient la scène courante
     int16_t on_mission_update {-1}; // octets 5-6 : à chaque image (scène globale, scène courante)
     int16_t on_leaving {-1};        // octets 7-8 : quand la scène cesse d'être courante, et en fin de mission
-    bool is_coord_on_area {false};
-    std::vector<uint8_t> unknown_bytes;
-    std::vector<uint8_t> cast;
+    bool has_arrival_point {false};
+    int16_t arrival_heading {-1};
+    Vector3D arrival_position;
+    std::vector<uint16_t> cast;
 };
 ```
 
@@ -216,7 +220,9 @@ bool AREA::contains(const Vector3D &point) const {
 
 ### 2.3 `RSMission.cpp` — lecture du chunk `SCNE`
 
-Seul changement : le 2e script du fichier va dans `on_mission_update`, le 3e dans `on_leaving` (c'était l'inverse).
+Le 2e script du fichier va dans `on_mission_update`, le 3e dans `on_leaving` (c'était l'inverse). Les octets 9 à 23
+donnent le point d'arrivée du pilote automatique (§ 4.1). Les objets de la scène sont lus en `uint16`, comme le jeu
+(avant : l'octet bas, puis l'octet haut sauté).
 
 ```cpp
 void RSMission::parseMISN_PLAY_SCEN(uint8_t *data, size_t size) {
@@ -234,15 +240,19 @@ void RSMission::parseMISN_PLAY_SCEN(uint8_t *data, size_t size) {
     scen->on_is_activated = scen->progs_id[0];
     scen->on_mission_update = scen->progs_id[1];
     scen->on_leaving = scen->progs_id[2];
-    scen->is_coord_on_area = stream.ReadByte();
-    for (int i = 0; i < 14; i++) {
-        scen->unknown_bytes.push_back(stream.ReadByte());
-    }
+    // MissionScene_ParseRecord_AA3A5, lu par Autopilot_JumpSequence_7A054
+    scen->has_arrival_point = stream.ReadByte() != 0;
+    scen->arrival_heading = stream.ReadShort();
+    int32_t c0 = stream.ReadInt32LE();
+    int32_t c1 = stream.ReadInt32LE();
+    int32_t c2 = stream.ReadInt32LE();
+    scen->arrival_position.x = c0 / 256.0f;
+    scen->arrival_position.y = c2 / 256.0f;
+    scen->arrival_position.z = -c1 / 256.0f;
     size_t read = 24;
     while (read < size) {
-        scen->cast.push_back(stream.ReadByte());
-        stream.ReadByte();
-        read+=2;
+        scen->cast.push_back(stream.ReadUShort());
+        read += 2;
     }
     this->mission_data.scenes.push_back(scen);
 }
@@ -519,9 +529,38 @@ puis (taille − 24) ÷ 2 mots : les objets de la scène, index dans `PART`.
 | 3, 4 | `on_is_activated` | quand la scène devient courante, après l'apparition de ses objets (`Scene_TriggerActivation_531CD`) |
 | 5, 6 | `on_mission_update` | **à chaque image**, pour la scène globale puis pour la scène courante (`MAIN_GAME_TICK` → `Scene_RunUpdateScript_531F2`) |
 | 7, 8 | `on_leaving` | **quand la scène cesse d'être courante** (`Scene_DetectAndActivateChange_532EA` → `Scene_RunLeavingScript_53211`), **et en fin de mission** |
-| 9 | `is_coord_on_area` | rangé en mémoire par le chargeur ; rôle non établi (0 ou 1 dans les données) |
-| 10 à 23 | `unknown_bytes` | rangés en mémoire : un `uint16` (0, 90, 135, 180 ou 270 dans les données) puis 3 `int32` 24.8 ; rôle non établi |
+| 9 | `has_arrival_point` | `uint8` : la scène a un point d'arrivée du pilote automatique (§ 4.1) ; rangé en +24 |
+| 10, 11 | `arrival_heading` | `int16` : cap d'arrivée en degrés, −1 = l'avion garde sa direction ; rangé en +25 |
+| 12 à 23 | `arrival_position` | 3 `int32` 24.8 : position d'arrivée, absolue ; rangée en +27, +31, +35 |
 | 24… | `cast` | `uint16` : objets de la scène (index `PART`) |
+
+### 4.1 Le point d'arrivée du pilote automatique (octets 9 à 23)
+
+`MissionScene_ParseRecord_AA3A5` range l'octet 9 en +24 (`mov [si+18h], al`), les octets 10 et 11 en +25
+(`mov [si+19h], ax`) et les trois `int32` en +27, +31 et +35 (`mov [si+1Bh], eax`, `mov [si+1Fh], eax`,
+`mov [si+23h], eax`). Le seul lecteur trouvé est `Autopilot_JumpSequence_7A054`, la séquence de saut du pilote
+automatique. Une fois la scène d'arrivée trouvée (`Scene_FindMatchingByAreaContainment_53236`, rangée dans `di`) :
+
+```
+cmp byte ptr [di+18h], 0 / jz        pas de point d'arrivée : l'avion garde le point calculé par le saut
+mov ax, di / add ax, 1Bh             position d'arrivée = les 3 int32 de la scène, recopiés tels quels
+mov ax, [di+19h]                     cap d'arrivée
+cmp [bp+var_4A], 0FFFFh / jz         cap −1 : pas de rotation, l'avion garde sa direction de vol
+neg ax / shl eax, 8                  le nez (le nord, 0 / 1 / 0) est tourné de −cap
+call Vector_RotateHeading2D_556D4
+mov [bp+var_58], 0C800h              vitesse 200, constante du code
+call Pilot_LowLevelControlCommand    → JDYN_JumpToPoint_49242 : l'avion est posé à ce point, sur ce cap, à cette vitesse
+```
+
+Pour libRealSpace : position `x = c0 ÷ 256`, `y = c2 ÷ 256` (altitude), `z = −c1 ÷ 256` ; la position est absolue,
+le code ne lui ajoute pas la zone. Nez pour un cap `c` : `x = −sin c`, `z = −cos c` (cap 0 = nord, vers −Z ; cap 90 =
+ouest, vers −X).
+
+Dans les données, 58 scènes sur 295 ont l'octet 9 à 1, presque toujours la scène 0 de chaque mission de campagne
+(exemple, MISN-1A : point (−70 762 ; 126 343) dans le plan, altitude 3 580 m, cap 0). Caps relevés : 0, 90, 135,
+180, 270. Les 237 autres scènes ont l'octet 9 à 0 et une position nulle.
+
+Le pilote automatique de libRealSpace (`SCStrike::autopilotCompute`) ne se sert pas encore de ce point.
 
 **Les noms des 2e et 3e scripts, et leur preuve.**
 - Chaque image, `MAIN_GAME_TICK` lance le champ +12 du record (octets 5 et 6) sur la scène globale
@@ -610,7 +649,9 @@ a un 3e script (programme 4), la scène 5 un script d'activation (programme 14).
 
 ## 7. Points ouverts
 
-- **Octets 9 à 23 d'une scène** : rangés en mémoire, aucun lecteur trouvé dans les fonctions de scène lues.
+- **Chunks `SCNE` de moins de 24 octets** : 14 chunks de 4 à 19 octets, dans 4 fichiers hors campagne (`BASIC`,
+  `GAME`, `LAND`, `MISSION.IFF`). Le jeu lit quand même 24 octets ; ce que rend `ResourceRecord_ReadFieldGroupA_64A19`
+  au-delà du chunk n'a pas été lu.
 - **Bit 3 des objets** : `Scene_LeaveMarkUnits_5317A` le pose sur les objets de la scène quittée qui ont un 4e
   script `PART` ; `Scene_EnsureUnitsSpawned_530FF` l'efface sur ceux déjà présents à l'activation. Rôle non établi.
 - **Premier passage après le chargement** : `MissionScenario_LoadMainRecord_A8331` appelle

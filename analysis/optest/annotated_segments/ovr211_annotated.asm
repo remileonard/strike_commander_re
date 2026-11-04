@@ -6,7 +6,49 @@ ovr211		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_BDE10	proc far		; CODE XREF: sub_4268AJ
+; ==============================================================================================
+; far, 1594L, LUE 2026-10-31. GÉNÉRIQUE DE FIN. Argument : 1 = « THE END » seul, 0 = générique
+; déroulant puis score final. Lit ..\..\data\midgames\credits.iff, FORM CRED (push large
+; 44455243h). Chunk INFO : 10 uint16 puis 3 uint8, dans l'ordre (valeurs par défaut si le
+; chunk manque) : cadence du défilement en images/s (10) ; hauteur des lignes de type 2, 5, 6
+; (8) ; hauteur des types 3, 4 (8) ; hauteur du type 7 (8) ; écart avant le type 2 (10) ;
+; écart avant les types 3 et 5 (10) ; écart avant le type 6 (15) ; écart avant le type 7 (10)
+; ; x des types 2, 5, 6 (150) ; x des types 3, 4 (170) ; police des types 2, 5, 6 (0) ; police
+; des types 3, 4 (0) ; police du type 7 (0). FORM PALT obligatoire (sinon erreur 'credits 50')
+; : INFO uint8 nombre, puis autant de DATA = blocs de palette (Palette_LoadFromResource_2CCE5
+; : octet premier indice, octet ignoré, uint16 nombre, RVB 0..63) copiés dans la palette,
+; envoyée ensuite (Palette_Upload_2CDE1). FORM FONT obligatoire (sinon 'credits 1') : INFO
+; uint8 nombre de polices, puis autant de DATA (police = archive de formes,
+; GlyphObject_ComputeMetrics_3111E). Chunks LINE (comptés d'abord, un enregistrement de 22
+; octets chacun), 1er octet = type ; y courant parti de 0 ; pour chaque ligne y += écart, haut
+; = y, bas = y + hauteur. Type 0 = image : uint16 écart, uint16 hauteur, uint16 x, puis une
+; forme (taille du chunk − 7) dans un calque (Layer_ConstructAtOrigin_2DE95) placé en (x,
+; haut). Type 1 = texte réglé dans le chunk : uint16 écart, uint16 hauteur, uint8
+; justification, uint16 x, uint8 police, texte. Types 2 à 7 = texte, réglages du INFO : 2
+; (droite à x, écart 5e champ), 3 (gauche à x, écart 6e), 4 (gauche à x, écart 0 : même ligne
+; que la précédente), 5 (droite, écart 6e), 6 (droite, écart 7e), 7 (centré sur x = 160, écart
+; 8e, police 13e). Justification : 0 centré (x − largeur / 2), 1 à droite (x − largeur), 2 à
+; gauche (x) ; largeur = GlyphObject_RenderToWidget_31A68. Type 8 = fin : uint16 écart,
+; hauteur 15, marque de fin (+0x15). Musique : entrée 24 de rmusic.pak (byte_46848 = 1) ou
+; amusic.pak (= 2) par Speech_LoadBank_28D24 → sub_8EAD ; arrêt en sortie (sub_28D49 →
+; sub_9128). DÉFILEMENT : groupe de calques (LayerGroup_Construct_2DC66, cadence = 1er champ
+; INFO), position verticale du groupe partie de 200 et diminuée de 1 à chaque image. Une ligne
+; entre dans le groupe quand position + haut < 200 ; si c'est la marque de fin, on attend 1200
+; tics ou une touche (Input_CheckSkip_D24A), fondu au noir (Palette_FadeToColor_2D09C, pas 2),
+; sortie. Une ligne sort quand position + bas < 0. Sortie aussi sur une touche ou quand la
+; dernière ligne parcourue est sortie. SCORE FINAL : police convfont.shp, couleur = indice de
+; palette le plus proche de (50, 50, 50) (sub_FA5F, somme des écarts absolus), écran noir puis
+; textes centrés : « Your well-deserved » y = 60, « Strike Commander final score is » y = 75,
+; « %D. » (dword_48E19, la variable que la pause affiche par « Game score: %ld ») y = 90, «
+; Congratulations. » y = 125 ; fondu depuis le noir, attente d'une touche sans limite, fondu
+; au noir. ARGUMENT 1 : « THE END » (police 0 du fichier) centré en (160, 97), fondu depuis le
+; noir, 300 tics ou une touche, fondu au noir, sortie sans défilement ni score. Appelée par le
+; relais sub_4268A : Gameflow_CheckLossConversations_50645 (1), Gameflow_PlayMidgame_4ABE0
+; pour PLAY_MIDGAME 36 (cas 35 après dec ax), après sa cinématique sub_42620 (0) ; la
+; cinématique de PLAY_MIDGAME 33 (cas 32, sub_A3C30) lit aussi credits.iff, sub_4A239 cas 0
+; (0).
+; ==============================================================================================
+Credits_Play_BDE10	proc far		; CODE XREF: sub_4268AJ
 
 var_192		= word ptr -192h
 var_135		= dword	ptr -135h
@@ -175,7 +217,7 @@ arg_0		= word ptr  6
 		jmp	loc_BE05C
 ; ���������������������������������������������������������������������������
 
-loc_BDF82:				; CODE XREF: sub_BDE10+16Dj
+loc_BDF82:				; CODE XREF: Credits_Play_BDE10+16Dj
 		lea	ax, [bp+var_192]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -244,7 +286,7 @@ loc_BDF82:				; CODE XREF: sub_BDE10+16Dj
 		mov	eax, [bp+var_11C]
 		mov	[bp+var_12D], eax
 
-loc_BE05C:				; CODE XREF: sub_BDE10+16Fj
+loc_BE05C:				; CODE XREF: Credits_Play_BDE10+16Fj
 		push	0
 		push	large 544C4150h
 		lea	ax, [bp+var_192]
@@ -256,7 +298,7 @@ loc_BE05C:				; CODE XREF: sub_BDE10+16Fj
 		jmp	loc_BE1F0
 ; ���������������������������������������������������������������������������
 
-loc_BE078:				; CODE XREF: sub_BDE10+263j
+loc_BE078:				; CODE XREF: Credits_Play_BDE10+263j
 		push	0
 		push	large 4F464E49h
 		lea	ax, [bp+var_192]
@@ -274,7 +316,7 @@ loc_BE078:				; CODE XREF: sub_BDE10+263j
 		jmp	loc_BE1C0
 ; ���������������������������������������������������������������������������
 
-loc_BE0AC:				; CODE XREF: sub_BDE10+3B9j
+loc_BE0AC:				; CODE XREF: Credits_Play_BDE10+3B9j
 		push	1
 		push	large 41544144h
 		lea	ax, [bp+var_192]
@@ -354,14 +396,14 @@ loc_BE0AC:				; CODE XREF: sub_BDE10+3B9j
 		add	sp, 8
 		jmp	short $+2
 
-loc_BE1AB:				; CODE XREF: sub_BDE10+37Bj
-					; sub_BDE10+382j
+loc_BE1AB:				; CODE XREF: Credits_Play_BDE10+37Bj
+					; Credits_Play_BDE10+382j
 		mov	[bp+var_46+2], 0
 		mov	byte ptr [bp+var_40+1],	0
 		mov	[bp+var_40+2], 0
 		inc	di
 
-loc_BE1C0:				; CODE XREF: sub_BDE10+299j
+loc_BE1C0:				; CODE XREF: Credits_Play_BDE10+299j
 		mov	al, byte ptr [bp+var_3A+1]
 		mov	ah, 0
 		cmp	ax, di
@@ -369,7 +411,7 @@ loc_BE1C0:				; CODE XREF: sub_BDE10+299j
 		jmp	loc_BE0AC
 ; ���������������������������������������������������������������������������
 
-loc_BE1CC:				; CODE XREF: sub_BDE10+3B7j
+loc_BE1CC:				; CODE XREF: Credits_Play_BDE10+3B7j
 		lea	ax, [bp+var_192]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -385,12 +427,12 @@ loc_BE1CC:				; CODE XREF: sub_BDE10+3B7j
 		jmp	short loc_BE1FB
 ; ���������������������������������������������������������������������������
 
-loc_BE1F0:				; CODE XREF: sub_BDE10+265j
+loc_BE1F0:				; CODE XREF: Credits_Play_BDE10+265j
 		push	2974h
 		call	Fatal_Error_310B
 		add	sp, 2
 
-loc_BE1FB:				; CODE XREF: sub_BDE10+3DEj
+loc_BE1FB:				; CODE XREF: Credits_Play_BDE10+3DEj
 		push	0
 		push	large 544E4F46h
 		lea	ax, [bp+var_192]
@@ -402,7 +444,7 @@ loc_BE1FB:				; CODE XREF: sub_BDE10+3DEj
 		jmp	loc_BE3A2
 ; ���������������������������������������������������������������������������
 
-loc_BE217:				; CODE XREF: sub_BDE10+402j
+loc_BE217:				; CODE XREF: Credits_Play_BDE10+402j
 		push	0
 		push	large 4F464E49h
 		lea	ax, [bp+var_192]
@@ -442,7 +484,7 @@ loc_BE217:				; CODE XREF: sub_BDE10+402j
 		jmp	loc_BE387
 ; ���������������������������������������������������������������������������
 
-loc_BE285:				; CODE XREF: sub_BDE10+580j
+loc_BE285:				; CODE XREF: Credits_Play_BDE10+580j
 		push	1
 		push	large 41544144h
 		lea	ax, [bp+var_192]
@@ -536,7 +578,7 @@ loc_BE285:				; CODE XREF: sub_BDE10+580j
 		mov	[bp+var_12D], eax
 		inc	di
 
-loc_BE387:				; CODE XREF: sub_BDE10+472j
+loc_BE387:				; CODE XREF: Credits_Play_BDE10+472j
 		mov	al, [bp+var_F]
 		mov	ah, 0
 		cmp	ax, di
@@ -544,7 +586,7 @@ loc_BE387:				; CODE XREF: sub_BDE10+472j
 		jmp	loc_BE285
 ; ���������������������������������������������������������������������������
 
-loc_BE393:				; CODE XREF: sub_BDE10+57Ej
+loc_BE393:				; CODE XREF: Credits_Play_BDE10+57Ej
 		lea	ax, [bp+var_192]
 		push	ax
 		call	ResourceRecord_ReleaseAndClear_3C595
@@ -552,18 +594,18 @@ loc_BE393:				; CODE XREF: sub_BDE10+57Ej
 		jmp	short loc_BE3AD
 ; ���������������������������������������������������������������������������
 
-loc_BE3A2:				; CODE XREF: sub_BDE10+404j
+loc_BE3A2:				; CODE XREF: Credits_Play_BDE10+404j
 		push	297Fh
 		call	Fatal_Error_310B
 		add	sp, 2
 
-loc_BE3AD:				; CODE XREF: sub_BDE10+590j
+loc_BE3AD:				; CODE XREF: Credits_Play_BDE10+590j
 		cmp	[bp+arg_0], 1
 		jz	short loc_BE3B6
 		jmp	loc_BE566
 ; ���������������������������������������������������������������������������
 
-loc_BE3B6:				; CODE XREF: sub_BDE10+5A1j
+loc_BE3B6:				; CODE XREF: Credits_Play_BDE10+5A1j
 		mov	byte ptr [bp+var_3C], 0
 		mov	byte ptr [bp+var_3C+1],	0
 		mov	byte ptr [bp+var_3A], 0
@@ -632,15 +674,15 @@ loc_BE3B6:				; CODE XREF: sub_BDE10+5A1j
 		jmp	short loc_BE48D
 ; ���������������������������������������������������������������������������
 
-loc_BE482:				; CODE XREF: sub_BDE10+697j
+loc_BE482:				; CODE XREF: Credits_Play_BDE10+697j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_BE48D
 		jmp	short loc_BE4A9
 ; ���������������������������������������������������������������������������
 
-loc_BE48D:				; CODE XREF: sub_BDE10+670j
-					; sub_BDE10+679j
+loc_BE48D:				; CODE XREF: Credits_Play_BDE10+670j
+					; Credits_Play_BDE10+679j
 		mov	eax, [bp+var_4F+1]
 		add	eax, [bp-4Ah]
 		cmp	eax, dword_47ABB
@@ -649,15 +691,15 @@ loc_BE48D:				; CODE XREF: sub_BDE10+670j
 		jmp	short loc_BE4A3
 ; ���������������������������������������������������������������������������
 
-loc_BE4A1:				; CODE XREF: sub_BDE10+68Aj
+loc_BE4A1:				; CODE XREF: Credits_Play_BDE10+68Aj
 		xor	ax, ax
 
-loc_BE4A3:				; CODE XREF: sub_BDE10+68Fj
+loc_BE4A3:				; CODE XREF: Credits_Play_BDE10+68Fj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_BE482
 
-loc_BE4A9:				; CODE XREF: sub_BDE10+67Bj
+loc_BE4A9:				; CODE XREF: Credits_Play_BDE10+67Bj
 		push	100h
 		push	0
 		push	2
@@ -726,18 +768,18 @@ loc_BE4A9:				; CODE XREF: sub_BDE10+67Bj
 		retf
 ; ���������������������������������������������������������������������������
 
-loc_BE566:				; CODE XREF: sub_BDE10+5A3j
+loc_BE566:				; CODE XREF: Credits_Play_BDE10+5A3j
 		mov	[bp+var_35], 0
 		jmp	short loc_BE57D
 ; ���������������������������������������������������������������������������
 
-loc_BE56C:				; CODE XREF: sub_BDE10+788j
+loc_BE56C:				; CODE XREF: Credits_Play_BDE10+788j
 		mov	[bp+var_35], 1
 		inc	[bp+var_A]
 		mov	eax, [bp+var_11C]
 		mov	[bp+var_12D], eax
 
-loc_BE57D:				; CODE XREF: sub_BDE10+75Aj
+loc_BE57D:				; CODE XREF: Credits_Play_BDE10+75Aj
 		mov	al, [bp+var_35]
 		mov	ah, 0
 		push	ax
@@ -763,7 +805,7 @@ loc_BE57D:				; CODE XREF: sub_BDE10+75Aj
 		jmp	loc_BE8F6
 ; ���������������������������������������������������������������������������
 
-loc_BE5C3:				; CODE XREF: sub_BDE10+AEEj
+loc_BE5C3:				; CODE XREF: Credits_Play_BDE10+AEEj
 		mov	al, [bp+var_35]
 		mov	ah, 0
 		push	ax
@@ -798,13 +840,13 @@ loc_BE5C3:				; CODE XREF: sub_BDE10+AEEj
 		add	ax, word ptr [bp+var_40+2]
 		mov	[si+4],	ax
 
-loc_BE62B:				; CODE XREF: sub_BDE10+7E4j
+loc_BE62B:				; CODE XREF: Credits_Play_BDE10+7E4j
 		cmp	byte ptr [bp+var_3A+1],	0
 		jz	short loc_BE634
 		jmp	loc_BE6D6
 ; ���������������������������������������������������������������������������
 
-loc_BE634:				; CODE XREF: sub_BDE10+81Fj
+loc_BE634:				; CODE XREF: Credits_Play_BDE10+81Fj
 		lea	ax, [bp+var_192]
 		push	ax
 		call	ResourceRecord_ReadFieldGroupB_3C2C4
@@ -858,7 +900,7 @@ loc_BE634:				; CODE XREF: sub_BDE10+81Fj
 		jmp	loc_BE8E6
 ; ���������������������������������������������������������������������������
 
-loc_BE6D6:				; CODE XREF: sub_BDE10+821j
+loc_BE6D6:				; CODE XREF: Credits_Play_BDE10+821j
 		cmp	byte ptr [bp+var_3A+1],	8
 		jnz	short loc_BE708
 		lea	ax, [bp+var_192]
@@ -877,7 +919,7 @@ loc_BE6D6:				; CODE XREF: sub_BDE10+821j
 		jmp	loc_BE8E6
 ; ���������������������������������������������������������������������������
 
-loc_BE708:				; CODE XREF: sub_BDE10+8CAj
+loc_BE708:				; CODE XREF: Credits_Play_BDE10+8CAj
 		mov	ax, word ptr [bp+var_120]
 		add	ax, 0FFFFh
 		mov	word ptr [bp+var_42], ax
@@ -890,7 +932,7 @@ loc_BE708:				; CODE XREF: sub_BDE10+8CAj
 		jmp	loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE722:				; CODE XREF: sub_BDE10+90Dj
+loc_BE722:				; CODE XREF: Credits_Play_BDE10+90Dj
 		shl	bx, 1
 		jmp	cs:off_BEE0B[bx] ; switch jump
 
@@ -916,7 +958,7 @@ loc_BE729:				; DATA XREF: ovr211:off_BEE0Bo
 		jmp	loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE765:				; CODE XREF: sub_BDE10+914j
+loc_BE765:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	1 ; case 0x1
 		mov	di, [bp+var_28]
@@ -929,7 +971,7 @@ loc_BE765:				; CODE XREF: sub_BDE10+914j
 		jmp	loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE781:				; CODE XREF: sub_BDE10+914j
+loc_BE781:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	2 ; case 0x2
 		mov	di, [bp+var_2A]
@@ -942,7 +984,7 @@ loc_BE781:				; CODE XREF: sub_BDE10+914j
 		jmp	short loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE79C:				; CODE XREF: sub_BDE10+914j
+loc_BE79C:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	2 ; case 0x3
 		mov	di, [bp+var_2A]
@@ -954,7 +996,7 @@ loc_BE79C:				; CODE XREF: sub_BDE10+914j
 		jmp	short loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE7B6:				; CODE XREF: sub_BDE10+914j
+loc_BE7B6:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	1 ; case 0x4
 		mov	di, [bp+var_28]
@@ -967,7 +1009,7 @@ loc_BE7B6:				; CODE XREF: sub_BDE10+914j
 		jmp	short loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE7D1:				; CODE XREF: sub_BDE10+914j
+loc_BE7D1:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	1 ; case 0x5
 		mov	di, [bp+var_28]
@@ -980,7 +1022,7 @@ loc_BE7D1:				; CODE XREF: sub_BDE10+914j
 		jmp	short loc_BE807	; default
 ; ���������������������������������������������������������������������������
 
-loc_BE7EC:				; CODE XREF: sub_BDE10+914j
+loc_BE7EC:				; CODE XREF: Credits_Play_BDE10+914j
 					; DATA XREF: ovr211:off_BEE0Bo
 		mov	byte ptr [bp+var_40+1],	0 ; case 0x6
 		mov	di, 0A0h ; '�'
@@ -992,8 +1034,8 @@ loc_BE7EC:				; CODE XREF: sub_BDE10+914j
 		mov	word ptr [bp+var_40+2],	ax
 		jmp	short $+2
 
-loc_BE807:				; CODE XREF: sub_BDE10+90Fj
-					; sub_BDE10+952j ...
+loc_BE807:				; CODE XREF: Credits_Play_BDE10+90Fj
+					; Credits_Play_BDE10+952j ...
 		push	word ptr [bp+var_42] ; default
 		call	CRT_Malloc16_Retry
 		add	sp, 2
@@ -1038,7 +1080,7 @@ loc_BE807:				; CODE XREF: sub_BDE10+90Fj
 		jmp	short loc_BE8AE
 ; ���������������������������������������������������������������������������
 
-loc_BE87D:				; CODE XREF: sub_BDE10+A3Cj
+loc_BE87D:				; CODE XREF: Credits_Play_BDE10+A3Cj
 		cmp	byte ptr [bp+var_40+1],	1
 		jnz	short loc_BE8AE
 		mov	al, byte ptr [bp+var_40]
@@ -1057,8 +1099,8 @@ loc_BE87D:				; CODE XREF: sub_BDE10+A3Cj
 		add	sp, 4
 		sub	di, ax
 
-loc_BE8AE:				; CODE XREF: sub_BDE10+A6Bj
-					; sub_BDE10+A71j
+loc_BE8AE:				; CODE XREF: Credits_Play_BDE10+A6Bj
+					; Credits_Play_BDE10+A71j
 		mov	ax, [bp+var_3C]
 		add	[bp+var_16], ax
 		mov	ax, [bp+var_16]
@@ -1078,21 +1120,21 @@ loc_BE8AE:				; CODE XREF: sub_BDE10+A6Bj
 		mov	ax, word ptr [bp+var_46+2]
 		mov	[si+7],	ax
 
-loc_BE8E6:				; CODE XREF: sub_BDE10+8C3j
-					; sub_BDE10+8F5j
+loc_BE8E6:				; CODE XREF: Credits_Play_BDE10+8C3j
+					; Credits_Play_BDE10+8F5j
 		mov	eax, [bp+var_11C]
 		mov	[bp+var_12D], eax
 		inc	[bp+var_38]
 		add	si, 16h
 
-loc_BE8F6:				; CODE XREF: sub_BDE10+7B0j
+loc_BE8F6:				; CODE XREF: Credits_Play_BDE10+7B0j
 		mov	ax, [bp+var_38]
 		cmp	ax, [bp+var_A]
 		jnb	short loc_BE901
 		jmp	loc_BE5C3
 ; ���������������������������������������������������������������������������
 
-loc_BE901:				; CODE XREF: sub_BDE10+AECj
+loc_BE901:				; CODE XREF: Credits_Play_BDE10+AECj
 		mov	[bp+var_192], 56Eh
 		lea	ax, [bp+var_192]
 		push	ax
@@ -1115,7 +1157,7 @@ loc_BE901:				; CODE XREF: sub_BDE10+AECj
 		jmp	short loc_BE97C
 ; ���������������������������������������������������������������������������
 
-loc_BE93E:				; CODE XREF: sub_BDE10+B25j
+loc_BE93E:				; CODE XREF: Credits_Play_BDE10+B25j
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1130,7 +1172,7 @@ loc_BE93E:				; CODE XREF: sub_BDE10+B25j
 		jmp	short loc_BE97C
 ; ���������������������������������������������������������������������������
 
-loc_BE95D:				; CODE XREF: sub_BDE10+B2Aj
+loc_BE95D:				; CODE XREF: Credits_Play_BDE10+B2Aj
 		push	ds
 		push	offset a_pak	; ".pak"
 		push	ds
@@ -1144,8 +1186,8 @@ loc_BE95D:				; CODE XREF: sub_BDE10+B2Aj
 		mov	[bp+var_2E], 1
 		jmp	short $+2
 
-loc_BE97C:				; CODE XREF: sub_BDE10+B2Cj
-					; sub_BDE10+B4Bj
+loc_BE97C:				; CODE XREF: Credits_Play_BDE10+B2Cj
+					; Credits_Play_BDE10+B4Bj
 		cmp	[bp+var_2E], 0
 		jz	short loc_BE991
 		push	18h
@@ -1154,7 +1196,7 @@ loc_BE97C:				; CODE XREF: sub_BDE10+B2Cj
 		call	Speech_LoadBank_28D24
 		add	sp, 4
 
-loc_BE991:				; CODE XREF: sub_BDE10+B70j
+loc_BE991:				; CODE XREF: Credits_Play_BDE10+B70j
 		push	word_46F46
 		push	0
 		push	[bp+var_18]
@@ -1169,7 +1211,7 @@ loc_BE991:				; CODE XREF: sub_BDE10+B70j
 		jmp	loc_BEB42
 ; ���������������������������������������������������������������������������
 
-loc_BE9BE:				; CODE XREF: sub_BDE10+D3Bj
+loc_BE9BE:				; CODE XREF: Credits_Play_BDE10+D3Bj
 		mov	[bp+var_35], 0
 		mov	[bp+var_36], 0
 		mov	ax, [bp+var_34]
@@ -1183,7 +1225,7 @@ loc_BE9BE:				; CODE XREF: sub_BDE10+D3Bj
 		jmp	short loc_BEA58
 ; ���������������������������������������������������������������������������
 
-loc_BE9DE:				; CODE XREF: sub_BDE10+C4Bj
+loc_BE9DE:				; CODE XREF: Credits_Play_BDE10+C4Bj
 		cmp	[bp+var_36], 0
 		jz	short loc_BE9E8
 		jmp	short loc_BEA5D
@@ -1191,7 +1233,7 @@ loc_BE9DE:				; CODE XREF: sub_BDE10+C4Bj
 		jmp	short loc_BEA4E
 ; ���������������������������������������������������������������������������
 
-loc_BE9E8:				; CODE XREF: sub_BDE10+BD2j
+loc_BE9E8:				; CODE XREF: Credits_Play_BDE10+BD2j
 		cmp	byte ptr [si+6], 0
 		jnz	short loc_BEA22
 		mov	ax, [bp+var_DC]
@@ -1204,26 +1246,26 @@ loc_BE9E8:				; CODE XREF: sub_BDE10+BD2j
 		jmp	short loc_BEA16
 ; ���������������������������������������������������������������������������
 
-loc_BEA06:				; CODE XREF: sub_BDE10+BEEj
+loc_BEA06:				; CODE XREF: Credits_Play_BDE10+BEEj
 		push	word ptr [si+7]
 		lea	ax, [bp+var_EA]
 		push	ax
 		call	LayerGroup_Add_2DB84
 		add	sp, 4
 
-loc_BEA16:				; CODE XREF: sub_BDE10+BF4j
+loc_BEA16:				; CODE XREF: Credits_Play_BDE10+BF4j
 		mov	byte ptr [si+6], 1
 		jmp	short loc_BEA20
 ; ���������������������������������������������������������������������������
 
-loc_BEA1C:				; CODE XREF: sub_BDE10+BE8j
+loc_BEA1C:				; CODE XREF: Credits_Play_BDE10+BE8j
 		mov	[bp+var_36], 1
 
-loc_BEA20:				; CODE XREF: sub_BDE10+C0Aj
+loc_BEA20:				; CODE XREF: Credits_Play_BDE10+C0Aj
 		jmp	short loc_BEA4E
 ; ���������������������������������������������������������������������������
 
-loc_BEA22:				; CODE XREF: sub_BDE10+BDCj
+loc_BEA22:				; CODE XREF: Credits_Play_BDE10+BDCj
 		cmp	byte ptr [si+6], 1
 		jnz	short loc_BEA4E
 		mov	ax, [bp+var_DC]
@@ -1237,29 +1279,29 @@ loc_BEA22:				; CODE XREF: sub_BDE10+BDCj
 		call	LayerGroup_Remove_2DBC1
 		add	sp, 4
 
-loc_BEA47:				; CODE XREF: sub_BDE10+C25j
+loc_BEA47:				; CODE XREF: Credits_Play_BDE10+C25j
 		mov	byte ptr [si+6], 2
 		mov	[bp+var_34], di
 
-loc_BEA4E:				; CODE XREF: sub_BDE10+BD6j
-					; sub_BDE10:loc_BEA20j	...
+loc_BEA4E:				; CODE XREF: Credits_Play_BDE10+BD6j
+					; Credits_Play_BDE10:loc_BEA20j	...
 		mov	al, [si+6]
 		mov	byte ptr [bp+var_38], al
 		inc	di
 		add	si, 16h
 
-loc_BEA58:				; CODE XREF: sub_BDE10+BCCj
+loc_BEA58:				; CODE XREF: Credits_Play_BDE10+BCCj
 		cmp	di, [bp+var_A]
 		jb	short loc_BE9DE
 
-loc_BEA5D:				; CODE XREF: sub_BDE10+BD4j
+loc_BEA5D:				; CODE XREF: Credits_Play_BDE10+BD4j
 		call	sub_D157
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_BEA6F
 		mov	[bp+var_31], 1
 
-loc_BEA6F:				; CODE XREF: sub_BDE10+C59j
+loc_BEA6F:				; CODE XREF: Credits_Play_BDE10+C59j
 		lea	ax, [bp+var_EA]
 		push	ax
 		call	LayerGroup_PlayFrame_2DD86
@@ -1269,7 +1311,7 @@ loc_BEA6F:				; CODE XREF: sub_BDE10+C59j
 		jmp	loc_BEB34
 ; ���������������������������������������������������������������������������
 
-loc_BEA85:				; CODE XREF: sub_BDE10+C70j
+loc_BEA85:				; CODE XREF: Credits_Play_BDE10+C70j
 		xor	eax, eax
 		mov	dword ptr [bp+var_3C], eax
 		mov	[bp+var_40], eax
@@ -1279,15 +1321,15 @@ loc_BEA85:				; CODE XREF: sub_BDE10+C70j
 		jmp	short loc_BEAAD
 ; ���������������������������������������������������������������������������
 
-loc_BEAA2:				; CODE XREF: sub_BDE10+CB7j
+loc_BEAA2:				; CODE XREF: Credits_Play_BDE10+CB7j
 		call	Input_CheckSkip_D24A
 		or	al, al
 		jz	short loc_BEAAD
 		jmp	short loc_BEAC9
 ; ���������������������������������������������������������������������������
 
-loc_BEAAD:				; CODE XREF: sub_BDE10+C90j
-					; sub_BDE10+C99j
+loc_BEAAD:				; CODE XREF: Credits_Play_BDE10+C90j
+					; Credits_Play_BDE10+C99j
 		mov	eax, [bp+var_40]
 		add	eax, [bp-3Ch]
 		cmp	eax, dword_47ABB
@@ -1296,15 +1338,15 @@ loc_BEAAD:				; CODE XREF: sub_BDE10+C90j
 		jmp	short loc_BEAC3
 ; ���������������������������������������������������������������������������
 
-loc_BEAC1:				; CODE XREF: sub_BDE10+CAAj
+loc_BEAC1:				; CODE XREF: Credits_Play_BDE10+CAAj
 		xor	ax, ax
 
-loc_BEAC3:				; CODE XREF: sub_BDE10+CAFj
+loc_BEAC3:				; CODE XREF: Credits_Play_BDE10+CAFj
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_BEAA2
 
-loc_BEAC9:				; CODE XREF: sub_BDE10+C9Bj
+loc_BEAC9:				; CODE XREF: Credits_Play_BDE10+C9Bj
 		mov	byte ptr [bp+var_46+2],	0
 		mov	byte ptr [bp+var_46+3],	0
 		mov	[bp+var_42], 0
@@ -1343,15 +1385,15 @@ loc_BEAC9:				; CODE XREF: sub_BDE10+C9Bj
 		call	Palette_Destruct_2D048
 		add	sp, 4
 
-loc_BEB34:				; CODE XREF: sub_BDE10+C72j
+loc_BEB34:				; CODE XREF: Credits_Play_BDE10+C72j
 		cmp	byte ptr [bp+var_38], 2
 		jnz	short loc_BEB3E
 		mov	[bp+var_31], 1
 
-loc_BEB3E:				; CODE XREF: sub_BDE10+D28j
+loc_BEB3E:				; CODE XREF: Credits_Play_BDE10+D28j
 		dec	[bp+var_DC]
 
-loc_BEB42:				; CODE XREF: sub_BDE10+BABj
+loc_BEB42:				; CODE XREF: Credits_Play_BDE10+BABj
 		mov	al, [bp+var_31]
 		mov	ah, 0
 		or	ax, ax
@@ -1359,7 +1401,7 @@ loc_BEB42:				; CODE XREF: sub_BDE10+BABj
 		jmp	loc_BE9BE
 ; ���������������������������������������������������������������������������
 
-loc_BEB4E:				; CODE XREF: sub_BDE10+D39j
+loc_BEB4E:				; CODE XREF: Credits_Play_BDE10+D39j
 		mov	byte ptr [bp+var_38], 0
 		mov	byte ptr [bp+var_38+1],	0
 		mov	[bp+var_36], 0
@@ -1495,7 +1537,7 @@ loc_BEB4E:				; CODE XREF: sub_BDE10+D39j
 		call	Input_Flush_CDDC
 		jmp	short $+2
 
-loc_BECEA:				; CODE XREF: sub_BDE10+EE3j
+loc_BECEA:				; CODE XREF: Credits_Play_BDE10+EE3j
 		call	Input_CheckSkip_D24A
 		mov	ah, 0
 		or	ax, ax
@@ -1542,8 +1584,8 @@ loc_BECEA:				; CODE XREF: sub_BDE10+EE3j
 		add	sp, 8
 		jmp	short $+2
 
-loc_BED64:				; CODE XREF: sub_BDE10+F34j
-					; sub_BDE10+F3Bj
+loc_BED64:				; CODE XREF: Credits_Play_BDE10+F34j
+					; Credits_Play_BDE10+F3Bj
 		mov	[bp+var_46], 0
 		mov	[bp+var_41], 0
 		mov	[bp+var_40], 0
@@ -1599,10 +1641,10 @@ loc_BED64:				; CODE XREF: sub_BDE10+F34j
 		pop	si
 		leave
 		retf
-sub_BDE10	endp
+Credits_Play_BDE10	endp
 
 ; ���������������������������������������������������������������������������
-off_BEE0B	dw offset loc_BE729	; DATA XREF: sub_BDE10+914r
+off_BEE0B	dw offset loc_BE729	; DATA XREF: Credits_Play_BDE10+914r
 		dw offset loc_BE765	; jump table for switch	statement
 		dw offset loc_BE781
 		dw offset loc_BE79C

@@ -175,6 +175,7 @@ ul.tree .o { font-size: 11.5px; color: var(--mark); border: 1px solid var(--mark
     <li><a href="#palette"><span>6b</span><span>Palette</span></a></li>
     <li><a href="#camr"><span>7</span><span>Caméras CAMR</span></a></li>
     <li><a href="#ponts"><span>8</span><span>Ponts campagne</span></a></li>
+    <li><a href="#credits"><span>9</span><span>Générique CREDITS</span></a></li>
     <li><a href="#ouvert"><span>—</span><span>Points ouverts</span></a></li>
   </ol>
 </nav>
@@ -1138,13 +1139,13 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       <tr><td>active au départ</td><td>uint8</td><td class="num">1</td><td>0 ou 1</td></tr>
       <tr><td>zone</td><td>int16</td><td class="num">2</td><td>index dans <code>AREA</code> (−1 = scène globale)</td></tr>
       <tr><td>script à l'activation</td><td>int16</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
-      <tr><td>script en quittant</td><td>int16</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
       <tr><td>script à chaque image</td><td>int16</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
-      <tr><td>position propre</td><td>uint8</td><td class="num">1</td><td>rangé en mémoire par le chargeur ; 0 ou 1 observés ; rôle non établi</td></tr>
-      <tr><td>cap</td><td>uint16</td><td class="num">2</td><td>rangé en mémoire par le chargeur ; 180 ou 0 observés ; rôle non établi</td></tr>
-      <tr><td>position X</td><td>float</td><td class="num">4</td><td>rangé en mémoire par le chargeur ; rôle non établi</td></tr>
-      <tr><td>position Z</td><td>float</td><td class="num">4</td><td>rangé en mémoire par le chargeur ; rôle non établi</td></tr>
-      <tr><td>position Y</td><td>float</td><td class="num">4</td><td>rangé en mémoire par le chargeur ; rôle non établi</td></tr>
+      <tr><td>script en quittant</td><td>int16</td><td class="num">2</td><td>numéro dans <code>PROG</code> (−1 = aucun)</td></tr>
+      <tr><td>point d'arrivée</td><td>uint8</td><td class="num">1</td><td>1 = la scène a un point d'arrivée du pilote automatique ; 0 ou 1 observés</td></tr>
+      <tr><td>cap d'arrivée</td><td>int16</td><td class="num">2</td><td>degrés, −1 = aucun ; 0, 90, 135, 180, 270 observés</td></tr>
+      <tr><td>position d'arrivée X</td><td>int32</td><td class="num">4</td><td>24.8 ; ÷ 256 → mètres ; libRealSpace x</td></tr>
+      <tr><td>position d'arrivée Z</td><td>int32</td><td class="num">4</td><td>24.8 ; ÷ 256 → mètres ; libRealSpace z = −valeur</td></tr>
+      <tr><td>position d'arrivée Y</td><td>int32</td><td class="num">4</td><td>24.8 ; ÷ 256 → mètres ; altitude, libRealSpace y</td></tr>
       <tr><td>liste d'objets</td><td>uint16&nbsp;×&nbsp;n</td><td class="num">2 × n</td><td>index dans <code>PART</code> ; n = (taille du chunk − 24) ÷ 2</td></tr>
     </tbody>
   </table></div>
@@ -1499,6 +1500,69 @@ position = décalage                         sinon (coordonnées absolues)</pre>
       </table></div>
     </div>
   </div>
+</article>
+
+<!-- ============================ CREDITS ============================ -->
+<article class="mv" id="credits">
+  <header><span class="id">MIDGAMES\CREDITS.IFF</span><h2>Le générique de fin</h2></header>
+  <ul class="chips"><li>racine <b>FORM CRED</b></li><li>lu par <b>OPTEST.EXE</b></li><li>lecteur <b>Credits_Play_BDE10</b></li></ul>
+  <p>Le texte et l'image du générique déroulant, avec sa palette et ses polices. Positions et longueurs en <b>pixels d'écran</b> (320 × 200, y vers le bas). Les lignes sont rangées dans l'ordre du défilement ; chacune est placée sous la précédente, décalée de son écart.</p>
+  <div class="treebox"><ul class="tree"><li><span class="t form">FORM CRED</span> <span class="d">racine du fichier MIDGAMES\CREDITS.IFF</span><ul><li><a href="#credits"><span class="t chunk">INFO</span></a> <span class="d">23 octets : réglages des lignes</span></li><li><a href="#credits"><span class="t form">FORM PALT</span></a> <span class="d">palettes</span><ul><li><a href="#credits"><span class="t chunk">INFO</span></a> <span class="d">uint8 nombre de chunks DATA</span></li><li><a href="#credits"><span class="t chunk">DATA</span></a> <span class="d">un bloc de palette</span></li></ul></li><li><a href="#credits"><span class="t form">FORM FONT</span></a> <span class="d">polices</span><ul><li><a href="#credits"><span class="t chunk">INFO</span></a> <span class="d">uint8 nombre de polices</span></li><li><a href="#credits"><span class="t chunk">DATA</span></a> <span class="d">une police (numéro = rang)</span></li></ul></li><li><a href="#credits"><span class="t chunk">LINE</span></a> <span class="d">une ligne du générique, autant que de lignes</span></li></ul></li></ul></div>
+
+  <h3>INFO (23 octets)</h3>
+  <p>« À droite » désigne les lignes de type 2, 5 et 6, alignées à droite sur leur x ; « à gauche » les types 3 et 4, alignés à gauche ; « titre » le type 7, centré.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>cadence</td><td>uint16</td><td class="num">2</td><td>images par seconde du défilement ; le texte monte d'un pixel par image (30 dans le fichier)</td></tr>
+      <tr><td>hauteur à droite</td><td>uint16</td><td class="num">2</td><td>hauteur des lignes de type 2, 5 et 6 (9)</td></tr>
+      <tr><td>hauteur à gauche</td><td>uint16</td><td class="num">2</td><td>hauteur des lignes de type 3 et 4 (9)</td></tr>
+      <tr><td>hauteur du titre</td><td>uint16</td><td class="num">2</td><td>hauteur des lignes de type 7 (9)</td></tr>
+      <tr><td>écart d'un intitulé</td><td>uint16</td><td class="num">2</td><td>écart avant une ligne de type 2 (40)</td></tr>
+      <tr><td>écart d'un nom</td><td>uint16</td><td class="num">2</td><td>écart avant une ligne de type 3 ou 5 (13)</td></tr>
+      <tr><td>écart d'une section</td><td>uint16</td><td class="num">2</td><td>écart avant une ligne de type 6 (50)</td></tr>
+      <tr><td>écart d'un titre</td><td>uint16</td><td class="num">2</td><td>écart avant une ligne de type 7 (100)</td></tr>
+      <tr><td>x à droite</td><td>uint16</td><td class="num">2</td><td>x des lignes de type 2, 5 et 6 (150)</td></tr>
+      <tr><td>x à gauche</td><td>uint16</td><td class="num">2</td><td>x des lignes de type 3 et 4 (170)</td></tr>
+      <tr><td>police à droite</td><td>uint8</td><td class="num">1</td><td>numéro de police des lignes de type 2, 5 et 6 (1)</td></tr>
+      <tr><td>police à gauche</td><td>uint8</td><td class="num">1</td><td>numéro de police des lignes de type 3 et 4 (0)</td></tr>
+      <tr><td>police du titre</td><td>uint8</td><td class="num">1</td><td>numéro de police des lignes de type 7 (0)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>FORM PALT : un bloc de palette (DATA)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Champ</th><th>Type</th><th>Octets</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>premier indice</td><td>uint8</td><td class="num">1</td><td>première couleur remplacée (0 dans le fichier)</td></tr>
+      <tr><td>—</td><td>uint8</td><td class="num">1</td><td>lu sans être utilisé (0)</td></tr>
+      <tr><td>nombre de couleurs</td><td>uint16</td><td class="num">2</td><td>256 dans le fichier</td></tr>
+      <tr><td>couleurs</td><td>nombre&nbsp;×&nbsp;3&nbsp;uint8</td><td class="num">3 × n</td><td>R, V, B sur 0 à 63</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le fichier a un seul bloc de 772 octets : la palette entière.</p>
+
+  <h3>FORM FONT : une police (DATA)</h3>
+  <p>Une police au format des archives de formes : un <code>uint32</code> (taille), puis la table des décalages des images, une image par caractère. Le fichier a deux polices ; leurs couleurs sont celles de leurs images.</p>
+
+  <h3>LINE : une ligne</h3>
+  <p>Le premier octet est le type de la ligne ; les champs qui suivent dépendent du type. Le texte occupe la fin du chunk et se termine par un octet nul.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Type</th><th>Rôle</th><th>Champs après le type</th><th>Réglages</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td>image</td><td><code>uint16</code> écart, <code>uint16</code> hauteur, <code>uint16</code> x, puis une forme (le reste du chunk)</td><td>image posée en (x, haut de la ligne)</td></tr>
+      <tr><td class="num">1</td><td>texte réglé dans la ligne</td><td><code>uint16</code> écart, <code>uint16</code> hauteur, <code>uint8</code> justification, <code>uint16</code> x, <code>uint8</code> police, texte</td><td>justification : 0 centré sur x, 1 aligné à droite sur x, 2 aligné à gauche sur x</td></tr>
+      <tr><td class="num">2</td><td>intitulé (« DESIGN », « Producer »)</td><td>texte</td><td>aligné à droite sur x à droite ; écart d'un intitulé ; hauteur et police à droite</td></tr>
+      <tr><td class="num">3</td><td>nom sur la ligne suivante</td><td>texte</td><td>aligné à gauche sur x à gauche ; écart d'un nom ; hauteur et police à gauche</td></tr>
+      <tr><td class="num">4</td><td>nom sur la même ligne que la précédente</td><td>texte</td><td>aligné à gauche sur x à gauche ; écart 0 ; hauteur et police à gauche</td></tr>
+      <tr><td class="num">5</td><td>intitulé rapproché</td><td>texte</td><td>aligné à droite sur x à droite ; écart d'un nom ; hauteur et police à droite (aucune ligne de ce type dans le fichier)</td></tr>
+      <tr><td class="num">6</td><td>section (« PROGRAMMING »)</td><td>texte</td><td>aligné à droite sur x à droite ; écart d'une section ; hauteur et police à droite</td></tr>
+      <tr><td class="num">7</td><td>titre (« STRIKE COMMANDER »)</td><td>texte</td><td>centré sur x = 160 ; écart d'un titre ; hauteur et police du titre</td></tr>
+      <tr><td class="num">8</td><td>fin du générique</td><td><code>uint16</code> écart</td><td>hauteur 15 ; rien n'est affiché</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Placement.</b> Le y courant part de 0. Pour chaque ligne, y augmente de son écart ; le haut de la ligne vaut ce y, le bas vaut y + hauteur. La largeur d'un texte est la somme des largeurs de ses caractères, plus 2 pixels entre deux caractères.</p>
+  <p><b>Contenu du fichier (constaté).</b> 269 lignes : 1 de type 0 (une image de 276 × 170 pixels, écart 150, hauteur 200, x = 0), 1 de type 1 (« Associate Producer »), 74 de type 2, 95 de type 3, 81 de type 4, 7 de type 6, 9 de type 7 et la ligne de fin (écart 196).</p>
 </article>
 
 <section id="ouvert">

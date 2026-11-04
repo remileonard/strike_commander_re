@@ -407,8 +407,8 @@ a_pak_3		db '.PAK',0             ; DATA XREF: Player_EjectSequence_7D31A+8Eo
 		dd VROOMM_StubThunk_6AC20
 		dd TrackedObject_NotifyWorldObjects_2DFE4
 		align 2
-byte_6D5DE	db 0			; DATA XREF: GlyphObject_Helper8_7EC45:loc_7ED86r
-					; GlyphObject_Helper8_7EC45:loc_7EDB5w	...
+byte_6D5DE	db 0			; DATA XREF: NavMap_PlaceLabel_7EC45:loc_7ED86r
+					; NavMap_PlaceLabel_7EC45:loc_7EDB5w	...
 aMission	db 'Mission:',0         ; DATA XREF: Expr_ResolveBuiltinCallSite_7E81D+2Fo
 aLeader		db 'Leader:',0          ; DATA XREF: Expr_ResolveBuiltinCallSite_7E81D+6Eo
 aWingman	db 'Wingman:',0         ; DATA XREF: Expr_ResolveBuiltinCallSite_7E81D+F8o

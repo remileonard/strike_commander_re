@@ -14,7 +14,7 @@ stru_42660	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg170:0756o
 
 ; Attributes: thunk
 
-sub_42680	proc far		; DATA XREF: dseg:29EAo sub_BDE10+F99o
+sub_42680	proc far		; DATA XREF: dseg:29EAo Credits_Play_BDE10+F99o
 		jmp	sub_BEE6A
 sub_42680	endp
 
@@ -23,7 +23,7 @@ sub_42680	endp
 
 ; Attributes: thunk
 
-sub_42685	proc far		; DATA XREF: sub_BDE10+78Do
+sub_42685	proc far		; DATA XREF: Credits_Play_BDE10+78Do
 		jmp	sub_BEE19
 sub_42685	endp
 
@@ -34,7 +34,7 @@ sub_42685	endp
 
 sub_4268A	proc far		; CODE XREF: sub_4A239+17DP
 					; Gameflow_PlayMidgame_4ABE0+137P ...
-		jmp	sub_BDE10
+		jmp	Credits_Play_BDE10
 sub_4268A	endp
 
 stub211		ends

@@ -118,7 +118,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 268 | `sub_A1E6D` | `PaletteScreen_DrawWidgetBorderB_A1E6D` | seg442 |
 | 267 | `sub_99650` | `Terrain_AllocateSectorBuffers_99650` | ovr292 |
 | 262 | `sub_88894` | `MissionRecord_LoadSubrecords_88894` | ovr253 |
-| 256 | `sub_7EC45` | `GlyphObject_Helper8_7EC45` | ovr241 |
+| 256 | `sub_7EC45` | `NavMap_PlaceLabel_7EC45` | ovr241 |
 | 255 | `sub_62BFE` | `Render_DrawOrMeasureTextVariantB_62BFE` | seg180 |
 | 254 | `sub_ABBEF` | `AudioQueue_MainProcessEntry_ABBEF` | seg461 |
 | 254 | `sub_53896` | `UIScreen_Construct_53896` | seg114 |

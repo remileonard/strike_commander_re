@@ -301,6 +301,14 @@ Pilot_IssueControlCommand_79DA0	endp
 ; (WorldObjects_RemoveAndDelete_223C5). Le bit 5 = 'accompagne le joueur au pilote
 ; automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le
 ; pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu.
+; COMPLÉMENT 2026-10-31 : arrivée du saut. La scène d'arrivée est trouvée par
+; Scene_FindMatchingByAreaContainment_53236 (di) ; si son octet +0x18 n'est pas nul (cmp byte
+; ptr [di+18h], 0), le point d'arrivée devient la position de la scène (+0x1B, 3× i32,
+; recopiés tels quels) et le cap celui de la scène (+0x19) ; cap -1 (cmp [bp+var_4A], 0FFFFh)
+; : pas de rotation ; autre cap : le nez (0, 1, 0) est tourné de -cap (neg ax / shl eax, 8 /
+; Vector_RotateHeading2D_556D4) ; vitesse 200 (mov [bp+var_58], 0C800h) ;
+; Pilot_LowLevelControlCommand → JDYN_JumpToPoint_49242 pose l'avion. IMPL_MISSION_AREAS.md §
+; 4.1.
 ; ==============================================================================================
 Autopilot_JumpSequence_7A054	proc far		; CODE XREF: VROOMM_StubThunk_6AC85J UIScript_Helper_7A79E+32p	...
 

@@ -3736,7 +3736,7 @@ loc_AEE1:				; DATA XREF: dseg:1727o dseg:1757o
 
 ; Attributes: bp-based frame
 
-sub_AEF4	proc far		; CODE XREF: sub_BDE10+A2DP
+sub_AEF4	proc far		; CODE XREF: Credits_Play_BDE10+A2DP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8

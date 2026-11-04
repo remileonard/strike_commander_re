@@ -45,7 +45,7 @@ VROOMM_StubThunk_6AE25	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE2A	proc far
-		jmp	GlyphObject_Helper5_7EB1C
+		jmp	NavMap_ReserveBox_7EB1C
 VROOMM_StubThunk_6AE2A	endp
 
 
@@ -58,7 +58,7 @@ VROOMM_StubThunk_6AE2A	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE2F	proc far
-		jmp	GlyphObject_Helper7_7EBCA
+		jmp	NavMap_IsBoxFree_7EBCA
 VROOMM_StubThunk_6AE2F	endp
 
 
@@ -71,7 +71,7 @@ VROOMM_StubThunk_6AE2F	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE34	proc far
-		jmp	GlyphObject_Helper8_7EC45
+		jmp	NavMap_PlaceLabel_7EC45
 VROOMM_StubThunk_6AE34	endp
 
 
@@ -175,7 +175,7 @@ VROOMM_StubThunk_6AE57	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE5C	proc far
-		jmp	GlyphObject_Helper3_7E72B
+		jmp	NavMap_WorldToScreen_7E72B
 VROOMM_StubThunk_6AE5C	endp
 
 
@@ -279,7 +279,7 @@ VROOMM_StubThunk_6AE7F	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AE84	proc far
-		jmp	Expr_ResolveStringEntry_7F5D5
+		jmp	NavMap_SetObjective_7F5D5
 VROOMM_StubThunk_6AE84	endp
 
 
@@ -370,7 +370,7 @@ VROOMM_StubThunk_6AEA2	endp
 ; d'overlay actuellement charge en memoire. fileoff=0AB70h, codesize=1C7Dh, nentries=28.
 ; ==============================================================================================
 VROOMM_StubThunk_6AEA7	proc far
-		jmp	GlyphObject_Helper6_7EB72
+		jmp	NavMap_ClampBox_7EB72
 VROOMM_StubThunk_6AEA7	endp
 
 stub241		ends

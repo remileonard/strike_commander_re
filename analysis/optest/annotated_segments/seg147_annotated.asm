@@ -1099,7 +1099,7 @@ ResourceRecord_ReadFieldGroupC_3C2EE	endp
 ; Référencée par sub_8DF49.
 ; ==============================================================================================
 ResourceRecord_ReadViaHelper_3C349	proc far		; CODE XREF: Gameflow_ShowMap_542AC+19DP
-					; sub_BDE10+A0EP
+					; Credits_Play_BDE10+A0EP
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
