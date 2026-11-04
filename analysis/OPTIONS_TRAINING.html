@@ -151,11 +151,11 @@ chaque tour avant le panneau. Aucune palette n'est chargée : c'est celle du vol
   <header><span class="id">2</span><h2>Méthode de dessin, commune aux 8 écrans</h2></header>
 
 <ol class="steps">
-<li>Image 0 du fichier <code>.SHP</code> de l'écran, en <b>(5, 4)</b> : bandeau « CONFIGURATION » (310 × 31).</li>
-<li>Image 1, en <b>(5, 39)</b> : fond du panneau. <b>Elle contient déjà tous les libellés</b> (boutons, titres,
-listes) dans leur aspect neutre.</li>
-<li>Boutons : image normale, image enfoncée au clic. Chaque image de bouton porte aussi son libellé.</li>
-<li>Jauges (listes à choix) et images choisies à l'exécution : § 6.</li>
+<li><span>Image 0 du fichier <code>.SHP</code> de l'écran, en <b>(5, 4)</b> : bandeau « CONFIGURATION » (310 × 31).</span></li>
+<li><span>Image 1, en <b>(5, 39)</b> : fond du panneau. <b>Elle contient déjà tous les libellés</b> (boutons, titres,
+listes) dans leur aspect neutre.</span></li>
+<li><span>Boutons : image normale, image enfoncée au clic. Chaque image de bouton porte aussi son libellé.</span></li>
+<li><span>Jauges (listes à choix) et images choisies à l'exécution : sections 5 à 11.</span></li>
 </ol>
 <p>Positions des boutons en coordonnées d'écran (320 × 200). Un bouton : rectangle (position, taille), image
 normale, image enfoncée, valeur écrite au clic.</p>
@@ -246,10 +246,10 @@ FLIGHT et de CAMERAS n'est pas établi. Référence : <code>analysis/OPTIONS_SCR
 <pre class="tpl">Training_Run_597B2
   banque midgames\rmusic.pak (amusic.pak si byte_46848 = 2)
   Training_InitSettings_598FC            réglages, altitude 5000 pieds
-  Training_TypeScreen_5547D              écrans de réglage (§ 13 à 15)
+  Training_TypeScreen_5547D              écrans de réglage (sections 14 et 15)
   stock d&#x27;armes de la partie, [partie+252] = 11
   Gameflow_WeaponLoadout_51AB3           écran d&#x27;armement de la campagne
-  Training_BuildInstantMission_58EEA     instant.iff (§ 17)
+  Training_BuildInstantMission_58EEA     instant.iff (sections 17 à 22)
 Gameflow_MainLoop_3D2E
   [partie+249] = 254, [partie+232] = 1   départ en vol, op2misn.iff avec « instant »</pre>
 
@@ -332,15 +332,15 @@ validé. Elle ouvre en lecture <code>..\..\data\missions\template.iff</code> et 
 sans chemin (répertoire courant). Le fichier produit est <b>une copie du modèle, chunk par chunk</b>, à laquelle
 s'ajoutent les objets choisis aux écrans. La fonction n'ouvre que ces deux fichiers.</p>
 <ol class="steps">
-<li>Ouverture de <code>FORM MISN</code>.</li>
-<li>Recopie des chunks du modèle <b>jusqu'au premier <code>AREA</code></b> (<code>ResourceRecord_CopyChunksUntilTag_3CBF6</code>).</li>
-<li><code>AREA</code> : le contenu du modèle, puis l'ajout du § 19.</li>
-<li>Recopie jusqu'au premier <code>FLAG</code>.</li>
-<li><code>FLAG</code>, <code>CAST</code>, <code>PART</code> : le modèle puis les ajouts. Chaque chunk est cherché par son tag
-dans le modèle, d'où l'ordre du fichier produit : <code>PART</code> avant <code>PROG</code>, à l'inverse du modèle.</li>
-<li><code>PROG</code>, <code>TEAM</code> recopiés.</li>
-<li><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout du § 21.</li>
-<li><code>LOAD</code> recopié ; fermeture de <code>FORM MISN</code>.</li>
+<li><span>Ouverture de <code>FORM MISN</code>.</span></li>
+<li><span>Recopie des chunks du modèle <b>jusqu'au premier <code>AREA</code></b> (<code>ResourceRecord_CopyChunksUntilTag_3CBF6</code>).</span></li>
+<li><span><code>AREA</code> : le contenu du modèle, puis l'ajout de la section 19.</span></li>
+<li><span>Recopie jusqu'au premier <code>FLAG</code>.</span></li>
+<li><span><code>FLAG</code>, <code>CAST</code>, <code>PART</code> : le modèle puis les ajouts. Chaque chunk est cherché par son tag
+dans le modèle, d'où l'ordre du fichier produit : <code>PART</code> avant <code>PROG</code>, à l'inverse du modèle.</span></li>
+<li><span><code>PROG</code>, <code>TEAM</code> recopiés.</span></li>
+<li><span><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout de la section 21.</span></li>
+<li><span><code>LOAD</code> recopié ; fermeture de <code>FORM MISN</code>.</span></li>
 </ol>
 <p>Le nombre d'enregistrements déjà présents est relevé au passage (<code>ResourceRecord_RecordCount_3C5D6</code> : taille
 du chunk ÷ taille d'un enregistrement) : 13 zones, 3 noms CAST, 3 objets PART. Les index écrits dans les ajouts
@@ -402,15 +402,15 @@ OP_SET_LABEL 78</pre>
 <div class="tablewrap"><table><thead><tr><th>Octets</th><th>Contenu</th><th>Valeur écrite</th><th>Lecture libRealSpace</th></tr></thead><tbody><tr><td>0</td><td>forme</td><td><code>S</code> (sphère)</td><td>—</td></tr><tr><td>1-32</td><td>nom</td><td>« Destroy bogeys », complété par des 0</td><td>—</td></tr><tr><td>33-36</td><td>c0, int32 24.8</td><td>−66000 × 256</td><td>x = −66000</td></tr><tr><td>37-40</td><td>c1, int32 24.8</td><td>128000 × 256</td><td>z = −128000</td></tr><tr><td>41-44</td><td>c2, int32 24.8</td><td>pieds × 256 (<code>shl eax, 8</code>)</td><td>y = 5000, 15000, 25000 ou 35000</td></tr><tr><td>45-48</td><td>rayon, int32 24.8</td><td>45000 × 256</td><td>45000</td></tr></tbody></table></div>
 
 <p class="note">L'altitude du centre est le <b>nombre de pieds recopié sans conversion</b>, alors que l'altitude des avions
-est convertie (§ 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
+est convertie (section 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
 contient de toute façon le joueur et tous les avions.</p>
 <h3>FLAG : le compteur d'avions (les deux types)</h3>
 <p>Un mot ajouté après FLAG[0] du modèle : <b>FLAG[1] = nombre total d'avions</b> (réglage +20 : somme des groupes ;
-0 en SEARCH AND DESTROY). Le programme 3 le décompte (§ 21).</p>
+0 en SEARCH AND DESTROY). Le programme 3 le décompte (section 21).</p>
 <h3>CAST : un pilote par avion (DOGFIGHT)</h3>
 <p>Un nom de 9 octets par avion, groupe après groupe, dans le même ordre que les objets PART. Ce sont des profils de
 pilote du dossier <code>INTEL</code> (<code>ROOKIE.IFF</code>, <code>VETERAN.IFF</code>, <code>ACE.IFF</code>,
-<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table du § 16) :</p>
+<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table de la section 16) :</p>
 <div class="tablewrap"><table><thead><tr><th>Avion</th><th>Nom CAST ajouté</th></tr></thead><tbody><tr><td>drapeau à 1 : F-15, F-16, F/A-18, F-22, YF-23, A-10, Tornado, Mirage 2000, MiG-21, MiG-29, Su-27</td><td>rookie, veteran ou ace (niveau choisi)</td></tr><tr><td>drapeau à 0 : C-130, E-3, Lear Jet, 747, TU-95</td><td>target</td></tr></tbody></table></div>
 </article>
 <article class="card" id="trn-part">

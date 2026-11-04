@@ -123,10 +123,10 @@ _X10 = table(['Écran', 'Position', 'Taille', 'Liste (d\'après le rendu)'], [
 _X11 = code("""Training_Run_597B2
   banque midgames\\rmusic.pak (amusic.pak si byte_46848 = 2)
   Training_InitSettings_598FC            réglages, altitude 5000 pieds
-  Training_TypeScreen_5547D              écrans de réglage (§ 13 à 15)
+  Training_TypeScreen_5547D              écrans de réglage (sections 14 et 15)
   stock d'armes de la partie, [partie+252] = 11
   Gameflow_WeaponLoadout_51AB3           écran d'armement de la campagne
-  Training_BuildInstantMission_58EEA     instant.iff (§ 17)
+  Training_BuildInstantMission_58EEA     instant.iff (sections 17 à 22)
 Gameflow_MainLoop_3D2E
   [partie+249] = 254, [partie+232] = 1   départ en vol, op2misn.iff avec « instant »""")
 _X12 = table(['Fichier', 'Contenu employé'], [
@@ -172,7 +172,7 @@ P1.append(card('alt-methode', '2', 'Méthode de dessin, commune aux 8 écrans', 
 <li>Image 1, en <b>(5, 39)</b> : fond du panneau. <b>Elle contient déjà tous les libellés</b> (boutons, titres,
 listes) dans leur aspect neutre.</li>
 <li>Boutons : image normale, image enfoncée au clic. Chaque image de bouton porte aussi son libellé.</li>
-<li>Jauges (listes à choix) et images choisies à l'exécution : § 6.</li>
+<li>Jauges (listes à choix) et images choisies à l'exécution : sections 5 à 11.</li>
 </ol>
 <p>Positions des boutons en coordonnées d'écran (320 × 200). Un bouton : rectangle (position, taille), image
 normale, image enfoncée, valeur écrite au clic.</p>
@@ -558,12 +558,12 @@ s'ajoutent les objets choisis aux écrans. La fonction n'ouvre que ces deux fich
 <ol class="steps">
 <li>Ouverture de <code>FORM MISN</code>.</li>
 <li>Recopie des chunks du modèle <b>jusqu'au premier <code>AREA</code></b> (<code>ResourceRecord_CopyChunksUntilTag_3CBF6</code>).</li>
-<li><code>AREA</code> : le contenu du modèle, puis l'ajout du § 19.</li>
+<li><code>AREA</code> : le contenu du modèle, puis l'ajout de la section 19.</li>
 <li>Recopie jusqu'au premier <code>FLAG</code>.</li>
 <li><code>FLAG</code>, <code>CAST</code>, <code>PART</code> : le modèle puis les ajouts. Chaque chunk est cherché par son tag
 dans le modèle, d'où l'ordre du fichier produit : <code>PART</code> avant <code>PROG</code>, à l'inverse du modèle.</li>
 <li><code>PROG</code>, <code>TEAM</code> recopiés.</li>
-<li><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout du § 21.</li>
+<li><code>FORM PLAY</code> : les scènes du modèle, puis l'ajout de la section 21.</li>
 <li><code>LOAD</code> recopié ; fermeture de <code>FORM MISN</code>.</li>
 </ol>
 <p>Le nombre d'enregistrements déjà présents est relevé au passage (<code>ResourceRecord_RecordCount_3C5D6</code> : taille
@@ -590,15 +590,15 @@ P2.append(card('trn-area', '19', 'Ajouts aux chunks AREA, FLAG et CAST', '''
 <p>Un enregistrement de sphère de 49 octets, placé après les 13 zones du modèle : c'est la zone 13.</p>
 ''' + _M4 + '''
 <p class="note">L'altitude du centre est le <b>nombre de pieds recopié sans conversion</b>, alors que l'altitude des avions
-est convertie (§ 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
+est convertie (section 20). Constaté dans le code ; l'effet en vol n'est pas vérifié. Avec un rayon de 45000 m, la sphère
 contient de toute façon le joueur et tous les avions.</p>
 <h3>FLAG : le compteur d'avions (les deux types)</h3>
 <p>Un mot ajouté après FLAG[0] du modèle : <b>FLAG[1] = nombre total d'avions</b> (réglage +20 : somme des groupes ;
-0 en SEARCH AND DESTROY). Le programme 3 le décompte (§ 21).</p>
+0 en SEARCH AND DESTROY). Le programme 3 le décompte (section 21).</p>
 <h3>CAST : un pilote par avion (DOGFIGHT)</h3>
 <p>Un nom de 9 octets par avion, groupe après groupe, dans le même ordre que les objets PART. Ce sont des profils de
 pilote du dossier <code>INTEL</code> (<code>ROOKIE.IFF</code>, <code>VETERAN.IFF</code>, <code>ACE.IFF</code>,
-<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table du § 16) :</p>
+<code>TARGET.IFF</code>) ; le choix vient du drapeau de l'avion (table de la section 16) :</p>
 ''' + _M5))
 
 P2.append(card('trn-part', '20', 'Le joueur et les avions : chunk PART', '''
@@ -667,6 +667,16 @@ TOC = [('alt-ouverture', '1', 'ALT+O'), ('alt-methode', '2', 'Méthode de dessin
        ('trn-scne', '21', 'Scène et scripts'), ('trn-exemple', '22', 'Exemple'), ('trn-strike', '23', 'Vers STRIKE.EXE')]
 
 
+def wrap_steps(page):
+    """Listes numérotées : la feuille de style (grille de 2 colonnes) attend le texte d'une étape dans un seul span."""
+    import re
+
+    def fix(m):
+        items = re.sub(r'<li>(?!<span>)(.*?)</li>', r'<li><span>\1</span></li>', m.group(0), flags=re.S)
+        return items
+    return re.sub(r'<ol class="steps">.*?</ol>', fix, page, flags=re.S)
+
+
 def main():
     toc = ''.join(f'    <li><a href="#{i}"><span>{n}</span><span>{t}</span></a></li>\n' for i, n, t in TOC)
     page = f'''<!doctype html>
@@ -703,6 +713,7 @@ def main():
 </body>
 </html>
 '''
+    page = wrap_steps(page)
     out = os.path.join(ROOT, 'OPTIONS_TRAINING.html')
     with open(out, 'w', encoding='utf-8') as f:
         f.write(page)
