@@ -9,14 +9,15 @@ ovr268		segment	para public 'OVERLAY' use16
 ; ==============================================================================================
 ; far, LUE 2026-11-04. Dessin de l'aperçu central du sous-écran DETAIL (ex-
 ; Cockpit_ApplyFormatAndDraw_91B70, renommée car elle ne sert qu'à DETAIL). Appelée par
-; Options_DetailScreen_91D29. Crée un cadre de 93 × 72 pixels (coordonnées (114,69) à
-; (206,140)), passé à TextRenderer_ApplyFormatChange_5E34D, puis dessine chaque image de
-; DETLOPT.SHP par Shape_DrawSpans_61F52. Choix des images selon la configuration reçue (si) :
+; Options_DetailScreen_91D29. Prépare une surface de 94 × 73 pixels (fenêtre (0,0)-(93,72),
+; TextRenderer_ApplyFormatChange_5E34D l'alloue) et un rectangle (114,69)-(206,140) = zone
+; vide au centre de l'image 1 de DETLOPT, où l'aperçu apparaît à l'écran ; dessine chaque
+; image de DETLOPT.SHP par Shape_DrawSpans_61F52 à l'origine (0,0) de la surface (images en
+; coordonnées locales 0..92 × 0..71). Choix des images selon la configuration reçue (si) :
 ; [si+90] toujours → 39 si non nul sinon 38 ; [si+86] → 40, [si+89] → 41, [si+85] → 42,
 ; [si+88] → 43, [si+87] → 44 (si non nul) ; [si+91] toujours → 46 si non nul sinon 45 ;
 ; [si+81] toujours → 49 si non nul sinon 50 ; [si+82] toujours → 48 et 51 si non nul sinon 47.
-; Rôle de TextRenderer_ApplyFormatChange_5E34D et Shape_DrawSpans_61F52 non établi (corps non
-; lu). Quel bouton écrit quel octet : non suivi. analysis/OPTIONS_SCREEN.md § 4.
+; Quel bouton écrit quel octet : non suivi. analysis/OPTIONS_SCREEN.md § 4.
 ; ==============================================================================================
 Options_DetailPreview_Draw_91B70	proc far		; CODE XREF: VROOMM_StubThunk_6B830J Options_DetailScreen_91D29+91Cp
 

@@ -181,10 +181,11 @@ Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d
   (243, 93) et (127, 159). Leur rôle n'est pas établi.
 - **Aperçu central** (zone noire de l'image 1) : dessiné par `Options_DetailPreview_Draw_91B70`
   (ex-`Cockpit_ApplyFormatAndDraw_91B70`, renommée ici car elle ne sert qu'à l'écran DETAIL ; lue le 2026-11-04).
-  - Cadre passé au dessin : 93 × 72 pixels, coordonnées (114, 69) à (206, 140). Ces dimensions sont celles des
-    images 38 et 39 ; la zone noire de l'image 1 les contient.
-  - Les images sont chargées depuis `DETLOPT.SHP` et dessinées une à une par `Shape_DrawSpans_61F52` dans le
-    même cadre. Choix d'image, selon des octets de la configuration reçue en argument (décimal) :
+  - **Emplacement** : la zone vide (transparente) au centre de l'image 1, de (114, 69) à (206, 140) à l'écran,
+    soit 93 × 72 pixels (mesuré sur l'image 1 posée en (5, 39)). Les images 38 à 51 sont en coordonnées locales
+    (x de 0 à 92, y de 0 à 71) : chacune se dessine avec son origine en **(114, 69)**.
+  - Les images sont dessinées une à une par `Shape_DrawSpans_61F52`, dans l'ordre du tableau, chacune par-dessus
+    les précédentes (calques). Choix d'image, selon des octets de la configuration reçue en argument (décimal) :
 
 | Octet de la configuration | Image dessinée |
 |---|---|
@@ -198,13 +199,26 @@ Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d
 | `[si+81]` (toujours) | 49 si non nul, 50 sinon |
 | `[si+82]` (toujours) | 48 et 51 si non nul, 47 sinon |
 
-  - Rendu de contrôle des images : 38 et 39 sont deux vues de terrain (sol vert, ciel), 44 une bande de terrain
-    gris, 49 un avion vu de dessus, 51 une tache de débris ; 40 (bande brune) n'est pas identifiée. Ces rôles
-    viennent de l'aspect des images, pas du code.
+  - Rendu de contrôle (`options_images/detail_apercu.png`) : à gauche tous les octets à zéro (38, 45, 50, 47), à
+    droite tous non nuls (39, 40 à 44, 46, 49, 48, 51). Étendue de chaque image dans le cadre :
+
+| Image | x | y |
+|---|---|---|
+| 38, 39 (fond de terrain) | 0 à 92 | 0 à 71 |
+| 40 | 0 à 23 | 24 à 64 |
+| 41 | 49 à 85 | 23 à 28 |
+| 42 | 15 à 39 | 30 à 46 |
+| 43 | 73 à 92 | 25 à 42 |
+| 44 | 2 à 92 | 38 à 71 |
+| 45, 46 | 27 à 80 | 24 à 40 |
+| 47, 48 | 41 à 84 | 29 à 62 |
+| 49, 50 (avion) | 21 à 61 | 3 à 38 |
+| 51 | 29 à 58 | 3 à 36 |
+
+![Aperçu de DETAIL, octets à zéro puis non nuls](options_images/detail_apercu.png)
+
   - **Non établi** : quel bouton écrit quel octet (la logique des clics n'est pas suivie) ; une hypothèse est que
-    `[si+90]` commande le choix entre les deux vues de terrain (GOURAUD). Le rôle de
-    `TextRenderer_ApplyFormatChange_5E34D` et de `Shape_DrawSpans_61F52` (corps non lu) : position ou découpe
-    du cadre, et d'où vient le décalage de chaque sous-image.
+    `[si+90]` commande le choix entre les deux vues de terrain (GOURAUD).
 
 ## 5. Tous les menus ouverts par ALT+O
 
