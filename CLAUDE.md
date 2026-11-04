@@ -342,6 +342,8 @@ strike_commander_re/
 │   ├── TRAINING_MISSION.md          TRAINING MISSION d'OPTEST (choix 3 du menu, ovr190) : 7 écrans (TM.SHP, OBJVIEW.PAK),
 │   │                                  réglages, table des 16 avions, construction d'instant.iff depuis TEMPLATE.IFF,
 │   │                                  op2misn.iff ; rendus dans training_images/
+│   ├── OPTIONS_TRAINING.html        version illustrée (HTML, images intégrées) d'OPTIONS_SCREEN.md et de TRAINING_MISSION.md
+│   │                                  (tools/options_training_html.py)
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace

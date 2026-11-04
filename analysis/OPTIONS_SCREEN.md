@@ -154,9 +154,9 @@ pas été établi (l'écran GAMEPLAY, qui les montre sans doute, n'est pas lu).
 
 Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d'images
 `FONTS\DETLOPT.SHP` (52 images). Image composée avec les images aux positions du code, sur fond noir :
-`options_images/detlopt.png`.
+`options_images/menu_detail.png`.
 
-![Sous-écran DETAIL](options_images/detlopt.png)
+![Sous-écran DETAIL](options_images/menu_detail.png)
 
 - **Titres et libellés des colonnes** (DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR) : dans
   l'image 1 ; le rendu, sans police, les montre.
