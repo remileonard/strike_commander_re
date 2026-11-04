@@ -4,6 +4,8 @@ Lu le 2026-11-04 dans `analysis/optest/annotated_segments/ovr190_annotated.asm` 
 appelées. Nombres en décimal ; positions d'écran en pixels de l'écran 320 × 200 ; positions du monde en mètres dans
 le repère de libRealSpace (Y = altitude ; lecture d'un fichier : `x = c0`, `y = c2`, `z = −c1`).
 
+Implémentation proposée pour libRealSpace (sans fichier `instant.iff`) : `IMPL_TRAINING_MISSION.md`.
+
 Outils :
 - `tools/instant_mission.py` reproduit la construction du fichier de mission et lit un fichier produit (§ 6) ;
 - `analysis/training_images/` : rendus des écrans (§ 3), faits avec les images du jeu aux positions du code.
