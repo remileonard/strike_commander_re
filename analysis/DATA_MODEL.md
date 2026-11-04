@@ -605,7 +605,7 @@ Capacités par type de point d'emport : voir `WeaponSys_LoadStoresOnHardpoint_9E
 **Mission et fumées.**
 - PART : vitesse initiale en m/s. Le 3ᵉ nom désigne l'armement imposé (FORM WEAP). Le camp remplace
   celui d'ALGN.
-- SCNE : rôle des octets 0x09 à 0x17 (drapeau, « cap », position) non établi.
+- SCNE : octets 9 à 23 = point d'arrivée du pilote automatique (drapeau, cap, position), lu par `Autopilot_JumpSequence_7A054`.
 - Fumées : mode 0 = disque ombré ; mode 1 = sprite opaque ; mode 2 = sprite avec les couleurs
   A..A+B−1 translucides, peintes par table[teinte + c − A][fond].
 
@@ -1621,11 +1621,11 @@ Layout confirmé (croisé avec le code + `MISSIONS\MISN-1A.IFF`) :
 | `0x03` | i16 | 1er script : quand la scène devient courante, après l'apparition de ses objets (ref `PROG`, `-1` = aucun ; `Scene_TriggerActivation_531CD`) | `Expr_LookupNamedValue_51E4A(ctx+0x40, …)` | `+0x08` (far ptr) |
 | `0x05` | i16 | 2e script : **à chaque image**, pour la scène globale et la scène courante (`MAIN_GAME_TICK` → `Scene_RunUpdateScript_531F2`) | idem | `+0x0C` |
 | `0x07` | i16 | 3e script : **quand la scène cesse d'être courante, et en fin de mission** (`Scene_RunLeavingScript_53211`) | idem | `+0x10` |
-| `0x09` | u8 | rôle non établi (valeurs des données : 0 ou 1) | — | `+0x18` |
-| `0x0A` | u16 | rôle non établi (valeurs des données : 0, 90, 135, 180, 270) | — | `+0x19` |
-| `0x0C` | i32 | c0 ÷ 256 → libRealSpace **X** ; rôle non établi | — | `+0x1B` |
-| `0x10` | i32 | c1 ÷ 256 → libRealSpace **Z** = −c1 ; rôle non établi | — | `+0x1F` |
-| `0x14` | i32 | c2 ÷ 256 → libRealSpace **Y** (altitude) ; rôle non établi | — | `+0x23` |
+| `0x09` | u8 | **point d'arrivée du pilote automatique** défini (0 ou 1) | copié tel quel | `+0x18` |
+| `0x0A` | i16 | **cap d'arrivée** en degrés, −1 = aucun (valeurs des données : 0, 90, 135, 180, 270) | copié tel quel | `+0x19` |
+| `0x0C` | i32 | position d'arrivée c0 ÷ 256 → libRealSpace **X** | copié tel quel | `+0x1B` |
+| `0x10` | i32 | position d'arrivée c1 ÷ 256 → libRealSpace **Z** = −c1 | copié tel quel | `+0x1F` |
+| `0x14` | i32 | position d'arrivée c2 ÷ 256 → libRealSpace **Y** (altitude) | copié tel quel | `+0x23` |
 | `0x18…` | u16 × `(taille−24)/2` | **liste d'unités** de la scène | `malloc` + copie brute | `+0x14` count, `+0x16` ptr |
 
 Le record en mémoire ajoute `+0x02` = back-ptr vers l'objet `PLAY` (contexte, = `arg`).

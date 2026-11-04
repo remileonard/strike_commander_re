@@ -30275,7 +30275,7 @@
 "sub_1CBCB"
 ],
 "new_name": "Autopilot_JumpSequence_7A054",
-"summary": "far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A : l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste (WorldObjects_RemoveAndDelete_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu."
+"summary": "far, 796L, LUE PARTIELLEMENT 2026-10-03. Ex-'UIScript_ParseAndEvaluate' (FAUX). SEQUENCE DE PILOTE AUTOMATIQUE (pose byte_6D558 autour de sa boucle). Quand la scene de destination differe de la scene courante (cmp di, [bp+var_E]) : parcourt la liste d'objets 0x59C3 ; pour chaque objet de mission dont MissionScenario_QueryFieldWrapper_A7FF0 repond 1 (objet monde +0x1D, controleur +0x52, et BIT 5 DE +0x39 EFFACE), appelle PartEntry_Deactivate_5242A : l'objet reste derriere ; les autres objets (bit 0 ou 5 de +4) sont retires de la liste (WorldObjects_RemoveAndDelete_223C5). Le bit 5 = 'accompagne le joueur au pilote automatique', pose par l'opcode de script 0xB8, efface par 0xB9 ; le chargeur de mission le pose sur l'objet du joueur. Puis altitude cible >= terrain + 2000 m. Reste non relu. COMPLÉMENT 2026-10-31 : arrivée du saut. La scène d'arrivée est trouvée par Scene_FindMatchingByAreaContainment_53236 (di) ; si son octet +0x18 n'est pas nul (cmp byte ptr [di+18h], 0), le point d'arrivée devient la position de la scène (+0x1B, 3× i32, recopiés tels quels) et le cap celui de la scène (+0x19) ; cap -1 (cmp [bp+var_4A], 0FFFFh) : pas de rotation ; autre cap : le nez (0, 1, 0) est tourné de -cap (neg ax / shl eax, 8 / Vector_RotateHeading2D_556D4) ; vitesse 200 (mov [bp+var_58], 0C800h) ; Pilot_LowLevelControlCommand → JDYN_JumpToPoint_49242 pose l'avion. IMPL_MISSION_AREAS.md § 4.1."
 },
 "sub_7A79E": {
 "segment": "ovr233",
@@ -30783,7 +30783,7 @@
 "sub_6064A"
 ],
 "new_name": "GlyphObject_DrawScaled_7E0BD",
-"summary": "⚠️ far, 143 lignes, NON DÉTAILLÉE — combine `Render_DrawScaledSprite_621A2` (seg175) et `GlyphObject_MeasureChar_6064A`."
+"summary": "far, 143L, LUE 2026-10-31. Écrit une chaîne avec une police (arguments : police, surface, x, y, texte far, couleur) ; rend le x qui suit le dernier caractère. Couleur : table de 256 octets tous égaux à la couleur demandée (boucle mov [bx], al jusqu'à cmp dx, 100h), passée à Render_DrawScaledSprite_621A2 avec A = octet 25 de la police (mov al, [si+19h]) et B = 1 (push 1) : seuls les pixels de la lettre dont la couleur vaut l'octet 25 de la police prennent la couleur demandée, les autres pixels gardent leur propre couleur. Lettres : si l'octet 26 de la police n'est pas nul, une lettre de « a » à « z » ou de « A » à « Z » devient octet 26 + rang de la lettre (sauf si l'octet 26 vaut déjà « a » ou « A », selon la casse). Caractère 10 : retour au x de départ et y + (octet 23 de la police) + 1. Autre caractère : image n° caractère de la forme obtenue par Memory_TypedAllocDispatchB_5C832 (police +2, +6), dessinée en (x, y + mot 14 de la police) à l'échelle 1 (push large 1000100h), puis x + avance du caractère (GlyphObject_MeasureChar_6064A). Fin au caractère 0. Appelée par GlyphObject_Helper_7E6E1 (police de la carte de navigation, [carte+52], y + 1)."
 },
 "sub_7E1B4": {
 "segment": "ovr241",
@@ -30839,7 +30839,7 @@
 "sub_65643"
 ],
 "new_name": "Font_LoadDefinitionFromIFF_7E1B4",
-"summary": "⭐⚠️ far, 482 lignes, NON DÉTAILLÉE — construit un StreamReader, valide un enregistrement IFF, lit de nombreux champs — référencée directement par `ResourceRecord_ReadDwordField_64AAE`/`64AFF` (seg193) dans des sessions précédentes sans être documentée. Probable chargeur complet de définition de police. Candidat pour session dédiée."
+"summary": "⭐⚠️ far, 482 lignes, NON DÉTAILLÉE — construit un StreamReader, valide un enregistrement IFF, lit de nombreux champs — référencée directement par `ResourceRecord_ReadDwordField_64AAE`/`64AFF` (seg193) dans des sessions précédentes sans être documentée. Probable chargeur complet de définition de police. Candidat pour session dédiée. COMPLÉMENT 2026-10-31 : chargeur de NAVMAP.IFF. Chunk INFO : 4 mots → [carte+0] gauche, [carte+2] haut, [carte+4] largeur, [carte+6] hauteur de la fenêtre (25, 23, 212, 154 dans les données), puis un int32 24.8 → [carte+20] demi-taille du monde (180 000 m) ; échelles [carte+24] = demi-taille / (largeur / 2) et [carte+28] = demi-taille / (hauteur / 2) (sar ax, 1 / idiv ebx). Puis FONT (police, [carte+52]) et TEXT."
 },
 "sub_7E5F2": {
 "segment": "ovr241",
@@ -30897,8 +30897,8 @@
 "lines": 70,
 "type": "far",
 "calls": [],
-"new_name": "GlyphObject_Helper3_7E72B",
-"summary": "far, aucun appel externe visible (70 lignes)."
+"new_name": "NavMap_WorldToScreen_7E72B",
+"summary": "far, 70L, LUE 2026-10-31. Position monde → écran de la carte de navigation (arguments : carte, vecteur position 3× i32 24.8, sorties x et y). x = [carte+0] + (c0 + [carte+20]) / [carte+24] ; y = [carte+2] + [carte+6] − (c1 + [carte+20]) / [carte+28] (division 24.8 : sar edx, 18h / shl eax, 8 / idiv ecx, puis partie entière). [carte+0], [carte+2], [carte+6] = gauche, haut, hauteur de la fenêtre et [carte+20] = demi-taille du monde, lus dans le chunk INFO de NAVMAP.IFF ; [carte+24] et [carte+28] = échelles (Font_LoadDefinitionFromIFF_7E1B4)."
 },
 "sub_7E7CC": {
 "segment": "ovr241",
@@ -30965,7 +30965,7 @@
 "type": "far",
 "calls": [],
 "new_name": "GlyphObject_Helper4_7EB0D",
-"summary": "far, aucun appel externe visible (13 lignes)."
+"summary": "far, 13L, LUE 2026-10-31. Vide la table des rectangles occupés de la carte de navigation ([carte+54] = 0) ; appelée au début de NavMap_DrawMissionObjects_7EDCA."
 },
 "sub_7EB1C": {
 "segment": "ovr241",
@@ -30974,8 +30974,8 @@
 "lines": 64,
 "type": "far",
 "calls": [],
-"new_name": "GlyphObject_Helper5_7EB1C",
-"summary": "far, aucun appel externe visible (64 lignes)."
+"new_name": "NavMap_ReserveBox_7EB1C",
+"summary": "far, 64L, LUE 2026-10-31. Réserve un rectangle (gauche, haut, largeur, hauteur) dans la table des rectangles occupés de la carte de navigation : nombre en [carte+54], gauches [carte+56+2i], hauts [carte+120+2i], droites [carte+184+2i], bas [carte+248+2i] (droite = gauche + largeur − 1, bas = haut + hauteur − 1) ; au plus 32 (cmp word ptr [si+36h], 20h). Appelée pour le repère 3 × 3 de chaque objet et pour chaque texte placé (NavMap_PlaceLabel_7EC45)."
 },
 "sub_7EB72": {
 "segment": "ovr241",
@@ -30984,8 +30984,8 @@
 "lines": 58,
 "type": "far",
 "calls": [],
-"new_name": "GlyphObject_Helper6_7EB72",
-"summary": "far, aucun appel externe visible (58 lignes)."
+"new_name": "NavMap_ClampBox_7EB72",
+"summary": "far, 58L, LUE 2026-10-31. Ramène le rectangle d'un texte de la carte de navigation dans la fenêtre des textes : si droite > 241 (cmp …, 0F1h), gauche = 241 − largeur + 1 ; si bas > 177 (0B1h), haut = 177 − hauteur + 1 ; puis gauche au moins 25 (19h) et haut au moins 23 (17h)."
 },
 "sub_7EBCA": {
 "segment": "ovr241",
@@ -30994,8 +30994,8 @@
 "lines": 103,
 "type": "far",
 "calls": [],
-"new_name": "GlyphObject_Helper7_7EBCA",
-"summary": "far, aucun appel externe visible (103 lignes)."
+"new_name": "NavMap_IsBoxFree_7EBCA",
+"summary": "far, 103L, LUE 2026-10-31. Vrai si le rectangle (gauche, haut, largeur, hauteur) est dans la fenêtre des textes (x de 25 à 241, y de 23 à 177) et ne recouvre aucun rectangle réservé (NavMap_ReserveBox_7EB1C) ; recouvrement, bornes incluses : droite réservée ≥ gauche, gauche réservée ≤ droite, bas réservé ≥ haut et haut réservé ≤ bas."
 },
 "sub_7EC45": {
 "segment": "ovr241",
@@ -31011,8 +31011,8 @@
 "sub_7EB1C",
 "sub_7E6E1"
 ],
-"new_name": "GlyphObject_Helper8_7EC45",
-"summary": "⚠️ far, 256 lignes, NON DÉTAILLÉE — aucun appel externe visible (calcul entièrement inline)."
+"new_name": "NavMap_PlaceLabel_7EC45",
+"summary": "far, 256L, LUE 2026-10-31. Écrit un texte près d'un point de la carte de navigation (arguments : carte, surface, x, y, texte, couleur), en majuscules (lettre de base « A » de la police, [police+26]). L = largeur du texte (GlyphObject_MeasureWrapper_7DFCA), H = [police+23] + 1. Essais dans l'ordre, coin haut-gauche : 0 (x − L/2, y + H/4) ; 1 (x − L/2, y − H − H/4) ; 2 (x + 3, y − H/2) ; 3 (x − L − 3, y − H/2) ; 4 (x − L/2, y + H) ; 5 (x − L/2, y − 2H) ; ensuite (x + 3, y − H/2) sans contrôle. Chaque essai est ramené dans la fenêtre (NavMap_ClampBox_7EB72) et gardé s'il est libre (NavMap_IsBoxFree_7EBCA), puis réservé (NavMap_ReserveBox_7EB1C). Si byte_6D5DE n'est pas nul et que l'essai 0 est pris, rien n'est écrit (le drapeau reste posé) ; sinon le texte est écrit par GlyphObject_Helper_7E6E1 en (gauche, haut + 1) et byte_6D5DE est remis à 0."
 },
 "sub_7EDCA": {
 "segment": "ovr241",
@@ -31043,7 +31043,7 @@
 "sub_7EC45"
 ],
 "new_name": "NavMap_DrawMissionObjects_7EDCA",
-"summary": "far, 1080L, LUE PARTIELLEMENT 2026-10-03 (trace des objets). Ex-'Render_DrawComplexShape' (nom generique). CARTE DE NAVIGATION : trace des objets de mission. Pour chaque objet de la table de mission (Expr_LookupTableEntry85B_52D45, enregistrements de 85 octets) ayant un controleur (+0x52) ET le BIT 4 de +0x39 (shl ax, 0Bh / sar ax, 0Fh ; pose par l'opcode de script 0xB6, efface par 0xB7, pose sur le joueur par le chargeur) : point (Render_SetPixelClipped_61B58) + glyphe 3x3 (GlyphObject_Helper5_7EB1C) a sa position (GlyphObject_Helper3_7E72B) ; couleur 0xE6 si camp +0x31 == 0xFF, 0xC7 si c'est le joueur (word_722E6), 0x1F sinon ; pour un avion (bit 2 de +4), decalage du trait selon le signe de la vitesse (seuil 0x40 en 24.8). Le reste (primitives d'ellipse et de rectangle) non relu."
+"summary": "far, 1080L, LUE 2026-10-31 en entier (ex-'Render_DrawComplexShape'). CARTE DE NAVIGATION : ce qui est dessiné sur la carte, en trois passes, après NavMap_ResetBoxes (GlyphObject_Helper4_7EB0D). (1) Contours des zones : pour chaque scène (scénario+58 nombre, +60 tableau, 39 octets) active, avec une zone dont le nom ne commence pas par « . » (cmp byte ptr es:[bx+2], 2Eh) : couleur 215 (0D7h), 238 (0EEh) si c'est la zone de l'objectif ([carte+314], NavMap_SetObjective_7F5D5) ; pixel au point de référence (zone+34, NavMap_WorldToScreen_7E72B) ; sphère : ellipse de demi-axes rayon (zone+46) / échelle X et / échelle Y (Render_DrawEllipseOutline_61612) ; cylindre : même ellipse avec le rayon zone+50 ; boîte : 4 traits (Render_FillClippedRect_61960) de x − ouest (zone+50) à x + est (zone+46) et de y − nord (zone+54) à y + sud (zone+58). (2) Objets : chaque objet de la table de mission (Expr_LookupTableEntry85B_52D45) créé (+0x52) et marqué (bit 4 de +0x39) : point de couleur 230 (0E6h) si camp +0x31 = 255, 199 (0C7h) pour le joueur (word_722E6), 31 sinon ; repère 3 × 3 réservé (NavMap_ReserveBox_7EB1C) ; second point en (x + 1, y) de la même couleur, ou pour un avion (bit 2 de +4) point de couleur 0 à l'opposé de la vitesse (seuil 0x40 en 24.8 sur c0 et c1) ; nom en couleur 31 (NavMap_PlaceLabel_7EC45) : chaîne ds:1449h pour le joueur, indicatif du pilote ([+0x55]+140) pour un autre avion, [objet+6] sinon. (3) Noms des zones, mêmes scènes qu'en (1) : couleur 223 (0DFh), 237 (0EDh) si la zone est dans la liste à scénario+104 (Parser_FindDuplicateSymbol ; rôle de la liste non établi), 199 (0C7h) si c'est la zone de l'objectif ; byte_6D5DE = 1, NavMap_PlaceLabel_7EC45 au point de référence, puis à y + 10, puis à y − 10 tant que rien n'est écrit, enfin byte_6D5DE = 0 et dernier appel au point de référence."
 },
 "sub_7F587": {
 "segment": "ovr241",
@@ -31071,8 +31071,8 @@
 "sub_50EC8",
 "sub_52DDB"
 ],
-"new_name": "Expr_ResolveStringEntry_7F5D5",
-"summary": "far, combine `Str_GetNthEntry_50EC8` (seg114) et `Expr_LookupNamedValue_52DDB` (seg114)."
+"new_name": "NavMap_SetObjective_7F5D5",
+"summary": "far, 106L, LUE 2026-10-31 (ex-NavMap_SetObjective_7F5D5). Prépare l'objectif affiché sur la carte de navigation à partir de l'ordre de navigation courant (enregistrement bx : +6 ordre, +7 argument, +8 numéro de message). [carte+314], [carte+318] et [carte+322] remis à 0 ; message ≠ −1 : [carte+322] = texte du message (Str_GetNthEntry_50EC8, liste MSGS) ; ordres 164, 165 (OP_SET_OBJ_FLY_TO_WP) et 166 (OP_SET_OBJ_FLY_TO_AREA) : [carte+314] = zone du SPOT de l'argument (premier champ de l'enregistrement de 16 octets, liste à scénario+30) ; ordres 167 à 170 : [carte+318] = objet visé (Expr_LookupNamedValue_52DDB). Appelée par Lexer_AdvanceWrapper_7F69C et les autres déplacements dans la liste des ordres de navigation."
 },
 "sub_7F69C": {
 "segment": "ovr241",
@@ -44671,7 +44671,7 @@
 "sub_64A19"
 ],
 "new_name": "MissionScene_ParseRecord_AA3A5",
-"summary": "far,123L — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (ReadFieldGroupA) : +0x00 u8 active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG à l'activation / en quittant / à chaque image (-1 = aucun ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 ; +0x0A u16 → record+0x19 ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23. Rôle des champs record+0x18 à +0x26 (drapeau, « cap », position) non établi. Puis (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. Vérifié sur MISSIONS/MISN-1A.IFF."
+"summary": "far,123L, relue 2026-10-31 — parse un chunk 'SCNE' (scène) en un record de 0x27 octets (appelé par MissionPlay_LoadScenes_AA595). En-tête disque de 24 octets (push large 18h / ResourceRecord_ReadFieldGroupA_64A19) : +0x00 u8 active au départ ; +0x01 u16 zone (index AREA, -1 = scène globale ; PtrList_GetAt_53034(ctx+0x1A) → record+0x04) ; +0x03/+0x05/+0x07 3× i16 scripts PROG : à l'activation, à chaque image, en quittant (-1 = aucun ; Expr_LookupNamedValue_51E4A(ctx+0x40) → record+0x08/+0x0C/+0x10) ; +0x09 u8 → record+0x18 = point d'arrivée du pilote automatique défini ; +0x0A i16 → record+0x19 = cap d'arrivée en degrés (-1 = aucun) ; +0x0C/+0x10/+0x14 3× i32 24.8 → record+0x1B/+0x1F/+0x23 = position d'arrivée absolue. Ces champs d'arrivée sont lus par Autopilot_JumpSequence_7A054. Puis (taille − 24)/2 u16 = index dans PART des objets de la scène → record+0x14 nombre, +0x16 tableau. IMPL_MISSION_AREAS.md § 4.1."
 },
 "sub_AA49A": {
 "segment": "seg457",

@@ -403,7 +403,7 @@ loc_31358:				; DATA XREF: dseg:1DC9o dseg:381Co ...
 ; Attributes: bp-based frame
 
 sub_3139A	proc far		; CODE XREF: Midgame1_PlayPart1_5FCF0+6497P
-					; sub_BDE10+DDDP
+					; Credits_Play_BDE10+DDDP
 					; DATA XREF: ...
 
 arg_0		= word ptr  6

@@ -123,7 +123,7 @@ ProgBuffer_FindSubProgramByIndex_50E94	endp
 ; far, enveloppe bornée de Str_SeekNthEntryByte : retourne un pointeur nul si l'index dépasse
 ; le compteur en tête de structure.
 ; ==============================================================================================
-Str_GetNthEntry_50EC8	proc far		; CODE XREF: Expr_ResolveStringEntry_7F5D5:loc_7F61EP
+Str_GetNthEntry_50EC8	proc far		; CODE XREF: NavMap_SetObjective_7F5D5:loc_7F61EP
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
