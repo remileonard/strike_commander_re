@@ -230,7 +230,7 @@ RIVERS (22, 106) 8/9, FIELDS (22, 119) 10/11, CITIES (22, 132) 12/13, RUNWAYS (2
 OBJECTS GOURAUD (226, 67) 26/27, TEXTURE (226, 80) 28/29 ; EXIT (244, 132) 36/37.
 
 FLIGHT (`FLITOPT.SHP`) : MIDAIR COLLISIONS (121, 62) 29/30, EASY LANDINGS (121, 81) 31/32, STALLS (121, 119)
-36/37, EXIT (131, 176) 38/39. SHOW WEAPONS (121, 100) et CALIBRATE JOYSTICK (93, 146) : images dynamiques (§ 5.4).
+36/37, EXIT (131, 176) 38/39. SHOW WEAPONS (121, 100) 33/34 (fixe, § 5.4) ; CALIBRATE JOYSTICK (93, 146) : images dynamiques (§ 5.4).
 
 GAMEPLAY (`GAMEOPT.SHP`) : UNLIMITED AMMO (48, 70) 2/3, EASY GUN HITS (48, 90) 4/5, EXIT (129, 122) 12/13.
 
@@ -240,7 +240,7 @@ Libellés d'après le rendu : gauche LADDER, TAPES, AUTO TARGET, 360 TARGET LOCK
 droite SUN GLARE, G EFFECTS, SMART RADAR, 360 AA RADAR, SMART RAW SCOPE.
 
 CAMERAS (`CAMROPT.SHP`) : AUTO SWITCHING (22, 60) 2/3, VICTIM VIEW (164, 60) 4/5, WEAPON CAMERA (22, 73) 6/7 ;
-TERRAIN IN GUN CAMERA (164, 73) dynamique (§ 5.4) ; EXIT (129, 124) 17/18.
+TERRAIN IN GUN CAMERA (164, 73) : 8/9 ou 10/10 selon la mémoire (§ 5.4) ; EXIT (129, 124) 17/18.
 
 AUDIO (`AUDIOPT.SHP`) : MUSIC (88, 63), SOUND FX (88, 76), SPEECH (165, 63), DIGITAL FX (165, 76) :
 toutes dynamiques (§ 5.4) ; EXIT (129, 101) 14/15.
@@ -286,15 +286,38 @@ Une paire dont les deux images sont identiques (4, 4 ; 10, 10 ; 7, 7 ; 13, 13) e
 désactivé, mais l'aspect de ces images n'a pas été vérifié. Quelle paire correspond à « activé » dépend
 du sens des drapeaux, non établi.
 
-**FLIGHT, CAMERAS, EXIT GAME : non résolus.** Les paires sont calculées à partir de variables locales
-(FLIGHT : SHOW WEAPONS par défaut 33 / 34, CALIBRATE JOYSTICK par défaut 40 / 41, puis remplacées selon
-un état ; CAMERAS : TERRAIN IN GUN CAMERA = base + décalage ; EXIT GAME, élément vertical = base + 70).
-Il reste à remonter ces variables jusqu'aux champs de la configuration.
+**FLIGHT (résolu en partie).**
+
+- SHOW WEAPONS (121, 100) : paire 33 / 34, écrite une fois en début de fonction et jamais modifiée.
+  Elle est donc fixe, pas dynamique.
+- CALIBRATE JOYSTICK (93, 146) : normale = variable de la paire 40 ; enfoncée = variable de la paire 41.
+  Si l'octet brut du bouton 0 de la manette (`Joystick_GetButtonRawByte_67B82`, argument 0) est nul,
+  les deux variables deviennent 42.
+  Vérifié par rendu : l'image 42 porte un libellé différent, « JOYSTICK CALIBRATION », alors que les
+  images 40 et 41 portent « CALIBRATE JOYSTICK ». Le fond (image 1) contient aussi « CALIBRATE JOYSTICK » ;
+  la superposition réelle sous la condition n'a pas été vérifiée.
+  La condition n'est pas nommée : l'octet brut peut indiquer une manette présente (hypothèse).
+- Un second drapeau, `byte_72E6C`, change d'autres variables (`var_10`, `var_12`, `var_6`) : quand il est
+  nul, `var_12` et `var_10` valent 17, et `var_6` vaut 6. Ces variables sont lues plus loin, et la
+  cible de cette lecture n'est pas tracée.
+
+**CAMERAS (résolu en partie).**
+
+- TERRAIN IN GUN CAMERA (164, 73) : normale = variable de la paire 8, enfoncée = variable de la paire 9.
+  Si la valeur dword renvoyée par `Memory_TypedAllocDispatchC_5C86D` (appelée avec l'argument 5C44h)
+  est inférieure à 40960 (`cmp eax, 0A000h` / `jge`), les deux variables deviennent 10.
+  Vérifié par rendu : les images 8 et 9 sont le libellé « TERRAIN IN GUN CAMERA » normal et enfoncé ;
+  l'image 10 porte le même libellé avec un aspect plus clair, sans doute l'état désactivé (non vérifié).
+  La sémantique de la valeur renvoyée n'est pas établie : la mémoire disponible est une hypothèse.
+
+**EXIT GAME : non résolu.** L'élément vertical (290, 55) prend ses images de `var_A + 70` (lignes 436 et
+438 de la fonction), dont le second terme n'est pas tracé.
 
 ### 5.5 Points ouverts pour l'implémentation
 
 - Lire `GaugeWidget_DrawByMode_A39DC` : mise en évidence de l'élément choisi, et images utilisées.
-- Résoudre les paires dynamiques de FLIGHT, CAMERAS et EXIT GAME (§ 5.4).
+- Résoudre les paires dynamiques restantes : EXIT GAME, et les deux conditions de FLIGHT et de CAMERAS (§ 5.4).
+- Cible des variables `var_10`, `var_12` et `var_6` de FLIGHT, lues plus loin, et sens de `byte_72E6C`.
 - Identifier les drapeaux `byte_70996` et `word_70999`, et le sens des paires « activé » / « désactivé ».
 - Rôle des champs écrits par ROOKIE, VETERAN, ACE (§ 2.4).
 - Vérifier chaque libellé d'après le rendu (les noms de § 5.2 ne sont pas lus dans le code).
