@@ -801,7 +801,7 @@ loc_7A4C0:				; CODE XREF: Autopilot_JumpSequence_7A054+420j
 loc_7A4C9:				; CODE XREF: Autopilot_JumpSequence_7A054+418j
 					; Autopilot_JumpSequence_7A054+435j
 		push	51E2h
-		call	Config_ReadCalibration
+		call	Input_AltKeyCommands_26F7E
 		pop	cx
 		mov	byte_6D558, 0
 

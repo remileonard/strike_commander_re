@@ -48,6 +48,8 @@ rechercher chaque nom dans `known_functions.json`. À ne pas reproduire.)*
   l'instruction (`if (valeur == 1) {` … `}`) ;
 - **une seule instruction par ligne**, y compris les déclarations (`int a;` puis `int b;`, jamais `int a, b;`) ;
 - une liste d'initialisation de plus d'une valeur (tableau, enum…) : **une valeur par ligne**.
+- **pas de lambda** : une action (bouton, zone, rappel) est une **méthode de l'objet**, passée avec
+  `std::bind(&Classe::methode, this, …)` comme dans le reste de libRealSpace.
 
 Après chaque modification : `clang-format --style=file:tools/sc_player/.clang-format -i <fichiers>`
 puis `python3 tools/sc_player/tools/style_check.py <fichiers>` (doit ne rien signaler ;
@@ -241,7 +243,8 @@ visionneuse d'objets 3D (`objview.pak`), générique et score final.
 - Analyse dans **`analysis/optest/`** : `known_functions.json`, `function_index.json`,
   `segment_boundaries.json`, `annotated_segments/`, `strike_matches.json`.
 - Tous les outils de consultation et de génération prennent **`--exe optest`** (défaut `strike`),
-  chemins dans `tools/exe_paths.py`.
+  chemins dans `tools/exe_paths.py`. Troisième exécutable : **`--exe topt`** = `TOPTTST1.EXE` de
+  Tactical Operations, sans base IDA (listing reconstruit, `analysis/topt/README.md`).
 - **Noms repris de STRIKE.EXE** par `tools/match_functions.py --write` : 567 fonctions dont le
   code est identique (412) ou de même suite d'instructions avec des adresses de données
   différentes (155, « à vérifier »), appels sortants contrôlés. Leur résumé commence par
@@ -267,8 +270,12 @@ strike_commander_re/
 │   ├── strike.asm                   désassemblage IDA complet (371 062 lignes)
 │   ├── strike.map                   fichier map du linker
 │   ├── optest.asm                   désassemblage IDA d'OPTEST.EXE (358 861 lignes)
-│   └── optest.map                   fichier map d'OPTEST.EXE
+│   ├── optest.map                   fichier map d'OPTEST.EXE
+│   └── topttst1.asm                 TOPTTST1.EXE (Tactical Operations), listing reconstruit au format IDA
+│                                      par tools/vroomm_listing.py — analysis/topt/README.md
 ├── analysis/
+│   ├── topt/                        analyse de TOPTTST1.EXE (Tactical Operations, --exe topt) : README.md,
+│   │                                  known_functions, cinématiques (midgames/, iff/), midgame_engine.json porté
 │   ├── optest/                      analyse d'OPTEST.EXE : mêmes fichiers que ci-dessous
 │   │                                  (known_functions, index, annotated_segments)
 │   │                                  + strike_matches.json — voir « OPTEST.EXE »
@@ -318,6 +325,11 @@ strike_commander_re/
 │   │                                  au sol, camp, allié par défaut = chef, poste en formation, repère du joueur ; chunks LOAD, CACH et SPOT) — RSMission, SCMission, SCProg…
 │   ├── IMPL_OBJECT_RENDER.md        à porter dans SCRenderer : gammes RANG, éclairage par type de face,
 │   │                                  normales, textures, brouillard, LOD — C++ vérifié à la compilation
+│   ├── OPTIONS_SCREEN.md            panneau CONFIGURATION du vol (ALT+O) : § 5 = tous les menus (images, boutons, jauges, paires dynamiques) ; options_layout.json (tools/options_layout.py) : touches ALT (Input_AltKeyCommands_26F7E), MAINOPT.SHP,
+│   │                                  13 boutons, sous-écrans Options_*Screen_*, OPTIONS.CFG / OPTDFLT.CFG ; image dans options_images/
+│   ├── menu_cd/                     MENU.EXE du CD-ROM : intro THEFLIC.FLX puis menu Strike Commander / Tactical Operations (code de sortie 10 / 11)
+│   │                                  ; FLX_FORMAT.md : format de THEFLIC.FLX (palettes, images LZW, blocs 4 × 4, images par lignes)
+│   ├── IMPL_FLIC_INTRO.md           à porter : intro du CD (RSFlic + SCFlicPlayer, RSMusic::GetMidgamesPak, main.cpp) — tools/flic_ref/
 │   ├── optest_cd/                   OPTTEST.EXE du CD-ROM (sans IDA, exe_disasm.py) : listings des
 │   │                                  conversations avec voix — CONV_SYSTEM.md § 8
 │   ├── CONV_SYSTEM.md               conversations d'OPTEST : format de CONV.PAK (commandes 00h–10h),
@@ -329,6 +341,13 @@ strike_commander_re/
 │   ├── GAMEFLOW_SYSTEM.md           déroulement de la campagne (OPTEST) : GAMEFLOW.IFF, boucle principale,
 │   │                                  scènes et REQU, les 39 commandes des scripts EFCT (43 sur CD), compte rendu
 │   │                                  de vol misn2op.iff, écarts avec SCGameFlow de libRealSpace
+│   ├── TRAINING_MISSION.md          TRAINING MISSION d'OPTEST (choix 3 du menu, ovr190) : 7 écrans (TM.SHP, OBJVIEW.PAK),
+│   │                                  réglages, table des 16 avions, construction d'instant.iff depuis TEMPLATE.IFF,
+│   │                                  op2misn.iff ; rendus dans training_images/
+│   ├── IMPL_TRAINING_MISSION.md     à porter : l'entraînement sans fichier (RSMission::addTraining dans SCMission::loadMission,
+│   │                                  réglages dans SCState, 7 écrans de SCTrainingMenu) — tools/training_ref/
+│   ├── OPTIONS_TRAINING.html        version illustrée (HTML, images intégrées) d'OPTIONS_SCREEN.md et de TRAINING_MISSION.md
+│   │                                  (tools/options_training_html.py)
 │   ├── MIDGAME_SYSTEM.md            cinématiques d'OPTEST (moteur de scène, calques, déplacements,
 │   │                                  suites d'images, bouches, fondus) ; mid1 en exemple ; rapport
 │   │                                  avec SCAnimationArchive de libRealSpace
@@ -373,12 +392,21 @@ strike_commander_re/
     ├── tre_extract.py               extrait BIGTRE.TRE (données du jeu, jamais dans le dépôt)
     ├── midgame_check.py             lecteur de contrôle d'un MID_*.IFF, comparé au rendu de référence
     │                                  (règles = spécification de SCAnimationPlayer, MID1_PLANS.md)
+    ├── vroomm_listing.py            listing au format IDA d'un EXE Borland à overlays VROOMM (capstone) :
+    │                                  source/topttst1.asm ; midgame_engine_port.py : porte le catalogue du
+    │                                  moteur des cinématiques d'un exécutable à l'autre (analysis/topt/README.md)
     ├── exe_disasm.py                désassemble un EXE DOS sans IDA (capstone) : OPTTEST.EXE du CD-ROM,
     │                                  chaînes du DGROUP et appels annotés — CONV_SYSTEM.md § 8
+    ├── flx_render.py                intro du CD THEFLIC.FLX : rendu de référence (GIF, planche, --empreintes) — menu_cd/FLX_FORMAT.md ;
+    │                                  flic_ref/ : RSFlic et SCFlicPlayer pour libRealSpace, build.sh, flic_test (943 images identiques)
     ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
     │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_spot_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
+    ├── training_ref/                entraînement : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lance
+    │                                  training_mission_test : mission en mémoire comparée à INSTANT.IFF ; écran d'armement) — IMPL_TRAINING_MISSION.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
     │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
+    ├── instant_mission.py           mission d'entraînement : reproduit instant.iff (DOGFIGHT / SEARCH AND DESTROY)
+    │                                  depuis MISSIONS\TEMPLATE.IFF, --lire un fichier produit — TRAINING_MISSION.md
     ├── match_functions.py           retrouve dans OPTEST les fonctions identiques à
     │                                  celles de STRIKE et reprend leurs noms (--write)
     ├── extract_segment.py           liste les fonctions d'un segment donné

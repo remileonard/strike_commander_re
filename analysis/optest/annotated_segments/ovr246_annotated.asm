@@ -46,7 +46,7 @@ loc_C8802:				; CODE XREF: sub_C87E0+Dj
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	si
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [si+0Eh], 3878h
 		mov	dword ptr [si+24h], 0

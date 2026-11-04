@@ -370,9 +370,9 @@
     "summary": "⭐⚠️ far, 1081 lignes, corps NON DÉTAILLÉ (ex-`MissionRecord_LoadAndBuildWidgetTree_7D31A`, nom faux). **Séquence d'éjection volontaire du joueur** : appelée par `STRIKE_EXE_MAIN_LOOP` via `VROOMM_StubThunk_6ADFA` quand `byte_6E4B8 != 0` (la boucle pose d'abord `byte_6E4B4 = 1`). `byte_6E4B8` est posé par `Player_MainUpdate` sur la touche de code 0x12 (E) avec Ctrl (tables d'état clavier `byte_72DE5` / `byte_72E1D`, indice 0x1D = Ctrl), ou quand `byte_6E33B != 0`. Charge aussi `OBJECTS\\EJECT.PAK` (`push offset aEject`) et **demande la piste musicale 0x0A** (`push 0Ah / call Music_RequestTune_5A984`). Retour non nul → `byte_706AF = 2` ; nul → `byte_706AF = 3`."
   },
   "sub_91B70": {
-    "new_name": "Cockpit_ApplyFormatAndDraw_91B70",
+    "new_name": "Options_DetailPreview_Draw_91B70",
     "segment": "ovr268",
-    "summary": "⚠️ far, 227 lignes, NON DÉTAILLÉE — combine `TextRenderer_ApplyFormatChange_5E34D` (seg143), `Shape_DrawSpans_61F52` (×2)."
+    "summary": "far, LUE 2026-11-04. Dessin de l'aperçu central du sous-écran DETAIL (ex-Cockpit_ApplyFormatAndDraw_91B70, renommée car elle ne sert qu'à DETAIL). Appelée par Options_DetailScreen_91D29. Prépare une surface de 94 × 73 pixels (fenêtre (0,0)-(93,72), TextRenderer_ApplyFormatChange_5E34D l'alloue) et un rectangle (114,69)-(206,140) = zone vide au centre de l'image 1 de DETLOPT, où l'aperçu apparaît à l'écran ; dessine chaque image de DETLOPT.SHP par Shape_DrawSpans_61F52 à l'origine (0,0) de la surface (images en coordonnées locales 0..92 × 0..71). Choix des images selon la configuration reçue (si) : [si+90] toujours → 39 si non nul sinon 38 ; [si+86] → 40, [si+89] → 41, [si+85] → 42, [si+88] → 43, [si+87] → 44 (si non nul) ; [si+91] toujours → 46 si non nul sinon 45 ; [si+81] toujours → 49 si non nul sinon 50 ; [si+82] toujours → 48 et 51 si non nul sinon 47. Quel bouton écrit quel octet : non suivi. analysis/OPTIONS_SCREEN.md § 4."
   },
   "sub_6AE48": {
     "new_name": "VROOMM_StubThunk_6AE48",
@@ -2445,9 +2445,9 @@
     "summary": "far, combine Memory_TypedFreeWrapper_5C6F3, PlayerComponent_DispatchPair_9EC4D, PlayerComponent_FullReleaseAndLoad_9F4ED. Référencée via jmp depuis un stub VROOMM (sub_6C3F8)."
   },
   "sub_8FB73": {
-    "new_name": "Config_WriteSettingsField_8FB73",
+    "new_name": "Options_SaveConfig_8FB73",
     "segment": "ovr266",
-    "summary": "far, construit un StreamReader et écrit un champ typé (`StreamReader_WriteTyped_6568F`, seg195)."
+    "summary": "far. Bouton SAVE : écrit la structure de configuration dans OPTIONS.CFG (nom en DGROUP 5210 = `push 145Ah`, StreamReader_WriteTyped_6568F). Ex-nom « Config_WriteSettingsField_8FB73 »."
   },
   "sub_604C9": {
     "new_name": "GlyphObject_AllocateBuffer_604C9",
@@ -2910,9 +2910,9 @@
     "summary": "Ex-'AudioQueue_AdvanceWrapper_AB583'. far. LUE 2026-10-06. Facade de SoundFX_StopAllChannels_AB770."
   },
   "sub_9416A": {
-    "new_name": "ResourceFile_LoadTypeG_9416A",
+    "new_name": "Options_AudioScreen_9416A",
     "segment": "ovr269",
-    "summary": "⭐⚠️ far, 580 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « AUDIO » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\AUDIOPT.SHP (chaînes « audiopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
   },
   "sub_6AFEC": {
     "new_name": "VROOMM_StubThunk_6AFEC",
@@ -5265,9 +5265,9 @@
     "summary": "far, combine sub_6CAC5, PlayerComponent_HelperB_A4BA6, PlayerComponent_HelperC_A5189."
   },
   "sub_8FD2A": {
-    "new_name": "Config_ReadSettingsFieldWithMessage_8FD2A",
+    "new_name": "Options_LoadDefaults_8FD2A",
     "segment": "ovr266",
-    "summary": "far, combine `CRT_Write_TextMode` et lecture de champ typé."
+    "summary": "far. Bouton DEFAULT : CRT_Write_TextMode, lit OPTDFLT.CFG (nom en DGROUP 5222 = `push 1466h`, StreamReader_ReadTyped_63FA1) dans la structure de configuration, VROOMM_StubThunk_6B70F(9025h), puis Cockpit_ReadControlsFrame_8F720 (applique les réglages). Ex-nom « Config_ReadSettingsFieldWithMessage_8FD2A »."
   },
   "sub_6AC34": {
     "new_name": "VROOMM_StubThunk_6AC34",
@@ -7705,9 +7705,9 @@
     "summary": "far,44L — itère un tableau indexé (+0x23/+0x27) appelant vtable[4] avec argument : **notification (update) d'un groupe alternatif avec argument.**"
   },
   "sub_93295": {
-    "new_name": "ResourceFile_LoadTypeE_93295",
+    "new_name": "Options_CockpitScreen_93295",
     "segment": "ovr269",
-    "summary": "⭐⚠️ far, 1023 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « COCKPIT » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\COCKOPT.SHP (chaînes « cockopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
   },
   "sub_32901": {
     "new_name": "Terrain_HeightSample",
@@ -10540,9 +10540,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_8AF59) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=16CA0h, codesize=1915h, nentries=16."
   },
   "sub_9277C": {
-    "new_name": "ResourceFile_LoadTypeC_9277C",
+    "new_name": "Options_ExitGameScreen_9277C",
     "segment": "ovr268",
-    "summary": "⭐⚠️ far, 832 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — écran du bouton EXIT GAME du panneau CONFIGURATION : charge FONTS\\\\RESTART.SHP ; chaînes voisines « do you want to: », « EXIT GAME », « YOU HAVE EJECTED. », « YOU HAVE DIED. », « YOU HAVE LANDED. ». Appelé avec (structure de configuration, 0) ; son résultat décide la fermeture du panneau. Ex-nom « ResourceFile_LoadTypeC_9277C »."
   },
   "sub_6CED1": {
     "new_name": "VROOMM_StubThunk_6CED1",
@@ -10605,9 +10605,9 @@
     "summary": "far, enveloppe appelant Joystick_ReadButtonsOnly_663BD (seg199). Référencée depuis seg201."
   },
   "sub_90D20": {
-    "new_name": "Cockpit_LoadAndInitFull_90D20",
+    "new_name": "Options_ConfigurationScreen_90D20",
     "segment": "ovr267",
-    "summary": "⭐⚠️ far, 1390 lignes, NON DÉTAILLÉE — combine `Cockpit_PanAzimuthUpdate`, `EMS_MapPage` (accès mémoire étendue, seg127), `UI_ApplyEncodingHelper_5E576`, `Path_ResolveDataFile`, StreamReader — chargement et initialisation complète du cockpit avec accès à la mémoire paginée. Candidat prioritaire pour session dédiée."
+    "summary": "far, LUE 2026-11-03 (structure). Panneau CONFIGURATION ouvert par ALT+O (Input_AltKeyCommands_26F7E, argument = structure de configuration DGROUP 21056). Ouverture : Cockpit_PanAzimuthUpdate(541Ah, &256) ; si byte_721F0 ≠ 2, UI_ApplyEncodingHelper_5E576(word_70E62, 5196h) (copie de l'écran du vol dans un tampon, sens déduit de l'ordre des arguments, fonction non lue), sinon EMS_MapPage et int 15h AX=1209h. Boucle : charge FONTS\\\\MAINOPT.SHP (28 images), fenêtre (0,0)-(319,199) (VROOMM_StubThunk_6C969), 13 boutons de 48 à 66 × 11 pixels (VROOMM_StubThunk_6C76C ; image normale, image enfoncée, variable mise à 1 au clic) : DETAIL (36,61) → Options_DetailScreen_91D29 ; FLIGHT (106,61) → Options_FlightScreen_90097 ; GAMEPLAY (36,74) → Options_GameplayScreen_92E60 ; COCKPIT (106,74) → Options_CockpitScreen_93295 ; CAMERAS (36,87) → Options_CamerasScreen_93BA5 ; AUDIO (106,87) → Options_AudioScreen_9416A ; ROOKIE (211,61), VETERAN (211,74), ACE (211,87) → Options_PresetRookie_91B2C, Options_PresetVeteran_91AE9, Options_PresetAce_91AA6 (sans fermer) ; SAVE (18,114) → Options_SaveConfig_8FB73 ; DEFAULT (73,114) → Options_LoadDefaults_8FD2A ; EXIT (139,114) → fermeture ; EXIT GAME (211,114) → Options_ExitGameScreen_9277C(arg, 0), son résultat décide la fermeture. Souris : Input_GetCalibratedXValue_67481 / 2 et Input_GetCalibratedYValue_67499 → word_711C6/711C8 et word_72EB0/72EB2. Dessin : Options_DrawPanel_8FA4C (fond restauré, images 0 et 1). Un clic sur un sous-menu ferme le panneau, joue le sous-écran puis rouvre le panneau (MAINOPT.SHP rechargé). Fermeture : Cockpit_ReadControlsFrame_8F720 (applique les réglages), TextScrollDisplayB_ApplyHelperD_67F60, Cockpit_ApplyEncodingWrapper_8FB2A, Kneeboard_ProcessSelected(59CDh). Ex-nom « Cockpit_LoadAndInitFull_90D20 » (faux : rien ne vient de COCKPITS). analysis/OPTIONS_SCREEN.md."
   },
   "loc_A307": {
     "new_name": "Goal_SetObjective_A307",
@@ -11185,9 +11185,9 @@
     "summary": "far, 41 lignes, entre sub_5EFD3 et sub_5F04C — buffer local (0x16 octets), probable formatage/impression d'une valeur numérique. ⚠️ Adresse exacte non résolue."
   },
   "sub_93BA5": {
-    "new_name": "ResourceFile_LoadTypeF_93BA5",
+    "new_name": "Options_CamerasScreen_93BA5",
     "segment": "ovr269",
-    "summary": "⭐⚠️ far, 650 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « CAMERAS » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\CAMROPT.SHP (chaînes « camropt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
   },
   "sub_4E3F3": {
     "new_name": "Particle_ComputeSpawnAtAttachPoint",
@@ -11635,9 +11635,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_99FA1) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=280D0h, codesize=973h, nentries=11."
   },
   "sub_90097": {
-    "new_name": "ResourceFile_LoadTypeA_90097",
+    "new_name": "Options_FlightScreen_90097",
     "segment": "ovr266",
-    "summary": "⭐⚠️ far, 809 lignes, NON DÉTAILLÉE — premier d'une famille de grosses fonctions de chargement de fichier ressource quasi identiques dans leur ouverture (`Path_ResolveDataFile`, StreamReader_ConstructVariantA_63A39, GetCapacity_64062) — voir aussi ovr267-269. Candidat pour session dédiée."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « FLIGHT » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\FLITOPT.SHP (chaînes « flitopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
   },
   "unnamed_seg120_blit": {
     "new_name": "Font_BlitGlyphRuns_UNRESOLVED",
@@ -11850,9 +11850,9 @@
     "summary": "far, duplicat confirmé de AircraftDamageComponentFamily_ScalarDeletingDtor_75091 (dernier de la série de 18)."
   },
   "sub_91B2C": {
-    "new_name": "Cockpit_Helper3_91B2C",
+    "new_name": "Options_PresetRookie_91B2C",
     "segment": "ovr267",
-    "summary": "far, aucun appel externe visible (33 lignes)."
+    "summary": "far, LUE 2026-11-03. Bouton ROOKIE du panneau CONFIGURATION : écrit dans la structure de configuration [+100]=0, [+101]=1, [+102]=0, [+104]=1, [+105]=1, [+106]=1, [+109]=1, [+107]=1, [+108]=1, [+110]=1, mot [+111]=2, [+115]=1, [+116]=0, [+117]=0. Rôle des champs non établi. Ex-nom « Cockpit_Helper3_91B2C »."
   },
   "sub_C5CD": {
     "new_name": "AI_MessageDispatcher",
@@ -14180,9 +14180,9 @@
     "summary": "far,49L — recherche dans une table de 0x1D octets/entrée (+0x133) l'entrée dont le premier octet correspond à arg_2 ; si trouvée, invoque sub_23C82(code 4) : **sélection d'une entrée de liste (radar/cible) par touche.**"
   },
   "sub_92E60": {
-    "new_name": "ResourceFile_LoadTypeD_92E60",
+    "new_name": "Options_GameplayScreen_92E60",
     "segment": "ovr269",
-    "summary": "⚠️ far, 477 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097."
+    "summary": "⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « GAMEPLAY » du panneau CONFIGURATION (Options_ConfigurationScreen_90D20) : charge FONTS\\\\GAMEOPT.SHP (chaînes « gameopt » et « .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056, contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03). analysis/OPTIONS_SCREEN.md."
   },
   "sub_9A95A": {
     "new_name": "TerrainCell_LoadPlacedObjects_9A95A",
@@ -15545,9 +15545,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A6683) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=34870h, codesize=7C5h, nentries=10."
   },
   "sub_91AE9": {
-    "new_name": "Cockpit_Helper2_91AE9",
+    "new_name": "Options_PresetVeteran_91AE9",
     "segment": "ovr267",
-    "summary": "far, aucun appel externe visible (26 lignes)."
+    "summary": "far, LUE 2026-11-03. Bouton VETERAN : [+100]=1, [+101]=1, [+102]=1, [+104]=0, [+105]=1, [+106]=1, [+109]=1, [+107]=0, [+108]=0, [+110]=0, mot [+111]=1, [+115]=1, [+116]=1, [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper2_91AE9 »."
   },
   "sub_3DDC4": {
     "new_name": "Camera_ResolvePositionVelocity_3DDC4",
@@ -16530,9 +16530,9 @@
     "summary": "far, thunk fixe VROOMM (jmp sub_A3B34) — redirige un point d'entree stable vers le code d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57."
   },
   "sub_91D29": {
-    "new_name": "ResourceFile_LoadTypeB_91D29",
+    "new_name": "Options_DetailScreen_91D29",
     "segment": "ovr268",
-    "summary": "⭐⚠️ far, 1017 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097. Candidat pour session dédiée."
+    "summary": "far, LUE 2026-11-03 (structure, pas le corps de chaque bouton). Sous-écran DETAIL du panneau CONFIGURATION (ouvert par Options_ConfigurationScreen_90D20). Charge FONTS\\\\DETLOPT.SHP (52 images, chaîne « detlopt » et « .shp ») et la configuration (argument). Fenêtre (0,0)-(319,199) (VROOMM_StubThunk_6C969). Neuf boutons de 73 × 11 pixels et un de 38 × 11 (VROOMM_StubThunk_6C76C), chacun avec une paire d'images normale / enfoncée : TERRAIN GOURAUD (22,67) images 2/3 ; TRANSITION (22,80) 4/5 ; INTEREST (22,93) 6/7 ; RIVERS (22,106) 8/9 ; FIELDS (22,119) 10/11 ; CITIES (22,132) 12/13 ; RUNWAYS (22,145) 14/15 ; OBJECTS GOURAUD (226,67) 26/27 ; TEXTURE (226,80) 28/29 ; EXIT (244,132), images 24/25 (13 × 12). Deux jauges (VROOMM_StubThunk_6C9F0 → GaugeWidgetVariantD_ConstructAndInit_A4270) aux positions (243,93) et (127,159), rôle non établi. L'aperçu central est dessiné par Options_DetailPreview_Draw_91B70 (sub_91B70, lue le 2026-11-04) appelée à la fin de la boucle. Titres DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR : dans les images 0 et 1 (dessin sans police vérifié par rendu). 10 images de 13 × 12 (16 à 25) : cases HI/LO (3) et HAZING (5). analysis/OPTIONS_SCREEN.md § 4."
   },
   "sub_23241": {
     "new_name": "Radar_TargetTypeFilter",
@@ -16700,9 +16700,9 @@
     "summary": "far, combine sub_1839 (externe), TextScrollDisplay_RegisterEntries_673B9 et sub_22E1 (×2)."
   },
   "sub_26F7E": {
-    "new_name": "Config_ReadCalibration",
+    "new_name": "Input_AltKeyCommands_26F7E",
     "segment": "seg047",
-    "summary": "far,292L — vérifie l'état d'initialisation (byte_6E345), lit une valeur de config (sub_286D2, byte_722D1) selon plusieurs flags de mode (byte_722D0/D3) : **lecture de paramètres de configuration/calibration selon le mode d'affichage/contrôleur actif.**"
+    "summary": "far, LUE 2026-11-03. Touches ALT du vol (ex-nom « Config_ReadCalibration », faux). Si byte_6E345 = 0 : lit l'événement clavier (Input_PointerConfigDispatch), code de touche byte_722D1 ; exige ALT enfoncé (byte_722D3 & 0C0h, ou byte_72E00 / byte_72E21) et ni MAJ (byte_722D3 & 0Ch, ou byte_72DF2 / byte_72DFE) ni CTRL (byte_722D3 & 30h, ou byte_72DE5 / byte_72E1D) ; puis aiguillage sur le code de touche (table word_27130) : 24 (O) → coupe les effets (SoundFX_StopAll_5AA95) et ouvre le panneau CONFIGURATION (`push 5240h` / VROOMM_StubThunk_6B7F0 → Options_ConfigurationScreen_90D20), puis relance (Music_SelectStartTune_5AA02) ou arrête (Music_Stop_5A9E6) la musique si son interrupteur byte_7236B a changé ; 31 (S) → bascule les effets sonores byte_7236C (SoundFX_Disable_5AA73 quand ils étaient actifs) ; 36 (J) → pour chaque manette 0 et 1 présente (Joystick_GetButtonRawByte_67B82), VROOMM_StubThunk_6B745(arg+5, n, 1) ; 45 (X) → Input_CalibrationHandler, s'il rend vrai : [arg+36] = 1 et byte_6E345 = 1 ; 50 (M) → bascule la musique byte_7236B (Music_Stop_5A9E6 ou Music_SelectStartTune_5AA02). Fin : Sound_FrameUpdate_5AB79(5C06h), rend 1 (0 si byte_6E345 était posé). Appelée par CombatTarget_WeaponActionSubsystem et les boucles de vol (ovr233, ovr241, seg112). analysis/OPTIONS_SCREEN.md."
   },
   "sub_6B35B": {
     "new_name": "VROOMM_StubThunk_6B35B",
@@ -17950,9 +17950,9 @@
     "summary": "far, 108 lignes (10771-10878) - LUE INTEGRALEMENT ET CORRECTEMENT ATTRIBUEE (tag 0x278 confirme = ID=3 via methode d'ancrage sequentiel off_6D32C). Base=5, efface node+0x27 au debut. GARDES : tache en cours (entite+0x13), byte_720C3<=byte_72038, word_72093<=0x14 -> score=0 direct si echec (PAS de sub_564A/sub_56E5 ici, contrairement a ID=1/2/4/7 - formule plus simple). CALCUL : ajustements -3/-6 sur word_72095 (paliers 0x5A/0x2D), +3 ou -3 selon dword_7209B vs dword_7201C (deux comparaisons opposees successives). GARDE FINALE : si byte_720DF actif, soustrait entite->aircraft+0xB0 /4 (meme champ carburant, division differente des autres IDs qui font /2). Score borne [0,9]. TRAITS ATRB CORRIGES 2026-09-25 : le chargeur PilotProfile_LoadATRB_12E47 range les octets du fichier (ordre TH, CN, VB, LY, FL, AG, AA, SM, AR, 10e) a profil+0x97, +0x99, +0x98, +0x9A, +0x96, +0x9B, +0x9C, +0x9D, +0x9E, +0x9F ; le profil vit a entite+0x1A (constructeur : 'mov word ptr es:[bx+1Ah], 368h', vtable 0x368 slot 0 = PilotProfile_LoadATRB_12E47). Donc entite+0xB0 = FL (Flying), +0xB1 = TH, +0xB2 = VB, +0xB3 = CN, +0xB4 = LY, +0xB5 = AG, +0xB6 = AA, +0xB7 = SM, +0xB8 = AR, +0xB9 = 10e octet. Toute mention ci-dessus de TH pour +0xB0, CN pour +0xB1, LY pour +0xB3 ou FL pour +0xB4 est a lire selon cette table."
   },
   "sub_8FA4C": {
-    "new_name": "Cockpit_DrawEncodedText_8FA4C",
+    "new_name": "Options_DrawPanel_8FA4C",
     "segment": "ovr266",
-    "summary": "⚠️ far, 118 lignes, NON DÉTAILLÉE — combine `UI_ApplyEncodingHelper_5E576` (seg143), `Shape_DrawSpans_61F52` (seg174, ×2)."
+    "summary": "far, LUE 2026-11-03. Dessin d'un panneau d'options (ex-nom « Cockpit_DrawEncodedText_8FA4C »). Arguments : structure de configuration, fenêtre, images (SHP), numéro de l'image du bas, drapeau. VROOMM_StubThunk_6C7B7 ; si byte_721F0 ≠ 2 : UI_ApplyEncodingHelper_5E576(5196h, word_70E62) (recopie du tampon de l'écran du vol, sens déduit) ; si drapeau : image 0 en (5, 4) (`push large 40005h`, Shape_DrawSpans_61F52) ; image demandée en (5, 39) (`push large 270005h`) ; VROOMM_StubThunk_6C7BC. Appelée par Options_ConfigurationScreen_90D20 (image 1, drapeau 1) et Options_FlightScreen_90097."
   },
   "sub_14795": {
     "new_name": "Text_TypewriterFrame",
@@ -18105,9 +18105,9 @@
     "summary": "far,**2938 lignes — la plus grosse fonction de toute la base**. Déclenche le streaming de secteur terrain (sub_33735), configure la caméra (mêmes globals dword_7220A/E/212 que le pipeline objet sub_2FEE2), fixe les bornes de clipping (dword_6EB14/18, partagées avec sub_2FEE2), résout la texture terrain (sub_5C832), puis itère sur la grille de sommets du secteur (segment GS) en les transformant/soumettant au rendu. **Pipeline principal de rendu du terrain — l'équivalent 'terrain' de la fonction de rendu d'objets sub_2FEE2 (seg069)**. Priorité absolue pour une session d'analyse dédiée. | COMPLÉMENT 2026-10-12 (sommet .ELV, via le pointeur +0x11 du sommet transformé) : int16 +0 = hauteur (cwde, × axes caméra dword_7221E/72236/7222A) ; uint8 +2 = ÉCLAIRAGE du sommet (octet haut de l'intensité [di+0Ch], interpolée sur la face) ; uint8 +3 = COULEUR de base du triangle : celle du sommet dont le mot +0 (hauteur) est le PLUS GRAND en comparaison NON SIGNÉE (loc_349F0 : `mov al,fs:[bx+3] / mov dx,fs:[bx]` puis `cmp dx,fs:[bx] / ja` → on garde le plus grand ; égalité → le dernier ; une hauteur négative compte comme très grande) — CORRIGÉ 2026-10-14, l'ancienne mention « le plus bas » était fausse ; rangée dans gs:[si] et byte_6EAE0. Intensité : `mov ah,fs:[bx+2] / xor al,al / mov [di+0Ch],ax` = éclairage × 256 (interpolée par le découpage). Par sommet du polygone découpé : Palette_ShadeIndexWithFog_2F24E(541Ah, couleur, intensité >> 8, profondeur [si+12h], 0) → index de palette, rangé × 256 dans +0Ch ; puis si byte_6EB21 = 1 (défaut, réglé par Cockpit_ReadControlsFrame_8F720 depuis le champ +0x5A des réglages) chaque sommet garde son index (dégradé), sinon les 3 reçoivent la moyenne ÷ 3 (face unie) ; uint8 +4 / +5 = TEXTURE du triangle (1er / 2e triangle de la case selon gs:[si+1]) ; 0xFF = pas de texture ; ≥ 0xDF = traitement particulier (var_580)."
   },
   "sub_91AA6": {
-    "new_name": "Cockpit_Helper_91AA6",
+    "new_name": "Options_PresetAce_91AA6",
     "segment": "ovr267",
-    "summary": "far, aucun appel externe visible (26 lignes)."
+    "summary": "far, LUE 2026-11-03. Bouton ACE : [+100]=1, [+101]=0, [+102]=1, [+104]=0, [+105]=0, [+106]=0, [+109]=0, [+107]=0, [+108]=0, [+110]=0, mot [+111]=0, [+115]=0, [+116]=1, [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper_91AA6 »."
   },
   "sub_A5F89": {
     "new_name": "SmokeGen_LoadFromIFF_A5F89",

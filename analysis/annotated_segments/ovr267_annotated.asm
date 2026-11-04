@@ -7,12 +7,31 @@ ovr267		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 1390 lignes, NON DÉTAILLÉE — combine Cockpit_PanAzimuthUpdate, EMS_MapPage (accès
-; mémoire étendue, seg127), UI_ApplyEncodingHelper_5E576, Path_ResolveDataFile, StreamReader —
-; chargement et initialisation complète du cockpit avec accès à la mémoire paginée. Candidat
-; prioritaire pour session dédiée.
+; far, LUE 2026-11-03 (structure). Panneau CONFIGURATION ouvert par ALT+O
+; (Input_AltKeyCommands_26F7E, argument = structure de configuration DGROUP 21056). Ouverture
+; : Cockpit_PanAzimuthUpdate(541Ah, &256) ; si byte_721F0 ≠ 2,
+; UI_ApplyEncodingHelper_5E576(word_70E62, 5196h) (copie de l'écran du vol dans un tampon,
+; sens déduit de l'ordre des arguments, fonction non lue), sinon EMS_MapPage et int 15h
+; AX=1209h. Boucle : charge FONTS\\MAINOPT.SHP (28 images), fenêtre (0,0)-(319,199)
+; (VROOMM_StubThunk_6C969), 13 boutons de 48 à 66 × 11 pixels (VROOMM_StubThunk_6C76C ; image
+; normale, image enfoncée, variable mise à 1 au clic) : DETAIL (36,61) →
+; Options_DetailScreen_91D29 ; FLIGHT (106,61) → Options_FlightScreen_90097 ; GAMEPLAY (36,74)
+; → Options_GameplayScreen_92E60 ; COCKPIT (106,74) → Options_CockpitScreen_93295 ; CAMERAS
+; (36,87) → Options_CamerasScreen_93BA5 ; AUDIO (106,87) → Options_AudioScreen_9416A ; ROOKIE
+; (211,61), VETERAN (211,74), ACE (211,87) → Options_PresetRookie_91B2C,
+; Options_PresetVeteran_91AE9, Options_PresetAce_91AA6 (sans fermer) ; SAVE (18,114) →
+; Options_SaveConfig_8FB73 ; DEFAULT (73,114) → Options_LoadDefaults_8FD2A ; EXIT (139,114) →
+; fermeture ; EXIT GAME (211,114) → Options_ExitGameScreen_9277C(arg, 0), son résultat décide
+; la fermeture. Souris : Input_GetCalibratedXValue_67481 / 2 et
+; Input_GetCalibratedYValue_67499 → word_711C6/711C8 et word_72EB0/72EB2. Dessin :
+; Options_DrawPanel_8FA4C (fond restauré, images 0 et 1). Un clic sur un sous-menu ferme le
+; panneau, joue le sous-écran puis rouvre le panneau (MAINOPT.SHP rechargé). Fermeture :
+; Cockpit_ReadControlsFrame_8F720 (applique les réglages),
+; TextScrollDisplayB_ApplyHelperD_67F60, Cockpit_ApplyEncodingWrapper_8FB2A,
+; Kneeboard_ProcessSelected(59CDh). Ex-nom « Cockpit_LoadAndInitFull_90D20 » (faux : rien ne
+; vient de COCKPITS). analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-Cockpit_LoadAndInitFull_90D20	proc far		; CODE XREF: VROOMM_StubThunk_6B7F0J
+Options_ConfigurationScreen_90D20	proc far		; CODE XREF: VROOMM_StubThunk_6B7F0J
 
 var_14E		= word ptr -14Eh
 var_106		= word ptr -106h
@@ -101,10 +120,10 @@ arg_0		= word ptr  6
 		jmp	short loc_90D51
 ; ���������������������������������������������������������������������������
 
-loc_90D4F:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+28j
+loc_90D4F:				; CODE XREF: Options_ConfigurationScreen_90D20+28j
 		xor	ax, ax
 
-loc_90D51:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+2Dj
+loc_90D51:				; CODE XREF: Options_ConfigurationScreen_90D20+2Dj
 		or	ax, ax
 		jz	short loc_90D7B
 		cmp	byte_721F0, 2
@@ -115,7 +134,7 @@ loc_90D51:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+2Dj
 		add	sp, 4
 		jmp	short $+2
 
-loc_90D6B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+3Aj
+loc_90D6B:				; CODE XREF: Options_ConfigurationScreen_90D20+3Aj
 		xor	dx, dx
 		mov	cl, 0
 		mov	ch, 2
@@ -127,18 +146,18 @@ loc_90D79:
 		jmp	short loc_90D8A
 ; ���������������������������������������������������������������������������
 
-loc_90D7B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+33j
+loc_90D7B:				; CODE XREF: Options_ConfigurationScreen_90D20+33j
 		push	5196h
 		push	word_70E62
 		call	UI_ApplyEncodingHelper_5E576
 		add	sp, 4
 
-loc_90D8A:				; CODE XREF: Cockpit_LoadAndInitFull_90D20:loc_90D79j
+loc_90D8A:				; CODE XREF: Options_ConfigurationScreen_90D20:loc_90D79j
 		mov	[bp+var_6], 0
 		jmp	loc_91A2A
 ; ���������������������������������������������������������������������������
 
-loc_90D92:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D10j
+loc_90D92:				; CODE XREF: Options_ConfigurationScreen_90D20+D10j
 		push	ds
 		push	offset a_shp_5	; ".shp"
 		push	ds
@@ -253,7 +272,7 @@ loc_90E85:
 		mov	[bp+var_B7], 0
 		jmp	short $+2
 
-loc_90EF4:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+1CBj
+loc_90EF4:				; CODE XREF: Options_ConfigurationScreen_90D20+1CBj
 		push	0
 		mov	[bp+var_24], si
 		push	30h ; '0'
@@ -265,7 +284,7 @@ loc_90EF4:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+1CBj
 		jmp	loc_90F91
 ; ���������������������������������������������������������������������������
 
-loc_90F0A:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+1E5j
+loc_90F0A:				; CODE XREF: Options_ConfigurationScreen_90D20+1E5j
 		push	large 0B0042h
 		push	large 3D0024h
 		push	ax
@@ -304,10 +323,10 @@ loc_90F73:
 		jmp	short loc_90F93
 ; ���������������������������������������������������������������������������
 
-loc_90F91:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+1E7j
+loc_90F91:				; CODE XREF: Options_ConfigurationScreen_90D20+1E7j
 		mov	ax, di
 
-loc_90F93:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+26Fj
+loc_90F93:				; CODE XREF: Options_ConfigurationScreen_90D20+26Fj
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -324,7 +343,7 @@ loc_90F93:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+26Fj
 		jmp	loc_9103E
 ; ���������������������������������������������������������������������������
 
-loc_90FB7:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+292j
+loc_90FB7:				; CODE XREF: Options_ConfigurationScreen_90D20+292j
 		push	large 0B0042h
 		push	large 3D006Ah
 		push	ax
@@ -359,10 +378,10 @@ loc_90FB7:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+292j
 		jmp	short loc_91040
 ; ���������������������������������������������������������������������������
 
-loc_9103E:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+294j
+loc_9103E:				; CODE XREF: Options_ConfigurationScreen_90D20+294j
 		mov	ax, di
 
-loc_91040:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+31Cj
+loc_91040:				; CODE XREF: Options_ConfigurationScreen_90D20+31Cj
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -379,7 +398,7 @@ loc_91040:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+31Cj
 		jmp	loc_910EB
 ; ���������������������������������������������������������������������������
 
-loc_91064:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+33Fj
+loc_91064:				; CODE XREF: Options_ConfigurationScreen_90D20+33Fj
 		push	large 0B0042h
 		push	large 4A0024h
 		push	ax
@@ -416,10 +435,10 @@ loc_91071:
 		jmp	short loc_910ED
 ; ���������������������������������������������������������������������������
 
-loc_910EB:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+341j
+loc_910EB:				; CODE XREF: Options_ConfigurationScreen_90D20+341j
 		mov	ax, di
 
-loc_910ED:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+3C9j
+loc_910ED:				; CODE XREF: Options_ConfigurationScreen_90D20+3C9j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -436,7 +455,7 @@ loc_910ED:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+3C9j
 		jmp	loc_91198
 ; ���������������������������������������������������������������������������
 
-loc_91111:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+3ECj
+loc_91111:				; CODE XREF: Options_ConfigurationScreen_90D20+3ECj
 		push	large 0B0042h
 		push	large 4A006Ah
 		push	ax
@@ -475,10 +494,10 @@ loc_91182:
 		jmp	short loc_9119A
 ; ���������������������������������������������������������������������������
 
-loc_91198:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+3EEj
+loc_91198:				; CODE XREF: Options_ConfigurationScreen_90D20+3EEj
 		mov	ax, di
 
-loc_9119A:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+476j
+loc_9119A:				; CODE XREF: Options_ConfigurationScreen_90D20+476j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -495,7 +514,7 @@ loc_9119A:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+476j
 		jmp	loc_91245
 ; ���������������������������������������������������������������������������
 
-loc_911BE:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+499j
+loc_911BE:				; CODE XREF: Options_ConfigurationScreen_90D20+499j
 		push	large 0B0042h
 		push	large 570024h
 		push	ax
@@ -542,10 +561,10 @@ loc_911F6:
 		jmp	short loc_91247
 ; ���������������������������������������������������������������������������
 
-loc_91245:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+49Bj
+loc_91245:				; CODE XREF: Options_ConfigurationScreen_90D20+49Bj
 		mov	ax, di
 
-loc_91247:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+523j
+loc_91247:				; CODE XREF: Options_ConfigurationScreen_90D20+523j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -562,7 +581,7 @@ loc_91247:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+523j
 		jmp	loc_912F2
 ; ���������������������������������������������������������������������������
 
-loc_9126B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+546j
+loc_9126B:				; CODE XREF: Options_ConfigurationScreen_90D20+546j
 		push	large 0B0042h
 
 loc_91271:
@@ -607,10 +626,10 @@ loc_912EE:
 		jmp	short loc_912F4
 ; ���������������������������������������������������������������������������
 
-loc_912F2:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+548j
+loc_912F2:				; CODE XREF: Options_ConfigurationScreen_90D20+548j
 		mov	ax, di
 
-loc_912F4:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+5D0j
+loc_912F4:				; CODE XREF: Options_ConfigurationScreen_90D20+5D0j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -627,7 +646,7 @@ loc_912F4:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+5D0j
 		jmp	loc_9139F
 ; ���������������������������������������������������������������������������
 
-loc_91318:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+5F3j
+loc_91318:				; CODE XREF: Options_ConfigurationScreen_90D20+5F3j
 		push	large 0B0042h
 		push	large 3D00D3h
 		push	ax
@@ -674,10 +693,10 @@ loc_91365:
 		jmp	short loc_913A1
 ; ���������������������������������������������������������������������������
 
-loc_9139F:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+5F5j
+loc_9139F:				; CODE XREF: Options_ConfigurationScreen_90D20+5F5j
 		mov	ax, di
 
-loc_913A1:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+67Dj
+loc_913A1:				; CODE XREF: Options_ConfigurationScreen_90D20+67Dj
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -694,7 +713,7 @@ loc_913A1:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+67Dj
 		jmp	loc_9144C
 ; ���������������������������������������������������������������������������
 
-loc_913C5:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+6A0j
+loc_913C5:				; CODE XREF: Options_ConfigurationScreen_90D20+6A0j
 		push	large 0B0042h
 		push	large 4A00D3h
 		push	ax
@@ -733,10 +752,10 @@ loc_913EB:
 		jmp	short loc_9144E
 ; ���������������������������������������������������������������������������
 
-loc_9144C:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+6A2j
+loc_9144C:				; CODE XREF: Options_ConfigurationScreen_90D20+6A2j
 		mov	ax, di
 
-loc_9144E:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+72Aj
+loc_9144E:				; CODE XREF: Options_ConfigurationScreen_90D20+72Aj
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -757,7 +776,7 @@ loc_9145E:
 		jmp	loc_914F9
 ; ���������������������������������������������������������������������������
 
-loc_91472:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+74Dj
+loc_91472:				; CODE XREF: Options_ConfigurationScreen_90D20+74Dj
 		push	large 0B0042h
 		push	large 5700D3h
 		push	ax
@@ -794,10 +813,10 @@ loc_914E6:
 		jmp	short loc_914FB
 ; ���������������������������������������������������������������������������
 
-loc_914F9:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+74Fj
+loc_914F9:				; CODE XREF: Options_ConfigurationScreen_90D20+74Fj
 		mov	ax, di
 
-loc_914FB:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+7D7j
+loc_914FB:				; CODE XREF: Options_ConfigurationScreen_90D20+7D7j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -814,7 +833,7 @@ loc_914FB:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+7D7j
 		jmp	loc_915A6
 ; ���������������������������������������������������������������������������
 
-loc_9151F:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+7FAj
+loc_9151F:				; CODE XREF: Options_ConfigurationScreen_90D20+7FAj
 		push	large 0B003Bh
 		push	large 720049h
 		push	ax
@@ -857,10 +876,10 @@ loc_91573:
 		jmp	short loc_915A8
 ; ���������������������������������������������������������������������������
 
-loc_915A6:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+7FCj
+loc_915A6:				; CODE XREF: Options_ConfigurationScreen_90D20+7FCj
 		mov	ax, di
 
-loc_915A8:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+884j
+loc_915A8:				; CODE XREF: Options_ConfigurationScreen_90D20+884j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -877,7 +896,7 @@ loc_915A8:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+884j
 		jmp	loc_91653
 ; ���������������������������������������������������������������������������
 
-loc_915CC:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+8A7j
+loc_915CC:				; CODE XREF: Options_ConfigurationScreen_90D20+8A7j
 		push	large 0B0030h
 		push	large 720012h
 		push	ax
@@ -920,10 +939,10 @@ loc_915F6:
 		jmp	short loc_91655
 ; ���������������������������������������������������������������������������
 
-loc_91653:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+8A9j
+loc_91653:				; CODE XREF: Options_ConfigurationScreen_90D20+8A9j
 		mov	ax, di
 
-loc_91655:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+931j
+loc_91655:				; CODE XREF: Options_ConfigurationScreen_90D20+931j
 		push	ax
 		lea	ax, [bp+var_106]
 
@@ -942,7 +961,7 @@ loc_9165A:
 		jmp	loc_91702
 ; ���������������������������������������������������������������������������
 
-loc_91679:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+954j
+loc_91679:				; CODE XREF: Options_ConfigurationScreen_90D20+954j
 		push	large 0B0031h
 
 loc_9167F:
@@ -985,10 +1004,10 @@ loc_916E4:
 		jmp	short loc_91704
 ; ���������������������������������������������������������������������������
 
-loc_91702:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+956j
+loc_91702:				; CODE XREF: Options_ConfigurationScreen_90D20+956j
 		mov	ax, di
 
-loc_91704:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+9E0j
+loc_91704:				; CODE XREF: Options_ConfigurationScreen_90D20+9E0j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -1011,7 +1030,7 @@ loc_91704:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+9E0j
 		jmp	loc_917C8
 ; ���������������������������������������������������������������������������
 
-loc_9173C:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+A17j
+loc_9173C:				; CODE XREF: Options_ConfigurationScreen_90D20+A17j
 		push	large 0B0042h
 		push	large 7200D3h
 		push	ax
@@ -1060,10 +1079,10 @@ loc_91781:
 		jmp	short loc_917CA
 ; ���������������������������������������������������������������������������
 
-loc_917C8:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+A19j
+loc_917C8:				; CODE XREF: Options_ConfigurationScreen_90D20+A19j
 		mov	ax, di
 
-loc_917CA:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+AA6j
+loc_917CA:				; CODE XREF: Options_ConfigurationScreen_90D20+AA6j
 		push	ax
 		lea	ax, [bp+var_106]
 		push	ax
@@ -1119,7 +1138,7 @@ loc_91854:
 		jmp	loc_918EA
 ; ���������������������������������������������������������������������������
 
-loc_91862:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BD0j
+loc_91862:				; CODE XREF: Options_ConfigurationScreen_90D20+BD0j
 		push	0
 		lea	ax, [bp+var_106]
 		push	ax
@@ -1150,36 +1169,36 @@ loc_91883:
 		cmp	word ptr [bp+var_E], 0
 		jz	short loc_918B0
 
-loc_918A7:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+B55j
-					; Cockpit_LoadAndInitFull_90D20+B5Bj ...
+loc_918A7:				; CODE XREF: Options_ConfigurationScreen_90D20+B55j
+					; Options_ConfigurationScreen_90D20+B5Bj ...
 		mov	[bp+var_6], 1
 		mov	[bp+var_7], 1
 
-loc_918B0:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+B85j
+loc_918B0:				; CODE XREF: Options_ConfigurationScreen_90D20+B85j
 		cmp	[bp+var_22], 0
 		jz	short loc_918C4
 		push	si
 		nop
 		push	cs
-		call	near ptr Cockpit_Helper_91AA6
+		call	near ptr Options_PresetAce_91AA6
 		pop	cx
 		mov	[bp+var_22], 0
 		jmp	short loc_918EA
 ; ���������������������������������������������������������������������������
 
-loc_918C4:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+B94j
+loc_918C4:				; CODE XREF: Options_ConfigurationScreen_90D20+B94j
 		cmp	[bp+var_20], 0
 		jz	short loc_918D8
 		push	si
 		nop
 		push	cs
-		call	near ptr Cockpit_Helper2_91AE9
+		call	near ptr Options_PresetVeteran_91AE9
 		pop	cx
 		mov	[bp+var_20], 0
 		jmp	short loc_918EA
 ; ���������������������������������������������������������������������������
 
-loc_918D8:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BA8j
+loc_918D8:				; CODE XREF: Options_ConfigurationScreen_90D20+BA8j
 		cmp	[bp+var_1E], 0
 		jz	short loc_918EA
 		push	si
@@ -1187,18 +1206,18 @@ loc_918D8:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BA8j
 		push	cs
 
 loc_918E1:
-		call	near ptr Cockpit_Helper3_91B2C
+		call	near ptr Options_PresetRookie_91B2C
 		pop	cx
 		mov	[bp+var_1E], 0
 
-loc_918EA:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+B3Fj
-					; Cockpit_LoadAndInitFull_90D20+BA2j ...
+loc_918EA:				; CODE XREF: Options_ConfigurationScreen_90D20+B3Fj
+					; Options_ConfigurationScreen_90D20+BA2j ...
 		cmp	[bp+var_6], 0
 		jnz	short loc_918F3
 		jmp	loc_91862
 ; ���������������������������������������������������������������������������
 
-loc_918F3:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BCEj
+loc_918F3:				; CODE XREF: Options_ConfigurationScreen_90D20+BCEj
 		cmp	[bp+var_1A], 0
 		jz	short loc_91905
 		push	si
@@ -1206,7 +1225,7 @@ loc_918F3:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BCEj
 		pop	cx
 		mov	[bp+var_1A], 0
 
-loc_91905:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BD7j
+loc_91905:				; CODE XREF: Options_ConfigurationScreen_90D20+BD7j
 		cmp	word ptr [bp+var_12+2],	0
 		jz	short loc_91917
 		push	si
@@ -1214,7 +1233,7 @@ loc_91905:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BD7j
 		pop	cx
 		mov	word ptr [bp+var_12+2],	0
 
-loc_91917:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BE9j
+loc_91917:				; CODE XREF: Options_ConfigurationScreen_90D20+BE9j
 		cmp	word ptr [bp+var_12], 0
 		jz	short loc_91929
 		push	si
@@ -1222,7 +1241,7 @@ loc_91917:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BE9j
 		pop	cx
 		mov	word ptr [bp+var_12], 0
 
-loc_91929:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BFBj
+loc_91929:				; CODE XREF: Options_ConfigurationScreen_90D20+BFBj
 		cmp	word ptr [bp+var_16+2],	0
 		jz	short loc_9193B
 		push	si
@@ -1230,7 +1249,7 @@ loc_91929:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+BFBj
 		pop	cx
 		mov	word ptr [bp+var_16+2],	0
 
-loc_9193B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C0Dj
+loc_9193B:				; CODE XREF: Options_ConfigurationScreen_90D20+C0Dj
 		cmp	word ptr [bp+var_16], 0
 		jz	short loc_9194D
 		push	si
@@ -1238,7 +1257,7 @@ loc_9193B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C0Dj
 		pop	cx
 		mov	word ptr [bp+var_16], 0
 
-loc_9194D:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C1Fj
+loc_9194D:				; CODE XREF: Options_ConfigurationScreen_90D20+C1Fj
 		cmp	[bp+var_18], 0
 
 loc_91951:
@@ -1248,7 +1267,7 @@ loc_91951:
 		pop	cx
 		mov	[bp+var_18], 0
 
-loc_9195F:				; CODE XREF: Cockpit_LoadAndInitFull_90D20:loc_91951j
+loc_9195F:				; CODE XREF: Options_ConfigurationScreen_90D20:loc_91951j
 		cmp	[bp+var_1C], 0
 		jz	short loc_9197E
 		push	0
@@ -1260,7 +1279,7 @@ loc_9195F:				; CODE XREF: Cockpit_LoadAndInitFull_90D20:loc_91951j
 		mov	[bp+var_1C], 0
 		mov	[bp+var_7], 0
 
-loc_9197E:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C43j
+loc_9197E:				; CODE XREF: Options_ConfigurationScreen_90D20+C43j
 		cmp	word ptr [bp+var_E+2], 0
 
 loc_91982:
@@ -1270,7 +1289,7 @@ loc_91982:
 		pop	cx
 		mov	word ptr [bp+var_E+2], 0
 
-loc_91990:				; CODE XREF: Cockpit_LoadAndInitFull_90D20:loc_91982j
+loc_91990:				; CODE XREF: Options_ConfigurationScreen_90D20:loc_91982j
 		cmp	word ptr [bp+var_E], 0
 		jz	short loc_919A2
 		push	si
@@ -1278,7 +1297,7 @@ loc_91990:				; CODE XREF: Cockpit_LoadAndInitFull_90D20:loc_91982j
 		pop	cx
 		mov	word ptr [bp+var_E], 0
 
-loc_919A2:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C74j
+loc_919A2:				; CODE XREF: Options_ConfigurationScreen_90D20+C74j
 		cmp	[bp+var_6], 0
 		jnz	short loc_919D2
 		push	1
@@ -1297,7 +1316,7 @@ loc_919A2:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C74j
 		call	VROOMM_StubThunk_6B785
 		add	sp, 0Ch
 
-loc_919D2:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+C86j
+loc_919D2:				; CODE XREF: Options_ConfigurationScreen_90D20+C86j
 		lea	ax, [bp+var_106]
 		push	ax
 		call	VROOMM_StubThunk_6C9BE
@@ -1321,8 +1340,8 @@ loc_919EB:
 		add	sp, 8
 		jmp	short $+2
 
-loc_919FD:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+CC1j
-					; Cockpit_LoadAndInitFull_90D20:loc_919E7j
+loc_919FD:				; CODE XREF: Options_ConfigurationScreen_90D20+CC1j
+					; Options_ConfigurationScreen_90D20:loc_919E7j
 		mov	dword ptr [si],	0
 		mov	byte ptr [si+5], 0
 		mov	dword ptr [si+6], 0
@@ -1330,20 +1349,20 @@ loc_919FD:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+CC1j
 		jz	short loc_91A1B
 		mov	[bp+var_6], 0
 
-loc_91A1B:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+CF4j
+loc_91A1B:				; CODE XREF: Options_ConfigurationScreen_90D20+CF4j
 		push	2
 		lea	ax, [bp+var_106]
 		push	ax
 		call	VROOMM_StubThunk_6C978
 		add	sp, 4
 
-loc_91A2A:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+6Fj
+loc_91A2A:				; CODE XREF: Options_ConfigurationScreen_90D20+6Fj
 		cmp	[bp+var_6], 0
 		jnz	short loc_91A33
 		jmp	loc_90D92
 ; ���������������������������������������������������������������������������
 
-loc_91A33:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D0Ej
+loc_91A33:				; CODE XREF: Options_ConfigurationScreen_90D20+D0Ej
 		push	si
 		call	VROOMM_StubThunk_6B7AD
 		pop	cx
@@ -1357,10 +1376,10 @@ loc_91A33:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D0Ej
 		jmp	short loc_91A54
 ; ���������������������������������������������������������������������������
 
-loc_91A52:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D2Bj
+loc_91A52:				; CODE XREF: Options_ConfigurationScreen_90D20+D2Bj
 		xor	ax, ax
 
-loc_91A54:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D30j
+loc_91A54:				; CODE XREF: Options_ConfigurationScreen_90D20+D30j
 		or	ax, ax
 		jz	short loc_91A99
 		cmp	byte_721F0, 2
@@ -1392,8 +1411,8 @@ loc_91A63:
 		popf
 		jmp	short $+2
 
-loc_91A99:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D36j
-					; Cockpit_LoadAndInitFull_90D20+D3Dj ...
+loc_91A99:				; CODE XREF: Options_ConfigurationScreen_90D20+D36j
+					; Options_ConfigurationScreen_90D20+D3Dj ...
 		push	59CDh
 		call	Kneeboard_ProcessSelected
 		pop	cx
@@ -1401,7 +1420,7 @@ loc_91A99:				; CODE XREF: Cockpit_LoadAndInitFull_90D20+D36j
 		pop	si
 		leave
 		retf
-Cockpit_LoadAndInitFull_90D20	endp
+Options_ConfigurationScreen_90D20	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1409,9 +1428,11 @@ Cockpit_LoadAndInitFull_90D20	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (26 lignes).
+; far, LUE 2026-11-03. Bouton ACE : [+100]=1, [+101]=0, [+102]=1, [+104]=0, [+105]=0,
+; [+106]=0, [+109]=0, [+107]=0, [+108]=0, [+110]=0, mot [+111]=0, [+115]=0, [+116]=1,
+; [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper_91AA6 ».
 ; ==============================================================================================
-Cockpit_Helper_91AA6	proc far		; CODE XREF: VROOMM_StubThunk_6B7F5J Cockpit_LoadAndInitFull_90D20+B99p
+Options_PresetAce_91AA6	proc far		; CODE XREF: VROOMM_StubThunk_6B7F5J Options_ConfigurationScreen_90D20+B99p
 
 arg_0		= word ptr  6
 
@@ -1436,7 +1457,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Cockpit_Helper_91AA6	endp
+Options_PresetAce_91AA6	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1444,9 +1465,11 @@ Cockpit_Helper_91AA6	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (26 lignes).
+; far, LUE 2026-11-03. Bouton VETERAN : [+100]=1, [+101]=1, [+102]=1, [+104]=0, [+105]=1,
+; [+106]=1, [+109]=1, [+107]=0, [+108]=0, [+110]=0, mot [+111]=1, [+115]=1, [+116]=1,
+; [+117]=1. Rôle des champs non établi. Ex-nom « Cockpit_Helper2_91AE9 ».
 ; ==============================================================================================
-Cockpit_Helper2_91AE9	proc far		; CODE XREF: VROOMM_StubThunk_6B7FAJ Cockpit_LoadAndInitFull_90D20+BADp
+Options_PresetVeteran_91AE9	proc far		; CODE XREF: VROOMM_StubThunk_6B7FAJ Options_ConfigurationScreen_90D20+BADp
 
 arg_0		= word ptr  6
 
@@ -1471,7 +1494,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-Cockpit_Helper2_91AE9	endp
+Options_PresetVeteran_91AE9	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1479,10 +1502,13 @@ Cockpit_Helper2_91AE9	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far, aucun appel externe visible (33 lignes).
+; far, LUE 2026-11-03. Bouton ROOKIE du panneau CONFIGURATION : écrit dans la structure de
+; configuration [+100]=0, [+101]=1, [+102]=0, [+104]=1, [+105]=1, [+106]=1, [+109]=1,
+; [+107]=1, [+108]=1, [+110]=1, mot [+111]=2, [+115]=1, [+116]=0, [+117]=0. Rôle des champs
+; non établi. Ex-nom « Cockpit_Helper3_91B2C ».
 ; ==============================================================================================
-Cockpit_Helper3_91B2C	proc far		; CODE XREF: VROOMM_StubThunk_6B7FFJ
-					; Cockpit_LoadAndInitFull_90D20:loc_918E1p
+Options_PresetRookie_91B2C	proc far		; CODE XREF: VROOMM_StubThunk_6B7FFJ
+					; Options_ConfigurationScreen_90D20:loc_918E1p
 
 arg_0		= word ptr  6
 
@@ -1513,6 +1539,6 @@ loc_91B5B:
 		pop	si
 		pop	bp
 		retf
-Cockpit_Helper3_91B2C	endp
+Options_PresetRookie_91B2C	endp
 
 ovr267		ends

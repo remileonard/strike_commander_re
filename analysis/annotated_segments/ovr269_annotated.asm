@@ -7,9 +7,13 @@ ovr269		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 477 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097.
+; ⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « GAMEPLAY » du panneau CONFIGURATION
+; (Options_ConfigurationScreen_90D20) : charge FONTS\\GAMEOPT.SHP (chaînes « gameopt » et «
+; .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056,
+; contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-ResourceFile_LoadTypeD_92E60	proc far		; CODE XREF: VROOMM_StubThunk_6B87FJ
+Options_GameplayScreen_92E60	proc far		; CODE XREF: VROOMM_StubThunk_6B87FJ
 
 var_14E		= word ptr -14Eh
 var_F1		= dword	ptr -0F1h
@@ -141,7 +145,7 @@ loc_92F10:
 		mov	[bp+var_49], 0
 		jmp	short $+2
 
-loc_92F80:				; CODE XREF: ResourceFile_LoadTypeD_92E60+118j
+loc_92F80:				; CODE XREF: Options_GameplayScreen_92E60+118j
 		push	0
 
 loc_92F82:
@@ -210,10 +214,10 @@ loc_93009:
 		jmp	short loc_9301A
 ; ���������������������������������������������������������������������������
 
-loc_93018:				; CODE XREF: ResourceFile_LoadTypeD_92E60+13Ej
+loc_93018:				; CODE XREF: Options_GameplayScreen_92E60+13Ej
 		mov	ax, di
 
-loc_9301A:				; CODE XREF: ResourceFile_LoadTypeD_92E60+1B6j
+loc_9301A:				; CODE XREF: Options_GameplayScreen_92E60+1B6j
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -279,10 +283,10 @@ loc_930B1:
 		jmp	short loc_930C2
 ; ���������������������������������������������������������������������������
 
-loc_930C0:				; CODE XREF: ResourceFile_LoadTypeD_92E60+1E6j
+loc_930C0:				; CODE XREF: Options_GameplayScreen_92E60+1E6j
 		mov	ax, di
 
-loc_930C2:				; CODE XREF: ResourceFile_LoadTypeD_92E60+25Ej
+loc_930C2:				; CODE XREF: Options_GameplayScreen_92E60+25Ej
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -353,7 +357,7 @@ loc_93114:
 		jmp	loc_931DA
 ; ���������������������������������������������������������������������������
 
-loc_93153:				; CODE XREF: ResourceFile_LoadTypeD_92E60+2EEj
+loc_93153:				; CODE XREF: Options_GameplayScreen_92E60+2EEj
 		push	large 0B003Bh
 		push	large 7A0081h
 		push	ax
@@ -394,10 +398,10 @@ loc_931A7:
 		jmp	short loc_931DC
 ; ���������������������������������������������������������������������������
 
-loc_931DA:				; CODE XREF: ResourceFile_LoadTypeD_92E60+2F0j
+loc_931DA:				; CODE XREF: Options_GameplayScreen_92E60+2F0j
 		mov	ax, di
 
-loc_931DC:				; CODE XREF: ResourceFile_LoadTypeD_92E60+378j
+loc_931DC:				; CODE XREF: Options_GameplayScreen_92E60+378j
 		push	ax
 		lea	ax, [bp+var_98]
 		push	ax
@@ -444,13 +448,13 @@ loc_93213:
 		jmp	short loc_9323B
 ; ���������������������������������������������������������������������������
 
-loc_93230:				; CODE XREF: ResourceFile_LoadTypeD_92E60+3DFj
+loc_93230:				; CODE XREF: Options_GameplayScreen_92E60+3DFj
 		push	0
 		push	di
 		call	VROOMM_StubThunk_6C9B4
 		add	sp, 4
 
-loc_9323B:				; CODE XREF: ResourceFile_LoadTypeD_92E60+3CEj
+loc_9323B:				; CODE XREF: Options_GameplayScreen_92E60+3CEj
 		cmp	[bp+var_2], 0
 		jz	short loc_93230
 		push	di
@@ -471,8 +475,8 @@ loc_9323B:				; CODE XREF: ResourceFile_LoadTypeD_92E60+3CEj
 		add	sp, 8
 		jmp	short $+2
 
-loc_9326E:				; CODE XREF: ResourceFile_LoadTypeD_92E60+3ECj
-					; ResourceFile_LoadTypeD_92E60+3F3j
+loc_9326E:				; CODE XREF: Options_GameplayScreen_92E60+3ECj
+					; Options_GameplayScreen_92E60+3F3j
 		mov	dword ptr [si+32h], 0
 		mov	byte ptr [si+37h], 0
 		mov	dword ptr [si+38h], 0
@@ -485,7 +489,7 @@ loc_9326E:				; CODE XREF: ResourceFile_LoadTypeD_92E60+3ECj
 		pop	si
 		leave
 		retf
-ResourceFile_LoadTypeD_92E60	endp
+Options_GameplayScreen_92E60	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -493,9 +497,13 @@ ResourceFile_LoadTypeD_92E60	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 1023 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097.
+; ⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « COCKPIT » du panneau CONFIGURATION
+; (Options_ConfigurationScreen_90D20) : charge FONTS\\COCKOPT.SHP (chaînes « cockopt » et «
+; .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056,
+; contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-ResourceFile_LoadTypeE_93295	proc far		; CODE XREF: VROOMM_StubThunk_6B870J
+Options_CockpitScreen_93295	proc far		; CODE XREF: VROOMM_StubThunk_6B870J
 
 var_19E		= word ptr -19Eh
 var_141		= dword	ptr -141h
@@ -679,7 +687,7 @@ loc_933A1:
 		mov	[bp+var_99], 0
 		jmp	short $+2
 
-loc_933B7:				; CODE XREF: ResourceFile_LoadTypeE_93295+119j
+loc_933B7:				; CODE XREF: Options_CockpitScreen_93295+119j
 		push	0
 		mov	ax, si
 		add	ax, 1Eh
@@ -738,10 +746,10 @@ loc_93413:
 		jmp	short loc_93451
 ; ���������������������������������������������������������������������������
 
-loc_9344F:				; CODE XREF: ResourceFile_LoadTypeE_93295:loc_933D5j
+loc_9344F:				; CODE XREF: Options_CockpitScreen_93295:loc_933D5j
 		mov	ax, di
 
-loc_93451:				; CODE XREF: ResourceFile_LoadTypeE_93295+1B8j
+loc_93451:				; CODE XREF: Options_CockpitScreen_93295+1B8j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -807,10 +815,10 @@ loc_934E3:
 		jmp	short loc_934F9
 ; ���������������������������������������������������������������������������
 
-loc_934F7:				; CODE XREF: ResourceFile_LoadTypeE_93295+1E8j
+loc_934F7:				; CODE XREF: Options_CockpitScreen_93295+1E8j
 		mov	ax, di
 
-loc_934F9:				; CODE XREF: ResourceFile_LoadTypeE_93295+260j
+loc_934F9:				; CODE XREF: Options_CockpitScreen_93295+260j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -870,10 +878,10 @@ loc_93590:
 		jmp	short loc_935A1
 ; ���������������������������������������������������������������������������
 
-loc_9359F:				; CODE XREF: ResourceFile_LoadTypeE_93295+290j
+loc_9359F:				; CODE XREF: Options_CockpitScreen_93295+290j
 		mov	ax, di
 
-loc_935A1:				; CODE XREF: ResourceFile_LoadTypeE_93295+308j
+loc_935A1:				; CODE XREF: Options_CockpitScreen_93295+308j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -939,10 +947,10 @@ loc_93611:
 		jmp	short loc_93649
 ; ���������������������������������������������������������������������������
 
-loc_93647:				; CODE XREF: ResourceFile_LoadTypeE_93295+338j
+loc_93647:				; CODE XREF: Options_CockpitScreen_93295+338j
 		mov	ax, di
 
-loc_93649:				; CODE XREF: ResourceFile_LoadTypeE_93295+3B0j
+loc_93649:				; CODE XREF: Options_CockpitScreen_93295+3B0j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1014,10 +1022,10 @@ loc_936E0:
 		jmp	short loc_936F1
 ; ���������������������������������������������������������������������������
 
-loc_936EF:				; CODE XREF: ResourceFile_LoadTypeE_93295+3E0j
+loc_936EF:				; CODE XREF: Options_CockpitScreen_93295+3E0j
 		mov	ax, di
 
-loc_936F1:				; CODE XREF: ResourceFile_LoadTypeE_93295+458j
+loc_936F1:				; CODE XREF: Options_CockpitScreen_93295+458j
 		push	ax
 
 loc_936F2:
@@ -1075,10 +1083,10 @@ loc_93793:
 		jmp	short loc_93799
 ; ���������������������������������������������������������������������������
 
-loc_93797:				; CODE XREF: ResourceFile_LoadTypeE_93295+488j
+loc_93797:				; CODE XREF: Options_CockpitScreen_93295+488j
 		mov	ax, di
 
-loc_93799:				; CODE XREF: ResourceFile_LoadTypeE_93295+500j
+loc_93799:				; CODE XREF: Options_CockpitScreen_93295+500j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1142,10 +1150,10 @@ loc_93803:
 		jmp	short loc_93841
 ; ���������������������������������������������������������������������������
 
-loc_9383F:				; CODE XREF: ResourceFile_LoadTypeE_93295+530j
+loc_9383F:				; CODE XREF: Options_CockpitScreen_93295+530j
 		mov	ax, di
 
-loc_93841:				; CODE XREF: ResourceFile_LoadTypeE_93295+5A8j
+loc_93841:				; CODE XREF: Options_CockpitScreen_93295+5A8j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1213,10 +1221,10 @@ loc_938B1:
 		jmp	short loc_938E9
 ; ���������������������������������������������������������������������������
 
-loc_938E7:				; CODE XREF: ResourceFile_LoadTypeE_93295:loc_9386Dj
+loc_938E7:				; CODE XREF: Options_CockpitScreen_93295:loc_9386Dj
 		mov	ax, di
 
-loc_938E9:				; CODE XREF: ResourceFile_LoadTypeE_93295+650j
+loc_938E9:				; CODE XREF: Options_CockpitScreen_93295+650j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1282,10 +1290,10 @@ loc_93988:
 		jmp	short loc_93991
 ; ���������������������������������������������������������������������������
 
-loc_9398F:				; CODE XREF: ResourceFile_LoadTypeE_93295+680j
+loc_9398F:				; CODE XREF: Options_CockpitScreen_93295+680j
 		mov	ax, di
 
-loc_93991:				; CODE XREF: ResourceFile_LoadTypeE_93295+6F8j
+loc_93991:				; CODE XREF: Options_CockpitScreen_93295+6F8j
 		push	ax
 
 loc_93992:
@@ -1349,10 +1357,10 @@ loc_93A13:
 		jmp	short loc_93A39
 ; ���������������������������������������������������������������������������
 
-loc_93A37:				; CODE XREF: ResourceFile_LoadTypeE_93295+728j
+loc_93A37:				; CODE XREF: Options_CockpitScreen_93295+728j
 		mov	ax, di
 
-loc_93A39:				; CODE XREF: ResourceFile_LoadTypeE_93295+7A0j
+loc_93A39:				; CODE XREF: Options_CockpitScreen_93295+7A0j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1371,7 +1379,7 @@ loc_93A39:				; CODE XREF: ResourceFile_LoadTypeE_93295+7A0j
 		jmp	loc_93AE9
 ; ���������������������������������������������������������������������������
 
-loc_93A62:				; CODE XREF: ResourceFile_LoadTypeE_93295+7C8j
+loc_93A62:				; CODE XREF: Options_CockpitScreen_93295+7C8j
 		push	large 0B003Bh
 
 loc_93A68:
@@ -1424,10 +1432,10 @@ loc_93AE5:
 		jmp	short loc_93AEB
 ; ���������������������������������������������������������������������������
 
-loc_93AE9:				; CODE XREF: ResourceFile_LoadTypeE_93295+7CAj
+loc_93AE9:				; CODE XREF: Options_CockpitScreen_93295+7CAj
 		mov	ax, di
 
-loc_93AEB:				; CODE XREF: ResourceFile_LoadTypeE_93295+852j
+loc_93AEB:				; CODE XREF: Options_CockpitScreen_93295+852j
 		push	ax
 		lea	ax, [bp+var_E8]
 		push	ax
@@ -1466,13 +1474,13 @@ loc_93B12:
 		jmp	short loc_93B4B
 ; ���������������������������������������������������������������������������
 
-loc_93B40:				; CODE XREF: ResourceFile_LoadTypeE_93295+8BAj
+loc_93B40:				; CODE XREF: Options_CockpitScreen_93295+8BAj
 		push	0
 		push	di
 		call	VROOMM_StubThunk_6C9B4
 		add	sp, 4
 
-loc_93B4B:				; CODE XREF: ResourceFile_LoadTypeE_93295+8A9j
+loc_93B4B:				; CODE XREF: Options_CockpitScreen_93295+8A9j
 		cmp	[bp+var_2], 0
 		jz	short loc_93B40
 		push	di
@@ -1495,8 +1503,8 @@ loc_93B6A:
 		add	sp, 8
 		jmp	short $+2
 
-loc_93B7E:				; CODE XREF: ResourceFile_LoadTypeE_93295+8C7j
-					; ResourceFile_LoadTypeE_93295+8CEj
+loc_93B7E:				; CODE XREF: Options_CockpitScreen_93295+8C7j
+					; Options_CockpitScreen_93295+8CEj
 		mov	dword ptr [si+1Eh], 0
 		mov	byte ptr [si+23h], 0
 		mov	dword ptr [si+24h], 0
@@ -1517,7 +1525,7 @@ loc_93BA1:
 locret_93BA3:
 		leave
 		retf
-ResourceFile_LoadTypeE_93295	endp
+Options_CockpitScreen_93295	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -1525,9 +1533,13 @@ ResourceFile_LoadTypeE_93295	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 650 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097.
+; ⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « CAMERAS » du panneau CONFIGURATION
+; (Options_ConfigurationScreen_90D20) : charge FONTS\\CAMROPT.SHP (chaînes « camropt » et «
+; .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056,
+; contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-ResourceFile_LoadTypeF_93BA5	proc far		; CODE XREF: VROOMM_StubThunk_6B875J
+Options_CamerasScreen_93BA5	proc far		; CODE XREF: VROOMM_StubThunk_6B875J
 
 var_16A		= word ptr -16Ah
 var_10D		= dword	ptr -10Dh
@@ -1708,7 +1720,7 @@ loc_93CB4:
 		mov	[bp+var_6], ax
 		mov	[bp+var_4], ax
 
-loc_93CD1:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+121j
+loc_93CD1:				; CODE XREF: Options_CamerasScreen_93BA5+121j
 		push	large 0C7013Fh
 		push	large 0
 		lea	ax, [bp+var_B4]
@@ -1726,7 +1738,7 @@ loc_93CEB:
 loc_93CF1:
 		jmp	short $+2
 
-loc_93CF3:				; CODE XREF: ResourceFile_LoadTypeF_93BA5:loc_93CEBj
+loc_93CF3:				; CODE XREF: Options_CamerasScreen_93BA5:loc_93CEBj
 		push	0
 		mov	ax, si
 		add	ax, 28h	; '('
@@ -1777,10 +1789,10 @@ loc_93D67:
 		jmp	short loc_93D8D
 ; ���������������������������������������������������������������������������
 
-loc_93D8B:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+16Cj
+loc_93D8B:				; CODE XREF: Options_CamerasScreen_93BA5+16Cj
 		mov	ax, di
 
-loc_93D8D:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+1E4j
+loc_93D8D:				; CODE XREF: Options_CamerasScreen_93BA5+1E4j
 		push	ax
 		lea	ax, [bp+var_B4]
 		push	ax
@@ -1850,10 +1862,10 @@ loc_93DF3:
 		jmp	short loc_93E35
 ; ���������������������������������������������������������������������������
 
-loc_93E33:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+214j
+loc_93E33:				; CODE XREF: Options_CamerasScreen_93BA5+214j
 		mov	ax, di
 
-loc_93E35:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+28Cj
+loc_93E35:				; CODE XREF: Options_CamerasScreen_93BA5+28Cj
 		push	ax
 		lea	ax, [bp+var_B4]
 		push	ax
@@ -1907,10 +1919,10 @@ loc_93E8D:
 		jmp	short loc_93EDD
 ; ���������������������������������������������������������������������������
 
-loc_93EDB:				; CODE XREF: ResourceFile_LoadTypeF_93BA5:loc_93E61j
+loc_93EDB:				; CODE XREF: Options_CamerasScreen_93BA5:loc_93E61j
 		mov	ax, di
 
-loc_93EDD:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+334j
+loc_93EDD:				; CODE XREF: Options_CamerasScreen_93BA5+334j
 		push	ax
 		lea	ax, [bp+var_B4]
 		push	ax
@@ -1986,10 +1998,10 @@ loc_93F84:
 		jmp	short loc_93F93
 ; ���������������������������������������������������������������������������
 
-loc_93F91:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+370j
+loc_93F91:				; CODE XREF: Options_CamerasScreen_93BA5+370j
 		mov	ax, di
 
-loc_93F93:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+3EAj
+loc_93F93:				; CODE XREF: Options_CamerasScreen_93BA5+3EAj
 		push	ax
 		lea	ax, [bp+var_B4]
 		push	ax
@@ -2040,7 +2052,7 @@ loc_93FFF:
 		jmp	loc_940AE
 ; ���������������������������������������������������������������������������
 
-loc_94027:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+47Dj
+loc_94027:				; CODE XREF: Options_CamerasScreen_93BA5+47Dj
 		push	large 0B003Bh
 		push	large 7C0081h
 		push	ax
@@ -2085,10 +2097,10 @@ loc_940A5:
 		jmp	short loc_940B0
 ; ���������������������������������������������������������������������������
 
-loc_940AE:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+47Fj
+loc_940AE:				; CODE XREF: Options_CamerasScreen_93BA5+47Fj
 		mov	ax, di
 
-loc_940B0:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+507j
+loc_940B0:				; CODE XREF: Options_CamerasScreen_93BA5+507j
 		push	ax
 		lea	ax, [bp+var_B4]
 		push	ax
@@ -2133,13 +2145,13 @@ loc_940FD:
 		jmp	short loc_94110
 ; ���������������������������������������������������������������������������
 
-loc_94105:				; CODE XREF: ResourceFile_LoadTypeF_93BA5:loc_94114j
+loc_94105:				; CODE XREF: Options_CamerasScreen_93BA5:loc_94114j
 		push	0
 		push	di
 		call	VROOMM_StubThunk_6C9B4
 		add	sp, 4
 
-loc_94110:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+55Ej
+loc_94110:				; CODE XREF: Options_CamerasScreen_93BA5+55Ej
 		cmp	[bp+var_2], 0
 
 loc_94114:
@@ -2162,8 +2174,8 @@ loc_94114:
 		add	sp, 8
 		jmp	short $+2
 
-loc_94143:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+57Cj
-					; ResourceFile_LoadTypeF_93BA5+583j
+loc_94143:				; CODE XREF: Options_CamerasScreen_93BA5+57Cj
+					; Options_CamerasScreen_93BA5+583j
 		mov	dword ptr [si+28h], 0
 		mov	byte ptr [si+2Dh], 0
 		mov	dword ptr [si+2Eh], 0
@@ -2176,7 +2188,7 @@ loc_94143:				; CODE XREF: ResourceFile_LoadTypeF_93BA5+57Cj
 		pop	si
 		leave
 		retf
-ResourceFile_LoadTypeF_93BA5	endp
+Options_CamerasScreen_93BA5	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -2184,9 +2196,13 @@ ResourceFile_LoadTypeF_93BA5	endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⭐⚠️ far, 580 lignes, NON DÉTAILLÉE — variante de ResourceFile_LoadTypeA_90097.
+; ⚠️ far, NON DÉTAILLÉE (corps non lu) — sous-écran « AUDIO » du panneau CONFIGURATION
+; (Options_ConfigurationScreen_90D20) : charge FONTS\\AUDIOPT.SHP (chaînes « audiopt » et «
+; .shp », Path_ResolveDataFile) ; argument = la structure de configuration (DGROUP 21056,
+; contenu d'OPTIONS.CFG). Ex-nom générique « ResourceFile_LoadType… » (2026-11-03).
+; analysis/OPTIONS_SCREEN.md.
 ; ==============================================================================================
-ResourceFile_LoadTypeG_9416A	proc far		; CODE XREF: VROOMM_StubThunk_6B87AJ
+Options_AudioScreen_9416A	proc far		; CODE XREF: VROOMM_StubThunk_6B87AJ
 
 var_17E		= word ptr -17Eh
 var_121		= dword	ptr -121h
@@ -2338,7 +2354,7 @@ loc_9420E:
 		mov	[bp+var_79], 0
 		jmp	short $+2
 
-loc_9428B:				; CODE XREF: ResourceFile_LoadTypeG_9416A+119j
+loc_9428B:				; CODE XREF: Options_AudioScreen_9416A+119j
 		mov	dx, 2
 		mov	bx, 3
 		mov	[bp+var_4], 5
@@ -2355,7 +2371,7 @@ loc_9428B:				; CODE XREF: ResourceFile_LoadTypeG_9416A+119j
 		mov	[bp+var_A], ax
 		mov	[bp+var_8], ax
 
-loc_942C4:				; CODE XREF: ResourceFile_LoadTypeG_9416A+14Aj
+loc_942C4:				; CODE XREF: Options_AudioScreen_9416A+14Aj
 		cmp	word_70999, 0
 		jnz	short loc_942DD
 		mov	ax, 7
@@ -2365,7 +2381,7 @@ loc_942C4:				; CODE XREF: ResourceFile_LoadTypeG_9416A+14Aj
 		mov	[bp+var_E], ax
 		mov	[bp+var_C], ax
 
-loc_942DD:				; CODE XREF: ResourceFile_LoadTypeG_9416A+15Fj
+loc_942DD:				; CODE XREF: Options_AudioScreen_9416A+15Fj
 		push	0
 		mov	ax, si
 
@@ -2422,10 +2438,10 @@ loc_94363:
 		jmp	short loc_9437F
 ; ���������������������������������������������������������������������������
 
-loc_9437D:				; CODE XREF: ResourceFile_LoadTypeG_9416A+197j
+loc_9437D:				; CODE XREF: Options_AudioScreen_9416A+197j
 		mov	ax, di
 
-loc_9437F:				; CODE XREF: ResourceFile_LoadTypeG_9416A+211j
+loc_9437F:				; CODE XREF: Options_AudioScreen_9416A+211j
 		push	ax
 		lea	ax, [bp+var_C8]
 		push	ax
@@ -2489,10 +2505,10 @@ loc_9440D:
 		jmp	short loc_94435
 ; ���������������������������������������������������������������������������
 
-loc_94433:				; CODE XREF: ResourceFile_LoadTypeG_9416A+24Dj
+loc_94433:				; CODE XREF: Options_AudioScreen_9416A+24Dj
 		mov	ax, di
 
-loc_94435:				; CODE XREF: ResourceFile_LoadTypeG_9416A+2C7j
+loc_94435:				; CODE XREF: Options_AudioScreen_9416A+2C7j
 		push	ax
 		lea	ax, [bp+var_C8]
 		push	ax
@@ -2552,10 +2568,10 @@ loc_94475:
 		jmp	short loc_944EB
 ; ���������������������������������������������������������������������������
 
-loc_944E9:				; CODE XREF: ResourceFile_LoadTypeG_9416A+303j
+loc_944E9:				; CODE XREF: Options_AudioScreen_9416A+303j
 		mov	ax, di
 
-loc_944EB:				; CODE XREF: ResourceFile_LoadTypeG_9416A+37Dj
+loc_944EB:				; CODE XREF: Options_AudioScreen_9416A+37Dj
 		push	ax
 		lea	ax, [bp+var_C8]
 		push	ax
@@ -2619,10 +2635,10 @@ loc_94572:
 		jmp	short loc_945A1
 ; ���������������������������������������������������������������������������
 
-loc_9459F:				; CODE XREF: ResourceFile_LoadTypeG_9416A+3B9j
+loc_9459F:				; CODE XREF: Options_AudioScreen_9416A+3B9j
 		mov	ax, di
 
-loc_945A1:				; CODE XREF: ResourceFile_LoadTypeG_9416A+433j
+loc_945A1:				; CODE XREF: Options_AudioScreen_9416A+433j
 		push	ax
 		lea	ax, [bp+var_C8]
 		push	ax
@@ -2641,7 +2657,7 @@ loc_945A1:				; CODE XREF: ResourceFile_LoadTypeG_9416A+433j
 		jmp	loc_94651
 ; ���������������������������������������������������������������������������
 
-loc_945CA:				; CODE XREF: ResourceFile_LoadTypeG_9416A+45Bj
+loc_945CA:				; CODE XREF: Options_AudioScreen_9416A+45Bj
 		push	large 0B003Bh
 		push	large 650081h
 		push	ax
@@ -2680,10 +2696,10 @@ loc_94602:
 		jmp	short loc_94653
 ; ���������������������������������������������������������������������������
 
-loc_94651:				; CODE XREF: ResourceFile_LoadTypeG_9416A+45Dj
+loc_94651:				; CODE XREF: Options_AudioScreen_9416A+45Dj
 		mov	ax, di
 
-loc_94653:				; CODE XREF: ResourceFile_LoadTypeG_9416A+4E5j
+loc_94653:				; CODE XREF: Options_AudioScreen_9416A+4E5j
 		push	ax
 		lea	ax, [bp+var_C8]
 		push	ax
@@ -2722,13 +2738,13 @@ loc_94674:
 		jmp	short loc_946B3
 ; ���������������������������������������������������������������������������
 
-loc_946A8:				; CODE XREF: ResourceFile_LoadTypeG_9416A+54Dj
+loc_946A8:				; CODE XREF: Options_AudioScreen_9416A+54Dj
 		push	0
 		push	di
 		call	VROOMM_StubThunk_6C9B4
 		add	sp, 4
 
-loc_946B3:				; CODE XREF: ResourceFile_LoadTypeG_9416A+53Cj
+loc_946B3:				; CODE XREF: Options_AudioScreen_9416A+53Cj
 		cmp	[bp+var_2], 0
 		jz	short loc_946A8
 		push	di
@@ -2751,8 +2767,8 @@ loc_946B3:				; CODE XREF: ResourceFile_LoadTypeG_9416A+53Cj
 loc_946E4:
 		jmp	short $+2
 
-loc_946E6:				; CODE XREF: ResourceFile_LoadTypeG_9416A+55Aj
-					; ResourceFile_LoadTypeG_9416A+561j
+loc_946E6:				; CODE XREF: Options_AudioScreen_9416A+55Aj
+					; Options_AudioScreen_9416A+561j
 		mov	dword ptr [si+3Ch], 0
 		mov	byte ptr [si+41h], 0
 		mov	dword ptr [si+42h], 0
@@ -2765,6 +2781,6 @@ loc_946E6:				; CODE XREF: ResourceFile_LoadTypeG_9416A+55Aj
 		pop	si
 		leave
 		retf
-ResourceFile_LoadTypeG_9416A	endp
+Options_AudioScreen_9416A	endp
 
 ovr269		ends

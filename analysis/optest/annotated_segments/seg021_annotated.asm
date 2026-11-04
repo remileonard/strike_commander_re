@@ -7,7 +7,7 @@ seg021		segment	byte public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_D2CC	proc far		; CODE XREF: seg021:07D2p sub_DAEB+29p ...
+sub_D2CC	proc far		; CODE XREF: seg021:07D2p WidgetPanel_Construct_DAEB+29p ...
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -34,7 +34,7 @@ loc_D2E7:				; CODE XREF: sub_D2CC+9j
 		push	[bp+arg_4]
 		push	[bp+arg_2]
 		push	si
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [si+0Eh], 2A87h
 		xor	ax, ax
@@ -1211,7 +1211,7 @@ loc_DA27:				; CODE XREF: seg021:072Ej
 
 ; Attributes: bp-based frame
 
-sub_DA2B	proc far		; CODE XREF: seg021:081Dp sub_DAEB+74p ...
+sub_DA2B	proc far		; CODE XREF: seg021:081Dp WidgetPanel_Construct_DAEB+74p ...
 
 arg_0		= word ptr  6
 
@@ -1296,7 +1296,13 @@ loc_DAE3:				; CODE XREF: seg021:07C6j
 
 ; Attributes: bp-based frame
 
-sub_DAEB	proc far		; CODE XREF: sub_11F61+29P
+; ==============================================================================================
+; far, LUE 2026-11-04 (en-tête). Constructeur d'un panneau qui contient des boutons (114
+; octets, par sub_D2CC → Widget_ConstructRect_FED6) : arguments x, y, largeur, hauteur. Dans
+; TRAINING MISSION, l'image du panneau (TM.SHP) est posée dans l'objet et les positions des
+; boutons sont relatives au coin du panneau (vérifié par rendu).
+; ==============================================================================================
+WidgetPanel_Construct_DAEB	proc far		; CODE XREF: sub_11F61+29P
 					; sub_4CF75+37EP ...
 
 arg_0		= word ptr  6
@@ -1318,7 +1324,7 @@ arg_8		= word ptr  0Eh
 		or	ax, ax
 		jz	short loc_DB65
 
-loc_DB06:				; CODE XREF: sub_DAEB+9j
+loc_DB06:				; CODE XREF: WidgetPanel_Construct_DAEB+9j
 		push	[bp+arg_8]
 		push	[bp+arg_6]
 		push	[bp+arg_4]
@@ -1344,12 +1350,12 @@ loc_DB06:				; CODE XREF: sub_DAEB+9j
 		call	near ptr sub_DA2B
 		add	sp, 2
 
-loc_DB65:				; CODE XREF: sub_DAEB+19j
+loc_DB65:				; CODE XREF: WidgetPanel_Construct_DAEB+19j
 		mov	ax, si
 		pop	si
 		pop	bp
 		retf
-sub_DAEB	endp
+WidgetPanel_Construct_DAEB	endp
 
 ; ���������������������������������������������������������������������������
 		pop	si

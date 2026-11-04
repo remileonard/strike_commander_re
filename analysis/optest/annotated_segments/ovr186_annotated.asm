@@ -1755,7 +1755,7 @@ loc_4F3A2:				; CODE XREF: Gameflow_MainMenu_4F1A7+19Ej
 		push	2Dh ; '-'
 		lea	ax, [bp+var_39C]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		mov	[bp+var_32E], 0
 		mov	[bp+var_32C], 1
@@ -1855,7 +1855,7 @@ loc_4F746:				; CODE XREF: Gameflow_MainMenu_4F1A7+59Aj
 		push	0Ah
 		push	0Bh
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0
@@ -1918,7 +1918,7 @@ loc_4F7FD:				; CODE XREF: Gameflow_MainMenu_4F1A7+651j
 		push	1Bh
 		push	0Bh
 		push	[bp+var_90]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_90]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -1991,7 +1991,7 @@ loc_4F8F2:				; CODE XREF: Gameflow_MainMenu_4F1A7+746j
 		push	2Ch ; ','
 		push	0Bh
 		push	[bp+var_98]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_98]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2062,7 +2062,7 @@ loc_4F9E7:				; CODE XREF: Gameflow_MainMenu_4F1A7+83Bj
 		push	3Dh ; '='
 		push	0Bh
 		push	[bp+var_A0]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_A0]
 		mov	word ptr [bx+0Eh], 7A8h
@@ -2133,7 +2133,7 @@ loc_4FADC:				; CODE XREF: Gameflow_MainMenu_4F1A7+930j
 		push	4Eh ; 'N'
 		push	0Bh
 		push	[bp+var_A8]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp+var_A8]
 		mov	word ptr [bx+0Eh], 7A8h

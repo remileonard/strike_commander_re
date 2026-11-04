@@ -165,7 +165,7 @@ VROOMM_StubThunk_6C762	endp
 ; d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C767	proc far		; CODE XREF: Input_CalibrationHandler+177P
-					; Cockpit_LoadAndInitFull_90D20+16CP
+					; Options_ConfigurationScreen_90D20+16CP
 		jmp	PaletteScreen_BuildCustomGradient_A1626
 VROOMM_StubThunk_6C767	endp
 
@@ -378,7 +378,7 @@ VROOMM_StubThunk_6C7B2	endp
 ; d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C7B7	proc far		; CODE XREF: Input_CalibrationHandler+33AP
-					; Cockpit_DrawEncodedText_8FA4C+BP	...
+					; Options_DrawPanel_8FA4C+BP	...
 		jmp	PaletteScreen_AcquireOwnership_A1240
 VROOMM_StubThunk_6C7B7	endp
 
@@ -392,7 +392,7 @@ VROOMM_StubThunk_6C7B7	endp
 ; d'overlay actuellement charge en memoire. fileoff=2F8E0h, codesize=19E8h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C7BC	proc far		; CODE XREF: Input_CalibrationHandler+36FP
-					; Cockpit_DrawEncodedText_8FA4C+D5P ...
+					; Options_DrawPanel_8FA4C+D5P ...
 		jmp	PaletteScreen_ReleaseOwnership_A125D
 VROOMM_StubThunk_6C7BC	endp
 

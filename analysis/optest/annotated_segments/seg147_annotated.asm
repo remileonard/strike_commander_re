@@ -1568,8 +1568,12 @@ ResourceRecord_ResetIfSet_3C5C8	endp
 
 ; Attributes: bp-based frame
 
-sub_3C5D6	proc far		; CODE XREF: sub_58EEA+2A7P
-					; sub_58EEA+399P
+; ==============================================================================================
+; far, LUE 2026-11-04. Nombre d'enregistrements du chunk courant : taille du chunk ([si+72h])
+; / taille d'un enregistrement (argument dword), rangée en [si+7Eh] et renvoyée.
+; ==============================================================================================
+ResourceRecord_RecordCount_3C5D6	proc far		; CODE XREF: Training_BuildInstantMission_58EEA+2A7P
+					; Training_BuildInstantMission_58EEA+399P
 
 arg_0		= word ptr  6
 arg_2		= dword	ptr  8
@@ -1588,7 +1592,7 @@ arg_2		= dword	ptr  8
 		pop	si
 		pop	bp
 		retf
-sub_3C5D6	endp
+ResourceRecord_RecordCount_3C5D6	endp
 
 ; ���������������������������������������������������������������������������
 		push	bp

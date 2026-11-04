@@ -61,7 +61,7 @@ sub_4209F	endp
 ; Attributes: thunk
 
 sub_420A4	proc far		; CODE XREF: Gameflow_RunScriptPairs_36CF+2B1P
-					; sub_597B2+BBP
+					; Training_Run_597B2+BBP
 		jmp	Gameflow_WeaponLoadout_51AB3
 sub_420A4	endp
 

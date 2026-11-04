@@ -508,7 +508,7 @@ VROOMM_StubThunk_6C964	endp
 ; d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C969	proc far		; CODE XREF: Input_CalibrationHandler+192P
-					; ResourceFile_LoadTypeA_90097+1DAP ...
+					; Options_FlightScreen_90097+1DAP ...
 		jmp	GaugeWidgetVariantB_ConstructAndInit_A353F
 VROOMM_StubThunk_6C969	endp
 
@@ -548,7 +548,7 @@ VROOMM_StubThunk_6C973	endp
 ; d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C978	proc far		; CODE XREF: Input_CalibrationHandler+43BP
-					; ResourceFile_LoadTypeA_90097+880P ...
+					; Options_FlightScreen_90097+880P ...
 		jmp	GaugeWidget_RebuildAndRelease_A36BD
 VROOMM_StubThunk_6C978	endp
 
@@ -627,7 +627,7 @@ VROOMM_StubThunk_6C991	endp
 ; d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C996	proc far		; CODE XREF: Input_CalibrationHandler+32FP
-					; ResourceFile_LoadTypeA_90097+786P ...
+					; Options_FlightScreen_90097+786P ...
 		jmp	GaugeWidget_QueryRenderState_A39B7
 VROOMM_StubThunk_6C996	endp
 
@@ -706,7 +706,7 @@ VROOMM_StubThunk_6C9AF	endp
 ; d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C9B4	proc far		; CODE XREF: Input_CalibrationHandler+37EP
-					; ResourceFile_LoadTypeA_90097+791P ...
+					; Options_FlightScreen_90097+791P ...
 		jmp	GaugeWidget_QueryAndFormat_A3C2C
 VROOMM_StubThunk_6C9B4	endp
 
@@ -733,7 +733,7 @@ VROOMM_StubThunk_6C9B9	endp
 ; d'overlay actuellement charge en memoire. fileoff=31550h, codesize=1475h, nentries=57.
 ; ==============================================================================================
 VROOMM_StubThunk_6C9BE	proc far		; CODE XREF: Input_CalibrationHandler+391P
-					; ResourceFile_LoadTypeA_90097+839P ...
+					; Options_FlightScreen_90097+839P ...
 		jmp	GaugeWidget_DrawByMode_A39DC
 VROOMM_StubThunk_6C9BE	endp
 

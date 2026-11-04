@@ -18,8 +18,8 @@ stru_6C9D0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:0B1Eo
 ; far, thunk fixe VROOMM (jmp sub_A4270) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=32A70h, codesize=2FEh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6C9F0	proc far		; CODE XREF: ResourceFile_LoadTypeA_90097+26BP
-					; ResourceFile_LoadTypeA_90097+680P ...
+VROOMM_StubThunk_6C9F0	proc far		; CODE XREF: Options_FlightScreen_90097+26BP
+					; Options_FlightScreen_90097+680P ...
 		jmp	GaugeWidgetVariantD_ConstructAndInit_A4270
 VROOMM_StubThunk_6C9F0	endp
 

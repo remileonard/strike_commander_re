@@ -289,8 +289,25 @@ class Extractor:
         self.objects = {}
         self.counters = {}
         self.tables = []
+        self.scene_at = {}
         self.local_names = {}
         self.arg_names = {}
+
+    def switch_table(self, label):
+        """Cibles d'une table de switch : « label dw offset loc_A » puis « dw offset loc_B »…"""
+        if not hasattr(self, '_switch_tables'):
+            self._switch_tables = {}
+        if label not in self._switch_tables:
+            targets = []
+            start = next((i for i, l in enumerate(self.lines) if re.match(rf'^{label}\s+dw\s', l)), None)
+            if start is not None:
+                for line in self.lines[start:]:
+                    m = re.match(r'^(?:' + re.escape(label) + r')?\s+dw\s+offset\s+(\w+)', line)
+                    if not m:
+                        break
+                    targets.append(m.group(1))
+            self._switch_tables[label] = targets
+        return self._switch_tables[label]
 
     # --- objets -----------------------------------------------------------
     def new_obj(self, kind, prefix):
@@ -1216,6 +1233,18 @@ class FunctionRun:
                 return
             self.call(t, k, line)
             return
+        if mn == 'jmp' and re.match(r'^cs:off_[0-9A-F]+\[bx\]', ops.strip()):
+            # Switch par table (listing reconstruit de TOPTTST1.EXE) : un saut conditionnel par cas,
+            # bx = 2 × numéro du cas ; la borne a été testée juste avant (ja vers le cas par défaut).
+            table = re.match(r'^cs:(off_[0-9A-F]+)', ops.strip()).group(1)
+            index = self.regs.get('bx', unknown())
+            for case, target in enumerate(self.ex.switch_table(table)):
+                if target in self.label_index and self.label_index[target] > k:
+                    self.open_conditions.add(target)
+                self.pending.setdefault(target, []).append(self.snapshot())
+                self.emit(('cgoto', ('cmp', '==', index, const(2 * case)), target, line))
+            self.dead = True
+            return
         if mn == 'jmp':
             target = self.jump_target(ops)
             if target == '$+2':
@@ -1360,6 +1389,7 @@ def apply(self, run, target, spec, args, line):
                     obj = self.new_obj('scene', 'scène')
                     run.found_regions.setdefault(off, []).append((run.k, 33, obj.id))
                     oid = obj.id
+                    self.scene_at[(run.addr, run.k)] = obj
             else:
                 if off is None:
                     for start, entries in run.regions.items():
@@ -1369,6 +1399,12 @@ def apply(self, run, target, spec, args, line):
                 hit = run.region_at(off) if off is not None else None
                 if hit and hit[0] == off:
                     oid = hit[1]
+        if not oid and run.pass_no != 1 and (run.addr, run.k) in self.scene_at:
+            # Zone de la scène retirée en 2e passe parce qu'elle chevauche une autre (to1mid2 : la scène prend
+            # la place du tableau objets2, lue comme objets2+16) : la scène créée par cette instruction en 1re passe.
+            obj = self.scene_at[(run.addr, run.k)]
+            self.objects[obj.id] = obj
+            oid = obj.id
         if oid:
             objv = ('obj', oid)
         run.emit(('scene', self.render(objv), self.render(named.get('cadence')), self.render(named.get('palette')), self.render(named.get('surface')), line))

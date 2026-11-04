@@ -1580,7 +1580,7 @@ var_4		= dword	ptr -4
 		push	0
 		lea	ax, [bp+var_9A]
 		push	ax
-		call	sub_DAEB
+		call	WidgetPanel_Construct_DAEB
 		add	sp, 0Ah
 		cmp	[bp+var_65], 0
 		jnz	short loc_5DEB6
@@ -1604,7 +1604,7 @@ loc_5DECB:				; CODE XREF: sub_5DD30+196j
 		push	0AFh ; '�'
 		push	5Bh ; '['
 		push	si
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [si+0Eh], 7A8h
 		mov	dword ptr [si+1Eh], 0
@@ -1665,7 +1665,7 @@ loc_5DF84:				; CODE XREF: sub_5DD30+24Fj
 		push	0AFh ; '�'
 		push	0A4h ; '�'
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 7A8h
 		mov	dword ptr [di+1Eh], 0

@@ -279,7 +279,7 @@ Music_Resume_5A9D0	endp
 ; Ex-'Widget_Helper_5A9E6'. far. LUE 2026-10-06. Facade (appelee par STRIKE_EXE_MAIN_LOOP) :
 ; Music_StopWithFade_AB1EF(fondu = argument).
 ; ==============================================================================================
-Music_Stop_5A9E6	proc far		; CODE XREF: Config_ReadCalibration:loc_270D5P
+Music_Stop_5A9E6	proc far		; CODE XREF: Input_AltKeyCommands_26F7E:loc_270D5P
 					; STRIKE_EXE_MAIN_LOOP+1F1P ...
 
 arg_0		= byte ptr  6
@@ -310,7 +310,7 @@ Music_Stop_5A9E6	endp
 ; choisit rien : ennemis proches (Music_ScanNearbyEnemies_590E0) -> 4 si byte_70869 sinon 0x13
 ; ; sinon piste de la mission byte_706A2 (chunk TUNE) ; Music_RequestTune_5A984.
 ; ==============================================================================================
-Music_SelectStartTune_5AA02	proc far		; CODE XREF: Config_ReadCalibration:loc_27100P
+Music_SelectStartTune_5AA02	proc far		; CODE XREF: Input_AltKeyCommands_26F7E:loc_27100P
 					; Cockpit_LoadAndDrawCalibration_8FDC0+2C2P
 		push	bp
 		mov	bp, sp
@@ -399,7 +399,7 @@ Music_OnObjectDestroyed_5AA49	endp
 ; Ex-'Widget_Helper_5AA73'. far. LUE 2026-10-06. Desactive les effets (byte_7236C = 0) apres
 ; avoir arrete tous les canaux.
 ; ==============================================================================================
-SoundFX_Disable_5AA73	proc far		; CODE XREF: Config_ReadCalibration+19FP
+SoundFX_Disable_5AA73	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+19FP
 		push	bp
 		mov	bp, sp
 		cmp	byte_7236C, 0
@@ -425,7 +425,7 @@ SoundFX_Disable_5AA73	endp
 ; Ex-'Widget_Helper_5AA95'. far. LUE 2026-10-06. Arrete tous les canaux d'effets
 ; (SoundFX_StopAllChannels_AB770).
 ; ==============================================================================================
-SoundFX_StopAll_5AA95	proc far		; CODE XREF: Config_ReadCalibration+138P
+SoundFX_StopAll_5AA95	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+138P
 		push	bp
 		mov	bp, sp
 		cmp	byte_7236C, 0
@@ -608,7 +608,7 @@ loc_5AB77:				; CODE XREF: seg125:02DDj seg125:02E7j
 ; frame : SoundFX_Tick_59CFA, tick de la voix (AudioQueue_FinalizeAndRelease_ABDEC), et
 ; Music_CombatIntensitySelector_59302 une frame sur 16 ('test word_70466, 0Fh').
 ; ==============================================================================================
-Sound_FrameUpdate_5AB79	proc far		; CODE XREF: Config_ReadCalibration+1A7P
+Sound_FrameUpdate_5AB79	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+1A7P
 
 arg_0		= word ptr  6
 

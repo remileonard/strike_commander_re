@@ -18,8 +18,8 @@ stru_6B7D0	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:off_6A6F6o
 ; far, thunk fixe VROOMM (jmp sub_90D20) — redirige un point d'entree stable vers le code
 ; d'overlay actuellement charge en memoire. fileoff=1E7F0h, codesize=0E4Fh, nentries=4.
 ; ==============================================================================================
-VROOMM_StubThunk_6B7F0	proc far		; CODE XREF: Config_ReadCalibration+140P
-		jmp	Cockpit_LoadAndInitFull_90D20
+VROOMM_StubThunk_6B7F0	proc far		; CODE XREF: Input_AltKeyCommands_26F7E+140P
+		jmp	Options_ConfigurationScreen_90D20
 VROOMM_StubThunk_6B7F0	endp
 
 
@@ -32,7 +32,7 @@ VROOMM_StubThunk_6B7F0	endp
 ; d'overlay actuellement charge en memoire. fileoff=1E7F0h, codesize=0E4Fh, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6B7F5	proc far
-		jmp	Cockpit_Helper_91AA6
+		jmp	Options_PresetAce_91AA6
 VROOMM_StubThunk_6B7F5	endp
 
 
@@ -45,7 +45,7 @@ VROOMM_StubThunk_6B7F5	endp
 ; d'overlay actuellement charge en memoire. fileoff=1E7F0h, codesize=0E4Fh, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6B7FA	proc far
-		jmp	Cockpit_Helper2_91AE9
+		jmp	Options_PresetVeteran_91AE9
 VROOMM_StubThunk_6B7FA	endp
 
 
@@ -58,7 +58,7 @@ VROOMM_StubThunk_6B7FA	endp
 ; d'overlay actuellement charge en memoire. fileoff=1E7F0h, codesize=0E4Fh, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6B7FF	proc far
-		jmp	Cockpit_Helper3_91B2C
+		jmp	Options_PresetRookie_91B2C
 VROOMM_StubThunk_6B7FF	endp
 
 stub267		ends

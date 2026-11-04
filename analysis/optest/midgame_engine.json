@@ -453,7 +453,7 @@
     "chronomètre"
    ]
   },
-  "Render_MeasureOrDrawTextString_32CD8": {
+  "Shape_DrawSpans_32CD8": {
    "op": "dessine_image",
    "args": [
     "surface",

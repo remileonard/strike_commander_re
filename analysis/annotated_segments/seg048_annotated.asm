@@ -1672,7 +1672,7 @@ loc_27F90:				; DATA XREF: seg339:12A2o
 ; (sub_2075B référencé) et l'INT15 AH=12h fonction 0x4355h (calibration périphérique) :
 ; gestionnaire de calibration de périphérique d'entrée (joystick/manche), à approfondir.
 ; ==============================================================================================
-Input_CalibrationHandler	proc far		; CODE XREF: Config_ReadCalibration:loc_27065P
+Input_CalibrationHandler	proc far		; CODE XREF: Input_AltKeyCommands_26F7E:loc_27065P
 
 var_150		= word ptr -150h
 var_F3		= dword	ptr -0F3h

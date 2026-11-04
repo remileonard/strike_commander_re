@@ -1005,7 +1005,7 @@ loc_119DD:				; CODE XREF: seg025:05D8j
 		push	word ptr [bp-1Ch]
 		push	word ptr [bp-1Ah]
 		push	di
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	word ptr [di+0Eh], 848h
 		mov	word ptr [di+24h], 2BDh
@@ -1066,7 +1066,7 @@ loc_11B01:				; CODE XREF: seg025:06FDj
 		push	word ptr [bp-2Ah]
 		push	word ptr [bp-28h]
 		push	word ptr [bp-30h]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp-30h]
 		mov	word ptr [bx+0Eh], 2BA2h
@@ -1148,7 +1148,7 @@ loc_11C03:				; CODE XREF: seg025:07FEj
 		push	word ptr [bp-34h]
 		push	word ptr [bp-32h]
 		push	word ptr [bp-3Ch]
-		call	sub_FED6
+		call	Widget_ConstructRect_FED6
 		add	sp, 0Ah
 		mov	bx, [bp-3Ch]
 		mov	word ptr [bx+0Eh], 2B3Ah
