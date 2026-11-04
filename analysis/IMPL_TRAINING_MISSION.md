@@ -15,21 +15,25 @@ un seul programme : la mission est construite **en mémoire**.
 
 1. `SCTrainingMenu` affiche les écrans et remplit les réglages (`MISN_TRAINING`, l'équivalent des 42 octets de
    `Training_InitSettings_598FC`).
-2. À ACCEPT, les réglages sont rangés dans `SCState` (`training_active`, `training`), comme le jeu les garde dans la
-   structure de partie (`[partie+249]` = 254), puis le vol part sur `MISSIONS\TEMPLATE.IFF`, comme avant.
-3. `SCMission::loadMission` lit le modèle (`RSMission::InitFromRAM`) puis, si `training_active` est posé, appelle
+2. À ACCEPT, l'écran d'armement de la campagne s'ouvre (`WeaponLoadoutScene`, comme pour la commande
+   `WEAPON_LOADOUT` de `SCGameFlow`), avec le stock fixe de l'entraînement, la scène 11 et le chargement par défaut 0
+   (§ 2.2). Le sprite 12 lance le vol avec l'emport choisi ; l'autre sprite arrête l'entraînement, comme dans le jeu.
+3. Au départ, les réglages sont rangés dans `SCState` (`training_active`, `training`), comme le jeu les garde dans la
+   structure de partie (`[partie+249]` = 254), puis le vol part sur `MISSIONS\TEMPLATE.IFF`.
+4. `SCMission::loadMission` lit le modèle (`RSMission::InitFromRAM`) puis, si `training_active` est posé, appelle
    `RSMission::addTraining`, **avant** la création des scènes et des acteurs.
-4. `RSMission::addTraining` fait dans `mission_data` les ajouts que `Training_BuildInstantMission_58EEA` fait dans le
+5. `RSMission::addTraining` fait dans `mission_data` les ajouts que `Training_BuildInstantMission_58EEA` fait dans le
    fichier (zone, `FLAG[1]`, pilotes `CAST`, joueur replacé, avions `PART`, scène `SCNE`), avec les conversions de
    lecture de `parseMISN_*`. Le reste de `loadMission` crée les avions comme pour toute mission (profil
    `INTEL\ACE.IFF`…, cerveau d'IA, scripts du modèle).
-5. Au retour du vol, `SCTrainingMenu::focus` efface `training_active` et revient au premier écran.
+6. Au retour du vol, `SCTrainingMenu::focus` efface `training_active`, rétablit le stock d'armes d'avant l'entraînement
+   et revient au premier écran.
 
 **Pourquoi `SCState` et pas un argument de `SCStrike::setMission` (changement par rapport à la proposition) :**
 `setMission` passe par `SCStrike::createMission`, redéfinie dans `PSStrike`, `EnhancedStrike` et `DebugStrike`. Un
 argument de plus aurait obligé à modifier ces trois classes et `SCMission` (constructeur). Avec `SCState`, **`SCStrike`
-n'est pas modifié**, et la version « enhanced » (`EnhancedTrainingMenu::OnSearchAndDestroy` → `EnhancedStrike`)
-fonctionne sans changement.
+n'est pas modifié**. La version « enhanced » (`EnhancedTrainingMenu::OnSearchAndDestroy` → `EnhancedStrike`) ne
+reçoit qu'une ligne : l'emport choisi à l'écran d'armement (`player_loadout`).
 
 ## 2. Les fichiers modifiés
 
@@ -40,7 +44,10 @@ fonctionne sans changement.
 | `strike_commander/SCState.h` | `training_active`, `training` |
 | `strike_commander/SCMission.cpp` | `SCMission::loadMission` : appel d'`addTraining` après la lecture |
 | `engine/FrameBuffer.cpp` | `FrameBuffer::textGlyphAdvance` : espace de la largeur d'un « A » si la police n'a pas de tiret |
-| `strike_commander/SCTrainingMenu.h`, `.cpp` | les 7 écrans, les textes, BACKUP, le départ en vol |
+| `strike_commander/SCTrainingMenu.h`, `.cpp` | les 7 écrans, les textes, BACKUP, l'écran d'armement, le départ en vol |
+| `strike_commander/SCScene.h`, `.cpp` | `SCScene::checkZones` (corps de `SCGameFlow::CheckZones`, partagé) ; `WeaponLoadoutScene::keep_music` |
+| `strike_commander/SCGameFlow.cpp` | `SCGameFlow::CheckZones` appelle `SCScene::checkZones` |
+| `enhanced/EnhancedTrainingMenu.cpp` | `OnSearchAndDestroy` passe l'emport choisi à `EnhancedStrike` |
 
 `OnSearchAndDestroy` garde son nom et son rôle de départ en vol, pour les deux types (le vol est toujours
 `TEMPLATE.IFF`) : `EnhancedTrainingMenu` le redéfinit. `OnDogFight`, privée et appelée par aucun bouton, est retirée.
@@ -62,12 +69,33 @@ fonctionne sans changement.
   du tiret pour l'espace, donc 0 : l'espace prend maintenant la largeur d'un « A » quand le tiret est vide. Couleur 0 :
   les lettres gardent leurs couleurs (0 et 1 de la palette d'`OBJVIEW.PAK`, noir et gris clair). Le jeu passe 255 à
   `PaletteScreen_DispatchWidgetLayoutB_11363`, dont le sens n'est pas lu.
-- **Armement** : le jeu pose un stock fixe (`TRAINING_MISSION.md` § 7) puis ouvre l'écran d'armement de la campagne
-  (`Gameflow_WeaponLoadout_51AB3`). Ce n'est pas repris : `WeaponLoadoutScene` est lancé par `SCGameFlow` avec une scène
-  de `GAMEFLOW.IFF`. L'avion du joueur garde l'emport de son fichier (`player_loadout` à faux).
 - **Retour de vol** : l'entraînement ne touche pas à la campagne (dans le jeu, `Gameflow_SaveTmpState_4BBA0` est sautée
   pour la mission 254). Ici, le vol est lancé par `SCTrainingMenu`, pas par `SCGameFlow` : le compte rendu n'est pas
   appliqué à la partie ; retour au premier écran d'entraînement.
+
+### 2.2 L'écran d'armement
+
+Comme dans `SCGameFlow` (commande `WEAPON_LOADOUT`), mais hébergé par `SCTrainingMenu`, qui reste l'activité courante :
+
+| Élément | Valeur | Origine dans le jeu |
+|---|---|---|
+| écran d'`OPTIONS.IFF` | 15 (comme `SCGameFlow`) | — |
+| scène (`GAMEFLOW_SCEN::info.ID`) | 11 : `WeaponLoadoutScene` en fait une zone (sprite 11 de l'écran 15) | `[partie+252]` = 11 posé par `Training_Run_597B2` |
+| chargement par défaut | 0 de `GAMEFLOW.IFF` (vide : aucune arme posée) | argument 0 de `Gameflow_WeaponLoadout_51AB3` |
+| stock | SWINDERJ 6, SWINDERM 6, AGM-65D 12, DURANDAL 12, MK20 24, MK82 24, GBU-15G 4, POD 8, AMRAAM 6 | `Training_Run_597B2`, `[partie+609 + 2 × arme]` |
+| sprite 12 | départ en vol, `SCStrike::player_loadout` vrai (emport de `GameState.weapon_load_out`) | `Gameflow_WeaponLoadout_51AB3` rend 1 |
+| autre sprite | fin de l'entraînement (retour au menu) | rend 0, `Training_Run_597B2` rend 0 |
+| musique | celle de l'écran d'entraînement continue (`keep_music`) | `byte_43BAA` = 1 : pas de changement d'ambiance |
+
+Constaté dans les données avec `RSOption` : l'écran 15 d'`OPTIONS.IFF` a les sprites 11, 12 et 20 (20 = retour de la
+campagne dans `SCGameFlow::flyOrReturnFromScene`) ; le chargement 0 de `GAMEFLOW.IFF` ne contient que son numéro.
+
+- Le stock de la partie est mis de côté à l'ouverture de l'écran et rétabli au retour du vol ou à l'abandon : le vol
+  d'entraînement retire ses armes du stock d'entraînement (`takeTeamWeaponsFromStock`), pas de celui d'une campagne.
+- Les clics de zone sont notés et appliqués après `SCScene::checkZones`, comme ceux des boutons : la scène est détruite
+  au départ.
+- `SCScene::checkZones` est l'ancien corps de `SCGameFlow::CheckZones` (curseur, clic, nom de zone écrit en bas),
+  rendu statique avec la liste des zones en argument, pour servir aux deux activités sans copie.
 
 ## 3. Le code de chaque changement
 
@@ -643,7 +671,142 @@ int FrameBuffer::textGlyphAdvance(RSFont *font, char c) {
 }
 ```
 
-### 3.7 `strike_commander/SCTrainingMenu.h` (entier)
+### 3.7 `strike_commander/SCScene.h` — `checkZones`, `keep_music`
+
+Dans `class SCScene`, après `Render` :
+
+```cpp
+    static SCZone *checkZones(std::vector<SCZone *> *zones);
+```
+
+Dans `class WeaponLoadoutScene` :
+
+```cpp
+    // Vrai pour l'écran d'armement de l'entraînement : la musique de la scène n'est pas lancée.
+    bool keep_music{false};
+```
+
+### 3.8 `strike_commander/SCScene.cpp` — `SCScene::checkZones` (nouvelle, ancien corps de `SCGameFlow::CheckZones`)
+
+```cpp
+// Zones d'une scène sous la souris : curseur en viseur, action au relâchement du bouton gauche, nom de la zone écrit en
+// bas de l'écran (OPTFONT.SHP). Ancien corps de SCGameFlow::CheckZones.
+SCZone *SCScene::checkZones(std::vector<SCZone *> *zones) {
+    SCMouse &Mouse = SCMouse::getInstance();
+    RSVGA &VGA = RSVGA::getInstance();
+    RSFontManager &FontManager = RSFontManager::getInstance();
+    static uint8_t color = 0;
+    RSFont *fnt = FontManager.GetFont("..\\..\\DATA\\FONTS\\OPTFONT.SHP");
+    for (auto zone : *zones) {
+        if (zone->active) {
+            if (zone->quad != nullptr) {
+                if (isPointInQuad(Mouse.getPosition(), zone->quad)) {
+                    Mouse.setMode(SCMouse::VISOR);
+
+                    // If the mouse button has just been released: trigger action.
+                    if (Mouse.buttons[MouseButton::LEFT].event == MouseButton::RELEASED) {
+                        Mouse.buttons[MouseButton::LEFT].event = MouseButton::NONE;
+                        zone->onAction();
+                    }
+                    Point2D p = {160 - static_cast<int32_t>(zone->label->length() / 2) * 8, 180};
+                    VGA.getFrameBuffer()->printText(fnt, &p, (char *)zone->label->c_str(), color, 0,
+                                                    static_cast<uint32_t>(zone->label->length()), 3, 5);
+                    return zone;
+                }
+            }
+            if (Mouse.getPosition().x > zone->position.x &&
+                Mouse.getPosition().x < zone->position.x + zone->dimension.x &&
+                Mouse.getPosition().y > zone->position.y &&
+                Mouse.getPosition().y < zone->position.y + zone->dimension.y) {
+                // HIT !
+                Mouse.setMode(SCMouse::VISOR);
+
+                if (Mouse.buttons[MouseButton::LEFT].event == MouseButton::RELEASED) {
+                    Mouse.buttons[MouseButton::LEFT].event = MouseButton::NONE;
+                    zone->onAction();
+                }
+                Point2D p = {160 - ((int32_t)(zone->label->length() / 2) * 8), 180};
+                VGA.getFrameBuffer()->printText(fnt, &p, (char *)zone->label->c_str(), color, 0,
+                                                static_cast<uint32_t>(zone->label->length()), 3, 5);
+
+                return zone;
+            }
+        }
+    }
+
+    Mouse.setMode(SCMouse::CURSOR);
+    return nullptr;
+}
+```
+
+### 3.9 `strike_commander/SCScene.cpp` — `WeaponLoadoutScene::Render`
+
+Seul le test de la musique change (`!this->keep_music`) ; la fonction entière :
+
+```cpp
+void WeaponLoadoutScene::Render() {
+    int fpsupdate = 0;
+    fpsupdate     = (SDL_GetTicks() / 10) - this->fps > 12;
+    if (fpsupdate) {
+        this->fps = (SDL_GetTicks() / 10);
+    }
+    // Entraînement : la musique de l'écran d'entraînement continue (OPTEST : byte_43BAA posé, pas de changement d'ambiance).
+    if (!this->keep_music && this->sceneOpts->tune != nullptr) {
+        if (Mixer.getMusicID() != this->sceneOpts->tune->ID) {
+            Mixer.switchBank(1);
+            Mixer.playMusic(this->sceneOpts->tune->ID);
+        }
+    }
+    ByteStream paletteReader;
+    paletteReader.Set((this->rawPalette), 772);
+    this->palette.ReadPatch(&paletteReader);
+    VGA.setPalette(&this->palette);
+    for (auto layer : this->layers) {
+        VGA.getFrameBuffer()->drawShape(layer->img->GetShape(layer->img->sequence[layer->frameCounter]));
+        if (layer->img->sequence.size() > 1) {
+            layer->frameCounter = (uint8_t)(layer->frameCounter + fpsupdate) % layer->img->sequence.size();
+        }
+    }
+
+    paletteReader.Set((this->forPalette), 772);
+    this->palette.ReadPatch(&paletteReader);
+    VGA.setPalette(&this->palette);
+    for (auto ezn : this->extra_zones) {
+        ezn->draw();
+    }
+    if (this->zones.size() > 0) {
+        for (auto zn : this->zones) {
+            if (zn->active) {
+                zn->draw();
+            }
+        }
+    }
+}
+```
+
+### 3.10 `strike_commander/SCGameFlow.cpp` — `SCGameFlow::CheckZones`
+
+```cpp
+// Corps déplacé dans SCScene::checkZones, partagé avec l'écran d'armement de SCTrainingMenu.
+SCZone *SCGameFlow::CheckZones(void) {
+    return SCScene::checkZones(this->zones);
+}
+```
+
+### 3.11 `enhanced/EnhancedTrainingMenu.cpp` — `EnhancedTrainingMenu::OnSearchAndDestroy`
+
+```cpp
+void EnhancedTrainingMenu::OnSearchAndDestroy() {
+    EnhancedStrike *strike = new EnhancedStrike();
+    strike->init();
+    // Emport choisi à l'écran d'armement de l'entraînement (SCTrainingMenu::openLoadout).
+    strike->player_loadout = this->player_loadout_pending;
+    strike->setMission("TEMPLATE.IFF");
+    Game->addActivity(strike);
+}
+```
+
+### 3.12 `strike_commander/SCTrainingMenu.h` (entier)
 
 ```cpp
 //
@@ -660,6 +823,9 @@ int FrameBuffer::textGlyphAdvance(RSFont *font, char c) {
 #ifndef __libRealSpace__File__
 #define __libRealSpace__File__
 
+// Déclarée dans SCScene.h, inclus après ce fichier par precomp.h.
+class WeaponLoadoutScene;
+
 class SCTrainingMenu : public IActivity {
 
 public:
@@ -672,6 +838,8 @@ public:
     void runFrame(void);
 
 protected:
+    // Départ du vol après l'écran d'armement : SCStrike::player_loadout (emport choisi à l'écran, GameState.weapon_load_out).
+    bool player_loadout_pending{ false };
     virtual void OnSearchAndDestroy();
 
 private:
@@ -718,6 +886,21 @@ private:
     bool choice_pending{ false };
     int choice{ 0 };
 
+    // Écran d'armement de la campagne (Gameflow_WeaponLoadout_51AB3 dans OPTEST), ouvert après ACCEPT.
+    RSOption options;
+    RSGameFlow gameflow;
+    PakArchive opt_shps;
+    PakArchive opt_pals;
+    bool options_loaded{ false };
+    WeaponLoadoutScene *loadout{ nullptr };
+    std::vector<SCZone *> *zones{ nullptr };
+    GAMEFLOW_SCEN loadout_scene;
+    // Stock de la partie avant l'entraînement, rétabli au retour.
+    std::unordered_map<uint8_t, int16_t> saved_inventory;
+    bool inventory_saved{ false };
+    bool zone_pending{ false };
+    uint8_t zone_choice{ 0 };
+
     void OnExitTraining();
     void showScreen(TrainingScreen next);
     void addButton(Point2D panel, int x, int y, int width, int height, int image, int value);
@@ -726,13 +909,17 @@ private:
     void applyChoice(int value);
     void pushStep();
     void backup();
-    void startFlight();
+    void startFlight(bool with_loadout);
+    bool openLoadout();
+    void closeLoadout();
+    void restoreInventory();
+    void onLoadoutClick(std::vector<EFCT *> *script, uint8_t id);
 };
 
 #endif /* defined(__libRealSpace__File__) */
 ```
 
-### 3.8 `strike_commander/SCTrainingMenu.cpp` (entier)
+### 3.13 `strike_commander/SCTrainingMenu.cpp` (entier)
 
 ```cpp
 //
@@ -759,12 +946,32 @@ static const Point2D PANEL_HIGH = {
 };
 // Espace entre deux lettres de FrameBuffer::printText (version à 4 arguments).
 static const int TEXT_LETTER_GAP = 2;
+// Stock d'armes de l'entraînement, posé par Training_Run_597B2 avant l'écran d'armement ([partie+609 + 2 × arme]), dans
+// l'ordre des armes d'OPTEST (optest_weapon_ids) : SWINDERJ, SWINDERM, AGM-65D, DURANDAL, MK20, MK82, GBU-15G, POD, AMRAAM.
+static const int16_t TRAINING_STOCK[9] = {
+    6,
+    6,
+    12,
+    12,
+    24,
+    24,
+    4,
+    8,
+    6,
+};
+// Écran d'armement : écran 15 d'OPTIONS.IFF, scène 11 ([partie+252] = 11 posé par Training_Run_597B2), chargement par
+// défaut 0 de GAMEFLOW.IFF (argument 0 de Gameflow_WeaponLoadout_51AB3), départ par le sprite 12.
+static const uint8_t LOADOUT_OPTIONS_SCREEN = 15;
+static const uint8_t LOADOUT_SCENE = 11;
+static const uint8_t LOADOUT_DEFAULT_LOAD = 0;
+static const uint8_t LOADOUT_SPRITE_FLY = 12;
 
 SCTrainingMenu::SCTrainingMenu() {
     this->music_playing = false;
 }
 
 SCTrainingMenu::~SCTrainingMenu() {
+    this->closeLoadout();
     for (auto button : this->buttons) {
         delete button;
     }
@@ -785,6 +992,7 @@ void SCTrainingMenu::focus(void) {
     // Retour d'un vol d'entraînement : la mission n'a plus à être complétée, les écrans repartent du début.
     if (GameState.training_active) {
         GameState.training_active = false;
+        this->restoreInventory();
         this->settings = MISN_TRAINING();
         this->group = 0;
         this->texts.clear();
@@ -806,12 +1014,14 @@ void SCTrainingMenu::unFocus(void) {
 void SCTrainingMenu::OnSearchAndDestroy() {
     SCStrike *strike = new SCStrike();
     strike->init();
+    strike->player_loadout = this->player_loadout_pending;
     strike->setMission("TEMPLATE.IFF");
     Game->addActivity(strike);
 }
 
 void SCTrainingMenu::OnExitTraining(void) {
     GameState.training_active = false;
+    this->restoreInventory();
     Game->stopTopActivity();
 }
 
@@ -1003,10 +1213,79 @@ void SCTrainingMenu::backup() {
     this->showScreen(step.screen);
 }
 
-void SCTrainingMenu::startFlight() {
+void SCTrainingMenu::startFlight(bool with_loadout) {
     GameState.training = this->settings;
     GameState.training_active = true;
+    this->player_loadout_pending = with_loadout;
     this->OnSearchAndDestroy();
+}
+
+void SCTrainingMenu::restoreInventory() {
+    if (!this->inventory_saved) {
+        return;
+    }
+    GameState.weapon_inventory = this->saved_inventory;
+    this->saved_inventory.clear();
+    this->inventory_saved = false;
+}
+
+// ACCEPT : stock de l'entraînement puis écran d'armement de la campagne (WeaponLoadoutScene, comme SCGameFlow pour la
+// commande WEAPON_LOADOUT), avec la scène 11 et le chargement par défaut 0.
+bool SCTrainingMenu::openLoadout() {
+    if (!this->options_loaded) {
+        TreEntry *optionIFF = Assets.GetEntryByName(Assets.option_filename);
+        TreEntry *gameflowIFF = Assets.GetEntryByName(Assets.gameflow_filename);
+        TreEntry *optShapEntry = Assets.GetEntryByName(Assets.optshps_filename);
+        TreEntry *optPalettesEntry = Assets.GetEntryByName(Assets.optpals_filename);
+        if (optionIFF == nullptr || gameflowIFF == nullptr || optShapEntry == nullptr || optPalettesEntry == nullptr) {
+            return false;
+        }
+        this->options.InitFromRam(optionIFF->data, optionIFF->size);
+        this->gameflow.InitFromRam(gameflowIFF->data, gameflowIFF->size);
+        this->opt_shps.InitFromRAM("OPTSHPS.PAK", optShapEntry->data, optShapEntry->size);
+        this->opt_pals.InitFromRAM("OPTPALS.PAK", optPalettesEntry->data, optPalettesEntry->size);
+        this->options_loaded = true;
+    }
+    if (this->options.opts.find(LOADOUT_OPTIONS_SCREEN) == this->options.opts.end()) {
+        return false;
+    }
+    if (!this->inventory_saved) {
+        this->saved_inventory = GameState.weapon_inventory;
+        this->inventory_saved = true;
+    }
+    GameState.weapon_inventory.clear();
+    for (int i = 0; i < 9; i++) {
+        GameState.weapon_inventory[optest_weapon_ids[i]] = TRAINING_STOCK[i];
+    }
+    this->loadout_scene.info.ID = LOADOUT_SCENE;
+    this->loadout_scene.info.UNKOWN = 0;
+    this->loadout_scene.requ = nullptr;
+    this->loadout = new WeaponLoadoutScene(&this->opt_shps, &this->opt_pals);
+    this->loadout->keep_music = true;
+    this->zones = this->loadout->init(
+        &this->loadout_scene, this->options.opts[LOADOUT_OPTIONS_SCREEN],
+        std::bind(&SCTrainingMenu::onLoadoutClick, this, std::placeholders::_1, std::placeholders::_2));
+    if (this->zones == nullptr) {
+        this->closeLoadout();
+        return false;
+    }
+    this->loadout->applyDefaultLoadout(this->gameflow.game.load, LOADOUT_DEFAULT_LOAD);
+    return true;
+}
+
+void SCTrainingMenu::closeLoadout() {
+    if (this->loadout != nullptr) {
+        delete this->loadout;
+        this->loadout = nullptr;
+    }
+    this->zones = nullptr;
+    this->zone_pending = false;
+}
+
+// Clic sur une zone de l'écran d'armement : noté, appliqué par runFrame (les zones appartiennent à la scène).
+void SCTrainingMenu::onLoadoutClick(std::vector<EFCT *> *script, uint8_t id) {
+    this->zone_pending = true;
+    this->zone_choice = id;
 }
 
 void SCTrainingMenu::applyChoice(int value) {
@@ -1099,14 +1378,35 @@ void SCTrainingMenu::applyChoice(int value) {
         this->showScreen(SCREEN_ACCEPT);
         break;
     case SCREEN_ACCEPT:
-        // ACCEPT. Dans le jeu suivent le stock d'armes fixe et l'écran d'armement de la campagne
-        // (Gameflow_WeaponLoadout_51AB3), pas repris ici : l'avion garde l'emport de son fichier.
-        this->startFlight();
+        // ACCEPT : écran d'armement ; sans OPTIONS.IFF, départ direct avec l'emport du fichier de l'avion.
+        if (!this->openLoadout()) {
+            this->startFlight(false);
+        }
         break;
     }
 }
 
 void SCTrainingMenu::runFrame(void) {
+    // Écran d'armement (comme SCGameFlow::runFrame pour une scène). Sprite 12 : départ en vol avec l'emport choisi ;
+    // autre sprite : Gameflow_WeaponLoadout_51AB3 rend 0, l'entraînement s'arrête (retour au menu).
+    if (this->loadout != nullptr) {
+        VGA.activate();
+        VGA.getFrameBuffer()->fillWithColor(0);
+        this->loadout->Render();
+        SCScene::checkZones(this->zones);
+        Mouse.draw();
+        VGA.vSync();
+        if (this->zone_pending) {
+            uint8_t id = this->zone_choice;
+            this->closeLoadout();
+            if (id == LOADOUT_SPRITE_FLY) {
+                this->startFlight(true);
+            } else {
+                this->OnExitTraining();
+            }
+        }
+        return;
+    }
     checkButtons();
     if (this->choice_pending) {
         this->choice_pending = false;
@@ -1168,14 +1468,13 @@ valeur exacte. L'écart est au plus de 255 / 65280 m (3,9 mm) ; à 1 mm près, s
 fractionnaire de l'altitude 0,125).
 
 Tout le jeu compile avec ces fichiers (`strike_commander/*.cpp`, `enhanced/*.cpp`, `DebugStrike.cpp`). Les écrans
-de `SCTrainingMenu` n'ont pas été essayés à l'écran : la session n'a pas de quoi lancer le jeu.
+de `SCTrainingMenu` et l'écran d'armement n'ont pas été essayés à l'écran : la session n'a pas de quoi lancer le jeu.
 
 ## 5. Points ouverts
 
 - `ByteStream::ReadFixedFloatLE` (et `ReadFixedFloatBE`, `ReadFixedFloat16LE`) : ÷ 255 au lieu de ÷ 256 pour la partie
   fractionnaire d'un 24.8. Hors du sujet de l'entraînement, non modifié ici ; l'effet sur une position est de quelques
   millimètres.
-- Écran d'armement et stock fixe de l'entraînement (§ 2.1).
 - Sens de la couleur 255 passée par le jeu au dessin du texte, et espacement exact des lettres de `BWFONT.SHP`
   (dessin du texte d'OPTEST non lu).
 - Altitude de la zone « Destroy bogeys » : le nombre de pieds tel quel, alors que celle des avions est convertie ; repris

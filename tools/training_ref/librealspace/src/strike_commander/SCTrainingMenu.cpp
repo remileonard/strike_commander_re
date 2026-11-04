@@ -22,12 +22,32 @@ static const Point2D PANEL_HIGH = {
 };
 // Espace entre deux lettres de FrameBuffer::printText (version à 4 arguments).
 static const int TEXT_LETTER_GAP = 2;
+// Stock d'armes de l'entraînement, posé par Training_Run_597B2 avant l'écran d'armement ([partie+609 + 2 × arme]), dans
+// l'ordre des armes d'OPTEST (optest_weapon_ids) : SWINDERJ, SWINDERM, AGM-65D, DURANDAL, MK20, MK82, GBU-15G, POD, AMRAAM.
+static const int16_t TRAINING_STOCK[9] = {
+    6,
+    6,
+    12,
+    12,
+    24,
+    24,
+    4,
+    8,
+    6,
+};
+// Écran d'armement : écran 15 d'OPTIONS.IFF, scène 11 ([partie+252] = 11 posé par Training_Run_597B2), chargement par
+// défaut 0 de GAMEFLOW.IFF (argument 0 de Gameflow_WeaponLoadout_51AB3), départ par le sprite 12.
+static const uint8_t LOADOUT_OPTIONS_SCREEN = 15;
+static const uint8_t LOADOUT_SCENE = 11;
+static const uint8_t LOADOUT_DEFAULT_LOAD = 0;
+static const uint8_t LOADOUT_SPRITE_FLY = 12;
 
 SCTrainingMenu::SCTrainingMenu() {
     this->music_playing = false;
 }
 
 SCTrainingMenu::~SCTrainingMenu() {
+    this->closeLoadout();
     for (auto button : this->buttons) {
         delete button;
     }
@@ -48,6 +68,7 @@ void SCTrainingMenu::focus(void) {
     // Retour d'un vol d'entraînement : la mission n'a plus à être complétée, les écrans repartent du début.
     if (GameState.training_active) {
         GameState.training_active = false;
+        this->restoreInventory();
         this->settings = MISN_TRAINING();
         this->group = 0;
         this->texts.clear();
@@ -69,12 +90,14 @@ void SCTrainingMenu::unFocus(void) {
 void SCTrainingMenu::OnSearchAndDestroy() {
     SCStrike *strike = new SCStrike();
     strike->init();
+    strike->player_loadout = this->player_loadout_pending;
     strike->setMission("TEMPLATE.IFF");
     Game->addActivity(strike);
 }
 
 void SCTrainingMenu::OnExitTraining(void) {
     GameState.training_active = false;
+    this->restoreInventory();
     Game->stopTopActivity();
 }
 
@@ -266,10 +289,79 @@ void SCTrainingMenu::backup() {
     this->showScreen(step.screen);
 }
 
-void SCTrainingMenu::startFlight() {
+void SCTrainingMenu::startFlight(bool with_loadout) {
     GameState.training = this->settings;
     GameState.training_active = true;
+    this->player_loadout_pending = with_loadout;
     this->OnSearchAndDestroy();
+}
+
+void SCTrainingMenu::restoreInventory() {
+    if (!this->inventory_saved) {
+        return;
+    }
+    GameState.weapon_inventory = this->saved_inventory;
+    this->saved_inventory.clear();
+    this->inventory_saved = false;
+}
+
+// ACCEPT : stock de l'entraînement puis écran d'armement de la campagne (WeaponLoadoutScene, comme SCGameFlow pour la
+// commande WEAPON_LOADOUT), avec la scène 11 et le chargement par défaut 0.
+bool SCTrainingMenu::openLoadout() {
+    if (!this->options_loaded) {
+        TreEntry *optionIFF = Assets.GetEntryByName(Assets.option_filename);
+        TreEntry *gameflowIFF = Assets.GetEntryByName(Assets.gameflow_filename);
+        TreEntry *optShapEntry = Assets.GetEntryByName(Assets.optshps_filename);
+        TreEntry *optPalettesEntry = Assets.GetEntryByName(Assets.optpals_filename);
+        if (optionIFF == nullptr || gameflowIFF == nullptr || optShapEntry == nullptr || optPalettesEntry == nullptr) {
+            return false;
+        }
+        this->options.InitFromRam(optionIFF->data, optionIFF->size);
+        this->gameflow.InitFromRam(gameflowIFF->data, gameflowIFF->size);
+        this->opt_shps.InitFromRAM("OPTSHPS.PAK", optShapEntry->data, optShapEntry->size);
+        this->opt_pals.InitFromRAM("OPTPALS.PAK", optPalettesEntry->data, optPalettesEntry->size);
+        this->options_loaded = true;
+    }
+    if (this->options.opts.find(LOADOUT_OPTIONS_SCREEN) == this->options.opts.end()) {
+        return false;
+    }
+    if (!this->inventory_saved) {
+        this->saved_inventory = GameState.weapon_inventory;
+        this->inventory_saved = true;
+    }
+    GameState.weapon_inventory.clear();
+    for (int i = 0; i < 9; i++) {
+        GameState.weapon_inventory[optest_weapon_ids[i]] = TRAINING_STOCK[i];
+    }
+    this->loadout_scene.info.ID = LOADOUT_SCENE;
+    this->loadout_scene.info.UNKOWN = 0;
+    this->loadout_scene.requ = nullptr;
+    this->loadout = new WeaponLoadoutScene(&this->opt_shps, &this->opt_pals);
+    this->loadout->keep_music = true;
+    this->zones = this->loadout->init(
+        &this->loadout_scene, this->options.opts[LOADOUT_OPTIONS_SCREEN],
+        std::bind(&SCTrainingMenu::onLoadoutClick, this, std::placeholders::_1, std::placeholders::_2));
+    if (this->zones == nullptr) {
+        this->closeLoadout();
+        return false;
+    }
+    this->loadout->applyDefaultLoadout(this->gameflow.game.load, LOADOUT_DEFAULT_LOAD);
+    return true;
+}
+
+void SCTrainingMenu::closeLoadout() {
+    if (this->loadout != nullptr) {
+        delete this->loadout;
+        this->loadout = nullptr;
+    }
+    this->zones = nullptr;
+    this->zone_pending = false;
+}
+
+// Clic sur une zone de l'écran d'armement : noté, appliqué par runFrame (les zones appartiennent à la scène).
+void SCTrainingMenu::onLoadoutClick(std::vector<EFCT *> *script, uint8_t id) {
+    this->zone_pending = true;
+    this->zone_choice = id;
 }
 
 void SCTrainingMenu::applyChoice(int value) {
@@ -362,14 +454,35 @@ void SCTrainingMenu::applyChoice(int value) {
         this->showScreen(SCREEN_ACCEPT);
         break;
     case SCREEN_ACCEPT:
-        // ACCEPT. Dans le jeu suivent le stock d'armes fixe et l'écran d'armement de la campagne
-        // (Gameflow_WeaponLoadout_51AB3), pas repris ici : l'avion garde l'emport de son fichier.
-        this->startFlight();
+        // ACCEPT : écran d'armement ; sans OPTIONS.IFF, départ direct avec l'emport du fichier de l'avion.
+        if (!this->openLoadout()) {
+            this->startFlight(false);
+        }
         break;
     }
 }
 
 void SCTrainingMenu::runFrame(void) {
+    // Écran d'armement (comme SCGameFlow::runFrame pour une scène). Sprite 12 : départ en vol avec l'emport choisi ;
+    // autre sprite : Gameflow_WeaponLoadout_51AB3 rend 0, l'entraînement s'arrête (retour au menu).
+    if (this->loadout != nullptr) {
+        VGA.activate();
+        VGA.getFrameBuffer()->fillWithColor(0);
+        this->loadout->Render();
+        SCScene::checkZones(this->zones);
+        Mouse.draw();
+        VGA.vSync();
+        if (this->zone_pending) {
+            uint8_t id = this->zone_choice;
+            this->closeLoadout();
+            if (id == LOADOUT_SPRITE_FLY) {
+                this->startFlight(true);
+            } else {
+                this->OnExitTraining();
+            }
+        }
+        return;
+    }
     checkButtons();
     if (this->choice_pending) {
         this->choice_pending = false;

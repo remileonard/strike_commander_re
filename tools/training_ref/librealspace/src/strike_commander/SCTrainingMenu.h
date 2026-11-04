@@ -12,6 +12,9 @@
 #ifndef __libRealSpace__File__
 #define __libRealSpace__File__
 
+// Déclarée dans SCScene.h, inclus après ce fichier par precomp.h.
+class WeaponLoadoutScene;
+
 class SCTrainingMenu : public IActivity {
 
 public:
@@ -24,6 +27,8 @@ public:
     void runFrame(void);
 
 protected:
+    // Départ du vol après l'écran d'armement : SCStrike::player_loadout (emport choisi à l'écran, GameState.weapon_load_out).
+    bool player_loadout_pending{ false };
     virtual void OnSearchAndDestroy();
 
 private:
@@ -70,6 +75,21 @@ private:
     bool choice_pending{ false };
     int choice{ 0 };
 
+    // Écran d'armement de la campagne (Gameflow_WeaponLoadout_51AB3 dans OPTEST), ouvert après ACCEPT.
+    RSOption options;
+    RSGameFlow gameflow;
+    PakArchive opt_shps;
+    PakArchive opt_pals;
+    bool options_loaded{ false };
+    WeaponLoadoutScene *loadout{ nullptr };
+    std::vector<SCZone *> *zones{ nullptr };
+    GAMEFLOW_SCEN loadout_scene;
+    // Stock de la partie avant l'entraînement, rétabli au retour.
+    std::unordered_map<uint8_t, int16_t> saved_inventory;
+    bool inventory_saved{ false };
+    bool zone_pending{ false };
+    uint8_t zone_choice{ 0 };
+
     void OnExitTraining();
     void showScreen(TrainingScreen next);
     void addButton(Point2D panel, int x, int y, int width, int height, int image, int value);
@@ -78,7 +98,11 @@ private:
     void applyChoice(int value);
     void pushStep();
     void backup();
-    void startFlight();
+    void startFlight(bool with_loadout);
+    bool openLoadout();
+    void closeLoadout();
+    void restoreInventory();
+    void onLoadoutClick(std::vector<EFCT *> *script, uint8_t id);
 };
 
 #endif /* defined(__libRealSpace__File__) */

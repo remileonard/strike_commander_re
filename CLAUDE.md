@@ -400,7 +400,7 @@ strike_commander_re/
     ├── mission_ref/                 missions : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lie l'essai),
     │                                  mission_areas_test.cpp, mission_part_test.cpp, mission_load_test.cpp, mission_spot_test.cpp, mission_relative_test.cpp (RSMission modifié sur les missions) — IMPL_MISSION_AREAS.md, IMPL_MISSION_PART.md
     ├── training_ref/                entraînement : fichiers libRealSpace modifiés (librealspace/src), build.sh (compile le jeu, lance
-    │                                  training_mission_test : mission en mémoire comparée à INSTANT.IFF) — IMPL_TRAINING_MISSION.md
+    │                                  training_mission_test : mission en mémoire comparée à INSTANT.IFF ; écran d'armement) — IMPL_TRAINING_MISSION.md
     ├── mission_prog.py              scripts PROG des fichiers de mission : désassemblage, objets et scènes
     │                                  qui les déclenchent, origine des valeurs STAT (--stat) — GAMEFLOW_SYSTEM.md § 6.1
     ├── instant_mission.py           mission d'entraînement : reproduit instant.iff (DOGFIGHT / SEARCH AND DESTROY)
