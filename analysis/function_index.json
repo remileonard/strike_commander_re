@@ -35955,8 +35955,8 @@
 "sub_5E526",
 "sub_5E526"
 ],
-"new_name": "Cockpit_ApplyFormatAndDraw_91B70",
-"summary": "⚠️ far, 227 lignes, NON DÉTAILLÉE — combine `TextRenderer_ApplyFormatChange_5E34D` (seg143), `Shape_DrawSpans_61F52` (×2)."
+"new_name": "Options_DetailPreview_Draw_91B70",
+"summary": "far, LUE 2026-11-04. Dessin de l'aperçu central du sous-écran DETAIL (ex-Cockpit_ApplyFormatAndDraw_91B70, renommée car elle ne sert qu'à DETAIL). Appelée par Options_DetailScreen_91D29. Crée un cadre de 93 × 72 pixels (coordonnées (114,69) à (206,140)), passé à TextRenderer_ApplyFormatChange_5E34D, puis dessine chaque image de DETLOPT.SHP par Shape_DrawSpans_61F52. Choix des images selon la configuration reçue (si) : [si+90] toujours → 39 si non nul sinon 38 ; [si+86] → 40, [si+89] → 41, [si+85] → 42, [si+88] → 43, [si+87] → 44 (si non nul) ; [si+91] toujours → 46 si non nul sinon 45 ; [si+81] toujours → 49 si non nul sinon 50 ; [si+82] toujours → 48 et 51 si non nul sinon 47. Rôle de TextRenderer_ApplyFormatChange_5E34D et Shape_DrawSpans_61F52 non établi (corps non lu). Quel bouton écrit quel octet : non suivi. analysis/OPTIONS_SCREEN.md § 4."
 },
 "sub_91D29": {
 "segment": "ovr268",
@@ -36020,7 +36020,7 @@
 "sub_6C978"
 ],
 "new_name": "Options_DetailScreen_91D29",
-"summary": "far, LUE 2026-11-03 (structure, pas le corps de chaque bouton). Sous-écran DETAIL du panneau CONFIGURATION (ouvert par Options_ConfigurationScreen_90D20). Charge FONTS\\\\DETLOPT.SHP (52 images, chaîne « detlopt » et « .shp ») et la configuration (argument). Fenêtre (0,0)-(319,199) (VROOMM_StubThunk_6C969). Neuf boutons de 73 × 11 pixels et un de 38 × 11 (VROOMM_StubThunk_6C76C), chacun avec une paire d'images normale / enfoncée : TERRAIN GOURAUD (22,67) images 2/3 ; TRANSITION (22,80) 4/5 ; INTEREST (22,93) 6/7 ; RIVERS (22,106) 8/9 ; FIELDS (22,119) 10/11 ; CITIES (22,132) 12/13 ; RUNWAYS (22,145) 14/15 ; OBJECTS GOURAUD (226,67) 26/27 ; TEXTURE (226,80) 28/29 ; EXIT (244,132), images 24/25 (13 × 12). Deux jauges (VROOMM_StubThunk_6C9F0 → GaugeWidgetVariantD_ConstructAndInit_A4270) aux positions (243,93) et (127,159), rôle non établi. Une fonction de dessin, Cockpit_ApplyFormatAndDraw_91B70 (non lue, utilise TextRenderer_ApplyFormatChange), est appelée à la fin de la boucle. Titres DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR : dans les images 0 et 1 (dessin sans police vérifié par rendu). 10 images de 13 × 12 (16 à 25) : cases HI/LO (3) et HAZING (5). analysis/OPTIONS_SCREEN.md § 4."
+"summary": "far, LUE 2026-11-03 (structure, pas le corps de chaque bouton). Sous-écran DETAIL du panneau CONFIGURATION (ouvert par Options_ConfigurationScreen_90D20). Charge FONTS\\\\DETLOPT.SHP (52 images, chaîne « detlopt » et « .shp ») et la configuration (argument). Fenêtre (0,0)-(319,199) (VROOMM_StubThunk_6C969). Neuf boutons de 73 × 11 pixels et un de 38 × 11 (VROOMM_StubThunk_6C76C), chacun avec une paire d'images normale / enfoncée : TERRAIN GOURAUD (22,67) images 2/3 ; TRANSITION (22,80) 4/5 ; INTEREST (22,93) 6/7 ; RIVERS (22,106) 8/9 ; FIELDS (22,119) 10/11 ; CITIES (22,132) 12/13 ; RUNWAYS (22,145) 14/15 ; OBJECTS GOURAUD (226,67) 26/27 ; TEXTURE (226,80) 28/29 ; EXIT (244,132), images 24/25 (13 × 12). Deux jauges (VROOMM_StubThunk_6C9F0 → GaugeWidgetVariantD_ConstructAndInit_A4270) aux positions (243,93) et (127,159), rôle non établi. L'aperçu central est dessiné par Options_DetailPreview_Draw_91B70 (sub_91B70, lue le 2026-11-04) appelée à la fin de la boucle. Titres DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR : dans les images 0 et 1 (dessin sans police vérifié par rendu). 10 images de 13 × 12 (16 à 25) : cases HI/LO (3) et HAZING (5). analysis/OPTIONS_SCREEN.md § 4."
 },
 "sub_926A5": {
 "segment": "ovr268",

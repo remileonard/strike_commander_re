@@ -179,10 +179,32 @@ Lu le 2026-11-03 (`analysis/annotated_segments/ovr268_annotated.asm`). Fichier d
   (5 cases, entre FAR et NEAR). Le code qui choisit quelle image de la paire montrer n'est pas lu.
 - **Jauges** : deux widgets de jauge (`GaugeWidgetVariantD_ConstructAndInit_A4270`) aux positions
   (243, 93) et (127, 159). Leur rôle n'est pas établi.
-- **Zone noire au centre** : sur le rendu, c'est l'emplacement de l'aperçu ; elle n'est pas une image
-  du fichier. Le code qui la dessine n'est pas lu.
-- **Dessin** : `Cockpit_ApplyFormatAndDraw_91B70` (nom actuel, non lu) appelle `TextRenderer_ApplyFormatChange_5E34D`,
-  donc du texte peut être dessiné avec la police à cet endroit. Ce qu'elle écrit n'est pas établi.
+- **Aperçu central** (zone noire de l'image 1) : dessiné par `Options_DetailPreview_Draw_91B70`
+  (ex-`Cockpit_ApplyFormatAndDraw_91B70`, renommée ici car elle ne sert qu'à l'écran DETAIL ; lue le 2026-11-04).
+  - Cadre passé au dessin : 93 × 72 pixels, coordonnées (114, 69) à (206, 140). Ces dimensions sont celles des
+    images 38 et 39 ; la zone noire de l'image 1 les contient.
+  - Les images sont chargées depuis `DETLOPT.SHP` et dessinées une à une par `Shape_DrawSpans_61F52` dans le
+    même cadre. Choix d'image, selon des octets de la configuration reçue en argument (décimal) :
+
+| Octet de la configuration | Image dessinée |
+|---|---|
+| `[si+90]` (toujours) | 39 si non nul, 38 sinon |
+| `[si+86]` | 40 si non nul |
+| `[si+89]` | 41 si non nul |
+| `[si+85]` | 42 si non nul |
+| `[si+88]` | 43 si non nul |
+| `[si+87]` | 44 si non nul |
+| `[si+91]` (toujours) | 46 si non nul, 45 sinon |
+| `[si+81]` (toujours) | 49 si non nul, 50 sinon |
+| `[si+82]` (toujours) | 48 et 51 si non nul, 47 sinon |
+
+  - Rendu de contrôle des images : 38 et 39 sont deux vues de terrain (sol vert, ciel), 44 une bande de terrain
+    gris, 49 un avion vu de dessus, 51 une tache de débris ; 40 (bande brune) n'est pas identifiée. Ces rôles
+    viennent de l'aspect des images, pas du code.
+  - **Non établi** : quel bouton écrit quel octet (la logique des clics n'est pas suivie) ; une hypothèse est que
+    `[si+90]` commande le choix entre les deux vues de terrain (GOURAUD). Le rôle de
+    `TextRenderer_ApplyFormatChange_5E34D` et de `Shape_DrawSpans_61F52` (corps non lu) : position ou découpe
+    du cadre, et d'où vient le décalage de chaque sous-image.
 
 ## 5. Tous les menus ouverts par ALT+O
 

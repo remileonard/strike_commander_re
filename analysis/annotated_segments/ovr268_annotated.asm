@@ -7,10 +7,18 @@ ovr268		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; ⚠️ far, 227 lignes, NON DÉTAILLÉE — combine TextRenderer_ApplyFormatChange_5E34D (seg143),
-; Shape_DrawSpans_61F52 (×2).
+; far, LUE 2026-11-04. Dessin de l'aperçu central du sous-écran DETAIL (ex-
+; Cockpit_ApplyFormatAndDraw_91B70, renommée car elle ne sert qu'à DETAIL). Appelée par
+; Options_DetailScreen_91D29. Crée un cadre de 93 × 72 pixels (coordonnées (114,69) à
+; (206,140)), passé à TextRenderer_ApplyFormatChange_5E34D, puis dessine chaque image de
+; DETLOPT.SHP par Shape_DrawSpans_61F52. Choix des images selon la configuration reçue (si) :
+; [si+90] toujours → 39 si non nul sinon 38 ; [si+86] → 40, [si+89] → 41, [si+85] → 42,
+; [si+88] → 43, [si+87] → 44 (si non nul) ; [si+91] toujours → 46 si non nul sinon 45 ;
+; [si+81] toujours → 49 si non nul sinon 50 ; [si+82] toujours → 48 et 51 si non nul sinon 47.
+; Rôle de TextRenderer_ApplyFormatChange_5E34D et Shape_DrawSpans_61F52 non établi (corps non
+; lu). Quel bouton écrit quel octet : non suivi. analysis/OPTIONS_SCREEN.md § 4.
 ; ==============================================================================================
-Cockpit_ApplyFormatAndDraw_91B70	proc far		; CODE XREF: VROOMM_StubThunk_6B830J Options_DetailScreen_91D29+91Cp
+Options_DetailPreview_Draw_91B70	proc far		; CODE XREF: VROOMM_StubThunk_6B830J Options_DetailScreen_91D29+91Cp
 
 var_1E		= word ptr -1Eh
 var_1C		= word ptr -1Ch
@@ -81,10 +89,10 @@ loc_91B84:
 		jmp	short loc_91BEE
 ; ���������������������������������������������������������������������������
 
-loc_91BEC:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+76j
+loc_91BEC:				; CODE XREF: Options_DetailPreview_Draw_91B70+76j
 		push	26h ; '&'
 
-loc_91BEE:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+7Aj
+loc_91BEE:				; CODE XREF: Options_DetailPreview_Draw_91B70+7Aj
 		push	large [bp+arg_4]
 		push	large 0
 		lea	ax, [bp+var_10]
@@ -101,7 +109,7 @@ loc_91BEE:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+7Aj
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_91C1C:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+95j
+loc_91C1C:				; CODE XREF: Options_DetailPreview_Draw_91B70+95j
 		cmp	byte ptr [si+59h], 0
 		jz	short loc_91C37
 		push	29h ; ')'
@@ -112,7 +120,7 @@ loc_91C1C:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+95j
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_91C37:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+B0j
+loc_91C37:				; CODE XREF: Options_DetailPreview_Draw_91B70+B0j
 		cmp	byte ptr [si+55h], 0
 		jz	short loc_91C52
 		push	2Ah ; '*'
@@ -123,7 +131,7 @@ loc_91C37:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+B0j
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_91C52:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+CBj
+loc_91C52:				; CODE XREF: Options_DetailPreview_Draw_91B70+CBj
 		cmp	byte ptr [si+58h], 0
 		jz	short loc_91C6D
 		push	2Bh ; '+'
@@ -134,7 +142,7 @@ loc_91C52:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+CBj
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_91C6D:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+E6j
+loc_91C6D:				; CODE XREF: Options_DetailPreview_Draw_91B70+E6j
 		cmp	byte ptr [si+57h], 0
 
 loc_91C71:
@@ -147,17 +155,17 @@ loc_91C71:
 		call	Shape_DrawSpans_61F52
 		add	sp, 0Ch
 
-loc_91C88:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70:loc_91C71j
+loc_91C88:				; CODE XREF: Options_DetailPreview_Draw_91B70:loc_91C71j
 		cmp	byte ptr [si+5Bh], 0
 		jz	short loc_91C92
 		push	2Eh ; '.'
 		jmp	short loc_91C94
 ; ���������������������������������������������������������������������������
 
-loc_91C92:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+11Cj
+loc_91C92:				; CODE XREF: Options_DetailPreview_Draw_91B70+11Cj
 		push	2Dh ; '-'
 
-loc_91C94:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+120j
+loc_91C94:				; CODE XREF: Options_DetailPreview_Draw_91B70+120j
 		push	large [bp+arg_4]
 		push	large 0
 		lea	ax, [bp+var_10]
@@ -170,10 +178,10 @@ loc_91C94:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+120j
 		jmp	short loc_91CB3
 ; ���������������������������������������������������������������������������
 
-loc_91CB1:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+13Bj
+loc_91CB1:				; CODE XREF: Options_DetailPreview_Draw_91B70+13Bj
 		push	32h ; '2'
 
-loc_91CB3:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+13Fj
+loc_91CB3:				; CODE XREF: Options_DetailPreview_Draw_91B70+13Fj
 		push	large [bp+arg_4]
 		push	large 0
 		lea	ax, [bp+var_10]
@@ -205,10 +213,10 @@ loc_91CE3:
 		jmp	short loc_91CE7
 ; ���������������������������������������������������������������������������
 
-loc_91CE5:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70+15Aj
+loc_91CE5:				; CODE XREF: Options_DetailPreview_Draw_91B70+15Aj
 		push	2Fh ; '/'
 
-loc_91CE7:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70:loc_91CE3j
+loc_91CE7:				; CODE XREF: Options_DetailPreview_Draw_91B70:loc_91CE3j
 		push	large [bp+arg_4]
 		push	large 0
 		lea	ax, [bp+var_10]
@@ -236,7 +244,7 @@ loc_91CE7:				; CODE XREF: Cockpit_ApplyFormatAndDraw_91B70:loc_91CE3j
 		pop	si
 		leave
 		retf
-Cockpit_ApplyFormatAndDraw_91B70	endp
+Options_DetailPreview_Draw_91B70	endp
 
 
 ; ��������������� S U B	R O U T	I N E ���������������������������������������
@@ -253,11 +261,11 @@ Cockpit_ApplyFormatAndDraw_91B70	endp
 ; 8/9 ; FIELDS (22,119) 10/11 ; CITIES (22,132) 12/13 ; RUNWAYS (22,145) 14/15 ; OBJECTS
 ; GOURAUD (226,67) 26/27 ; TEXTURE (226,80) 28/29 ; EXIT (244,132), images 24/25 (13 × 12).
 ; Deux jauges (VROOMM_StubThunk_6C9F0 → GaugeWidgetVariantD_ConstructAndInit_A4270) aux
-; positions (243,93) et (127,159), rôle non établi. Une fonction de dessin,
-; Cockpit_ApplyFormatAndDraw_91B70 (non lue, utilise TextRenderer_ApplyFormatChange), est
-; appelée à la fin de la boucle. Titres DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR :
-; dans les images 0 et 1 (dessin sans police vérifié par rendu). 10 images de 13 × 12 (16 à
-; 25) : cases HI/LO (3) et HAZING (5). analysis/OPTIONS_SCREEN.md § 4.
+; positions (243,93) et (127,159), rôle non établi. L'aperçu central est dessiné par
+; Options_DetailPreview_Draw_91B70 (sub_91B70, lue le 2026-11-04) appelée à la fin de la
+; boucle. Titres DETAIL, TERRAIN, OBJECTS, HAZING, HI, LO, FAR, NEAR : dans les images 0 et 1
+; (dessin sans police vérifié par rendu). 10 images de 13 × 12 (16 à 25) : cases HI/LO (3) et
+; HAZING (5). analysis/OPTIONS_SCREEN.md § 4.
 ; ==============================================================================================
 Options_DetailScreen_91D29	proc far		; CODE XREF: VROOMM_StubThunk_6B83AJ
 
@@ -1231,7 +1239,7 @@ loc_9262B:				; CODE XREF: Options_DetailScreen_91D29+8F5j
 		push	di
 		push	si
 		push	cs
-		call	near ptr Cockpit_ApplyFormatAndDraw_91B70
+		call	near ptr Options_DetailPreview_Draw_91B70
 		add	sp, 8
 		cmp	[bp+var_2], 0
 		jz	short loc_92620

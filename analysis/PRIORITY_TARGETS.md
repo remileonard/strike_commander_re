@@ -139,7 +139,7 @@ meilleures candidates pour des sessions dédiées de décodage ligne à ligne.
 | 230 | `sub_9F286` | `PlayerComponent_OrchestrateComplex_9F286` | seg432 |
 | 227 | `sub_A3CF6` | `GaugeWidget_FormatDisplayValue_A3CF6` | seg444 |
 | 227 | `sub_95E20` | `AircraftComponent_LoadFieldGroupPair_95E20` | ovr276 |
-| 227 | `sub_91B70` | `Cockpit_ApplyFormatAndDraw_91B70` | ovr268 |
+| 227 | `sub_91B70` | `Options_DetailPreview_Draw_91B70` | ovr268 |
 | 226 | `sub_A61D0` | `SmokeSet_LoadSmokeModel_A61D0` | seg450 |
 | 225 | `sub_8C32C` | `MissionRecord_LoadFieldGroupMixD_8C32C` | ovr255 |
 | 224 | `sub_68254` | `VROOMM_OpenAndParseOverlayFile_68254` | None |

@@ -19,7 +19,7 @@ stru_6B810	db 0CDh, 3Fh		; int_code ; DATA XREF:	seg216:091Eo
 ; d'overlay actuellement charge en memoire. fileoff=1F6F0h, codesize=12EEh, nentries=4.
 ; ==============================================================================================
 VROOMM_StubThunk_6B830	proc far
-		jmp	Cockpit_ApplyFormatAndDraw_91B70
+		jmp	Options_DetailPreview_Draw_91B70
 VROOMM_StubThunk_6B830	endp
 
 
