@@ -322,9 +322,8 @@ mode. Le panneau principal l'appelle avec le mode 0 (`push 0` avant `push si`, d
   - ABORT → 4 ;
   - RESTART → 6 ;
   - CONTINUE → 1, seulement si le mode vaut 0 ou 3.
-  La valeur 1 est aussi écrite par le bouton CONTINUE avec un autre test ; le code n'est pas tracé plus loin.
-- Vérifié par rendu : l'écran avec le mode 0 (images 8 / 9 pour l'élément vertical) donne les libellés
-  RESTART, ABORT et CONTINUE, sans état supplémentaire.
+- Non vérifié par rendu : l'aspect de l'élément vertical aux paires 8 / 9 et 10 ; le rendu fait à
+  l'étape précédente ne l'a pas dessiné.
 
 ### 5.5 Points ouverts pour l'implémentation
 
