@@ -893,6 +893,7 @@ private:
     void OnExitTraining();
     void showScreen(TrainingScreen next);
     void addButton(Point2D panel, int x, int y, int width, int height, int image, int value);
+    void onButtonClick(int value);
     int addText(int x, int y, const std::string &text);
     int textWidth(const std::string &text);
     void applyChoice(int value);
@@ -1070,17 +1071,18 @@ void SCTrainingMenu::addButton(Point2D panel, int x, int y, int width, int heigh
         width,
         height,
     };
-    button->initBehavior(
-        [this, value]() {
-            this->choice_pending = true;
-            this->choice = value;
-        },
-        position, dimension);
+    button->initBehavior(std::bind(&SCTrainingMenu::onButtonClick, this, value), position, dimension);
     button->appearance[SCButton::APR_UP].InitWithPosition(this->tm_pack.GetEntry(image)->data,
                                                           this->tm_pack.GetEntry(image)->size, &position);
     button->appearance[SCButton::APR_DOWN].InitWithPosition(this->tm_pack.GetEntry(image + 1)->data,
                                                             this->tm_pack.GetEntry(image + 1)->size, &position);
     this->buttons.push_back(button);
+}
+
+// Clic sur un bouton : la valeur est notée, applyChoice l'applique depuis runFrame.
+void SCTrainingMenu::onButtonClick(int value) {
+    this->choice_pending = true;
+    this->choice = value;
 }
 
 // Panneau et boutons de chaque écran (positions et images de TRAINING_MISSION.md § 3).

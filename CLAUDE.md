@@ -48,6 +48,8 @@ rechercher chaque nom dans `known_functions.json`. À ne pas reproduire.)*
   l'instruction (`if (valeur == 1) {` … `}`) ;
 - **une seule instruction par ligne**, y compris les déclarations (`int a;` puis `int b;`, jamais `int a, b;`) ;
 - une liste d'initialisation de plus d'une valeur (tableau, enum…) : **une valeur par ligne**.
+- **pas de lambda** : une action (bouton, zone, rappel) est une **méthode de l'objet**, passée avec
+  `std::bind(&Classe::methode, this, …)` comme dans le reste de libRealSpace.
 
 Après chaque modification : `clang-format --style=file:tools/sc_player/.clang-format -i <fichiers>`
 puis `python3 tools/sc_player/tools/style_check.py <fichiers>` (doit ne rien signaler ;

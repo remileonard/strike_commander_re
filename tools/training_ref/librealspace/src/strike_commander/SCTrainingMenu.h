@@ -93,6 +93,7 @@ private:
     void OnExitTraining();
     void showScreen(TrainingScreen next);
     void addButton(Point2D panel, int x, int y, int width, int height, int image, int value);
+    void onButtonClick(int value);
     int addText(int x, int y, const std::string &text);
     int textWidth(const std::string &text);
     void applyChoice(int value);
