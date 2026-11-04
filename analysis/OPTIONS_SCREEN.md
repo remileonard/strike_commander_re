@@ -246,7 +246,7 @@ AUDIO (`AUDIOPT.SHP`) : MUSIC (88, 63), SOUND FX (88, 76), SPEECH (165, 63), DIG
 toutes dynamiques (§ 5.4) ; EXIT (129, 101) 14/15.
 
 EXIT GAME (`RESTART.SHP`) : RESTART (54, 80) 2/3, ABORT (126, 80) 4/5, CONTINUE (198, 80) 6/7 ;
-un élément vertical à droite (290, 55), 11 × 29, dynamique, rôle non établi.
+un élément vertical à droite (290, 55), 11 × 29, dynamique (§ 5.4).
 
 Chaque bouton écrit la valeur 1 au clic (champ `[di+44]`), sauf les boutons à image dynamique dont la
 valeur n'est pas relevée.
@@ -310,13 +310,26 @@ du sens des drapeaux, non établi.
   l'image 10 porte le même libellé avec un aspect plus clair, sans doute l'état désactivé (non vérifié).
   La sémantique de la valeur renvoyée n'est pas établie : la mémoire disponible est une hypothèse.
 
-**EXIT GAME : non résolu.** L'élément vertical (290, 55) prend ses images de `var_A + 70` (lignes 436 et
-438 de la fonction), dont le second terme n'est pas tracé.
+**EXIT GAME (résolu).** `Options_ExitGameScreen_9277C` reçoit deux arguments : la configuration, et un
+mode. Le panneau principal l'appelle avec le mode 0 (`push 0` avant `push si`, dans
+`Options_ConfigurationScreen_90D20`).
+
+- Élément vertical (290, 55) : normale = variable de la paire 8 (valeur par défaut), enfoncée = paire 9.
+  Si le mode est non nul (`cmp arg_2, 0` / `jz`), les deux deviennent 10. Avec le mode 0, la paire reste 8 / 9.
+- Boutons : chacun écrit son clic dans une variable locale. RESTART écrit `var_4`, ABORT écrit `var_8`,
+  CONTINUE écrit `var_6`, et l'élément vertical écrit `var_2`.
+- Code de résultat `byte_706AF`, à la sortie de la fonction :
+  - ABORT → 4 ;
+  - RESTART → 6 ;
+  - CONTINUE → 1, seulement si le mode vaut 0 ou 3.
+  La valeur 1 est aussi écrite par le bouton CONTINUE avec un autre test ; le code n'est pas tracé plus loin.
+- Vérifié par rendu : l'écran avec le mode 0 (images 8 / 9 pour l'élément vertical) donne les libellés
+  RESTART, ABORT et CONTINUE, sans état supplémentaire.
 
 ### 5.5 Points ouverts pour l'implémentation
 
 - Lire `GaugeWidget_DrawByMode_A39DC` : mise en évidence de l'élément choisi, et images utilisées.
-- Résoudre les paires dynamiques restantes : EXIT GAME, et les deux conditions de FLIGHT et de CAMERAS (§ 5.4).
+- Conditions de FLIGHT et de CAMERAS : le sens exact de `byte_72E6C`, et la mesure de la valeur mémoire (§ 5.4).
 - Cible des variables `var_10`, `var_12` et `var_6` de FLIGHT, lues plus loin, et sens de `byte_72E6C`.
 - Identifier les drapeaux `byte_70996` et `word_70999`, et le sens des paires « activé » / « désactivé ».
 - Rôle des champs écrits par ROOKIE, VETERAN, ACE (§ 2.4).
