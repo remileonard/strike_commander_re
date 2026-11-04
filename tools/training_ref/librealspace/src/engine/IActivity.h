@@ -1,0 +1,63 @@
+//
+//  IActivity.h
+//  libRealSpace
+//
+//  Created by Fabien Sanglard on 1/25/2014.
+//  Copyright (c) 2014 Fabien Sanglard. All rights reserved.
+//
+
+#pragma once
+#include <vector>
+#include "../commons/Maths.h"
+#include "SCButton.h"
+#include "RSVGA.h"
+
+#include "RSScreen.h"
+#include "SCMouse.h"
+
+
+class GameEngine;
+class SCZone;
+
+char* strtoupper(char* dest, const char* src);
+bool isPointInQuad(const Point2D &p, const std::vector<Point2D *> *quad);
+
+class IActivity{
+private:
+    bool running;
+
+protected:
+    bool music_playing;
+    bool focused;
+    int timer{0};
+    IActivity();
+    SCButton* checkButtons(void);
+    // Comme checkButtons, pour les zones d'une scène (SCZone) : même traitement que SCGameFlow::CheckZones.
+    SCZone *checkZones(std::vector<SCZone *> *zones);
+    std::vector<SCButton*> buttons;
+    void drawButtons(void);
+    RSScreen *Screen = &RSScreen::instance();
+    GameEngine *Game{nullptr};
+    AssetManager &Assets = AssetManager::getInstance();
+    RSFontManager &FontManager = RSFontManager::getInstance();
+    RSMixer &Mixer = RSMixer::getInstance();
+    RSVGA &VGA = RSVGA::getInstance();
+    SCMouse &Mouse = SCMouse::getInstance();
+    SCRenderer &Renderer = SCRenderer::getInstance();
+    
+public:
+    VGAPalette palette;
+
+    virtual void init(void) = 0;
+    virtual void start(void) { this->running = true;}
+    void stop(void);
+    virtual void runFrame (void) = 0;
+    void setTitle(const char* title);
+    inline bool isRunning(void){ return this->running; }
+    virtual ~IActivity();
+    virtual void focus(void)  { this->focused = true;}
+    virtual void unFocus(void){ this->focused = false;}
+    virtual void renderMenu(void) {}
+    virtual void renderUI(void) {}
+    void checkKeyboard(void);
+};

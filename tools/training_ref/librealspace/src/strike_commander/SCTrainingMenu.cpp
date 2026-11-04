@@ -469,7 +469,7 @@ void SCTrainingMenu::runFrame(void) {
         VGA.activate();
         VGA.getFrameBuffer()->fillWithColor(0);
         this->loadout->Render();
-        SCScene::checkZones(this->zones);
+        this->checkZones(this->zones);
         Mouse.draw();
         VGA.vSync();
         if (this->zone_pending) {

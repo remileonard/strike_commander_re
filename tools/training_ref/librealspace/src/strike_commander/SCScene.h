@@ -44,7 +44,6 @@ public:
     virtual std::vector<SCZone *> *
     init(GAMEFLOW_SCEN *gf, SCEN *sc_opts, std::function<void(std::vector<EFCT *> *script, uint8_t id)> onclick);
     virtual void Render();
-    static SCZone *checkZones(std::vector<SCZone *> *zones);
 };
 
 class WeaponLoadoutScene : public SCScene {

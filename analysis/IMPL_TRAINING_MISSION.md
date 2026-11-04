@@ -45,8 +45,8 @@ reçoit qu'une ligne : l'emport choisi à l'écran d'armement (`player_loadout`)
 | `strike_commander/SCMission.cpp` | `SCMission::loadMission` : appel d'`addTraining` après la lecture |
 | `engine/FrameBuffer.cpp` | `FrameBuffer::textGlyphAdvance` : espace de la largeur d'un « A » si la police n'a pas de tiret |
 | `strike_commander/SCTrainingMenu.h`, `.cpp` | les 7 écrans, les textes, BACKUP, l'écran d'armement, le départ en vol |
-| `strike_commander/SCScene.h`, `.cpp` | `SCScene::checkZones` (corps de `SCGameFlow::CheckZones`, partagé) ; `WeaponLoadoutScene::keep_music` |
-| `strike_commander/SCGameFlow.cpp` | `SCGameFlow::CheckZones` appelle `SCScene::checkZones` |
+| `strike_commander/SCScene.h`, `.cpp` | `WeaponLoadoutScene::keep_music` |
+| `engine/IActivity.h`, `.cpp` | `IActivity::checkZones`, à côté de `checkButtons` : zones d'une scène sous la souris |
 | `enhanced/EnhancedTrainingMenu.cpp` | `OnSearchAndDestroy` passe l'emport choisi à `EnhancedStrike` |
 
 `OnSearchAndDestroy` garde son nom et son rôle de départ en vol, pour les deux types (le vol est toujours
@@ -92,10 +92,11 @@ campagne dans `SCGameFlow::flyOrReturnFromScene`) ; le chargement 0 de `GAMEFLOW
 
 - Le stock de la partie est mis de côté à l'ouverture de l'écran et rétabli au retour du vol ou à l'abandon : le vol
   d'entraînement retire ses armes du stock d'entraînement (`takeTeamWeaponsFromStock`), pas de celui d'une campagne.
-- Les clics de zone sont notés et appliqués après `SCScene::checkZones`, comme ceux des boutons : la scène est détruite
-  au départ.
-- `SCScene::checkZones` est l'ancien corps de `SCGameFlow::CheckZones` (curseur, clic, nom de zone écrit en bas),
-  rendu statique avec la liste des zones en argument, pour servir aux deux activités sans copie.
+- Les clics de zone sont notés et appliqués après `IActivity::checkZones`, comme ceux des boutons : la scène est
+  détruite au départ.
+- `IActivity::checkZones` fait pour une liste de zones ce que `checkButtons` fait pour les boutons : même traitement que
+  `SCGameFlow::CheckZones` (curseur, clic, nom de zone écrit en bas avec `OPTFONT.SHP`). `SCGameFlow` n'est pas modifié
+  et garde sa propre fonction.
 
 ## 3. Le code de chaque changement
 
@@ -671,13 +672,63 @@ int FrameBuffer::textGlyphAdvance(RSFont *font, char c) {
 }
 ```
 
-### 3.7 `strike_commander/SCScene.h` — `checkZones`, `keep_music`
+### 3.7 `engine/IActivity.h` — `checkZones`
 
-Dans `class SCScene`, après `Render` :
+Avant `class IActivity` : `class SCZone;`. Dans `class IActivity`, après `checkButtons` :
 
 ```cpp
-    static SCZone *checkZones(std::vector<SCZone *> *zones);
+    // Comme checkButtons, pour les zones d'une scène (SCZone) : même traitement que SCGameFlow::CheckZones.
+    SCZone *checkZones(std::vector<SCZone *> *zones);
 ```
+
+### 3.8 `engine/IActivity.cpp` — `IActivity::checkZones` (nouvelle ; `#include "SCZone.h"` ajouté)
+
+```cpp
+// Zones d'une scène sous la souris : curseur en viseur, action au relâchement du bouton gauche, nom de la zone écrit en
+// bas de l'écran (OPTFONT.SHP). Même traitement que SCGameFlow::CheckZones, pour une liste de zones donnée.
+SCZone *IActivity::checkZones(std::vector<SCZone *> *zones) {
+    static uint8_t color = 0;
+    if (zones == nullptr) {
+        return nullptr;
+    }
+    RSFont *fnt = FontManager.GetFont("..\\..\\DATA\\FONTS\\OPTFONT.SHP");
+    for (auto zone : *zones) {
+        if (!zone->active) {
+            continue;
+        }
+        bool inside = false;
+        if (zone->quad != nullptr) {
+            inside = isPointInQuad(Mouse.getPosition(), zone->quad);
+        }
+        if (!inside) {
+            inside = Mouse.getPosition().x > zone->position.x &&
+                     Mouse.getPosition().x < zone->position.x + zone->dimension.x &&
+                     Mouse.getPosition().y > zone->position.y &&
+                     Mouse.getPosition().y < zone->position.y + zone->dimension.y;
+        }
+        if (!inside) {
+            continue;
+        }
+        Mouse.setMode(SCMouse::VISOR);
+        // If the mouse button has just been released: trigger action.
+        if (Mouse.buttons[MouseButton::LEFT].event == MouseButton::RELEASED) {
+            Mouse.buttons[MouseButton::LEFT].event = MouseButton::NONE;
+            zone->onAction();
+        }
+        Point2D p = {
+            160 - static_cast<int32_t>(zone->label->length() / 2) * 8,
+            180,
+        };
+        VGA.getFrameBuffer()->printText(fnt, &p, (char *)zone->label->c_str(), color, 0,
+                                        static_cast<uint32_t>(zone->label->length()), 3, 5);
+        return zone;
+    }
+    Mouse.setMode(SCMouse::CURSOR);
+    return nullptr;
+}
+```
+
+### 3.9 `strike_commander/SCScene.h` — `WeaponLoadoutScene::keep_music`
 
 Dans `class WeaponLoadoutScene` :
 
@@ -686,60 +737,7 @@ Dans `class WeaponLoadoutScene` :
     bool keep_music{false};
 ```
 
-### 3.8 `strike_commander/SCScene.cpp` — `SCScene::checkZones` (nouvelle, ancien corps de `SCGameFlow::CheckZones`)
-
-```cpp
-// Zones d'une scène sous la souris : curseur en viseur, action au relâchement du bouton gauche, nom de la zone écrit en
-// bas de l'écran (OPTFONT.SHP). Ancien corps de SCGameFlow::CheckZones.
-SCZone *SCScene::checkZones(std::vector<SCZone *> *zones) {
-    SCMouse &Mouse = SCMouse::getInstance();
-    RSVGA &VGA = RSVGA::getInstance();
-    RSFontManager &FontManager = RSFontManager::getInstance();
-    static uint8_t color = 0;
-    RSFont *fnt = FontManager.GetFont("..\\..\\DATA\\FONTS\\OPTFONT.SHP");
-    for (auto zone : *zones) {
-        if (zone->active) {
-            if (zone->quad != nullptr) {
-                if (isPointInQuad(Mouse.getPosition(), zone->quad)) {
-                    Mouse.setMode(SCMouse::VISOR);
-
-                    // If the mouse button has just been released: trigger action.
-                    if (Mouse.buttons[MouseButton::LEFT].event == MouseButton::RELEASED) {
-                        Mouse.buttons[MouseButton::LEFT].event = MouseButton::NONE;
-                        zone->onAction();
-                    }
-                    Point2D p = {160 - static_cast<int32_t>(zone->label->length() / 2) * 8, 180};
-                    VGA.getFrameBuffer()->printText(fnt, &p, (char *)zone->label->c_str(), color, 0,
-                                                    static_cast<uint32_t>(zone->label->length()), 3, 5);
-                    return zone;
-                }
-            }
-            if (Mouse.getPosition().x > zone->position.x &&
-                Mouse.getPosition().x < zone->position.x + zone->dimension.x &&
-                Mouse.getPosition().y > zone->position.y &&
-                Mouse.getPosition().y < zone->position.y + zone->dimension.y) {
-                // HIT !
-                Mouse.setMode(SCMouse::VISOR);
-
-                if (Mouse.buttons[MouseButton::LEFT].event == MouseButton::RELEASED) {
-                    Mouse.buttons[MouseButton::LEFT].event = MouseButton::NONE;
-                    zone->onAction();
-                }
-                Point2D p = {160 - ((int32_t)(zone->label->length() / 2) * 8), 180};
-                VGA.getFrameBuffer()->printText(fnt, &p, (char *)zone->label->c_str(), color, 0,
-                                                static_cast<uint32_t>(zone->label->length()), 3, 5);
-
-                return zone;
-            }
-        }
-    }
-
-    Mouse.setMode(SCMouse::CURSOR);
-    return nullptr;
-}
-```
-
-### 3.9 `strike_commander/SCScene.cpp` — `WeaponLoadoutScene::Render`
+### 3.10 `strike_commander/SCScene.cpp` — `WeaponLoadoutScene::Render`
 
 Seul le test de la musique change (`!this->keep_music`) ; la fonction entière :
 
@@ -781,15 +779,6 @@ void WeaponLoadoutScene::Render() {
             }
         }
     }
-}
-```
-
-### 3.10 `strike_commander/SCGameFlow.cpp` — `SCGameFlow::CheckZones`
-
-```cpp
-// Corps déplacé dans SCScene::checkZones, partagé avec l'écran d'armement de SCTrainingMenu.
-SCZone *SCGameFlow::CheckZones(void) {
-    return SCScene::checkZones(this->zones);
 }
 ```
 
@@ -1393,7 +1382,7 @@ void SCTrainingMenu::runFrame(void) {
         VGA.activate();
         VGA.getFrameBuffer()->fillWithColor(0);
         this->loadout->Render();
-        SCScene::checkZones(this->zones);
+        this->checkZones(this->zones);
         Mouse.draw();
         VGA.vSync();
         if (this->zone_pending) {
