@@ -48,9 +48,7 @@ SCTrainingMenu::SCTrainingMenu() {
 
 SCTrainingMenu::~SCTrainingMenu() {
     this->closeLoadout();
-    for (auto button : this->buttons) {
-        delete button;
-    }
+    // Les boutons appartiennent aux panneaux, qui les détruisent.
     this->buttons.clear();
     if (this->font != nullptr) {
         delete this->font;
@@ -141,109 +139,85 @@ void SCTrainingMenu::init() {
         this->font->InitFromPAK(&fontPack);
     }
 
+    this->buildPanels();
     this->showScreen(SCREEN_TYPE);
 }
 
 // Un bouton : rectangle relatif au panneau, image normale `image`, image enfoncée `image + 1` (toutes les paires de
-// TM.SHP se suivent), valeur rendue au clic. Le clic ne fait que noter la valeur : runFrame l'applique après
-// checkButtons, car l'écran suivant remplace les boutons.
-void SCTrainingMenu::addButton(Point2D panel, int x, int y, int width, int height, int image, int value) {
-    SCButton *button = new SCButton();
-    Point2D position = {
-        panel.x + x,
-        panel.y + y,
-    };
-    Point2D dimension = {
-        width,
-        height,
-    };
-    button->initBehavior(std::bind(&SCTrainingMenu::onButtonClick, this, value), position, dimension);
-    button->appearance[SCButton::APR_UP].InitWithPosition(this->tm_pack.GetEntry(image)->data,
-                                                          this->tm_pack.GetEntry(image)->size, &position);
-    button->appearance[SCButton::APR_DOWN].InitWithPosition(this->tm_pack.GetEntry(image + 1)->data,
-                                                            this->tm_pack.GetEntry(image + 1)->size, &position);
-    this->buttons.push_back(button);
+// TM.SHP se suivent).
+void SCTrainingMenu::addButton(SCPanel *panel, int x, int y, int width, int height, int image,
+                               std::function<void()> action) {
+    panel->addButton(x, y, width, height, this->tm_pack.GetEntry(image), this->tm_pack.GetEntry(image + 1), action);
 }
 
-// Clic sur un bouton : la valeur est notée, applyChoice l'applique depuis runFrame.
-void SCTrainingMenu::onButtonClick(int value) {
-    this->choice_pending = true;
-    this->choice = value;
+// BACKUP en (87, y) et CANCEL en (155, y), images `image` et `image + 2` : présents sur tous les écrans sauf le premier.
+void SCTrainingMenu::addBackupCancel(SCPanel *panel, int y, int image) {
+    this->addButton(panel, 87, y, 65, 12, image, std::bind(&SCTrainingMenu::backup, this));
+    this->addButton(panel, 155, y, 65, 12, image + 2, std::bind(&SCTrainingMenu::OnExitTraining, this));
 }
 
-// Panneau et boutons de chaque écran (positions et images de TRAINING_MISSION.md § 3).
+// Panneaux et boutons des 7 écrans (positions et images de TRAINING_MISSION.md § 3), construits une fois.
+void SCTrainingMenu::buildPanels() {
+    SCPanel *panel = &this->panels[SCREEN_TYPE];
+    panel->init(this->tm_pack.GetEntry(0), PANEL_LOW);
+    this->addButton(panel, 16, 9, 136, 12, 1, std::bind(&SCTrainingMenu::onTypeChosen, this, 2));
+    this->addButton(panel, 155, 9, 136, 12, 3, std::bind(&SCTrainingMenu::onTypeChosen, this, 1));
+    this->addButton(panel, 155, 24, 65, 12, 5, std::bind(&SCTrainingMenu::OnExitTraining, this));
+
+    panel = &this->panels[SCREEN_COUNT];
+    panel->init(this->tm_pack.GetEntry(7), PANEL_LOW);
+    for (int n = 0; n < 5; n++) {
+        this->addButton(panel, 113 + 17 * n, 9, 14, 12, 8 + 2 * n, std::bind(&SCTrainingMenu::onCountChosen, this, n + 1));
+    }
+    this->addBackupCancel(panel, 24, 18);
+
+    panel = &this->panels[SCREEN_PLANE];
+    panel->init(this->tm_pack.GetEntry(22), PANEL_HIGH);
+    const int columns[4] = {
+        9,
+        77,
+        145,
+        235,
+    };
+    for (int n = 0; n < 16; n++) {
+        this->addButton(panel, columns[n / 4], 7 + 13 * (n % 4), 65, 12, 23 + 2 * n,
+                        std::bind(&SCTrainingMenu::onPlaneChosen, this, n + 1));
+    }
+    this->addBackupCancel(panel, 61, 55);
+
+    panel = &this->panels[SCREEN_MORE];
+    panel->init(this->tm_pack.GetEntry(59), PANEL_LOW);
+    this->addButton(panel, 87, 9, 65, 12, 60, std::bind(&SCTrainingMenu::onMore, this));
+    this->addButton(panel, 155, 9, 65, 12, 62, std::bind(&SCTrainingMenu::onEnough, this));
+    this->addBackupCancel(panel, 24, 64);
+
+    panel = &this->panels[SCREEN_ALTITUDE];
+    panel->init(this->tm_pack.GetEntry(68), PANEL_LOW);
+    for (int n = 0; n < 4; n++) {
+        this->addButton(panel, 19 + 68 * n, 9, 65, 12, 69 + 2 * n,
+                        std::bind(&SCTrainingMenu::onAltitudeChosen, this, n + 1));
+    }
+    this->addBackupCancel(panel, 24, 77);
+
+    panel = &this->panels[SCREEN_LEVEL];
+    panel->init(this->tm_pack.GetEntry(81), PANEL_LOW);
+    for (int n = 0; n < 3; n++) {
+        this->addButton(panel, 54 + 68 * n, 9, 65, 12, 82 + 2 * n,
+                        std::bind(&SCTrainingMenu::onLevelChosen, this, n + 1));
+    }
+    this->addBackupCancel(panel, 24, 88);
+
+    panel = &this->panels[SCREEN_ACCEPT];
+    panel->init(this->tm_pack.GetEntry(92), PANEL_LOW);
+    this->addButton(panel, 121, 9, 65, 12, 93, std::bind(&SCTrainingMenu::onAccept, this));
+    this->addBackupCancel(panel, 24, 95);
+}
+
+// Changement d'écran : la liste des boutons de l'activité devient celle du panneau. Appelé depuis l'action d'un bouton
+// pendant checkButtons, qui s'arrête juste après l'action : les boutons ne sont pas détruits, rien n'est invalidé.
 void SCTrainingMenu::showScreen(TrainingScreen next) {
-    for (auto button : this->buttons) {
-        delete button;
-    }
-    this->buttons.clear();
     this->screen = next;
-    Point2D panel = PANEL_LOW;
-    int panelImage = 0;
-    switch (next) {
-    case SCREEN_TYPE:
-        panelImage = 0;
-        this->addButton(panel, 16, 9, 136, 12, 1, 2);
-        this->addButton(panel, 155, 9, 136, 12, 3, 1);
-        this->addButton(panel, 155, 24, 65, 12, 5, CHOICE_CANCEL);
-        break;
-    case SCREEN_COUNT:
-        panelImage = 7;
-        for (int n = 0; n < 5; n++) {
-            this->addButton(panel, 113 + 17 * n, 9, 14, 12, 8 + 2 * n, n + 1);
-        }
-        this->addButton(panel, 87, 24, 65, 12, 18, CHOICE_BACKUP);
-        this->addButton(panel, 155, 24, 65, 12, 20, CHOICE_CANCEL);
-        break;
-    case SCREEN_PLANE: {
-        panel = PANEL_HIGH;
-        panelImage = 22;
-        const int columns[4] = {
-            9,
-            77,
-            145,
-            235,
-        };
-        for (int n = 0; n < 16; n++) {
-            this->addButton(panel, columns[n / 4], 7 + 13 * (n % 4), 65, 12, 23 + 2 * n, n + 1);
-        }
-        this->addButton(panel, 87, 61, 65, 12, 55, CHOICE_BACKUP);
-        this->addButton(panel, 155, 61, 65, 12, 57, CHOICE_CANCEL);
-        break;
-    }
-    case SCREEN_MORE:
-        panelImage = 59;
-        this->addButton(panel, 87, 9, 65, 12, 60, 1);
-        this->addButton(panel, 155, 9, 65, 12, 62, 2);
-        this->addButton(panel, 87, 24, 65, 12, 64, CHOICE_BACKUP);
-        this->addButton(panel, 155, 24, 65, 12, 66, CHOICE_CANCEL);
-        break;
-    case SCREEN_ALTITUDE:
-        panelImage = 68;
-        for (int n = 0; n < 4; n++) {
-            this->addButton(panel, 19 + 68 * n, 9, 65, 12, 69 + 2 * n, n + 1);
-        }
-        this->addButton(panel, 87, 24, 65, 12, 77, CHOICE_BACKUP);
-        this->addButton(panel, 155, 24, 65, 12, 79, CHOICE_CANCEL);
-        break;
-    case SCREEN_LEVEL:
-        panelImage = 81;
-        for (int n = 0; n < 3; n++) {
-            this->addButton(panel, 54 + 68 * n, 9, 65, 12, 82 + 2 * n, n + 1);
-        }
-        this->addButton(panel, 87, 24, 65, 12, 88, CHOICE_BACKUP);
-        this->addButton(panel, 155, 24, 65, 12, 90, CHOICE_CANCEL);
-        break;
-    case SCREEN_ACCEPT:
-        panelImage = 92;
-        this->addButton(panel, 121, 9, 65, 12, 93, 1);
-        this->addButton(panel, 87, 24, 65, 12, 95, CHOICE_BACKUP);
-        this->addButton(panel, 155, 24, 65, 12, 97, CHOICE_CANCEL);
-        break;
-    }
-    PakEntry *entry = this->tm_pack.GetEntry(panelImage);
-    this->board.init(entry->data, entry->size);
-    this->board.SetPosition(&panel);
+    this->buttons = this->panels[next].buttons;
 }
 
 // Largeur d'un texte écrit par FrameBuffer::printText, espace qui suit compris : x du texte écrit à sa suite.
@@ -365,101 +339,103 @@ void SCTrainingMenu::onLoadoutClick(std::vector<EFCT *> *script, uint8_t id) {
     this->zone_choice = id;
 }
 
-void SCTrainingMenu::applyChoice(int value) {
-    if (value == CHOICE_CANCEL) {
-        this->OnExitTraining();
-        return;
+// Premier écran : 1 = DOGFIGHT, 2 = SEARCH AND DESTROY.
+void SCTrainingMenu::onTypeChosen(int type) {
+    this->pushStep();
+    this->settings = MISN_TRAINING();
+    this->settings.type = (uint8_t)type;
+    this->group = 0;
+    if (type == 1) {
+        // Training_DogfightBriefing_58E2A
+        this->addText(5, 43, "Mission Briefing: Air Superiority");
+        this->addText(5, 55, "Intercept and engage inbound bogeys:");
+        this->showScreen(SCREEN_COUNT);
+    } else {
+        // Training_SearchBriefing_58E74 : aucun réglage, validation directe.
+        this->addText(5, 43, "Mission Briefing: Ground Attack");
+        this->addText(5, 55, "Search and destroy enemy targets at");
+        this->addText(5, 67, "pilot's discretion.  Refer to area");
+        this->addText(5, 79, "map for enemy positions.");
+        this->showScreen(SCREEN_ACCEPT);
     }
-    if (value == CHOICE_BACKUP) {
-        this->backup();
-        return;
+}
+
+// Nombre d'avions du groupe (1 à 5).
+void SCTrainingMenu::onCountChosen(int count) {
+    this->pushStep();
+    this->settings.group_count[this->group] = (uint8_t)count;
+    this->addText(20, 67 + 12 * this->group, std::to_string(count));
+    this->showScreen(SCREEN_PLANE);
+}
+
+// Type d'avion du groupe (1 à 16, rang dans RSMission::training_planes + 1).
+void SCTrainingMenu::onPlaneChosen(int plane) {
+    this->pushStep();
+    this->settings.group_plane[this->group] = (uint8_t)(plane - 1);
+    std::string name = RSMission::training_planes[plane - 1].name;
+    if (this->group == 2) {
+        name += ".";
     }
+    this->addText(30, 67 + 12 * this->group, name);
+    if (this->group < 2) {
+        this->showScreen(SCREEN_MORE);
+    } else {
+        this->addText(5, 103, "Altitude: ");
+        this->showScreen(SCREEN_ALTITUDE);
+    }
+}
+
+// MORE : « , » après le 1er groupe, « , and » après le 2e, puis le groupe suivant.
+void SCTrainingMenu::onMore() {
+    this->pushStep();
+    int line = 67 + 12 * this->group;
+    int x = 30 + this->textWidth(RSMission::training_planes[this->settings.group_plane[this->group]].name);
+    if (this->group == 1) {
+        this->addText(x, line, ", and");
+    } else {
+        this->addText(x, line, ",");
+    }
+    this->group++;
+    this->showScreen(SCREEN_COUNT);
+}
+
+// ENOUGH : « . » après le dernier groupe, puis l'altitude.
+void SCTrainingMenu::onEnough() {
+    this->pushStep();
+    int line = 67 + 12 * this->group;
+    int x = 30 + this->textWidth(RSMission::training_planes[this->settings.group_plane[this->group]].name);
+    this->addText(x, line, ".");
+    this->addText(5, 103, "Altitude: ");
+    this->showScreen(SCREEN_ALTITUDE);
+}
+
+// Training_AltitudeScreen_55C92 : choix × 10000 − 5000 pieds (choix 1 à 4).
+void SCTrainingMenu::onAltitudeChosen(int choice) {
+    this->pushStep();
+    this->settings.altitude_feet = choice * 10000 - 5000;
+    this->addText(5 + this->textWidth("Altitude: "), 103, std::to_string(this->settings.altitude_feet) + " feet.");
+    this->addText(5, 115, "Intelligence reports indicate ");
+    this->showScreen(SCREEN_LEVEL);
+}
+
+// Niveau des pilotes ennemis (1 à 3).
+void SCTrainingMenu::onLevelChosen(int level) {
     const char *levels[3] = {
         "rookie",
         "veteran",
         "ace",
     };
-    int line = 67 + 12 * this->group;
-    switch (this->screen) {
-    case SCREEN_TYPE:
-        this->pushStep();
-        this->settings = MISN_TRAINING();
-        this->settings.type = (uint8_t)value;
-        this->group = 0;
-        if (value == 1) {
-            // Training_DogfightBriefing_58E2A
-            this->addText(5, 43, "Mission Briefing: Air Superiority");
-            this->addText(5, 55, "Intercept and engage inbound bogeys:");
-            this->showScreen(SCREEN_COUNT);
-        } else {
-            // Training_SearchBriefing_58E74 : aucun réglage, validation directe.
-            this->addText(5, 43, "Mission Briefing: Ground Attack");
-            this->addText(5, 55, "Search and destroy enemy targets at");
-            this->addText(5, 67, "pilot's discretion.  Refer to area");
-            this->addText(5, 79, "map for enemy positions.");
-            this->showScreen(SCREEN_ACCEPT);
-        }
-        break;
-    case SCREEN_COUNT:
-        this->pushStep();
-        this->settings.group_count[this->group] = (uint8_t)value;
-        this->addText(20, line, std::to_string(value));
-        this->showScreen(SCREEN_PLANE);
-        break;
-    case SCREEN_PLANE: {
-        this->pushStep();
-        this->settings.group_plane[this->group] = (uint8_t)(value - 1);
-        std::string name = RSMission::training_planes[value - 1].name;
-        if (this->group == 2) {
-            name += ".";
-        }
-        this->addText(30, line, name);
-        if (this->group < 2) {
-            this->showScreen(SCREEN_MORE);
-        } else {
-            this->addText(5, 103, "Altitude: ");
-            this->showScreen(SCREEN_ALTITUDE);
-        }
-        break;
-    }
-    case SCREEN_MORE: {
-        this->pushStep();
-        int x = 30 + this->textWidth(RSMission::training_planes[this->settings.group_plane[this->group]].name);
-        if (value == 1) {
-            // MORE : « , » après le 1er groupe, « , and » après le 2e.
-            this->addText(x, line, this->group == 1 ? ", and" : ",");
-            this->group++;
-            this->showScreen(SCREEN_COUNT);
-        } else {
-            // ENOUGH
-            this->addText(x, line, ".");
-            this->addText(5, 103, "Altitude: ");
-            this->showScreen(SCREEN_ALTITUDE);
-        }
-        break;
-    }
-    case SCREEN_ALTITUDE:
-        this->pushStep();
-        // Training_AltitudeScreen_55C92 : choix × 10000 − 5000 pieds.
-        this->settings.altitude_feet = value * 10000 - 5000;
-        this->addText(5 + this->textWidth("Altitude: "), 103,
-                      std::to_string(this->settings.altitude_feet) + " feet.");
-        this->addText(5, 115, "Intelligence reports indicate ");
-        this->showScreen(SCREEN_LEVEL);
-        break;
-    case SCREEN_LEVEL:
-        this->pushStep();
-        this->settings.pilot_level = (uint8_t)(value - 1);
-        this->addText(5 + this->textWidth("Intelligence reports indicate "), 115,
-                      std::string(levels[value - 1]) + " pilots.");
-        this->showScreen(SCREEN_ACCEPT);
-        break;
-    case SCREEN_ACCEPT:
-        // ACCEPT : écran d'armement ; sans OPTIONS.IFF, départ direct avec l'emport du fichier de l'avion.
-        if (!this->openLoadout()) {
-            this->startFlight(false);
-        }
-        break;
+    this->pushStep();
+    this->settings.pilot_level = (uint8_t)(level - 1);
+    this->addText(5 + this->textWidth("Intelligence reports indicate "), 115,
+                  std::string(levels[level - 1]) + " pilots.");
+    this->showScreen(SCREEN_ACCEPT);
+}
+
+// ACCEPT : écran d'armement ; sans OPTIONS.IFF, départ direct avec l'emport du fichier de l'avion.
+void SCTrainingMenu::onAccept() {
+    if (!this->openLoadout()) {
+        this->startFlight(false);
     }
 }
 
@@ -485,10 +461,6 @@ void SCTrainingMenu::runFrame(void) {
         return;
     }
     checkButtons();
-    if (this->choice_pending) {
-        this->choice_pending = false;
-        this->applyChoice(this->choice);
-    }
 
     VGA.activate();
     VGA.getFrameBuffer()->clear();
@@ -497,7 +469,7 @@ void SCTrainingMenu::runFrame(void) {
 
     VGA.getFrameBuffer()->drawShape(&background);
     VGA.getFrameBuffer()->drawShape(&title);
-    VGA.getFrameBuffer()->drawShape(&board);
+    this->panels[this->screen].draw(VGA.getFrameBuffer());
 
     // Couleur 0 : les lettres gardent leurs couleurs (0 et 1 de la palette d'OBJVIEW.PAK, noir et gris clair).
     if (this->font != nullptr) {

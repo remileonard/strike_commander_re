@@ -12,6 +12,8 @@
 #ifndef __libRealSpace__File__
 #define __libRealSpace__File__
 
+#include "../engine/SCPanel.h"
+
 // Déclarée dans SCScene.h, inclus après ce fichier par precomp.h.
 class WeaponLoadoutScene;
 
@@ -32,7 +34,7 @@ protected:
     virtual void OnSearchAndDestroy();
 
 private:
-    // Un écran = un panneau de TM.SHP et ses boutons (§ 3 du document).
+    // Un écran = un panneau de TM.SHP et ses boutons (§ 3 du document), rangé dans panels à son indice.
     enum TrainingScreen {
         SCREEN_TYPE,
         SCREEN_COUNT,
@@ -40,11 +42,9 @@ private:
         SCREEN_MORE,
         SCREEN_ALTITUDE,
         SCREEN_LEVEL,
-        SCREEN_ACCEPT
+        SCREEN_ACCEPT,
+        SCREEN_TOTAL
     };
-    // Valeurs rendues par les boutons BACKUP et CANCEL (−1 et −2 dans le jeu).
-    static const int CHOICE_BACKUP = -1;
-    static const int CHOICE_CANCEL = -2;
 
     // Ligne de texte écrite au-dessus du panneau (Training_PrintText_55BDC).
     struct TrainingText {
@@ -62,8 +62,9 @@ private:
     SCState &GameState = SCState::getInstance();
     RLEShape title;
     RLEShape background;
-    RLEShape board;
     PakArchive tm_pack;
+    // Les 7 écrans, construits une fois par init ; IActivity::buttons pointe sur les boutons de l'écran affiché.
+    SCPanel panels[SCREEN_TOTAL];
     RSFont *font{ nullptr };
 
     TrainingScreen screen{ SCREEN_TYPE };
@@ -71,9 +72,6 @@ private:
     int group{ 0 };
     std::vector<TrainingText> texts;
     std::vector<TrainingStep> history;
-    // Choix noté par un bouton, appliqué après checkButtons (les boutons sont remplacés à chaque écran).
-    bool choice_pending{ false };
-    int choice{ 0 };
 
     // Écran d'armement de la campagne (Gameflow_WeaponLoadout_51AB3 dans OPTEST), ouvert après ACCEPT.
     RSOption options;
@@ -91,12 +89,21 @@ private:
     uint8_t zone_choice{ 0 };
 
     void OnExitTraining();
+    void buildPanels();
+    void addButton(SCPanel *panel, int x, int y, int width, int height, int image, std::function<void()> action);
+    void addBackupCancel(SCPanel *panel, int y, int image);
     void showScreen(TrainingScreen next);
-    void addButton(Point2D panel, int x, int y, int width, int height, int image, int value);
-    void onButtonClick(int value);
     int addText(int x, int y, const std::string &text);
     int textWidth(const std::string &text);
-    void applyChoice(int value);
+    // Actions des boutons, une par écran (valeur du bouton en argument).
+    void onTypeChosen(int type);
+    void onCountChosen(int count);
+    void onPlaneChosen(int plane);
+    void onMore();
+    void onEnough();
+    void onAltitudeChosen(int choice);
+    void onLevelChosen(int level);
+    void onAccept();
     void pushStep();
     void backup();
     void startFlight(bool with_loadout);
