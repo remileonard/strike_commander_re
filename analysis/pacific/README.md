@@ -881,6 +881,8 @@ u32  NOUVEAU (÷ 256)                     Corsair : 50
 u32  NOUVEAU (÷ 256)                     Corsair : 45 ; la moitié sert de vitesse plancher
 ```
 
+![Chunk THRS : Strike Commander et Pacific Strike, valeurs du Corsair](images/ps_thrs_format.png)
+
 **La poussée devient celle d'une hélice** (`Aero_PropellerThrust_4710B`, à la place d'`Aero_ThrottleThrustCurve_4730F`).
 Appelée comme dans Strike Commander par le tick physique (`sub_4A8F4`, équivalent de `PhysicsTicks`, puis × gain
 moteur) : `poussée = courbe(&jdyn[34], cran)`. Recalculée quand le cran change, sinon une image sur 8. En flottants :
@@ -897,6 +899,8 @@ si altitude > hc : P = P − P × (altitude − hc) ÷ (plafond − hc)
 v = max(V, THRS 7e champ ÷ 2)                    Corsair : 22,5 m/s
 poussée (N) = 0,8477 × 550 × P ÷ (v × 3,2773) × 4,4453 × cran ÷ 10, bornée à 0
 ```
+
+![Corsair : poussée de l'hélice plein gaz selon la vitesse et l'altitude](images/ps_prop_thrust.png)
 
 Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-force par seconde et par cheval,
 3,2773 pieds par mètre, 4,4453 newtons par livre-force, rendement de l'hélice 0,8477 (`mov [bp+var_8], 22600h`,
@@ -946,9 +950,12 @@ m = m × gain de la gouverne de profondeur
 si décrochage (bit 6) : m = 0
 α_max = JDYN champ 20 (octet 58 du chunk)          Corsair : 20°
 manche hors du neutre : consigne = α_max × m
-manche au neutre       : l'incidence actuelle est gardée, bornée entre −calage (−volets) et la limite
+manche au neutre       : incidence actuelle gardée,
+                         bornée entre −calage (−volets) et la limite
 borne finale : ± α_max × gain de la gouverne de profondeur
 ```
+
+![Corsair : incidence voulue selon le manche](images/ps_aoa_command.png)
 
 Un cas particulier du joueur (`byte_7CEF8` = 4 et `dword_7977E` = 1,0) ajoute le calage à la consigne ; non identifié.
 
@@ -960,6 +967,8 @@ coefficient ÷ 8 au lieu de ÷ 4.
 
 **3. Traînée** (`Aero_ComputeDragWithFeedback_481AB`) : même formule, sauf l'option `word_7CB07` : la part de
 l'incidence au-delà de (calage + 1) compte × 0,797 (incidence négative) ou × 0,656 (positive) à 1, × 0,5 ou × 0,328 à 2.
+
+![Corsair : incidence comptée dans la traînée selon l'option de difficulté](images/ps_drag_alpha.png)
 
 **4. Somme des forces** (`Aero_SumLinearForces_486B5`) : identique, sauf quand le bit 5 des drapeaux est posé.
 Strike Commander met alors poussée et portance à zéro ; Pacific Strike divise la poussée par 512, garde la portance et
@@ -980,6 +989,8 @@ que quand le flux vient de l'arrière.
 - **roulage** : lacet imposé par le manche sous **25 m/s** (Strike Commander : 40 m/s), même formule ;
 - **roulette de queue** : au sol, le tangage du nez est ramené vers **10°** : remis d'un coup à 10° à l'arrêt s'il
   sort de 10 ± 0,5°, mené vers 10° à au plus 0,5 °/s sous 20 m/s. Ces trois valeurs sont fixes, pas lues dans le fichier.
+
+![Corsair : tous les seuils de vitesse du modèle de vol](images/ps_speed_marks.png)
 
 **Les deux options de difficulté.** `word_7CB07` (0, 1 ou 2, 1 par défaut) donne au joueur plus de puissance à basse
 vitesse, moins de traînée à forte incidence, et à 2 supprime son décrochage. `byte_7CB11` (0 par défaut) règle la
