@@ -14968,8 +14968,8 @@
 "sub_634A4",
 "sub_634A4"
 ],
-"new_name": "sub_2EEB8",
-"summary": ""
+"new_name": "Render_FacePipeline_2EEB8",
+"summary": "far, 2307 lignes. LUE EN PARTIE 2026-11-05 (champs de la face seulement). Dessine une face : image = dword +14h de la face (-> dword_77B78 ; 0 = sans image), double face = octet +25h (-> byte_77B7C) ; sommets transformés dans le repère de l'observateur (Matrix_WorldToLocal_5A569) avec cache (bit 80h de +10h du sommet) ; u, v des 3 sommets (+18h à +22h) passés en 8.8 (shl ax, 8) : coordonnées en POINTS de l'image. Clé de tri : profondeur du sommet le plus loin + 7D00h, moins 1900h si l'octet +25h vaut 1, moins 4B00h s'il vaut 2 (rôle exact non lu). Découpage et envoi (sub_2E656, sub_634A4) non lus."
 },
 "sub_30C18": {
 "segment": "seg079",
@@ -14995,8 +14995,8 @@
 "sub_2EB67",
 "sub_2EEB8"
 ],
-"new_name": "sub_30C62",
-"summary": ""
+"new_name": "TriOverlay_RenderRegion_30C62",
+"summary": "far. LUE 2026-11-05. Équivalent de TriOverlay_RenderRegion_31BFF de STRIKE.EXE (faces de 38 octets en mémoire au lieu de 30) : efface les bits 80h/40h des sommets, prend la liste de la case 0 de la grille, et pour chaque face : groupe (+24h) ≤ [desc+9], hauteur de visibilité du groupe ([desc+2Dh+4g] << 8) > altitude de l'observateur ([arg_2+1Ch]), boîte du groupe (sub_2EB67, desc+3Dh+16g) ; puis Render_FacePipeline_2EEB8."
 },
 "sub_30DA2": {
 "segment": "seg079",
@@ -61239,8 +61239,8 @@
 "sub_6D61E",
 "sub_6DFAB"
 ],
-"new_name": "sub_A7090",
-"summary": ""
+"new_name": "TerrainTextures_LoadAccList_A7090",
+"summary": "far. LUE 2026-11-05. Charge la table des matériaux des pistes (structure word_7CC8E : +0 nombre d'images simples, +2 nombre d'images animées, +4 table des images simples, pas de 14 octets, +8 table des animées, pas de 24). Ouvre TXM\\ACC_LIST (FORM TXMS, push large 534D5854h) ; chunk INFO = 2 mots (les deux nombres) -> TextureTable_Allocate_BB46A ; ouvre TXM\\ACCPACK.PAK ; chunk MAPS = enregistrements de 15 octets (taille ÷ 15) : mot = numéro (moins le numéro du premier enregistrement = place dans la table ; 255 = sauté), nom, octet 11 = nombre d'images (1 : une image au nom donné ; bit 7 : image animée, TextureTable_LoadAnimated_BB541 ; sinon n images nommées « %s%d » de 1 à n, places successives) ; chaque image = l'entrée de ACCPACK.PAK de même numéro que sa place (TextureTable_LoadImage_BB506). Équivalent de TextureLoader_OpenAndLoadFull_98A60 de STRIKE.EXE."
 },
 "sub_A7320": {
 "segment": "ovr285",
@@ -68741,8 +68741,8 @@
 "sub_BAAAE",
 "sub_6C4F3"
 ],
-"new_name": "sub_BAD4F",
-"summary": ""
+"new_name": "TextureRecord_ReadImage_BAD4F",
+"summary": "far. LUE 2026-11-05. Lit 4 octets (largeur et hauteur sur 2 octets chacune, constat sur ACCPACK.PAK : 120 × 126), réserve l'image dans l'enregistrement (sub_BA8A0) puis lit les points (un octet de palette par point). Rend 1 si l'image est chargée."
 },
 "sub_BADC7": {
 "segment": "ovr342",
@@ -68773,8 +68773,8 @@
 "sub_BAD4F",
 "sub_6C110"
 ],
-"new_name": "sub_BAE1C",
-"summary": ""
+"new_name": "TextureRecord_LoadFromPakOrFile_BAE1C",
+"summary": "far. LUE 2026-11-05. Avec un PAK : se place sur l'entrée demandée (sub_7844) puis TextureRecord_ReadImage_BAD4F. Sans PAK : ouvre TXM\\<nom> (extension aTXM_1) et lit l'image de ce fichier."
 },
 "sub_BAEB3": {
 "segment": "ovr342",
@@ -68909,8 +68909,8 @@
 "sub_149D",
 "sub_1DDFE"
 ],
-"new_name": "sub_BB46A",
-"summary": ""
+"new_name": "TextureTable_Allocate_BB46A",
+"summary": "far. LUE 2026-11-05. Range les deux nombres (images simples +0, animées +2) et alloue les deux tables : simples à pas de 14 octets (+4), animées à pas de 24 (+8) ; erreur 902Bh / 902Ch si l'allocation échoue."
 },
 "sub_BB506": {
 "segment": "ovr342",
@@ -68922,8 +68922,8 @@
 "sub_BAE1C",
 "sub_1DDFE"
 ],
-"new_name": "sub_BB506",
-"summary": ""
+"new_name": "TextureTable_LoadImage_BB506",
+"summary": "far. LUE 2026-11-05. Image simple n° place : erreur 902Dh si place ≥ nombre d'images simples ; sinon TextureRecord_LoadFromPakOrFile_BAE1C sur l'enregistrement table+14×place."
 },
 "sub_BB541": {
 "segment": "ovr342",
@@ -68935,8 +68935,8 @@
 "sub_BB331",
 "sub_1DDFE"
 ],
-"new_name": "sub_BB541",
-"summary": ""
+"new_name": "TextureTable_LoadAnimated_BB541",
+"summary": "far. LUE 2026-11-05 (en-tête seulement). Image animée : place − nombre d'images simples = rang dans la table des animées (pas de 24) ; erreur 902Eh au-delà ; sub_BB331 (pas lue) remplit l'enregistrement."
 },
 "sub_BB583": {
 "segment": "ovr342",

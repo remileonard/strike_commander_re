@@ -55,7 +55,7 @@ sub_75174	endp
 ; Attributes: thunk
 
 sub_75179	proc far
-		jmp	sub_BAD4F
+		jmp	TextureRecord_ReadImage_BAD4F
 sub_75179	endp
 
 ; ----------------------------------------------------------------------
@@ -63,7 +63,7 @@ sub_75179	endp
 ; Attributes: thunk
 
 sub_7517E	proc far
-		jmp	sub_BAE1C
+		jmp	TextureRecord_LoadFromPakOrFile_BAE1C
 sub_7517E	endp
 
 ; ----------------------------------------------------------------------
@@ -143,7 +143,7 @@ sub_751AB	endp
 ; Attributes: thunk
 
 sub_751B0	proc far
-		jmp	sub_BB46A
+		jmp	TextureTable_Allocate_BB46A
 sub_751B0	endp
 
 ; ----------------------------------------------------------------------
@@ -151,7 +151,7 @@ sub_751B0	endp
 ; Attributes: thunk
 
 sub_751B5	proc far
-		jmp	sub_BB506
+		jmp	TextureTable_LoadImage_BB506
 sub_751B5	endp
 
 ; ----------------------------------------------------------------------
@@ -159,7 +159,7 @@ sub_751B5	endp
 ; Attributes: thunk
 
 sub_751BA	proc far
-		jmp	sub_BB541
+		jmp	TextureTable_LoadAnimated_BB541
 sub_751BA	endp
 
 ; ----------------------------------------------------------------------

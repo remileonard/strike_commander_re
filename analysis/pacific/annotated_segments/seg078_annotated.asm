@@ -7,7 +7,16 @@ seg078		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_2EEB8		proc far
+; ==============================================================================================
+; far, 2307 lignes. LUE EN PARTIE 2026-11-05 (champs de la face seulement). Dessine une face :
+; image = dword +14h de la face (-> dword_77B78 ; 0 = sans image), double face = octet +25h
+; (-> byte_77B7C) ; sommets transformés dans le repère de l'observateur
+; (Matrix_WorldToLocal_5A569) avec cache (bit 80h de +10h du sommet) ; u, v des 3 sommets
+; (+18h à +22h) passés en 8.8 (shl ax, 8) : coordonnées en POINTS de l'image. Clé de tri :
+; profondeur du sommet le plus loin + 7D00h, moins 1900h si l'octet +25h vaut 1, moins 4B00h
+; s'il vaut 2 (rôle exact non lu). Découpage et envoi (sub_2E656, sub_634A4) non lus.
+; ==============================================================================================
+Render_FacePipeline_2EEB8		proc far
 
 var_534		= dword ptr -534h
 var_530		= dword ptr -530h
@@ -2313,11 +2322,11 @@ loc_30BF7:
 		add	bx, 24h
 		dec	[bp+var_516]
 		jnz	loc_3095D
-sub_2EEB8		endp
+Render_FacePipeline_2EEB8		endp
 
-; START OF FUNCTION CHUNK FOR sub_2EEB8
+; START OF FUNCTION CHUNK FOR Render_FacePipeline_2EEB8
 
 loc_30C0E:
 		db 89h, 3Eh
-; END OF FUNCTION CHUNK FOR sub_2EEB8
+; END OF FUNCTION CHUNK FOR Render_FacePipeline_2EEB8
 seg078		ends

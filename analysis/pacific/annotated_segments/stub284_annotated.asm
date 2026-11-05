@@ -15,7 +15,7 @@ stru_73E80	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_73EA0	proc far
-		jmp	sub_A7090
+		jmp	TerrainTextures_LoadAccList_A7090
 sub_73EA0	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub284		ends

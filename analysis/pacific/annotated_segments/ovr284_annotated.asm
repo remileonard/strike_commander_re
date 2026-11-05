@@ -6,7 +6,20 @@ ovr284		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_A7090		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Charge la table des matériaux des pistes (structure word_7CC8E : +0
+; nombre d'images simples, +2 nombre d'images animées, +4 table des images simples, pas de 14
+; octets, +8 table des animées, pas de 24). Ouvre TXM\ACC_LIST (FORM TXMS, push large
+; 534D5854h) ; chunk INFO = 2 mots (les deux nombres) -> TextureTable_Allocate_BB46A ; ouvre
+; TXM\ACCPACK.PAK ; chunk MAPS = enregistrements de 15 octets (taille ÷ 15) : mot = numéro
+; (moins le numéro du premier enregistrement = place dans la table ; 255 = sauté), nom, octet
+; 11 = nombre d'images (1 : une image au nom donné ; bit 7 : image animée,
+; TextureTable_LoadAnimated_BB541 ; sinon n images nommées « %s%d » de 1 à n, places
+; successives) ; chaque image = l'entrée de ACCPACK.PAK de même numéro que sa place
+; (TextureTable_LoadImage_BB506). Équivalent de TextureLoader_OpenAndLoadFull_98A60 de
+; STRIKE.EXE.
+; ==============================================================================================
+TerrainTextures_LoadAccList_A7090		proc far
 
 var_1E4		= word ptr -1E4h
 var_1D6		= word ptr -1D6h
@@ -275,5 +288,5 @@ loc_A72F1:
 		pop	si
 		leave
 		retf
-sub_A7090		endp
+TerrainTextures_LoadAccList_A7090		endp
 ovr284		ends

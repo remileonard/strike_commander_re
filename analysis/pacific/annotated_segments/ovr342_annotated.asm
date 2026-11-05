@@ -546,7 +546,12 @@ sub_BABC2		endp
 
 ; Attributes: bp-based frame
 
-sub_BAD4F		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Lit 4 octets (largeur et hauteur sur 2 octets chacune, constat sur
+; ACCPACK.PAK : 120 × 126), réserve l'image dans l'enregistrement (sub_BA8A0) puis lit les
+; points (un octet de palette par point). Rend 1 si l'image est chargée.
+; ==============================================================================================
+TextureRecord_ReadImage_BAD4F		proc far
 
 var_8		= dword ptr -8
 var_4		= dword ptr -4
@@ -607,7 +612,7 @@ loc_BADC4:
 		pop	si
 		leave
 		retf
-sub_BAD4F		endp
+TextureRecord_ReadImage_BAD4F		endp
 
 ; ----------------------------------------------------------------------
 
@@ -668,7 +673,12 @@ sub_BADC7		endp
 
 ; Attributes: bp-based frame
 
-sub_BAE1C		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Avec un PAK : se place sur l'entrée demandée (sub_7844) puis
+; TextureRecord_ReadImage_BAD4F. Sans PAK : ouvre TXM\<nom> (extension aTXM_1) et lit l'image
+; de ce fichier.
+; ==============================================================================================
+TextureRecord_LoadFromPakOrFile_BAE1C		proc far
 
 var_B0		= word ptr -0B0h
 var_52		= word ptr -52h
@@ -696,7 +706,7 @@ arg_8		= word ptr  0Eh
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_BAD4F
+		call	near ptr TextureRecord_ReadImage_BAD4F
 		add	sp, 8
 		mov	[bp+var_1], al
 		jmp	short loc_BAEAC
@@ -730,7 +740,7 @@ loc_BAE51:
 		push	si
 		push	large [bp+arg_0]
 		push	cs
-		call	near ptr sub_BAD4F
+		call	near ptr TextureRecord_ReadImage_BAD4F
 		add	sp, 8
 		mov	[bp+var_1], al
 
@@ -747,7 +757,7 @@ loc_BAEAC:
 		pop	si
 		leave
 		retf
-sub_BAE1C		endp
+TextureRecord_LoadFromPakOrFile_BAE1C		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1346,7 +1356,7 @@ loc_BB394:
 		push	ax
 		push	large [bp+var_4]
 		push	cs
-		call	near ptr sub_BAE1C
+		call	near ptr TextureRecord_LoadFromPakOrFile_BAE1C
 		add	sp, 0Ah
 		add	word ptr [bp+var_4], 0Eh
 		inc	si
@@ -1423,7 +1433,12 @@ sub_BB407		endp
 
 ; Attributes: bp-based frame
 
-sub_BB46A		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Range les deux nombres (images simples +0, animées +2) et alloue les
+; deux tables : simples à pas de 14 octets (+4), animées à pas de 24 (+8) ; erreur 902Bh /
+; 902Ch si l'allocation échoue.
+; ==============================================================================================
+TextureTable_Allocate_BB46A		proc far
 
 arg_0		= word ptr  6
 arg_4		= word ptr  0Ah
@@ -1481,13 +1496,17 @@ loc_BB4BE:
 loc_BB504:
 		pop	bp
 		retf
-sub_BB46A		endp
+TextureTable_Allocate_BB46A		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_BB506		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Image simple n° place : erreur 902Dh si place ≥ nombre d'images simples
+; ; sinon TextureRecord_LoadFromPakOrFile_BAE1C sur l'enregistrement table+14×place.
+; ==============================================================================================
+TextureTable_LoadImage_BB506		proc far
 
 arg_0		= word ptr  6
 arg_4		= word ptr  0Ah
@@ -1511,7 +1530,7 @@ arg_A		= word ptr  10h
 		push	word ptr es:[bx+6]
 		push	ax
 		push	cs
-		call	near ptr sub_BAE1C
+		call	near ptr TextureRecord_LoadFromPakOrFile_BAE1C
 		add	sp, 0Ah
 		jmp	short loc_BB53F
 
@@ -1523,13 +1542,18 @@ loc_BB536:
 loc_BB53F:
 		pop	bp
 		retf
-sub_BB506		endp
+TextureTable_LoadImage_BB506		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_BB541		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (en-tête seulement). Image animée : place − nombre d'images simples =
+; rang dans la table des animées (pas de 24) ; erreur 902Eh au-delà ; sub_BB331 (pas lue)
+; remplit l'enregistrement.
+; ==============================================================================================
+TextureTable_LoadAnimated_BB541		proc far
 
 arg_0		= word ptr  6
 arg_4		= word ptr  0Ah
@@ -1568,7 +1592,7 @@ loc_BB578:
 loc_BB581:
 		pop	bp
 		retf
-sub_BB541		endp
+TextureTable_LoadAnimated_BB541		endp
 
 ; ----------------------------------------------------------------------
 

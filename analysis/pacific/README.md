@@ -699,8 +699,57 @@ déjà `public`.
 | `param3Table`, `grid`, `drawList` | après les faces | après les faces, même lecture |
 
 Contrôle sur `OAHU.ZIP` : avec ces règles, la région se lit exactement jusqu'à la fin de son entrée (798 octets).
-Ce que le jeu fait du numéro de matériau (tables de 14 et 24 octets, `word_7CC8E`) n'est pas lu : le dessin de
-la piste avec sa texture reste à étudier.
+Le numéro de matériau et le dessin de la piste : ci-dessous.
+
+### 7.1 Dessin d'une piste avec son matériau
+
+**1. La table des matériaux** (`TerrainTextures_LoadAccList_A7090`, au chargement du terrain). Elle vient de deux
+fichiers du dossier `TXM` :
+
+- `TXM\ACC_LIST.IFF`, un `FORM TXMS` :
+  - chunk `INFO` : 2 mots, le nombre d'images simples (19), puis le nombre d'images animées (0) ;
+  - chunk `MAPS` : enregistrements de 15 octets, un mot (numéro), le nom, puis à l'octet 11 le nombre d'images.
+- `TXM\ACCPACK.PAK` : les images.
+
+Lecture de `MAPS` : la **place** dans la table = numéro de l'enregistrement moins le numéro du premier (255 = sauté).
+Si le nombre d'images vaut 1, une image à cette place ; si le bit 7 est posé, une image animée ; sinon n images
+nommées nom + 1 … nom + n (format `%s%d`), aux places suivantes. Dans `ACC_LIST.IFF` :
+
+```
+numéro 256   RUNWAY   7 images   places 0 à 6     RUNWAY1 … RUNWAY7
+numéro 263   water   10 images   places 7 à 16    water1 … water10
+numéro 273   CRATER   1 image    place 17
+numéro 274   SKY      1 image    place 18
+```
+
+Chaque image est **l'entrée de `ACCPACK.PAK` qui porte le numéro de sa place** (`TextureRecord_LoadFromPakOrFile_BAE1C`
+se place sur l'entrée, le nom ne sert pas à la trouver). Une image = largeur et hauteur sur 2 octets chacune, puis un
+octet de palette par point (`TextureRecord_ReadImage_BAD4F`) ; les 7 images `RUNWAY` font 120 × 126 points.
+
+**2. Le matériau d'une face** (`TRI_ParseOverlayGeometry_A7710`) : un numéro plus petit que le nombre d'images
+simples désigne l'image simple de cette place ; au-delà, une image animée (numéro − nombre d'images simples) ; au-delà
+encore, aucune image. La face garde l'image ; « double face » = pas d'image, ou matériau 14 à 17.
+
+**3. Le dessin** (`TriOverlay_RenderRegion_30C62`, comme `TriOverlay_RenderRegion_31BFF` de STRIKE.EXE) : pour chaque
+face de la liste, tests du groupe de détail (altitude de l'observateur sous la hauteur du groupe, face dans le rayon du
+groupe), puis `Render_FacePipeline_2EEB8`. Celle-ci prend l'image de la face et les **u, v en points de l'image**
+(`mov ax, gs:[si+18h]` / `shl ax, 8` : passage en virgule fixe, sans mise à l'échelle). Le découpage et le tracé
+eux-mêmes n'ont pas été lus.
+
+**Contrôle sur la piste d'Oahu** : 7 tronçons de 2 triangles, matériaux 6, 5, 4, 3, 2, 1, 0 du nord au sud, u de 0 à
+64 et v de 0 à 125. Dans chaque image `RUNWAY`, la piste occupe justement les 64 premières colonnes (le reste est un
+fond uni) ; dessinés avec ces règles, les 7 tronçons forment une piste continue, traces de pneus aux deux bouts.
+
+![Les 7 images RUNWAY de ACCPACK.PAK (matériaux 0 à 6)](images/ps_runway_textures.png)
+
+![La piste d'Oahu dessinée avec ces règles, vue de dessus (1 600 m de long, largeur agrandie 2 fois)](images/ps_runway_oahu.png)
+
+**Écart avec libRealSpace** (`SCRenderer`, dessin de `objectOverlay`) : l'image est cherchée par
+`area->GetImageByID(tri.color + 255)`, dans les images de `TXMPACK` puis de `ACCPACK`, et une face est texturée si
+`color` ≠ 255. Les u, v sont divisés par 128 (`TRI_UV_SCALE`). Pour Pacific Strike, le jeu fait autrement : matériau m
+= entrée m de `ACCPACK.PAK` (par la table de `ACC_LIST.IFF`), et u, v en points de l'image, donc divisés par sa largeur
+(120) et sa hauteur (126). Avec 128, la bande de piste serait coupée à 60 colonnes au lieu de 64. Ces règles n'ont été
+relues que dans PACIFIC.EXE ; Strike Commander n'est pas concerné.
 
 ![Oahu : relief (pistes en rouge) et champ « éclairage » des sommets](images/ps_terrain_oahu.png)
 

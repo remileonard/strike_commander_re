@@ -49,7 +49,14 @@ sub_30C18		endp
 
 ; Attributes: bp-based frame
 
-sub_30C62		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent de TriOverlay_RenderRegion_31BFF de STRIKE.EXE (faces de 38
+; octets en mémoire au lieu de 30) : efface les bits 80h/40h des sommets, prend la liste de la
+; case 0 de la grille, et pour chaque face : groupe (+24h) ≤ [desc+9], hauteur de visibilité
+; du groupe ([desc+2Dh+4g] << 8) > altitude de l'observateur ([arg_2+1Ch]), boîte du groupe
+; (sub_2EB67, desc+3Dh+16g) ; puis Render_FacePipeline_2EEB8.
+; ==============================================================================================
+TriOverlay_RenderRegion_30C62		proc far
 
 var_1A		= dword ptr -1Ah
 var_16		= word ptr -16h
@@ -178,7 +185,7 @@ loc_30D52:
 		or	ax, ax
 		jnz	short loc_30D88
 		push	large [bp+var_12]
-		call	sub_2EEB8
+		call	Render_FacePipeline_2EEB8
 		add	sp, 4
 
 loc_30D88:
@@ -198,7 +205,7 @@ loc_30D9E:
 		pop	si
 		leave
 		retf
-sub_30C62		endp
+TriOverlay_RenderRegion_30C62		endp
 
 ; ----------------------------------------------------------------------
 
@@ -713,7 +720,7 @@ loc_3121A:
 		les	bx, [bp+var_4]
 		push	word ptr es:[bx]
 		push	cs
-		call	near ptr sub_30C62
+		call	near ptr TriOverlay_RenderRegion_30C62
 		add	sp, 6
 		jmp	short loc_31283
 
@@ -913,7 +920,7 @@ loc_313BA:
 		or	ax, ax
 		jnz	short loc_313FE
 		push	large [bp+var_28]
-		call	sub_2EEB8
+		call	Render_FacePipeline_2EEB8
 		add	sp, 4
 
 loc_313FE:
