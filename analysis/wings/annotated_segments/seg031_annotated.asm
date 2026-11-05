@@ -47,7 +47,11 @@ ConvRec_ReadName_18AAF		endp
 
 ; Attributes: bp-based frame
 
-sub_18AD6		proc far
+; ==============================================================================================
+; far, lit un CLOSEUP : 1er appel (rec+1Dh = 0) visage (9), image (1), décor (9), x, y (mots),
+; texte, couleur (1) ; appels suivants (CONT 4, SAME 19) : texte seul.
+; ==============================================================================================
+ConvRec_ReadCloseup_18AD6		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -195,7 +199,7 @@ loc_18BFC:
 		pop	si
 		leave
 		retf
-sub_18AD6		endp
+ConvRec_ReadCloseup_18AD6		endp
 
 ; ----------------------------------------------------------------------
 
@@ -272,7 +276,10 @@ ConvRec_ReadFigure_18C04		endp
 
 ; Attributes: bp-based frame
 
-sub_18C77		proc far
+; ==============================================================================================
+; far, lit nom (9), x, y (mots), un octet, puis un texte ; appelant non relevé.
+; ==============================================================================================
+ConvRec_ReadFigureText_18C77		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -365,13 +372,16 @@ loc_18D34:
 		pop	si
 		leave
 		retf
-sub_18C77		endp
+ConvRec_ReadFigureText_18C77		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_18D3D		proc far
+; ==============================================================================================
+; far, lit SHOW_TEXT : couleur (1) puis texte terminé par 0 (copie allouée).
+; ==============================================================================================
+ConvRec_ReadText_18D3D		proc far
 
 var_2		= word ptr -2
 arg_0		= word ptr  6
@@ -420,7 +430,7 @@ loc_18D93:
 		pop	si
 		leave
 		retf
-sub_18D3D		endp
+ConvRec_ReadText_18D3D		endp
 
 ; ----------------------------------------------------------------------
 

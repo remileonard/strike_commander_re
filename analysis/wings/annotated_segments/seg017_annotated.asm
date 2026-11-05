@@ -282,7 +282,7 @@ loc_9F75:
 
 loc_9F7A:
 		push	5C40h
-		call	sub_B155
+		call	Gameflow_MainLoop_B155
 		pop	cx
 		mov	[bp+var_2], ax
 		push	605Ah

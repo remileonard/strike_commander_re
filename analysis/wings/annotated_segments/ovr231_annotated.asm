@@ -368,7 +368,7 @@ loc_81CD2:
 		push	0Eh
 		lea	ax, [bp+var_34]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	0
 		push	word_5DD44

@@ -308,7 +308,7 @@ loc_87510:
 		push	0Dh
 		lea	ax, [bp+var_24]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		cmp	[bp+var_1], 0
 		jz	short loc_87548
@@ -422,7 +422,7 @@ loc_87633:
 		pop	cx
 		mov	si, 113h
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_8766B
@@ -455,7 +455,7 @@ loc_8766B:
 		add	sp, 4
 		lea	ax, [bp+var_386]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		push	2
 		lea	ax, [bp+var_386]

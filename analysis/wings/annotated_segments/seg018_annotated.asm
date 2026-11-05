@@ -120,7 +120,11 @@ sub_A3E3		endp
 
 ; Attributes: bp-based frame
 
-sub_A40C		proc far
+; ==============================================================================================
+; far (n) : n < 256 → mot de la table word_5FD3C ; n ≥ 256 → bit (n − 256) de la table
+; word_5FD40.
+; ==============================================================================================
+GameVar_Get_A40C		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -159,13 +163,16 @@ loc_A446:
 loc_A453:
 		leave
 		retf
-sub_A40C		endp
+GameVar_Get_A40C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A455		proc far
+; ==============================================================================================
+; far (n) : variable n = 1 (mot) ou bit posé.
+; ==============================================================================================
+GameVar_SetFlag_A455		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -202,13 +209,16 @@ loc_A48B:
 loc_A49A:
 		leave
 		retf
-sub_A455		endp
+GameVar_SetFlag_A455		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A49C		proc far
+; ==============================================================================================
+; far (n, valeur) : mot = valeur, ou bit posé si valeur ≠ 0, effacé sinon.
+; ==============================================================================================
+GameVar_Set_A49C		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -255,13 +265,16 @@ loc_A4ED:
 		pop	si
 		pop	bp
 		retf
-sub_A49C		endp
+GameVar_Set_A49C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A4F0		proc far
+; ==============================================================================================
+; far (n) : variable n = 0 (mot) ou bit effacé.
+; ==============================================================================================
+GameVar_Clear_A4F0		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -299,7 +312,7 @@ loc_A528:
 loc_A537:
 		leave
 		retf
-sub_A4F0		endp
+GameVar_Clear_A4F0		endp
 
 ; ----------------------------------------------------------------------
 
@@ -321,7 +334,7 @@ arg_0		= word ptr  6
 		jbe	short loc_A59B
 		push	si
 		push	cs
-		call	near ptr sub_A40C
+		call	near ptr GameVar_Get_A40C
 		pop	cx
 		sub	si, 100h
 		mov	di, si
@@ -333,7 +346,7 @@ arg_0		= word ptr  6
 		add	ax, 100h
 		push	ax
 		push	cs
-		call	near ptr sub_A40C
+		call	near ptr GameVar_Get_A40C
 		pop	cx
 		mov	byte ptr [bp+var_2+1], al
 		cmp	byte ptr [bp+var_2+1], 0
@@ -359,7 +372,7 @@ loc_A589:
 loc_A59B:
 		push	si
 		push	cs
-		call	near ptr sub_A40C
+		call	near ptr GameVar_Get_A40C
 		pop	cx
 		mov	[bp+var_2], ax
 		cmp	[bp+var_2], 0

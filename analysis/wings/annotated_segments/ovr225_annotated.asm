@@ -768,7 +768,7 @@ loc_79098:
 		push	2
 		lea	ax, [bp+var_4A]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	1
 		call	sub_1FA51

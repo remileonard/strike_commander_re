@@ -10,7 +10,10 @@ loc_C422:
 
 ; Attributes: bp-based frame
 
-sub_C426		proc far
+; ==============================================================================================
+; far (partie, n) : chunks PILT, STAT, CHNG, INFO ; commande EFCT 34 APPLY_CHANGE.
+; ==============================================================================================
+Gameflow_ApplyChange_C426		proc far
 
 var_AC		= word ptr -0ACh
 var_4F		= dword ptr -4Fh
@@ -310,7 +313,7 @@ loc_C6A3:
 		pop	si
 		leave
 		retf
-sub_C426		endp
+Gameflow_ApplyChange_C426		endp
 
 ; ----------------------------------------------------------------------
 
@@ -331,7 +334,12 @@ sub_C6D1		endp
 
 ; Attributes: bp-based frame
 
-sub_C6D9		proc far
+; ==============================================================================================
+; far (partie, a, b) : tableau des victoires (WWISHPS.PAK, WWIPALS.PAK, police BOARDFNT ; «
+; missing killboard headlines / dates », « Return to tent », « Return to common room ») ;
+; commande EFCT 19.
+; ==============================================================================================
+Gameflow_KillBoard_C6D9		proc far
 
 var_32A		= word ptr -32Ah
 var_2DA		= word ptr -2DAh
@@ -421,7 +429,7 @@ arg_4		= word ptr  0Ah
 		call	CRT_Fmemcpy
 		xor	di, di
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_C735
@@ -473,7 +481,7 @@ loc_C758:
 		cmp	cx, word_5A96C
 		jz	short loc_C7C4
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_C7A2
@@ -559,7 +567,7 @@ loc_C7C4:
 		mov	[bp+var_7], 0
 		mov	[bp+var_6], 0
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_C84D
@@ -827,7 +835,7 @@ loc_CA13:
 		call	Widget_ApplyStyleAndAllocate_48C4D
 		add	sp, 6
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_CB6E
@@ -1069,7 +1077,7 @@ loc_CDAA:
 
 loc_CDB2:
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_CE35
@@ -1424,5 +1432,5 @@ loc_D13E:
 		push	ax
 		call	IndexedRecordReader_Destruct_5483E
 		add	sp, 4
-sub_C6D9		endp
+Gameflow_KillBoard_C6D9		endp
 seg021		ends

@@ -169,7 +169,7 @@ arg_6		= word ptr  0Ch
 		mov	[bp+var_10], 13Fh
 		mov	[bp+var_E], 0C7h
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_7E505
@@ -289,7 +289,7 @@ loc_7E62B:
 		push	0Bh
 		lea	ax, [bp+var_28]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	0
 		push	word_5DD44
@@ -401,7 +401,7 @@ loc_7E72B:
 		add	sp, 4
 		lea	ax, [bp+var_334]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		push	2
 		lea	ax, [bp+var_334]
@@ -615,7 +615,7 @@ loc_7E9AA:
 
 loc_7E9C0:
 		push	si
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_7EA06

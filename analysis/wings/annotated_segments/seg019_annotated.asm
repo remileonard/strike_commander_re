@@ -300,7 +300,11 @@ sub_A8DA		endp
 
 ; Attributes: bp-based frame
 
-sub_A911		proc far
+; ==============================================================================================
+; far (partie, longueur, REQU) : conditions de 3 octets (condition, numéro sur un mot) : 0
+; REQUIRE_NOT_SET, 1 REQUIRE_SET, 2 OR_NOT_SET, 3 OR_SET ; rend 1 si visible.
+; ==============================================================================================
+Gameflow_TestRequ_A911		proc far
 
 var_3		= byte ptr -3
 var_2		= byte ptr -2
@@ -343,7 +347,7 @@ loc_A92C:
 
 loc_A959:
 		push	dx
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_A971
@@ -361,7 +365,7 @@ loc_A971:
 
 loc_A977:
 		push	dx
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_A971
@@ -374,7 +378,7 @@ loc_A977:
 
 loc_A98F:
 		push	dx
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_A9AB
@@ -382,7 +386,7 @@ loc_A98F:
 
 loc_A99C:
 		push	dx
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_A9AB
@@ -406,20 +410,26 @@ loc_A9BA:
 		pop	si
 		leave
 		retf
-sub_A911		endp
+Gameflow_TestRequ_A911		endp
 
-; START OF FUNCTION CHUNK FOR sub_A911
+; START OF FUNCTION CHUNK FOR Gameflow_TestRequ_A911
 off_A9C1	dw offset loc_A959
 		dw offset loc_A977
 		dw offset loc_A98F
 		dw offset loc_A99C
-; END OF FUNCTION CHUNK FOR sub_A911
+; END OF FUNCTION CHUNK FOR Gameflow_TestRequ_A911
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A9C9		proc far
+; ==============================================================================================
+; far (partie, longueur, EFCT) : interpréteur des scripts EFCT, 59 commandes (cmp bx, 3Ah /
+; jmp cs:off_AED6[bx]) ; ELSE 30, ENDIF 31, OR_GROUP 33 traités avant ; pas de 3 octets pour
+; 0, 6, 7, 9, 10, 19, 50, 51, 55, 2 sinon ; registre [partie+282]. Table complète :
+; analysis/wings/README.md § 4.3.
+; ==============================================================================================
+Gameflow_RunScript_A9C9		proc far
 
 var_AC		= word ptr -0ACh
 var_5C		= word ptr -5Ch
@@ -680,12 +690,12 @@ loc_ABD1:
 
 loc_ABD3:
 		push	[bp+var_A]
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		jmp	short loc_ABE5
 
 loc_ABDD:
 		push	[bp+var_A]
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 
 loc_ABE5:
 		pop	cx
@@ -693,7 +703,7 @@ loc_ABE5:
 
 loc_ABE9:
 		push	[bp+var_A]
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_ABF9
@@ -705,7 +715,7 @@ loc_ABF9:
 
 loc_ABFE:
 		push	[bp+var_A]
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_AC0E
@@ -821,7 +831,7 @@ loc_ACF6:
 		mov	al, [bp+var_7]
 		push	ax
 		push	si
-		call	sub_D51A
+		call	Gameflow_Map_D51A
 		jmp	loc_AEB8
 
 loc_AD03:
@@ -832,7 +842,7 @@ loc_AD03:
 		mov	ah, 0
 		push	ax
 		push	si
-		call	sub_C6D9
+		call	Gameflow_KillBoard_C6D9
 		add	sp, 6
 		jmp	loc_AE4E
 
@@ -863,7 +873,7 @@ loc_AD41:
 		mov	al, [bp+var_7]
 		push	ax
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	6040h
 		call	sub_13BB6
@@ -871,7 +881,7 @@ loc_AD41:
 
 loc_AD5B:
 		push	si
-		call	sub_D17C
+		call	Gameflow_ClearFlags760_764_D17C
 		jmp	short loc_ADDE
 
 loc_AD63:
@@ -909,7 +919,7 @@ loc_AD99:
 
 loc_AD9C:
 		push	si
-		call	sub_D1B1
+		call	Gameflow_ClearFlags261_269_D1B1
 		jmp	short loc_ADDE
 
 loc_ADA4:
@@ -927,7 +937,7 @@ loc_ADB8:
 		mov	al, [bp+var_7]
 		push	ax
 		push	si
-		call	sub_C426
+		call	Gameflow_ApplyChange_C426
 		jmp	loc_AEB8
 
 loc_ADC5:
@@ -969,14 +979,14 @@ loc_ADFA:
 
 loc_ADFC:
 		push	[bp+var_A]
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		jmp	short loc_AE4A
 
 loc_AE07:
 		push	word ptr [si+11Ah]
 		push	[bp+var_A]
-		call	sub_A49C
+		call	GameVar_Set_A49C
 		jmp	loc_AB9F
 
 loc_AE16:
@@ -1094,9 +1104,9 @@ loc_AECA:
 		pop	si
 		leave
 		retf
-sub_A9C9		endp
+Gameflow_RunScript_A9C9		endp
 
-; START OF FUNCTION CHUNK FOR sub_A9C9
+; START OF FUNCTION CHUNK FOR Gameflow_RunScript_A9C9
 off_AECE	dw offset loc_AE8E
 		dw offset loc_AE93
 		dw offset loc_AE98
@@ -1160,7 +1170,7 @@ off_AED6	dw offset loc_AB96
 		dw offset loc_AE51
 		dw offset loc_AE63
 		dw offset loc_AE75
-; END OF FUNCTION CHUNK FOR sub_A9C9
+; END OF FUNCTION CHUNK FOR Gameflow_RunScript_A9C9
 
 ; ----------------------------------------------------------------------
 
@@ -1285,7 +1295,7 @@ loc_B03F:
 		mov	al, [bp+var_5]
 		push	ax
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	6040h
 		call	sub_13BB6
@@ -1366,7 +1376,7 @@ loc_B0CB:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_A9C9
+		call	near ptr Gameflow_RunScript_A9C9
 		add	sp, 6
 		cmp	byte ptr [si+0F7h], 0
 		jz	short loc_B151
@@ -1386,7 +1396,12 @@ sub_AF4C		endp
 
 ; Attributes: bp-based frame
 
-sub_B155		proc far
+; ==============================================================================================
+; far : boucle du déroulement (scènes, sprites, scripts EFCT par Gameflow_RunScript_A9C9) ;
+; [partie+252] = 1 → Gameflow_WriteOp2Misn_681AA puis retour du code de sortie (CRT_Exit dans
+; l'appelant).
+; ==============================================================================================
+Gameflow_MainLoop_B155		proc far
 
 var_5E		= word ptr -5Eh
 var_E		= word ptr -0Eh
@@ -1816,7 +1831,7 @@ loc_B4DA:
 		push	ax
 		push	si
 		push	cs
-		call	near ptr sub_A9C9
+		call	near ptr Gameflow_RunScript_A9C9
 		add	sp, 6
 		cmp	byte ptr [si+0FCh], 4
 		jz	short loc_B50C
@@ -1875,9 +1890,9 @@ loc_B565:
 		pop	si
 		leave
 		retf
-sub_B155		endp
+Gameflow_MainLoop_B155		endp
 
-; START OF FUNCTION CHUNK FOR sub_B155
+; START OF FUNCTION CHUNK FOR Gameflow_MainLoop_B155
 off_B576	dw offset loc_B3CB
 		dw offset loc_B3F0
 		dw offset loc_B437
@@ -1900,7 +1915,7 @@ off_B59A	dw offset loc_B278
 		dw offset loc_B1EB
 		dw offset loc_B2AA
 		dw offset loc_B2B9
-; END OF FUNCTION CHUNK FOR sub_B155
+; END OF FUNCTION CHUNK FOR Gameflow_MainLoop_B155
 
 ; ----------------------------------------------------------------------
 

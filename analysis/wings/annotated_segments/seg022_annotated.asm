@@ -22,7 +22,10 @@ sub_D174		endp
 
 ; Attributes: bp-based frame
 
-sub_D17C		proc far
+; ==============================================================================================
+; far : efface les variables 760 à 764 ; commande EFCT 25.
+; ==============================================================================================
+Gameflow_ClearFlags760_764_D17C		proc far
 
 arg_0		= word ptr  6
 
@@ -30,29 +33,32 @@ arg_0		= word ptr  6
 		mov	bp, sp
 		mov	ax, [bp+arg_0]
 		push	2F8h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FAh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2F9h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FCh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FBh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		pop	bp
 		retf
-sub_D17C		endp
+Gameflow_ClearFlags760_764_D17C		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_D1B1		proc far
+; ==============================================================================================
+; far : efface les variables 261 à 269 ; commande EFCT 29.
+; ==============================================================================================
+Gameflow_ClearFlags261_269_D1B1		proc far
 
 arg_0		= word ptr  6
 
@@ -60,35 +66,35 @@ arg_0		= word ptr  6
 		mov	bp, sp
 		mov	ax, [bp+arg_0]
 		push	105h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	106h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	107h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	108h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	109h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	10Ah
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	10Bh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	10Ch
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	10Dh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		pop	bp
 		retf
-sub_D1B1		endp
+Gameflow_ClearFlags261_269_D1B1		endp
 
 ; ----------------------------------------------------------------------
 
@@ -106,17 +112,17 @@ arg_0		= word ptr  6
 		cmp	si, 5
 		jl	short loc_D243
 		push	105h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D243
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D243
 		push	105h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	ax, 0CFh
 		jmp	loc_D332
@@ -125,17 +131,17 @@ loc_D243:
 		cmp	si, 0Ah
 		jl	short loc_D271
 		push	106h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D271
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D271
 		push	106h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	ax, 0D0h
 		jmp	loc_D332
@@ -144,17 +150,17 @@ loc_D271:
 		cmp	si, 0Fh
 		jl	short loc_D29F
 		push	107h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D29F
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D29F
 		push	107h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	ax, 0D1h
 		jmp	loc_D332
@@ -163,17 +169,17 @@ loc_D29F:
 		cmp	si, 14h
 		jl	short loc_D2CC
 		push	108h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D2CC
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D2CC
 		push	108h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	ax, 0D2h
 		jmp	short loc_D332
@@ -182,15 +188,15 @@ loc_D2CC:
 		cmp	si, 1Eh
 		jl	short loc_D2FE
 		push	10Ah
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D2FE
 		push	10Ah
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D2F9
@@ -205,15 +211,15 @@ loc_D2FE:
 		cmp	si, 3Ch
 		jl	short loc_D330
 		push	10Eh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D330
 		push	10Eh
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_D32B

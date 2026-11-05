@@ -71,7 +71,7 @@ sub_58AAE	endp
 ; Attributes: thunk
 
 sub_58AB3	proc far
-		jmp	sub_6719B
+		jmp	Gameflow_PlayConversation_6719B
 sub_58AB3	endp
 
 ; ----------------------------------------------------------------------
@@ -79,7 +79,7 @@ sub_58AB3	endp
 ; Attributes: thunk
 
 sub_58AB8	proc far
-		jmp	sub_6741E
+		jmp	Gameflow_PlayMidgame_6741E
 sub_58AB8	endp
 
 ; ----------------------------------------------------------------------
@@ -95,7 +95,7 @@ sub_58ABD	endp
 ; Attributes: thunk
 
 sub_58AC2	proc far
-		jmp	sub_67CD9
+		jmp	Gameflow_ReadMisn2Op_67CD9
 sub_58AC2	endp
 
 ; ----------------------------------------------------------------------
@@ -111,7 +111,7 @@ sub_58AC7	endp
 ; Attributes: thunk
 
 sub_58ACC	proc far
-		jmp	sub_681AA
+		jmp	Gameflow_WriteOp2Misn_681AA
 sub_58ACC	endp
 
 ; ----------------------------------------------------------------------

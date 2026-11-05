@@ -81,7 +81,7 @@ arg_0		= word ptr  6
 		mov	[bp+var_C], 6Eh
 		push	6
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		mov	[bp+var_16], 0
 		mov	byte ptr [bp+var_14+2], 2
@@ -1107,7 +1107,7 @@ loc_68EA9:
 loc_68ECA:
 		push	11h
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	100h
 		push	0

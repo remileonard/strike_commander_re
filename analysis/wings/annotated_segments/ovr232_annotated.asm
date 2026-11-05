@@ -216,7 +216,7 @@ loc_82626:
 		push	8
 		lea	ax, [bp+var_1C]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		mov	[bp+var_9D2], 1D6Bh
 		mov	[bp+var_9C2], 0

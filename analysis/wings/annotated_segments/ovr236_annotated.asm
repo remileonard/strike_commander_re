@@ -148,7 +148,7 @@ var_1		= byte ptr -1
 		mov	[bp+var_12], 13Fh
 		mov	[bp+var_10], 0C7h
 		push	2F8h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_869D0
@@ -157,7 +157,7 @@ var_1		= byte ptr -1
 
 loc_869D0:
 		push	2F9h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_869E2
@@ -166,7 +166,7 @@ loc_869D0:
 
 loc_869E2:
 		push	2FAh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_869F4
@@ -175,7 +175,7 @@ loc_869E2:
 
 loc_869F4:
 		push	2FBh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_86A06
@@ -253,7 +253,7 @@ loc_86AB2:
 		push	0
 		lea	ax, [bp+var_1E]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		mov	[bp+var_9D4], 1D6Bh
 		mov	[bp+var_9C4], 0

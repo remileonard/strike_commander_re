@@ -616,7 +616,7 @@ loc_7D489:
 		push	0Ch
 		lea	ax, [bp+var_14]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	0
 		push	word_5DD44

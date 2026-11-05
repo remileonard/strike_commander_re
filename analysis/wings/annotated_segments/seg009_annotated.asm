@@ -370,7 +370,7 @@ loc_5C20:
 
 loc_5C2E:
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_5C49

@@ -486,7 +486,7 @@ arg_0		= word ptr  6
 loc_E8F3:
 		mov	dword ptr [si+82h], 0
 		push	2FDh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	large 0C80140h
 		push	large 0
@@ -4167,19 +4167,19 @@ loc_111CB:
 		call	UI_ApplyEncodingHelper_47B1D
 		add	sp, 4
 		push	2F8h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2F9h
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FBh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FAh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		push	2FCh
-		call	sub_A4F0
+		call	GameVar_Clear_A4F0
 		pop	cx
 		mov	[bp+var_2], 2
 		mov	[bp+var_C], 0
@@ -4750,35 +4750,35 @@ loc_1195D:
 
 loc_11985:
 		push	2F8h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	word ptr [si+80h], 1
 		jmp	short loc_119E4
 
 loc_11996:
 		push	2F9h
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	word ptr [si+80h], 2
 		jmp	short loc_119E4
 
 loc_119A7:
 		push	2FBh
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	word ptr [si+80h], 3
 		jmp	short loc_119E4
 
 loc_119B8:
 		push	2FAh
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	word ptr [si+80h], 4
 		jmp	short loc_119E4
 
 loc_119C9:
 		push	2FCh
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		mov	word ptr [si+80h], 0Ah
 		jmp	short loc_119E4
@@ -6657,7 +6657,7 @@ arg_0		= word ptr  6
 		push	si
 		mov	si, [bp+arg_0]
 		push	2FDh
-		call	sub_A455
+		call	GameVar_SetFlag_A455
 		pop	cx
 		push	si
 		push	cs
@@ -7534,7 +7534,7 @@ arg_0		= word ptr  6
 		mov	byte_5ABAE, 1
 		push	0
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	6040h
 		call	sub_13BB6

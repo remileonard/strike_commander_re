@@ -57,7 +57,7 @@ var_4		= byte ptr -4
 		push	5
 		lea	ax, [bp+var_8]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		call	sub_1F377
 		mov	[bp+var_12], 0
@@ -65,7 +65,7 @@ var_4		= byte ptr -4
 		mov	byte ptr [bp+var_10+3], 0
 		mov	[bp+var_C], 0
 		push	2F8h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_82CCA
@@ -74,7 +74,7 @@ var_4		= byte ptr -4
 
 loc_82CCA:
 		push	2F9h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_82CDC
@@ -83,7 +83,7 @@ loc_82CCA:
 
 loc_82CDC:
 		push	2FAh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_82CEE
@@ -92,7 +92,7 @@ loc_82CDC:
 
 loc_82CEE:
 		push	2FBh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_82D00

@@ -113,6 +113,151 @@ peut pas les lire : sa recherche compare des noms. Pour trouver le hachage, il f
 archives (autre version du jeu). Recherches faites sans résultat ici : table de CRC 32 (octets `96h, 30h, 7, 77h`),
 polynômes `0EDB88320h` / `4C11DB7h`.
 
-## 4. Le reste n'est pas lu
+## 4. Déroulement (scripts `EFCT` et conditions `REQU`) — lu le 2026-11-05
+
+### 4.1 Variables
+
+Une seule table de variables, lue et écrite par quatre fonctions de seg018 :
+
+| Fonction | Rôle |
+|---|---|
+| `GameVar_Get_A40C` | lit la variable n |
+| `GameVar_SetFlag_A455` | met la variable n à 1 |
+| `GameVar_Clear_A4F0` | met la variable n à 0 |
+| `GameVar_Set_A49C` | variable n = valeur |
+
+Numéros 0 à 255 : des **mots** (table `word_5FD3C`, `shl ax, 1`). Numéros 256 et plus : des **bits**
+(table `word_5FD40`, octet `(n − 256) / 8`, bit `(n − 256) mod 8`) ; écrire une valeur non nulle pose le bit.
+
+### 4.2 Conditions `REQU` (`Gameflow_TestRequ_A911`)
+
+Mêmes 4 conditions que Strike Commander (`GAMEFLOW_SYSTEM.md` § 4.2), mais **chaque entrée fait 3 octets** :
+la condition (1 octet), puis le numéro sur un mot (`[bx+si+1] | [bx+si+2] << 8`, `add si, 3`).
+
+| Valeur | Nom |
+|---|---|
+| 0 | `REQUIRE_NOT_SET` |
+| 1 | `REQUIRE_SET` |
+| 2 | `OR_NOT_SET` |
+| 3 | `OR_SET` |
+| autre | rien |
+
+### 4.3 Scripts `EFCT` (`Gameflow_RunScript_A9C9`)
+
+Lit la commande et deux octets a, b (`[script+i+1]`, `[script+i+2]`), et le mot `a | b << 8`. Pas de **2**
+octets, **3** pour les commandes 0, 6, 7, 9, 10, 19, 50, 51 et 55 (`inc di` en `loc_AE4E`, puis `add di, 2`), y compris
+quand elles sont sautées. `ELSE` (30), `ENDIF` (31) et `OR_GROUP` (33) sont traités avant la table ; la table compte
+**59 commandes** (`cmp bx, 3Ah / jbe`, `jmp cs:off_AED6[bx]`).
+
+Tests comptés pendant un saut (pour les `ENDIF` imbriqués) et seuls admis dans un groupe `OR_GROUP`
+(« Faulty OR structure in gameflow file ») : 9, 10, 20, 21, 28, 32, 35, 37, 52, 53, 54.
+
+**Registre.** Nouveauté par rapport à Pacific Strike : un mot de la partie, `[partie+282]` (`[si+11Ah]`), sert de
+registre (commandes 50 à 55).
+
+Noms : ceux de Pacific Strike quand l'effet est le même ; \* = nom proposé.
+
+| Valeur | Nom | Argument | Effet constaté dans le code |
+|---|---|---|---|
+| 0 | `PLAY_CONV` | mot | conversation n (`Gameflow_PlayConversation_6719B` → `Conv_PlayScript_14F62`) |
+| 1 | `PLAY_SCENE` | octet | scène `[partie+271]` = n, arrêt du script (`[partie+247]` = 1) |
+| 2 | `PLAY_MIDGAME`\* | octet | `Gameflow_PlayMidgame_6741E`(n, registre) : n = 1 à 14 → cinématique `MIDGAMnn.PAK` (14 rejoue `MIDGAM03`), 15 → générique (`mycredit`) |
+| 3 | `FLY_MISSION_NOW` | octet | mission `[partie+268]` = n, `[partie+252]` = 1 |
+| 4 | `NOP_4` | octet | rien |
+| 5 | `SELECT_MISSION_5`\* | octet | mission `[partie+268]` = n (même code que 12) |
+| 6 | `SET_FLAG` | mot | `GameVar_SetFlag_A455`(n) |
+| 7 | `CLEAR_FLAG` | mot | `GameVar_Clear_A4F0`(n) |
+| 8 | `NOP_8` | octet | rien |
+| 9 | `IF_NOT_FLAG` | mot | réussit si la variable n = 0 |
+| 10 | `IF_FLAG` | mot | réussit si la variable n ≠ 0 |
+| 11 | `QUIT_TO_DOS`\* | octet | message « You just chose CMD_quit_to_dos. » (`sub_9D78`) |
+| 12 | `SELECT_MISSION` | octet | mission `[partie+268]` = n |
+| 13 | `SET_NEXT_MISSION` | octet | `[partie+270]` = n |
+| 14 | `START_FLIGHT` | octet | `[partie+252]` = 1 |
+| 15 | `GOTO_NEXT_MISSION` | octet | `sub_13C38`(0) ; si `sub_D20A` rend une valeur non nulle, `Gameflow_PlayMidgame_6741E`(4, cette valeur) ; `[partie+252]` = 2 |
+| 16 | `SAVE_GAME` | octet | choix d'un fichier (`sub_BA82`), sauvegarde dans `saved\` puis `gensave.tmp` (`sub_BBDF`) |
+| 17 | `LOAD_GAME` | octet | choix d'un fichier (`sub_BE70`) ; s'il est donné, `[partie+252]` = 3 |
+| 18 | `TRAVEL`\* | octet | `Gameflow_Map_D51A`(n) : chunks `MAPS`, `INFO`, `WRLD`, `DATA`, `SPED` |
+| 19 | `LOOK_AT_KILLBOARD` | 2 octets a, b | `Gameflow_KillBoard_C6D9`(a, b) : `WWISHPS.PAK`, `WWIPALS.PAK`, police `BOARDFNT`, « Return to tent » / « Return to common room » |
+| 20 | `IF_MISSION_ACCEPTED` | octet | réussit si `[partie+874]` ≠ 0 |
+| 21 | `IF_MISSION_REFUSED` | octet | réussit si `[partie+874]` = 0 |
+| 22 | — | — | erreur |
+| 23 | `NOP_23` | octet | `sub_D174`, fonction vide |
+| 24 | `SET_MUSIC`\* | octet | `Music_LoadTune_13AF4`(n) (`AMUSIC.PAK` / `RMUSIC.PAK` de `midgames`), puis lancement (`sub_13BB6`) |
+| 25 | `CLEAR_FLAGS_760_764`\* | octet | efface les variables 760 à 764 (`sub_D17C`) |
+| 26 | `SHOW_KILL_MARKS` | octet | si `[partie+256]` ≠ 0 et `[partie+267]` ≠ 2 : `sub_C6D1`, fonction vide |
+| 27 | `CLEAR_SLOT`\* | octet | si n < 8 : mot `[partie+690+26×n]` = 0 |
+| 28 | `IF_AT_MOST_658`\* | octet | réussit si n ≤ `[partie+658]` |
+| 29 | `CLEAR_FLAGS_261_269`\* | octet | efface les variables 261 à 269 (`sub_D1B1`) |
+| 30 | `ELSE` | octet | traité avant la table |
+| 31 | `ENDIF` | octet | traité avant la table |
+| 32 | `IF_MISSION_SUCCESS` | octet | réussit si l'octet `[partie+540+n]` = 1 |
+| 33 | `OR_GROUP` | octet | traité avant la table : les n tests suivants forment un OU |
+| 34 | `APPLY_CHANGE` | octet | `Gameflow_ApplyChange_C426`(n) : chunks `PILT`, `STAT`, `CHNG`, `INFO` |
+| 35 | `IF_NEVER`\* | octet | échoue toujours (`cmp word ptr [si+0FDh], 0` puis `jmp short loc_AE41` sans condition) |
+| 36 | `LOST_PLANE_WARNING`\* | octet | si `[partie+253]` ≠ 0 : message « CMD_lost_plane_warning » (`sub_9D78`) |
+| 37 | `IF_BYTE_982`\* | octet | réussit si `[partie+982]` ≠ 0 |
+| 38 | `NOP_38` | octet | rien |
+| 39 à 43 | — | — | erreur (`push 12h` / `sub_9D78`) |
+| 44 | `SET_SLOT`\* | octet | si n < 8 : mot `[partie+690+26×n]` = 1 |
+| 45 à 49 | — | — | erreur |
+| 50 | `LOAD_VARIABLE`\* | mot | registre = variable n (`GameVar_Get_A40C`) |
+| 51 | `STORE_VARIABLE`\* | mot | variable n = registre (`GameVar_Set_A49C`) |
+| 52 | `IF_REGISTER_GREATER`\* | octet | réussit si registre > n |
+| 53 | `IF_REGISTER_EQUAL`\* | octet | réussit si registre = n |
+| 54 | `IF_REGISTER_LESS`\* | octet | réussit si registre < n |
+| 55 | `LOAD_CONSTANT`\* | mot | registre = n |
+| 56 | `SET_SLOT_56`\* | octet | mot `[partie+690+26×n]` = 1 (sans borne) |
+| 57 | `CLEAR_SLOT_57`\* | octet | mot `[partie+690+26×n]` = 0 (sans borne) |
+| 58 | `SET_RANK`\* | octet | texte du grade en `[partie+965]` : 1 « 1st Lt. », 2 « Captain », 3 « Major », 4 « Lt. Colonel », autre « 2nd Lt. » |
+
+Les lignes « erreur » ont été vues dans la table (`loc_AEAD`) ; les blocs `[partie+690+26×n]` (8 enregistrements de
+26 octets) ne sont pas encore identifiés.
+
+## 5. Conversations (`Conv_PlayScript_14F62`) — lu le 2026-11-05
+
+Lit un octet de commande, `cmp bx, 13h / jbe` puis `jmp cs:off_16757[bx]` : **20 valeurs**, dont 8 utilisées.
+Lecteurs des champs dans seg031.
+
+| Valeur | Nom | Champs (dans l'ordre) | Lu par |
+|---|---|---|---|
+| 0 | `GROUP_SHOT` | décor (9) ; puis les commandes 1 qui suivent | `ConvRec_ReadName_18AAF` ; figures du chunk `FIGR` de `CONVDATA.IFF` |
+| 1 | `GROUP_SHOT_ADD_CHARACTER` | figure (9), x (mot), y (mot) | `ConvRec_ReadFigure_18C04` (seulement derrière 0 ou 18) |
+| 3 | `CLOSEUP` | visage (9), image (1), décor (9), x (mot), y (mot), texte, couleur (1) ; puis les commandes 19 et 4 qui suivent | `ConvRec_ReadCloseup_18AD6` |
+| 4 | `CLOSEUP_CONTINUATION` | texte (seulement derrière 3) | `ConvRec_ReadCloseup_18AD6` (2ᵉ appel : texte seul) |
+| 10 | `SHOW_TEXT` | couleur (1), texte | `ConvRec_ReadText_18D3D` |
+| 12 | `JUMP`\* | n (mot) : le pointeur du script avance de n octets (`add [di+4], ax`) | `ConvRec_ReadNumber_18DDA` |
+| 16 | `NOP_16` | aucun | — |
+| 18 | `GROUP_SHOT_WWI`\* | décor (9) ; puis les commandes 1 qui suivent, figures prises dans `WWISHPS.PAK` | `ConvRec_ReadName_18AAF` |
+| 19 | `CLOSEUP_SAME`\* | texte (seulement derrière 3) | `ConvRec_ReadCloseup_18AD6` |
+| autre | — | « Got lost while running the conversation! » | — |
+
+4 ou 19 rencontrés seuls : « CONT or SAME out of place! ».
+
+Différences avec Pacific Strike :
+- pas de 4 octets de voix après le texte ;
+- pas de blocs conditionnels (`IF_FLAG`, `ELSE`, `ENDIF`) ;
+- pas de commandant devant la carte (17) ;
+- nouveaux : 18 (plan de groupe avec `WWISHPS.PAK`), 19 (suite du gros plan) et 12 (saut relatif).
+
+## 6. Scripts de mission : pas dans `WINGS_OF.EXE`
+
+`WINGS_OF.EXE` est le programme **hors vol** (comme `OPTEST.EXE` de Strike Commander) :
+
+1. Quand un script `EFCT` lance un vol (`[partie+252]` = 1), la boucle du déroulement (`Gameflow_MainLoop_B155`) appelle
+   `Gameflow_WriteOp2Misn_681AA`. Celle-ci écrit `op2misn.iff` (chunks `MLST`, `NAME`, `SNAM`, `RANK`, `INVN`).
+2. La boucle rend son code, et le programme se termine par `CRT_Exit` (`sub_9DCA` →
+   `PagedResourceC_RefreshAndFinalize_47E2A`).
+3. Au retour, `Gameflow_ReadMisn2Op_67CD9` lit `misn2op.iff` (chunks `MLST`, `EXIT`, `INVN`, `JETS`, `KILL`).
+
+Les étiquettes `PROG`, `PART`, `CAST` et `AREA` n'apparaissent que dans l'écriture de la mission d'entraînement
+(`sub_12D3D`). Celle-ci recopie des chunks de `dogfight.iff`, `bombrun.iff` ou `gauntlet.iff` dans `instant.iff`,
+sans les interpréter. Aucun aiguillage d'instructions de mission n'existe dans cet exécutable, et il ne contient
+aucune étiquette du modèle de vol (`DYNM`, `JDYN`).
+
+**Les instructions des scripts de mission sont dans l'exécutable du vol**, lancé ensuite par le lanceur `WG` ; il
+n'a pas été fourni.
+
+## 7. Le reste n'est pas lu
 
 Aucune autre fonction propre à Wings of Glory n'a été lue. Les données du jeu n'ont pas été fournies.

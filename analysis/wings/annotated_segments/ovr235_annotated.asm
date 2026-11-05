@@ -256,7 +256,7 @@ loc_862CA:
 		mov	[bp+var_12], 13Fh
 		mov	[bp+var_10], 0C7h
 		push	2F8h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_8630E
@@ -267,12 +267,12 @@ loc_862CA:
 
 loc_8630E:
 		push	2F9h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_8634A
 		push	10Fh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jnz	short loc_86339
@@ -289,7 +289,7 @@ loc_86339:
 
 loc_8634A:
 		push	2FAh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_86368
@@ -300,7 +300,7 @@ loc_8634A:
 
 loc_86368:
 		push	2FBh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_86386
@@ -311,7 +311,7 @@ loc_86368:
 
 loc_86386:
 		push	2FCh
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_863A4
@@ -399,7 +399,7 @@ loc_8646E:
 		push	0
 		lea	ax, [bp+var_24]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		cmp	[bp+var_1], 0
 		jz	short loc_864A6

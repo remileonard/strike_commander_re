@@ -2556,7 +2556,7 @@ arg_0		= word ptr  6
 		mov	byte_5FF55, 0
 		push	6
 		push	6040h
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	6040h
 		call	sub_13BB6

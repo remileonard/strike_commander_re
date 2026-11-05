@@ -321,7 +321,7 @@ loc_669FF:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_6741E
+		call	near ptr Gameflow_PlayMidgame_6741E
 		add	sp, 6
 		jmp	short loc_66A47
 
@@ -336,7 +336,7 @@ loc_66A1D:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_6719B
+		call	near ptr Gameflow_PlayConversation_6719B
 		add	sp, 4
 		push	0AC5h
 		call	sub_9D78
@@ -1074,7 +1074,7 @@ loc_67040:
 		mov	al, byte ptr [bp+var_14]
 		push	ax
 		push	si
-		call	sub_A911
+		call	Gameflow_TestRequ_A911
 		add	sp, 6
 		or	al, al
 		jz	short loc_670AA
@@ -1194,7 +1194,11 @@ sub_66CAC		endp
 
 ; Attributes: bp-based frame
 
-sub_6719B		proc far
+; ==============================================================================================
+; far (partie, n) : prépare la conversation n (sub_14085) et la joue (Conv_PlayScript_14F62) ;
+; commande EFCT 0.
+; ==============================================================================================
+Gameflow_PlayConversation_6719B		proc far
 
 var_8C		= word ptr -8Ch
 var_16		= word ptr -16h
@@ -1249,7 +1253,7 @@ arg_2		= word ptr  8
 		add	sp, 4
 		lea	ax, [bp+var_8C]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		xor	eax, eax
 		mov	[bp+var_4], eax
@@ -1273,7 +1277,7 @@ arg_2		= word ptr  8
 		pop	si
 		leave
 		retf
-sub_6719B		endp
+Gameflow_PlayConversation_6719B		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1510,7 +1514,12 @@ sub_67305		endp
 
 ; Attributes: bp-based frame
 
-sub_6741E		proc far
+; ==============================================================================================
+; far (partie, n, registre) : coupe la musique (Music_Stop_3D1D6) puis n = 1 à 14 →
+; cinématique MIDGAMnn (14 rejoue MIDGAM03), 15 → générique (sub_6DC70, mycredit) ; autre :
+; erreur OPTHAN-O.CPP. Commandes EFCT 2 et 15.
+; ==============================================================================================
+Gameflow_PlayMidgame_6741E		proc far
 
 var_2		= byte ptr -2
 var_1		= byte ptr -1
@@ -1691,9 +1700,9 @@ loc_6756F:
 		pop	si
 		leave
 		retf
-sub_6741E		endp
+Gameflow_PlayMidgame_6741E		endp
 
-; START OF FUNCTION CHUNK FOR sub_6741E
+; START OF FUNCTION CHUNK FOR Gameflow_PlayMidgame_6741E
 off_67573	dw offset loc_67453
 		dw offset loc_6745B
 		dw offset loc_67463
@@ -1709,7 +1718,7 @@ off_67573	dw offset loc_67453
 		dw offset loc_67500
 		dw offset loc_67507
 		dw offset loc_67521
-; END OF FUNCTION CHUNK FOR sub_6741E
+; END OF FUNCTION CHUNK FOR Gameflow_PlayMidgame_6741E
 
 ; ----------------------------------------------------------------------
 
@@ -2478,7 +2487,10 @@ sub_67591		endp
 
 ; Attributes: bp-based frame
 
-sub_67CD9		proc far
+; ==============================================================================================
+; far : lit misn2op.iff au retour du vol (MLST, EXIT, INVN, JETS, KILL).
+; ==============================================================================================
+Gameflow_ReadMisn2Op_67CD9		proc far
 
 var_122		= word ptr -122h
 var_C5		= dword ptr -0C5h
@@ -2941,7 +2953,7 @@ loc_680FF:
 
 loc_6811D:
 		push	100h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_68134
@@ -2973,7 +2985,7 @@ loc_6815C:
 		pop	si
 		leave
 		retf
-sub_67CD9		endp
+Gameflow_ReadMisn2Op_67CD9		endp
 
 ; ----------------------------------------------------------------------
 
@@ -3016,7 +3028,11 @@ sub_6816B		endp
 
 ; Attributes: bp-based frame
 
-sub_681AA		proc far
+; ==============================================================================================
+; far : écrit op2misn.iff (MLST, NAME, SNAM, RANK, INVN) avant le vol ; appelée par la boucle
+; du déroulement quand [partie+252] = 1.
+; ==============================================================================================
+Gameflow_WriteOp2Misn_681AA		proc far
 
 var_1C2		= word ptr -1C2h
 var_165		= dword ptr -165h
@@ -3130,7 +3146,7 @@ loc_6828F:
 		cmp	ax, di
 		jge	short loc_68279
 		push	103h
-		call	sub_A40C
+		call	GameVar_Get_A40C
 		pop	cx
 		or	ax, ax
 		jz	short loc_682C4
@@ -3364,7 +3380,7 @@ loc_68320:
 		pop	si
 		leave
 		retf
-sub_681AA		endp
+Gameflow_WriteOp2Misn_681AA		endp
 
 ; ----------------------------------------------------------------------
 

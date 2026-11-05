@@ -154,7 +154,7 @@ loc_13AD7:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_13AF4
+		call	near ptr Music_LoadTune_13AF4
 		add	sp, 4
 
 loc_13AE3:
@@ -175,7 +175,11 @@ sub_13AAE		endp
 
 ; Attributes: bp-based frame
 
-sub_13AF4		proc far
+; ==============================================================================================
+; far (lecteur, n) : charge le morceau n depuis AMUSIC.PAK ou RMUSIC.PAK (dossier midgames) ;
+; commande EFCT 24 (avec sub_13BB6).
+; ==============================================================================================
+Music_LoadTune_13AF4		proc far
 
 var_CA		= word ptr -0CAh
 var_52		= word ptr -52h
@@ -273,7 +277,7 @@ loc_13BB2:
 loc_13BB4:
 		leave
 		retf
-sub_13AF4		endp
+Music_LoadTune_13AF4		endp
 
 ; ----------------------------------------------------------------------
 

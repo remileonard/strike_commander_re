@@ -549,7 +549,7 @@ loc_8341A:
 		push	3
 		lea	ax, [bp+var_48]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		push	0
 		push	word_5DD44
@@ -1249,7 +1249,7 @@ loc_83B98:
 		add	sp, 4
 		lea	ax, [bp+var_5D8]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		push	2
 		lea	ax, [bp+var_5D8]

@@ -4869,8 +4869,8 @@
 "lines": 40,
 "type": "far",
 "calls": [],
-"new_name": "sub_A40C",
-"summary": ""
+"new_name": "GameVar_Get_A40C",
+"summary": "far (n) : n < 256 → mot de la table word_5FD3C ; n ≥ 256 → bit (n − 256) de la table word_5FD40."
 },
 "sub_A455": {
 "segment": "seg018",
@@ -4879,8 +4879,8 @@
 "lines": 38,
 "type": "far",
 "calls": [],
-"new_name": "sub_A455",
-"summary": ""
+"new_name": "GameVar_SetFlag_A455",
+"summary": "far (n) : variable n = 1 (mot) ou bit posé."
 },
 "sub_A49C": {
 "segment": "seg018",
@@ -4889,8 +4889,8 @@
 "lines": 48,
 "type": "far",
 "calls": [],
-"new_name": "sub_A49C",
-"summary": ""
+"new_name": "GameVar_Set_A49C",
+"summary": "far (n, valeur) : mot = valeur, ou bit posé si valeur ≠ 0, effacé sinon."
 },
 "sub_A4F0": {
 "segment": "seg018",
@@ -4899,8 +4899,8 @@
 "lines": 39,
 "type": "far",
 "calls": [],
-"new_name": "sub_A4F0",
-"summary": ""
+"new_name": "GameVar_Clear_A4F0",
+"summary": "far (n) : variable n = 0 (mot) ou bit effacé."
 },
 "sub_A539": {
 "segment": "seg018",
@@ -5053,8 +5053,8 @@
 "sub_A40C",
 "sub_A40C"
 ],
-"new_name": "sub_A911",
-"summary": ""
+"new_name": "Gameflow_TestRequ_A911",
+"summary": "far (partie, longueur, REQU) : conditions de 3 octets (condition, numéro sur un mot) : 0 REQUIRE_NOT_SET, 1 REQUIRE_SET, 2 OR_NOT_SET, 3 OR_SET ; rend 1 si visible."
 },
 "sub_A9C9": {
 "segment": "seg019",
@@ -5094,8 +5094,8 @@
 "sub_2CA9",
 "sub_9D78"
 ],
-"new_name": "sub_A9C9",
-"summary": ""
+"new_name": "Gameflow_RunScript_A9C9",
+"summary": "far (partie, longueur, EFCT) : interpréteur des scripts EFCT, 59 commandes (cmp bx, 3Ah / jmp cs:off_AED6[bx]) ; ELSE 30, ENDIF 31, OR_GROUP 33 traités avant ; pas de 3 octets pour 0, 6, 7, 9, 10, 19, 50, 51, 55, 2 sinon ; registre [partie+282]. Table complète : analysis/wings/README.md § 4.3."
 },
 "sub_AF4C": {
 "segment": "seg019",
@@ -5186,8 +5186,8 @@
 "sub_58AC7",
 "sub_58ACC"
 ],
-"new_name": "sub_B155",
-"summary": ""
+"new_name": "Gameflow_MainLoop_B155",
+"summary": "far : boucle du déroulement (scènes, sprites, scripts EFCT par Gameflow_RunScript_A9C9) ; [partie+252] = 1 → Gameflow_WriteOp2Misn_681AA puis retour du code de sortie (CRT_Exit dans l'appelant)."
 },
 "sub_B5A2": {
 "segment": "seg019",
@@ -5624,8 +5624,8 @@
 "sub_53B24",
 "sub_544B1"
 ],
-"new_name": "sub_C426",
-"summary": ""
+"new_name": "Gameflow_ApplyChange_C426",
+"summary": "far (partie, n) : chunks PILT, STAT, CHNG, INFO ; commande EFCT 34 APPLY_CHANGE."
 },
 "sub_C6D1": {
 "segment": "seg021",
@@ -5744,8 +5744,8 @@
 "sub_5483E",
 "sub_5483E"
 ],
-"new_name": "sub_C6D9",
-"summary": ""
+"new_name": "Gameflow_KillBoard_C6D9",
+"summary": "far (partie, a, b) : tableau des victoires (WWISHPS.PAK, WWIPALS.PAK, police BOARDFNT ; « missing killboard headlines / dates », « Return to tent », « Return to common room ») ; commande EFCT 19."
 },
 "sub_D174": {
 "segment": "seg022",
@@ -5770,8 +5770,8 @@
 "sub_A4F0",
 "sub_A4F0"
 ],
-"new_name": "sub_D17C",
-"summary": ""
+"new_name": "Gameflow_ClearFlags760_764_D17C",
+"summary": "far : efface les variables 760 à 764 ; commande EFCT 25."
 },
 "sub_D1B1": {
 "segment": "seg022",
@@ -5790,8 +5790,8 @@
 "sub_A4F0",
 "sub_A4F0"
 ],
-"new_name": "sub_D1B1",
-"summary": ""
+"new_name": "Gameflow_ClearFlags261_269_D1B1",
+"summary": "far : efface les variables 261 à 269 ; commande EFCT 29."
 },
 "sub_D20A": {
 "segment": "seg022",
@@ -5943,8 +5943,8 @@
 "sub_53B24",
 "sub_544B1"
 ],
-"new_name": "sub_D51A",
-"summary": ""
+"new_name": "Gameflow_Map_D51A",
+"summary": "far (partie, n) : carte, chunks MAPS, INFO, WRLD, DATA, SPED ; commande EFCT 18."
 },
 "sub_E4B8": {
 "segment": "seg023",
@@ -6821,8 +6821,8 @@
 "sub_1A769",
 "sub_5483E"
 ],
-"new_name": "sub_13AF4",
-"summary": ""
+"new_name": "Music_LoadTune_13AF4",
+"summary": "far (lecteur, n) : charge le morceau n depuis AMUSIC.PAK ou RMUSIC.PAK (dossier midgames) ; commande EFCT 24 (avec sub_13BB6)."
 },
 "sub_13BB6": {
 "segment": "seg026",
@@ -7521,8 +7521,8 @@
 "sub_9D78",
 "sub_9D78"
 ],
-"new_name": "sub_14F62",
-"summary": ""
+"new_name": "Conv_PlayScript_14F62",
+"summary": "far, interpréteur des conversations : octet de commande, cmp bx, 13h / jmp cs:off_16757[bx] (20 valeurs). 0 GROUP_SHOT et 18 (figures de WWISHPS.PAK) consomment les commandes 1 qui suivent ; 3 CLOSEUP consomme les 19 et 4 qui suivent ; 10 SHOW_TEXT ; 12 saut relatif d'un mot ; 16 rien ; 4 ou 19 seuls : « CONT or SAME out of place! » ; autre : « Got lost while running the conversation! ». Voir analysis/wings/README.md § 5."
 },
 "sub_1677F": {
 "segment": "seg027",
@@ -8665,8 +8665,8 @@
 "sub_44F3F",
 "sub_9D78"
 ],
-"new_name": "sub_18AD6",
-"summary": ""
+"new_name": "ConvRec_ReadCloseup_18AD6",
+"summary": "far, lit un CLOSEUP : 1er appel (rec+1Dh = 0) visage (9), image (1), décor (9), x, y (mots), texte, couleur (1) ; appels suivants (CONT 4, SAME 19) : texte seul."
 },
 "sub_18C04": {
 "segment": "seg031",
@@ -8689,8 +8689,8 @@
 "sub_45058",
 "sub_44F3F"
 ],
-"new_name": "sub_18C77",
-"summary": ""
+"new_name": "ConvRec_ReadFigureText_18C77",
+"summary": "far, lit nom (9), x, y (mots), un octet, puis un texte ; appelant non relevé."
 },
 "sub_18D3D": {
 "segment": "seg031",
@@ -8703,8 +8703,8 @@
 "sub_45058",
 "sub_44F3F"
 ],
-"new_name": "sub_18D3D",
-"summary": ""
+"new_name": "ConvRec_ReadText_18D3D",
+"summary": "far, lit SHOW_TEXT : couleur (1) puis texte terminé par 0 (copie allouée)."
 },
 "sub_18D9C": {
 "segment": "seg031",
@@ -37734,8 +37734,8 @@
 "sub_47B53",
 "sub_141F1"
 ],
-"new_name": "sub_6719B",
-"summary": ""
+"new_name": "Gameflow_PlayConversation_6719B",
+"summary": "far (partie, n) : prépare la conversation n (sub_14085) et la joue (Conv_PlayScript_14F62) ; commande EFCT 0."
 },
 "sub_67259": {
 "segment": "ovr186",
@@ -37814,8 +37814,8 @@
 "sub_4160F",
 "sub_47B53"
 ],
-"new_name": "sub_6741E",
-"summary": ""
+"new_name": "Gameflow_PlayMidgame_6741E",
+"summary": "far (partie, n, registre) : coupe la musique (Music_Stop_3D1D6) puis n = 1 à 14 → cinématique MIDGAMnn (14 rejoue MIDGAM03), 15 → générique (sub_6DC70, mycredit) ; autre : erreur OPTHAN-O.CPP. Commandes EFCT 2 et 15."
 },
 "sub_67591": {
 "segment": "ovr186",
@@ -37954,8 +37954,8 @@
 "sub_53B24",
 "sub_544B1"
 ],
-"new_name": "sub_67CD9",
-"summary": ""
+"new_name": "Gameflow_ReadMisn2Op_67CD9",
+"summary": "far : lit misn2op.iff au retour du vol (MLST, EXIT, INVN, JETS, KILL)."
 },
 "sub_6816B": {
 "segment": "ovr186",
@@ -38018,8 +38018,8 @@
 "sub_53B24",
 "sub_544B1"
 ],
-"new_name": "sub_681AA",
-"summary": ""
+"new_name": "Gameflow_WriteOp2Misn_681AA",
+"summary": "far : écrit op2misn.iff (MLST, NAME, SNAM, RANK, INVN) avant le vol ; appelée par la boucle du déroulement quand [partie+252] = 1."
 },
 "sub_68559": {
 "segment": "ovr186",

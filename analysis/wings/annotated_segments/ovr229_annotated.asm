@@ -392,7 +392,7 @@ loc_7EF0E:
 		push	9
 		lea	ax, [bp+var_3E]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		cmp	[bp+var_1], 0
 		jz	short loc_7EF44
@@ -563,7 +563,7 @@ loc_7F0B1:
 		add	sp, 4
 		lea	ax, [bp+var_36C]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		push	2
 		lea	ax, [bp+var_36C]
@@ -1054,7 +1054,7 @@ loc_7F676:
 		add	sp, 4
 		lea	ax, [bp+var_36C]
 		push	ax
-		call	sub_14F62
+		call	Conv_PlayScript_14F62
 		pop	cx
 		push	2
 		lea	ax, [bp+var_36C]

@@ -137,7 +137,7 @@ loc_6DD44:
 		push	4
 		lea	ax, [bp+var_E]
 		push	ax
-		call	sub_13AF4
+		call	Music_LoadTune_13AF4
 		add	sp, 4
 		lea	ax, [bp+var_E]
 		push	ax

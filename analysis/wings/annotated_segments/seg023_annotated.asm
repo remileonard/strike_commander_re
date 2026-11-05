@@ -285,7 +285,10 @@ sub_D335		endp
 
 ; Attributes: bp-based frame
 
-sub_D51A		proc far
+; ==============================================================================================
+; far (partie, n) : carte, chunks MAPS, INFO, WRLD, DATA, SPED ; commande EFCT 18.
+; ==============================================================================================
+Gameflow_Map_D51A		proc far
 
 var_4CE		= word ptr -4CEh
 var_4CC		= word ptr -4CCh
@@ -1821,7 +1824,7 @@ loc_E4B4:
 		pop	si
 		leave
 		retf
-sub_D51A		endp
+Gameflow_Map_D51A		endp
 
 ; ----------------------------------------------------------------------
 

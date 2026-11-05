@@ -1949,7 +1949,14 @@ sub_14A86		endp
 
 ; Attributes: bp-based frame
 
-sub_14F62		proc far
+; ==============================================================================================
+; far, interpréteur des conversations : octet de commande, cmp bx, 13h / jmp cs:off_16757[bx]
+; (20 valeurs). 0 GROUP_SHOT et 18 (figures de WWISHPS.PAK) consomment les commandes 1 qui
+; suivent ; 3 CLOSEUP consomme les 19 et 4 qui suivent ; 10 SHOW_TEXT ; 12 saut relatif d'un
+; mot ; 16 rien ; 4 ou 19 seuls : « CONT or SAME out of place! » ; autre : « Got lost while
+; running the conversation! ». Voir analysis/wings/README.md § 5.
+; ==============================================================================================
+Conv_PlayScript_14F62		proc far
 
 var_1F4		= word ptr -1F4h
 var_1F2		= word ptr -1F2h
@@ -2906,7 +2913,7 @@ loc_157DC:
 		push	di
 		lea	ax, [bp+var_28]
 		push	ax
-		call	sub_18D3D
+		call	ConvRec_ReadText_18D3D
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_90]
@@ -3141,7 +3148,7 @@ loc_159EE:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		lea	ax, [bp+var_C1]
 		mov	word ptr [bp+var_2E], ax
@@ -3565,7 +3572,7 @@ loc_15E91:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_B0]
@@ -3681,7 +3688,7 @@ loc_15F91:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_B0]
@@ -3744,7 +3751,7 @@ loc_16033:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 
 loc_16044:
@@ -3884,7 +3891,7 @@ loc_16146:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_B0]
@@ -4096,7 +4103,7 @@ loc_16322:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_B0]
@@ -4212,7 +4219,7 @@ loc_16422:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 		push	0
 		lea	ax, [bp+var_B0]
@@ -4275,7 +4282,7 @@ loc_164C4:
 		push	di
 		lea	ax, [bp+var_CE]
 		push	ax
-		call	sub_18AD6
+		call	ConvRec_ReadCloseup_18AD6
 		add	sp, 4
 
 loc_164D5:
@@ -4563,9 +4570,9 @@ loc_16753:
 		pop	si
 		leave
 		retf
-sub_14F62		endp
+Conv_PlayScript_14F62		endp
 
-; START OF FUNCTION CHUNK FOR sub_14F62
+; START OF FUNCTION CHUNK FOR Conv_PlayScript_14F62
 off_16757	dw offset loc_1536C
 		dw offset loc_1672A
 		dw offset loc_1672A
@@ -4586,7 +4593,7 @@ off_16757	dw offset loc_1536C
 		dw offset loc_1672A
 		dw offset loc_14FB9
 		dw offset loc_16716
-; END OF FUNCTION CHUNK FOR sub_14F62
+; END OF FUNCTION CHUNK FOR Conv_PlayScript_14F62
 
 ; ----------------------------------------------------------------------
 
