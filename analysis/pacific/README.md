@@ -669,12 +669,38 @@ pistes passent par `RSArea::ParseTriFile`, qui lit le format de Strike Commander
 - les faces sont lues sur 16 octets au lieu de 28 ;
 - la lecture attend 3 048 octets alors que l'entrée en fait 798 : elle déborde de l'entrée.
 
-**Implémentation prévue** (décision de Rémi) : `RSArea` n'est pas modifié dans sa lecture, pour ne pas casser
-Strike Commander. La lecture de Pacific Strike ira dans une classe `PSArea`, dérivée de `RSArea`, qui remplace
-`ParseTriFile` ; `PSMission` créera un `PSArea` au lieu d'un `RSArea` (`this->area = new RSArea();` aujourd'hui).
-Seul point à toucher dans `RSArea.h` : `ParseTriFile` y est `private` et non virtuelle (appelée par
-`RSArea::ParseTrigo`) ; il faudra la déclarer `virtual` et la passer en `protected`, ainsi que les membres qu'elle
-remplit, sans rien changer à ce que fait Strike Commander.
+**Implémentation prévue** (décision de Rémi) : `RSArea` garde sa lecture, qui est juste pour Strike Commander. Une
+classe `PSArea` étend `RSArea` et remplace seulement `ParseTriFile` ; `PSMission::loadMission` crée un `PSArea` au lieu
+d'un `RSArea` (`this->area = new RSArea();` aujourd'hui). Tout le reste vient de `RSArea` : `InitFromZipFileName`,
+le terrain, et l'appel de `ParseTriFile` pour chaque région par `RSArea::ParseTrigo`.
+
+À changer dans `RSArea.h` pour le permettre : `ParseTriFile` y est `private` et non virtuelle ; la déclarer `virtual`
+et la passer en `protected`. Strike Commander appelle toujours le même code. Le résultat va dans `objectOverlay`,
+déjà `public`.
+
+`PSArea::ParseTriFile` remplit les mêmes structures que `RSArea::ParseTriFile` (`AreaOverlay`, `AoVPoints`,
+`AreaOverlayTriangles`), avec les règles de `TRI_ParseOverlayGeometry_A7710` :
+
+| Champ de libRealSpace | Strike Commander (`RSArea`) | Pacific Strike (`PSArea`) |
+|---|---|---|
+| nombre de sommets | mot 0 de l'en-tête | mot 0 de l'en-tête |
+| nombre de faces | mot 2 | mot 2 |
+| — | — | mot 4 : sauté (non lu par le jeu) |
+| `param2` (côté de la grille) | mot 4 | mot 6 |
+| `param3` (longueur de la table des listes) | mot 6 | mot 8 |
+| sommets (`AoVPoints`) | 13 octets, à partir de l'octet 8 | 13 octets, à partir de l'octet 10, lecture identique |
+| `flag0` | octet 0 de la face | octet 0 de la face |
+| `verticesIdx[0..2]` | mots aux octets 1, 3, 5 | mots aux octets 1, 3, 5 |
+| — | — | octets 7 à 18 : sautés (non lus par le jeu) |
+| `type` | octet 7 | octet 19 |
+| `color` | mot à l'octet 8 | mot à l'octet 20 (numéro de matériau) |
+| `uv[0..2]` | octets 10 à 15 | octets 22 à 27 |
+| taille d'une face | 16 octets | 28 octets |
+| `param3Table`, `grid`, `drawList` | après les faces | après les faces, même lecture |
+
+Contrôle sur `OAHU.ZIP` : avec ces règles, la région se lit exactement jusqu'à la fin de son entrée (798 octets).
+Ce que le jeu fait du numéro de matériau (tables de 14 et 24 octets, `word_7CC8E`) n'est pas lu : le dessin de
+la piste avec sa texture reste à étudier.
 
 ![Oahu : relief (pistes en rouge) et champ « éclairage » des sommets](images/ps_terrain_oahu.png)
 
