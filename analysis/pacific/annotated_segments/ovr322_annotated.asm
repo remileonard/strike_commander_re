@@ -358,7 +358,7 @@ loc_B1A10:
 		lea	ax, word ptr [bp+var_6C]
 		push	ax
 		push	[bp+var_E]
-		call	sub_4936E
+		call	JDYN_JumpToPoint_4936E
 		add	sp, 0Ah
 		jmp	short loc_B1B07
 

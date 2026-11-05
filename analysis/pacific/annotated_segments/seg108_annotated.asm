@@ -255,7 +255,7 @@ loc_4394F:
 		lea	ax, word ptr [bp+var_32]
 		push	ax
 		push	[bp+var_1A]
-		call	sub_4936E
+		call	JDYN_JumpToPoint_4936E
 		add	sp, 0Ah
 		mov	byte_78EB8, 1
 		mov	byte_78EB6, 1

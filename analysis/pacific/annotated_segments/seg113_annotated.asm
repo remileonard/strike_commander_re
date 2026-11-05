@@ -66,7 +66,13 @@ Physics_IntegrateSecondaryPosition		endp
 
 ; Attributes: bp-based frame
 
-sub_46922		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comparée le 2026-11-05 à Aero_FlowAngle_AoA_469FE de STRIKE.EXE : même
+; calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire :
+; +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image). Rend l'adresse de dword_793FC.
+; ==============================================================================================
+Aero_FlowAngle_AoA_46922		proc far
 
 var_C		= dword ptr -0Ch
 var_8		= dword ptr -8
@@ -87,7 +93,7 @@ arg_0		= word ptr  6
 
 loc_46939:
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	bx, ax
 		mov	si, bx
@@ -138,13 +144,19 @@ loc_469C3:
 		pop	si
 		leave
 		retf
-sub_46922		endp
+Aero_FlowAngle_AoA_46922		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_469CA		proc far
+; ==============================================================================================
+; far. Comparée le 2026-11-05 à Aero_FlowAngle_Sideslip_46AB5 de STRIKE.EXE : même calcul
+; (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17,
+; +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image).
+; ==============================================================================================
+Aero_FlowAngle_Sideslip_469CA		proc far
 
 var_C		= dword ptr -0Ch
 var_8		= dword ptr -8
@@ -165,7 +177,7 @@ arg_0		= word ptr  6
 
 loc_469E1:
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	bx, ax
 		mov	si, bx
@@ -215,7 +227,7 @@ loc_46A68:
 		pop	si
 		leave
 		retf
-sub_469CA		endp
+Aero_FlowAngle_Sideslip_469CA		endp
 
 ; ----------------------------------------------------------------------
 
@@ -458,7 +470,13 @@ sub_46BA2		endp
 
 ; Attributes: bp-based frame
 
-sub_46C16		proc far
+; ==============================================================================================
+; far. Comparée le 2026-11-05 à Aero_DynamicPressure_46D13 de STRIKE.EXE : même calcul
+; (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17,
+; +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image).
+; ==============================================================================================
+Aero_DynamicPressure_46C16		proc far
 
 var_4		= dword ptr -4
 arg_0		= word ptr  6
@@ -511,13 +529,19 @@ loc_46C87:
 		pop	si
 		leave
 		retf
-sub_46C16		endp
+Aero_DynamicPressure_46C16		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_46C8D		proc far
+; ==============================================================================================
+; far. Comparée le 2026-11-05 à Atmosphere_AirDensityAtAltitude_46DA3 de STRIKE.EXE : même
+; calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire :
+; +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image). Suite d'instructions identique (ratio 1,0).
+; ==============================================================================================
+Atmosphere_AirDensityAtAltitude_46C8D		proc far
 
 var_64		= dword ptr -64h
 var_60		= dword ptr -60h
@@ -657,7 +681,7 @@ loc_46CE1:
 		pop	si
 		leave
 		retf
-sub_46C8D		endp
+Atmosphere_AirDensityAtAltitude_46C8D		endp
 
 ; ----------------------------------------------------------------------
 
@@ -687,7 +711,7 @@ arg_0		= word ptr  6
 		lea	ax, word ptr [bp+var_4]
 		push	ax
 		push	cs
-		call	near ptr sub_46C8D
+		call	near ptr Atmosphere_AirDensityAtAltitude_46C8D
 		add	sp, 6
 		mov	eax, [bp+var_4]
 		mov	dword_79406, eax
@@ -731,7 +755,7 @@ arg_0		= word ptr  6
 
 loc_46E6D:
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -750,7 +774,7 @@ loc_46E6D:
 		mov	[bp+var_4], eax
 		push	si
 		push	cs
-		call	near ptr sub_46C16
+		call	near ptr Aero_DynamicPressure_46C16
 		pop	cx
 		mov	di, ax
 		mov	eax, [si+4]
@@ -1634,7 +1658,7 @@ arg_0		= word ptr  6
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_47600
+		call	near ptr Aero_ComputeForcesMain_47600
 		pop	cx
 		push	ax
 		push	si
@@ -1721,7 +1745,13 @@ sub_475EE		endp
 
 ; Attributes: bp-based frame
 
-sub_47600		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (écarts seulement). Comme Aero_ComputeForcesMain_4791E de STRIKE
+; (asservissement d'attitude en racine carrée) ; une condition ajoutée : α et β sont forcés à
+; ± 90° aussi quand l'objet du monde a ([objet+2] & 6Fh) = 4Eh ET le bit 6 de [si+92h]
+; (décrochage) est posé (STRIKE : seulement quand le flux vient de l'arrière, v_corps.c1 < 0).
+; ==============================================================================================
+Aero_ComputeForcesMain_47600		proc far
 
 var_B8		= dword ptr -0B8h
 var_B4		= dword ptr -0B4h
@@ -1785,7 +1815,7 @@ arg_0		= word ptr  6
 loc_47618:
 		push	word ptr [si+10h]
 		push	cs
-		call	near ptr sub_46C16
+		call	near ptr Aero_DynamicPressure_46C16
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -1804,20 +1834,20 @@ loc_47618:
 		mov	[bp+var_4], eax
 		push	si
 		push	cs
-		call	near ptr sub_46922
+		call	near ptr Aero_FlowAngle_AoA_46922
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
 		mov	[bp+var_8], eax
 		push	si
 		push	cs
-		call	near ptr sub_469CA
+		call	near ptr Aero_FlowAngle_Sideslip_469CA
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
 		mov	[bp+var_C], eax
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	di, ax
 		xor	cx, cx
@@ -2261,7 +2291,7 @@ loc_47B36:
 		pop	si
 		leave
 		retf
-sub_47600		endp
+Aero_ComputeForcesMain_47600		endp
 
 ; ----------------------------------------------------------------------
 

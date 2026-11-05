@@ -3083,7 +3083,7 @@ loc_87378:
 		call	dword ptr [bx+48h]
 		pop	cx
 		push	ax
-		call	sub_4936E
+		call	JDYN_JumpToPoint_4936E
 		add	sp, 0Ah
 		les	bx, [bp+arg_0]
 		mov	bx, es:[bx+0Ah]

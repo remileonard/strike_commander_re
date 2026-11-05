@@ -1995,7 +1995,7 @@ sub_3A421		proc far
 		add	ax, 0FF2Fh
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	sub_4A8F4
+		jmp	PhysicsTicks_4A8F4
 sub_3A421		endp
 
 ; ----------------------------------------------------------------------
@@ -2091,7 +2091,7 @@ sub_3A4D9		proc far
 		add	ax, 0FF55h
 		mov	bx, sp
 		add	ss:[bx+4], ax
-		jmp	sub_4A8F4
+		jmp	PhysicsTicks_4A8F4
 sub_3A4D9		endp
 
 ; ----------------------------------------------------------------------
@@ -2295,7 +2295,7 @@ sub_3A64A		endp
 sub_3A656		proc far
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFDEh
-		jmp	sub_4A8F4
+		jmp	PhysicsTicks_4A8F4
 sub_3A656		endp
 
 ; ----------------------------------------------------------------------
@@ -2353,7 +2353,7 @@ sub_3A69E		endp
 sub_3A6AA		proc far
 		mov	bx, sp
 		add	word ptr ss:[bx+4], 0FFE2h
-		jmp	sub_4A8F4
+		jmp	PhysicsTicks_4A8F4
 sub_3A6AA		endp
 
 ; ----------------------------------------------------------------------

@@ -21849,8 +21849,8 @@
 "lines": 30,
 "type": "far",
 "calls": [],
-"new_name": "sub_463B3",
-"summary": ""
+"new_name": "Physics_ResolveWindVectorCached_463B3",
+"summary": "far. Apparié 2026-11-05 à Physics_ResolveWindVectorCached_4643B de STRIKE.EXE (vitesse en repère corps, cache par image) ; rend l'adresse du vecteur. Non relu ligne à ligne."
 },
 "sub_463F4": {
 "segment": "seg112",
@@ -21996,8 +21996,8 @@
 "sub_463B3",
 "sub_57CA1"
 ],
-"new_name": "sub_46922",
-"summary": ""
+"new_name": "Aero_FlowAngle_AoA_46922",
+"summary": "far. LUE 2026-11-05. Comparée le 2026-11-05 à Aero_FlowAngle_AoA_469FE de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image). Rend l'adresse de dword_793FC."
 },
 "sub_469CA": {
 "segment": "seg113",
@@ -22009,8 +22009,8 @@
 "sub_463B3",
 "sub_57CA1"
 ],
-"new_name": "sub_469CA",
-"summary": ""
+"new_name": "Aero_FlowAngle_Sideslip_469CA",
+"summary": "far. Comparée le 2026-11-05 à Aero_FlowAngle_Sideslip_46AB5 de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image)."
 },
 "sub_46A6F": {
 "segment": "seg113",
@@ -22086,8 +22086,8 @@
 "sub_56E96",
 "sub_46E08"
 ],
-"new_name": "sub_46C16",
-"summary": ""
+"new_name": "Aero_DynamicPressure_46C16",
+"summary": "far. Comparée le 2026-11-05 à Aero_DynamicPressure_46D13 de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image)."
 },
 "sub_46C8D": {
 "segment": "seg113",
@@ -22098,8 +22098,8 @@
 "calls": [
 "sub_6534F"
 ],
-"new_name": "sub_46C8D",
-"summary": ""
+"new_name": "Atmosphere_AirDensityAtAltitude_46C8D",
+"summary": "far. Comparée le 2026-11-05 à Atmosphere_AirDensityAtAltitude_46DA3 de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image). Suite d'instructions identique (ratio 1,0)."
 },
 "sub_46E08": {
 "segment": "seg113",
@@ -22355,8 +22355,8 @@
 "sub_56A1E",
 "sub_57C2E"
 ],
-"new_name": "sub_47600",
-"summary": ""
+"new_name": "Aero_ComputeForcesMain_47600",
+"summary": "far. LUE 2026-11-05 (écarts seulement). Comme Aero_ComputeForcesMain_4791E de STRIKE (asservissement d'attitude en racine carrée) ; une condition ajoutée : α et β sont forcés à ± 90° aussi quand l'objet du monde a ([objet+2] & 6Fh) = 4Eh ET le bit 6 de [si+92h] (décrochage) est posé (STRIKE : seulement quand le flux vient de l'arrière, v_corps.c1 < 0)."
 },
 "sub_47B3D": {
 "segment": "seg113",
@@ -22427,8 +22427,8 @@
 "lines": 62,
 "type": "far",
 "calls": [],
-"new_name": "sub_47D30",
-"summary": ""
+"new_name": "Aero_ComputeDragFromFlags_47D30",
+"summary": "far. Comparée le 2026-11-05 à Aero_ComputeDragFromFlags75 de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image)."
 },
 "sub_47DBA": {
 "segment": "seg114",
@@ -22439,8 +22439,8 @@
 "calls": [
 "sub_46922"
 ],
-"new_name": "sub_47DBA",
-"summary": ""
+"new_name": "Aero_ComputeAoAWithTrim_47DBA",
+"summary": "far. Comparée le 2026-11-05 à Aero_ComputeAoAWithTrim_480CA de STRIKE.EXE : même calcul (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17, +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une variable globale, cache une fois par image)."
 },
 "sub_47E1E": {
 "segment": "seg114",
@@ -22458,8 +22458,8 @@
 "sub_5A065",
 "sub_57715"
 ],
-"new_name": "sub_47E1E",
-"summary": ""
+"new_name": "Aero_ComputeLiftAndSideForce_47E1E",
+"summary": "far. LUE 2026-11-05. Comme Aero_ComputeLiftAndSideForce_4812B de STRIKE (portance k·dword_7CE2E·α_eff·q, force latérale), avec : (1) force latérale k÷8 au lieu de k÷4 (sar eax, 3) ; (2) DÉCROCHAGE aussi par la vitesse : si |α_eff| > α_décrochage (jdyn[5Ch]) OU si la vitesse est sous Vs = partie entière du dernier champ de THRS ([si+41h], ÷8 de moins si le bit 1 de [si+92h] est posé) ; (3) le décrochage (portance nulle, bit 6 = pas au sol) n'est appliqué que si word_7977C > 10 images, l'objet est celui de word_7CADA (joueur) ET word_7CB07 < 2 (option de difficulté : à 2, pas de décrochage)."
 },
 "sub_481AB": {
 "segment": "seg114",
@@ -22477,8 +22477,8 @@
 "sub_5A065",
 "sub_57796"
 ],
-"new_name": "sub_481AB",
-"summary": ""
+"new_name": "Aero_ComputeDragWithFeedback_481AB",
+"summary": "far. LUE 2026-11-05. Comme Aero_ComputeDragWithFeedback_48400 de STRIKE (traînée = q·(k·α'² + k/8·β² + traînée des drapeaux), terme au sol, direction opposée au flux), avec : option word_7CB07 = 1 : la part de |α_eff| au-delà de L = calage (jdyn[5Dh]) + 1 compte × 0,797 (α < 0) ou × 0,656 (α > 0) ; = 2 : × 0,5 ou × 0,328 ; = 0 : inchangé. Bloc « V > Vref (jdyn[9Dh]) : vecteur de [si+10h] × V/Vref » sans effet (vecteur réécrit ensuite à loc_4862A)."
 },
 "sub_486B5": {
 "segment": "seg114",
@@ -22495,8 +22495,8 @@
 "sub_46F56",
 "sub_481AB"
 ],
-"new_name": "sub_486B5",
-"summary": ""
+"new_name": "Aero_SumLinearForces_486B5",
+"summary": "far. LUE 2026-11-05. Comme Aero_SumLinearForces_48639 de STRIKE (F = poussée÷256 + portance + traînée ; accel = F/masse ; facteur de charge [si+99h] ; + gravité), SAUF bit 5 de [si+92h] : STRIKE met poussée et portance à 0 ; ici la poussée est divisée par 512 (20000h), la portance est gardée et la traînée est ajoutée deux fois. Rend l'adresse de dword_7CE4E."
 },
 "sub_48964": {
 "segment": "seg114",
@@ -22508,8 +22508,8 @@
 "sub_46C16",
 "sub_46922"
 ],
-"new_name": "sub_48964",
-"summary": ""
+"new_name": "Aero_ComputeAoACommand_48964",
+"summary": "far. LUE 2026-11-05. Remplace Aero_ComputeAoACommand_48862 de STRIKE : PLUS DE LOI DE CHARGE (ni masse, ni q, ni cos du tangage, ni facteur 1,5). Bit 5 ou q < 1 → consigne [si+16h] = 0. m = manche [ctrl+1Fh] ÷ 16, ÷ 2 si négatif (STRIKE : ÷ 3), × dword_7CE26 (gain de la gouverne de profondeur) ; bit 6 (décrochage) → m = 0. T = α_max (jdyn[76h], champ 20 de JDYN) × m. Cas joueur, bit 4 à 0, byte_7CEF8 = 4 et dword_7977E = 1,0 : T += calage, fin. Sinon : c = −calage (−volets jdyn[5Eh] si bit 1) ; si m = 0, T = α actuelle ; T gardée si elle est entre c et c + T×gain, sinon T = c + T×gain ; bornée à ± α_max × gain ; puis si décrochage ou m ≠ 0 : T = α_max × m."
 },
 "sub_48C43": {
 "segment": "seg114",
@@ -22535,8 +22535,8 @@
 "sub_5A065",
 "sub_4B590"
 ],
-"new_name": "sub_48C92",
-"summary": ""
+"new_name": "Aero_RollCommand_48C92",
+"summary": "far. Apparié 2026-11-05 à Aero_ComputeControlFlags75Bit5C de STRIKE (roulis), ratio 0,90 ; constantes identiques une fois les champs décalés ; lignes ajoutées autour du drapeau au sol non relues."
 },
 "sub_48F55": {
 "segment": "seg114",
@@ -22545,8 +22545,8 @@
 "lines": 59,
 "type": "far",
 "calls": [],
-"new_name": "sub_48F55",
-"summary": ""
+"new_name": "Aero_YawCommand_48F55",
+"summary": "far. Apparié 2026-11-05 à Aero_ResetAccumulatorFlags75Bit5 de STRIKE (consigne de lacet, palonnier), constantes identiques une fois les champs décalés."
 },
 "sub_48FEA": {
 "segment": "seg114",
@@ -22574,8 +22574,8 @@
 "sub_48C43",
 "sub_57C2E"
 ],
-"new_name": "sub_49011",
-"summary": ""
+"new_name": "Aero_ControlOrchestrator_49011",
+"summary": "far. LUE 2026-11-05. Équivalent d'Aero_ControlOrchestrator_48FC2 : Aero_ComputeAoACommand_48964, sub_48F55 (consigne de lacet), puis trois moments : sub_48FEA, Aero_RollCommand_48C92, sub_48C43, rangés dans le vecteur statique 6736h (Utility_Helper_57C2E). L'ordre des trois derniers diffère de STRIKE ; leurs rôles exacts sont repris par ressemblance, non relus."
 },
 "sub_4908A": {
 "segment": "seg114",
@@ -22617,8 +22617,8 @@
 "sub_5A065",
 "sub_4710B"
 ],
-"new_name": "sub_4936E",
-"summary": ""
+"new_name": "JDYN_JumpToPoint_4936E",
+"summary": "far. Apparié 2026-11-05 à JDYN_JumpToPoint_49242 de STRIKE, ratio 0,95 ; deux constantes de STRIKE (253, 254) absentes ici ; non relu."
 },
 "sub_495B1": {
 "segment": "seg114",
@@ -22665,8 +22665,8 @@
 "sub_57715",
 "sub_59429"
 ],
-"new_name": "sub_49925",
-"summary": ""
+"new_name": "Autopilot_NosePitchRelax_49925",
+"summary": "far. Comparée 2026-11-05 à Autopilot_NosePitchRelax_498B5 de STRIKE : suite d'instructions identique."
 },
 "sub_49AF0": {
 "segment": "seg114",
@@ -22679,8 +22679,8 @@
 "sub_58E8E",
 "sub_59429"
 ],
-"new_name": "sub_49AF0",
-"summary": ""
+"new_name": "Autopilot_BankForTurn_49AF0",
+"summary": "far. Comparée 2026-11-05 à Autopilot_BankForTurn_49A7C de STRIKE : mêmes constantes (ratio 0,98)."
 },
 "sub_49CB8": {
 "segment": "seg114",
@@ -22708,8 +22708,8 @@
 "sub_57715",
 "sub_49925"
 ],
-"new_name": "sub_49CB8",
-"summary": ""
+"new_name": "Autopilot_FlyToPointKinematic_49CB8",
+"summary": "far. Comparée 2026-11-05 à Autopilot_FlyToPointKinematic_49C2E de STRIKE : même suite d'instructions (ratio 1,0), mais constantes différentes (STRIKE : 5, 20, 25, 50 ; ici : 1, 2, 3, 10, 360) ; non relue."
 },
 "sub_4A8D7": {
 "segment": "seg114",
@@ -22757,8 +22757,8 @@
 "sub_5A065",
 "sub_59A03"
 ],
-"new_name": "sub_4A8F4",
-"summary": ""
+"new_name": "PhysicsTicks_4A8F4",
+"summary": "far, 950 instructions. LUE 2026-11-05. Tick physique de l'avion (équivalent de PhysicsTicks). Ordre : gains de dégâts ([bx+34h]) ; AU SOL : joueur + variable 667 posée + vitesse < 20 m/s → au sol forcé, sol = dword_776A2 (120 m s'il est sous 10 m) ; autres : sub_3664D ; décollage (au sol effacé) si l'altitude dépasse sol + garde (Aircraft_GroundClearance_3DF89) + dword_7CDE6 (si 667 à 0) + 10 m ; sub_4B53B ; MOTEUR : carburant ≤ 0 → poussée 0 ; cran ≤ arrondi(10·g) ; poussée = Aero_PropellerThrust_4710B × g (dword_7CE36) ; carburant −= (10 − 9·dword_7CE1E)·sfc·(cran·0,199 si ≤ 5, sinon cran·0,297 ; facteur sauté au cran 0)·dt, comme STRIKE ; COMMANDES → drapeaux [si+92h] (bit 0 aérofreins, bit 1 avec son 18, bit 2 train, bits 4, 5 (méthode +44h), bits 7-8 compteur 0..2), chaque organe bloqué si détruit (octets +42h..+44h de l'objet de dégâts contre leurs maxima +7..+9) ; 1re image : bit 2 si vitesse nulle, cran 4 sinon ; PILOTE AUTOMATIQUE si jdyn[85h] ≠ 255 et bit 5 à 0 ; FORCES : Aero_SumLinearForces_486B5 ; VITESSE BORNÉE à 2 × Vref (jdyn[9Dh]) ; Aero_ControlOrchestrator_49011 ; Physics_IntegrateSecondaryPosition ; au sol sous 25 m/s : lacet = −([ctrl+21h]/16 · V)/4 (STRIKE : 40 m/s) ; Physics_IntegratePosition_462A6 ; AU SOL : vitesse projetée sur le sol, annulée sous 5/256 ; jdyn[79h] = 10, [7Dh] = 20, [81h] = 0,5 ; tangage du nez (sub_59A03) : à l'arrêt hors de 10 ± 0,5° → remis à 10° (méthode +2Ch) ; sous 20 m/s : vitesse de tangage menée vers 10°, bornée à 0,5·dt (roulette de queue)."
 },
 "sub_4B53B": {
 "segment": "seg114",
@@ -22794,8 +22794,8 @@
 "sub_469CA",
 "sub_5A065"
 ],
-"new_name": "sub_4B590",
-"summary": ""
+"new_name": "Aero_MaxRollRate_4B590",
+"summary": "far. Apparié 2026-11-05 à Aero_MaxRollRate_4AF35 de STRIKE, ratio 0,89 ; constantes identiques une fois les champs décalés."
 },
 "sub_4B6E2": {
 "segment": "seg114",

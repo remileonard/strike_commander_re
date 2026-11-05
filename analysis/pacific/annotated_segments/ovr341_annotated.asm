@@ -355,7 +355,7 @@ arg_0		= word ptr  6
 		mov	ax, si
 		add	ax, 4
 		push	ax
-		call	sub_47600
+		call	Aero_ComputeForcesMain_47600
 		pop	cx
 		push	ax
 		mov	ax, si

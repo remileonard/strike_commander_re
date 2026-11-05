@@ -386,7 +386,11 @@ sub_46338		endp
 
 ; Attributes: bp-based frame
 
-sub_463B3		proc far
+; ==============================================================================================
+; far. Apparié 2026-11-05 à Physics_ResolveWindVectorCached_4643B de STRIKE.EXE (vitesse en
+; repère corps, cache par image) ; rend l'adresse du vecteur. Non relu ligne à ligne.
+; ==============================================================================================
+Physics_ResolveWindVectorCached_463B3		proc far
 
 arg_0		= word ptr  6
 
@@ -415,7 +419,7 @@ arg_0		= word ptr  6
 		pop	si
 		pop	bp
 		retf
-sub_463B3		endp
+Physics_ResolveWindVectorCached_463B3		endp
 
 ; ----------------------------------------------------------------------
 

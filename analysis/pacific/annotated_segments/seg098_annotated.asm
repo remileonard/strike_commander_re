@@ -1466,7 +1466,7 @@ arg_6		= dword ptr  0Ch
 		call	dword ptr [bx+48h]
 		pop	cx
 		push	ax
-		call	sub_4936E
+		call	JDYN_JumpToPoint_4936E
 		add	sp, 0Ah
 		push	large [si+5Ah]
 		call	sub_11C42

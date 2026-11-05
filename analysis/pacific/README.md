@@ -919,7 +919,75 @@ mot à l'octet 61, le champ 26 un u32 à l'octet 67. Ce qui change, c'est le cod
 Pour libRealSpace : en lisant un `JDYN` de Pacific Strike, ces deux champs servent à la poussée. Non vérifié : si l'IA
 de Pacific Strike les lit encore comme dans Strike Commander.
 
-Le reste du modèle de vol (forces, moments, `ATMO`, `STBL`) n'a pas encore été comparé.
+### 9.1 Le reste du modèle de vol
+
+Lu le 2026-11-05. Méthode : chaque fonction du modèle de vol de PACIFIC.EXE (seg112 à seg114) a été appariée à sa
+voisine de STRIKE.EXE par la suite de ses instructions, puis comparée constante par constante, en compensant le
+décalage des champs de `JDYN` en mémoire. Les fonctions qui changent ont été lues. Les valeurs sont en flottants,
+angles en degrés, vitesses en m/s.
+
+**Inchangé** (même calcul que Strike Commander, `PHYSICS.md`) : angles d'incidence et de dérapage
+(`Aero_FlowAngle_AoA_46922`, `Aero_FlowAngle_Sideslip_469CA`), pression dynamique (`Aero_DynamicPressure_46C16`),
+densité de l'air selon l'altitude (`Atmosphere_AirDensityAtAltitude_46C8D`), incidence avec calage
+(`Aero_ComputeAoAWithTrim_47DBA`), traînée des aérofreins et du train (`Aero_ComputeDragFromFlags_47D30`), roulis et
+lacet (`Aero_RollCommand_48C92`, `Aero_YawCommand_48F55`, `Aero_MaxRollRate_4B590`), intégration de la position et
+des vitesses angulaires, consommation de carburant, pilote automatique (`Autopilot_BankForTurn_49AF0`,
+`Autopilot_NosePitchRelax_49925`). `Autopilot_FlyToPointKinematic_49CB8` a la même suite d'instructions mais d'autres
+constantes (non relu).
+
+**1. Consigne de tangage : plus de loi de charge** (`Aero_ComputeAoACommand_48964`). Strike Commander calcule
+l'incidence voulue à partir d'un facteur de charge (masse, pression dynamique, cosinus du tangage, facteur 1,5).
+Pacific Strike commande l'incidence directement :
+
+```
+si bit 5 des drapeaux, ou q < 1 : consigne = 0
+m = manche longitudinal ÷ 16 ; m ÷ 2 si le manche est poussé (Strike Commander : ÷ 3)
+m = m × gain de la gouverne de profondeur
+si décrochage (bit 6) : m = 0
+α_max = JDYN champ 20 (octet 58 du chunk)          Corsair : 20°
+manche hors du neutre : consigne = α_max × m
+manche au neutre       : l'incidence actuelle est gardée, bornée entre −calage (−volets) et la limite
+borne finale : ± α_max × gain de la gouverne de profondeur
+```
+
+Un cas particulier du joueur (`byte_7CEF8` = 4 et `dword_7977E` = 1,0) ajoute le calage à la consigne ; non identifié.
+
+**2. Portance : décrochage aussi par la vitesse** (`Aero_ComputeLiftAndSideForce_47E1E`). Le décrochage (portance
+nulle, alerte) a lieu si |α| dépasse l'incidence de décrochage, comme Strike Commander, **ou si la vitesse passe sous
+la vitesse de décrochage** : partie entière du dernier champ de `THRS` (Corsair : 45 m/s), un huitième de moins quand
+le bit 1 des drapeaux est posé. Il ne touche que le joueur, et pas avec l'option `word_7CB07` = 2. Force latérale :
+coefficient ÷ 8 au lieu de ÷ 4.
+
+**3. Traînée** (`Aero_ComputeDragWithFeedback_481AB`) : même formule, sauf l'option `word_7CB07` : la part de
+l'incidence au-delà de (calage + 1) compte × 0,797 (incidence négative) ou × 0,656 (positive) à 1, × 0,5 ou × 0,328 à 2.
+
+**4. Somme des forces** (`Aero_SumLinearForces_486B5`) : identique, sauf quand le bit 5 des drapeaux est posé.
+Strike Commander met alors poussée et portance à zéro ; Pacific Strike divise la poussée par 512, garde la portance et
+compte la traînée deux fois.
+
+**5. Asservissement d'attitude** (`Aero_ComputeForcesMain_47600`) : incidence et dérapage forcés à ± 90° aussi en
+décrochage, pour les objets dont le type ([objet+2] & 6Fh) vaut 4Eh (type non identifié) ; Strike Commander ne le fait
+que quand le flux vient de l'arrière.
+
+**6. Le tick** (`PhysicsTicks_4A8F4`) garde l'ordre de Strike Commander et ajoute :
+
+- **porte-avions** : pour le joueur, si la variable 667 de la table commune (§ 2.1) est posée et que sa vitesse est
+  sous 20 m/s, il est mis au sol et le niveau du sol vient de `dword_776A2` (120 m s'il est sous 10 m) ;
+- **commandes** : les touches posent les bits des drapeaux (aérofreins, volets avec un son, train, compteur à 3
+  positions), chacune bloquée si l'organe est détruit ;
+- **première image** : train sorti si l'avion est à l'arrêt, sinon manette au cran 4 ;
+- **vitesse plafonnée** à 2 × Vref (champ 23 de `JDYN` ; Corsair : 394 m/s) ;
+- **roulage** : lacet imposé par le manche sous **25 m/s** (Strike Commander : 40 m/s), même formule ;
+- **roulette de queue** : au sol, le tangage du nez est ramené vers **10°** : remis d'un coup à 10° à l'arrêt s'il
+  sort de 10 ± 0,5°, mené vers 10° à au plus 0,5 °/s sous 20 m/s. Ces trois valeurs sont fixes, pas lues dans le fichier.
+
+**Les deux options de difficulté.** `word_7CB07` (0, 1 ou 2, 1 par défaut) donne au joueur plus de puissance à basse
+vitesse, moins de traînée à forte incidence, et à 2 supprime son décrochage. `byte_7CB11` (0 par défaut) règle la
+puissance d'autres avions (× 0,898 / 0,949 / 1,0). Chacune enlève 0,098 (à 1) ou 0,199 (à 2) au multiplicateur de score.
+Leur nom à l'écran n'a pas été trouvé.
+
+Hors du modèle de vol de l'avion : seg111 (code sans équivalent dans STRIKE.EXE) traite des objets au sol ou des
+navires (`GroundObj_AccelerateToCruise_43156`, file radio).
 
 ## 5. Rapport avec libRealSpace
 

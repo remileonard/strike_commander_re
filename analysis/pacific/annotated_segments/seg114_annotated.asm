@@ -101,7 +101,13 @@ sub_47CD1		endp
 
 ; Attributes: bp-based frame
 
-sub_47D30		proc far
+; ==============================================================================================
+; far. Comparée le 2026-11-05 à Aero_ComputeDragFromFlags75 de STRIKE.EXE : même calcul
+; (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17,
+; +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image).
+; ==============================================================================================
+Aero_ComputeDragFromFlags_47D30		proc far
 
 arg_0		= word ptr  6
 
@@ -162,13 +168,19 @@ loc_47DB3:
 		pop	si
 		pop	bp
 		retf
-sub_47D30		endp
+Aero_ComputeDragFromFlags_47D30		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_47DBA		proc far
+; ==============================================================================================
+; far. Comparée le 2026-11-05 à Aero_ComputeAoAWithTrim_480CA de STRIKE.EXE : même calcul
+; (constantes identiques une fois compensé le décalage des champs de JDYN en mémoire : +17,
+; +29 au-delà de +128) ; différences de forme seulement (résultat rendu par adresse d'une
+; variable globale, cache une fois par image).
+; ==============================================================================================
+Aero_ComputeAoAWithTrim_47DBA		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -185,7 +197,7 @@ arg_0		= word ptr  6
 
 loc_47DCF:
 		push	si
-		call	sub_46922
+		call	Aero_FlowAngle_AoA_46922
 		pop	cx
 		mov	bx, ax
 		mov	eax, [bx]
@@ -213,13 +225,22 @@ loc_47E18:
 		pop	si
 		leave
 		retf
-sub_47DBA		endp
+Aero_ComputeAoAWithTrim_47DBA		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_47E1E		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme Aero_ComputeLiftAndSideForce_4812B de STRIKE (portance
+; k·dword_7CE2E·α_eff·q, force latérale), avec : (1) force latérale k÷8 au lieu de k÷4 (sar
+; eax, 3) ; (2) DÉCROCHAGE aussi par la vitesse : si |α_eff| > α_décrochage (jdyn[5Ch]) OU si
+; la vitesse est sous Vs = partie entière du dernier champ de THRS ([si+41h], ÷8 de moins si
+; le bit 1 de [si+92h] est posé) ; (3) le décrochage (portance nulle, bit 6 = pas au sol)
+; n'est appliqué que si word_7977C > 10 images, l'objet est celui de word_7CADA (joueur) ET
+; word_7CB07 < 2 (option de difficulté : à 2, pas de décrochage).
+; ==============================================================================================
+Aero_ComputeLiftAndSideForce_47E1E		proc far
 
 var_66		= dword ptr -66h
 var_62		= dword ptr -62h
@@ -265,19 +286,19 @@ arg_0		= word ptr  6
 
 loc_47E34:
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	di, ax
 		push	si
 		push	cs
-		call	near ptr sub_47DBA
+		call	near ptr Aero_ComputeAoAWithTrim_47DBA
 		pop	cx
 		mov	[bp+var_6], ax
 		mov	bx, [bp+var_6]
 		mov	eax, [bx]
 		mov	[bp+var_4], eax
 		push	si
-		call	sub_469CA
+		call	Aero_FlowAngle_Sideslip_469CA
 		pop	cx
 		mov	[bp+var_C], ax
 		mov	bx, [bp+var_C]
@@ -298,7 +319,7 @@ loc_47E71:
 loc_47E81:
 		mov	[bp+var_14], eax
 		push	word ptr [si+10h]
-		call	sub_46C16
+		call	Aero_DynamicPressure_46C16
 		pop	cx
 		mov	[bp+var_1A], ax
 		mov	bx, [bp+var_1A]
@@ -565,13 +586,21 @@ loc_48189:
 		pop	si
 		leave
 		retf
-sub_47E1E		endp
+Aero_ComputeLiftAndSideForce_47E1E		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_481AB		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme Aero_ComputeDragWithFeedback_48400 de STRIKE (traînée = q·(k·α'²
+; + k/8·β² + traînée des drapeaux), terme au sol, direction opposée au flux), avec : option
+; word_7CB07 = 1 : la part de |α_eff| au-delà de L = calage (jdyn[5Dh]) + 1 compte × 0,797 (α
+; < 0) ou × 0,656 (α > 0) ; = 2 : × 0,5 ou × 0,328 ; = 0 : inchangé. Bloc « V > Vref
+; (jdyn[9Dh]) : vecteur de [si+10h] × V/Vref » sans effet (vecteur réécrit ensuite à
+; loc_4862A).
+; ==============================================================================================
+Aero_ComputeDragWithFeedback_481AB		proc far
 
 var_6C		= dword ptr -6Ch
 var_68		= dword ptr -68h
@@ -618,13 +647,13 @@ arg_0		= word ptr  6
 		mov	[bp+var_4], eax
 		push	si
 		push	cs
-		call	near ptr sub_47DBA
+		call	near ptr Aero_ComputeAoAWithTrim_47DBA
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
 		mov	[bp+var_8], eax
 		push	si
-		call	sub_469CA
+		call	Aero_FlowAngle_Sideslip_469CA
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -799,7 +828,7 @@ loc_483A4:
 
 loc_48410:
 		push	word ptr [si+10h]
-		call	sub_46C16
+		call	Aero_DynamicPressure_46C16
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -808,13 +837,13 @@ loc_48410:
 		mov	[bp+var_16], eax
 		push	si
 		push	cs
-		call	near ptr sub_47D30
+		call	near ptr Aero_ComputeDragFromFlags_47D30
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
 		mov	[bp+var_1A], eax
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	di, ax
 		mov	ax, si
@@ -1014,13 +1043,19 @@ loc_4862A:
 		pop	si
 		leave
 		retf
-sub_481AB		endp
+Aero_ComputeDragWithFeedback_481AB		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_486B5		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme Aero_SumLinearForces_48639 de STRIKE (F = poussée÷256 + portance
+; + traînée ; accel = F/masse ; facteur de charge [si+99h] ; + gravité), SAUF bit 5 de
+; [si+92h] : STRIKE met poussée et portance à 0 ; ici la poussée est divisée par 512 (20000h),
+; la portance est gardée et la traînée est ajoutée deux fois. Rend l'adresse de dword_7CE4E.
+; ==============================================================================================
+Aero_SumLinearForces_486B5		proc far
 
 var_28		= dword ptr -28h
 var_24		= dword ptr -24h
@@ -1051,7 +1086,7 @@ arg_0		= word ptr  6
 loc_486CB:
 		push	si
 		push	cs
-		call	near ptr sub_47E1E
+		call	near ptr Aero_ComputeLiftAndSideForce_47E1E
 		pop	cx
 		mov	[bp+var_2], ax
 		mov	ax, si
@@ -1062,7 +1097,7 @@ loc_486CB:
 		mov	[bp+var_4], ax
 		push	si
 		push	cs
-		call	near ptr sub_481AB
+		call	near ptr Aero_ComputeDragWithFeedback_481AB
 		pop	cx
 		mov	di, ax
 		mov	ax, si
@@ -1080,7 +1115,7 @@ loc_486CB:
 		mov	[bp+var_20], eax
 		push	si
 		push	cs
-		call	near ptr sub_47E1E
+		call	near ptr Aero_ComputeLiftAndSideForce_47E1E
 		pop	cx
 		mov	[bp+var_8], ax
 		mov	bx, [bp+var_8]
@@ -1115,7 +1150,7 @@ loc_486CB:
 		mov	[bx+8], eax
 		push	si
 		push	cs
-		call	near ptr sub_481AB
+		call	near ptr Aero_ComputeDragWithFeedback_481AB
 		pop	cx
 		mov	[bp+var_C], ax
 		mov	bx, [bp+var_C]
@@ -1254,13 +1289,23 @@ loc_488C9:
 		pop	si
 		leave
 		retf
-sub_486B5		endp
+Aero_SumLinearForces_486B5		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_48964		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Remplace Aero_ComputeAoACommand_48862 de STRIKE : PLUS DE LOI DE CHARGE
+; (ni masse, ni q, ni cos du tangage, ni facteur 1,5). Bit 5 ou q < 1 → consigne [si+16h] = 0.
+; m = manche [ctrl+1Fh] ÷ 16, ÷ 2 si négatif (STRIKE : ÷ 3), × dword_7CE26 (gain de la
+; gouverne de profondeur) ; bit 6 (décrochage) → m = 0. T = α_max (jdyn[76h], champ 20 de
+; JDYN) × m. Cas joueur, bit 4 à 0, byte_7CEF8 = 4 et dword_7977E = 1,0 : T += calage, fin.
+; Sinon : c = −calage (−volets jdyn[5Eh] si bit 1) ; si m = 0, T = α actuelle ; T gardée si
+; elle est entre c et c + T×gain, sinon T = c + T×gain ; bornée à ± α_max × gain ; puis si
+; décrochage ou m ≠ 0 : T = α_max × m.
+; ==============================================================================================
+Aero_ComputeAoACommand_48964		proc far
 
 var_30		= dword ptr -30h
 var_2C		= word ptr -2Ch
@@ -1288,7 +1333,7 @@ arg_2		= word ptr  8
 		push	di
 		mov	si, [bp+arg_0]
 		push	word ptr [si+10h]
-		call	sub_46C16
+		call	Aero_DynamicPressure_46C16
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -1307,7 +1352,7 @@ loc_48999:
 
 loc_489A4:
 		push	si
-		call	sub_46922
+		call	Aero_FlowAngle_AoA_46922
 		pop	cx
 		mov	di, ax
 		mov	al, [si+92h]
@@ -1530,7 +1575,7 @@ loc_48C3F:
 		pop	si
 		leave
 		retf
-sub_48964		endp
+Aero_ComputeAoACommand_48964		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1551,13 +1596,13 @@ arg_0		= word ptr  6
 
 loc_48C56:
 		push	si
-		call	sub_47600
+		call	Aero_ComputeForcesMain_47600
 		pop	cx
 		mov	bx, ax
 		mov	eax, [bx]
 		mov	dword_7CE5A, eax
 		push	word ptr [si]
-		call	sub_463B3
+		call	Physics_ResolveWindVectorCached_463B3
 		pop	cx
 		mov	di, ax
 		mov	bx, [si]
@@ -1580,7 +1625,12 @@ sub_48C43		endp
 
 ; Attributes: bp-based frame
 
-sub_48C92		proc far
+; ==============================================================================================
+; far. Apparié 2026-11-05 à Aero_ComputeControlFlags75Bit5C de STRIKE (roulis), ratio 0,90 ;
+; constantes identiques une fois les champs décalés ; lignes ajoutées autour du drapeau au sol
+; non relues.
+; ==============================================================================================
+Aero_RollCommand_48C92		proc far
 
 var_38		= dword ptr -38h
 var_34		= dword ptr -34h
@@ -1791,7 +1841,7 @@ loc_48E4F:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_4B590
+		call	near ptr Aero_MaxRollRate_4B590
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -1869,13 +1919,17 @@ loc_48F4E:
 		pop	si
 		leave
 		retf
-sub_48C92		endp
+Aero_RollCommand_48C92		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_48F55		proc far
+; ==============================================================================================
+; far. Apparié 2026-11-05 à Aero_ResetAccumulatorFlags75Bit5 de STRIKE (consigne de lacet,
+; palonnier), constantes identiques une fois les champs décalés.
+; ==============================================================================================
+Aero_YawCommand_48F55		proc far
 
 var_10		= dword ptr -10h
 var_C		= word ptr -0Ch
@@ -1933,7 +1987,7 @@ loc_48FE7:
 		pop	si
 		leave
 		retf
-sub_48F55		endp
+Aero_YawCommand_48F55		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1952,7 +2006,7 @@ arg_0		= word ptr  6
 
 loc_48FFB:
 		push	ax
-		call	sub_47600
+		call	Aero_ComputeForcesMain_47600
 		pop	cx
 		mov	bx, ax
 		mov	eax, [bx+8]
@@ -1966,7 +2020,14 @@ sub_48FEA		endp
 
 ; Attributes: bp-based frame
 
-sub_49011		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent d'Aero_ControlOrchestrator_48FC2 :
+; Aero_ComputeAoACommand_48964, sub_48F55 (consigne de lacet), puis trois moments : sub_48FEA,
+; Aero_RollCommand_48C92, sub_48C43, rangés dans le vecteur statique 6736h
+; (Utility_Helper_57C2E). L'ordre des trois derniers diffère de STRIKE ; leurs rôles exacts
+; sont repris par ressemblance, non relus.
+; ==============================================================================================
+Aero_ControlOrchestrator_49011		proc far
 
 var_10		= dword ptr -10h
 var_C		= dword ptr -0Ch
@@ -1987,12 +2048,12 @@ loc_49024:
 		push	large [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_48964
+		call	near ptr Aero_ComputeAoACommand_48964
 		add	sp, 6
 		push	large [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_48F55
+		call	near ptr Aero_YawCommand_48F55
 		add	sp, 6
 		sub	sp, 4
 		push	si
@@ -2006,7 +2067,7 @@ loc_49024:
 		push	large [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_48C92
+		call	near ptr Aero_RollCommand_48C92
 		add	sp, 6
 		mov	di, ax
 		mov	eax, [di]
@@ -2027,7 +2088,7 @@ loc_49024:
 		pop	si
 		pop	bp
 		retf
-sub_49011		endp
+Aero_ControlOrchestrator_49011		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2356,7 +2417,11 @@ sub_492E3		endp
 
 ; Attributes: bp-based frame
 
-sub_4936E		proc far
+; ==============================================================================================
+; far. Apparié 2026-11-05 à JDYN_JumpToPoint_49242 de STRIKE, ratio 0,95 ; deux constantes de
+; STRIKE (253, 254) absentes ici ; non relu.
+; ==============================================================================================
+JDYN_JumpToPoint_4936E		proc far
 
 var_5A		= word ptr -5Ah
 var_36		= dword ptr -36h
@@ -2560,7 +2625,7 @@ loc_4953E:
 		pop	si
 		leave
 		retf
-sub_4936E		endp
+JDYN_JumpToPoint_4936E		endp
 
 ; ----------------------------------------------------------------------
 
@@ -2907,7 +2972,11 @@ sub_4991D		endp
 
 ; Attributes: bp-based frame
 
-sub_49925		proc far
+; ==============================================================================================
+; far. Comparée 2026-11-05 à Autopilot_NosePitchRelax_498B5 de STRIKE : suite d'instructions
+; identique.
+; ==============================================================================================
+Autopilot_NosePitchRelax_49925		proc far
 
 var_5C		= dword ptr -5Ch
 var_58		= dword ptr -58h
@@ -3093,13 +3162,17 @@ loc_49AEC:
 		pop	si
 		leave
 		retf
-sub_49925		endp
+Autopilot_NosePitchRelax_49925		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_49AF0		proc far
+; ==============================================================================================
+; far. Comparée 2026-11-05 à Autopilot_BankForTurn_49A7C de STRIKE : mêmes constantes (ratio
+; 0,98).
+; ==============================================================================================
+Autopilot_BankForTurn_49AF0		proc far
 
 var_54		= dword ptr -54h
 var_50		= dword ptr -50h
@@ -3322,13 +3395,18 @@ loc_49CB4:
 		pop	si
 		leave
 		retf
-sub_49AF0		endp
+Autopilot_BankForTurn_49AF0		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_49CB8		proc far
+; ==============================================================================================
+; far. Comparée 2026-11-05 à Autopilot_FlyToPointKinematic_49C2E de STRIKE : même suite
+; d'instructions (ratio 1,0), mais constantes différentes (STRIKE : 5, 20, 25, 50 ; ici : 1,
+; 2, 3, 10, 360) ; non relue.
+; ==============================================================================================
+Autopilot_FlyToPointKinematic_49CB8		proc far
 
 var_276		= dword ptr -276h
 var_272		= dword ptr -272h
@@ -4182,7 +4260,7 @@ loc_4A566:
 		push	di
 		push	si
 		push	cs
-		call	near ptr sub_49AF0
+		call	near ptr Autopilot_BankForTurn_49AF0
 		add	sp, 6
 		mov	eax, [bp+var_40]
 		mov	[bp+var_E4], eax
@@ -4395,7 +4473,7 @@ loc_4A77F:
 		push	di
 		push	si
 		push	cs
-		call	near ptr sub_49925
+		call	near ptr Autopilot_NosePitchRelax_49925
 		add	sp, 6
 		mov	eax, dword_79CEC
 		mov	[si+4], eax
@@ -4476,7 +4554,7 @@ loc_4A8D3:
 		pop	si
 		leave
 		retf
-sub_49CB8		endp
+Autopilot_FlyToPointKinematic_49CB8		endp
 
 ; ----------------------------------------------------------------------
 
@@ -4492,7 +4570,7 @@ arg_0		= word ptr  6
 		mov	si, [bp+arg_0]
 		push	si
 		push	cs
-		call	near ptr sub_486B5
+		call	near ptr Aero_SumLinearForces_486B5
 		pop	cx
 		push	ax
 		push	word ptr [si]
@@ -4508,7 +4586,26 @@ sub_4A8D7		endp
 
 ; Attributes: bp-based frame
 
-sub_4A8F4		proc far
+; ==============================================================================================
+; far, 950 instructions. LUE 2026-11-05. Tick physique de l'avion (équivalent de
+; PhysicsTicks). Ordre : gains de dégâts ([bx+34h]) ; AU SOL : joueur + variable 667 posée +
+; vitesse < 20 m/s → au sol forcé, sol = dword_776A2 (120 m s'il est sous 10 m) ; autres :
+; sub_3664D ; décollage (au sol effacé) si l'altitude dépasse sol + garde
+; (Aircraft_GroundClearance_3DF89) + dword_7CDE6 (si 667 à 0) + 10 m ; sub_4B53B ; MOTEUR :
+; carburant ≤ 0 → poussée 0 ; cran ≤ arrondi(10·g) ; poussée = Aero_PropellerThrust_4710B × g
+; (dword_7CE36) ; carburant −= (10 − 9·dword_7CE1E)·sfc·(cran·0,199 si ≤ 5, sinon cran·0,297 ;
+; facteur sauté au cran 0)·dt, comme STRIKE ; COMMANDES → drapeaux [si+92h] (bit 0 aérofreins,
+; bit 1 avec son 18, bit 2 train, bits 4, 5 (méthode +44h), bits 7-8 compteur 0..2), chaque
+; organe bloqué si détruit (octets +42h..+44h de l'objet de dégâts contre leurs maxima +7..+9)
+; ; 1re image : bit 2 si vitesse nulle, cran 4 sinon ; PILOTE AUTOMATIQUE si jdyn[85h] ≠ 255
+; et bit 5 à 0 ; FORCES : Aero_SumLinearForces_486B5 ; VITESSE BORNÉE à 2 × Vref (jdyn[9Dh]) ;
+; Aero_ControlOrchestrator_49011 ; Physics_IntegrateSecondaryPosition ; au sol sous 25 m/s :
+; lacet = −([ctrl+21h]/16 · V)/4 (STRIKE : 40 m/s) ; Physics_IntegratePosition_462A6 ; AU SOL
+; : vitesse projetée sur le sol, annulée sous 5/256 ; jdyn[79h] = 10, [7Dh] = 20, [81h] = 0,5
+; ; tangage du nez (sub_59A03) : à l'arrêt hors de 10 ± 0,5° → remis à 10° (méthode +2Ch) ;
+; sous 20 m/s : vitesse de tangage menée vers 10°, bornée à 0,5·dt (roulette de queue).
+; ==============================================================================================
+PhysicsTicks_4A8F4		proc far
 
 var_E6		= dword ptr -0E6h
 var_E2		= dword ptr -0E2h
@@ -5217,7 +5314,7 @@ loc_4AF6E:
 		push	large [bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr sub_49CB8
+		call	near ptr Autopilot_FlyToPointKinematic_49CB8
 		add	sp, 6
 		mov	al, 1
 		jmp	loc_4B537
@@ -5225,7 +5322,7 @@ loc_4AF6E:
 loc_4AF96:
 		push	si
 		push	cs
-		call	near ptr sub_486B5
+		call	near ptr Aero_SumLinearForces_486B5
 		pop	cx
 		mov	di, ax
 		mov	eax, [di]
@@ -5331,7 +5428,7 @@ loc_4B0F9:
 		push	large [bp+var_4]
 		push	si
 		push	cs
-		call	near ptr sub_49011
+		call	near ptr Aero_ControlOrchestrator_49011
 		add	sp, 6
 		push	ax
 		push	si
@@ -5706,7 +5803,7 @@ loc_4B537:
 		pop	si
 		leave
 		retf
-sub_4A8F4		endp
+PhysicsTicks_4A8F4		endp
 
 ; ----------------------------------------------------------------------
 
@@ -5758,7 +5855,11 @@ sub_4B575		endp
 
 ; Attributes: bp-based frame
 
-sub_4B590		proc far
+; ==============================================================================================
+; far. Apparié 2026-11-05 à Aero_MaxRollRate_4AF35 de STRIKE, ratio 0,89 ; constantes
+; identiques une fois les champs décalés.
+; ==============================================================================================
+Aero_MaxRollRate_4B590		proc far
 
 var_34		= dword ptr -34h
 var_30		= dword ptr -30h
@@ -5799,11 +5900,11 @@ loc_4B5A6:
 		mov	[bp+var_8], eax
 		mov	[bp+var_4], eax
 		push	si
-		call	sub_46922
+		call	Aero_FlowAngle_AoA_46922
 		pop	cx
 		mov	di, ax
 		push	si
-		call	sub_469CA
+		call	Aero_FlowAngle_Sideslip_469CA
 		pop	cx
 		mov	[bp+var_12], ax
 		mov	eax, [di]
@@ -5894,7 +5995,7 @@ loc_4B6DB:
 		pop	si
 		leave
 		retf
-sub_4B590		endp
+Aero_MaxRollRate_4B590		endp
 
 ; ----------------------------------------------------------------------
 
