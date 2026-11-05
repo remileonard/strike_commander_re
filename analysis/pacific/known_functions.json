@@ -6018,5 +6018,10 @@
     "new_name": "GroundAttack_Phase7_1542B",
     "segment": "seg029",
     "summary": "far. LUE 2026-11-05. Phase 7 : [nœud+71] = 1, [entité+361] = 1, garde la direction ; si dword_7C837 < 250 : +20 par tour sur [[avion+99]+62] jusqu'à [[avion+99]+3]. Aucun largage d'arme."
+  },
+  "sub_51DD3": {
+    "new_name": "Expr_VM_SeekLabel_51DD3",
+    "segment": "seg125",
+    "summary": "far. LUE 2026-11-05. Recherche d'étiquette des sauts (équivalent de la recherche de STRIKE.EXE) : depuis la position courante, lit des paires d'octets et s'arrête sur (8 = OP_SET_LABEL, n) ou sur un mot nul (fin du programme, test de [dx] et [dx+1]). Trouvée : position courante = après l'étiquette. Absente : erreur (push 901Fh / sub_1DDFE). Appelée par les sauts conditionnels (argument [di+8]) et par OP_BRANCH (registre de travail [di+10h])."
   }
 }

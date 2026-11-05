@@ -24337,8 +24337,8 @@
 "calls": [
 "sub_1DDFE"
 ],
-"new_name": "sub_51DD3",
-"summary": ""
+"new_name": "Expr_VM_SeekLabel_51DD3",
+"summary": "far. LUE 2026-11-05. Recherche d'étiquette des sauts (équivalent de la recherche de STRIKE.EXE) : depuis la position courante, lit des paires d'octets et s'arrête sur (8 = OP_SET_LABEL, n) ou sur un mot nul (fin du programme, test de [dx] et [dx+1]). Trouvée : position courante = après l'étiquette. Absente : erreur (push 901Fh / sub_1DDFE). Appelée par les sauts conditionnels (argument [di+8]) et par OP_BRANCH (registre de travail [di+10h])."
 },
 "sub_51E46": {
 "segment": "seg125",

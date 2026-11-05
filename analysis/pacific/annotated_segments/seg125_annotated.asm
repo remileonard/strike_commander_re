@@ -318,7 +318,15 @@ Expr_VM_ReadNextToken_51D33		endp
 
 ; Attributes: bp-based frame
 
-sub_51DD3		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Recherche d'étiquette des sauts (équivalent de la recherche de
+; STRIKE.EXE) : depuis la position courante, lit des paires d'octets et s'arrête sur (8 =
+; OP_SET_LABEL, n) ou sur un mot nul (fin du programme, test de [dx] et [dx+1]). Trouvée :
+; position courante = après l'étiquette. Absente : erreur (push 901Fh / sub_1DDFE). Appelée
+; par les sauts conditionnels (argument [di+8]) et par OP_BRANCH (registre de travail
+; [di+10h]).
+; ==============================================================================================
+Expr_VM_SeekLabel_51DD3		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -386,7 +394,7 @@ loc_51E40:
 		pop	si
 		leave
 		retf
-sub_51DD3		endp
+Expr_VM_SeekLabel_51DD3		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1392,7 +1400,7 @@ loc_525C6:
 loc_525C9:
 		push	di
 		push	cs
-		call	near ptr sub_51DD3
+		call	near ptr Expr_VM_SeekLabel_51DD3
 		jmp	loc_52D83
 
 loc_525D1:

@@ -633,6 +633,53 @@ CLOSEUP air 25 ms_rpov 130 128 "I can't give you an answer, Wally. There's no re
 <p>Ce que le nœud fait du mode :</p>
 <ul><li><code>GroundAttack_CanEngage_137A1</code> (méthode +4) : si l'avion n'a pas d'arme utilisable (<code>[emport+36]</code> &lt; 1), ou si la cible est un navire (classe 23 ou 24) sans arme des masques 31 ou 64, l'attaque est acceptée (valeur 10) <b>si le mode vaut 1, ou si l'octet +101 de la description de l'avion vaut 4</b> ; sinon refusée (0). Avec une arme adaptée, les valeurs 9, 7 ou 1 viennent des armes.</li><li><code>GroundAttack_Start_13956</code> (méthode +8) : même condition (mode 1 ou octet +101 = 4) → l'attaque commence <b>directement à la phase 6</b>, avec la valeur 4,0 en <code>[nœud+45]</code> ; sinon, déroulement normal.</li><li><code>GroundAttack_PhaseDispatch_13C9B</code> (méthode +12) joue la phase en cours (12 phases) : - phase 6 (<code>GroundAttack_Phase6_14FBE</code>) : l'avion se dirige vers la cible (<code>sub_A41D</code>) ; aligné et assez près, passe à la phase 7 ; - phase 7 (<code>GroundAttack_Phase7_1542B</code>) : garde le cap vers la cible et augmente de 20 par tour un réglage de l'avion (<code>[avion+99]</code> → +62) jusqu'à son maximum (+3), quand <code>dword_7C837</code> &lt; 250. - <b>Aucun largage d'arme n'est appelé dans ces deux phases.</b></li></ul>
 <p>En résumé : 174 = attaquer une cible ennemie tirée au hasard, comme un ordre de destruction ordinaire ; 175 = même cible, mais contre une cible au sol l'avion fonce dessus (phases 6 et 7) sans avoir besoin d'arme. Les 3 missions qui emploient 175 (<code>IJOK-M1</code>, <code>IJOK-M3</code>, <code>LYTG-M2</code>) sont celles d'Iwo Jima, d'Okinawa et de Leyte, et l'octet +101 = 4 donne le même comportement à certains avions : <b>cela ressemble à une attaque kamikaze, mais ce n'est pas établi</b> (ni l'impact ni le sens de la valeur 4 n'ont été lus).</p>
+<h3>6.7 Règles de lecture pour avoir le bon programme en mémoire</h3>
+<p>Ce que le jeu fait, pas à pas, pour passer du fichier de mission au programme joué par un objet. Chaque règle est suivie de la fonction qui la prouve. Les vérifications sur les données portent sur les 51 missions de <code>PACIFIC.DAT</code>.</p>
+<p><b>1. Le chunk <code>PROG</code> est gardé tel quel.</b> Aucun découpage au chargement : le bloc est copié en mémoire et le chargeur compte seulement les octets nuls aux positions paires (<code>ProgBuffer_LoadRawAndCountMarkers_BF8E9</code>). Ce compte sert de borne (règle 3), pas de liste des programmes.</p>
+<p><b>2. Le programme n commence juste après le n-ième mot nul.</b> <code>ProgBuffer_FindSubProgramByIndex_51C42</code> parcourt le bloc <b>par mots de 2 octets</b> depuis le début (<code>repne scasw</code> avec <code>ax = 0</code>), n fois ; le programme 0 commence à l'octet 0. Un mot nul, c'est l'instruction de fin de programme (instruction 0, argument 0) : dans les données, chaque mot nul est exactement une telle instruction, et chaque programme se termine par elle (aussi le dernier).</p>
+<p><b>3. Un numéro de programme est valable s'il est plus petit que le compte de la règle 1</b> (<code>Expr_LookupNamedValue_530A7</code> : <code>cmp [si], dx</code> / <code>jbe</code> → programme nul). Le numéro 65 535 du fichier veut donc dire « pas de script ». Attention : ce compte <b>n'est pas</b> le nombre de programmes. Une instruction de drapeau dont l'octet haut du numéro vaut 0 laisse aussi un octet nul à une position paire (règle 5) : dans les 51 missions, le compte est plus grand que le nombre de programmes. Pour le portage, découper sur les mots nuls (règle 2) et traiter comme « pas de script » tout numéro qui ne désigne pas un programme existant donne le même résultat sur les données : le plus grand numéro employé est 80 et aucun ne dépasse le nombre de programmes.</p>
+<p><b>4. Une instruction = 2 octets, plus 2 octets par argument supplémentaire</b> (<code>Expr_VM_ReadNextToken_51D33</code>) :</p>
+<pre class="tpl">octet 0 : numéro de l&#x27;instruction
+octet 1 : argument
+tant que l&#x27;octet suivant vaut 9 (3 fois au plus) :
+    octet 9, sauté
+    octet : argument suivant</pre>
+<p>Les arguments absents valent 65 535 (<code>mov word ptr [di+0Ah], 0FFFFh</code>, idem +0Ch et +0Eh). Les données contiennent 433 de ces extensions.</p>
+<p><b>5. Les 22 instructions de drapeau ont 2 octets de plus.</b> Après la lecture de la règle 4, le cas de l'instruction lit un octet de plus, l'octet haut du numéro de variable, puis exige l'octet 5 et le saute (<code>shl dx, 8</code> / <code>add dx, [arg]</code>, puis <code>cmp byte ptr es:[bx], 5</code> ; sinon erreur ; puis <code>inc word ptr [di]</code> en <code>loc_5275A</code>). Le numéro est donc <b>octet bas d'abord</b> :</p>
+<pre class="tpl">octet 0 : numéro de l&#x27;instruction
+octet 1 : numéro de variable, octet bas
+octet 2 : numéro de variable, octet haut
+octet 3 : 5
+numéro = octet 1 + 256 × octet 2      (table commune du § 2.1 : &lt; 256 variable, ≥ 256 drapeau)</pre>
+<p>Les 22 instructions de drapeau :</p>
+<pre class="tpl">OP_MOVE_FLAG_TO_WORK_REGISTER
+OP_SWAP_WORK_AND_FLAG*
+OP_ADD_FLAG_TO_WORK*
+OP_ADD_VALUE_TO_FLAG*
+OP_ADD_WORK_REGISTER_TO_FLAG
+OP_SUB_FLAG_FROM_WORK*
+OP_SUB_VALUE_FROM_FLAG*
+OP_SUB_WORK_FROM_FLAG*
+OP_OR_FLAG_WITH_WORK*
+OP_AND_FLAG_WITH_WORK*
+OP_XOR_FLAG_WITH_WORK*
+OP_MUL_FLAG_WITH_WORK*
+OP_DIV_WORK_BY_FLAG*
+OP_CMP_WORK_WITH_FLAG*
+OP_CMP_FLAG_WITH_WORK*
+OP_TEST_FLAG
+OP_MOVE_WORK_REGISTER_TO_FLAG
+OP_MOVE_RESULT_TO_FLAG*
+OP_SET_FLAG_TO_TRUE
+OP_SET_FLAG_TO_FALSE
+OP_ADD_1_TO_FLAG
+OP_REMOVE_1_TO_FLAG</pre>
+<p>Toutes les instructions ont une longueur paire : un lecteur qui avance instruction par instruction reste aligné sur les mots de la règle 2.</p>
+<p><b>6. Les sauts cherchent l'étiquette vers l'avant, dans le programme courant.</b> Les instructions de saut (<code>OP_GOTO_IF_CURRENT_COMMAND_IN_PROGRESS</code>, <code>OP_BRANCH_IF_EQUAL</code> et les autres <code>OP_BRANCH_IF_*</code>) passent leur argument à <code>Expr_VM_SeekLabel_51DD3</code> ; <code>OP_BRANCH</code> lui passe le registre de travail. Elle part de la position courante, lit des paires d'octets et s'arrête sur la première paire (instruction <code>OP_SET_LABEL</code>, argument n), ou sur un mot nul (fin du programme) : étiquette absente = erreur. Pas de retour en arrière : le programme est rejoué depuis son début à chaque image (§ 6.2). C'est ce que fait déjà <code>SCProg</code> de libRealSpace (<code>jump_to</code>, exécution suspendue jusqu'à l'étiquette). La recherche lit des paires, pas des instructions : un octet haut de drapeau égal à 8 serait pris pour une étiquette. Les données n'en ont aucun ; elles n'ont pas non plus d'octet haut égal à 9, qui serait lu comme une extension par la règle 4.</p>
+<p><b>7. Le chunk <code>PART</code> donne les 4 scripts sur 2 octets.</b> Dans chaque objet de 62 octets, les octets 54, 56, 58 et 60 sont 4 numéros de programme sur 2 octets (<code>on_is_activated</code>, <code>on_mission_update</code>, <code>on_is_destroyed</code>, <code>on_missions_init</code>), résolus en pointeurs au chargement (règle 3). Dans les données : 65 535 (pas de script) ou un numéro de 0 à 80.</p>
+<p><b>8. Un script désigne un objet par son octet 0, pas par son rang dans <code>PART</code>.</b> L'octet 0 de l'objet est rangé en +27 ; la recherche d'un objet (<code>Expr_LookupNamedValue_546A8</code>) parcourt la liste (pas de 89 octets) et compare cet octet. La valeur 255 désigne l'objet qui joue le script (<code>Expr_VM_ReadVarOrOverride_51EEA</code>).</p>
+<p><b>Écarts avec libRealSpace</b> (lecture actuelle, à corriger une fois la documentation relue) :</p>
+<ul><li><code>RSMission::paseMissionScript</code> (Strike Commander) lit des paires et découpe sur la paire (0, 0) : juste pour les instructions de 2 octets, mais une extension (9, x) devient une instruction à part.</li><li><code>PSMissionParser::paseMissionScript</code> : - 9 instructions seulement ont 4 octets ; 8 sont des instructions de drapeau, la 9ᵉ, <code>OP_SAVE_VALUE_TO_GAMFLOW_REGISTER</code>, n'en est pas une dans le jeu (absente des données) ; - il manque <code>OP_ADD_FLAG_TO_WORK</code>*, <code>OP_SUB_VALUE_FROM_FLAG</code>*, <code>OP_SUB_WORK_FROM_FLAG</code>*, <code>OP_CMP_WORK_WITH_FLAG</code>* et <code>OP_CMP_FLAG_WITH_WORK</code>*, présentes 43 fois dans les données (et 8 autres qui n'y sont pas) : leur octet haut et l'octet 5 deviennent une fausse instruction ; - numéro de variable lu octet haut d'abord (<code>data[i+2] | data[i+1] &lt;&lt; 8</code>) : le jeu lit octet bas d'abord (règle 5) ; - les extensions de la règle 4 ne sont pas lues.</li><li><code>RSMission::parseMISN_PART</code> lit l'octet bas de chaque numéro de script et saute l'octet haut : 65 535 devient 255. Sans conséquence sur les données (numéros de 0 à 80), mais le jeu lit 2 octets (règle 7).</li></ul>
 </article>
 
 <!-- 14 -->
