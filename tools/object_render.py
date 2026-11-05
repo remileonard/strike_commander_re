@@ -340,9 +340,14 @@ def draw_face(canvas, model, shading, fi, scr_v):
         rgb = shading.rgb
 
         def glass(a, under):
-            r = (rgb[3 * under] + rgb[3 * colour]) // 2
-            g = (rgb[3 * under + 1] + rgb[3 * colour + 1]) // 2
-            b = (rgb[3 * under + 2] + rgb[3 * colour + 2]) // 2
+            # Sous la face : un index de palette, ou le RVB d'une autre face translucide déjà dessinée.
+            if isinstance(under, tuple):
+                below = under[1:4]
+            else:
+                below = (rgb[3 * under], rgb[3 * under + 1], rgb[3 * under + 2])
+            r = (below[0] + rgb[3 * colour]) // 2
+            g = (below[1] + rgb[3 * colour + 1]) // 2
+            b = (below[2] + rgb[3 * colour + 2]) // 2
             return ("rgb", r, g, b)
         canvas.triangle(pts, flat, glass)
     elif kind == 4:

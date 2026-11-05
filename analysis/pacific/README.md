@@ -823,6 +823,32 @@ raccordent d'une case à l'autre et Pearl Harbor apparaît avec Ford Island, les
 Strike Commander servent tels quels. Leur dessin n'a pas encore été comparé à ces règles (couleur 0, remplacement du
 triangle ombré par la texture, u, v fixes, plans d'eau et de ciel, format des images de `TXMPACK.PAK`).
 
+## 8. Objets 3D (essai sur le F4U Corsair)
+
+Essai du 2026-11-05 sur `OBJECTS\CORSAIR.IFF` (« F4U-1A Corsair »). **Format constaté sur les données, pas relu
+dans PACIFIC.EXE.** Le `FORM JETP` (vol, armes, dégâts) a les mêmes chunks que Strike Commander ; l'apparence
+(`FORM APPR` / `FORM POLY`) change :
+
+| Chunk | Contenu |
+|---|---|
+| `VERT` | sommets, 3 × i32 ÷ 256 (comme Strike Commander) ; X = envergure, 2e composante = nez, 3e = haut |
+| `FORM TRIS` / `FACE` | 8 octets par triangle : type, couleur, 3 × mot sommet |
+| `FORM TRIS` / `MAPS` | 16 octets par face texturée : mot face, mot texture, 3 × (mot u, mot v) |
+| `FORM QUAD` / `FACE` | 10 octets par quadrilatère : type, couleur, 4 × mot sommet |
+| `FORM QUAD` / `MAPS` | 20 octets : mot face, mot texture, 4 × (mot u, mot v) |
+| `FORM LINE` / `FACE` | 6 octets par trait : type, couleur, 2 × mot sommet |
+| `FORM DETA` / `LVLn` | u32 distance, puis numéros de face (triangles, puis quadrilatères, puis traits) ; les listes ne se recouvrent pas : chaque niveau est un modèle complet |
+| `ATTR` | 9 octets par face : mot numéro, lettre de forme (`T`, `Q`, `L`), masque du niveau de détail (1, 2, 4), octet 4 = 0 ou 1, 4 octets à 0 |
+| `FORM TXMS` / `TXMP` | nom (8 octets), largeur, hauteur, un mot (11 088 partout), puis un flux PKWARE DCL de largeur × (hauteur ÷ 2) octets : **une ligne sur deux, chaque ligne affichée deux fois** |
+| `FORM TXMS` / `TXMA` | texture animée (`COPROP`, l'hélice) : nom, largeur, hauteur, nombre d'images, 4 octets, puis le flux |
+
+Les faces texturées sont exactement celles de types 6, 7 et 8, comme dans Strike Commander. Dessiné avec les règles
+de Strike Commander (`tools/object_render.py`, par `tools/ps_object_render.py`) : le sens des sommets est le même,
+et l'objet n'est juste que si l'octet 4 de `ATTR` est pris comme drapeau « face double » (sans lui, la dérive et le
+stabilisateur disparaissent) ; ce rôle reste à confirmer dans le code. Le modèle mesure 25 m d'envergure.
+
+![F4U Corsair : quatre vues et les niveaux de détail 1 et 2](images/ps_corsair.png)
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).
