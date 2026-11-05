@@ -1231,7 +1231,12 @@ Container_Op_1E66D		endp
 
 ; Attributes: bp-based frame
 
-sub_1E6E1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (liste, type, camp, précédent) : objet suivant dont l'octet +53 de la
+; description vaut type et, pour un objet de la classe 16 ([objet+2] & 16), dont le camp
+; [objet+81] vaut camp.
+; ==============================================================================================
+WorldObjects_FindNextOfType_1E6E1		proc far
 
 var_4		= word ptr -4
 var_2		= word ptr -2
@@ -1289,7 +1294,7 @@ loc_1E739:
 		pop	si
 		leave
 		retf
-sub_1E6E1		endp
+WorldObjects_FindNextOfType_1E6E1		endp
 
 ; ----------------------------------------------------------------------
 

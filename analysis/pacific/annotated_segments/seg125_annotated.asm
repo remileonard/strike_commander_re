@@ -1740,7 +1740,7 @@ loc_52898:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_537DF
+		call	near ptr MissionScript_SpawnEffectOnObj_537DF
 		add	sp, 8
 		jmp	loc_52EF1
 
@@ -1764,7 +1764,7 @@ loc_528C6:
 		push	ax
 		nop
 		push	cs
-		call	near ptr sub_539B4
+		call	near ptr MissionScript_FireAtSpot_539B4
 		add	sp, 0Ah
 		jmp	loc_52EF1
 
@@ -3502,7 +3502,16 @@ Expr_Node_DetachChildAndRecompute_537B7		endp
 
 ; Attributes: bp-based frame
 
-sub_537DF		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Instruction 153 (objet, SPOT, rang LOAD) : LOAD[rang] doit être de
+; classe 15 (méthode +8, erreur 9039h) ; position = SPOT tourné par l'orientation de l'objet
+; (sub_5A629) + position de l'objet ; [description+67] = 1 ; instance (méthode +4, sous-objet
+; +49 si présent), compteur +4 de la description incrémenté, position, sub_4BD5F(instance,
+; [description+75], 100, [description+77]), orientation de l'objet (méthode +64), son 2 selon
+; la distance à la caméra (sub_5EB62), ajout à la liste des objets du monde
+; (List_AppendIfNonNull_1E24C).
+; ==============================================================================================
+MissionScript_SpawnEffectOnObj_537DF		proc far
 
 var_3C		= dword ptr -3Ch
 var_30		= dword ptr -30h
@@ -3692,13 +3701,19 @@ loc_539B0:
 		pop	si
 		leave
 		retf
-sub_537DF		endp
+MissionScript_SpawnEffectOnObj_537DF		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_539B4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Instruction 154 (objet, SPOT de départ, rang LOAD, SPOT visé) :
+; LOAD[rang] de classe 9 (erreur 9038h) ; départ = SPOT tourné par l'orientation de l'objet +
+; sa position ; instance créée, placée, méthode +84 avec la position du SPOT visé (monde),
+; sub_3FEC1, ajout aux objets du monde.
+; ==============================================================================================
+MissionScript_FireAtSpot_539B4		proc far
 
 var_20		= word ptr -20h
 var_14		= dword ptr -14h
@@ -3848,7 +3863,7 @@ loc_53B07:
 		pop	si
 		leave
 		retf
-sub_539B4		endp
+MissionScript_FireAtSpot_539B4		endp
 
 ; ----------------------------------------------------------------------
 
@@ -4335,7 +4350,7 @@ loc_53F12:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_545A4
+		call	near ptr MissionScript_PickRandomObjectOfType_545A4
 		add	sp, 8
 		mov	[bp+var_3A], ax
 		push	ax
@@ -4354,7 +4369,7 @@ loc_53F3C:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_545A4
+		call	near ptr MissionScript_PickRandomObjectOfType_545A4
 		add	sp, 8
 		mov	[bp+var_3C], ax
 		push	ax
@@ -4462,7 +4477,7 @@ loc_54037:
 		push	large [bp+arg_0]
 		nop
 		push	cs
-		call	near ptr sub_545A4
+		call	near ptr MissionScript_PickRandomObjectOfType_545A4
 		add	sp, 8
 		mov	[bp+var_3A], ax
 		mov	si, [bp+var_3A]
@@ -5146,7 +5161,11 @@ Expr_Node_HasChildError_5457C		endp
 
 ; Attributes: bp-based frame
 
-sub_545A4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. (objet, type, camp) : jusqu'à 6 objets du monde trouvés par sub_1E6E1,
+; un tiré au hasard (CRT_Rand) ; 0 si aucun.
+; ==============================================================================================
+MissionScript_PickRandomObjectOfType_545A4		proc far
 
 var_E		= word ptr -0Eh
 var_2		= word ptr -2
@@ -5178,7 +5197,7 @@ loc_545C2:
 		mov	al, [bp+arg_4]
 		push	ax
 		push	67ADh
-		call	sub_1E6E1
+		call	WorldObjects_FindNextOfType_1E6E1
 		add	sp, 8
 		mov	dx, ax
 		or	ax, ax
@@ -5209,7 +5228,7 @@ loc_5460F:
 		pop	si
 		leave
 		retf
-sub_545A4		endp
+MissionScript_PickRandomObjectOfType_545A4		endp
 
 ; ----------------------------------------------------------------------
 

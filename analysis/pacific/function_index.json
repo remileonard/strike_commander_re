@@ -9765,8 +9765,8 @@
 "calls": [
 "sub_1E7CF"
 ],
-"new_name": "sub_1E6E1",
-"summary": ""
+"new_name": "WorldObjects_FindNextOfType_1E6E1",
+"summary": "far. LUE 2026-11-05. (liste, type, camp, précédent) : objet suivant dont l'octet +53 de la description vaut type et, pour un objet de la classe 16 ([objet+2] & 16), dont le camp [objet+81] vaut camp."
 },
 "sub_1E73C": {
 "segment": "seg050",
@@ -24589,8 +24589,8 @@
 "sub_5EB62",
 "sub_1E24C"
 ],
-"new_name": "sub_537DF",
-"summary": ""
+"new_name": "MissionScript_SpawnEffectOnObj_537DF",
+"summary": "far. LUE 2026-11-05. Instruction 153 (objet, SPOT, rang LOAD) : LOAD[rang] doit être de classe 15 (méthode +8, erreur 9039h) ; position = SPOT tourné par l'orientation de l'objet (sub_5A629) + position de l'objet ; [description+67] = 1 ; instance (méthode +4, sous-objet +49 si présent), compteur +4 de la description incrémenté, position, sub_4BD5F(instance, [description+75], 100, [description+77]), orientation de l'objet (méthode +64), son 2 selon la distance à la caméra (sub_5EB62), ajout à la liste des objets du monde (List_AppendIfNonNull_1E24C)."
 },
 "sub_539B4": {
 "segment": "seg125",
@@ -24607,8 +24607,8 @@
 "sub_3FEC1",
 "sub_1E24C"
 ],
-"new_name": "sub_539B4",
-"summary": ""
+"new_name": "MissionScript_FireAtSpot_539B4",
+"summary": "far. LUE 2026-11-05. Instruction 154 (objet, SPOT de départ, rang LOAD, SPOT visé) : LOAD[rang] de classe 9 (erreur 9038h) ; départ = SPOT tourné par l'orientation de l'objet + sa position ; instance créée, placée, méthode +84 avec la position du SPOT visé (monde), sub_3FEC1, ajout aux objets du monde."
 },
 "sub_53B0B": {
 "segment": "seg125",
@@ -24726,8 +24726,8 @@
 "sub_1E6E1",
 "sub_81F"
 ],
-"new_name": "sub_545A4",
-"summary": ""
+"new_name": "MissionScript_PickRandomObjectOfType_545A4",
+"summary": "far. LUE 2026-11-05. (objet, type, camp) : jusqu'à 6 objets du monde trouvés par sub_1E6E1, un tiré au hasard (CRT_Rand) ; 0 si aucun."
 },
 "sub_54612": {
 "segment": "seg125",

@@ -333,19 +333,25 @@ traitées, et 12 de plus :
 | Valeur | Nom | Données | Constaté dans le code |
 |---|---|---|---|
 | 5 | `OP_NOOP_5`\* | 0 | rien |
-| 112 | `OP_ORDER_FRIENDLY_OF_TYPE`\* | 0 | ordre : pour un objet du monde de la classe 16 (`test byte ptr [bx+2], 10h`), choisit au hasard un objet du même camp et du type donné (`sub_545A4`) et prend sa position ; sinon l'ordre échoue |
-| 153 | `OP_153`\* | 12 | objet, `SPOT` : crée un élément ajouté à une liste (`sub_537DF`) ; rôle non établi |
-| 154 | `OP_154`\* | 69 | objet, deux `SPOT` : même famille que 153 (`sub_539B4`) ; rôle non établi |
+| 112 | `OP_ORDER_FRIENDLY_OF_TYPE`\* | 0 | ordre : pour un objet du monde de la classe 16 (`test byte ptr [bx+2], 10h`), choisit au hasard un objet du même camp et du type donné (`MissionScript_PickRandomObjectOfType_545A4`) et prend sa position ; sinon l'ordre échoue |
+| 153 | `OP_SPAWN_EFFECT_ON_OBJ`\* | 12 | **objet, `SPOT`, rang dans `LOAD`** : crée l'objet `LOAD`[rang] (classe 15 exigée, sinon erreur 9039h ; dans les données : `GUNSPARK`, éclair de tir) au point `SPOT` pris **dans le repère de l'objet** (position tournée par l'orientation de l'objet, puis ajoutée à sa position), avec l'orientation de l'objet ; réglage de départ par `sub_4BD5F` (champs +75 et +77 de la description, non lus) ; son n° 2 selon la distance à la caméra (`sub_5EB62`) ; ajouté aux objets du monde (`MissionScript_SpawnEffectOnObj_537DF`) |
+| 154 | `OP_FIRE_AT_SPOT`\* | 69 | **objet, `SPOT` de départ, rang dans `LOAD`, `SPOT` visé** : crée l'objet `LOAD`[rang] (classe 9 exigée, sinon erreur 9038h ; dans les données : `DDSHELL`, `B1000LB`) au `SPOT` de départ pris dans le repère de l'objet, et lui donne comme but la position du `SPOT` visé, en coordonnées du monde (méthode +84 de l'objet créé) ; puis `sub_3FEC1` ; ajouté aux objets du monde (`MissionScript_FireAtSpot_539B4`). Exemple `SLMN-M4` : l'artillerie (`ARTILL`) tire des obus vers un point |
 | 155 | `OP_SPAWN_AT_SPOT`\* | 4 | crée un objet (`Debris_LoadAndInstantiateAlt`) à la position d'un `SPOT` |
-| 156 | `OP_RELEASE_ATTACHED`\* | 4 | libère l'élément attaché à l'objet du monde (`[objet+120]`, `sub_74144`) et le remet à 0 |
-| 157 | `OP_157`\* | 16 | deux objets et un `SPOT` : fait apparaître le premier (`PartEntry_ResolveSpawnPositionAndActivate_5313D`), lit la position du `SPOT`, puis une méthode de l'objet du monde du second ; rôle non établi |
+| 156 | `OP_DETACH_CARRIED`\* | 4 | libère l'objet porté par l'objet du monde (`[objet+120]`, `sub_74144`) et le remet à 0. Exemple `IJOK-M3` : avant que le `BETTY` lâche son `BAKA` |
+| 157 | `OP_LAUNCH_FROM_OBJ`\* | 16 | **objet A, objet B, `SPOT`** : fait apparaître A (`PartEntry_ResolveSpawnPositionAndActivate_5313D`), le place au point `SPOT` pris dans le repère de B, et lui donne l'orientation de B (méthodes +60 et +64). Exemples : `IJOK-M3` lâche l'avion-suicide `BAKA` sous le bombardier `BETTY` ; `IJOK-M4` fait partir un siège éjectable (`EJECSEAJ`) d'un `BETTY` |
 | 173 | `OP_SET_OBJ_DESTROY_TARGET_B`\* | 1 | même traitement que `OP_SET_OBJ_DESTROY_TARGET` (167) |
-| 174 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE`\* | 1 279 | si +68 est vide : choisit au hasard un objet du camp adverse et du type n (`sub_545A4`) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue |
+| 174 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE`\* | 1 279 | si +68 est vide : choisit au hasard un objet du camp adverse et du type n (`MissionScript_PickRandomObjectOfType_545A4`) et le garde en +68 ; puis vise sa position. Rien de trouvé : l'ordre échoue |
 | 175 | `OP_ORDER_RANDOM_ENEMY_OF_TYPE_B`\* | 4 | même traitement que 174 |
 | 193 | `OP_ORDER_OBJ_AND_SPOT`\* | 48 | ordre avec un objet (2ᵉ argument) et un `SPOT` (3ᵉ argument ; 65 535 = erreur) |
 
-« Données » = nombre d'emplois dans les 64 fichiers de `MISSIONS`. `sub_545A4` (pas encore nommée) parcourt les
-objets du monde (`sub_1E6E1`) et retient ceux dont l'octet +53 de la description vaut n et, pour les objets de la
+**Numéros d'objet.** Dans les scripts, un objet est désigné par le numéro écrit dans les 2 premiers octets de son
+enregistrement `PART`, pas par son rang (dans `IJOK-M3`, l'objet 33 est le 38ᵉ enregistrement) ; 255 désigne
+l'objet qui joue le script (valeur par défaut d'`Expr_VM_ReadVarOrOverride_51EEA`). **`SPOT` en repère local** : 153,
+154 et 157 prennent la position d'un `SPOT` comme un décalage dans le repère d'un objet ; seul le `SPOT` visé de 154
+est une position du monde.
+
+« Données » = nombre d'emplois dans les 64 fichiers de `MISSIONS`. `MissionScript_PickRandomObjectOfType_545A4` parcourt les
+objets du monde (`WorldObjects_FindNextOfType_1E6E1`) et retient ceux dont l'octet +53 de la description vaut n et, pour les objets de la
 classe 16, dont le camp (`[objet+81]`) est celui demandé ; elle en garde 6 au plus et en tire un au hasard
 (`CRT_Rand`). Pour 174 et 175, le camp demandé est l'inverse de celui de l'objet (−1 ↔ 1).
 
