@@ -10,6 +10,8 @@ La lecture du PAK vient de tools/terrain_map.py et tools/tri_map.py (écrits d'a
 analysis/DATA_MODEL.html). Les enregistrements d'objets (ressource n° 6) ne sont pas dans
 la doc : leur disposition ci-dessous est un CONSTAT sur ALASKA.PAK.
 
+Pacific Strike : TERRAIN\\<nom>.ZIP (compressé en PKWARE DCL, décompressé ici), palette avec --palette.
+
 Usage : python3 tools/terrain_viewer.py data/ALASKA.PAK [-o data/ALASKA_viewer.html]
 """
 
@@ -23,7 +25,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from terrain_map import assemble, read_elevations  # noqa: E402
-from tri_map import read_pak, read_region  # noqa: E402
+from tri_map import read_pak, read_region, read_region_ps  # noqa: E402
 
 CELL_SIZE = 20000          # ATRI (taille d'une cellule) et ELEV de ALASKA.PAK
 
@@ -77,14 +79,24 @@ def read_palette(path):
     return pal, rang
 
 
-def read_runways(data, top, index):
+# Pacific Strike : le numéro de face est un matériau (texture), pas un index de palette ; les textures ne sont pas
+# dessinées, les pistes prennent ce gris de la palette.
+PACIFIC_RUNWAY_GREY = 7
+
+
+def read_runways(data, top, index, pacific=False):
     start, end = top[index]
     tri = data[start:end]
     runways = []
     for cell, (a, b) in enumerate(read_pak(tri)):
         if b <= a:
             continue
-        r = read_region(tri, a, b)
+        if pacific:
+            r = read_region_ps(tri, a, b)
+            for t in r["triangles"]:
+                t["colour"] = PACIFIC_RUNWAY_GREY
+        else:
+            r = read_region(tri, a, b)
         V = r["vertices"]
         runways.append({
             "cell": cell,
@@ -104,6 +116,10 @@ def main():
     args = ap.parse_args()
 
     data = open(args.pak, "rb").read()
+    pacific = data[:2] == b"\x00\x06"
+    if pacific:
+        import pkware_dcl
+        data = pkware_dcl.explode(data)
     top = read_pak(data)
     cells = read_elevations(data, top, 1)
     grid = int(math.isqrt(len(cells)))
@@ -129,7 +145,7 @@ def main():
         "light": base64.b64encode(bytes(v for row in light for v in row)).decode(),
         "colour": base64.b64encode(bytes(v for row in colour for v in row)).decode(),
         "textured": base64.b64encode(bytes(v for row in textured for v in row)).decode(),
-        "runways": read_runways(data, top, 4),
+        "runways": read_runways(data, top, 4, pacific),
         "objects": read_objects(data, top, 5),
     }
     pal_path = args.palette or os.path.join(os.path.dirname(args.pak), "PALETTE.IFF")

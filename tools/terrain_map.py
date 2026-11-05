@@ -9,7 +9,13 @@ Image produite : à gauche le relief (couleur = altitude Y, ombrage calculé), p
 en rouge ; à droite le champ « éclairage » des sommets tel quel, en niveaux de gris.
 Vue de dessus : X vers la droite, Z vers le haut.
 
+Pacific Strike : le terrain est TERRAIN\\<nom>.ZIP (nom donné par le chunk TERA du monde, MISSIONS\\<monde>.IFF).
+Constat : le fichier entier est compressé en PKWARE DCL (commence par 00 06) ; décompressé, c'est le même PAK.
+Les régions .TRI ont un en-tête de 5 mots (Strike Commander : 4) et des faces de 28 octets (16) : lues par
+tri_map.read_region_ps, d'après TRI_ParseOverlayGeometry_A7710 de PACIFIC.EXE.
+
 Usage : python3 tools/terrain_map.py data/ALASKA.PAK [-o carte.png] [--level elv|med|low]
+        python3 tools/terrain_map.py <DATA de Pacific Strike>/TERRAIN/OAHU.ZIP
 """
 
 import argparse
@@ -20,7 +26,7 @@ import sys
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from tri_map import read_pak, read_region  # noqa: E402
+from tri_map import read_pak, read_region, read_region_ps  # noqa: E402
 
 
 def lzw(data):
@@ -185,6 +191,10 @@ def main():
     args = ap.parse_args()
 
     data = open(args.pak, "rb").read()
+    pacific = data[:2] == b"\x00\x06"
+    if pacific:
+        import pkware_dcl
+        data = pkware_dcl.explode(data)
     top = read_pak(data)
     print(f"{args.pak} : {len(data)} octets, PAK de {len(top)} ressources")
     # Constat sur ALASKA.PAK : ordre des ressources = TERA, ELV, MED, LOW, TRI, puis un PAK
@@ -205,7 +215,10 @@ def main():
     runways = []
     for a, b in read_pak(tri):
         if b > a:
-            r = read_region(tri, a, b)
+            if pacific:
+                r = read_region_ps(tri, a, b)
+            else:
+                r = read_region(tri, a, b)
             runways.append(r)
             V = r["vertices"]
             cx = sum(v["x"] for v in V) / len(V)

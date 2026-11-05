@@ -15,7 +15,7 @@ stru_73EE0	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_73F00	proc far
-		jmp	sub_A7710
+		jmp	TRI_ParseOverlayGeometry_A7710
 sub_73F00	endp
 		db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 stub286		ends

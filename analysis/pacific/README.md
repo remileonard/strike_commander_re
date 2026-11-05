@@ -608,6 +608,41 @@ octet. La valeur 255 désigne l'objet qui joue le script (`Expr_VM_ReadVarOrOver
 - `RSMission::parseMISN_PART` lit l'octet bas de chaque numéro de script et saute l'octet haut : 65 535 devient 255.
   Sans conséquence sur les données (numéros de 0 à 80), mais le jeu lit 2 octets (règle 7).
 
+## 7. Terrain
+
+Lu le 2026-11-05 sur la première mission, `PRLH-M1` (« Scramble »). Chaîne des noms : chunk `WRLD`/`FILE` de la mission
+= `OAHU` → `MISSIONS\OAHU.IFF` (`FORM WRLD`) → chunk `TERA` = `oahu` → `TERRAIN\OAHU.ZIP`.
+
+- **`TERRAIN\<nom>.ZIP` n'est pas une archive ZIP** : le fichier entier est compressé en PKWARE DCL (il commence par
+  `00 06`, comme les entrées compressées des PAK, § 1). Décompressé, c'est **le même PAK que les terrains de Strike
+  Commander** : 7 ressources dans le même ordre (`TERA`, altitudes `ELV`, `MED`, `LOW`, régions `.TRI`, objets
+  posés, un mot par cellule).
+- **Altitudes** : lues sans changement par `tools/terrain_map.py` (constat sur les données) : 18 × 18 cellules de
+  20 × 20 sommets, 1000 m entre deux sommets, altitudes de 0 à 1120 m. Oahu, Molokai, Lanai et le bord de Kauai sont
+  reconnaissables. Le sens des octets « éclairage » et « couleur » des sommets n'a pas été relu dans PACIFIC.EXE : la
+  vue 3D applique les règles de Strike Commander, et les textures (`TXM`) ne sont pas dessinées.
+- **Régions `.TRI` (pistes)** : lues par `TRI_ParseOverlayGeometry_A7710` (ovr286). Elles changent :
+
+| | Strike Commander | Pacific Strike |
+|---|---|---|
+| en-tête | 4 mots : sommets, faces, côté de la grille, longueur de la table des listes | 5 mots : sommets, faces, un mot non lu, côté de la grille, longueur de la table des listes |
+| sommet | 13 octets | 13 octets, identique |
+| face | 16 octets | 28 octets, toujours un triangle |
+| couleur de la face | mot à l'octet 8 | mot à l'octet 20, numéro de matériau (14 à 17 = double face) |
+| u, v des 3 sommets | octets 10 à 15 | octets 22 à 27 |
+| autres champs | groupe (octet 0), type (octet 7) | groupe (octet 0), octet 19 ; octets 7 à 18 non lus par ce chargeur |
+
+  `OAHU.ZIP` n'a qu'une région (cellule 188) : 28 sommets, 14 triangles, une piste d'environ 80 m sur 1 600 m à
+  121 m d'altitude, au bord de Pearl Harbor ; matériaux 0 à 6, deux triangles par matériau.
+- **Objets posés** : aucun dans `OAHU.ZIP` (ressource vide).
+
+![Oahu : relief (pistes en rouge) et champ « éclairage » des sommets](images/ps_terrain_oahu.png)
+
+![Oahu : vue 3D, couleurs de la palette selon les règles de Strike Commander, sans textures](images/ps_terrain_oahu_3d.png)
+
+Outils : `tools/terrain_map.py` et `tools/terrain_viewer.py` lisent directement `TERRAIN\<nom>.ZIP` ;
+`tri_map.read_region_ps` lit une région `.TRI` de Pacific Strike.
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).

@@ -77,6 +77,43 @@ def read_region(data, start, end):
             "g": g, "problems": problems}
 
 
+def read_region_ps(data, start, end):
+    """Une région .TRI de Pacific Strike, lue comme TRI_ParseOverlayGeometry_A7710 (PACIFIC.EXE, ovr286).
+    En-tête de 5 mots (lecture de 10 octets) : sommets, faces, un mot non lu, côté de la grille, longueur de la
+    table des listes. Sommet : 13 octets, comme Strike Commander. Face : 28 octets (add [bp+var_4C], 1Ch) :
+    groupe (octet 0), 3 sommets (mots aux octets 1, 3, 5), octets 7 à 18 non lus par ce chargeur, octet 19,
+    matériau (mot à l'octet 20 : numéro dans les tables de matériaux, pas un index de palette ; 14 à 17 = double
+    face), puis u, v des 3 sommets (octets 22 à 27). Ensuite la table des listes, puis la grille."""
+    nv, nt, unused, g, nl = struct.unpack_from("<5H", data, start)
+    p = start + 10
+    vertices = []
+    for _ in range(nv):
+        x, z, y = (v / 256 for v in struct.unpack_from("<3i", data, p))
+        vertices.append({"x": x, "z": z, "y": y, "light": data[p + 12]})
+        p += 13
+    triangles = []
+    for _ in range(nt):
+        group, a, b, c = struct.unpack_from("<B3H", data, p)
+        material = struct.unpack_from("<H", data, p + 20)[0]
+        uv = tuple(data[p + 22:p + 28])
+        triangles.append({"group": group, "v": (a, b, c), "byte19": data[p + 19], "material": material,
+                          "uv": uv, "unread": data[p + 7:p + 19]})
+        p += 28
+    lists = struct.unpack_from(f"<{nl}H", data, p)
+    p += 2 * nl
+    grid = struct.unpack_from(f"<{g * g}H", data, p)
+    p += 2 * g * g
+    problems = []
+    if p != end:
+        problems.append(f"la région finit à {p}, l'entrée PAK à {end}")
+    for t in triangles:
+        if max(t["v"]) >= nv:
+            problems.append(f"triangle vers un sommet inexistant {t['v']}")
+            break
+    return {"vertices": vertices, "triangles": triangles, "lists": lists, "grid": grid, "g": g,
+            "problems": problems}
+
+
 # --- dessin -------------------------------------------------------------------------------
 
 # La palette du jeu (PALETTE.IFF) n'est pas dans le dépôt : les couleurs sont arbitraires,

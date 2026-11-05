@@ -6,7 +6,21 @@ ovr286		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_A7710		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent de TRI_ParseOverlayGeometry_99120 de STRIKE.EXE : lit une
+; région .TRI (pistes) du terrain. En-tête de 10 octets (StreamReader_ReadTyped_6C4F3, push
+; large 0Ah) : +0 sommets (-> [di+6]), +2 faces (-> [di+14h]), +4 non lu, +6 côté de la grille
+; (-> [di+16h]), +8 longueur de la table des listes (en mots). Sommet 13 octets (add word ptr
+; [bp+var_40], 0Dh) : X, Z, Y en i32 24.8, éclairage (octet 12 -> sortie +1Dh). Face 28 octets
+; (add word ptr [bp+var_4C], 1Ch), toujours 3 sommets : +0 groupe (-> +24h), +1/+3/+5 sommets
+; (× 30, pointeurs), +7 à +18 NON LUS par ce chargeur, +19 octet (-> sortie +0), +20 mot =
+; matériau (< word_7CC8E : table dword_7CC94/word_7CC92 pas de 14 ; sinon table word_7CC96 pas
+; de 24 ; au-delà : aucun ; sortie +25h = double face si matériau absent ou 14 à 17), +22 à
+; +27 = u, v des 3 sommets (-> +18h, +1Ah, +1Ch, +1Eh, +20h, +22h). Faces en mémoire : 38
+; octets (imul 26h). Puis la table des listes (gardée en [di+1Ch]) et la grille (côté² mots,
+; convertie en pointeurs [di+18h], 65 535 = case vide), comme Strike Commander.
+; ==============================================================================================
+TRI_ParseOverlayGeometry_A7710		proc far
 
 var_6A		= dword ptr -6Ah
 var_66		= dword ptr -66h
@@ -542,5 +556,5 @@ loc_A7C7B:
 		pop	si
 		leave
 		retf
-sub_A7710		endp
+TRI_ParseOverlayGeometry_A7710		endp
 ovr286		ends
