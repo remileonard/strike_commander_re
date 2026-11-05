@@ -2801,13 +2801,13 @@ Render_WaterOrSkyPlane_2CDA0		endp
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; far. LUE 2026-11-05. Fond de la vue. Si byte_7CAFE (ciel texturé) et byte_7CAFF (eau
-; texturée) valent 0 : calcule la ligne d'horizon (bornée à ± 8191, rangée en
-; [caméra+78h..7Eh]) et Camera_UpdateViewportClip, comme STRIKE. Sinon : si byte_7CAFF et
-; observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) → Render_WaterOrSkyPlane_2CDA0(0) (eau) ;
-; si byte_7CAFE → Render_WaterOrSkyPlane_2CDA0(1) (ciel) ; remplissage par la couleur 166
-; (TextFormat_ReleaseAttribute_67F1D, 0A6h) dans certains cas (conditions à relire).
-; byte_7CAFE et byte_7CAFF valent 0 au départ ; basculés par Input_AltKeyDetailToggles_5093D.
+; far. LUE 2026-11-05. Fond de la vue, avant le terrain. byte_7CAFE (ciel texturé) = 0 : ligne
+; d'horizon calculée (bornée à ± 8191, [caméra+78h..7Eh]) puis Camera_UpdateViewportClip,
+; comme STRIKE. byte_7CAFE ≠ 0 : pas de ligne d'horizon ; la vue est remplie de la couleur 166
+; (TextFormat_ReleaseAttribute_67F1D, 0A6h), puis Render_WaterOrSkyPlane_2CDA0(1) (ciel).
+; byte_7CAFF (eau texturée) ≠ 0 et observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) :
+; Render_WaterOrSkyPlane_2CDA0(0) (eau), avant le ciel. Les deux réglages valent 0 au départ
+; et basculent par Input_AltKeyDetailToggles_5093D (ALT+R eau, ALT+Y ciel).
 ; ==============================================================================================
 Render_SkyAndSeaBackground_2D6FC		proc far
 

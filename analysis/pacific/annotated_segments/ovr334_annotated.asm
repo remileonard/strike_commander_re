@@ -7,16 +7,12 @@ ovr334		segment	para public 'OVERLAY' use16
 ; Attributes: bp-based frame
 
 ; ==============================================================================================
-; Reprise de STRIKE.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de
-; données ou constantes) — à vérifier à AircraftDynamics_ReadStblChunk_A52B8 (sub_A52B8 de
-; STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far,
-; seg449. Lecteur du chunk 'STBL' de la hierarchie FORM DYNM (erreur 0xA004 si absent).
-; sub_A52FD (helper) puis ResourceRecord_SeekAndRead('STBL', FourCC ASM 0x4C425453) +
-; sub_64A7E (u32) -> [si+0x12]. [si+0x12] = jdyn[0x12] = COEFF DE STABILITE / AUTORITE DE
-; TANGAGE : echelle q' dans Aero_ComputeForcesMain (q' = q * jdyn[0x12] / 100). Detail:
-; DATA_MODEL.md 6.2.
+; far. LUE 2026-11-05 (corrige une reprise automatique erronée qui l'appelait ReadStblChunk :
+; même suite d'instructions que le lecteur de STBL, mais elle cherche 'DYNM', push large
+; 4D4E5944h). Lecteur du chunk DYNM (masse) : un u32 -> [si+1Ah] (STRIKE : [si+4],
+; AircraftDynamics_ReadMassChunk_A4A20) ; erreur 0A001h si absent. Format de fichier inchangé.
 ; ==============================================================================================
-AircraftDynamics_ReadStblChunk_B78C0		proc far
+AircraftDynamics_ReadMassChunk_B78C0		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -58,7 +54,7 @@ loc_B7901:
 		pop	si
 		pop	bp
 		retf
-AircraftDynamics_ReadStblChunk_B78C0		endp
+AircraftDynamics_ReadMassChunk_B78C0		endp
 
 ; ----------------------------------------------------------------------
 
@@ -76,7 +72,7 @@ arg_2		= word ptr  8
 		push	[bp+arg_2]
 		push	si
 		push	cs
-		call	near ptr AircraftDynamics_ReadStblChunk_B78C0
+		call	near ptr AircraftDynamics_ReadMassChunk_B78C0
 		add	sp, 4
 		mov	ax, word_793EC
 		mov	[si+22h], ax

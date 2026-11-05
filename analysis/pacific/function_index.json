@@ -14607,7 +14607,7 @@
 "sub_2CDA0"
 ],
 "new_name": "Render_SkyAndSeaBackground_2D6FC",
-"summary": "far. LUE 2026-11-05. Fond de la vue. Si byte_7CAFE (ciel texturé) et byte_7CAFF (eau texturée) valent 0 : calcule la ligne d'horizon (bornée à ± 8191, rangée en [caméra+78h..7Eh]) et Camera_UpdateViewportClip, comme STRIKE. Sinon : si byte_7CAFF et observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) → Render_WaterOrSkyPlane_2CDA0(0) (eau) ; si byte_7CAFE → Render_WaterOrSkyPlane_2CDA0(1) (ciel) ; remplissage par la couleur 166 (TextFormat_ReleaseAttribute_67F1D, 0A6h) dans certains cas (conditions à relire). byte_7CAFE et byte_7CAFF valent 0 au départ ; basculés par Input_AltKeyDetailToggles_5093D."
+"summary": "far. LUE 2026-11-05. Fond de la vue, avant le terrain. byte_7CAFE (ciel texturé) = 0 : ligne d'horizon calculée (bornée à ± 8191, [caméra+78h..7Eh]) puis Camera_UpdateViewportClip, comme STRIKE. byte_7CAFE ≠ 0 : pas de ligne d'horizon ; la vue est remplie de la couleur 166 (TextFormat_ReleaseAttribute_67F1D, 0A6h), puis Render_WaterOrSkyPlane_2CDA0(1) (ciel). byte_7CAFF (eau texturée) ≠ 0 et observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) : Render_WaterOrSkyPlane_2CDA0(0) (eau), avant le ciel. Les deux réglages valent 0 au départ et basculent par Input_AltKeyDetailToggles_5093D (ALT+R eau, ALT+Y ciel)."
 },
 "sub_2DCAB": {
 "segment": "seg074",
@@ -22247,8 +22247,8 @@
 "calls": [
 "sub_5A065"
 ],
-"new_name": "sub_4710B",
-"summary": ""
+"new_name": "Aero_PropellerThrust_4710B",
+"summary": "far. LUE 2026-11-05. Équivalent d'Aero_ThrottleThrustCurve_4730F de STRIKE, remplacé par un modèle d'HÉLICE. Appel : (&résultat, &jdyn[22h] = sous-objet THRS, cran) ; résultat rangé par l'appelant en jdyn[28h]. Recalcul seulement si le cran change ou une image sur 8 ((word_7977C + [avion+22h]) & 7), sinon rend [THRS+16h]. P = THRS+0Eh (puissance). V = norme de la vitesse de l'objet du monde (méthode +50h, sub_5A065). Si V < 0,65625 × Vref (Vref = mot jdyn[9Dh], champ 23 de JDYN) : P × 1,047 / 1,074 / 1,098 selon word_7CB07 (0/1/2) si l'objet est celui de word_7CADA, sinon P × 0,898 / 0,949 / 1,0 selon byte_7CB11 si l'octet +51h de l'objet vaut 255 ; si V > Vref : P ÷ 2. Altitude h ([[objet]+1Ah]) au-dessus de hc = jdyn[0A3h] (champ 26, mètres entiers) : P −= P × (h − hc) ÷ (octet THRS+14h × 100 − hc). Poussée = 550 × P × 4,4453 × 0,8477 ÷ (max(V, THRS+1Eh ÷ 2) × 3,2773) × cran ÷ 10, bornée ≥ 0, rangée en THRS+16h (constantes 22600h, 472h, 0D9h, 347h, 0A00h). THRS+0Ah (poussée max), +12h et +1Ah ne sont pas utilisés ici."
 },
 "sub_47514": {
 "segment": "seg113",
@@ -67548,8 +67548,8 @@
 "sub_6DAF7",
 "sub_1DDFE"
 ],
-"new_name": "AircraftDynamics_ReadStblChunk_B78C0",
-"summary": "Reprise de STRIKE.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `AircraftDynamics_ReadStblChunk_A52B8` (sub_A52B8 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, seg449. Lecteur du chunk 'STBL' de la hierarchie FORM DYNM (erreur 0xA004 si absent). sub_A52FD (helper) puis ResourceRecord_SeekAndRead('STBL', FourCC ASM 0x4C425453) + sub_64A7E (u32) -> [si+0x12]. [si+0x12] = jdyn[0x12] = COEFF DE STABILITE / AUTORITE DE TANGAGE : echelle q' dans Aero_ComputeForcesMain (q' = q * jdyn[0x12] / 100). Detail: DATA_MODEL.md 6.2."
+"new_name": "AircraftDynamics_ReadMassChunk_B78C0",
+"summary": "far. LUE 2026-11-05 (corrige une reprise automatique erronée qui l'appelait ReadStblChunk : même suite d'instructions que le lecteur de STBL, mais elle cherche 'DYNM', push large 4D4E5944h). Lecteur du chunk DYNM (masse) : un u32 -> [si+1Ah] (STRIKE : [si+4], AircraftDynamics_ReadMassChunk_A4A20) ; erreur 0A001h si absent. Format de fichier inchangé."
 },
 "sub_B7905": {
 "segment": "ovr334",
@@ -67704,8 +67704,8 @@
 "sub_6B53F",
 "sub_6DFAB"
 ],
-"new_name": "sub_B7AB1",
-"summary": ""
+"new_name": "AircraftDynamics_ReadAtmoChunk_B7AB1",
+"summary": "far. LUE 2026-11-05. Comme AircraftDynamics_ReadAtmoChunk_A4BE1 de STRIKE (u32 -> [si+10h], modèle d'atmosphère global dword_7CE14 au premier avion), avec une instruction de plus avant la lecture : mov dword ptr [si+14h], 100h (nouveau champ en mémoire mis à 1,0 ; rôle non lu). Format de fichier inchangé."
 },
 "sub_B7BD3": {
 "segment": "ovr335",
@@ -67868,8 +67868,8 @@
 "sub_6DAF7",
 "sub_1DDFE"
 ],
-"new_name": "sub_B81AC",
-"summary": ""
+"new_name": "AircraftDynamics_ReadThrustChunk_B81AC",
+"summary": "far. LUE 2026-11-05. Lecteur du chunk THRS, FORMAT CHANGÉ (19 octets au lieu de 7) : u32 -> [si+0Ah] (poussée max, comme STRIKE) ; NOUVEAU u32 -> [si+0Eh] (puissance, chevaux, utilisée par Aero_PropellerThrust_4710B) ; 3 u8 -> [si+12h], [si+13h], [si+14h] (STRIKE : [si+0Eh..10h]) ; NOUVEAU u32 -> [si+1Ah] ; NOUVEAU u32 -> [si+1Eh] (Aero_PropellerThrust_4710B : moitié = vitesse plancher). Erreur 0A003h si absent."
 },
 "sub_B8235": {
 "segment": "ovr335",

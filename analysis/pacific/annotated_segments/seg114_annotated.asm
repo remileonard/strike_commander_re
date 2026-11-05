@@ -2552,7 +2552,7 @@ loc_4953E:
 		push	ss
 		lea	ax, word ptr [bp+var_2A]
 		push	ax
-		call	sub_4710B
+		call	Aero_PropellerThrust_4710B
 		add	sp, 8
 		mov	eax, [bp+var_2A]
 		mov	[si+28h], eax
@@ -2583,7 +2583,7 @@ arg_0		= word ptr  6
 		push	ss
 		lea	ax, word ptr [bp+var_4]
 		push	ax
-		call	sub_4710B
+		call	Aero_PropellerThrust_4710B
 		add	sp, 8
 		mov	eax, [bp+var_4]
 		mov	[si+28h], eax
@@ -4859,7 +4859,7 @@ loc_4ABBB:
 		push	ss
 		lea	ax, word ptr [bp+var_64]
 		push	ax
-		call	sub_4710B
+		call	Aero_PropellerThrust_4710B
 		add	sp, 8
 		mov	eax, [bp+var_64]
 		mov	[si+28h], eax

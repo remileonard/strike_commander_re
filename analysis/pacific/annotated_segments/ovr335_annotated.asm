@@ -196,7 +196,7 @@ arg_2		= word ptr  8
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_B7AB1
+		call	near ptr AircraftDynamics_ReadAtmoChunk_B7AB1
 		add	sp, 4
 		mov	bx, [si]
 		mov	ax, word_793EC
@@ -213,7 +213,13 @@ sub_B7A79		endp
 
 ; Attributes: bp-based frame
 
-sub_B7AB1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Comme AircraftDynamics_ReadAtmoChunk_A4BE1 de STRIKE (u32 -> [si+10h],
+; modèle d'atmosphère global dword_7CE14 au premier avion), avec une instruction de plus avant
+; la lecture : mov dword ptr [si+14h], 100h (nouveau champ en mémoire mis à 1,0 ; rôle non
+; lu). Format de fichier inchangé.
+; ==============================================================================================
+AircraftDynamics_ReadAtmoChunk_B7AB1		proc far
 
 var_72		= word ptr -72h
 var_15		= dword ptr -15h
@@ -329,7 +335,7 @@ loc_B7BCF:
 		pop	si
 		leave
 		retf
-sub_B7AB1		endp
+AircraftDynamics_ReadAtmoChunk_B7AB1		endp
 
 ; ----------------------------------------------------------------------
 
@@ -666,7 +672,7 @@ arg_2		= word ptr  8
 		add	ax, 4
 		push	ax
 		push	cs
-		call	near ptr sub_B7AB1
+		call	near ptr AircraftDynamics_ReadAtmoChunk_B7AB1
 		add	sp, 4
 		mov	bx, [si]
 		mov	ax, word_793EC
@@ -1065,13 +1071,13 @@ arg_2		= word ptr  8
 		push	di
 		push	word ptr [si]
 		push	cs
-		call	near ptr sub_B7AB1
+		call	near ptr AircraftDynamics_ReadAtmoChunk_B7AB1
 		add	sp, 4
 		push	di
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_B81AC
+		call	near ptr AircraftDynamics_ReadThrustChunk_B81AC
 		add	sp, 4
 		mov	bx, [si+2]
 		mov	ax, word_793EC
@@ -1087,7 +1093,14 @@ sub_B8170		endp
 
 ; Attributes: bp-based frame
 
-sub_B81AC		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Lecteur du chunk THRS, FORMAT CHANGÉ (19 octets au lieu de 7) : u32 ->
+; [si+0Ah] (poussée max, comme STRIKE) ; NOUVEAU u32 -> [si+0Eh] (puissance, chevaux, utilisée
+; par Aero_PropellerThrust_4710B) ; 3 u8 -> [si+12h], [si+13h], [si+14h] (STRIKE :
+; [si+0Eh..10h]) ; NOUVEAU u32 -> [si+1Ah] ; NOUVEAU u32 -> [si+1Eh]
+; (Aero_PropellerThrust_4710B : moitié = vitesse plancher). Erreur 0A003h si absent.
+; ==============================================================================================
+AircraftDynamics_ReadThrustChunk_B81AC		proc far
 
 arg_0		= word ptr  6
 arg_2		= word ptr  8
@@ -1157,7 +1170,7 @@ loc_B8231:
 		pop	si
 		pop	bp
 		retf
-sub_B81AC		endp
+AircraftDynamics_ReadThrustChunk_B81AC		endp
 
 ; ----------------------------------------------------------------------
 
@@ -1186,7 +1199,7 @@ arg_2		= word ptr  8
 		push	di
 		push	word ptr [si+10h]
 		push	cs
-		call	near ptr sub_B7AB1
+		call	near ptr AircraftDynamics_ReadAtmoChunk_B7AB1
 		add	sp, 4
 		push	di
 		push	si

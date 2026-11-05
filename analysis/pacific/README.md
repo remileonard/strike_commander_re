@@ -853,6 +853,62 @@ rendu de contrôle, pas de proposition.
 
 ![F4U Corsair : quatre vues et les niveaux de détail 1 et 2](images/ps_corsair.png)
 
+## 9. Physique : les chunks du FORM DYNM
+
+Lu le 2026-11-05 en comparant les lecteurs de PACIFIC.EXE à ceux de STRIKE.EXE, instruction par instruction. Valeurs
+d'exemple : `OBJECTS\CORSAIR.IFF`.
+
+| Chunk | Lecteur (PACIFIC.EXE) | Format du fichier | Corsair |
+|---|---|---|---|
+| `DYNM` | `AircraftDynamics_ReadMassChunk_B78C0` | inchangé : u32 masse (÷ 256, kg) | 4 025 kg |
+| `ATMO` | `AircraftDynamics_ReadAtmoChunk_B7AB1` | inchangé : u32 | 0,699 |
+| `STBL` | `AircraftDynamics_ReadStblChunk_B8279` | inchangé : u32 | 0,355 |
+| `JDYN` | `JDYN_ReadChunkFields_B8DE8` | inchangé : 73 octets, 28 champs, mêmes tailles, même ordre | voir plus bas |
+| `THRS` | `AircraftDynamics_ReadThrustChunk_B81AC` | **changé : 19 octets au lieu de 7** | voir plus bas |
+
+Seule la place des champs dans l'objet en mémoire change (décalés de 17 octets pour la plupart) : sans effet sur la
+lecture du fichier. `ATMO` ajoute un champ en mémoire mis à 1,0 avant la lecture (rôle non lu).
+
+**`THRS` dans Pacific Strike** :
+
+```
+u32  poussée maximale (÷ 256)            Corsair : 0
+u32  NOUVEAU : puissance (÷ 256, ch)     Corsair : 2 350
+u8   comme Strike Commander              Corsair : 152
+u8   comme Strike Commander              Corsair : 180
+u8   plafond (× 100 m)                   Corsair : 112, soit 11 200 m
+u32  NOUVEAU (÷ 256)                     Corsair : 50
+u32  NOUVEAU (÷ 256)                     Corsair : 45 ; la moitié sert de vitesse plancher
+```
+
+**La poussée devient celle d'une hélice** (`Aero_PropellerThrust_4710B`, à la place d'`Aero_ThrottleThrustCurve_4730F`).
+Appelée comme dans Strike Commander par le tick physique (`sub_4A8F4`, équivalent de `PhysicsTicks`, puis × gain
+moteur) : `poussée = courbe(&jdyn[34], cran)`. Recalculée quand le cran change, sinon une image sur 8. En flottants :
+
+```
+P = puissance                                    (THRS, 2e champ)
+V = norme de la vitesse de l'avion (m/s)
+Vref = JDYN champ 23 (mot, octet 61 du chunk)    Corsair : 197 m/s
+si V < 0,65625 × Vref : P = P × k                (k ci-dessous)
+si V > Vref           : P = P ÷ 2
+hc = JDYN champ 26 (u32 entier, octet 67)        Corsair : 6 098 m
+plafond = THRS 5e champ × 100 m                  Corsair : 11 200 m
+si altitude > hc : P = P − P × (altitude − hc) ÷ (plafond − hc)
+v = max(V, THRS 7e champ ÷ 2)                    Corsair : 22,5 m/s
+poussée (N) = 0,8477 × 550 × P ÷ (v × 3,2773) × 4,4453 × cran ÷ 10, bornée à 0
+```
+
+Les constantes sont celles d'une formule en unités anglaises : 550 pied·livre-force par seconde et par cheval,
+3,2773 pieds par mètre, 4,4453 newtons par livre-force, rendement de l'hélice 0,8477 (`mov [bp+var_8], 22600h`,
+`472h`, `347h`, `0D9h`). Le facteur k ne s'applique qu'à basse vitesse : 1,047, 1,074 ou 1,098 selon `word_7CB07` (0, 1,
+2) pour l'avion désigné par `word_7CADA` ; 0,898, 0,949 ou 1,0 selon `byte_7CB11` pour un objet dont l'octet +51
+vaut 255 ; aucun facteur sinon. Le sens de ces deux réglages n'est pas établi.
+
+Non utilisés par cette fonction : la poussée maximale de `THRS`, son 3e champ (u8) et son 6e (u32). Les champs 23 et 26
+de `JDYN` sont, dans Strike Commander, des réglages de l'IA (vitesse de poursuite maximale, seuil de portée,
+PHYSICS.md) ; dans Pacific Strike, la poussée les lit aussi. Le reste du modèle de vol (forces, moments, `ATMO`,
+`STBL`) n'a pas encore été comparé.
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).

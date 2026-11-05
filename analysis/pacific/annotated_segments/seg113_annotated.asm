@@ -1122,7 +1122,21 @@ Widget_Method_Dispatch18_470F9		endp
 
 ; Attributes: bp-based frame
 
-sub_4710B		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Équivalent d'Aero_ThrottleThrustCurve_4730F de STRIKE, remplacé par un
+; modèle d'HÉLICE. Appel : (&résultat, &jdyn[22h] = sous-objet THRS, cran) ; résultat rangé
+; par l'appelant en jdyn[28h]. Recalcul seulement si le cran change ou une image sur 8
+; ((word_7977C + [avion+22h]) & 7), sinon rend [THRS+16h]. P = THRS+0Eh (puissance). V = norme
+; de la vitesse de l'objet du monde (méthode +50h, sub_5A065). Si V < 0,65625 × Vref (Vref =
+; mot jdyn[9Dh], champ 23 de JDYN) : P × 1,047 / 1,074 / 1,098 selon word_7CB07 (0/1/2) si
+; l'objet est celui de word_7CADA, sinon P × 0,898 / 0,949 / 1,0 selon byte_7CB11 si l'octet
+; +51h de l'objet vaut 255 ; si V > Vref : P ÷ 2. Altitude h ([[objet]+1Ah]) au-dessus de hc =
+; jdyn[0A3h] (champ 26, mètres entiers) : P −= P × (h − hc) ÷ (octet THRS+14h × 100 − hc).
+; Poussée = 550 × P × 4,4453 × 0,8477 ÷ (max(V, THRS+1Eh ÷ 2) × 3,2773) × cran ÷ 10, bornée ≥
+; 0, rangée en THRS+16h (constantes 22600h, 472h, 0D9h, 347h, 0A00h). THRS+0Ah (poussée max),
+; +12h et +1Ah ne sont pas utilisés ici.
+; ==============================================================================================
+Aero_PropellerThrust_4710B		proc far
 
 var_96		= dword ptr -96h
 var_92		= dword ptr -92h
@@ -1501,7 +1515,7 @@ loc_47507:
 		pop	si
 		leave
 		retf
-sub_4710B		endp
+Aero_PropellerThrust_4710B		endp
 
 ; ----------------------------------------------------------------------
 

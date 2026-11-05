@@ -15,7 +15,7 @@ stru_74E90	db 0CDh, 3Fh		; int_code
 ; Attributes: thunk
 
 sub_74EB0	proc far
-		jmp	AircraftDynamics_ReadStblChunk_B78C0
+		jmp	AircraftDynamics_ReadMassChunk_B78C0
 sub_74EB0	endp
 
 ; ----------------------------------------------------------------------

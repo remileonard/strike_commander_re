@@ -55,7 +55,7 @@ sub_74F04	endp
 ; Attributes: thunk
 
 sub_74F09	proc far
-		jmp	sub_B7AB1
+		jmp	AircraftDynamics_ReadAtmoChunk_B7AB1
 sub_74F09	endp
 
 ; ----------------------------------------------------------------------
@@ -119,7 +119,7 @@ sub_74F2C	endp
 ; Attributes: thunk
 
 sub_74F31	proc far
-		jmp	sub_B81AC
+		jmp	AircraftDynamics_ReadThrustChunk_B81AC
 sub_74F31	endp
 
 ; ----------------------------------------------------------------------

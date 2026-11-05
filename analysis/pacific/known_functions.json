@@ -4820,9 +4820,9 @@
     "summary": "Reprise de STRIKE.EXE : même suite d'instructions, 1 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `PaletteScreen_ReleaseStyleAndObject_A2BFF` (sub_A2BFF de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, combine TextFormat_ReleaseStyleList_5E526 et libération d'objet (sub_338)."
   },
   "sub_B78C0": {
-    "new_name": "AircraftDynamics_ReadStblChunk_B78C0",
+    "new_name": "AircraftDynamics_ReadMassChunk_B78C0",
     "segment": "ovr334",
-    "summary": "Reprise de STRIKE.EXE : même suite d'instructions, 3 opérande(s) différent(s) (adresses de données ou constantes) — à vérifier à `AircraftDynamics_ReadStblChunk_A52B8` (sub_A52B8 de STRIKE.EXE). Résumé repris de STRIKE.EXE ; appelants et contexte à revérifier ici. — far, seg449. Lecteur du chunk 'STBL' de la hierarchie FORM DYNM (erreur 0xA004 si absent). sub_A52FD (helper) puis ResourceRecord_SeekAndRead('STBL', FourCC ASM 0x4C425453) + sub_64A7E (u32) -> [si+0x12]. [si+0x12] = jdyn[0x12] = COEFF DE STABILITE / AUTORITE DE TANGAGE : echelle q' dans Aero_ComputeForcesMain (q' = q * jdyn[0x12] / 100). Detail: DATA_MODEL.md 6.2."
+    "summary": "far. LUE 2026-11-05 (corrige une reprise automatique erronée qui l'appelait ReadStblChunk : même suite d'instructions que le lecteur de STBL, mais elle cherche 'DYNM', push large 4D4E5944h). Lecteur du chunk DYNM (masse) : un u32 -> [si+1Ah] (STRIKE : [si+4], AircraftDynamics_ReadMassChunk_A4A20) ; erreur 0A001h si absent. Format de fichier inchangé."
   },
   "sub_B7962": {
     "new_name": "PlayerComponent_Helper_B7962",
@@ -6123,5 +6123,20 @@
     "new_name": "TerrainTextures_ReleaseUnused_32716",
     "segment": "seg082",
     "summary": "far. LUE 2026-11-05. Si byte_77BFD : pour chaque place dont l'octet d'utilisation (seg226) vaut 0 et dont l'image est chargée, la libère (sub_7516F) et remet l'enregistrement à « pas chargée » (+4 = place, +0Ch = 255)."
+  },
+  "sub_B7AB1": {
+    "new_name": "AircraftDynamics_ReadAtmoChunk_B7AB1",
+    "segment": "ovr335",
+    "summary": "far. LUE 2026-11-05. Comme AircraftDynamics_ReadAtmoChunk_A4BE1 de STRIKE (u32 -> [si+10h], modèle d'atmosphère global dword_7CE14 au premier avion), avec une instruction de plus avant la lecture : mov dword ptr [si+14h], 100h (nouveau champ en mémoire mis à 1,0 ; rôle non lu). Format de fichier inchangé."
+  },
+  "sub_B81AC": {
+    "new_name": "AircraftDynamics_ReadThrustChunk_B81AC",
+    "segment": "ovr335",
+    "summary": "far. LUE 2026-11-05. Lecteur du chunk THRS, FORMAT CHANGÉ (19 octets au lieu de 7) : u32 -> [si+0Ah] (poussée max, comme STRIKE) ; NOUVEAU u32 -> [si+0Eh] (puissance, chevaux, utilisée par Aero_PropellerThrust_4710B) ; 3 u8 -> [si+12h], [si+13h], [si+14h] (STRIKE : [si+0Eh..10h]) ; NOUVEAU u32 -> [si+1Ah] ; NOUVEAU u32 -> [si+1Eh] (Aero_PropellerThrust_4710B : moitié = vitesse plancher). Erreur 0A003h si absent."
+  },
+  "sub_4710B": {
+    "new_name": "Aero_PropellerThrust_4710B",
+    "segment": "seg113",
+    "summary": "far. LUE 2026-11-05. Équivalent d'Aero_ThrottleThrustCurve_4730F de STRIKE, remplacé par un modèle d'HÉLICE. Appel : (&résultat, &jdyn[22h] = sous-objet THRS, cran) ; résultat rangé par l'appelant en jdyn[28h]. Recalcul seulement si le cran change ou une image sur 8 ((word_7977C + [avion+22h]) & 7), sinon rend [THRS+16h]. P = THRS+0Eh (puissance). V = norme de la vitesse de l'objet du monde (méthode +50h, sub_5A065). Si V < 0,65625 × Vref (Vref = mot jdyn[9Dh], champ 23 de JDYN) : P × 1,047 / 1,074 / 1,098 selon word_7CB07 (0/1/2) si l'objet est celui de word_7CADA, sinon P × 0,898 / 0,949 / 1,0 selon byte_7CB11 si l'octet +51h de l'objet vaut 255 ; si V > Vref : P ÷ 2. Altitude h ([[objet]+1Ah]) au-dessus de hc = jdyn[0A3h] (champ 26, mètres entiers) : P −= P × (h − hc) ÷ (octet THRS+14h × 100 − hc). Poussée = 550 × P × 4,4453 × 0,8477 ÷ (max(V, THRS+1Eh ÷ 2) × 3,2773) × cran ÷ 10, bornée ≥ 0, rangée en THRS+16h (constantes 22600h, 472h, 0D9h, 347h, 0A00h). THRS+0Ah (poussée max), +12h et +1Ah ne sont pas utilisés ici."
   }
 }
