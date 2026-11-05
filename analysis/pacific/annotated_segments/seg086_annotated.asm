@@ -328,7 +328,7 @@ loc_365B2:
 		mov	ax, [si+0B3h]
 		cmp	ax, [bp+var_2]
 		jg	short loc_3655F
-		call	sub_32716
+		call	TerrainTextures_ReleaseUnused_32716
 		mov	al, 1
 		pop	di
 		pop	si

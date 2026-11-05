@@ -7,7 +7,12 @@ seg082		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_324D1		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Charge la texture n si elle n'est pas chargée (+0Ch = 255) et s'il
+; reste au moins 150 000 octets libres (cmp eax, 249F0h) : ouvre TXM\TXMPACK.PAK, se place sur
+; l'entrée n (sub_7844), lit l'image (sub_75179). Rend 1 si chargée.
+; ==============================================================================================
+TerrainTextures_LoadOnDemand_324D1		proc far
 
 var_D2		= word ptr -0D2h
 var_5A		= word ptr -5Ah
@@ -140,13 +145,17 @@ loc_325DE:
 		pop	si
 		leave
 		retf
-sub_324D1		endp
+TerrainTextures_LoadOnDemand_324D1		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_325E4		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Variante de TerrainTextures_Resolve_32638 : charge si besoin, puis
+; sub_75188 rend l'image.
+; ==============================================================================================
+TerrainTextures_ResolveB_325E4		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -172,7 +181,7 @@ loc_3260A:
 		les	bx, word ptr [bp+arg_0]
 		push	word ptr es:[bx+4]
 		push	cs
-		call	near ptr sub_324D1
+		call	near ptr TerrainTextures_LoadOnDemand_324D1
 		pop	cx
 		or	al, al
 		jz	short loc_32630
@@ -189,13 +198,18 @@ loc_32630:
 		mov	ax, word ptr [bp+var_4]
 		leave
 		retf
-sub_325E4		endp
+TerrainTextures_ResolveB_325E4		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_32638		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Rend l'image d'un enregistrement de texture du sol, en la chargeant si
+; besoin (TerrainTextures_LoadOnDemand_324D1) ; retenue CF posée si le chargement a été tenté.
+; Appelée par Render_TerrainPipelineMain_3362C.
+; ==============================================================================================
+TerrainTextures_Resolve_32638		proc far
 
 var_4		= dword ptr -4
 arg_0		= dword ptr  6
@@ -224,7 +238,7 @@ loc_32661:
 		les	bx, word ptr [bp+arg_0]
 		push	word ptr es:[bx+4]
 		push	cs
-		call	near ptr sub_324D1
+		call	near ptr TerrainTextures_LoadOnDemand_324D1
 		pop	cx
 		or	al, al
 		jnz	short loc_32685
@@ -256,7 +270,7 @@ loc_3269E:
 		pop	si
 		leave
 		retf
-sub_32638		endp
+TerrainTextures_Resolve_32638		endp
 
 ; ----------------------------------------------------------------------
 
@@ -332,7 +346,12 @@ sub_326CB		endp
 
 ; Attributes: bp-based frame
 
-sub_32716		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Si byte_77BFD : pour chaque place dont l'octet d'utilisation (seg226)
+; vaut 0 et dont l'image est chargée, la libère (sub_7516F) et remet l'enregistrement à « pas
+; chargée » (+4 = place, +0Ch = 255).
+; ==============================================================================================
+TerrainTextures_ReleaseUnused_32716		proc far
 
 var_6		= word ptr -6
 var_4		= dword ptr -4
@@ -427,7 +446,7 @@ loc_327C9:
 		pop	si
 		leave
 		retf
-sub_32716		endp
+TerrainTextures_ReleaseUnused_32716		endp
 
 ; ----------------------------------------------------------------------
 

@@ -176,7 +176,7 @@ arg_0		= word ptr  6
 		call	sub_6735D
 		add	sp, 4
 		push	si
-		call	sub_2D6FC
+		call	Render_SkyAndSeaBackground_2D6FC
 		pop	cx
 		push	si
 		push	67ADh
@@ -482,7 +482,7 @@ loc_8AB0D:
 		jmp	loc_8ABF8
 
 loc_8AB24:
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		mov	[bp+var_28], al
 		mov	ax, di
 		add	ax, 12h
@@ -1020,7 +1020,7 @@ loc_8B27D:
 		jmp	short loc_8B2AF
 
 loc_8B28A:
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jz	short loc_8B2AF
 		cmp	byte_79B9B, 0
@@ -1926,7 +1926,7 @@ loc_8C089:
 loc_8C08B:
 		or	al, al
 		jz	short loc_8C09B
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jz	short loc_8C09B
 		jmp	loc_8B8EF

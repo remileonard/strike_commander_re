@@ -6,7 +6,12 @@ ovr290		segment	para public 'OVERLAY' use16
 
 ; Attributes: bp-based frame
 
-sub_A85B0		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. byte_77BFD = 0, mesure la mémoire libre (sub_64B0E), compare à 10 000
+; 000, puis byte_77BFD = 1 (aucun saut entre les deux dans ce listing) ; efface la table
+; d'utilisation seg226 (sub_380B, 255 octets).
+; ==============================================================================================
+TerrainTextures_PrepareCache_A85B0		proc far
 		push	bp
 		mov	bp, sp
 		mov	byte_77BFD, 0
@@ -23,13 +28,17 @@ sub_A85B0		proc far
 		add	sp, 8
 		pop	bp
 		retf
-sub_A85B0		endp
+TerrainTextures_PrepareCache_A85B0		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A85E2		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Réserve la place n de la table des textures du sol sans image :
+; enregistrement +4 = n, +0Ch = 255 (pas chargée).
+; ==============================================================================================
+TerrainTextures_ReserveSlot_A85E2		proc far
 
 var_6		= word ptr -6
 var_4		= dword ptr -4
@@ -84,13 +93,24 @@ loc_A8627:
 loc_A864B:
 		leave
 		retf
-sub_A85E2		endp
+TerrainTextures_ReserveSlot_A85E2		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_A864D		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Table des textures du sol (word_7CCEA : +0 simples, +2 animées, +4
+; table pas de 14, +8 table pas de 24). Lit le FORM TXMS du terrain (dans <nom>.ZIP, ressource
+; TERA) : INFO = 2 mots (les deux nombres, 255 et 255 pour OAHU) ; ouvre TXM\TXMPACK.PAK ;
+; MAPS = enregistrements de 12 octets (mot numéro = place, sans soustraction ; nom 8 octets ;
+; octet 11 = nombre d'images) ; 1 image → place = numéro ; bit 7 → animée ; sinon n images «
+; %s%d » aux places numéro … numéro + n − 1. Numéro 255 sauté ; numéros ≤ 215 sautés si
+; byte_77BF4 = 0 (1 au départ). Les images ne sont pas chargées ici : byte_77BFD (toujours 1
+; dans ce listing, TerrainTextures_PrepareCache_A85B0) → TerrainTextures_ReserveSlot_A85E2 ;
+; chargement à la demande par TerrainTextures_LoadOnDemand_324D1.
+; ==============================================================================================
+TerrainTextures_LoadTerrainList_A864D		proc far
 
 var_E8		= word ptr -0E8h
 var_DA		= word ptr -0DAh
@@ -111,7 +131,7 @@ arg_4		= word ptr  0Ah
 		push	di
 		mov	si, [bp+arg_4]
 		push	cs
-		call	near ptr sub_A85B0
+		call	near ptr TerrainTextures_PrepareCache_A85B0
 		push	0
 		push	large 534D5854h
 		push	si
@@ -223,7 +243,7 @@ loc_A8771:
 		jz	short loc_A8784
 		push	[bp+var_DA]
 		push	cs
-		call	near ptr sub_A85E2
+		call	near ptr TerrainTextures_ReserveSlot_A85E2
 		pop	cx
 		jmp	loc_A8837
 
@@ -284,7 +304,7 @@ loc_A880A:
 		jz	short loc_A8819
 		push	dx
 		push	cs
-		call	near ptr sub_A85E2
+		call	near ptr TerrainTextures_ReserveSlot_A85E2
 		pop	cx
 		jmp	short loc_A8831
 
@@ -330,7 +350,7 @@ loc_A885B:
 		pop	si
 		leave
 		retf
-sub_A864D		endp
+TerrainTextures_LoadTerrainList_A864D		endp
 
 ; ----------------------------------------------------------------------
 

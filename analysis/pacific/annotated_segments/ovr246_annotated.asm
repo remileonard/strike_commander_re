@@ -265,7 +265,7 @@ loc_8C35B:
 		inc	ax
 		or	ax, ax
 		jz	short loc_8C379
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jnz	short loc_8C31A
 
@@ -559,7 +559,7 @@ loc_8C73B:
 loc_8C73D:
 		or	al, al
 		jz	short loc_8C74D
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jz	short loc_8C74D
 		jmp	loc_8C503
@@ -609,7 +609,7 @@ loc_8C778:
 		jmp	short loc_8C7ED
 
 loc_8C7BD:
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		mov	ah, 0
 		or	ax, ax
 		jz	short loc_8C805

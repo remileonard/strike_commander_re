@@ -7060,7 +7060,7 @@ loc_550D6:
 		push	cs
 		call	near ptr PartEntry_DispatchMissionUpdateTick_5471E
 		pop	cx
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jz	short loc_550FB
 		push	si

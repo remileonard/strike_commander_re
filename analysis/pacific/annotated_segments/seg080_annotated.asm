@@ -1085,7 +1085,7 @@ loc_31EE1:
 		mov	[si+5], eax
 		push	di
 		push	si
-		call	sub_3362C
+		call	Render_TerrainPipelineMain_3362C
 		add	sp, 4
 		pop	di
 		pop	si

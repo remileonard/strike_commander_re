@@ -758,6 +758,72 @@ relues que dans PACIFIC.EXE ; Strike Commander n'est pas concerné.
 Outils : `tools/terrain_map.py` et `tools/terrain_viewer.py` lisent directement `TERRAIN\<nom>.ZIP` ;
 `tri_map.read_region_ps` lit une région `.TRI` de Pacific Strike.
 
+### 7.2 Dessin du sol et de l'eau
+
+Lu le 2026-11-05 dans `Render_TerrainPipelineMain_3362C` (seg083, lu en partie : choix de la couleur et de la
+texture, envoi), `Render_SkyAndSeaBackground_2D6FC` et `Render_WaterOrSkyPlane_2CDA0` (seg074). Le sommet du sol est
+celui de Strike Commander : altitude, éclairage, couleur, texture du 1er triangle (octet 4), texture du 2e (octet 5).
+
+**Le sol, triangle par triangle**
+
+1. Couleur de base = celle du sommet le plus haut, comme Strike Commander.
+2. **Nouveau : un triangle de couleur 0 n'est pas dessiné** (`or al, al` / `jnz`, sinon fin du triangle). Strike
+   Commander dessine ces triangles ; dans Pacific Strike, la mer n'est pas du terrain, c'est le fond (plus bas).
+3. Texture = octet 4 (1er triangle) ou 5 (2e) du premier sommet de la case ; 255 = aucune. Sinon, numéro dans la
+   table des textures du sol (images simples, puis animées), comme les matériaux des pistes (§ 7.1).
+4. **u, v fixes** : la texture couvre toute la case (1000 m), image de 64 × 64 points (`mov cx, 40h`), avec une marge
+   d'un ou deux points :
+
+```
+1er triangle : (2, 1)  (63, 1)  (63, 62)
+2e triangle  : (0, 1)  (61, 62)  (0, 62)
+```
+
+5. **Avec une texture, le triangle texturé remplace le triangle ombré** (primitive de type 9 au lieu de 6) ; Strike
+   Commander dessinait le triangle ombré puis la texture. Si l'éclairage s'applique à la texture n'a pas été lu (tracé
+   du type 9 non lu). Les numéros 223 et plus passent par un drapeau (`var_578`) qui, dans ce listing, mène aux mêmes
+   écritures.
+
+**La table des textures du sol** (`TerrainTextures_LoadTerrainList_A864D`) vient du terrain lui-même : le `FORM TXMS`
+de la ressource `TERA` de `OAHU.ZIP` (chunk `INFO` : 255 et 255 ; chunk `MAPS` : enregistrements de 12 octets, mot =
+numéro, nom sur 8 octets, octet 11 = nombre d'images), et les images de `TXM\TXMPACK.PAK`. Différence avec la table des
+pistes : **la place est le numéro lui-même** (pas de soustraction), et l'image n est l'entrée n de `TXMPACK.PAK`. Les
+images ne sont pas chargées d'avance : chaque place est réservée vide, puis l'image est lue au premier dessin
+(`TerrainTextures_LoadOnDemand_324D1`, s'il reste au moins 150 000 octets) et libérée quand elle ne sert plus
+(`TerrainTextures_ReleaseUnused_32716`). `TXM\TXM_LIST.IFF` a le même format (mêmes numéros : `SNDBCH` 0, `TREBCH` 6…)
+mais aucun lecteur n'a été trouvé ; `MOS_LIST.IFF` non plus.
+
+Dans `TXMPACK.PAK` : 106 images de 64 × 64 et 11 de 128 × 128 (entrées 232 à 238 et 251 à 254). Oahu emploie les
+numéros 0 à 11, 42 à 59, 216 à 219, 226 à 234, 251 et 252 ; 2 % des triangles seulement ont une texture : côtes,
+lisières, ville et port.
+
+**L'eau et le ciel** (`Render_SkyAndSeaBackground_2D6FC`, avant le terrain). Deux réglages, à 0 au départ, basculés
+par ALT+R (eau texturée) et ALT+Y (ciel texturé) (`Input_AltKeyDetailToggles_5093D`, codes de touche 19 et 21) :
+
+- ciel texturé coupé : ligne d'horizon et zone de découpe de la vue, comme Strike Commander (couleurs de ce fond non
+  relues ici) ;
+- ciel texturé : la vue est d'abord remplie de la couleur 166 de la palette, puis un plan `SKY` est dessiné à 8 500 m ;
+- eau texturée, observateur sous 4 000 m : un plan d'eau à l'altitude 0, avant le ciel.
+
+Le plan (`Render_WaterOrSkyPlane_2CDA0`) est un carré de ± 800 km centré sur l'observateur, transformé et découpé
+comme une face. Ses u, v sont les **coordonnées monde des coins divisées par 16** (eau) ou **par 128** (ciel) : la
+texture reste fixe sur le monde quand l'observateur bouge. Image de l'eau : place 7 + n de la table des pistes
+(`water1` à `water10`), n avançant de 1 tous les 2 dessins et revenant à 0 après 9 ; image du ciel : place 18 (`SKY`,
+256 × 256). Dans `ACCPACK.PAK`, seule `water1` existe (128 × 128) : les entrées 8 à 16 sont vides (adresse marquée
+`FF`) ; `sub_7844` se place quand même sur l'entrée suivante, et ce qui est alors lu comme image n'a pas été vérifié.
+
+Contrôle (`tools/ps_ground_render.py`, vue de dessus, mer en couleur 166) : avec ces règles, les textures de côte se
+raccordent d'une case à l'autre et Pearl Harbor apparaît avec Ford Island, les quais et la ville.
+
+![Oahu vue de dessus : sol ombré, textures, triangles de couleur 0 non dessinés (mer en couleur 166)](images/ps_ground_oahu.png)
+
+![Pearl Harbor : textures de côte, de ville et de port, 48 points par case](images/ps_ground_pearl.png)
+
+**Écarts avec libRealSpace** (`RSArea`, le dessin du terrain de Strike Commander, utilisé tel quel pour Pacific Strike) :
+les triangles de couleur 0 y sont dessinés ; la texture s'ajoute au triangle ombré ; l'eau texturée n'existe pas.
+Le chargement des images (`TXMPACK.PAK` de Pacific Strike : largeur et hauteur sur 2 octets, puis les points) n'a pas
+été comparé à `RSMapTextureSet`.
+
 ## 5. Rapport avec libRealSpace
 
 - `PSGameFlowParser::parseOpCode` : les longueurs sont celles du code pour 0, 6, 7, 9, 10, 35 et 36 (2 octets).

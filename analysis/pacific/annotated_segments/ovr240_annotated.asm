@@ -765,7 +765,7 @@ loc_8A193:
 		call	sub_50F18
 
 loc_8A1C8:
-		call	sub_5093D
+		call	Input_AltKeyDetailToggles_5093D
 		or	al, al
 		jnz	short loc_8A17E
 

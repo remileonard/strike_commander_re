@@ -31,7 +31,7 @@ sub_73FE5	endp
 ; Attributes: thunk
 
 sub_73FEA	proc far
-		jmp	sub_A864D
+		jmp	TerrainTextures_LoadTerrainList_A864D
 sub_73FEA	endp
 
 ; ----------------------------------------------------------------------
@@ -79,7 +79,7 @@ sub_74003	endp
 ; Attributes: thunk
 
 sub_74008	proc far
-		jmp	sub_A85B0
+		jmp	TerrainTextures_PrepareCache_A85B0
 sub_74008	endp
 
 ; ----------------------------------------------------------------------
@@ -87,7 +87,7 @@ sub_74008	endp
 ; Attributes: thunk
 
 sub_7400D	proc far
-		jmp	sub_A85E2
+		jmp	TerrainTextures_ReserveSlot_A85E2
 sub_7400D	endp
 
 ; ----------------------------------------------------------------------

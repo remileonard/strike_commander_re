@@ -6068,5 +6068,60 @@
     "new_name": "Render_FacePipeline_2EEB8",
     "segment": "seg078",
     "summary": "far, 2307 lignes. LUE EN PARTIE 2026-11-05 (champs de la face seulement). Dessine une face : image = dword +14h de la face (-> dword_77B78 ; 0 = sans image), double face = octet +25h (-> byte_77B7C) ; sommets transformés dans le repère de l'observateur (Matrix_WorldToLocal_5A569) avec cache (bit 80h de +10h du sommet) ; u, v des 3 sommets (+18h à +22h) passés en 8.8 (shl ax, 8) : coordonnées en POINTS de l'image. Clé de tri : profondeur du sommet le plus loin + 7D00h, moins 1900h si l'octet +25h vaut 1, moins 4B00h s'il vaut 2 (rôle exact non lu). Découpage et envoi (sub_2E656, sub_634A4) non lus."
+  },
+  "sub_3362C": {
+    "new_name": "Render_TerrainPipelineMain_3362C",
+    "segment": "seg083",
+    "summary": "far, 2700 lignes. LUE EN PARTIE 2026-11-05 (choix de couleur et de texture, envoi). Équivalent de Render_TerrainPipelineMain de STRIKE.EXE. Par triangle : couleur de base = octet +3 du sommet dont le mot +0 (hauteur) est le plus grand en comparaison non signée (comme STRIKE) ; NOUVEAU : couleur 0 → triangle non dessiné (or al, al / jnz, sinon jmp loc_357B3) ; texture = octet +4 (gs:[si+1] ≠ 0) ou +5 du 1er sommet de la case, 255 = aucune, sinon table des textures du sol word_7CCEA (pas de 14, puis animées pas de 24) ; ≥ 223 (0DFh) → var_578 = 1, sans autre effet dans ce listing (les deux branches écrivent le type 9). u, v FIXES pour une image de 64 points (mov cx, 40h) : 1er triangle (2,1) (63,1) (63,62), 2e (0,1) (61,62) (0,62). Envoi : sans texture primitive de type 6 (triangle ombré, intensités +20h/+38h/+50h, moyenne ÷ 3 si byte_77C2F ≠ 1) ; avec texture primitive de type 9 (image résolue par TerrainTextures_Resolve_32638, chargée à la demande) qui remplace le triangle ombré (STRIKE dessinait les deux). Découpage et tracé non lus."
+  },
+  "sub_2CDA0": {
+    "new_name": "Render_WaterOrSkyPlane_2CDA0",
+    "segment": "seg074",
+    "summary": "far. LUE 2026-11-05 (préparation). Dessine un plan texturé centré sur l'observateur (arg_4 = position), carré de ± 800 000 m (0C350000h en 24.8). arg_0 = 0 : EAU, altitude 0, image = place word_77B1A + 7 de la table des pistes (ACC_LIST : water1 à water10), word_77B1A avance de 1 tous les 2 appels (word_77B1C) si word_77B60 = 0 et revient à 0 après 9 ; u, v = coordonnées monde (24.8) des coins ÷ 16. arg_0 ≠ 0 : CIEL, altitude 8 500 m (2134h), image = place 18 (SKY), u, v = coordonnées ÷ 128. Coins transformés (Matrix_WorldToLocal_5A569), découpés (sub_2BEDA) ; la suite (envoi) non lue."
+  },
+  "sub_2D6FC": {
+    "new_name": "Render_SkyAndSeaBackground_2D6FC",
+    "segment": "seg074",
+    "summary": "far. LUE 2026-11-05. Fond de la vue, avant le terrain. byte_7CAFE (ciel texturé) = 0 : ligne d'horizon calculée (bornée à ± 8191, [caméra+78h..7Eh]) puis Camera_UpdateViewportClip, comme STRIKE. byte_7CAFE ≠ 0 : pas de ligne d'horizon ; la vue est remplie de la couleur 166 (TextFormat_ReleaseAttribute_67F1D, 0A6h), puis Render_WaterOrSkyPlane_2CDA0(1) (ciel). byte_7CAFF (eau texturée) ≠ 0 et observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) : Render_WaterOrSkyPlane_2CDA0(0) (eau), avant le ciel. Les deux réglages valent 0 au départ et basculent par Input_AltKeyDetailToggles_5093D (ALT+R eau, ALT+Y ciel)."
+  },
+  "sub_5093D": {
+    "new_name": "Input_AltKeyDetailToggles_5093D",
+    "segment": "seg123",
+    "summary": "far. LUE EN PARTIE 2026-11-05. Aiguillage sur le code de touche byte_7CAC3 − 15 (table off_50E83, 19 cas), touche ALT exigée (byte_7CAC5 & 0C0h, ou byte_7D348 / byte_7D369) : code 19 (R) → bascule byte_7CAFF (eau texturée) ; code 21 (Y) → bascule byte_7CAFE (ciel texturé). Autres cas (codes 15, 25, 32, 33) non lus."
+  },
+  "sub_A864D": {
+    "new_name": "TerrainTextures_LoadTerrainList_A864D",
+    "segment": "ovr290",
+    "summary": "far. LUE 2026-11-05. Table des textures du sol (word_7CCEA : +0 simples, +2 animées, +4 table pas de 14, +8 table pas de 24). Lit le FORM TXMS du terrain (dans <nom>.ZIP, ressource TERA) : INFO = 2 mots (les deux nombres, 255 et 255 pour OAHU) ; ouvre TXM\\TXMPACK.PAK ; MAPS = enregistrements de 12 octets (mot numéro = place, sans soustraction ; nom 8 octets ; octet 11 = nombre d'images) ; 1 image → place = numéro ; bit 7 → animée ; sinon n images « %s%d » aux places numéro … numéro + n − 1. Numéro 255 sauté ; numéros ≤ 215 sautés si byte_77BF4 = 0 (1 au départ). Les images ne sont pas chargées ici : byte_77BFD (toujours 1 dans ce listing, TerrainTextures_PrepareCache_A85B0) → TerrainTextures_ReserveSlot_A85E2 ; chargement à la demande par TerrainTextures_LoadOnDemand_324D1."
+  },
+  "sub_A85B0": {
+    "new_name": "TerrainTextures_PrepareCache_A85B0",
+    "segment": "ovr290",
+    "summary": "far. LUE 2026-11-05. byte_77BFD = 0, mesure la mémoire libre (sub_64B0E), compare à 10 000 000, puis byte_77BFD = 1 (aucun saut entre les deux dans ce listing) ; efface la table d'utilisation seg226 (sub_380B, 255 octets)."
+  },
+  "sub_A85E2": {
+    "new_name": "TerrainTextures_ReserveSlot_A85E2",
+    "segment": "ovr290",
+    "summary": "far. LUE 2026-11-05. Réserve la place n de la table des textures du sol sans image : enregistrement +4 = n, +0Ch = 255 (pas chargée)."
+  },
+  "sub_324D1": {
+    "new_name": "TerrainTextures_LoadOnDemand_324D1",
+    "segment": "seg082",
+    "summary": "far. LUE 2026-11-05. Charge la texture n si elle n'est pas chargée (+0Ch = 255) et s'il reste au moins 150 000 octets libres (cmp eax, 249F0h) : ouvre TXM\\TXMPACK.PAK, se place sur l'entrée n (sub_7844), lit l'image (sub_75179). Rend 1 si chargée."
+  },
+  "sub_32638": {
+    "new_name": "TerrainTextures_Resolve_32638",
+    "segment": "seg082",
+    "summary": "far. LUE 2026-11-05. Rend l'image d'un enregistrement de texture du sol, en la chargeant si besoin (TerrainTextures_LoadOnDemand_324D1) ; retenue CF posée si le chargement a été tenté. Appelée par Render_TerrainPipelineMain_3362C."
+  },
+  "sub_325E4": {
+    "new_name": "TerrainTextures_ResolveB_325E4",
+    "segment": "seg082",
+    "summary": "far. LUE 2026-11-05. Variante de TerrainTextures_Resolve_32638 : charge si besoin, puis sub_75188 rend l'image."
+  },
+  "sub_32716": {
+    "new_name": "TerrainTextures_ReleaseUnused_32716",
+    "segment": "seg082",
+    "summary": "far. LUE 2026-11-05. Si byte_77BFD : pour chaque place dont l'octet d'utilisation (seg226) vaut 0 et dont l'image est chargée, la libère (sub_7516F) et remet l'enregistrement à « pas chargée » (+4 = place, +0Ch = 255)."
   }
 }

@@ -13,7 +13,13 @@ loc_5093A:
 
 ; Attributes: bp-based frame
 
-sub_5093D		proc far
+; ==============================================================================================
+; far. LUE EN PARTIE 2026-11-05. Aiguillage sur le code de touche byte_7CAC3 − 15 (table
+; off_50E83, 19 cas), touche ALT exigée (byte_7CAC5 & 0C0h, ou byte_7D348 / byte_7D369) : code
+; 19 (R) → bascule byte_7CAFF (eau texturée) ; code 21 (Y) → bascule byte_7CAFE (ciel
+; texturé). Autres cas (codes 15, 25, 32, 33) non lus.
+; ==============================================================================================
+Input_AltKeyDetailToggles_5093D		proc far
 
 var_74		= dword ptr -74h
 var_70		= word ptr -70h
@@ -657,9 +663,9 @@ loc_50E7E:
 		mov	al, [bp+var_1]
 		leave
 		retf
-sub_5093D		endp
+Input_AltKeyDetailToggles_5093D		endp
 
-; START OF FUNCTION CHUNK FOR sub_5093D
+; START OF FUNCTION CHUNK FOR Input_AltKeyDetailToggles_5093D
 off_50E83	dw offset loc_50A5F
 		dw offset loc_50CB4
 		dw offset loc_50CB4
@@ -679,7 +685,7 @@ off_50E83	dw offset loc_50A5F
 		dw offset loc_50CB4
 		dw offset loc_50A21
 		dw offset loc_509E6
-; END OF FUNCTION CHUNK FOR sub_5093D
+; END OF FUNCTION CHUNK FOR Input_AltKeyDetailToggles_5093D
 
 ; ----------------------------------------------------------------------
 

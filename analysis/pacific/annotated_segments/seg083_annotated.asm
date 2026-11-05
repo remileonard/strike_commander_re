@@ -7,7 +7,21 @@ seg083		segment	para public 'CODE' use16
 
 ; Attributes: bp-based frame
 
-sub_3362C		proc far
+; ==============================================================================================
+; far, 2700 lignes. LUE EN PARTIE 2026-11-05 (choix de couleur et de texture, envoi).
+; Équivalent de Render_TerrainPipelineMain de STRIKE.EXE. Par triangle : couleur de base =
+; octet +3 du sommet dont le mot +0 (hauteur) est le plus grand en comparaison non signée
+; (comme STRIKE) ; NOUVEAU : couleur 0 → triangle non dessiné (or al, al / jnz, sinon jmp
+; loc_357B3) ; texture = octet +4 (gs:[si+1] ≠ 0) ou +5 du 1er sommet de la case, 255 =
+; aucune, sinon table des textures du sol word_7CCEA (pas de 14, puis animées pas de 24) ; ≥
+; 223 (0DFh) → var_578 = 1, sans autre effet dans ce listing (les deux branches écrivent le
+; type 9). u, v FIXES pour une image de 64 points (mov cx, 40h) : 1er triangle (2,1) (63,1)
+; (63,62), 2e (0,1) (61,62) (0,62). Envoi : sans texture primitive de type 6 (triangle ombré,
+; intensités +20h/+38h/+50h, moyenne ÷ 3 si byte_77C2F ≠ 1) ; avec texture primitive de type 9
+; (image résolue par TerrainTextures_Resolve_32638, chargée à la demande) qui remplace le
+; triangle ombré (STRIKE dessinait les deux). Découpage et tracé non lus.
+; ==============================================================================================
+Render_TerrainPipelineMain_3362C		proc far
 
 var_57C		= byte ptr -57Ch
 var_57A		= byte ptr -57Ah
@@ -2566,7 +2580,7 @@ loc_3560A:
 		push	large dword_77C04
 		push	ss
 		pop	ds
-		call	sub_32638
+		call	TerrainTextures_Resolve_32638
 		add	sp, 4
 		push	ax
 		push	dx
@@ -2707,9 +2721,9 @@ loc_357B3:
 loc_357B8:
 		add	di, 16h
 		dec	[bp+var_56]
-sub_3362C		endp
+Render_TerrainPipelineMain_3362C		endp
 
-; START OF FUNCTION CHUNK FOR sub_3362C
+; START OF FUNCTION CHUNK FOR Render_TerrainPipelineMain_3362C
 		db 0Fh, 85h
-; END OF FUNCTION CHUNK FOR sub_3362C
+; END OF FUNCTION CHUNK FOR Render_TerrainPipelineMain_3362C
 seg083		ends

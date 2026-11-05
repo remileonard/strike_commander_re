@@ -24,7 +24,7 @@ arg_2		= word ptr  8
 		call	Camera_CopyState
 		add	sp, 4
 		push	si
-		call	sub_2D6FC
+		call	Render_SkyAndSeaBackground_2D6FC
 		pop	cx
 		push	si
 		push	67ADh

@@ -1322,7 +1322,7 @@ loc_2C8FF:
 		push	si
 		nop
 		push	cs
-		call	near ptr sub_2D6FC
+		call	near ptr Render_SkyAndSeaBackground_2D6FC
 		pop	cx
 		push	si
 		push	67ADh
@@ -1889,7 +1889,16 @@ sub_2CD83		endp
 
 ; Attributes: bp-based frame
 
-sub_2CDA0		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05 (préparation). Dessine un plan texturé centré sur l'observateur (arg_4 =
+; position), carré de ± 800 000 m (0C350000h en 24.8). arg_0 = 0 : EAU, altitude 0, image =
+; place word_77B1A + 7 de la table des pistes (ACC_LIST : water1 à water10), word_77B1A avance
+; de 1 tous les 2 appels (word_77B1C) si word_77B60 = 0 et revient à 0 après 9 ; u, v =
+; coordonnées monde (24.8) des coins ÷ 16. arg_0 ≠ 0 : CIEL, altitude 8 500 m (2134h), image =
+; place 18 (SKY), u, v = coordonnées ÷ 128. Coins transformés (Matrix_WorldToLocal_5A569),
+; découpés (sub_2BEDA) ; la suite (envoi) non lue.
+; ==============================================================================================
+Render_WaterOrSkyPlane_2CDA0		proc far
 
 var_392		= dword ptr -392h
 var_38E		= dword ptr -38Eh
@@ -2785,13 +2794,22 @@ loc_2D6F8:
 		pop	si
 		leave
 		retf
-sub_2CDA0		endp
+Render_WaterOrSkyPlane_2CDA0		endp
 
 ; ----------------------------------------------------------------------
 
 ; Attributes: bp-based frame
 
-sub_2D6FC		proc far
+; ==============================================================================================
+; far. LUE 2026-11-05. Fond de la vue. Si byte_7CAFE (ciel texturé) et byte_7CAFF (eau
+; texturée) valent 0 : calcule la ligne d'horizon (bornée à ± 8191, rangée en
+; [caméra+78h..7Eh]) et Camera_UpdateViewportClip, comme STRIKE. Sinon : si byte_7CAFF et
+; observateur sous 4 000 m ([caméra+1Ch] < 0FA000h) → Render_WaterOrSkyPlane_2CDA0(0) (eau) ;
+; si byte_7CAFE → Render_WaterOrSkyPlane_2CDA0(1) (ciel) ; remplissage par la couleur 166
+; (TextFormat_ReleaseAttribute_67F1D, 0A6h) dans certains cas (conditions à relire).
+; byte_7CAFE et byte_7CAFF valent 0 au départ ; basculés par Input_AltKeyDetailToggles_5093D.
+; ==============================================================================================
+Render_SkyAndSeaBackground_2D6FC		proc far
 
 var_AA		= dword ptr -0AAh
 var_A0		= dword ptr -0A0h
@@ -3260,7 +3278,7 @@ loc_2DC09:
 		push	ax
 		push	0
 		push	cs
-		call	near ptr sub_2CDA0
+		call	near ptr Render_WaterOrSkyPlane_2CDA0
 		add	sp, 0Ch
 
 loc_2DC34:
@@ -3314,7 +3332,7 @@ loc_2DC80:
 		push	ax
 		push	1
 		push	cs
-		call	near ptr sub_2CDA0
+		call	near ptr Render_WaterOrSkyPlane_2CDA0
 		add	sp, 0Ch
 
 loc_2DCA7:
@@ -3322,7 +3340,7 @@ loc_2DCA7:
 		pop	si
 		leave
 		retf
-sub_2D6FC		endp
+Render_SkyAndSeaBackground_2D6FC		endp
 
 ; ----------------------------------------------------------------------
 
